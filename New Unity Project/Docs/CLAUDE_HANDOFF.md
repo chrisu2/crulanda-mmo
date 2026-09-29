@@ -30,6 +30,15 @@ Chris's rules:
   - Khaven gloom and dusk, Peaks mountains, the grey Ash Rim, and the soft Wasting edge.
 
 **Next, in order:**
+0. **TOP PRIORITY BUG: you can't travel to the new zones.** Chris, 2026-09-29, playing the published build `76ed4eb`.
+   - Reproduce it first. Try each exit in Oakhaven (west road to Khaven, south road to the Ash Rim) and the others.
+   - Suspects, in order:
+     - Step 1's backdrop skirt, forest edge or boundary colliders keeping the player (a CharacterController, not a navmesh agent) out of the exit radius.
+     - E now picking a friend or target before the exit (`EncounterSession.Interact` / `TalkTarget` priority).
+     - The "not in combat" rule, or an ambush or camp near an exit keeping you in combat.
+     - Arrival points landing in blocked or unwalkable spots after the zone changes (the phantom-Wasting wall in Khaven and the Peaks was fixed on `main` in `191d9b8`).
+     - ZoneContentTests only path-checks exits on the navmesh.
+   - Add a PlayMode test that walks the player (the motor, not a teleport) into each exit and presses E, and checks that the zone changes.
 1. **Finish step 2:**
    1. `git merge wip/step2-fix-round`.
    2. Run `tools\validation\run_tests.ps1`, then `build_and_tour.ps1 -Zones zone.oakhaven, zone.khaven, zone.peaks, zone.ashrim`.

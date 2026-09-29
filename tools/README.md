@@ -19,6 +19,14 @@ From a terminal (PowerShell or cmd) in this folder:
 - The finished game goes to `...\Codex\2026-09-28\hel\outputs\Crulanda-Playable\Crulanda.exe`
   (left alone if the game is running at the time). Logs: `...\hel\work\test-builds\<time>`.
 
+## Backup
+`.\Backup.ps1` copies all of `D:\code\mmo` (project, docs, tools and the `.git` history) to
+`J:\claude\unity projects\mmo`.
+- It's additive: new and changed files are copied, and nothing in the backup is deleted.
+- By default it skips Unity's caches (Library, Temp, Logs). `-Full` includes them.
+- `-Mirror` makes the backup an exact copy.
+- Run it after committing. J: is slow, so a full copy takes about 10 minutes.
+
 ## Inside the Unity editor
 Menu **Crulanda > Test Build**: *Build Test Player*, *Build and Run Test Player*, *Run Last Test Player*.
 These build the project you have open (into `New Unity Project\Builds\Crulanda`).

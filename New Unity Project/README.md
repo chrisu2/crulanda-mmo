@@ -1,6 +1,8 @@
 # Crulanda — current development state
 
 Unity project: D:\code\mmo\New Unity Project (Unity 6000.6.3f1).
+Git repo: D:\code\mmo (branch main). Backup: J:\claude\unity projects\mmo (run ..\tools\Backup.ps1).
+Current state and every location: ..\CLAUDE.md and Docs/CLAUDE_HANDOFF.md (this README's status notes below are older).
 Playable scene: Assets/Crulanda/Scenes/PlayableEncounter.unity.
 Foundation-only scene: Assets/Crulanda/Scenes/Phase0_TestMap.unity.
 

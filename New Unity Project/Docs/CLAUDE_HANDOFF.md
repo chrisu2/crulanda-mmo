@@ -38,6 +38,15 @@ The user requested this handoff because they ran out of tokens. Do not assume an
   - They mirror Assets into the validation copy and run `ZoneSceneBuilder.BuildOakhaven`, which registers zones, quests and items.
   - `EncounterBuildPlayer.Build` now does the same before building.
 - **PowerShell gotcha:** never pass a single replacement pair as `@( @(a,b) )`. PowerShell flattens it, which corrupted two files once.
+- **Visual review:** 81 confirmed defects across the four zones, listed in `Docs/VISUAL_REVIEW_2026-09-29.md`. None are fixed yet. The main themes:
+  - The world's edge is visible past the exits.
+  - Night-facing sides render pure black.
+  - A grey slab sits under the bridge arches.
+  - Zone moods don't come through: Khaven isn't dusk or grey, Gloom Creek is chrome, the Peaks are grassy hills, and the Ash Rim is tan sand.
+  - Floating or clipping props.
+  - Landmarks that don't match their names.
+  - Speech bubbles and labels over the HUD.
+  - Capture-tour cameras stuck inside trees and walls.
 - **Open items:**
   - Quest rewards don't grant items yet.
   - Water doesn't receive shadows, and there is no underwater camera.
@@ -128,6 +137,18 @@ The all-class calculator from "IMMEDIATE UNFINISHED WORK" below now exists and w
 
 ## Exact locations
 
+- **Git repo (2026-09-29):**
+  - `D:\code\mmo` on branch `main`, first commit `72b4af7`. The repo root also holds `tools\` and `CLAUDE.md`.
+  - Never commit the game into the unrelated `D:\code` repo.
+  - Git is at `C:\Program Files\Git\cmd\git.exe` (not on PATH).
+  - Commit with `-c user.name=Chris -c user.email=chrisu2@gmail.com`, since no global identity is set.
+  - LFS is local to this repo.
+- **Backup:** `J:\claude\unity projects\mmo`, a full copy including `.git`.
+  - Run `D:\code\mmo\tools\Backup.ps1` after commits. It is additive; `-Full` includes Library, and `-Mirror` makes an exact copy.
+  - J: is slow (about 2 MB/s).
+- Lore: `D:\code\crulanda`
+- Chris's save: `C:\Users\chris\AppData\LocalLow\Crulanda\Crulanda - The Quiet Trail\CrulandaEncounter`. Save backups: workspace `work\save-backups`.
+- Screenshots: workspace `work\world-captures` and `work\ui-captures`.
 - Actual Unity project: `D:\code\mmo\New Unity Project`
 - Assets: `D:\code\mmo\New Unity Project\Assets`
 - Project docs: `D:\code\mmo\New Unity Project\Docs`
@@ -143,7 +164,8 @@ The all-class calculator from "IMMEDIATE UNFINISHED WORK" below now exists and w
 - Bundled Python: `C:\Users\chris\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe`
 - Bundled Node: `C:\Users\chris\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe`
 
-This session had full filesystem access and used PowerShell. No Git baseline/commits were established.
+This session had full filesystem access and used PowerShell. Since 2026-09-29 the project is under git (see above);
+earlier checkpoints are zip files in `work\checkpoints`.
 Do not overwrite or recreate the project or scene to update it. Preserve .meta GUIDs and user saves.
 
 ## User direction and feedback

@@ -54,7 +54,7 @@ namespace Crulanda.World
             if (art.grass != null && art.grass.Length > 0)
                 gameObject.AddComponent<GrassField>().Build(this, art.grass, art.flowers, Openness, Zone.seed + 99, Zone.biome == "meadow" ? 2.3f : 1.6f, TallGrassPatches());
             gameObject.AddComponent<FallingLeaves>().Init(this);
-            Splashes.Ensure(this);
+            Splashes.Ensure(this); TreeFade.Begin(art.fade);
             var view = Camera.main;
             if (view != null && art.post != null && view.GetComponent<ZonePost>() == null) view.gameObject.AddComponent<ZonePost>().Init(art.post, Zone, sunLight);
             try { StaticBatchingUtility.Combine(statics.gameObject); } catch (Exception e) { Debug.LogWarning("Static batching skipped: " + e.Message); }
@@ -645,7 +645,7 @@ namespace Crulanda.World
             }
             Branch(root, new Vector3(0, trunkH * .92f, 0), Vector3.up, trunkH * (girth > .6f ? .55f : .5f), trunkR * (girth > .6f ? .75f : .7f), depth, mat);
             var cap = root.gameObject.AddComponent<CapsuleCollider>(); cap.center = new Vector3(0, trunkH / 2, 0); cap.height = trunkH; cap.radius = trunkR;
-            root.gameObject.AddComponent<NavBlocker>();
+            root.gameObject.AddComponent<NavBlocker>(); root.gameObject.AddComponent<TreeFade>();
         }
         void Branch(Transform root, Vector3 start, Vector3 dir, float length, float radius, int depth, Material mat)
         {
@@ -698,7 +698,7 @@ namespace Crulanda.World
                 Lump(Canopy(), t, new Vector3(Mathf.Cos(a) * r, h + .9f + (i == 0 ? .8f : R01 * 1.2f), Mathf.Sin(a) * r), new Vector3(s, s * .85f, s), i % 3 == 1 ? leafLight : leaf, R01 * 360);
             }
             var cap = t.gameObject.AddComponent<CapsuleCollider>(); cap.center = new Vector3(0, h / 2, 0); cap.height = h; cap.radius = .35f;
-            t.gameObject.AddComponent<NavBlocker>();
+            t.gameObject.AddComponent<NavBlocker>(); t.gameObject.AddComponent<TreeFade>();
         }
         Mesh cone;
         void Pine(Transform t)
@@ -715,7 +715,7 @@ namespace Crulanda.World
                 float rad = (2.6f - i * .45f) * (h / 8); part.transform.localScale = new Vector3(rad, h * .34f, rad);
             }
             var cap = t.gameObject.AddComponent<CapsuleCollider>(); cap.center = new Vector3(0, 2, 0); cap.height = 4; cap.radius = .4f;
-            t.gameObject.AddComponent<NavBlocker>();
+            t.gameObject.AddComponent<NavBlocker>(); t.gameObject.AddComponent<TreeFade>();
         }
         void Fence(Transform t, float length)
         {
@@ -868,7 +868,9 @@ namespace Crulanda.World
         void Gallows(Transform t)
         {
             // The Gallows Tree: a leafless tree with a heavy limb, a rope and a wooden platform beneath.
-            DeadTree(Vector2.zero, .75f, Tint(art.bark, new Color(.2f, .17f, .15f)), 3, statics, t);
+            // The tree on its own child, so only the tree fades for the camera, not the platform and rope.
+            var tree = new GameObject("Gallows tree").transform; tree.SetParent(t, false);
+            DeadTree(Vector2.zero, .75f, Tint(art.bark, new Color(.2f, .17f, .15f)), 3, statics, tree);
             Part(PrimitiveType.Cylinder, t, new Vector3(1.6f, 3.6f, 0), new Vector3(.28f, 1.7f, .28f), art.bark, Quaternion.Euler(0, 0, 80));
             Part(PrimitiveType.Cylinder, t, new Vector3(2.8f, 2.7f, 0), new Vector3(.05f, .75f, .05f), Tint(art.cloth, new Color(.45f, .38f, .28f)));
             Part(PrimitiveType.Cube, t, new Vector3(2.8f, .5f, 0), new Vector3(2.4f, .15f, 2.4f), art.timber);
@@ -912,7 +914,7 @@ namespace Crulanda.World
                         var fruit = Tint(art.hay, new Color(.72f, .18f, .12f));
                         for (int k = 0; k < 6; k++) Part(PrimitiveType.Sphere, t, new Vector3(R01 * 2.4f - 1.2f, h + .2f + R01 * 1.4f, R01 * 2.4f - 1.2f), Vector3.one * .22f, fruit);
                         var cap = t.gameObject.AddComponent<CapsuleCollider>(); cap.center = new Vector3(0, h / 2, 0); cap.height = h; cap.radius = .3f;
-                        t.gameObject.AddComponent<NavBlocker>();
+                        t.gameObject.AddComponent<NavBlocker>(); t.gameObject.AddComponent<TreeFade>();
                     }
             foreach (var g in Zone.groves.Where(g => g.kind != "orchard"))
                 for (int i = 0; i < g.count; i++)

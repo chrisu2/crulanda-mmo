@@ -33,5 +33,7 @@ namespace Crulanda.World
         public Material splash;
         [Tooltip("Hidden/Crulanda/Post: bloom, sun shafts, tone map and grade (camera post-processing).")]
         public Material post;
+        [Tooltip("Crulanda/Fade: what a tree turns into while it blocks the camera's view of the player (TreeFade).")]
+        public Material fade;
     }
 }

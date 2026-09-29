@@ -32,6 +32,10 @@ Chris's instruction: **work in order of importance and finish each step before s
     - Past the Wasting side (east), the flat unmade ground ends in a hard straight horizon (Oakhaven, Khaven and the Ash Rim).
     - In the Peaks the backdrop is close and barely fogged (shots 02 and 03).
 - **Then:** step 3, props and landmarks; then step 4, HUD overlaps. See `Docs/VISUAL_REVIEW_2026-09-29.md`.
+- **Step 5, water realism pass 2.** Chris, 2026-09-29: "still looks plasticky and not real".
+  - Reflect the surroundings (banks and trees), not only the sky.
+  - Finer, layered ripples.
+  - Sparkle instead of broad uniform highlights.
 - **Helper scripts:** `D:\code\mmo	oolsalidation`.
   - `run_tests.ps1` mirrors Assets into the validation copy, registers content, then runs EditMode and PlayMode.
   - `build_and_tour.ps1 -Zones zone.oakhaven, zone.khaven, zone.peaks, zone.ashrim` builds and captures the world tour.

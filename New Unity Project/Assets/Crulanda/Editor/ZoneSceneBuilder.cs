@@ -218,6 +218,7 @@ namespace Crulanda.EditorTools
             if (art.ashFlake == null) { art.ashFlake = new Material(Shader.Find("Legacy Shaders/Particles/Alpha Blended")) { mainTexture = flakeTex, name = "Ash flake" }; AssetDatabase.CreateAsset(art.ashFlake, ArtRoot + "/Ash flake.mat"); }
             if (art.splash == null) { art.splash = new Material(Shader.Find("Legacy Shaders/Particles/Alpha Blended")) { mainTexture = mote, name = "Splash" }; AssetDatabase.CreateAsset(art.splash, ArtRoot + "/Splash.mat"); }
             if (art.post == null) { art.post = new Material(Shader.Find("Hidden/Crulanda/Post")) { name = "Post" }; AssetDatabase.CreateAsset(art.post, ArtRoot + "/Post.mat"); }
+            if (art.fade == null) { art.fade = new Material(Shader.Find("Crulanda/Fade")) { name = "Tree fade" }; AssetDatabase.CreateAsset(art.fade, ArtRoot + "/Tree fade.mat"); }
             // Grass and flowers sway in the wind (same textures and tints; the wind shader keeps instancing).
             var grassShader = Shader.Find("Crulanda/Grass");
             if (grassShader != null)

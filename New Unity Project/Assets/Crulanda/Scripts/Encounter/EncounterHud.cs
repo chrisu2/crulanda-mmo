@@ -429,6 +429,7 @@ namespace Crulanda.Encounter
             }
             GUI.contentColor = Color.white;
         }
+        GUIStyle plate;
         void DrawWorldLabels()
         {
             DrawPlaceAndPeopleLabels();
@@ -439,9 +440,22 @@ namespace Crulanda.Encounter
                 if (screen.z <= 0 || session.Distance(enemy) > 25) continue;
                 float x = screen.x * 1440 / Screen.width, y = (Screen.height - screen.y) * 900 / Screen.height;
                 if (y < 140 || y > 560) continue;
+                // Names are centred over the enemy, like the bar. Your target: a dark backing with a gold edge sized to its
+                // name (the ring on the ground marks it too).
+                if (plate == null) plate = new GUIStyle(small) { alignment = TextAnchor.UpperCenter, wordWrap = false };
+                string label = enemy.actor.Level + "  " + enemy.actor.DisplayName;
+                if (session.Target == enemy)
+                {
+                    float bw = Mathf.Max(146, plate.CalcSize(new GUIContent(label)).x + 16);
+                    var box = new Rect(x - bw / 2, y - 25, bw, 38);
+                    GUI.color = new Color(0, 0, 0, .5f); GUI.DrawTexture(box, Texture2D.whiteTexture);
+                    GUI.color = gold; foreach (var edge in new[] { new Rect(box.x, box.y, box.width, 1.5f), new Rect(box.x, box.yMax - 1.5f, box.width, 1.5f), new Rect(box.x, box.y, 1.5f, box.height), new Rect(box.xMax - 1.5f, box.y, 1.5f, box.height) })
+                        GUI.DrawTexture(edge, Texture2D.whiteTexture);
+                    GUI.color = Color.white;
+                }
                 // Level-coloured names (grey, green, yellow, orange, red by how the enemy compares to you).
                 GUI.contentColor = session.Target == enemy ? gold : ConColor(enemy.actor.Level);
-                GUI.Label(new Rect(x - 90, y - 25, 220, 27), enemy.actor.Level + "  " + enemy.actor.DisplayName, small);
+                GUI.Label(new Rect(x - 110, y - 25, 220, 27), label, plate);
                 Bar(new Rect(x - 65, y, 130, 6), enemy.actor.Health.Pool.Ratio, new Color(.8f,.3f,.25f), "");
             }
             GUI.contentColor = Color.white;

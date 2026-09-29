@@ -92,16 +92,20 @@ namespace Crulanda.Encounter
             if (view == null) return;
             var pivot = transform.position + Vector3.up * .6f;
             var rotation = Quaternion.Euler(pitch, yaw, 0);
-            // Camera collision: pull in toward the player when scenery (not characters) is in the way.
+            // Camera collision: pull in toward the player when scenery is in the way. Not characters, and not trees: the
+            // camera looks through a tree instead (it fades, below), so turning among trees doesn't yank the view in.
             float allowed = distance;
             foreach (var hit in Physics.SphereCastAll(pivot, .3f, -(rotation * Vector3.forward), distance, ~0, QueryTriggerInteraction.Ignore))
-                if (hit.collider.GetComponentInParent<Crulanda.Gameplay.Actor>() == null && hit.distance > .05f) allowed = Mathf.Min(allowed, hit.distance);
+                if (hit.collider.GetComponentInParent<Crulanda.Gameplay.Actor>() == null && hit.collider.GetComponentInParent<Crulanda.World.TreeFade>() == null && hit.distance > .05f)
+                    allowed = Mathf.Min(allowed, hit.distance);
             var camAt = pivot - rotation * Vector3.forward * Mathf.Max(1.2f, allowed);
             // Keep the camera above any water surface (no looking up at the water from underneath).
             var zone = Crulanda.World.ZoneBuilder.Active;
             if (zone != null && zone.WaterAt(new Vector2(camAt.x, camAt.z), out float s, out _) && camAt.y < s + .2f) camAt.y = s + .2f;
             view.transform.position = camAt;
             view.transform.rotation = rotation;
+            // Trees between the camera and you turn see-through.
+            Crulanda.World.TreeFade.UpdateAll(camAt, transform.position + Vector3.up * .7f, transform.position);
         }
         /// <summary>Orbit camera framing (capture tools and cutscene-style framing).</summary>
         public void SetView(float yawDegrees, float pitchDegrees, float zoom) { yaw = yawDegrees; pitch = Mathf.Clamp(pitchDegrees, 5, 85); distance = Mathf.Clamp(zoom, 2, 60); }

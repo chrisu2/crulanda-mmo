@@ -341,6 +341,25 @@ namespace Crulanda.Encounter
                     yield return new WaitForSeconds(.9f);
                     ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "99-ambush-sprung.png")); yield return new WaitForSeconds(.4f);
                 }
+                // Targeting: a camp enemy selected, with the ring under it and its nameplate boxed.
+                var mob = session.Enemies.Find(e => e != null && e.actor.IsAlive && !e.Hidden && e.persistentId != null && e.persistentId.StartsWith("mob."));
+                if (mob != null)
+                {
+                    var mp = mob.transform.position;
+                    motor.Teleport(zone.Ground(new Vector2(mp.x, mp.z - 5), 1.1f)); motor.SetView(0, 34, 7); session.Select(mob);
+                    yield return new WaitForSeconds(.6f);   // before it wanders or closes in
+                    ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "99-target-ring.png")); yield return new WaitForSeconds(.4f);
+                    session.Select(null);
+                }
+                // The camera among trees: stand just past a tree with the camera behind it; the tree fades instead of hiding you.
+                var tree = Crulanda.World.TreeFade.All.Find(t => t != null && new Vector2(t.transform.position.x, t.transform.position.z).magnitude < 90);
+                if (tree != null)
+                {
+                    var tp = tree.transform.position;
+                    motor.Teleport(zone.Ground(new Vector2(tp.x, tp.z + 3.5f), 1.1f)); motor.SetView(0, 12, 7);
+                    yield return new WaitForSeconds(1);
+                    ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "99-tree-fade.png")); yield return new WaitForSeconds(.4f);
+                }
             }
             EncounterHud.Hidden = false;
             Debug.Log("WORLD_CAPTURE_DONE"); Application.Quit(0);

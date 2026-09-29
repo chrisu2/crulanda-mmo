@@ -192,3 +192,15 @@ These fix the "water, edges, night" group of `Docs/VISUAL_REVIEW_2026-09-29.md`.
   - Grazing angles cost less light through the water.
   - Clear water has murk 0.8.
 - **Trees:** dead trees (the Great Oak and the grey husks) get a root flare, a broad swell with half-sunk buttress ridges, in place of five thin tilted cylinders that read as sticks laid round the base.
+
+## 2026-09-29 — Camera looks through trees; clear target confirmation (Chris's playtest)
+- **Trees fade instead of blocking the camera** (`World/TreeFade.cs`, `World/Shaders/Fade.shader`):
+  - Every tree (broadleaf, pine, orchard, dead tree, the gallows tree) fades while one of its parts actually hides you: the trunk, a leaf clump, a bough tier or a limb. It fades back about 0.25 s after the view clears.
+  - The fade is a screen-door dither with the same Standard lighting, so there is no brightness jump. Its shadow stays on the ground.
+  - Tree trunks no longer pull the camera in.
+  - Clicks pass through faded trees and through your own character.
+- **Target ring** (`Encounter/TargetRing.cs`): a ring on the ground under whatever is selected.
+  - Colours: red for a living enemy, gold for a body with loot (grey once looted), green for Mira or a villager.
+  - It pops on selection, breathes gently, and lies along sloped ground.
+  - The selected enemy's nameplate is boxed in gold, and all enemy nameplates are now centred.
+- The tour captures `99-target-ring` and `99-tree-fade`. New tests are in `CameraAndTargetTests` (PlayMode).

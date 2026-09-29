@@ -548,6 +548,7 @@ namespace Crulanda.Encounter
             var controller = Player.gameObject.AddComponent<CharacterController>(); controller.height = 2; controller.radius = .4f; controller.stepOffset = .35f;
             controller.minMoveDistance = 0;
             var motor = Player.gameObject.AddComponent<AdventurerMotor>(); motor.session = this; motor.view = View;
+            if (GetComponent<TargetRing>() == null) gameObject.AddComponent<TargetRing>().session = this;
             Player.gameObject.SetActive(true);
             playerStats = Player.gameObject.AddComponent<DerivedStatsController>();
             Inventory.Ensure(Progress);
@@ -712,8 +713,16 @@ namespace Crulanda.Encounter
             if (!BuildOpen && EncounterInput.Press(KeyCode.Tab)) CycleTarget();
             if (EncounterInput.Click && !EncounterHud.BlocksPointer(EncounterInput.Pointer))
             {
+                // Click through faded trees (you can see through them) and through yourself; the first thing left is what you hit.
                 EncounterEnemy enemy = null;
-                if (Physics.Raycast(View.ScreenPointToRay(EncounterInput.Pointer), out var hit, 100)) enemy = hit.collider.GetComponentInParent<EncounterEnemy>();
+                var hits = Physics.RaycastAll(View.ScreenPointToRay(EncounterInput.Pointer), 100, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+                System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+                foreach (var hit in hits)
+                {
+                    if (hit.collider.transform.IsChildOf(Player.transform)) continue;
+                    var tree = hit.collider.GetComponentInParent<Crulanda.World.TreeFade>(); if (tree != null && tree.Faded) continue;
+                    enemy = hit.collider.GetComponentInParent<EncounterEnemy>(); break;
+                }
                 if (enemy != null && enemy.Hidden) enemy = null;
                 if (enemy != null) Select(enemy);
                 else PickFriendly(EncounterInput.Pointer);
@@ -826,7 +835,9 @@ namespace Crulanda.Encounter
         }
         public const float TalkRange = 3.5f, DoorRange = 2.6f;
         public bool CompanionInReach { get { return Companion != null && Vector3.Distance(Player.transform.position, Companion.transform.position) < TalkRange; } }
-        EncounterEnemy LootableCorpse { get { return Enemies.Find(e => !e.actor.IsAlive && (e.Camp ? !e.Looted : !Progress.FindEnemy(e.persistentId).looted) && Distance(e) < 3.6f); } }
+        /// <summary>A body that still has something to take (camp mobs until looted; story enemies by their saved record).</summary>
+        public bool CanLoot(EncounterEnemy e) { return e != null && !e.actor.IsAlive && (e.Camp ? !e.Looted : !Progress.FindEnemy(e.persistentId).looted); }
+        EncounterEnemy LootableCorpse { get { return Enemies.Find(e => CanLoot(e) && Distance(e) < 3.6f); } }
         public Crulanda.World.ZoneDoor NearbyDoor
         {
             get

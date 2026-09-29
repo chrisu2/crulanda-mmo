@@ -43,7 +43,7 @@ namespace Crulanda.World
             var alpha = new Gradient(); alpha.SetKeys(new[] { new GradientColorKey(Color.white, 0), new GradientColorKey(Color.white, 1) }, new[] { new GradientAlphaKey(0, 0), new GradientAlphaKey(1, ash ? .03f : .1f), new GradientAlphaKey(1, .8f), new GradientAlphaKey(0, 1) });   // ash is born in view: a quick fade-in
             fade.color = alpha;
             var r = ps.GetComponent<ParticleSystemRenderer>(); r.sharedMaterial = mat; r.renderMode = ParticleSystemRenderMode.Billboard; r.alignment = ash ? ParticleSystemRenderSpace.View : ParticleSystemRenderSpace.Local;
-            if (ash) r.maxParticleSize = .025f;   // a flake passing the lens stays a flake, not a blot
+            if (ash) r.maxParticleSize = .011f;   // a flake passing the lens stays a small flake (~10 px), not a soft blot
             r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             emission = ps.emission; emission.rateOverTime = 0;
             ps.Play();

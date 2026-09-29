@@ -105,7 +105,10 @@ namespace Crulanda.Encounter
         {
             bool wolf = look == ActorLook.Wolf, boar = look == ActorLook.Boar;
             bool ash = variant % 2 == 1;
-            Color coat = wolf ? (ash ? new Color(.16f, .15f, .15f) : new Color(.45f, .41f, .36f)) : boar ? new Color(.33f, .24f, .18f) : new Color(.42f, .42f, .45f);
+            // Khaven's dusk (gloom): darker hides, or wolves and boars vanish into its pale earth and dry grass.
+            var zone = Crulanda.World.ZoneBuilder.Active; bool gloom = zone != null && zone.Zone != null && zone.Zone.biome == "gloom";
+            Color coat = wolf ? (ash ? new Color(.16f, .15f, .15f) : gloom ? new Color(.25f, .23f, .22f) : new Color(.45f, .41f, .36f))
+                : boar ? (gloom ? new Color(.19f, .14f, .11f) : new Color(.33f, .24f, .18f)) : new Color(.42f, .42f, .45f);
             var fur = Mat(coat); var dark = Mat(coat * .6f); var eye = Mat(wolf && !ash ? new Color(.9f, .75f, .3f) : new Color(1, .45f, .15f), .8f);
             if (!wolf && !boar) { eye = Mat(new Color(.75f, .45f, 1f), .9f); eye.EnableKeyword("_EMISSION"); eye.SetColor("_EmissionColor", new Color(.7f, .35f, 1f) * 2.2f); }
             else if (ash) { eye.EnableKeyword("_EMISSION"); eye.SetColor("_EmissionColor", new Color(1, .4f, .1f) * 2); }

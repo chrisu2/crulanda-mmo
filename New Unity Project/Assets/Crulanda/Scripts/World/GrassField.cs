@@ -16,8 +16,11 @@ namespace Crulanda.World
         readonly List<CellData> cells = new List<CellData>();
         Mesh tuft;
 
-        public void Build(ZoneBuilder zone, Material[] grass, Material[] flowers, System.Func<Vector2, float> openness, int seed, float density, List<(Vector2 center, float radius)> tall = null)
+        /// <summary>Bakes the tufts. Tall patches may use their own materials (<paramref name="tallGrass"/>), height and density scales.</summary>
+        public void Build(ZoneBuilder zone, Material[] grass, Material[] flowers, System.Func<Vector2, float> openness, int seed, float density, List<(Vector2 center, float radius)> tall = null,
+            Material[] tallGrass = null, float tallHeight = 1, float tallDensity = 1)
         {
+            if (tallGrass == null || tallGrass.Length == 0) tallGrass = grass;
             if (grass == null || grass.Length == 0) return;
             tuft = TuftMesh();
             var rng = new System.Random(seed);
@@ -44,7 +47,7 @@ namespace Crulanda.World
             if (tall != null)
                 foreach (var (center, radius) in tall)
                 {
-                    int n = Mathf.RoundToInt(Mathf.PI * radius * radius * 5);
+                    int n = Mathf.RoundToInt(Mathf.PI * radius * radius * 5 * tallDensity);
                     for (int i = 0; i < n; i++)
                     {
                         float a = (float)rng.NextDouble() * Mathf.PI * 2, r = Mathf.Sqrt((float)rng.NextDouble()) * radius;
@@ -53,9 +56,9 @@ namespace Crulanda.World
                         int cx = Mathf.Clamp((int)((p.x + half) / Cell), 0, perAxis - 1), cz = Mathf.Clamp((int)((p.y + half) / Cell), 0, perAxis - 1);
                         var cell = grid[cx, cz];
                         if (cell == null) { cell = grid[cx, cz] = new CellData { center = new Vector3(-half + (cx + .5f) * Cell, 0, -half + (cz + .5f) * Cell) }; cells.Add(cell); }
-                        var mat = grass[rng.Next(grass.Length)];
+                        var mat = tallGrass[rng.Next(tallGrass.Length)];
                         float s = 1.25f + (float)rng.NextDouble() * .7f;
-                        var m = Matrix4x4.TRS(zone.Ground(p, -.02f), Quaternion.Euler(0, (float)rng.NextDouble() * 360, 0), new Vector3(s, s * (1.3f + (float)rng.NextDouble() * .5f), s));
+                        var m = Matrix4x4.TRS(zone.Ground(p, -.02f), Quaternion.Euler(0, (float)rng.NextDouble() * 360, 0), new Vector3(s, s * (1.3f + (float)rng.NextDouble() * .5f) * tallHeight, s));
                         if (!cell.byMaterial.TryGetValue(mat, out var list)) cell.byMaterial[mat] = list = new List<Matrix4x4>();
                         list.Add(m);
                     }

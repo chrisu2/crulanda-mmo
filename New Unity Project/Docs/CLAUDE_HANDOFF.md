@@ -9,39 +9,52 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-09-29, about 13:10)
-Chris's instruction: **work in order of importance and finish each step before starting the next.**
-- **Step 1 is DONE: water, world edges and night.** It is published to `outputs\Crulanda-Playable`, and tests pass (EditMode 166/166, PlayMode 47/47).
-  - The water is now see-through (see the CHANGELOG): a GrabPass plus the depth texture, a clear bed, murk that deepens with depth, and thin touch-foam.
-    Creeks have a current, and wading or standing in water makes ripple rings.
-  - No black blotches: ripples flatten at grazing angles. Khaven's water is murky rather than tar-like.
-  - Backdrop pines have trunks, and the Peaks exit no longer faces a wall.
-  - The daytime grade is crisp again, and the shadow lift applies only at night.
-  - Dead trees have a root flare instead of sticks.
-  - Chris's feedback during this step: he wanted the water "more water-like, see-through, better physics", and "not to churn a lot of time on it".
-- **Small leftovers from step 1** (not blocking; fix only if Chris asks):
-  - At night the red barn wall is still nearly black, and window and lamp light reads neutral white rather than warm.
-  - The Oakhaven creek's outer edge is still fairly straight in the foreground, and Brook pond still reads as an oval.
-  - Khaven's creek has hot sun glints near the camera.
-- **Step 2 is next: zone looks.**
-  - Khaven dusk and a grey Whispering Wood.
-  - The Peaks as mountains, not grassy hills.
-  - The Ash Rim grey instead of tan sand, with visible falling ash and angular cracks instead of worm-trail squiggles.
-  - Reviewer notes that belong here:
-    - On the Ash Rim, distant trees and ruins vanish into, or look paler than, the backdrop hills, because the fog doesn't match. The edge also feels walled in.
-    - Past the Wasting side (east), the flat unmade ground ends in a hard straight horizon (Oakhaven, Khaven and the Ash Rim).
-    - In the Peaks the backdrop is close and barely fogged (shots 02 and 03).
-- **Then:** step 3, props and landmarks; then step 4, HUD overlaps. See `Docs/VISUAL_REVIEW_2026-09-29.md`.
-- **Step 5, water realism pass 2.** Chris, 2026-09-29: "still looks plasticky and not real".
-  - Reflect the surroundings (banks and trees), not only the sky.
-  - Finer, layered ripples.
-  - Sparkle instead of broad uniform highlights.
-- **Helper scripts:** `D:\code\mmo	oolsalidation`.
-  - `run_tests.ps1` mirrors Assets into the validation copy, registers content, then runs EditMode and PlayMode.
-  - `build_and_tour.ps1 -Zones zone.oakhaven, zone.khaven, zone.peaks, zone.ashrim` builds and captures the world tour.
-  - Check the build log for `Shader error`: a broken shader still "builds" and silently falls back.
-  - The water material is regenerated on every validation build, so shader defaults apply.
-  - Archive `work\world-captures` before each new tour.
+## RESUME HERE (session paused 2026-09-29, about 15:30, until Chris's tokens reset)
+Chris's rules:
+- Work in order of importance and finish each step.
+- Keep going without waiting for him, using parallel agents (memory: crulanda-autonomy).
+- Tell him when step 2 is published.
+
+**Git state:**
+- `main` = `191d9b8`: step 2, tested (EditMode 166/166, PlayMode 49/49). Not published yet.
+- Branch `wip/step2-fix-round` = `b178580`: the fixes for the 7 confirmed step-2 problems. UNTESTED: a reviewer found no compile errors, but nothing has run in Unity.
+- The published build (`outputs\Crulanda-Playable`) is `76ed4eb`: step 1 plus the tree fade and target ring.
+
+**Done today:**
+- **Step 1:** water, world edges and night.
+- **Camera and targeting:**
+  - Trees fade when they block the view.
+  - The target ring and boxed nameplate.
+- **Step 2, zone looks:**
+  - The phantom Wasting wall fixed.
+  - Khaven gloom and dusk, Peaks mountains, the grey Ash Rim, and the soft Wasting edge.
+
+**Next, in order:**
+1. **Finish step 2:**
+   1. `git merge wip/step2-fix-round`.
+   2. Run `tools\validation\run_tests.ps1`, then `build_and_tour.ps1 -Zones zone.oakhaven, zone.khaven, zone.peaks, zone.ashrim`.
+   3. Check the build log for `Shader error`.
+   4. Verify the shots against the 7 problems:
+      - Khaven roads visible, boars visible in the grass;
+      - Peaks pines seated, rock not pale;
+      - Ash Rim cracks thin;
+      - the curtain has no seam and no night smears.
+   5. Commit, then publish: robocopy `work\encounter-validation\Builds\Crulanda` to `outputs\Crulanda-Playable` if Crulanda.exe isn't running.
+   6. Back up and **tell Chris step 2 is published**.
+   - Minor step-2 notes not yet addressed: Khaven reads one hue (rose) with no orange-versus-violet split; its leafy trees are grey puffs; the HUD clock shows day in permanent dusk; the Ash Rim's far trees are paler than the backdrop; the Peaks' far distance is a bit milky.
+2. **Step 3, props, landmarks and creatures:** patches are ready in `tools\pending-patches\step3-props-landmarks-creatures.json` (see its README).
+   - Floating props; the Pale's floating head; the Weave-Eater remodelled to canon (a drifting thread-mass, not a dog).
+   - Oakhaven, Khaven, Peaks and Ash landmarks that match their names.
+   - Tour framing.
+   - Expect some skipped edits, because step 2 changed `ZoneBuilder` after these were written; merge those by hand.
+3. **Step 4, HUD overlaps and readability:** `tools\pending-patches\step4-hud.json`.
+4. **Step 5, water realism** (Chris: "still looks plasticky"): `tools\pending-patches\step5-water-realism.json`.
+   - A planar reflection camera (`WaterReflection.cs` is in `newFiles`), plus finer ripples and sparkle.
+
+**Helper scripts** (`D:\code\mmo\tools\validation`):
+- `run_tests.ps1`.
+- `build_and_tour.ps1`: now skips the tour if the build fails, and waits 420 s per zone because the machine is slow under load.
+- Archive `work\world-captures` before each tour.
 
 ## UPDATE 2026-09-29 (Claude session) — zones 1-10, camps, items, water, graphics
 - **Decision by Chris:** the level cap stays at 10 for now.

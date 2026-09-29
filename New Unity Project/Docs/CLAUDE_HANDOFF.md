@@ -47,6 +47,9 @@ Chris's rules:
    - Oakhaven, Khaven, Peaks and Ash landmarks that match their names.
    - Tour framing.
    - Expect some skipped edits, because step 2 changed `ZoneBuilder` after these were written; merge those by hand.
+   - **Also in step 3** (Chris, playtest screenshot, 2026-09-29): the broadleaf and orchard tree trunks "look bad". They are plain grey pipes.
+     - `ZoneBuilder.Broadleaf` adds a wider base cylinder (`h * .08`) that reads as a pipe collar.
+     - Fix: tapered trunks; a root flare like DeadTree's (a swell plus half-sunk buttress ridges) instead of the collar; bark colour variation; a slight lean; limbs that join the trunk.
 3. **Step 4, HUD overlaps and readability:** `tools\pending-patches\step4-hud.json`.
 4. **Step 5, water realism** (Chris: "still looks plasticky"): `tools\pending-patches\step5-water-realism.json`.
    - A planar reflection camera (`WaterReflection.cs` is in `newFiles`), plus finer ripples and sparkle.

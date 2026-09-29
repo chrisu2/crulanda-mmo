@@ -74,7 +74,9 @@ namespace Crulanda.World
         }
         void Build(Material mat)
         {
-            spray = Make("Splash spray", mat, false); rings = Make("Ripple rings", mat, true);
+            spray = Make("Splash spray", mat, false);
+            // Rings need a ring sprite: with the spray's soft dot they drew as flat white discs on the water.
+            rings = Make("Ripple rings", new Material(mat) { name = "Ripple ring", mainTexture = RingTexture() }, true);
         }
         ParticleSystem Make(string name, Material mat, bool ring)
         {
@@ -94,6 +96,21 @@ namespace Crulanda.World
             if (ring) { r.renderMode = ParticleSystemRenderMode.HorizontalBillboard; }
             return ps;
         }
+        /// <summary>A thin bright ring on a transparent square (built once per zone at load).</summary>
+        static Texture2D RingTexture()
+        {
+            const int n = 64; var t = new Texture2D(n, n, TextureFormat.RGBA32, false) { name = "Ripple ring", wrapMode = TextureWrapMode.Clamp };
+            var px = new Color32[n * n];
+            for (int y = 0, i = 0; y < n; y++)
+                for (int x = 0; x < n; x++, i++)
+                {
+                    float r = new Vector2(x + .5f - n / 2f, y + .5f - n / 2f).magnitude / (n / 2f);
+                    float a = Mathf.Clamp01(1 - Mathf.Abs(r - .8f) / .1f); px[i] = new Color32(255, 255, 255, (byte)(a * a * 255));
+                }
+            t.SetPixels32(px); t.Apply(false, true); return t;
+        }
+        /// <summary>Just a ripple ring (standing or treading water), <paramref name="size"/> metres across to start.</summary>
+        public void Ring(Vector3 surfacePoint, float size) { rings.Emit(new ParticleSystem.EmitParams { position = surfacePoint + Vector3.up * .03f, startSize = size }, 1); }
         /// <summary>A splash of <paramref name="drops"/> droplets and a ripple ring at a surface point.</summary>
         public void At(Vector3 surfacePoint, int drops)
         {

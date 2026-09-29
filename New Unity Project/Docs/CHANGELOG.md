@@ -171,3 +171,24 @@ These fix the "water, edges, night" group of `Docs/VISUAL_REVIEW_2026-09-29.md`.
   - The post contrast curve gets a soft toe below mid-grey, so shadows deepen without clipping to pure black.
   - The Great Oak's bark is paler.
 - Tests: EditMode 166/166, PlayMode 47/47. `WaterTests` now checks each creek row at its own width, and lakes along their irregular edge.
+
+## 2026-09-29 — See-through water, currents and ripples (Chris: "more water-like, more see-through, better physics")
+- **Water shader:**
+  - A named GrabPass plus the camera depth texture: the bed and anything underwater show through shallow water, bent slightly by the ripples.
+  - The water fades into its own colour with the depth the view crosses (`_Murk` per metre).
+  - The water's own colour is lit by ambient plus sun or moon, so it darkens at night.
+  - Foam is thin and broken, and appears only where the water touches something: banks, legs, posts. There are no more foam bands, wedges or blotches.
+  - The zone map (an orthographic camera) shows plain water colour.
+- Murky zone water (`waterReflect`) is also harder to see into and calmer (Khaven: murk 2.6, ripples x0.55), so it no longer reads as tar.
+- **Currents:** creeks push you gently downstream (`ZoneWater.FlowAt`). The push is strongest mid-channel and in deeper water, and weak enough that you can always wade across.
+- **Ripples:**
+  - Ripple rings now use a real ring sprite (they drew as white discs).
+  - Standing or treading water sends out slow rings.
+- **Backdrop:** pines have bark trunks under lifted boughs. Mountain backdrops climb more gently near the edge, so the Peaks exit no longer faces a fog wall.
+- **Grade:** daytime keeps the original crisp contrast. The shadow lift (a power toe) now fades in only with darkness (`_Lift`).
+- **Clear water, no black blotches** (Chris: "still looks dark and not clear"):
+  - Ripples flatten at grazing angles and in the distance.
+  - Below-horizon reflections keep 45% instead of going black.
+  - Grazing angles cost less light through the water.
+  - Clear water has murk 0.8.
+- **Trees:** dead trees (the Great Oak and the grey husks) get a root flare, a broad swell with half-sunk buttress ridges, in place of five thin tilted cylinders that read as sticks laid round the base.

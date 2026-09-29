@@ -48,6 +48,9 @@ namespace Crulanda.Encounter
             Sneaking = EncounterInput.Sneak && !Swimming;
             float wade = inWater ? Mathf.Lerp(1, .6f, Mathf.Clamp01(depth / 1.3f)) : 1;
             float speed = 5.2f * session.Kit.MoveSpeedMultiplier * (Swimming ? .55f : wade) * (Sneaking ? .5f : 1);
+            // Creek current: a gentle push downstream, strongest mid-channel and in deeper water (you can always wade across).
+            var flow = inWater ? zone.FlowAt(new Vector2(here.x, here.z)) : Vector2.zero;
+            var current = new Vector3(flow.x, 0, flow.y) * (Swimming ? 1.2f : .9f * Mathf.Clamp01(depth / .8f));
             if (Swimming)
             {
                 // Float: a damped spring toward riding just under the surface (head and shoulders out). A fall carries
@@ -64,7 +67,7 @@ namespace Crulanda.Encounter
             else vertical -= 20 * Time.deltaTime;
             Moving = direction.sqrMagnitude > .01f || vertical > .5f;
             float fallSpeed = -vertical;
-            controller.Move((direction * speed + Vector3.up * vertical) * Time.deltaTime);
+            controller.Move((direction * speed + current + Vector3.up * vertical) * Time.deltaTime);
             // Splashes: entering scales with how hard you hit the water (and waits 0.4 s after leaving it), then
             // strokes or wading ripples while moving.
             if (inWater && Crulanda.World.Splashes.Active != null)
@@ -76,13 +79,15 @@ namespace Crulanda.Encounter
                     Crulanda.World.Splashes.Active.At(at, Mathf.RoundToInt(Mathf.Lerp(3, 18, Mathf.InverseLerp(1, 8, impact))));
                 }
                 else if (Time.time >= nextSplash && direction.sqrMagnitude > .01f) { nextSplash = Time.time + (Swimming ? .45f : .32f); Crulanda.World.Splashes.Active.At(at + direction * .5f, Swimming ? 6 : 3); }
+                else if (Time.time >= nextSplash) { nextSplash = Time.time + (Swimming ? .9f : 1.4f); Crulanda.World.Splashes.Active.Ring(at, Swimming ? .7f : .45f); }   // still: slow rings
             }
             if (wasInWater && !inWater) leftWater = Time.time;
             wasInWater = inWater;
             if (direction.sqrMagnitude > .01f) transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime * 12);
             var p = transform.position;
             if (p.y < -5 && !(wet && p.y > surface - 12)) Teleport(session.RecoveryPoint);
-        }        void LateUpdate()
+        }
+        void LateUpdate()
         {
             if (view == null) return;
             var pivot = transform.position + Vector3.up * .6f;

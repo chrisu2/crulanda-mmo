@@ -170,7 +170,7 @@ namespace Crulanda.World
             RenderSettings.fogColor = ZoneColors.Parse(l.fogColor, Color.grey); RenderSettings.fogStartDistance = l.fogStart; RenderSettings.fogEndDistance = l.fogEnd;
             if (art.skybox != null) { RenderSettings.skybox = art.skybox; RenderSettings.sun = sun; }
             var cam = Camera.main;
-            if (cam != null) { cam.clearFlags = art.skybox != null ? CameraClearFlags.Skybox : CameraClearFlags.SolidColor; cam.backgroundColor = RenderSettings.fogColor; cam.farClipPlane = Mathf.Max(cam.farClipPlane, (Half + BackdropWidth) * 2.9f); }
+            if (cam != null) { cam.clearFlags = art.skybox != null ? CameraClearFlags.Skybox : CameraClearFlags.SolidColor; cam.backgroundColor = RenderSettings.fogColor; cam.depthTextureMode |= DepthTextureMode.Depth; cam.farClipPlane = Mathf.Max(cam.farClipPlane, (Half + BackdropWidth) * 2.9f); }
         }
 
         // ---------- ground ----------
@@ -310,11 +310,17 @@ namespace Crulanda.World
             // The tint only colours the (premultiplied) body under the sky reflection: murky water also reflects less sky
             // face-on and glints less, or the untinted sky is all you see (Gloom Creek read as chrome).
             if (Zone.waterReflect > 0 && m.HasProperty("_Reflect"))
-            { float r = Mathf.Clamp01(Zone.waterReflect); m.SetFloat("_Reflect", r); m.SetFloat("_Glare", m.GetFloat("_Glare") * (.6f + .4f * r)); }
+            {
+                // Murky water is also harder to see into and calmer-looking (big ripples on dark water read as tar).
+                float r = Mathf.Clamp01(Zone.waterReflect); m.SetFloat("_Reflect", r); m.SetFloat("_Glare", m.GetFloat("_Glare") * (.6f + .4f * r));
+                if (m.HasProperty("_Murk")) { m.SetFloat("_Murk", Mathf.Lerp(3.2f, 1.2f, r)); m.SetFloat("_Bump", m.GetFloat("_Bump") * .55f); }
+            }
             return m;
         }
         /// <summary>Water at a point: its surface height and how deep it is over the ground there. False on dry land.</summary>
         public bool WaterAt(Vector2 p, out float surface, out float depth) { surface = depth = 0; return Water != null && Water.At(p, HeightAt(p.x, p.y), out surface, out depth); }
+        /// <summary>Creek current at a point (downstream, 1 mid-channel fading to 0 at the banks); zero on lakes and land.</summary>
+        public Vector2 FlowAt(Vector2 p) { return Water != null ? Water.FlowAt(p) : Vector2.zero; }
         void BuildWater()
         {
             var waterMat = WaterMaterial();
@@ -629,11 +635,13 @@ namespace Crulanda.World
             if (girth < 0) girth = existing != null && depth >= 5 ? .9f : .38f;
             float trunkH = (girth > .6f ? 4.2f : 5.2f) * scale, trunkR = girth * scale;
             Part(PrimitiveType.Cylinder, root, new Vector3(0, trunkH / 2, 0), new Vector3(trunkR * 2, trunkH / 2, trunkR * 2), mat);
-            // Flared roots.
+            // Root flare: a broad swell at the foot of the trunk and low buttress ridges running out and down into the soil
+            // (long, half-sunk spheres). Thin tilted cylinders here read as sticks laid round the tree.
+            Part(PrimitiveType.Sphere, root, new Vector3(0, .1f * scale, 0), new Vector3(trunkR * 2.9f, .9f * scale, trunkR * 2.9f), mat);
             for (int i = 0; i < 5; i++)
             {
-                float a = i * 72 + R01 * 20;
-                Part(PrimitiveType.Cylinder, root, Quaternion.Euler(0, a, 0) * new Vector3(0, .25f * scale, trunkR * .9f), new Vector3(trunkR * .7f, .9f * scale, trunkR * .7f), mat, Quaternion.Euler(0, a, 0) * Quaternion.Euler(68, 0, 0));
+                var outward = Quaternion.Euler(0, i * 72 + R01 * 20, 0);
+                Part(PrimitiveType.Sphere, root, outward * new Vector3(0, .05f * scale, trunkR * 1.3f), new Vector3(trunkR * .9f, .55f * scale, trunkR * 2.4f), mat, outward * Quaternion.Euler(12, 0, 0));
             }
             Branch(root, new Vector3(0, trunkH * .92f, 0), Vector3.up, trunkH * (girth > .6f ? .55f : .5f), trunkR * (girth > .6f ? .75f : .7f), depth, mat);
             var cap = root.gameObject.AddComponent<CapsuleCollider>(); cap.center = new Vector3(0, trunkH / 2, 0); cap.height = trunkH; cap.radius = trunkR;
@@ -1289,7 +1297,7 @@ namespace Crulanda.World
         {
             var root = new GameObject("Backdrop").transform; root.SetParent(transform, false);
             bool mountain = Zone.biome == "mountain", ash = Zone.biome == "ash";
-            float rise = mountain ? 70 : ash ? 42 : 32;
+            float rise = mountain ? 58 : ash ? 42 : 32;
             // Valleys: the mirror image of the last 45 m of each road that leaves the zone (where its mirrored paint runs).
             var valleys = new List<Vector2[]>();
             foreach (var road in Zone.roads)
@@ -1314,7 +1322,9 @@ namespace Crulanda.World
                 float d = Mathf.Max(Mathf.Abs(x), Mathf.Abs(z)) - Half; if (d <= 0) return 0;
                 float n = Mathf.PerlinNoise(x * .011f + 300, z * .011f + Zone.seed % 500), m = Mathf.PerlinNoise(x * .045f + 80, z * .045f + 30);
                 if (mountain) n = 1 - Mathf.Abs(n * 2 - 1);   // ridged: peaks and cols, not rolling hills
-                float h = rise * (.5f + .5f * n + (m - .5f) * (mountain ? .4f : .15f)) * Mathf.SmoothStep(0, 1, d / (BackdropWidth * .8f));
+                // Mountains start their climb more gently, so an exit near the edge doesn't face a fog-grey wall.
+                float ramp = Mathf.SmoothStep(0, 1, d / (BackdropWidth * .8f)); if (mountain) ramp *= ramp;
+                float h = rise * (.5f + .5f * n + (m - .5f) * (mountain ? .4f : .15f)) * ramp;
                 var at = new Vector2(x, z);
                 foreach (var v in valleys) h *= Mathf.Lerp(.5f, 1, Mathf.Clamp01((DistanceToPath(at, v) - 6) / 20));
                 if (Zone.wasting != null) h *= Mathf.Clamp01((Zone.wasting.x + 2 - x) / 40);   // hills fall away to the unmade, which stays flat
@@ -1371,8 +1381,10 @@ namespace Crulanda.World
                         }
                         else if (pick < dead + pines)
                         {
-                            Put(side, spire, pineMat, at + Vector3.up * .5f, Quaternion.Euler(0, yaw, 0), new Vector3(th * .3f, th * .62f, th * .3f));
-                            Put(side, spire, pineMat, at + Vector3.up * (.5f + th * .4f), Quaternion.Euler(0, yaw + 30, 0), new Vector3(th * .2f, th * .6f, th * .2f));
+                            // A bark trunk under lifted boughs, so a pine on a slope stands on it rather than hovering on a flat cone base.
+                            Put(side, spire, art.bark, at, Quaternion.identity, new Vector3(.4f, th * .5f, .4f));
+                            Put(side, spire, pineMat, at + Vector3.up * (1 + th * .16f), Quaternion.Euler(0, yaw, 0), new Vector3(th * .26f, th * .6f, th * .26f));
+                            Put(side, spire, pineMat, at + Vector3.up * (1 + th * .52f), Quaternion.Euler(0, yaw + 30, 0), new Vector3(th * .18f, th * .56f, th * .18f));
                         }
                         else
                         {

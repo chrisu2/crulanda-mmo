@@ -100,14 +100,23 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
 - **Navmesh:** wading water is area 3 (cost 6), so agents prefer bridges. Swim-depth water is not walkable. Bridges are seated
   above both banks and clear the water.
 - **Rendering (`World/Shaders/Water.shader`):**
-  - A premultiplied transparent surface with its own lighting (`LightingWater`, which wraps Standard).
+  - The water is see-through. A named GrabPass (`_WaterBackground`) and the camera depth texture (turned on by ZoneBuilder)
+    show the bed through shallow water, refracted by the ripples (`_Refract`).
+  - It fades to the lit water colour with the metres of water the view crosses (`_Murk`).
+  - The surface writes the composite opaquely (`finalcolor`), and is lit by `LightingWater`, which wraps Standard.
+  - The zone map (orthographic) shows plain water colour.
   - Sky reflection is `_Reflect` face-on, rising to full at grazing. It fades where a reflection would dip under the horizon, and highlights are capped at `_Glare`.
   - Zone `waterReflect` (0..1) overrides `_Reflect`. Murky water uses about 0.3 (Khaven 0.3); unset keeps the default 0.7.
   - Ripple normals scroll downstream along creeks.
-  - Foam is a noise-broken line at the waterline, and there is a small swell that fades toward the shore.
+  - Foam is thin and noise-broken, and appears only where the depth texture says the water touches something (banks, legs, posts).
+  - There is a small swell that fades toward the shore.
   - It reflects a realtime sky-only probe (`WorldClock.Reflections`, re-rendered every 2 s). The probe's intensity dims at night.
   - The project is in **Gamma** colour space. Keep that in mind for any lighting maths.
 - While swimming, weapons and shields are slung on the back.
+- **Current:** `ZoneWater.FlowAt` gives the downstream direction times a strength (1 mid-channel, 0 at the edge).
+  The motor adds it: up to 0.9 m/s wading (scaled by depth) and 1.2 m/s swimming. Lakes are still.
+- **Ripples** (`NatureFx.Splashes`: `At` for a splash, `Ring` for a ring alone): moving in water throws small splashes, and
+  standing or treading water sends slow rings.
 - Critters, crows and trees are kept out of the water.
 - Tests: `WaterTests` (drawn/carved/felt agreement in every zone; bridges; wading and swimming; saving while swimming).
 
@@ -124,7 +133,9 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
 
 ## Night
 - Moonlit ambient floor: sky, equator and ground are roughly double the old values, the moon is at 0.26, the fog is a dark blue haze, and the sky exposure stays at 0.3.
-- `Post.shader` contrast is linear above mid-grey, with a power toe below it. Shadows deepen without clipping to black.
+- `Post.shader` contrast is linear above mid-grey.
+  - By day there is only a small quadratic toe where the line would clip, so the day look stays crisp.
+  - With darkness (`_Lift`), it blends to a power toe that lifts the darks, so shadows never go pure black.
 
 ## Nature and post-processing
 - Grass (`Grass.shader`): instanced with wind sway, density 2.3 in meadows. `tallGrass` patches hide ambushers.

@@ -8,7 +8,7 @@ Shader "Hidden/Crulanda/Post"
     #include "UnityCG.cginc"
     sampler2D _MainTex; float4 _MainTex_TexelSize;
     sampler2D _Bloom; sampler2D _Shafts;
-    float _Threshold, _Knee, _BloomIntensity, _ShaftIntensity, _Exposure, _Contrast, _Saturation, _Vignette;
+    float _Threshold, _Knee, _BloomIntensity, _ShaftIntensity, _Exposure, _Contrast, _Saturation, _Vignette, _Lift;
     float4 _Tint, _SunScreen;
     struct v2f { float4 pos : SV_POSITION; float2 uv : TEXCOORD0; };
     v2f vert(appdata_img v) { v2f o; o.pos = UnityObjectToClipPos(v.vertex); o.uv = v.texcoord; return o; }
@@ -50,8 +50,14 @@ Shader "Hidden/Crulanda/Post"
         c = ACES(c * _Exposure);
         half l = dot(c, half3(0.2126, 0.7152, 0.0722));
         c = lerp(l.xxx, c, _Saturation);
-        // Contrast about mid-grey: linear above it, a power toe below it (same slope at 0.5), so shadows deepen but never clip to black.
-        c = c > 0.5 ? (c - 0.5) * _Contrast + 0.5 : 0.5 * pow(max(c * 2, 1e-4), _Contrast);
+        // Contrast about mid-grey. By day: the straight line, with a small quadratic toe only where it would clip to black
+        // (shadows stay crisp and saturated). Toward night (_Lift = darkness): a power toe that lifts the darks, so faces
+        // turned from the moon stay readable. Both match the line above mid-grey.
+        float c0 = 0.5 - 0.5 / max(_Contrast, 1.0001);
+        half3 lin = (c - 0.5) * _Contrast + 0.5;
+        half3 dayC = c < 2 * c0 ? _Contrast * c * c / (4 * c0) : lin;
+        half3 nightC = c > 0.5 ? lin : 0.5 * pow(max(c * 2, 1e-4), _Contrast);
+        c = lerp(dayC, nightC, _Lift);
         c = saturate(c) * _Tint.rgb;
         float2 v = i.uv - 0.5; c *= saturate(1 - dot(v, v) * _Vignette);
         return half4(c, 1);

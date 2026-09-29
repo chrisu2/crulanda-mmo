@@ -175,6 +175,26 @@ namespace Crulanda.World
             }
             return false;
         }
+        /// <summary>
+        /// Creek current at a point: the downstream direction (creek points run source first) times a strength of 1 in
+        /// mid-channel, falling to 0 at the drawn edge. Lakes are still.
+        /// </summary>
+        public Vector2 FlowAt(Vector2 p)
+        {
+            foreach (var c in Creeks)
+            {
+                if (c.drawHalf <= 0 || !c.box.Contains(p)) continue;
+                float best = float.MaxValue, half = 1; Vector2 dir = Vector2.zero;
+                for (int i = 0; i + 1 < c.pts.Length; i++)
+                {
+                    Vector2 a = c.pts[i], ab = c.pts[i + 1] - a;
+                    float t = Mathf.Clamp01(Vector2.Dot(p - a, ab) / Mathf.Max(.0001f, ab.sqrMagnitude)), d = Vector2.Distance(p, a + ab * t);
+                    if (d < best) { best = d; dir = ab.normalized; half = c.DrawHalf(Mathf.Lerp(c.wide[i], c.wide[i + 1], t)); }
+                }
+                if (best < half) { float x = best / half; return dir * (1 - x * x); }
+            }
+            return Vector2.zero;
+        }
         public bool NearWater(Vector2 p, float margin)
         {
             foreach (var k in Lakes) { var off = p - k.def.center; if (off.magnitude < k.RadiusAt(off) + margin) return true; }

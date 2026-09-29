@@ -9,24 +9,35 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (session ended 2026-09-29, about 03:30)
-- **Done and committed:** `c4a8967` fixes the "water, edges, night" group of `Docs/VISUAL_REVIEW_2026-09-29.md`:
-  - the bridge slab, chrome Gloom Creek, the foam ring, the irregular pond shore, meandering creeks, the sawtooth bank, the mill wheel, and the sword while swimming;
-  - the backdrop past the zone edges;
-  - the night ambient.
-  - The CHANGELOG and WORLD_ZONES describe it.
-  - Tests: EditMode 166/166, PlayMode 47/47. The player build succeeded.
-- **Not done:**
-  - **Visual verification.** The new tour is in `work\world-captures`, and the before shots are in `work\world-captures\archive-20260929-pre-water-fix`. A before/after review was started but stopped at bedtime; re-run it first.
-  - The new build is **not published**. `outputs\Crulanda-Playable` still holds the earlier build, and the new one is in `work\encounter-validation\Builds\Crulanda`. Publish it once the shots look right, after checking that Crulanda.exe isn't running.
-- **Helper scripts:** `D:\code\mmo\tools\validation`.
+## RESUME HERE (updated 2026-09-29, about 13:10)
+Chris's instruction: **work in order of importance and finish each step before starting the next.**
+- **Step 1 is DONE: water, world edges and night.** It is published to `outputs\Crulanda-Playable`, and tests pass (EditMode 166/166, PlayMode 47/47).
+  - The water is now see-through (see the CHANGELOG): a GrabPass plus the depth texture, a clear bed, murk that deepens with depth, and thin touch-foam.
+    Creeks have a current, and wading or standing in water makes ripple rings.
+  - No black blotches: ripples flatten at grazing angles. Khaven's water is murky rather than tar-like.
+  - Backdrop pines have trunks, and the Peaks exit no longer faces a wall.
+  - The daytime grade is crisp again, and the shadow lift applies only at night.
+  - Dead trees have a root flare instead of sticks.
+  - Chris's feedback during this step: he wanted the water "more water-like, see-through, better physics", and "not to churn a lot of time on it".
+- **Small leftovers from step 1** (not blocking; fix only if Chris asks):
+  - At night the red barn wall is still nearly black, and window and lamp light reads neutral white rather than warm.
+  - The Oakhaven creek's outer edge is still fairly straight in the foreground, and Brook pond still reads as an oval.
+  - Khaven's creek has hot sun glints near the camera.
+- **Step 2 is next: zone looks.**
+  - Khaven dusk and a grey Whispering Wood.
+  - The Peaks as mountains, not grassy hills.
+  - The Ash Rim grey instead of tan sand, with visible falling ash and angular cracks instead of worm-trail squiggles.
+  - Reviewer notes that belong here:
+    - On the Ash Rim, distant trees and ruins vanish into, or look paler than, the backdrop hills, because the fog doesn't match. The edge also feels walled in.
+    - Past the Wasting side (east), the flat unmade ground ends in a hard straight horizon (Oakhaven, Khaven and the Ash Rim).
+    - In the Peaks the backdrop is close and barely fogged (shots 02 and 03).
+- **Then:** step 3, props and landmarks; then step 4, HUD overlaps. See `Docs/VISUAL_REVIEW_2026-09-29.md`.
+- **Helper scripts:** `D:\code\mmo	oolsalidation`.
   - `run_tests.ps1` mirrors Assets into the validation copy, registers content, then runs EditMode and PlayMode.
-  - `build_and_tour.ps1 -Zones ...` builds and captures the world tour.
-- **Next, in the order Chris chose:**
-  1. Verify and polish water, edges and night.
-  2. Zone looks: Khaven dusk and grey wood, Peaks mountains, grey Ash Rim and visible falling ash.
-  3. Props and landmarks: floating props, the white NPCs with floating heads in the Peaks, landmarks that match their names.
-  4. HUD overlaps.
+  - `build_and_tour.ps1 -Zones zone.oakhaven, zone.khaven, zone.peaks, zone.ashrim` builds and captures the world tour.
+  - Check the build log for `Shader error`: a broken shader still "builds" and silently falls back.
+  - The water material is regenerated on every validation build, so shader defaults apply.
+  - Archive `work\world-captures` before each new tour.
 
 ## UPDATE 2026-09-29 (Claude session) — zones 1-10, camps, items, water, graphics
 - **Decision by Chris:** the level cap stays at 10 for now.

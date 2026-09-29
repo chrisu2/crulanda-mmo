@@ -41,7 +41,7 @@ namespace Crulanda.World
             mat.SetFloat("_Threshold", Mathf.Lerp(g.threshold, .55f, dark)); mat.SetFloat("_Knee", .5f);
             mat.SetFloat("_BloomIntensity", Mathf.Lerp(g.bloom, 1.1f, dark));
             mat.SetFloat("_Exposure", Mathf.Lerp(g.exposure, 1.2f, dark));
-            mat.SetFloat("_Saturation", Mathf.Lerp(g.saturation, .62f, dark)); mat.SetFloat("_Contrast", g.contrast);
+            mat.SetFloat("_Saturation", Mathf.Lerp(g.saturation, .62f, dark)); mat.SetFloat("_Contrast", g.contrast); mat.SetFloat("_Lift", dark);
             mat.SetFloat("_Vignette", g.vignette + dark * .4f);
             mat.SetColor("_Tint", Color.Lerp(Color.Lerp(g.tint, new Color(.86f, .92f, 1.12f), dark), new Color(1.08f, .96f, .88f), dusk * .6f));
             // Bloom: prefilter at half size, blur down the chain, then back up additively.

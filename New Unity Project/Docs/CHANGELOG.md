@@ -145,3 +145,29 @@ Expanded CLASS_BUILD_MATRIX.md to all initial classes and later Crulanda candida
 - **Saves:**
   - Format 5 moves experience onto the new curve (level and progress into it are kept).
   - Format 6 adds the bag and equipment lists. Older saves upgrade on load.
+
+## 2026-09-29 — Water, world edges and night (first fixes from the visual review)
+These fix the "water, edges, night" group of `Docs/VISUAL_REVIEW_2026-09-29.md`.
+- **Bridges:** removed the old centre pier. After bridges were seated on their banks it showed as a grey slab on the water under every arch.
+- **Water shading:**
+  - The water shader now has its own lighting (`LightingWater`). Sky reflection is fresnel-weighted: `_Reflect` face-on, rising to full at grazing.
+  - Reflections fade where they dip under the horizon, and highlights are capped (`_Glare`).
+  - A new zone field, `waterReflect`, sets how much the water reflects. Khaven's Gloom Creek uses 0.3, so it stays dark instead of chrome.
+  - Foam is a broken, noise-driven line rather than a uniform ring.
+  - Creek ripples now flow downstream.
+  - Night reflections actually dim: the zone's sky probe intensity follows `reflectionIntensity`.
+- **Banks and shapes:**
+  - Lakes have an irregular shoreline: the radius varies smoothly with angle, and carving, drawing, feel, navmesh and tests all share it.
+  - Creeks meander gently and vary in width.
+  - The bank paint follows the real waterline.
+  - Ground normals come from central differences, which removes the sawtooth shading on curved slopes.
+- **Mill:** the mill wheel snaps to the creek surface so its paddles dip in.
+- **Swimming:** weapon and shield (and the Druid staff) are slung on the back while swimming.
+- **World edges:** a backdrop skirt continues the ground past every zone edge and rises into biome-coloured hills with tree and rock silhouettes.
+  - The sky below the horizon now matches the fog at every hour, so there is no brown plane or void past the exits.
+  - The camera's far plane is extended to cover the backdrop.
+- **Night:**
+  - A moonlit blue ambient floor, and the moon at 0.26.
+  - The post contrast curve gets a soft toe below mid-grey, so shadows deepen without clipping to pure black.
+  - The Great Oak's bark is paler.
+- Tests: EditMode 166/166, PlayMode 47/47. `WaterTests` now checks each creek row at its own width, and lakes along their irregular edge.

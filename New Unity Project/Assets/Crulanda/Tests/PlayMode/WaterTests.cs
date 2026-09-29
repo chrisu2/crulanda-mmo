@@ -61,7 +61,7 @@ namespace Crulanda.Tests
                         var side = new Vector2(-dir.y, dir.x).normalized; rows++;
                         foreach (int sgn in new[] { -1, 1 })
                         {
-                            var edge = c.pts[i] + side * sgn * c.drawHalf;
+                            var edge = c.pts[i] + side * sgn * c.DrawHalf(c.wide[i]);
                             if (zone.HeightAt(edge.x, edge.y) < c.level[i] - .03f) floating++;           // drawn edge must tuck into the bank
                         }
                         var mid = c.pts[i];
@@ -76,7 +76,7 @@ namespace Crulanda.Tests
                     int floating = 0;
                     for (int a = 0; a < 48; a++)
                     {
-                        float ang = a * Mathf.PI / 24; var e = k.def.center + new Vector2(Mathf.Cos(ang), Mathf.Sin(ang)) * k.drawRadius;
+                        float ang = a * Mathf.PI / 24; var dir = new Vector2(Mathf.Cos(ang), Mathf.Sin(ang)); var e = k.def.center + dir * k.DrawRadiusAt(dir);
                         if (zone.HeightAt(e.x, e.y) < k.level - .03f) floating++;
                     }
                     if (floating > 0) problems.Add(p + k.def.name + ": lake edge floats at " + floating + "/48");
@@ -124,7 +124,7 @@ namespace Crulanda.Tests
             s.Save(false);
             Assert.IsFalse(zone.WaterAt(new Vector2(s.Progress.x, s.Progress.z), out _, out float savedDepth) && savedDepth > .3f, "Saved on dry land.");
             // Shallow edge: back to walking.
-            var edge = pond.def.center + new Vector2(pond.radius - .6f, 0);
+            var edge = pond.def.center + new Vector2(pond.RadiusAt(Vector2.right) - .6f, 0);   // 0.6 m in from this side's waterline
             motor.Teleport(zone.Ground(edge, 1.1f)); for (int i = 0; i < 20; i++) yield return null;
             Assert.IsFalse(motor.Swimming, "At the pond's edge you stand.");
         }

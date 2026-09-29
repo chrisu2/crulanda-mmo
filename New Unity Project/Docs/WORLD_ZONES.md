@@ -87,7 +87,11 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
   - Water levels run downhill from the higher end.
   - The terrain is carved into a terraced valley around the channel.
   - Meshes are drawn in chunks, with vertex alpha giving shallowness from the real depth.
-- **Lakes** (`lakes`: name, center, radius, depth): a flat level, a bowl with a ramped underwater bank, and a gentle shore.
+  - Creeks meander gently and their width breathes. Bridges and the mill pin the line, and nearby roads and props limit the swing.
+- **Lakes** (`lakes`: name, center, radius, depth):
+  - A flat level, a bowl with a ramped underwater bank, and a gentle shore.
+  - `radius` is the mean waterline. The shore wanders up to about a fifth in and out around it (`ZoneWater.Lake.RadiusAt`).
+- The bank paint (`ZoneWater.Shore`) and the grass line follow the real waterline.
 - **Feel:**
   - `ZoneBuilder.WaterAt(p, out surface, out depth)`.
   - The motor wades when the water is above the feet, and swims past 1.45 m (out below 1.25 m).
@@ -96,11 +100,31 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
 - **Navmesh:** wading water is area 3 (cost 6), so agents prefer bridges. Swim-depth water is not walkable. Bridges are seated
   above both banks and clear the water.
 - **Rendering (`World/Shaders/Water.shader`):**
-  - Premultiplied transparent Standard surface, with ripple normals scrolling downstream along creeks.
-  - Shore foam and a small swell that fades toward the shore.
-  - It reflects a realtime sky-only probe (`WorldClock.Reflections`, re-rendered every 2 s), dimmed at night.
+  - A premultiplied transparent surface with its own lighting (`LightingWater`, which wraps Standard).
+  - Sky reflection is `_Reflect` face-on, rising to full at grazing. It fades where a reflection would dip under the horizon, and highlights are capped at `_Glare`.
+  - Zone `waterReflect` (0..1) overrides `_Reflect`. Murky water uses about 0.3 (Khaven 0.3); unset keeps the default 0.7.
+  - Ripple normals scroll downstream along creeks.
+  - Foam is a noise-broken line at the waterline, and there is a small swell that fades toward the shore.
+  - It reflects a realtime sky-only probe (`WorldClock.Reflections`, re-rendered every 2 s). The probe's intensity dims at night.
+  - The project is in **Gamma** colour space. Keep that in mind for any lighting maths.
+- While swimming, weapons and shields are slung on the back.
 - Critters, crows and trees are kept out of the water.
 - Tests: `WaterTests` (drawn/carved/felt agreement in every zone; bridges; wading and swimming; saving while swimming).
+
+## World edge backdrop
+`ZoneBuilder.BuildBackdrop` (built last, with its own random stream so the zone layout doesn't change):
+- A skirt of ground continues past each side of the zone: `ZoneMeshes.Backdrop`, four sides with rings out to `BackdropWidth`.
+  - Its inner row shares the ground's edge vertices (`GroundSegments`), so no crack can open.
+  - UVs mirror the painted ground, so roads run on over the seam.
+- The skirt rises into hills (`Rise`) coloured by biome, with tree and rock silhouettes. Next to the Wasting it falls away.
+- The sky's `_GroundColor` is set to the fog colour each frame, divided by sqrt(exposure) to suit gamma space. Anything seen
+  past the backdrop fades into fog, not into a brown plane.
+- The camera's far plane covers the backdrop. Shadow distance is unchanged.
+- It is scenery only: no navmesh, colliders or gameplay.
+
+## Night
+- Moonlit ambient floor: sky, equator and ground are roughly double the old values, the moon is at 0.26, the fog is a dark blue haze, and the sky exposure stays at 0.3.
+- `Post.shader` contrast is linear above mid-grey, with a power toe below it. Shadows deepen without clipping to black.
 
 ## Nature and post-processing
 - Grass (`Grass.shader`): instanced with wind sway, density 2.3 in meadows. `tallGrass` patches hide ambushers.

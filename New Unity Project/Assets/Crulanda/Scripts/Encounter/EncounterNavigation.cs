@@ -55,7 +55,8 @@ namespace Crulanda.Encounter
                 }
             // Water: shallow (wading) water is walkable but costly (area 3), so agents prefer bridges yet can follow you in.
             // Swim-depth water is not walkable (area 1). Modifier volumes (not solid boxes) follow each 3 m of creek at its
-            // own level and cover lakes in 1 m strips, so they never reach up into bridge decks or out over dry shore.
+            // own level and width, and cover lakes in radial wedges out to their wandering shore, so they never reach up into
+            // bridge decks or out over dry shore.
             NavMesh.SetAreaCost(ShallowsArea, 6);
             var water = zone.Water;
             if (water != null)
@@ -64,20 +65,25 @@ namespace Crulanda.Encounter
                     for (int i = 0; i + 1 < c.pts.Length; i++)
                     {
                         Vector2 a = c.pts[i], b = c.pts[i + 1], mid = (a + b) / 2, dir = b - a; if (dir.sqrMagnitude < .001f) continue;
-                        float level = (c.level[i] + c.level[i + 1]) / 2, bottom = level + ZoneWater.BankDrop - c.depth - 1;
+                        float level = (c.level[i] + c.level[i + 1]) / 2, bottom = level + ZoneWater.BankDrop - c.depth - 1, wide = (c.wide[i] + c.wide[i + 1]) / 2;
                         var rot = Quaternion.LookRotation(new Vector3(dir.x, 0, dir.y));
-                        if (c.waterHalf > .2f) sources.Add(Modifier(new Vector3(mid.x, (bottom + level + .05f) / 2, mid.y), rot, new Vector3(c.waterHalf * 2, level + .05f - bottom, dir.magnitude + .6f), ShallowsArea));
-                        if (c.swimHalf > .3f) sources.Add(Modifier(new Vector3(mid.x, (bottom + level + .05f) / 2, mid.y), rot, new Vector3(c.swimHalf * 2, level + .05f - bottom, dir.magnitude + .6f), 1));
+                        if (c.waterHalf > .2f) sources.Add(Modifier(new Vector3(mid.x, (bottom + level + .05f) / 2, mid.y), rot, new Vector3(c.waterHalf * wide * 2, level + .05f - bottom, dir.magnitude + .6f), ShallowsArea));
+                        if (c.swimHalf > .3f) sources.Add(Modifier(new Vector3(mid.x, (bottom + level + .05f) / 2, mid.y), rot, new Vector3(c.swimHalf * wide * 2, level + .05f - bottom, dir.magnitude + .6f), 1));
                     }
                 foreach (var k in water.Lakes)
                 {
-                    float bottom = k.bottom - 1;
-                    for (float x = -k.radius + .5f; x < k.radius; x += 1)
+                    // Radial wedges out to the irregular waterline, and in from it to where the water gets swim-deep.
+                    float bottom = k.bottom - 1; const int Seg = 48;
+                    for (int s = 0; s < Seg; s++)
                     {
-                        float wet = Mathf.Sqrt(Mathf.Max(0, k.radius * k.radius - x * x)), swim = k.swimRadius > x ? Mathf.Sqrt(Mathf.Max(0, k.swimRadius * k.swimRadius - x * x)) : 0;
-                        var centre = new Vector3(k.def.center.x + x, (bottom + k.level + .05f) / 2, k.def.center.y);
-                        if (wet > .2f) sources.Add(Modifier(centre, Quaternion.identity, new Vector3(1.02f, k.level + .05f - bottom, wet * 2), ShallowsArea));
-                        if (swim > .2f) sources.Add(Modifier(centre, Quaternion.identity, new Vector3(1.02f, k.level + .05f - bottom, swim * 2), 1));
+                        float a = (s + .5f) * Mathf.PI * 2 / Seg; var dir = new Vector2(Mathf.Cos(a), Mathf.Sin(a)); var rot = Quaternion.LookRotation(new Vector3(dir.x, 0, dir.y));
+                        float wet = k.RadiusAt(dir), swim = k.swimInset > 0 ? wet - k.swimInset : 0;
+                        foreach (var (reach, area) in new[] { (wet, ShallowsArea), (swim, 1) })
+                        {
+                            if (reach < .3f) continue;
+                            var mid = k.def.center + dir * reach / 2;
+                            sources.Add(Modifier(new Vector3(mid.x, (bottom + k.level + .05f) / 2, mid.y), rot, new Vector3(reach * Mathf.PI * 2 / Seg + .3f, k.level + .05f - bottom, reach), area));
+                        }
                     }
                 }
             }            return sources;

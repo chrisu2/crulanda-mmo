@@ -50,7 +50,9 @@ Shader "Hidden/Crulanda/Post"
         c = ACES(c * _Exposure);
         half l = dot(c, half3(0.2126, 0.7152, 0.0722));
         c = lerp(l.xxx, c, _Saturation);
-        c = saturate((c - 0.5) * _Contrast + 0.5) * _Tint.rgb;
+        // Contrast about mid-grey: linear above it, a power toe below it (same slope at 0.5), so shadows deepen but never clip to black.
+        c = c > 0.5 ? (c - 0.5) * _Contrast + 0.5 : 0.5 * pow(max(c * 2, 1e-4), _Contrast);
+        c = saturate(c) * _Tint.rgb;
         float2 v = i.uv - 0.5; c *= saturate(1 - dot(v, v) * _Vignette);
         return half4(c, 1);
     }

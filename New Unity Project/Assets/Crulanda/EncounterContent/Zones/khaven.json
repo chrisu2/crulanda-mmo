@@ -17,6 +17,7 @@
   "hillHeight": 2.6,
   "seed": 4410,
   "waterTint": "#1C2624",
+  "waterReflect": 0.3,
   "lighting": {
     "sunPitch": 11,
     "sunYaw": -62,

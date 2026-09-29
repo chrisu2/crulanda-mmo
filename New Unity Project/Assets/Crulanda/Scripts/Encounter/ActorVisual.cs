@@ -18,6 +18,8 @@ namespace Crulanda.Encounter
 
         public ActorPose Pose;
         int variant; bool child, posed; string role; float stoop, swimLean, swimPhase;
+        /// <summary>Held weapon/shield/staff parts, and the same kit slung on the back (shown instead while swimming).</summary>
+        Transform[] held, stowed; bool gearStowed;
         /// <summary>Villagers pass their trade (<paramref name="role"/>) to get its outfit and tool; see <see cref="Dress"/>.</summary>
         public static ActorVisual Attach(GameObject actor, ActorLook look, int variant = 0, bool child = false, string role = null)
         {
@@ -207,17 +209,32 @@ namespace Crulanda.Encounter
             switch (look)
             {
                 case ActorLook.Warrior:
+                {
                     foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Sphere, body, new Vector3(s * .31f, .58f, 0), new Vector3(.26f, .18f, .26f), accent);
-                    Part(PrimitiveType.Cube, armR, new Vector3(0, -.66f, .38f), new Vector3(.05f, .06f, .9f), accent, new Vector3(20, 0, 0));   // sword
-                    Part(PrimitiveType.Cube, armR, new Vector3(0, -.64f, -.04f), new Vector3(.22f, .04f, .06f), Mat(new Color(.4f, .3f, .15f))); // crossguard
-                    Part(PrimitiveType.Cylinder, armL, new Vector3(-.1f, -.38f, .05f), new Vector3(.5f, .03f, .5f), Mat(new Color(.36f, .25f, .15f)), new Vector3(0, 0, 90)); // shield
-                    Part(PrimitiveType.Cylinder, armL, new Vector3(-.13f, -.38f, .05f), new Vector3(.18f, .02f, .18f), accent, new Vector3(0, 0, 90));
+                    var hilt = Mat(new Color(.4f, .3f, .15f)); var boards = Mat(new Color(.36f, .25f, .15f));
+                    held = new[] {
+                        Part(PrimitiveType.Cube, armR, new Vector3(0, -.66f, .38f), new Vector3(.05f, .06f, .9f), accent, new Vector3(20, 0, 0)),         // sword
+                        Part(PrimitiveType.Cube, armR, new Vector3(0, -.64f, -.04f), new Vector3(.22f, .04f, .06f), hilt),                                 // crossguard
+                        Part(PrimitiveType.Cylinder, armL, new Vector3(-.1f, -.38f, .05f), new Vector3(.5f, .03f, .5f), boards, new Vector3(0, 0, 90)),   // shield
+                        Part(PrimitiveType.Cylinder, armL, new Vector3(-.13f, -.38f, .05f), new Vector3(.18f, .02f, .18f), accent, new Vector3(0, 0, 90)) };
+                    // Slung for swimming: the sword across the back, hilt over the right shoulder, the shield flat over it.
+                    stowed = new[] {
+                        Part(PrimitiveType.Cube, body, new Vector3(0, .3f, -.18f), new Vector3(.05f, .9f, .06f), accent, new Vector3(0, 0, -35)),
+                        Part(PrimitiveType.Cube, body, new Vector3(.24f, .64f, -.18f), new Vector3(.22f, .04f, .06f), hilt, new Vector3(0, 0, -35)),
+                        Part(PrimitiveType.Cylinder, body, new Vector3(0, .3f, -.24f), new Vector3(.5f, .03f, .5f), boards, new Vector3(90, 0, 0)),
+                        Part(PrimitiveType.Cylinder, body, new Vector3(0, .3f, -.27f), new Vector3(.18f, .02f, .18f), accent, new Vector3(90, 0, 0)) };
                     break;
+                }
                 case ActorLook.Druid:
                     Part(PrimitiveType.Sphere, body, new Vector3(0, .84f, -.03f), new Vector3(.36f, .38f, .38f), cloth);                 // hood
                     Part(PrimitiveType.Cube, body, new Vector3(0, .2f, -.17f), new Vector3(.52f, .95f, .05f), accent, new Vector3(-6, 0, 0)); // cloak
-                    Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.45f, .08f), new Vector3(.06f, .85f, .06f), Mat(new Color(.35f, .25f, .15f)), new Vector3(8, 0, 0)); // staff
-                    Part(PrimitiveType.Sphere, armR, new Vector3(0, .38f, .15f), Vector3.one * .13f, Mat(new Color(.45f, .7f, .4f), .6f));
+                {
+                    var staff = Mat(new Color(.35f, .25f, .15f)); var orb = Mat(new Color(.45f, .7f, .4f), .6f);
+                    held = new[] { Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.45f, .08f), new Vector3(.06f, .85f, .06f), staff, new Vector3(8, 0, 0)),   // staff
+                        Part(PrimitiveType.Sphere, armR, new Vector3(0, .38f, .15f), Vector3.one * .13f, orb) };
+                    stowed = new[] { Part(PrimitiveType.Cylinder, body, new Vector3(0, .25f, -.28f), new Vector3(.06f, .85f, .06f), staff, new Vector3(0, 0, -40)),   // across the back (behind the cloak) for swimming
+                        Part(PrimitiveType.Sphere, body, new Vector3(.55f, .9f, -.28f), Vector3.one * .13f, orb) };
+                }
                     break;
                 case ActorLook.Healer:
                     Part(PrimitiveType.Cylinder, body, new Vector3(0, -.5f, 0), new Vector3(.52f, .45f, .44f), cloth);                  // robe skirt
@@ -275,6 +292,7 @@ namespace Crulanda.Encounter
                     Part(PrimitiveType.Cube, body, new Vector3(0, -.2f, 0), new Vector3(.4f, .9f, .22f), cloth);
                     break;
             }
+            if (stowed != null) foreach (var g in stowed) g.gameObject.SetActive(false);   // shown only while swimming
             lastPosition = transform.position;
         }
 
@@ -452,6 +470,14 @@ namespace Crulanda.Encounter
         void LateUpdate()
         {
             if (body == null || legL == null) return;
+            // Swimming: the kit goes on the back, so no sword stands out of the water like a mast.
+            bool stow = Pose == ActorPose.Swim;
+            if (held != null && stow != gearStowed)
+            {
+                gearStowed = stow;
+                foreach (var g in held) g.gameObject.SetActive(!stow);
+                if (stowed != null) foreach (var g in stowed) g.gameObject.SetActive(stow);
+            }
             var delta = transform.position - lastPosition; delta.y = 0; lastPosition = transform.position;
             float target = Time.deltaTime > 0 ? delta.magnitude / Time.deltaTime : 0;
             speed = Mathf.Lerp(speed, target, Time.deltaTime * 8);

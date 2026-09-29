@@ -107,8 +107,49 @@ namespace Crulanda.World
                     t[k++] = i; t[k++] = i + segments + 1; t[k++] = i + 1;
                     t[k++] = i + 1; t[k++] = i + segments + 1; t[k++] = i + segments + 2;
                 }
+            // Normals from central differences on the height grid rather than from the triangles: symmetric in x and z, so a
+            // curved slope or shore crossing the grid's fixed diagonals shades smoothly, not in light and dark triangles.
+            var n = new Vector3[v.Length]; float step = size / segments; int row = segments + 1;
+            for (int z = 0, i = 0; z <= segments; z++)
+                for (int x = 0; x <= segments; x++, i++)
+                {
+                    int x0 = Mathf.Max(0, x - 1), x1 = Mathf.Min(segments, x + 1), z0 = Mathf.Max(0, z - 1), z1 = Mathf.Min(segments, z + 1);
+                    float dx = (v[z * row + x1].y - v[z * row + x0].y) / ((x1 - x0) * step), dz = (v[z1 * row + x].y - v[z0 * row + x].y) / ((z1 - z0) * step);
+                    n[i] = new Vector3(-dx, 1, -dz).normalized;
+                }
             var m = new Mesh { name = "Zone ground", indexFormat = UnityEngine.Rendering.IndexFormat.UInt32 };
-            m.vertices = v; m.uv = uv; m.triangles = t; m.RecalculateNormals(); m.RecalculateBounds();
+            m.vertices = v; m.uv = uv; m.triangles = t; m.normals = n; m.RecalculateBounds();
+            return m;
+        }
+        /// <summary>
+        /// One side (0 south, 1 east, 2 north, 3 west) of the scenery skirt round the square ground: the ground's edge row
+        /// scaled out from the centre to each offset past it. Row 0 is the ground's own edge (same vertices, so no crack).
+        /// UVs mirror back across the edge into the zone's painted texture, so the paint (roads too) runs on over the seam.
+        /// Normals come from the height function, so the four sides and the ground shade as one surface.
+        /// </summary>
+        public static Mesh Backdrop(float size, int segments, int side, float[] offsets, Func<float, float, float> height)
+        {
+            float half = size / 2; int cols = segments + 1;
+            float C(int k) { return -size / 2 + size * k / segments; }   // exactly the ground grid's coordinates
+            float Mirror(float a) { return a > half ? size - a : a < -half ? -size - a : a; }
+            var v = new Vector3[cols * offsets.Length]; var n = new Vector3[v.Length]; var uv = new Vector2[v.Length]; var t = new int[(offsets.Length - 1) * segments * 6];
+            for (int r = 0, i = 0; r < offsets.Length; r++)
+                for (int k = 0; k < cols; k++, i++)
+                {
+                    // Anticlockwise seen from above: the south edge runs west to east, the east edge south to north, and so on.
+                    var e = side == 0 ? new Vector2(C(k), C(0)) : side == 1 ? new Vector2(C(segments), C(k)) : side == 2 ? new Vector2(C(segments - k), C(segments)) : new Vector2(C(0), C(segments - k));
+                    var p = e * ((half + offsets[r]) / half);
+                    v[i] = new Vector3(p.x, height(p.x, p.y), p.y);
+                    n[i] = new Vector3(height(p.x - .75f, p.y) - height(p.x + .75f, p.y), 1.5f, height(p.x, p.y - .75f) - height(p.x, p.y + .75f)).normalized;
+                    uv[i] = new Vector2((Mirror(p.x) + half) / size, (Mirror(p.y) + half) / size);
+                }
+            for (int r = 0, j = 0; r + 1 < offsets.Length; r++)
+                for (int k = 0; k < segments; k++)
+                {
+                    int a = r * cols + k, d = a + cols;   // clockwise from above (upward-facing)
+                    t[j++] = a; t[j++] = a + 1; t[j++] = d + 1; t[j++] = a; t[j++] = d + 1; t[j++] = d;
+                }
+            var m = new Mesh { name = "Backdrop skirt" }; m.vertices = v; m.normals = n; m.uv = uv; m.triangles = t; m.RecalculateBounds();
             return m;
         }
         static void Quad(List<Vector3> v, List<int> t, Vector3 a, Vector3 b, Vector3 c, Vector3 d)

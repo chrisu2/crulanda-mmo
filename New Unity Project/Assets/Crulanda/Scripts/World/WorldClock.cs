@@ -28,7 +28,7 @@ namespace Crulanda.World
         Light sun; Material sky; ZoneLighting day; System.Collections.Generic.List<NightLight> lamps;
         struct Look { public Color sun, sky, equator, ground, fog; public float intensity, exposure; }
         Look dayLook, dawn, dusk, night;
-        Color skyTint = Color.grey, groundTint = Color.grey; float atmosphere = 1, sunSize = .04f;
+        Color skyTint = Color.grey; float atmosphere = 1, sunSize = .04f;
 
         public void Init(Light sunLight, ZoneLighting lighting, Material skybox, System.Collections.Generic.List<NightLight> nightLights)
         {
@@ -37,7 +37,6 @@ namespace Crulanda.World
             {
                 sky = new Material(skybox); RenderSettings.skybox = sky;
                 if (sky.HasProperty("_SkyTint")) skyTint = sky.GetColor("_SkyTint");
-                if (sky.HasProperty("_GroundColor")) groundTint = sky.GetColor("_GroundColor");
                 if (sky.HasProperty("_AtmosphereThickness")) atmosphere = sky.GetFloat("_AtmosphereThickness");
                 if (sky.HasProperty("_SunSize")) sunSize = sky.GetFloat("_SunSize");
             }
@@ -45,7 +44,8 @@ namespace Crulanda.World
                 equator = ZoneColors.Parse(day.ambientEquator, Color.grey), ground = ZoneColors.Parse(day.ambientGround, Color.black), fog = ZoneColors.Parse(day.fogColor, Color.grey), exposure = 1.05f };
             dawn = new Look { sun = new Color(1, .62f, .4f), intensity = .6f, sky = new Color(.5f, .45f, .55f), equator = new Color(.55f, .42f, .38f), ground = new Color(.22f, .18f, .16f), fog = new Color(.62f, .5f, .48f), exposure = .7f };
             dusk = new Look { sun = new Color(1, .5f, .28f), intensity = .55f, sky = new Color(.45f, .38f, .5f), equator = new Color(.5f, .34f, .3f), ground = new Color(.2f, .15f, .13f), fog = new Color(.55f, .4f, .38f), exposure = .6f };
-            night = new Look { sun = new Color(.52f, .6f, .85f), intensity = .22f, sky = new Color(.1f, .12f, .2f), equator = new Color(.08f, .09f, .14f), ground = new Color(.04f, .04f, .06f), fog = new Color(.07f, .08f, .12f), exposure = .3f };
+            // Moonlit night: a blue ambient floor so faces turned from the moon stay readable; the sky stays dark (exposure .3).
+            night = new Look { sun = new Color(.52f, .6f, .85f), intensity = .26f, sky = new Color(.2f, .24f, .36f), equator = new Color(.16f, .19f, .3f), ground = new Color(.08f, .09f, .13f), fog = new Color(.09f, .1f, .15f), exposure = .3f };
             Apply();
         }
         /// <summary>Sky-only reflection probe (water and glossy surfaces reflect the current sky, not a fixed default one).</summary>
@@ -92,11 +92,15 @@ namespace Crulanda.World
                 if (sky.HasProperty("_SkyTint")) sky.SetColor("_SkyTint", Color.Lerp(skyTint, new Color(.18f, .24f, .48f), d));
                 if (sky.HasProperty("_AtmosphereThickness")) sky.SetFloat("_AtmosphereThickness", Mathf.Lerp(atmosphere, .55f, d));
                 if (sky.HasProperty("_SunSize")) sky.SetFloat("_SunSize", Mathf.Lerp(sunSize, .018f, d));
-                if (sky.HasProperty("_GroundColor")) sky.SetColor("_GroundColor", Color.Lerp(groundTint, new Color(.05f, .05f, .07f), d));
+                // Below the horizon the sky is the fog, so anything seen past the backdrop fades into fog like the land does, at
+                // every hour, not into a brown plane. This gamma-space procedural sky draws its ground as colour * sqrt(exposure).
+                if (sky.HasProperty("_GroundColor")) sky.SetColor("_GroundColor", look.fog / Mathf.Sqrt(Mathf.Max(.09f, look.exposure)));
             }
             var cam = Camera.main; if (cam != null) cam.backgroundColor = look.fog;
             float dark = Darkness;
-            RenderSettings.reflectionIntensity = Mathf.Lerp(1f, .55f, dark);
+            // The zone's realtime sky probe has its own intensity (RenderSettings.reflectionIntensity only scales the default
+            // skybox reflection), so dim both: night water stays dark instead of glowing with the moonlit sky.
+            RenderSettings.reflectionIntensity = Mathf.Lerp(1f, .55f, dark); if (Reflections != null) Reflections.intensity = RenderSettings.reflectionIntensity;
             if (lamps != null) foreach (var l in lamps)
                 if (l.light != null) { l.light.intensity = Mathf.Lerp(l.dayIntensity, l.nightIntensity, dark); l.light.enabled = l.light.intensity > .01f; }
         }

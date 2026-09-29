@@ -28,6 +28,7 @@ namespace Crulanda.World
         public ZoneExit[] exits = new ZoneExit[0];
         public ZoneGrove[] groves = new ZoneGrove[0];
         public string waterTint;   // optional hex, e.g. dark Gloom Creek
+        public float waterReflect; // optional sky reflection face-on 0..1 (0 = the water material's own); murky water ~.3
         public ZoneLife life;
         /// <summary>Level band shown on maps and exits (e.g. 1-2); camps spawn inside it.</summary>
         public int levelMin = 1, levelMax = 2;
@@ -103,8 +104,9 @@ namespace Crulanda.World
     /// </summary>
     [Serializable] public sealed class ZonePath { public string name; public float width = 4; public Vector2[] points = new Vector2[0]; public float depth = 1.1f; }
     /// <summary>
-    /// A round lake or pond. radius is the waterline; depth is the water's depth in the middle (a flat bottom, a bank
-    /// under about 38 degrees, a gentle shore). Deeper than about 1.45 m, you swim. See ZoneWater.
+    /// A lake or pond. radius is the mean waterline (the shore wanders up to a fifth in and out around it); depth is the
+    /// water's depth in the middle (a flat bottom, a bank under about 38 degrees, a gentle shore). Deeper than about
+    /// 1.45 m, you swim. See ZoneWater.
     /// </summary>
     [Serializable] public sealed class ZoneLake { public string name; public Vector2 center; public float radius = 10, depth = 2.6f; }
     [Serializable] public sealed class ZoneRect { public string name; public Vector2 center, size; public float rotation; public string crop = "soil"; }

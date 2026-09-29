@@ -50,7 +50,7 @@ namespace Crulanda.World
             props = new GameObject("Zone props").transform; props.SetParent(transform, false);
             statics = new GameObject("Zone static scenery").transform; statics.SetParent(transform, false);
             Water = new ZoneWater(); Water.Prepare(Zone, (x, z) => HeightAt(x, z, false));
-            BuildLighting(); BuildGround(); BuildWater(); BuildWasting(); BuildProps(); BuildGroves(); BuildExits(); BuildForestEdge(); BuildBoundaries();
+            BuildLighting(); BuildGround(); BuildWater(); BuildWasting(); BuildProps(); BuildGroves(); BuildExits(); BuildForestEdge(); BuildBoundaries(); BuildBackdrop();
             if (art.grass != null && art.grass.Length > 0)
                 gameObject.AddComponent<GrassField>().Build(this, art.grass, art.flowers, Openness, Zone.seed + 99, Zone.biome == "meadow" ? 2.3f : 1.6f, TallGrassPatches());
             gameObject.AddComponent<FallingLeaves>().Init(this);
@@ -170,14 +170,14 @@ namespace Crulanda.World
             RenderSettings.fogColor = ZoneColors.Parse(l.fogColor, Color.grey); RenderSettings.fogStartDistance = l.fogStart; RenderSettings.fogEndDistance = l.fogEnd;
             if (art.skybox != null) { RenderSettings.skybox = art.skybox; RenderSettings.sun = sun; }
             var cam = Camera.main;
-            if (cam != null) { cam.clearFlags = art.skybox != null ? CameraClearFlags.Skybox : CameraClearFlags.SolidColor; cam.backgroundColor = RenderSettings.fogColor; cam.farClipPlane = Mathf.Max(cam.farClipPlane, Zone.size * 1.6f); }
+            if (cam != null) { cam.clearFlags = art.skybox != null ? CameraClearFlags.Skybox : CameraClearFlags.SolidColor; cam.backgroundColor = RenderSettings.fogColor; cam.farClipPlane = Mathf.Max(cam.farClipPlane, (Half + BackdropWidth) * 2.9f); }
         }
 
         // ---------- ground ----------
         void BuildGround()
         {
             var go = new GameObject("Ground"); go.transform.SetParent(transform, false); go.layer = 0;
-            var mesh = ZoneMeshes.Ground(Zone.size, Mathf.RoundToInt(Zone.size / 1.25f), HeightAt);
+            var mesh = ZoneMeshes.Ground(Zone.size, GroundSegments, HeightAt);
             GroundMesh = go.AddComponent<MeshFilter>(); GroundMesh.sharedMesh = mesh;
             var r = go.AddComponent<MeshRenderer>(); var m = new Material(art.ground) { name = "Painted ground" };
             m.SetTextureScale("_DetailAlbedoMap", Vector2.one * Zone.size / 1.8f);   // ~1.8 m grain repeat, whatever the zone size
@@ -195,7 +195,6 @@ namespace Crulanda.World
             float size = Zone.size, half = size / 2;
             // Bounding boxes let most pixels skip the per-segment distance tests (the expensive part at 2048x2048).
             var roadBox = Zone.roads.Select(r => Box(r.points, r.width / 2 + 1.3f)).ToArray();
-            var waterBox = Zone.water.Select(w => Box(w.points, w.width + 1.6f)).ToArray();
             for (int j = 0; j < res; j++)
                 for (int i = 0; i < res; i++)
                 {
@@ -256,22 +255,17 @@ namespace Crulanda.World
                         Color rc = Color.Lerp(Color.Lerp(dirt, rut, wheel + n3 * .3f), mud, n2 * .2f);
                         c = Color.Lerp(c, rc, Mathf.Clamp01((hw + 1.2f - d) / 1.6f + (n2 - .5f) * .6f));
                     }
-                    for (int k = 0; k < Zone.water.Length; k++)
+                    // The water's edge, creeks and lakes alike, along the real (wandering) waterline: a dark silty bed, wet mud
+                    // and pale pebbles at the water, a narrow earthen bank, then grass. Noise breaks up the bank's outer edge;
+                    // the grass stops at the same line (Openness).
+                    float shore = Water.Shore(p, 3) + (n2 - .5f) * 1.1f;
+                    if (shore < 2.2f)
                     {
-                        var w = Zone.water[k]; if (!waterBox[k].Contains(p)) continue;
-                        float d = DistanceToPath(p, w.points);
-                        if (d < w.width + 1.5f) c = Color.Lerp(c, mud, Mathf.Clamp01((w.width + 1.5f - d) / 2.2f));
+                        c = Color.Lerp(c, Color.Lerp(mud, dirt, n1 * .4f), Mathf.Clamp01((2.2f - shore) / 1.5f));
+                        if (shore < .6f) c = Color.Lerp(c, new Color(.22f, .2f, .15f), Mathf.Clamp01((.6f - shore) / .6f) * .6f);
+                        if (Mathf.Abs(shore) < .5f && n3 > .5f) c = Color.Lerp(c, new Color(.55f, .52f, .46f), .45f);
+                        if (shore < -.5f) c = Color.Lerp(c, new Color(.16f, .15f, .12f), Mathf.Clamp01((-.5f - shore) / 3));
                     }
-                    if (Zone.lakes != null)
-                        foreach (var l in Zone.lakes)
-                        {
-                            // A muddy shore with a pale pebble line, and a dark silty bed under the water.
-                            float d = Vector2.Distance(p, l.center);
-                            if (d > l.radius + 3) continue;
-                            c = Color.Lerp(c, mud, Mathf.Clamp01((l.radius + 3 - d) / 3));
-                            if (Mathf.Abs(d - l.radius) < .8f && n3 > .45f) c = Color.Lerp(c, new Color(.55f, .52f, .46f), .5f);
-                            if (d < l.radius - 1) c = Color.Lerp(c, new Color(.16f, .15f, .12f), Mathf.Clamp01((l.radius - 1 - d) / 4));
-                        }
                     if (Zone.wasting != null)
                     {
                         float t = Mathf.Clamp01((x - (Zone.wasting.x - Zone.wasting.fade)) / Zone.wasting.fade);
@@ -305,10 +299,18 @@ namespace Crulanda.World
         Material WaterMaterial()
         {
             var baseMat = art.waterSurface != null ? art.waterSurface : art.water;
-            if (string.IsNullOrEmpty(Zone.waterTint)) return baseMat;
-            var m = new Material(baseMat); var tint = ZoneColors.Parse(Zone.waterTint, baseMat.color);
-            if (m.HasProperty("_Shallow")) { tint.a = .86f; m.SetColor("_Color", tint); m.SetColor("_Shallow", Color.Lerp(tint, Color.grey, .3f) * new Color(1, 1, 1, .6f)); }
-            else { tint.a = baseMat.color.a; m.color = tint; }
+            if (string.IsNullOrEmpty(Zone.waterTint) && Zone.waterReflect <= 0) return baseMat;
+            var m = new Material(baseMat);
+            if (!string.IsNullOrEmpty(Zone.waterTint))
+            {
+                var tint = ZoneColors.Parse(Zone.waterTint, baseMat.color);
+                if (m.HasProperty("_Shallow")) { tint.a = .86f; m.SetColor("_Color", tint); m.SetColor("_Shallow", Color.Lerp(tint, Color.grey, .3f) * new Color(1, 1, 1, .6f)); }
+                else { tint.a = baseMat.color.a; m.color = tint; }
+            }
+            // The tint only colours the (premultiplied) body under the sky reflection: murky water also reflects less sky
+            // face-on and glints less, or the untinted sky is all you see (Gloom Creek read as chrome).
+            if (Zone.waterReflect > 0 && m.HasProperty("_Reflect"))
+            { float r = Mathf.Clamp01(Zone.waterReflect); m.SetFloat("_Reflect", r); m.SetFloat("_Glare", m.GetFloat("_Glare") * (.6f + .4f * r)); }
             return m;
         }
         /// <summary>Water at a point: its surface height and how deep it is over the ground there. False on dry land.</summary>
@@ -428,7 +430,7 @@ namespace Crulanda.World
                     case "gallows": Gallows(t); break;
                     case "crypt": Crypt(t); break;
                     case "cliff": Cliff(t, p.size.x > 0 ? p.size.x : 20); break;
-                    case "dead_oak": DeadTree(p.at, 1, art.bark, 5, statics, t); break;   // size comes from the root's scale
+                    case "dead_oak": DeadTree(p.at, 1, Tint(art.bark, new Color(.4f, .36f, .32f)), 5, statics, t); break;   // weathered, paler bark (plain bark reads black in shade); size comes from the root's scale
                     case "tree": Broadleaf(t, p.variant); break;
                     case "pine": Pine(t); break;
                     case "fence": Fence(t, p.size.x > 0 ? p.size.x : 8); break;
@@ -796,7 +798,6 @@ namespace Crulanda.World
                     para.AddComponent<BoxCollider>();
                 }
             }
-            Part(PrimitiveType.Cube, t, new Vector3(0, -.5f, 0), new Vector3(width - .6f, 1.2f, length * .35f), Tint(art.stone, new Color(.38f, .38f, .36f)));
         }
         void Ruin(Transform t, float length)
         {
@@ -961,8 +962,8 @@ namespace Crulanda.World
         {
             if (Zone.wasting != null && p.x > Zone.wasting.x - Zone.wasting.fade * .6f) return 0;
             foreach (var r in Zone.roads) if (DistanceToPath(p, r.points) < r.width / 2 + .8f) return 0;
-            foreach (var w in Zone.water) if (DistanceToPath(p, w.points) < w.width + 1.2f) return 0;
-            if (Zone.lakes != null) foreach (var l in Zone.lakes) if (Vector2.Distance(p, l.center) < l.radius + 1.5f) return 0;
+            // Grass grows down to the bank's noisy edge (the same line PaintGround draws there), never in the water.
+            if (Water.Shore(p, 3) + (Mathf.PerlinNoise(p.x * .45f, p.y * .45f) - .5f) * 1.1f < 1.3f) return 0;
             foreach (var c in Zone.clearings) if (Vector2.Distance(p, c.center) < c.radius + 1) return 0;
             foreach (var f in Zone.fields)
             {
@@ -1005,6 +1006,18 @@ namespace Crulanda.World
         {
             House(t, size, 3.4f, 1, false);
             var wheel = new GameObject("Water wheel").transform; wheel.SetParent(t, false); wheel.localPosition = new Vector3(-size.x / 2 - 1.1f, 1.3f, 0);
+            // Hang it in the creek, whatever ground the house stands on: its inner face where the water is 0.4 m deep out from
+            // the west wall, the hub set from the surface so the lower paddles dip 0.35 m in, and a shaft back to the wall.
+            float wall = size.x / 2;
+            for (float x = wall + .6f; x < wall + 9; x += .25f)
+            {
+                var at = t.TransformPoint(new Vector3(-x, 0, 0));
+                if (!WaterAt(new Vector2(at.x, at.z), out float surface, out float depth) || depth < .4f) continue;
+                float hub = x + .5f; at = t.TransformPoint(new Vector3(-hub, 0, 0));
+                wheel.position = new Vector3(at.x, surface + 1.85f, at.z);
+                if (hub - wall > 1) Part(PrimitiveType.Cylinder, t, new Vector3(-(wall + hub) / 2, wheel.localPosition.y, 0), new Vector3(.3f, (hub - wall) / 2, .3f), art.timber, Quaternion.Euler(0, 0, 90));
+                break;
+            }
             var spokes = art.timber;
             Part(PrimitiveType.Cylinder, wheel, Vector3.zero, new Vector3(4, .5f, 4), Tint(art.timber, new Color(.3f, .22f, .15f)), Quaternion.Euler(0, 0, 90));
             for (int i = 0; i < 8; i++) Part(PrimitiveType.Cube, wheel, Vector3.zero, new Vector3(.9f, 4.4f, .3f), spokes, Quaternion.Euler(i * 22.5f, 0, 0));
@@ -1257,6 +1270,123 @@ namespace Crulanda.World
                 bool ns = side < 2; float sign = side % 2 == 0 ? 1 : -1;
                 b.center = ns ? new Vector3(0, 5, sign * (Half - 1)) : new Vector3(sign * (Half - 1), 5, 0);
                 b.size = ns ? new Vector3(Zone.size, 12, 2) : new Vector3(2, 12, Zone.size);
+            }
+        }
+
+        // ---------- backdrop ----------
+        /// <summary>How far the scenery runs on past the playable edge, in metres (the camera's far plane reaches past it).</summary>
+        const float BackdropWidth = 90;
+        /// <summary>Ground grid resolution (the backdrop's inner row shares the ground's edge vertices exactly).</summary>
+        int GroundSegments { get { return Mathf.RoundToInt(Zone.size / 1.25f); } }
+        /// <summary>
+        /// Scenery past the playable edge, so the world never visibly ends: a skirt of ground carrying on from the edge (same
+        /// heights at the seam, the painted ground mirrored across it) that rises into the biome's hills or mountains, crags
+        /// above the treeline on mountain and ash ridges, and silhouettes in the zone's own mix of woods. A road that runs off
+        /// the edge carries on (its mirrored paint) up a valley that closes into trees or a col. Visual only: no colliders,
+        /// no nav sources, outside the navmesh bounds and the map. Its own random stream leaves the zone's layout unchanged.
+        /// </summary>
+        void BuildBackdrop()
+        {
+            var root = new GameObject("Backdrop").transform; root.SetParent(transform, false);
+            bool mountain = Zone.biome == "mountain", ash = Zone.biome == "ash";
+            float rise = mountain ? 70 : ash ? 42 : 32;
+            // Valleys: the mirror image of the last 45 m of each road that leaves the zone (where its mirrored paint runs).
+            var valleys = new List<Vector2[]>();
+            foreach (var road in Zone.roads)
+                for (int end = 0; end < 2 && road.points.Length > 1; end++)
+                {
+                    var pts = end == 0 ? road.points : Enumerable.Reverse(road.points).ToArray(); var e = pts[0];
+                    bool ew = Mathf.Abs(e.x) >= Half - 3;
+                    if ((!ew && Mathf.Abs(e.y) < Half - 3) || (Zone.wasting != null && e.x > Zone.wasting.x)) continue;
+                    var list = new List<Vector2>(); float left = 45;
+                    for (int i = 0; i < pts.Length && left > 0; i++)
+                    {
+                        var p = pts[i];
+                        if (i > 0) { float seg = Vector2.Distance(pts[i - 1], p); if (seg > left) p = Vector2.Lerp(pts[i - 1], p, left / seg); left -= seg; }
+                        list.Add(ew ? new Vector2(Mathf.Sign(e.x) * Zone.size - p.x, p.y) : new Vector2(p.x, Mathf.Sign(e.y) * Zone.size - p.y));
+                    }
+                    valleys.Add(list.ToArray());
+                }
+            // Height past the edge: the zone's own ground carried on, plus a rise that is nothing on the seam and levels off
+            // as a ridge by 80% of the width (above the camera, so nothing below the horizon shows through).
+            float Rise(float x, float z)
+            {
+                float d = Mathf.Max(Mathf.Abs(x), Mathf.Abs(z)) - Half; if (d <= 0) return 0;
+                float n = Mathf.PerlinNoise(x * .011f + 300, z * .011f + Zone.seed % 500), m = Mathf.PerlinNoise(x * .045f + 80, z * .045f + 30);
+                if (mountain) n = 1 - Mathf.Abs(n * 2 - 1);   // ridged: peaks and cols, not rolling hills
+                float h = rise * (.5f + .5f * n + (m - .5f) * (mountain ? .4f : .15f)) * Mathf.SmoothStep(0, 1, d / (BackdropWidth * .8f));
+                var at = new Vector2(x, z);
+                foreach (var v in valleys) h *= Mathf.Lerp(.5f, 1, Mathf.Clamp01((DistanceToPath(at, v) - 6) / 20));
+                if (Zone.wasting != null) h *= Mathf.Clamp01((Zone.wasting.x + 2 - x) / 40);   // hills fall away to the unmade, which stays flat
+                return h;
+            }
+            float H(float x, float z) { return HeightAt(x, z) + Rise(x, z); }
+            void Show(Mesh mesh, Material mat)
+            {
+                var go = new GameObject(mesh.name); go.transform.SetParent(root, false); go.AddComponent<MeshFilter>().sharedMesh = mesh;
+                var r = go.AddComponent<MeshRenderer>(); r.sharedMaterial = mat; r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            }
+            // The skirt: four sides (each culled alone and clear of the village's point lights), in the ground's own paint.
+            float[] rings = { 0, 1.5f, 4, 8, 13, 19, 26, 34, 43, 53, 64, 76, BackdropWidth };
+            var paint = GroundMesh.GetComponent<MeshRenderer>().sharedMaterial;
+            for (int side = 0; side < 4; side++) Show(ZoneMeshes.Backdrop(Zone.size, GroundSegments, side, rings, H), paint);
+            // Silhouettes: the zone's own mix of woods (weighted by its groves) on the lower slopes, tors above the treeline on
+            // mountain and ash ridges. One merged mesh per material and side, no colliders, no shadows.
+            var rnd = new System.Random(Zone.seed + 4242); float R() { return (float)rnd.NextDouble(); }
+            float dead = 0, pines = 0, leafy = 0;
+            foreach (var g in Zone.groves) { if (g.kind == "dead") dead += g.count; else if (g.kind == "pine") pines += g.count; else if (g.kind == "broadleaf") leafy += g.count; }
+            if (dead + pines + leafy <= 0) pines = 1;
+            var spire = ZoneMeshes.Cone(1, 1, 6); var crown = ZoneMeshes.Blob(Zone.seed + 910, .55f, false, 5, 7); var crag = ZoneMeshes.Blob(Zone.seed + 920, 1.1f, true, 8, 12);
+            var pineMat = Tint(art.pine, new Color(.16f, .23f, .16f)); var deadMat = Tint(art.bark, new Color(.26f, .24f, .22f));
+            var rockMat = Tint(art.stone, ash ? new Color(.3f, .28f, .27f) : new Color(.48f, .47f, .45f));
+            var parts = new Dictionary<(Material, int), List<CombineInstance>>();
+            void Put(int side, Mesh mesh, Material mat, Vector3 at, Quaternion rot, Vector3 scale)
+            {
+                if (!parts.TryGetValue((mat, side), out var list)) parts[(mat, side)] = list = new List<CombineInstance>();
+                list.Add(new CombineInstance { mesh = mesh, transform = Matrix4x4.TRS(at, rot, scale) });
+            }
+            float treeline = mountain ? 32 : ash ? 22 : 43;
+            foreach (float row in new[] { 8f, 14, 22, 32, 43, 53, 64 })
+            {
+                bool rock = row > treeline; if (rock && !mountain && !ash) break;
+                // keep: near rows leave the roads' way out open; further out the woods close across it (the road goes into cover).
+                float edge = Half + row, step = rock ? 20 + row * .2f : (6 + row * .3f) * (ash ? 1.8f : 1), keep = rock ? 14 : row < 30 ? 9 : 0;
+                for (int side = 0; side < 4; side++)
+                    for (float a = -edge + R() * step; a < edge; a += step * (.7f + R() * .6f))
+                    {
+                        float o = edge + (R() - .5f) * 3;
+                        var q = side == 0 ? new Vector2(a, -o) : side == 1 ? new Vector2(o, a) : side == 2 ? new Vector2(-a, o) : new Vector2(-o, -a);
+                        if ((Zone.wasting != null && q.x > Zone.wasting.x - 6) || (keep > 0 && valleys.Exists(v => DistanceToPath(q, v) < keep))) continue;
+                        var at = new Vector3(q.x, H(q.x, q.y) - 1, q.y); float yaw = R() * 360, th = 7 + R() * 5, pick = R() * (dead + pines + leafy);
+                        if (rock)
+                        {
+                            // A tor: tall and narrow, sunk deep enough that its downhill side never hangs over the slope.
+                            float s = mountain ? 12 + R() * 14 : 8 + R() * 8;
+                            Put(side, crag, rockMat, at + Vector3.down * s * .8f, Quaternion.Euler(0, yaw, 0), new Vector3(1.2f * s, 2.8f * s, 1.1f * s));
+                        }
+                        else if (pick < dead)
+                        {
+                            Put(side, spire, deadMat, at, Quaternion.identity, new Vector3(.45f, th, .45f));
+                            for (int j = 0; j < 3; j++) Put(side, spire, deadMat, at + Vector3.up * th * (.45f + j * .14f), Quaternion.Euler(0, yaw + j * 120, 35 + R() * 20), new Vector3(.18f, th * .4f, .18f));
+                        }
+                        else if (pick < dead + pines)
+                        {
+                            Put(side, spire, pineMat, at + Vector3.up * .5f, Quaternion.Euler(0, yaw, 0), new Vector3(th * .3f, th * .62f, th * .3f));
+                            Put(side, spire, pineMat, at + Vector3.up * (.5f + th * .4f), Quaternion.Euler(0, yaw + 30, 0), new Vector3(th * .2f, th * .6f, th * .2f));
+                        }
+                        else
+                        {
+                            float c = th * .45f; var leaf = Tint(art.foliage, Leaf[(int)(R() * 3)]);
+                            Put(side, spire, art.bark, at, Quaternion.identity, new Vector3(.35f, th * .62f, .35f));
+                            Put(side, crown, leaf, at + Vector3.up * th * .62f, Quaternion.Euler(0, yaw, 0), new Vector3(c, c * .85f, c));
+                            Put(side, crown, leaf, at + new Vector3(c * .3f, th * .5f, c * .2f), Quaternion.Euler(0, yaw + 90, 0), new Vector3(c * .7f, c * .6f, c * .7f));
+                        }
+                    }
+            }
+            foreach (var kv in parts)
+            {
+                var mesh = new Mesh { name = "Backdrop " + kv.Key.Item1.name, indexFormat = UnityEngine.Rendering.IndexFormat.UInt32 };
+                mesh.CombineMeshes(kv.Value.ToArray(), true, true); Show(mesh, kv.Key.Item1);
             }
         }
     }

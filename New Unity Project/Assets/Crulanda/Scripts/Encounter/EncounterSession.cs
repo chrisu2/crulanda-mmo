@@ -824,7 +824,11 @@ namespace Crulanda.Encounter
         public bool TravelTo(Crulanda.World.ZoneExit exit)
         {
             if (exit == null || Zone == null || !Zone.HasZone(exit.to)) return false;
-            if (InCombat || !Player.IsAlive) { Message("You can't travel while fighting."); return false; }
+            // Only a fight you are actually in stops you: something after you nearby. A mob stuck chasing you from the far side
+            // of the zone must not bar every road out.
+            var chaser = Enemies.Find(e => e != null && e.Engaged && Distance(e) < 40);
+            if (!Player.IsAlive || chaser != null || (AutoAttack && Target != null && Target.actor.IsAlive && Distance(Target) < 40))
+            { Message(chaser != null ? "You can't travel while fighting: " + chaser.actor.DisplayName + " is still after you." : "You can't travel while fighting."); return false; }
             if (saves == null || saveBlocked) { Message("Travel disabled to protect an unreadable save."); return false; }
             Save(false);
             Progress.zoneId = exit.to; Progress.x = exit.arrive.x; Progress.z = exit.arrive.y; Progress.y = 1.1f;

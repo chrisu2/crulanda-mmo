@@ -233,3 +233,23 @@ These fix the "water, edges, night" group of `Docs/VISUAL_REVIEW_2026-09-29.md`.
   - The curtain is an unlit fog-coloured sheet with crawling bands (not glass).
   - A far haze bank in the fog colour, so the flat unmade fades into haze instead of meeting the sky in a hard line.
   - The Oakhaven Wasting landmark moves to the front.
+
+## 2026-09-29 — Step 2 finished: fix round and zone travel check
+- **Step 2 fix round:**
+  - Khaven roads and clearings are browner and darker than the rose ground, with dry verge grass.
+  - Khaven's tall grass is dark grey and lower, so boars and wolves read against it.
+  - Peaks pines on steep ground are refused, sunk into the ground or swapped for rocks.
+  - Peaks rock and scree are darker and shaded toward the midday sun, and the close-up grain is softened.
+  - Ash Rim's large cracks are thin and light, the crazing no longer covers the unmade ground, and near ash flakes are small.
+  - The Wasting curtain spans 1.3 times the zone and fades out at its ends. Its static only ever lightens, and it flattens at night.
+  - Oakhaven's unmade ground is greyer, with fine static.
+- **Zone travel** (Chris couldn't travel in the `76ed4eb` build):
+  - New `ZoneExitTests` walks the player into every exit of every zone with the real character controller, checks the E prompt, travels, and checks the arrival.
+  - Everything passes on this build. The invisible phantom-Wasting wall, fixed in step 2, blocked the Peaks' road east and Khaven's east side.
+  - Travel is now refused only by a fight nearby (an enemy engaged within 40 m), and the message names who is still after you.
+- Tests: EditMode 166/166, PlayMode 50/50.
+- Still to polish, to be done alongside step 3:
+  - Khaven roads need more contrast.
+  - A pine cluster above the Peaks exit still floats.
+  - Peaks rock is still a little pale.
+  - A straight sky seam in `oakhaven-18`, probably the sun shafts rather than the curtain.

@@ -9,28 +9,25 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (session paused 2026-09-29, about 15:30, until Chris's tokens reset)
+## RESUME HERE (updated 2026-09-29, about 18:50)
 Chris's rules:
 - Work in order of importance and finish each step.
 - Keep going without waiting for him, using parallel agents (memory: crulanda-autonomy).
-- Tell him when step 2 is published.
 
-**Git state:**
-- `main` = `191d9b8`: step 2, tested (EditMode 166/166, PlayMode 49/49). Not published yet.
-- Branch `wip/step2-fix-round` = `b178580`: the fixes for the 7 confirmed step-2 problems. UNTESTED: a reviewer found no compile errors, but nothing has run in Unity.
-- The published build (`outputs\Crulanda-Playable`) is `76ed4eb`: step 1 plus the tree fade and target ring.
-
-**Done today:**
-- **Step 1:** water, world edges and night.
-- **Camera and targeting:**
-  - Trees fade when they block the view.
-  - The target ring and boxed nameplate.
-- **Step 2, zone looks:**
-  - The phantom Wasting wall fixed.
-  - Khaven gloom and dusk, Peaks mountains, the grey Ash Rim, and the soft Wasting edge.
+**State:**
+- **Step 2 is PUBLISHED** to `outputs\Crulanda-Playable`. Chris has been told.
+  - It includes step 2's zone looks, its fix round and the travel hardening.
+  - Tests: EditMode 166/166, PlayMode 50/50, including the new ZoneExitTests, which walks into every exit and travels.
+- The zone-travel bug: the new test passes for all 8 exits. The published `76ed4eb` build had the phantom-Wasting wall, which blocked the Peaks' road east and Khaven's east side. Travel is now refused only by a fight within 40 m.
+  - Chris's save was at (-20, 120), the north edge of Oakhaven, where there is no exit. Oakhaven's exits are west (to Khaven) and south (to the Ash Rim).
+- Step 2 polish still to do, alongside step 3:
+  - Khaven roads need more contrast: a greyer, darker brown.
+  - The pine cluster above the peaks-09 exit still floats.
+  - Peaks sunlit rock is still about 135-148; the target is 110-130.
+  - The oakhaven-18 sky seam is unchanged: probably the sun shafts or a haze-bank edge, not the curtain.
 
 **Next, in order:**
-0. **TOP PRIORITY BUG: you can't travel to the new zones.** Chris, 2026-09-29, playing the published build `76ed4eb`.
+0. ~~Zone-travel bug~~: fixed or verified on 2026-09-29 (see above). The original report: Chris, 2026-09-29, playing the published build `76ed4eb`.
    - Reproduce it first. Try each exit in Oakhaven (west road to Khaven, south road to the Ash Rim) and the others.
    - Suspects, in order:
      - Step 1's backdrop skirt, forest edge or boundary colliders keeping the player (a CharacterController, not a navmesh agent) out of the exit radius.

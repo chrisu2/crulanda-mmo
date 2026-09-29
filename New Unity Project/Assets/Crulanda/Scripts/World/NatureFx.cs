@@ -9,7 +9,7 @@ namespace Crulanda.World
     /// </summary>
     public sealed class FallingLeaves : MonoBehaviour
     {
-        ZoneBuilder zone; ParticleSystem ps; ParticleSystem.EmissionModule emission; float nextCheck; bool ash;
+        ZoneBuilder zone; ParticleSystem ps; ParticleSystem.EmissionModule emission; float nextCheck; bool ash, filled;
         public void Init(ZoneBuilder builder)
         {
             zone = builder; ash = zone.Zone.biome == "ash";
@@ -19,27 +19,31 @@ namespace Crulanda.World
             ps.transform.SetParent(transform, false);
             ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
             var main = ps.main;
-            main.duration = 5; main.loop = true; main.startLifetime = ash ? 14 : 9;
-            main.startSpeed = 0; main.startSize = ash ? new ParticleSystem.MinMaxCurve(.05f, .12f) : new ParticleSystem.MinMaxCurve(.12f, .22f);
-            main.gravityModifier = ash ? .012f : .035f; main.maxParticles = 700; main.simulationSpace = ParticleSystemSimulationSpace.World;
-            main.startRotation3D = true;
+            // Ash: bigger, slower flakes drifting on the wind through the whole air column (small grey ones vanished in the haze).
+            main.duration = 5; main.loop = true; main.startLifetime = ash ? new ParticleSystem.MinMaxCurve(10, 18) : new ParticleSystem.MinMaxCurve(9);
+            main.startSpeed = 0; main.startSize = ash ? new ParticleSystem.MinMaxCurve(.1f, .22f) : new ParticleSystem.MinMaxCurve(.12f, .22f);
+            main.gravityModifier = ash ? .003f : .035f; main.maxParticles = ash ? 1200 : 700; main.simulationSpace = ParticleSystemSimulationSpace.World;
+            main.startRotation3D = !ash;   // ash faces the camera: flat quads tilted edge-on read as rain streaks
             main.startRotationX = new ParticleSystem.MinMaxCurve(0, Mathf.PI * 2); main.startRotationY = new ParticleSystem.MinMaxCurve(0, Mathf.PI * 2); main.startRotationZ = new ParticleSystem.MinMaxCurve(0, Mathf.PI * 2);
             var colors = new Gradient();
-            if (ash) colors.SetKeys(new[] { new GradientColorKey(new Color(.55f, .54f, .53f), 0), new GradientColorKey(new Color(.35f, .33f, .32f), 1) }, new[] { new GradientAlphaKey(.9f, 0), new GradientAlphaKey(.9f, 1) });
+            // Ash: mostly pale flakes (they show against the ground and trees), a quarter charred flecks (against the sky and haze).
+            if (ash) colors.SetKeys(new[] { new GradientColorKey(new Color(.92f, .91f, .9f), 0), new GradientColorKey(new Color(.78f, .77f, .77f), .6f), new GradientColorKey(new Color(.24f, .23f, .23f), .75f), new GradientColorKey(new Color(.2f, .19f, .19f), 1) }, new[] { new GradientAlphaKey(.95f, 0), new GradientAlphaKey(.95f, 1) });
+            else if (zone.Zone.biome == "gloom") colors.SetKeys(new[] { new GradientColorKey(new Color(.44f, .38f, .29f), 0), new GradientColorKey(new Color(.34f, .3f, .26f), .5f), new GradientColorKey(new Color(.52f, .47f, .38f), 1) }, new[] { new GradientAlphaKey(1, 0), new GradientAlphaKey(1, 1) });   // withered, not autumn
             else colors.SetKeys(new[] { new GradientColorKey(new Color(.85f, .45f, .12f), 0), new GradientColorKey(new Color(.75f, .22f, .1f), .35f), new GradientColorKey(new Color(.85f, .7f, .2f), .7f), new GradientColorKey(new Color(.45f, .3f, .15f), 1) },
                 new[] { new GradientAlphaKey(1, 0), new GradientAlphaKey(1, 1) });
             main.startColor = new ParticleSystem.MinMaxGradient(colors) { mode = ParticleSystemGradientMode.RandomColor };
-            var shape = ps.shape; shape.shapeType = ParticleSystemShapeType.Box; shape.scale = new Vector3(44, 1, 44);
+            var shape = ps.shape; shape.shapeType = ParticleSystemShapeType.Box; shape.scale = new Vector3(44, ash ? 10 : 1, 44);   // ash is born through the air column, so it shows at once
             // Flutter: turbulence plus a slow tumble.
-            var noise = ps.noise; noise.enabled = true; noise.strength = ash ? .25f : .55f; noise.frequency = .35f; noise.scrollSpeed = .2f; noise.separateAxes = false;
+            var noise = ps.noise; noise.enabled = true; noise.strength = ash ? .4f : .55f; noise.frequency = .35f; noise.scrollSpeed = .2f; noise.separateAxes = false;
             var rot = ps.rotationOverLifetime; rot.enabled = !ash; rot.separateAxes = true;
             rot.x = new ParticleSystem.MinMaxCurve(-2.5f, 2.5f); rot.y = new ParticleSystem.MinMaxCurve(-1.5f, 1.5f); rot.z = new ParticleSystem.MinMaxCurve(-3, 3);
             var vel = ps.velocityOverLifetime; vel.enabled = true; vel.space = ParticleSystemSimulationSpace.World;
-            vel.x = new ParticleSystem.MinMaxCurve(.2f, .6f); vel.y = new ParticleSystem.MinMaxCurve(-.35f, -.15f); vel.z = new ParticleSystem.MinMaxCurve(-.1f, .25f);
+            vel.x = ash ? new ParticleSystem.MinMaxCurve(.35f, 1f) : new ParticleSystem.MinMaxCurve(.2f, .6f); vel.y = ash ? new ParticleSystem.MinMaxCurve(-.5f, -.25f) : new ParticleSystem.MinMaxCurve(-.35f, -.15f); vel.z = new ParticleSystem.MinMaxCurve(-.1f, .25f);
             var fade = ps.colorOverLifetime; fade.enabled = true;
-            var alpha = new Gradient(); alpha.SetKeys(new[] { new GradientColorKey(Color.white, 0), new GradientColorKey(Color.white, 1) }, new[] { new GradientAlphaKey(0, 0), new GradientAlphaKey(1, .1f), new GradientAlphaKey(1, .8f), new GradientAlphaKey(0, 1) });
+            var alpha = new Gradient(); alpha.SetKeys(new[] { new GradientColorKey(Color.white, 0), new GradientColorKey(Color.white, 1) }, new[] { new GradientAlphaKey(0, 0), new GradientAlphaKey(1, ash ? .03f : .1f), new GradientAlphaKey(1, .8f), new GradientAlphaKey(0, 1) });   // ash is born in view: a quick fade-in
             fade.color = alpha;
-            var r = ps.GetComponent<ParticleSystemRenderer>(); r.sharedMaterial = mat; r.renderMode = ParticleSystemRenderMode.Billboard; r.alignment = ParticleSystemRenderSpace.Local;
+            var r = ps.GetComponent<ParticleSystemRenderer>(); r.sharedMaterial = mat; r.renderMode = ParticleSystemRenderMode.Billboard; r.alignment = ash ? ParticleSystemRenderSpace.View : ParticleSystemRenderSpace.Local;
+            if (ash) r.maxParticleSize = .025f;   // a flake passing the lens stays a flake, not a blot
             r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             emission = ps.emission; emission.rateOverTime = 0;
             ps.Play();
@@ -50,10 +54,14 @@ namespace Crulanda.World
             var cam = Camera.main; if (cam == null) return;
             // Centre on the ground ahead of the camera, a little above head height.
             var focus = cam.transform.position + Vector3.ProjectOnPlane(cam.transform.forward, Vector3.up).normalized * 12;
-            ps.transform.position = new Vector3(focus.x, zone.HeightAt(focus.x, focus.z) + 11, focus.z);
+            var at = new Vector3(focus.x, zone.HeightAt(focus.x, focus.z) + (ash ? 6.5f : 11), focus.z);
+            // Ash hangs everywhere: fill the air at once on arrival and after a teleport (the old flakes stay behind; turning
+            // the camera moves the focus 24 m at most, so a turn never refills).
+            if (ash && (!filled || (at - ps.transform.position).sqrMagnitude > 30 * 30)) { ps.transform.position = at; ps.Clear(); ps.Emit(700); filled = true; }
+            ps.transform.position = at;
             if (Time.time < nextCheck) return;
             nextCheck = Time.time + 1;
-            if (ash) { emission.rateOverTime = 18; return; }
+            if (ash) { emission.rateOverTime = 60; return; }
             int near = 0;
             foreach (var t in zone.LeafTrees) if ((new Vector2(t.x - focus.x, t.z - focus.z)).sqrMagnitude < 26 * 26) near++;
             emission.rateOverTime = Mathf.Min(38, near * 1.3f);

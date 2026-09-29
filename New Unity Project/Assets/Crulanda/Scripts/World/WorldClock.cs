@@ -40,8 +40,11 @@ namespace Crulanda.World
                 if (sky.HasProperty("_AtmosphereThickness")) atmosphere = sky.GetFloat("_AtmosphereThickness");
                 if (sky.HasProperty("_SunSize")) sunSize = sky.GetFloat("_SunSize");
             }
+            // A zone's own daytime sky (Khaven's dusk) replaces the shared one; night drains it the same way.
+            if (!string.IsNullOrEmpty(day.skyTint)) skyTint = ZoneColors.Parse(day.skyTint, skyTint);
+            if (day.skyHaze > 0) atmosphere = day.skyHaze;
             dayLook = new Look { sun = ZoneColors.Parse(day.sunColor, Color.white), intensity = day.sunIntensity, sky = ZoneColors.Parse(day.ambientSky, Color.grey),
-                equator = ZoneColors.Parse(day.ambientEquator, Color.grey), ground = ZoneColors.Parse(day.ambientGround, Color.black), fog = ZoneColors.Parse(day.fogColor, Color.grey), exposure = 1.05f };
+                equator = ZoneColors.Parse(day.ambientEquator, Color.grey), ground = ZoneColors.Parse(day.ambientGround, Color.black), fog = ZoneColors.Parse(day.fogColor, Color.grey), exposure = day.skyExposure > 0 ? day.skyExposure : 1.05f };
             dawn = new Look { sun = new Color(1, .62f, .4f), intensity = .6f, sky = new Color(.5f, .45f, .55f), equator = new Color(.55f, .42f, .38f), ground = new Color(.22f, .18f, .16f), fog = new Color(.62f, .5f, .48f), exposure = .7f };
             dusk = new Look { sun = new Color(1, .5f, .28f), intensity = .55f, sky = new Color(.45f, .38f, .5f), equator = new Color(.5f, .34f, .3f), ground = new Color(.2f, .15f, .13f), fog = new Color(.55f, .4f, .38f), exposure = .6f };
             // Moonlit night: a blue ambient floor so faces turned from the moon stay readable; the sky stays dark (exposure .3).
@@ -79,7 +82,9 @@ namespace Crulanda.World
             var look = Current();
             // The same light plays sun by day and moon by night; it swings across the sky with the hour.
             bool moon = Hour >= 20.2f || Hour < 5.6f;
-            float elevation = moon ? 38 : Mathf.Lerp(4, Mathf.Max(day.sunPitch * 1.6f, 45), Mathf.Sin(Mathf.Clamp01((Hour - 5.6f) / 14.6f) * Mathf.PI));
+            // Noon height: the default arc, or the zone's own (sunHigh: Khaven's sun never climbs out of the evening).
+            float high = day.sunHigh > 0 ? day.sunHigh : Mathf.Max(day.sunPitch * 1.6f, 45);
+            float elevation = moon ? 38 : Mathf.Lerp(4, high, Mathf.Sin(Mathf.Clamp01((Hour - 5.6f) / 14.6f) * Mathf.PI));
             float yaw = day.sunYaw + (moon ? 180 : (Hour - 12) * 12);
             if (sun != null) { sun.transform.rotation = Quaternion.Euler(elevation, yaw, 0); sun.color = look.sun; sun.intensity = look.intensity; sun.shadowStrength = moon ? .45f : .75f; }
             RenderSettings.ambientSkyColor = look.sky; RenderSettings.ambientEquatorColor = look.equator; RenderSettings.ambientGroundColor = look.ground;

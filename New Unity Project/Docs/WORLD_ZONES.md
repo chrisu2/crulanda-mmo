@@ -39,6 +39,9 @@ GAME-ONLY / PROVISIONAL: the Concord collectors and warden, Mira, exact building
 Canon names from `maps\khaven_village_map.png`: the Cracked Hearth, two Fallen Smithies, the Blood-Stone Well, the Gallows
 Tree, the Crypt-Keeper's Hovel, the Whispering Wood, Gloom Creek and the Carrion Cliffs. Built as a walled village at dusk
 with gate towers, a dead grey wood, dark creek water and an old crypt under the cliffs.
+Biome `gloom`: hard grey-brown earth, thin dry grass and no flowers, grey dead woods, withered pines and brush, and a drained
+rose-violet grade. The dusk holds all day: `lighting.sunHigh` keeps the sun low, and `skyTint`/`skyExposure`/`skyHaze` give a
+dusky sky, while night still falls on the global clock. No Wasting here: only zones whose JSON has a `wasting` block get one.
 GAME-ONLY / PROVISIONAL: the Sandthrone outriders holding it (Sandthrone is a canon mercenary faction), the Pale watcher
 (canon "Pale Things" as cosmic auditors), the crypt and all exact placement.
 
@@ -49,7 +52,11 @@ GAME-ONLY / PROVISIONAL:
 - this pass, its toll gate and toll-house;
 - the pilgrims' rest and its people, the ruined waystation and the cairns;
 - all camps and placement.
-Biome `mountain`: rock and scree painting, sparse grass, pines.
+Biome `mountain`: rock and scree painting (rock on steep ground), sparse tufted grass, pines, strewn boulders.
+Relief (`ZoneBuilder.Crag`): steep knolls, rock ribs and walls climbing to the zone edge rise only off the keep grid, which
+holds roads, clearings, camps, props, people, landmarks, exits, arrivals and a 6 m way from each to its nearest road, so all
+of it stays reachable. A cliff's `lift` raises a shelf behind it (negative: on its -z side): the Umbra scarp, the High ledge
+and its wall, the Eyrie crag, the North wall and the South and East scarps.
 
 ## The Ashland Rim (CANON-EXPANDED / PROVISIONAL), levels 9-10
 Canon (book1 ch.20): the Ash-Walkers (Chieftain Grohl, Mother Vane the Salt-Speaker) live in caves along the Wasting and fight
@@ -125,7 +132,7 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
 - A skirt of ground continues past each side of the zone: `ZoneMeshes.Backdrop`, four sides with rings out to `BackdropWidth`.
   - Its inner row shares the ground's edge vertices (`GroundSegments`), so no crack can open.
   - UVs mirror the painted ground, so roads run on over the seam.
-- The skirt rises into hills (`Rise`) coloured by biome, with tree and rock silhouettes. Next to the Wasting it falls away.
+- The skirt rises into hills (`Rise`) coloured by biome, with tree and rock silhouettes. Next to the Wasting it falls away to the flat unmade. There the skirt spreads the unmade strip's own paint instead of mirroring (no meadow, roads or cracks come back), and `BuildWasting` lays haze in the fog's own colour over the unmade (`WastingStatic`): clear at the curtain, opaque before the skirt ends, with a bank of it on the horizon that thins upward into the sky. Linear fog alone left the skirt's edge half-fogged at the sides of the view, which drew a straight horizon line. The Wasting's front (`Unmade`) is ragged for paint and grass alike; its curtain is unlit static in the fog's colour, thin at the ground.
 - The sky's `_GroundColor` is set to the fog colour each frame, divided by sqrt(exposure) to suit gamma space. Anything seen
   past the backdrop fades into fog, not into a brown plane.
 - The camera's far plane covers the backdrop. Shadow distance is unchanged.

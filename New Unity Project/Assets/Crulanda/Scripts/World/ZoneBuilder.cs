@@ -29,8 +29,19 @@ namespace Crulanda.World
         }
         public ZoneDefinition FindZone(string id)
         {
-            foreach (var z in zones) { var d = z == null ? null : JsonUtility.FromJson<ZoneDefinition>(z.text); if (d != null && d.id == id) return d; }
+            foreach (var z in zones) { var d = z == null ? null : ParseZone(z.text); if (d != null && d.id == id) return d; }
             return null;
+        }
+        /// <summary>
+        /// A zone from its JSON. JsonUtility never leaves a nested class null, so a zone without a "wasting" block got a default
+        /// Wasting at x = 58 (grey unmade ground, a static curtain and a wall across Khaven's Carrion Cliffs and the Peaks' toll
+        /// road east). Only zones that describe their Wasting have one.
+        /// </summary>
+        static ZoneDefinition ParseZone(string json)
+        {
+            var d = JsonUtility.FromJson<ZoneDefinition>(json);
+            if (d != null && !json.Contains("\"wasting\"")) d.wasting = null;
+            return d;
         }
         public ZoneDefinition Zone { get; private set; }
         public MeshFilter GroundMesh { get; private set; }
@@ -42,17 +53,21 @@ namespace Crulanda.World
 
         void Awake()
         {
-            Zone = (RequestedZoneId != null ? FindZone(RequestedZoneId) : null) ?? JsonUtility.FromJson<ZoneDefinition>(zoneJson != null ? zoneJson.text : "{}");
+            Zone = (RequestedZoneId != null ? FindZone(RequestedZoneId) : null) ?? ParseZone(zoneJson != null ? zoneJson.text : "{}");
             RequestedZoneId = null;
             if (Zone == null || string.IsNullOrEmpty(Zone.id) || art == null) { Debug.LogError("Zone definition or art missing."); enabled = false; return; }
             Active = this;
             rng = new System.Random(Zone.seed);
             props = new GameObject("Zone props").transform; props.SetParent(transform, false);
             statics = new GameObject("Zone static scenery").transform; statics.SetParent(transform, false);
-            Water = new ZoneWater(); Water.Prepare(Zone, (x, z) => HeightAt(x, z, false));
+            PrepareRelief(); Water = new ZoneWater(); Water.Prepare(Zone, (x, z) => HeightAt(x, z, false));
             BuildLighting(); BuildGround(); BuildWater(); BuildWasting(); BuildProps(); BuildGroves(); BuildExits(); BuildForestEdge(); BuildBoundaries(); BuildBackdrop();
             if (art.grass != null && art.grass.Length > 0)
-                gameObject.AddComponent<GrassField>().Build(this, art.grass, art.flowers, Openness, Zone.seed + 99, Zone.biome == "meadow" ? 2.3f : 1.6f, TallGrassPatches());
+            {
+                // Gloom: the tufts are dry, greyed straw and no wildflowers bloom.
+                var grass = Gloom ? art.grass.Select(m => new Material(m) { name = m.name + " (dry)", color = Color.Lerp(m.color, new Color(.5f, .46f, .37f), .75f), enableInstancing = true }).ToArray() : art.grass;
+                gameObject.AddComponent<GrassField>().Build(this, grass, Gloom ? null : art.flowers, Openness, Zone.seed + 99, Zone.biome == "meadow" ? 2.3f : 1.6f, TallGrassPatches());
+            }
             gameObject.AddComponent<FallingLeaves>().Init(this);
             Splashes.Ensure(this); TreeFade.Begin(art.fade);
             var view = Camera.main;
@@ -91,7 +106,7 @@ namespace Crulanda.World
         {
             if (all != null) return all;
             all = new List<ZoneDefinition>();
-            foreach (var z in zones) { var d = z == null ? null : JsonUtility.FromJson<ZoneDefinition>(z.text); if (d != null && !string.IsNullOrEmpty(d.id)) all.Add(d); }
+            foreach (var z in zones) { var d = z == null ? null : ParseZone(z.text); if (d != null && !string.IsNullOrEmpty(d.id)) all.Add(d); }
             if (!all.Exists(d => d.id == Zone.id)) all.Add(Zone);
             return all;
         }
@@ -107,7 +122,7 @@ namespace Crulanda.World
             float r = new Vector2(x, z).magnitude;
             float hills = Mathf.SmoothStep(0, 1, Mathf.InverseLerp(Zone.flatRadius, Zone.flatRadius + 22, r));
             float n = Mathf.PerlinNoise(x * .035f + Zone.seed, z * .035f + Zone.seed * 2) * .75f + Mathf.PerlinNoise(x * .11f, z * .11f) * .25f;
-            float h = hills * Zone.hillHeight * n;
+            float h = hills * Zone.hillHeight * n + (hills > 0 ? hills * Crag(x, z) : 0) + CliffLift(x, z);   // mountain crags off the kept ways; shelves behind cliffs
             if (Zone.wasting != null && x > Zone.wasting.x - 4) h *= Mathf.Clamp01((Zone.wasting.x + 2 - x) / 6);  // unmade ground is dead flat
             if (carveWater && Water != null) h = Water.Carve(x, z, h);   // creeks and lakes (see ZoneWater)
             return h;
@@ -149,6 +164,127 @@ namespace Crulanda.World
             return best;
         }
 
+        // ---------- relief ----------
+        // Mountain zones get crags on top of the rolling hills: steep knolls, narrow rock ribs and walls that climb to the edge
+        // and on under the backdrop. They rise only where the keep grid is 0: never on a road, clearing, camp, prop, person,
+        // landmark, exit or arrival, nor on a 6 m way from each of those to its nearest road, so all of it stays reachable.
+        // In any zone, a cliff prop with a lift raises the ground behind it into a shelf that high, so the crag reads as the
+        // face of a scarp or ledge instead of blocks standing on a lawn.
+        const float KeepStep = 2;
+        float[] keep; int keepN;
+        float[] groundUp;   // the ground grid's normal.y (1 on the flat), for slope-aware paint and grass
+        readonly List<(Vector2 at, float cos, float sin, float half, float lift)> lifts = new List<(Vector2, float, float, float, float)>();
+        void PrepareRelief()
+        {
+            foreach (var p in Zone.props)
+                if (p != null && p.kind == "cliff" && p.lift != 0)
+                    lifts.Add((p.at, Mathf.Cos(p.rotation * Mathf.Deg2Rad), Mathf.Sin(p.rotation * Mathf.Deg2Rad), (p.size.x > 0 ? p.size.x : 20) / 2, p.lift));
+            if (Zone.biome != "mountain") return;
+            var circles = new List<(Vector2 c, float r)>(); var lines = new List<(Vector2 a, Vector2 b, float w)>();
+            foreach (var road in Zone.roads) for (int i = 0; i + 1 < road.points.Length; i++) lines.Add((road.points[i], road.points[i + 1], road.width / 2 + 3));
+            foreach (var c in Zone.clearings) circles.Add((c.center, c.radius + 3));
+            foreach (var c in Zone.camps) circles.Add((c.center, c.radius + 4));
+            foreach (var e in Zone.exits) circles.Add((e.at, e.radius + 4));
+            foreach (var l in Zone.landmarks) circles.Add((l.at, Mathf.Min(l.radius * .5f, 6)));
+            foreach (var z in AllZones()) foreach (var e in z.exits) if (e.to == Zone.id) circles.Add((e.arrive, 5));
+            circles.Add((Zone.spawns.player, 5)); circles.Add((Zone.spawns.companion, 4)); circles.Add((Zone.spawns.recovery, 4));
+            // The low side of each raised cliff stays level for a few metres, so its face stands clear above the ground there.
+            foreach (var (at, cos, sin, half, lift) in lifts)
+            {
+                Vector2 along = new Vector2(cos, -sin) * half, front = new Vector2(sin, cos) * (-Mathf.Sign(lift) * 7);
+                lines.Add((at + along + front, at - along + front, 4));
+            }
+            foreach (var p in Zone.props)
+            {
+                if (p == null || p.kind == "cliff" || (p.kind == "rock" && string.IsNullOrEmpty(p.interact))) continue;   // crags and loose rocks may sink into it
+                if (p.kind == "wall") { for (int i = 0; i + 1 < p.points.Length; i++) lines.Add((p.points[i], p.points[i + 1], 3)); continue; }
+                circles.Add((p.at, Mathf.Max(p.size.x, p.size.y) * .75f + 3));
+            }
+            if (Zone.life != null)
+            {
+                foreach (var r in Zone.life.residents) if (r != null) circles.Add((r.at, 4));
+                foreach (var c in Zone.life.critters) if (c != null) circles.Add((c.center, Mathf.Min(c.radius * .7f, 8)));
+            }
+            var roadPts = new List<Vector2>(); foreach (var road in Zone.roads) roadPts.AddRange(Densify(road.points, 2));
+            if (roadPts.Count > 0)
+                foreach (var (c, _) in circles)
+                {
+                    var near = roadPts[0]; foreach (var q in roadPts) if ((q - c).sqrMagnitude < (near - c).sqrMagnitude) near = q;
+                    lines.Add((c, near, 3));
+                }
+            keepN = Mathf.CeilToInt(Zone.size / KeepStep) + 1; keep = new float[keepN * keepN];
+            for (int j = 0; j < keepN; j++)
+                for (int i = 0; i < keepN; i++)
+                {
+                    var p = new Vector2(-Half + i * KeepStep, -Half + j * KeepStep); float d = float.MaxValue;
+                    foreach (var (c, r) in circles) d = Mathf.Min(d, Vector2.Distance(p, c) - r);
+                    foreach (var (a, b, w) in lines) d = Mathf.Min(d, Segment(p, a, b) - w);
+                    keep[j * keepN + i] = 1 - Mathf.SmoothStep(0, 1, d / 10);   // held out to d = 0, free 10 m further on
+                }
+        }
+        static float Segment(Vector2 p, Vector2 a, Vector2 b)
+        {
+            var ab = b - a; float t = Mathf.Clamp01(Vector2.Dot(p - a, ab) / Mathf.Max(.0001f, ab.sqrMagnitude));
+            return Vector2.Distance(p, a + ab * t);
+        }
+        /// <summary>Keep grid at a point (1 held, 0 free). Past the edge it mirrors back like the backdrop's paint, so a road's
+        /// notch runs on out with its mirrored paint.</summary>
+        float Keep(float x, float z)
+        {
+            if (keep == null) return 1;
+            float s = Zone.size, h = Half;
+            if (x > h) x = s - x; else if (x < -h) x = -s - x;
+            if (z > h) z = s - z; else if (z < -h) z = -s - z;
+            float fx = Mathf.Clamp((x + h) / KeepStep, 0, keepN - 1.001f), fz = Mathf.Clamp((z + h) / KeepStep, 0, keepN - 1.001f);
+            int ix = (int)fx, iz = (int)fz; fx -= ix; fz -= iz; int i = iz * keepN + ix;
+            return Mathf.Lerp(Mathf.Lerp(keep[i], keep[i + 1], fx), Mathf.Lerp(keep[i + keepN], keep[i + keepN + 1], fx), fz);
+        }
+        /// <summary>Mountain relief added to the rolling hills at a point: 0 off mountains and wherever the keep grid holds.</summary>
+        float Crag(float x, float z)
+        {
+            if (keep == null) return 0;
+            float free = 1 - Keep(x, z); if (free <= 0) return 0;
+            float cheb = Mathf.Max(Mathf.Abs(x), Mathf.Abs(z));
+            float rib = 1 - Mathf.Abs(Mathf.PerlinNoise(x * .019f + 170, z * .019f + 60) * 2 - 1);    // ridged: 1 on a crest line
+            float peak = 1 - Mathf.Abs(Mathf.PerlinNoise(x * .031f + 12, z * .031f + 140) * 2 - 1);
+            float knoll = Mathf.Clamp01((Mathf.PerlinNoise(x * .043f + 33, z * .043f + 81) - .52f) * 4.5f);
+            float edge = Mathf.SmoothStep(0, 1, Mathf.InverseLerp(Half - 40, Half - 6, cheb));
+            rib *= rib; rib *= rib;
+            // Narrow rock ribs, steep knolls, and walls with jagged crests toward the edge; past it the backdrop's ridges take over.
+            float h = rib * 5 + knoll * knoll * 8 + edge * (6 + peak * peak * 14);
+            return h * free * (1 - .6f * Mathf.SmoothStep(0, 1, (cheb - Half) / 60));
+        }
+        /// <summary>Ground raised behind cliff props (lift metres on the prop's +z side, or its -z side when negative): a 3 m face
+        /// at the crag, a shelf 16 m deep easing out over 12 m, and a 14 m ramp past each end.</summary>
+        float CliffLift(float x, float z)
+        {
+            float best = 0;
+            foreach (var (at, cos, sin, half, lift) in lifts)
+            {
+                float wx = x - at.x, wz = z - at.y, lx = wx * cos - wz * sin, lz = (wx * sin + wz * cos) * Mathf.Sign(lift);   // into the prop's frame, raised side +
+                if (lz < -1 || lz > 28 || Mathf.Abs(lx) > half + 14) continue;
+                float along = 1 - Mathf.SmoothStep(0, 1, (Mathf.Abs(lx) - half) / 14);
+                float behind = Mathf.SmoothStep(0, 1, (lz + 1) / 3) * (1 - Mathf.SmoothStep(0, 1, (lz - 16) / 12));
+                best = Mathf.Max(best, Mathf.Abs(lift) * along * behind);
+            }
+            return best;
+        }
+        /// <summary>How level the ground is at a point (the ground grid's normal.y, 1 on the flat).</summary>
+        float UpAt(float x, float z)
+        {
+            if (groundUp == null) return 1;
+            int seg = GroundSegments, row = seg + 1;
+            float fx = Mathf.Clamp((x + Half) / Zone.size * seg, 0, seg - .001f), fz = Mathf.Clamp((z + Half) / Zone.size * seg, 0, seg - .001f);
+            int ix = (int)fx, iz = (int)fz; fx -= ix; fz -= iz; int i = iz * row + ix;
+            return Mathf.Lerp(Mathf.Lerp(groundUp[i], groundUp[i + 1], fx), Mathf.Lerp(groundUp[i + row], groundUp[i + row + 1], fx), fz);
+        }
+        /// <summary>Mountain ground: how rocky a point is before slope (noise patches, more toward the high edges); 0 = turf.</summary>
+        float MountainRock(float x, float z)
+        {
+            float edge = Mathf.InverseLerp(Half - 40, Half - 6, Mathf.Max(Mathf.Abs(x), Mathf.Abs(z)));
+            return (Mathf.PerlinNoise(x * .045f + 90, z * .045f + 17) - .45f) * 2.4f + edge * .6f;
+        }
+
         // ---------- lighting ----------
         void BuildLighting()
         {
@@ -178,9 +314,11 @@ namespace Crulanda.World
         {
             var go = new GameObject("Ground"); go.transform.SetParent(transform, false); go.layer = 0;
             var mesh = ZoneMeshes.Ground(Zone.size, GroundSegments, HeightAt);
+            var normals = mesh.normals; groundUp = new float[normals.Length]; for (int i = 0; i < normals.Length; i++) groundUp[i] = normals[i].y;
             GroundMesh = go.AddComponent<MeshFilter>(); GroundMesh.sharedMesh = mesh;
             var r = go.AddComponent<MeshRenderer>(); var m = new Material(art.ground) { name = "Painted ground" };
             m.SetTextureScale("_DetailAlbedoMap", Vector2.one * Zone.size / 1.8f);   // ~1.8 m grain repeat, whatever the zone size
+            if (Zone.biome == "ash") { m.SetTexture("_DetailAlbedoMap", AshDetail(Zone.seed)); m.SetTextureScale("_DetailAlbedoMap", Vector2.one * Zone.size / 5); }   // fine crazing, sharp up close
             m.mainTexture = PaintGround(Mathf.Clamp(Mathf.RoundToInt(Zone.size * 8 / 256) * 256, 1024, 2048)); r.sharedMaterial = m;
             go.AddComponent<MeshCollider>().sharedMesh = mesh;
         }
@@ -192,7 +330,24 @@ namespace Crulanda.World
             Color dirt = new Color(.46f, .38f, .27f), rut = new Color(.34f, .28f, .20f), mud = new Color(.28f, .25f, .19f);
             Color soil = new Color(.30f, .23f, .16f), furrow = new Color(.20f, .15f, .11f), stubble = new Color(.62f, .53f, .30f);
             Color unmade = new Color(.47f, .47f, .49f);
-            float size = Zone.size, half = size / 2;
+            bool gloom = Gloom;
+            if (gloom) { dirt = new Color(.42f, .38f, .34f); rut = new Color(.31f, .28f, .26f); }   // grey-brown village dirt and roads
+            float size = Zone.size, half = size / 2, texel = size / res;
+            // Ash crust: petrified-ash plates split by angular cracks, a Voronoi network with one jittered site per 5 m cell
+            // (sx/sz in cell units, three cells of margin), plus each site's 8 bisectors with its neighbours (unit normal bx/bz,
+            // offset bo, neighbour bn), so a pixel's distance to its nearest crack is 8 dot products.
+            bool ashen = Zone.biome == "ash"; const float plate = 5; int cells = Mathf.CeilToInt(size / plate) + 7;
+            var sx = new float[ashen ? cells * cells : 0]; var sz = new float[sx.Length]; var crust = new System.Random(Zone.seed + 77);
+            for (int k = 0; k < sx.Length; k++) { sx[k] = k % cells + .15f + .7f * (float)crust.NextDouble(); sz[k] = k / cells + .15f + .7f * (float)crust.NextDouble(); }
+            var bx = new float[sx.Length * 8]; var bz = new float[bx.Length]; var bo = new float[bx.Length]; var bn = new int[bx.Length];
+            for (int k = 0, m = 0; k < sx.Length; k++)
+                for (int e = 0; e < 9; e++)
+                {
+                    if (e == 4) continue; int a = k % cells + e % 3 - 1, b = k / cells + e / 3 - 1, o = b * cells + a;
+                    if (a < 0 || b < 0 || a >= cells || b >= cells) { bo[m++] = 99; continue; }   // off the grid: never the nearest
+                    float ax = sx[o] - sx[k], az = sz[o] - sz[k], len = Mathf.Sqrt(ax * ax + az * az);
+                    bx[m] = ax / len; bz[m] = az / len; bo[m] = ((sx[o] + sx[k]) * ax + (sz[o] + sz[k]) * az) * .5f / len; bn[m++] = o;
+                }
             // Bounding boxes let most pixels skip the per-segment distance tests (the expensive part at 2048x2048).
             var roadBox = Zone.roads.Select(r => Box(r.points, r.width / 2 + 1.3f)).ToArray();
             for (int j = 0; j < res; j++)
@@ -204,20 +359,38 @@ namespace Crulanda.World
                     c *= .88f + n2 * .18f + (n3 - .5f) * .08f;
                     if (Zone.biome == "mountain")
                     {
-                        // Alpine: thin dry grass broken by bare rock and scree; more rock at larger noise peaks.
-                        float rock = Mathf.Clamp01((Mathf.PerlinNoise(x * .045f + 90, z * .045f + 17) - .42f) * 2.6f + (n3 - .5f) * .5f);
-                        Color rockC = Color.Lerp(new Color(.40f, .39f, .37f), new Color(.55f, .53f, .50f), n2);
-                        Color alp = Color.Lerp(new Color(.36f, .40f, .25f), new Color(.52f, .48f, .32f), n1);
-                        c = Color.Lerp(alp, rockC, rock) * (.9f + n3 * .16f);
+                        // Alpine: patches of thin dry turf between warm scree and grey rock. Rock takes the steep ground (crags,
+                        // scarps, gorge walls) and the high edges, scree the rocky flats. Mid-dark values, so it never reads as snow.
+                        float steep = Mathf.Clamp01((1 - UpAt(x, z) - .06f) * 6);
+                        float rock = Mathf.Clamp01(MountainRock(x, z) + steep + (n3 - .5f) * .5f);
+                        Color rockC = Color.Lerp(new Color(.27f, .27f, .28f), new Color(.39f, .38f, .36f), n2);
+                        Color scree = Color.Lerp(new Color(.38f, .35f, .30f), new Color(.46f, .42f, .36f), n3);
+                        Color alp = Color.Lerp(new Color(.27f, .31f, .18f), new Color(.38f, .36f, .22f), n1);
+                        c = Color.Lerp(alp, Color.Lerp(scree, rockC, Mathf.Clamp01(steep * 1.4f + (n1 - .5f) * .8f)), rock) * (.88f + n3 * .18f);
                     }
-                    else if (Zone.biome == "ash")
+                    else if (ashen)
                     {
-                        // Ashland: pale grey ash with a web of dark cracks and the odd ember-rust stain.
-                        float crack = Mathf.Abs(Mathf.PerlinNoise(x * .11f + 7, z * .11f + 3) * 2 - 1), crack2 = Mathf.Abs(Mathf.PerlinNoise(x * .31f + 1, z * .31f + 9) * 2 - 1);
-                        Color ashC = Color.Lerp(new Color(.38f, .37f, .36f), new Color(.52f, .50f, .48f), n1);
-                        ashC = Color.Lerp(ashC, new Color(.45f, .33f, .26f), Mathf.Clamp01((Mathf.PerlinNoise(x * .02f + 60, z * .02f) - .62f) * 3));
-                        float dark = Mathf.Max(Mathf.Clamp01((.05f - crack) * 16), Mathf.Clamp01((.03f - crack2) * 20) * .7f);
-                        c = Color.Lerp(ashC, new Color(.14f, .13f, .13f), dark) * (.9f + n3 * .14f);
+                        // Ashland: pale grey petrified ash in plates a shade apart, split by angular cracks (Voronoi cell edges, some
+                        // left faint so the network looks broken, not paved), and the odd copper-rust stain (canon: the dust tastes of
+                        // copper). The edges bend a little; lines are about a texel wide, so up close they stay thin seams, not bands.
+                        float u = (x + half) / plate + 3 + (n2 - .5f) * .1f + (n3 - .5f) * .03f;
+                        float v = (z + half) / plate + 3 + (Mathf.PerlinNoise(x * .45f + 31, z * .45f + 17) - .5f) * .1f + (n3 - .5f) * .03f;
+                        int cx = (int)u, cy = (int)v, near = 0, other = 0; float best = 99, edge = 99;
+                        for (int b = cy - 1; b <= cy + 1; b++) for (int a = cx - 1; a <= cx + 1; a++)
+                        { int k = b * cells + a; float dx = sx[k] - u, dz = sz[k] - v; if (dx * dx + dz * dz < best) { best = dx * dx + dz * dz; near = k; } }
+                        for (int m = near * 8; m < near * 8 + 8; m++) { float e = bo[m] - u * bx[m] - v * bz[m]; if (e < edge) { edge = e; other = bn[m]; } }
+                        uint pair = (uint)(Mathf.Min(near, other) * 7919 + Mathf.Max(near, other)) * 2654435761u;
+                        float line = Mathf.Clamp01((.04f + .06f * n1 - edge * plate) / texel + .5f) * (pair >> 24 < 64 ? .35f : 1);
+                        Color ashC = Color.Lerp(new Color(.46f, .46f, .47f), new Color(.60f, .59f, .59f), n1) * (.97f + .06f * Mathf.Repeat(sx[near] * 7.31f + sz[near] * 3.17f, 1));
+                        ashC = Color.Lerp(ashC, new Color(.52f, .44f, .40f), Mathf.Clamp01((Mathf.PerlinNoise(x * .02f + 60, z * .02f) - .66f) * 2.2f));
+                        c = Color.Lerp(ashC, new Color(.17f, .165f, .165f), line * .6f) * (.93f + n3 * .1f);
+                    }
+                    if (gloom)
+                    {
+                        // Gloom (Khaven): hard grey-brown earth under thin dead grass, darker in the damp hollows. Nothing green.
+                        Color earth = Color.Lerp(new Color(.37f, .34f, .31f), new Color(.46f, .43f, .38f), n1), sere = Color.Lerp(new Color(.44f, .41f, .32f), new Color(.5f, .46f, .35f), n3);
+                        c = Color.Lerp(earth, sere, Mathf.Clamp01((Mathf.PerlinNoise(x * .05f + 70, z * .05f + 33) - .35f) * 2.2f));
+                        c = Color.Lerp(c, new Color(.27f, .25f, .24f), Mathf.Clamp01((Mathf.PerlinNoise(x * .025f + 5, z * .025f + 81) - .64f) * 3) * .7f) * (.9f + n2 * .15f);
                     }
                     // Fields: tilled furrows or golden stubble, following each field's rotation.
                     foreach (var f in Zone.fields)
@@ -240,10 +413,10 @@ namespace Crulanda.World
                         float ex = g.size.x / 2 - Mathf.Abs(x - g.center.x), ez = g.size.y / 2 - Mathf.Abs(z - g.center.y);
                         if (ex <= -4 || ez <= -4) continue;
                         float edge = Mathf.Clamp01((Mathf.Min(ex, ez) + 4) / 8) * (.7f + n2 * .3f);
-                        Color litter = g.kind == "dead" ? Color.Lerp(new Color(.29f, .26f, .21f), new Color(.36f, .31f, .23f), n3)
+                        Color litter = g.kind == "dead" ? (gloom ? Color.Lerp(new Color(.33f, .32f, .31f), new Color(.4f, .38f, .36f), n3) : Color.Lerp(new Color(.29f, .26f, .21f), new Color(.36f, .31f, .23f), n3))
                             : g.kind == "pine" ? Color.Lerp(new Color(.20f, .24f, .15f), new Color(.30f, .25f, .17f), n3)
                             : Color.Lerp(new Color(.38f, .32f, .17f), new Color(.46f, .30f, .15f), n3);
-                        c = Color.Lerp(c, litter, edge);
+                        c = Color.Lerp(c, gloom && g.kind != "dead" ? Wither(litter) : litter, edge);   // gloom: needles and leaves withered too
                     }
                     for (int k = 0; k < Zone.roads.Length; k++)
                     {
@@ -266,20 +439,57 @@ namespace Crulanda.World
                         if (Mathf.Abs(shore) < .5f && n3 > .5f) c = Color.Lerp(c, new Color(.55f, .52f, .46f), .45f);
                         if (shore < -.5f) c = Color.Lerp(c, new Color(.16f, .15f, .12f), Mathf.Clamp01((-.5f - shore) / 3));
                     }
-                    if (Zone.wasting != null)
+                    // Ash: roads, yards and grove litter are trodden ash too, keeping only a trace of their earth colour.
+                    if (ashen) { float l = c.grayscale; c = Color.Lerp(new Color(l, l, l), c, .4f); }
+                    float gone = Unmade(x, z);
+                    if (gone > 0)
                     {
-                        float t = Mathf.Clamp01((x - (Zone.wasting.x - Zone.wasting.fade)) / Zone.wasting.fade);
-                        if (t > 0)
-                        {
-                            float grey = c.grayscale; var g = new Color(grey, grey, grey) * .7f + unmade * .3f;
-                            if (t >= 1 && n3 > .78f) g = Color.Lerp(g, Color.white, .35f);   // static speckle
-                            c = Color.Lerp(c, g, t * t);
-                        }
+                        // The colour drains first (grey grass, grey dirt), then the land's own features go too: roads, cracks and
+                        // shading are erased into flat grey with a fine fizz of static. Not burnt, not rotted: unmade.
+                        uint hsh = (uint)(i * 73856093) ^ (uint)(j * 19349663); hsh = (hsh ^ (hsh >> 13)) * 0x5bd1e995u;
+                        float grey = c.grayscale, fizz = ((hsh ^ (hsh >> 15)) & 1023) / 1023f;
+                        var drained = Color.Lerp(c, new Color(grey, grey, grey * 1.02f), Mathf.Clamp01(gone * 1.8f));
+                        var stat = unmade * (.9f + (fizz - .5f) * .22f + (n1 - .5f) * .12f);
+                        c = Color.Lerp(drained, stat, Mathf.SmoothStep(0, 1, Mathf.InverseLerp(.3f, .95f, gone)));
                     }
                     px[j * res + i] = c;
                 }
             tex.SetPixels32(px); tex.Apply(true, true);
             return tex;
+        }
+        /// <summary>
+        /// Ash ground detail (x2 over the paint, 5 m repeat): fine angular crazing, the edges of a tileable Voronoi of 8x8
+        /// plates (~.6 m), some left faint, over powdery grain; averages mid-grey. Sharp up close, where the paint blurs.
+        /// </summary>
+        static Texture2D AshDetail(int seed)
+        {
+            const int n = 512, cells = 8; float per = (float)n / cells; var rnd = new System.Random(seed + 31);
+            var sx = new float[cells * cells]; var sz = new float[sx.Length]; var tone = new float[sx.Length];
+            for (int k = 0; k < sx.Length; k++) { sx[k] = .15f + .7f * (float)rnd.NextDouble(); sz[k] = .15f + .7f * (float)rnd.NextDouble(); tone[k] = (float)rnd.NextDouble() - .5f; }
+            var px = new Color32[n * n];
+            for (int y = 0; y < n; y++)
+                for (int x = 0; x < n; x++)
+                {
+                    // Neighbour sites wrap around the tile (so it repeats seamlessly) but sit at their true, unwrapped offset.
+                    float u = (x + .5f) / per, v = (y + .5f) / per, nx = 0, nz = 0, best = 99, edge = 99; int cx = (int)u, cy = (int)v, near = 0, other = 0;
+                    for (int b = -1; b <= 1; b++) for (int a = -1; a <= 1; a++)
+                    {
+                        int k = (cy + b + cells) % cells * cells + (cx + a + cells) % cells; float ux = cx + a + sx[k], uz = cy + b + sz[k];
+                        float d = (ux - u) * (ux - u) + (uz - v) * (uz - v); if (d < best) { best = d; nx = ux; nz = uz; near = k; }
+                    }
+                    for (int b = -2; b <= 2; b++) for (int a = -2; a <= 2; a++)
+                    {
+                        int k = (cy + b + cells) % cells * cells + (cx + a + cells) % cells; float ux = cx + a + sx[k] - nx, uz = cy + b + sz[k] - nz, len = Mathf.Sqrt(ux * ux + uz * uz);
+                        float e = len > .001f ? ((nx + ux * .5f - u) * ux + (nz + uz * .5f - v) * uz) / len : 99; if (e < edge) { edge = e; other = k; }
+                    }
+                    uint h = (uint)x * 374761393u + (uint)y * 668265263u, pair = (uint)(Mathf.Min(near, other) * 97 + Mathf.Max(near, other)) * 2654435761u;
+                    h = (h ^ (h >> 13)) * 1274126177u; h ^= h >> 16;
+                    float g = .52f + tone[near] * .04f + ((h & 1023) / 1023f - .5f) * .07f;
+                    g = Mathf.Lerp(g, .34f, Mathf.Clamp01(1.7f - edge * per) * (pair >> 24 < 80 ? .35f : 1));   // ~2.5 px (2.5 cm) line
+                    byte c = (byte)(Mathf.Clamp01(g) * 255); px[y * n + x] = new Color32(c, c, c, 255);
+                }
+            var tex = new Texture2D(n, n, TextureFormat.RGB24, true) { name = "Ash crazing", wrapMode = TextureWrapMode.Repeat, filterMode = FilterMode.Trilinear, anisoLevel = 4 };
+            tex.SetPixels32(px); tex.Apply(true, true); return tex;
         }
         static Rect Box(Vector2[] pts, float pad)
         {
@@ -342,17 +552,64 @@ namespace Crulanda.World
         }
 
         // ---------- the Wasting ----------
+        /// <summary>
+        /// How far the Wasting has eaten the ground at a point: 0 living, 1 unmade (from its line east). The front wanders and
+        /// frays across the fade band (grey tongues reaching in, living spurs holding out) but is pinned to the band's ends.
+        /// </summary>
+        float Unmade(float x, float z)
+        {
+            var w = Zone.wasting; if (w == null) return 0;
+            float t = (x - (w.x - w.fade)) / Mathf.Max(1, w.fade); if (t <= 0) return 0; if (t >= 1) return 1;
+            float fray = (Mathf.PerlinNoise(z * .045f + 3.1f, 7.7f) - .5f) * 1.1f + (Mathf.PerlinNoise(x * .21f + 40, z * .21f) - .5f) * .5f;
+            return Mathf.Clamp01(t + fray * 4 * t * (1 - t));
+        }
+        /// <summary>A sheet of haze through rows of points (each row the same length): vertex alpha from <paramref name="alpha"/>,
+        /// u 0..1 along the rows, v 0..1 across them. Drawn with a particle shader (Cull Off), so both faces show.</summary>
+        static Mesh HazeMesh(string name, Vector3[][] rows, Func<Vector3, float> alpha)
+        {
+            int n = rows[0].Length; var v = new List<Vector3>(); var col = new List<Color>(); var uv = new List<Vector2>(); var t = new List<int>();
+            for (int r = 0; r < rows.Length; r++)
+                for (int k = 0; k < n; k++) { v.Add(rows[r][k]); col.Add(new Color(1, 1, 1, Mathf.Clamp01(alpha(rows[r][k])))); uv.Add(new Vector2(k / (n - 1f), r / (rows.Length - 1f))); }
+            for (int r = 0; r + 1 < rows.Length; r++)
+                for (int k = 0; k + 1 < n; k++) { int a = r * n + k, b = a + n; t.AddRange(new[] { a, b, b + 1, a, b + 1, a + 1 }); }
+            var m = new Mesh { name = name }; m.SetVertices(v); m.SetColors(col); m.SetUVs(0, uv); m.SetTriangles(t, 0); m.RecalculateBounds();
+            return m;
+        }
+        /// <summary>n + 1 evenly spaced points from at(0) to at(1).</summary>
+        static Vector3[] HazeRow(int n, Func<float, Vector3> at) { var row = new Vector3[n + 1]; for (int k = 0; k <= n; k++) row[k] = at(k / (float)n); return row; }
         void BuildWasting()
         {
             var w = Zone.wasting; if (w == null) return;
             var root = new GameObject("The Wasting").transform; root.SetParent(transform, false);
-            var veil = GameObject.CreatePrimitive(PrimitiveType.Quad); veil.name = "Static curtain"; DestroyImmediate(veil.GetComponent<Collider>());
-            veil.transform.SetParent(root, false);
-            veil.transform.position = new Vector3(w.x, w.curtainHeight / 2 - 1, 0); veil.transform.rotation = Quaternion.Euler(0, 90, 0);
-            veil.transform.localScale = new Vector3(Zone.size * 2.2f, w.curtainHeight, 1);   // runs past the view so its ends never show
-            veil.GetComponent<Renderer>().sharedMaterial = new Material(art.veil) { name = "Wasting veil" };
-            veil.AddComponent<WastingStatic>();
-            var back = Instantiate(veil, root); back.transform.rotation = Quaternion.Euler(0, -90, 0); back.name = "Static curtain (far side)";
+            // Haze over the unmade: unlit sheets in the fog's own colour hour by hour (WastingStatic), so the unmade greys into haze
+            // rather than sitting behind a lit, glassy pane, and never ends in a ruled line against a brighter sky. Queues: the far
+            // bank, then the water (Transparent-10), then the haze over the unmade, then the curtain.
+            void Haze(Mesh mesh, int queue, bool fizz, float grey, float gain)
+            {
+                var go = new GameObject(mesh.name); go.transform.SetParent(root, false); go.AddComponent<MeshFilter>().sharedMesh = mesh;
+                var r = go.AddComponent<MeshRenderer>(); r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off; r.receiveShadows = false;
+                r.sharedMaterial = new Material(art.particle) { name = mesh.name, renderQueue = queue };
+                go.AddComponent<WastingStatic>().Init(fizz, grey, gain);
+            }
+            if (art.particle != null)
+            {
+                float edge = Half + BackdropWidth, x0 = w.x + 2, x1 = edge - 12, span = Zone.size * 1.1f;
+                // The static curtain: crawling grey static, thin at the ground and thickest a few metres up, so the land behind it
+                // greys with distance instead of behind a ruled bottom edge. It runs past the view; its ends fade out.
+                Haze(HazeMesh("Static curtain", new[] { HazeRow(24, s => new Vector3(w.x, -1, (s * 2 - 1) * span)), HazeRow(24, s => new Vector3(w.x, w.curtainHeight - 1, (s * 2 - 1) * span)) },
+                    p => (span - Mathf.Abs(p.z)) / 30), 3000, true, .35f, 1.2f);
+                // The unmade fades into haze: a flat sheet over it, clear at the curtain and opaque before the backdrop's flat skirt
+                // ends (and toward its sides). Linear fog alone leaves that edge half-fogged at the sides of the view (Oakhaven, Peaks).
+                var floor = new Vector3[8][];
+                for (int r = 0; r < 8; r++) { float x = r < 7 ? Mathf.Lerp(x0, x1, r / 6f) : edge + 40; floor[r] = HazeRow(40, s => new Vector3(x, .3f, (s * 2 - 1) * (edge + 40))); }
+                Haze(HazeMesh("Unmade haze", floor, p => Mathf.Clamp01((edge + 40 - Mathf.Abs(p.z)) / 40) * Mathf.SmoothStep(0, 1, Mathf.Max(Mathf.InverseLerp(x0, x1, p.x),
+                    Mathf.InverseLerp(Half + 20, x1, Mathf.Abs(p.z)) * Mathf.InverseLerp(x0, x0 + 30, p.x)))), 2995, false, 0, 1);
+                // The far bank on the horizon beyond it, on an arc covering every way the flat unmade lies from the zone: opaque below
+                // the eye line and thinning upward into the sky, so the haze meets the sky in a gradient, not a line.
+                float reach = edge * 1.5f, arc = Mathf.Atan2(edge, x0) + .35f;
+                var bank = new[] { -70f, 0, 10, 26, 55 }.Select(y => HazeRow(48, s => new Vector3(Mathf.Cos((s * 2 - 1) * arc) * reach, y, Mathf.Sin((s * 2 - 1) * arc) * reach))).ToArray();
+                Haze(HazeMesh("Unmade bank", bank, p => Mathf.Clamp01((arc - Mathf.Abs(Mathf.Atan2(p.z, p.x))) / .3f) * Mathf.Pow(Mathf.Clamp01(1 - p.y / 55), 2)), 2990, false, 0, 1);
+            }
             // Grey, leafless husks of what stood beyond: the land isn't burnt, it is unmade.
             for (int i = 0; i < 14; i++)
             {
@@ -435,7 +692,7 @@ namespace Crulanda.World
                     case "tower": Tower(t, p.size.x > 0 ? p.size.x : 4.4f); break;
                     case "gallows": Gallows(t); break;
                     case "crypt": Crypt(t); break;
-                    case "cliff": Cliff(t, p.size.x > 0 ? p.size.x : 20); break;
+                    case "cliff": Cliff(t, p.size.x > 0 ? p.size.x : 20, Mathf.Abs(p.lift)); break;
                     case "dead_oak": DeadTree(p.at, 1, Tint(art.bark, new Color(.4f, .36f, .32f)), 5, statics, t); break;   // weathered, paler bark (plain bark reads black in shade); size comes from the root's scale
                     case "tree": Broadleaf(t, p.variant); break;
                     case "pine": Pine(t); break;
@@ -647,6 +904,8 @@ namespace Crulanda.World
             var cap = root.gameObject.AddComponent<CapsuleCollider>(); cap.center = new Vector3(0, trunkH / 2, 0); cap.height = trunkH; cap.radius = trunkR;
             root.gameObject.AddComponent<NavBlocker>(); root.gameObject.AddComponent<TreeFade>();
         }
+        /// <summary>Bark for dead woods: charred dark in the ash, weathered grey elsewhere (Khaven's Whispering Wood). One draw.</summary>
+        Material DeadBark() { float t = R01; return Tint(art.bark, Zone.biome == "ash" ? Color.Lerp(new Color(.2f, .18f, .16f), new Color(.3f, .27f, .24f), t) : Color.Lerp(new Color(.58f, .57f, .56f), new Color(.72f, .71f, .69f), t)); }
         void Branch(Transform root, Vector3 start, Vector3 dir, float length, float radius, int depth, Material mat)
         {
             if (depth <= 0 || radius < .02f) return;
@@ -664,6 +923,9 @@ namespace Crulanda.World
             }
         }
         static readonly Color[] Leaf = { new Color(.33f, .38f, .17f), new Color(.55f, .42f, .16f), new Color(.52f, .27f, .13f), new Color(.40f, .36f, .15f) };
+        bool Gloom { get { return Zone.biome == "gloom"; } }
+        /// <summary>Gloom (Khaven): living colour drained toward a dull grey, so woods and brush read withered rather than autumnal.</summary>
+        Color Wither(Color c) { if (!Gloom) return c; float g = c.grayscale * .8f; return Color.Lerp(c, new Color(g, g, g, c.a), .6f); }
         /// <summary>Broadleaf trees (their positions drive where autumn leaves fall).</summary>
         public readonly List<Vector3> LeafTrees = new List<Vector3>();
         /// <summary>Tall dense grass: the zone's own patches plus a patch around every ambush camp for its hunters to hide in.</summary>
@@ -690,7 +952,7 @@ namespace Crulanda.World
             Part(PrimitiveType.Cylinder, t, new Vector3(0, h * .08f, 0), new Vector3(.72f, h * .08f, .72f), art.bark);
             foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cylinder, t, new Vector3(s * .45f, h * .92f, 0), new Vector3(.22f, .9f, .22f), art.bark, Quaternion.Euler(0, R01 * 360, s * 35));
             var baseLeaf = Leaf[(Mathf.Abs(variant) + (int)(R01 * 2)) % Leaf.Length];
-            var leaf = Tint(art.foliage, baseLeaf); var leafLight = Tint(art.foliage, Color.Lerp(baseLeaf, new Color(.75f, .7f, .35f), .22f));
+            var leaf = Tint(art.foliage, Wither(baseLeaf)); var leafLight = Tint(art.foliage, Wither(Color.Lerp(baseLeaf, new Color(.75f, .7f, .35f), .22f)));
             int clumps = 5 + (int)(R01 * 3);
             for (int i = 0; i < clumps; i++)
             {
@@ -707,7 +969,7 @@ namespace Crulanda.World
             float h = 6 + R01 * 4;
             Part(PrimitiveType.Cylinder, t, new Vector3(0, 1, 0), new Vector3(.45f, 1, .45f), art.bark);
             // Five tiers, each slightly tilted and turned, darker at the base where the light doesn't reach.
-            var top = Color.Lerp(new Color(.18f, .27f, .18f), new Color(.22f, .3f, .19f), R01);
+            var top = Wither(Color.Lerp(new Color(.18f, .27f, .18f), new Color(.22f, .3f, .19f), R01));
             for (int i = 0; i < 5; i++)
             {
                 var mat = Tint(art.pine, Color.Lerp(top * .72f, top, i / 4f));
@@ -820,7 +1082,7 @@ namespace Crulanda.World
         void RuinedHouse(Transform t, Vector2 size)
         {
             // A fallen building: broken wall stubs of uneven height, a charred remnant of roof slumped inside, fallen beams.
-            float w = size.x, d = size.y; var plaster = Tint(art.plaster, new Color(.52f, .48f, .42f)); var charred = Tint(art.timber, new Color(.13f, .11f, .1f));
+            float w = size.x, d = size.y; var plaster = Tint(art.plaster, Zone.biome == "ash" ? new Color(.46f, .455f, .45f) : new Color(.52f, .48f, .42f)); var charred = Tint(art.timber, new Color(.13f, .11f, .1f));
             Part(PrimitiveType.Cube, t, new Vector3(0, .3f, 0), new Vector3(w + .3f, .6f, d + .3f), art.stone);
             foreach (int sz in new[] { -1, 1 })
                 for (float x = -w / 2 + .6f; x < w / 2; x += 1.2f)
@@ -887,16 +1149,23 @@ namespace Crulanda.World
             for (int i = 0; i < 6; i++) Part(PrimitiveType.Cube, t, new Vector3(R01 * 10 - 5, .5f, -4 - R01 * 4), new Vector3(.55f, 1, .15f), stone, Quaternion.Euler(R01 * 10 - 5, R01 * 30 - 15, R01 * 10 - 5));
             Solid(t, new Vector3(0, 1.8f, 1.2f), new Vector3(6.2f, 3.6f, 6.6f));
         }
-        void Cliff(Transform t, float length)
+        void Cliff(Transform t, float length, float lift = 0)
         {
-            // A broken escarpment of tall leaning stone blocks.
-            var stone = Tint(art.stone, new Color(.4f, .38f, .35f));
+            // A broken escarpment of tall leaning stone blocks, taller where the ground is raised behind it (CliffLift). On
+            // mountains each block stands on the lower of the ground at its front and back, so none hangs off a slope.
+            var stone = Tint(art.stone, Zone.biome == "ash" ? new Color(.37f, .365f, .37f) : new Color(.4f, .38f, .35f));   // ash: grey, not sandstone
+            bool seat = Zone.biome == "mountain";
             for (float x = -length / 2; x < length / 2; x += 2.2f)
             {
-                float h = 4 + R01 * 4;
-                Part(PrimitiveType.Cube, t, new Vector3(x, h / 2 - .5f, R01 * 1.5f), new Vector3(2.6f + R01, h, 3 + R01 * 2), stone, Quaternion.Euler(R01 * 10 - 5, R01 * 30 - 15, R01 * 8 - 4));
+                float h = 4 + R01 * 4 + lift * .5f, z = R01 * 1.5f, y = 0; var size = new Vector3(2.6f + R01, h, 3 + R01 * 2);
+                if (seat)
+                {
+                    Vector3 front = t.TransformPoint(new Vector3(x, 0, z - size.z / 2)), back = t.TransformPoint(new Vector3(x, 0, z + size.z / 2));
+                    y = Mathf.Min(HeightAt(front.x, front.z), HeightAt(back.x, back.z)) - t.position.y;
+                }
+                Part(PrimitiveType.Cube, t, new Vector3(x, y + h / 2 - .5f, z), size, stone, Quaternion.Euler(R01 * 10 - 5, R01 * 30 - 15, R01 * 8 - 4));
             }
-            Solid(t, new Vector3(0, 3, .8f), new Vector3(length + 2, 6, 4.5f));
+            Solid(t, new Vector3(0, (6 + lift) / 2, .8f), new Vector3(length + 2, 6 + lift, 4.5f));
         }
         void BuildGroves()
         {
@@ -921,7 +1190,7 @@ namespace Crulanda.World
                 {
                     var at = new Vector2(g.center.x + (R01 - .5f) * g.size.x, g.center.y + (R01 - .5f) * g.size.y);
                     if (NearRoad(at, 2.5f) || NearProp(at, 5) || Water.NearWater(at, 1.5f)) continue;
-                    if (g.kind == "dead") { DeadTree(at, .5f + R01 * .55f, Tint(art.bark, Color.Lerp(new Color(.2f, .18f, .16f), new Color(.3f, .27f, .24f), R01)), 3 + (R01 > .6f ? 1 : 0), statics); continue; }
+                    if (g.kind == "dead") { DeadTree(at, .5f + R01 * .55f, DeadBark(), 3 + (R01 > .6f ? 1 : 0), statics); continue; }
                     var p = new ZoneProp { kind = g.kind == "pine" ? "pine" : "tree", at = at, rotation = R01 * 360, scale = .8f + R01 * .5f, variant = (int)(R01 * 4) };
                     var t = Root(p, statics);
                     if (p.kind == "pine") Pine(t); else Broadleaf(t, p.variant);
@@ -940,7 +1209,7 @@ namespace Crulanda.World
         {
             var t = new GameObject("Bush").transform; t.SetParent(statics, false); t.position = Ground(at, -.1f); t.rotation = Quaternion.Euler(0, R01 * 360, 0);
             var c = conifer ? Color.Lerp(new Color(.17f, .25f, .15f), new Color(.24f, .3f, .17f), R01) : Leaf[(int)(R01 * Leaf.Length) % Leaf.Length] * (.85f + R01 * .2f);
-            var mat = Tint(art.foliage, c);
+            var mat = Tint(art.foliage, Wither(c));
             int n = 2 + (int)(R01 * 2);
             for (int i = 0; i < n; i++) { float s = .9f + R01 * .8f; Lump(Canopy(), t, new Vector3(R01 * 1.2f - .6f, s * .3f, R01 * 1.2f - .6f), new Vector3(s * 1.3f, s * .8f, s * 1.3f), mat, R01 * 360); }
         }
@@ -970,7 +1239,7 @@ namespace Crulanda.World
         /// <summary>How much grass should grow at a point (0 = none): open meadow is full, the village core is trampled.</summary>
         float Openness(Vector2 p)
         {
-            if (Zone.wasting != null && p.x > Zone.wasting.x - Zone.wasting.fade * .6f) return 0;
+            float living = 1 - Unmade(p.x, p.y) / .55f; if (living <= 0) return 0;   // grass thins out along the grey's ragged front
             foreach (var r in Zone.roads) if (DistanceToPath(p, r.points) < r.width / 2 + .8f) return 0;
             // Grass grows down to the bank's noisy edge (the same line PaintGround draws there), never in the water.
             if (Water.Shore(p, 3) + (Mathf.PerlinNoise(p.x * .45f, p.y * .45f) - .5f) * 1.1f < 1.3f) return 0;
@@ -991,8 +1260,14 @@ namespace Crulanda.World
             }
             if (p.magnitude < Zone.flatRadius * .45f) open *= .35f;
             if (Zone.biome == "ash") return 0;                       // nothing grows in the ash
-            if (Zone.biome == "mountain") open *= .5f;               // thin alpine grass
-            return open;
+            if (Zone.biome == "mountain")
+            {
+                // Thin alpine turf in tufts: none on rock, scree or steep ground, and clumped where it does grow.
+                float turf = 1 - Mathf.Clamp01(MountainRock(p.x, p.y) + Mathf.Clamp01((1 - UpAt(p.x, p.y) - .06f) * 6));
+                open *= turf * turf * Mathf.Clamp01((Mathf.PerlinNoise(p.x * .23f + 7, p.y * .23f + 3) - .38f) * 2.4f) * .8f;
+            }
+            if (Gloom) open *= .25f + .6f * Mathf.PerlinNoise(p.x * .07f + 13, p.y * .07f + 29);   // dry, patchy grass on hard ground
+            return open * living;
         }
         /// <summary>Soft grey smoke from a chimney (or any stack).</summary>
         void Smoke(Transform parent, Vector3 localPos)
@@ -1239,14 +1514,22 @@ namespace Crulanda.World
         // ---------- edges ----------
         void BuildForestEdge()
         {
-            // A ragged ring of pine and autumn broadleaf around three sides; the east side belongs to the Wasting.
-            float edge = Half - 5;
+            // A ragged ring of woods: pine and autumn broadleaf; grey dead wood, dark pine and boulders in gloom. A Wasting holds the east side.
+            float edge = Half - 5; var sides = Zone.wasting != null ? new[] { 0, 1, 2 } : new[] { 0, 1, 2, 3 };
             for (float s = -Half + 3; s < Half - 3; s += 3.2f)
-                foreach (var side in new[] { 0, 1, 2 })
+                foreach (var side in sides)
                 {
-                    var at = side == 0 ? new Vector2(-edge - R01 * 3, s) : side == 1 ? new Vector2(s, edge + R01 * 3) : new Vector2(s, -edge - R01 * 3);
+                    var at = side == 0 ? new Vector2(-edge - R01 * 3, s) : side == 1 ? new Vector2(s, edge + R01 * 3) : side == 2 ? new Vector2(s, -edge - R01 * 3) : new Vector2(edge + R01 * 3, s);
                     if (Zone.wasting != null && at.x > Zone.wasting.x - 6) continue;
                     if (NearRoad(at, 5) || Water.NearWater(at, 1.5f)) continue;
+                    if (Gloom)
+                    {
+                        float pick = R01;
+                        if (pick < .4f) DeadTree(at, .6f + R01 * .5f, DeadBark(), 3, statics);
+                        else if (pick < .82f) Pine(Root(new ZoneProp { kind = "pine", at = at, rotation = R01 * 360, scale = .85f + R01 * .5f }, statics));
+                        else EdgeRock(at);
+                        continue;
+                    }
                     if (Zone.biome == "ash") { if (R01 < .55f) DeadTree(at, .6f + R01 * .5f, Tint(art.bark, new Color(.2f, .19f, .18f)), 3, statics); else EdgeRock(at); continue; }
                     var p = new ZoneProp { kind = Zone.biome == "mountain" ? (R01 < .7f ? "pine" : "rock") : R01 < .6f ? "pine" : "tree", at = at, rotation = R01 * 360, scale = .85f + R01 * .5f, variant = (int)(R01 * 4) };
                     if (p.kind == "rock") { EdgeRock(at); continue; }
@@ -1255,13 +1538,27 @@ namespace Crulanda.World
                     var bushAt = at + new Vector2(R01 * 4 - 2, R01 * 4 - 2);
                     if (Zone.biome == "meadow" && R01 < .5f && !Water.NearWater(bushAt, 1)) Bush(bushAt, p.kind == "pine");
                 }
+            // Mountains: boulders strewn over the rough ground between the kept ways (never on a road, camp or path).
+            if (Zone.biome == "mountain")
+                for (int i = 0, placed = 0; i < 600 && placed < 70; i++)
+                {
+                    var at = new Vector2((R01 - .5f) * (Zone.size - 16), (R01 - .5f) * (Zone.size - 16));
+                    if (Keep(at.x, at.y) > .1f || UpAt(at.x, at.y) < .85f || NearProp(at, 4)) continue;
+                    EdgeRock(at); placed++;
+                }
         }
         /// <summary>A big weathered boulder for rocky edges (mountain and ash zones).</summary>
         void EdgeRock(Vector2 at)
         {
             var t = Root(new ZoneProp { kind = "rock", at = at, rotation = R01 * 360 }, statics);
             float s = 1.6f + R01 * 1.8f;
-            var mat = Tint(art.stone, Zone.biome == "ash" ? new Color(.33f, .32f, .31f) : new Color(.5f, .49f, .46f));
+            var mat = Tint(art.stone, Zone.biome == "ash" ? new Color(.33f, .32f, .31f) : new Color(.42f, .41f, .39f));
+            if (Zone.biome == "mountain")
+            {
+                // Sunk by the fall of the slope across it, so its downhill side never hangs in the air.
+                float low = Mathf.Min(Mathf.Min(HeightAt(at.x + s, at.y), HeightAt(at.x - s, at.y)), Mathf.Min(HeightAt(at.x, at.y + s), HeightAt(at.x, at.y - s)));
+                t.position += Vector3.down * (Mathf.Clamp(t.position.y - low, 0, .6f * s) + .15f * s);
+            }
             Lump(Boulder(), t, new Vector3(0, .45f * s, 0), new Vector3(2.1f * s, 1.5f * s, 1.8f * s), mat, R01 * 360);
             Lump(Boulder(), t, new Vector3(.8f * s, .25f * s, .45f * s), new Vector3(1.2f * s, .9f * s, 1.1f * s), mat, R01 * 360);
             Solid(t, new Vector3(0, .6f * s, 0), new Vector3(1.8f * s, 1.2f * s, 1.5f * s));
@@ -1278,8 +1575,10 @@ namespace Crulanda.World
             {
                 var b = new GameObject("Boundary").AddComponent<BoxCollider>(); b.transform.SetParent(root, false);
                 bool ns = side < 2; float sign = side % 2 == 0 ? 1 : -1;
-                b.center = ns ? new Vector3(0, 5, sign * (Half - 1)) : new Vector3(sign * (Half - 1), 5, 0);
-                b.size = ns ? new Vector3(Zone.size, 12, 2) : new Vector3(2, 12, Zone.size);
+                // Mountain edges climb far past 12 m: stand tall enough that no walkable slope steps over it onto the backdrop.
+                float h = Zone.biome == "mountain" ? 90 : 12;
+                b.center = ns ? new Vector3(0, h / 2 - 1, sign * (Half - 1)) : new Vector3(sign * (Half - 1), h / 2 - 1, 0);
+                b.size = ns ? new Vector3(Zone.size, h, 2) : new Vector3(2, h, Zone.size);
             }
         }
 
@@ -1299,7 +1598,7 @@ namespace Crulanda.World
         {
             var root = new GameObject("Backdrop").transform; root.SetParent(transform, false);
             bool mountain = Zone.biome == "mountain", ash = Zone.biome == "ash";
-            float rise = mountain ? 58 : ash ? 42 : 32;
+            float rise = mountain ? 58 : ash ? 20 : 32;   // the Ashland Rim is a plain: low swells, not a wall (fog hides the far edge)
             // Valleys: the mirror image of the last 45 m of each road that leaves the zone (where its mirrored paint runs).
             var valleys = new List<Vector2[]>();
             foreach (var road in Zone.roads)
@@ -1323,7 +1622,7 @@ namespace Crulanda.World
             {
                 float d = Mathf.Max(Mathf.Abs(x), Mathf.Abs(z)) - Half; if (d <= 0) return 0;
                 float n = Mathf.PerlinNoise(x * .011f + 300, z * .011f + Zone.seed % 500), m = Mathf.PerlinNoise(x * .045f + 80, z * .045f + 30);
-                if (mountain) n = 1 - Mathf.Abs(n * 2 - 1);   // ridged: peaks and cols, not rolling hills
+                if (mountain) { n = 1 - Mathf.Abs(n * 2 - 1); m = 1 - Mathf.Abs(m * 2 - 1); }   // ridged: peaks and cols with jagged crests, not rolling hills
                 // Mountains start their climb more gently, so an exit near the edge doesn't face a fog-grey wall.
                 float ramp = Mathf.SmoothStep(0, 1, d / (BackdropWidth * .8f)); if (mountain) ramp *= ramp;
                 float h = rise * (.5f + .5f * n + (m - .5f) * (mountain ? .4f : .15f)) * ramp;
@@ -1341,7 +1640,20 @@ namespace Crulanda.World
             // The skirt: four sides (each culled alone and clear of the village's point lights), in the ground's own paint.
             float[] rings = { 0, 1.5f, 4, 8, 13, 19, 26, 34, 43, 53, 64, 76, BackdropWidth };
             var paint = GroundMesh.GetComponent<MeshRenderer>().sharedMaterial;
-            for (int side = 0; side < 4; side++) Show(ZoneMeshes.Backdrop(Zone.size, GroundSegments, side, rings, H), paint);
+            for (int side = 0; side < 4; side++)
+            {
+                var skirt = ZoneMeshes.Backdrop(Zone.size, GroundSegments, side, rings, H);
+                // Past the Wasting the mirrored paint would bring meadow, roads and cracks back out of the grey: past the edge, spread
+                // the unmade strip's own paint (Wasting line to edge) across the skirt instead. Linear, so it interpolates exactly.
+                float start = Zone.wasting != null ? Zone.wasting.x + 2 : Half;
+                if (start < Half - 1)
+                {
+                    var sv = skirt.vertices; var suv = skirt.uv;
+                    for (int i = 0; i < sv.Length; i++) if (sv[i].x > Half) suv[i].x = (Half - (sv[i].x - Half) * (Half - start) / BackdropWidth + Half) / Zone.size;
+                    skirt.uv = suv;
+                }
+                Show(skirt, paint);
+            }
             // Silhouettes: the zone's own mix of woods (weighted by its groves) on the lower slopes, tors above the treeline on
             // mountain and ash ridges. One merged mesh per material and side, no colliders, no shadows.
             var rnd = new System.Random(Zone.seed + 4242); float R() { return (float)rnd.NextDouble(); }
@@ -1349,8 +1661,8 @@ namespace Crulanda.World
             foreach (var g in Zone.groves) { if (g.kind == "dead") dead += g.count; else if (g.kind == "pine") pines += g.count; else if (g.kind == "broadleaf") leafy += g.count; }
             if (dead + pines + leafy <= 0) pines = 1;
             var spire = ZoneMeshes.Cone(1, 1, 6); var crown = ZoneMeshes.Blob(Zone.seed + 910, .55f, false, 5, 7); var crag = ZoneMeshes.Blob(Zone.seed + 920, 1.1f, true, 8, 12);
-            var pineMat = Tint(art.pine, new Color(.16f, .23f, .16f)); var deadMat = Tint(art.bark, new Color(.26f, .24f, .22f));
-            var rockMat = Tint(art.stone, ash ? new Color(.3f, .28f, .27f) : new Color(.48f, .47f, .45f));
+            var pineMat = Tint(art.pine, Wither(new Color(.16f, .23f, .16f))); var deadMat = Tint(art.bark, Gloom ? new Color(.55f, .54f, .53f) : new Color(.26f, .24f, .22f));   // gloom: the grey wood carries on
+            var rockMat = Tint(art.stone, ash ? new Color(.36f, .355f, .36f) : new Color(.40f, .39f, .38f));
             var parts = new Dictionary<(Material, int), List<CombineInstance>>();
             void Put(int side, Mesh mesh, Material mat, Vector3 at, Quaternion rot, Vector3 scale)
             {
@@ -1373,7 +1685,7 @@ namespace Crulanda.World
                         if (rock)
                         {
                             // A tor: tall and narrow, sunk deep enough that its downhill side never hangs over the slope.
-                            float s = mountain ? 12 + R() * 14 : 8 + R() * 8;
+                            float s = mountain ? 12 + R() * 14 : 5 + R() * 6;   // ash: low broken tors on the swells
                             Put(side, crag, rockMat, at + Vector3.down * s * .8f, Quaternion.Euler(0, yaw, 0), new Vector3(1.2f * s, 2.8f * s, 1.1f * s));
                         }
                         else if (pick < dead)
@@ -1390,7 +1702,7 @@ namespace Crulanda.World
                         }
                         else
                         {
-                            float c = th * .45f; var leaf = Tint(art.foliage, Leaf[(int)(R() * 3)]);
+                            float c = th * .45f; var leaf = Tint(art.foliage, Wither(Leaf[(int)(R() * 3)]));
                             Put(side, spire, art.bark, at, Quaternion.identity, new Vector3(.35f, th * .62f, .35f));
                             Put(side, crown, leaf, at + Vector3.up * th * .62f, Quaternion.Euler(0, yaw, 0), new Vector3(c, c * .85f, c));
                             Put(side, crown, leaf, at + new Vector3(c * .3f, th * .5f, c * .2f), Quaternion.Euler(0, yaw + 90, 0), new Vector3(c * .7f, c * .6f, c * .7f));
@@ -1412,31 +1724,54 @@ namespace Crulanda.World
         void Update() { if (m != null) m.mainTextureOffset = new Vector2(0, Time.time * .04f); }
     }
 
-    /// <summary>The Wasting's curtain: regenerates a small noise texture so it reads as crawling grey static.</summary>
+    /// <summary>
+    /// Haze over the unmade: unlit, in the fog's own colour hour by hour, so what lies behind it greys into haze instead of
+    /// sitting behind a lit pane (and at night it is dark haze, never a glowing wall). The curtain is pulled toward neutral grey
+    /// and regenerates a small noise texture so it reads as crawling grey static; the haze over the unmade and the bank are plain.
+    /// </summary>
     public sealed class WastingStatic : MonoBehaviour
     {
-        Material m; Texture2D tex; Color32[] px; float next; System.Random rng = new System.Random(7);
-        void Start()
+        Material m; Texture2D tex; Color32[] px; float next, grey, gain; bool fizz; System.Random rng = new System.Random(7);
+        /// <summary>Set up at once (the zone map is rendered before Start). The renderer's material must be its own.</summary>
+        public void Init(bool noise, float toGrey, float brightness)
         {
-            m = GetComponent<Renderer>().material;
-            tex = new Texture2D(128, 64, TextureFormat.RGBA32, false) { filterMode = FilterMode.Bilinear, wrapMode = TextureWrapMode.Repeat, name = "Wasting static" };
-            tex.wrapModeV = TextureWrapMode.Clamp;
-            px = new Color32[128 * 64]; m.mainTexture = tex; m.mainTextureScale = new Vector2(14, 1);
-            Fill();
+            fizz = noise; grey = toGrey; gain = brightness; m = GetComponent<Renderer>().sharedMaterial;
+            if (fizz)
+            {
+                tex = new Texture2D(128, 64, TextureFormat.RGBA32, false) { filterMode = FilterMode.Bilinear, wrapMode = TextureWrapMode.Repeat, name = "Wasting static" };
+                tex.wrapModeV = TextureWrapMode.Clamp;
+                px = new Color32[128 * 64]; m.mainTexture = tex; m.mainTextureScale = new Vector2(14, 1);
+                Fill();
+            }
+            else m.mainTexture = Texture2D.whiteTexture;
+            Tint();
         }
-        void Update() { if (Time.time >= next) { next = Time.time + .11f; Fill(); } }
+        void LateUpdate()
+        {
+            if (m == null) return;
+            Tint();   // after the clock has set this frame's fog
+            if (fizz && Time.time >= next) { next = Time.time + .11f; Fill(); }
+        }
+        void Tint()
+        {
+            // The fog's colour (particle shaders double their tint), the curtain's pulled toward grey and a touch brighter.
+            var f = RenderSettings.fogColor; float l = f.grayscale;
+            var c = Color.Lerp(f, new Color(l, l, l * 1.03f), grey) * (.5f * gain); c.a = .5f; m.SetColor("_TintColor", c);
+        }
         void Fill()
         {
-            // Crawling grey static: dense at the ground, dissolving upward into haze, never a hard top edge.
+            // Crawling grey static: thin at the ground (the land behind fades in with distance, no ruled bottom edge), thickest a
+            // few metres up, dissolving upward into haze. Soft slanted bands crawl sideways through it, not rain-like streaks.
+            float t = Time.time;
             for (int y = 0; y < 64; y++)
             {
-                float h = y / 63f, body = Mathf.Clamp01(1.1f - h * 1.25f) * Mathf.Clamp01(h * 12);
+                float h = y / 63f, body = Mathf.SmoothStep(0, 1, h / .3f) * (1 - Mathf.SmoothStep(0, 1, (h - .3f) / .7f));
                 for (int x = 0; x < 128; x++)
                 {
-                    int v = rng.Next(105, 225);
-                    float streak = Mathf.PerlinNoise(x * .09f, (y + Time.time * 6) * .05f);
-                    byte a = (byte)Mathf.Clamp(rng.Next(30, 120) * body * (.55f + streak * .7f), 0, 255);
-                    px[y * 128 + x] = new Color32((byte)v, (byte)v, (byte)Mathf.Min(255, v + 8), a);
+                    int v = rng.Next(170, 250);
+                    float u = x * Mathf.PI / 64, band = .5f + .3f * Mathf.Sin(u * 3 + t * .25f + y * .19f) + .2f * Mathf.Sin(u * 5 - t * .45f + y * .31f + 1.7f);
+                    byte a = (byte)Mathf.Clamp(rng.Next(40, 140) * body * (.4f + band * .9f), 0, 255);
+                    px[y * 128 + x] = new Color32((byte)v, (byte)v, (byte)Mathf.Min(255, v + 4), a);
                 }
             }
             tex.SetPixels32(px); tex.Apply(false);

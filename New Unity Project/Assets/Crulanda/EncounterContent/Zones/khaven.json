@@ -7,7 +7,7 @@
   "size": 240,
   "levelMin": 3,
   "levelMax": 5,
-  "biome": "meadow",
+  "biome": "gloom",
   "worldMapPosition": {
     "x": 0.605,
     "y": 0.665
@@ -19,16 +19,20 @@
   "waterTint": "#1C2624",
   "waterReflect": 0.3,
   "lighting": {
-    "sunPitch": 11,
+    "sunPitch": 12,
     "sunYaw": -62,
-    "sunIntensity": 0.85,
-    "sunColor": "#E09068",
-    "ambientSky": "#5E6470",
-    "ambientEquator": "#5A4F4A",
-    "ambientGround": "#2A2522",
-    "fogColor": "#5F5A57",
-    "fogStart": 30,
-    "fogEnd": 120
+    "sunIntensity": 1.05,
+    "sunColor": "#F08A5A",
+    "ambientSky": "#6C6588",
+    "ambientEquator": "#68545E",
+    "ambientGround": "#2C2428",
+    "fogColor": "#7A5F66",
+    "fogStart": 24,
+    "fogEnd": 112,
+    "sunHigh": 17,
+    "skyTint": "#A67884",
+    "skyExposure": 0.8,
+    "skyHaze": 1.4
   },
   "spawns": {
     "player": {

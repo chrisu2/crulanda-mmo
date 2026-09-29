@@ -19,14 +19,14 @@
   "lighting": {
     "sunPitch": 42,
     "sunYaw": -28,
-    "sunIntensity": 1.25,
+    "sunIntensity": 1.2,
     "sunColor": "#EEF2FF",
-    "ambientSky": "#A4B6CC",
-    "ambientEquator": "#8C939A",
-    "ambientGround": "#3C3F45",
-    "fogColor": "#BCC7D2",
-    "fogStart": 90,
-    "fogEnd": 260
+    "ambientSky": "#8C9CB1",
+    "ambientEquator": "#747B84",
+    "ambientGround": "#34373C",
+    "fogColor": "#A7B4C3",
+    "fogStart": 60,
+    "fogEnd": 240
   },
   "spawns": {
     "player": {
@@ -540,6 +540,7 @@
     {
       "kind": "cliff",
       "name": "Eyrie crag",
+      "lift": 6,
       "at": {
         "x": 58,
         "y": 108
@@ -553,6 +554,7 @@
     {
       "kind": "cliff",
       "name": "High ledge",
+      "lift": 4.5,
       "at": {
         "x": 100,
         "y": 84
@@ -566,6 +568,7 @@
     {
       "kind": "cliff",
       "name": "Ledge wall",
+      "lift": 6,
       "at": {
         "x": 112,
         "y": 100
@@ -670,6 +673,7 @@
     {
       "kind": "cliff",
       "name": "Umbra scarp",
+      "lift": -8,
       "at": {
         "x": -106,
         "y": 20
@@ -696,6 +700,7 @@
     {
       "kind": "cliff",
       "name": "North wall",
+      "lift": 6,
       "at": {
         "x": -20,
         "y": 108
@@ -709,6 +714,7 @@
     {
       "kind": "cliff",
       "name": "South scarp",
+      "lift": -6,
       "at": {
         "x": 10,
         "y": -108
@@ -722,6 +728,7 @@
     {
       "kind": "cliff",
       "name": "East scarp",
+      "lift": -5,
       "at": {
         "x": 80,
         "y": -100

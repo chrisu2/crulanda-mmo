@@ -19,14 +19,15 @@
   "lighting": {
     "sunPitch": 16,
     "sunYaw": -48,
-    "sunIntensity": 0.72,
-    "sunColor": "#E0935E",
-    "ambientSky": "#6C625D",
-    "ambientEquator": "#5E5248",
-    "ambientGround": "#2A2521",
-    "fogColor": "#6F645C",
+    "sunIntensity": 0.9,
+    "sunColor": "#D8D0C6",
+    "ambientSky": "#7C7B82",
+    "ambientEquator": "#69676C",
+    "ambientGround": "#2D2B2D",
+    "fogColor": "#A3A1A8",
     "fogStart": 16,
-    "fogEnd": 90
+    "fogEnd": 90,
+    "skyTint": "#9987A1"
   },
   "spawns": {
     "player": {

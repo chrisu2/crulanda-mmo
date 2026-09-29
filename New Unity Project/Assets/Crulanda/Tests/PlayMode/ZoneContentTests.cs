@@ -63,6 +63,17 @@ namespace Crulanda.Tests
                 if (arrivals.TryGetValue(id, out var ins))
                     foreach (var (from, at) in ins) if (!NavMesh.SamplePosition(s.Zone.Ground(at), out _, 2.5f, NavMesh.AllAreas)) problems.Add(p + "arrival from " + from + " at " + at + " is not walkable");
                 foreach (var e in z.exits) if (!s.Zone.HasZone(e.to)) problems.Add(p + "exit to unknown zone " + e.to);
+                // Every exit and camp can be walked to from the player's start: no wall, crag or relief cuts the zone in two.
+                if (NavMesh.SamplePosition(s.Zone.Ground(z.spawns.player), out var start, 2.5f, NavMesh.AllAreas))
+                {
+                    var path = new NavMeshPath();
+                    foreach (var e in z.exits)
+                        if (!NavMesh.SamplePosition(s.Zone.Ground(e.at), out var to, Mathf.Max(2.5f, e.radius), NavMesh.AllAreas) || !NavMesh.CalculatePath(start.position, to.position, NavMesh.AllAreas, path) || path.status != NavMeshPathStatus.PathComplete)
+                            problems.Add(p + "exit to " + e.to + " can't be walked to from the start");
+                    foreach (var camp in z.camps)
+                        if (!NavMesh.SamplePosition(s.Zone.Ground(camp.center), out var to, Mathf.Max(2.5f, camp.radius), NavMesh.AllAreas) || !NavMesh.CalculatePath(start.position, to.position, NavMesh.AllAreas, path) || path.status != NavMeshPathStatus.PathComplete)
+                            problems.Add(p + "camp '" + camp.name + "' can't be walked to from the start");
+                }
                 // Camps: most of each pack must find walkable ground; levels inside the zone's band.
                 string shortId = id.Replace("zone.", "");
                 for (int c = 0; c < z.camps.Length; c++)

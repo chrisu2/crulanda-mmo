@@ -561,8 +561,8 @@
       "name": "The Wasting",
       "text": "Not fire, not rot. The world simply stops.",
       "at": {
-        "x": 50,
-        "y": 0
+        "x": 94,
+        "y": 4
       },
       "radius": 10
     },

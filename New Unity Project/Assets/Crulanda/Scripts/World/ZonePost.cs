@@ -27,8 +27,11 @@ namespace Crulanda.World
         {
             switch (zone != null ? zone.biome : "meadow")
             {
-                case "mountain": return new Grade { saturation = 1.02f, contrast = 1.14f, exposure = .98f, vignette = .55f, bloom = .5f, threshold = 1.05f, tint = new Color(.97f, 1, 1.04f) };
-                case "ash": return new Grade { saturation = .78f, contrast = 1.16f, exposure = .95f, vignette = .95f, bloom = .6f, threshold = .95f, tint = new Color(1.05f, .97f, .9f) };
+                // Thin cold air: crisp contrast, a touch more colour and less glow, so rock, pines and the far blue ridges separate.
+                case "mountain": return new Grade { saturation = 1.08f, contrast = 1.2f, exposure = .95f, vignette = .55f, bloom = .42f, threshold = 1.1f, tint = new Color(.97f, 1, 1.04f) };
+                // Ash: drained grey with a faint bruised-violet cast (canon sky, book1 ch.20); a sepia tint turned the ash to desert tan.
+                case "ash": return new Grade { saturation = .7f, contrast = 1.16f, exposure = .95f, vignette = .8f, bloom = .6f, threshold = .95f, tint = new Color(.99f, .985f, 1.02f) };
+                case "gloom": return new Grade { saturation = .82f, contrast = 1.12f, exposure = 1.04f, vignette = .85f, bloom = .6f, threshold = .95f, tint = new Color(1.05f, .95f, 1.03f) };   // Khaven: drained, rose-violet dusk
                 default: return new Grade { saturation = 1.18f, contrast = 1.14f, exposure = 1f, vignette = .6f, bloom = .55f, threshold = 1f, tint = new Color(1.03f, 1, .95f) };
             }
         }

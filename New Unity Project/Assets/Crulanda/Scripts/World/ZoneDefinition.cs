@@ -22,7 +22,7 @@ namespace Crulanda.World
         public ZoneRect[] fields = new ZoneRect[0];
         public ZoneCircle[] clearings = new ZoneCircle[0];
         public ZoneProp[] props = new ZoneProp[0];
-        public ZoneWasting wasting;
+        public ZoneWasting wasting;         // only when the JSON has a "wasting" block (ZoneBuilder.ParseZone)
         public ZoneLabel[] landmarks = new ZoneLabel[0];
         public string[] objectives = new string[0];
         public ZoneExit[] exits = new ZoneExit[0];
@@ -32,7 +32,10 @@ namespace Crulanda.World
         public ZoneLife life;
         /// <summary>Level band shown on maps and exits (e.g. 1-2); camps spawn inside it.</summary>
         public int levelMin = 1, levelMax = 2;
-        /// <summary>Ground palette: meadow (green farmland), mountain (rock, scree, sparse grass), ash (grey cracked ash).</summary>
+        /// <summary>
+        /// Ground palette: meadow (green farmland), mountain (rock, scree, sparse grass), ash (grey cracked ash), gloom (Khaven:
+        /// hard grey-brown earth, thin dry grass and no flowers, grey dead woods, withered pines and brush, a drained dusk grade).
+        /// </summary>
         public string biome = "meadow";
         /// <summary>Mob camps for levelling: packs that respawn after they are killed. Not saved; they always return.</summary>
         public ZoneCamp[] camps = new ZoneCamp[0];
@@ -88,6 +91,12 @@ namespace Crulanda.World
         public float sunPitch = 32, sunYaw = -40, sunIntensity = 1.1f;
         public string sunColor = "#FFDDB0", ambientSky = "#8A93A0", ambientEquator = "#6E6A5E", ambientGround = "#3C382F";
         public string fogColor = "#9A9888"; public float fogStart = 45, fogEnd = 120;
+        /// <summary>
+        /// Optional (0 or empty = the shared default), read by WorldClock. sunHigh: the sun's noon elevation in degrees (the
+        /// default arc climbs to about 45; Khaven's stays low, so its day holds the dusk). skyTint (hex), skyExposure (default
+        /// 1.05) and skyHaze (atmosphere thickness): the procedural sky's daytime look. Night falls the same everywhere.
+        /// </summary>
+        public float sunHigh, skyExposure, skyHaze; public string skyTint;
     }
     [Serializable] public sealed class ZoneSpawns
     {
@@ -120,6 +129,8 @@ namespace Crulanda.World
     {
         public string kind, name; public Vector2 at; public float rotation, scale = 1; public int variant;
         public Vector2 size;   // footprint for sized props (house, barn, fence length in x)
+        /// <summary>Cliff: raise the ground behind the crag (its +z side; negative, its -z side) this many metres into a shelf.</summary>
+        public float lift;
         public Vector2[] points = new Vector2[0];   // polyline props (wall)
         /// <summary>Optional: makes the prop usable with E. This is the prompt, e.g. "Search the black-iron wagon".</summary>
         public string interact;

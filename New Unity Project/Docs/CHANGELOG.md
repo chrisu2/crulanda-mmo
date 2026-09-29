@@ -204,3 +204,32 @@ These fix the "water, edges, night" group of `Docs/VISUAL_REVIEW_2026-09-29.md`.
   - It pops on selection, breathes gently, and lies along sloped ground.
   - The selected enemy's nameplate is boxed in gold, and all enemy nameplates are now centred.
 - The tour captures `99-target-ring` and `99-tree-fade`. New tests are in `CameraAndTargetTests` (PlayMode).
+
+## 2026-09-29 — Step 2: zone looks (Khaven dusk, Peaks mountains, grey Ash Rim, the Wasting edge)
+- **Bug fix: the phantom Wasting.**
+  - JsonUtility never leaves a nested class null, so zones without a `wasting` block (Khaven, the Peaks) got a default Wasting at x = 58.
+  - That meant flat grey unmade ground, husks, a curtain, and an invisible wall across Khaven's Carrion boars camp and the Peaks' east side, including the Captain's eyrie, The High Ledge and the east exit.
+  - `ZoneBuilder.ParseZone` now keeps a Wasting only when the zone declares one.
+  - ZoneContentTests now path-checks every exit and camp from the player's start.
+- **Khaven**, new biome `gloom`, a permanent dusk:
+  - A low orange sun, capped by the new lighting field `sunHigh`, and violet ambient.
+  - Rose-mauve haze and a zone sky (`skyTint`, `skyExposure`, `skyHaze`).
+  - A drained dusk grade.
+  - Grey-brown hard earth with thin dry grass and no flowers.
+  - A grey dead Whispering Wood, and withered pines and brush.
+  - A dead, pine and rock forest edge on the east too, and a grey backdrop wood.
+- **The Shattered Peaks** as real mountains:
+  - Steep knolls, rock ribs and jagged walls climbing to the edge. A keep-grid holds roads, camps, props, landmarks, exits and spawns at walkable height and connected.
+  - Cliff shelves (new prop field `lift`).
+  - Slope-aware rock, scree and turf paint, sparse tufted grass and scattered boulders.
+  - Darker, cooler light with blue distance fog and a crisper grade. Tall boundary colliders.
+- **The Ashland Rim** as grey petrified ash:
+  - A neutral grey ground with angular cracks (not worm trails).
+  - Grey ruins and rocks, and a bruised violet sky.
+  - Fog lighter than the ground, so distance reads correctly. A lower, less walled-in backdrop and a lighter vignette.
+  - Falling ash made visible: bigger, paler flakes, prewarmed, facing the camera.
+- **The Wasting edge:**
+  - A ragged, fraying front for paint and grass. The unmade ground drains to flat grey static.
+  - The curtain is an unlit fog-coloured sheet with crawling bands (not glass).
+  - A far haze bank in the fog colour, so the flat unmade fades into haze instead of meeting the sky in a hard line.
+  - The Oakhaven Wasting landmark moves to the front.

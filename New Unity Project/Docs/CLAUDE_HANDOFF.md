@@ -60,6 +60,10 @@ Chris's rules:
        - a big root flare, perhaps a low stone ring or bench round it;
        - the green framing it.
      - Keep its TreeFade and collider, and keep it readable from the whole village.
+   - **Also in step 3: critters have no legs.** Chris: "cats have no legs".
+     - In `WorldLife.cs` (the critter body switch, around line 715), the cat, chicken, rabbit and crow are built without legs. Only the deer and sheep have them.
+     - Add legs (cat: four slim legs and paws; chicken and crow: two thin legs and feet; rabbit: haunches and forepaws), sized so the bodies stand on the ground.
+     - Add a simple leg swing while they move, like the villagers' walk.
 3. **Step 4, HUD overlaps and readability:** `tools\pending-patches\step4-hud.json`.
 4. **Step 5, water realism** (Chris: "still looks plasticky"): `tools\pending-patches\step5-water-realism.json`.
    - A planar reflection camera (`WaterReflection.cs` is in `newFiles`), plus finer ripples and sparkle.

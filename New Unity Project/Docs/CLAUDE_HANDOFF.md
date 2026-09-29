@@ -50,6 +50,16 @@ Chris's rules:
    - **Also in step 3** (Chris, playtest screenshot, 2026-09-29): the broadleaf and orchard tree trunks "look bad". They are plain grey pipes.
      - `ZoneBuilder.Broadleaf` adds a wider base cylinder (`h * .08`) that reads as a pipe collar.
      - Fix: tapered trunks; a root flare like DeadTree's (a swell plus half-sunk buttress ridges) instead of the collar; bark colour variation; a slight lean; limbs that join the trunk.
+   - **PRIORITY in step 3: rebuild the Great Oak as the town's centrepiece.** Chris: "this tree looks terrible. this should be the center piece of town".
+     - CANON (book1/chapter_4.md, line 39): a massive, ancient oak dominating the centre of the communal square, the historical heart of the settlement. After the erasure it is found petrified mid-bloom, in spring leaf.
+     - So before the erasure, when the game is set, it must be ALIVE: in full leaf, with sprawling massive branches.
+     - Today it is `dead_oak` (DeadTree cylinders): a banded trunk where the cylinders overlap, stick limbs with ball knuckles, no leaves.
+     - Rebuild it as a new `great_oak` kind in oakhaven.json:
+       - a gnarled, tapered trunk mesh with smoothly merging limbs;
+       - a huge layered canopy of blob clumps with fresh green leaf (it may carry some autumn colour to fit Oakhaven's season);
+       - a big root flare, perhaps a low stone ring or bench round it;
+       - the green framing it.
+     - Keep its TreeFade and collider, and keep it readable from the whole village.
 3. **Step 4, HUD overlaps and readability:** `tools\pending-patches\step4-hud.json`.
 4. **Step 5, water realism** (Chris: "still looks plasticky"): `tools\pending-patches\step5-water-realism.json`.
    - A planar reflection camera (`WaterReflection.cs` is in `newFiles`), plus finer ripples and sparkle.

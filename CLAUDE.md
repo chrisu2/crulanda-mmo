@@ -24,7 +24,7 @@ Single-player simulated MMORPG. Start with `New Unity Project/Docs/CLAUDE_HANDOF
   - J: is slow (about 2 MB/s), so a full copy takes about 10 minutes. If J: is missing, say so.
 - Git:
   - It's at `C:\Program Files\Git\cmd\git.exe` and not on the agent shell's PATH.
-  - No global identity is set, so commit with `-c user.name=Chris -c user.email=chrisu2@gmail.com`.
+  - The author is set in this repo's local config (`Chris Underwood <chrisu2@gmail.com>`), so a plain `git commit` works. There is no global identity.
   - Git LFS is enabled for this repo only (`.gitattributes` sends images, models and audio through it).
 - `D:\code` is a separate, unrelated repo (other projects, VM images and model weights, owned by an old Windows account).
   Never commit this game there.

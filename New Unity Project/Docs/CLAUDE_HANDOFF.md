@@ -9,7 +9,26 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## UPDATE 2026-09-29 (Claude session, newest) — zones 1-10, camps, items, water, graphics
+## RESUME HERE (session ended 2026-09-29, about 03:30)
+- **Done and committed:** `c4a8967` fixes the "water, edges, night" group of `Docs/VISUAL_REVIEW_2026-09-29.md`:
+  - the bridge slab, chrome Gloom Creek, the foam ring, the irregular pond shore, meandering creeks, the sawtooth bank, the mill wheel, and the sword while swimming;
+  - the backdrop past the zone edges;
+  - the night ambient.
+  - The CHANGELOG and WORLD_ZONES describe it.
+  - Tests: EditMode 166/166, PlayMode 47/47. The player build succeeded.
+- **Not done:**
+  - **Visual verification.** The new tour is in `work\world-captures`, and the before shots are in `work\world-captures\archive-20260929-pre-water-fix`. A before/after review was started but stopped at bedtime; re-run it first.
+  - The new build is **not published**. `outputs\Crulanda-Playable` still holds the earlier build, and the new one is in `work\encounter-validation\Builds\Crulanda`. Publish it once the shots look right, after checking that Crulanda.exe isn't running.
+- **Helper scripts:** `D:\code\mmo\tools\validation`.
+  - `run_tests.ps1` mirrors Assets into the validation copy, registers content, then runs EditMode and PlayMode.
+  - `build_and_tour.ps1 -Zones ...` builds and captures the world tour.
+- **Next, in the order Chris chose:**
+  1. Verify and polish water, edges and night.
+  2. Zone looks: Khaven dusk and grey wood, Peaks mountains, grey Ash Rim and visible falling ash.
+  3. Props and landmarks: floating props, the white NPCs with floating heads in the Peaks, landmarks that match their names.
+  4. HUD overlaps.
+
+## UPDATE 2026-09-29 (Claude session) — zones 1-10, camps, items, water, graphics
 - **Decision by Chris:** the level cap stays at 10 for now.
   - Ladder: Oakhaven 1-2 → Khaven 3-5 → Shattered Peaks 6-8 → Ashland Rim 9-10.
   - Build order: Peaks then Ashlands.
@@ -141,7 +160,7 @@ The all-class calculator from "IMMEDIATE UNFINISHED WORK" below now exists and w
   - `D:\code\mmo` on branch `main`, first commit `72b4af7`. The repo root also holds `tools\` and `CLAUDE.md`.
   - Never commit the game into the unrelated `D:\code` repo.
   - Git is at `C:\Program Files\Git\cmd\git.exe` (not on PATH).
-  - Commit with `-c user.name=Chris -c user.email=chrisu2@gmail.com`, since no global identity is set.
+  - The author is repo-local (`Chris Underwood <chrisu2@gmail.com>`), and there is no global identity.
   - LFS is local to this repo.
 - **Backup:** `J:\claude\unity projects\mmo`, a full copy including `.git`.
   - Run `D:\code\mmo\tools\Backup.ps1` after commits. It is additive; `-Full` includes Library, and `-Mirror` makes an exact copy.

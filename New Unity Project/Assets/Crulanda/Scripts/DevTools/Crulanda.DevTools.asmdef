@@ -1,0 +1,14 @@
+{
+  "name": "Crulanda.DevTools",
+  "rootNamespace": "Crulanda.DevTools",
+  "references": ["Crulanda.Core","Crulanda.Data","Crulanda.Gameplay"],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

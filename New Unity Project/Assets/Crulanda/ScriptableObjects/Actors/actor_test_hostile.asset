@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 340da54bd20c1a34f8bb0b81e46b7e4b, type: 3}
+  m_Name: actor_test_hostile
+  m_EditorClassIdentifier: Crulanda.Data::Crulanda.Data.ActorArchetypeDefinition
+  _id:
+    _value: actor.test_hostile
+  _displayName: Test Hostile
+  _description: 
+  _canonStatus: 1
+  _tags:
+    _tags: []
+  _level: 1
+  _disposition: 2
+  _classification: 0
+  _resourceKind: 0
+  _baseStats:
+  - stat: 4
+    value: 12
+  - stat: 0
+    value: 12
+  - stat: 10
+    value: 200

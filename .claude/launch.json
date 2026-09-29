@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "calculator",
+      "runtimeExecutable": "C:\\Users\\chris\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "runtimeArgs": ["-m", "http.server", "8765", "--bind", "127.0.0.1", "--directory", "C:\\Users\\chris\\Documents\\Codex\\2026-09-28\\hel\\outputs"],
+      "port": 8765
+    }
+  ]
+}

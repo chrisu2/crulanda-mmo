@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="2" result="Passed" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-29 00:21:12Z" end-time="2026-09-29 00:21:15Z" duration="2.9176695">
+  <test-suite type="TestSuite" id="1026" name="Crulanda - The Quiet Trail" fullname="Crulanda - The Quiet Trail" runstate="Runnable" testcasecount="17" result="Passed" start-time="2026-09-29 00:21:12Z" end-time="2026-09-29 00:21:15Z" duration="2.917670" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <test-suite type="Assembly" id="1021" name="Crulanda.Tests.PlayMode.dll" fullname="C:/Users/chris/Documents/Codex/2026-09-28/hel/work/encounter-validation/Library/ScriptAssemblies/Crulanda.Tests.PlayMode.dll" runstate="Runnable" testcasecount="17" result="Passed" start-time="2026-09-29 00:21:12Z" end-time="2026-09-29 00:21:15Z" duration="2.911831" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="38196" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="EditorOnly" value="False" />
+      </properties>
+      <test-suite type="TestSuite" id="1022" name="Crulanda" fullname="Crulanda" runstate="Runnable" testcasecount="17" result="Passed" start-time="2026-09-29 00:21:12Z" end-time="2026-09-29 00:21:15Z" duration="2.911288" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1023" name="Tests" fullname="Crulanda.Tests" runstate="Runnable" testcasecount="17" result="Passed" start-time="2026-09-29 00:21:12Z" end-time="2026-09-29 00:21:15Z" duration="2.910944" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestFixture" id="1015" name="EncounterLoopTests" fullname="Crulanda.Tests.EncounterLoopTests" classname="Crulanda.Tests.EncounterLoopTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-09-29 00:21:12Z" end-time="2026-09-29 00:21:15Z" duration="2.909755" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1016" name="Auto_attacks_continue_while_strike_is_on_cooldown" fullname="Crulanda.Tests.EncounterLoopTests.Auto_attacks_continue_while_strike_is_on_cooldown" methodname="Auto_attacks_continue_while_strike_is_on_cooldown" classname="Crulanda.Tests.EncounterLoopTests" runstate="Runnable" seed="1633123425" result="Passed" start-time="2026-09-29 00:21:12Z" end-time="2026-09-29 00:21:15Z" duration="2.877262" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1017" name="Solid_scenery_blocks_player_and_navigation" fullname="Crulanda.Tests.EncounterLoopTests.Solid_scenery_blocks_player_and_navigation" methodname="Solid_scenery_blocks_player_and_navigation" classname="Crulanda.Tests.EncounterLoopTests" runstate="Runnable" seed="648745479" result="Passed" start-time="2026-09-29 00:21:15Z" end-time="2026-09-29 00:21:15Z" duration="0.022818" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Saving results to: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\feedback-targeted-results.xml
+]]></output>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

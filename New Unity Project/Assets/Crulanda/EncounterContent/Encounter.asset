@@ -1,0 +1,495 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41a5afc19a25d2841aaf81155928ada1, type: 3}
+  m_Name: Encounter
+  m_EditorClassIdentifier: Crulanda.Encounter::Crulanda.Encounter.EncounterContent
+  player: {fileID: 11400000, guid: 704cd90732d94d44c8910a6b80ffdd6d, type: 2}
+  healer: {fileID: 11400000, guid: 3be69faf7b5fdfb4583503682877be4f, type: 2}
+  enemy: {fileID: 11400000, guid: 190bcb106a23e0244903607898143faa, type: 2}
+  abilities:
+  - name: Strike
+    id: ability.strike
+    effect: 0
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 0
+    description: A heavy strike. Starts automatic weapon attacks while in melee range.
+    power: 12
+    cost: 15
+    cooldown: 5
+    range: 3.2
+  - name: Challenge
+    id: ability.challenge
+    effect: 1
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 3
+    description: Forces your target to attack you for 3 seconds. Use it to protect Mira.
+    power: 0
+    cost: 10
+    cooldown: 8
+    range: 10
+  - name: Guard
+    id: ability.guard
+    statusId: status.guard
+    effect: 4
+    castTime: 0
+    globalCooldown: 0
+    duration: 5
+    description: Reduce incoming damage for 5 seconds.
+    power: 0
+    cost: 20
+    cooldown: 12
+    range: 0
+  - name: Intercept
+    id: ability.intercept
+    effect: 5
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 3
+    description: Dash to Mira and take the next blow aimed at her within 3 seconds at Guard strength. Talent.
+    power: 0
+    cost: 20
+    cooldown: 15
+    range: 0
+  - name: Breaching Blow
+    id: ability.breaching_blow
+    effect: 6
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 4
+    description: Spend all weapon pressure for 12 damage per pressure and Expose the target for 4 seconds. Talent.
+    power: 12
+    cost: 0
+    cooldown: 10
+    range: 3.2
+  - name: Muster
+    id: ability.muster
+    effect: 7
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 6
+    description: Give you and nearby Mira a 20-point barrier for 6 seconds. Talent.
+    power: 20
+    cost: 25
+    cooldown: 30
+    range: 12
+  - name: Barkhide
+    id: druid.barkhide
+    effect: 4
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 0
+    description: Shift into Barkhide: armor and health up, Bark builds from blows. Costs Shift Breath.
+    power: 0
+    cost: 25
+    cooldown: 1.5
+    range: 0
+  - name: Thornclaw
+    id: druid.thornclaw
+    effect: 4
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 0
+    description: Shift into Thornclaw: faster, quicker swings, Fang combo finishers. Costs Shift Breath.
+    power: 0
+    cost: 25
+    cooldown: 1.5
+    range: 0
+  - name: Rootmend
+    id: druid.rootmend
+    effect: 4
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 0
+    description: Shift into Rootmend: Seedling heals build Sap for bigger blooms. Costs Shift Breath.
+    power: 0
+    cost: 25
+    cooldown: 1.5
+    range: 0
+  - name: Thornsong
+    id: druid.thornsong
+    effect: 4
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 0
+    description: Shift into Thornsong: alternate Seedshot and Thornbolt to build Glimmer. Costs Shift Breath.
+    power: 0
+    cost: 25
+    cooldown: 1.5
+    range: 0
+  - name: Bough Strike
+    id: druid.bough_strike
+    effect: 0
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 0
+    description: Heavy blow with double threat. Builds 12 Bark.
+    power: 10
+    cost: 0
+    cooldown: 4.5
+    range: 3.2
+  - name: Bellowing Roar
+    id: druid.bellowing_roar
+    effect: 1
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 3
+    description: Taunt your target for 3 seconds and add threat to every enemy within 8 metres.
+    power: 0
+    cost: 0
+    cooldown: 10
+    range: 10
+  - name: Barkmend
+    id: druid.barkmend
+    effect: 3
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 0
+    description: Spend 30 Bark to heal yourself for 12% of maximum health.
+    power: 0
+    cost: 0
+    cooldown: 8
+    range: 0
+  - name: Heartwood Brace
+    id: druid.heartwood_brace
+    effect: 4
+    castTime: 0
+    globalCooldown: 0
+    duration: 6
+    description: Spend 40 Bark: take 35% less damage for 6 seconds. Talent.
+    power: 0
+    cost: 0
+    cooldown: 15
+    range: 0
+  - name: Rake
+    id: druid.rake
+    effect: 0
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 6
+    description: Claw the target and make it bleed for 6 seconds. Builds 1 Fang.
+    power: 6
+    cost: 0
+    cooldown: 0
+    range: 3.2
+  - name: Lunge
+    id: druid.lunge
+    effect: 0
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 0
+    description: Leap to an enemy within 12 metres. Builds 1 Fang.
+    power: 0
+    cost: 0
+    cooldown: 12
+    range: 12
+  - name: Tear
+    id: druid.tear
+    effect: 0
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 0
+    description: Finisher: spend all Fang for 10 damage per Fang.
+    power: 10
+    cost: 0
+    cooldown: 0
+    range: 3.2
+  - name: Rending Flurry
+    id: druid.rending_flurry
+    effect: 0
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 2
+    description: Finisher: spend 3-5 Fang for 4-8 rapid strikes over 2 seconds. Talent.
+    power: 5
+    cost: 0
+    cooldown: 10
+    range: 3.2
+  - name: Seedling
+    id: druid.seedling
+    effect: 3
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 10
+    description: Heal-over-time on your lowest-health ally for 10 seconds. Each tick builds Sap.
+    power: 0
+    cost: 0
+    cooldown: 0
+    range: 25
+  - name: Quickbloom
+    id: druid.quickbloom
+    effect: 3
+    castTime: 1.5
+    globalCooldown: 1.5
+    duration: 0
+    description: 1.5s cast: spend 25 Sap on a direct heal. Moving interrupts.
+    power: 30
+    cost: 0
+    cooldown: 0
+    range: 25
+  - name: Verdant Ward
+    id: druid.verdant_ward
+    effect: 4
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 8
+    description: Give your lowest-health ally a barrier for 8 seconds.
+    power: 25
+    cost: 0
+    cooldown: 12
+    range: 25
+  - name: Burst Bloom
+    id: druid.burst_bloom
+    effect: 3
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 0
+    description: Spend 30 Sap: consume a Seedling and heal its remaining ticks plus 25%. Talent.
+    power: 0
+    cost: 0
+    cooldown: 8
+    range: 25
+  - name: Seedshot
+    id: druid.seedshot
+    effect: 0
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 4
+    description: Instant thorn shot with a short damage-over-time. Alternate with Thornbolt for Glimmer.
+    power: 6
+    cost: 0
+    cooldown: 0
+    range: 25
+  - name: Thornbolt
+    id: druid.thornbolt
+    effect: 0
+    castTime: 1.8
+    globalCooldown: 1.5
+    duration: 0
+    description: 1.8s cast: heavy thorn bolt. Alternate with Seedshot for Glimmer. Moving interrupts.
+    power: 16
+    cost: 0
+    cooldown: 0
+    range: 25
+  - name: Briar Snare
+    id: druid.briar_snare
+    effect: 4
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 6
+    description: Slow the target by 40% for 6 seconds.
+    power: 0
+    cost: 0
+    cooldown: 12
+    range: 25
+  - name: Bramblestorm
+    id: druid.bramblestorm
+    effect: 0
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 3
+    description: Spend all Glimmer (min 30): 3-second channel of thorn rain. Talent.
+    power: 0
+    cost: 0
+    cooldown: 20
+    range: 25
+  - name: Swiftroot
+    id: druid.swiftroot
+    effect: 3
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 0
+    description: Instant emergency heal on your lowest-health ally. Rootmend only unless talented.
+    power: 20
+    cost: 0
+    cooldown: 15
+    range: 25
+  - name: Stillroot
+    id: druid.stillroot
+    effect: 4
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 4
+    description: Root the target in place for 4 seconds. Thornsong only unless talented.
+    power: 0
+    cost: 0
+    cooldown: 20
+    range: 25
+  playerSwingInterval: 2.6
+  enemySwingInterval: 2.6
+  veteranHealth: 340
+  itemId: item.training_blade
+  itemName: Tempered Trailblade
+  weaponBonus: 7
+  healingAbility:
+    id: ability.restorative_weave
+    name: Restorative weave
+    description: A deliberate restorative cast.
+    effect: 3
+    power: 42
+    cost: 18
+    cooldown: 3.5
+    range: 13
+    castTime: 1.5
+    globalCooldown: 1.5
+    duration: 0
+  boltAbility:
+    id: ability.light_bolt
+    name: Light bolt
+    description: Opportunistic support damage.
+    effect: 0
+    power: 7
+    cost: 0
+    cooldown: 4
+    range: 12
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 0
+  playerStats:
+    baseHealth: 180
+    healthPerLevel: 25
+    healthPerStamina: 5
+    baseAttackPower: 12
+    attackPowerPerLevel: 2
+    attackPowerPerStrength: 1
+    spellPowerPerIntellect: 1
+    armorPerAgility: 1
+  statuses:
+  - id: status.guard
+    name: Guard
+    duration: 5
+    incomingDamageMultiplier: 0.4
+    modifiers: []
+  talentTree: {fileID: 4900000, guid: 91ec937a34a741efaaf03d29334b12f6, type: 3}
+  additionalClasses:
+  - definition:
+      id: class.druid
+      displayName: Druid
+      role: 4
+      resource: 4
+      maxResource: 100
+      combatRegen: 4
+      restingRegen: 15
+      stats:
+        baseHealth: 170
+        healthPerLevel: 22
+        healthPerStamina: 5
+        baseAttackPower: 10
+        attackPowerPerLevel: 2
+        attackPowerPerStrength: 1
+        spellPowerPerIntellect: 1
+        armorPerAgility: 1
+      unlocks:
+        - abilityId: druid.barkhide
+          level: 1
+          talentId: 
+        - abilityId: druid.thornclaw
+          level: 1
+          talentId: 
+        - abilityId: druid.rootmend
+          level: 1
+          talentId: 
+        - abilityId: druid.thornsong
+          level: 1
+          talentId: 
+        - abilityId: druid.bough_strike
+          level: 1
+          talentId: 
+        - abilityId: druid.bellowing_roar
+          level: 2
+          talentId: 
+        - abilityId: druid.barkmend
+          level: 4
+          talentId: 
+        - abilityId: druid.heartwood_brace
+          level: 1
+          talentId: bh-heartwood-brace
+        - abilityId: druid.rake
+          level: 1
+          talentId: 
+        - abilityId: druid.lunge
+          level: 3
+          talentId: 
+        - abilityId: druid.tear
+          level: 1
+          talentId: 
+        - abilityId: druid.rending_flurry
+          level: 1
+          talentId: tc-rending-flurry
+        - abilityId: druid.seedling
+          level: 1
+          talentId: 
+        - abilityId: druid.quickbloom
+          level: 2
+          talentId: 
+        - abilityId: druid.verdant_ward
+          level: 5
+          talentId: 
+        - abilityId: druid.burst_bloom
+          level: 1
+          talentId: rm-burst-bloom
+        - abilityId: druid.seedshot
+          level: 1
+          talentId: 
+        - abilityId: druid.thornbolt
+          level: 1
+          talentId: 
+        - abilityId: druid.briar_snare
+          level: 4
+          talentId: 
+        - abilityId: druid.bramblestorm
+          level: 1
+          talentId: ts-bramblestorm
+        - abilityId: druid.swiftroot
+          level: 3
+          talentId: 
+        - abilityId: druid.stillroot
+          level: 6
+          talentId: 
+    talentTree: {fileID: 4900000, guid: 457f191fd7564f54a95742e419040cb1, type: 3}
+  playerClass:
+    id: class.warrior
+    displayName: Warrior
+    role: 0
+    resource: 2
+    maxResource: 100
+    combatRegen: 5
+    restingRegen: 12
+    stats:
+      baseHealth: 180
+      healthPerLevel: 25
+      healthPerStamina: 5
+      baseAttackPower: 12
+      attackPowerPerLevel: 2
+      attackPowerPerStrength: 1
+      spellPowerPerIntellect: 1
+      armorPerAgility: 1
+    unlocks:
+    - abilityId: ability.strike
+      level: 1
+    - abilityId: ability.challenge
+      level: 1
+    - abilityId: ability.guard
+      level: 1
+    - abilityId: ability.intercept
+      level: 1
+      talentId: tk-intercept
+    - abilityId: ability.breaching_blow
+      level: 1
+      talentId: dp-breaching-blow
+    - abilityId: ability.muster
+      level: 1
+      talentId: sp-muster
+  questFiles:
+  - {fileID: 4900000, guid: 459d5e0303c34e389076eb618e2fb240, type: 3}
+  - {fileID: 4900000, guid: d0ff85cb9a9d4cb9b5f491280a3765d4, type: 3}

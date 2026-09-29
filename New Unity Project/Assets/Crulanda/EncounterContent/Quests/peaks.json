@@ -1,0 +1,471 @@
+{
+  "items": [
+    {
+      "id": "item.toll_ledger",
+      "name": "Sandthrone toll-book",
+      "description": "The toll-master's book, bound in greasy hide and thick with thumbprints."
+    },
+    {
+      "id": "item.escort_orders",
+      "name": "Seeker's warrant",
+      "description": "Folded orders under a Seeker's seal. The seal is already broken."
+    },
+    {
+      "id": "item.rockhide",
+      "name": "Rockhide",
+      "description": "Thick, stone-grey boar hide that barely bends."
+    },
+    {
+      "id": "item.mender_letters",
+      "name": "Salt-Mender letters",
+      "description": "Folded papers in a waxed pouch, written in a cipher of salt-marks."
+    },
+    {
+      "id": "item.pilgrim_journal",
+      "name": "Soot-black journal",
+      "description": "The waystation keeper's journal, wrapped in oilcloth."
+    }
+  ],
+  "documents": [
+    {
+      "id": "doc.peaks.toll_book",
+      "title": "The Toll-Book",
+      "text": "SANDTHRONE TOLL - HIGH GATE\nkept by the toll-master's hand\n\n14th day. Salt-carter, two mules. 3 sovereigns. Paid.\n15th day. Pilgrims, six, for the south. 1 sovereign each. Four paid; two held till paid.\n17th day. Oakhaven run, by Khaven. Two, small. Received from our riders.\n    Handed on at the gate to the Concord escort: four horse, one closed cart. Road to Argentis.\n    TOLL: none. By Seeker's warrant. Captain has the paper.\n18th day. Iron, four carts, north road. 12 sovereigns. Paid.\n19th day. Goatherd. Took two goats.",
+      "canonStatus": "GAME-ONLY: the toll-book and its entries. Sandthrone tolls in the Peaks are canon (book1 ch.5)."
+    },
+    {
+      "id": "doc.peaks.warrant",
+      "title": "Under a Seeker's Seal",
+      "text": "BY WARRANT OF THE HIGH COUNCIL\nSeeker's Office, to the Sandthrone captain of the Peaks toll\n\nThe bearer's escort passes the gate without toll or search, with its cargo: resonance candidates, two, collected at Oakhaven by the Investigation Bureau. They are to reach Argentis sound. Damage to the cargo will come out of your Company's fee.\n\nA third candidate (the miller's boy) follows by the next wagon. Pass it likewise.\n\nOn the third passing, send word down the east road to the Bureau's man at Oakhaven. The seed already lies in the village water. It is to be woken then, and not before.\n\n- the Seeker's mark -",
+      "canonStatus": "CANON-EXPANDED: Seekers, the Investigation Bureau and the Void-Seed in Oakhaven's water are canon (book1 ch.4); the warrant and its wording are GAME-ONLY. Where the children are taken is left open."
+    },
+    {
+      "id": "doc.peaks.journal",
+      "title": "The Waystation Keeper's Last Page",
+      "text": "Third day of the new masters on the gate. They want a toll off the waystation now. A toll on bread.\n\nFifth day. Paid it. Paid it again when a different one came asking.\n\nSixth day. Torches on the lower road. I've sent the pilgrims out by the goat path with what bread there was, and I'm putting this in the hearth where I put everything. If you're reading it, lay a stone for me on the cairn below the gate.\n\nGrenna Holt, keeper.",
+      "canonStatus": "GAME-ONLY"
+    }
+  ],
+  "quests": [
+    {
+      "id": "main.peaks.1",
+      "title": "The Toll-Book",
+      "kind": "main",
+      "giver": "Maddoc Vire",
+      "turnIn": "Maddoc Vire",
+      "zone": "zone.peaks",
+      "level": 6,
+      "requires": [
+        "main.khaven.3"
+      ],
+      "canonStatus": "CANON-EXPANDED: Sandthrone tolls in the Shattered Peaks are canon (book1 ch.5); the toll-book and the handover to a Concord escort are GAME-ONLY.",
+      "summary": "Fight through the Sandthrone toll-guards at the gate and take the toll-book from the strongbox by the toll-house.",
+      "offer": "\"Paid before they got here. Paid by whom?\" Maddoc taps the page. \"The Sandthrone write everything in their toll-book: who passed, what they paid, who paid it for them. They're proud of that book. They keep it in a strongbox by the toll-house, behind the gate.\"\n\n\"I can't ask pilgrims to fight for it. You aren't a pilgrim.\"",
+      "complete": "\"Here.\" Maddoc's finger stops on the page. \"'Two, small. Oakhaven run. Handed on at the gate to the Concord escort. Road to Argentis. No toll: by Seeker's warrant.'\" He closes the book gently, as if it might wake. \"A Seeker's warrant. That's the Council's own hand.\"",
+      "steps": [
+        {
+          "text": "Break the toll-guards at the gate.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.peaks",
+              "target": "mob.tollguard.peaks*",
+              "count": 5,
+              "text": "Sandthrone toll-guards"
+            }
+          ]
+        },
+        {
+          "text": "Take the toll-book from the strongbox by the toll-house.",
+          "objectives": [
+            {
+              "type": "collect",
+              "zone": "zone.peaks",
+              "target": "Toll-house strongbox",
+              "item": "item.toll_ledger",
+              "text": "Break open the toll strongbox",
+              "say": "The strongbox lid gives with a crack. Coin, a knife, and a thick book bound in greasy hide.",
+              "document": "doc.peaks.toll_book"
+            }
+          ]
+        },
+        {
+          "text": "Bring the toll-book to Maddoc Vire.",
+          "objectives": [
+            {
+              "type": "deliver",
+              "zone": "zone.peaks",
+              "target": "Maddoc Vire",
+              "item": "item.toll_ledger",
+              "text": "Bring the toll-book to Maddoc",
+              "say": "\"Let me see it.\" He wets a finger and turns the pages back a fortnight."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 220,
+        "gold": 45,
+        "reputation": [
+          {
+            "faction": "oakhaven",
+            "amount": 150
+          },
+          {
+            "faction": "sandthrone",
+            "amount": -200
+          }
+        ]
+      }
+    },
+    {
+      "id": "main.peaks.2",
+      "title": "Under a Seeker's Seal",
+      "kind": "main",
+      "giver": "Maddoc Vire",
+      "turnIn": "Tarsk",
+      "zone": "zone.peaks",
+      "level": 7,
+      "requires": [
+        "main.peaks.1"
+      ],
+      "canonStatus": "CANON-EXPANDED: Seekers and the Level 4 Void-Seed in Oakhaven's water are canon (book1 ch.4); the warrant, the captain and the Void-Seed's timing are GAME-ONLY. The children's fate is left open.",
+      "summary": "Take the Seeker's warrant from the Sandthrone captain in his eyrie above the toll gate, then show it to Tarsk the Ash-Walker.",
+      "offer": "\"'Captain has the paper.'\" Maddoc says it twice. \"The captain keeps the high camp above the gate, where he can watch the whole road. He's no toll-guard. He fights like the Peaks belong to him.\"\n\n\"If there's a warrant, it'll say where the children went, and why. Bring it back, and show it to Tarsk. He sits by my door and says nothing, but he reads, and he knows things about the grey I'd rather not.\"",
+      "complete": "\"The children are gone up the road to Argentis. I know nothing that goes up that road and comes back.\" Tarsk taps the last lines of the warrant. \"But this I know. A seed in your village water, waiting for a word. My people have seen what a seed does when it wakes.\"",
+      "steps": [
+        {
+          "text": "Take the Seeker's warrant from the Sandthrone captain above the toll gate.",
+          "objectives": [
+            {
+              "type": "collect",
+              "zone": "zone.peaks",
+              "target": "kill:mob.captain.peaks*",
+              "item": "item.escort_orders",
+              "text": "The Seeker's warrant",
+              "say": "Inside the captain's coat, in an oilcloth wrap: folded orders under a Seeker's seal, already broken.",
+              "document": "doc.peaks.warrant"
+            }
+          ]
+        },
+        {
+          "text": "Show the warrant to Tarsk, the Ash-Walker scout at the rest.",
+          "objectives": [
+            {
+              "type": "deliver",
+              "zone": "zone.peaks",
+              "target": "Tarsk",
+              "item": "item.escort_orders",
+              "text": "Show the warrant to Tarsk",
+              "say": "Tarsk reads it once. Then he reads the last lines again, and lays his hand flat on the paper as if to hold something down."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 260,
+        "gold": 55,
+        "reputation": [
+          {
+            "faction": "oakhaven",
+            "amount": 150
+          },
+          {
+            "faction": "ashwalkers",
+            "amount": 150
+          },
+          {
+            "faction": "sandthrone",
+            "amount": -200
+          }
+        ]
+      }
+    },
+    {
+      "id": "main.peaks.3",
+      "title": "Salt of the First Sea",
+      "kind": "main",
+      "giver": "Tarsk",
+      "turnIn": "Mother Vane",
+      "zone": "zone.peaks",
+      "level": 8,
+      "requires": [
+        "main.peaks.2"
+      ],
+      "canonStatus": "CANON-EXPANDED: Mother Vane the Salt-Speaker, Salt of the First Sea and the enclave in the caves of the Eastern Ridge are canon (book1 ch.20); that salt can bind a Void-Seed is GAME-ONLY.",
+      "summary": "Follow the toll road down to the Ashland Rim and ask Mother Vane, the Ash-Walkers' Salt-Speaker, for salt to bind the seed in Oakhaven's well.",
+      "offer": "\"Salt binds what the grey unmakes. Not your kitchen salt. Salt of the First Sea, the old salt, spoken over by one who knows its words.\" Tarsk stands for the first time since you came. \"Mother Vane knows them. Our enclave is in the caves of the Eastern Ridge, down the toll road where the land turns to ash.\"\n\n\"She won't give it to you. Salt is not given. But she may let you earn it.\"",
+      "complete": "Mother Vane hears you out without a word, turning a pinch of white salt between finger and thumb. \"Aye. Salt of the First Sea will bind a seed. Bind it, mind. Not unmake it.\" She lets the salt fall. \"And it's not given. It's earned.\"",
+      "steps": [
+        {
+          "text": "Follow the toll road down to the Ashland Rim.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.ashrim",
+              "at": {
+                "x": -102,
+                "y": 85
+              },
+              "radius": 9,
+              "text": "Go down to the Ashland Rim",
+              "say": "The toll road drops out of the Peaks onto a plain of grey ash. Nothing grows. Far to the east a ridge of dark rock stands against a bruised sky, and beyond it, the grey static of the Wasting."
+            }
+          ]
+        },
+        {
+          "text": "Find Mother Vane at the Ash-Walker enclave on the Eastern Ridge.",
+          "objectives": [
+            {
+              "type": "talk",
+              "zone": "zone.ashrim",
+              "target": "Mother Vane",
+              "text": "Mother Vane, the Salt-Speaker",
+              "say": "\"Tarsk sent you. He sends me strays and expects me to feed them.\" Her eyes are blue and entirely too sharp. \"A seed in a well. Hm. Sit down. Tell me all of it.\""
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 300,
+        "gold": 60,
+        "reputation": [
+          {
+            "faction": "ashwalkers",
+            "amount": 250
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.maddoc.cairns",
+      "title": "Stones for the Lost",
+      "kind": "npc",
+      "giver": "Maddoc Vire",
+      "turnIn": "Maddoc Vire",
+      "zone": "zone.peaks",
+      "level": 6,
+      "canonStatus": "GAME-ONLY (a burial custom of the pass)",
+      "summary": "Lay a stone on each of the three pilgrims' cairns along the toll road.",
+      "offer": "\"Every pilgrim who dies on this road gets a cairn, and every pilgrim who passes lays a stone on it. That's the custom.\" He looks at the empty benches. \"Not many pass now. The cairns go bare, and the old folk say a bare cairn lets the dead wander.\"\n\n\"There are three along the road: one below, on the way up from Khaven, and two past the gate. A stone on each. Say their names if you know them. I don't, anymore.\"",
+      "complete": "\"Good.\" Maddoc opens his book to a page of names and runs his thumb down it. \"They'll rest a while longer.\"",
+      "steps": [
+        {
+          "text": "Lay a stone on each pilgrim cairn along the toll road.",
+          "objectives": [
+            {
+              "type": "interact",
+              "zone": "zone.peaks",
+              "target": "Pilgrim cairn",
+              "count": 3,
+              "text": "Stones laid on the cairns"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 200,
+        "gold": 40
+      }
+    },
+    {
+      "id": "npc.yara.wolves",
+      "title": "Wolves on the Mule Track",
+      "kind": "npc",
+      "giver": "Yara Quell",
+      "turnIn": "Yara Quell",
+      "zone": "zone.peaks",
+      "level": 6,
+      "canonStatus": "GAME-ONLY",
+      "summary": "Cull six mountain wolves in the pines on the western slope.",
+      "offer": "\"I've three mules left, and the wolves in the west pines have learned the sound of their bells.\" Yara slaps dust from her trader's coat. \"Six of them. Enough that the rest learn a new sound.\"",
+      "complete": "\"My mules will sleep tonight. So will I.\" She counts coin onto the stall without haggling, which for Yara is a kind of thanks.",
+      "steps": [
+        {
+          "text": "Cull the mountain wolves in the west pines.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.peaks",
+              "target": "mob.wolf.peaks*",
+              "count": 6,
+              "text": "Mountain wolves culled"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 220,
+        "gold": 45
+      }
+    },
+    {
+      "id": "npc.yara.rockhide",
+      "title": "Rockhide",
+      "kind": "npc",
+      "giver": "Yara Quell",
+      "turnIn": "Yara Quell",
+      "zone": "zone.peaks",
+      "level": 7,
+      "canonStatus": "GAME-ONLY",
+      "summary": "Bring Yara five rockhides from the boars in the wallow on the southern slopes.",
+      "offer": "\"Rockhide boars. Skin like a scree slope, and it wears like one. Pilgrims' boots, mule harness, a Sandthrone jerkin if one comes asking.\" She grins. \"Five hides. The boars wallow on the south slope, past the pines.\"",
+      "complete": "She bends a hide double; it barely creases. \"That'll outlast us both.\"",
+      "steps": [
+        {
+          "text": "Take rockhides from the boars in the southern wallow.",
+          "objectives": [
+            {
+              "type": "collect",
+              "zone": "zone.peaks",
+              "target": "kill:mob.boar.peaks*",
+              "item": "item.rockhide",
+              "count": 5,
+              "text": "Rockhides"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 240,
+        "gold": 50
+      }
+    },
+    {
+      "id": "npc.maddoc.journal",
+      "title": "The Waystation Keeper",
+      "kind": "npc",
+      "giver": "Maddoc Vire",
+      "turnIn": "Maddoc Vire",
+      "zone": "zone.peaks",
+      "level": 7,
+      "canonStatus": "GAME-ONLY",
+      "summary": "Search the ruined waystation on the lower road for its last keeper's journal.",
+      "offer": "\"Before the Sandthrone came there was a waystation on the lower road. Grenna Holt kept it. The toll-guards burned it the week they took the gate, and nobody ever found her.\"\n\n\"She kept a journal, like I keep my book. It'll be in the hearth if it's anywhere; she hid everything in the hearth. Bring it back. Someone should know how it ended.\"",
+      "complete": "Maddoc reads the last page twice, then closes the journal. \"She got the pilgrims out by the goat path. That's like her.\" He sets it on the shelf beside his own book.",
+      "steps": [
+        {
+          "text": "Search the ruined waystation on the lower road.",
+          "objectives": [
+            {
+              "type": "collect",
+              "zone": "zone.peaks",
+              "target": "Collapsed hearth",
+              "item": "item.pilgrim_journal",
+              "text": "Search the collapsed hearth",
+              "say": "Behind a loose hearthstone, wrapped in oilcloth: a soot-black journal. The last pages are written fast.",
+              "document": "doc.peaks.journal"
+            }
+          ]
+        },
+        {
+          "text": "Bring Grenna's journal to Maddoc Vire.",
+          "objectives": [
+            {
+              "type": "deliver",
+              "zone": "zone.peaks",
+              "target": "Maddoc Vire",
+              "item": "item.pilgrim_journal",
+              "text": "Bring the journal to Maddoc"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 240,
+        "gold": 50
+      }
+    },
+    {
+      "id": "faction.sandthrone.1",
+      "title": "The Dead-Drop",
+      "kind": "faction",
+      "giver": "Hadrik Sull",
+      "turnIn": "Hadrik Sull",
+      "zone": "zone.peaks",
+      "level": 7,
+      "canonStatus": "CANON factions (Sandthrone, Salt-Menders), GAME-ONLY quest",
+      "summary": "Hadrik Sull will pay well for the Salt-Menders' letters hidden in a waymarker on the eastern descent. Taking this contract costs you standing with the Salt-Menders.",
+      "offer": "The broker doesn't get up. \"Everyone who comes up this road ends up killing a few of my Company's people. I don't hold it against them. It's trade. Everything is.\"\n\n\"Here's another. The Salt-Menders run people over this pass under our noses, and they leave letters for each other in a hollow waymarker on the east road down. I want those letters. Bring them, and the Company forgets a few of its dead, and you walk away with more coin than the pilgrims will ever pay you.\"\n\n\"The Menders won't thank you. But then, they never pay.\"",
+      "complete": "Hadrik counts coin onto the bench, more than you've seen in one place since Oakhaven. \"The Company remembers who it trades with. So do the Menders, I'm told. Choose your friends.\"",
+      "steps": [
+        {
+          "text": "Take the Salt-Menders' letters from the hollow waymarker on the eastern descent.",
+          "objectives": [
+            {
+              "type": "collect",
+              "zone": "zone.peaks",
+              "target": "Hollow waymarker",
+              "item": "item.mender_letters",
+              "text": "Search the hollow waymarker"
+            }
+          ]
+        },
+        {
+          "text": "Bring the letters to Hadrik Sull.",
+          "objectives": [
+            {
+              "type": "deliver",
+              "zone": "zone.peaks",
+              "target": "Hadrik Sull",
+              "item": "item.mender_letters",
+              "text": "Sell the letters to Hadrik Sull",
+              "say": "\"Ciphered in salt-marks. Of course.\" He smiles and pockets them. \"We have people who read salt.\""
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 240,
+        "gold": 70,
+        "reputation": [
+          {
+            "faction": "sandthrone",
+            "amount": 600
+          },
+          {
+            "faction": "saltmenders",
+            "amount": -400
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.tarsk.pale",
+      "title": "What the Pale Ones Watch",
+      "kind": "npc",
+      "giver": "Tarsk",
+      "turnIn": "Tarsk",
+      "zone": "zone.peaks",
+      "level": 8,
+      "canonStatus": "CANON-EXPANDED: the Pale Things as cosmic watchers are canon (world_bible.md); the watchers on the high ledge are GAME-ONLY.",
+      "summary": "Drive the Pale watchers off the high ledge above the east road, so Tarsk can see what they were watching.",
+      "offer": "\"Pale ones on the high ledge, above the east road. Three. They came when the escort went through, and they haven't moved since.\" Tarsk's voice is flat. \"My people don't fight the Pale. We don't know that they can be fought. But you have a way of making things stop being where they stand.\"\n\n\"Make them stop. Then I'll go up and look at what they were looking at.\"",
+      "complete": "Tarsk comes down from the ledge an hour later and says nothing for a long time. \"They were watching the road to Argentis,\" he says at last. \"Not the road. What's at the end of it.\"",
+      "steps": [
+        {
+          "text": "Drive the Pale watchers off the high ledge.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.peaks",
+              "target": "mob.pale.peaks*",
+              "count": 3,
+              "text": "Pale watchers dispersed"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 300,
+        "gold": 60,
+        "reputation": [
+          {
+            "faction": "ashwalkers",
+            "amount": 150
+          }
+        ]
+      }
+    }
+  ]
+}

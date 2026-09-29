@@ -1,0 +1,6 @@
+{
+  "name": "Crulanda.Combat",
+  "rootNamespace": "Crulanda.Combat",
+  "references": ["Crulanda.Core", "Crulanda.Gameplay"],
+  "autoReferenced": true
+}

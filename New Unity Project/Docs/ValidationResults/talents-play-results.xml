@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="22" result="Passed" total="22" passed="22" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-29 00:46:34Z" end-time="2026-09-29 00:48:01Z" duration="86.4192972">
+  <test-suite type="TestSuite" id="1031" name="Crulanda - The Quiet Trail" fullname="Crulanda - The Quiet Trail" runstate="Runnable" testcasecount="22" result="Passed" start-time="2026-09-29 00:46:34Z" end-time="2026-09-29 00:48:01Z" duration="86.419297" total="22" passed="22" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <test-suite type="Assembly" id="1026" name="Crulanda.Tests.PlayMode.dll" fullname="C:/Users/chris/Documents/Codex/2026-09-28/hel/work/encounter-validation/Library/ScriptAssemblies/Crulanda.Tests.PlayMode.dll" runstate="Runnable" testcasecount="22" result="Passed" start-time="2026-09-29 00:46:34Z" end-time="2026-09-29 00:48:01Z" duration="86.413343" total="22" passed="22" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="37580" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="EditorOnly" value="False" />
+      </properties>
+      <test-suite type="TestSuite" id="1027" name="Crulanda" fullname="Crulanda" runstate="Runnable" testcasecount="22" result="Passed" start-time="2026-09-29 00:46:34Z" end-time="2026-09-29 00:48:01Z" duration="86.412905" total="22" passed="22" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1028" name="Tests" fullname="Crulanda.Tests" runstate="Runnable" testcasecount="22" result="Passed" start-time="2026-09-29 00:46:34Z" end-time="2026-09-29 00:48:01Z" duration="86.412641" total="22" passed="22" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestFixture" id="1001" name="ActorSmokeTests" fullname="Crulanda.Tests.ActorSmokeTests" classname="Crulanda.Tests.ActorSmokeTests" runstate="Runnable" testcasecount="8" result="Passed" start-time="2026-09-29 00:46:34Z" end-time="2026-09-29 00:46:34Z" duration="0.035128" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1005" name="Actor_initializes_from_archetype_and_registers" fullname="Crulanda.Tests.ActorSmokeTests.Actor_initializes_from_archetype_and_registers" methodname="Actor_initializes_from_archetype_and_registers" classname="Crulanda.Tests.ActorSmokeTests" runstate="Runnable" seed="425847966" result="Passed" start-time="2026-09-29 00:46:34Z" end-time="2026-09-29 00:46:34Z" duration="0.016193" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1009" name="Disabled_actors_leave_the_registry" fullname="Crulanda.Tests.ActorSmokeTests.Disabled_actors_leave_the_registry" methodname="Disabled_actors_leave_the_registry" classname="Crulanda.Tests.ActorSmokeTests" runstate="Runnable" seed="1797807709" result="Passed" start-time="2026-09-29 00:46:34Z" end-time="2026-09-29 00:46:34Z" duration="0.001088" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1007" name="Healing_is_capped_and_blocked_while_dead" fullname="Crulanda.Tests.ActorSmokeTests.Healing_is_capped_and_blocked_while_dead" methodname="Healing_is_capped_and_blocked_while_dead" classname="Crulanda.Tests.ActorSmokeTests" runstate="Runnable" seed="747603185" result="Passed" start-time="2026-09-29 00:46:34Z" end-time="2026-09-29 00:46:34Z" duration="0.002720" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[[Actors] Smoke Actor died.
+]]></output>
+            </test-case>
+            <test-case id="1006" name="Lethal_damage_kills_once_and_publishes_event" fullname="Crulanda.Tests.ActorSmokeTests.Lethal_damage_kills_once_and_publishes_event" methodname="Lethal_damage_kills_once_and_publishes_event" classname="Crulanda.Tests.ActorSmokeTests" runstate="Runnable" seed="1947386726" result="Passed" start-time="2026-09-29 00:46:34Z" end-time="2026-09-29 00:46:34Z" duration="0.001248" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[[Actors] Smoke Actor died.
+]]></output>
+            </test-case>
+            <test-case id="1004" name="Maximum_reduction_to_zero_health_publishes_death_once" fullname="Crulanda.Tests.ActorSmokeTests.Maximum_reduction_to_zero_health_publishes_death_once" methodname="Maximum_reduction_to_zero_health_publishes_death_once" classname="Crulanda.Tests.ActorSmokeTests" runstate="Runnable" seed="1840187629" result="Passed" start-time="2026-09-29 00:46:34Z" end-time="2026-09-29 00:46:34Z" duration="0.001077" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[[Actors] Smoke Actor died.
+]]></output>
+            </test-case>
+            <test-case id="1008" name="Raising_max_health_via_stats_preserves_the_ratio" fullname="Crulanda.Tests.ActorSmokeTests.Raising_max_health_via_stats_preserves_the_ratio" methodname="Raising_max_health_via_stats_preserves_the_ratio" classname="Crulanda.Tests.ActorSmokeTests" runstate="Runnable" seed="1569589852" result="Passed" start-time="2026-09-29 00:46:34Z" end-time="2026-09-29 00:46:34Z" duration="0.000940" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1002" name="Reinitialize_clears_previous_stats_and_modifiers" fullname="Crulanda.Tests.ActorSmokeTests.Reinitialize_clears_previous_stats_and_modifiers" methodname="Reinitialize_clears_previous_stats_and_modifiers" classname="Crulanda.Tests.ActorSmokeTests" runstate="Runnable" seed="1342073991" result="Passed" start-time="2026-09-29 00:46:34Z" end-time="2026-09-29 00:46:34Z" duration="0.001086" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1003" name="Restored_identity_survives_activation" fullname="Crulanda.Tests.ActorSmokeTests.Restored_identity_survives_activation" methodname="Restored_identity_survives_activation" classname="Crulanda.Tests.ActorSmokeTests" runstate="Runnable" seed="1870163780" result="Passed" start-time="2026-09-29 00:46:34Z" end-time="2026-09-29 00:46:34Z" duration="0.001378" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1010" name="CombatIntegrationTests" fullname="Crulanda.Tests.CombatIntegrationTests" classname="Crulanda.Tests.CombatIntegrationTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-09-29 00:46:34Z" end-time="2026-09-29 00:46:35Z" duration="0.306075" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1011" name="Guard_expires_and_death_removes_effects" fullname="Crulanda.Tests.CombatIntegrationTests.Guard_expires_and_death_removes_effects" methodname="Guard_expires_and_death_removes_effects" classname="Crulanda.Tests.CombatIntegrationTests" runstate="Runnable" seed="1034172192" result="Passed" start-time="2026-09-29 00:46:34Z" end-time="2026-09-29 00:46:34Z" duration="0.152038" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[[Actors] Combat test died.
+]]></output>
+            </test-case>
+            <test-case id="1014" name="Lethal_stat_change_clears_effects_without_leaving_modifiers" fullname="Crulanda.Tests.CombatIntegrationTests.Lethal_stat_change_clears_effects_without_leaving_modifiers" methodname="Lethal_stat_change_clears_effects_without_leaving_modifiers" classname="Crulanda.Tests.CombatIntegrationTests" runstate="Runnable" seed="2001169026" result="Passed" start-time="2026-09-29 00:46:34Z" end-time="2026-09-29 00:46:34Z" duration="0.001515" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[[Actors] Combat test died.
+]]></output>
+            </test-case>
+            <test-case id="1013" name="One_effect_applies_its_stat_changes_together" fullname="Crulanda.Tests.CombatIntegrationTests.One_effect_applies_its_stat_changes_together" methodname="One_effect_applies_its_stat_changes_together" classname="Crulanda.Tests.CombatIntegrationTests" runstate="Runnable" seed="103070149" result="Passed" start-time="2026-09-29 00:46:34Z" end-time="2026-09-29 00:46:34Z" duration="0.000767" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1012" name="Primary_stat_buffs_recalculate_and_expire_without_drifting" fullname="Crulanda.Tests.CombatIntegrationTests.Primary_stat_buffs_recalculate_and_expire_without_drifting" methodname="Primary_stat_buffs_recalculate_and_expire_without_drifting" classname="Crulanda.Tests.CombatIntegrationTests" runstate="Runnable" seed="2124874936" result="Passed" start-time="2026-09-29 00:46:34Z" end-time="2026-09-29 00:46:35Z" duration="0.150828" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1015" name="EncounterLoopTests" fullname="Crulanda.Tests.EncounterLoopTests" classname="Crulanda.Tests.EncounterLoopTests" runstate="Runnable" testcasecount="10" result="Passed" start-time="2026-09-29 00:46:35Z" end-time="2026-09-29 00:48:01Z" duration="86.070400" total="10" passed="10" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1021" name="Auto_attacks_continue_while_strike_is_on_cooldown" fullname="Crulanda.Tests.EncounterLoopTests.Auto_attacks_continue_while_strike_is_on_cooldown" methodname="Auto_attacks_continue_while_strike_is_on_cooldown" classname="Crulanda.Tests.EncounterLoopTests" runstate="Runnable" seed="1734035397" result="Passed" start-time="2026-09-29 00:46:35Z" end-time="2026-09-29 00:46:37Z" duration="2.870858" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1020" name="Class_unlocks_block_costs_and_effects_until_required_level" fullname="Crulanda.Tests.EncounterLoopTests.Class_unlocks_block_costs_and_effects_until_required_level" methodname="Class_unlocks_block_costs_and_effects_until_required_level" classname="Crulanda.Tests.EncounterLoopTests" runstate="Runnable" seed="2027332505" result="Passed" start-time="2026-09-29 00:46:37Z" end-time="2026-09-29 00:46:37Z" duration="0.020091" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1025" name="Death_recovery_keeps_equipment_and_repositions_party" fullname="Crulanda.Tests.EncounterLoopTests.Death_recovery_keeps_equipment_and_repositions_party" methodname="Death_recovery_keeps_equipment_and_repositions_party" classname="Crulanda.Tests.EncounterLoopTests" runstate="Runnable" seed="1968682155" result="Passed" start-time="2026-09-29 00:46:37Z" end-time="2026-09-29 00:46:37Z" duration="0.019349" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[[Actors] You died.
+]]></output>
+            </test-case>
+            <test-case id="1018" name="Dps_signature_cleaves_and_combat_blocks_respec" fullname="Crulanda.Tests.EncounterLoopTests.Dps_signature_cleaves_and_combat_blocks_respec" methodname="Dps_signature_cleaves_and_combat_blocks_respec" classname="Crulanda.Tests.EncounterLoopTests" runstate="Runnable" seed="1219527828" result="Passed" start-time="2026-09-29 00:46:37Z" end-time="2026-09-29 00:46:38Z" duration="0.054835" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1024" name="Keyboard_movement_and_camera_follow_work" fullname="Crulanda.Tests.EncounterLoopTests.Keyboard_movement_and_camera_follow_work" methodname="Keyboard_movement_and_camera_follow_work" classname="Crulanda.Tests.EncounterLoopTests" runstate="Runnable" seed="625307845" result="Passed" start-time="2026-09-29 00:46:38Z" end-time="2026-09-29 00:46:38Z" duration="0.719158" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1023" name="Recruit_fight_heal_loot_equip_save_and_reload" fullname="Crulanda.Tests.EncounterLoopTests.Recruit_fight_heal_loot_equip_save_and_reload" methodname="Recruit_fight_heal_loot_equip_save_and_reload" classname="Crulanda.Tests.EncounterLoopTests" runstate="Runnable" seed="1518042102" result="Passed" start-time="2026-09-29 00:46:38Z" end-time="2026-09-29 00:48:00Z" duration="82.249730" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[[Actors] Trail sentry 1 died.
+PACING_MEASUREMENT sentry.0 20.8 seconds
+[Actors] Trail sentry 2 died.
+PACING_MEASUREMENT sentry.1 24.4 seconds
+[Actors] Veteran sentry died.
+PACING_MEASUREMENT sentry.2 35.0 seconds
+[Actors] Trail sentry 1 died.
+[Actors] Trail sentry 2 died.
+[Actors] Veteran sentry died.
+]]></output>
+            </test-case>
+            <test-case id="1022" name="Solid_scenery_blocks_player_and_navigation" fullname="Crulanda.Tests.EncounterLoopTests.Solid_scenery_blocks_player_and_navigation" methodname="Solid_scenery_blocks_player_and_navigation" classname="Crulanda.Tests.EncounterLoopTests" runstate="Runnable" seed="1709649960" result="Passed" start-time="2026-09-29 00:48:00Z" end-time="2026-09-29 00:48:00Z" duration="0.019602" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1019" name="Support_challenge_and_guard_help_nearby_companion" fullname="Crulanda.Tests.EncounterLoopTests.Support_challenge_and_guard_help_nearby_companion" methodname="Support_challenge_and_guard_help_nearby_companion" classname="Crulanda.Tests.EncounterLoopTests" runstate="Runnable" seed="1184956316" result="Passed" start-time="2026-09-29 00:48:00Z" end-time="2026-09-29 00:48:01Z" duration="0.035576" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1016" name="Talent_stats_persist_and_respec_without_stacking" fullname="Crulanda.Tests.EncounterLoopTests.Talent_stats_persist_and_respec_without_stacking" methodname="Talent_stats_persist_and_respec_without_stacking" classname="Crulanda.Tests.EncounterLoopTests" runstate="Runnable" seed="64780280" result="Passed" start-time="2026-09-29 00:48:01Z" end-time="2026-09-29 00:48:01Z" duration="0.037478" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1017" name="Tank_signature_modifies_guard_and_respec_clears_it" fullname="Crulanda.Tests.EncounterLoopTests.Tank_signature_modifies_guard_and_respec_clears_it" methodname="Tank_signature_modifies_guard_and_respec_clears_it" classname="Crulanda.Tests.EncounterLoopTests" runstate="Runnable" seed="991898386" result="Passed" start-time="2026-09-29 00:48:01Z" end-time="2026-09-29 00:48:01Z" duration="0.042134" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Saving results to: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\talents-play-results.xml
+]]></output>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

@@ -1,0 +1,14 @@
+﻿{
+  "name": "Crulanda.Editor",
+  "rootNamespace": "Crulanda.EditorTools",
+  "references": ["Crulanda.Abilities","Crulanda.Combat","Crulanda.Core","Crulanda.Data","Crulanda.Gameplay","Crulanda.Game","Crulanda.DevTools","Crulanda.Encounter","Crulanda.World"],
+  "includePlatforms": ["Editor"],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

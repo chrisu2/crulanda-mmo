@@ -1,0 +1,344 @@
+{
+  "items": [
+    {
+      "id": "item.training_blade",
+      "name": "Tempered Trailblade",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 2,
+      "level": 1,
+      "value": 5,
+      "weaponDamage": 7,
+      "description": "Taken back from the Concord collectors. Someone in Oakhaven kept it sharp.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "junk.wolf_pelt",
+      "name": "Grey wolf pelt",
+      "kind": "junk",
+      "quality": 0,
+      "value": 2,
+      "stack": 10,
+      "description": "The skinner will want it, or any merchant.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "junk.wolf_fang",
+      "name": "Wolf fang",
+      "kind": "junk",
+      "quality": 0,
+      "value": 1,
+      "stack": 10,
+      "description": "Yellowed and sharp.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "junk.boar_tusk",
+      "name": "Boar tusk",
+      "kind": "junk",
+      "quality": 0,
+      "value": 2,
+      "stack": 10,
+      "description": "Good for handles and charms.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "junk.boar_meat",
+      "name": "Tough boar meat",
+      "kind": "junk",
+      "quality": 0,
+      "value": 1,
+      "stack": 10,
+      "description": "Needs a long stew.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "junk.tithe_token",
+      "name": "Concord tithe token",
+      "kind": "junk",
+      "quality": 0,
+      "value": 3,
+      "stack": 10,
+      "description": "Stamped with the Council seal. Worth more melted down.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "junk.toll_coin",
+      "name": "Sandthrone toll coin",
+      "kind": "junk",
+      "quality": 0,
+      "value": 4,
+      "stack": 10,
+      "description": "Desert gold, clipped at the edges.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "junk.desert_wrap",
+      "name": "Frayed desert wrap",
+      "kind": "junk",
+      "quality": 0,
+      "value": 2,
+      "stack": 10,
+      "description": "Sand still falls out of the folds.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "junk.petrified_shard",
+      "name": "Petrified shard",
+      "kind": "junk",
+      "quality": 0,
+      "value": 5,
+      "stack": 10,
+      "description": "Grey stone that was, not long ago, a person.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "junk.bone_mask",
+      "name": "Bone mask fragment",
+      "kind": "junk",
+      "quality": 0,
+      "value": 6,
+      "stack": 10,
+      "description": "A purple tear is painted under the eye-hole.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "junk.static_glass",
+      "name": "Static-glass shard",
+      "kind": "junk",
+      "quality": 0,
+      "value": 8,
+      "stack": 10,
+      "description": "It hums when you hold it near your ear. Do not.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "junk.pale_filament",
+      "name": "Pale filament",
+      "kind": "junk",
+      "quality": 0,
+      "value": 7,
+      "stack": 10,
+      "description": "Thinner than hair, colder than snow.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "food.brown_loaf",
+      "name": "Oakhaven brown loaf",
+      "kind": "consumable",
+      "food": true,
+      "heal": 150,
+      "quality": 1,
+      "value": 1,
+      "stack": 20,
+      "description": "Hedda Thorne's bread. Eat when the fighting's done."
+    },
+    {
+      "id": "food.harrow_cheese",
+      "name": "Harrow cheese",
+      "kind": "consumable",
+      "food": true,
+      "heal": 260,
+      "quality": 1,
+      "level": 3,
+      "value": 2,
+      "stack": 20
+    },
+    {
+      "id": "food.mountain_jerky",
+      "name": "Mountain jerky",
+      "kind": "consumable",
+      "food": true,
+      "heal": 420,
+      "quality": 1,
+      "level": 6,
+      "value": 4,
+      "stack": 20
+    },
+    {
+      "id": "potion.minor",
+      "name": "Minor healing draught",
+      "kind": "consumable",
+      "heal": 90,
+      "quality": 1,
+      "value": 3,
+      "stack": 10,
+      "description": "Yarrow and honey. Works in a fight."
+    },
+    {
+      "id": "potion.healing",
+      "name": "Healing draught",
+      "kind": "consumable",
+      "heal": 200,
+      "quality": 1,
+      "level": 4,
+      "value": 8,
+      "stack": 10
+    },
+    {
+      "id": "potion.salt",
+      "name": "Salt-cured tonic",
+      "kind": "consumable",
+      "heal": 360,
+      "quality": 2,
+      "level": 8,
+      "value": 15,
+      "stack": 10,
+      "description": "An Ash-Walker recipe. Burns going down."
+    }
+  ],
+  "vendors": [
+    {
+      "role": "merchant",
+      "items": [
+        "potion.minor",
+        "potion.healing",
+        "food.brown_loaf",
+        "food.harrow_cheese"
+      ],
+      "gearForZone": true
+    },
+    {
+      "role": "blacksmith",
+      "items": [],
+      "gearForZone": true
+    },
+    {
+      "role": "baker",
+      "items": [
+        "food.brown_loaf",
+        "food.harrow_cheese"
+      ]
+    },
+    {
+      "role": "herbalist",
+      "items": [
+        "potion.minor",
+        "potion.healing"
+      ]
+    }
+  ],
+  "loot": [
+    {
+      "tag": "wolf",
+      "levelMin": 1,
+      "levelMax": 10,
+      "gearChance": 0.12,
+      "entries": [
+        {
+          "item": "junk.wolf_pelt",
+          "chance": 0.7
+        },
+        {
+          "item": "junk.wolf_fang",
+          "chance": 0.35,
+          "max": 2
+        }
+      ]
+    },
+    {
+      "tag": "boar",
+      "levelMin": 1,
+      "levelMax": 10,
+      "gearChance": 0.12,
+      "entries": [
+        {
+          "item": "junk.boar_tusk",
+          "chance": 0.6
+        },
+        {
+          "item": "junk.boar_meat",
+          "chance": 0.5
+        }
+      ]
+    },
+    {
+      "tag": "collector",
+      "levelMin": 1,
+      "levelMax": 10,
+      "gearChance": 0.18,
+      "entries": [
+        {
+          "item": "junk.tithe_token",
+          "chance": 0.6
+        },
+        {
+          "item": "potion.minor",
+          "chance": 0.15
+        }
+      ]
+    },
+    {
+      "tag": "outrider",
+      "levelMin": 1,
+      "levelMax": 10,
+      "gearChance": 0.18,
+      "entries": [
+        {
+          "item": "junk.toll_coin",
+          "chance": 0.6
+        },
+        {
+          "item": "junk.desert_wrap",
+          "chance": 0.4
+        },
+        {
+          "item": "potion.healing",
+          "chance": 0.1
+        }
+      ]
+    },
+    {
+      "tag": "hollow",
+      "levelMin": 1,
+      "levelMax": 10,
+      "gearChance": 0.1,
+      "entries": [
+        {
+          "item": "junk.petrified_shard",
+          "chance": 0.7
+        }
+      ]
+    },
+    {
+      "tag": "cultist",
+      "levelMin": 1,
+      "levelMax": 10,
+      "gearChance": 0.2,
+      "entries": [
+        {
+          "item": "junk.bone_mask",
+          "chance": 0.6
+        },
+        {
+          "item": "potion.salt",
+          "chance": 0.08
+        }
+      ]
+    },
+    {
+      "tag": "weaveeater",
+      "levelMin": 1,
+      "levelMax": 10,
+      "gearChance": 0.14,
+      "entries": [
+        {
+          "item": "junk.static_glass",
+          "chance": 0.7
+        }
+      ]
+    },
+    {
+      "tag": "pale",
+      "levelMin": 1,
+      "levelMax": 10,
+      "gearChance": 0.25,
+      "entries": [
+        {
+          "item": "junk.pale_filament",
+          "chance": 0.8
+        }
+      ]
+    }
+  ]
+}

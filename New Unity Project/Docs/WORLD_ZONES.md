@@ -1,0 +1,167 @@
+# World zones — generated from data
+
+Status 2026-09-28. The game opens in **Oakhaven** (`Assets/Crulanda/Scenes/Oakhaven.unity`). The Quiet Trail
+(`PlayableEncounter.unity`) stays in the build as the automated test map.
+
+## How a zone is made
+- A zone is a JSON file in `Assets/Crulanda/EncounterContent/Zones/` (format: `Scripts/World/ZoneDefinition.cs`).
+  Metres, x = east, z = north, origin at the zone centre. Everything is text, so zones can be authored and diffed like talents.
+- `ZoneBuilder` (runs first, execution order -800) generates at load:
+  sculpted ground (flat village core, rolling hills outside `flatRadius`, carved creek beds, dead-flat unmade land),
+  a painted ground texture (grass variation, dirt roads with wheel ruts, tilled/stubble fields, clearings, muddy banks,
+  grey unmade ground), water ribbons, props, forest edges on three sides, the Wasting, lighting/fog/sky and boundaries.
+  Scenery is static-batched after generation.
+- Prop kinds: house, inn (walk-in), barn, mill, coop, forge, stall, oven, tannery, woodpile, well, dead_oak, tree, pine, fence, hedge, haystack, cart, barrels, crates, lamp, grave,
+  rock, bridge, signpost, ruin. Solid props carry `NavBlocker`; bridge decks carry `NavWalkable`.
+- `EncounterNavigation` builds the navmesh from the generated ground + bridge decks, cuts out blockers and blocks water
+  so enemies path over bridges. Without a zone it falls back to the old name-based Quiet Trail logic.
+- Art palette: `Assets/Crulanda/World/Art/ZoneArt.asset` + materials/textures made by **Crulanda > World > Build Oakhaven**
+  (`Editor/ZoneSceneBuilder.cs`). They are real assets so transparent/emissive shader variants survive player builds.
+  Rerunning the menu item never overwrites existing materials or the scene.
+- The session reads spawns (player, companion, recovery, enemies, leash), objectives and the zone title from the JSON.
+  Saves store `zoneId`; arriving from another zone (or the old test map) starts you at the zone entrance.
+- Characters: `ActorVisual` builds a placeholder humanoid (Warrior, Druid, Healer/Mira, Concord collector/warden, legacy
+  sentry) with movement-driven walk/idle animation. Stand-in until authored models exist.
+
+## Checking visuals without playing
+- `Crulanda.exe --crulanda-world-capture <dir>`: scenic tour screenshots (HUD hidden), isolated temp save.
+- `Crulanda.exe --crulanda-ui-capture <dir> [--crulanda-class class.druid]`: talent panel + combat HUD screenshots.
+Both need a visible window (not -batchmode). Latest shots: workspace `work\world-captures`, `work\ui-captures`.
+
+## Oakhaven (CANON-EXPANDED)
+Canon: an eastern agricultural hub erased by an accelerated, localized Wasting that hid the Council's abduction of
+resonance candidates (source: `D:\code\crulanda\maps\interactive_map.html`, `maps\oakhaven_village_map.png`).
+The zone is Oakhaven before that erasure (the game is set before it happens): the Great Oak on the green, the Golden Cask inn (canon name, book1\chapter_4.md), the communal well,
+fields, Oak creek with two bridges, and the Wasting eating the eastern edge as grey static.
+GAME-ONLY / PROVISIONAL: the Concord collectors and warden, Mira, exact building placement, the chapel ruin and graves.
+
+## Khaven Village (CANON-EXPANDED)
+Canon names from `maps\khaven_village_map.png`: the Cracked Hearth, two Fallen Smithies, the Blood-Stone Well, the Gallows
+Tree, the Crypt-Keeper's Hovel, the Whispering Wood, Gloom Creek and the Carrion Cliffs. Built as a walled village at dusk
+with gate towers, a dead grey wood, dark creek water and an old crypt under the cliffs.
+GAME-ONLY / PROVISIONAL: the Sandthrone outriders holding it (Sandthrone is a canon mercenary faction), the Pale watcher
+(canon "Pale Things" as cosmic auditors), the crypt and all exact placement.
+
+## The Shattered Peaks (CANON-EXPANDED), levels 6-8
+Canon: a jagged range on the eastern border that holds back the Wasting while the void slowly eats the stone (world_bible.md).
+Sandthrone mercenaries hold it and charge a toll (book1 ch.5).
+GAME-ONLY / PROVISIONAL:
+- this pass, its toll gate and toll-house;
+- the pilgrims' rest and its people, the ruined waystation and the cairns;
+- all camps and placement.
+Biome `mountain`: rock and scree painting, sparse grass, pines.
+
+## The Ashland Rim (CANON-EXPANDED / PROVISIONAL), levels 9-10
+Canon (book1 ch.20): the Ash-Walkers (Chieftain Grohl, Mother Vane the Salt-Speaker) live in caves along the Wasting and fight
+Weave-Eaters with Salt of the First Sea. The Cult of Ash and its iron-wired bone masks are canon (book1 ch.10).
+The canon Ashlands only take their full form later (after the Spoke fires), so this pre-erasure rim is PROVISIONAL.
+GAME-ONLY:
+- the zone's name and roads;
+- the shrine's location, Cinderfold, the ash hounds and the brood;
+- all placement.
+Biome `ash`: grey cracked ground with no grass, dead trees and falling ash.
+
+## Level ladder and camps (GAME-ONLY)
+- Zones carry `levelMin`/`levelMax`, which drive con colours, the map exit labels ("Khaven Village 3-5") and the world map pins.
+- `camps` (`ZoneCamp`) fields:
+  - `name`, `mob` (display name), `tag` (the loot table and default look) and `look`;
+  - `center`, `radius` and `count`;
+  - `levelMin`/`levelMax`, `elite`, `ambush` and `respawn` (seconds, default 75). Camp mobs have ids `mob.<tag>.<zone>.<camp>.<n>`, respawn after dying, and are not saved.
+- Mob stats scale by level (`EncounterEnemy.MobHealth` / `MobHit`), with separate multipliers for beasts, story enemies and elites.
+- **Ambush camps** hide their mobs lowered into tall grass: no nameplate, no map dot, and they can't be targeted.
+  They pounce when you come within 8 m, or 3 m while sneaking (hold Ctrl).
+- Mobs that can't reach you for 4 s give up the chase and reset.
+
+| Zone | Camps (level) |
+|---|---|
+| Oakhaven 1-2 | Harrow wood wolves (1-2), South copse boars (1-2), North pines wolves (2), Tall-grass stalkers (1-2, ambush), Brookside boars (2) |
+| Khaven 3-5 | Whispering Wood wolves (3-4), Carrion boars (3-4, ambush), Sandthrone outrider camp (4-5), Gloom Creek hollows (5), The Grey Sexton (5, elite) |
+| Peaks 6-8 | Toll-gate guards (6-7), Wolf pines pack (6-7, ambush), Rockhide wallow (7), The High Ledge (8), Captain's eyrie (8, elite) |
+| Ash Rim 9-10 | Ash hound pack (9), Unwoven Flats eaters (9-10), Tear-marked shrine (9-10), Cinderfold hollows (10), The Weave-Eater brood (10, elite) |
+
+## Water (`Scripts/World/ZoneWater.cs`)
+One model answers all of these, so they always agree: what is drawn (meshes), what is carved (terrain) and what is felt (motor, navmesh).
+- **Creeks** (the zone's `water` paths):
+  - `depth` is the channel depth below the bank (default 1.1 m). The water sits `BankDrop` (0.42 m) below the bank, so
+    the default creek is 0.68 m deep for wading. Swimming needs a depth of about 1.9 m.
+  - Water levels run downhill from the higher end.
+  - The terrain is carved into a terraced valley around the channel.
+  - Meshes are drawn in chunks, with vertex alpha giving shallowness from the real depth.
+- **Lakes** (`lakes`: name, center, radius, depth): a flat level, a bowl with a ramped underwater bank, and a gentle shore.
+- **Feel:**
+  - `ZoneBuilder.WaterAt(p, out surface, out depth)`.
+  - The motor wades when the water is above the feet, and swims past 1.45 m (out below 1.25 m).
+  - A damped float spring keeps the head up. Pushing against a bank climbs out, and Space jumps out of shallows.
+  - Splashes are sized by the impact.
+- **Navmesh:** wading water is area 3 (cost 6), so agents prefer bridges. Swim-depth water is not walkable. Bridges are seated
+  above both banks and clear the water.
+- **Rendering (`World/Shaders/Water.shader`):**
+  - Premultiplied transparent Standard surface, with ripple normals scrolling downstream along creeks.
+  - Shore foam and a small swell that fades toward the shore.
+  - It reflects a realtime sky-only probe (`WorldClock.Reflections`, re-rendered every 2 s), dimmed at night.
+- Critters, crows and trees are kept out of the water.
+- Tests: `WaterTests` (drawn/carved/felt agreement in every zone; bridges; wading and swimming; saving while swimming).
+
+## Nature and post-processing
+- Grass (`Grass.shader`): instanced with wind sway, density 2.3 in meadows. `tallGrass` patches hide ambushers.
+- Falling leaves under broadleaf trees, and falling ash in the `ash` biome (`NatureFx.cs`).
+- Blob-mesh canopies, bushes and boulders (`ZoneMeshes.Blob`), and edge rocks.
+- `ZonePost` + `Post.shader`: bloom (Karis prefilter), sun shafts, ACES tone mapping, and a biome grade (exposure, contrast,
+  saturation, tint), plus a vignette.
+
+## Travel
+- Zones list `exits` (to, name, at, arrive, radius). Standing at an exit shows "[E] <name>"; E travels (not in combat):
+  the character saves with the new zone and arrival point, and the scene rebuilds the other zone. A recruited Mira comes along.
+- One scene (`Oakhaven.unity`) builds any registered zone (`ZoneBuilder.zones`, filled by the editor menu item); on load,
+  a character saved in another zone is rebuilt there. `--crulanda-zone <id>` picks a zone for capture tools.
+- Roads: Oakhaven west ↔ Khaven, Khaven north ↔ Peaks, Peaks east ↔ Ash Rim, and Ash Rim north ↔ Oakhaven south (marked dangerous, 9-10).
+  Minimap and zone-map exits show the destination's level band. The world map draws the roads. Grove areas (`groves`: dead / pine / broadleaf) fill forests and darken
+  the ground beneath them. New prop kinds: ruined_house, wall (polyline), tower, gallows, crypt, cliff; well variant 1 = blood-stone.
+
+## Life, day and night (GAME-ONLY)
+- `life` in the zone JSON: villager count, mood (`wary` / `afraid`) and critter groups (chicken, rabbit, crow, deer,
+  sheep, cat). `WorldLife.cs`: villagers have roles (farmer, gossip, drinker, child, elder, miller, henwife), homes
+  (the houses' doors), places from the zone (fields, well, green, inn seats, mill), chat in pairs, bark at the player,
+  and flee home when fighting starts nearby. Critters never fight and scatter from the player; crows fly.
+- **Day/night** (`Scripts/World/WorldClock.cs`): one game day lasts 40 real minutes and starts at 08:30. The hour
+  continues across zone travel (it is not saved yet). The directional light is the sun by day and a pale moon at night.
+  Dawn, day, dusk and night keyframes blend with the zone's own `lighting` palette: ambient, fog, sky tint and exposure.
+  Lamps (`NightLights`) light up after dark. The minimap rim shows a sun or moon and the time. In development builds,
+  F11 skips an hour.
+- **Night routine:** villagers go home to bed from about 20:00, children first. Drinkers stay at the inn until 23:00 or
+  later. Everyone wakes between about 05:50 and 07:30.
+- **Hen coops** (prop kind `coop`, registered in `ZoneBuilder.Coops`) are raised huts with a ramp, a pop-hole door on a
+  hinge, nest boxes and a feed trough. Each coop gets a hen-wife (Oakhaven: Goody Marl at Harrow, Hettie Brook on the
+  green, Nan Pennock at Brook farm), and chickens belong to the nearest coop. Her day runs like this:
+  - 05:45: opens the coop, and the hens come down the ramp one by one from 06:00.
+  - Morning and afternoon: scatters feed at the trough, and every hen in the yard comes running.
+  - During the day: hens lay up to one egg each. She collects them from the nest boxes and carries the basket home.
+  - From 18:36: hens head in on their own.
+  - From 19:18: she herds the stragglers (walks round behind the farthest one), shuts the door once all are in, and goes to bed.
+  - Night: hens roost inside and are hidden.
+- **Trades** (GAME-ONLY):
+  - Villagers take trades in this order: blacksmith, farmer, merchant, baker, gossip, hunter, drinker, child,
+    woodcutter, herbalist, farmer, elder, miller, leatherworker, skinner, and so on.
+  - A trade whose workplace the zone lacks falls back to farmer or gossip.
+  - Each trade has its own outfit and tool (`ActorVisual.Dress`) and a `<Title>` under its nameplate.
+  - Workplaces are new prop kinds registered in `ZoneBuilder.Workplaces` (a stand point and a look target):
+    `forge` (smithy with lit hearth, anvil and quench barrel), `stall` (awning and goods; variant 0 produce, 1 cloth and
+    pots, 2 bread), `oven` (clay bake oven), `tannery` (hide frames, vat, scraping beam) and `woodpile`.
+  - Hunters and woodcutters work the groves. Herbalists gather on the open meadow.
+  - Work poses: Hammer, Chop, Gather, Knead. Each trade has its own lines of talk.
+  - Oakhaven has Vell's smithy, Market row (three stalls), Thorne's bakehouse, the Tannery yard and the Woodyard, with 20 villagers.
+  - The capture tour shoots each trade at work, plus a line-up of every trade on the green.
+- Tests: `Tests/PlayMode/VillageDayTests.cs` cover three cases: night (coops shut, hens roosting, village abed), morning
+  (coops open, feed scattered) and dusk (every hen in, door shut).
+
+## Known limits / next
+- Villagers and hens are simulated only while the player is in the zone. There is no off-screen catch-up, and the clock is not saved.
+- Four zones (levels 1-10). More candidates with canon maps: Deep Veins, Argentis/Lowtowns, Forge District, Glass Coast,
+  Iron North (see `CRULANDA_LOCATIONS.md`).
+- Water:
+  - It doesn't receive shadows (a transparent surface shader in the built-in pipeline).
+  - The camera stays above the surface, so there is no underwater view.
+  - Only Oakhaven has a swimmable lake.
+- The crypt has no interior/dungeon yet; the Whispering Wood does not whisper (no audio).
+- Primitive-built art, no authored models/animation/audio; windows are flat emissive panes; no interiors.
+- The camera pulls in on scenery collisions but can still clip very thin geometry.

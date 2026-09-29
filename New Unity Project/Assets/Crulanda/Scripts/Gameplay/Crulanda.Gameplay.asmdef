@@ -1,0 +1,14 @@
+{
+  "name": "Crulanda.Gameplay",
+  "rootNamespace": "Crulanda.Gameplay",
+  "references": ["Crulanda.Core","Crulanda.Data"],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

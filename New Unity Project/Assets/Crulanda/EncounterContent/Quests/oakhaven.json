@@ -1,0 +1,601 @@
+{
+  "items": [
+    {
+      "id": "item.bureau_ledger",
+      "name": "Bureau ledger",
+      "description": "A black-bound ledger from the Concord wagon."
+    },
+    {
+      "id": "item.egg_basket",
+      "name": "Goody Marl's eggs",
+      "description": "A basket of brown and speckled eggs, still warm."
+    },
+    {
+      "id": "item.flour_sample",
+      "name": "Twist of flour",
+      "description": "A paper twist of Hedda's flour. It is faintly grey."
+    },
+    {
+      "id": "item.clean_grain",
+      "name": "Sack of Harrow grain",
+      "description": "Good grain from the Harrow barn, stored before the grey came close."
+    },
+    {
+      "id": "item.yarrow",
+      "name": "Yarrow",
+      "description": "Feathery leaves and white flower heads. It stops bleeding."
+    },
+    {
+      "id": "item.concord_iron",
+      "name": "Confiscated iron",
+      "description": "Bar iron taken from Oakhaven as 'tithe'."
+    }
+  ],
+  "documents": [
+    {
+      "id": "doc.oakhaven.ledger",
+      "title": "Two Hundred and Forty Souls",
+      "text": "HIGH COUNCIL INVESTIGATION BUREAU\nFIELD LEDGER  -  EASTERN AGRICULTURAL HUB (OAKHAVEN)\n\nTotal Population (Pre-Operation): 240 Souls.\nViable Resonance Candidates Positively Identified: 3.\n\n  J.  -  age 7.  'Sparked' in the square before witnesses. FIRST PRIORITY.  Collected.\n  W. Harrow  -  age 9.  Flame-sympathy, strong.  Collected.\n  T. Crisp  -  age 11.  Stone-resonance (the mill).  Scheduled: next wagon.\n\nLocal authority: none of note. Elder compliant. Resistance: negligible.\n\nContingency on completion: one Void-Seed, Level 4, to be placed in the water supply. The resulting Wasting will be reported as a natural surge, to hide our tracks.\n\n- the rest of the page has been torn away -",
+      "canonStatus": "CANON-EXPANDED: the figures, the Void-Seed and \"to hide our tracks\" are from book1 ch.4; the initials and schedule are GAME-ONLY."
+    },
+    {
+      "id": "doc.oakhaven.lullaby",
+      "title": "Sleep Now, Stone and Sky",
+      "text": "Sleep now, stone and sky,\nthe oak will keep the night.\nThe wheel will turn, the hens will lie,\nthe lamp will hold its light.\n\nSleep now, root and rain,\nthe grey is far away.\nWhat's taken finds its way again\nby the turning of the day.\n\nSleep now, salt and bone,\nyour name is in the oak.\nNo one who sleeps is quite alone\nwhile Oakhaven's hearths still smoke.\n\n(Pieced together from Goody Marl, Old Tobin and Hettie Brook.)",
+      "canonStatus": "The first line is CANON (book1 ch.23, \"an old lullaby from Oakhaven\"); the rest is GAME-ONLY."
+    }
+  ],
+  "quests": [
+    {
+      "id": "main.oakhaven.1",
+      "title": "Two Hundred and Forty Souls",
+      "kind": "main",
+      "giver": "auto",
+      "turnIn": "Corwin Ashby",
+      "zone": "zone.oakhaven",
+      "level": 1,
+      "canonStatus": "CANON-EXPANDED",
+      "summary": "Concord collectors hold Oakhaven. Find Mira, drive them off, and learn what their black-iron wagon is for.",
+      "offer": "",
+      "complete": "Corwin reads it twice. His hands shake on the second time.\n\n\"Two hundred and forty. They counted us like sacks in a barn.\" He taps the initials. \"J. That's the soldier's little brother, the one who made the lamps flicker. They took him first, before any of us understood. W. Harrow is Wren; Sel has not slept since.\"\n\nHe stops at the last line. \"T. Crisp. Tam. The miller's boy. It says they're coming back for him.\"",
+      "steps": [
+        {
+          "text": "Find Mira inside the Golden Cask.",
+          "objectives": [
+            {
+              "type": "flag",
+              "target": "recruited",
+              "text": "Find Mira inside the Golden Cask"
+            }
+          ]
+        },
+        {
+          "text": "Drive the Concord collectors out of Oakhaven.",
+          "say": "They were guarding something on the east road, near the grey. A wagon, all black iron. Whatever is in it, they didn't want the village to see.",
+          "sayBy": "Mira",
+          "objectives": [
+            {
+              "type": "kill",
+              "target": "oakhaven.*",
+              "count": 5,
+              "text": "Concord collectors driven off"
+            }
+          ]
+        },
+        {
+          "text": "Arm yourself with a recovered blade [I].",
+          "objectives": [
+            {
+              "type": "flag",
+              "target": "equipped:item.training_blade",
+              "text": "Equip a recovered blade [I]"
+            }
+          ]
+        },
+        {
+          "text": "Search the black-iron wagon on the east road.",
+          "objectives": [
+            {
+              "type": "collect",
+              "item": "item.bureau_ledger",
+              "target": "Bureau wagon",
+              "text": "Search the black-iron wagon",
+              "say": "Behind a strongbox in the cage: small manacles on a chain, and a black-bound ledger.",
+              "document": "doc.oakhaven.ledger"
+            }
+          ]
+        },
+        {
+          "text": "Show the ledger to Corwin Ashby, the village elder.",
+          "objectives": [
+            {
+              "type": "deliver",
+              "target": "Corwin Ashby",
+              "item": "item.bureau_ledger",
+              "text": "Show the ledger to Corwin Ashby",
+              "say": "What is this? ...Give it here. Let me sit down."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 60,
+        "gold": 15,
+        "reputation": [
+          {
+            "faction": "oakhaven",
+            "amount": 250
+          }
+        ]
+      }
+    },
+    {
+      "id": "main.oakhaven.2",
+      "title": "The Miller's Boy",
+      "kind": "main",
+      "giver": "Corwin Ashby",
+      "turnIn": "Corwin Ashby",
+      "zone": "zone.oakhaven",
+      "level": 1,
+      "requires": [
+        "main.oakhaven.1"
+      ],
+      "canonStatus": "CANON-EXPANDED",
+      "summary": "Speak with the Harrows and the miller, then ask Mira how a boy might be hidden from the Concord.",
+      "offer": "\"We can't bring back Wren, or the soldier's boy. Not yet. But Tam is still here, sleeping above the millstones.\"\n\n\"Speak to Sel Harrow; she saw the collectors come. Then Aldo Crisp at the mill. He'll not want to hear it. And ask your healer. Healers know which roads are quiet.\"",
+      "complete": "\"Salt-Menders.\" Corwin says the word like a prayer and a curse at once. \"If they'll take him, then go with my blessing. And may the oak forgive us for needing them.\"",
+      "steps": [
+        {
+          "text": "Speak with Sel Harrow, Aldo Crisp, and Mira.",
+          "objectives": [
+            {
+              "type": "talk",
+              "target": "Sel Harrow",
+              "text": "Sel Harrow",
+              "say": "Wren could make a candle flame lean just by looking at it. We thought it was a blessing. We told people. We TOLD people."
+            },
+            {
+              "type": "talk",
+              "target": "Aldo Crisp",
+              "text": "Aldo Crisp, the miller",
+              "say": "Tam hums, and the millstones hum back. I told him to stop. I told him! ...They're coming for him? Then where do I hide a boy in a village with one road?"
+            },
+            {
+              "type": "talk",
+              "target": "Mira",
+              "text": "Mira",
+              "say": "Then we keep him out of their sight. The Salt-Menders move people the Concord wants. There's a hooded one at the Cask who isn't here for the ale."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 70,
+        "reputation": [
+          {
+            "faction": "oakhaven",
+            "amount": 250
+          }
+        ]
+      }
+    },
+    {
+      "id": "main.oakhaven.3",
+      "title": "The Ruts Go West",
+      "kind": "main",
+      "giver": "Corwin Ashby",
+      "turnIn": "Wenna Coyle",
+      "level": 2,
+      "requires": [
+        "main.oakhaven.2"
+      ],
+      "canonStatus": "CANON-EXPANDED: the Bureau's collection of Oakhaven's resonance candidates is canon (book1 ch.4); the route west and the Sandthrone handover at Khaven are GAME-ONLY.",
+      "summary": "Follow the collectors' ruts along the West road to Khaven Village and find out who took Wren and the soldier's boy.",
+      "offer": "\"Tam is out of their reach, for now. The other two aren't.\" Corwin runs his thumb along the ledger's torn edge.\n\n\"They didn't keep those children in that cage. They took them west in the night, before you came: narrow wheels, heavy load. The ruts are still cut in the mud past the signpost on the West road. Follow them to Khaven. Someone there will have seen where they went. Khaven folk see everything and say nothing, so be patient with them.\"",
+      "complete": "Wenna spits in the dust by the gate. \"You want those children back, you'll go through the two sand-men in our square first. And then you'll have to go further, because they didn't keep them here long.\"",
+      "steps": [
+        {
+          "text": "Follow the wagon ruts along the West road to Khaven Village.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.khaven",
+              "at": {
+                "x": -86,
+                "y": -94
+              },
+              "radius": 9,
+              "text": "Follow the ruts to Khaven",
+              "say": "The ruts are deep here, where the wagon stood a long while by the creek road. Beside them, small bare footprints in the mud; then hoofprints, a great many, going on toward the gate."
+            }
+          ]
+        },
+        {
+          "text": "Ask in Khaven who saw the wagon. Try the hedge-witch by the gate.",
+          "objectives": [
+            {
+              "type": "talk",
+              "zone": "zone.khaven",
+              "target": "Wenna Coyle",
+              "text": "Wenna Coyle, by the gate",
+              "say": "The black wagon? It stopped at our gate a fortnight gone, collectors on the box, and Sandthrone riders waiting for it. They lifted two little ones down in chains and paid in coin, and the wagon went back east empty. The sand-men kept the children."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 70,
+        "gold": 12,
+        "reputation": [
+          {
+            "faction": "oakhaven",
+            "amount": 150
+          }
+        ]
+      }
+    },
+    {
+      "id": "faction.saltmenders.1",
+      "title": "Salt in the Tithe",
+      "kind": "faction",
+      "giver": "Quill",
+      "turnIn": "Quill",
+      "zone": "zone.oakhaven",
+      "level": 1,
+      "requires": [
+        "main.oakhaven.2"
+      ],
+      "canonStatus": "CANON faction, GAME-ONLY quest",
+      "summary": "Spoil the Concord's supply cart on the east road so the next wagon is delayed.",
+      "offer": "The hood doesn't turn toward you. \"Corwin sent you. Good. I don't do favours, but I do arithmetic.\"\n\n\"The collectors eat from a supply cart on the east road. Salt it. Every sack. They'll need a new cart from Ironhold, and a new cart means another week. For the miller's boy, a week is everything.\"",
+      "complete": "\"Good. Quiet work, well done.\" For the first time the hood tilts toward you. \"You'll hear from us. The Menders remember the ones who don't ask why.\"",
+      "steps": [
+        {
+          "text": "Salt the Concord's supply cart on the east road.",
+          "objectives": [
+            {
+              "type": "interact",
+              "target": "Concord supply cart",
+              "text": "Salt the supply cart",
+              "say": "The salt hisses into the grain sacks. No one will be eating Concord bread this week."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 60,
+        "gold": 10,
+        "reputation": [
+          {
+            "faction": "saltmenders",
+            "amount": 500
+          },
+          {
+            "faction": "oakhaven",
+            "amount": 100
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.goody.eggs",
+      "title": "A Dozen for the Oven",
+      "kind": "npc",
+      "giver": "Goody Marl",
+      "turnIn": "Hedda Thorne",
+      "zone": "zone.oakhaven",
+      "level": 1,
+      "canonStatus": "GAME-ONLY",
+      "giveOnAccept": [
+        "item.egg_basket"
+      ],
+      "summary": "Carry Goody Marl's eggs to Hedda Thorne at the bakehouse, west of the green.",
+      "offer": "\"Oh, you've a strong back. Take these to Hedda at the bakehouse, would you? My knees don't like that path.\"\n\n\"And mind the basket. The speckled ones are Old Speckle's, and she'll know if you crack one.\"",
+      "complete": "\"Proper eggs! Tell Goody her girls are the only honest things left in this village. Here, for your trouble.\"",
+      "steps": [
+        {
+          "text": "Bring the eggs to Hedda Thorne's bakehouse.",
+          "objectives": [
+            {
+              "type": "deliver",
+              "target": "Hedda Thorne",
+              "item": "item.egg_basket",
+              "text": "Bring the eggs to Hedda Thorne"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 25,
+        "gold": 4,
+        "reputation": [
+          {
+            "faction": "oakhaven",
+            "amount": 100
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.hedda.flour",
+      "title": "Ash in the Flour",
+      "kind": "npc",
+      "giver": "Hedda Thorne",
+      "turnIn": "Hedda Thorne",
+      "zone": "zone.oakhaven",
+      "level": 1,
+      "requires": [
+        "npc.goody.eggs"
+      ],
+      "canonStatus": "GAME-ONLY",
+      "giveOnAccept": [
+        "item.flour_sample"
+      ],
+      "summary": "Have the herbalist test Hedda's grey flour, then fetch clean grain from the Harrow barn.",
+      "offer": "\"Taste that. No, go on.\" The flour is dry and oddly light, like nothing at all.\n\n\"It's been like that since the harvest. Take a twist to Lisbet Crane; she knows what's in things. And if there's clean grain anywhere, it's in the Harrows' barn. They stored early, before the grey came close.\"",
+      "complete": "She rubs the Harrow grain between her fingers and closes her eyes. \"That's grain. That's real grain.\" \"Tell no one where it came from. If the collectors hear, they'll tithe that too.\"",
+      "steps": [
+        {
+          "text": "Take the flour to Lisbet Crane, the herbalist.",
+          "objectives": [
+            {
+              "type": "deliver",
+              "target": "Lisbet Crane",
+              "item": "item.flour_sample",
+              "text": "Show the flour to Lisbet Crane",
+              "say": "Ash. Not wood ash. It isn't anything at all, really. It just takes up room where the flour should be. Don't eat it."
+            }
+          ]
+        },
+        {
+          "text": "Take a sack of clean grain from the Harrow barn.",
+          "objectives": [
+            {
+              "type": "collect",
+              "item": "item.clean_grain",
+              "target": "Harrow grain bin",
+              "text": "Clean grain from the Harrow barn"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 45,
+        "gold": 8,
+        "reputation": [
+          {
+            "faction": "oakhaven",
+            "amount": 150
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.lisbet.yarrow",
+      "title": "Yarrow for Mira",
+      "kind": "npc",
+      "giver": "Lisbet Crane",
+      "turnIn": "Mira",
+      "zone": "zone.oakhaven",
+      "level": 1,
+      "canonStatus": "GAME-ONLY",
+      "summary": "Gather five bunches of yarrow on the open meadows around the village and take them to Mira.",
+      "offer": "\"Your healer's running short. I can see it in how she holds her hands.\"\n\n\"Yarrow grows on the open meadows outside the fences. Feathery leaves, flat white flowers. Five good bunches, and take them to her yourself. She'd not take them from me; proud, that one.\"",
+      "complete": "Mira turns a sprig in her fingers. \"Lisbet sent these? ...Of course she did.\" She almost smiles. \"This will keep you standing a while longer.\"",
+      "steps": [
+        {
+          "text": "Gather yarrow on the meadows.",
+          "objectives": [
+            {
+              "type": "collect",
+              "item": "item.yarrow",
+              "target": "Yarrow",
+              "count": 5,
+              "text": "Yarrow gathered"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 40,
+        "reputation": [
+          {
+            "faction": "oakhaven",
+            "amount": 100
+          },
+          {
+            "faction": "preservationists",
+            "amount": 100
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.garet.tracks",
+      "title": "What the Deer Know",
+      "kind": "npc",
+      "giver": "Garet Moss",
+      "turnIn": "Garet Moss",
+      "zone": "zone.oakhaven",
+      "level": 1,
+      "canonStatus": "GAME-ONLY",
+      "summary": "Follow the deer tracks east toward the grey, then check the grey-edge copse.",
+      "offer": "\"You've good eyes? Then use them for me. There's a line of deer tracks heading east, toward the grey. They don't come back.\"\n\n\"Follow them as far as you dare, then look at the copse by the grey's edge south of the east road. Tell me what you see. Don't touch anything grey.\"",
+      "complete": "Garet listens without blinking. \"Stopped mid-stride. Grey at the roots.\" He spits. \"It's not creeping. Creeping is slow. This is... deliberate. Like something is drawing a line.\"",
+      "steps": [
+        {
+          "text": "Follow the deer tracks east toward the grey.",
+          "objectives": [
+            {
+              "type": "visit",
+              "at": {
+                "x": 88,
+                "y": 40
+              },
+              "radius": 8,
+              "text": "Follow the tracks east",
+              "say": "The tracks stop mid-stride, as if the deer simply stopped being. Ahead, the grey stands in a line too straight for nature."
+            }
+          ]
+        },
+        {
+          "text": "Look over the grey-edge copse.",
+          "objectives": [
+            {
+              "type": "visit",
+              "at": {
+                "x": 62,
+                "y": -18
+              },
+              "radius": 9,
+              "text": "Check the grey-edge copse",
+              "say": "Inside the copse the grass is grey at the roots, and the birdsong stops at the treeline."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 40,
+        "reputation": [
+          {
+            "faction": "oakhaven",
+            "amount": 100
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.brannoc.iron",
+      "title": "Good Iron",
+      "kind": "npc",
+      "giver": "Brannoc Vell",
+      "turnIn": "Brannoc Vell",
+      "zone": "zone.oakhaven",
+      "level": 2,
+      "canonStatus": "GAME-ONLY",
+      "summary": "Take back three bars of confiscated iron from the tithe crates near the Concord wagon.",
+      "offer": "\"They took my bar iron. Called it a tithe. Stacked it in crates by that wagon of theirs like it was theirs to take.\"\n\n\"Three bars. That's all I ask. With three bars I can shoe every horse left in Oakhaven, and put an edge on anything you like.\"",
+      "complete": "He weighs each bar in his palm and nods. \"Good iron. Oakhaven iron.\" The forge roars as he works the bellows. \"Come back any time your edge wants care.\"",
+      "steps": [
+        {
+          "text": "Recover confiscated iron from the tithe crates on the east road.",
+          "objectives": [
+            {
+              "type": "collect",
+              "item": "item.concord_iron",
+              "target": "Tithe crate",
+              "count": 3,
+              "text": "Confiscated iron"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 50,
+        "gold": 10,
+        "reputation": [
+          {
+            "faction": "oakhaven",
+            "amount": 150
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.corwin.lullaby",
+      "title": "Sleep Now, Stone and Sky",
+      "kind": "npc",
+      "giver": "Corwin Ashby",
+      "turnIn": "Corwin Ashby",
+      "zone": "zone.oakhaven",
+      "level": 1,
+      "requires": [
+        "main.oakhaven.1"
+      ],
+      "canonStatus": "CANON-EXPANDED",
+      "summary": "Collect the verses of Oakhaven's old lullaby from Goody Marl, Old Tobin and Hettie Brook.",
+      "offer": "\"There was a lullaby. Every mother in Oakhaven sang it: 'Sleep now, stone and sky.' I've lost the rest. Age takes things.\"\n\n\"Goody Marl will have a verse. Old Tobin too, if he's sober enough to find it. And Hettie Brook sang it to half the village. If the grey takes us, I want someone to carry it.\"",
+      "complete": "He mouths the verses as you say them, and on the last he sings, cracked and quiet. \"There. Now it lives in two heads. Keep it. Sing it somewhere green.\"",
+      "steps": [
+        {
+          "text": "Gather the verses of the lullaby.",
+          "objectives": [
+            {
+              "type": "talk",
+              "target": "Goody Marl",
+              "text": "A verse from Goody Marl",
+              "say": "Oh, that one. 'The wheel will turn, the hens will lie, the lamp will hold its light.' My mother sang it to the hens, if you'll believe it."
+            },
+            {
+              "type": "talk",
+              "target": "Old Tobin",
+              "text": "A verse from Old Tobin",
+              "say": "Ah... 'Sleep now, root and rain, the grey is far away.' It was, once. It was far away once."
+            },
+            {
+              "type": "talk",
+              "target": "Hettie Brook",
+              "text": "A verse from Hettie Brook",
+              "say": "The last verse? 'No one who sleeps is quite alone while Oakhaven's hearths still smoke.' Mind you sing it softly."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 45,
+        "documents": [
+          "doc.oakhaven.lullaby"
+        ],
+        "reputation": [
+          {
+            "faction": "oakhaven",
+            "amount": 200
+          },
+          {
+            "faction": "preservationists",
+            "amount": 100
+          }
+        ]
+      }
+    },
+    {
+      "id": "faction.preservationists.1",
+      "title": "Roots Before Ruin",
+      "kind": "faction",
+      "giver": "Warden Ivel",
+      "turnIn": "Warden Ivel",
+      "zone": "zone.oakhaven",
+      "level": 1,
+      "canonStatus": "CANON faction, GAME-ONLY quest",
+      "summary": "Bind the three grey-hearted oaks at the edge of the Harrow wood with living vine-cord, so the grey cannot spread through their roots.",
+      "offer": "A woman in green and brown steps out of the treeline. Vine moves on her armour as if it breathes.\n\n\"The grey has reached three oaks at the wood's edge. It is in their hearts now; I can hear it. If it reaches the roots it walks under the whole wood. Bind them with this cord. It is alive, and the grey hates what is alive.\"",
+      "complete": "Warden Ivel lays a palm on the nearest trunk and listens. \"Slower. Not stopped, slower.\" She bows her head. \"The Guild will remember you. Matriarch Solari keeps a long list, and it is not all names of enemies.\"",
+      "steps": [
+        {
+          "text": "Bind the grey-hearted oaks at the edge of the Harrow wood.",
+          "objectives": [
+            {
+              "type": "interact",
+              "target": "Grey-hearted oak",
+              "count": 3,
+              "text": "Oaks bound with vine-cord"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 55,
+        "reputation": [
+          {
+            "faction": "preservationists",
+            "amount": 500
+          },
+          {
+            "faction": "oakhaven",
+            "amount": 100
+          }
+        ]
+      }
+    }
+  ]
+}

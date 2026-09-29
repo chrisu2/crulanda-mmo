@@ -1,0 +1,523 @@
+using UnityEngine;
+
+namespace Crulanda.Encounter
+{
+    public enum ActorLook { Warrior, Druid, Healer, Collector, Warden, Sentry, Outrider, Pale, Villager, Hollow, Cultist, Wolf, Boar, WeaveEater }
+    /// <summary>Body language layered over walking: working a hoe or bucket, talking, sitting, cowering.</summary>
+    public enum ActorPose { None, Work, Talk, Sit, Cower, Hammer, Chop, Gather, Knead, Swim, Sneak }
+
+    /// <summary>
+    /// Placeholder humanoid built from primitives under the actor's "Body" (so death poses and form scaling still apply
+    /// to the whole figure). Walk/idle motion is driven by real movement. Stand-in until authored models exist.
+    /// </summary>
+    public sealed class ActorVisual : MonoBehaviour
+    {
+        Transform body, legL, legR, armL, armR, torso, head;
+        Material cloth, accent;
+        Vector3 lastPosition; float phase, speed;
+
+        public ActorPose Pose;
+        int variant; bool child, posed; string role; float stoop, swimLean, swimPhase;
+        /// <summary>Villagers pass their trade (<paramref name="role"/>) to get its outfit and tool; see <see cref="Dress"/>.</summary>
+        public static ActorVisual Attach(GameObject actor, ActorLook look, int variant = 0, bool child = false, string role = null)
+        {
+            var v = actor.AddComponent<ActorVisual>(); v.variant = variant; v.child = child; v.role = role; v.Build(look); return v;
+        }
+        /// <summary>Trades with a recognisable outfit. Others (gossip, drinker, child) wear plain clothes with a random hat or apron.</summary>
+        public static bool HasOutfit(string role)
+        {
+            switch (role)
+            {
+                case "blacksmith": case "merchant": case "baker": case "henwife": case "farmer": case "hunter": case "leatherworker":
+                case "skinner": case "lumberjack": case "herbalist": case "miller": case "elder": case "drinker": case "stranger": case "warden": return true;
+                default: return false;
+            }
+        }
+        static readonly Color[] VillagerCloth = { new Color(.55f, .42f, .28f), new Color(.38f, .45f, .32f), new Color(.52f, .3f, .24f), new Color(.34f, .38f, .48f),
+            new Color(.6f, .55f, .42f), new Color(.45f, .33f, .4f), new Color(.3f, .34f, .28f) };
+        static readonly Color[] Skins = { new Color(.8f, .64f, .52f), new Color(.68f, .52f, .4f), new Color(.52f, .38f, .28f), new Color(.86f, .72f, .6f) };
+        /// <summary>Recolours the outfit's main cloth (e.g. Druid forms).</summary>
+        public void SetClothColor(Color c) { if (cloth != null) cloth.color = c; }
+
+        static Material Mat(Color c, float smooth = .15f, float metal = 0)
+        { var m = new Material(Shader.Find("Standard")) { color = c }; m.SetFloat("_Glossiness", smooth); m.SetFloat("_Metallic", metal); return m; }
+        Transform Part(PrimitiveType type, Transform parent, Vector3 pos, Vector3 scale, Material m, Vector3? euler = null)
+        {
+            var o = GameObject.CreatePrimitive(type); Destroy(o.GetComponent<Collider>());
+            o.transform.SetParent(parent, false); o.transform.localPosition = pos; o.transform.localScale = scale;
+            if (euler.HasValue) o.transform.localEulerAngles = euler.Value;
+            o.GetComponent<Renderer>().sharedMaterial = m; return o.transform;
+        }
+        Transform Pivot(string name, Vector3 pos) { var t = new GameObject(name).transform; t.SetParent(body, false); t.localPosition = pos; return t; }
+
+        static readonly Color[] HairColors = { new Color(.22f, .14f, .08f), new Color(.08f, .07f, .06f), new Color(.62f, .48f, .26f), new Color(.45f, .2f, .1f), new Color(.34f, .24f, .14f), new Color(.7f, .68f, .64f) };
+        /// <summary>
+        /// Softer figure and a face: neck, rounded chest and shoulders, eyes with pupils, brows, nose, mouth, ears, and hair
+        /// in a few styles (short, long, tied back, cropped, bald). Colour and style come from the variant. Stone Hollow Men
+        /// get blank grey eyes; helmets and hoods simply sit over the hair.
+        /// </summary>
+        void Features(ActorLook look, Material skin)
+        {
+            bool stone = look == ActorLook.Hollow;
+            Part(PrimitiveType.Cylinder, body, new Vector3(0, .64f, 0), new Vector3(.15f, .06f, .15f), skin);                          // neck
+            Part(PrimitiveType.Sphere, body, new Vector3(0, .44f, .02f), new Vector3(.47f, .34f, .31f), cloth);                        // chest
+            foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Sphere, body, new Vector3(s * .24f, .55f, 0), new Vector3(.2f, .16f, .22f), cloth); // shoulders
+            var eyeWhite = Mat(stone ? new Color(.45f, .45f, .47f) : new Color(.95f, .94f, .9f), .6f);
+            var pupil = Mat(stone ? new Color(.3f, .3f, .32f) : new Color(.12f, .09f, .07f), .8f);
+            var brow = Mat(stone ? new Color(.35f, .35f, .36f) : HairColors[Mathf.Abs(variant * 3 + 1) % HairColors.Length] * .8f);
+            foreach (int s in new[] { -1, 1 })
+            {
+                Part(PrimitiveType.Sphere, body, new Vector3(s * .062f, .835f, .128f), new Vector3(.055f, .045f, .03f), eyeWhite);
+                if (!stone) Part(PrimitiveType.Sphere, body, new Vector3(s * .062f, .834f, .142f), Vector3.one * .026f, pupil);
+                Part(PrimitiveType.Cube, body, new Vector3(s * .064f, .872f, .133f), new Vector3(.06f, .013f, .02f), brow, new Vector3(0, 0, s * -8));
+                Part(PrimitiveType.Sphere, body, new Vector3(s * .152f, .8f, 0), new Vector3(.05f, .08f, .05f), skin);                  // ears
+            }
+            Part(PrimitiveType.Sphere, body, new Vector3(0, .8f, .15f), new Vector3(.05f, .07f, .06f), skin);                           // nose
+            Part(PrimitiveType.Cube, body, new Vector3(0, .745f, .137f), new Vector3(.075f, .012f, .01f), Mat(stone ? new Color(.3f, .3f, .31f) : new Color(.45f, .2f, .18f))); // mouth
+            if (stone) return;
+            // Hair: style and colour by variant (elders go grey via their outfit's own hair piece).
+            var hair = Mat(HairColors[Mathf.Abs(variant * 3 + 1) % HairColors.Length], .25f);
+            switch (Mathf.Abs(variant) % 5)
+            {
+                case 0: Part(PrimitiveType.Sphere, body, new Vector3(0, .87f, -.02f), new Vector3(.32f, .22f, .32f), hair); break;              // short
+                case 1:
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .87f, -.02f), new Vector3(.33f, .24f, .33f), hair);
+                    Part(PrimitiveType.Cube, body, new Vector3(0, .7f, -.12f), new Vector3(.3f, .34f, .08f), hair); break;                      // long
+                case 2:
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .87f, -.02f), new Vector3(.32f, .22f, .32f), hair);
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .84f, -.17f), Vector3.one * .12f, hair); break;                              // tied back
+                case 3: Part(PrimitiveType.Sphere, body, new Vector3(0, .9f, -.01f), new Vector3(.3f, .15f, .3f), hair); break;               // cropped
+                default: break;                                                                                                                  // bald
+            }
+        }
+        public static bool IsBeast(ActorLook look) { return look == ActorLook.Wolf || look == ActorLook.Boar || look == ActorLook.WeaveEater; }
+
+        /// <summary>
+        /// Four-legged creatures. The front legs use the arm pivots and the hind legs the leg pivots, so the walk cycle
+        /// moves diagonal pairs.
+        /// - Wolf: a grey-brown hunter. Charcoal with ember eyes when variant is odd ("Ash hound").
+        /// - Boar: heavy, bristled, tusked.
+        /// - Weave-Eater: GAME-ONLY design. A hunched, long-limbed thing of grey static with violet light in its cracks.
+        /// </summary>
+        void BuildBeast(ActorLook look)
+        {
+            bool wolf = look == ActorLook.Wolf, boar = look == ActorLook.Boar;
+            bool ash = variant % 2 == 1;
+            Color coat = wolf ? (ash ? new Color(.16f, .15f, .15f) : new Color(.45f, .41f, .36f)) : boar ? new Color(.33f, .24f, .18f) : new Color(.42f, .42f, .45f);
+            var fur = Mat(coat); var dark = Mat(coat * .6f); var eye = Mat(wolf && !ash ? new Color(.9f, .75f, .3f) : new Color(1, .45f, .15f), .8f);
+            if (!wolf && !boar) { eye = Mat(new Color(.75f, .45f, 1f), .9f); eye.EnableKeyword("_EMISSION"); eye.SetColor("_EmissionColor", new Color(.7f, .35f, 1f) * 2.2f); }
+            else if (ash) { eye.EnableKeyword("_EMISSION"); eye.SetColor("_EmissionColor", new Color(1, .4f, .1f) * 2); }
+            float hipY = boar ? -.55f : wolf ? -.42f : -.25f, legLen = boar ? .42f : wolf ? .55f : .72f;
+            float len = boar ? .95f : wolf ? .9f : .8f;
+            // Body.
+            torso = Part(PrimitiveType.Capsule, body, new Vector3(0, hipY + (boar ? .05f : 0), 0), boar ? new Vector3(.62f, len * .62f, .58f) : wolf ? new Vector3(.34f, len * .58f, .38f) : new Vector3(.42f, .5f, .5f), fur, new Vector3(90, 0, 0));
+            if (!wolf && !boar) torso.localRotation = Quaternion.Euler(55, 0, 0);   // hunched upright
+            // Legs: front on the arm pivots, hind on the leg pivots.
+            float w = boar ? .2f : .13f, front = len * .42f, hind = -len * .38f;
+            armL = Pivot("Leg FL", new Vector3(-w, hipY, front)); armR = Pivot("Leg FR", new Vector3(w, hipY, front));
+            legL = Pivot("Leg HL", new Vector3(-w, hipY, hind)); legR = Pivot("Leg HR", new Vector3(w, hipY, hind));
+            foreach (var leg in new[] { armL, armR, legL, legR })
+            {
+                bool frontLeg = leg == armL || leg == armR; float l = legLen * (!wolf && !boar && frontLeg ? 1.35f : 1);
+                Part(PrimitiveType.Capsule, leg, new Vector3(0, -l / 2, 0), new Vector3(boar ? .13f : .1f, l / 2, boar ? .13f : .1f), fur);
+                Part(PrimitiveType.Sphere, leg, new Vector3(0, -l, .03f), new Vector3(.11f, .07f, .14f), dark);
+            }
+            // Head.
+            var neck = boar ? new Vector3(0, hipY - .02f, len * .62f) : wolf ? new Vector3(0, hipY + .2f, len * .6f) : new Vector3(0, hipY + .55f, .32f);
+            head = Part(PrimitiveType.Sphere, body, neck, boar ? new Vector3(.36f, .34f, .42f) : wolf ? new Vector3(.26f, .25f, .3f) : new Vector3(.3f, .26f, .34f), fur);
+            if (wolf)
+            {
+                Part(PrimitiveType.Cube, head, new Vector3(0, -.15f, .75f), new Vector3(.5f, .45f, .8f), fur);                       // muzzle
+                Part(PrimitiveType.Sphere, head, new Vector3(0, -.05f, 1.15f), Vector3.one * .22f, Mat(new Color(.05f, .05f, .05f)));  // nose
+                foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, head, new Vector3(s * .3f, .55f, -.1f), new Vector3(.25f, .5f, .12f), dark, new Vector3(0, 0, s * -12));
+                Part(PrimitiveType.Capsule, body, new Vector3(0, hipY + .05f, -len * .62f), new Vector3(.1f, .3f, .1f), dark, new Vector3(-55, 0, 0)); // tail
+                Part(PrimitiveType.Sphere, body, new Vector3(0, hipY + .12f, len * .38f), new Vector3(.36f, .3f, .3f), dark);              // ruff
+            }
+            else if (boar)
+            {
+                Part(PrimitiveType.Cylinder, head, new Vector3(0, -.12f, .62f), new Vector3(.42f, .15f, .4f), dark, new Vector3(90, 0, 0)); // snout
+                foreach (int s in new[] { -1, 1 })
+                {
+                    Part(PrimitiveType.Cube, head, new Vector3(s * .25f, -.2f, .72f), new Vector3(.07f, .35f, .07f), Mat(new Color(.9f, .86f, .75f), .5f), new Vector3(-20, 0, s * 20)); // tusks
+                    Part(PrimitiveType.Cube, head, new Vector3(s * .32f, .45f, -.05f), new Vector3(.2f, .3f, .12f), dark, new Vector3(0, 0, s * -25));
+                }
+                for (int i = 0; i < 6; i++) Part(PrimitiveType.Cube, body, new Vector3(0, hipY + .3f, len * .35f - i * .14f), new Vector3(.05f, .14f, .1f), dark); // bristle ridge
+                Part(PrimitiveType.Capsule, body, new Vector3(0, hipY + .1f, -len * .6f), new Vector3(.05f, .12f, .05f), dark, new Vector3(-30, 0, 0));
+            }
+            else
+            {
+                // Weave-Eater: cracks of violet light, spines of static along the back, a lamprey mouth.
+                for (int i = 0; i < 7; i++) Part(PrimitiveType.Cube, torso, new Vector3((i % 2 - .5f) * .6f, -.4f + i * .13f, .4f), new Vector3(.08f, .3f, .06f), eye, new Vector3(0, 0, i * 25));
+                for (int i = 0; i < 5; i++) Part(PrimitiveType.Cube, body, new Vector3(0, hipY + .3f + i * .1f, .1f - i * .12f), new Vector3(.05f, .35f, .05f), dark, new Vector3(-30 - i * 8, 0, 0));
+                Part(PrimitiveType.Cylinder, head, new Vector3(0, -.2f, .55f), new Vector3(.55f, .15f, .55f), Mat(new Color(.06f, .04f, .08f)), new Vector3(90, 0, 0));
+                foreach (var leg in new[] { armL, armR }) Part(PrimitiveType.Cube, leg, new Vector3(0, -legLen * 1.35f, .12f), new Vector3(.06f, .06f, .3f), dark);    // claws
+            }
+            foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Sphere, head, new Vector3(s * .3f, .12f, .38f), Vector3.one * .12f, eye);
+            cloth = fur; beast = true;
+        }
+        bool beast;
+
+        void Build(ActorLook look)
+        {
+            body = transform.Find("Body"); if (body == null) return;
+            var capsule = body.GetComponent<MeshRenderer>(); if (capsule != null) capsule.enabled = false;
+            if (IsBeast(look)) { BuildBeast(look); lastPosition = transform.position; return; }
+            Material skin = Mat(new Color(.76f, .6f, .48f));
+            Color clothC, accentC, legC;
+            switch (look)
+            {
+                case ActorLook.Warrior: clothC = new Color(.17f, .36f, .47f); accentC = new Color(.55f, .56f, .58f); legC = new Color(.25f, .2f, .16f); break;
+                case ActorLook.Druid: clothC = new Color(.36f, .44f, .26f); accentC = new Color(.42f, .31f, .2f); legC = new Color(.3f, .24f, .17f); break;
+                case ActorLook.Healer: clothC = new Color(.55f, .7f, .58f); accentC = new Color(.85f, .82f, .7f); legC = new Color(.4f, .5f, .42f); break;
+                case ActorLook.Collector: clothC = new Color(.4f, .45f, .55f); accentC = new Color(.62f, .64f, .68f); legC = new Color(.2f, .21f, .25f); break;
+                case ActorLook.Warden: clothC = new Color(.26f, .29f, .39f); accentC = new Color(.72f, .72f, .76f); legC = new Color(.16f, .17f, .2f); break;
+                case ActorLook.Outrider: clothC = new Color(.66f, .52f, .32f); accentC = new Color(.5f, .48f, .45f); legC = new Color(.36f, .27f, .18f); break;
+                case ActorLook.Pale: clothC = new Color(.86f, .87f, .9f); accentC = new Color(.93f, .94f, .97f); legC = new Color(.8f, .81f, .85f); break;
+                case ActorLook.Hollow: clothC = new Color(.5f, .5f, .51f); accentC = new Color(.4f, .4f, .42f); legC = new Color(.44f, .44f, .45f); skin = Mat(new Color(.56f, .56f, .57f), .05f); break;
+                case ActorLook.Cultist: clothC = new Color(.14f, .12f, .14f); accentC = new Color(.86f, .82f, .72f); legC = new Color(.12f, .1f, .11f); break;
+                case ActorLook.Villager:
+                    clothC = VillagerCloth[Mathf.Abs(variant) % VillagerCloth.Length]; accentC = VillagerCloth[Mathf.Abs(variant * 3 + 2) % VillagerCloth.Length] * .8f;
+                    legC = new Color(.3f, .25f, .2f) * (.8f + (variant % 3) * .15f); skin = Mat(Skins[Mathf.Abs(variant * 7) % Skins.Length]); break;
+                default: clothC = new Color(.6f, .27f, .18f); accentC = new Color(.4f, .35f, .3f); legC = new Color(.28f, .2f, .16f); break;
+            }
+            cloth = Mat(clothC); accent = Mat(accentC, look == ActorLook.Warrior || look == ActorLook.Warden || look == ActorLook.Collector ? .55f : .15f,
+                look == ActorLook.Warrior || look == ActorLook.Warden || look == ActorLook.Collector ? .5f : 0);
+            var legs = Mat(legC); var boots = Mat(new Color(.18f, .13f, .1f));
+            if (look == ActorLook.Warden) body.localScale = new Vector3(1.08f, 1.12f, 1.08f);
+            if (look == ActorLook.Pale) { body.localScale = new Vector3(.82f, 1.3f, .82f); skin = Mat(new Color(.9f, .91f, .95f), .7f); }
+
+            // Legs and arms hang from pivots so they can swing.
+            legL = Pivot("Leg L", new Vector3(-.12f, -.08f, 0)); legR = Pivot("Leg R", new Vector3(.12f, -.08f, 0));
+            foreach (var leg in new[] { legL, legR })
+            {
+                Part(PrimitiveType.Capsule, leg, new Vector3(0, -.44f, 0), new Vector3(.18f, .44f, .18f), legs);
+                Part(PrimitiveType.Cube, leg, new Vector3(0, -.86f, .05f), new Vector3(.17f, .12f, .28f), boots);
+            }
+            Part(PrimitiveType.Cube, body, new Vector3(0, -.02f, 0), new Vector3(.44f, .2f, .27f), legs);           // hips
+            torso = Part(PrimitiveType.Cube, body, new Vector3(0, .3f, 0), new Vector3(.48f, .6f, .29f), cloth);
+            Part(PrimitiveType.Cube, body, new Vector3(0, .06f, 0), new Vector3(.5f, .07f, .31f), Mat(new Color(.22f, .16f, .11f))); // belt
+            head = Part(PrimitiveType.Sphere, body, new Vector3(0, .8f, 0), new Vector3(.3f, .32f, .3f), skin);
+            if (look != ActorLook.Pale) Features(look, skin);
+            armL = Pivot("Arm L", new Vector3(-.31f, .53f, 0)); armR = Pivot("Arm R", new Vector3(.31f, .53f, 0));
+            foreach (var arm in new[] { armL, armR })
+            {
+                Part(PrimitiveType.Capsule, arm, new Vector3(0, -.3f, 0), new Vector3(.14f, .3f, .14f), cloth);
+                Part(PrimitiveType.Sphere, arm, new Vector3(0, -.62f, 0), Vector3.one * .12f, skin);
+            }
+            switch (look)
+            {
+                case ActorLook.Warrior:
+                    foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Sphere, body, new Vector3(s * .31f, .58f, 0), new Vector3(.26f, .18f, .26f), accent);
+                    Part(PrimitiveType.Cube, armR, new Vector3(0, -.66f, .38f), new Vector3(.05f, .06f, .9f), accent, new Vector3(20, 0, 0));   // sword
+                    Part(PrimitiveType.Cube, armR, new Vector3(0, -.64f, -.04f), new Vector3(.22f, .04f, .06f), Mat(new Color(.4f, .3f, .15f))); // crossguard
+                    Part(PrimitiveType.Cylinder, armL, new Vector3(-.1f, -.38f, .05f), new Vector3(.5f, .03f, .5f), Mat(new Color(.36f, .25f, .15f)), new Vector3(0, 0, 90)); // shield
+                    Part(PrimitiveType.Cylinder, armL, new Vector3(-.13f, -.38f, .05f), new Vector3(.18f, .02f, .18f), accent, new Vector3(0, 0, 90));
+                    break;
+                case ActorLook.Druid:
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .84f, -.03f), new Vector3(.36f, .38f, .38f), cloth);                 // hood
+                    Part(PrimitiveType.Cube, body, new Vector3(0, .2f, -.17f), new Vector3(.52f, .95f, .05f), accent, new Vector3(-6, 0, 0)); // cloak
+                    Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.45f, .08f), new Vector3(.06f, .85f, .06f), Mat(new Color(.35f, .25f, .15f)), new Vector3(8, 0, 0)); // staff
+                    Part(PrimitiveType.Sphere, armR, new Vector3(0, .38f, .15f), Vector3.one * .13f, Mat(new Color(.45f, .7f, .4f), .6f));
+                    break;
+                case ActorLook.Healer:
+                    Part(PrimitiveType.Cylinder, body, new Vector3(0, -.5f, 0), new Vector3(.52f, .45f, .44f), cloth);                  // robe skirt
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .84f, -.03f), new Vector3(.35f, .37f, .37f), accent);                 // hood
+                    Part(PrimitiveType.Cube, body, new Vector3(0, .3f, .15f), new Vector3(.12f, .55f, .02f), accent);                     // stole
+                    break;
+                case ActorLook.Collector:
+                case ActorLook.Warden:
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .86f, 0), new Vector3(.34f, .24f, .34f), accent);                     // helmet
+                    Part(PrimitiveType.Cube, body, new Vector3(0, .15f, .15f), new Vector3(.36f, .7f, .03f), Mat(new Color(.72f, .72f, .74f))); // Concord tabard
+                    Part(PrimitiveType.Cube, body, new Vector3(0, .32f, .165f), new Vector3(.14f, .14f, .01f), Mat(new Color(.75f, .62f, .25f), .6f, .5f)); // sigil
+                    float pole = look == ActorLook.Warden ? 1.1f : .9f;
+                    Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.35f, .1f), new Vector3(.05f, pole, .05f), Mat(new Color(.3f, .22f, .14f)));
+                    Part(PrimitiveType.Cube, armR, new Vector3(0, -.35f + pole, .1f), look == ActorLook.Warden ? new Vector3(.05f, .3f, .28f) : new Vector3(.04f, .22f, .06f), accent);
+                    if (look == ActorLook.Warden) Part(PrimitiveType.Cube, body, new Vector3(0, .25f, -.17f), new Vector3(.56f, .9f, .04f), cloth, new Vector3(-5, 0, 0));
+                    break;
+                case ActorLook.Outrider:
+                    // Sandthrone mercenary: sand-coloured wraps, a head scarf and a bearded axe.
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .84f, 0), new Vector3(.34f, .26f, .34f), cloth);
+                    Part(PrimitiveType.Cube, body, new Vector3(0, .1f, 0), new Vector3(.54f, .45f, .33f), accent);
+                    Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.5f, .2f), new Vector3(.05f, .5f, .05f), Mat(new Color(.3f, .22f, .14f)), new Vector3(60, 0, 0));
+                    Part(PrimitiveType.Cube, armR, new Vector3(0, -.72f, .58f), new Vector3(.04f, .34f, .26f), Mat(new Color(.55f, .56f, .58f), .5f, .5f), new Vector3(60, 0, 0));
+                    break;
+                case ActorLook.Villager when HasOutfit(role):
+                    Dress(role, skin, legs);
+                    break;
+                case ActorLook.Villager:
+                    // Plain folk: an apron or a hat or a headscarf, chosen by variant; children are smaller.
+                    if (variant % 3 == 0) Part(PrimitiveType.Cube, body, new Vector3(0, -.05f, .15f), new Vector3(.4f, .6f, .02f), Mat(new Color(.78f, .74f, .64f)));
+                    if (variant % 4 == 1) { Part(PrimitiveType.Cylinder, body, new Vector3(0, .95f, 0), new Vector3(.46f, .02f, .46f), Mat(new Color(.62f, .52f, .3f))); Part(PrimitiveType.Cylinder, body, new Vector3(0, 1.0f, 0), new Vector3(.26f, .07f, .26f), Mat(new Color(.62f, .52f, .3f))); }
+                    if (variant % 4 == 2) Part(PrimitiveType.Sphere, body, new Vector3(0, .84f, -.02f), new Vector3(.33f, .3f, .34f), accent);
+                    if (child) body.localScale = new Vector3(.68f, .66f, .68f);
+                    break;
+                case ActorLook.Hollow:
+                    // A Hollow Man (CANON, book1 ch.4): a villager turned to grey stone, cracked, with a violet shard where the heart was.
+                    for (int i = 0; i < 5; i++) Part(PrimitiveType.Cube, body, new Vector3((i - 2) * .08f, .25f + (i % 2) * .15f, .15f), new Vector3(.02f, .25f, .01f), Mat(new Color(.22f, .22f, .23f)), new Vector3(0, 0, i * 30 - 60));
+                    var shard = Mat(new Color(.7f, .4f, 1f), .9f); shard.EnableKeyword("_EMISSION"); shard.SetColor("_EmissionColor", new Color(.65f, .3f, 1f) * 2.5f);
+                    Part(PrimitiveType.Cube, body, new Vector3(-.06f, .42f, .15f), new Vector3(.07f, .12f, .04f), shard, new Vector3(0, 0, 20));
+                    body.localEulerAngles = new Vector3(10, 0, 0); stoop = 10;
+                    break;
+                case ActorLook.Cultist:
+                    // Cult of Ash (CANON cult, book1 series bible): bone mask, purple tear, soot-black robes. GAME-ONLY styling.
+                    Part(PrimitiveType.Cylinder, body, new Vector3(0, -.5f, 0), new Vector3(.54f, .45f, .46f), cloth);
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .85f, -.04f), new Vector3(.37f, .39f, .39f), cloth);
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .8f, .1f), new Vector3(.26f, .3f, .14f), accent);                         // bone mask
+                    var tear = Mat(new Color(.55f, .2f, .8f), .8f); tear.EnableKeyword("_EMISSION"); tear.SetColor("_EmissionColor", new Color(.5f, .15f, .8f) * 1.8f);
+                    Part(PrimitiveType.Cube, body, new Vector3(.06f, .74f, .17f), new Vector3(.03f, .1f, .01f), tear);
+                    Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.45f, .08f), new Vector3(.05f, .85f, .05f), Mat(new Color(.18f, .15f, .12f)));
+                    Part(PrimitiveType.Sphere, armR, new Vector3(0, .42f, .08f), new Vector3(.16f, .2f, .16f), accent);                      // skull knob
+                    break;
+                case ActorLook.Pale:
+                    // A Pale Thing: too tall, too thin, a smooth elongated head and no face. It carries nothing.
+                    head.localScale = new Vector3(.24f, .46f, .26f); head.localPosition = new Vector3(0, .9f, 0);
+                    foreach (var arm in new[] { armL, armR }) arm.localScale = new Vector3(.8f, 1.35f, .8f);
+                    Part(PrimitiveType.Cube, body, new Vector3(0, -.2f, 0), new Vector3(.4f, .9f, .22f), cloth);
+                    break;
+            }
+            lastPosition = transform.position;
+        }
+
+        /// <summary>
+        /// Trade outfits: each has a distinct silhouette (hat or hood, apron or coat) and a tool, so a smith reads as a smith
+        /// from across the green. Built on the plain villager body (torso/arms use <see cref="cloth"/>). GAME-ONLY styling.
+        /// </summary>
+        void Dress(string trade, Material skin, Material legs)
+        {
+            Material M(float r, float g, float b, float smooth = .15f, float metal = 0) { return Mat(new Color(r, g, b), smooth, metal); }
+            var iron = M(.32f, .32f, .34f, .55f, .7f); var wood = M(.42f, .3f, .18f); var leather = M(.36f, .23f, .13f);
+            void Apron(Material m, float length, float width = .42f) { Part(PrimitiveType.Cube, body, new Vector3(0, .42f - length / 2, .16f), new Vector3(width, length, .03f), m); }
+            void Brim(Material m, float width, float crown, float crownH) { Part(PrimitiveType.Cylinder, body, new Vector3(0, .94f, 0), new Vector3(width, .015f, width), m); Part(PrimitiveType.Cylinder, body, new Vector3(0, .94f + crownH, 0), new Vector3(crown, crownH, crown), m); }
+            void Beard(Color c, float size) { Part(PrimitiveType.Cube, body, new Vector3(0, .68f - size * .2f, .12f), new Vector3(.22f, .12f + size * .2f, .08f), Mat(c)); }
+            void Skirt(Material m) { Part(PrimitiveType.Cylinder, body, new Vector3(0, -.45f, 0), new Vector3(.5f, .42f, .42f), m); }
+            // A tool held in the right hand, pointing forward like a carried hammer or axe (it swings with the arm).
+            void HandTool(Material handle, float length, Material head, Vector3 headScale, float headAt = 1)
+            {
+                Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.64f, length / 2 - .08f), new Vector3(.045f, length / 2, .045f), handle, new Vector3(90, 0, 0));
+                if (head != null) Part(PrimitiveType.Cube, armR, new Vector3(0, -.64f + headScale.y * .25f, (length - .08f) * headAt), headScale, head);
+            }
+            switch (trade)
+            {
+                case "blacksmith":
+                    // Broad, soot-dark shirt with bare forearms, a long leather apron, a skullcap, and a hammer.
+                    cloth.color = new Color(.26f, .24f, .23f); legs.color = new Color(.2f, .18f, .16f);
+                    body.localScale = new Vector3(1.14f, 1.02f, 1.1f);
+                    foreach (var arm in new[] { armL, armR }) Part(PrimitiveType.Capsule, arm, new Vector3(0, -.47f, 0), new Vector3(.15f, .15f, .15f), skin);
+                    Apron(leather, 1.02f, .46f);
+                    Part(PrimitiveType.Cube, body, new Vector3(0, .5f, .16f), new Vector3(.03f, .2f, .02f), leather);       // apron strap
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .87f, -.01f), new Vector3(.31f, .2f, .31f), M(.45f, .14f, .1f)); // skullcap
+                    Beard(new Color(.18f, .12f, .08f), .5f);
+                    HandTool(wood, .5f, iron, new Vector3(.1f, .1f, .16f));
+                    break;
+                case "merchant":
+                    // Plump, in a long burgundy coat with gold buttons, a feathered wide hat and a coin purse.
+                    cloth.color = new Color(.46f, .12f, .17f); legs.color = new Color(.2f, .16f, .2f);
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .26f, .06f), new Vector3(.5f, .5f, .38f), cloth);           // belly
+                    Part(PrimitiveType.Cylinder, body, new Vector3(0, -.34f, 0), new Vector3(.52f, .3f, .38f), cloth);           // coat skirts
+                    var gold = M(.85f, .68f, .25f, .7f, .8f);
+                    for (int i = 0; i < 4; i++) Part(PrimitiveType.Sphere, body, new Vector3(0, .42f - i * .14f, .25f - Mathf.Abs(i - 1.5f) * .02f), Vector3.one * .05f, gold);
+                    Part(PrimitiveType.Cube, body, new Vector3(0, .6f, .12f), new Vector3(.3f, .08f, .08f), M(.9f, .88f, .8f)); // collar
+                    var hatM = M(.15f, .12f, .14f); Brim(hatM, .56f, .28f, .09f);
+                    Part(PrimitiveType.Cube, body, new Vector3(.14f, 1.12f, -.08f), new Vector3(.03f, .3f, .06f), M(.3f, .6f, .4f), new Vector3(-30, 0, -25)); // feather
+                    Part(PrimitiveType.Sphere, body, new Vector3(-.27f, -.05f, .1f), new Vector3(.12f, .15f, .1f), M(.55f, .42f, .2f)); // purse
+                    break;
+                case "baker":
+                    // All in flour-white: a white cap puffed on top, a white apron, and a loaf under the arm.
+                    cloth.color = new Color(.9f, .88f, .82f); legs.color = new Color(.62f, .57f, .5f);
+                    var white = M(.97f, .96f, .93f);
+                    Apron(white, .92f);
+                    Part(PrimitiveType.Cylinder, body, new Vector3(0, .98f, 0), new Vector3(.28f, .08f, .28f), white);
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, 1.1f, 0), new Vector3(.38f, .2f, .38f), white);
+                    Part(PrimitiveType.Capsule, armL, new Vector3(0, -.55f, .12f), new Vector3(.15f, .2f, .15f), M(.72f, .48f, .22f), new Vector3(90, 0, 0)); // loaf
+                    break;
+                case "henwife":
+                    // Long skirt, a shawl and a red kerchief; a feed pouch on the apron.
+                    cloth.color = new Color(.5f, .4f, .3f); Skirt(M(.38f, .4f, .48f));
+                    Apron(M(.8f, .76f, .66f), .8f, .36f);
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .86f, -.02f), new Vector3(.33f, .28f, .34f), M(.66f, .2f, .16f));   // kerchief
+                    Part(PrimitiveType.Cube, body, new Vector3(0, .54f, -.01f), new Vector3(.56f, .16f, .34f), M(.55f, .5f, .38f));     // shawl
+                    Part(PrimitiveType.Cube, body, new Vector3(.1f, -.1f, .19f), new Vector3(.16f, .14f, .05f), M(.72f, .62f, .44f)); // feed pouch
+                    break;
+                case "farmer":
+                    // Wide straw hat, a denim bib over a work shirt, and a pitchfork.
+                    cloth.color = variant % 2 == 0 ? new Color(.62f, .55f, .4f) : new Color(.5f, .52f, .38f); legs.color = new Color(.28f, .32f, .42f);
+                    Part(PrimitiveType.Cube, body, new Vector3(0, .2f, .15f), new Vector3(.36f, .44f, .02f), M(.3f, .35f, .47f));      // bib
+                    foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, body, new Vector3(s * .12f, .5f, .15f), new Vector3(.04f, .2f, .02f), M(.3f, .35f, .47f));
+                    Brim(M(.78f, .66f, .36f), .62f, .26f, .07f);
+                    Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.45f, .08f), new Vector3(.035f, .85f, .035f), wood);
+                    for (int i = -1; i <= 1; i++) Part(PrimitiveType.Cube, armR, new Vector3(i * .05f, .47f, .08f), new Vector3(.02f, .2f, .02f), iron);
+                    Part(PrimitiveType.Cube, armR, new Vector3(0, .38f, .08f), new Vector3(.14f, .02f, .02f), iron);
+                    break;
+                case "hunter":
+                    // Green hood and cape, leather jerkin, bow and quiver on the back.
+                    cloth.color = new Color(.25f, .34f, .2f); legs.color = new Color(.3f, .25f, .17f);
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .85f, -.03f), new Vector3(.36f, .37f, .38f), M(.2f, .28f, .16f));  // hood
+                    Part(PrimitiveType.Cube, body, new Vector3(0, .32f, .01f), new Vector3(.5f, .44f, .31f), leather);                 // jerkin
+                    Part(PrimitiveType.Cube, body, new Vector3(0, .25f, -.17f), new Vector3(.5f, .8f, .03f), M(.2f, .28f, .16f), new Vector3(-6, 0, 0)); // cape
+                    Part(PrimitiveType.Cylinder, body, new Vector3(.14f, .45f, -.22f), new Vector3(.13f, .24f, .13f), leather, new Vector3(0, 0, -18)); // quiver
+                    for (int i = 0; i < 3; i++) Part(PrimitiveType.Cube, body, new Vector3(.2f + i * .03f, .72f, -.22f), new Vector3(.03f, .06f, .03f), M(.85f, .85f, .8f), new Vector3(0, 0, -18));
+                    Part(PrimitiveType.Cube, body, new Vector3(-.05f, .3f, -.21f), new Vector3(.035f, 1.25f, .035f), wood, new Vector3(0, 0, 24));   // bow
+                    Part(PrimitiveType.Cube, body, new Vector3(-.02f, .3f, -.19f), new Vector3(.008f, 1.15f, .008f), M(.85f, .82f, .7f), new Vector3(0, 0, 24)); // string
+                    break;
+                case "leatherworker":
+                    // Tan work clothes, a leather apron and cap, a satchel on a cross-strap, and a roll of hide.
+                    cloth.color = new Color(.62f, .5f, .34f); legs.color = new Color(.34f, .26f, .18f);
+                    Apron(M(.52f, .34f, .18f), .8f);
+                    Part(PrimitiveType.Cylinder, body, new Vector3(0, .93f, 0), new Vector3(.31f, .05f, .31f), leather);                // cap
+                    Part(PrimitiveType.Cube, body, new Vector3(0, .32f, .165f), new Vector3(.05f, .75f, .02f), leather, new Vector3(0, 0, 38)); // strap
+                    Part(PrimitiveType.Cube, body, new Vector3(-.3f, -.02f, 0), new Vector3(.1f, .24f, .28f), leather);                 // satchel
+                    Part(PrimitiveType.Cylinder, armL, new Vector3(0, -.58f, .12f), new Vector3(.14f, .22f, .14f), M(.7f, .55f, .36f), new Vector3(90, 0, 0)); // hide roll
+                    break;
+                case "skinner":
+                    // Fur hat, a stained apron, pelts over the shoulder and a skinning knife.
+                    cloth.color = new Color(.36f, .31f, .27f); legs.color = new Color(.25f, .21f, .17f);
+                    Apron(M(.6f, .55f, .48f), .9f);
+                    var stain = M(.42f, .1f, .08f);
+                    Part(PrimitiveType.Cube, body, new Vector3(.08f, .05f, .18f), new Vector3(.14f, .1f, .01f), stain);
+                    Part(PrimitiveType.Cube, body, new Vector3(-.1f, -.25f, .18f), new Vector3(.1f, .14f, .01f), stain);
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .9f, 0), new Vector3(.36f, .26f, .36f), M(.45f, .38f, .3f));        // fur hat
+                    Part(PrimitiveType.Sphere, body, new Vector3(-.22f, .55f, -.1f), new Vector3(.34f, .16f, .5f), M(.55f, .42f, .3f), new Vector3(0, 0, 30)); // pelt
+                    Part(PrimitiveType.Sphere, body, new Vector3(-.12f, .45f, -.18f), new Vector3(.4f, .12f, .3f), M(.4f, .4f, .38f), new Vector3(0, 0, 20));  // pelt
+                    HandTool(wood, .22f, M(.75f, .76f, .78f, .7f, .8f), new Vector3(.02f, .05f, .2f), 1.6f);
+                    break;
+                case "lumberjack":
+                    // Red plaid shirt, knit cap, big beard, and an axe.
+                    cloth.color = new Color(.62f, .15f, .13f); legs.color = new Color(.24f, .26f, .32f);
+                    body.localScale = new Vector3(1.1f, 1.04f, 1.08f);
+                    var check = M(.12f, .08f, .08f);
+                    foreach (float y in new[] { .15f, .42f }) foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, body, new Vector3(0, y, s * .147f), new Vector3(.49f, .05f, .005f), check);
+                    foreach (float x in new[] { -.12f, .12f }) foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, body, new Vector3(x, .3f, s * .148f), new Vector3(.04f, .6f, .005f), check);
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .9f, 0), new Vector3(.32f, .26f, .32f), M(.25f, .3f, .22f));        // knit cap
+                    Part(PrimitiveType.Cylinder, body, new Vector3(0, .84f, 0), new Vector3(.33f, .04f, .33f), M(.22f, .27f, .2f));
+                    Beard(new Color(.42f, .24f, .12f), 1);
+                    HandTool(wood, .8f, iron, new Vector3(.04f, .22f, .18f));
+                    break;
+                case "herbalist":
+                    // Sage robe with a moss shawl and hood, a herb satchel with sprigs, and a small sickle.
+                    cloth.color = new Color(.48f, .55f, .4f); Skirt(M(.4f, .46f, .33f));
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .85f, -.03f), new Vector3(.35f, .36f, .37f), M(.3f, .4f, .26f));    // hood
+                    Part(PrimitiveType.Cube, body, new Vector3(0, .54f, -.01f), new Vector3(.56f, .16f, .34f), M(.3f, .4f, .26f));      // shawl
+                    Part(PrimitiveType.Cube, body, new Vector3(-.3f, -.02f, .02f), new Vector3(.12f, .22f, .26f), M(.55f, .48f, .32f)); // satchel
+                    for (int i = 0; i < 4; i++) Part(PrimitiveType.Cube, body, new Vector3(-.3f, .14f, -.06f + i * .05f), new Vector3(.02f, .14f, .02f), M(.3f, .6f, .25f), new Vector3(i * 8 - 12, 0, 0));
+                    Part(PrimitiveType.Sphere, body, new Vector3(-.3f, .21f, 0), Vector3.one * .05f, M(.8f, .7f, .3f));                // a flower
+                    HandTool(wood, .2f, M(.7f, .7f, .72f, .6f, .7f), new Vector3(.02f, .14f, .16f), 1.5f);
+                    break;
+                case "miller":
+                    // Flour-dusted shirt and cap, a sack of meal on the shoulder.
+                    cloth.color = new Color(.82f, .79f, .72f); legs.color = new Color(.48f, .44f, .38f);
+                    Part(PrimitiveType.Cylinder, body, new Vector3(0, .93f, .02f), new Vector3(.32f, .05f, .34f), M(.62f, .6f, .54f));
+                    Part(PrimitiveType.Cube, body, new Vector3(0, .93f, .16f), new Vector3(.22f, .02f, .1f), M(.62f, .6f, .54f));       // cap peak
+                    Part(PrimitiveType.Sphere, body, new Vector3(-.22f, .74f, -.06f), new Vector3(.3f, .4f, .26f), M(.74f, .66f, .5f), new Vector3(0, 0, 20)); // sack
+                    Apron(M(.88f, .86f, .8f), .7f);
+                    break;
+                case "elder":
+                    // Grey hair, a shawl, a walking stick and a slight stoop.
+                    cloth.color = new Color(.4f, .36f, .42f);
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .84f, -.03f), new Vector3(.31f, .3f, .32f), M(.78f, .78f, .76f));   // grey hair
+                    Part(PrimitiveType.Cube, body, new Vector3(0, .54f, -.01f), new Vector3(.56f, .16f, .34f), M(.5f, .44f, .36f));     // shawl
+                    Beard(new Color(.8f, .8f, .78f), .8f);
+                    Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.95f, .08f), new Vector3(.03f, .36f, .03f), wood);
+                    stoop = 8;
+                    break;
+                case "stranger":
+                    // A Salt-Mender contact: charcoal cloak and deep hood hiding the face, a salt pouch at the belt.
+                    cloth.color = new Color(.2f, .2f, .22f); legs.color = new Color(.16f, .15f, .15f);
+                    var cloak = M(.17f, .17f, .19f);
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .85f, -.02f), new Vector3(.38f, .4f, .4f), cloak);                 // hood
+                    Part(PrimitiveType.Cube, body, new Vector3(0, .8f, .13f), new Vector3(.22f, .24f, .06f), M(.04f, .04f, .05f));     // shadowed face
+                    Part(PrimitiveType.Cube, body, new Vector3(0, .1f, -.17f), new Vector3(.56f, 1.15f, .05f), cloak, new Vector3(-5, 0, 0));
+                    foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, body, new Vector3(s * .27f, .15f, 0), new Vector3(.05f, 1.05f, .3f), cloak);
+                    Part(PrimitiveType.Sphere, body, new Vector3(.22f, -.02f, .14f), new Vector3(.12f, .13f, .1f), M(.92f, .92f, .9f)); // salt pouch
+                    break;
+                case "warden":
+                    // A Preservationist Warden (CANON look, book1 ch.5): green and brown, armour of living vine, an iron-wood staff.
+                    cloth.color = new Color(.3f, .38f, .22f); legs.color = new Color(.32f, .24f, .16f);
+                    var vine = M(.22f, .45f, .18f); var bark = M(.3f, .22f, .14f);
+                    for (int i = 0; i < 5; i++) Part(PrimitiveType.Cube, body, new Vector3(0, .05f + i * .13f, 0), new Vector3(.5f, .05f, .31f), vine, new Vector3(0, 0, i % 2 == 0 ? 12 : -12));
+                    foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Sphere, body, new Vector3(s * .31f, .58f, 0), new Vector3(.24f, .16f, .24f), bark);
+                    for (int i = 0; i < 6; i++) Part(PrimitiveType.Sphere, body, new Vector3(Mathf.Sin(i) * .24f, .1f + i * .1f, .16f), Vector3.one * .06f, M(.35f, .6f, .25f)); // leaves
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .86f, -.02f), new Vector3(.34f, .3f, .35f), M(.26f, .32f, .18f));   // hood
+                    Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.4f, .08f), new Vector3(.06f, .95f, .06f), M(.24f, .24f, .22f, .4f, .3f)); // iron-wood staff
+                    Part(PrimitiveType.Sphere, armR, new Vector3(0, .55f, .08f), new Vector3(.14f, .1f, .14f), vine);
+                    break;
+                case "drinker":
+                    // A pewter tankard, never far from hand.
+                    Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.66f, .1f), new Vector3(.12f, .08f, .12f), M(.6f, .6f, .62f, .6f, .6f));
+                    if (variant % 2 == 0) Part(PrimitiveType.Sphere, body, new Vector3(0, .84f, -.02f), new Vector3(.33f, .3f, .34f), accent);
+                    break;
+            }
+            body.localEulerAngles = new Vector3(stoop, 0, 0);
+        }
+
+        void LateUpdate()
+        {
+            if (body == null || legL == null) return;
+            var delta = transform.position - lastPosition; delta.y = 0; lastPosition = transform.position;
+            float target = Time.deltaTime > 0 ? delta.magnitude / Time.deltaTime : 0;
+            speed = Mathf.Lerp(speed, target, Time.deltaTime * 8);
+            float stride = Mathf.Clamp01(speed / 4.5f);
+            phase += Time.deltaTime * (2.2f + speed * 1.6f);
+            float swing = Mathf.Sin(phase) * 34 * stride, idle = Mathf.Sin(Time.time * 1.7f) * 2 * (1 - stride);
+            legL.localEulerAngles = new Vector3(swing, 0, 0); legR.localEulerAngles = new Vector3(-swing, 0, 0);
+            armL.localEulerAngles = new Vector3(-swing * .8f + idle, 0, 3); armR.localEulerAngles = new Vector3(swing * .8f - idle, 0, -3);
+            if (torso != null && !beast) torso.localPosition = new Vector3(0, .3f + Mathf.Abs(Mathf.Sin(phase)) * .025f * stride, 0);
+            if (Pose == ActorPose.None)   // combatants never use poses (their death pose moves the body)
+            {
+                if (posed) { posed = false; swimLean = 0; body.localPosition = Vector3.zero; body.localEulerAngles = new Vector3(stoop, 0, 0); }
+                return;
+            }
+            posed = true;
+            bool travelPose = Pose == ActorPose.Swim || Pose == ActorPose.Sneak;   // these belong to moving, not standing still
+            if (stride > .3f && !travelPose) { body.localPosition = Vector3.zero; body.localEulerAngles = new Vector3(stoop, 0, 0); return; }   // moving: walking wins over any pose
+            float t = Time.time + variant * .7f; float lean = stoop;
+            switch (Pose)
+            {
+                case ActorPose.Swim:     // breaststroke-ish: lying forward, arms sweeping in turn, legs kicking
+                {
+                    swimPhase += Time.deltaTime * (stride > .1f ? 4.5f : 2);
+                    armL.localEulerAngles = new Vector3(-120 + Mathf.Sin(swimPhase) * 70, 0, 25); armR.localEulerAngles = new Vector3(-120 + Mathf.Sin(swimPhase + Mathf.PI) * 70, 0, -25);
+                    legL.localEulerAngles = new Vector3(Mathf.Sin(swimPhase * 1.6f) * 25, 0, 0); legR.localEulerAngles = new Vector3(-Mathf.Sin(swimPhase * 1.6f) * 25, 0, 0);
+                    swimLean = Mathf.MoveTowards(swimLean, stride > .1f ? 55 : 18, 150 * Time.deltaTime);
+                    // Lean about the chest, not the hips, so the head stays up out of the water.
+                    var chest = new Vector3(0, .45f, 0); var tilt = Quaternion.Euler(swimLean, 0, 0);
+                    body.localRotation = tilt; body.localPosition = chest - tilt * chest;
+                    return;
+                }
+                case ActorPose.Sneak:    // crouched, knees bent, arms held close
+                    legL.localEulerAngles = new Vector3(-35 + swing * .6f, 0, 0); legR.localEulerAngles = new Vector3(-35 - swing * .6f, 0, 0);
+                    armL.localEulerAngles = new Vector3(-30, 0, 10); armR.localEulerAngles = new Vector3(-30, 0, -10);
+                    lean += 22; break;
+                case ActorPose.Hammer:   // steady strikes on the anvil with the right hand; the left holds the work
+                {
+                    float k = Mathf.Repeat(t * 1.3f, 1), lift = k < .7f ? Mathf.SmoothStep(0, 1, k / .7f) : 1 - (k - .7f) / .3f;
+                    armR.localEulerAngles = new Vector3(-20 - lift * 110, 0, -8); armL.localEulerAngles = new Vector3(-45, 0, 12); lean += 8; break;
+                }
+                case ActorPose.Chop:     // a big overhead swing, then a pause to set the next log
+                {
+                    float k = Mathf.Repeat(t * .8f, 1), axe = k < .55f ? Mathf.SmoothStep(0, 1, k / .55f) * 160 : Mathf.Max(0, 160 - (k - .55f) * 900);
+                    armL.localEulerAngles = armR.localEulerAngles = new Vector3(-axe, 0, 0); lean += axe < 40 ? 14 : 0; break;
+                }
+                case ActorPose.Gather:   // bent over, picking at the ground
+                    armL.localEulerAngles = new Vector3(-50 + Mathf.Sin(t * 2) * 12, 0, 8); armR.localEulerAngles = new Vector3(-55 + Mathf.Sin(t * 2.6f + 1) * 16, 0, -8);
+                    lean += 38; break;
+                case ActorPose.Knead:    // both hands pushing forward in turn (dough, hides, a stall's wares)
+                    armL.localEulerAngles = new Vector3(-60 - Mathf.Max(0, Mathf.Sin(t * 3)) * 25, 0, 6); armR.localEulerAngles = new Vector3(-60 - Mathf.Max(0, Mathf.Sin(t * 3 + Mathf.PI)) * 25, 0, -6);
+                    lean += 10; break;
+                case ActorPose.Work:   // both arms chop down together, like hoeing or hauling a bucket
+                    float chop = Mathf.Abs(Mathf.Sin(t * 2.4f)) * 70;
+                    armL.localEulerAngles = new Vector3(-chop, 0, 10); armR.localEulerAngles = new Vector3(-chop, 0, -10); break;
+                case ActorPose.Talk:   // an occasional gesture with one hand
+                    float gesture = Mathf.Max(0, Mathf.Sin(t * 1.3f)) * 55;
+                    armR.localEulerAngles = new Vector3(-gesture, 0, -12 - gesture * .2f); break;
+                case ActorPose.Sit:
+                    legL.localEulerAngles = legR.localEulerAngles = new Vector3(-80, 0, 0);
+                    armL.localEulerAngles = new Vector3(-35, 0, 8); armR.localEulerAngles = new Vector3(-35 + Mathf.Sin(t) * 10, 0, -8); break;
+                case ActorPose.Cower:
+                    armL.localEulerAngles = new Vector3(-150, 0, 25); armR.localEulerAngles = new Vector3(-150, 0, -25); break;
+            }
+            // Sitting lowers the whole figure onto the seat; everything else stands.
+            body.localPosition = new Vector3(0, Pose == ActorPose.Sit ? -.45f * (child ? .66f : 1) : Pose == ActorPose.Sneak ? -.28f : Pose == ActorPose.Swim ? -.15f : 0, 0);
+            body.localEulerAngles = new Vector3(lean, 0, 0);
+        }
+    }
+}

@@ -1,0 +1,2185 @@
+{
+  "id": "zone.oakhaven",
+  "displayName": "Oakhaven",
+  "subtitle": "An eastern farming village at the edge of the Wasting",
+  "canonStatus": "CANON-EXPANDED",
+  "canonNote": "Canon: Oakhaven is an eastern agricultural hub erased by an accelerated, localized Wasting event that hid the Council's abduction of resonance candidates (interactive map; Oakhaven village map). This zone shows it on the eve of that erasure. Layout follows the canon village map. The Concord collectors, Mira and exact building placement are GAME-ONLY / PROVISIONAL. The wolf and boar camps and the south road to the Ashland Rim are GAME-ONLY.",
+  "size": 260,
+  "levelMin": 1,
+  "levelMax": 2,
+  "biome": "meadow",
+  "worldMapPosition": {
+    "x": 0.683,
+    "y": 0.625
+  },
+  "worldMapNote": "Pin follows the interactive chart (eastern farmlands); the exact spot is provisional.",
+  "flatRadius": 58,
+  "hillHeight": 5,
+  "seed": 1771,
+  "lighting": {
+    "sunPitch": 27,
+    "sunYaw": -38,
+    "sunIntensity": 1.05,
+    "sunColor": "#FFD7A6",
+    "ambientSky": "#8C96A3",
+    "ambientEquator": "#7A7465",
+    "ambientGround": "#3A352C",
+    "fogColor": "#A39F91",
+    "fogStart": 70,
+    "fogEnd": 210
+  },
+  "spawns": {
+    "player": {
+      "x": -30,
+      "y": -104
+    },
+    "playerFacing": 15,
+    "companion": {
+      "x": -16.5,
+      "y": -12.8
+    },
+    "recovery": {
+      "x": -8,
+      "y": -8
+    },
+    "leash": 17,
+    "enemies": [
+      {
+        "id": "oakhaven.collector.0",
+        "name": "Concord collector",
+        "at": {
+          "x": 20,
+          "y": -3
+        },
+        "level": 2
+      },
+      {
+        "id": "oakhaven.collector.1",
+        "name": "Concord collector",
+        "at": {
+          "x": -37,
+          "y": 33
+        },
+        "level": 2
+      },
+      {
+        "id": "oakhaven.warden.0",
+        "name": "Concord warden",
+        "at": {
+          "x": 37,
+          "y": 33
+        },
+        "veteran": true,
+        "level": 2
+      },
+      {
+        "id": "oakhaven.collector.2",
+        "name": "Concord collector",
+        "at": {
+          "x": -84,
+          "y": 43
+        },
+        "level": 2
+      },
+      {
+        "id": "oakhaven.collector.3",
+        "name": "Concord collector",
+        "at": {
+          "x": -58,
+          "y": -46
+        },
+        "level": 2
+      }
+    ]
+  },
+  "objectives": [
+    "Find Mira inside the Golden Cask",
+    "Drive off the Concord collectors",
+    "Arm yourself with a recovered blade [I]"
+  ],
+  "exits": [
+    {
+      "to": "zone.khaven",
+      "name": "West road to Khaven Village",
+      "at": {
+        "x": -121,
+        "y": 13.5
+      },
+      "arrive": {
+        "x": -92,
+        "y": -104
+      },
+      "radius": 5
+    },
+    {
+      "to": "zone.ashrim",
+      "name": "South road to the Ashland Rim (dangerous, 9-10)",
+      "at": {
+        "x": -35,
+        "y": -123
+      },
+      "arrive": {
+        "x": 5,
+        "y": 114
+      },
+      "radius": 5
+    }
+  ],
+  "clearings": [
+    {
+      "name": "Oak green",
+      "center": {
+        "x": 0,
+        "y": 0
+      },
+      "radius": 12
+    },
+    {
+      "name": "Inn yard",
+      "center": {
+        "x": -11,
+        "y": -13
+      },
+      "radius": 6
+    },
+    {
+      "name": "Well yard",
+      "center": {
+        "x": 21,
+        "y": 4
+      },
+      "radius": 5
+    },
+    {
+      "name": "Barn yard",
+      "center": {
+        "x": -38,
+        "y": 36
+      },
+      "radius": 7
+    },
+    {
+      "name": "Harrow yard",
+      "center": {
+        "x": -86,
+        "y": 50
+      },
+      "radius": 7
+    },
+    {
+      "name": "Mill yard",
+      "center": {
+        "x": -62,
+        "y": -50
+      },
+      "radius": 5
+    },
+    {
+      "name": "Brook yard",
+      "center": {
+        "x": 62,
+        "y": -98
+      },
+      "radius": 6
+    }
+  ],
+  "roads": [
+    {
+      "name": "North road",
+      "width": 5,
+      "points": [
+        {
+          "x": -3,
+          "y": 8
+        },
+        {
+          "x": -8,
+          "y": 35
+        },
+        {
+          "x": -14,
+          "y": 70
+        },
+        {
+          "x": -18,
+          "y": 128
+        }
+      ]
+    },
+    {
+      "name": "West road",
+      "width": 5,
+      "points": [
+        {
+          "x": -9,
+          "y": 2
+        },
+        {
+          "x": -35,
+          "y": 4
+        },
+        {
+          "x": -70,
+          "y": 8
+        },
+        {
+          "x": -100,
+          "y": 12
+        },
+        {
+          "x": -128,
+          "y": 14
+        }
+      ]
+    },
+    {
+      "name": "Road into the grey",
+      "width": 4.5,
+      "points": [
+        {
+          "x": 6,
+          "y": 7
+        },
+        {
+          "x": 28,
+          "y": 30
+        },
+        {
+          "x": 52,
+          "y": 56
+        },
+        {
+          "x": 76,
+          "y": 82
+        },
+        {
+          "x": 104,
+          "y": 104
+        }
+      ]
+    },
+    {
+      "name": "South road",
+      "width": 5,
+      "points": [
+        {
+          "x": -2,
+          "y": -10
+        },
+        {
+          "x": -8,
+          "y": -35
+        },
+        {
+          "x": -22,
+          "y": -70
+        },
+        {
+          "x": -30,
+          "y": -100
+        },
+        {
+          "x": -36,
+          "y": -128
+        }
+      ]
+    },
+    {
+      "name": "Mill road",
+      "width": 4.5,
+      "points": [
+        {
+          "x": 9,
+          "y": -4
+        },
+        {
+          "x": 22,
+          "y": -20
+        },
+        {
+          "x": 34,
+          "y": -34
+        },
+        {
+          "x": 42,
+          "y": -50
+        },
+        {
+          "x": 52,
+          "y": -62
+        },
+        {
+          "x": 70,
+          "y": -85
+        },
+        {
+          "x": 100,
+          "y": -110
+        }
+      ]
+    },
+    {
+      "name": "Harrow track",
+      "width": 3.5,
+      "points": [
+        {
+          "x": -80,
+          "y": 11
+        },
+        {
+          "x": -84,
+          "y": 30
+        },
+        {
+          "x": -88,
+          "y": 44
+        }
+      ]
+    },
+    {
+      "name": "Mill lane",
+      "width": 3.5,
+      "points": [
+        {
+          "x": -12,
+          "y": -48
+        },
+        {
+          "x": -40,
+          "y": -49
+        },
+        {
+          "x": -62,
+          "y": -50
+        }
+      ]
+    },
+    {
+      "name": "Brook track",
+      "width": 3.5,
+      "points": [
+        {
+          "x": 66,
+          "y": -80
+        },
+        {
+          "x": 62,
+          "y": -92
+        }
+      ]
+    }
+  ],
+  "water": [
+    {
+      "name": "Oak creek",
+      "width": 4,
+      "points": [
+        {
+          "x": -130,
+          "y": -70
+        },
+        {
+          "x": -100,
+          "y": -64
+        },
+        {
+          "x": -70,
+          "y": -58
+        },
+        {
+          "x": -40,
+          "y": -55
+        },
+        {
+          "x": -10,
+          "y": -52
+        },
+        {
+          "x": 20,
+          "y": -45
+        },
+        {
+          "x": 38,
+          "y": -38
+        },
+        {
+          "x": 70,
+          "y": -30
+        },
+        {
+          "x": 104,
+          "y": -24
+        },
+        {
+          "x": 130,
+          "y": -22
+        }
+      ]
+    }
+  ],
+  "fields": [
+    {
+      "name": "West furrows",
+      "center": {
+        "x": -48,
+        "y": -14
+      },
+      "size": {
+        "x": 26,
+        "y": 20
+      },
+      "rotation": 8,
+      "crop": "soil"
+    },
+    {
+      "name": "Stubble field",
+      "center": {
+        "x": -50,
+        "y": 18
+      },
+      "size": {
+        "x": 22,
+        "y": 16
+      },
+      "rotation": -6,
+      "crop": "stubble"
+    },
+    {
+      "name": "North furrows",
+      "center": {
+        "x": -24,
+        "y": 54
+      },
+      "size": {
+        "x": 20,
+        "y": 14
+      },
+      "rotation": 12,
+      "crop": "soil"
+    },
+    {
+      "name": "Last harvest",
+      "center": {
+        "x": 24,
+        "y": 52
+      },
+      "size": {
+        "x": 22,
+        "y": 14
+      },
+      "rotation": -10,
+      "crop": "stubble"
+    },
+    {
+      "name": "Creek field",
+      "center": {
+        "x": -42,
+        "y": -38
+      },
+      "size": {
+        "x": 20,
+        "y": 10
+      },
+      "rotation": 3,
+      "crop": "soil"
+    },
+    {
+      "name": "Harrow furrows",
+      "center": {
+        "x": -104,
+        "y": 70
+      },
+      "size": {
+        "x": 24,
+        "y": 16
+      },
+      "rotation": 5,
+      "crop": "soil"
+    },
+    {
+      "name": "Harrow stubble",
+      "center": {
+        "x": -72,
+        "y": 72
+      },
+      "size": {
+        "x": 20,
+        "y": 16
+      },
+      "rotation": -4,
+      "crop": "stubble"
+    },
+    {
+      "name": "Brook field",
+      "center": {
+        "x": 42,
+        "y": -112
+      },
+      "size": {
+        "x": 22,
+        "y": 12
+      },
+      "rotation": 8,
+      "crop": "soil"
+    }
+  ],
+  "wasting": {
+    "x": 104,
+    "curtainHeight": 26,
+    "fade": 20,
+    "note": "Canon: the Wasting unmakes rather than destroys, leaving grey static."
+  },
+  "landmarks": [
+    {
+      "name": "The Great Oak",
+      "text": "Dead for a generation, still the heart of the green.",
+      "at": {
+        "x": 0,
+        "y": 0
+      },
+      "radius": 14
+    },
+    {
+      "name": "The Golden Cask",
+      "text": "Oakhaven's inn. Its cellar hears everything.",
+      "at": {
+        "x": -14,
+        "y": -16
+      },
+      "radius": 9
+    },
+    {
+      "name": "Communal Well",
+      "text": "The water has started to taste of iron.",
+      "at": {
+        "x": 21,
+        "y": 4
+      },
+      "radius": 6
+    },
+    {
+      "name": "The Wasting",
+      "text": "Not fire, not rot. The world simply stops.",
+      "at": {
+        "x": 50,
+        "y": 0
+      },
+      "radius": 10
+    },
+    {
+      "name": "Oak creek mill",
+      "text": "The wheel still turns, though there's less and less to grind.",
+      "at": {
+        "x": -70,
+        "y": -50
+      },
+      "radius": 9
+    },
+    {
+      "name": "Harrow farm",
+      "text": "The Harrows lost a daughter to the collectors.",
+      "at": {
+        "x": -88,
+        "y": 50
+      },
+      "radius": 12
+    },
+    {
+      "name": "The Old Orchard",
+      "text": "Planted by someone's great-grandmother, when the east was still green.",
+      "at": {
+        "x": -55,
+        "y": 88
+      },
+      "radius": 14
+    },
+    {
+      "name": "Old wayshrine",
+      "text": "Offerings here have turned grey and brittle.",
+      "at": {
+        "x": 86,
+        "y": 20
+      },
+      "radius": 8
+    },
+    {
+      "name": "Harrow hen coop",
+      "text": "Goody Marl's hens. She counts them in every dusk.",
+      "at": {
+        "x": -90,
+        "y": 58
+      },
+      "radius": 6
+    },
+    {
+      "name": "Vell's smithy",
+      "text": "Brannoc Vell mends ploughs and hinges. The Concord took his good iron.",
+      "at": {
+        "x": 8,
+        "y": -17
+      },
+      "radius": 6
+    },
+    {
+      "name": "Market row",
+      "text": "Three stalls along the north road; fewer carts come every season.",
+      "at": {
+        "x": -5,
+        "y": 15
+      },
+      "radius": 8
+    },
+    {
+      "name": "Thorne's bakehouse",
+      "text": "The oven has not gone cold in forty years.",
+      "at": {
+        "x": -35,
+        "y": -11
+      },
+      "radius": 6
+    },
+    {
+      "name": "Tannery yard",
+      "text": "Downwind of the village, for good reason.",
+      "at": {
+        "x": -58,
+        "y": -16
+      },
+      "radius": 6
+    },
+    {
+      "name": "Woodyard",
+      "text": "Stacked for a winter that may come early.",
+      "at": {
+        "x": -24,
+        "y": 60
+      },
+      "radius": 6
+    },
+    {
+      "name": "The black-iron wagon",
+      "text": "A Concord cage on wheels. The villagers won't go near it.",
+      "at": {
+        "x": 60,
+        "y": 50
+      },
+      "radius": 6
+    },
+    {
+      "name": "Brook pond",
+      "text": "Deep and cold. The Brook children dare each other to swim it.",
+      "at": {
+        "x": 36,
+        "y": -82
+      },
+      "radius": 8
+    },
+    {
+      "name": "The tall grass",
+      "text": "Something moves in it when the wind drops. Sneak (Ctrl) if you must cross.",
+      "at": {
+        "x": 6,
+        "y": -108
+      },
+      "radius": 10
+    }
+  ],
+  "props": [
+    {
+      "kind": "dead_oak",
+      "name": "The Great Oak",
+      "at": {
+        "x": 0,
+        "y": 0
+      },
+      "scale": 1.9
+    },
+    {
+      "kind": "inn",
+      "name": "The Golden Cask",
+      "at": {
+        "x": -14,
+        "y": -16
+      },
+      "rotation": 221,
+      "size": {
+        "x": 12,
+        "y": 8
+      },
+      "variant": 0
+    },
+    {
+      "kind": "well",
+      "name": "Communal Well",
+      "at": {
+        "x": 21,
+        "y": 4
+      }
+    },
+    {
+      "kind": "barn",
+      "name": "Tithe barn",
+      "at": {
+        "x": -44,
+        "y": 41
+      },
+      "rotation": 135,
+      "size": {
+        "x": 12,
+        "y": 8
+      }
+    },
+    {
+      "kind": "house",
+      "at": {
+        "x": -22,
+        "y": 14
+      },
+      "rotation": 302,
+      "size": {
+        "x": 7,
+        "y": 5
+      },
+      "variant": 0
+    },
+    {
+      "kind": "house",
+      "at": {
+        "x": -16,
+        "y": 28
+      },
+      "rotation": 330,
+      "size": {
+        "x": 8,
+        "y": 5.5
+      },
+      "variant": 1
+    },
+    {
+      "kind": "house",
+      "at": {
+        "x": 12,
+        "y": 25
+      },
+      "rotation": 26,
+      "size": {
+        "x": 7,
+        "y": 5
+      },
+      "variant": 2
+    },
+    {
+      "kind": "house",
+      "at": {
+        "x": 28,
+        "y": 19
+      },
+      "rotation": 55,
+      "size": {
+        "x": 9,
+        "y": 6
+      },
+      "variant": 3
+    },
+    {
+      "kind": "house",
+      "at": {
+        "x": 36,
+        "y": 5
+      },
+      "rotation": 81,
+      "size": {
+        "x": 7,
+        "y": 5
+      },
+      "variant": 4
+    },
+    {
+      "kind": "house",
+      "at": {
+        "x": 30,
+        "y": -12
+      },
+      "rotation": 112,
+      "size": {
+        "x": 7.5,
+        "y": 5
+      },
+      "variant": 1
+    },
+    {
+      "kind": "house",
+      "at": {
+        "x": 17,
+        "y": -25
+      },
+      "rotation": 145,
+      "size": {
+        "x": 7,
+        "y": 5
+      },
+      "variant": 0
+    },
+    {
+      "kind": "house",
+      "at": {
+        "x": 8,
+        "y": -31
+      },
+      "rotation": 165,
+      "size": {
+        "x": 6.5,
+        "y": 5
+      },
+      "variant": 2
+    },
+    {
+      "kind": "house",
+      "at": {
+        "x": -26,
+        "y": -4
+      },
+      "rotation": 261,
+      "size": {
+        "x": 7,
+        "y": 5
+      },
+      "variant": 3
+    },
+    {
+      "kind": "house",
+      "at": {
+        "x": -29,
+        "y": -21
+      },
+      "rotation": 234,
+      "size": {
+        "x": 7,
+        "y": 5
+      },
+      "variant": 4
+    },
+    {
+      "kind": "bridge",
+      "name": "Mill footbridge",
+      "at": {
+        "x": -15.2,
+        "y": -52.6
+      },
+      "rotation": 22,
+      "size": {
+        "x": 12
+      }
+    },
+    {
+      "kind": "bridge",
+      "name": "Old stone bridge",
+      "at": {
+        "x": 36.3,
+        "y": -38.7
+      },
+      "rotation": 153,
+      "size": {
+        "x": 12
+      }
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": -48,
+        "y": -3.3
+      },
+      "rotation": 8,
+      "size": {
+        "x": 24
+      }
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": -61.5,
+        "y": -15
+      },
+      "rotation": 98,
+      "size": {
+        "x": 18
+      }
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": -50,
+        "y": 9.6
+      },
+      "rotation": -6,
+      "size": {
+        "x": 20
+      }
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": -24,
+        "y": 46.5
+      },
+      "rotation": 12,
+      "size": {
+        "x": 18
+      }
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": 24,
+        "y": 44.5
+      },
+      "rotation": -10,
+      "size": {
+        "x": 20
+      }
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": -42,
+        "y": -32.8
+      },
+      "rotation": 3,
+      "size": {
+        "x": 20
+      }
+    },
+    {
+      "kind": "hedge",
+      "at": {
+        "x": -21,
+        "y": -9
+      },
+      "rotation": 261,
+      "size": {
+        "x": 7
+      }
+    },
+    {
+      "kind": "hedge",
+      "at": {
+        "x": 24,
+        "y": -3
+      },
+      "rotation": 20,
+      "size": {
+        "x": 5
+      }
+    },
+    {
+      "kind": "haystack",
+      "at": {
+        "x": -55,
+        "y": 20
+      }
+    },
+    {
+      "kind": "haystack",
+      "at": {
+        "x": -47,
+        "y": 15
+      }
+    },
+    {
+      "kind": "haystack",
+      "at": {
+        "x": -44,
+        "y": 23
+      }
+    },
+    {
+      "kind": "haystack",
+      "at": {
+        "x": 20,
+        "y": 55
+      }
+    },
+    {
+      "kind": "cart",
+      "at": {
+        "x": -35,
+        "y": 34
+      },
+      "rotation": 40
+    },
+    {
+      "kind": "cart",
+      "at": {
+        "x": 26,
+        "y": -18
+      },
+      "rotation": 200
+    },
+    {
+      "kind": "barrels",
+      "at": {
+        "x": 24,
+        "y": 7
+      },
+      "variant": 2
+    },
+    {
+      "kind": "crates",
+      "at": {
+        "x": 33,
+        "y": -7
+      },
+      "rotation": 30,
+      "variant": 2
+    },
+    {
+      "kind": "crates",
+      "at": {
+        "x": -40,
+        "y": 46
+      },
+      "rotation": 135,
+      "variant": 1
+    },
+    {
+      "kind": "barrels",
+      "at": {
+        "x": -19,
+        "y": 21
+      },
+      "variant": 1
+    },
+    {
+      "kind": "lamp",
+      "at": {
+        "x": 8,
+        "y": 8
+      },
+      "rotation": 225,
+      "variant": 1
+    },
+    {
+      "kind": "lamp",
+      "at": {
+        "x": -9,
+        "y": -8
+      },
+      "rotation": 45,
+      "variant": 1
+    },
+    {
+      "kind": "lamp",
+      "at": {
+        "x": 9,
+        "y": -8
+      },
+      "rotation": 315
+    },
+    {
+      "kind": "lamp",
+      "at": {
+        "x": -10,
+        "y": 7
+      },
+      "rotation": 135
+    },
+    {
+      "kind": "signpost",
+      "at": {
+        "x": -11,
+        "y": -41
+      },
+      "rotation": 22
+    },
+    {
+      "kind": "signpost",
+      "at": {
+        "x": -37,
+        "y": 7
+      },
+      "rotation": 90
+    },
+    {
+      "kind": "grave",
+      "at": {
+        "x": 1,
+        "y": 46
+      }
+    },
+    {
+      "kind": "grave",
+      "at": {
+        "x": 3.5,
+        "y": 46.5
+      }
+    },
+    {
+      "kind": "grave",
+      "at": {
+        "x": 6,
+        "y": 46
+      }
+    },
+    {
+      "kind": "grave",
+      "at": {
+        "x": 1.5,
+        "y": 49
+      }
+    },
+    {
+      "kind": "grave",
+      "at": {
+        "x": 4.5,
+        "y": 49.5
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "Old chapel wall",
+      "at": {
+        "x": 4,
+        "y": 53
+      },
+      "rotation": 5,
+      "size": {
+        "x": 8
+      }
+    },
+    {
+      "kind": "dead_oak",
+      "name": "Lone dead tree",
+      "at": {
+        "x": 44,
+        "y": 42
+      },
+      "scale": 0.8
+    },
+    {
+      "kind": "tree",
+      "at": {
+        "x": -34,
+        "y": 27
+      },
+      "variant": 1
+    },
+    {
+      "kind": "tree",
+      "at": {
+        "x": 15,
+        "y": 38
+      },
+      "variant": 2
+    },
+    {
+      "kind": "tree",
+      "at": {
+        "x": -30,
+        "y": -33
+      },
+      "variant": 0
+    },
+    {
+      "kind": "tree",
+      "at": {
+        "x": 44,
+        "y": -18
+      },
+      "variant": 2
+    },
+    {
+      "kind": "tree",
+      "at": {
+        "x": -58,
+        "y": 34
+      },
+      "variant": 3
+    },
+    {
+      "kind": "tree",
+      "at": {
+        "x": 0,
+        "y": -44
+      },
+      "variant": 1
+    },
+    {
+      "kind": "tree",
+      "at": {
+        "x": -60,
+        "y": -30
+      },
+      "variant": 0
+    },
+    {
+      "kind": "pine",
+      "at": {
+        "x": -52,
+        "y": 52
+      }
+    },
+    {
+      "kind": "pine",
+      "at": {
+        "x": 38,
+        "y": 58
+      }
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -5,
+        "y": -58
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 12,
+        "y": -52
+      }
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -62,
+        "y": 0
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 30,
+        "y": 42
+      }
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 48,
+        "y": -8
+      },
+      "variant": 2
+    },
+    {
+      "kind": "mill",
+      "name": "Oak creek mill",
+      "at": {
+        "x": -70,
+        "y": -52
+      },
+      "rotation": 270,
+      "size": {
+        "x": 7,
+        "y": 6
+      }
+    },
+    {
+      "kind": "house",
+      "name": "Harrow farmhouse",
+      "at": {
+        "x": -94,
+        "y": 48
+      },
+      "rotation": 150,
+      "size": {
+        "x": 8,
+        "y": 5.5
+      },
+      "variant": 2
+    },
+    {
+      "kind": "barn",
+      "name": "Harrow barn",
+      "at": {
+        "x": -78,
+        "y": 56
+      },
+      "rotation": 180,
+      "size": {
+        "x": 12,
+        "y": 8
+      }
+    },
+    {
+      "kind": "house",
+      "name": "Brook farmhouse",
+      "at": {
+        "x": 58,
+        "y": -102
+      },
+      "rotation": 30,
+      "size": {
+        "x": 7,
+        "y": 5
+      },
+      "variant": 4
+    },
+    {
+      "kind": "barn",
+      "name": "Brook barn",
+      "at": {
+        "x": 74,
+        "y": -106
+      },
+      "rotation": 20,
+      "size": {
+        "x": 10,
+        "y": 7
+      }
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": -100,
+        "y": -9
+      },
+      "rotation": 0,
+      "size": {
+        "x": 30,
+        "y": 0
+      }
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": -100,
+        "y": -31
+      },
+      "rotation": 0,
+      "size": {
+        "x": 30,
+        "y": 0
+      }
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": -115,
+        "y": -20
+      },
+      "rotation": 90,
+      "size": {
+        "x": 22,
+        "y": 0
+      }
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": -85,
+        "y": -24
+      },
+      "rotation": 90,
+      "size": {
+        "x": 14,
+        "y": 0
+      }
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": -104,
+        "y": 61
+      },
+      "rotation": 5,
+      "size": {
+        "x": 24,
+        "y": 0
+      }
+    },
+    {
+      "kind": "haystack",
+      "at": {
+        "x": -74,
+        "y": 70
+      }
+    },
+    {
+      "kind": "haystack",
+      "at": {
+        "x": -68,
+        "y": 76
+      }
+    },
+    {
+      "kind": "haystack",
+      "at": {
+        "x": -80,
+        "y": 44
+      }
+    },
+    {
+      "kind": "cart",
+      "at": {
+        "x": -83,
+        "y": 40
+      },
+      "rotation": 20
+    },
+    {
+      "kind": "barrels",
+      "at": {
+        "x": -66,
+        "y": -46
+      },
+      "variant": 2
+    },
+    {
+      "kind": "crates",
+      "at": {
+        "x": -64,
+        "y": -55
+      },
+      "variant": 1
+    },
+    {
+      "kind": "crates",
+      "at": {
+        "x": 64,
+        "y": -94
+      },
+      "variant": 2
+    },
+    {
+      "kind": "ruin",
+      "name": "Old wayshrine",
+      "at": {
+        "x": 86,
+        "y": 20
+      },
+      "rotation": 15,
+      "size": {
+        "x": 5,
+        "y": 0
+      }
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 89,
+        "y": 25
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 83,
+        "y": 16
+      }
+    },
+    {
+      "kind": "signpost",
+      "at": {
+        "x": -78,
+        "y": 14
+      },
+      "rotation": 0
+    },
+    {
+      "kind": "signpost",
+      "at": {
+        "x": -26,
+        "y": -92
+      },
+      "rotation": 15
+    },
+    {
+      "kind": "lamp",
+      "at": {
+        "x": -60,
+        "y": -46
+      },
+      "variant": 1
+    },
+    {
+      "kind": "lamp",
+      "at": {
+        "x": -84,
+        "y": 38
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -60,
+        "y": 10
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 20,
+        "y": 90
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -40,
+        "y": -90
+      },
+      "variant": 1
+    },
+    {
+      "kind": "tree",
+      "at": {
+        "x": -40,
+        "y": -75
+      },
+      "variant": 2
+    },
+    {
+      "kind": "tree",
+      "at": {
+        "x": 10,
+        "y": -80
+      },
+      "variant": 1
+    },
+    {
+      "kind": "tree",
+      "at": {
+        "x": -70,
+        "y": 30
+      },
+      "variant": 3
+    },
+    {
+      "kind": "tree",
+      "at": {
+        "x": 30,
+        "y": 75
+      },
+      "variant": 0
+    },
+    {
+      "kind": "tree",
+      "at": {
+        "x": -20,
+        "y": 95
+      },
+      "variant": 2
+    },
+    {
+      "kind": "pine",
+      "at": {
+        "x": -120,
+        "y": -60
+      }
+    },
+    {
+      "kind": "coop",
+      "name": "Harrow hen coop",
+      "at": {
+        "x": -90,
+        "y": 61
+      },
+      "rotation": 0
+    },
+    {
+      "kind": "coop",
+      "name": "West field hen coop",
+      "at": {
+        "x": -61,
+        "y": 28
+      },
+      "rotation": 0
+    },
+    {
+      "kind": "coop",
+      "name": "Brook hen coop",
+      "at": {
+        "x": 68,
+        "y": -93
+      },
+      "rotation": 0
+    },
+    {
+      "kind": "forge",
+      "name": "Vell's smithy",
+      "at": {
+        "x": 8,
+        "y": -17
+      },
+      "rotation": 90
+    },
+    {
+      "kind": "stall",
+      "name": "Produce stall",
+      "at": {
+        "x": 2,
+        "y": 15
+      },
+      "rotation": 90,
+      "variant": 0
+    },
+    {
+      "kind": "stall",
+      "name": "Cloth and pots",
+      "at": {
+        "x": -12,
+        "y": 12
+      },
+      "rotation": 270,
+      "variant": 1
+    },
+    {
+      "kind": "stall",
+      "name": "Bread stall",
+      "at": {
+        "x": -12,
+        "y": 19
+      },
+      "rotation": 270,
+      "variant": 2
+    },
+    {
+      "kind": "oven",
+      "name": "Thorne's bakehouse",
+      "at": {
+        "x": -35,
+        "y": -11
+      },
+      "rotation": 270
+    },
+    {
+      "kind": "tannery",
+      "name": "Tannery yard",
+      "at": {
+        "x": -58,
+        "y": -16
+      },
+      "rotation": 0
+    },
+    {
+      "kind": "woodpile",
+      "name": "Woodyard",
+      "at": {
+        "x": -24,
+        "y": 60
+      },
+      "rotation": 20
+    },
+    {
+      "kind": "lamp",
+      "at": {
+        "x": -8,
+        "y": 16
+      },
+      "variant": 0
+    },
+    {
+      "kind": "wagon",
+      "name": "Bureau wagon",
+      "at": {
+        "x": 60,
+        "y": 50
+      },
+      "rotation": 40,
+      "interact": "Search the black-iron wagon",
+      "item": "item.bureau_ledger",
+      "once": true
+    },
+    {
+      "kind": "crates",
+      "name": "Tithe crate",
+      "at": {
+        "x": 55,
+        "y": 45
+      },
+      "rotation": 20,
+      "variant": 1,
+      "interact": "Take back the confiscated iron",
+      "item": "item.concord_iron",
+      "once": true
+    },
+    {
+      "kind": "crates",
+      "name": "Tithe crate",
+      "at": {
+        "x": 66,
+        "y": 47
+      },
+      "rotation": 70,
+      "variant": 2,
+      "interact": "Take back the confiscated iron",
+      "item": "item.concord_iron",
+      "once": true
+    },
+    {
+      "kind": "crates",
+      "name": "Tithe crate",
+      "at": {
+        "x": 63,
+        "y": 57
+      },
+      "rotation": 10,
+      "variant": 0,
+      "interact": "Take back the confiscated iron",
+      "item": "item.concord_iron",
+      "once": true
+    },
+    {
+      "kind": "cart",
+      "name": "Concord supply cart",
+      "at": {
+        "x": 52,
+        "y": 40
+      },
+      "rotation": 120,
+      "interact": "Salt the collectors' supplies",
+      "once": true
+    },
+    {
+      "kind": "crates",
+      "name": "Harrow grain bin",
+      "at": {
+        "x": -74,
+        "y": 49
+      },
+      "rotation": 0,
+      "variant": 2,
+      "interact": "Take a sack of clean grain",
+      "item": "item.clean_grain"
+    },
+    {
+      "kind": "tree",
+      "name": "Grey-hearted oak",
+      "at": {
+        "x": -84,
+        "y": 86
+      },
+      "variant": 3,
+      "interact": "Bind the trunk with vine-cord",
+      "once": true
+    },
+    {
+      "kind": "tree",
+      "name": "Grey-hearted oak",
+      "at": {
+        "x": -91,
+        "y": 79
+      },
+      "variant": 3,
+      "interact": "Bind the trunk with vine-cord",
+      "once": true
+    },
+    {
+      "kind": "tree",
+      "name": "Grey-hearted oak",
+      "at": {
+        "x": -77,
+        "y": 94
+      },
+      "variant": 3,
+      "interact": "Bind the trunk with vine-cord",
+      "once": true
+    },
+    {
+      "kind": "herb",
+      "name": "Yarrow",
+      "at": {
+        "x": -70,
+        "y": 44
+      },
+      "variant": 0,
+      "interact": "Gather yarrow",
+      "item": "item.yarrow"
+    },
+    {
+      "kind": "herb",
+      "name": "Yarrow",
+      "at": {
+        "x": -30,
+        "y": 72
+      },
+      "variant": 0,
+      "interact": "Gather yarrow",
+      "item": "item.yarrow"
+    },
+    {
+      "kind": "herb",
+      "name": "Yarrow",
+      "at": {
+        "x": 30,
+        "y": 66
+      },
+      "variant": 0,
+      "interact": "Gather yarrow",
+      "item": "item.yarrow"
+    },
+    {
+      "kind": "herb",
+      "name": "Yarrow",
+      "at": {
+        "x": 52,
+        "y": 12
+      },
+      "variant": 0,
+      "interact": "Gather yarrow",
+      "item": "item.yarrow"
+    },
+    {
+      "kind": "herb",
+      "name": "Yarrow",
+      "at": {
+        "x": -72,
+        "y": -30
+      },
+      "variant": 0,
+      "interact": "Gather yarrow",
+      "item": "item.yarrow"
+    },
+    {
+      "kind": "herb",
+      "name": "Yarrow",
+      "at": {
+        "x": 12,
+        "y": -68
+      },
+      "variant": 0,
+      "interact": "Gather yarrow",
+      "item": "item.yarrow"
+    },
+    {
+      "kind": "herb",
+      "name": "Yarrow",
+      "at": {
+        "x": -46,
+        "y": -68
+      },
+      "variant": 0,
+      "interact": "Gather yarrow",
+      "item": "item.yarrow"
+    },
+    {
+      "kind": "herb",
+      "name": "Yarrow",
+      "at": {
+        "x": -60,
+        "y": 60
+      },
+      "variant": 0,
+      "interact": "Gather yarrow",
+      "item": "item.yarrow"
+    }
+  ],
+  "groves": [
+    {
+      "name": "The Old Orchard",
+      "kind": "orchard",
+      "center": {
+        "x": -55,
+        "y": 88
+      },
+      "size": {
+        "x": 34,
+        "y": 22
+      },
+      "count": 0
+    },
+    {
+      "name": "Harrow wood",
+      "kind": "broadleaf",
+      "center": {
+        "x": -100,
+        "y": 102
+      },
+      "size": {
+        "x": 40,
+        "y": 36
+      },
+      "count": 55
+    },
+    {
+      "name": "North pines",
+      "kind": "pine",
+      "center": {
+        "x": 40,
+        "y": 110
+      },
+      "size": {
+        "x": 70,
+        "y": 24
+      },
+      "count": 45
+    },
+    {
+      "name": "South copse",
+      "kind": "broadleaf",
+      "center": {
+        "x": -95,
+        "y": -102
+      },
+      "size": {
+        "x": 40,
+        "y": 30
+      },
+      "count": 35
+    },
+    {
+      "name": "Grey-edge copse",
+      "kind": "broadleaf",
+      "center": {
+        "x": 62,
+        "y": -18
+      },
+      "size": {
+        "x": 16,
+        "y": 16
+      },
+      "count": 12
+    }
+  ],
+  "life": {
+    "villagers": 20,
+    "mood": "wary",
+    "critters": [
+      {
+        "kind": "chicken",
+        "center": {
+          "x": -89,
+          "y": 54
+        },
+        "radius": 5,
+        "count": 6
+      },
+      {
+        "kind": "chicken",
+        "center": {
+          "x": -60,
+          "y": 21
+        },
+        "radius": 5,
+        "count": 4
+      },
+      {
+        "kind": "chicken",
+        "center": {
+          "x": 67,
+          "y": -99
+        },
+        "radius": 5,
+        "count": 4
+      },
+      {
+        "kind": "rabbit",
+        "center": {
+          "x": -100,
+          "y": 28
+        },
+        "radius": 22,
+        "count": 6
+      },
+      {
+        "kind": "rabbit",
+        "center": {
+          "x": 20,
+          "y": -75
+        },
+        "radius": 20,
+        "count": 5
+      },
+      {
+        "kind": "rabbit",
+        "center": {
+          "x": -40,
+          "y": 110
+        },
+        "radius": 18,
+        "count": 4
+      },
+      {
+        "kind": "crow",
+        "center": {
+          "x": -48,
+          "y": -14
+        },
+        "radius": 12,
+        "count": 5
+      },
+      {
+        "kind": "crow",
+        "center": {
+          "x": 24,
+          "y": 52
+        },
+        "radius": 10,
+        "count": 5
+      },
+      {
+        "kind": "crow",
+        "center": {
+          "x": 70,
+          "y": 40
+        },
+        "radius": 14,
+        "count": 4
+      },
+      {
+        "kind": "deer",
+        "center": {
+          "x": -96,
+          "y": 88
+        },
+        "radius": 16,
+        "count": 3
+      },
+      {
+        "kind": "deer",
+        "center": {
+          "x": 30,
+          "y": 98
+        },
+        "radius": 18,
+        "count": 3
+      },
+      {
+        "kind": "sheep",
+        "center": {
+          "x": -100,
+          "y": -20
+        },
+        "radius": 9,
+        "count": 7
+      },
+      {
+        "kind": "cat",
+        "center": {
+          "x": 0,
+          "y": -18
+        },
+        "radius": 14,
+        "count": 3
+      }
+    ],
+    "residents": [
+      {
+        "name": "Quill",
+        "role": "stranger",
+        "title": "Salt-Mender",
+        "place": "inn"
+      },
+      {
+        "name": "Warden Ivel",
+        "role": "warden",
+        "title": "Preservationist Warden",
+        "at": {
+          "x": -80,
+          "y": 83
+        }
+      }
+    ]
+  },
+  "camps": [
+    {
+      "name": "Harrow wood wolves",
+      "mob": "Grey wolf",
+      "tag": "wolf",
+      "look": "wolf",
+      "canonStatus": "GAME-ONLY",
+      "center": {
+        "x": -106,
+        "y": 108
+      },
+      "radius": 9,
+      "count": 4,
+      "levelMin": 1,
+      "levelMax": 2,
+      "respawn": 75
+    },
+    {
+      "name": "South copse boars",
+      "mob": "Wild boar",
+      "tag": "boar",
+      "look": "boar",
+      "canonStatus": "GAME-ONLY",
+      "center": {
+        "x": -96,
+        "y": -104
+      },
+      "radius": 10,
+      "count": 4,
+      "levelMin": 1,
+      "levelMax": 2,
+      "respawn": 75
+    },
+    {
+      "name": "North pines wolves",
+      "mob": "Grey wolf",
+      "tag": "wolf",
+      "look": "wolf",
+      "canonStatus": "GAME-ONLY",
+      "center": {
+        "x": 48,
+        "y": 106
+      },
+      "radius": 9,
+      "count": 4,
+      "levelMin": 2,
+      "levelMax": 2,
+      "respawn": 75
+    },
+    {
+      "name": "Tall-grass stalkers",
+      "mob": "Grey wolf",
+      "tag": "wolf",
+      "look": "wolf",
+      "center": {
+        "x": 6,
+        "y": -108
+      },
+      "radius": 9,
+      "count": 4,
+      "levelMin": 1,
+      "levelMax": 2,
+      "respawn": 75,
+      "ambush": true,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "Brookside boars",
+      "mob": "Wild boar",
+      "tag": "boar",
+      "look": "boar",
+      "center": {
+        "x": 76,
+        "y": -56
+      },
+      "radius": 9,
+      "count": 4,
+      "levelMin": 2,
+      "levelMax": 2,
+      "respawn": 75,
+      "canonStatus": "GAME-ONLY"
+    }
+  ],
+  "lakes": [
+    {
+      "name": "Brook pond",
+      "center": {
+        "x": 36,
+        "y": -82
+      },
+      "radius": 9,
+      "depth": 2.8
+    }
+  ],
+  "tallGrass": [
+    {
+      "name": "North meadow",
+      "center": {
+        "x": -42,
+        "y": 108
+      },
+      "radius": 10
+    }
+  ]
+}

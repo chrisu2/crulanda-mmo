@@ -1,0 +1,1473 @@
+{
+  "id": "zone.khaven",
+  "displayName": "Khaven Village",
+  "subtitle": "A walled village of gallows and crypts beside the Whispering Wood",
+  "canonStatus": "CANON-EXPANDED",
+  "canonNote": "Canon (Khaven Village map): walled village with the Cracked Hearth, two Fallen Smithies, the Blood-Stone Well, the Gallows Tree and the Crypt-Keeper's Hovel; the Whispering Wood to the west, Gloom Creek, and the Carrion Cliffs. GAME-ONLY / PROVISIONAL: the Sandthrone outriders holding it, the Pale watcher at the crypt, the crypt itself, road links to Oakhaven and all exact placement. Also GAME-ONLY: the wilderness beyond the walls (the deep Whispering Wood, the north road to the Peaks, the drowned graveyard and creek barrow), the levelling camps, and the residents Wenna Coyle, Ansel Morrow and Cato Brisk. Hollow Men are a CANON creature (book1 ch.4); their presence here is GAME-ONLY.",
+  "size": 240,
+  "levelMin": 3,
+  "levelMax": 5,
+  "biome": "meadow",
+  "worldMapPosition": {
+    "x": 0.605,
+    "y": 0.665
+  },
+  "worldMapNote": "Position provisional: canon gives no location; placed west of Oakhaven because the roads connect.",
+  "flatRadius": 40,
+  "hillHeight": 2.6,
+  "seed": 4410,
+  "waterTint": "#1C2624",
+  "lighting": {
+    "sunPitch": 11,
+    "sunYaw": -62,
+    "sunIntensity": 0.85,
+    "sunColor": "#E09068",
+    "ambientSky": "#5E6470",
+    "ambientEquator": "#5A4F4A",
+    "ambientGround": "#2A2522",
+    "fogColor": "#5F5A57",
+    "fogStart": 30,
+    "fogEnd": 120
+  },
+  "spawns": {
+    "player": {
+      "x": -50,
+      "y": -44
+    },
+    "playerFacing": 40,
+    "companion": {
+      "x": -20,
+      "y": -8
+    },
+    "recovery": {
+      "x": -19,
+      "y": -6
+    },
+    "leash": 16,
+    "enemies": [
+      {
+        "id": "khaven.outrider.0",
+        "name": "Sandthrone outrider",
+        "look": "outrider",
+        "at": {
+          "x": 0,
+          "y": -5
+        },
+        "level": 4
+      },
+      {
+        "id": "khaven.outrider.1",
+        "name": "Sandthrone outrider",
+        "look": "outrider",
+        "at": {
+          "x": -34,
+          "y": -20
+        },
+        "level": 4
+      },
+      {
+        "id": "khaven.pale.0",
+        "name": "Pale watcher",
+        "look": "pale",
+        "at": {
+          "x": 34,
+          "y": -27
+        },
+        "veteran": true,
+        "level": 5
+      }
+    ]
+  },
+  "objectives": [
+    "Keep Mira at your side [E]",
+    "Break the Sandthrone hold",
+    "Arm yourself with a recovered blade [I]"
+  ],
+  "exits": [
+    {
+      "to": "zone.oakhaven",
+      "name": "Gloom road to Oakhaven",
+      "at": {
+        "x": -96.5,
+        "y": -112
+      },
+      "arrive": {
+        "x": -113,
+        "y": 13
+      },
+      "radius": 5
+    },
+    {
+      "to": "zone.peaks",
+      "name": "North road to the Shattered Peaks",
+      "at": {
+        "x": -11,
+        "y": 113
+      },
+      "arrive": {
+        "x": -88,
+        "y": -114
+      },
+      "radius": 5
+    }
+  ],
+  "clearings": [
+    {
+      "name": "Well square",
+      "center": {
+        "x": 0,
+        "y": 0
+      },
+      "radius": 10
+    },
+    {
+      "name": "Gate yard",
+      "center": {
+        "x": -21,
+        "y": -9
+      },
+      "radius": 6
+    },
+    {
+      "name": "Crypt ground",
+      "center": {
+        "x": 34,
+        "y": -24
+      },
+      "radius": 8
+    },
+    {
+      "name": "Outrider camp",
+      "center": {
+        "x": 30,
+        "y": 90
+      },
+      "radius": 7
+    },
+    {
+      "name": "Drowned graveyard",
+      "center": {
+        "x": 6,
+        "y": -96
+      },
+      "radius": 6
+    }
+  ],
+  "roads": [
+    {
+      "name": "Gate road",
+      "width": 4.5,
+      "points": [
+        {
+          "x": 0,
+          "y": 0
+        },
+        {
+          "x": -25.7,
+          "y": -10.3
+        },
+        {
+          "x": -45,
+          "y": -30
+        },
+        {
+          "x": -60,
+          "y": -55
+        },
+        {
+          "x": -74,
+          "y": -76
+        },
+        {
+          "x": -88,
+          "y": -96
+        },
+        {
+          "x": -100,
+          "y": -118
+        }
+      ]
+    },
+    {
+      "name": "Crypt path",
+      "width": 3,
+      "points": [
+        {
+          "x": 12,
+          "y": -6
+        },
+        {
+          "x": 20,
+          "y": -26
+        },
+        {
+          "x": 30,
+          "y": -26
+        }
+      ]
+    },
+    {
+      "name": "North road",
+      "width": 4,
+      "points": [
+        {
+          "x": -35.4,
+          "y": -20.2
+        },
+        {
+          "x": -40,
+          "y": -6
+        },
+        {
+          "x": -40,
+          "y": 10
+        },
+        {
+          "x": -36,
+          "y": 28
+        },
+        {
+          "x": -28,
+          "y": 46
+        },
+        {
+          "x": -20,
+          "y": 66
+        },
+        {
+          "x": -14,
+          "y": 90
+        },
+        {
+          "x": -10,
+          "y": 120
+        }
+      ]
+    }
+  ],
+  "water": [
+    {
+      "name": "Gloom Creek",
+      "width": 4,
+      "points": [
+        {
+          "x": -122,
+          "y": -6
+        },
+        {
+          "x": -94,
+          "y": -12
+        },
+        {
+          "x": -66,
+          "y": -24
+        },
+        {
+          "x": -48,
+          "y": -38
+        },
+        {
+          "x": -30,
+          "y": -50
+        },
+        {
+          "x": -10,
+          "y": -58
+        },
+        {
+          "x": 20,
+          "y": -66
+        },
+        {
+          "x": 48,
+          "y": -78
+        },
+        {
+          "x": 80,
+          "y": -84
+        },
+        {
+          "x": 122,
+          "y": -92
+        }
+      ]
+    }
+  ],
+  "groves": [
+    {
+      "name": "The Whispering Wood",
+      "kind": "dead",
+      "center": {
+        "x": -50,
+        "y": 14
+      },
+      "size": {
+        "x": 26,
+        "y": 86
+      },
+      "count": 75
+    },
+    {
+      "name": "North pines",
+      "kind": "pine",
+      "center": {
+        "x": 8,
+        "y": 52
+      },
+      "size": {
+        "x": 100,
+        "y": 16
+      },
+      "count": 34
+    },
+    {
+      "name": "Cliffside scrub",
+      "kind": "dead",
+      "center": {
+        "x": 50,
+        "y": 5
+      },
+      "size": {
+        "x": 20,
+        "y": 50
+      },
+      "count": 22
+    },
+    {
+      "name": "Deep Whispering Wood",
+      "kind": "dead",
+      "center": {
+        "x": -88,
+        "y": 36
+      },
+      "size": {
+        "x": 36,
+        "y": 60
+      },
+      "count": 60
+    },
+    {
+      "name": "Gloom thicket",
+      "kind": "dead",
+      "center": {
+        "x": -94,
+        "y": -68
+      },
+      "size": {
+        "x": 24,
+        "y": 28
+      },
+      "count": 22
+    },
+    {
+      "name": "Ridge pines",
+      "kind": "pine",
+      "center": {
+        "x": 78,
+        "y": 68
+      },
+      "size": {
+        "x": 36,
+        "y": 36
+      },
+      "count": 30
+    },
+    {
+      "name": "Carrion scrub",
+      "kind": "dead",
+      "center": {
+        "x": 88,
+        "y": -10
+      },
+      "size": {
+        "x": 24,
+        "y": 36
+      },
+      "count": 18
+    },
+    {
+      "name": "Gloom alders",
+      "kind": "broadleaf",
+      "center": {
+        "x": -40,
+        "y": -92
+      },
+      "size": {
+        "x": 36,
+        "y": 20
+      },
+      "count": 20
+    }
+  ],
+  "landmarks": [
+    {
+      "name": "Blood-Stone Well",
+      "text": "Scrubbed every morning. Still red by noon.",
+      "at": {
+        "x": -2,
+        "y": 2
+      },
+      "radius": 6
+    },
+    {
+      "name": "The Gallows Tree",
+      "text": "Nobody remembers who planted it. Everyone remembers who hung there.",
+      "at": {
+        "x": 11,
+        "y": 3
+      },
+      "radius": 6
+    },
+    {
+      "name": "The Cracked Hearth",
+      "text": "The fire has not gone out in living memory.",
+      "at": {
+        "x": -12,
+        "y": 15
+      },
+      "radius": 8
+    },
+    {
+      "name": "The Whispering Wood",
+      "text": "Grey trunks that talk when the wind stops.",
+      "at": {
+        "x": -50,
+        "y": 14
+      },
+      "radius": 20
+    },
+    {
+      "name": "The north road",
+      "text": "Hoofprints, baked hard, going north toward the Peaks.",
+      "at": {
+        "x": -38,
+        "y": 30
+      },
+      "radius": 10
+    },
+    {
+      "name": "Deep Whispering Wood",
+      "text": "Past the walls the grey trunks crowd close enough to touch.",
+      "at": {
+        "x": -88,
+        "y": 36
+      },
+      "radius": 18
+    },
+    {
+      "name": "Carrion Cliffs",
+      "text": "Something always circles overhead.",
+      "at": {
+        "x": 70,
+        "y": -40
+      },
+      "radius": 12
+    },
+    {
+      "name": "Drowned graveyard",
+      "text": "When the creek floods, it takes the low graves.",
+      "at": {
+        "x": 6,
+        "y": -96
+      },
+      "radius": 10
+    },
+    {
+      "name": "Creek barrow",
+      "text": "Old Hobb Garner asked to be buried with his spade.",
+      "at": {
+        "x": 44,
+        "y": -100
+      },
+      "radius": 8
+    },
+    {
+      "name": "Outrider camp",
+      "text": "Sandthrone tents of a sort, and everything they 'tolled' off Khaven.",
+      "at": {
+        "x": 30,
+        "y": 90
+      },
+      "radius": 10
+    }
+  ],
+  "props": [
+    {
+      "kind": "wall",
+      "name": "Khaven wall",
+      "points": [
+        {
+          "x": -27.8,
+          "y": -5.3
+        },
+        {
+          "x": -30,
+          "y": 0
+        },
+        {
+          "x": -21.2,
+          "y": 21.2
+        },
+        {
+          "x": 0,
+          "y": 30
+        },
+        {
+          "x": 21.2,
+          "y": 21.2
+        },
+        {
+          "x": 30,
+          "y": 0
+        },
+        {
+          "x": 21.2,
+          "y": -21.2
+        },
+        {
+          "x": 0,
+          "y": -30
+        },
+        {
+          "x": -21.2,
+          "y": -21.2
+        },
+        {
+          "x": -23.7,
+          "y": -15.3
+        }
+      ]
+    },
+    {
+      "kind": "tower",
+      "name": "Gate tower (north)",
+      "at": {
+        "x": -28.6,
+        "y": -3.2
+      },
+      "size": {
+        "x": 4.6
+      }
+    },
+    {
+      "kind": "tower",
+      "name": "Gate tower (south)",
+      "at": {
+        "x": -22.8,
+        "y": -17.2
+      },
+      "size": {
+        "x": 4.6
+      }
+    },
+    {
+      "kind": "tower",
+      "at": {
+        "x": 21.2,
+        "y": 21.2
+      },
+      "size": {
+        "x": 4
+      }
+    },
+    {
+      "kind": "tower",
+      "at": {
+        "x": 21.2,
+        "y": -21.2
+      },
+      "size": {
+        "x": 4
+      }
+    },
+    {
+      "kind": "inn",
+      "name": "The Cracked Hearth",
+      "at": {
+        "x": -12,
+        "y": 15
+      },
+      "rotation": 321,
+      "size": {
+        "x": 11,
+        "y": 7
+      },
+      "variant": 1
+    },
+    {
+      "kind": "ruined_house",
+      "name": "Fallen Smithy",
+      "at": {
+        "x": 10,
+        "y": 19
+      },
+      "rotation": 28,
+      "size": {
+        "x": 8,
+        "y": 6
+      }
+    },
+    {
+      "kind": "ruined_house",
+      "name": "Fallen Smithy (west)",
+      "at": {
+        "x": -18,
+        "y": 2
+      },
+      "rotation": 276,
+      "size": {
+        "x": 7,
+        "y": 5
+      }
+    },
+    {
+      "kind": "well",
+      "name": "Blood-Stone Well",
+      "at": {
+        "x": -2,
+        "y": 2
+      },
+      "variant": 1
+    },
+    {
+      "kind": "gallows",
+      "name": "The Gallows Tree",
+      "at": {
+        "x": 11,
+        "y": 3
+      },
+      "rotation": 200
+    },
+    {
+      "kind": "house",
+      "name": "Crypt-Keeper's Hovel",
+      "at": {
+        "x": 21,
+        "y": 7
+      },
+      "rotation": 72,
+      "size": {
+        "x": 6,
+        "y": 5
+      },
+      "variant": 3
+    },
+    {
+      "kind": "house",
+      "at": {
+        "x": -4,
+        "y": -16
+      },
+      "rotation": 195,
+      "size": {
+        "x": 7,
+        "y": 5
+      },
+      "variant": 1
+    },
+    {
+      "kind": "house",
+      "at": {
+        "x": 11,
+        "y": -14
+      },
+      "rotation": 144,
+      "size": {
+        "x": 6.5,
+        "y": 5
+      },
+      "variant": 3
+    },
+    {
+      "kind": "house",
+      "at": {
+        "x": -12,
+        "y": -19
+      },
+      "rotation": 214,
+      "size": {
+        "x": 6,
+        "y": 4.5
+      },
+      "variant": 4
+    },
+    {
+      "kind": "house",
+      "at": {
+        "x": 3,
+        "y": 22
+      },
+      "rotation": 8,
+      "size": {
+        "x": 6,
+        "y": 4.5
+      },
+      "variant": 1
+    },
+    {
+      "kind": "crypt",
+      "name": "The Old Crypt",
+      "at": {
+        "x": 38,
+        "y": -21
+      },
+      "rotation": 120
+    },
+    {
+      "kind": "grave",
+      "at": {
+        "x": 30,
+        "y": -30
+      }
+    },
+    {
+      "kind": "grave",
+      "at": {
+        "x": 32.5,
+        "y": -31
+      }
+    },
+    {
+      "kind": "grave",
+      "at": {
+        "x": 35,
+        "y": -32
+      }
+    },
+    {
+      "kind": "grave",
+      "at": {
+        "x": 28,
+        "y": -33
+      }
+    },
+    {
+      "kind": "grave",
+      "at": {
+        "x": 31,
+        "y": -34.5
+      }
+    },
+    {
+      "kind": "grave",
+      "at": {
+        "x": 42,
+        "y": -30
+      }
+    },
+    {
+      "kind": "cliff",
+      "name": "Carrion Cliffs",
+      "at": {
+        "x": 44,
+        "y": -40
+      },
+      "rotation": -20,
+      "size": {
+        "x": 40
+      }
+    },
+    {
+      "kind": "cliff",
+      "name": "Carrion Cliffs (east)",
+      "at": {
+        "x": 58,
+        "y": -18
+      },
+      "rotation": -75,
+      "size": {
+        "x": 24
+      }
+    },
+    {
+      "kind": "bridge",
+      "name": "Gloom bridge",
+      "at": {
+        "x": -49.6,
+        "y": -36.5
+      },
+      "rotation": 217,
+      "size": {
+        "x": 11
+      }
+    },
+    {
+      "kind": "barrels",
+      "at": {
+        "x": -7,
+        "y": 12
+      },
+      "variant": 2
+    },
+    {
+      "kind": "crates",
+      "at": {
+        "x": 6,
+        "y": 15
+      },
+      "rotation": 30,
+      "variant": 2
+    },
+    {
+      "kind": "cart",
+      "at": {
+        "x": -16,
+        "y": -7
+      },
+      "rotation": 110
+    },
+    {
+      "kind": "lamp",
+      "at": {
+        "x": -4,
+        "y": 7
+      },
+      "rotation": 180,
+      "variant": 1
+    },
+    {
+      "kind": "lamp",
+      "at": {
+        "x": -19,
+        "y": -12
+      },
+      "rotation": 60,
+      "variant": 1
+    },
+    {
+      "kind": "signpost",
+      "at": {
+        "x": -40,
+        "y": -26
+      },
+      "rotation": 45
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -36,
+        "y": -40
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 18,
+        "y": -48
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 48,
+        "y": -52
+      },
+      "variant": 2
+    },
+    {
+      "kind": "crates",
+      "name": "Outrider saddlebags",
+      "at": {
+        "x": -30,
+        "y": -26
+      },
+      "rotation": 20,
+      "variant": 1,
+      "interact": "Search the outriders' saddlebags",
+      "item": "item.small_shackle",
+      "once": true
+    },
+    {
+      "kind": "stall",
+      "name": "Chandler's stall",
+      "at": {
+        "x": 19,
+        "y": -9
+      },
+      "rotation": 90,
+      "variant": 1
+    },
+    {
+      "kind": "signpost",
+      "at": {
+        "x": -43,
+        "y": -14
+      },
+      "rotation": 90
+    },
+    {
+      "kind": "signpost",
+      "at": {
+        "x": -6,
+        "y": 102
+      },
+      "rotation": 0
+    },
+    {
+      "kind": "herb",
+      "name": "Mourner's cap",
+      "at": {
+        "x": -104,
+        "y": -2
+      },
+      "variant": 1,
+      "interact": "Pick mourner's cap",
+      "item": "item.mourners_cap"
+    },
+    {
+      "kind": "herb",
+      "name": "Mourner's cap",
+      "at": {
+        "x": -80,
+        "y": -11
+      },
+      "variant": 1,
+      "interact": "Pick mourner's cap",
+      "item": "item.mourners_cap"
+    },
+    {
+      "kind": "herb",
+      "name": "Mourner's cap",
+      "at": {
+        "x": -56,
+        "y": -24
+      },
+      "variant": 1,
+      "interact": "Pick mourner's cap",
+      "item": "item.mourners_cap"
+    },
+    {
+      "kind": "herb",
+      "name": "Mourner's cap",
+      "at": {
+        "x": -40,
+        "y": -52
+      },
+      "variant": 1,
+      "interact": "Pick mourner's cap",
+      "item": "item.mourners_cap"
+    },
+    {
+      "kind": "herb",
+      "name": "Mourner's cap",
+      "at": {
+        "x": -24,
+        "y": -45
+      },
+      "variant": 1,
+      "interact": "Pick mourner's cap",
+      "item": "item.mourners_cap"
+    },
+    {
+      "kind": "herb",
+      "name": "Mourner's cap",
+      "at": {
+        "x": 0,
+        "y": -54
+      },
+      "variant": 1,
+      "interact": "Pick mourner's cap",
+      "item": "item.mourners_cap"
+    },
+    {
+      "kind": "herb",
+      "name": "Mourner's cap",
+      "at": {
+        "x": 30,
+        "y": -62
+      },
+      "variant": 1,
+      "interact": "Pick mourner's cap",
+      "item": "item.mourners_cap"
+    },
+    {
+      "kind": "crates",
+      "name": "Stolen goods crate",
+      "at": {
+        "x": 22,
+        "y": 97
+      },
+      "rotation": 15,
+      "variant": 2,
+      "interact": "Take back Khaven's goods",
+      "item": "item.khaven_goods",
+      "once": true
+    },
+    {
+      "kind": "crates",
+      "name": "Stolen goods crate",
+      "at": {
+        "x": 39,
+        "y": 84
+      },
+      "rotation": 70,
+      "variant": 1,
+      "interact": "Take back Khaven's goods",
+      "item": "item.khaven_goods",
+      "once": true
+    },
+    {
+      "kind": "crates",
+      "name": "Stolen goods crate",
+      "at": {
+        "x": 24,
+        "y": 82
+      },
+      "rotation": 40,
+      "variant": 0,
+      "interact": "Take back Khaven's goods",
+      "item": "item.khaven_goods",
+      "once": true
+    },
+    {
+      "kind": "cart",
+      "name": "Outrider cart",
+      "at": {
+        "x": 40,
+        "y": 96
+      },
+      "rotation": 30
+    },
+    {
+      "kind": "barrels",
+      "at": {
+        "x": 20,
+        "y": 89
+      },
+      "variant": 2
+    },
+    {
+      "kind": "lamp",
+      "at": {
+        "x": 31,
+        "y": 94
+      },
+      "rotation": 200,
+      "variant": 1
+    },
+    {
+      "kind": "grave",
+      "at": {
+        "x": 0,
+        "y": -98
+      }
+    },
+    {
+      "kind": "grave",
+      "at": {
+        "x": 3,
+        "y": -100
+      }
+    },
+    {
+      "kind": "grave",
+      "at": {
+        "x": 8,
+        "y": -99
+      }
+    },
+    {
+      "kind": "grave",
+      "at": {
+        "x": 11,
+        "y": -97
+      }
+    },
+    {
+      "kind": "grave",
+      "at": {
+        "x": 4,
+        "y": -104
+      }
+    },
+    {
+      "kind": "grave",
+      "at": {
+        "x": 9,
+        "y": -103
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "Drowned chapel wall",
+      "at": {
+        "x": 16,
+        "y": -104
+      },
+      "rotation": 10,
+      "size": {
+        "x": 7,
+        "y": 0
+      }
+    },
+    {
+      "kind": "crypt",
+      "name": "Creek barrow",
+      "at": {
+        "x": 44,
+        "y": -100
+      },
+      "rotation": 160
+    },
+    {
+      "kind": "cliff",
+      "name": "Carrion Cliffs (far)",
+      "at": {
+        "x": 100,
+        "y": -40
+      },
+      "rotation": 80,
+      "size": {
+        "x": 36,
+        "y": 0
+      }
+    },
+    {
+      "kind": "cliff",
+      "name": "Carrion Cliffs (low)",
+      "at": {
+        "x": 72,
+        "y": -66
+      },
+      "rotation": 15,
+      "size": {
+        "x": 22,
+        "y": 0
+      }
+    },
+    {
+      "kind": "cliff",
+      "name": "Grey scarp",
+      "at": {
+        "x": -92,
+        "y": 94
+      },
+      "rotation": 30,
+      "size": {
+        "x": 30,
+        "y": 0
+      }
+    },
+    {
+      "kind": "cliff",
+      "name": "North ridge",
+      "at": {
+        "x": 44,
+        "y": 104
+      },
+      "rotation": -5,
+      "size": {
+        "x": 30,
+        "y": 0
+      }
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -70,
+        "y": -104
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -104,
+        "y": -40
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -60,
+        "y": 88
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -30,
+        "y": 96
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 60,
+        "y": 30
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 74,
+        "y": 46
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 96,
+        "y": 12
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 92,
+        "y": -72
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 62,
+        "y": -94
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -28,
+        "y": -100
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 84,
+        "y": 88
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -100,
+        "y": 62
+      },
+      "variant": 2
+    }
+  ],
+  "life": {
+    "villagers": 6,
+    "mood": "afraid",
+    "critters": [
+      {
+        "kind": "crow",
+        "center": {
+          "x": 11,
+          "y": 3
+        },
+        "radius": 8,
+        "count": 5
+      },
+      {
+        "kind": "crow",
+        "center": {
+          "x": 34,
+          "y": -30
+        },
+        "radius": 10,
+        "count": 4
+      },
+      {
+        "kind": "rabbit",
+        "center": {
+          "x": -50,
+          "y": -20
+        },
+        "radius": 15,
+        "count": 3
+      },
+      {
+        "kind": "cat",
+        "center": {
+          "x": 0,
+          "y": 5
+        },
+        "radius": 12,
+        "count": 2
+      },
+      {
+        "kind": "crow",
+        "center": {
+          "x": 70,
+          "y": -40
+        },
+        "radius": 12,
+        "count": 5
+      },
+      {
+        "kind": "crow",
+        "center": {
+          "x": 6,
+          "y": -96
+        },
+        "radius": 8,
+        "count": 3
+      },
+      {
+        "kind": "rabbit",
+        "center": {
+          "x": 60,
+          "y": 40
+        },
+        "radius": 14,
+        "count": 4
+      },
+      {
+        "kind": "rabbit",
+        "center": {
+          "x": -60,
+          "y": 80
+        },
+        "radius": 12,
+        "count": 3
+      },
+      {
+        "kind": "deer",
+        "center": {
+          "x": 70,
+          "y": 70
+        },
+        "radius": 14,
+        "count": 2
+      }
+    ],
+    "names": [
+      "Hollis Grane",
+      "Dorra Vey",
+      "Mattock Jenn",
+      "Siv Harl",
+      "Old Kestrel",
+      "Wynn Tabor",
+      "Brisa Thorn",
+      "Col Emmet"
+    ],
+    "residents": [
+      {
+        "name": "Wenna Coyle",
+        "role": "herbalist",
+        "title": "Hedge-Witch",
+        "at": {
+          "x": -15,
+          "y": -12
+        }
+      },
+      {
+        "name": "Ansel Morrow",
+        "role": "elder",
+        "title": "Crypt-Keeper",
+        "at": {
+          "x": 17,
+          "y": -2
+        }
+      },
+      {
+        "name": "Cato Brisk",
+        "role": "merchant",
+        "title": "Chandler",
+        "at": {
+          "x": 22,
+          "y": -9
+        }
+      }
+    ]
+  },
+  "camps": [
+    {
+      "name": "Whispering Wood wolves",
+      "mob": "Grey wolf",
+      "tag": "wolf",
+      "look": "wolf",
+      "canonStatus": "GAME-ONLY",
+      "center": {
+        "x": -86,
+        "y": 44
+      },
+      "radius": 10,
+      "count": 5,
+      "levelMin": 3,
+      "levelMax": 4,
+      "respawn": 75
+    },
+    {
+      "name": "Carrion boars",
+      "mob": "Carrion boar",
+      "tag": "boar",
+      "look": "boar",
+      "canonStatus": "GAME-ONLY",
+      "center": {
+        "x": 86,
+        "y": -44
+      },
+      "radius": 10,
+      "count": 4,
+      "levelMin": 3,
+      "levelMax": 4,
+      "respawn": 75,
+      "ambush": true
+    },
+    {
+      "name": "Sandthrone outrider camp",
+      "mob": "Sandthrone outrider",
+      "tag": "outrider",
+      "look": "outrider",
+      "canonStatus": "CANON faction (Sandthrone), GAME-ONLY camp",
+      "center": {
+        "x": 30,
+        "y": 90
+      },
+      "radius": 10,
+      "count": 4,
+      "levelMin": 4,
+      "levelMax": 5,
+      "respawn": 90
+    },
+    {
+      "name": "Gloom Creek hollows",
+      "mob": "Hollow Man",
+      "tag": "hollow",
+      "look": "hollow",
+      "canonStatus": "CANON creature (Hollow Men, book1 ch.4), GAME-ONLY placement",
+      "center": {
+        "x": 6,
+        "y": -90
+      },
+      "radius": 10,
+      "count": 4,
+      "levelMin": 5,
+      "levelMax": 5,
+      "respawn": 90
+    },
+    {
+      "name": "The Grey Sexton",
+      "mob": "The Grey Sexton",
+      "tag": "sexton",
+      "look": "hollow",
+      "canonStatus": "CANON creature (Hollow Man), GAME-ONLY character",
+      "center": {
+        "x": 38,
+        "y": -92
+      },
+      "radius": 5,
+      "count": 1,
+      "levelMin": 5,
+      "levelMax": 5,
+      "respawn": 240,
+      "elite": true
+    }
+  ]
+}

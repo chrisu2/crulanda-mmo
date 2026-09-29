@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6bf9496596443a6b473c068ce6c6509, type: 3}
+  m_Name: ZoneArt
+  m_EditorClassIdentifier: Crulanda.World::Crulanda.World.ZoneArt
+  ground: {fileID: 2100000, guid: 5e8a810f922d4a74a9eaa95171b7c2df, type: 2}
+  plaster: {fileID: 2100000, guid: 18cbc3777a9e6b94e9db4955f1f0ae14, type: 2}
+  timber: {fileID: 2100000, guid: 7a4d75bc87f510643a2fefea93ede4ba, type: 2}
+  thatch: {fileID: 2100000, guid: bc3e8e06109775c4abeb314d8c1c7e7c, type: 2}
+  slate: {fileID: 2100000, guid: 23b946193c6c77e4495c93ddd7b9fa72, type: 2}
+  stone: {fileID: 2100000, guid: f773cf6e9d3310b40be1ffe3e442e13d, type: 2}
+  bark: {fileID: 2100000, guid: 83bb866f203911242b43c2e46bbc5e84, type: 2}
+  foliage: {fileID: 2100000, guid: 014bbd0b3a7ea1141ab264252f8a1ffc, type: 2}
+  pine: {fileID: 2100000, guid: 2d855be76c7e18b4f99e827d36ecf168, type: 2}
+  soil: {fileID: 2100000, guid: c71076d429ff73c408af5a61214f97dd, type: 2}
+  hay: {fileID: 2100000, guid: 7882426e6f4038643be3f9472697b5dd, type: 2}
+  cloth: {fileID: 2100000, guid: 1e34c4f3e5404f84fb0a98648c4bdd9e, type: 2}
+  metal: {fileID: 2100000, guid: 4f801b206c3623a47873c3359478d5d7, type: 2}
+  glass: {fileID: 2100000, guid: 66f9d5337a2c75243b30fa3a8c5fb2e3, type: 2}
+  water: {fileID: 2100000, guid: 523d6e055035e724bae3c24f64ba11be, type: 2}
+  veil: {fileID: 2100000, guid: 85fd20ca57640e54882e77a8bd61ed98, type: 2}
+  ash: {fileID: 2100000, guid: 3530eb5f65c125e4db478304b4ade441, type: 2}
+  particle: {fileID: 2100000, guid: 5dea15a6491337b4aa02bda13c5ac726, type: 2}
+  skybox: {fileID: 2100000, guid: 1e5b84cdd285036478985c5373d9345f, type: 2}
+  grass:
+  - {fileID: 2100000, guid: f43ffd207a986b4459eb212074d83cbc, type: 2}
+  - {fileID: 2100000, guid: b9e046348aa634b4587ec4da9cb50c7b, type: 2}
+  - {fileID: 2100000, guid: df3bdc8232e72b04d8c2f73c3d1b1d79, type: 2}
+  flowers:
+  - {fileID: 2100000, guid: 504db067fbf339640b67fc87967c0235, type: 2}
+  - {fileID: 2100000, guid: a7b450e64624d694eaf7dcd24f088746, type: 2}
+  - {fileID: 2100000, guid: 0fd3f0de0799b3d428f9fe2423dcb145, type: 2}
+  worldMap: {fileID: 2800000, guid: bef170c91001ac948859ea63adef4f26, type: 3}

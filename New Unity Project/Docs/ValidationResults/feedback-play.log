@@ -1,0 +1,1065 @@
+VBCSCompilerPreWarmer: watching VBCSCompiler (PID 20896)
+VBCSCompilerPreWarmer: pre-warm launched (dotnet PID 37000)
+VBCSCompiler prewarm took 9.98 ms
+[Licensing::Module] Trying to connect to existing licensing client channel...
+Built from '6000.6/staging' branch; Version is '6000.6.3f1 (45d8eee7de74) revision 4577518'; Using compiler version '194234433'; Build Type 'Release'
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-chris" at "2026-09-29T00:18:12.8379725Z"
+OS: 'Windows 11  (10.0.26200) Professional' Language: 'en' Physical Memory: 48607 MB
+BatchMode: 1, IsHumanControllingUs: 0, StartBugReporterOnCrash: 0, Is64bit: 1
+System  architecture: x64
+Process architecture: x64
+Date: 2026-09-29T00:18:12Z
+
+COMMAND LINE ARGUMENTS:
+D:\unity\Hub\Editor\6000.6.3f1\Editor\Unity.exe
+-batchmode
+-nographics
+-projectPath
+C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation
+-runTests
+-testPlatform
+PlayMode
+-testResults
+C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\feedback-play-results.xml
+-logFile
+C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\feedback-play.log
+Successfully changed project path to: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation
+C:/Users/chris/Documents/Codex/2026-09-28/hel/work/encounter-validation
+[UnityMemory] Configuration Parameters - Can be set up in boot.config
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-nav-mesh-worker=65536"
+    "memorysetup-temp-allocator-size-audio-worker=65536"
+    "memorysetup-temp-allocator-size-cloud-worker=32768"
+    "memorysetup-temp-allocator-size-gfx=262144"
+    "memorysetup-remapper-allocator-initial-capacity=32768"
+    "memorysetup-temp-allocator-size-preload-manager=33554432"
+    "memorysetup-allocator-temp-initial-block-size-main=262144"
+    "memorysetup-allocator-temp-initial-block-size-worker=262144"
+    "memorysetup-temp-allocator-size-job-worker=262144"
+    "memorysetup-temp-allocator-size-background-worker=32768"
+    "memorysetup-bucket-allocator-granularity=16"
+    "memorysetup-bucket-allocator-bucket-count=8"
+    "memorysetup-bucket-allocator-block-size=33554432"
+    "memorysetup-bucket-allocator-block-count=8"
+    "memorysetup-main-allocator-block-size=16777216"
+    "memorysetup-thread-allocator-block-size=16777216"
+    "memorysetup-main-allocator-mimalloc-enabled=1"
+    "memorysetup-gfx-main-allocator-block-size=16777216"
+    "memorysetup-gfx-thread-allocator-block-size=16777216"
+    "memorysetup-cache-allocator-block-size=4194304"
+    "memorysetup-typetree-allocator-block-size=2097152"
+    "memorysetup-profiler-bucket-allocator-granularity=16"
+    "memorysetup-profiler-bucket-allocator-bucket-count=8"
+    "memorysetup-profiler-bucket-allocator-block-size=33554432"
+    "memorysetup-profiler-bucket-allocator-block-count=8"
+    "memorysetup-profiler-allocator-block-size=16777216"
+    "memorysetup-profiler-editor-allocator-block-size=1048576"
+    "memorysetup-temp-allocator-size-main=16777216"
+    "memorysetup-job-temp-allocator-block-size=2097152"
+    "memorysetup-job-temp-allocator-block-size-background=1048576"
+    "memorysetup-job-temp-allocator-reduction-small-platforms=262144"
+Logging is directed to a specific file, skipping project log.
+Player connection [10788]  Target information:
+
+Player connection [10788]  * "[IP] 192.168.1.88 [Port] 55505 [Flags] 2 [Guid] 845292216 [EditorId] 845292216 [Version] 1048832 [Id] WindowsEditor(7,DESKTOP-FGCDA1M) [Debug] 1 [PackageName] WindowsEditor [ProjectName] Editor" 
+
+Player connection [10788] Host joined multi-casting on [225.0.0.222:54997]...
+Player connection [10788] Host joined alternative multi-casting on [225.0.0.222:34997]...
+[Licensing::Client] Code 10 while verifying Licensing Client signature (process Id: 10556, path: "D:/unity/Hub/Editor/6000.6.3f1/Editor/Data/Resources/Licensing/Client/Unity.Licensing.Client.exe")
+[Licensing::Module] LicensingClient has failed validation; ignoring
+[Licensing::Client] Handshaking with LicensingClient:
+  Version:                 1.18.3+d7ffd15
+  Session Id:              d4425da4a22748668ffdc32456e00caa
+  Correlation Id:          79b3457515e094e3daf206b88a0906da
+  External correlation Id: 4730607024976542488
+  Machine Id:              iPmEOoldJizWyP4VF5z6xzr/VRM=
+[Licensing::Module] Successfully connected to LicensingClient on channel: "LicenseClient-chris" (connect: 0.00s, validation: 0.00s, handshake: 0.03s)
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-chris-notifications" at "2026-09-29T00:18:12.8669865Z"
+[Licensing::Module] Error: Access token is unavailable; failed to update
+Input System module state changed to: Initialized.
+[Licensing::Client] Successfully resolved entitlement details
+[Licensing::Module] License group:
+  Id: 304649-UnityPersXXXX
+  Product: Unity Personal
+  Type: Assigned
+  Expiration: Unlimited
+[Licensing::Client] Successfully updated license, isAsync: True, time: 0.00
+[Licensing::Module] Licensing Background thread has ended after 0.03s
+[Physics::Module] Initialized fallback backend.
+[Physics::Module] Id: 0xdecafbad
+[Package Manager] Connected to IPC stream "Upm-24676" after 0.2 seconds.
+[Licensing::Client] Successfully resolved entitlement details
+Library Redirect Path: Library/
+Launching Unity Data Store - D:/unity/Hub/Editor/6000.6.3f1/Editor/Data/Tools/Unity.DataStore.exe 
+Unity Data Store artifact dir = Library/DataStore, working dir = C:/Users/chris/Documents/Codex/2026-09-28/hel/work/encounter-validationUnity Data Store running and initialised
+[Physics::Module] Selected backend (deferred post-plugins).
+[Physics::Module] Name: PhysX
+[Physics::Module] Id: 0xf2b8ea05
+[Physics::Module] SDK Version: 4.1.2
+[Physics::Module] Integration Version: 1.0.0
+[Physics::Module] Threading Mode: Multi-Threaded
+Initialize engine version: 6000.6.3f1 (45d8eee7de74)
+[EntityIdStore] init: VM path (explicit commit), pageSize=4096, blockCount=1048576, entitiesPerBlock=256, slots reserved=4294967296 bytes
+[Subsystems] Discovering subsystems at path D:/unity/Hub/Editor/6000.6.3f1/Editor/Data/Resources/UnitySubsystems
+[Subsystems] Discovering subsystems at path C:/Users/chris/Documents/Codex/2026-09-28/hel/work/encounter-validation/Assets
+Forcing GfxDevice: Null
+GfxDevice: creating device client; kGfxThreadingModeNonThreaded
+NullGfxDevice:
+    Version:  NULL 1.0 [1.0]
+    Renderer: Null Device
+    Vendor:   Unity Technologies
+Initialize mono
+Mono path[0] = 'D:/unity/Hub/Editor/6000.6.3f1/Editor/Data/Managed'
+Mono path[1] = 'D:/unity/Hub/Editor/6000.6.3f1/Editor/Data/BCLExtensions/runtime/netstandard2.1'
+Mono path[2] = 'D:/unity/Hub/Editor/6000.6.3f1/Editor/Data/MonoBleedingEdge/lib/mono/unityjit-win32'
+Mono config path = 'D:/unity/Hub/Editor/6000.6.3f1/Editor/Data/MonoBleedingEdge/etc'
+Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56676
+CodeReloadManager initialized
+ImportWorker Server TCP listen port: 0
+AcceleratorClientConnectionCallback - disconnected - :0
+Begin MonoManager ReloadAssembly
+Registering precompiled unity dll's ...
+Register platform support module: D:/unity/Hub/Editor/6000.6.3f1/Editor/Data/PlaybackEngines/WindowsStandaloneSupport/UnityEditor.WindowsStandalone.Extensions.dll
+Registered in 0.001001 seconds.
+Native extension for WindowsStandalone target not found
+Package Manager log level set to [2]
+ScheduleIndexationOnStartup MainProcess:False IndexOnStartup:False
+Scripting: successfully reloaded assembly
+- Finished resetting the current domain, in  0.601 seconds
+Domain Reload Profiling: 1008ms
+	BeginReloadAssembly (116ms)
+		CreateAndSetChildDomain (8ms)
+	RebuildCommonClasses (4ms)
+	RebuildNativeTypeToScriptingClass (12ms)
+	initialDomainReloadingComplete (47ms)
+	LoadAllAssembliesAndSetupDomain (226ms)
+		LoadAssemblies (107ms)
+		TypeCache.Refresh (157ms)
+			TypeCache.ScanAssembly (146ms)
+		AnalyzeDomain (0ms)
+	FinalizeReload (602ms)
+		SetupLoadedEditorAssemblies (0ms)
+			BeforeProcessingInitializeOnLoad (88ms)
+			ProcessInitializeOnLoadAttributes (149ms)
+			ProcessInitializeOnLoadMethodAttributes (167ms)
+[Licensing::Client] Successfully resolved entitlement details
+Application.AssetDatabase Initial Refresh Start
+[Package Manager] Restoring resolved packages state from cache
+[Licensing::Client] Successfully resolved entitlement details
+[Package Manager] Registered 43 packages:
+  Packages from [https://packages.unity.com]:
+    com.unity.inputsystem@1.20.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.inputsystem@7a4e1a2a8194)
+    com.unity.ide.rider@3.0.38 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.ide.rider@1f60b3138684)
+    com.unity.ide.visualstudio@2.0.26 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.ide.visualstudio@a99d56dec63f)
+  Built-in packages:
+    com.unity.test-framework@1.8.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.test-framework@80f691d4262b)
+    com.unity.modules.accessibility@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.accessibility)
+    com.unity.modules.adaptiveperformance@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.adaptiveperformance)
+    com.unity.modules.ai@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.ai)
+    com.unity.modules.androidjni@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.androidjni)
+    com.unity.modules.animation@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.animation)
+    com.unity.modules.assetbundle@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.assetbundle)
+    com.unity.modules.audio@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.audio)
+    com.unity.modules.cloth@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.cloth)
+    com.unity.modules.director@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.director)
+    com.unity.modules.imageconversion@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.imageconversion)
+    com.unity.modules.imgui@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.imgui)
+    com.unity.modules.jsonserialize@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.jsonserialize)
+    com.unity.modules.particlesystem@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.particlesystem)
+    com.unity.modules.physics@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.physics)
+    com.unity.modules.physics2d@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.physics2d)
+    com.unity.modules.physicscore2d@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.physicscore2d)
+    com.unity.modules.screencapture@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.screencapture)
+    com.unity.modules.terrain@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.terrain)
+    com.unity.modules.terrainphysics@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.terrainphysics)
+    com.unity.modules.tetgen@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.tetgen)
+    com.unity.modules.tilemap@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.tilemap)
+    com.unity.modules.timelinefoundation@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.timelinefoundation)
+    com.unity.modules.ui@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.ui)
+    com.unity.modules.uielements@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.uielements)
+    com.unity.modules.umbra@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.umbra)
+    com.unity.modules.unityanalytics@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.unityanalytics)
+    com.unity.modules.unitywebrequest@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.unitywebrequest)
+    com.unity.modules.unitywebrequestassetbundle@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.unitywebrequestassetbundle)
+    com.unity.modules.unitywebrequestaudio@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.unitywebrequestaudio)
+    com.unity.modules.unitywebrequesttexture@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.unitywebrequesttexture)
+    com.unity.modules.unitywebrequestwww@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.unitywebrequestwww)
+    com.unity.modules.vectorgraphics@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.vectorgraphics)
+    com.unity.modules.vehicles@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.vehicles)
+    com.unity.modules.video@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.video)
+    com.unity.modules.wind@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.wind)
+    com.unity.modules.xr@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.xr)
+    com.unity.modules.subsystems@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.subsystems)
+    com.unity.modules.hierarchycore@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.hierarchycore)
+    com.unity.ext.nunit@2.1.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.ext.nunit@0198eae3b53e)
+[Subsystems] No new subsystems found in resolved package list.
+[Package Manager] Done registering packages in 0.01 seconds
+[ScriptCompilation] Requested script compilation because: AssetDatabase observed changes in script compilation related files
+Starting: D:\unity\Hub\Editor\6000.6.3f1\Editor\Data\Tools\BuildPipeline\bee_backend.exe --ipc --defer-dag-verification --dagfile="Library/Bee/1900b0aE.dag" --continue-on-failure --profile="Library/Bee/backend1.traceevents" ScriptAssemblies
+WorkingDir: C:/Users/chris/Documents/Codex/2026-09-28/hel/work/encounter-validation
+DisplayProgressbar: Compiling Scripts
+ExitCode: 0 Duration: 1s146ms
+[             ] Cannot trust contents of `Assets\Crulanda\Scripts\Core\Ids\ContentId.cs` because its timestamp is in the future. Any node with this file as input will rebuild until the timestamp of the file is no longer newer than local machine time.
+[302/371    0s] ILPP-Configuration Library/ilpp-configuration.nevergeneratedoutput
+[327/371    0s] Csc Library/Bee/artifacts/1900b0aE.dag/Crulanda.Core.dll (+2 others)
+Assets\Crulanda\Scripts\Core\Logging\CrulandaLog.cs(172,21): warning UAC0009: DEVELOPMENT_BUILD preprocessor directive has been deprecated. Please use one of the managed code variant directives (such as DEBUG, UNITY_ENABLE_CHECKS or UNITY_INCLUDE_INSTRUMENTATION) if different code paths are desired for different managed code variants. Checking for development build is possible at runtime using Debug.isDebugBuild. See the Conditional Compilation manual page for more details.
+[             ] Cannot trust contents of `Assets\Crulanda\Scripts\Persistence\SaveEnvelope.cs` because its timestamp is in the future. Any node with this file as input will rebuild until the timestamp of the file is no longer newer than local machine time.
+[             ] Cannot trust contents of `Assets\Crulanda\Scripts\Data\ActorArchetypeDefinition.cs` because its timestamp is in the future. Any node with this file as input will rebuild until the timestamp of the file is no longer newer than local machine time.
+[331/371    0s] Csc Library/Bee/artifacts/1900b0aE.dag/Crulanda.Persistence.dll (+2 others)
+[335/371    0s] Csc Library/Bee/artifacts/1900b0aE.dag/Crulanda.Data.dll (+2 others)
+[             ] Cannot trust contents of `Assets\Crulanda\Scripts\Gameplay\Actors\ActorEvents.cs` because its timestamp is in the future. Any node with this file as input will rebuild until the timestamp of the file is no longer newer than local machine time.
+[339/371    0s] Csc Library/Bee/artifacts/1900b0aE.dag/Crulanda.Gameplay.dll (+2 others)
+[             ] Cannot trust contents of `Assets\Crulanda\Scripts\DevTools\DevConsole.cs` because its timestamp is in the future. Any node with this file as input will rebuild until the timestamp of the file is no longer newer than local machine time.
+[347/371    0s] Csc Library/Bee/artifacts/1900b0aE.dag/Crulanda.DevTools.dll (+2 others)
+[             ] Cannot trust contents of `Assets\Crulanda\Scripts\Game\GameBootstrap.cs` because its timestamp is in the future. Any node with this file as input will rebuild until the timestamp of the file is no longer newer than local machine time.
+[351/371    0s] Csc Library/Bee/artifacts/1900b0aE.dag/Crulanda.Encounter.dll (+2 others)
+Assets\Crulanda\Scripts\Encounter\EncounterNavigation.cs(19,70): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+
+Assets\Crulanda\Scripts\Encounter\EncounterNavigation.cs(19,38): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+[             ] Cannot trust contents of `Assets\Crulanda\Tests\EditMode\ContentRegistryTests.cs` because its timestamp is in the future. Any node with this file as input will rebuild until the timestamp of the file is no longer newer than local machine time.
+[352/371    0s] Csc Library/Bee/artifacts/1900b0aE.dag/Crulanda.Game.dll (+2 others)
+[             ] Cannot trust contents of `Assets\Crulanda\Editor\ContentValidator.cs` because its timestamp is in the future. Any node with this file as input will rebuild until the timestamp of the file is no longer newer than local machine time.
+[356/371    0s] ILPostProcess Library/Bee/artifacts/1900b0aE.dag/post-processed/Crulanda.Encounter.dll (+pdb)
+Processing assembly Library/Bee/artifacts/1900b0aE.dag/Crulanda.Encounter.dll, with 149 defines and 296 references
+
+processors: zzzUnity.Burst.CodeGen.BurstILPostProcessor
+
+1 processor(s) skipped this assembly
+[357/371    0s] CopyFiles Library/ScriptAssemblies/Crulanda.Encounter.pdb
+[358/371    0s] Csc Library/Bee/artifacts/1900b0aE.dag/Crulanda.Tests.PlayMode.dll (+2 others)
+Assets\Crulanda\Tests\PlayMode\EncounterLoopTests.cs(27,23): warning CS0618: 'Object.FindFirstObjectByType<T>()' is obsolete: 'FindFirstObjectByType has been deprecated because it relies on instance ID ordering. Use FindAnyObjectByType instead, which does not depend on ordering.'
+
+Assets\Crulanda\Tests\PlayMode\EncounterLoopTests.cs(32,13): warning CS0618: 'Object.FindFirstObjectByType<T>()' is obsolete: 'FindFirstObjectByType has been deprecated because it relies on instance ID ordering. Use FindAnyObjectByType instead, which does not depend on ordering.'
+[359/371    0s] CopyFiles Library/ScriptAssemblies/Crulanda.Encounter.dll
+[360/371    0s] Csc Library/Bee/artifacts/1900b0aE.dag/Crulanda.Tests.EditMode.dll (+2 others)
+[361/371    0s] Csc Library/Bee/artifacts/1900b0aE.dag/Crulanda.Editor.dll (+2 others)
+Assets\Crulanda\Editor\Phase0Validation.cs(20,61): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+
+Assets\Crulanda\Editor\Phase0Validation.cs(20,17): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+[362/371    0s] ILPostProcess Library/Bee/artifacts/1900b0aE.dag/post-processed/Crulanda.Tests.PlayMode.dll (+pdb)
+Processing assembly Library/Bee/artifacts/1900b0aE.dag/Crulanda.Tests.PlayMode.dll, with 149 defines and 294 references
+
+processors: zzzUnity.Burst.CodeGen.BurstILPostProcessor
+
+1 processor(s) skipped this assembly
+[363/371    0s] CopyFiles Library/ScriptAssemblies/Crulanda.Tests.PlayMode.pdb
+[364/371    0s] CopyFiles Library/ScriptAssemblies/Crulanda.Tests.PlayMode.dll
+[365/371    0s] ILPostProcess Library/Bee/artifacts/1900b0aE.dag/post-processed/Crulanda.Editor.dll (+pdb)
+Processing assembly Library/Bee/artifacts/1900b0aE.dag/Crulanda.Editor.dll, with 147 defines and 306 references
+
+processors: zzzUnity.Burst.CodeGen.BurstILPostProcessor
+
+1 processor(s) skipped this assembly
+[366/371    0s] ILPostProcess Library/Bee/artifacts/1900b0aE.dag/post-processed/Crulanda.Tests.EditMode.dll (+pdb)
+Processing assembly Library/Bee/artifacts/1900b0aE.dag/Crulanda.Tests.EditMode.dll, with 147 defines and 305 references
+
+processors: zzzUnity.Burst.CodeGen.BurstILPostProcessor
+
+1 processor(s) skipped this assembly
+[367/371    0s] CopyFiles Library/ScriptAssemblies/Crulanda.Editor.pdb
+[368/371    0s] CopyFiles Library/ScriptAssemblies/Crulanda.Tests.EditMode.pdb
+[369/371    0s] CopyFiles Library/ScriptAssemblies/Crulanda.Editor.dll
+[370/371    0s] CopyFiles Library/ScriptAssemblies/Crulanda.Tests.EditMode.dll
+*** Tundra build success (1.12 seconds), 23 items updated, 371 evaluated
+Assets\Crulanda\Scripts\Core\Logging\CrulandaLog.cs(172,21): warning UAC0009: DEVELOPMENT_BUILD preprocessor directive has been deprecated. Please use one of the managed code variant directives (such as DEBUG, UNITY_ENABLE_CHECKS or UNITY_INCLUDE_INSTRUMENTATION) if different code paths are desired for different managed code variants. Checking for development build is possible at runtime using Debug.isDebugBuild. See the Conditional Compilation manual page for more details.
+Assets\Crulanda\Scripts\Encounter\EncounterNavigation.cs(19,70): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets\Crulanda\Scripts\Encounter\EncounterNavigation.cs(19,38): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets\Crulanda\Tests\PlayMode\EncounterLoopTests.cs(27,23): warning CS0618: 'Object.FindFirstObjectByType<T>()' is obsolete: 'FindFirstObjectByType has been deprecated because it relies on instance ID ordering. Use FindAnyObjectByType instead, which does not depend on ordering.'
+Assets\Crulanda\Tests\PlayMode\EncounterLoopTests.cs(32,13): warning CS0618: 'Object.FindFirstObjectByType<T>()' is obsolete: 'FindFirstObjectByType has been deprecated because it relies on instance ID ordering. Use FindAnyObjectByType instead, which does not depend on ordering.'
+Assets\Crulanda\Editor\Phase0Validation.cs(20,61): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets\Crulanda\Editor\Phase0Validation.cs(20,17): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Total cache size 71477604
+Total cache size after purge 71477604, took 00:00:00.0874262
+AssetDatabase: script compilation time: 1.646532s
+Begin MonoManager ReloadAssembly
+Native extension for WindowsStandalone target not found
+ScheduleIndexationOnStartup MainProcess:True IndexOnStartup:False
+Scripting: successfully reloaded assembly
+- Finished resetting the current domain, in  0.408 seconds
+Domain Reload Profiling: 857ms
+	BeginReloadAssembly (202ms)
+		DisableScriptedObjects (19ms)
+		CreateAndSetChildDomain (46ms)
+	RebuildCommonClasses (7ms)
+	RebuildNativeTypeToScriptingClass (13ms)
+	initialDomainReloadingComplete (35ms)
+	LoadAllAssembliesAndSetupDomain (192ms)
+		LoadAssemblies (180ms)
+		TypeCache.Refresh (20ms)
+			TypeCache.ScanAssembly (15ms)
+		AnalyzeDomain (10ms)
+			BuildScriptInfoCaches (9ms)
+	FinalizeReload (409ms)
+		SetupLoadedEditorAssemblies (0ms)
+			BeforeProcessingInitializeOnLoad (79ms)
+			ProcessInitializeOnLoadAttributes (106ms)
+			ProcessInitializeOnLoadMethodAttributes (49ms)
+		AwakeInstancesAfterBackupRestoration (28ms)
+Starting new worker id: 0 with log in C:/Users/chris/Documents/Codex/2026-09-28/hel/work/encounter-validation/Logs/AssetImportWorkerHW0.log
+
+Asset Pipeline Refresh (id=2a168d6099264cf47814bcbe9c96a08e): Total: 2.777 seconds - Initiated by InitialRefreshV2(ForceSynchronousImport)
+	(Values over 0.05ms)
+	Summary:
+		Imports: total=0 (actual=0, local cache=0, cache server=0)
+		Asset DB Process Time: managed=0 ms, native=567 ms
+		Asset DB Callback time: managed=66 ms, native=14 ms
+		Scripting: domain reloads=1, domain reload time=469 ms, compile time=1648 ms, other=10 ms
+		Project Asset Count: scripts=302, non-scripts=249
+		Asset File Changes: new=0, changed=4, moved=0, deleted=0
+		Scan Filter Count: 0
+	InvokePackagesCallback: 13.849ms
+	ApplyChangesToAssetFolders: 0.490ms
+	Scan: 46.141ms
+	Collect global state as custom dependencies: 6.979ms
+	OnSourceAssetsModified: 0.482ms
+	CategorizeScriptCompilationAssets: 4.873ms
+	ProcessAssetsWithTransientArtifactChanges: 6.379ms
+	CategorizeAssets: 4.563ms
+	CompileScripts: 1648.465ms
+	ImportOutOfDateAssets: 420.201ms (410.139ms without children)
+		UnloadImportedAssets: 0.075ms
+		EnsureUptoDateAssetsAreRegisteredWithGuidPM: 0.072ms
+		ImportSchedulerStart: 9.910ms
+	PostProcessAllAssets: 67.073ms
+		VCAutoAddAssetPostprocess 0.610ms
+		XRBuildSystem.XRAssetImported 0.070ms
+		MonoPostProcessAllAssets: 65.914ms
+			AssetPostprocessor.OnPostprocessAllAssets 28.308ms
+			SyncVS.PostprocessSyncProject 7.907ms
+			StyleCatalogPostProcessor.OnPostprocessAllAssets 6.844ms
+			WindowAssetPostprocessingWatcher.OnPostprocessAllAssets 5.621ms
+			BuilderAssetPostprocessor.OnPostprocessAllAssets 3.870ms
+			AssetChangedListener.OnPostprocessAllAssets 1.357ms
+			RetainedModeAssetPostprocessor.OnPostprocessAllAssets 0.896ms
+			EditModeScopePostprocessor.OnPostprocessAllAssets 0.693ms
+			SpeedTree9Postprocessor.OnPostprocessAllAssets 0.535ms
+			ArtifactBrowserPostProcessor.OnPostprocessAllAssets 0.411ms
+			TextAssetPostProcessor.OnPostprocessAllAssets 0.393ms
+			InputActionAssetPostprocessor.OnPostprocessAllAssets 0.276ms
+			ReferencedClipsPostProcessor.OnPostprocessAllAssets 0.213ms
+			AudioMixerPostprocessor.OnPostprocessAllAssets 0.201ms
+			InputActionJsonNameModifierAssetProcessor.OnPostprocessAllAssets 0.191ms
+			AssetEvents.OnPostprocessAllAssets 0.179ms
+			TerrainToolbarOverlayPostProcessor.OnPostprocessAllAssets 0.141ms
+			AssetDatabaseCallbacks.OnPostprocessAllAssets 0.110ms
+			ProjectSettingsPostprocessor.OnPostprocessAllAssets 0.101ms
+			SpeedTreePostProcessor.OnPostprocessAllAssets 0.099ms
+			ConfigAssetsTracker.OnPostprocessAllAssets 0.094ms
+			ThemePostprocessor.OnPostprocessAllAssets 0.085ms
+			ScenarioDriftAssetsTracker.OnPostprocessAllAssets 0.084ms
+			RenderPipelineGlobalSettingsPostprocessor.OnPostprocessAllAssets 0.070ms
+			AudioContainerPostProcessor.OnPostprocessAllAssets 0.054ms
+	PostAssetChangesProfiler: 0.642ms
+	UnloadStreamsBegin: 1.069ms
+	GenerateScriptTypeHashes: 1.243ms
+	GenerateScriptTypeSerializationHashes: 2.621ms
+	Untracked: 535.869ms
+
+Application.AssetDatabase Initial Refresh End
+Scanning for USB devices : 16.987ms
+Initializing Unity extensions:
+[MODES] ModeService[none].Initialize
+[MODES] ModeService[none].LoadModes
+[MODES] Loading mode Default (0) for mode-current-id-Crulanda - The Quiet Trail
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 1013 unused Assets / (0.8 MB). Loaded Objects now: 1733.
+Memory consumption went from 235.3 MB to 234.6 MB.
+Total: 3.625700 ms (FindLiveObjects: 0.162200 ms CreateObjectMapping: 0.031200 ms MarkObjects: 3.099900 ms  DeleteObjects: 0.220400 ms)
+
+Microsoft Media Foundation video decoding to texture disabled: graphics device is Null, only Direct3D 11 and Direct3D 12 (only on desktop) are supported for hardware-accelerated video decoding.
+[Project] Loading completed in 4.629 seconds
+	Project init time: 				4.434 seconds
+		Template init time: 		0.000 seconds
+		Package Manager init time: 		0.201 seconds
+		Asset Database init time: 		0.159 seconds
+		Global illumination init time: 	0.002 seconds
+		Assemblies load time: 			1.041 seconds
+		Unity extensions init time: 	0.002 seconds
+		Asset Database refresh time: 	2.777 seconds
+	Scene opening time: 			0.063 seconds
+##utp:{"type":"ProjectInfo","version":2,"phase":"Immediate","time":1790641097359,"processId":24676,"projectLoad":4.629061800000001,"projectInit":4.4337314,"templateInit":0.0,"packageManagerInit":0.2012869,"assetDatabaseInit":0.1590673,"globalIlluminationInit":0.0024372,"assembliesLoad":1.0411885,"unityExtensionsInit":0.001838,"assetDatabaseRefresh":2.7772649,"sceneOpening":0.0632638}
+##utp:{"type":"EditorInfo","version":2,"phase":"Immediate","time":1790641097359,"processId":24676,"editorVersion":"6000.6.3f1 (45d8eee7de74)","branch":"6000.6/staging","buildType":"Release","platform":"Windows"}
+[Licensing::Client] Successfully resolved entitlement details
+Running tests for ExecutionSettings with details:
+targetPlatform = 
+playerHeartbeatTimeout = 600
+filters[0] = 
+   Filter with settings:
+   testMode = PlayMode
+   targetPlatform = 
+   testNames = null
+   groupNames = null
+   categoryNames = null
+   assemblyNames = null
+ignoreTests = {}
+featureFlags = null
+
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+UnityEditor.TestTools.TestRunner.CommandLineTest.Executer:InitializeAndExecuteRun (string[]) (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEditor.TestRunner/CommandLineTest/Executer.cs:53)
+UnityEditor.TestTools.TestRunner.CommandLineTest.TestStarter:InitializeAndExecuteRun () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEditor.TestRunner/CommandLineTest/TestStarter.cs:64)
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions ()
+
+(Filename: ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEditor.TestRunner/CommandLineTest/Executer.cs Line: 53)
+
+[UnityConnectServicesConfig] config is NOT valid, switching to default
+Created GICache directory at C:/Users/chris/AppData/LocalLow/Unity/Caches/GiCache. Took: 0.016s, timestamps: [4.631 - 4.646]
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 0 unused Assets / (Unknown). Loaded Objects now: 1884.
+Memory consumption went from 241.6 MB to 241.6 MB.
+Total: 5.109500 ms (FindLiveObjects: 0.137700 ms CreateObjectMapping: 0.014600 ms MarkObjects: 4.835500 ms  DeleteObjects: 0.005000 ms)
+
+Importing 'GUID: 9602e4c987ff1514d95f8a8fd963b43f - Path: Assets/InitTestScenec145727b-7def-4ac2-959a-dee9b27f7d33.unity' with importer (DefaultImporter)
+Imported 'GUID: 9602e4c987ff1514d95f8a8fd963b43f' -> (Import Result ID: '2e8fc1487f2ece633c980fe64955d474') in 0.003 seconds [static dependencies only]. Details - ImportResultOutputID=e45adeb0ad21c36d9ae9925d71779c97 DependenciesID=e0957dcc08d8ec56de36effd313b03c7 StaticDependenciesID=e026e843905d03ee17b259d3828bf830 
+Asset Pipeline Refresh (id=f48daac767d4c114d8cbf91ee5876203): Total: 0.024 seconds - Initiated by StopAssetImportingV2(NoUpdateAssetOptions)
+Reloading assemblies for play mode.
+Reloading assemblies after forced synchronous recompile.
+Begin MonoManager ReloadAssembly
+Worker ready: AssetImportWorkerHW0 0
+Native extension for WindowsStandalone target not found
+ScheduleIndexationOnStartup MainProcess:True IndexOnStartup:False
+Scripting: successfully reloaded assembly
+- Finished resetting the current domain, in  0.470 seconds
+Domain Reload Profiling: 953ms
+	BeginReloadAssembly (337ms)
+		DisableScriptedObjects (58ms)
+		CreateAndSetChildDomain (153ms)
+	RebuildCommonClasses (7ms)
+	RebuildNativeTypeToScriptingClass (11ms)
+	initialDomainReloadingComplete (31ms)
+	LoadAllAssembliesAndSetupDomain (95ms)
+		LoadAssemblies (99ms)
+		TypeCache.Refresh (3ms)
+		AnalyzeDomain (1ms)
+	FinalizeReload (471ms)
+		SetupLoadedEditorAssemblies (0ms)
+			BeforeProcessingInitializeOnLoad (68ms)
+			ProcessInitializeOnLoadAttributes (86ms)
+			ProcessInitializeOnLoadMethodAttributes (92ms)
+		AwakeInstancesAfterBackupRestoration (28ms)
+No restricted APIs configured; Validation skipped.
+Checking 2 assemblies for restricted APIs found 0 usage(s) in 2 ms
+
+Asset Pipeline Refresh (id=15dfb8f32a45d0a4dbb0b1cf23cd3b0f): Total: 1.206 seconds - Initiated by StopAssetImportingV2(ForceSynchronousImport | ForceDomainReload)
+	(Values over 0.05ms)
+	Summary:
+		Imports: total=0 (actual=0, local cache=0, cache server=0)
+		Asset DB Process Time: managed=0 ms, native=530 ms
+		Asset DB Callback time: managed=123 ms, native=49 ms
+		Scripting: domain reloads=1, domain reload time=501 ms, compile time=2 ms, other=0 ms
+		Project Asset Count: scripts=302, non-scripts=250
+		Asset File Changes: new=0, changed=0, moved=0, deleted=0
+		Scan Filter Count: 0
+	InvokePackagesCallback: 1.520ms
+	ApplyChangesToAssetFolders: 0.128ms
+	Collect global state as custom dependencies: 0.650ms
+	ProcessAssetsWithTransientArtifactChanges: 18.520ms
+	CategorizeAssets: 3.332ms
+	CompileScripts: 1.621ms
+	ImportOutOfDateAssets: 472.261ms (471.967ms without children)
+		UnloadImportedAssets: 0.095ms
+		EnsureUptoDateAssetsAreRegisteredWithGuidPM: 0.057ms
+		ImportSchedulerStart: 0.139ms
+	PostProcessAllAssets: 171.357ms
+		PostProcessCallbackCreateDeferredMaterials 2.734ms
+		ShaderAssetModifiedCallback 1.319ms
+		AssemblyValidation.PostprocessAllAssets 1.081ms
+		RaytracingShaderImportPostprocess 0.522ms
+		ComputeShaderImportPostprocess 0.489ms
+		SpeedTreeImporter.PostprocessAllAssets 0.420ms
+		LocalizationDatabase.AssetDatabasePostprocessCallback 0.271ms
+		BlockShaderImporter.PostprocessAllAssets 0.228ms
+		XRBuildSystem.XRAssetImported 0.091ms
+		MonoPostProcessAllAssets: 123.028ms
+			SyncVS.PostprocessSyncProject 82.337ms
+			StyleCatalogPostProcessor.OnPostprocessAllAssets 5.671ms
+			AssetPostprocessor.OnPostprocessAllAssets 5.610ms
+			WindowAssetPostprocessingWatcher.OnPostprocessAllAssets 3.809ms
+			BuilderAssetPostprocessor.OnPostprocessAllAssets 3.702ms
+			InputActionJsonNameModifierAssetProcessor.OnPostprocessAllAssets 3.098ms
+			InputActionAssetPostprocessor.OnPostprocessAllAssets 2.910ms
+			AssetChangedListener.OnPostprocessAllAssets 1.845ms
+			TextAssetPostProcessor.OnPostprocessAllAssets 1.808ms
+			RetainedModeAssetPostprocessor.OnPostprocessAllAssets 0.832ms
+			SpeedTree9Postprocessor.OnPostprocessAllAssets 0.780ms
+			ProjectSettingsPostprocessor.OnPostprocessAllAssets 0.536ms
+			ArtifactBrowserPostProcessor.OnPostprocessAllAssets 0.339ms
+			EditModeScopePostprocessor.OnPostprocessAllAssets 0.188ms
+			AudioMixerPostprocessor.OnPostprocessAllAssets 0.181ms
+			ReferencedClipsPostProcessor.OnPostprocessAllAssets 0.177ms
+			AssetEvents.OnPostprocessAllAssets 0.152ms
+			TerrainToolbarOverlayPostProcessor.OnPostprocessAllAssets 0.125ms
+			SpeedTreePostProcessor.OnPostprocessAllAssets 0.111ms
+			AssetDatabaseCallbacks.OnPostprocessAllAssets 0.105ms
+			ThemePostprocessor.OnPostprocessAllAssets 0.103ms
+			ConfigAssetsTracker.OnPostprocessAllAssets 0.099ms
+			ScenarioDriftAssetsTracker.OnPostprocessAllAssets 0.089ms
+			RenderPipelineGlobalSettingsPostprocessor.OnPostprocessAllAssets 0.057ms
+	PostAssetChangesProfiler: 0.988ms
+	GenerateScriptTypeHashes: 1.248ms
+	GenerateScriptTypeSerializationHashes: 2.585ms
+	Untracked: 517.773ms
+
+Loaded scene 'Temp/__Backupscenes/0.backup'
+	Deserialize:            0.608 ms
+	Integration:            13.071 ms
+	Integration of assets:  0.002 ms
+	Thread Wait Time:       0.022 ms
+	Total Operation Time:   13.703 ms
+[MODES] ModeService[none].Initialize
+[MODES] ModeService[none].LoadModes
+[Licensing::Client] Successfully resolved entitlement details
+[Actors] Smoke Actor died.
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object,UnityEngine.Object)
+UnityEngine.Debug:Log (object,UnityEngine.Object)
+Crulanda.Core.CrulandaLog:Write (Crulanda.Core.LogLevel,Crulanda.Core.LogCategory,string,UnityEngine.Object) (at Assets/Crulanda/Scripts/Core/Logging/CrulandaLog.cs:116)
+Crulanda.Core.CrulandaLog:Info (Crulanda.Core.LogCategory,string,UnityEngine.Object) (at Assets/Crulanda/Scripts/Core/Logging/CrulandaLog.cs:86)
+Crulanda.Gameplay.Health:Die () (at Assets/Crulanda/Scripts/Gameplay/Actors/Health.cs:71)
+Crulanda.Gameplay.Health:ApplyDamage (int) (at Assets/Crulanda/Scripts/Gameplay/Actors/Health.cs:42)
+Crulanda.Tests.ActorSmokeTests/<Healing_is_capped_and_blocked_while_dead>d__10:MoveNext () (at Assets/Crulanda/Tests/PlayMode/ActorSmokeTests.cs:133)
+UnityEngine.TestTools.TestEnumerator/<Execute>d__8:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Attributes/TestEnumerator.cs:52)
+UnityEngine.TestTools.EnumerableTestMethodCommand/<ExecuteEnumerableAndRecordExceptions>d__4:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:85)
+UnityEngine.TestTools.EnumerableTestMethodCommand:AdvanceEnumerator (System.Collections.IEnumerator) (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:64)
+UnityEngine.TestTools.EnumerableTestMethodCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:47)
+UnityEngine.TestRunner.NUnitExtensions.Runner.UnityLogCheckDelegatingCommand/<ExecuteEnumerable>d__4:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Runner/UnityLogCheckDelegatingCommand.cs:66)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<NUnit.Framework.ITestAction>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<System.Reflection.MethodInfo>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<System.Reflection.MethodInfo>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<UnityEngine.TestTools.IOuterUnityTestAction>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.RetryCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/RetryCommand.cs:37)
+UnityEngine.TestTools.RepeatCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/RepeatCommand.cs:36)
+UnityEngine.TestTools.IgnoreTestCommand/<ExecuteEnumerable>d__3:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/IgnoreTestCommand.cs:42)
+UnityEngine.TestTools.StrictCheckCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/StrictCheckCommand.cs:29)
+UnityEngine.TestTools.Utils.CoroutineRunner/<WrapEnumeratorForChecks>d__8:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/Utils/CoroutineRunner.cs:58)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+(Filename: Assets/Crulanda/Scripts/Core/Logging/CrulandaLog.cs Line: 116)
+
+[Actors] Smoke Actor died.
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object,UnityEngine.Object)
+UnityEngine.Debug:Log (object,UnityEngine.Object)
+Crulanda.Core.CrulandaLog:Write (Crulanda.Core.LogLevel,Crulanda.Core.LogCategory,string,UnityEngine.Object) (at Assets/Crulanda/Scripts/Core/Logging/CrulandaLog.cs:116)
+Crulanda.Core.CrulandaLog:Info (Crulanda.Core.LogCategory,string,UnityEngine.Object) (at Assets/Crulanda/Scripts/Core/Logging/CrulandaLog.cs:86)
+Crulanda.Gameplay.Health:Die () (at Assets/Crulanda/Scripts/Gameplay/Actors/Health.cs:71)
+Crulanda.Gameplay.Health:ApplyDamage (int) (at Assets/Crulanda/Scripts/Gameplay/Actors/Health.cs:42)
+Crulanda.Tests.ActorSmokeTests/<Lethal_damage_kills_once_and_publishes_event>d__9:MoveNext () (at Assets/Crulanda/Tests/PlayMode/ActorSmokeTests.cs:118)
+UnityEngine.TestTools.TestEnumerator/<Execute>d__8:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Attributes/TestEnumerator.cs:52)
+UnityEngine.TestTools.EnumerableTestMethodCommand/<ExecuteEnumerableAndRecordExceptions>d__4:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:85)
+UnityEngine.TestTools.EnumerableTestMethodCommand:AdvanceEnumerator (System.Collections.IEnumerator) (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:64)
+UnityEngine.TestTools.EnumerableTestMethodCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:47)
+UnityEngine.TestRunner.NUnitExtensions.Runner.UnityLogCheckDelegatingCommand/<ExecuteEnumerable>d__4:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Runner/UnityLogCheckDelegatingCommand.cs:66)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<NUnit.Framework.ITestAction>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<System.Reflection.MethodInfo>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<System.Reflection.MethodInfo>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<UnityEngine.TestTools.IOuterUnityTestAction>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.RetryCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/RetryCommand.cs:37)
+UnityEngine.TestTools.RepeatCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/RepeatCommand.cs:36)
+UnityEngine.TestTools.IgnoreTestCommand/<ExecuteEnumerable>d__3:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/IgnoreTestCommand.cs:42)
+UnityEngine.TestTools.StrictCheckCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/StrictCheckCommand.cs:29)
+UnityEngine.TestTools.Utils.CoroutineRunner/<WrapEnumeratorForChecks>d__8:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/Utils/CoroutineRunner.cs:58)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+(Filename: Assets/Crulanda/Scripts/Core/Logging/CrulandaLog.cs Line: 116)
+
+[Actors] Smoke Actor died.
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object,UnityEngine.Object)
+UnityEngine.Debug:Log (object,UnityEngine.Object)
+Crulanda.Core.CrulandaLog:Write (Crulanda.Core.LogLevel,Crulanda.Core.LogCategory,string,UnityEngine.Object) (at Assets/Crulanda/Scripts/Core/Logging/CrulandaLog.cs:116)
+Crulanda.Core.CrulandaLog:Info (Crulanda.Core.LogCategory,string,UnityEngine.Object) (at Assets/Crulanda/Scripts/Core/Logging/CrulandaLog.cs:86)
+Crulanda.Gameplay.Health:Die () (at Assets/Crulanda/Scripts/Gameplay/Actors/Health.cs:71)
+Crulanda.Gameplay.Health:SetMaximum (int) (at Assets/Crulanda/Scripts/Gameplay/Actors/Health.cs:57)
+Crulanda.Gameplay.Actor:OnStatChanged (Crulanda.Core.StatType) (at Assets/Crulanda/Scripts/Gameplay/Actors/Actor.cs:133)
+Crulanda.Gameplay.StatBlock:Invalidate (Crulanda.Core.StatType) (at Assets/Crulanda/Scripts/Gameplay/Stats/StatBlock.cs:133)
+Crulanda.Gameplay.StatBlock:SetBase (Crulanda.Core.StatType,single) (at Assets/Crulanda/Scripts/Gameplay/Stats/StatBlock.cs:46)
+Crulanda.Tests.ActorSmokeTests/<Maximum_reduction_to_zero_health_publishes_death_once>d__7:MoveNext () (at Assets/Crulanda/Tests/PlayMode/ActorSmokeTests.cs:83)
+UnityEngine.TestTools.TestEnumerator/<Execute>d__8:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Attributes/TestEnumerator.cs:52)
+UnityEngine.TestTools.EnumerableTestMethodCommand/<ExecuteEnumerableAndRecordExceptions>d__4:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:85)
+UnityEngine.TestTools.EnumerableTestMethodCommand:AdvanceEnumerator (System.Collections.IEnumerator) (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:64)
+UnityEngine.TestTools.EnumerableTestMethodCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:47)
+UnityEngine.TestRunner.NUnitExtensions.Runner.UnityLogCheckDelegatingCommand/<ExecuteEnumerable>d__4:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Runner/UnityLogCheckDelegatingCommand.cs:66)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<NUnit.Framework.ITestAction>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<System.Reflection.MethodInfo>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<System.Reflection.MethodInfo>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<UnityEngine.TestTools.IOuterUnityTestAction>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.RetryCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/RetryCommand.cs:37)
+UnityEngine.TestTools.RepeatCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/RepeatCommand.cs:36)
+UnityEngine.TestTools.IgnoreTestCommand/<ExecuteEnumerable>d__3:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/IgnoreTestCommand.cs:42)
+UnityEngine.TestTools.StrictCheckCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/StrictCheckCommand.cs:29)
+UnityEngine.TestTools.Utils.CoroutineRunner/<WrapEnumeratorForChecks>d__8:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/Utils/CoroutineRunner.cs:58)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+(Filename: Assets/Crulanda/Scripts/Core/Logging/CrulandaLog.cs Line: 116)
+
+[Actors] Combat test died.
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object,UnityEngine.Object)
+UnityEngine.Debug:Log (object,UnityEngine.Object)
+Crulanda.Core.CrulandaLog:Write (Crulanda.Core.LogLevel,Crulanda.Core.LogCategory,string,UnityEngine.Object) (at Assets/Crulanda/Scripts/Core/Logging/CrulandaLog.cs:116)
+Crulanda.Core.CrulandaLog:Info (Crulanda.Core.LogCategory,string,UnityEngine.Object) (at Assets/Crulanda/Scripts/Core/Logging/CrulandaLog.cs:86)
+Crulanda.Gameplay.Health:Die () (at Assets/Crulanda/Scripts/Gameplay/Actors/Health.cs:71)
+Crulanda.Gameplay.Health:ApplyDamage (int) (at Assets/Crulanda/Scripts/Gameplay/Actors/Health.cs:42)
+Crulanda.Tests.CombatIntegrationTests/<Guard_expires_and_death_removes_effects>d__5:MoveNext () (at Assets/Crulanda/Tests/PlayMode/CombatIntegrationTests.cs:33)
+UnityEngine.TestTools.TestEnumerator/<Execute>d__8:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Attributes/TestEnumerator.cs:52)
+UnityEngine.TestTools.EnumerableTestMethodCommand/<ExecuteEnumerableAndRecordExceptions>d__4:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:85)
+UnityEngine.TestTools.EnumerableTestMethodCommand:AdvanceEnumerator (System.Collections.IEnumerator) (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:64)
+UnityEngine.TestTools.EnumerableTestMethodCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:47)
+UnityEngine.TestRunner.NUnitExtensions.Runner.UnityLogCheckDelegatingCommand/<ExecuteEnumerable>d__4:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Runner/UnityLogCheckDelegatingCommand.cs:66)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<NUnit.Framework.ITestAction>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<System.Reflection.MethodInfo>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<System.Reflection.MethodInfo>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<UnityEngine.TestTools.IOuterUnityTestAction>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.RetryCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/RetryCommand.cs:37)
+UnityEngine.TestTools.RepeatCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/RepeatCommand.cs:36)
+UnityEngine.TestTools.IgnoreTestCommand/<ExecuteEnumerable>d__3:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/IgnoreTestCommand.cs:42)
+UnityEngine.TestTools.StrictCheckCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/StrictCheckCommand.cs:29)
+UnityEngine.TestTools.Utils.CoroutineRunner/<WrapEnumeratorForChecks>d__8:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/Utils/CoroutineRunner.cs:58)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+(Filename: Assets/Crulanda/Scripts/Core/Logging/CrulandaLog.cs Line: 116)
+
+[Actors] Combat test died.
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object,UnityEngine.Object)
+UnityEngine.Debug:Log (object,UnityEngine.Object)
+Crulanda.Core.CrulandaLog:Write (Crulanda.Core.LogLevel,Crulanda.Core.LogCategory,string,UnityEngine.Object) (at Assets/Crulanda/Scripts/Core/Logging/CrulandaLog.cs:116)
+Crulanda.Core.CrulandaLog:Info (Crulanda.Core.LogCategory,string,UnityEngine.Object) (at Assets/Crulanda/Scripts/Core/Logging/CrulandaLog.cs:86)
+Crulanda.Gameplay.Health:Die () (at Assets/Crulanda/Scripts/Gameplay/Actors/Health.cs:71)
+Crulanda.Gameplay.Health:SetMaximum (int) (at Assets/Crulanda/Scripts/Gameplay/Actors/Health.cs:57)
+Crulanda.Gameplay.Actor:OnStatChanged (Crulanda.Core.StatType) (at Assets/Crulanda/Scripts/Gameplay/Actors/Actor.cs:133)
+Crulanda.Gameplay.StatBlock:NotifyBatch (System.Collections.Generic.HashSet`1<Crulanda.Core.StatType>) (at Assets/Crulanda/Scripts/Gameplay/Stats/StatBlock.cs:88)
+Crulanda.Gameplay.StatBlock:AddModifiers (System.Collections.Generic.IEnumerable`1<Crulanda.Gameplay.StatModifier>) (at Assets/Crulanda/Scripts/Gameplay/Stats/StatBlock.cs:64)
+Crulanda.Combat.StatusEffectRuntime:Apply (Crulanda.Combat.StatusEffectDefinition,single) (at Assets/Crulanda/Scripts/Combat/StatusEffectRuntime.cs:67)
+Crulanda.Combat.Combatant:Apply (Crulanda.Combat.StatusEffectDefinition) (at Assets/Crulanda/Scripts/Combat/Combatant.cs:40)
+Crulanda.Tests.CombatIntegrationTests/<Lethal_stat_change_clears_effects_without_leaving_modifiers>d__8:MoveNext () (at Assets/Crulanda/Tests/PlayMode/CombatIntegrationTests.cs:69)
+UnityEngine.TestTools.TestEnumerator/<Execute>d__8:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Attributes/TestEnumerator.cs:52)
+UnityEngine.TestTools.EnumerableTestMethodCommand/<ExecuteEnumerableAndRecordExceptions>d__4:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:85)
+UnityEngine.TestTools.EnumerableTestMethodCommand:AdvanceEnumerator (System.Collections.IEnumerator) (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:64)
+UnityEngine.TestTools.EnumerableTestMethodCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:47)
+UnityEngine.TestRunner.NUnitExtensions.Runner.UnityLogCheckDelegatingCommand/<ExecuteEnumerable>d__4:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Runner/UnityLogCheckDelegatingCommand.cs:66)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<NUnit.Framework.ITestAction>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<System.Reflection.MethodInfo>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<System.Reflection.MethodInfo>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<UnityEngine.TestTools.IOuterUnityTestAction>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.RetryCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/RetryCommand.cs:37)
+UnityEngine.TestTools.RepeatCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/RepeatCommand.cs:36)
+UnityEngine.TestTools.IgnoreTestCommand/<ExecuteEnumerable>d__3:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/IgnoreTestCommand.cs:42)
+UnityEngine.TestTools.StrictCheckCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/StrictCheckCommand.cs:29)
+UnityEngine.TestTools.Utils.CoroutineRunner/<WrapEnumeratorForChecks>d__8:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/Utils/CoroutineRunner.cs:58)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+(Filename: Assets/Crulanda/Scripts/Core/Logging/CrulandaLog.cs Line: 116)
+
+Unloading 11 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.313100 ms
+Loaded scene 'Assets/Crulanda/Scenes/PlayableEncounter.unity'
+	Deserialize:            5.137 ms
+	Integration:            41.327 ms
+	Integration of assets:  0.527 ms
+	Thread Wait Time:       0.443 ms
+	Total Operation Time:   47.435 ms
+Launched and connected shader compiler UnityShaderCompiler.exe after 0.01 seconds
+Unloading 939 unused Assets / (248.9 KB). Loaded Objects now: 2325.
+Memory consumption went from 257.1 MB to 256.8 MB.
+Total: 4.062000 ms (FindLiveObjects: 0.305700 ms CreateObjectMapping: 0.029500 ms MarkObjects: 3.494200 ms  DeleteObjects: 0.121500 ms)
+
+[Actors] You died.
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object,UnityEngine.Object)
+UnityEngine.Debug:Log (object,UnityEngine.Object)
+Crulanda.Core.CrulandaLog:Write (Crulanda.Core.LogLevel,Crulanda.Core.LogCategory,string,UnityEngine.Object) (at Assets/Crulanda/Scripts/Core/Logging/CrulandaLog.cs:116)
+Crulanda.Core.CrulandaLog:Info (Crulanda.Core.LogCategory,string,UnityEngine.Object) (at Assets/Crulanda/Scripts/Core/Logging/CrulandaLog.cs:86)
+Crulanda.Gameplay.Health:Die () (at Assets/Crulanda/Scripts/Gameplay/Actors/Health.cs:71)
+Crulanda.Gameplay.Health:ApplyDamage (int) (at Assets/Crulanda/Scripts/Gameplay/Actors/Health.cs:42)
+Crulanda.Tests.EncounterLoopTests/<Death_recovery_keeps_equipment_and_repositions_party>d__7:MoveNext () (at Assets/Crulanda/Tests/PlayMode/EncounterLoopTests.cs:119)
+UnityEngine.TestTools.TestEnumerator/<Execute>d__8:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Attributes/TestEnumerator.cs:52)
+UnityEngine.TestTools.EnumerableTestMethodCommand/<ExecuteEnumerableAndRecordExceptions>d__4:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:85)
+UnityEngine.TestTools.EnumerableTestMethodCommand:AdvanceEnumerator (System.Collections.IEnumerator) (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:64)
+UnityEngine.TestTools.EnumerableTestMethodCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:47)
+UnityEngine.TestRunner.NUnitExtensions.Runner.UnityLogCheckDelegatingCommand/<ExecuteEnumerable>d__4:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Runner/UnityLogCheckDelegatingCommand.cs:66)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<NUnit.Framework.ITestAction>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<System.Reflection.MethodInfo>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<System.Reflection.MethodInfo>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<UnityEngine.TestTools.IOuterUnityTestAction>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.RetryCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/RetryCommand.cs:37)
+UnityEngine.TestTools.RepeatCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/RepeatCommand.cs:36)
+UnityEngine.TestTools.IgnoreTestCommand/<ExecuteEnumerable>d__3:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/IgnoreTestCommand.cs:42)
+UnityEngine.TestTools.StrictCheckCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/StrictCheckCommand.cs:29)
+UnityEngine.TestTools.Utils.CoroutineRunner/<WrapEnumeratorForChecks>d__8:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/Utils/CoroutineRunner.cs:58)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+(Filename: Assets/Crulanda/Scripts/Core/Logging/CrulandaLog.cs Line: 116)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.093300 ms
+Loaded scene 'Assets/Crulanda/Scenes/PlayableEncounter.unity'
+	Deserialize:            2.256 ms
+	Integration:            9.440 ms
+	Integration of assets:  0.001 ms
+	Thread Wait Time:       0.467 ms
+	Total Operation Time:   12.164 ms
+Unloading 7 unused Assets / (25.2 KB). Loaded Objects now: 2325.
+Memory consumption went from 256.3 MB to 256.3 MB.
+Total: 3.851300 ms (FindLiveObjects: 0.228000 ms CreateObjectMapping: 0.015700 ms MarkObjects: 3.468900 ms  DeleteObjects: 0.026700 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.087700 ms
+Loaded scene 'Assets/Crulanda/Scenes/PlayableEncounter.unity'
+	Deserialize:            2.438 ms
+	Integration:            8.811 ms
+	Integration of assets:  0.001 ms
+	Thread Wait Time:       0.251 ms
+	Total Operation Time:   11.501 ms
+Unloading 7 unused Assets / (28.9 KB). Loaded Objects now: 2325.
+Memory consumption went from 257.4 MB to 257.4 MB.
+Total: 3.774200 ms (FindLiveObjects: 0.226500 ms CreateObjectMapping: 0.016400 ms MarkObjects: 3.395800 ms  DeleteObjects: 0.021500 ms)
+
+[Actors] Trail sentry 1 died.
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object,UnityEngine.Object)
+UnityEngine.Debug:Log (object,UnityEngine.Object)
+Crulanda.Core.CrulandaLog:Write (Crulanda.Core.LogLevel,Crulanda.Core.LogCategory,string,UnityEngine.Object) (at Assets/Crulanda/Scripts/Core/Logging/CrulandaLog.cs:116)
+Crulanda.Core.CrulandaLog:Info (Crulanda.Core.LogCategory,string,UnityEngine.Object) (at Assets/Crulanda/Scripts/Core/Logging/CrulandaLog.cs:86)
+Crulanda.Gameplay.Health:Die () (at Assets/Crulanda/Scripts/Gameplay/Actors/Health.cs:71)
+Crulanda.Gameplay.Health:ApplyDamage (int) (at Assets/Crulanda/Scripts/Gameplay/Actors/Health.cs:42)
+Crulanda.Combat.Combatant:Damage (int) (at Assets/Crulanda/Scripts/Combat/Combatant.cs:34)
+Crulanda.Encounter.EncounterEnemy:Receive (int,Crulanda.Gameplay.Actor) (at Assets/Crulanda/Scripts/Encounter/EncounterEnemy.cs:53)
+Crulanda.Encounter.EncounterSession:Update () (at Assets/Crulanda/Scripts/Encounter/EncounterSession.cs:162)
+
+(Filename: Assets/Crulanda/Scripts/Core/Logging/CrulandaLog.cs Line: 116)
+
+PACING_MEASUREMENT sentry.0 20.8 seconds
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+Crulanda.Tests.EncounterLoopTests/<Recruit_fight_heal_loot_equip_save_and_reload>d__5:MoveNext () (at Assets/Crulanda/Tests/PlayMode/EncounterLoopTests.cs:68)
+UnityEngine.TestTools.TestEnumerator/<Execute>d__8:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Attributes/TestEnumerator.cs:52)
+UnityEngine.TestTools.EnumerableTestMethodCommand/<ExecuteEnumerableAndRecordExceptions>d__4:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:85)
+UnityEngine.TestTools.EnumerableTestMethodCommand:AdvanceEnumerator (System.Collections.IEnumerator) (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:64)
+UnityEngine.TestTools.EnumerableTestMethodCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:47)
+UnityEngine.TestRunner.NUnitExtensions.Runner.UnityLogCheckDelegatingCommand/<ExecuteEnumerable>d__4:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Runner/UnityLogCheckDelegatingCommand.cs:66)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<NUnit.Framework.ITestAction>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<System.Reflection.MethodInfo>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<System.Reflection.MethodInfo>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<UnityEngine.TestTools.IOuterUnityTestAction>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.RetryCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/RetryCommand.cs:37)
+UnityEngine.TestTools.RepeatCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/RepeatCommand.cs:36)
+UnityEngine.TestTools.IgnoreTestCommand/<ExecuteEnumerable>d__3:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/IgnoreTestCommand.cs:42)
+UnityEngine.TestTools.StrictCheckCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/StrictCheckCommand.cs:29)
+UnityEngine.TestTools.Utils.CoroutineRunner/<WrapEnumeratorForChecks>d__8:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/Utils/CoroutineRunner.cs:58)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+(Filename: Assets/Crulanda/Tests/PlayMode/EncounterLoopTests.cs Line: 68)
+
+TrimDiskCacheJob: Current cache size 0mb
+[Actors] Trail sentry 2 died.
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object,UnityEngine.Object)
+UnityEngine.Debug:Log (object,UnityEngine.Object)
+Crulanda.Core.CrulandaLog:Write (Crulanda.Core.LogLevel,Crulanda.Core.LogCategory,string,UnityEngine.Object) (at Assets/Crulanda/Scripts/Core/Logging/CrulandaLog.cs:116)
+Crulanda.Core.CrulandaLog:Info (Crulanda.Core.LogCategory,string,UnityEngine.Object) (at Assets/Crulanda/Scripts/Core/Logging/CrulandaLog.cs:86)
+Crulanda.Gameplay.Health:Die () (at Assets/Crulanda/Scripts/Gameplay/Actors/Health.cs:71)
+Crulanda.Gameplay.Health:ApplyDamage (int) (at Assets/Crulanda/Scripts/Gameplay/Actors/Health.cs:42)
+Crulanda.Combat.Combatant:Damage (int) (at Assets/Crulanda/Scripts/Combat/Combatant.cs:34)
+Crulanda.Encounter.EncounterEnemy:Receive (int,Crulanda.Gameplay.Actor) (at Assets/Crulanda/Scripts/Encounter/EncounterEnemy.cs:53)
+Crulanda.Encounter.EncounterSession/<>c__DisplayClass66_0:<UseAbility>b__1 () (at Assets/Crulanda/Scripts/Encounter/EncounterSession.cs:204)
+Crulanda.Abilities.AbilityRuntime:TryStart (Crulanda.Abilities.AbilityDefinition,single,System.Func`2<int, bool>,System.Action) (at Assets/Crulanda/Scripts/Abilities/AbilityRuntime.cs:46)
+Crulanda.Encounter.EncounterSession:UseAbility (int) (at Assets/Crulanda/Scripts/Encounter/EncounterSession.cs:191)
+Crulanda.Tests.EncounterLoopTests/<Recruit_fight_heal_loot_equip_save_and_reload>d__5:MoveNext () (at Assets/Crulanda/Tests/PlayMode/EncounterLoopTests.cs:62)
+UnityEngine.TestTools.TestEnumerator/<Execute>d__8:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Attributes/TestEnumerator.cs:52)
+UnityEngine.TestTools.EnumerableTestMethodCommand/<ExecuteEnumerableAndRecordExceptions>d__4:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:85)
+UnityEngine.TestTools.EnumerableTestMethodCommand:AdvanceEnumerator (System.Collections.IEnumerator) (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:64)
+UnityEngine.TestTools.EnumerableTestMethodCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:47)
+UnityEngine.TestRunner.NUnitExtensions.Runner.UnityLogCheckDelegatingCommand/<ExecuteEnumerable>d__4:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Runner/UnityLogCheckDelegatingCommand.cs:66)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<NUnit.Framework.ITestAction>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<System.Reflection.MethodInfo>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<System.Reflection.MethodInfo>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<UnityEngine.TestTools.IOuterUnityTestAction>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.RetryCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/RetryCommand.cs:37)
+UnityEngine.TestTools.RepeatCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/RepeatCommand.cs:36)
+UnityEngine.TestTools.IgnoreTestCommand/<ExecuteEnumerable>d__3:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/IgnoreTestCommand.cs:42)
+UnityEngine.TestTools.StrictCheckCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/StrictCheckCommand.cs:29)
+UnityEngine.TestTools.Utils.CoroutineRunner/<WrapEnumeratorForChecks>d__8:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/Utils/CoroutineRunner.cs:58)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+(Filename: Assets/Crulanda/Scripts/Core/Logging/CrulandaLog.cs Line: 116)
+
+PACING_MEASUREMENT sentry.1 24.4 seconds
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+Crulanda.Tests.EncounterLoopTests/<Recruit_fight_heal_loot_equip_save_and_reload>d__5:MoveNext () (at Assets/Crulanda/Tests/PlayMode/EncounterLoopTests.cs:68)
+UnityEngine.TestTools.TestEnumerator/<Execute>d__8:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Attributes/TestEnumerator.cs:52)
+UnityEngine.TestTools.EnumerableTestMethodCommand/<ExecuteEnumerableAndRecordExceptions>d__4:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:85)
+UnityEngine.TestTools.EnumerableTestMethodCommand:AdvanceEnumerator (System.Collections.IEnumerator) (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:64)
+UnityEngine.TestTools.EnumerableTestMethodCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:47)
+UnityEngine.TestRunner.NUnitExtensions.Runner.UnityLogCheckDelegatingCommand/<ExecuteEnumerable>d__4:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Runner/UnityLogCheckDelegatingCommand.cs:66)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<NUnit.Framework.ITestAction>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<System.Reflection.MethodInfo>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<System.Reflection.MethodInfo>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<UnityEngine.TestTools.IOuterUnityTestAction>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.RetryCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/RetryCommand.cs:37)
+UnityEngine.TestTools.RepeatCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/RepeatCommand.cs:36)
+UnityEngine.TestTools.IgnoreTestCommand/<ExecuteEnumerable>d__3:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/IgnoreTestCommand.cs:42)
+UnityEngine.TestTools.StrictCheckCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/StrictCheckCommand.cs:29)
+UnityEngine.TestTools.Utils.CoroutineRunner/<WrapEnumeratorForChecks>d__8:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/Utils/CoroutineRunner.cs:58)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+(Filename: Assets/Crulanda/Tests/PlayMode/EncounterLoopTests.cs Line: 68)
+
+[Actors] Veteran sentry died.
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object,UnityEngine.Object)
+UnityEngine.Debug:Log (object,UnityEngine.Object)
+Crulanda.Core.CrulandaLog:Write (Crulanda.Core.LogLevel,Crulanda.Core.LogCategory,string,UnityEngine.Object) (at Assets/Crulanda/Scripts/Core/Logging/CrulandaLog.cs:116)
+Crulanda.Core.CrulandaLog:Info (Crulanda.Core.LogCategory,string,UnityEngine.Object) (at Assets/Crulanda/Scripts/Core/Logging/CrulandaLog.cs:86)
+Crulanda.Gameplay.Health:Die () (at Assets/Crulanda/Scripts/Gameplay/Actors/Health.cs:71)
+Crulanda.Gameplay.Health:ApplyDamage (int) (at Assets/Crulanda/Scripts/Gameplay/Actors/Health.cs:42)
+Crulanda.Combat.Combatant:Damage (int) (at Assets/Crulanda/Scripts/Combat/Combatant.cs:34)
+Crulanda.Encounter.EncounterEnemy:Receive (int,Crulanda.Gameplay.Actor) (at Assets/Crulanda/Scripts/Encounter/EncounterEnemy.cs:53)
+Crulanda.Encounter.EncounterSession/<>c__DisplayClass66_0:<UseAbility>b__1 () (at Assets/Crulanda/Scripts/Encounter/EncounterSession.cs:204)
+Crulanda.Abilities.AbilityRuntime:TryStart (Crulanda.Abilities.AbilityDefinition,single,System.Func`2<int, bool>,System.Action) (at Assets/Crulanda/Scripts/Abilities/AbilityRuntime.cs:46)
+Crulanda.Encounter.EncounterSession:UseAbility (int) (at Assets/Crulanda/Scripts/Encounter/EncounterSession.cs:191)
+Crulanda.Tests.EncounterLoopTests/<Recruit_fight_heal_loot_equip_save_and_reload>d__5:MoveNext () (at Assets/Crulanda/Tests/PlayMode/EncounterLoopTests.cs:62)
+UnityEngine.TestTools.TestEnumerator/<Execute>d__8:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Attributes/TestEnumerator.cs:52)
+UnityEngine.TestTools.EnumerableTestMethodCommand/<ExecuteEnumerableAndRecordExceptions>d__4:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:85)
+UnityEngine.TestTools.EnumerableTestMethodCommand:AdvanceEnumerator (System.Collections.IEnumerator) (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:64)
+UnityEngine.TestTools.EnumerableTestMethodCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:47)
+UnityEngine.TestRunner.NUnitExtensions.Runner.UnityLogCheckDelegatingCommand/<ExecuteEnumerable>d__4:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Runner/UnityLogCheckDelegatingCommand.cs:66)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<NUnit.Framework.ITestAction>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<System.Reflection.MethodInfo>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<System.Reflection.MethodInfo>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<UnityEngine.TestTools.IOuterUnityTestAction>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.RetryCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/RetryCommand.cs:37)
+UnityEngine.TestTools.RepeatCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/RepeatCommand.cs:36)
+UnityEngine.TestTools.IgnoreTestCommand/<ExecuteEnumerable>d__3:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/IgnoreTestCommand.cs:42)
+UnityEngine.TestTools.StrictCheckCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/StrictCheckCommand.cs:29)
+UnityEngine.TestTools.Utils.CoroutineRunner/<WrapEnumeratorForChecks>d__8:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/Utils/CoroutineRunner.cs:58)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+(Filename: Assets/Crulanda/Scripts/Core/Logging/CrulandaLog.cs Line: 116)
+
+PACING_MEASUREMENT sentry.2 35.0 seconds
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+Crulanda.Tests.EncounterLoopTests/<Recruit_fight_heal_loot_equip_save_and_reload>d__5:MoveNext () (at Assets/Crulanda/Tests/PlayMode/EncounterLoopTests.cs:68)
+UnityEngine.TestTools.TestEnumerator/<Execute>d__8:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Attributes/TestEnumerator.cs:52)
+UnityEngine.TestTools.EnumerableTestMethodCommand/<ExecuteEnumerableAndRecordExceptions>d__4:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:85)
+UnityEngine.TestTools.EnumerableTestMethodCommand:AdvanceEnumerator (System.Collections.IEnumerator) (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:64)
+UnityEngine.TestTools.EnumerableTestMethodCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:47)
+UnityEngine.TestRunner.NUnitExtensions.Runner.UnityLogCheckDelegatingCommand/<ExecuteEnumerable>d__4:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Runner/UnityLogCheckDelegatingCommand.cs:66)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<NUnit.Framework.ITestAction>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<System.Reflection.MethodInfo>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<System.Reflection.MethodInfo>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<UnityEngine.TestTools.IOuterUnityTestAction>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.RetryCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/RetryCommand.cs:37)
+UnityEngine.TestTools.RepeatCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/RepeatCommand.cs:36)
+UnityEngine.TestTools.IgnoreTestCommand/<ExecuteEnumerable>d__3:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/IgnoreTestCommand.cs:42)
+UnityEngine.TestTools.StrictCheckCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/StrictCheckCommand.cs:29)
+UnityEngine.TestTools.Utils.CoroutineRunner/<WrapEnumeratorForChecks>d__8:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/Utils/CoroutineRunner.cs:58)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+(Filename: Assets/Crulanda/Tests/PlayMode/EncounterLoopTests.cs Line: 68)
+
+[Actors] Trail sentry 1 died.
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object,UnityEngine.Object)
+UnityEngine.Debug:Log (object,UnityEngine.Object)
+Crulanda.Core.CrulandaLog:Write (Crulanda.Core.LogLevel,Crulanda.Core.LogCategory,string,UnityEngine.Object) (at Assets/Crulanda/Scripts/Core/Logging/CrulandaLog.cs:116)
+Crulanda.Core.CrulandaLog:Info (Crulanda.Core.LogCategory,string,UnityEngine.Object) (at Assets/Crulanda/Scripts/Core/Logging/CrulandaLog.cs:86)
+Crulanda.Gameplay.Health:Die () (at Assets/Crulanda/Scripts/Gameplay/Actors/Health.cs:71)
+Crulanda.Gameplay.Health:ApplyDamage (int) (at Assets/Crulanda/Scripts/Gameplay/Actors/Health.cs:42)
+Crulanda.Encounter.EncounterEnemy:RestoreDead () (at Assets/Crulanda/Scripts/Encounter/EncounterEnemy.cs:67)
+Crulanda.Encounter.EncounterSession:SpawnParty () (at Assets/Crulanda/Scripts/Encounter/EncounterSession.cs:117)
+Crulanda.Encounter.EncounterSession:Load () (at Assets/Crulanda/Scripts/Encounter/EncounterSession.cs:273)
+Crulanda.Tests.EncounterLoopTests/<Recruit_fight_heal_loot_equip_save_and_reload>d__5:MoveNext () (at Assets/Crulanda/Tests/PlayMode/EncounterLoopTests.cs:76)
+UnityEngine.TestTools.TestEnumerator/<Execute>d__8:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Attributes/TestEnumerator.cs:52)
+UnityEngine.TestTools.EnumerableTestMethodCommand/<ExecuteEnumerableAndRecordExceptions>d__4:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:85)
+UnityEngine.TestTools.EnumerableTestMethodCommand:AdvanceEnumerator (System.Collections.IEnumerator) (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:64)
+UnityEngine.TestTools.EnumerableTestMethodCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:47)
+UnityEngine.TestRunner.NUnitExtensions.Runner.UnityLogCheckDelegatingCommand/<ExecuteEnumerable>d__4:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Runner/UnityLogCheckDelegatingCommand.cs:66)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<NUnit.Framework.ITestAction>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<System.Reflection.MethodInfo>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<System.Reflection.MethodInfo>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<UnityEngine.TestTools.IOuterUnityTestAction>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.RetryCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/RetryCommand.cs:37)
+UnityEngine.TestTools.RepeatCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/RepeatCommand.cs:36)
+UnityEngine.TestTools.IgnoreTestCommand/<ExecuteEnumerable>d__3:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/IgnoreTestCommand.cs:42)
+UnityEngine.TestTools.StrictCheckCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/StrictCheckCommand.cs:29)
+UnityEngine.TestTools.Utils.CoroutineRunner/<WrapEnumeratorForChecks>d__8:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/Utils/CoroutineRunner.cs:58)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+(Filename: Assets/Crulanda/Scripts/Core/Logging/CrulandaLog.cs Line: 116)
+
+[Actors] Trail sentry 2 died.
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object,UnityEngine.Object)
+UnityEngine.Debug:Log (object,UnityEngine.Object)
+Crulanda.Core.CrulandaLog:Write (Crulanda.Core.LogLevel,Crulanda.Core.LogCategory,string,UnityEngine.Object) (at Assets/Crulanda/Scripts/Core/Logging/CrulandaLog.cs:116)
+Crulanda.Core.CrulandaLog:Info (Crulanda.Core.LogCategory,string,UnityEngine.Object) (at Assets/Crulanda/Scripts/Core/Logging/CrulandaLog.cs:86)
+Crulanda.Gameplay.Health:Die () (at Assets/Crulanda/Scripts/Gameplay/Actors/Health.cs:71)
+Crulanda.Gameplay.Health:ApplyDamage (int) (at Assets/Crulanda/Scripts/Gameplay/Actors/Health.cs:42)
+Crulanda.Encounter.EncounterEnemy:RestoreDead () (at Assets/Crulanda/Scripts/Encounter/EncounterEnemy.cs:67)
+Crulanda.Encounter.EncounterSession:SpawnParty () (at Assets/Crulanda/Scripts/Encounter/EncounterSession.cs:117)
+Crulanda.Encounter.EncounterSession:Load () (at Assets/Crulanda/Scripts/Encounter/EncounterSession.cs:273)
+Crulanda.Tests.EncounterLoopTests/<Recruit_fight_heal_loot_equip_save_and_reload>d__5:MoveNext () (at Assets/Crulanda/Tests/PlayMode/EncounterLoopTests.cs:76)
+UnityEngine.TestTools.TestEnumerator/<Execute>d__8:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Attributes/TestEnumerator.cs:52)
+UnityEngine.TestTools.EnumerableTestMethodCommand/<ExecuteEnumerableAndRecordExceptions>d__4:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:85)
+UnityEngine.TestTools.EnumerableTestMethodCommand:AdvanceEnumerator (System.Collections.IEnumerator) (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:64)
+UnityEngine.TestTools.EnumerableTestMethodCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:47)
+UnityEngine.TestRunner.NUnitExtensions.Runner.UnityLogCheckDelegatingCommand/<ExecuteEnumerable>d__4:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Runner/UnityLogCheckDelegatingCommand.cs:66)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<NUnit.Framework.ITestAction>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<System.Reflection.MethodInfo>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<System.Reflection.MethodInfo>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<UnityEngine.TestTools.IOuterUnityTestAction>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.RetryCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/RetryCommand.cs:37)
+UnityEngine.TestTools.RepeatCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/RepeatCommand.cs:36)
+UnityEngine.TestTools.IgnoreTestCommand/<ExecuteEnumerable>d__3:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/IgnoreTestCommand.cs:42)
+UnityEngine.TestTools.StrictCheckCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/StrictCheckCommand.cs:29)
+UnityEngine.TestTools.Utils.CoroutineRunner/<WrapEnumeratorForChecks>d__8:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/Utils/CoroutineRunner.cs:58)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+(Filename: Assets/Crulanda/Scripts/Core/Logging/CrulandaLog.cs Line: 116)
+
+[Actors] Veteran sentry died.
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object,UnityEngine.Object)
+UnityEngine.Debug:Log (object,UnityEngine.Object)
+Crulanda.Core.CrulandaLog:Write (Crulanda.Core.LogLevel,Crulanda.Core.LogCategory,string,UnityEngine.Object) (at Assets/Crulanda/Scripts/Core/Logging/CrulandaLog.cs:116)
+Crulanda.Core.CrulandaLog:Info (Crulanda.Core.LogCategory,string,UnityEngine.Object) (at Assets/Crulanda/Scripts/Core/Logging/CrulandaLog.cs:86)
+Crulanda.Gameplay.Health:Die () (at Assets/Crulanda/Scripts/Gameplay/Actors/Health.cs:71)
+Crulanda.Gameplay.Health:ApplyDamage (int) (at Assets/Crulanda/Scripts/Gameplay/Actors/Health.cs:42)
+Crulanda.Encounter.EncounterEnemy:RestoreDead () (at Assets/Crulanda/Scripts/Encounter/EncounterEnemy.cs:67)
+Crulanda.Encounter.EncounterSession:SpawnParty () (at Assets/Crulanda/Scripts/Encounter/EncounterSession.cs:117)
+Crulanda.Encounter.EncounterSession:Load () (at Assets/Crulanda/Scripts/Encounter/EncounterSession.cs:273)
+Crulanda.Tests.EncounterLoopTests/<Recruit_fight_heal_loot_equip_save_and_reload>d__5:MoveNext () (at Assets/Crulanda/Tests/PlayMode/EncounterLoopTests.cs:76)
+UnityEngine.TestTools.TestEnumerator/<Execute>d__8:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Attributes/TestEnumerator.cs:52)
+UnityEngine.TestTools.EnumerableTestMethodCommand/<ExecuteEnumerableAndRecordExceptions>d__4:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:85)
+UnityEngine.TestTools.EnumerableTestMethodCommand:AdvanceEnumerator (System.Collections.IEnumerator) (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:64)
+UnityEngine.TestTools.EnumerableTestMethodCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/EnumerableTestMethodCommand.cs:47)
+UnityEngine.TestRunner.NUnitExtensions.Runner.UnityLogCheckDelegatingCommand/<ExecuteEnumerable>d__4:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Runner/UnityLogCheckDelegatingCommand.cs:66)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<NUnit.Framework.ITestAction>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<System.Reflection.MethodInfo>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<System.Reflection.MethodInfo>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<UnityEngine.TestTools.IOuterUnityTestAction>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:213)
+UnityEngine.TestTools.RetryCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/RetryCommand.cs:37)
+UnityEngine.TestTools.RepeatCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/RepeatCommand.cs:36)
+UnityEngine.TestTools.IgnoreTestCommand/<ExecuteEnumerable>d__3:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/IgnoreTestCommand.cs:42)
+UnityEngine.TestTools.StrictCheckCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/NUnitExtensions/Commands/StrictCheckCommand.cs:29)
+UnityEngine.TestTools.Utils.CoroutineRunner/<WrapEnumeratorForChecks>d__8:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEngine.TestRunner/Utils/CoroutineRunner.cs:58)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+(Filename: Assets/Crulanda/Scripts/Core/Logging/CrulandaLog.cs Line: 116)
+
+Saving results to: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\feedback-play-results.xml
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+Loaded scene 'Temp/__Backupscenes/0.backup'
+	Deserialize:            0.361 ms
+	Integration:            3.368 ms
+	Integration of assets:  0.001 ms
+	Thread Wait Time:       0.007 ms
+	Total Operation Time:   3.737 ms
+Unloading 7 unused Assets / (27.9 KB). Loaded Objects now: 1901.
+Memory consumption went from 258.6 MB to 258.5 MB.
+Total: 3.932100 ms (FindLiveObjects: 0.219100 ms CreateObjectMapping: 0.014600 ms MarkObjects: 3.564900 ms  DeleteObjects: 0.022200 ms)
+
+[Licensing::Client] Successfully resolved entitlement details
+Unloading 0 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 0 unused Assets / (0 B). Loaded Objects now: 1906.
+Memory consumption went from 258.7 MB to 258.7 MB.
+Total: 3.798600 ms (FindLiveObjects: 0.208200 ms CreateObjectMapping: 0.014200 ms MarkObjects: 3.454500 ms  DeleteObjects: 0.004900 ms)
+
+Asset Pipeline Refresh (id=af22bf39c789cf749b63c1549c18213c): Total: 0.018 seconds - Initiated by StopAssetImportingV2(NoUpdateAssetOptions)
+DisplayProgressbar: Undo
+Test run completed. Exiting with code 0 (Ok). Run completed.
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+UnityEditor.TestTools.TestRunner.CommandLineTest.Executer:ExitApplication (UnityEditor.TestTools.TestRunner.CommandLineTest.Executer/ReturnCodes,string) (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEditor.TestRunner/CommandLineTest/Executer.cs:81)
+UnityEditor.TestTools.TestRunner.CommandLineTest.Executer:ExitIfRunIsCompleted () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEditor.TestRunner/CommandLineTest/Executer.cs:74)
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions ()
+
+(Filename: ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEditor.TestRunner/CommandLineTest/Executer.cs Line: 81)
+
+MonoPathRemapper: Attempts to remap: 4856; Successful remaps: 84
+Serialized file version minimum: 23, current 23
+Importing 'GUID: 00000000000000004000000000000000 - Path: ProjectSettings/ProjectSettings.asset' with importer (LibraryAssetImporter)
+Imported 'GUID: 00000000000000004000000000000000' -> (Import Result ID: '57d9a8031da8be96f7c3bbdf946af202') in 0.003 seconds [static dependencies only]. Details - ImportResultOutputID=054c890a8f4b6dddbea933bc5e4b7df4 DependenciesID=1d242eadbeb87576a8bd08f673976259 StaticDependenciesID=001aa7e94f01086792edbcbf200b891e 
+Asset Pipeline Refresh (id=22fb6da7caeb9a1499911f84b610bde9): Total: 0.009 seconds - Initiated by StopAssetImportingV2(NoUpdateAssetOptions)
+[Physics::Module] Cleanup current backend.
+[Physics::Module] Id: 0xf2b8ea05
+Input System module state changed to: ShutdownInProgress.
+Input Polling Thread exited.
+Input System module state changed to: Shutdown.
+[Licensing::IpcConnector] LicenseClient-chris-notifications channel disconnected successfully.
+[Licensing::IpcConnector] LicenseClient-chris channel disconnected successfully.
+Lingering sessions upon destruction of worker manager
+Unity Data Store service was successfully shut down
+UDS shutting down local client system
+AcceleratorClientConnectionCallback - disconnected - :0
+Cleanup mono
+CodeReloadManager destroyed
+VBCSCompilerPreWarmer: requested VBCSCompiler shutdown
+Checking for leaked weakptr:
+  Found no leaked weakptrs.
+[Package Manager] Server process was shutdown
+##utp:{"type":"MemoryLeaks","version":2,"phase":"Immediate","time":1790641183389,"processId":24676,"allocatedMemory":11545129,"memoryLabels":[{"Default":165033},{"Permanent":15516},{"NewDelete":69119},{"Thread":4197984},{"Manager":35133},{"VertexData":8},{"Geometry":816},{"Texture":24},{"Shader":848547},{"Material":68},{"GfxDevice":55968},{"Animation":952},{"FreeType":8},{"FontEngine":736},{"Physics":1970},{"Physics2D":16},{"Serialization":17696},{"Input":42840},{"JobScheduler":256},{"TextLib":280},{"Mono":48},{"ScriptingNativeRuntime":1243480},{"BaseObject":49008},{"Resource":1252},{"Renderer":2376},{"Transform":4685},{"File":7397},{"WebCam":616},{"Culling":32},{"Terrain":11442},{"Wind":24},{"STL":40},{"String":738786},{"StaticString":3808},{"Utility":2675078},{"Curl":2478},{"PoolAlloc":2168},{"AI":80},{"TypeTree":14869},{"ScriptManager":18984},{"CodeReload":448},{"RuntimeInitializeOnLoadManager":64},{"Sprites":102},{"SpriteAtlas":120},{"GI":7816},{"Director":8296},{"CloudService":432},{"WebRequest":18060},{"VR":49650},{"SceneManager":608},{"Video":64},{"LazyScriptCache":32},{"Camera":729},{"Secure":2377},{"SerializationCache":9256},{"APIUpdating":10320},{"Subsystems":336},{"VirtualTexturing":57888},{"StaticSafetyDebugInfo":278528},{"Analytics":464},{"Hierarchy":1188},{"UIElements":40},{"CoreStats":14456},{"Identifiers":7152},{"Gui":128},{"EditorUtility":111718},{"VersionControl":8},{"Undo":931},{"AssetDatabase":677233},{"AssetImporter":40},{"EditorGi":328},{"UnityConnect":40465},{"Upm":1912},{"UpmDiagnostics":8},{"AssetCompliance":96},{"DrivenProperties":72},{"LocalIPC":211},{"ProfilerEditor":9746},{"CoreBusinessMetrics":3226},{"Windowing":456},{"Licensing":696},{"AssetReference":32},{"IPCStream":32}]}

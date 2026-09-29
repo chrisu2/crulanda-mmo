@@ -1,0 +1,783 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="118" result="Passed" total="118" passed="118" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.1672837">
+  <test-suite type="TestSuite" id="1000" name="Crulanda - The Quiet Trail" fullname="Crulanda - The Quiet Trail" runstate="Runnable" testcasecount="118" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.167284" total="118" passed="118" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1136" name="Crulanda.Tests.EditMode.dll" fullname="C:/Users/chris/Documents/Codex/2026-09-28/hel/work/encounter-validation/Library/ScriptAssemblies/Crulanda.Tests.EditMode.dll" runstate="Runnable" testcasecount="118" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.160970" total="118" passed="118" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="23600" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1137" name="Crulanda" fullname="Crulanda" runstate="Runnable" testcasecount="118" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.160228" total="118" passed="118" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1138" name="Tests" fullname="Crulanda.Tests" runstate="Runnable" testcasecount="118" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.157918" total="118" passed="118" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestFixture" id="1001" name="AbilityRuntimeTests" fullname="Crulanda.Tests.AbilityRuntimeTests" classname="Crulanda.Tests.AbilityRuntimeTests" runstate="Runnable" testcasecount="8" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.022245" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1008" name="Actor_runtimes_do_not_share_cooldowns" fullname="Crulanda.Tests.AbilityRuntimeTests.Actor_runtimes_do_not_share_cooldowns" methodname="Actor_runtimes_do_not_share_cooldowns" classname="Crulanda.Tests.AbilityRuntimeTests" runstate="Runnable" seed="350457611" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.009813" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1004" name="Cast_executes_once_after_duration_and_blocks_overlapping_casts" fullname="Crulanda.Tests.AbilityRuntimeTests.Cast_executes_once_after_duration_and_blocks_overlapping_casts" methodname="Cast_executes_once_after_duration_and_blocks_overlapping_casts" classname="Crulanda.Tests.AbilityRuntimeTests" runstate="Runnable" seed="1991589091" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.001250" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1006" name="Failed_cost_does_not_start_any_timers" fullname="Crulanda.Tests.AbilityRuntimeTests.Failed_cost_does_not_start_any_timers" methodname="Failed_cost_does_not_start_any_timers" classname="Crulanda.Tests.AbilityRuntimeTests" runstate="Runnable" seed="1153204421" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000291" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1002" name="Global_cooldown_blocks_other_spells_without_spending" fullname="Crulanda.Tests.AbilityRuntimeTests.Global_cooldown_blocks_other_spells_without_spending" methodname="Global_cooldown_blocks_other_spells_without_spending" classname="Crulanda.Tests.AbilityRuntimeTests" runstate="Runnable" seed="1653259411" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000247" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1005" name="Interrupted_cast_never_executes_and_keeps_cost_and_cooldown" fullname="Crulanda.Tests.AbilityRuntimeTests.Interrupted_cast_never_executes_and_keeps_cost_and_cooldown" methodname="Interrupted_cast_never_executes_and_keeps_cost_and_cooldown" classname="Crulanda.Tests.AbilityRuntimeTests" runstate="Runnable" seed="638212218" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000147" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1009" name="Invalid_data_is_rejected_without_spending_or_effects" fullname="Crulanda.Tests.AbilityRuntimeTests.Invalid_data_is_rejected_without_spending_or_effects" methodname="Invalid_data_is_rejected_without_spending_or_effects" classname="Crulanda.Tests.AbilityRuntimeTests" runstate="Runnable" seed="1424271834" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000119" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1003" name="Off_global_defense_does_not_clear_existing_global_cooldown" fullname="Crulanda.Tests.AbilityRuntimeTests.Off_global_defense_does_not_clear_existing_global_cooldown" methodname="Off_global_defense_does_not_clear_existing_global_cooldown" classname="Crulanda.Tests.AbilityRuntimeTests" runstate="Runnable" seed="399710699" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000204" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1007" name="Reset_cancels_pending_effects_and_cooldowns" fullname="Crulanda.Tests.AbilityRuntimeTests.Reset_cancels_pending_effects_and_cooldowns" methodname="Reset_cancels_pending_effects_and_cooldowns" classname="Crulanda.Tests.AbilityRuntimeTests" runstate="Runnable" seed="1346273545" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000214" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1010" name="ContentIdTests" fullname="Crulanda.Tests.ContentIdTests" classname="Crulanda.Tests.ContentIdTests" runstate="Runnable" testcasecount="13" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.004481" total="13" passed="13" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1023" name="Default_and_empty_ids_are_invalid_and_equal" fullname="Crulanda.Tests.ContentIdTests.Default_and_empty_ids_are_invalid_and_equal" methodname="Default_and_empty_ids_are_invalid_and_equal" classname="Crulanda.Tests.ContentIdTests" runstate="Runnable" seed="1405437477" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000314" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1024" name="EntityId_New_is_valid_and_unique" fullname="Crulanda.Tests.ContentIdTests.EntityId_New_is_valid_and_unique" methodname="EntityId_New_is_valid_and_unique" classname="Crulanda.Tests.ContentIdTests" runstate="Runnable" seed="2012793976" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000265" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1022" name="Equality_and_hashing_follow_the_string_value" fullname="Crulanda.Tests.ContentIdTests.Equality_and_hashing_follow_the_string_value" methodname="Equality_and_hashing_follow_the_string_value" classname="Crulanda.Tests.ContentIdTests" runstate="Runnable" seed="1816649218" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.001225" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1020" name="IsValidFormat" fullname="Crulanda.Tests.ContentIdTests.IsValidFormat" classname="Crulanda.Tests.ContentIdTests" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.001432" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1011" name="IsValidFormat(&quot;item.iron_sword&quot;,True)" fullname="Crulanda.Tests.ContentIdTests.IsValidFormat(&quot;item.iron_sword&quot;,True)" methodname="IsValidFormat" classname="Crulanda.Tests.ContentIdTests" runstate="Runnable" seed="615251658" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000481" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1012" name="IsValidFormat(&quot;a&quot;,True)" fullname="Crulanda.Tests.ContentIdTests.IsValidFormat(&quot;a&quot;,True)" methodname="IsValidFormat" classname="Crulanda.Tests.ContentIdTests" runstate="Runnable" seed="1142974429" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000052" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1013" name="IsValidFormat(&quot;ability.warrior.strike-1&quot;,True)" fullname="Crulanda.Tests.ContentIdTests.IsValidFormat(&quot;ability.warrior.strike-1&quot;,True)" methodname="IsValidFormat" classname="Crulanda.Tests.ContentIdTests" runstate="Runnable" seed="1577106350" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000034" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1014" name="IsValidFormat(&quot;&quot;,False)" fullname="Crulanda.Tests.ContentIdTests.IsValidFormat(&quot;&quot;,False)" methodname="IsValidFormat" classname="Crulanda.Tests.ContentIdTests" runstate="Runnable" seed="1293963308" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000028" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1015" name="IsValidFormat(null,False)" fullname="Crulanda.Tests.ContentIdTests.IsValidFormat(null,False)" methodname="IsValidFormat" classname="Crulanda.Tests.ContentIdTests" runstate="Runnable" seed="218577481" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000028" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1016" name="IsValidFormat(&quot;Item.Sword&quot;,False)" fullname="Crulanda.Tests.ContentIdTests.IsValidFormat(&quot;Item.Sword&quot;,False)" methodname="IsValidFormat" classname="Crulanda.Tests.ContentIdTests" runstate="Runnable" seed="494105500" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000026" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1017" name="IsValidFormat(&quot;1item&quot;,False)" fullname="Crulanda.Tests.ContentIdTests.IsValidFormat(&quot;1item&quot;,False)" methodname="IsValidFormat" classname="Crulanda.Tests.ContentIdTests" runstate="Runnable" seed="1675516785" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000027" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1018" name="IsValidFormat(&quot;item sword&quot;,False)" fullname="Crulanda.Tests.ContentIdTests.IsValidFormat(&quot;item sword&quot;,False)" methodname="IsValidFormat" classname="Crulanda.Tests.ContentIdTests" runstate="Runnable" seed="393638780" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000026" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1019" name="IsValidFormat(&quot;item/sword&quot;,False)" fullname="Crulanda.Tests.ContentIdTests.IsValidFormat(&quot;item/sword&quot;,False)" methodname="IsValidFormat" classname="Crulanda.Tests.ContentIdTests" runstate="Runnable" seed="1318968689" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000026" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-case id="1021" name="Too_long_ids_are_invalid" fullname="Crulanda.Tests.ContentIdTests.Too_long_ids_are_invalid" methodname="Too_long_ids_are_invalid" classname="Crulanda.Tests.ContentIdTests" runstate="Runnable" seed="87696586" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000183" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1025" name="ContentRegistryTests" fullname="Crulanda.Tests.ContentRegistryTests" classname="Crulanda.Tests.ContentRegistryTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.007572" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1026" name="Added_definitions_can_be_found_by_id" fullname="Crulanda.Tests.ContentRegistryTests.Added_definitions_can_be_found_by_id" methodname="Added_definitions_can_be_found_by_id" classname="Crulanda.Tests.ContentRegistryTests" runstate="Runnable" seed="147299353" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.003374" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1030" name="All_returns_definitions_of_the_requested_type" fullname="Crulanda.Tests.ContentRegistryTests.All_returns_definitions_of_the_requested_type" methodname="All_returns_definitions_of_the_requested_type" classname="Crulanda.Tests.ContentRegistryTests" runstate="Runnable" seed="1978972893" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000858" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1027" name="Duplicate_ids_are_rejected_and_first_wins" fullname="Crulanda.Tests.ContentRegistryTests.Duplicate_ids_are_rejected_and_first_wins" methodname="Duplicate_ids_are_rejected_and_first_wins" classname="Crulanda.Tests.ContentRegistryTests" runstate="Runnable" seed="364776231" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000550" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1029" name="Get_throws_for_unknown_id" fullname="Crulanda.Tests.ContentRegistryTests.Get_throws_for_unknown_id" methodname="Get_throws_for_unknown_id" classname="Crulanda.Tests.ContentRegistryTests" runstate="Runnable" seed="1959886461" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.001459" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1028" name="Invalid_ids_and_nulls_are_rejected" fullname="Crulanda.Tests.ContentRegistryTests.Invalid_ids_and_nulls_are_rejected" methodname="Invalid_ids_and_nulls_are_rejected" classname="Crulanda.Tests.ContentRegistryTests" runstate="Runnable" seed="752247086" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000188" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1031" name="DebugCommandRegistryTests" fullname="Crulanda.Tests.DebugCommandRegistryTests" classname="Crulanda.Tests.DebugCommandRegistryTests" runstate="Runnable" testcasecount="7" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.003270" total="7" passed="7" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1037" name="Blank_input_returns_empty" fullname="Crulanda.Tests.DebugCommandRegistryTests.Blank_input_returns_empty" methodname="Blank_input_returns_empty" classname="Crulanda.Tests.DebugCommandRegistryTests" runstate="Runnable" seed="63912038" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000570" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1034" name="Command_names_are_case_insensitive" fullname="Crulanda.Tests.DebugCommandRegistryTests.Command_names_are_case_insensitive" methodname="Command_names_are_case_insensitive" classname="Crulanda.Tests.DebugCommandRegistryTests" runstate="Runnable" seed="1242126253" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000180" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1033" name="Execute_passes_arguments_without_the_command_name" fullname="Crulanda.Tests.DebugCommandRegistryTests.Execute_passes_arguments_without_the_command_name" methodname="Execute_passes_arguments_without_the_command_name" classname="Crulanda.Tests.DebugCommandRegistryTests" runstate="Runnable" seed="1417993036" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000504" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1036" name="Handler_exceptions_become_error_text" fullname="Crulanda.Tests.DebugCommandRegistryTests.Handler_exceptions_become_error_text" methodname="Handler_exceptions_become_error_text" classname="Crulanda.Tests.DebugCommandRegistryTests" runstate="Runnable" seed="1070637380" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000516" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1038" name="Help_lists_commands_and_shows_usage" fullname="Crulanda.Tests.DebugCommandRegistryTests.Help_lists_commands_and_shows_usage" methodname="Help_lists_commands_and_shows_usage" classname="Crulanda.Tests.DebugCommandRegistryTests" runstate="Runnable" seed="905568875" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000463" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1032" name="Tokenize_splits_on_whitespace_and_respects_quotes" fullname="Crulanda.Tests.DebugCommandRegistryTests.Tokenize_splits_on_whitespace_and_respects_quotes" methodname="Tokenize_splits_on_whitespace_and_respects_quotes" classname="Crulanda.Tests.DebugCommandRegistryTests" runstate="Runnable" seed="597647669" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000123" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1035" name="Unknown_command_returns_a_hint" fullname="Crulanda.Tests.DebugCommandRegistryTests.Unknown_command_returns_a_hint" methodname="Unknown_command_returns_a_hint" classname="Crulanda.Tests.DebugCommandRegistryTests" runstate="Runnable" seed="997988441" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000061" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1039" name="EncounterRulesTests" fullname="Crulanda.Tests.EncounterRulesTests" classname="Crulanda.Tests.EncounterRulesTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.011763" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1040" name="Kill_and_loot_credit_cannot_be_duplicated" fullname="Crulanda.Tests.EncounterRulesTests.Kill_and_loot_credit_cannot_be_duplicated" methodname="Kill_and_loot_credit_cannot_be_duplicated" classname="Crulanda.Tests.EncounterRulesTests" runstate="Runnable" seed="1045608433" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000738" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1042" name="Save_round_trip_preserves_identity_party_equipment_and_rewards" fullname="Crulanda.Tests.EncounterRulesTests.Save_round_trip_preserves_identity_party_equipment_and_rewards" methodname="Save_round_trip_preserves_identity_party_equipment_and_rewards" classname="Crulanda.Tests.EncounterRulesTests" runstate="Runnable" seed="1788697278" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.009384" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1041" name="Taunt_expires_and_dead_targets_are_ignored" fullname="Crulanda.Tests.EncounterRulesTests.Taunt_expires_and_dead_targets_are_ignored" methodname="Taunt_expires_and_dead_targets_are_ignored" classname="Crulanda.Tests.EncounterRulesTests" runstate="Runnable" seed="1014001272" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.001054" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1043" name="EventBusTests" fullname="Crulanda.Tests.EventBusTests" classname="Crulanda.Tests.EventBusTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.003749" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1047" name="Handler_may_unsubscribe_itself_during_publish" fullname="Crulanda.Tests.EventBusTests.Handler_may_unsubscribe_itself_during_publish" methodname="Handler_may_unsubscribe_itself_during_publish" classname="Crulanda.Tests.EventBusTests" runstate="Runnable" seed="1742543947" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000732" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1048" name="Publishing_without_subscribers_is_a_no_op" fullname="Crulanda.Tests.EventBusTests.Publishing_without_subscribers_is_a_no_op" methodname="Publishing_without_subscribers_is_a_no_op" classname="Crulanda.Tests.EventBusTests" runstate="Runnable" seed="1590720498" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000579" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1044" name="Subscribers_receive_published_events" fullname="Crulanda.Tests.EventBusTests.Subscribers_receive_published_events" methodname="Subscribers_receive_published_events" classname="Crulanda.Tests.EventBusTests" runstate="Runnable" seed="1507353904" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000148" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1046" name="Throwing_handler_does_not_block_other_handlers" fullname="Crulanda.Tests.EventBusTests.Throwing_handler_does_not_block_other_handlers" methodname="Throwing_handler_does_not_block_other_handlers" classname="Crulanda.Tests.EventBusTests" runstate="Runnable" seed="1871888320" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.001302" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1045" name="Unsubscribe_stops_delivery" fullname="Crulanda.Tests.EventBusTests.Unsubscribe_stops_delivery" methodname="Unsubscribe_stops_delivery" classname="Crulanda.Tests.EventBusTests" runstate="Runnable" seed="1924652882" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000186" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1049" name="GameTagTests" fullname="Crulanda.Tests.GameTagTests" classname="Crulanda.Tests.GameTagTests" runstate="Runnable" testcasecount="19" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.008114" total="19" passed="19" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1068" name="All_declared_tags_are_valid_and_unique" fullname="Crulanda.Tests.GameTagTests.All_declared_tags_are_valid_and_unique" methodname="All_declared_tags_are_valid_and_unique" classname="Crulanda.Tests.GameTagTests" runstate="Runnable" seed="1375248486" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.003080" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1063" name="IsValidPath" fullname="Crulanda.Tests.GameTagTests.IsValidPath" classname="Crulanda.Tests.GameTagTests" runstate="Runnable" testcasecount="13" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.002773" total="13" passed="13" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1050" name="IsValidPath(&quot;Damage&quot;,True)" fullname="Crulanda.Tests.GameTagTests.IsValidPath(&quot;Damage&quot;,True)" methodname="IsValidPath" classname="Crulanda.Tests.GameTagTests" runstate="Runnable" seed="1314822633" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000104" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1051" name="IsValidPath(&quot;Damage.Fire&quot;,True)" fullname="Crulanda.Tests.GameTagTests.IsValidPath(&quot;Damage.Fire&quot;,True)" methodname="IsValidPath" classname="Crulanda.Tests.GameTagTests" runstate="Runnable" seed="544565517" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000037" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1052" name="IsValidPath(&quot;Ability.CrowdControl&quot;,True)" fullname="Crulanda.Tests.GameTagTests.IsValidPath(&quot;Ability.CrowdControl&quot;,True)" methodname="IsValidPath" classname="Crulanda.Tests.GameTagTests" runstate="Runnable" seed="677344688" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000031" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1053" name="IsValidPath(&quot;A1.B2&quot;,True)" fullname="Crulanda.Tests.GameTagTests.IsValidPath(&quot;A1.B2&quot;,True)" methodname="IsValidPath" classname="Crulanda.Tests.GameTagTests" runstate="Runnable" seed="971086132" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000030" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1054" name="IsValidPath(&quot;&quot;,False)" fullname="Crulanda.Tests.GameTagTests.IsValidPath(&quot;&quot;,False)" methodname="IsValidPath" classname="Crulanda.Tests.GameTagTests" runstate="Runnable" seed="984836868" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000028" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1055" name="IsValidPath(null,False)" fullname="Crulanda.Tests.GameTagTests.IsValidPath(null,False)" methodname="IsValidPath" classname="Crulanda.Tests.GameTagTests" runstate="Runnable" seed="1892542250" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000027" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1056" name="IsValidPath(&quot;damage&quot;,False)" fullname="Crulanda.Tests.GameTagTests.IsValidPath(&quot;damage&quot;,False)" methodname="IsValidPath" classname="Crulanda.Tests.GameTagTests" runstate="Runnable" seed="538974525" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000027" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1057" name="IsValidPath(&quot;Damage.&quot;,False)" fullname="Crulanda.Tests.GameTagTests.IsValidPath(&quot;Damage.&quot;,False)" methodname="IsValidPath" classname="Crulanda.Tests.GameTagTests" runstate="Runnable" seed="883071230" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000026" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1058" name="IsValidPath(&quot;.Damage&quot;,False)" fullname="Crulanda.Tests.GameTagTests.IsValidPath(&quot;.Damage&quot;,False)" methodname="IsValidPath" classname="Crulanda.Tests.GameTagTests" runstate="Runnable" seed="1590589319" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000062" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1059" name="IsValidPath(&quot;Damage..Fire&quot;,False)" fullname="Crulanda.Tests.GameTagTests.IsValidPath(&quot;Damage..Fire&quot;,False)" methodname="IsValidPath" classname="Crulanda.Tests.GameTagTests" runstate="Runnable" seed="2059623801" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000036" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1060" name="IsValidPath(&quot;Damage.fire&quot;,False)" fullname="Crulanda.Tests.GameTagTests.IsValidPath(&quot;Damage.fire&quot;,False)" methodname="IsValidPath" classname="Crulanda.Tests.GameTagTests" runstate="Runnable" seed="966591623" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000030" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1061" name="IsValidPath(&quot;Damage Fire&quot;,False)" fullname="Crulanda.Tests.GameTagTests.IsValidPath(&quot;Damage Fire&quot;,False)" methodname="IsValidPath" classname="Crulanda.Tests.GameTagTests" runstate="Runnable" seed="1113989168" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000029" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1062" name="IsValidPath(&quot;Damage-Fire&quot;,False)" fullname="Crulanda.Tests.GameTagTests.IsValidPath(&quot;Damage-Fire&quot;,False)" methodname="IsValidPath" classname="Crulanda.Tests.GameTagTests" runstate="Runnable" seed="270717037" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000028" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-case id="1065" name="Tag_does_not_match_descendants_siblings_or_lookalikes" fullname="Crulanda.Tests.GameTagTests.Tag_does_not_match_descendants_siblings_or_lookalikes" methodname="Tag_does_not_match_descendants_siblings_or_lookalikes" classname="Crulanda.Tests.GameTagTests" runstate="Runnable" seed="1956354093" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000221" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1064" name="Tag_matches_itself_and_its_ancestors" fullname="Crulanda.Tests.GameTagTests.Tag_matches_itself_and_its_ancestors" methodname="Tag_matches_itself_and_its_ancestors" classname="Crulanda.Tests.GameTagTests" runstate="Runnable" seed="2020466889" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000093" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1066" name="TagSet_queries_are_hierarchical" fullname="Crulanda.Tests.GameTagTests.TagSet_queries_are_hierarchical" methodname="TagSet_queries_are_hierarchical" classname="Crulanda.Tests.GameTagTests" runstate="Runnable" seed="434045782" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000892" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1067" name="TagSet_rejects_duplicates_and_invalid_tags" fullname="Crulanda.Tests.GameTagTests.TagSet_rejects_duplicates_and_invalid_tags" methodname="TagSet_rejects_duplicates_and_invalid_tags" classname="Crulanda.Tests.GameTagTests" runstate="Runnable" seed="173880894" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000140" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1069" name="Undeclared_tag_is_not_known" fullname="Crulanda.Tests.GameTagTests.Undeclared_tag_is_not_known" methodname="Undeclared_tag_is_not_known" classname="Crulanda.Tests.GameTagTests" runstate="Runnable" seed="999742914" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000074" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1070" name="LevelConTests" fullname="Crulanda.Tests.LevelConTests" classname="Crulanda.Tests.LevelConTests" runstate="Runnable" testcasecount="13" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.002123" total="13" passed="13" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="ParameterizedMethod" id="1084" name="Evaluate_matches_thresholds" fullname="Crulanda.Tests.LevelConTests.Evaluate_matches_thresholds" classname="Crulanda.Tests.LevelConTests" runstate="Runnable" testcasecount="13" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.001767" total="13" passed="13" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1071" name="Evaluate_matches_thresholds(10,3,Trivial)" fullname="Crulanda.Tests.LevelConTests.Evaluate_matches_thresholds(10,3,Trivial)" methodname="Evaluate_matches_thresholds" classname="Crulanda.Tests.LevelConTests" runstate="Runnable" seed="1222503897" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000244" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1072" name="Evaluate_matches_thresholds(10,5,Trivial)" fullname="Crulanda.Tests.LevelConTests.Evaluate_matches_thresholds(10,5,Trivial)" methodname="Evaluate_matches_thresholds" classname="Crulanda.Tests.LevelConTests" runstate="Runnable" seed="1591706178" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000079" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1073" name="Evaluate_matches_thresholds(10,6,Easy)" fullname="Crulanda.Tests.LevelConTests.Evaluate_matches_thresholds(10,6,Easy)" methodname="Evaluate_matches_thresholds" classname="Crulanda.Tests.LevelConTests" runstate="Runnable" seed="142891815" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000060" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1074" name="Evaluate_matches_thresholds(10,8,Easy)" fullname="Crulanda.Tests.LevelConTests.Evaluate_matches_thresholds(10,8,Easy)" methodname="Evaluate_matches_thresholds" classname="Crulanda.Tests.LevelConTests" runstate="Runnable" seed="1939512779" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000056" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1075" name="Evaluate_matches_thresholds(10,9,Even)" fullname="Crulanda.Tests.LevelConTests.Evaluate_matches_thresholds(10,9,Even)" methodname="Evaluate_matches_thresholds" classname="Crulanda.Tests.LevelConTests" runstate="Runnable" seed="1029189072" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000056" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1076" name="Evaluate_matches_thresholds(10,10,Even)" fullname="Crulanda.Tests.LevelConTests.Evaluate_matches_thresholds(10,10,Even)" methodname="Evaluate_matches_thresholds" classname="Crulanda.Tests.LevelConTests" runstate="Runnable" seed="1371860065" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000055" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1077" name="Evaluate_matches_thresholds(10,11,Even)" fullname="Crulanda.Tests.LevelConTests.Evaluate_matches_thresholds(10,11,Even)" methodname="Evaluate_matches_thresholds" classname="Crulanda.Tests.LevelConTests" runstate="Runnable" seed="532818451" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000055" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1078" name="Evaluate_matches_thresholds(10,12,Tough)" fullname="Crulanda.Tests.LevelConTests.Evaluate_matches_thresholds(10,12,Tough)" methodname="Evaluate_matches_thresholds" classname="Crulanda.Tests.LevelConTests" runstate="Runnable" seed="1368838636" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000053" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1079" name="Evaluate_matches_thresholds(10,13,Tough)" fullname="Crulanda.Tests.LevelConTests.Evaluate_matches_thresholds(10,13,Tough)" methodname="Evaluate_matches_thresholds" classname="Crulanda.Tests.LevelConTests" runstate="Runnable" seed="1814319183" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000055" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1080" name="Evaluate_matches_thresholds(10,14,Dangerous)" fullname="Crulanda.Tests.LevelConTests.Evaluate_matches_thresholds(10,14,Dangerous)" methodname="Evaluate_matches_thresholds" classname="Crulanda.Tests.LevelConTests" runstate="Runnable" seed="1612385769" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000051" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1081" name="Evaluate_matches_thresholds(10,15,Dangerous)" fullname="Crulanda.Tests.LevelConTests.Evaluate_matches_thresholds(10,15,Dangerous)" methodname="Evaluate_matches_thresholds" classname="Crulanda.Tests.LevelConTests" runstate="Runnable" seed="671931228" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000050" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1082" name="Evaluate_matches_thresholds(10,16,Deadly)" fullname="Crulanda.Tests.LevelConTests.Evaluate_matches_thresholds(10,16,Deadly)" methodname="Evaluate_matches_thresholds" classname="Crulanda.Tests.LevelConTests" runstate="Runnable" seed="1100749561" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000052" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1083" name="Evaluate_matches_thresholds(1,40,Deadly)" fullname="Crulanda.Tests.LevelConTests.Evaluate_matches_thresholds(1,40,Deadly)" methodname="Evaluate_matches_thresholds" classname="Crulanda.Tests.LevelConTests" runstate="Runnable" seed="280608462" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000056" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+          </test-suite>
+          <test-suite type="TestFixture" id="1085" name="LogTests" fullname="Crulanda.Tests.LogTests" classname="Crulanda.Tests.LogTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.002639" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1087" name="Levels_are_per_category" fullname="Crulanda.Tests.LogTests.Levels_are_per_category" methodname="Levels_are_per_category" classname="Crulanda.Tests.LogTests" runstate="Runnable" seed="1670115281" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000526" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1086" name="Messages_below_the_category_level_are_dropped" fullname="Crulanda.Tests.LogTests.Messages_below_the_category_level_are_dropped" methodname="Messages_below_the_category_level_are_dropped" classname="Crulanda.Tests.LogTests" runstate="Runnable" seed="651742814" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000146" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1088" name="Off_silences_a_category_even_for_errors" fullname="Crulanda.Tests.LogTests.Off_silences_a_category_even_for_errors" methodname="Off_silences_a_category_even_for_errors" classname="Crulanda.Tests.LogTests" runstate="Runnable" seed="1130773255" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000099" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1090" name="Parse_helpers_are_case_insensitive_and_reject_numbers" fullname="Crulanda.Tests.LogTests.Parse_helpers_are_case_insensitive_and_reject_numbers" methodname="Parse_helpers_are_case_insensitive_and_reject_numbers" classname="Crulanda.Tests.LogTests" runstate="Runnable" seed="102122709" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000833" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1089" name="Recent_buffer_keeps_the_newest_entries_in_order" fullname="Crulanda.Tests.LogTests.Recent_buffer_keeps_the_newest_entries_in_order" methodname="Recent_buffer_keeps_the_newest_entries_in_order" classname="Crulanda.Tests.LogTests" runstate="Runnable" seed="96487214" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000386" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1091" name="SaveFileStoreTests" fullname="Crulanda.Tests.SaveFileStoreTests" classname="Crulanda.Tests.SaveFileStoreTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.037200" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1094" name="Corrupt_primary_falls_back_to_backup" fullname="Crulanda.Tests.SaveFileStoreTests.Corrupt_primary_falls_back_to_backup" methodname="Corrupt_primary_falls_back_to_backup" classname="Crulanda.Tests.SaveFileStoreTests" runstate="Runnable" seed="870803679" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.024212" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1096" name="Invalid_slot_names_are_rejected" fullname="Crulanda.Tests.SaveFileStoreTests.Invalid_slot_names_are_rejected" methodname="Invalid_slot_names_are_rejected" classname="Crulanda.Tests.SaveFileStoreTests" runstate="Runnable" seed="824958966" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000372" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1097" name="ListSlots_and_Delete_work" fullname="Crulanda.Tests.SaveFileStoreTests.ListSlots_and_Delete_work" methodname="ListSlots_and_Delete_work" classname="Crulanda.Tests.SaveFileStoreTests" runstate="Runnable" seed="1636418830" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.003648" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1095" name="Missing_slot_fails_cleanly" fullname="Crulanda.Tests.SaveFileStoreTests.Missing_slot_fails_cleanly" methodname="Missing_slot_fails_cleanly" classname="Crulanda.Tests.SaveFileStoreTests" runstate="Runnable" seed="1676476830" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000350" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1093" name="Overwrite_keeps_a_backup_and_new_data_wins" fullname="Crulanda.Tests.SaveFileStoreTests.Overwrite_keeps_a_backup_and_new_data_wins" methodname="Overwrite_keeps_a_backup_and_new_data_wins" classname="Crulanda.Tests.SaveFileStoreTests" runstate="Runnable" seed="296510217" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.006130" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1092" name="Write_then_read_round_trips" fullname="Crulanda.Tests.SaveFileStoreTests.Write_then_read_round_trips" methodname="Write_then_read_round_trips" classname="Crulanda.Tests.SaveFileStoreTests" runstate="Runnable" seed="1518338485" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.001559" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1098" name="SaveMigratorTests" fullname="Crulanda.Tests.SaveMigratorTests" classname="Crulanda.Tests.SaveMigratorTests" runstate="Runnable" testcasecount="7" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.003005" total="7" passed="7" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1099" name="Current_version_is_returned_unchanged" fullname="Crulanda.Tests.SaveMigratorTests.Current_version_is_returned_unchanged" methodname="Current_version_is_returned_unchanged" classname="Crulanda.Tests.SaveMigratorTests" runstate="Runnable" seed="1054213142" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000535" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1105" name="Duplicate_or_non_increasing_registrations_are_rejected" fullname="Crulanda.Tests.SaveMigratorTests.Duplicate_or_non_increasing_registrations_are_rejected" methodname="Duplicate_or_non_increasing_registrations_are_rejected" classname="Crulanda.Tests.SaveMigratorTests" runstate="Runnable" seed="725830704" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000897" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1101" name="Input_envelope_is_not_mutated" fullname="Crulanda.Tests.SaveMigratorTests.Input_envelope_is_not_mutated" methodname="Input_envelope_is_not_mutated" classname="Crulanda.Tests.SaveMigratorTests" runstate="Runnable" seed="511109907" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000164" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1100" name="Migrations_are_chained_in_order" fullname="Crulanda.Tests.SaveMigratorTests.Migrations_are_chained_in_order" methodname="Migrations_are_chained_in_order" classname="Crulanda.Tests.SaveMigratorTests" runstate="Runnable" seed="1750713367" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000092" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1102" name="Missing_step_throws" fullname="Crulanda.Tests.SaveMigratorTests.Missing_step_throws" methodname="Missing_step_throws" classname="Crulanda.Tests.SaveMigratorTests" runstate="Runnable" seed="891642806" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000151" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1103" name="Newer_save_than_game_throws" fullname="Crulanda.Tests.SaveMigratorTests.Newer_save_than_game_throws" methodname="Newer_save_than_game_throws" classname="Crulanda.Tests.SaveMigratorTests" runstate="Runnable" seed="1733947077" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000119" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1104" name="Overshooting_migration_throws" fullname="Crulanda.Tests.SaveMigratorTests.Overshooting_migration_throws" methodname="Overshooting_migration_throws" classname="Crulanda.Tests.SaveMigratorTests" runstate="Runnable" seed="2036396452" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000125" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1106" name="SeededRandomTests" fullname="Crulanda.Tests.SeededRandomTests" classname="Crulanda.Tests.SeededRandomTests" runstate="Runnable" testcasecount="7" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.042055" total="7" passed="7" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1112" name="Chance_handles_the_extremes" fullname="Crulanda.Tests.SeededRandomTests.Chance_handles_the_extremes" methodname="Chance_handles_the_extremes" classname="Crulanda.Tests.SeededRandomTests" runstate="Runnable" seed="934187099" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000134" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1113" name="Chance_is_roughly_calibrated" fullname="Crulanda.Tests.SeededRandomTests.Chance_is_roughly_calibrated" methodname="Chance_is_roughly_calibrated" classname="Crulanda.Tests.SeededRandomTests" runstate="Runnable" seed="815092926" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000771" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1108" name="Different_seeds_diverge" fullname="Crulanda.Tests.SeededRandomTests.Different_seeds_diverge" methodname="Different_seeds_diverge" classname="Crulanda.Tests.SeededRandomTests" runstate="Runnable" seed="1463310538" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000122" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1109" name="NextFloat_stays_in_unit_interval" fullname="Crulanda.Tests.SeededRandomTests.NextFloat_stays_in_unit_interval" methodname="NextFloat_stays_in_unit_interval" classname="Crulanda.Tests.SeededRandomTests" runstate="Runnable" seed="1493892059" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.021589" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1111" name="NextInt_rejects_empty_range" fullname="Crulanda.Tests.SeededRandomTests.NextInt_rejects_empty_range" methodname="NextInt_rejects_empty_range" classname="Crulanda.Tests.SeededRandomTests" runstate="Runnable" seed="515044101" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000294" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1110" name="NextInt_respects_bounds_including_negative_ranges" fullname="Crulanda.Tests.SeededRandomTests.NextInt_respects_bounds_including_negative_ranges" methodname="NextInt_respects_bounds_including_negative_ranges" classname="Crulanda.Tests.SeededRandomTests" runstate="Runnable" seed="758311258" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.017975" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1107" name="Same_seed_gives_same_sequence" fullname="Crulanda.Tests.SeededRandomTests.Same_seed_gives_same_sequence" methodname="Same_seed_gives_same_sequence" classname="Crulanda.Tests.SeededRandomTests" runstate="Runnable" seed="205409850" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000274" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1114" name="StatBlockTests" fullname="Crulanda.Tests.StatBlockTests" classname="Crulanda.Tests.StatBlockTests" runstate="Runnable" testcasecount="12" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.004258" total="12" passed="12" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1116" name="Base_value_is_returned_without_modifiers" fullname="Crulanda.Tests.StatBlockTests.Base_value_is_returned_without_modifiers" methodname="Base_value_is_returned_without_modifiers" classname="Crulanda.Tests.StatBlockTests" runstate="Runnable" seed="1710097980" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000716" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1123" name="Cached_value_is_refreshed_after_changes" fullname="Crulanda.Tests.StatBlockTests.Cached_value_is_refreshed_after_changes" methodname="Cached_value_is_refreshed_after_changes" classname="Crulanda.Tests.StatBlockTests" runstate="Runnable" seed="1971198988" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000119" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1124" name="Changed_event_reports_the_stat" fullname="Crulanda.Tests.StatBlockTests.Changed_event_reports_the_stat" methodname="Changed_event_reports_the_stat" classname="Crulanda.Tests.StatBlockTests" runstate="Runnable" seed="98072567" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000452" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1117" name="Flat_modifiers_add_to_base" fullname="Crulanda.Tests.StatBlockTests.Flat_modifiers_add_to_base" methodname="Flat_modifiers_add_to_base" classname="Crulanda.Tests.StatBlockTests" runstate="Runnable" seed="1637065449" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000174" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1120" name="Formula_is_base_plus_flat_then_percentAdd_then_percentMult" fullname="Crulanda.Tests.StatBlockTests.Formula_is_base_plus_flat_then_percentAdd_then_percentMult" methodname="Formula_is_base_plus_flat_then_percentAdd_then_percentMult" classname="Crulanda.Tests.StatBlockTests" runstate="Runnable" seed="1454881833" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000136" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1125" name="GetRounded_rounds_halves_away_from_zero" fullname="Crulanda.Tests.StatBlockTests.GetRounded_rounds_halves_away_from_zero" methodname="GetRounded_rounds_halves_away_from_zero" classname="Crulanda.Tests.StatBlockTests" runstate="Runnable" seed="1745767417" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000285" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1126" name="LoadBase_sets_all_values" fullname="Crulanda.Tests.StatBlockTests.LoadBase_sets_all_values" methodname="LoadBase_sets_all_values" classname="Crulanda.Tests.StatBlockTests" runstate="Runnable" seed="1361393187" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000546" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1121" name="Modifiers_only_affect_their_own_stat" fullname="Crulanda.Tests.StatBlockTests.Modifiers_only_affect_their_own_stat" methodname="Modifiers_only_affect_their_own_stat" classname="Crulanda.Tests.StatBlockTests" runstate="Runnable" seed="1406362219" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000111" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1118" name="PercentAdd_modifiers_sum_before_applying" fullname="Crulanda.Tests.StatBlockTests.PercentAdd_modifiers_sum_before_applying" methodname="PercentAdd_modifiers_sum_before_applying" classname="Crulanda.Tests.StatBlockTests" runstate="Runnable" seed="1180974554" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000089" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1119" name="PercentMult_modifiers_multiply_each_other" fullname="Crulanda.Tests.StatBlockTests.PercentMult_modifiers_multiply_each_other" methodname="PercentMult_modifiers_multiply_each_other" classname="Crulanda.Tests.StatBlockTests" runstate="Runnable" seed="205963553" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000079" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1122" name="RemoveModifiersFromSource_removes_only_that_source" fullname="Crulanda.Tests.StatBlockTests.RemoveModifiersFromSource_removes_only_that_source" methodname="RemoveModifiersFromSource_removes_only_that_source" classname="Crulanda.Tests.StatBlockTests" runstate="Runnable" seed="1698053156" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000265" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1115" name="Unset_stat_is_zero" fullname="Crulanda.Tests.StatBlockTests.Unset_stat_is_zero" methodname="Unset_stat_is_zero" classname="Crulanda.Tests.StatBlockTests" runstate="Runnable" seed="907354857" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000083" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1127" name="VitalPoolTests" fullname="Crulanda.Tests.VitalPoolTests" classname="Crulanda.Tests.VitalPoolTests" runstate="Runnable" testcasecount="8" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.003210" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1129" name="Change_clamps_to_max_and_reports_applied_amount" fullname="Crulanda.Tests.VitalPoolTests.Change_clamps_to_max_and_reports_applied_amount" methodname="Change_clamps_to_max_and_reports_applied_amount" classname="Crulanda.Tests.VitalPoolTests" runstate="Runnable" seed="1347362660" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000248" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1130" name="Change_clamps_to_zero_and_reports_applied_amount" fullname="Crulanda.Tests.VitalPoolTests.Change_clamps_to_zero_and_reports_applied_amount" methodname="Change_clamps_to_zero_and_reports_applied_amount" classname="Crulanda.Tests.VitalPoolTests" runstate="Runnable" seed="1381508525" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000095" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1134" name="Changed_does_not_fire_when_nothing_changes" fullname="Crulanda.Tests.VitalPoolTests.Changed_does_not_fire_when_nothing_changes" methodname="Changed_does_not_fire_when_nothing_changes" classname="Crulanda.Tests.VitalPoolTests" runstate="Runnable" seed="480678490" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000139" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1133" name="Changed_fires_with_old_and_new_values" fullname="Crulanda.Tests.VitalPoolTests.Changed_fires_with_old_and_new_values" methodname="Changed_fires_with_old_and_new_values" classname="Crulanda.Tests.VitalPoolTests" runstate="Runnable" seed="650833993" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000123" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1135" name="Ratio_is_zero_when_max_is_zero" fullname="Crulanda.Tests.VitalPoolTests.Ratio_is_zero_when_max_is_zero" methodname="Ratio_is_zero_when_max_is_zero" classname="Crulanda.Tests.VitalPoolTests" runstate="Runnable" seed="1201180705" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000091" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1132" name="SetMax_with_preserve_keeps_the_ratio" fullname="Crulanda.Tests.VitalPoolTests.SetMax_with_preserve_keeps_the_ratio" methodname="SetMax_with_preserve_keeps_the_ratio" classname="Crulanda.Tests.VitalPoolTests" runstate="Runnable" seed="955535369" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000128" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1131" name="SetMax_without_preserve_only_clamps" fullname="Crulanda.Tests.VitalPoolTests.SetMax_without_preserve_only_clamps" methodname="SetMax_without_preserve_only_clamps" classname="Crulanda.Tests.VitalPoolTests" runstate="Runnable" seed="1142252789" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000074" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1128" name="Starts_full_or_empty_as_requested" fullname="Crulanda.Tests.VitalPoolTests.Starts_full_or_empty_as_requested" methodname="Starts_full_or_empty_as_requested" classname="Crulanda.Tests.VitalPoolTests" runstate="Runnable" seed="249492675" result="Passed" start-time="2026-09-28 23:37:19Z" end-time="2026-09-28 23:37:19Z" duration="0.000115" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Saving results to: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\abilities-edit-results.xml
+]]></output>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

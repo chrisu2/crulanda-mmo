@@ -1,0 +1,14 @@
+{
+  "name": "Crulanda.Persistence",
+  "rootNamespace": "Crulanda.Persistence",
+  "references": ["Crulanda.Core"],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

@@ -1,0 +1,47 @@
+{
+  "factions": [
+    {
+      "id": "oakhaven",
+      "name": "Oakhaven Folk",
+      "start": 0,
+      "canonStatus": "CANON-EXPANDED",
+      "description": "The farmers, tradesfolk and families of Oakhaven, the eastern grain hub. Help them and doors open, prices drop and people talk."
+    },
+    {
+      "id": "saltmenders",
+      "name": "The Salt-Menders",
+      "start": 0,
+      "canonStatus": "CANON",
+      "description": "Rebels of the Alliance who meet in old tunnels and mean to 'break the machine'. They move people the Concord wants."
+    },
+    {
+      "id": "preservationists",
+      "name": "Preservationist Guild",
+      "start": 0,
+      "canonStatus": "CANON",
+      "description": "Matriarch Vala Solari's guild. Its Wardens wear green and brown and armour of living vine, and they stand against the Spoke."
+    },
+    {
+      "id": "ashwalkers",
+      "name": "Ash-Walkers",
+      "start": 0,
+      "canonStatus": "CANON",
+      "description": "Survivors who live along the Wasting and fight what comes out of it with salt. Their caves are on the Eastern Ridge."
+    },
+    {
+      "id": "sandthrone",
+      "name": "Sandthrone",
+      "start": -500,
+      "canonStatus": "CANON",
+      "description": "Mercenaries from the wastes, often hired by the Concord but with their own agenda. They'll sell you a contract if the coin is right."
+    },
+    {
+      "id": "concord",
+      "name": "High Concord",
+      "start": -4000,
+      "fixedStanding": true,
+      "canonStatus": "CANON",
+      "description": "The Council in Argentis: 'Order at any cost.' Its collectors and Investigation Bureau do not bargain with the likes of you."
+    }
+  ]
+}

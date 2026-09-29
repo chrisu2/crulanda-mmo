@@ -1,0 +1,457 @@
+{
+  "items": [
+    {
+      "id": "item.brood_heart",
+      "name": "Brood heart-crystal",
+      "description": "A fist of white crystal from the heart of a salted Weave-Eater. It hums against your palm."
+    },
+    {
+      "id": "item.calcified_shard",
+      "name": "Calcified shard",
+      "description": "White crystal left where a Weave-Eater stood, salt-bound and still."
+    },
+    {
+      "id": "item.salt_cask",
+      "name": "Salt-cask",
+      "description": "A small sealed cask of Ash-Walker salt, marked with a harpoon."
+    },
+    {
+      "id": "item.petrified_bone",
+      "name": "Petrified bone",
+      "description": "Grey bone turned to stone. The Eaters won't touch it."
+    },
+    {
+      "id": "item.first_sea_salt",
+      "name": "Salt of the First Sea",
+      "description": "A sack of white salt, tied with three knots by Mother Vane. It is heavier than salt should be."
+    }
+  ],
+  "documents": [
+    {
+      "id": "doc.ashrim.litany",
+      "title": "The Tear-Marked Litany",
+      "text": "Kneel in the ash, for the ash is honest.\nThe Weave was a lie told by the Makers, and the grey is the truth coming home.\nWear the bone, that the Kings may know you for theirs.\nMark the tear, that the Kings may find you in the dark.\nThe eternal Void hungers for the light.\nGive it the light.\n\n(In the margin, another hand: 'Salt from the Ridge caves, three casks. The Patriarch says: no salt, no binding. Let them see what walks when there is no salt.')",
+      "canonStatus": "CANON-EXPANDED: 'The eternal Void hungers for the light' is the cult's cry in book1 ch.10; the Patriarch of Ash (Torvyn Embercloak) is canon, and the purple tear and preparing for the Kings belong to the later House of Ash (series_bible.md). The rest of the litany is GAME-ONLY."
+    },
+    {
+      "id": "doc.ashrim.salt_rite",
+      "title": "Salt of the First Sea",
+      "text": "Mother Vane's words over the salt, as she taught them to you:\n\nSalt of the First Sea!\nBy the Maker's hand!\nBy the Keeper's breath!\nI bind the Chaos!\nI seal the Wound!\n\n'Say it loud. The salt doesn't hear you. You hear you. A binding done quiet is a binding done by half.'\n\n'Salt binds. It does not unmake. Remember that, townsman, when you're tempted to think a thing is finished.'",
+      "canonStatus": "The chant is CANON (book1 ch.20); Mother Vane's advice is GAME-ONLY."
+    }
+  ],
+  "quests": [
+    {
+      "id": "main.ashrim.1",
+      "title": "Salt Is Not Given",
+      "kind": "main",
+      "giver": "Mother Vane",
+      "turnIn": "Chieftain Grohl",
+      "zone": "zone.ashrim",
+      "level": 9,
+      "requires": [
+        "main.peaks.3"
+      ],
+      "canonStatus": "CANON-EXPANDED: Weave-Eaters, salt that turns them to white crystal, Chieftain Grohl and Mother Vane are canon (book1 ch.20); the Unwoven Flats and this trial are GAME-ONLY.",
+      "summary": "Hunt Weave-Eaters on the Unwoven Flats with Ash-Walker salt, and come back alive to Chieftain Grohl.",
+      "offer": "\"The salt is earned on the flats.\" Mother Vane closes your hand around a pouch of white salt. It is heavier than it should be. \"Weave-Eaters feed on the Unwoven Flats, west of the Ridge. They're hunger, walking. A blade goes through them and breaks.\"\n\n\"So you don't cut first. You salt, and then you break. Five of them. Grohl will want to see you come back. Most don't.\"",
+      "complete": "Chieftain Grohl looks you over with his one eye: the grey dust on your boots, the white crystal caught in your coat. \"Five. And you came back.\" He grunts. \"You fight like a townsman. But you came back. Vane! This one can stay.\"",
+      "steps": [
+        {
+          "text": "Salt and shatter Weave-Eaters on the Unwoven Flats.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.ashrim",
+              "target": "mob.weaveeater.ashrim*",
+              "count": 5,
+              "text": "Weave-Eaters salted and shattered"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 380,
+        "gold": 85,
+        "reputation": [
+          {
+            "faction": "ashwalkers",
+            "amount": 350
+          }
+        ]
+      }
+    },
+    {
+      "id": "main.ashrim.2",
+      "title": "The Tear-Marked Shrine",
+      "kind": "main",
+      "giver": "Chieftain Grohl",
+      "turnIn": "Chieftain Grohl",
+      "zone": "zone.ashrim",
+      "level": 9,
+      "requires": [
+        "main.ashrim.1"
+      ],
+      "canonStatus": "CANON-EXPANDED: the Cult of Ash (Torvyn Embercloak, Vorn) and its iron-wired bone masks are canon (book1 ch.10, series_bible.md); the purple tear is the later House of Ash's symbol (series_bible.md), used early here; the shrine on the Ashland Rim is GAME-ONLY.",
+      "summary": "Break the bone-masked cultists at the Cult of Ash shrine in the south-west and topple their shrine. They have been stealing the Ash-Walkers' salt.",
+      "offer": "\"You want salt for a well. Then help me keep it.\" Grohl drives the butt of his mace into the ash. \"Bone-masks. The Cult of Ash. They pray to the grey like it's a god, and they daub a purple tear on everything they touch.\"\n\n\"They have a shrine in the south-west, at the end of the old waste road. They steal our salt so we can't hold the Eaters off, and they call it a sacrament. Break the masks. Six will teach the rest some distance. Then pull their shrine down.\"",
+      "complete": "Grohl reads the litany slowly, lips moving, then crushes it in his fist. \"'The Void hungers.' Aye. So do I.\" He throws the ball of vellum into the fire. \"Good work. Vane will want to see you.\"",
+      "steps": [
+        {
+          "text": "Break the bone-masked cultists at the shrine.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.ashrim",
+              "target": "mob.cultist.ashrim*",
+              "count": 6,
+              "text": "Bone-masked cultists"
+            }
+          ]
+        },
+        {
+          "text": "Topple the purple-tear shrine.",
+          "objectives": [
+            {
+              "type": "interact",
+              "zone": "zone.ashrim",
+              "target": "Purple-tear shrine",
+              "text": "Topple the purple-tear shrine",
+              "say": "The shrine comes down in a spill of wired bone. Under the altar-stone is a scrap of vellum in a close, careful hand.",
+              "document": "doc.ashrim.litany"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 400,
+        "gold": 90,
+        "reputation": [
+          {
+            "faction": "ashwalkers",
+            "amount": 350
+          }
+        ]
+      }
+    },
+    {
+      "id": "main.ashrim.3",
+      "title": "Heart of the Brood",
+      "kind": "main",
+      "giver": "Mother Vane",
+      "turnIn": "Mother Vane",
+      "zone": "zone.ashrim",
+      "level": 10,
+      "requires": [
+        "main.ashrim.2"
+      ],
+      "canonStatus": "CANON-EXPANDED: Salt of the First Sea and its binding words are canon (book1 ch.20); feeding the salt with a brood-heart is GAME-ONLY.",
+      "summary": "Destroy the Weave-Eater brood at the Wasting's edge and bring its heart-crystal to Mother Vane, so the salt is strong enough to bind a seed. The brood is dangerous alone.",
+      "offer": "\"Salt for a cooking pot, I'd give you now. Salt for a seed must be fed.\" Mother Vane opens a cask and shows you salt gone faintly grey. \"It has to taste the thing it binds. There's a brood of Eaters at the Wasting's edge, south along the Ridge. Great ones, fat on what they've unmade.\"\n\n\"Kill the brood. When the salt takes them, what's left at the heart is a crystal, white and humming. Bring me that, and I'll wake the salt with it.\"",
+      "complete": "\"There.\" Mother Vane's hands shake, just a little. \"Salt of the First Sea. It'll bind your seed. Bind it, mind. Whoever planted it can still wake it, if they come with will enough. Salt buys time. It doesn't buy the world.\"",
+      "steps": [
+        {
+          "text": "Destroy the Weave-Eater brood at the Wasting's edge and take its heart-crystal.",
+          "objectives": [
+            {
+              "type": "collect",
+              "zone": "zone.ashrim",
+              "target": "kill:mob.brood.ashrim*",
+              "item": "item.brood_heart",
+              "text": "Brood heart-crystal"
+            }
+          ]
+        },
+        {
+          "text": "Bring the heart-crystal to Mother Vane.",
+          "objectives": [
+            {
+              "type": "deliver",
+              "zone": "zone.ashrim",
+              "target": "Mother Vane",
+              "item": "item.brood_heart",
+              "text": "Give the heart-crystal to Mother Vane",
+              "say": "She drops the crystal into the cask. The grey salt flares white all at once, and the cave is as bright as noon."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 450,
+        "gold": 100,
+        "documents": [
+          "doc.ashrim.salt_rite"
+        ],
+        "reputation": [
+          {
+            "faction": "ashwalkers",
+            "amount": 400
+          }
+        ]
+      }
+    },
+    {
+      "id": "main.ashrim.4",
+      "title": "Salt for the Well",
+      "kind": "main",
+      "giver": "Mother Vane",
+      "turnIn": "Corwin Ashby",
+      "zone": "zone.ashrim",
+      "level": 10,
+      "requires": [
+        "main.ashrim.3"
+      ],
+      "canonStatus": "CANON-EXPANDED: the Void-Seed in Oakhaven's water is canon (book1 ch.4); binding it with salt is GAME-ONLY. Oakhaven's later erasure stays canon: the salt only makes the seed wait.",
+      "giveOnAccept": [
+        "item.first_sea_salt"
+      ],
+      "summary": "Carry the Salt of the First Sea home by the dangerous north road, salt Oakhaven's Communal Well, and give what is left to Corwin Ashby.",
+      "offer": "Mother Vane ties the sack herself, three knots, and puts it in your arms. \"The north road runs to your village from here, if you're brave or a fool. Most things on it will be glad to see you.\"\n\n\"Pour it into the well and say the words. Then give what's left to your elder and tell him to salt the stones again every new moon. It won't stop what's coming. It will make it wait.\"",
+      "complete": "Corwin listens to all of it: the toll-book, the Seeker's warrant, the road to Argentis. He doesn't interrupt.\n\n\"So Wren and the soldier's boy are beyond us. For now.\" He sets the salt by his door, where he'll see it every day. \"And the thing in our well sleeps, and we keep it sleeping. Every new moon.\" He looks at you a long while. \"You went to the edge of the world for a well and a boy you've never met. Oakhaven won't forget it, whatever comes.\"",
+      "steps": [
+        {
+          "text": "Take the north road home to Oakhaven and salt the Communal Well.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.oakhaven",
+              "at": {
+                "x": 21,
+                "y": 4
+              },
+              "radius": 5,
+              "text": "Salt the Communal Well",
+              "say": "You pour the salt into the well and say the words aloud. Something far down in the dark water flinches. The faint violet at the bottom of the shaft dims to nothing, and for the first time in weeks the water smells only of water."
+            }
+          ]
+        },
+        {
+          "text": "Give the rest of the salt to Corwin Ashby.",
+          "objectives": [
+            {
+              "type": "deliver",
+              "zone": "zone.oakhaven",
+              "target": "Corwin Ashby",
+              "item": "item.first_sea_salt",
+              "text": "Give the salt to Corwin Ashby",
+              "say": "\"Salt. From the Ash-Walkers?\" Corwin weighs the sack in both hands. \"I thought they were a story we told children.\""
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 500,
+        "gold": 120,
+        "reputation": [
+          {
+            "faction": "oakhaven",
+            "amount": 500
+          },
+          {
+            "faction": "ashwalkers",
+            "amount": 250
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.grohl.hounds",
+      "title": "Hounds on the Harpoon-Line",
+      "kind": "npc",
+      "giver": "Chieftain Grohl",
+      "turnIn": "Chieftain Grohl",
+      "zone": "zone.ashrim",
+      "level": 9,
+      "canonStatus": "GAME-ONLY (ash hounds)",
+      "summary": "Kill six ash hounds hunting in the dead snags west of the enclave.",
+      "offer": "\"Ash hounds. Wolves, once, before the grey got into them. Now they're wolves that don't need to eat, and eat anyway.\" He spits into the ash. \"They've been at our harpoon-line in the western snags. Six. Bring me nothing back; I'll believe you.\"",
+      "complete": "\"Good. The line holds another night.\" From Grohl, that is a speech.",
+      "steps": [
+        {
+          "text": "Kill the ash hounds in the western snags.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.ashrim",
+              "target": "mob.hound.ashrim*",
+              "count": 6,
+              "text": "Ash hounds killed"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 360,
+        "gold": 80,
+        "reputation": [
+          {
+            "faction": "ashwalkers",
+            "amount": 250
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.vane.shards",
+      "title": "White Shards",
+      "kind": "npc",
+      "giver": "Mother Vane",
+      "turnIn": "Mother Vane",
+      "zone": "zone.ashrim",
+      "level": 9,
+      "canonStatus": "CANON-EXPANDED: salted Weave-Eaters turning to white crystal is canon (book1 ch.20); using the shards is GAME-ONLY.",
+      "summary": "Gather six calcified shards from the Weave-Eaters you salt and shatter.",
+      "offer": "\"When the salt takes an Eater it leaves white crystal. Most of my people kick it into the ash.\" She holds a shard up to the firelight. \"Wasteful. Ground fine, it sweetens the salt. Bring me six shards. Whole ones.\"",
+      "complete": "\"Whole. Good hands.\" She drops them one by one into a stone bowl, and each rings like a small bell.",
+      "steps": [
+        {
+          "text": "Gather calcified shards from salted Weave-Eaters.",
+          "objectives": [
+            {
+              "type": "collect",
+              "zone": "zone.ashrim",
+              "target": "kill:mob.weaveeater.ashrim*",
+              "item": "item.calcified_shard",
+              "count": 6,
+              "text": "Calcified shards"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 380,
+        "gold": 85,
+        "reputation": [
+          {
+            "faction": "ashwalkers",
+            "amount": 250
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.oska.bone",
+      "title": "Leviathan Bone",
+      "kind": "npc",
+      "giver": "Oska",
+      "turnIn": "Oska",
+      "zone": "zone.ashrim",
+      "level": 9,
+      "canonStatus": "CANON-EXPANDED: Ash-Walker harpoons of petrified leviathan bone and a petrified ribcage on the ash plain are canon images (book1 ch.20); this ribcage and the quest are GAME-ONLY.",
+      "summary": "Chip five pieces of petrified bone from the old ribcage in the south for Oska's harpoons.",
+      "offer": "Oska doesn't look up from the harpoon she is carving. \"The Eaters won't eat old bone. Nobody knows why. So we make our harpoons of it.\"\n\n\"There's a ribcage in the south, big as a hall, from something that swam when the ash was sea, or so the old ones say. Chip me five good pieces. Hard ones. The soft ones splinter.\"",
+      "complete": "She taps each piece against her teeth, listening, and keeps four. \"Good enough. The fifth I'll make you a luck-charm of. You'll want luck.\"",
+      "steps": [
+        {
+          "text": "Chip petrified bone from the old ribcage.",
+          "objectives": [
+            {
+              "type": "collect",
+              "zone": "zone.ashrim",
+              "target": "Petrified rib",
+              "item": "item.petrified_bone",
+              "count": 5,
+              "text": "Petrified bone"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 380,
+        "gold": 85,
+        "reputation": [
+          {
+            "faction": "ashwalkers",
+            "amount": 250
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.brine.casks",
+      "title": "The Stolen Casks",
+      "kind": "npc",
+      "giver": "Sefa Brine",
+      "turnIn": "Sefa Brine",
+      "zone": "zone.ashrim",
+      "level": 10,
+      "canonStatus": "GAME-ONLY",
+      "summary": "Take back three salt-casks the Cult of Ash carried off to their shrine in the south-west.",
+      "offer": "\"Three casks.\" The salt-trader counts on her fingers as if she might have got it wrong. \"Three casks of good salt gone in one night, and the tracks go south-west to the bone-masks' shrine. They don't eat it. They don't sell it. They just keep it from us.\"\n\n\"Bring them back and I'll trade you anything on my table at cost. Well. Near cost.\"",
+      "complete": "\"All three, and the seals unbroken.\" Sefa rolls them behind her stall. \"You're a better thief than they are.\"",
+      "steps": [
+        {
+          "text": "Take back the stolen salt-casks from the cult shrine.",
+          "objectives": [
+            {
+              "type": "collect",
+              "zone": "zone.ashrim",
+              "target": "Stolen salt-cask",
+              "item": "item.salt_cask",
+              "count": 3,
+              "text": "Salt-casks recovered"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 420,
+        "gold": 95,
+        "reputation": [
+          {
+            "faction": "ashwalkers",
+            "amount": 250
+          }
+        ]
+      }
+    },
+    {
+      "id": "side.ashrim.cinderfold",
+      "title": "Cinderfold",
+      "kind": "side",
+      "giver": "Sefa Brine",
+      "turnIn": "Sefa Brine",
+      "zone": "zone.ashrim",
+      "level": 10,
+      "canonStatus": "CANON creature (Hollow Men, book1 ch.4); Cinderfold is GAME-ONLY.",
+      "summary": "Put down the Hollow Men in the ruins of Cinderfold, north-west of the enclave, and find the house with the carved fish.",
+      "offer": "\"I was born in Cinderfold, north of here, before the grey went through it. It didn't take the houses. It took everything that lived in them.\" She doesn't stop polishing her scales. \"They walk the lanes now. Grey. Saying they're hungry.\"\n\n\"Put six of them down. And find the house with the fish carved over the door. I'd like to know it's still standing.\"",
+      "complete": "\"The fish.\" Sefa smiles, just barely. \"My father carved that. He couldn't carve.\"",
+      "steps": [
+        {
+          "text": "Put down the Hollow Men of Cinderfold and find the Brine house.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.ashrim",
+              "target": "mob.hollow.ashrim*",
+              "count": 6,
+              "text": "Hollow Men of Cinderfold"
+            },
+            {
+              "type": "visit",
+              "zone": "zone.ashrim",
+              "at": {
+                "x": -24,
+                "y": 86
+              },
+              "radius": 6,
+              "text": "Find the house with the carved fish",
+              "say": "The door is grey like everything else, but the carved fish over the lintel is still there. Inside: a child's cup, grey as the ash."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 450,
+        "gold": 100,
+        "reputation": [
+          {
+            "faction": "ashwalkers",
+            "amount": 250
+          }
+        ]
+      }
+    }
+  ]
+}

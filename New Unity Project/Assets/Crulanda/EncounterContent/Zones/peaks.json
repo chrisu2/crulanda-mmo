@@ -1,0 +1,1126 @@
+{
+  "id": "zone.peaks",
+  "displayName": "The Shattered Peaks",
+  "subtitle": "The Sandthrone toll road over the eastern border mountains",
+  "canonStatus": "CANON-EXPANDED",
+  "canonNote": "Canon: the Shattered Peaks are a jagged range on the eastern border that holds back the Wasting while the void slowly eats through the stone (world_bible.md), and Sandthrone mercenaries hold them and charge a toll (book1 ch.5). GAME-ONLY / PROVISIONAL: this pass and its toll gate, the toll-house, the pilgrims' rest and its people, the ruined waystation, the pilgrims' cairns, the levelling camps and all placement. Mount Umbra is named on the game's world map image but not in the lore folder.",
+  "size": 260,
+  "levelMin": 6,
+  "levelMax": 8,
+  "biome": "mountain",
+  "worldMapPosition": {
+    "x": 0.53,
+    "y": 0.55
+  },
+  "worldMapNote": "Placed on Mount Umbra's south-east foothills of the game map, on the road from Khaven; exact spot provisional.",
+  "flatRadius": 30,
+  "hillHeight": 10,
+  "seed": 6131,
+  "lighting": {
+    "sunPitch": 42,
+    "sunYaw": -28,
+    "sunIntensity": 1.25,
+    "sunColor": "#EEF2FF",
+    "ambientSky": "#A4B6CC",
+    "ambientEquator": "#8C939A",
+    "ambientGround": "#3C3F45",
+    "fogColor": "#BCC7D2",
+    "fogStart": 90,
+    "fogEnd": 260
+  },
+  "spawns": {
+    "player": {
+      "x": -88,
+      "y": -114
+    },
+    "playerFacing": 20,
+    "companion": {
+      "x": -14,
+      "y": -2
+    },
+    "recovery": {
+      "x": -18,
+      "y": -2
+    },
+    "leash": 17,
+    "enemies": []
+  },
+  "objectives": [
+    "Find the pilgrims' rest below the toll gate",
+    "Learn where the Sandthrone sent the children"
+  ],
+  "exits": [
+    {
+      "to": "zone.khaven",
+      "name": "Toll road down to Khaven Village",
+      "at": {
+        "x": -90,
+        "y": -123
+      },
+      "arrive": {
+        "x": -12,
+        "y": 104
+      },
+      "radius": 5
+    },
+    {
+      "to": "zone.ashrim",
+      "name": "Toll road east to the Ashland Rim",
+      "at": {
+        "x": 123,
+        "y": -92
+      },
+      "arrive": {
+        "x": -114,
+        "y": 88
+      },
+      "radius": 5
+    }
+  ],
+  "clearings": [
+    {
+      "name": "Rest yard",
+      "center": {
+        "x": -18,
+        "y": 2
+      },
+      "radius": 9
+    },
+    {
+      "name": "Toll yard",
+      "center": {
+        "x": 24,
+        "y": 58
+      },
+      "radius": 6
+    },
+    {
+      "name": "Captain's eyrie",
+      "center": {
+        "x": 58,
+        "y": 96
+      },
+      "radius": 6
+    },
+    {
+      "name": "Waystation yard",
+      "center": {
+        "x": -76,
+        "y": -58
+      },
+      "radius": 5
+    },
+    {
+      "name": "Rockhide wallow",
+      "center": {
+        "x": 40,
+        "y": -70
+      },
+      "radius": 8
+    }
+  ],
+  "roads": [
+    {
+      "name": "Toll road",
+      "width": 5,
+      "points": [
+        {
+          "x": -92,
+          "y": -130
+        },
+        {
+          "x": -86,
+          "y": -108
+        },
+        {
+          "x": -72,
+          "y": -82
+        },
+        {
+          "x": -58,
+          "y": -54
+        },
+        {
+          "x": -40,
+          "y": -30
+        },
+        {
+          "x": -20,
+          "y": -12
+        },
+        {
+          "x": 0,
+          "y": 2
+        },
+        {
+          "x": 12,
+          "y": 22
+        },
+        {
+          "x": 18,
+          "y": 44
+        },
+        {
+          "x": 26,
+          "y": 64
+        },
+        {
+          "x": 44,
+          "y": 74
+        },
+        {
+          "x": 66,
+          "y": 66
+        },
+        {
+          "x": 82,
+          "y": 42
+        },
+        {
+          "x": 94,
+          "y": 12
+        },
+        {
+          "x": 104,
+          "y": -24
+        },
+        {
+          "x": 112,
+          "y": -60
+        },
+        {
+          "x": 120,
+          "y": -88
+        },
+        {
+          "x": 130,
+          "y": -100
+        }
+      ]
+    },
+    {
+      "name": "Eyrie track",
+      "width": 2.5,
+      "points": [
+        {
+          "x": 44,
+          "y": 74
+        },
+        {
+          "x": 50,
+          "y": 86
+        },
+        {
+          "x": 56,
+          "y": 93
+        }
+      ]
+    }
+  ],
+  "water": [],
+  "fields": [],
+  "landmarks": [
+    {
+      "name": "Pilgrims' Rest",
+      "text": "The last warm hearth below the toll gate. Maddoc writes down everyone who goes up.",
+      "at": {
+        "x": -16,
+        "y": 6
+      },
+      "radius": 10
+    },
+    {
+      "name": "The Toll Gate",
+      "text": "Sandthrone hold the pass. Everything that goes through pays, one way or another.",
+      "at": {
+        "x": 21.0,
+        "y": 51.5
+      },
+      "radius": 10
+    },
+    {
+      "name": "Ruined waystation",
+      "text": "Burned the week the Sandthrone took the gate.",
+      "at": {
+        "x": -80,
+        "y": -62
+      },
+      "radius": 9
+    },
+    {
+      "name": "Captain's eyrie",
+      "text": "From up here the captain can see the whole toll road.",
+      "at": {
+        "x": 58,
+        "y": 96
+      },
+      "radius": 9
+    },
+    {
+      "name": "The High Ledge",
+      "text": "Pale shapes stand on the ledge and watch the east road.",
+      "at": {
+        "x": 100,
+        "y": 98
+      },
+      "radius": 9
+    },
+    {
+      "name": "Umbra scarp",
+      "text": "The mountain's flank. Its summit is lost in cloud.",
+      "at": {
+        "x": -106,
+        "y": 20
+      },
+      "radius": 12
+    },
+    {
+      "name": "Rockhide wallow",
+      "text": "Boars with hides like the scree they sleep on.",
+      "at": {
+        "x": 40,
+        "y": -70
+      },
+      "radius": 10
+    }
+  ],
+  "props": [
+    {
+      "kind": "house",
+      "name": "Pilgrims' Rest",
+      "at": {
+        "x": -16,
+        "y": 6
+      },
+      "rotation": 315,
+      "variant": 2,
+      "size": {
+        "x": 8,
+        "y": 6
+      }
+    },
+    {
+      "kind": "well",
+      "name": "Pilgrims' well",
+      "at": {
+        "x": -4,
+        "y": 14
+      }
+    },
+    {
+      "kind": "stall",
+      "name": "Pass-trader's stall",
+      "at": {
+        "x": -26,
+        "y": -4
+      },
+      "rotation": 315,
+      "variant": 1
+    },
+    {
+      "kind": "woodpile",
+      "at": {
+        "x": -24,
+        "y": 14
+      },
+      "rotation": 20
+    },
+    {
+      "kind": "lamp",
+      "at": {
+        "x": -9,
+        "y": 7
+      },
+      "rotation": 135,
+      "variant": 1
+    },
+    {
+      "kind": "barrels",
+      "at": {
+        "x": -21,
+        "y": -1
+      },
+      "variant": 1
+    },
+    {
+      "kind": "cart",
+      "name": "Pilgrim cart",
+      "at": {
+        "x": -32,
+        "y": 2
+      },
+      "rotation": 60
+    },
+    {
+      "kind": "crates",
+      "at": {
+        "x": -12,
+        "y": 16
+      },
+      "rotation": 10,
+      "variant": 2
+    },
+    {
+      "kind": "signpost",
+      "at": {
+        "x": -3,
+        "y": -5
+      },
+      "rotation": 315
+    },
+    {
+      "kind": "tower",
+      "name": "Toll tower (east)",
+      "at": {
+        "x": 26.1,
+        "y": 49.5
+      },
+      "size": {
+        "x": 4.4,
+        "y": 0
+      }
+    },
+    {
+      "kind": "tower",
+      "name": "Toll tower (west)",
+      "at": {
+        "x": 15.9,
+        "y": 53.5
+      },
+      "size": {
+        "x": 4.4,
+        "y": 0
+      }
+    },
+    {
+      "kind": "wall",
+      "name": "Toll wall (east)",
+      "points": [
+        {
+          "x": 28.2,
+          "y": 48.6
+        },
+        {
+          "x": 41.4,
+          "y": 43.3
+        }
+      ]
+    },
+    {
+      "kind": "wall",
+      "name": "Toll wall (west)",
+      "points": [
+        {
+          "x": 13.8,
+          "y": 54.4
+        },
+        {
+          "x": 0.6,
+          "y": 59.7
+        }
+      ]
+    },
+    {
+      "kind": "cliff",
+      "name": "Toll crag (east)",
+      "at": {
+        "x": 48.9,
+        "y": 40.4
+      },
+      "rotation": 22,
+      "size": {
+        "x": 16,
+        "y": 0
+      }
+    },
+    {
+      "kind": "cliff",
+      "name": "Toll crag (west)",
+      "at": {
+        "x": -6.9,
+        "y": 62.6
+      },
+      "rotation": 22,
+      "size": {
+        "x": 16,
+        "y": 0
+      }
+    },
+    {
+      "kind": "house",
+      "name": "Toll-house",
+      "at": {
+        "x": 33.3,
+        "y": 55.2
+      },
+      "rotation": 112,
+      "variant": 3,
+      "size": {
+        "x": 7,
+        "y": 5
+      }
+    },
+    {
+      "kind": "crates",
+      "name": "Toll-house strongbox",
+      "at": {
+        "x": 38.5,
+        "y": 60
+      },
+      "rotation": 20,
+      "variant": 0,
+      "interact": "Break open the toll strongbox",
+      "item": "item.toll_ledger",
+      "once": true
+    },
+    {
+      "kind": "barrels",
+      "at": {
+        "x": 36,
+        "y": 64
+      },
+      "variant": 2
+    },
+    {
+      "kind": "lamp",
+      "at": {
+        "x": 24,
+        "y": 46
+      },
+      "rotation": 250,
+      "variant": 1
+    },
+    {
+      "kind": "gallows",
+      "name": "Toll gibbet",
+      "at": {
+        "x": 8,
+        "y": 40
+      },
+      "rotation": 0
+    },
+    {
+      "kind": "signpost",
+      "at": {
+        "x": 12,
+        "y": 36
+      },
+      "rotation": 290
+    },
+    {
+      "kind": "tower",
+      "name": "Eyrie lookout",
+      "at": {
+        "x": 66,
+        "y": 102
+      },
+      "size": {
+        "x": 4,
+        "y": 0
+      }
+    },
+    {
+      "kind": "lamp",
+      "at": {
+        "x": 52,
+        "y": 100
+      },
+      "rotation": 90,
+      "variant": 1
+    },
+    {
+      "kind": "crates",
+      "at": {
+        "x": 62,
+        "y": 90
+      },
+      "rotation": 30,
+      "variant": 1
+    },
+    {
+      "kind": "cliff",
+      "name": "Eyrie crag",
+      "at": {
+        "x": 58,
+        "y": 108
+      },
+      "rotation": 0,
+      "size": {
+        "x": 24,
+        "y": 0
+      }
+    },
+    {
+      "kind": "cliff",
+      "name": "High ledge",
+      "at": {
+        "x": 100,
+        "y": 84
+      },
+      "rotation": 0,
+      "size": {
+        "x": 26,
+        "y": 0
+      }
+    },
+    {
+      "kind": "cliff",
+      "name": "Ledge wall",
+      "at": {
+        "x": 112,
+        "y": 100
+      },
+      "rotation": 90,
+      "size": {
+        "x": 20,
+        "y": 0
+      }
+    },
+    {
+      "kind": "ruined_house",
+      "name": "Ruined waystation",
+      "at": {
+        "x": -80,
+        "y": -62
+      },
+      "rotation": 60,
+      "size": {
+        "x": 9,
+        "y": 6
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "Collapsed hearth",
+      "at": {
+        "x": -70,
+        "y": -54
+      },
+      "rotation": 30,
+      "size": {
+        "x": 3,
+        "y": 0
+      },
+      "interact": "Search the collapsed hearth",
+      "item": "item.pilgrim_journal",
+      "once": true
+    },
+    {
+      "kind": "ruin",
+      "name": "Waystation wall",
+      "at": {
+        "x": -88,
+        "y": -50
+      },
+      "rotation": 100,
+      "size": {
+        "x": 7,
+        "y": 0
+      }
+    },
+    {
+      "kind": "rock",
+      "name": "Pilgrim cairn",
+      "at": {
+        "x": -54,
+        "y": -36
+      },
+      "variant": 1,
+      "interact": "Lay a stone on the cairn",
+      "once": true
+    },
+    {
+      "kind": "rock",
+      "name": "Pilgrim cairn",
+      "at": {
+        "x": 76,
+        "y": 64
+      },
+      "variant": 1,
+      "interact": "Lay a stone on the cairn",
+      "once": true
+    },
+    {
+      "kind": "rock",
+      "name": "Pilgrim cairn",
+      "at": {
+        "x": 98,
+        "y": -34
+      },
+      "variant": 1,
+      "interact": "Lay a stone on the cairn",
+      "once": true
+    },
+    {
+      "kind": "ruin",
+      "name": "Hollow waymarker",
+      "at": {
+        "x": 100,
+        "y": -54
+      },
+      "rotation": 10,
+      "size": {
+        "x": 2,
+        "y": 0
+      },
+      "interact": "Search the hollow waymarker",
+      "item": "item.mender_letters",
+      "once": true
+    },
+    {
+      "kind": "cliff",
+      "name": "Umbra scarp",
+      "at": {
+        "x": -106,
+        "y": 20
+      },
+      "rotation": 90,
+      "size": {
+        "x": 40,
+        "y": 0
+      }
+    },
+    {
+      "kind": "cliff",
+      "name": "Umbra scarp (north)",
+      "at": {
+        "x": -90,
+        "y": 90
+      },
+      "rotation": 45,
+      "size": {
+        "x": 36,
+        "y": 0
+      }
+    },
+    {
+      "kind": "cliff",
+      "name": "North wall",
+      "at": {
+        "x": -20,
+        "y": 108
+      },
+      "rotation": 0,
+      "size": {
+        "x": 40,
+        "y": 0
+      }
+    },
+    {
+      "kind": "cliff",
+      "name": "South scarp",
+      "at": {
+        "x": 10,
+        "y": -108
+      },
+      "rotation": 0,
+      "size": {
+        "x": 40,
+        "y": 0
+      }
+    },
+    {
+      "kind": "cliff",
+      "name": "East scarp",
+      "at": {
+        "x": 80,
+        "y": -100
+      },
+      "rotation": -30,
+      "size": {
+        "x": 24,
+        "y": 0
+      }
+    },
+    {
+      "kind": "cliff",
+      "name": "Switchback crag",
+      "at": {
+        "x": 64,
+        "y": 24
+      },
+      "rotation": 60,
+      "size": {
+        "x": 20,
+        "y": 0
+      }
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -60,
+        "y": -100
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -40,
+        "y": -72
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -100,
+        "y": -80
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -30,
+        "y": 30
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -50,
+        "y": 76
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 0,
+        "y": 80
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 30,
+        "y": 100
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 80,
+        "y": 20
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 70,
+        "y": -40
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 20,
+        "y": -40
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 60,
+        "y": -100
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 110,
+        "y": 40
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -80,
+        "y": 0
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 40,
+        "y": 20
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -110,
+        "y": -40
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 30,
+        "y": -84
+      },
+      "variant": 1
+    }
+  ],
+  "groves": [
+    {
+      "name": "Wolf pines",
+      "kind": "pine",
+      "center": {
+        "x": -72,
+        "y": 52
+      },
+      "size": {
+        "x": 40,
+        "y": 36
+      },
+      "count": 40
+    },
+    {
+      "name": "South pines",
+      "kind": "pine",
+      "center": {
+        "x": -12,
+        "y": -72
+      },
+      "size": {
+        "x": 46,
+        "y": 22
+      },
+      "count": 30
+    },
+    {
+      "name": "High pines",
+      "kind": "pine",
+      "center": {
+        "x": -44,
+        "y": 96
+      },
+      "size": {
+        "x": 44,
+        "y": 20
+      },
+      "count": 28
+    },
+    {
+      "name": "East pines",
+      "kind": "pine",
+      "center": {
+        "x": 84,
+        "y": -62
+      },
+      "size": {
+        "x": 24,
+        "y": 30
+      },
+      "count": 22
+    },
+    {
+      "name": "Gate pines",
+      "kind": "pine",
+      "center": {
+        "x": -20,
+        "y": 40
+      },
+      "size": {
+        "x": 30,
+        "y": 24
+      },
+      "count": 22
+    }
+  ],
+  "camps": [
+    {
+      "name": "Toll-gate guards",
+      "mob": "Sandthrone toll-guard",
+      "tag": "tollguard",
+      "look": "outrider",
+      "canonStatus": "CANON faction (Sandthrone), GAME-ONLY camp",
+      "center": {
+        "x": 26,
+        "y": 62
+      },
+      "radius": 9,
+      "count": 5,
+      "levelMin": 6,
+      "levelMax": 7,
+      "respawn": 90
+    },
+    {
+      "name": "Wolf pines pack",
+      "mob": "Mountain wolf",
+      "tag": "wolf",
+      "look": "wolf",
+      "canonStatus": "GAME-ONLY",
+      "center": {
+        "x": -72,
+        "y": 54
+      },
+      "radius": 10,
+      "count": 5,
+      "levelMin": 6,
+      "levelMax": 7,
+      "respawn": 75,
+      "ambush": true
+    },
+    {
+      "name": "Rockhide wallow",
+      "mob": "Rockhide boar",
+      "tag": "boar",
+      "look": "boar",
+      "canonStatus": "GAME-ONLY",
+      "center": {
+        "x": 40,
+        "y": -70
+      },
+      "radius": 10,
+      "count": 5,
+      "levelMin": 7,
+      "levelMax": 7,
+      "respawn": 75
+    },
+    {
+      "name": "Captain's eyrie",
+      "mob": "Sandthrone captain",
+      "tag": "captain",
+      "look": "outrider",
+      "canonStatus": "CANON faction (Sandthrone), GAME-ONLY character",
+      "center": {
+        "x": 58,
+        "y": 96
+      },
+      "radius": 6,
+      "count": 1,
+      "levelMin": 8,
+      "levelMax": 8,
+      "respawn": 180,
+      "elite": true
+    },
+    {
+      "name": "The High Ledge",
+      "mob": "Pale watcher",
+      "tag": "pale",
+      "look": "pale",
+      "canonStatus": "CANON-EXPANDED (the Pale as watchers), GAME-ONLY placement",
+      "center": {
+        "x": 100,
+        "y": 98
+      },
+      "radius": 7,
+      "count": 3,
+      "levelMin": 8,
+      "levelMax": 8,
+      "respawn": 120
+    }
+  ],
+  "life": {
+    "villagers": 0,
+    "mood": "afraid",
+    "critters": [
+      {
+        "kind": "crow",
+        "center": {
+          "x": 8,
+          "y": 40
+        },
+        "radius": 10,
+        "count": 5
+      },
+      {
+        "kind": "crow",
+        "center": {
+          "x": -80,
+          "y": -62
+        },
+        "radius": 8,
+        "count": 3
+      },
+      {
+        "kind": "deer",
+        "center": {
+          "x": -50,
+          "y": 90
+        },
+        "radius": 14,
+        "count": 3
+      },
+      {
+        "kind": "deer",
+        "center": {
+          "x": 80,
+          "y": -76
+        },
+        "radius": 12,
+        "count": 3
+      },
+      {
+        "kind": "rabbit",
+        "center": {
+          "x": -30,
+          "y": -40
+        },
+        "radius": 14,
+        "count": 4
+      },
+      {
+        "kind": "rabbit",
+        "center": {
+          "x": 60,
+          "y": 0
+        },
+        "radius": 12,
+        "count": 3
+      }
+    ],
+    "residents": [
+      {
+        "name": "Maddoc Vire",
+        "role": "elder",
+        "title": "Keeper of the Rest",
+        "at": {
+          "x": -11,
+          "y": 1
+        }
+      },
+      {
+        "name": "Yara Quell",
+        "role": "merchant",
+        "title": "Pass-Trader",
+        "at": {
+          "x": -28,
+          "y": -2
+        }
+      },
+      {
+        "name": "Tarsk",
+        "role": "hunter",
+        "title": "Ash-Walker Scout",
+        "at": {
+          "x": -2,
+          "y": -12
+        }
+      },
+      {
+        "name": "Hadrik Sull",
+        "role": "stranger",
+        "title": "Sandthrone Broker",
+        "at": {
+          "x": -36,
+          "y": 10
+        }
+      }
+    ]
+  }
+}

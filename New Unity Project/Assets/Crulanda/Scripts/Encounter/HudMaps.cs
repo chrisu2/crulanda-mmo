@@ -1,0 +1,276 @@
+using UnityEngine;
+using Crulanda.World;
+
+namespace Crulanda.Encounter
+{
+    /// <summary>
+    /// Minimap (round, north-up, rotating player arrow), zone map (M) and world map (scroll out on the zone map).
+    /// Draws in EncounterHud's 1440x900 canvas. The zone picture is ZoneBuilder.MapTexture; the world map is the
+    /// author's overworld image (ZoneArt.worldMap) with a pin per zone.
+    /// </summary>
+    public sealed class HudMaps
+    {
+        public static readonly Rect MinimapRect = new Rect(1238, 30, 184, 184);
+        public static readonly Rect WindowRect = new Rect(230, 50, 980, 800);
+        static readonly float[] MinimapRadii = { 28, 45, 70 };
+        int zoom = 1;
+        Texture2D mask, dot, arrow, pin;
+        GUIStyle label, title, note, centered;
+
+        void Init()
+        {
+            if (mask != null) return;
+            mask = new Texture2D(256, 256, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp };
+            for (int y = 0; y < 256; y++) for (int x = 0; x < 256; x++)
+            {
+                float r = Vector2.Distance(new Vector2(x, y), new Vector2(127.5f, 127.5f)) / 128f;
+                Color c = r < .9f ? Color.clear : r < .97f ? new Color(.62f, .52f, .33f, 1) : r < 1 ? new Color(.2f, .16f, .1f, 1) : Color.clear;
+                if (r >= .88f && r < .9f) c = new Color(.1f, .08f, .06f, .8f);
+                mask.SetPixel(x, y, c);
+            }
+            mask.Apply();
+            dot = Circle(24); pin = Circle(40, true);
+            arrow = new Texture2D(32, 32, TextureFormat.RGBA32, false);
+            for (int y = 0; y < 32; y++) for (int x = 0; x < 32; x++)
+            {
+                // Pointing up in GUI space (texture row 31 is the top).
+                float half = (y / 31f) * 13f; bool inside = Mathf.Abs(x - 15.5f) < (15 - half) && y > 2 && y < 30;
+                bool notch = y < 9 && Mathf.Abs(x - 15.5f) < (9 - y) * .8f;
+                arrow.SetPixel(x, y, inside && !notch ? Color.white : Color.clear);
+            }
+            arrow.Apply();
+            label = new GUIStyle(GUI.skin.label) { fontSize = 13, fontStyle = FontStyle.Bold };
+            centered = new GUIStyle(label) { alignment = TextAnchor.MiddleCenter };
+            title = new GUIStyle(GUI.skin.label) { fontSize = 24, fontStyle = FontStyle.Bold };
+            note = new GUIStyle(GUI.skin.label) { fontSize = 13, wordWrap = true };
+        }
+        static Texture2D Circle(int size, bool ring = false)
+        {
+            var t = new Texture2D(size, size, TextureFormat.RGBA32, false);
+            for (int y = 0; y < size; y++) for (int x = 0; x < size; x++)
+            {
+                float r = Vector2.Distance(new Vector2(x, y), new Vector2((size - 1) / 2f, (size - 1) / 2f)) / (size / 2f);
+                Color c = r < 1 ? Color.white : Color.clear;
+                if (ring && r < 1 && r > .72f) c = new Color(.1f, .08f, .06f, 1);
+                t.SetPixel(x, y, c);
+            }
+            t.Apply(); return t;
+        }
+        void Shadowed(Rect r, string s, GUIStyle style, Color color)
+        {
+            GUI.contentColor = new Color(0, 0, 0, .85f); GUI.Label(new Rect(r.x + 1, r.y + 1, r.width, r.height), s, style);
+            GUI.contentColor = color; GUI.Label(r, s, style); GUI.contentColor = Color.white;
+        }
+        void Dot(Vector2 at, float size, Color c) { GUI.color = c; GUI.DrawTexture(new Rect(at.x - size / 2, at.y - size / 2, size, size), dot); GUI.color = Color.white; }
+        void Arrow(Vector2 at, float size, float yaw)
+        {
+            var m = GUI.matrix; GUIUtility.RotateAroundPivot(yaw, at);
+            GUI.color = new Color(1, .92f, .55f); GUI.DrawTexture(new Rect(at.x - size / 2, at.y - size / 2, size, size), arrow); GUI.color = Color.white;
+            GUI.matrix = m;
+        }
+
+        GUIStyle mark;
+        /// <summary>
+        /// Quest pins: ! and ? over quest givers (the same rules as the head markers), and a gold ring on each place a
+        /// quest asks you to go. People off the edge of the minimap are not shown; places are clamped to its rim.
+        /// </summary>
+        void QuestMarks(EncounterSession s, System.Func<Vector3, Vector2?> person, System.Func<Vector3, Vector2?> place, int size)
+        {
+            if (s.Quests == null || s.Zone == null) return;
+            if (mark == null) mark = new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleCenter };
+            mark.fontSize = size;
+            foreach (var (q, o, done) in s.Quests.Places())
+            {
+                if (done || (!string.IsNullOrEmpty(o.zone) && o.zone != s.ZoneId)) continue;
+                var at = place(s.Zone.Ground(o.at)); if (!at.HasValue) continue;
+                GUI.color = new Color(1, .82f, .25f, .85f); GUI.DrawTexture(new Rect(at.Value.x - size * .6f, at.Value.y - size * .6f, size * 1.2f, size * 1.2f), pin); GUI.color = Color.white;
+            }
+            // Breadcrumbs: a quest step waiting in another zone rings the exit on the road there.
+            foreach (var (q, st) in s.Quests.Active())
+            {
+                var elsewhere = s.QuestZoneElsewhere(q, st); if (elsewhere == null) continue;
+                var exit = s.ExitToward(elsewhere); if (exit == null) continue;
+                var at = place(s.Zone.Ground(exit.at)); if (!at.HasValue) continue;
+                GUI.color = new Color(1, .82f, .25f, .95f); GUI.DrawTexture(new Rect(at.Value.x - size * .75f, at.Value.y - size * .75f, size * 1.5f, size * 1.5f), pin); GUI.color = Color.white;
+            }
+            var life = VillageLife.Active; if (life == null) return;
+            foreach (var v in life.Villagers)
+            {
+                if (!v.Visible) continue;
+                char m = s.Quests.Marker(v.Name, s.ZoneId, s.Progress.Level, out bool grey); if (m == ' ') continue;
+                var at = person(v.transform.position); if (!at.HasValue) continue;
+                Shadowed(new Rect(at.Value.x - 12, at.Value.y - 14, 24, 26), m.ToString(), mark, grey ? new Color(.7f, .7f, .7f) : new Color(1, .82f, .15f));
+            }
+        }
+
+        public static string Band(ZoneDefinition z) { return z.levelMin == z.levelMax ? "(" + z.levelMin + ")" : "(" + z.levelMin + "-" + z.levelMax + ")"; }
+        /// <summary>Colour of a level band for you: grey = beneath you, green = right for you, yellow = a stretch, red = too dangerous.</summary>
+        public static Color BandColor(ZoneDefinition z, int level)
+        {
+            if (level > z.levelMax + 2) return new Color(.65f, .65f, .62f);
+            if (level >= z.levelMin) return new Color(.5f, 1, .45f);
+            if (level >= z.levelMin - 2) return new Color(1, .85f, .3f);
+            return new Color(1, .35f, .28f);
+        }
+        static Color LevelColor(int mobLevel, int level)
+        {
+            int d = mobLevel - level;
+            return d <= -4 ? new Color(.65f, .65f, .62f) : d <= -2 ? new Color(.5f, 1, .45f) : d <= 1 ? new Color(1, .88f, .35f) : d <= 3 ? new Color(1, .55f, .25f) : new Color(1, .3f, .25f);
+        }
+
+        // ---------- minimap ----------
+        public void DrawMinimap(EncounterSession s, Color gold)
+        {
+            Init(); var zone = s.Zone; var r = MinimapRect;
+            Shadowed(new Rect(r.x - 40, r.y - 26, r.width + 80, 22), zone != null ? zone.Zone.displayName : s.ZoneTitle, centered, gold);
+            GUI.color = new Color(.08f, .09f, .08f, 1); GUI.DrawTexture(r, Texture2D.whiteTexture); GUI.color = Color.white;
+            var p = s.Player.transform.position; float radius = MinimapRadii[zoom];
+            if (zone != null && zone.MapTexture != null)
+            {
+                var uv = zone.MapUV(p); float w = radius * 2 / zone.Zone.size;
+                GUI.DrawTextureWithTexCoords(r, zone.MapTexture, new Rect(uv.x - w / 2, uv.y - w / 2, w, w));
+            }
+            var center = r.center; float px = r.width / 2 / radius;
+            System.Func<Vector3, bool, Vector2?> toMini = (world, clampToEdge) => {
+                var d = new Vector2(world.x - p.x, world.z - p.z) * px; d.y = -d.y;
+                float max = r.width / 2 - 9;
+                if (d.magnitude > max) { if (!clampToEdge) return null; d = d.normalized * max; }
+                return center + d;
+            };
+            if (zone != null)
+                foreach (var e in zone.Zone.exits)
+                {
+                    var at = toMini(zone.Ground(e.at), true); if (!at.HasValue) continue;
+                    Dot(at.Value, 11, new Color(1, .82f, .3f));
+                    // Where the road goes, and its level band, tucked inside the rim.
+                    var to = zone.FindZone(e.to);
+                    if (to != null) { var inward = (center - at.Value).normalized * 16; Shadowed(new Rect(at.Value.x + inward.x - 40, at.Value.y + inward.y - 9, 80, 18), Band(to), centered, BandColor(to, s.Progress.Level)); }
+                }
+            foreach (var enemy in s.Enemies)
+            { if (!enemy.actor.IsAlive || enemy.Hidden) continue; var at = toMini(enemy.transform.position, false); if (at.HasValue) Dot(at.Value, 9, new Color(.95f, .25f, .2f)); }
+            QuestMarks(s, w => toMini(w, false), w => toMini(w, true), 15);
+            if (s.Companion != null)
+            { var at = toMini(s.Companion.transform.position, !s.Progress.recruited); if (at.HasValue) Dot(at.Value, s.Progress.recruited ? 9 : 12, s.Progress.recruited ? new Color(.4f, 1, .55f) : gold); }
+            Arrow(center, 20, s.Player.transform.eulerAngles.y);
+            GUI.DrawTexture(new Rect(r.x - 6, r.y - 6, r.width + 12, r.height + 12), mask);
+            // Time of day on the rim: a sun or moon disc and the hour.
+            bool night = WorldClock.Darkness > .5f;
+            Dot(new Vector2(r.xMax - 4, r.y + 10), 16, night ? new Color(.72f, .8f, 1) : new Color(1, .82f, .35f));
+            Shadowed(new Rect(r.xMax - 50, r.y + 20, 60, 20), WorldClock.Text, centered, night ? new Color(.8f, .86f, 1) : gold);
+            // Corner mask: square HUD corners hidden under the round frame.
+            if (GUI.Button(new Rect(r.xMax - 18, r.yMax - 30, 24, 24), "+")) zoom = Mathf.Max(0, zoom - 1);
+            if (GUI.Button(new Rect(r.xMax - 18, r.yMax - 4, 24, 24), "−")) zoom = Mathf.Min(MinimapRadii.Length - 1, zoom + 1);
+            if (GUI.Button(new Rect(r.x - 10, r.yMax - 16, 28, 24), "M")) s.MapOpen = !s.MapOpen;
+        }
+
+        // ---------- zone / world map window ----------
+        public void DrawWindow(EncounterSession s, Color gold, Color ink)
+        {
+            Init(); var zone = s.Zone; var w = WindowRect;
+            if (Event.current.type == EventType.ScrollWheel && w.Contains(Event.current.mousePosition))
+            { s.MapWorld = Event.current.delta.y > 0 || (s.MapWorld && Event.current.delta.y >= 0); Event.current.Use(); }
+            GUI.color = new Color(ink.r, ink.g, ink.b, .97f); GUI.DrawTexture(w, Texture2D.whiteTexture); GUI.color = Color.white;
+            var map = new Rect(w.x + 20, w.y + 64, 700, 700);
+            if (!s.MapWorld && zone != null) DrawZoneMap(s, zone, map, gold);
+            else DrawWorldMap(s, zone, map, gold);
+            if (GUI.Button(new Rect(w.xMax - 250, w.y + 14, 110, 32), s.MapWorld ? "Zone map" : "World map")) s.MapWorld = !s.MapWorld;
+            if (GUI.Button(new Rect(w.xMax - 130, w.y + 14, 110, 32), "Close [M]")) s.MapOpen = false;
+            GUI.Label(new Rect(w.x + 20, w.yMax - 30, 700, 24), s.MapWorld ? "Scroll in (or press Zone map) to return to the zone." : "Scroll out (or press World map) for the world map.", note);
+        }
+        Vector2 OnMap(Rect map, Vector2 uv) { return new Vector2(map.x + uv.x * map.width, map.y + (1 - uv.y) * map.height); }
+        void DrawZoneMap(EncounterSession s, ZoneBuilder zone, Rect map, Color gold)
+        {
+            var z = zone.Zone; var side = new Rect(map.xMax + 20, map.y, WindowRect.xMax - map.xMax - 40, map.height);
+            Shadowed(new Rect(WindowRect.x + 20, WindowRect.y + 14, 600, 34), z.displayName + "   " + Band(z), title, gold);
+            GUI.Label(new Rect(WindowRect.x + 20, WindowRect.y + 44, 700, 20), z.subtitle, note);
+            if (zone.MapTexture != null) GUI.DrawTexture(map, zone.MapTexture);
+            GUI.color = new Color(0, 0, 0, .25f); GUI.DrawTexture(new Rect(map.x - 2, map.y - 2, map.width + 4, 2), Texture2D.whiteTexture); GUI.color = Color.white;
+            foreach (var l in z.landmarks)
+            {
+                var at = OnMap(map, zone.MapUV(zone.Ground(l.at)));
+                Dot(at, 8, new Color(.95f, .85f, .6f)); Shadowed(new Rect(at.x - 110, at.y + 4, 220, 20), l.name, centered, new Color(1, .93f, .75f));
+            }
+            // Camps: a red ring with the pack and its levels.
+            if (z.camps != null)
+                foreach (var c in z.camps)
+                {
+                    if (c == null) continue;
+                    var at = OnMap(map, zone.MapUV(zone.Ground(c.center))); float rr = Mathf.Max(10, c.radius / z.size * map.width);
+                    GUI.color = new Color(.9f, .25f, .2f, .5f); GUI.DrawTexture(new Rect(at.x - rr, at.y - rr, rr * 2, rr * 2), pin); GUI.color = Color.white;
+                    Shadowed(new Rect(at.x - 110, at.y + rr - 2, 220, 20), c.mob + "  " + (c.levelMin == c.levelMax ? c.levelMin.ToString() : c.levelMin + "-" + c.levelMax) + (c.elite ? "  elite" : ""), centered, LevelColor(c.levelMax, s.Progress.Level));
+                }
+            foreach (var e in z.exits)
+            {
+                var at = OnMap(map, zone.MapUV(zone.Ground(e.at))); var to = zone.FindZone(e.to);
+                Dot(at, 14, new Color(1, .82f, .3f));
+                string text = "→ " + (to != null ? to.displayName + "  (" + Band(to) + ")" : e.name);
+                float tw = label.CalcSize(new GUIContent(text)).x;
+                float lx = Mathf.Clamp(at.x - tw / 2, map.x + 4, map.xMax - tw - 4), ly = Mathf.Clamp(at.y - 26, map.y + 4, map.yMax - 24);
+                Shadowed(new Rect(lx, ly, tw + 4, 20), text, label, to != null ? BandColor(to, s.Progress.Level) : gold);
+            }
+            foreach (var enemy in s.Enemies) if (enemy.actor.IsAlive && !enemy.Hidden) Dot(OnMap(map, zone.MapUV(enemy.transform.position)), 10, new Color(.95f, .25f, .2f));
+            QuestMarks(s, w => OnMap(map, zone.MapUV(w)), w => OnMap(map, zone.MapUV(w)), 20);
+            if (s.Companion != null)
+            {
+                var at = OnMap(map, zone.MapUV(s.Companion.transform.position));
+                Dot(at, 12, s.Progress.recruited ? new Color(.4f, 1, .55f) : gold); Shadowed(new Rect(at.x + 8, at.y - 10, 120, 20), "Mira", label, new Color(.6f, 1, .7f));
+            }
+            Arrow(OnMap(map, zone.MapUV(s.Player.transform.position)), 26, s.Player.transform.eulerAngles.y);
+            // Side panel: legend and places.
+            float y = side.y;
+            GUI.Label(new Rect(side.x, y, side.width, 22), "LEGEND", label); y += 26;
+            foreach (var (text, c) in new[] { ("You", new Color(1, .92f, .55f)), ("Mira", new Color(.4f, 1, .55f)), ("Enemy / camp", new Color(.95f, .25f, .2f)), ("Road out (levels)", new Color(1, .82f, .3f)), ("Quest place", new Color(1, .82f, .25f)), ("Landmark", new Color(.95f, .85f, .6f)) })
+            { Dot(new Vector2(side.x + 8, y + 10), 11, c); GUI.Label(new Rect(side.x + 22, y, side.width - 22, 22), text, note); y += 22; }
+            y += 12; GUI.Label(new Rect(side.x, y, side.width, 22), "ROADS OUT", label); y += 24;
+            foreach (var e in z.exits)
+            {
+                var to = zone.FindZone(e.to); if (to == null) continue;
+                Shadowed(new Rect(side.x, y, side.width, 20), to.displayName + "  " + Band(to), label, BandColor(to, s.Progress.Level)); y += 20;
+                GUI.Label(new Rect(side.x + 10, y, side.width - 10, 20), e.name, note); y += 22;
+            }
+            y += 10; GUI.Label(new Rect(side.x, y, side.width, 22), "PLACES", label); y += 24;
+            foreach (var l in z.landmarks)
+            {
+                if (y > side.yMax - 60) break;
+                Shadowed(new Rect(side.x, y, side.width, 20), l.name, label, gold); y += 19;
+            }
+            if (!string.IsNullOrEmpty(z.canonStatus)) GUI.Label(new Rect(side.x, side.yMax - 40, side.width, 40), "Lore status: " + z.canonStatus, note);
+        }
+        void DrawWorldMap(EncounterSession s, ZoneBuilder zone, Rect map, Color gold)
+        {
+            Shadowed(new Rect(WindowRect.x + 20, WindowRect.y + 14, 600, 34), "The Land of Crulanda", title, gold);
+            GUI.Label(new Rect(WindowRect.x + 20, WindowRect.y + 44, 700, 20), "World map", note);
+            var art = zone != null ? zone.art : null;
+            if (art != null && art.worldMap != null) GUI.DrawTexture(map, art.worldMap, ScaleMode.StretchToFill);
+            else GUI.Label(map, "World map image not imported.", note);
+            if (zone == null) return;
+            var side = new Rect(map.xMax + 20, map.y, WindowRect.xMax - map.xMax - 40, map.height); float y = side.y;
+            GUI.Label(new Rect(side.x, y, side.width, 22), "ZONES", label); y += 28;
+            var all = zone.AllZones();
+            System.Func<ZoneDefinition, Vector2> pos = zz => new Vector2(map.x + zz.worldMapPosition.x * map.width, map.y + zz.worldMapPosition.y * map.height);
+            // Roads between zones: a dotted line for each pair joined by an exit.
+            foreach (var a in all)
+                foreach (var e in a.exits)
+                {
+                    var b = all.Find(zz => zz.id == e.to); if (b == null || a.worldMapPosition.x < 0 || b.worldMapPosition.x < 0 || string.CompareOrdinal(a.id, b.id) > 0) continue;
+                    Vector2 p0 = pos(a), p1 = pos(b); int dots = Mathf.Max(3, Mathf.RoundToInt(Vector2.Distance(p0, p1) / 9));
+                    for (int i = 1; i < dots; i++) Dot(Vector2.Lerp(p0, p1, i / (float)dots), 5, new Color(.3f, .2f, .1f, .85f));
+                }
+            foreach (var z in all)
+            {
+                bool here = z.id == zone.Zone.id;
+                if (z.worldMapPosition.x >= 0)
+                {
+                    var at = pos(z);
+                    GUI.color = here ? new Color(1, .85f, .35f) : BandColor(z, s.Progress.Level);
+                    GUI.DrawTexture(new Rect(at.x - (here ? 11 : 8), at.y - (here ? 11 : 8), here ? 22 : 16, here ? 22 : 16), pin); GUI.color = Color.white;
+                    Shadowed(new Rect(at.x + 12, at.y - 11, 260, 22), z.displayName + "  " + Band(z) + (here ? "  (you are here)" : ""), label, here ? gold : BandColor(z, s.Progress.Level));
+                }
+                Shadowed(new Rect(side.x, y, side.width, 20), z.displayName + "  " + Band(z), label, here ? gold : BandColor(z, s.Progress.Level)); y += 20;
+                string info = (z.subtitle ?? "") + (string.IsNullOrEmpty(z.worldMapNote) ? "" : "\n" + z.worldMapNote);
+                float h = note.CalcHeight(new GUIContent(info), side.width);
+                GUI.Label(new Rect(side.x, y, side.width, h), info, note); y += h + 14;
+            }
+        }
+    }
+}

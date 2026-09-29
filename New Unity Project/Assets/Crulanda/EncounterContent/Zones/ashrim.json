@@ -1,0 +1,1052 @@
+{
+  "id": "zone.ashrim",
+  "displayName": "The Ashland Rim",
+  "subtitle": "Grey ash at the edge of the Wasting, where the Ash-Walkers hold the Eastern Ridge",
+  "canonStatus": "CANON-EXPANDED",
+  "canonNote": "Canon (book1 ch.20): the Ash-Walkers live along the Wasting and fight the Weave-Eaters with Salt of the First Sea; Chieftain Grohl and Mother Vane, the Salt-Speaker, lead them from an enclave in the deep caves of the Eastern Ridge, across a plain of petrified ash. The Cult of Ash (Torvyn Embercloak, Vorn) and its iron-wired bone masks are canon (book1 ch.10, series_bible.md); the purple tear is the later House of Ash's symbol (series_bible.md), used here early (GAME-ONLY). The books also call Torvyn's cultists 'Ashwalkers'; the game keeps the Ash-Walkers of ch.20 and the Cult of Ash apart. The canon Ashlands take their full form after the Spoke fires (series_bible.md), so this pre-erasure rim is PROVISIONAL. GAME-ONLY: the zone's name and its roads to the Peaks and Oakhaven, the cult shrine's location, Cinderfold, the old ribcage, the ash hounds, the brood, and all placement.",
+  "size": 260,
+  "levelMin": 9,
+  "levelMax": 10,
+  "biome": "ash",
+  "worldMapPosition": {
+    "x": 0.72,
+    "y": 0.8
+  },
+  "worldMapNote": "Placed at the northern edge of the Ashlands on the game map, south of Oakhaven; exact spot provisional.",
+  "flatRadius": 36,
+  "hillHeight": 5,
+  "seed": 9187,
+  "lighting": {
+    "sunPitch": 16,
+    "sunYaw": -48,
+    "sunIntensity": 0.72,
+    "sunColor": "#E0935E",
+    "ambientSky": "#6C625D",
+    "ambientEquator": "#5E5248",
+    "ambientGround": "#2A2521",
+    "fogColor": "#6F645C",
+    "fogStart": 16,
+    "fogEnd": 90
+  },
+  "spawns": {
+    "player": {
+      "x": -114,
+      "y": 88
+    },
+    "playerFacing": 110,
+    "companion": {
+      "x": 56,
+      "y": 6
+    },
+    "recovery": {
+      "x": 56,
+      "y": 2
+    },
+    "leash": 17,
+    "enemies": []
+  },
+  "objectives": [
+    "Find the Ash-Walker enclave on the Eastern Ridge",
+    "Earn the Salt of the First Sea"
+  ],
+  "exits": [
+    {
+      "to": "zone.peaks",
+      "name": "Ridge road to the Shattered Peaks",
+      "at": {
+        "x": -123,
+        "y": 90
+      },
+      "arrive": {
+        "x": 119,
+        "y": -84
+      },
+      "radius": 5
+    },
+    {
+      "to": "zone.oakhaven",
+      "name": "North road to Oakhaven",
+      "at": {
+        "x": 4.5,
+        "y": 123
+      },
+      "arrive": {
+        "x": -33,
+        "y": -114
+      },
+      "radius": 5
+    }
+  ],
+  "clearings": [
+    {
+      "name": "Enclave yard",
+      "center": {
+        "x": 58,
+        "y": 0
+      },
+      "radius": 12
+    },
+    {
+      "name": "Shrine ground",
+      "center": {
+        "x": -64,
+        "y": -72
+      },
+      "radius": 7
+    }
+  ],
+  "roads": [
+    {
+      "name": "Ridge road",
+      "width": 4.5,
+      "points": [
+        {
+          "x": -130,
+          "y": 92
+        },
+        {
+          "x": -104,
+          "y": 86
+        },
+        {
+          "x": -76,
+          "y": 70
+        },
+        {
+          "x": -50,
+          "y": 50
+        },
+        {
+          "x": -24,
+          "y": 30
+        },
+        {
+          "x": 0,
+          "y": 14
+        },
+        {
+          "x": 24,
+          "y": 4
+        },
+        {
+          "x": 46,
+          "y": 0
+        }
+      ]
+    },
+    {
+      "name": "North road",
+      "width": 4,
+      "points": [
+        {
+          "x": 4,
+          "y": 130
+        },
+        {
+          "x": 6,
+          "y": 104
+        },
+        {
+          "x": 12,
+          "y": 76
+        },
+        {
+          "x": 18,
+          "y": 48
+        },
+        {
+          "x": 22,
+          "y": 24
+        },
+        {
+          "x": 24,
+          "y": 4
+        }
+      ]
+    },
+    {
+      "name": "Waste road",
+      "width": 3.5,
+      "points": [
+        {
+          "x": -24,
+          "y": 30
+        },
+        {
+          "x": -40,
+          "y": 0
+        },
+        {
+          "x": -52,
+          "y": -30
+        },
+        {
+          "x": -58,
+          "y": -58
+        }
+      ]
+    }
+  ],
+  "water": [],
+  "fields": [],
+  "wasting": {
+    "x": 104,
+    "curtainHeight": 26,
+    "fade": 20,
+    "note": "Canon: the Wasting unmakes rather than destroys; the Ash-Walkers live along its edge (book1 ch.20)."
+  },
+  "landmarks": [
+    {
+      "name": "Ash-Walker enclave",
+      "text": "Caves in the Eastern Ridge, with water that does not taste of ash.",
+      "at": {
+        "x": 60,
+        "y": 0
+      },
+      "radius": 14
+    },
+    {
+      "name": "The Unwoven Flats",
+      "text": "The ash here is too smooth, as if something licked it clean.",
+      "at": {
+        "x": -10,
+        "y": -40
+      },
+      "radius": 16
+    },
+    {
+      "name": "Tear-marked shrine",
+      "text": "Bone wired to bone, and a purple tear daubed over all of it.",
+      "at": {
+        "x": -64,
+        "y": -72
+      },
+      "radius": 12
+    },
+    {
+      "name": "The old ribcage",
+      "text": "Ribs of something vast, turned to stone before anyone could name it.",
+      "at": {
+        "x": -22,
+        "y": -96
+      },
+      "radius": 10
+    },
+    {
+      "name": "Cinderfold",
+      "text": "A hamlet the grey went through. The houses stayed.",
+      "at": {
+        "x": -34,
+        "y": 92
+      },
+      "radius": 14
+    },
+    {
+      "name": "The brood",
+      "text": "Where the Eaters grow fat at the Wasting's edge.",
+      "at": {
+        "x": 54,
+        "y": -86
+      },
+      "radius": 10
+    },
+    {
+      "name": "The Wasting",
+      "text": "Past the Ridge the world simply stops.",
+      "at": {
+        "x": 96,
+        "y": 60
+      },
+      "radius": 10
+    }
+  ],
+  "props": [
+    {
+      "kind": "crypt",
+      "name": "Ash-Walker caves",
+      "at": {
+        "x": 72,
+        "y": 0
+      },
+      "rotation": 90
+    },
+    {
+      "kind": "cliff",
+      "name": "Eastern Ridge (north)",
+      "at": {
+        "x": 82,
+        "y": 26
+      },
+      "rotation": 90,
+      "size": {
+        "x": 40,
+        "y": 0
+      }
+    },
+    {
+      "kind": "cliff",
+      "name": "Eastern Ridge (south)",
+      "at": {
+        "x": 82,
+        "y": -26
+      },
+      "rotation": 90,
+      "size": {
+        "x": 40,
+        "y": 0
+      }
+    },
+    {
+      "kind": "cliff",
+      "name": "Eastern Ridge (back)",
+      "at": {
+        "x": 90,
+        "y": 0
+      },
+      "rotation": 90,
+      "size": {
+        "x": 16,
+        "y": 0
+      }
+    },
+    {
+      "kind": "cliff",
+      "name": "Eastern Ridge (far north)",
+      "at": {
+        "x": 84,
+        "y": 70
+      },
+      "rotation": 80,
+      "size": {
+        "x": 36,
+        "y": 0
+      }
+    },
+    {
+      "kind": "cliff",
+      "name": "Eastern Ridge (far south)",
+      "at": {
+        "x": 84,
+        "y": -72
+      },
+      "rotation": 100,
+      "size": {
+        "x": 36,
+        "y": 0
+      }
+    },
+    {
+      "kind": "lamp",
+      "at": {
+        "x": 64,
+        "y": 9
+      },
+      "rotation": 180,
+      "variant": 1
+    },
+    {
+      "kind": "lamp",
+      "at": {
+        "x": 64,
+        "y": -9
+      },
+      "rotation": 180,
+      "variant": 1
+    },
+    {
+      "kind": "lamp",
+      "at": {
+        "x": 52,
+        "y": 0
+      },
+      "rotation": 90,
+      "variant": 1
+    },
+    {
+      "kind": "barrels",
+      "name": "Salt casks",
+      "at": {
+        "x": 60,
+        "y": 14
+      },
+      "variant": 2
+    },
+    {
+      "kind": "barrels",
+      "at": {
+        "x": 67,
+        "y": -15
+      },
+      "variant": 1
+    },
+    {
+      "kind": "stall",
+      "name": "Salt-trader's stall",
+      "at": {
+        "x": 54,
+        "y": -14
+      },
+      "rotation": 90,
+      "variant": 1
+    },
+    {
+      "kind": "crates",
+      "at": {
+        "x": 60,
+        "y": -21
+      },
+      "rotation": 15,
+      "variant": 2
+    },
+    {
+      "kind": "ruin",
+      "name": "Harpoon rack",
+      "at": {
+        "x": 52,
+        "y": 16
+      },
+      "rotation": 0,
+      "size": {
+        "x": 4,
+        "y": 0
+      }
+    },
+    {
+      "kind": "signpost",
+      "at": {
+        "x": 40,
+        "y": 5
+      },
+      "rotation": 90
+    },
+    {
+      "kind": "ruin",
+      "name": "Purple-tear shrine",
+      "at": {
+        "x": -64,
+        "y": -72
+      },
+      "rotation": 0,
+      "size": {
+        "x": 4,
+        "y": 0
+      },
+      "interact": "Topple the purple-tear shrine",
+      "once": true
+    },
+    {
+      "kind": "grave",
+      "at": {
+        "x": -60,
+        "y": -66
+      }
+    },
+    {
+      "kind": "grave",
+      "at": {
+        "x": -68,
+        "y": -66
+      }
+    },
+    {
+      "kind": "grave",
+      "at": {
+        "x": -60,
+        "y": -78
+      }
+    },
+    {
+      "kind": "grave",
+      "at": {
+        "x": -68,
+        "y": -78
+      }
+    },
+    {
+      "kind": "lamp",
+      "at": {
+        "x": -55,
+        "y": -72
+      },
+      "rotation": 90,
+      "variant": 1
+    },
+    {
+      "kind": "lamp",
+      "at": {
+        "x": -73,
+        "y": -72
+      },
+      "rotation": 270,
+      "variant": 1
+    },
+    {
+      "kind": "ruined_house",
+      "name": "Cult hut",
+      "at": {
+        "x": -82,
+        "y": -58
+      },
+      "rotation": 40,
+      "size": {
+        "x": 6,
+        "y": 5
+      }
+    },
+    {
+      "kind": "barrels",
+      "name": "Stolen salt-cask",
+      "at": {
+        "x": -54,
+        "y": -84
+      },
+      "variant": 0,
+      "interact": "Take back the salt-cask",
+      "item": "item.salt_cask",
+      "once": true
+    },
+    {
+      "kind": "barrels",
+      "name": "Stolen salt-cask",
+      "at": {
+        "x": -77,
+        "y": -80
+      },
+      "variant": 0,
+      "interact": "Take back the salt-cask",
+      "item": "item.salt_cask",
+      "once": true
+    },
+    {
+      "kind": "barrels",
+      "name": "Stolen salt-cask",
+      "at": {
+        "x": -51,
+        "y": -62
+      },
+      "variant": 0,
+      "interact": "Take back the salt-cask",
+      "item": "item.salt_cask",
+      "once": true
+    },
+    {
+      "kind": "ruin",
+      "name": "Petrified rib",
+      "at": {
+        "x": -28,
+        "y": -90
+      },
+      "rotation": 90,
+      "size": {
+        "x": 2.2,
+        "y": 0
+      },
+      "interact": "Chip off petrified bone",
+      "item": "item.petrified_bone"
+    },
+    {
+      "kind": "ruin",
+      "name": "Petrified rib",
+      "at": {
+        "x": -22,
+        "y": -88
+      },
+      "rotation": 90,
+      "size": {
+        "x": 2.2,
+        "y": 0
+      },
+      "interact": "Chip off petrified bone",
+      "item": "item.petrified_bone"
+    },
+    {
+      "kind": "ruin",
+      "name": "Petrified rib",
+      "at": {
+        "x": -16,
+        "y": -90
+      },
+      "rotation": 90,
+      "size": {
+        "x": 2.2,
+        "y": 0
+      },
+      "interact": "Chip off petrified bone",
+      "item": "item.petrified_bone"
+    },
+    {
+      "kind": "ruin",
+      "name": "Petrified rib",
+      "at": {
+        "x": -28,
+        "y": -102
+      },
+      "rotation": 90,
+      "size": {
+        "x": 2.2,
+        "y": 0
+      },
+      "interact": "Chip off petrified bone",
+      "item": "item.petrified_bone"
+    },
+    {
+      "kind": "ruin",
+      "name": "Petrified rib",
+      "at": {
+        "x": -22,
+        "y": -104
+      },
+      "rotation": 90,
+      "size": {
+        "x": 2.2,
+        "y": 0
+      },
+      "interact": "Chip off petrified bone",
+      "item": "item.petrified_bone"
+    },
+    {
+      "kind": "ruin",
+      "name": "Petrified rib",
+      "at": {
+        "x": -16,
+        "y": -102
+      },
+      "rotation": 90,
+      "size": {
+        "x": 2.2,
+        "y": 0
+      },
+      "interact": "Chip off petrified bone",
+      "item": "item.petrified_bone"
+    },
+    {
+      "kind": "ruined_house",
+      "name": "Cinderfold house",
+      "at": {
+        "x": -46,
+        "y": 100
+      },
+      "rotation": 20,
+      "size": {
+        "x": 7,
+        "y": 5
+      }
+    },
+    {
+      "kind": "ruined_house",
+      "name": "Cinderfold house",
+      "at": {
+        "x": -24,
+        "y": 104
+      },
+      "rotation": -10,
+      "size": {
+        "x": 8,
+        "y": 5
+      }
+    },
+    {
+      "kind": "ruined_house",
+      "name": "Cinderfold house",
+      "at": {
+        "x": -42,
+        "y": 80
+      },
+      "rotation": 60,
+      "size": {
+        "x": 7,
+        "y": 5
+      }
+    },
+    {
+      "kind": "ruined_house",
+      "name": "The Brine house",
+      "at": {
+        "x": -22,
+        "y": 82
+      },
+      "rotation": 150,
+      "size": {
+        "x": 7,
+        "y": 5
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "Cinderfold wall",
+      "at": {
+        "x": -36,
+        "y": 108
+      },
+      "rotation": 0,
+      "size": {
+        "x": 6,
+        "y": 0
+      }
+    },
+    {
+      "kind": "cliff",
+      "name": "South rim",
+      "at": {
+        "x": -50,
+        "y": -112
+      },
+      "rotation": 0,
+      "size": {
+        "x": 36,
+        "y": 0
+      }
+    },
+    {
+      "kind": "cliff",
+      "name": "West scarp",
+      "at": {
+        "x": -110,
+        "y": -30
+      },
+      "rotation": 90,
+      "size": {
+        "x": 36,
+        "y": 0
+      }
+    },
+    {
+      "kind": "cliff",
+      "name": "North rim",
+      "at": {
+        "x": -80,
+        "y": 112
+      },
+      "rotation": 0,
+      "size": {
+        "x": 30,
+        "y": 0
+      }
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -44,
+        "y": 34
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -100,
+        "y": 50
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -20,
+        "y": 60
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 40,
+        "y": 30
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 30,
+        "y": -40
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -90,
+        "y": -40
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 76,
+        "y": -100
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -110,
+        "y": 70
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 60,
+        "y": 100
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 98,
+        "y": 40
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 20,
+        "y": -70
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -60,
+        "y": -100
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -100,
+        "y": -62
+      },
+      "variant": 1
+    }
+  ],
+  "groves": [
+    {
+      "name": "Ashen snags",
+      "kind": "dead",
+      "center": {
+        "x": -80,
+        "y": 16
+      },
+      "size": {
+        "x": 36,
+        "y": 40
+      },
+      "count": 45
+    },
+    {
+      "name": "Grey thicket",
+      "kind": "dead",
+      "center": {
+        "x": -96,
+        "y": -96
+      },
+      "size": {
+        "x": 26,
+        "y": 26
+      },
+      "count": 24
+    },
+    {
+      "name": "Rim snags",
+      "kind": "dead",
+      "center": {
+        "x": 40,
+        "y": 62
+      },
+      "size": {
+        "x": 26,
+        "y": 26
+      },
+      "count": 22
+    },
+    {
+      "name": "South snags",
+      "kind": "dead",
+      "center": {
+        "x": 10,
+        "y": -100
+      },
+      "size": {
+        "x": 30,
+        "y": 16
+      },
+      "count": 16
+    },
+    {
+      "name": "Cinderfold orchard",
+      "kind": "dead",
+      "center": {
+        "x": -62,
+        "y": 108
+      },
+      "size": {
+        "x": 22,
+        "y": 14
+      },
+      "count": 14
+    }
+  ],
+  "camps": [
+    {
+      "name": "Unwoven Flats eaters",
+      "mob": "Weave-Eater",
+      "tag": "weaveeater",
+      "look": "weaveeater",
+      "canonStatus": "CANON creature (Weave-Eaters, book1 ch.20), GAME-ONLY placement",
+      "center": {
+        "x": -10,
+        "y": -40
+      },
+      "radius": 12,
+      "count": 5,
+      "levelMin": 9,
+      "levelMax": 10,
+      "respawn": 90
+    },
+    {
+      "name": "Ash hound pack",
+      "mob": "Ash hound",
+      "tag": "hound",
+      "look": "wolf",
+      "canonStatus": "GAME-ONLY",
+      "center": {
+        "x": -80,
+        "y": 16
+      },
+      "radius": 10,
+      "count": 5,
+      "levelMin": 9,
+      "levelMax": 9,
+      "respawn": 75
+    },
+    {
+      "name": "Tear-marked shrine",
+      "mob": "Bone-masked cultist",
+      "tag": "cultist",
+      "look": "cultist",
+      "canonStatus": "CANON faction (Cult of Ash, book1 ch.10), GAME-ONLY placement",
+      "center": {
+        "x": -64,
+        "y": -72
+      },
+      "radius": 12,
+      "count": 5,
+      "levelMin": 9,
+      "levelMax": 10,
+      "respawn": 90
+    },
+    {
+      "name": "The Weave-Eater brood",
+      "mob": "Brood Weave-Eater",
+      "tag": "brood",
+      "look": "weaveeater",
+      "canonStatus": "CANON creature, GAME-ONLY brood",
+      "center": {
+        "x": 54,
+        "y": -86
+      },
+      "radius": 7,
+      "count": 2,
+      "levelMin": 10,
+      "levelMax": 10,
+      "respawn": 180,
+      "elite": true
+    },
+    {
+      "name": "Cinderfold hollows",
+      "mob": "Hollow Man",
+      "tag": "hollow",
+      "look": "hollow",
+      "canonStatus": "CANON creature (Hollow Men, book1 ch.4), GAME-ONLY placement",
+      "center": {
+        "x": -34,
+        "y": 92
+      },
+      "radius": 10,
+      "count": 5,
+      "levelMin": 10,
+      "levelMax": 10,
+      "respawn": 90
+    }
+  ],
+  "life": {
+    "villagers": 0,
+    "mood": "afraid",
+    "critters": [
+      {
+        "kind": "crow",
+        "center": {
+          "x": -64,
+          "y": -72
+        },
+        "radius": 10,
+        "count": 4
+      },
+      {
+        "kind": "crow",
+        "center": {
+          "x": -22,
+          "y": -96
+        },
+        "radius": 10,
+        "count": 3
+      },
+      {
+        "kind": "crow",
+        "center": {
+          "x": -34,
+          "y": 92
+        },
+        "radius": 12,
+        "count": 3
+      }
+    ],
+    "residents": [
+      {
+        "name": "Chieftain Grohl",
+        "role": "warden",
+        "title": "Ash-Walker Chieftain",
+        "at": {
+          "x": 62,
+          "y": 4
+        }
+      },
+      {
+        "name": "Mother Vane",
+        "role": "herbalist",
+        "title": "Salt-Speaker",
+        "at": {
+          "x": 62,
+          "y": -4
+        }
+      },
+      {
+        "name": "Sefa Brine",
+        "role": "merchant",
+        "title": "Salt-Trader",
+        "at": {
+          "x": 57,
+          "y": -14
+        }
+      },
+      {
+        "name": "Oska",
+        "role": "blacksmith",
+        "title": "Harpoon-Carver",
+        "at": {
+          "x": 54,
+          "y": 20
+        }
+      }
+    ]
+  }
+}

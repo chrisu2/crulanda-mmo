@@ -1,0 +1,14 @@
+{
+  "name": "Crulanda.Tests.EditMode",
+  "rootNamespace": "Crulanda.Tests",
+  "references": ["Crulanda.Encounter","Crulanda.Abilities","Crulanda.Combat","Crulanda.Core","Crulanda.Data","Crulanda.Gameplay","Crulanda.Persistence","Crulanda.DevTools","UnityEngine.TestRunner","UnityEditor.TestRunner"],
+  "includePlatforms": ["Editor"],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": true,
+  "precompiledReferences": ["nunit.framework.dll"],
+  "autoReferenced": false,
+  "defineConstraints": ["UNITY_INCLUDE_TESTS"],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

@@ -1,0 +1,896 @@
+{
+ "id": "druid",
+ "name": "Druid",
+ "resource": "Wildstores",
+ "resourceDesc": "Each form keeps its own pool (Bark, Fang, Sap, Glimmer) filled only by that form's actions; changing form spends shared Shift Breath and never refills any pool for free.",
+ "identity": "A deliberate generalist recognised by committing to one form at a time and paying a visible Shift Breath cost to leave it.",
+ "branches": [
+  {
+   "id": "barkhide",
+   "name": "Barkhide",
+   "role": "tank",
+   "loop": "Commit to the heavy Barkhide form, build Bark from absorbed hits to hold threat, and time Bark-spending recoveries around enemy spikes.",
+   "tradeoff": "Healing and ranged output are restricted while in Barkhide, and shifting out strands unspent Bark.",
+   "nodes": [
+    {
+     "id": "bh-ringed-hide",
+     "name": "Ringed Hide",
+     "tier": 0,
+     "col": 1,
+     "max": 5,
+     "req": null,
+     "kind": "passive",
+     "icon": "shield",
+     "desc": "+2% armor per rank in Barkhide, and each blow you take in Barkhide grants 1 extra Bark per rank.",
+     "emphasis": {
+      "mitigation": 1,
+      "sustain": 0.3
+     },
+     "impl": true
+    },
+    {
+     "id": "bh-rooted-stance",
+     "name": "Rooted Stance",
+     "tier": 0,
+     "col": 2,
+     "max": 3,
+     "req": null,
+     "kind": "modifier",
+     "icon": "leaf",
+     "desc": "After 2s without moving, Bough Strike also hits 1/2/3 other enemies within 4m of its target and threatens each.",
+     "emphasis": {
+      "mitigation": 1,
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "bh-mosscoat",
+     "name": "Mosscoat",
+     "tier": 1,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "leaf",
+     "desc": "Shifting into Barkhide costs 10/20/30% less Shift Breath and grants a moss barrier worth 3% of your maximum health per rank for 8s.",
+     "emphasis": {
+      "mitigation": 0.8,
+      "sustain": 0.5
+     },
+     "impl": true
+    },
+    {
+     "id": "bh-heartwood-brace",
+     "name": "Heartwood Brace",
+     "tier": 1,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "active",
+     "icon": "shield",
+     "desc": "New action (Barkhide): spend 40 Bark to reduce damage taken by 35% for 6s. Unusable below 40 Bark, so it must be banked from earlier blows.",
+     "emphasis": {
+      "mitigation": 4
+     },
+     "impl": true
+    },
+    {
+     "id": "bh-thorned-bark",
+     "name": "Thorned Bark",
+     "tier": 1,
+     "col": 3,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "sword",
+     "desc": "In Barkhide, enemies that strike you take 3 nature damage per rank plus 5% of your armor per rank, with double threat.",
+     "emphasis": {
+      "damage": 0.5,
+      "control": 0.4
+     },
+     "impl": true
+    },
+    {
+     "id": "bh-sapwood-core",
+     "name": "Sapwood Core",
+     "tier": 2,
+     "col": 1,
+     "max": 3,
+     "req": "bh-heartwood-brace",
+     "kind": "modifier",
+     "icon": "heart",
+     "desc": "When Heartwood Brace ends, 10/20/30% of the damage it prevented returns as healing over 8s.",
+     "emphasis": {
+      "mitigation": 1,
+      "sustain": 1.8
+     },
+     "impl": true
+    },
+    {
+     "id": "bh-lodged-roots",
+     "name": "Lodged Roots",
+     "tier": 2,
+     "col": 2,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "chain",
+     "desc": "Bellowing Roar snares its target by 20/40% for 4s; while snared it deals 5% less damage to anyone other than you.",
+     "emphasis": {
+      "control": 0.8,
+      "support": 0.5
+     },
+     "impl": true
+    },
+    {
+     "id": "bh-deep-grain",
+     "name": "Deep Grain",
+     "tier": 3,
+     "col": 0,
+     "max": 3,
+     "req": "bh-mosscoat",
+     "kind": "passive",
+     "icon": "leaf",
+     "desc": "While Mosscoat's shield holds, Bark generation is +10/20/30%. Staying in Barkhide for 20s raises the Bark cap by 10 per rank.",
+     "emphasis": {
+      "sustain": 1,
+      "mitigation": 0.4
+     }
+    },
+    {
+     "id": "bh-bristle-roar",
+     "name": "Bristle Roar",
+     "tier": 3,
+     "col": 3,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "target",
+     "desc": "Your area threat roar applies Bristled: affected enemies deal 3/6/9% less damage to you specifically for 8s.",
+     "emphasis": {
+      "mitigation": 1.2
+     }
+    },
+    {
+     "id": "bh-ancient-bulwark",
+     "name": "Ancient Bulwark",
+     "tier": 4,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "signature",
+     "icon": "shield",
+     "desc": "Swell into an ironbark colossus for 12s. Hits taken bank Bark past the cap as Overgrowth, released as a self-heal when it ends. Leaving form early forfeits all Overgrowth.",
+     "emphasis": {
+      "mitigation": 6,
+      "sustain": 2
+     }
+    },
+    {
+     "id": "bh-knotted-pulse",
+     "name": "Knotted Pulse",
+     "tier": 4,
+     "col": 2,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "clock",
+     "desc": "Every 20 Bark you spend reduces Heartwood Brace's cooldown by 1/2/3s, rewarding a steady spend rhythm over hoarding.",
+     "emphasis": {
+      "mitigation": 0.8,
+      "sustain": 0.6
+     }
+    },
+    {
+     "id": "bh-grove-guard",
+     "name": "Grove Guard",
+     "tier": 5,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "hand",
+     "desc": "The ally nearest you takes 4/8/12% less damage; the prevented amount drains your Bark instead. Protects a partner at the cost of your own buffer.",
+     "emphasis": {
+      "support": 1.2,
+      "sustain": -0.3
+     }
+    },
+    {
+     "id": "bh-last-ring",
+     "name": "Last Ring",
+     "tier": 5,
+     "col": 2,
+     "max": 2,
+     "req": "bh-knotted-pulse",
+     "kind": "passive",
+     "icon": "heart",
+     "desc": "Dropping below 30% health triggers Heartwood Brace at no Bark cost, once every 90/60s.",
+     "emphasis": {
+      "mitigation": 2
+     }
+    },
+    {
+     "id": "bh-worldroot-stand",
+     "name": "Worldroot Stand",
+     "tier": 6,
+     "col": 1,
+     "max": 1,
+     "req": "bh-ancient-bulwark",
+     "kind": "capstone",
+     "icon": "star",
+     "desc": "Ancient Bulwark lasts 6s longer and forces every enemy within 10m to attack you, but you cannot move or shift until it ends.",
+     "emphasis": {
+      "mitigation": 7,
+      "control": 3,
+      "sustain": -1
+     }
+    }
+   ]
+  },
+  {
+   "id": "thornclaw",
+   "name": "Thornclaw",
+   "role": "dps",
+   "loop": "Use the mobile Thornclaw form to build Fang with quick rakes and spend it on finishing chains before it decays.",
+   "tradeoff": "Lower durability than Barkhide; Fang decays outside combat and shifting away strands it.",
+   "nodes": [
+    {
+     "id": "tc-keen-claws",
+     "name": "Keen Claws",
+     "tier": 0,
+     "col": 2,
+     "max": 5,
+     "req": null,
+     "kind": "passive",
+     "icon": "dagger",
+     "desc": "+3% Thornclaw damage per rank. At 5 ranks, every third Rake grants an extra Fang.",
+     "emphasis": {
+      "damage": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "tc-chain-pounce",
+     "name": "Chain Pounce",
+     "tier": 0,
+     "col": 1,
+     "max": 3,
+     "req": null,
+     "kind": "modifier",
+     "icon": "paw",
+     "desc": "Tear or Rending Flurry used within 3s of Lunge counts as 1/2/3 extra Fang (up to 5).",
+     "emphasis": {
+      "damage": 1.5,
+      "sustain": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "tc-quickpad",
+     "name": "Quickpad",
+     "tier": 1,
+     "col": 3,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "wind",
+     "desc": "Movement speed +5/10/15% in Barkhide and Thornclaw.",
+     "emphasis": {
+      "mitigation": 0.4,
+      "sustain": 0.4
+     },
+     "impl": true
+    },
+    {
+     "id": "tc-rending-flurry",
+     "name": "Rending Flurry",
+     "tier": 1,
+     "col": 2,
+     "max": 1,
+     "req": null,
+     "kind": "active",
+     "icon": "paw",
+     "desc": "New action (Thornclaw): spend 3-5 Fang for 4-8 rapid strikes over 2s. You may move while it runs; shifting mid-flurry loses the remaining strikes.",
+     "emphasis": {
+      "damage": 4
+     },
+     "impl": true
+    },
+    {
+     "id": "tc-scent-of-blood",
+     "name": "Scent of Blood",
+     "tier": 1,
+     "col": 0,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "eye",
+     "desc": "Rake bleeds deal 10% more per rank to targets below 35% health; at rank 2 those Rakes also grant an extra Fang.",
+     "emphasis": {
+      "damage": 0.8,
+      "sustain": 0.3
+     },
+     "impl": true
+    },
+    {
+     "id": "tc-feral-cadence",
+     "name": "Feral Cadence",
+     "tier": 2,
+     "col": 2,
+     "max": 3,
+     "req": "tc-rending-flurry",
+     "kind": "modifier",
+     "icon": "spiral",
+     "desc": "If the target survives every strike of Rending Flurry, the final strike refunds 1/2/3 Fang.",
+     "emphasis": {
+      "damage": 1,
+      "sustain": 1.5
+     },
+     "impl": true
+    },
+    {
+     "id": "tc-bramble-feint",
+     "name": "Bramble Feint",
+     "tier": 2,
+     "col": 1,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "hand",
+     "desc": "Blows you take in Thornclaw grant 1 Fang, at most once every 6/4s.",
+     "emphasis": {
+      "mitigation": 0.8,
+      "sustain": 0.4
+     },
+     "impl": true
+    },
+    {
+     "id": "tc-trackers-shift",
+     "name": "Tracker's Shift",
+     "tier": 3,
+     "col": 3,
+     "max": 3,
+     "req": "tc-quickpad",
+     "kind": "passive",
+     "icon": "paw",
+     "desc": "With Quickpad, shifting into Thornclaw converts 10/20/30% of the pool you leave into Fang. It is a conversion, not a refill: the old pool is emptied.",
+     "emphasis": {
+      "sustain": 1.2
+     }
+    },
+    {
+     "id": "tc-open-veins",
+     "name": "Open Veins",
+     "tier": 3,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "drop",
+     "desc": "Your bleeds last 2/4/6s longer and each tick has a 5% chance to add 1 Fang.",
+     "emphasis": {
+      "damage": 1,
+      "sustain": 0.3
+     }
+    },
+    {
+     "id": "tc-wildrun",
+     "name": "Wildrun",
+     "tier": 4,
+     "col": 2,
+     "max": 1,
+     "req": null,
+     "kind": "signature",
+     "icon": "paw",
+     "desc": "For 10s, every finisher chains a free Lunge to the nearest wounded enemy. Ends early if a single hit deals over 15% of your max health.",
+     "emphasis": {
+      "damage": 6,
+      "mitigation": -1
+     }
+    },
+    {
+     "id": "tc-thornlash",
+     "name": "Thornlash",
+     "tier": 4,
+     "col": 1,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "sword",
+     "desc": "Finishers spending 5 Fang apply Thornlash: your damage to that target +2/4/6% for 8s.",
+     "emphasis": {
+      "damage": 1.2
+     }
+    },
+    {
+     "id": "tc-pack-mark",
+     "name": "Pack Mark",
+     "tier": 5,
+     "col": 3,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "target",
+     "desc": "Finishers mark the target; allies' physical hits on it restore 1 Fang to you, at most once per 3/2/1s.",
+     "emphasis": {
+      "support": 1,
+      "sustain": 0.4
+     }
+    },
+    {
+     "id": "tc-bloodied-verve",
+     "name": "Bloodied Verve",
+     "tier": 5,
+     "col": 1,
+     "max": 2,
+     "req": "tc-thornlash",
+     "kind": "passive",
+     "icon": "heart",
+     "desc": "Finishers against a Thornlashed target heal you for 1/2% max health, keeping the fragile form alive without shifting out.",
+     "emphasis": {
+      "sustain": 1,
+      "mitigation": 0.8
+     }
+    },
+    {
+     "id": "tc-apex-chase",
+     "name": "Apex Chase",
+     "tier": 6,
+     "col": 2,
+     "max": 1,
+     "req": "tc-wildrun",
+     "kind": "capstone",
+     "icon": "star",
+     "desc": "Wildrun lasts until a chained Lunge misses; each consecutive Lunge adds 4% damage. While it runs you cannot shift and healing above 70% health is wasted.",
+     "emphasis": {
+      "damage": 8,
+      "mitigation": -2
+     }
+    }
+   ]
+  },
+  {
+   "id": "rootmend",
+   "name": "Rootmend",
+   "role": "healer",
+   "loop": "Seed allies with slow restoration ahead of damage, then spend Sap on reactive blooms when spikes land.",
+   "tradeoff": "Little offense; leaving Rootmend to rescue in another form costs Shift Breath and strands Sap.",
+   "nodes": [
+    {
+     "id": "rm-slow-sap",
+     "name": "Slow Sap",
+     "tier": 0,
+     "col": 1,
+     "max": 5,
+     "req": null,
+     "kind": "passive",
+     "icon": "leaf",
+     "desc": "Seedling heals 4% more per rank. Seedling ticks are the main source of Sap.",
+     "emphasis": {
+      "healing": 1,
+      "sustain": 0.3
+     },
+     "impl": true
+    },
+    {
+     "id": "rm-pre-bloom",
+     "name": "Pre-bloom",
+     "tier": 0,
+     "col": 2,
+     "max": 3,
+     "req": null,
+     "kind": "modifier",
+     "icon": "plus",
+     "desc": "Seedling ticks on an ally at full health are stored (up to 1/2/3) and released instantly when that ally drops below 60%.",
+     "emphasis": {
+      "healing": 2
+     },
+     "impl": true
+    },
+    {
+     "id": "rm-dew-cleanse",
+     "name": "Dew Cleanse",
+     "tier": 1,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "drop",
+     "desc": "Swiftroot can be cast from any form, costing 15/10/5 Shift Breath outside Rootmend. A cheap emergency heal for hybrids.",
+     "emphasis": {
+      "support": 1,
+      "healing": 0.2
+     },
+     "impl": true
+    },
+    {
+     "id": "rm-burst-bloom",
+     "name": "Burst Bloom",
+     "tier": 1,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "active",
+     "icon": "heart",
+     "desc": "New action (Rootmend): spend 30 Sap to consume the Seedling on your heal target, healing its remaining ticks instantly plus 25%.",
+     "emphasis": {
+      "healing": 4
+     },
+     "impl": true
+    },
+    {
+     "id": "rm-canopy",
+     "name": "Canopy",
+     "tier": 1,
+     "col": 3,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "moon",
+     "desc": "Allies carrying your Seedling take 3/6% less damage.",
+     "emphasis": {
+      "mitigation": 0.6,
+      "support": 0.5
+     },
+     "impl": true
+    },
+    {
+     "id": "rm-grafting",
+     "name": "Grafting",
+     "tier": 2,
+     "col": 1,
+     "max": 3,
+     "req": "rm-burst-bloom",
+     "kind": "modifier",
+     "icon": "leaf",
+     "desc": "Burst Bloom leaves a 3/5/7s sprout that re-seeds the ally; it costs 5 more Sap.",
+     "emphasis": {
+      "healing": 1.8,
+      "sustain": -0.4
+     },
+     "impl": true
+    },
+    {
+     "id": "rm-sap-thrift",
+     "name": "Sap Thrift",
+     "tier": 2,
+     "col": 2,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "flask",
+     "desc": "10/20% of Seedling overhealing returns as Sap.",
+     "emphasis": {
+      "sustain": 1.2
+     },
+     "impl": true
+    },
+    {
+     "id": "rm-rain-root",
+     "name": "Rain Root",
+     "tier": 3,
+     "col": 0,
+     "max": 3,
+     "req": "rm-dew-cleanse",
+     "kind": "passive",
+     "icon": "leaf",
+     "desc": "Cleansing with Dew Cleanse plants a free 4s Seedling on the target and allies within 5/7/9m.",
+     "emphasis": {
+      "healing": 1.2,
+      "support": 0.3
+     }
+    },
+    {
+     "id": "rm-heartwood-reading",
+     "name": "Heartwood Reading",
+     "tier": 3,
+     "col": 3,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "eye",
+     "desc": "Telegraphed attacks on seeded allies are shown 1s earlier per rank, so preparation beats reaction.",
+     "emphasis": {
+      "healing": 0.8,
+      "support": 0.4
+     }
+    },
+    {
+     "id": "rm-living-grove",
+     "name": "Living Grove",
+     "tier": 4,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "signature",
+     "icon": "leaf",
+     "desc": "Plant a stationary grove for 12s: Seedlings on allies inside spread to one unseeded ally every 2s, and Burst Bloom cast inside costs no Sap.",
+     "emphasis": {
+      "healing": 6
+     }
+    },
+    {
+     "id": "rm-deep-rings",
+     "name": "Deep Rings",
+     "tier": 4,
+     "col": 2,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "clock",
+     "desc": "Seedlings that run their full duration refund 2/4/6 Sap.",
+     "emphasis": {
+      "sustain": 1.2
+     }
+    },
+    {
+     "id": "rm-thornward",
+     "name": "Thornward",
+     "tier": 5,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "shield",
+     "desc": "Burst Bloom also grants a bark shield worth 5/10/15% of the heal for 6s.",
+     "emphasis": {
+      "mitigation": 1,
+      "healing": 0.4
+     }
+    },
+    {
+     "id": "rm-evergreen",
+     "name": "Evergreen",
+     "tier": 5,
+     "col": 2,
+     "max": 2,
+     "req": "rm-deep-rings",
+     "kind": "passive",
+     "icon": "leaf",
+     "desc": "Deep Rings refunds past the Sap cap fill a 20/40 reserve that only Burst Bloom can spend.",
+     "emphasis": {
+      "sustain": 1.5
+     }
+    },
+    {
+     "id": "rm-worldbloom",
+     "name": "Worldbloom",
+     "tier": 6,
+     "col": 1,
+     "max": 1,
+     "req": "rm-living-grove",
+     "kind": "capstone",
+     "icon": "star",
+     "desc": "When Living Grove ends it erupts, instantly blooming every Seedling in range at 60% value. Afterward Sap cannot generate for 8s.",
+     "emphasis": {
+      "healing": 8,
+      "sustain": -2
+     }
+    }
+   ]
+  },
+  {
+   "id": "thornsong",
+   "name": "Thornsong",
+   "role": "dps",
+   "loop": "Alternate Seedshot and Thornbolt casts to build Glimmer, then spend it on a channelled Bramblestorm while exposed.",
+   "tradeoff": "Long cast exposure and weak frontline survival; Glimmer builds only through alternation, so interrupts break the rhythm.",
+   "nodes": [
+    {
+     "id": "ts-green-voice",
+     "name": "Green Voice",
+     "tier": 0,
+     "col": 2,
+     "max": 5,
+     "req": null,
+     "kind": "passive",
+     "icon": "bolt",
+     "desc": "+2% Thornsong damage per rank. At ranks 3 and 5, each Seedshot/Thornbolt alternation grants 5 more Glimmer.",
+     "emphasis": {
+      "damage": 1,
+      "sustain": 0.2
+     },
+     "impl": true
+    },
+    {
+     "id": "ts-germinate",
+     "name": "Germinate",
+     "tier": 0,
+     "col": 1,
+     "max": 3,
+     "req": null,
+     "kind": "modifier",
+     "icon": "leaf",
+     "desc": "Seedshot plants a seed instead of its damage-over-time; your next Thornbolt on that target detonates it for 15/30/45% bonus damage.",
+     "emphasis": {
+      "damage": 2
+     },
+     "impl": true
+    },
+    {
+     "id": "ts-stillroot-cast",
+     "name": "Stillroot Cast",
+     "tier": 1,
+     "col": 3,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "hand",
+     "desc": "Stillroot lasts 1/2/3s longer and can be cast from any form without Shift Breath.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "ts-bramblestorm",
+     "name": "Bramblestorm",
+     "tier": 1,
+     "col": 2,
+     "max": 1,
+     "req": null,
+     "kind": "active",
+     "icon": "wind",
+     "desc": "New action (Thornsong): spend all Glimmer (min 30) to channel 3s of thorn rain around your target; damage scales with Glimmer spent. Moving breaks it.",
+     "emphasis": {
+      "damage": 4.5,
+      "mitigation": -0.5
+     },
+     "impl": true
+    },
+    {
+     "id": "ts-pollen-veil",
+     "name": "Pollen Veil",
+     "tier": 1,
+     "col": 0,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "eye",
+     "desc": "Enemies hit by Seedshot deal 3/6% less damage to you for 6s.",
+     "emphasis": {
+      "mitigation": 0.7
+     },
+     "impl": true
+    },
+    {
+     "id": "ts-thornbound-channel",
+     "name": "Thornbound Channel",
+     "tier": 2,
+     "col": 2,
+     "max": 3,
+     "req": "ts-bramblestorm",
+     "kind": "modifier",
+     "icon": "wind",
+     "desc": "Moving no longer breaks Bramblestorm, but it costs 10 more Glimmer and its ticks deal 40/25/10% less damage while you move.",
+     "emphasis": {
+      "damage": 1,
+      "mitigation": 0.8,
+      "sustain": -0.4
+     },
+     "impl": true
+    },
+    {
+     "id": "ts-cadence-thread",
+     "name": "Cadence Thread",
+     "tier": 2,
+     "col": 1,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "spiral",
+     "desc": "Three perfect alternations in a row make your next Thornbolt instant (holds 1/2 charges).",
+     "emphasis": {
+      "damage": 0.8,
+      "mitigation": 0.4
+     },
+     "impl": true
+    },
+    {
+     "id": "ts-deep-root-snare",
+     "name": "Deep Root Snare",
+     "tier": 3,
+     "col": 3,
+     "max": 3,
+     "req": "ts-stillroot-cast",
+     "kind": "passive",
+     "icon": "chain",
+     "desc": "Enemies held by Stillroot Cast take 5/10/15% more damage from Thornbolt.",
+     "emphasis": {
+      "damage": 1,
+      "control": 0.3
+     }
+    },
+    {
+     "id": "ts-quartzine-seed",
+     "name": "Quartzine Seed",
+     "tier": 3,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "crystal",
+     "desc": "Germinated seeds that are detonated by a critical Thornbolt shatter into quartzine shards hitting enemies within 3/4/5m.",
+     "emphasis": {
+      "damage": 1
+     }
+    },
+    {
+     "id": "ts-overgrowth-aria",
+     "name": "Overgrowth Aria",
+     "tier": 4,
+     "col": 2,
+     "max": 1,
+     "req": null,
+     "kind": "signature",
+     "icon": "note",
+     "desc": "For 10s both casts count as each other, so every cast is a perfect alternation and Glimmer builds twice as fast. You cannot move during the Aria.",
+     "emphasis": {
+      "damage": 6,
+      "mitigation": -1
+     }
+    },
+    {
+     "id": "ts-sporecount",
+     "name": "Sporecount",
+     "tier": 4,
+     "col": 1,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "clock",
+     "desc": "Each 10 Glimmer held raises Thornbolt damage by 1/2/3%, rewarding patience before a Bramblestorm.",
+     "emphasis": {
+      "damage": 1
+     }
+    },
+    {
+     "id": "ts-seedward",
+     "name": "Seedward",
+     "tier": 5,
+     "col": 3,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "shield",
+     "desc": "Starting Bramblestorm grants a bark ward absorbing 4/8/12% of your max health.",
+     "emphasis": {
+      "mitigation": 1
+     }
+    },
+    {
+     "id": "ts-ripened-glimmer",
+     "name": "Ripened Glimmer",
+     "tier": 5,
+     "col": 1,
+     "max": 2,
+     "req": "ts-sporecount",
+     "kind": "passive",
+     "icon": "star",
+     "desc": "Glimmer can exceed its cap by 15/30; the overflow decays by 1 per second.",
+     "emphasis": {
+      "sustain": 1.2,
+      "damage": 0.3
+     }
+    },
+    {
+     "id": "ts-thousand-thorns",
+     "name": "Thousand Thorns",
+     "tier": 6,
+     "col": 2,
+     "max": 1,
+     "req": "ts-overgrowth-aria",
+     "kind": "capstone",
+     "icon": "star",
+     "desc": "Overgrowth Aria ends with an automatic Bramblestorm at double Glimmer value. Afterward Glimmer cannot be generated for 6s.",
+     "emphasis": {
+      "damage": 8,
+      "sustain": -2
+     }
+    }
+   ]
+  }
+ ]
+}

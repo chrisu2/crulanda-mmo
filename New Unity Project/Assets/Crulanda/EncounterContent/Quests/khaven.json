@@ -1,0 +1,422 @@
+{
+  "items": [
+    {
+      "id": "item.small_shackle",
+      "name": "Child's shackle",
+      "description": "A shackle too small for any grown wrist, stamped with the Bureau's mark."
+    },
+    {
+      "id": "item.mourners_cap",
+      "name": "Mourner's cap",
+      "description": "A black-gilled toadstool from the banks of Gloom Creek, where the drowned graves are. Wenna swears by it."
+    },
+    {
+      "id": "item.boar_tallow",
+      "name": "Carrion boar tallow",
+      "description": "Rendered fat, rank as the cliffs it came from. It burns long and yellow."
+    },
+    {
+      "id": "item.khaven_goods",
+      "name": "Khaven's goods",
+      "description": "Candles, a bolt of wool, a family's pewter: taken from Khaven as 'toll'."
+    }
+  ],
+  "documents": [
+    {
+      "id": "doc.khaven.tally",
+      "title": "Forty Sovereigns",
+      "text": "A notched tally-stick, with a scrap of paper wound round it in a clumsy hand:\n\nBureau wagon, Oakhaven run.\nTwo, small, taken on at Khaven gate. Sound.\nForty sovereigns: twenty paid at the gate, twenty at the toll.\nRide them north by the Peaks road. Hand on at the gate to the Concord escort.\nNo questions, as agreed.",
+      "canonStatus": "GAME-ONLY: the handover, the price and the route. Sandthrone working for the Concord follows world_bible.md."
+    }
+  ],
+  "quests": [
+    {
+      "id": "main.khaven.1",
+      "title": "Break the Sandthrone Hold",
+      "kind": "main",
+      "giver": "Wenna Coyle",
+      "turnIn": "Wenna Coyle",
+      "zone": "zone.khaven",
+      "level": 3,
+      "requires": [
+        "main.oakhaven.3"
+      ],
+      "canonStatus": "CANON-EXPANDED: Sandthrone are canon mercenaries 'often employed by the Concord but with their own agenda' (world_bible.md); their hold on Khaven and the handover are GAME-ONLY.",
+      "summary": "Drive the two Sandthrone outriders out of Khaven, then search their saddlebags outside the gate for proof of the handover.",
+      "offer": "\"Two of them. One by the well, one out on the Gloom road, and neither has paid for a drink since they came.\" She presses a twist of dried leaves into your hand. \"For after.\"\n\n\"Put them down, then look in their saddlebags. They leave them on the ground outside the gate, like the road owes them. If there's anything about the little ones, it'll be in there.\"",
+      "complete": "\"Forty sovereigns,\" Wenna reads from the tally, flat. \"Half at our gate, half 'at the toll'. There's only one toll anyone means round here: the Sandthrone road over the Peaks.\"\n\n\"Go and see Ansel Morrow at the Crypt-Keeper's Hovel. He sits on his step all night. He'll have seen which way they rode.\"",
+      "steps": [
+        {
+          "text": "Drive off the Sandthrone outriders holding Khaven.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.khaven",
+              "target": "khaven.outrider.*",
+              "count": 2,
+              "text": "Sandthrone outriders driven off"
+            }
+          ]
+        },
+        {
+          "text": "Search the outriders' saddlebags outside the gate.",
+          "objectives": [
+            {
+              "type": "collect",
+              "zone": "zone.khaven",
+              "target": "Outrider saddlebags",
+              "item": "item.small_shackle",
+              "text": "Search the outriders' saddlebags",
+              "say": "Under a rolled cloak: a child's shackle with the Bureau's mark, and a notched tally-stick with a note wound round it.",
+              "document": "doc.khaven.tally"
+            }
+          ]
+        },
+        {
+          "text": "Show Wenna what you found.",
+          "objectives": [
+            {
+              "type": "deliver",
+              "zone": "zone.khaven",
+              "target": "Wenna Coyle",
+              "item": "item.small_shackle",
+              "text": "Show the shackle to Wenna Coyle",
+              "say": "She turns the shackle over and over. \"This size. They made it this size, and they put it on a child.\""
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 100,
+        "gold": 18,
+        "reputation": [
+          {
+            "faction": "oakhaven",
+            "amount": 150
+          },
+          {
+            "faction": "sandthrone",
+            "amount": -100
+          }
+        ]
+      }
+    },
+    {
+      "id": "main.khaven.2",
+      "title": "What the Pale Thing Counts",
+      "kind": "main",
+      "giver": "Ansel Morrow",
+      "turnIn": "Ansel Morrow",
+      "zone": "zone.khaven",
+      "level": 4,
+      "requires": [
+        "main.khaven.1"
+      ],
+      "canonStatus": "CANON-EXPANDED: the Pale Things / Pale Kings as cosmic watchers and auditors are canon (world_bible.md, series_bible.md); the watcher at Khaven's crypt is GAME-ONLY.",
+      "summary": "Drive off the Pale watcher that has stood at the crypt since the wagon came, then walk the north road where Ansel saw the riders go.",
+      "offer": "The old man doesn't look at you. He looks past you, at the crypt. \"It came the night the wagon did. Stands at my crypt door, pale as a peeled egg, and it counts. The riders. The children. Me. I've buried Khaven for forty years and never minded the dead watching. I mind that.\"\n\n\"Make it stop counting. Then walk the north road past the Whispering Wood. The riders went that way with the children across their saddles. I watched them from my step, and I did nothing.\"",
+      "complete": "\"North, then. To the toll road.\" Ansel lowers himself onto his step. \"The Sandthrone hold the pass. They'll take coin from anyone for anything. A good trade, a child, if you've no soul to speak of.\"",
+      "steps": [
+        {
+          "text": "Drive the Pale watcher from the crypt.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.khaven",
+              "target": "khaven.pale.0",
+              "text": "The Pale watcher at the crypt",
+              "say": "It does not fall. It stops being there, the way a sound stops, and the air where it stood stays cold a long moment after."
+            }
+          ]
+        },
+        {
+          "text": "Follow the riders' tracks up the north road.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.khaven",
+              "at": {
+                "x": -38,
+                "y": 26
+              },
+              "radius": 8,
+              "text": "Walk the north road past the Whispering Wood",
+              "say": "Hoofprints a fortnight old, baked hard, going north at a trot. Where the horses stopped, the scuff of small feet. Ahead, the road climbs toward the grey shoulders of the Peaks."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 120,
+        "gold": 22,
+        "reputation": [
+          {
+            "faction": "oakhaven",
+            "amount": 100
+          }
+        ]
+      }
+    },
+    {
+      "id": "main.khaven.3",
+      "title": "The Toll Road North",
+      "kind": "main",
+      "giver": "Ansel Morrow",
+      "turnIn": "Maddoc Vire",
+      "zone": "zone.khaven",
+      "level": 5,
+      "requires": [
+        "main.khaven.2"
+      ],
+      "canonStatus": "CANON-EXPANDED: the Sandthrone charge a toll in the Shattered Peaks (book1 ch.5); the pilgrims' rest and Maddoc Vire are GAME-ONLY.",
+      "summary": "Take the north road up into the Shattered Peaks and find the pilgrims' rest below the Sandthrone toll gate.",
+      "offer": "\"There's a rest-house on the pass, below the toll gate. Pilgrims wait there for the Sandthrone to name a price. Maddoc Vire keeps it. He's kept it through three sets of masters on that gate, and he writes down everyone who goes up.\"\n\n\"Ask him about two children in chains. And go careful. The Peaks aren't Khaven. Things up there are hungrier.\"",
+      "complete": "Maddoc turns his book toward you. Two lines, in a careful hand: 'Two children, small, chained at the wrist. Brought up by Sandthrone riders. Taken through the gate without toll.'\n\n\"Without toll,\" he says. \"The Sandthrone never let so much as a goat through without toll. Somebody paid before they got here.\"",
+      "steps": [
+        {
+          "text": "Take the north road into the Shattered Peaks.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.peaks",
+              "at": {
+                "x": -78,
+                "y": -92
+              },
+              "radius": 9,
+              "text": "Climb into the Shattered Peaks",
+              "say": "The air thins and cools. Above you the road switchbacks over bare rock toward a wall across the pass. Smoke rises from a hut on the flat below it."
+            }
+          ]
+        },
+        {
+          "text": "Find Maddoc Vire at the pilgrims' rest.",
+          "objectives": [
+            {
+              "type": "talk",
+              "zone": "zone.peaks",
+              "target": "Maddoc Vire",
+              "text": "Maddoc Vire, keeper of the rest",
+              "say": "\"Two children, chained, a fortnight back?\" He opens a book older than you. \"Yes. I wrote them down. I write everyone down.\""
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 150,
+        "gold": 30,
+        "reputation": [
+          {
+            "faction": "oakhaven",
+            "amount": 100
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.wenna.wolves",
+      "title": "Grey at the Wood's Edge",
+      "kind": "npc",
+      "giver": "Wenna Coyle",
+      "turnIn": "Wenna Coyle",
+      "zone": "zone.khaven",
+      "level": 3,
+      "canonStatus": "GAME-ONLY",
+      "summary": "Thin the grey wolves hunting the Whispering Wood beyond the walls.",
+      "offer": "\"Wolves in the Whispering Wood. Grey ones, greyer every season, as if the wood's got into them.\" She touches a charm of knotted bone over the gate. \"They've had Col Emmet's goats, and they'll have Col next. Six of them, and I'll sleep.\"",
+      "complete": "\"Six. Good.\" She ties another knot in the cord at her wrist. \"The wood will be quieter tonight. Not quiet. Quieter.\"",
+      "steps": [
+        {
+          "text": "Cull the grey wolves in the deep Whispering Wood.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.khaven",
+              "target": "mob.wolf.khaven*",
+              "count": 6,
+              "text": "Grey wolves culled"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 90,
+        "gold": 15
+      }
+    },
+    {
+      "id": "npc.wenna.mourners_cap",
+      "title": "Mourner's Cap",
+      "kind": "npc",
+      "giver": "Wenna Coyle",
+      "turnIn": "Wenna Coyle",
+      "zone": "zone.khaven",
+      "level": 3,
+      "canonStatus": "GAME-ONLY",
+      "summary": "Gather five mourner's caps from the banks of Gloom Creek for Wenna's salves.",
+      "offer": "\"You'll be bleeding before you're done in Khaven, and so will everyone else. I need mourner's cap for the salve: black-gilled, grows on the creek banks where the water's darkest. The old folk call it that because it likes the drowned graves. Five. And don't lick your fingers after.\"",
+      "complete": "She crushes one in her palm and the smell is like wet stone. \"That'll close a cut. Here, take a pot of it for yourself. You'll want it.\"",
+      "steps": [
+        {
+          "text": "Gather mourner's cap on the banks of Gloom Creek.",
+          "objectives": [
+            {
+              "type": "collect",
+              "zone": "zone.khaven",
+              "target": "Mourner's cap",
+              "item": "item.mourners_cap",
+              "count": 5,
+              "text": "Mourner's cap gathered"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 90,
+        "gold": 15
+      }
+    },
+    {
+      "id": "npc.cato.tallow",
+      "title": "Tallow for the Dark",
+      "kind": "npc",
+      "giver": "Cato Brisk",
+      "turnIn": "Cato Brisk",
+      "zone": "zone.khaven",
+      "level": 4,
+      "canonStatus": "GAME-ONLY",
+      "summary": "Bring Cato five lumps of tallow from the carrion boars rooting under the Carrion Cliffs.",
+      "offer": "\"Candles. Khaven runs on candles, and I've none to sell.\" He spreads empty hands over his stall. \"The boars under the Carrion Cliffs are fat as abbots on what falls from up there. Don't ask what falls. Five good lumps of their tallow, and there'll be light in Khaven's windows again.\"",
+      "complete": "\"Rank. Perfect.\" He wraps the tallow in sacking. \"Nobody asks what a candle smells of, so long as it burns.\"",
+      "steps": [
+        {
+          "text": "Take tallow from the carrion boars below the Carrion Cliffs.",
+          "objectives": [
+            {
+              "type": "collect",
+              "zone": "zone.khaven",
+              "target": "kill:mob.boar.khaven*",
+              "item": "item.boar_tallow",
+              "count": 5,
+              "text": "Carrion boar tallow"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 120,
+        "gold": 25
+      }
+    },
+    {
+      "id": "npc.cato.spoils",
+      "title": "What the Outriders Took",
+      "kind": "npc",
+      "giver": "Cato Brisk",
+      "turnIn": "Cato Brisk",
+      "zone": "zone.khaven",
+      "level": 5,
+      "canonStatus": "CANON faction (Sandthrone), GAME-ONLY quest",
+      "summary": "Raid the Sandthrone outrider camp beyond the north pines and take back the goods they carried off as 'toll'.",
+      "offer": "\"The two in the square were the polite ones.\" Cato keeps his voice low. \"There's a camp of them out past the north pines. Everything they 'tolled' off us is sitting in their crates: my stock, the Tabors' pewter, Old Kestrel's good wool.\"\n\n\"Bring back what you can carry. And if a few of them don't get up again, I won't weep.\"",
+      "complete": "Cato sorts the goods with quick, careful fingers, setting the pewter aside for the Tabors. \"That isn't stock. That's Khaven's.\" He presses coin into your hand and won't hear a word against it.",
+      "steps": [
+        {
+          "text": "Raid the outrider camp and recover Khaven's goods.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.khaven",
+              "target": "mob.outrider.khaven*",
+              "count": 5,
+              "text": "Sandthrone outriders"
+            },
+            {
+              "type": "collect",
+              "zone": "zone.khaven",
+              "target": "Stolen goods crate",
+              "item": "item.khaven_goods",
+              "count": 3,
+              "text": "Khaven's goods recovered"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 150,
+        "gold": 32,
+        "reputation": [
+          {
+            "faction": "sandthrone",
+            "amount": -150
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.ansel.hollows",
+      "title": "The Ones Who Came Back",
+      "kind": "npc",
+      "giver": "Ansel Morrow",
+      "turnIn": "Ansel Morrow",
+      "zone": "zone.khaven",
+      "level": 5,
+      "canonStatus": "CANON creature (Hollow Men: stone-grey, whispering 'Hungry', book1 ch.4); the drowned graveyard is GAME-ONLY.",
+      "summary": "Lay to rest the grey dead walking out of the drowned graveyard south of Gloom Creek.",
+      "offer": "\"When the creek floods, it takes the low graves. Always has. We'd find a boot, a jaw, and bury it again.\" His hands are shaking on his stick. \"This year they walked out on their own. Grey. Skin like stone. Whispering that they're hungry.\"\n\n\"Those are Khaven's dead, and I'm their keeper. Five of them. Put them down so they stay down.\"",
+      "complete": "\"Ash. Just ash and old clothes.\" Ansel writes five names in his book, slowly. \"I'll bury what's left. Deeper, this time.\"",
+      "steps": [
+        {
+          "text": "Lay the Hollow Men of the drowned graveyard to rest.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.khaven",
+              "target": "mob.hollow.khaven*",
+              "count": 5,
+              "text": "Hollow Men laid to rest"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 150,
+        "gold": 30
+      }
+    },
+    {
+      "id": "npc.ansel.sexton",
+      "title": "The Grey Sexton",
+      "kind": "npc",
+      "giver": "Ansel Morrow",
+      "turnIn": "Ansel Morrow",
+      "zone": "zone.khaven",
+      "level": 5,
+      "requires": [
+        "npc.ansel.hollows"
+      ],
+      "canonStatus": "CANON creature (a Hollow Man), GAME-ONLY character",
+      "summary": "Destroy the Grey Sexton, the hollowed thing that keeps the creek barrow south of Gloom Creek. It is dangerous alone.",
+      "offer": "\"There's one more. Old Hobb Garner, who kept the crypt before me. Buried in the creek barrow with his spade, like he asked.\" Ansel doesn't blink. \"He's up. Bigger than he was, and digging. The others come to him.\"\n\n\"I can't ask you to go alone. But I'm asking.\"",
+      "complete": "Ansel takes the spade in both hands. \"Hobb Garner. Forty years he kept this ground, and I'll keep him now.\" He leans it by his door. \"Thank you. That's not a thing I say.\"",
+      "steps": [
+        {
+          "text": "Destroy the Grey Sexton at the creek barrow.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.khaven",
+              "target": "mob.sexton.khaven*",
+              "text": "The Grey Sexton",
+              "say": "The spade clatters down, and the thing that held it pours out of its coat as grey dust."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 160,
+        "gold": 35
+      }
+    }
+  ]
+}

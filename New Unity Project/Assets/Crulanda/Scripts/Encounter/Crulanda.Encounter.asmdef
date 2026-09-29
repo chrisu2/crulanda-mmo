@@ -1,0 +1,6 @@
+﻿{
+  "name": "Crulanda.Encounter",
+  "rootNamespace": "Crulanda.Encounter",
+  "references": ["Crulanda.Abilities", "Crulanda.Combat","Crulanda.Core", "Crulanda.Data", "Crulanda.Gameplay", "Crulanda.Persistence", "Crulanda.World", "Unity.InputSystem"],
+  "autoReferenced": true
+}

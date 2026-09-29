@@ -1,0 +1,767 @@
+{
+ "id": "warrior",
+ "name": "Warrior",
+ "resource": "Vigor",
+ "resourceDesc": "Vigor builds from landed Strikes, blows taken and well-timed Guards and is spent on Challenge, Guard and weapon techniques; DPS builds also stack weapon pressure (0-5) from Strikes to spend on finishers.",
+ "identity": "A flexible frontline weapon fighter who reads enemy swings and decides, moment to moment, whether Vigor becomes a block, a finisher or a rally for the group.",
+ "branches": [
+  {
+   "id": "tank",
+   "name": "Tank",
+   "role": "tank",
+   "loop": "Spend vigor on blocks, intercepts and threat; time Guard against enemy swings instead of holding it.",
+   "tradeoff": "Reduced offensive spending: Vigor committed to Guard and Challenge is not available for weapon techniques.",
+   "nodes": [
+    {
+     "id": "tk-hardened-grip",
+     "name": "Hardened Grip",
+     "tier": 0,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "hand",
+     "desc": "Blows you absorb with Guard generate +1 Vigor per rank, so a well-held line funds its own next block.",
+     "emphasis": {
+      "sustain": 1,
+      "mitigation": 0.3
+     },
+     "impl": true
+    },
+    {
+     "id": "tk-tempered-armor",
+     "name": "Tempered Armor",
+     "tier": 0,
+     "col": 1,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "shield",
+     "desc": "+8 armor per rank. Reduces incoming weapon damage.",
+     "emphasis": {
+      "mitigation": 1.5
+     },
+     "impl": true
+    },
+    {
+     "id": "tk-timed-guard",
+     "name": "Timed Guard",
+     "tier": 0,
+     "col": 2,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "clock",
+     "desc": "An enemy blow landing within 0.5s of you raising Guard is a timed Guard and refunds 3 Vigor per rank. Watch the enemy swing timer on the target frame.",
+     "emphasis": {
+      "mitigation": 0.5,
+      "sustain": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "tk-scarred-veteran",
+     "name": "Scarred Veteran",
+     "tier": 1,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "shield",
+     "desc": "+3% maximum health per rank.",
+     "emphasis": {
+      "mitigation": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "tk-steady-challenge",
+     "name": "Steady Challenge",
+     "tier": 1,
+     "col": 1,
+     "max": 1,
+     "req": "tk-tempered-armor",
+     "kind": "modifier",
+     "icon": "banner",
+     "desc": "Challenge refunds 10 Vigor when it lands, making taunts self-funding during pulls.",
+     "emphasis": {
+      "sustain": 2,
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "tk-intercept",
+     "name": "Intercept",
+     "tier": 1,
+     "col": 2,
+     "max": 1,
+     "req": null,
+     "kind": "active",
+     "icon": "wind",
+     "desc": "New action: dash to Mira (up to 10m) and take the next enemy blow aimed at her within 3s at Guard strength. 20 Vigor, 15s cooldown.",
+     "emphasis": {
+      "mitigation": 2,
+      "support": 2
+     },
+     "impl": true
+    },
+    {
+     "id": "tk-bulwark",
+     "name": "Bulwark",
+     "tier": 2,
+     "col": 1,
+     "max": 1,
+     "req": "tk-steady-challenge",
+     "kind": "modifier",
+     "icon": "shield",
+     "desc": "Guard lasts 7s and reduces incoming damage by 75% instead of 60%.",
+     "emphasis": {
+      "mitigation": 4
+     },
+     "impl": true
+    },
+    {
+     "id": "tk-long-reach",
+     "name": "Long Reach",
+     "tier": 2,
+     "col": 2,
+     "max": 2,
+     "req": "tk-intercept",
+     "kind": "passive",
+     "icon": "wind",
+     "desc": "Intercept range +4m per rank; the enemy whose blow you intercept is Challenged for 2s per rank.",
+     "emphasis": {
+      "support": 0.8,
+      "control": 0.8
+     },
+     "impl": true
+    },
+    {
+     "id": "tk-grudge-ledger",
+     "name": "Grudge Ledger",
+     "tier": 2,
+     "col": 3,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "chain",
+     "desc": "Enemies you have Challenged in the last 10s deal 2% less damage to you per rank.",
+     "emphasis": {
+      "mitigation": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "tk-held-line",
+     "name": "Held Line",
+     "tier": 3,
+     "col": 1,
+     "max": 1,
+     "req": "tk-bulwark",
+     "kind": "signature",
+     "icon": "chain",
+     "desc": "Signature stance: Guard no longer expires; it drains 4 Vigor/s instead. Each timed Guard converts the blocked hit into threat and 6 Vigor. Moving more than 2m breaks the stance.",
+     "emphasis": {
+      "mitigation": 6,
+      "control": 1,
+      "sustain": -1
+     }
+    },
+    {
+     "id": "tk-iron-reserve",
+     "name": "Iron Reserve",
+     "tier": 3,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "crystal",
+     "desc": "+10 maximum Vigor per rank while you are below 50% health.",
+     "emphasis": {
+      "sustain": 1
+     }
+    },
+    {
+     "id": "tk-unbroken-line",
+     "name": "Unbroken Line",
+     "tier": 4,
+     "col": 1,
+     "max": 3,
+     "req": "tk-held-line",
+     "kind": "passive",
+     "icon": "shield",
+     "desc": "Each timed Guard during Held Line lowers its drain by 1 Vigor/s per rank for 5s (stacks up to 3 times).",
+     "emphasis": {
+      "sustain": 1.5,
+      "mitigation": 0.5
+     }
+    },
+    {
+     "id": "tk-rebuke",
+     "name": "Rebuke",
+     "tier": 4,
+     "col": 2,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "sword",
+     "desc": "Timed Guards return 10% of the blocked damage per rank to the attacker as high-threat damage.",
+     "emphasis": {
+      "damage": 0.5,
+      "control": 0.5
+     }
+    },
+    {
+     "id": "tk-stand-fast",
+     "name": "Stand Fast",
+     "tier": 5,
+     "col": 0,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "clock",
+     "desc": "A hit that would drop you below 20% health instead triggers a free 3s Guard. 90s cooldown, reduced 20s per rank.",
+     "emphasis": {
+      "mitigation": 2
+     }
+    },
+    {
+     "id": "tk-forgespire-plating",
+     "name": "Forgespire Plating",
+     "tier": 5,
+     "col": 2,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "gear",
+     "desc": "Guard also reduces periodic and spell damage at 20% of its normal strength per rank.",
+     "emphasis": {
+      "mitigation": 1.5
+     }
+    },
+    {
+     "id": "tk-mountains-keel",
+     "name": "Mountain's Keel",
+     "tier": 6,
+     "col": 1,
+     "max": 1,
+     "req": "tk-unbroken-line",
+     "kind": "capstone",
+     "icon": "banner",
+     "desc": "While Held Line is up, Challenge becomes an 8m area taunt and allies within 8m take 15% less damage from Challenged enemies. Held Line's drain rises to 6 Vigor/s.",
+     "emphasis": {
+      "mitigation": 7,
+      "support": 2,
+      "sustain": -2
+     }
+    }
+   ]
+  },
+  {
+   "id": "dps",
+   "name": "DPS",
+   "role": "dps",
+   "loop": "Build weapon pressure with Strikes and spend it during exposed-target windows opened by whiffed or Guarded enemy attacks.",
+   "tradeoff": "Fewer defensive responses: Guard and Challenge compete with finishers for Vigor, and deep damage talents weaken Guard.",
+   "nodes": [
+    {
+     "id": "dp-edge-discipline",
+     "name": "Edge Discipline",
+     "tier": 0,
+     "col": 3,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "sword",
+     "desc": "Automatic swings have a 5% chance per rank to add 1 weapon pressure.",
+     "emphasis": {
+      "sustain": 1,
+      "damage": 0.5
+     },
+     "impl": true
+    },
+    {
+     "id": "dp-weapon-pressure",
+     "name": "Heavy Hand",
+     "tier": 0,
+     "col": 2,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "sword",
+     "desc": "+2 weapon damage per rank, including automatic swings.",
+     "emphasis": {
+      "damage": 1.5
+     },
+     "impl": true
+    },
+    {
+     "id": "dp-read-the-opening",
+     "name": "Read the Opening",
+     "tier": 0,
+     "col": 1,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "eye",
+     "desc": "Exposed windows last 0.5s longer per rank. Enemies are Exposed for 3s when your Guard absorbs their blow; Exposed enemies take 5% more damage from your party.",
+     "emphasis": {
+      "damage": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "dp-honed-edge",
+     "name": "Honed Edge",
+     "tier": 1,
+     "col": 3,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "sword",
+     "desc": "Strike deals +4% damage per rank against Exposed targets.",
+     "emphasis": {
+      "damage": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "dp-finishing-strike",
+     "name": "Finishing Strike",
+     "tier": 1,
+     "col": 2,
+     "max": 1,
+     "req": "dp-weapon-pressure",
+     "kind": "modifier",
+     "icon": "skull",
+     "desc": "Strike deals +8 damage against targets below 40% health.",
+     "emphasis": {
+      "damage": 3
+     },
+     "impl": true
+    },
+    {
+     "id": "dp-breaching-blow",
+     "name": "Breaching Blow",
+     "tier": 1,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "active",
+     "icon": "bolt",
+     "desc": "New action: spend all weapon pressure (Strike builds 1, max 5) on a blow dealing 12 damage per pressure that Exposes the target for 4s. 10s cooldown.",
+     "emphasis": {
+      "damage": 4,
+      "control": 0.5
+     },
+     "impl": true
+    },
+    {
+     "id": "dp-sweeping-strike",
+     "name": "Sweeping Strike",
+     "tier": 2,
+     "col": 2,
+     "max": 1,
+     "req": "dp-finishing-strike",
+     "kind": "modifier",
+     "icon": "wind",
+     "desc": "Strike also deals half its raw damage to other enemies within 4m of its target. Can pull extra enemies.",
+     "emphasis": {
+      "damage": 3,
+      "mitigation": -0.5
+     },
+     "impl": true
+    },
+    {
+     "id": "dp-deep-breach",
+     "name": "Deep Breach",
+     "tier": 2,
+     "col": 1,
+     "max": 2,
+     "req": "dp-breaching-blow",
+     "kind": "passive",
+     "icon": "bolt",
+     "desc": "Breaching Blow at 5 pressure staggers the target, delaying its next swing by 0.5s per rank.",
+     "emphasis": {
+      "control": 1.5,
+      "damage": 0.5
+     },
+     "impl": true
+    },
+    {
+     "id": "dp-momentum",
+     "name": "Gathering Swing",
+     "tier": 2,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "spiral",
+     "desc": "Each weapon pressure held raises attack speed by 1% per rank.",
+     "emphasis": {
+      "damage": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "dp-press-the-breach",
+     "name": "Press the Breach",
+     "tier": 3,
+     "col": 2,
+     "max": 1,
+     "req": "dp-sweeping-strike",
+     "kind": "signature",
+     "icon": "target",
+     "desc": "Signature action: for 6s after you Expose a target, Strikes cost no Vigor and build 2 pressure, and every finisher resets Breaching Blow. 45s cooldown.",
+     "emphasis": {
+      "damage": 6,
+      "sustain": 0.5
+     }
+    },
+    {
+     "id": "dp-battle-rhythm",
+     "name": "Battle Rhythm",
+     "tier": 3,
+     "col": 3,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "drop",
+     "desc": "Spending 5 weapon pressure at once restores 4 Vigor per rank.",
+     "emphasis": {
+      "sustain": 1
+     }
+    },
+    {
+     "id": "dp-relentless-press",
+     "name": "Relentless Press",
+     "tier": 4,
+     "col": 2,
+     "max": 3,
+     "req": "dp-press-the-breach",
+     "kind": "passive",
+     "icon": "target",
+     "desc": "If a finisher kills during Press the Breach, it lasts 1s longer per rank and carries to the nearest enemy, Exposing it.",
+     "emphasis": {
+      "damage": 1.5
+     }
+    },
+    {
+     "id": "dp-reckless-stance",
+     "name": "Reckless Stance",
+     "tier": 4,
+     "col": 1,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "flame",
+     "desc": "+5% damage per rank, but Guard reduces 10% less damage per rank.",
+     "emphasis": {
+      "damage": 1.5,
+      "mitigation": -1
+     }
+    },
+    {
+     "id": "dp-greatweapon-arc",
+     "name": "Greatweapon Arc",
+     "tier": 5,
+     "col": 3,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "sword",
+     "desc": "Two-handed grip: Sweeping Strike hits a wide 150-degree arc and deals +10% per rank, but Strike recovers 0.1s slower per rank.",
+     "emphasis": {
+      "damage": 1.5
+     },
+     "exclusive": "warrior-grip"
+    },
+    {
+     "id": "dp-paired-blades",
+     "name": "Paired Blades",
+     "tier": 5,
+     "col": 1,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "dagger",
+     "desc": "Dual grip: automatic swings strike twice at 55% damage, and each second hit has a 10% chance per rank to add 1 weapon pressure.",
+     "emphasis": {
+      "damage": 1,
+      "sustain": 0.5
+     },
+     "exclusive": "warrior-grip"
+    },
+    {
+     "id": "dp-forgefall",
+     "name": "Forgefall",
+     "tier": 6,
+     "col": 2,
+     "max": 1,
+     "req": "dp-relentless-press",
+     "kind": "capstone",
+     "icon": "flame",
+     "desc": "Breaching Blow at 5 pressure becomes Forgefall: a leaping blow dealing triple damage to the Exposed target and half to nearby foes. You cannot Guard for 4s afterward.",
+     "emphasis": {
+      "damage": 8,
+      "mitigation": -2
+     }
+    }
+   ]
+  },
+  {
+   "id": "support",
+   "name": "Support",
+   "role": "support",
+   "loop": "Rally allies and expose enemies; intercept at the right moment so a teammate's worst hit lands on you instead.",
+   "tradeoff": "Personal damage funds party gains: rally effects cost Vigor and deep nodes lower your own Strike output.",
+   "nodes": [
+    {
+     "id": "sp-called-cadence",
+     "name": "Called Cadence",
+     "tier": 0,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "banner",
+     "desc": "Challenge rallies you for 6s: +4% attack speed per rank. Mira, if within 10m, casts and recovers 4% faster per rank for the same 6s.",
+     "emphasis": {
+      "support": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "sp-rally-reserve",
+     "name": "Rally Reserve",
+     "tier": 0,
+     "col": 1,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "crystal",
+     "desc": "+10 maximum Vigor per rank. More capacity, not faster regeneration.",
+     "emphasis": {
+      "sustain": 1.5
+     },
+     "impl": true
+    },
+    {
+     "id": "sp-mark-the-gap",
+     "name": "Mark the Gap",
+     "tier": 0,
+     "col": 2,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "eye",
+     "desc": "Strike Exposes its target for 1s per rank (Exposed enemies take 5% more damage from your party).",
+     "emphasis": {
+      "support": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "sp-steady-voice",
+     "name": "Steady Voice",
+     "tier": 1,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "note",
+     "desc": "Your rally effects (Rallying Challenge, Called Cadence, Muster, Shared Shelter, Planted Standard) reach 2m further per rank.",
+     "emphasis": {
+      "support": 0.8
+     },
+     "impl": true
+    },
+    {
+     "id": "sp-rallying-challenge",
+     "name": "Rallying Challenge",
+     "tier": 1,
+     "col": 1,
+     "max": 1,
+     "req": "sp-rally-reserve",
+     "kind": "modifier",
+     "icon": "banner",
+     "desc": "Challenge restores 12 mana to Mira when she is recruited, alive and within 13m.",
+     "emphasis": {
+      "support": 3,
+      "sustain": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "sp-muster",
+     "name": "Muster",
+     "tier": 1,
+     "col": 2,
+     "max": 1,
+     "req": null,
+     "kind": "active",
+     "icon": "banner",
+     "desc": "New action: spend 25 Vigor to give you and Mira (within 12m) a 20-point barrier for 6s. 30s cooldown.",
+     "emphasis": {
+      "support": 3,
+      "mitigation": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "sp-shared-shelter",
+     "name": "Shared Shelter",
+     "tier": 2,
+     "col": 1,
+     "max": 1,
+     "req": "sp-rallying-challenge",
+     "kind": "modifier",
+     "icon": "shield",
+     "desc": "Guard also heals Mira for 20 and reduces her incoming damage by 30% for 5s. Requires 13m range.",
+     "emphasis": {
+      "support": 3,
+      "healing": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "sp-planted-standard",
+     "name": "Planted Standard",
+     "tier": 2,
+     "col": 2,
+     "max": 2,
+     "req": "sp-muster",
+     "kind": "passive",
+     "icon": "banner",
+     "desc": "Muster plants a standard for 4s per rank; you and Mira regain 2 Vigor or mana per second within 8m of it.",
+     "emphasis": {
+      "support": 1,
+      "sustain": 0.8
+     },
+     "impl": true
+    },
+    {
+     "id": "sp-scatter-their-guard",
+     "name": "Scatter Their Guard",
+     "tier": 2,
+     "col": 3,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "target",
+     "desc": "Exposed enemies take a further 3% damage per rank from your party.",
+     "emphasis": {
+      "support": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "sp-answering-step",
+     "name": "Answering Step",
+     "tier": 3,
+     "col": 1,
+     "max": 1,
+     "req": "sp-shared-shelter",
+     "kind": "signature",
+     "icon": "hand",
+     "desc": "Signature action: within 1s of an ally being targeted by a heavy attack, swap places, take the hit at Guard strength and Expose the attacker to your party for 5s. 20s cooldown.",
+     "emphasis": {
+      "support": 6,
+      "mitigation": 1,
+      "control": 1
+     }
+    },
+    {
+     "id": "sp-second-wind",
+     "name": "Shared Second Wind",
+     "tier": 3,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "drop",
+     "desc": "Muster restores 3 Vigor per rank for each ally it reaches.",
+     "emphasis": {
+      "sustain": 1
+     }
+    },
+    {
+     "id": "sp-shoulder-to-shoulder",
+     "name": "Shoulder to Shoulder",
+     "tier": 4,
+     "col": 1,
+     "max": 3,
+     "req": "sp-answering-step",
+     "kind": "passive",
+     "icon": "shield",
+     "desc": "The ally saved by Answering Step takes 5% less damage per rank for 6s; if they survive, its cooldown drops 2s per rank.",
+     "emphasis": {
+      "support": 1.5,
+      "mitigation": 0.5
+     }
+    },
+    {
+     "id": "sp-drilled-formation",
+     "name": "Drilled Formation",
+     "tier": 4,
+     "col": 2,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "chain",
+     "desc": "Allies within 8m of you take 2% less damage per rank from enemies you have Challenged.",
+     "emphasis": {
+      "support": 1,
+      "mitigation": 0.5
+     }
+    },
+    {
+     "id": "sp-lend-the-edge",
+     "name": "Lend the Edge",
+     "tier": 5,
+     "col": 0,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "sword",
+     "desc": "Your Strike deals 5% less damage per rank; that amount is added to the next ally attack on the same target.",
+     "emphasis": {
+      "support": 1.5,
+      "damage": -0.5
+     }
+    },
+    {
+     "id": "sp-weathered-voice",
+     "name": "Weathered Voice",
+     "tier": 5,
+     "col": 2,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "note",
+     "desc": "Muster's barriers absorb 10% more per rank and also remove one slowing effect.",
+     "emphasis": {
+      "support": 1
+     }
+    },
+    {
+     "id": "sp-stormlight-standard",
+     "name": "Stormlight Standard",
+     "tier": 6,
+     "col": 1,
+     "max": 1,
+     "req": "sp-shoulder-to-shoulder",
+     "kind": "capstone",
+     "icon": "star",
+     "desc": "Answering Step also plants your standard: for 8s allies within 10m share 20% of incoming damage with you and receive your Vigor refunds as their resource. Your damage is halved meanwhile.",
+     "emphasis": {
+      "support": 8,
+      "mitigation": 1,
+      "damage": -2
+     }
+    }
+   ]
+  }
+ ]
+}

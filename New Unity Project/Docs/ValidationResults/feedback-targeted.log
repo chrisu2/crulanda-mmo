@@ -1,0 +1,601 @@
+VBCSCompilerPreWarmer: watching VBCSCompiler (PID 38792)
+VBCSCompilerPreWarmer: pre-warm launched (dotnet PID 23764)
+VBCSCompiler prewarm took 8.91 ms
+[Licensing::Module] Trying to connect to existing licensing client channel...
+Built from '6000.6/staging' branch; Version is '6000.6.3f1 (45d8eee7de74) revision 4577518'; Using compiler version '194234433'; Build Type 'Release'
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-chris" at "2026-09-29T00:21:06.4630579Z"
+OS: 'Windows 11  (10.0.26200) Professional' Language: 'en' Physical Memory: 48607 MB
+BatchMode: 1, IsHumanControllingUs: 0, StartBugReporterOnCrash: 0, Is64bit: 1
+System  architecture: x64
+Process architecture: x64
+Date: 2026-09-29T00:21:06Z
+[Licensing::Client] Code 10 while verifying Licensing Client signature (process Id: 10556, path: "D:/unity/Hub/Editor/6000.6.3f1/Editor/Data/Resources/Licensing/Client/Unity.Licensing.Client.exe")
+[Licensing::Module] LicensingClient has failed validation; ignoring
+[Licensing::Client] Handshaking with LicensingClient:
+  Version:                 1.18.3+d7ffd15
+  Session Id:              f17fcc7e953d43b9a834c4a897c2bcc4
+  Correlation Id:          79b3457515e094e3daf206b88a0906da
+  External correlation Id: 3613609608165552900
+  Machine Id:              iPmEOoldJizWyP4VF5z6xzr/VRM=
+[Licensing::Module] Successfully connected to LicensingClient on channel: "LicenseClient-chris" (connect: 0.00s, validation: 0.00s, handshake: 0.03s)
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-chris-notifications" at "2026-09-29T00:21:06.4898922Z"
+[Licensing::Module] Error: Access token is unavailable; failed to update
+[Licensing::Client] Successfully resolved entitlement details
+[Licensing::Module] License group:
+  Id: 304649-UnityPersXXXX
+  Product: Unity Personal
+  Type: Assigned
+  Expiration: Unlimited
+[Licensing::Client] Successfully updated license, isAsync: True, time: 0.00
+[Licensing::Module] Licensing Background thread has ended after 0.03s
+
+COMMAND LINE ARGUMENTS:
+D:\unity\Hub\Editor\6000.6.3f1\Editor\Unity.exe
+-batchmode
+-nographics
+-projectPath
+C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation
+-runTests
+-testPlatform
+PlayMode
+-testFilter
+Crulanda.Tests.EncounterLoopTests.Auto_attacks_continue_while_strike_is_on_cooldown;Crulanda.Tests.EncounterLoopTests.Solid_scenery_blocks_player_and_navigation
+-testResults
+C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\feedback-targeted-results.xml
+-logFile
+C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\feedback-targeted.log
+Successfully changed project path to: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation
+C:/Users/chris/Documents/Codex/2026-09-28/hel/work/encounter-validation
+[UnityMemory] Configuration Parameters - Can be set up in boot.config
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-nav-mesh-worker=65536"
+    "memorysetup-temp-allocator-size-audio-worker=65536"
+    "memorysetup-temp-allocator-size-cloud-worker=32768"
+    "memorysetup-temp-allocator-size-gfx=262144"
+    "memorysetup-remapper-allocator-initial-capacity=32768"
+    "memorysetup-temp-allocator-size-preload-manager=33554432"
+    "memorysetup-allocator-temp-initial-block-size-main=262144"
+    "memorysetup-allocator-temp-initial-block-size-worker=262144"
+    "memorysetup-temp-allocator-size-job-worker=262144"
+    "memorysetup-temp-allocator-size-background-worker=32768"
+    "memorysetup-bucket-allocator-granularity=16"
+    "memorysetup-bucket-allocator-bucket-count=8"
+    "memorysetup-bucket-allocator-block-size=33554432"
+    "memorysetup-bucket-allocator-block-count=8"
+    "memorysetup-main-allocator-block-size=16777216"
+    "memorysetup-thread-allocator-block-size=16777216"
+    "memorysetup-main-allocator-mimalloc-enabled=1"
+    "memorysetup-gfx-main-allocator-block-size=16777216"
+    "memorysetup-gfx-thread-allocator-block-size=16777216"
+    "memorysetup-cache-allocator-block-size=4194304"
+    "memorysetup-typetree-allocator-block-size=2097152"
+    "memorysetup-profiler-bucket-allocator-granularity=16"
+    "memorysetup-profiler-bucket-allocator-bucket-count=8"
+    "memorysetup-profiler-bucket-allocator-block-size=33554432"
+    "memorysetup-profiler-bucket-allocator-block-count=8"
+    "memorysetup-profiler-allocator-block-size=16777216"
+    "memorysetup-profiler-editor-allocator-block-size=1048576"
+    "memorysetup-temp-allocator-size-main=16777216"
+    "memorysetup-job-temp-allocator-block-size=2097152"
+    "memorysetup-job-temp-allocator-block-size-background=1048576"
+    "memorysetup-job-temp-allocator-reduction-small-platforms=262144"
+Logging is directed to a specific file, skipping project log.
+Player connection [21616]  Target information:
+
+Player connection [21616]  * "[IP] 192.168.1.88 [Port] 55505 [Flags] 2 [Guid] 175367142 [EditorId] 175367142 [Version] 1048832 [Id] WindowsEditor(7,DESKTOP-FGCDA1M) [Debug] 1 [PackageName] WindowsEditor [ProjectName] Editor" 
+
+Player connection [21616] Host joined multi-casting on [225.0.0.222:54997]...
+Player connection [21616] Host joined alternative multi-casting on [225.0.0.222:34997]...
+Input System module state changed to: Initialized.
+[Physics::Module] Initialized fallback backend.
+[Physics::Module] Id: 0xdecafbad
+[Package Manager] Connected to IPC stream "Upm-38196" after 0.2 seconds.
+[Licensing::Client] Successfully resolved entitlement details
+Library Redirect Path: Library/
+Launching Unity Data Store - D:/unity/Hub/Editor/6000.6.3f1/Editor/Data/Tools/Unity.DataStore.exe 
+Unity Data Store artifact dir = Library/DataStore, working dir = C:/Users/chris/Documents/Codex/2026-09-28/hel/work/encounter-validationUnity Data Store running and initialised
+[Physics::Module] Selected backend (deferred post-plugins).
+[Physics::Module] Name: PhysX
+[Physics::Module] Id: 0xf2b8ea05
+[Physics::Module] SDK Version: 4.1.2
+[Physics::Module] Integration Version: 1.0.0
+[Physics::Module] Threading Mode: Multi-Threaded
+Initialize engine version: 6000.6.3f1 (45d8eee7de74)
+[EntityIdStore] init: VM path (explicit commit), pageSize=4096, blockCount=1048576, entitiesPerBlock=256, slots reserved=4294967296 bytes
+[Subsystems] Discovering subsystems at path D:/unity/Hub/Editor/6000.6.3f1/Editor/Data/Resources/UnitySubsystems
+[Subsystems] Discovering subsystems at path C:/Users/chris/Documents/Codex/2026-09-28/hel/work/encounter-validation/Assets
+Forcing GfxDevice: Null
+GfxDevice: creating device client; kGfxThreadingModeNonThreaded
+NullGfxDevice:
+    Version:  NULL 1.0 [1.0]
+    Renderer: Null Device
+    Vendor:   Unity Technologies
+Initialize mono
+Mono path[0] = 'D:/unity/Hub/Editor/6000.6.3f1/Editor/Data/Managed'
+Mono path[1] = 'D:/unity/Hub/Editor/6000.6.3f1/Editor/Data/BCLExtensions/runtime/netstandard2.1'
+Mono path[2] = 'D:/unity/Hub/Editor/6000.6.3f1/Editor/Data/MonoBleedingEdge/lib/mono/unityjit-win32'
+Mono config path = 'D:/unity/Hub/Editor/6000.6.3f1/Editor/Data/MonoBleedingEdge/etc'
+Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56196
+CodeReloadManager initialized
+ImportWorker Server TCP listen port: 0
+AcceleratorClientConnectionCallback - disconnected - :0
+Begin MonoManager ReloadAssembly
+Registering precompiled unity dll's ...
+Register platform support module: D:/unity/Hub/Editor/6000.6.3f1/Editor/Data/PlaybackEngines/WindowsStandaloneSupport/UnityEditor.WindowsStandalone.Extensions.dll
+Registered in 0.001092 seconds.
+Native extension for WindowsStandalone target not found
+Package Manager log level set to [2]
+ScheduleIndexationOnStartup MainProcess:False IndexOnStartup:False
+Scripting: successfully reloaded assembly
+- Finished resetting the current domain, in  0.563 seconds
+Domain Reload Profiling: 954ms
+	BeginReloadAssembly (114ms)
+		CreateAndSetChildDomain (16ms)
+	RebuildCommonClasses (3ms)
+	RebuildNativeTypeToScriptingClass (12ms)
+	initialDomainReloadingComplete (44ms)
+	LoadAllAssembliesAndSetupDomain (217ms)
+		LoadAssemblies (97ms)
+		TypeCache.Refresh (149ms)
+			TypeCache.ScanAssembly (139ms)
+		AnalyzeDomain (0ms)
+	FinalizeReload (564ms)
+		SetupLoadedEditorAssemblies (0ms)
+			BeforeProcessingInitializeOnLoad (78ms)
+			ProcessInitializeOnLoadAttributes (143ms)
+			ProcessInitializeOnLoadMethodAttributes (153ms)
+[Licensing::Client] Successfully resolved entitlement details
+Application.AssetDatabase Initial Refresh Start
+[Package Manager] Restoring resolved packages state from cache
+[Licensing::Client] Successfully resolved entitlement details
+[Package Manager] Registered 43 packages:
+  Packages from [https://packages.unity.com]:
+    com.unity.inputsystem@1.20.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.inputsystem@7a4e1a2a8194)
+    com.unity.ide.rider@3.0.38 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.ide.rider@1f60b3138684)
+    com.unity.ide.visualstudio@2.0.26 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.ide.visualstudio@a99d56dec63f)
+  Built-in packages:
+    com.unity.test-framework@1.8.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.test-framework@80f691d4262b)
+    com.unity.modules.accessibility@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.accessibility)
+    com.unity.modules.adaptiveperformance@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.adaptiveperformance)
+    com.unity.modules.ai@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.ai)
+    com.unity.modules.androidjni@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.androidjni)
+    com.unity.modules.animation@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.animation)
+    com.unity.modules.assetbundle@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.assetbundle)
+    com.unity.modules.audio@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.audio)
+    com.unity.modules.cloth@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.cloth)
+    com.unity.modules.director@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.director)
+    com.unity.modules.imageconversion@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.imageconversion)
+    com.unity.modules.imgui@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.imgui)
+    com.unity.modules.jsonserialize@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.jsonserialize)
+    com.unity.modules.particlesystem@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.particlesystem)
+    com.unity.modules.physics@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.physics)
+    com.unity.modules.physics2d@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.physics2d)
+    com.unity.modules.physicscore2d@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.physicscore2d)
+    com.unity.modules.screencapture@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.screencapture)
+    com.unity.modules.terrain@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.terrain)
+    com.unity.modules.terrainphysics@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.terrainphysics)
+    com.unity.modules.tetgen@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.tetgen)
+    com.unity.modules.tilemap@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.tilemap)
+    com.unity.modules.timelinefoundation@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.timelinefoundation)
+    com.unity.modules.ui@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.ui)
+    com.unity.modules.uielements@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.uielements)
+    com.unity.modules.umbra@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.umbra)
+    com.unity.modules.unityanalytics@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.unityanalytics)
+    com.unity.modules.unitywebrequest@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.unitywebrequest)
+    com.unity.modules.unitywebrequestassetbundle@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.unitywebrequestassetbundle)
+    com.unity.modules.unitywebrequestaudio@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.unitywebrequestaudio)
+    com.unity.modules.unitywebrequesttexture@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.unitywebrequesttexture)
+    com.unity.modules.unitywebrequestwww@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.unitywebrequestwww)
+    com.unity.modules.vectorgraphics@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.vectorgraphics)
+    com.unity.modules.vehicles@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.vehicles)
+    com.unity.modules.video@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.video)
+    com.unity.modules.wind@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.wind)
+    com.unity.modules.xr@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.xr)
+    com.unity.modules.subsystems@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.subsystems)
+    com.unity.modules.hierarchycore@1.0.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.modules.hierarchycore)
+    com.unity.ext.nunit@2.1.0 (location: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\Library\PackageCache\com.unity.ext.nunit@0198eae3b53e)
+[Subsystems] No new subsystems found in resolved package list.
+[Package Manager] Done registering packages in 0.01 seconds
+[ScriptCompilation] Requested script compilation because: AssetDatabase observed changes in script compilation related files
+Starting: D:\unity\Hub\Editor\6000.6.3f1\Editor\Data\Tools\BuildPipeline\bee_backend.exe --ipc --defer-dag-verification --dagfile="Library/Bee/1900b0aE.dag" --continue-on-failure --profile="Library/Bee/backend1.traceevents" ScriptAssemblies
+WorkingDir: C:/Users/chris/Documents/Codex/2026-09-28/hel/work/encounter-validation
+DisplayProgressbar: Compiling Scripts
+ExitCode: 0 Duration: 1s10ms
+[             ] Cannot trust contents of `Assets\Crulanda\Scripts\Core\Ids\ContentId.cs` because its timestamp is in the future. Any node with this file as input will rebuild until the timestamp of the file is no longer newer than local machine time.
+[302/371    0s] ILPP-Configuration Library/ilpp-configuration.nevergeneratedoutput
+[327/371    0s] Csc Library/Bee/artifacts/1900b0aE.dag/Crulanda.Core.dll (+2 others)
+Assets\Crulanda\Scripts\Core\Logging\CrulandaLog.cs(172,21): warning UAC0009: DEVELOPMENT_BUILD preprocessor directive has been deprecated. Please use one of the managed code variant directives (such as DEBUG, UNITY_ENABLE_CHECKS or UNITY_INCLUDE_INSTRUMENTATION) if different code paths are desired for different managed code variants. Checking for development build is possible at runtime using Debug.isDebugBuild. See the Conditional Compilation manual page for more details.
+[             ] Cannot trust contents of `Assets\Crulanda\Scripts\Persistence\SaveEnvelope.cs` because its timestamp is in the future. Any node with this file as input will rebuild until the timestamp of the file is no longer newer than local machine time.
+[             ] Cannot trust contents of `Assets\Crulanda\Scripts\Data\ActorArchetypeDefinition.cs` because its timestamp is in the future. Any node with this file as input will rebuild until the timestamp of the file is no longer newer than local machine time.
+[331/371    0s] Csc Library/Bee/artifacts/1900b0aE.dag/Crulanda.Persistence.dll (+2 others)
+[335/371    0s] Csc Library/Bee/artifacts/1900b0aE.dag/Crulanda.Data.dll (+2 others)
+[             ] Cannot trust contents of `Assets\Crulanda\Scripts\Gameplay\Actors\ActorEvents.cs` because its timestamp is in the future. Any node with this file as input will rebuild until the timestamp of the file is no longer newer than local machine time.
+[339/371    0s] Csc Library/Bee/artifacts/1900b0aE.dag/Crulanda.Gameplay.dll (+2 others)
+[             ] Cannot trust contents of `Assets\Crulanda\Scripts\DevTools\DevConsole.cs` because its timestamp is in the future. Any node with this file as input will rebuild until the timestamp of the file is no longer newer than local machine time.
+[347/371    0s] Csc Library/Bee/artifacts/1900b0aE.dag/Crulanda.DevTools.dll (+2 others)
+[             ] Cannot trust contents of `Assets\Crulanda\Scripts\Game\GameBootstrap.cs` because its timestamp is in the future. Any node with this file as input will rebuild until the timestamp of the file is no longer newer than local machine time.
+[351/371    0s] Csc Library/Bee/artifacts/1900b0aE.dag/Crulanda.Encounter.dll (+2 others)
+Assets\Crulanda\Scripts\Encounter\EncounterNavigation.cs(19,70): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+
+Assets\Crulanda\Scripts\Encounter\EncounterNavigation.cs(19,38): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+[             ] Cannot trust contents of `Assets\Crulanda\Tests\EditMode\ContentRegistryTests.cs` because its timestamp is in the future. Any node with this file as input will rebuild until the timestamp of the file is no longer newer than local machine time.
+[352/371    0s] Csc Library/Bee/artifacts/1900b0aE.dag/Crulanda.Game.dll (+2 others)
+[             ] Cannot trust contents of `Assets\Crulanda\Editor\ContentValidator.cs` because its timestamp is in the future. Any node with this file as input will rebuild until the timestamp of the file is no longer newer than local machine time.
+[356/371    0s] ILPostProcess Library/Bee/artifacts/1900b0aE.dag/post-processed/Crulanda.Encounter.dll (+pdb)
+Processing assembly Library/Bee/artifacts/1900b0aE.dag/Crulanda.Encounter.dll, with 149 defines and 296 references
+
+processors: zzzUnity.Burst.CodeGen.BurstILPostProcessor
+
+1 processor(s) skipped this assembly
+[357/371    0s] CopyFiles Library/ScriptAssemblies/Crulanda.Encounter.pdb
+[358/371    0s] Csc Library/Bee/artifacts/1900b0aE.dag/Crulanda.Tests.PlayMode.dll (+2 others)
+Assets\Crulanda\Tests\PlayMode\EncounterLoopTests.cs(27,23): warning CS0618: 'Object.FindFirstObjectByType<T>()' is obsolete: 'FindFirstObjectByType has been deprecated because it relies on instance ID ordering. Use FindAnyObjectByType instead, which does not depend on ordering.'
+
+Assets\Crulanda\Tests\PlayMode\EncounterLoopTests.cs(32,13): warning CS0618: 'Object.FindFirstObjectByType<T>()' is obsolete: 'FindFirstObjectByType has been deprecated because it relies on instance ID ordering. Use FindAnyObjectByType instead, which does not depend on ordering.'
+[359/371    0s] CopyFiles Library/ScriptAssemblies/Crulanda.Encounter.dll
+[360/371    0s] Csc Library/Bee/artifacts/1900b0aE.dag/Crulanda.Tests.EditMode.dll (+2 others)
+[361/371    0s] Csc Library/Bee/artifacts/1900b0aE.dag/Crulanda.Editor.dll (+2 others)
+Assets\Crulanda\Editor\Phase0Validation.cs(20,61): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+
+Assets\Crulanda\Editor\Phase0Validation.cs(20,17): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+[362/371    0s] ILPostProcess Library/Bee/artifacts/1900b0aE.dag/post-processed/Crulanda.Tests.PlayMode.dll (+pdb)
+Processing assembly Library/Bee/artifacts/1900b0aE.dag/Crulanda.Tests.PlayMode.dll, with 149 defines and 294 references
+
+processors: zzzUnity.Burst.CodeGen.BurstILPostProcessor
+
+1 processor(s) skipped this assembly
+[363/371    0s] CopyFiles Library/ScriptAssemblies/Crulanda.Tests.PlayMode.pdb
+[364/371    0s] CopyFiles Library/ScriptAssemblies/Crulanda.Tests.PlayMode.dll
+[365/371    0s] ILPostProcess Library/Bee/artifacts/1900b0aE.dag/post-processed/Crulanda.Editor.dll (+pdb)
+Processing assembly Library/Bee/artifacts/1900b0aE.dag/Crulanda.Editor.dll, with 147 defines and 306 references
+
+processors: zzzUnity.Burst.CodeGen.BurstILPostProcessor
+
+1 processor(s) skipped this assembly
+[366/371    0s] ILPostProcess Library/Bee/artifacts/1900b0aE.dag/post-processed/Crulanda.Tests.EditMode.dll (+pdb)
+Processing assembly Library/Bee/artifacts/1900b0aE.dag/Crulanda.Tests.EditMode.dll, with 147 defines and 305 references
+
+processors: zzzUnity.Burst.CodeGen.BurstILPostProcessor
+
+1 processor(s) skipped this assembly
+[367/371    0s] CopyFiles Library/ScriptAssemblies/Crulanda.Tests.EditMode.pdb
+[368/371    0s] CopyFiles Library/ScriptAssemblies/Crulanda.Editor.pdb
+[369/371    0s] CopyFiles Library/ScriptAssemblies/Crulanda.Editor.dll
+[370/371    0s] CopyFiles Library/ScriptAssemblies/Crulanda.Tests.EditMode.dll
+*** Tundra build success (0.99 seconds), 23 items updated, 371 evaluated
+Assets\Crulanda\Scripts\Core\Logging\CrulandaLog.cs(172,21): warning UAC0009: DEVELOPMENT_BUILD preprocessor directive has been deprecated. Please use one of the managed code variant directives (such as DEBUG, UNITY_ENABLE_CHECKS or UNITY_INCLUDE_INSTRUMENTATION) if different code paths are desired for different managed code variants. Checking for development build is possible at runtime using Debug.isDebugBuild. See the Conditional Compilation manual page for more details.
+Assets\Crulanda\Scripts\Encounter\EncounterNavigation.cs(19,70): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets\Crulanda\Scripts\Encounter\EncounterNavigation.cs(19,38): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Assets\Crulanda\Tests\PlayMode\EncounterLoopTests.cs(27,23): warning CS0618: 'Object.FindFirstObjectByType<T>()' is obsolete: 'FindFirstObjectByType has been deprecated because it relies on instance ID ordering. Use FindAnyObjectByType instead, which does not depend on ordering.'
+Assets\Crulanda\Tests\PlayMode\EncounterLoopTests.cs(32,13): warning CS0618: 'Object.FindFirstObjectByType<T>()' is obsolete: 'FindFirstObjectByType has been deprecated because it relies on instance ID ordering. Use FindAnyObjectByType instead, which does not depend on ordering.'
+Assets\Crulanda\Editor\Phase0Validation.cs(20,61): warning CS0618: 'FindObjectsSortMode' is obsolete: 'FindObjectsSortMode has been deprecated. Use the FindObjectsByType overloads that do not take a FindObjectsSortMode parameter.'
+Assets\Crulanda\Editor\Phase0Validation.cs(20,17): warning CS0618: 'Object.FindObjectsByType<T>(FindObjectsSortMode)' is obsolete: 'FindObjectsByType with FindObjectsSortMode parameter has been deprecated. Use FindObjectsByType<T>() or FindObjectsByType<T>(FindObjectsInactive) instead. InstanceID will be replaced in the future with EntityId and previous sort order cannot be maintained.'
+Total cache size 71477604
+Total cache size after purge 71477604, took 00:00:00.0785573
+AssetDatabase: script compilation time: 1.468277s
+Begin MonoManager ReloadAssembly
+Native extension for WindowsStandalone target not found
+ScheduleIndexationOnStartup MainProcess:True IndexOnStartup:False
+Scripting: successfully reloaded assembly
+- Finished resetting the current domain, in  0.370 seconds
+Domain Reload Profiling: 767ms
+	BeginReloadAssembly (177ms)
+		DisableScriptedObjects (33ms)
+		CreateAndSetChildDomain (26ms)
+	RebuildCommonClasses (6ms)
+	RebuildNativeTypeToScriptingClass (11ms)
+	initialDomainReloadingComplete (29ms)
+	LoadAllAssembliesAndSetupDomain (173ms)
+		LoadAssemblies (155ms)
+		TypeCache.Refresh (19ms)
+			TypeCache.ScanAssembly (14ms)
+		AnalyzeDomain (10ms)
+			BuildScriptInfoCaches (9ms)
+	FinalizeReload (371ms)
+		SetupLoadedEditorAssemblies (0ms)
+			BeforeProcessingInitializeOnLoad (75ms)
+			ProcessInitializeOnLoadAttributes (93ms)
+			ProcessInitializeOnLoadMethodAttributes (44ms)
+		AwakeInstancesAfterBackupRestoration (23ms)
+Starting new worker id: 0 with log in C:/Users/chris/Documents/Codex/2026-09-28/hel/work/encounter-validation/Logs/AssetImportWorkerHW0.log
+
+Asset Pipeline Refresh (id=eab31fe405629554d82fb25144c48434): Total: 2.470 seconds - Initiated by InitialRefreshV2(ForceSynchronousImport)
+	(Values over 0.05ms)
+	Summary:
+		Imports: total=0 (actual=0, local cache=0, cache server=0)
+		Asset DB Process Time: managed=0 ms, native=500 ms
+		Asset DB Callback time: managed=61 ms, native=12 ms
+		Scripting: domain reloads=1, domain reload time=416 ms, compile time=1470 ms, other=8 ms
+		Project Asset Count: scripts=302, non-scripts=249
+		Asset File Changes: new=0, changed=4, moved=0, deleted=0
+		Scan Filter Count: 0
+	InvokePackagesCallback: 12.557ms
+	ApplyChangesToAssetFolders: 0.420ms
+	Scan: 31.900ms
+	Collect global state as custom dependencies: 5.824ms
+	OnSourceAssetsModified: 0.491ms
+	CategorizeScriptCompilationAssets: 4.427ms
+	ProcessAssetsWithTransientArtifactChanges: 6.949ms
+	CategorizeAssets: 4.136ms
+	CompileScripts: 1470.104ms
+	ImportOutOfDateAssets: 379.716ms (371.910ms without children)
+		UnloadImportedAssets: 0.061ms
+		EnsureUptoDateAssetsAreRegisteredWithGuidPM: 0.060ms
+		ImportSchedulerStart: 7.681ms
+	PostProcessAllAssets: 61.861ms
+		VCAutoAddAssetPostprocess 0.575ms
+		XRBuildSystem.XRAssetImported 0.082ms
+		MonoPostProcessAllAssets: 60.638ms
+			AssetPostprocessor.OnPostprocessAllAssets 25.803ms
+			SyncVS.PostprocessSyncProject 7.326ms
+			StyleCatalogPostProcessor.OnPostprocessAllAssets 7.048ms
+			WindowAssetPostprocessingWatcher.OnPostprocessAllAssets 5.188ms
+			BuilderAssetPostprocessor.OnPostprocessAllAssets 3.422ms
+			AssetChangedListener.OnPostprocessAllAssets 1.356ms
+			RetainedModeAssetPostprocessor.OnPostprocessAllAssets 0.879ms
+			EditModeScopePostprocessor.OnPostprocessAllAssets 0.587ms
+			SpeedTree9Postprocessor.OnPostprocessAllAssets 0.522ms
+			TextAssetPostProcessor.OnPostprocessAllAssets 0.398ms
+			ArtifactBrowserPostProcessor.OnPostprocessAllAssets 0.383ms
+			InputActionAssetPostprocessor.OnPostprocessAllAssets 0.251ms
+			ReferencedClipsPostProcessor.OnPostprocessAllAssets 0.204ms
+			AudioMixerPostprocessor.OnPostprocessAllAssets 0.190ms
+			InputActionJsonNameModifierAssetProcessor.OnPostprocessAllAssets 0.183ms
+			AssetEvents.OnPostprocessAllAssets 0.173ms
+			TerrainToolbarOverlayPostProcessor.OnPostprocessAllAssets 0.141ms
+			AssetDatabaseCallbacks.OnPostprocessAllAssets 0.115ms
+			ProjectSettingsPostprocessor.OnPostprocessAllAssets 0.104ms
+			SpeedTreePostProcessor.OnPostprocessAllAssets 0.101ms
+			ConfigAssetsTracker.OnPostprocessAllAssets 0.097ms
+			ThemePostprocessor.OnPostprocessAllAssets 0.089ms
+			ScenarioDriftAssetsTracker.OnPostprocessAllAssets 0.085ms
+			RenderPipelineGlobalSettingsPostprocessor.OnPostprocessAllAssets 0.076ms
+			AudioContainerPostProcessor.OnPostprocessAllAssets 0.055ms
+	PostAssetChangesProfiler: 0.476ms
+	UnloadStreamsBegin: 1.285ms
+	GenerateScriptTypeHashes: 1.270ms
+	GenerateScriptTypeSerializationHashes: 2.652ms
+	Untracked: 471.026ms
+
+Application.AssetDatabase Initial Refresh End
+Scanning for USB devices : 15.782ms
+Initializing Unity extensions:
+[MODES] ModeService[none].Initialize
+[MODES] ModeService[none].LoadModes
+[MODES] Loading mode Default (0) for mode-current-id-Crulanda - The Quiet Trail
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 1013 unused Assets / (0.9 MB). Loaded Objects now: 1733.
+Memory consumption went from 234.2 MB to 233.3 MB.
+Total: 3.997000 ms (FindLiveObjects: 0.158800 ms CreateObjectMapping: 0.029700 ms MarkObjects: 3.310800 ms  DeleteObjects: 0.342000 ms)
+
+Microsoft Media Foundation video decoding to texture disabled: graphics device is Null, only Direct3D 11 and Direct3D 12 (only on desktop) are supported for hardware-accelerated video decoding.
+[Project] Loading completed in 4.169 seconds
+	Project init time: 				3.982 seconds
+		Template init time: 		0.000 seconds
+		Package Manager init time: 		0.161 seconds
+		Asset Database init time: 		0.125 seconds
+		Global illumination init time: 	0.002 seconds
+		Assemblies load time: 			0.982 seconds
+		Unity extensions init time: 	0.002 seconds
+		Asset Database refresh time: 	2.470 seconds
+	Scene opening time: 			0.063 seconds
+##utp:{"type":"ProjectInfo","version":2,"phase":"Immediate","time":1790641270589,"processId":38196,"projectLoad":4.169401499999999,"projectInit":3.9815136,"templateInit":0.0,"packageManagerInit":0.1611291,"assetDatabaseInit":0.125413,"globalIlluminationInit":0.0021373,"assembliesLoad":0.9815764,"unityExtensionsInit":0.0021597,"assetDatabaseRefresh":2.4702108,"sceneOpening":0.0630437}
+##utp:{"type":"EditorInfo","version":2,"phase":"Immediate","time":1790641270589,"processId":38196,"editorVersion":"6000.6.3f1 (45d8eee7de74)","branch":"6000.6/staging","buildType":"Release","platform":"Windows"}
+[Licensing::Client] Successfully resolved entitlement details
+Running tests for ExecutionSettings with details:
+targetPlatform = 
+playerHeartbeatTimeout = 600
+filters[0] = 
+   Filter with settings:
+   testMode = PlayMode
+   targetPlatform = 
+   testNames = null
+   groupNames = Crulanda.Tests.EncounterLoopTests.Auto_attacks_continue_while_strike_is_on_cooldown, Crulanda.Tests.EncounterLoopTests.Solid_scenery_blocks_player_and_navigation
+   categoryNames = null
+   assemblyNames = null
+ignoreTests = {}
+featureFlags = null
+
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+UnityEditor.TestTools.TestRunner.CommandLineTest.Executer:InitializeAndExecuteRun (string[]) (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEditor.TestRunner/CommandLineTest/Executer.cs:53)
+UnityEditor.TestTools.TestRunner.CommandLineTest.TestStarter:InitializeAndExecuteRun () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEditor.TestRunner/CommandLineTest/TestStarter.cs:64)
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions ()
+
+(Filename: ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEditor.TestRunner/CommandLineTest/Executer.cs Line: 53)
+
+[UnityConnectServicesConfig] config is NOT valid, switching to default
+Created GICache directory at C:/Users/chris/AppData/LocalLow/Unity/Caches/GiCache. Took: 0.014s, timestamps: [4.171 - 4.185]
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 0 unused Assets / (0 B). Loaded Objects now: 1884.
+Memory consumption went from 241.5 MB to 241.5 MB.
+Total: 3.794500 ms (FindLiveObjects: 0.141600 ms CreateObjectMapping: 0.014400 ms MarkObjects: 3.525100 ms  DeleteObjects: 0.003500 ms)
+
+Importing 'GUID: 60fde8fe73d20ed41978638f5f992b9f - Path: Assets/InitTestScenee78f64f6-8959-4647-876a-0d019d58d0e8.unity' with importer (DefaultImporter)
+Imported 'GUID: 60fde8fe73d20ed41978638f5f992b9f' -> (Import Result ID: 'c0c449805ac3141da7d0a1e5a5b5a473') in 0.003 seconds [static dependencies only]. Details - ImportResultOutputID=d7cea79b5a37aceb56c5108b4d705d46 DependenciesID=3792a70923602a008f6d60d057fa6558 StaticDependenciesID=8e0c91f3842d708b46defb58778e79e6 
+Asset Pipeline Refresh (id=ab312998275252a498421e712dd61a13): Total: 0.024 seconds - Initiated by StopAssetImportingV2(NoUpdateAssetOptions)
+Reloading assemblies for play mode.
+Reloading assemblies after forced synchronous recompile.
+Begin MonoManager ReloadAssembly
+Worker ready: AssetImportWorkerHW0 0
+Native extension for WindowsStandalone target not found
+ScheduleIndexationOnStartup MainProcess:True IndexOnStartup:False
+Scripting: successfully reloaded assembly
+- Finished resetting the current domain, in  0.477 seconds
+Domain Reload Profiling: 895ms
+	BeginReloadAssembly (284ms)
+		DisableScriptedObjects (43ms)
+		CreateAndSetChildDomain (134ms)
+	RebuildCommonClasses (6ms)
+	RebuildNativeTypeToScriptingClass (11ms)
+	initialDomainReloadingComplete (28ms)
+	LoadAllAssembliesAndSetupDomain (88ms)
+		LoadAssemblies (86ms)
+		TypeCache.Refresh (4ms)
+		AnalyzeDomain (1ms)
+	FinalizeReload (478ms)
+		SetupLoadedEditorAssemblies (0ms)
+			BeforeProcessingInitializeOnLoad (69ms)
+			ProcessInitializeOnLoadAttributes (88ms)
+			ProcessInitializeOnLoadMethodAttributes (96ms)
+		AwakeInstancesAfterBackupRestoration (29ms)
+No restricted APIs configured; Validation skipped.
+Checking 2 assemblies for restricted APIs found 0 usage(s) in 2 ms
+
+Asset Pipeline Refresh (id=1e109bac4ad019848b1b46bbd313f8ba): Total: 1.142 seconds - Initiated by StopAssetImportingV2(ForceSynchronousImport | ForceDomainReload)
+	(Values over 0.05ms)
+	Summary:
+		Imports: total=0 (actual=0, local cache=0, cache server=0)
+		Asset DB Process Time: managed=0 ms, native=539 ms
+		Asset DB Callback time: managed=118 ms, native=46 ms
+		Scripting: domain reloads=1, domain reload time=434 ms, compile time=2 ms, other=0 ms
+		Project Asset Count: scripts=302, non-scripts=250
+		Asset File Changes: new=0, changed=0, moved=0, deleted=0
+		Scan Filter Count: 0
+	InvokePackagesCallback: 1.308ms
+	ApplyChangesToAssetFolders: 0.128ms
+	Collect global state as custom dependencies: 0.692ms
+	ProcessAssetsWithTransientArtifactChanges: 17.437ms
+	CategorizeAssets: 3.245ms
+	CompileScripts: 2.013ms
+	ImportOutOfDateAssets: 479.144ms (478.868ms without children)
+		UnloadImportedAssets: 0.091ms
+		EnsureUptoDateAssetsAreRegisteredWithGuidPM: 0.053ms
+		ImportSchedulerStart: 0.127ms
+	PostProcessAllAssets: 164.026ms
+		PostProcessCallbackCreateDeferredMaterials 2.565ms
+		ShaderAssetModifiedCallback 1.294ms
+		AssemblyValidation.PostprocessAllAssets 1.038ms
+		RaytracingShaderImportPostprocess 0.568ms
+		SpeedTreeImporter.PostprocessAllAssets 0.560ms
+		ComputeShaderImportPostprocess 0.484ms
+		LocalizationDatabase.AssetDatabasePostprocessCallback 0.406ms
+		BlockShaderImporter.PostprocessAllAssets 0.236ms
+		XRBuildSystem.XRAssetImported 0.150ms
+		MonoPostProcessAllAssets: 117.778ms
+			SyncVS.PostprocessSyncProject 79.367ms
+			AssetPostprocessor.OnPostprocessAllAssets 5.191ms
+			StyleCatalogPostProcessor.OnPostprocessAllAssets 5.033ms
+			WindowAssetPostprocessingWatcher.OnPostprocessAllAssets 3.441ms
+			BuilderAssetPostprocessor.OnPostprocessAllAssets 3.362ms
+			InputActionAssetPostprocessor.OnPostprocessAllAssets 2.882ms
+			InputActionJsonNameModifierAssetProcessor.OnPostprocessAllAssets 2.797ms
+			AssetChangedListener.OnPostprocessAllAssets 1.870ms
+			TextAssetPostProcessor.OnPostprocessAllAssets 1.815ms
+			RetainedModeAssetPostprocessor.OnPostprocessAllAssets 0.802ms
+			SpeedTree9Postprocessor.OnPostprocessAllAssets 0.763ms
+			ProjectSettingsPostprocessor.OnPostprocessAllAssets 0.575ms
+			ArtifactBrowserPostProcessor.OnPostprocessAllAssets 0.308ms
+			ReferencedClipsPostProcessor.OnPostprocessAllAssets 0.219ms
+			EditModeScopePostprocessor.OnPostprocessAllAssets 0.184ms
+			AudioMixerPostprocessor.OnPostprocessAllAssets 0.170ms
+			AssetEvents.OnPostprocessAllAssets 0.149ms
+			TerrainToolbarOverlayPostProcessor.OnPostprocessAllAssets 0.135ms
+			ThemePostprocessor.OnPostprocessAllAssets 0.114ms
+			SpeedTreePostProcessor.OnPostprocessAllAssets 0.104ms
+			AssetDatabaseCallbacks.OnPostprocessAllAssets 0.101ms
+			ConfigAssetsTracker.OnPostprocessAllAssets 0.087ms
+			ScenarioDriftAssetsTracker.OnPostprocessAllAssets 0.080ms
+			RenderPipelineGlobalSettingsPostprocessor.OnPostprocessAllAssets 0.055ms
+	PostAssetChangesProfiler: 1.239ms
+	GenerateScriptTypeHashes: 1.105ms
+	GenerateScriptTypeSerializationHashes: 2.328ms
+	Untracked: 449.857ms
+
+Loaded scene 'Temp/__Backupscenes/0.backup'
+	Deserialize:            0.619 ms
+	Integration:            12.891 ms
+	Integration of assets:  0.001 ms
+	Thread Wait Time:       0.012 ms
+	Total Operation Time:   13.524 ms
+[MODES] ModeService[none].Initialize
+[MODES] ModeService[none].LoadModes
+[Licensing::Client] Successfully resolved entitlement details
+Unloading 11 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.277200 ms
+Loaded scene 'Assets/Crulanda/Scenes/PlayableEncounter.unity'
+	Deserialize:            5.462 ms
+	Integration:            13.506 ms
+	Integration of assets:  0.503 ms
+	Thread Wait Time:       0.379 ms
+	Total Operation Time:   19.850 ms
+Launched and connected shader compiler UnityShaderCompiler.exe after 0.01 seconds
+Unloading 939 unused Assets / (264.4 KB). Loaded Objects now: 2325.
+Memory consumption went from 255.7 MB to 255.4 MB.
+Total: 4.170900 ms (FindLiveObjects: 0.307000 ms CreateObjectMapping: 0.030700 ms MarkObjects: 3.588500 ms  DeleteObjects: 0.132700 ms)
+
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.080400 ms
+Loaded scene 'Assets/Crulanda/Scenes/PlayableEncounter.unity'
+	Deserialize:            2.123 ms
+	Integration:            8.532 ms
+	Integration of assets:  0.001 ms
+	Thread Wait Time:       0.241 ms
+	Total Operation Time:   10.896 ms
+Unloading 7 unused Assets / (23.8 KB). Loaded Objects now: 2325.
+Memory consumption went from 255.5 MB to 255.5 MB.
+Total: 3.894400 ms (FindLiveObjects: 0.217600 ms CreateObjectMapping: 0.016000 ms MarkObjects: 3.508700 ms  DeleteObjects: 0.039600 ms)
+
+Saving results to: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\feedback-targeted-results.xml
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+Loaded scene 'Temp/__Backupscenes/0.backup'
+	Deserialize:            0.355 ms
+	Integration:            3.457 ms
+	Integration of assets:  0.001 ms
+	Thread Wait Time:       0.019 ms
+	Total Operation Time:   3.832 ms
+Unloading 6 unused Assets / (20.8 KB). Loaded Objects now: 1901.
+Memory consumption went from 255.5 MB to 255.5 MB.
+Total: 3.834600 ms (FindLiveObjects: 0.361500 ms CreateObjectMapping: 0.015800 ms MarkObjects: 3.324800 ms  DeleteObjects: 0.021600 ms)
+
+Unloading 0 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 0 unused Assets / (0 B). Loaded Objects now: 1906.
+Memory consumption went from 255.5 MB to 255.5 MB.
+Total: 3.749400 ms (FindLiveObjects: 0.195400 ms CreateObjectMapping: 0.014600 ms MarkObjects: 3.425200 ms  DeleteObjects: 0.004300 ms)
+
+Asset Pipeline Refresh (id=fca6be13a5c40ac4a924382b0b962f44): Total: 0.017 seconds - Initiated by StopAssetImportingV2(NoUpdateAssetOptions)
+DisplayProgressbar: Undo
+Test run completed. Exiting with code 0 (Ok). Run completed.
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+UnityEditor.TestTools.TestRunner.CommandLineTest.Executer:ExitApplication (UnityEditor.TestTools.TestRunner.CommandLineTest.Executer/ReturnCodes,string) (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEditor.TestRunner/CommandLineTest/Executer.cs:81)
+UnityEditor.TestTools.TestRunner.CommandLineTest.Executer:ExitIfRunIsCompleted () (at ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEditor.TestRunner/CommandLineTest/Executer.cs:74)
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions ()
+
+(Filename: ./Library/PackageCache/com.unity.test-framework@80f691d4262b/UnityEditor.TestRunner/CommandLineTest/Executer.cs Line: 81)
+
+MonoPathRemapper: Attempts to remap: 4814; Successful remaps: 84
+Serialized file version minimum: 23, current 23
+Importing 'GUID: 00000000000000004000000000000000 - Path: ProjectSettings/ProjectSettings.asset' with importer (LibraryAssetImporter)
+Imported 'GUID: 00000000000000004000000000000000' -> (Import Result ID: '57d9a8031da8be96f7c3bbdf946af202') in 0.003 seconds [static dependencies only]. Details - ImportResultOutputID=054c890a8f4b6dddbea933bc5e4b7df4 DependenciesID=1d242eadbeb87576a8bd08f673976259 StaticDependenciesID=001aa7e94f01086792edbcbf200b891e 
+Asset Pipeline Refresh (id=36589bfd309c8734ab045d130a900612): Total: 0.009 seconds - Initiated by StopAssetImportingV2(NoUpdateAssetOptions)
+[Physics::Module] Cleanup current backend.
+[Physics::Module] Id: 0xf2b8ea05
+Input System module state changed to: ShutdownInProgress.
+Input Polling Thread exited.
+Input System module state changed to: Shutdown.
+[Licensing::IpcConnector] LicenseClient-chris-notifications channel disconnected successfully.
+[Licensing::IpcConnector] LicenseClient-chris channel disconnected successfully.
+Lingering sessions upon destruction of worker manager
+Unity Data Store service was successfully shut down
+UDS shutting down local client system
+AcceleratorClientConnectionCallback - disconnected - :0
+Cleanup mono
+CodeReloadManager destroyed
+VBCSCompilerPreWarmer: requested VBCSCompiler shutdown
+Checking for leaked weakptr:
+  Found no leaked weakptrs.
+[Package Manager] Server process was shutdown
+##utp:{"type":"MemoryLeaks","version":2,"phase":"Immediate","time":1790641276018,"processId":38196,"allocatedMemory":11272494,"memoryLabels":[{"Default":165353},{"Permanent":15516},{"NewDelete":69119},{"Thread":4197944},{"Manager":34909},{"VertexData":8},{"Geometry":816},{"Texture":24},{"Shader":848547},{"Material":68},{"GfxDevice":55968},{"Animation":952},{"Audio":32},{"FreeType":8},{"FontEngine":736},{"Physics":1970},{"Physics2D":16},{"Serialization":17408},{"Input":42840},{"JobScheduler":256},{"TextLib":280},{"Mono":48},{"ScriptingNativeRuntime":1243480},{"BaseObject":49008},{"Resource":1252},{"Renderer":2376},{"Transform":4685},{"File":7397},{"WebCam":616},{"Culling":32},{"Terrain":11442},{"Wind":24},{"STL":40},{"String":471686},{"StaticString":3808},{"Utility":2675078},{"Curl":2478},{"PoolAlloc":2168},{"AI":80},{"TypeTree":14869},{"ScriptManager":18984},{"CodeReload":448},{"RuntimeInitializeOnLoadManager":64},{"Sprites":102},{"SpriteAtlas":120},{"GI":7816},{"Director":8296},{"CloudService":432},{"WebRequest":552},{"VR":49650},{"SceneManager":608},{"Video":64},{"LazyScriptCache":32},{"Camera":729},{"Secure":2377},{"SerializationCache":9256},{"APIUpdating":10320},{"Subsystems":336},{"VirtualTexturing":57888},{"StaticSafetyDebugInfo":278528},{"Analytics":464},{"Hierarchy":1188},{"UIElements":40},{"CoreStats":14456},{"Identifiers":7152},{"Gui":128},{"EditorUtility":111710},{"VersionControl":8},{"Undo":931},{"AssetDatabase":677233},{"AssetImporter":40},{"EditorGi":328},{"UnityConnect":40465},{"Upm":1912},{"UpmDiagnostics":8},{"AssetCompliance":96},{"DrivenProperties":72},{"LocalIPC":260},{"ProfilerEditor":9746},{"CoreBusinessMetrics":3226},{"Windowing":456},{"Licensing":12572},{"AssetReference":32},{"IPCStream":32}]}

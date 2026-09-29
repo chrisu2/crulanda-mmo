@@ -1,0 +1,152 @@
+using System;
+using UnityEngine;
+
+namespace Crulanda.World
+{
+    /// <summary>
+    /// A playable zone described as data (EncounterContent/Zones/*.json) and generated at runtime by ZoneBuilder.
+    /// Coordinates are metres on the ground plane: x = east, z = north, origin at the zone centre.
+    /// Lore status of every zone is recorded in <see cref="canonStatus"/>; game-only additions must say so.
+    /// </summary>
+    [Serializable] public sealed class ZoneDefinition
+    {
+        public string id, displayName, subtitle, canonStatus, canonNote;
+        public float size = 140;            // square side length
+        public float flatRadius = 50;       // village ground stays flat inside this radius
+        public float hillHeight = 3;        // rolling ground outside it
+        public int seed = 1;
+        public ZoneLighting lighting = new ZoneLighting();
+        public ZoneSpawns spawns = new ZoneSpawns();
+        public ZonePath[] roads = new ZonePath[0];
+        public ZonePath[] water = new ZonePath[0];
+        public ZoneRect[] fields = new ZoneRect[0];
+        public ZoneCircle[] clearings = new ZoneCircle[0];
+        public ZoneProp[] props = new ZoneProp[0];
+        public ZoneWasting wasting;
+        public ZoneLabel[] landmarks = new ZoneLabel[0];
+        public string[] objectives = new string[0];
+        public ZoneExit[] exits = new ZoneExit[0];
+        public ZoneGrove[] groves = new ZoneGrove[0];
+        public string waterTint;   // optional hex, e.g. dark Gloom Creek
+        public ZoneLife life;
+        /// <summary>Level band shown on maps and exits (e.g. 1-2); camps spawn inside it.</summary>
+        public int levelMin = 1, levelMax = 2;
+        /// <summary>Ground palette: meadow (green farmland), mountain (rock, scree, sparse grass), ash (grey cracked ash).</summary>
+        public string biome = "meadow";
+        /// <summary>Mob camps for levelling: packs that respawn after they are killed. Not saved; they always return.</summary>
+        public ZoneCamp[] camps = new ZoneCamp[0];
+        public ZoneLake[] lakes = new ZoneLake[0];
+        /// <summary>Patches of tall, dense grass (ambush camps get their own automatically).</summary>
+        public ZoneCircle[] tallGrass = new ZoneCircle[0];
+        /// <summary>Pin on the overworld map, normalised 0..1 from the image's top-left corner.</summary>
+        public Vector2 worldMapPosition = new Vector2(-1, -1);
+        public string worldMapNote;
+    }
+    /// <summary>
+    /// Ambient life. villagers: how many named villagers live here (homes are the zone's barred houses).
+    /// mood: "wary" (collectors about; brightens once they are gone) or "afraid". Critters never fight; they flee.
+    /// </summary>
+    [Serializable] public sealed class ZoneLife
+    {
+        public int villagers; public string mood = "wary";
+        public ZoneCritters[] critters = new ZoneCritters[0];
+        /// <summary>Villager names for this zone, in order. Omitted: the default (Oakhaven) list.</summary>
+        public string[] names = new string[0];
+        /// <summary>Named extra people with a fixed role and place (quest givers such as a stranger at the inn).</summary>
+        public ZoneResident[] residents = new ZoneResident[0];
+    }
+    /// <summary>
+    /// role: any villager role, or stranger (keeps to one place). place: a place kind (inn, green, woods...).
+    /// title: the nameplate subtitle.
+    /// </summary>
+    [Serializable] public sealed class ZoneResident { public string name, role, title, place, look; public Vector2 at; }
+    /// <summary>kind: chicken, rabbit, crow, deer, sheep, cat.</summary>
+    [Serializable] public sealed class ZoneCritters { public string kind; public Vector2 center; public float radius = 10; public int count = 4; }
+    /// <summary>
+    /// A levelling camp. Holds count mobs of one kind within radius of center, each at a level between levelMin and
+    /// levelMax, respawning respawn seconds after death. Mob ids are "mob.&lt;tag&gt;.&lt;zone&gt;.&lt;camp index&gt;.&lt;n&gt;", so a
+    /// quest can target a kind with "mob.wolf.*".
+    /// - look: collector, warden, outrider, pale, hollow, cultist, wolf, boar, weaveeater.
+    /// - elite: tougher, and marked on the map.
+    /// </summary>
+    [Serializable] public sealed class ZoneCamp
+    {
+        public string name, mob, tag, look, canonStatus;
+        public Vector2 center; public float radius = 10;
+        public int count = 4, levelMin = 1, levelMax = 1;
+        public float respawn = 75; public bool elite;
+        /// <summary>Lie hidden in tall grass until you come close (much closer if you sneak, holding Ctrl), then leap out.</summary>
+        public bool ambush;
+    }
+    /// <summary>Walk into the radius and press E to travel; you arrive at <see cref="arrive"/> in the other zone.</summary>
+    [Serializable] public sealed class ZoneExit { public string to, name; public Vector2 at, arrive; public float radius = 5; }
+    /// <summary>An area filled with trees. kind: dead (grey, leafless, darkened ground), pine, broadleaf.</summary>
+    [Serializable] public sealed class ZoneGrove { public string name, kind = "dead"; public Vector2 center, size; public int count = 30; }
+    [Serializable] public sealed class ZoneLighting
+    {
+        public float sunPitch = 32, sunYaw = -40, sunIntensity = 1.1f;
+        public string sunColor = "#FFDDB0", ambientSky = "#8A93A0", ambientEquator = "#6E6A5E", ambientGround = "#3C382F";
+        public string fogColor = "#9A9888"; public float fogStart = 45, fogEnd = 120;
+    }
+    [Serializable] public sealed class ZoneSpawns
+    {
+        public Vector2 player, companion, recovery; public float playerFacing;
+        public ZoneEnemy[] enemies = new ZoneEnemy[0];
+        public float leash = 17;
+    }
+    /// <summary>look: collector, warden, outrider, pale (default: collector, or warden when veteran).</summary>
+    [Serializable] public sealed class ZoneEnemy { public string id, name, look; public Vector2 at; public bool veteran; public int level; }
+    /// <summary>
+    /// A road or creek. depth (creeks only): the channel's depth below its banks. The water surface sits 0.42 m under the
+    /// bank, so the water in the middle is depth - 0.42 deep. The default 1.1 is a wading creek (0.68 m); swimming needs
+    /// about 1.9 or more. See ZoneWater.
+    /// </summary>
+    [Serializable] public sealed class ZonePath { public string name; public float width = 4; public Vector2[] points = new Vector2[0]; public float depth = 1.1f; }
+    /// <summary>
+    /// A round lake or pond. radius is the waterline; depth is the water's depth in the middle (a flat bottom, a bank
+    /// under about 38 degrees, a gentle shore). Deeper than about 1.45 m, you swim. See ZoneWater.
+    /// </summary>
+    [Serializable] public sealed class ZoneLake { public string name; public Vector2 center; public float radius = 10, depth = 2.6f; }
+    [Serializable] public sealed class ZoneRect { public string name; public Vector2 center, size; public float rotation; public string crop = "soil"; }
+    [Serializable] public sealed class ZoneCircle { public string name; public Vector2 center; public float radius = 8; }
+    /// <summary>
+    /// kind: house, inn, barn, well, dead_oak, tree, pine, fence, haystack, cart, barrels, crates, lamp, grave, rock, bridge,
+    /// hedge, signpost, ruin, ruined_house, wall (uses points), tower, gallows, crypt, cliff.
+    /// rotation in degrees (0 = door faces south). variant picks colour/size variations.
+    /// </summary>
+    [Serializable] public sealed class ZoneProp
+    {
+        public string kind, name; public Vector2 at; public float rotation, scale = 1; public int variant;
+        public Vector2 size;   // footprint for sized props (house, barn, fence length in x)
+        public Vector2[] points = new Vector2[0];   // polyline props (wall)
+        /// <summary>Optional: makes the prop usable with E. This is the prompt, e.g. "Search the black-iron wagon".</summary>
+        public string interact;
+        /// <summary>
+        /// Optional quest item the interaction gives, only while a quest wants it. once = true: it is emptied for good
+        /// (a crate); otherwise it grows back after a while (herbs).
+        /// </summary>
+        public string item; public bool once;
+    }
+    /// <summary>A usable prop registered by ZoneBuilder (see ZoneProp.interact).</summary>
+    public sealed class ZoneInteractable
+    {
+        public string name, prompt, item, kind; public bool once;
+        /// <summary>Picked or emptied things vanish (herbs regrow, crates stay empty); wagons and trees stay put.</summary>
+        public bool Vanishes { get { return kind == "herb" || kind == "crates" || kind == "barrels"; } }
+        public Vector3 position; public Transform root;
+        public float hiddenUntil;
+        public string Key(string zoneId) { return zoneId + "|" + name + "|" + Mathf.RoundToInt(position.x) + "|" + Mathf.RoundToInt(position.z); }
+    }
+    [Serializable] public sealed class ZoneWasting
+    {
+        /// <summary>The unmade edge: everything east of <see cref="x"/> greys out; a static curtain stands at x.</summary>
+        public float x = 58, curtainHeight = 26, fade = 14; public string note;
+    }
+    [Serializable] public sealed class ZoneLabel { public string name, text; public Vector2 at; public float radius = 10; }
+
+    public static class ZoneColors
+    {
+        public static Color Parse(string hex, Color fallback)
+        { return !string.IsNullOrEmpty(hex) && ColorUtility.TryParseHtmlString(hex, out var c) ? c : fallback; }
+    }
+}

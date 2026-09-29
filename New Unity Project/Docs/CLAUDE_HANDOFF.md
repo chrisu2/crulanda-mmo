@@ -1,0 +1,417 @@
+# Crulanda Unity 6 — Claude continuation handoff
+
+Updated 2026-09-28, America/New_York (latest logs cross into 2026-09-29 UTC).
+This is the authoritative current progress snapshot. Some older project documents retain historical status statements.
+
+## Start here
+
+Chris wants you to continue developing the existing Unity project, not restart it.
+Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
+The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
+
+## UPDATE 2026-09-29 (Claude session, newest) — zones 1-10, camps, items, water, graphics
+- **Decision by Chris:** the level cap stays at 10 for now.
+  - Ladder: Oakhaven 1-2 → Khaven 3-5 → Shattered Peaks 6-8 → Ashland Rim 9-10.
+  - Build order: Peaks then Ashlands.
+  - Graphics priorities: lighting and atmosphere, terrain and nature, characters and creatures. Buildings come later.
+- **Chris's standing requests:**
+  - Every zone keeps respawning camps for grinding.
+  - Breadcrumb quests carry you to the next zone.
+  - Water must look and behave correctly.
+- **Where to read:**
+  - CHANGELOG, the "Zones 1-10" entry.
+  - WORLD_ZONES.md: the new zones, the level ladder and camps table, Water, and Nature and post-processing.
+  - QUEST_DESIGN.md §8: the chain across zones.
+  - SAVE_FORMAT.md: formats 5 (XP curve) and 6 (bag and equipment).
+- **Key new code:**
+  - `World/ZoneWater.cs`: the single water model.
+  - `World/NatureFx.cs` and `World/ZonePost.cs`.
+  - `World/Shaders/Water`, `Grass` and `Post`.
+  - `Encounter/Items.cs`: `ItemDatabase` and `Inventory`.
+  - `Encounter/EncounterHud.Items.cs`: bags, the character sheet and vendors.
+  - Camps and ambush in `EncounterEnemy`, and swimming and sneaking in `AdventurerMotor`.
+- **Validation (2026-09-29):**
+  - EditMode 166/166, PlayMode 47/47. These include `ZoneContentTests` and `WaterTests` for all four zones.
+  - The player build succeeded, and world tours of all four zones were captured.
+- **Chris's save:** backed up to `work\save-backups\20260929-020630-pre-v6` before the format 6 build was published.
+- **Helper scripts** are in the session scratchpad (`run_tests.ps1`, `build_and_tour.ps1`, `build_ui_capture.ps1`).
+  - They mirror Assets into the validation copy and run `ZoneSceneBuilder.BuildOakhaven`, which registers zones, quests and items.
+  - `EncounterBuildPlayer.Build` now does the same before building.
+- **PowerShell gotcha:** never pass a single replacement pair as `@( @(a,b) )`. PowerShell flattens it, which corrupted two files once.
+- **Open items:**
+  - Quest rewards don't grant items yet.
+  - Water doesn't receive shadows, and there is no underwater camera.
+  - No audio.
+  - Buildings pass (graphics) still to do.
+  - Hollow Men / the well at night (Chronicle II).
+
+## UPDATE 2026-09-29 (Claude session) — quests, village trades, direction decisions
+- **Decisions by Chris (2026-09-29):**
+  - The game is set BEFORE Oakhaven is erased, so the village stays standing and the erasure is not shown.
+  - The inn is the **Golden Cask**, the book's name (it was Whispering Barrel).
+  - When you need his input, ask prominently: use the question prompt, or put the question first and short. He skims long reports.
+- **Quests:** the framework and 10 Oakhaven quests are done. Read `Docs/QUEST_DESIGN.md` section 7. The book is on L. Save format 4 (`SAVE_FORMAT.md`).
+- **Village trades:**
+  - Trade outfits, `<Trade>` nameplates and workplaces: forge, stall, oven, tannery and woodpile.
+  - Residents (`life.residents`): Quill the Salt-Mender and Warden Ivel.
+  - See WORLD_ZONES.md, "Life, day and night".
+- **Next:** the well at night and the Hollow Men (Chronicle II onward), then Khaven quests and the Sandthrone contracts.
+- **Validation:** helper scripts are in the session scratchpad (they can be recreated from "Practical validation workflow" below).
+  They sync with robocopy /MIR, run EditMode and PlayMode, build, and capture with `--crulanda-ui-capture` and `--crulanda-world-capture`.
+
+## UPDATE 2026-09-28 (Claude session) — day/night cycle, hen-wives and chicken coops
+Chris asked for a chicken farmer who gathers eggs, feeds the chickens, and puts them in the coops at night.
+- `Scripts/World/WorldClock.cs`: the day/night cycle (40 min/day, static hour, lamps as `NightLights`) and `ZoneCoop`.
+- `ZoneBuilder.Coop` builds the `coop` prop. Oakhaven has three coops.
+- `WorldLife.cs`:
+  - Villager role `henwife` with a scheduled routine: open, feed, eggs, yard, herd, close.
+  - Every villager has a bedtime.
+  - Chickens link to a coop and gain the states Roost, Return and Feed.
+- Full description: WORLD_ZONES.md, "Life, day and night". Tests: VillageDayTests (PlayMode).
+- Earlier in this session (not yet in the CHANGELOG):
+  - WoW-classic-style HUD (`EncounterHud`, `HudMaps`): minimap, M zone map, scroll out to the world map.
+  - Oakhaven enlarged to 260 m with farms, mill, orchard, groves and instanced grass.
+  - Walk-in inn with a door; villagers and critters (`WorldLife.cs`).
+
+## UPDATE 2026-09-28 (Claude session, latest) — direction: evolve the world; Druid playable; Oakhaven zone
+Chris's direction (latest): stop per-skill testing/balancing; "the game needs to evolve first" - build graphics, zones
+and maps from the lore in `D:\code\crulanda` (world_bible.md, maps\*.png, interactive_map.html, chars\*.html, books).
+- Multi-class: `ClassKit` base (Warrior/Druid kits), per-class character saves (`encounter`, `encounter-druid`),
+  last-played remembered via a `profile` slot, switch character from the Esc pause menu. `--crulanda-class <id>` flag.
+- Druid playable: 4 forms (Barkhide/Thornclaw/Rootmend/Thornsong), Shift Breath + per-form pools, 22 base actions,
+  28 talents (rows 0-2 of druid.json). Shared frameworks added: PeriodicEffects (DoT/HoT/channels), enemy Slow/Root,
+  player cast bars with movement interrupt, keys 9/0.
+- World: data-driven zones (`Docs/WORLD_ZONES.md`), Oakhaven built from the canon village map and set as the opening
+  scene; procedural humanoid characters (`ActorVisual`); camera collision. Canon notes: `Docs/CRULANDA_LOCATIONS.md`
+  (Forgeborn is canon; Driftkin/Windcaller are not found in the lore folder).
+- Next world steps: zone-to-zone travel, a second zone (Khaven Village has a strong canon map), interiors for the inn,
+  ambient life (villagers), audio, then better character art.
+
+## UPDATE 2026-09-28 (Claude session, later) — Warrior tree is data-driven and 27 talents are playable
+Read PHASE2_CLASS_LOOPS.md "Update 2026-09-28 (later)" and SAVE_FORMAT.md for details. Key facts:
+- Source of truth for talents: workspace `work\calculator\trees\warrior.json` -> copied to
+  `Assets\Crulanda\EncounterContent\Talents\warrior.json` with `build.py --sync` (build.py refuses to run on drift).
+  Game loads it via EncounterContent.talentTree. Only nodes with `"impl": true` are playable, and each must be listed in
+  WarriorKit.ImplementedTalents with code behind it (TalentTree.Parse throws otherwise).
+- Budget = level + 1; tier gate 5 points per row in a branch; same rule in calculator (both modes).
+- Code: TalentTree.cs, WarriorKit.cs (new), EncounterSession/Enemy/Hud/Save/Input/Capture, HealerCompanion,
+  Combatant (barrier), AbilityDefinition (Intercept/Breach/Rally effects), ClassDefinition (talentId on unlocks).
+- Verified: 145/145 EditMode, 26/26 PlayMode, player build OK, HUD screenshots checked (work\ui-captures).
+- Build published to outputs\Crulanda-Playable. Chris's save was backed up to work\save-backups\*-pre-v3 (it was
+  still format 1, level 2) before the new build could migrate it. Zip checkpoint of Assets/Docs/Packages/ProjectSettings
+  from before this slice: work\checkpoints\pre-warrior-slice-*.zip (no Git on this machine).
+- Chris's Unity editor was open on Phase0_TestMap during this work; it will reimport the changed scripts when focused.
+
+## UPDATE 2026-09-28 (Claude session) — calculator delivered
+The all-class calculator from "IMMEDIATE UNFINISHED WORK" below now exists and was browser-tested:
+- Page: workspace `outputs\Crulanda-Talent-Calculator.html` (self-contained, ~290 KB; opens from disk).
+- Source: workspace `work\calculator\`: `trees\<class>.json` (20 files, hand-authored per path, PROVISIONAL / GAME-ONLY),
+  `template.html` (renderer), `build.py` (bundles; embeds the Warrior prototype mirroring WarriorTalents.cs),
+  `validate.py` (schema + tier-gate reachability under worst exclusive choice), `tweak.py` (lead-review pass; idempotent),
+  `lint.py` (cross-class duplicate names / borrowed MMO names / cheat-death effects), `summarize.py` (compact review view).
+  Rebuild: run `build.py` with the bundled Python. Old `data.json`/`generate.py` placeholders are superseded.
+- Proposed trees: 3 branches (Druid 4), 7 tiers x 4 columns, 5 points per tier gate, 30-42 ranks per branch,
+  one signature (tier 3-4) and one capstone (tier 6) per path; 1 point per level from level 1 up to level 50 (assumption, not approved).
+- Warrior has two modes: "Implemented prototype" (exact Unity rules, level 1-10) and the proposed 16-node-per-branch full tree
+  that grows out of the prototype nodes.
+- Features: search, per-tree/all reset, tooltips + inspector, dependency-safe refunds, build codes (URL hash, copy/load),
+  saved builds in browser storage, two-build compare. "Design emphasis" bars sum authored per-rank weights; they are
+  explicitly NOT DPS/healing measurements, and observations are allocation facts, not viability verdicts.
+- Verified: 25 in-browser rule/UI checks passed (prototype gates/levels/exclusive signature, tier gates, refund blocking,
+  code round-trip and rejection, save/compare/load, all 20 classes render, every branch fully purchasable under each exclusive choice),
+  no console errors, phone width has no horizontal scroll.
+- Not done: the in-game Unity talent panel still has not been visually inspected (needs a window capture incl. IMGUI);
+  HUD stretches non-uniformly on non-16:10 screens (see KNOWN_ISSUES). Proposed talents are unreviewed by the author,
+  unbalanced and not checked against the novels.
+- Next: Chris reviews trees in the calculator -> lock Warrior's next nodes -> implement them in Unity
+  (data-driven talent assets rather than static WarriorTalents) -> Druid four-path slice.
+
+## Exact locations
+
+- Actual Unity project: `D:\code\mmo\New Unity Project`
+- Assets: `D:\code\mmo\New Unity Project\Assets`
+- Project docs: `D:\code\mmo\New Unity Project\Docs`
+- Unity: `D:\unity\Hub\Editor\6000.6.3f1\Editor\Unity.exe`
+- Validation project copy: `C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation`
+- Workspace: `C:\Users\chris\Documents\Codex\2026-09-28\hel`
+- Outputs: `C:\Users\chris\Documents\Codex\2026-09-28\hel\outputs`
+- Latest packaged player: `outputs\Crulanda-Playable\Crulanda.exe` under the workspace above.
+- Original brief: `C:\Users\chris\Downloads\CRULANDA_UNITY6_CLAUDE_MASTER.md`
+- Supplemental archive: `C:\Users\chris\Downloads\files.zip` (contains Phase 0 archive plus docs).
+- Original brief copied into project: `Docs\PROJECT_MASTER.md`.
+- Calculator reference screenshot: `C:\Users\chris\AppData\Local\Temp\codex-clipboard-27f154d6-8cf3-418c-a2d4-da297c823e45.png`.
+- Bundled Python: `C:\Users\chris\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe`
+- Bundled Node: `C:\Users\chris\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe`
+
+This session had full filesystem access and used PowerShell. No Git baseline/commits were established.
+Do not overwrite or recreate the project or scene to update it. Preserve .meta GUIDs and user saves.
+
+## User direction and feedback
+
+- User repeatedly confirmed the project path above and granted full access.
+- Integrate the supplied foundation and validate in actual Unity before expanding the sandbox.
+- Handle technical testing autonomously; do not ask the user to play every tiny feature.
+- User confirmed the playable encounter worked, then said combat was too fast. It was slowed.
+- User later saw dead mobs from saved progress. We backed up their save and restarted fresh.
+- User noted walking through scenery. Solid scenery collision/navigation were added and tested.
+- User asked to see auto-attack timing. Do NOT add a separate toggle: keep auto-attacks starting from Strike/Challenge. Show countdown/progress between swings.
+- User wants 3–4 base builds per class, combining classic class trees, branching upgrades and hybrid investment.
+- Explicit examples: Warrior Tank/DPS/Support; Druid Tank/Melee/Healer/Ranged.
+- User then explicitly asked for the matrix for ALL classes. It has been expanded.
+- Latest feature request: a calculator visually like the supplied classic talent-tree screenshot, for every build, to explore choices and judge viability.
+- Be candid about proposed estimates versus measured game balance. No false claims that every class is playable.
+
+## Completed foundation / Phase 1
+
+Imported and repaired the provided Phase 0 foundation, then built the playable encounter.
+Assemblies include Core, Data, Gameplay, Persistence, DevTools, Game, Editor, Encounter, Abilities and Combat.
+
+Implemented:
+- Stable actor identity, registry, health/resources, stats/modifiers, content registry and persistence infrastructure.
+- Third-person movement, jump, orbit/zoom camera, tab/click enemy targeting.
+- Automatic melee attacks plus Strike, Challenge (taunt), Guard.
+- Three sentries, threat, leash, death/recovery and recruitable healer Mira.
+- Healer casting, mana, healing threat and opportunistic damage.
+- XP/levels, one loot/equipment upgrade, reward deduplication, save/load and Repeat Trail.
+- Shared per-actor ability runtime: cooldowns, global cooldowns, casts, interruption and resource commitment.
+- Shared Combatant/CombatMath, armor mitigation, timed statuses and derived stats.
+- Status refresh without magnitude stacking; expiry/death/disable/rebuild cleanup.
+- Batched stat mutations invalidate all related caches before notifications; regression coverage for reentrancy and lethal changes.
+- Time-based proximity threat rather than frame-dependent accumulation.
+- Solid scenery collision and blocked NavMesh footprints for tent, crate, rocks, trunks, ruins and boundaries.
+- Visible automatic swing countdown/progress; no extra activation control.
+
+Current scene: `Assets/Crulanda/Scenes/PlayableEncounter.unity`.
+Original foundation scene: `Assets/Crulanda/Scenes/Phase0_TestMap.unity`.
+Do not confuse the two; the foundation map has no playable character loop.
+
+Pacing defaults:
+- Regular sentries 240 HP, veteran 340 HP.
+- Player/enemy swing interval 2.6 seconds.
+- Strike +12 damage, 5-second cooldown.
+- Guard baseline 5 seconds, incoming damage multiplier 0.4.
+- Challenge taunt 3 seconds.
+- Healer heal 42, mana cost 18, cast 1.5s, cooldown 3.5s; bolt 7 every 4s.
+- Historical fresh-character fight timings about 21/24/35 seconds after corrected threat.
+
+## Phase 2 foundation already implemented
+
+Files under `Assets/Crulanda/Scripts/Encounter`:
+- `ClassDefinition.cs`: ClassDefinition, ClassAbilityUnlock, ClassLoadout. Profiles hold identity, role, resource capacity/regen, derived stats and ordered ability unlocks. IDs resolve against the catalog; invalid/duplicate/unknown unlocks are rejected.
+- `BuildTree.cs`: validates complete proposed rank allocations with rank/level gates, prerequisites, branch investment, budget, exclusive choices and reachable purchase order. Rejects cyclic or missing graph prerequisites.
+- EncounterContent now has `playerClass`; current serialized content is `class.warrior` with all original three actions available at level 1.
+- Session gates abilities before spending costs/effects and derives action ordering from the class profile.
+- HUD reads class/resource names and action slots from data. Number keys 1–8 are supported.
+- Actor.ConfigureResource configures class resource at spawn. Derived stats use playerClass.stats.
+- Legacy EncounterContent.playerStats remains for asset compatibility but is no longer authoritative; existing values were copied to playerClass.stats.
+
+No class selection, Druid forms, extra playable class kits or full equipment restrictions/trainers exist yet.
+
+## NEW: implemented Warrior talent prototype (latest code/build)
+
+This is newer than several older docs stating no tree exists.
+
+New file: `Assets/Crulanda/Scripts/Encounter/WarriorTalents.cs`.
+Nine nodes across three columns, 12 possible rank points in total:
+
+| Path | Early node (2 ranks, level 1) | Middle (1 rank, level 3, requires early 2/2) | Signature (1 rank, level 5, requires middle) |
+|---|---|---|---|
+| Tank | Tempered armor: +8 armor/rank | Steady challenge: landed Challenge refunds 10 vigor | Bulwark: Guard lasts 7s and reduces damage by 75% |
+| DPS | Weapon pressure: +2 weapon damage/rank, including autos | Finishing strike: Strike +8 against targets below 40% HP | Sweeping strike: Strike hits other living sentries within 4m of target for half raw damage; can pull extras |
+| Support | Rally reserve: +10 max vigor/rank, no extra regen | Rallying challenge: landed Challenge restores 12 mana to living/recruited Mira within 13m | Shared shelter: Guard heals nearby Mira for 20 and gives 30% damage reduction for 5s |
+
+Rules:
+- One talent point per level including level 1; capped at 10 for this prototype.
+- All three signature nodes share an exclusive group: only one signature can be chosen.
+- Cross-path investment in earlier talents is allowed within the budget.
+- Changes/refunds/full reset require alive, unpaused and out of combat.
+- Individual refunds validate the entire allocation; cannot orphan a dependent talent.
+- Changes save immediately; full respec is free during the prototype.
+- Talent stat modifiers have a dedicated source and are removed/reapplied, preventing stacking.
+- Respec/allocation changes remove active Guard/shared-shelter effects so talents do not leave temporary benefits behind.
+- Support healing creates threat attributed to the player.
+- Build UI opens with B or the Talents button. It has three connected columns, descriptions, rank counts, requirements, invest/refund and full reset.
+- Movement, target cycling and ability number keys are suppressed while the tree is open. Combat itself is not paused; allocation becomes read-only during combat.
+
+Modified files: EncounterSession.cs, EncounterHud.cs, EncounterProgress.cs, EncounterSave.cs, EncounterInput.cs, AdventurerMotor.cs.
+
+Important: the in-game talent UI has NOT been visually inspected yet, and the user has NOT played this talent build.
+The automated tests and player build passed. Do not equate that with completed visual QA or balanced builds.
+
+## Save migration and compatibility
+
+Current save folder:
+`C:\Users\chris\AppData\LocalLow\Crulanda\Crulanda - The Quiet Trail\CrulandaEncounter`
+Files: `encounter.save.json` plus `.bak`.
+
+Latest EncounterSave writes envelope formatVersion 2, gameVersion 0.2.0.
+- EncounterProgress now includes classId (`class.warrior`) and List<TalentRank> talents.
+- Version 1 reads explicitly migrate to Warrior and an empty talent list, preserving IDs, progression, equipment, party and enemies.
+- Version 2 validates known Warrior class identity and complete talent allocations.
+- Unknown/invalid allocations reject loading; existing save-protection behavior blocks overwrite of unreadable startup saves.
+- Legacy migration is persisted on the next normal save, not by overwriting during read.
+- Transient statuses/cooldowns remain unpersisted.
+- Only Warrior is currently supported by this save validator; expand it deliberately when other classes become playable.
+
+Previous user save backup is under workspace `work\save-backups\<timestamp>`.
+Do not reset or delete the user's progress just to test. Use isolated test save directories.
+
+## Latest validation — VERIFIED
+
+Unity 6000.6.3f1 ran these on the synchronized validation project copy, leaving the user's open project/editor untouched:
+- **142/142 EditMode tests passed.**
+- **22/22 PlayMode tests passed.**
+- **Windows player build succeeded.**
+
+New coverage:
+- Hybrid budgets, exclusive signature choice, level gates and prerequisite refunds.
+- Legacy save migration, v2 talent round trip, rejection of foreign talent IDs.
+- Talent stats survive reload and do not stack after respec/reallocation.
+- Tank Guard multiplier/duration and cleanup on respec.
+- DPS cleave and refusal to respec in combat.
+- Support mana restoration, healing and protection.
+- Existing class gating, swing timing, scenery/NavMesh, combat/healer/loot/equip/save/load regressions still pass.
+
+Reports copied to actual project `Docs\ValidationResults`:
+`talents-edit-results.xml`, `talents-play-results.xml`, `talents-edit.log`, `talents-play.log`, `talents-build.log`.
+Earlier reports remain for history.
+
+Latest build was copied into `outputs\Crulanda-Playable` during handoff (no player process was running).
+No user replay requested. No visual screenshot of the new tree was captured.
+
+## Full roster/build matrix — complete as a design document
+
+Project: `Docs\CLASS_BUILD_MATRIX.md`.
+User-facing copy: `outputs\Crulanda-Class-Build-Matrix.md`.
+
+Covers 20 entries / 61 proposed paths:
+1. Warrior: Tank / DPS / Support.
+2. Paladin: Oathguard / Judicator / Sanctuary.
+3. Ranger: Marksman / Beastbond / Pathfinder.
+4. Rogue / Assassin / Shadow Operative: Duelist / Assassin / Infiltrator (Spy grouped here).
+5. Cleric: Restoration / Aegis / Censure.
+6. Druid: Tank / Melee / Healer / Ranged.
+7. Shaman: Spirit / Weapon-channeler / Totemkeeper.
+8. Mage: Combustion / Heatweaver / Spellbinder.
+9. Necromancer: Bone host / Withering / Soul ward.
+10. Warlock: Pactbound / Affliction / Sacrifice.
+11. Bard: Anthem / Elegist / Skirmisher.
+12. Monk: Sentinel / Striker / Harmonist.
+13. Knight: Bastion / Challenger / Oathkeeper.
+14. Seer: Oracle / Fateweaver / Watcher.
+15. Tinker: Construct keeper / Gadgeteer / Field technician.
+16. Engineer: Artillerist / Demolitionist / Fortifier.
+17. Healer / medicinal practitioner: Herbalist / Woundkeeper / Apothecary.
+18. Mystic: Resonant / Prism guardian / Crystal binder.
+19. Windcaller: Storm conductor / Gale keeper / Tempest.
+20. Venom / Alchemical Specialist: Toxicologist / Catalyst / Chemist.
+
+The original brief had 12 generic classes and later additional Crulanda seeds. Covering all produces 20 candidates,
+not a decision to ship 20 classes. The up-to-15 final roster target and overlaps remain unresolved.
+Tinker/Engineer, Knight/Paladin/Warrior, Cleric/Healer, Rogue/Assassin, etc. have explicit differentiation notes.
+The user asked for ALL-class matrix coverage; do not limit the calculator to Warrior/Druid.
+The newer 3–4-build instruction takes precedence over the brief's earlier up-to-3 specializations.
+
+Novels were not supplied/cross-checked. Canon names/claims from the brief remain unverified.
+Avoid treating proposed spell names and mechanics as established Crulanda lore.
+
+## IMMEDIATE UNFINISHED WORK: visual all-class calculator
+
+The user's reference shows tall parallel trees, icon nodes, rank badges, connecting arrows,
+branch totals, tooltips/search, reset controls and a shared point budget. They want to see choices
+for every class/build and use the calculator to explore viability.
+
+What EXISTS:
+1. `outputs\Crulanda-Build-Workshop.html` (~20 KB): an earlier, self-contained preview.
+   - Actual 9-node Warrior prototype calculator with levels 1–10, ranked investment/refund and exclusive signatures.
+   - Other classes have build-path cards copied from the matrix and hybrid comparison selections.
+   - Does NOT yet match the full reference or provide detailed trees for all classes.
+   - No saved-build system, robust viability model or visual/browser QA completed.
+2. `work\calculator\generate.py`: draft data generator for the larger calculator.
+3. `work\calculator\data.json` (~251 KB): generated 20 classes / 61 paths / 13 draft nodes per path = 793 draft nodes.
+   - Seven tiers, branch-spend gates 0/5/10/15/20/25/30, proposed level gates, rank caps, prerequisite IDs.
+   - Per-path proposed signature names derive from the matrix's mechanics.
+   - Most passive nodes and numerical modifiers are generated templates, NOT individually designed/approved talents.
+   - Provisional model modifiers: damage, healing, mitigation, support, control, capacity, efficiency, regen, coverage, drain.
+   - There is NO completed renderer or viability evaluator consuming this new dataset yet.
+   - No assertions of balanced builds are warranted. Review/refine placeholders, especially duplicated percentage nodes.
+   - The intended full-tree point budget was still a design assumption (classic-style 51-point exploration was being considered), NOT a user-approved progression rule. Actual Unity prototype remains 1 point/level to level 10.
+
+The reference screenshot path is listed above. Do not copy branded art/assets; use the tree organization as a visual reference.
+
+What to do next:
+1. Inspect the existing Unity talent UI visually and address layout/input issues before calling it presentation-ready.
+2. Build the full standalone calculator with original icon/branch presentation, connected nodes, tooltips and locked/unlocked states.
+3. Cover every class in the matrix; clearly distinguish implemented Warrior prototype talents from proposed full-game design talents.
+4. Support add/refund, dependency-safe reset, branch/class totals, point/level budget, search and saved/imported/exported builds.
+5. Add explicit assumptions and comparison results for modeled damage/healing/durability/resource pressure/utility.
+   Allocation legality can be definitive; gameplay viability is speculative until classes/rotations/encounters are implemented.
+   Do not fake simulation by presenting generic percentage sums as measured DPS or a definitive viability score.
+6. Test prerequisite/refund/point-budget rules, imports, class changes, save slots and comparison behavior.
+7. Visually verify the calculator and open it for Chris. User asked to SEE options, not only receive another prose matrix.
+8. Continue Warrior build iteration and then Druid's four paths, using the calculator as a reviewed design surface.
+
+## Practical validation workflow
+
+Do not run two Unity processes against the same project directory concurrently.
+Copy changed source/assets from actual project to validation copy, preserving relative paths.
+Use hidden background processes for technical runs; do not close the user's open Unity editor.
+
+PowerShell test pattern (substitute EditMode/PlayMode and report names):
+
+```powershell
+$v = 'C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation'
+$unity = 'D:\unity\Hub\Editor\6000.6.3f1\Editor\Unity.exe'
+Start-Process $unity -WindowStyle Hidden -PassThru -ArgumentList @(
+  '-batchmode','-nographics','-projectPath',('"'+$v+'"'),
+  '-runTests','-testPlatform','PlayMode',
+  '-testResults',('"'+$v+'\talents-play-results.xml"'),
+  '-logFile',('"'+$v+'\talents-play.log"')
+)
+```
+
+Do NOT add `-quit` to test runs. Wait for completion and inspect XML test-run totals/failures.
+PlayMode full encounter runs take roughly 90–120 seconds.
+
+Build pattern:
+
+```powershell
+Start-Process $unity -WindowStyle Hidden -PassThru -ArgumentList @(
+  '-batchmode','-nographics','-quit','-projectPath',('"'+$v+'"'),
+  '-executeMethod','Crulanda.EditorTools.EncounterBuildPlayer.Build',
+  '-logFile',('"'+$v+'\talents-build.log"')
+)
+```
+
+Output: validation project `Builds\Crulanda`.
+Confirm `Build Finished, Result: Success` in the log, then copy to outputs only when the player is not running.
+New Unity-generated .meta files should be copied back to actual project only if missing; preserve existing GUIDs.
+
+There is an opt-in `--crulanda-capture <directory>` rendered smoke harness with isolated saves.
+It captures camera-rendered world frames, NOT IMGUI overlays. It cannot visually validate the talent HUD.
+Use actual window capture for HUD inspection, or a deliberate appropriate UI capture method.
+
+## Controls and practical limitations
+
+WASD move, Space jump, RMB orbit, wheel zoom, Tab/click target.
+1 Strike starts automatic attacks; 2 Challenge also starts autos; 3 Guard.
+E talk/recruit/revive/loot/travel; left-click selects NPCs; I bags; C character; L quest book; M map; B talents;
+Ctrl (hold) sneak; F5 save; F9 load; R recover after death; Esc pause. Development builds: F10 level 10, F11 skip an hour.
+Repeat Trail respawns enemies while keeping progression/equipment.
+
+Art is placeholder primitives; HUD is IMGUI. No final animation/audio/world art.
+Scenery collisions are added at runtime by EncounterNavigation based on existing prototype object names;
+agent navigation excludes renderer-bound footprints. This should eventually become authored collision/navigation data.
+Talent content is currently a static WarriorTalents definition in Encounter, not a general content-asset pipeline.
+Support targets Mira specifically; general friendly targeting/party support is future work.
+Cleave can aggro additional enemies intentionally. Talents are provisional and may change combat pacing.
+No DOT/HoT/CC/dispels framework, full inventory/vendors, quests, full parties, offscreen population simulation or dungeons yet.
+Do not claim Phase 2 complete just because the foundation and one small talent tree compile.
+
+## Handoff housekeeping
+
+Copies of this handoff are in project `Docs\CLAUDE_HANDOFF.md` and workspace `outputs\Crulanda-Claude-Handoff.md`.
+Roadmap, Phase 2 plan, build matrix and known-issues docs received dated handoff notes correcting their older no-tree/schema-1 status.
+The completed matrix and earlier browser preview remain available in outputs.
+There were no active background Unity test/build processes at the last completion check.
+No new calculator browser server was launched, and no new UI screenshot was captured.

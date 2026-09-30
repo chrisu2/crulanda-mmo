@@ -9,22 +9,22 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (paused 2026-09-29, about 21:30, at Chris's request)
-Chris's rules:
-- Work in order of importance and finish each step.
-- Keep going without waiting for him, using parallel agents (memory: crulanda-autonomy).
-- Tell him when each step is published.
+## RESUME HERE (paused 2026-09-29, about 22:50, usage limit reached mid-step)
+Chris's rules: work in order of importance; finish each step; keep going without waiting (memory: crulanda-autonomy); tell him at each publish.
 
 **State:**
-- **Steps 1-3 are PUBLISHED** to `outputs\Crulanda-Playable`.
-  - Step 3 covers: the living Great Oak, better trunks, critter legs, the Weave-Eater remodelled to canon, the Pale, floating props fixed, landmarks that match their names, the step 2 polish, and the sky-seam fix in TreeFade's shadow pass.
-  - Tests: EditMode 166/166, PlayMode 50/50, 0 shader errors.
-  - Spot-checked: oakhaven-02 (oak), ashrim-03 (Weave-Eaters), khaven-06 (road).
-  - A full per-landmark verification workflow was NOT run. Do one early next session, using the shots in `work\world-captures`.
-- Minor notes seen: the Great Oak's canopy is big, uniform blobs (could be broken up more); Khaven's dead trees still show banded joints (DeadTree cylinders).
+- **Steps 1-3 are PUBLISHED.** **Step 4 (HUD) is committed and TESTED but NOT built or published.** Tests: EditMode 166/166, PlayMode 50/50.
+- Chris asked to SEE the new turquoise water, and chose to add it to the step 4 build. NOT applied yet.
+- The step-3 visual verification workflow (`verify-step3`) was running when the limit hit; its result, if any, is in the session task output. If lost, re-run a per-area review of `work\world-captures\archive-20260929-step3-published`.
 
 **Next:**
-1. **Step 4, HUD:** apply `tools\pending-patches\step4-hud.json` (overlaps, readability).
+0. **Finish step 4 + water, in one build:**
+   a. Apply the turquoise water: `tools\pending-patches\step5-stylized-water.json`. Use the review's `correctedNewFiles` (a full new `World/Shaders/Water.shader`; write it) and `correctedEdits` (2 in `ZoneBuilder.WaterMaterial()`, 1 in WORLD_ZONES.md). The night-foam glow is already fixed in the corrected version.
+   b. Lighten the bed so the shallows show sand, as in Chris's reference: `ZoneBuilder.PaintGround` shore paint (about line 529-531) darkens the waterline to .22/.2/.15 and the bed to .16/.15/.12. For non-gloom biomes use a pale sand (about .62/.56/.42) at the waterline and a slightly darker sand under water; keep Khaven dark.
+   c. `run_tests.ps1`, then `build_and_tour.ps1` for all four zones; check `Shader error` in the build log (a broken shader silently falls back).
+   d. Look at the water shots (oakhaven-99-creek/wading/pond/pond-night, 06-oak-creek-mill, 17-brook-pond, khaven-99-*) and the HUD shots (*-97-*, *-98-*, *-99-*): road signs at exits, no label overlaps, tracker readable.
+   e. Publish, back up, and **tell Chris step 4 is published and show him the water**.
+1. ~~Step 4, HUD~~ done (see above). Remaining detail: apply `tools\pending-patches\step4-hud.json` (overlaps, readability).
    - Its `overlaps` patch rewrites `EncounterHud` label drawing and was already rebased once. Expect skipped edits; merge them.
    - Also add world labels at exits ("Road to Khaven Village (3-5)") within about 30 m, so exits are easy to find. Chris was lost at a map edge with no exit.
 2. **NEW STEP, right after step 4: a seamless cave and the Sandthrone bandit quest.** Chris decided on 2026-09-29 (order: after the HUD, before the water).

@@ -302,3 +302,16 @@ These fix the "water, edges, night" group of `Docs/VISUAL_REVIEW_2026-09-29.md`.
   - With nothing tracked, the zone name and the "look for !" hint fade out after 14 s.
   - Enemy nameplates are centred over their bars.
 - **Road signs:** exits show a label from 60 m ("Road to Khaven Village (3-5)", in the band colour), so the way out is never a mystery.
+
+## 2026-09-29 — Step 5: stylized turquoise water (Chris's art direction)
+Chris shared a reference of a stylized fantasy cove and chose this look for Oakhaven, the Peaks and the Ash Rim; Khaven's Gloom Creek stays murky. It is a style reference only, with no assets or names copied.
+- **New `Water.shader`:** hand-painted water.
+  - Colour by depth: pale shallows (`_ShallowColor`) to turquoise (`_MidColor`, by 0.55 m) to deep teal-blue (`_DeepColor`, by 2.2 m), lit like the scene, so night water stays dark.
+  - The bed shows through the shallows, lifted by scattered light (`_Glow`), fading out with murk.
+  - Soft, slowly wobbling white foam at shores and around anything in the water, plus a thinner line washing in every few seconds on still water.
+  - Painted highlights (`_Sparkle`): sparse away from the sun, crowded and bright along its path. Faint moon path at night.
+  - Only a gentle sky tint at a slant (`_SkyTint`), with no mirror.
+  - The zone map shows the depth colours only.
+- **Zone settings** (`ZoneBuilder.WaterMaterial`): `waterTint` recolours the whole depth ramp dark, with dull scum foam; `waterReflect` sets the sky tint and damps sparkle, foam and ripples for murky water.
+- **Sandy bed:** the shore paint at the waterline and under water is pale sand in non-gloom biomes, so the shallows show a sandy bottom. Khaven keeps its dark silt.
+- The earlier `step5-water-realism` patch (planar mirror) is dropped; it conflicts with this direction.

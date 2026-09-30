@@ -519,16 +519,18 @@ namespace Crulanda.World
                         Color rc = Color.Lerp(Color.Lerp(dirt, rut, wheel + n3 * .3f), mud, n2 * .2f);
                         c = Color.Lerp(c, rc, Mathf.Clamp01((hw + 1.2f - d) / 1.6f + (n2 - .5f) * .6f));
                     }
-                    // The water's edge, creeks and lakes alike, along the real (wandering) waterline: a dark silty bed, wet mud
-                    // and pale pebbles at the water, a narrow earthen bank, then grass. Noise breaks up the bank's outer edge;
-                    // the grass stops at the same line (Openness).
+                    // The water's edge, creeks and lakes alike, along the real (wandering) waterline: a pale sandy bed that shows
+                    // through the clear turquoise shallows, wet sand and pebbles at the water, a narrow earthen bank, then grass.
+                    // Khaven's murky creek keeps its dark silt. Noise breaks up the bank's outer edge; the grass stops at the
+                    // same line (Openness).
                     float shore = Water.Shore(p, 3) + (n2 - .5f) * 1.1f;
                     if (shore < 2.2f)
                     {
+                        Color wet = gloom ? new Color(.22f, .2f, .15f) : new Color(.6f, .54f, .4f), bed = gloom ? new Color(.16f, .15f, .12f) : new Color(.54f, .49f, .36f);
                         c = Color.Lerp(c, Color.Lerp(mud, dirt, n1 * .4f), Mathf.Clamp01((2.2f - shore) / 1.5f));
-                        if (shore < .6f) c = Color.Lerp(c, new Color(.22f, .2f, .15f), Mathf.Clamp01((.6f - shore) / .6f) * .6f);
-                        if (Mathf.Abs(shore) < .5f && n3 > .5f) c = Color.Lerp(c, new Color(.55f, .52f, .46f), .45f);
-                        if (shore < -.5f) c = Color.Lerp(c, new Color(.16f, .15f, .12f), Mathf.Clamp01((-.5f - shore) / 3));
+                        if (shore < .6f) c = Color.Lerp(c, wet, Mathf.Clamp01((.6f - shore) / .6f) * .6f);
+                        if (Mathf.Abs(shore) < .5f && n3 > .5f) c = Color.Lerp(c, new Color(.66f, .62f, .54f), .45f);
+                        if (shore < -.5f) c = Color.Lerp(c, Color.Lerp(bed, bed * .8f, n1 * .5f), Mathf.Clamp01((-.5f - shore) / 3));
                     }
                     // Ash: roads, yards and grove litter are trodden ash too, keeping only a trace of their earth colour.
                     if (ashen) { float l = c.grayscale; c = Color.Lerp(new Color(l, l, l), c, .4f); }
@@ -617,17 +619,23 @@ namespace Crulanda.World
             var m = new Material(baseMat);
             if (!string.IsNullOrEmpty(Zone.waterTint))
             {
-                var tint = ZoneColors.Parse(Zone.waterTint, baseMat.color);
-                if (m.HasProperty("_Shallow")) { tint.a = .86f; m.SetColor("_Color", tint); m.SetColor("_Shallow", Color.Lerp(tint, Color.grey, .3f) * new Color(1, 1, 1, .6f)); }
-                else { tint.a = baseMat.color.a; m.color = tint; }
+                if (m.HasProperty("_DeepColor"))
+                {
+                    // Murky water (Gloom Creek): the whole depth ramp becomes the zone's tint, only a little lighter toward the
+                    // banks, and the foam a faint, dull scum line instead of clean white.
+                    var tint = ZoneColors.Parse(Zone.waterTint, m.GetColor("_DeepColor")); tint.a = 1;
+                    m.SetColor("_DeepColor", tint); m.SetColor("_MidColor", Color.Lerp(tint, Color.grey, .12f)); m.SetColor("_ShallowColor", Color.Lerp(tint, Color.grey, .3f));
+                    var scum = Color.Lerp(tint, new Color(.62f, .62f, .58f), .65f); scum.a = .4f; m.SetColor("_FoamColor", scum);
+                }
+                else { var tint = ZoneColors.Parse(Zone.waterTint, baseMat.color); tint.a = baseMat.color.a; m.color = tint; }
             }
-            // The tint only colours the (premultiplied) body under the sky reflection: murky water also reflects less sky
-            // face-on and glints less, or the untinted sky is all you see (Gloom Creek read as chrome).
-            if (Zone.waterReflect > 0 && m.HasProperty("_Reflect"))
+            // waterReflect (0..1): how much sky murky water shows at a slant (_SkyTint). Murky water also hides its bed within a
+            // metre or so, glints and ripples less (big ripples on dark water read as tar) and washes up less foam.
+            if (Zone.waterReflect > 0 && m.HasProperty("_SkyTint"))
             {
-                // Murky water is also harder to see into and calmer-looking (big ripples on dark water read as tar).
-                float r = Mathf.Clamp01(Zone.waterReflect); m.SetFloat("_Reflect", r); m.SetFloat("_Glare", m.GetFloat("_Glare") * (.6f + .4f * r));
-                if (m.HasProperty("_Murk")) { m.SetFloat("_Murk", Mathf.Lerp(3.2f, 1.2f, r)); m.SetFloat("_Bump", m.GetFloat("_Bump") * .55f); }
+                float r = Mathf.Clamp01(Zone.waterReflect); m.SetFloat("_SkyTint", r); m.SetFloat("_Glare", m.GetFloat("_Glare") * (.6f + .4f * r));
+                m.SetFloat("_Sparkle", m.GetFloat("_Sparkle") * r); m.SetFloat("_FoamWaves", m.GetFloat("_FoamWaves") * .4f);
+                m.SetFloat("_Murk", Mathf.Lerp(3.2f, 1.2f, r)); m.SetFloat("_Bump", m.GetFloat("_Bump") * .55f);
             }
             return m;
         }

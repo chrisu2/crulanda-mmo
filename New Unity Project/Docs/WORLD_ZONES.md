@@ -106,18 +106,24 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
   - Splashes are sized by the impact.
 - **Navmesh:** wading water is area 3 (cost 6), so agents prefer bridges. Swim-depth water is not walkable. Bridges are seated
   above both banks and clear the water.
-- **Rendering (`World/Shaders/Water.shader`):**
-  - The water is see-through. A named GrabPass (`_WaterBackground`) and the camera depth texture (turned on by ZoneBuilder)
-    show the bed through shallow water, refracted by the ripples (`_Refract`).
-  - It fades to the lit water colour with the metres of water the view crosses (`_Murk`).
-  - The surface writes the composite opaquely (`finalcolor`), and is lit by `LightingWater`, which wraps Standard.
-  - The zone map (orthographic) shows plain water colour.
-  - Sky reflection is `_Reflect` face-on, rising to full at grazing. It fades where a reflection would dip under the horizon, and highlights are capped at `_Glare`.
-  - Zone `waterReflect` (0..1) overrides `_Reflect`. Murky water uses about 0.3 (Khaven 0.3); unset keeps the default 0.7.
-  - Ripple normals scroll downstream along creeks.
-  - Foam is thin and noise-broken, and appears only where the depth texture says the water touches something (banks, legs, posts).
-  - There is a small swell that fades toward the shore.
-  - It reflects a realtime sky-only probe (`WorldClock.Reflections`, re-rendered every 2 s). The probe's intensity dims at night.
+- **Rendering (`World/Shaders/Water.shader`):** stylized, hand-painted clear water (art direction, Chris 2026-09-29).
+  - See-through: a named GrabPass (`_WaterBackground`) and the camera depth texture (turned on by ZoneBuilder) give the metres
+    of water the view crosses and the depth straight down. The bed shows through, a little refracted (`_Refract`), lifted by
+    light in the shallows (`_Glow`), and fades into the depth colour at `_Murk` per metre (sooner at a slant).
+  - Colour by depth: `_ShallowColor` (pale teal) -> `_MidColor` (turquoise, by `_MidDepth`) -> `_DeepColor` (deep teal-blue,
+    by `_DeepDepth`). Lit like the scene and dimmed a little faster than it, so dusk and night water stay dark.
+  - Foam: a soft band with a slowly wobbling edge wherever the water touches something (banks, rocks, posts, legs), plus on
+    still water a thinner line washing in toward the shore (`_FoamWidth`, `_FoamWaves`; `_FoamColor` alpha is its opacity).
+    Only the foam is lit (`LightingWater`, lanterns too); everything else is emission.
+  - Painted highlights (`_Sparkle`): soft noise blobs, sparse and faint away from the sun, crowded and bright along its (or the
+    moon's) reflection. Capped at `_Glare`.
+  - Sky: only a gentle tint at a slant (`_SkyTint`) from the realtime sky-only probe (`WorldClock.Reflections`, re-rendered
+    every 2 s, dimmed at night). No mirror.
+  - The surface writes the composite opaquely (`finalcolor`). The zone map (orthographic) shows the depth colours, taking
+    depth from the vertex shallowness.
+  - Zone `waterTint` turns the whole ramp into that murky colour with a dull scum for foam; `waterReflect` (0..1) sets
+    `_SkyTint` and damps highlights, ripples and foam. Khaven uses #1C2624 and 0.3. Unset keeps the turquoise defaults.
+  - Ripple normals scroll downstream along creeks. There is a small swell that fades toward the shore.
   - The project is in **Gamma** colour space. Keep that in mind for any lighting maths.
 - While swimming, weapons and shields are slung on the back.
 - **Current:** `ZoneWater.FlowAt` gives the downstream direction times a strength (1 mid-channel, 0 at the edge).

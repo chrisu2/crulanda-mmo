@@ -27,11 +27,22 @@ Chris's rules:
 1. **Step 4, HUD:** apply `tools\pending-patches\step4-hud.json` (overlaps, readability).
    - Its `overlaps` patch rewrites `EncounterHud` label drawing and was already rebased once. Expect skipped edits; merge them.
    - Also add world labels at exits ("Road to Khaven Village (3-5)") within about 30 m, so exits are easy to find. Chris was lost at a map edge with no exit.
-2. **Step 5, stylized turquoise water:**
-   - The design workflow `step5-stylized-water` was still running at the pause. If `tools\pending-patches\step5-stylized-water.raw.json` exists, use it (the review's `correctedNewFiles`/`correctedEdits`).
+2. **NEW STEP, right after step 4: a seamless cave and the Sandthrone bandit quest.** Chris decided on 2026-09-29 (order: after the HUD, before the water).
+   - A quest appears at level 3: clear out the bandits and their Bandit King in a cave, so they stop harassing the villagers.
+   - Tie-in (chosen): SANDTHRONE DESERTERS. The Sandthrone is a canon mercenary company, antagonists in world_bible.md, holding the Peaks toll in book1 ch.5; in the game they already hold Khaven.
+     - A deserter band dug into a cave near Oakhaven and raids its farms.
+     - The 'Bandit King' is a GAME-ONLY character. Don't use canon Sandthrone names such as Zarytha Vex for him.
+     - The lore has no bandit king. Copper-Tithe (book1 ch.24) was rejected because they are sympathetic in canon.
+   - Seamless means no loading: a rock-shell cave built into a hillside (tunnels and chambers, blob-mesh walls and ceiling, a flat walkable floor on the terrain).
+     - Inside: navmesh, torches, and lighting and fog that darken as you walk in (a trigger volume lerping ambient, fog and post exposure).
+     - A camp of deserters, with the Bandit King (elite) in the deepest chamber and loot.
+   - Good spot: Oakhaven's north hills. Chris wandered to the north edge looking for a way out.
+   - Add tests: ZoneContentTests reachability inside the cave, and the quest data.
+3. **Step 5, stylized turquoise water:**
+   - Ready: `tools\pending-patches\step5-stylized-water.json` has a full new Water.shader plus WaterMaterial() edits, compile-checked with fxc. Use the review's `correctedNewFiles`/`correctedEdits` when the verdict is 'fixable'. `apply_patches.ps1` doesn't write new files.
    - Otherwise re-run the design, which asks for: a depth colour ramp (pale teal to turquoise to deep teal), soft wobbly white foam at shores and objects, stylized sparkle bands, and little reflection.
    - Khaven stays murky.
-3. **Step 6:** the painted style pass on all zones, keeping each zone's mood (see memory crulanda-direction).
+4. **Step 6:** the painted style pass on all zones, keeping each zone's mood (see memory crulanda-direction).
 
 **Next, in order:**
 0. ~~Zone-travel bug~~: fixed or verified on 2026-09-29 (see above). The original report: Chris, 2026-09-29, playing the published build `76ed4eb`.

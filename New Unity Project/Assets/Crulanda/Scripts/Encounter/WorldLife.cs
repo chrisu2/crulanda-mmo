@@ -640,7 +640,7 @@ namespace Crulanda.Encounter
         public bool Roosting { get { return state == State.Roost; } }
         public bool Returning { get { return state == State.Return; } }
         VillageLife life; Vector2 home; float radius; State state; Vector3 target, flyFrom; float until, speed, fleeSpeed, fleeRadius, flyT, fedSeen = -999;
-        Transform body, head, wingL, wingR; float phase, seed; Renderer[] rends;
+        Transform body, head, wingL, wingR; float phase, seed; Renderer[] rends; bool wingsSpread;
         // Legs on hip pivots (see Leg): lag is the leg's place in the stride in radians, or -1 to swing with a rabbit's hop;
         // amp its swing in degrees (negative reaches forward). stepRate: phase per m/s that keeps a planted foot from sliding.
         readonly List<(Transform hip, float lag, float amp)> legs = new List<(Transform, float, float)>();
@@ -785,8 +785,8 @@ namespace Crulanda.Encounter
                     Part(PrimitiveType.Sphere, body, new Vector3(0, .18f, 0), new Vector3(.16f, .15f, .3f), black);
                     head = Part(PrimitiveType.Sphere, body, new Vector3(0, .29f, .13f), Vector3.one * .11f, black);
                     Part(PrimitiveType.Cube, head, new Vector3(0, -.1f, .7f), new Vector3(.2f, .2f, .7f), new Color(.15f, .15f, .15f));
-                    // Wings on shoulder pivots: folded back along the body on the ground, spread wide and beating in flight
-                    // (thin slivers flapping about the body's own axis made a flying crow look perched on thin air).
+                    // Wings on shoulder pivots: folded down over the flanks on the ground (FoldWings), spread wide and beating
+                    // in flight (thin slivers flapping about the body's own axis made a flying crow look perched on thin air).
                     foreach (int s in new[] { -1, 1 })
                     {
                         var wing = new GameObject("Wing").transform; wing.SetParent(body, false); wing.localPosition = new Vector3(s * .07f, .23f, .03f);
@@ -881,6 +881,7 @@ namespace Crulanda.Encounter
                     break;
                 case State.Fly: Fly(); break;
             }
+            if (state != State.Fly && wingsSpread) FoldWings();   // any way down that skips Fly's landing still folds them
         }
         /// <summary>Does the straight walk from a to b dip into water anywhere (checked every metre)?</summary>
         bool CrossesWater(Vector3 a, Vector3 b)
@@ -938,7 +939,7 @@ namespace Crulanda.Encounter
             var dir = target - flyFrom; dir.y = 0; if (dir.sqrMagnitude > .01f) transform.rotation = Quaternion.LookRotation(dir);
             // Beat up to height, glide the middle stretch on spread wings (a shallow V), beat again to land.
             float flap = flyT > .35f && flyT < .7f ? Mathf.Sin(Time.time * 5) * 8 - 6 : Mathf.Sin(Time.time * 22) * 60;
-            if (wingL != null) { wingL.localEulerAngles = new Vector3(0, 0, flap); wingR.localEulerAngles = new Vector3(0, 0, -flap); }
+            if (wingL != null) { wingsSpread = true; wingL.localEulerAngles = new Vector3(0, 0, flap); wingR.localEulerAngles = new Vector3(0, 0, -flap); }
             Legs(0, flyT < .85f);   // tucked from take-off; let down again for the landing
             if (flyT >= 1)
             {
@@ -947,7 +948,16 @@ namespace Crulanda.Encounter
                 FoldWings();
             }
         }
-        /// <summary>Wings folded back along the body (on the ground); <see cref="Fly"/> spreads them.</summary>
-        void FoldWings() { if (wingL == null) return; wingL.localEulerAngles = new Vector3(0, -80, 0); wingR.localEulerAngles = new Vector3(0, 80, 0); }
+        /// <summary>
+        /// Wings folded (on the ground, from spawn and every landing): each swept back along the body and hung down over its
+        /// flank, chord near vertical with the top edge tucked in, tip a touch up over the tail. A yaw alone left them lying
+        /// flat, as wide as the chord: a square with a head. <see cref="Fly"/> spreads them.
+        /// </summary>
+        void FoldWings()
+        {
+            if (wingL == null) return; wingsSpread = false;
+            foreach (int s in new[] { -1, 1 })
+                (s < 0 ? wingL : wingR).localRotation = Quaternion.AngleAxis(s * 80, Vector3.up) * Quaternion.AngleAxis(s * 8, Vector3.forward) * Quaternion.AngleAxis(-100, Vector3.right);
+        }
     }
 }

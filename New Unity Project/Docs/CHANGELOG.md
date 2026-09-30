@@ -315,3 +315,19 @@ Chris shared a reference of a stylized fantasy cove and chose this look for Oakh
 - **Zone settings** (`ZoneBuilder.WaterMaterial`): `waterTint` recolours the whole depth ramp dark, with dull scum foam; `waterReflect` sets the sky tint and damps sparkle, foam and ripples for murky water.
 - **Sandy bed:** the shore paint at the waterline and under water is pale sand in non-gloom biomes, so the shallows show a sandy bottom. Khaven keeps its dark silt.
 - The earlier `step5-water-realism` patch (planar mirror) is dropped; it conflicts with this direction.
+
+## 2026-09-29 — Fix: a temp-save run lost its character on zone travel
+- Chris reported "talents reset when I zoned into the Ashland Rim" on a `--crulanda-temp-save` run.
+- Cause: the throwaway save folder was chosen in `Start`, and travel reloads the scene, so each zone minted a new folder and found no save. The whole character (level, gear, talents) started fresh, not just the talents.
+- Fix: the temp folder is static and shared by the whole play session. New test `TempSaveTravelTests` spends a talent, earns a level, travels, and checks everything arrives. Real saves were never affected.
+
+## 2026-09-30 — Step 3 fix round published (with the temp-save travel fix)
+- **Temp-save travel:** a `--crulanda-temp-save` run keeps one folder for the whole session, so level, gear and talents survive zone travel. New test `TempSaveTravelTests`.
+- **Weave-Eater** is a drifting tangle of 30 curved violet threads round a dim core, with glowing tips, a slow bob and wander, and the old jerk. No head lobe, no legs.
+- **The Pale** have a deep cowl (no gold sliver from behind), a narrower, longer robe and a slight stoop.
+- **Crows** fold their wings on the ground; they spread only in flight.
+- **Khaven's Fallen Smithy** ruin moved off the Cracked Hearth's sight line and out of the house's doorway.
+- **Backdrop trees** stand on the drawn skirt mesh (exact triangle interpolation), skip ledges and crests, and sink into slopes. The Peaks exit no longer shows floating pines.
+- **Rockhide Wallow** has a wet, sheened pool with a raised mud rim. The **Great Oak's** bench ring is mitred arc segments, and its crown is layered: big squashed masses over the limbs, a middle ring, a low skirt and small tops.
+- **Umbra Scarp** became a stepped course of blocks. This REGRESSED: it reads as a wall of smooth grey slabs, and is redone in the next round.
+- Tests: EditMode 166/166, PlayMode 51/51, 0 shader errors.

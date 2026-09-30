@@ -14,6 +14,12 @@ namespace Crulanda.Encounter
     {
         public EncounterContent content;
         [NonSerialized] public string SaveDirectoryOverride;
+        /// <summary>The throwaway save folder of a --crulanda-temp-save run (static: it must outlive the scene reload that travel does).</summary>
+        static string tempSaveRoot;
+        /// <summary>Same as the --crulanda-temp-save flag (tests set it). <see cref="ResetTempSave"/> forgets the folder.</summary>
+        public static bool UseTempSave;
+        public static string TempSaveRoot { get { return tempSaveRoot; } }
+        public static void ResetTempSave() { UseTempSave = false; tempSaveRoot = null; }
         public EncounterProgress Progress { get; private set; }
         public Actor Player { get; private set; }
         public HealerCompanion Companion { get; private set; }
@@ -452,11 +458,12 @@ namespace Crulanda.Encounter
         void Start()
         {
             if (content == null) { Debug.LogError("Encounter content missing."); enabled = false; return; }
-            if (Array.IndexOf(Environment.GetCommandLineArgs(), "--crulanda-temp-save") >= 0 && SaveDirectoryOverride == null)
+            if ((UseTempSave || Array.IndexOf(Environment.GetCommandLineArgs(), "--crulanda-temp-save") >= 0) && SaveDirectoryOverride == null)
             {
-                // Test runs: a fresh throwaway character that never touches the real save folder.
-                SaveDirectoryOverride = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "CrulandaTestSave-" + Guid.NewGuid().ToString("N"));
-                Message("Test save: progress in this session is thrown away.");
+                // Test runs: a fresh throwaway character that never touches the real save folder. One folder for the whole
+                // play session: travel reloads the scene, and a new folder per zone would lose the character at every road.
+                if (tempSaveRoot == null) { tempSaveRoot = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "CrulandaTestSave-" + Guid.NewGuid().ToString("N")); Message("Test save: progress in this session is thrown away."); }
+                SaveDirectoryOverride = tempSaveRoot;
             }
             if (EncounterCapture.Requested)
             {

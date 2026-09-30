@@ -42,6 +42,27 @@ namespace Crulanda.World
             }
             return Build("Cone", v, t);
         }
+        /// <summary>
+        /// A ring segment: a block on a circle round the origin with radial (mitred) ends, from angle a0 to a1 (degrees,
+        /// anticlockwise from +x seen from above) and radius r0 to r1, height h up from y = 0. Flat-shaded, with metre UVs so
+        /// stone tiles across it (kerbs, bench rings).
+        /// </summary>
+        public static Mesh Arc(float r0, float r1, float a0, float a1, float h)
+        {
+            var v = new List<Vector3>(); var t = new List<int>(); var uv = new List<Vector2>();
+            Vector3 P(float r, float a, float y) { return new Vector3(Mathf.Cos(a * Mathf.Deg2Rad) * r, y, Mathf.Sin(a * Mathf.Deg2Rad) * r); }
+            void Face(Vector3 a, Vector3 b, Vector3 c, Vector3 d, Vector2 ua, Vector2 ub, Vector2 uc, Vector2 ud) { Quad(v, t, a, b, c, d); uv.Add(ua / 1.2f); uv.Add(ub / 1.2f); uv.Add(uc / 1.2f); uv.Add(ud / 1.2f); }
+            Vector2 Flat(Vector3 p) { return new Vector2(p.x, p.z); }
+            float l0 = a0 * Mathf.Deg2Rad, l1 = a1 * Mathf.Deg2Rad;   // arc lengths per unit radius, for the curved faces
+            Vector3 i00 = P(r0, a0, 0), i01 = P(r0, a1, 0), o00 = P(r1, a0, 0), o01 = P(r1, a1, 0), i10 = P(r0, a0, h), i11 = P(r0, a1, h), o10 = P(r1, a0, h), o11 = P(r1, a1, h);
+            Face(i10, i11, o11, o10, Flat(i10), Flat(i11), Flat(o11), Flat(o10));                                   // top
+            Face(o00, o01, i01, i00, Flat(o00), Flat(o01), Flat(i01), Flat(i00));                                   // underside
+            Face(o00, o10, o11, o01, new Vector2(l0 * r1, 0), new Vector2(l0 * r1, h), new Vector2(l1 * r1, h), new Vector2(l1 * r1, 0));   // outer face
+            Face(i01, i11, i10, i00, new Vector2(l1 * r0, 0), new Vector2(l1 * r0, h), new Vector2(l0 * r0, h), new Vector2(l0 * r0, 0));   // inner face
+            Face(i00, i10, o10, o00, new Vector2(r0, 0), new Vector2(r0, h), new Vector2(r1, h), new Vector2(r1, 0));   // the end at a0
+            Face(o01, o11, i11, i01, new Vector2(r1, 0), new Vector2(r1, h), new Vector2(r0, h), new Vector2(r0, 0));   // the end at a1
+            var m = Build("Arc", v, t); m.SetUVs(0, uv); return m;
+        }
         /// <summary>Flat ribbon following a polyline at a fixed height, e.g. water surface.</summary>
         public static Mesh Ribbon(IList<Vector2> points, float width, Func<Vector2, float> height)
         {

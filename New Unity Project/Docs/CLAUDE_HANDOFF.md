@@ -9,16 +9,29 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (paused 2026-09-29, about 22:50, usage limit reached mid-step)
+## RESUME HERE (updated 2026-09-29, late evening)
 Chris's rules: work in order of importance; finish each step; keep going without waiting (memory: crulanda-autonomy); tell him at each publish.
 
 **State:**
-- **Steps 1-3 are PUBLISHED.** **Step 4 (HUD) is committed and TESTED but NOT built or published.** Tests: EditMode 166/166, PlayMode 50/50.
-- Chris asked to SEE the new turquoise water, and chose to add it to the step 4 build. NOT applied yet.
-- The step-3 visual verification workflow (`verify-step3`) was running when the limit hit; its result, if any, is in the session task output. If lost, re-run a per-area review of `work\world-captures\archive-20260929-step3-published`.
+- **Steps 1-4 and the turquoise water are PUBLISHED** to `outputs\Crulanda-Playable`. Chris has seen water shots.
+  - Tests: EditMode 166/166, PlayMode 50/50, 0 shader errors.
+- The step-3 visual verification workflow (`verify-step3`, run wf_1b4b81d4-c71) was running; its confirmed majors go into the next fix round. If lost, re-run a per-area review of `work\world-captures\archive-20260929-step3-published`.
+- Small tour gap: the exit shot (`*-19-exit` etc.) hides the HUD, so the new "Road to <zone>" sign isn't photographed. Add a HUD-on exit shot to `EncounterCapture` next cycle.
+- Water polish still worth doing later: the Oakhaven pond is a fairly flat turquoise oval; the reference has more colour variation and shallow lobes.
 
 **Next:**
-0. **Finish step 4 + water, in one build:**
+0. ~~Finish step 4 + water~~ DONE and published.
+0. **TREES, again (Chris, 2026-09-29, after the trunk pass: "trees still look bad").** Priority: right after the current step-3 fix round, BEFORE the cave.
+   - The trunks are fine now. The problem is the CROWNS: every broadleaf/orchard tree is one or two smooth faceted balls on a stick (no leaf edge, no gaps, no branches inside), and the pines are perfect stacked cones. See `work\world-captures\oakhaven-99-target-ring.png` and `oakhaven-08-the-old-orchard.png`.
+   - Target look (Chris's reference, memory crulanda-direction): ragged leaf silhouettes, sky showing through, visible fronds and branch structure.
+   - Plan: leaf CARDS. Painted alpha-cutout leaf-cluster textures generated in ZoneSceneBuilder (green, yellow-green, autumn, a pine-bough variant); crowns from 8-14 crossed, tilted quads on short boughs plus a small dark inner core; pine tiers as tilted bough cards, not solid cones; a Crulanda/Leaf cutout shader (two-sided, wind sway, ShadowCaster with the cutout); TreeFade taught to fade cutout leaves. Keep crown volumes so bounds, colliders and navmesh don't change; keep the zone rng stream.
+   - A design workflow (`tree-crowns-design`) may have produced a patch; check the session task output, else re-run it.
+0b. **TEMP-SAVE TRAVEL BUG**
+0c. **WORLD DEPTH (Chris, 2026-09-29: "zones do need to be bigger with more places and secrets to explore").** Decisions: rewards = DISCOVERIES + LOOT; order = CAVE, then SECRETS, then SIZE.
+   - Today every zone is a ~260 m square with 5 camps, and nearly every interactable is a map-marked quest pickup (Peaks: 6 interactables over 60 props). Nothing is hidden; wandering pays nothing.
+   - **Secrets:** hidden finds NOT marked on any map, a few per zone: a cache behind a waterfall / under a bridge, a lookout with a view, an abandoned camp with loot and a note, a Chronicle page in a hollow tree, a rare herb patch, a locked chest whose key is elsewhere. Each grants a 'Discovered: <name>' toast + XP, most hold a cache (gold, a rare item, a page). Add a Discoveries tab to the quest book (per zone, found/total), a `discoveries` list in the save (format 7), and a `secret` flag on props so maps skip them. Tests: every secret reachable on the navmesh; discovery toast and save round-trip.
+   - **Sub-areas:** the bandit cave first (item 2 in this list), then one per zone in the same vein: a crypt interior under Khaven, a mine or ledge path in the Peaks, a sunken ruin on the Rim.
+   - **Size:** grow zones to ~340-380 m LAST, once there is content to fill them; keep the village cores where they are (roads, exits and arrival points move with the edge: check ZoneExitTests). (Chris: "lose talent points going to new zones", confirmed twice): FIXED in code (static `tempSaveRoot`, test `TempSaveTravelTests`), NOT yet in a build. Cause: `--crulanda-temp-save` minted a new folder on every scene reload, so each zone started a fresh character. Real saves were never affected. Ship it in the next build and tell Chris.
    a. Apply the turquoise water: `tools\pending-patches\step5-stylized-water.json`. Use the review's `correctedNewFiles` (a full new `World/Shaders/Water.shader`; write it) and `correctedEdits` (2 in `ZoneBuilder.WaterMaterial()`, 1 in WORLD_ZONES.md). The night-foam glow is already fixed in the corrected version.
    b. Lighten the bed so the shallows show sand, as in Chris's reference: `ZoneBuilder.PaintGround` shore paint (about line 529-531) darkens the waterline to .22/.2/.15 and the bed to .16/.15/.12. For non-gloom biomes use a pale sand (about .62/.56/.42) at the waterline and a slightly darker sand under water; keep Khaven dark.
    c. `run_tests.ps1`, then `build_and_tour.ps1` for all four zones; check `Shader error` in the build log (a broken shader silently falls back).

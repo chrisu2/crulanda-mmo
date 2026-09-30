@@ -159,44 +159,55 @@ namespace Crulanda.Encounter
         public bool LyingLow;
 
         // Weave-Eater state (BuildEater / Drift).
-        Transform core; Transform[] flicker; Renderer[] eaterParts; Material[] eaterMats; Material crystal; Crulanda.Gameplay.Actor self;
+        Transform core, inner; Transform[] flicker; Renderer[] eaterParts; Material[] eaterMats; Material crystal; Crulanda.Gameplay.Actor self;
         Vector3 anchor, glitchScale; float nextJerk, glitchUntil, glitchYaw, eaterSeed; bool calcified;
+        /// <summary>Standard shader in Fade mode, with the Wasting veil material's keyword set so the variant is in every build.</summary>
+        static Material Fade(Color c, Color emission)
+        {
+            var m = Mat(c, .45f); m.SetFloat("_Mode", 2); m.SetOverrideTag("RenderType", "Transparent");
+            m.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha); m.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha); m.SetInt("_ZWrite", 0);
+            m.EnableKeyword("_ALPHABLEND_ON"); m.EnableKeyword("_EMISSION"); m.SetColor("_EmissionColor", emission); m.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+            return m;
+        }
         /// <summary>
         /// A Weave-Eater (CANON, book1 ch.20): a manifestation of the Wasting, born from the frayed threads of the broken Weave,
-        /// with no face and no limbs. Here: a towering knot of void (dark, glossy) in a broken shell of grey static, torn threads
-        /// trailing under it and whipping off the top, violet light where they are torn. It hangs in the air and never walks;
-        /// <see cref="Drift"/> moves it by sudden displacement. Salted and broken it sets into jagged white crystal (CANON), so
-        /// its corpse is a white statue. The primitive design is GAME-ONLY.
+        /// with no face and no limbs, that drifts and moves by sudden jerking displacement. Here: a loose, half-seen tangle of
+        /// torn threads, each bent along its own arc and radiating every way (some trailing under it, none bunched), round a
+        /// small dim violet core buried inside; a few thread tips still burn violet. It hangs in the air and never walks:
+        /// <see cref="Drift"/> bobs and turns it slowly and moves it by displacement. Salted and broken it sets into jagged
+        /// white crystal (CANON), so its corpse is a white statue. The tangle comes from a fixed per-actor seed. GAME-ONLY design.
         /// </summary>
         void BuildEater()
         {
-            self = GetComponent<Crulanda.Gameplay.Actor>(); eaterSeed = Random.value * 10;
-            var voidM = Mat(new Color(.04f, .03f, .06f), .9f); var stat = Mat(new Color(.45f, .44f, .5f), .6f); var fray = Mat(new Color(.3f, .28f, .36f), .3f);
-            var glow = Mat(new Color(.75f, .45f, 1f), .9f); glow.EnableKeyword("_EMISSION"); glow.SetColor("_EmissionColor", new Color(.7f, .35f, 1f) * 2.2f);
-            cloth = stat;
-            core = new GameObject("Core").transform; core.SetParent(body, false); core.localPosition = new Vector3(0, .45f, 0);
-            head = Part(PrimitiveType.Sphere, core, Vector3.zero, new Vector3(.8f, 1.25f, .7f), voidM);                                    // the void at the heart
-            Part(PrimitiveType.Sphere, core, new Vector3(.1f, .55f, -.04f), new Vector3(.46f, .7f, .42f), voidM, new Vector3(0, 0, -18));   // lopsided, taller than a man
-            Transform Strand(Vector3 from, Vector3 dir, float length, Material m)
-            { return Part(PrimitiveType.Cube, core, from + dir * (length / 2), new Vector3(.035f, length, .035f), m, Quaternion.FromToRotation(Vector3.up, dir).eulerAngles); }
-            var flick = new System.Collections.Generic.List<Transform>();
-            // A broken shell of grey static: shards at every angle across the surface, a few lit violet.
-            for (int i = 0; i < 10; i++)
+            self = GetComponent<Crulanda.Gameplay.Actor>();
+            // Seeded by name and spawn spot: the same eater always frays the same way, and no other random stream is touched.
+            var at = transform.position; int seed = 17; foreach (char ch in name) seed = seed * 31 + ch;
+            var rng = new System.Random(seed ^ (Mathf.RoundToInt(at.x * 10) * 73856093) ^ (Mathf.RoundToInt(at.z * 10) * 19349663));
+            float R(float a, float b) { return a + (float)rng.NextDouble() * (b - a); }
+            eaterSeed = R(0, 10);
+            var fray = Fade(new Color(.5f, .44f, .6f, .55f), new Color(.1f, .04f, .16f)); var faint = Fade(new Color(.66f, .56f, .82f, .3f), new Color(.16f, .06f, .26f));
+            var voidM = Mat(new Color(.1f, .05f, .14f), .8f); voidM.EnableKeyword("_EMISSION"); voidM.SetColor("_EmissionColor", new Color(.24f, .07f, .4f));
+            var glow = Mat(new Color(.8f, .5f, 1f), .9f); glow.EnableKeyword("_EMISSION"); glow.SetColor("_EmissionColor", new Color(.7f, .35f, 1f) * 2.2f);
+            cloth = fray;
+            core = new GameObject("Core").transform; core.SetParent(body, false); core.localPosition = new Vector3(0, .5f, 0);
+            inner = new GameObject("Inner").transform; inner.SetParent(core, false);   // turns against the rest (Drift), so the tangle never sets
+            head = Part(PrimitiveType.Sphere, inner, Vector3.zero, new Vector3(.3f, .4f, .3f), voidM);   // the void at the heart: small, dim, buried
+            var flick = new System.Collections.Generic.List<Transform>(); var rings = new float[8]; for (int i = 0; i < 8; i++) rings[i] = i / 7f;
+            for (int i = 0; i < 30; i++)
             {
-                var dir = Quaternion.Euler(Random.Range(-70f, 60f), i * 36 + Random.Range(-15f, 15f), 0) * Vector3.forward;
-                flick.Add(Part(PrimitiveType.Cube, core, Vector3.Scale(dir, new Vector3(.4f, .62f, .35f)), new Vector3(Random.Range(.08f, .16f), Random.Range(.4f, .75f), .04f),
-                    i % 3 == 0 ? glow : stat, new Vector3(Random.Range(0f, 360f), Random.Range(0f, 360f), Random.Range(0f, 360f))));
-            }
-            // Frayed threads trailing beneath (ending well above the ground: it hangs in the air) and whipping off the top.
-            for (int i = 0; i < 12; i++)
-            {
-                var turn = Quaternion.Euler(0, i * 30 + Random.Range(-12f, 12f), 0);
-                Strand(turn * new Vector3(0, -.42f, Random.Range(.1f, .28f)), turn * (Quaternion.Euler(-Random.Range(6f, 26f), 0, 0) * Vector3.down), Random.Range(.35f, .68f), i % 4 == 0 ? glow : fray);
-            }
-            for (int i = 0; i < 5; i++)
-            {
-                var turn = Quaternion.Euler(0, i * 72 + Random.Range(-20f, 20f), 0);
-                flick.Add(Strand(turn * new Vector3(0, .6f, .1f), turn * (Quaternion.Euler(Random.Range(20f, 50f), 0, 0) * Vector3.up), Random.Range(.35f, .75f), i % 2 == 0 ? glow : fray));
+                // A thread: out of the core along dir, bent on an arc in its own plane, tapering to nothing; every third one trails down.
+                bool down = i % 3 == 0; var dir = Quaternion.Euler(down ? R(35, 80) : R(-80, 50), R(0, 360), 0) * Vector3.forward;
+                var side = Vector3.Cross(dir, Quaternion.Euler(R(0, 360), R(0, 360), 0) * Vector3.forward);
+                if (side.sqrMagnitude < .01f) side = Vector3.Cross(dir, Mathf.Abs(dir.y) < .9f ? Vector3.up : Vector3.right);
+                side.Normalize();
+                float len = down ? R(.6f, 1.05f) : R(.35f, .95f), bend = len * R(.15f, .55f), thick = R(.012f, .03f);
+                Vector3 root = dir * .1f, ctrl = root + dir * (len * .5f) + side * bend, end = root + dir * (len * .9f) + side * (bend * 1.7f);
+                Vector3 Bez(float t) { float u = 1 - t; return root * (u * u) + ctrl * (2 * u * t) + end * (t * t); }
+                var mesh = Crulanda.World.ZoneMeshes.Tube(Bez, (t, a) => thick * Mathf.Clamp01((1 - t) * 3), rings, 5, Vector3.Cross(dir, side));
+                var thread = new GameObject("Thread", typeof(MeshFilter), typeof(MeshRenderer)).transform; thread.SetParent(i % 4 == 1 ? inner : core, false);
+                thread.GetComponent<MeshFilter>().sharedMesh = mesh; thread.GetComponent<MeshRenderer>().sharedMaterial = i % 5 == 2 ? faint : fray;
+                if (i % 4 == 3) flick.Add(Part(PrimitiveType.Sphere, thread.parent, end, Vector3.one * R(.03f, .05f), glow));   // a tip still burning
+                else if (i % 7 == 5) flick.Add(thread);
             }
             flicker = flick.ToArray();
             crystal = Mat(new Color(.9f, .93f, .97f), .92f); crystal.EnableKeyword("_EMISSION"); crystal.SetColor("_EmissionColor", new Color(.22f, .23f, .26f));
@@ -205,9 +216,10 @@ namespace Crulanda.Encounter
             anchor = transform.position;
         }
         /// <summary>
-        /// The Weave-Eater's motion: it hangs in the air, rippling, then is simply somewhere else (CANON: "a sudden, jerking
-        /// displacement of space"). The figure holds still while the agent moves on beneath it and catches up in one jump, with
-        /// a flicker of its shards and a torn stretch for a moment. Dead, it is a white crystal statue standing on its threads.
+        /// The Weave-Eater's motion: it drifts (a slow bob and wander about its anchor, the tangle turning one way and its inner
+        /// threads the other), then is simply somewhere else (CANON: "a sudden, jerking displacement of space"). The figure
+        /// keeps its anchor while the agent moves on beneath it and catches up in one jump, with a flicker of its lit threads
+        /// and a torn stretch for a moment. Dead, it is a white crystal statue standing on its threads.
         /// </summary>
         void Drift()
         {
@@ -222,7 +234,7 @@ namespace Crulanda.Encounter
             {
                 // EncounterEnemy tips a dead body over; a statue stays upright, set down on its threads.
                 body.localRotation = Quaternion.identity; body.localPosition = new Vector3(0, -.3f, 0);
-                core.localRotation = Quaternion.identity; core.localScale = Vector3.one; return;
+                core.localRotation = inner.localRotation = Quaternion.identity; core.localScale = Vector3.one; return;
             }
             float t = Time.time, dt = Time.deltaTime; var at = transform.position;
             bool moving = (at - lastPosition).sqrMagnitude > .25f * dt * dt; lastPosition = at;   // faster than .5 m/s, at any frame rate
@@ -236,18 +248,21 @@ namespace Crulanda.Encounter
             }
             bool glitch = t < glitchUntil;
             body.localRotation = Quaternion.identity;
-            body.position = anchor + Vector3.up * (.12f + Mathf.Sin(t * 1.3f + eaterSeed) * .1f);
-            core.localScale = glitch ? glitchScale : Vector3.one * (1 + Mathf.Sin(t * 9 + eaterSeed) * .025f);
-            core.localRotation = Quaternion.Euler(Mathf.Sin(t * 1.7f + eaterSeed) * 7, t * 30 + eaterSeed * 36 + (glitch ? glitchYaw : 0), Mathf.Cos(t * 1.3f) * 7);
+            // Adrift between jerks: a slow bob with a faint ripple on it, and a slower wander round the anchor.
+            body.position = anchor + new Vector3(Mathf.Sin(t * .41f + eaterSeed) * .14f, .16f + Mathf.Sin(t * .8f + eaterSeed) * .16f + Mathf.Sin(t * 2.6f + eaterSeed * 2) * .03f, Mathf.Cos(t * .33f + eaterSeed * 1.7f) * .14f);
+            core.localScale = glitch ? glitchScale : Vector3.one * (1 + Mathf.Sin(t * 9 + eaterSeed) * .02f);
+            core.localRotation = Quaternion.Euler(Mathf.Sin(t * .7f + eaterSeed) * 9, t * 14 + eaterSeed * 36 + (glitch ? glitchYaw : 0), Mathf.Cos(t * .55f + eaterSeed) * 9);
+            inner.localRotation = Quaternion.Euler(Mathf.Cos(t * .45f + eaterSeed) * 12, -t * 24 + eaterSeed * 50, Mathf.Sin(t * .6f + eaterSeed) * 12);
         }
 
         static Mesh robeCone;
         /// <summary>
         /// A Pale watcher. The Pale Things are cosmic watchers and auditors (CANON, world_bible.md); the Pale King seen in book1
-        /// is impossibly tall and wears a featureless gold mask with no eyes (CANON). This figure is GAME-ONLY: about 2.4 m,
-        /// gaunt, in a pale floor-length robe and a tall hood, a small eyeless gold mask for a face, arms too long, and no legs
-        /// showing, so it glides (Khaven: "It leaves no footprints"), faintly pale-lit at dusk. Nothing is scaled: every part sits
-        /// at its true height (feet at -1), so the hood rests on the collar and the swinging arms don't shear.
+        /// is impossibly tall and wears a featureless gold mask with no eyes (CANON). This figure is GAME-ONLY: about 2.5 m,
+        /// gaunt, in a narrow pale floor-length robe (the hem 1.3x the shoulders: a column, not a pawn) and a deep tall hood
+        /// with a small eyeless gold mask set back in it, stooped a little at the waist, arms too long, and no legs showing,
+        /// so it glides (Khaven: "It leaves no footprints"), faintly pale-lit at dusk. Nothing is scaled: every part sits at its
+        /// true height (feet at -1), so the hood rests on the collar and the swinging arms don't shear.
         /// </summary>
         void BuildPale()
         {
@@ -258,24 +273,34 @@ namespace Crulanda.Encounter
             // A tall narrow cone from the hem to the throat: robe, waist and high collar in one taper.
             if (robeCone == null) robeCone = Crulanda.World.ZoneMeshes.Cone(1, 1, 14);
             var gown = new GameObject("Robe", typeof(MeshFilter), typeof(MeshRenderer)).transform; gown.SetParent(body, false);
-            gown.localPosition = new Vector3(0, -.97f, 0); gown.localScale = new Vector3(.38f, 2.3f, .34f);
+            gown.localPosition = new Vector3(0, -.97f, 0); gown.localScale = new Vector3(.3f, 2.55f, .27f);
             gown.GetComponent<MeshFilter>().sharedMesh = robeCone; gown.GetComponent<MeshRenderer>().sharedMaterial = robe;
-            Part(PrimitiveType.Cylinder, body, new Vector3(0, -.955f, 0), new Vector3(.79f, .015f, .71f), fold);          // hem
-            Part(PrimitiveType.Cube, body, new Vector3(0, .5f, 0), new Vector3(.32f, .62f, .2f), robe);                   // narrow chest
-            Part(PrimitiveType.Sphere, body, new Vector3(0, .8f, 0), new Vector3(.46f, .14f, .24f), robe);                // high, sloping shoulders
-            head = Part(PrimitiveType.Sphere, body, new Vector3(0, 1.16f, -.03f), new Vector3(.3f, .44f, .31f), robe);    // tall hood, resting on the collar
-            Part(PrimitiveType.Sphere, body, new Vector3(0, 1.15f, .11f), new Vector3(.17f, .27f, .07f), gold);          // the mask: no eyes, nothing on it
-            Part(PrimitiveType.Sphere, body, new Vector3(0, .8f, .12f), Vector3.one * .06f, gold);                        // clasp
+            Part(PrimitiveType.Cylinder, body, new Vector3(0, -.955f, 0), new Vector3(.62f, .015f, .56f), fold);          // hem
+            // Everything above the waist hangs from a spine pivot pitched forward: a slight stoop, bent as if to look down at you.
+            var spine = Pivot("Spine", new Vector3(0, .2f, 0)); spine.localEulerAngles = new Vector3(8, 0, 0);
+            Transform Up(PrimitiveType type, Vector3 pos, Vector3 scale, Material m, Vector3? euler = null) { return Part(type, spine, pos - new Vector3(0, .2f, 0), scale, m, euler); }
+            Up(PrimitiveType.Cube, new Vector3(0, .56f, 0), new Vector3(.3f, .72f, .18f), robe);                      // narrow chest
+            Up(PrimitiveType.Sphere, new Vector3(0, .9f, 0), new Vector3(.46f, .14f, .24f), robe);                   // high, sloping shoulders
+            Up(PrimitiveType.Cylinder, new Vector3(0, .98f, 0), new Vector3(.2f, .06f, .2f), robe);                  // collar
+            head = Up(PrimitiveType.Sphere, new Vector3(0, 1.28f, -.05f), new Vector3(.3f, .46f, .32f), robe);        // tall hood, resting on the collar
+            // A deep cowl: a peak and two cheek flaps reach forward past the mask, so the face sits back in the hood and no
+            // gold shows round the head from behind (the mask used to poke out past the hood as a sliver).
+            Up(PrimitiveType.Cube, new Vector3(0, 1.44f, .08f), new Vector3(.28f, .05f, .18f), robe, new Vector3(12, 0, 0));
+            foreach (int s in new[] { -1, 1 }) Up(PrimitiveType.Cube, new Vector3(s * .13f, 1.24f, .08f), new Vector3(.05f, .34f, .18f), robe, new Vector3(0, s * -12, 0));
+            Up(PrimitiveType.Sphere, new Vector3(0, 1.25f, .1f), new Vector3(.18f, .28f, .08f), gold);              // the mask: no eyes, nothing on it
+            Up(PrimitiveType.Sphere, new Vector3(0, .9f, .12f), Vector3.one * .06f, gold);                           // clasp
             legL = Pivot("Leg L", new Vector3(-.1f, -.08f, 0)); legR = Pivot("Leg R", new Vector3(.1f, -.08f, 0));       // under the robe: nothing shows
-            armL = Pivot("Arm L", new Vector3(-.24f, .8f, 0)); armR = Pivot("Arm R", new Vector3(.24f, .8f, 0));
+            // The arms hang straight down (body space) from the stooped shoulders, so they don't trail behind the lean.
+            armL = Pivot("Arm L", new Vector3(-.24f, .89f, .1f)); armR = Pivot("Arm R", new Vector3(.24f, .89f, .1f));
+            float sn = Mathf.Sin(5 * Mathf.Deg2Rad);
             foreach (int s in new[] { -1, 1 })
             {
-                // Held 9 degrees out from the body (6 once the walk cycle's inward 3 is added), so the long sleeves and hands
-                // hang clear of the flared robe instead of sinking into it.
-                var arm = s < 0 ? armL : armR; var tilt = new Vector3(0, 0, s * 9);
-                Part(PrimitiveType.Capsule, arm, new Vector3(s * .078f, -.494f, 0), new Vector3(.11f, .5f, .11f), robe, tilt);     // sleeves to mid-thigh
-                Part(PrimitiveType.Cylinder, arm, new Vector3(s * .144f, -.909f, 0), new Vector3(.17f, .07f, .17f), fold, tilt);  // cuff
-                Part(PrimitiveType.Sphere, arm, new Vector3(s * .172f, -1.086f, 0), new Vector3(.08f, .24f, .06f), skin, tilt);   // long, thin hands
+                // Held 5 degrees out from the body (2 once the walk cycle's inward 3 is added): the sleeves and hands hang just
+                // clear of the narrow robe instead of sinking into it.
+                var arm = s < 0 ? armL : armR; var tilt = new Vector3(0, 0, s * 5);
+                Part(PrimitiveType.Capsule, arm, new Vector3(s * .53f * sn, -.53f, 0), new Vector3(.1f, .53f, .1f), robe, tilt);     // sleeves to mid-thigh
+                Part(PrimitiveType.Cylinder, arm, new Vector3(s * .97f * sn, -.97f, 0), new Vector3(.16f, .07f, .16f), fold, tilt);  // cuff
+                Part(PrimitiveType.Sphere, arm, new Vector3(s * 1.15f * sn, -1.15f, 0), new Vector3(.08f, .24f, .06f), skin, tilt);   // long, thin hands
             }
         }
 

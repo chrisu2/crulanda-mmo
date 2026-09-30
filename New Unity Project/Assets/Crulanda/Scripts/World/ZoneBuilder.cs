@@ -798,6 +798,9 @@ namespace Crulanda.World
                 // Moving parts (doors, wheels) and things that can be picked or emptied can't be static-batched.
                 var parent = p.kind == "bridge" || p.kind == "inn" || p.kind == "mill" || p.kind == "coop" || p.kind == "herb" || !string.IsNullOrEmpty(p.interact) ? props : statics;
                 var t = Root(p, parent);
+                // A ruin never stands in a building: moved clear here, or (a plain one) built for its draws and then left out.
+                bool drop = (p.kind == "ruin" || p.kind == "ruined_house") && !ClearOfBuildings(p, t);
+                if (p.kind == "wall") WarnWallInBuilding(p);
                 // New landmark kinds draw from their own stream, after taking the draws the kind that stood here took, so
                 // every later prop, tree and rock keeps the layout it had.
                 var zoneRng = rng; int legacy = p.kind == "cave" ? 30 : p.kind == "rib" ? 6 : p.kind == "perch" || p.kind == "wallow" || p.kind == "brood" ? 0 : -1;
@@ -822,7 +825,7 @@ namespace Crulanda.World
                     case "tower": Tower(t, p.size.x > 0 ? p.size.x : 4.4f); break;
                     case "gallows": Gallows(t); break;
                     case "crypt": Crypt(t, p.variant); break;
-                    case "cliff": Cliff(t, p.size.x > 0 ? p.size.x : 20, Mathf.Abs(p.lift)); break;
+                    case "cliff": Cliff(t, p.size.x > 0 ? p.size.x : 20, p.lift); break;
                     case "dead_oak": DeadTree(p.at, 1, Tint(art.bark, new Color(.4f, .36f, .32f)), 5, statics, t); break;   // weathered, paler bark (plain bark reads black in shade); size comes from the root's scale
                     case "great_oak": GreatOak(t); break;
                     case "tree": Broadleaf(t, p.variant); break;
@@ -861,8 +864,76 @@ namespace Crulanda.World
                     default: Debug.LogWarning("Unknown zone prop kind '" + p.kind + "'."); break;
                 }
                 rng = zoneRng;
+                if (drop) { DestroyImmediate(t.gameObject); continue; }
                 if (!string.IsNullOrEmpty(p.interact) && t != null)
                     Interactables.Add(new ZoneInteractable { name = string.IsNullOrEmpty(p.name) ? p.kind : p.name, prompt = p.interact, item = p.item, kind = p.kind, once = p.once, position = t.position, root = t });
+            }
+        }
+        /// <summary>Half-extents of a building's footprint (a little over its walls, for roof and plinth); zero for anything else.</summary>
+        static Vector2 Footprint(ZoneProp p)
+        {
+            switch (p.kind)
+            {
+                case "house": return (p.size.x > 0 ? p.size : new Vector2(7, 5)) / 2 + Vector2.one * .8f;
+                case "inn": case "barn": return (p.size.x > 0 ? p.size : new Vector2(12, 8)) / 2 + Vector2.one * .8f;
+                case "mill": case "keep": return (p.size.x > 0 ? p.size : new Vector2(7, 6)) / 2 + Vector2.one * .8f;
+                case "tower": return Vector2.one * ((p.size.x > 0 ? p.size.x : 4.4f) / 2 + .3f);
+                case "crypt": return new Vector2(3.6f, 4.6f);
+                case "forge": return new Vector2(2.9f, 2.4f);
+                case "tannery": case "shelter": return new Vector2(2.2f, 2.1f);
+                default: return Vector2.zero;
+            }
+        }
+        /// <summary>Whether two footprints (centre, half-size, yaw) overlap; push is the shortest move of the first that parts them.</summary>
+        static bool Overlap(Vector2 ca, Vector2 ha, float ya, Vector2 cb, Vector2 hb, float yb, out Vector2 push)
+        {
+            Vector2 X(float yaw) { float r = yaw * Mathf.Deg2Rad; return new Vector2(Mathf.Cos(r), -Mathf.Sin(r)); }   // a prop's local x and z in the world (Unity's yaw)
+            Vector2 Z(float yaw) { float r = yaw * Mathf.Deg2Rad; return new Vector2(Mathf.Sin(r), Mathf.Cos(r)); }
+            Vector2 xa = X(ya), za = Z(ya), xb = X(yb), zb = Z(yb), d = cb - ca; push = Vector2.zero; float least = float.MaxValue;
+            foreach (var n in new[] { xa, za, xb, zb })
+            {
+                float reach = Mathf.Abs(Vector2.Dot(xa, n)) * ha.x + Mathf.Abs(Vector2.Dot(za, n)) * ha.y + Mathf.Abs(Vector2.Dot(xb, n)) * hb.x + Mathf.Abs(Vector2.Dot(zb, n)) * hb.y;
+                float along = Vector2.Dot(d, n), gap = reach - Mathf.Abs(along);
+                if (gap <= 0) return false;   // a separating axis
+                if (gap < least) { least = gap; push = n * (along > 0 ? -gap : gap); }
+            }
+            return true;
+        }
+        /// <summary>
+        /// A ruin or fallen house never stands in a building: one over a building's footprint is pushed straight out of it (up
+        /// to 5 m, never onto a road or into water), with a warning. If that fails a usable one (a quest search) stays put and a
+        /// plain one is left out. Draws nothing random, and the prop is built either way, so the zone's layout is unchanged.
+        /// </summary>
+        bool ClearOfBuildings(ZoneProp p, Transform t)
+        {
+            var half = p.kind == "ruin" ? new Vector2((p.size.x > 0 ? p.size.x : 6) / 2 + .5f, .6f) : (p.size.x > 0 ? p.size : new Vector2(8, 6)) / 2 + Vector2.one * .3f;
+            var at = p.at; string name = Zone.id + ": '" + (string.IsNullOrEmpty(p.name) ? p.kind : p.name) + "'";
+            for (int pass = 0; pass < 4; pass++)
+            {
+                ZoneProp hit = null; Vector2 push = Vector2.zero;
+                foreach (var b in Zone.props)
+                {
+                    if (b == null || b == p) continue; var bh = Footprint(b); if (bh.x <= 0) continue;
+                    if (Overlap(at, half, p.rotation, b.at, bh, b.rotation, out var v) && v.sqrMagnitude > push.sqrMagnitude) { hit = b; push = v; }
+                }
+                if (hit == null) { if (pass > 0) { t.position = Ground(at); Debug.LogWarning(name + " stood in a building; moved from " + p.at + " to " + at + "."); } return true; }
+                var next = at + push + push.normalized * .4f;
+                if (Vector2.Distance(next, p.at) > 5 || NearRoad(next, half.x) || Water.NearWater(next, half.x)) break;
+                at = next;
+            }
+            if (!string.IsNullOrEmpty(p.interact)) { Debug.LogWarning(name + " stands in a building and could not be moved clear; kept, it is used."); return true; }
+            Debug.LogWarning(name + " stands in a building and could not be moved clear; left out."); return false;
+        }
+        /// <summary>A curtain wall through a house, inn, barn, mill or keep is reported (it is built as authored: it joins towers and gates).</summary>
+        void WarnWallInBuilding(ZoneProp p)
+        {
+            for (int i = 0; i + 1 < p.points.Length; i++)
+            {
+                Vector2 a = p.points[i], b = p.points[i + 1], dir = b - a; float len = dir.magnitude; if (len < .1f) continue;
+                float yaw = Mathf.Atan2(-dir.y, dir.x) * Mathf.Rad2Deg;   // the segment along its local x
+                foreach (var h in Zone.props)
+                    if (h != null && (h.kind == "house" || h.kind == "inn" || h.kind == "barn" || h.kind == "mill" || h.kind == "keep") && Overlap((a + b) / 2, new Vector2(len / 2, .6f), yaw, h.at, Footprint(h), h.rotation, out _))
+                        Debug.LogWarning(Zone.id + ": wall '" + p.name + "' runs through '" + (string.IsNullOrEmpty(h.name) ? h.kind : h.name) + "' at " + h.at + ".");
             }
         }
         static readonly Color[] Plaster = { new Color(.78f, .72f, .60f), new Color(.70f, .66f, .58f), new Color(.74f, .64f, .52f) };
@@ -1282,8 +1353,11 @@ namespace Crulanda.World
                     tips.Add((to + Vector3.up * .2f, 2.6f + T() * .6f));
                 }
             }
-            // The crown: leaf on every limb and branch end, then a layered dome (a wide, darker skirt, a middle tier, a sunlit top)
-            // and big clumps inside so no sky shows through its heart. Fresh green in a few shades, a touch of autumn gold on the rim.
+            // The crown: leaf on every limb and branch end (small: they are its edges), then the bulk as five big squashed masses
+            // over the limbs and one over the leader, a ring of middle clumps under their rims, a low wide skirt of small clumps
+            // and small clumps on top, so from above it reads as a few broad billows, not a heap of equal balls; big clumps
+            // inside too, so no sky shows through its heart. Fresh green in a few shades, a touch of autumn gold on the rim.
+            // All from the oak's own stream, so nothing else in the zone moves.
             if (oakLeaves == null) { oakLeaves = new Mesh[5]; for (int i = 0; i < 5; i++) oakLeaves[i] = ZoneMeshes.Blob(Zone.seed + 830 + i * 29, .6f, false, 10, 16); }
             Material deep = Tint(art.foliage, new Color(.19f, .30f, .12f)), mid = Tint(art.foliage, new Color(.25f, .37f, .14f)), light = Tint(art.foliage, new Color(.32f, .44f, .17f)),
                 sunlit = Tint(art.foliage, new Color(.40f, .47f, .19f)), gold = Tint(art.foliage, new Color(.42f, .43f, .16f));   // gold: the first turn of autumn, on two low clumps
@@ -1292,11 +1366,12 @@ namespace Crulanda.World
                 var o = MeshPart(oakLeaves[(int)(T() * 5) % 5], t, at, m, Quaternion.Euler((T() - .5f) * 20, T() * 360, (T() - .5f) * 20));
                 o.transform.localScale = new Vector3(size, size * flat, size); o.name = "Oak leaves";
             }
-            foreach (var tip in tips) Clump(tip.at, tip.size, T() < .5f ? mid : light);
-            for (int i = 0; i < 12; i++) { float a = (i + T() * .5f) * Mathf.PI / 6, r = 4.5f + T() * 1; Clump(new Vector3(Mathf.Cos(a) * r, 4.9f + T() * .7f, Mathf.Sin(a) * r), 2.5f + T() * .6f, i % 6 == 1 ? gold : i % 2 == 0 ? deep : mid, .72f); }
-            for (int i = 0; i < 9; i++) { float a = (i + T() * .6f) * Mathf.PI * 2 / 9 + .3f, r = 3.1f + T(); Clump(new Vector3(Mathf.Cos(a) * r, 6.9f + T() * .8f, Mathf.Sin(a) * r), 3 + T() * .6f, i % 3 == 0 ? light : mid); }
-            for (int i = 0; i < 6; i++) { float a = (i + T() * .6f) * Mathf.PI / 3 + .6f, r = 1.4f + T() * 1.1f; Clump(new Vector3(Mathf.Cos(a) * r, 8.5f + T() * .7f, Mathf.Sin(a) * r), 3 + T() * .5f, i % 2 == 0 ? sunlit : light); }
-            Clump(new Vector3(.3f, 9.9f, -.2f), 3.4f, sunlit); Clump(new Vector3(-.8f, 9.4f, .9f), 3f, light);
+            foreach (var tip in tips) Clump(tip.at, tip.size * .7f, T() < .5f ? mid : light);
+            for (int i = 0; i < 5; i++) { float a = (i + (T() - .5f) * .3f) * Mathf.PI * 2 / 5 + .4f, r = 1.9f + T() * .9f; Clump(new Vector3(Mathf.Cos(a) * r, 7.1f + T() * .9f, Mathf.Sin(a) * r), 5.6f + T() * 1.6f, i % 2 == 0 ? mid : light, .5f + T() * .1f); }
+            Clump(new Vector3(.2f, 8.7f, -.2f), 6.4f, sunlit, .55f);
+            for (int i = 0; i < 12; i++) { float a = (i + T() * .5f) * Mathf.PI / 6, r = 4.7f + T(); Clump(new Vector3(Mathf.Cos(a) * r, 4.8f + T() * .6f, Mathf.Sin(a) * r), 2 + T() * .8f, i % 6 == 1 ? gold : i % 2 == 0 ? deep : mid, .62f); }
+            for (int i = 0; i < 8; i++) { float a = (i + T() * .6f) * Mathf.PI / 4 + .3f, r = 3.6f + T() * .9f; Clump(new Vector3(Mathf.Cos(a) * r, 6.2f + T() * .7f, Mathf.Sin(a) * r), 3 + T() * .8f, i % 3 == 0 ? light : mid, .65f); }
+            for (int i = 0; i < 5; i++) { float a = (i + T() * .6f) * Mathf.PI * 2 / 5 + .9f, r = .7f + T() * 1.6f; Clump(new Vector3(Mathf.Cos(a) * r, 9.9f + T() * .8f, Mathf.Sin(a) * r), 1.7f + T() * .8f, i % 2 == 0 ? sunlit : light); }
             for (int i = 0; i < 3; i++) { float a = i * 2.1f + T(); Clump(new Vector3(Mathf.Cos(a) * 1.5f, 6.3f + T() * .6f, Mathf.Sin(a) * 1.5f), 4 + T() * .4f, deep); }
             var cap = t.gameObject.AddComponent<CapsuleCollider>(); cap.center = new Vector3(0, 3.2f, 0); cap.height = 6.4f; cap.radius = 1.1f;
             t.gameObject.AddComponent<NavBlocker>(); t.gameObject.AddComponent<TreeFade>();
@@ -1310,14 +1385,14 @@ namespace Crulanda.World
             var tr = new System.Random(Zone.seed + 4133); float T() { return (float)tr.NextDouble(); }
             var stones = new[] { Tint(art.stone, new Color(.52f, .5f, .46f)), Tint(art.stone, new Color(.47f, .45f, .41f)), Tint(art.stone, new Color(.56f, .53f, .48f)) };
             var seat = Tint(art.stone, new Color(.6f, .58f, .53f));
-            const int Blocks = 22;
+            // Each block and its cap stone are ring segments with radial (mitred) ends, so the joints neither gap on the outside
+            // nor overlap within; the courses differ a little in height and shade, as laid stone does.
+            const int Blocks = 22; float step = 360f / Blocks;
             for (int i = 0; i < Blocks; i++)
             {
-                float a = (i + (T() - .5f) * .12f) * 360f / Blocks, len = 2 * Mathf.PI * radius / Blocks * (.93f + T() * .05f), high = .36f + T() * .06f;
-                var p = new Vector3(Mathf.Cos(a * Mathf.Deg2Rad) * radius, 0, Mathf.Sin(a * Mathf.Deg2Rad) * radius); p.y = LocalGround(ring, p.x, p.z);
-                var turn = Quaternion.Euler((T() - .5f) * 3, -(a + 90), (T() - .5f) * 3);   // its length along the ring
-                Part(PrimitiveType.Cube, ring, p + Vector3.up * (high / 2 - .08f), new Vector3(len, high, .5f), stones[(int)(T() * 3) % 3], turn);
-                Part(PrimitiveType.Cube, ring, p + Vector3.up * (high - .05f), new Vector3(len * .98f, .1f, .64f), seat, turn);   // a flat cap stone: the seat
+                float a0 = i * step, a = a0 + step / 2, high = .36f + T() * .06f, y = LocalGround(ring, Mathf.Cos(a * Mathf.Deg2Rad) * radius, Mathf.Sin(a * Mathf.Deg2Rad) * radius);
+                MeshPart(ZoneMeshes.Arc(radius - .25f, radius + .25f, a0 - .15f, a0 + step + .15f, high), ring, Vector3.up * (y - .08f), stones[(int)(T() * 3) % 3]).name = "Bench stone";
+                MeshPart(ZoneMeshes.Arc(radius - .32f, radius + .32f, a0 - .25f, a0 + step + .25f, .1f), ring, Vector3.up * (y + high - .1f), seat).name = "Bench seat";   // the flat cap stone
             }
             for (int i = 0; i < 10; i++)
             {
@@ -1597,23 +1672,54 @@ namespace Crulanda.World
             for (int i = 0; i < 6; i++) { float gx = R01 * 10 - 5, gz = -4 - R01 * 4; Part(PrimitiveType.Cube, t, new Vector3(gx, LocalGround(t, gx, gz) + .46f, gz), new Vector3(.55f, 1, .15f), stone, Quaternion.Euler(R01 * 10 - 5, R01 * 30 - 15, R01 * 10 - 5)); }
             if (variant == 1) Solid(t, new Vector3(0, 1.2f, 1.85f), new Vector3(6.8f, 2.4f, 8.7f)); else Solid(t, new Vector3(0, 1.8f, 1.2f), new Vector3(6.2f, 3.6f, 6.6f));
         }
+        /// <summary>
+        /// A crag: a broken escarpment of tall leaning stone blocks (on mountains each stands on the lower of the ground at its
+        /// front and back, so none hangs off a slope). With a lift (CliffLift raises a shelf behind it, on local +z, or -z when
+        /// the lift is negative) it is a scarp instead: a stepped rock face that is the slope. Its front course stands shoulder
+        /// to shoulder (wider than its 2.2 m step and turned only a little, so no gap opens), each block sunk into the lowest
+        /// ground along its foot and rising to the shelf's ground just behind it and a little over; a second, lower course sits
+        /// sunk into the shelf's lip behind, so from below the face is rock from foot to crest and no smooth ground shows
+        /// between or above the blocks. The zone's seven draws per block are taken as before; the lip course has its own stream.
+        /// </summary>
         void Cliff(Transform t, float length, float lift = 0)
         {
-            // A broken escarpment of tall leaning stone blocks, taller where the ground is raised behind it (CliffLift). On
-            // mountains each block stands on the lower of the ground at its front and back, so none hangs off a slope.
             var stone = Tint(art.stone, Zone.biome == "ash" ? new Color(.37f, .365f, .37f) : Zone.biome == "mountain" ? new Color(.35f, .335f, .31f) : new Color(.4f, .38f, .35f));   // ash: grey, not sandstone; mountain: darker, so a sunlit crag stays under the fog
-            bool seat = Zone.biome == "mountain";
+            bool seat = Zone.biome == "mountain"; float side = Mathf.Sign(lift), rise = Mathf.Abs(lift), low = 0;
+            float Y(float x, float z) { var w = t.TransformPoint(new Vector3(x, 0, z)); return HeightAt(w.x, w.z) - t.position.y; }
             for (float x = -length / 2; x < length / 2; x += 2.2f)
             {
-                float h = 4 + R01 * 4 + lift * .5f, z = R01 * 1.5f, y = 0; var size = new Vector3(2.6f + R01, h, 3 + R01 * 2);
-                if (seat)
+                float r0 = R01, r1 = R01, r2 = R01, r3 = R01, ra = R01, rb = R01, rc = R01;   // the seven draws every block always took
+                if (rise > 0)
                 {
-                    Vector3 front = t.TransformPoint(new Vector3(x, 0, z - size.z / 2)), back = t.TransformPoint(new Vector3(x, 0, z + size.z / 2));
-                    y = Mathf.Min(HeightAt(front.x, front.z), HeightAt(back.x, back.z)) - t.position.y;
+                    // Scarp: 3.2-3.8 m wide on the 2.2 m step (always overlapping), 3.5-5 m deep across the ground's 3 m rise, from
+                    // .6 m under the lowest ground along its foot up to the shelf a metre behind it plus .3-1.1 m of parapet, leaning
+                    // back into the shelf a degree or three.
+                    float w = 3.2f + r2 * .6f, d = 3.5f + r3 * 1.5f, z = side * (.4f + r1 * .8f), zf = z - side * d / 2;
+                    float foot = Mathf.Min(Y(x, zf), Mathf.Min(Y(x - w / 2, zf), Y(x + w / 2, zf))) - .6f, top = Y(x, z + side * (d / 2 + 1)) + .3f + r0 * .8f, h = Mathf.Max(3, top - foot);
+                    Part(PrimitiveType.Cube, t, new Vector3(x, foot + h / 2, z), new Vector3(w, h, d), stone, Quaternion.Euler(side * (1 + ra * 2.5f), rb * 8 - 4, rc * 4 - 2));
+                    low = Mathf.Min(low, foot); continue;
                 }
-                Part(PrimitiveType.Cube, t, new Vector3(x, y + h / 2 - .5f, z), size, stone, Quaternion.Euler(R01 * 10 - 5, R01 * 30 - 15, R01 * 8 - 4));
+                float hh = 4 + r0 * 4, zz = r1 * 1.5f, y = 0; var size = new Vector3(2.6f + r2, hh, 3 + r3 * 2);
+                if (seat) y = Mathf.Min(Y(x, zz - size.z / 2), Y(x, zz + size.z / 2));
+                Part(PrimitiveType.Cube, t, new Vector3(x, y + hh / 2 - .5f, zz), size, stone, Quaternion.Euler(ra * 10 - 5, rb * 30 - 15, rc * 8 - 4));
+                low = Mathf.Min(low, y - .5f);
             }
-            Solid(t, new Vector3(0, (6 + lift) / 2, .8f), new Vector3(length + 2, 6 + lift, 4.5f));
+            if (rise > 0)
+            {
+                // The lip course: lower blocks a step behind and half a step along, sunk a metre into the shelf's edge and standing
+                // 1.2-2.4 m proud of it, overlapping the front course's backs. Solid too, so nothing on the shelf walks into it.
+                var own = new System.Random(Zone.seed ^ (Mathf.RoundToInt(t.position.x * 8) * 73856093) ^ (Mathf.RoundToInt(t.position.z * 8) * 19349663)); float O() { return (float)own.NextDouble(); }
+                float zb = side * 4.2f, shelf = Y(0, zb);
+                for (float x = -length / 2 + 1.1f; x < length / 2; x += 2.4f)
+                {
+                    float w = 2.8f + O() * .8f, d = 2.6f + O() * .8f, z = zb + side * (O() - .5f) * .6f, h = 2.2f + O() * 1.2f, g = Mathf.Min(Y(x, z), Y(x, z - side * d / 2));
+                    Part(PrimitiveType.Cube, t, new Vector3(x, g - 1 + h / 2, z), new Vector3(w, h, d), stone, Quaternion.Euler(O() * 6 - 3, O() * 10 - 5, O() * 6 - 3));
+                }
+                Solid(t, new Vector3(0, shelf + 1.5f, zb), new Vector3(length + 1, 6, 3.2f));
+            }
+            // The face's collider: over the blocks' full depth (a scarp's course sits on the shelf's side), and down to the lowest
+            // seated block, so nothing walks into a block's foot below the root.
+            Solid(t, new Vector3(0, (low + 6 + rise) / 2, rise > 0 ? side * .8f : .8f), new Vector3(length + 2, 6 + rise - low, rise > 0 ? 5.8f : 4.5f));
         }
         /// <summary>Trunks already standing (hand-placed trees, orchards, groves, the forest edge): scattered trees keep clear of them.</summary>
         readonly List<Vector2> trunks = new List<Vector2>();
@@ -2150,16 +2256,26 @@ namespace Crulanda.World
         /// </summary>
         void Wallow(Transform t, float radius)
         {
-            var pool = Tint(art.water, new Color(.21f, .16f, .11f)); var mud = Tint(art.soil, new Color(.22f, .17f, .12f)); var stone = Tint(art.stone, new Color(.42f, .4f, .37f));
+            // The pools are wet mud: dark, smooth and a little glossy (a plain Standard material, no grain), so they catch the
+            // sky as a sheen instead of reading as a flat grey shape.
+            var pool = new Material(art.metal) { name = "Wallow pool", color = new Color(.15f, .115f, .08f) }; pool.SetFloat("_Metallic", 0); pool.SetFloat("_Glossiness", .8f);
+            var mud = Tint(art.soil, new Color(.22f, .17f, .12f)); var wet = Tint(art.soil, new Color(.16f, .12f, .085f)); var stone = Tint(art.stone, new Color(.42f, .4f, .37f));
             for (int i = 0; i < 6; i++)
             {
                 float a = i * 60 + R01 * 40, r = i == 0 ? R01 : radius * (.3f + R01 * .35f), s = i == 0 ? radius * .95f : radius * (.3f + R01 * .25f);
-                Part(PrimitiveType.Cylinder, t, Quaternion.Euler(0, a, 0) * new Vector3(0, .03f + i * .004f, r), new Vector3(s, .01f, s * (.55f + R01 * .35f)), pool, Quaternion.Euler(0, R01 * 180, 0));
+                Part(PrimitiveType.Cylinder, t, Quaternion.Euler(0, a, 0) * new Vector3(0, .03f + i * .004f, r), new Vector3(s, .03f, s * (.55f + R01 * .35f)), pool, Quaternion.Euler(0, R01 * 180, 0));
+            }
+            // A raised rim of churned mud round the pools: sixteen flattened lumps, each longer than its step so they run
+            // together, sunk a little and wetter on some; then the old lower banks pushed out beyond the rim.
+            for (int i = 0; i < 16; i++)
+            {
+                float a = i * 22.5f + (R01 - .5f) * 8, r = radius * (.84f + R01 * .1f), len = radius * (.5f + R01 * .2f);
+                Part(PrimitiveType.Sphere, t, Quaternion.Euler(0, a, 0) * new Vector3(0, .08f + R01 * .1f, r), new Vector3(1.6f + R01 * .8f, .6f + R01 * .35f, len), i % 3 == 0 ? wet : mud, Quaternion.Euler(0, a + 90 + (R01 - .5f) * 12, 0));
             }
             for (int i = 0; i < 10; i++)
             {
                 float a = i * 36 + R01 * 20;
-                Part(PrimitiveType.Sphere, t, Quaternion.Euler(0, a, 0) * new Vector3(0, 0, radius * (.8f + R01 * .25f)), new Vector3(1.4f + R01, .45f + R01 * .2f, 2.2f + R01 * 1.5f), mud, Quaternion.Euler(0, a + 90, 0));
+                Part(PrimitiveType.Sphere, t, Quaternion.Euler(0, a, 0) * new Vector3(0, -.05f, radius * (1.02f + R01 * .25f)), new Vector3(1.4f + R01, .4f + R01 * .2f, 2.2f + R01 * 1.5f), mud, Quaternion.Euler(0, a + 90, 0));
             }
             foreach (var at in new[] { new Vector3(radius * .55f, 0, radius * .35f), new Vector3(-radius * .45f, 0, -radius * .5f) })
             {
@@ -2559,10 +2675,10 @@ namespace Crulanda.World
             }
             // The skirt: four sides (each culled alone and clear of the village's point lights), in the ground's own paint.
             float[] rings = { 0, 1.5f, 4, 8, 13, 19, 26, 34, 43, 53, 64, 76, BackdropWidth };
-            var paint = GroundMesh.GetComponent<MeshRenderer>().sharedMaterial;
+            var paint = GroundMesh.GetComponent<MeshRenderer>().sharedMaterial; var skirtV = new Vector3[4][];
             for (int side = 0; side < 4; side++)
             {
-                var skirt = ZoneMeshes.Backdrop(Zone.size, GroundSegments, side, rings, H);
+                var skirt = ZoneMeshes.Backdrop(Zone.size, GroundSegments, side, rings, H); skirtV[side] = skirt.vertices;
                 // Past the Wasting the mirrored paint would bring meadow, roads and cracks back out of the grey: past the edge, spread
                 // the unmade strip's own paint (Wasting line to edge) across the skirt instead. Linear, so it interpolates exactly.
                 float start = Zone.wasting != null ? Zone.wasting.x + 2 : Half;
@@ -2584,15 +2700,20 @@ namespace Crulanda.World
             var pineMat = Tint(art.pine, Wither(new Color(.16f, .23f, .16f))); var deadMat = Tint(art.bark, Gloom ? new Color(.55f, .54f, .53f) : new Color(.26f, .24f, .22f));   // gloom: the grey wood carries on
             var rockMat = Tint(art.stone, ash ? new Color(.36f, .355f, .36f) : mountain ? MountainStone : new Color(.40f, .39f, .38f));
             var parts = new Dictionary<(Material, int), List<CombineInstance>>();
-            // The skirt as drawn: its rings are the edge row scaled out from the centre, so between two rings (5-14 m apart out
-            // here) its surface runs straight from one ring's height to the next. On a ridged crest that chord lies metres under
-            // the height function, and a silhouette set on the function stood on air (the pines above the Peaks' exit).
+            // The skirt as drawn: the height of its own triangles under a point. Its rings are the edge row scaled out from the
+            // centre, so a point's column is where its ray from the centre crosses the edge row, and between two rings (5-14 m
+            // apart out here) the surface runs straight from one ring's vertices to the next. On a ridged crest that chord lies
+            // metres under the height function, and a silhouette set on the function stood on air (the pines above the Peaks'
+            // exit); a crest between two columns sits under it too, so the vertices are read, not the function.
             float Drawn(float x, float z)
             {
-                float cheb = Mathf.Max(Mathf.Abs(x), Mathf.Abs(z)), o = cheb - Half; if (o <= 0) return H(x, z);
+                float ax = Mathf.Abs(x), az = Mathf.Abs(z), cheb = Mathf.Max(ax, az), o = cheb - Half; if (o <= 0) return MeshY(x, z);
+                int side = az >= ax ? (z < 0 ? 0 : 2) : (x > 0 ? 1 : 3), seg = GroundSegments, cols = seg + 1;
+                float kf = ((side == 0 || side == 2 ? x : z) * Half / cheb + Half) / Zone.size * seg; if (side >= 2) kf = seg - kf;   // the north and west rows run the other way
                 int r = 0; while (r + 2 < rings.Length && rings[r + 1] < o) r++;
-                float f0 = (Half + rings[r]) / cheb, f1 = (Half + rings[r + 1]) / cheb;
-                return Mathf.Lerp(H(x * f0, z * f0), H(x * f1, z * f1), Mathf.Clamp01((o - rings[r]) / (rings[r + 1] - rings[r])));
+                int k = Mathf.Clamp((int)kf, 0, seg - 1); float u = Mathf.Clamp01(kf - k), s = Mathf.Clamp01((o - rings[r]) / (rings[r + 1] - rings[r]));
+                var v = skirtV[side]; int a = r * cols + k, d = a + cols; float ha = v[a].y, hb = v[a + 1].y, hc = v[d + 1].y, hd = v[d].y;
+                return u >= s ? ha + (hb - ha) * u + (hc - hb) * s : ha + (hd - ha) * s + (hc - hd) * u;   // the quad's two triangles, split from a to d+1
             }
             void Put(int side, Mesh mesh, Material mat, Vector3 at, Quaternion rot, Vector3 scale)
             {
@@ -2612,11 +2733,17 @@ namespace Crulanda.World
                         var q = side == 0 ? new Vector2(a, -o) : side == 1 ? new Vector2(o, a) : side == 2 ? new Vector2(-a, o) : new Vector2(-o, -a);
                         if ((Zone.wasting != null && q.x > Zone.wasting.x - 6) || (keep > 0 && valleys.Exists(v => DistanceToPath(q, v) < keep))) continue;
                         var at = new Vector3(q.x, H(q.x, q.y) - 1, q.y); float yaw = R() * 360, th = 7 + R() * 5, pick = R() * (dead + pines + leafy);
-                        // Set on the lowest drawn ground round it (1.2 m out); no tree where that ground is near-vertical (a rise of
-                        // over 2.2 m across it). The draws are taken either way, so the rest stand where they did.
-                        float lo = Drawn(q.x, q.y), hi = lo;
-                        for (int k = 0; k < 6; k++) { float y = Drawn(q.x + Mathf.Cos(k * 1.047f) * 1.2f, q.y + Mathf.Sin(k * 1.047f) * 1.2f); lo = Mathf.Min(lo, y); hi = Mathf.Max(hi, y); }
-                        bool bare = !rock && hi - lo > 2.2f; at.y = lo - (rock ? 0 : .5f);
+                        // Set on the lowest drawn ground round it (1.2 m out, and at the trunk's own radius); no tree where that
+                        // ground is near-vertical (a rise of over 2.2 m across it, or a 2 m step within 2.5 m: a crest or ledge). The
+                        // trunk sinks half a metre, and further the steeper the ground, so the cone's base never shows.
+                        // The draws are taken either way, so the rest stand where they did.
+                        float lo = Drawn(q.x, q.y), hi = lo, far = 0;
+                        for (int k = 0; k < 12; k++)
+                        {
+                            float ca = Mathf.Cos(k * .5236f), sa = Mathf.Sin(k * .5236f), y = Drawn(q.x + ca * (k % 2 == 0 ? 1.2f : .5f), q.y + sa * (k % 2 == 0 ? 1.2f : .5f));
+                            lo = Mathf.Min(lo, y); hi = Mathf.Max(hi, y); if (k % 2 == 0) far = Mathf.Max(far, Mathf.Abs(Drawn(q.x + ca * 2.5f, q.y + sa * 2.5f) - y));
+                        }
+                        bool bare = !rock && (hi - lo > 2.2f || far > 2); at.y = lo - (rock ? 0 : .5f + (hi - lo) * .3f);
                         if (rock)
                         {
                             // A tor: tall and narrow, sunk deep enough that its downhill side never hangs over the slope.

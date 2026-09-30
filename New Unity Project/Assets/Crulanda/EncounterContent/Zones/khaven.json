@@ -631,8 +631,8 @@
       "kind": "ruined_house",
       "name": "Fallen Smithy",
       "at": {
-        "x": 10,
-        "y": 19
+        "x": 12.5,
+        "y": 19.5
       },
       "rotation": 28,
       "size": {

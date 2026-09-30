@@ -23,6 +23,8 @@ games are style references only: no copied names, assets, zones or creatures fro
 - **Living world:** villagers with trades and daily routines, hen-wives and coops, critters with legs, a day/night
   cycle with lamps, falling leaves and ash, wind-swayed grass, respawning camps, ambushes from tall grass, breadcrumb
   quests that lead from zone to zone, a quest book, factions and standing.
+- **A walk-in cave:** Crowsfoot Hollow at the end of Oakhaven's North road, with Sandthrone deserters, Caddock the
+  Bandit King in a tin crown, and the level-3 quest "The Tin Crown" (WORLD_ZONES.md "Caves you walk into").
 - **Weather:** per-zone schedules of rain, storms, mist, flurries and ash squalls; a painted cloud layer with cloud
   shadows; wind gusts through grass and leaf crowns; wet ground and rain rings (WORLD_ZONES.md "Weather").
 - **Water:** stylized turquoise (Chris's chosen look): a sandy bed showing through pale shallows, foam at shores and
@@ -54,7 +56,7 @@ reference only:
   cache, a Discoveries tab in the quest book). The overall order: **tree crowns, weather, the cave, secrets in every
   zone, then grow the zones** to about 340-380 m once there is content to fill them, then the painted style pass.
 - **Seamless caves:** a rock-shell cave built into a hillside with no loading screen, darkening as you walk in. The
-  first is the **Sandthrone deserters' cave** in Oakhaven's north hills: a level-3 quest to clear the bandits and their
+  first, **Crowsfoot Hollow**, is built (2026-09-30), the **Sandthrone deserters' cave** in Oakhaven's north hills: a level-3 quest to clear the bandits and their
   game-only Bandit King so they stop harassing the villagers. (Sandthrone is a canon mercenary company; the Bandit King
   is ours, and no canon Sandthrone name is used for him.)
 - **Camps for grinding** stay in every zone; breadcrumb quests carry the player from zone to zone.

@@ -9,11 +9,11 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-09-30, afternoon)
+## RESUME HERE (updated 2026-09-30, evening)
 **The standing direction is in `GAME_BRIEF.md` (read it first): a high-fidelity, beautiful MMO-style world, AAA quality in a classic style, judged on details, graphics, lighting, mood and visual feel.**
 Chris's rules: work in order of importance; finish each step; keep going without waiting (memory: crulanda-autonomy); tell him at each publish.
 
-**State: everything below is PUBLISHED** to `outputs/Crulanda-Playable` and committed on `main` (backed up to J:). Tests: EditMode 174/174, PlayMode 56/56, 0 shader errors.
+**State: everything below is PUBLISHED** to `outputs/Crulanda-Playable` and committed on `main` (backed up to J:). Tests: EditMode 174/174, PlayMode 65/65, 0 shader errors.
 - Published so far:
   - steps 1-4 of the visual review;
   - the turquoise water;
@@ -21,7 +21,14 @@ Chris's rules: work in order of importance; finish each step; keep going without
   - the cliff rework;
   - the temp-save travel fix;
   - the tree crowns (painted leaf cards);
-  - and now **WEATHER** (commit 58d06b1, published 2026-09-30 afternoon).
+  - **WEATHER** (commit 58d06b1, published 2026-09-30 afternoon);
+  - and now **CROWSFOOT HOLLOW** (commit 87dd05b, published 2026-09-30 evening).
+- **Crowsfoot Hollow** covers:
+  - Oakhaven's walk-in cave at the end of the North road, a seamless rock passage and knoll;
+  - the Sandthrone deserters and Caddock, the Bandit King (elite, tin crown);
+  - the level-3 quest "The Tin Crown" from Wil Carder;
+  - quest `minLevel`, line-of-sight aggro, and "harder" camps.
+  - Design: `WORLD_ZONES.md` "Caves you walk into"; `QUEST_DESIGN.md` section 7; the CHANGELOG.
 - **Weather** covers:
   - per-zone seeded schedules (7-minute spells, one severity step at a time);
   - a painted cloud layer and cloud shadows;
@@ -35,7 +42,8 @@ Chris's rules: work in order of importance; finish each step; keep going without
   - the store title, "The Quiet Trail" (the productName) or "The Land of Crulanda" as the novels and bullet-hell use;
   - that *The First Spoke* is out.
 
-**NEXT JOB: THE CAVE** (item 3 and 0c below): a seamless rock-shell cave in Oakhaven's north hills, Sandthrone deserters and a game-only Bandit King, and a level-3 quest. Then secrets, zone size, and the painted style pass.
+**NEXT JOB: SECRETS** (item 0c below): hidden discoveries in every zone, not on any map. Each gives a "Discovered" toast, XP and most a cache; there is a Discoveries tab in the quest book; the save goes to format 7 with a `discoveries` list (BACK UP Chris's save first); props get a `secret` flag the maps skip; tests.
+Then zone size, and the painted style pass. More walk-in caves (a crypt under Khaven, a mine in the Peaks, a sunken ruin on the Rim) can reuse the `cavern` prop: a new plan in `ZoneBuilder.CavernPlan(variant)`.
 Weather polish for later (not blocking):
 - rain and thunder audio (there is no audio yet);
 - puddles;

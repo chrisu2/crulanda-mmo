@@ -1201,9 +1201,14 @@ namespace Crulanda.World
             if (Zone.camps != null) foreach (var c in Zone.camps) if (c != null && c.ambush) list.Add((c.center, c.radius + 4));
             return list;
         }
-        Mesh[] canopies, boulders;
+        Mesh[] canopies, boulders, crags;
         Mesh Canopy() { if (canopies == null) { canopies = new Mesh[6]; for (int i = 0; i < 6; i++) canopies[i] = ZoneMeshes.Blob(Zone.seed + i * 17, .55f, false); } return canopies[(int)(R01 * 6) % 6]; }
-        Mesh Boulder() { if (boulders == null) { boulders = new Mesh[6]; for (int i = 0; i < 6; i++) boulders[i] = ZoneMeshes.Blob(Zone.seed + 400 + i * 23, 1.1f, true, 8, 12); } return boulders[(int)(R01 * 6) % 6]; }
+        /// <summary>A boulder blob picked with one zone draw (the draw is taken before the cache fills, as it always was).</summary>
+        Mesh Boulder() { return BoulderAt((int)(R01 * 6)); }
+        /// <summary>A boulder blob by index, no zone draw: for a prop that picks with its own stream.</summary>
+        Mesh BoulderAt(int i) { if (boulders == null) { boulders = new Mesh[6]; for (int k = 0; k < 6; k++) boulders[k] = ZoneMeshes.Blob(Zone.seed + 400 + k * 23, 1.1f, true, 8, 12); } return boulders[((i % 6) + 6) % 6]; }
+        /// <summary>A crag's rock lump by index, no zone draw: a faceted blob, lumpier than a boulder, its stone tiled about 2 m on a 5 x 9 m lump.</summary>
+        Mesh CragRock(int i) { if (crags == null) { crags = new Mesh[6]; for (int k = 0; k < 6; k++) crags[k] = ZoneMeshes.Blob(Zone.seed + 700 + k * 31, 1.25f, true, 9, 14, 6, 4, true); } return crags[((i % 6) + 6) % 6]; }
         GameObject Lump(Mesh mesh, Transform parent, Vector3 at, Vector3 scale, Material m, float yaw)
         {
             var o = MeshPart(mesh, parent, at, m, Quaternion.Euler(0, yaw, 0)); o.transform.localScale = scale; return o;
@@ -1673,53 +1678,129 @@ namespace Crulanda.World
             if (variant == 1) Solid(t, new Vector3(0, 1.2f, 1.85f), new Vector3(6.8f, 2.4f, 8.7f)); else Solid(t, new Vector3(0, 1.8f, 1.2f), new Vector3(6.2f, 3.6f, 6.6f));
         }
         /// <summary>
-        /// A crag: a broken escarpment of tall leaning stone blocks (on mountains each stands on the lower of the ground at its
-        /// front and back, so none hangs off a slope). With a lift (CliffLift raises a shelf behind it, on local +z, or -z when
-        /// the lift is negative) it is a scarp instead: a stepped rock face that is the slope. Its front course stands shoulder
-        /// to shoulder (wider than its 2.2 m step and turned only a little, so no gap opens), each block sunk into the lowest
-        /// ground along its foot and rising to the shelf's ground just behind it and a little over; a second, lower course sits
-        /// sunk into the shelf's lip behind, so from below the face is rock from foot to crest and no smooth ground shows
-        /// between or above the blocks. The zone's seven draws per block are taken as before; the lip course has its own stream.
+        /// A crag: a broken escarpment of lumpy rock. Each 2.2 m step of it is a stack of overlapping faceted lumps (CragRock, the
+        /// stone tiled on them at about 2 m): a wide base bulging a little forward, an upper mass set back and leaning, and on
+        /// two steps in three a crest knob, some standing well over the crest; so the face is stepped and knobbly and its crest
+        /// ragged, with no flat top anywhere. On mountains each step stands on the lower of the ground at its front and back, so
+        /// none hangs off a slope. With a lift (CliffLift raises a shelf behind it, on local +z, or -z when the lift is negative)
+        /// it is a scarp instead: a stepped rock face that is the slope, each step sunk .6 m under the lowest ground along its
+        /// foot and rising to the shelf's ground a metre behind it and a little over, its lumps leaning back into the shelf; a
+        /// second, lower course of lumps sits sunk into the shelf's lip behind, so from below the face is rock from foot to crest
+        /// and no smooth ground shows between or above the lumps. Fallen blocks and scree lie along the foot (Scree). The zone's
+        /// seven draws per step are taken as before and set the step's envelope, so its lowest foot and the colliders are exactly
+        /// what they were; every other choice comes from the prop's own stream, keyed on its position.
         /// </summary>
         void Cliff(Transform t, float length, float lift = 0)
         {
             var stone = Tint(art.stone, Zone.biome == "ash" ? new Color(.37f, .365f, .37f) : Zone.biome == "mountain" ? new Color(.35f, .335f, .31f) : new Color(.4f, .38f, .35f));   // ash: grey, not sandstone; mountain: darker, so a sunlit crag stays under the fog
             bool seat = Zone.biome == "mountain"; float side = Mathf.Sign(lift), rise = Mathf.Abs(lift), low = 0;
             float Y(float x, float z) { var w = t.TransformPoint(new Vector3(x, 0, z)); return HeightAt(w.x, w.z) - t.position.y; }
+            var own = new System.Random(Zone.seed ^ (Mathf.RoundToInt(t.position.x * 8) * 73856093) ^ (Mathf.RoundToInt(t.position.z * 8) * 19349663)); float O() { return (float)own.NextDouble(); }
+            // A lump: a crag blob (the prop's stream picks which) with its flat base at bottom, scaled (sx, sy, sz), tipped lean
+            // degrees about x (positive tips its top to +z), rolled about z, turned yaw.
+            void Rock(float x, float bottom, float z, float sx, float sy, float sz, float lean, float roll, float yaw)
+            {
+                MeshPart(CragRock((int)(O() * 6)), t, new Vector3(x, bottom + .2f * sy, z), stone, Quaternion.Euler(lean, yaw, roll)).transform.localScale = new Vector3(sx, sy, sz);
+            }
+            var fronts = new List<Vector2>();   // each step's (x, front plane z), for the scree
+            // One step of the face: the lumps that fill an envelope w wide, d deep and h tall from its front plane zf and its foot.
+            // f is which way is back (into a scarp's shelf, +z on a free crag); a scarp's lumps lean that way, a free crag's
+            // either way. The zone's lean draws (ra, rb, rc) tip the upper mass, as they tipped the old slab.
+            void Step(float x, float zf, float foot, float h, float w, float d, float f, bool scarp, float ra, float rb, float rc)
+            {
+                fronts.Add(new Vector2(x, zf));
+                // The base: wide and low (half the height), bulging .3 m in front of the step's front plane, sunk .3 m under the foot.
+                float hA = Mathf.Max(2.5f, h * (.5f + O() * .15f)), szA = d * .85f + O() * .5f;
+                Rock(x + (O() - .5f) * .8f, foot - .3f, zf + f * (szA / 2 - .3f), w + 1.8f + O() * .8f, hA, szA, scarp ? f * (1 + O() * 3) : (O() - .5f) * 8, (O() - .5f) * 4, (O() - .5f) * 30);
+                // The upper mass: set back (.8-1.6 m on a scarp, .3-.8 on a free crag), its top .95-1.15 of the way from the foot to
+                // the crest, so the crest is ragged; tall enough (.65-.85 of the height) that its base sits well down in the base lump.
+                float hB = Mathf.Max(2.5f, h * (.65f + O() * .2f)), szB = d * .75f + O() * .4f, topB = foot + h * (.95f + O() * .2f), zB = zf + f * ((scarp ? .8f + O() * .8f : .3f + O() * .5f) + szB / 2);
+                Rock(x + (O() - .5f) * 1.4f, topB - hB, zB, w + 1.2f + O() * .8f, hB, szB, scarp ? f * (2 + ra * 5) : ra * 14 - 7, rc * 6 - 3, scarp ? rb * 16 - 8 : rb * 30 - 15);
+                // A crest knob on two steps in three, part sunk into the upper mass's top, some standing a couple of metres over it.
+                if (O() < .65f) { float hC = 1.6f + O() * 2.2f; Rock(x + (O() - .5f) * 2.2f, topB - hC * (.35f + O() * .4f), zB + f * (O() - .5f) * 1.2f, 1.8f + O() * 1.6f, hC, 1.6f + O() * 1.2f, (O() - .5f) * 16, (O() - .5f) * 16, O() * 360); }
+            }
             for (float x = -length / 2; x < length / 2; x += 2.2f)
             {
-                float r0 = R01, r1 = R01, r2 = R01, r3 = R01, ra = R01, rb = R01, rc = R01;   // the seven draws every block always took
+                float r0 = R01, r1 = R01, r2 = R01, r3 = R01, ra = R01, rb = R01, rc = R01;   // the seven draws every step always took
                 if (rise > 0)
                 {
-                    // Scarp: 3.2-3.8 m wide on the 2.2 m step (always overlapping), 3.5-5 m deep across the ground's 3 m rise, from
-                    // .6 m under the lowest ground along its foot up to the shelf a metre behind it plus .3-1.1 m of parapet, leaning
-                    // back into the shelf a degree or three.
+                    // Scarp step: 3.2-3.8 m wide on the 2.2 m step (always overlapping), 3.5-5 m deep across the ground's 3 m rise,
+                    // from .6 m under the lowest ground along its foot up to the shelf a metre behind it plus .3-1.1 m of parapet.
                     float w = 3.2f + r2 * .6f, d = 3.5f + r3 * 1.5f, z = side * (.4f + r1 * .8f), zf = z - side * d / 2;
                     float foot = Mathf.Min(Y(x, zf), Mathf.Min(Y(x - w / 2, zf), Y(x + w / 2, zf))) - .6f, top = Y(x, z + side * (d / 2 + 1)) + .3f + r0 * .8f, h = Mathf.Max(3, top - foot);
-                    Part(PrimitiveType.Cube, t, new Vector3(x, foot + h / 2, z), new Vector3(w, h, d), stone, Quaternion.Euler(side * (1 + ra * 2.5f), rb * 8 - 4, rc * 4 - 2));
+                    Step(x, zf, foot, h, w, d, side, true, ra, rb, rc);
                     low = Mathf.Min(low, foot); continue;
                 }
+                // A free crag's step: 2.6-3.6 m wide, 4-8 m tall, 3-5 m deep, its foot half a metre under the ground it stands on.
                 float hh = 4 + r0 * 4, zz = r1 * 1.5f, y = 0; var size = new Vector3(2.6f + r2, hh, 3 + r3 * 2);
                 if (seat) y = Mathf.Min(Y(x, zz - size.z / 2), Y(x, zz + size.z / 2));
-                Part(PrimitiveType.Cube, t, new Vector3(x, y + hh / 2 - .5f, zz), size, stone, Quaternion.Euler(ra * 10 - 5, rb * 30 - 15, rc * 8 - 4));
+                Step(x, zz - size.z / 2, y - .5f, hh, size.x, size.z, 1, false, ra, rb, rc);
                 low = Mathf.Min(low, y - .5f);
             }
             if (rise > 0)
             {
-                // The lip course: lower blocks a step behind and half a step along, sunk a metre into the shelf's edge and standing
-                // 1.2-2.4 m proud of it, overlapping the front course's backs. Solid too, so nothing on the shelf walks into it.
-                var own = new System.Random(Zone.seed ^ (Mathf.RoundToInt(t.position.x * 8) * 73856093) ^ (Mathf.RoundToInt(t.position.z * 8) * 19349663)); float O() { return (float)own.NextDouble(); }
+                // The lip course: lower lumps a step behind and half a step along, sunk a metre into the shelf's edge and standing
+                // 1.6-3 m proud of it, overlapping the front course's backs, half of them with a small knob. Solid too, so nothing
+                // on the shelf walks into it.
                 float zb = side * 4.2f, shelf = Y(0, zb);
                 for (float x = -length / 2 + 1.1f; x < length / 2; x += 2.4f)
                 {
-                    float w = 2.8f + O() * .8f, d = 2.6f + O() * .8f, z = zb + side * (O() - .5f) * .6f, h = 2.2f + O() * 1.2f, g = Mathf.Min(Y(x, z), Y(x, z - side * d / 2));
-                    Part(PrimitiveType.Cube, t, new Vector3(x, g - 1 + h / 2, z), new Vector3(w, h, d), stone, Quaternion.Euler(O() * 6 - 3, O() * 10 - 5, O() * 6 - 3));
+                    float w = 3.4f + O() * 1.2f, d = 2.8f + O(), z = zb + side * (O() - .5f) * .6f, h = 2.6f + O() * 1.4f, g = Mathf.Min(Y(x, z), Y(x, z - side * d / 2));
+                    Rock(x, g - 1, z, w, h, d, side * O() * 4, (O() - .5f) * 6, (O() - .5f) * 50);
+                    if (O() < .5f) { float k = 1.2f + O() * 1.2f; Rock(x + (O() - .5f) * 1.6f, g - 1 + h * .55f, z + side * (O() - .5f), 1.6f + O(), k, 1.4f + O() * .8f, (O() - .5f) * 14, (O() - .5f) * 14, O() * 360); }
                 }
                 Solid(t, new Vector3(0, shelf + 1.5f, zb), new Vector3(length + 1, 6, 3.2f));
             }
-            // The face's collider: over the blocks' full depth (a scarp's course sits on the shelf's side), and down to the lowest
-            // seated block, so nothing walks into a block's foot below the root.
+            // The face's collider: over the lumps' full depth (a scarp's course sits on the shelf's side), and down to the lowest
+            // seated step, so nothing walks into a lump's foot below the root.
             Solid(t, new Vector3(0, (low + 6 + rise) / 2, rise > 0 ? side * .8f : .8f), new Vector3(length + 2, 6 + rise - low, rise > 0 ? 5.8f : 4.5f));
+            Scree(t, fronts, rise > 0 ? side : 1, rise > 0 ? 1 : .5f, stone, O);
+        }
+        /// <summary>
+        /// Fallen rock along a crag's foot, in the crag root's frame: the steps' front planes are <paramref name="fronts"/> (x, z)
+        /// and the low side is -<paramref name="f"/>. A block broken off the face every 6-12 m (1.2-2 m, faceted like the face,
+        /// its back in the face's foot) and scree out to 4 m (.35-1.3 m boulder lumps, most within a metre of the foot and the far
+        /// ones small), every lump sunk a quarter to a half into the lower of the height function and the drawn ground, and
+        /// none where loose rock may not lie (RockMayLie). No colliders, so the navmesh is as it was. Draws only from the crag's
+        /// own stream <paramref name="O"/>; <paramref name="density"/> thins a free crag's fall to half a scarp's.
+        /// </summary>
+        void Scree(Transform t, List<Vector2> fronts, float f, float density, Material stone, Func<float> O)
+        {
+            if (fronts.Count == 0) return;
+            float Front(float x) { var best = fronts[0]; foreach (var q in fronts) if (Mathf.Abs(q.x - x) < Mathf.Abs(best.x - x)) best = q; return best.y; }
+            float G(float x, float z) { var w = t.TransformPoint(new Vector3(x, 0, z)); return Mathf.Min(HeightAt(w.x, w.z), MeshY(w.x, w.z)) - t.position.y; }
+            bool May(float x, float z) { var w = t.TransformPoint(new Vector3(x, 0, z)); return RockMayLie(new Vector2(w.x, w.z)); }
+            float x0 = fronts[0].x - 1, x1 = fronts[fronts.Count - 1].x + 1;
+            for (float x = x0 + O() * 4; x < x1; x += 6 + O() * 6)
+            {
+                if (O() > density) continue;
+                float s = 1.2f + O() * .8f, z = Front(x) - f * (.4f + s * .25f), sy = s * .8f; if (!May(x, z)) continue;
+                MeshPart(CragRock((int)(O() * 6)), t, new Vector3(x, G(x, z) - s * .4f + .2f * sy, z), stone, Quaternion.Euler((O() - .5f) * 30, O() * 360, (O() - .5f) * 30)).transform.localScale = new Vector3(s * (1 + O() * .4f), sy, s * (.9f + O() * .4f));
+            }
+            for (float x = x0; x < x1; x += 1.1f)
+            {
+                if (O() > density * .75f) continue;
+                float r = O(), o = .3f + r * r * 4.2f, s = .35f + O() * (o > 2 ? .5f : .95f), xx = x + (O() - .5f), z = Front(xx) - f * o, sy = s * .9f; if (!May(xx, z)) continue;
+                Lump(BoulderAt((int)(O() * 6)), t, new Vector3(xx, G(xx, z) - s * (.25f + O() * .3f) + .18f * sy, z), new Vector3(s * (1.1f + O() * .6f), sy, s * (1 + O() * .5f)), stone, O() * 360);
+            }
+        }
+        /// <summary>Whether loose rock may lie at a zone point: off the roads and out of the water, and clear of camps, clearings,
+        /// exits, arrivals from other zones, the spawns and the other props (not crags, loose rocks, trees, graves or walls).
+        /// Draws nothing random.</summary>
+        bool RockMayLie(Vector2 p)
+        {
+            if (NearRoad(p, 2) || Water.NearWater(p, 1.5f)) return false;
+            if (Zone.camps != null) foreach (var c in Zone.camps) if (c != null && Vector2.Distance(p, c.center) < c.radius + 1) return false;
+            foreach (var c in Zone.clearings) if (c != null && Vector2.Distance(p, c.center) < c.radius + 1) return false;
+            foreach (var e in Zone.exits) if (e != null && Vector2.Distance(p, e.at) < e.radius + 2) return false;
+            foreach (var z in AllZones()) foreach (var e in z.exits) if (e != null && e.to == Zone.id && Vector2.Distance(p, e.arrive) < 5) return false;
+            if (Vector2.Distance(p, Zone.spawns.player) < 4 || Vector2.Distance(p, Zone.spawns.companion) < 3 || Vector2.Distance(p, Zone.spawns.recovery) < 3) return false;
+            foreach (var q in Zone.props)
+            {
+                if (q == null || q.kind == "cliff" || q.kind == "rock" || q.kind == "tree" || q.kind == "pine" || q.kind == "grave" || q.kind == "wall") continue;
+                if (Vector2.Distance(p, q.at) < Mathf.Max(q.size.x, q.size.y) / 2 + 1.5f) return false;
+            }
+            return true;
         }
         /// <summary>Trunks already standing (hand-placed trees, orchards, groves, the forest edge): scattered trees keep clear of them.</summary>
         readonly List<Vector2> trunks = new List<Vector2>();

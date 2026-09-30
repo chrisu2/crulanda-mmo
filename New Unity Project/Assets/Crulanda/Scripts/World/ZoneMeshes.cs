@@ -82,9 +82,12 @@ namespace Crulanda.World
         }
         /// <summary>
         /// A lumpy unit sphere (radius about 0.5) displaced by layered noise: tree canopies and bushes (low roughness),
-        /// rocks and boulders (high roughness, flattened underside). The seed picks the shape.
+        /// rocks and boulders (high roughness, flattened underside). The seed picks the shape. UVs wrap once round and once up
+        /// unless <paramref name="uvAround"/> and <paramref name="uvUp"/> repeat them (a big rock lump keeps its stone texture at
+        /// a steady size that way). <paramref name="faceted"/> gives every triangle its own vertices, so it shades flat: broken
+        /// rock rather than clay.
         /// </summary>
-        public static Mesh Blob(int seed, float roughness, bool flatBottom, int rings = 9, int segments = 14)
+        public static Mesh Blob(int seed, float roughness, bool flatBottom, int rings = 9, int segments = 14, float uvAround = 1, float uvUp = 1, bool faceted = false)
         {
             var v = new List<Vector3>(); var t = new List<int>(); var uv = new List<Vector2>();
             float ox = seed * 3.17f, oy = seed * 7.41f;
@@ -101,15 +104,23 @@ namespace Crulanda.World
                     float radius = .5f * (1 + (n - .5f) * roughness);
                     var p = dir * radius;
                     if (flatBottom && p.y < -.18f) p.y = -.18f + (p.y + .18f) * .15f;
-                    v.Add(p); uv.Add(new Vector2((float)s / segments, (float)r / rings));
+                    v.Add(p); uv.Add(new Vector2((float)s / segments * uvAround, (float)r / rings * uvUp));
                 }
             }
+            // The bottom and top rings are each one point, so the triangles that have two corners on them are dropped.
             for (int r = 0; r < rings; r++)
                 for (int s = 0; s < segments; s++)
                 {
                     int a = r * (segments + 1) + s, b = a + segments + 1;
-                    t.AddRange(new[] { a, b, a + 1, a + 1, b, b + 1 });
+                    if (r > 0) t.AddRange(new[] { a, b, a + 1 });
+                    if (r < rings - 1) t.AddRange(new[] { a + 1, b, b + 1 });
                 }
+            if (faceted)
+            {
+                var fv = new List<Vector3>(t.Count); var fuv = new List<Vector2>(t.Count); var ft = new List<int>(t.Count);
+                for (int i = 0; i < t.Count; i++) { fv.Add(v[t[i]]); fuv.Add(uv[t[i]]); ft.Add(i); }
+                v = fv; uv = fuv; t = ft;
+            }
             var m = Build("Blob", v, t); m.SetUVs(0, uv); return m;
         }
         /// <summary>

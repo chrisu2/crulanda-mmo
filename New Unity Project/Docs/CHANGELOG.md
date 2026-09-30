@@ -329,5 +329,12 @@ Chris shared a reference of a stylized fantasy cove and chose this look for Oakh
 - **Khaven's Fallen Smithy** ruin moved off the Cracked Hearth's sight line and out of the house's doorway.
 - **Backdrop trees** stand on the drawn skirt mesh (exact triangle interpolation), skip ledges and crests, and sink into slopes. The Peaks exit no longer shows floating pines.
 - **Rockhide Wallow** has a wet, sheened pool with a raised mud rim. The **Great Oak's** bench ring is mitred arc segments, and its crown is layered: big squashed masses over the limbs, a middle ring, a low skirt and small tops.
-- **Umbra Scarp** became a stepped course of blocks. This REGRESSED: it reads as a wall of smooth grey slabs, and is redone in the next round.
+- **Umbra Scarp** became a stepped course of blocks. This REGRESSED: it read as a wall of smooth grey slabs. Redone the same night (below).
 - Tests: EditMode 166/166, PlayMode 51/51, 0 shader errors.
+
+
+## 2026-09-30 — Cliffs as rock, not slabs
+- Every cliff step (lifted scarps and free crags, in the Peaks and Khaven) is now a stack of overlapping faceted rock lumps: a wide base, an upper mass leaning into the shelf, and a crest knob on most steps, so the crest is ragged and nothing has a flat top.
+- The stone texture tiles at about 2 m across each lump (blob meshes gained UV repeat and flat-shaded faceting).
+- Fallen blocks and scree at the foot, sunk into the ground, kept off roads, water, camps, exits, arrivals, spawns and other props. No colliders, so the navmesh is unchanged; the player can brush into foot rubble.
+- The lip course on the shelf edge is lumps too. All colliders and the zone's random draws are unchanged.

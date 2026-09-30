@@ -34,6 +34,8 @@ namespace Crulanda.World
         /// storm). Empty: the biome's default. Spells of weather follow each other one step of severity at a time (WorldWeather).
         /// </summary>
         public ZoneWeather[] weather = new ZoneWeather[0];
+        /// <summary>Hidden finds (ZoneSecret): on no map; found by walking onto a lookout or searching a hidden spot.</summary>
+        public ZoneSecret[] secrets = new ZoneSecret[0];
         public ZoneLife life;
         /// <summary>Level band shown on maps and exits (e.g. 1-2); camps spawn inside it.</summary>
         public int levelMin = 1, levelMax = 2;
@@ -94,6 +96,23 @@ namespace Crulanda.World
     }
     /// <summary>Walk into the radius and press E to travel; you arrive at <see cref="arrive"/> in the other zone.</summary>
     [Serializable] public sealed class ZoneExit { public string to, name; public Vector2 at, arrive; public float radius = 5; }
+    /// <summary>
+    /// A hidden find: on no map, rewarded when found (a "Discovered" toast, XP, and most hold a cache). Its id is unique across
+    /// zones ("secret.&lt;zone&gt;.&lt;slug&gt;") and is what the save keeps. kind is what stands there (ZoneBuilder builds it):
+    /// - vista: a lookout, found by walking within radius (a cairn or nothing at all);
+    /// - cache: a hidden box or bundle; note: a page or scrap tucked away; herb: a rare plant; chest: a locked chest;
+    ///   key: a key hidden somewhere else, for a chest that names it in needs. These are found by searching (E, prompt).
+    /// Rewards: xp, gold, an item id, a document id (a readable page, as quests give). height lifts the prop off the ground
+    /// (something tucked up under a bridge or in a tree); rotation turns it. canonStatus as everywhere.
+    /// </summary>
+    [Serializable] public sealed class ZoneSecret
+    {
+        public string id, name, kind = "cache", prompt, text, item, document, needs, canonStatus;
+        public Vector2 at; public float radius = 2.5f, rotation, height;
+        public int xp, gold;
+    }
+    /// <summary>A secret as built in the world (ZoneBuilder.Secrets): its data, where it stands, and its visible parts.</summary>
+    public sealed class ZoneSecretSpot { public ZoneSecret def; public Vector3 position; public Transform root; }
     /// <summary>One kind of weather a zone can have and how often (a weight, relative to the zone's other kinds).</summary>
     [Serializable] public sealed class ZoneWeather { public string kind; public float weight = 1; }
     /// <summary>An area filled with trees. kind: dead (grey, leafless, darkened ground), pine, broadleaf.</summary>

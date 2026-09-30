@@ -2395,6 +2395,8 @@ namespace Crulanda.World
         }
         /// <summary>Props usable with E (quest wagons, crates, herb patches). Registered from ZoneProp.interact.</summary>
         public readonly List<ZoneInteractable> Interactables = new List<ZoneInteractable>();
+        /// <summary>The zone's secrets as built (on no map; the encounter's discovery system finds and rewards them).</summary>
+        public readonly List<ZoneSecretSpot> Secrets = new List<ZoneSecretSpot>();
         /// <summary>
         /// The Investigation Bureau's black-iron wagon (CANON, book1 ch.4): a barred cage on a heavy bed, its door hanging
         /// open, child-sized manacles on a chain inside. Front faces -Z.

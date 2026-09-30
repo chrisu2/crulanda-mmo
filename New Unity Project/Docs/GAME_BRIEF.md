@@ -41,15 +41,15 @@ reference only:
 - **Trees are judged hardest.** Chris has called them out twice. Trunks are fixed; crowns must be leaf cards, not
   blobs and cones (the patch is prepared in `tools\pending-patches\step3b-tree-crowns.json`).
 - **Weather and atmosphere are part of the bar:** fog and haze that give depth, sun shafts, bloom, a moonlit night
-  that stays readable, particles (leaves, ash, splashes, motes). Weather systems (rain, wind gusts, cloud shadow) are
-  still to do.
+  that stays readable, particles (leaves, ash, splashes, motes). **Weather** (rain, wind gusts, cloud shadow, per-biome
+  flurries, ash squalls and mist) is the next job after the tree crowns (Chris, 2026-09-30).
 
 ## The world direction (decided 2026-09-29)
 
 - **Zones need to be bigger, with more places and secrets to explore.** Today nothing is hidden: every interactable is
   a map-marked quest pickup. Decided: exploration is rewarded with **discoveries + loot** (a "Discovered" toast, XP, a
-  cache, a Discoveries tab in the quest book), in this order: the **cave** first, then **secrets** in every zone, then
-  **grow the zones** to about 340-380 m once there is content to fill them.
+  cache, a Discoveries tab in the quest book). The overall order: **tree crowns, weather, the cave, secrets in every
+  zone, then grow the zones** to about 340-380 m once there is content to fill them, then the painted style pass.
 - **Seamless caves:** a rock-shell cave built into a hillside with no loading screen, darkening as you walk in. The
   first is the **Sandthrone deserters' cave** in Oakhaven's north hills: a level-3 quest to clear the bandits and their
   game-only Bandit King so they stop harassing the villagers. (Sandthrone is a canon mercenary company; the Bandit King

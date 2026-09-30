@@ -229,6 +229,55 @@ namespace Crulanda.World
             var m = new Mesh { name = "Backdrop skirt" }; m.vertices = v; m.normals = n; m.uv = uv; m.triangles = t; m.RecalculateBounds();
             return m;
         }
+        /// <summary>
+        /// Painted leaf cards collected into one mesh (a crown's clusters, a pine's boughs; Crulanda/Leaf). Each card is a quad
+        /// standing on its near edge at <c>at</c>, reaching <c>length</c> along <c>along</c> and <c>width</c> across <c>across</c>;
+        /// its UV v runs from 0 at that edge (where the leaf texture's twig sits, on the bough) to 1 at the far edge. Its normals
+        /// are not the card's face but the crown's: away from <c>heart</c> (a point inside the crown), turned up by <c>lift</c>
+        /// (0..1), so every card shades like the outside of one round crown whichever way it faces, and its back face shades like
+        /// its front (the leaf shader draws both faces and culls nothing, so the winding doesn't matter). The vertex colour tints
+        /// the card (rgb: a lighter or darker cluster; <c>footTint</c>, when given, is the near edge's, so a bough can darken in at
+        /// the trunk) and carries how much the wind moves it (alpha: 0 at the near edge, 1 at the far).
+        /// </summary>
+        public sealed class Cards
+        {
+            readonly List<Vector3> v = new List<Vector3>(); readonly List<Vector3> n = new List<Vector3>(); readonly List<Vector2> uv = new List<Vector2>();
+            readonly List<Color> c = new List<Color>(); readonly List<int> t = new List<int>();
+            public int Count { get { return v.Count / 4; } }
+            public void Add(Vector3 at, Vector3 along, Vector3 across, float length, float width, Vector3 heart, float lift, Color tint, float swayNear = 0, float swayFar = 1, Color? footTint = null)
+            {
+                var w = across.normalized * (width / 2); var l = along.normalized * length; int s = v.Count;
+                foreach (var p in new[] { at - w, at + w, at + w + l, at - w + l })
+                {
+                    var away = p - heart; var normal = away.sqrMagnitude < 1e-4f ? Vector3.up : Vector3.Slerp(away.normalized, Vector3.up, lift);
+                    v.Add(p); n.Add(normal.normalized);
+                }
+                uv.Add(new Vector2(0, 0)); uv.Add(new Vector2(1, 0)); uv.Add(new Vector2(1, 1)); uv.Add(new Vector2(0, 1));
+                var near = footTint ?? tint; near.a = swayNear; var far = tint; far.a = swayFar;
+                c.Add(near); c.Add(near); c.Add(far); c.Add(far);
+                t.AddRange(new[] { s, s + 2, s + 1, s, s + 3, s + 2 });
+            }
+            /// <summary>
+            /// A leaf cluster: two cards crossed on one axis, the second turned a right angle about <c>along</c>, a little smaller and a
+            /// shade deeper; with <paramref name="cards"/> 3, a third between them in roll and tilted 24 degrees off the shared axis, so
+            /// no view (down the axis, or edge-on to the pair) meets only lines, and the cluster has a body from below as well.
+            /// </summary>
+            public void AddCross(Vector3 at, Vector3 along, Vector3 across, float length, float width, Vector3 heart, float lift, Color tint, int cards = 2)
+            {
+                Add(at, along, across, length, width, heart, lift, tint);
+                Add(at, along, Vector3.Cross(along, across), length * .92f, width * .85f, heart, lift, tint * new Color(.93f, .93f, .93f, 1));
+                if (cards < 3) return;
+                var tilted = Quaternion.AngleAxis(24, across.normalized) * along.normalized;
+                Add(at, tilted, Quaternion.AngleAxis(45, tilted) * across, length * .88f, width * .9f, heart, lift, tint * new Color(.9f, .92f, .88f, 1));
+            }
+            public Mesh Build(string name)
+            {
+                var m = new Mesh { name = name };
+                if (v.Count > 65000) m.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;   // a backdrop side's every card in one mesh
+                m.SetVertices(v); m.SetNormals(n); m.SetUVs(0, uv); m.SetColors(c); m.SetTriangles(t, 0); m.RecalculateBounds();
+                return m;
+            }
+        }
         static void Quad(List<Vector3> v, List<int> t, Vector3 a, Vector3 b, Vector3 c, Vector3 d)
         { int s = v.Count; v.Add(a); v.Add(b); v.Add(c); v.Add(d); t.AddRange(new[] { s, s + 1, s + 2, s, s + 2, s + 3 }); }
         static void Tri(List<Vector3> v, List<int> t, Vector3 a, Vector3 b, Vector3 c)

@@ -35,5 +35,9 @@ namespace Crulanda.World
         public Material post;
         [Tooltip("Crulanda/Fade: what a tree turns into while it blocks the camera's view of the player (TreeFade).")]
         public Material fade;
+        [Tooltip("Crulanda/Leaf painted leaf-cluster cards for broadleaf and orchard crowns: fresh green, yellow-green, autumn (ZoneBuilder maps its Leaf palette onto these and tints per tree).")]
+        public Material[] leafCards = new Material[0];
+        [Tooltip("Crulanda/Leaf painted pine-bough card (needle fronds) for pine tiers.")]
+        public Material pineBough;
     }
 }

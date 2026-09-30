@@ -123,6 +123,11 @@ namespace Crulanda.World
                 if (solidMat.HasProperty("_MainTex")) f.mainTexture = solidMat.mainTexture;
                 if (solidMat.HasProperty("_Color")) f.color = solidMat.color;
                 if (solidMat.HasProperty("_Glossiness")) f.SetFloat("_Glossiness", solidMat.GetFloat("_Glossiness"));
+                // Painted leaf cards (Crulanda/Leaf): their cutout, both faces, wind and painted shade carry over (the fade shader
+                // reads the same properties), so a faded crown keeps its ragged shape and keeps swaying. Solid parts stay as they were.
+                if (solidMat.shader != null && solidMat.shader.name == "Crulanda/Leaf")
+                    foreach (var p in new[] { "_Cutoff", "_Cull", "_Wither", "_VertexTint", "_Wind", "_WindSpeed" })
+                        if (solidMat.HasProperty(p) && f.HasProperty(p)) f.SetFloat(p, solidMat.GetFloat(p));
                 fadeCopies[solidMat] = f;
             }
             return f;

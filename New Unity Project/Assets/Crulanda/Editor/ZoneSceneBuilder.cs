@@ -219,6 +219,18 @@ namespace Crulanda.EditorTools
             if (art.splash == null) { art.splash = new Material(Shader.Find("Legacy Shaders/Particles/Alpha Blended")) { mainTexture = mote, name = "Splash" }; AssetDatabase.CreateAsset(art.splash, ArtRoot + "/Splash.mat"); }
             if (art.post == null) { art.post = new Material(Shader.Find("Hidden/Crulanda/Post")) { name = "Post" }; AssetDatabase.CreateAsset(art.post, ArtRoot + "/Post.mat"); }
             if (art.fade == null) { art.fade = new Material(Shader.Find("Crulanda/Fade")) { name = "Tree fade" }; AssetDatabase.CreateAsset(art.fade, ArtRoot + "/Tree fade.mat"); }
+            // ---------- painted leaf cards: the crowns of broadleaf, orchard and pine trees (ZoneBuilder.LeafCrown, Pine) ----------
+            // Saturated painted colour lives in the textures (dark, mid, light of each leaf); ZoneBuilder's tints stay near white.
+            var leafGreen = LeafClusterTex("leaf_cluster_green", 11, new Color(.14f, .29f, .13f), new Color(.36f, .57f, .20f), new Color(.72f, .82f, .32f));
+            var leafYellow = LeafClusterTex("leaf_cluster_yellow", 23, new Color(.26f, .33f, .10f), new Color(.60f, .62f, .16f), new Color(.92f, .84f, .34f));
+            var leafAutumn = LeafClusterTex("leaf_cluster_autumn", 37, new Color(.42f, .14f, .06f), new Color(.82f, .38f, .10f), new Color(.98f, .72f, .24f));
+            // The bough is pine_bough_full, a fuller feather than the first pine_bough (Tex writes a PNG once, so a repaint takes a new
+            // name); a Pine bough material made earlier is pointed at it.
+            var pineBough = PineBoughTex("pine_bough_full", new Color(.09f, .19f, .13f), new Color(.24f, .42f, .22f), new Color(.52f, .62f, .28f));
+            if (art.leafCards == null || art.leafCards.Length == 0)
+                art.leafCards = new[] { LeafCard("Leaf green", leafGreen, .07f), LeafCard("Leaf yellow", leafYellow, .07f), LeafCard("Leaf autumn", leafAutumn, .08f) };
+            if (art.pineBough == null) art.pineBough = LeafCard("Pine bough", pineBough, .04f);
+            else if (art.pineBough.mainTexture != pineBough) { art.pineBough.mainTexture = pineBough; EditorUtility.SetDirty(art.pineBough); }
             // Grass and flowers sway in the wind (same textures and tints; the wind shader keeps instancing).
             var grassShader = Shader.Find("Crulanda/Grass");
             if (grassShader != null)
@@ -258,6 +270,80 @@ namespace Crulanda.EditorTools
                 importer.textureType = TextureImporterType.NormalMap; importer.wrapMode = TextureWrapMode.Repeat; importer.SaveAndReimport();
             }
             return AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+        }
+        /// <summary>A painted leaf-card material: Crulanda/Leaf (alpha cut, both faces, wind sway keyed to world position), or a one-sided
+        /// Standard cutout when that shader is missing. White tint: the paint carries the colour; ZoneBuilder tints per tree.</summary>
+        static Material LeafCard(string name, Texture2D tex, float wind)
+        {
+            var shader = Shader.Find("Crulanda/Leaf");
+            if (shader == null) { Debug.LogWarning("Crulanda/Leaf shader missing: " + name + " is a one-sided Standard cutout."); return Cutout(name, Color.white, tex); }
+            var m = new Material(shader) { name = name, color = Color.white, mainTexture = tex };
+            m.SetFloat("_Cutoff", .45f); m.SetFloat("_Wind", wind); m.SetFloat("_Glossiness", .05f);
+            AssetDatabase.CreateAsset(m, ArtRoot + "/" + name + ".mat"); return m;
+        }
+        /// <summary>
+        /// A painted cluster of lobed leaves on a twig (alpha cut, tip up): the twig runs up from the bottom edge (v = 0, where the
+        /// card meets its bough) and ten to twelve leaves fan up and out from it, overlapping, the low ones reaching sideways and the
+        /// top ones up. The outer and upper leaves are lighter, the inner lower ones darker; each has a lighter half, a darker base, a
+        /// dark painted rim and a midrib; the gaps between them are clear, so sky shows through a crown and its edge is ragged leaf.
+        /// Colours run dark (shade) through mid to light (sunlit): the paint carries the hue shift, the tint doesn't have to.
+        /// </summary>
+        static Texture2D LeafClusterTex(string name, int seed, Color dark, Color mid, Color light)
+        {
+            var r = new System.Random(seed); float R() { return (float)r.NextDouble(); }
+            var leaves = new System.Collections.Generic.List<(Vector2 at, float angle, float len, float wide, int lobes, float shade, float side)>();
+            int n = 10 + (int)(R() * 3);
+            for (int k = 0; k < n; k++)
+            {
+                float u = (float)k / (n - 1), side = k % 2 == 0 ? -1 : 1;   // up the twig; which side the leaf leaves it on
+                float angle = u > .82f ? (R() - .5f) * 30 : side * (28 + R() * 42) * (1 - u * .35f);   // degrees from straight up
+                leaves.Add((new Vector2(64 + (R() - .5f) * 8 + side * u * 4, 10 + u * 44), angle, 34 + R() * 16 - u * 4, .46f + R() * .14f, R() < .5f ? 3 : 4, .3f + u * .45f + R() * .25f, R() < .5f ? -1 : 1));
+            }
+            leaves.Sort((a, b) => a.shade.CompareTo(b.shade));   // painter's order: the deeper (darker) leaves first, the lighter ones over them
+            Color Ramp(float s) { s = Mathf.Clamp01(s); return s < .5f ? Color.Lerp(dark, mid, s * 2) : Color.Lerp(mid, light, (s - .5f) * 2); }
+            return Tex(name, 128, (x, y) => {
+                var p = new Vector2(x + .5f, y + .5f); Color c = mid; float a = 0;   // clear pixels keep the mid colour: no dark halo once mipped
+                if (y < 60 && Mathf.Abs(x - 63.5f) < 1.6f - y * .012f) { c = new Color(.24f, .17f, .10f); a = 1; }   // the twig, under everything
+                foreach (var leaf in leaves)
+                {
+                    float rad = leaf.angle * Mathf.Deg2Rad; var dir = new Vector2(Mathf.Sin(rad), Mathf.Cos(rad)); var across = new Vector2(dir.y, -dir.x);
+                    var d = p - leaf.at; float u = Vector2.Dot(d, dir) / leaf.len, v = Vector2.Dot(d, across) / leaf.len;
+                    if (u <= 0 || u >= 1) continue;
+                    // A lobed leaf: widest below its middle, pointed at both ends, scalloped along its edge.
+                    float half = leaf.wide * .5f * Mathf.Pow(Mathf.Sin(u * Mathf.PI), .55f) * (1 - u * .25f) * (.76f + .24f * Mathf.Abs(Mathf.Cos(u * Mathf.PI * leaf.lobes)));
+                    float edge = half - Mathf.Abs(v); if (edge <= 0) continue;
+                    float shade = leaf.shade + (v * leaf.side > 0 ? .1f : -.04f) - (1 - u) * .12f + (Perlin(x, y, .3f) - .5f) * .14f;
+                    if (edge < 1.4f / leaf.len) shade -= .28f;                                    // the painted rim
+                    if (Mathf.Abs(v) < .9f / leaf.len && u > .08f && u < .92f) shade -= .12f;    // the midrib
+                    c = Ramp(shade); a = 1;
+                }
+                return new Color(c.r, c.g, c.b, a);
+            }, true);
+        }
+        /// <summary>
+        /// A painted pine bough (alpha cut): a twig up the middle from the trunk end (v = 0) to the tip, with a solid body of needles
+        /// either side, painted as needles lying out and forward at a slant, darker in at the twig and lighter out at the edge, and a
+        /// comb of needle tips standing past the body, so the edge is ragged. A full feather: the body is opaque and takes most of
+        /// the card's width from close to the trunk end (two thirds of it a third of the way out), narrowing only toward the tip, so
+        /// the boughs carry a tier's mass and overlap; thin lines would mip away at a distance and leave a pine sparse.
+        /// </summary>
+        static Texture2D PineBoughTex(string name, Color dark, Color mid, Color light)
+        {
+            Color Ramp(float s) { s = Mathf.Clamp01(s); return s < .5f ? Color.Lerp(dark, mid, s * 2) : Color.Lerp(mid, light, (s - .5f) * 2); }
+            return Tex(name, 128, (x, y) => {
+                float u = (y - 4) / 118f, v = (x - 63.5f) / 128f;   // along the twig (0 at the trunk end, 1 at the tip); across, in texture widths
+                if (u <= 0 || u >= 1) return new Color(mid.r, mid.g, mid.b, 0);
+                float body = .40f * Mathf.Pow(Mathf.Sin(u * Mathf.PI), .35f) * (1 - u * .4f);            // near full width from close to the trunk end, pointed only at the tip
+                float slant = Mathf.Abs(v) * 128 * .9f - u * 118 * .55f;                                 // constant along a needle: they lie out and forward
+                float comb = .06f * (1 - u * .5f) * Mathf.Pow(Mathf.Abs(Mathf.Sin(slant * .55f)), 3);    // needle tips standing past the body
+                float edge = body + comb - Mathf.Abs(v);
+                if (edge <= 0) return new Color(mid.r, mid.g, mid.b, 0);
+                float across = Mathf.Abs(v) / Mathf.Max(.02f, body + comb), stripe = Mathf.Sin(slant * .55f) * .5f + .5f;
+                float shade = .2f + across * .5f + stripe * .22f + (Perlin(x, y, .2f) - .5f) * .12f;
+                if (edge < .012f) shade += .12f;                              // lit needle tips
+                if (Mathf.Abs(v) < .012f * (1 - u * .6f)) shade -= .2f;       // the twig's shadow line
+                var c = Ramp(shade); return new Color(c.r, c.g, c.b, 1);
+            }, true);
         }
         static Material Standard(string name, Color color, Texture2D tex, float smoothness, float metallic = 0)
         {

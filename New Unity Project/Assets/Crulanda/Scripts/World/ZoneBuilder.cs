@@ -1218,32 +1218,152 @@ namespace Crulanda.World
             LeafTrees.Add(t.position);
             float h = 3.5f + R01 * 1.5f;
             float yawA = R01 * 120, yawB = R01 * 120 + 180;   // the two main limbs' bearings, on roughly opposite sides (the zone's draws, as before)
-            var baseLeaf = Leaf[(Mathf.Abs(variant) + (int)(R01 * 2)) % Leaf.Length];
-            var leaf = Tint(art.foliage, Wither(baseLeaf)); var leafLight = Tint(art.foliage, Wither(Color.Lerp(baseLeaf, new Color(.75f, .7f, .35f), .22f)));
+            int family = (Mathf.Abs(variant) + (int)(R01 * 2)) % Leaf.Length;   // its leaf: fresh green, yellow-green, autumn or dull gold (the same draw as before)
             // A tapered, slightly bent and leaning trunk on a root flare, in its own shade of bark, running up into the crown's
-            // middle clump; limbs grow out of it into the side clumps. Its look comes from its own stream (TreeRandom).
+            // heart; limbs grow out of it toward the crown's side clusters. Its look comes from its own stream (TreeRandom).
             var tr = TreeRandom(t.position); float T() { return (float)tr.NextDouble(); }
             var bark = BarkShade(T()); float r0 = .24f + T() * .07f;
             var axis = Bole(t, tr, h + .7f, r0, bark); var lean = axis(h) - new Vector3(0, h, 0);   // the crown sits over the leaning top
-            int clumps = 5 + (int)(R01 * 3); var sides = new List<Vector3>();
+            // Where the crown's clumps stood (the zone's draws, exactly as before; no blob is built now): each becomes a cluster of
+            // painted leaf cards fanning out from that spot (LeafCrown). The first is the crown's top, the rest its sides.
+            int clumps = 5 + (int)(R01 * 3); var sides = new List<Vector3>(); var spots = new List<(Vector3 at, float size, bool light)>();
             for (int i = 0; i < clumps; i++)
             {
                 float a = i * 2.4f + R01, r = i == 0 ? 0 : 1 + R01 * .9f, s = (i == 0 ? 3.4f : 2.2f + R01 * 1.1f);
-                var blob = Canopy(); var at = new Vector3(Mathf.Cos(a) * r, h + .9f + (i == 0 ? .8f : R01 * 1.2f), Mathf.Sin(a) * r) + lean;
-                Lump(blob, t, at, new Vector3(s, s * .85f, s), i % 3 == 1 ? leafLight : leaf, R01 * 360);
+                _ = Canopy(); var at = new Vector3(Mathf.Cos(a) * r, h + .9f + (i == 0 ? .8f : R01 * 1.2f), Mathf.Sin(a) * r) + lean;
+                _ = R01;   // the blob's yaw
+                spots.Add((at, s, i % 3 == 1));
                 if (i > 0) sides.Add(at);
             }
-            // Two limbs (a third on some trees) from inside the trunk, bowing up and out to the side clump nearest their bearing.
+            // Two limbs (a third on some trees) from inside the trunk, bowing up and out to the side cluster nearest their bearing.
             var bearings = T() < .55f ? new[] { yawA, yawB, yawA + 70 + T() * 40 } : new[] { yawA, yawB };
+            var ends = new List<Vector3> { axis(h + .4f) };   // where the crown's boughs grow from: the trunk's top and each limb's end
             foreach (float yaw in bearings)
             {
                 var want = Quaternion.Euler(0, yaw, 0) * Vector3.right; var to = sides[0];
                 foreach (var c in sides) if (Vector3.Dot(new Vector3(c.x, 0, c.z).normalized, want) > Vector3.Dot(new Vector3(to.x, 0, to.z).normalized, want)) to = c;
-                var from = axis(h * (.56f + T() * .12f));
-                Limb(t, from, to - new Vector3(0, .3f, 0) + want * .15f, r0 * (.44f + T() * .1f), .06f, bark);
+                var from = axis(h * (.56f + T() * .12f)); var end = to - new Vector3(0, .3f, 0) + want * .15f;
+                Limb(t, from, end, r0 * (.44f + T() * .1f), .06f, bark);
+                ends.Add(end);
             }
+            // A full crown: three cards a cluster, ten to fourteen clusters, three or four lying under it, and a dark core about
+            // 60% of the crown's radius (the crown reaches about 3.4 m from its heart), so from below it is leaf mass, not sky.
+            LeafCrown(t, tr, lean + new Vector3(0, h + 1.5f, 0), spots, ends, LeafMaterial(family), bark, Tint(art.foliage, Wither(Color.Lerp(Leaf[family], Color.black, .45f))), 1.5f, new Vector3(4, 2.3f, 4), 3, 10, 14, 3, 4);
             var cap = t.gameObject.AddComponent<CapsuleCollider>(); cap.center = new Vector3(0, h / 2, 0); cap.height = h; cap.radius = .35f;
             t.gameObject.AddComponent<NavBlocker>(); t.gameObject.AddComponent<TreeFade>();
+        }
+        /// <summary>
+        /// A crown of painted leaf cards (Crulanda/Leaf) over a trunk. At every clump spot a cluster of crossed cards (two, or three
+        /// with <paramref name="cardsPer"/> 3) fans out from a short bough that grows in from the nearest limb end or the trunk's top;
+        /// a few small clusters hang low round the rim between them, so the underside is ragged leaf, not a shelf; and a dark squashed
+        /// core sits at the heart, so the crown is never hollow from below. A big crown asks for more: clusters spread round and
+        /// through it until it has <paramref name="crownMin"/> to <paramref name="crownMax"/>, and <paramref name="underMin"/> to
+        /// <paramref name="underMax"/> low clusters lying inward along its underside, so looking up meets leaf, not sky between
+        /// cut-outs (all off by default: the orchard's trees keep their counts). The cards' union covers about the volume the clumps
+        /// had (a fan is centred a little past its spot, reaching where the clump's rim was), so a tree's bounds, fade and collider
+        /// are as before. One mesh for the cards and one for the boughs. Draws only from <paramref name="tr"/>, the tree's own
+        /// stream, after its trunk and limbs, the extras' draws after the ones a plain crown takes: the zone's is untouched.
+        /// </summary>
+        void LeafCrown(Transform t, System.Random tr, Vector3 heart, List<(Vector3 at, float size, bool light)> spots, List<Vector3> ends, Material leaves, Material bark, Material core, float rim, Vector3 coreSize,
+            int cardsPer = 2, int crownMin = 0, int crownMax = 0, int underMin = 0, int underMax = 0)
+        {
+            float T() { return (float)tr.NextDouble(); }
+            var cards = new ZoneMeshes.Cards(); var boughs = new List<CombineInstance>();
+            Color Shade(int level, float u)   // a deep (cool), mid or light (warm) cluster, with a little variation: the vertex tint
+            {
+                var c = level == 0 ? new Color(.68f, .74f, .66f) : level == 1 ? new Color(.86f, .9f, .84f) : new Color(1, 1, .95f);
+                return c * (.94f + u * .12f);
+            }
+            void Cluster(Vector3 at, float size, Color shade, bool bough, bool under = false)
+            {
+                if (under)
+                {
+                    // Under the crown: the fan lies along the underside from out at the rim in toward the heart, near flat, so its
+                    // first card faces down, its second hangs and its third is tilted: looking up meets leaf.
+                    var inward = heart - at; inward.y = 0;
+                    var axis = (inward.normalized + Vector3.up * ((T() - .5f) * .3f)).normalized;
+                    var flat = Quaternion.AngleAxis((T() - .5f) * 40, axis) * Vector3.Cross(axis, Vector3.up).normalized;
+                    cards.AddCross(at, axis, flat, size * (.95f + T() * .2f), size * (.85f + T() * .25f), heart, .25f, shade, cardsPer);
+                    return;
+                }
+                // The fan's axis: out from the heart and lifted; one over the heart leans over instead of standing (a vertical cross
+                // is a line from above). Rolled at random about that axis, then its crossed cards.
+                var outward = at - heart; outward.y = 0;
+                var along = (outward.sqrMagnitude < .04f ? Quaternion.Euler(0, T() * 360, 0) * Vector3.right * .9f : outward.normalized * .8f) + Vector3.up * (.4f + T() * .4f);
+                along = (Quaternion.Euler((T() - .5f) * 30, 0, (T() - .5f) * 30) * along).normalized;
+                var across = Vector3.Cross(along, Vector3.up); if (across.sqrMagnitude < .01f) across = Vector3.right;
+                across = Quaternion.AngleAxis(T() * 180, along) * across.normalized;
+                float len = size * (.95f + T() * .2f), wide = size * (.85f + T() * .25f);
+                var foot = at - along * len * .42f;
+                cards.AddCross(foot, along, across, len, wide, heart, .25f, shade, cardsPer);
+                if (!bough) return;
+                // Its bough: from the nearest limb end or the trunk's top in to the foot of the fan; thin, bowed a little, closed at the tip.
+                var from = ends[0]; foreach (var e in ends) if ((e - foot).sqrMagnitude < (from - foot).sqrMagnitude) from = e;
+                var d = foot - from; float l = d.magnitude; if (l < .2f) return;
+                var side = Vector3.Cross(d / l, Vector3.up); if (side.sqrMagnitude < 1e-4f) side = Vector3.right;
+                Vector3 C(float s) { return from + d * s + Vector3.up * (Mathf.Sin(s * Mathf.PI) * l * .05f); }
+                float R(float s, float a) { return Mathf.Lerp(.055f, .022f, s) * Mathf.Clamp01((1.05f - s) / .1f); }
+                boughs.Add(new CombineInstance { mesh = ZoneMeshes.Tube(C, R, new[] { 0, .3f, .6f, .85f, 1.05f }, 5, side.normalized, 1, l * .5f), transform = Matrix4x4.identity });
+            }
+            foreach (var spot in spots) Cluster(spot.at, spot.size * .8f, Shade(spot.light ? 2 : 1, T()), true);
+            // Low fillers round the rim between the side clusters: small, deep in shade, on no bough (they hang among the others).
+            int fill = 2 + (int)(T() * 2);
+            for (int k = 0; k < fill; k++) { float a = T() * Mathf.PI * 2; Cluster(heart + new Vector3(Mathf.Cos(a) * rim, -.9f + T() * .5f, Mathf.Sin(a) * rim), rim * 1.2f + T() * .4f, Shade(0, T()), false); }
+            // A big crown's extra clusters: spread round and through it, on boughs of their own, until it has its count.
+            if (crownMax > 0)
+            {
+                int more = crownMin + (int)(T() * (crownMax - crownMin + 1)) - spots.Count;
+                for (int k = 0; k < more; k++)
+                {
+                    float a = T() * Mathf.PI * 2, r = rim * (.4f + T());
+                    Cluster(heart + new Vector3(Mathf.Cos(a) * r, -.5f + T() * 1.5f, Mathf.Sin(a) * r), rim * 1.2f + T() * .8f, Shade(k % 3 == 1 ? 2 : 1, T()), true);
+                }
+            }
+            // Under it: low clusters spaced round the underside, lying inward, deep in shade, on no bough.
+            if (underMax > 0)
+            {
+                int under = underMin + (int)(T() * (underMax - underMin + 1));
+                for (int k = 0; k < under; k++)
+                {
+                    float a = (k + T() * .7f) * Mathf.PI * 2 / under, r = rim * (.7f + T() * .6f);
+                    Cluster(heart + new Vector3(Mathf.Cos(a) * r, -1.2f + T() * .5f, Mathf.Sin(a) * r), rim * 1.1f + T() * .5f, Shade(0, T()), false, true);
+                }
+            }
+            MeshPart(cards.Build("Leaves"), t, Vector3.zero, leaves);
+            if (boughs.Count > 0)
+            {
+                var mesh = new Mesh { name = "Boughs" }; mesh.CombineMeshes(boughs.ToArray(), true, false); mesh.RecalculateBounds();
+                foreach (var piece in boughs) DestroyImmediate(piece.mesh);
+                MeshPart(mesh, t, Vector3.zero, bark);
+            }
+            // The core: a dark squashed clump at the heart, seen only through the gaps and from below.
+            var coreMesh = canopies != null ? canopies[(int)(T() * 6) % 6] : null;
+            if (coreMesh != null) Lump(coreMesh, t, heart - new Vector3(0, .3f, 0), coreSize, core, T() * 360);
+        }
+        /// <summary>The tint of each leaf family's painted cards (near white: the paint carries the colour), and which card each family takes
+        /// (fresh green, yellow-green, autumn; dull gold is the yellow card in a duller tint).</summary>
+        static readonly Color[] LeafTints = { new Color(1, 1, .94f), new Color(1, .97f, .84f), new Color(1, .92f, .86f), new Color(.9f, .86f, .7f) };
+        static readonly int[] LeafCardOf = { 0, 1, 2, 1 };
+        /// <summary>The painted leaf-card material for a leaf family (Leaf[]), greyed in gloom; the old flat foliage when the palette has no card art.</summary>
+        Material LeafMaterial(int family)
+        {
+            var cards = art.leafCards; family = Mathf.Abs(family) % Leaf.Length;
+            if (cards == null || cards.Length == 0) return Tint(art.foliage, Wither(Leaf[family]));
+            return LeafMaterial(cards[LeafCardOf[family] % cards.Length], LeafTints[family]);
+        }
+        /// <summary>A painted leaf-card material in a tint; in gloom the paint itself is greyed too (a tint alone can't drain a painted green).</summary>
+        Material LeafMaterial(Material card, Color tint)
+        {
+            var m = Tint(card, Wither(tint));
+            if (Gloom && m.HasProperty("_Wither")) m.SetFloat("_Wither", .7f);
+            return m;
+        }
+        /// <summary>A pine's painted bough material in one of four shades of the zone's draw (few materials, so pines batch); the old flat pine when the palette has no card art.</summary>
+        Material PineMaterial(float pick)
+        {
+            pick = Mathf.Round(Mathf.Clamp01(pick) * 3) / 3;
+            if (art.pineBough == null) return Tint(art.pine, Wither(Color.Lerp(new Color(.18f, .27f, .18f), new Color(.22f, .3f, .19f), pick)));
+            return LeafMaterial(art.pineBough, Color.Lerp(new Color(.86f, .94f, .86f), new Color(1, 1, .9f), pick));
         }
         /// <summary>A tree's own draws (bark shade, lean, flare, bends), seeded by where it stands, so the zone's stream and every
         /// layout drawn from it stay exactly as they were.</summary>
@@ -1378,6 +1498,29 @@ namespace Crulanda.World
             for (int i = 0; i < 8; i++) { float a = (i + T() * .6f) * Mathf.PI / 4 + .3f, r = 3.6f + T() * .9f; Clump(new Vector3(Mathf.Cos(a) * r, 6.2f + T() * .7f, Mathf.Sin(a) * r), 3 + T() * .8f, i % 3 == 0 ? light : mid, .65f); }
             for (int i = 0; i < 5; i++) { float a = (i + T() * .6f) * Mathf.PI * 2 / 5 + .9f, r = .7f + T() * 1.6f; Clump(new Vector3(Mathf.Cos(a) * r, 9.9f + T() * .8f, Mathf.Sin(a) * r), 1.7f + T() * .8f, i % 2 == 0 ? sunlit : light); }
             for (int i = 0; i < 3; i++) { float a = i * 2.1f + T(); Clump(new Vector3(Mathf.Cos(a) * 1.5f, 6.3f + T() * .6f, Mathf.Sin(a) * 1.5f), 4 + T() * .4f, deep); }
+            // A fringe of painted leaf cards (Crulanda/Leaf) round the skirt, the middle ring and the top, fanning out past the clumps,
+            // so the crown's edge against the sky and the ground is ragged leaf, not the clumps' smooth curves. Three meshes (skirt,
+            // rim, top), so the fade still tells the crown's levels apart. From the oak's stream, after every clump: nothing else moves.
+            if (art.leafCards != null && art.leafCards.Length > 0)
+            {
+                var crownHeart = new Vector3(0, 7.2f, 0); var fringeLeaf = LeafMaterial(0);
+                void Fringe(string name, int count, float step, float phase, float r0, float r1, float y0, float y1, float s0, float s1, float lift0, float lift1)
+                {
+                    var fringe = new ZoneMeshes.Cards();
+                    for (int i = 0; i < count; i++)
+                    {
+                        float a = (i + T() * .6f) * step + phase, r = Mathf.Lerp(r0, r1, T()), y = Mathf.Lerp(y0, y1, T()), size = Mathf.Lerp(s0, s1, T());
+                        var outward = new Vector3(Mathf.Cos(a), 0, Mathf.Sin(a)); var along = (outward + Vector3.up * Mathf.Lerp(lift0, lift1, T())).normalized;
+                        var across = Quaternion.AngleAxis(T() * 180, along) * Vector3.Cross(along, Vector3.up).normalized;
+                        var shade = i % 7 == 1 ? new Color(1, .95f, .72f) : i % 2 == 0 ? new Color(.8f, .84f, .74f) : new Color(.92f, .95f, .86f);   // a touch of gold, as on the clumps
+                        fringe.AddCross(outward * r + Vector3.up * y - along * size * .3f, along, across, size, size * .9f, crownHeart, .25f, shade);
+                    }
+                    MeshPart(fringe.Build(name), t, Vector3.zero, fringeLeaf);
+                }
+                Fringe("Oak leaf skirt", 14, Mathf.PI / 7, 0, 4.4f, 5.2f, 4.5f, 5.3f, 2.6f, 3.2f, -.2f, .2f);
+                Fringe("Oak leaf rim", 10, Mathf.PI / 5, .3f, 3.5f, 4.3f, 6.5f, 7.3f, 2.8f, 3.4f, .3f, .7f);
+                Fringe("Oak leaf top", 5, Mathf.PI * 2 / 5, .9f, 1, 2.4f, 9.4f, 10.2f, 2.3f, 2.8f, 1, 1.8f);
+            }
             var cap = t.gameObject.AddComponent<CapsuleCollider>(); cap.center = new Vector3(0, 3.2f, 0); cap.height = 6.4f; cap.radius = 1.1f;
             t.gameObject.AddComponent<NavBlocker>(); t.gameObject.AddComponent<TreeFade>();
             OakRing(t, 3.05f * t.localScale.x);
@@ -1418,17 +1561,59 @@ namespace Crulanda.World
         Mesh cone;
         void Pine(Transform t)
         {
-            if (cone == null) cone = ZoneMeshes.Cone(1, 1);
             float h = 6 + R01 * 4;
-            Part(PrimitiveType.Cylinder, t, new Vector3(0, 1, 0), new Vector3(.45f, 1, .45f), art.bark);
-            // Five tiers, each slightly tilted and turned, darker at the base where the light doesn't reach.
-            var top = Wither(Color.Lerp(new Color(.18f, .27f, .18f), new Color(.22f, .3f, .19f), R01));
-            for (int i = 0; i < 5; i++)
+            var tr = TreeRandom(t.position); float T() { return (float)tr.NextDouble(); }
+            // The trunk runs the whole height now, a pole tapering to the leader's tip on a small root swell (the boughs no longer
+            // hide a stub). A tube, so the bark grain runs up it: the shared cone mesh has no UVs and would read as one flat texel.
+            float top = 1.1f + h * .94f;
+            Vector3 Axis(float s) { return new Vector3(0, s, 0); }
+            float Radius(float s, float a) { return Mathf.Lerp(.24f, .04f, Mathf.Clamp01(s / top)) * (1 + .35f * Mathf.Exp(-Mathf.Max(0, s + .3f) / .45f)) * Mathf.Clamp01((top - s) / .3f); }
+            MeshPart(ZoneMeshes.Tube(Axis, Radius, new[] { -.3f, -.1f, .1f, .4f, top * .2f, top * .4f, top * .6f, top * .8f, top * .92f, top }, 8, Vector3.right, 2, .5f), t, Vector3.zero, art.bark).name = "Trunk";
+            // Five or six tiers of painted bough cards (no solid cones), six to eight boughs each fanning out from the trunk and
+            // drooping 20-35 degrees, every card 1.6 tier radii across, so the boughs overlap round a tier and the tiers overlap
+            // down the tree: no trunk shows between them, and the silhouette is a full triangle, widest at the foot. Each bough
+            // is crossed by a narrower hanging fin, so a tier has depth from the side. Darker in at the trunk on every bough and
+            // toward the tree's foot, in the shade the zone drew for this tree. The zone's draws are the ones the cones took
+            // (the shade, then five tiers' small offset, tilt and turn); a sixth tier, and every bough's own shape, come from the
+            // tree's own stream.
+            float pick = R01;
+            var cards = new ZoneMeshes.Cards();
+            int tiers = 5 + (T() < .5f ? 1 : 0);
+            for (int i = 0; i < tiers; i++)
             {
-                var mat = Tint(art.pine, Color.Lerp(top * .72f, top, i / 4f));
-                var part = MeshPart(cone, t, new Vector3(R01 * .2f - .1f, 1.1f + i * h * .15f, R01 * .2f - .1f), mat, Quaternion.Euler(R01 * 6 - 3, R01 * 360, R01 * 6 - 3));
-                float rad = (2.6f - i * .45f) * (h / 8); part.transform.localScale = new Vector3(rad, h * .34f, rad);
+                float ox, oz, tiltX, turn, tiltZ;
+                if (i < 5) { ox = R01 * .2f - .1f; oz = R01 * .2f - .1f; tiltX = R01 * 6 - 3; turn = R01 * 360; tiltZ = R01 * 6 - 3; }
+                else { ox = T() * .2f - .1f; oz = T() * .2f - .1f; tiltX = T() * 6 - 3; turn = T() * 360; tiltZ = T() * 6 - 3; }
+                float u = (float)i / (tiers - 1), y = 1.1f + u * h * .6f, rad = Mathf.Lerp(2.6f, .8f, u) * (h / 8);
+                var tilt = Quaternion.Euler(tiltX, 0, tiltZ); var tier = Color.Lerp(new Color(.58f, .66f, .58f), Color.white, u);
+                var heart = new Vector3(ox, y - rad * .5f, oz);   // the cards' normals fan out and up from here, like a cone's surface
+                int boughs = 6 + (int)(T() * 3);
+                for (int k = 0; k < boughs; k++)
+                {
+                    float droop = (20 + T() * 15) * Mathf.Deg2Rad; var outward = Quaternion.Euler(0, turn + k * 360f / boughs + (T() - .5f) * 24, 0) * Vector3.right;
+                    var along = tilt * (outward * Mathf.Cos(droop) - Vector3.up * Mathf.Sin(droop));
+                    var across = Quaternion.AngleAxis((T() - .5f) * 30, along) * Vector3.Cross(along, Vector3.up).normalized;
+                    float len = rad * (.95f + T() * .2f), wide = rad * 1.6f * (.9f + T() * .2f);
+                    var foot = new Vector3(ox, y + h * .06f, oz) + outward * .05f; var shade = tier * (.92f + T() * .1f); var footShade = shade * .6f;
+                    cards.Add(foot, along, across, len, wide, heart, .35f, shade, 0, 1, footShade);
+                    cards.Add(foot, along, Vector3.Cross(along, across), len * .85f, wide * .4f, heart, .35f, shade * .85f, 0, 1, footShade * .85f);
+                }
             }
+            // The leader: a small tier of five short boughs over the top tier, then three upright fronds crossed at sixty degrees
+            // running to the tip, so the top is a dense spike, not a tuft.
+            {
+                float y = 1.1f + h * .7f, rad = .5f * (h / 8), turn = T() * 360; var heart = new Vector3(0, y - rad * .5f, 0);
+                for (int k = 0; k < 5; k++)
+                {
+                    float droop = (25 + T() * 15) * Mathf.Deg2Rad; var outward = Quaternion.Euler(0, turn + k * 72 + (T() - .5f) * 20, 0) * Vector3.right;
+                    var along = outward * Mathf.Cos(droop) - Vector3.up * Mathf.Sin(droop);
+                    cards.Add(new Vector3(0, y + h * .03f, 0), along, Vector3.Cross(along, Vector3.up).normalized, rad * 1.1f, rad * 1.6f, heart, .35f, Color.white, 0, 1, new Color(.6f, .6f, .6f));
+                }
+                float ty = 1.1f + h * .66f, tl = h * .3f, lead = T() * 180; var tip = new Vector3(0, ty - tl * .5f, 0);
+                for (int k = 0; k < 3; k++)
+                    cards.Add(new Vector3(0, ty, 0), Vector3.up, Quaternion.Euler(0, lead + k * 60, 0) * Vector3.right, tl * (k == 0 ? 1 : .95f), tl * .36f, tip, .5f, k == 0 ? Color.white : new Color(.92f, .92f, .9f), 0, 1, new Color(.68f, .7f, .68f));
+            }
+            MeshPart(cards.Build("Boughs"), t, Vector3.zero, PineMaterial(pick));
             var cap = t.gameObject.AddComponent<CapsuleCollider>(); cap.center = new Vector3(0, 2, 0); cap.height = 4; cap.radius = .4f;
             t.gameObject.AddComponent<NavBlocker>(); t.gameObject.AddComponent<TreeFade>();
         }
@@ -1839,19 +2024,26 @@ namespace Crulanda.World
                         if (NearRoad(at, 2) || Water.NearWater(at, 1.5f)) continue;
                         var t = Root(new ZoneProp { kind = "tree", at = at, scale = .75f + R01 * .15f }, statics);
                         float h = 2.4f + R01 * .6f;
-                        // An old fruit tree: a short leaning trunk on a root flare, forking low into three limbs, one to each clump.
-                        // Its shape and bark come from its own stream; the zone's draws below are the ones it always took.
+                        // An old fruit tree: a short leaning trunk on a root flare, forking low into three limbs, one to each leaf
+                        // cluster (LeafCrown: painted cards, no blobs). Its shape and bark come from its own stream; the zone's draws
+                        // below are the ones it always took.
                         var tr = TreeRandom(t.position); var bark = BarkShade((float)tr.NextDouble());
                         var axis = Bole(t, tr, h + .3f, .14f + (float)tr.NextDouble() * .04f, bark); var lean = axis(h) - new Vector3(0, h, 0);
-                        var leaf = Tint(art.foliage, Color.Lerp(new Color(.3f, .42f, .18f), new Color(.38f, .44f, .2f), R01));
+                        float pick = R01;   // which fresh green (was the flat leaf's shade)
+                        var spots = new List<(Vector3 at, float size, bool light)>(); var ends = new List<Vector3> { axis(h + .15f) };
                         for (int k = 0; k < 3; k++)
                         {
-                            float s = 2 + R01 * .8f; var blob = Canopy(); var c = new Vector3(R01 * 1.2f - .6f, h + .5f + R01 * .7f, R01 * 1.2f - .6f) + lean;
-                            Lump(blob, t, c, new Vector3(s, s * .85f, s), leaf, R01 * 360);
+                            float s = 2 + R01 * .8f; _ = Canopy(); var c = new Vector3(R01 * 1.2f - .6f, h + .5f + R01 * .7f, R01 * 1.2f - .6f) + lean;
+                            _ = R01;   // the clump's yaw
+                            spots.Add((c, s, k == 1));
                             var from = axis(h * (.42f + (float)tr.NextDouble() * .12f)); var reach = new Vector3(c.x - from.x, 0, c.z - from.z);
-                            if (reach.sqrMagnitude < .25f) reach = Quaternion.Euler(0, k * 120 + (float)tr.NextDouble() * 40, 0) * Vector3.right * .6f;   // a clump right overhead: spread the fork
-                            Limb(t, from, new Vector3(from.x + reach.x, c.y - .35f, from.z + reach.z), .085f, .04f, bark, .14f, 7);
+                            if (reach.sqrMagnitude < .25f) reach = Quaternion.Euler(0, k * 120 + (float)tr.NextDouble() * 40, 0) * Vector3.right * .6f;   // a cluster right overhead: spread the fork
+                            var end = new Vector3(from.x + reach.x, c.y - .35f, from.z + reach.z);
+                            Limb(t, from, end, .085f, .04f, bark, .14f, 7); ends.Add(end);
                         }
+                        var orchardLeaf = art.leafCards != null && art.leafCards.Length > 0 ? LeafMaterial(art.leafCards[0], Color.Lerp(new Color(.94f, 1, .9f), new Color(1, 1, .8f), Mathf.Round(pick * 2) / 2))
+                            : Tint(art.foliage, Color.Lerp(new Color(.3f, .42f, .18f), new Color(.38f, .44f, .2f), pick));
+                        LeafCrown(t, tr, lean + new Vector3(0, h + .85f, 0), spots, ends, orchardLeaf, bark, Tint(art.foliage, new Color(.19f, .29f, .12f)), 1, new Vector3(1.8f, 1.1f, 1.8f));
                         var fruit = Tint(art.hay, new Color(.72f, .18f, .12f));
                         for (int k = 0; k < 6; k++) Part(PrimitiveType.Sphere, t, new Vector3(R01 * 2.4f - 1.2f, h + .2f + R01 * 1.4f, R01 * 2.4f - 1.2f) + lean, Vector3.one * .22f, fruit);
                         var cap = t.gameObject.AddComponent<CapsuleCollider>(); cap.center = new Vector3(0, h / 2, 0); cap.height = h; cap.radius = .3f; trunks.Add(at);
@@ -1879,14 +2071,38 @@ namespace Crulanda.World
                     Bush(at, g.kind == "pine");
                 }
         }
-        /// <summary>A low leafy bush of two or three clumps; no collider (you push through it).</summary>
+        /// <summary>
+        /// A low leafy bush: two or three crossed pairs of painted leaf cards (four to six cards) fanning up and out round a small dark
+        /// core, on the green leaf card a shade darker than a tree's (a pine grove's a little cooler), about the spread the old two or
+        /// three blobs had; those blobs when the palette has no card art. No collider (you push through it). The zone's draws are the
+        /// ones the blobs took, in their order; the cards' own shape comes from a stream keyed to where it stands.
+        /// </summary>
         void Bush(Vector2 at, bool conifer)
         {
             var t = new GameObject("Bush").transform; t.SetParent(statics, false); t.position = Ground(at, -.1f); t.rotation = Quaternion.Euler(0, R01 * 360, 0);
             var c = conifer ? Color.Lerp(new Color(.17f, .25f, .15f), new Color(.24f, .3f, .17f), R01) : Leaf[(int)(R01 * Leaf.Length) % Leaf.Length] * (.85f + R01 * .2f);
-            var mat = Tint(art.foliage, Wither(c));
+            bool cardArt = art.leafCards != null && art.leafCards.Length > 0;
+            var mat = cardArt ? LeafMaterial(art.leafCards[0], conifer ? new Color(.62f, .74f, .66f) : new Color(.72f, .8f, .64f)) : Tint(art.foliage, Wither(c));
             int n = 2 + (int)(R01 * 2);
-            for (int i = 0; i < n; i++) { float s = .9f + R01 * .8f; Lump(Canopy(), t, new Vector3(R01 * 1.2f - .6f, s * .3f, R01 * 1.2f - .6f), new Vector3(s * 1.3f, s * .8f, s * 1.3f), mat, R01 * 360); }
+            var cards = new ZoneMeshes.Cards(); var br = TreeRandom(t.position); float B() { return (float)br.NextDouble(); }
+            var heart = new Vector3(0, .3f, 0); float size = 0;
+            for (int i = 0; i < n; i++)
+            {
+                float s = .9f + R01 * .8f; var blob = Canopy(); var spot = new Vector3(R01 * 1.2f - .6f, s * .3f, R01 * 1.2f - .6f); float yaw = R01 * 360;
+                if (!cardArt) { Lump(blob, t, spot, new Vector3(s * 1.3f, s * .8f, s * 1.3f), mat, yaw); continue; }
+                size += s / n;
+                // A crossed pair fanning up and out from the core toward where the blob sat, rolled at random about that line.
+                var outward = new Vector3(spot.x, 0, spot.z); if (outward.sqrMagnitude < .04f) outward = Quaternion.Euler(0, B() * 360, 0) * Vector3.right * .3f;
+                var along = (outward.normalized * (.55f + B() * .3f) + Vector3.up * (.45f + B() * .35f)).normalized;
+                var across = Quaternion.AngleAxis(B() * 180, along) * Vector3.Cross(along, Vector3.up).normalized;
+                float len = s * (1.05f + B() * .25f);
+                cards.AddCross(heart + outward * .25f - along * len * .15f, along, across, len, s * (.95f + B() * .25f), heart, .3f, new Color(.8f, .86f, .78f) * (.9f + B() * .15f));
+            }
+            if (!cardArt) return;
+            MeshPart(cards.Build("Bush leaves"), t, Vector3.zero, mat);
+            // The core: a small dark clump at the heart, seen through the cards' gaps (canopies is filled: the loop drew from it).
+            var coreMat = Tint(art.foliage, Wither(conifer ? new Color(.1f, .17f, .11f) : new Color(.12f, .2f, .09f)));
+            Lump(canopies[(int)(B() * 6) % 6], t, heart, new Vector3(1.1f, .7f, 1.1f) * size, coreMat, B() * 360);
         }
         bool NearProp(Vector2 p, float margin)
         {
@@ -2781,6 +2997,15 @@ namespace Crulanda.World
             var pineMat = Tint(art.pine, Wither(new Color(.16f, .23f, .16f))); var deadMat = Tint(art.bark, Gloom ? new Color(.55f, .54f, .53f) : new Color(.26f, .24f, .22f));   // gloom: the grey wood carries on
             var rockMat = Tint(art.stone, ash ? new Color(.36f, .355f, .36f) : mountain ? MountainStone : new Color(.40f, .39f, .38f));
             var parts = new Dictionary<(Material, int), List<CombineInstance>>();
+            // The wood silhouettes' painted leaf cards (the zone's own Crulanda/Leaf materials), one card mesh per material and side,
+            // so a far ridge is ragged leaf and needle like the near trees, not blobs and cones beside them; the blobs and cones when
+            // the palette has no card art. Their shapes draw from a stream of their own: the placing draws (rnd) are as they were,
+            // so every silhouette stands and sits where it did.
+            bool cardArt = art.leafCards != null && art.leafCards.Length > 0 && art.pineBough != null;
+            var sil = new System.Random(Zone.seed + 4343); float S() { return (float)sil.NextDouble(); }
+            var cardSets = new Dictionary<(Material, int), ZoneMeshes.Cards>();
+            ZoneMeshes.Cards CardsFor(Material mat, int side) { if (!cardSets.TryGetValue((mat, side), out var set)) cardSets[(mat, side)] = set = new ZoneMeshes.Cards(); return set; }
+            var boughMat = cardArt ? LeafMaterial(art.pineBough, new Color(.8f, .88f, .8f)) : null;
             // The skirt as drawn: the height of its own triangles under a point. Its rings are the edge row scaled out from the
             // centre, so a point's column is where its ray from the centre crosses the edge row, and between two rings (5-14 m
             // apart out here) the surface runs straight from one ring's vertices to the next. On a ridged crest that chord lies
@@ -2841,15 +3066,53 @@ namespace Crulanda.World
                         {
                             // A bark trunk under lifted boughs, so a pine on a slope stands on it rather than hovering on a flat cone base.
                             Put(side, spire, art.bark, at, Quaternion.identity, new Vector3(.4f, th * .5f, .4f));
-                            Put(side, spire, pineMat, at + Vector3.up * (1 + th * .16f), Quaternion.Euler(0, yaw, 0), new Vector3(th * .26f, th * .6f, th * .26f));
-                            Put(side, spire, pineMat, at + Vector3.up * (1 + th * .52f), Quaternion.Euler(0, yaw + 30, 0), new Vector3(th * .18f, th * .56f, th * .18f));
+                            if (cardArt)
+                            {
+                                // Three tiers of four drooping bough cards, widest at the foot, over the height the cones had, and two
+                                // crossed upright fronds to the tip.
+                                var set = CardsFor(boughMat, side); float turn = S() * 360;
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    float u = i / 2f, y = 1 + th * Mathf.Lerp(.2f, .62f, u), rad = th * Mathf.Lerp(.3f, .14f, u); var heart = at + Vector3.up * (y - rad * .5f);
+                                    var tier = Color.Lerp(new Color(.6f, .68f, .6f), Color.white, u);
+                                    for (int k = 0; k < 4; k++)
+                                    {
+                                        float droop = (22 + S() * 12) * Mathf.Deg2Rad; var outward = Quaternion.Euler(0, turn + i * 45 + k * 90 + (S() - .5f) * 20, 0) * Vector3.right;
+                                        var along = outward * Mathf.Cos(droop) - Vector3.up * Mathf.Sin(droop);
+                                        set.Add(at + Vector3.up * (y + th * .05f), along, Vector3.Cross(along, Vector3.up).normalized, rad * 1.1f, rad * 1.6f, heart, .35f, tier, 0, 1, tier * .6f);
+                                    }
+                                }
+                                float ty = 1 + th * .68f, tl = th * .4f, lead = S() * 180; var tip = at + Vector3.up * (ty - tl * .5f);
+                                set.Add(at + Vector3.up * ty, Vector3.up, Quaternion.Euler(0, lead, 0) * Vector3.right, tl, tl * .36f, tip, .5f, Color.white, 0, 1, new Color(.68f, .7f, .68f));
+                                set.Add(at + Vector3.up * ty, Vector3.up, Quaternion.Euler(0, lead + 90, 0) * Vector3.right, tl * .95f, tl * .34f, tip, .5f, new Color(.92f, .92f, .9f), 0, 1, new Color(.68f, .7f, .68f));
+                            }
+                            else
+                            {
+                                Put(side, spire, pineMat, at + Vector3.up * (1 + th * .16f), Quaternion.Euler(0, yaw, 0), new Vector3(th * .26f, th * .6f, th * .26f));
+                                Put(side, spire, pineMat, at + Vector3.up * (1 + th * .52f), Quaternion.Euler(0, yaw + 30, 0), new Vector3(th * .18f, th * .56f, th * .18f));
+                            }
                         }
                         else
                         {
-                            float c = th * .45f; var leaf = Tint(art.foliage, Wither(Leaf[(int)(R() * 3)]));
+                            float c = th * .45f; int fam = (int)(R() * 3);   // its leaf shade: the same draw as before
                             Put(side, spire, art.bark, at, Quaternion.identity, new Vector3(.35f, th * .62f, .35f));
-                            Put(side, crown, leaf, at + Vector3.up * th * .62f, Quaternion.Euler(0, yaw, 0), new Vector3(c, c * .85f, c));
-                            Put(side, crown, leaf, at + new Vector3(c * .3f, th * .5f, c * .2f), Quaternion.Euler(0, yaw + 90, 0), new Vector3(c * .7f, c * .6f, c * .7f));
+                            if (cardArt)
+                            {
+                                // Three leaf-cluster cards crossed at sixty degrees about a tilted axis through the crown's middle, the
+                                // size the blobs were, so from any side one card faces the eye and the crown's edge is ragged leaf.
+                                var set = CardsFor(LeafMaterial(fam), side); var centre = at + Vector3.up * th * .62f;
+                                var axis = Quaternion.Euler(0, S() * 360, 0) * (Quaternion.Euler(15 + S() * 15, 0, 0) * Vector3.up);
+                                var across = Quaternion.AngleAxis(S() * 60, axis) * Vector3.Cross(axis, Vector3.up).normalized;
+                                float len = c * 1.2f, wide = c * 1.1f; var foot = centre - axis * len * .5f;
+                                for (int k = 0; k < 3; k++)
+                                    set.Add(foot, axis, Quaternion.AngleAxis(k * 60, axis) * across, len * (k == 0 ? 1 : .95f), wide * (k == 0 ? 1 : .92f), centre, .3f, k == 0 ? new Color(1, 1, .95f) : new Color(.88f, .9f, .85f));
+                            }
+                            else
+                            {
+                                var leaf = Tint(art.foliage, Wither(Leaf[fam]));
+                                Put(side, crown, leaf, at + Vector3.up * th * .62f, Quaternion.Euler(0, yaw, 0), new Vector3(c, c * .85f, c));
+                                Put(side, crown, leaf, at + new Vector3(c * .3f, th * .5f, c * .2f), Quaternion.Euler(0, yaw + 90, 0), new Vector3(c * .7f, c * .6f, c * .7f));
+                            }
                         }
                     }
             }
@@ -2858,6 +3121,7 @@ namespace Crulanda.World
                 var mesh = new Mesh { name = "Backdrop " + kv.Key.Item1.name, indexFormat = UnityEngine.Rendering.IndexFormat.UInt32 };
                 mesh.CombineMeshes(kv.Value.ToArray(), true, true); Show(mesh, kv.Key.Item1);
             }
+            foreach (var kv in cardSets) Show(kv.Value.Build("Backdrop " + kv.Key.Item1.name + " cards"), kv.Key.Item1);
         }
     }
 

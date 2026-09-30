@@ -338,3 +338,19 @@ Chris shared a reference of a stylized fantasy cove and chose this look for Oakh
 - The stone texture tiles at about 2 m across each lump (blob meshes gained UV repeat and flat-shaded faceting).
 - Fallen blocks and scree at the foot, sunk into the ground, kept off roads, water, camps, exits, arrivals, spawns and other props. No colliders, so the navmesh is unchanged; the player can brush into foot rubble.
 - The lip course on the shelf edge is lumps too. All colliders and the zone's random draws are unchanged.
+
+## 2026-09-30 — Tree crowns: painted leaf cards (Chris: "trees still look bad")
+- The trunks were fixed earlier; the crowns were smooth blob balls and solid cones. Crowns are now **painted leaf cards on boughs**.
+  - Three generated leaf-cluster textures (green, yellow-green, autumn) and a pine-bough texture, alpha cut-out with ragged edges and gaps, so sky shows through.
+  - Broadleaf and orchard crowns: 7-10 clusters of crossed cards on thin bowed boughs from the limbs, a dark squashed core inside so the crown isn't hollow from below, and low filler clusters round the rim.
+  - Pines: a full-height bark-grain pole with five tiers of drooping bough cards crossed by hanging fins, darker at the foot, a crossed leader at the tip. No cones.
+  - The Great Oak keeps its clump crown and gains a card fringe round the skirt, rim and top.
+- New `Crulanda/Leaf` shader: Standard lighting, alpha test, drawn two-sided; the cards bake **crown normals** (away from the crown's heart, lifted toward up) so both faces shade like the outside of one round crown and nothing goes black; per-vertex wind sway keyed to world position; a shadow-caster pass with the same sway and cut-out.
+- `Fade.shader` and `TreeFade` fade cut-out leaves too, so a card tree still goes see-through for the camera and keeps its ragged shape.
+- The zone's random draws are unchanged draw-by-draw, so nothing else in any zone moves. Colliders and the navmesh are untouched.
+- **Second pass (same day), after the first tour:** the first cards left pines as sparse poles and near crowns thin.
+  - Pines: 5-6 tiers of 6-8 wide drooping boughs, overlapping down the trunk, widest at the foot, darker at the foot, with a dense crossed leader; a fuller bough texture (`pine_bough_full`). A full conifer triangle.
+  - Broadleafs: three cards per cluster, 10-14 clusters, a core about 60% of the crown radius, and 3-4 low underside clusters, so looking up shows leaf mass. Orchard trees unchanged (they already read well).
+  - Bushes: 4-6 leaf cards round a dark core, on the same leaf material, same footprint, still no collider.
+  - Backdrop silhouettes: far broadleafs are three crossed cards and far pines three tiers of boughs, so the horizon matches the near trees.
+  - Zone random draws verified unchanged site by site; colliders and the navmesh untouched.

@@ -45,6 +45,9 @@ namespace Crulanda.Encounter
         public List<string> questItems = new List<string>();
         /// <summary>One-shot interactables already emptied ("zone|name|x|z"), e.g. a crate you took the iron from.</summary>
         public List<string> usedInteractables = new List<string>();
+        // ---------- discoveries (save format 7; older saves load with this empty) ----------
+        /// <summary>Hidden finds already found, by id ("secret.&lt;zone&gt;.&lt;slug&gt;"): each pays out once, ever. See DiscoveryLog.</summary>
+        public List<string> discoveries = new List<string>();
 
         // ---------- levels (save format 5) ----------
         public const int LevelCap = 10;

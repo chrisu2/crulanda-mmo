@@ -44,6 +44,24 @@
       "title": "The Waystation Keeper's Last Page",
       "text": "Third day of the new masters on the gate. They want a toll off the waystation now. A toll on bread.\n\nFifth day. Paid it. Paid it again when a different one came asking.\n\nSixth day. Torches on the lower road. I've sent the pilgrims out by the goat path with what bread there was, and I'm putting this in the hearth where I put everything. If you're reading it, lay a stone for me on the cairn below the gate.\n\nGrenna Holt, keeper.",
       "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "doc.peaks.goat_path",
+      "title": "Six on the Goat Path",
+      "text": "Pencilled very small on the back of a pilgrim's token:\n\nSix of us out of the waystation by the goat path, the night the torches came up the road. Grenna gave us the bread and would not come. She said someone had to keep the hearth lit, or they'd know.\nCold here. No fire after dark; they would see it from the gate.\nWe go on over the top at first light, south, for the Archive.\nIf you find this, Grenna: we made it this far.",
+      "canonStatus": "GAME-ONLY: the pilgrims and their camp. The Archive of Silence in the south is CANON (world_bible.md)."
+    },
+    {
+      "id": "doc.peaks.letter_home",
+      "title": "To Ysolde, by Any Caravan",
+      "text": "To Ysolde at the Dry Wells, in the south, by any caravan:\n\nSister, the pay is good, as they promised, and the cold is worse than they said. Snow in the middle of summer. They have us stopping carts on a mountain road and taking what we like and calling it toll, and most of the lads like it well enough.\nI don't. Last week we passed two little ones through the gate in a closed cart, under a paper with a seal I'm not to speak of. No toll. They didn't cry. That was the worst of it.\nWhen I've enough I'm coming home. Keep the goats.\nYour brother, Tomas",
+      "canonStatus": "GAME-ONLY: the letter, Tomas and Ysolde. The Sandthrone is a CANON mercenary company; its toll in the Peaks is CANON (book1 ch.5)."
+    },
+    {
+      "id": "doc.peaks.echo",
+      "title": "What the Jar Remembers",
+      "text": "Unstopped, the jar gives back a voice, very far off, in no tongue you know, and yet you understand it:\n\n'...and the river said its own name, and every stone in it answered, and that was the first song. We did not make it. We only learned to hum along. Remember that, when they tell you the Weave is theirs to spend...'\n\nThen only the wind in the jar, and your own breath.",
+      "canonStatus": "CANON-EXPANDED: echo-jars, the Silent Pilgrims and the Original Song are CANON (world_bible.md); the words in this jar are GAME-ONLY."
     }
   ],
   "quests": [

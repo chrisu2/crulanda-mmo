@@ -38,6 +38,12 @@
       "title": "Salt of the First Sea",
       "text": "Mother Vane's words over the salt, as she taught them to you:\n\nSalt of the First Sea!\nBy the Maker's hand!\nBy the Keeper's breath!\nI bind the Chaos!\nI seal the Wound!\n\n'Say it loud. The salt doesn't hear you. You hear you. A binding done quiet is a binding done by half.'\n\n'Salt binds. It does not unmake. Remember that, townsman, when you're tempted to think a thing is finished.'",
       "canonStatus": "The chant is CANON (book1 ch.20); Mother Vane's advice is GAME-ONLY."
+    },
+    {
+      "id": "doc.ashrim.doubter",
+      "title": "Ash in the Bread",
+      "text": "To my mother at Cinderfold, if anyone is left there to read it:\n\nVorn says the ash is honest. He says the grey is the truth coming home and we should kneel in it. I knelt. I wore the bone.\nThen we went through Cinderfold after the grey had, to see what the truth looked like. The bread was still on the table, Mam. Ash all through, the shape of bread and nothing in it.\nI'm going. The coin is what I had off the offering-bowl. Salt from the Ridge caves is dearer than bone, and I mean to buy some.\nDon't wait up.",
+      "canonStatus": "CANON-EXPANDED: the Cult of Ash, its bone masks and Vorn are CANON (book1 ch.10, world_bible.md); the letter and its writer are GAME-ONLY."
     }
   ],
   "quests": [

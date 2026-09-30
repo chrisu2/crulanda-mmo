@@ -27,6 +27,18 @@
       "title": "Forty Sovereigns",
       "text": "A notched tally-stick, with a scrap of paper wound round it in a clumsy hand:\n\nBureau wagon, Oakhaven run.\nTwo, small, taken on at Khaven gate. Sound.\nForty sovereigns: twenty paid at the gate, twenty at the toll.\nRide them north by the Peaks road. Hand on at the gate to the Concord escort.\nNo questions, as agreed.",
       "canonStatus": "GAME-ONLY: the handover, the price and the route. Sandthrone working for the Concord follows world_bible.md."
+    },
+    {
+      "id": "doc.khaven.low_row",
+      "title": "The Low Row",
+      "text": "From the sexton's register of Khaven, the low row by the creek:\n\nTamsin Ade, drowned in the spring. Laid with salt on her tongue, as is proper.\nOld Pell, the fever. Salt, and a coin for the road he's on now.\nThe Fenwick twins, both in the one box. Salt.\nHarl Emmet, the gallows. No salt. The Sandthrone would not allow it.\n\n(Added later, in a shaking hand:) The creek came up in the spring flood and took the low row. When it went down the graves stood open and every box was empty. I have told no one. I sleep with the lamp lit now.  - A. M.",
+      "canonStatus": "GAME-ONLY: the register, the names and the salt custom. Hollow Men are a CANON creature (book1 ch.4)."
+    },
+    {
+      "id": "doc.khaven.skim",
+      "title": "What the Captain Doesn't Count",
+      "text": "A tally scratched on a scrap of hide, in an outrider's hand:\n\nKhaven toll, my share, not the Company's:\n  four pewter plates (the Vey woman's)\n  one good knife, off a pedlar who argued\n  eleven sovereigns in small coin\n  a silver thimble\n\nCaptain counts the carts. Captain doesn't count me.\nWhen the Company moves on, I don't. There's a glass ship out of Port Caelum with room for one man and no questions.",
+      "canonStatus": "GAME-ONLY: the outrider and his tally. Port Caelum and its glass ships are CANON (world_bible.md)."
     }
   ],
   "quests": [

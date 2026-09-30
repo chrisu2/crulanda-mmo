@@ -43,7 +43,8 @@ Biome `gloom`: hard grey-brown earth, thin dry grass and no flowers, grey dead w
 rose-violet grade. The dusk holds all day: `lighting.sunHigh` keeps the sun low, and `skyTint`/`skyExposure`/`skyHaze` give a
 dusky sky, while night still falls on the global clock. No Wasting here: only zones whose JSON has a `wasting` block get one.
 GAME-ONLY / PROVISIONAL: the Sandthrone outriders holding it (Sandthrone is a canon mercenary faction), the Pale watcher
-(canon "Pale Things" as cosmic auditors), the crypt and all exact placement. GAME-ONLY looks: the Cracked Hearth's split chimney with the fire showing through (a reading of the canon name; the map draws it as the inn), the drowned graveyard's flood pool and heaved graves, and the creek barrow's turf mound.
+(canon "Pale Things" as cosmic auditors), the crypt and all exact placement. GAME-ONLY: the beacon mound east of the walls (a
+`Beacon mound` shape, 3.6 m, its old beacon a lookout secret), the only raised ground in the zone. GAME-ONLY looks: the Cracked Hearth's split chimney with the fire showing through (a reading of the canon name; the map draws it as the inn), the drowned graveyard's flood pool and heaved graves, and the creek barrow's turf mound.
 
 ## The Shattered Peaks (CANON-EXPANDED), levels 6-8
 Canon: a jagged range on the eastern border that holds back the Wasting while the void slowly eats the stone (world_bible.md).
@@ -237,6 +238,40 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
   - King's guard: 2 in the hall.
   - Caddock's hall: Caddock, the Bandit King, elite, level 4.
   - The deserters are levels 3-4.
+
+## Secrets (hidden finds; `ZoneBuilder.BuildSecrets`)
+- **Data:** a zone's `secrets` (`ZoneSecret`, see ZoneDefinition.cs). Found and paid out by the encounter's DiscoveryLog: a lookout
+  (`vista`) by standing within `radius`, anything else by searching with E within 2.8 m (ground distance).
+- **Built after the map is rendered**, so none shows on the minimap or the zone map. No colliders and nothing in the navmesh.
+  Each prop draws from its own stream keyed on where it stands, so the zone's layout is unchanged.
+- **Looks** (small and subtle: metal glints, pages are pale, herbs glow faintly; never a marker's glow):
+  - cache: a dented tin, or an oilcloth bundle when the prompt or name says bundle, oilcloth, sack or pack (salt-crusted with
+    red cord when it says salt);
+  - note: a folded page standing out of a crack, or lying under a stone; herb: a patch of pale bells (colour by biome);
+  - chest: an iron-banded chest with a padlock; key: a brass key on a thong from a nail;
+  - vista: nothing, or a cairn ("stones"/"cairn"), a beacon ring ("beacon") or a salt line turned by `rotation` ("salt").
+- **Scenes:** a word in a searchable's prompt or name dresses the spot: "camp" (cold fire ring and bedroll), "log"/"trunk",
+  "stump" (a hollow stump), "rocks"/"cleft" (two flanking stones), "stone" (a flat stone half over it), "scrape".
+  - The frame faces -Z toward you; the hiding place is behind (+Z). `height` lifts the find (a key on a post, a page in a wall).
+  - Notes, keys and herbs vanish when found, so `ZoneSecretSpot.root` holds only the thing; its scene stays.
+  - A herb, or a find with a scene of its own, standing in a trunk or rock moves clear (up to 2.5 m). A find tucked against a prop
+    stays put.
+- **Placement rules** (tested by `SecretPlacementTests`):
+  - reachable on the navmesh from the player start (a searchable within reach of E);
+  - not in a building, water, a camp, on a road, on a quest prop, at an exit, spawn or arrival;
+  - keep 4 m or more off roads and bridge decks so walking past never raises the prompt;
+  - keep 5 m or more from the foot of free crags (their rock lumps and scree reach past the colliders);
+  - nothing in or on Crowsfoot Hollow (it will be rebuilt as a dungeon with its own loot).
+- **Per zone** (GAME-ONLY placement; canonStatus on each):
+  - Oakhaven: the Road's End (vista), the Poacher's Cold Camp, a Salt-Mender's Drop behind the old wayshrine, a Leaf from the
+    Chapel Book (hollow stump), Moonbells.
+  - Khaven: the Old Beacon (vista, on a new `Beacon mound` shape east of the walls), a Key Under the Gallows, the Outrider's Hoard
+    (chest; needs the key), a Page from the Sexton's Register (drowned chapel wall), Widow's-Lamps.
+  - Peaks: Above the East Road (vista on the High Ledge), the Goat-Path Camp, a Silent Pilgrim's Echo-Jar, a Letter Never Sent,
+    Frostbells.
+  - Ashland Rim: the Salt Line (vista in the southern gap of the Eastern Ridge), an Ash-Walker Cache, a Cultist's Hidden Letter,
+    Last-Light, the Cinderfold Tin.
+- The capture tour shoots one find per zone up close (`87-secret-<slug>`; the first chest, cache, herb, note or key).
 
 ## Travel
 - Zones list `exits` (to, name, at, arrive, radius). Standing at an exit shows "[E] <name>"; E travels (not in combat):

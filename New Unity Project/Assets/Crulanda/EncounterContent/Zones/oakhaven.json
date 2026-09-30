@@ -2325,5 +2325,83 @@
       "height": 0,
       "blend": 9
     }
+  ],
+  "secrets": [
+    {
+      "id": "secret.oakhaven.roads-end",
+      "name": "The Road's End",
+      "kind": "vista",
+      "at": {
+        "x": 94.5,
+        "y": 101.5
+      },
+      "radius": 6,
+      "rotation": 40,
+      "text": "Someone has stacked three stones where the cart ruts run into the grey and stop, mid-rut, as if the road had been rolled up and put away. Past them nothing moves: not grass, not dust, not light.",
+      "xp": 25,
+      "canonStatus": "GAME-ONLY place. The Wasting unmaking the land into grey static is CANON (world_bible.md)."
+    },
+    {
+      "id": "secret.oakhaven.poachers-camp",
+      "name": "The Poacher's Cold Camp",
+      "kind": "cache",
+      "prompt": "Search the bundle at the cold camp",
+      "at": {
+        "x": -80,
+        "y": -92
+      },
+      "rotation": 225,
+      "text": "A cold fire ring under the copse eaves, a snare line, and a bundle done up in oilcloth against the rain. Whoever camped here left in a hurry and hasn't come back for it.",
+      "item": "item.poachers_hood",
+      "xp": 30,
+      "gold": 5,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "secret.oakhaven.menders-drop",
+      "name": "A Salt-Mender's Drop",
+      "kind": "cache",
+      "prompt": "Reach in behind the shrine's plinth",
+      "at": {
+        "x": 87.28,
+        "y": 20.3
+      },
+      "rotation": 270,
+      "text": "A tin pushed in behind the plinth, a salt-stiff cord knotted round it: a Salt-Mender drop. Coins, a draught of yarrow and honey, and a scrap in a careful hand: Take what you need. Mend what you can.",
+      "item": "potion.minor",
+      "xp": 25,
+      "gold": 6,
+      "canonStatus": "CANON-EXPANDED: the Salt-Menders are a canon faction (world_bible.md); their drops, and this one, are GAME-ONLY."
+    },
+    {
+      "id": "secret.oakhaven.chapel-leaf",
+      "name": "A Leaf from the Chapel Book",
+      "kind": "note",
+      "prompt": "Reach into the hollow stump",
+      "at": {
+        "x": 9.5,
+        "y": 50.5
+      },
+      "rotation": 40,
+      "height": 0.55,
+      "text": "Folded small and pushed deep into the hollow of the old stump by the chapel wall, where the damp couldn't reach it: a leaf cut out of the chapel book.",
+      "document": "doc.oakhaven.acorn_oath",
+      "xp": 30,
+      "canonStatus": "GAME-ONLY: the chapel book and its oath. The Great Oak as the settlement's historical heart is CANON (book1 ch.4)."
+    },
+    {
+      "id": "secret.oakhaven.moonbells",
+      "name": "Moonbells",
+      "kind": "herb",
+      "prompt": "Pick the pale bells",
+      "at": {
+        "x": 62,
+        "y": -18
+      },
+      "text": "Pale bells glowing faintly in the copse's shade, this close to the grey. Hedge-wives say moonbells only grow where the ground is still sure of itself.",
+      "item": "herb.moonbell",
+      "xp": 20,
+      "canonStatus": "GAME-ONLY"
+    }
   ]
 }

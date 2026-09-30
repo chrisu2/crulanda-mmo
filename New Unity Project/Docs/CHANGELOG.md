@@ -455,3 +455,44 @@ Chris shared a reference of a stylized fantasy cove and chose this look for Oakh
   - `CaveTests` (4): walkable from the green to the hall through the mouth; walled and roofed with nothing in the passage;
     dark and dry inside, rained on outside; nothing grows in it, and the deserters hold it.
   - `HollowQuestTests` (5): the minLevel gate, the targets, the looks, a full play-through, and line-of-sight aggro.
+
+## 2026-09-30 — Secrets (Chris's order: after the cave)
+- **Hidden finds in every zone**: five per zone, twenty in all (GAME-ONLY placement, canonStatus on each). None is on any map;
+  you find them by going off the road and looking.
+  - **Lookouts** (`vista`): stand on the spot and it counts, for XP. The Road's End, the Old Beacon, Above the East Road,
+    the Salt Line.
+  - **Caches:** an oilcloth bundle or a dented tin tucked behind rocks, in a log, under a stone or at a cold camp. Gold, and
+    a piece of gear or supplies.
+  - **Pages:** a folded page in a crack, a hollow stump or a drowned chapel wall, read in the Chronicle.
+  - **Herbs:** a patch of pale bells glowing faintly, a healing herb of the zone.
+  - **A key and its chest** in Khaven: the key under the gallows opens the Outrider's Hoard. Without it: "Locked. The key must
+    be somewhere near."
+- **Finding one:** search with E within reach (a lookout needs only standing there). "Discovered: ..." shows as a toast and a
+  chat line with what it paid. Each find pays once, ever: XP, gold, an item in the bags, and a Chronicle page. With full bags
+  it waits: "Your bags are full. Make room, then search again."
+- **Quest book: a fourth tab, Discoveries.** It shows each zone's finds found out of total, with the current zone first. The
+  found ones are listed by name and text; the rest only as "3 more lie hidden in Khaven."
+- **New things to find:**
+  - 4 gear pieces: the Poacher's Oilskin Hood, the Outrider's Hooked Knife, the Silent Pilgrim's Echo-Jar (neck) and the
+    Leviathan-Bone Harpoon.
+  - 4 healing herbs: Moonbell, Widow's-lamp, Frostbell and Last-light.
+  - 7 documents, among them the Acorn Oath from Oakhaven's chapel book, the Khaven sexton's Low Row, a Sandthrone soldier's
+    letter home and a cultist's doubting letter.
+- **The look** is small and subtle: metal glints, pages are pale, herbs glow faintly, and nothing wears a marker's glow. A
+  word in the prompt dresses the spot: a camp gets a cold fire ring and bedroll, a stump is hollow, rocks flank a cleft.
+- **Khaven** has a beacon mound east of the walls (a new `Beacon mound` shape), the only raised ground in the zone, with the
+  old beacon's ring on top.
+- **Save format 7:** a `discoveries` list of found ids, with a 6 → 7 SaveMigrator step (`AddDiscoveriesMigration`) that adds
+  only the empty list. Chris's save was backed up first (`work\save-backups\20260930-1739-before-format7`). The step was run
+  read-only on a copy of it: all 26 fields came through byte-identical.
+- **Built after the maps are rendered**, each prop on its own position-keyed random stream, so the maps and the rest of each
+  zone's layout are unchanged.
+- **Placement rules**, tested: reachable on foot from the start; not in a building, water, a camp, on a road, a quest prop, an
+  exit or a spawn; 4 m or more off roads, so walking past never raises the prompt; clear of crags' scree.
+- **First build:** the Peaks' Goat-Path Camp sat on a shelf above the waystation that you couldn't walk to. It moved down to
+  the planner's checked spot.
+- **Tests:**
+  - EditMode `DiscoveryLogTests` (8), plus the 6 → 7 migration in `SaveMigratorTests`.
+  - PlayMode `DiscoveryTests` (5): a lookout by walking on and paying once; a cache paying XP, gold, its item and its page;
+    the key and chest; save, load and reload never paying twice; the book's counts, and no map mark.
+  - PlayMode `SecretPlacementTests` (2): every secret placed by the rules, and ids, keys, items and pages all resolve.

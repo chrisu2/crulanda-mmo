@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using Crulanda.Persistence;
 
@@ -9,11 +10,15 @@ namespace Crulanda.Encounter
     /// Encounter save envelope. Format 3 stores data-driven talent ids (EncounterContent/Talents/*.json); format 4 adds
     /// quests, faction standing, Chronicle pages and the quest bag (empty when loading 1-3; the Chronicle catches up from
     /// what the character has already done). v1 (no talents) and v2 (9-node prototype ids) migrate on read; the migrated
-    /// form is written on the next save.
+    /// form is written on the next save. From format 6 on, each format step is a SaveMigrator step on the payload text
+    /// (6 → 7: <see cref="AddDiscoveriesMigration"/>), run before the payload is read.
     /// </summary>
     public sealed class EncounterSave
     {
-        public const int FormatVersion = 6;   // 5: level curve (experience migrated). 6: bag + equipment slots (old item list moved in)
+        public const int FormatVersion = 7;   // 5: level curve (experience migrated). 6: bag + equipment slots (old item list moved in). 7: discoveries
+        /// <summary>The payload steps from format 6 on. Formats 1-5 are older than this chain and are upgraded in memory in Read.</summary>
+        static readonly SaveMigrator Steps = CreateSteps();
+        static SaveMigrator CreateSteps() { var m = new SaveMigrator(); m.Register(new AddDiscoveriesMigration()); return m; }
         /// <summary>9-node prototype ids (format 2) -> the nodes they became in the data-driven Warrior tree.</summary>
         public static readonly Dictionary<string, string> LegacyTalentIds = new Dictionary<string, string>(StringComparer.Ordinal) {
             { "tank.armor", "tk-tempered-armor" }, { "tank.challenge", "tk-steady-challenge" }, { "tank.bulwark", "tk-bulwark" },
@@ -48,8 +53,11 @@ namespace Crulanda.Encounter
             if (!store.TryRead(slot, out var envelope, out message)) return false;
             if (envelope.formatVersion < 1 || envelope.formatVersion > FormatVersion || envelope.payloadType != "CrulandaEncounter")
             { message = "Unsupported save format; the save has not been changed."; return false; }
+            int from = envelope.formatVersion;
             try
             {
+                // Format 6 and later: the payload text is brought up to date step by step (in memory; the file is untouched).
+                if (from >= 6) envelope = Steps.MigrateToVersion(envelope, FormatVersion);
                 var p = JsonUtility.FromJson<EncounterProgress>(envelope.payloadJson);
                 if (p == null || !Guid.TryParse(p.playerId, out _) || !Guid.TryParse(p.companionId, out _) ||
                     p.enemies == null || p.experience < 0 || p.gold < 0 ||
@@ -58,14 +66,14 @@ namespace Crulanda.Encounter
                     Math.Abs(p.x) > 500 || Math.Abs(p.z) > 500 || p.y < -20 || p.y > 60)
                     throw new InvalidOperationException("Invalid encounter data.");
                 // Level curve changed in format 5: convert experience first so every level-based check sees the same level.
-                if (envelope.formatVersion < 5) p.experience = EncounterProgress.MigrateExperience(p.experience);
+                if (from < 5) p.experience = EncounterProgress.MigrateExperience(p.experience);
                 // Keep any store note (e.g. restored from backup) unless a migration has something more important to say.
-                if (envelope.formatVersion == 1)
+                if (from == 1)
                 {
                     p.classId = "class.warrior"; p.talents = new List<TalentRank>();
                     message = "Legacy expedition upgraded: Warrior talent points are available [B].";
                 }
-                else if (envelope.formatVersion == 2) message = MigrateV2(p);
+                else if (from == 2) message = MigrateV2(p);
                 // Quest lists are absent before format 4 (JsonUtility leaves them null or empty): start them empty.
                 if (p.quests == null) p.quests = new List<QuestState>();
                 if (p.questsDone == null) p.questsDone = new List<string>();
@@ -75,9 +83,12 @@ namespace Crulanda.Encounter
                 if (p.usedInteractables == null) p.usedInteractables = new List<string>();
                 foreach (var q in p.quests) if (q == null || string.IsNullOrEmpty(q.id) || q.step < 0) throw new InvalidOperationException("Invalid quest data.");
                 foreach (var q in p.quests) if (q.counts == null) q.counts = new List<int>();
+                // Format 7: hidden finds already found. Formats 1-5 have no list; a blank id can't be a find, so it is dropped.
+                if (p.discoveries == null) p.discoveries = new List<string>();
+                p.discoveries.RemoveAll(string.IsNullOrEmpty);
                 // Format 6: the old item list and single weapon become bag slots and the main-hand slot.
                 Inventory.Ensure(p);
-                if (envelope.formatVersion < 6)
+                if (from < 6)
                 {
                     if (p.inventory != null)
                         foreach (var id in p.inventory)
@@ -108,6 +119,26 @@ namespace Crulanda.Encounter
             if (talents.Validate(p, out _)) return "Talent tree expanded: your choices carried over. New talents are available [B].";
             p.talents = new List<TalentRank>();
             return "Talent tree expanded and its tier rules changed: your talent points were refunded [B]. Nothing else changed.";
+        }
+    }
+
+    /// <summary>
+    /// Save format 6 → 7: adds an empty <c>discoveries</c> list (hidden finds, DiscoveryLog). An edit on the payload text: the list
+    /// goes in before the closing brace and every other character of the format-6 payload stays exactly as it was. A payload that
+    /// already has the list is left alone; one that isn't a JSON object is refused (the save is then not loaded, not changed).
+    /// </summary>
+    public sealed class AddDiscoveriesMigration : ISaveMigration
+    {
+        public int FromVersion { get { return 6; } }
+        public int ToVersion { get { return 7; } }
+        static readonly Regex HasList = new Regex("\"discoveries\"\\s*:");
+        public string Migrate(string payloadJson)
+        {
+            string json = (payloadJson ?? "").Trim();
+            if (json.Length < 2 || json[0] != '{' || json[json.Length - 1] != '}') throw new SaveMigrationException("The save's payload is not a JSON object.");
+            if (HasList.IsMatch(json)) return payloadJson;
+            string body = json.Substring(0, json.Length - 1).TrimEnd();
+            return body + (body.EndsWith("{") ? "" : ",") + "\"discoveries\":[]}";
         }
     }
 }

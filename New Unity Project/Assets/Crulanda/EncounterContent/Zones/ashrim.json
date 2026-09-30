@@ -1146,5 +1146,83 @@
         }
       }
     ]
-  }
+  },
+  "secrets": [
+    {
+      "id": "secret.ashrim.salt-line",
+      "name": "The Salt Line",
+      "kind": "vista",
+      "at": {
+        "x": 85.5,
+        "y": -50.2
+      },
+      "radius": 5,
+      "rotation": 83,
+      "text": "A line of salt runs across the gap in the Ridge, laid fresh and often by the look of it. Past it the ash goes on a little way, and then it doesn't.",
+      "xp": 180,
+      "canonStatus": "CANON-EXPANDED: the Ash-Walkers binding Weave-Eaters with salt is CANON (book1 ch.20); the salt line across the gap is GAME-ONLY."
+    },
+    {
+      "id": "secret.ashrim.hunters-cache",
+      "name": "An Ash-Walker Cache",
+      "kind": "cache",
+      "prompt": "Open the salt-crusted bundle between the rocks",
+      "at": {
+        "x": 15.9,
+        "y": -71.2
+      },
+      "rotation": 135,
+      "text": "A bundle crusted white with salt, tucked between two stones in the lee of the great rock: an Ash-Walker hunters' cache, left for any of their own caught out at dusk. The red cord knotted round it means take what you need.",
+      "item": "item.bone_harpoon",
+      "xp": 170,
+      "canonStatus": "CANON-EXPANDED: Ash-Walker harpoons of petrified leviathan bone are CANON (book1 ch.20); the hunters' caches are GAME-ONLY."
+    },
+    {
+      "id": "secret.ashrim.doubters-letter",
+      "name": "A Cultist's Hidden Letter",
+      "kind": "note",
+      "prompt": "Work the letter out of the wall",
+      "at": {
+        "x": -84.496,
+        "y": -56.035
+      },
+      "rotation": 130,
+      "height": 1.0,
+      "text": "Pushed into a gap in the cult hut's wall, where the others wouldn't look: a letter, with a little money folded in it for the road. Someone meant to run.",
+      "document": "doc.ashrim.doubter",
+      "xp": 160,
+      "gold": 30,
+      "canonStatus": "CANON-EXPANDED: the Cult of Ash, its bone masks and Vorn are CANON (book1 ch.10, world_bible.md); the letter and its writer are GAME-ONLY."
+    },
+    {
+      "id": "secret.ashrim.last-light",
+      "name": "Last-Light",
+      "kind": "herb",
+      "prompt": "Pick the last-light",
+      "at": {
+        "x": 40,
+        "y": 62
+      },
+      "text": "Pale flowers pushing up through the ash among the dead snags, faintly lit, the only living thing for a mile. The Ash-Walkers call it last-light and say it grows where something refused to be unmade.",
+      "item": "herb.last_light",
+      "xp": 150,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "secret.ashrim.orchard-tin",
+      "name": "The Cinderfold Tin",
+      "kind": "cache",
+      "prompt": "Scrape the ash back from the tin",
+      "at": {
+        "x": -58,
+        "y": 104
+      },
+      "rotation": 45,
+      "text": "A tin buried shallow among the dead trees of Cinderfold's orchard, where some animal has scraped the ash back. Whoever buried it meant to come back once the grey had passed. The grey did not pass.",
+      "item": "potion.salt",
+      "xp": 160,
+      "gold": 45,
+      "canonStatus": "GAME-ONLY"
+    }
+  ]
 }

@@ -9,11 +9,26 @@
   "levelMax": 8,
   "biome": "mountain",
   "weather": [
-    { "kind": "clear", "weight": 2 },
-    { "kind": "fair", "weight": 3 },
-    { "kind": "windy", "weight": 2.5 },
-    { "kind": "overcast", "weight": 2 },
-    { "kind": "flurries", "weight": 3 }
+    {
+      "kind": "clear",
+      "weight": 2
+    },
+    {
+      "kind": "fair",
+      "weight": 3
+    },
+    {
+      "kind": "windy",
+      "weight": 2.5
+    },
+    {
+      "kind": "overcast",
+      "weight": 2
+    },
+    {
+      "kind": "flurries",
+      "weight": 3
+    }
   ],
   "worldMapPosition": {
     "x": 0.53,
@@ -1220,5 +1235,82 @@
         }
       }
     ]
-  }
+  },
+  "secrets": [
+    {
+      "id": "secret.peaks.ledge-lip",
+      "name": "Above the East Road",
+      "kind": "vista",
+      "at": {
+        "x": 84,
+        "y": 93
+      },
+      "radius": 5,
+      "text": "From the ledge's lip the toll road winds down and away east, toward the grey. This is what the pale shapes stand here watching, day and night: the road, and whoever comes up it.",
+      "xp": 110,
+      "canonStatus": "CANON-EXPANDED: the Pale Things as watchers and auditors are CANON (world_bible.md); this lookout is GAME-ONLY."
+    },
+    {
+      "id": "secret.peaks.goat-path-camp",
+      "name": "The Goat-Path Camp",
+      "kind": "cache",
+      "prompt": "Search the cold camp's bundle",
+      "at": {
+        "x": -92.8,
+        "y": -71.2
+      },
+      "rotation": 270,
+      "text": "A cold fire on a shelf above the waystation, where the goat path gives out. Six hollows in the scree where six people slept, and a bundle left by the ashes with a note tucked in its knot.",
+      "item": "food.mountain_jerky",
+      "document": "doc.peaks.goat_path",
+      "xp": 100,
+      "gold": 22,
+      "canonStatus": "GAME-ONLY: the pilgrims and their camp (see the waystation keeper's journal)."
+    },
+    {
+      "id": "secret.peaks.echo-jar",
+      "name": "A Silent Pilgrim's Echo-Jar",
+      "kind": "cache",
+      "prompt": "Unwrap the oilcloth bundle in the rocks",
+      "at": {
+        "x": 96.2,
+        "y": -46.5
+      },
+      "rotation": 250,
+      "text": "An oilcloth bundle wedged between two rocks, a stone's throw from the pilgrims' cairn. Inside, wrapped in grey wool, a stoppered clay jar that whispers when you unstop it.",
+      "item": "item.echo_jar",
+      "document": "doc.peaks.echo",
+      "xp": 120,
+      "canonStatus": "CANON-EXPANDED: the Silent Pilgrims and their echo-jars, which hold fragments of lost eras, are CANON (world_bible.md); this jar and what it holds are GAME-ONLY."
+    },
+    {
+      "id": "secret.peaks.letter-home",
+      "name": "A Letter Never Sent",
+      "kind": "note",
+      "prompt": "Lift the flat stone",
+      "at": {
+        "x": -21.8,
+        "y": 68.8
+      },
+      "rotation": 315,
+      "text": "Weighted under a flat stone where the crag gives out above the toll wall, a sentry's perch, the ink run by snow: a letter home. It was never sent, and it won't be now.",
+      "document": "doc.peaks.letter_home",
+      "xp": 90,
+      "canonStatus": "GAME-ONLY: the letter, its writer and his sister. The Sandthrone toll in the Peaks is CANON (book1 ch.5)."
+    },
+    {
+      "id": "secret.peaks.frostbells",
+      "name": "Frostbells",
+      "kind": "herb",
+      "prompt": "Pick the frostbells",
+      "at": {
+        "x": -8,
+        "y": 100.8
+      },
+      "text": "Ice-blue bells in the lee of the north wall, where the snow lies longest. Pilgrims chew one against the cold and swear it keeps the heart going on the high road.",
+      "item": "herb.frostbell",
+      "xp": 90,
+      "canonStatus": "GAME-ONLY"
+    }
+  ]
 }

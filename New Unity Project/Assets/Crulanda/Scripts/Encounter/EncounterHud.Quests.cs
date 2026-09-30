@@ -5,7 +5,7 @@ namespace Crulanda.Encounter
 {
     /// <summary>
     /// Quest interface: tracker (under the minimap), ! and ? over quest givers, the parchment conversation window, and the
-    /// quest book (L) with Quests, Chronicle and Standing tabs.
+    /// quest book (L) with Quests, Chronicle, Standing and Discoveries tabs (the last in EncounterHud.Discoveries.cs).
     /// </summary>
     public sealed partial class EncounterHud
     {
@@ -14,7 +14,7 @@ namespace Crulanda.Encounter
         static bool QuestUiBlocks(Vector2 p) { return (talkVisible && TalkRect.Contains(p)) || (bookVisible && BookRect.Contains(p)); }
         static readonly Color Parchment = new Color(.9f, .84f, .7f, .98f), InkBrown = new Color(.2f, .13f, .07f), QuestGold = new Color(1, .82f, .15f);
         GUIStyle qTitle, qBody, qSmall, qHead, qMark, qList;
-        /// <summary>Open quest book tab: quests, chronicle or standing (capture tools set it).</summary>
+        /// <summary>Open quest book tab: quests, chronicle, standing or discoveries (capture tools set it).</summary>
         public static string BookTab = "quests";
         string bookQuest, lastReading;
         Vector2 bookScroll, textScroll;
@@ -212,7 +212,7 @@ namespace Crulanda.Encounter
             // A newly revealed page jumps to the Chronicle once; after that the reader can switch tabs freely.
             if (!string.IsNullOrEmpty(session.ReadingDocument) && session.ReadingDocument != lastReading) BookTab = "chronicle";
             lastReading = session.ReadingDocument;
-            string[] tabs = { "quests", "chronicle", "standing" }; string[] names = { "Quests", "Chronicle", "Standing" };
+            string[] tabs = { "quests", "chronicle", "standing", "discoveries" }; string[] names = { "Quests", "Chronicle", "Standing", "Discoveries" };
             for (int i = 0; i < tabs.Length; i++)
             {
                 GUI.enabled = BookTab != tabs[i];
@@ -224,6 +224,7 @@ namespace Crulanda.Encounter
             Fill(list, new Color(1, 1, 1, .04f));
             if (BookTab == "quests") BookQuests(log, list, page);
             else if (BookTab == "chronicle") BookChronicle(log, list, page);
+            else if (BookTab == "discoveries") BookDiscoveries(list, page);
             else BookStanding(log, new Rect(list.x, list.y, w.width - 40, list.height));
         }
         void BookQuests(QuestLog log, Rect list, Rect page)

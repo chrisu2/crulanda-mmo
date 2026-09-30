@@ -13,7 +13,7 @@ The user requested this handoff because they ran out of tokens. Do not assume an
 **The standing direction is in `GAME_BRIEF.md` (read it first): a high-fidelity, beautiful MMO-style world, AAA quality in a classic style, judged on details, graphics, lighting, mood and visual feel.**
 Chris's rules: work in order of importance; finish each step; keep going without waiting (memory: crulanda-autonomy); tell him at each publish.
 
-**State: everything below is PUBLISHED** to `outputs/Crulanda-Playable` and committed on `main` (backed up to J:). Tests: EditMode 174/174, PlayMode 65/65, 0 shader errors.
+**State: everything below is PUBLISHED** to `outputs/Crulanda-Playable` and committed on `main` (backed up to J:). Tests: EditMode 183/183, PlayMode 72/72, 0 shader errors.
 - Published so far:
   - steps 1-4 of the visual review;
   - the turquoise water;
@@ -22,7 +22,9 @@ Chris's rules: work in order of importance; finish each step; keep going without
   - the temp-save travel fix;
   - the tree crowns (painted leaf cards);
   - **WEATHER** (commit 58d06b1, published 2026-09-30 afternoon);
-  - and now **CROWSFOOT HOLLOW** (commit 87dd05b, published 2026-09-30 evening).
+  - **CROWSFOOT HOLLOW** (commit 87dd05b, published 2026-09-30 evening);
+  - and now **SECRETS** (published 2026-09-30, late evening): twenty hidden finds on no map, the Discoveries tab, save format 7.
+    Design: `WORLD_ZONES.md` "Secrets", `SAVE_FORMAT.md` format 7, the CHANGELOG.
 - **Crowsfoot Hollow** covers:
   - Oakhaven's walk-in cave at the end of the North road, a seamless rock passage and knoll;
   - the Sandthrone deserters and Caddock, the Bandit King (elite, tin crown);
@@ -42,8 +44,35 @@ Chris's rules: work in order of importance; finish each step; keep going without
   - the store title, "The Quiet Trail" (the productName) or "The Land of Crulanda" as the novels and bullet-hell use;
   - that *The First Spoke* is out.
 
-**NEXT JOB: SECRETS** (item 0c below): hidden discoveries in every zone, not on any map. Each gives a "Discovered" toast, XP and most a cache; there is a Discoveries tab in the quest book; the save goes to format 7 with a `discoveries` list (BACK UP Chris's save first); props get a `secret` flag the maps skip; tests.
-Then zone size, and the painted style pass. More walk-in caves (a crypt under Khaven, a mine in the Peaks, a sunken ruin on the Rim) can reuse the `cavern` prop: a new plan in `ZoneBuilder.CavernPlan(variant)`.
+~~SECRETS~~ DONE and published (item 0c below). **NEXT JOB: CROWSFOOT HOLLOW GOES DEEP** (below), then zone size, and the painted style pass. More walk-in caves (a crypt under Khaven, a mine in the Peaks, a sunken ruin on the Rim) can reuse the `cavern` prop: a new plan in `ZoneBuilder.CavernPlan(variant)`.
+**AFTER SECRETS: CROWSFOOT HOLLOW GOES DEEP** (Chris, 2026-09-30: "the cave should be deep and the first foray into dungeon crawling").
+It becomes a starter dungeon of about 100 m of passage with five encounters, descending about 14 m, and running under the zone's north edge into the backdrop hills. The design:
+- **Floors.** Each plan point gets a floor drop, so the passage floor is its own mesh (earth material, collider, NavWalkable) instead of the terrain.
+  - `ZoneMeshes.Ground` skips any triangle with a corner inside a passage's volume. The rock shell, 2 m or more thick, always covers the gap (grid cells are about 1.3 m).
+  - The floor mesh runs 1 m out of the mouth onto the terrain, so the navmesh joins.
+- **Layout** (local plan, mouth at the origin; the world is at plus (-16, 90)):
+  - Upper Hollow: the mouth, then the camp chamber at z 12, as now.
+  - The low passage west, turning north at about (-11.5, 23.5).
+  - **The Drop:** a steep stepped descent to drop -9 by plan z 38. Its ceiling must be below world y -1 where it passes under the north boundary box (y -1..11 at z 128-130).
+  - Under the backdrop: the **Store Caves** at plan (-5..-2, 48..52), drop -10.5; a winding passage east; and the **Echoing Hall** at plan (19.5, 75..81), half-width 9, height 8.5-9, drop -14, holding Caddock's throne, braziers, stalagmites off the path, and the plunder.
+- **Encounters** (all deserters level 3-5, `harder`):
+  - 2 lookouts;
+  - 4 at the camp fire;
+  - 2 sentries on the Drop;
+  - the Quartermaster (a new GAME-ONLY mini-boss, elite 4) with 2 in the Store Caves;
+  - 2 in the winding passage;
+  - Caddock (elite 5) with 3 guards in the Echoing Hall.
+- **Loot.** A locked strongbox in the Store Caves whose key hangs on a nail on the Drop (a chest and key pair, as secrets). The plunder moves to the Hall.
+- **Feel.**
+  - Wooden steps and a rope rail down the Drop; puddles; faint blue-green glow-fungus in the deep parts; a rubble-choked side tunnel.
+  - A subzone banner, "Crowsfoot Hollow", on entering.
+  - Falling leaves (NatureFx) stop underground. Today they fall through the knoll into the camp chamber, so this is a fix.
+- **Plumbing.**
+  - `Hollow.FloorAt(p)` for camp spawns (`EncounterSession.SpawnCamps` uses `Zone.Ground`: wrong underground), secret props, `TargetRing` (which uses HeightAt) and anything else ground-seated.
+  - `Hollow.Cover` counts only near-surface rings (for paint, grass, trees and `UnderRoof`). `WorldWeather` shelters on `Hollow.DepthAt(camera) > 0`.
+  - `EncounterNavigation` bounds grow to include hollows beyond the zone square.
+- **Tests.** Extend `CaveTests`: walkable to the Echoing Hall, walled all the way, nothing of the terrain inside the passage, and camps on the passage floor.
+
 Weather polish for later (not blocking):
 - rain and thunder audio (there is no audio yet);
 - puddles;

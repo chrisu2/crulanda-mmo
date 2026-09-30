@@ -1520,5 +1520,96 @@
       "respawn": 240,
       "elite": true
     }
+  ],
+  "shapes": [
+    {
+      "name": "Beacon mound",
+      "center": {
+        "x": 74,
+        "y": 26
+      },
+      "radius": 3,
+      "height": 3.6,
+      "blend": 11
+    }
+  ],
+  "secrets": [
+    {
+      "id": "secret.khaven.beacon-mound",
+      "name": "The Old Beacon",
+      "kind": "vista",
+      "at": {
+        "x": 74,
+        "y": 26
+      },
+      "radius": 5,
+      "rotation": 20,
+      "text": "Fire-cracked stones ring the crown of the mound where Khaven once lit its beacon. From up here the village sits in its dusk: the red well, the gallows, the split chimney glowing.",
+      "xp": 60,
+      "canonStatus": "GAME-ONLY: the mound and its beacon. The Blood-Stone Well, the Gallows Tree and the Cracked Hearth are CANON (the Khaven village map)."
+    },
+    {
+      "id": "secret.khaven.outriders-key",
+      "name": "A Key Under the Gallows",
+      "kind": "key",
+      "prompt": "Feel under the gallows boards",
+      "at": {
+        "x": 9.681,
+        "y": 4.64
+      },
+      "rotation": 200,
+      "height": 0.38,
+      "text": "A brass key on a greasy thong, hung from a nail under the gallows boards, where no one in Khaven will put a hand. Desert brass. Not a village key.",
+      "xp": 40,
+      "canonStatus": "GAME-ONLY: the key and its owner. The Sandthrone is a CANON mercenary company; its hold on Khaven is GAME-ONLY."
+    },
+    {
+      "id": "secret.khaven.outriders-hoard",
+      "name": "The Outrider's Hoard",
+      "kind": "chest",
+      "prompt": "Open the banded box under the log",
+      "at": {
+        "x": -56,
+        "y": 20
+      },
+      "rotation": 255,
+      "needs": "secret.khaven.outriders-key",
+      "text": "An iron-banded box tucked in against a fallen grey trunk, deep where the wood talks. The brass key turns stiffly. Inside is an outrider's private share of Khaven's 'toll', and his tally of it.",
+      "item": "item.outriders_knife",
+      "document": "doc.khaven.skim",
+      "xp": 70,
+      "gold": 18,
+      "canonStatus": "GAME-ONLY: the hoard, the knife and the tally. The Sandthrone is CANON; its hold on Khaven is GAME-ONLY."
+    },
+    {
+      "id": "secret.khaven.sextons-page",
+      "name": "A Page from the Sexton's Register",
+      "kind": "note",
+      "prompt": "Tease the page out of the wall",
+      "at": {
+        "x": 16.274,
+        "y": -104.46
+      },
+      "rotation": 10,
+      "height": 0.5,
+      "text": "A page torn from the sexton's register, folded into a crack in the drowned chapel's wall and gone soft with damp. Most of it still reads.",
+      "document": "doc.khaven.low_row",
+      "xp": 55,
+      "canonStatus": "GAME-ONLY: the register, its names and the salt custom. Hollow Men are a CANON creature (book1 ch.4)."
+    },
+    {
+      "id": "secret.khaven.widows-lamps",
+      "name": "Widow's-Lamps",
+      "kind": "herb",
+      "prompt": "Pick the pale lamps",
+      "at": {
+        "x": -36,
+        "y": -94
+      },
+      "text": "Pale bells no bigger than a thumbnail, lit from inside like lamps left in a window. Khaven calls them widow's-lamps and won't pick them after dark.",
+      "item": "herb.widows_lamp",
+      "xp": 45,
+      "canonStatus": "GAME-ONLY"
+    }
   ]
 }

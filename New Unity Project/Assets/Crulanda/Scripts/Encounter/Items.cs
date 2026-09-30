@@ -199,6 +199,13 @@ namespace Crulanda.Encounter
             return count;
         }
         public static int FreeSlots(EncounterProgress p) { int n = 0; foreach (var s in p.bag) if (s.Empty) n++; return n; }
+        /// <summary>How many of an item the bags could take now (room left on its stacks, then empty slots). 0 for an unknown item.</summary>
+        public static int Room(EncounterProgress p, ItemDatabase db, string item)
+        {
+            Ensure(p); var d = db?.Get(item); if (d == null) return 0;
+            int n = 0; foreach (var s in p.bag) n += s.Empty ? d.stack : s.item == item ? Math.Max(0, d.stack - s.count) : 0;
+            return n;
+        }
         public static void Remove(EncounterProgress p, string item, int count)
         {
             for (int i = p.bag.Count - 1; i >= 0 && count > 0; i--)

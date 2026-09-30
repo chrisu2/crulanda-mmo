@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using Crulanda.World;
 
@@ -6,10 +7,56 @@ namespace Crulanda.Encounter
     /// <summary>
     /// Minimap (round, north-up, rotating player arrow), zone map (M) and world map (scroll out on the zone map).
     /// Draws in EncounterHud's 1440x900 canvas. The zone picture is ZoneBuilder.MapTexture; the world map is the
-    /// author's overworld image (ZoneArt.worldMap) with a pin per zone.
+    /// author's overworld image (ZoneArt.worldMap) with a pin per zone. What the two zone maps mark comes from
+    /// <see cref="Marks"/> alone.
     /// </summary>
     public sealed class HudMaps
     {
+        /// <summary>What a map mark is (see <see cref="Marks"/>).</summary>
+        public enum MarkKind { Landmark, Camp, Exit, Enemy, QuestPlace, QuestRoad, QuestPerson }
+        /// <summary>
+        /// One thing the maps mark: what it is, where it is in the world, and its words (a name, a mob, a quest's title, or the ! or ?
+        /// over someone). A camp carries its data (ring and levels); a road out the zone it leads to (null if unknown); a grey ! or ? is grey.
+        /// </summary>
+        public struct MapMark { public MarkKind kind; public Vector3 world; public string text; public bool grey; public ZoneDefinition to; public ZoneCamp camp; }
+        /// <summary>
+        /// Everything the minimap and the zone map mark besides you and Mira, in drawing order: the zone's landmarks, camps and roads
+        /// out, enemies in sight, the places quests send you, the roads they lead down, and the ! and ? over people. The maps draw
+        /// from this list and nothing else. Hidden finds (ZoneBuilder.Secrets) are never read here: a secret is on no map.
+        /// </summary>
+        public static void Marks(EncounterSession s, List<MapMark> into)
+        {
+            into.Clear(); var zone = s.Zone;
+            if (zone != null)
+            {
+                var z = zone.Zone;
+                foreach (var l in z.landmarks) into.Add(new MapMark { kind = MarkKind.Landmark, world = zone.Ground(l.at), text = l.name });
+                if (z.camps != null)
+                    foreach (var c in z.camps) if (c != null) into.Add(new MapMark { kind = MarkKind.Camp, world = zone.Ground(c.center), text = c.mob, camp = c });
+                foreach (var e in z.exits) into.Add(new MapMark { kind = MarkKind.Exit, world = zone.Ground(e.at), text = e.name, to = ZoneById(zone, e.to) });
+            }
+            foreach (var enemy in s.Enemies) if (enemy != null && enemy.actor.IsAlive && !enemy.Hidden) into.Add(new MapMark { kind = MarkKind.Enemy, world = enemy.transform.position, text = enemy.actor.DisplayName });
+            if (s.Quests == null || zone == null) return;
+            foreach (var (q, o, done) in s.Quests.Places())
+                if (!done && (string.IsNullOrEmpty(o.zone) || o.zone == s.ZoneId)) into.Add(new MapMark { kind = MarkKind.QuestPlace, world = zone.Ground(o.at), text = q.title });
+            // Breadcrumbs: a quest step waiting in another zone rings the exit on the road there.
+            foreach (var (q, st) in s.Quests.Active())
+            {
+                var elsewhere = s.QuestZoneElsewhere(q, st); if (elsewhere == null) continue;
+                var exit = s.ExitToward(elsewhere); if (exit == null) continue;
+                into.Add(new MapMark { kind = MarkKind.QuestRoad, world = zone.Ground(exit.at), text = q.title });
+            }
+            var life = VillageLife.Active; if (life == null) return;
+            foreach (var v in life.Villagers)
+            {
+                if (!v.Visible) continue;
+                char m = s.Quests.Marker(v.Name, s.ZoneId, s.Progress.Level, out bool grey); if (m == ' ') continue;
+                into.Add(new MapMark { kind = MarkKind.QuestPerson, world = v.transform.position, text = m.ToString(), grey = grey });
+            }
+        }
+        /// <summary>A zone's data by id, from the builder's parsed list (no JSON parsing per frame).</summary>
+        static ZoneDefinition ZoneById(ZoneBuilder zone, string id) { foreach (var d in zone.AllZones()) if (d.id == id) return d; return null; }
+        readonly List<MapMark> marks = new List<MapMark>();
         public static readonly Rect MinimapRect = new Rect(1238, 30, 184, 184);
         public static readonly Rect WindowRect = new Rect(230, 50, 980, 800);
         static readonly float[] MinimapRadii = { 28, 45, 70 };
@@ -71,35 +118,24 @@ namespace Crulanda.Encounter
 
         GUIStyle mark;
         /// <summary>
-        /// Quest pins: ! and ? over quest givers (the same rules as the head markers), and a gold ring on each place a
-        /// quest asks you to go. People off the edge of the minimap are not shown; places are clamped to its rim.
+        /// A quest pin: a gold ring on a place a quest asks you to go (a larger one on the road out toward a step in another zone),
+        /// or the ! or ? over a quest giver (the same rules as the head markers). People off the edge of the minimap are not shown;
+        /// places are clamped to its rim.
         /// </summary>
-        void QuestMarks(EncounterSession s, System.Func<Vector3, Vector2?> person, System.Func<Vector3, Vector2?> place, int size)
+        void QuestMark(MapMark m, System.Func<Vector3, Vector2?> person, System.Func<Vector3, Vector2?> place, int size)
         {
-            if (s.Quests == null || s.Zone == null) return;
             if (mark == null) mark = new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleCenter };
             mark.fontSize = size;
-            foreach (var (q, o, done) in s.Quests.Places())
+            if (m.kind == MarkKind.QuestPerson)
             {
-                if (done || (!string.IsNullOrEmpty(o.zone) && o.zone != s.ZoneId)) continue;
-                var at = place(s.Zone.Ground(o.at)); if (!at.HasValue) continue;
-                GUI.color = new Color(1, .82f, .25f, .85f); GUI.DrawTexture(new Rect(at.Value.x - size * .6f, at.Value.y - size * .6f, size * 1.2f, size * 1.2f), pin); GUI.color = Color.white;
+                var at = person(m.world); if (!at.HasValue) return;
+                Shadowed(new Rect(at.Value.x - 12, at.Value.y - 14, 24, 26), m.text, mark, m.grey ? new Color(.7f, .7f, .7f) : new Color(1, .82f, .15f));
             }
-            // Breadcrumbs: a quest step waiting in another zone rings the exit on the road there.
-            foreach (var (q, st) in s.Quests.Active())
+            else if (m.kind == MarkKind.QuestPlace || m.kind == MarkKind.QuestRoad)
             {
-                var elsewhere = s.QuestZoneElsewhere(q, st); if (elsewhere == null) continue;
-                var exit = s.ExitToward(elsewhere); if (exit == null) continue;
-                var at = place(s.Zone.Ground(exit.at)); if (!at.HasValue) continue;
-                GUI.color = new Color(1, .82f, .25f, .95f); GUI.DrawTexture(new Rect(at.Value.x - size * .75f, at.Value.y - size * .75f, size * 1.5f, size * 1.5f), pin); GUI.color = Color.white;
-            }
-            var life = VillageLife.Active; if (life == null) return;
-            foreach (var v in life.Villagers)
-            {
-                if (!v.Visible) continue;
-                char m = s.Quests.Marker(v.Name, s.ZoneId, s.Progress.Level, out bool grey); if (m == ' ') continue;
-                var at = person(v.transform.position); if (!at.HasValue) continue;
-                Shadowed(new Rect(at.Value.x - 12, at.Value.y - 14, 24, 26), m.ToString(), mark, grey ? new Color(.7f, .7f, .7f) : new Color(1, .82f, .15f));
+                var at = place(m.world); if (!at.HasValue) return;
+                bool road = m.kind == MarkKind.QuestRoad; float half = size * (road ? .75f : .6f);
+                GUI.color = new Color(1, .82f, .25f, road ? .95f : .85f); GUI.DrawTexture(new Rect(at.Value.x - half, at.Value.y - half, half * 2, half * 2), pin); GUI.color = Color.white;
             }
         }
 
@@ -137,18 +173,21 @@ namespace Crulanda.Encounter
                 if (d.magnitude > max) { if (!clampToEdge) return null; d = d.normalized * max; }
                 return center + d;
             };
-            if (zone != null)
-                foreach (var e in zone.Zone.exits)
+            // Roads out, enemies and quest pins (the minimap leaves landmarks and camps to the zone map).
+            System.Func<Vector3, Vector2?> person = w => toMini(w, false), place = w => toMini(w, true);
+            Marks(s, marks);
+            foreach (var m in marks)
+            {
+                if (m.kind == MarkKind.Exit)
                 {
-                    var at = toMini(zone.Ground(e.at), true); if (!at.HasValue) continue;
+                    var at = toMini(m.world, true); if (!at.HasValue) continue;
                     Dot(at.Value, 11, new Color(1, .82f, .3f));
                     // Where the road goes, and its level band, tucked inside the rim.
-                    var to = zone.FindZone(e.to);
-                    if (to != null) { var inward = (center - at.Value).normalized * 16; Shadowed(new Rect(at.Value.x + inward.x - 40, at.Value.y + inward.y - 9, 80, 18), Band(to), centered, BandColor(to, s.Progress.Level)); }
+                    if (m.to != null) { var inward = (center - at.Value).normalized * 16; Shadowed(new Rect(at.Value.x + inward.x - 40, at.Value.y + inward.y - 9, 80, 18), Band(m.to), centered, BandColor(m.to, s.Progress.Level)); }
                 }
-            foreach (var enemy in s.Enemies)
-            { if (!enemy.actor.IsAlive || enemy.Hidden) continue; var at = toMini(enemy.transform.position, false); if (at.HasValue) Dot(at.Value, 9, new Color(.95f, .25f, .2f)); }
-            QuestMarks(s, w => toMini(w, false), w => toMini(w, true), 15);
+                else if (m.kind == MarkKind.Enemy) { var at = toMini(m.world, false); if (at.HasValue) Dot(at.Value, 9, new Color(.95f, .25f, .2f)); }
+                else QuestMark(m, person, place, 15);
+            }
             if (s.Companion != null)
             { var at = toMini(s.Companion.transform.position, !s.Progress.recruited); if (at.HasValue) Dot(at.Value, s.Progress.recruited ? 9 : 12, s.Progress.recruited ? new Color(.4f, 1, .55f) : gold); }
             Arrow(center, 20, s.Player.transform.eulerAngles.y);
@@ -189,31 +228,37 @@ namespace Crulanda.Encounter
             GUI.Label(new Rect(WindowRect.x + 20, WindowRect.y + 44, 700, 20), z.subtitle, note);
             if (zone.MapTexture != null) GUI.DrawTexture(map, zone.MapTexture);
             GUI.color = new Color(0, 0, 0, .25f); GUI.DrawTexture(new Rect(map.x - 2, map.y - 2, map.width + 4, 2), Texture2D.whiteTexture); GUI.color = Color.white;
-            foreach (var l in z.landmarks)
+            System.Func<Vector3, Vector2?> onMap = w => OnMap(map, zone.MapUV(w));
+            Marks(s, marks);
+            foreach (var m in marks)
             {
-                var at = OnMap(map, zone.MapUV(zone.Ground(l.at)));
-                Dot(at, 8, new Color(.95f, .85f, .6f)); Shadowed(new Rect(at.x - 110, at.y + 4, 220, 20), l.name, centered, new Color(1, .93f, .75f));
-            }
-            // Camps: a red ring with the pack and its levels.
-            if (z.camps != null)
-                foreach (var c in z.camps)
+                var at = OnMap(map, zone.MapUV(m.world));
+                switch (m.kind)
                 {
-                    if (c == null) continue;
-                    var at = OnMap(map, zone.MapUV(zone.Ground(c.center))); float rr = Mathf.Max(10, c.radius / z.size * map.width);
-                    GUI.color = new Color(.9f, .25f, .2f, .5f); GUI.DrawTexture(new Rect(at.x - rr, at.y - rr, rr * 2, rr * 2), pin); GUI.color = Color.white;
-                    Shadowed(new Rect(at.x - 110, at.y + rr - 2, 220, 20), c.mob + "  " + (c.levelMin == c.levelMax ? c.levelMin.ToString() : c.levelMin + "-" + c.levelMax) + (c.elite ? "  elite" : ""), centered, LevelColor(c.levelMax, s.Progress.Level));
+                    case MarkKind.Landmark:
+                        Dot(at, 8, new Color(.95f, .85f, .6f)); Shadowed(new Rect(at.x - 110, at.y + 4, 220, 20), m.text, centered, new Color(1, .93f, .75f));
+                        break;
+                    case MarkKind.Camp:
+                    {
+                        // A red ring with the pack and its levels.
+                        var c = m.camp; float rr = Mathf.Max(10, c.radius / z.size * map.width);
+                        GUI.color = new Color(.9f, .25f, .2f, .5f); GUI.DrawTexture(new Rect(at.x - rr, at.y - rr, rr * 2, rr * 2), pin); GUI.color = Color.white;
+                        Shadowed(new Rect(at.x - 110, at.y + rr - 2, 220, 20), c.mob + "  " + (c.levelMin == c.levelMax ? c.levelMin.ToString() : c.levelMin + "-" + c.levelMax) + (c.elite ? "  elite" : ""), centered, LevelColor(c.levelMax, s.Progress.Level));
+                        break;
+                    }
+                    case MarkKind.Exit:
+                    {
+                        Dot(at, 14, new Color(1, .82f, .3f));
+                        string text = "→ " + (m.to != null ? m.to.displayName + "  (" + Band(m.to) + ")" : m.text);
+                        float tw = label.CalcSize(new GUIContent(text)).x;
+                        float lx = Mathf.Clamp(at.x - tw / 2, map.x + 4, map.xMax - tw - 4), ly = Mathf.Clamp(at.y - 26, map.y + 4, map.yMax - 24);
+                        Shadowed(new Rect(lx, ly, tw + 4, 20), text, label, m.to != null ? BandColor(m.to, s.Progress.Level) : gold);
+                        break;
+                    }
+                    case MarkKind.Enemy: Dot(at, 10, new Color(.95f, .25f, .2f)); break;
+                    default: QuestMark(m, onMap, onMap, 20); break;
                 }
-            foreach (var e in z.exits)
-            {
-                var at = OnMap(map, zone.MapUV(zone.Ground(e.at))); var to = zone.FindZone(e.to);
-                Dot(at, 14, new Color(1, .82f, .3f));
-                string text = "→ " + (to != null ? to.displayName + "  (" + Band(to) + ")" : e.name);
-                float tw = label.CalcSize(new GUIContent(text)).x;
-                float lx = Mathf.Clamp(at.x - tw / 2, map.x + 4, map.xMax - tw - 4), ly = Mathf.Clamp(at.y - 26, map.y + 4, map.yMax - 24);
-                Shadowed(new Rect(lx, ly, tw + 4, 20), text, label, to != null ? BandColor(to, s.Progress.Level) : gold);
             }
-            foreach (var enemy in s.Enemies) if (enemy.actor.IsAlive && !enemy.Hidden) Dot(OnMap(map, zone.MapUV(enemy.transform.position)), 10, new Color(.95f, .25f, .2f));
-            QuestMarks(s, w => OnMap(map, zone.MapUV(w)), w => OnMap(map, zone.MapUV(w)), 20);
             if (s.Companion != null)
             {
                 var at = OnMap(map, zone.MapUV(s.Companion.transform.position));

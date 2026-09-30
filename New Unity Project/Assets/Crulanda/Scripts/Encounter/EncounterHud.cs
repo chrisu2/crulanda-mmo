@@ -74,6 +74,7 @@ namespace Crulanda.Encounter
             if (session.MapOpen) maps.DrawWindow(session, gold, ink);
             if (session.QuestBookOpen) DrawQuestBook();
             if (session.Conversation != null) DrawConversation();
+            DrawDiscoveryToast();   // over the windows: it lasts a few seconds
             if (!session.Player.IsAlive)
             {
                 Frame(new Rect(490, 355, 460, 145));

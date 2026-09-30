@@ -442,6 +442,32 @@ namespace Crulanda.Encounter
                         ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + shot + ".png")); yield return new WaitForSeconds(.4f);
                     }
                 }
+                // A hidden find up close, one a zone (its first chest, cache, herb, note or key): from the side you come to it (its
+                // frame's -Z), a little above, the player out of frame and the HUD hidden. Secrets are on no map: this is their picture.
+                Crulanda.World.ZoneSecretSpot find = null;
+                foreach (var kind in new[] { "chest", "cache", "herb", "note", "key" })
+                    if (find == null) find = zone.Secrets.Find(sp => sp != null && sp.def != null && sp.def.kind == kind && sp.root != null);
+                if (find != null)
+                {
+                    EncounterHud.Hidden = true; Crulanda.World.WorldClock.Hour = 15;
+                    var focus = find.position + Vector3.up * .15f; var back = -find.root.forward; back.y = 0; back.Normalize();
+                    Vector3 From(float turn)
+                    {
+                        var c = focus + Quaternion.Euler(0, turn, 0) * back * 2.4f + Vector3.up * 1.1f;
+                        c.y = Mathf.Max(c.y, zone.HeightAt(c.x, c.z) + 1.2f); return c;
+                    }
+                    var shotFrom = From(0);
+                    for (int k = 1; k < 8 && Physics.CheckSphere(shotFrom, .35f, ~0, QueryTriggerInteraction.Ignore); k++) shotFrom = From((k + 1) / 2 * (k % 2 == 1 ? 35 : -35));   // in the open: turn round it
+                    var body = Array.FindAll(session.Player.GetComponentsInChildren<Renderer>(), r => r.enabled);
+                    motor.Teleport(zone.Ground(new Vector2(shotFrom.x + back.x * 2, shotFrom.z + back.z * 2), 1.1f));
+                    foreach (var r in body) r.enabled = false;
+                    motor.enabled = false; var view = session.View.transform; var look = Quaternion.LookRotation(focus - shotFrom);
+                    for (float w = 0; w < .8f; w += Time.deltaTime) { view.SetPositionAndRotation(shotFrom, look); Crulanda.World.TreeFade.UpdateAll(shotFrom, focus, focus); yield return null; }
+                    view.SetPositionAndRotation(shotFrom, look);
+                    string slug = find.def.id.Substring(find.def.id.LastIndexOf('.') + 1);
+                    ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "87-secret-" + slug + ".png")); yield return new WaitForSeconds(.4f);
+                    motor.enabled = true; foreach (var r in body) r.enabled = true;
+                }
             }
             EncounterHud.Hidden = false;
             Debug.Log("WORLD_CAPTURE_DONE"); Application.Quit(0);

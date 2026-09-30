@@ -78,6 +78,7 @@ namespace Crulanda.World
             if (view != null && art.post != null && view.GetComponent<ZonePost>() == null) view.gameObject.AddComponent<ZonePost>().Init(art.post, Zone, sunLight);
             try { StaticBatchingUtility.Combine(statics.gameObject); } catch (Exception e) { Debug.LogWarning("Static batching skipped: " + e.Message); }
             MapTexture = RenderMap(1024);   // in daylight, before the clock sets the hour
+            BuildSecrets();   // after the map: a hidden find must never show on the minimap or the zone map
             gameObject.AddComponent<WorldWeather>().Init(this, sunLight);   // before the clock: its first light already has the weather in it
             var clock = gameObject.AddComponent<WorldClock>(); clock.Init(sunLight, Zone.lighting, art.skybox, NightLights);
             // Reflections follow the real sky: a sky-only realtime probe covering the zone, refreshed by the clock.
@@ -895,10 +896,12 @@ namespace Crulanda.World
                 default: return Vector2.zero;
             }
         }
-        /// <summary>Whether a point stands under a building's roof (its footprint, eaves included): no rain or snow falls there.</summary>
-        public bool UnderRoof(Vector2 p)
+        /// <summary>Whether a point stands under a building's roof (its footprint, eaves included) or in a cave: no rain or snow falls there.</summary>
+        public bool UnderRoof(Vector2 p) { return Hollow.CoverAt(p, .3f) > 0 || InBuilding(p); }   // a cave's passage, or a building
+        /// <summary>Whether a point stands inside a building's footprint, eaves included (house, inn, barn, mill, keep, tower, crypt,
+        /// forge, tannery, shelter).</summary>
+        public bool InBuilding(Vector2 p)
         {
-            if (Hollow.CoverAt(p, .3f) > 0) return true;   // a cave's passage
             foreach (var b in Zone.props)
             {
                 if (b == null) continue;
@@ -3089,6 +3092,330 @@ namespace Crulanda.World
             foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(s * .5f, 1.2f, -.02f), new Vector3(.18f, .6f, .03f), rag, Quaternion.Euler(0, 0, s * 8));   // tatters
             Mask(t, new Vector3(0, 2.3f, -.1f), 0, 1.3f);
             Solid(t, new Vector3(0, 1, 0), new Vector3(.5f, 2, .5f));
+        }
+
+        // ---------- secrets: hidden finds on no map ----------
+        /// <summary>
+        /// The zone's hidden finds (<see cref="ZoneSecret"/>), each built as a small, subtle prop and registered in
+        /// <see cref="Secrets"/> for the encounter's discovery system. Built after the map is rendered, so none shows on the minimap
+        /// or the zone map; no colliders, so the navmesh is as it was; drawn from a stream of its own keyed on where it stands, so
+        /// the zone's stream (every tree, bush and rock) is untouched. Its frame faces -Z the way you come to it (its rotation) with
+        /// its hiding place behind (+Z):
+        /// - cache: a dented tin, or an oilcloth bundle when its prompt or name says bundle, oilcloth, sack or pack (crusted with
+        ///   salt when it says salt);
+        /// - note: a folded page standing out of a crack, or lying under a stone;
+        /// - herb: a small patch of pale, faintly glowing bells;
+        /// - chest: an iron-banded chest with a padlock; key: a small brass key on a thong from a nail;
+        /// - vista: nothing, a small cairn ("stones", "cairn"), a ring of fire-cracked beacon stones ("beacon") or a line of salt
+        ///   across the way, its rotation turning it ("salt").
+        /// A word in a searchable's prompt or name sets a scene round it: "camp" (a cold fire ring and a rolled bedroll in front),
+        /// "log" or "trunk" (a fallen trunk behind it), "stump" (a hollow stump it is pushed into), "rocks" or "cleft" (two stones
+        /// either side), "stone" (a flat stone half over it), "scrape" (a shallow scrape it lies half buried in).
+        /// Things you take (a note, a key, a herb) are kept apart from their scene: <see cref="ZoneSecretSpot.root"/> is the thing
+        /// alone, so only it vanishes when found (the nail, the crack and the stump stay). Metal catches the light in a small glint,
+        /// pages are pale and the herbs glow faintly: enough to catch a curious eye, never a quest marker's glow.
+        /// A herb, or a find in a scene of its own, that stands in a trunk or a rock is moved clear (up to 2.5 m; never onto a
+        /// road, into water or a building); one tucked against a prop (a key on a gallows, a page in a wall) stays exactly put.
+        /// </summary>
+        void BuildSecrets()
+        {
+            if (Zone.secrets == null || Zone.secrets.Length == 0) return;
+            var all = new GameObject("Zone secrets").transform; all.SetParent(transform, false);
+            Physics.SyncTransforms();   // this frame's colliders, for moving a find out of a trunk or a rock
+            foreach (var s in Zone.secrets)
+            {
+                if (s == null || string.IsNullOrEmpty(s.id)) continue;
+                string words = ((s.prompt ?? "") + " " + (s.name ?? "") + (s.kind == "vista" ? " " + (s.text ?? "") : "")).ToLowerInvariant();
+                bool Says(params string[] any) { foreach (var w in any) if (words.Contains(w)) return true; return false; }
+                string scene = s.kind == "vista" ? (Says("beacon") ? "beacon" : Says("salt") ? "salt" : Says("stones", "cairn") ? "cairn" : null)
+                    : Says("camp") ? "camp" : Says("log", "trunk") ? "log" : Says("stump") ? "stump" : Says("rocks", "cleft") ? "rocks" : Says("stone") ? "stone" : Says("scrape") ? "scrape" : null;
+                var sr = new System.Random(Zone.seed ^ (Mathf.RoundToInt(s.at.x * 8) * 73856093) ^ (Mathf.RoundToInt(s.at.y * 8) * 19349663) ^ 0x51c2e7);
+                float R() { return (float)sr.NextDouble(); }
+                var at = s.at;
+                if (s.kind == "herb" || (s.kind != "vista" && scene != null)) at = SecretClear(at, scene == "camp" ? 1.9f : scene == "log" ? 1.5f : scene == "rocks" ? .9f : .5f);
+                var t = new GameObject("Secret: " + (string.IsNullOrEmpty(s.name) ? s.id : s.name)).transform; t.SetParent(all, false);
+                t.position = Ground(at); t.rotation = Quaternion.Euler(0, s.rotation, 0);
+                var item = new GameObject(s.kind).transform; item.SetParent(t, false); item.localPosition = Vector3.up * s.height;
+                switch (s.kind)
+                {
+                    case "vista":
+                        if (scene == "beacon") SecretBeacon(t, R);
+                        else if (scene == "salt") SecretSaltLine(t, R);
+                        else if (scene == "cairn") SecretCairn(t, R, Zone.wasting != null && Unmade(at.x, at.y) > .2f ? Tint(art.stone, new Color(.6f, .6f, .62f)) : null);   // in the grey, its top stone greyed too
+                        break;
+                    case "cache":
+                        if (Says("bundle", "oilcloth", "sack", "pack")) SecretBundle(item, R, Says("salt"));
+                        else SecretTin(item, R, Says("salt"), scene == "scrape" ? .07f : .035f);
+                        break;
+                    case "note": SecretPage(item, R, scene == "stone"); if (scene == null) SecretCrack(t, s.height); break;
+                    case "herb": SecretHerb(item, R); break;
+                    case "chest": SecretChest(item, t, R); break;
+                    case "key": SecretKey(item, t, s.height, R); break;
+                    default: Debug.LogWarning(Zone.id + ": secret '" + s.id + "' has an unknown kind '" + s.kind + "'."); break;
+                }
+                if (s.kind != "vista")
+                    switch (scene)
+                    {
+                        case "camp": SecretCamp(t, R); break;
+                        case "log": SecretLog(t, R); break;
+                        case "stump": SecretStump(t, R, s.height); break;
+                        case "rocks": SecretRocks(t, R); break;
+                        case "stone": SecretFlatStone(t, R); break;
+                        case "scrape": SecretScrape(t, R); break;
+                    }
+                bool pocketed = s.kind == "note" || s.kind == "key" || s.kind == "herb";   // what you take vanishes once found; its scene stays
+                Secrets.Add(new ZoneSecretSpot { def = s, position = s.kind == "vista" ? t.position : item.position, root = pocketed ? item : t });
+            }
+        }
+        /// <summary>
+        /// Where a find, and the scene round it (radius r), may stand at or near at: clear of every collider but the ground's (a trunk,
+        /// a rock, a wall), off the roads and out of the water and buildings, up to 2.5 m away; at itself when nothing near is clear.
+        /// Draws nothing random.
+        /// </summary>
+        Vector2 SecretClear(Vector2 at, float r)
+        {
+            var ground = GroundMesh != null ? GroundMesh.GetComponent<Collider>() : null;
+            bool Clear(Vector2 q)
+            {
+                if (NearRoad(q, 1) || Water.NearWater(q, .5f) || InBuilding(q)) return false;
+                foreach (var c in Physics.OverlapSphere(Ground(q, .6f), r, ~0, QueryTriggerInteraction.Ignore)) if (c != ground) return false;
+                return true;
+            }
+            if (Clear(at)) return at;
+            for (float d = .5f; d <= 2.51f; d += .5f)
+                for (int k = 0; k < 8; k++) { var q = at + new Vector2(Mathf.Cos(k * Mathf.PI / 4), Mathf.Sin(k * Mathf.PI / 4)) * d; if (Clear(q)) return q; }
+            return at;
+        }
+        /// <summary>Stone for a find's scene (cairns, stones), in the zone's own rock.</summary>
+        Material SecretStone(float shade = 1)
+        {
+            var c = Zone.biome == "ash" ? new Color(.35f, .34f, .33f) : Zone.biome == "mountain" ? MountainStone : Gloom ? new Color(.39f, .38f, .37f) : new Color(.46f, .45f, .42f);
+            return Tint(art.stone, c * shade);
+        }
+        /// <summary>A small bright fleck where metal catches the light: enough to catch a curious eye, nowhere near a marker's glow.</summary>
+        void Glint(Transform t, Vector3 at, float size = .02f) { Part(PrimitiveType.Sphere, t, at, Vector3.one * size, Glowing(new Color(1, .94f, .8f), .55f)).name = "Glint"; }
+        /// <summary>A dented tin, its lid not quite square, a spot of rust and a brass clasp catching the light; sunk a little (half
+        /// buried in a scrape); a salt-stiff cord round it for a Salt-Mender's.</summary>
+        void SecretTin(Transform item, Func<float> R, bool cord, float sink)
+        {
+            var box = new GameObject("Tin").transform; box.SetParent(item, false);
+            box.localPosition = Vector3.down * sink; box.localRotation = Quaternion.Euler((R() - .5f) * 10, (R() - .5f) * 40, (R() - .5f) * 10);
+            Part(PrimitiveType.Cube, box, new Vector3(0, .065f, 0), new Vector3(.3f, .13f, .2f), Tint(art.metal, new Color(.36f, .35f, .32f)));
+            Part(PrimitiveType.Cube, box, new Vector3(.006f, .138f, .004f), new Vector3(.314f, .028f, .214f), Tint(art.metal, new Color(.42f, .41f, .38f)), Quaternion.Euler(0, 2, 1.5f));
+            Part(PrimitiveType.Cube, box, new Vector3(-.075f, .06f, -.1015f), new Vector3(.11f, .07f, .004f), Tint(art.metal, new Color(.36f, .2f, .12f)));   // rust
+            Part(PrimitiveType.Cube, box, new Vector3(0, .12f, -.107f), new Vector3(.03f, .036f, .012f), Tint(art.metal, new Color(.62f, .48f, .22f)));   // the clasp
+            Glint(box, new Vector3(.004f, .126f, -.114f));
+            if (cord) Part(PrimitiveType.Cube, box, new Vector3(.07f, .075f, 0), new Vector3(.014f, .162f, .218f), Tint(art.cloth, new Color(.8f, .78f, .72f)));
+        }
+        /// <summary>An oilcloth bundle, tied twice round with cord and knotted, a flap folded over; crusted white where salt was packed in it,
+        /// and tied with red cord (an Ash-Walker's sign: take what you need).</summary>
+        void SecretBundle(Transform item, Func<float> R, bool salt)
+        {
+            var b = new GameObject("Bundle").transform; b.SetParent(item, false); b.localRotation = Quaternion.Euler(0, (R() - .5f) * 50, (R() - .5f) * 8);
+            var cloth = Tint(art.cloth, Wither(new Color(.25f, .23f, .17f))); var cord = Tint(art.cloth, salt ? new Color(.55f, .16f, .1f) : new Color(.55f, .46f, .3f));
+            Part(PrimitiveType.Sphere, b, new Vector3(0, .1f, 0), new Vector3(.48f, .26f, .34f), cloth);
+            Part(PrimitiveType.Cube, b, new Vector3(.1f, .19f, -.05f), new Vector3(.24f, .02f, .2f), Tint(art.cloth, Wither(new Color(.2f, .19f, .14f))), Quaternion.Euler(-14, 24, 9));   // the flap
+            // Two turns of cord: flat rings standing across it, their rims just proud of the cloth; the knot on top.
+            foreach (int k in new[] { -1, 1 }) Part(PrimitiveType.Cylinder, b, new Vector3(k * .09f, .1f, 0), new Vector3(.26f, .008f, .33f), cord, Quaternion.Euler(0, 0, 90));
+            Part(PrimitiveType.Sphere, b, new Vector3(.09f, .23f, -.03f), new Vector3(.05f, .04f, .05f), cord);
+            if (salt) for (int k = 0; k < 6; k++) Part(PrimitiveType.Cube, b, new Vector3((R() - .5f) * .3f, .2f + R() * .03f, (R() - .5f) * .2f), Vector3.one * (.025f + R() * .03f), Tint(art.stone, new Color(.93f, .93f, .9f)), Quaternion.Euler(R() * 90, R() * 90, 0));
+        }
+        /// <summary>A page folded small: standing out of a crack (or a hollow), its corner bent over and a spot of wax on it; or, flat,
+        /// lying under a stone with its end showing.</summary>
+        void SecretPage(Transform item, Func<float> R, bool flat)
+        {
+            var p = new GameObject("Page").transform; p.SetParent(item, false);
+            var paper = Tint(art.plaster, new Color(.9f, .85f, .7f));
+            if (flat)
+            {
+                // Face up, its far end (+Z) under the stone behind it.
+                p.localPosition = Vector3.up * .006f; p.localRotation = Quaternion.Euler(0, (R() - .5f) * 30, 0);
+                Part(PrimitiveType.Cube, p, new Vector3(0, 0, .03f), new Vector3(.12f, .004f, .16f), paper);
+                Part(PrimitiveType.Cube, p, new Vector3(.04f, .012f, -.045f), new Vector3(.05f, .003f, .04f), paper, Quaternion.Euler(-24, 0, 0));   // a corner lifting
+                Part(PrimitiveType.Sphere, p, new Vector3(-.02f, .004f, -.02f), new Vector3(.024f, .007f, .024f), Tint(art.cloth, new Color(.52f, .12f, .09f)));
+                return;
+            }
+            // Pushed into the face (the frame's z = 0 plane), turned a little toward you: most of it in the crack, a hand's width out.
+            p.localRotation = Quaternion.Euler(0, 40 + (R() - .5f) * 14, (R() - .5f) * 16);
+            Part(PrimitiveType.Cube, p, new Vector3(0, 0, -.035f), new Vector3(.004f, .15f, .12f), paper);
+            Part(PrimitiveType.Cube, p, new Vector3(.013f, -.045f, -.085f), new Vector3(.004f, .05f, .045f), paper, Quaternion.Euler(0, 35, 0));   // the corner bent over
+            Part(PrimitiveType.Sphere, p, new Vector3(.003f, .02f, -.06f), new Vector3(.008f, .022f, .022f), Tint(art.cloth, new Color(.52f, .12f, .09f)));
+        }
+        /// <summary>The crack a page is pushed into: a dark seam on the face behind it (it stays when the page is taken).</summary>
+        void SecretCrack(Transform t, float height)
+        {
+            var dark = Tint(art.stone, new Color(.06f, .055f, .05f));
+            Part(PrimitiveType.Cube, t, new Vector3(0, height, -.004f), new Vector3(.03f, .3f, .012f), dark);
+            Part(PrimitiveType.Cube, t, new Vector3(.03f, height - .17f, -.004f), new Vector3(.02f, .1f, .012f), dark, Quaternion.Euler(0, 0, 28));
+        }
+        /// <summary>A small patch of pale bells nodding on arching stems over rosettes of leaves, glowing faintly: moonbell pale blue on
+        /// the meadow, widow's-lamp green-white in the gloom, frostbell ice-blue in the mountains, last-light pale lilac in the ash.</summary>
+        void SecretHerb(Transform item, Func<float> R)
+        {
+            var pale = Zone.biome == "ash" ? new Color(.94f, .86f, 1) : Zone.biome == "mountain" ? new Color(.72f, .88f, 1) : Gloom ? new Color(.84f, 1, .84f) : new Color(.82f, .9f, 1);
+            var leafC = Zone.biome == "ash" ? new Color(.38f, .42f, .36f) : Zone.biome == "mountain" ? new Color(.2f, .3f, .24f) : Wither(new Color(.2f, .32f, .15f));
+            var bell = Glowing(pale, .4f); var leaf = Tint(art.foliage, leafC); var stem = Tint(art.foliage, leafC * 1.25f);
+            for (int c = 0; c < 3; c++)
+            {
+                var at = c == 0 ? Vector3.zero : Quaternion.Euler(0, c * 150 + R() * 60, 0) * new Vector3(0, 0, .17f + R() * .1f);
+                for (int k = 0; k < 5; k++) { var q = Quaternion.Euler(0, k * 72 + R() * 30, 0); Part(PrimitiveType.Sphere, item, at + q * new Vector3(0, .015f, .075f), new Vector3(.055f, .014f, .15f), leaf, q * Quaternion.Euler(-10, 0, 0)); }
+                int stems = c == 0 ? 4 : 2 + (int)(R() * 2);
+                for (int k = 0; k < stems; k++)
+                {
+                    // A stem leaning out, then a short piece bending over, the bell hanging from its tip under a little green cap.
+                    float h = (c == 0 ? .32f : .24f) + R() * .14f; var q = Quaternion.Euler(0, R() * 360, 0) * Quaternion.Euler(8 + R() * 14, 0, 0);
+                    var top = at + q * Vector3.up * h; var over = q * Quaternion.Euler(70, 0, 0); var tip = top + over * Vector3.up * .045f;
+                    Part(PrimitiveType.Cylinder, item, at + q * Vector3.up * (h / 2), new Vector3(.011f, h / 2, .011f), stem, q);
+                    Part(PrimitiveType.Cylinder, item, top + over * Vector3.up * .022f, new Vector3(.009f, .024f, .009f), stem, over);
+                    Part(PrimitiveType.Sphere, item, tip + Vector3.down * .038f, new Vector3(.058f, .07f, .058f), bell);
+                    Part(PrimitiveType.Sphere, item, tip + Vector3.down * .006f, new Vector3(.032f, .02f, .032f), stem);
+                }
+            }
+        }
+        /// <summary>An iron-banded chest with a domed lid, ring handles and a padlock on its hasp (the lock catches the light), sunk a
+        /// little and askew, reaching down to the lowest ground under it.</summary>
+        void SecretChest(Transform item, Transform t, Func<float> R)
+        {
+            float low = 0; foreach (int sx in new[] { -1, 1 }) foreach (int sz in new[] { -1, 1 }) low = Mathf.Min(low, LocalGround(t, sx * .36f, sz * .22f));
+            var c = new GameObject("Chest").transform; c.SetParent(item, false);
+            c.localPosition = Vector3.up * (low - .04f); c.localRotation = Quaternion.Euler((R() - .5f) * 5, (R() - .5f) * 12, (R() - .5f) * 5);
+            var wood = Tint(art.timber, new Color(.3f, .2f, .12f)); var lidWood = Tint(art.timber, new Color(.34f, .23f, .14f)); var iron = Tint(art.metal, new Color(.2f, .2f, .21f));
+            Part(PrimitiveType.Cube, c, new Vector3(0, .18f, 0), new Vector3(.72f, .36f, .44f), wood);
+            Part(PrimitiveType.Cylinder, c, new Vector3(0, .36f, 0), new Vector3(.44f, .36f, .44f), lidWood, Quaternion.Euler(0, 0, 90));   // the domed lid (its lower half inside)
+            foreach (int sx in new[] { -1, 1 })
+            {
+                // An iron band over the lid and down the front and back, a corner bracket at each front corner, a ring handle at the end.
+                Part(PrimitiveType.Cylinder, c, new Vector3(sx * .22f, .36f, 0), new Vector3(.46f, .025f, .46f), iron, Quaternion.Euler(0, 0, 90));
+                foreach (int sz in new[] { -1, 1 }) Part(PrimitiveType.Cube, c, new Vector3(sx * .22f, .18f, sz * .225f), new Vector3(.05f, .36f, .012f), iron);
+                Part(PrimitiveType.Cube, c, new Vector3(sx * .34f, .05f, -.225f), new Vector3(.06f, .08f, .012f), iron);
+                Part(PrimitiveType.Cylinder, c, new Vector3(sx * .366f, .22f, 0), new Vector3(.08f, .006f, .08f), iron, Quaternion.Euler(0, 0, 90));
+            }
+            // The hasp, and the padlock hanging on it: body, shackle, a brass keyhole plate catching the light.
+            Part(PrimitiveType.Cube, c, new Vector3(0, .34f, -.228f), new Vector3(.05f, .1f, .014f), iron);
+            Part(PrimitiveType.Cube, c, new Vector3(0, .27f, -.247f), new Vector3(.085f, .075f, .035f), Tint(art.metal, new Color(.26f, .25f, .24f)));
+            Part(PrimitiveType.Cylinder, c, new Vector3(0, .325f, -.247f), new Vector3(.055f, .006f, .055f), iron, Quaternion.Euler(90, 0, 0));
+            Part(PrimitiveType.Cube, c, new Vector3(0, .265f, -.266f), new Vector3(.018f, .026f, .004f), Tint(art.metal, new Color(.62f, .48f, .22f)));
+            Glint(c, new Vector3(.006f, .272f, -.27f));
+        }
+        /// <summary>A small brass key on a greasy thong, hung from a nail driven into what is behind it: the key is the find (it swings a
+        /// little), the nail stays.</summary>
+        void SecretKey(Transform item, Transform t, float height, Func<float> R)
+        {
+            var iron = Tint(art.metal, new Color(.18f, .18f, .19f));
+            Part(PrimitiveType.Cylinder, t, new Vector3(0, height, .005f), new Vector3(.014f, .025f, .014f), iron, Quaternion.Euler(90, 0, 0));
+            Part(PrimitiveType.Cylinder, t, new Vector3(0, height, -.022f), new Vector3(.03f, .004f, .03f), iron, Quaternion.Euler(90, 0, 0));
+            var k = new GameObject("Key").transform; k.SetParent(item, false); k.localPosition = new Vector3(0, 0, -.028f); k.localRotation = Quaternion.Euler(0, 0, (R() - .5f) * 16);
+            var brass = Tint(art.metal, new Color(.66f, .5f, .24f));
+            Part(PrimitiveType.Cylinder, k, new Vector3(0, -.045f, 0), new Vector3(.007f, .045f, .007f), Tint(art.cloth, new Color(.18f, .13f, .09f)));   // the thong
+            Part(PrimitiveType.Cylinder, k, new Vector3(0, -.11f, 0), new Vector3(.042f, .005f, .042f), brass, Quaternion.Euler(90, 0, 0));   // the bow
+            Part(PrimitiveType.Cylinder, k, new Vector3(0, -.11f, -.0055f), new Vector3(.017f, .002f, .017f), Tint(art.metal, new Color(.12f, .1f, .08f)), Quaternion.Euler(90, 0, 0));
+            Part(PrimitiveType.Cube, k, new Vector3(0, -.168f, 0), new Vector3(.009f, .075f, .009f), brass);   // the shank
+            Part(PrimitiveType.Cube, k, new Vector3(.013f, -.197f, 0), new Vector3(.022f, .012f, .006f), brass);   // the bit
+            Part(PrimitiveType.Cube, k, new Vector3(.011f, -.181f, 0), new Vector3(.016f, .01f, .006f), brass);
+            Glint(k, new Vector3(-.012f, -.098f, -.006f), .014f);
+        }
+        /// <summary>A little cairn: three stones stacked, each on the one below; its top stone of <paramref name="top"/> when given.</summary>
+        void SecretCairn(Transform t, Func<float> R, Material top)
+        {
+            var stone = SecretStone(); float at = LocalGround(t, 0, 0) - .03f;
+            float[] w = { .56f, .42f, .28f }, h = { .26f, .22f, .18f };
+            for (int k = 0; k < 3; k++)
+            {
+                // A boulder lump's flat foot lies .18 of its height under its middle; the next stone sits a little down into this one.
+                Lump(BoulderAt((int)(R() * 6)), t, new Vector3((R() - .5f) * .06f, at + .18f * h[k], (R() - .5f) * .06f), new Vector3(w[k], h[k], w[k] * .9f), k == 2 && top != null ? top : stone, R() * 360);
+                at += .58f * h[k];
+            }
+        }
+        /// <summary>An old beacon: a ring of fire-cracked stones round a charred patch with burnt-out stubs, a standing stone behind it.</summary>
+        void SecretBeacon(Transform t, Func<float> R)
+        {
+            var soot = Tint(art.stone, new Color(.16f, .15f, .14f)); var burnt = Tint(art.stone, new Color(.28f, .26f, .24f)); var coal = Tint(art.timber, new Color(.07f, .06f, .05f));
+            float g = LocalGround(t, 0, 0);
+            Part(PrimitiveType.Cylinder, t, new Vector3(0, g + .006f, 0), new Vector3(1.5f, .01f, 1.5f), soot);
+            for (int k = 0; k < 7; k++)
+            {
+                float a = k * Mathf.PI * 2 / 7 + R() * .3f, x = Mathf.Cos(a) * 1.05f, z = Mathf.Sin(a) * 1.05f, s = .38f + R() * .22f;
+                Lump(BoulderAt((int)(R() * 6)), t, new Vector3(x, LocalGround(t, x, z) + .18f * s * .8f - .05f, z), new Vector3(s, s * .8f, s * .9f), k % 3 == 0 ? soot : burnt, R() * 360);
+            }
+            for (int k = 0; k < 3; k++) Part(PrimitiveType.Cylinder, t, new Vector3((R() - .5f) * .5f, g + .05f, (R() - .5f) * .5f), new Vector3(.09f, .26f + R() * .1f, .09f), coal, Quaternion.Euler(90, R() * 180, 0));
+            Lump(BoulderAt((int)(R() * 6)), t, new Vector3(.2f, LocalGround(t, .2f, 1.6f) + .1f, 1.6f), new Vector3(.45f, 1.05f, .38f), burnt, R() * 360);
+        }
+        /// <summary>A line of salt laid across the way (along the frame's x), broken here and there, with a little cairn beside it whose
+        /// top stone is crusted white.</summary>
+        void SecretSaltLine(Transform t, Func<float> R)
+        {
+            var salt = Tint(art.stone, new Color(.92f, .92f, .89f));
+            for (float x = -3.7f; x < 3.7f; x += .55f)
+            {
+                if (R() < .12f) continue;
+                float len = .45f + R() * .2f, z = (R() - .5f) * .06f, mid = x + len / 2;
+                Part(PrimitiveType.Cube, t, new Vector3(mid, LocalGround(t, mid, z) + .008f, z), new Vector3(len, .02f, .1f + R() * .05f), salt, Quaternion.Euler(0, (R() - .5f) * 8, 0));
+            }
+            // In the middle of the way, on the near side (-Z) of the line: the ends run in under rock the colliders don't cover.
+            var c = new GameObject("Salt cairn").transform; c.SetParent(t, false); c.localPosition = new Vector3(.3f, 0, -1.3f);
+            SecretCairn(c, R, salt);
+        }
+        /// <summary>A cold camp in front of a find: a ring of stones round old ash and two charred sticks, a rolled bedroll tied twice.</summary>
+        void SecretCamp(Transform t, Func<float> R)
+        {
+            var stone = SecretStone(.85f); var ash = Tint(art.stone, new Color(.21f, .2f, .19f)); var coal = Tint(art.timber, new Color(.07f, .06f, .05f));
+            var fire = new Vector3(.3f, 0, -1.35f); fire.y = LocalGround(t, fire.x, fire.z);
+            Part(PrimitiveType.Cylinder, t, fire + Vector3.up * .006f, new Vector3(.8f, .01f, .8f), ash);
+            for (int k = 0; k < 8; k++) { var q = Quaternion.Euler(0, k * 45 + R() * 12, 0); var p = fire + q * new Vector3(0, 0, .48f); p.y = LocalGround(t, p.x, p.z) + .02f; Lump(BoulderAt(k), t, p, new Vector3(.24f, .16f, .2f), stone, R() * 360); }
+            for (int k = 0; k < 2; k++) Part(PrimitiveType.Cylinder, t, fire + new Vector3(0, .04f, 0), new Vector3(.05f, .24f, .05f), coal, Quaternion.Euler(90, k * 70 + R() * 30, 0));
+            var roll = new Vector3(-1.05f, 0, -.35f); roll.y = LocalGround(t, roll.x, roll.z) + .12f;
+            var lie = Quaternion.Euler(0, 15 + R() * 30, 0) * Quaternion.Euler(0, 0, 90); var along = lie * Vector3.up;
+            Part(PrimitiveType.Cylinder, t, roll, new Vector3(.26f, .38f, .26f), Tint(art.cloth, Wither(new Color(.4f, .33f, .24f))), lie);
+            foreach (int k in new[] { -1, 1 }) Part(PrimitiveType.Cylinder, t, roll + along * (k * .2f), new Vector3(.272f, .012f, .272f), Tint(art.cloth, new Color(.3f, .24f, .16f)), lie);
+        }
+        /// <summary>A fallen trunk lying behind a find along the ground, half sunk, its broken end splintered and a snapped limb standing up.</summary>
+        void SecretLog(Transform t, Func<float> R)
+        {
+            var bark = Tint(art.bark, Gloom || Zone.biome == "ash" ? new Color(.52f, .51f, .49f) : new Color(.34f, .3f, .26f)); var heart = Tint(art.timber, Wither(new Color(.5f, .42f, .31f)));
+            float len = 2.4f + R() * .5f, rad = .23f; var dir = Quaternion.Euler(0, (R() - .5f) * 16, 0) * Vector3.right; var mid = new Vector3(.15f, 0, .6f);
+            Vector3 End(float k) { var p = mid + dir * (k * len / 2); p.y = LocalGround(t, p.x, p.z) + rad * .55f; return p; }
+            Vector3 a = End(-1), b = End(1), d = b - a;
+            Part(PrimitiveType.Cylinder, t, (a + b) / 2, new Vector3(rad * 2, d.magnitude / 2, rad * 2), bark, Quaternion.FromToRotation(Vector3.up, d.normalized));
+            for (int k = 0; k < 3; k++) { var q = Quaternion.FromToRotation(Vector3.up, d.normalized) * Quaternion.Euler((R() - .5f) * 50, k * 120, (R() - .5f) * 50); Part(PrimitiveType.Cube, t, b + d.normalized * .08f + q * new Vector3(0, .1f, .09f), new Vector3(.07f, .26f, .05f), k == 1 ? heart : bark, q); }
+            var stub = a + d * .35f + Vector3.up * rad * .8f; var up = (Vector3.up + dir * .4f).normalized;
+            Part(PrimitiveType.Cylinder, t, stub + up * .2f, new Vector3(.08f, .22f, .08f), bark, Quaternion.FromToRotation(Vector3.up, up));
+        }
+        /// <summary>A hollow stump (a lightning-split yew or oak gone to punk) behind a find, the dark hollow in its front at the find's
+        /// height; heartwood shards stand up round its broken top.</summary>
+        void SecretStump(Transform t, Func<float> R, float hollowAt)
+        {
+            var bark = Tint(art.bark, Wither(new Color(.35f, .3f, .25f))); var wood = Tint(art.timber, Wither(new Color(.46f, .38f, .28f)));
+            var c = new Vector3(0, 0, .32f); float g = LocalGround(t, c.x, c.z), top = Mathf.Max(.85f, hollowAt + .3f);
+            Part(PrimitiveType.Cylinder, t, new Vector3(c.x, g + top / 2 - .06f, c.z), new Vector3(.6f, top / 2 + .06f, .6f), bark);
+            for (int k = 0; k < 5; k++)
+            {
+                var q = Quaternion.Euler(0, k * 72 + R() * 30, 0); var p = c + q * new Vector3(0, 0, .22f);
+                Part(PrimitiveType.Cube, t, new Vector3(p.x, g + top + .04f + R() * .08f, p.z), new Vector3(.06f + R() * .05f, .16f + R() * .18f, .05f), k % 2 == 0 ? bark : wood, q * Quaternion.Euler(-12 - R() * 16, 0, (R() - .5f) * 24));
+            }
+            for (int k = 0; k < 4; k++) { var q = Quaternion.Euler(0, k * 90 + 45 + R() * 20, 0); var p = c + q * new Vector3(0, 0, .3f); Part(PrimitiveType.Sphere, t, new Vector3(p.x, LocalGround(t, p.x, p.z) + .03f, p.z), new Vector3(.2f, .16f, .42f), bark, q * Quaternion.Euler(12, 0, 0)); }
+            Part(PrimitiveType.Sphere, t, new Vector3(0, hollowAt, .005f), new Vector3(.24f, .32f, .05f), Tint(art.stone, new Color(.045f, .04f, .035f)));   // the hollow
+        }
+        /// <summary>Two stones either side of a find, a little behind it, so it sits in the cleft between them.</summary>
+        void SecretRocks(Transform t, Func<float> R)
+        {
+            foreach (int k in new[] { -1, 1 })
+            {
+                float s = .5f + R() * .25f; var p = new Vector3(k * (.26f + s * .45f), 0, .1f + R() * .1f); p.y = LocalGround(t, p.x, p.z) + .18f * s * .75f - .06f;
+                Lump(BoulderAt((int)(R() * 6)), t, p, new Vector3(s, s * .75f, s * .9f), SecretStone(), R() * 360);
+            }
+        }
+        /// <summary>A flat stone lying half over a find (a page slid under it, its near end showing).</summary>
+        void SecretFlatStone(Transform t, Func<float> R)
+        {
+            var p = new Vector3(.02f, 0, .25f); p.y = LocalGround(t, p.x, p.z) + .02f;
+            Lump(BoulderAt((int)(R() * 6)), t, p, new Vector3(.46f, .13f, .36f), SecretStone(), R() * 360);
+        }
+        /// <summary>A shallow scrape (some animal dug here) round a half-buried find, the spoil heaped beside it.</summary>
+        void SecretScrape(Transform t, Func<float> R)
+        {
+            bool ashen = Zone.biome == "ash";
+            Part(PrimitiveType.Cylinder, t, new Vector3(0, LocalGround(t, 0, 0) + .004f, 0), new Vector3(.62f, .006f, .46f), Tint(art.soil, ashen ? new Color(.25f, .24f, .24f) : new Color(.2f, .16f, .12f)), Quaternion.Euler(0, R() * 30, 0));
+            Part(PrimitiveType.Sphere, t, new Vector3(.42f, LocalGround(t, .42f, .1f) + .015f, .1f), new Vector3(.34f, .1f, .24f), ashen ? Tint(art.ash, new Color(.5f, .5f, .5f)) : Tint(art.soil, new Color(.3f, .24f, .17f)));
         }
 
         // ---------- edges ----------

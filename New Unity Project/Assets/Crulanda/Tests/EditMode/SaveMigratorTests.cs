@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using Crulanda.Encounter;
 using Crulanda.Persistence;
 
 namespace Crulanda.Tests
@@ -81,6 +82,27 @@ namespace Crulanda.Tests
             m.Register(new AppendMigration(1, 2, "a"));
             Assert.Throws<System.ArgumentException>(() => m.Register(new AppendMigration(1, 3, "b")));
             Assert.Throws<System.ArgumentException>(() => m.Register(new AppendMigration(4, 4, "c")));
+        }
+
+        [Test]
+        public void Encounter_format_6_to_7_adds_an_empty_discoveries_list_and_keeps_everything_else()
+        {
+            var step = new AddDiscoveriesMigration();
+            Assert.AreEqual(6, step.FromVersion); Assert.AreEqual(7, step.ToVersion);
+            string v6 = SaveFixtures.V6Payload, v7 = step.Migrate(v6);
+            Assert.AreEqual(v6.Substring(0, v6.Length - 1) + ",\"discoveries\":[]}", v7, "Every character of the v6 payload is kept; the list goes in before the closing brace.");
+            Assert.AreEqual(v7, step.Migrate(v7), "A payload that has the list is left alone.");
+            Assert.AreEqual("{\"discoveries\":[]}", step.Migrate("{}"));
+            Assert.AreEqual("{ \"a\" : 1,\"discoveries\":[]}", step.Migrate("  { \"a\" : 1 }\n"));
+            Assert.Throws<SaveMigrationException>(() => step.Migrate("[1,2]"));
+            Assert.Throws<SaveMigrationException>(() => step.Migrate(""));
+
+            var m = new SaveMigrator(); m.Register(step);
+            var input = new SaveEnvelope { formatVersion = 6, payloadType = "CrulandaEncounter", payloadJson = v6 };
+            var result = m.MigrateToVersion(input, EncounterSave.FormatVersion);
+            Assert.AreEqual(7, result.formatVersion); Assert.AreEqual(v7, result.payloadJson);
+            Assert.AreEqual(6, input.formatVersion); Assert.AreEqual(v6, input.payloadJson);
+            Assert.Throws<SaveMigrationException>(() => m.MigrateToVersion(new SaveEnvelope { formatVersion = 5, payloadJson = v6 }, 7), "Formats before 6 are not in this chain (EncounterSave upgrades them in memory).");
         }
     }
 }

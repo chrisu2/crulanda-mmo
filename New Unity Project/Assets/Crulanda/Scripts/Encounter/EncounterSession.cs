@@ -336,7 +336,8 @@ namespace Crulanda.Encounter
                 Crulanda.World.ZoneInteractable best = null; float bestD = UseRange;
                 foreach (var i in Zone.Interactables)
                 {
-                    if (Time.time < i.hiddenUntil || (i.once && Progress.usedInteractables.Contains(i.Key(Zone.Zone.id)))) continue;
+                    // A hidden find registered as a prop too is searched through SecretSpots (DiscoveryLog), never as a quest prop.
+                    if (i.kind == "secret" || Time.time < i.hiddenUntil || (i.once && Progress.usedInteractables.Contains(i.Key(Zone.Zone.id)))) continue;
                     var p = Player.transform.position;   // ground distance: the prop's origin is at its foot, the player's at the waist
                     var d = Vector2.Distance(new Vector2(p.x, p.z), new Vector2(i.position.x, i.position.z)); if (d < bestD) { best = i; bestD = d; }
                 }
@@ -377,6 +378,150 @@ namespace Crulanda.Encounter
             if (!emptiedHidden) { emptiedHidden = true; foreach (var i in Zone.Interactables) if (i.once && i.Vanishes && i.root != null && Progress.usedInteractables.Contains(i.Key(Zone.Zone.id))) HideProp(i.root); }
         }
         bool emptiedHidden;
+
+        // ---------- discoveries: hidden finds on no map (ZoneSecret; save format 7) ----------
+        /// <summary>What the character has found, and what finding pays (null until the session starts).</summary>
+        public DiscoveryLog Discoveries { get; private set; }
+        /// <summary>How long a "Discovered" toast shows, its fade in and out included.</summary>
+        public const float ToastSeconds = 3.2f;
+        /// <summary>The name on the "Discovered" toast showing now (null = none). Finds made together queue up behind it.</summary>
+        public string ToastName { get; private set; }
+        /// <summary>Seconds the current toast has been showing.</summary>
+        public float ToastAge { get { return ToastName == null ? 0 : Time.time - toastSince; } }
+        readonly Queue<string> toasts = new Queue<string>();
+        float toastSince, nextSecretCheck; bool pocketedSynced; string vistaWaiting;
+        static readonly Crulanda.World.ZoneSecret[] NoSecrets = new Crulanda.World.ZoneSecret[0];
+        void StartDiscoveries()
+        {
+            Discoveries = new DiscoveryLog(Progress, Items, Quests != null ? Quests.Db : null);
+            Discoveries.Say = Message;
+            Discoveries.Found = s => { toasts.Enqueue(DiscoveryLog.Name(s)); AdvanceToast(); };
+        }
+        void AdvanceToast()
+        {
+            if (ToastName != null && Time.time - toastSince < ToastSeconds) return;
+            ToastName = toasts.Count > 0 ? toasts.Dequeue() : null; toastSince = Time.time;
+        }
+        readonly List<Crulanda.World.ZoneSecretSpot> spots = new List<Crulanda.World.ZoneSecretSpot>();
+        Crulanda.World.ZoneBuilder spotsZone; Crulanda.World.ZoneSecret[] spotsDefs; int spotsBuilt = -1;
+        /// <summary>
+        /// This zone's secrets where they stand: the spots ZoneBuilder built (ZoneBuilder.Secrets), plus a bare spot on the ground at
+        /// <c>at</c> for any secret in the zone's data without one, so every secret the book counts can be found.
+        /// </summary>
+        public List<Crulanda.World.ZoneSecretSpot> SecretSpots
+        {
+            get
+            {
+                var zone = Zone;
+                if (zone == null) { spots.Clear(); spotsZone = null; return spots; }
+                var defs = zone.Zone.secrets ?? NoSecrets;
+                if (spotsZone == zone && spotsDefs == defs && spotsBuilt == zone.Secrets.Count) return spots;
+                spotsZone = zone; spotsDefs = defs; spotsBuilt = zone.Secrets.Count; spots.Clear();
+                var ids = new HashSet<string>(StringComparer.Ordinal);
+                foreach (var spot in zone.Secrets) if (spot != null && spot.def != null && !string.IsNullOrEmpty(spot.def.id) && ids.Add(spot.def.id)) spots.Add(spot);
+                foreach (var d in defs) if (d != null && !string.IsNullOrEmpty(d.id) && ids.Add(d.id)) spots.Add(new Crulanda.World.ZoneSecretSpot { def = d, position = zone.Ground(d.at, d.height) });
+                return spots;
+            }
+        }
+        float GroundDistance(Vector3 at) { var p = Player.transform.position; return Vector2.Distance(new Vector2(p.x, p.z), new Vector2(at.x, at.z)); }
+        /// <summary>A hidden find within reach that E would search: not a lookout, not found yet (a locked chest counts; E says so).</summary>
+        public Crulanda.World.ZoneSecretSpot NearbySecret
+        {
+            get
+            {
+                if (Zone == null || Player == null || Discoveries == null) return null;
+                Crulanda.World.ZoneSecretSpot best = null; float bestD = UseRange;
+                foreach (var spot in SecretSpots)
+                {
+                    if (DiscoveryLog.IsVista(spot.def) || Discoveries.IsFound(spot.def)) continue;
+                    float d = GroundDistance(spot.position); if (d < bestD) { best = spot; bestD = d; }
+                }
+                return best;
+            }
+        }
+        /// <summary>What E uses among the props and hidden finds in reach: the nearer of the two (the other comes back null).</summary>
+        (Crulanda.World.ZoneInteractable usable, Crulanda.World.ZoneSecretSpot secret) NearestUse()
+        {
+            var usable = NearbyInteractable; var secret = NearbySecret;
+            if (usable != null && secret != null) { if (GroundDistance(secret.position) <= GroundDistance(usable.position)) usable = null; else secret = null; }
+            return (usable, secret);
+        }
+        public static string SearchPrompt(Crulanda.World.ZoneSecret s) { return s == null || string.IsNullOrEmpty(s.prompt) ? "Search" : s.prompt; }
+        /// <summary>
+        /// Searching a hidden find (E): it is found and pays out, or you are told why not: a chest whose key isn't found yet stays
+        /// locked, and a find whose item won't fit in full bags stays where it is until there is room.
+        /// </summary>
+        public DiscoveryLog.Result Search(Crulanda.World.ZoneSecretSpot spot)
+        {
+            if (spot == null || spot.def == null || Discoveries == null) return DiscoveryLog.Result.AlreadyFound;
+            var r = Find(spot);
+            if (r == DiscoveryLog.Result.Locked) Message(DiscoveryLog.ShutLine(spot.def));
+            else if (r == DiscoveryLog.Result.BagsFull) Message(DiscoveryLog.BagsFullLine);
+            return r;
+        }
+        /// <summary>Records a find and pays it out, levelling you up the way a quest reward does; what you take vanishes; saves.</summary>
+        DiscoveryLog.Result Find(Crulanda.World.ZoneSecretSpot spot)
+        {
+            int before = Progress.Level;
+            var r = Discoveries.Discover(spot.def);
+            if (r != DiscoveryLog.Result.Found) return r;
+            if (Progress.Level > before) { ApplyLevel(); Player.Health.ApplyHealing(Player.Health.Pool.Max); Message("Level " + Progress.Level + "! Talent points are waiting [B]."); }
+            if (DiscoveryLog.Pocketed(spot.def)) Pocket(spot);
+            Save(false);
+            return r;
+        }
+        /// <summary>Lookouts are found by standing on them, checked every 0.5 s like quest places.</summary>
+        void TickDiscoveries()
+        {
+            if (Discoveries == null || Zone == null || Time.time < nextSecretCheck) return;
+            nextSecretCheck = Time.time + .5f;
+            if (!pocketedSynced) { pocketedSynced = true; SyncPocketed(); }
+            string waiting = null;
+            foreach (var spot in SecretSpots)
+            {
+                var d = spot.def;
+                if (!DiscoveryLog.IsVista(d) || Discoveries.IsFound(d) || GroundDistance(spot.position) > d.radius) continue;
+                // A lookout whose find won't fit in the bags waits for room: said once while you stand there.
+                if (Find(spot) == DiscoveryLog.Result.BagsFull) { waiting = d.id; if (vistaWaiting != d.id) Message(DiscoveryLog.BagsFullLine); }
+            }
+            vistaWaiting = waiting;
+        }
+        /// <summary>Renderers hidden on found things you took (a page, a key, a plant), so a load that un-finds them can show them again.</summary>
+        readonly Dictionary<Transform, Renderer[]> pocketed = new Dictionary<Transform, Renderer[]>();
+        void Pocket(Crulanda.World.ZoneSecretSpot spot)
+        {
+            if (spot.root == null || pocketed.ContainsKey(spot.root)) return;
+            var shown = Array.FindAll(spot.root.GetComponentsInChildren<Renderer>(), r => r.enabled);
+            foreach (var r in shown) r.enabled = false;
+            pocketed[spot.root] = shown;
+        }
+        /// <summary>After a load: found things you took are gone, and ones this save hasn't found are back.</summary>
+        void SyncPocketed()
+        {
+            foreach (var spot in SecretSpots)
+            {
+                if (spot.root == null || !DiscoveryLog.Pocketed(spot.def)) continue;
+                if (Discoveries.IsFound(spot.def)) Pocket(spot);
+                else if (pocketed.TryGetValue(spot.root, out var shown)) { foreach (var r in shown) if (r != null) r.enabled = true; pocketed.Remove(spot.root); }
+            }
+        }
+        /// <summary>
+        /// The quest book's Discoveries tab: every zone, this one first and the rest by level, with how many secrets each holds and
+        /// the ones found (the rest are only counted). This zone's are the ones in play here (SecretSpots); other zones' come from
+        /// their data.
+        /// </summary>
+        public List<DiscoveryLog.Tally> DiscoveryTallies()
+        {
+            var list = new List<DiscoveryLog.Tally>();
+            if (Discoveries == null || Zone == null) return list;
+            var here = new List<Crulanda.World.ZoneSecret>(); foreach (var spot in SecretSpots) here.Add(spot.def);
+            list.Add(Discoveries.TallyOf(Zone.Zone.id, Zone.Zone.displayName, here, true));
+            var others = Zone.AllZones().FindAll(z => z != null && z.id != Zone.Zone.id);
+            others.Sort((a, b) => a.levelMin != b.levelMin ? a.levelMin.CompareTo(b.levelMin) : string.CompareOrdinal(a.id, b.id));
+            foreach (var z in others) list.Add(Discoveries.TallyOf(z.id, z.displayName, z.secrets, false));
+            return list;
+        }
+
         /// <summary>Where the player last stood on dry ground (saves use it if you are in the water).</summary>
         Vector3 lastDry;
         public int TalentRank(string id) { return TalentTree.Rank(Progress, id); }
@@ -503,7 +648,7 @@ namespace Crulanda.Encounter
             SpawnParty();
             // Villagers and critters live alongside the encounter (they survive load/respawn of the party).
             if (Zone != null && Zone.Zone.life != null) new GameObject("Village life").AddComponent<VillageLife>().Init(this);
-            StartQuests();
+            StartQuests(); StartDiscoveries();
             Message(Zone != null ? Zone.Zone.displayName + ". " + Objective(0, "") + "." : "Recruit the healer at camp [E], then follow the path to the sentries.");
             ReconcileQuests();
             nextSave = Time.time + 30;
@@ -696,6 +841,7 @@ namespace Crulanda.Encounter
         void Update()
         {
             if (Player == null) return;
+            AdvanceToast();
             if (EncounterInput.Press(KeyCode.Escape))
             {
                 // Esc closes open windows (conversation, quest book, map) before it pauses.
@@ -720,7 +866,7 @@ namespace Crulanda.Encounter
             if (Debug.isDebugBuild && EncounterInput.Press(KeyCode.F11)) { Crulanda.World.WorldClock.Advance(1); Message("Time skips ahead: " + Crulanda.World.WorldClock.Text + " (dev)."); }
             if (Debug.isDebugBuild && EncounterInput.Press(KeyCode.F8) && Crulanda.World.WorldWeather.Active != null) Message("Weather: " + Crulanda.World.WorldWeather.Active.CycleForced() + " (dev).");
             if (!Player.IsAlive) { if (EncounterInput.Press(KeyCode.R)) Recover(); return; }
-            TickQuests(); TickItems();
+            TickQuests(); TickItems(); TickDiscoveries();
             if (Zone != null && Player.GetComponent<CharacterController>().isGrounded && !Zone.WaterAt(new Vector2(Player.transform.position.x, Player.transform.position.z), out _, out _)) lastDry = Player.transform.position;
             var motor = Player.GetComponent<AdventurerMotor>(); var look = Player.GetComponent<ActorVisual>();
             if (look != null) look.Pose = motor.Swimming ? ActorPose.Swim : motor.Sneaking ? ActorPose.Sneak : ActorPose.None;
@@ -881,7 +1027,9 @@ namespace Crulanda.Encounter
                 var (villager, mira) = TalkTarget();
                 if (mira) return !Progress.recruited ? "Recruit Mira" : !Companion.actor.IsAlive ? "Revive Mira" : "Talk to Mira";
                 if (villager != null) return "Talk to " + villager.Name;
-                var usable = NearbyInteractable; if (usable != null) return usable.prompt;
+                var (usable, secret) = NearestUse();
+                if (secret != null) return SearchPrompt(secret.def);
+                if (usable != null) return usable.prompt;
                 var door = NearbyDoor;
                 if (door != null) return door.openable ? (door.Open ? "Close the door" : "Open the door") + " · " + door.name : "Knock · " + door.name;
                 return null;
@@ -925,7 +1073,8 @@ namespace Crulanda.Encounter
                 else VillageLife.Active.Talk(talkTo);
                 return;
             }
-            var usable = NearbyInteractable;
+            var (usable, secret) = NearestUse();
+            if (secret != null) { Search(secret); return; }
             if (usable != null) { UseInteractable(usable); return; }
             var door = NearbyDoor;
             if (door != null)
@@ -999,6 +1148,7 @@ namespace Crulanda.Encounter
             Progress = p; Target = null; AutoAttack = false; abilities.Reset();
             Floating.Clear(); SpawnParty(); Message(error ?? "Saved expedition restored.");
             if (Quests != null) { Quests.Bind(Progress); Conversation = null; emptiedHidden = false; ReconcileQuests(); }
+            if (Discoveries != null) { Discoveries.Bind(Progress); pocketedSynced = false; vistaWaiting = null; }
         }
         public void RepeatTrail()
         {

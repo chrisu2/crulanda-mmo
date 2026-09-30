@@ -66,10 +66,14 @@ entries. Gameplay raises events (EnemyKilled, Talked, Collected, Visited, Intera
 
 ## 4. Interface
 - **Quest dialog:** a parchment window with the NPC's text, the objectives and rewards, and Accept / Decline or Complete. It opens with E.
-- **Quest book (L)** has three tabs:
+- **Quest book (L)** has four tabs:
   - **Quests:** grouped by zone and kind, with details and track / abandon buttons.
-  - **Chronicle:** completed story, plus documents found, such as the ledger page as a readable item.
+  - **Chronicle:** completed story, plus documents found, such as the ledger page as a readable item. Pages found as secrets land here too.
   - **Reputation:** each faction's standing on six tiers: Hostile, Distrusted, Neutral, Trusted, Honoured, Sworn.
+  - **Discoveries** (2026-09-30):
+    - each zone's hidden finds, found out of total, with the current zone first;
+    - the found ones by name and text; the rest only as "N more lie hidden in X";
+    - secrets are on no map (the data is `ZoneSecret` in the zone files; the logic is `DiscoveryLog`, save format 7).
 - **Tracker:** up to 5 tracked quests replace the current three fixed lines.
 
 ## 5. Oakhaven content (first pass)

@@ -60,7 +60,7 @@ namespace Crulanda.World
             rng = new System.Random(Zone.seed);
             props = new GameObject("Zone props").transform; props.SetParent(transform, false);
             statics = new GameObject("Zone static scenery").transform; statics.SetParent(transform, false);
-            PrepareRelief(); Water = new ZoneWater(); Water.Prepare(Zone, (x, z) => HeightAt(x, z, false));
+            PrepareRelief(); PrepareShapes(); Water = new ZoneWater(); Water.Prepare(Zone, (x, z) => HeightAt(x, z, false));
             BuildLighting(); BuildGround(); BuildWater(); BuildWasting(); BuildProps(); BuildGroves(); BuildExits(); BuildForestEdge(); BuildBoundaries(); BuildBackdrop();
             if (art.grass != null && art.grass.Length > 0)
             {
@@ -126,8 +126,46 @@ namespace Crulanda.World
             float n = Mathf.PerlinNoise(x * .035f + Zone.seed, z * .035f + Zone.seed * 2) * .75f + Mathf.PerlinNoise(x * .11f, z * .11f) * .25f;
             float h = hills * Zone.hillHeight * n + (hills > 0 ? hills * Crag(x, z) : 0) + CliffLift(x, z);   // mountain crags off the kept ways; shelves behind cliffs
             if (Zone.wasting != null && x > Zone.wasting.x - 4) h *= Mathf.Clamp01((Zone.wasting.x + 2 - x) / 6);  // unmade ground is dead flat
+            if (shapes != null) h = Shape(x, z, h);   // landmark ground: level pads, perches and basins (ZoneShape)
             if (carveWater && Water != null) h = Water.Carve(x, z, h);   // creeks and lakes (see ZoneWater)
             return h;
+        }
+        ZoneShape[] shapes;   // the zone's landmark ground, live once PrepareShapes has levelled its pads
+        /// <summary>
+        /// Levels each pad (after PrepareRelief, so crags and cliff lifts count): a pad or basin at the mean ground round its edge
+        /// plus its height; a perch its height above the lowest ground round its foot (radius + blend), so no way up it climbs
+        /// more than that, however high the crags beside it.
+        /// </summary>
+        void PrepareShapes()
+        {
+            if (Zone.shapes == null || Zone.shapes.Length == 0) return;
+            foreach (var s in Zone.shapes)
+            {
+                if (s == null) continue;
+                bool perch = s.height > 0; float r = s.radius + (perch ? Mathf.Max(.5f, s.blend) : 0), sum = 0, low = float.MaxValue;
+                for (int i = 0; i < 32; i++) { float a = i * Mathf.PI / 16, y = HeightAt(s.center.x + Mathf.Cos(a) * r, s.center.y + Mathf.Sin(a) * r, false); sum += y; low = Mathf.Min(low, y); }
+                s.level = (perch ? low : sum / 32) + s.height;
+            }
+            shapes = Zone.shapes;
+        }
+        /// <summary>Landmark ground over the land: each pad levels it (a perch raised, a basin sunk), easing back over its blend.</summary>
+        float Shape(float x, float z, float h)
+        {
+            var p = new Vector2(x, z);
+            foreach (var s in shapes)
+            {
+                if (s == null) continue;
+                float blend = Mathf.Max(.5f, s.blend), d = Vector2.Distance(p, s.center) - s.radius;
+                if (d < blend) h = Mathf.Lerp(h, s.level, 1 - Mathf.SmoothStep(0, 1, d / blend));
+            }
+            return h;
+        }
+        /// <summary>How much of a pad's ground paint covers p (0..1): the pad right across, fading out a little past its rim.</summary>
+        static float ShapeCover(ZoneShape s, Vector2 p)
+        {
+            float blend = Mathf.Max(.5f, s.blend), fade = blend * .6f + 1, reach = s.radius + fade;
+            if ((p - s.center).sqrMagnitude >= reach * reach) return 0;   // most of the zone: a cheap reject (PaintGround asks per pixel)
+            return 1 - Mathf.SmoothStep(0, 1, (Vector2.Distance(p, s.center) - s.radius) / fade);
         }
         public Vector3 Ground(Vector2 p, float lift = 0) { return new Vector3(p.x, HeightAt(p.x, p.y) + lift, p.y); }
         static List<Vector2> Densify(Vector2[] pts, float step)
@@ -362,9 +400,10 @@ namespace Crulanda.World
             var sunC = ZoneColors.Parse(Zone.lighting.sunColor, Color.white); sunC /= Mathf.Max(.05f, sunC.grayscale);
             Color unmade = new Color(.47f / Mathf.Lerp(1, sunC.r, .3f), .47f / Mathf.Lerp(1, sunC.g, .3f), .49f / Mathf.Lerp(1, sunC.b, .3f));
             bool gloom = Gloom;
-            // Gloom: cold grey-brown village dirt and roads, ~18% darker than the earth. Green is raised against Khaven's orange
-            // sun and rose haze and grade, so they light grey-brown (R>G>B) instead of taking the ground's rose-mauve.
-            if (gloom) { dirt = new Color(.32f, .34f, .26f); rut = new Color(.25f, .265f, .2f); }
+            // Gloom: trodden roads and yards are dark, near-grey brown, about half the earth's value and less saturated, so they
+            // read as ways against the rose ground under Khaven's orange sun and rose grade (a hue nudge alone left them lost in it).
+            // Green is held level with red so the rose light doesn't turn them mauve.
+            if (gloom) { dirt = new Color(.235f, .23f, .205f); rut = new Color(.175f, .172f, .155f); }
             if (Zone.biome == "mountain") { dirt = new Color(.4f, .35f, .28f); rut = new Color(.31f, .27f, .21f); }   // yards and roads a shade darker in the hard light
             var toSun = Quaternion.Euler(55, Zone.lighting.sunYaw, 0) * Vector3.back;   // the day sun, roughly (mountain counter-shading)
             float size = Zone.size, half = size / 2, texel = size / res;
@@ -402,8 +441,9 @@ namespace Crulanda.World
                         float steep = Mathf.Clamp01((1 - UpAt(x, z) - .06f) * 6);
                         float rock = Mathf.Clamp01(MountainRock(x, z) + steep + (n3 - .5f) * .3f);
                         var nrm = NormalAt(x, z); float turn = nrm.x * toSun.x + nrm.z * toSun.z, shade = 1 - Mathf.Clamp(turn, -.6f, .6f) * (turn < 0 ? .5f : .22f);   // horizontal turn toward the midday sun (55 deg, an average)
-                        Color rockC = Color.Lerp(new Color(.23f, .22f, .21f), new Color(.33f, .31f, .29f), n2) * shade;
-                        Color scree = Color.Lerp(new Color(.34f, .31f, .26f), new Color(.41f, .37f, .31f), (n2 + n3) * .5f) * shade;
+                        // A sixth darker again than step 2's (sunlit crags still read ~140 of 255 in the tour; the aim is 110-130).
+                        Color rockC = Color.Lerp(new Color(.195f, .186f, .178f), new Color(.278f, .262f, .245f), n2) * shade;
+                        Color scree = Color.Lerp(new Color(.288f, .262f, .22f), new Color(.346f, .312f, .262f), (n2 + n3) * .5f) * shade;
                         Color alp = Color.Lerp(new Color(.27f, .31f, .18f), new Color(.38f, .36f, .22f), n1);
                         c = Color.Lerp(alp, Color.Lerp(scree, rockC, Mathf.Clamp01(steep * 1.4f + (n1 - .5f) * .8f)), rock) * (.91f + n3 * .12f);
                     }
@@ -458,6 +498,17 @@ namespace Crulanda.World
                             : Color.Lerp(new Color(.38f, .32f, .17f), new Color(.46f, .30f, .15f), n3);
                         c = Color.Lerp(c, gloom && g.kind != "dead" ? Wither(litter) : litter, edge);   // gloom: needles and leaves withered too
                     }
+                    // Landmark ground (ZoneShape paint): a wallow's dark wet mud, a brood's grey unmade floor veined with pale thread.
+                    if (Zone.shapes != null)
+                        foreach (var s in Zone.shapes)
+                        {
+                            if (s == null || string.IsNullOrEmpty(s.paint)) continue;
+                            float cover = ShapeCover(s, p); if (cover <= 0) continue;
+                            Color sc;
+                            if (s.paint == "unmade") { float vein = Mathf.Abs(Mathf.PerlinNoise(x * .7f + 13, z * .7f + 29) * 2 - 1); sc = Color.Lerp(unmade * (.8f + n3 * .35f), new Color(.76f, .76f, .8f), Mathf.Clamp01((.07f - vein) * 14)); }
+                            else sc = Color.Lerp(new Color(.25f, .2f, .15f), new Color(.12f, .095f, .075f), Mathf.Clamp01((n1 - .4f) * 2.5f + (n3 - .5f) * .4f));   // mud
+                            c = Color.Lerp(c, sc, Mathf.Clamp01(cover * (.85f + n2 * .3f)));
+                        }
                     for (int k = 0; k < Zone.roads.Length; k++)
                     {
                         var road = Zone.roads[k]; if (!roadBox[k].Contains(p)) continue;
@@ -700,6 +751,19 @@ namespace Crulanda.World
             t.position = Ground(p.at); t.rotation = Quaternion.Euler(0, p.rotation, 0); t.localScale = Vector3.one * (p.scale <= 0 ? 1 : p.scale);
             return t;
         }
+        /// <summary>Ground height under a point of a prop (local x, z), relative to its root: props sit at their centre's height, so on a slope the corners differ.</summary>
+        float LocalGround(Transform t, float x, float z)
+        {
+            var p = t.TransformPoint(new Vector3(x, 0, z));
+            return (HeightAt(p.x, p.z) - t.position.y) / Mathf.Max(.01f, t.lossyScale.y);
+        }
+        /// <summary>How far a plinth or footing must reach below the root so no part of a w x d footprint (centred at local z = cz) hangs over a slope; 0 on the flat.</summary>
+        float FootDrop(Transform t, float w, float d, float cz = 0)
+        {
+            float low = 0;
+            for (int sx = -1; sx <= 1; sx++) for (int sz = -1; sz <= 1; sz++) low = Mathf.Min(low, LocalGround(t, sx * w / 2, cz + sz * d / 2));
+            return low < -.02f ? .12f - low : 0;
+        }
         GameObject Part(PrimitiveType type, Transform parent, Vector3 localPos, Vector3 scale, Material m, Quaternion? rot = null)
         {
             var o = GameObject.CreatePrimitive(type); DestroyImmediate(o.GetComponent<Collider>());
@@ -726,6 +790,10 @@ namespace Crulanda.World
                 // Moving parts (doors, wheels) and things that can be picked or emptied can't be static-batched.
                 var parent = p.kind == "bridge" || p.kind == "inn" || p.kind == "mill" || p.kind == "coop" || p.kind == "herb" || !string.IsNullOrEmpty(p.interact) ? props : statics;
                 var t = Root(p, parent);
+                // New landmark kinds draw from their own stream, after taking the draws the kind that stood here took, so
+                // every later prop, tree and rock keeps the layout it had.
+                var zoneRng = rng; int legacy = p.kind == "cave" ? 30 : p.kind == "rib" ? 6 : p.kind == "perch" || p.kind == "wallow" || p.kind == "brood" ? 0 : -1;
+                if (legacy >= 0) { for (int k = 0; k < legacy; k++) _ = R01; rng = new System.Random(Zone.seed ^ (Mathf.RoundToInt(p.at.x * 8) * 73856093) ^ (Mathf.RoundToInt(p.at.y * 8) * 19349663)); }
                 switch (p.kind)
                 {
                     case "house": House(t, p.size.x > 0 ? p.size : new Vector2(7, 5), 3f, p.variant, false); break;
@@ -745,9 +813,10 @@ namespace Crulanda.World
                     case "wall": Wall(p.points, statics); DestroyImmediate(t.gameObject); break;
                     case "tower": Tower(t, p.size.x > 0 ? p.size.x : 4.4f); break;
                     case "gallows": Gallows(t); break;
-                    case "crypt": Crypt(t); break;
+                    case "crypt": Crypt(t, p.variant); break;
                     case "cliff": Cliff(t, p.size.x > 0 ? p.size.x : 20, Mathf.Abs(p.lift)); break;
                     case "dead_oak": DeadTree(p.at, 1, Tint(art.bark, new Color(.4f, .36f, .32f)), 5, statics, t); break;   // weathered, paler bark (plain bark reads black in shade); size comes from the root's scale
+                    case "great_oak": GreatOak(t); break;
                     case "tree": Broadleaf(t, p.variant); break;
                     case "pine": Pine(t); break;
                     case "fence": Fence(t, p.size.x > 0 ? p.size.x : 8); break;
@@ -755,15 +824,35 @@ namespace Crulanda.World
                     case "haystack": Part(PrimitiveType.Sphere, t, new Vector3(0, .9f, 0), new Vector3(2.6f, 2.2f, 2.6f), art.hay); Solid(t, new Vector3(0, 1, 0), new Vector3(2.4f, 2, 2.4f)); break;
                     case "cart": Cart(t); break;
                     case "barrels": for (int i = 0; i <= p.variant % 3; i++) Part(PrimitiveType.Cylinder, t, new Vector3(i * .75f - .4f, .5f, (i % 2) * .6f), new Vector3(.7f, .5f, .7f), art.timber); Solid(t, new Vector3(0, .5f, .3f), new Vector3(2.2f, 1, 1.4f)); break;
-                    case "crates": for (int i = 0; i <= p.variant % 3; i++) Part(PrimitiveType.Cube, t, new Vector3(i * .9f - .5f, .45f + (i == 2 ? .9f : 0), 0), Vector3.one * .9f, Tint(art.timber, new Color(.45f, .33f, .21f))); Solid(t, new Vector3(0, .5f, 0), new Vector3(2.2f, 1, 1)); break;
+                    case "crates": for (int i = 0; i <= p.variant % 3; i++) Part(PrimitiveType.Cube, t, new Vector3(i == 2 ? -.05f : i * .9f - .5f, i == 2 ? 1.35f : .45f, 0), Vector3.one * .9f, Tint(art.timber, new Color(.45f, .33f, .21f))); Solid(t, new Vector3(0, .5f, 0), new Vector3(2.2f, 1, 1)); break;   // the third crate rests across the two below, not on air
                     case "lamp": Lamp(t, p.variant); break;
-                    case "grave": Part(PrimitiveType.Cube, t, new Vector3(0, .5f, 0), new Vector3(.6f, 1, .15f), art.stone, Quaternion.Euler(R01 * 8 - 4, 0, R01 * 8 - 4)); break;
-                    case "rock": { float s = 1 + p.variant * .6f; Lump(Boulder(), t, new Vector3(0, .3f * s, 0), new Vector3(2f * s, 1.3f * s, 1.7f * s), art.stone, R01 * 360); if (s > 1.3f) Lump(Boulder(), t, new Vector3(.7f * s, .15f * s, .5f * s), new Vector3(.9f * s, .6f * s, .8f * s), art.stone, R01 * 360); Solid(t, new Vector3(0, .5f * s, 0), new Vector3(1.6f * s, 1f * s, 1.4f * s)); break; }
+                    case "grave": { float a = R01 * 8 - 4, b = R01 * 8 - 4; if (p.variant == 1) { a = Mathf.Sign(a) * (14 + Mathf.Abs(a) * 2); b *= 2; } Part(PrimitiveType.Cube, t, new Vector3(0, p.variant == 1 ? .36f : .46f, 0), new Vector3(.6f, 1, .15f), art.stone, Quaternion.Euler(a, 0, b)); break; }   // variant 1: heaved over and half sunk (the drowned graves)
+                    case "rock":
+                    {
+                        float s = 1 + p.variant * .6f; var stone = art.stone;
+                        // Mountains: a loose rock left on a face the crags raised rolls to flatter ground near by and sinks by the slope.
+                        if (Zone.biome == "mountain") { stone = Tint(art.stone, MountainStone); if (string.IsNullOrEmpty(p.interact)) { var spot = FlatterSpot(p.at, 1.2f * s); t.position = Ground(spot); SinkBySlope(t, spot, s); } }
+                        Lump(Boulder(), t, new Vector3(0, .3f * s, 0), new Vector3(2f * s, 1.3f * s, 1.7f * s), stone, R01 * 360); if (s > 1.3f) Lump(Boulder(), t, new Vector3(.7f * s, .15f * s, .5f * s), new Vector3(.9f * s, .6f * s, .8f * s), stone, R01 * 360); Solid(t, new Vector3(0, .5f * s, 0), new Vector3(1.6f * s, 1f * s, 1.4f * s)); break;
+                    }
                     case "bridge": SeatBridge(t, p.size.x > 0 ? p.size.x : 12); Bridge(t, p.size.x > 0 ? p.size.x : 12); break;
                     case "signpost": Part(PrimitiveType.Cube, t, new Vector3(0, 1.1f, 0), new Vector3(.15f, 2.2f, .15f), art.timber); Part(PrimitiveType.Cube, t, new Vector3(.45f, 1.8f, 0), new Vector3(.9f, .28f, .06f), art.timber); break;
                     case "ruin": Ruin(t, p.size.x > 0 ? p.size.x : 6); break;
+                    case "gate": Gate(t, p.size.x > 0 ? p.size.x : 6.4f); break;
+                    case "keep": Stronghold(t, p.size.x > 0 ? p.size : new Vector2(7, 6)); break;
+                    case "perch": Perch(t, p.size.x > 0 ? p.size.x : 8); break;
+                    case "wallow": Wallow(t, p.size.x > 0 ? p.size.x : 6); break;
+                    case "cave": Cave(t, p.size.x > 0 ? p.size.x : 20); break;
+                    case "shelter": Shelter(t); break;
+                    case "brazier": Brazier(t, Vector3.zero, p.variant == 1 ? Bone : null); Solid(t, new Vector3(0, .6f, 0), new Vector3(.8f, 1.2f, .8f)); break;
+                    case "brood": Brood(t, p.size.x > 0 ? p.size.x : 5); break;
+                    case "rib": Rib(t, p.size.x > 0 ? p.size.x : 6, p.size.y > 0 ? p.size.y : 7); break;
+                    case "spine": Spine(t, p.size.x > 0 ? p.size.x : 24, p.size.y > 0 ? p.size.y : 7); break;
+                    case "shrine": Shrine(t); break;
+                    case "idol": Idol(t); break;
+                    case "wayshrine": Wayshrine(t); break;
                     default: Debug.LogWarning("Unknown zone prop kind '" + p.kind + "'."); break;
                 }
+                rng = zoneRng;
                 if (!string.IsNullOrEmpty(p.interact) && t != null)
                     Interactables.Add(new ZoneInteractable { name = string.IsNullOrEmpty(p.name) ? p.kind : p.name, prompt = p.interact, item = p.item, kind = p.kind, once = p.once, position = t.position, root = t });
             }
@@ -774,24 +863,30 @@ namespace Crulanda.World
             float w = size.x, d = size.y;
             var plaster = Tint(art.plaster, Plaster[Mathf.Abs(variant) % Plaster.Length]);
             var roofMat = variant % 2 == 0 ? art.thatch : art.slate;
-            Part(PrimitiveType.Cube, t, new Vector3(0, .3f, 0), new Vector3(w + .3f, .6f, d + .3f), art.stone);
+            float drop = FootDrop(t, w + .3f, d + .3f);   // on a slope the plinth reaches down to the lowest ground under it
+            Part(PrimitiveType.Cube, t, new Vector3(0, .3f - drop / 2, 0), new Vector3(w + .3f, .6f + drop, d + .3f), art.stone);
             Part(PrimitiveType.Cube, t, new Vector3(0, .6f + wallHeight / 2, 0), new Vector3(w, wallHeight, d), plaster);
-            // Timber framing: corner posts, a mid rail per storey and cross braces on the long walls.
+            // Timber framing: corner posts, a sill rail under the windows (a rail per storey on an inn) and a knee brace from each
+            // corner post up to the first rail, so the door and windows sit in clear panels with nothing crossing them.
             float top = .6f + wallHeight;
             for (int sx = -1; sx <= 1; sx += 2) for (int sz = -1; sz <= 1; sz += 2)
                 Part(PrimitiveType.Cube, t, new Vector3(sx * (w / 2), .6f + wallHeight / 2, sz * (d / 2)), new Vector3(.3f, wallHeight, .3f), art.timber);
-            int storeys = inn ? 2 : 1;
+            int storeys = inn ? 2 : 1; float firstRail = .6f + wallHeight * (inn ? .5f : .3f);
             for (int s = 1; s <= storeys; s++)
             {
-                float y = .6f + wallHeight * s / (storeys + (inn ? 0 : 1)) ;
+                float y = inn ? .6f + wallHeight * s / storeys : firstRail;
                 foreach (int sz in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(0, y, sz * (d / 2 + .02f)), new Vector3(w, .22f, .12f), art.timber);
                 foreach (int sx in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(sx * (w / 2 + .02f), y, 0), new Vector3(.12f, .22f, d), art.timber);
             }
-            foreach (int sz in new[] { -1, 1 })
-                for (float x = -w / 2 + 1.8f; x < w / 2 - 1; x += 2.6f)
-                    Part(PrimitiveType.Cube, t, new Vector3(x, .6f + wallHeight * .3f, sz * (d / 2 + .03f)), new Vector3(.14f, wallHeight * .62f, .1f), art.timber, Quaternion.Euler(0, 0, 32));
-            // Door faces south (-Z); warm windows either side and on the back.
-            Part(PrimitiveType.Cube, t, new Vector3(0, .6f + 1.05f, -d / 2 - .05f), new Vector3(1.2f, 2.1f, .12f), Tint(art.timber, new Color(.22f, .14f, .09f)));
+            float rise = firstRail - .6f, run = rise * .625f;   // 32 degree braces: foot against the post, head under the rail
+            foreach (int sz in new[] { -1, 1 }) foreach (int sx in new[] { -1, 1 })
+                Part(PrimitiveType.Cube, t, new Vector3(sx * (w / 2 - .15f - run / 2), .6f + rise / 2, sz * (d / 2 + .03f)), new Vector3(.14f, rise / .848f, .1f), art.timber, Quaternion.Euler(0, 0, sx * 32));
+            // Door faces south (-Z). It stands on the ground in a timber frame in front of the plinth (which stops at the doorway)
+            // instead of hanging on the wall above it. Warm windows either side and on the back.
+            float foot = Mathf.Min(0, LocalGround(t, 0, -d / 2 - .19f)) - .05f;
+            Part(PrimitiveType.Cube, t, new Vector3(0, (foot + 2.7f) / 2, -d / 2 - .19f), new Vector3(1.2f, 2.7f - foot, .06f), Tint(art.timber, new Color(.22f, .14f, .09f)));
+            foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(s * .68f, (foot + 2.86f) / 2, -d / 2 - .12f), new Vector3(.16f, 2.86f - foot, .24f), art.timber);
+            Part(PrimitiveType.Cube, t, new Vector3(0, 2.78f, -d / 2 - .12f), new Vector3(1.52f, .16f, .24f), art.timber);
             if (!inn) Doors.Add(new ZoneDoor { name = t.name, openable = false, position = t.TransformPoint(new Vector3(0, 1, -d / 2 - .1f)) });
             for (float x = -w / 2 + 1.4f; x < w / 2 - .8f; x += 2.6f)
             {
@@ -821,7 +916,7 @@ namespace Crulanda.World
         /// <summary>
         /// A walk-in inn: hollow ground floor behind a working door, with a bar, tables, stools and a lit hearth.
         /// Built at ground level (no plinth under the floor) so characters and navigation walk straight in.
-        /// Each wall piece is its own collider/nav blocker so the interior stays open.
+        /// Each wall piece is its own collider/nav blocker so the interior stays open. variant 1 is the Cracked Hearth (CrackedHearth).
         /// </summary>
         void Inn(Transform t, Vector2 size, int variant)
         {
@@ -870,7 +965,8 @@ namespace Crulanda.World
                 }
             float roofH = Mathf.Max(2.4f, d * .5f);
             MeshPart(ZoneMeshes.GableRoof(w + 1.2f, d + 1.4f, roofH), t, new Vector3(0, H, 0), variant % 2 == 0 ? art.thatch : art.slate);
-            Part(PrimitiveType.Cube, t, new Vector3(w / 2 - 1.1f, H + roofH * .75f, d * .15f), new Vector3(1, roofH * 1.1f, 1), art.stone);
+            if (variant == 1) CrackedHearth(t, w, H, roofH);   // the Cracked Hearth: its chimney breast split, the fire showing through
+            else Part(PrimitiveType.Cube, t, new Vector3(w / 2 - 1.1f, H + roofH * .75f, d * .15f), new Vector3(1, roofH * 1.1f, 1), art.stone);
             // The door: a plank door on a hinge at the left jamb, plus a stone step.
             var hinge = new GameObject("Door hinge").transform; hinge.SetParent(t, false); hinge.localPosition = new Vector3(-doorW / 2, 0, -d / 2 - .02f);
             var door = Part(PrimitiveType.Cube, hinge, new Vector3(doorW / 2, doorH / 2, 0), new Vector3(doorW, doorH, .1f), dark);
@@ -878,7 +974,7 @@ namespace Crulanda.World
             Part(PrimitiveType.Cube, t, new Vector3(0, .06f, -d / 2 - .55f), new Vector3(2, .12f, .8f), art.stone);
             var innDoor = new ZoneDoor { name = t.name, openable = true, hinge = hinge, blocker = doorCollider, position = t.TransformPoint(new Vector3(0, 1, -d / 2)) };
             Doors.Add(innDoor); innDoor.SetOpen(true);   // the inn keeps its door open; villagers come and go
-            if (art.particle != null) Smoke(t, new Vector3(w / 2 - 1.1f, H + roofH * 1.4f, d * .15f));
+            if (art.particle != null && variant != 1) Smoke(t, new Vector3(w / 2 - 1.1f, H + roofH * 1.4f, d * .15f));
             // Inside: bar counter with barrels behind it, three tables with stools, and the hearth.
             var bar = Part(PrimitiveType.Cube, t, new Vector3(-w / 2 + 2.6f, .55f, d / 2 - 1.5f), new Vector3(4, 1.1f, .7f), boards);
             bar.AddComponent<BoxCollider>(); bar.AddComponent<NavBlocker>();
@@ -905,17 +1001,52 @@ namespace Crulanda.World
             // Outside: the hanging sign and barrels by the door.
             Part(PrimitiveType.Cube, t, new Vector3(-2, 3.4f, -d / 2 - .8f), new Vector3(.12f, .12f, 1.6f), art.timber);
             Part(PrimitiveType.Cube, t, new Vector3(-2, 2.8f, -d / 2 - 1.4f), new Vector3(1, .75f, .08f), Tint(art.timber, new Color(.5f, .36f, .2f)));
+            // The board hangs on two chains from the bracket, and a strut braces the bracket to the wall (seen close up, a board
+            // with nothing above it in frame read as a slab floating in mid-air).
+            foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(-2 + s * .38f, 3.26f, -d / 2 - 1.4f), new Vector3(.03f, .2f, .03f), art.metal);
+            Part(PrimitiveType.Cube, t, new Vector3(-2, 2.98f, -d / 2 - .38f), new Vector3(.1f, .1f, 1.06f), art.timber, Quaternion.Euler(45, 0, 0));
             Part(PrimitiveType.Cylinder, t, new Vector3(-2, 2.8f, -d / 2 - 1.46f), new Vector3(.45f, .06f, .45f), art.metal, Quaternion.Euler(90, 0, 0));
             Part(PrimitiveType.Cylinder, t, new Vector3(w / 2 - 1.2f, .5f, -d / 2 - 1), new Vector3(.8f, .5f, .8f), art.timber);
             var glow = new GameObject("Inn lantern").AddComponent<Light>(); glow.transform.SetParent(t, false);
             glow.transform.localPosition = new Vector3(0, 2.6f, -d / 2 - 1.2f); glow.type = LightType.Point; glow.range = 8; glow.intensity = 1.4f; glow.color = new Color(1, .72f, .4f);
             NightLights.Add(new NightLight { light = glow, dayIntensity = 1.4f, nightIntensity = 2.2f });
         }
+        /// <summary>
+        /// The Cracked Hearth (inn variant 1): a stone chimney breast on the hearth gable (+X), split from its glowing ash-pit
+        /// door up to the eaves with the fire showing through, and the stack above knocked askew on a glowing seam.
+        /// </summary>
+        void CrackedHearth(Transform t, float w, float H, float roofH)
+        {
+            var stone = Tint(art.stone, new Color(.42f, .4f, .37f)); float face = w / 2 + 1.05f, z = .8f, low = H * .62f;
+            var breast = Part(PrimitiveType.Cube, t, new Vector3(w / 2 + .6f, low / 2, z), new Vector3(.9f, low, 2.2f), stone);
+            breast.AddComponent<BoxCollider>(); breast.AddComponent<NavBlocker>();
+            Part(PrimitiveType.Cube, t, new Vector3(w / 2 + .65f, (low + H + .4f) / 2, z), new Vector3(.8f, H + .4f - low, 1.2f), stone);
+            Part(PrimitiveType.Cube, t, new Vector3(face, .42f, z), new Vector3(.04f, .45f, .55f), art.glass);   // the ash-pit door, glowing
+            // The crack zig-zags up the outer face from the ash-pit to the seam (p: height, depth).
+            var p = new Vector2(.5f, z - .05f);
+            for (int i = 0; i < 6; i++)
+            {
+                float a = i % 2 == 0 ? 20 : -20; var step = new Vector2(Mathf.Cos(a * Mathf.Deg2Rad), Mathf.Sin(a * Mathf.Deg2Rad)) * 1.1f;
+                Part(PrimitiveType.Cube, t, new Vector3(face + .005f, p.x + step.x / 2, p.y + step.y / 2), new Vector3(.05f, 1.16f, .2f), art.glass, Quaternion.Euler(a, 0, 0));
+                p += step;
+            }
+            Part(PrimitiveType.Cube, t, new Vector3(w / 2 + .65f, H + .4f, z), new Vector3(.84f, .08f, 1.24f), art.glass);
+            var stack = new GameObject("Chimney stack").transform; stack.SetParent(t, false);
+            stack.localPosition = new Vector3(w / 2 + .72f, H + .44f, z); stack.localRotation = Quaternion.Euler(0, 0, -5);   // leaning away from the house
+            float tall = roofH + 1.2f;
+            Part(PrimitiveType.Cube, stack, new Vector3(0, tall / 2, 0), new Vector3(.8f, tall, 1.2f), stone);
+            Part(PrimitiveType.Cube, stack, new Vector3(0, tall + .1f, 0), new Vector3(1, .2f, 1.4f), stone);
+            if (art.particle != null) Smoke(stack, new Vector3(0, tall + .4f, 0));
+            // Stones fallen from the crack.
+            Part(PrimitiveType.Cube, t, new Vector3(face + .5f, .1f, z + .9f), new Vector3(.4f, .25f, .3f), stone, Quaternion.Euler(0, 30, 0));
+            Part(PrimitiveType.Cube, t, new Vector3(face + .35f, .08f, z - .7f), new Vector3(.3f, .2f, .35f), stone, Quaternion.Euler(0, -20, 0));
+        }
         void Barn(Transform t, Vector2 size)
         {
             float w = size.x, d = size.y, h = 4.2f;
             var boards = Tint(art.timber, new Color(.36f, .22f, .15f));
             Part(PrimitiveType.Cube, t, new Vector3(0, h / 2, 0), new Vector3(w, h, d), boards);
+            float drop = FootDrop(t, w, d); if (drop > 0) Part(PrimitiveType.Cube, t, new Vector3(0, .1f - drop / 2, 0), new Vector3(w + .2f, drop + .2f, d + .2f), art.stone);   // stone footing on a slope
             for (float x = -w / 2; x <= w / 2 + .01f; x += 1.2f)
                 foreach (int sz in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(x, h / 2, sz * (d / 2 + .04f)), new Vector3(.12f, h, .08f), art.timber);
             Part(PrimitiveType.Cube, t, new Vector3(0, 1.6f, -d / 2 - .07f), new Vector3(3.2f, 3.2f, .1f), Tint(art.timber, new Color(.18f, .12f, .09f)));
@@ -937,12 +1068,12 @@ namespace Crulanda.World
             Part(PrimitiveType.Cylinder, t, new Vector3(.2f, 1.5f, 0), new Vector3(.35f, .22f, .35f), art.timber);
             Solid(t, new Vector3(0, 1.2f, 0), new Vector3(2.4f, 2.4f, 2.4f));
         }
-        /// <summary>Recursive branching dead tree (the Oakhaven oak, Wasting husks). Trunk gets a collider when solid.</summary>
-        void DeadTree(Vector2 at, float scale, Material mat, int depth, Transform parent, Transform existing = null, float girth = -1)
+        /// <summary>Recursive branching dead tree (dead_oak props, grey woods, Wasting husks). Trunk gets a collider when solid. Returns its root.</summary>
+        Transform DeadTree(Vector2 at, float scale, Material mat, int depth, Transform parent, Transform existing = null, float girth = -1)
         {
             var root = existing != null ? existing : new GameObject("Dead tree").transform;
             if (existing == null) { root.SetParent(parent, false); root.position = Ground(at); root.rotation = Quaternion.Euler(0, R01 * 360, 0); }
-            // The Great Oak keeps a massive trunk; ordinary dead trees are slimmer with longer, reaching limbs.
+            // A dead_oak prop (Oakhaven's lone dead tree) keeps a massive trunk; ordinary dead trees are slimmer with longer, reaching limbs.
             if (girth < 0) girth = existing != null && depth >= 5 ? .9f : .38f;
             float trunkH = (girth > .6f ? 4.2f : 5.2f) * scale, trunkR = girth * scale;
             Part(PrimitiveType.Cylinder, root, new Vector3(0, trunkH / 2, 0), new Vector3(trunkR * 2, trunkH / 2, trunkR * 2), mat);
@@ -957,6 +1088,7 @@ namespace Crulanda.World
             Branch(root, new Vector3(0, trunkH * .92f, 0), Vector3.up, trunkH * (girth > .6f ? .55f : .5f), trunkR * (girth > .6f ? .75f : .7f), depth, mat);
             var cap = root.gameObject.AddComponent<CapsuleCollider>(); cap.center = new Vector3(0, trunkH / 2, 0); cap.height = trunkH; cap.radius = trunkR;
             root.gameObject.AddComponent<NavBlocker>(); root.gameObject.AddComponent<TreeFade>();
+            return root;
         }
         /// <summary>Bark for dead woods: charred dark in the ash, weathered grey elsewhere (Khaven's Whispering Wood). One draw.</summary>
         Material DeadBark() { float t = R01; return Tint(art.bark, Zone.biome == "ash" ? Color.Lerp(new Color(.2f, .18f, .16f), new Color(.3f, .27f, .24f), t) : Color.Lerp(new Color(.58f, .57f, .56f), new Color(.72f, .71f, .69f), t)); }
@@ -1001,20 +1133,199 @@ namespace Crulanda.World
         {
             LeafTrees.Add(t.position);
             float h = 3.5f + R01 * 1.5f;
-            // A tapering trunk with two limbs into the crown, and a crown of lumpy clumps in two shades.
-            Part(PrimitiveType.Cylinder, t, new Vector3(0, h / 2, 0), new Vector3(.5f, h / 2, .5f), art.bark);
-            Part(PrimitiveType.Cylinder, t, new Vector3(0, h * .08f, 0), new Vector3(.72f, h * .08f, .72f), art.bark);
-            foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cylinder, t, new Vector3(s * .45f, h * .92f, 0), new Vector3(.22f, .9f, .22f), art.bark, Quaternion.Euler(0, R01 * 360, s * 35));
+            float yawA = R01 * 120, yawB = R01 * 120 + 180;   // the two main limbs' bearings, on roughly opposite sides (the zone's draws, as before)
             var baseLeaf = Leaf[(Mathf.Abs(variant) + (int)(R01 * 2)) % Leaf.Length];
             var leaf = Tint(art.foliage, Wither(baseLeaf)); var leafLight = Tint(art.foliage, Wither(Color.Lerp(baseLeaf, new Color(.75f, .7f, .35f), .22f)));
-            int clumps = 5 + (int)(R01 * 3);
+            // A tapered, slightly bent and leaning trunk on a root flare, in its own shade of bark, running up into the crown's
+            // middle clump; limbs grow out of it into the side clumps. Its look comes from its own stream (TreeRandom).
+            var tr = TreeRandom(t.position); float T() { return (float)tr.NextDouble(); }
+            var bark = BarkShade(T()); float r0 = .24f + T() * .07f;
+            var axis = Bole(t, tr, h + .7f, r0, bark); var lean = axis(h) - new Vector3(0, h, 0);   // the crown sits over the leaning top
+            int clumps = 5 + (int)(R01 * 3); var sides = new List<Vector3>();
             for (int i = 0; i < clumps; i++)
             {
                 float a = i * 2.4f + R01, r = i == 0 ? 0 : 1 + R01 * .9f, s = (i == 0 ? 3.4f : 2.2f + R01 * 1.1f);
-                Lump(Canopy(), t, new Vector3(Mathf.Cos(a) * r, h + .9f + (i == 0 ? .8f : R01 * 1.2f), Mathf.Sin(a) * r), new Vector3(s, s * .85f, s), i % 3 == 1 ? leafLight : leaf, R01 * 360);
+                var blob = Canopy(); var at = new Vector3(Mathf.Cos(a) * r, h + .9f + (i == 0 ? .8f : R01 * 1.2f), Mathf.Sin(a) * r) + lean;
+                Lump(blob, t, at, new Vector3(s, s * .85f, s), i % 3 == 1 ? leafLight : leaf, R01 * 360);
+                if (i > 0) sides.Add(at);
+            }
+            // Two limbs (a third on some trees) from inside the trunk, bowing up and out to the side clump nearest their bearing.
+            var bearings = T() < .55f ? new[] { yawA, yawB, yawA + 70 + T() * 40 } : new[] { yawA, yawB };
+            foreach (float yaw in bearings)
+            {
+                var want = Quaternion.Euler(0, yaw, 0) * Vector3.right; var to = sides[0];
+                foreach (var c in sides) if (Vector3.Dot(new Vector3(c.x, 0, c.z).normalized, want) > Vector3.Dot(new Vector3(to.x, 0, to.z).normalized, want)) to = c;
+                var from = axis(h * (.56f + T() * .12f));
+                Limb(t, from, to - new Vector3(0, .3f, 0) + want * .15f, r0 * (.44f + T() * .1f), .06f, bark);
             }
             var cap = t.gameObject.AddComponent<CapsuleCollider>(); cap.center = new Vector3(0, h / 2, 0); cap.height = h; cap.radius = .35f;
             t.gameObject.AddComponent<NavBlocker>(); t.gameObject.AddComponent<TreeFade>();
+        }
+        /// <summary>A tree's own draws (bark shade, lean, flare, bends), seeded by where it stands, so the zone's stream and every
+        /// layout drawn from it stay exactly as they were.</summary>
+        System.Random TreeRandom(Vector3 at) { return new System.Random((Zone.seed * 7919) ^ (Mathf.RoundToInt(at.x * 8) * 73856093) ^ (Mathf.RoundToInt(at.z * 8) * 19349663)); }
+        static readonly Color[] Barks = { new Color(.30f, .26f, .22f), new Color(.36f, .31f, .26f), new Color(.27f, .25f, .23f), new Color(.40f, .36f, .31f), new Color(.33f, .31f, .27f), new Color(.25f, .22f, .19f) };
+        /// <summary>One of a few bark shades (warm brown, grey-brown, weathered pale), so neighbouring trees differ without a material each.</summary>
+        Material BarkShade(float u) { return Tint(art.bark, Wither(Barks[(int)(u * Barks.Length) % Barks.Length])); }
+        /// <summary>
+        /// A living tree's trunk, from under the ground to <paramref name="top"/> (local metres): tapering from <paramref name="r0"/>,
+        /// gently bent, a few degrees off plumb and a little gnarled, on a root flare (a swell and four or five buttress ridges that
+        /// sink into the soil, where a pipe had a collar). Closed at the top. Returns its axis, where a limb from a height starts.
+        /// </summary>
+        Func<float, Vector3> Bole(Transform t, System.Random tr, float top, float r0, Material bark)
+        {
+            float T() { return (float)tr.NextDouble(); }
+            float lx = (T() - .5f) * .1f, lz = (T() - .5f) * .1f, bend = (T() - .5f) * r0 * .9f, ph = T() * 6.3f, seed = T() * 60;
+            int n = 4 + (int)(T() * 2); var at = new float[n]; var w = new float[n];
+            for (int i = 0; i < n; i++) { at[i] = (i + (T() - .5f) * .6f) * 2 * Mathf.PI / n; w[i] = .7f + T() * .5f; }
+            Vector3 Axis(float y) { float s = Mathf.Sin(y / top * 3.1f + ph) * bend; return new Vector3(lx * y + s, y, lz * y + s * .6f); }
+            float Radius(float y, float a)
+            {
+                float r = r0 * (1 - .42f * Mathf.Clamp01(y / top)) * (1 + .16f * (Mathf.PerlinNoise(Mathf.Cos(a) + seed, Mathf.Sin(a) + y * 1.4f) - .5f));
+                float flare = Mathf.Exp(-Mathf.Max(0, y + .1f) / (r0 * 2.1f)), ridge = 0;   // a long, concave swell, not a boot
+                for (int i = 0; i < n; i++) ridge += w[i] * Mathf.Pow(Mathf.Max(0, Mathf.Cos(a - at[i])), 5);
+                return (r + r0 * flare * (.22f + .9f * ridge)) * Mathf.Clamp01((top - y) / (r0 * 1.6f));
+            }
+            MeshPart(ZoneMeshes.Tube(Axis, Radius, new[] { -.45f, -.2f, -.05f, .08f, .2f, .36f, .58f, top * .3f, top * .48f, top * .66f, top * .82f, top * .93f, top }, 14, Vector3.right, 2, .5f), t, Vector3.zero, bark).name = "Trunk";
+            return Axis;
+        }
+        /// <summary>
+        /// A limb from inside a trunk or limb (<paramref name="from"/>, on its axis) out to <paramref name="to"/>: tapered, swelling
+        /// where it leaves the wood it grows from, and bowed a little below the straight line so it sets out flatter and turns
+        /// upward. Closed at the tip. Local metres, like the parts round it.
+        /// </summary>
+        void Limb(Transform t, Vector3 from, Vector3 to, float r0, float tip, Material bark, float bow = .12f, int sides = 8)
+        {
+            var d = to - from; float len = d.magnitude; if (len < .05f) return; var dir = d / len;
+            var side = Vector3.Cross(dir, Vector3.up); if (side.sqrMagnitude < 1e-4f) side = Vector3.right;
+            var sag = Vector3.Cross(side.normalized, dir) * len * bow;   // perpendicular to the limb, on its underside
+            if (sag.y > 0) sag = -sag;
+            Vector3 C(float s) { return from + d * s + sag * (4 * s * (1 - s)); }
+            float R(float s, float a) { return Mathf.Lerp(r0, tip, s) * (1 + .35f * Mathf.Exp(-s * 9)) * Mathf.Clamp01((1.05f - s) / .1f); }
+            MeshPart(ZoneMeshes.Tube(C, R, new[] { 0, .12f, .26f, .42f, .58f, .74f, .88f, .97f, 1.05f }, sides, side.normalized, 1, len * .5f), t, Vector3.zero, bark).name = "Limb";
+        }
+        Mesh[] oakLeaves;
+        /// <summary>
+        /// The Great Oak on Oakhaven's green. Canon (book1 ch.4): a massive, ancient oak dominating the square, the settlement's
+        /// historical heart; after the erasure it is found petrified mid-bloom in spring leaf, so now, before it, it is alive and in
+        /// full leaf. A gnarled lofted bole on a flare of six buttresses, surface roots running out into the turf, five great limbs
+        /// growing out of the bole where it swells and bending up into a layered dome of leaf, and a low stone bench ring round it.
+        /// Local metres: the prop's scale multiplies it. Its own stream draws it (the zone's moves on as for the old dead oak).
+        /// </summary>
+        void GreatOak(Transform t)
+        {
+            SkipDeadOakDraws();
+            LeafTrees.Add(t.position);
+            var tr = new System.Random(Zone.seed + 4127); float T() { return (float)tr.NextDouble(); }
+            var bark = Tint(art.bark, new Color(.41f, .36f, .31f)); var rootBark = Tint(art.bark, new Color(.35f, .33f, .27f));
+            // The bole: a slight lean and wander, a metre in radius above the flare, swelling where the limbs part, then a tapering
+            // leader up into the crown. Gnarl, deep fluting and a few burls; six buttresses, twisting a little as they climb.
+            float lx = (T() - .5f) * .05f, lz = (T() - .5f) * .05f, ph = T() * 6.3f, seed = T() * 40;
+            Vector3 Axis(float y) { float g = Mathf.Max(0, y) / 4; return new Vector3(lx * y + .12f * Mathf.Sin(y * .8f + ph) * g, y, lz * y + .1f * Mathf.Sin(y * 1.05f + ph + 2) * g); }
+            const int Buttresses = 6; var bAt = new float[Buttresses]; var bW = new float[Buttresses];
+            for (int i = 0; i < Buttresses; i++) { bAt[i] = (i + (T() - .5f) * .5f) * 2 * Mathf.PI / Buttresses; bW[i] = .75f + T() * .4f; }
+            var burls = new Vector3[4]; for (int i = 0; i < burls.Length; i++) burls[i] = new Vector3(T() * 360, .9f + T() * 2.6f, .1f + T() * .12f);   // bearing (degrees), height, size
+            float Girth(float y, float a)
+            {
+                float r = Mathf.Lerp(1.02f, .78f, Mathf.SmoothStep(0, 1, y / 3.4f)) + .18f * Mathf.Exp(-(y - 3.9f) * (y - 3.9f) / .36f) - .5f * Mathf.SmoothStep(0, 1, (y - 4.2f) / 2.2f);
+                r *= 1 + .14f * (Mathf.PerlinNoise(Mathf.Cos(a) * 1.4f + seed, Mathf.Sin(a) * 1.4f + y * .7f) - .5f) + .025f * Mathf.Sin(a * 9 + y * 1.3f);
+                foreach (var burl in burls) { float da = Mathf.DeltaAngle(a * Mathf.Rad2Deg, burl.x) / 28, dy = (y - burl.y) / .35f; r += burl.z * Mathf.Exp(-da * da - dy * dy); }
+                float flare = Mathf.Exp(-Mathf.Max(0, y + .25f) / .5f), ridge = 0;
+                for (int i = 0; i < Buttresses; i++) ridge += bW[i] * Mathf.Pow(Mathf.Max(0, Mathf.Cos(a - bAt[i] - y * .12f)), 8);
+                return (r + flare * (.28f + 1.05f * ridge)) * Mathf.Clamp01((6.5f - y) / .5f);
+            }
+            // Two parts cut from the one surface (they meet without a seam): the flare, low and wide, and the bole, tall and narrow,
+            // so the camera only counts as inside the tree (TreeFade) when it really is.
+            MeshPart(ZoneMeshes.Tube(Axis, Girth, new[] { -.6f, -.42f, -.26f, -.13f, 0, .12f, .26f, .42f, .6f, .82f, 1.05f, 1.3f }, 32, Vector3.right, 3, .5f), t, Vector3.zero, bark).name = "Oak root flare";
+            MeshPart(ZoneMeshes.Tube(Axis, Girth, new[] { 1.3f, 1.65f, 2f, 2.4f, 2.8f, 3.2f, 3.55f, 3.85f, 4.15f, 4.5f, 4.9f, 5.35f, 5.8f, 6.2f, 6.5f }, 32, Vector3.right, 3, .5f), t, Vector3.zero, bark).name = "Oak bole";
+            // Surface roots: one out of each buttress and two between, flattened, sinking into the turf as they thin. One mesh.
+            var roots = new List<CombineInstance>();
+            for (int i = 0; i < Buttresses + 2; i++)
+            {
+                bool main = i < Buttresses; float a = main ? bAt[i] + .1f : bAt[i * 3 % Buttresses] + Mathf.PI / Buttresses, len = (main ? 1.7f : 1.1f) + T() * .6f, rr = main ? .42f * bW[i] : .26f, wig = (T() - .5f) * .9f, ph2 = T() * 6;
+                var dir = new Vector3(Mathf.Cos(a), 0, -Mathf.Sin(a)); var across = new Vector3(-dir.z, 0, dir.x);   // the bole's angle a points this way
+                Vector3 C(float s) { var p = dir * (1.05f + len * s) + across * (wig * Mathf.Sin(s * 3 + ph2) * s); return new Vector3(p.x, LocalGround(t, p.x, p.z) + .3f - .62f * s, p.z); }
+                float R(float s, float ang) { return Mathf.Lerp(rr, .08f, s) * (1 - .38f * Mathf.Abs(Mathf.Cos(ang))); }   // angle 0 is up: wider than tall
+                roots.Add(new CombineInstance { mesh = ZoneMeshes.Tube(C, R, new[] { 0, .12f, .25f, .4f, .55f, .7f, .85f, 1 }, 10, Vector3.up, 1, len * .5f), transform = Matrix4x4.identity });
+            }
+            var rootMesh = new Mesh { name = "Oak roots" }; rootMesh.CombineMeshes(roots.ToArray(), true, false); rootMesh.RecalculateBounds();
+            foreach (var piece in roots) DestroyImmediate(piece.mesh);
+            MeshPart(rootMesh, t, Vector3.zero, rootBark);
+            // Five great limbs out of the bole where it swells: the low ones sprawl wide and nearly level, the high ones climb. Each
+            // leaves the bole flat and bends upward (a quadratic curve), swells where it joins, and carries three lesser branches.
+            var tips = new List<(Vector3 at, float size)>(); float turn = T() * 360;
+            for (int i = 0; i < 5; i++)
+            {
+                float yaw = turn + i * 72 + (T() - .5f) * 26, y0 = 3.3f + i * 2 % 5 * .25f + T() * .1f, low = Mathf.Clamp01(1 - (y0 - 3.3f));
+                var outward = Quaternion.Euler(0, yaw, 0) * Vector3.right;
+                float reach = Mathf.Lerp(3.2f, 4.6f, low) + T() * .5f, rise = Mathf.Lerp(3.3f, 1.8f, low) + T() * .5f, rb = Mathf.Lerp(.44f, .54f, low);
+                Vector3 p0 = Axis(y0), p2 = p0 + outward * reach + Vector3.up * rise, p1 = p0 + outward * reach * .55f + Vector3.up * rise * .12f;
+                Vector3 C(float s) { return (1 - s) * (1 - s) * p0 + 2 * s * (1 - s) * p1 + s * s * p2; }
+                float R(float s, float a) { return Mathf.Lerp(rb, .12f, s) * (1 + .3f * Mathf.Exp(-s * 7)) * (1 + .05f * Mathf.Sin(a * 3 + s * 9)) * Mathf.Clamp01((1.06f - s) / .1f); }
+                MeshPart(ZoneMeshes.Tube(C, R, new[] { 0, .08f, .17f, .27f, .38f, .5f, .62f, .74f, .86f, .96f, 1.06f }, 14, Vector3.Cross(Vector3.up, outward), 2, 2.5f), t, Vector3.zero, bark).name = "Oak limb";
+                tips.Add((p2 + Vector3.up * .25f, 3.1f + T() * .5f));
+                for (int k = 0; k < 3; k++)
+                {
+                    float s = .4f + k * .2f + T() * .06f, turnBy = (k % 2 == 0 ? 1 : -1) * (26 + T() * 20), len = (2.6f - k * .35f) * (.85f + T() * .3f);
+                    var along = C(s + .01f) - C(s - .01f); var flat = new Vector3(along.x, 0, along.z).normalized;
+                    var dir = (Quaternion.AngleAxis(turnBy, Vector3.up) * flat + Vector3.up * (.18f + T() * .3f)).normalized;   // out to the side, not straight up like a peg
+                    var from = C(s); var to = from + dir * len + Vector3.up * len * .25f;
+                    Limb(t, from, to, R(s, 0) * .68f, .06f, bark, .16f, 9);   // bowed: it sets out level and turns up into the leaf
+                    tips.Add((to + Vector3.up * .2f, 2.6f + T() * .6f));
+                }
+            }
+            // The crown: leaf on every limb and branch end, then a layered dome (a wide, darker skirt, a middle tier, a sunlit top)
+            // and big clumps inside so no sky shows through its heart. Fresh green in a few shades, a touch of autumn gold on the rim.
+            if (oakLeaves == null) { oakLeaves = new Mesh[5]; for (int i = 0; i < 5; i++) oakLeaves[i] = ZoneMeshes.Blob(Zone.seed + 830 + i * 29, .6f, false, 10, 16); }
+            Material deep = Tint(art.foliage, new Color(.19f, .30f, .12f)), mid = Tint(art.foliage, new Color(.25f, .37f, .14f)), light = Tint(art.foliage, new Color(.32f, .44f, .17f)),
+                sunlit = Tint(art.foliage, new Color(.40f, .47f, .19f)), gold = Tint(art.foliage, new Color(.42f, .43f, .16f));   // gold: the first turn of autumn, on two low clumps
+            void Clump(Vector3 at, float size, Material m, float flat = .8f)
+            {
+                var o = MeshPart(oakLeaves[(int)(T() * 5) % 5], t, at, m, Quaternion.Euler((T() - .5f) * 20, T() * 360, (T() - .5f) * 20));
+                o.transform.localScale = new Vector3(size, size * flat, size); o.name = "Oak leaves";
+            }
+            foreach (var tip in tips) Clump(tip.at, tip.size, T() < .5f ? mid : light);
+            for (int i = 0; i < 12; i++) { float a = (i + T() * .5f) * Mathf.PI / 6, r = 4.5f + T() * 1; Clump(new Vector3(Mathf.Cos(a) * r, 4.9f + T() * .7f, Mathf.Sin(a) * r), 2.5f + T() * .6f, i % 6 == 1 ? gold : i % 2 == 0 ? deep : mid, .72f); }
+            for (int i = 0; i < 9; i++) { float a = (i + T() * .6f) * Mathf.PI * 2 / 9 + .3f, r = 3.1f + T(); Clump(new Vector3(Mathf.Cos(a) * r, 6.9f + T() * .8f, Mathf.Sin(a) * r), 3 + T() * .6f, i % 3 == 0 ? light : mid); }
+            for (int i = 0; i < 6; i++) { float a = (i + T() * .6f) * Mathf.PI / 3 + .6f, r = 1.4f + T() * 1.1f; Clump(new Vector3(Mathf.Cos(a) * r, 8.5f + T() * .7f, Mathf.Sin(a) * r), 3 + T() * .5f, i % 2 == 0 ? sunlit : light); }
+            Clump(new Vector3(.3f, 9.9f, -.2f), 3.4f, sunlit); Clump(new Vector3(-.8f, 9.4f, .9f), 3f, light);
+            for (int i = 0; i < 3; i++) { float a = i * 2.1f + T(); Clump(new Vector3(Mathf.Cos(a) * 1.5f, 6.3f + T() * .6f, Mathf.Sin(a) * 1.5f), 4 + T() * .4f, deep); }
+            var cap = t.gameObject.AddComponent<CapsuleCollider>(); cap.center = new Vector3(0, 3.2f, 0); cap.height = 6.4f; cap.radius = 1.1f;
+            t.gameObject.AddComponent<NavBlocker>(); t.gameObject.AddComponent<TreeFade>();
+            OakRing(t, 3.05f * t.localScale.x);
+        }
+        /// <summary>A low dry-stone bench ring round the Great Oak's roots, where the village sits in its shade (GAME-ONLY). Its own
+        /// root beside the tree, so the stone never fades with it; solid all round, so people walk round it.</summary>
+        void OakRing(Transform oak, float radius)
+        {
+            var ring = new GameObject("Oak bench ring").transform; ring.SetParent(oak.parent, false); ring.position = oak.position;
+            var tr = new System.Random(Zone.seed + 4133); float T() { return (float)tr.NextDouble(); }
+            var stones = new[] { Tint(art.stone, new Color(.52f, .5f, .46f)), Tint(art.stone, new Color(.47f, .45f, .41f)), Tint(art.stone, new Color(.56f, .53f, .48f)) };
+            var seat = Tint(art.stone, new Color(.6f, .58f, .53f));
+            const int Blocks = 22;
+            for (int i = 0; i < Blocks; i++)
+            {
+                float a = (i + (T() - .5f) * .12f) * 360f / Blocks, len = 2 * Mathf.PI * radius / Blocks * (.93f + T() * .05f), high = .36f + T() * .06f;
+                var p = new Vector3(Mathf.Cos(a * Mathf.Deg2Rad) * radius, 0, Mathf.Sin(a * Mathf.Deg2Rad) * radius); p.y = LocalGround(ring, p.x, p.z);
+                var turn = Quaternion.Euler((T() - .5f) * 3, -(a + 90), (T() - .5f) * 3);   // its length along the ring
+                Part(PrimitiveType.Cube, ring, p + Vector3.up * (high / 2 - .08f), new Vector3(len, high, .5f), stones[(int)(T() * 3) % 3], turn);
+                Part(PrimitiveType.Cube, ring, p + Vector3.up * (high - .05f), new Vector3(len * .98f, .1f, .64f), seat, turn);   // a flat cap stone: the seat
+            }
+            for (int i = 0; i < 10; i++)
+            {
+                var seg = new GameObject("Bench").transform; seg.SetParent(ring, false); float a = i * 36;
+                seg.localPosition = new Vector3(Mathf.Cos(a * Mathf.Deg2Rad) * radius, 0, Mathf.Sin(a * Mathf.Deg2Rad) * radius); seg.localRotation = Quaternion.Euler(0, -(a + 90), 0);
+                Solid(seg, new Vector3(0, .3f, 0), new Vector3(2 * radius * Mathf.Sin(18 * Mathf.Deg2Rad) + .25f, .8f, .7f));
+            }
+        }
+        /// <summary>The zone draws DeadTree took for the Great Oak when it was a dead oak (its flare, then a five-deep limb tree),
+        /// taken again without building anything, so every prop, grove and tree drawn after it keeps its old place.</summary>
+        void SkipDeadOakDraws() { for (int i = 0; i < 5; i++) _ = R01; SkipBranchDraws(5, .675f); }
+        void SkipBranchDraws(int depth, float radius)
+        {
+            if (depth <= 0 || radius < .02f) return;
+            int kids = depth > 3 ? 3 : 2 + (R01 > .5f ? 1 : 0);
+            for (int i = 0; i < kids; i++) { _ = R01 + R01 + R01; SkipBranchDraws(depth - 1, radius * .58f); }
         }
         Mesh cone;
         void Pine(Transform t)
@@ -1127,17 +1438,44 @@ namespace Crulanda.World
         {
             for (float x = -length / 2; x < length / 2; x += 1.1f)
             {
-                float h = .6f + R01 * 2.4f;
-                Part(PrimitiveType.Cube, t, new Vector3(x, h / 2, 0), new Vector3(1.05f, h, .8f), Tint(art.stone, new Color(.42f, .41f, .38f)), Quaternion.Euler(0, R01 * 6 - 3, R01 * 6 - 3));
+                float h = .6f + R01 * 2.4f, g = LocalGround(t, x, 0) - .15f;   // each block stands on (and a little into) the ground under it
+                Part(PrimitiveType.Cube, t, new Vector3(x, g + (h + .15f) / 2, 0), new Vector3(1.05f, h + .15f, .8f), Tint(art.stone, new Color(.42f, .41f, .38f)), Quaternion.Euler(0, R01 * 6 - 3, R01 * 6 - 3));
             }
             Solid(t, new Vector3(0, 1.2f, 0), new Vector3(length, 2.4f, 1));
+        }
+        /// <summary>
+        /// A wayside shrine (front faces -Z): two stone steps and a squared pillar carrying a little gabled niche with a pale
+        /// figure in it and a sun-disc on the gable; a bowl, two candle stubs and offerings gone grey at its foot.
+        /// </summary>
+        void Wayshrine(Transform t)
+        {
+            var stone = Tint(art.stone, new Color(.6f, .57f, .5f)); var dark = Tint(art.stone, new Color(.12f, .11f, .1f));
+            Part(PrimitiveType.Cube, t, new Vector3(0, .02f, 0), new Vector3(2.2f, .5f, 2.2f), stone);   // deep enough to sit on a slope
+            Part(PrimitiveType.Cube, t, new Vector3(0, .35f, .15f), new Vector3(1.5f, .22f, 1.5f), stone);
+            Part(PrimitiveType.Cube, t, new Vector3(0, 1.23f, .25f), new Vector3(.5f, 1.6f, .5f), stone);
+            Part(PrimitiveType.Cube, t, new Vector3(0, 2.4f, .25f), new Vector3(.9f, .8f, .75f), stone);
+            Part(PrimitiveType.Cube, t, new Vector3(0, 2.38f, -.13f), new Vector3(.6f, .56f, .04f), dark);
+            Part(PrimitiveType.Capsule, t, new Vector3(0, 2.36f, -.17f), new Vector3(.18f, .2f, .1f), Tint(art.stone, new Color(.86f, .84f, .78f)));
+            MeshPart(ZoneMeshes.GableRoof(1.25f, 1.15f, .45f, .12f), t, new Vector3(0, 2.8f, .25f), art.slate, Quaternion.Euler(0, 90, 0));
+            Part(PrimitiveType.Cylinder, t, new Vector3(0, 3.42f, -.28f), new Vector3(.34f, .03f, .34f), stone, Quaternion.Euler(90, 0, 0));
+            Part(PrimitiveType.Cylinder, t, new Vector3(0, .5f, -.35f), new Vector3(.46f, .05f, .46f), dark);
+            Part(PrimitiveType.Sphere, t, new Vector3(0, .55f, -.35f), new Vector3(.34f, .12f, .34f), art.ash);
+            foreach (int s in new[] { -1, 1 })
+            {
+                Part(PrimitiveType.Cylinder, t, new Vector3(s * .5f, .56f, -.38f), new Vector3(.08f, .1f, .08f), Tint(art.stone, new Color(.82f, .8f, .72f)));
+                Part(PrimitiveType.Sphere, t, new Vector3(s * .5f, .7f, -.38f), new Vector3(.05f, .08f, .05f), art.glass);
+            }
+            // Offerings on the lower step. Fifteen draws, as the old ruin wall here took, so the rest of the zone keeps its layout.
+            for (int i = 0; i < 5; i++) { float s = .12f + R01 * .1f; Part(PrimitiveType.Sphere, t, new Vector3(i * .4f - .8f + R01 * .16f, .27f + s * .3f, -.85f + R01 * .2f), new Vector3(s, s * .7f, s), art.ash); }
+            Solid(t, new Vector3(0, 1.4f, .1f), new Vector3(1.5f, 2.8f, 1.5f));
         }
 
         void RuinedHouse(Transform t, Vector2 size)
         {
             // A fallen building: broken wall stubs of uneven height, a charred remnant of roof slumped inside, fallen beams.
             float w = size.x, d = size.y; var plaster = Tint(art.plaster, Zone.biome == "ash" ? new Color(.46f, .455f, .45f) : new Color(.52f, .48f, .42f)); var charred = Tint(art.timber, new Color(.13f, .11f, .1f));
-            Part(PrimitiveType.Cube, t, new Vector3(0, .3f, 0), new Vector3(w + .3f, .6f, d + .3f), art.stone);
+            float drop = FootDrop(t, w + .3f, d + .3f);   // on a slope the floor slab reaches down to the lowest ground under it
+            Part(PrimitiveType.Cube, t, new Vector3(0, .3f - drop / 2, 0), new Vector3(w + .3f, .6f + drop, d + .3f), art.stone);
             foreach (int sz in new[] { -1, 1 })
                 for (float x = -w / 2 + .6f; x < w / 2; x += 1.2f)
                 {
@@ -1146,8 +1484,26 @@ namespace Crulanda.World
                 }
             foreach (int sx in new[] { -1, 1 })
                 for (float z = -d / 2 + .6f; z < d / 2; z += 1.2f) { float h = .8f + R01 * 2.8f; Part(PrimitiveType.Cube, t, new Vector3(sx * w / 2, .6f + h / 2, z), new Vector3(.35f, h, 1.2f), plaster); }
-            MeshPart(ZoneMeshes.GableRoof(w * .7f, d * .8f, 1.6f), t, new Vector3(.8f, .9f, .4f), Tint(art.thatch, new Color(.24f, .2f, .15f)), Quaternion.Euler(14, 8, -22));
-            for (int i = 0; i < 4; i++) Part(PrimitiveType.Cube, t, new Vector3(R01 * w - w / 2, .75f, R01 * d - d / 2), new Vector3(.25f, .25f, 3 + R01 * 2), charred, Quaternion.Euler(R01 * 20, R01 * 180, R01 * 30));
+            // The roof fell in: a section lies in one end of the shell, its low eave on the floor and its high side on a charred
+            // post, clear of the walls and never through the floor slab (a tilted slab used to push out under the base).
+            var fallen = Quaternion.Euler(0, 6, -15); float rw = w * .55f, rd = d * .6f, rh = 1.2f; Vector3 lo = Vector3.one * 99, hi = -lo;
+            foreach (int sx in new[] { -1, 1 }) foreach (var q in new[] { new Vector3(0, -.25f, -1), new Vector3(0, -.25f, 1), new Vector3(0, rh, 0) })
+            { var c = fallen * new Vector3(sx * rw / 2, q.y, q.z * rd / 2); lo = Vector3.Min(lo, c); hi = Vector3.Max(hi, c); }
+            float hx = w / 2 - .45f, hz = d / 2 - .45f;   // inside the wall stubs, with a margin
+            var roofAt = new Vector3(-hx - lo.x, .6f - lo.y - .05f, -(lo.z + hi.z) / 2);
+            MeshPart(ZoneMeshes.GableRoof(rw, rd, rh), t, roofAt, Tint(art.thatch, new Color(.24f, .2f, .15f)), fallen);
+            var post = roofAt + fallen * new Vector3(-rw / 2 + .35f, -.25f, 0);
+            if (post.y > .7f) Part(PrimitiveType.Cube, t, new Vector3(post.x, (.6f + post.y) / 2, post.z), new Vector3(.2f, post.y - .6f, .2f), charred);
+            // Fallen joists lie side by side on the floor in the open end, with one fallen across them: inside the walls and
+            // resting on something (random beams used to run through the walls and hang out over the grass).
+            float x0 = roofAt.x + hi.x + .15f, lane = (hx - x0) / 3;
+            for (int i = 0; i < 4; i++)
+            {
+                float fx = R01, fz = R01, len = 3 + R01 * 2; _ = R01; float yaw = R01; _ = R01;   // the same six draws as before, so everything built after stays put
+                if (lane < .38f) continue;
+                if (i < 3) { float half = Mathf.Min(len / 2, hz - .1f); Part(PrimitiveType.Cube, t, new Vector3(x0 + (i + .5f + (fx - .5f) * .2f) * lane, .72f, (fz * 2 - 1) * (hz - half)), new Vector3(.25f, .25f, half * 2), charred, Quaternion.Euler(0, (yaw - .5f) * 3, 0)); }
+                else { float half = Mathf.Min(len / 2, (hx - x0) / 2 + .05f); Part(PrimitiveType.Cube, t, new Vector3((x0 + hx) / 2, .97f, (fz * 2 - 1) * .35f), new Vector3(.25f, .25f, half * 2), charred, Quaternion.Euler(0, 90 + (yaw - .5f) * 16, 0)); }
+            }
             Solid(t, new Vector3(0, 1.5f, 0), new Vector3(w + .4f, 3, d + .4f));
         }
         /// <summary>Stone curtain wall along a polyline, with a walkway lip and crenellations.</summary>
@@ -1160,7 +1516,10 @@ namespace Crulanda.World
                 Vector2 a = pts[i], b = pts[i + 1]; float len = Vector2.Distance(a, b); if (len < .1f) continue;
                 var seg = new GameObject("Wall").transform; seg.SetParent(parent, false);
                 var mid = (a + b) / 2; seg.position = Ground(mid); seg.rotation = Quaternion.LookRotation(new Vector3(b.x - a.x, 0, b.y - a.y));
-                Part(PrimitiveType.Cube, seg, new Vector3(0, 1.8f, 0), new Vector3(1.2f, 4.2f, len + .6f), stone);
+                // Down to the lowest ground along the run, so a wall across a slope (or off a levelled gate pad) never shows daylight under it.
+                float low = seg.position.y; for (int k = 0; k <= 8; k++) { var q = Vector2.Lerp(a, b, k / 8f); low = Mathf.Min(low, HeightAt(q.x, q.y)); }
+                float sink = seg.position.y - low + .4f;
+                Part(PrimitiveType.Cube, seg, new Vector3(0, (3.9f - sink) / 2, 0), new Vector3(1.2f, 3.9f + sink, len + .6f), stone);
                 for (float z = -len / 2 + .5f; z < len / 2; z += 1.4f)
                     foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, seg, new Vector3(s * .45f, 4.2f, z), new Vector3(.35f, .6f, .7f), stone);
                 Solid(seg, new Vector3(0, 2, 0), new Vector3(1.4f, 5, len + .4f));
@@ -1169,7 +1528,8 @@ namespace Crulanda.World
         void Tower(Transform t, float diameter)
         {
             float h = 7.5f; var stone = Tint(art.stone, new Color(.44f, .43f, .41f));
-            Part(PrimitiveType.Cylinder, t, new Vector3(0, h / 2, 0), new Vector3(diameter, h / 2, diameter), stone);
+            float drop = FootDrop(t, diameter * .8f, diameter * .8f);   // on a slope the tower's foot reaches the lowest ground at its base
+            Part(PrimitiveType.Cylinder, t, new Vector3(0, (h - drop) / 2, 0), new Vector3(diameter, (h + drop) / 2, diameter), stone);
             for (int i = 0; i < 10; i++)
             {
                 float a = i * 36 * Mathf.Deg2Rad;
@@ -1192,22 +1552,48 @@ namespace Crulanda.World
             Part(PrimitiveType.Cube, t, new Vector3(2.8f, .5f, 0), new Vector3(2.4f, .15f, 2.4f), art.timber);
             foreach (int sx in new[] { -1, 1 }) foreach (int sz in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(2.8f + sx, .25f, sz), new Vector3(.18f, .5f, .18f), art.timber);
         }
-        void Crypt(Transform t)
+        /// <summary>
+        /// A stone crypt (door faces -Z) with grave markers before it. variant 1: a barrow, an earthen mound ringed with kerb
+        /// stones, the slab that sealed its black doorway thrown down in front.
+        /// </summary>
+        void Crypt(Transform t, int variant = 0)
         {
             var stone = Tint(art.stone, new Color(.36f, .36f, .37f));
-            Part(PrimitiveType.Cube, t, new Vector3(0, 1.2f, 1.5f), new Vector3(6, 2.4f, 6), stone);
-            MeshPart(ZoneMeshes.GableRoof(6.6f, 6.6f, 1.6f), t, new Vector3(0, 2.4f, 1.5f), Tint(art.slate, new Color(.27f, .28f, .3f)));
-            Part(PrimitiveType.Cube, t, new Vector3(0, 1, -1.52f), new Vector3(1.8f, 2, .1f), Tint(art.metal, new Color(.14f, .14f, .16f)));
-            foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(s * 1.4f, 1.3f, -1.7f), new Vector3(.6f, 2.6f, .6f), stone);
-            for (int i = 0; i < 3; i++) Part(PrimitiveType.Cube, t, new Vector3(0, .1f + i * .12f, -2.6f + i * .35f), new Vector3(2.6f, .2f, .4f), stone);
-            for (int i = 0; i < 6; i++) Part(PrimitiveType.Cube, t, new Vector3(R01 * 10 - 5, .5f, -4 - R01 * 4), new Vector3(.55f, 1, .15f), stone, Quaternion.Euler(R01 * 10 - 5, R01 * 30 - 15, R01 * 10 - 5));
-            Solid(t, new Vector3(0, 1.8f, 1.2f), new Vector3(6.2f, 3.6f, 6.6f));
+            if (variant == 1)
+            {
+                // On a slope the mound reaches down past the lowest ground round its foot (its top drops only half as far).
+                float e = LocalGround(t, 0, -2.6f), sink = Mathf.Min(FootDrop(t, 5.2f, 6, 2.2f), 1.2f);
+                Part(PrimitiveType.Sphere, t, new Vector3(0, -.2f - sink, 2.2f), new Vector3(7.4f, 5.8f + sink, 8.6f), Tint(art.foliage, new Color(.3f, .31f, .19f)));
+                Part(PrimitiveType.Cube, t, new Vector3(0, e + 1.05f, -2.15f), new Vector3(1.6f, 2.2f, .1f), Tint(art.metal, new Color(.04f, .04f, .05f)));
+                Part(PrimitiveType.Cube, t, new Vector3(0, e + 1.05f, -1.2f), new Vector3(1.6f, 2.2f, 1.9f), Tint(art.metal, new Color(.04f, .04f, .05f)));   // the dark passage behind the door
+                foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(s * 1.05f, e + 1.1f, -1.2f), new Vector3(.5f, 2.3f, 2.6f), stone);   // jambs run back into the mound
+                Part(PrimitiveType.Cube, t, new Vector3(0, e + 2.4f, -.9f), new Vector3(2.9f, .45f, 3.2f), stone);
+                Part(PrimitiveType.Cube, t, new Vector3(0, e - .1f, -2.9f), new Vector3(2.6f, .4f, 1.2f), stone);
+                Part(PrimitiveType.Cube, t, new Vector3(1.9f, e - .02f, -3.3f), new Vector3(1.6f, .36f, 2.1f), stone, Quaternion.Euler(0, 20, 0));   // the sealing slab, thrown down
+                for (int i = 0; i < 9; i++)   // kerb stones round the mound, open at the door
+                {
+                    float a = 40 + i * 35, kx = Mathf.Sin(a * Mathf.Deg2Rad) * 3.9f, kz = 2.2f - Mathf.Cos(a * Mathf.Deg2Rad) * 4.5f;
+                    Part(PrimitiveType.Cube, t, new Vector3(kx, LocalGround(t, kx, kz) + .2f, kz), new Vector3(.7f, .55f, .45f), stone, Quaternion.Euler(0, -a, (i % 3 - 1) * 5));
+                }
+            }
+            else
+            {
+                float drop = FootDrop(t, 6, 6, 1.5f);   // on a slope the vault reaches down to the lowest ground under it
+                Part(PrimitiveType.Cube, t, new Vector3(0, 1.2f - drop / 2, 1.5f), new Vector3(6, 2.4f + drop, 6), stone);
+                MeshPart(ZoneMeshes.GableRoof(6.6f, 6.6f, 1.6f), t, new Vector3(0, 2.4f, 1.5f), Tint(art.slate, new Color(.27f, .28f, .3f)));
+                Part(PrimitiveType.Cube, t, new Vector3(0, 1, -1.52f), new Vector3(1.8f, 2, .1f), Tint(art.metal, new Color(.14f, .14f, .16f)));
+                foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(s * 1.4f, 1.3f, -1.7f), new Vector3(.6f, 2.6f, .6f), stone);
+                for (int i = 0; i < 3; i++) Part(PrimitiveType.Cube, t, new Vector3(0, .1f + i * .12f, -2.6f + i * .35f), new Vector3(2.6f, .2f, .4f), stone);
+            }
+            // Grave markers before it (the same five draws each, in the same order), set on the ground where they stand.
+            for (int i = 0; i < 6; i++) { float gx = R01 * 10 - 5, gz = -4 - R01 * 4; Part(PrimitiveType.Cube, t, new Vector3(gx, LocalGround(t, gx, gz) + .46f, gz), new Vector3(.55f, 1, .15f), stone, Quaternion.Euler(R01 * 10 - 5, R01 * 30 - 15, R01 * 10 - 5)); }
+            if (variant == 1) Solid(t, new Vector3(0, 1.2f, 1.85f), new Vector3(6.8f, 2.4f, 8.7f)); else Solid(t, new Vector3(0, 1.8f, 1.2f), new Vector3(6.2f, 3.6f, 6.6f));
         }
         void Cliff(Transform t, float length, float lift = 0)
         {
             // A broken escarpment of tall leaning stone blocks, taller where the ground is raised behind it (CliffLift). On
             // mountains each block stands on the lower of the ground at its front and back, so none hangs off a slope.
-            var stone = Tint(art.stone, Zone.biome == "ash" ? new Color(.37f, .365f, .37f) : new Color(.4f, .38f, .35f));   // ash: grey, not sandstone
+            var stone = Tint(art.stone, Zone.biome == "ash" ? new Color(.37f, .365f, .37f) : Zone.biome == "mountain" ? new Color(.35f, .335f, .31f) : new Color(.4f, .38f, .35f));   // ash: grey, not sandstone; mountain: darker, so a sunlit crag stays under the fog
             bool seat = Zone.biome == "mountain";
             for (float x = -length / 2; x < length / 2; x += 2.2f)
             {
@@ -1221,8 +1607,35 @@ namespace Crulanda.World
             }
             Solid(t, new Vector3(0, (6 + lift) / 2, .8f), new Vector3(length + 2, 6 + lift, 4.5f));
         }
+        /// <summary>Trunks already standing (hand-placed trees, orchards, groves, the forest edge): scattered trees keep clear of them.</summary>
+        readonly List<Vector2> trunks = new List<Vector2>();
+        /// <summary>
+        /// Where a scattered tree may grow clear of the trunks already standing: here, or pushed out to <paramref name="gap"/> from the
+        /// one it grew into; null if that lands on a road, in water, by a building or still against a trunk. Draws nothing random.
+        /// </summary>
+        Vector2? Spot(Vector2 at, float gap)
+        {
+            for (int pass = 0; ; pass++)
+            {
+                int near = trunks.FindIndex(q => (q - at).sqrMagnitude < gap * gap);
+                if (near < 0) return at;
+                if (pass == 3) return null;
+                var away = at - trunks[near]; at = trunks[near] + (away.sqrMagnitude > 1e-4f ? away.normalized : Vector2.right) * (gap + .05f);
+                if (NearRoad(at, 2.5f) || NearProp(at, 5) || Water.NearWater(at, 1.5f)) return null;
+            }
+        }
+        /// <summary>
+        /// Records a scattered tree's trunk, or drops the tree when it found no clear spot. It is built either way, so the zone's
+        /// random stream (every later tree, bush and rock) stays exactly where it was.
+        /// </summary>
+        void Keep(Transform tree, Vector2 at, bool clear)
+        {
+            if (clear) { trunks.Add(at); return; }
+            LeafTrees.Remove(tree.position); DestroyImmediate(tree.gameObject);
+        }
         void BuildGroves()
         {
+            foreach (var prop in Zone.props) if (prop != null && (prop.kind == "tree" || prop.kind == "pine" || prop.kind == "dead_oak" || prop.kind == "great_oak")) trunks.Add(prop.at);
             foreach (var g in Zone.groves.Where(g => g.kind == "orchard"))
                 for (float x = g.center.x - g.size.x / 2 + 3; x < g.center.x + g.size.x / 2; x += 6.5f)
                     for (float z = g.center.y - g.size.y / 2 + 3; z < g.center.y + g.size.y / 2; z += 6.5f)
@@ -1231,12 +1644,22 @@ namespace Crulanda.World
                         if (NearRoad(at, 2) || Water.NearWater(at, 1.5f)) continue;
                         var t = Root(new ZoneProp { kind = "tree", at = at, scale = .75f + R01 * .15f }, statics);
                         float h = 2.4f + R01 * .6f;
-                        Part(PrimitiveType.Cylinder, t, new Vector3(0, h / 2, 0), new Vector3(.35f, h / 2, .35f), art.bark);
+                        // An old fruit tree: a short leaning trunk on a root flare, forking low into three limbs, one to each clump.
+                        // Its shape and bark come from its own stream; the zone's draws below are the ones it always took.
+                        var tr = TreeRandom(t.position); var bark = BarkShade((float)tr.NextDouble());
+                        var axis = Bole(t, tr, h + .3f, .14f + (float)tr.NextDouble() * .04f, bark); var lean = axis(h) - new Vector3(0, h, 0);
                         var leaf = Tint(art.foliage, Color.Lerp(new Color(.3f, .42f, .18f), new Color(.38f, .44f, .2f), R01));
-                        for (int k = 0; k < 3; k++) { float s = 2 + R01 * .8f; Lump(Canopy(), t, new Vector3(R01 * 1.2f - .6f, h + .5f + R01 * .7f, R01 * 1.2f - .6f), new Vector3(s, s * .85f, s), leaf, R01 * 360); }
+                        for (int k = 0; k < 3; k++)
+                        {
+                            float s = 2 + R01 * .8f; var blob = Canopy(); var c = new Vector3(R01 * 1.2f - .6f, h + .5f + R01 * .7f, R01 * 1.2f - .6f) + lean;
+                            Lump(blob, t, c, new Vector3(s, s * .85f, s), leaf, R01 * 360);
+                            var from = axis(h * (.42f + (float)tr.NextDouble() * .12f)); var reach = new Vector3(c.x - from.x, 0, c.z - from.z);
+                            if (reach.sqrMagnitude < .25f) reach = Quaternion.Euler(0, k * 120 + (float)tr.NextDouble() * 40, 0) * Vector3.right * .6f;   // a clump right overhead: spread the fork
+                            Limb(t, from, new Vector3(from.x + reach.x, c.y - .35f, from.z + reach.z), .085f, .04f, bark, .14f, 7);
+                        }
                         var fruit = Tint(art.hay, new Color(.72f, .18f, .12f));
-                        for (int k = 0; k < 6; k++) Part(PrimitiveType.Sphere, t, new Vector3(R01 * 2.4f - 1.2f, h + .2f + R01 * 1.4f, R01 * 2.4f - 1.2f), Vector3.one * .22f, fruit);
-                        var cap = t.gameObject.AddComponent<CapsuleCollider>(); cap.center = new Vector3(0, h / 2, 0); cap.height = h; cap.radius = .3f;
+                        for (int k = 0; k < 6; k++) Part(PrimitiveType.Sphere, t, new Vector3(R01 * 2.4f - 1.2f, h + .2f + R01 * 1.4f, R01 * 2.4f - 1.2f) + lean, Vector3.one * .22f, fruit);
+                        var cap = t.gameObject.AddComponent<CapsuleCollider>(); cap.center = new Vector3(0, h / 2, 0); cap.height = h; cap.radius = .3f; trunks.Add(at);
                         t.gameObject.AddComponent<NavBlocker>(); t.gameObject.AddComponent<TreeFade>();
                     }
             foreach (var g in Zone.groves.Where(g => g.kind != "orchard"))
@@ -1244,11 +1667,13 @@ namespace Crulanda.World
                 {
                     var at = new Vector2(g.center.x + (R01 - .5f) * g.size.x, g.center.y + (R01 - .5f) * g.size.y);
                     if (NearRoad(at, 2.5f) || NearProp(at, 5) || Water.NearWater(at, 1.5f)) continue;
-                    if (g.kind == "dead") { DeadTree(at, .5f + R01 * .55f, DeadBark(), 3 + (R01 > .6f ? 1 : 0), statics); continue; }
+                    var spot = Spot(at, 1.8f); if (spot.HasValue) at = spot.Value;   // never growing through a trunk already standing
+                    if (g.kind == "dead") { Keep(DeadTree(at, .5f + R01 * .55f, DeadBark(), 3 + (R01 > .6f ? 1 : 0), statics), at, spot.HasValue); continue; }
                     var p = new ZoneProp { kind = g.kind == "pine" ? "pine" : "tree", at = at, rotation = R01 * 360, scale = .8f + R01 * .5f, variant = (int)(R01 * 4) };
                     var t = Root(p, statics);
                     if (p.kind == "pine") Pine(t); else Broadleaf(t, p.variant);
                     if (p.kind == "pine" && !SeatPine(t, at)) DestroyImmediate(t.gameObject);   // built first: the zone's draws stay the same
+                    else Keep(t, at, spot.HasValue);
                 }
             // Undergrowth: low bushes in living woods (none in dead groves), so a wood reads as a wood at eye level.
             foreach (var g in Zone.groves.Where(g => g.kind == "broadleaf" || g.kind == "pine"))
@@ -1300,6 +1725,7 @@ namespace Crulanda.World
             // Grass grows down to the bank's noisy edge (the same line PaintGround draws there), never in the water.
             if (Water.Shore(p, 3) + (Mathf.PerlinNoise(p.x * .45f, p.y * .45f) - .5f) * 1.1f < 1.3f) return 0;
             foreach (var c in Zone.clearings) if (Vector2.Distance(p, c.center) < c.radius + 1) return 0;
+            if (Zone.shapes != null) foreach (var s in Zone.shapes) if (s != null && !string.IsNullOrEmpty(s.paint) && ShapeCover(s, p) > .35f) return 0;   // wallow mud, unmade brood ground
             foreach (var f in Zone.fields)
             {
                 var local = Rotate(p - f.center, -f.rotation);
@@ -1421,16 +1847,21 @@ namespace Crulanda.World
             Workplace(t, "forge", new Vector3(1.2f, 0, -.3f), new Vector3(1.2f, 1, 1.1f));
         }
         static readonly Color[][] Awnings = { new[] { new Color(.62f, .2f, .16f), new Color(.86f, .8f, .66f) }, new[] { new Color(.2f, .34f, .52f), new Color(.86f, .8f, .66f) }, new[] { new Color(.32f, .45f, .22f), new Color(.8f, .66f, .3f) } };
-        /// <summary>Market stall: striped awning on four posts, a counter of goods (variant: 0 produce, 1 cloth and pots, 2 bread).</summary>
+        /// <summary>
+        /// Market stall: an awning on four posts, a counter of goods (variant: 0 produce, 1 cloth and pots, 2 bread, all under
+        /// dyed stripes; 3 Ash-Walker, GAME-ONLY look: two stitched hides on bone poles, a ragged hide valance, salt and bone).
+        /// </summary>
         void Stall(Transform t, int variant)
         {
-            var colors = Awnings[Mathf.Abs(variant) % Awnings.Length];
+            bool hide = variant == 3;
+            var colors = hide ? new[] { new Color(.56f, .43f, .29f), new Color(.64f, .52f, .36f) } : Awnings[Mathf.Abs(variant) % Awnings.Length];
             foreach (int sx in new[] { -1, 1 }) foreach (int sz in new[] { -1, 1 })
-                Part(PrimitiveType.Cube, t, new Vector3(sx * 1.4f, sz > 0 ? 1.25f : 1.1f, sz * .9f), new Vector3(.1f, sz > 0 ? 2.5f : 2.2f, .1f), art.timber);
-            for (int i = 0; i < 6; i++)
-                Part(PrimitiveType.Cube, t, new Vector3(-1.25f + i * .5f, 2.35f, 0), new Vector3(.5f, .05f, 2.3f), Tint(art.cloth, colors[i % 2]), Quaternion.Euler(-9, 0, 0));
-            for (int i = 0; i < 6; i++)
-                Part(PrimitiveType.Cube, t, new Vector3(-1.25f + i * .5f, 2.05f, -1.16f), new Vector3(.5f, .3f, .03f), Tint(art.cloth, colors[i % 2])); // valance
+                if (hide) Part(PrimitiveType.Cylinder, t, new Vector3(sx * 1.4f, sz > 0 ? 1.25f : 1.1f, sz * .9f), new Vector3(.13f, sz > 0 ? 1.25f : 1.1f, .13f), Bone);
+                else Part(PrimitiveType.Cube, t, new Vector3(sx * 1.4f, sz > 0 ? 1.25f : 1.1f, sz * .9f), new Vector3(.1f, sz > 0 ? 2.5f : 2.2f, .1f), art.timber);
+            for (int i = 0; i < 6; i++)   // stripes, or one hide per half
+                Part(PrimitiveType.Cube, t, new Vector3(-1.25f + i * .5f, 2.35f, 0), new Vector3(.5f, .05f, 2.3f), Tint(art.cloth, colors[hide ? i / 3 : i % 2]), Quaternion.Euler(-9, 0, hide ? (i / 3) * 3 - 1.5f : 0));
+            for (int i = 0; i < 6; i++)   // valance: striped, or ragged hide strips of uneven length
+                Part(PrimitiveType.Cube, t, new Vector3(-1.25f + i * .5f, hide ? 2.14f - (i * 7 % 4) * .04f : 2.05f, -1.16f), new Vector3(.5f, hide ? .12f + (i * 7 % 4) * .08f : .3f, .03f), Tint(art.cloth, colors[hide ? 0 : i % 2]));
             Part(PrimitiveType.Cube, t, new Vector3(0, .5f, -.45f), new Vector3(2.8f, 1, .7f), Tint(art.timber, new Color(.45f, .32f, .2f)));
             Part(PrimitiveType.Cube, t, new Vector3(0, 1.02f, -.45f), new Vector3(2.9f, .05f, .8f), Tint(art.timber, new Color(.35f, .25f, .16f)));
             var r = new System.Random(Zone.seed + (int)(t.position.x * 13 + t.position.z * 7));
@@ -1438,7 +1869,7 @@ namespace Crulanda.World
             for (int i = 0; i < 7; i++)
             {
                 var at = new Vector3(-1.2f + i * .4f, 1.1f, -.45f + (R() - .5f) * .3f);
-                switch (Mathf.Abs(variant) % 3)
+                switch (hide ? 3 : Mathf.Abs(variant) % 3)
                 {
                     case 0:   // baskets of apples, turnips and cabbages
                         Part(PrimitiveType.Cylinder, t, at, new Vector3(.32f, .08f, .32f), art.hay);
@@ -1448,6 +1879,11 @@ namespace Crulanda.World
                     case 1:   // bolts of cloth and clay pots
                         if (i % 2 == 0) Part(PrimitiveType.Cylinder, t, at + new Vector3(0, .08f, 0), new Vector3(.16f, .18f, .16f), Tint(art.cloth, Color.HSVToRGB(R(), .5f, .6f)), Quaternion.Euler(0, 0, 90));
                         else Part(PrimitiveType.Sphere, t, at + new Vector3(0, .12f, 0), new Vector3(.22f, .26f, .22f), Tint(art.stone, new Color(.62f, .4f, .28f)));
+                        break;
+                    case 3:   // salt blocks, bone harpoon heads, strips of dried meat
+                        if (i % 3 == 0) Part(PrimitiveType.Cube, t, at + new Vector3(0, .1f, 0), new Vector3(.24f, .2f, .2f), Tint(art.stone, new Color(.94f, .94f, .91f)), Quaternion.Euler(0, R() * 40 - 20, 0));
+                        else if (i % 3 == 1) Part(PrimitiveType.Cube, t, at + new Vector3(0, .03f, 0), new Vector3(.07f, .05f, .34f), Bone, Quaternion.Euler(0, R() * 50 - 25, 0));
+                        else Part(PrimitiveType.Capsule, t, at + new Vector3(0, .05f, 0), new Vector3(.08f, .14f, .08f), Tint(art.cloth, new Color(.36f, .16f, .12f)), Quaternion.Euler(90, R() * 60, 0));
                         break;
                     default:  // loaves and rolls
                         Part(PrimitiveType.Capsule, t, at + new Vector3(0, .06f, 0), new Vector3(.14f, .14f, .14f), Tint(art.hay, new Color(.72f, .48f, .22f)), Quaternion.Euler(90, R() * 60, 0));
@@ -1474,11 +1910,20 @@ namespace Crulanda.World
             Part(PrimitiveType.Cube, t, new Vector3(2.1f, .75f, -.3f), new Vector3(1.4f, .08f, .8f), art.timber);
             foreach (int sx in new[] { -1, 1 }) foreach (int sz in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(2.1f + sx * .6f, .37f, -.3f + sz * .32f), new Vector3(.07f, .74f, .07f), art.timber);
             for (int i = 0; i < 5; i++) Part(PrimitiveType.Capsule, t, new Vector3(1.6f + i * .25f, .86f, -.3f + (i % 2) * .15f), new Vector3(.13f, .15f, .13f), Tint(art.hay, new Color(.72f, .48f, .22f)), Quaternion.Euler(90, i * 10, 0));
-            Part(PrimitiveType.Sphere, t, new Vector3(-1.5f, .38f, -.6f), new Vector3(.55f, .7f, .5f), Tint(art.cloth, new Color(.9f, .88f, .82f)));
-            Part(PrimitiveType.Sphere, t, new Vector3(-1.6f, .32f, .1f), new Vector3(.5f, .6f, .45f), Tint(art.cloth, new Color(.9f, .88f, .82f)));
-            Part(PrimitiveType.Cube, t, new Vector3(-1.2f, 1.1f, .9f), new Vector3(.05f, 2.2f, .05f), art.timber, Quaternion.Euler(-12, 0, 20));
-            Part(PrimitiveType.Cube, t, new Vector3(-1.6f, 2.1f, 1.1f), new Vector3(.35f, .45f, .03f), art.timber, Quaternion.Euler(-12, 0, 20));
-            Part(PrimitiveType.Cube, t, new Vector3(-1.5f, .9f, 1.3f), new Vector3(1, 1.8f, .6f), art.stone);    // woodstack for the fire
+            // Flour sacks of sacking tied at the neck, standing on the ground clear of the plinth (white balls read as eggs sunk in the stone).
+            var sacking = Tint(art.cloth, new Color(.84f, .78f, .64f));
+            foreach (var sack in new[] { new Vector3(-1.55f, .55f, -.55f), new Vector3(-1.62f, .5f, .1f) })
+            {
+                Part(PrimitiveType.Sphere, t, new Vector3(sack.x, sack.y * .45f, sack.z), new Vector3(.52f, sack.y, .46f), sacking);
+                Part(PrimitiveType.Cylinder, t, new Vector3(sack.x, sack.y * .95f + .03f, sack.z), new Vector3(.15f, .07f, .15f), sacking);
+            }
+            // The peel leans on the back edge of the plinth with its blade up clear of the dome (it used to stick into the stone).
+            Part(PrimitiveType.Cube, t, new Vector3(.5f, 1, 1.35f), new Vector3(.05f, 2.2f, .05f), art.timber, Quaternion.Euler(-24, 0, 0));
+            Part(PrimitiveType.Cube, t, new Vector3(.5f, 1.87f, .97f), new Vector3(.35f, .45f, .03f), art.timber, Quaternion.Euler(-24, 0, 0));
+            // The fire's woodstack: split logs piled beside the plinth (a tall stone block here read as a chimney cutting the dome).
+            for (int row = 0; row < 3; row++)
+                for (int i = 0; i < 3 - row; i++)
+                    Part(PrimitiveType.Cylinder, t, new Vector3(-2.05f + row * .15f + i * .3f, .15f + row * .26f, 1.2f), new Vector3(.3f, .35f, .3f), art.bark, Quaternion.Euler(90, 0, 0));
             Solid(t, new Vector3(0, .9f, .3f), new Vector3(2.3f, 1.8f, 2.3f));
             Solid(t, new Vector3(2.1f, .4f, -.3f), new Vector3(1.4f, .8f, .8f));
             Workplace(t, "oven", new Vector3(0, 0, -1.5f), new Vector3(0, 1.1f, -.7f));
@@ -1499,9 +1944,11 @@ namespace Crulanda.World
             }
             Part(PrimitiveType.Cylinder, t, new Vector3(2.4f, .45f, -.2f), new Vector3(1.3f, .45f, 1.3f), dark);                                 // vat
             Part(PrimitiveType.Cylinder, t, new Vector3(2.4f, .91f, -.2f), new Vector3(1.15f, .01f, 1.15f), Tint(art.water, new Color(.35f, .24f, .12f)));
-            for (int i = 0; i < 4; i++) Part(PrimitiveType.Cube, t, new Vector3(-2.4f + (i % 2) * .15f, .1f + i * .09f, -.6f), new Vector3(1, .08f, .7f), Tint(art.cloth, hides[i % 3]), Quaternion.Euler(0, i * 17, 0)); // pelts
-            Part(PrimitiveType.Cube, t, new Vector3(-.4f, .55f, -.9f), new Vector3(.25f, .25f, 1.6f), dark, Quaternion.Euler(22, 0, 0));      // scraping beam
-            Part(PrimitiveType.Cube, t, new Vector3(-.4f, .62f, -.9f), new Vector3(.3f, .04f, 1.2f), Tint(art.cloth, hides[2]), Quaternion.Euler(22, 0, 0));
+            for (int i = 0; i < 4; i++) Part(PrimitiveType.Cube, t, new Vector3(-2.4f + (i % 2) * .15f, .04f + i * .08f, -.6f), new Vector3(1, .08f, .7f), Tint(art.cloth, hides[i % 3]), Quaternion.Euler(0, i * 17, 0)); // pelts, each on the one below
+            // Scraping beam: the far end rests on the ground and the tanner's end on a pair of splayed legs (not one end in the air).
+            Part(PrimitiveType.Cube, t, new Vector3(-.4f, .42f, -.9f), new Vector3(.25f, .25f, 1.6f), dark, Quaternion.Euler(22, 0, 0));
+            Part(PrimitiveType.Cube, t, new Vector3(-.4f, .56f, -.85f), new Vector3(.3f, .04f, 1.2f), Tint(art.cloth, hides[2]), Quaternion.Euler(22, 0, 0));
+            foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(-.4f + s * .12f, .3f, -1.5f), new Vector3(.07f, .62f, .07f), dark, Quaternion.Euler(0, 0, s * 12));
             Solid(t, new Vector3(-.4f, 1, .8f), new Vector3(4.2f, 2, .4f));
             Solid(t, new Vector3(2.4f, .45f, -.2f), new Vector3(1.4f, .9f, 1.4f));
             Workplace(t, "tannery", new Vector3(-1.6f, 0, 0), new Vector3(-1.6f, 1.1f, .8f));
@@ -1568,6 +2015,349 @@ namespace Crulanda.World
             Workplace(t, "woodpile", new Vector3(1.4f, 0, -1.4f), new Vector3(1.4f, .6f, -.6f));
         }
 
+        // ---------- landmarks (the Peaks, the Ashland Rim) ----------
+        /// <summary>Bleached bone: masks, poles, tusks, stall goods.</summary>
+        Material Bone { get { return Tint(art.plaster, new Color(.84f, .8f, .7f)); } }
+        /// <summary>An emissive colour (flames, the purple tear): a tinted copy of the window glow, glowing in that colour.</summary>
+        Material Glowing(Color c, float strength)
+        {
+            var m = Tint(art.glass, c);
+            if (m.HasProperty("_EmissionColor")) { m.EnableKeyword("_EMISSION"); m.SetColor("_EmissionColor", c * strength); }
+            return m;
+        }
+        /// <summary>
+        /// A curved limb of capsules (ribs, tusks, threads): from a base it rises, bows out by bulge, then curves in to end
+        /// reach metres ahead (the yaw's +Z) at height, tapering from thick to thin. Returns the tip.
+        /// </summary>
+        Vector3 Arc(Transform t, Vector3 at, float yaw, float reach, float height, float bulge, float thick, float thin, Material m, int segs = 8)
+        {
+            var rot = Quaternion.Euler(0, yaw, 0); var prev = at;
+            for (int i = 1; i <= segs; i++)
+            {
+                float u = i / (float)segs, a = u * Mathf.PI / 2;
+                var next = at + rot * new Vector3(0, height * Mathf.Sin(a), reach * (1 - Mathf.Cos(a)) - bulge * Mathf.Sin(u * Mathf.PI));
+                var seg = next - prev; float d = Mathf.Lerp(thick, thin, u - .5f / segs);
+                Part(PrimitiveType.Capsule, t, (prev + next) / 2, new Vector3(d, (seg.magnitude + d) / 2, d), m, Quaternion.FromToRotation(Vector3.up, seg));
+                prev = next;
+            }
+            return prev;
+        }
+        /// <summary>
+        /// A gateway between two towers (the Sandthrone toll gate, GAME-ONLY): a crenellated span over the gap with an iron
+        /// portcullis raised into it, the timber leaves swung open inward (+Z), Sandthrone banners (sand with a rust-red
+        /// stripe, GAME-ONLY colours) over the arch, and a barrier boom raised on its post outside (-Z). width: the gap.
+        /// </summary>
+        void Gate(Transform t, float width)
+        {
+            float half = width / 2, top = 4.4f, step = width / 6;
+            var stone = Tint(art.stone, new Color(.44f, .43f, .41f)); var iron = Tint(art.metal, new Color(.2f, .2f, .22f)); var planks = Tint(art.timber, new Color(.3f, .21f, .14f));
+            var sand = Tint(art.cloth, new Color(.78f, .63f, .38f)); var rust = Tint(art.cloth, new Color(.5f, .15f, .1f));
+            Part(PrimitiveType.Cube, t, new Vector3(0, top + .7f, 0), new Vector3(width + 3, 1.4f, 2.6f), stone);   // the span, reaching into both towers
+            foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(s * half, top, 0), new Vector3(1.2f, 1.2f, 2.5f), stone, Quaternion.Euler(0, 0, 45));   // corbels round the arch
+            for (int i = 0; i <= 6; i++) foreach (int sz in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(-half + i * step, top + 1.75f, sz * 1.05f), new Vector3(.6f, .7f, .45f), stone);
+            // The portcullis, raised: its grid and spiked foot hang below the arch.
+            for (float x = -half + .3f; x < half - .2f; x += .45f)
+            {
+                Part(PrimitiveType.Cube, t, new Vector3(x, top - .2f, -.8f), new Vector3(.08f, 2.4f, .08f), iron);
+                Part(PrimitiveType.Cube, t, new Vector3(x, top - 1.45f, -.8f), new Vector3(.12f, .12f, .08f), iron, Quaternion.Euler(0, 0, 45));
+            }
+            foreach (float y in new[] { top - 1.1f, top - .45f }) Part(PrimitiveType.Cube, t, new Vector3(0, y, -.8f), new Vector3(width - .4f, .09f, .09f), iron);
+            // The leaves, open against the passage sides, with iron straps; banners hang over the arch.
+            float leaf = half - .15f;
+            foreach (int s in new[] { -1, 1 })
+            {
+                Part(PrimitiveType.Cube, t, new Vector3(s * (half - .25f), 1.8f, 1.1f + leaf / 2), new Vector3(.18f, 3.6f, leaf), planks);
+                foreach (float y in new[] { .6f, 1.8f, 3 }) Part(PrimitiveType.Cube, t, new Vector3(s * (half - .36f), y, 1.1f + leaf / 2), new Vector3(.04f, .14f, leaf), iron);
+                Solid(t, new Vector3(s * (half - .25f), 1.8f, 1.1f + leaf / 2), new Vector3(.3f, 3.6f, leaf));
+                Part(PrimitiveType.Cube, t, new Vector3(s * (half - .8f), top + .25f, -1.36f), new Vector3(1, 2.3f, .04f), sand);
+                Part(PrimitiveType.Cube, t, new Vector3(s * (half - .8f), top + .25f, -1.385f), new Vector3(.3f, 2.3f, .02f), rust);
+            }
+            // Barrier boom outside, raised on its post over a stone counterweight; the rest post opposite takes it when lowered.
+            var pivot = new Vector3(-half + .2f, 1.25f, -3.4f); var boom = Quaternion.Euler(0, 0, 72);
+            Part(PrimitiveType.Cube, t, new Vector3(pivot.x, .6f, pivot.z), new Vector3(.35f, 1.3f, .35f), planks);
+            Part(PrimitiveType.Cube, t, pivot + boom * new Vector3(2.6f, 0, 0), new Vector3(6.4f, .16f, .16f), planks, boom);
+            Part(PrimitiveType.Cube, t, pivot + boom * new Vector3(-.75f, 0, 0), new Vector3(.5f, .45f, .4f), stone, boom);
+            Part(PrimitiveType.Cube, t, pivot + boom * new Vector3(5.5f, 0, 0) + new Vector3(0, -.3f, 0), new Vector3(.04f, .55f, .3f), rust);   // pennant
+            Part(PrimitiveType.Cube, t, new Vector3(half - .2f, .55f, pivot.z), new Vector3(.25f, 1.1f, .25f), planks);
+            Part(PrimitiveType.Cube, t, new Vector3(half - .2f, 1.12f, pivot.z), new Vector3(.45f, .1f, .25f), iron);
+            Solid(t, new Vector3(pivot.x, .6f, pivot.z), new Vector3(.5f, 1.2f, .5f));
+            Solid(t, new Vector3(half - .2f, .55f, pivot.z), new Vector3(.4f, 1.1f, .4f));
+        }
+        /// <summary>
+        /// A small fortified hall on a deep footing (the Sandthrone captain's eyrie, GAME-ONLY): a crenellated parapet, an
+        /// iron-strapped door in a stone surround with a step, arrow slits, a lit loophole, and Sandthrone banners (sand with
+        /// a rust-red stripe, GAME-ONLY colours) either side of the door and flying from a pole on the roof. Front faces -Z.
+        /// </summary>
+        void Stronghold(Transform t, Vector2 size)
+        {
+            float w = size.x, d = size.y, h = 5;
+            var stone = Tint(art.stone, new Color(.47f, .45f, .42f)); var dark = Tint(art.timber, new Color(.2f, .14f, .1f)); var iron = Tint(art.metal, new Color(.2f, .2f, .22f));
+            var sand = Tint(art.cloth, new Color(.78f, .63f, .38f)); var rust = Tint(art.cloth, new Color(.5f, .15f, .1f)); var slit = Tint(art.timber, new Color(.05f, .04f, .03f));
+            Part(PrimitiveType.Cube, t, new Vector3(0, -.75f, 0), new Vector3(w + .7f, 1.7f, d + .7f), Tint(art.stone, new Color(.4f, .39f, .37f)));   // footing: a low plinth, deep where the perch falls away
+            Part(PrimitiveType.Cube, t, new Vector3(0, h / 2, 0), new Vector3(w, h, d), stone);
+            Part(PrimitiveType.Cube, t, new Vector3(0, h + .1f, 0), new Vector3(w + .3f, .2f, d + .3f), stone);   // string course
+            int nx = Mathf.Max(2, Mathf.RoundToInt(w / 1.15f)), nz = Mathf.Max(2, Mathf.RoundToInt(d / 1.15f));
+            for (int i = 0; i < nx; i++) foreach (int sz in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(Mathf.Lerp(-w / 2 + .3f, w / 2 - .3f, i / (nx - 1f)), h + .6f, sz * (d / 2 - .1f)), new Vector3(.6f, .8f, .45f), stone);
+            for (int i = 1; i < nz - 1; i++) foreach (int sx in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(sx * (w / 2 - .1f), h + .6f, Mathf.Lerp(-d / 2 + .3f, d / 2 - .3f, i / (nz - 1f))), new Vector3(.45f, .8f, .6f), stone);
+            // The door: planks and straps in a stone surround, a step before it, a lit loophole above.
+            Part(PrimitiveType.Cube, t, new Vector3(0, 1.2f, -d / 2 - .06f), new Vector3(1.5f, 2.4f, .12f), dark);
+            foreach (float y in new[] { .5f, 1.2f, 1.9f }) Part(PrimitiveType.Cube, t, new Vector3(0, y, -d / 2 - .13f), new Vector3(1.5f, .1f, .04f), iron);
+            foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(s * .95f, 1.3f, -d / 2 - .1f), new Vector3(.4f, 2.6f, .2f), stone);
+            Part(PrimitiveType.Cube, t, new Vector3(0, 2.7f, -d / 2 - .1f), new Vector3(2.3f, .4f, .2f), stone);
+            Part(PrimitiveType.Cube, t, new Vector3(0, .1f, -d / 2 - .45f), new Vector3(2.2f, .2f, .7f), stone);
+            Part(PrimitiveType.Cube, t, new Vector3(0, 3.6f, -d / 2 - .02f), new Vector3(.2f, .7f, .06f), art.glass);
+            foreach (int sx in new[] { -1, 1 })
+            {
+                Part(PrimitiveType.Cube, t, new Vector3(sx * w * .25f, 3, d / 2 + .02f), new Vector3(.16f, .9f, .06f), slit);
+                Part(PrimitiveType.Cube, t, new Vector3(sx * (w / 2 + .02f), 3, 0), new Vector3(.06f, .9f, .16f), slit);
+                Part(PrimitiveType.Cube, t, new Vector3(sx * 2.05f, h - .15f, -d / 2 - .2f), new Vector3(1.2f, .1f, .1f), dark);   // banner pole
+                Part(PrimitiveType.Cube, t, new Vector3(sx * 2.05f, h - 1.55f, -d / 2 - .1f), new Vector3(1, 2.7f, .04f), sand);
+                Part(PrimitiveType.Cube, t, new Vector3(sx * 2.05f, h - 1.55f, -d / 2 - .125f), new Vector3(.28f, 2.7f, .02f), rust);
+            }
+            Part(PrimitiveType.Cylinder, t, new Vector3(w / 2 - .9f, h + 2.4f, d / 2 - .9f), new Vector3(.12f, 2.4f, .12f), dark);   // flagpole
+            Part(PrimitiveType.Cube, t, new Vector3(w / 2 - 1.68f, h + 4.1f, d / 2 - .9f), new Vector3(1.5f, .95f, .04f), sand, Quaternion.Euler(0, 0, 3));
+            Part(PrimitiveType.Cube, t, new Vector3(w / 2 - 1.68f, h + 4.1f, d / 2 - .925f), new Vector3(1.52f, .26f, .02f), rust, Quaternion.Euler(0, 0, 3));
+            Solid(t, new Vector3(0, h / 2, 0), new Vector3(w + .5f, h + 1.2f, d + .5f));
+        }
+        /// <summary>
+        /// Rocks round a raised perch (a ZoneShape with a height): boulders sunk into its slopes all the way round but
+        /// for the way up, which faces the prop's -Z. radius: the perch's edge.
+        /// </summary>
+        void Perch(Transform t, float radius)
+        {
+            var mat = Tint(art.stone, Zone.biome == "mountain" ? MountainStone : new Color(.42f, .41f, .39f));   // the boulders' stone (EdgeRock)
+            for (float a = R01 * 10; a < 360; a += 18 + R01 * 10)
+            {
+                if (Mathf.Abs(Mathf.DeltaAngle(a, 180)) < 38) continue;   // the way up
+                var dir = Quaternion.Euler(0, a, 0) * Vector3.forward; float r = radius + .6f + R01 * 2.2f, s = 1.8f + R01 * 1.8f, lo = float.MaxValue;
+                foreach (float k in new[] { -.7f, 0, .7f }) { var w = t.TransformPoint(dir * (r + k * s)); lo = Mathf.Min(lo, HeightAt(w.x, w.z)); }   // sit on the downhill side
+                var at = dir * r + Vector3.up * (lo - t.position.y);
+                Lump(Boulder(), t, at + new Vector3(0, .1f * s, 0), new Vector3(1.5f * s, 1.3f * s, 1.3f * s), mat, R01 * 360);
+                Solid(t, at + new Vector3(0, .5f * s, 0), new Vector3(1.1f * s, s, 1.1f * s));
+            }
+        }
+        /// <summary>
+        /// A mud wallow (on a sunk ZoneShape painted mud): pools of brown water, churned banks round the rim, and two
+        /// rubbing stones worn smooth. Walkable; only the stones are solid.
+        /// </summary>
+        void Wallow(Transform t, float radius)
+        {
+            var pool = Tint(art.water, new Color(.21f, .16f, .11f)); var mud = Tint(art.soil, new Color(.22f, .17f, .12f)); var stone = Tint(art.stone, new Color(.42f, .4f, .37f));
+            for (int i = 0; i < 6; i++)
+            {
+                float a = i * 60 + R01 * 40, r = i == 0 ? R01 : radius * (.3f + R01 * .35f), s = i == 0 ? radius * .95f : radius * (.3f + R01 * .25f);
+                Part(PrimitiveType.Cylinder, t, Quaternion.Euler(0, a, 0) * new Vector3(0, .03f + i * .004f, r), new Vector3(s, .01f, s * (.55f + R01 * .35f)), pool, Quaternion.Euler(0, R01 * 180, 0));
+            }
+            for (int i = 0; i < 10; i++)
+            {
+                float a = i * 36 + R01 * 20;
+                Part(PrimitiveType.Sphere, t, Quaternion.Euler(0, a, 0) * new Vector3(0, 0, radius * (.8f + R01 * .25f)), new Vector3(1.4f + R01, .45f + R01 * .2f, 2.2f + R01 * 1.5f), mud, Quaternion.Euler(0, a + 90, 0));
+            }
+            foreach (var at in new[] { new Vector3(radius * .55f, 0, radius * .35f), new Vector3(-radius * .45f, 0, -radius * .5f) })
+            {
+                Lump(Boulder(), t, at + new Vector3(0, .35f, 0), new Vector3(2.2f, 1.6f, 1.8f), stone, R01 * 360);
+                Solid(t, at + new Vector3(0, .6f, 0), new Vector3(1.7f, 1.2f, 1.5f));
+            }
+        }
+        /// <summary>
+        /// The Ash-Walker enclave's cave mouths (CANON, book1 ch.20: the Ash-Walkers live in the deep caves of the Eastern
+        /// Ridge; this look is GAME-ONLY): a craggy rock face length wide with three mouths, the great one framed by bone
+        /// tusks and lit by a fire within, a hide awning on bone poles over one, a hide curtain drawn half across another,
+        /// and salt wherever the Eaters might come in: crusted lintels, a salt line over every threshold, stacked blocks.
+        /// Front faces -Z; the rock is solid (the caves are not entered).
+        /// </summary>
+        void Cave(Transform t, float length)
+        {
+            float H = 10, D = 7;
+            var rock = Tint(art.stone, new Color(.37f, .365f, .37f)); var dark = Tint(art.stone, new Color(.035f, .03f, .03f)); var salt = Tint(art.stone, new Color(.94f, .94f, .91f));   // rock: the ash cliffs' grey, so the face runs on into the Ridge
+            var hide = Tint(art.cloth, new Color(.56f, .43f, .29f)); var hide2 = Tint(art.cloth, new Color(.67f, .55f, .39f));
+            var mouths = new[] { new Vector3(0, 4.2f, 4.6f), new Vector3(-length * .32f, 2.4f, 3), new Vector3(length * .3f, 2.4f, 2.8f) };   // (x, width, height)
+            float Floor(float at) { var w = t.TransformPoint(new Vector3(at, 0, 0)); return HeightAt(w.x, w.z) - t.position.y; }
+            for (float x = -length / 2; x <= length / 2 + .01f; x += 1.8f)
+            {
+                float y = Floor(x), bottom = y - 1, top = y + H - 1.5f + R01 * 3;
+                foreach (var m in mouths) if (Mathf.Abs(x - m.x) < m.y / 2 + .6f) bottom = Floor(m.x) + m.z;   // a lintel over a mouth
+                Part(PrimitiveType.Cube, t, new Vector3(x, (bottom + top) / 2, D / 2 + R01 * .6f), new Vector3(2.2f + R01 * .6f, top - bottom, D), rock, Quaternion.Euler(R01 * 5 - 3, R01 * 10 - 5, R01 * 4 - 2));
+                if (R01 < .5f) Lump(Boulder(), t, new Vector3(x, top - .3f, D * .6f), new Vector3(2.6f, 1.8f, 3), rock, R01 * 360);   // a rounded crest
+            }
+            foreach (var m in mouths)
+            {
+                float fy = Floor(m.x);
+                Part(PrimitiveType.Cube, t, new Vector3(m.x, fy + m.z / 2, 2.7f), new Vector3(m.y + 1.6f, m.z + .2f, 3.6f), dark);   // the dark within
+                foreach (int s in new[] { -1, 1 }) Lump(Boulder(), t, new Vector3(m.x + s * m.y * .45f, fy + m.z - .3f, -.05f), new Vector3(1.5f, 1.4f, 1.2f), rock, R01 * 360);   // round the arch
+                Part(PrimitiveType.Cube, t, new Vector3(m.x, fy + .03f, -.4f), new Vector3(m.y + .4f, .06f, .3f), salt);   // salt line across the threshold
+                Part(PrimitiveType.Cube, t, new Vector3(m.x, fy + m.z + .08f, -.3f), new Vector3(m.y + 1, .16f, .6f), salt, Quaternion.Euler(0, 0, R01 * 4 - 2));   // salt-crusted lintel
+            }
+            // The great mouth: bone tusks arching over it, a fire inside, salt blocks stacked beside it.
+            var g = mouths[0]; float gy = Floor(g.x);
+            foreach (int s in new[] { -1, 1 })
+            {
+                Arc(t, new Vector3(s * (g.y / 2 + .9f), gy - .3f, -1), s > 0 ? -90 : 90, g.y / 2 + .7f, g.z + 1.4f, .5f, .45f, .2f, Bone, 7);
+                Solid(t, new Vector3(s * (g.y / 2 + .9f), gy + 1, -1.1f), new Vector3(.7f, 2, .7f));
+            }
+            if (cone == null) cone = ZoneMeshes.Cone(1, 1);
+            Part(PrimitiveType.Cylinder, t, new Vector3(0, gy + .06f, .5f), new Vector3(1.2f, .05f, .7f), art.glass);   // embers on the cave floor
+            MeshPart(cone, t, new Vector3(0, gy + .08f, .55f), Glowing(new Color(1, .55f, .2f), 2.2f)).transform.localScale = new Vector3(.35f, 1, .3f);
+            Glow(t, new Vector3(0, gy + 1.5f, -.2f), 10, 1.5f, new Color(1, .55f, .25f), 2.4f);
+            float bx = g.y / 2 + 2;
+            for (int i = 0; i < 3; i++) Part(PrimitiveType.Cube, t, new Vector3(bx + (i == 2 ? .35f : i * .75f), Floor(bx) + (i == 2 ? .75f : .25f), -1.5f), new Vector3(.7f, .5f, .5f), salt, Quaternion.Euler(0, R01 * 20 - 10, 0));
+            Solid(t, new Vector3(bx + .4f, Floor(bx) + .5f, -1.5f), new Vector3(1.8f, 1, .8f));
+            // A hide awning on bone poles over the second mouth.
+            var n = mouths[1]; float ny = Floor(n.x);
+            foreach (int s in new[] { -1, 1 })
+            {
+                Part(PrimitiveType.Cylinder, t, new Vector3(n.x + s * 1.6f, ny + 1.2f, -2.6f), new Vector3(.12f, 1.2f, .12f), Bone);
+                Solid(t, new Vector3(n.x + s * 1.6f, ny + 1.2f, -2.6f), new Vector3(.3f, 2.4f, .3f));
+            }
+            Part(PrimitiveType.Cylinder, t, new Vector3(n.x, ny + 2.4f, -2.6f), new Vector3(.1f, 1.75f, .1f), Bone, Quaternion.Euler(0, 0, 90));
+            Part(PrimitiveType.Cube, t, new Vector3(n.x - .75f, ny + 2.72f, -1.35f), new Vector3(1.9f, .05f, 2.75f), hide, Quaternion.Euler(-13, 0, 2));
+            Part(PrimitiveType.Cube, t, new Vector3(n.x + .8f, ny + 2.7f, -1.35f), new Vector3(1.8f, .05f, 2.7f), hide2, Quaternion.Euler(-13, 0, -2));
+            // A hide curtain drawn half across the third, on a bone rod.
+            var c = mouths[2]; float cy = Floor(c.x);
+            Part(PrimitiveType.Cylinder, t, new Vector3(c.x, cy + c.z - .15f, -.25f), new Vector3(.09f, c.y / 2 + .3f, .09f), Bone, Quaternion.Euler(0, 0, 90));
+            Part(PrimitiveType.Cube, t, new Vector3(c.x - c.y * .2f, cy + (c.z - .2f) / 2, -.2f), new Vector3(c.y * .62f, c.z - .25f, .05f), hide, Quaternion.Euler(0, 0, 1.5f));
+            Solid(t, new Vector3(0, gy + H / 2 - 1, D / 2 + .3f), new Vector3(length + 1, H + 2, D));
+        }
+        /// <summary>An Ash-Walker lean-to (GAME-ONLY look): two hides stretched from a bone ridge pole down to the ground behind, a bedroll and a basket of salt inside. Open front faces -Z.</summary>
+        void Shelter(Transform t)
+        {
+            var hide = Tint(art.cloth, new Color(.56f, .43f, .29f)); var hide2 = Tint(art.cloth, new Color(.67f, .55f, .39f));
+            foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cylinder, t, new Vector3(s * 1.8f, 1.1f, -1.4f), new Vector3(.13f, 1.1f, .13f), Bone, Quaternion.Euler(0, 0, s * -4));
+            Part(PrimitiveType.Cylinder, t, new Vector3(0, 2.2f, -1.4f), new Vector3(.11f, 2.05f, .11f), Bone, Quaternion.Euler(0, 0, 90));
+            Part(PrimitiveType.Cube, t, new Vector3(-.95f, 1.04f, .35f), new Vector3(2, .05f, 4.2f), hide, Quaternion.Euler(33, 0, 0));   // pegged into the ground behind
+            Part(PrimitiveType.Cube, t, new Vector3(.95f, 1.02f, .37f), new Vector3(2, .05f, 4.2f), hide2, Quaternion.Euler(33, 0, 0));
+            Part(PrimitiveType.Cube, t, new Vector3(-.6f, .08f, .3f), new Vector3(.9f, .14f, 1.8f), hide2);   // bedroll
+            Part(PrimitiveType.Cylinder, t, new Vector3(1.1f, .22f, .5f), new Vector3(.6f, .22f, .6f), Tint(art.hay, new Color(.45f, .38f, .26f)));   // basket
+            Part(PrimitiveType.Cube, t, new Vector3(1.1f, .5f, .5f), new Vector3(.35f, .2f, .3f), Tint(art.stone, new Color(.94f, .94f, .91f)));   // salt
+            Solid(t, new Vector3(0, 1.1f, .2f), new Vector3(4, 2.2f, 3.8f));
+        }
+        /// <summary>A fire-bowl on three legs (iron, or bone) with glowing coals and a flame; burns day and night.</summary>
+        void Brazier(Transform t, Vector3 at, Material legs)
+        {
+            var iron = Tint(art.metal, new Color(.18f, .17f, .17f));
+            for (int i = 0; i < 3; i++) { var q = Quaternion.Euler(0, i * 120, 0); Part(PrimitiveType.Cube, t, at + q * new Vector3(0, .5f, .24f), new Vector3(.07f, 1.05f, .07f), legs ?? iron, q * Quaternion.Euler(-14, 0, 0)); }
+            Part(PrimitiveType.Sphere, t, at + new Vector3(0, 1, 0), new Vector3(.8f, .3f, .8f), iron);
+            Part(PrimitiveType.Sphere, t, at + new Vector3(0, 1.07f, 0), new Vector3(.66f, .18f, .66f), art.glass);   // coals heaped in the bowl, showing over its rim
+            if (cone == null) cone = ZoneMeshes.Cone(1, 1);
+            MeshPart(cone, t, at + new Vector3(0, 1.12f, 0), Glowing(new Color(1, .55f, .2f), 2.2f)).transform.localScale = new Vector3(.2f, .55f, .2f);
+            Glow(t, at + new Vector3(0, 1.7f, 0), 7, 1.2f, new Color(1, .58f, .28f), 1.9f);
+        }
+        /// <summary>
+        /// The Weave-Eater brood (GAME-ONLY; Weave-Eaters born of the frayed threads of the broken Weave are CANON, book1
+        /// ch.20): a hollow of unmade ground (a sunk ZoneShape painted unmade) ringed with torn crust, with burrows,
+        /// thread-wrapped sacs and frayed grey threads arching out of the ash or strung across it. Walkable, no colliders.
+        /// </summary>
+        void Brood(Transform t, float radius)
+        {
+            var thread = Tint(art.ash, new Color(.82f, .82f, .86f)); var crust = Tint(art.ash, new Color(.46f, .46f, .49f));
+            var sac = Tint(art.ash, new Color(.66f, .64f, .7f)); var hole = Tint(art.stone, new Color(.03f, .03f, .035f));
+            for (int k = 0; k < 16; k++) { var q = Quaternion.Euler(0, k * 22.5f + R01 * 10, 0); Part(PrimitiveType.Cube, t, q * new Vector3(0, .15f, radius * 1.05f), new Vector3(1.8f, .12f, 1.3f), crust, q * Quaternion.Euler(-30 - R01 * 25, 0, R01 * 16 - 8)); }   // the nest's torn rim
+            for (int i = 0; i < 3; i++)   // burrows: dark mouths in the floor, lipped with torn crust
+            {
+                var at = Quaternion.Euler(0, i * 120 + R01 * 40, 0) * new Vector3(0, 0, radius * (.25f + R01 * .3f));
+                Part(PrimitiveType.Sphere, t, at + new Vector3(0, -.1f, 0), new Vector3(1.7f + R01 * .6f, .26f, 1.3f + R01 * .5f), hole);
+                for (int k = 0; k < 6; k++) { var q = Quaternion.Euler(0, k * 60 + R01 * 25, 0); Part(PrimitiveType.Cube, t, at + q * new Vector3(0, .06f, 1.05f), new Vector3(.8f, .08f, .55f), crust, q * Quaternion.Euler(-20 - R01 * 25, 0, 0)); }
+            }
+            for (int i = 0; i < 8; i++)   // sacs, half sunk, wrapped in thread
+            {
+                var at = Quaternion.Euler(0, R01 * 360, 0) * new Vector3(0, 0, radius * (.3f + R01 * .55f)); float s = .45f + R01 * .5f;
+                Part(PrimitiveType.Sphere, t, at + new Vector3(0, s * .3f, 0), new Vector3(s, s * 1.35f, s), sac, Quaternion.Euler(R01 * 30 - 15, 0, R01 * 30 - 15));
+                for (int k = 0; k < 2; k++) Part(PrimitiveType.Cylinder, t, at + new Vector3(0, s * (.2f + k * .3f), 0), new Vector3(s * 1.04f, .015f, s * 1.04f), thread, Quaternion.Euler(R01 * 40 - 20, 0, R01 * 40 - 20));
+            }
+            for (int i = 0; i < 11; i++)   // frayed threads arching out of the ash; their tips unravel
+            {
+                var at = Quaternion.Euler(0, R01 * 360, 0) * new Vector3(0, 0, radius * R01 * 1.1f);
+                var tip = Arc(t, at + Vector3.down * .2f, R01 * 360, .8f + R01 * 2.4f, 1.2f + R01 * 2.4f, R01 * .8f, .14f, .05f, thread, 6);
+                for (int k = 0; k < 3; k++) { var dir = Quaternion.Euler(R01 * 360, R01 * 360, 0) * Vector3.up; Part(PrimitiveType.Cube, t, tip + dir * .2f, new Vector3(.025f, .4f, .025f), thread, Quaternion.FromToRotation(Vector3.up, dir)); }
+            }
+            for (int i = 0; i < 5; i++)   // loose threads strung across the hollow
+            {
+                Vector3 a = Quaternion.Euler(0, R01 * 360, 0) * new Vector3(0, .3f + R01 * .9f, radius * (.6f + R01 * .5f)), b = Quaternion.Euler(0, R01 * 360, 0) * new Vector3(0, .2f + R01 * .7f, radius * (.6f + R01 * .5f));
+                Part(PrimitiveType.Cylinder, t, (a + b) / 2, new Vector3(.04f, Vector3.Distance(a, b) / 2, .04f), thread, Quaternion.FromToRotation(Vector3.up, b - a));
+            }
+        }
+        /// <summary>
+        /// A rib of the old ribcage (a colossal petrified ribcage on the ash plain is a CANON image, book1 ch.20; this one is
+        /// GAME-ONLY): bone turned to pale grey stone, rising out of the ash, bowing out, then curving in over reach metres
+        /// (+Z) to meet the spine at height (see Spine).
+        /// </summary>
+        void Rib(Transform t, float reach, float height)
+        {
+            var bone = Tint(art.stone, new Color(.76f, .73f, .65f));
+            Arc(t, new Vector3(0, -.4f, 0), 0, reach, height + .4f, reach * .28f, .8f, .42f, bone);
+            Part(PrimitiveType.Sphere, t, new Vector3(0, .02f, -.25f), new Vector3(1.3f, .45f, 1.2f), Tint(art.ash, new Color(.4f, .39f, .38f)));   // ash heaped at its foot
+            Solid(t, new Vector3(0, 1.3f, -.3f), new Vector3(1.1f, 2.6f, 1.4f));
+        }
+        /// <summary>The old ribcage's spine (see Rib): vertebrae along local X at the ribs' height, plunging into the ash at both ends.</summary>
+        void Spine(Transform t, float length, float height)
+        {
+            var bone = Tint(art.stone, new Color(.76f, .73f, .65f));
+            float half = length / 2, level = half - 5;   // level over the ribs, then five metres down into the ground (neck and tail)
+            float Y(float u) { float e = Mathf.Clamp01((Mathf.Abs(u) - level) / 5); return height * (1 - e * e) - .8f * e; }
+            Vector3? last = null; float run = 99;
+            for (float x = -half; x <= half; x += .05f)
+            {
+                run += new Vector2(.05f, Y(x + .05f) - Y(x)).magnitude; if (run < 1.2f) continue; run = 0;   // a vertebra every 1.2 m along the curve
+                float s = 1 - Mathf.Clamp01((Mathf.Abs(x) - level) / 5) * .35f;
+                var r = Quaternion.Euler(0, 0, Mathf.Atan((Y(x + .05f) - Y(x - .05f)) / .1f) * Mathf.Rad2Deg); var at = new Vector3(x, Y(x) + .15f, 0);
+                Part(PrimitiveType.Cylinder, t, at, new Vector3(1.1f * s, .28f, 1.1f * s), bone, r * Quaternion.Euler(0, 0, 90));
+                Part(PrimitiveType.Cube, t, at + r * new Vector3(-.1f, .65f * s, 0), new Vector3(.22f, .9f * s, .45f), bone, r * Quaternion.Euler(0, 0, 16));   // dorsal spine
+                Part(PrimitiveType.Cube, t, at, new Vector3(.2f, .2f, 1.9f * s), bone, r);   // side processes
+                if (last.HasValue) { var seg = at - last.Value; Part(PrimitiveType.Capsule, t, (at + last.Value) / 2, new Vector3(.55f * s, (seg.magnitude + .55f) / 2, .55f * s), bone, Quaternion.FromToRotation(Vector3.up, seg)); }
+                last = at;
+            }
+            foreach (int sx in new[] { -1, 1 }) Solid(t, new Vector3(sx * (half - .5f), .8f, 0), new Vector3(1.6f, 1.8f, 1.8f));   // where it goes into the ground
+        }
+        /// <summary>
+        /// The Cult of Ash's shrine (bone masks wired with iron: CANON, book1 ch.10; the purple tear is the later House of
+        /// Ash's symbol, used early: GAME-ONLY): a scorched dais, an altar-stone with candles and bones, a stele daubed with
+        /// the purple tear on both faces and hung with wired bone masks, a brazier either side. Front faces -Z.
+        /// </summary>
+        void Shrine(Transform t)
+        {
+            var dark = Tint(art.stone, new Color(.25f, .24f, .24f)); var soot = Tint(art.stone, new Color(.15f, .14f, .14f)); var tear = Glowing(new Color(.5f, .16f, .62f), 1.4f);
+            Part(PrimitiveType.Cube, t, new Vector3(0, .02f, 0), new Vector3(4.6f, .14f, 4.6f), soot, Quaternion.Euler(0, 45, 0));   // scorched dais
+            Part(PrimitiveType.Cube, t, new Vector3(0, .1f, .35f), new Vector3(3.2f, .16f, 2.6f), dark);
+            Part(PrimitiveType.Cube, t, new Vector3(0, .6f, 0), new Vector3(2, .9f, 1.1f), dark);   // the altar-stone
+            Part(PrimitiveType.Cube, t, new Vector3(0, 1.1f, 0), new Vector3(2.2f, .14f, 1.3f), soot);
+            Part(PrimitiveType.Cube, t, new Vector3(0, 1.75f, 1.05f), new Vector3(1.3f, 3.3f, .45f), dark);   // the stele
+            Part(PrimitiveType.Cube, t, new Vector3(0, 3.45f, 1.05f), new Vector3(1.5f, .2f, .6f), soot);
+            if (cone == null) cone = ZoneMeshes.Cone(1, 1);
+            foreach (int s in new[] { -1, 1 })
+            {
+                float z = 1.05f + s * .23f;   // the tear on both faces
+                Part(PrimitiveType.Sphere, t, new Vector3(0, 2.05f, z), new Vector3(.62f, .62f, .06f), tear);
+                MeshPart(cone, t, new Vector3(0, 2.05f, z), tear).transform.localScale = new Vector3(.3f, .8f, .03f);
+                Mask(t, new Vector3(s * .62f, 2.75f, .78f), 0, .85f);
+                Brazier(t, new Vector3(s * 2.1f, 0, -.4f), null);
+                Solid(t, new Vector3(s * 2.1f, .6f, -.4f), new Vector3(.8f, 1.2f, .8f));
+            }
+            for (int i = 0; i < 3; i++) Part(PrimitiveType.Cylinder, t, new Vector3(-.7f + i * .7f, 1.3f, -.3f + (i % 2) * .2f), new Vector3(.08f, .12f, .08f), art.glass);   // candles
+            for (int i = 0; i < 4; i++) Part(PrimitiveType.Cube, t, new Vector3(-.3f + R01 * .6f, 1.21f, .1f + R01 * .3f), new Vector3(.07f, .06f, .45f), Bone, Quaternion.Euler(0, R01 * 180, 0));   // bones
+            Glow(t, new Vector3(0, 2.3f, .3f), 5, .8f, new Color(.62f, .3f, .85f), 1.4f);
+            Solid(t, new Vector3(0, 1.7f, .5f), new Vector3(2.4f, 3.4f, 2.1f));
+        }
+        /// <summary>A Cult of Ash bone mask (CANON, book1 ch.10): jagged bone plates wired together with rusting iron wire, dark eye holes. Faces -Z.</summary>
+        void Mask(Transform t, Vector3 at, float yaw, float s)
+        {
+            var hole = Tint(art.stone, new Color(.05f, .05f, .05f)); var wire = Tint(art.metal, new Color(.36f, .21f, .12f)); var r = Quaternion.Euler(0, yaw, 0);
+            Part(PrimitiveType.Sphere, t, at, new Vector3(.5f, .66f, .22f) * s, Bone, r);
+            for (int i = 0; i < 4; i++) Part(PrimitiveType.Cube, t, at + r * new Vector3(i % 2 == 0 ? -.2f : .2f, i < 2 ? .24f : -.22f, -.01f) * s, new Vector3(.2f, .22f, .06f) * s, Bone, r * Quaternion.Euler(0, 0, 25 + i * 40));   // jagged plates
+            foreach (int sx in new[] { -1, 1 }) Part(PrimitiveType.Sphere, t, at + r * new Vector3(sx * .11f, .07f, -.1f) * s, new Vector3(.13f, .08f, .05f) * s, hole, r);
+            foreach (float y in new[] { .17f, -.13f }) Part(PrimitiveType.Cube, t, at + r * new Vector3(0, y, -.1f) * s, new Vector3(.54f, .025f, .03f) * s, wire, r * Quaternion.Euler(0, 0, y * 25));
+        }
+        /// <summary>A cult idol: a stake hung with grey rags on a cross-arm and crowned with a wired bone mask (see Mask). Faces -Z.</summary>
+        void Idol(Transform t)
+        {
+            var stake = Tint(art.timber, new Color(.2f, .16f, .13f)); var rag = Tint(art.cloth, new Color(.36f, .35f, .34f));
+            Part(PrimitiveType.Cube, t, new Vector3(0, 1.2f, 0), new Vector3(.14f, 2.4f, .14f), stake);
+            Part(PrimitiveType.Cube, t, new Vector3(0, 1.8f, 0), new Vector3(1.3f, .1f, .1f), stake, Quaternion.Euler(0, 0, R01 * 14 - 7));
+            Part(PrimitiveType.Cube, t, new Vector3(0, 1.35f, -.02f), new Vector3(1.1f, .85f, .03f), rag, Quaternion.Euler(3, 0, R01 * 8 - 4));
+            foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(s * .5f, 1.2f, -.02f), new Vector3(.18f, .6f, .03f), rag, Quaternion.Euler(0, 0, s * 8));   // tatters
+            Mask(t, new Vector3(0, 2.3f, -.1f), 0, 1.3f);
+            Solid(t, new Vector3(0, 1, 0), new Vector3(.5f, 2, .5f));
+        }
+
         // ---------- edges ----------
         void BuildForestEdge()
         {
@@ -1579,15 +2369,16 @@ namespace Crulanda.World
                     var at = side == 0 ? new Vector2(-edge - R01 * 3, s) : side == 1 ? new Vector2(s, edge + R01 * 3) : side == 2 ? new Vector2(s, -edge - R01 * 3) : new Vector2(edge + R01 * 3, s);
                     if (Zone.wasting != null && at.x > Zone.wasting.x - 6) continue;
                     if (NearRoad(at, 5) || Water.NearWater(at, 1.5f)) continue;
+                    var spot = Spot(at, 1.8f); if (spot.HasValue) at = spot.Value;   // never growing through a grove tree
                     if (Gloom)
                     {
                         float pick = R01;
-                        if (pick < .4f) DeadTree(at, .6f + R01 * .5f, DeadBark(), 3, statics);
-                        else if (pick < .82f) Pine(Root(new ZoneProp { kind = "pine", at = at, rotation = R01 * 360, scale = .85f + R01 * .5f }, statics));
+                        if (pick < .4f) Keep(DeadTree(at, .6f + R01 * .5f, DeadBark(), 3, statics), at, spot.HasValue);
+                        else if (pick < .82f) { var pt = Root(new ZoneProp { kind = "pine", at = at, rotation = R01 * 360, scale = .85f + R01 * .5f }, statics); Pine(pt); Keep(pt, at, spot.HasValue); }
                         else EdgeRock(at);
                         continue;
                     }
-                    if (Zone.biome == "ash") { if (R01 < .55f) DeadTree(at, .6f + R01 * .5f, Tint(art.bark, new Color(.2f, .19f, .18f)), 3, statics); else EdgeRock(at); continue; }
+                    if (Zone.biome == "ash") { if (R01 < .55f) Keep(DeadTree(at, .6f + R01 * .5f, Tint(art.bark, new Color(.2f, .19f, .18f)), 3, statics), at, spot.HasValue); else EdgeRock(at); continue; }
                     var p = new ZoneProp { kind = Zone.biome == "mountain" ? (R01 < .7f ? "pine" : "rock") : R01 < .6f ? "pine" : "tree", at = at, rotation = R01 * 360, scale = .85f + R01 * .5f, variant = (int)(R01 * 4) };
                     if (p.kind == "rock") { EdgeRock(at); continue; }
                     var t = Root(p, statics);
@@ -1599,6 +2390,7 @@ namespace Crulanda.World
                         uint hash = (uint)(Mathf.RoundToInt(at.x * 10) * 73856093) ^ (uint)(Mathf.RoundToInt(at.y * 10) * 19349663) ^ (uint)Zone.seed;
                         if ((hash >> 7 & 1) == 0) { var zoneRng = rng; rng = new System.Random((int)(hash & 0x7fffffff)); EdgeRock(at); rng = zoneRng; }
                     }
+                    else Keep(t, at, spot.HasValue);   // recorded, or dropped when crowded (the draws are unchanged)
                     var bushAt = at + new Vector2(R01 * 4 - 2, R01 * 4 - 2);
                     if (Zone.biome == "meadow" && R01 < .5f && !Water.NearWater(bushAt, 1)) Bush(bushAt, p.kind == "pine");
                 }
@@ -1611,39 +2403,77 @@ namespace Crulanda.World
                     EdgeRock(at); placed++;
                 }
         }
-        /// <summary>A big weathered boulder for rocky edges (mountain and ash zones).</summary>
+        /// <summary>The mountains' rock (boulders, crags, tors): a shade darker than plain stone, so sunlit rock stays under the fog.</summary>
+        Color MountainStone { get { return new Color(.36f, .35f, .335f); } }
+        /// <summary>A big weathered boulder for rocky edges (mountain and ash zones). None on near-vertical ground (it read as glued
+        /// to the face); its draws are taken all the same, so the zone's stream is unchanged.</summary>
         void EdgeRock(Vector2 at)
         {
-            var t = Root(new ZoneProp { kind = "rock", at = at, rotation = R01 * 360 }, statics);
-            float s = 1.6f + R01 * 1.8f;
-            var mat = Tint(art.stone, Zone.biome == "ash" ? new Color(.33f, .32f, .31f) : new Color(.42f, .41f, .39f));
-            if (Zone.biome == "mountain")
-            {
-                // Sunk by the fall of the slope across it, so its downhill side never hangs in the air.
-                float low = Mathf.Min(Mathf.Min(HeightAt(at.x + s, at.y), HeightAt(at.x - s, at.y)), Mathf.Min(HeightAt(at.x, at.y + s), HeightAt(at.x, at.y - s)));
-                t.position += Vector3.down * (Mathf.Clamp(t.position.y - low, 0, .6f * s) + .15f * s);
-            }
-            Lump(Boulder(), t, new Vector3(0, .45f * s, 0), new Vector3(2.1f * s, 1.5f * s, 1.8f * s), mat, R01 * 360);
-            Lump(Boulder(), t, new Vector3(.8f * s, .25f * s, .45f * s), new Vector3(1.2f * s, .9f * s, 1.1f * s), mat, R01 * 360);
+            float yaw = R01 * 360, s = 1.6f + R01 * 1.8f; Mesh b0 = Boulder(); float y0 = R01 * 360; Mesh b1 = Boulder(); float y1 = R01 * 360;
+            if (Zone.biome == "mountain" && Steep(at, s) > 1) return;   // steeper than 45 degrees across it
+            var t = Root(new ZoneProp { kind = "rock", at = at, rotation = yaw }, statics);
+            var mat = Tint(art.stone, Zone.biome == "ash" ? new Color(.33f, .32f, .31f) : Zone.biome == "mountain" ? MountainStone : new Color(.42f, .41f, .39f));
+            if (Zone.biome == "mountain") SinkBySlope(t, at, s);
+            Lump(b0, t, new Vector3(0, .45f * s, 0), new Vector3(2.1f * s, 1.5f * s, 1.8f * s), mat, y0);
+            Lump(b1, t, new Vector3(.8f * s, .25f * s, .45f * s), new Vector3(1.2f * s, .9f * s, 1.1f * s), mat, y1);
             Solid(t, new Vector3(0, .6f * s, 0), new Vector3(1.8f * s, 1.2f * s, 1.5f * s));
         }
+        /// <summary>The steepest rise or fall per metre from a point out to <paramref name="reach"/> (8 ways, drawn ground and height
+        /// function both, so a sharp crest or a ledge edge counts): about 1 at 45 degrees.</summary>
+        float Steep(Vector2 at, float reach)
+        {
+            float hc = Mathf.Min(HeightAt(at.x, at.y), MeshY(at.x, at.y)), worst = 0;
+            for (int k = 0; k < 8; k++)
+            {
+                var q = at + new Vector2(Mathf.Cos(k * Mathf.PI / 4), Mathf.Sin(k * Mathf.PI / 4)) * reach;
+                worst = Mathf.Max(worst, Mathf.Max(Mathf.Abs(HeightAt(q.x, q.y) - hc), Mathf.Abs(MeshY(q.x, q.y) - hc)) / reach);
+            }
+            return worst;
+        }
+        /// <summary>Sinks a boulder of size s by the fall of the slope across it (to the lowest drawn ground under it, at most .6 s),
+        /// so its downhill side never hangs in the air.</summary>
+        void SinkBySlope(Transform t, Vector2 at, float s)
+        {
+            float low = t.position.y;
+            for (int k = 0; k < 8; k++) { var q = at + new Vector2(Mathf.Cos(k * Mathf.PI / 4), Mathf.Sin(k * Mathf.PI / 4)) * s; low = Mathf.Min(low, Mathf.Min(HeightAt(q.x, q.y), MeshY(q.x, q.y))); }
+            t.position += Vector3.down * (Mathf.Clamp(t.position.y - low, 0, .6f * s) + .15f * s);
+        }
         /// <summary>
-        /// Mountains: whether a generated pine may stand here, and if so sinks it to the lowest drawn ground under its trunk.
-        /// Refused on steep ground (a rise or fall over .75 m per metre within 1.5 m, or a grid normal under .8), where its trunk
-        /// ended in mid-air against the slope; the ring test also catches sharp crests, which central differences call level.
+        /// Mountains: whether a generated pine may stand here, and if so sinks it to the lowest drawn ground under it (its trunk and
+        /// a little beyond). Refused on steep ground (a rise or fall over .7 m per metre within 1.5 m, .75 within 3 m, or a grid
+        /// normal under .82), where its trunk ended in mid-air in front of the slope; the ring tests also catch sharp crests and
+        /// ledge edges, which central differences call level.
         /// </summary>
         bool SeatPine(Transform t, Vector2 at)
         {
             if (Zone.biome != "mountain") return true;
-            float hc = HeightAt(at.x, at.y), low = Mathf.Min(hc, MeshY(at.x, at.y)), fall = 0, foot = .4f * t.localScale.x;
-            for (int k = 0; k < 8; k++)
-            {
-                var d = new Vector2(Mathf.Cos(k * Mathf.PI / 4), Mathf.Sin(k * Mathf.PI / 4));
-                fall = Mathf.Max(fall, Mathf.Abs(HeightAt(at.x + d.x * 1.5f, at.y + d.y * 1.5f) - hc) / 1.5f);
-                var q = at + d * foot; low = Mathf.Min(low, Mathf.Min(HeightAt(q.x, q.y), MeshY(q.x, q.y)));
-            }
-            if (fall > .75f || UpAt(at.x, at.y) < .8f) return false;
-            t.position = new Vector3(t.position.x, low - .05f, t.position.z); return true;
+            if (Steep(at, 1.5f) > .7f || Steep(at, 3) > .75f || UpAt(at.x, at.y) < .82f) return false;
+            float low = Mathf.Min(HeightAt(at.x, at.y), MeshY(at.x, at.y)), foot = .4f * t.localScale.x;
+            for (int k = 0; k < 12; k++)
+                foreach (float f in new[] { foot, foot * 2 })
+                {
+                    var q = at + new Vector2(Mathf.Cos(k * Mathf.PI / 6), Mathf.Sin(k * Mathf.PI / 6)) * f;
+                    low = Mathf.Min(low, Mathf.Min(HeightAt(q.x, q.y), MeshY(q.x, q.y)));
+                }
+            t.position = new Vector3(t.position.x, low - .12f, t.position.z); return true;
+        }
+        /// <summary>
+        /// Mountains: a loose rock (no quest use) where crags rose round it (PrepareRelief keeps no ground for loose rocks) rolls to
+        /// the flattest ground within 6 m that is off the roads, out of the water and no more a kept way than where it lay; stays put
+        /// when nothing near is flatter. Draws nothing random.
+        /// </summary>
+        Vector2 FlatterSpot(Vector2 at, float size)
+        {
+            float best = Steep(at, size), keepHere = Keep(at.x, at.y) + .05f; var spot = at;
+            if (best <= .8f) return at;
+            for (float r = 2; r <= 6; r += 2)
+                for (int k = 0; k < 12; k++)
+                {
+                    var q = at + new Vector2(Mathf.Cos(k * Mathf.PI / 6), Mathf.Sin(k * Mathf.PI / 6)) * r;
+                    if (Mathf.Max(Mathf.Abs(q.x), Mathf.Abs(q.y)) > Half - 4 || NearRoad(q, 1.5f + size) || Water.NearWater(q, 1.5f) || Keep(q.x, q.y) > keepHere) continue;
+                    float s = Steep(q, size); if (s < best - .1f) { best = s; spot = q; }
+                }
+            return spot;
         }
         bool NearRoad(Vector2 p, float margin)
         {
@@ -1744,8 +2574,18 @@ namespace Crulanda.World
             if (dead + pines + leafy <= 0) pines = 1;
             var spire = ZoneMeshes.Cone(1, 1, 6); var crown = ZoneMeshes.Blob(Zone.seed + 910, .55f, false, 5, 7); var crag = ZoneMeshes.Blob(Zone.seed + 920, 1.1f, true, 8, 12);
             var pineMat = Tint(art.pine, Wither(new Color(.16f, .23f, .16f))); var deadMat = Tint(art.bark, Gloom ? new Color(.55f, .54f, .53f) : new Color(.26f, .24f, .22f));   // gloom: the grey wood carries on
-            var rockMat = Tint(art.stone, ash ? new Color(.36f, .355f, .36f) : new Color(.40f, .39f, .38f));
+            var rockMat = Tint(art.stone, ash ? new Color(.36f, .355f, .36f) : mountain ? MountainStone : new Color(.40f, .39f, .38f));
             var parts = new Dictionary<(Material, int), List<CombineInstance>>();
+            // The skirt as drawn: its rings are the edge row scaled out from the centre, so between two rings (5-14 m apart out
+            // here) its surface runs straight from one ring's height to the next. On a ridged crest that chord lies metres under
+            // the height function, and a silhouette set on the function stood on air (the pines above the Peaks' exit).
+            float Drawn(float x, float z)
+            {
+                float cheb = Mathf.Max(Mathf.Abs(x), Mathf.Abs(z)), o = cheb - Half; if (o <= 0) return H(x, z);
+                int r = 0; while (r + 2 < rings.Length && rings[r + 1] < o) r++;
+                float f0 = (Half + rings[r]) / cheb, f1 = (Half + rings[r + 1]) / cheb;
+                return Mathf.Lerp(H(x * f0, z * f0), H(x * f1, z * f1), Mathf.Clamp01((o - rings[r]) / (rings[r + 1] - rings[r])));
+            }
             void Put(int side, Mesh mesh, Material mat, Vector3 at, Quaternion rot, Vector3 scale)
             {
                 if (!parts.TryGetValue((mat, side), out var list)) parts[(mat, side)] = list = new List<CombineInstance>();
@@ -1764,6 +2604,11 @@ namespace Crulanda.World
                         var q = side == 0 ? new Vector2(a, -o) : side == 1 ? new Vector2(o, a) : side == 2 ? new Vector2(-a, o) : new Vector2(-o, -a);
                         if ((Zone.wasting != null && q.x > Zone.wasting.x - 6) || (keep > 0 && valleys.Exists(v => DistanceToPath(q, v) < keep))) continue;
                         var at = new Vector3(q.x, H(q.x, q.y) - 1, q.y); float yaw = R() * 360, th = 7 + R() * 5, pick = R() * (dead + pines + leafy);
+                        // Set on the lowest drawn ground round it (1.2 m out); no tree where that ground is near-vertical (a rise of
+                        // over 2.2 m across it). The draws are taken either way, so the rest stand where they did.
+                        float lo = Drawn(q.x, q.y), hi = lo;
+                        for (int k = 0; k < 6; k++) { float y = Drawn(q.x + Mathf.Cos(k * 1.047f) * 1.2f, q.y + Mathf.Sin(k * 1.047f) * 1.2f); lo = Mathf.Min(lo, y); hi = Mathf.Max(hi, y); }
+                        bool bare = !rock && hi - lo > 2.2f; at.y = lo - (rock ? 0 : .5f);
                         if (rock)
                         {
                             // A tor: tall and narrow, sunk deep enough that its downhill side never hangs over the slope.
@@ -1772,9 +2617,10 @@ namespace Crulanda.World
                         }
                         else if (pick < dead)
                         {
-                            Put(side, spire, deadMat, at, Quaternion.identity, new Vector3(.45f, th, .45f));
-                            for (int j = 0; j < 3; j++) Put(side, spire, deadMat, at + Vector3.up * th * (.45f + j * .14f), Quaternion.Euler(0, yaw + j * 120, 35 + R() * 20), new Vector3(.18f, th * .4f, .18f));
+                            if (!bare) Put(side, spire, deadMat, at, Quaternion.identity, new Vector3(.45f, th, .45f));
+                            for (int j = 0; j < 3; j++) { float tilt = 35 + R() * 20; if (!bare) Put(side, spire, deadMat, at + Vector3.up * th * (.45f + j * .14f), Quaternion.Euler(0, yaw + j * 120, tilt), new Vector3(.18f, th * .4f, .18f)); }
                         }
+                        else if (bare) { if (pick >= dead + pines) R(); }   // (a broadleaf's leaf shade draw)
                         else if (pick < dead + pines)
                         {
                             // A bark trunk under lifted boughs, so a pine on a slope stands on it rather than hovering on a flat cone base.

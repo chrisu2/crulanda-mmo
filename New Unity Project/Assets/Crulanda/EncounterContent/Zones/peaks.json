@@ -119,6 +119,39 @@
       "radius": 8
     }
   ],
+  "shapes": [
+    {
+      "name": "Toll gate pad",
+      "center": {
+        "x": 22,
+        "y": 53
+      },
+      "radius": 14,
+      "height": 0,
+      "blend": 8
+    },
+    {
+      "name": "Captain's eyrie perch",
+      "center": {
+        "x": 60,
+        "y": 100
+      },
+      "radius": 9,
+      "height": 3.5,
+      "blend": 10
+    },
+    {
+      "name": "Rockhide wallow",
+      "paint": "mud",
+      "center": {
+        "x": 40,
+        "y": -70
+      },
+      "radius": 7,
+      "height": -0.5,
+      "blend": 5
+    }
+  ],
   "roads": [
     {
       "name": "Toll road",
@@ -421,6 +454,31 @@
       ]
     },
     {
+      "kind": "gate",
+      "name": "Toll gate",
+      "at": {
+        "x": 21,
+        "y": 51.5
+      },
+      "rotation": 22,
+      "size": {
+        "x": 6.4,
+        "y": 0
+      }
+    },
+    {
+      "kind": "wallow",
+      "name": "Rockhide wallow mud",
+      "at": {
+        "x": 40,
+        "y": -70
+      },
+      "size": {
+        "x": 6,
+        "y": 0
+      }
+    },
+    {
       "kind": "cliff",
       "name": "Toll crag (east)",
       "at": {
@@ -508,11 +566,37 @@
       "rotation": 290
     },
     {
+      "kind": "keep",
+      "name": "Captain's eyrie",
+      "at": {
+        "x": 58,
+        "y": 104.5
+      },
+      "rotation": 20,
+      "size": {
+        "x": 7,
+        "y": 6
+      }
+    },
+    {
+      "kind": "perch",
+      "name": "Eyrie rocks",
+      "at": {
+        "x": 60,
+        "y": 100
+      },
+      "rotation": 34,
+      "size": {
+        "x": 9,
+        "y": 0
+      }
+    },
+    {
       "kind": "tower",
       "name": "Eyrie lookout",
       "at": {
         "x": 66,
-        "y": 102
+        "y": 104
       },
       "size": {
         "x": 4,
@@ -522,8 +606,8 @@
     {
       "kind": "lamp",
       "at": {
-        "x": 52,
-        "y": 100
+        "x": 54,
+        "y": 95
       },
       "rotation": 90,
       "variant": 1
@@ -531,8 +615,8 @@
     {
       "kind": "crates",
       "at": {
-        "x": 62,
-        "y": 90
+        "x": 63,
+        "y": 95
       },
       "rotation": 30,
       "variant": 1
@@ -542,8 +626,8 @@
       "name": "Eyrie crag",
       "lift": 6,
       "at": {
-        "x": 58,
-        "y": 108
+        "x": 60,
+        "y": 117
       },
       "rotation": 0,
       "size": {

@@ -243,7 +243,7 @@ namespace Crulanda.Encounter
             { "leatherworker", new[] { "Good hides are scarce. Half of what comes in is grey at the edges.", "A proper belt outlasts a man. Mine outlasted two." } },
             { "skinner", new[] { "Stinks, I know. So does hunger.", "Bring me pelts and I'll pay fair. Rabbit, deer, anything that isn't grey." } },
             { "miller", new[] { "The wheel still turns. There's less to put under the stone every year.", "Flour's flour. Don't ask where the grain's been." } },
-            { "elder", new[] { "I remember when the east was green to the horizon.", "The oak on the green was old when my grandmother was young. Now look at it." } } };
+            { "elder", new[] { "I remember when the east was green to the horizon.", "The oak on the green was old when my grandmother was young. It'll see the lot of us out." } } };
         public string LineFor(Villager v, bool toPlayer)
         {
             if (!toPlayer) return Chatter[rng.Next(Chatter.Length)];
@@ -412,6 +412,20 @@ namespace Crulanda.Encounter
             foreach (var r in renderers) r.enabled = true;
             if (agent.isOnNavMesh) { agent.Warp(at); agent.isStopped = true; }
             transform.rotation = Quaternion.Euler(0, yaw, 0); visual.Pose = ActorPose.None; state = State.Activity; activity = "posed"; until = Time.time + 60; enabled = false;
+        }
+        /// <summary>Capture/debug: out of sight and out of the way (no body, no nameplate) until <see cref="Release"/>.</summary>
+        public void Park()
+        {
+            state = State.Hidden; Bubble = null; foreach (var r in renderers) r.enabled = false;
+            if (basket != null) basket.SetActive(false);   // not left hanging in the air where she stood
+            if (agent.isOnNavMesh) agent.isStopped = true; enabled = false;
+        }
+        /// <summary>Capture/debug: back to the day's routine after <see cref="StandAt"/> or <see cref="Park"/>, starting from where they were.</summary>
+        public void Release(Vector3 at)
+        {
+            foreach (var r in renderers) r.enabled = true;
+            if (agent.isOnNavMesh && NavMesh.SamplePosition(at, out var hit, 2.5f, NavMesh.AllAreas)) agent.Warp(hit.position);
+            enabled = true; state = State.Activity; until = 0; visual.Pose = ActorPose.None; ChooseNext();
         }
         /// <summary>What working looks like for this trade at this place.</summary>
         ActorPose PoseFor(string place)
@@ -614,7 +628,8 @@ namespace Crulanda.Encounter
 
     /// <summary>
     /// A critter: wanders and grazes near home, never fights, flees from the player. Crows take wing. Built from
-    /// primitives with small idle motions (pecking, grazing, hopping, flapping). No colliders, not targetable.
+    /// primitives standing on legs that step in a gait, with small idle motions (pecking, grazing, hopping, flapping).
+    /// No colliders, not targetable.
     /// </summary>
     public sealed class Critter : MonoBehaviour
     {
@@ -626,6 +641,10 @@ namespace Crulanda.Encounter
         public bool Returning { get { return state == State.Return; } }
         VillageLife life; Vector2 home; float radius; State state; Vector3 target, flyFrom; float until, speed, fleeSpeed, fleeRadius, flyT, fedSeen = -999;
         Transform body, head, wingL, wingR; float phase, seed; Renderer[] rends;
+        // Legs on hip pivots (see Leg): lag is the leg's place in the stride in radians, or -1 to swing with a rabbit's hop;
+        // amp its swing in degrees (negative reaches forward). stepRate: phase per m/s that keeps a planted foot from sliding.
+        readonly List<(Transform hip, float lag, float amp)> legs = new List<(Transform, float, float)>();
+        float stepRate = 12, legLen, stride, tuck; bool atRest;
         static readonly Dictionary<Color, Material> mats = new Dictionary<Color, Material>();
         static Material Mat(Color c)
         {
@@ -638,6 +657,23 @@ namespace Crulanda.Encounter
             o.transform.SetParent(parent, false); o.transform.localPosition = pos; o.transform.localScale = scale;
             if (euler.HasValue) o.transform.localEulerAngles = euler.Value;
             o.GetComponent<Renderer>().sharedMaterial = Mat(c); o.GetComponent<Renderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off; return o.transform;
+        }
+        /// <summary>A leg on a hip pivot in body space, hip.y above the ground: a slim cylinder (thick &gt; 0) down to the
+        /// ground, swung by <see cref="Legs"/>. lag: its place in the stride (0-1), or -1 to swing with the hop; amp: degrees.</summary>
+        Transform Leg(Vector3 hip, float thick, Color c, float lag, float amp)
+        {
+            var t = new GameObject("Leg").transform; t.SetParent(body, false); t.localPosition = hip;
+            if (thick > 0) Part(PrimitiveType.Cylinder, t, new Vector3(0, -hip.y / 2, 0), new Vector3(thick, hip.y / 2, thick), c);
+            legs.Add((t, lag < 0 ? -1 : lag * Mathf.PI * 2, amp)); legLen = hip.y;
+            stepRate = Mathf.PI / (2 * hip.y * Mathf.Sin(Mathf.Abs(amp) * Mathf.Deg2Rad));   // a half-stride carries it 2 * len * sin(amp)
+            return t;
+        }
+        /// <summary>A bird's foot at the bottom of a leg: one toe fore and aft (the hind toe behind) and two splayed forward.</summary>
+        void Toes(Transform leg, float toe, Color c)
+        {
+            var ankle = new Vector3(0, .006f - leg.localPosition.y, 0); var size = new Vector3(toe * .28f, .012f, toe);
+            Part(PrimitiveType.Cube, leg, ankle + new Vector3(0, 0, toe * .3f), new Vector3(size.x, size.y, toe * 1.6f), c);
+            foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, leg, ankle + Quaternion.Euler(0, s * 38, 0) * new Vector3(0, 0, toe * .5f), size, c, new Vector3(0, s * 38, 0));
         }
         public static Critter Spawn(VillageLife life, string kind, Vector2 center, float radius)
         {
@@ -717,35 +753,58 @@ namespace Crulanda.Encounter
                 case "chicken":
                     speed = .7f; fleeSpeed = 2.8f; fleeRadius = 3;
                     var plumage = r < .5f ? new Color(.92f, .9f, .84f) : new Color(.55f, .36f, .2f);
-                    Part(PrimitiveType.Sphere, body, new Vector3(0, .22f, 0), new Vector3(.26f, .24f, .34f), plumage);
-                    head = Part(PrimitiveType.Sphere, body, new Vector3(0, .4f, .14f), Vector3.one * .13f, plumage);
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .25f, 0), new Vector3(.26f, .24f, .34f), plumage);
+                    head = Part(PrimitiveType.Sphere, body, new Vector3(0, .43f, .14f), Vector3.one * .13f, plumage);
                     Part(PrimitiveType.Cube, head, new Vector3(0, .6f, .1f), new Vector3(.25f, .5f, .4f), new Color(.8f, .15f, .12f));
                     Part(PrimitiveType.Cube, head, new Vector3(0, -.05f, .6f), new Vector3(.25f, .2f, .5f), new Color(.9f, .7f, .2f));
-                    Part(PrimitiveType.Sphere, body, new Vector3(0, .3f, -.18f), new Vector3(.12f, .18f, .12f), plumage);
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .33f, -.18f), new Vector3(.12f, .18f, .12f), plumage);
+                    // Two thin yellow legs stepping in turn, each on three splayed toes.
+                    var shank = new Color(.86f, .66f, .22f);
+                    foreach (int s in new[] { -1, 1 }) Toes(Leg(new Vector3(s * .055f, .18f, .02f), .03f, shank, s < 0 ? 0 : .5f, 32), .05f, shank);
                     break;
                 case "rabbit":
                     speed = 1.1f; fleeSpeed = 6; fleeRadius = 7;
                     var fur = Color.Lerp(new Color(.52f, .44f, .34f), new Color(.62f, .6f, .56f), r);
-                    Part(PrimitiveType.Sphere, body, new Vector3(0, .15f, 0), new Vector3(.2f, .2f, .32f), fur);
-                    head = Part(PrimitiveType.Sphere, body, new Vector3(0, .26f, .14f), Vector3.one * .15f, fur);
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .18f, 0), new Vector3(.2f, .2f, .32f), fur);
+                    head = Part(PrimitiveType.Sphere, body, new Vector3(0, .29f, .14f), Vector3.one * .15f, fur);
                     foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Capsule, head, new Vector3(s * .25f, .9f, -.1f), new Vector3(.25f, .6f, .15f), fur, new Vector3(-15, 0, s * 10));
-                    Part(PrimitiveType.Sphere, body, new Vector3(0, .16f, -.17f), Vector3.one * .08f, new Color(.92f, .92f, .9f));
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .19f, -.17f), Vector3.one * .08f, new Color(.92f, .92f, .9f));
+                    // Haunches: big bent back legs bulging from the flanks, each on a long hind foot flat on the ground; small
+                    // forepaws under the chest. Mid-hop the haunches kick back and the forepaws reach forward (see Legs).
+                    foreach (int s in new[] { -1, 1 })
+                    {
+                        var haunch = Leg(new Vector3(s * .07f, .1f, -.07f), 0, fur, -1, 45);
+                        Part(PrimitiveType.Sphere, haunch, new Vector3(s * .005f, .005f, -.005f), new Vector3(.075f, .13f, .15f), fur);
+                        Part(PrimitiveType.Sphere, haunch, new Vector3(0, -.085f, .03f), new Vector3(.045f, .03f, .15f), fur);
+                        Part(PrimitiveType.Sphere, Leg(new Vector3(s * .045f, .13f, .1f), .03f, fur, -1, -35), new Vector3(0, -.116f, .012f), new Vector3(.036f, .028f, .05f), fur);
+                    }
                     break;
                 case "crow":
                     speed = .5f; fleeSpeed = 7; fleeRadius = 7;
                     var black = new Color(.07f, .07f, .09f);
-                    Part(PrimitiveType.Sphere, body, new Vector3(0, .16f, 0), new Vector3(.16f, .15f, .3f), black);
-                    head = Part(PrimitiveType.Sphere, body, new Vector3(0, .27f, .13f), Vector3.one * .11f, black);
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .18f, 0), new Vector3(.16f, .15f, .3f), black);
+                    head = Part(PrimitiveType.Sphere, body, new Vector3(0, .29f, .13f), Vector3.one * .11f, black);
                     Part(PrimitiveType.Cube, head, new Vector3(0, -.1f, .7f), new Vector3(.2f, .2f, .7f), new Color(.15f, .15f, .15f));
-                    wingL = Part(PrimitiveType.Cube, body, new Vector3(-.1f, .2f, 0), new Vector3(.04f, .02f, .22f), black);
-                    wingR = Part(PrimitiveType.Cube, body, new Vector3(.1f, .2f, 0), new Vector3(.04f, .02f, .22f), black);
-                    Part(PrimitiveType.Cube, body, new Vector3(0, .17f, -.2f), new Vector3(.1f, .02f, .16f), black);
+                    // Wings on shoulder pivots: folded back along the body on the ground, spread wide and beating in flight
+                    // (thin slivers flapping about the body's own axis made a flying crow look perched on thin air).
+                    foreach (int s in new[] { -1, 1 })
+                    {
+                        var wing = new GameObject("Wing").transform; wing.SetParent(body, false); wing.localPosition = new Vector3(s * .07f, .23f, .03f);
+                        Part(PrimitiveType.Cube, wing, new Vector3(s * .17f, 0, -.02f), new Vector3(.34f, .02f, .15f), black);
+                        if (s < 0) wingL = wing; else wingR = wing;
+                    }
+                    FoldWings();
+                    Part(PrimitiveType.Cube, body, new Vector3(0, .19f, -.2f), new Vector3(.1f, .02f, .16f), black);
+                    // Two thin dark legs on splayed toes; tucked back under the tail in flight (see Fly).
+                    var claw = new Color(.13f, .13f, .14f);
+                    foreach (int s in new[] { -1, 1 }) Toes(Leg(new Vector3(s * .035f, .13f, .01f), .02f, claw, s < 0 ? 0 : .5f, 30), .036f, claw);
                     break;
                 case "deer":
                     speed = 1.2f; fleeSpeed = 7.5f; fleeRadius = 16;
                     var hide = new Color(.5f, .34f, .2f);
                     Part(PrimitiveType.Capsule, body, new Vector3(0, 1f, 0), new Vector3(.45f, .6f, .45f), hide, new Vector3(90, 0, 0));
-                    foreach (int sx in new[] { -1, 1 }) foreach (int sz in new[] { -1, 1 }) Part(PrimitiveType.Cylinder, body, new Vector3(sx * .15f, .42f, sz * .42f), new Vector3(.08f, .42f, .08f), hide * .8f);
+                    // Hips tucked up inside the body so the leg tops stay hidden as they swing; diagonal pairs step together.
+                    foreach (int sx in new[] { -1, 1 }) foreach (int sz in new[] { -1, 1 }) Leg(new Vector3(sx * .15f, .92f, sz * .42f), .08f, hide * .8f, sx == sz ? 0 : .5f, 22);
                     var neck = Part(PrimitiveType.Capsule, body, new Vector3(0, 1.35f, .55f), new Vector3(.18f, .32f, .18f), hide, new Vector3(35, 0, 0));
                     head = Part(PrimitiveType.Sphere, body, new Vector3(0, 1.62f, .78f), new Vector3(.2f, .2f, .32f), hide);
                     if (r < .5f) foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cylinder, head, new Vector3(s * .5f, 1.4f, -.3f), new Vector3(.12f, .9f, .12f), new Color(.7f, .62f, .5f), new Vector3(-10, 0, s * 25));
@@ -756,15 +815,20 @@ namespace Crulanda.Encounter
                     var wool = Color.Lerp(new Color(.9f, .88f, .82f), new Color(.8f, .77f, .7f), r);
                     Part(PrimitiveType.Sphere, body, new Vector3(0, .62f, 0), new Vector3(.75f, .6f, 1f), wool);
                     head = Part(PrimitiveType.Sphere, body, new Vector3(0, .7f, .55f), new Vector3(.25f, .28f, .32f), new Color(.12f, .11f, .1f));
-                    foreach (int sx in new[] { -1, 1 }) foreach (int sz in new[] { -1, 1 }) Part(PrimitiveType.Cylinder, body, new Vector3(sx * .2f, .2f, sz * .28f), new Vector3(.08f, .2f, .08f), new Color(.12f, .11f, .1f));
+                    // Hips up inside the fleece (the old legs stopped just short of it at the corners).
+                    foreach (int sx in new[] { -1, 1 }) foreach (int sz in new[] { -1, 1 }) Leg(new Vector3(sx * .2f, .47f, sz * .28f), .08f, new Color(.12f, .11f, .1f), sx == sz ? 0 : .5f, 20);
                     break;
                 default: // cat
                     speed = .9f; fleeSpeed = 4.5f; fleeRadius = 4;
                     var coat = r < .33f ? new Color(.15f, .14f, .13f) : r < .66f ? new Color(.75f, .45f, .2f) : new Color(.55f, .55f, .55f);
-                    Part(PrimitiveType.Capsule, body, new Vector3(0, .2f, 0), new Vector3(.18f, .22f, .18f), coat, new Vector3(90, 0, 0));
-                    head = Part(PrimitiveType.Sphere, body, new Vector3(0, .32f, .22f), Vector3.one * .15f, coat);
+                    Part(PrimitiveType.Capsule, body, new Vector3(0, .26f, 0), new Vector3(.18f, .22f, .18f), coat, new Vector3(90, 0, 0));
+                    head = Part(PrimitiveType.Sphere, body, new Vector3(0, .38f, .22f), Vector3.one * .15f, coat);
                     foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, head, new Vector3(s * .28f, .45f, 0), new Vector3(.2f, .3f, .1f), coat, new Vector3(0, 0, s * 15));
-                    Part(PrimitiveType.Cylinder, body, new Vector3(0, .32f, -.28f), new Vector3(.04f, .2f, .04f), coat, new Vector3(-50, 0, 0));
+                    Part(PrimitiveType.Cylinder, body, new Vector3(0, .38f, -.28f), new Vector3(.04f, .2f, .04f), coat, new Vector3(-50, 0, 0));
+                    // Four slim legs (diagonal pairs step together) on small paws; some cats wear white socks.
+                    var paw = seed % 10 < 3 ? new Color(.9f, .88f, .82f) : Color.Lerp(coat, Color.white, .12f);
+                    foreach (int sx in new[] { -1, 1 }) foreach (int sz in new[] { -1, 1 })
+                        Part(PrimitiveType.Sphere, Leg(new Vector3(sx * .055f, .22f, sz * .14f), .05f, coat, sx == sz ? 0 : .5f, 28), new Vector3(0, -.202f, .015f), new Vector3(.065f, .036f, .085f), paw);
                     break;
             }
         }
@@ -834,15 +898,30 @@ namespace Crulanda.Encounter
             if (life.Zone.WaterAt(new Vector2(next.x, next.z), out _, out _)) return true;   // stop at the water's edge
             next.y = life.Zone.HeightAt(next.x, next.z);
             transform.position = next; transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), Time.deltaTime * 8);
-            phase += Time.deltaTime * v * 6;
-            float hop = Kind == "rabbit" ? Mathf.Abs(Mathf.Sin(phase)) * .18f : Kind == "chicken" ? Mathf.Abs(Mathf.Sin(phase * 1.5f)) * .03f : Mathf.Abs(Mathf.Sin(phase)) * .02f;
-            body.localPosition = new Vector3(0, hop, 0);
+            // Stride matched to the ground speed (capped, so a bolt is quick legs rather than a blur); a rabbit hops,
+            // one hop each half-turn, longer and higher as it speeds up.
+            phase += Time.deltaTime * (Kind == "rabbit" ? Mathf.Min(v, 2.2f) * 5.5f : Mathf.Min(v * stepRate, 24));
+            if (Kind == "rabbit") body.localPosition = new Vector3(0, Mathf.Abs(Mathf.Sin(phase)) * Mathf.Lerp(.16f, .28f, (v - 1) / 5), 0);
+            Legs(1);
             if (head != null && Kind != "deer") head.localEulerAngles = Vector3.zero;
             return false;
         }
+        /// <summary>
+        /// Legs: swung in the gait while stepping (easing in and out), tucked back under the tail in flight. Walkers dip as
+        /// their legs spread so the planted feet stay on the ground; a rabbit stretches out mid-hop and pitches nose up, then down.
+        /// </summary>
+        void Legs(float moving, bool flying = false)
+        {
+            stride = Mathf.MoveTowards(stride, moving, Time.deltaTime * 5); tuck = Mathf.MoveTowards(tuck, flying ? 1 : 0, Time.deltaTime * 4);
+            if (stride == 0 && tuck == 0) { if (atRest) return; atRest = true; } else atRest = false;
+            foreach (var l in legs)
+                l.hip.localEulerAngles = new Vector3((l.lag < 0 ? Mathf.Abs(Mathf.Sin(phase)) : Mathf.Sin(phase + l.lag)) * l.amp * stride + tuck * 75, 0, 0);
+            if (Kind == "rabbit") body.localEulerAngles = new Vector3(-Mathf.Sin(phase * 2) * 9 * stride, 0, 0);
+            else if (legs.Count > 0) body.localPosition = new Vector3(0, -legLen * (1 - Mathf.Cos(Mathf.Sin(phase) * legs[0].amp * stride * Mathf.Deg2Rad)), 0);
+        }
         void Idle()
         {
-            body.localPosition = Vector3.zero;
+            body.localPosition = Vector3.zero; Legs(0);
             if (head == null) return;
             float t = Time.time + seed;
             // Chickens peck, sheep and deer graze (head down), rabbits and cats look around.
@@ -857,14 +936,18 @@ namespace Crulanda.Encounter
             float height = Mathf.Sin(Mathf.Clamp01(flyT) * Mathf.PI) * 9;
             transform.position = flat + Vector3.up * height;
             var dir = target - flyFrom; dir.y = 0; if (dir.sqrMagnitude > .01f) transform.rotation = Quaternion.LookRotation(dir);
-            float flap = Mathf.Sin(Time.time * 22) * 60;
+            // Beat up to height, glide the middle stretch on spread wings (a shallow V), beat again to land.
+            float flap = flyT > .35f && flyT < .7f ? Mathf.Sin(Time.time * 5) * 8 - 6 : Mathf.Sin(Time.time * 22) * 60;
             if (wingL != null) { wingL.localEulerAngles = new Vector3(0, 0, flap); wingR.localEulerAngles = new Vector3(0, 0, -flap); }
+            Legs(0, flyT < .85f);   // tucked from take-off; let down again for the landing
             if (flyT >= 1)
             {
                 state = State.Idle; until = Time.time + 3 + life.R01 * 5;
                 transform.position = life.Zone.Ground(new Vector2(target.x, target.z));
-                if (wingL != null) wingL.localEulerAngles = wingR.localEulerAngles = Vector3.zero;
+                FoldWings();
             }
         }
+        /// <summary>Wings folded back along the body (on the ground); <see cref="Fly"/> spreads them.</summary>
+        void FoldWings() { if (wingL == null) return; wingL.localEulerAngles = new Vector3(0, -80, 0); wingR.localEulerAngles = new Vector3(0, 80, 0); }
     }
 }

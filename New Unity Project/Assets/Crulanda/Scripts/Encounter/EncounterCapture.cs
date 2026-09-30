@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
@@ -190,28 +191,68 @@ namespace Crulanda.Encounter
             yield return new WaitForSeconds(2);
             var zone = Crulanda.World.ZoneBuilder.Active;
             var motor = session.Player.GetComponent<AdventurerMotor>();
-            // Generic tour: the entrance, then each landmark framed from its south-west, then the first exit.
-            var shots = new System.Collections.Generic.List<(string name, Vector2 at, float yaw, float pitch, float zoom)>();
+            // Generic tour: the entrance, then each landmark, then the first exit. A landmark with an authored view is shot from
+            // it as authored (facing the landmark, its own pitch and zoom). Any other landmark (and the exit) is shot from a
+            // searched viewpoint with the player out of frame (LandmarkView); when none is clear, the old orbit framing from
+            // its south-west (the exit's from the north-east) stands in.
+            var shots = new List<(string name, Vector2 at, float yaw, float pitch, float zoom, Vector2 mark, float radius, float bearing, Transform root)>();
             if (zone != null)
             {
-                var z = zone.Zone; shots.Add(("01-entrance", z.spawns.player, z.spawns.playerFacing, 16, 12));
+                var z = zone.Zone; shots.Add(("01-entrance", z.spawns.player, z.spawns.playerFacing, 16, 12, Vector2.zero, 0, 0, null));
                 int n = 2;
                 foreach (var l in z.landmarks)
                 {
                     var from = l.at + new Vector2(-.6f, -.8f) * Mathf.Min(l.radius + 4, 14);
                     float lim = z.size / 2 - 10; from = new Vector2(Mathf.Clamp(from.x, -lim, lim), Mathf.Clamp(from.y, -lim, lim));
+                    bool authored = l.view != Vector2.zero; if (authored) from = l.view;   // the side that reads: a door, the grey, a view across the water
                     var dir = l.at - from; float yaw = Mathf.Atan2(dir.x, dir.y) * Mathf.Rad2Deg;
-                    shots.Add(((n++).ToString("00") + "-" + l.name.ToLowerInvariant().Replace(' ', '-').Replace("'", ""), from, yaw, 17, 11));
+                    // A prop carrying the landmark's name is framed on its own extent, and a building from its front (-Z), turned
+                    // a little for a three-quarter view; anything else from the south-west. Authored views skip the search (radius 0).
+                    var prop = Array.Find(z.props, p => p != null && p.name == l.name);
+                    Transform root = null;
+                    if (prop != null) { root = zone.transform.Find("Zone props/" + prop.name); if (root == null) root = zone.transform.Find("Zone static scenery/" + prop.name); }
+                    float bearing = prop != null && Array.IndexOf(Fronted, prop.kind) >= 0 ? prop.rotation + 205 : Mathf.Atan2(-.6f, -.8f) * Mathf.Rad2Deg;
+                    shots.Add(((n++).ToString("00") + "-" + l.name.ToLowerInvariant().Replace(' ', '-').Replace("'", ""), from, yaw, l.viewPitch > 0 ? l.viewPitch : 17, l.viewZoom > 0 ? l.viewZoom : 11,
+                        l.at, authored ? 0 : l.radius, bearing, root));
                 }
-                if (z.exits.Length > 0) shots.Add(((n++).ToString("00") + "-exit", z.exits[0].at + new Vector2(4, 4), 225, 15, 10));
+                if (z.exits.Length > 0)
+                {
+                    var x = z.exits[0];   // its waystone, seen from the zone's side looking out along the road
+                    shots.Add(((n++).ToString("00") + "-exit", x.at + new Vector2(4, 4), 225, 15, 10, x.at, Mathf.Max(x.radius, 4), Mathf.Atan2(-x.at.x, -x.at.y) * Mathf.Rad2Deg,
+                        zone.transform.Find("Zone static scenery/Exit: " + x.name)));
+                }
+            }
+            // Every tree's crown (its renderers' bounds): the camera keeps out of them, and they are counted in a sight line.
+            var crowns = new List<Bounds>();
+            foreach (var tf in Crulanda.World.TreeFade.All)
+            {
+                var parts = tf == null ? null : tf.GetComponentsInChildren<MeshRenderer>(); if (parts == null || parts.Length == 0) continue;
+                var cb = parts[0].bounds; foreach (var r in parts) cb.Encapsulate(r.bounds); crowns.Add(cb);
             }
             EncounterHud.Hidden = true;
             foreach (var s in shots)
             {
+                string file = Path.Combine(directory, (zone != null ? zone.Zone.id.Replace("zone.", "") : "world") + "-" + s.name + ".png");
+                if (zone != null && s.radius > 0 && LandmarkView(zone, s.mark, s.radius, s.bearing, s.root, crowns, out var cam, out var focus, out var near))
+                {
+                    // The camera goes straight to the viewpoint (the orbit rests); the player waits hidden just behind it, and
+                    // trees short of the landmark fade as they would between the camera and the player.
+                    var back = new Vector2(cam.x - focus.x, cam.z - focus.z).normalized;
+                    motor.Teleport(zone.Ground(new Vector2(cam.x, cam.z) + back * 2, 1.1f));
+                    var body = Array.FindAll(session.Player.GetComponentsInChildren<Renderer>(), r => r.enabled);
+                    foreach (var r in body) r.enabled = false;
+                    motor.enabled = false; var view = session.View.transform; var look = Quaternion.LookRotation(focus - cam);
+                    for (float w = 0; w < .6f; w += Time.deltaTime) { view.SetPositionAndRotation(cam, look); Crulanda.World.TreeFade.UpdateAll(cam, near, near); yield return null; }
+                    view.SetPositionAndRotation(cam, look); ScreenCapture.CaptureScreenshot(file);
+                    yield return new WaitForSeconds(.4f);
+                    motor.enabled = true; foreach (var r in body) r.enabled = true;
+                    continue;
+                }
+                if (s.radius > 0) Debug.Log("World tour " + s.name + ": no clear viewpoint, orbit framing");
                 motor.Teleport(zone != null ? zone.Ground(s.at, 1.1f) : new Vector3(s.at.x, 1.1f, s.at.y));
                 motor.SetView(s.yaw, s.pitch, s.zoom);
                 yield return new WaitForSeconds(.6f);
-                ScreenCapture.CaptureScreenshot(Path.Combine(directory, (zone != null ? zone.Zone.id.Replace("zone.", "") : "world") + "-" + s.name + ".png"));
+                ScreenCapture.CaptureScreenshot(file);
                 yield return new WaitForSeconds(.4f);
             }
             // Day and night at the first hen coop: the hen-wife's dusk round-up, then the village after dark.
@@ -274,17 +315,20 @@ namespace Crulanda.Encounter
                 }
                 var seen = new System.Collections.Generic.HashSet<string>(); var line = new System.Collections.Generic.List<Villager>();
                 foreach (var v in life.Villagers) if (v.Title != null && seen.Add(v.Role)) line.Add(v);
+                var before = line.ConvertAll(v => v.transform.position);
                 // Groups of four in a row facing the camera, so nameplates don't overlap.
                 for (int g = 0; g * 4 < line.Count; g++)
                 {
                     for (int i = g * 4; i < Mathf.Min(line.Count, g * 4 + 4); i++)
                         line[i].StandAt(zone.Ground(new Vector2((i - g * 4 - 1.5f) * 2.6f, -8)), 180);
-                    for (int i = 0; i < line.Count; i++) if (i < g * 4 || i >= g * 4 + 4) line[i].StandAt(zone.Ground(new Vector2(-40 + i, -40)), 0);
+                    // The others step out of sight (a parking row at -40,-40 turned up in the water shots, heaped on one bank).
+                    for (int i = 0; i < line.Count; i++) if (i < g * 4 || i >= g * 4 + 4) line[i].Park();
                     motor.Teleport(zone.Ground(new Vector2(0, -15), 1.1f)); motor.SetView(0, 6, 3.2f);
                     yield return new WaitForSeconds(1.2f);
                     ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "98-trades-lineup-" + (g + 1) + ".png"));
                     yield return new WaitForSeconds(.4f);
                 }
+                for (int i = 0; i < line.Count; i++) line[i].Release(before[i]);   // back to their day, from where they were
                 foreach (var r in playerRenderers) r.enabled = true;
             }
             // Nature: swimming in the first lake, then walking up on an ambush camp until something leaps out of the grass.
@@ -363,6 +407,100 @@ namespace Crulanda.Encounter
             }
             EncounterHud.Hidden = false;
             Debug.Log("WORLD_CAPTURE_DONE"); Application.Quit(0);
+        }
+        /// <summary>Prop kinds whose front (door or open side) faces local -Z: their landmark shots look at that side.</summary>
+        static readonly string[] Fronted = { "house", "inn", "barn", "mill", "coop", "forge", "stall", "oven", "tannery", "woodpile", "wagon", "crypt" };
+        /// <summary>
+        /// A viewpoint for a landmark shot. Sizes the landmark (its named prop's renderers, else the scenery colliders and tree
+        /// crowns in its circle), then tries 16 bearings round it, the preferred one first and turning away both ways, at three
+        /// distances that fit its footprint and height into the middle of the frame. A spot counts when it is inside the zone
+        /// and in open air (not in scenery or a crown, above any water) and sees the landmark's middle with nothing solid short
+        /// of the landmark itself. The best wins: nearest the preferred bearing and distance, fewest trees in the sight line
+        /// (they fade), the landmark's foot in view, no roof under the camera. <paramref name="near"/> is where the sight line
+        /// reaches the landmark (a prop's own bounds, else its circle or the first of its trees), so every tree short of it
+        /// fades and the landmark's own trees (the Great Oak, a wood) never do. False when nothing is clear.
+        /// </summary>
+        bool LandmarkView(Crulanda.World.ZoneBuilder zone, Vector2 at, float radius, float bearing, Transform root, List<Bounds> crowns, out Vector3 camera, out Vector3 focus, out Vector3 near)
+        {
+            camera = near = Vector3.zero;
+            float reach = Mathf.Clamp(radius, 4, 18), top = float.MinValue;
+            var own = root != null ? root.GetComponentsInChildren<MeshRenderer>() : new MeshRenderer[0];
+            var ob = new Bounds(); if (own.Length == 0) root = null;   // nothing drawn under that name: its circle stands in
+            if (root != null)
+            {
+                ob = own[0].bounds; foreach (var r in own) ob.Encapsulate(r.bounds);
+                at = new Vector2(ob.center.x, ob.center.z); top = ob.max.y; reach = Mathf.Clamp(Mathf.Max(ob.extents.x, ob.extents.z) + 1, 4, 22);
+                ob.Expand(.3f);   // padded as TreeFade pads a crown, so a landmark that is a tree stays solid
+            }
+            float ground = zone.HeightAt(at.x, at.y);
+            if (zone.WaterAt(at, out float surface, out _)) ground = Mathf.Max(ground, surface);   // a pond: its surface, not its bed
+            if (root == null)
+            {
+                foreach (var c in Physics.OverlapSphere(new Vector3(at.x, ground, at.y), reach, ~0, QueryTriggerInteraction.Ignore))
+                    if (c.bounds.size.x < 60 && c.bounds.size.z < 60 && !Ignored(c)) top = Mathf.Max(top, c.bounds.max.y);
+                foreach (var cb in crowns) if (Flat(cb.center, at) < reach) top = Mathf.Max(top, cb.max.y);
+            }
+            float height = Mathf.Clamp(top - ground, 2, 24);
+            focus = new Vector3(at.x, ground + Mathf.Clamp(height * .5f, 1.2f, 10), at.y);
+            // Distance: the footprint across three quarters of the frame's width, the height within 70% of it. Tall landmarks
+            // are seen from lower down, so their tops stay in frame.
+            float tanV = Mathf.Tan(session.View.fieldOfView * .5f * Mathf.Deg2Rad), tanH = tanV * session.View.aspect;
+            float fit = Mathf.Clamp(Mathf.Max(reach / (.75f * tanH), height * .5f / (.7f * tanV), reach + 3, 10), 10, 38);
+            var distances = new[] { fit, Mathf.Min(fit * 1.3f, 46), Mathf.Max(fit * .8f, reach + 3) };
+            float rise = Mathf.Tan(Mathf.Clamp(22 - height * .6f, 8, 20) * Mathf.Deg2Rad), lim = zone.Zone.size / 2 - 12, best = float.MaxValue;
+            var mid = at; var nearby = crowns.FindAll(q => Flat(q.center, mid) < distances[1] + 12);
+            for (int k = 0; k < 16; k++)
+            {
+                float turn = (k + 1) / 2 * (k % 2 == 1 ? -22.5f : 22.5f), a = (bearing + turn) * Mathf.Deg2Rad;
+                var outward = new Vector2(Mathf.Sin(a), Mathf.Cos(a));
+                for (int j = 0; j < distances.Length; j++)
+                {
+                    float score = Mathf.Abs(turn) / 45 + j * .6f; if (score >= best) continue;
+                    var p = at + outward * distances[j];
+                    if (Mathf.Abs(p.x) > lim || Mathf.Abs(p.y) > lim) continue;
+                    float floor = zone.HeightAt(p.x, p.y) + 2.2f;
+                    if (zone.WaterAt(p, out float s, out _)) floor = Mathf.Max(floor, s + 2);
+                    var cam = new Vector3(p.x, Mathf.Max(focus.y + distances[j] * rise, floor), p.y);
+                    var sight = focus - cam; float length = sight.magnitude; sight /= length;
+                    if (sight.y < -.64f) continue;   // steeper than 40 degrees down: perched on a rise over it
+                    // Open air (not in scenery or within half a metre of a crown), and the landmark's middle in clear view.
+                    bool shut = false;
+                    foreach (var c in Physics.OverlapSphere(cam, .8f, ~0, QueryTriggerInteraction.Ignore)) if (!Ignored(c)) { shut = true; break; }
+                    foreach (var cb in nearby) if (cb.SqrDistance(cam) < .25f) { shut = true; break; }
+                    if (shut || Blocked(cam, focus, at, reach, root, .4f) || UnderWater(zone, cam, focus)) continue;
+                    // The rest costs: the landmark's foot hidden, a roof or rock under the camera, each tree short of the landmark.
+                    if (Blocked(cam, new Vector3(at.x, ground + .6f, at.y), at, reach, root, .25f)) score += 1.5f;
+                    if (Physics.Raycast(cam, Vector3.down, out var under, 60, ~0, QueryTriggerInteraction.Ignore) && under.collider.bounds.size.x < 60 && !Ignored(under.collider)) score += 1;
+                    var ray = new Ray(cam, sight); float gap = length * (1 - reach / distances[j]);
+                    if (root != null) { if (ob.IntersectRay(ray, out float enter)) gap = enter; }
+                    else foreach (var cb in nearby) if (Flat(cb.center, at) < reach) { var e = cb; e.Expand(.3f); if (e.IntersectRay(ray, out float hit)) gap = Mathf.Min(gap, hit); }
+                    foreach (var cb in nearby) if (root != null || Flat(cb.center, at) >= reach) { var e = cb; e.Expand(.3f); if (e.IntersectRay(ray, out float hit) && hit < gap - .5f) score += 1; }
+                    if (score < best) { best = score; camera = cam; near = cam + sight * gap; }
+                }
+            }
+            return best < float.MaxValue;
+        }
+        /// <summary>
+        /// True when scenery stops a sphere swept from a to b short of the landmark. Characters and trees never count (trees
+        /// fade). For a prop only the prop itself and the ground in its circle may be in the way; otherwise anything in its circle.
+        /// </summary>
+        static bool Blocked(Vector3 a, Vector3 b, Vector2 at, float reach, Transform root, float radius)
+        {
+            var d = b - a; float length = d.magnitude;
+            foreach (var hit in Physics.SphereCastAll(a, radius, d / length, length, ~0, QueryTriggerInteraction.Ignore))
+            {
+                var c = hit.collider; if (Ignored(c) || root != null && c.transform.IsChildOf(root)) continue;
+                if (hit.distance <= 0 || Flat(hit.point, at) > reach || root != null && c.bounds.size.x < 60 && c.bounds.size.z < 60) return true;
+            }
+            return false;
+        }
+        static bool Ignored(Collider c) { return c.GetComponentInParent<Crulanda.Gameplay.Actor>() != null || c.GetComponentInParent<Crulanda.World.TreeFade>() != null; }
+        static float Flat(Vector3 p, Vector2 at) { return Vector2.Distance(new Vector2(p.x, p.z), at); }
+        /// <summary>True when the line from a to b dips under a water surface anywhere along it.</summary>
+        static bool UnderWater(Crulanda.World.ZoneBuilder zone, Vector3 a, Vector3 b)
+        {
+            for (int i = 0; i <= 8; i++) { var p = Vector3.Lerp(a, b, i / 8f); if (zone.WaterAt(new Vector2(p.x, p.z), out float s, out _) && p.y < s + .1f) return true; }
+            return false;
         }
         void CaptureWorld(string path)
         {

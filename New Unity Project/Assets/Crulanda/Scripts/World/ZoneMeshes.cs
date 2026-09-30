@@ -21,6 +21,7 @@ namespace Crulanda.World
             Quad(v, t, aR + d, bR + d, bL + d, aL + d); // underside
             Tri(v, t, aL, bL, rL); Tri(v, t, bR, aR, rR); // gable ends (closed triangles)
             Quad(v, t, aL + d, aL, aR, aR + d); Quad(v, t, bR + d, bR, bL, bL + d); // eave edges
+            Quad(v, t, aR + d, aR, bR, bR + d); Quad(v, t, bL + d, bL, aL, aL + d); // slab ends under the gables (left open, the eave slab read as a loose board)
             var m = Build("Gable roof", v, t);
             // Planar UVs in metres (x along the ridge, distance up the slope) so thatch/slate textures tile at a steady scale.
             var uv = new List<Vector2>();
@@ -89,6 +90,50 @@ namespace Crulanda.World
                     t.AddRange(new[] { a, b, a + 1, a + 1, b, b + 1 });
                 }
             var m = Build("Blob", v, t); m.SetUVs(0, uv); return m;
+        }
+        /// <summary>
+        /// A tube lofted along a curve (trunks, limbs, roots): ring k sits at centre(rings[k]), square to the curve, with its
+        /// radius at each angle from radius(t, angle) (taper, gnarl, buttress ridges). Angle 0 points along <paramref name="reference"/>
+        /// (a direction the curve never runs along) squared to the curve, so the rings never twist. Normals come from the surface
+        /// function itself, so two tubes cut from one function at the same t meet without a shading seam. u wraps round
+        /// <paramref name="wraps"/> times; v is t * <paramref name="vPerT"/>, or half the length along when that is 0. No end caps:
+        /// an end sits inside another part or underground, or the radius closes it to a point.
+        /// </summary>
+        public static Mesh Tube(Func<float, Vector3> centre, Func<float, float, float> radius, IList<float> rings, int sides, Vector3 reference, int wraps = 1, float vPerT = 0)
+        {
+            Vector3 At(float t, float a)
+            {
+                var tan = (centre(t + .002f) - centre(t - .002f)).normalized;
+                var n = (reference - tan * Vector3.Dot(reference, tan)).normalized;
+                return centre(t) + (n * Mathf.Cos(a) + Vector3.Cross(tan, n) * Mathf.Sin(a)) * radius(t, a);
+            }
+            int cols = sides + 1; var v = new Vector3[rings.Count * cols]; var nrm = new Vector3[v.Length]; var uv = new Vector2[v.Length];
+            float along = 0; var last = centre(rings[0]);
+            for (int k = 0; k < rings.Count; k++)
+            {
+                float t = rings[k]; var c = centre(t); along += Vector3.Distance(c, last); last = c;
+                for (int s = 0; s < cols; s++)
+                {
+                    float a = 2 * Mathf.PI * (s % sides) / sides; int i = k * cols + s;   // the seam column repeats column 0 exactly
+                    v[i] = At(t, a);
+                    var n = Vector3.Cross((At(t + .01f, a) - At(t - .01f, a)).normalized, (At(t, a + .02f) - At(t, a - .02f)).normalized);
+                    if (n.sqrMagnitude < 1e-6f) n = (centre(t + .01f) - centre(t - .01f)) * (k == 0 ? -1 : 1);   // a closed tip: along the curve, outward
+                    n.Normalize(); nrm[i] = Vector3.Dot(n, v[i] - c) < 0 ? -n : n;   // away from the axis
+                    uv[i] = new Vector2((float)s / sides * wraps, vPerT > 0 ? t * vPerT : along / 2);
+                }
+            }
+            // Wound to face outward (a front face's Cross(p1 - p0, p2 - p0) points at the viewer): test one quad, wind them all alike.
+            int q = (rings.Count - 2) / 2 * cols; bool fwd = Vector3.Dot(Vector3.Cross(v[q + cols] - v[q], v[q + 1] - v[q]), nrm[q]) > 0;
+            var tri = new int[(rings.Count - 1) * sides * 6];
+            for (int k = 0, j = 0; k + 1 < rings.Count; k++)
+                for (int s = 0; s < sides; s++)
+                {
+                    int a = k * cols + s, b = a + 1, c = a + cols, d = c + 1;
+                    if (fwd) { tri[j++] = a; tri[j++] = c; tri[j++] = b; tri[j++] = b; tri[j++] = c; tri[j++] = d; }
+                    else { tri[j++] = a; tri[j++] = b; tri[j++] = c; tri[j++] = b; tri[j++] = d; tri[j++] = c; }
+                }
+            var m = new Mesh { name = "Tube" }; m.vertices = v; m.normals = nrm; m.uv = uv; m.triangles = tri; m.RecalculateBounds();
+            return m;
         }
         /// <summary>Square ground grid of <paramref name="size"/> metres; UV (0..1) spans the whole zone for the painted texture.</summary>
         public static Mesh Ground(float size, int segments, Func<float, float, float> height)

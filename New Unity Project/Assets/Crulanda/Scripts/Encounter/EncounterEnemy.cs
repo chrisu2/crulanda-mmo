@@ -27,18 +27,26 @@ namespace Crulanda.Encounter
         float lungeUntil, unreachableSince = -1;
         public void Hide()
         {
-            Hidden = true; var body = transform.Find("Body");
-            if (body != null) body.localPosition = new Vector3(0, -.55f, 0);   // crouched down in the grass
+            Hidden = true; var body = transform.Find("Body"); var look = GetComponent<ActorVisual>();
+            // Crouched down in the grass; beasts lie with the belly on the ground and the legs folded, not sunk into it.
+            if (body != null) body.localPosition = new Vector3(0, -(look != null && look.LieDepth > 0 ? look.LieDepth : .55f), 0);
+            if (look != null) look.LyingLow = true;
         }
         /// <summary>Springs out at the player: a fast lunge, a snarl, and straight into the fight.</summary>
         void Pounce()
         {
             Hidden = false; var body = transform.Find("Body"); if (body != null) body.localPosition = Vector3.zero;
+            var look = GetComponent<ActorVisual>(); if (look != null) look.LyingLow = false;
             threat.Add(session.Player.EntityId.Value, 40);
             lungeUntil = Time.time + 1.1f;
             session.FloatText(transform.position + Vector3.up * .6f, "!", new Color(1, .35f, .2f));
             session.Message(actor.DisplayName + " springs out of the grass!");
         }
+        /// <summary>
+        /// How far from its camp's centre (as a fraction of the camp radius) an ambusher lies. Tall grass fills its patch
+        /// (camp radius + 4) only where the ground is open; elsewhere only the inner 30% is sure to be grass (GrassField).
+        /// </summary>
+        public static float AmbushSpread(float campRadius) { return Mathf.Min(.7f, .3f * (campRadius + 4) / Mathf.Max(1, campRadius)); }
         // ---------- level scaling ----------
         /// <summary>Health for a mob of this level. Story enemies are sturdier; veterans 1.4x; camp elites 2.2x; beasts a little lighter.</summary>
         public static int MobHealth(int level, bool story, bool elite, bool beast)
@@ -102,6 +110,8 @@ namespace Crulanda.Encounter
             // Reach: 2.6 m across the ground and 1.6 m of height (a wading target sits lower than one on the bank).
             var gap = Victim.transform.position - transform.position; float across = new Vector2(gap.x, gap.z).magnitude;
             bool inReach = across < 2.6f && Mathf.Abs(gap.y) < 1.6f;
+            // No coasting into (and through) the target after a charge or a lunge out of the grass: stop dead on arrival.
+            if (agent.isOnNavMesh && !agent.pathPending && agent.remainingDistance <= agent.stoppingDistance) agent.velocity = Vector3.zero;
             // Evade: a target it cannot reach (swimming, across deep water) for 4 s makes it give up and go home whole.
             bool blocked = agent.isOnNavMesh && !agent.pathPending && agent.pathStatus != NavMeshPathStatus.PathComplete;
             if (!inReach && blocked) { if (unreachableSince < 0) unreachableSince = Time.time; else if (Time.time - unreachableSince > 4) { session.Message(actor.DisplayName + " gives up the chase."); ResetFight(); return; } }
@@ -144,7 +154,7 @@ namespace Crulanda.Encounter
         void Respawn()
         {
             respawnAt = float.MaxValue;
-            var at = session.Zone != null ? session.Zone.Ground(CampCenter + Random.insideUnitCircle * CampRadius, 0) : home;
+            var at = session.Zone != null ? session.Zone.Ground(CampCenter + Random.insideUnitCircle * CampRadius * (Ambusher ? AmbushSpread(CampRadius) : 1), 0) : home;
             if (NavMesh.SamplePosition(at, out var hit, 3, NavMesh.AllAreas)) at = hit.position;
             if (agent.isOnNavMesh) agent.Warp(at); else transform.position = at + Vector3.up;
             home = transform.position;

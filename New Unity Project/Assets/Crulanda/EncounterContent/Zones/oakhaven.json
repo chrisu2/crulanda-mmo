@@ -532,7 +532,7 @@
   "landmarks": [
     {
       "name": "The Great Oak",
-      "text": "Dead for a generation, still the heart of the green.",
+      "text": "Ancient and in full leaf: the heart of the green.",
       "at": {
         "x": 0,
         "y": 0
@@ -546,7 +546,13 @@
         "x": -14,
         "y": -16
       },
-      "radius": 9
+      "radius": 9,
+      "view": {
+        "x": -3,
+        "y": -12
+      },
+      "viewPitch": 16,
+      "viewZoom": 16
     },
     {
       "name": "Communal Well",
@@ -564,7 +570,12 @@
         "x": 94,
         "y": 4
       },
-      "radius": 10
+      "radius": 10,
+      "view": {
+        "x": 88,
+        "y": 4
+      },
+      "viewPitch": 12
     },
     {
       "name": "Oak creek mill",
@@ -600,7 +611,13 @@
         "x": 86,
         "y": 20
       },
-      "radius": 8
+      "radius": 8,
+      "view": {
+        "x": 77,
+        "y": 20
+      },
+      "viewPitch": 18,
+      "viewZoom": 7
     },
     {
       "name": "Harrow hen coop",
@@ -686,7 +703,7 @@
   ],
   "props": [
     {
-      "kind": "dead_oak",
+      "kind": "great_oak",
       "name": "The Great Oak",
       "at": {
         "x": 0,
@@ -1035,8 +1052,8 @@
     {
       "kind": "crates",
       "at": {
-        "x": -40,
-        "y": 46
+        "x": -39,
+        "y": 47
       },
       "rotation": 135,
       "variant": 1
@@ -1444,17 +1461,13 @@
       "variant": 2
     },
     {
-      "kind": "ruin",
+      "kind": "wayshrine",
       "name": "Old wayshrine",
       "at": {
         "x": 86,
         "y": 20
       },
-      "rotation": 15,
-      "size": {
-        "x": 5,
-        "y": 0
-      }
+      "rotation": 90
     },
     {
       "kind": "rock",
@@ -1498,8 +1511,8 @@
     {
       "kind": "lamp",
       "at": {
-        "x": -84,
-        "y": 38
+        "x": -89.5,
+        "y": 40
       },
       "variant": 1
     },

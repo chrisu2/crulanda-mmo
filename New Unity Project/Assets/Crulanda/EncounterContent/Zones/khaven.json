@@ -298,6 +298,17 @@
       ]
     }
   ],
+  "lakes": [
+    {
+      "name": "Drowned graves",
+      "center": {
+        "x": 4,
+        "y": -99
+      },
+      "radius": 5.5,
+      "depth": 0.85
+    }
+  ],
   "groves": [
     {
       "name": "The Whispering Wood",
@@ -430,7 +441,13 @@
         "x": -12,
         "y": 15
       },
-      "radius": 8
+      "radius": 8,
+      "view": {
+        "x": 0,
+        "y": 13
+      },
+      "viewPitch": 8,
+      "viewZoom": 16
     },
     {
       "name": "The Whispering Wood",
@@ -472,10 +489,15 @@
       "name": "Drowned graveyard",
       "text": "When the creek floods, it takes the low graves.",
       "at": {
-        "x": 6,
-        "y": -96
+        "x": 5,
+        "y": -99
       },
-      "radius": 10
+      "radius": 10,
+      "view": {
+        "x": 17,
+        "y": -97
+      },
+      "viewPitch": 28
     },
     {
       "name": "Creek barrow",
@@ -484,7 +506,13 @@
         "x": 44,
         "y": -100
       },
-      "radius": 8
+      "radius": 8,
+      "view": {
+        "x": 48,
+        "y": -90
+      },
+      "viewPitch": 18,
+      "viewZoom": 10
     },
     {
       "name": "Outrider camp",
@@ -1055,23 +1083,29 @@
     {
       "kind": "grave",
       "at": {
-        "x": 0,
-        "y": -98
-      }
+        "x": 1,
+        "y": -97
+      },
+      "rotation": 20,
+      "variant": 1
     },
     {
       "kind": "grave",
       "at": {
-        "x": 3,
-        "y": -100
-      }
+        "x": 0.5,
+        "y": -100.5
+      },
+      "rotation": -35,
+      "variant": 1
     },
     {
       "kind": "grave",
       "at": {
-        "x": 8,
-        "y": -99
-      }
+        "x": 7,
+        "y": -96
+      },
+      "rotation": 70,
+      "variant": 1
     },
     {
       "kind": "grave",
@@ -1083,16 +1117,20 @@
     {
       "kind": "grave",
       "at": {
-        "x": 4,
-        "y": -104
-      }
+        "x": 6,
+        "y": -103.5
+      },
+      "rotation": 150,
+      "variant": 1
     },
     {
       "kind": "grave",
       "at": {
         "x": 9,
         "y": -103
-      }
+      },
+      "rotation": -60,
+      "variant": 1
     },
     {
       "kind": "ruin",
@@ -1114,7 +1152,8 @@
         "x": 44,
         "y": -100
       },
-      "rotation": 160
+      "rotation": 160,
+      "variant": 1
     },
     {
       "kind": "cliff",

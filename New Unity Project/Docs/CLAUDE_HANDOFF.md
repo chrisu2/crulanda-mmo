@@ -9,22 +9,29 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-09-29, about 18:50)
+## RESUME HERE (paused 2026-09-29, about 21:30, at Chris's request)
 Chris's rules:
 - Work in order of importance and finish each step.
 - Keep going without waiting for him, using parallel agents (memory: crulanda-autonomy).
+- Tell him when each step is published.
 
 **State:**
-- **Step 2 is PUBLISHED** to `outputs\Crulanda-Playable`. Chris has been told.
-  - It includes step 2's zone looks, its fix round and the travel hardening.
-  - Tests: EditMode 166/166, PlayMode 50/50, including the new ZoneExitTests, which walks into every exit and travels.
-- The zone-travel bug: the new test passes for all 8 exits. The published `76ed4eb` build had the phantom-Wasting wall, which blocked the Peaks' road east and Khaven's east side. Travel is now refused only by a fight within 40 m.
-  - Chris's save was at (-20, 120), the north edge of Oakhaven, where there is no exit. Oakhaven's exits are west (to Khaven) and south (to the Ash Rim).
-- Step 2 polish still to do, alongside step 3:
-  - Khaven roads need more contrast: a greyer, darker brown.
-  - The pine cluster above the peaks-09 exit still floats.
-  - Peaks sunlit rock is still about 135-148; the target is 110-130.
-  - The oakhaven-18 sky seam is unchanged: probably the sun shafts or a haze-bank edge, not the curtain.
+- **Steps 1-3 are PUBLISHED** to `outputs\Crulanda-Playable`.
+  - Step 3 covers: the living Great Oak, better trunks, critter legs, the Weave-Eater remodelled to canon, the Pale, floating props fixed, landmarks that match their names, the step 2 polish, and the sky-seam fix in TreeFade's shadow pass.
+  - Tests: EditMode 166/166, PlayMode 50/50, 0 shader errors.
+  - Spot-checked: oakhaven-02 (oak), ashrim-03 (Weave-Eaters), khaven-06 (road).
+  - A full per-landmark verification workflow was NOT run. Do one early next session, using the shots in `work\world-captures`.
+- Minor notes seen: the Great Oak's canopy is big, uniform blobs (could be broken up more); Khaven's dead trees still show banded joints (DeadTree cylinders).
+
+**Next:**
+1. **Step 4, HUD:** apply `tools\pending-patches\step4-hud.json` (overlaps, readability).
+   - Its `overlaps` patch rewrites `EncounterHud` label drawing and was already rebased once. Expect skipped edits; merge them.
+   - Also add world labels at exits ("Road to Khaven Village (3-5)") within about 30 m, so exits are easy to find. Chris was lost at a map edge with no exit.
+2. **Step 5, stylized turquoise water:**
+   - The design workflow `step5-stylized-water` was still running at the pause. If `tools\pending-patches\step5-stylized-water.raw.json` exists, use it (the review's `correctedNewFiles`/`correctedEdits`).
+   - Otherwise re-run the design, which asks for: a depth colour ramp (pale teal to turquoise to deep teal), soft wobbly white foam at shores and objects, stylized sparkle bands, and little reflection.
+   - Khaven stays murky.
+3. **Step 6:** the painted style pass on all zones, keeping each zone's mood (see memory crulanda-direction).
 
 **Next, in order:**
 0. ~~Zone-travel bug~~: fixed or verified on 2026-09-29 (see above). The original report: Chris, 2026-09-29, playing the published build `76ed4eb`.
@@ -71,7 +78,15 @@ Chris's rules:
      - Add legs (cat: four slim legs and paws; chicken and crow: two thin legs and feet; rabbit: haunches and forepaws), sized so the bodies stand on the ground.
      - Add a simple leg swing while they move, like the villagers' walk.
 3. **Step 4, HUD overlaps and readability:** `tools\pending-patches\step4-hud.json`.
-4. **Step 5, water realism** (Chris: "still looks plasticky"): `tools\pending-patches\step5-water-realism.json`.
+4. **Step 5: STYLIZED TURQUOISE WATER.** Chris's decision on 2026-09-29 replaces the realism plan. His reference was a screenshot of a lush tropical cove from a stylized MMO; use it for STYLE only, copying no assets or names.
+   - Bright clear pale-teal shallows over a visible sandy bed, deepening to rich turquoise and blue.
+   - Soft white foam lines at the shores and around rocks and legs, painted ripple highlights, little mirror reflection.
+   - Oakhaven, the Peaks and the Ash Rim get it. Khaven's Gloom Creek stays murky.
+   - The see-through water, murk and touch-foam we already have are the base. From `tools\pending-patches\step5-water-realism.json`, only parts of 'surface-detail' may still help (layered ripples); the planar-reflection camera is not needed for this style.
+5. **Step 6: PAINTED STYLE PASS on all zones, keeping each zone's mood** (Chris's decision the same day).
+   - Richer, saturated colour; many more plant types (broad leaves, ferns, flowers, tall grasses).
+   - Sculpted rock formations with painted gradient shading; chunky stylized props (rope-and-post wooden bridges); a warm, clear sky.
+   - Khaven stays grim dusk and the Ash Rim stays grey, painted in their own palettes.
    - A planar reflection camera (`WaterReflection.cs` is in `newFiles`), plus finer ripples and sparkle.
 
 **Helper scripts** (`D:\code\mmo\tools\validation`):

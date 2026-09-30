@@ -42,6 +42,8 @@ namespace Crulanda.World
         public ZoneLake[] lakes = new ZoneLake[0];
         /// <summary>Patches of tall, dense grass (ambush camps get their own automatically).</summary>
         public ZoneCircle[] tallGrass = new ZoneCircle[0];
+        /// <summary>Landmark ground: level pads, raised perches and sunk basins (see <see cref="ZoneShape"/>).</summary>
+        public ZoneShape[] shapes = new ZoneShape[0];
         /// <summary>Pin on the overworld map, normalised 0..1 from the image's top-left corner.</summary>
         public Vector2 worldMapPosition = new Vector2(-1, -1);
         public string worldMapNote;
@@ -121,9 +123,25 @@ namespace Crulanda.World
     [Serializable] public sealed class ZoneRect { public string name; public Vector2 center, size; public float rotation; public string crop = "soil"; }
     [Serializable] public sealed class ZoneCircle { public string name; public Vector2 center; public float radius = 8; }
     /// <summary>
-    /// kind: house, inn, barn, well, dead_oak, tree, pine, fence, haystack, cart, barrels, crates, lamp, grave, rock, bridge,
-    /// hedge, signpost, ruin, ruined_house, wall (uses points), tower, gallows, crypt, cliff.
-    /// rotation in degrees (0 = door faces south). variant picks colour/size variations.
+    /// Landmark ground, applied over the land (relief and cliff lifts included) before water: a level pad of radius easing
+    /// back to the land over blend metres. It sits at the mean ground round its edge plus height (0: level; negative: a sunk
+    /// basin); with a positive height it is a perch, that high above the lowest ground round its foot (radius + blend).
+    /// paint (optional): mud (a wallow's wet ground) or unmade (the Wasting's grey, thread-veined ground); painted ground
+    /// grows no grass.
+    /// </summary>
+    [Serializable] public sealed class ZoneShape
+    {
+        public string name, paint; public Vector2 center; public float radius = 8, height, blend = 6;
+        [NonSerialized] public float level;   // set by ZoneBuilder.PrepareShapes
+    }
+    /// <summary>
+    /// kind: house, inn, barn, well, dead_oak, great_oak (the living Great Oak with its bench ring), tree, pine, fence, haystack, cart, barrels, crates, lamp, grave, rock, bridge,
+    /// hedge, signpost, ruin, ruined_house, wall (uses points), tower, gallows, crypt, cliff, wayshrine (a wayside shrine).
+    /// Landmarks: gate (size.x the gap between two towers), keep, perch (rocks round a raised ZoneShape; size.x its radius),
+    /// wallow, cave (size.x the face), shelter, brazier (variant 1: bone legs), brood, rib (size: reach to the spine, height),
+    /// spine (size: length, height), shrine (the Cult of Ash's), idol.
+    /// rotation in degrees (0 = door faces south). variant picks colour/size variations; some are looks of their own:
+    /// well 1 blood-stone, inn 1 the Cracked Hearth (split, glowing chimney), crypt 1 a turfed barrow, grave 1 heaved over.
     /// </summary>
     [Serializable] public sealed class ZoneProp
     {
@@ -155,7 +173,11 @@ namespace Crulanda.World
         /// <summary>The unmade edge: everything east of <see cref="x"/> greys out; a static curtain stands at x.</summary>
         public float x = 58, curtainHeight = 26, fade = 14; public string note;
     }
-    [Serializable] public sealed class ZoneLabel { public string name, text; public Vector2 at; public float radius = 10; }
+    /// <summary>
+    /// A named place, labelled over <see cref="at"/>. view (optional): where the capture tour stands to frame it, facing at
+    /// (unset: from its south-west); viewPitch and viewZoom set that shot's camera (0: 17 degrees, 11 m).
+    /// </summary>
+    [Serializable] public sealed class ZoneLabel { public string name, text; public Vector2 at; public float radius = 10; public Vector2 view; public float viewPitch, viewZoom; }
 
     public static class ZoneColors
     {

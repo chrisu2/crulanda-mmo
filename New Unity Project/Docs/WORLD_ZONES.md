@@ -11,7 +11,7 @@ Status 2026-09-28. The game opens in **Oakhaven** (`Assets/Crulanda/Scenes/Oakha
   a painted ground texture (grass variation, dirt roads with wheel ruts, tilled/stubble fields, clearings, muddy banks,
   grey unmade ground), water ribbons, props, forest edges on three sides, the Wasting, lighting/fog/sky and boundaries.
   Scenery is static-batched after generation.
-- Prop kinds: house, inn (walk-in), barn, mill, coop, forge, stall, oven, tannery, woodpile, well, dead_oak, tree, pine, fence, hedge, haystack, cart, barrels, crates, lamp, grave,
+- Prop kinds: house, inn (walk-in), barn, mill, coop, forge, stall, oven, tannery, woodpile, well, dead_oak, great_oak (Oakhaven's living Great Oak, with a stone bench ring), tree, pine, fence, hedge, haystack, cart, barrels, crates, lamp, grave,
   rock, bridge, signpost, ruin. Solid props carry `NavBlocker`; bridge decks carry `NavWalkable`.
 - `EncounterNavigation` builds the navmesh from the generated ground + bridge decks, cuts out blockers and blocks water
   so enemies path over bridges. Without a zone it falls back to the old name-based Quiet Trail logic.
@@ -26,14 +26,14 @@ Status 2026-09-28. The game opens in **Oakhaven** (`Assets/Crulanda/Scenes/Oakha
 ## Checking visuals without playing
 - `Crulanda.exe --crulanda-world-capture <dir>`: scenic tour screenshots (HUD hidden), isolated temp save.
 - `Crulanda.exe --crulanda-ui-capture <dir> [--crulanda-class class.druid]`: talent panel + combat HUD screenshots.
-Both need a visible window (not -batchmode). Latest shots: workspace `work\world-captures`, `work\ui-captures`.
+Both need a visible window (not -batchmode). Latest shots: workspace `work\world-captures`, `work\ui-captures`. A landmark that sets `view` (where to stand, facing it) with `viewPitch`/`viewZoom` is shot from there as authored. Other landmarks, and the first exit's waystone, are shot from a searched viewpoint with the player hidden (`LandmarkView`: a named prop is framed on its own bounds, a building from its front). When no spot is clear, the tour falls back to the orbit from the south-west and logs it.
 
 ## Oakhaven (CANON-EXPANDED)
 Canon: an eastern agricultural hub erased by an accelerated, localized Wasting that hid the Council's abduction of
 resonance candidates (source: `D:\code\crulanda\maps\interactive_map.html`, `maps\oakhaven_village_map.png`).
 The zone is Oakhaven before that erasure (the game is set before it happens): the Great Oak on the green, the Golden Cask inn (canon name, book1\chapter_4.md), the communal well,
 fields, Oak creek with two bridges, and the Wasting eating the eastern edge as grey static.
-GAME-ONLY / PROVISIONAL: the Concord collectors and warden, Mira, exact building placement, the chapel ruin and graves.
+GAME-ONLY / PROVISIONAL: the Concord collectors and warden, Mira, exact building placement, the chapel ruin and graves, and the old wayshrine at the edge of the grey.
 
 ## Khaven Village (CANON-EXPANDED)
 Canon names from `maps\khaven_village_map.png`: the Cracked Hearth, two Fallen Smithies, the Blood-Stone Well, the Gallows
@@ -43,7 +43,7 @@ Biome `gloom`: hard grey-brown earth, thin dry grass and no flowers, grey dead w
 rose-violet grade. The dusk holds all day: `lighting.sunHigh` keeps the sun low, and `skyTint`/`skyExposure`/`skyHaze` give a
 dusky sky, while night still falls on the global clock. No Wasting here: only zones whose JSON has a `wasting` block get one.
 GAME-ONLY / PROVISIONAL: the Sandthrone outriders holding it (Sandthrone is a canon mercenary faction), the Pale watcher
-(canon "Pale Things" as cosmic auditors), the crypt and all exact placement.
+(canon "Pale Things" as cosmic auditors), the crypt and all exact placement. GAME-ONLY looks: the Cracked Hearth's split chimney with the fire showing through (a reading of the canon name; the map draws it as the inn), the drowned graveyard's flood pool and heaved graves, and the creek barrow's turf mound.
 
 ## The Shattered Peaks (CANON-EXPANDED), levels 6-8
 Canon: a jagged range on the eastern border that holds back the Wasting while the void slowly eats the stone (world_bible.md).
@@ -158,7 +158,7 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
   a character saved in another zone is rebuilt there. `--crulanda-zone <id>` picks a zone for capture tools.
 - Roads: Oakhaven west ↔ Khaven, Khaven north ↔ Peaks, Peaks east ↔ Ash Rim, and Ash Rim north ↔ Oakhaven south (marked dangerous, 9-10).
   Minimap and zone-map exits show the destination's level band. The world map draws the roads. Grove areas (`groves`: dead / pine / broadleaf) fill forests and darken
-  the ground beneath them. New prop kinds: ruined_house, wall (polyline), tower, gallows, crypt, cliff; well variant 1 = blood-stone.
+  the ground beneath them. New prop kinds: ruined_house, wall (polyline), tower, gallows, crypt, cliff, wayshrine (a wayside shrine); Peaks and Ash Rim landmarks: gate, keep, perch, wallow, cave, shelter, brazier, brood, rib, spine, shrine (the Cult of Ash's), idol; well variant 1 = blood-stone, inn 1 = the Cracked Hearth (split, glowing chimney), crypt 1 = a turfed barrow, grave 1 = heaved over and half sunk.
 
 ## Life, day and night (GAME-ONLY)
 - `life` in the zone JSON: villager count, mood (`wary` / `afraid`) and critter groups (chicken, rabbit, crow, deer,

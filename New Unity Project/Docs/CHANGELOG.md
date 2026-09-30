@@ -253,3 +253,39 @@ These fix the "water, edges, night" group of `Docs/VISUAL_REVIEW_2026-09-29.md`.
   - A pine cluster above the Peaks exit still floats.
   - Peaks rock is still a little pale.
   - A straight sky seam in `oakhaven-18`, probably the sun shafts rather than the curtain.
+
+## 2026-09-29 — Step 3: props, landmarks and creatures
+- **The Great Oak** (new prop kind `great_oak`) is the living centrepiece of Oakhaven's green.
+  - CANON: book1 ch.4 describes it as massive and ancient, the heart of the square, later petrified mid-bloom. The game is set before that, so it is alive and in full leaf.
+  - Built as:
+    - one lofted, tapered trunk with gnarls, fluting and burls, on a twisting buttress flare, with surface roots;
+    - five sprawling limbs that merge smoothly into the bole;
+    - a layered crown of about 45 leaf clumps (about 21 m tall and 24 m across);
+    - a low dry-stone bench ring.
+  - The zone's random draws are kept, so the village layout doesn't move.
+- **Trees:** broadleaf and orchard trunks taper, lean slightly, and have a buttress root flare instead of the pipe collar. There are six bark shades, and limbs grow out of the trunk toward the crown. Trees keep a minimum spacing.
+- **Critters have legs:**
+  - The cat has four legs and paws, sometimes white socks. The chicken and crow have thin legs with toes. The rabbit has haunches and forepaws.
+  - The legs swing with the stride, and flying crows glide and fold their wings.
+- **Creatures:**
+  - The Pale's head is attached, and they read as tall, gaunt figures in robes.
+  - The Weave-Eater is remodelled to canon (book1 ch.20): a drifting, frayed, flickering mass of unravelling threads that moves in jerks. It is not a dog.
+- **Floating and clipping props fixed:**
+  - the inn sign's bracket, broadleaf limbs, the tannery beam, the bakehouse oven's woodstack and peel;
+  - house doors, rails and plinths on slopes, the stacked crates, ruin beams and roofs;
+  - hill-seated footings, and crows' wings in flight.
+- **Landmarks that match their names:**
+  - Oakhaven: the wayshrine, the Wasting view, and the Golden Cask front.
+  - Khaven: the drowned graveyard, a flooded pool with heaved-over graves; the Cracked Hearth, a split chimney breast with the fire showing through; and the Creek barrow, a mound with a stone doorway and passage.
+  - Peaks: the toll gate, gate leaves on a carved road; the Captain's Eyrie, a keep on a rocky perch; Umbra Scarp; and Rockhide Wallow, a mud pool.
+  - Ash Rim:
+    - the Ash-Walker cave enclave, cave mouths in a cliff with hide-and-bone shelters;
+    - the Brood nest;
+    - the Old Ribcage, paired bone ribs along a spine;
+    - the Tear-marked shrine, an altar, bone-mask idols and braziers.
+- **Capture tour:** landmark shots search for a clear viewpoint, or use an authored `view`.
+- **Step 2 polish:**
+  - Khaven roads and clearings are now a neutral dark earth.
+  - Peaks backdrop trees and tors stand on the drawn ground, and pines aren't placed on near-vertical slopes.
+  - Peaks rock is darker.
+- **The oakhaven-18 sky seam is fixed.** A faded tree was still written whole into the camera's depth texture, cutting the soft haze and curtain along its silhouette. Its ShadowCaster pass now dithers like the tree does.

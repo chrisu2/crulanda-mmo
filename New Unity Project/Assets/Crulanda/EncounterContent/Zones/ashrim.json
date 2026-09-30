@@ -96,6 +96,49 @@
       "radius": 7
     }
   ],
+  "shapes": [
+    {
+      "name": "Enclave yard",
+      "center": {
+        "x": 68,
+        "y": 0
+      },
+      "radius": 11,
+      "height": 0,
+      "blend": 7
+    },
+    {
+      "name": "Shrine ground",
+      "center": {
+        "x": -64,
+        "y": -72
+      },
+      "radius": 8,
+      "height": 0,
+      "blend": 6
+    },
+    {
+      "name": "The old ribcage",
+      "center": {
+        "x": -22,
+        "y": -96
+      },
+      "radius": 12,
+      "height": 0,
+      "blend": 6
+    },
+    {
+      "name": "The brood",
+      "paint": "unmade",
+      "center": {
+        "x": 54,
+        "y": -86
+      },
+      "radius": 5,
+      "height": -1.2,
+      "blend": 5
+    }
+  ],
   "roads": [
     {
       "name": "Ridge road",
@@ -263,11 +306,33 @@
   ],
   "props": [
     {
-      "kind": "crypt",
+      "kind": "cave",
       "name": "Ash-Walker caves",
       "at": {
-        "x": 72,
+        "x": 77,
         "y": 0
+      },
+      "rotation": 90,
+      "size": {
+        "x": 22,
+        "y": 0
+      }
+    },
+    {
+      "kind": "shelter",
+      "name": "Hide shelter",
+      "at": {
+        "x": 70,
+        "y": 12
+      },
+      "rotation": 90
+    },
+    {
+      "kind": "shelter",
+      "name": "Hide shelter",
+      "at": {
+        "x": 70,
+        "y": -11
       },
       "rotation": 90
     },
@@ -337,30 +402,27 @@
       }
     },
     {
-      "kind": "lamp",
+      "kind": "brazier",
       "at": {
         "x": 64,
         "y": 9
       },
-      "rotation": 180,
       "variant": 1
     },
     {
-      "kind": "lamp",
+      "kind": "brazier",
       "at": {
         "x": 64,
         "y": -9
       },
-      "rotation": 180,
       "variant": 1
     },
     {
-      "kind": "lamp",
+      "kind": "brazier",
       "at": {
         "x": 52,
         "y": 0
       },
-      "rotation": 90,
       "variant": 1
     },
     {
@@ -388,7 +450,7 @@
         "y": -14
       },
       "rotation": 90,
-      "variant": 1
+      "variant": 3
     },
     {
       "kind": "crates",
@@ -421,65 +483,69 @@
       "rotation": 90
     },
     {
-      "kind": "ruin",
+      "kind": "shrine",
       "name": "Purple-tear shrine",
       "at": {
         "x": -64,
         "y": -72
       },
-      "rotation": 0,
+      "rotation": 203,
       "size": {
-        "x": 4,
+        "x": 5,
         "y": 0
       },
       "interact": "Topple the purple-tear shrine",
       "once": true
     },
     {
-      "kind": "grave",
+      "kind": "idol",
+      "name": "Bone-mask idol",
       "at": {
         "x": -60,
         "y": -66
-      }
+      },
+      "rotation": 214
     },
     {
-      "kind": "grave",
+      "kind": "idol",
+      "name": "Bone-mask idol",
       "at": {
         "x": -68,
         "y": -66
-      }
+      },
+      "rotation": 146
     },
     {
-      "kind": "grave",
+      "kind": "idol",
+      "name": "Bone-mask idol",
       "at": {
         "x": -60,
         "y": -78
-      }
+      },
+      "rotation": 326
     },
     {
-      "kind": "grave",
+      "kind": "idol",
+      "name": "Bone-mask idol",
       "at": {
         "x": -68,
         "y": -78
-      }
+      },
+      "rotation": 34
     },
     {
-      "kind": "lamp",
+      "kind": "brazier",
       "at": {
         "x": -55,
         "y": -72
-      },
-      "rotation": 90,
-      "variant": 1
+      }
     },
     {
-      "kind": "lamp",
+      "kind": "brazier",
       "at": {
         "x": -73,
         "y": -72
-      },
-      "rotation": 270,
-      "variant": 1
+      }
     },
     {
       "kind": "ruined_house",
@@ -531,94 +597,119 @@
       "once": true
     },
     {
-      "kind": "ruin",
+      "kind": "rib",
       "name": "Petrified rib",
       "at": {
         "x": -28,
         "y": -90
       },
-      "rotation": 90,
+      "rotation": 180,
       "size": {
-        "x": 2.2,
-        "y": 0
+        "x": 6,
+        "y": 7
       },
       "interact": "Chip off petrified bone",
       "item": "item.petrified_bone"
     },
     {
-      "kind": "ruin",
+      "kind": "rib",
       "name": "Petrified rib",
       "at": {
         "x": -22,
         "y": -88
       },
-      "rotation": 90,
+      "rotation": 180,
       "size": {
-        "x": 2.2,
-        "y": 0
+        "x": 8,
+        "y": 7
       },
       "interact": "Chip off petrified bone",
       "item": "item.petrified_bone"
     },
     {
-      "kind": "ruin",
+      "kind": "rib",
       "name": "Petrified rib",
       "at": {
         "x": -16,
         "y": -90
       },
-      "rotation": 90,
+      "rotation": 180,
       "size": {
-        "x": 2.2,
-        "y": 0
+        "x": 6,
+        "y": 7
       },
       "interact": "Chip off petrified bone",
       "item": "item.petrified_bone"
     },
     {
-      "kind": "ruin",
+      "kind": "rib",
       "name": "Petrified rib",
       "at": {
         "x": -28,
         "y": -102
       },
-      "rotation": 90,
+      "rotation": 0,
       "size": {
-        "x": 2.2,
-        "y": 0
+        "x": 6,
+        "y": 7
       },
       "interact": "Chip off petrified bone",
       "item": "item.petrified_bone"
     },
     {
-      "kind": "ruin",
+      "kind": "rib",
       "name": "Petrified rib",
       "at": {
         "x": -22,
         "y": -104
       },
-      "rotation": 90,
+      "rotation": 0,
       "size": {
-        "x": 2.2,
-        "y": 0
+        "x": 8,
+        "y": 7
       },
       "interact": "Chip off petrified bone",
       "item": "item.petrified_bone"
     },
     {
-      "kind": "ruin",
+      "kind": "rib",
       "name": "Petrified rib",
       "at": {
         "x": -16,
         "y": -102
       },
-      "rotation": 90,
+      "rotation": 0,
       "size": {
-        "x": 2.2,
-        "y": 0
+        "x": 6,
+        "y": 7
       },
       "interact": "Chip off petrified bone",
       "item": "item.petrified_bone"
+    },
+    {
+      "kind": "spine",
+      "name": "Old ribcage spine",
+      "at": {
+        "x": -22,
+        "y": -96
+      },
+      "rotation": 0,
+      "size": {
+        "x": 24,
+        "y": 7
+      }
+    },
+    {
+      "kind": "brood",
+      "name": "Brood nest",
+      "at": {
+        "x": 54,
+        "y": -86
+      },
+      "size": {
+        "x": 5,
+        "y": 0
+      }
     },
     {
       "kind": "ruined_house",

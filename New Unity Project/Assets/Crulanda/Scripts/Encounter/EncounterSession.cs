@@ -639,6 +639,8 @@ namespace Crulanda.Encounter
                 for (int n = 0; n < camp.count; n++)
                 {
                     var spot = camp.center + new Vector2((float)rng.NextDouble() - .5f, (float)rng.NextDouble() - .5f) * camp.radius * 2;
+                    // Hunters in hiding lie where the tall grass is sure to be, not out at the corners of the camp.
+                    if (camp.ambush) spot = camp.center + Vector2.ClampMagnitude(spot - camp.center, camp.radius) * EncounterEnemy.AmbushSpread(camp.radius);
                     var point = Zone.Ground(spot, 1);
                     if (NavMesh.SamplePosition(point, out var hit, 3, NavMesh.AllAreas)) point = hit.position + Vector3.up; else continue;
                     int level = camp.levelMin + rng.Next(Mathf.Max(1, camp.levelMax - camp.levelMin + 1));
@@ -646,7 +648,7 @@ namespace Crulanda.Encounter
                     bool elite = camp.elite && n == 0;
                     string id = "mob." + tag + "." + zoneShort + "." + c + "." + n;
                     var a = SpawnActor(elite ? camp.mob + " (elite)" : camp.mob, content.enemy, point, Color.grey, id, look, level);
-                    AddAgent(a.gameObject, look == ActorLook.Wolf ? 4.2f : look == ActorLook.Boar ? 3.8f : look == ActorLook.WeaveEater ? 3.4f : 2.8f);
+                    AddAgent(a.gameObject, look == ActorLook.Wolf ? 4.2f : look == ActorLook.Boar ? 3.8f : look == ActorLook.WeaveEater ? 3.4f : 2.8f, beast ? .6f : .45f);
                     var enemy = a.gameObject.AddComponent<EncounterEnemy>(); enemy.actor = a; enemy.persistentId = id; enemy.session = this;
                     enemy.Camp = true; enemy.Elite = elite; enemy.RespawnSeconds = Mathf.Max(20, camp.respawn); enemy.CampCenter = camp.center; enemy.CampRadius = camp.radius;
                     enemy.Ambusher = camp.ambush;
@@ -661,11 +663,12 @@ namespace Crulanda.Encounter
         }
         /// <summary>Story enemies of this zone (saved, stay dead) as opposed to camp mobs.</summary>
         public List<EncounterEnemy> StoryEnemies { get { return Enemies.FindAll(e => !e.Camp); } }
-        static void AddAgent(GameObject go, float speed)
+        /// <summary>Collider and agent. Beasts and Weave-Eaters are bulkier than a person: wider apart, and they stop further off.</summary>
+        static void AddAgent(GameObject go, float speed, float radius = .45f)
         {
-            var collider = go.AddComponent<CapsuleCollider>(); collider.height = 2; collider.radius = .45f;
+            var collider = go.AddComponent<CapsuleCollider>(); collider.height = 2; collider.radius = radius;
             var agent = go.AddComponent<NavMeshAgent>(); agent.speed = speed; agent.angularSpeed = 540;
-            agent.acceleration = 16; agent.stoppingDistance = 1.8f; agent.radius = .45f; agent.height = 2; agent.baseOffset = 1;
+            agent.acceleration = 16; agent.stoppingDistance = 1.8f + (radius - .45f) * 2; agent.radius = radius; agent.height = 2; agent.baseOffset = 1;
         }
         static void SetHealth(Actor actor, int value)
         {

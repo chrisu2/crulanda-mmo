@@ -157,6 +157,55 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
 - `ZonePost` + `Post.shader`: bloom (Karis prefilter), sun shafts, ACES tone mapping, and a biome grade (exposure, contrast,
   saturation, tint), plus a vignette.
 
+## Weather (`Scripts/World/WorldWeather.cs`)
+- **Data:** a zone's `weather` array lists kinds with weights, calmest first: `clear`, `fair`, `windy`, `overcast`, `mist`,
+  `rain`, `flurries` (snow), `ashsquall`, `storm`. With no array, the biome's default applies (`WeatherSchedule.Defaults`).
+  | Zone | Weather (weights) | About how often (share of spells) |
+  |---|---|---|
+  | Oakhaven | clear 2, fair 3, windy 1.5, overcast 2.5, rain 3, storm 1.2 | calm half the time; overcast 24%, rain 20%, storm 5% |
+  | Khaven Village | fair 1, windy 1, overcast 3, mist 4, rain 2 (it never clears; the dusk stays) | mist 39%, overcast 29%, rain 16% |
+  | The Shattered Peaks | clear 2, fair 3, windy 2.5, overcast 2, flurries 3 | flurries 14%, overcast 20% |
+  | The Ashland Rim | fair 1, windy 2, overcast 3, ash squall 3 (it never rains on the ash) | ash squall 28%, overcast 43% |
+  - The weights are relative, and the one-step rule reshapes them (calm kinds sit next to more neighbours), so the last column
+    comes from simulating the schedule, not from the weights alone.
+- **Schedule:** spells of 7 minutes (a 40-minute day has five or six).
+  - Each spell is picked from the table by a seeded random (the zone's seed and the spell number): the same zone always has
+    the same weather at the same weather time.
+  - A spell moves one step of severity at most: clear, then fair or windy, then overcast or mist, then rain, flurries or ash
+    squall, then storm.
+  - A new spell turns in from the last over 50 s.
+  - The weather clock is static like the hour, so it carries across zone travel. A new session starts inside a calm spell.
+  - Weather is not saved.
+- **What it does**, blended through `WeatherLook` (clouds, dim, rain, snow, ash, mist, wind, fog):
+  - **Light:** cloud takes the sun (`WorldClock`), taking less of the moon so nights stay readable. Ambient flattens toward
+    grey with a little more skylight. Shadows soften.
+  - **Air:** the fog greys, cools, pales (mist), dulls (ash) or brightens (snow), and closes in (never nearer than 55 m at
+    its far end). The sky's tint greys and its haze thickens. Lamps light early under heavy cloud.
+  - **Grade:** `ZonePost` takes colour and contrast down a little, with no glare, sun shafts only through breaks, and a
+    cool rain tint.
+  - **Clouds:** `Clouds.shader` draws a painted cloud layer on a dome round the camera. Each view ray meets a flat sheet
+    900 m up, so clouds stay put in the world, drift with the wind and crowd toward the horizon. Cover goes from a few
+    puffs (clear) to a grey lid (overcast), with lit tops, shaded undersides and a silver rim round the sun.
+  - **Cloud shadows:** the post composite finds each pixel's ground point from the depth texture and darkens it under the
+    same noise, cover and drift. They are strongest under broken cloud.
+  - **Wind:** the global `_WeatherWind` (direction and strength) sends gust waves through the grass (`Grass.shader`) and
+    leaf crowns (`Leaf.shader`; `Fade.shader` matches it exactly), with a downwind lean. Falling leaves and ash drift with it.
+  - **Rain:**
+    - streaks from a box above the view;
+    - splashes where drops land;
+    - rings on water (`Splashes.Drop`);
+    - the ground darkens and turns glossy as it soaks, then dries over about three minutes.
+    - Nothing falls under a roof (`ZoneBuilder.UnderRoof`, the building footprints), and a camera indoors sees none.
+  - **Storm:** rain, gales and lightning flashes every 8-26 s.
+  - **Flurries:** snow through the air column. **Mist:** big soft puffs low on the ground. **Ash squall:** dun dust and a
+    blizzard of ash.
+- **Chat and HUD:** a turn is announced in the chat ("It starts to rain."). The minimap shows the weather under the hour
+  (not when clear or fair).
+- **Testing:**
+  - F8 (development builds) cycles through the zone's kinds, then back to its own weather.
+  - `--crulanda-weather <kind>` starts in that weather.
+  - Capture tours hold fair weather for comparable shots, and add `80-weather-<kind>` shots (plus `81-...-pond` for rain).
+
 ## Travel
 - Zones list `exits` (to, name, at, arrive, radius). Standing at an exit shows "[E] <name>"; E travels (not in combat):
   the character saves with the new zone and arrival point, and the scene rebuilds the other zone. A recruited Mira comes along.

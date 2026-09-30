@@ -33,15 +33,21 @@ Shader "Crulanda/Leaf"
         fixed4 _Color;
         half _Cutoff, _Wither, _VertexTint;
         float _Wind, _WindSpeed;
+        // The weather's wind (WorldWeather, global): xy its direction (world x, z), z its strength 0..1; all zero without weather.
+        float4 _WeatherWind;
         // The wind: a slow gust and a quicker flutter by world position (the same for a batched or an unbatched tree), moving the
-        // vertex by weight (the vertex colour's alpha: 0 at the bough, 1 at the leaf tips) in world metres.
+        // vertex by weight (the vertex colour's alpha: 0 at the bough, 1 at the leaf tips) in world metres. The weather's gusts roll
+        // through downwind as a travelling wave, stirring the flutter and leaning the leaves downwind. Crulanda/Fade has the same.
         void LeafSway(inout float4 vertex, float weight)
         {
             float3 wp = mul(unity_ObjectToWorld, vertex).xyz;
             float t = _Time.y * _WindSpeed;
             float gust = sin(t + wp.x * 0.23 + wp.z * 0.19) * 0.6 + sin(t * 1.9 + wp.x * 0.9 - wp.y * 0.6) * 0.4;
             float lift = sin(t * 1.3 + wp.z * 0.7 + wp.x * 0.4) * 0.35;
-            float3 sway = float3(gust, lift, gust * 0.55) * (_Wind * weight);
+            float w = _WeatherWind.z;
+            float wave = sin(dot(wp.xz, _WeatherWind.xy) * 0.05 - _Time.y * 1.6) * 0.5 + 0.5; wave *= wave;
+            float3 sway = float3(gust, lift, gust * 0.55) * (_Wind * weight * (1 + w * (1 + 2 * wave)));
+            sway += float3(_WeatherWind.x, 0, _WeatherWind.y) * (_Wind * weight * w * (1 + 2.5 * wave));
             vertex.xyz += mul((float3x3)unity_WorldToObject, sway);
         }
         // The painted colour of a card pixel: the texture, greyed by _Wither, in the material's and the vertex's tint.

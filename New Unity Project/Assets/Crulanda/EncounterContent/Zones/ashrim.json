@@ -8,6 +8,12 @@
   "levelMin": 9,
   "levelMax": 10,
   "biome": "ash",
+  "weather": [
+    { "kind": "fair", "weight": 1 },
+    { "kind": "windy", "weight": 2 },
+    { "kind": "overcast", "weight": 3 },
+    { "kind": "ashsquall", "weight": 3 }
+  ],
   "worldMapPosition": {
     "x": 0.72,
     "y": 0.8

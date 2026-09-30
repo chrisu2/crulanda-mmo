@@ -404,6 +404,31 @@ namespace Crulanda.Encounter
                     yield return new WaitForSeconds(1);
                     ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "99-tree-fade.png")); yield return new WaitForSeconds(.4f);
                 }
+                // Weather: each of the zone's unsettled kinds at midday from the entrance (the land, the sky and the air), rain on
+                // the pond, and the calm tour weather again after. Every other shot holds the calm weather (WorldWeather.TourKind).
+                var weather = Crulanda.World.WorldWeather.Active;
+                if (weather != null)
+                {
+                    EncounterHud.Hidden = true; Crulanda.World.WorldClock.Hour = 11.5f;
+                    var z = zone.Zone;
+                    foreach (var kind in weather.Showcase())
+                    {
+                        weather.Force(kind, true);
+                        string name = Crulanda.World.WeatherSchedule.Name(kind).ToLowerInvariant().Replace(' ', '-');
+                        motor.Teleport(zone.Ground(z.spawns.player, 1.1f)); motor.SetView(z.spawns.playerFacing, 9, 12);
+                        yield return new WaitForSeconds(4);
+                        while (Crulanda.World.WorldWeather.Flash > .01f) yield return null;   // not mid-lightning
+                        ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "80-weather-" + name + ".png")); yield return new WaitForSeconds(.4f);
+                        if ((kind == Crulanda.World.WeatherKind.Rain || kind == Crulanda.World.WeatherKind.Storm) && zone.Water.Lakes.Count > 0)
+                        {
+                            var l = zone.Water.Lakes[0];
+                            motor.Teleport(zone.Ground(l.def.center + new Vector2(0, -(l.radius + 4)), 1.1f)); motor.SetView(0, 24, 6);
+                            yield return new WaitForSeconds(2);
+                            ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "81-weather-" + name + "-pond.png")); yield return new WaitForSeconds(.4f);
+                        }
+                    }
+                    weather.Force(weather.TourKind(), true);
+                }
             }
             EncounterHud.Hidden = false;
             Debug.Log("WORLD_CAPTURE_DONE"); Application.Quit(0);

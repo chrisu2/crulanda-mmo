@@ -39,5 +39,7 @@ namespace Crulanda.World
         public Material[] leafCards = new Material[0];
         [Tooltip("Crulanda/Leaf painted pine-bough card (needle fronds) for pine tiers.")]
         public Material pineBough;
+        [Tooltip("Crulanda/Clouds: the painted cloud layer over the sky (WorldWeather makes the dome and the noise at runtime).")]
+        public Material clouds;
     }
 }

@@ -1,7 +1,7 @@
 {
   "name": "Crulanda.Tests.EditMode",
   "rootNamespace": "Crulanda.Tests",
-  "references": ["Crulanda.Encounter","Crulanda.Abilities","Crulanda.Combat","Crulanda.Core","Crulanda.Data","Crulanda.Gameplay","Crulanda.Persistence","Crulanda.DevTools","UnityEngine.TestRunner","UnityEditor.TestRunner"],
+  "references": ["Crulanda.Encounter","Crulanda.World","Crulanda.Abilities","Crulanda.Combat","Crulanda.Core","Crulanda.Data","Crulanda.Gameplay","Crulanda.Persistence","Crulanda.DevTools","UnityEngine.TestRunner","UnityEditor.TestRunner"],
   "includePlatforms": ["Editor"],
   "excludePlatforms": [],
   "allowUnsafeCode": false,

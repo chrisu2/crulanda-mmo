@@ -157,6 +157,10 @@ namespace Crulanda.Encounter
             bool night = WorldClock.Darkness > .5f;
             Dot(new Vector2(r.xMax - 4, r.y + 10), 16, night ? new Color(.72f, .8f, 1) : new Color(1, .82f, .35f));
             Shadowed(new Rect(r.xMax - 50, r.y + 20, 60, 20), WorldClock.Text, centered, night ? new Color(.8f, .86f, 1) : gold);
+            // The weather under the hour, when there is any to speak of.
+            var weather = WorldWeather.Active;
+            if (weather != null && weather.Kind != WeatherKind.Clear && weather.Kind != WeatherKind.Fair)
+                Shadowed(new Rect(r.xMax - 70, r.y + 38, 100, 18), WeatherSchedule.Name(weather.Kind), centered, night ? new Color(.72f, .78f, .92f) : new Color(.86f, .84f, .74f));
             // Corner mask: square HUD corners hidden under the round frame.
             if (GUI.Button(new Rect(r.xMax - 18, r.yMax - 30, 24, 24), "+")) zoom = Mathf.Max(0, zoom - 1);
             if (GUI.Button(new Rect(r.xMax - 18, r.yMax - 4, 24, 24), "−")) zoom = Mathf.Min(MinimapRadii.Length - 1, zoom + 1);

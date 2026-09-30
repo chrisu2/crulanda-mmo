@@ -8,6 +8,14 @@
   "levelMin": 1,
   "levelMax": 2,
   "biome": "meadow",
+  "weather": [
+    { "kind": "clear", "weight": 2 },
+    { "kind": "fair", "weight": 3 },
+    { "kind": "windy", "weight": 1.5 },
+    { "kind": "overcast", "weight": 2.5 },
+    { "kind": "rain", "weight": 3 },
+    { "kind": "storm", "weight": 1.2 }
+  ],
   "worldMapPosition": {
     "x": 0.683,
     "y": 0.625

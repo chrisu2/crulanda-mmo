@@ -59,12 +59,18 @@ namespace Crulanda.World
             // the camera moves the focus 24 m at most, so a turn never refills).
             if (ash && (!filled || (at - ps.transform.position).sqrMagnitude > 30 * 30)) { ps.transform.position = at; ps.Clear(); ps.Emit(700); filled = true; }
             ps.transform.position = at;
+            // The weather's wind carries them downwind (an ash squall hard); gusts strip more leaves and whip up more ash.
+            var weather = WorldWeather.Now; var wind = WorldWeather.WindDirection * (weather.wind * (ash ? 4.5f : 3f));
+            var vel = ps.velocityOverLifetime;
+            vel.x = ash ? new ParticleSystem.MinMaxCurve(.35f + wind.x, 1f + wind.x) : new ParticleSystem.MinMaxCurve(.2f + wind.x, .6f + wind.x);
+            vel.z = new ParticleSystem.MinMaxCurve(-.1f + wind.y, .25f + wind.y);
             if (Time.time < nextCheck) return;
             nextCheck = Time.time + 1;
-            if (ash) { emission.rateOverTime = 60; return; }
+            var noise = ps.noise; noise.strength = (ash ? .4f : .55f) * (1 + weather.wind);
+            if (ash) { emission.rateOverTime = 60 + 260 * weather.ash; return; }
             int near = 0;
             foreach (var t in zone.LeafTrees) if ((new Vector2(t.x - focus.x, t.z - focus.z)).sqrMagnitude < 26 * 26) near++;
-            emission.rateOverTime = Mathf.Min(38, near * 1.3f);
+            emission.rateOverTime = Mathf.Min(38, near * 1.3f) * (1 + 1.5f * weather.wind);
         }
     }
 
@@ -119,6 +125,8 @@ namespace Crulanda.World
         }
         /// <summary>Just a ripple ring (standing or treading water), <paramref name="size"/> metres across to start.</summary>
         public void Ring(Vector3 surfacePoint, float size) { rings.Emit(new ParticleSystem.EmitParams { position = surfacePoint + Vector3.up * .03f, startSize = size }, 1); }
+        /// <summary>A raindrop's ring: small, and gone in <paramref name="life"/> seconds (WorldWeather).</summary>
+        public void Drop(Vector3 surfacePoint, float size, float life) { rings.Emit(new ParticleSystem.EmitParams { position = surfacePoint + Vector3.up * .03f, startSize = size, startLifetime = life }, 1); }
         /// <summary>A splash of <paramref name="drops"/> droplets and a ripple ring at a surface point.</summary>
         public void At(Vector3 surfacePoint, int drops)
         {

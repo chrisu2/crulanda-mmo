@@ -61,6 +61,8 @@ Shader "Crulanda/Water"
         fixed4 _DeepColor, _MidColor, _ShallowColor, _BedTint, _FoamColor;
         float4 _Drift;
         float _MidDepth, _DeepDepth, _Murk, _Glow, _FoamWidth, _FoamWaves, _Sparkle, _SkyTint, _Bump, _FlowSpeed, _Wave, _Refract, _Glare;
+        // The weather (WorldWeather, global): x cloud dimness by day, y rain. Zero without weather.
+        float4 _WeatherTone;
         // Only the foam is lit here (it is the one thing on the water with a body of its own), softly so it never goes flat on
         // the shaded side; lanterns (the forward-add passes) light it too. Premultiplied by its alpha. Everything else the water
         // shows (bed, depth colour, sky tint, highlights) is emission from surf.
@@ -124,7 +126,7 @@ Shader "Crulanda/Water"
             float2 d1 = lerp(_Drift.xy, float2(0.02, _FlowSpeed * 0.11), flowing) * t;
             float2 d2 = lerp(_Drift.zw, float2(-0.015, _FlowSpeed * 0.07), flowing) * t;
             float2 slope = (UnpackNormal(tex2D(_Normal, uv - d1)).xy + UnpackNormal(tex2D(_Normal, uv * 1.9 - d2)).xy) * _Bump;
-            slope *= lerp(0.3, 1, saturate(V.y * 2.5)) * lerp(1, 0.5, saturate(dist / 60));
+            slope *= lerp(0.3, 1, saturate(V.y * 2.5)) * lerp(1, 0.5, saturate(dist / 60)) * (1 + 0.6 * _WeatherTone.y);   // rain roughens it
             o.Normal = normalize(float3(slope, 1));
             float3 N = normalize(WorldNormalVector(IN, o.Normal));
 
@@ -161,6 +163,8 @@ Shader "Crulanda/Water"
             float3 R = reflect(-V, N);
             float3 sky = DecodeHDR(UNITY_SAMPLE_TEXCUBE_LOD(unity_SpecCube0, float3(R.x, max(R.y, 0.05), R.z), 4), unity_SpecCube0_HDR);
             water = lerp(water, min(sky, 1), _SkyTint * pow(1 - saturate(dot(N, V)), 4) * wet);
+            // Under cloud the turquoise dulls toward a cool grey-green and darkens a little: no sunny water under a rain sky.
+            water = lerp(water, dot(water, float3(0.3, 0.59, 0.11)) * float3(0.9, 0.97, 1.0), _WeatherTone.x * 0.45) * (1 - 0.2 * _WeatherTone.x);
 
             // Painted highlights: two soft noise layers in metres sliding past each other (streaked along a creek's flow) make
             // blobs that swell and fade. Away from the sun only the brightest few show, faintly; along the sun's (or moon's)

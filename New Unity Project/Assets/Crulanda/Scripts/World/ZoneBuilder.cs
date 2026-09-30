@@ -45,6 +45,8 @@ namespace Crulanda.World
         }
         public ZoneDefinition Zone { get; private set; }
         public MeshFilter GroundMesh { get; private set; }
+        /// <summary>The zone's own ground material (WorldWeather darkens and glosses it when the ground is wet).</summary>
+        public Material GroundMaterial { get; private set; }
         public readonly List<ZoneDoor> Doors = new List<ZoneDoor>();
         public float Half { get { return Zone.size / 2; } }
         Transform props, statics;
@@ -76,6 +78,7 @@ namespace Crulanda.World
             if (view != null && art.post != null && view.GetComponent<ZonePost>() == null) view.gameObject.AddComponent<ZonePost>().Init(art.post, Zone, sunLight);
             try { StaticBatchingUtility.Combine(statics.gameObject); } catch (Exception e) { Debug.LogWarning("Static batching skipped: " + e.Message); }
             MapTexture = RenderMap(1024);   // in daylight, before the clock sets the hour
+            gameObject.AddComponent<WorldWeather>().Init(this, sunLight);   // before the clock: its first light already has the weather in it
             var clock = gameObject.AddComponent<WorldClock>(); clock.Init(sunLight, Zone.lighting, art.skybox, NightLights);
             // Reflections follow the real sky: a sky-only realtime probe covering the zone, refreshed by the clock.
             var probe = new GameObject("Sky reflection").AddComponent<ReflectionProbe>(); probe.transform.SetParent(transform, false);
@@ -386,7 +389,7 @@ namespace Crulanda.World
                 m.SetTexture("_DetailMask", DetailMask(256, (x, z) => 1 - Mathf.SmoothStep(0, 1, Mathf.InverseLerp(.3f, .95f, Unmade(x, z)))));   // none on the unmade
             }
             if (Zone.biome == "mountain") m.SetTexture("_DetailMask", DetailMask(4, (x, z) => .5f));   // half grain: in hard alpine light it was a harsh speckle
-            m.mainTexture = PaintGround(Mathf.Clamp(Mathf.RoundToInt(Zone.size * 8 / 256) * 256, 1024, 2048)); r.sharedMaterial = m;
+            m.mainTexture = PaintGround(Mathf.Clamp(Mathf.RoundToInt(Zone.size * 8 / 256) * 256, 1024, 2048)); r.sharedMaterial = m; GroundMaterial = m;
             go.AddComponent<MeshCollider>().sharedMesh = mesh;
         }
         Texture2D PaintGround(int res)
@@ -883,6 +886,18 @@ namespace Crulanda.World
                 case "tannery": case "shelter": return new Vector2(2.2f, 2.1f);
                 default: return Vector2.zero;
             }
+        }
+        /// <summary>Whether a point stands under a building's roof (its footprint, eaves included): no rain or snow falls there.</summary>
+        public bool UnderRoof(Vector2 p)
+        {
+            foreach (var b in Zone.props)
+            {
+                if (b == null) continue;
+                var h = Footprint(b); if (h.x <= 0) continue;
+                float r = b.rotation * Mathf.Deg2Rad, c = Mathf.Cos(r), s = Mathf.Sin(r); var d = p - b.at;
+                if (Mathf.Abs(d.x * c - d.y * s) <= h.x && Mathf.Abs(d.x * s + d.y * c) <= h.y) return true;   // along its local x and z (as Overlap)
+            }
+            return false;
         }
         /// <summary>Whether two footprints (centre, half-size, yaw) overlap; push is the shortest move of the first that parts them.</summary>
         static bool Overlap(Vector2 ca, Vector2 ha, float ya, Vector2 cb, Vector2 hb, float yb, out Vector2 push)

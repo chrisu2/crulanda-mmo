@@ -354,3 +354,62 @@ Chris shared a reference of a stylized fantasy cove and chose this look for Oakh
   - Bushes: 4-6 leaf cards round a dark core, on the same leaf material, same footprint, still no collider.
   - Backdrop silhouettes: far broadleafs are three crossed cards and far pines three tiers of boughs, so the horizon matches the near trees.
   - Zone random draws verified unchanged site by site; colliders and the navmesh untouched.
+
+## 2026-09-30 — Weather (Chris: "move weather up after the trees")
+- **A weather system** (`WorldWeather.cs`): every zone has its own weather table (zone JSON `weather`, calmest first), turned
+  into a seeded schedule of 7-minute spells that moves one step of severity at a time (clear, fair or windy, overcast or mist,
+  rain or flurries or ash squall, storm) and blends over 50 s. The weather clock carries across zone travel; a session starts
+  calm. Nothing is saved: the same zone at the same weather time always has the same weather.
+- **Per zone:**
+  - Oakhaven: clear to fair, overcast, rain and storms, about a fifth of the time rain.
+  - Khaven: mostly mist, overcast and rain; it never clears.
+  - The Peaks: flurries.
+  - The Rim: ash squalls; it never rains on the ash.
+- **Sky:** a painted cloud layer (`Clouds.shader`) on a dome round the camera. Clouds hold still in the world, drift with
+  the wind, crowd toward the horizon, have lit tops and shaded undersides, and close into a grey lid under overcast that
+  runs down into the fog. Matching **cloud shadows** sweep the land (post composite, from the depth texture and the same noise).
+- **Light and air:**
+  - Cloud takes the sun (less of the moon, so nights stay readable), flattens the ambient and softens shadows.
+  - The fog greys, pales in mist, dulls in ash and closes in (never nearer than 55 m).
+  - The sky's haze thins under cloud, so there's no orange horizon under rain.
+  - The grade cools and loses its glare. Lamps light early under heavy cloud.
+- **Wind:** gusts roll through the grass and leaf crowns as travelling waves, with a downwind lean (`_WeatherWind`; Leaf
+  and Fade identical). Falling leaves and ash follow the wind.
+- **Rain:**
+  - streaks slanting with the wind, and splashes where drops land;
+  - rings on ponds and creeks, and the water dulls and roughens;
+  - the ground darkens as it soaks, then dries over about three minutes;
+  - nothing falls under a roof, and a camera indoors sees none.
+- **Storm:** rain, gales and lightning every 8-26 s. **Flurries** in the Peaks, **drifting mist** in Khaven, **ash squalls**
+  (dust and an ash blizzard) on the Rim.
+- **Player-facing:** a chat line when the weather turns ("It starts to rain."), and the weather word under the minimap clock.
+- **For testing:**
+  - F8 (development builds) cycles through the zone's weather, then back to its own.
+  - `--crulanda-weather <kind>` starts in that weather.
+  - Capture tours hold fair weather for comparable shots and add `80-weather-*` shots per zone.
+- **Tests:**
+  - EditMode `WeatherScheduleTests` (8): deterministic under a seed, only the zone's own kinds, one step at a time, smooth
+    turns, a calm start, names that parse, sane looks.
+  - PlayMode `WeatherTests` (5): rain falls, wets and dries the ground; none indoors; every kind keeps the fog in its band
+    and the light readable, day and night; the schedule turns and is announced; the wind reaches the shaders and the
+    clouds are up.
+- **First tour, fixed before shipping:**
+  - A yellow horizon band under every cloud lid, from the sky haze thickening under cloud.
+  - A patchy, sunny-looking overcast.
+  - A bleached storm frame: the lightning was far too strong, and the first bolt fell exactly when the tour shot.
+  - Pale wet ground: too glossy, so it mirrored the sky.
+  - Faint rain streaks, and invisible raindrop rings.
+  - Turquoise water glowing under rain.
+  - A per-spell System.Random that gave correlated draws, so one test seed went 600 spells without a storm; now a
+    SplitMix hash.
+- **Independent code review (a second agent read the whole diff), all fixed:**
+  - Cloud drift wrapped every 2600 m, which jumped the finer noise layer; it now wraps over 10 tiles.
+  - Rain flickered off whenever the camera brushed a wall or rose above the roofs. "Indoors" now also needs a ceiling overhead.
+  - Cloud shadows darkened fully fogged land and distant hills. The shade now falls on the land only.
+  - Rain splash droplets were soft-faded into the ground; they now have their own material.
+  - Mist and ash haze were not refilled after travel or a teleport; they are now.
+  - The sky's cloud sheet sat at camera height + 900 m while the shadows used 900 m; both are now at 900 m.
+  - The sky below the horizon used the unweathered exposure.
+  - The cloud dome could lag the camera by a frame; it now updates after the camera moves.
+  - The capture tour's storm shot now waits out any lightning flash.
+  - Rain streaks right at the lens are capped thin.

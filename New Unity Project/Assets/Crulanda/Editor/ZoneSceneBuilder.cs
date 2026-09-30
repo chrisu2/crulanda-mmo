@@ -219,6 +219,7 @@ namespace Crulanda.EditorTools
             if (art.splash == null) { art.splash = new Material(Shader.Find("Legacy Shaders/Particles/Alpha Blended")) { mainTexture = mote, name = "Splash" }; AssetDatabase.CreateAsset(art.splash, ArtRoot + "/Splash.mat"); }
             if (art.post == null) { art.post = new Material(Shader.Find("Hidden/Crulanda/Post")) { name = "Post" }; AssetDatabase.CreateAsset(art.post, ArtRoot + "/Post.mat"); }
             if (art.fade == null) { art.fade = new Material(Shader.Find("Crulanda/Fade")) { name = "Tree fade" }; AssetDatabase.CreateAsset(art.fade, ArtRoot + "/Tree fade.mat"); }
+            if (art.clouds == null) { art.clouds = new Material(Shader.Find("Crulanda/Clouds")) { name = "Clouds" }; AssetDatabase.CreateAsset(art.clouds, ArtRoot + "/Clouds.mat"); }
             // ---------- painted leaf cards: the crowns of broadleaf, orchard and pine trees (ZoneBuilder.LeafCrown, Pine) ----------
             // Saturated painted colour lives in the textures (dark, mid, light of each leaf); ZoneBuilder's tints stay near white.
             var leafGreen = LeafClusterTex("leaf_cluster_green", 11, new Color(.14f, .29f, .13f), new Color(.36f, .57f, .20f), new Color(.72f, .82f, .32f));

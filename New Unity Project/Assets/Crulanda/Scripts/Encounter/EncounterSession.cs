@@ -458,6 +458,7 @@ namespace Crulanda.Encounter
         void Start()
         {
             if (content == null) { Debug.LogError("Encounter content missing."); enabled = false; return; }
+            Crulanda.World.WorldWeather.Turned += OnWeatherTurned;
             if ((UseTempSave || Array.IndexOf(Environment.GetCommandLineArgs(), "--crulanda-temp-save") >= 0) && SaveDirectoryOverride == null)
             {
                 // Test runs: a fresh throwaway character that never touches the real save folder. One folder for the whole
@@ -715,6 +716,7 @@ namespace Crulanda.Encounter
             if (EncounterInput.Press(KeyCode.F5)) Save();
             if (EncounterInput.Press(KeyCode.F10)) PrototypeLevelCap();
             if (Debug.isDebugBuild && EncounterInput.Press(KeyCode.F11)) { Crulanda.World.WorldClock.Advance(1); Message("Time skips ahead: " + Crulanda.World.WorldClock.Text + " (dev)."); }
+            if (Debug.isDebugBuild && EncounterInput.Press(KeyCode.F8) && Crulanda.World.WorldWeather.Active != null) Message("Weather: " + Crulanda.World.WorldWeather.Active.CycleForced() + " (dev).");
             if (!Player.IsAlive) { if (EncounterInput.Press(KeyCode.R)) Recover(); return; }
             TickQuests(); TickItems();
             if (Zone != null && Player.GetComponent<CharacterController>().isGrounded && !Zone.WaterAt(new Vector2(Player.transform.position.x, Player.transform.position.z), out _, out _)) lastDry = Player.transform.position;
@@ -1008,7 +1010,13 @@ namespace Crulanda.Encounter
         public void Message(string text) { Messages.Add(text); if (Messages.Count > 6) Messages.RemoveAt(0); }
         public void FloatText(Vector3 point, string text, Color color) { Floating.Add(new CombatText { position = point + Vector3.up * 1.5f, text = text, color = color, expires = Time.time + 1.3f }); }
         public void Resume() { Paused = false; Time.timeScale = 1; }
-        void OnDestroy() { Time.timeScale = 1; }
+        void OnDestroy() { Time.timeScale = 1; Crulanda.World.WorldWeather.Turned -= OnWeatherTurned; }
+        /// <summary>The zone's weather turns: a line in the chat ("It starts to rain.").</summary>
+        void OnWeatherTurned(Crulanda.World.WeatherKind from, Crulanda.World.WeatherKind to)
+        {
+            var line = Crulanda.World.WeatherSchedule.Herald(from, to);
+            if (line != null) Message(line);
+        }
         void OnApplicationQuit() { if (Player != null) Save(false); }
     }
 }

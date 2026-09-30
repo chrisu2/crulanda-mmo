@@ -29,6 +29,11 @@ namespace Crulanda.World
         public ZoneGrove[] groves = new ZoneGrove[0];
         public string waterTint;   // optional hex, e.g. dark Gloom Creek
         public float waterReflect; // optional sky reflection face-on 0..1 (0 = the water material's own); murky water ~.3
+        /// <summary>
+        /// The zone's weather: kinds with weights, calmest first (clear, fair, windy, overcast, mist, rain, flurries, ashsquall,
+        /// storm). Empty: the biome's default. Spells of weather follow each other one step of severity at a time (WorldWeather).
+        /// </summary>
+        public ZoneWeather[] weather = new ZoneWeather[0];
         public ZoneLife life;
         /// <summary>Level band shown on maps and exits (e.g. 1-2); camps spawn inside it.</summary>
         public int levelMin = 1, levelMax = 2;
@@ -86,6 +91,8 @@ namespace Crulanda.World
     }
     /// <summary>Walk into the radius and press E to travel; you arrive at <see cref="arrive"/> in the other zone.</summary>
     [Serializable] public sealed class ZoneExit { public string to, name; public Vector2 at, arrive; public float radius = 5; }
+    /// <summary>One kind of weather a zone can have and how often (a weight, relative to the zone's other kinds).</summary>
+    [Serializable] public sealed class ZoneWeather { public string kind; public float weight = 1; }
     /// <summary>An area filled with trees. kind: dead (grey, leafless, darkened ground), pine, broadleaf.</summary>
     [Serializable] public sealed class ZoneGrove { public string name, kind = "dead"; public Vector2 center, size; public int count = 30; }
     [Serializable] public sealed class ZoneLighting

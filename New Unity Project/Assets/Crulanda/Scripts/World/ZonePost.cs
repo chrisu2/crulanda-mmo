@@ -39,11 +39,18 @@ namespace Crulanda.World
         {
             if (mat == null) { Graphics.Blit(src, dst); return; }
             var g = ForBiome(); float dark = WorldClock.Darkness;
+            // Weather (WorldWeather): cloud flattens the light (less colour and contrast, no glare); rain cools it; an ash squall drains it.
+            var weather = WorldWeather.Now; float lit = 1 - dark;
+            g.saturation *= 1 - .2f * weather.dim * lit - .08f * weather.ash; g.contrast = Mathf.Lerp(g.contrast, 1.04f, .5f * weather.dim);
+            g.threshold += .35f * weather.dim; g.bloom *= 1 - .25f * weather.dim;
+            g.tint = Color.Lerp(Color.Lerp(g.tint, new Color(.98f, 1, 1.02f), .6f * weather.dim * lit), new Color(.95f, 1, 1.06f), .5f * weather.rain * lit);   // no warm sun under cloud
+            g.exposure *= 1 - .06f * weather.rain * lit;
             // Night: lamps bloom more, colour drains and cools; dusk and dawn warm up a touch.
             float dusk = Mathf.Clamp01(1 - Mathf.Abs(dark - .5f) * 2);
             mat.SetFloat("_Threshold", Mathf.Lerp(g.threshold, .55f, dark)); mat.SetFloat("_Knee", .5f);
             mat.SetFloat("_BloomIntensity", Mathf.Lerp(g.bloom, 1.1f, dark));
-            mat.SetFloat("_Exposure", Mathf.Lerp(g.exposure, 1.2f, dark));
+            mat.SetFloat("_Exposure", Mathf.Lerp(g.exposure, 1.2f, dark) * (1 + .2f * WorldWeather.Flash));
+            CloudShadows(weather, dark);
             mat.SetFloat("_Saturation", Mathf.Lerp(g.saturation, .62f, dark)); mat.SetFloat("_Contrast", g.contrast); mat.SetFloat("_Lift", dark);
             mat.SetFloat("_Vignette", g.vignette + dark * .4f);
             mat.SetColor("_Tint", Color.Lerp(Color.Lerp(g.tint, new Color(.86f, .92f, 1.12f), dark), new Color(1.08f, .96f, .88f), dusk * .6f));
@@ -67,7 +74,7 @@ namespace Crulanda.World
                 if (vp.z > 0 && toSun.y > .02f)
                 {
                     float onScreen = Mathf.Clamp01(1.4f - Mathf.Max(Mathf.Abs(vp.x - .5f), Mathf.Abs(vp.y - .5f)) * 2);
-                    shaftStrength = onScreen * (1 - dark) * .45f;
+                    shaftStrength = onScreen * (1 - dark) * .45f * Mathf.Clamp01(1 - WorldWeather.Now.clouds * 1.15f);   // cloud cover hides the sun
                     mat.SetVector("_SunScreen", new Vector4(vp.x, vp.y, 1, 0));
                     if (shaftStrength > .01f) { shafts = RenderTexture.GetTemporary(src.width / 4, src.height / 4, 0, format); Graphics.Blit(down[0], shafts, mat, 3); }
                 }
@@ -78,6 +85,34 @@ namespace Crulanda.World
             Graphics.Blit(src, dst, mat, 4);
             for (int i = 0; i < levels; i++) { RenderTexture.ReleaseTemporary(down[i]); down[i] = null; }
             if (shafts != null) RenderTexture.ReleaseTemporary(shafts);
+        }
+        readonly Vector3[] corners = new Vector3[4];
+        /// <summary>
+        /// Cloud shadows sweeping over the land: the composite finds each pixel's ground point from the depth texture and darkens
+        /// it where the cloud layer (the same noise and drift as the sky's clouds) stands between it and the sun. Strongest under
+        /// broken cloud; none under a clear sky, a full overcast lid (the light is already flat), at night or with the sun low.
+        /// </summary>
+        void CloudShadows(WeatherLook w, float dark)
+        {
+            float strength = 0;
+            var toSun = sun != null ? -sun.transform.forward : Vector3.down;
+            if (WorldWeather.CloudNoise != null && toSun.y > 0)
+            {
+                float c = w.clouds;
+                strength = .36f * Mathf.SmoothStep(0, 1, Mathf.InverseLerp(.22f, .5f, c)) * (1 - Mathf.SmoothStep(0, 1, Mathf.InverseLerp(.74f, .98f, c)))
+                    * (1 - .6f * w.dim) * (1 - dark) * Mathf.Clamp01(toSun.y * 3);
+            }
+            mat.SetVector("_CloudShadow", new Vector4(strength, w.clouds, .2f, 0));
+            if (strength <= .001f) return;
+            mat.SetTexture("_CloudTex", WorldWeather.CloudNoise);
+            mat.SetVector("_CloudDrift", WorldWeather.CloudDrift); mat.SetVector("_CloudSun", toSun);
+            mat.SetFloat("_CloudHeight", WorldWeather.CloudHeight); mat.SetFloat("_CloudTile", WorldWeather.CloudTile);
+            mat.SetVector("_CloudFog", new Vector4(RenderSettings.fogStartDistance, RenderSettings.fogEndDistance, 0, 0));
+            // Rays through the frame's corners, scaled to one metre of eye depth: ground point = camera + ray * eye depth.
+            var t = cam.transform; mat.SetVector("_CamPos", t.position);
+            cam.CalculateFrustumCorners(new Rect(0, 0, 1, 1), 1, Camera.MonoOrStereoscopicEye.Mono, corners);   // bottom-left, top-left, top-right, bottom-right
+            mat.SetVector("_RayBL", t.TransformVector(corners[0])); mat.SetVector("_RayTL", t.TransformVector(corners[1]));
+            mat.SetVector("_RayTR", t.TransformVector(corners[2])); mat.SetVector("_RayBR", t.TransformVector(corners[3]));
         }
     }
 }

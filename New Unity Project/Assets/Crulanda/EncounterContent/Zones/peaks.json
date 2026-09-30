@@ -8,6 +8,13 @@
   "levelMin": 6,
   "levelMax": 8,
   "biome": "mountain",
+  "weather": [
+    { "kind": "clear", "weight": 2 },
+    { "kind": "fair", "weight": 3 },
+    { "kind": "windy", "weight": 2.5 },
+    { "kind": "overcast", "weight": 2 },
+    { "kind": "flurries", "weight": 3 }
+  ],
   "worldMapPosition": {
     "x": 0.53,
     "y": 0.55

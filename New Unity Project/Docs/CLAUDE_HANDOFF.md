@@ -9,15 +9,13 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-09-29, late evening)
+## RESUME HERE (updated 2026-09-30, early morning)
 Chris's rules: work in order of importance; finish each step; keep going without waiting (memory: crulanda-autonomy); tell him at each publish.
 
-**State:**
-- **Steps 1-4 and the turquoise water are PUBLISHED** to `outputs\Crulanda-Playable`. Chris has seen water shots.
-  - Tests: EditMode 166/166, PlayMode 50/50, 0 shader errors.
-- The step-3 visual verification workflow (`verify-step3`, run wf_1b4b81d4-c71) was running; its confirmed majors go into the next fix round. If lost, re-run a per-area review of `work\world-captures\archive-20260929-step3-published`.
-- Small tour gap: the exit shot (`*-19-exit` etc.) hides the HUD, so the new "Road to <zone>" sign isn't photographed. Add a HUD-on exit shot to `EncounterCapture` next cycle.
-- Water polish still worth doing later: the Oakhaven pond is a fairly flat turquoise oval; the reference has more colour variation and shallow lobes.
+**State: steps 1-4, the turquoise water, the step-3 fix round and the cliff rework are all PUBLISHED.** Tests: EditMode 166/166, PlayMode 51/51, 0 shader errors.
+- The temp-save travel bug (character lost at every zone border on `--crulanda-temp-save`) is fixed and published; Chris has been told.
+- Step 3's confirmed majors are all closed: Weave-Eater (thread tangle), the Pale (cowl, narrow robe), the Khaven ruin moved, the floating Peaks pines, and Umbra Scarp (now faceted rock lumps with scree; all crags in the Peaks and Khaven got the same look).
+- Chris likes the Shattered Peaks.
 
 **Next:**
 0. ~~Finish step 4 + water~~ DONE and published.

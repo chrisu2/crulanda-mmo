@@ -273,7 +273,7 @@ namespace Crulanda.Encounter
             // A tall narrow cone from the hem to the throat: robe, waist and high collar in one taper.
             if (robeCone == null) robeCone = Crulanda.World.ZoneMeshes.Cone(1, 1, 14);
             var gown = new GameObject("Robe", typeof(MeshFilter), typeof(MeshRenderer)).transform; gown.SetParent(body, false);
-            gown.localPosition = new Vector3(0, -.97f, 0); gown.localScale = new Vector3(.3f, 2.55f, .27f);
+            gown.localPosition = new Vector3(0, -.97f, 0); gown.localScale = new Vector3(.3f, 2.38f, .27f);   // apex stays inside the hood
             gown.GetComponent<MeshFilter>().sharedMesh = robeCone; gown.GetComponent<MeshRenderer>().sharedMaterial = robe;
             Part(PrimitiveType.Cylinder, body, new Vector3(0, -.955f, 0), new Vector3(.62f, .015f, .56f), fold);          // hem
             // Everything above the waist hangs from a spine pivot pitched forward: a slight stoop, bent as if to look down at you.

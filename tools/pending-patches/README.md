@@ -8,7 +8,8 @@ replaces `diagnosis.edits` when the verdict is `fixable`.
 |---|---|---|
 | `step3-props-landmarks-creatures.json` | 3 | floating-props, creatures-npcs (the Pale's floating head, the Weave-Eater remodel to canon), landmarks-oak-khaven, landmarks-peaks-ash, capture-framing |
 | `step4-hud.json` | 4 | overlaps (bubbles, labels, nameplates: line of sight, de-overlap, beast heights), readability (tracker backing, hint fade, chat panel, text outlines) |
-| `step5-water-realism.json` | 5 | reflections (planar mirror camera `WaterReflection.cs`: `newFiles`/`correctedNewFiles` hold new files), surface-detail (ripples, sparkle) |
+| `step5-stylized-water.json` | 5 | stylized turquoise water. APPLIED and published 2026-09-30; kept for reference. (`step5-water-realism.json`, the planar-mirror design, was dropped: it conflicted with the art direction.) |
+| `step3b-tree-crowns.json` | 3b | tree-crowns: painted alpha-cutout leaf cards on boughs for broadleaf, orchard and pine crowns; a Crulanda/Leaf two-sided wind shader (in `newFiles`, plus its .meta); Fade.shader/TreeFade taught to fade cutout leaves; a Great Oak card fringe. Verdict fixable: use `review.correctedEdits` (2) and `review.correctedNewFiles`; re-check the Great Oak anchor first. Zone rng stream verified unchanged. NEXT TO APPLY. |
 
 **How to apply one step:**
 

@@ -2,6 +2,8 @@
 
 Status 2026-09-29: the **framework is implemented** (section 7). Oakhaven has 10 quests: Chronicle I and II, six NPC quests
 and two faction introductions. The Hollow Men, the well at night, Khaven content and Sandthrone contracts are still design only.
+2026-09-30: quests can wait for a level (`minLevel`, section 7), and Oakhaven has its first side quest, **The Tin Crown**
+(Crowsfoot Hollow, level 3; section 5).
 Lore sources: `D:\code\crulanda` (world_bible.md, series_overview.md, book1\chapter_4.md, chapter_5.md, chapter_20.md,
 ledger_of_souls.md). Labels:
 - CANON: stated in the books.
@@ -43,8 +45,8 @@ later finds in the ruins. This echoes canon without replacing her story.
 - Markers appear over heads and on the minimap and zone map. Objective areas are drawn as circles on the maps.
 
 ## 3. Objectives (data-driven, like zones and talents)
-Quest JSON in `EncounterContent/Quests/*.json`. Each quest has an id, title, kind, giver, turn-in, level, zone, and
-requires (quests / reputation / time of day). It has an ordered list of **steps**; each step holds one or more objectives. Rewards are xp, coin,
+Quest JSON in `EncounterContent/Quests/*.json`. Each quest has an id, title, kind, giver, turn-in, level, an optional
+minLevel, zone, and requires (quests / reputation / time of day). It has an ordered list of **steps**; each step holds one or more objectives. Rewards are xp, coin,
 items, reputation and unlocks. Text: offer / progress / complete, plus canonStatus.
 
 | Objective type | Example |
@@ -99,6 +101,26 @@ shown. The main quest can foreshadow it (the Void-Seed and the straight grey lin
 | Corwin Ashby, elder | *Sleep Now, Stone and Sky*: collect the verses of the old Oakhaven lullaby (CANON lullaby) | talk chain, Chronicle |
 | Pim and the children | *Hide and Seek*: find the three hiding children | visit |
 
+### Side quest: *The Tin Crown* (GAME-ONLY quest; CANON faction, the Sandthrone)
+Chris's brief: "a quest appears at lvl 3 to take out the bandit and bandit king in the cave so they stop harassing the villagers".
+- **Crowsfoot Hollow** (GAME-ONLY) is the walk-in cave where the North road ends in the hills north of the village: a camp
+  of **Sandthrone deserters** in the first chamber, lookouts at the mouth, and the hall of **Caddock, the Bandit King** (elite)
+  at the end of the western bend. The Sandthrone are the canon mercenary company that holds the Peaks toll; this band walked
+  away from it and lives off Oakhaven's farms.
+- **Caddock** is GAME-ONLY: a deserter sergeant who crowned himself with beaten tin. No canon Sandthrone name is used.
+- **Giver and turn-in:** Wil Carder, the farmer whose barn they emptied (Garet Moss tracked them to the hollow).
+- **Level 3, minLevel 3:** nothing shows before level 3, then a gold !.
+- **Steps:**
+  1. Kill 6 deserters and Caddock, in either order.
+  2. Search the deserters' plunder in his hall.
+  3. Return to Wil.
+- **Rewards:** 110 XP, 20 gold, +300 Oakhaven Folk.
+- **Looks:** the deserters wear the company's sand gone to dirt: a torn tabard over company mail, a hood or head-wrap, an ochre
+  scarf over the face, one leather pauldron and one mail sleeve, a falchion or a club. Each is put together differently.
+  Caddock wears a long dark coat, the torn company sash, a crooked crown of beaten tin, and carries a two-handed cleaver.
+- **Villager talk** (`VillageLife.HollowQuest`): Oakhaven folk mention the raids from Crowsfoot until the quest is done,
+  and then thank you for it.
+
 ### Faction introductions (CANON factions, GAME-ONLY quests)
 - **Oakhaven Folk** (village standing): earned from the NPC quests. Raises prices at the stalls, opens a room at the inn, and gets villagers to share rumours.
 - **Salt-Menders (the Alliance):** a quiet stranger at the inn asks you to spoil the collectors' supplies. Their chain works against the Concord.
@@ -124,6 +146,12 @@ shown. The main quest can foreshadow it (the Void-Seed and the straight grey lin
   - Visit, checked every 0.5 s.
   - Flags: `recruited` and `equipped:<item>`.
   - `ReconcileQuests()` catches new steps up with what the character has already done.
+- **Level gates** (`QuestLog.For`, `Marker`, `Accept`):
+  - A quest is offered from 3 levels below its `level`, with a grey ! until then.
+  - An optional `minLevel` hides it completely below that level: no offer, no ! of any colour, and `Accept` refuses it.
+  - Without `minLevel`, a quest behaves as before.
+  - `minLevel` must be 0-10.
+- A kill or flag objective's `say` line is narration. The chat no longer prints the enemy id as if it were the speaker.
 - UI lives in `EncounterHud.Quests.cs`:
   - Tracker for up to 5 quests, with the Chronicle first.
   - Gold or grey ! / ? over heads, and on the minimap and zone map. Quest places show as gold rings.
@@ -144,16 +172,23 @@ shown. The main quest can foreshadow it (the Void-Seed and the straight grey lin
 
 **Content** (`EncounterContent/Quests/`)
 - `factions.json`: Oakhaven Folk, Salt-Menders, Preservationist Guild, Ash-Walkers, Sandthrone, and High Concord (fixed Hostile).
-- `oakhaven.json`, 10 quests:
+- `oakhaven.json`, 11 quests:
   - Chronicle I, "Two Hundred and Forty Souls": Mira, the collectors, the blade, the wagon and ledger, then Corwin.
   - Chronicle II, "The Miller's Boy".
   - NPC quests: A Dozen for the Oven, Ash in the Flour, Yarrow for Mira, What the Deer Know, Good Iron, and Sleep Now, Stone and Sky.
   - Faction quests: Salt in the Tithe (Salt-Menders) and Roots Before Ruin (Preservationists).
+  - Side quest: The Tin Crown (`side.oakhaven.crowsfoot`, Wil Carder, minLevel 3): Crowsfoot Hollow, see section 5.
 - Chronicle pages: the Bureau ledger and the Oakhaven lullaby.
 
 **Tests**
 - EditMode: `QuestLogTests` (10).
 - PlayMode: `OakhavenQuestTests`, which checks that every giver, target and interactable exists, and plays Chronicle I end to end.
+- PlayMode: `HollowQuestTests` covers The Tin Crown:
+  - the level gate;
+  - that its kill targets are the hollow's camps, in their own looks;
+  - that the plunder exists;
+  - a full play-through;
+  - that a mob doesn't notice you through solid scenery.
 
 ## 8. The road to level 10 (2026-09-29)
 Each zone's last main quest is turned in to someone in the next zone. This makes the Chronicle a breadcrumb trail:

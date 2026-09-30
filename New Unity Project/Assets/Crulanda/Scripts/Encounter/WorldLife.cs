@@ -214,6 +214,18 @@ namespace Crulanda.Encounter
             "The well's gone bitter. Iron, my gran says. Or worse.",
             "Every morning the grey is a little closer. You can hear it, if the wind stops.",
             "Mira's at the Cask. She mends what the collectors break." };
+        /// <summary>
+        /// Crowsfoot Hollow (GAME-ONLY): Sandthrone deserters raid the north farms until the player clears the hollow (this
+        /// quest), and then the talk turns. Oakhaven's wary pool carries the lines, so the draw from the shared rng is unchanged.
+        /// </summary>
+        public const string HollowQuest = "side.oakhaven.crowsfoot";
+        static readonly string[] WaryRaided = new List<string>(Wary) {
+            "Deserters came down the North road again last night. Sandthrone, or they were once.",
+            "Bar your door after dark. The Crowsfoot lot don't knock.",
+            "They've a king up in Crowsfoot Hollow, if you'll believe it. Tin crown and all." }.ToArray();
+        static readonly string[] WaryAfterHollow = new List<string>(Wary) {
+            "Not a door kicked in on the North road since you went up to Crowsfoot.",
+            "Wil Carder's got his seed-corn back. First time I've seen him smile since harvest." }.ToArray();
         static readonly string[] Relieved = {
             "You drove them off? Then we've a few quiet nights, at least.",
             "I'll pour you a cup at the Cask. On me.",
@@ -258,6 +270,7 @@ namespace Crulanda.Encounter
             if (v.Role == "child") return ChildLines[rng.Next(ChildLines.Length)];
             var mood = Zone.Zone.life.mood;
             var pool = mood == "afraid" ? (EnemiesCleared ? Relieved : Afraid) : EnemiesCleared ? Relieved : Wary;
+            if (pool == Wary && Zone.Zone.id == "zone.oakhaven") pool = Session.Quests != null && Session.Quests.IsDone(HollowQuest) ? WaryAfterHollow : WaryRaided;
             return pool[rng.Next(pool.Length)];
         }
         public void Talk(Villager v)

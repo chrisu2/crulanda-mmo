@@ -84,6 +84,8 @@ namespace Crulanda.World
             // grey, with a little more skylight by day; the air greys, cools, pales or dulls with it and the fog closes in; a storm's
             // lightning flashes everything for a moment.
             var w = WorldWeather.Now; float dark = Darkness, lit = 1 - dark, flash = WorldWeather.Flash;
+            // In a cave (Hollow) the skylight and the air darken with depth; its torches and fires light it.
+            var view = Camera.main; float under = view != null ? Hollow.DepthAt(view.transform.position) : 0; Hollow.CameraDepth = under;
             float loss = w.dim * Mathf.Lerp(.5f, 1, lit), lift = 1 + (.14f * w.dim - .2f * w.rain) * lit + flash * .7f;   // overcast skylight is bright; rain is gloomy
             // The same light plays sun by day and moon by night; it swings across the sky with the hour.
             bool moon = Hour >= 20.2f || Hour < 5.6f;
@@ -98,10 +100,12 @@ namespace Crulanda.World
             }
             RenderSettings.ambientSkyColor = Flat(look.sky, .35f * loss) * lift; RenderSettings.ambientEquatorColor = Flat(look.equator, .35f * loss) * lift;
             RenderSettings.ambientGroundColor = Flat(look.ground, .3f * loss) * (1 + .5f * flash);
-            var fog = Weathered(look.fog, w, lit);
+            float cave = Mathf.Lerp(1, .2f, under);
+            RenderSettings.ambientSkyColor *= cave; RenderSettings.ambientEquatorColor *= cave; RenderSettings.ambientGroundColor *= cave;
+            var fog = Color.Lerp(Weathered(look.fog, w, lit), new Color(.05f, .045f, .04f, look.fog.a), .9f * under);   // smoky cave air
             RenderSettings.fogColor = fog;
             // The fog closes in with the weather, never nearer than 55 m at its far end (enemies stay in sight).
-            RenderSettings.fogStartDistance = day.fogStart * w.fog; RenderSettings.fogEndDistance = Mathf.Max(day.fogEnd * w.fog, Mathf.Min(day.fogEnd, 55));
+            RenderSettings.fogStartDistance = Mathf.Lerp(day.fogStart * w.fog, 1.5f, under); RenderSettings.fogEndDistance = Mathf.Lerp(Mathf.Max(day.fogEnd * w.fog, Mathf.Min(day.fogEnd, 55)), 34, under);
             if (sky != null)
             {
                 float exposure = look.exposure * (1 - .3f * w.dim) * (1 + flash);
@@ -120,7 +124,7 @@ namespace Crulanda.World
             var cam = Camera.main; if (cam != null) cam.backgroundColor = fog;
             // The zone's realtime sky probe has its own intensity (RenderSettings.reflectionIntensity only scales the default
             // skybox reflection), so dim both: night water stays dark instead of glowing with the moonlit sky.
-            RenderSettings.reflectionIntensity = Mathf.Lerp(1f, .55f, dark) * (1 - .35f * w.dim); if (Reflections != null) Reflections.intensity = RenderSettings.reflectionIntensity;
+            RenderSettings.reflectionIntensity = Mathf.Lerp(1f, .55f, dark) * (1 - .35f * w.dim) * (1 - .85f * under); if (Reflections != null) Reflections.intensity = RenderSettings.reflectionIntensity;
             // Lamps are lit early under heavy cloud: a glow in the windows and on the lanterns through the rain.
             float lamp = Mathf.Max(dark, .5f * Mathf.InverseLerp(.5f, .9f, w.dim));
             if (lamps != null) foreach (var l in lamps)

@@ -81,7 +81,7 @@ namespace Crulanda.Tests
                     var camp = z.camps[c];
                     int spawned = s.Enemies.Count(e => e.Camp && e.persistentId.Contains("." + shortId + "." + c + "."));
                     if (spawned < Mathf.CeilToInt(camp.count * .75f)) problems.Add(p + "camp '" + camp.name + "' spawned " + spawned + "/" + camp.count);
-                    if (camp.levelMin < z.levelMin - 1 || camp.levelMax > z.levelMax + 1) problems.Add(p + "camp '" + camp.name + "' levels " + camp.levelMin + "-" + camp.levelMax + " outside " + z.levelMin + "-" + z.levelMax);
+                    if (camp.levelMin < z.levelMin - 1 || camp.levelMax > z.levelMax + (camp.harder ? 3 : 1)) problems.Add(p + "camp '" + camp.name + "' levels " + camp.levelMin + "-" + camp.levelMax + " outside " + z.levelMin + "-" + z.levelMax);
                 }
                 // Quest people and props that the zone is responsible for.
                 var life = VillageLife.Active;

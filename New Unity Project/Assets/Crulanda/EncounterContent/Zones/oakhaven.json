@@ -3,18 +3,36 @@
   "displayName": "Oakhaven",
   "subtitle": "An eastern farming village at the edge of the Wasting",
   "canonStatus": "CANON-EXPANDED",
-  "canonNote": "Canon: Oakhaven is an eastern agricultural hub erased by an accelerated, localized Wasting event that hid the Council's abduction of resonance candidates (interactive map; Oakhaven village map). This zone shows it on the eve of that erasure. Layout follows the canon village map. The Concord collectors, Mira and exact building placement are GAME-ONLY / PROVISIONAL. The wolf and boar camps and the south road to the Ashland Rim are GAME-ONLY.",
+  "canonNote": "Canon: Oakhaven is an eastern agricultural hub erased by an accelerated, localized Wasting event that hid the Council's abduction of resonance candidates (interactive map; Oakhaven village map). This zone shows it on the eve of that erasure. Layout follows the canon village map. The Concord collectors, Mira and exact building placement are GAME-ONLY / PROVISIONAL. The wolf and boar camps and the south road to the Ashland Rim are GAME-ONLY. Crowsfoot Hollow (the cave at the end of the North road), its Sandthrone deserters and Caddock, the Bandit King are GAME-ONLY; the Sandthrone company is CANON.",
   "size": 260,
   "levelMin": 1,
   "levelMax": 2,
   "biome": "meadow",
   "weather": [
-    { "kind": "clear", "weight": 2 },
-    { "kind": "fair", "weight": 3 },
-    { "kind": "windy", "weight": 1.5 },
-    { "kind": "overcast", "weight": 2.5 },
-    { "kind": "rain", "weight": 3 },
-    { "kind": "storm", "weight": 1.2 }
+    {
+      "kind": "clear",
+      "weight": 2
+    },
+    {
+      "kind": "fair",
+      "weight": 3
+    },
+    {
+      "kind": "windy",
+      "weight": 1.5
+    },
+    {
+      "kind": "overcast",
+      "weight": 2.5
+    },
+    {
+      "kind": "rain",
+      "weight": 3
+    },
+    {
+      "kind": "storm",
+      "weight": 1.2
+    }
   ],
   "worldMapPosition": {
     "x": 0.683,
@@ -209,8 +227,8 @@
           "y": 70
         },
         {
-          "x": -18,
-          "y": 128
+          "x": -16,
+          "y": 87
         }
       ]
     },
@@ -707,6 +725,21 @@
         "y": -108
       },
       "radius": 10
+    },
+    {
+      "name": "Crowsfoot Hollow",
+      "text": "A cave in the north hills. Lately, smoke by night.",
+      "at": {
+        "x": -16,
+        "y": 93
+      },
+      "radius": 10,
+      "view": {
+        "x": -9,
+        "y": 72
+      },
+      "viewPitch": 10,
+      "viewZoom": 10
     }
   ],
   "props": [
@@ -1583,8 +1616,8 @@
     {
       "kind": "tree",
       "at": {
-        "x": -20,
-        "y": 95
+        "x": -2,
+        "y": 83
       },
       "variant": 2
     },
@@ -1890,6 +1923,15 @@
       "variant": 0,
       "interact": "Gather yarrow",
       "item": "item.yarrow"
+    },
+    {
+      "kind": "cavern",
+      "name": "Crowsfoot Hollow",
+      "at": {
+        "x": -16,
+        "y": 90
+      },
+      "rotation": 0
     }
   ],
   "groves": [
@@ -2180,6 +2222,75 @@
       "levelMax": 2,
       "respawn": 75,
       "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "Hollow lookouts",
+      "mob": "Sandthrone deserter",
+      "tag": "deserter",
+      "look": "deserter",
+      "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
+      "center": {
+        "x": -16,
+        "y": 84.5
+      },
+      "radius": 3,
+      "count": 2,
+      "levelMin": 3,
+      "levelMax": 3,
+      "respawn": 90,
+      "harder": true
+    },
+    {
+      "name": "Deserters' camp",
+      "mob": "Sandthrone deserter",
+      "tag": "deserter",
+      "look": "deserter",
+      "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
+      "center": {
+        "x": -15,
+        "y": 102.3
+      },
+      "radius": 3.5,
+      "count": 4,
+      "levelMin": 3,
+      "levelMax": 4,
+      "respawn": 90,
+      "harder": true
+    },
+    {
+      "name": "King's guard",
+      "mob": "Sandthrone deserter",
+      "tag": "deserter",
+      "look": "deserter",
+      "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
+      "center": {
+        "x": -30.5,
+        "y": 114
+      },
+      "radius": 3,
+      "count": 2,
+      "levelMin": 4,
+      "levelMax": 4,
+      "respawn": 120,
+      "harder": true
+    },
+    {
+      "name": "Caddock's hall",
+      "mob": "Caddock, the Bandit King",
+      "tag": "banditking",
+      "look": "banditking",
+      "canonStatus": "GAME-ONLY",
+      "center": {
+        "x": -34.6,
+        "y": 116.6
+      },
+      "radius": 1.2,
+      "count": 1,
+      "levelMin": 4,
+      "levelMax": 4,
+      "elite": true,
+      "respawn": 300,
+      "harder": true
     }
   ],
   "lakes": [
@@ -2201,6 +2312,18 @@
         "y": 108
       },
       "radius": 10
+    }
+  ],
+  "shapes": [
+    {
+      "name": "Crowsfoot Hollow floor",
+      "center": {
+        "x": -24,
+        "y": 106
+      },
+      "radius": 21,
+      "height": 0,
+      "blend": 9
     }
   ]
 }

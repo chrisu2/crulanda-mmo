@@ -24,11 +24,13 @@ namespace Crulanda.Encounter
     /// <summary>
     /// kind: main | side | npc | faction. giver/turnIn: a villager's name, "Mira", or "auto" (starts itself in its zone).
     /// Steps run in order; a step is done when all its objectives are.
+    /// level: offered up to 3 levels early, with a grey ! until then. minLevel (optional, 0 = none): below it the quest is
+    /// not offered, shows no ! at all, and can't be accepted (the Crowsfoot Hollow quest waits for level 3).
     /// </summary>
     [Serializable] public sealed class QuestDef
     {
         public string id, title, kind = "side", giver, turnIn, zone, canonStatus;
-        public int level = 1;
+        public int level = 1, minLevel;
         public string[] requires = new string[0];
         public string requiresFaction; public int requiresStanding;
         public string summary, offer, progress, complete;
@@ -116,6 +118,7 @@ namespace Crulanda.Encounter
             if (string.IsNullOrEmpty(q.giver)) errors.Add(p + "no giver.");
             if (string.IsNullOrEmpty(q.turnIn)) errors.Add(p + "no turnIn.");
             if (q.steps == null || q.steps.Length == 0) errors.Add(p + "no steps.");
+            if (q.minLevel < 0 || q.minLevel > EncounterProgress.LevelCap) errors.Add(p + "minLevel " + q.minLevel + " is outside 0-" + EncounterProgress.LevelCap + ".");
             foreach (var r in q.requires ?? new string[0]) if (!Quests.ContainsKey(r)) errors.Add(p + "requires unknown quest '" + r + "'.");
             if (!string.IsNullOrEmpty(q.requiresFaction) && !Factions.ContainsKey(q.requiresFaction)) errors.Add(p + "unknown faction '" + q.requiresFaction + "'.");
             foreach (var i in q.giveOnAccept ?? new string[0]) if (!Items.ContainsKey(i)) errors.Add(p + "gives unknown item '" + i + "'.");
@@ -231,9 +234,10 @@ namespace Crulanda.Encounter
         }
 
         // ---------- accept / abandon / turn in ----------
+        /// <summary>Takes on a quest that is available here. Refuses one the character is below <see cref="QuestDef.minLevel"/> for.</summary>
         public bool Accept(QuestDef q, string zoneId)
         {
-            if (q == null || Status(q, zoneId) != QuestStatus.Available) return false;
+            if (q == null || Status(q, zoneId) != QuestStatus.Available || Progress.Level < q.minLevel) return false;
             var s = new QuestState { id = q.id }; Progress.quests.Add(s);
             foreach (var item in q.giveOnAccept) Progress.questItems.Add(item);
             Say((q.IsMain ? "Chronicle begun: " : "Quest accepted: ") + q.title, null);
@@ -378,7 +382,8 @@ namespace Crulanda.Encounter
         }
         void Completed(QuestObjectiveDef o, string speaker = null)
         {
-            if (!string.IsNullOrEmpty(o.say)) Say(o.say, speaker ?? o.target);
+            // A kill or flag line is narration: its target is an enemy id pattern or a state name, not someone speaking.
+            if (!string.IsNullOrEmpty(o.say)) Say(o.say, speaker ?? (o.type == "kill" || o.type == "flag" ? null : o.target));
             if (!string.IsNullOrEmpty(o.document)) Reveal(o.document);
         }
         void Advance(QuestDef q, QuestState s)
@@ -429,7 +434,10 @@ namespace Crulanda.Encounter
         }
 
         // ---------- givers ----------
-        /// <summary>What this NPC offers right now: quests to hand in first, then new ones.</summary>
+        /// <summary>
+        /// What this NPC offers right now: quests to hand in first, then new ones. New ones are offered from 3 levels below
+        /// their level, and never below their <see cref="QuestDef.minLevel"/>.
+        /// </summary>
         public List<(QuestDef quest, QuestStatus status)> For(string npc, string zoneId, int level)
         {
             var list = new List<(QuestDef, QuestStatus)>();
@@ -441,11 +449,14 @@ namespace Crulanda.Encounter
             foreach (var q in Db.Ordered)
             {
                 var st = Status(q, zoneId);
-                if (st == QuestStatus.Available && q.giver == npc && q.level <= level + 3) list.Add((q, st));
+                if (st == QuestStatus.Available && q.giver == npc && q.level <= level + 3 && level >= q.minLevel) list.Add((q, st));
             }
             return list;
         }
-        /// <summary>Head marker for an NPC: '?' gold (hand in, or someone waiting to hear from you), '!' gold (offer), '?' grey (in progress), or none.</summary>
+        /// <summary>
+        /// Head marker for an NPC: '?' gold (hand in, or someone waiting to hear from you), '!' gold (offer), '?' grey (in progress), or none.
+        /// An offer more than 3 levels above you shows a grey '!'; one you are below the minLevel of shows nothing.
+        /// </summary>
         public char Marker(string npc, string zoneId, int level, out bool grey)
         {
             grey = false;
@@ -457,7 +468,7 @@ namespace Crulanda.Encounter
                     if ((o.type == "talk" || (o.type == "deliver" && ItemCount(o.item) >= o.count)) && Matches(o.target, npc) && !ObjectiveDoneFor(s, step, o)) return '?';
             }
             foreach (var q in Db.Ordered)
-                if (q.giver == npc && q.giver != "auto" && Status(q, zoneId) == QuestStatus.Available) { grey = q.level > level + 3; return '!'; }
+                if (q.giver == npc && q.giver != "auto" && level >= q.minLevel && Status(q, zoneId) == QuestStatus.Available) { grey = q.level > level + 3; return '!'; }
             foreach (var (q, s) in Active()) if (q.turnIn == npc && s.step < q.steps.Length) { grey = true; return '?'; }
             return ' ';
         }

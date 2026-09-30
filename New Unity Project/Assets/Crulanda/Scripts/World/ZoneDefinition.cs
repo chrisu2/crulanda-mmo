@@ -77,7 +77,7 @@ namespace Crulanda.World
     /// A levelling camp. Holds count mobs of one kind within radius of center, each at a level between levelMin and
     /// levelMax, respawning respawn seconds after death. Mob ids are "mob.&lt;tag&gt;.&lt;zone&gt;.&lt;camp index&gt;.&lt;n&gt;", so a
     /// quest can target a kind with "mob.wolf.*".
-    /// - look: collector, warden, outrider, pale, hollow, cultist, wolf, boar, weaveeater.
+    /// - look: collector, warden, outrider, pale, hollow, cultist, wolf, boar, weaveeater, deserter, banditking.
     /// - elite: tougher, and marked on the map.
     /// </summary>
     [Serializable] public sealed class ZoneCamp
@@ -86,6 +86,9 @@ namespace Crulanda.World
         public Vector2 center; public float radius = 10;
         public int count = 4, levelMin = 1, levelMax = 1;
         public float respawn = 75; public bool elite;
+        /// <summary>Harder on purpose (a cave behind a quest, such as Crowsfoot Hollow): its levels may run up to three past the zone's
+        /// band. The maps show every camp's levels in their level colour, so the player sees it coming.</summary>
+        public bool harder;
         /// <summary>Lie hidden in tall grass until you come close (much closer if you sneak, holding Ctrl), then leap out.</summary>
         public bool ambush;
     }
@@ -146,7 +149,8 @@ namespace Crulanda.World
     /// hedge, signpost, ruin, ruined_house, wall (uses points), tower, gallows, crypt, cliff, wayshrine (a wayside shrine).
     /// Landmarks: gate (size.x the gap between two towers), keep, perch (rocks round a raised ZoneShape; size.x its radius),
     /// wallow, cave (size.x the face), shelter, brazier (variant 1: bone legs), brood, rib (size: reach to the spine, height),
-    /// spine (size: length, height), shrine (the Cult of Ash's), idol.
+    /// spine (size: length, height), shrine (the Cult of Ash's), idol, cavern (a walk-in cave in a rocky knoll, its mouth at
+    /// the prop facing -Z; variant 0 is Crowsfoot Hollow's plan; give it a level ZoneShape pad under its floor, see Hollow).
     /// rotation in degrees (0 = door faces south). variant picks colour/size variations; some are looks of their own:
     /// well 1 blood-stone, inn 1 the Cracked Hearth (split, glowing chimney), crypt 1 a turfed barrow, grave 1 heaved over.
     /// </summary>

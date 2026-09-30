@@ -45,6 +45,9 @@ namespace Crulanda.World
             g.threshold += .35f * weather.dim; g.bloom *= 1 - .25f * weather.dim;
             g.tint = Color.Lerp(Color.Lerp(g.tint, new Color(.98f, 1, 1.02f), .6f * weather.dim * lit), new Color(.95f, 1, 1.06f), .5f * weather.rain * lit);   // no warm sun under cloud
             g.exposure *= 1 - .06f * weather.rain * lit;
+            // In a cave: the eye adjusts a little and firelight blooms.
+            float under = Hollow.CameraDepth;
+            g.exposure *= 1 + .3f * under; g.threshold = Mathf.Lerp(g.threshold, .6f, under); g.bloom += .3f * under; g.vignette += .25f * under;
             // Night: lamps bloom more, colour drains and cools; dusk and dawn warm up a touch.
             float dusk = Mathf.Clamp01(1 - Mathf.Abs(dark - .5f) * 2);
             mat.SetFloat("_Threshold", Mathf.Lerp(g.threshold, .55f, dark)); mat.SetFloat("_Knee", .5f);
@@ -100,7 +103,7 @@ namespace Crulanda.World
             {
                 float c = w.clouds;
                 strength = .36f * Mathf.SmoothStep(0, 1, Mathf.InverseLerp(.22f, .5f, c)) * (1 - Mathf.SmoothStep(0, 1, Mathf.InverseLerp(.74f, .98f, c)))
-                    * (1 - .6f * w.dim) * (1 - dark) * Mathf.Clamp01(toSun.y * 3);
+                    * (1 - .6f * w.dim) * (1 - dark) * Mathf.Clamp01(toSun.y * 3) * (1 - Hollow.CameraDepth);
             }
             mat.SetVector("_CloudShadow", new Vector4(strength, w.clouds, .2f, 0));
             if (strength <= .001f) return;

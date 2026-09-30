@@ -429,6 +429,19 @@ namespace Crulanda.Encounter
                     }
                     weather.Force(weather.TourKind(), true);
                 }
+                // Crowsfoot Hollow: the camp chamber from its way in, and the King's hall from the low passage.
+                var hollow = Crulanda.World.Hollow.All.Find(hh => hh.Name == "Crowsfoot Hollow");
+                if (hollow != null)
+                {
+                    EncounterHud.Hidden = true; Crulanda.World.WorldClock.Hour = 15;
+                    foreach (var (from, toward, shot) in new[] { (6.5f, 12.5f, "85-hollow-camp"), (hollow.Length - 13, hollow.Length - 5, "86-hollow-hall") })
+                    {
+                        var stand = hollow.At(from); var ahead = hollow.At(toward) - stand;
+                        motor.Teleport(stand + Vector3.up * 1.1f); motor.SetView(Mathf.Atan2(ahead.x, ahead.z) * Mathf.Rad2Deg, 10, 5);
+                        yield return new WaitForSeconds(1.2f);
+                        ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + shot + ".png")); yield return new WaitForSeconds(.4f);
+                    }
+                }
             }
             EncounterHud.Hidden = false;
             Debug.Log("WORLD_CAPTURE_DONE"); Application.Quit(0);

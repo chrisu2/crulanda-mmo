@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Crulanda.Encounter
 {
-    public enum ActorLook { Warrior, Druid, Healer, Collector, Warden, Sentry, Outrider, Pale, Villager, Hollow, Cultist, Wolf, Boar, WeaveEater }
+    public enum ActorLook { Warrior, Druid, Healer, Collector, Warden, Sentry, Outrider, Pale, Villager, Hollow, Cultist, Wolf, Boar, WeaveEater, Deserter, BanditKing }
     /// <summary>Body language layered over walking: working a hoe or bucket, talking, sitting, cowering.</summary>
     public enum ActorPose { None, Work, Talk, Sit, Cower, Hammer, Chop, Gather, Knead, Swim, Sneak }
 
@@ -323,6 +323,12 @@ namespace Crulanda.Encounter
                 case ActorLook.Outrider: clothC = new Color(.66f, .52f, .32f); accentC = new Color(.5f, .48f, .45f); legC = new Color(.36f, .27f, .18f); break;
                 case ActorLook.Hollow: clothC = new Color(.5f, .5f, .51f); accentC = new Color(.4f, .4f, .42f); legC = new Color(.44f, .44f, .45f); skin = Mat(new Color(.56f, .56f, .57f), .05f); break;
                 case ActorLook.Cultist: clothC = new Color(.14f, .12f, .14f); accentC = new Color(.86f, .82f, .72f); legC = new Color(.12f, .1f, .11f); break;
+                // Sandthrone sand gone to dirt (tinted per figure in BuildDeserter); faces weathered to any shade.
+                case ActorLook.Deserter:
+                    clothC = new Color(.55f, .45f, .3f); accentC = new Color(.44f, .44f, .45f); legC = new Color(.33f, .26f, .19f);
+                    skin = Mat(Skins[(FigureSeed() & 0x7fffffff) % Skins.Length]); break;
+                // The coat's near-black brown (torso and sleeves), dark breeches, a face gone red-brown in the wind.
+                case ActorLook.BanditKing: clothC = new Color(.15f, .12f, .11f); accentC = new Color(.6f, .46f, .27f); legC = new Color(.22f, .18f, .15f); skin = Mat(new Color(.7f, .53f, .4f)); break;
                 case ActorLook.Villager:
                     clothC = VillagerCloth[Mathf.Abs(variant) % VillagerCloth.Length]; accentC = VillagerCloth[Mathf.Abs(variant * 3 + 2) % VillagerCloth.Length] * .8f;
                     legC = new Color(.3f, .25f, .2f) * (.8f + (variant % 3) * .15f); skin = Mat(Skins[Mathf.Abs(variant * 7) % Skins.Length]); break;
@@ -401,7 +407,7 @@ namespace Crulanda.Encounter
                     Part(PrimitiveType.Sphere, body, new Vector3(0, .84f, 0), new Vector3(.34f, .26f, .34f), cloth);
                     Part(PrimitiveType.Cube, body, new Vector3(0, .1f, 0), new Vector3(.54f, .45f, .33f), accent);
                     Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.5f, .2f), new Vector3(.05f, .5f, .05f), Mat(new Color(.3f, .22f, .14f)), new Vector3(60, 0, 0));
-                    Part(PrimitiveType.Cube, armR, new Vector3(0, -.72f, .58f), new Vector3(.04f, .34f, .26f), Mat(new Color(.55f, .56f, .58f), .5f, .5f), new Vector3(60, 0, 0));
+                    Part(PrimitiveType.Cube, armR, new Vector3(0, -.45f, .55f), new Vector3(.04f, .34f, .26f), Mat(new Color(.55f, .56f, .58f), .5f, .5f), new Vector3(60, 0, 0));
                     break;
                 case ActorLook.Villager when HasOutfit(role):
                     Dress(role, skin, legs);
@@ -430,9 +436,174 @@ namespace Crulanda.Encounter
                     Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.45f, .08f), new Vector3(.05f, .85f, .05f), Mat(new Color(.18f, .15f, .12f)));
                     Part(PrimitiveType.Sphere, armR, new Vector3(0, .42f, .08f), new Vector3(.16f, .2f, .16f), accent);                      // skull knob
                     break;
+                case ActorLook.Deserter: BuildDeserter(); break;
+                case ActorLook.BanditKing: BuildBanditKing(); break;
             }
             if (stowed != null) foreach (var g in stowed) g.gameObject.SetActive(false);   // shown only while swimming
             lastPosition = transform.position;
+        }
+
+        /// <summary>A seed from the figure's name and spawn spot: the same deserter is always put together the same way, and no shared random stream is touched.</summary>
+        int FigureSeed()
+        {
+            var at = transform.position; int seed = 17; foreach (char ch in name) seed = seed * 31 + ch;
+            return seed ^ (Mathf.RoundToInt(at.x * 10) * 73856093) ^ (Mathf.RoundToInt(at.z * 10) * 19349663);
+        }
+        static Color Dim(Color c, float k) { return new Color(c.r * k, c.g * k, c.b * k); }
+        static readonly Color[] Scarves = { new Color(.46f, .25f, .15f), new Color(.5f, .35f, .18f), new Color(.38f, .2f, .14f) };   // red ochre, dark ochre, brick
+
+        /// <summary>
+        /// A Sandthrone deserter (CANON company, GAME-ONLY band): the company's sand gone to dirt. A torn sand tabard over company
+        /// mail ripped at the hem, a leather baldric, one leather pauldron and one mail sleeve, rags of the old waist-wrap, an
+        /// ochre scarf over nose and mouth, a hood or the torn Sandthrone head-wrap, and a short falchion or an iron-studded club.
+        /// Each is put together differently (<see cref="FigureSeed"/>), so a camp reads as a ragged band, not the uniformed
+        /// company that keeps the Peaks toll (Outrider). GAME-ONLY styling.
+        /// </summary>
+        void BuildDeserter()
+        {
+            var rng = new System.Random(FigureSeed());
+            float R(float a, float b) { return a + (float)rng.NextDouble() * (b - a); }
+            Material M(float r, float g, float b, float smooth = .15f, float metal = 0) { return Mat(new Color(r, g, b), smooth, metal); }
+            bool hooded = rng.NextDouble() < .6, club = rng.NextDouble() < .45; int side = rng.Next(2) == 0 ? 1 : -1;
+            float tint = R(.88f, 1.04f); var sandC = new Color(.55f * tint, .45f * tint, .3f * tint);
+            cloth.color = sandC; var sand = cloth;   // torso, sleeves, chest and shoulders share it
+            var mail = M(.44f, .44f, .45f, .35f, .55f); var leather = M(.36f, .23f, .13f); var dark = M(.25f, .17f, .11f);
+            var grime = M(.27f, .21f, .15f); var iron = M(.4f, .4f, .42f, .45f, .6f); var wood = M(.36f, .26f, .16f);
+            var scarf = Mat(Scarves[rng.Next(Scarves.Length)]);
+            // Company mail over the tunic, ripped at the hem.
+            Part(PrimitiveType.Cube, body, new Vector3(0, .37f, 0), new Vector3(.52f, .42f, .38f), mail);
+            for (int k = 0; k < 4; k++) { float l = R(.05f, .15f); Part(PrimitiveType.Cube, body, new Vector3(-.18f + k * .12f, .16f - l / 2, .18f), new Vector3(.1f, l, .02f), mail); }
+            for (int k = 0; k < 3; k++) { float l = R(.05f, .13f); Part(PrimitiveType.Cube, body, new Vector3(-.13f + k * .13f, .16f - l / 2, -.18f), new Vector3(.11f, l, .02f), mail); }
+            // The company's sand tabard, front and back, slipped to one side and torn to strips at the hem.
+            float tx = side * .035f;
+            Part(PrimitiveType.Cube, body, new Vector3(tx, .33f, .205f), new Vector3(.3f, .46f, .02f), sand);
+            for (int k = 0; k < 3; k++) { float l = R(.08f, .24f); Part(PrimitiveType.Cube, body, new Vector3(tx - .1f + k * .1f, .1f - l / 2, .205f), new Vector3(.085f, l, .016f), sand, new Vector3(0, 0, R(-6, 6))); }
+            Part(PrimitiveType.Cube, body, new Vector3(tx + .05f * side, .42f, .217f), new Vector3(.08f, .07f, .006f), grime);
+            Part(PrimitiveType.Cube, body, new Vector3(-tx, .33f, -.205f), new Vector3(.3f, .46f, .02f), sand);
+            for (int k = 0; k < 2; k++) { float l = R(.08f, .22f); Part(PrimitiveType.Cube, body, new Vector3(-tx - .06f + k * .12f, .1f - l / 2, -.205f), new Vector3(.1f, l, .016f), sand, new Vector3(0, 0, R(-6, 6))); }
+            // A leather baldric across the chest; a leather pauldron where it meets the shoulder, a mail sleeve on the other arm.
+            foreach (float z in new[] { .23f, -.215f }) Part(PrimitiveType.Cube, body, new Vector3(0, .34f, z), new Vector3(.055f, .66f, .016f), leather, new Vector3(0, 0, side * 36));
+            int p = -side;   // the baldric's upper end
+            Part(PrimitiveType.Sphere, body, new Vector3(p * .29f, .6f, 0), new Vector3(.25f, .17f, .27f), leather);
+            Part(PrimitiveType.Sphere, body, new Vector3(p * .3f, .663f, .09f), Vector3.one * .035f, iron);                 // rivet
+            Part(PrimitiveType.Capsule, p > 0 ? armL : armR, new Vector3(0, -.2f, 0), new Vector3(.17f, .2f, .17f), mail);
+            Part(PrimitiveType.Cylinder, p > 0 ? armR : armL, new Vector3(0, -.47f, 0), new Vector3(.16f, .07f, .16f), dark);   // bracer
+            // Rags of the old waist-wrap.
+            foreach (var (x, z, w, d) in new[] { (-.15f, .155f, .09f, .02f), (.13f, .155f, .08f, .02f), (-.235f, .03f, .02f, .09f), (.05f, -.155f, .1f, .02f) })
+            { float l = R(.22f, .34f); Part(PrimitiveType.Cube, body, new Vector3(x, .03f - l / 2, z), new Vector3(w, l, d), sand, new Vector3(0, 0, R(-5, 5))); }
+            // A hood with its cowl fallen on the shoulders, or the torn Sandthrone head-wrap trailing its ends.
+            if (hooded)
+            {
+                var hood = Mat(Dim(sandC, .8f));
+                Part(PrimitiveType.Sphere, body, new Vector3(0, .86f, -.05f), new Vector3(.37f, .35f, .36f), hood);
+                Part(PrimitiveType.Cube, body, new Vector3(0, .66f, -.15f), new Vector3(.34f, .16f, .08f), hood, new Vector3(-12, 0, 0));
+            }
+            else
+            {
+                var wrap = Mat(Dim(sandC, .92f));
+                Part(PrimitiveType.Sphere, body, new Vector3(0, .9f, -.01f), new Vector3(.33f, .2f, .33f), wrap);
+                Part(PrimitiveType.Cube, body, new Vector3(.05f, .74f, -.17f), new Vector3(.07f, .26f, .025f), wrap, new Vector3(10, 0, -6));
+                Part(PrimitiveType.Cube, body, new Vector3(-.03f, .7f, -.165f), new Vector3(.06f, .2f, .02f), wrap, new Vector3(6, 0, 8));
+            }
+            // The scarf: pulled up to the bridge of the nose, wound round the jaw, one end hanging down the back.
+            Part(PrimitiveType.Cube, body, new Vector3(0, .7575f, .135f), new Vector3(.24f, .115f, .1f), scarf);
+            Part(PrimitiveType.Cylinder, body, new Vector3(0, .66f, 0), new Vector3(.25f, .045f, .25f), scarf);
+            Part(PrimitiveType.Cube, body, new Vector3(side * .07f, .57f, -.228f), new Vector3(.07f, .2f, .02f), scarf, new Vector3(8, 0, side * 12));
+            // A short falchion or an iron-studded club, carried point-forward and a little down.
+            var hand = new Vector3(0, -.62f, 0); var along = new Vector3(0, -Mathf.Sin(20 * Mathf.Deg2Rad), Mathf.Cos(20 * Mathf.Deg2Rad));
+            Vector3 At(float t) { return hand + along * t; }
+            if (!club)
+            {
+                Part(PrimitiveType.Cylinder, armR, At(.02f), new Vector3(.035f, .075f, .035f), dark, new Vector3(110, 0, 0));                        // grip
+                Part(PrimitiveType.Sphere, armR, At(-.075f), Vector3.one * .045f, iron);                                                               // pommel
+                Part(PrimitiveType.Cube, armR, At(.1f), new Vector3(.13f, .03f, .035f), iron, new Vector3(20, 0, 0));                                 // guard
+                Part(PrimitiveType.Cube, armR, At(.36f), new Vector3(.035f, .07f, .5f), iron, new Vector3(20, 0, 0)).name = "Falchion";               // blade
+                Part(PrimitiveType.Cube, armR, At(.5f) + new Vector3(0, -.019f, -.007f), new Vector3(.034f, .1f, .2f), iron, new Vector3(20, 0, 0));  // the belly toward the point
+            }
+            else
+            {
+                var across = new Vector3(0, Mathf.Cos(20 * Mathf.Deg2Rad), Mathf.Sin(20 * Mathf.Deg2Rad));
+                Part(PrimitiveType.Cylinder, armR, At(0), Vector3.one * .05f, dark, new Vector3(110, 0, 0));                                          // grip wrap
+                Part(PrimitiveType.Cylinder, armR, At(.2f), new Vector3(.04f, .26f, .04f), wood, new Vector3(110, 0, 0));                             // haft
+                Part(PrimitiveType.Capsule, armR, At(.5f), new Vector3(.12f, .16f, .12f), M(.29f, .21f, .13f), new Vector3(110, 0, 0)).name = "Club";  // knob
+                for (int k = 0; k < 4; k++)
+                    Part(PrimitiveType.Cube, armR, At(.44f + (k % 2) * .1f) + (k < 2 ? new Vector3(k == 0 ? .06f : -.06f, 0, 0) : across * (k == 2 ? .06f : -.06f)),
+                        Vector3.one * .03f, iron, new Vector3(20, 0, 45));                                                                                // studs
+            }
+        }
+
+        /// <summary>
+        /// Caddock, the Bandit King (GAME-ONLY): the deserter sergeant who crowned himself. Heavier than his men, in a long dark
+        /// coat flaring to the knee and hanging open over company mail, his torn Sandthrone sash across it and knotted at the hip,
+        /// one battered shoulder-plate, riding boots, a black beard, and a heavy two-handed cleaver carried low. What you see first
+        /// across his hall is the crown: a hammered ring of tin with seven uneven prongs and a bead of red glass, worn crooked.
+        /// The camp scales him 1.18 as an elite on top of his own build. GAME-ONLY styling.
+        /// </summary>
+        void BuildBanditKing()
+        {
+            Material M(float r, float g, float b, float smooth = .15f, float metal = 0) { return Mat(new Color(r, g, b), smooth, metal); }
+            body.localScale = new Vector3(1.16f, 1.03f, 1.12f);
+            var coat = cloth; coat.SetFloat("_Glossiness", .3f);   // oiled leather
+            var collar = M(.22f, .17f, .14f); var sash = M(.6f, .46f, .27f); var stain = M(.34f, .2f, .12f);
+            var iron = M(.36f, .36f, .38f, .4f, .6f); var leather = M(.2f, .14f, .1f); var mail = M(.42f, .42f, .43f, .35f, .55f); var beard = M(.1f, .08f, .07f, .2f);
+            // Dull tin that still catches the torchlight, and a bead of red glass.
+            var tin = M(.66f, .67f, .64f, .4f, .45f); tin.EnableKeyword("_EMISSION"); tin.SetColor("_EmissionColor", new Color(.07f, .07f, .065f));
+            var glass = M(.55f, .1f, .07f, .85f); glass.EnableKeyword("_EMISSION"); glass.SetColor("_EmissionColor", new Color(.14f, .02f, .01f));
+            // The long coat: skirts to the knee that flare out, open at the front, and company mail where it hangs open.
+            Part(PrimitiveType.Cube, body, new Vector3(0, -.24f, -.19f), new Vector3(.5f, .6f, .035f), coat, new Vector3(8, 0, 0));
+            foreach (int s in new[] { -1, 1 })
+            {
+                Part(PrimitiveType.Cube, body, new Vector3(s * .26f, -.24f, 0), new Vector3(.035f, .6f, .36f), coat, new Vector3(0, 0, s * 8));
+                Part(PrimitiveType.Cube, body, new Vector3(s * .23f, -.24f, .17f), new Vector3(.09f, .6f, .035f), coat, new Vector3(-8, 0, 0));
+            }
+            Part(PrimitiveType.Sphere, body, new Vector3(0, .42f, .03f), new Vector3(.19f, .38f, .33f), mail);
+            Part(PrimitiveType.Cube, body, new Vector3(0, .66f, -.165f), new Vector3(.34f, .17f, .045f), collar, new Vector3(-14, 0, 0));   // high collar
+            foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, body, new Vector3(s * .15f, .645f, -.07f), new Vector3(.045f, .15f, .17f), collar, new Vector3(-8, 0, 0));
+            // The torn Sandthrone sash, right shoulder to left hip: up the chest, over the shoulder, across the back; knotted, the end ripped.
+            Part(PrimitiveType.Cube, body, new Vector3(-.08f, .2f, .175f), new Vector3(.1f, .5f, .02f), sash, new Vector3(2.9f, 0, -35));
+            Part(PrimitiveType.Cube, body, new Vector3(.14f, .5f, .1325f), new Vector3(.1f, .3f, .02f), sash, new Vector3(-27.8f, 0, -35.3f));
+            Part(PrimitiveType.Cube, body, new Vector3(.21f, .635f, -.04f), new Vector3(.1f, .02f, .26f), sash, new Vector3(0, 0, -10));
+            Part(PrimitiveType.Cube, body, new Vector3(-.01f, .29f, -.16f), new Vector3(.1f, .74f, .02f), sash, new Vector3(0, 0, -35.9f));
+            Part(PrimitiveType.Sphere, body, new Vector3(-.21f, .02f, .175f), new Vector3(.1f, .09f, .06f), sash);                          // knot
+            Part(PrimitiveType.Cube, body, new Vector3(-.23f, -.13f, .205f), new Vector3(.08f, .28f, .018f), sash, new Vector3(0, 0, 5));     // ripped ends
+            Part(PrimitiveType.Cube, body, new Vector3(-.16f, -.09f, .21f), new Vector3(.06f, .2f, .018f), sash, new Vector3(0, 0, -9));
+            Part(PrimitiveType.Cube, body, new Vector3(-.02f, .26f, .19f), new Vector3(.07f, .06f, .006f), stain, new Vector3(2.9f, 0, -35));
+            Part(PrimitiveType.Cube, body, new Vector3(0, .06f, .165f), new Vector3(.08f, .065f, .015f), tin);                               // buckle
+            // One battered shoulder-plate, tin-riveted; riding-boot tops; a black beard.
+            Part(PrimitiveType.Sphere, body, new Vector3(-.3f, .6f, 0), new Vector3(.27f, .19f, .29f), iron);
+            Part(PrimitiveType.Sphere, body, new Vector3(-.3f, .665f, .1f), Vector3.one * .035f, tin);
+            Part(PrimitiveType.Sphere, body, new Vector3(-.385f, .649f, .085f), Vector3.one * .03f, tin);
+            foreach (var leg in new[] { legL, legR }) Part(PrimitiveType.Cylinder, leg, new Vector3(0, -.6f, 0), new Vector3(.22f, .07f, .22f), leather);
+            Part(PrimitiveType.Cube, body, new Vector3(0, .66f, .12f), new Vector3(.2f, .14f, .08f), beard);
+            Part(PrimitiveType.Cube, body, new Vector3(0, .767f, .148f), new Vector3(.11f, .022f, .02f), beard);                            // moustache
+            // The crown of beaten tin: a ring of twelve hammered plates, seven prongs of uneven height, worn crooked.
+            var crown = new GameObject("Tin crown").transform; crown.SetParent(body, false);
+            crown.localPosition = new Vector3(0, .925f, -.02f); crown.localEulerAngles = new Vector3(4, 0, -6);
+            for (int i = 0; i < 12; i++)
+            {
+                float a = i * 30;
+                Part(PrimitiveType.Cube, crown, new Vector3(Mathf.Sin(a * Mathf.Deg2Rad), 0, Mathf.Cos(a * Mathf.Deg2Rad)) * .165f, new Vector3(.092f, .05f, .024f), tin, new Vector3(0, a, 0));
+            }
+            float[] off = { 0, 7, -5, 4, -8, 6, -3 }, tall = { .145f, .1f, .125f, .11f, .15f, .095f, .12f };
+            for (int i = 0; i < 7; i++)
+            {
+                float a = i * 360f / 7 + off[i]; var up = Quaternion.Euler(8, a, 0) * Vector3.up;   // each prong leans a little outward
+                var foot = new Vector3(Mathf.Sin(a * Mathf.Deg2Rad) * .168f, .02f, Mathf.Cos(a * Mathf.Deg2Rad) * .168f);
+                Part(PrimitiveType.Cube, crown, foot + up * (tall[i] / 2), new Vector3(.036f, tall[i], .02f), tin, new Vector3(8, a, 0));
+                Part(PrimitiveType.Cube, crown, foot + up * tall[i], new Vector3(.028f, .028f, .02f), tin, new Vector3(8, a, 45));        // hammered point
+            }
+            Part(PrimitiveType.Sphere, crown, new Vector3(0, 0, .18f), new Vector3(.045f, .045f, .03f), glass);
+            // The cleaver: a long grip, a broad square blade with a honed edge, carried low and point-forward.
+            var cleaver = new GameObject("Cleaver").transform; cleaver.SetParent(armR, false);
+            cleaver.localPosition = new Vector3(0, -.62f, 0); cleaver.localEulerAngles = new Vector3(115, 0, 0);   // local y runs along the weapon, z toward its edge
+            Part(PrimitiveType.Cylinder, cleaver, new Vector3(0, .12f, 0), new Vector3(.05f, .2f, .05f), leather);                                      // grip
+            Part(PrimitiveType.Sphere, cleaver, new Vector3(0, -.1f, 0), Vector3.one * .075f, iron);                                                      // pommel
+            Part(PrimitiveType.Cube, cleaver, new Vector3(0, .34f, .04f), new Vector3(.05f, .045f, .17f), iron);                                         // guard
+            Part(PrimitiveType.Cube, cleaver, new Vector3(0, .72f, .1f), new Vector3(.035f, .74f, .25f), iron);                                          // blade
+            Part(PrimitiveType.Cube, cleaver, new Vector3(0, .72f, .232f), new Vector3(.03f, .74f, .03f), M(.74f, .74f, .76f, .7f, .7f));               // edge
+            Part(PrimitiveType.Cube, cleaver, new Vector3(0, 1.07f, -.04f), new Vector3(.03f, .06f, .06f), iron, new Vector3(45, 0, 0));                // spur on the spine
+            Part(PrimitiveType.Cylinder, cleaver, new Vector3(0, .98f, .05f), new Vector3(.06f, .02f, .06f), M(.08f, .07f, .07f), new Vector3(0, 0, 90)); // hanging hole
+            Part(PrimitiveType.Cube, cleaver, new Vector3(0, .52f, .16f), new Vector3(.037f, .14f, .1f), M(.35f, .2f, .11f));                            // rust
         }
 
         /// <summary>

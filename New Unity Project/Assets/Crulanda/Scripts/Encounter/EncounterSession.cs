@@ -627,6 +627,8 @@ namespace Crulanda.Encounter
                 case "wolf": return ActorLook.Wolf;
                 case "boar": return ActorLook.Boar;
                 case "weaveeater": return ActorLook.WeaveEater;
+                case "deserter": return ActorLook.Deserter;
+                case "banditking": return ActorLook.BanditKing;
                 default: return veteran ? ActorLook.Warden : ActorLook.Collector;
             }
         }

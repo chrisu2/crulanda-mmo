@@ -100,7 +100,9 @@ namespace Crulanda.Encounter
             }
             if (agent != null) agent.speed = Rooted ? 0 : baseSpeed * (Slowed ? slowFactor : 1) * (Time.time < lungeUntil ? 2.2f : 1);
             if (Vector3.Distance(transform.position, home) > session.Leash || !session.Player.IsAlive) { ResetFight(); return; }
-            if (session.Player.IsAlive && Vector3.Distance(transform.position, session.Player.transform.position) < 5)
+            // Noticing you: within 5 m and, until a fight is on, only with a clear line to you, so a mob inside a rock cave or
+            // behind a wall doesn't come for you through it.
+            if (session.Player.IsAlive && Vector3.Distance(transform.position, session.Player.transform.position) < 5 && (Victim != null || Sees(session.Player.transform.position)))
                 threat.AddProximity(session.Player.EntityId.Value, Time.deltaTime);
             var id = threat.Choose(Time.time, session.IsLivingPartyMember);
             Victim = session.PartyActor(id);
@@ -122,6 +124,24 @@ namespace Crulanda.Encounter
                 int damage = session.Kit.ResolveEnemyHit(this, Victim, Mathf.RoundToInt(HitBase));
                 session.FloatText(Victim.transform.position, "−" + damage, new Color(1, .45f, .35f));
             }
+        }
+        static readonly RaycastHit[] sightHits = new RaycastHit[16];
+        /// <summary>
+        /// A clear line from this mob's eyes to the point's chest height. Static scenery (ground, rock, walls, trunks) blocks
+        /// it; actors and triggers don't. Cast both ways, because a one-sided mesh (a cave's rock skin) only blocks from its
+        /// front.
+        /// </summary>
+        bool Sees(Vector3 target)
+        {
+            Vector3 eye = transform.position + Vector3.up * .6f, chest = target + Vector3.up * .4f;
+            return Clear(eye, chest) && Clear(chest, eye);
+        }
+        static bool Clear(Vector3 from, Vector3 to)
+        {
+            var line = to - from; float length = line.magnitude; if (length < .01f) return true;
+            int n = Physics.RaycastNonAlloc(from, line / length, sightHits, length, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+            for (int i = 0; i < n; i++) if (sightHits[i].collider.GetComponentInParent<Actor>() == null) return false;
+            return true;
         }
         public void ResetFight()
         {

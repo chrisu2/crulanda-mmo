@@ -206,6 +206,38 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
   - `--crulanda-weather <kind>` starts in that weather.
   - Capture tours hold fair weather for comparable shots, and add `80-weather-<kind>` shots (plus `81-...-pond` for rain).
 
+## Caves you walk into (`Scripts/World/Hollow.cs`, `ZoneBuilder.Cavern`)
+- **Crowsfoot Hollow** (GAME-ONLY) is Oakhaven's cave, at the end of the North road in the north hills. It is the Sandthrone
+  deserters' hideout; there is no loading, you walk in.
+- **Data:** a `cavern` prop (`at` is the mouth, which faces -Z turned by `rotation`; `variant` picks the plan) plus a level
+  `shapes` pad under its floor.
+  - The passage (`Hollow`) comes from the plan: control points (x, z, half-width, height) smoothed into rings about every 0.7 m.
+  - It is worked out before the ground is painted, so everything else can ask whether a point is inside it and how deep.
+- **Build:**
+  - A lofted rock shell: faceted, faces both in and out, casting shadow both ways, one mesh collider, and a navmesh obstacle.
+  - Its floor is the levelled ground, painted bare earth.
+  - Crag lumps heap over and round it into a knoll. Each is checked to stay clear of the passage (tests hold it to that), and
+    has a collider and a navmesh obstacle.
+- **Inside Crowsfoot Hollow:**
+  - flickering torches down the walls;
+  - the deserters' camp round a fire (bedrolls, stolen grain, crates, a torn Sandthrone banner) in the first chamber;
+  - a low passage bending west;
+  - Caddock's hall: a plank throne on a stone dais between braziers, his banner, and "The deserters' plunder" (usable, for
+    the quest).
+- **Light and air:**
+  - With the camera's depth (0 at the mouth, 1 from about 10 m in), WorldClock cuts the skylight to a fifth, thickens the
+    air to a smoky brown haze (fog 1.5-34 m), and drops sky reflections.
+  - ZonePost lets the eye adjust (+30% exposure), makes firelight bloom, and adds vignette. Cloud shadows stop at the mouth.
+- **Weather:** nothing falls inside. `UnderRoof` counts the passage, and the rock is overhead.
+- **Scatter:** no grass grows on the floor. Trees, bushes and edge rocks that land in it are built (their draws taken) and
+  dropped, so the zone's layout elsewhere is unchanged.
+- **Camps:**
+  - Hollow lookouts: 2 on the road at the mouth.
+  - Deserters' camp: 4 at the fire.
+  - King's guard: 2 in the hall.
+  - Caddock's hall: Caddock, the Bandit King, elite, level 4.
+  - The deserters are levels 3-4.
+
 ## Travel
 - Zones list `exits` (to, name, at, arrive, radius). Standing at an exit shows "[E] <name>"; E travels (not in combat):
   the character saves with the new zone and arrival point, and the scene rebuilds the other zone. A recruited Mira comes along.

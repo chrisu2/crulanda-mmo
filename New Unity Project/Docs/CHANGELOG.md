@@ -413,3 +413,45 @@ Chris shared a reference of a stylized fantasy cove and chose this look for Oakh
   - The cloud dome could lag the camera by a frame; it now updates after the camera moves.
   - The capture tour's storm shot now waits out any lightning flash.
   - Rain streaks right at the lens are capped thin.
+
+## 2026-09-30 — Crowsfoot Hollow and "The Tin Crown" (Chris: a level-3 quest to clear out the bandits and their king in a cave)
+- **Crowsfoot Hollow** (GAME-ONLY) is Oakhaven's first walk-in cave, with no loading. The North road, which used to run to the
+  zone's edge and stop at nothing, now ends at its mouth in the north hills.
+  - A lofted rock passage (`Hollow`): an entrance tunnel, the deserters' camp chamber, a low passage bending west, and the
+    deep hall.
+  - A thick outer shell heaps it into a rocky knoll, closed at the back with a cut rock lip at the mouth; crest rocks and
+    buttresses are seated into it.
+  - The floor is the levelled ground (a new `shapes` pad), painted bare earth.
+  - Torches flicker down the walls. The camp has a fire and pot, bedrolls, stolen grain, crates, barrels and a torn
+    Sandthrone banner.
+  - The hall has Caddock's plank throne on a stone dais between braziers, his banner, bones, and the plunder pile.
+  - Inside, the skylight and air darken with depth: a fifth of the skylight, smoky brown haze, no sky reflections. The eye
+    adjusts a little and firelight blooms. Nothing falls inside, no grass grows, and trees or bushes that would land in it are
+    dropped (their draws still taken, so the zone's layout elsewhere is unchanged).
+  - Collisions: the passage and knoll have mesh colliders and are navmesh obstacles. The camera and your feet stop at the
+    rock, and agents path in through the mouth.
+  - First build: a single-precision sin(pi) came out a hair negative and turned a column of the shell NaN (every Oakhaven load
+    asserted). The first knoll also floated a flat slab over the tunnel; it is now the outer shell.
+- **The Sandthrone deserters** (GAME-ONLY band; the company is CANON), new `deserter` look:
+  - a torn sand tabard over grey mail, a red-ochre face-scarf, a hood or head-wrap, and a falchion or club;
+  - each one assembled differently, so a camp reads as a ragged band.
+  - They stand as 2 lookouts at the mouth, 4 at the camp fire, and 2 guards in the hall, levels 3-4.
+- **Caddock, the Bandit King** (GAME-ONLY), new `banditking` look, elite level 4, in his hall:
+  - a near-black long coat, a torn Sandthrone sash, a two-handed cleaver;
+  - a crooked crown of hammered tin with a faint glint so it reads in the dark.
+- **Quest "The Tin Crown"** (`side.oakhaven.crowsfoot`, level 3, from Wil Carder, whose barn they raided):
+  - kill six deserters and Caddock, search the deserters' plunder, and bring back the north farms' stores;
+  - rewards: 110 XP, 20 gold, +300 Oakhaven.
+  - New quest field `minLevel`: the quest is hidden entirely (no offer, no "!") until level 3.
+  - Villagers talk about the raids before, and thank you after.
+- **Line of sight for aggro:** a mob out of a fight needs a clear line to you before it notices you, so nothing aggroes through
+  rock or a house wall. Fights already on are unchanged.
+- **Fixes along the way:**
+  - A kill objective's `say` line printed its target pattern as the speaker, e.g. "mob.sexton.khaven*: ...". It is now narration.
+  - The Peaks outrider's axe head floated a quarter metre off its haft.
+- **Camps:** a camp may now be `harder` on purpose (up to three levels past its zone's band); the maps show every camp's
+  levels in their level colour.
+- **Tests:**
+  - `CaveTests` (4): walkable from the green to the hall through the mouth; walled and roofed with nothing in the passage;
+    dark and dry inside, rained on outside; nothing grows in it, and the deserters hold it.
+  - `HollowQuestTests` (5): the minLevel gate, the targets, the looks, a full play-through, and line-of-sight aggro.

@@ -23,6 +23,8 @@ games are style references only: no copied names, assets, zones or creatures fro
 - **Living world:** villagers with trades and daily routines, hen-wives and coops, critters with legs, a day/night
   cycle with lamps, falling leaves and ash, wind-swayed grass, respawning camps, ambushes from tall grass, breadcrumb
   quests that lead from zone to zone, a quest book, factions and standing.
+- **Weather:** per-zone schedules of rain, storms, mist, flurries and ash squalls; a painted cloud layer with cloud
+  shadows; wind gusts through grass and leaf crowns; wet ground and rain rings (WORLD_ZONES.md "Weather").
 - **Water:** stylized turquoise (Chris's chosen look): a sandy bed showing through pale shallows, foam at shores and
   around legs, a creek current, ripple rings, wading and swimming. Khaven's Gloom Creek stays murky.
 - **Camera and targeting:** trees fade when they block the view; a coloured ring under the selected target.
@@ -38,11 +40,12 @@ reference only:
   sculpted rock with painted gradient shading, chunky stylized props, a warm clear sky.
 - **Every zone keeps its own mood:** Khaven stays grim dusk, the Ash Rim stays grey, the Peaks stay mountains. The
   style pass raises the craft, not the palette.
-- **Trees are judged hardest.** Chris has called them out twice. Trunks are fixed; crowns must be leaf cards, not
-  blobs and cones (the patch is prepared in `tools\pending-patches\step3b-tree-crowns.json`).
+- **Trees are judged hardest.** Chris has called them out twice. Trunks are fixed, and crowns are now painted leaf cards
+  (published 2026-09-30). Keep them that way: no blobs or cones.
 - **Weather and atmosphere are part of the bar:** fog and haze that give depth, sun shafts, bloom, a moonlit night
-  that stays readable, particles (leaves, ash, splashes, motes). **Weather** (rain, wind gusts, cloud shadow, per-biome
-  flurries, ash squalls and mist) is the next job after the tree crowns (Chris, 2026-09-30).
+  that stays readable, particles (leaves, ash, splashes, motes). **Weather** is built (2026-09-30): each zone has its own
+  (Oakhaven rain and storms, Khaven mist, Peaks flurries, Rim ash squalls), with a painted cloud layer, cloud shadows and
+  wind through grass and crowns.
 
 ## The world direction (decided 2026-09-29)
 

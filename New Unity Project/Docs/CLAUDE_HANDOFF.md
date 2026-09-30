@@ -9,16 +9,39 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-09-30, morning; session paused at Chris's request)
+## RESUME HERE (updated 2026-09-30, afternoon)
 **The standing direction is in `GAME_BRIEF.md` (read it first): a high-fidelity, beautiful MMO-style world, AAA quality in a classic style, judged on details, graphics, lighting, mood and visual feel.**
 Chris's rules: work in order of importance; finish each step; keep going without waiting (memory: crulanda-autonomy); tell him at each publish.
 
-**State: everything below is PUBLISHED** to `outputs\Crulanda-Playable` and committed on `main` (backed up to J:). Tests: EditMode 166/166, PlayMode 51/51, 0 shader errors.
-- Steps 1-4 of the visual review, the turquoise water, the step-3 fix round, the cliff rework, the temp-save travel fix, and now the **TREE CROWNS** (painted leaf cards on boughs for broadleaf, orchard, pine, bushes and the backdrop; a Crulanda/Leaf shader). The crowns took two passes; the second (dense pines, three-card clusters, underside fill, card bushes, card backdrop) is what shipped.
-- `tools\pending-patches\step3b-tree-crowns.json` is APPLIED (kept for reference).
-- Chris has been told the crowns are published (2026-09-30, end of session).
+**State: everything below is PUBLISHED** to `outputs/Crulanda-Playable` and committed on `main` (backed up to J:). Tests: EditMode 174/174, PlayMode 56/56, 0 shader errors.
+- Published so far:
+  - steps 1-4 of the visual review;
+  - the turquoise water;
+  - the step-3 fix round;
+  - the cliff rework;
+  - the temp-save travel fix;
+  - the tree crowns (painted leaf cards);
+  - and now **WEATHER** (commit 58d06b1, published 2026-09-30 afternoon).
+- **Weather** covers:
+  - per-zone seeded schedules (7-minute spells, one severity step at a time);
+  - a painted cloud layer and cloud shadows;
+  - rain with streaks, splashes, rings on water and wet ground;
+  - storms with lightning; Khaven ground mist, Peaks flurries and Rim ash squalls;
+  - wind gusts through grass and crowns;
+  - a chat line when the weather turns, and the weather under the minimap clock.
+  - Design and data: `WORLD_ZONES.md` "Weather"; the CHANGELOG has what the three tours and the independent review fixed.
+- Dev: F8 cycles the zone's weather in development builds; `--crulanda-weather rain` starts in it.
+- Marketing: `marketing/steam-blurb.md` is the Steam copy draft (commit 06e8795). Chris to confirm:
+  - the store title, "The Quiet Trail" (the productName) or "The Land of Crulanda" as the novels and bullet-hell use;
+  - that *The First Spoke* is out.
 
-**NEXT JOB: WEATHER** (handoff item 0a below has the full design). Then the cave, secrets, zone size, the painted style pass.
+**NEXT JOB: THE CAVE** (item 3 and 0c below): a seamless rock-shell cave in Oakhaven's north hills, Sandthrone deserters and a game-only Bandit King, and a level-3 quest. Then secrets, zone size, and the painted style pass.
+Weather polish for later (not blocking):
+- rain and thunder audio (there is no audio yet);
+- puddles;
+- a wet sheen on roofs and props;
+- villagers heading indoors in rain;
+- snow settling on the Peaks.
 
 **Next:**
 0. ~~Finish step 4 + water~~ DONE and published.
@@ -27,7 +50,7 @@ Chris's rules: work in order of importance; finish each step; keep going without
    - Target look (Chris's reference, memory crulanda-direction): ragged leaf silhouettes, sky showing through, visible fronds and branch structure.
    - Plan: leaf CARDS. Painted alpha-cutout leaf-cluster textures generated in ZoneSceneBuilder (green, yellow-green, autumn, a pine-bough variant); crowns from 8-14 crossed, tilted quads on short boughs plus a small dark inner core; pine tiers as tilted bough cards, not solid cones; a Crulanda/Leaf cutout shader (two-sided, wind sway, ShadowCaster with the cutout); TreeFade taught to fade cutout leaves. Keep crown volumes so bounds, colliders and navmesh don't change; keep the zone rng stream.
    - **The patch is READY:** `tools\pending-patches\step3b-tree-crowns.json` (verdict fixable: apply `review.correctedEdits` and write `review.correctedNewFiles`, i.e. `World/Shaders/Leaf.shader` + `.meta`). The critic verified all anchors against the tree at commit f959dfd and the zone rng stream unchanged. Re-check the Great Oak anchor (`cap.center = new Vector3(0, 3.2f, 0); cap.height = 6.4f; cap.radius = 1.1f;`) before applying. Then: tests, build, four-zone tour, check `oakhaven-99-target-ring` and `oakhaven-08-the-old-orchard` and a pine shot, publish, tell Chris.
-0a. **WEATHER (Chris, 2026-09-30: "move weather up after the trees").** Second job, right after the tree crowns, before the cave.
+0a. ~~WEATHER~~ DONE and published 2026-09-30 (commit 58d06b1; see WORLD_ZONES.md "Weather"). The original plan is kept below; cloud shadows ended up in the post composite, not a light cookie, because a cookie on the sun would push every lit surface into an extra forward pass.
    - The goal in the brief: the landscape should show off weather, lighting and particles. Nothing weather-like exists yet beyond the fixed fog, the day/night cycle and the falling leaves/ash.
    - Build a `WorldWeather` system (Scripts/World): a per-zone weather state that changes over game time (clear, overcast, rain, wind, and per-biome extras: mountain snow flurries in the Peaks, ash squalls on the Rim, drifting mist in Khaven's wood), blending fog density/colour, ambient and sun intensity, the sky's exposure/haze and the post grade over 20-40 s transitions.
    - Rain: a particle system that follows the camera (world-space streaks, a ground splash layer, darker wet ground tint, water surface pocked with rings); rain never falls indoors or under the Wasting curtain.

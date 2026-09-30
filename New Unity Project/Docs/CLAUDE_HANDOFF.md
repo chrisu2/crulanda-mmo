@@ -9,18 +9,20 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-09-30, early morning)
+## RESUME HERE (updated 2026-09-30, morning; session paused at Chris's request)
 **The standing direction is in `GAME_BRIEF.md` (read it first): a high-fidelity, beautiful MMO-style world, AAA quality in a classic style, judged on details, graphics, lighting, mood and visual feel.**
 Chris's rules: work in order of importance; finish each step; keep going without waiting (memory: crulanda-autonomy); tell him at each publish.
 
-**State: steps 1-4, the turquoise water, the step-3 fix round and the cliff rework are all PUBLISHED.** Tests: EditMode 166/166, PlayMode 51/51, 0 shader errors.
-- The temp-save travel bug (character lost at every zone border on `--crulanda-temp-save`) is fixed and published; Chris has been told.
-- Step 3's confirmed majors are all closed: Weave-Eater (thread tangle), the Pale (cowl, narrow robe), the Khaven ruin moved, the floating Peaks pines, and Umbra Scarp (now faceted rock lumps with scree; all crags in the Peaks and Khaven got the same look).
-- Chris likes the Shattered Peaks.
+**State: everything below is PUBLISHED** to `outputs\Crulanda-Playable` and committed on `main` (backed up to J:). Tests: EditMode 166/166, PlayMode 51/51, 0 shader errors.
+- Steps 1-4 of the visual review, the turquoise water, the step-3 fix round, the cliff rework, the temp-save travel fix, and now the **TREE CROWNS** (painted leaf cards on boughs for broadleaf, orchard, pine, bushes and the backdrop; a Crulanda/Leaf shader). The crowns took two passes; the second (dense pines, three-card clusters, underside fill, card bushes, card backdrop) is what shipped.
+- `tools\pending-patches\step3b-tree-crowns.json` is APPLIED (kept for reference).
+- Chris has been told the crowns are published (2026-09-30, end of session).
+
+**NEXT JOB: WEATHER** (handoff item 0a below has the full design). Then the cave, secrets, zone size, the painted style pass.
 
 **Next:**
 0. ~~Finish step 4 + water~~ DONE and published.
-0. **TREES, again (Chris, 2026-09-29, after the trunk pass: "trees still look bad").** Priority: right after the current step-3 fix round, BEFORE the cave.
+0. ~~TREES~~ DONE and published 2026-09-30 (two passes). Original notes kept:
    - The trunks are fine now. The problem is the CROWNS: every broadleaf/orchard tree is one or two smooth faceted balls on a stick (no leaf edge, no gaps, no branches inside), and the pines are perfect stacked cones. See `work\world-captures\oakhaven-99-target-ring.png` and `oakhaven-08-the-old-orchard.png`.
    - Target look (Chris's reference, memory crulanda-direction): ragged leaf silhouettes, sky showing through, visible fronds and branch structure.
    - Plan: leaf CARDS. Painted alpha-cutout leaf-cluster textures generated in ZoneSceneBuilder (green, yellow-green, autumn, a pine-bough variant); crowns from 8-14 crossed, tilted quads on short boughs plus a small dark inner core; pine tiers as tilted bough cards, not solid cones; a Crulanda/Leaf cutout shader (two-sided, wind sway, ShadowCaster with the cutout); TreeFade taught to fade cutout leaves. Keep crown volumes so bounds, colliders and navmesh don't change; keep the zone rng stream.

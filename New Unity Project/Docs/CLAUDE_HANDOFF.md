@@ -10,6 +10,7 @@ Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
 ## RESUME HERE (updated 2026-09-30, early morning)
+**The standing direction is in `GAME_BRIEF.md` (read it first): a high-fidelity, beautiful MMO-style world, AAA quality in a classic style, judged on details, graphics, lighting, mood and visual feel.**
 Chris's rules: work in order of importance; finish each step; keep going without waiting (memory: crulanda-autonomy); tell him at each publish.
 
 **State: steps 1-4, the turquoise water, the step-3 fix round and the cliff rework are all PUBLISHED.** Tests: EditMode 166/166, PlayMode 51/51, 0 shader errors.

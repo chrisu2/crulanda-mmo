@@ -1,6 +1,6 @@
 # Crulanda MMO (Unity 6)
 
-Single-player simulated MMORPG. Start with `New Unity Project/Docs/CLAUDE_HANDOFF.md` (current state), then
+Single-player simulated MMORPG. Read `New Unity Project/Docs/GAME_BRIEF.md` first (what the game is and the bar it is held to), then `Docs/CLAUDE_HANDOFF.md` (current state), then
 `Docs/CHANGELOG.md`, `Docs/WORLD_ZONES.md`, `Docs/QUEST_DESIGN.md` and `Docs/SAVE_FORMAT.md`.
 
 ## Where everything is

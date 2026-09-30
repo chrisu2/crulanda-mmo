@@ -6,7 +6,7 @@ Current state and every location: ..\CLAUDE.md and Docs/CLAUDE_HANDOFF.md (this 
 Playable scene: Assets/Crulanda/Scenes/PlayableEncounter.unity.
 Foundation-only scene: Assets/Crulanda/Scenes/Phase0_TestMap.unity.
 
-Start with Docs/ROADMAP.md for current status and next work. PROJECT_MASTER.md is the original vision,
+Start with Docs/GAME_BRIEF.md (the standing direction) and Docs/CLAUDE_HANDOFF.md (current state). PROJECT_MASTER.md is the original vision; its example zones (Greenhaven, Ashwood, Blackstone) were never built and are superseded by the four Crulanda zones,
 not a claim that every listed system is implemented. ARCHITECTURE.md records current assembly boundaries.
 
 Docs/PLAYABLE_ENCOUNTER.md covers controls and current scenario scope.

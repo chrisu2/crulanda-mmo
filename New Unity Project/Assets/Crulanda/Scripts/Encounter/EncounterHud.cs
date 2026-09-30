@@ -90,6 +90,25 @@ namespace Crulanda.Encounter
             GUI.contentColor = new Color(0, 0, 0, .9f); GUI.Label(new Rect(r.x + 1, r.y + 1, r.width, r.height), s, style);
             GUI.contentColor = c; GUI.Label(r, s, style); GUI.contentColor = Color.white;
         }
+        readonly GUIContent measureContent = new GUIContent();   // reused for CalcSize/CalcHeight so measuring lines allocates nothing
+        GUIStyle enemyPlateStyle;
+        /// <summary>Text with a 1px dark outline (four diagonal copies, painted on Repaint only): readable over bright grass, sky and walls.</summary>
+        void Outlined(Rect r, string s, GUIStyle style, Color c)
+        {
+            if (Event.current.type == EventType.Repaint)
+            {
+                GUI.contentColor = new Color(0, 0, 0, .8f * c.a);
+                GUI.Label(new Rect(r.x - 1, r.y - 1, r.width, r.height), s, style); GUI.Label(new Rect(r.x + 1, r.y - 1, r.width, r.height), s, style);
+                GUI.Label(new Rect(r.x - 1, r.y + 1, r.width, r.height), s, style); GUI.Label(new Rect(r.x + 1, r.y + 1, r.width, r.height), s, style);
+            }
+            GUI.contentColor = c; GUI.Label(r, s, style); GUI.contentColor = Color.white;
+        }
+        /// <summary>Subtle ink plate behind free-floating HUD text (quest tracker, message log) with a faint gold rule on top; alpha fades it out.</summary>
+        void HudBacking(Rect r, float alpha)
+        {
+            if (alpha <= .01f) return;
+            Fill(r, new Color(ink.r, ink.g, ink.b, .5f * alpha)); Fill(new Rect(r.x, r.y, r.width, 1), new Color(gold.r, gold.g, gold.b, .3f * alpha));
+        }
         void Disc(Rect r, Color c) { GUI.color = c; GUI.DrawTexture(r, disc); GUI.color = Color.white; }
         void Fill(Rect r, Color c) { GUI.color = c; GUI.DrawTexture(r, Texture2D.whiteTexture); GUI.color = Color.white; }
         /// <summary>A bar with a dark edge and centred shadowed text, like classic unit frames.</summary>
@@ -99,7 +118,8 @@ namespace Crulanda.Encounter
             Fill(r, new Color(c.r * .25f, c.g * .25f, c.b * .25f, 1));
             Fill(new Rect(r.x, r.y, r.width * Mathf.Clamp01(fill), r.height), c);
             Fill(new Rect(r.x, r.y, r.width * Mathf.Clamp01(fill), r.height * .35f), new Color(1, 1, 1, .12f));
-            if (!string.IsNullOrEmpty(label)) Shadow(r, label, barText, Color.white);
+            // Thin bars (the 13 px resource bar): the label gets a 20 px rect centred on the bar (the label style clips at its padded rect), so it isn't cut top and bottom.
+            if (!string.IsNullOrEmpty(label)) Shadow(r.height >= 20 ? r : new Rect(r.x, r.center.y - 10, r.width, 20), label, barText, Color.white);
         }
         /// <summary>Round portrait: coloured ring, dark face with an initial, and a level badge.</summary>
         void Portrait(Vector2 c, float size, Color ring, string letter, string level)
@@ -138,7 +158,7 @@ namespace Crulanda.Encounter
             var a = m.actor;
             Fill(new Rect(48, 118, 214, 44), new Color(0, 0, 0, .5f));
             Portrait(new Vector2(40, 140), 46, new Color(.45f, .8f, .55f), "M", null);
-            Shadow(new Rect(70, 116, 190, 18), "Mira" + (session.Progress.recruited ? "" : "  (not in party)"), tiny, session.Progress.recruited ? Color.white : new Color(.8f, .8f, .8f));
+            Shadow(new Rect(70, 114, 190, 22), "Mira" + (session.Progress.recruited ? "" : "  (not in party)"), tiny, session.Progress.recruited ? Color.white : new Color(.8f, .8f, .8f));   // 22 px: an 18 px rect clipped the p and y
             UnitBar(new Rect(70, 135, 184, 12), a.Health.Pool.Ratio, HealthGreen, "");
             UnitBar(new Rect(70, 149, 184, 8), a.Resource.Pool.Ratio, ResourceColor(Crulanda.Core.ResourceKind.Mana), "");
             Shadow(new Rect(20, 166, 320, 20), m.Activity, tiny, new Color(.85f, .9f, .85f));
@@ -166,7 +186,7 @@ namespace Crulanda.Encounter
         {
             if (session.Quests != null && session.Zone != null) { DrawQuests(); return; }
             var r = new Rect(1120, 240, 310, 200);
-            Shadow(new Rect(r.x, r.y, r.width, 20), session.ZoneTitle, frameName, gold);
+            TrackerBegin(r, 1); TrackLine(new Rect(r.x, r.y, r.width, 20), session.ZoneTitle, frameName, gold);
             int total = session.Enemies.Count, dead = session.Enemies.FindAll(e => !e.actor.IsAlive).Count;
             string miraDistance = session.Progress.recruited || session.Companion == null ? "" :
                 "  (" + Mathf.RoundToInt(Vector3.Distance(session.Player.transform.position, session.Companion.transform.position)) + "m)";
@@ -177,21 +197,33 @@ namespace Crulanda.Encounter
             };
             float y = r.y + 24;
             foreach (var (done, line) in lines)
-            { Shadow(new Rect(r.x, y, r.width, 36), (done ? "✓  " : "–  ") + line, tiny, done ? new Color(.6f, .6f, .6f) : new Color(1, .95f, .85f)); y += 22; }
-            if (session.Zone != null) Shadow(new Rect(r.x, y + 4, r.width, 36), session.Zone.Zone.subtitle, tiny, new Color(.75f, .75f, .72f));
+            { TrackLine(new Rect(r.x, y, r.width, 36), (done ? "✓  " : "–  ") + line, tiny, done ? new Color(.6f, .6f, .6f) : new Color(1, .95f, .85f)); y += 22; }
+            if (session.Zone != null) TrackLine(new Rect(r.x, y + 4, r.width, 36), session.Zone.Zone.subtitle, tiny, new Color(.75f, .75f, .72f));
+            trackerH = y - r.y + (session.Zone != null ? 24 : 0);
             if (total > 0 && dead == total && GUI.Button(new Rect(r.x, y + 44, 250, 28), "Patrol returns · keep gear and XP", micro)) session.RepeatTrail();
         }
 
         // ---------- bottom ----------
+        float chatTop = 770, chatW, chatAt; int chatCount; string chatFirst, chatLast;
+        static readonly Rect ChatArea = new Rect(10, 620, 470, 150);
+        const float ChatPlateSeconds = 8;
+        /// <summary>The message log. Its plate hugs the lines (last pass's extent, since IMGUI paints in call order) and fades out
+        /// a few seconds after the last message; hovering the log brings it back. The text itself stays, outlined.</summary>
         void DrawChat()
         {
-            Fill(new Rect(10, 620, 470, 150), new Color(0, 0, 0, .32f));
-            float y = 770 - 6;
-            for (int i = session.Messages.Count - 1; i >= 0 && y > 626; i--)
+            var msgs = session.Messages; int n = msgs.Count;
+            if (n != chatCount || (n > 0 && (!object.ReferenceEquals(msgs[0], chatFirst) || !object.ReferenceEquals(msgs[n - 1], chatLast))))
+            { chatCount = n; chatFirst = n > 0 ? msgs[0] : null; chatLast = n > 0 ? msgs[n - 1] : null; chatAt = Time.unscaledTime; }
+            float fade = ChatArea.Contains(Event.current.mousePosition) ? 1 : Mathf.Clamp01(1 - (Time.unscaledTime - chatAt - ChatPlateSeconds) / 3);
+            if (chatW > 0) HudBacking(new Rect(10, chatTop - 6, chatW + 16, 776 - chatTop), fade);
+            float y = 770 - 6; chatW = 0;
+            for (int i = n - 1; i >= 0 && y > 626; i--)
             {
-                var h = tiny.CalcHeight(new GUIContent(session.Messages[i]), 455); y -= h;
-                Shadow(new Rect(18, y, 455, h), session.Messages[i], tiny, new Color(1, .96f, .86f));
+                measureContent.text = msgs[i]; var h = tiny.CalcHeight(measureContent, 455); y -= h;
+                chatW = Mathf.Max(chatW, Mathf.Min(455, tiny.CalcSize(measureContent).x));
+                Outlined(new Rect(18, y, 455, h), msgs[i], tiny, new Color(1, .96f, .86f));
             }
+            chatTop = y;
             Shadow(new Rect(12, 774, 700, 20), "WASD move · Space jump · Right-drag look · Wheel zoom · Tab target · E interact · L quests · M map · B talents · I bags · C character", tiny, new Color(.8f, .8f, .78f));
         }
         void DrawCenter()
@@ -361,104 +393,238 @@ namespace Crulanda.Encounter
             GUI.enabled = true;
             if (GUI.Button(new Rect(PanelX + PanelW - 210, 715, 180, 40), "Close [B]", button)) session.BuildOpen = false;
         }
-        GUIStyle centered, marker;
+        // ---------- world labels ----------
+        // Nameplates, ! and ? markers, speech bubbles and place names float over the world. They keep off the HUD panels and
+        // inside the screen, hide behind solid scenery (one ray each), and stack instead of overprinting: the nearest keeps its
+        // place and farther ones move up out of its way. Drawn on Repaint only (labels take no input), so the rays run once a frame.
+        struct Plate { public float dist, fade, top; public Vector2 at; public Rect box; public Villager v; public EncounterEnemy e; public bool mira, named, shown, grey; public char mark; public string name, title; }
+        readonly System.Collections.Generic.List<Plate> plates = new System.Collections.Generic.List<Plate>(48);
+        readonly System.Collections.Generic.List<Rect> taken = new System.Collections.Generic.List<Rect>(64);
+        readonly System.Collections.Generic.Dictionary<EncounterEnemy, (float height, int level, string label)> enemyPlates = new System.Collections.Generic.Dictionary<EncounterEnemy, (float height, int level, string label)>();
+        readonly System.Collections.Generic.Dictionary<string, string> bracketed = new System.Collections.Generic.Dictionary<string, string>();
+        readonly Rect[] hud = new Rect[10]; int hudCount;
+        static readonly RaycastHit[] sightHits = new RaycastHit[12];
+        static readonly GUIContent measure = new GUIContent();
+        /// <summary>The quest tracker's area as last drawn (world labels keep out of it). The old test map's tracker is fixed.</summary>
+        Rect trackerArea = new Rect(1110, 236, 330, 210);
+        GUIStyle centered, plateText;
         bool ToCanvas(Vector3 world, out Vector2 p)
         {
             var s = session.View.WorldToScreenPoint(world); p = new Vector2(s.x * 1440 / Screen.width, (Screen.height - s.y) * 900 / Screen.height);
             return s.z > 0 && p.x > -100 && p.x < 1540 && p.y > 0 && p.y < 900;
         }
-        void DrawPlaceAndPeopleLabels()
+        float TextWidth(GUIStyle style, string s) { measure.text = s; return style.CalcSize(measure).x; }
+        string Bracketed(string title) { if (!bracketed.TryGetValue(title, out var s)) bracketed[title] = s = "<" + title + ">"; return s; }
+        /// <summary>The HUD panels showing this frame: unit frames, minimap, quest tracker, chat, the centre prompt and bars, and the bars along the bottom.</summary>
+        void CollectHudRects()
         {
-            if (centered == null)
+            hudCount = 0; var mini = HudMaps.MinimapRect;
+            hud[hudCount++] = new Rect(6, 6, 356, 104);                                                          // your frame and its status line
+            if (session.Companion != null) hud[hudCount++] = new Rect(6, 112, 264, 84);                           // Mira's frame
+            if (targetVisible) hud[hudCount++] = new Rect(362, 8, 380, 114);                                     // target or friend frame
+            hud[hudCount++] = new Rect(mini.x - 42, 0, 1440 - mini.x + 42, mini.yMax + 28);                      // minimap, its name and buttons
+            if (trackerArea.height > 0) hud[hudCount++] = trackerArea;
+            hud[hudCount++] = new Rect(6, 614, 480, 160);                                                        // chat
+            hud[hudCount++] = new Rect(516, 688, 408, 90);                                                       // [E] prompt, cast and swing bars
+            hud[hudCount++] = new Rect(0, 772, 1440, 128);                                                       // key help, action bar, micro menu, XP bar
+        }
+        bool OverHud(Rect r) { for (int i = 0; i < hudCount; i++) if (hud[i].Overlaps(r)) return true; return false; }
+        /// <summary>
+        /// Finds room for a world label: nudged inside the screen's sides, lifted past the labels already placed this frame by at
+        /// most <paramref name="maxLift"/>, never over a HUD panel or off the top. Records it and returns true if it may show.
+        /// </summary>
+        bool Place(ref Rect r, float maxLift)
+        {
+            r.x = Mathf.Clamp(r.x, 4, 1436 - r.width); float start = r.y;
+            for (int pass = 0; ; pass++)
             {
-                centered = new GUIStyle(text) { alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold };
-                marker = new GUIStyle(heading) { alignment = TextAnchor.MiddleCenter, fontSize = 34 };
+                bool moved = false;
+                for (int i = 0; i < taken.Count; i++) if (taken[i].Overlaps(r)) { r.y = taken[i].y - r.height - 1; moved = true; }
+                if (!moved) break; if (pass == 7) return false;
             }
-            var player = session.Player.transform.position;
-            // Landmark names float over their places when you are near enough to see them.
-            if (session.Zone != null)
-                foreach (var l in session.Zone.Zone.landmarks)
-                {
-                    var at = session.Zone.Ground(l.at, 7.2f);
-                    float d = Vector3.Distance(player, at);
-                    if (d > 38 || !ToCanvas(at, out var p)) continue;
-                    GUI.color = new Color(1, 1, 1, Mathf.Clamp01((38 - d) / 10));
-                    GUI.contentColor = new Color(.1f, .08f, .06f); GUI.Label(new Rect(p.x - 159, p.y - 13, 320, 28), l.name, centered);
-                    GUI.contentColor = gold; GUI.Label(new Rect(p.x - 160, p.y - 14, 320, 28), l.name, centered);
-                    GUI.color = Color.white;
-                }
-            // Villagers: soft nameplates when close, and speech bubbles when they talk.
+            if (start - r.y > maxLift || r.y < 2 || OverHud(r)) return false;
+            taken.Add(r); return true;
+        }
+        /// <summary>A bubble a HUD panel blocks slides sideways off it, staying over its speaker's side, if there is room there.</summary>
+        bool SlideOffHud(ref Rect r, float speakerX)
+        {
+            r.x = Mathf.Clamp(r.x, 4, 1436 - r.width);
+            for (int i = 0; i < hudCount; i++)
+            {
+                if (!hud[i].Overlaps(r)) continue;
+                var s = r; s.x = speakerX > hud[i].center.x ? hud[i].xMax + 4 : hud[i].x - s.width - 4;
+                if (Mathf.Abs(s.center.x - speakerX) < s.width / 2 + 60 && Place(ref s, 120)) { r = s; return true; }
+                return false;
+            }
+            return false;
+        }
+        /// <summary>
+        /// True when solid scenery (walls, roofs, ground, rocks) hides <paramref name="point"/> from the camera. People and trees
+        /// never hide a label: trees turn see-through, and people stand in front of each other. Anything within
+        /// <paramref name="slack"/> in front of the point doesn't count (a place's own building).
+        /// </summary>
+        bool Occluded(Vector3 point, float slack = .3f)
+        {
+            var from = session.View.transform.position; var d = point - from; float length = d.magnitude - slack;
+            if (length <= .1f) return false;
+            int n = Physics.RaycastNonAlloc(from, d.normalized, sightHits, length, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+            for (int i = 0; i < n; i++)
+            {
+                var c = sightHits[i].collider;
+                if (c.GetComponentInParent<Crulanda.Gameplay.Actor>() == null && c.GetComponentInParent<Crulanda.World.TreeFade>() == null) return true;
+            }
+            return false;
+        }
+        /// <summary>
+        /// An enemy's plate height over its root: just above the top of its model, so wolves and boars get low plates and people
+        /// keep theirs over the head (measured once from its renderers while it stands, elite scale included). Also its
+        /// "level  name" label, rebuilt only when the level changes.
+        /// </summary>
+        (float height, string label) EnemyPlate(EncounterEnemy e)
+        {
+            var a = e.actor; bool known = enemyPlates.TryGetValue(e, out var c), dirty = !known || c.level != a.Level;
+            if (dirty) { c.level = a.Level; c.label = a.Level + "  " + a.DisplayName; }
+            if (c.height <= 0 && !e.Hidden && a.IsAlive)
+            {
+                float top = float.MinValue;
+                foreach (var r in e.GetComponentsInChildren<Renderer>()) if (r.enabled) top = Mathf.Max(top, r.bounds.max.y);
+                c.height = top > float.MinValue ? Mathf.Clamp(top - e.transform.position.y + .45f, .3f, 1.7f * e.transform.lossyScale.y) : 1.7f; dirty = true;
+            }
+            if (dirty) { if (!known && enemyPlates.Count > 400) enemyPlates.Clear(); enemyPlates[e] = c; }
+            return (c.height > 0 ? c.height : 1.7f, c.label);
+        }
+        /// <summary>
+        /// A plate's box: its name (and trade) rows above the anchor, with the ! or ? above those. <paramref name="p"/>.top is
+        /// where the rows start, relative to the anchor.
+        /// </summary>
+        void AddPlate(Plate p, float width)
+        {
+            float top = p.at.y + p.top - (p.mark != ' ' ? 36 : 0), bottom = p.named ? p.at.y - 3 : p.at.y + p.top;
+            p.box = new Rect(p.at.x - width / 2, top, width, bottom - top); p.shown = true; plates.Add(p);
+        }
+        /// <summary>Villagers, enemies and Mira that show a plate this frame: in range, on screen and in plain sight.</summary>
+        void GatherPlates(Vector3 player)
+        {
             var life = VillageLife.Active;
             if (life != null)
                 foreach (var v in life.Villagers)
                 {
                     if (!v.Visible) continue;
-                    var top = v.transform.position + Vector3.up * 1.3f; float vd = Vector3.Distance(player, top);
-                    if (vd > 28 || !ToCanvas(top, out var vp)) continue;
-                    if (vd < 18)
-                    {
-                        // WoW-style: name, and the trade in angle brackets beneath it.
-                        float a = Mathf.Clamp01((18 - vd) / 4); var style = small != null ? new GUIStyle(small) { alignment = TextAnchor.MiddleCenter } : centered;
-                        bool titled = v.Title != null;
-                        void Plate(Rect r, string text, Color c)
-                        {
-                            GUI.contentColor = new Color(0, 0, 0, a * .85f); GUI.Label(new Rect(r.x + 1, r.y + 1, r.width, r.height), text, style);
-                            GUI.contentColor = c; GUI.Label(r, text, style);
-                        }
-                        Plate(new Rect(vp.x - 100, vp.y - (titled ? 42 : 26), 200, 24), v.Name, session.FocusVillager == v ? new Color(.55f, 1, .55f, a) : new Color(.85f, .9f, 1, a));
-                        if (titled) Plate(new Rect(vp.x - 100, vp.y - 26, 200, 22), "<" + v.Title + ">", new Color(1, .84f, .45f, a));
-                    }
-                    DrawHeadMarker(v.Name, vp, vd, v.Title != null && vd < 18 ? 44 : 28);
-                    if (v.Bubble != null && Time.time < v.BubbleUntil)
-                    {
-                        var content = new GUIContent(v.Bubble); float bw = Mathf.Min(260, small.CalcSize(content).x + 20), bh = small.CalcHeight(content, bw - 16) + 10;
-                        var br = new Rect(vp.x - bw / 2, vp.y - (v.Title != null && vd < 18 ? 50 : 34) - bh, bw, bh);
-                        GUI.color = new Color(.96f, .93f, .84f, .92f); GUI.DrawTexture(br, Texture2D.whiteTexture); GUI.color = Color.white;
-                        GUI.contentColor = new Color(.12f, .1f, .08f); GUI.Label(new Rect(br.x + 8, br.y + 4, bw - 16, bh), v.Bubble, small);
-                    }
-                    GUI.contentColor = Color.white;
+                    var root = v.transform.position; float vd = Vector3.Distance(player, root + Vector3.up * 1.3f);
+                    if (vd > 28 || !ToCanvas(root + Vector3.up * 1.3f, out var vp) || vp.x < 0 || vp.x > 1440) continue;
+                    // Soft nameplates when close (name, and the trade in angle brackets beneath it), the quest marker, and speech.
+                    bool named = vd < 18; char m = HeadMarker(v.Name, vd, out bool grey);
+                    if (!named && m == ' ' && (v.Bubble == null || Time.time >= v.BubbleUntil)) continue;
+                    if (Occluded(root + Vector3.up * .85f)) continue;
+                    string title = named && v.Title != null ? Bracketed(v.Title) : null;
+                    float w = Mathf.Max(Mathf.Max(named ? TextWidth(plateText, v.Name) : 0, title != null ? TextWidth(plateText, title) : 0), m != ' ' ? 28 : 0) + 8;
+                    AddPlate(new Plate { dist = vd, fade = named ? Mathf.Clamp01((18 - vd) / 4) : 0, top = named ? (title != null ? -41 : -25) : -20, at = vp, v = v, named = named, name = v.Name, title = title, mark = m, grey = grey }, w);
                 }
-            // Mira: nameplate, plus a gold marker until she has joined you.
-            var mira = session.Companion; if (mira == null) return;
-            var head = mira.transform.position + Vector3.up * 1.4f;
-            if (Vector3.Distance(player, head) < 45 && ToCanvas(head, out var mp))
+            foreach (var e in session.Enemies)
             {
-                GUI.contentColor = new Color(.55f, 1, .7f); GUI.Label(new Rect(mp.x - 100, mp.y - 30, 200, 26), "Mira", centered);
-                if (!session.Progress.recruited) { GUI.contentColor = gold; GUI.Label(new Rect(mp.x - 30, mp.y - 72, 60, 44), "!", marker); }
-                else DrawHeadMarker("Mira", mp, Vector3.Distance(player, head), 30);
+                if (e.Hidden) continue;   // lying in wait: no nameplate
+                float d = session.Distance(e); if (d > 25) continue;
+                var (h, label) = EnemyPlate(e); var root = e.transform.position;
+                if (!ToCanvas(root + Vector3.up * h, out var ep) || ep.x < 0 || ep.x > 1440 || Occluded(root + Vector3.up * (h - .45f))) continue;
+                float w = session.Target == e ? Mathf.Max(146, TextWidth(plateText, label) + 16) : Mathf.Max(130, TextWidth(plateText, label)) + 8;
+                plates.Add(new Plate { dist = d, fade = 1, at = ep, e = e, name = label, shown = true, box = new Rect(ep.x - w / 2, ep.y - 25, w, 38) });
             }
-            GUI.contentColor = Color.white;
+            // Mira: nameplate, plus a gold ! until she has joined you (after that, whatever the quests say).
+            var mira = session.Companion; if (mira == null) return;
+            var head = mira.transform.position + Vector3.up * 1.4f; float md = Vector3.Distance(player, head);
+            if (md >= 45 || !ToCanvas(head, out var mp) || mp.x < 0 || mp.x > 1440 || Occluded(mira.transform.position + Vector3.up * .9f)) return;
+            bool mgrey = false; char mm = session.Progress.recruited ? HeadMarker("Mira", md, out mgrey) : '!';
+            AddPlate(new Plate { dist = md, fade = 1, top = -29, at = mp, mira = true, named = true, name = "Mira", mark = mm, grey = mgrey }, Mathf.Max(TextWidth(centered, "Mira"), 28) + 8);
         }
-        GUIStyle plate;
-        void DrawWorldLabels()
+        void DrawPlate(Plate p)
         {
-            DrawPlaceAndPeopleLabels();
-            foreach (var enemy in session.Enemies)
+            var a = p.at;
+            if (p.e != null)
             {
-                if (enemy.Hidden) continue;   // lying in wait: no nameplate
-                var screen = session.View.WorldToScreenPoint(enemy.transform.position + Vector3.up * 1.7f);
-                if (screen.z <= 0 || session.Distance(enemy) > 25) continue;
-                float x = screen.x * 1440 / Screen.width, y = (Screen.height - screen.y) * 900 / Screen.height;
-                if (y < 140 || y > 560) continue;
-                // Names are centred over the enemy, like the bar. Your target: a dark backing with a gold edge sized to its
-                // name (the ring on the ground marks it too).
-                if (plate == null) plate = new GUIStyle(small) { alignment = TextAnchor.UpperCenter, wordWrap = false };
-                string label = enemy.actor.Level + "  " + enemy.actor.DisplayName;
-                if (session.Target == enemy)
+                bool target = session.Target == p.e;
+                // Your target: a dark backing with a gold edge behind its nameplate (the ring on the ground marks it too).
+                if (target)
                 {
-                    float bw = Mathf.Max(146, plate.CalcSize(new GUIContent(label)).x + 16);
-                    var box = new Rect(x - bw / 2, y - 25, bw, 38);
-                    GUI.color = new Color(0, 0, 0, .5f); GUI.DrawTexture(box, Texture2D.whiteTexture);
-                    GUI.color = gold; foreach (var edge in new[] { new Rect(box.x, box.y, box.width, 1.5f), new Rect(box.x, box.yMax - 1.5f, box.width, 1.5f), new Rect(box.x, box.y, 1.5f, box.height), new Rect(box.xMax - 1.5f, box.y, 1.5f, box.height) })
-                        GUI.DrawTexture(edge, Texture2D.whiteTexture);
-                    GUI.color = Color.white;
+                    var b = p.box; Fill(b, new Color(0, 0, 0, .5f));
+                    Fill(new Rect(b.x, b.y, b.width, 1.5f), gold); Fill(new Rect(b.x, b.yMax - 1.5f, b.width, 1.5f), gold);
+                    Fill(new Rect(b.x, b.y, 1.5f, b.height), gold); Fill(new Rect(b.xMax - 1.5f, b.y, 1.5f, b.height), gold);
                 }
                 // Level-coloured names (grey, green, yellow, orange, red by how the enemy compares to you).
-                GUI.contentColor = session.Target == enemy ? gold : ConColor(enemy.actor.Level);
-                GUI.Label(new Rect(x - 110, y - 25, 220, 27), label, plate);
-                Bar(new Rect(x - 65, y, 130, 6), enemy.actor.Health.Pool.Ratio, new Color(.8f,.3f,.25f), "");
+                Outlined(new Rect(a.x - 150, a.y - 25, 300, 22), p.name, plateText, target ? gold : ConColor(p.e.actor.Level));
+                Fill(new Rect(a.x - 66, a.y - 1, 132, 8), new Color(0, 0, 0, .75f));
+                Bar(new Rect(a.x - 65, a.y, 130, 6), p.e.actor.Health.Pool.Ratio, new Color(.8f, .3f, .25f), "");
+                return;
             }
-            GUI.contentColor = Color.white;
+            // Rows are 22 px (24 for Mira's larger font): the label style clips at its padded rect, so tighter rows cut off g, p and y.
+            float rows = a.y + p.top;
+            if (p.named)
+            {
+                var style = p.mira ? centered : plateText;
+                Outlined(new Rect(a.x - 150, rows, 300, p.mira ? 24 : 22), p.name, style, p.mira ? new Color(.55f, 1, .7f) :
+                    session.FocusVillager == p.v ? new Color(.55f, 1, .55f, p.fade) : new Color(.85f, .9f, 1, p.fade));
+                if (p.title != null) Outlined(new Rect(a.x - 150, rows + 15, 300, 22), p.title, style, new Color(1, .84f, .45f, p.fade));
+            }
+            if (p.mark != ' ') DrawHeadMarker(p.mark, p.grey, new Vector2(a.x, rows - 20));
+        }
+        /// <summary>A speech bubble above its speaker's plate and marker (never over them), off the HUD, fading as it ends.</summary>
+        void DrawBubble(Plate p)
+        {
+            var v = p.v; if (v.Bubble == null || Time.time >= v.BubbleUntil) return;
+            measure.text = v.Bubble; float bw = Mathf.Min(260, small.CalcSize(measure).x + 20), bh = small.CalcHeight(measure, bw - 16) + 10;
+            var natural = new Rect(p.at.x - bw / 2, (p.box.height > 0 ? p.box.y : p.at.y + p.top) - 7 - bh, bw, bh); var br = natural;
+            if (!Place(ref br, 120)) { br = natural; if (!SlideOffHud(ref br, p.at.x)) return; }
+            float fade = Mathf.Clamp01((v.BubbleUntil - Time.time) * 2); var paper = new Color(.96f, .93f, .84f, .92f * fade);
+            Fill(br, paper);
+            float tail = Mathf.Clamp(p.at.x, br.x + 10, br.xMax - 10);   // a small tail pointing down at the speaker
+            Fill(new Rect(tail - 5, br.yMax, 10, 3), paper); Fill(new Rect(tail - 2, br.yMax + 3, 4, 3), paper);
+            GUI.contentColor = new Color(.12f, .1f, .08f, fade); GUI.Label(new Rect(br.x + 8, br.y + 4, bw - 16, bh), v.Bubble, small); GUI.contentColor = Color.white;
+        }
+        /// <summary>
+        /// Landmark names over their places when you are near enough to see them, and the roads out ("Road to Khaven Village
+        /// (3-5)") from further off, so an exit is never a mystery. They give way to people's plates.
+        /// </summary>
+        void DrawPlaceNames(Vector3 player)
+        {
+            if (session.Zone == null) return;
+            foreach (var l in session.Zone.Zone.landmarks) PlaceName(player, session.Zone.Ground(l.at, 7.2f), l.name, 38, gold);
+            foreach (var e in session.Zone.Zone.exits)
+            {
+                var to = session.Zone.FindZone(e.to); if (to == null) continue;
+                PlaceName(player, session.Zone.Ground(e.at, 6.5f), "Road to " + to.displayName + "  " + HudMaps.Band(to), 60, HudMaps.BandColor(to, session.Progress.Level));
+            }
+        }
+        void PlaceName(Vector3 player, Vector3 at, string name, float reach, Color colour)
+        {
+            float d = Vector3.Distance(player, at);
+            if (d > reach || !ToCanvas(at, out var p) || p.x < 0 || p.x > 1440 || Occluded(at, 8)) return;
+            float w = TextWidth(centered, name) + 10; var r = new Rect(p.x - w / 2, Mathf.Max(4, p.y - 14), w, 28);
+            if (!Place(ref r, 40)) return;
+            GUI.color = new Color(1, 1, 1, Mathf.Clamp01((reach - d) / 10));
+            GUI.contentColor = new Color(.1f, .08f, .06f); GUI.Label(new Rect(r.x + 1, r.y + 1, r.width, r.height), name, centered);
+            GUI.contentColor = colour; GUI.Label(r, name, centered);
+            GUI.color = Color.white; GUI.contentColor = Color.white;
+        }
+        void DrawWorldLabels()
+        {
+            if (Event.current.type != EventType.Repaint) return;
+            if (centered == null)
+            {
+                centered = new GUIStyle(text) { alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold, wordWrap = false };
+                plateText = new GUIStyle(small) { alignment = TextAnchor.MiddleCenter, wordWrap = false };
+            }
+            CollectHudRects(); taken.Clear(); plates.Clear();
+            var player = session.Player.transform.position;
+            GatherPlates(player);
+            // Nearest first: each keeps its natural place if it can, and farther ones stack above it.
+            for (int i = 1; i < plates.Count; i++) { var p = plates[i]; int j = i - 1; while (j >= 0 && plates[j].dist > p.dist) { plates[j + 1] = plates[j]; j--; } plates[j + 1] = p; }
+            for (int i = 0; i < plates.Count; i++)
+            {
+                var p = plates[i]; if (p.box.height <= 0) continue;   // only speaking: the bubble finds its own room
+                var r = p.box; p.shown = Place(ref r, 200); p.at += r.position - p.box.position; p.box = r; plates[i] = p;
+            }
+            for (int i = plates.Count - 1; i >= 0; i--) if (plates[i].shown) DrawPlate(plates[i]);   // nearer plates on top
+            for (int i = 0; i < plates.Count; i++) if (plates[i].shown && plates[i].v != null) DrawBubble(plates[i]);
+            DrawPlaceNames(player);
             foreach (var f in session.Floating)
             {
                 var p = session.View.WorldToScreenPoint(f.position + Vector3.up * (1.3f - (f.expires - Time.time)));

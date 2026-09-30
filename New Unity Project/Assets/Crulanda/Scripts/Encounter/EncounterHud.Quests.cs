@@ -32,15 +32,18 @@ namespace Crulanda.Encounter
         void Ink(Rect r, string s, GUIStyle style, Color c) { GUI.contentColor = c; GUI.Label(r, s, style); GUI.contentColor = Color.white; }
         static string KindLabel(QuestDef q) { return q.kind == "main" ? "Chronicle" : q.kind == "npc" ? "Village work" : q.kind == "faction" ? "Faction" : "Side quest"; }
 
-        /// <summary>! or ? over someone's head (called from the nameplate pass).</summary>
-        void DrawHeadMarker(string npc, Vector2 at, float distance, float lift)
+        /// <summary>The ! or ? over someone's head, or ' ' (no quests here, or too far away).</summary>
+        char HeadMarker(string npc, float distance, out bool grey)
         {
-            if (session.Quests == null || session.Zone == null || distance > 45) return;
-            QuestStyles();
-            char m = session.Quests.Marker(npc, session.ZoneId, session.Progress.Level, out bool grey); if (m == ' ') return;
-            var r = new Rect(at.x - 30, at.y - lift - 44, 60, 48);
-            GUI.contentColor = new Color(0, 0, 0, .8f); GUI.Label(new Rect(r.x + 2, r.y + 2, r.width, r.height), m.ToString(), qMark);
-            GUI.contentColor = grey ? new Color(.72f, .72f, .72f) : QuestGold; GUI.Label(r, m.ToString(), qMark); GUI.contentColor = Color.white;
+            grey = false;
+            return session.Quests == null || session.Zone == null || distance > 45 ? ' ' : session.Quests.Marker(npc, session.ZoneId, session.Progress.Level, out grey);
+        }
+        /// <summary>Draws a head marker centred on <paramref name="at"/> (the nameplate pass places it above the name).</summary>
+        void DrawHeadMarker(char m, bool grey, Vector2 at)
+        {
+            QuestStyles(); string s = m == '!' ? "!" : "?"; var r = new Rect(at.x - 30, at.y - 24, 60, 48);
+            GUI.contentColor = new Color(0, 0, 0, .8f); GUI.Label(new Rect(r.x + 2, r.y + 2, r.width, r.height), s, qMark);
+            GUI.contentColor = grey ? new Color(.72f, .72f, .72f) : QuestGold; GUI.Label(r, s, qMark); GUI.contentColor = Color.white;
         }
 
         /// <summary>Target frame for a clicked villager or Mira: green ring, name, trade, and what E will do.</summary>
@@ -61,11 +64,33 @@ namespace Crulanda.Encounter
         }
 
         // ---------- tracker ----------
+        float trackerX, trackerW, trackerH;
+        /// <summary>With nothing tracked, the zone name and hint show this long after arriving (or after the last tracked quest), then fade over 3 s.</summary>
+        const float HintSeconds = 14; float hintSince; string hintZone; bool hintIdle;
+        /// <summary>Paints the tracker's ink plate from the previous pass's text extent (IMGUI paints in call order, so the plate goes
+        /// first), then starts measuring this pass's lines.</summary>
+        void TrackerBegin(Rect r, float alpha)
+        {
+            if (trackerW > 0 && trackerH > 0) HudBacking(new Rect(r.x - 8, r.y - 4, trackerW + 16, trackerH + 8), alpha);
+            trackerX = r.x; trackerW = 0;
+        }
+        /// <summary>One outlined tracker line; widens the plate to fit it (a wrapped line takes the full width).</summary>
+        void TrackLine(Rect r, string s, GUIStyle style, Color c)
+        {
+            Outlined(r, s, style, c);
+            measureContent.text = s; trackerW = Mathf.Max(trackerW, Mathf.Min(r.xMax, r.x + style.CalcSize(measureContent).x) - trackerX);
+        }
         void DrawQuests()
         {
             QuestStyles();
             var r = new Rect(1120, 240, 310, 260); var log = session.Quests;
-            Shadow(new Rect(r.x, r.y, r.width, 20), session.ZoneTitle, frameName, gold);
+            // Nothing tracked: the zone name and the hint show for a while after arriving (or once the last tracked quest is
+            // done), then fade over 3 s, so they don't sit over the scene for good. The minimap names the zone anyway.
+            if (hintZone != session.ZoneId) { hintZone = session.ZoneId; hintSince = Time.time; }
+            float fade = hintIdle ? Mathf.Clamp01(1 - (Time.time - hintSince - HintSeconds) / 3) : 1;
+            if (fade <= 0) { trackerArea = default; trackerW = 0; return; }
+            TrackerBegin(r, fade);
+            TrackLine(new Rect(r.x, r.y, r.width, 20), session.ZoneTitle, frameName, new Color(gold.r, gold.g, gold.b, fade));
             float y = r.y + 24; int shown = 0;
             // Chronicle first, then the rest in the order taken.
             var active = new List<(QuestDef quest, QuestState state)>(log.Active());
@@ -74,7 +99,7 @@ namespace Crulanda.Encounter
             {
                 if (!s.tracked || shown >= 5 || y > 470) continue;
                 shown++;
-                Shadow(new Rect(r.x, y, r.width, 20), (q.IsMain ? "◆ " : "") + q.title, tiny, q.IsMain ? new Color(1, .86f, .5f) : new Color(1, .82f, .2f)); y += 19;
+                TrackLine(new Rect(r.x, y, r.width, 20), (q.IsMain ? "◆ " : "") + q.title, tiny, q.IsMain ? new Color(1, .86f, .5f) : new Color(1, .82f, .2f)); y += 19;
                 var step = log.CurrentStep(s);
                 // Breadcrumb: the next step waits in another zone; say which road leads there (it is ringed on the maps).
                 var elsewhere = session.QuestZoneElsewhere(q, s);
@@ -82,19 +107,28 @@ namespace Crulanda.Encounter
                 {
                     var exit = session.ExitToward(elsewhere);
                     string road = "→ Travel to " + session.ZoneName(elsewhere) + (exit != null && exit.to != elsewhere ? " (via " + session.ZoneName(exit.to) + ")" : "");
-                    Shadow(new Rect(r.x + 12, y, r.width - 12, 20), road, tiny, new Color(1, .85f, .4f)); y += 20;
+                    TrackLine(new Rect(r.x + 12, y, r.width - 12, 20), road, tiny, new Color(1, .85f, .4f)); y += 20;
                 }
-                if (step == null) { Shadow(new Rect(r.x + 12, y, r.width - 12, 20), "Return to " + q.turnIn, tiny, new Color(.6f, 1, .6f)); y += 20; continue; }
+                if (step == null) { TrackLine(new Rect(r.x + 12, y, r.width - 12, 20), "Return to " + q.turnIn, tiny, new Color(.6f, 1, .6f)); y += 20; continue; }
                 for (int i = 0; i < step.objectives.Length; i++)
                 {
                     bool done = log.ObjectiveDone(s, i);
                     var line = (done ? "✓ " : "– ") + log.ObjectiveLine(s, i);
-                    float h = tiny.CalcHeight(new GUIContent(line), r.width - 12);
-                    Shadow(new Rect(r.x + 12, y, r.width - 12, h), line, tiny, done ? new Color(.6f, .6f, .6f) : new Color(1, .95f, .85f)); y += h + 1;
+                    measureContent.text = line; float h = tiny.CalcHeight(measureContent, r.width - 12);
+                    TrackLine(new Rect(r.x + 12, y, r.width - 12, h), line, tiny, done ? new Color(.6f, .6f, .6f) : new Color(1, .95f, .85f)); y += h + 1;
                 }
                 y += 4;
             }
-            if (shown == 0) { Shadow(new Rect(r.x, y, r.width, 40), "Look for gold ! over people's heads, or open your quests [L].", tiny, new Color(.85f, .85f, .8f)); y += 40; }
+            if (shown == 0)
+            {
+                if (!hintIdle) { hintIdle = true; hintSince = Time.time; }
+                const string hint = "Look for gold ! over people's heads, or open your quests [L].";
+                measureContent.text = hint; float hh = tiny.CalcHeight(measureContent, r.width);
+                TrackLine(new Rect(r.x, y, r.width, hh), hint, tiny, new Color(.85f, .85f, .8f, fade)); y += hh + 2;
+            }
+            else hintIdle = false;
+            trackerH = y - r.y;
+            trackerArea = new Rect(r.x - 8, r.y - 4, Mathf.Max(trackerW, 120) + 16, y - r.y + 8);   // world labels keep out of it
             var story = session.StoryEnemies; int total = story.Count, dead = story.FindAll(e => !e.actor.IsAlive).Count;
             if (total > 0 && dead == total && GUI.Button(new Rect(r.x, y + 6, 250, 26), "Patrol returns · keep gear and XP", micro)) session.RepeatTrail();
         }

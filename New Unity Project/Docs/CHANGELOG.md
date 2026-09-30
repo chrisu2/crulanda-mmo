@@ -289,3 +289,16 @@ These fix the "water, edges, night" group of `Docs/VISUAL_REVIEW_2026-09-29.md`.
   - Peaks backdrop trees and tors stand on the drawn ground, and pines aren't placed on near-vertical slopes.
   - Peaks rock is darker.
 - **The oakhaven-18 sky seam is fixed.** A faded tree was still written whole into the camera's depth texture, cutting the soft haze and curtain along its silhouette. Its ShadowCaster pass now dithers like the tree does.
+
+## 2026-09-29 — Step 4: HUD overlaps and readability
+- **World labels** (nameplates, ! and ? markers, speech bubbles, place names) are placed as a set each frame.
+  - They stay off the HUD panels (frames, minimap, tracker, chat, prompt, bottom bars) and inside the screen.
+  - They hide behind solid scenery (one ray each, ignoring people and trees), and stack instead of overprinting: the nearest keeps its place.
+  - A bubble that a panel would cover slides off it, and never covers a quest marker.
+  - Enemy plates sit just above each model's real top, so wolves and boars get low plates.
+- **Readability:**
+  - A 1 px dark outline on nameplates, tracker lines and place names, so yellow and green con colours read on grass.
+  - The quest tracker and message log draw on a subtle ink plate sized to their text.
+  - With nothing tracked, the zone name and the "look for !" hint fade out after 14 s.
+  - Enemy nameplates are centred over their bars.
+- **Road signs:** exits show a label from 60 m ("Road to Khaven Village (3-5)", in the band colour), so the way out is never a mystery.

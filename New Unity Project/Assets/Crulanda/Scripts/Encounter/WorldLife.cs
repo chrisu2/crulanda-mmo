@@ -579,6 +579,15 @@ namespace Crulanda.Encounter
         }
         /// <summary>Capture/debug: hold these goods (as on an errand) while posed by <see cref="StandAt"/>.</summary>
         public void ShowLoad(Load what, int count) { Carry(what, count); }
+        /// <summary>Capture/debug: sat at an inn seat with a tankard, or slumped over the table, until <see cref="Release"/>.</summary>
+        public bool PoseAtInn(int seat, bool slumped)
+        {
+            if (!life.Places.TryGetValue("inn", out var seats) || seats.Count == 0 || !agent.isOnNavMesh) return false;
+            foreach (var r in renderers) r.enabled = true; CancelErrand();
+            agent.Warp(seats[seat % seats.Count]); agent.isStopped = true; state = State.Activity; until = Time.time + 60; enabled = false;
+            activity = slumped ? "passedout" : "inn"; visual.Pose = slumped ? ActorPose.Slump : ActorPose.Drink; ShowTankard(!slumped);
+            return true;
+        }
         static string EggLine(int n) { return n >= 5 ? n + " eggs. Good girls." : n >= 2 ? n + " eggs. They're off-lay; it's the grey, I'd wager." : n == 1 ? "Just the one. Well. It's something." : "Nothing. Off-lay, the lot of you."; }
         void Carry(Load what, int count) { DropLoad(); loadKind = what; loadCount = count; load = LoadProps.Build(transform, what, count); }
         void DropLoad() { if (load != null) Destroy(load); load = null; loadKind = Load.None; }

@@ -367,6 +367,28 @@ namespace Crulanda.Encounter
                     yield return new WaitForSeconds(.4f);
                 }
                 for (int i = 0; i < carriers.Count; i++) carriers[i].Item1.Release(wasAt[i]);
+                // The out of work at the inn: one with a tankard, the next slumped over the table, seen from the table by the door.
+                if (life.Places.TryGetValue("inn", out var seats) && seats.Count >= 8)
+                {
+                    var drinkers = life.Villagers.FindAll(v => v.Role == "drinker" && !v.Resident);
+                    if (drinkers.Count > 0)
+                    {
+                        var drinkerAt = drinkers.ConvertAll(v => v.transform.position);
+                        for (int i = 0; i < drinkers.Count; i++) drinkers[i].PoseAtInn(i, i % 2 == 1);
+                        // The camera is set by hand (the orbit camera backs out through the wall from a seat): at head height over the
+                        // far table, looking at the drinkers' table.
+                        var innDoor = zone.Doors.Find(d => d.openable && d.hinge != null); var innRoom = innDoor != null ? innDoor.hinge.parent : null;
+                        var table = (drinkers[0].transform.position + drinkers[Mathf.Min(1, drinkers.Count - 1)].transform.position) / 2 + Vector3.up * .2f;
+                        var eye = innRoom != null ? innRoom.TransformPoint(new Vector3(-3.6f, 1.75f, 1.4f)) : seats[7] + Vector3.up * 1.7f;
+                        motor.Teleport(seats[7] + Vector3.up * 1.1f); motor.enabled = false;
+                        var lens = Camera.main.transform;
+                        for (float t = 0; t < 1.5f; t += Time.deltaTime) { lens.position = eye; lens.rotation = Quaternion.LookRotation(table - eye); yield return null; }
+                        ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "99-inn-drinkers.png"));
+                        for (float t = 0; t < .4f; t += Time.deltaTime) { lens.position = eye; lens.rotation = Quaternion.LookRotation(table - eye); yield return null; }
+                        motor.enabled = true;
+                        for (int i = 0; i < drinkers.Count; i++) drinkers[i].Release(drinkerAt[i]);
+                    }
+                }
                 for (int i = 0; i < bystanders.Count; i++) bystanders[i].Release(bystanderAt[i]);
                 foreach (var r in playerRenderers) r.enabled = true;
             }

@@ -789,8 +789,7 @@ namespace Crulanda.Encounter
                     Part(PrimitiveType.Sphere, armR, new Vector3(0, .55f, .08f), new Vector3(.14f, .1f, .14f), vine);
                     break;
                 case "drinker":
-                    // A pewter tankard, never far from hand.
-                    Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.66f, .1f), new Vector3(.12f, .08f, .12f), M(.6f, .6f, .62f, .6f, .6f));
+                    // (The tankard is not part of the outfit: it is in the hand only at the inn, see Villager.DrinkRound.)
                     if (variant % 2 == 0) Part(PrimitiveType.Sphere, body, new Vector3(0, .84f, -.02f), new Vector3(.33f, .3f, .34f), accent);
                     break;
             }

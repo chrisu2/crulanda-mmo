@@ -10,7 +10,7 @@ using EntityId = Crulanda.Core.EntityId;
 
 namespace Crulanda.Encounter
 {
-    public sealed class EncounterSession : MonoBehaviour
+    public sealed class EncounterSession : MonoBehaviour, Crulanda.World.IZoneNodeKinds
     {
         public EncounterContent content;
         [NonSerialized] public string SaveDirectoryOverride;
@@ -266,8 +266,11 @@ namespace Crulanda.Encounter
         public void SellBag(int i)
         {
             if (VendorNpc == null || i < 0 || i >= Progress.bag.Count || Progress.bag[i].Empty) return;
-            string n = ItemName(Progress.bag[i].item); int count = Progress.bag[i].count;
+            string n = ItemName(Progress.bag[i].item); int count = Progress.bag[i].count; var d = Items?.Get(Progress.bag[i].item);
             int gold = Inventory.Sell(Progress, Items, i);
+            // A material sold in a village is that day's delivery to its trade (ore to the forge, herbs to the stall), and the trades
+            // notice; "sold." + the trade marks it as the player's (the herbalist brings the stall herbs herself every day).
+            if (d != null && !string.IsNullOrEmpty(d.trade) && VillageLife.Active != null) { VillageLife.Active.Deliver(d.trade, count); VillageLife.Active.Deliver("sold." + d.trade, count); }
             Message("Sold " + n + (count > 1 ? " x" + count : "") + " for " + gold + " gold."); Save(false);
         }
         public void SellJunk()
@@ -295,25 +298,55 @@ namespace Crulanda.Encounter
         public bool TradesOpen { get; private set; }
         /// <summary>What using a crafting material from the bags says.</summary>
         public const string MaterialLine = "A crafting material. Press K.";
-        static ProfessionDatabase professionCache; static EncounterContent professionCacheFor; static ItemDatabase professionCacheItems;
+        static ProfessionDatabase professionCache; static EncounterContent professionCacheFor; static ItemDatabase professionCacheItems; static bool professionCacheBad;
+        /// <summary>The trades' content read against the items (cached), or null when it is missing or invalid (logged once).</summary>
+        ProfessionDatabase ProfessionContent()
+        {
+            if (content == null || content.professionFiles == null || content.professionFiles.Length == 0) return null;
+            if (Items == null) LoadItems();
+            if (Items == null) return null;
+            if (professionCacheFor != content || professionCacheItems != Items)
+            {
+                professionCache = null; professionCacheBad = false; professionCacheFor = content; professionCacheItems = Items;
+                try { var texts = new List<string>(); foreach (var f in content.professionFiles) if (f != null) texts.Add(f.text); professionCache = ProfessionDatabase.Parse(texts, Items); }
+                catch (ArgumentException e) { Debug.LogError("Profession content invalid:\n" + e.Message); professionCacheBad = true; }
+            }
+            return professionCacheBad ? null : professionCache;
+        }
         /// <summary>Reads the profession files against the items. A bad file is logged and leaves the trades off; the items stay.</summary>
         void LoadProfessions()
         {
-            if (Items == null || content.professionFiles == null || content.professionFiles.Length == 0) return;
-            try
-            {
-                if (professionCache == null || professionCacheFor != content || professionCacheItems != Items)
-                {
-                    var texts = new List<string>(); foreach (var f in content.professionFiles) if (f != null) texts.Add(f.text);
-                    professionCache = ProfessionDatabase.Parse(texts, Items); professionCacheFor = content; professionCacheItems = Items;
-                }
-                var db = professionCache;
-                Professions = new ProfessionLog(db, Items, Progress);
-                Professions.Say = Message;
-                Professions.SkillUp = (id, skill) => Message(db.Profession(id).name + " " + skill + ".");
-            }
-            catch (ArgumentException e) { Debug.LogError("Profession content invalid:\n" + e.Message); Professions = null; }
+            var db = ProfessionContent(); if (db == null) { Professions = null; return; }
+            Professions = new ProfessionLog(db, Items, Progress);
+            Professions.Say = Message;
+            Professions.SkillUp = (id, skill) => {
+                var trade = db.Profession(id); Message(trade.name + " " + skill + ".");
+                // A new tier comes easily: at 20, 40, 60 and 80 the next kind of node stops being hard going.
+                var tier = skill > 1 ? db.NodesFor(id).Find(n => n.skill == skill) : null;
+                if (tier != null) ShowToast(trade.name.ToUpperInvariant(), tier.name + "s come easily now");
+            };
         }
+        /// <summary>The zone builder asks what a kind of node is (IZoneNodeKinds): from the trades' content, before the session starts.</summary>
+        public Crulanda.World.ZoneNodeKind NodeKind(string id)
+        {
+            var n = ProfessionContent()?.Node(id);
+            return n == null ? null : new Crulanda.World.ZoneNodeKind { id = n.id, name = n.name, look = n.look, prompt = n.prompt, variant = n.variant };
+        }
+        /// <summary>The zones (display names, this one first) that have a node of this kind, from their data, for the Trades window.</summary>
+        public List<string> ZonesWithNode(string nodeId)
+        {
+            var list = new List<string>(); if (Zone == null || string.IsNullOrEmpty(nodeId)) return list;
+            foreach (var z in Zone.AllZones())
+            {
+                bool has = false;
+                if (z.nodes != null) foreach (var n in z.nodes) if (n != null && n.node == nodeId) has = true;
+                if (z.props != null) foreach (var p in z.props) if (p != null && p.node == nodeId) has = true;
+                if (has) { if (z.id == Zone.Zone.id) list.Insert(0, z.displayName); else list.Add(z.displayName); }
+            }
+            return list;
+        }
+        /// <summary>Raises a toast (the banner a find raises): a small kicker over a name. Toasts raised together queue up.</summary>
+        public void ShowToast(string kicker, string name) { toasts.Enqueue((kicker, name)); AdvanceToast(); }
         /// <summary>Opens or closes the Trades window. Opening it closes the character sheet and a merchant, and opens the bags beside it.</summary>
         public void ShowTrades(bool open)
         {
@@ -327,6 +360,97 @@ namespace Crulanda.Encounter
             if (Professions == null) { Message("You have no use for that yet."); return false; }
             if (!Professions.UseTool(bagIndex, out var why)) { if (why != null) Message(why); return false; }
             Save(false); return true;
+        }
+
+        // ---------- gathering: ore seams, windfalls and herbs (ZoneBuilder's nodes; the Yarrow props are nodes too) ----------
+        public const string FightingLine = "You can't do that while fighting.", WorkStoppedLine = "You stop working.";
+        /// <summary>When each worked node (ZoneInteractable.Key) can be worked again, on Time.time. Static, so leaving a zone and
+        /// coming back does not refill its nodes; not saved, so a restart does.</summary>
+        static readonly Dictionary<string, float> nodeReadyAt = new Dictionary<string, float>();
+        /// <summary>Tests only: every node comes back at once.</summary>
+        public static void ForgetRestingNodes() { nodeReadyAt.Clear(); }
+        readonly System.Random gatherRng = new System.Random();
+        /// <summary>
+        /// E on a node: the refusals (in a fight; the trade's tool not at the belt; bags full when no quest wants what it gives),
+        /// then the work on the cast bar: 2 s for ore and timber and 1.5 s for herbs, twice that when the skill is under the
+        /// node's ("hard going": low skill never refuses a node). Nothing starts while working or casting (the two share the cast
+        /// bar). Moving, being hit, a fight or dying stops it.
+        /// </summary>
+        void TryGather(Crulanda.World.ZoneInteractable i)
+        {
+            if (Working || abilities.IsCasting) return;
+            var def = Professions.Db.Node(i.node);
+            if (def == null) { Message("You look it over, but find nothing you need right now."); return; }
+            if (InCombat) { Message(FightingLine); return; }
+            if (!Professions.CanGather(def, out bool hard, out string why)) { Message(why); return; }
+            bool questWants = Quests != null && !string.IsNullOrEmpty(i.item) && Quests.Wants(i.item, i.name);
+            if (Inventory.Room(Progress, Items, def.item) == 0 && !questWants) { Message(ProfessionLog.BagsFullLine); return; }
+            var trade = Professions.Db.Profession(def.profession);
+            if (hard) Message("Hard going: this wants " + trade.name + " " + def.skill + ".");
+            StartWork(WorkLabel(trade.verb), Professions.WorkSeconds(def, hard), () => GatherNow(i));
+        }
+        /// <summary>"Mining", "Cutting", "Gathering": the work bar's label from the trade's verb.</summary>
+        static string WorkLabel(string verb)
+        {
+            if (string.IsNullOrEmpty(verb)) return "Working";
+            if (verb.EndsWith("e")) return verb.Substring(0, verb.Length - 1) + "ing";
+            if (verb.Length == 3 && "aeiou".IndexOf(verb[1]) >= 0 && "aeiouwy".IndexOf(verb[2]) < 0) return verb + verb[2] + "ing";
+            return verb + "ing";
+        }
+        /// <summary>
+        /// A node worked to the end (the work bar's completion; tests call it straight): its yield into the bags ("+2 Crowsfoot
+        /// copper ore") and the skill roll, then what a quest wants of it as before (a Yarrow gives a quest's yarrow while one is
+        /// wanted). Only when something went into the bags or a quest took it does it rest until its respawn and the game save;
+        /// otherwise (the bags filled while the work went on) it says why and the node stays. True when something went into the bags.
+        /// </summary>
+        public bool GatherNow(Crulanda.World.ZoneInteractable i)
+        {
+            if (i == null || i.node == null || Professions == null || Zone == null) return false;
+            var def = Professions.Db.Node(i.node); if (def == null) return false;
+            int got = Professions.Gather(def, gatherRng, out string why);
+            if (got > 0) FloatText(i.position, "+" + got + " " + ItemName(def.item), new Color(.86f, .95f, .66f));
+            bool quest = QuestUse(i);
+            if (got == 0 && !quest) { if (why != null) Message(why); return false; }   // nothing went in and no quest took it: the node stays
+            RestNode(i, def.respawn);
+            Save(false);
+            return got > 0;
+        }
+        /// <summary>A worked node rests: it cannot be used until then, and its part (or all of it) is hidden until it comes back.</summary>
+        void RestNode(Crulanda.World.ZoneInteractable i, float seconds)
+        {
+            if (seconds <= 0 || Zone == null) return;
+            i.hiddenUntil = Time.time + seconds; nodeReadyAt[i.Key(Zone.Zone.id)] = i.hiddenUntil;
+            var hide = i.part != null ? i.part : i.root;
+            if (hide != null) StartCoroutine(HideFor(hide, seconds));
+        }
+        bool nodesRested;
+        /// <summary>After a zone is built or a save loaded: nodes worked a little while ago are still resting (nodeReadyAt).</summary>
+        void TickNodes()
+        {
+            if (nodesRested || Zone == null) return;
+            nodesRested = true;
+            foreach (var i in Zone.Interactables)
+                if (i.node != null && Time.time >= i.hiddenUntil && nodeReadyAt.TryGetValue(i.Key(Zone.Zone.id), out var at) && at > Time.time) RestNode(i, at - Time.time);
+        }
+        // The work bar: gathering (and later crafting) shares the cast bar with abilities.
+        string workName; float workStart, workSeconds; Vector3 workAt; int workHealth; Action workDone;
+        /// <summary>Whether the player is at work (a node being worked) on the cast bar.</summary>
+        public bool Working { get { return workDone != null; } }
+        void StartWork(string name, float seconds, Action done)
+        {
+            workName = name; workStart = Time.time; workSeconds = Mathf.Max(.1f, seconds); workAt = Player.transform.position; workHealth = Player.Health.Pool.Current; workDone = done;
+        }
+        /// <summary>Stops the work in hand, if any (nothing is gathered), saying so when <paramref name="say"/>.</summary>
+        public void CancelWork(bool say = false) { if (workDone == null) return; workDone = null; workName = null; if (say) Message(WorkStoppedLine); }
+        void TickWork()
+        {
+            if (workDone == null) return;
+            var p = Player.transform.position; int health = Player.Health.Pool.Current;
+            if (!Player.IsAlive) { CancelWork(); return; }
+            if (new Vector2(p.x - workAt.x, p.z - workAt.z).magnitude > .3f || health < workHealth || InCombat) { CancelWork(true); return; }
+            workHealth = health;   // it may climb (resting heals); only a fall stops the work
+            if (Time.time - workStart < workSeconds) return;
+            var done = workDone; workDone = null; workName = null; done();
         }
 
         // ---------- routing between zones (maps and breadcrumbs) ----------
@@ -396,17 +520,23 @@ namespace Crulanda.Encounter
         }
         public void UseInteractable(Crulanda.World.ZoneInteractable i)
         {
+            if (i.node != null && Professions != null) { TryGather(i); return; }   // a node (a seam, a windfall, a herb) is worked with its trade
             if (Quests == null) { Message("Nothing here you need."); return; }
-            bool mattered = false;
-            int before = CountQuestProgress();
-            if (!string.IsNullOrEmpty(i.item) && Quests.Wants(i.item, i.name)) { Quests.GiveItem(i.item); mattered = true; }
-            Quests.Notify("interact", i.name); ReconcileQuests();
-            if (CountQuestProgress() != before) mattered = true;
-            if (!mattered) { Message(string.IsNullOrEmpty(i.item) ? "You look it over, but find nothing you need right now." : "You don't need any of this right now."); return; }
+            if (!QuestUse(i)) { Message(string.IsNullOrEmpty(i.item) ? "You look it over, but find nothing you need right now." : "You don't need any of this right now."); return; }
             // Used up: once-only things stay done (saved); herbs regrow after a while.
             if (i.once) { Progress.usedInteractables.Add(i.Key(Zone.Zone.id)); if (i.Vanishes && i.root != null) HideProp(i.root); }
             else if (i.Vanishes) { i.hiddenUntil = Time.time + 90; if (i.root != null) StartCoroutine(HideFor(i.root, 90)); }
             Save(false);
+        }
+        /// <summary>What a quest makes of using a prop: its item while a quest wants it, and the "interact" step. True when it mattered.</summary>
+        bool QuestUse(Crulanda.World.ZoneInteractable i)
+        {
+            if (Quests == null) return false;
+            bool mattered = false;
+            int before = CountQuestProgress();
+            if (!string.IsNullOrEmpty(i.item) && Quests.Wants(i.item, i.name)) { Quests.GiveItem(i.item); mattered = true; }
+            Quests.Notify("interact", i.name); ReconcileQuests();
+            return mattered || CountQuestProgress() != before;
         }
         int CountQuestProgress() { int n = 0; foreach (var s in Progress.quests) { n += s.step * 100; foreach (var c in s.counts) n += c; } return n + Progress.questsDone.Count * 10000; }
         static void HideProp(Transform t) { foreach (var r in t.GetComponentsInChildren<Renderer>()) r.enabled = false; foreach (var l in t.GetComponentsInChildren<Light>()) l.enabled = false; }   // its glow goes with it
@@ -639,7 +769,7 @@ namespace Crulanda.Encounter
         {
             get
             {
-                if (Kit != null && !Kit.MeleeAutoAttacks) return PlayerCasting ? "Casting " + abilities.Casting.name : "No weapon swings in this form";
+                if (Kit != null && !Kit.MeleeAutoAttacks) return abilities.IsCasting ? "Casting " + abilities.Casting.name : "No weapon swings in this form";
                 return !AutoAttack ? "Auto attack: use a melee ability" : Target == null || !Target.actor.IsAlive ? "Auto attack: no target" :
                     Distance(Target) >= 3.2f ? "Auto attack: move closer" : "Next swing: " + SwingRemaining.ToString("0.0") + "s";
             }
@@ -653,9 +783,10 @@ namespace Crulanda.Encounter
         readonly AbilityRuntime abilities = new AbilityRuntime();
         public float CooldownRemaining(int index) { return abilities.Remaining(ActionAt(index), Time.time); }
         public float CooldownRemaining(AbilityDefinition ability) { return abilities.Remaining(ability, Time.time); }
-        public bool PlayerCasting { get { return abilities.IsCasting; } }
-        public float PlayerCastProgress { get { return abilities.CastProgress(Time.time); } }
-        public string PlayerCastName { get { return abilities.IsCasting ? abilities.Casting.name : null; } }
+        /// <summary>A cast in progress, or work (gathering) on the same bar.</summary>
+        public bool PlayerCasting { get { return abilities.IsCasting || Working; } }
+        public float PlayerCastProgress { get { return abilities.IsCasting ? abilities.CastProgress(Time.time) : Working ? Mathf.Clamp01((Time.time - workStart) / workSeconds) : 0; } }
+        public string PlayerCastName { get { return abilities.IsCasting ? abilities.Casting.name : workName; } }
 
         // ---------- helpers for class kits ----------
         /// <summary>Spends the player's class resource and starts the ability (casts complete later via Update).</summary>
@@ -814,7 +945,7 @@ namespace Crulanda.Encounter
             ApplyEquipment();
             SetHealth(Player, Progress.health);
             Player.Health.Died += h => {
-                AutoAttack = false; abilities.Interrupt(); Message("You fell. Press R to recover at camp. Your equipment is kept.");
+                AutoAttack = false; abilities.Interrupt(); CancelWork(); Message("You fell. Press R to recover at camp. Your equipment is kept.");
                 var look = Player.GetComponent<ActorVisual>(); if (look != null) look.Pose = ActorPose.None;   // no swimming or sneaking corpse
             };
             lastDry = Player.transform.position;
@@ -973,7 +1104,7 @@ namespace Crulanda.Encounter
             if (Debug.isDebugBuild && EncounterInput.Press(KeyCode.F11)) { Crulanda.World.WorldClock.Advance(1); Message("Time skips ahead: " + Crulanda.World.WorldClock.Text + " (dev)."); }
             if (Debug.isDebugBuild && EncounterInput.Press(KeyCode.F8) && Crulanda.World.WorldWeather.Active != null) Message("Weather: " + Crulanda.World.WorldWeather.Active.CycleForced() + " (dev).");
             if (!Player.IsAlive) { if (EncounterInput.Press(KeyCode.R)) Recover(); return; }
-            TickQuests(); TickItems(); TickDiscoveries(); TickPlaces();
+            TickQuests(); TickItems(); TickDiscoveries(); TickPlaces(); TickNodes(); TickWork();
             if (Zone != null && Player.GetComponent<CharacterController>().isGrounded && !Zone.WaterAt(new Vector2(Player.transform.position.x, Player.transform.position.z), out _, out _)) lastDry = Player.transform.position;
             var motor = Player.GetComponent<AdventurerMotor>(); var look = Player.GetComponent<ActorVisual>();
             if (look != null) look.Pose = motor.Swimming ? ActorPose.Swim : motor.Sneaking ? ActorPose.Sneak : ActorPose.None;
@@ -1075,7 +1206,9 @@ namespace Crulanda.Encounter
         {
             if (Paused || Player == null || !Player.IsAlive || !ActionUnlocked(index)) return false;
             if (CooldownRemaining(index) > 0) return false;
-            return Kit.Use(index);
+            bool used = Kit.Use(index);
+            if (used) CancelWork(true);   // an ability that goes off takes the hands off the work (the work only ends in TickWork, so it gathers nothing)
+            return used;
         }
         /// <summary>The zone exit the player is standing at, if any.</summary>
         public Crulanda.World.ZoneExit NearbyExit
@@ -1277,7 +1410,7 @@ namespace Crulanda.Encounter
         {
             if (!saves.Read(out var p, out var error)) { Message("Load failed: " + error); return; }
             actorsRoot.SetActive(false); Destroy(actorsRoot);
-            Progress = p; Target = null; AutoAttack = false; abilities.Reset();
+            Progress = p; Target = null; AutoAttack = false; abilities.Reset(); CancelWork(); nodesRested = false;
             Floating.Clear(); SpawnParty(); Message(error ?? "Saved expedition restored.");
             if (Quests != null) { Quests.Bind(Progress); Conversation = null; emptiedHidden = false; ReconcileQuests(); }
             if (Discoveries != null) { Discoveries.Bind(Progress); pocketedSynced = false; vistaWaiting = null; }

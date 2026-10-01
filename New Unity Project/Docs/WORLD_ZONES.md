@@ -61,6 +61,19 @@ on the South road below the Cask; **Lisbet's drying hut** by the Last harvest fi
 inn's back wall; and **Moss's game rack** in the lodge yard. All six are appended to `props` and checked to move nothing:
 `WorkshopDataTests` (the placement rules) and `VillageStreamTests` (Oakhaven built with and without them: trunks, scenery and
 the creek's points are the same). Khaven's four village houses are named too (Grane, Vey, Jenn, Tabor).
+Trades in Oakhaven (GAME-ONLY, 2026-10-01; BUILD_PLAN step 4; tier 1, every node at skill 1, so a new character gathers at once):
+- **Ore** (Crowsfoot copper): four seams at the foot of the Crowsfoot scarps either side of the Hollow's mouth, one by the big rock
+  south of the North pines, one on Crowsfoot Ridge's crown over the Drop; four rich seams on the Hollow's floor, against the
+  walls between the deserters' posts, never in a camp or among the camp's things: the low passage west of the camp chamber,
+  the foot of the Store Caves where the Deep Stair begins, half-way down the Deep Stair, and at its foot before the Echoing
+  Hall (the Drop's stepped floor has none). Mining needs a pick (merchants, the smith).
+- **Timber** (Harrow oak windfalls): at the edges of the broadleaf woods, the stump on the wood's side: the Grey-edge copse, the
+  Harrow wood (east and south edges), the South copse, the Southwood, the Mastwood, the Brook spinney and the Bound copse.
+  Woodcutting needs a hatchet.
+- **Herbs** (yarrow): the eight Yarrow props on the meadows (still the quest's yarrow while Lisbet's quest wants it) and two more,
+  on the Harrow downs west of the farm and on the meadow north of Brook pond. Bare hands.
+- Selling ore or timber in the village is the forge's delivery for the day, herbs the stall's: Brannoc Vell talks of the
+  Crowsfoot ore, the merchant of the fresh herbs.
 
 ## Khaven Village (CANON-EXPANDED)
 Canon names from `maps\khaven_village_map.png`: the Cracked Hearth, two Fallen Smithies, the Blood-Stone Well, the Gallows
@@ -470,6 +483,32 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
     Last-Light, the Cinderfold Tin; in the outer ring a Page from the Waybook, a Bone-Carver's Bundle and Last-Light in the Grey.
   - Verdant Shore: Above Mossveil Falls and the Mossy Outcrop (lookouts), the Tapper's Stump, a Glass-Ship's Log, Lantern-Moss.
 - The capture tour shoots one find per zone up close (`87-secret-<slug>`; the first chest, cache, herb, note or key).
+
+## Things to gather (`ZoneBuilder.BuildNodes`, `ZoneBuilder.Nodes.cs`; GAME-ONLY)
+- **Data:** a zone's `nodes` (`ZoneNode`) and herb props with a `node` (see DATA_SCHEMA.md); the kinds of node (name, prompt,
+  look, tier) are the trades' content (`Professions/professions.json`).
+- **Built after the secrets**, each from its own stream keyed on where it stands, with no colliders and nothing in the navmesh:
+  every tree, prop, secret and creek point stands where it stood (`NodeStreamTests`).
+- **Looks** (in the painted style, from the crags' and boulders' own meshes and stone):
+  - ore seam: an outcrop of the crag stone a metre high, leaning back, one shoulder stained the ore's colour; on its face veins of
+    ore, crystal shards and flecks, and broken ore at its foot (tier colours: copper red-brown with verdigris, bog-iron rust,
+    Adit iron dark with a glint, cinder ember-orange and glowing, Veridian blue-green and glowing). The ore is matte (the metal
+    material with no metalness), so it keeps its colour in a cave and at night, where reflections fade. Rich seams are a third
+    larger. Mined out, the ore goes and the rock stays. In a cave the rock turns to the nearer wall and stands on the floor as
+    its mesh runs between the rings (`Hollow.FloorSmooth`), so nothing floats on a slope.
+  - windfall: a snapped stump with a splintered top (it stays) and the trunk lying beside it with stub limbs (cut away while it
+    rests); bark by tier (oak, black pine, stone-pine, the ash's charred snag, pale ghost-oak).
+  - herb: the herb patches (`Herb`), with the trades' tarnwort, cinder-thistle and dewfern as variants 3-5.
+- **Placement** (moved clear at build, up to 3 m, and tested by `NodePlacementTests`): reachable from the player start to within
+  reach of E; out of water, buildings and off roads; 5 m from secrets and from each other, 2 m from trunks; rich seams only on a
+  cave floor. Seams by crags and rocks, windfalls at broadleaf wood edges, herbs in the open meadow. A node's footprint
+  (`ZoneBuilder.NodeFootprint`: a seam 2.1 m round, a rich one 2.8 m, a windfall 3 m, a herb 0.6 m) stays out of every camp's
+  spread (its radius out to the square's corners, x 1.42) and off a cave's furnishings, which have no colliders, so `Cavern`
+  marks each one it places (`ZoneBuilder.KeepClearSpots`: the camp's fire, bedrolls, grain, crates and barrels, the Drop's
+  treads and rail posts, the Store Caves' stacks, desk, brazier and fallen rock, the throne, braziers, banner and plunder).
+- **Working one** (E; the rules are in DATA_SCHEMA.md, "Trades"): the work bar is the cast bar; moving, a blow, a fight or dying
+  stops it. A worked node rests (`respawn`), also across a zone hop; a restart refills it.
+- The world capture tour shoots every node from a few metres off its face (`<zone>-80-node-NN-<name>`).
 
 ## Travel
 - Zones list `exits` (to, name, at, arrive, radius). Standing at an exit shows "[E] <name>"; E travels (not in combat):

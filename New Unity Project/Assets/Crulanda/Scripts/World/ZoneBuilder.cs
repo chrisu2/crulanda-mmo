@@ -99,6 +99,7 @@ namespace Crulanda.World
             MapTexture = RenderMap(Mathf.Clamp(Mathf.RoundToInt(Zone.size * 4 / 256f) * 256, 1024, 2048));
             Lap("map");
             BuildSecrets();   // after the map: a hidden find must never show on the minimap or the zone map
+            BuildNodes();     // after the secrets (they keep clear of them), each from a stream of its own: nothing else moves
             gameObject.AddComponent<WorldWeather>().Init(this, sunLight);   // before the clock: its first light already has the weather in it
             var clock = gameObject.AddComponent<WorldClock>(); clock.Init(sunLight, Zone.lighting, art.skybox, NightLights);
             // Reflections follow the real sky: a sky-only realtime probe covering the zone, refreshed by the clock.
@@ -1123,7 +1124,7 @@ namespace Crulanda.World
                 rng = zoneRng;
                 if (drop) { DestroyImmediate(t.gameObject); continue; }
                 if (!string.IsNullOrEmpty(p.interact) && t != null)
-                    Interactables.Add(new ZoneInteractable { name = string.IsNullOrEmpty(p.name) ? p.kind : p.name, prompt = p.interact, item = p.item, kind = p.kind, once = p.once, position = t.position, root = t });
+                    Interactables.Add(new ZoneInteractable { name = string.IsNullOrEmpty(p.name) ? p.kind : p.name, prompt = p.interact, item = p.item, kind = p.kind, once = p.once, node = string.IsNullOrEmpty(p.node) ? null : p.node, position = t.position, root = t });
             }
         }
         /// <summary>
@@ -3396,9 +3397,11 @@ namespace Crulanda.World
             Part(PrimitiveType.Cube, t, new Vector3(1.09f, 2.2f, 0), new Vector3(.02f, .5f, .5f), Tint(art.metal, new Color(.75f, .62f, .25f)));
             Solid(t, new Vector3(0, 1.5f, 0), new Vector3(2.4f, 3, 3.8f));
         }
-        /// <summary>A herb patch: a clump of stems with flower heads (variant 0 yarrow white, 1 feverfew yellow, 2 comfrey violet).</summary>
+        /// <summary>A herb patch: a clump of stems with flower heads (variant 0 yarrow white, 1 feverfew yellow, 2 comfrey violet;
+        /// 3 tarnwort, 4 cinder-thistle and 5 dewfern are the trades' herbs, see HerbOfTheTrades). Draws nothing random.</summary>
         void Herb(Transform t, int variant)
         {
+            if (variant >= 3 && variant <= 5) { HerbOfTheTrades(t, variant); return; }
             var stem = Tint(art.foliage, new Color(.3f, .5f, .22f));
             var flower = Tint(art.foliage, new[] { new Color(.95f, .94f, .88f), new Color(.95f, .82f, .25f), new Color(.6f, .4f, .75f) }[Mathf.Abs(variant) % 3]);
             for (int i = 0; i < 7; i++)
@@ -3958,6 +3961,11 @@ namespace Crulanda.World
             // The low passage: a dropped sack, a spent torch.
             Part(PrimitiveType.Sphere, t, new Vector3(-7.4f, FloorY(-7.4f, 20.6f) + .3f, 20.6f), new Vector3(.7f, .55f, .6f), sack, Quaternion.Euler(0, 30, 20));
             Part(PrimitiveType.Cylinder, t, new Vector3(-9.8f, FloorY(-9.8f, 22.9f) + .05f, 22.9f), new Vector3(.06f, .35f, .06f), wood, Quaternion.Euler(0, 40, 88));
+            // None of the camp has a collider: the nodes keep clear of it by these (ZoneBuilder.Nodes, keepClear).
+            KeepClear(t, fire, 1.2f);
+            foreach (var deg in new[] { 55f, 115f, 235f, 300f }) KeepClear(t, fire + Quaternion.Euler(0, deg, 0) * new Vector3(0, 0, 2.9f), 1.1f);
+            KeepClear(t, new Vector3(4.6f, 0, 10.1f), 1.2f); KeepClear(t, new Vector3(-3.45f, 0, 15.6f), 1); KeepClear(t, new Vector3(5.1f, 0, 13.6f), .6f);
+            KeepClear(t, new Vector3(-4.6f, 0, 9.8f), .5f); KeepClear(t, new Vector3(-7.4f, 0, 20.6f), .5f); KeepClear(t, new Vector3(-9.8f, 0, 22.9f), .4f);
 
             // The Drop, and wherever the floor runs steep: plank treads pegged across it and a rope rail on posts down one wall.
             float lastPost = -9;
@@ -3966,10 +3974,10 @@ namespace Crulanda.World
                 int i = RingAt(s), j = Mathf.Min(n - 1, i + 2); float run = h.Along[j] - h.Along[i];
                 if (run <= 0 || (c[i].y - c[j].y) / run < .28f) continue;
                 var q = Along(s); float w = h.Half[i] * .62f;
-                Part(PrimitiveType.Cube, t, On(s, 0) + Vector3.up * .04f, new Vector3(w * 2, .07f, .3f), wood, q);
+                Part(PrimitiveType.Cube, t, On(s, 0) + Vector3.up * .04f, new Vector3(w * 2, .07f, .3f), wood, q); KeepClear(t, On(s, 0), w);
                 if (s - lastPost < 2.4f) continue;
                 var post = On(s, h.Half[i] * .72f);
-                Part(PrimitiveType.Cylinder, t, post + Vector3.up * .55f, new Vector3(.07f, .55f, .07f), wood);
+                Part(PrimitiveType.Cylinder, t, post + Vector3.up * .55f, new Vector3(.07f, .55f, .07f), wood); KeepClear(t, post, .4f);
                 if (lastPost > 0) { var prev = On(lastPost, h.Half[RingAt(lastPost)] * .72f) + Vector3.up * 1.05f; var top = post + Vector3.up * 1.05f; var d = top - prev;
                     Part(PrimitiveType.Cylinder, t, (prev + top) / 2, new Vector3(.035f, d.magnitude / 2, .035f), Tint(art.hay, new Color(.55f, .47f, .32f)), Quaternion.FromToRotation(Vector3.up, d)); }
                 lastPost = s;
@@ -4001,19 +4009,21 @@ namespace Crulanda.World
                     for (int stack = 0; stack < 1 + k % 3; stack++) Part(PrimitiveType.Cube, t, at + Vector3.up * (.45f + stack * .9f), Vector3.one * .9f, crate, q0 * Quaternion.Euler(0, k * 17 + stack * 9, 0));
                     Block(at, new Vector3(1.05f, .9f * (1 + k % 3), 1.05f), q0 * Quaternion.Euler(0, k * 17 + 9, 0));
                     Part(PrimitiveType.Sphere, t, at + q0 * new Vector3(0, .35f, 1.1f), new Vector3(.8f, .7f, .7f), sack, Quaternion.Euler(0, k * 40, 0));
+                    KeepClear(t, at + q0 * new Vector3(0, 0, .5f), 1.2f);   // the stack and its sack
                 }
-                var desk = On(s0 + 1.5f, -h.Half[store] * .45f);
+                var desk = On(s0 + 1.5f, -h.Half[store] * .45f); KeepClear(t, desk, 1.3f);
                 foreach (int b in new[] { -1, 1 }) Part(PrimitiveType.Cylinder, t, desk + q0 * new Vector3(b * .7f, .45f, 0), new Vector3(.55f, .45f, .55f), wood);
                 Part(PrimitiveType.Cube, t, desk + Vector3.up * .95f, new Vector3(2, .08f, .8f), wood, q0);
                 Part(PrimitiveType.Cube, t, desk + q0 * new Vector3(-.3f, 1.03f, 0), new Vector3(.4f, .06f, .3f), Tint(art.cloth, new Color(.4f, .22f, .14f)), q0 * Quaternion.Euler(0, 8, 0));   // the ledger
                 Part(PrimitiveType.Cylinder, t, desk + q0 * new Vector3(.5f, 1.1f, .1f), new Vector3(.06f, .08f, .06f), Tint(art.plaster, new Color(.9f, .86f, .75f)));   // a candle
                 Glow(t, desk + q0 * new Vector3(.5f, 1.4f, .1f), 5, .9f, new Color(1, .7f, .4f), .9f).gameObject.AddComponent<Flicker>();
                 Block(desk, new Vector3(2.1f, 1, .9f), q0);
-                var warm = On(s0 - 1.5f, h.Half[store] * .3f); Brazier(t, warm, null); Block(warm, new Vector3(.8f, 1.2f, .8f), Quaternion.identity);   // off the way through
+                var warm = On(s0 - 1.5f, h.Half[store] * .3f); Brazier(t, warm, null); Block(warm, new Vector3(.8f, 1.2f, .8f), Quaternion.identity); KeepClear(t, warm, .6f);   // off the way through
                 // The choked side way: a dark mouth in the left wall and a heap of fallen rock across it.
                 int sw2 = Mathf.Min(n - 1, store + 3); var wall = ring[sw2, P - 5]; var inw = c[sw2] + Vector3.up * (wall.y - c[sw2].y) - wall; inw.y = 0; inw.Normalize();
                 Part(PrimitiveType.Sphere, t, wall - inw * .1f + Vector3.up * .3f, new Vector3(2.2f, 2.6f, .6f), Tint(art.stone, new Color(.03f, .03f, .03f)), Quaternion.LookRotation(inw));
                 for (int k = 0; k < 7; k++) Lump(BoulderAt(k), t, wall + inw * (.3f + (k % 3) * .35f) + new Vector3((R01 - .5f) * 1.6f, .2f + (k / 3) * .35f, (R01 - .5f) * 1.6f), Vector3.one * (.55f + R01 * .5f), Tint(art.stone, new Color(.38f, .36f, .33f)), R01 * 360);
+                KeepClear(t, wall + inw * .6f, 1.6f);   // the fallen rock
             }
             // The Echoing Hall: stalagmites round its edges, stalactites overhead, and at the far end the throne on its dais facing the
             // way in, braziers either side, the banner behind, the plunder.
@@ -4039,9 +4049,12 @@ namespace Crulanda.World
                 foreach (int k in new[] { -1, 1 }) { var at = seat + face * new Vector3(k * 2.4f, 0, .6f); at.y = FloorY(at.x, at.z); Brazier(t, at, null); Block(at, new Vector3(.8f, 1.2f, .8f), Quaternion.identity); }
                 foreach (int k in new[] { -1, 1 }) { var at = On(h.Along[hall], k * h.Half[hall] * .6f); Brazier(t, at, null); Block(at, new Vector3(.8f, 1.2f, .8f), Quaternion.identity); }
                 Banner(t, seat + face * new Vector3(0, 0, -1.6f), face.eulerAngles.y, sand, wood, 3.6f);
+                KeepClear(t, seat, 1.2f); KeepClear(t, seat + face * new Vector3(0, 0, -1.6f), .6f);
+                foreach (int k in new[] { -1, 1 }) { KeepClear(t, seat + face * new Vector3(k * 2.4f, 0, .6f), .6f); KeepClear(t, On(h.Along[hall], k * h.Half[hall] * .6f), .6f); }
                 var loot = new GameObject("The deserters' plunder").transform; loot.SetParent(t, false);
                 var lootAt = seat + face * new Vector3(-3.4f, 0, .9f); lootAt.y = FloorY(lootAt.x, lootAt.z); loot.localPosition = lootAt; loot.localRotation = face;
                 Block(lootAt, new Vector3(1.9f, 1.8f, 1), face);   // the crates; the sacks and the open chest in front stay underfoot
+                KeepClear(t, lootAt + face * new Vector3(0, 0, .5f), 1.8f);
                 for (int k = 0; k < 3; k++) Part(PrimitiveType.Cube, loot, new Vector3(k == 2 ? .1f : k * .9f - .45f, k == 2 ? 1.35f : .45f, 0), Vector3.one * .9f, Tint(art.timber, new Color(.42f, .31f, .19f)), Quaternion.Euler(0, k * 9, 0));
                 for (int k = 0; k < 4; k++) Part(PrimitiveType.Sphere, loot, new Vector3(-1.3f + k * .35f, .3f, .9f + (k % 2) * .3f), new Vector3(.75f, .6f, .65f), sack, Quaternion.Euler(0, k * 50, 0));
                 Part(PrimitiveType.Cube, loot, new Vector3(1.4f, .3f, .8f), new Vector3(.9f, .6f, .6f), Tint(art.timber, new Color(.3f, .2f, .12f)));   // a chest

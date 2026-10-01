@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
 using Crulanda.Encounter;
@@ -102,6 +103,78 @@ namespace Crulanda.Tests
             // A sound file with no trades at all is an empty database, and a blank file is skipped.
             var empty = ProfessionDatabase.Parse(new[] { "", "{}" }, new ItemDatabase());
             Assert.IsEmpty(empty.Order); Assert.AreEqual(2, empty.CraftSlots);
+        }
+
+        /// <summary>Every zone's data, by file name.</summary>
+        static Dictionary<string, Crulanda.World.ZoneDefinition> Zones()
+        {
+            var zones = new Dictionary<string, Crulanda.World.ZoneDefinition>();
+            foreach (var f in Directory.GetFiles(Path.Combine(Application.dataPath, "Crulanda", "EncounterContent", "Zones"), "*.json"))
+                zones[Path.GetFileNameWithoutExtension(f)] = JsonUtility.FromJson<Crulanda.World.ZoneDefinition>(File.ReadAllText(f));
+            return zones;
+        }
+        /// <summary>A zone's nodes, from its nodes array and its props: the node id, where it is put, and whether it is a herb prop.</summary>
+        static List<(string node, Vector2 at, string where)> NodesOf(Crulanda.World.ZoneDefinition z)
+        {
+            var list = new List<(string, Vector2, string)>();
+            foreach (var n in z.nodes ?? new Crulanda.World.ZoneNode[0]) if (n != null) list.Add((n.node, n.at, "node at " + n.at));
+            foreach (var p in z.props ?? new Crulanda.World.ZoneProp[0]) if (p != null && !string.IsNullOrEmpty(p.node)) list.Add((p.node, p.at, p.kind + " prop '" + p.name + "' at " + p.at));
+            return list;
+        }
+
+        [Test] public void EveryNodeAndRecipe_UsesKnownItems()
+        {
+            var items = Items(); var db = Db(items); var problems = new List<string>();
+            foreach (var n in db.Nodes)
+            {
+                if (items.Get(n.item) == null) problems.Add(n.id + ": unknown item " + n.item);
+                else if (items.Get(n.item).kind != "material") problems.Add(n.id + ": gives " + n.item + ", which is not a material");
+                if (n.skill < 1 || n.skill > ProfessionDatabase.MaxSkill) problems.Add(n.id + ": skill " + n.skill);
+                if (Array.IndexOf(new[] { "ore", "ore_rich", "windfall", "herb" }, n.look) < 0) problems.Add(n.id + ": no look the zone builder knows ('" + n.look + "')");
+                if (n.look == "herb" && (n.variant < 0 || n.variant > 5)) problems.Add(n.id + ": herb variant " + n.variant);
+                if ((n.look == "ore" || n.look == "ore_rich" || n.look == "windfall") && (n.variant < 0 || n.variant > 4)) problems.Add(n.id + ": variant " + n.variant + " (tiers 0-4)");
+                if (db.Profession(n.profession)?.kind != "gather") problems.Add(n.id + ": its trade is not a gathering skill");
+            }
+            foreach (var r in db.Recipes)
+            {
+                if (items.Get(r.output) == null) problems.Add(r.id + ": unknown output " + r.output);
+                foreach (var i in r.inputs) if (items.Get(i.item) == null) problems.Add(r.id + ": unknown input " + i.item);
+                if (r.skill < 1 || r.skill > ProfessionDatabase.MaxSkill) problems.Add(r.id + ": skill " + r.skill);
+                foreach (var s in ProfessionDatabase.Stations(r.station)) if (Array.IndexOf(ProfessionDatabase.StationKinds, s) < 0) problems.Add(r.id + ": station " + s);
+            }
+            // The zones' nodes name real kinds of node; a herb prop worked as a node is a herb; no two share a respawn key (name and metre).
+            foreach (var kv in Zones())
+            {
+                var keys = new HashSet<string>();
+                foreach (var (node, at, where) in NodesOf(kv.Value))
+                {
+                    var def = db.Node(node);
+                    if (def == null) { problems.Add(kv.Key + ": " + where + " names the unknown node '" + node + "'"); continue; }
+                    if (where.Contains(" prop ") && !(where.StartsWith("herb prop") && def.look == "herb")) problems.Add(kv.Key + ": " + where + " is worked as a " + def.look + " node; only herb props are, as herb nodes");
+                    if (!keys.Add(def.name + "|" + Mathf.RoundToInt(at.x) + "|" + Mathf.RoundToInt(at.y))) problems.Add(kv.Key + ": two '" + def.name + "' within a metre at " + at + " would share a respawn");
+                }
+                foreach (var p in kv.Value.props ?? new Crulanda.World.ZoneProp[0])
+                    if (p != null && !string.IsNullOrEmpty(p.node) && string.IsNullOrEmpty(p.interact)) problems.Add(kv.Key + ": prop '" + p.name + "' is a node with no E prompt (interact)");
+            }
+            Assert.IsEmpty(problems, string.Join("\n", problems));
+        }
+
+        /// <summary>Oakhaven, tier 1 (DESIGN 2.4): ten ore (six seams outside and four rich ones on Crowsfoot Hollow's floor), eight
+        /// windfalls and ten herbs (the eight Yarrow props and two more), every one at Oakhaven's skill, so a new character can start
+        /// at once. The Yarrow props still give the quest's yarrow.</summary>
+        [Test] public void Oakhaven_HasTenOreEightTimberTenHerbNodes()
+        {
+            var db = Db(Items()); var z = Zones()["oakhaven"]; var all = NodesOf(z);
+            int Count(string look) { return all.Count(x => db.Node(x.node)?.look == look); }
+            Assert.AreEqual(6, Count("ore"), "Six seams outside."); Assert.AreEqual(4, Count("ore_rich"), "Four rich seams in the Hollow.");
+            Assert.AreEqual(4, z.nodes.Count(n => n != null && n.under), "The rich seams are on the cave's floor.");
+            Assert.IsTrue(z.nodes.Where(n => n != null && n.under).All(n => db.Node(n.node).look == "ore_rich"));
+            Assert.AreEqual(8, Count("windfall")); Assert.AreEqual(10, Count("herb"));
+            foreach (var x in all) Assert.AreEqual(1, db.Node(x.node).skill, x.where + ": Oakhaven's nodes are tier 1.");
+            var yarrows = z.props.Where(p => p != null && p.kind == "herb" && p.name == "Yarrow").ToList();
+            Assert.AreEqual(8, yarrows.Count);
+            foreach (var p in yarrows) { Assert.AreEqual("node.yarrow", p.node); Assert.AreEqual("item.yarrow", p.item, "The quest's yarrow is still given."); }
+            Assert.IsTrue(z.nodes.Where(n => n != null && n.node == "node.yarrow").All(n => n.item == "item.yarrow"), "The two new yarrows count for the quest too.");
         }
 
         [Test] public void Stations_split_on_the_bar()

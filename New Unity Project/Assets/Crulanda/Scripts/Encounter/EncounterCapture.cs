@@ -270,6 +270,24 @@ namespace Crulanda.Encounter
                 ScreenCapture.CaptureScreenshot(file);
                 yield return new WaitForSeconds(.4f);
             }
+            // Every node to gather (a seam, a windfall, a herb patch) from three metres off its face (a windfall side on), the
+            // player hidden: <zone>-80-node-NN-<name>.png.
+            if (zone != null)
+            {
+                int k = 0;
+                foreach (var node in zone.Interactables)
+                {
+                    if (node.node == null || node.root == null) continue;
+                    var face = node.root.rotation * Vector3.back; var from = node.position + face * 3.2f;
+                    motor.Teleport(zone.StandAt(new Vector2(from.x, from.z), node.position.y, 1.1f));
+                    var body = Array.FindAll(session.Player.GetComponentsInChildren<Renderer>(), r => r.enabled); foreach (var r in body) r.enabled = false;
+                    motor.SetView(Quaternion.LookRotation(-face).eulerAngles.y, 22, 4.5f);
+                    yield return new WaitForSeconds(.6f);
+                    ScreenCapture.CaptureScreenshot(Path.Combine(directory, zone.Zone.id.Replace("zone.", "") + "-80-node-" + (k++).ToString("00") + "-" + node.name.ToLowerInvariant().Replace(' ', '-').Replace("'", "") + ".png"));
+                    yield return new WaitForSeconds(.4f);
+                    foreach (var r in body) r.enabled = true;
+                }
+            }
             // Day and night at the first hen coop: the hen-wife's dusk round-up, then the village after dark.
             if (zone != null && zone.Coops.Count > 0)
             {

@@ -134,6 +134,22 @@ namespace Crulanda.World
             int i = Nearest(p, out float d); if (d > Half[i]) return false;
             y = Centre[i].y; return true;
         }
+        /// <summary>
+        /// The passage floor under a ground point, if the point is within the passage's walls, eased between the nearest ring and
+        /// the next one on its side (along the line between their centres), as the floor's mesh runs: on a sloping stretch a thing
+        /// set on it neither floats nor sinks, where <see cref="FloorAt"/> gives the nearest ring's level.
+        /// </summary>
+        public bool FloorSmooth(Vector2 p, out float y)
+        {
+            y = 0; if (Centre.Count == 0 || !box.Contains(p)) return false;
+            int i = Nearest(p, out float d); if (d > Half[i]) return false;
+            y = Centre[i].y; if (Centre.Count < 2) return true;
+            var a = new Vector2(Centre[i].x, Centre[i].z);
+            int j = i == 0 ? 1 : i == Centre.Count - 1 ? i - 1 : Vector2.Dot(p - a, new Vector2(Centre[i + 1].x, Centre[i + 1].z) - a) >= 0 ? i + 1 : i - 1;
+            var b = new Vector2(Centre[j].x, Centre[j].z);
+            float f = Mathf.Clamp01(Vector2.Dot(p - a, b - a) / Mathf.Max(1e-6f, (b - a).sqrMagnitude));
+            y = Mathf.Lerp(Centre[i].y, Centre[j].y, f); return true;
+        }
         /// <summary>How deep a point is in the passage: 0 outside it, else from 0 at the mouth to 1 ten metres in.</summary>
         public float Depth(Vector3 p)
         {
@@ -148,6 +164,8 @@ namespace Crulanda.World
         public static bool InsideAny(Vector3 p, float margin) { foreach (var h in All) if (h.Inside(p, margin)) return true; return false; }
         /// <summary>The floor of whichever passage a point stands in (<paramref name="y"/> unchanged when none).</summary>
         public static bool FloorUnder(Vector2 p, ref float y) { foreach (var h in All) if (h.FloorAt(p, out float f)) { y = f; return true; } return false; }
+        /// <summary>The floor of whichever passage a point stands in, eased between its rings (<see cref="FloorSmooth"/>); <paramref name="y"/> unchanged when none.</summary>
+        public static bool FloorSmoothUnder(Vector2 p, ref float y) { foreach (var h in All) if (h.FloorSmooth(p, out float f)) { y = f; return true; } return false; }
         /// <summary>The world point <paramref name="along"/> metres in from the mouth, on the floor, <paramref name="aside"/> metres to the right.</summary>
         public Vector3 At(float along, float aside = 0)
         {

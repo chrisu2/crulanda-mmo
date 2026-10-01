@@ -166,8 +166,9 @@ namespace Crulanda.Encounter
     /// <summary>
     /// What a character knows of the trades: which skills are learned and how far each has come (EncounterProgress.professions,
     /// save format 8). A gathering tool (a pick, a hatchet) is used once from the bags: it teaches its skill at 1 and hangs at the
-    /// belt from then on, taking no bag slot; a second one is refused and kept. Pure logic over the progress, like QuestLog and
-    /// DiscoveryLog, so it is tested without a scene.
+    /// belt from then on, taking no bag slot; a second one is refused and kept. Gathering: whether a node can be worked, how long
+    /// it takes, what it yields and the skill roll (the session runs the work bar and rests the node). Pure logic over the
+    /// progress, like QuestLog and DiscoveryLog, so it is tested without a scene.
     /// </summary>
     public sealed class ProfessionLog
     {
@@ -236,6 +237,67 @@ namespace Crulanda.Encounter
             if (!UseTool(Items.Get(s.item), out why)) return false;
             s.count--; if (s.count <= 0) { s.item = ""; s.count = 0; }
             return true;
+        }
+
+        // ---------- gathering ----------
+        public const string BagsFullLine = "Your bags are full.";
+        /// <summary>
+        /// Whether the character can work a node: they need its trade (a gathering skill with a tool is learned by hanging the tool
+        /// at the belt; why then names it: "You need a miner's pick. Merchants sell them."). Skill never refuses a node: under the
+        /// node's skill the work is only hard going (<paramref name="hard"/>): slower, a yield of one, a skill point every time.
+        /// </summary>
+        public bool CanGather(NodeDef n, out bool hard, out string why)
+        {
+            hard = false; why = null;
+            var trade = n == null ? null : Db.Profession(n.profession);
+            if (trade == null) { why = "You can't work that."; return false; }
+            if (!Has(trade.id))
+            {
+                var tool = Items?.Get(trade.tool);
+                why = tool != null ? "You need a " + char.ToLowerInvariant(tool.name[0]) + tool.name.Substring(1) + ". Merchants sell them." : "You don't know how to work that.";
+                return false;
+            }
+            hard = Skill(trade.id) < n.skill;
+            return true;
+        }
+        /// <summary>How long working a node takes: its seconds, twice that when it is hard going.</summary>
+        public float WorkSeconds(NodeDef n, bool hard) { return hard ? n.seconds * 2 : n.seconds; }
+        /// <summary>What working a node yields (the yield only; no skill roll): exactly one when the skill is under the node's; else
+        /// min-max, and a one-in-four chance of one more from 20 points over it.</summary>
+        public (string item, int count) RollGather(NodeDef n, System.Random rng)
+        {
+            int skill = Skill(n.profession);
+            if (skill < n.skill) return (n.item, 1);
+            int count = n.min + rng.Next(Math.Max(1, n.max - n.min + 1));
+            if (skill >= n.skill + 20 && rng.NextDouble() < .25) count++;
+            return (n.item, count);
+        }
+        /// <summary>The chance that working a node of skill <paramref name="nodeSkill"/> raises a skill: certain under 20 points over
+        /// it, even under 40, never from 40 over.</summary>
+        public static float GatherUpChance(int skill, int nodeSkill) { return skill < nodeSkill + 20 ? 1 : skill < nodeSkill + 40 ? .5f : 0; }
+        /// <summary>The skill roll after working a node (see <see cref="GatherUpChance"/>); a skill never passes 100. True when it rose
+        /// (SkillUp is told).</summary>
+        public bool Gathered(NodeDef n, System.Random rng)
+        {
+            var e = n == null || Db.Profession(n.profession) == null ? null : Entry(n.profession);
+            if (e == null || e.skill >= ProfessionDatabase.MaxSkill) return false;
+            float chance = GatherUpChance(e.skill, n.skill);
+            if (chance <= 0 || (chance < 1 && rng.NextDouble() >= chance)) return false;
+            e.skill++; SkillUp(n.profession, e.skill);
+            return true;
+        }
+        /// <summary>
+        /// A node worked to the end: the yield goes into the bags and, when any of it went in, the skill is rolled. Returns how many
+        /// went in; 0 with why when the node can't be worked or nothing fits ("Your bags are full."), and then nothing changes.
+        /// </summary>
+        public int Gather(NodeDef n, System.Random rng, out string why)
+        {
+            if (!CanGather(n, out _, out why)) return 0;
+            if (Items == null || Inventory.Room(Progress, Items, n.item) == 0) { why = BagsFullLine; return 0; }
+            var (item, count) = RollGather(n, rng);
+            int got = count - Inventory.Add(Progress, Items, item, count);
+            if (got > 0) Gathered(n, rng);
+            return got;
         }
     }
 }

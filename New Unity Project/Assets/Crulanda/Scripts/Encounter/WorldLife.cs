@@ -488,14 +488,18 @@ namespace Crulanda.Encounter
             if (pool == Wary && Zone.Zone.id == "zone.oakhaven") pool = Session.Quests != null && Session.Quests.IsDone(HollowQuest) ? WaryAfterHollow : WaryRaided;
             return pool[rng.Next(pool.Length)];
         }
-        /// <summary>What the day's deliveries give people to say: the trades talk of each other's goods (see <see cref="Stock"/>).</summary>
+        /// <summary>What the day's deliveries give people to say: the trades talk of each other's goods (see <see cref="Stock"/>),
+        /// the player's sales among them (ore and wood to the forge, herbs to the stall: EncounterSession.SellBag, which marks its own
+        /// as "sold." + the trade, so the merchant's fresh herbs are the player's and not the herbalist's daily errand).</summary>
         string StockLine(Villager v)
         {
             switch (v.Role)
             {
-                case "merchant": return Count("stall.eggs") > 0 ? "Eggs in from the hen-wife, if you want them. Fresh today." : Count("stall.flour") > 0 ? "Flour from the mill, ground this afternoon. Dear, mind." : Count("stall.goods") > 0 ? "Belts and nails and hinges, all village-made. Nothing from the east." : null;
+                case "merchant": return Count("stall.eggs") > 0 ? "Eggs in from the hen-wife, if you want them. Fresh today." : Count("sold.stall.herbs") > 0 ? "Fresh-cut herbs on the stall. Somebody's been in the meadow." : Count("stall.flour") > 0 ? "Flour from the mill, ground this afternoon. Dear, mind." : Count("stall.goods") > 0 ? "Belts and nails and hinges, all village-made. Nothing from the east." : null;
                 case "baker": return Count("oven.flour") > 0 ? "The miller's flour came in. Thin stuff, but it rises." : WorldClock.Between(10, 19) ? "No flour from the mill yet today. The loaves'll be late." : null;
-                case "blacksmith": return Count("forge.wood") > 0 ? "The woodcutter brought oak this morning. Hearth's drawing well." : null;
+                case "blacksmith":
+                    if (Count("forge.ore") > 0) return Zone.Zone.id == "zone.oakhaven" ? "Someone's been up the Crowsfoot with a pick. First ore I've not had to beg for." : "Someone's been out with a pick. First ore I've not had to beg for.";
+                    return Count("forge.wood") > 0 ? "The woodcutter brought oak this morning. Hearth's drawing well." : null;
                 case "miller": return Count("mill.grain") > 0 ? "Barley's in from the fields. The stone's turning on something, at least." : null;
                 case "leatherworker": case "skinner": return Count("tannery.hides") > 0 ? "The hunter's been by with a hide. Grey at one edge; the rest'll do." : null;
                 case "henwife": return Count("stall.eggs") > 0 ? "Eggs are at the produce stall if you're wanting any. I don't sell from the yard." : Count("inn.eggs") > 0 ? "Took the Cask its eggs this morning. The rest go to the stall after dinner." : null;

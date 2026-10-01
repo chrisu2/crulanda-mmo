@@ -2327,7 +2327,8 @@
       },
       "variant": 0,
       "interact": "Gather yarrow",
-      "item": "item.yarrow"
+      "item": "item.yarrow",
+      "node": "node.yarrow"
     },
     {
       "kind": "herb",
@@ -2338,7 +2339,8 @@
       },
       "variant": 0,
       "interact": "Gather yarrow",
-      "item": "item.yarrow"
+      "item": "item.yarrow",
+      "node": "node.yarrow"
     },
     {
       "kind": "herb",
@@ -2349,7 +2351,8 @@
       },
       "variant": 0,
       "interact": "Gather yarrow",
-      "item": "item.yarrow"
+      "item": "item.yarrow",
+      "node": "node.yarrow"
     },
     {
       "kind": "herb",
@@ -2360,7 +2363,8 @@
       },
       "variant": 0,
       "interact": "Gather yarrow",
-      "item": "item.yarrow"
+      "item": "item.yarrow",
+      "node": "node.yarrow"
     },
     {
       "kind": "herb",
@@ -2371,7 +2375,8 @@
       },
       "variant": 0,
       "interact": "Gather yarrow",
-      "item": "item.yarrow"
+      "item": "item.yarrow",
+      "node": "node.yarrow"
     },
     {
       "kind": "herb",
@@ -2382,7 +2387,8 @@
       },
       "variant": 0,
       "interact": "Gather yarrow",
-      "item": "item.yarrow"
+      "item": "item.yarrow",
+      "node": "node.yarrow"
     },
     {
       "kind": "herb",
@@ -2393,7 +2399,8 @@
       },
       "variant": 0,
       "interact": "Gather yarrow",
-      "item": "item.yarrow"
+      "item": "item.yarrow",
+      "node": "node.yarrow"
     },
     {
       "kind": "herb",
@@ -2404,7 +2411,8 @@
       },
       "variant": 0,
       "interact": "Gather yarrow",
-      "item": "item.yarrow"
+      "item": "item.yarrow",
+      "node": "node.yarrow"
     },
     {
       "kind": "cavern",
@@ -4470,5 +4478,27 @@
       "xp": 35,
       "canonStatus": "CANON-EXPANDED: the Wasting creeping on the eastern farms is CANON (book1 ch.4, world_bible.md); the watchtower and its book are GAME-ONLY."
     }
+  ],
+  "nodes": [
+    { "node": "node.copper", "at": { "x": -37.5, "y": 88.2 } },
+    { "node": "node.copper", "at": { "x": -27.5, "y": 88.4 } },
+    { "node": "node.copper", "at": { "x": 0.5, "y": 89.4 } },
+    { "node": "node.copper", "at": { "x": 6.2, "y": 89.4 } },
+    { "node": "node.copper", "at": { "x": 16.3, "y": 91.5 }, "rotation": 90 },
+    { "node": "node.copper", "at": { "x": -30, "y": 134 }, "rotation": 90 },
+    { "node": "node.copper_rich", "at": { "x": -18.5, "y": 111.5 }, "under": true },
+    { "node": "node.copper_rich", "at": { "x": -14, "y": 150 }, "under": true },
+    { "node": "node.copper_rich", "at": { "x": -2, "y": 155.5 }, "under": true },
+    { "node": "node.copper_rich", "at": { "x": 3.5, "y": 157.5 }, "under": true },
+    { "node": "node.oak", "at": { "x": 53, "y": -14 }, "rotation": 180 },
+    { "node": "node.oak", "at": { "x": -78.5, "y": 104 } },
+    { "node": "node.oak", "at": { "x": -101, "y": 81.5 }, "rotation": 90 },
+    { "node": "node.oak", "at": { "x": -101, "y": -85 }, "rotation": 270 },
+    { "node": "node.oak", "at": { "x": -80, "y": -143 }, "rotation": 270 },
+    { "node": "node.oak", "at": { "x": -100.5, "y": 157 } },
+    { "node": "node.oak", "at": { "x": 80, "y": -145.5 }, "rotation": 270 },
+    { "node": "node.oak", "at": { "x": -164, "y": -7 } },
+    { "node": "node.yarrow", "item": "item.yarrow", "at": { "x": -104, "y": 30 } },
+    { "node": "node.yarrow", "item": "item.yarrow", "at": { "x": 24, "y": -72 } }
   ]
 }

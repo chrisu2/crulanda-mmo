@@ -226,7 +226,7 @@ namespace Crulanda.Encounter
                 Outlined(new Rect(18, y, 455, h), msgs[i], tiny, new Color(1, .96f, .86f));
             }
             chatTop = y;
-            Shadow(new Rect(12, 774, 780, 20), "WASD move · Space jump · Right-drag look · Wheel zoom · Tab target · E interact · L quests · M map · B talents · I bags · C character · K trades", tiny, new Color(.8f, .8f, .78f));
+            Shadow(new Rect(12, 774, 880, 20), "WASD move · Space jump · Right-drag look · Wheel zoom · Tab target · E interact · L quests · M map · B talents · I bags · C character · K trades", tiny, new Color(.8f, .8f, .78f));
         }
         void DrawCenter()
         {

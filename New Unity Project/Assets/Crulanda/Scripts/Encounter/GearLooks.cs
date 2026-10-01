@@ -274,10 +274,10 @@ namespace Crulanda.Encounter
         }
         /// <summary>The resolver's own copy of the level bands (ItemDatabase's is private): 1-2, 3-5, 6-8, 9-10, 11-13.</summary>
         public static int BandOf(int level) { return level <= 2 ? 0 : level <= 5 ? 1 : level <= 8 ? 2 : level <= 10 ? 3 : 4; }
-        /// <summary>A short key for a resolved look (family, variant, palette, quality, glow and metal), for caching rendered icons.</summary>
+        /// <summary>A short key for a resolved look (family, variant, palette, quality, glow, metal and detail), for caching rendered icons.</summary>
         public static string LookKey(GearLook l)
         {
-            return l.family + ":" + l.variant + "/" + l.palette + "#" + l.quality + (l.forceGlow ? "+glow" : "") + "@" + ColorUtility.ToHtmlStringRGB(l.metal);
+            return l.family + ":" + l.variant + "/" + l.palette + "#" + l.quality + (l.forceGlow ? "+glow" : "") + "@" + ColorUtility.ToHtmlStringRGB(l.metal) + "~" + l.detail;
         }
 
         /// <summary>The look of an item: its own look, else its generated name's, else its slot's fallback. Never fails.</summary>

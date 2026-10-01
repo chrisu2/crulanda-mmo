@@ -74,9 +74,15 @@ namespace Crulanda.Encounter
             Grip(k, r, -.09f, .09f, .033f);
             GBall(r, k.trim, V(0, -.125f, 0), S(.085f));
             GBox(r, k.trim, V(0, .11f, 0), V(.05f, .042f, .2f));
-            GPart(r, M.Straight("short.blade", .55f, .09f, .032f, .22f), k.metal, V(0, .13f, 0), Vector3.one);
-            if (k.l.variant == "notched")
-                GPart(r, M.Many("short.notches", Cube, M.At(V(0, .3f, .043f), V(45, 0, 0), V(.036f, .03f, .03f)), M.At(V(0, .41f, .041f), V(45, 0, 0), V(.036f, .026f, .026f))), k.dark, V(0, 0, 0), Vector3.one);
+            // Notched: two V nicks cut into the edge (the same profile as the plain blade otherwise), so the outline itself shows them.
+            float h = .045f;
+            float Tp(float t) { return 1 - .12f * t; }
+            float U(float t) { return Mathf.Clamp01((t - .78f) / .22f); }
+            float N(float t, float c) { return Mathf.Clamp01(1 - Mathf.Abs(t - c) / .04f); }   // a nick centred on a station (30 stations, .0333 apart)
+            var blade = k.l.variant == "notched"
+                ? M.Blade("short.blade.notched", .55f, t => h * Tp(t) * (1 - U(t)) * (1 - .55f * N(t, .3f) - .45f * N(t, .5f)), t => h * Tp(t) * (1 - U(t)), .032f, null, false, 30)
+                : M.Straight("short.blade", .55f, .09f, .032f, .22f);
+            GPart(r, blade, k.metal, V(0, .13f, 0), Vector3.one);
             BladeMarks(k, r, .13f, .55f, .032f, .11f, .05f);
         }
         static float ArmingW(float t) { float u = Mathf.Clamp01((t - .8f) / .2f); return .039f * (1 - .12f * t) * (1 - u); }
@@ -450,13 +456,13 @@ namespace Crulanda.Encounter
         /// <summary>A flat paint (or strap) on a domed face: the same dome, just proud of it.</summary>
         static Mesh Paint(string key, Vector2[] outline, float faceThick, float bulge, Vector2 centre, Vector2 radius, float raise = .0015f, float depth = .002f)
         { return M.Plate(key, outline, depth, bulge, centre, radius, faceThick / 2 + raise - depth / 2 + .0005f); }
-        /// <summary>Several flat paints in one mesh.</summary>
-        static Mesh Paints(string key, float faceThick, float bulge, Vector2 centre, Vector2 radius, params Vector2[][] outlines)
+        /// <summary>Several flat paints in one mesh, <paramref name="raise"/> proud of the face (paints that cross each other need different raises).</summary>
+        static Mesh Paints(string key, float faceThick, float bulge, Vector2 centre, Vector2 radius, float raise, params Vector2[][] outlines)
         {
             return M.Cached(key, () =>
             {
                 var c = new CombineInstance[outlines.Length];
-                for (int i = 0; i < outlines.Length; i++) c[i] = new CombineInstance { mesh = Paint(key + "." + i, outlines[i], faceThick, bulge, centre, radius), transform = Matrix4x4.identity };
+                for (int i = 0; i < outlines.Length; i++) c[i] = new CombineInstance { mesh = Paint(key + "." + i, outlines[i], faceThick, bulge, centre, radius, raise), transform = Matrix4x4.identity };
                 var m = new Mesh(); m.CombineMeshes(c, true, true); m.RecalculateBounds(); return m;
             });
         }
@@ -530,20 +536,20 @@ namespace Crulanda.Encounter
                     GPart(r, M.Rim("round.rim.hide", outline, .022f, .012f, th / 2, bulge, c, radius), k.leather, Vector3.zero, Vector3.one);
                     break;
                 case "cask":   // the end of a salt cask: staves, an iron hoop, the cooper's stamp
-                    GPart(r, Paints("round.cask.seams", th, bulge, c, radius, Strip(-.27f, .27f, -.1f, .01f), Strip(-.28f, .28f, 0, .01f), Strip(-.27f, .27f, .1f, .01f)), k.dark, Vector3.zero, Vector3.one);
+                    GPart(r, Paints("round.cask.seams", th, bulge, c, radius, .0015f, Strip(-.27f, .27f, -.1f, .01f), Strip(-.28f, .28f, 0, .01f), Strip(-.27f, .27f, .1f, .01f)), k.dark, Vector3.zero, Vector3.one);
                     var stamp = Circle(.055f, 16); for (int i = 0; i < stamp.Length; i++) stamp[i] += new Vector2(-.12f, .06f);
                     GPart(r, Paint("round.cask.stamp", stamp, th, bulge, c, radius, .0025f), GearMats.Get(k.l.wood * .45f, .1f), Vector3.zero, Vector3.one);
                     GPart(r, M.Rim("round.rim.hoop", outline, .04f, .014f, th / 2, bulge, c, radius), k.metal, Vector3.zero, Vector3.one);
                     break;
                 case "lid":   // a strongbox lid: iron straps and a lock plate
-                    GPart(r, Paints("round.lid.straps", th, bulge, c, radius, Strip(-.24f, .24f, -.12f, .05f), Strip(-.24f, .24f, .12f, .05f)), k.metal, Vector3.zero, Vector3.one);
+                    GPart(r, Paints("round.lid.straps", th, bulge, c, radius, .0015f, Strip(-.24f, .24f, -.12f, .05f), Strip(-.24f, .24f, .12f, .05f)), k.metal, Vector3.zero, Vector3.one);
                     GPart(r, Paint("round.lid.lock", Pts(-.05f, -.04f, .05f, -.04f, .05f, .04f, -.05f, .04f), th, bulge, c, radius, .004f, .006f), k.trim, Vector3.zero, Vector3.one);
                     GBox(r, GearMats.Get(new Color(.05f, .04f, .04f)), V(0, faceTop + .004f, 0), V(.03f, .006f, .012f));                               // keyhole
                     GPart(r, M.Rim("round.rim", outline, .025f, .013f, th / 2, bulge, c, radius), k.metal, Vector3.zero, Vector3.one);
                     break;
                 default:   // boards: three seams, two quarters painted, an iron boss
-                    GPart(r, Paints("round.quarters", th, bulge, c, radius, Sector(0, .265f, 0, 90, 8), Sector(0, .265f, 180, 270, 8)), k.cloth, Vector3.zero, Vector3.one);
-                    GPart(r, Paints("round.seams", th, bulge, c, radius, Strip(-.26f, .26f, -.1f, .008f), Strip(-.27f, .27f, 0, .008f), Strip(-.26f, .26f, .1f, .008f)), k.dark, Vector3.zero, Vector3.one);
+                    GPart(r, Paints("round.quarters", th, bulge, c, radius, .0015f, Sector(0, .265f, 0, 90, 8), Sector(0, .265f, 180, 270, 8)), k.cloth, Vector3.zero, Vector3.one);
+                    GPart(r, Paints("round.seams", th, bulge, c, radius, .003f, Strip(-.26f, .26f, -.1f, .008f), Strip(-.27f, .27f, 0, .008f), Strip(-.26f, .26f, .1f, .008f)), k.dark, Vector3.zero, Vector3.one);
                     GPart(r, M.Rim("round.rim", outline, .025f, .013f, th / 2, bulge, c, radius), k.metal, Vector3.zero, Vector3.one);
                     break;
             }
@@ -607,7 +613,7 @@ namespace Crulanda.Encounter
                 veins[2 * i] = Pts(x - .008f, .01f, x + .008f, .01f, xe + .007f, len, xe - .007f, len);
                 veins[2 * i + 1] = Pts(x - .008f, -.01f, xe - .007f, -len, xe + .007f, -len, x + .008f, -.01f);
             }
-            GPart(r, Paints("leaf.veins", th, bulge, c, radius, veins), vein, Vector3.zero, Vector3.one);
+            GPart(r, Paints("leaf.veins", th, bulge, c, radius, .0015f, veins), vein, Vector3.zero, Vector3.one);
             GPart(r, M.Rim("leaf.rim", LeafOutline, .016f, .01f, th / 2, bulge, c, radius), bark ? vein : k.trim, Vector3.zero, Vector3.one);
             if (bark) GPart(r, M.Many("leaf.moss", Sphere, M.At(V(-.2f, surface(-.2f, .09f), .09f), Vector3.zero, V(.07f, .02f, .05f)), M.At(V(.12f, surface(.12f, -.1f), -.1f), Vector3.zero, V(.05f, .018f, .04f))), GearMats.Get(new Color(.3f, .45f, .22f), .1f), Vector3.zero, Vector3.one);
             Extra(k, r, Sphere, V(-.02f, surface(-.02f, 0) + .006f, 0), V(.05f, .02f, .05f));
@@ -639,7 +645,7 @@ namespace Crulanda.Encounter
                     GBall(r, k.trim, V(0, -.1f, .012f), S(.03f));
                     break;
                 default:   // a lantern: lantern (open cage), shuttered, or moss under glass
-                    GPart(r, M.Rod("lantern.bail", new[] { V(0, -.13f, -.04f), V(0, -.01f, -.045f), V(0, -.01f, .045f), V(0, -.13f, .04f) }, .006f, .006f), k.dark, Vector3.zero, Vector3.one);
+                    GPart(r, M.Rod("lantern.bail", new[] { V(0, -.13f, -.04f), V(0, .03f, -.045f), V(0, .03f, .045f), V(0, -.13f, .04f) }, .006f, .006f), k.dark, Vector3.zero, Vector3.one);
                     GPart(r, M.Cone(10), k.metal, V(0, -.15f, 0), V(.14f, .06f, .14f));
                     GPrim(PrimitiveType.Cylinder, r, k.metal, V(0, -.288f, 0), V(.13f, .01f, .13f));
                     if (v == "moss")   // lantern-moss under a glass dome

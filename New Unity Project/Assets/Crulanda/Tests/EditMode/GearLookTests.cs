@@ -115,6 +115,9 @@ namespace Crulanda.Tests
                 Assert.AreEqual(GearLooks.LookKey(a.Resolve(d)), GearLooks.LookKey(b.Resolve(other)), d.id);
                 Assert.AreEqual(GearLooks.LookKey(a.Resolve(d)), GearLooks.LookKey(a.Resolve(d)), d.id);
             }
+            // Two looks that differ only in their detail (a trim band on the grip, or none) build different parts, so keep apart.
+            var plain = a.Resolve(dbA.Get(ItemDatabase.GearId("mainhand", 5, 2, 0))); var banded = plain; plain.detail = "none"; banded.detail = "band";
+            Assert.AreNotEqual(GearLooks.LookKey(plain), GearLooks.LookKey(banded), "The detail is part of the key.");
             // Two items with the same words differ at most in the variant (the seed), never in family or palette.
             var seen = new Dictionary<string, GearLook>();
             foreach (var d in Generated(dbA, 40))

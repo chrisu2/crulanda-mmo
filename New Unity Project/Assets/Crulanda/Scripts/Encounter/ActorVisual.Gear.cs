@@ -115,9 +115,9 @@ namespace Crulanda.Encounter
         /// <summary>
         /// Where a slot's piece sits (DESIGN.md 2.3 "Roots"). Main hand: at the right hand, the weapon along +Y pointing forward and
         /// 20 degrees down (turned 20 degrees about its length so a flat shows to a camera behind and above); staves and polearms
-        /// stand nearly upright through the fist. Off hand: on the left forearm, face outward; hung pieces from the left hand. Slung
-        /// copies: the weapon across the back (hilt over the right shoulder, flat to the back), the shield flat on the back point
-        /// down, a lantern at the left hip.
+        /// stand nearly upright just in front of the fist, clear of the sleeve. Off hand: on the left forearm, face outward; hung
+        /// pieces from the left hand, the bail or chain inside the fist. Slung copies: the weapon across the back (hilt over the
+        /// right shoulder, flat to the back), the shield flat on the back point down, a lantern hanging beside the left hip.
         /// </summary>
         Transform Mount(EquipSlot slot, string family, bool stow)
         {
@@ -125,8 +125,8 @@ namespace Crulanda.Encounter
             Transform parent; Vector3 pos; Quaternion rot;
             if (!stow)
             {
-                if (main) { parent = armR; pos = new Vector3(0, -.62f, 0); rot = tall ? Quaternion.Euler(8, 0, 0) : Quaternion.Euler(110, 0, 0) * Quaternion.Euler(0, 20, 0); }
-                else if (hung) { parent = armL; pos = new Vector3(0, -.7f, .04f); rot = Quaternion.identity; }
+                if (main) { parent = armR; pos = tall ? new Vector3(0, -.62f, .085f) : new Vector3(0, -.62f, 0); rot = tall ? Quaternion.Euler(8, 0, 0) : Quaternion.Euler(110, 0, 0) * Quaternion.Euler(0, 20, 0); }
+                else if (hung) { parent = armL; pos = new Vector3(0, -.65f, 0); rot = Quaternion.identity; }
                 else { parent = armL; pos = new Vector3(-.1f, -.38f, .05f); rot = Quaternion.Euler(0, 0, 90); }
             }
             else
@@ -134,7 +134,7 @@ namespace Crulanda.Encounter
                 parent = body;
                 if (main && tall) { pos = new Vector3(0, .25f, -.27f); rot = Quaternion.Euler(0, 0, -40) * Quaternion.Euler(0, 90, 0); }
                 else if (main) { pos = new Vector3(.26f, .66f, -.2f); rot = Quaternion.Euler(0, 0, 145) * Quaternion.Euler(0, 90, 0); }
-                else if (hung) { pos = new Vector3(-.24f, .06f, -.1f); rot = Quaternion.identity; }
+                else if (hung) { pos = new Vector3(-.31f, .08f, -.12f); rot = Quaternion.Euler(0, 90, 0); }   // clear of the hip and thigh; a balance's beam runs fore and aft
                 else { pos = new Vector3(0, .3f, -.24f); rot = Quaternion.Euler(0, -90, 90); }
             }
             var t = new GameObject("Gear " + ItemDatabase.SlotNames[(int)slot] + (stow ? " (slung)" : "")).transform;

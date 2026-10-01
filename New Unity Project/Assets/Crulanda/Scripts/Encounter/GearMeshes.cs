@@ -200,7 +200,10 @@ namespace Crulanda.Encounter
             });
         }
 
-        /// <summary>A bent rod through the points of a Bezier curve (a knuckle bow, a root curl, a tine), tapering from r0 to r1.</summary>
+        /// <summary>
+        /// A bent rod through the points of a Bezier curve (a knuckle bow, a root curl, a tine), tapering from r0 to r1, both ends
+        /// capped flat.
+        /// </summary>
         public static Mesh Rod(string key, Vector3[] control, float r0, float r1, int sides = 6, int rings = 9)
         {
             return Cached(key, () =>
@@ -209,7 +212,22 @@ namespace Crulanda.Encounter
                 // Square to the rod's general run: the axis it runs along least, so the rings never twist.
                 var dir = (control[control.Length - 1] - control[0]).normalized; var reference = Vector3.right;
                 foreach (var axis in new[] { Vector3.up, Vector3.forward }) if (Mathf.Abs(Vector3.Dot(dir, axis)) < Mathf.Abs(Vector3.Dot(dir, reference))) reference = axis;
-                return Crulanda.World.ZoneMeshes.Tube(t => Bezier(control, t), (t, a) => Mathf.Lerp(r0, r1, t), rs, sides, reference);
+                var m = Crulanda.World.ZoneMeshes.Tube(t => Bezier(control, t), (t, a) => Mathf.Lerp(r0, r1, t), rs, sides, reference);
+                // Close both ends with a flat fan (Tube leaves them open, and an open end shows through where nothing covers it: a
+                // crook's tip, a tusk's butt). Ring k is vertices k * (sides + 1) on; each cap has its own vertices so it shades flat.
+                var v = new List<Vector3>(m.vertices); var n = new List<Vector3>(m.normals); var uv = new List<Vector2>(m.uv); var tri = new List<int>(m.triangles); int cols = sides + 1;
+                foreach (int k in new[] { 0, rings - 1 })
+                {
+                    var c = Bezier(control, rs[k]); var outward = (Bezier(control, Mathf.Min(1, rs[k] + .01f)) - Bezier(control, Mathf.Max(0, rs[k] - .01f))).normalized * (k == 0 ? -1 : 1);
+                    int ci = v.Count; v.Add(c); n.Add(outward); uv.Add(uv[k * cols]);
+                    for (int s = 0; s < sides; s++) { v.Add(v[k * cols + s]); n.Add(outward); uv.Add(uv[k * cols + s]); }
+                    for (int s = 0; s < sides; s++)
+                    {
+                        int a = ci + 1 + s, b = ci + 1 + (s + 1) % sides;
+                        if (Vector3.Dot(Vector3.Cross(v[a] - c, v[b] - c), outward) > 0) { tri.Add(ci); tri.Add(a); tri.Add(b); } else { tri.Add(ci); tri.Add(b); tri.Add(a); }
+                    }
+                }
+                m.SetVertices(v); m.SetNormals(n); m.SetUVs(0, uv); m.SetTriangles(tri, 0); m.RecalculateBounds(); return m;
             });
         }
         static Vector3 Bezier(Vector3[] p, float t)
@@ -225,10 +243,30 @@ namespace Crulanda.Encounter
         }
         /// <summary>An upright cone, base at the origin (a spike, a lantern cap, a thorn).</summary>
         public static Mesh Cone(int sides = 8) { return Cached("cone" + sides, () => Crulanda.World.ZoneMeshes.Cone(.5f, 1, sides)); }
-        /// <summary>A ring segment in the XZ plane (Crulanda.World.ZoneMeshes.Arc): a crescent axe head, a sickle, a handle.</summary>
+        /// <summary>
+        /// A ring segment in the XZ plane, centred on y 0, from angle a0 to a1 (degrees, anticlockwise from +X seen from above) and
+        /// radius r0 to r1, curved in steps of 10 degrees or less: a crescent axe head, a sickle, a handle.
+        /// </summary>
         public static Mesh Arc(string key, float r0, float r1, float a0, float a1, float h)
         {
-            return Cached(key, () => { var m = Crulanda.World.ZoneMeshes.Arc(r0, r1, a0, a1, h); var v = m.vertices; for (int i = 0; i < v.Length; i++) v[i].y -= h / 2; m.vertices = v; m.RecalculateBounds(); return m; });
+            return Cached(key, () =>
+            {
+                var b = new Builder(); int n = Mathf.Max(6, Mathf.CeilToInt(Mathf.Abs(a1 - a0) / 10)); float y0 = -h / 2, y1 = h / 2, s = Mathf.Sign(a1 - a0);
+                Vector3 D(float a) { return new Vector3(Mathf.Cos(a * Mathf.Deg2Rad), 0, Mathf.Sin(a * Mathf.Deg2Rad)); }
+                Vector3 P(float r, float a, float y) { return D(a) * r + Vector3.up * y; }
+                for (int i = 0; i < n; i++)
+                {
+                    float p = Mathf.Lerp(a0, a1, (float)i / n), q = Mathf.Lerp(a0, a1, (float)(i + 1) / n); var radial = D((p + q) / 2);
+                    b.Quad(b.Add(P(r0, p, y1)), b.Add(P(r1, p, y1)), b.Add(P(r1, q, y1)), b.Add(P(r0, q, y1)), Vector3.up);
+                    b.Quad(b.Add(P(r0, p, y0)), b.Add(P(r1, p, y0)), b.Add(P(r1, q, y0)), b.Add(P(r0, q, y0)), Vector3.down);
+                    b.Quad(b.Add(P(r1, p, y0)), b.Add(P(r1, p, y1)), b.Add(P(r1, q, y1)), b.Add(P(r1, q, y0)), radial);
+                    b.Quad(b.Add(P(r0, p, y0)), b.Add(P(r0, p, y1)), b.Add(P(r0, q, y1)), b.Add(P(r0, q, y0)), -radial);
+                }
+                Vector3 T(float a) { return Vector3.Cross(D(a), Vector3.up) * s; }   // along the arc toward a1
+                b.Quad(b.Add(P(r0, a0, y0)), b.Add(P(r0, a0, y1)), b.Add(P(r1, a0, y1)), b.Add(P(r1, a0, y0)), -T(a0));
+                b.Quad(b.Add(P(r0, a1, y0)), b.Add(P(r0, a1, y1)), b.Add(P(r1, a1, y1)), b.Add(P(r1, a1, y0)), T(a1));
+                return b.Build();
+            });
         }
         /// <summary>
         /// One mesh made of several placed copies of another (six flanges, a ring of studs, a cage's bars): one part, not many.

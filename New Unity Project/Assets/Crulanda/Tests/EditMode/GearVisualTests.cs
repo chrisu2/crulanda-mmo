@@ -9,7 +9,7 @@ namespace Crulanda.Tests
     /// Worn gear on the figure, the hand-held half (loot step A1; step A2 adds the armour): a bare Warrior holds nothing and has
     /// no pads; a weapon goes on the right hand and a shield or lantern on the left; swapping gear leaves nothing behind and makes
     /// no new materials or meshes; gear put on while swimming is slung on the back; every main-hand and off-hand family and
-    /// variant builds at every quality within the part budget; a session with no items keeps the class kit; enemies' own weapons
+    /// variant builds at every quality within the part budget; arcs curve and rods are capped; a session with no items keeps the class kit; enemies' own weapons
     /// and Caddock's crown are untouched. Built in edit mode on bare figures (no scene, no save).
     /// </summary>
     public class GearVisualTests
@@ -135,6 +135,16 @@ namespace Crulanda.Tests
                     }
             }
             Assert.AreEqual((47 + 19) * 5, built, "47 main-hand and 19 off-hand variants, five qualities each.");
+        }
+
+        [Test] public void Arcs_curve_and_rods_are_closed()
+        {
+            var arc = GearMeshes.Arc("test.crescent", .1f, .19f, 20, 160, .036f);
+            Assert.Greater(arc.bounds.max.z, .18f, "A crescent reaches out to its full radius at 90 degrees, not a flat slab between its ends.");
+            Assert.GreaterOrEqual(arc.vertexCount, 4 * 4 * 14, "Fourteen steps of 10 degrees, four faces each.");
+            Assert.AreEqual(-.018f, arc.bounds.min.y, 1e-4f, "Centred on y 0."); Assert.AreEqual(.018f, arc.bounds.max.y, 1e-4f);
+            var rod = GearMeshes.Rod("test.rod", new[] { new Vector3(0, 0, 0), new Vector3(0, .2f, .1f), new Vector3(0, .3f, 0) }, .02f, .015f, 6, 9);
+            Assert.AreEqual(8 * 6 * 6 + 2 * 6 * 3, rod.triangles.Length, "The tube's sides and a fan over each end.");
         }
 
         [Test] public void Legacy_session_without_items_keeps_the_class_kit()

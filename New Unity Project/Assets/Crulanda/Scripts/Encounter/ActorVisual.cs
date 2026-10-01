@@ -828,6 +828,7 @@ namespace Crulanda.Encounter
             legL.localEulerAngles = new Vector3(swing, 0, 0); legR.localEulerAngles = new Vector3(-swing, 0, 0);
             armL.localEulerAngles = new Vector3(-swing * .8f + idle, 0, 3); armR.localEulerAngles = new Vector3(swing * .8f - idle, 0, -3);
             if (torso != null && !beast) torso.localPosition = new Vector3(0, .3f + Mathf.Abs(Mathf.Sin(phase)) * .025f * stride, 0);
+            if (gearDriven && torso != null) GearBob(torso.localPosition.y - .3f);
             if (beast && LyingLow) { armL.localEulerAngles = armR.localEulerAngles = new Vector3(80, 0, 0); legL.localEulerAngles = legR.localEulerAngles = new Vector3(-80, 0, 0); }   // lying in wait: legs folded under the belly
             if (Pose == ActorPose.None)   // combatants never use poses (their death pose moves the body)
             {

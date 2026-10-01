@@ -24,6 +24,11 @@ from a read-only review of that work.
   disc sat inside a solid pan); `main.verdant.5` awards its page (`documents`, a list); the Root-Mother's roots go down into the
   floor, not 14 m up; the village's stock starts again before dawn; a delivery home says its line at the door before going in;
   the hen-wife only speaks of eggs that got there; three flaky spots in `VillageErrandTests`.
+- **Update 01:56:** items 1 and 2 below are FIXED in code (`tools\wip\review_fixes_3.py`) and a focused run passed 11/11
+  (RootDeepTests, VillageErrandTests with its hardening, HollowQuestTests, ZoneContentTests): the Heart's plan stays tall to its
+  back wall (rows z 95 and 98 are 8-8.5 m high, the end at z 100.5), so the Root-Mother stands under the roof; the cold is its
+  own child ("The cold": rod, light, hoarfrost), `once`, and stays gone when salted while the pale root stays. NOT yet seen:
+  look at `verdant-86-hollow-hall.png` on the next tour. Item 3 is still open.
 - **Review findings still OPEN, do these before publishing:**
   1. The Root-Mother's upper knot, face and eyes sit above the passage roof at the Heart's tapered end (`RootDeepInterior`,
      `sEnd = h.Length - 3.5f`). Move the seat about 7 m into the hall (roof 8 m there) and move the camps "The Root-Warden"

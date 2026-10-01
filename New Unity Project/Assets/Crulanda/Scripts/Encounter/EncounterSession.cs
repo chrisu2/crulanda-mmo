@@ -366,7 +366,7 @@ namespace Crulanda.Encounter
             Save(false);
         }
         int CountQuestProgress() { int n = 0; foreach (var s in Progress.quests) { n += s.step * 100; foreach (var c in s.counts) n += c; } return n + Progress.questsDone.Count * 10000; }
-        static void HideProp(Transform t) { foreach (var r in t.GetComponentsInChildren<Renderer>()) r.enabled = false; }
+        static void HideProp(Transform t) { foreach (var r in t.GetComponentsInChildren<Renderer>()) r.enabled = false; foreach (var l in t.GetComponentsInChildren<Light>()) l.enabled = false; }   // its glow goes with it
         System.Collections.IEnumerator HideFor(Transform t, float seconds)
         {
             var rs = Array.FindAll(t.GetComponentsInChildren<Renderer>(), r => r.enabled); foreach (var r in rs) r.enabled = false;

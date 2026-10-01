@@ -2834,8 +2834,9 @@ namespace Crulanda.World
                 new[] { 1f, 34, 4, 4.4f, -9.2f }, new[] { 4f, 38, 2.6f, 3.2f, -9.8f }, new[] { 8f, 41.5f, 2.4f, 3, -10.6f }, new[] { 12f, 45, 2.6f, 3.2f, -11.4f },
                 new[] { 15f, 50, 5, 4.8f, -12 }, new[] { 16f, 56, 6, 5.2f, -12.2f }, new[] { 14.5f, 62, 4.5f, 4.4f, -12.4f },
                 new[] { 11f, 66, 2.6f, 3.2f, -13.2f }, new[] { 6.5f, 69.5f, 2.5f, 3.1f, -14.6f }, new[] { 2f, 73, 2.8f, 3.4f, -16 },
-                new[] { 0f, 78, 7, 7, -16.5f }, new[] { -1f, 84, 9, 8.5f, -16.8f }, new[] { -1.5f, 90, 8.5f, 8, -16.8f }, new[] { -2f, 95, 5, 5.5f, -16.8f },
-                new[] { -2f, 98, 2, 2.5f, -16.8f }, new[] { -2f, 99.5f, .3f, .4f, -16.8f } };
+                new[] { 0f, 78, 7, 7, -16.5f }, new[] { -1f, 84, 9, 8.5f, -16.8f }, new[] { -1.5f, 90, 8.5f, 8, -16.8f }, new[] { -2f, 95, 7, 8.5f, -16.8f },
+                // The Heart stays tall to its back wall (the Root-Mother stands seven metres high against it), then closes at once.
+                new[] { -2f, 98, 5, 8, -16.8f }, new[] { -2f, 100.5f, .3f, .4f, -16.8f } };
         }
         void PrepareHollows()
         {
@@ -3306,14 +3307,16 @@ namespace Crulanda.World
                 Block(knot, new Vector3(6, 7, 3.5f), face);
                 var cold = seat + face * new Vector3(1.6f, 0, 2.4f); cold.y = FloorY(cold.x, cold.z);
                 var husk = new GameObject("The cold in the root").transform; husk.SetParent(t, false); husk.localPosition = cold; husk.localRotation = face;
+                // The cold itself (rod, light, hoarfrost) is the usable part: salted once, it is gone for good; the pale root stays.
+                var rod = new GameObject("The cold").transform; rod.SetParent(husk, false);
                 var black = Tint(art.metal, new Color(.04f, .04f, .06f));
-                Part(PrimitiveType.Cylinder, husk, new Vector3(0, .9f, 0), new Vector3(.22f, .8f, .22f), black, Quaternion.Euler(12, 30, 8));
-                Part(PrimitiveType.Cylinder, husk, new Vector3(.02f, .9f, .02f), new Vector3(.2f, .7f, .2f), black, Quaternion.Euler(-10, 75, -6));
-                Part(PrimitiveType.Sphere, husk, new Vector3(0, 1.75f, 0), new Vector3(.3f, .3f, .3f), Glowing(new Color(.45f, .2f, .7f), 1.2f));
-                for (int k = 0; k < 9; k++) Part(PrimitiveType.Sphere, husk, new Vector3((D() - .5f) * 3.2f, .03f, (D() - .5f) * 3.2f), new Vector3(.6f + D() * .9f, .05f, .5f + D() * .8f), frost);   // the hoarfrost
+                Part(PrimitiveType.Cylinder, rod, new Vector3(0, .9f, 0), new Vector3(.22f, .8f, .22f), black, Quaternion.Euler(12, 30, 8));
+                Part(PrimitiveType.Cylinder, rod, new Vector3(.02f, .9f, .02f), new Vector3(.2f, .7f, .2f), black, Quaternion.Euler(-10, 75, -6));
+                Part(PrimitiveType.Sphere, rod, new Vector3(0, 1.75f, 0), new Vector3(.3f, .3f, .3f), Glowing(new Color(.45f, .2f, .7f), 1.2f));
+                for (int k = 0; k < 9; k++) Part(PrimitiveType.Sphere, rod, new Vector3((D() - .5f) * 3.2f, .03f, (D() - .5f) * 3.2f), new Vector3(.6f + D() * .9f, .05f, .5f + D() * .8f), frost);   // the hoarfrost
                 Part(PrimitiveType.Sphere, husk, new Vector3(0, .25f, 0), new Vector3(1.6f, .5f, 1.6f), pale);   // the root it is lodged in, gone pale
-                Glow(husk, new Vector3(0, 1.8f, 0), 6, .5f, new Color(.6f, .35f, .9f), .9f);
-                Interactables.Add(new ZoneInteractable { name = husk.name, prompt = "Salt the cold root", kind = "crates", position = husk.position, root = husk });
+                Glow(rod, new Vector3(0, 1.8f, 0), 6, .5f, new Color(.6f, .35f, .9f), .9f);
+                Interactables.Add(new ZoneInteractable { name = husk.name, prompt = "Salt the cold root", kind = "crates", once = true, position = husk.position, root = rod });
                 // Bones of what came down before, and the Pilgrim's abandoned pack by the way in.
                 for (int k = 0; k < 3; k++)
                 {

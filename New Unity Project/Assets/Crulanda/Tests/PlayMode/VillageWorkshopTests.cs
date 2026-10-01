@@ -74,10 +74,11 @@ namespace Crulanda.Tests
             Assert.AreEqual(1, life.Places["bar"].Count, "One place behind the bar.");
             Assert.AreEqual(1, life.Places["lodge"].Count, "One place at the game rack.");
             Assert.IsTrue(zone.Doors.Any(d => d.kind == "rooms" && !d.openable && d.name == "The Golden Cask, upstairs"), "The inn has its rooms door.");
-            Assert.IsFalse(life.Homes.Any(d => d.kind == "rooms"), "Nobody lives behind the rooms door yet.");
-            Assert.IsFalse(life.Homes.Any(d => VillageLife.UnsettledHouses.Contains(d.name)), "The two new houses stand empty until households, so the old houses keep their folk.");
-            foreach (var name in VillageLife.UnsettledHouses)
+            Assert.IsFalse(life.Homes.Any(d => d.kind == "rooms"), "The rooms door is not a house.");
+            Assert.IsFalse(life.Villagers.Any(v => v.Home != null && v.Home.kind == "rooms"), "Nobody in Oakhaven lodges behind the rooms door yet.");
+            foreach (var name in new[] { "Carder farmhouse", "Crisp cottage" })
             {
+                Assert.IsTrue(life.Homes.Any(d => d.name == name), name + " is a house.");
                 var door = zone.Doors.Single(d => d.name == name);
                 Assert.IsTrue(NavMesh.SamplePosition(door.position, out var dh, 2, NavMesh.AllAreas) && NavMesh.CalculatePath(start.position, dh.position, NavMesh.AllAreas, path) && path.status == NavMeshPathStatus.PathComplete, name + "'s door can be walked to.");
             }

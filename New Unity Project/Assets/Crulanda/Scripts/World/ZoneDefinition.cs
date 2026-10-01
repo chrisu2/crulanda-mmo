@@ -56,7 +56,7 @@ namespace Crulanda.World
         public string worldMapNote;
     }
     /// <summary>
-    /// Ambient life. villagers: how many named villagers live here (homes are the zone's barred houses).
+    /// Ambient life. villagers: how many named villagers live here (homes are the zone's barred houses, given by households).
     /// mood: "wary" (collectors about; brightens once they are gone) or "afraid". Critters never fight; they flee.
     /// </summary>
     [Serializable] public sealed class ZoneLife
@@ -67,12 +67,33 @@ namespace Crulanda.World
         public string[] names = new string[0];
         /// <summary>Named extra people with a fixed role and place (quest givers such as a stranger at the inn).</summary>
         public ZoneResident[] residents = new ZoneResident[0];
+        /// <summary>Who lives behind which door: one named house per household, families sharing. Empty: villager i takes the
+        /// zone's house i while houses last, the rest lodge at the inn, and a hen-wife joins the house nearest her coop.</summary>
+        public ZoneHousehold[] households = new ZoneHousehold[0];
+        /// <summary>Whose workshop a prop is (a trade then works its own rather than any of the kind).</summary>
+        public ZoneWorkshop[] workshops = new ZoneWorkshop[0];
     }
     /// <summary>
     /// role: any villager role, or stranger (keeps to one place). place: a place kind (inn, green, woods...).
-    /// title: the nameplate subtitle.
+    /// title: the nameplate subtitle. works: an ordinary villager with the role's working day and a home (an innkeeper), not
+    /// one who keeps a post day and night.
     /// </summary>
-    [Serializable] public sealed class ZoneResident { public string name, role, title, place, look; public Vector2 at; }
+    [Serializable] public sealed class ZoneResident { public string name, role, title, place, look; public Vector2 at; public bool works; }
+    /// <summary>
+    /// A household (GAME-ONLY): the folk who share one house. house names a prop of kind house, mill or barn (a barn gets a door
+    /// of its own) or inn (its rooms upstairs). members name spawned villagers, hen-wives and residents; kin is free text for
+    /// lines ("head", "husband", "daughter"). stipend and needs are the household's purse (coin a day, what it buys in order).
+    /// </summary>
+    [Serializable] public sealed class ZoneHousehold
+    {
+        public string name, house, canonStatus; public int stipend = 6;
+        public string[] needs = { "bread", "firewood", "eggs" };
+        public ZoneMember[] members = new ZoneMember[0];
+    }
+    /// <summary>A member of a household: a villager's name and how they are kin ("head", "wife", "son", "lodger").</summary>
+    [Serializable] public sealed class ZoneMember { public string name, kin; }
+    /// <summary>who works at the prop named prop (its workplaces' stand points are theirs).</summary>
+    [Serializable] public sealed class ZoneWorkshop { public string who, prop; }
     /// <summary>kind: chicken, rabbit, crow, deer, sheep, cat.</summary>
     [Serializable] public sealed class ZoneCritters { public string kind; public Vector2 center; public float radius = 10; public int count = 4; }
     /// <summary>

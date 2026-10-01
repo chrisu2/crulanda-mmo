@@ -3009,6 +3009,71 @@
           "y": -9
         }
       }
+    ],
+    "households": [
+      {
+        "name": "Grane",
+        "house": "Grane house",
+        "canonStatus": "GAME-ONLY",
+        "members": [
+          {
+            "name": "Hollis Grane",
+            "kin": "head"
+          }
+        ]
+      },
+      {
+        "name": "Vey",
+        "house": "Vey house",
+        "canonStatus": "GAME-ONLY",
+        "members": [
+          {
+            "name": "Dorra Vey",
+            "kin": "head"
+          },
+          {
+            "name": "Old Kestrel",
+            "kin": "father"
+          }
+        ]
+      },
+      {
+        "name": "Jenn",
+        "house": "Jenn house",
+        "canonStatus": "GAME-ONLY",
+        "members": [
+          {
+            "name": "Mattock Jenn",
+            "kin": "head"
+          },
+          {
+            "name": "Siv Harl",
+            "kin": "wife"
+          }
+        ]
+      },
+      {
+        "name": "Tabor",
+        "house": "Tabor house",
+        "canonStatus": "GAME-ONLY",
+        "members": [
+          {
+            "name": "Wynn Tabor",
+            "kin": "head"
+          }
+        ]
+      },
+      {
+        "name": "Morrow",
+        "house": "Crypt-Keeper's Hovel",
+        "canonStatus": "GAME-ONLY",
+        "members": [
+          {
+            "name": "Ansel Morrow",
+            "kin": "head"
+          }
+        ]
+      }
     ]
   },
   "camps": [

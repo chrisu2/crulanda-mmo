@@ -73,39 +73,56 @@ namespace Crulanda.Encounter
         {
             Session = session; Zone = session.Zone; Active = this;
             var z = Zone.Zone; rng = new System.Random(z.seed + 7);
-            FindPlaces(); MorningCask();
+            FindPlaces(); MorningCask(); NameHouseholds();
+            // Without households in the zone's data, villager i takes house i while houses last and the rest lodge at the inn.
+            bool named = Households.Count > 0; var lodging = Zone.Doors.Find(d => d.kind == "rooms");
             int count = z.life.villagers;
             for (int i = 0; i < count; i++)
             {
                 string role = Roles[i % Roles.Length], need = Needs(role);
                 // Out of work: a trade whose workplace this village lacks. Where there is an inn they drink; elsewhere they gossip.
                 if (need != null && Places[need].Count == 0) role = Places["inn"].Count > 0 ? "drinker" : "gossip";
-                var home = Homes.Count > 0 ? Homes[i % Homes.Count] : null;
                 var start = RandomPlace(role == "drinker" ? "inn" : "green") ?? Zone.Ground(z.spawns.recovery);
                 var names = z.life.names != null && z.life.names.Length > 0 ? z.life.names : Names;
-                Villagers.Add(Villager.Spawn(this, names[i % names.Length], role, i, home, start));
+                string name = names[i % names.Length];
+                var household = named ? HouseholdOf(name) : i < Homes.Count ? Derived(Homes[i]) : null;
+                Settle(Villager.Spawn(this, name, role, i, household?.house ?? lodging, start), household);
             }
-            // Residents: named people with a fixed place (quest givers), e.g. a hooded stranger who never leaves the inn.
+            // Residents: named people with a fixed place (quest givers), e.g. a hooded stranger who never leaves the inn. One who
+            // works (an innkeeper) has the role's day and a home instead. A post's keeper may be named in a household (so a knock at
+            // the house names them) and still keeps the post day and night.
             if (z.life.residents != null)
                 for (int i = 0; i < z.life.residents.Length; i++)
                 {
                     var r = z.life.residents[i]; if (r == null || string.IsNullOrEmpty(r.name)) continue;
+                    var household = HouseholdOf(r.name);
+                    if (r.works)
+                    {
+                        var at = RandomPlace(r.place ?? "green") ?? Zone.Ground(z.spawns.recovery);
+                        Settle(Villager.Spawn(this, r.name, r.role ?? "stranger", 60 + i, household?.house ?? lodging, at, null, null, r.title, r.look), household);
+                        continue;
+                    }
                     string place = r.place ?? "green";
                     if (r.at != Vector2.zero) { place = "post:" + r.name; Places[place] = new List<Vector3>(); AddPlace(place, r.at); }   // a fixed post
                     var start = RandomPlace(place) ?? Zone.Ground(r.at != Vector2.zero ? r.at : z.spawns.recovery);
-                    var v = Villager.Spawn(this, r.name, r.role ?? "stranger", 60 + i, null, start, null, place, r.title, r.look);
-                    Villagers.Add(v);
+                    Settle(Villager.Spawn(this, r.name, r.role ?? "stranger", 60 + i, null, start, null, place, r.title, r.look), household);
                 }
-            // One hen-wife per coop, living in the nearest house. The coop starts open or shut for the hour.
+            // One hen-wife per coop, living in her household's house (without households, the house nearest her coop). The coop
+            // starts open or shut for the hour.
             for (int i = 0; i < Zone.Coops.Count; i++)
             {
-                var coop = Zone.Coops[i];
+                var coop = Zone.Coops[i]; string name = KeeperNames[i % KeeperNames.Length];
                 coop.SetOpen(WorldClock.Between(6, 20.4f));
-                ZoneDoor home = null; float best = float.MaxValue;
-                foreach (var h in Homes) { float d = (h.position - coop.door).sqrMagnitude; if (d < best) { best = d; home = h; } }
+                Household household;
+                if (named) household = HouseholdOf(name);
+                else
+                {
+                    ZoneDoor near = null; float best = float.MaxValue;
+                    foreach (var h in Homes) { float d = (h.position - coop.door).sqrMagnitude; if (d < best) { best = d; near = h; } }
+                    household = near != null ? Households.Find(h => h.house == near) ?? Derived(near) : null;
+                }
                 var start = NavMesh.SamplePosition(coop.yard, out var hit, 4, NavMesh.AllAreas) ? hit.position : coop.yard;
-                var keeper = Villager.Spawn(this, KeeperNames[i % KeeperNames.Length], "henwife", 40 + i, home, start, coop);
-                Villagers.Add(keeper);
+                Settle(Villager.Spawn(this, name, "henwife", 40 + i, household?.house ?? lodging, start, coop), household);
             }
             foreach (var group in z.life.critters)
                 for (int i = 0; i < group.count; i++)
@@ -114,9 +131,128 @@ namespace Crulanda.Encounter
         static readonly string[] KeeperNames = { "Goody Marl", "Hettie Brook", "Nan Pennock", "Old Sorrel" };
         public static string[] DefaultNames { get { return Names; } }
         public static string[] KeeperNamesList { get { return KeeperNames; } }
-        /// <summary>Oakhaven's two houses built for the trades (GAME-ONLY). They stand empty, out of <see cref="Homes"/>, until
-        /// households give every villager a house by name.</summary>
-        public static readonly HashSet<string> UnsettledHouses = new HashSet<string> { "Carder farmhouse", "Crisp cottage" };
+
+        // ---------- households: who lives behind which door ----------
+        /// <summary>The village's households: from the zone's <c>life.households</c>, or one per house dealt out in order.</summary>
+        public readonly List<Household> Households = new List<Household>();
+        /// <summary>The household a villager, hen-wife or resident of this name belongs to, or null.</summary>
+        public Household HouseholdOf(string name)
+        {
+            foreach (var h in Households) if (h.def != null && System.Array.Exists(h.def.members, m => m != null && m.name == name)) return h;
+            foreach (var h in Households) if (h.members.Exists(v => v.Name == name)) return h;
+            return null;
+        }
+        /// <summary>The household whose house this door is, or null (a door nobody lives behind).</summary>
+        public Household HouseholdAt(ZoneDoor door) { return door == null ? null : Households.Find(h => h.house == door); }
+        /// <summary>The households the zone names, each with the door of its house: a house or mill's own door, a barn's added home
+        /// door, an inn's door to its rooms. A house that is not built leaves its household without a door (they lodge at the inn).</summary>
+        void NameHouseholds()
+        {
+            var defs = Zone.Zone.life.households; if (defs == null) return;
+            foreach (var def in defs)
+            {
+                if (def == null || string.IsNullOrEmpty(def.name)) continue;
+                var door = string.IsNullOrEmpty(def.house) ? null : Zone.Doors.Find(d => !d.openable && d.kind != "rooms" && d.name == def.house) ?? Zone.Doors.Find(d => d.kind == "rooms" && d.name == def.house + ", upstairs");
+                if (door == null) Debug.LogWarning("Household '" + def.name + "': no door for the house '" + def.house + "'; they lodge at the inn.");
+                Households.Add(new Household { name = def.name, def = def, house = door });
+            }
+        }
+        /// <summary>A household made for a house when the zone names none (called after the house).</summary>
+        Household Derived(ZoneDoor house) { var h = new Household { name = house.name, house = house }; Households.Add(h); return h; }
+        void Settle(Villager v, Household household) { Villagers.Add(v); v.Household = household; if (household != null) household.members.Add(v); }
+        /// <summary>Who is indoors behind this door now (hidden at home: abed, at dinner, or fled in).</summary>
+        public List<Villager> AtHome(ZoneDoor door) { return Villagers.FindAll(v => v.Home == door && v.Indoors); }
+        /// <summary>The player paid this villager this much coin. Kept for the purses (ADDENDUM C); nothing is done with it yet.</summary>
+        public void Paid(string npc, int coin) { }
+
+        /// <summary>
+        /// What a knock at a household's door gets (GAME-ONLY): who is abed, where the head of the house is if they are out, or
+        /// that nobody is home. Null for a door no household lives behind (the old barred-door lines answer there).
+        /// </summary>
+        public string KnockLine(ZoneDoor door)
+        {
+            var h = HouseholdAt(door); if (h == null || h.members.Count == 0) return null;
+            var inside = AtHome(door); var head = h.Head;
+            if (inside.Count == 0)
+            {
+                if (head.Resident) return "No answer. " + HouseName(h) + " stands empty; " + FirstName(head.Name) + " keeps watch elsewhere, day and night.";
+                return "No answer. " + HouseName(h) + (WorldClock.Between(5, 18) ? " is empty till supper." : " is dark, and nobody's home.");
+            }
+            if (inside.Count == h.members.Count && inside.TrueForAll(v => v.Activity == "sleep" || v.Activity == "sleepitoff"))
+            {
+                var child = h.members.Find(v => v.Role == "child");
+                string after = child != null ? " A child coughs, and somebody hushes " + Pronoun(h, child) + "." : h.members.Count > 1 ? " Somebody turns over and snores." : " The bar is down and the fire banked.";
+                return Folk(h) + (h.members.Count > 1 ? " are abed." : " is abed.") + after;
+            }
+            if (!inside.Contains(head))
+            {
+                var where = Whereabouts(head);
+                return "A voice through the planks: \"" + FirstName(head.Name) + "'s " + (where != null ? where + ". Try there.\"" : "out. " + (WorldClock.Between(5, 18) ? "Back by supper, likely.\"" : "Back before long, likely.\""));
+            }
+            return FirstName(head.Name) + "'s voice, through the planks: \"" + (WorldClock.IsNight ? "Not at this hour." : "Not now.") + " Since the collectors came, this door stays barred.\"";
+        }
+        /// <summary>Where someone is, as the folk at home would say it ("at the shop by the South road"), or null when it is no one place.</summary>
+        string Whereabouts(Villager v)
+        {
+            if (!v.Visible || v.Errand != null) return null;
+            switch (v.Activity)
+            {
+                case "leathershop": { var road = RoadNear(v.transform.position, 12); return "at the shop" + (road != null ? " by the " + road : ""); }
+                case "forge": return "at the forge"; case "stall": return "at the stall"; case "oven": return "at the bakehouse";
+                case "tannery": return "at the tannery yard"; case "woodpile": return "at the woodyard"; case "mill": return "at the mill";
+                case "dryhut": return "at the drying hut"; case "lodge": return "at the lodge"; case "field": return "out in the fields";
+                case "woods": return "in the woods"; case "meadow": return "out on the hill gathering"; case "green": return "on the green";
+                case "well": return "at the well"; case "inn": case "bar": case "kitchen": case "kitchendoor": case "passedout": return "at the inn";
+                case "yard": case "herd": return "with the hens";
+                default: return null;
+            }
+        }
+        /// <summary>The name of the road passing within this distance of a point, or null.</summary>
+        string RoadNear(Vector3 at, float within)
+        {
+            string best = null; float bd = within; var p = new Vector2(at.x, at.z);
+            foreach (var r in Zone.Zone.roads)
+            {
+                if (r == null || string.IsNullOrEmpty(r.name)) continue;
+                for (int i = 0; i + 1 < r.points.Length; i++)
+                {
+                    Vector2 a = r.points[i], ab = r.points[i + 1] - a;
+                    float d = Vector2.Distance(p, a + ab * Mathf.Clamp01(Vector2.Dot(p - a, ab) / Mathf.Max(.0001f, ab.sqrMagnitude))) - r.width / 2;
+                    if (d < bd) { bd = d; best = r.name; }
+                }
+            }
+            return best;
+        }
+        /// <summary>How a house is named at the start of a sentence: "The Tanner house", "Jory's house", "Moss's lodge". A possessive
+        /// stays bare only when the owner is the household or one of its members ("The Crypt-Keeper's Hovel" takes the article).</summary>
+        static string HouseName(Household h)
+        {
+            string n = h.def != null && !string.IsNullOrEmpty(h.def.house) ? h.def.house : h.house != null ? h.house.name : h.name;
+            int s = n.IndexOf("'s "); string owner = s > 0 ? n.Substring(0, s) : null;
+            return n.StartsWith("The ") || owner != null && (owner == h.name || h.members.Exists(v => FirstName(v.Name) == owner)) ? n : "The " + n;
+        }
+        /// <summary>A household as its neighbours say it: one person by name, a family by its name ("The Tanners"); a farm's folk go by
+        /// the head's family name (the Harrow farm's are "The Harrows", the Brook farm's "The Lowes").</summary>
+        static string Folk(Household h)
+        {
+            if (h.members.Count == 1) return FirstName(h.members[0].Name);
+            string n = h.name.EndsWith(" farm") ? h.name.Substring(0, h.name.Length - 5) : h.name;
+            if (h.name.EndsWith(" farm") && h.Head != null && h.Head.Name.IndexOf(' ') > 0) n = h.Head.Name.Substring(h.Head.Name.LastIndexOf(' ') + 1);
+            return n.Contains(" ") ? "Everyone in " + HouseName(h).Replace("The ", "the ") : "The " + n + "s";
+        }
+        static string Pronoun(Household h, Villager v)
+        {
+            string kin = h.KinOf(v);
+            return kin == "daughter" || kin == "wife" || kin == "aunt" ? "her" : kin == "son" || kin == "husband" || kin == "father" ? "him" : "them";
+        }
+        /// <summary>What neighbours call someone: the first name ("Maud"), or the whole of a name like "Old Tobin" or "Goody Marl".</summary>
+        public static string FirstName(string name)
+        {
+            int space = name.IndexOf(' ');
+            if (space < 0) return name;
+            string first = name.Substring(0, space);
+            return first == "Old" || first == "Goody" || first == "Warden" || first == "Sister" ? name : first;
+        }
         /// <summary>Hens lay through the working day, one egg each at most; the count resets before dawn. The water pan dries out.</summary>
         void Update()
         {
@@ -158,9 +294,8 @@ namespace Crulanda.Encounter
                 if (z.wasting != null && p.x > z.wasting.x - 20) continue;
                 AddPlace("meadow", p);
             }
-            // The inn's rooms door and the two houses built for the trades are nobody's home until households say so, which keeps
-            // the old deal of houses (Init's i % Homes.Count, the hen-wife's nearest house) as it was.
-            foreach (var d in Zone.Doors) if (!d.openable && d.kind != "rooms" && !UnsettledHouses.Contains(d.name)) Homes.Add(d);
+            // Houses: every barred door but the inn's rooms (house, mill and a barn's home door), in the order they were built.
+            foreach (var d in Zone.Doors) if (!d.openable && d.kind != "rooms") Homes.Add(d);
             foreach (var f in z.fields)
                 for (int i = 0; i < 4; i++)
                 {
@@ -377,6 +512,32 @@ namespace Crulanda.Encounter
     }
 
     /// <summary>
+    /// A household (GAME-ONLY): the folk who share one house, from the zone's data (<see cref="ZoneHousehold"/>) or, in a zone
+    /// that names none, one per house. house is the door they go in by (null when the house is not built; they lodge at the inn).
+    /// </summary>
+    public sealed class Household
+    {
+        public string name; public ZoneHousehold def; public ZoneDoor house;
+        public readonly List<Villager> members = new List<Villager>();
+        /// <summary>The member the data calls the head, else the first.</summary>
+        public Villager Head
+        {
+            get
+            {
+                if (def != null) foreach (var m in def.members) if (m != null && m.kin == "head") { var v = members.Find(x => x.Name == m.name); if (v != null) return v; }
+                return members.Count > 0 ? members[0] : null;
+            }
+        }
+        /// <summary>How a member is kin ("head", "daughter"), or null.</summary>
+        public string KinOf(Villager v)
+        {
+            if (def == null || v == null) return null;
+            foreach (var m in def.members) if (m != null && m.name == v.Name) return m.kin;
+            return null;
+        }
+    }
+
+    /// <summary>
     /// A villager: picks an activity for their role, walks there, does it (working, chatting, sitting), and repeats.
     /// Flees home and hides when fighting breaks out nearby; comes back out once it has been calm for a while.
     /// </summary>
@@ -412,12 +573,21 @@ namespace Crulanda.Encounter
         public Errand Errand { get { return errand; } }
         /// <summary>Errands finished so far today, by id.</summary>
         public bool Done(string errandId) { return done.Contains(errandId); }
+        /// <summary>The door of the house they live in (null: no house; they sleep on a bench at the inn).</summary>
+        public ZoneDoor Home { get { return home; } }
+        /// <summary>The household they belong to (see <see cref="VillageLife.Households"/>), or null.</summary>
+        public Household Household { get; internal set; }
+        /// <summary>Indoors at home: gone in to bed, to dinner, at the end of an errand home, or fled in.</summary>
+        public bool Indoors { get { return state == State.Hidden && indoors; } }
+        bool indoors;
         VillageLife life; NavMeshAgent agent; ActorVisual visual; ZoneDoor home; Renderer[] renderers;
         State state; string activity; float until, calmSince, nextBark, nextChatter, bedAt, wakeAt, nextHerd;
         Villager partner; string fixedPlace;
         GameObject load; Load loadKind; int loadCount; Errand errand; int leg; Vector3 dropAt; bool goingIn; readonly HashSet<string> done = new HashSet<string>(); float lastHour;
         /// <summary>Night: everyone goes home to bed (staggered; drinkers stay at the inn late, children go early).</summary>
         public bool Bedtime { get { return WorldClock.Between(bedAt, wakeAt); } }
+        /// <summary>When a hunter who lives at a lodge sets off for bed: Oakhaven's is about a game hour's walk from the green.</summary>
+        public const float HunterBed = 19.8f;
 
         public static Villager Spawn(VillageLife life, string name, string role, int index, ZoneDoor home, Vector3 at, ZoneCoop coop = null, string fixedPlace = null, string title = null, string look = null)
         {
@@ -435,8 +605,9 @@ namespace Crulanda.Encounter
             if (v.Keeper) { v.agent.height = 2.6f; v.agent.baseOffset = 1; v.agent.speed = 1.3f; }
             v.Title = title ?? VillageLife.TitleFor(role); v.fixedPlace = fixedPlace;
             v.Coop = coop;
-            // Bed and rising: the baker is up before dawn for the first loaves, the drinkers last to bed and last up, children early to bed.
-            v.bedAt = role == "drinker" ? 23 + (index % 3) * .3f : role == "child" ? 19.8f + (index % 3) * .2f : role == "henwife" ? HerdHour : role == "baker" ? 19.6f : 20.2f + (index % 5) * .25f;
+            // Bed and rising: the baker is up before dawn for the first loaves, the drinkers last to bed and last up, children early to bed;
+            // the hunter early too where he has a lodge, for the long walk out to it.
+            v.bedAt = role == "drinker" ? 23 + (index % 3) * .3f : role == "child" ? 19.8f + (index % 3) * .2f : role == "henwife" ? HerdHour : role == "baker" ? 19.6f : role == "hunter" && life.Places["lodge"].Count > 0 ? HunterBed : 20.2f + (index % 5) * .25f;
             v.wakeAt = role == "drinker" ? 7.5f : role == "henwife" ? 5.7f : role == "baker" ? 4.6f : 5.8f + (index % 5) * .3f;
             if (fixedPlace != null) v.bedAt = v.wakeAt = 0;   // residents keep their post day and night
             v.lastHour = WorldClock.Hour; v.index = index; v.tolerance = .85f + (index % 5) * .18f;
@@ -490,7 +661,7 @@ namespace Crulanda.Encounter
             if (Role == "drinker" && DrinkerNext()) return;
             if (StartErrand()) return;
             var shift = VillageWork.ShiftFor(Role, WorldClock.Hour);
-            GoTo(shift != null ? shift.places : Role == "child" ? new[] { "green", "green", "wander", "wander", "well" } : new[] { "wander", "green" });
+            GoTo(shift != null ? VillageWork.PlacesFor(shift, Role, life.Places["lodge"].Count > 0) : Role == "child" ? new[] { "green", "green", "wander", "wander", "well" } : new[] { "wander", "green" });
         }
         /// <summary>Walk to one of these kinds of place (a repeat weights the choice; a kind this village lacks is passed over).</summary>
         void GoTo(string[] options)
@@ -624,11 +795,18 @@ namespace Crulanda.Encounter
         /// <summary>Capture/debug: out of sight and out of the way (no body, no nameplate) until <see cref="Release"/>.</summary>
         public void Park()
         {
-            state = State.Hidden; Bubble = null; foreach (var r in renderers) r.enabled = false;
+            state = State.Hidden; indoors = false; Bubble = null; foreach (var r in renderers) r.enabled = false;
             CancelErrand(); ShowTankard(false);   // not left hanging in the air where they stood
             if (agent.isOnNavMesh) agent.isStopped = true; enabled = false;
         }
-        /// <summary>Capture/debug: back to the day's routine after <see cref="StandAt"/> or <see cref="Park"/>, starting from where they were.</summary>
+        /// <summary>Capture/debug: indoors at home now, as at the end of an errand home, until <see cref="Release"/>. False with no home.</summary>
+        public bool GoIndoors()
+        {
+            if (home == null || !agent.isOnNavMesh) return false;
+            CancelErrand(); if (NavMesh.SamplePosition(home.position, out var hit, 2.5f, NavMesh.AllAreas)) agent.Warp(hit.position);
+            activity = "home"; until = Time.time + 600; Hide(); enabled = false; return true;
+        }
+        /// <summary>Capture/debug: back to the day's routine after <see cref="StandAt"/>, <see cref="Park"/> or <see cref="GoIndoors"/>, starting from where they were.</summary>
         public void Release(Vector3 at)
         {
             foreach (var r in renderers) r.enabled = true;
@@ -655,9 +833,11 @@ namespace Crulanda.Encounter
                 default: return ActorPose.None;
             }
         }
+        /// <summary>Out of sight and counted indoors at home. Every caller is at their door, but for a flight stranded short of it, which
+        /// hides where it stopped and is not counted at home (see the flee branch of Update).</summary>
         void Hide()
         {
-            state = State.Hidden; calmSince = Time.time; foreach (var r in renderers) r.enabled = false;
+            state = State.Hidden; indoors = true; calmSince = Time.time; foreach (var r in renderers) r.enabled = false;
             DropLoad(); ShowTankard(false);   // the goods put away in the pantry
             if (agent.isOnNavMesh) agent.isStopped = true; Bubble = null;
         }
@@ -812,7 +992,12 @@ namespace Crulanda.Encounter
                 else if (Time.time - calmSince > (activity == "home" ? until - calmSince : 12)) Emerge();
                 return;
             }
-            if (state == State.Flee) { if (Arrived || Stranded) { activity = "fled"; Hide(); } return; }
+            if (state == State.Flee)
+            {
+                // Only a flight that reached the door counts as indoors; one stranded short of it hides where it stopped.
+                if (Arrived || Stranded) { activity = "fled"; Hide(); var d = transform.position - home.position; d.y = 0; indoors = d.magnitude < 3.5f; }
+                return;
+            }
             if (danger && Role != "drinker" || danger && life.EnemyNear(transform.position, 10)) { Flee(); return; }
             // Talking with the player: stand still and face them until the conversation ends, then carry on.
             if (Attending && !PassedOut)

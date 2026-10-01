@@ -3549,6 +3549,205 @@
           "y": 83
         }
       }
+    ],
+    "households": [
+      {
+        "name": "Vell",
+        "house": "Vell house",
+        "canonStatus": "GAME-ONLY",
+        "members": [
+          {
+            "name": "Brannoc Vell",
+            "kin": "head"
+          }
+        ]
+      },
+      {
+        "name": "Thorne",
+        "house": "Thorne house",
+        "canonStatus": "GAME-ONLY",
+        "members": [
+          {
+            "name": "Hedda Thorne",
+            "kin": "head"
+          }
+        ]
+      },
+      {
+        "name": "Tanner",
+        "house": "Tanner house",
+        "canonStatus": "GAME-ONLY",
+        "members": [
+          {
+            "name": "Maud Tanner",
+            "kin": "head"
+          },
+          {
+            "name": "Fen Walker",
+            "kin": "husband"
+          },
+          {
+            "name": "Nettie",
+            "kin": "daughter"
+          }
+        ]
+      },
+      {
+        "name": "Rusk",
+        "house": "Rusk house",
+        "canonStatus": "GAME-ONLY",
+        "members": [
+          {
+            "name": "Ama Rusk",
+            "kin": "head"
+          }
+        ]
+      },
+      {
+        "name": "Reed",
+        "house": "Reed house",
+        "canonStatus": "GAME-ONLY",
+        "members": [
+          {
+            "name": "Tamsin Reed",
+            "kin": "head"
+          }
+        ]
+      },
+      {
+        "name": "Farrow",
+        "house": "Farrow house",
+        "canonStatus": "GAME-ONLY",
+        "members": [
+          {
+            "name": "Osk Farrow",
+            "kin": "head"
+          },
+          {
+            "name": "Pim",
+            "kin": "son"
+          }
+        ]
+      },
+      {
+        "name": "Crane",
+        "house": "Crane house",
+        "canonStatus": "GAME-ONLY",
+        "members": [
+          {
+            "name": "Lisbet Crane",
+            "kin": "head"
+          }
+        ]
+      },
+      {
+        "name": "Ashby",
+        "house": "The Elder's house",
+        "canonStatus": "GAME-ONLY",
+        "members": [
+          {
+            "name": "Corwin Ashby",
+            "kin": "head"
+          }
+        ]
+      },
+      {
+        "name": "Pell",
+        "house": "Pell house",
+        "canonStatus": "GAME-ONLY",
+        "members": [
+          {
+            "name": "Old Tobin",
+            "kin": "head"
+          },
+          {
+            "name": "Edda Pell",
+            "kin": "wife"
+          }
+        ]
+      },
+      {
+        "name": "Jory",
+        "house": "Jory's house",
+        "canonStatus": "GAME-ONLY",
+        "members": [
+          {
+            "name": "Jory",
+            "kin": "head"
+          }
+        ]
+      },
+      {
+        "name": "Harrow farm",
+        "house": "Harrow farmhouse",
+        "canonStatus": "GAME-ONLY",
+        "members": [
+          {
+            "name": "Sel Harrow",
+            "kin": "head"
+          },
+          {
+            "name": "Ilse Brandt",
+            "kin": "hand"
+          },
+          {
+            "name": "Goody Marl",
+            "kin": "aunt"
+          }
+        ]
+      },
+      {
+        "name": "Carder farm",
+        "house": "Carder farmhouse",
+        "canonStatus": "GAME-ONLY",
+        "members": [
+          {
+            "name": "Wil Carder",
+            "kin": "head"
+          },
+          {
+            "name": "Hettie Brook",
+            "kin": "aunt"
+          }
+        ]
+      },
+      {
+        "name": "Brook farm",
+        "house": "Brook farmhouse",
+        "canonStatus": "GAME-ONLY",
+        "members": [
+          {
+            "name": "Grete Lowe",
+            "kin": "head"
+          },
+          {
+            "name": "Nan Pennock",
+            "kin": "lodger"
+          }
+        ]
+      },
+      {
+        "name": "Crisp",
+        "house": "Crisp cottage",
+        "canonStatus": "GAME-ONLY",
+        "members": [
+          {
+            "name": "Aldo Crisp",
+            "kin": "head"
+          }
+        ]
+      },
+      {
+        "name": "Moss",
+        "house": "Moss's lodge",
+        "canonStatus": "GAME-ONLY",
+        "members": [
+          {
+            "name": "Garet Moss",
+            "kin": "head"
+          }
+        ]
+      }
     ]
   },
   "camps": [

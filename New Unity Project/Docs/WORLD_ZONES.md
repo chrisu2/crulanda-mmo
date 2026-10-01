@@ -40,7 +40,8 @@ Status 2026-09-28. The game opens in **Oakhaven** (`Assets/Crulanda/Scenes/Oakha
 ## Checking visuals without playing
 - `Crulanda.exe --crulanda-world-capture <dir>`: scenic tour screenshots (HUD hidden), isolated temp save.
 - `Crulanda.exe --crulanda-ui-capture <dir> [--crulanda-class class.druid]`: talent panel + combat HUD screenshots.
-Both need a visible window (not -batchmode). Latest shots: workspace `work\world-captures`, `work\ui-captures`. A landmark that sets `view` (where to stand, facing it) with `viewPitch`/`viewZoom` is shot from there as authored. Other landmarks, and the first exit's waystone, are shot from a searched viewpoint with the player hidden (`LandmarkView`: a named prop is framed on its own bounds, a building from its front). When no spot is clear, the tour falls back to the orbit from the south-west and logs it.
+- `Crulanda.exe --crulanda-wardrobe-capture <dir>`: every main-hand and off-hand family and variant on bare mannequins, labelled, seven a shot (`01-weapon-rack-a`..`g`, `02-shield-wall-a`..`c`), then poor-to-epic ladders at dusk (`03-quality-ladder-a` blades, `-b` shields, `-c` lanterns). Isolated temp save; HUD, player, enemies and village hidden. Latest shots: workspace `work\ui-captures\wardrobe`.
+All three need a visible window (not -batchmode). Latest shots: workspace `work\world-captures`, `work\ui-captures`. A landmark that sets `view` (where to stand, facing it) with `viewPitch`/`viewZoom` is shot from there as authored. Other landmarks, and the first exit's waystone, are shot from a searched viewpoint with the player hidden (`LandmarkView`: a named prop is framed on its own bounds, a building from its front). When no spot is clear, the tour falls back to the orbit from the south-west and logs it.
 
 ## Oakhaven (CANON-EXPANDED)
 Canon: an eastern agricultural hub erased by an accelerated, localized Wasting that hid the Council's abduction of

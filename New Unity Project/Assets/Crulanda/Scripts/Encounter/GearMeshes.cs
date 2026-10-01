@@ -206,7 +206,9 @@ namespace Crulanda.Encounter
             return Cached(key, () =>
             {
                 var rs = new float[rings]; for (int i = 0; i < rings; i++) rs[i] = (float)i / (rings - 1);
-                var dir = control[control.Length - 1] - control[0]; var reference = Mathf.Abs(Vector3.Dot(dir.normalized, Vector3.right)) < .9f ? Vector3.right : Vector3.forward;
+                // Square to the rod's general run: the axis it runs along least, so the rings never twist.
+                var dir = (control[control.Length - 1] - control[0]).normalized; var reference = Vector3.right;
+                foreach (var axis in new[] { Vector3.up, Vector3.forward }) if (Mathf.Abs(Vector3.Dot(dir, axis)) < Mathf.Abs(Vector3.Dot(dir, reference))) reference = axis;
                 return Crulanda.World.ZoneMeshes.Tube(t => Bezier(control, t), (t, a) => Mathf.Lerp(r0, r1, t), rs, sides, reference);
             });
         }
@@ -228,14 +230,31 @@ namespace Crulanda.Encounter
         {
             return Cached(key, () => { var m = Crulanda.World.ZoneMeshes.Arc(r0, r1, a0, a1, h); var v = m.vertices; for (int i = 0; i < v.Length; i++) v[i].y -= h / 2; m.vertices = v; m.RecalculateBounds(); return m; });
         }
-        /// <summary>One mesh made of several placed copies of another (six flanges, a ring of studs, a cage's bars): one part, not many.</summary>
+        /// <summary>
+        /// One mesh made of several placed copies of another (six flanges, a ring of studs, a cage's bars): one part, not many.
+        /// A built-in primitive is swapped for a generated one of the same size, since only readable meshes can be combined in a
+        /// player build.
+        /// </summary>
         public static Mesh Many(string key, Mesh part, params Matrix4x4[] places)
         {
             return Cached(key, () =>
             {
+                part = Combinable(part);
                 var c = new CombineInstance[places.Length]; for (int i = 0; i < places.Length; i++) c[i] = new CombineInstance { mesh = part, transform = places[i] };
                 var m = new Mesh(); m.CombineMeshes(c, true, true); m.RecalculateBounds(); return m;
             });
+        }
+        /// <summary>The generated stand-in for a built-in primitive (same size: cube 1, sphere 1 across, cylinder 2 tall and 1 across).</summary>
+        static Mesh Combinable(Mesh part)
+        {
+            if (part == prims[(int)PrimitiveType.Cube]) return Plate("unit.cube", new[] { new Vector2(-.5f, -.5f), new Vector2(.5f, -.5f), new Vector2(.5f, .5f), new Vector2(-.5f, .5f) }, 1);
+            if (part == prims[(int)PrimitiveType.Cylinder]) return Lathe("unit.cylinder", new[] { new Vector2(0, -1), new Vector2(.5f, -1), new Vector2(.5f, 1), new Vector2(0, 1) }, 14);
+            if (part == prims[(int)PrimitiveType.Sphere])
+            {
+                var arc = new Vector2[9]; for (int i = 0; i <= 8; i++) { float a = Mathf.PI * i / 8; arc[i] = new Vector2(Mathf.Sin(a) * .5f, -Mathf.Cos(a) * .5f); }
+                return Lathe("unit.sphere", arc, 14, true);
+            }
+            return part;
         }
         /// <summary>A placement for <see cref="Many"/>.</summary>
         public static Matrix4x4 At(Vector3 pos, Vector3 euler, Vector3 scale) { return Matrix4x4.TRS(pos, Quaternion.Euler(euler), scale); }

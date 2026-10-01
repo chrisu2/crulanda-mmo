@@ -35,7 +35,7 @@ namespace Crulanda.Encounter
             m.SetFloat("_Mode", 2); m.SetOverrideTag("RenderType", "Transparent");
             m.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha); m.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha); m.SetInt("_ZWrite", 0);
             m.EnableKeyword("_ALPHABLEND_ON"); m.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
-            if (emission.maxColorComponent > .001f) { m.EnableKeyword("_EMISSION"); m.SetColor("_EmissionColor", emission); }
+            m.EnableKeyword("_EMISSION"); m.SetColor("_EmissionColor", emission);   // always: the Fade-and-emission variant ships (the Weave-Eaters use it)
             cache[key] = m; return m;
         }
     }

@@ -1182,6 +1182,36 @@
       },
       "radius": 10,
       "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "Carder farm",
+      "text": "Wil Carder's new thatch, still yellow. The West field hens scratch across the lane.",
+      "at": {
+        "x": -61,
+        "y": 45
+      },
+      "radius": 10,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "Tanner's leather shop",
+      "text": "Maud Tanner cuts and stitches here, upwind of the tannery yard. Bags hang over the counter.",
+      "at": {
+        "x": -20,
+        "y": -33
+      },
+      "radius": 6,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "Lisbet's drying hut",
+      "text": "Yarrow, feverfew and comfrey hung head-down to dry. It smells of hay and bitter tea.",
+      "at": {
+        "x": 23,
+        "y": 37
+      },
+      "radius": 6,
+      "canonStatus": "GAME-ONLY"
     }
   ],
   "props": [
@@ -1231,6 +1261,7 @@
     },
     {
       "kind": "house",
+      "name": "Reed house",
       "at": {
         "x": -22,
         "y": 14
@@ -1244,6 +1275,7 @@
     },
     {
       "kind": "house",
+      "name": "Farrow house",
       "at": {
         "x": -16,
         "y": 28
@@ -1257,6 +1289,7 @@
     },
     {
       "kind": "house",
+      "name": "Crane house",
       "at": {
         "x": 12,
         "y": 25
@@ -1270,6 +1303,7 @@
     },
     {
       "kind": "house",
+      "name": "The Elder's house",
       "at": {
         "x": 28,
         "y": 19
@@ -1283,6 +1317,7 @@
     },
     {
       "kind": "house",
+      "name": "Rusk house",
       "at": {
         "x": 36,
         "y": 5
@@ -1296,6 +1331,7 @@
     },
     {
       "kind": "house",
+      "name": "Jory's house",
       "at": {
         "x": 30,
         "y": -12
@@ -1309,6 +1345,7 @@
     },
     {
       "kind": "house",
+      "name": "Vell house",
       "at": {
         "x": 17,
         "y": -25
@@ -1322,6 +1359,7 @@
     },
     {
       "kind": "house",
+      "name": "Pell house",
       "at": {
         "x": 8,
         "y": -31
@@ -1335,6 +1373,7 @@
     },
     {
       "kind": "house",
+      "name": "Thorne house",
       "at": {
         "x": -26,
         "y": -4
@@ -1348,6 +1387,7 @@
     },
     {
       "kind": "house",
+      "name": "Tanner house",
       "at": {
         "x": -29,
         "y": -21
@@ -2944,6 +2984,70 @@
         "y": 0
       },
       "lift": 10
+    },
+    {
+      "kind": "house",
+      "name": "Carder farmhouse",
+      "at": {
+        "x": -61,
+        "y": 47
+      },
+      "rotation": 330,
+      "size": {
+        "x": 8,
+        "y": 5.5
+      },
+      "variant": 2
+    },
+    {
+      "kind": "house",
+      "name": "Crisp cottage",
+      "at": {
+        "x": -60,
+        "y": -37
+      },
+      "rotation": 10,
+      "size": {
+        "x": 7,
+        "y": 5
+      },
+      "variant": 3
+    },
+    {
+      "kind": "leathershop",
+      "name": "Tanner's leather shop",
+      "at": {
+        "x": -20,
+        "y": -33
+      },
+      "rotation": 270
+    },
+    {
+      "kind": "dryhut",
+      "name": "Lisbet's drying hut",
+      "at": {
+        "x": 23,
+        "y": 37
+      },
+      "rotation": 315
+    },
+    {
+      "kind": "kitchen",
+      "name": "The Cask's kitchen",
+      "at": {
+        "x": -20,
+        "y": -18.3
+      },
+      "rotation": 41
+    },
+    {
+      "kind": "gamerack",
+      "name": "Moss's game rack",
+      "at": {
+        "x": -96,
+        "y": 137
+      },
+      "rotation": 45
     }
   ],
   "groves": [

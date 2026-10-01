@@ -39,7 +39,9 @@ namespace Crulanda.Encounter
     /// Daily schedules by trade (GAME-ONLY): who works where through the day, and the errands that tie the trades together: the
     /// farmer's grain goes to the mill, the miller's flour to the bakehouse and the stall, the first loaves to the inn, the hunter's
     /// hides to the tannery and his hares to the inn's pot, wood to the forge and the inn's hearth, herbs to the stall and to Mira,
-    /// the smith's and the leatherworker's wares to the stall, and the hen-wife's eggs to the inn, the stall and her own pot.
+    /// the smith's and the leatherworker's wares to the stall, and the hen-wife's eggs to the inn, the stall and her own pot. The
+    /// leatherworker keeps her own shop (9 to 12 and 2 to 6, the tannery yard either side) and the herbalist calls in at her drying
+    /// hut; in a village without them the leatherworker works the tannery yard and the herbalist passes the hut over.
     /// </summary>
     public static class VillageWork
     {
@@ -67,9 +69,9 @@ namespace Crulanda.Encounter
                 new Errand("hares to the inn", 11, 13.5f, "tannery", "inn", Load.Game, "meat", "Two hares for the pot. Don't let the drinkers see them.")) },
             { "skinner", new WorkDay(new[] { new Shift(7, 12, "tannery", "tannery", "tannery", "well"), new Shift(12, 13, "inn", "well"), new Shift(13, 17.5f, "tannery", "tannery", "tannery", "woods"), new Shift(17.5f, Night, "green", "inn") },
                 new Errand("pelts from the snares", 14.5f, 17, "woods", "tannery", Load.Hide, "hides", "Rabbit, mostly. Snares were full.", "Snares. Let's see... rabbit. Rabbit. Rabbit.")) },
-            { "leatherworker", new WorkDay(new[] { new Shift(7, 12, "tannery", "tannery", "tannery", "well"), new Shift(12, 13, "inn"), new Shift(13, 17.5f, "tannery", "tannery", "tannery", "green"), new Shift(17.5f, Night, "green", "inn") },
+            { "leatherworker", new WorkDay(new[] { new Shift(7, 9, "tannery", "leathershop"), new Shift(9, 12, "leathershop"), new Shift(12, 13, "inn"), new Shift(13, 14, "tannery", "leathershop"), new Shift(14, 18, "leathershop"), new Shift(18, Night, "green", "inn") },
                 new Errand("leather to the stall", 11.2f, 13.5f, "tannery", "stall", Load.Goods, "goods", "Belts, a bridle, two purses. Coin or trade.")) },
-            { "herbalist", new WorkDay(new[] { new Shift(Dawn, 10.5f, "meadow", "meadow", "meadow", "woods"), new Shift(10.5f, 12.5f, "stall", "inn", "green"), new Shift(12.5f, 16.5f, "meadow", "meadow", "woods", "woods"), new Shift(16.5f, Night, "green", "green", "inn") },
+            { "herbalist", new WorkDay(new[] { new Shift(Dawn, 10.5f, "meadow", "meadow", "meadow", "woods"), new Shift(10.5f, 12.5f, "stall", "inn", "green", "dryhut"), new Shift(12.5f, 16.5f, "meadow", "meadow", "woods", "woods"), new Shift(16.5f, Night, "green", "green", "inn", "dryhut") },
                 new Errand("herbs to the stall", 10.3f, 12.5f, "meadow", "stall", Load.Herbs, "herbs", "Comfrey and yarrow for the stall. The marigold's for Mira."),
                 new Errand("marigold for Mira", 11, 13.5f, "stall", "inn", Load.Herbs, "herbs", "Marigold and comfrey, for whoever's bleeding this week."),
                 new Errand("herbs to dry", 16.3f, 18.5f, "meadow", "home", Load.Herbs, "herbs")) },

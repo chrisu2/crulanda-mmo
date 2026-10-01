@@ -315,7 +315,7 @@ namespace Crulanda.Encounter
                 EncounterHud.Hidden = false;
                 var playerRenderers = Array.FindAll(session.Player.GetComponentsInChildren<Renderer>(), r => r.enabled);
                 foreach (var r in playerRenderers) r.enabled = false;   // the camera looks past where we stand
-                var jobs = new[] { ("blacksmith", "forge"), ("merchant", "stall"), ("baker", "oven"), ("leatherworker", "tannery"), ("lumberjack", "woodpile") };
+                var jobs = new[] { ("blacksmith", "forge"), ("merchant", "stall"), ("baker", "oven"), ("leatherworker", "leathershop"), ("herbalist", "dryhut"), ("lumberjack", "woodpile") };
                 foreach (var job in jobs)
                 {
                     Villager worker = null;
@@ -540,7 +540,7 @@ namespace Crulanda.Encounter
             Debug.Log("WORLD_CAPTURE_DONE"); Application.Quit(0);
         }
         /// <summary>Prop kinds whose front (door or open side) faces local -Z: their landmark shots look at that side.</summary>
-        static readonly string[] Fronted = { "house", "inn", "barn", "mill", "coop", "forge", "stall", "oven", "tannery", "woodpile", "wagon", "crypt" };
+        static readonly string[] Fronted = { "house", "inn", "barn", "mill", "coop", "forge", "stall", "oven", "tannery", "woodpile", "wagon", "crypt", "leathershop", "dryhut", "kitchen", "gamerack" };
         /// <summary>
         /// A viewpoint for a landmark shot. Sizes the landmark (its named prop's renderers, else the scenery colliders and tree
         /// crowns in its circle), then tries 16 bearings round it, the preferred one first and turning away both ways, at three

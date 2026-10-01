@@ -1505,6 +1505,7 @@
     },
     {
       "kind": "house",
+      "name": "Grane house",
       "at": {
         "x": -4,
         "y": -16
@@ -1518,6 +1519,7 @@
     },
     {
       "kind": "house",
+      "name": "Vey house",
       "at": {
         "x": 11,
         "y": -14
@@ -1531,6 +1533,7 @@
     },
     {
       "kind": "house",
+      "name": "Jenn house",
       "at": {
         "x": -12,
         "y": -19
@@ -1544,6 +1547,7 @@
     },
     {
       "kind": "house",
+      "name": "Tabor house",
       "at": {
         "x": 3,
         "y": 22

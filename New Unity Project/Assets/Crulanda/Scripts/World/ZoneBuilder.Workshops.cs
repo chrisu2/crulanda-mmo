@@ -15,8 +15,9 @@ namespace Crulanda.World
         /// <summary>The walls' footprint of each roofed workshop (x along its front, y its depth). Their props carry no size: a
         /// sized prop would stop the creek's swing and clear a wider ring of grove trees.</summary>
         public static readonly Vector2 LeatherShopSize = new Vector2(6, 5), DryingHutSize = new Vector2(5, 4.5f), KitchenSize = new Vector2(5, 3);
-        /// <summary>Where the kitchen's back door stands along the inn's wall (the kitchen's local x).</summary>
-        const float KitchenDoorX = 1.9f;
+        /// <summary>Where the kitchen's back door stands along the inn's wall (the kitchen's local x; the inn's x is the kitchen's
+        /// middle less this, the two facing opposite ways).</summary>
+        public const float KitchenDoorX = 1.9f;
         static readonly Color[] HideTints = { new Color(.62f, .48f, .32f), new Color(.5f, .36f, .22f), new Color(.7f, .6f, .46f), new Color(.4f, .27f, .17f), new Color(.56f, .4f, .26f) };
         /// <summary>Leather and hides: tan, brown, pale, dark, chestnut.</summary>
         Material HideOf(int i) { return Tint(art.cloth, HideTints[((i % HideTints.Length) + HideTints.Length) % HideTints.Length]); }
@@ -273,7 +274,7 @@ namespace Crulanda.World
             Eaves(t, w, d, top, roofH, art.thatch);
             Gables(t, w / 2, d, top, roofH, d / 2 + .7f, w / 2 + .6f, weave, 1, .18f);
             // Herbs: four bunches on pegs under the front plate over the closed panel, five on a pole under the ceiling inside.
-            for (int i = 0; i < 4; i++) HerbBundle(t, new Vector3(-2.05f + i * .48f, top - .4f, -d / 2 - .14f), i);
+            for (int i = 0; i < 4; i++) HerbBundle(t, new Vector3(-2.05f + i * .48f, top - .4f, -d / 2 - .22f), i);   // the heads clear the wattle's stakes
             Rod(t, new Vector3(-w / 2 + .1f, top - .32f, .4f), new Vector3(w / 2 - .1f, top - .32f, .4f), .05f, withy);
             for (int i = 0; i < 5; i++) HerbBundle(t, new Vector3(-1.7f + i * .8f, top - .34f, .4f), i + 2);
             // The bench along the right wall, from the back: a mortar and pestle, three jars, and the still at the doorway end
@@ -414,7 +415,7 @@ namespace Crulanda.World
         {
             var pole = Tint(art.timber, new Color(.36f, .27f, .18f)); var dark = Tint(art.timber, new Color(.26f, .18f, .12f)); var cord = Tint(art.hay, new Color(.6f, .54f, .42f));
             float G(float x, float z) { return LocalGround(t, x, z); }
-            const float bar = 2.6f;
+            float bar = 2.6f + Mathf.Max(0, G(-.6f, 0), G(-.6f, .15f));   // the deer's antlers stay clear of the hillside under them
             // The rack: each pole forks at the head and the crossbar lies in the forks.
             foreach (int s in new[] { -1, 1 })
             {

@@ -9,7 +9,8 @@ namespace Crulanda.Tests
     public class VillageWorkTests
     {
         static readonly string[] Trades = { "farmer", "miller", "baker", "blacksmith", "lumberjack", "hunter", "skinner", "leatherworker", "herbalist", "merchant", "gossip", "child", "elder", "drinker", "henwife" };
-        static readonly HashSet<string> Places = new HashSet<string> { "field", "well", "green", "inn", "mill", "wander", "forge", "stall", "oven", "tannery", "woodpile", "woods", "meadow", "home", "yard", "nest", "trough", "pan" };
+        static readonly HashSet<string> Places = new HashSet<string> { "field", "well", "green", "inn", "mill", "wander", "forge", "stall", "oven", "tannery", "woodpile", "woods", "meadow", "home", "yard", "nest", "trough", "pan",
+            "leathershop", "dryhut", "kitchen", "kitchendoor", "bar", "lodge" };
 
         [Test] public void Every_trade_has_a_day_that_covers_its_working_hours()
         {

@@ -692,3 +692,23 @@ A read-only review by five reviewers, each finding checked by a second who tried
   standing alone, rubble); the Peaks' steep ground reads as bedded rock and scree with crags seated in aprons; cave walls are
   painted rock (Crowsfoot) and earth packed with roots (the Root-Mother's Deep), with dripstone and ledges, and the deep's capture
   shots stand in the right places.
+
+## 2026-10-01 — Trades begin, the village grows, and your weapon shows (Chris: "we need to gather ore, lumber, herbs etc and sell or refine. also have a profession for the character"; "each npc has their own house and each profession has their own workshop"; "improve armor and weapons and each has a different visual appearance when worn")
+- **Trades, the groundwork** (BUILD_PLAN step 2): the save moves to format 8 (what you have learned of the trades, and room for
+  trade bags), safely migrated from format 7. Nineteen materials (ores, logs, herbs, charcoal, flour, salt, vials), a miner's pick
+  and a woodcutter's hatchet to buy from Ama Rusk or the smith, and the **Trades window (K)**: Mining, Woodcutting and Herbalism
+  free to everyone, Cooking for everyone, and two crafts (Blacksmithing and Alchemy) to choose between. Gathering itself arrives
+  with the next step.
+- **The village grows** (step 1): the Carder farmhouse and the Crisp cottage; **Maud Tanner's leather shop** by the South road,
+  apart from the tannery yard, where she now works 9-12 and 14-18; **Lisbet's drying hut**, herbs on the racks; **the Golden Cask's
+  kitchen** lean-to with a range and a back door; **the game rack** at Moss's lodge; and every house carries its name ("Knock ·
+  Tanner house"). Who lives where follows in the households step.
+- **Weapons and shields show in your hands** (loot step A1): every weapon and shield has its own built shape (short and arming
+  swords, falchions, knives, cleavers, hand and bearded and crescent axes, clubs, flanged maces, war hammers, staves, polearms;
+  bucklers, round, kite and heater shields; lanterns and censers), coloured by where it comes from, held a little larger than life
+  in the painted style; better quality shows in the trim and a glowing accent. Slung on the back when you swim. **Empty hands show
+  empty**: a new character starts with nothing in hand until the Trailblade is equipped.
+- **Found by the first full check and fixed:** the Crisp cottage's door point sat in a pocket of navmesh nobody could reach (every
+  house's door point now stands on its step); held weapons drawn life-size read as twigs (now 1.35x, shields 1.15x).
+- How it was built: each piece on its own branch, reviewed through three lenses with every finding refuted or confirmed by a
+  second reviewer (21 defects fixed before merging), then the full tests, five zone tours and a wardrobe line-up of every weapon.

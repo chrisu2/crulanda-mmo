@@ -18,26 +18,16 @@ The user requested this handoff because they ran out of tokens. Do not assume an
 Tests on 078d276: EditMode 186/186, PlayMode 83/83, 0 shader errors. Main has since gained an inn shot of the drinkers
 (`oakhaven-99-inn-drinkers.png`) and the plan documents; nothing unpublished changes play.
 
-**WRAPPED UP 2026-10-01 night at Chris's request. Main is AHEAD of the published build and NOT YET PUBLISHED.**
-Main (commit after 48df0e1) has three merged, reviewed pieces on top of the published 078d276:
-- **Trades step 2:** save format 8 (professions, pouches; migration from 7 with guards), 19 materials, pick and hatchet, vendor
-  stock, `professions.json`, `Professions.cs`, the Trades window (K).
-- **Trades step 1:** the new buildings (Carder farmhouse, Crisp cottage, Maud's leather shop, Lisbet's drying hut, the inn's
-  kitchen lean-to, the game rack at Moss's lodge), named houses, Maud working at her shop. Temporary `VillageLife.UnsettledHouses`
-  keeps the old home deal until step 3.
-- **Loot step A1:** weapons and shields shown in hand (`GearLooks`, `Resources/Gear/looks.json`, `GearMeshes`, `GearMats`,
-  `ActorVisual.Gear*.cs`, `GearBinder`, `WardrobeCapture`); empty slots show empty, so a new Warrior starts unarmed until the
-  Trailblade.
-Each was built in a worktree, reviewed by three lenses with every finding refuted or confirmed, and fixed (21 confirmed defects
-fixed in all) before merging. **Tested so far: EditMode 221/221** (the run was stopped there). **Still to do before publishing:**
-1. `run_tests.ps1` (PlayMode not yet run on this main), then `build_and_tour.ps1 -Zones zone.oakhaven,zone.khaven,zone.peaks,
-   zone.ashrim,zone.verdant`, then `tools\validation\capture_extra.ps1` (the HUD captures incl. `17-trades.png` and the wardrobe
-   line-up in `ui-captures\wardrobe`: 01-weapon-rack-a..g, 02-shield-wall-a..c, 03-quality-ladder-a..c).
-2. LOOK: the new buildings (landmark and trade shots, `oakhaven-97-trade-leatherworker/-herbalist`), the Trades window, every
-   weapon and shield in the wardrobe shots, the player now unarmed by default.
-3. Fix what shows, publish, backup, CHANGELOG entry (none written yet for these three).
-Chris's save is backed up before format 8 (`hel/work/save-backups/20261001-1545-before-format8`); his save migrates to 8 the first
-time the published build saves.
+**PUBLISHED 2026-10-01 evening (sixth publish): trades step 2 (save format 8, materials, tools, the Trades window), trades step
+1 (the new buildings, named houses, Maud's leather shop), loot step A1 (weapons and shields in hand).** Tests: EditMode 221/221,
+PlayMode 89/89, 0 shader errors; five zones toured; the HUD captures (`ui-captures\warrior-17-trades.png`) and the wardrobe
+line-up (`ui-captures\wardrobe\`, 10 weapon racks, 4 shield walls, 3 quality ladders) viewed. Fixed after the first check: house
+door points on the step (the Crisp cottage door was unreachable), held gear 1.35x and shields 1.15x, trade shots that find a clear
+view. Still to polish (loot): the quality ladder's rare and epic glow is faint; the Golden Cask's leather-shop trade shot was
+inside a wall (fixed in the capture code after this build, not yet seen).
+**Long runs now go detached:** `toolsalidation\start_detached.ps1 [-Arguments '-NoTour' | '-Zones zone.oakhaven -NoTests']`
+runs `full_run.ps1` outside the tool's process tree; wait for `hel\workull-run.done` (the log is mixed-encoding: read the result
+XMLs and logs directly).
 
 **NEXT ROUND (worktrees made, nothing built yet; branches at main):** `trades/a3-households` (BUILD_PLAN step 3),
 `trades/b4-gathering` (step 4), `loot/a2-armour` (loot A2), `visual/w3-slopes-hero` (visual worklist items 10 and 11). Worktrees

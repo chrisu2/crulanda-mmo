@@ -65,7 +65,8 @@ namespace Crulanda.Encounter
                 new Errand("logs to the woodyard", 9, 11.5f, "woods", "woodpile", Load.Logs, "logs", "Two more loads and that's the big oak down."),
                 new Errand("firewood to the inn", 14.5f, 16.5f, "woodpile", "inn", Load.Logs, "wood", "Firewood for the Cask. Dry, mind, not the grey stuff."),
                 new Errand("firewood to the forge", 16, 18, "woodpile", "forge", Load.Logs, "wood", "For the hearth. Don't burn it all at once.")) },
-            { "hunter", new WorkDay(new[] { new Shift(Dawn, 10.5f, "woods", "woods", "woods", "meadow", "meadow"), new Shift(10.5f, 13, "tannery", "inn", "inn"), new Shift(13, 18, "woods", "woods", "woods", "meadow", "meadow"), new Shift(18, Night, "inn", "inn", "green") },
+            // The hunter keeps to his lodge yard in the evening and goes to bed early (Villager.HunterBed): it is a long walk out.
+            { "hunter", new WorkDay(new[] { new Shift(Dawn, 10.5f, "woods", "woods", "woods", "meadow", "meadow", "lodge"), new Shift(10.5f, 13, "tannery", "inn", "inn"), new Shift(13, 18, "woods", "woods", "woods", "meadow", "meadow"), new Shift(18, Night, "lodge", "lodge", "inn") },
                 new Errand("the hide to the tannery", 10, 12.5f, "woods", "tannery", Load.Game, "hides", "A buck's hide, and the hares are for the Cask. Pay me for the hide."),
                 new Errand("hares to the inn", 11, 13.5f, "tannery", "inn", Load.Game, "meat", "Two hares for the pot. Don't let the drinkers see them.")) },
             { "skinner", new WorkDay(new[] { new Shift(7, 12, "tannery", "tannery", "tannery", "well"), new Shift(12, 13, "inn", "well"), new Shift(13, 17.5f, "tannery", "tannery", "tannery", "woods"), new Shift(17.5f, Night, "green", "inn") },

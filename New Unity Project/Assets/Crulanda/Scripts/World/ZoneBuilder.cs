@@ -69,7 +69,7 @@ namespace Crulanda.World
             props = new GameObject("Zone props").transform; props.SetParent(transform, false);
             statics = new GameObject("Zone static scenery").transform; statics.SetParent(transform, false);
             PrepareRelief(); PrepareShapes(); Water = new ZoneWater(); Water.Prepare(Zone, (x, z) => HeightAt(x, z, false)); PrepareHollows(); Lap("prepare");
-            BuildLighting(); BuildGround(); Lap("ground"); BuildWater(); BuildWasting(); Lap("water"); BuildProps(); Lap("props"); BuildGroves(); BuildExits(); Lap("groves");
+            BuildLighting(); BuildGround(); Lap("ground"); BuildWater(); BuildWasting(); Lap("water"); BuildProps(); BuildHomeDoors(); Lap("props"); BuildGroves(); BuildExits(); Lap("groves");
             BuildForestEdge(); BuildBoundaries(); Lap("edge"); BuildBackdrop(); Lap("backdrop");
             if (art.grass != null && art.grass.Length > 0)
             {
@@ -1124,6 +1124,22 @@ namespace Crulanda.World
                 if (drop) { DestroyImmediate(t.gameObject); continue; }
                 if (!string.IsNullOrEmpty(p.interact) && t != null)
                     Interactables.Add(new ZoneInteractable { name = string.IsNullOrEmpty(p.name) ? p.kind : p.name, prompt = p.interact, item = p.item, kind = p.kind, once = p.once, position = t.position, root = t });
+            }
+        }
+        /// <summary>
+        /// A barn a household lives in (Moss's lodge) has no door of its own to knock at: it gets a barred one ("home") a little
+        /// out from the middle of its big doors on the -Z side, so villagers have somewhere to go in. Draws nothing random.
+        /// </summary>
+        void BuildHomeDoors()
+        {
+            if (Zone.life == null || Zone.life.households == null) return;
+            foreach (var h in Zone.life.households)
+            {
+                if (h == null || string.IsNullOrEmpty(h.house) || Doors.Exists(d => d.name == h.house)) continue;
+                var p = Array.Find(Zone.props, q => q != null && q.kind == "barn" && q.name == h.house); if (p == null) continue;
+                float d = (p.size.y > 0 ? p.size.y : 8) * (p.scale <= 0 ? 1 : p.scale);
+                var at = Ground(p.at) + Quaternion.Euler(0, p.rotation, 0) * new Vector3(0, 0, -d / 2 - .6f);
+                Doors.Add(new ZoneDoor { name = h.house, kind = "home", openable = false, position = Ground(new Vector2(at.x, at.z), 1) });
             }
         }
         /// <summary>Half-extents of a building's footprint (a little over its walls, for roof and plinth); zero for anything else.</summary>

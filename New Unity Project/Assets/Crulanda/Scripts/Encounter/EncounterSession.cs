@@ -251,14 +251,15 @@ namespace Crulanda.Encounter
         // Merchants.
         Vector3 vendorAt;
         public bool IsVendor(Villager v) { return v != null && Items != null && Items.StockFor(v.Name, v.Role, 1).Count > 0; }
-        public void OpenVendor(Villager v)
+        /// <summary>Open a vendor's wares; <paramref name="at"/> is where the trade is done (their door, when you knocked), else where they stand.</summary>
+        public void OpenVendor(Villager v, Vector3? at = null)
         {
             if (Items == null || v == null) return;
             int band = Zone != null ? Zone.Zone.levelMax : 2;
             VendorStock = Items.StockFor(v.Name, v.Role, band); if (VendorStock.Count == 0) return;
             // What the village brought the stall today (the hen-wife's eggs): sold on while they last.
             if (v.Role == "merchant" && VillageLife.Active != null && VillageLife.Active.Count("stall.eggs") > 0 && Items.Get(FreshEggs) != null) VendorStock.Insert(0, FreshEggs);
-            VendorNpc = v.Name; vendorAt = v.transform.position; InventoryOpen = true; Conversation = null; TradesOpen = false; v.Hold(30);
+            VendorNpc = v.Name; vendorAt = at ?? v.transform.position; InventoryOpen = true; Conversation = null; TradesOpen = false; v.Hold(30);
         }
         public const string FreshEggs = "food.fresh_eggs";
         public void CloseVendor() { VendorNpc = null; VendorStock = new List<string>(); }
@@ -1188,10 +1189,33 @@ namespace Crulanda.Encounter
             if (door != null)
             {
                 if (door.openable) door.SetOpen(!door.Open);
-                else Message(door.name + ": " + (door.kind == "rooms" ? RoomsDoorLine : BarredDoorLines[Mathf.Abs(door.name.GetHashCode() + Time.frameCount / 600) % BarredDoorLines.Length]));
+                else if (door.kind == "rooms") Message(door.name + ": " + RoomsDoorLine);
+                else Knock(door);
                 return;
             }
             Message("Nothing to interact with here.");
+        }
+        /// <summary>What answering a knock says when someone home has wares or quest business for you (GAME-ONLY).</summary>
+        public const string ShutterLine = "A shutter opens. \"At this hour? Go on, then.\"";
+        /// <summary>
+        /// A knock at a barred door. Someone at home with wares or quest business for you opens up and deals with you at the door,
+        /// as if you had found them; otherwise the household answers (who is abed, where the head of the house is), and a door nobody
+        /// lives behind gives one of the old barred-door lines.
+        /// </summary>
+        void Knock(Crulanda.World.ZoneDoor door)
+        {
+            var life = VillageLife.Active;
+            if (life != null)
+                foreach (var v in life.AtHome(door))
+                {
+                    bool business = Quests != null && Zone != null && Quests.Marker(v.Name, Zone.Zone.id, Progress.Level, out bool grey) != ' ' && !grey;
+                    if (!business && !IsVendor(v)) continue;
+                    Message(door.name + ": " + ShutterLine);
+                    if (!QuestTalk(v.Name, door.position)) OpenVendor(v, door.position);
+                    return;
+                }
+            var line = life != null ? life.KnockLine(door) : null;
+            Message(door.name + ": " + (line ?? BarredDoorLines[Mathf.Abs(door.name.GetHashCode() + Time.frameCount / 600) % BarredDoorLines.Length]));
         }
         public void EnemyDied(EncounterEnemy enemy)
         {

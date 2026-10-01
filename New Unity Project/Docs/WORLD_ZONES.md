@@ -483,18 +483,48 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
 ## Life, day and night (GAME-ONLY)
 - `life` in the zone JSON: villager count, mood (`wary` / `afraid`) and critter groups (chicken, rabbit, crow, deer,
   sheep, cat). `WorldLife.cs`: villagers have roles (farmer, gossip, drinker, child, elder, miller, henwife), homes
-  (the houses' doors), places from the zone (fields, well, green, inn seats, mill), chat in pairs, bark at the player,
+  (their household's door, below), places from the zone (fields, well, green, inn seats, mill), chat in pairs, bark at the player,
   and flee home when fighting starts nearby. Critters never fight and scatter from the player; crows fly.
+- **Households** (GAME-ONLY; `life.households`, `ZoneHousehold`; tools/wip/professions/ADDENDUM.md A): each household names
+  its house (a prop of kind house, mill, barn or inn) and its members with their kin ("head", "husband", "daughter",
+  "lodger"); families share one house, and no two households share one. A barn lived in gets a barred door of its own
+  (`ZoneDoor.kind` "home", `ZoneBuilder.BuildHomeDoors`, no random draws); an inn named as a house means its rooms door. Every
+  villager, hen-wife and working resident goes home to their household's door (`Villager.Home`, `Villager.Household`,
+  `VillageLife.Households`, `HouseholdOf`); a resident who keeps a post can be named in a household (so a knock names them)
+  and still keeps the post day and night. `stipend` (default 6) and `needs` (default bread, firewood, eggs) are read by the
+  purses, a later step.
+  - Oakhaven, 15 households: Vell, Thorne, **Tanner** (Maud Tanner, leatherworker; Fen Walker, skinner, her husband; Nettie,
+    their daughter), Rusk, Reed, Farrow (Osk and his son Pim), Crane, Ashby (the Elder's house), Pell (Old Tobin and his wife
+    Edda), Jory (alone, Jory's house), Harrow farm (Sel Harrow, Ilse Brandt the hand, Goody Marl their aunt), **Carder farm**
+    (Wil Carder and Hettie Brook, his aunt, in the new Carder farmhouse), Brook farm (Grete Lowe, Nan Pennock lodging), **Crisp**
+    (Aldo Crisp in the new Crisp cottage; nobody sleeps at the mill) and **Moss** (Garet Moss at his lodge, a barn with a home
+    door). Quill and Warden Ivel keep their posts. The Golden Cask's household comes with its innkeeper.
+  - Khaven, 5: Grane, Vey (Dorra Vey and Old Kestrel, her father), Jenn (Mattock Jenn and Siv Harl, his wife), Tabor, and
+    Morrow at the Crypt-Keeper's Hovel (Ansel Morrow keeps his post at the crypt; the hovel stands empty).
+  - A zone with villagers and no `households` uses the derived rule: villager i takes house i (the barred doors in the order
+    they were built) while houses last, the rest lodge behind the inn's rooms door, and a hen-wife joins the household of the
+    house nearest her coop. Nobody is given a door by modulo any more.
+  - **Knocking** (`EncounterSession.Knock`): someone at home with wares or quest business for you (a gold `!` or `?`) opens
+    up and deals with you at the door ("A shutter opens. "At this hour? Go on, then.""). Otherwise the household answers
+    (`VillageLife.KnockLine`): all abed ("The Tanners are abed. A child coughs, and somebody hushes her."), the head out and
+    someone in ("Maud's at the shop by the South road. Try there."), the head in ("Not now. Since the collectors came, this door
+    stays barred."), or nobody home ("No answer. The Tanner house is empty till supper."). A door no household lives behind
+    gives the old barred-door lines; the inn's rooms door its own line.
+  - Tests: `HouseholdDataTests` (EditMode: every villager in exactly one household, houses are props and not shared, Khaven's
+    six, zones without households parse) and `VillageHomeTests` (PlayMode: everyone walks home to their own door by 23:30, the
+    Tanners share a house, farmers live with their hen-wife, the hunter makes it from the inn to his lodge in time, every home
+    door is on the navmesh, knocking names the household).
 - **Day/night** (`Scripts/World/WorldClock.cs`): one game day lasts 40 real minutes and starts at 08:30. The hour
   continues across zone travel (it is not saved yet). The directional light is the sun by day and a pale moon at night.
   Dawn, day, dusk and night keyframes blend with the zone's own `lighting` palette: ambient, fog, sky tint and exposure.
   Lamps (`NightLights`) light up after dark. The minimap rim shows a sun or moon and the time. In development builds,
   F11 skips an hour.
-- **Night routine:** villagers go home to bed from about 20:00, children first. Drinkers stay at the inn until 23:00 or
+- **Night routine:** villagers go home to bed from about 20:00, children first. The hunter sets off at 19:48 and spends his
+  evening in the lodge yard (his lodge is about a game hour's walk from the green). Drinkers stay at the inn until 23:00 or
   later. Everyone wakes between about 05:50 and 07:30.
 - **Hen coops** (prop kind `coop`, registered in `ZoneBuilder.Coops`) are raised huts with a ramp, a pop-hole door on a
-  hinge, nest boxes and a feed trough. Each coop gets a hen-wife (Oakhaven: Goody Marl at Harrow, Hettie Brook on the
-  green, Nan Pennock at Brook farm), and chickens belong to the nearest coop. Her day (Chris, 2026-10-01: "the hen
+  hinge, nest boxes and a feed trough. Each coop gets a hen-wife (Oakhaven: Goody Marl at Harrow, Hettie Brook at the West
+  field coop by the Carder farm, Nan Pennock at Brook farm), and chickens belong to the nearest coop. Her day (Chris, 2026-10-01: "the hen
   maiden/mother should feed the chickens in the morning. water during the day. collect eggs ... she should take some eggs to
   the merchants to sell. some home to eat. some eggs to the inn for food for the village"):
   - 05:45: opens the coop, and the hens come down the ramp one by one from 06:00; then the morning feed at the trough, and
@@ -566,9 +596,9 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
     - `gamerack`, 3 x 2 m on a hillside: forked poles and a crossbar hung with a deer, two hares and a brace of pheasants; a
       rail of pelts; a hide laced in a frame; a butcher's block with a cleaver; a ring of cold stones. Place: `lodge`.
     - The inn adds a `bar` place at the open end of the bar and a barred door to the rooms upstairs (`ZoneDoor.kind` "rooms";
-      nobody's home yet; trying it says the stair is kept for the inn's lodgers). `ZoneDoor.smoke` is the house's chimney smoke.
-    - Until households, the Carder farmhouse and the Crisp cottage stand empty (`VillageLife.UnsettledHouses`, left out of
-      `Homes`), so every villager and hen-wife keeps the house the old rule gave them.
+      nobody in Oakhaven lodges there yet; trying it says the stair is kept for the inn's lodgers). `ZoneDoor.smoke` is the
+      house's chimney smoke.
+    - The Carder farmhouse and the Crisp cottage are lived in (see Households).
     - A villager at stand points close together (the kitchen's range and table) works and looks at the nearest one.
     - A village with a tannery yard and no leather shop has its leatherworker work the yard (`leathershop` shares the
       `tannery` places).

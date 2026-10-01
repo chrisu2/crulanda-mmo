@@ -11,6 +11,7 @@ Shader "Crulanda/Grass"
         _WindSpeed ("Wind speed", Float) = 1.6
         _Glow ("Night glow", Float) = 0
         _Wither ("Wither (drains the paint's green)", Range(0, 1)) = 0
+        _FadeFar ("Fade end in metres from the camera (0: no fade)", Float) = 0
     }
     SubShader
     {
@@ -24,6 +25,9 @@ Shader "Crulanda/Grass"
         sampler2D _MainTex;
         fixed4 _Color;
         float _Wind, _WindSpeed, _Glow, _Wither;
+        // GrassField's tufts (its own material copies set this): a tuft shrinks into the ground over the 20 m before _FadeFar, so
+        // the field thins out into the turf's paint instead of whole cells switching. 0 (plants, the assets): no fade.
+        float _FadeFar;
         // How dark the night is (WorldClock, global): a glowing flower (_Glow) is faint by day and lights up after dark.
         float _NightGlow;
         // The weather's wind (WorldWeather, global): xy its direction on the ground (world x, z), z its strength 0..1. All zero
@@ -44,6 +48,9 @@ Shader "Crulanda/Grass"
             v.vertex.z += gust * _Wind * 0.5 * stir * tip;
             float3 down = mul((float3x3)unity_WorldToObject, float3(_WeatherWind.x, 0, _WeatherWind.y));
             v.vertex.xyz += normalize(down + float3(1e-5, 0, 0)) * (_Wind * w * (0.9 + 2.1 * wave) * tip) + float3(0, -0.12, 0) * (w * wave * tip);
+            // The distance fade: the tuft's root is the object's origin, so scaling the vertex draws it down into its root.
+            float fade = _FadeFar > 0 ? saturate((_FadeFar - distance(wp.xz, _WorldSpaceCameraPos.xz)) * 0.05) : 1;
+            v.vertex.xyz *= fade;
         }
         void surf(Input IN, inout SurfaceOutput o)
         {

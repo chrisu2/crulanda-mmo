@@ -50,11 +50,11 @@
     "ambientSky": "#8AA3C4",
     "ambientEquator": "#86886E",
     "ambientGround": "#3E4030",
-    "fogColor": "#AFC0C6",
-    "fogStart": 70,
-    "fogEnd": 240,
-    "skyTint": "#788FB8",
-    "skyExposure": 1.2,
+    "fogColor": "#96B8DA",
+    "fogStart": 105,
+    "fogEnd": 330,
+    "skyTint": "#6189C8",
+    "skyExposure": 1.05,
     "skyHaze": 1.0
   },
   "spawns": {

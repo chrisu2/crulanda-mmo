@@ -7,8 +7,14 @@ namespace Crulanda.World
     /// <summary>Small procedural meshes the zone builder needs beyond Unity's primitives.</summary>
     public static class ZoneMeshes
     {
-        /// <summary>Gable roof: ridge runs along X; width (X) x depth (Z) footprint, ridge at +height. Pivot at eave centre.</summary>
-        public static Mesh GableRoof(float width, float depth, float height, float thickness = .25f)
+        /// <summary>
+        /// Gable roof: ridge runs along X; width (X) x depth (Z) footprint, ridge at +height. Pivot at eave centre. With
+        /// <paramref name="verge"/> 0 the two ends are closed with triangles in the roof's own material: a roof with no wall
+        /// under it (a well, a porch hood, a fallen roof). On a walled building <paramref name="verge"/> is how far the roof
+        /// reaches past the gable wall at each end: the ends are left open for that wall (see <see cref="Gable"/>), the slopes
+        /// get undersides (seen under the verge) and the flat soffit stops at the wall.
+        /// </summary>
+        public static Mesh GableRoof(float width, float depth, float height, float thickness = .25f, float verge = 0)
         {
             float hw = width / 2, hd = depth / 2;
             var v = new List<Vector3>(); var t = new List<int>();
@@ -17,23 +23,47 @@ namespace Crulanda.World
             Vector3 bL = new Vector3(-hw, 0, hd), bR = new Vector3(hw, 0, hd);
             Quad(v, t, aL, rL, rR, aR);          // south slope
             Quad(v, t, bR, rR, rL, bL);          // north slope
-            Vector3 d = Vector3.down * thickness;
-            Quad(v, t, aR + d, bR + d, bL + d, aL + d); // underside
-            Tri(v, t, aL, bL, rL); Tri(v, t, bR, aR, rR); // gable ends (closed triangles)
+            Vector3 d = Vector3.down * thickness, e = Vector3.right * verge; bool open = verge > 0;
+            if (open) { Quad(v, t, aR, rR, rL, aL); Quad(v, t, bL, rL, rR, bR); } // the slopes' undersides (vertices 8 to 15)
+            Quad(v, t, aR - e + d, bR - e + d, bL + e + d, aL + e + d); // underside (between the gable walls on an open roof)
+            if (!open) { Tri(v, t, aL, bL, rL); Tri(v, t, bR, aR, rR); } // gable ends (closed triangles)
             Quad(v, t, aL + d, aL, aR, aR + d); Quad(v, t, bR + d, bR, bL, bL + d); // eave edges
-            Quad(v, t, aR + d, aR, bR, bR + d); Quad(v, t, bL + d, bL, aL, aL + d); // slab ends under the gables (left open, the eave slab read as a loose board)
+            if (!open) { Quad(v, t, aR + d, aR, bR, bR + d); Quad(v, t, bL + d, bL, aL, aL + d); } // slab ends under the gables (left open, the eave slab read as a loose board)
             var m = Build("Gable roof", v, t);
             // UVs in metres, 2.5 m a tile. The two slopes (the first eight vertices): x along the ridge, the true distance up the
             // slope from the eave (|z| + y hardly changes up a 45 degree roof, which smeared one row of thatch over the whole slope).
-            // The rest (underside, gable ends, edges): flat, across and up.
-            float slope = Mathf.Sqrt(hd * hd + height * height);
+            // An open roof's slope undersides (the next eight) are laid the same. The rest (underside, gable ends, edges): flat,
+            // across and up.
+            float slope = Mathf.Sqrt(hd * hd + height * height); int slopes = open ? 16 : 8;
             var uv = new List<Vector2>();
             for (int i = 0; i < v.Count; i++)
             {
                 var p = v[i];
-                uv.Add(i < 8 ? new Vector2(p.x / 2.5f, p.y / height * slope / 2.5f) : new Vector2((p.x + p.z) / 2.5f, p.y / 2.5f));
+                uv.Add(i < slopes ? new Vector2(p.x / 2.5f, p.y / height * slope / 2.5f) : new Vector2((p.x + p.z) / 2.5f, p.y / 2.5f));
             }
             m.SetUVs(0, uv); return m;
+        }
+        /// <summary>
+        /// The wall under the end of a gable roof: <paramref name="width"/> wide (X) and <paramref name="thickness"/> thick (Z),
+        /// standing on the wall top at y = 0 and following the roof's slope up to the ridge at <paramref name="height"/>. With
+        /// <paramref name="eave"/> 0 it is a triangle. Otherwise the roof reaches that far past it at each eave, so its two ends
+        /// stand upright from the wall top to the slope. Its two faces only (+z and -z): the roof covers the rest. UVs in metres
+        /// (<paramref name="tile"/> metres a tile), laid as <see cref="Box"/> lays its z faces, with v counted up from
+        /// <paramref name="foot"/>, the height of the wall top in its building, so the texture runs on from the wall below.
+        /// </summary>
+        public static Mesh Gable(float width, float height, float thickness, float tile = 2, float eave = 0, float foot = 0)
+        {
+            var v = new List<Vector3>(); var t = new List<int>(); var uv = new List<Vector2>();
+            float hw = width / 2, hz = thickness / 2, sh = eave > 0 ? height * eave / (hw + eave) : 0;
+            var ring = sh > 0 ? new[] { new Vector2(hw, 0), new Vector2(hw, sh), new Vector2(0, height), new Vector2(-hw, sh), new Vector2(-hw, 0) }
+                : new[] { new Vector2(hw, 0), new Vector2(0, height), new Vector2(-hw, 0) };
+            foreach (int s in new[] { 1, -1 })   // the +z face, then the -z face mirrored, so both are wound clockwise seen from outside
+            {
+                int b = v.Count;
+                foreach (var p in ring) { v.Add(new Vector3(s * p.x, p.y, s * hz)); uv.Add(new Vector2(-p.x, p.y + foot) / tile); }
+                for (int k = 1; k + 1 < ring.Length; k++) t.AddRange(new[] { b, b + k, b + k + 1 });
+            }
+            var m = Build("Gable", v, t); m.SetUVs(0, uv); return m;
         }
         /// <summary>
         /// A box with planar UVs in metres on every face (<paramref name="tile"/> metres a tile), so a painted wall texture holds

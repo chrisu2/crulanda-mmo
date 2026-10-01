@@ -108,7 +108,8 @@ namespace Crulanda.World
             Part(PrimitiveType.Cube, t, house + new Vector3(0, floor + 1.4f, -hr - .08f), new Vector3(1.05f, 1.9f, .08f), wood);
             BoxPart(t, house + new Vector3(0, floor + .5f, -hr - .8f), new Vector3(1.8f, .25f, .9f), stone, null, 1);
             foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cylinder, t, house + new Vector3(s * 1.05f, floor + 1.55f, -hr - .95f), new Vector3(.18f, 1.2f, .18f), wood);
-            MeshPart(ZoneMeshes.GableRoof(2.6f, 1.6f, .6f, .1f), t, house + new Vector3(0, floor + 2.8f, -hr - .7f), tile, Quaternion.Euler(0, 90, 0));
+            MeshPart(ZoneMeshes.GableRoof(2.6f, 1.6f, .6f, .1f), t, house + new Vector3(0, floor + 2.8f, -hr - .7f), tile, Quaternion.Euler(0, 90, 0));   // a hood on two posts: closed ends
+            MeshPart(PropMesh("Porch gable", () => ZoneMeshes.Gable(1.6f, .6f, .04f, 1)), t, house + new Vector3(0, floor + 2.8f, -hr - 2.01f), wood);   // its front boarded, 3 cm proud (the back is in the house)
             var lantern = house + new Vector3(.95f, floor + 2.15f, -hr - .95f);
             Part(PrimitiveType.Cube, t, lantern, new Vector3(.22f, .3f, .22f), art.glass);
             Glow(t, lantern, 7, .3f, new Color(1, .74f, .42f), 1.4f);
@@ -226,7 +227,7 @@ namespace Crulanda.World
                 sheet.gameObject.AddComponent<FallingWater>().speed = speed;
             }
             // Foam where it lands, and mist off the pool.
-            var foam = FallMaterial(.95f);
+            var foam = FallMaterial(.95f); HourTinted.Add(foam);
             for (int i = 0; i < 9; i++) Part(PrimitiveType.Sphere, t, new Vector3((i - 4) * width / 9 + (T() - .5f) * .6f, .05f, .6f + T() * .6f), new Vector3(1.4f + T(), .25f, 1.1f + T() * .5f), foam);
             var ps = new GameObject("Waterfall mist").AddComponent<ParticleSystem>(); ps.transform.SetParent(t, false); ps.transform.localPosition = new Vector3(0, .5f, -.2f);
             var main = ps.main; main.startLifetime = 3.5f; main.startSpeed = .7f; main.startSize = new ParticleSystem.MinMaxCurve(1.5f, 3.2f); main.maxParticles = 160;
@@ -235,6 +236,7 @@ namespace Crulanda.World
             var shape = ps.shape; shape.shapeType = ParticleSystemShapeType.Box; shape.scale = new Vector3(width, .4f, 1.2f);
             var col = ps.colorOverLifetime; col.enabled = true; var g = new Gradient(); g.SetKeys(new[] { new GradientColorKey(Color.white, 0), new GradientColorKey(Color.white, 1) }, new[] { new GradientAlphaKey(0, 0), new GradientAlphaKey(1, .25f), new GradientAlphaKey(0, 1) }); col.color = g;
             ps.GetComponent<ParticleSystemRenderer>().sharedMaterial = art.particle;
+            HourTinted.Add(ps);
         }
         /// <summary>The fall's sheet: a strip from the lip (at its height, a little forward) down to the pool, rows bowed out at the top.</summary>
         static Mesh FallMesh(float width, float height, float z)
@@ -250,7 +252,10 @@ namespace Crulanda.World
             var m = new Mesh { name = "Waterfall sheet" }; m.SetVertices(v); m.SetUVs(0, uv); m.SetTriangles(tri, 0); m.RecalculateNormals(); m.RecalculateBounds(); return m;
         }
         static Texture2D fallStreaks;
-        /// <summary>Streaked white-blue water (unlit, alpha-blended particles shader, both faces), its streaks tiling down the sheet.</summary>
+        /// <summary>
+        /// Streaked white-blue water (unlit, alpha-blended particles shader, both faces), its streaks tiling down the sheet. Unlit,
+        /// so its tint follows the hour (<see cref="HourTint"/>; the sheets through <see cref="FallingWater"/>).
+        /// </summary>
         Material FallMaterial(float alpha)
         {
             if (fallStreaks == null)
@@ -343,8 +348,9 @@ namespace Crulanda.World
     /// <summary>Slides a waterfall sheet's streaks down (the texture's offset), so the water falls.</summary>
     public sealed class FallingWater : MonoBehaviour
     {
-        public float speed = .6f; Material m;
-        void Start() { var r = GetComponent<Renderer>(); if (r != null) m = r.material; }
-        void Update() { if (m != null) m.mainTextureOffset = new Vector2(0, -Time.time * speed); }
+        public float speed = .6f; Material m; Color tint;
+        void Start() { var r = GetComponent<Renderer>(); if (r != null) { m = r.material; tint = m.GetColor("_TintColor"); } }
+        // The sheet is unlit: its tint takes the hour's light, so the fall is moonlit at night and not the brightest thing in view.
+        void Update() { if (m == null) return; m.mainTextureOffset = new Vector2(0, -Time.time * speed); m.SetColor("_TintColor", HourTint.Of(tint)); }
     }
 }

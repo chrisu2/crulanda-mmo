@@ -37,7 +37,7 @@ namespace Crulanda.Encounter
             {
                 case "blacksmith": return "forge"; case "merchant": return "stall"; case "baker": return "oven";
                 case "leatherworker": case "skinner": return "tannery"; case "lumberjack": case "hunter": return "woods";
-                case "herbalist": return "meadow"; case "miller": return "mill"; default: return null;
+                case "herbalist": return "meadow"; case "miller": return "mill"; case "farmer": return "field"; default: return null;
             }
         }
         /// <summary>WoW-style subtitle under a villager's name, e.g. &lt;Blacksmith&gt;. Null for folk without a trade.</summary>
@@ -63,12 +63,13 @@ namespace Crulanda.Encounter
         {
             Session = session; Zone = session.Zone; Active = this;
             var z = Zone.Zone; rng = new System.Random(z.seed + 7);
-            FindPlaces();
+            FindPlaces(); MorningCask();
             int count = z.life.villagers;
             for (int i = 0; i < count; i++)
             {
                 string role = Roles[i % Roles.Length], need = Needs(role);
-                if (need != null && Places[need].Count == 0) role = i % 2 == 0 ? "farmer" : "gossip";
+                // Out of work: a trade whose workplace this village lacks. Where there is an inn they drink; elsewhere they gossip.
+                if (need != null && Places[need].Count == 0) role = Places["inn"].Count > 0 ? "drinker" : "gossip";
                 var home = Homes.Count > 0 ? Homes[i % Homes.Count] : null;
                 var start = RandomPlace(role == "drinker" ? "inn" : "green") ?? Zone.Ground(z.spawns.recovery);
                 var names = z.life.names != null && z.life.names.Length > 0 ? z.life.names : Names;
@@ -109,7 +110,7 @@ namespace Crulanda.Encounter
             foreach (var coop in Zone.Coops) coop.Dry(Time.deltaTime / 420);   // a pan lasts about four hours
             if (Time.time < nextLay) return;
             nextLay = Time.time + 20;
-            if (WorldClock.Between(4, 5)) Stock.Clear();   // the stock is the day's deliveries: yesterday's are eaten, sold or burnt
+            if (WorldClock.Between(4, 5)) { Stock.Clear(); MorningCask(); }   // the stock is the day's deliveries: yesterday's are eaten, sold or burnt
             foreach (var coop in Zone.Coops)
             {
                 if (WorldClock.Between(4, 5)) coop.LaidToday = 0;
@@ -232,6 +233,9 @@ namespace Crulanda.Encounter
         }
 
         // ---------- the village's stock: goods carried between the trades ----------
+        /// <summary>What is left in yesterday's cask at the inn each morning, in tankards (the merchant brings a fresh one: "a cask for the inn").</summary>
+        public const int MorningAle = 10;
+        void MorningCask() { if (Places.TryGetValue("inn", out var seats) && seats.Count > 0) Stock["inn.ale"] = MorningAle; }
         /// <summary>What has been delivered where today, by "place.good" (inn.eggs, stall.flour, forge.wood...); see <see cref="VillageWork"/>.</summary>
         public readonly Dictionary<string, int> Stock = new Dictionary<string, int>();
         public int Count(string key) { return Stock.TryGetValue(key, out var n) ? n : 0; }
@@ -316,6 +320,7 @@ namespace Crulanda.Encounter
                 if (OwnLines.TryGetValue(v.Name, out var own) && rng.Next(2) == 0) return own[rng.Next(own.Length)];
                 return v.Keeper ? Keepers[rng.Next(Keepers.Length)] : OwnLines.TryGetValue(v.Name, out var mine) ? mine[rng.Next(mine.Length)] : Keepers[rng.Next(Keepers.Length)];
             }
+            if (v.PassedOut) return "Zzz...";
             if (!toPlayer) return Chatter[rng.Next(Chatter.Length)];
             if (rng.Next(3) == 0) { var day = StockLine(v); if (day != null) return day; }
             if (!v.Keeper && TradeLines.TryGetValue(v.Role, out var trade) && rng.Next(3) > 0) return trade[rng.Next(trade.Length)];
@@ -344,13 +349,13 @@ namespace Crulanda.Encounter
                 case "leatherworker": case "skinner": return Count("tannery.hides") > 0 ? "The hunter's been by with a hide. Grey at one edge; the rest'll do." : null;
                 case "henwife": return Count("stall.eggs") > 0 ? "Eggs are at the produce stall if you're wanting any. I don't sell from the yard." : Count("inn.eggs") > 0 ? "Took the Cask its eggs this morning. The rest go to the stall after dinner." : null;
                 case "drinker": case "elder": case "gossip": case "farmer":
-                    return Count("inn.meat") > 0 ? "Hare in the Cask's pot tonight. The hunter's doing." : Count("inn.bread") > 0 && Count("inn.eggs") > 0 ? "Bread and eggs at the Cask today. Like old times, nearly." : Count("inn.wood") > 0 ? "The Cask's got a fire going. Dry oak, for once." : null;
+                    return Places["inn"].Count > 0 && Count("inn.ale") == 0 ? "The cask's run dry at the inn. The out-of-work drank it by supper." : Count("inn.meat") > 0 ? "Hare in the Cask's pot tonight. The hunter's doing." : Count("inn.bread") > 0 && Count("inn.eggs") > 0 ? "Bread and eggs at the Cask today. Like old times, nearly." : Count("inn.wood") > 0 ? "The Cask's got a fire going. Dry oak, for once." : null;
                 default: return null;
             }
         }
         public void Talk(Villager v)
         {
-            var line = LineFor(v, true); v.Say(line, 6); v.FacePlayer();
+            var line = LineFor(v, true); v.Say(line, 6); if (!v.PassedOut) v.FacePlayer();
             Session.Message(v.Name + ": " + line);
         }
     }
@@ -378,6 +383,14 @@ namespace Crulanda.Encounter
         public string Activity { get { return activity; } }
         /// <summary>Goods in hand (see <see cref="Load"/>), carried on an errand between trades.</summary>
         public bool Carrying { get { return load != null; } }
+        /// <summary>How much a drinker has had (0 sober; past <see cref="Tolerance"/> they fold or go home), how much they can hold, and
+        /// whether they are done for the day (the ale ran out, or they did).</summary>
+        public float Drunk { get { return drunk; } }
+        public float Tolerance { get { return tolerance; } set { tolerance = value; } }
+        public bool Spent { get { return spent; } }
+        /// <summary>Slumped over the inn's table, dead to the world.</summary>
+        public bool PassedOut { get { return activity == "passedout"; } }
+        int index; float drunk, tolerance = 1; bool spent; GameObject tankard;
         public Load Carried { get { return loadKind; } }
         /// <summary>The errand under way (walking to pick up, or carrying), or null.</summary>
         public Errand Errand { get { return errand; } }
@@ -410,7 +423,7 @@ namespace Crulanda.Encounter
             v.bedAt = role == "drinker" ? 23 + (index % 3) * .3f : role == "child" ? 19.8f + (index % 3) * .2f : role == "henwife" ? HerdHour : role == "baker" ? 19.6f : 20.2f + (index % 5) * .25f;
             v.wakeAt = role == "drinker" ? 7.5f : role == "henwife" ? 5.7f : role == "baker" ? 4.6f : 5.8f + (index % 5) * .3f;
             if (fixedPlace != null) v.bedAt = v.wakeAt = 0;   // residents keep their post day and night
-            v.lastHour = WorldClock.Hour;
+            v.lastHour = WorldClock.Hour; v.index = index; v.tolerance = .85f + (index % 5) * .18f;
             go.SetActive(true);
             // Only what's showing now: the placeholder capsule ActorVisual hides must stay hidden when they come back out.
             v.renderers = System.Array.FindAll(go.GetComponentsInChildren<Renderer>(), r => r.enabled);
@@ -437,7 +450,8 @@ namespace Crulanda.Encounter
         void Go(Vector3 target, float speedScale = 1)
         {
             if (!agent.enabled || !agent.isOnNavMesh) return;
-            agent.speed = (Role == "child" ? 2.4f : Role == "elder" ? 1.1f : 1.6f) * speedScale;
+            float reel = Reeling; visual.Stagger = reel; ShowTankard(false);
+            agent.speed = (Role == "child" ? 2.4f : Role == "elder" ? 1.1f : 1.6f) * speedScale * (1 - .35f * reel);
             agent.isStopped = false; agent.SetDestination(target); state = State.Travel; visual.Pose = ActorPose.None;
         }
         /// <summary>
@@ -457,6 +471,7 @@ namespace Crulanda.Encounter
                 return;
             }
             if (fixedPlace != null) { activity = fixedPlace; var spot = life.RandomPlace(fixedPlace); if (spot.HasValue) Go(spot.Value); else { state = State.Activity; until = Time.time + 20; } return; }
+            if (Role == "drinker" && DrinkerNext()) return;
             if (StartErrand()) return;
             var shift = VillageWork.ShiftFor(Role, WorldClock.Hour);
             GoTo(shift != null ? shift.places : Role == "child" ? new[] { "green", "green", "wander", "wander", "well" } : new[] { "wander", "green" });
@@ -476,6 +491,8 @@ namespace Crulanda.Encounter
         void StartActivity()
         {
             if (errand != null) { ErrandArrive(); return; }
+            if (Role == "drinker" && activity == "inn") { DrinkRound(); return; }
+            if (activity == "sleepitoff") { state = State.Activity; if (agent.isOnNavMesh) agent.isStopped = true; until = Time.time + 30; if (home != null) Hide(); return; }
             state = State.Activity; if (agent.isOnNavMesh) agent.isStopped = true;
             until = Time.time + (activity == "home" ? HomeStay : 14 + life.R01 * 30);
             visual.Pose = PoseFor(activity);
@@ -583,7 +600,7 @@ namespace Crulanda.Encounter
         public void Park()
         {
             state = State.Hidden; Bubble = null; foreach (var r in renderers) r.enabled = false;
-            CancelErrand();   // not left hanging in the air where they stood
+            CancelErrand(); ShowTankard(false);   // not left hanging in the air where they stood
             if (agent.isOnNavMesh) agent.isStopped = true; enabled = false;
         }
         /// <summary>Capture/debug: back to the day's routine after <see cref="StandAt"/> or <see cref="Park"/>, starting from where they were.</summary>
@@ -614,7 +631,7 @@ namespace Crulanda.Encounter
         void Hide()
         {
             state = State.Hidden; calmSince = Time.time; foreach (var r in renderers) r.enabled = false;
-            DropLoad();   // the goods put away in the pantry
+            DropLoad(); ShowTankard(false);   // the goods put away in the pantry
             if (agent.isOnNavMesh) agent.isStopped = true; Bubble = null;
         }
         void Emerge()
@@ -623,7 +640,62 @@ namespace Crulanda.Encounter
             if (home != null && agent.isOnNavMesh && NavMesh.SamplePosition(home.position, out var hit, 2, NavMesh.AllAreas)) agent.Warp(hit.position);
             if (activity == "fled") Say(life.EnemiesCleared ? "Is it over? ...Gods be thanked." : "Is it quiet? Is it safe?", 4);
             else if (activity == "sleep" && life.R01 < .3f) Say(life.R01 < .5f ? "Another grey morning." : "Morning. Still here, then.", 4);
+            else if (activity == "sleepitoff") Say(life.R01 < .5f ? "Never again. ...Is the Cask open yet?" : "My head. Who put the sun there?", 5);
+            if (activity == "sleep" || activity == "sleepitoff") { drunk = 0; spent = false; visual.Stagger = 0; }   // a new day, a clear head
             ChooseNext();
+        }
+
+        // ---------- the out of work at the inn ----------
+        static readonly string[] SoberLines = { "Same again.", "To absent friends.", "First of the day. Well. Of the afternoon.", "No work, no worry. That's what I tell the wife." };
+        static readonly string[] MerryLines = { "I'm not shaying the Council's wrong. I'm shaying... what was I shaying?", "Lissen. Lissen. The grey's jusht weather.", "Another! For the Harrow girl.", "They took my trade. They can't take my thirsht." };
+        static readonly string[] FarGoneLines = { "Thersh two of you. Both ugly.", "I can shee the Washting from here. 'S pretty.", "Hic.", "'M fine. 'M fine. The floor's drunk." };
+        static readonly string[] LeavingLines = { "Thass me done. G'night, all.", "Home. Before she locks the door.", "One more and I'd be under the table. G'night." };
+        static readonly string[] DryLines = { "Dry? The Cask's dry? Then I'm for home.", "No ale. No work and no ale. What a village.", "Empty. Somebody tell the merchant." };
+        /// <summary>0 steady to 1 reeling, from how near a drinker is to their limit.</summary>
+        float Reeling { get { return Role == "drinker" && tolerance > 0 ? Mathf.Clamp01((drunk / tolerance - .45f) / .55f) : 0; } }
+        void ShowTankard(bool on)
+        {
+            if (on && tankard == null && visual != null && visual.RightArm != null) tankard = LoadProps.Tankard(visual.RightArm);
+            if (tankard != null) tankard.SetActive(on);
+        }
+        /// <summary>
+        /// The out of work (the drinkers, and anyone whose trade this village has no place for) drink at the inn until the ale is gone or
+        /// they are. Past their limit some fold over the table where they sit and the rest say goodnight while they can; spent, they go
+        /// home to sleep it off until morning (with no home, they stay slumped at the table). False: the day's shift decides.
+        /// </summary>
+        bool DrinkerNext()
+        {
+            if (activity == "passedout" && !spent) { spent = true; Say("Ugh. My head. Who moved the floor?", 5); }   // come round, hours later
+            if (!spent && drunk >= tolerance)
+            {
+                if (activity == "inn" && (index % 5 < 2 || home == null)) { PassOut(); return true; }
+                spent = true; Say(LeavingLines[life.Next(LeavingLines.Length)], 5);
+            }
+            if (!spent) return false;
+            if (home == null) { if (activity == "inn" || activity == "passedout") { PassOut(); return true; } return false; }
+            activity = "sleepitoff"; Go(home.position); return true;
+        }
+        void PassOut()
+        {
+            activity = "passedout"; state = State.Activity; if (agent.isOnNavMesh) agent.isStopped = true;
+            ShowTankard(false); visual.Pose = ActorPose.Slump; until = Time.time + 280 + life.R01 * 220; Say("Zzz...", 6); nextBark = Time.time + 20;
+        }
+        /// <summary>A round at the inn: a tankard off the day's cask (the village's stock, "inn.ale") and a little further gone; when the
+        /// cask is dry they grumble and call it a day.</summary>
+        void DrinkRound()
+        {
+            state = State.Activity; if (agent.isOnNavMesh) agent.isStopped = true;
+            var look = life.LookFor(transform.position); if (look.HasValue) Face(look.Value);
+            until = Time.time + 16 + life.R01 * 22;
+            if (spent || !life.Take("inn.ale"))
+            {
+                visual.Pose = ActorPose.Sit; ShowTankard(false);
+                if (!spent) { spent = true; Say(DryLines[life.Next(DryLines.Length)], 5); until = Time.time + 8; }
+                return;
+            }
+            drunk += .07f + life.R01 * .05f; visual.Pose = ActorPose.Drink; ShowTankard(true);
+            float gone = drunk / Mathf.Max(.01f, tolerance); var lines = gone < .4f ? SoberLines : gone < .75f ? MerryLines : FarGoneLines;
+            if (life.R01 < .55f) Say(lines[life.Next(lines.Length)], 4);
         }
 
         // ---------- the hen-wife ----------
@@ -708,6 +780,7 @@ namespace Crulanda.Encounter
             {
                 if (danger) calmSince = Time.time;
                 else if (activity == "sleep") { if (!Bedtime || Interrupted) Emerge(); }
+                else if (activity == "sleepitoff") { if (WorldClock.Between(wakeAt, 10.5f)) Emerge(); }   // not before morning
                 else if (Coop != null && Interrupted) Emerge();   // hens before anything else at dusk
                 else if (Time.time - calmSince > (activity == "home" ? until - calmSince : 12)) Emerge();
                 return;
@@ -715,7 +788,7 @@ namespace Crulanda.Encounter
             if (state == State.Flee) { if (Arrived || Stranded) { activity = "fled"; Hide(); } return; }
             if (danger && Role != "drinker" || danger && life.EnemyNear(transform.position, 10)) { Flee(); return; }
             // Talking with the player: stand still and face them until the conversation ends, then carry on.
-            if (Attending)
+            if (Attending && !PassedOut)
             {
                 var to = life.Session.Player.transform.position - transform.position; to.y = 0;
                 if (to.sqrMagnitude > .01f) transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(to), Time.deltaTime * 6);
@@ -776,6 +849,7 @@ namespace Crulanda.Encounter
         }
         void BarkAtPlayer()
         {
+            if (PassedOut) { if (Time.time >= nextBark) { nextBark = Time.time + 18 + life.R01 * 14; Say(life.R01 < .7f ? "Zzz..." : "...'nother one...", 4); } return; }
             var player = life.Session.Player; if (player == null || !player.IsAlive || Time.time < nextBark) return;
             if ((player.transform.position - transform.position).sqrMagnitude < 16 && !life.Session.InCombat)
             {

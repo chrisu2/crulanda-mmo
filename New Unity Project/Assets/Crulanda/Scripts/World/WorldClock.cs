@@ -22,6 +22,11 @@ namespace Crulanda.World
         {
             get { float h = Hour; return h >= 12 ? Mathf.InverseLerp(18.5f, 20.5f, h) : 1 - Mathf.InverseLerp(5.5f, 7, h); }
         }
+        /// <summary>
+        /// What the hour and the weather leave of the zone's clear noon, as a tint for things drawn unlit (chimney smoke, falling
+        /// water, foam, mist): white at noon, dimmer under rain, a dim blue at night. Set each frame; white with no clock.
+        /// </summary>
+        public static Color Unlit { get; private set; } = Color.white;
         /// <summary>Skip forward (development key, capture tours).</summary>
         public static void Advance(float hours) { Hour = Mathf.Repeat(Hour + hours, 24); if (Instance != null) Instance.Apply(); }
 
@@ -47,8 +52,9 @@ namespace Crulanda.World
                 equator = ZoneColors.Parse(day.ambientEquator, Color.grey), ground = ZoneColors.Parse(day.ambientGround, Color.black), fog = ZoneColors.Parse(day.fogColor, Color.grey), exposure = day.skyExposure > 0 ? day.skyExposure : 1.05f };
             dawn = new Look { sun = new Color(1, .62f, .4f), intensity = .6f, sky = new Color(.5f, .45f, .55f), equator = new Color(.55f, .42f, .38f), ground = new Color(.22f, .18f, .16f), fog = new Color(.62f, .5f, .48f), exposure = .7f };
             dusk = new Look { sun = new Color(1, .5f, .28f), intensity = .55f, sky = new Color(.45f, .38f, .5f), equator = new Color(.5f, .34f, .3f), ground = new Color(.2f, .15f, .13f), fog = new Color(.55f, .4f, .38f), exposure = .6f };
-            // Moonlit night: a blue ambient floor so faces turned from the moon stay readable; the sky stays dark (exposure .3).
-            night = new Look { sun = new Color(.52f, .6f, .85f), intensity = .26f, sky = new Color(.2f, .24f, .36f), equator = new Color(.16f, .19f, .3f), ground = new Color(.08f, .09f, .13f), fog = new Color(.09f, .1f, .15f), exposure = .3f };
+            // Moonlit night: a clear blue moon and a blue ambient floor carry the night's colour (the grade no longer drains it), so
+            // faces turned from the moon stay readable; the sky stays dark (exposure .3).
+            night = new Look { sun = new Color(.45f, .6f, 1f), intensity = .4f, sky = new Color(.24f, .32f, .55f), equator = new Color(.18f, .24f, .42f), ground = new Color(.1f, .12f, .2f), fog = new Color(.09f, .1f, .15f), exposure = .3f };
             Apply();
         }
         /// <summary>Sky-only reflection probe (water and glossy surfaces reflect the current sky, not a fixed default one).</summary>
@@ -87,7 +93,7 @@ namespace Crulanda.World
             Shader.SetGlobalFloat("_NightGlow", dark);   // glowing flowers and mushrooms brighten after dark (Crulanda/Grass)
             // In a cave (Hollow) the skylight and the air darken with depth; its torches and fires light it.
             var view = Camera.main; float under = view != null ? Hollow.DepthAt(view.transform.position) : 0; Hollow.CameraDepth = under;
-            float loss = w.dim * Mathf.Lerp(.5f, 1, lit), lift = 1 + (.14f * w.dim - .2f * w.rain) * lit + flash * .7f;   // overcast skylight is bright; rain is gloomy
+            float loss = w.dim * Mathf.Lerp(.5f, 1, lit), lift = 1 + (.08f * w.dim - .45f * w.rain) * lit + flash * .7f;   // overcast skylight is a little bright; rain is gloomy, a storm dark
             // The same light plays sun by day and moon by night; it swings across the sky with the hour.
             bool moon = Hour >= 20.2f || Hour < 5.6f;
             // Noon height: the default arc, or the zone's own (sunHigh: Khaven's sun never climbs out of the evening).
@@ -103,13 +109,19 @@ namespace Crulanda.World
             RenderSettings.ambientGroundColor = Flat(look.ground, .3f * loss) * (1 + .5f * flash);
             float cave = Mathf.Lerp(1, .2f, under);
             RenderSettings.ambientSkyColor *= cave; RenderSettings.ambientEquatorColor *= cave; RenderSettings.ambientGroundColor *= cave;
+            // Unlit things take what is left of the light: the skylight and the sun or moon now against the zone's clear noon, a
+            // step lower at night, in half of the skylight's change of hue.
+            var amb = RenderSettings.ambientSkyColor; var noon = dayLook.sky; float ag = Mathf.Max(.01f, amb.grayscale), ng = Mathf.Max(.01f, noon.grayscale);
+            float left = Mathf.Clamp((ag + .5f * (look.intensity * (1 - .7f * loss) + flash * .45f)) / (ng + .5f * dayLook.intensity), 0, 1.2f) * (1 - .2f * dark);
+            var hue = new Color(Hue(amb.r / ag, noon.r / ng), Hue(amb.g / ag, noon.g / ng), Hue(amb.b / ag, noon.b / ng));
+            Unlit = new Color(Mathf.Lerp(1, hue.r, .5f) * left, Mathf.Lerp(1, hue.g, .5f) * left, Mathf.Lerp(1, hue.b, .5f) * left, 1);
             var fog = Color.Lerp(Weathered(look.fog, w, lit), new Color(.05f, .045f, .04f, look.fog.a), .9f * under);   // smoky cave air
             RenderSettings.fogColor = fog;
             // The fog closes in with the weather, never nearer than 55 m at its far end (enemies stay in sight).
             RenderSettings.fogStartDistance = Mathf.Lerp(day.fogStart * w.fog, 1.5f, under); RenderSettings.fogEndDistance = Mathf.Lerp(Mathf.Max(day.fogEnd * w.fog, Mathf.Min(day.fogEnd, 55)), 34, under);
             if (sky != null)
             {
-                float exposure = look.exposure * (1 - .3f * w.dim) * (1 + flash);
+                float exposure = look.exposure * (1 - .3f * w.dim) * (1 - .25f * w.rain) * (1 + flash);
                 sky.SetFloat("_Exposure", exposure);
                 // Night sky: deep blue, thin atmosphere, a small pale moon disc instead of the sun. Cloud greys the sky's tint, thins
                 // its scattering (a thick atmosphere turns the horizon orange: a sunny glow under a rain sky) and hides the sun or moon.
@@ -134,24 +146,52 @@ namespace Crulanda.World
         /// <summary>A colour pulled toward its own grey by <paramref name="k"/> (0: as it is, 1: grey).</summary>
         static Color Flat(Color c, float k) { float g = c.grayscale; return Color.Lerp(c, new Color(g, g, g, c.a), k); }
         /// <summary>
-        /// The fog (the air) under the weather: cloud greys and cools it; rain darkens it by day; mist pales it; an ash squall
-        /// dulls it to dun; snow brightens it. Night keeps its own dark blue, only greyed.
+        /// The fog (the air) under the weather: cloud greys and cools it; rain turns it to slate and darkens it by day (a storm by
+        /// a third); mist pales it; an ash squall dulls it to dun; snow brightens it. Night keeps its own dark blue, only greyed.
         /// </summary>
         static Color Weathered(Color fog, WeatherLook w, float lit)
         {
             float g = fog.grayscale;
             var c = Color.Lerp(fog, new Color(g * .97f, g * .99f, g * 1.04f, fog.a), .6f * w.dim);
-            c *= 1 - .14f * w.rain * lit;
+            c = Color.Lerp(c, new Color(g * .9f, g * .97f, g * 1.1f, fog.a), .5f * w.rain * lit) * (1 - .34f * w.rain * lit);
             c = Color.Lerp(c, Color.Lerp(c, Color.white, .22f), .7f * w.mist * lit);
             c = Color.Lerp(c, new Color(g * 1.06f, g, g * .9f, fog.a), .45f * w.ash);
             c = Color.Lerp(c, Color.Lerp(c, new Color(.92f, .95f, 1f), .25f), .6f * w.snow * lit);
             c.a = fog.a; return c;
         }
-        void OnDestroy() { if (Instance == this) Instance = null; }
+        /// <summary>One channel's change of hue, now against noon, kept within a sane band (a zone's noon skylight may lack a channel).</summary>
+        static float Hue(float now, float noon) { return Mathf.Clamp(now / Mathf.Max(.05f, noon), .5f, 1.6f); }
+        void OnDestroy() { if (Instance == this) { Instance = null; Unlit = Color.white; } }
     }
 
     /// <summary>A light that changes with the hour (lamps are dark by day, lit at night).</summary>
     public sealed class NightLight { public Light light; public float dayIntensity, nightIntensity; }
+
+    /// <summary>
+    /// Unlit effects in the hour's light: chimney smoke, a waterfall's foam and mist. Their shader takes no light, so at night they
+    /// showed at their daytime brightness and bloomed. Each is tinted with the colour it was made with times
+    /// <see cref="WorldClock.Unlit"/>; a particle system takes it on the particles it emits from then on.
+    /// </summary>
+    public sealed class HourTint : MonoBehaviour
+    {
+        readonly System.Collections.Generic.List<Material> mats = new System.Collections.Generic.List<Material>();
+        readonly System.Collections.Generic.List<ParticleSystem> systems = new System.Collections.Generic.List<ParticleSystem>();
+        readonly System.Collections.Generic.List<Color> matTints = new System.Collections.Generic.List<Color>(), systemTints = new System.Collections.Generic.List<Color>();
+        Color shown = new Color(-1, -1, -1);
+        /// <summary>A material of its own (not a shared asset) on the particle shader: its _TintColor follows the hour.</summary>
+        public void Add(Material m) { if (m == null || !m.HasProperty("_TintColor")) return; mats.Add(m); matTints.Add(m.GetColor("_TintColor")); shown.r = -1; }
+        /// <summary>A particle system whose start colour is already set: it follows the hour.</summary>
+        public void Add(ParticleSystem ps) { if (ps == null) return; systems.Add(ps); systemTints.Add(ps.main.startColor.color); shown.r = -1; }
+        /// <summary><paramref name="c"/> in the hour's light (its alpha kept).</summary>
+        public static Color Of(Color c) { var u = WorldClock.Unlit; return new Color(c.r * u.r, c.g * u.g, c.b * u.b, c.a); }
+        void LateUpdate()
+        {
+            var u = WorldClock.Unlit; if (Mathf.Abs(u.r - shown.r) + Mathf.Abs(u.g - shown.g) + Mathf.Abs(u.b - shown.b) < .004f) return;
+            shown = u;
+            for (int i = 0; i < mats.Count; i++) if (mats[i] != null) mats[i].SetColor("_TintColor", Of(matTints[i]));
+            for (int i = 0; i < systems.Count; i++) if (systems[i] != null) { var main = systems[i].main; main.startColor = Of(systemTints[i]); }
+        }
+    }
 
     /// <summary>A chicken coop: hens roost inside at night. The hen-wife opens it in the morning and shuts it at dusk.</summary>
     public sealed class ZoneCoop

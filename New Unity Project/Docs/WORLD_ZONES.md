@@ -174,6 +174,10 @@ mood. How it was made: a first draft was pre-checked by agents who ported the ge
 - **Sky, light and ground** (zone JSON `lighting`, `ZonePost` grades, the meadow ground palette): Oakhaven a blue sky, a greener
   meadow and bluer distance; the Peaks crisp alpine blue with a warm sun; Khaven keeps its dusk with the warm sun split from the
   violet shade; the Ash Rim keeps its grey with deeper shadow and a little more distance.
+- **Built stone** (part 5; `Dressed`, `Ashlar`, `Stonework`, `ZoneMeshes.Spire`): towers as one turned masonry drum with a plinth
+  course and a corbel ring under the battlements, slate spire roofs, arrow slits; curtain walls, the gate and the keep as one
+  joined masonry mesh each with coping and merlons; crypts, ruins, wayshrines and the Cracked Hearth's chimney in coursed stone;
+  headstones, waystones and altars as painted rock (five courses on a headstone read as a toy pillar).
 - **Chunky props** (part 4; `PropMesh`, `Turned`, `Cutout`, `Stake`, `Barrel`, `Crate`, `Wheel`, `Signpost`): hewn capped fence
   posts with lapped rails that follow each post's lean; carts with spoked wheels, side boards and shafts; lamp posts on a masonry
   footing with an iron bracket and a roofed lantern; the well as a turned masonry ring with a roofed windlass, rope and bucket;
@@ -518,6 +522,14 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
     (and a child fetches a loaf for Mum); the elders sit on the green and at the inn; drinkers drink.
   - A trade whose errand needs a place the village lacks (no mill, no tannery) skips it for the day. Deliveries go to the
     place where someone of that trade is working now (the stall with the merchant behind it), else any of that kind.
+  - **The out of work drink** (Chris, 2026-10-01: "have unemployed npc show up at the inn and drink till gone or passed out"):
+    the drinkers, and anyone whose trade this village has no place for (a smith with no forge, a farmer with no fields: in a
+    village with an inn they become drinkers), loiter the morning away and are at the inn from 11:00. Each round is a tankard off
+    the day's cask (`inn.ale` in the village's stock: ten left from yesterday each dawn, twelve more when the merchant brings "a
+    cask for the inn" at 08:36), drunk sitting with the tankard in hand (`ActorPose.Drink`), and leaves them a little further gone;
+    their talk slurs with it. When the cask is dry they grumble and call it a day. Past their limit (it differs by person) some
+    fold over the table and snore for three to five hours (`ActorPose.Slump`; "Zzz..." is all you get from them), the rest say
+    goodnight and reel home (`ActorVisual.Stagger`); spent, they stay indoors until morning. `VillageDrinkTests`.
   - Tests: `VillageWorkTests` (every trade's day covers its hours; every errand runs between known places in a window and
     carries a good; the hen-wife's seven) and `VillageErrandTests` (eggs reach the inn in a basket you can see and the merchant
     sells them on; water fills the pan and the hens come; the farmer's barley reaches the mill).

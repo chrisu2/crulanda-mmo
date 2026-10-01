@@ -673,3 +673,16 @@ A read-only review by five reviewers, each finding checked by a second who tried
   fixed: roof textures smeared up the slope (the roof's UV used |z| + y, which is constant up a 45 degree roof); the rock's
   joints made cliffs read as dry-stone walls.
 - The zone layouts are unchanged (the random stream is untouched) and so is everything gameplay stands on.
+
+## 2026-10-01 — Painted masonry, and the out of work at the inn
+- **Built stone:** towers, curtain walls, the toll gate, the keep, crypts, ruins and wayshrines in painted coursed masonry (turned
+  drums with plinth and corbel courses, slate spires, coping); headstones and waystones in painted rock.
+- **The out of work drink at the inn** (Chris: "have unemployed npc show up at the inn and drink till gone or passed out"): the
+  drinkers, and any trade a village has no workplace for, are at the inn from 11:00, a tankard in hand, drinking the day's cask
+  (the merchant brings a fresh one each morning). When the ale is gone they go home; past their limit some pass out over the table
+  and the rest reel home to sleep it off.
+- **The first batch of the visual review's worklist** (four reviewers looked at every capture of the published painted pass and
+  ranked what still falls short; `tools/wip/painted/visual_review.md`): Oakhaven's haze turned to blue air; storms that darken
+  the day; night with firelit windows and a moonlit blue base instead of bleached white on mud; broadleaf crowns built of leafy
+  lumps instead of one brown ball; a greener, denser meadow whose tufts fade out with distance; hedges and haystacks with shape;
+  gable ends that are wall, with barge boards and a tie beam, instead of roof.

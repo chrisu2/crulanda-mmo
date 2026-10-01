@@ -78,7 +78,7 @@ namespace Crulanda.World
                     : Zone.biome == "meadow" ? art.grass.Select(m => new Material(m) { name = m.name + " (meadow)", color = Color.Lerp(m.color, new Color(.34f, .6f, .2f), .4f), enableInstancing = true }).ToArray()
                     : Zone.biome == "mountain" ? art.grass.Select(m => new Material(m) { name = m.name + " (alpine)", color = Color.Lerp(m.color, new Color(.3f, .5f, .25f), .35f), enableInstancing = true }).ToArray()
                     : grass;
-                gameObject.AddComponent<GrassField>().Build(this, lush, Gloom ? null : art.flowers, Openness, Zone.seed + 99, Zone.biome == "meadow" ? 2.3f : Zone.biome == "verdant" ? 2.8f : 1.6f, TallGrassPatches(), tall, Gloom ? .8f : Zone.biome == "verdant" ? 1.25f : 1, Gloom ? .7f : 1);
+                gameObject.AddComponent<GrassField>().Build(this, lush, Gloom ? null : art.flowers, Openness, Zone.seed + 99, Zone.biome == "meadow" ? 3f : Zone.biome == "verdant" ? 2.8f : 1.6f, TallGrassPatches(), tall, Gloom ? .8f : Zone.biome == "verdant" ? 1.25f : 1, Gloom ? .7f : 1);
             }
             Lap("grass");
             if (art.fern != null || art.broadLeaf != null || art.reeds != null) gameObject.AddComponent<PlantField>().Build(this, art, Gloom ? null : art.flowers, Openness, Zone.seed + 177);
@@ -443,7 +443,7 @@ namespace Crulanda.World
             // Green is held level with red so the rose light doesn't turn them mauve.
             if (gloom) { dirt = new Color(.235f, .23f, .205f); rut = new Color(.175f, .172f, .155f); }
             if (Zone.biome == "mountain") { dirt = new Color(.4f, .35f, .28f); rut = new Color(.31f, .27f, .21f); }   // yards and roads a shade darker in the hard light
-            if (Zone.biome == "meadow") { grassA = new Color(.22f, .40f, .16f); grassB = new Color(.35f, .47f, .19f); grassC = new Color(.50f, .44f, .20f); dirt = new Color(.49f, .39f, .25f); rut = new Color(.36f, .28f, .19f); }   // Oakhaven: fresh pasture green with late-summer gold patches; warm trodden earth
+            if (Zone.biome == "meadow") { grassA = new Color(.25f, .48f, .17f); grassB = new Color(.37f, .58f, .21f); grassC = new Color(.50f, .44f, .20f); dirt = new Color(.49f, .39f, .25f); rut = new Color(.36f, .28f, .19f); }   // Oakhaven: fresh pasture green with late-summer gold patches; warm trodden earth
             bool verdant = Zone.biome == "verdant";
             if (verdant)
             {
@@ -500,7 +500,7 @@ namespace Crulanda.World
                         // A sixth darker again than step 2's (sunlit crags still read ~140 of 255 in the tour; the aim is 110-130).
                         Color rockC = Color.Lerp(new Color(.195f, .186f, .178f), new Color(.278f, .262f, .245f), n2) * shade;
                         Color scree = Color.Lerp(new Color(.288f, .262f, .22f), new Color(.346f, .312f, .262f), (n2 + n3) * .5f) * shade;
-                        Color alp = Color.Lerp(new Color(.24f, .36f, .17f), new Color(.38f, .41f, .2f), n1);
+                        Color alp = Color.Lerp(new Color(.26f, .41f, .18f), new Color(.38f, .46f, .21f), n1);   // a step toward the alpine tufts' green, so they sit in turf
                         c = Color.Lerp(alp, Color.Lerp(scree, rockC, Mathf.Clamp01(steep * 1.4f + (n1 - .5f) * .8f)), rock) * (.91f + n3 * .12f);
                     }
                     else if (ashen)
@@ -948,8 +948,8 @@ namespace Crulanda.World
                     case "tree": Broadleaf(t, p.variant); break;
                     case "pine": Pine(t); break;
                     case "fence": Fence(t, p.size.x > 0 ? p.size.x : 8); break;
-                    case "hedge": Part(PrimitiveType.Cube, t, new Vector3(0, .7f, 0), new Vector3(p.size.x > 0 ? p.size.x : 6, 1.4f, 1.2f), Tint(art.foliage, new Color(.22f, .30f, .16f))); Solid(t, new Vector3(0, .7f, 0), new Vector3(p.size.x > 0 ? p.size.x : 6, 1.4f, 1.2f)); break;
-                    case "haystack": Part(PrimitiveType.Sphere, t, new Vector3(0, .9f, 0), new Vector3(2.6f, 2.2f, 2.6f), art.hay); Solid(t, new Vector3(0, 1, 0), new Vector3(2.4f, 2, 2.4f)); break;
+                    case "hedge": Hedge(t, p.size.x > 0 ? p.size.x : 6); break;
+                    case "haystack": Haystack(t); break;
                     case "cart": Cart(t); break;
                     case "barrels": for (int i = 0; i <= p.variant % 3; i++) Barrel(t, new Vector3(i * .75f - .4f, 0, (i % 2) * .6f), i == 1 ? .9f : 1, i * 70); Solid(t, new Vector3(0, .5f, .3f), new Vector3(2.2f, 1, 1.4f)); break;
                     case "crates": for (int i = 0; i <= p.variant % 3; i++) Crate(t, new Vector3(i == 2 ? -.05f : i * .9f - .5f, i == 2 ? 1.19f : .41f, 0), i == 2 ? .7f : .82f, i == 2 ? 24 : i * 9 - 4); Solid(t, new Vector3(0, .5f, 0), new Vector3(2.2f, 1, 1)); break;   // the third crate rests across the two below, not on air
@@ -1090,6 +1090,41 @@ namespace Crulanda.World
             Part(PrimitiveType.Cube, t, new Vector3(0, top + roofH + .05f - (sag + .07f) / 2, 0), new Vector3(w + 1.3f, sag + .07f, .34f), roofMat == art.slate ? dark : Tint(art.thatch, new Color(.6f, .48f, .26f)));   // ridge cap: its bottom edges sink 2 cm into the slopes
         }
         /// <summary>
+        /// The two gable ends of a walled building under an open gable roof (ZoneMeshes.GableRoof with a verge): the wall carried
+        /// up to the roof in <paramref name="wall"/>, its texture running on from the wall below (<paramref name="tile"/> metres a
+        /// tile); a dark cheek that closes the corner under each eave, beside the wall; a barge board down each verge, so the
+        /// roof's edge reads thick; and, with <paramref name="beam"/> above 0 (the timbers' depth), a tie beam on the wall top
+        /// with a king post and a collar over it. <paramref name="face"/> is the gable walls' outer face (x) and
+        /// <paramref name="d"/> their width, <paramref name="top"/> the wall top, <paramref name="run"/> half the roof's depth,
+        /// <paramref name="end"/> half its length and <paramref name="slab"/> its thickness. For the eye only: no colliders.
+        /// </summary>
+        void Gables(Transform t, float face, float d, float top, float roofH, float run, float end, Material wall, float tile, float beam, float slab = .25f)
+        {
+            var dark = Tint(art.timber, new Color(.26f, .17f, .11f));
+            var infill = ZoneMeshes.Gable(d, roofH, .3f, tile, run - d / 2, top);
+            var cheeks = ZoneMeshes.Gable(run * 2, roofH + slab, .06f, 1, run * slab / roofH); cheeks.name = "Eave cheeks";   // from the soffit up: the same slope, upright for the slab's depth at each eave
+            float slope = Mathf.Sqrt(run * run + roofH * roofH), pitch = Mathf.Atan2(roofH, run) * Mathf.Rad2Deg, board = Mathf.Min(.3f, roofH * .2f);
+            foreach (int sx in new[] { -1, 1 })
+            {
+                var turn = Quaternion.Euler(0, sx * 90, 0);   // the meshes' +z face looks out
+                MeshPart(infill, t, new Vector3(sx * (face - .15f), top, 0), wall, turn);       // face-.3 .. face
+                MeshPart(cheeks, t, new Vector3(sx * (face - .05f), top - slab, 0), dark, turn);   // face-.08 .. face-.02: inside the wall, seen only past its corners
+                if (beam > 0)
+                {
+                    float post = roofH * (1 - beam * .45f / run) - beam / 2, half = run * (.5f - beam * .4f / roofH);   // the post's head and the collar's ends stop on the slope
+                    Part(PrimitiveType.Cube, t, new Vector3(sx * (face + .02f), top, 0), new Vector3(.12f, beam, d), art.timber);                                   // tie beam: face-.04 .. face+.08
+                    Part(PrimitiveType.Cube, t, new Vector3(sx * (face + .02f), top + beam / 2 + post / 2, 0), new Vector3(.12f, post, beam * .9f), art.timber);   // king post, standing on it
+                    Part(PrimitiveType.Cube, t, new Vector3(sx * (face + .02f), top + roofH * .5f, 0), new Vector3(.1f, beam * .8f, half * 2), art.timber);       // collar: 1 cm behind the post's face
+                }
+                // Barge boards: 3 cm above the slope and hanging down from it, from 3 cm past the ridge (the two cross there) to 12 cm past the eave; end-.02 .. end+.06, 1 cm proud of the fascia's end.
+                foreach (int sz in new[] { -1, 1 })
+                {
+                    var down = new Vector3(0, -roofH, sz * run) / slope; var up = new Vector3(0, run, sz * roofH) / slope;
+                    Part(PrimitiveType.Cube, t, new Vector3(sx * (end + .02f), top + roofH / 2, sz * run / 2) + down * .045f - up * (board / 2 - .03f), new Vector3(.08f, board, slope + .15f), dark, Quaternion.Euler(sz * pitch, 0, 0));
+                }
+            }
+        }
+        /// <summary>
         /// A framed window on a wall: <paramref name="face"/> is the point on the OUTER WALL FACE at the window's centre and
         /// <paramref name="sz"/> the way that face looks (+1 or -1 along z). Frame, sill and shutters are all set into the wall
         /// by 1 to 2 cm. <paramref name="glass"/> is false where the wall already has its pane (the inn's passes through the wall).
@@ -1157,8 +1192,9 @@ namespace Crulanda.World
                     Window(t, new Vector3(x, .6f + wallHeight * .78f, sz * d / 2), .8f, .7f, sz, variant, false);
             }
             float roofH = Mathf.Max(2.2f, d * .55f);
-            MeshPart(ZoneMeshes.GableRoof(w + 1.2f, d + 1.4f, roofH), t, new Vector3(0, top, 0), roofMat);
+            MeshPart(ZoneMeshes.GableRoof(w + 1.2f, d + 1.4f, roofH, .25f, .6f), t, new Vector3(0, top, 0), roofMat);
             Eaves(t, w, d, top, roofH, roofMat);
+            Gables(t, w / 2, d, top, roofH, d / 2 + .7f, w / 2 + .6f, plaster, 2, .22f);   // plaster to the ridge, framed like the walls
             BoxPart(t, new Vector3(w / 2 - 1.1f, top + roofH * .75f, d * .15f), new Vector3(.9f, roofH * 1.1f, .9f), Masonry, null, 1);
             BoxPart(t, new Vector3(w / 2 - 1.1f, top + roofH * 1.3f + .04f, d * .15f), new Vector3(1.1f, .12f, 1.1f), Tint(Masonry, new Color(.45f, .44f, .4f)), null, 1);   // the chimney's cap, 2 cm down over the stack
             if (art.particle != null) Smoke(t, new Vector3(w / 2 - 1.1f, top + roofH * 1.35f, d * .15f));
@@ -1229,8 +1265,9 @@ namespace Crulanda.World
                     Window(t, new Vector3(x, storey + 1.3f, sz * (d / 2 + wall / 2)), .8f, .7f, sz, variant, false, false);
                 }
             float roofH = Mathf.Max(2.4f, d * .5f);
-            MeshPart(ZoneMeshes.GableRoof(w + 1.2f, d + 1.4f, roofH), t, new Vector3(0, H, 0), variant % 2 == 0 ? art.thatch : art.slate);
+            MeshPart(ZoneMeshes.GableRoof(w + 1.2f, d + 1.4f, roofH, .25f, .6f - wall / 2), t, new Vector3(0, H, 0), variant % 2 == 0 ? art.thatch : art.slate);
             Eaves(t, w, d, H, roofH, variant % 2 == 0 ? art.thatch : art.slate);
+            Gables(t, w / 2 + wall / 2, d + wall, H, roofH, d / 2 + .7f, w / 2 + .6f, plaster, 2, .22f);   // the end walls' outer faces, out to the front and back walls' faces
             if (variant == 1) CrackedHearth(t, w, H, roofH);   // the Cracked Hearth: its chimney breast split, the fire showing through
             else
             {
@@ -1279,7 +1316,7 @@ namespace Crulanda.World
             Part(PrimitiveType.Cylinder, t, new Vector3(w / 2 - 1.2f, .5f, -d / 2 - 1), new Vector3(.8f, .5f, .8f), art.timber);
             var glow = new GameObject("Inn lantern").AddComponent<Light>(); glow.transform.SetParent(t, false);
             glow.transform.localPosition = new Vector3(0, 2.6f, -d / 2 - 1.2f); glow.type = LightType.Point; glow.range = 8; glow.intensity = 1.4f; glow.color = new Color(1, .72f, .4f);
-            NightLights.Add(new NightLight { light = glow, dayIntensity = 1.4f, nightIntensity = 2.2f });
+            NightLights.Add(new NightLight { light = glow, dayIntensity = .6f, nightIntensity = 2.2f });   // faint by day: at 1.4 it bloomed to a pale blob on the plaster
         }
         /// <summary>
         /// The Cracked Hearth (inn variant 1): a stone chimney breast on the hearth gable (+X), split from its glowing ash-pit
@@ -1323,8 +1360,9 @@ namespace Crulanda.World
             Part(PrimitiveType.Cube, t, new Vector3(0, 1.6f, -d / 2 - .12f), new Vector3(3.3f, .2f, .06f), art.timber, Quaternion.Euler(0, 0, 44));
             Part(PrimitiveType.Cube, t, new Vector3(0, 1.6f, -d / 2 - .12f), new Vector3(3.3f, .2f, .06f), art.timber, Quaternion.Euler(0, 0, -44));
             float roofH = d * .5f;
-            MeshPart(ZoneMeshes.GableRoof(w + 1, d + 1.4f, roofH), t, new Vector3(0, h, 0), art.thatch);
+            MeshPart(ZoneMeshes.GableRoof(w + 1, d + 1.4f, roofH, .25f, .5f), t, new Vector3(0, h, 0), art.thatch);
             Eaves(t, w - .2f, d, h, roofH, art.thatch);   // the barn's roof is 1 m wider than its walls, not 1.2
+            Gables(t, w / 2, d, h, roofH, d / 2 + .7f, w / 2 + .5f, boards, d, .2f);   // boards to the ridge: the wall below is a cube, one tile across its width
             Solid(t, new Vector3(0, (h + roofH) / 2, 0), new Vector3(w + .3f, h + roofH, d + .3f));
         }
         /// <summary>
@@ -1341,7 +1379,8 @@ namespace Crulanda.World
             Part(PrimitiveType.Cylinder, t, new Vector3(0, .6f, 0), new Vector3(1.62f, .02f, 1.62f), water);   // down in the shaft
             foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(s * 1, 1.55f, 0), new Vector3(.22f, 2.4f, .22f), dark);
             Part(PrimitiveType.Cube, t, new Vector3(0, 2.68f, 0), new Vector3(2.5f, .14f, .2f), dark);         // tie beam, its ends past the posts
-            MeshPart(ZoneMeshes.GableRoof(2.8f, 2.2f, 1f, .1f), t, new Vector3(0, 2.75f, 0), art.slate, Quaternion.Euler(0, 90, 0));
+            MeshPart(ZoneMeshes.GableRoof(2.8f, 2.2f, 1f, .1f), t, new Vector3(0, 2.75f, 0), art.slate, Quaternion.Euler(0, 90, 0));   // on posts, no wall under it: closed ends
+            foreach (int s in new[] { -1, 1 }) MeshPart(PropMesh("Well gable", () => ZoneMeshes.Gable(2.2f, 1, .04f, 1)), t, new Vector3(0, 2.75f, s * 1.41f), dark);   // boarded over: 3 cm proud of each end
             Part(PrimitiveType.Cylinder, t, new Vector3(0, 1.9f, 0), new Vector3(.24f, .89f, .24f), art.timber, Quaternion.Euler(0, 0, 90));   // windlass drum
             Part(PrimitiveType.Cylinder, t, new Vector3(.2f, 1.9f, 0), new Vector3(.33f, .15f, .33f), rope, Quaternion.Euler(0, 0, 90));       // the rope wound on it
             Rod(t, new Vector3(.2f, 1.78f, 0), new Vector3(.2f, 1.36f, 0), .04f, rope);
@@ -1471,9 +1510,11 @@ namespace Crulanda.World
                 Limb(t, from, end, r0 * (.44f + T() * .1f), .06f, bark);
                 ends.Add(end);
             }
-            // A full crown: three cards a cluster, ten to fourteen clusters, three or four lying under it, and a dark core about
-            // 60% of the crown's radius (the crown reaches about 3.4 m from its heart), so from below it is leaf mass, not sky.
-            LeafCrown(t, tr, lean + new Vector3(0, h + 1.5f, 0), spots, ends, LeafMaterial(family), bark, Tint(art.foliage, Wither(Color.Lerp(Leaf[family], Color.black, .45f))), 1.5f, new Vector3(4, 2.3f, 4), 3, 10, 14, 3, 4);
+            // A full crown: a leaf-coloured lump at every clump spot, in the family's own deep, mid and light (the Great Oak's way:
+            // a billowed mass, never a brown ball), three cards a cluster as its ragged fringe, ten to fourteen clusters, three or
+            // four lying under it, and a small core in the family's shade at the heart, so from below it is leaf mass, not sky.
+            var core = Tint(art.foliage, Wither(Color.Lerp(LeafMass[family][0], new Color(.14f, .22f, .1f), .5f)));
+            LeafCrown(t, tr, lean + new Vector3(0, h + 1.5f, 0), spots, ends, LeafMaterial(family), bark, core, 1.5f, new Vector3(2.6f, 1.5f, 2.6f), 3, 10, 14, 3, 4, LeafMassOf(family), .95f);
             var cap = t.gameObject.AddComponent<CapsuleCollider>(); cap.center = new Vector3(0, h / 2, 0); cap.height = h; cap.radius = .35f;
             t.gameObject.AddComponent<NavBlocker>(); t.gameObject.AddComponent<TreeFade>();
         }
@@ -1488,9 +1529,13 @@ namespace Crulanda.World
         /// had (a fan is centred a little past its spot, reaching where the clump's rim was), so a tree's bounds, fade and collider
         /// are as before. One mesh for the cards and one for the boughs. Draws only from <paramref name="tr"/>, the tree's own
         /// stream, after its trunk and limbs, the extras' draws after the ones a plain crown takes: the zone's is untouched.
+        /// With <paramref name="mass"/> (deep, mid and light leaf, LeafMassOf) the crown has a body: a rounded lump at every clump
+        /// spot, <paramref name="massSize"/> of the clump across and drawn a fifth of the way in to the heart, so they run together
+        /// into one billowed mass in the leaf's own colour and the cards (<paramref name="cardSize"/> of the clump) are its
+        /// ragged edge. The top and the light spots take the light leaf, the low ones the deep. Drawn last of all from the stream.
         /// </summary>
         void LeafCrown(Transform t, System.Random tr, Vector3 heart, List<(Vector3 at, float size, bool light)> spots, List<Vector3> ends, Material leaves, Material bark, Material core, float rim, Vector3 coreSize,
-            int cardsPer = 2, int crownMin = 0, int crownMax = 0, int underMin = 0, int underMax = 0)
+            int cardsPer = 2, int crownMin = 0, int crownMax = 0, int underMin = 0, int underMax = 0, Material[] mass = null, float cardSize = .8f, float massSize = .68f)
         {
             float T() { return (float)tr.NextDouble(); }
             var cards = new ZoneMeshes.Cards(); var boughs = new List<CombineInstance>();
@@ -1530,7 +1575,7 @@ namespace Crulanda.World
                 float R(float s, float a) { return Mathf.Lerp(.055f, .022f, s) * Mathf.Clamp01((1.05f - s) / .1f); }
                 boughs.Add(new CombineInstance { mesh = ZoneMeshes.Tube(C, R, new[] { 0, .3f, .6f, .85f, 1.05f }, 5, side.normalized, 1, l * .5f), transform = Matrix4x4.identity });
             }
-            foreach (var spot in spots) Cluster(spot.at, spot.size * .8f, Shade(spot.light ? 2 : 1, T()), true);
+            foreach (var spot in spots) Cluster(spot.at, spot.size * cardSize, Shade(spot.light ? 2 : 1, T()), true);
             // Low fillers round the rim between the side clusters: small, deep in shade, on no bough (they hang among the others).
             int fill = 2 + (int)(T() * 2);
             for (int k = 0; k < fill; k++) { float a = T() * Mathf.PI * 2; Cluster(heart + new Vector3(Mathf.Cos(a) * rim, -.9f + T() * .5f, Mathf.Sin(a) * rim), rim * 1.2f + T() * .4f, Shade(0, T()), false); }
@@ -1564,6 +1609,73 @@ namespace Crulanda.World
             // The core: a dark squashed clump at the heart, seen only through the gaps and from below.
             var coreMesh = canopies != null ? canopies[(int)(T() * 6) % 6] : null;
             if (coreMesh != null) Lump(coreMesh, t, heart - new Vector3(0, .3f, 0), coreSize, core, T() * 360);
+            // The leaf mass: a lump at every clump spot (the first is the crown's top).
+            if (mass == null || mass.Length < 3) return;
+            for (int i = 0; i < spots.Count; i++)
+            {
+                var spot = spots[i]; float wide = spot.size * (massSize + T() * .1f);
+                var size = new Vector3(wide, spot.size * (massSize * .65f + T() * .08f), wide * (.92f + T() * .16f));
+                Lump(LeafLumpAt((int)(T() * 6)), t, Vector3.Lerp(spot.at, heart, .2f), size, mass[i == 0 || spot.light ? 2 : spot.at.y < heart.y ? 0 : 1], T() * 360).name = "Leaf mass";
+            }
+        }
+        /// <summary>A crown's leaf mass by leaf family (Leaf[]): deep, mid and light, taken from the family's painted card (fresh green,
+        /// yellow-green, autumn orange, dull gold), so a crown's body is the colour of its leaves.</summary>
+        static readonly Color[][] LeafMass = {
+            new[] { new Color(.20f, .33f, .12f), new Color(.27f, .42f, .15f), new Color(.34f, .50f, .18f) },
+            new[] { new Color(.33f, .38f, .11f), new Color(.46f, .48f, .13f), new Color(.56f, .56f, .16f) },
+            new[] { new Color(.50f, .22f, .07f), new Color(.64f, .30f, .08f), new Color(.76f, .42f, .11f) },
+            new[] { new Color(.34f, .34f, .11f), new Color(.45f, .44f, .13f), new Color(.54f, .52f, .16f) } };
+        /// <summary>A leaf family's mass materials (deep, mid, light), greyed in gloom.</summary>
+        Material[] LeafMassOf(int family) { var c = LeafMass[Mathf.Abs(family) % LeafMass.Length]; return new[] { Tint(art.foliage, Wither(c[0])), Tint(art.foliage, Wither(c[1])), Tint(art.foliage, Wither(c[2])) }; }
+        Mesh[] leafLumps;
+        /// <summary>A rounded leafy lump by index, no zone draw (crowns' masses, hedges, loose hay): a blob a little lumpier and lighter
+        /// (8 x 12) than a canopy, since a crown takes five to seven.</summary>
+        Mesh LeafLumpAt(int i) { if (leafLumps == null) { leafLumps = new Mesh[6]; for (int k = 0; k < 6; k++) leafLumps[k] = ZoneMeshes.Blob(Zone.seed + 950 + k * 19, .6f, false, 8, 12); } return leafLumps[((i % 6) + 6) % 6]; }
+        /// <summary>
+        /// A hedge along x: a row of overlapping rounded leafy lumps in two greens, smaller and lighter ones along its top and a few
+        /// sprays of painted leaf standing out of it, inside the box it always was (<paramref name="length"/> x 1.4 x 1.2 m: its
+        /// collider, unchanged). Its shape comes from a stream keyed to where it stands: the zone's draws are untouched.
+        /// </summary>
+        void Hedge(Transform t, float length)
+        {
+            var hr = TreeRandom(t.position); float H() { return (float)hr.NextDouble(); }
+            var greens = new[] { Tint(art.foliage, Wither(new Color(.19f, .32f, .12f))), Tint(art.foliage, Wither(new Color(.25f, .39f, .14f))), Tint(art.foliage, Wither(new Color(.31f, .45f, .17f))) };
+            bool cardArt = art.leafCards != null && art.leafCards.Length > 0; var cards = new ZoneMeshes.Cards();
+            int n = Mathf.Max(2, Mathf.RoundToInt(length / .8f)); float step = Mathf.Max(0, length - 1.6f) / (n - 1);
+            for (int i = 0; i < n; i++)
+            {
+                float x = -length / 2 + .8f + i * step, wide = 1.45f + H() * .3f, high = 1.3f + H() * .3f;
+                if (length < 1.6f) x = 0;
+                Lump(LeafLumpAt((int)(H() * 6)), t, new Vector3(x, high * .46f, (H() - .5f) * .14f), new Vector3(wide, high, 1.1f + H() * .2f), greens[i % 2], H() * 360).name = "Hedge";
+                if (i % 2 == 0) continue;
+                // Every other lump: a small light one on top, and a spray of leaf leaning out of it.
+                Lump(LeafLumpAt((int)(H() * 6)), t, new Vector3(x + (H() - .5f) * .3f, 1.1f + H() * .12f, (H() - .5f) * .3f), new Vector3(.85f + H() * .25f, .6f, .8f + H() * .2f), greens[2], H() * 360).name = "Hedge";
+                var along = new Vector3((H() - .5f) * .8f, 1, (H() - .5f) * 1.2f).normalized; var across = Quaternion.AngleAxis(H() * 180, along) * Vector3.Cross(along, Vector3.forward).normalized;
+                float size = .6f + H() * .25f; var foot = new Vector3(x + (H() - .5f) * .4f, 1.02f, (H() - .5f) * .5f);
+                if (cardArt) cards.AddCross(foot, along, across, size, size * .95f, new Vector3(x, .5f, 0), .3f, new Color(.8f, .86f, .78f) * (.9f + H() * .15f));
+            }
+            if (cards.Count > 0) MeshPart(cards.Build("Hedge leaves"), t, Vector3.zero, LeafMaterial(art.leafCards[0], new Color(.72f, .8f, .64f)));
+            Solid(t, new Vector3(0, .7f, 0), new Vector3(length, 1.4f, 1.2f));
+        }
+        /// <summary>
+        /// A hayrick: a round stack built up in four tiers, each standing a little proud of the one below (a flared skirt, two
+        /// shoulders, a cap), in pale thatch whose painted layers run round it, with the stack pole out of its top and loose hay
+        /// at its foot. About the size of the old round one (2.6 m across, a little over 2 m high); its collider is unchanged.
+        /// Height, girth, turn and the pole's lean come from a stream keyed to where it stands: no zone draw.
+        /// </summary>
+        void Haystack(Transform t)
+        {
+            var hr = TreeRandom(t.position); float H() { return (float)hr.NextDouble(); }
+            var rick = PropMesh("Hayrick", () => Turned(new[] { new Vector2(1.2f, -.35f), new Vector2(1.27f, .12f), new Vector2(1.16f, .62f), new Vector2(1.24f, .58f), new Vector2(1.04f, 1.12f), new Vector2(1.11f, 1.08f), new Vector2(.74f, 1.6f), new Vector2(.8f, 1.56f), new Vector2(.36f, 1.98f), new Vector2(0, 2.2f) }, 14, 2.5f));
+            float girth = .95f + H() * .07f, high = .92f + H() * .16f;
+            MeshPart(rick, t, Vector3.zero, Tint(art.thatch, new Color(.84f, .72f, .42f)), Quaternion.Euler(0, H() * 360, 0)).transform.localScale = new Vector3(girth, high, girth);
+            Part(PrimitiveType.Cylinder, t, new Vector3(0, 2.2f * high + .12f, 0), new Vector3(.07f, .4f, .07f), Tint(art.timber, new Color(.3f, .21f, .13f)), Quaternion.Euler((H() - .5f) * 10, 0, (H() - .5f) * 10));   // the stack pole
+            for (int k = 0; k < 3; k++)
+            {
+                float a = (k + H() * .7f) * 2.1f, x = Mathf.Cos(a) * 1.25f, z = Mathf.Sin(a) * 1.25f;
+                Lump(LeafLumpAt(k), t, new Vector3(x, LocalGround(t, x, z) + .08f, z), new Vector3(.8f + H() * .3f, .34f, .6f + H() * .25f), art.hay, H() * 360).name = "Loose hay";
+            }
+            Solid(t, new Vector3(0, 1, 0), new Vector3(2.4f, 2, 2.4f));
         }
         /// <summary>The tint of each leaf family's painted cards (near white: the paint carries the colour), and which card each family takes
         /// (fresh green, yellow-green, autumn; dull gold is the yellow card in a duller tint).</summary>
@@ -2033,7 +2145,9 @@ namespace Crulanda.World
             Part(PrimitiveType.Cube, t, new Vector3(0, 1, 1.3f), new Vector3(1.56f, .3f, .07f), board);        // tail board, lower
             Rod(t, new Vector3(-1.06f, .615f, -.2f), new Vector3(1.06f, .615f, -.2f), .11f, dark);            // axle
             Part(PrimitiveType.Cube, t, new Vector3(0, .7f, -.2f), new Vector3(1.3f, .14f, .16f), dark);       // bolster: the bed rests on the axle
-            Part(PrimitiveType.Sphere, t, new Vector3(0, 1.28f, .05f), new Vector3(1.42f, .86f, 2.4f), art.hay);
+            // The load: a heaped mound of hay in three tiers, the rick's thatch, as long and wide and high as the old round one.
+            MeshPart(PropMesh("Hay load", () => Turned(new[] { new Vector2(.47f, -.1f), new Vector2(.5f, .1f), new Vector2(.43f, .3f), new Vector2(.47f, .28f), new Vector2(.27f, .52f), new Vector2(0, .62f) }, 12, 1.8f)), t, new Vector3(0, .98f, .05f), Tint(art.thatch, new Color(.84f, .72f, .42f)))
+                .transform.localScale = new Vector3(1.42f, 1.15f, 2.4f);
             Solid(t, new Vector3(0, .8f, -.4f), new Vector3(2.1f, 1.6f, 3.8f));
         }
         /// <summary>A street lamp: a hewn post on a stone footing, an arm through it on an iron brace, and a roofed lantern hung round the light.</summary>
@@ -2048,11 +2162,14 @@ namespace Crulanda.World
             Part(PrimitiveType.Cube, t, new Vector3(.6f, 2.4f, 0), new Vector3(.28f, .36f, .28f), art.glass);
             // Every lamp is lit after dark; variant > 0 lamps also burn by day (inn yard, mill).
             var l = new GameObject("Lamp light").AddComponent<Light>(); l.transform.SetParent(t, false); l.transform.localPosition = new Vector3(.6f, 2.3f, 0);
-            l.type = LightType.Point; l.range = variant > 0 ? 7 : 9; l.intensity = 1.2f; l.color = new Color(1, .7f, .38f);
+            l.type = LightType.Point; l.range = variant > 0 ? 9 : 11; l.intensity = 1.2f; l.color = new Color(1, .7f, .38f);
             NightLights.Add(new NightLight { light = l, dayIntensity = variant > 0 ? 1.2f : 0, nightIntensity = 1.7f });
         }
         /// <summary>Lights that brighten after dark (lamps, inn lanterns). Driven by <see cref="WorldClock"/>.</summary>
         public readonly List<NightLight> NightLights = new List<NightLight>();
+        /// <summary>Unlit effects (chimney smoke, a fall's foam and mist) that take the hour's light. Made on first use.</summary>
+        HourTint HourTinted { get { if (hourTint == null) hourTint = gameObject.AddComponent<HourTint>(); return hourTint; } }
+        HourTint hourTint;
         /// <summary>Chicken coops in this zone; the hen-wife works them and hens roost in them.</summary>
         public readonly List<ZoneCoop> Coops = new List<ZoneCoop>();
         /// <summary>
@@ -2069,7 +2186,8 @@ namespace Crulanda.World
             Part(PrimitiveType.Cube, t, new Vector3(0, floor + h / 2, 0), new Vector3(w, h, d), boards);
             for (float x = -w / 2 + .3f; x < w / 2; x += .45f)
                 foreach (int sz in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(x, floor + h / 2, sz * (d / 2 + .02f)), new Vector3(.06f, h, .04f), dark);
-            MeshPart(ZoneMeshes.GableRoof(w + .5f, d + .6f, .9f), t, new Vector3(0, floor + h, 0), art.thatch);
+            MeshPart(ZoneMeshes.GableRoof(w + .5f, d + .6f, .9f, .25f, .25f), t, new Vector3(0, floor + h, 0), art.thatch);
+            Gables(t, w / 2, d, floor + h, .9f, d / 2 + .3f, w / 2 + .25f, boards, d, 0);   // boards to the ridge and barge boards; too small for a truss
             // Nest boxes bolted to the east side, with a lid the hen-wife lifts to collect eggs.
             Part(PrimitiveType.Cube, t, new Vector3(w / 2 + .3f, floor + .45f, 0), new Vector3(.6f, .6f, d * .8f), boards);
             Part(PrimitiveType.Cube, t, new Vector3(w / 2 + .32f, floor + .8f, 0), new Vector3(.7f, .08f, d * .85f), art.slate, Quaternion.Euler(0, 0, -18));
@@ -2152,7 +2270,8 @@ namespace Crulanda.World
                 Ashlar(new Vector3(0, 1.23f, .25f), new Vector3(.5f, 1.6f, .5f), 1), Ashlar(new Vector3(0, 1.95f, .25f), new Vector3(.66f, .12f, .66f), 1), Ashlar(new Vector3(0, 2.4f, .25f), new Vector3(.9f, .8f, .75f), 1));
             Part(PrimitiveType.Cube, t, new Vector3(0, 2.38f, -.13f), new Vector3(.6f, .56f, .04f), dark);
             Part(PrimitiveType.Capsule, t, new Vector3(0, 2.36f, -.17f), new Vector3(.18f, .2f, .1f), Tint(art.stone, new Color(.86f, .84f, .78f)));
-            MeshPart(ZoneMeshes.GableRoof(1.25f, 1.15f, .45f, .12f), t, new Vector3(0, 2.8f, .25f), art.slate, Quaternion.Euler(0, 90, 0));
+            MeshPart(ZoneMeshes.GableRoof(1.25f, 1.15f, .45f, .12f), t, new Vector3(0, 2.8f, .25f), art.slate, Quaternion.Euler(0, 90, 0));   // a cap on the niche: closed ends
+            foreach (int s in new[] { -1, 1 }) MeshPart(PropMesh("Wayshrine gable", () => ZoneMeshes.Gable(1.15f, .45f, .04f, 1)), t, new Vector3(0, 2.8f, .25f + s * .635f), Dressed(new Color(.6f, .57f, .5f)));   // faced in the shrine's stone, 3 cm proud
             Part(PrimitiveType.Cylinder, t, new Vector3(0, 3.42f, -.28f), new Vector3(.34f, .03f, .34f), stone, Quaternion.Euler(90, 0, 0));
             Part(PrimitiveType.Cylinder, t, new Vector3(0, .5f, -.35f), new Vector3(.46f, .05f, .46f), dark);
             Part(PrimitiveType.Sphere, t, new Vector3(0, .55f, -.35f), new Vector3(.34f, .12f, .34f), art.ash);
@@ -2332,7 +2451,8 @@ namespace Crulanda.World
                 foreach (int s in new[] { -1, 1 }) blocks.Add(Ashlar(new Vector3(s * 1.4f, 1.3f, -1.7f), new Vector3(.6f, 2.6f, .6f)));
                 for (int i = 0; i < 3; i++) blocks.Add(Ashlar(new Vector3(0, .1f + i * .12f, -2.6f + i * .35f), new Vector3(2.6f, .2f, .4f)));
                 Stonework("Crypt stone", t, stone, blocks.ToArray());
-                MeshPart(ZoneMeshes.GableRoof(6.6f, 6.6f, 1.6f), t, new Vector3(0, 2.4f, 1.5f), Tint(art.slate, new Color(.27f, .28f, .3f)));
+                MeshPart(ZoneMeshes.GableRoof(6.6f, 6.6f, 1.6f), t, new Vector3(0, 2.4f, 1.5f), Tint(art.slate, new Color(.27f, .28f, .3f)));   // the vault fills it: closed ends
+                foreach (int s in new[] { -1, 1 }) MeshPart(PropMesh("Crypt pediment", () => ZoneMeshes.Gable(6.6f, 1.6f, .06f, 1.75f, 0, 2.4f)), t, new Vector3(s * 3.31f, 2.4f, 1.5f), stone, Quaternion.Euler(0, s * 90, 0));   // a pediment of the vault's stone, 4 cm proud of each end
                 Part(PrimitiveType.Cube, t, new Vector3(0, 1, -1.52f), new Vector3(1.8f, 2, .1f), Tint(art.metal, new Color(.14f, .14f, .16f)));
             }
             // Grave markers before it (the same five draws each, in the same order), set on the ground where they stand: headstones, each one slab.
@@ -2526,7 +2646,8 @@ namespace Crulanda.World
                         }
                         var orchardLeaf = art.leafCards != null && art.leafCards.Length > 0 ? LeafMaterial(art.leafCards[0], Color.Lerp(new Color(.94f, 1, .9f), new Color(1, 1, .8f), Mathf.Round(pick * 2) / 2))
                             : Tint(art.foliage, Color.Lerp(new Color(.3f, .42f, .18f), new Color(.38f, .44f, .2f), pick));
-                        LeafCrown(t, tr, lean + new Vector3(0, h + .85f, 0), spots, ends, orchardLeaf, bark, Tint(art.foliage, new Color(.19f, .29f, .12f)), 1, new Vector3(1.8f, 1.1f, 1.8f));
+                        // Its leaf mass: small fresh-green lumps (the fruit still shows round them) under the cards.
+                        LeafCrown(t, tr, lean + new Vector3(0, h + .85f, 0), spots, ends, orchardLeaf, bark, Tint(art.foliage, new Color(.19f, .29f, .12f)), 1, new Vector3(1.5f, .9f, 1.5f), mass: LeafMassOf(0), cardSize: .9f, massSize: .54f);
                         var fruit = Tint(art.hay, new Color(.72f, .18f, .12f));
                         for (int k = 0; k < 6; k++) Part(PrimitiveType.Sphere, t, new Vector3(R01 * 2.4f - 1.2f, h + .2f + R01 * 1.4f, R01 * 2.4f - 1.2f) + lean, Vector3.one * .22f, fruit);
                         var cap = t.gameObject.AddComponent<CapsuleCollider>(); cap.center = new Vector3(0, h / 2, 0); cap.height = h; cap.radius = .3f; trunks.Add(at);
@@ -2678,6 +2799,7 @@ namespace Crulanda.World
             var vel = ps.velocityOverLifetime; vel.enabled = true; vel.space = ParticleSystemSimulationSpace.World;
             vel.x = new ParticleSystem.MinMaxCurve(.25f, .5f); vel.y = new ParticleSystem.MinMaxCurve(0, 0); vel.z = new ParticleSystem.MinMaxCurve(.05f, .15f);
             ps.GetComponent<ParticleSystemRenderer>().sharedMaterial = art.particle;
+            HourTinted.Add(ps);   // grey by day, a dim wisp against the night sky
         }
         /// <summary>A watermill: a house on the bank with a turning wheel in the creek on its west side.</summary>
         void Mill(Transform t, Vector2 size)
@@ -4548,6 +4670,10 @@ namespace Crulanda.World
                                 var axis = Quaternion.Euler(0, S() * 360, 0) * (Quaternion.Euler(15 + S() * 15, 0, 0) * Vector3.up);
                                 var across = Quaternion.AngleAxis(S() * 60, axis) * Vector3.Cross(axis, Vector3.up).normalized;
                                 float len = c * 1.2f, wide = c * 1.1f; var foot = centre - axis * len * .5f;
+                                // Inside them a leaf-coloured mass, two lumps in the family's mid and deep: a crown with a ragged edge, not cards on a stick.
+                                var mass = LeafMassOf(fam);
+                                Put(side, crown, mass[1], centre, Quaternion.Euler(0, yaw, 0), new Vector3(c * .8f, c * .6f, c * .8f));
+                                Put(side, crown, mass[0], centre + new Vector3(c * .22f, -c * .2f, c * .15f), Quaternion.Euler(0, yaw + 90, 0), new Vector3(c * .62f, c * .46f, c * .62f));
                                 for (int k = 0; k < 3; k++)
                                     set.Add(foot, axis, Quaternion.AngleAxis(k * 60, axis) * across, len * (k == 0 ? 1 : .95f), wide * (k == 0 ? 1 : .92f), centre, .3f, k == 0 ? new Color(1, 1, .95f) : new Color(.88f, .9f, .85f));
                             }

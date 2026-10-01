@@ -7,7 +7,8 @@ namespace Crulanda.World
     /// - bloom on lamps, windows, embers and the sun;
     /// - sun shafts when the sun is in view;
     /// - a filmic (ACES) tone map;
-    /// - colour grading that follows the zone's biome and the hour (cooler and less saturated at night);
+    /// - colour grading that follows the zone's biome, the hour and the weather (cooler at night, with firelight kept warm;
+    ///   darker and duller under rain);
     /// - a soft vignette.
     /// Shader: Hidden/Crulanda/Post, kept in builds through ZoneArt.post.
     /// </summary>
@@ -43,22 +44,24 @@ namespace Crulanda.World
             var g = ForBiome(); float dark = WorldClock.Darkness;
             // Weather (WorldWeather): cloud flattens the light (less colour and contrast, no glare); rain cools it; an ash squall drains it.
             var weather = WorldWeather.Now; float lit = 1 - dark;
-            g.saturation *= 1 - .2f * weather.dim * lit - .08f * weather.ash; g.contrast = Mathf.Lerp(g.contrast, 1.04f, .5f * weather.dim);
+            g.saturation *= 1 - .2f * weather.dim * lit - .12f * weather.rain * lit - .08f * weather.ash; g.contrast = Mathf.Lerp(g.contrast, 1.04f, .5f * weather.dim);
             g.threshold += .35f * weather.dim; g.bloom *= 1 - .25f * weather.dim;
             g.tint = Color.Lerp(Color.Lerp(g.tint, new Color(.98f, 1, 1.02f), .6f * weather.dim * lit), new Color(.95f, 1, 1.06f), .5f * weather.rain * lit);   // no warm sun under cloud
-            g.exposure *= 1 - .06f * weather.rain * lit;
+            g.exposure *= 1 - .12f * weather.rain * lit;   // rain is a dull day, a storm a dark one (the skylight falls with it: WorldClock)
             // In a cave: the eye adjusts a little and firelight blooms.
             float under = Hollow.CameraDepth;
             g.exposure *= 1 + .3f * under; g.threshold = Mathf.Lerp(g.threshold, .6f, under); g.bloom += .3f * under; g.vignette += .25f * under;
-            // Night: lamps bloom more, colour drains and cools; dusk and dawn warm up a touch.
+            // Night: only lamps, windows and fires bloom, and not so far that they clip to white; the moon and the blue skylight
+            // carry the night's colour (WorldClock), so the grade drains little and cools a little, and the composite keeps
+            // firelight warm (_Lift); dusk and dawn warm up a touch.
             float dusk = Mathf.Clamp01(1 - Mathf.Abs(dark - .5f) * 2);
-            mat.SetFloat("_Threshold", Mathf.Lerp(g.threshold, .55f, dark)); mat.SetFloat("_Knee", .5f);
-            mat.SetFloat("_BloomIntensity", Mathf.Lerp(g.bloom, 1.1f, dark));
-            mat.SetFloat("_Exposure", Mathf.Lerp(g.exposure, 1.2f, dark) * (1 + .2f * WorldWeather.Flash));
+            mat.SetFloat("_Threshold", Mathf.Lerp(g.threshold, .7f, dark)); mat.SetFloat("_Knee", .5f);
+            mat.SetFloat("_BloomIntensity", Mathf.Lerp(g.bloom, .8f, dark));
+            mat.SetFloat("_Exposure", Mathf.Lerp(g.exposure, 1.05f, dark) * (1 + .2f * WorldWeather.Flash));
             CloudShadows(weather, dark);
-            mat.SetFloat("_Saturation", Mathf.Lerp(g.saturation, .62f, dark)); mat.SetFloat("_Contrast", g.contrast); mat.SetFloat("_Lift", dark);
-            mat.SetFloat("_Vignette", g.vignette + dark * .4f);
-            mat.SetColor("_Tint", Color.Lerp(Color.Lerp(g.tint, new Color(.86f, .92f, 1.12f), dark), new Color(1.08f, .96f, .88f), dusk * .6f));
+            mat.SetFloat("_Saturation", Mathf.Lerp(g.saturation, .9f, dark)); mat.SetFloat("_Contrast", g.contrast); mat.SetFloat("_Lift", dark);
+            mat.SetFloat("_Vignette", g.vignette + dark * .15f);
+            mat.SetColor("_Tint", Color.Lerp(Color.Lerp(g.tint, new Color(.9f, .95f, 1.1f), dark), new Color(1.08f, .96f, .88f), dusk * .6f));
             // Bloom: prefilter at half size, blur down the chain, then back up additively.
             int w = src.width / 2, h = src.height / 2;
             var format = src.format;

@@ -74,6 +74,7 @@ namespace Crulanda.Encounter
                 new Errand("marigold for Mira", 11, 13.5f, "stall", "inn", Load.Herbs, "herbs", "Marigold and comfrey, for whoever's bleeding this week."),
                 new Errand("herbs to dry", 16.3f, 18.5f, "meadow", "home", Load.Herbs, "herbs")) },
             { "merchant", new WorkDay(new[] { new Shift(7.3f, 12.5f, "stall", "stall", "stall", "stall", "green"), new Shift(12.5f, 13.3f, "well", "inn"), new Shift(13.3f, 18, "stall", "stall", "stall", "stall"), new Shift(18, Night, "inn", "inn", "green") },
+                new Errand("a cask for the inn", 8.6f, 11, "stall", "inn", Load.Goods, "ale", "Ale for the Cask. Make it last the night, for once.") { amount = 12 },
                 new Errand("shutters up", 17.8f, 19.5f, "stall", "home", Load.Goods, "goods", "Shutters up. What didn't sell comes home.")) },
             { "gossip", new WorkDay(new[] { new Shift(Dawn, 8, "well", "well", "green"), new Shift(8, 12, "green", "green", "green", "well"), new Shift(12, 13.5f, "inn", "inn", "well"), new Shift(13.5f, 17, "green", "green", "well", "wander"), new Shift(17, Night, "inn", "green", "home") },
                 new Errand("the morning's water", 6.5f, 8.5f, "well", "home", Load.Bucket, "water", "Water's bitter again. Iron, my gran says."),
@@ -82,7 +83,9 @@ namespace Crulanda.Encounter
                 new Errand("a loaf for Mum", 11, 13, "oven", "home", Load.Bread, "bread", null, "Mum says a loaf, and no eating the crust."),
                 new Errand("chores", 16.5f, 18.5f, "well", "home", Load.Bucket, "water", "Chores.")) },
             { "elder", new WorkDay(new[] { new Shift(7, 12, "green", "green", "green", "inn"), new Shift(12, 14, "inn", "inn", "green"), new Shift(14, 18, "green", "green", "green", "inn"), new Shift(18, Night, "inn", "home") }) },
-            { "drinker", new WorkDay(new[] { new Shift(7.5f, 10, "wander", "green", "well"), new Shift(10, 15, "inn", "inn", "inn", "inn", "green"), new Shift(15, 16, "wander", "well"), new Shift(16, 23.5f, "inn", "inn", "inn", "inn", "inn", "green") }) },
+            // The out of work (the drinkers, and any trade whose workplace the village lacks): loiter the morning away, then the inn, where
+            // they drink until the ale is gone or they are (Villager.DrinkRound).
+            { "drinker", new WorkDay(new[] { new Shift(7.5f, 11, "wander", "green", "well"), new Shift(11, 23.6f, "inn") }) },
             // The hen-wife: feed at first light and again mid-afternoon, water from the well through the day, eggs three times:
             // the first to the inn's kitchen, the second to the produce stall, the last home for the pot. Dusk is the hens' (Villager.KeeperNext).
             { "henwife", new WorkDay(new[] { new Shift(5.7f, 12.2f, "yard", "yard", "yard", "well", "green"), new Shift(12.2f, 13.5f, "home"), new Shift(13.5f, 18, "yard", "yard", "yard", "well", "green"), new Shift(18, 19.3f, "yard") },
@@ -116,6 +119,7 @@ namespace Crulanda.Encounter
                 case "meat": return r < .5f ? "Hares. Good. Stew tonight." : "Round the back, before the drinkers see.";
                 case "herbs": return r < .5f ? "Put them to dry." : "Comfrey. Bless you.";
                 case "goods": return r < .5f ? "Leave it on the counter." : "I'll see what sells.";
+                case "ale": return r < .5f ? "About time. They're through the last one." : "Roll it behind the bar.";
                 default: return null;
             }
         }
@@ -140,6 +144,16 @@ namespace Crulanda.Encounter
         }
         static readonly Color Wicker = new Color(.55f, .4f, .22f), Timber = new Color(.36f, .26f, .16f), Sack = new Color(.68f, .6f, .46f), Water = new Color(.35f, .5f, .62f);
         /// <summary>Build a load under <paramref name="owner"/>; <paramref name="count"/> is how many (eggs in the basket).</summary>
+        /// <summary>A drinker's tankard, hung from the right arm's pivot at the hand and tilted so that lifting the arm tips it to the mouth.</summary>
+        public static GameObject Tankard(Transform arm)
+        {
+            var go = new GameObject("Tankard"); var t = go.transform; t.SetParent(arm, false); t.localPosition = new Vector3(0, -.64f, .1f); t.localEulerAngles = new Vector3(55, 0, 0);
+            Part(PrimitiveType.Cylinder, t, Vector3.zero, new Vector3(.11f, .075f, .11f), new Color(.46f, .33f, .19f));
+            Part(PrimitiveType.Cylinder, t, new Vector3(0, .078f, 0), new Vector3(.118f, .006f, .118f), new Color(.62f, .6f, .56f));   // the pewter rim
+            Part(PrimitiveType.Cylinder, t, new Vector3(0, .07f, 0), new Vector3(.095f, .004f, .095f), new Color(.86f, .8f, .62f));    // the head on the ale
+            Part(PrimitiveType.Cube, t, new Vector3(.075f, 0, 0), new Vector3(.03f, .09f, .02f), new Color(.36f, .26f, .16f));         // the handle
+            return go;
+        }
         public static GameObject Build(Transform owner, Load load, int count)
         {
             var go = new GameObject("Load " + load); go.transform.SetParent(owner, false); var t = go.transform;

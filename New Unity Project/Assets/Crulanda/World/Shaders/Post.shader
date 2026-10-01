@@ -1,6 +1,7 @@
 // Crulanda post-processing for the built-in pipeline (camera OnRenderImage):
 // 0 bright-pass prefilter, 1 blur down, 2 blur up (additive), 3 sun shafts (radial blur toward the sun),
-// 4 composite: cloud shadows, bloom + shafts, exposure, ACES filmic tone map, saturation/contrast/tint grade, vignette.
+// 4 composite: cloud shadows, bloom + shafts, exposure, ACES filmic tone map, saturation/contrast/tint grade (firelight
+//   kept warm at night), vignette.
 Shader "Hidden/Crulanda/Post"
 {
     Properties { _MainTex ("", 2D) = "white" {} }
@@ -74,7 +75,10 @@ Shader "Hidden/Crulanda/Post"
         c += tex2D(_Bloom, i.uv).rgb * _BloomIntensity + tex2D(_Shafts, i.uv).rgb * _ShaftIntensity;
         c = ACES(c * _Exposure);
         half l = dot(c, half3(0.2126, 0.7152, 0.0722));
-        c = lerp(l.xxx, c, _Saturation);
+        // Firelight after dark (_Lift = darkness): bright warm pixels (lit windows, lamp glass, the ground under a lamp) keep
+        // their colour and take a warm tint, not the night's cool one, so they read as fire and not as cold white. None by day.
+        half fire = _Lift * smoothstep(0.3, 0.7, l) * saturate((c.r - c.b) * 4);
+        c = lerp(l.xxx, c, lerp(_Saturation, max(_Saturation, 1.15), fire));
         // Contrast about mid-grey. By day: the straight line, with a small quadratic toe only where it would clip to black
         // (shadows stay crisp and saturated). Toward night (_Lift = darkness): a power toe that lifts the darks, so faces
         // turned from the moon stay readable. Both match the line above mid-grey.
@@ -83,7 +87,7 @@ Shader "Hidden/Crulanda/Post"
         half3 dayC = c < 2 * c0 ? _Contrast * c * c / (4 * c0) : lin;
         half3 nightC = c > 0.5 ? lin : 0.5 * pow(max(c * 2, 1e-4), _Contrast);
         c = lerp(dayC, nightC, _Lift);
-        c = saturate(c) * _Tint.rgb;
+        c = saturate(c) * lerp(_Tint.rgb, half3(1.04, 0.96, 0.84), fire);
         float2 v = i.uv - 0.5; c *= saturate(1 - dot(v, v) * _Vignette);
         return half4(c, 1);
     }

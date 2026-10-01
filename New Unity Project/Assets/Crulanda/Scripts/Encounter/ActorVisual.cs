@@ -4,7 +4,7 @@ namespace Crulanda.Encounter
 {
     public enum ActorLook { Warrior, Druid, Healer, Collector, Warden, Sentry, Outrider, Pale, Villager, Hollow, Cultist, Wolf, Boar, WeaveEater, Deserter, BanditKing, Keeper, Stag, Spider, Bramble }
     /// <summary>Body language layered over walking: working a hoe or bucket, talking, sitting, cowering.</summary>
-    public enum ActorPose { None, Work, Talk, Sit, Cower, Hammer, Chop, Gather, Knead, Swim, Sneak }
+    public enum ActorPose { None, Work, Talk, Sit, Cower, Hammer, Chop, Gather, Knead, Swim, Sneak, Drink, Slump }
 
     /// <summary>
     /// Placeholder humanoid built from primitives under the actor's "Body" (so death poses and form scaling still apply
@@ -40,6 +40,11 @@ namespace Crulanda.Encounter
         static readonly Color[] Skins = { new Color(.8f, .64f, .52f), new Color(.68f, .52f, .4f), new Color(.52f, .38f, .28f), new Color(.86f, .72f, .6f) };
         /// <summary>Recolours the outfit's main cloth (e.g. Druid forms).</summary>
         public void SetClothColor(Color c) { if (cloth != null) cloth.color = c; }
+        /// <summary>The right arm's shoulder pivot (the hand is .62 down it): what a villager's tankard hangs from.</summary>
+        public Transform RightArm { get { return armR; } }
+        /// <summary>0 sober to 1 reeling: the body rolls and pitches with the stride (a drinker walking home).</summary>
+        public float Stagger;
+        bool staggering;
 
         static Material Mat(Color c, float smooth = .15f, float metal = 0)
         { var m = new Material(Shader.Find("Standard")) { color = c }; m.SetFloat("_Glossiness", smooth); m.SetFloat("_Metallic", metal); return m; }
@@ -817,6 +822,8 @@ namespace Crulanda.Encounter
             if (Pose == ActorPose.None)   // combatants never use poses (their death pose moves the body)
             {
                 if (posed) { posed = false; swimLean = 0; body.localPosition = Vector3.zero; body.localEulerAngles = new Vector3(stoop, 0, 0); }
+                if (Stagger > 0) { staggering = true; body.localEulerAngles = new Vector3(stoop + Mathf.Sin(phase * .5f) * 6 * Stagger, 0, Mathf.Sin(phase * .5f + 1.1f) * 14 * Stagger); }
+                else if (staggering) { staggering = false; body.localEulerAngles = new Vector3(stoop, 0, 0); }
                 return;
             }
             posed = true;
@@ -867,9 +874,20 @@ namespace Crulanda.Encounter
                     armL.localEulerAngles = new Vector3(-35, 0, 8); armR.localEulerAngles = new Vector3(-35 + Mathf.Sin(t) * 10, 0, -8); break;
                 case ActorPose.Cower:
                     armL.localEulerAngles = new Vector3(-150, 0, 25); armR.localEulerAngles = new Vector3(-150, 0, -25); break;
+                case ActorPose.Drink:    // seated with a tankard: the right arm lifts it to the mouth every few seconds, the head tipping back
+                {
+                    legL.localEulerAngles = legR.localEulerAngles = new Vector3(-80, 0, 0);
+                    float k = Mathf.Repeat(t * .28f, 1), lift = k < .18f ? Mathf.SmoothStep(0, 1, k / .18f) : k < .45f ? 1 : k < .6f ? 1 - Mathf.SmoothStep(0, 1, (k - .45f) / .15f) : 0;
+                    armL.localEulerAngles = new Vector3(-35, 0, 8); armR.localEulerAngles = new Vector3(-40 - lift * 85, 0, -8 + lift * 18);
+                    lean -= lift * 8; break;
+                }
+                case ActorPose.Slump:    // passed out over the table: folded forward, arms out, breathing slow
+                    legL.localEulerAngles = legR.localEulerAngles = new Vector3(-80, 0, 0);
+                    armL.localEulerAngles = new Vector3(-110, 0, 22); armR.localEulerAngles = new Vector3(-105, 0, -26);
+                    lean += 62 + Mathf.Sin(t * .6f) * 1.5f; break;
             }
             // Sitting lowers the whole figure onto the seat; everything else stands.
-            body.localPosition = new Vector3(0, Pose == ActorPose.Sit ? -.45f * (child ? .66f : 1) : Pose == ActorPose.Sneak ? -.28f : Pose == ActorPose.Swim ? -.15f : 0, 0);
+            body.localPosition = new Vector3(0, Pose == ActorPose.Sit || Pose == ActorPose.Drink || Pose == ActorPose.Slump ? -.45f * (child ? .66f : 1) : Pose == ActorPose.Sneak ? -.28f : Pose == ActorPose.Swim ? -.15f : 0, 0);
             body.localEulerAngles = new Vector3(lean, 0, 0);
         }
     }

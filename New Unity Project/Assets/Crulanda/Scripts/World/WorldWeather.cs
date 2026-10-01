@@ -35,7 +35,7 @@ namespace Crulanda.World
                 case WeatherKind.Rain: return new WeatherLook { clouds = 1, dim = .74f, rain = .72f, wind = .45f, fog = .66f };
                 case WeatherKind.Snow: return new WeatherLook { clouds = .9f, dim = .5f, snow = 1, wind = .5f, fog = .7f };
                 case WeatherKind.AshSquall: return new WeatherLook { clouds = .88f, dim = .52f, ash = 1, wind = .92f, fog = .72f };
-                case WeatherKind.Storm: return new WeatherLook { clouds = 1, dim = .86f, rain = 1, wind = 1, fog = .56f };
+                case WeatherKind.Storm: return new WeatherLook { clouds = 1, dim = .86f, rain = 1, wind = 1, fog = .5f };
                 default: return None;
             }
         }
@@ -474,7 +474,7 @@ namespace Crulanda.World
             var top = Color.Lerp(new Color(1, .985f, .96f), sun != null ? sun.color : Color.white, .35f);   // sunlit tops, warmed at dawn and dusk
             var under = new Color(.62f, .67f, .77f);                                                         // blue-grey undersides
             top = Color.Lerp(top, grey * 1.18f, .8f * overcast);                                               // under cover: a grey lid,
-            under = Color.Lerp(under, grey * .86f, .3f + .6f * overcast) * (1 - .28f * shown.rain);           // darker with rain
+            under = Color.Lerp(under, grey * .86f, .3f + .6f * overcast) * (1 - .35f * shown.rain);           // darker with rain (the air it is cut from darkens too: WorldClock.Weathered)
             top = Color.Lerp(top, fog * 1.7f + new Color(.02f, .03f, .06f), dark); under = Color.Lerp(under, fog * 1.05f, dark);   // night: dim slate
             top *= 1 + Flash * 1.2f; under *= 1 + Flash; top.a = under.a = 1; fog.a = 1;
             clouds.SetColor("_TopColor", top); clouds.SetColor("_UnderColor", under); clouds.SetColor("_HorizonColor", fog);

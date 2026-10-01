@@ -191,6 +191,31 @@ mood. How it was made: a first draft was pre-checked by agents who ported the ge
   footing with an iron bracket and a roofed lantern; the well as a turned masonry ring with a roofed windlass, rope and bucket;
   stalls with a scalloped valance, thicker posts and turned baskets and pots; turned barrels with hoops; battened crates; a
   woodpile with pale cut ends and a sawhorse; stone bridges with coping and corner piers; leaning signposts.
+- **Buildings on slopes** (visual review item 10; `ZoneBuilder.Buildings.cs`: `Footing`, `DoorSteps`): houses (and the mill),
+  barns, the inns and fallen houses stand on a stepped masonry footing instead of one stone box under them. It is laid in runs
+  of about 1.4 m round the walls, each reaching a quarter metre into the ground under it. Where the ground rises against a wall
+  the run climbs in whole .3 m courses, so the stone steps up the hillside and the grass never cuts the wall. Where a run
+  stands well out of the ground on the downhill side, its foot steps out a course or two (a terraced base) and every other
+  tall run has a dark cellar vent under a lintel, so there are no blank stone wedges. A darker coping caps every run. The
+  ground itself is not levelled (the height function is untouched, so no tree, rock, grass or creek moves). A house's or
+  barn's door stands on a stone threshold at the highest ground across its doorway (the barn's doors reach the ground on
+  the downhill side), with up to five steps out from it where the ground falls away in front. A fallen house keeps its
+  floor slab inside the footing, so no slab overhangs a slope.
+- **Hero buildings** (visual review item 11): the inns (`InnFront`; the Golden Cask and the Cracked Hearth) keep their walls,
+  colliders, door and taproom, and gain:
+  - timber framing on every face (studs between the windows, sill rails, a head plate);
+  - the upper front jettied .35 m out on joist ends and brackets, with four larger mullioned windows;
+  - a gabled porch on two solid posts (they cut no navmesh), with the lantern hung under its ridge;
+  - a sign twice the size, with the inn's device: a gilded cask on green, or a black pot over a glowing crack;
+  - window boxes (dry stalks in Khaven's gloom), a bench, barrels and two dormers.
+  The kitchen lean-to's stretch of the back wall stays clear. Vell's smithy (`Forge`) is a hearth house under a slate gable
+  (metre UVs, eaves, boarded gables with king posts) on a stone end wall and a plank half wall, with a slate lean-to over the
+  anvil. It has a heap of glowing coals on the hearth, a tapered hood and a chimney stack through the roof, leather bellows,
+  a horned anvil with a hammer and tongs, a stone quench trough and a tool rail. Outside stand a rack of finished work
+  (horseshoes, sickles, axe heads), a barrel of bar iron and a grindstone. Its hearth, back wall and anvil colliders and both
+  workplaces are where they were; the end walls and the trough are solid too. The capture tour shoots `99-inn-front`,
+  `99-inn-front-night` and `99-smithy-front` at eye level (`BuildingGroundTests` checks the footings, thresholds, the
+  smithy's places and the way into the inn).
 - **The rules every part kept:** the zone's random stream is untouched (each prop method makes the draws it always made, in the
   same order), every collider, navmesh blocker, workplace, light and registered door or usable prop is where it was, and the
   tests ran green after each part.
@@ -547,7 +572,7 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
   - A trade whose workplace the zone lacks falls back to farmer or gossip.
   - Each trade has its own outfit and tool (`ActorVisual.Dress`) and a `<Title>` under its nameplate.
   - Workplaces are new prop kinds registered in `ZoneBuilder.Workplaces` (a stand point, a look target and the prop's name):
-    `forge` (smithy with lit hearth, anvil and quench barrel), `stall` (awning and goods; variant 0 produce, 1 cloth and
+    `forge` (smithy: a hearth house and a lean-to, a lit hearth, anvil, quench trough and grindstone), `stall` (awning and goods; variant 0 produce, 1 cloth and
     pots, 2 bread), `oven` (clay bake oven), `tannery` (hide frames, vat, scraping beam) and `woodpile`.
   - The trades' workshops (`ZoneBuilder.Workshops.cs`, GAME-ONLY; each draws from its own stream, carries no `size`, and is in
     `Footprint` (no rain) and the grass's bare list):

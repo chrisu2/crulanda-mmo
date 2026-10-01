@@ -411,6 +411,32 @@ namespace Crulanda.Encounter
             if (zone != null)
             {
                 string prefix = zone.Zone.id.Replace("zone.", "") + "-";
+                // The hero buildings close up at eye level, the player out of frame and the HUD hidden: the inn's front (its porch,
+                // sign, window boxes and lantern) by day and after dark, and the smithy from its open front corner. Each view is
+                // set in the building's own frame (front -Z), the inn's from its front wall.
+                var innProp = System.Array.Find(zone.Zone.props, pr => pr != null && pr.kind == "inn");
+                var forgeProp = System.Array.Find(zone.Zone.props, pr => pr != null && pr.kind == "forge");
+                var closeUps = new[] { (innProp, new Vector3(-4.5f, 1.7f, -8.5f), new Vector3(-1, 2.9f, -.6f), 11f, "99-inn-front"), (innProp, new Vector3(-4.5f, 1.7f, -8.5f), new Vector3(-1, 2.9f, -.6f), 21.5f, "99-inn-front-night"),
+                    (forgeProp, new Vector3(-4.2f, 1.7f, -5.5f), new Vector3(.4f, 1.5f, .4f), 11f, "99-smithy-front") };
+                bool hudWas = EncounterHud.Hidden;
+                foreach (var (building, eyeAt, focusAt, closeHour, closeShot) in closeUps)
+                {
+                    if (building == null) continue;
+                    var frame = zone.transform.Find("Zone props/" + building.name); if (frame == null) frame = zone.transform.Find("Zone static scenery/" + building.name); if (frame == null) continue;
+                    float front = building.kind == "inn" ? -(building.size.y > 0 ? building.size.y : 8) / 2 : 0;
+                    EncounterHud.Hidden = true; Crulanda.World.WorldClock.Hour = closeHour;
+                    var eye = frame.TransformPoint(new Vector3(eyeAt.x, 0, eyeAt.z + front)); eye.y = zone.Ground(new Vector2(eye.x, eye.z)).y + eyeAt.y;
+                    var aim = frame.TransformPoint(focusAt + new Vector3(0, 0, front)); var behind = new Vector2(eye.x - aim.x, eye.z - aim.z).normalized;
+                    motor.Teleport(zone.Ground(new Vector2(eye.x, eye.z) + behind * 2, 1.1f));
+                    var hidden = Array.FindAll(session.Player.GetComponentsInChildren<Renderer>(), r => r.enabled);
+                    foreach (var r in hidden) r.enabled = false;
+                    motor.enabled = false; var lens = session.View.transform; var toward = Quaternion.LookRotation(aim - eye);
+                    for (float w = 0; w < (closeHour > 20 ? 2 : .8f); w += Time.deltaTime) { lens.SetPositionAndRotation(eye, toward); Crulanda.World.TreeFade.UpdateAll(eye, aim, aim); yield return null; }
+                    lens.SetPositionAndRotation(eye, toward);
+                    ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + closeShot + ".png")); yield return new WaitForSeconds(.4f);
+                    motor.enabled = true; foreach (var r in hidden) r.enabled = true;
+                }
+                EncounterHud.Hidden = hudWas;
                 Crulanda.World.WorldClock.Hour = 15;
                 // Water close-ups: a creek from its bank at eye level, looking along it; the first bridge; the pond by day,
                 // swimming, and at night.

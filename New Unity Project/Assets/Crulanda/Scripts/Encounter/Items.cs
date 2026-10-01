@@ -17,13 +17,17 @@ namespace Crulanda.Encounter
         public LootTableDef[] loot = new LootTableDef[0];
     }
     /// <summary>
-    /// kind: gear | junk | consumable. slot: head, neck, shoulders, chest, hands, legs, feet, mainhand, offhand (gear only).
+    /// kind: gear | junk | consumable | material | tool. slot: head, neck, shoulders, chest, hands, legs, feet, mainhand, offhand (gear only).
     /// quality: 0 poor (grey), 1 common (white), 2 uncommon (green), 3 rare (blue), 4 epic (purple).
     /// value: sell price in gold (merchants charge 4x). heal: consumables restore this much health (potions) or over 10 s out of combat (food).
+    /// material: something gathered or refined that recipes use (quality 1, so "Sell junk" leaves it). trade: the village stock a sale of
+    /// it feeds ("forge.ore", "stall.herbs"). pouch: the class of trade bag that holds it (ore, timber, herb, larder).
+    /// tool: used once from the bags, it teaches the trade named in teaches and takes no bag slot after that (ProfessionLog.UseTool).
     /// </summary>
     [Serializable] public sealed class ItemDef
     {
         public string id, name, kind = "gear", slot, description, canonStatus;
+        public string trade, teaches, pouch;
         public int quality = 1, level = 1, value = 1, stack = 1;
         public int armor, stamina, strength, agility, intellect, spirit, weaponDamage, heal;
         public bool food;
@@ -264,6 +268,15 @@ namespace Crulanda.Encounter
             if (bagIndex < 0 || bagIndex >= p.bag.Count || p.bag[bagIndex].Empty) return 0;
             var s = p.bag[bagIndex]; var d = db.Get(s.item); int gold = (d != null ? d.value : 0) * s.count;
             p.gold += gold; p.bag[bagIndex] = new ItemStack(); return gold;
+        }
+        /// <summary>What "Sell junk" takes: junk, and anything of poor quality. Materials and tools are common quality, so they stay.</summary>
+        public static bool IsJunk(ItemDef d) { return d != null && (d.kind == "junk" || d.quality == 0); }
+        /// <summary>Sells every stack of junk in the bags. Returns the gold earned.</summary>
+        public static int SellJunk(EncounterProgress p, ItemDatabase db)
+        {
+            int total = 0;
+            for (int i = 0; i < p.bag.Count; i++) if (IsJunk(db.Get(p.bag[i].item))) total += Sell(p, db, i);
+            return total;
         }
         public static int Price(ItemDef d) { return Math.Max(1, d.value * 4); }
         public static bool Buy(EncounterProgress p, ItemDatabase db, string item, out string why)

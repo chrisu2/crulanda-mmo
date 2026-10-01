@@ -41,3 +41,57 @@ selects a status from the encounter's data asset. The guard status uses a 0.4 in
 ## Class/build foundation
 EncounterContent.playerClass is now authoritative for player derived stats, resource and action ordering. The legacy playerStats field is retained for asset compatibility; its current authored values were copied into playerClass.stats. Unlock entries resolve abilityId plus level (1–10). Current saves still imply the single Warrior reference class; no selectable identity or allocated talents are persisted yet. A versioned migration is required before those features ship.
 
+
+## Items (`EncounterContent/Items/*.json`, `ItemDatabase`)
+One file may hold `items`, `vendors` and `loot`. Registered on `Encounter.asset` (`itemFiles`) by Crulanda > World > Build Oakhaven.
+
+`ItemDef` fields: id, name, kind, slot, description, canonStatus, quality (0 poor to 4 epic), level, value (sell price; vendors
+charge 4x), stack, armor, stamina, strength, agility, intellect, spirit, weaponDamage, heal, food, and for the trades:
+
+| Field | On | Meaning |
+|---|---|---|
+| `kind: "material"` | ore, logs, herbs, charcoal, flour, salt, vials | Something gathered or refined that recipes use. Quality 1, stack 20. Using it from the bags says "A crafting material. Press K." "Sell junk" never takes it (`Inventory.IsJunk`: kind junk, or quality 0). |
+| `kind: "tool"` | `tool.pick`, `tool.hatchet` | Used once from the bags: teaches the trade in `teaches` at skill 1 and is used up. A second one is refused and kept. Stack 1. |
+| `teaches` | tools | A profession id. `ProfessionDatabase.Parse` refuses a tool that teaches an unknown trade. |
+| `trade` | materials | The village stock key a sale of it feeds: `forge.ore`, `forge.wood`, `stall.herbs` (used from the gathering step on). |
+| `pouch` | materials | The class of trade bag that holds it: `ore`, `timber`, `herb`, `larder` (used from the bags step on). |
+
+Kinds are `gear`, `junk`, `consumable`, `material`, `tool`. `VendorDef`: `npc` or `role`, `items`, `gearForZone`. A role entry leaves
+`npc` out (never `""`). Vendors never sell ore, logs or herbs: those come from the world only.
+
+## Trades (`EncounterContent/Professions/*.json`, `ProfessionDatabase`)
+Registered on `Encounter.asset` (`professionFiles`) by the same menu step, which logs "Registered N profession files.". Read
+against the item database; every problem in a file is reported in one `ArgumentException`, the session logs "Profession content
+invalid" and runs without the trades (items are unaffected).
+
+```json
+{
+  "craftSlots": 2,
+  "professions": [
+    { "id": "mining", "name": "Mining", "kind": "gather", "tool": "tool.pick", "verb": "Mine",
+      "taught": "You hang the pick at your belt. You can now mine.", "description": "...", "canonStatus": "GAME-ONLY" },
+    { "id": "cooking", "name": "Cooking", "kind": "free", "station": "fire" },
+    { "id": "blacksmithing", "name": "Blacksmithing", "kind": "craft", "station": "forge", "trainerRole": "blacksmith" }
+  ],
+  "nodes": [
+    { "id": "node.copper", "name": "Copper seam", "profession": "mining", "skill": 1, "item": "mat.copper_ore", "min": 1, "max": 3,
+      "respawn": 180, "seconds": 2, "look": "ore", "variant": 0, "prompt": "Mine the copper seam" }
+  ],
+  "recipes": [
+    { "id": "recipe.charcoal_oak", "name": "Charcoal", "profession": "woodcutting", "skill": 1, "station": "forge|fire",
+      "inputs": [ { "item": "mat.oak_log", "count": 1 } ], "output": "mat.charcoal", "count": 1 }
+  ]
+}
+```
+
+- `ProfessionDef`: `kind` is `gather` (free to everyone, no limit), `free` (everyone has it from the start) or `craft` (at most
+  `craftSlots` at once). `tool` is an item of kind `tool` whose `teaches` is this id; a `gather` trade with no tool is known from the
+  start. `station` is `forge`, `bench` or `fire`. `taught` is the line said when the tool is first used; `description` is the
+  trade's page in the Trades window (K).
+- `NodeDef`: a kind of thing worked in the world. `profession` must be a `gather` trade, `item` a known item, `skill` 1-100 (the
+  skill at which it comes easily: 1, 20, 40, 60, 80 by zone), `min`-`max` the yield, `respawn` and `seconds` above zero. `look` and
+  `variant` choose the prop (`ore`, `ore_rich`, `windfall`, `herb`). Zones place nodes from the gathering step on.
+- `RecipeDef`: `profession`, `skill` 1-100, `station` (alternatives joined with `|`), at least one input, `output`, `count`
+  (default 1). The file has none yet; they arrive with the stations step.
+- Skill is 1-100 (`ProfessionDatabase.MaxSkill`). What a character has learned is saved as `EncounterProgress.professions`
+  (save format 8, see SAVE_FORMAT.md) and handled by `ProfessionLog`.

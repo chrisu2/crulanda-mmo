@@ -27,6 +27,8 @@ namespace Crulanda.Tests
             "\"questsDone\":[\"npc.goody.eggs\"],\"reputation\":[{\"faction\":\"oakhaven\",\"value\":100}],\"documents\":[\"doc.oakhaven.ledger\"]," +
             "\"questItems\":[\"item.yarrow\"],\"usedInteractables\":[\"zone.oakhaven|Tithe crate|55|45\"]}";
         static string Slots(int n) { var s = new string[n]; for (int i = 0; i < n; i++) s[i] = "{\"item\":\"\",\"count\":0}"; return string.Join(",", s); }
+        /// <summary>A format-7 payload as the game wrote it: the format-6 one with its list of discoveries, two of them found.</summary>
+        public static readonly string V7Payload = V6Payload.Substring(0, V6Payload.Length - 1) + ",\"discoveries\":[\"secret.oakhaven.mill-cache\",\"secret.khaven.bell-tower\"]}";
     }
 
     /// <summary>
@@ -59,7 +61,7 @@ namespace Crulanda.Tests
         }
 
         // ---------- the save ----------
-        [Test] public void A_real_v6_save_loads_as_format_7_with_nothing_lost()
+        [Test] public void A_real_v6_save_loads_as_the_current_format_with_nothing_lost()
         {
             string root = Temp();
             try
@@ -97,14 +99,15 @@ namespace Crulanda.Tests
                 CollectionAssert.AreEqual(new[] { "doc.oakhaven.ledger" }, p.documents);
                 CollectionAssert.AreEqual(new[] { "item.yarrow" }, p.questItems);
                 CollectionAssert.AreEqual(new[] { "zone.oakhaven|Tithe crate|55|45" }, p.usedInteractables);
-                // And the new list, empty.
+                // And the new lists (format 7's discoveries, format 8's trades), empty.
                 Assert.NotNull(p.discoveries); Assert.IsEmpty(p.discoveries);
-                // The next save is format 7, and reads back the same.
+                Assert.NotNull(p.professions); Assert.IsEmpty(p.professions); Assert.NotNull(p.pouches); Assert.IsEmpty(p.pouches);
+                // The next save is the current format, and reads back the same.
                 save.Write(p);
                 Assert.IsTrue(store.TryRead("encounter", out var envelope, out _));
-                Assert.AreEqual(7, envelope.formatVersion); StringAssert.EndsWith(",\"discoveries\":[]}", envelope.payloadJson);
+                Assert.AreEqual(EncounterSave.FormatVersion, envelope.formatVersion); StringAssert.EndsWith(",\"discoveries\":[],\"professions\":[],\"pouches\":[]}", envelope.payloadJson);
                 Assert.IsTrue(save.Read(out var again, out message), message);
-                Assert.AreEqual(JsonUtility.ToJson(p), JsonUtility.ToJson(again), "A format-7 round trip changes nothing.");
+                Assert.AreEqual(JsonUtility.ToJson(p), JsonUtility.ToJson(again), "A round trip in the current format changes nothing.");
             }
             finally { if (Directory.Exists(root)) Directory.Delete(root, true); }
         }
@@ -118,7 +121,7 @@ namespace Crulanda.Tests
                 p.discoveries.Add("secret.oakhaven.mill-cache"); p.discoveries.Add("secret.khaven.bell-tower"); p.discoveries.Add("");
                 var save = new EncounterSave(root, TestTalents.Warrior()); save.Write(p);
                 Assert.IsTrue(new SaveFileStore(root).TryRead("encounter", out var envelope, out _));
-                Assert.AreEqual(EncounterSave.FormatVersion, envelope.formatVersion); Assert.AreEqual(7, EncounterSave.FormatVersion);
+                Assert.AreEqual(EncounterSave.FormatVersion, envelope.formatVersion); Assert.GreaterOrEqual(EncounterSave.FormatVersion, 7);
                 StringAssert.Contains("\"discoveries\":[\"secret.oakhaven.mill-cache\",\"secret.khaven.bell-tower\",\"\"]", envelope.payloadJson);
                 Assert.IsTrue(save.Read(out var loaded, out var message), message);
                 CollectionAssert.AreEqual(new[] { "secret.oakhaven.mill-cache", "secret.khaven.bell-tower" }, loaded.discoveries, "Kept in order; a blank id is no find and is dropped.");

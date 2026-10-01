@@ -1,0 +1,31 @@
+{
+  "craftSlots": 2,
+  "professions": [
+    { "id": "mining", "name": "Mining", "kind": "gather", "tool": "tool.pick", "verb": "Mine", "taught": "You hang the pick at your belt. You can now mine.", "description": "Ore lies in seams along the cliffs and on cave floors. It takes a pick and a strong back, and any smith will pay for what you carry out.", "canonStatus": "GAME-ONLY" },
+    { "id": "woodcutting", "name": "Woodcutting", "kind": "gather", "tool": "tool.hatchet", "verb": "Cut", "taught": "You hang the hatchet at your belt. You can now cut timber.", "description": "Wind-felled timber is anyone's to cut. It takes a hatchet. Standing trees are left to stand.", "canonStatus": "GAME-ONLY" },
+    { "id": "herbalism", "name": "Herbalism", "kind": "gather", "verb": "Gather", "description": "Bare hands and a good eye. Herbs grow where the ground suits them, and grow back when picked.", "canonStatus": "GAME-ONLY" },
+    { "id": "cooking", "name": "Cooking", "kind": "free", "station": "fire", "description": "Meat, flour and eggs become something worth eating at any fire: an inn's hearth, a bake oven, a cookfire. Everyone can cook. Few do it well.", "canonStatus": "GAME-ONLY" },
+    { "id": "blacksmithing", "name": "Blacksmithing", "kind": "craft", "station": "forge", "trainerRole": "blacksmith", "description": "Ore to bars, and bars to blades and plate, at a forge. A craft takes years, and a body has time for two.", "canonStatus": "GAME-ONLY" },
+    { "id": "alchemy", "name": "Alchemy", "kind": "craft", "station": "bench", "trainerRole": "herbalist", "description": "Herbs to draughts, at a herbalist's bench. A craft takes years, and a body has time for two.", "canonStatus": "GAME-ONLY" }
+  ],
+  "nodes": [
+    { "id": "node.copper", "name": "Copper seam", "profession": "mining", "skill": 1, "item": "mat.copper_ore", "min": 1, "max": 3, "respawn": 180, "seconds": 2, "look": "ore", "variant": 0, "prompt": "Mine the copper seam" },
+    { "id": "node.copper_rich", "name": "Rich copper seam", "profession": "mining", "skill": 1, "item": "mat.copper_ore", "min": 2, "max": 4, "respawn": 180, "seconds": 2, "look": "ore_rich", "variant": 0, "prompt": "Mine the rich copper seam" },
+    { "id": "node.bogiron", "name": "Bog-iron seam", "profession": "mining", "skill": 20, "item": "mat.bogiron_ore", "min": 1, "max": 3, "respawn": 180, "seconds": 2, "look": "ore", "variant": 1, "prompt": "Mine the bog-iron seam" },
+    { "id": "node.adit", "name": "Adit iron seam", "profession": "mining", "skill": 40, "item": "mat.adit_ore", "min": 1, "max": 3, "respawn": 180, "seconds": 2, "look": "ore", "variant": 2, "prompt": "Mine the iron seam" },
+    { "id": "node.cinder", "name": "Cinder seam", "profession": "mining", "skill": 60, "item": "mat.cinder_ore", "min": 1, "max": 3, "respawn": 180, "seconds": 2, "look": "ore", "variant": 3, "prompt": "Mine the cinder seam" },
+    { "id": "node.veridian", "name": "Veridian seam", "profession": "mining", "skill": 80, "item": "mat.veridian_ore", "min": 1, "max": 3, "respawn": 180, "seconds": 2, "look": "ore", "variant": 4, "prompt": "Mine the Veridian seam" },
+    { "id": "node.veridian_rich", "name": "Rich Veridian seam", "profession": "mining", "skill": 80, "item": "mat.veridian_ore", "min": 2, "max": 4, "respawn": 180, "seconds": 2, "look": "ore_rich", "variant": 4, "prompt": "Mine the rich Veridian seam" },
+    { "id": "node.oak", "name": "Windfall oak", "profession": "woodcutting", "skill": 1, "item": "mat.oak_log", "min": 1, "max": 3, "respawn": 180, "seconds": 2, "look": "windfall", "variant": 0, "prompt": "Cut the windfall oak" },
+    { "id": "node.blackpine", "name": "Windfall black pine", "profession": "woodcutting", "skill": 20, "item": "mat.blackpine_log", "min": 1, "max": 3, "respawn": 180, "seconds": 2, "look": "windfall", "variant": 1, "prompt": "Cut the windfall pine" },
+    { "id": "node.stonepine", "name": "Windfall stone-pine", "profession": "woodcutting", "skill": 40, "item": "mat.stonepine_log", "min": 1, "max": 3, "respawn": 180, "seconds": 2, "look": "windfall", "variant": 2, "prompt": "Cut the windfall stone-pine" },
+    { "id": "node.snag", "name": "Fallen ash-snag", "profession": "woodcutting", "skill": 60, "item": "mat.snag_wood", "min": 1, "max": 3, "respawn": 180, "seconds": 2, "look": "windfall", "variant": 3, "prompt": "Cut the fallen snag" },
+    { "id": "node.ghostoak", "name": "Windfall ghost-oak", "profession": "woodcutting", "skill": 80, "item": "mat.ghostoak_log", "min": 1, "max": 3, "respawn": 180, "seconds": 2, "look": "windfall", "variant": 4, "prompt": "Cut the windfall ghost-oak" },
+    { "id": "node.yarrow", "name": "Yarrow", "profession": "herbalism", "skill": 1, "item": "mat.yarrow", "min": 1, "max": 2, "respawn": 90, "seconds": 1.5, "look": "herb", "variant": 0, "prompt": "Gather yarrow" },
+    { "id": "node.mourners_cap", "name": "Mourner's cap", "profession": "herbalism", "skill": 20, "item": "mat.mourners_cap", "min": 1, "max": 2, "respawn": 90, "seconds": 1.5, "look": "herb", "variant": 1, "prompt": "Pick mourner's cap" },
+    { "id": "node.tarnwort", "name": "Tarnwort", "profession": "herbalism", "skill": 40, "item": "mat.tarnwort", "min": 1, "max": 2, "respawn": 90, "seconds": 1.5, "look": "herb", "variant": 3, "prompt": "Gather tarnwort" },
+    { "id": "node.cinder_thistle", "name": "Cinder-thistle", "profession": "herbalism", "skill": 60, "item": "mat.cinder_thistle", "min": 1, "max": 2, "respawn": 90, "seconds": 1.5, "look": "herb", "variant": 4, "prompt": "Cut the cinder-thistle" },
+    { "id": "node.dewfern", "name": "Dewfern", "profession": "herbalism", "skill": 80, "item": "mat.dewfern", "min": 1, "max": 2, "respawn": 90, "seconds": 1.5, "look": "herb", "variant": 5, "prompt": "Gather dewfern" }
+  ],
+  "recipes": []
+}

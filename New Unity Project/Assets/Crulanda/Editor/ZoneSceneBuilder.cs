@@ -18,6 +18,7 @@ namespace Crulanda.EditorTools
         const string ArtRoot = "Assets/Crulanda/World/Art";
         public const string OakhavenScene = "Assets/Crulanda/Scenes/Oakhaven.unity";
         const string OakhavenJson = "Assets/Crulanda/EncounterContent/Zones/oakhaven.json";
+        public const string ProfessionsFolder = "Assets/Crulanda/EncounterContent/Professions";
 
         [MenuItem("Crulanda/World/Build Oakhaven")]
         public static void BuildOakhaven()
@@ -31,7 +32,7 @@ namespace Crulanda.EditorTools
             AssetDatabase.SaveAssets();
             Debug.Log("OAKHAVEN_BUILT");
         }
-        /// <summary>Points the encounter content at every quest JSON (EncounterContent/Quests), so new quest files are never left out.</summary>
+        /// <summary>Points the encounter content at every quest, item and profession JSON (EncounterContent/Quests, Items, Professions), so new files are never left out.</summary>
         static void RegisterQuests()
         {
             var content = AssetDatabase.LoadAssetAtPath<EncounterContent>("Assets/Crulanda/EncounterContent/Encounter.asset");
@@ -51,8 +52,19 @@ namespace Crulanda.EditorTools
                 if (path.EndsWith(".json")) items.Add(AssetDatabase.LoadAssetAtPath<TextAsset>(path));
             }
             content.itemFiles = items.ToArray();
+            // Trades (EncounterContent/Professions): the folder may be missing in an older checkout, and FindAssets warns about that.
+            var trades = new System.Collections.Generic.List<TextAsset>();
+            if (AssetDatabase.IsValidFolder(ProfessionsFolder))
+                foreach (var guid in AssetDatabase.FindAssets("t:TextAsset", new[] { ProfessionsFolder }))
+                {
+                    string path = AssetDatabase.GUIDToAssetPath(guid);
+                    if (path.EndsWith(".json")) trades.Add(AssetDatabase.LoadAssetAtPath<TextAsset>(path));
+                }
+            trades.Sort((a, b) => string.CompareOrdinal(a.name, b.name));
+            content.professionFiles = trades.ToArray();
             EditorUtility.SetDirty(content);
             Debug.Log("Registered " + files.Count + " quest files and " + items.Count + " item files.");
+            Debug.Log("Registered " + trades.Count + " profession files.");
         }
 
         static void CreateScene(ZoneArt art)

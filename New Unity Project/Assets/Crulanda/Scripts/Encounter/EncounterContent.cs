@@ -32,6 +32,8 @@ namespace Crulanda.Encounter
         public TextAsset[] questFiles = new TextAsset[0];
         [Tooltip("Item content JSON (items, merchants, loot tables). Registered by Crulanda > World > Build Oakhaven.")]
         public TextAsset[] itemFiles = new TextAsset[0];
+        [Tooltip("Trades JSON (professions, node kinds, recipes). Registered by Crulanda > World > Build Oakhaven.")]
+        public TextAsset[] professionFiles = new TextAsset[0];
         public PlayableClass FindClass(string id)
         {
             if (string.IsNullOrEmpty(id)) return null;

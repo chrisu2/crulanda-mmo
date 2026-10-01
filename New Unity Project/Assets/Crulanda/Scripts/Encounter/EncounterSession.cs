@@ -194,6 +194,8 @@ namespace Crulanda.Encounter
             if (Items == null && Progress.bag[bagIndex].item != content.itemId) return false;
             var d = Items?.Get(Progress.bag[bagIndex].item);
             if (d != null && d.kind == "consumable") return UseItem(bagIndex);
+            if (d != null && d.kind == "tool") return UseTool(bagIndex);
+            if (d != null && d.kind == "material") { Message(MaterialLine); return false; }
             string why;
             bool ok = Items != null ? Inventory.Equip(Progress, Items, bagIndex, Progress.Level, out why) : LegacyEquip(bagIndex, out why);
             if (!ok) { if (why != null) Message(why); return false; }
@@ -256,7 +258,7 @@ namespace Crulanda.Encounter
             VendorStock = Items.StockFor(v.Name, v.Role, band); if (VendorStock.Count == 0) return;
             // What the village brought the stall today (the hen-wife's eggs): sold on while they last.
             if (v.Role == "merchant" && VillageLife.Active != null && VillageLife.Active.Count("stall.eggs") > 0 && Items.Get(FreshEggs) != null) VendorStock.Insert(0, FreshEggs);
-            VendorNpc = v.Name; vendorAt = v.transform.position; InventoryOpen = true; Conversation = null; v.Hold(30);
+            VendorNpc = v.Name; vendorAt = v.transform.position; InventoryOpen = true; Conversation = null; TradesOpen = false; v.Hold(30);
         }
         public const string FreshEggs = "food.fresh_eggs";
         public void CloseVendor() { VendorNpc = null; VendorStock = new List<string>(); }
@@ -270,8 +272,7 @@ namespace Crulanda.Encounter
         public void SellJunk()
         {
             if (VendorNpc == null) return;
-            int total = 0;
-            for (int i = 0; i < Progress.bag.Count; i++) { var d = Items.Get(Progress.bag[i].item); if (d != null && (d.kind == "junk" || d.quality == 0)) total += Inventory.Sell(Progress, Items, i); }
+            int total = Inventory.SellJunk(Progress, Items);
             Message(total > 0 ? "Sold your junk for " + total + " gold." : "Nothing worth selling as junk."); Save(false);
         }
         public void Buy(string item)
@@ -284,6 +285,47 @@ namespace Crulanda.Encounter
                 if (item == FreshEggs) { VillageLife.Active.Take("stall.eggs"); if (VillageLife.Active.Count("stall.eggs") == 0) VendorStock.Remove(item); }
             }
             else Message(why);
+        }
+
+        // ---------- trades: gathering skills, Cooking and crafts (ProfessionLog; save format 8) ----------
+        /// <summary>What the character knows of the trades (null when profession content is missing or invalid).</summary>
+        public ProfessionLog Professions { get; private set; }
+        /// <summary>The Trades window (K).</summary>
+        public bool TradesOpen { get; private set; }
+        /// <summary>What using a crafting material from the bags says.</summary>
+        public const string MaterialLine = "A crafting material. Press K.";
+        static ProfessionDatabase professionCache; static EncounterContent professionCacheFor; static ItemDatabase professionCacheItems;
+        /// <summary>Reads the profession files against the items. A bad file is logged and leaves the trades off; the items stay.</summary>
+        void LoadProfessions()
+        {
+            if (Items == null || content.professionFiles == null || content.professionFiles.Length == 0) return;
+            try
+            {
+                if (professionCache == null || professionCacheFor != content || professionCacheItems != Items)
+                {
+                    var texts = new List<string>(); foreach (var f in content.professionFiles) if (f != null) texts.Add(f.text);
+                    professionCache = ProfessionDatabase.Parse(texts, Items); professionCacheFor = content; professionCacheItems = Items;
+                }
+                var db = professionCache;
+                Professions = new ProfessionLog(db, Items, Progress);
+                Professions.Say = Message;
+                Professions.SkillUp = (id, skill) => Message(db.Profession(id).name + " " + skill + ".");
+            }
+            catch (ArgumentException e) { Debug.LogError("Profession content invalid:\n" + e.Message); Professions = null; }
+        }
+        /// <summary>Opens or closes the Trades window. Opening it closes the character sheet and a merchant, and opens the bags beside it.</summary>
+        public void ShowTrades(bool open)
+        {
+            if (open && Professions == null) { Message("You have no trade to speak of yet."); return; }
+            TradesOpen = open;
+            if (open) { CharacterOpen = false; CloseVendor(); InventoryOpen = true; }
+        }
+        /// <summary>A gathering tool used from the bags: it teaches its skill and hangs at the belt, or is refused and kept ("You already carry one.").</summary>
+        bool UseTool(int bagIndex)
+        {
+            if (Professions == null) { Message("You have no use for that yet."); return false; }
+            if (!Professions.UseTool(bagIndex, out var why)) { if (why != null) Message(why); return false; }
+            Save(false); return true;
         }
 
         // ---------- routing between zones (maps and breadcrumbs) ----------
@@ -696,7 +738,7 @@ namespace Crulanda.Encounter
                 return;
             }
             View = Camera.main;
-            LoadItems();
+            LoadItems(); LoadProfessions();
             SpawnParty();
             // Villagers and critters live alongside the encounter (they survive load/respawn of the party).
             if (Zone != null && Zone.Zone.life != null) new GameObject("Village life").AddComponent<VillageLife>().Init(this);
@@ -909,6 +951,7 @@ namespace Crulanda.Encounter
                 // Esc closes open windows (conversation, quest book, map) before it pauses.
                 if (Conversation != null && !Paused) Conversation = null;
                 else if (VendorNpc != null && !Paused) CloseVendor();
+                else if (TradesOpen && !Paused) TradesOpen = false;
                 else if ((CharacterOpen || InventoryOpen) && !Paused) { CharacterOpen = false; InventoryOpen = false; }
                 else if (QuestBookOpen && !Paused) { QuestBookOpen = false; ReadingDocument = null; }
                 else if (MapOpen && !Paused) MapOpen = false;
@@ -921,7 +964,8 @@ namespace Crulanda.Encounter
             // Moving interrupts the player's own cast-time abilities (instant abilities are unaffected).
             abilities.Tick(Time.time, Player.IsAlive && !Player.GetComponent<AdventurerMotor>().Moving);
             if (EncounterInput.Press(KeyCode.I)) InventoryOpen = !InventoryOpen;
-            if (EncounterInput.Press(KeyCode.C)) CharacterOpen = !CharacterOpen;
+            if (EncounterInput.Press(KeyCode.C)) { CharacterOpen = !CharacterOpen; if (CharacterOpen) TradesOpen = false; }
+            if (EncounterInput.Press(KeyCode.K)) ShowTrades(!TradesOpen);
             if (EncounterInput.Press(KeyCode.F9)) { Load(); return; }
             if (EncounterInput.Press(KeyCode.F5)) Save();
             if (EncounterInput.Press(KeyCode.F10)) PrototypeLevelCap();
@@ -1211,6 +1255,7 @@ namespace Crulanda.Encounter
             Floating.Clear(); SpawnParty(); Message(error ?? "Saved expedition restored.");
             if (Quests != null) { Quests.Bind(Progress); Conversation = null; emptiedHidden = false; ReconcileQuests(); }
             if (Discoveries != null) { Discoveries.Bind(Progress); pocketedSynced = false; vistaWaiting = null; }
+            if (Professions != null) Professions.Bind(Progress);
         }
         public void RepeatTrail()
         {

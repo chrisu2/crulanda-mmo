@@ -20,6 +20,7 @@ namespace Crulanda.Encounter
         {
             if (instance != null) return;
             var go = new GameObject("Gear binder"); DontDestroyOnLoad(go); instance = go.AddComponent<GearBinder>();
+            UnityEngine.SceneManagement.SceneManager.sceneLoaded += (scene, mode) => { if (instance != null) { instance.session = null; instance.nextSearch = 0; } };
         }
 
         void LateUpdate()

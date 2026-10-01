@@ -877,6 +877,25 @@ namespace Crulanda.World
         {
             return MeshPart(ZoneMeshes.Box(size, tile, localPos), parent, localPos, m, rot);
         }
+        /// <summary>
+        /// Dressed stone in a zone's own tint: the painted masonry. Its texture is darker than the plain stone that built stone
+        /// used to wear (a mean of about .63 against .83), so the tint is lifted by a little less than that and a wall keeps
+        /// the colour it had, never brighter. Plain stone in the tint as given until the art has a masonry.
+        /// </summary>
+        Material Dressed(Color c) { return art.masonry != null ? Tint(art.masonry, new Color(c.r * 1.25f, c.g * 1.25f, c.b * 1.25f)) : Tint(art.stone, c); }
+        /// <summary>One block of a piece of stonework (see Stonework): a box at <paramref name="at"/> in its prop, its texture
+        /// measured in metres from the prop's own origin, so the courses run on from block to block.</summary>
+        static CombineInstance Ashlar(Vector3 at, Vector3 size, float tile = 1.75f, Quaternion? rot = null) { return Piece(ZoneMeshes.Box(size, tile, at), at, rot); }
+        /// <summary>Blocks joined into one mesh of one material (a wall with its merlons, a gate's span and corbels): one object
+        /// for the lot. The blocks' own meshes are used up.</summary>
+        GameObject Stonework(string name, Transform parent, Material m, params CombineInstance[] blocks)
+        {
+            var mesh = Joined(blocks); mesh.name = name;
+            foreach (var b in blocks) DestroyImmediate(b.mesh);
+            return MeshPart(mesh, parent, Vector3.zero, m);
+        }
+        /// <summary>A headstone: one slab with a rounded head, .6 wide, a metre tall and .15 thick, centred like a cube.</summary>
+        Mesh Headstone { get { return PropMesh("Headstone", () => Cutout(new[] { new Vector2(-.3f, -.5f), new Vector2(-.3f, .26f), new Vector2(-.22f, .41f), new Vector2(-.09f, .5f), new Vector2(.09f, .5f), new Vector2(.22f, .41f), new Vector2(.3f, .26f), new Vector2(.3f, -.5f) }, .15f)); } }
         void Solid(Transform root, Vector3 center, Vector3 size)
         {
             var box = root.gameObject.AddComponent<BoxCollider>(); box.center = center; box.size = size;
@@ -935,7 +954,7 @@ namespace Crulanda.World
                     case "barrels": for (int i = 0; i <= p.variant % 3; i++) Barrel(t, new Vector3(i * .75f - .4f, 0, (i % 2) * .6f), i == 1 ? .9f : 1, i * 70); Solid(t, new Vector3(0, .5f, .3f), new Vector3(2.2f, 1, 1.4f)); break;
                     case "crates": for (int i = 0; i <= p.variant % 3; i++) Crate(t, new Vector3(i == 2 ? -.05f : i * .9f - .5f, i == 2 ? 1.19f : .41f, 0), i == 2 ? .7f : .82f, i == 2 ? 24 : i * 9 - 4); Solid(t, new Vector3(0, .5f, 0), new Vector3(2.2f, 1, 1)); break;   // the third crate rests across the two below, not on air
                     case "lamp": Lamp(t, p.variant); break;
-                    case "grave": { float a = R01 * 8 - 4, b = R01 * 8 - 4; if (p.variant == 1) { a = Mathf.Sign(a) * (14 + Mathf.Abs(a) * 2); b *= 2; } Part(PrimitiveType.Cube, t, new Vector3(0, p.variant == 1 ? .36f : .46f, 0), new Vector3(.6f, 1, .15f), art.stone, Quaternion.Euler(a, 0, b)); break; }   // variant 1: heaved over and half sunk (the drowned graves)
+                    case "grave": { float a = R01 * 8 - 4, b = R01 * 8 - 4; if (p.variant == 1) { a = Mathf.Sign(a) * (14 + Mathf.Abs(a) * 2); b *= 2; } MeshPart(Headstone, t, new Vector3(0, p.variant == 1 ? .36f : .46f, 0), RockTint(new Color(.52f, .51f, .48f)), Quaternion.Euler(a, 0, b)); break; }   // variant 1: heaved over and half sunk (the drowned graves)
                     case "rock":
                     {
                         float s = 1 + p.variant * .6f; var stone = RockTint(new Color(.52f, .51f, .48f));
@@ -1268,10 +1287,10 @@ namespace Crulanda.World
         /// </summary>
         void CrackedHearth(Transform t, float w, float H, float roofH)
         {
-            var stone = Tint(art.stone, new Color(.42f, .4f, .37f)); float face = w / 2 + 1.05f, z = .8f, low = H * .62f;
-            var breast = Part(PrimitiveType.Cube, t, new Vector3(w / 2 + .6f, low / 2, z), new Vector3(.9f, low, 2.2f), stone);
-            breast.AddComponent<BoxCollider>(); breast.AddComponent<NavBlocker>();
-            Part(PrimitiveType.Cube, t, new Vector3(w / 2 + .65f, (low + H + .4f) / 2, z), new Vector3(.8f, H + .4f - low, 1.2f), stone);
+            var stone = Dressed(new Color(.42f, .4f, .37f)); float face = w / 2 + 1.05f, z = .8f, low = H * .62f;
+            var breast = BoxPart(t, new Vector3(w / 2 + .6f, low / 2, z), new Vector3(.9f, low, 2.2f), stone, null, 1);
+            var solid = breast.AddComponent<BoxCollider>(); solid.center = Vector3.zero; solid.size = new Vector3(.9f, low, 2.2f); breast.AddComponent<NavBlocker>();
+            BoxPart(t, new Vector3(w / 2 + .65f, (low + H + .4f) / 2, z), new Vector3(.8f, H + .4f - low, 1.2f), stone, null, 1);
             Part(PrimitiveType.Cube, t, new Vector3(face, .42f, z), new Vector3(.04f, .45f, .55f), art.glass);   // the ash-pit door, glowing
             // The crack zig-zags up the outer face from the ash-pit to the seam (p: height, depth).
             var p = new Vector2(.5f, z - .05f);
@@ -1285,12 +1304,12 @@ namespace Crulanda.World
             var stack = new GameObject("Chimney stack").transform; stack.SetParent(t, false);
             stack.localPosition = new Vector3(w / 2 + .72f, H + .44f, z); stack.localRotation = Quaternion.Euler(0, 0, -5);   // leaning away from the house
             float tall = roofH + 1.2f;
-            Part(PrimitiveType.Cube, stack, new Vector3(0, tall / 2, 0), new Vector3(.8f, tall, 1.2f), stone);
-            Part(PrimitiveType.Cube, stack, new Vector3(0, tall + .1f, 0), new Vector3(1, .2f, 1.4f), stone);
+            BoxPart(stack, new Vector3(0, tall / 2, 0), new Vector3(.8f, tall, 1.2f), stone, null, 1);
+            BoxPart(stack, new Vector3(0, tall + .1f, 0), new Vector3(1, .2f, 1.4f), stone, null, 1);
             if (art.particle != null) Smoke(stack, new Vector3(0, tall + .4f, 0));
             // Stones fallen from the crack.
-            Part(PrimitiveType.Cube, t, new Vector3(face + .5f, .1f, z + .9f), new Vector3(.4f, .25f, .3f), stone, Quaternion.Euler(0, 30, 0));
-            Part(PrimitiveType.Cube, t, new Vector3(face + .35f, .08f, z - .7f), new Vector3(.3f, .2f, .35f), stone, Quaternion.Euler(0, -20, 0));
+            BoxPart(t, new Vector3(face + .5f, .1f, z + .9f), new Vector3(.4f, .25f, .3f), stone, Quaternion.Euler(0, 30, 0));
+            BoxPart(t, new Vector3(face + .35f, .08f, z - .7f), new Vector3(.3f, .2f, .35f), stone, Quaternion.Euler(0, -20, 0));
         }
         void Barn(Transform t, Vector2 size)
         {
@@ -2113,10 +2132,11 @@ namespace Crulanda.World
         }
         void Ruin(Transform t, float length)
         {
+            var stone = Dressed(new Color(.42f, .41f, .38f));
             for (float x = -length / 2; x < length / 2; x += 1.1f)
             {
                 float h = .6f + R01 * 2.4f, g = LocalGround(t, x, 0) - .15f;   // each block stands on (and a little into) the ground under it
-                Part(PrimitiveType.Cube, t, new Vector3(x, g + (h + .15f) / 2, 0), new Vector3(1.05f, h + .15f, .8f), Tint(art.stone, new Color(.42f, .41f, .38f)), Quaternion.Euler(0, R01 * 6 - 3, R01 * 6 - 3));
+                BoxPart(t, new Vector3(x, g + (h + .15f) / 2, 0), new Vector3(1.05f, h + .15f, .8f), stone, Quaternion.Euler(0, R01 * 6 - 3, R01 * 6 - 3), 1.5f);
             }
             Solid(t, new Vector3(0, 1.2f, 0), new Vector3(length, 2.4f, 1));
         }
@@ -2127,10 +2147,9 @@ namespace Crulanda.World
         void Wayshrine(Transform t)
         {
             var stone = Tint(art.stone, new Color(.6f, .57f, .5f)); var dark = Tint(art.stone, new Color(.12f, .11f, .1f));
-            Part(PrimitiveType.Cube, t, new Vector3(0, .02f, 0), new Vector3(2.2f, .5f, 2.2f), stone);   // deep enough to sit on a slope
-            Part(PrimitiveType.Cube, t, new Vector3(0, .35f, .15f), new Vector3(1.5f, .22f, 1.5f), stone);
-            Part(PrimitiveType.Cube, t, new Vector3(0, 1.23f, .25f), new Vector3(.5f, 1.6f, .5f), stone);
-            Part(PrimitiveType.Cube, t, new Vector3(0, 2.4f, .25f), new Vector3(.9f, .8f, .75f), stone);
+            // Two steps (the lower deep enough to sit on a slope), the pillar, a cap course on it and the niche house: small dressed stone, one mesh.
+            Stonework("Wayshrine stone", t, Dressed(new Color(.6f, .57f, .5f)), Ashlar(new Vector3(0, .02f, 0), new Vector3(2.2f, .5f, 2.2f), 1), Ashlar(new Vector3(0, .35f, .15f), new Vector3(1.5f, .22f, 1.5f), 1),
+                Ashlar(new Vector3(0, 1.23f, .25f), new Vector3(.5f, 1.6f, .5f), 1), Ashlar(new Vector3(0, 1.95f, .25f), new Vector3(.66f, .12f, .66f), 1), Ashlar(new Vector3(0, 2.4f, .25f), new Vector3(.9f, .8f, .75f), 1));
             Part(PrimitiveType.Cube, t, new Vector3(0, 2.38f, -.13f), new Vector3(.6f, .56f, .04f), dark);
             Part(PrimitiveType.Capsule, t, new Vector3(0, 2.36f, -.17f), new Vector3(.18f, .2f, .1f), Tint(art.stone, new Color(.86f, .84f, .78f)));
             MeshPart(ZoneMeshes.GableRoof(1.25f, 1.15f, .45f, .12f), t, new Vector3(0, 2.8f, .25f), art.slate, Quaternion.Euler(0, 90, 0));
@@ -2152,7 +2171,7 @@ namespace Crulanda.World
             // A fallen building: broken wall stubs of uneven height, a charred remnant of roof slumped inside, fallen beams.
             float w = size.x, d = size.y; var plaster = Tint(art.plaster, Zone.biome == "ash" ? new Color(.46f, .455f, .45f) : new Color(.52f, .48f, .42f)); var charred = Tint(art.timber, new Color(.13f, .11f, .1f));
             float drop = FootDrop(t, w + .3f, d + .3f);   // on a slope the floor slab reaches down to the lowest ground under it
-            Part(PrimitiveType.Cube, t, new Vector3(0, .3f - drop / 2, 0), new Vector3(w + .3f, .6f + drop, d + .3f), art.stone);
+            BoxPart(t, new Vector3(0, .3f - drop / 2, 0), new Vector3(w + .3f, .6f + drop, d + .3f), Dressed(new Color(.52f, .51f, .48f)), null, 1.5f);
             foreach (int sz in new[] { -1, 1 })
                 for (float x = -w / 2 + .6f; x < w / 2; x += 1.2f)
                 {
@@ -2183,11 +2202,12 @@ namespace Crulanda.World
             }
             Solid(t, new Vector3(0, 1.5f, 0), new Vector3(w + .4f, 3, d + .4f));
         }
-        /// <summary>Stone curtain wall along a polyline, with a walkway lip and crenellations.</summary>
+        /// <summary>Stone curtain wall along a polyline: a plinth course at its foot, a coping under the battlements and
+        /// crenellations, each run one mesh of dressed stone.</summary>
         void Wall(Vector2[] pts, Transform parent)
         {
             if (pts == null || pts.Length < 2) return;
-            var stone = Tint(art.stone, new Color(.46f, .45f, .42f));
+            var stone = Dressed(new Color(.46f, .45f, .42f));
             for (int i = 0; i + 1 < pts.Length; i++)
             {
                 Vector2 a = pts[i], b = pts[i + 1]; float len = Vector2.Distance(a, b); if (len < .1f) continue;
@@ -2196,9 +2216,12 @@ namespace Crulanda.World
                 // Down to the lowest ground along the run, so a wall across a slope (or off a levelled gate pad) never shows daylight under it.
                 float low = seg.position.y; for (int k = 0; k <= 8; k++) { var q = Vector2.Lerp(a, b, k / 8f); low = Mathf.Min(low, HeightAt(q.x, q.y)); }
                 float sink = seg.position.y - low + .4f;
-                Part(PrimitiveType.Cube, seg, new Vector3(0, (3.9f - sink) / 2, 0), new Vector3(1.2f, 3.9f + sink, len + .6f), stone);
+                var blocks = new List<CombineInstance> { Ashlar(new Vector3(0, (3.9f - sink) / 2, 0), new Vector3(1.2f, 3.9f + sink, len + .6f)),
+                    Ashlar(new Vector3(0, (.55f - sink) / 2, 0), new Vector3(1.4f, .55f + sink, len + .7f)),   // the plinth course, as wide as the collider
+                    Ashlar(new Vector3(0, 3.84f, 0), new Vector3(1.4f, .2f, len + .7f)) };                       // the coping the merlons stand on
                 for (float z = -len / 2 + .5f; z < len / 2; z += 1.4f)
-                    foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, seg, new Vector3(s * .45f, 4.2f, z), new Vector3(.35f, .6f, .7f), stone);
+                    foreach (int s in new[] { -1, 1 }) blocks.Add(Ashlar(new Vector3(s * .45f, 4.2f, z), new Vector3(.35f, .6f, .7f)));
+                Stonework("Wall stone", seg, stone, blocks.ToArray());
                 Solid(seg, new Vector3(0, 2, 0), new Vector3(1.4f, 5, len + .4f));
             }
         }
@@ -2245,17 +2268,23 @@ namespace Crulanda.World
         }
         void Tower(Transform t, float diameter)
         {
-            float h = 7.5f; var stone = Tint(art.stone, new Color(.44f, .43f, .41f));
+            float h = 7.5f, r = diameter / 2; var stone = Dressed(new Color(.44f, .43f, .41f)); var slit = Tint(art.timber, new Color(.05f, .04f, .03f));
             float drop = FootDrop(t, diameter * .8f, diameter * .8f);   // on a slope the tower's foot reaches the lowest ground at its base
-            Part(PrimitiveType.Cylinder, t, new Vector3(0, (h - drop) / 2, 0), new Vector3(diameter, (h + drop) / 2, diameter), stone);
+            // The drum, turned in one piece: a plinth course at the foot, the shaft (the old cylinder's girth), and a corbelled
+            // ring under the battlements. The stone tiles in metres round it and up it.
+            var drum = Turned(new[] { new Vector2(r + .14f, -drop), new Vector2(r + .14f, .5f), new Vector2(r, .68f), new Vector2(r, h - 1), new Vector2(r + .16f, h - .8f), new Vector2(r + .16f, h), new Vector2(0, h) }, 20, 1.75f);
+            drum.name = "Tower drum"; MeshPart(drum, t, Vector3.zero, stone);
+            var merlons = new CombineInstance[10];
             for (int i = 0; i < 10; i++)
             {
                 float a = i * 36 * Mathf.Deg2Rad;
-                Part(PrimitiveType.Cube, t, new Vector3(Mathf.Cos(a) * diameter * .46f, h + .35f, Mathf.Sin(a) * diameter * .46f), new Vector3(.6f, .7f, .6f), stone, Quaternion.Euler(0, -i * 36, 0));
+                merlons[i] = Piece(ZoneMeshes.Box(new Vector3(.6f, .7f, .6f), 1.75f), new Vector3(Mathf.Cos(a) * diameter * .46f, h + .35f, Mathf.Sin(a) * diameter * .46f), Quaternion.Euler(0, -i * 36, 0));
             }
-            if (cone == null) cone = ZoneMeshes.Cone(1, 1);
-            var roof = MeshPart(cone, t, new Vector3(0, h + .2f, 0), art.slate); roof.transform.localScale = new Vector3(diameter * .55f, 3.2f, diameter * .55f);
+            Stonework("Tower battlements", t, stone, merlons);
+            MeshPart(PropMesh("Tower roof " + Mathf.RoundToInt(diameter * 100), () => ZoneMeshes.Spire(diameter * .55f, 3.2f)), t, new Vector3(0, h + .2f, 0), art.slate);
             Part(PrimitiveType.Cube, t, new Vector3(0, 4.5f, -diameter / 2 - .02f), new Vector3(.4f, .9f, .1f), art.glass);
+            foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(s * r, 3.3f, 0), new Vector3(.1f, 1, .16f), slit);   // arrow slits to the sides and the back
+            Part(PrimitiveType.Cube, t, new Vector3(0, 3.3f, r), new Vector3(.16f, 1, .1f), slit);
             var cap = t.gameObject.AddComponent<CapsuleCollider>(); cap.center = new Vector3(0, h / 2, 0); cap.height = h + 3; cap.radius = diameter / 2;
             t.gameObject.AddComponent<NavBlocker>();
         }
@@ -2276,7 +2305,7 @@ namespace Crulanda.World
         /// </summary>
         void Crypt(Transform t, int variant = 0)
         {
-            var stone = Tint(art.stone, new Color(.36f, .36f, .37f));
+            var stone = Dressed(new Color(.36f, .36f, .37f));
             if (variant == 1)
             {
                 // On a slope the mound reaches down past the lowest ground round its foot (its top drops only half as far).
@@ -2284,6 +2313,7 @@ namespace Crulanda.World
                 Part(PrimitiveType.Sphere, t, new Vector3(0, -.2f - sink, 2.2f), new Vector3(7.4f, 5.8f + sink, 8.6f), Tint(art.foliage, new Color(.3f, .31f, .19f)));
                 Part(PrimitiveType.Cube, t, new Vector3(0, e + 1.05f, -2.15f), new Vector3(1.6f, 2.2f, .1f), Tint(art.metal, new Color(.04f, .04f, .05f)));
                 Part(PrimitiveType.Cube, t, new Vector3(0, e + 1.05f, -1.2f), new Vector3(1.6f, 2.2f, 1.9f), Tint(art.metal, new Color(.04f, .04f, .05f)));   // the dark passage behind the door
+                stone = RockTint(new Color(.36f, .36f, .37f));   // a barrow is single great stones, not coursed work
                 foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(s * 1.05f, e + 1.1f, -1.2f), new Vector3(.5f, 2.3f, 2.6f), stone);   // jambs run back into the mound
                 Part(PrimitiveType.Cube, t, new Vector3(0, e + 2.4f, -.9f), new Vector3(2.9f, .45f, 3.2f), stone);
                 Part(PrimitiveType.Cube, t, new Vector3(0, e - .1f, -2.9f), new Vector3(2.6f, .4f, 1.2f), stone);
@@ -2297,14 +2327,17 @@ namespace Crulanda.World
             else
             {
                 float drop = FootDrop(t, 6, 6, 1.5f);   // on a slope the vault reaches down to the lowest ground under it
-                Part(PrimitiveType.Cube, t, new Vector3(0, 1.2f - drop / 2, 1.5f), new Vector3(6, 2.4f + drop, 6), stone);
+                // The vault, a cornice under the eaves, the door's pillars and three steps: one mesh of dressed stone.
+                var blocks = new List<CombineInstance> { Ashlar(new Vector3(0, 1.2f - drop / 2, 1.5f), new Vector3(6, 2.4f + drop, 6)), Ashlar(new Vector3(0, 2.09f, 1.5f), new Vector3(6.3f, .22f, 6.3f)) };
+                foreach (int s in new[] { -1, 1 }) blocks.Add(Ashlar(new Vector3(s * 1.4f, 1.3f, -1.7f), new Vector3(.6f, 2.6f, .6f)));
+                for (int i = 0; i < 3; i++) blocks.Add(Ashlar(new Vector3(0, .1f + i * .12f, -2.6f + i * .35f), new Vector3(2.6f, .2f, .4f)));
+                Stonework("Crypt stone", t, stone, blocks.ToArray());
                 MeshPart(ZoneMeshes.GableRoof(6.6f, 6.6f, 1.6f), t, new Vector3(0, 2.4f, 1.5f), Tint(art.slate, new Color(.27f, .28f, .3f)));
                 Part(PrimitiveType.Cube, t, new Vector3(0, 1, -1.52f), new Vector3(1.8f, 2, .1f), Tint(art.metal, new Color(.14f, .14f, .16f)));
-                foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(s * 1.4f, 1.3f, -1.7f), new Vector3(.6f, 2.6f, .6f), stone);
-                for (int i = 0; i < 3; i++) Part(PrimitiveType.Cube, t, new Vector3(0, .1f + i * .12f, -2.6f + i * .35f), new Vector3(2.6f, .2f, .4f), stone);
             }
-            // Grave markers before it (the same five draws each, in the same order), set on the ground where they stand.
-            for (int i = 0; i < 6; i++) { float gx = R01 * 10 - 5, gz = -4 - R01 * 4; Part(PrimitiveType.Cube, t, new Vector3(gx, LocalGround(t, gx, gz) + .46f, gz), new Vector3(.55f, 1, .15f), stone, Quaternion.Euler(R01 * 10 - 5, R01 * 30 - 15, R01 * 10 - 5)); }
+            // Grave markers before it (the same five draws each, in the same order), set on the ground where they stand: headstones, each one slab.
+            var slab = RockTint(new Color(.36f, .36f, .37f));
+            for (int i = 0; i < 6; i++) { float gx = R01 * 10 - 5, gz = -4 - R01 * 4; MeshPart(Headstone, t, new Vector3(gx, LocalGround(t, gx, gz) + .46f, gz), slab, Quaternion.Euler(R01 * 10 - 5, R01 * 30 - 15, R01 * 10 - 5)); }
             if (variant == 1) Solid(t, new Vector3(0, 1.2f, 1.85f), new Vector3(6.8f, 2.4f, 8.7f)); else Solid(t, new Vector3(0, 1.8f, 1.2f), new Vector3(6.2f, 3.6f, 6.6f));
         }
         /// <summary>
@@ -2578,7 +2611,7 @@ namespace Crulanda.World
             foreach (var e in Zone.exits)
             {
                 var t = new GameObject("Exit: " + e.name).transform; t.SetParent(statics, false); t.position = Ground(e.at);
-                Part(PrimitiveType.Cube, t, new Vector3(0, 1.1f, 0), new Vector3(.8f, 2.2f, .5f), Tint(art.stone, new Color(.5f, .48f, .44f)), Quaternion.Euler(0, 15, 0));
+                MeshPart(PropMesh("Waystone", () => Cutout(new[] { new Vector2(-.4f, -1.1f), new Vector2(-.4f, .78f), new Vector2(-.24f, 1.1f), new Vector2(.24f, 1.1f), new Vector2(.4f, .78f), new Vector2(.4f, -1.1f) }, .5f)), t, new Vector3(0, 1.1f, 0), RockTint(new Color(.5f, .48f, .44f)), Quaternion.Euler(0, 15, 0));   // one standing stone, its shoulders chamfered
                 Part(PrimitiveType.Cube, t, new Vector3(0, 2.45f, 0), new Vector3(.35f, .45f, .35f), art.glass);
                 var l = new GameObject("Waystone light").AddComponent<Light>(); l.transform.SetParent(t, false); l.transform.localPosition = new Vector3(0, 2.5f, 0);
                 l.type = LightType.Point; l.range = 6; l.intensity = 1.1f; l.color = new Color(1, .7f, .4f);
@@ -2693,12 +2726,12 @@ namespace Crulanda.World
             foreach (int sx in new[] { -1, 1 }) foreach (int sz in new[] { -1, 1 })
                 Part(PrimitiveType.Cube, t, new Vector3(sx * 2.4f, sz > 0 ? 1.6f : 1.35f, sz * 1.9f), new Vector3(.22f, sz > 0 ? 3.2f : 2.7f, .22f), dark);
             Part(PrimitiveType.Cube, t, new Vector3(0, 2.95f, 0), new Vector3(5.6f, .14f, 4.6f), art.slate, Quaternion.Euler(-8, 0, 0));
-            Part(PrimitiveType.Cube, t, new Vector3(0, .7f, 1.95f), new Vector3(5, 1.4f, .3f), art.stone);                        // back wall
+            BoxPart(t, new Vector3(0, .7f, 1.95f), new Vector3(5, 1.4f, .3f), Masonry, null, 1);                                  // back wall
             // Hearth, coals, hood and chimney.
-            Part(PrimitiveType.Cube, t, new Vector3(1.2f, .5f, 1.1f), new Vector3(1.8f, 1, 1.3f), art.stone);
+            BoxPart(t, new Vector3(1.2f, .5f, 1.1f), new Vector3(1.8f, 1, 1.3f), Masonry, null, 1);
             Part(PrimitiveType.Cube, t, new Vector3(1.2f, 1.02f, 1.05f), new Vector3(1.3f, .08f, .9f), art.glass);
-            Part(PrimitiveType.Cube, t, new Vector3(1.2f, 2.1f, 1.35f), new Vector3(1.3f, .9f, .9f), art.stone);
-            Part(PrimitiveType.Cube, t, new Vector3(1.2f, 3.4f, 1.5f), new Vector3(.55f, 1.8f, .55f), art.stone);
+            BoxPart(t, new Vector3(1.2f, 2.1f, 1.35f), new Vector3(1.3f, .9f, .9f), Masonry, null, 1);
+            BoxPart(t, new Vector3(1.2f, 3.4f, 1.5f), new Vector3(.55f, 1.8f, .55f), Masonry, null, 1);
             if (art.particle != null) Smoke(t, new Vector3(1.2f, 4.4f, 1.5f));
             Glow(t, new Vector3(1.2f, 1.5f, .6f), 7, 1.4f, new Color(1, .5f, .2f), 2.2f);
             Part(PrimitiveType.Cube, t, new Vector3(2.15f, .9f, 1.1f), new Vector3(.25f, .5f, .7f), Tint(art.timber, new Color(.4f, .28f, .18f))); // bellows
@@ -2786,7 +2819,7 @@ namespace Crulanda.World
         void Oven(Transform t)
         {
             var clay = Tint(art.stone, new Color(.66f, .42f, .3f));
-            Part(PrimitiveType.Cube, t, new Vector3(0, .45f, .3f), new Vector3(2.2f, .9f, 2.2f), art.stone);
+            BoxPart(t, new Vector3(0, .45f, .3f), new Vector3(2.2f, .9f, 2.2f), Masonry, null, 1);
             Part(PrimitiveType.Sphere, t, new Vector3(0, 1.1f, .3f), new Vector3(2f, 1.5f, 2f), clay);
             Part(PrimitiveType.Cube, t, new Vector3(0, 1.15f, -.72f), new Vector3(.7f, .55f, .1f), Tint(art.timber, new Color(.08f, .05f, .04f)));
             Part(PrimitiveType.Cube, t, new Vector3(0, 1.0f, -.69f), new Vector3(.5f, .18f, .08f), art.glass);   // embers in the mouth
@@ -2950,11 +2983,14 @@ namespace Crulanda.World
         void Gate(Transform t, float width)
         {
             float half = width / 2, top = 4.4f, step = width / 6;
-            var stone = Tint(art.stone, new Color(.44f, .43f, .41f)); var iron = Tint(art.metal, new Color(.2f, .2f, .22f)); var planks = Tint(art.timber, new Color(.3f, .21f, .14f));
+            var stone = Dressed(new Color(.44f, .43f, .41f)); var iron = Tint(art.metal, new Color(.2f, .2f, .22f)); var planks = Tint(art.timber, new Color(.3f, .21f, .14f));
             var sand = Tint(art.cloth, new Color(.78f, .63f, .38f)); var rust = Tint(art.cloth, new Color(.5f, .15f, .1f));
-            Part(PrimitiveType.Cube, t, new Vector3(0, top + .7f, 0), new Vector3(width + 3, 1.4f, 2.6f), stone);   // the span, reaching into both towers
-            foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(s * half, top, 0), new Vector3(1.2f, 1.2f, 2.5f), stone, Quaternion.Euler(0, 0, 45));   // corbels round the arch
-            for (int i = 0; i <= 6; i++) foreach (int sz in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(-half + i * step, top + 1.75f, sz * 1.05f), new Vector3(.6f, .7f, .45f), stone);
+            // One mesh of dressed stone: the span, reaching into both towers, a string course under its battlements, two stepped
+            // corbels a side round the arch (level courses, where two cubes stood on edge), and the merlons.
+            var blocks = new List<CombineInstance> { Ashlar(new Vector3(0, top + .7f, 0), new Vector3(width + 3, 1.4f, 2.6f)), Ashlar(new Vector3(0, top + 1.32f, 0), new Vector3(width + 3, .2f, 2.84f)) };
+            foreach (int s in new[] { -1, 1 }) { blocks.Add(Ashlar(new Vector3(s * (half - .05f), top - .16f, 0), new Vector3(1.3f, .36f, 2.5f))); blocks.Add(Ashlar(new Vector3(s * (half + .2f), top - .5f, 0), new Vector3(.8f, .36f, 2.5f))); }   // their outer ends run into the towers
+            for (int i = 0; i <= 6; i++) foreach (int sz in new[] { -1, 1 }) blocks.Add(Ashlar(new Vector3(-half + i * step, top + 1.75f, sz * 1.05f), new Vector3(.6f, .7f, .45f)));
+            Stonework("Gate stone", t, stone, blocks.ToArray());
             // The portcullis, raised: its grid and spiked foot hang below the arch.
             for (float x = -half + .3f; x < half - .2f; x += .45f)
             {
@@ -2976,7 +3012,7 @@ namespace Crulanda.World
             var pivot = new Vector3(-half + .2f, 1.25f, -3.4f); var boom = Quaternion.Euler(0, 0, 72);
             Part(PrimitiveType.Cube, t, new Vector3(pivot.x, .6f, pivot.z), new Vector3(.35f, 1.3f, .35f), planks);
             Part(PrimitiveType.Cube, t, pivot + boom * new Vector3(2.6f, 0, 0), new Vector3(6.4f, .16f, .16f), planks, boom);
-            Part(PrimitiveType.Cube, t, pivot + boom * new Vector3(-.75f, 0, 0), new Vector3(.5f, .45f, .4f), stone, boom);
+            Part(PrimitiveType.Cube, t, pivot + boom * new Vector3(-.75f, 0, 0), new Vector3(.5f, .45f, .4f), RockTint(new Color(.44f, .43f, .41f)), boom);   // one rough stone
             Part(PrimitiveType.Cube, t, pivot + boom * new Vector3(5.5f, 0, 0) + new Vector3(0, -.3f, 0), new Vector3(.04f, .55f, .3f), rust);   // pennant
             Part(PrimitiveType.Cube, t, new Vector3(half - .2f, .55f, pivot.z), new Vector3(.25f, 1.1f, .25f), planks);
             Part(PrimitiveType.Cube, t, new Vector3(half - .2f, 1.12f, pivot.z), new Vector3(.45f, .1f, .25f), iron);
@@ -2991,20 +3027,21 @@ namespace Crulanda.World
         void Stronghold(Transform t, Vector2 size)
         {
             float w = size.x, d = size.y, h = 5;
-            var stone = Tint(art.stone, new Color(.47f, .45f, .42f)); var dark = Tint(art.timber, new Color(.2f, .14f, .1f)); var iron = Tint(art.metal, new Color(.2f, .2f, .22f));
+            var stone = Dressed(new Color(.47f, .45f, .42f)); var dark = Tint(art.timber, new Color(.2f, .14f, .1f)); var iron = Tint(art.metal, new Color(.2f, .2f, .22f));
             var sand = Tint(art.cloth, new Color(.78f, .63f, .38f)); var rust = Tint(art.cloth, new Color(.5f, .15f, .1f)); var slit = Tint(art.timber, new Color(.05f, .04f, .03f));
-            Part(PrimitiveType.Cube, t, new Vector3(0, -.75f, 0), new Vector3(w + .7f, 1.7f, d + .7f), Tint(art.stone, new Color(.4f, .39f, .37f)));   // footing: a low plinth, deep where the perch falls away
-            Part(PrimitiveType.Cube, t, new Vector3(0, h / 2, 0), new Vector3(w, h, d), stone);
-            Part(PrimitiveType.Cube, t, new Vector3(0, h + .1f, 0), new Vector3(w + .3f, .2f, d + .3f), stone);   // string course
+            BoxPart(t, new Vector3(0, -.75f, 0), new Vector3(w + .7f, 1.7f, d + .7f), Dressed(new Color(.4f, .39f, .37f)), null, 1.75f);   // footing: a low plinth, deep where the perch falls away
+            // The hall's stone is one mesh: the body, the string course, the merlons, and the door's surround and step below.
+            var blocks = new List<CombineInstance> { Ashlar(new Vector3(0, h / 2, 0), new Vector3(w, h, d)), Ashlar(new Vector3(0, h + .1f, 0), new Vector3(w + .3f, .2f, d + .3f)) };
             int nx = Mathf.Max(2, Mathf.RoundToInt(w / 1.15f)), nz = Mathf.Max(2, Mathf.RoundToInt(d / 1.15f));
-            for (int i = 0; i < nx; i++) foreach (int sz in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(Mathf.Lerp(-w / 2 + .3f, w / 2 - .3f, i / (nx - 1f)), h + .6f, sz * (d / 2 - .1f)), new Vector3(.6f, .8f, .45f), stone);
-            for (int i = 1; i < nz - 1; i++) foreach (int sx in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(sx * (w / 2 - .1f), h + .6f, Mathf.Lerp(-d / 2 + .3f, d / 2 - .3f, i / (nz - 1f))), new Vector3(.45f, .8f, .6f), stone);
+            for (int i = 0; i < nx; i++) foreach (int sz in new[] { -1, 1 }) blocks.Add(Ashlar(new Vector3(Mathf.Lerp(-w / 2 + .3f, w / 2 - .3f, i / (nx - 1f)), h + .6f, sz * (d / 2 - .1f)), new Vector3(.6f, .8f, .45f)));
+            for (int i = 1; i < nz - 1; i++) foreach (int sx in new[] { -1, 1 }) blocks.Add(Ashlar(new Vector3(sx * (w / 2 - .1f), h + .6f, Mathf.Lerp(-d / 2 + .3f, d / 2 - .3f, i / (nz - 1f))), new Vector3(.45f, .8f, .6f)));
             // The door: planks and straps in a stone surround, a step before it, a lit loophole above.
             Part(PrimitiveType.Cube, t, new Vector3(0, 1.2f, -d / 2 - .06f), new Vector3(1.5f, 2.4f, .12f), dark);
             foreach (float y in new[] { .5f, 1.2f, 1.9f }) Part(PrimitiveType.Cube, t, new Vector3(0, y, -d / 2 - .13f), new Vector3(1.5f, .1f, .04f), iron);
-            foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(s * .95f, 1.3f, -d / 2 - .1f), new Vector3(.4f, 2.6f, .2f), stone);
-            Part(PrimitiveType.Cube, t, new Vector3(0, 2.7f, -d / 2 - .1f), new Vector3(2.3f, .4f, .2f), stone);
-            Part(PrimitiveType.Cube, t, new Vector3(0, .1f, -d / 2 - .45f), new Vector3(2.2f, .2f, .7f), stone);
+            foreach (int s in new[] { -1, 1 }) blocks.Add(Ashlar(new Vector3(s * .95f, 1.3f, -d / 2 - .1f), new Vector3(.4f, 2.6f, .2f), 1));
+            blocks.Add(Ashlar(new Vector3(0, 2.7f, -d / 2 - .1f), new Vector3(2.3f, .4f, .2f), 1));
+            blocks.Add(Ashlar(new Vector3(0, .1f, -d / 2 - .45f), new Vector3(2.2f, .2f, .7f), 1));
+            Stonework("Keep stone", t, stone, blocks.ToArray());
             Part(PrimitiveType.Cube, t, new Vector3(0, 3.6f, -d / 2 - .02f), new Vector3(.2f, .7f, .06f), art.glass);
             foreach (int sx in new[] { -1, 1 })
             {
@@ -3785,7 +3822,8 @@ namespace Crulanda.World
         {
             var dark = Tint(art.stone, new Color(.25f, .24f, .24f)); var soot = Tint(art.stone, new Color(.15f, .14f, .14f)); var tear = Glowing(new Color(.5f, .16f, .62f), 1.4f);
             Part(PrimitiveType.Cube, t, new Vector3(0, .02f, 0), new Vector3(4.6f, .14f, 4.6f), soot, Quaternion.Euler(0, 45, 0));   // scorched dais
-            Part(PrimitiveType.Cube, t, new Vector3(0, .1f, .35f), new Vector3(3.2f, .16f, 2.6f), dark);
+            BoxPart(t, new Vector3(0, .1f, .35f), new Vector3(3.2f, .16f, 2.6f), Dressed(new Color(.25f, .24f, .24f)), null, 1.5f);   // laid stone
+            dark = RockTint(new Color(.25f, .24f, .24f));   // the altar and the stele are each one stone
             Part(PrimitiveType.Cube, t, new Vector3(0, .6f, 0), new Vector3(2, .9f, 1.1f), dark);   // the altar-stone
             Part(PrimitiveType.Cube, t, new Vector3(0, 1.1f, 0), new Vector3(2.2f, .14f, 1.3f), soot);
             Part(PrimitiveType.Cube, t, new Vector3(0, 1.75f, 1.05f), new Vector3(1.3f, 3.3f, .45f), dark);   // the stele

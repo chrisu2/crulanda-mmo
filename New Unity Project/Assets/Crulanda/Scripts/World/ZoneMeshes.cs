@@ -75,6 +75,26 @@ namespace Crulanda.World
             return Build("Cone", v, t);
         }
         /// <summary>
+        /// A cone roof with UVs (a tower's slate cap), its base centred at the origin: each facet is unfolded flat, u along
+        /// the eave and v up the slope, both in metres (<paramref name="tile"/> metres a tile), so the rows of slate lie level
+        /// and hold their size. Flat-shaded facets and a closed underside, like Cone.
+        /// </summary>
+        public static Mesh Spire(float radius, float height, int sides = 10, float tile = 2.5f)
+        {
+            var v = new List<Vector3>(); var t = new List<int>(); var uv = new List<Vector2>();
+            var tip = Vector3.up * height; float edge = 2 * radius * Mathf.Sin(Mathf.PI / sides), inner = radius * Mathf.Cos(Mathf.PI / sides);
+            float slant = Mathf.Sqrt(height * height + inner * inner);
+            for (int i = 0; i < sides; i++)
+            {
+                float a0 = i * Mathf.PI * 2 / sides, a1 = (i + 1) * Mathf.PI * 2 / sides;
+                var p0 = new Vector3(Mathf.Cos(a0) * radius, 0, Mathf.Sin(a0) * radius);
+                var p1 = new Vector3(Mathf.Cos(a1) * radius, 0, Mathf.Sin(a1) * radius);
+                Tri(v, t, p1, p0, tip); uv.Add(new Vector2((i + 1) * edge, 0) / tile); uv.Add(new Vector2(i * edge, 0) / tile); uv.Add(new Vector2((i + .5f) * edge, slant) / tile);
+                Tri(v, t, p0, p1, Vector3.zero); uv.Add(new Vector2(p0.x, p0.z) / tile); uv.Add(new Vector2(p1.x, p1.z) / tile); uv.Add(Vector2.zero);
+            }
+            var m = Build("Spire", v, t); m.SetUVs(0, uv); return m;
+        }
+        /// <summary>
         /// A ring segment: a block on a circle round the origin with radial (mitred) ends, from angle a0 to a1 (degrees,
         /// anticlockwise from +x seen from above) and radius r0 to r1, height h up from y = 0. Flat-shaded, with metre UVs so
         /// stone tiles across it (kerbs, bench rings).

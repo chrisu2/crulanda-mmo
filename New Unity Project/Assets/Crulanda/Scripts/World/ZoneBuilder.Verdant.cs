@@ -92,12 +92,12 @@ namespace Crulanda.World
             GiantTree(t, variant);
             var tr = new System.Random(TreeRandom(t.position).Next() ^ 0x5eed); float T() { return (float)tr.NextDouble(); }
             var wood = Tint(art.timber, new Color(.36f, .25f, .16f)); var dark = Tint(art.timber, new Color(.22f, .15f, .1f));
-            var wattle = Tint(art.plaster, new Color(.74f, .68f, .54f)); var tile = Tint(art.slate, new Color(.62f, .3f, .19f)); var stone = Tint(art.stone, new Color(.5f, .48f, .44f));
+            var wattle = Tint(art.plaster, new Color(.74f, .68f, .54f)); var tile = Tint(art.slate, new Color(.62f, .3f, .19f)); var stone = Dressed(new Color(.5f, .48f, .44f));
             if (robeCone == null) robeCone = ZoneMeshes.Cone(1, 1, 14);
             // The round house, in the flare's front: wattle walls between timber posts, a tiled cone of a roof with a deep eave.
             var house = new Vector3(0, 0, -3.6f); float hr = 2.7f, wall = 3;
             float floor = Mathf.Max(LocalGround(t, house.x, house.z), LocalGround(t, house.x, house.z - hr)) - .1f;
-            Part(PrimitiveType.Cylinder, t, house + new Vector3(0, floor + .25f, 0), new Vector3(hr * 2 + .3f, .3f, hr * 2 + .3f), stone);   // the footing
+            MeshPart(PropMesh("Round footing", () => Turned(new[] { new Vector2(hr + .15f, 0), new Vector2(hr + .15f, .6f), new Vector2(0, .6f) }, 20, 1.5f)), t, house + new Vector3(0, floor - .05f, 0), stone);   // the footing
             Part(PrimitiveType.Cylinder, t, house + new Vector3(0, floor + .4f + wall / 2, 0), new Vector3(hr * 2, wall / 2, hr * 2), wattle);
             for (int i = 0; i < 8; i++) { float a = i * Mathf.PI / 4 + Mathf.PI / 8; Part(PrimitiveType.Cylinder, t, house + new Vector3(Mathf.Cos(a) * hr, floor + .4f + wall / 2, Mathf.Sin(a) * hr), new Vector3(.24f, wall / 2 + .1f, .24f), wood); }
             Part(PrimitiveType.Cylinder, t, house + new Vector3(0, floor + .45f + wall, 0), new Vector3(hr * 2 + .25f, .12f, hr * 2 + .25f), wood);   // the wall plate
@@ -106,7 +106,7 @@ namespace Crulanda.World
             Part(PrimitiveType.Cube, t, house + new Vector3(0, floor + 1.45f, -hr - .02f), new Vector3(1.3f, 2.1f, .12f), dark);
             Part(PrimitiveType.Cylinder, t, house + new Vector3(0, floor + 2.5f, -hr - .03f), new Vector3(1.3f, .07f, 1.3f), dark, Quaternion.Euler(90, 0, 0));
             Part(PrimitiveType.Cube, t, house + new Vector3(0, floor + 1.4f, -hr - .08f), new Vector3(1.05f, 1.9f, .08f), wood);
-            Part(PrimitiveType.Cube, t, house + new Vector3(0, floor + .5f, -hr - .8f), new Vector3(1.8f, .25f, .9f), stone);
+            BoxPart(t, house + new Vector3(0, floor + .5f, -hr - .8f), new Vector3(1.8f, .25f, .9f), stone, null, 1);
             foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cylinder, t, house + new Vector3(s * 1.05f, floor + 1.55f, -hr - .95f), new Vector3(.18f, 1.2f, .18f), wood);
             MeshPart(ZoneMeshes.GableRoof(2.6f, 1.6f, .6f, .1f), t, house + new Vector3(0, floor + 2.8f, -hr - .7f), tile, Quaternion.Euler(0, 90, 0));
             var lantern = house + new Vector3(.95f, floor + 2.15f, -hr - .95f);

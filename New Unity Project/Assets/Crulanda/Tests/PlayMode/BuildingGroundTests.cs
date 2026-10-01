@@ -112,7 +112,7 @@ namespace Crulanda.Tests
                 if (Vector2.Distance(new Vector2(hit.position.x, hit.position.z), new Vector2(w.stand.x, w.stand.z)) > .75f) problems.Add(q + "the nearest navmesh is too far off");
                 if (!NavMesh.CalculatePath(start.position, hit.position, NavMesh.AllAreas, path) || path.status != NavMeshPathStatus.PathComplete) problems.Add(q + "can't be walked to from the start");
             }
-            // The inn: in past the porch posts (they are solid but cut no navmesh), the door open, the lantern lit after dark.
+            // The inn: in past the porch posts (solid, each cutting its own navmesh hole), the door open, the lantern lit after dark.
             var innProp = zone.Zone.props.First(p => p != null && p.kind == "inn"); var inn = Built(zone, innProp);
             Assert.IsNotNull(inn, "The Golden Cask is built.");
             float d = innProp.size.y > 0 ? innProp.size.y : 8;
@@ -123,7 +123,7 @@ namespace Crulanda.Tests
                 if (!NavMesh.CalculatePath(start.position, hit.position, NavMesh.AllAreas, path) || path.status != NavMeshPathStatus.PathComplete) problems.Add("The inn: can't walk " + what + " from the start");
             }
             Assert.IsTrue(zone.Doors.Any(x => x.name == innProp.name && x.openable && x.Open), "The inn keeps its door open.");
-            Assert.AreEqual(2, inn.GetComponentsInChildren<BoxCollider>().Count(c => c.GetComponent<MeshFilter>() != null && c.GetComponent<NavBlocker>() == null && c.transform.localPosition.z < -d / 2 - 1), "The porch's two posts are solid.");
+            Assert.AreEqual(2, inn.GetComponentsInChildren<BoxCollider>().Count(c => c.GetComponent<MeshFilter>() != null && c.GetComponent<NavBlocker>() != null && c.transform.localPosition.z < -d / 2 - 1), "The porch's two posts are solid.");
             var lantern = zone.NightLights.Find(n => n.light != null && n.light.name == "Inn lantern" && n.light.transform.IsChildOf(inn));
             Assert.IsNotNull(lantern, "The inn's lantern is one of the zone's night lights.");
             Assert.Greater(lantern.nightIntensity, lantern.dayIntensity, "It burns brighter after dark.");

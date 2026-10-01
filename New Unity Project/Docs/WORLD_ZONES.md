@@ -191,6 +191,11 @@ mood. How it was made: a first draft was pre-checked by agents who ported the ge
   footing with an iron bracket and a roofed lantern; the well as a turned masonry ring with a roofed windlass, rope and bucket;
   stalls with a scalloped valance, thicker posts and turned baskets and pots; turned barrels with hoops; battened crates; a
   woodpile with pale cut ends and a sawhorse; stone bridges with coping and corner piers; leaning signposts.
+- **The rules every part kept:** the zone's random stream is untouched (each prop method makes the draws it always made, in the
+  same order), every collider, navmesh blocker, workplace, light and registered door or usable prop is where it was, and the
+  tests ran green after each part.
+- **The art is in the repo now:** `tools/validation/build_art.ps1` builds new generated art in the validation copy and brings it
+  home (before, each run's mirror deleted it and the register step made it again with new GUIDs).
 - **Buildings on slopes** (visual review item 10; `ZoneBuilder.Buildings.cs`: `Footing`, `DoorSteps`): houses (and the mill),
   barns, the inns and fallen houses stand on a stepped masonry footing instead of one stone box under them. It is laid in runs
   of about 1.4 m round the walls, each reaching a quarter metre into the ground under it. Where the ground rises against a wall
@@ -205,22 +210,21 @@ mood. How it was made: a first draft was pre-checked by agents who ported the ge
   colliders, door and taproom, and gain:
   - timber framing on every face (studs between the windows, sill rails, a head plate);
   - the upper front jettied .35 m out on joist ends and brackets, with four larger mullioned windows;
-  - a gabled porch on two solid posts (they cut no navmesh), with the lantern hung under its ridge;
-  - a sign twice the size, with the inn's device: a gilded cask on green, or a black pot over a glowing crack;
+  - a gabled porch on two solid posts (each cuts its own small hole in the navmesh) under a solid roof (no rain falls under
+    it), with the lantern hung from its ceiling;
+  - a sign twice the size, chained to a crossbar, with the inn's device: a gilded cask on green, or a black pot over a
+    glowing crack;
   - window boxes (dry stalks in Khaven's gloom), a bench, barrels and two dormers.
   The kitchen lean-to's stretch of the back wall stays clear. Vell's smithy (`Forge`) is a hearth house under a slate gable
   (metre UVs, eaves, boarded gables with king posts) on a stone end wall and a plank half wall, with a slate lean-to over the
   anvil. It has a heap of glowing coals on the hearth, a tapered hood and a chimney stack through the roof, leather bellows,
   a horned anvil with a hammer and tongs, a stone quench trough and a tool rail. Outside stand a rack of finished work
   (horseshoes, sickles, axe heads), a barrel of bar iron and a grindstone. Its hearth, back wall and anvil colliders and both
-  workplaces are where they were; the end walls and the trough are solid too. The capture tour shoots `99-inn-front`,
-  `99-inn-front-night` and `99-smithy-front` at eye level (`BuildingGroundTests` checks the footings, thresholds, the
-  smithy's places and the way into the inn).
-- **The rules every part kept:** the zone's random stream is untouched (each prop method makes the draws it always made, in the
-  same order), every collider, navmesh blocker, workplace, light and registered door or usable prop is where it was, and the
-  tests ran green after each part.
-- **The art is in the repo now:** `tools/validation/build_art.ps1` builds new generated art in the validation copy and brings it
-  home (before, each run's mirror deleted it and the register step made it again with new GUIDs).
+  workplaces are where they were; the end walls and the trough are solid too, and no grass grows on its floor. The capture
+  tour shoots `99-inn-front`, `99-inn-front-night` and `99-smithy-front` at eye level (`BuildingGroundTests` checks the footings, thresholds, the
+  smithy's places and the way into the inn). Buildings on slopes and the hero buildings are compile-checked only: not yet run
+  in PlayMode, not toured and not looked at. Unlike the earlier parts they add solid colliders (the porch posts and roof,
+  the smithy's end walls and the quench trough).
 
 ## Level ladder and camps (GAME-ONLY)
 - Zones carry `levelMin`/`levelMax`, which drive con colours, the map exit labels ("Khaven Village 3-5") and the world map pins.

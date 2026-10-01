@@ -140,18 +140,48 @@ namespace Crulanda.World
         void FlowerBox(Transform t, Vector3 at, float wide, Func<float> R)
         {
             var planks = Tint(art.timber, new Color(.36f, .25f, .16f)); var leaf = Tint(art.foliage, new Color(.26f, .44f, .2f));
-            Part(PrimitiveType.Cube, t, at, new Vector3(wide, .2f, .24f), planks);
-            Part(PrimitiveType.Cube, t, at + new Vector3(0, .095f, 0), new Vector3(wide - .06f, .02f, .18f), Tint(art.stone, new Color(.22f, .17f, .12f)));   // the earth in it
-            foreach (int k in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, at + new Vector3(k * (wide / 2 - .12f), -.16f, .09f), new Vector3(.06f, .14f, .3f), planks);   // brackets back to the wall
+            // Every piece of one material goes into one mesh (a box is a few objects, not a dozen spheres): the inn's front is
+            // not static-batched (its door moves), so each object would be a draw call of its own.
+            var parts = new Dictionary<Material, List<CombineInstance>>();
+            void Add(PrimitiveType type, Vector3 pos, Vector3 scale, Material m, Quaternion? rot = null)
+            {
+                if (!parts.TryGetValue(m, out var list)) parts[m] = list = new List<CombineInstance>();
+                list.Add(new CombineInstance { mesh = PrimitiveMesh(type), transform = Matrix4x4.TRS(pos, rot ?? Quaternion.identity, scale) });
+            }
+            Add(PrimitiveType.Cube, at, new Vector3(wide, .2f, .24f), planks);
+            Add(PrimitiveType.Cube, at + new Vector3(0, .095f, 0), new Vector3(wide - .06f, .02f, .18f), Tint(art.stone, new Color(.22f, .17f, .12f)));   // the earth in it
+            foreach (int k in new[] { -1, 1 }) Add(PrimitiveType.Cube, at + new Vector3(k * (wide / 2 - .12f), -.16f, .09f), new Vector3(.06f, .14f, .3f), planks);   // brackets back to the wall
             int n = Mathf.Max(3, Mathf.RoundToInt(wide / .2f));
             for (int i = 0; i < n; i++)
             {
                 float x = -wide / 2 + (i + .5f) * wide / n;
-                if (Gloom) { Part(PrimitiveType.Cube, t, at + new Vector3(x, .2f, 0), new Vector3(.02f, .22f + R() * .12f, .02f), Tint(art.hay, new Color(.4f, .33f, .24f)), Quaternion.Euler(R() * 30 - 15, 0, R() * 30 - 15)); continue; }
-                Part(PrimitiveType.Sphere, t, at + new Vector3(x, .15f, -.03f + R() * .05f), new Vector3(.2f, .14f, .2f), leaf);
-                if (i % 3 != 2) Part(PrimitiveType.Sphere, t, at + new Vector3(x + R() * .06f - .03f, .22f, -.07f + R() * .05f), Vector3.one * (.08f + R() * .03f), Tint(art.foliage, Blooms[(int)(R() * Blooms.Length) % Blooms.Length]));
-                if (i % 2 == 1) Part(PrimitiveType.Sphere, t, at + new Vector3(x, -.02f, -.13f), new Vector3(.12f, .2f, .06f), leaf);   // trailing over the front
+                if (Gloom) { Add(PrimitiveType.Cube, at + new Vector3(x, .2f, 0), new Vector3(.02f, .22f + R() * .12f, .02f), Tint(art.hay, new Color(.4f, .33f, .24f)), Quaternion.Euler(R() * 30 - 15, 0, R() * 30 - 15)); continue; }
+                Add(PrimitiveType.Sphere, at + new Vector3(x, .15f, -.03f + R() * .05f), new Vector3(.2f, .14f, .2f), leaf);
+                if (i % 3 != 2) Add(PrimitiveType.Sphere, at + new Vector3(x + R() * .06f - .03f, .22f, -.07f + R() * .05f), Vector3.one * (.08f + R() * .03f), Tint(art.foliage, Blooms[(int)(R() * Blooms.Length) % Blooms.Length]));
+                if (i % 2 == 1) Add(PrimitiveType.Sphere, at + new Vector3(x, -.02f, -.13f), new Vector3(.12f, .2f, .06f), leaf);   // trailing over the front
             }
+            foreach (var kv in parts) { var mesh = Joined(kv.Value.ToArray()); mesh.name = "Flower box"; MeshPart(mesh, t, Vector3.zero, kv.Key); }
+        }
+        static readonly Dictionary<PrimitiveType, Mesh> primitives = new Dictionary<PrimitiveType, Mesh>();
+        /// <summary>Unity's own mesh for a primitive (shared and never destroyed), to join scaled copies of it into one mesh.</summary>
+        static Mesh PrimitiveMesh(PrimitiveType type)
+        {
+            if (!primitives.TryGetValue(type, out var m) || m == null) { var o = GameObject.CreatePrimitive(type); m = o.GetComponent<MeshFilter>().sharedMesh; DestroyImmediate(o); primitives[type] = m; }
+            return m;
+        }
+        /// <summary>How far an inn's porch reaches out from its front wall's face (InnFront), and half its posts' spacing.</summary>
+        const float InnPorchDeep = 2.3f, InnPorchHalf = 1.3f;
+        /// <summary>Whether a point stands under an inn's porch roof, out past the inn's footprint (UnderRoof: no rain falls there).</summary>
+        bool UnderPorch(Vector2 p)
+        {
+            foreach (var b in Zone.props)
+            {
+                if (b == null || b.kind != "inn") continue;
+                float d = b.size.x > 0 ? b.size.y : 8, face = d / 2 + .15f, r = b.rotation * Mathf.Deg2Rad, c = Mathf.Cos(r), s = Mathf.Sin(r); var q = p - b.at;
+                float lx = q.x * c - q.y * s, lz = q.x * s + q.y * c;   // along its local x and z (as InBuilding)
+                if (Mathf.Abs(lx) <= InnPorchHalf + .6f && lz <= -face + .1f && lz >= -(face + InnPorchDeep + .1f)) return true;
+            }
+            return false;
         }
         /// <summary>
         /// The outside of a walk-in inn in the painted style (Inn keeps its walls, colliders, door and taproom):
@@ -160,13 +190,14 @@ namespace Crulanda.World
         /// - the upper front jettied .35 m out over the street on joist ends and brackets, with a bressumer, corner posts and
         ///   four larger mullioned windows of its own, each with a window box;
         /// - a gabled porch on two posts over the door, its gable boarded, the lit lantern (Inn's "Inn lantern") hung in an
-        ///   iron lantern from its ridge;
-        /// - a hanging sign twice the old one's size on a bracket under the jetty, painted with the inn's device (the Golden
+        ///   iron lantern under its ceiling;
+        /// - a hanging sign twice the old one's size on a bracket under the jetty, chained to a crossbar, painted with the inn's device (the Golden
         ///   Cask: a gilded cask on green; the Cracked Hearth, variant 1: a black pot over a glowing crack);
         /// - window boxes under the ground-floor front windows (dry stalks in a gloom), a bench under the first of them and
         ///   barrels at the far corner; two dormers on the front slope.
         /// A kitchen lean-to on the back wall (<paramref name="kitchen"/>: its middle along x) keeps its stretch clear. Only the
-        /// porch posts are solid, and they do not cut the navigation mesh (the way in stays as it was).
+        /// porch is solid: each post cuts its own small hole in the navigation mesh (the way in between them stays open), and
+        /// its roof is a ceiling overhead (no rain falls under it; see UnderPorch).
         /// </summary>
         void InnFront(Transform t, float w, float d, float H, float storey, float doorW, float doorH, float roofH, int variant, float? kitchen, Material plaster, Material roofMat)
         {
@@ -243,30 +274,33 @@ namespace Crulanda.World
             foreach (float x in frontWindows) FlowerBox(t, new Vector3(x, .86f, face - .25f), 1.05f, R);
             // The porch: two posts and their plates back to the wall, a beam across, a small gable roof with its end boarded and
             // a king post and barge boards on it; the lantern hangs from its ridge round the inn's lantern light.
-            float deep = variant == 1 ? 1.7f : 2.3f, px = 1.3f, eave = 2.7f, rise = .85f, zp = face - deep + .3f, span = px * 2 + .9f;
+            // The posts and timbers stand under the roof's flat ceiling (eave - .12). Both inns take the same depth: the Cracked
+            // Hearth's posts then stand clear of Khaven's barrels at (-7, 12).
+            float deep = InnPorchDeep, px = InnPorchHalf, eave = 2.7f, rise = .85f, zp = face - deep + .3f, span = px * 2 + .9f;
             foreach (int k in new[] { -1, 1 })
             {
                 float g = LocalGround(t, k * px, zp);
-                Stake(t, new Vector3(k * px, g - .1f, zp), .2f, eave - g + .02f, beam).AddComponent<BoxCollider>();
-                Part(PrimitiveType.Cube, t, new Vector3(k * px, eave - .08f, (face + zp) / 2), new Vector3(.14f, .16f, face - zp + .4f), beam);
+                var post = Stake(t, new Vector3(k * px, g - .1f, zp), .2f, eave - .12f - g + .1f, beam); post.AddComponent<BoxCollider>(); post.AddComponent<NavBlocker>();
+                Part(PrimitiveType.Cube, t, new Vector3(k * px, eave - .2f, (face + zp) / 2), new Vector3(.14f, .16f, face - zp + .4f), beam);
             }
-            Part(PrimitiveType.Cube, t, new Vector3(0, eave - .08f, zp), new Vector3(span - .2f, .16f, .16f), beam);
-            MeshPart(ZoneMeshes.GableRoof(deep + .06f, span, rise, .12f), t, new Vector3(0, eave, face - deep / 2 + .03f), roofMat, Quaternion.Euler(0, 90, 0));
+            Part(PrimitiveType.Cube, t, new Vector3(0, eave - .2f, zp), new Vector3(span - .2f, .16f, .16f), beam);
+            MeshPart(ZoneMeshes.GableRoof(deep + .06f, span, rise, .12f), t, new Vector3(0, eave, face - deep / 2 + .03f), roofMat, Quaternion.Euler(0, 90, 0)).AddComponent<BoxCollider>();   // solid: WorldWeather looks up for a ceiling
             MeshPart(PropMesh("Porch gable", () => ZoneMeshes.Gable(span, rise, .04f, 1)), t, new Vector3(0, eave, face - deep - .025f), boards);
             Part(PrimitiveType.Cube, t, new Vector3(0, eave + (rise - .12f) / 2, face - deep - .06f), new Vector3(.1f, rise - .12f, .05f), dark);
             foreach (int k in new[] { -1, 1 }) Bar(t, new Vector3(k * (span / 2 + .02f), eave - .04f, face - deep - .06f), new Vector3(0, eave + rise + .02f, face - deep - .06f), .14f, .05f, dark);
-            float lz = face - 1.05f;   // Inn's lantern light stands here, 2.6 m up
-            Rod(t, new Vector3(0, eave + rise - .14f, lz), new Vector3(0, 2.88f, lz), .025f, iron);
-            Part(PrimitiveType.Cube, t, new Vector3(0, 2.6f, lz), new Vector3(.24f, .3f, .24f), art.glass);
-            MeshPart(PropMesh("Lantern roof", () => ZoneMeshes.Cone(.27f, .2f, 4)), t, new Vector3(0, 2.75f, lz), iron, Quaternion.Euler(0, 45, 0));
-            Part(PrimitiveType.Cube, t, new Vector3(0, 2.43f, lz), new Vector3(.3f, .04f, .3f), iron);
-            foreach (int a in new[] { -1, 1 }) foreach (int b in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(a * .13f, 2.6f, lz + b * .13f), new Vector3(.025f, .3f, .025f), iron);
-            // The sign: an arm under the joists on a strut and a plate on the wall, two chains, and the board in a frame with the
-            // inn's device on its face.
+            float lz = face - 1.05f;   // Inn's lantern light stands here, 2.2 m up, the lantern hung from the ceiling
+            Rod(t, new Vector3(0, eave - .12f, lz), new Vector3(0, 2.5f, lz), .025f, iron);
+            Part(PrimitiveType.Cube, t, new Vector3(0, 2.2f, lz), new Vector3(.24f, .3f, .24f), art.glass);
+            MeshPart(PropMesh("Lantern roof", () => ZoneMeshes.Cone(.27f, .2f, 4)), t, new Vector3(0, 2.35f, lz), iron, Quaternion.Euler(0, 45, 0));
+            Part(PrimitiveType.Cube, t, new Vector3(0, 2.03f, lz), new Vector3(.3f, .04f, .3f), iron);
+            foreach (int a in new[] { -1, 1 }) foreach (int b in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(a * .13f, 2.2f, lz + b * .13f), new Vector3(.025f, .3f, .025f), iron);
+            // The sign: an arm under the joists on a strut and a plate on the wall, an iron crossbar under the arm's end with two
+            // chains from it, and the board in a frame with the inn's device on its face.
             float sy = storey - .2f, zb = face - 1.5f, by = sy - .8f;
             Part(PrimitiveType.Cube, t, new Vector3(sx, sy, face - .95f), new Vector3(.12f, .12f, 1.9f), beam);
             Bar(t, new Vector3(sx, sy - .75f, face - .03f), new Vector3(sx, sy - .06f, face - .8f), .1f, .1f, beam);
             Part(PrimitiveType.Cube, t, new Vector3(sx, sy - .4f, face - .04f), new Vector3(.22f, 1, .08f), beam);
+            Part(PrimitiveType.Cube, t, new Vector3(sx, sy - .085f, zb), new Vector3(1.32f, .06f, .06f), iron);
             foreach (int k in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(sx + k * .6f, sy - .155f, zb), new Vector3(.03f, .2f, .03f), iron);
             Vector2[] Octagon(float hx, float hy, float cut) { return new[] { new Vector2(-hx, -hy + cut), new Vector2(-hx, hy - cut), new Vector2(-hx + cut, hy), new Vector2(hx - cut, hy), new Vector2(hx, hy - cut), new Vector2(hx, -hy + cut), new Vector2(hx - cut, -hy), new Vector2(-hx + cut, -hy) }; }
             bool cask = variant != 1;
@@ -328,7 +362,7 @@ namespace Crulanda.World
         {
             var dark = Tint(art.timber, new Color(.25f, .17f, .11f)); var iron = Tint(art.metal, new Color(.22f, .22f, .24f));
             var boards = Tint(art.timber, new Color(.4f, .29f, .19f)); var hide = Tint(art.cloth, new Color(.42f, .29f, .18f));
-            const float top = 2.8f, roofH = 1.6f, end = 2.4f, front = -.6f, rear = 2.1f;   // the eaves, the ridge's rise, the end walls' middles, the hearth house's front and back faces
+            const float top = 3.2f, roofH = 1.6f, end = 2.4f, front = -.6f, rear = 2.1f;   // the eaves, the ridge's rise, the end walls' middles, the hearth house's front and back faces
             float G(float x, float z) { return LocalGround(t, x, z); }
             // The hearth house: the stone back wall (as before) with planks above it, the stone end wall, the plank half wall
             // with its rail, a corner post at each end of it, and plates under the roof's soffit (it hides anything above it).
@@ -349,7 +383,7 @@ namespace Crulanda.World
             Eaves(roof, w - .4f, d, top, roofH, art.slate);
             Gables(roof, w / 2, d, top, roofH, d / 2 + .7f, w / 2 + .45f, boards, 1.2f, .2f);
             // The lean-to over the anvil: slate from under the front plate down to a beam on two posts, on six rafters, a fascia at its foot.
-            const float hiY = 2.28f, loY = 1.95f, z0 = -.55f, z1 = -2.4f; float slope = (hiY - loY) / (z0 - z1), pitch = Mathf.Atan(slope) * Mathf.Rad2Deg;
+            const float hiY = 2.68f, loY = 2.35f, z0 = -.55f, z1 = -2.4f; float slope = (hiY - loY) / (z0 - z1), pitch = Mathf.Atan(slope) * Mathf.Rad2Deg;
             float Under(float z) { return hiY - (z0 - z) * slope - .04f; }   // the lean-to slab's underside over local z
             BoxPart(t, new Vector3(0, (hiY + loY) / 2, (z0 + z1) / 2), new Vector3(5.8f, .08f, Mathf.Sqrt((z0 - z1) * (z0 - z1) + (hiY - loY) * (hiY - loY)) + .05f), art.slate, Quaternion.Euler(-pitch, 0, 0), 2.5f);
             foreach (float x in new[] { -2.5f, -1.5f, -.5f, .5f, 1.5f, 2.5f }) Bar(t, new Vector3(x, Under(-.62f) - .045f, -.62f), new Vector3(x, Under(-2.3f) - .045f, -2.3f), .09f, .07f, dark);
@@ -369,10 +403,10 @@ namespace Crulanda.World
             }
             Part(PrimitiveType.Cube, t, new Vector3(1.2f, 1.62f, .52f), new Vector3(1.5f, .14f, .16f), dark);
             MeshPart(PropMesh("Forge hood", () => Turned(new[] { new Vector2(.99f, 0), new Vector2(.45f, .9f), new Vector2(.36f, .9f), new Vector2(.9f, 0) }, 4)), t, new Vector3(1.2f, 1.62f, 1.25f), Masonry, Quaternion.Euler(0, 45, 0));
-            BoxPart(t, new Vector3(1.2f, 3.76f, 1.25f), new Vector3(.64f, 2.5f, .64f), Masonry, null, 1);
-            BoxPart(t, new Vector3(1.2f, 5.06f, 1.25f), new Vector3(.84f, .12f, .84f), Tint(Masonry, new Color(.45f, .44f, .4f)), null, 1);
-            Part(PrimitiveType.Cylinder, t, new Vector3(1.2f, 5.22f, 1.25f), new Vector3(.26f, .1f, .26f), Tint(art.stone, new Color(.62f, .4f, .28f)));
-            if (art.particle != null) Smoke(t, new Vector3(1.2f, 5.4f, 1.25f));
+            BoxPart(t, new Vector3(1.2f, 3.96f, 1.25f), new Vector3(.64f, 2.9f, .64f), Masonry, null, 1);
+            BoxPart(t, new Vector3(1.2f, 5.46f, 1.25f), new Vector3(.84f, .12f, .84f), Tint(Masonry, new Color(.45f, .44f, .4f)), null, 1);
+            Part(PrimitiveType.Cylinder, t, new Vector3(1.2f, 5.62f, 1.25f), new Vector3(.26f, .1f, .26f), Tint(art.stone, new Color(.62f, .4f, .28f)));
+            if (art.particle != null) Smoke(t, new Vector3(1.2f, 5.8f, 1.25f));
             Glow(t, new Vector3(1.2f, 1.5f, .6f), 7, 1.4f, new Color(1, .5f, .2f), 2.2f);
             // The bellows, lying left of the hearth: two boards with the leather between, on a little trestle, the nozzle into
             // the fire's side and a pole at the wide end to work them.

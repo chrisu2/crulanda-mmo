@@ -1144,8 +1144,8 @@ namespace Crulanda.World
                 default: return Vector2.zero;
             }
         }
-        /// <summary>Whether a point stands under a building's roof (its footprint, eaves included) or in a cave: no rain or snow falls there.</summary>
-        public bool UnderRoof(Vector2 p) { return Hollow.CoverAt(p, .3f) > 0 || InBuilding(p); }   // a cave's passage, or a building
+        /// <summary>Whether a point stands under a building's roof (its footprint, eaves included), under an inn's porch or in a cave: no rain or snow falls there.</summary>
+        public bool UnderRoof(Vector2 p) { return Hollow.CoverAt(p, .3f) > 0 || InBuilding(p) || UnderPorch(p); }   // a cave's passage, a building, or an inn's porch
         /// <summary>Whether a point stands inside a building's footprint, eaves included (house, inn, barn, mill, keep, tower, crypt,
         /// forge, tannery, shelter, leather shop, drying hut, kitchen).</summary>
         public bool InBuilding(Vector2 p)
@@ -1457,7 +1457,7 @@ namespace Crulanda.World
             // Outside: the framing, the jetty, the porch with its lantern, the sign, window boxes, a bench and barrels (InnFront).
             InnFront(t, w, d, H, storey, doorW, doorH, roofH, variant, kitchen, plaster, variant % 2 == 0 ? art.thatch : art.slate);
             var glow = new GameObject("Inn lantern").AddComponent<Light>(); glow.transform.SetParent(t, false);
-            glow.transform.localPosition = new Vector3(0, 2.6f, -d / 2 - 1.2f); glow.type = LightType.Point; glow.range = 8; glow.intensity = 1.4f; glow.color = new Color(1, .72f, .4f);
+            glow.transform.localPosition = new Vector3(0, 2.2f, -d / 2 - 1.2f); glow.type = LightType.Point; glow.range = 8; glow.intensity = 1.4f; glow.color = new Color(1, .72f, .4f);
             NightLights.Add(new NightLight { light = glow, dayIntensity = .6f, nightIntensity = 2.2f });   // faint by day: at 1.4 it bloomed to a pale blob on the plaster
         }
         /// <summary>
@@ -3092,7 +3092,7 @@ namespace Crulanda.World
                 grassRoadBox = Zone.roads.Select(r => Box(r.points, r.width / 2 + 3.5f)).ToArray();
                 grassBuildings = Zone.props.Where(o => o != null && (o.kind == "house" || o.kind == "inn" || o.kind == "barn" || o.kind == "mill" || o.kind == "ruined_house"))
                     .Select(o => (o.at, Mathf.Max(2, Mathf.Max(o.size.x, o.size.y) * .75f) + 1.5f))
-                    .Concat(Zone.props.Where(o => o != null && (o.kind == "leathershop" || o.kind == "dryhut" || o.kind == "kitchen")).Select(o => (o.at, 4.5f))).ToArray();   // a workshop's floor (these props carry no size)
+                    .Concat(Zone.props.Where(o => o != null && (o.kind == "leathershop" || o.kind == "dryhut" || o.kind == "kitchen" || o.kind == "forge")).Select(o => (o.at, 4.5f))).ToArray();   // a workshop's floor (these props carry no size)
             }
             float living = 1 - Unmade(p.x, p.y) / .55f; if (living <= 0) return 0;   // grass thins out along the grey's ragged front
             if (Hollow.CoverAt(p, 1.2f) > 0) return 0;   // a cave's bare floor

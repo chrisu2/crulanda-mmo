@@ -21,6 +21,9 @@ namespace Crulanda.World
         /// <summary>Set before reloading the scene to build a different zone (zone travel).</summary>
         public static string RequestedZoneId;
         public static ZoneBuilder Active { get; private set; }
+        /// <summary>Tests only: changes the zone's definition after it is chosen and before anything is built (to build a zone
+        /// without some of its props and compare the two). Null in play; a test that sets it clears it in its teardown.</summary>
+        public static Func<ZoneDefinition, ZoneDefinition> DefinitionFilter;
         public bool HasZone(string id)
         {
             if (string.IsNullOrEmpty(id)) return false;
@@ -57,6 +60,7 @@ namespace Crulanda.World
         {
             Zone = (RequestedZoneId != null ? FindZone(RequestedZoneId) : null) ?? ParseZone(zoneJson != null ? zoneJson.text : "{}");
             RequestedZoneId = null;
+            if (Zone != null && DefinitionFilter != null) Zone = DefinitionFilter(Zone);
             if (Zone == null || string.IsNullOrEmpty(Zone.id) || art == null) { Debug.LogError("Zone definition or art missing."); enabled = false; return; }
             Active = this;
             var built = System.Diagnostics.Stopwatch.StartNew(); var phases = new System.Text.StringBuilder(); long mark = 0;
@@ -1045,7 +1049,7 @@ namespace Crulanda.World
                 if (p.kind == "wall") WarnWallInBuilding(p);
                 // New landmark kinds draw from their own stream, after taking the draws the kind that stood here took, so
                 // every later prop, tree and rock keeps the layout it had.
-                var zoneRng = rng; int legacy = p.kind == "cave" ? 30 : p.kind == "rib" ? 6 : p.kind == "perch" || p.kind == "wallow" || p.kind == "brood" || p.kind == "cavern" || p.kind == "monolith" || p.kind == "giant_tree" || p.kind == "treehouse" || p.kind == "waterfall" || p.kind == "mushrooms" || p.kind == "fallen_giant" ? 0 : -1;
+                var zoneRng = rng; int legacy = p.kind == "cave" ? 30 : p.kind == "rib" ? 6 : p.kind == "perch" || p.kind == "wallow" || p.kind == "brood" || p.kind == "cavern" || p.kind == "monolith" || p.kind == "giant_tree" || p.kind == "treehouse" || p.kind == "waterfall" || p.kind == "mushrooms" || p.kind == "fallen_giant" || p.kind == "leathershop" || p.kind == "dryhut" || p.kind == "kitchen" || p.kind == "gamerack" ? 0 : -1;
                 if (legacy >= 0) { for (int k = 0; k < legacy; k++) _ = R01; rng = new System.Random(Zone.seed ^ (Mathf.RoundToInt(p.at.x * 8) * 73856093) ^ (Mathf.RoundToInt(p.at.y * 8) * 19349663)); }
                 switch (p.kind)
                 {
@@ -1060,6 +1064,10 @@ namespace Crulanda.World
                     case "oven": Oven(t); break;
                     case "tannery": Tannery(t); break;
                     case "woodpile": Woodpile(t); break;
+                    case "leathershop": LeatherShop(t); break;
+                    case "dryhut": DryingHut(t); break;
+                    case "kitchen": Kitchen(t); break;
+                    case "gamerack": GameRack(t); break;
                     case "wagon": Wagon(t); break;
                     case "herb": Herb(t, p.variant); break;
                     case "ruined_house": RuinedHouse(t, p.size.x > 0 ? p.size : new Vector2(8, 6)); break;
@@ -1130,13 +1138,16 @@ namespace Crulanda.World
                 case "crypt": return new Vector2(3.6f, 4.6f);
                 case "forge": return new Vector2(2.9f, 2.4f);
                 case "tannery": case "shelter": return new Vector2(2.2f, 2.1f);
+                case "leathershop": return LeatherShopSize / 2 + Vector2.one * .8f;
+                case "dryhut": return DryingHutSize / 2 + Vector2.one * .8f;
+                case "kitchen": return KitchenSize / 2 + new Vector2(.3f, .4f);
                 default: return Vector2.zero;
             }
         }
         /// <summary>Whether a point stands under a building's roof (its footprint, eaves included) or in a cave: no rain or snow falls there.</summary>
         public bool UnderRoof(Vector2 p) { return Hollow.CoverAt(p, .3f) > 0 || InBuilding(p); }   // a cave's passage, or a building
         /// <summary>Whether a point stands inside a building's footprint, eaves included (house, inn, barn, mill, keep, tower, crypt,
-        /// forge, tannery, shelter).</summary>
+        /// forge, tannery, shelter, leather shop, drying hut, kitchen).</summary>
         public bool InBuilding(Vector2 p)
         {
             foreach (var b in Zone.props)
@@ -1312,7 +1323,8 @@ namespace Crulanda.World
             PlankDoor(t, new Vector3(0, (foot + 2.7f) / 2, -d / 2 - .19f), 1.2f, 2.7f - foot, Tint(art.timber, new Color(.3f, .2f, .12f)));
             foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(s * .68f, (foot + 2.86f) / 2, -d / 2 - .12f), new Vector3(.16f, 2.86f - foot, .24f), art.timber);
             Part(PrimitiveType.Cube, t, new Vector3(0, 2.78f, -d / 2 - .12f), new Vector3(1.52f, .16f, .24f), art.timber);
-            if (!inn) Doors.Add(new ZoneDoor { name = t.name, openable = false, position = t.TransformPoint(new Vector3(0, 1, -d / 2 - .1f)) });
+            ZoneDoor front = null;
+            if (!inn) { front = new ZoneDoor { name = t.name, openable = false, position = t.TransformPoint(new Vector3(0, 1, -d / 2 - .1f)) }; Doors.Add(front); }
             for (float x = -w / 2 + 1.4f; x < w / 2 - .8f; x += 2.6f)
             {
                 if (Mathf.Abs(x) < 1.2f) continue;
@@ -1328,7 +1340,7 @@ namespace Crulanda.World
             Gables(t, w / 2, d, top, roofH, d / 2 + .7f, w / 2 + .6f, plaster, 2, .22f);   // plaster to the ridge, framed like the walls
             BoxPart(t, new Vector3(w / 2 - 1.1f, top + roofH * .75f, d * .15f), new Vector3(.9f, roofH * 1.1f, .9f), Masonry, null, 1);
             BoxPart(t, new Vector3(w / 2 - 1.1f, top + roofH * 1.3f + .04f, d * .15f), new Vector3(1.1f, .12f, 1.1f), Tint(Masonry, new Color(.45f, .44f, .4f)), null, 1);   // the chimney's cap, 2 cm down over the stack
-            if (art.particle != null) Smoke(t, new Vector3(w / 2 - 1.1f, top + roofH * 1.35f, d * .15f));
+            if (art.particle != null) { var smoke = Smoke(t, new Vector3(w / 2 - 1.1f, top + roofH * 1.35f, d * .15f)); if (front != null) front.smoke = smoke; }
             if (inn)
             {
                 // Hanging sign on a bracket by the door: the Golden Cask.
@@ -1384,15 +1396,18 @@ namespace Crulanda.World
                     if (sz < 0 && Mathf.Abs(x) < doorW) continue;
                     Part(PrimitiveType.Cube, t, new Vector3(x, storey + (H - storey) * .5f, sz * (d / 2 + .03f)), new Vector3(.14f, (H - storey) * .8f, .1f), art.timber, Quaternion.Euler(0, 0, 32));
                 }
-            // Windows glow on both faces (the glass passes through the wall).
+            // Windows glow on both faces (the glass passes through the wall). A kitchen lean-to on the back wall takes the place
+            // of the ground-floor windows it would cover; the upstairs ones look out over its roof.
+            float? kitchen = KitchenBehind(t, d / 2 + wall / 2);
             foreach (int sz in new[] { -1, 1 })
                 for (float x = -w / 2 + 1.5f; x < w / 2 - .8f; x += 2.6f)
                 {
                     if (sz < 0 && Mathf.Abs(x) < doorW) continue;
-                    Part(PrimitiveType.Cube, t, new Vector3(x, 1.5f, sz * d / 2), new Vector3(.9f, .8f, wall + .1f), art.glass);
+                    bool covered = sz > 0 && kitchen.HasValue && Mathf.Abs(x - kitchen.Value) < KitchenSize.x / 2 + .85f;   // its glass, frame or shutters would meet the lean-to
+                    if (!covered) Part(PrimitiveType.Cube, t, new Vector3(x, 1.5f, sz * d / 2), new Vector3(.9f, .8f, wall + .1f), art.glass);
                     Part(PrimitiveType.Cube, t, new Vector3(x, storey + 1.3f, sz * d / 2), new Vector3(.8f, .7f, wall + .1f), art.glass);
                     // Frames and sills round that glass on the outer wall face; shutters downstairs where they clear the corner post (inner face at w/2 - .17) and the door opening.
-                    Window(t, new Vector3(x, 1.5f, sz * (d / 2 + wall / 2)), .9f, .8f, sz, variant, Mathf.Abs(x) + .84f <= w / 2 - .17f && (sz > 0 || Mathf.Abs(x) - .84f >= doorW / 2 + .05f), false);
+                    if (!covered) Window(t, new Vector3(x, 1.5f, sz * (d / 2 + wall / 2)), .9f, .8f, sz, variant, Mathf.Abs(x) + .84f <= w / 2 - .17f && (sz > 0 || Mathf.Abs(x) - .84f >= doorW / 2 + .05f), false);
                     Window(t, new Vector3(x, storey + 1.3f, sz * (d / 2 + wall / 2)), .8f, .7f, sz, variant, false, false);
                 }
             float roofH = Mathf.Max(2.4f, d * .5f);
@@ -1418,6 +1433,14 @@ namespace Crulanda.World
             bar.AddComponent<BoxCollider>(); bar.AddComponent<NavBlocker>();
             Part(PrimitiveType.Cube, t, new Vector3(-w / 2 + 2.6f, 1.12f, d / 2 - 1.5f), new Vector3(4.2f, .08f, .9f), dark);
             for (int i = 0; i < 3; i++) Part(PrimitiveType.Cylinder, t, new Vector3(-w / 2 + 1.2f + i * 1.1f, .5f, d / 2 - .55f), new Vector3(.8f, .5f, .8f), art.timber);
+            // The innkeeper's place at the open end of the bar, and behind it the door to the rooms upstairs (barred to the player:
+            // whoever lodges at the inn goes to bed through it), set between two of the back wall's windows. With a kitchen on the
+            // back wall, the kitchen's own door shows in the taproom too.
+            Workplace(t, "bar", new Vector3(-w / 2 + 5.3f, 0, d / 2 - 1.4f), new Vector3(0, 1, -1));
+            float roomsX = -w / 2 + 5.4f;
+            InnerDoor(t, roomsX, d / 2 - wall / 2, dark);
+            Doors.Add(new ZoneDoor { name = t.name + ", upstairs", kind = "rooms", openable = false, position = t.TransformPoint(new Vector3(roomsX, 1, d / 2 - .7f)) });
+            if (kitchen.HasValue) InnerDoor(t, kitchen.Value - KitchenDoorX, d / 2 - wall / 2, dark);
             foreach (var at in new[] { new Vector2(2.2f, -1.6f), new Vector2(2.8f, 1.3f), new Vector2(-2.8f, -1.9f) })
             {
                 Part(PrimitiveType.Cylinder, t, new Vector3(at.x, .78f, at.y), new Vector3(1.2f, .04f, 1.2f), boards);
@@ -3071,7 +3094,8 @@ namespace Crulanda.World
                 // A road counts only within 3.3 m of its edge (the verge); a building's footprint and 1.5 m round it is bare.
                 grassRoadBox = Zone.roads.Select(r => Box(r.points, r.width / 2 + 3.5f)).ToArray();
                 grassBuildings = Zone.props.Where(o => o != null && (o.kind == "house" || o.kind == "inn" || o.kind == "barn" || o.kind == "mill" || o.kind == "ruined_house"))
-                    .Select(o => (o.at, Mathf.Max(2, Mathf.Max(o.size.x, o.size.y) * .75f) + 1.5f)).ToArray();
+                    .Select(o => (o.at, Mathf.Max(2, Mathf.Max(o.size.x, o.size.y) * .75f) + 1.5f))
+                    .Concat(Zone.props.Where(o => o != null && (o.kind == "leathershop" || o.kind == "dryhut" || o.kind == "kitchen")).Select(o => (o.at, 4.5f))).ToArray();   // a workshop's floor (these props carry no size)
             }
             float living = 1 - Unmade(p.x, p.y) / .55f; if (living <= 0) return 0;   // grass thins out along the grey's ragged front
             if (Hollow.CoverAt(p, 1.2f) > 0) return 0;   // a cave's bare floor
@@ -3107,8 +3131,8 @@ namespace Crulanda.World
             if (Gloom) open *= Mathf.Lerp(.25f + .6f * Mathf.PerlinNoise(p.x * .07f + 13, p.y * .07f + 29), 1, verge * .85f);
             return open * living;
         }
-        /// <summary>Soft grey smoke from a chimney (or any stack).</summary>
-        void Smoke(Transform parent, Vector3 localPos)
+        /// <summary>Soft grey smoke from a chimney (or any stack). Returns its particle system (a house keeps it on its door).</summary>
+        ParticleSystem Smoke(Transform parent, Vector3 localPos)
         {
             var ps = new GameObject("Chimney smoke").AddComponent<ParticleSystem>(); ps.transform.SetParent(parent, false);
             ps.transform.localPosition = localPos; ps.transform.rotation = Quaternion.Euler(-90, 0, 0);
@@ -3124,6 +3148,7 @@ namespace Crulanda.World
             vel.x = new ParticleSystem.MinMaxCurve(.25f, .5f); vel.y = new ParticleSystem.MinMaxCurve(0, 0); vel.z = new ParticleSystem.MinMaxCurve(.05f, .15f);
             ps.GetComponent<ParticleSystemRenderer>().sharedMaterial = art.particle;
             HourTinted.Add(ps);   // grey by day, a dim wisp against the night sky
+            return ps;
         }
         /// <summary>A watermill: a house on the bank with a turning wheel in the creek on its west side.</summary>
         void Mill(Transform t, Vector2 size)

@@ -1137,7 +1137,7 @@ namespace Crulanda.Encounter
                 if (secret != null) return SearchPrompt(secret.def);
                 if (usable != null) return usable.prompt;
                 var door = NearbyDoor;
-                if (door != null) return door.openable ? (door.Open ? "Close the door" : "Open the door") + " · " + door.name : "Knock · " + door.name;
+                if (door != null) return door.openable ? (door.Open ? "Close the door" : "Open the door") + " · " + door.name : (door.kind == "rooms" ? "Try the door · " : "Knock · ") + door.name;
                 return null;
             }
         }
@@ -1147,6 +1147,8 @@ namespace Crulanda.Encounter
             "A voice through the planks: \"We've nothing left to give. Go away.\"",
             "Locked. Fresh scratches around the latch.",
         };
+        /// <summary>What an inn's door to its rooms upstairs says when the player tries it (GAME-ONLY).</summary>
+        const string RoomsDoorLine = "The stair up to the rooms. It's kept for the inn's lodgers.";
         public void Interact()
         {
             if (!Player.IsAlive || Paused) return;
@@ -1186,7 +1188,7 @@ namespace Crulanda.Encounter
             if (door != null)
             {
                 if (door.openable) door.SetOpen(!door.Open);
-                else Message(door.name + ": " + BarredDoorLines[Mathf.Abs(door.name.GetHashCode() + Time.frameCount / 600) % BarredDoorLines.Length]);
+                else Message(door.name + ": " + (door.kind == "rooms" ? RoomsDoorLine : BarredDoorLines[Mathf.Abs(door.name.GetHashCode() + Time.frameCount / 600) % BarredDoorLines.Length]));
                 return;
             }
             Message("Nothing to interact with here.");

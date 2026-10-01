@@ -36,7 +36,7 @@ namespace Crulanda.Encounter
             switch (role)
             {
                 case "blacksmith": return "forge"; case "merchant": return "stall"; case "baker": return "oven";
-                case "leatherworker": case "skinner": return "tannery"; case "lumberjack": case "hunter": return "woods";
+                case "leatherworker": return "leathershop"; case "skinner": return "tannery"; case "lumberjack": case "hunter": return "woods";
                 case "herbalist": return "meadow"; case "miller": return "mill"; case "farmer": return "field"; default: return null;
             }
         }
@@ -52,11 +52,21 @@ namespace Crulanda.Encounter
             }
         }
         readonly Dictionary<Vector3, Vector3> faceAt = new Dictionary<Vector3, Vector3>();
-        /// <summary>Where someone working at a place should look (the anvil, the counter's customers), if it is a workplace.</summary>
+        readonly Dictionary<Vector3, string> placeName = new Dictionary<Vector3, string>();
+        /// <summary>Where someone working at a place should look (the anvil, the counter's customers), if it is a workplace. Of
+        /// stand points close together (the kitchen's range and table), the nearest one's.</summary>
         public Vector3? LookFor(Vector3 at)
         {
-            foreach (var kv in faceAt) if ((kv.Key - at).sqrMagnitude < 2.5f) return kv.Value;
-            return null;
+            Vector3? best = null; float bd = 2.5f;
+            foreach (var kv in faceAt) { float d = (kv.Key - at).sqrMagnitude; if (d < bd) { bd = d; best = kv.Value; } }
+            return best;
+        }
+        /// <summary>The name of the workplace (the prop's name: "Tanner's leather shop") that the nearest stand point belongs to, or null off any.</summary>
+        public string WorkplaceAt(Vector3 at)
+        {
+            string best = null; float bd = 2.5f;
+            foreach (var kv in placeName) { float d = (kv.Key - at).sqrMagnitude; if (d < bd) { bd = d; best = kv.Value; } }
+            return best;
         }
 
         public void Init(EncounterSession session)
@@ -104,6 +114,9 @@ namespace Crulanda.Encounter
         static readonly string[] KeeperNames = { "Goody Marl", "Hettie Brook", "Nan Pennock", "Old Sorrel" };
         public static string[] DefaultNames { get { return Names; } }
         public static string[] KeeperNamesList { get { return KeeperNames; } }
+        /// <summary>Oakhaven's two houses built for the trades (GAME-ONLY). They stand empty, out of <see cref="Homes"/>, until
+        /// households give every villager a house by name.</summary>
+        public static readonly HashSet<string> UnsettledHouses = new HashSet<string> { "Carder farmhouse", "Crisp cottage" };
         /// <summary>Hens lay through the working day, one egg each at most; the count resets before dawn. The water pan dries out.</summary>
         void Update()
         {
@@ -127,10 +140,11 @@ namespace Crulanda.Encounter
         void FindPlaces()
         {
             var z = Zone.Zone;
-            foreach (var key in new[] { "field", "well", "green", "inn", "mill", "wander", "forge", "stall", "oven", "tannery", "woodpile", "woods", "meadow" }) Places[key] = new List<Vector3>();
-            // Trade workplaces (exact stand points, with where to look while working).
+            foreach (var key in new[] { "field", "well", "green", "inn", "mill", "wander", "forge", "stall", "oven", "tannery", "woodpile", "woods", "meadow", "leathershop", "dryhut", "kitchen", "kitchendoor", "bar", "lodge" }) Places[key] = new List<Vector3>();
+            // Trade workplaces (exact stand points, with where to look while working, and whose place it is).
             foreach (var w in Zone.Workplaces)
-                if (NavMesh.SamplePosition(w.stand, out var wh, 1.5f, NavMesh.AllAreas)) { Places[w.kind].Add(wh.position); faceAt[wh.position] = w.look; }
+                if (NavMesh.SamplePosition(w.stand, out var wh, 1.5f, NavMesh.AllAreas)) { Places[w.kind].Add(wh.position); faceAt[wh.position] = w.look; placeName[wh.position] = w.name; }
+            if (Places["leathershop"].Count == 0) Places["leathershop"] = Places["tannery"];   // a village with a tannery yard but no shop: the leatherworker works in the yard
             // Woods: inside living groves (not orchards). Meadow: open hillside between the village and the forest edge.
             foreach (var g in z.groves)
             {
@@ -144,7 +158,9 @@ namespace Crulanda.Encounter
                 if (z.wasting != null && p.x > z.wasting.x - 20) continue;
                 AddPlace("meadow", p);
             }
-            foreach (var d in Zone.Doors) if (!d.openable) Homes.Add(d);
+            // The inn's rooms door and the two houses built for the trades are nobody's home until households say so, which keeps
+            // the old deal of houses (Init's i % Homes.Count, the hen-wife's nearest house) as it was.
+            foreach (var d in Zone.Doors) if (!d.openable && d.kind != "rooms" && !UnsettledHouses.Contains(d.name)) Homes.Add(d);
             foreach (var f in z.fields)
                 for (int i = 0; i < 4; i++)
                 {
@@ -630,7 +646,9 @@ namespace Crulanda.Encounter
                 case "inn": case "sleep": return ActorPose.Sit;
                 case "forge": return ActorPose.Hammer;
                 case "stall": return Role == "merchant" || Role == "baker" && life.R01 < .5f ? ActorPose.Talk : ActorPose.Knead;
-                case "oven": case "tannery": return ActorPose.Knead;
+                case "oven": case "tannery": case "leathershop": case "dryhut": case "kitchen": return ActorPose.Knead;
+                case "bar": return ActorPose.Talk;
+                case "lodge": return ActorPose.Work;
                 case "woodpile": return ActorPose.Chop;
                 case "woods": return Role == "lumberjack" ? ActorPose.Chop : Role == "hunter" || Role == "warden" ? ActorPose.None : ActorPose.Gather;
                 case "meadow": return Role == "hunter" ? ActorPose.None : ActorPose.Gather;

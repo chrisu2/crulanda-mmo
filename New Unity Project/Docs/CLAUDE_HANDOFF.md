@@ -10,25 +10,39 @@ Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
 ## RESUME HERE (updated 2026-10-01, afternoon)
-**PUBLISHED 2026-10-01 (two publishes): (1) THE ROOT-MOTHER'S DEEP, CROWSFOOT'S HIDDEN MOUTH and EVERY TRADE HAS A DAY;
-(2) THE PAINTED STYLE PASS, parts 1-4** (commit 03fd06d): painted buildings and trim, painted natural rock, sky and colour per
-zone, chunky props. Tests on the published code: EditMode 186/186, PlayMode 81/81, 0 shader errors; all five zones toured and
-viewed. Design: `WORLD_ZONES.md` "The painted style pass", the CHANGELOG.
-- **In flight when this was written:** part 5 (`tools\wip\painted\v2\p5\patch_p5.py`, painted masonry with metre UVs on towers,
-  curtain walls, the gate, the keep, crypts, ruins, wayshrines; headstones and waystones as painted rock) is APPLIED in the working
-  tree; the full run and a five-zone tour were running. If it is not committed as published: run `run_tests.ps1`, tour, look at
-  `peaks-03-the-toll-gate.png`, `khaven-04`, `ashrim-01`, the crypts and ruins, then publish.
-- **A visual review of the published captures** (four reviewers, one ranked worklist) was also running; its worklist is the next
-  job's input. If it is not in `tools\wip\painted\visual_review.md`, rerun the workflow or review the captures in
-  `world-captures\archive-20261001-painted-published-p4`.
-- **How the painted pass was done, worth repeating:** draft -> agents pre-check (port generated textures to Python and LOOK at
-  them; recompute geometry; refute each finding) -> restage as anchor-based patch scripts verified by compiling a scratch copy
-  (`tools\wip\painted\v2\pN`) -> apply one part -> `build_art.ps1` if art changed -> tests -> tour -> LOOK -> fix -> publish.
-  Never edit Assets while a run is in flight (the tour mirrors Assets again); stage in `tools\wip`.
-- `tools\validation\run_focus.ps1 -Filter '<fixtures>'` runs a few fixtures in three minutes; `build_art.ps1` builds generated
-  art in the validation copy and brings it into the repo.
-- Then: the Verdant extras (mist banks, glass-frogs, a Temple root-stair prop, the sea backdrop), a `hollow` mist-walker
-  variant, weather polish, audio. Steam-blurb decisions are still Chris's (store title; whether The First Spoke is out).
+**PUBLISHED 2026-10-01 (four publishes; the playable build is commit ecc233b):**
+1. The Root-Mother's Deep, Crowsfoot's hidden mouth, every trade has a day (4c579e6).
+2. The painted style pass parts 1-4: painted buildings, painted rock, sky and colour, chunky props (03fd06d).
+3. Part 5: painted masonry on towers, walls, the gate, the keep, crypts, ruins (17168d8).
+4. The out of work drink at the inn (VillageDrinkTests), and the visual review's first batch: Oakhaven's blue air, storms that
+   darken, firelit night, leafy crowns, the meadow, gables, hedges and haystacks (ecc233b).
+Tests on ecc233b: EditMode 186/186, PlayMode 83/83 (the full run was 82/83 on a flaw in the new drinker test itself, corrected
+and rerun). Design: `WORLD_ZONES.md` "The painted style pass" and "Life, day and night"; the CHANGELOG.
+
+**IN FLIGHT when this was written:** the visual review's SECOND batch (`tools/wip/painted/v2/w2`: ash, edge, ruins, peaks, caves)
+is APPLIED in the working tree, its cave art built (`build_art.ps1`), with the full run and a five-zone tour running. If it is not
+committed as published: `run_tests.ps1`, tour, LOOK (ashrim-01/03, the *-exit shots, the ruins, peaks-01/07, the eight cave
+shots), fix, publish. The worklist is `tools/wip/painted/visual_review.md` (items 10 and 11 are still open: buildings on slopes;
+the inn and the smithy as hero buildings).
+
+**NEXT BIG JOB (Chris, 2026-10-01): PLAYER PROFESSIONS, GATHERING AND THE VILLAGE ECONOMY.** Everything he said and decided is
+in `tools/wip/professions/OWNER_NOTES.md` (read it first): gather ore, lumber and herbs, sell or refine; two crafting professions
+chosen from Blacksmith and Alchemist with Cooking and gathering free; the leatherworker makes profession bags by quest (bring
+leathers) or purchase and spends his coin on bread and firewood for his family; every tradesperson has a purse; one named house
+per household; a workshop per trade; an innkeeper; wild animals huntable and every beast skinnable for leather; farm animals and
+cats never huntable. Design documents: `tools/wip/professions/DESIGN.md` (a three-way design panel's synthesis), `ADDENDUM.md`
+and `BUILD_PLAN.md` (households, workshops, purses, bags; one integrated build order in small publishable steps; if those two are
+missing, rerun the `professions-addendum` workflow). Hunting and skinning came after the addendum was commissioned: make sure the
+build plan has them. The save format will change (format 8): BACK UP CHRIS'S SAVE FIRST (`hel/work/save-backups`).
+
+**How today's work was done, worth repeating:** draft -> agents pre-check (port generated textures to Python and LOOK; recompute
+geometry; a second agent tries to refute each finding) -> restage as anchor-based patch scripts verified by compiling a scratch
+copy (`tools/wip/painted/v2/...`) -> apply one batch -> `build_art.ps1` if art changed -> full tests -> tour -> LOOK -> publish.
+Before publishing gameplay, a read-only review workflow found a dozen real bugs the tests missed. Never edit Assets while a run
+is in flight (the tour mirrors Assets again): stage in `tools/wip`. `run_focus.ps1 -Filter '<fixtures>'` runs a few fixtures fast.
+
+**Chris asked whether to move to Unreal** (2026-10-01): answered no (the art, not the engine, is the limit; a port rewrites
+everything; a Unity lighting-pipeline trial is the cheap experiment). He did not ask for the trial.
 
 **The standing direction is in `GAME_BRIEF.md` (read it first): a high-fidelity, beautiful MMO-style world, AAA quality in a classic style, judged on details, graphics, lighting, mood and visual feel.**
 Chris's rules: work in order of importance; finish each step; keep going without waiting (memory: crulanda-autonomy); tell him at each publish.

@@ -34,7 +34,7 @@ namespace Crulanda.World
                 case WeatherKind.Mist: return new WeatherLook { clouds = .8f, dim = .42f, mist = 1, wind = .06f, fog = .62f };
                 case WeatherKind.Rain: return new WeatherLook { clouds = 1, dim = .74f, rain = .72f, wind = .45f, fog = .66f };
                 case WeatherKind.Snow: return new WeatherLook { clouds = .9f, dim = .5f, snow = 1, wind = .5f, fog = .7f };
-                case WeatherKind.AshSquall: return new WeatherLook { clouds = .88f, dim = .52f, ash = 1, wind = .92f, fog = .72f };
+                case WeatherKind.AshSquall: return new WeatherLook { clouds = .88f, dim = .58f, ash = 1, wind = .92f, fog = .56f };
                 case WeatherKind.Storm: return new WeatherLook { clouds = 1, dim = .86f, rain = 1, wind = 1, fog = .5f };
                 default: return None;
             }
@@ -432,8 +432,8 @@ namespace Crulanda.World
         {
             float mist = shown.mist, ash = shown.ash * .85f; dust = ash > mist;
             var fog = RenderSettings.fogColor; float g = fog.grayscale;
-            tint = dust ? Color.Lerp(fog, new Color(g * 1.08f, g, g * .9f), .6f) : Color.Lerp(fog, Color.white, Mathf.Lerp(.3f, .1f, dark));
-            float amount = Mathf.Max(mist, ash); tint.a = (dust ? .22f : .34f) * amount;
+            tint = dust ? Color.Lerp(fog, new Color(g * 1.08f, g, g * .9f), .8f) : Color.Lerp(fog, Color.white, Mathf.Lerp(.3f, .1f, dark));
+            float amount = Mathf.Max(mist, ash); tint.a = (dust ? .3f : .34f) * amount;   // a squall's dust is thick and dun
             wind = new Vector3(dir.x, 0, dir.y) * (dust ? 1.5f + 4 * shown.wind : .25f + .6f * shown.wind) + Vector3.up * .03f;
             return amount;
         }

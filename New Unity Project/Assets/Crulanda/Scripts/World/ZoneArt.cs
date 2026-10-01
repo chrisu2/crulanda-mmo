@@ -47,5 +47,7 @@ namespace Crulanda.World
         public Material masonry;
         [Tooltip("Crulanda/PaintedRock: natural rock (crags, cliffs, boulders), world-projected strata with lit tops. Null = ZoneBuilder falls back to stone.")]
         public Material rock;
+        [Tooltip("Crulanda/PaintedCave: a cave's walls from inside (ZoneBuilder.CaveLining), world-projected paint under the lining's own vertex shading. cave is bedded rock (Crowsfoot Hollow), caveEarth packed earth with roots (the Root-Mother's Deep). Null = the faceted shell shows, on stone or bark.")]
+        public Material cave, caveEarth;
     }
 }

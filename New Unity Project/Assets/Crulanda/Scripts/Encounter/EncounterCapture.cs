@@ -482,8 +482,23 @@ namespace Crulanda.Encounter
                     for (int i = 0; i + 3 < hollow.Centre.Count && drop < 0; i++) if (hollow.Centre[i].y - hollow.Centre[i + 3].y > .7f) drop = hollow.Along[i];   // where the floor first falls away
                     for (int i = 0; i < hollow.Centre.Count; i++)
                         if (hollow.Along[i] > hollow.Length * .45f && hollow.Along[i] < hollow.Length * .7f && hollow.Half[i] > widest) { widest = hollow.Half[i]; stores = hollow.Along[i]; }
-                    var views = new List<(float from, float toward, float pitch, string shot)> { (6.5f, 12.5f, 10, "85-hollow-camp" + hs) };
-                    if (drop > 0) views.Add((drop - 2.5f, drop + 7, 24, "88-hollow-drop" + hs));
+                    // A cave whose floor falls away from the mouth itself (the Root-Mother's Deep, down its root-stair) has no camp by
+                    // the way in, and the head of that stair is out in the daylight: both views stood at the mouth, the camera outside
+                    // it. Its first picture is its first chamber (the widest ring of the first two fifths: the Root Gallery) from just
+                    // inside it, and its drop the steepest stretch past that chamber (the Cold Stair), from its head.
+                    float campAt = 6.5f, campTo = 12.5f, campPitch = 10, dropPitch = 24;
+                    if (drop >= 0 && drop < 12.5f)
+                    {
+                        float first = -1, steep = .01f; widest = 0; drop = -1;
+                        for (int i = 0; i < hollow.Centre.Count; i++)
+                            if (hollow.Along[i] > hollow.Length * .12f && hollow.Along[i] < hollow.Length * .4f && hollow.Half[i] > widest) { widest = hollow.Half[i]; first = hollow.Along[i]; }
+                        for (int i = 0; first > 0 && i + 3 < hollow.Centre.Count; i++)
+                            if (hollow.Along[i] > first + 8 && hollow.Centre[i].y - hollow.Centre[i + 3].y > steep + .01f) { steep = hollow.Centre[i].y - hollow.Centre[i + 3].y; drop = hollow.Along[i]; }
+                        if (first > 0) { campAt = first - 4; campTo = first + 4; campPitch = 16; }   // from the stair's foot, over the stair behind
+                        dropPitch = 18;   // under the Sap Well's roof
+                    }
+                    var views = new List<(float from, float toward, float pitch, string shot)> { (campAt, campTo, campPitch, "85-hollow-camp" + hs) };
+                    if (drop > 0) views.Add((drop - 2.5f, drop + 7, dropPitch, "88-hollow-drop" + hs));
                     if (stores > 0) views.Add((stores - 8, stores + 1, 10, "89-hollow-stores" + hs));
                     views.Add((hollow.Length - 13, hollow.Length - 5, 10, "86-hollow-hall" + hs));
                     foreach (var (from, toward, pitch, shot) in views)

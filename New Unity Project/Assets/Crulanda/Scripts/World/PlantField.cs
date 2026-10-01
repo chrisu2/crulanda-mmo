@@ -9,7 +9,8 @@ namespace Crulanda.World
     /// ground. Instanced cards baked into 24 m cells and drawn near the camera (as GrassField), wherever grass may grow (Openness:
     /// never on a road, a yard, a field, in a building, a cave or the unmade). Each biome has its own mix: the meadow's, the
     /// mountain's few ferns and alpine flowers, Khaven's withered ferns and dark reeds, the verdant shore's riot (ferns everywhere,
-    /// glowing flowers at night); nothing grows on the ash. Its own random stream: the zone's layout is untouched.
+    /// glowing flowers at night); nothing grows on the ash. The edge ferns and the flower drifts run on past the zone's edge
+    /// over the backdrop's near slope and thin out to nothing there. Its own random stream: the zone's layout is untouched.
     /// </summary>
     public sealed class PlantField : MonoBehaviour
     {
@@ -42,8 +43,12 @@ namespace Crulanda.World
             }
         }
 
-        public void Build(ZoneBuilder zone, ZoneArt art, Material[] flowers, System.Func<Vector2, float> openness, int seed)
+        /// <summary>Bakes the plants. With <paramref name="edgeOpenness"/> and <paramref name="edgeGround"/> (what may grow at a point
+        /// past the edge, and the ground there) the edge's plants run on <paramref name="edgeReach"/> metres past it.</summary>
+        public void Build(ZoneBuilder zone, ZoneArt art, Material[] flowers, System.Func<Vector2, float> openness, int seed,
+            System.Func<Vector2, float> edgeOpenness = null, System.Func<Vector2, float, Vector3> edgeGround = null, float edgeReach = 0)
         {
+            Material[] glowing = null;
             var z = zone.Zone; var mix = MixFor(z.biome);
             if (art == null || (art.fern == null && art.broadLeaf == null && art.reeds == null)) return;
             var rng = new System.Random(seed); float R() { return (float)rng.NextDouble(); }
@@ -52,14 +57,14 @@ namespace Crulanda.World
             var fern = Tinted(art.fern, mix.fernTint, mix.wither); var leaf = Tinted(art.broadLeaf, mix.leafTint, mix.wither); var reed = Tinted(art.reeds, mix.reedTint, mix.wither);
             // Where a plant may stand: open to growth, not in the water (reeds excepted), and not on a trunk.
             bool Ground(Vector2 p) { return openness(p) > 0; }
-            void Plant(Mesh mesh, Material mat, Vector2 p, float size, float lift = -.03f)
+            void Plant(Mesh mesh, Material mat, Vector2 p, float size, float lift = -.03f, bool past = false)
             {
                 if (mesh == null || mat == null) return;
                 int cx = Mathf.Clamp((int)((p.x + half) / Cell), 0, perAxis - 1), cz = Mathf.Clamp((int)((p.y + half) / Cell), 0, perAxis - 1);
                 var cell = grid[cx, cz];
                 if (cell == null) { cell = grid[cx, cz] = new CellData { center = new Vector3(-half + (cx + .5f) * Cell, 0, -half + (cz + .5f) * Cell) }; cells.Add(cell); }
                 var key = (mesh, mat); if (!cell.lists.TryGetValue(key, out var list)) cell.lists[key] = list = new List<Matrix4x4>();
-                list.Add(Matrix4x4.TRS(zone.Ground(p, lift), Quaternion.Euler(0, R() * 360, 0), new Vector3(size, size * (.85f + R() * .3f), size)));
+                list.Add(Matrix4x4.TRS(past ? edgeGround(p, lift) : zone.Ground(p, lift), Quaternion.Euler(0, R() * 360, 0), new Vector3(size, size * (.85f + R() * .3f), size)));
             }
             // Ferns round the trunks (in their shade), in the woods, along the forest edge, and (on the verdant shore) in the open too.
             if (fern != null)
@@ -112,7 +117,7 @@ namespace Crulanda.World
             // Flowers in drifts: a patch of one colour where the drift noise is high, the colour from a second, slower noise.
             if (mix.flowers && flowers != null && flowers.Length > 0 && mix.flowerDrift > 0)
             {
-                var glow = mix.glow > 0 ? Glowing(flowers) : null;
+                var glow = glowing = mix.glow > 0 ? Glowing(flowers) : null;
                 for (int k = 0, n = Mathf.RoundToInt(z.size * z.size * .12f); k < n; k++)
                 {
                     var p = new Vector2((R() - .5f) * z.size, (R() - .5f) * z.size); float keep = R(), size = R();
@@ -122,6 +127,36 @@ namespace Crulanda.World
                     bool lit = glow != null && Mathf.PerlinNoise(p.x * .02f + 50, p.y * .02f + 60) > .62f;
                     Plant(tuftMesh, lit ? glow[hue] : flowers[hue], p, .8f + size * .5f); Flowers++;
                 }
+            }
+            // Past the edge: the forest edge's ferns (which stop 3 m short of the line inside) and the flower drifts run on over the
+            // backdrop's near slope, thinning to nothing by edgeReach, so the dressing never stops on a line (the grass does the
+            // same: GrassField.BuildEdge). They go in the edge cells. Drawn after everything else: every plant inside the zone
+            // stands where it did.
+            if (edgeOpenness != null && edgeGround != null && edgeReach > 0)
+            {
+                float span = z.size + edgeReach;   // each side's strip takes one corner
+                Vector2 Spot(float from, out float thin)
+                {
+                    int side = (int)(R() * 4); float a = R() * span, o = from + R() * (edgeReach - from);
+                    var p = side == 0 ? new Vector2(half - a, -half - o) : side == 1 ? new Vector2(half + o, half - a) : side == 2 ? new Vector2(-half + a, half + o) : new Vector2(-half - o, -half + a);
+                    thin = Mathf.SmoothStep(1, 0, (Mathf.Max(Mathf.Abs(p.x), Mathf.Abs(p.y)) - half) / edgeReach); return p;
+                }
+                if (fern != null)
+                    for (int k = 0, n = Mathf.RoundToInt(4 * span * (edgeReach + 3) * mix.fernShade); k < n; k++)
+                    {
+                        var p = Spot(-3, out float thin); float keep = R(), size = R();
+                        if (keep < thin && edgeOpenness(p) > 0 && NotOnTrunk(zone, p)) { Plant(fernMesh, fern, p, .7f + size * .8f, -.03f, true); Ferns++; }
+                    }
+                if (mix.flowers && flowers != null && flowers.Length > 0 && mix.flowerDrift > 0)
+                    for (int k = 0, n = Mathf.RoundToInt(4 * span * edgeReach * .12f); k < n; k++)
+                    {
+                        var p = Spot(0, out float thin); float keep = R(), size = R();
+                        float drift = Mathf.PerlinNoise(p.x * .045f + 31, p.y * .045f + 17);
+                        if (drift < .58f || keep > mix.flowerDrift * (drift - .58f) * 4 * thin || edgeOpenness(p) < .35f) continue;
+                        int hue = Mathf.Min(flowers.Length - 1, (int)(Mathf.PerlinNoise(p.x * .012f + 7, p.y * .012f + 3) * flowers.Length * 1.2f));
+                        bool lit = glowing != null && Mathf.PerlinNoise(p.x * .02f + 50, p.y * .02f + 60) > .62f;
+                        Plant(tuftMesh, lit ? glowing[hue] : flowers[hue], p, .8f + size * .5f, -.03f, true); Flowers++;
+                    }
             }
             foreach (var cell in cells)
             {

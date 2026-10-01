@@ -686,3 +686,9 @@ A read-only review by five reviewers, each finding checked by a second who tried
   the day; night with firelit windows and a moonlit blue base instead of bleached white on mud; broadleaf crowns built of leafy
   lumps instead of one brown ball; a greener, denser meadow whose tufts fade out with distance; hedges and haystacks with shape;
   gable ends that are wall, with barge boards and a tie beam, instead of roof.
+- **The second batch of the worklist:** the Ash Rim's ground is drifted ash over broken crust instead of paving, its flakes soft
+  and pale; the land carries on past the zone's edge at exits (grass, ferns and flowers thinning out over the backdrop's near
+  slope) and the waystone is a leaning carved stone with a lantern house; ruins have broken silhouettes (stepped stubs, a gable
+  standing alone, rubble); the Peaks' steep ground reads as bedded rock and scree with crags seated in aprons; cave walls are
+  painted rock (Crowsfoot) and earth packed with roots (the Root-Mother's Deep), with dripstone and ledges, and the deep's capture
+  shots stand in the right places.

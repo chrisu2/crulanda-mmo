@@ -251,6 +251,7 @@ namespace Crulanda.EditorTools
             if (art.reeds == null) art.reeds = PlantCard("Reeds", reedTex, .12f);
             PaintedTextures(art);   // the painted style pass: plaster, thatch, slate and timber repainted, and the masonry material (ZoneSceneBuilder.Painted.cs)
             EnsurePaintedRock(art);   // and the painted natural rock (ZoneSceneBuilder.PaintedRock.cs)
+            EnsurePaintedCave(art);   // and the cave walls, rock and earth (ZoneSceneBuilder.PaintedCave.cs)
             EditorUtility.SetDirty(art); AssetDatabase.SaveAssets();
             return art;
         }

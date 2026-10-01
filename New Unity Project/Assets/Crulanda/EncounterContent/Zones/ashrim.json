@@ -39,11 +39,11 @@
     "sunYaw": -48,
     "sunIntensity": 1.0,
     "sunColor": "#D8D0C6",
-    "ambientSky": "#72717C",
+    "ambientSky": "#6F6E82",
     "ambientEquator": "#5E5C64",
     "ambientGround": "#262428",
-    "fogColor": "#A3A1A8",
-    "fogStart": 22,
+    "fogColor": "#A4A1AE",
+    "fogStart": 32,
     "fogEnd": 105,
     "skyTint": "#9987A1"
   },
@@ -452,7 +452,8 @@
         "x": -10,
         "y": -40
       },
-      "radius": 16
+      "radius": 16,
+      "ground": "licked"
     },
     {
       "name": "Tear-marked shrine",

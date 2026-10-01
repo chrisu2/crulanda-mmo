@@ -96,6 +96,48 @@ namespace Crulanda.World
                 cell.byMaterial.Clear();
             }
         }
+        /// <summary>
+        /// The grass past the zone's edge: the same tufts and wildflowers running on over the backdrop's near slope for
+        /// <paramref name="reach"/> metres, as thick as the field at the line (<paramref name="density"/> a square metre) and
+        /// thinning to nothing, the tufts a little bigger as they thin. Call after Build. Cells of its own, drawn with the
+        /// rest; a stream of its own; its own copies of the materials, which fade with distance as the field's do
+        /// (Grass.shader's _FadeFar, where the shader has it).
+        /// </summary>
+        public void BuildEdge(float half, Material[] grass, Material[] flowers, System.Func<Vector2, float> openness, System.Func<Vector2, float, Vector3> ground, int seed, float density, float reach)
+        {
+            if (tuft == null || grass == null || grass.Length == 0 || reach <= 0) return;
+            var edgeRng = new System.Random(seed); float R() { return (float)edgeRng.NextDouble(); }
+            float span = half * 2 + reach;   // each side's strip takes one corner
+            var copies = new Dictionary<Material, Material>(); var edge = new Dictionary<(int, int), CellData>();
+            Material Copy(Material m)
+            {
+                if (!copies.TryGetValue(m, out var c)) { copies[m] = c = new Material(m) { name = m.name + " (edge)", enableInstancing = true }; c.SetFloat("_FadeFar", DrawDistance + Cell / 2); }
+                return c;
+            }
+            for (int i = 0, count = Mathf.RoundToInt(4 * span * reach * density); i < count; i++)
+            {
+                int side = edgeRng.Next(4); float a = R() * span, o = R() * reach, keep = R();
+                var p = side == 0 ? new Vector2(half - a, -half - o) : side == 1 ? new Vector2(half + o, half - a) : side == 2 ? new Vector2(-half + a, half + o) : new Vector2(-half - o, -half + a);
+                float past = Mathf.Clamp01((Mathf.Max(Mathf.Abs(p.x), Mathf.Abs(p.y)) - half) / reach), open = openness(p) * Mathf.SmoothStep(1, 0, past);
+                if (open <= 0 || keep > open) continue;
+                bool flower = flowers != null && flowers.Length > 0 && R() < .07f;
+                var mat = Copy(flower ? flowers[edgeRng.Next(flowers.Length)] : grass[edgeRng.Next(grass.Length)]);
+                float s = flower ? .45f + R() * .25f : (.55f + R() * .6f) * (1 + .4f * past);
+                var m = Matrix4x4.TRS(ground(p, -.02f), Quaternion.Euler(0, R() * 360, 0), new Vector3(s, s * (.8f + R() * .5f), s));
+                var key = (Mathf.FloorToInt((p.x + half) / Cell), Mathf.FloorToInt((p.y + half) / Cell));
+                if (!edge.TryGetValue(key, out var cell)) { edge[key] = cell = new CellData { center = new Vector3(-half + (key.Item1 + .5f) * Cell, 0, -half + (key.Item2 + .5f) * Cell) }; cells.Add(cell); }
+                if (!cell.byMaterial.TryGetValue(mat, out var list)) cell.byMaterial[mat] = list = new List<Matrix4x4>();
+                list.Add(m);
+            }
+            foreach (var cell in edge.Values)
+            {
+                cell.baked = new List<(Material, Matrix4x4[])>();
+                foreach (var kv in cell.byMaterial)
+                    for (int start = 0; start < kv.Value.Count; start += 1023)
+                        cell.baked.Add((kv.Key, kv.Value.GetRange(start, Mathf.Min(1023, kv.Value.Count - start)).ToArray()));
+                cell.byMaterial.Clear();
+            }
+        }
         void Update()
         {
             var cam = Camera.main; if (cam == null || tuft == null) return;

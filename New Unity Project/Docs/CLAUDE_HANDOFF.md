@@ -18,29 +18,33 @@ The user requested this handoff because they ran out of tokens. Do not assume an
 Tests on 078d276: EditMode 186/186, PlayMode 83/83, 0 shader errors. Main has since gained an inn shot of the drinkers
 (`oakhaven-99-inn-drinkers.png`) and the plan documents; nothing unpublished changes play.
 
-**STOPPED 2026-10-01 evening at Chris's request (his Fable usage was at 97%): both build workflows were stopped mid-way. Nothing
-on these branches is merged, reviewed or tested. State of each branch (the branches live in the main repo, so they are backed up):**
-- `trades/b2-format8` (d4bf222): step 2 IMPLEMENTED (save format 8, materials, tools, the Trades window, docs, a PlayMode check)
-  and compile-checked by its engineer, but the review, refute and fix stages never ran. Next: run the review on it (the
-  `build-step` workflow's review/verify/fix stages, or by hand), then merge, test, publish. Chris's save is backed up first.
-- `trades/a1-buildings` (cea6425): step 1 HALF-BUILT, saved as one WIP commit (WorldLife.cs, ZoneBuilder.cs, ZoneDoor.cs, a new
-  ZoneBuilder.Workshops.cs that still needs a .meta). Not compile-checked. Next: finish step 1 from BUILD_PLAN.md on this branch.
-- `loot/a1-weapons` (f354dea, nothing yet): loot step A1 had only just started. Next: start it fresh.
-The worktrees are in the old session's scratchpad (`...\scratchpad\wt1|b2|la1`); if they are gone, `git worktree prune` and
-add new ones from the branches. To rerun a step, reuse the `build-step` workflow (its script is in the session's workflows folder;
-the prompt for each step is in this handoff's plans and `tools/wip/*/OWNER_NOTES.md`).
+**WRAPPED UP 2026-10-01 night at Chris's request. Main is AHEAD of the published build and NOT YET PUBLISHED.**
+Main (commit after 48df0e1) has three merged, reviewed pieces on top of the published 078d276:
+- **Trades step 2:** save format 8 (professions, pouches; migration from 7 with guards), 19 materials, pick and hatchet, vendor
+  stock, `professions.json`, `Professions.cs`, the Trades window (K).
+- **Trades step 1:** the new buildings (Carder farmhouse, Crisp cottage, Maud's leather shop, Lisbet's drying hut, the inn's
+  kitchen lean-to, the game rack at Moss's lodge), named houses, Maud working at her shop. Temporary `VillageLife.UnsettledHouses`
+  keeps the old home deal until step 3.
+- **Loot step A1:** weapons and shields shown in hand (`GearLooks`, `Resources/Gear/looks.json`, `GearMeshes`, `GearMats`,
+  `ActorVisual.Gear*.cs`, `GearBinder`, `WardrobeCapture`); empty slots show empty, so a new Warrior starts unarmed until the
+  Trailblade.
+Each was built in a worktree, reviewed by three lenses with every finding refuted or confirmed, and fixed (21 confirmed defects
+fixed in all) before merging. **Tested so far: EditMode 221/221** (the run was stopped there). **Still to do before publishing:**
+1. `run_tests.ps1` (PlayMode not yet run on this main), then `build_and_tour.ps1 -Zones zone.oakhaven,zone.khaven,zone.peaks,
+   zone.ashrim,zone.verdant`, then `tools\validation\capture_extra.ps1` (the HUD captures incl. `17-trades.png` and the wardrobe
+   line-up in `ui-captures\wardrobe`: 01-weapon-rack-a..g, 02-shield-wall-a..c, 03-quality-ladder-a..c).
+2. LOOK: the new buildings (landmark and trade shots, `oakhaven-97-trade-leatherworker/-herbalist`), the Trades window, every
+   weapon and shield in the wardrobe shots, the player now unarmed by default.
+3. Fix what shows, publish, backup, CHANGELOG entry (none written yet for these three).
+Chris's save is backed up before format 8 (`hel/work/save-backups/20261001-1545-before-format8`); his save migrates to 8 the first
+time the published build saves.
 
-**THREE BUILD TRACKS IN FLIGHT (each a git worktree in the scratchpad `wt` folder, on its own branch; `git worktree list`):**
-- `trades/a1-buildings` (worktree `wt/a1`): professions BUILD_PLAN step 1, the village's new buildings and named houses.
-- `trades/b2-format8` (worktree `wt/b2`): BUILD_PLAN step 2, save format 8, materials, tools, the Trades window.
-- `loot/a1-weapons` (worktree `wt/la1`): loot DESIGN step A1, weapons and shields in hand, the wardrobe capture.
-Each is built by a workflow (`build-step` / `trades-build-round`): implement -> three review lenses -> every finding refuted or
-confirmed -> fix; the result names the branch head. THEN THE LEAD: `git merge --no-ff <branch>` into main one at a time (shared
-files: `ZoneBuilder.cs`, `ZoneDefinition.cs`, `EncounterSession.cs`, `WorldLife.cs`, `items.json`, `oakhaven.json`), offline
-compile, `build_art.ps1` if art changed, `run_tests.ps1`, tour (and `Crulanda.exe --crulanda-wardrobe-capture <dir>` for loot),
-LOOK, fix, publish, backup, CHANGELOG, then start the next round from the plan's "Order at a glance" table.
-If a session dies mid-round: the branches hold whatever was committed; check `git log main..<branch>` and the workflow journal
-under `.claude/projects/D--code-mmo/<session>/subagents/workflows/`, and either rerun the step or finish it by hand.
+**NEXT ROUND (worktrees made, nothing built yet; branches at main):** `trades/a3-households` (BUILD_PLAN step 3),
+`trades/b4-gathering` (step 4), `loot/a2-armour` (loot A2), `visual/w3-slopes-hero` (visual worklist items 10 and 11). Worktrees
+in the session scratchpad `wt\a3|b4|la2|v11` with `compile-<key>.py` beside them (`wt\mk_compile.py <keys>` makes more). The
+workflow that builds a round is saved at `.claude/projects/D--code-mmo/<session>/workflows/scripts/build-step-resume-*.js`
+(modes: implement, finish, review); its last args (the briefs for these four) are in that run's journal. Do the publish of main
+first, then start this round from the new main (recreate the branches if main moved).
 
 **THE PLANS (read the owner notes first; they are his words and decisions):**
 - Professions, gathering, households, purses, bags, hunting: `tools/wip/professions/OWNER_NOTES.md`, `DESIGN.md`, `ADDENDUM.md`,

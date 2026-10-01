@@ -325,7 +325,7 @@ namespace Crulanda.World
             foreach (int s in new[] { -1, 1 })
             {
                 Vector3 Post(int k) { float z = -length / 2 + k * length / spans; return new Vector3(s * (width / 2 + .1f), Deck(z), z); }
-                for (int k = 0; k <= spans; k++) { var p = Post(k); float tall = k == 0 || k == spans ? 1.5f : 1.2f; Part(PrimitiveType.Cylinder, t, p + new Vector3(0, tall / 2 - .35f, 0), new Vector3(.17f, tall / 2 + .35f, .17f), post); }
+                for (int k = 0; k <= spans; k++) { var p = Post(k); float tall = k == 0 || k == spans ? 1.5f : 1.2f; Stake(t, p + new Vector3(0, -.7f, 0), .2f, tall + .7f, post); }   // hewn and capped, as deep in the bank as the old round ones
                 for (int k = 0; k < spans; k++)
                 {
                     Vector3 a = Post(k) + Vector3.up * 1.05f, b = Post(k + 1) + Vector3.up * 1.05f;

@@ -659,3 +659,17 @@ A read-only review by five reviewers, each finding checked by a second who tried
   seven metres from the well (villagers keep 7 m from enemies, not 12, and a blocked errand says so).
 - **Tests:** three flaky spots in `VillageErrandTests`; `run_focus.ps1` (a fast filtered run) registers the content as the full
   run does.
+
+## 2026-10-01 — The painted style pass (Chris: "keep going with the painted style pass")
+- **Buildings:** hand-painted plaster, thatch in ragged layers, slate shingles, coursed masonry and planked timber, on walls and
+  roofs whose textures now tile per metre; eaves with fascia and rafter ends, ridge caps, framed windows with sills and shutters,
+  plank doors with iron bands, masonry plinths and capped chimneys.
+- **Rock:** cliffs, crags and boulders in bedded painted rock with lit tops (a new shader, `Crulanda/PaintedRock`).
+- **Colour:** Oakhaven under a blue sky on a green meadow; the Peaks crisp and blue; Khaven and the Ash Rim keep their moods
+  with more depth.
+- **Props:** chunky, hand-made fences, carts, lamps, wells, stalls, barrels, crates, woodpiles, bridges and signposts.
+- **How:** drafted, pre-checked by agents that rendered and looked at the textures and recomputed the geometry, restaged as
+  verified patches, then applied a part at a time with the tests and a capture tour after each. Found on the first tour and
+  fixed: roof textures smeared up the slope (the roof's UV used |z| + y, which is constant up a 45 degree roof); the rock's
+  joints made cliffs read as dry-stone walls.
+- The zone layouts are unchanged (the random stream is untouched) and so is everything gameplay stands on.

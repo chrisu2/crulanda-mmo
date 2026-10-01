@@ -9,6 +9,8 @@ Shader "Crulanda/Grass"
         _Cutoff ("Alpha cutoff", Range(0, 1)) = 0.45
         _Wind ("Wind strength", Float) = 0.12
         _WindSpeed ("Wind speed", Float) = 1.6
+        _Glow ("Night glow", Float) = 0
+        _Wither ("Wither (drains the paint's green)", Range(0, 1)) = 0
     }
     SubShader
     {
@@ -21,7 +23,9 @@ Shader "Crulanda/Grass"
         #pragma target 3.0
         sampler2D _MainTex;
         fixed4 _Color;
-        float _Wind, _WindSpeed;
+        float _Wind, _WindSpeed, _Glow, _Wither;
+        // How dark the night is (WorldClock, global): a glowing flower (_Glow) is faint by day and lights up after dark.
+        float _NightGlow;
         // The weather's wind (WorldWeather, global): xy its direction on the ground (world x, z), z its strength 0..1. All zero
         // without weather: only the grass's own sway.
         float4 _WeatherWind;
@@ -44,7 +48,11 @@ Shader "Crulanda/Grass"
         void surf(Input IN, inout SurfaceOutput o)
         {
             fixed4 c = tex2D(_MainTex, IN.uv_MainTex) * _Color;
+            // Withered (Khaven's dead wood): the paint's green drains to dry brown-grey, keeping the painted light and dark.
+            float grey = dot(c.rgb, float3(0.3, 0.59, 0.11));
+            c.rgb = lerp(c.rgb, float3(grey * 1.15, grey * 0.98, grey * 0.78), _Wither);
             o.Albedo = c.rgb;
+            o.Emission = c.rgb * _Glow * (0.15 + 0.85 * _NightGlow);
             o.Alpha = c.a;
         }
         ENDCG

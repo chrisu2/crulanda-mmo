@@ -67,6 +67,12 @@ reference only:
   should be deep and the first foray into dungeon crawling", so it is now a starter dungeon, 16 m deep. (Sandthrone is a canon mercenary company; the Bandit King
   is ours, and no canon Sandthrone name is used for him.)
 - **Camps for grinding** stay in every zone; breadcrumb quests carry the player from zone to zone.
+- **The next zone is a truly lush one** (Chris, 2026-09-30, with style references: a giant-tree forest of a thousand greens,
+  cozy wooden houses built into the trees, waterfalls, flowers and glowing plants). Decided: **the Verdant Shore** (CANON,
+  Book 3: "a forest that didn't know when to stop", trunks as wide as houses, the Veridian Keepers and their temple), set in
+  the game's time, before the books' exodus. It is the fifth zone, **levels 11-13, after the Ash Rim**, so the level cap rises
+  to 13; the way there crosses the ash-mountains west, as the survivors do in Book 3. The references are style only: nothing
+  is copied from any other game.
 
 ## Standing rules
 

@@ -32,6 +32,8 @@ namespace Crulanda.World
                 // Ash: drained grey with a faint bruised-violet cast (canon sky, book1 ch.20); a sepia tint turned the ash to desert tan.
                 case "ash": return new Grade { saturation = .7f, contrast = 1.16f, exposure = .95f, vignette = .8f, bloom = .6f, threshold = .95f, tint = new Color(.99f, .985f, 1.02f) };
                 case "gloom": return new Grade { saturation = .82f, contrast = 1.12f, exposure = 1.04f, vignette = .85f, bloom = .6f, threshold = .95f, tint = new Color(1.05f, .95f, 1.03f) };   // Khaven: drained, rose-violet dusk
+                // The Verdant Shore: rich, saturated and a little soft, lifted toward emerald, with the glow of a humid forest.
+                case "verdant": return new Grade { saturation = 1.3f, contrast = 1.1f, exposure = 1.04f, vignette = .55f, bloom = .7f, threshold = .9f, tint = new Color(.97f, 1.03f, .97f) };
                 default: return new Grade { saturation = 1.18f, contrast = 1.14f, exposure = 1f, vignette = .6f, bloom = .55f, threshold = 1f, tint = new Color(1.03f, 1, .95f) };
             }
         }

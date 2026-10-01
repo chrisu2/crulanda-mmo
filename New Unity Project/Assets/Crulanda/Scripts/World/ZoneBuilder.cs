@@ -12,7 +12,7 @@ namespace Crulanda.World
     /// Runs before EncounterNavigation so the navigation mesh can be built from what it creates.
     /// </summary>
     [DefaultExecutionOrder(-800)]
-    public sealed class ZoneBuilder : MonoBehaviour
+    public sealed partial class ZoneBuilder : MonoBehaviour
     {
         public TextAsset zoneJson;
         [Tooltip("Every zone this scene can build; travel picks one by id. zoneJson is the default/opening zone.")]
@@ -73,9 +73,12 @@ namespace Crulanda.World
                 var grass = Gloom ? art.grass.Select(m => new Material(m) { name = m.name + " (dry)", color = Color.Lerp(m.color, new Color(.5f, .46f, .37f), .75f), enableInstancing = true }).ToArray() : art.grass;
                 // Gloom: tall grass is dark grey dead stalks, a little shorter and thinner, so a boar or wolf breaking out of it shows.
                 var tall = Gloom ? art.grass.Select(m => new Material(m) { name = m.name + " (dead, tall)", color = Color.Lerp(m.color, new Color(.36f, .35f, .34f), .9f), enableInstancing = true }).ToArray() : null;
-                gameObject.AddComponent<GrassField>().Build(this, grass, Gloom ? null : art.flowers, Openness, Zone.seed + 99, Zone.biome == "meadow" ? 2.3f : 1.6f, TallGrassPatches(), tall, Gloom ? .8f : 1, Gloom ? .7f : 1);
+                var lush = Zone.biome == "verdant" ? art.grass.Select(m => new Material(m) { name = m.name + " (lush)", color = Color.Lerp(m.color, new Color(.3f, .62f, .22f), .55f), enableInstancing = true }).ToArray() : grass;
+                gameObject.AddComponent<GrassField>().Build(this, lush, Gloom ? null : art.flowers, Openness, Zone.seed + 99, Zone.biome == "meadow" ? 2.3f : Zone.biome == "verdant" ? 2.8f : 1.6f, TallGrassPatches(), tall, Gloom ? .8f : Zone.biome == "verdant" ? 1.25f : 1, Gloom ? .7f : 1);
             }
             Lap("grass");
+            if (art.fern != null || art.broadLeaf != null || art.reeds != null) gameObject.AddComponent<PlantField>().Build(this, art, Gloom ? null : art.flowers, Openness, Zone.seed + 177);
+            Lap("plants");
             gameObject.AddComponent<FallingLeaves>().Init(this);
             Splashes.Ensure(this); TreeFade.Begin(art.fade);
             var view = Camera.main;
@@ -429,6 +432,14 @@ namespace Crulanda.World
             // Green is held level with red so the rose light doesn't turn them mauve.
             if (gloom) { dirt = new Color(.235f, .23f, .205f); rut = new Color(.175f, .172f, .155f); }
             if (Zone.biome == "mountain") { dirt = new Color(.4f, .35f, .28f); rut = new Color(.31f, .27f, .21f); }   // yards and roads a shade darker in the hard light
+            bool verdant = Zone.biome == "verdant";
+            if (verdant)
+            {
+                // The Verdant Shore: deep saturated greens, from obsidian moss to bright emerald turf (canon: "a thousand shades" of green),
+                // over dark loam; the paths are damp brown earth.
+                grassA = new Color(.13f, .33f, .14f); grassB = new Color(.24f, .46f, .17f); grassC = new Color(.36f, .55f, .2f);
+                dirt = new Color(.33f, .25f, .16f); rut = new Color(.24f, .18f, .12f); mud = new Color(.2f, .16f, .11f);
+            }
             var toSun = Quaternion.Euler(55, Zone.lighting.sunYaw, 0) * Vector3.back;   // the day sun, roughly (mountain counter-shading)
             float size = Zone.size, half = size / 2, texel = size / res;
             // Ash crust: petrified-ash plates split by angular cracks, a Voronoi network with one jittered site per 5 m cell
@@ -457,6 +468,13 @@ namespace Crulanda.World
                     float n1 = Mathf.PerlinNoise(x * .08f + 11, z * .08f + 7), n2 = Mathf.PerlinNoise(x * .45f, z * .45f), n3 = Mathf.PerlinNoise(x * 1.9f + 3, z * 1.9f + 5);
                     Color c = Color.Lerp(Color.Lerp(grassA, grassB, n1), grassC, Mathf.Clamp01((Mathf.PerlinNoise(x * .03f + 40, z * .03f) - .55f) * 3));
                     c *= .88f + n2 * .18f + (n3 - .5f) * .08f;
+                    if (verdant)
+                    {
+                        // Moss in the hollows and shade (a darker, bluer green, in patches), and the brightest emerald where the light falls.
+                        float mossy = Mathf.Clamp01((Mathf.PerlinNoise(x * .06f + 21, z * .06f + 9) - .5f) * 3), sunlit = Mathf.Clamp01((Mathf.PerlinNoise(x * .02f + 77, z * .02f + 5) - .6f) * 4);
+                        c = Color.Lerp(c, new Color(.09f, .24f, .13f) * (.9f + n3 * .2f), mossy * .7f);
+                        c = Color.Lerp(c, new Color(.4f, .62f, .2f), sunlit * .5f);
+                    }
                     if (Zone.biome == "mountain")
                     {
                         // Alpine: patches of thin dry turf between warm scree and grey rock. Rock takes the steep ground (crags,
@@ -837,7 +855,7 @@ namespace Crulanda.World
                 if (p.kind == "wall") WarnWallInBuilding(p);
                 // New landmark kinds draw from their own stream, after taking the draws the kind that stood here took, so
                 // every later prop, tree and rock keeps the layout it had.
-                var zoneRng = rng; int legacy = p.kind == "cave" ? 30 : p.kind == "rib" ? 6 : p.kind == "perch" || p.kind == "wallow" || p.kind == "brood" || p.kind == "cavern" || p.kind == "monolith" ? 0 : -1;
+                var zoneRng = rng; int legacy = p.kind == "cave" ? 30 : p.kind == "rib" ? 6 : p.kind == "perch" || p.kind == "wallow" || p.kind == "brood" || p.kind == "cavern" || p.kind == "monolith" || p.kind == "giant_tree" || p.kind == "treehouse" || p.kind == "waterfall" || p.kind == "mushrooms" ? 0 : -1;
                 if (legacy >= 0) { for (int k = 0; k < legacy; k++) _ = R01; rng = new System.Random(Zone.seed ^ (Mathf.RoundToInt(p.at.x * 8) * 73856093) ^ (Mathf.RoundToInt(p.at.y * 8) * 19349663)); }
                 switch (p.kind)
                 {
@@ -857,6 +875,10 @@ namespace Crulanda.World
                     case "ruined_house": RuinedHouse(t, p.size.x > 0 ? p.size : new Vector2(8, 6)); break;
                     case "wall": Wall(p.points, statics); DestroyImmediate(t.gameObject); break;
                     case "tower": Tower(t, p.size.x > 0 ? p.size.x : 4.4f); break;
+                    case "giant_tree": GiantTree(t, p.variant); trunks.Add(p.at); break;
+                    case "treehouse": Treehouse(t, p.variant); trunks.Add(p.at); break;
+                    case "waterfall": Waterfall(t, p.size.x > 0 ? p.size.x : 6, p.lift > 0 ? p.lift : 10); break;
+                    case "mushrooms": Mushrooms(t, p.size.x > 0 ? p.size.x : 2, p.variant); break;
                     case "monolith": Monolith(t); break;
                     case "gallows": Gallows(t); break;
                     case "crypt": Crypt(t, p.variant); break;
@@ -880,7 +902,7 @@ namespace Crulanda.World
                         if (Zone.biome == "mountain") { stone = Tint(art.stone, MountainStone); if (string.IsNullOrEmpty(p.interact)) { var spot = FlatterSpot(p.at, 1.2f * s); t.position = Ground(spot); SinkBySlope(t, spot, s); } }
                         Lump(Boulder(), t, new Vector3(0, .3f * s, 0), new Vector3(2f * s, 1.3f * s, 1.7f * s), stone, R01 * 360); if (s > 1.3f) Lump(Boulder(), t, new Vector3(.7f * s, .15f * s, .5f * s), new Vector3(.9f * s, .6f * s, .8f * s), stone, R01 * 360); Solid(t, new Vector3(0, .5f * s, 0), new Vector3(1.6f * s, 1f * s, 1.4f * s)); break;
                     }
-                    case "bridge": SeatBridge(t, p.size.x > 0 ? p.size.x : 12); Bridge(t, p.size.x > 0 ? p.size.x : 12); break;
+                    case "bridge": SeatBridge(t, p.size.x > 0 ? p.size.x : 12); if (p.variant == 1) RopeBridge(t, p.size.x > 0 ? p.size.x : 12); else Bridge(t, p.size.x > 0 ? p.size.x : 12); break;
                     case "signpost": Part(PrimitiveType.Cube, t, new Vector3(0, 1.1f, 0), new Vector3(.15f, 2.2f, .15f), art.timber); Part(PrimitiveType.Cube, t, new Vector3(.45f, 1.8f, 0), new Vector3(.9f, .28f, .06f), art.timber); break;
                     case "ruin": Ruin(t, p.size.x > 0 ? p.size.x : 6); break;
                     case "gate": Gate(t, p.size.x > 0 ? p.size.x : 6.4f); break;
@@ -1198,46 +1220,67 @@ namespace Crulanda.World
             Part(PrimitiveType.Cylinder, t, new Vector3(.2f, 1.5f, 0), new Vector3(.35f, .22f, .35f), art.timber);
             Solid(t, new Vector3(0, 1.2f, 0), new Vector3(2.4f, 2.4f, 2.4f));
         }
-        /// <summary>Recursive branching dead tree (dead_oak props, grey woods, Wasting husks). Trunk gets a collider when solid. Returns its root.</summary>
+        /// <summary>
+        /// A dead tree (Khaven's Whispering Wood, the Rim's husks, the unmade): a tapered, slightly bent bole on a root flare of
+        /// buttress ridges (Bole), ending in a broken leader; three to five limbs leaving it at different heights, each crooked (a
+        /// kink part way) and tapering to a point, with branches off its length, not its tip, and twigs off those. Grey weathered
+        /// wood, no bark grain in the shade. Its look is its own (TreeRandom); from the zone's stream it takes exactly the draws the
+        /// old tree took, so nothing else moves. <paramref name="girth"/> &gt; .6 (a dead_oak prop) keeps a massive trunk.
+        /// </summary>
         Transform DeadTree(Vector2 at, float scale, Material mat, int depth, Transform parent, Transform existing = null, float girth = -1)
         {
             var root = existing != null ? existing : new GameObject("Dead tree").transform;
             if (existing == null) { root.SetParent(parent, false); root.position = Ground(at); root.rotation = Quaternion.Euler(0, R01 * 360, 0); }
-            // A dead_oak prop (Oakhaven's lone dead tree) keeps a massive trunk; ordinary dead trees are slimmer with longer, reaching limbs.
             if (girth < 0) girth = existing != null && depth >= 5 ? .9f : .38f;
             float trunkH = (girth > .6f ? 4.2f : 5.2f) * scale, trunkR = girth * scale;
-            Part(PrimitiveType.Cylinder, root, new Vector3(0, trunkH / 2, 0), new Vector3(trunkR * 2, trunkH / 2, trunkR * 2), mat);
-            // Root flare: a broad swell at the foot of the trunk and low buttress ridges running out and down into the soil
-            // (long, half-sunk spheres). Thin tilted cylinders here read as sticks laid round the tree.
-            Part(PrimitiveType.Sphere, root, new Vector3(0, .1f * scale, 0), new Vector3(trunkR * 2.9f, .9f * scale, trunkR * 2.9f), mat);
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 5; i++) _ = R01;                                           // the old root flare's draws
+            SkipBranchDraws(depth, trunkR * (girth > .6f ? .75f : .7f));                     // and the old limbs'
+            var tr = TreeRandom(root.position); float T() { return (float)tr.NextDouble(); }
+            bool massive = girth > .6f;
+            // A massive one (a dead_oak prop) is a great old tree: tall, a broad but not squat bole, long heavy limbs.
+            float top = (massive ? trunkH * 2.6f : trunkH * 1.55f) * (.9f + T() * .2f), r0 = massive ? trunkR * .62f : Mathf.Max(.13f, trunkR * .75f);
+            var axis = Bole(root, tr, top, r0, mat);
+            int n = (massive ? 4 : 3) + (int)(T() * 3); float turn = T() * 360;
+            for (int i = 0; i < n; i++)
             {
-                var outward = Quaternion.Euler(0, i * 72 + R01 * 20, 0);
-                Part(PrimitiveType.Sphere, root, outward * new Vector3(0, .05f * scale, trunkR * 1.3f), new Vector3(trunkR * .9f, .55f * scale, trunkR * 2.4f), mat, outward * Quaternion.Euler(12, 0, 0));
+                // Up the trunk from about 40% to 90%, lowest first; the lower limbs reach further and flatter, the upper ones climb.
+                float u = .4f + .5f * (i + T() * .7f) / n, yaw = turn + i * 360f / n + (T() - .5f) * 60;
+                var outward = Quaternion.Euler(0, yaw, 0) * Vector3.right; var aside = Vector3.Cross(Vector3.up, outward);
+                float reach = top * (massive ? .36f + T() * .24f : .3f + T() * .22f) * (1.25f - u * .55f), rise = reach * (.35f + T() * .75f) * (.6f + u * .7f);
+                float rb = r0 * (massive ? .3f + T() * .1f : .4f + T() * .14f) * (1.15f - u * .4f);
+                var from = axis(top * u);
+                var mid = from + outward * reach * (.42f + T() * .16f) + aside * ((T() - .5f) * reach * .35f) + Vector3.up * rise * (.25f + T() * .3f);
+                var end = mid + (Quaternion.AngleAxis((T() - .5f) * 50, Vector3.up) * outward) * reach * .5f + Vector3.up * rise * (.45f + T() * .3f);
+                Limb(root, from, mid, rb, rb * .6f, mat, .05f + T() * .06f, 8);
+                Limb(root, mid, end, rb * .6f, .035f, mat, .08f + T() * .08f, 7);   // to a point: no capped stub
+                int subs = 1 + (int)(T() * 3);
+                for (int k = 0; k < subs; k++)
+                {
+                    // Off the limb's length, each turning its own way and climbing; a fork on some.
+                    float s = .3f + T() * .55f; var at2 = s < .55f ? Vector3.Lerp(from, mid, s / .55f) : Vector3.Lerp(mid, end, (s - .55f) / .45f);
+                    float rAt = Mathf.Lerp(rb, .035f, s) * .62f;
+                    var dir = (Quaternion.AngleAxis((k % 2 == 0 ? 1 : -1) * (35 + T() * 45), Vector3.up) * outward + Vector3.up * (.3f + T() * 1)).normalized;
+                    float len = reach * (.32f + T() * .35f) * (1.1f - s * .5f); var tip = at2 + dir * len;
+                    Limb(root, at2, tip, rAt, .025f, mat, .1f + T() * .08f, 6);
+                    if (T() < .6f)
+                    {
+                        var at3 = Vector3.Lerp(at2, tip, .55f + T() * .2f); var d2 = (Quaternion.AngleAxis((T() - .5f) * 100, Vector3.up) * dir + Vector3.up * (.3f + T() * .5f)).normalized;
+                        Limb(root, at3, at3 + d2 * len * (.35f + T() * .25f), rAt * .5f, .02f, mat, .1f, 5);
+                    }
+                }
             }
-            Branch(root, new Vector3(0, trunkH * .92f, 0), Vector3.up, trunkH * (girth > .6f ? .55f : .5f), trunkR * (girth > .6f ? .75f : .7f), depth, mat);
-            var cap = root.gameObject.AddComponent<CapsuleCollider>(); cap.center = new Vector3(0, trunkH / 2, 0); cap.height = trunkH; cap.radius = trunkR;
+            // The leader's broken top: a last short twig or two just under the snag.
+            for (int k = 0, m = 1 + (int)(T() * 2); k < m; k++)
+            {
+                var from = axis(top * (.86f + T() * .06f)); var dir = (Quaternion.Euler(0, T() * 360, 0) * Vector3.right + Vector3.up * (.6f + T() * .8f)).normalized;
+                Limb(root, from, from + dir * top * (.12f + T() * .1f), r0 * .22f, .02f, mat, .08f, 5);
+            }
+            var cap = root.gameObject.AddComponent<CapsuleCollider>(); cap.center = new Vector3(0, top / 2, 0); cap.height = top; cap.radius = r0;
             root.gameObject.AddComponent<NavBlocker>(); root.gameObject.AddComponent<TreeFade>();
             return root;
         }
         /// <summary>Bark for dead woods: charred dark in the ash, weathered grey elsewhere (Khaven's Whispering Wood). One draw.</summary>
         Material DeadBark() { float t = R01; return Tint(art.bark, Zone.biome == "ash" ? Color.Lerp(new Color(.2f, .18f, .16f), new Color(.3f, .27f, .24f), t) : Color.Lerp(new Color(.58f, .57f, .56f), new Color(.72f, .71f, .69f), t)); }
-        void Branch(Transform root, Vector3 start, Vector3 dir, float length, float radius, int depth, Material mat)
-        {
-            if (depth <= 0 || radius < .02f) return;
-            var end = start + dir.normalized * length;
-            // Tapered limb: a cylinder plus a small knuckle at the fork so joints don't look sawn off.
-            Part(PrimitiveType.Cylinder, root, (start + end) / 2, new Vector3(radius * 2, length / 2, radius * 2), mat, Quaternion.FromToRotation(Vector3.up, dir));
-            Part(PrimitiveType.Sphere, root, end, Vector3.one * radius * 1.9f, mat);
-            int kids = depth > 3 ? 3 : 2 + (R01 > .5f ? 1 : 0);
-            for (int i = 0; i < kids; i++)
-            {
-                var axis = Quaternion.AngleAxis(i * 360f / kids + R01 * 50, Vector3.up) * Vector3.right;
-                var nd = Quaternion.AngleAxis(30 + R01 * 32, axis) * dir;
-                nd = Vector3.Lerp(nd, Vector3.up, .1f);
-                Branch(root, end, nd, length * (.7f + R01 * .15f), radius * .58f, depth - 1, mat);
-            }
-        }
         static readonly Color[] Leaf = { new Color(.33f, .38f, .17f), new Color(.55f, .42f, .16f), new Color(.52f, .27f, .13f), new Color(.40f, .36f, .15f) };
         bool Gloom { get { return Zone.biome == "gloom"; } }
         /// <summary>Gloom (Khaven): living colour drained toward a dull grey, so woods and brush read withered rather than autumnal.</summary>
@@ -2081,6 +2124,10 @@ namespace Crulanda.World
         }
         /// <summary>Trunks already standing (hand-placed trees, orchards, groves, the forest edge): scattered trees keep clear of them.</summary>
         readonly List<Vector2> trunks = new List<Vector2>();
+        /// <summary>The trunks standing in the zone (PlantField grows ferns in their shade).</summary>
+        public IReadOnlyList<Vector2> Trunks { get { return trunks; } }
+        /// <summary>Whether a point is at least <paramref name="r"/> from every standing trunk.</summary>
+        public bool TrunkClear(Vector2 p, float r) { float r2 = r * r; foreach (var t in trunks) if ((t - p).sqrMagnitude < r2) return false; return true; }
         /// <summary>
         /// Where a scattered tree may grow clear of the trunks already standing: here, or pushed out to <paramref name="gap"/> from the
         /// one it grew into; null if that lands on a road, in water, by a building or still against a trunk. Draws nothing random.
@@ -2108,7 +2155,7 @@ namespace Crulanda.World
         }
         void BuildGroves()
         {
-            foreach (var prop in Zone.props) if (prop != null && (prop.kind == "tree" || prop.kind == "pine" || prop.kind == "dead_oak" || prop.kind == "great_oak")) trunks.Add(prop.at);
+            foreach (var prop in Zone.props) if (prop != null && (prop.kind == "tree" || prop.kind == "pine" || prop.kind == "dead_oak" || prop.kind == "great_oak" || prop.kind == "giant_tree" || prop.kind == "treehouse")) trunks.Add(prop.at);
             foreach (var g in Zone.groves.Where(g => g.kind == "orchard"))
                 for (float x = g.center.x - g.size.x / 2 + 3; x < g.center.x + g.size.x / 2; x += 6.5f)
                     for (float z = g.center.y - g.size.y / 2 + 3; z < g.center.y + g.size.y / 2; z += 6.5f)
@@ -2149,6 +2196,13 @@ namespace Crulanda.World
                     if (NearRoad(at, 2.5f) || NearProp(at, 5) || Water.NearWater(at, 1.5f)) continue;
                     var spot = Spot(at, 1.8f); if (spot.HasValue) at = spot.Value;   // never growing through a trunk already standing
                     if (g.kind == "dead") { Keep(DeadTree(at, .5f + R01 * .55f, DeadBark(), 3 + (R01 > .6f ? 1 : 0), statics), at, spot.HasValue); continue; }
+                    if (g.kind == "giant" && i % 3 == 0 && !NearProp(at, 9) && TrunkClear(at, 9.5f) && !NearRoad(at, 7))
+                    {
+                        // Every third tree a giant, if the ground round it is free: its look is its own (TreeRandom); the draws a broadleaf
+                        // would have taken are taken all the same, so the grove's other trees stand where they would have.
+                        var gp = new ZoneProp { kind = "giant_tree", at = at, rotation = R01 * 360, scale = .85f + R01 * .3f, variant = (int)(R01 * 3) };   // the broadleaf's three draws
+                        var gt = Root(gp, statics); GiantTree(gt, gp.variant); trunks.Add(at); continue;
+                    }
                     var p = new ZoneProp { kind = g.kind == "pine" ? "pine" : "tree", at = at, rotation = R01 * 360, scale = .8f + R01 * .5f, variant = (int)(R01 * 4) };
                     var t = Root(p, statics);
                     if (p.kind == "pine") Pine(t); else Broadleaf(t, p.variant);
@@ -3667,6 +3721,17 @@ namespace Crulanda.World
                     if (Zone.biome == "ash") { if (R01 < .55f) Keep(DeadTree(at, .6f + R01 * .5f, Tint(art.bark, new Color(.2f, .19f, .18f)), 3, statics), at, spot.HasValue); else EdgeRock(at); continue; }
                     var p = new ZoneProp { kind = Zone.biome == "mountain" ? (R01 < .7f ? "pine" : "rock") : R01 < .6f ? "pine" : "tree", at = at, rotation = R01 * 360, scale = .85f + R01 * .5f, variant = (int)(R01 * 4) };
                     if (p.kind == "rock") { EdgeRock(at); continue; }
+                    if (Zone.biome == "verdant")
+                    {
+                        // The forest that doesn't know when to stop: the edge is giant trees (every fourth place, when the ground is free)
+                        // with broadleaf between, never pines. The draws are the ones a pine or tree took.
+                        if (p.kind == "pine" && TrunkClear(at, 9) && !NearProp(at, 9))
+                        {
+                            var gt = Root(new ZoneProp { kind = "giant_tree", at = at, rotation = p.rotation, scale = .8f + (p.scale - .85f) * .5f, variant = p.variant % 3 }, statics);
+                            GiantTree(gt, p.variant % 3); trunks.Add(at); continue;
+                        }
+                        p.kind = "tree";
+                    }
                     var t = Root(p, statics);
                     if (p.kind == "pine") Pine(t); else Broadleaf(t, p.variant);
                     if (p.kind == "pine" && !SeatPine(t, at))

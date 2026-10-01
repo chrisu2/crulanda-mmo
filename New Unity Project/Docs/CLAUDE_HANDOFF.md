@@ -47,7 +47,12 @@ Chris was away from 2026-09-30 evening and gave authority to carry on through th
   - the store title, "The Quiet Trail" (the productName) or "The Land of Crulanda" as the novels and bullet-hell use;
   - that *The First Spoke* is out.
 
-~~ZONE SIZE~~ DONE and published (item 0c below). **NEXT JOB: THE PAINTED STYLE PASS** (item 5 under "Next" below, and
+**NEXT JOB, CHRIS'S CALL (2026-09-30 night): THE VERDANT SHORE, a truly lush fifth zone** (GAME_BRIEF "world direction"):
+levels 11-13 after the Ash Rim (the level cap goes to 13), the canon Verdant Shore of Book 3 (giant trees, a thousand
+greens, the Veridian Keepers, their temple), reached over the ash-mountains from the Rim. It needs the lush art first: painted
+plants (ferns, broad leaves, reeds, flower drifts), giant trees, waterfalls, mushrooms and glowing plants, the Keepers'
+treehouses, an emerald atmosphere. The painted style pass on the old zones follows, reusing all of it.
+~~ZONE SIZE~~ DONE and published (item 0c below). Then: **THE PAINTED STYLE PASS** (item 5 under "Next" below, and
 GAME_BRIEF's art direction): richer saturated colour, more plant types (ferns, broad leaves, flowers, tall grasses),
 sculpted rock with painted gradient shading, chunky stylized props (rope-and-post bridges), a warm clear sky; every zone
 keeps its mood (Khaven grim dusk, the Rim grey). Plan it as a few publishes, biggest visual win first.

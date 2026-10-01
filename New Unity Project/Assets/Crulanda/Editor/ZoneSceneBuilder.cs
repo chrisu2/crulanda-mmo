@@ -242,6 +242,13 @@ namespace Crulanda.EditorTools
                     m.shader = grassShader; m.mainTexture = tex; m.color = col; m.SetFloat("_Cutoff", .45f);
                     m.SetFloat("_Wind", m.name.StartsWith("Flowers") ? .08f : .13f); m.enableInstancing = true; EditorUtility.SetDirty(m);
                 }
+            // ---------- painted plants (PlantField): ferns in the woods' shade, broad leaves by the water, reeds at the waterline ----------
+            var fernTex = FernFrondTex("fern_frond", new Color(.08f, .2f, .09f), new Color(.24f, .45f, .17f), new Color(.58f, .76f, .3f));
+            var broadTex = BroadLeafTex("broad_leaf", new Color(.09f, .21f, .1f), new Color(.23f, .43f, .17f), new Color(.5f, .68f, .27f));
+            var reedTex = ReedTex("reed_clump", new Color(.19f, .29f, .13f), new Color(.37f, .49f, .2f), new Color(.68f, .7f, .38f), new Color(.31f, .19f, .1f));
+            if (art.fern == null) art.fern = PlantCard("Fern", fernTex, .07f);
+            if (art.broadLeaf == null) art.broadLeaf = PlantCard("Broad leaf", broadTex, .05f);
+            if (art.reeds == null) art.reeds = PlantCard("Reeds", reedTex, .12f);
             EditorUtility.SetDirty(art); AssetDatabase.SaveAssets();
             return art;
         }
@@ -344,6 +351,103 @@ namespace Crulanda.EditorTools
                 if (edge < .012f) shade += .12f;                              // lit needle tips
                 if (Mathf.Abs(v) < .012f * (1 - u * .6f)) shade -= .2f;       // the twig's shadow line
                 var c = Ramp(shade); return new Color(c.r, c.g, c.b, 1);
+            }, true);
+        }
+        /// <summary>A painted plant card for PlantField: Crulanda/Grass (alpha cut, both faces, sways from the root, instanced). White
+        /// tint: the paint carries the colour; PlantField tints per zone (a withered Khaven fern).</summary>
+        static Material PlantCard(string name, Texture2D tex, float wind)
+        {
+            var shader = Shader.Find("Crulanda/Grass");
+            if (shader == null) { Debug.LogWarning("Crulanda/Grass shader missing: " + name + " is a Standard cutout."); return Cutout(name, Color.white, tex); }
+            var m = new Material(shader) { name = name, color = Color.white, mainTexture = tex, enableInstancing = true };
+            m.SetFloat("_Cutoff", .45f); m.SetFloat("_Wind", wind);
+            AssetDatabase.CreateAsset(m, ArtRoot + "/" + name + ".mat"); return m;
+        }
+        static Color Ramp3(Color dark, Color mid, Color light, float s) { s = Mathf.Clamp01(s); return s < .5f ? Color.Lerp(dark, mid, s * 2) : Color.Lerp(mid, light, (s - .5f) * 2); }
+        /// <summary>
+        /// A painted fern frond (alpha cut, tip up; v = 0 at the root): a rachis curving a little to one side, and pinnae in pairs
+        /// either side of it, longest a third of the way up and tapering to the tip, each a narrow pointed leaflet reaching up and
+        /// out. Darker toward the root and the rachis, lighter at the leaflets' ends and the frond's tip; a painted rim and midrib.
+        /// </summary>
+        static Texture2D FernFrondTex(string name, Color dark, Color mid, Color light)
+        {
+            float Rachis(float y) { float t = y / 124f; return 64 + 5 * t * t; }
+            return Tex(name, 128, (x, y) => {
+                var p = new Vector2(x + .5f, y + .5f); Color c = mid; float a = 0;
+                if (y > 2 && y < 124 && Mathf.Abs(p.x - Rachis(p.y)) < 1.5f - y * .008f) { c = Ramp3(dark, mid, light, .18f + y / 400f); a = 1; }
+                for (int k = 0; k < 17; k++)
+                {
+                    float y0 = 9 + k * 6.6f; if (y0 > 118) break;
+                    float t = y0 / 124f, len = 50 * Mathf.Pow(Mathf.Sin(Mathf.PI * Mathf.Clamp01((y0 - 3) / 128f)), .7f) * (1 - t * .55f) + 4;
+                    foreach (int side in new[] { -1, 1 })
+                    {
+                        float ang = (58 - t * 18) * Mathf.Deg2Rad; var dir = new Vector2(side * Mathf.Sin(ang), Mathf.Cos(ang)); var across = new Vector2(dir.y, -dir.x);
+                        var d = p - new Vector2(Rachis(y0), y0 + side * 1.6f); float u = Vector2.Dot(d, dir) / len, v = Vector2.Dot(d, across) / len;
+                        if (u <= 0 || u >= 1) continue;
+                        float half = .13f * Mathf.Pow(Mathf.Sin(u * Mathf.PI), .55f) * (1 - u * .3f) * (.85f + .15f * Mathf.Abs(Mathf.Cos(u * Mathf.PI * 4)));
+                        float edge = half - Mathf.Abs(v); if (edge <= 0) continue;
+                        float shade = .28f + u * .38f + t * .3f + (v * side > 0 ? .06f : -.03f) + (Perlin(x, y, .35f) - .5f) * .12f;
+                        if (edge < 1.2f / len) shade -= .25f;                                     // the painted rim
+                        if (Mathf.Abs(v) < .7f / len && u > .06f && u < .9f) shade -= .1f;     // the leaflet's midrib
+                        c = Ramp3(dark, mid, light, shade); a = 1;
+                    }
+                }
+                return new Color(c.r, c.g, c.b, a);
+            }, true);
+        }
+        /// <summary>
+        /// A painted broad leaf on its stalk (alpha cut, tip up): a stalk up from the root, and a big oval blade, a little heart-shaped
+        /// at the base and pointed at the tip, with a lighter midrib and paired side veins curving to the edge, a dark painted rim,
+        /// darker at the base and toward the shaded side, lighter toward the tip.
+        /// </summary>
+        static Texture2D BroadLeafTex(string name, Color dark, Color mid, Color light)
+        {
+            return Tex(name, 128, (x, y) => {
+                float px = x + .5f - 64, py = y + .5f; Color c = mid; float a = 0;
+                if (py < 34 && Mathf.Abs(px) < 1.8f) { c = Ramp3(dark, mid, light, .3f); a = 1; }   // the stalk
+                float v = (py - 26) / 99f;
+                if (v > 0 && v < 1)
+                {
+                    float half = 54 * Mathf.Pow(Mathf.Sin(Mathf.PI * v), .62f) * (1 - v * .3f) * (v < .12f ? .7f + v * 2.5f : 1);
+                    float edge = half - Mathf.Abs(px);
+                    if (edge > 0)
+                    {
+                        float across = Mathf.Abs(px) / Mathf.Max(1, half);
+                        float shade = .3f + v * .35f + across * .18f + (px > 0 ? .08f : -.04f) + (Perlin(x, y, .18f) - .5f) * .16f;
+                        float vein = Mathf.Abs(Mathf.Repeat(v * 9 - across * 1.6f, 1) - .5f);                         // side veins sweeping out and up
+                        if (vein < .045f && across > .08f && across < .9f) shade += .1f;
+                        if (Mathf.Abs(px) < 1.3f + (1 - v) * 1.2f) shade += .12f;                                    // the midrib, paler
+                        if (edge < 2.2f) shade -= .26f;                                                                // the painted rim
+                        c = Ramp3(dark, mid, light, shade); a = 1;
+                    }
+                }
+                return new Color(c.r, c.g, c.b, a);
+            }, true);
+        }
+        /// <summary>
+        /// A painted clump of reeds (alpha cut, tip up): long narrow blades from the root leaning a little either way, darker at the
+        /// root, lighter toward the tips, and three stems carrying brown seed heads, one bent over.
+        /// </summary>
+        static Texture2D ReedTex(string name, Color dark, Color mid, Color light, Color head)
+        {
+            return Tex(name, 128, (x, y) => {
+                float px = x + .5f, py = y + .5f; Color c = mid; float a = 0;
+                for (int b = 0; b < 9; b++)
+                {
+                    float root = 36 + b * 7f + Mathf.Sin(b * 2.3f) * 3, h = 96 + (b * 41 % 30), lean = (b % 3 - 1) * .13f + Mathf.Sin(b * 1.7f) * .05f;   // inside the card
+                    if (py > h) continue;
+                    float t = py / h, bx = root + lean * py + lean * py * t * .6f, width = 3.2f * (1 - t) + .5f;
+                    if (Mathf.Abs(px - bx) < width) { c = Ramp3(dark, mid, light, .2f + t * .7f + (px - bx) / width * .08f); a = 1; }
+                }
+                foreach (var (sx, top, bend) in new[] { (47f, 121f, 0f), (71f, 112f, .12f), (86f, 104f, -.06f) })
+                {
+                    float bx = sx + bend * py * py / 120f;
+                    if (py < top && Mathf.Abs(px - bx) < 1.1f) { c = Ramp3(dark, mid, light, .45f + py / 300f); a = 1; }
+                    float hx = sx + bend * (top - 12) * (top - 12) / 120f;
+                    if (py > top - 24 && py < top - 4 && Mathf.Abs(px - hx) < 3.4f - Mathf.Abs(py - (top - 14)) * .06f)
+                    { float s = .7f + (px - hx) * .06f + (Perlin(x, y, .5f) - .5f) * .2f; c = head * s; a = 1; }   // the seed head
+                }
+                return new Color(c.r, c.g, c.b, a);
             }, true);
         }
         static Material Standard(string name, Color color, Texture2D tex, float smoothness, float metallic = 0)

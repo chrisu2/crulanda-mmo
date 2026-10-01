@@ -50,7 +50,10 @@ namespace Crulanda.Encounter
         public List<string> discoveries = new List<string>();
 
         // ---------- levels (save format 5) ----------
-        public const int LevelCap = 10;
+        /// <summary>The highest level (13 since the Verdant Shore, 2026-09-30; it was 10 for the first four zones). Talent points stop
+        /// at <see cref="TalentCap"/>: the trees were designed for ten levels' worth, so the last levels bring health and hit, not points.</summary>
+        public const int LevelCap = 13;
+        public const int TalentCap = 10;
         /// <summary>Experience from level to level+1: 200 at level 1, +90 per level (1,000+ by the late levels).</summary>
         public static int XpToNext(int level) { return 200 + 90 * (Math.Max(1, level) - 1); }
         /// <summary>Total experience at which a level begins (level 1 = 0).</summary>
@@ -79,8 +82,8 @@ namespace Crulanda.Encounter
         /// <summary>Old saves (formats 1-4, 60 XP per level): keep the same level and the same fraction of it under the new curve.</summary>
         public static int MigrateExperience(int oldXp)
         {
-            int oldLevel = Math.Min(LevelCap, 1 + Math.Max(0, oldXp) / 60);
-            float frac = oldLevel >= LevelCap ? 0 : (Math.Max(0, oldXp) % 60) / 60f;
+            int oldLevel = Math.Min(10, 1 + Math.Max(0, oldXp) / 60);   // the old curve's cap was 10
+            float frac = oldLevel >= 10 ? 0 : (Math.Max(0, oldXp) % 60) / 60f;
             return XpForLevel(oldLevel) + (int)Math.Round(frac * XpToNext(oldLevel));
         }
 

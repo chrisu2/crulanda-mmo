@@ -41,5 +41,7 @@ namespace Crulanda.World
         public Material pineBough;
         [Tooltip("Crulanda/Clouds: the painted cloud layer over the sky (WorldWeather makes the dome and the noise at runtime).")]
         public Material clouds;
+        [Tooltip("Crulanda/Grass painted plant cards (PlantField): a fern frond, a broad leaf on its stalk, and a clump of reeds with their heads.")]
+        public Material fern, broadLeaf, reeds;
     }
 }

@@ -663,7 +663,7 @@ namespace Crulanda.Encounter
             {
                 ClassDef = playable.definition;
                 Kit = ClassKit.Create(ClassDef.id, this, ClassDef, content.abilities);
-                Talents = TalentTree.Parse(ClassDef.id, playable.talentTree != null ? playable.talentTree.text : null, 10, Kit.ImplementedTalents);
+                Talents = TalentTree.Parse(ClassDef.id, playable.talentTree != null ? playable.talentTree.text : null, EncounterProgress.TalentCap, Kit.ImplementedTalents);
             }
             catch (ArgumentException error) { Debug.LogError("Class content invalid: " + error.Message); enabled = false; return; }
             saves = new EncounterSave(root, Talents, EncounterSave.SlotFor(ClassDef.id));
@@ -812,6 +812,10 @@ namespace Crulanda.Encounter
                 case "weaveeater": return ActorLook.WeaveEater;
                 case "deserter": return ActorLook.Deserter;
                 case "banditking": return ActorLook.BanditKing;
+                case "keeper": return ActorLook.Keeper;
+                case "stag": return ActorLook.Stag;
+                case "spider": return ActorLook.Spider;
+                case "bramble": return ActorLook.Bramble;
                 default: return veteran ? ActorLook.Warden : ActorLook.Collector;
             }
         }

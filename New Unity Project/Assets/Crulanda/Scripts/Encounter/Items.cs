@@ -89,7 +89,8 @@ namespace Crulanda.Encounter
             new[] { "Homespun", "Frayed", "Patched" },          // 1-2
             new[] { "Tanned", "Riveted", "Stitched" },          // 3-5
             new[] { "Toll-road", "Ridge-forged", "Pilgrim's" }, // 6-8
-            new[] { "Ash-hardened", "Salt-cured", "Emberbound" } // 9-10
+            new[] { "Ash-hardened", "Salt-cured", "Emberbound" }, // 9-10
+            new[] { "Veridian", "Root-bound", "Sap-steeped" }    // 11-13: the Verdant Shore's
         };
         static readonly Dictionary<string, string[]> Pieces = new Dictionary<string, string[]> {
             { "head", new[] { "Cap", "Hood", "Coif" } }, { "neck", new[] { "Pendant", "Cord", "Torc" } }, { "shoulders", new[] { "Mantle", "Pauldrons", "Spaulders" } },
@@ -99,7 +100,7 @@ namespace Crulanda.Encounter
         static readonly (string suffix, int sta, int str, int agi, int intel, int spi)[] Suffixes = {
             ("of the Oak", 2, 2, 0, 0, 0), ("of the Hare", 1, 0, 3, 0, 0), ("of the Owl", 1, 0, 0, 3, 1), ("of the Bear", 3, 1, 0, 0, 0), ("of the Hearth", 2, 0, 0, 1, 2), ("of Salt", 1, 1, 1, 1, 0)
         };
-        static int BandOf(int level) { return level <= 2 ? 0 : level <= 5 ? 1 : level <= 8 ? 2 : 3; }
+        static int BandOf(int level) { return level <= 2 ? 0 : level <= 5 ? 1 : level <= 8 ? 2 : level <= 10 ? 3 : 4; }
         /// <summary>A generated gear id for this slot, level and quality (the seed picks name and suffix).</summary>
         public static string GearId(string slot, int level, int quality, int seed) { return "gen." + slot + "." + Mathf.Clamp(level, 1, EncounterProgress.LevelCap) + "." + Mathf.Clamp(quality, 0, 4) + "." + Mathf.Abs(seed % 10000); }
         static ItemDef Generate(string id)

@@ -84,6 +84,7 @@ namespace Crulanda.World
             // grey, with a little more skylight by day; the air greys, cools, pales or dulls with it and the fog closes in; a storm's
             // lightning flashes everything for a moment.
             var w = WorldWeather.Now; float dark = Darkness, lit = 1 - dark, flash = WorldWeather.Flash;
+            Shader.SetGlobalFloat("_NightGlow", dark);   // glowing flowers and mushrooms brighten after dark (Crulanda/Grass)
             // In a cave (Hollow) the skylight and the air darken with depth; its torches and fires light it.
             var view = Camera.main; float under = view != null ? Hollow.DepthAt(view.transform.position) : 0; Hollow.CameraDepth = under;
             float loss = w.dim * Mathf.Lerp(.5f, 1, lit), lift = 1 + (.14f * w.dim - .2f * w.rain) * lit + flash * .7f;   // overcast skylight is bright; rain is gloomy

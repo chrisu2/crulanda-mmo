@@ -11,8 +11,9 @@ namespace Crulanda.Tests
     /// gives the bare body back exactly; swapping gear leaves nothing behind and makes no new materials or meshes; gear put on
     /// while swimming is slung on the back; barbutes and hoods hide the hair, open helms do not; a full kit stays inside the part
     /// budget; every family and variant builds at every quality and level band and sits on the figure; arcs curve and rods are
-    /// capped; a session with no items keeps the class kit; the Druid keeps her staff and hood until a piece replaces them;
-    /// enemies' own weapons and Caddock's crown are untouched. Built in edit mode on bare figures (no scene, no save).
+    /// capped; a pendant hangs in front of a mantle and boots go under greaves; a session with no items keeps the class kit;
+    /// the Druid keeps her staff and hood until a piece replaces them; enemies' own weapons and Caddock's crown are untouched.
+    /// Built in edit mode on bare figures (no scene, no save).
     /// </summary>
     public class GearVisualTests
     {
@@ -177,6 +178,27 @@ namespace Crulanda.Tests
             v.ApplyGearIds(swapFeet, db, looks); Assert.AreSame(neck, v.GearRoot(EquipSlot.Neck), "New boots leave the pendant alone.");
             var swapChest = (string[])b.Clone(); swapChest[3] = GeneratedPiece(db, "chest", 11, 4, "Hauberk");
             v.ApplyGearIds(swapChest, db, looks); Assert.AreNotSame(neck, v.GearRoot(EquipSlot.Neck), "A hauberk lifts the pendant onto its collar.");
+        }
+
+        [Test] public void Pendant_hangs_in_front_of_a_mantle_and_boots_go_under_greaves()
+        {
+            var db = new ItemDatabase(); var looks = Looks(); var v = Figure();
+            float Front(EquipSlot s) { float z = float.MinValue; foreach (var r in SlotParts(v, s)) z = Mathf.Max(z, r.bounds.max.z); return z; }
+            float Top(EquipSlot s) { float y = float.MinValue; foreach (var r in SlotParts(v, s)) y = Mathf.Max(y, r.bounds.max.y); return y; }
+            // The wardrobe's cloth kit: hood, pendant, mantle and tunic. The drop hangs in front of the mantle, not inside it.
+            var kit = Kit(db, 5, 2, "Hood", "Pendant", "Mantle", "Tunic");
+            v.ApplyGearIds(kit, db, looks);
+            Assert.Greater(Front(EquipSlot.Neck), Front(EquipSlot.Shoulders), "The pendant's drop hangs in front of the mantle.");
+            // Taking the mantle off rebuilds the neck piece (it now lies over the hood's cape), and putting it back does too.
+            var neck = v.GearRoot(EquipSlot.Neck); var bare = new[] { kit[0], kit[1], kit[3] };
+            v.ApplyGearIds(bare, db, looks); Assert.AreNotSame(neck, v.GearRoot(EquipSlot.Neck), "Off with the mantle: the pendant is laid again.");
+            neck = v.GearRoot(EquipSlot.Neck); v.ApplyGearIds(kit, db, looks); Assert.AreNotSame(neck, v.GearRoot(EquipSlot.Neck), "And again when it goes back on.");
+            // Boots under greaves are rebuilt without their folded top, which would poke through the shin plates.
+            var boots = GeneratedPiece(db, "feet", 9, 3, "Boots");
+            v.ApplyGearIds(new[] { boots }, db, looks); float alone = Top(EquipSlot.Feet); var feet = v.GearRoot(EquipSlot.Feet);
+            v.ApplyGearIds(new[] { GeneratedPiece(db, "legs", 9, 3, "Greaves"), boots }, db, looks);
+            Assert.AreNotSame(feet, v.GearRoot(EquipSlot.Feet), "Putting greaves on rebuilds the boots.");
+            Assert.Less(Top(EquipSlot.Feet), alone - .02f, "Under greaves the boots lose their folded top (it stood .04 above the shaft).");
         }
 
         [Test] public void Gear_built_while_swimming_is_stowed_not_held()

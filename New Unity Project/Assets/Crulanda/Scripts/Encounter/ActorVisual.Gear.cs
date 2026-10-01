@@ -40,10 +40,13 @@ namespace Crulanda.Encounter
                 lks[s] = shows[s] ? looks.Resolve(d) : default;
                 sigs[s] = shows[s] ? d.id + "|" + GearLooks.LookKey(lks[s]) : stack == null || stack.Empty ? "" : stack.item;
             }
-            // What one piece rests on: a neck piece lies on the chest piece, a hood's drape tucks under shoulder armour.
-            wornChest = shows[(int)EquipSlot.Chest] ? lks[(int)EquipSlot.Chest].family + ":" + lks[(int)EquipSlot.Chest].variant : ""; wornShoulders = shows[(int)EquipSlot.Shoulders];
-            if (shows[(int)EquipSlot.Neck]) sigs[(int)EquipSlot.Neck] += "|" + wornChest;
+            // What one piece rests on: a neck piece lies on the chest piece or over a mantle or a hood's cape, a hood's drape tucks
+            // under shoulder armour, boots go under greaves, a mantle's back drape gives way to the Druid's hung cloak.
+            Rest(shows, lks);
+            if (shows[(int)EquipSlot.Neck]) sigs[(int)EquipSlot.Neck] += "|" + wornChest + "|" + neckOver;
             if (shows[(int)EquipSlot.Head]) sigs[(int)EquipSlot.Head] += "|" + wornShoulders;
+            if (shows[(int)EquipSlot.Feet]) sigs[(int)EquipSlot.Feet] += "|" + wornLegs;
+            if (shows[(int)EquipSlot.Shoulders]) sigs[(int)EquipSlot.Shoulders] += "|" + Cloaked;
             for (int s = 0; s < GearSlots; s++)
             {
                 if (gearSig[s] == sigs[s]) continue;

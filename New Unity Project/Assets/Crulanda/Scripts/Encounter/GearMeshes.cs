@@ -411,12 +411,15 @@ namespace Crulanda.Encounter
         }
         /// <summary>
         /// A flat panel cut to an outline drawn in (x, y), standing up, <paramref name="thick"/> through along Z with its face domed
-        /// by <paramref name="bulge"/> toward +Z (<paramref name="front"/>) or -Z: a tabard, a back drape, a coat skirt.
+        /// by <paramref name="bulge"/> toward +Z (<paramref name="front"/>) or -Z: a tabard, a back drape, a coat skirt. The outline
+        /// must be star-shaped round <paramref name="fan"/> (by default its centroid; a ragged hem needs a point nearer the top).
+        /// The dome stays centred on the centroid either way.
         /// </summary>
-        public static Mesh Panel(string key, Vector2[] outline, float thick, float bulge = 0, bool front = true)
+        public static Mesh Panel(string key, Vector2[] outline, float thick, float bulge = 0, bool front = true, Vector2? fan = null)
         {
             var o = new Vector2[outline.Length]; for (int i = 0; i < o.Length; i++) o[i] = front ? new Vector2(outline[i].x, -outline[i].y) : outline[i];
-            return Plate(key, o, thick, bulge, null, null, 0, 1, Quaternion.Euler(front ? 90 : -90, 0, 0));
+            Vector2? fn = fan.HasValue ? (front ? new Vector2(fan.Value.x, -fan.Value.y) : fan.Value) : (Vector2?)null;
+            return Plate(key, o, thick, bulge, fn.HasValue ? Centroid(o) : (Vector2?)null, null, 0, 1, Quaternion.Euler(front ? 90 : -90, 0, 0), fn);
         }
 
         static Vector2 Centroid(Vector2[] o) { var c = Vector2.zero; foreach (var p in o) c += p; return c / o.Length; }

@@ -75,6 +75,12 @@ namespace Crulanda.Tests
             for (int i = 0; i < 5; i++) { cam.position = zone.Ground(inn.at, 1.7f); yield return null; }
             var rain = weather.transform.Find("Rain").GetComponent<ParticleSystem>();
             Assert.AreEqual(0, rain.emission.rateOverTime.constant, 1e-3f, "Indoors, nothing falls.");
+            // Under the porch, by the lantern (local z = -(d/2 + 1.2); a local offset z is (z sin, z cos) in the world, as InBuilding turns it back).
+            float yr = inn.rotation * Mathf.Deg2Rad, d = inn.size.y > 0 ? inn.size.y : 8;
+            var porch = inn.at + new Vector2(Mathf.Sin(yr), Mathf.Cos(yr)) * -(d / 2 + 1.2f);
+            Assert.IsTrue(zone.UnderRoof(porch), "Under the inn's porch, no rain falls.");
+            for (int i = 0; i < 5; i++) { cam.position = zone.Ground(porch, 1.7f); yield return null; }
+            Assert.AreEqual(0, rain.emission.rateOverTime.constant, 1e-3f, "Under the porch, nothing falls.");
             motor.enabled = true;
         }
 

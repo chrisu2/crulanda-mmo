@@ -1161,8 +1161,8 @@ namespace Crulanda.World
                 default: return Vector2.zero;
             }
         }
-        /// <summary>Whether a point stands under a building's roof (its footprint, eaves included) or in a cave: no rain or snow falls there.</summary>
-        public bool UnderRoof(Vector2 p) { return Hollow.CoverAt(p, .3f) > 0 || InBuilding(p); }   // a cave's passage, or a building
+        /// <summary>Whether a point stands under a building's roof (its footprint, eaves included), under an inn's porch or in a cave: no rain or snow falls there.</summary>
+        public bool UnderRoof(Vector2 p) { return Hollow.CoverAt(p, .3f) > 0 || InBuilding(p) || UnderPorch(p); }   // a cave's passage, a building, or an inn's porch
         /// <summary>Whether a point stands inside a building's footprint, eaves included (house, inn, barn, mill, keep, tower, crypt,
         /// forge, tannery, shelter, leather shop, drying hut, kitchen).</summary>
         public bool InBuilding(Vector2 p)
@@ -1316,8 +1316,7 @@ namespace Crulanda.World
             float w = size.x, d = size.y;
             var plaster = Tint(art.plaster, Plaster[Mathf.Abs(variant) % Plaster.Length]);
             var roofMat = variant % 2 == 0 ? art.thatch : art.slate;
-            float drop = FootDrop(t, w + .3f, d + .3f);   // on a slope the plinth reaches down to the lowest ground under it
-            BoxPart(t, new Vector3(0, .3f - drop / 2, 0), new Vector3(w + .3f, .6f + drop, d + .3f), Masonry, null, 1.5f);
+            Footing(t, w + .34f, d + .34f, .6f, .52f, .9f, .62f);   // the plinth: stepped stone down to the ground and up the slope (2 cm proud of the corner posts it climbs over), open behind the door
             BoxPart(t, new Vector3(0, .6f + wallHeight / 2, 0), new Vector3(w, wallHeight, d), plaster);
             // Timber framing: corner posts, a sill rail under the windows (a rail per storey on an inn) and a knee brace from each
             // corner post up to the first rail, so the door and windows sit in clear panels with nothing crossing them.
@@ -1334,11 +1333,13 @@ namespace Crulanda.World
             float rise = firstRail - .6f, run = rise * .625f;   // 32 degree braces: foot against the post, head under the rail
             foreach (int sz in new[] { -1, 1 }) foreach (int sx in new[] { -1, 1 })
                 Part(PrimitiveType.Cube, t, new Vector3(sx * (w / 2 - .15f - run / 2), .6f + rise / 2, sz * (d / 2 + .03f)), new Vector3(.14f, rise / .848f, .1f), art.timber, Quaternion.Euler(0, 0, sx * 32));
-            // Door faces south (-Z). It stands on the ground in a timber frame in front of the plinth (which stops at the doorway)
-            // instead of hanging on the wall above it. Warm windows either side and on the back.
-            float foot = Mathf.Min(0, LocalGround(t, 0, -d / 2 - .19f)) - .05f;
+            // Door faces south (-Z), in a timber frame in front of the plinth. It stands on a stone threshold at the highest
+            // ground across the doorway, so the grass never cuts it, with steps up to it where the ground falls away in front
+            // (DoorSteps). Warm windows either side and on the back.
+            float foot = Mathf.Clamp(DoorGround(t, 0, -d / 2 - .3f, 1.2f) + .03f, -.25f, .65f);
             PlankDoor(t, new Vector3(0, (foot + 2.7f) / 2, -d / 2 - .19f), 1.2f, 2.7f - foot, Tint(art.timber, new Color(.3f, .2f, .12f)));
             foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(s * .68f, (foot + 2.86f) / 2, -d / 2 - .12f), new Vector3(.16f, 2.86f - foot, .24f), art.timber);
+            DoorSteps(t, 0, -d / 2 - .15f, foot, 1.5f);
             Part(PrimitiveType.Cube, t, new Vector3(0, 2.78f, -d / 2 - .12f), new Vector3(1.52f, .16f, .24f), art.timber);
             ZoneDoor front = null;
             // The door's point stands on the step in front of it: behind the slab, between door and wall, the navmesh can leave a
@@ -1398,36 +1399,30 @@ namespace Crulanda.World
             WallPiece(new Vector3(0, doorH + (H - doorH) / 2, -d / 2), new Vector3(doorW, H - doorH, wall));
             foreach (int sx in new[] { -1, 1 }) foreach (int sz in new[] { -1, 1 })
                 Part(PrimitiveType.Cube, t, new Vector3(sx * w / 2, H / 2, sz * d / 2), new Vector3(.34f, H, .34f), art.timber);
-            // Stone footing strips hug the outside of the walls only (the floor inside stays level with the ground).
+            // A stone footing hugs the outside of the walls only (the floor inside stays level with the ground), stepping down to
+            // the ground on a slope (Footing), open at the door and where a kitchen lean-to stands on the back wall.
+            float? kitchen = KitchenBehind(t, d / 2 + wall / 2);
             var footing = Tint(Masonry, new Color(.5f, .48f, .44f));
-            foreach (int s in new[] { -1, 1 }) BoxPart(t, new Vector3(s * (w / 2 + .12f), .15f, 0), new Vector3(.25f, .3f, d + .5f), footing, null, 1.5f);
-            BoxPart(t, new Vector3(0, .15f, d / 2 + .12f), new Vector3(w + .5f, .3f, .25f), footing, null, 1.5f);
-            foreach (int s in new[] { -1, 1 }) BoxPart(t, new Vector3(s * (doorW / 2 + side / 2 + .1f), .15f, -d / 2 - .12f), new Vector3(side + .3f, .3f, .25f), footing, null, 1.5f);
+            Footing(t, w + .5f, d + .5f, .3f, .35f, .5f, doorW / 2 + .05f, kitchen.HasValue ? new Vector2(kitchen.Value - KitchenSize.x / 2 - .1f, kitchen.Value + KitchenSize.x / 2 + .1f) : (Vector2?)null, footing);
             // Storey line and braces outside; the floor above is a closed ceiling inside.
             foreach (int sz in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(0, storey, sz * (d / 2 + .02f)), new Vector3(w, .22f, wall + .1f), art.timber);
             foreach (int sx in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(sx * (w / 2 + .02f), storey, 0), new Vector3(wall + .1f, .22f, d), art.timber);
             // Ceiling: solid so the third-person camera pulls in under it instead of poking through.
             Part(PrimitiveType.Cube, t, new Vector3(0, storey - .1f, 0), new Vector3(w - wall, .15f, d - wall), Tint(art.timber, new Color(.3f, .22f, .15f))).AddComponent<BoxCollider>();
             for (float x = -w / 2 + 1.2f; x < w / 2; x += 1.5f) Part(PrimitiveType.Cube, t, new Vector3(x, storey - .25f, 0), new Vector3(.18f, .2f, d - wall), dark); // ceiling beams
-            foreach (int sz in new[] { -1, 1 })
-                for (float x = -w / 2 + 1.6f; x < w / 2 - 1; x += 2.8f)
-                {
-                    if (sz < 0 && Mathf.Abs(x) < doorW) continue;
-                    Part(PrimitiveType.Cube, t, new Vector3(x, storey + (H - storey) * .5f, sz * (d / 2 + .03f)), new Vector3(.14f, (H - storey) * .8f, .1f), art.timber, Quaternion.Euler(0, 0, 32));
-                }
             // Windows glow on both faces (the glass passes through the wall). A kitchen lean-to on the back wall takes the place
-            // of the ground-floor windows it would cover; the upstairs ones look out over its roof.
-            float? kitchen = KitchenBehind(t, d / 2 + wall / 2);
+            // of the ground-floor windows it would cover; the upstairs ones look out over its roof. The upper front is the
+            // jetty's, with windows of its own (InnFront).
             foreach (int sz in new[] { -1, 1 })
                 for (float x = -w / 2 + 1.5f; x < w / 2 - .8f; x += 2.6f)
                 {
                     if (sz < 0 && Mathf.Abs(x) < doorW) continue;
                     bool covered = sz > 0 && kitchen.HasValue && Mathf.Abs(x - kitchen.Value) < KitchenSize.x / 2 + .85f;   // its glass, frame or shutters would meet the lean-to
                     if (!covered) Part(PrimitiveType.Cube, t, new Vector3(x, 1.5f, sz * d / 2), new Vector3(.9f, .8f, wall + .1f), art.glass);
-                    Part(PrimitiveType.Cube, t, new Vector3(x, storey + 1.3f, sz * d / 2), new Vector3(.8f, .7f, wall + .1f), art.glass);
+                    if (sz > 0) Part(PrimitiveType.Cube, t, new Vector3(x, storey + 1.3f, sz * d / 2), new Vector3(.8f, .7f, wall + .1f), art.glass);
                     // Frames and sills round that glass on the outer wall face; shutters downstairs where they clear the corner post (inner face at w/2 - .17) and the door opening.
                     if (!covered) Window(t, new Vector3(x, 1.5f, sz * (d / 2 + wall / 2)), .9f, .8f, sz, variant, Mathf.Abs(x) + .84f <= w / 2 - .17f && (sz > 0 || Mathf.Abs(x) - .84f >= doorW / 2 + .05f), false);
-                    Window(t, new Vector3(x, storey + 1.3f, sz * (d / 2 + wall / 2)), .8f, .7f, sz, variant, false, false);
+                    if (sz > 0) Window(t, new Vector3(x, storey + 1.3f, sz * (d / 2 + wall / 2)), .8f, .7f, sz, variant, false, false);
                 }
             float roofH = Mathf.Max(2.4f, d * .5f);
             MeshPart(ZoneMeshes.GableRoof(w + 1.2f, d + 1.4f, roofH, .25f, .6f - wall / 2), t, new Vector3(0, H, 0), variant % 2 == 0 ? art.thatch : art.slate);
@@ -1439,11 +1434,11 @@ namespace Crulanda.World
                 BoxPart(t, new Vector3(w / 2 - 1.1f, H + roofH * .75f, d * .15f), new Vector3(1, roofH * 1.1f, 1), Masonry, null, 1);
                 BoxPart(t, new Vector3(w / 2 - 1.1f, H + roofH * 1.3f + .04f, d * .15f), new Vector3(1.2f, .12f, 1.2f), Tint(Masonry, new Color(.45f, .44f, .4f)), null, 1);   // its cap
             }
-            // The door: a plank door on a hinge at the left jamb, plus a stone step.
+            // The door: a plank door on a hinge at the left jamb, on a stone threshold (with steps down if the ground falls away).
             var hinge = new GameObject("Door hinge").transform; hinge.SetParent(t, false); hinge.localPosition = new Vector3(-doorW / 2, 0, -d / 2 - .02f);
             var door = PlankDoor(hinge, new Vector3(doorW / 2, doorH / 2, 0), doorW, doorH, dark, .1f);
             var doorCollider = door.AddComponent<BoxCollider>();
-            BoxPart(t, new Vector3(0, .06f, -d / 2 - .55f), new Vector3(2, .12f, .8f), Masonry, null, 1);
+            DoorSteps(t, 0, -d / 2 - wall / 2, .05f, 2, wall, footing);
             var innDoor = new ZoneDoor { name = t.name, openable = true, hinge = hinge, blocker = doorCollider, position = t.TransformPoint(new Vector3(0, 1, -d / 2)) };
             Doors.Add(innDoor); innDoor.SetOpen(true);   // the inn keeps its door open; villagers come and go
             if (art.particle != null && variant != 1) Smoke(t, new Vector3(w / 2 - 1.1f, H + roofH * 1.4f, d * .15f));
@@ -1478,17 +1473,10 @@ namespace Crulanda.World
             fire.transform.localPosition = new Vector3(w / 2 - 1.6f, 1, .8f); fire.type = LightType.Point; fire.range = 9; fire.intensity = 1.8f; fire.color = new Color(1, .55f, .25f);
             var room = new GameObject("Taproom light").AddComponent<Light>(); room.transform.SetParent(t, false);
             room.transform.localPosition = new Vector3(-1, storey - .6f, 0); room.type = LightType.Point; room.range = 8; room.intensity = 1.1f; room.color = new Color(1, .78f, .5f);
-            // Outside: the hanging sign and barrels by the door.
-            Part(PrimitiveType.Cube, t, new Vector3(-2, 3.4f, -d / 2 - .8f), new Vector3(.12f, .12f, 1.6f), art.timber);
-            Part(PrimitiveType.Cube, t, new Vector3(-2, 2.8f, -d / 2 - 1.4f), new Vector3(1, .75f, .08f), Tint(art.timber, new Color(.5f, .36f, .2f)));
-            // The board hangs on two chains from the bracket, and a strut braces the bracket to the wall (seen close up, a board
-            // with nothing above it in frame read as a slab floating in mid-air).
-            foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(-2 + s * .38f, 3.26f, -d / 2 - 1.4f), new Vector3(.03f, .2f, .03f), art.metal);
-            Part(PrimitiveType.Cube, t, new Vector3(-2, 2.98f, -d / 2 - .38f), new Vector3(.1f, .1f, 1.06f), art.timber, Quaternion.Euler(45, 0, 0));
-            Part(PrimitiveType.Cylinder, t, new Vector3(-2, 2.8f, -d / 2 - 1.46f), new Vector3(.45f, .06f, .45f), art.metal, Quaternion.Euler(90, 0, 0));
-            Part(PrimitiveType.Cylinder, t, new Vector3(w / 2 - 1.2f, .5f, -d / 2 - 1), new Vector3(.8f, .5f, .8f), art.timber);
+            // Outside: the framing, the jetty, the porch with its lantern, the sign, window boxes, a bench and barrels (InnFront).
+            InnFront(t, w, d, H, storey, doorW, doorH, roofH, variant, kitchen, plaster, variant % 2 == 0 ? art.thatch : art.slate);
             var glow = new GameObject("Inn lantern").AddComponent<Light>(); glow.transform.SetParent(t, false);
-            glow.transform.localPosition = new Vector3(0, 2.6f, -d / 2 - 1.2f); glow.type = LightType.Point; glow.range = 8; glow.intensity = 1.4f; glow.color = new Color(1, .72f, .4f);
+            glow.transform.localPosition = new Vector3(0, 2.2f, -d / 2 - 1.2f); glow.type = LightType.Point; glow.range = 8; glow.intensity = 1.4f; glow.color = new Color(1, .72f, .4f);
             NightLights.Add(new NightLight { light = glow, dayIntensity = .6f, nightIntensity = 2.2f });   // faint by day: at 1.4 it bloomed to a pale blob on the plaster
         }
         /// <summary>
@@ -1526,12 +1514,18 @@ namespace Crulanda.World
             float w = size.x, d = size.y, h = 4.2f;
             var boards = Tint(art.timber, new Color(.4f, .25f, .16f));
             BoxPart(t, new Vector3(0, h / 2, 0), new Vector3(w, h, d), boards);
-            float drop = FootDrop(t, w, d); if (drop > 0) BoxPart(t, new Vector3(0, .1f - drop / 2, 0), new Vector3(w + .2f, drop + .2f, d + .2f), Masonry, null, 1.5f);   // stone footing on a slope
+            Footing(t, w + .3f, d + .3f, .45f, .4f, 1, 1.75f);   // a stone sill round the boards' foot, stepping up and down the slope, open at the doors
             for (float x = -w / 2; x <= w / 2 + .01f; x += 1.2f)
                 foreach (int sz in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(x, h / 2, sz * (d / 2 + .04f)), new Vector3(.12f, h, .08f), art.timber);
-            Part(PrimitiveType.Cube, t, new Vector3(0, 1.6f, -d / 2 - .07f), new Vector3(3.2f, 3.2f, .1f), Tint(art.timber, new Color(.18f, .12f, .09f)));
-            Part(PrimitiveType.Cube, t, new Vector3(0, 1.6f, -d / 2 - .12f), new Vector3(3.3f, .2f, .06f), art.timber, Quaternion.Euler(0, 0, 44));
-            Part(PrimitiveType.Cube, t, new Vector3(0, 1.6f, -d / 2 - .12f), new Vector3(3.3f, .2f, .06f), art.timber, Quaternion.Euler(0, 0, -44));
+            // The doors in a frame of two posts and a lintel, braced corner to corner, down to the highest ground across the
+            // doorway (the grass never cuts them), on a stone threshold down to the lowest, with steps if the ground falls away.
+            float sill = Mathf.Clamp(DoorGround(t, 0, -d / 2 - .3f, 3.2f) + .03f, -1, .6f), tall = 3.2f - sill, mid = (3.2f + sill) / 2;
+            float brace = Mathf.Atan2(tall, 3.2f) * Mathf.Rad2Deg, across = Mathf.Sqrt(3.2f * 3.2f + tall * tall) - .3f;
+            Part(PrimitiveType.Cube, t, new Vector3(0, mid, -d / 2 - .07f), new Vector3(3.2f, tall, .1f), Tint(art.timber, new Color(.18f, .12f, .09f)));
+            foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(0, mid, -d / 2 - .12f), new Vector3(across, .2f, .06f), art.timber, Quaternion.Euler(0, 0, s * brace));
+            foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(s * 1.72f, (sill + 3.4f) / 2, -d / 2 - .1f), new Vector3(.22f, 3.4f - sill, .2f), art.timber);
+            Part(PrimitiveType.Cube, t, new Vector3(0, 3.32f, -d / 2 - .1f), new Vector3(3.66f, .2f, .2f), art.timber);
+            DoorSteps(t, 0, -d / 2 - .15f, sill, 3.44f);
             float roofH = d * .5f;
             MeshPart(ZoneMeshes.GableRoof(w + 1, d + 1.4f, roofH, .25f, .5f), t, new Vector3(0, h, 0), art.thatch);
             Eaves(t, w - .2f, d, h, roofH, art.thatch);   // the barn's roof is 1 m wider than its walls, not 1.2
@@ -2525,8 +2519,11 @@ namespace Crulanda.World
             // frame still standing, one end left as a broken gable, rubble at the foot; a charred remnant of roof slumped
             // inside and fallen beams.
             float w = size.x, d = size.y; var plaster = Tint(art.plaster, Zone.biome == "ash" ? new Color(.56f, .555f, .55f) : new Color(.52f, .48f, .42f)); var charred = Tint(art.timber, new Color(.13f, .11f, .1f));
-            float drop = FootDrop(t, w + .3f, d + .3f);   // on a slope the floor slab reaches down to the lowest ground under it
-            BoxPart(t, new Vector3(0, .3f - drop / 2, 0), new Vector3(w + .3f, .6f + drop, d + .3f), Dressed(new Color(.52f, .51f, .48f)), null, 1.5f);
+            // The floor slab inside, and round it a stepped stone footing down to the ground on a slope (Footing): no slab
+            // overhangs a hillside.
+            var flags = Dressed(new Color(.52f, .51f, .48f));
+            BoxPart(t, new Vector3(0, .45f, 0), new Vector3(w - .5f, .3f, d - .5f), flags, null, 1.5f);
+            Footing(t, w + .3f, d + .3f, .6f, .45f, 0, 0, null, flags);
             // The heights the wall stubs drew, run by run (front, back, the -x end, the +x end): the same draws in the same
             // order as the stubs took, and none for the doorway's (-1 marks them).
             var runs = new[] { new List<float>(), new List<float>(), new List<float>(), new List<float>() };
@@ -3114,7 +3111,7 @@ namespace Crulanda.World
                 grassRoadBox = Zone.roads.Select(r => Box(r.points, r.width / 2 + 3.5f)).ToArray();
                 grassBuildings = Zone.props.Where(o => o != null && (o.kind == "house" || o.kind == "inn" || o.kind == "barn" || o.kind == "mill" || o.kind == "ruined_house"))
                     .Select(o => (o.at, Mathf.Max(2, Mathf.Max(o.size.x, o.size.y) * .75f) + 1.5f))
-                    .Concat(Zone.props.Where(o => o != null && (o.kind == "leathershop" || o.kind == "dryhut" || o.kind == "kitchen")).Select(o => (o.at, 4.5f))).ToArray();   // a workshop's floor (these props carry no size)
+                    .Concat(Zone.props.Where(o => o != null && (o.kind == "leathershop" || o.kind == "dryhut" || o.kind == "kitchen" || o.kind == "forge")).Select(o => (o.at, 4.5f))).ToArray();   // a workshop's floor (these props carry no size)
             }
             float living = 1 - Unmade(p.x, p.y) / .55f; if (living <= 0) return 0;   // grass thins out along the grey's ragged front
             if (Hollow.CoverAt(p, 1.2f) > 0) return 0;   // a cave's bare floor
@@ -3207,44 +3204,6 @@ namespace Crulanda.World
             l.type = LightType.Point; l.range = range; l.intensity = intensity; l.color = color;
             NightLights.Add(new NightLight { light = l, dayIntensity = intensity, nightIntensity = night });
             return l;
-        }
-        /// <summary>Open-fronted smithy: lean-to roof on posts, stone hearth with glowing coals and a hood, anvil, quench barrel, tool rack.</summary>
-        void Forge(Transform t)
-        {
-            var dark = Tint(art.timber, new Color(.25f, .17f, .11f));
-            var iron = Tint(art.metal, new Color(.22f, .22f, .24f));
-            foreach (int sx in new[] { -1, 1 }) foreach (int sz in new[] { -1, 1 })
-                Part(PrimitiveType.Cube, t, new Vector3(sx * 2.4f, sz > 0 ? 1.6f : 1.35f, sz * 1.9f), new Vector3(.22f, sz > 0 ? 3.2f : 2.7f, .22f), dark);
-            Part(PrimitiveType.Cube, t, new Vector3(0, 2.95f, 0), new Vector3(5.6f, .14f, 4.6f), art.slate, Quaternion.Euler(-8, 0, 0));
-            BoxPart(t, new Vector3(0, .7f, 1.95f), new Vector3(5, 1.4f, .3f), Masonry, null, 1);                                  // back wall
-            // Hearth, coals, hood and chimney.
-            BoxPart(t, new Vector3(1.2f, .5f, 1.1f), new Vector3(1.8f, 1, 1.3f), Masonry, null, 1);
-            Part(PrimitiveType.Cube, t, new Vector3(1.2f, 1.02f, 1.05f), new Vector3(1.3f, .08f, .9f), art.glass);
-            BoxPart(t, new Vector3(1.2f, 2.1f, 1.35f), new Vector3(1.3f, .9f, .9f), Masonry, null, 1);
-            BoxPart(t, new Vector3(1.2f, 3.4f, 1.5f), new Vector3(.55f, 1.8f, .55f), Masonry, null, 1);
-            if (art.particle != null) Smoke(t, new Vector3(1.2f, 4.4f, 1.5f));
-            Glow(t, new Vector3(1.2f, 1.5f, .6f), 7, 1.4f, new Color(1, .5f, .2f), 2.2f);
-            Part(PrimitiveType.Cube, t, new Vector3(2.15f, .9f, 1.1f), new Vector3(.25f, .5f, .7f), Tint(art.timber, new Color(.4f, .28f, .18f))); // bellows
-            // Anvil on a stump.
-            Part(PrimitiveType.Cylinder, t, new Vector3(-.6f, .3f, -.2f), new Vector3(.6f, .3f, .6f), art.timber);
-            Part(PrimitiveType.Cube, t, new Vector3(-.6f, .7f, -.2f), new Vector3(.26f, .2f, .55f), iron);
-            Part(PrimitiveType.Cube, t, new Vector3(-.6f, .84f, -.2f), new Vector3(.36f, .1f, .72f), iron);
-            Part(PrimitiveType.Sphere, t, new Vector3(-.6f, .84f, .22f), new Vector3(.2f, .1f, .28f), iron);
-            // Quench barrel, a rack of tools, and finished work leaning on the wall.
-            Part(PrimitiveType.Cylinder, t, new Vector3(-1.9f, .45f, .9f), new Vector3(.8f, .45f, .8f), art.timber);
-            Part(PrimitiveType.Cylinder, t, new Vector3(-1.9f, .91f, .9f), new Vector3(.66f, .01f, .66f), art.water);
-            Part(PrimitiveType.Cube, t, new Vector3(-.9f, 1.8f, 1.78f), new Vector3(1.8f, .08f, .08f), dark);
-            for (int i = 0; i < 5; i++)
-            {
-                Part(PrimitiveType.Cube, t, new Vector3(-1.6f + i * .35f, 1.55f, 1.76f), new Vector3(.04f, .45f, .04f), dark);
-                Part(PrimitiveType.Cube, t, new Vector3(-1.6f + i * .35f, 1.32f, 1.74f), new Vector3(i % 2 == 0 ? .14f : .06f, .08f, .06f), iron);
-            }
-            for (int i = 0; i < 3; i++) Part(PrimitiveType.Cube, t, new Vector3(-2.1f + i * .2f, .7f, 1.65f), new Vector3(.05f, 1.2f, .05f), art.metal, Quaternion.Euler(-10, 0, 0)); // blades and bars
-            Solid(t, new Vector3(1.2f, 1, 1.2f), new Vector3(1.9f, 2, 1.5f));
-            Solid(t, new Vector3(0, .7f, 1.95f), new Vector3(5, 1.4f, .3f));
-            Solid(t, new Vector3(-.6f, .45f, -.2f), new Vector3(.6f, .9f, .75f));
-            Workplace(t, "forge", new Vector3(-.6f, 0, -1.15f), new Vector3(-.6f, .9f, -.2f));
-            Workplace(t, "forge", new Vector3(1.2f, 0, -.3f), new Vector3(1.2f, 1, 1.1f));
         }
         static readonly Color[][] Awnings = { new[] { new Color(.62f, .2f, .16f), new Color(.86f, .8f, .66f) }, new[] { new Color(.2f, .34f, .52f), new Color(.86f, .8f, .66f) }, new[] { new Color(.32f, .45f, .22f), new Color(.8f, .66f, .3f) } };
         /// <summary>

@@ -135,7 +135,9 @@ namespace Crulanda.Encounter
             }
             // Every armour family and variant up close: uncommon, at the middle level band, so rims and trim show but not glow.
             yield return Shots(directory, "06-helms", Entries(HeadLooks, "head", 7), new Framing { perRow = 4, spacing = .9f, focus = 1.62f, pitch = 6, margin = .35f, label = 1.32f, yaw = 165 }, 12);
-            yield return Shots(directory, "07-shoulders-chests", Entries(ShoulderChestLooks, null, 7), new Framing { perRow = 4, spacing = 1.05f, focus = 1.3f, pitch = 8, margin = .45f, label = -.62f, yaw = 160 }, 12);
+            var chests = Entries(ShoulderChestLooks, null, 7);
+            chests.Add(MaterialEntry("chest", 4, 2, "Riveted", "Jerkin", "brigandine"));   // the studded look comes from the generated material, not a named look
+            yield return Shots(directory, "07-shoulders-chests", chests, new Framing { perRow = 4, spacing = 1.05f, focus = 1.3f, pitch = 8, margin = .45f, label = -.62f, yaw = 160 }, 12);
             var limbs = new List<Entry>(); var limbFrames = new List<Framing>();
             void Close(string[] list, string slot, Framing frame) { var e = Entries(list, slot, 7); for (int i = 0; i < e.Count; i += frame.perRow) { limbs.AddRange(e.GetRange(i, Mathf.Min(frame.perRow, e.Count - i))); limbFrames.Add(frame); } }
             Close(HandLooks, "hands", new Framing { perRow = 4, spacing = 1.05f, focus = 1.0f, pitch = 8, margin = .45f, label = -.75f, yaw = 135 });
@@ -200,6 +202,16 @@ namespace Crulanda.Encounter
                 if (GearLooks.TrySplitGenerated(db.Get(id), out _, out var p, out _, out _) && p == piece) return id;
             }
             Debug.LogError("Wardrobe capture: no " + ItemDatabase.QualityNames[quality] + " level-" + level + " " + piece + " among the first 10000 seeds."); return null;
+        }
+        /// <summary>A generated piece made of this material word (the first seed from 0 that gives it), labelled with what it shows.</summary>
+        Entry MaterialEntry(string slot, int level, int quality, string material, string piece, string shows)
+        {
+            for (int seed = 0; seed < 10000; seed++)
+            {
+                string id = ItemDatabase.GearId(slot, level, quality, seed);
+                if (GearLooks.TrySplitGenerated(db.Get(id), out var m, out var p, out _, out _) && m == material && p == piece) return new Entry { ids = new[] { id }, title = db.Get(id).name, sub = shows };
+            }
+            Debug.LogError("Wardrobe capture: no " + material + " " + piece + " at level " + level + "."); return new Entry { ids = new string[0], title = material + " " + piece, sub = "not found" };
         }
         /// <summary>A whole generated kit: one piece per slot by word, at this level and quality.</summary>
         Entry KitEntry(string[] pieces, int level, int quality)

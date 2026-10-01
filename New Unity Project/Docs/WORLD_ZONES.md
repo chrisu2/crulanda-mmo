@@ -11,7 +11,7 @@ Status 2026-09-28. The game opens in **Oakhaven** (`Assets/Crulanda/Scenes/Oakha
   a painted ground texture (grass variation, dirt roads with wheel ruts, tilled/stubble fields, clearings, muddy banks,
   grey unmade ground), water ribbons, props, forest edges on three sides, the Wasting, lighting/fog/sky and boundaries.
   Scenery is static-batched after generation.
-- Prop kinds: house, inn (walk-in), barn, mill, coop, forge, stall, oven, tannery, woodpile, well, dead_oak, great_oak (Oakhaven's living Great Oak, with a stone bench ring), tree, pine, fence, hedge, haystack, cart, barrels, crates, lamp, grave,
+- Prop kinds: house, inn (walk-in), barn, mill, coop, forge, stall, oven, tannery, woodpile, leathershop, dryhut, kitchen, gamerack, well, dead_oak, great_oak (Oakhaven's living Great Oak, with a stone bench ring), tree, pine, fence, hedge, haystack, cart, barrels, crates, lamp, grave,
   rock, bridge, signpost, ruin. Solid props carry `NavBlocker`; bridge decks carry `NavWalkable`.
 - `EncounterNavigation` builds the navmesh from the generated ground + bridge decks, cuts out blockers and blocks water
   so enemies path over bridges. Without a zone it falls back to the old name-based Quiet Trail logic.
@@ -53,6 +53,13 @@ from whose crest the village is first seen, is CANON, book1 ch.4), the Mastwood,
 Whitefoot's den, the Bound Stone, the Cider Barn and Withy pool (CANON-EXPANDED: Oakhaven's cider and deep springs), the Old
 Barrow (CANON-EXPANDED: the First Kin), Hollin farm, the Hallow's Creek milestone (CANON-EXPANDED: Hallow's Creek, the first
 settlement the Wasting took, world_bible.md) and the Watchtower on the east road. Each carries its `canonStatus` in the data.
+The trades' buildings (GAME-ONLY, 2026-10-01; `tools/wip/professions/BUILD_PLAN.md` step 1): the ten village houses carry
+names, so a door reads "Knock · Tanner house" (Reed, Farrow, Crane, the Elder's, Rusk, Jory's, Vell, Pell, Thorne, Tanner); two
+new houses, the **Carder farmhouse** west of the Tithe barn and the **Crisp cottage** on the Mill lane; **Tanner's leather shop**
+on the South road below the Cask; **Lisbet's drying hut** by the Last harvest field; **the Cask's kitchen**, a lean-to on the
+inn's back wall; and **Moss's game rack** in the lodge yard. All six are appended to `props` and checked to move nothing:
+`WorkshopDataTests` (the placement rules) and `VillageStreamTests` (Oakhaven built with and without them: trunks, scenery and
+the creek's points are the same). Khaven's four village houses are named too (Grane, Vey, Jenn, Tabor).
 
 ## Khaven Village (CANON-EXPANDED)
 Canon names from `maps\khaven_village_map.png`: the Cracked Hearth, two Fallen Smithies, the Blood-Stone Well, the Gallows
@@ -538,12 +545,36 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
     woodcutter, herbalist, farmer, elder, miller, leatherworker, skinner, and so on.
   - A trade whose workplace the zone lacks falls back to farmer or gossip.
   - Each trade has its own outfit and tool (`ActorVisual.Dress`) and a `<Title>` under its nameplate.
-  - Workplaces are new prop kinds registered in `ZoneBuilder.Workplaces` (a stand point and a look target):
+  - Workplaces are new prop kinds registered in `ZoneBuilder.Workplaces` (a stand point, a look target and the prop's name):
     `forge` (smithy with lit hearth, anvil and quench barrel), `stall` (awning and goods; variant 0 produce, 1 cloth and
     pots, 2 bread), `oven` (clay bake oven), `tannery` (hide frames, vat, scraping beam) and `woodpile`.
+  - The trades' workshops (`ZoneBuilder.Workshops.cs`, GAME-ONLY; each draws from its own stream, carries no `size`, and is in
+    `Footprint` (no rain) and the grass's bare list):
+    - `leathershop`, 6 x 5 m: plank walls on a stone sill under a thatched gable, the front open; a counter under a hide
+      pentice with the four trade bags hung over it and a lantern; a rail of belts and a bridle, a cutting bench with a hide on
+      it, a stitching horse, rolled and stacked hides; a satchel on the hanging sign. Places: the counter (weighted twice), the
+      bench, the stitching.
+    - `dryhut`, 5 x 4.5 m: wattle in a timber frame on a stone footing, steep thatch, half the front open; bunches of herbs
+      under the eave and from a pole inside; two drying racks hung with herbs out front; a bench with a mortar, jars and a small
+      still over a pan of coals (a glow). Places: the bench, the racks.
+    - `kitchen`, 5 x 3 m: a lean-to whose back edge meets an inn's back wall (`KitchenBehind`; the inn then leaves out the two
+      ground-floor windows it covers and shows the kitchen's door in the taproom): a slate roof on a beam and post, a stone end
+      wall with the range against it (fire mouth, plate, pot on a crane, a hood and a smoking chimney), firewood, a work table
+      under a shelf of crocks, the back door, two hares from the beam, onions and a water butt. Places: `kitchen` (range,
+      table) and three `kitchendoor` hand-over spots out front.
+    - `gamerack`, 3 x 2 m on a hillside: forked poles and a crossbar hung with a deer, two hares and a brace of pheasants; a
+      rail of pelts; a hide laced in a frame; a butcher's block with a cleaver; a ring of cold stones. Place: `lodge`.
+    - The inn adds a `bar` place at the open end of the bar and a barred door to the rooms upstairs (`ZoneDoor.kind` "rooms";
+      nobody's home yet). `ZoneDoor.smoke` is the house's chimney smoke.
+    - A village with a tannery yard and no leather shop has its leatherworker work the yard (`leathershop` shares the
+      `tannery` places).
+  - The leatherworker keeps her shop 9 to 12 and 2 to 6 (the yard either side); the herbalist calls at her drying hut late
+    morning and evening. `VillageWorkshopTests`: every workshop place is on the navmesh and can be walked to, and Maud keeps
+    shop apart from the tannery yard.
   - Hunters and woodcutters work the groves. Herbalists gather on the open meadow.
   - Work poses: Hammer, Chop, Gather, Knead. Each trade has its own lines of talk.
-  - Oakhaven has Vell's smithy, Market row (three stalls), Thorne's bakehouse, the Tannery yard and the Woodyard, with 20 villagers.
+  - Oakhaven has Vell's smithy, Market row (three stalls), Thorne's bakehouse, the Tannery yard, the Woodyard, Tanner's leather
+    shop, Lisbet's drying hut, the Cask's kitchen and Moss's game rack, with 20 villagers.
   - The capture tour shoots each trade at work, plus a line-up of every trade on the green.
 - Tests: `Tests/PlayMode/VillageDayTests.cs` cover three cases: night (coops shut, hens roosting, village abed), morning
   (coops open, feed scattered) and dusk (every hen in, door shut).

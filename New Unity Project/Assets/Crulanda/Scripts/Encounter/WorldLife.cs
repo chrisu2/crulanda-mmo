@@ -103,9 +103,10 @@ namespace Crulanda.Encounter
         static readonly string[] KeeperNames = { "Goody Marl", "Hettie Brook", "Nan Pennock", "Old Sorrel" };
         public static string[] DefaultNames { get { return Names; } }
         public static string[] KeeperNamesList { get { return KeeperNames; } }
-        /// <summary>Hens lay through the working day, one egg each at most; the count resets before dawn.</summary>
+        /// <summary>Hens lay through the working day, one egg each at most; the count resets before dawn. The water pan dries out.</summary>
         void Update()
         {
+            foreach (var coop in Zone.Coops) coop.Dry(Time.deltaTime / 420);   // a pan lasts about four hours
             if (Time.time < nextLay) return;
             nextLay = Time.time + 20;
             foreach (var coop in Zone.Coops)
@@ -183,17 +184,20 @@ namespace Crulanda.Encounter
         {
             if (NavMesh.SamplePosition(world, out var hit, exact ? 1.2f : 3f, NavMesh.AllAreas)) Places[key].Add(hit.position);
         }
-        /// <summary>A random place of a kind, avoiding spots near living enemies (villagers steer clear of the collectors).</summary>
+        /// <summary>A random place of a kind, avoiding spots near living enemies (villagers steer clear of the collectors, though
+        /// they will draw water with one across the square: <see cref="KeepClear"/>).</summary>
         public Vector3? RandomPlace(string key)
         {
             if (!Places.TryGetValue(key, out var list) || list.Count == 0) return null;
-            for (int tries = 0; tries < 6; tries++)
+            for (int tries = 0; tries < 8; tries++)
             {
                 var p = list[rng.Next(list.Count)];
-                if (!EnemyNear(p, 12)) return p;
+                if (!EnemyNear(p, KeepClear)) return p;
             }
             return null;
         }
+        /// <summary>How close to a living enemy nobody will stand to work or chat. (12 m shut the well while a collector stood seven metres off.)</summary>
+        public const float KeepClear = 7;
         public bool EnemyNear(Vector3 at, float radius)
         {
             foreach (var e in Session.Enemies) if (e.actor.IsAlive && (e.transform.position - at).sqrMagnitude < radius * radius) return true;
@@ -206,12 +210,33 @@ namespace Crulanda.Encounter
             return Session.InCombat && (Session.Player.transform.position - at).sqrMagnitude < 18 * 18;
         }
         public bool EnemiesCleared { get { return Session.Enemies.TrueForAll(e => !e.actor.IsAlive); } }
-        public Villager NearestVillager(Vector3 p, float range)
+        public Villager NearestVillager(Vector3 p, float range, Villager except = null)
         {
             Villager best = null; float bestD = range * range;
-            foreach (var v in Villagers) { if (!v.Visible) continue; float d = (v.transform.position - p).sqrMagnitude; if (d < bestD) { best = v; bestD = d; } }
+            foreach (var v in Villagers) { if (!v.Visible || v == except) continue; float d = (v.transform.position - p).sqrMagnitude; if (d < bestD) { best = v; bestD = d; } }
             return best;
         }
+        /// <summary>A place of this kind where someone is at work right now (the stall with the merchant behind it), so an errand goes to them.</summary>
+        public Vector3? WorkedPlace(string kind, Villager except)
+        {
+            if (!Places.TryGetValue(kind, out var list) || list.Count == 0) return null;
+            foreach (var v in Villagers)
+            {
+                if (v == except || !v.Visible || v.Activity != kind) continue;
+                Vector3? best = null; float bestD = 2.5f * 2.5f;
+                foreach (var p in list) { float d = (p - v.transform.position).sqrMagnitude; if (d < bestD) { bestD = d; best = p; } }
+                if (best.HasValue) return best;
+            }
+            return null;
+        }
+
+        // ---------- the village's stock: goods carried between the trades ----------
+        /// <summary>What has been delivered where today, by "place.good" (inn.eggs, stall.flour, forge.wood...); see <see cref="VillageWork"/>.</summary>
+        public readonly Dictionary<string, int> Stock = new Dictionary<string, int>();
+        public int Count(string key) { return Stock.TryGetValue(key, out var n) ? n : 0; }
+        public void Deliver(string key, int n) { Stock[key] = Count(key) + n; }
+        /// <summary>Take some (what the stall sells on, what the kitchen uses); false when there is none.</summary>
+        public bool Take(string key, int n = 1) { int have = Count(key); if (have < n) return false; Stock[key] = have - n; return true; }
 
         // ---------- what people say ----------
         static readonly string[] Wary = {
@@ -291,6 +316,7 @@ namespace Crulanda.Encounter
                 return v.Keeper ? Keepers[rng.Next(Keepers.Length)] : OwnLines.TryGetValue(v.Name, out var mine) ? mine[rng.Next(mine.Length)] : Keepers[rng.Next(Keepers.Length)];
             }
             if (!toPlayer) return Chatter[rng.Next(Chatter.Length)];
+            if (rng.Next(3) == 0) { var day = StockLine(v); if (day != null) return day; }
             if (!v.Keeper && TradeLines.TryGetValue(v.Role, out var trade) && rng.Next(3) > 0) return trade[rng.Next(trade.Length)];
             if (v.Role == "henwife" && v.Coop != null)
             {
@@ -304,6 +330,22 @@ namespace Crulanda.Encounter
             var pool = mood == "afraid" ? (EnemiesCleared ? Relieved : Afraid) : EnemiesCleared ? Relieved : Wary;
             if (pool == Wary && Zone.Zone.id == "zone.oakhaven") pool = Session.Quests != null && Session.Quests.IsDone(HollowQuest) ? WaryAfterHollow : WaryRaided;
             return pool[rng.Next(pool.Length)];
+        }
+        /// <summary>What the day's deliveries give people to say: the trades talk of each other's goods (see <see cref="Stock"/>).</summary>
+        string StockLine(Villager v)
+        {
+            switch (v.Role)
+            {
+                case "merchant": return Count("stall.eggs") > 0 ? "Eggs in from the hen-wife, if you want them. Fresh today." : Count("stall.flour") > 0 ? "Flour from the mill, ground this afternoon. Dear, mind." : Count("stall.goods") > 0 ? "Belts and nails and hinges, all village-made. Nothing from the east." : null;
+                case "baker": return Count("oven.flour") > 0 ? "The miller's flour came in. Thin stuff, but it rises." : WorldClock.Between(10, 19) ? "No flour from the mill yet today. The loaves'll be late." : null;
+                case "blacksmith": return Count("forge.wood") > 0 ? "The woodcutter brought oak this morning. Hearth's drawing well." : null;
+                case "miller": return Count("mill.grain") > 0 ? "Barley's in from the fields. The stone's turning on something, at least." : null;
+                case "leatherworker": case "skinner": return Count("tannery.hides") > 0 ? "The hunter's been by with a hide. Grey at one edge; the rest'll do." : null;
+                case "henwife": return v.Done("eggs to the stall") ? "Eggs are at the produce stall if you're wanting any. I don't sell from the yard." : v.Done("eggs to the inn") ? "Took the Cask its eggs this morning. The rest go to the stall after dinner." : null;
+                case "drinker": case "elder": case "gossip": case "farmer":
+                    return Count("inn.meat") > 0 ? "Hare in the Cask's pot tonight. The hunter's doing." : Count("inn.bread") > 0 && Count("inn.eggs") > 0 ? "Bread and eggs at the Cask today. Like old times, nearly." : Count("inn.wood") > 0 ? "The Cask's got a fire going. Dry oak, for once." : null;
+                default: return null;
+            }
         }
         public void Talk(Villager v)
         {
@@ -333,10 +375,17 @@ namespace Crulanda.Encounter
         /// <summary>The coop a hen-wife keeps (null for everyone else).</summary>
         public ZoneCoop Coop { get; private set; }
         public string Activity { get { return activity; } }
-        public bool Carrying { get { return basket != null && basket.activeSelf; } }
+        /// <summary>Goods in hand (see <see cref="Load"/>), carried on an errand between trades.</summary>
+        public bool Carrying { get { return load != null; } }
+        public Load Carried { get { return loadKind; } }
+        /// <summary>The errand under way (walking to pick up, or carrying), or null.</summary>
+        public Errand Errand { get { return errand; } }
+        /// <summary>Errands finished so far today, by id.</summary>
+        public bool Done(string errandId) { return done.Contains(errandId); }
         VillageLife life; NavMeshAgent agent; ActorVisual visual; ZoneDoor home; Renderer[] renderers;
         State state; string activity; float until, calmSince, nextBark, nextChatter, bedAt, wakeAt, nextHerd;
-        Villager partner; GameObject basket; string fixedPlace;
+        Villager partner; string fixedPlace;
+        GameObject load; Load loadKind; int loadCount; Errand errand; int leg; Vector3 dropAt; readonly HashSet<string> done = new HashSet<string>(); float lastHour;
         /// <summary>Night: everyone goes home to bed (staggered; drinkers stay at the inn late, children go early).</summary>
         public bool Bedtime { get { return WorldClock.Between(bedAt, wakeAt); } }
 
@@ -356,24 +405,11 @@ namespace Crulanda.Encounter
             if (v.Keeper) { v.agent.height = 2.6f; v.agent.baseOffset = 1; v.agent.speed = 1.3f; }
             v.Title = title ?? VillageLife.TitleFor(role); v.fixedPlace = fixedPlace;
             v.Coop = coop;
-            v.bedAt = role == "drinker" ? 23 + (index % 3) * .3f : role == "child" ? 19.8f + (index % 3) * .2f : role == "henwife" ? HerdHour : 20.2f + (index % 5) * .25f;
-            v.wakeAt = role == "drinker" ? 7.5f : role == "henwife" ? 5.7f : 5.8f + (index % 5) * .3f;
+            // Bed and rising: the baker is up before dawn for the first loaves, the drinkers last to bed and last up, children early to bed.
+            v.bedAt = role == "drinker" ? 23 + (index % 3) * .3f : role == "child" ? 19.8f + (index % 3) * .2f : role == "henwife" ? HerdHour : role == "baker" ? 19.6f : 20.2f + (index % 5) * .25f;
+            v.wakeAt = role == "drinker" ? 7.5f : role == "henwife" ? 5.7f : role == "baker" ? 4.6f : 5.8f + (index % 5) * .3f;
             if (fixedPlace != null) v.bedAt = v.wakeAt = 0;   // residents keep their post day and night
-            if (coop != null)
-            {
-                // Egg basket, carried on the arm after collecting from the nest boxes.
-                v.basket = new GameObject("Egg basket"); v.basket.transform.SetParent(go.transform, false); v.basket.transform.localPosition = new Vector3(.42f, -.1f, .15f);
-                var weave = GameObject.CreatePrimitive(PrimitiveType.Cylinder); Object.Destroy(weave.GetComponent<Collider>());
-                weave.transform.SetParent(v.basket.transform, false); weave.transform.localScale = new Vector3(.34f, .1f, .26f);
-                weave.GetComponent<Renderer>().material.color = new Color(.55f, .4f, .22f);
-                for (int i = 0; i < 3; i++)
-                {
-                    var egg = GameObject.CreatePrimitive(PrimitiveType.Sphere); Object.Destroy(egg.GetComponent<Collider>());
-                    egg.transform.SetParent(v.basket.transform, false); egg.transform.localPosition = new Vector3((i - 1) * .08f, .1f, (i % 2) * .05f); egg.transform.localScale = new Vector3(.07f, .09f, .07f);
-                    egg.GetComponent<Renderer>().material.color = i == 1 ? new Color(.78f, .6f, .42f) : new Color(.95f, .92f, .85f);
-                }
-                v.basket.SetActive(false);
-            }
+            v.lastHour = WorldClock.Hour;
             go.SetActive(true);
             // Only what's showing now: the placeholder capsule ActorVisual hides must stay hidden when they come back out.
             v.renderers = System.Array.FindAll(go.GetComponentsInChildren<Renderer>(), r => r.enabled);
@@ -403,8 +439,13 @@ namespace Crulanda.Encounter
             agent.speed = (Role == "child" ? 2.4f : Role == "elder" ? 1.1f : 1.6f) * speedScale;
             agent.isStopped = false; agent.SetDestination(target); state = State.Travel; visual.Pose = ActorPose.None;
         }
+        /// <summary>
+        /// What next: bed when it is time; a resident's post; the errand that is due (see <see cref="VillageWork"/>); otherwise one of
+        /// the places the trade's shift says to be at this hour (a repeat weights the choice). Off the schedule they potter.
+        /// </summary>
         void ChooseNext()
         {
+            CancelErrand();
             if (Coop != null) { KeeperNext(); return; }
             if (Bedtime)
             {
@@ -414,52 +455,126 @@ namespace Crulanda.Encounter
                 if (bed.HasValue) Go(bed.Value); else { state = State.Activity; until = Time.time + 30; }
                 return;
             }
-            // Weighted by role; each option is a kind of place.
-            string[] options;
             if (fixedPlace != null) { activity = fixedPlace; var spot = life.RandomPlace(fixedPlace); if (spot.HasValue) Go(spot.Value); else { state = State.Activity; until = Time.time + 20; } return; }
-            switch (Role)
+            if (StartErrand()) return;
+            var shift = VillageWork.ShiftFor(Role, WorldClock.Hour);
+            GoTo(shift != null ? shift.places : Role == "child" ? new[] { "green", "green", "wander", "wander", "well" } : new[] { "wander", "green" });
+        }
+        /// <summary>Walk to one of these kinds of place (a repeat weights the choice; a kind this village lacks is passed over).</summary>
+        void GoTo(string[] options)
+        {
+            for (int tries = 0; tries < 4; tries++)
             {
-                case "farmer": options = new[] { "field", "field", "field", "field", "well", "green", "green", "inn", "home" }; break;
-                case "gossip": options = new[] { "green", "green", "green", "well", "well", "inn", "wander", "home" }; break;
-                case "drinker": options = new[] { "inn", "inn", "inn", "inn", "green", "wander" }; break;
-                case "child": options = new[] { "green", "green", "wander", "wander", "well" }; break;
-                case "elder": options = new[] { "inn", "inn", "green", "green", "home" }; break;
-                case "miller": options = new[] { "mill", "mill", "mill", "inn", "green" }; break;
-                case "blacksmith": options = new[] { "forge", "forge", "forge", "forge", "forge", "well", "inn" }; break;
-                case "merchant": options = new[] { "stall", "stall", "stall", "stall", "green", "inn" }; break;
-                case "baker": options = new[] { "oven", "oven", "oven", "oven", "stall", "well" }; break;
-                case "leatherworker": options = new[] { "tannery", "tannery", "tannery", "stall", "green" }; break;
-                case "skinner": options = new[] { "tannery", "tannery", "tannery", "woods", "well" }; break;
-                case "lumberjack": options = new[] { "woods", "woods", "woods", "woodpile", "woodpile", "inn" }; break;
-                case "hunter": options = new[] { "woods", "woods", "woods", "meadow", "tannery", "inn" }; break;
-                case "herbalist": options = new[] { "meadow", "meadow", "meadow", "woods", "stall", "green" }; break;
-                default: options = new[] { "wander", "green" }; break;
+                activity = options[life.Next(options.Length)];
+                var target = activity == "home" || activity == "yard" ? Resolve(activity) : life.RandomPlace(activity);
+                if (target.HasValue) { Go(target.Value); return; }
             }
-            activity = options[life.Next(options.Length)];
-            Vector3? target = activity == "home" && home != null ? home.position : life.RandomPlace(activity);
-            if (!target.HasValue) { activity = "wander"; target = life.RandomPlace("wander"); }
-            if (target.HasValue) Go(target.Value); else { state = State.Activity; until = Time.time + 5; }
+            activity = "wander"; var alt = life.RandomPlace("wander") ?? life.RandomPlace("green");
+            if (alt.HasValue) Go(alt.Value); else { state = State.Activity; until = Time.time + 5; }
         }
         void StartActivity()
         {
+            if (errand != null) { ErrandArrive(); return; }
             state = State.Activity; if (agent.isOnNavMesh) agent.isStopped = true;
-            until = Time.time + (activity == "home" ? 20 : 14 + life.R01 * 30);
+            until = Time.time + (activity == "home" ? HomeStay : 14 + life.R01 * 30);
             visual.Pose = PoseFor(activity);
             var look = life.LookFor(transform.position); if (look.HasValue) Face(look.Value);
             if (Coop != null) KeeperStart();
             if ((activity == "home" || activity == "sleep") && home != null) Hide();
         }
+        /// <summary>Indoors for a short call, or for the rest of a shift spent at home (the children's dinner, the hen-wife's).</summary>
+        float HomeStay
+        {
+            get
+            {
+                var s = VillageWork.ShiftFor(Role, WorldClock.Hour);
+                return s != null && s.places.Length == 1 && s.places[0] == "home" ? Mathf.Clamp((s.to - WorldClock.Hour) * WorldClock.RealMinutesPerDay * 60 / 24, 20, 240) : 20;
+            }
+        }
+
+        // ---------- errands: goods carried between the trades (see VillageWork) ----------
+        /// <summary>Start the first errand of the day that is due and not yet done; false when there is none, or its places are not in this village.</summary>
+        bool StartErrand()
+        {
+            float hour = WorldClock.Hour;
+            if (hour < lastHour - 6) done.Clear();   // a new day (or the clock jumped back to the morning)
+            lastHour = hour;
+            var day = VillageWork.DayFor(Role); if (day == null) return false;
+            foreach (var e in day.errands)
+            {
+                if (done.Contains(e.id) || hour < e.at || hour >= e.until) continue;
+                done.Add(e.id);
+                var from = Resolve(e.from); if (!from.HasValue) { Blocked(e.from); continue; }
+                Vector3? to = null; if (e.to != null) { to = Resolve(e.to); if (!to.HasValue) { Blocked(e.to); continue; } }
+                errand = e; leg = 0; dropAt = to ?? from.Value; activity = e.id; Go(from.Value); return true;
+            }
+            return false;
+        }
+        void CancelErrand() { errand = null; DropLoad(); }   // goods posed for a capture are dropped too
+        /// <summary>An errand's place is there but nobody can get near it for the grey-coats: say so, and let it go for today.</summary>
+        void Blocked(string place)
+        {
+            if (!life.Places.TryGetValue(place, out var l) || l.Count == 0 || life.R01 > .7f) return;
+            Say(place == "well" ? "Can't get to the well with that grey-coat stood by it." : "Not with the grey-coats about. It'll keep.", 4);
+        }
+        /// <summary>Where an errand's place is: home, the coop's spots, or a kind of place (where one of that trade is working now, if any).</summary>
+        Vector3? Resolve(string place)
+        {
+            switch (place)
+            {
+                case "home": return home != null ? home.position : (Vector3?)null;
+                case "nest": return Coop != null ? Coop.nest : (Vector3?)null;
+                case "trough": return Coop != null ? Coop.trough : (Vector3?)null;
+                case "pan": return Coop != null ? Coop.pan : (Vector3?)null;
+                case "yard": return Coop != null ? Around(Coop.yard, 3) : null;
+            }
+            return life.WorkedPlace(place, this) ?? life.RandomPlace(place);
+        }
+        /// <summary>At the end of an errand's leg: pick up (what the place yields shows in the hands), or hand over and say so.</summary>
+        void ErrandArrive()
+        {
+            var e = errand; state = State.Activity; if (agent.isOnNavMesh) agent.isStopped = true;
+            var look = life.LookFor(transform.position); if (look.HasValue) Face(look.Value);
+            if (leg == 0)
+            {
+                int n = e.amount;
+                if (e.from == "nest") { n = Coop.Eggs; Coop.Eggs = 0; Face(Coop.door + (Coop.nest - Coop.door) * 2); }
+                if (e.from == "trough") { Coop.FedAt = Time.time; Coop.FeedSpot = Coop.trough; Face(Coop.trough + (Coop.trough - Coop.yard)); }
+                visual.Pose = e.pose; until = Time.time + e.work; loadCount = n;
+                string pick = e.from == "nest" ? EggLine(n) : e.pickupLine ?? (e.to == null ? e.line : null);
+                if (pick != null) Say(pick, 4);
+                if (e.to == null || n == 0) { errand = null; return; }   // a task done on the spot, or nothing to carry
+                if (e.load != Load.None) Carry(e.load, n);
+            }
+            else
+            {
+                visual.Pose = e.dropPose; until = Time.time + e.work;
+                if (e.good != null) life.Deliver(e.to + "." + e.good, Mathf.Max(1, loadCount));
+                if (e.to == "pan") { Coop.Water(); Face(Coop.pan + (Coop.pan - Coop.yard)); }
+                if (e.line != null) Say(e.line.Replace("{n}", loadCount.ToString()), 5);
+                var taker = life.NearestVillager(transform.position, 6, this);
+                if (taker != null && taker.state == State.Activity) { var reply = VillageWork.Reply(e.good, life.R01); if (reply != null) taker.Say(reply, 4); taker.Face(transform.position); }
+                DropLoad();
+                if (e.to == "home" && home != null) { activity = "home"; until = Time.time + 20; Hide(); }
+                errand = null;
+            }
+        }
+        /// <summary>Capture/debug: hold these goods (as on an errand) while posed by <see cref="StandAt"/>.</summary>
+        public void ShowLoad(Load what, int count) { Carry(what, count); }
+        static string EggLine(int n) { return n >= 5 ? n + " eggs. Good girls." : n >= 2 ? n + " eggs. They're off-lay; it's the grey, I'd wager." : n == 1 ? "Just the one. Well. It's something." : "Nothing. Off-lay, the lot of you."; }
+        void Carry(Load what, int count) { DropLoad(); loadKind = what; loadCount = count; load = LoadProps.Build(transform, what, count); }
+        void DropLoad() { if (load != null) Destroy(load); load = null; loadKind = Load.None; }
         /// <summary>Capture/debug: go straight to a place of this kind and work there for a minute.</summary>
         public bool WorkAt(string place)
         {
             if (!life.Places.TryGetValue(place, out var list) || list.Count == 0 || !agent.isOnNavMesh) return false;
-            foreach (var r in renderers) r.enabled = true;
+            foreach (var r in renderers) r.enabled = true; CancelErrand();
             agent.Warp(list[0]); activity = place; StartActivity(); until = Time.time + 60; return true;
         }
         /// <summary>Capture/debug: stop and stand still at a spot, facing a direction (for line-up shots).</summary>
         public void StandAt(Vector3 at, float yaw)
         {
-            foreach (var r in renderers) r.enabled = true;
+            foreach (var r in renderers) r.enabled = true; CancelErrand();
             if (agent.isOnNavMesh) { agent.Warp(at); agent.isStopped = true; }
             transform.rotation = Quaternion.Euler(0, yaw, 0); visual.Pose = ActorPose.None; state = State.Activity; activity = "posed"; until = Time.time + 60; enabled = false;
         }
@@ -467,7 +582,7 @@ namespace Crulanda.Encounter
         public void Park()
         {
             state = State.Hidden; Bubble = null; foreach (var r in renderers) r.enabled = false;
-            if (basket != null) basket.SetActive(false);   // not left hanging in the air where she stood
+            CancelErrand();   // not left hanging in the air where they stood
             if (agent.isOnNavMesh) agent.isStopped = true; enabled = false;
         }
         /// <summary>Capture/debug: back to the day's routine after <see cref="StandAt"/> or <see cref="Park"/>, starting from where they were.</summary>
@@ -498,7 +613,7 @@ namespace Crulanda.Encounter
         void Hide()
         {
             state = State.Hidden; calmSince = Time.time; foreach (var r in renderers) r.enabled = false;
-            if (basket != null) basket.SetActive(false);   // eggs put away in the pantry
+            DropLoad();   // the goods put away in the pantry
             if (agent.isOnNavMesh) agent.isStopped = true; Bubble = null;
         }
         void Emerge()
@@ -515,22 +630,19 @@ namespace Crulanda.Encounter
         const float HerdHour = 19.3f;
         static readonly string[] HerdLines ={ "Come on, you daft bird!", "In you go. In!", "Shoo, shoo! Bedtime.", "Not you again, Speckle." };
         /// <summary>
-        /// Her day: open the coop at first light; scatter feed morning and afternoon; collect eggs from the nest
-        /// boxes and carry them home; potter in the yard. From dusk she herds stragglers in, shuts the door, and goes to bed.
+        /// Her day (the schedule in <see cref="VillageWork"/>): open the coop at first light and scatter the morning feed; eggs to the
+        /// inn's kitchen; water from the well for the hens, morning and afternoon; dinner at home; the afternoon feed; eggs to the
+        /// produce stall; the last eggs home for the pot; and pottering in the yard between. Towards dusk she stays by the coop and
+        /// watches them go up the ramp; from <see cref="HerdHour"/> she herds stragglers in, shuts the door, and goes to bed.
         /// </summary>
         void KeeperNext()
         {
             if (Coop.Open && WorldClock.Between(HerdHour, 5.5f)) { activity = "herd"; Go(Coop.yard, 1.2f); return; }
             if (Bedtime) { activity = "sleep"; if (home != null) Go(home.position); else { state = State.Activity; until = Time.time + 30; } return; }
             if (!Coop.Open) { activity = "open"; Go(Coop.door); return; }
-            if (Carrying && home != null) { activity = "home"; Go(home.position); return; }
-            if (Time.time - Coop.FedAt > 300 && WorldClock.Between(6, 17.5f)) { activity = "feed"; Go(Coop.trough); return; }
-            if (Coop.Eggs >= 3 || (Coop.Eggs > 0 && WorldClock.Between(15, 18.6f))) { activity = "eggs"; Go(Coop.nest); return; }
-            // Towards dusk she stays by the coop and watches them go up the ramp.
-            var options = WorldClock.Between(18, HerdHour) ? new[] { "yard" } : new[] { "yard", "yard", "yard", "well", "green", "home" };
-            activity = options[life.Next(options.Length)];
-            Vector3? target = activity == "yard" ? Around(Coop.yard, 3) : activity == "home" && home != null ? home.position : life.RandomPlace(activity);
-            if (target.HasValue) Go(target.Value); else { activity = "yard"; state = State.Activity; until = Time.time + 8; }
+            if (StartErrand()) return;
+            var shift = VillageWork.ShiftFor(Role, WorldClock.Hour);
+            GoTo(shift != null ? shift.places : new[] { "yard", "yard", "yard", "well" });
         }
         Vector3? Around(Vector3 p, float r)
         {
@@ -545,16 +657,6 @@ namespace Crulanda.Encounter
                 case "open":
                     Coop.SetOpen(true); visual.Pose = ActorPose.Work; until = Time.time + 5; Face(Coop.door + (Coop.door - Coop.yard) * .3f);
                     Say(life.R01 < .5f ? "Up you get, girls. Out you come." : "Morning, ladies. Mind the step.", 4); break;
-                case "feed":
-                    Coop.FedAt = Time.time; Coop.FeedSpot = Coop.trough; visual.Pose = ActorPose.Work; until = Time.time + 16;
-                    Say("Chook-chook-chook-chook!", 4); break;
-                case "eggs":
-                {
-                    int n = Coop.Eggs; Coop.Eggs = 0; visual.Pose = ActorPose.Work; until = Time.time + 8; Face(Coop.door + (Coop.nest - Coop.door) * 2);
-                    if (basket != null) basket.SetActive(n > 0);
-                    Say(n >= 5 ? n + " eggs. Good girls." : n >= 2 ? n + " eggs. They're off-lay; it's the grey, I'd wager." : "Just the one. Well. It's something.", 5);
-                    break;
-                }
                 case "yard": visual.Pose = ActorPose.None; until = Time.time + 12 + life.R01 * 18; if (life.R01 < .35f) Say(life.R01 < .5f ? "There's my speckled lady." : "Who's been scratching up my beans?", 4); break;
                 case "herd": visual.Pose = ActorPose.None; until = float.MaxValue; break;
                 case "close":
@@ -632,13 +734,18 @@ namespace Crulanda.Encounter
                 until = Mathf.Max(until, Time.time + 3);
             }
             if (Interrupted) { partner = null; ChooseNext(); return; }
-            if (state == State.Travel && Stranded) { partner = null; activity = "wander"; var alt = life.RandomPlace("wander"); if (alt.HasValue) Go(alt.Value); else { state = State.Activity; until = Time.time + 5; } return; }
+            if (state == State.Travel && Stranded) { partner = null; CancelErrand(); activity = "wander"; var alt = life.RandomPlace("wander"); if (alt.HasValue) Go(alt.Value); else { state = State.Activity; until = Time.time + 5; } return; }
             if (state == State.Travel && Arrived) StartActivity();
             if (state == State.Activity)
             {
                 if (activity == "green" || activity == "well") Chat();
                 if (activity == "herd") Herd();
-                else if (Time.time > until) { partner = null; ChooseNext(); }
+                else if (Time.time > until)
+                {
+                    partner = null;
+                    if (errand != null && leg == 0) { leg = 1; Go(dropAt); }   // picked up: carry it over
+                    else ChooseNext();
+                }
             }
             BarkAtPlayer();
         }

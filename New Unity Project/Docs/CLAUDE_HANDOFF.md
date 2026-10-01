@@ -9,7 +9,19 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-10-01, early morning)
+## RESUME HERE (updated 2026-10-01, morning)
+**STOPPED MID-STEP (Chris rebooting, 2026-10-01 ~01:40): the deep, the hidden mouth and the trades' days are COMMITTED but NOT yet
+published or backed up to J:.** The full run was EditMode 186/186, PlayMode 80/81 (RootDeepTests green; the one failure, no water
+for the hens, was the first collector standing 7 m from the well with villagers keeping 12 m from enemies: now `VillageLife.KeepClear`
+= 7 m, and a blocked errand says so). After that fix a focused run (`toolsalidationun_focus.ps1`) showed two NEW failures to look at
+first: `OakhavenQuestTests.Chronicle_one...` (a NullReferenceException; read `encounter-validationocus.log`) and
+`VillageErrandTests.The_hen_wife_carries_her_eggs...` (`session.VendorNpc` null after `OpenVendor(merchant)`). Then: full run, tour
+(`build_and_tour.ps1 -Zones zone.oakhaven,zone.verdant`), view `oakhaven-99-errands-lineup-*.png` and the deep's `verdant-85/86/88/89`
+shots, publish, `tools\Backup.ps1`, tell Chris. The painted style pass (buildings first) is prepared in `tools\wip\painted\`
+(`ZoneSceneBuilder.Painted.cs` goes in `Assets/Crulanda/Editor/` with `public static partial class ZoneSceneBuilder` and a
+`PaintedTextures(art)` call at the end of `EnsureArt`; `ZoneArt` gains `public Material masonry;`; `patch_buildings.py` patches
+ZoneMeshes/ZoneBuilder).
+
 **The standing direction is in `GAME_BRIEF.md` (read it first): a high-fidelity, beautiful MMO-style world, AAA quality in a classic style, judged on details, graphics, lighting, mood and visual feel.**
 Chris's rules: work in order of importance; finish each step; keep going without waiting (memory: crulanda-autonomy); tell him at each publish.
 Chris was away from 2026-09-30 evening and gave authority to carry on through the phases unattended, publishing each.
@@ -40,6 +52,16 @@ Chris was away from 2026-09-30 evening and gave authority to carry on through th
     breadcrumb; and the lush art every zone now shares (painted ferns, broad leaves, reeds, flower drifts, giant trees,
     waterfalls, mushrooms, real dead trees). Design: `WORLD_ZONES.md` "The Verdant Shore" and "Painted plants and lush props",
     `QUEST_DESIGN.md`, the CHANGELOG.
+  - and now **THE ROOT-MOTHER'S DEEP and the hidden Crowsfoot mouth** (published 2026-10-01 morning): the Verdant Shore's
+    dungeon under the Temple (a second cavern plan, `variant: 1`, grown through earth and root: the Root Gallery, the Sap Well,
+    the Cold Stair, the Heart with the Root-Mother and the cold in her root; six camps and the Hollow Root-Warden; the finale
+    quest `main.verdant.5`); and Crowsfoot's mouth as a slot in a cliff face at the end of a bent track, not a rock on the
+    grass. Design: `WORLD_ZONES.md` "Caves you walk into", `QUEST_DESIGN.md`, the CHANGELOG.
+  - and now **EVERY TRADE HAS A DAY** (published 2026-10-01 morning): `VillageWork.cs`, daily shifts and errands for every
+    trade, goods carried in their hands between the trades (eggs, water, grain, flour, bread, logs, hides, herbs, hares,
+    wares), the village's stock, the trades talking about each other's goods, the hen-wife's full day (feed, eggs to the inn,
+    water to the hens' pan, dinner, feed, eggs to the stall, eggs home) and Oakhaven eggs on the merchant's stall. Design:
+    `WORLD_ZONES.md` "Life, day and night", the CHANGELOG.
 - **Weather** covers:
   - per-zone seeded schedules (7-minute spells, one severity step at a time);
   - a painted cloud layer and cloud shadows;
@@ -53,7 +75,8 @@ Chris was away from 2026-09-30 evening and gave authority to carry on through th
   - the store title, "The Quiet Trail" (the productName) or "The Land of Crulanda" as the novels and bullet-hell use;
   - that *The First Spoke* is out.
 
-~~THE VERDANT SHORE~~ DONE and published 2026-10-01. **NEXT JOB: THE PAINTED STYLE PASS on the four older zones**, reusing
+~~THE VERDANT SHORE~~, ~~THE ROOT-MOTHER'S DEEP~~ and ~~EVERY TRADE HAS A DAY~~ DONE and published 2026-10-01. **NEXT JOB: THE
+PAINTED STYLE PASS on the four older zones**, reusing
 the lush art (the undergrowth, dead trees and glowing plants are already in them): richer saturated colour per biome, more
 plant kinds, sculpted rock with painted gradient shading, chunky stylized props (rope-and-post bridges, the `bridge`
 variant 1), a warm clear sky; each zone keeps its mood. Then: the Verdant Shore's optional extras from the zone agent's notes

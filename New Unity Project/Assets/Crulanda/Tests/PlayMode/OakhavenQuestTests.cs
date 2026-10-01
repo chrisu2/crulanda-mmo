@@ -76,11 +76,13 @@ namespace Crulanda.Tests
             Assert.Less(Vector3.Distance(at, corwin.transform.position), 1f, "He waits while the conversation is open.");
             session.Conversation = null;
 
-            // Mira is closest, so E defaults to her; selecting a villager makes E talk to them instead.
+            // Mira is closest, so E defaults to her; selecting a villager makes E talk to them instead. On the open green (Corwin may be
+            // anywhere in the inn by now, and a warp beside a table misses the navmesh), with both of them straight ahead.
             var sel = VillageLife.Active.Find("Sel Harrow");
-            var p = session.Player.transform.position;
-            session.Companion.GetComponent<UnityEngine.AI.NavMeshAgent>().Warp(p + Vector3.left * 1.2f - Vector3.up * .1f);
-            sel.StandAt(p + Vector3.forward * 2.4f - Vector3.up * .1f, 180);
+            motor.Teleport(session.Zone.Ground(session.Zone.Zone.spawns.recovery) + Vector3.up * .1f); yield return null;
+            var p = session.Player.transform.position; var fwd = session.Player.transform.forward; fwd.y = 0; fwd.Normalize();
+            session.Companion.GetComponent<UnityEngine.AI.NavMeshAgent>().Warp(p + fwd * 1.2f - Vector3.up * .1f);
+            sel.StandAt(p + fwd * 2.6f - Vector3.up * .1f, 180);
             // Anyone else who happens to be passing (the village's day moves people about) steps well clear first.
             foreach (var v in VillageLife.Active.Villagers)
                 if (v != sel && v != corwin && Vector3.Distance(v.transform.position, p) < 6) v.StandAt(p + Vector3.back * 25 + Vector3.right * 3 * VillageLife.Active.Villagers.IndexOf(v), 0);

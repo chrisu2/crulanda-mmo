@@ -39,6 +39,8 @@ Warrior nine-node talent prototype is now implemented with B-key UI, live effect
 ## World life / day-night — 2026-09-28
 - The world clock is not saved. Each launch starts at 08:30, and the hour carries across zone travel only within one run.
 - Villagers, hens and eggs are only simulated while the zone is loaded. Nothing catches up off-screen.
-- Eggs are counted, not yet items. The hen-wife's basket is cosmetic.
+- Eggs are counted at the coop; they become an item ("Oakhaven eggs") only once the hen-wife has sold them to the stall. The
+  other goods the trades carry (grain, flour, bread, wood, hides, herbs) are a stock count the village talks about, not items.
+- The village's stock and the day's errands are not saved: a new load starts the day's deliveries again.
 - Chickens walk in straight lines (no pathfinding) and can cut through thin props.
 - Night uses the same directional light as a moon. Windows glow the same by day and night.

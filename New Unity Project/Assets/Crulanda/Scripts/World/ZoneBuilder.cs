@@ -934,7 +934,7 @@ namespace Crulanda.World
                     case "shrine": Shrine(t); break;
                     case "idol": Idol(t); break;
                     case "wayshrine": Wayshrine(t); break;
-                    case "cavern": Cavern(t, Hollow.All.Find(h => h.Name == t.name)); break;
+                    case "cavern": Cavern(t, Hollow.All.Find(h => h.Name == t.name), p.variant); break;
                     default: Debug.LogWarning("Unknown zone prop kind '" + p.kind + "'."); break;
                 }
                 rng = zoneRng;
@@ -1780,13 +1780,18 @@ namespace Crulanda.World
             var hinge = new GameObject("Coop door hinge").transform; hinge.SetParent(t, false); hinge.localPosition = new Vector3(0, floor + .05f, -d / 2 - .07f);
             Part(PrimitiveType.Cube, hinge, new Vector3(0, .3f, 0), new Vector3(.56f, .62f, .05f), dark);
             Part(PrimitiveType.Cube, t, new Vector3(0, floor / 2, -d / 2 - .75f), new Vector3(.5f, .05f, 1.6f), boards, Quaternion.Euler(-26, 0, 0));
-            // Feed trough and a grain sack out front.
+            // Feed trough and a grain sack out front, and a water pan the other side of the ramp (the hen-wife fills it from the well;
+            // the water sinks as the day dries it).
             Part(PrimitiveType.Cube, t, new Vector3(-1.4f, .18f, -d / 2 - 1.6f), new Vector3(1.2f, .25f, .35f), dark);
             Part(PrimitiveType.Cube, t, new Vector3(-1.4f, .3f, -d / 2 - 1.6f), new Vector3(1.1f, .04f, .25f), art.hay);
             Part(PrimitiveType.Sphere, t, new Vector3(1.5f, .35f, -d / 2 - .5f), new Vector3(.55f, .7f, .5f), art.cloth);
+            var pan = new GameObject("Water pan").transform; pan.SetParent(t, false); pan.localPosition = new Vector3(1.3f, 0, -d / 2 - 1.7f);
+            Part(PrimitiveType.Cylinder, pan, new Vector3(0, .08f, 0), new Vector3(.8f, .08f, .8f), Tint(art.metal, new Color(.3f, .3f, .32f)));
+            var water = Part(PrimitiveType.Cylinder, pan, new Vector3(0, .06f, 0), new Vector3(.68f, .012f, .68f), Tint(art.stone, new Color(.3f, .42f, .5f)));
+            water.SetActive(false);
             Solid(t, new Vector3(.2f, (floor + h + .9f) / 2, 0), new Vector3(w + .9f, floor + h + .9f, d + .2f));
             var coop = new ZoneCoop { name = name, hinge = hinge, door = t.TransformPoint(new Vector3(0, 0, -d / 2 - 1.7f)), yard = t.TransformPoint(new Vector3(0, 0, -d / 2 - 4.5f)),
-                nest = t.TransformPoint(new Vector3(w / 2 + 1.1f, 0, 0)), trough = t.TransformPoint(new Vector3(-1.4f, 0, -d / 2 - 2.3f)) };
+                nest = t.TransformPoint(new Vector3(w / 2 + 1.1f, 0, 0)), trough = t.TransformPoint(new Vector3(-1.4f, 0, -d / 2 - 2.3f)), pan = t.TransformPoint(new Vector3(1.3f, 0, -d / 2 - 2.4f)), water = water.transform };
             coop.SetOpen(false); Coops.Add(coop);
         }
         /// <summary>
@@ -2815,6 +2820,23 @@ namespace Crulanda.World
         }
         // ---------- walk-in caves ----------
         /// <summary>Walk-in caves ("cavern" props): their passages, known before the ground is painted, the grass sown or a tree grown.</summary>
+        /// <summary>
+        /// Variant 1, the Root-Mother's Deep under the Veridian Temple (the Verdant Shore's dungeon): the root-stair down from the
+        /// Temple's sunk hollow; the Root Gallery, a hall of root columns; a root-choked passage east; the Sap Well, a chamber round a
+        /// pool of glowing sap; the Cold Stair down west; and the Root-Mother's Heart, seventeen metres down, where the cold has
+        /// got into the root. No stretch steeper than about 30 degrees.
+        /// </summary>
+        static float[][] RootDeepPlan()
+        {
+            return new[] {
+                new[] { 0f, -1.2f, 2.2f, 3.2f, 0 }, new[] { 0f, 2, 2.3f, 3.2f, -.6f }, new[] { .4f, 6, 2.5f, 3.4f, -2.6f }, new[] { .8f, 10, 2.7f, 3.6f, -4.6f },
+                new[] { 1.2f, 14, 3.2f, 4, -6.6f }, new[] { 1f, 18, 5, 5, -8 }, new[] { .5f, 23, 6.5f, 6, -8.6f }, new[] { 0f, 29, 6.2f, 5.8f, -8.9f },
+                new[] { 1f, 34, 4, 4.4f, -9.2f }, new[] { 4f, 38, 2.6f, 3.2f, -9.8f }, new[] { 8f, 41.5f, 2.4f, 3, -10.6f }, new[] { 12f, 45, 2.6f, 3.2f, -11.4f },
+                new[] { 15f, 50, 5, 4.8f, -12 }, new[] { 16f, 56, 6, 5.2f, -12.2f }, new[] { 14.5f, 62, 4.5f, 4.4f, -12.4f },
+                new[] { 11f, 66, 2.6f, 3.2f, -13.2f }, new[] { 6.5f, 69.5f, 2.5f, 3.1f, -14.6f }, new[] { 2f, 73, 2.8f, 3.4f, -16 },
+                new[] { 0f, 78, 7, 7, -16.5f }, new[] { -1f, 84, 9, 8.5f, -16.8f }, new[] { -1.5f, 90, 8.5f, 8, -16.8f }, new[] { -2f, 95, 5, 5.5f, -16.8f },
+                new[] { -2f, 98, 2, 2.5f, -16.8f }, new[] { -2f, 99.5f, .3f, .4f, -16.8f } };
+        }
         void PrepareHollows()
         {
             Hollow.All.Clear();
@@ -2832,8 +2854,9 @@ namespace Crulanda.World
         /// </summary>
         static float[][] CavernPlan(int variant)
         {
+            if (variant == 1) return RootDeepPlan();
             return new[] {
-                new[] { 0f, -1.2f, 2.7f, 3.5f, 0 }, new[] { 0f, 1.5f, 2.4f, 3.3f, 0 }, new[] { .3f, 5, 2.5f, 3.4f, 0 }, new[] { .6f, 8.5f, 4.4f, 4.4f, 0 },
+                new[] { 0f, -1.2f, 1.9f, 2.7f, 0 }, new[] { 0f, 1.5f, 2f, 2.9f, 0 }, new[] { .3f, 5, 2.4f, 3.3f, 0 }, new[] { .6f, 8.5f, 4.4f, 4.4f, 0 },   // a low, narrow mouth: a hole in the hill, not a gate
                 new[] { 1f, 12, 6.4f, 5.6f, 0 }, new[] { .5f, 15.5f, 6.1f, 5.4f, 0 }, new[] { -1.5f, 18.5f, 4, 4.3f, 0 },
                 new[] { -4.5f, 20.6f, 2.6f, 3.4f, 0 }, new[] { -8f, 21.6f, 2.5f, 3.3f, -.2f },
                 new[] { -11.2f, 23.8f, 2.8f, 3.5f, -.8f }, new[] { -12.8f, 27.4f, 2.6f, 3.5f, -2.2f }, new[] { -12.6f, 31.2f, 2.5f, 3.6f, -4.4f },
@@ -2854,10 +2877,13 @@ namespace Crulanda.World
         /// pile, "The deserters' plunder"). The light and the air darken as you go in (Hollow.CameraDepth). Draws only from its own
         /// stream (BuildProps gives new landmark kinds one).
         /// </summary>
-        void Cavern(Transform t, Hollow h)
+        void Cavern(Transform t, Hollow h, int variant = 0)
         {
             if (h == null || h.Centre.Count < 3) return;
-            var rock = Tint(art.stone, new Color(.42f, .39f, .35f)); var knoll = Tint(art.stone, new Color(.46f, .44f, .41f));
+            bool roots = variant == 1;   // the Root-Mother's Deep: earth and root, not rock; sap-light, not torches
+            // The shell's outside is the hillside's rock: dark and mossed in a meadow (it is dug into a brow), the zone's stone elsewhere.
+            var rock = roots ? Tint(art.bark, new Color(.3f, .24f, .16f)) : Tint(art.stone, new Color(.42f, .39f, .35f));
+            var knoll = roots ? Tint(art.soil, new Color(.24f, .2f, .13f)) : Tint(art.stone, Zone.biome == "meadow" ? new Color(.33f, .34f, .29f) : new Color(.46f, .44f, .41f));
             int n = h.Centre.Count; const int K = 14; int P = K + 3;
             var c = new Vector3[n]; var right = new Vector3[n];
             for (int i = 0; i < n; i++) c[i] = t.InverseTransformPoint(h.Centre[i]);
@@ -2981,7 +3007,7 @@ namespace Crulanda.World
             for (float s = 1.5f; s < h.Length; s += 2.3f)
             {
                 int i = 0; while (i + 1 < n && h.Along[i + 1] <= s) i++;
-                if (!h.NearSurface(i)) continue;   // deep under the land: nothing of the knoll shows
+                if (!h.NearSurface(i) || roots) continue;   // deep under the land: nothing of the knoll shows (a root deep shows nothing anyway)
                 var fwd = new Vector3(-right[i].z, 0, right[i].x); float yaw = Mathf.Atan2(fwd.x, fwd.z) * Mathf.Rad2Deg;
                 // Crests: one or two rocks broken up out of the top, the bigger over the chambers.
                 for (int r = 0; r < 2; r++)
@@ -3025,7 +3051,7 @@ namespace Crulanda.World
                 for (int i = 0; i < n; i++) { int o = i * 2; ft.AddRange(new[] { o, o + 2, o + 1, o + 1, o + 2, o + 3 }); }
                 if (Vector3.Cross(fv[ft[1]] - fv[ft[0]], fv[ft[2]] - fv[ft[0]]).y < 0) for (int q = 0; q < ft.Count; q += 3) { int sw = ft[q + 1]; ft[q + 1] = ft[q + 2]; ft[q + 2] = sw; }   // facing up
                 var floorMesh = new Mesh { name = h.Name + " floor" }; floorMesh.SetVertices(fv); floorMesh.SetUVs(0, fuv); floorMesh.SetTriangles(ft, 0); floorMesh.RecalculateNormals(); floorMesh.RecalculateBounds();
-                var ground = MeshPart(floorMesh, t, Vector3.zero, Tint(art.soil, new Color(.34f, .3f, .25f)));
+                var ground = MeshPart(floorMesh, t, Vector3.zero, Tint(art.soil, roots ? new Color(.2f, .16f, .1f) : new Color(.34f, .3f, .25f)));
                 ground.AddComponent<MeshCollider>().sharedMesh = floorMesh; ground.AddComponent<NavWalkable>();
             }
             // Where things stand inside: the passage floor under a point (in the root's frame), not the land far above it.
@@ -3048,6 +3074,12 @@ namespace Crulanda.World
                 o.AddComponent<BoxCollider>().size = size; o.AddComponent<NavBlocker>();
             }
 
+
+            if (roots)
+            {
+                RootDeepInterior(t, h, c, right, ring, n, P, FloorY, RingAt, On, Along, Block);
+                return;
+            }
             // Inside: torches down the walls, alternating sides, set on the rock at about head height; every twelfth one in the deep
             // left dark (the deserters don't waste pitch on every stretch).
             int torchNo = 0;
@@ -3181,6 +3213,117 @@ namespace Crulanda.World
                     for (int b = 0; b < 2; b++) Part(PrimitiveType.Cylinder, t, at + new Vector3(b * .2f, .05f, 0), new Vector3(.07f, .3f, .07f), Bone, Quaternion.Euler(0, b * 70 + k * 40, 90));
                 }
             }
+        }
+        /// <summary>
+        /// The Root-Mother's Deep (CANON-EXPANDED: the Veridian Temple and the Root-Mother are Book 3's; the deep is GAME-ONLY): a
+        /// passage of earth and root under the Temple, lit by veins of glowing sap in the walls and teal fungus, not torches. Root
+        /// columns in the Gallery; a pool of emerald sap in the Sap Well with a Keeper's votive stones round it; and in the Heart, the
+        /// Root-Mother herself, a vast knot of root in the back wall with a hollow where a face would be, the cold got into her: a black
+        /// many-faced rod lodged in the root with hoarfrost spreading from it, which the quest has you salt ("The cold in the root").
+        /// Its own stream (TreeRandom at the mouth).
+        /// </summary>
+        void RootDeepInterior(Transform t, Hollow h, Vector3[] c, Vector3[] right, Vector3[,] ring, int n, int P, Func<float, float, float> FloorY, Func<float, int> RingAt, Func<float, float, Vector3> On, Func<float, Quaternion> Along, Action<Vector3, Vector3, Quaternion> Block)
+        {
+            var dr = TreeRandom(t.position); float D() { return (float)dr.NextDouble(); }
+            var bark = Tint(art.bark, new Color(.34f, .27f, .18f)); var pale = Tint(art.bark, new Color(.6f, .56f, .48f));
+            var sap = Glowing(new Color(.3f, 1, .5f), 1.6f); var fungus = Glowing(new Color(.3f, .95f, .8f), .9f); var frost = Glowing(new Color(.85f, .9f, 1), .35f);
+            var loam = Tint(art.soil, new Color(.17f, .13f, .09f));
+            // Sap veins: a few short glowing segments on the walls every six metres or so, and a dim green light at every third.
+            for (float s0 = 2.5f; s0 < h.Length - 2; s0 += 5.5f + D() * 2)
+            {
+                int i = RingAt(s0); int side = D() < .5f ? 1 : -1; int k = side > 0 ? 2 + (int)(D() * 4) : P - 3 - (int)(D() * 4);
+                var at = ring[i, k]; var inward = c[i] + Vector3.up * (at.y - c[i].y) - at; inward.y = 0; inward.Normalize();
+                for (int v = 0; v < 3 + (int)(D() * 3); v++)
+                {
+                    var from = at + inward * .08f + new Vector3((D() - .5f) * .8f, (D() - .5f) * 1.2f, (D() - .5f) * .8f);
+                    var dir = (new Vector3(D() - .5f, .6f + D() * .6f, D() - .5f)).normalized * (.5f + D() * .7f);
+                    Part(PrimitiveType.Capsule, t, from + dir / 2, new Vector3(.05f, dir.magnitude / 2, .05f), sap, Quaternion.FromToRotation(Vector3.up, dir));
+                }
+                if ((int)(s0 / 5.5f) % 3 == 0) Glow(t, c[i] + Vector3.up * 1.6f + inward * -.5f, 7, .55f, new Color(.4f, 1, .55f), .55f);
+                // Fungus near the vein, and a drip of sap on the floor under it.
+                for (int f = 0; f < 4; f++) Part(PrimitiveType.Sphere, t, at + inward * .06f + new Vector3((D() - .5f) * .7f, (D() - .5f) * .5f - .6f, (D() - .5f) * .7f), new Vector3(.14f + D() * .1f, .05f, .11f + D() * .08f), fungus, Quaternion.LookRotation(inward) * Quaternion.Euler(90, 0, 0));
+                Part(PrimitiveType.Cylinder, t, On(s0, side * h.Half[i] * .6f) + Vector3.up * .012f, new Vector3(.6f + D() * .5f, .01f, .5f + D() * .4f), sap, Along(s0) * Quaternion.Euler(0, D() * 90, 0));
+            }
+            // Roots through the walls and roof: knotted root-ends poking in everywhere, thicker in the Gallery.
+            for (float s0 = 1; s0 < h.Length - 2; s0 += 1.6f)
+            {
+                int i = RingAt(s0); if (D() < .35f) continue;
+                int k = 1 + (int)(D() * (P - 2)); var at = ring[i, k]; var inward = c[i] + Vector3.up * (at.y - c[i].y) - at; inward.y = 0; inward.Normalize();
+                var dir = (inward * .6f + new Vector3((D() - .5f) * .6f, -.3f - D() * .6f, (D() - .5f) * .6f)).normalized; float len = .6f + D() * 1.2f;
+                Limb(t, at - inward * .2f, at + dir * len, .07f + D() * .08f, .02f, bark, .15f, 6);
+            }
+            // The chambers: the Gallery (the widest ring in the first third), the Sap Well (the middle third) and the Heart (the last).
+            int widest(float from, float to) { int best = -1; for (int i = 0; i < n; i++) if (h.Along[i] >= from && h.Along[i] <= to && (best < 0 || h.Half[i] > h.Half[best])) best = i; return best; }
+            int gallery = widest(h.Length * .15f, h.Length * .4f), well = widest(h.Length * .45f, h.Length * .7f), heart = widest(h.Length - 26, h.Length - 4);
+            if (gallery >= 0)
+            {
+                // Root columns from floor to roof, a little off plumb, with knobs, two rows down the hall; solid.
+                float sg = h.Along[gallery];
+                for (int k = 0; k < 6; k++)
+                {
+                    float s1 = sg - 6 + k * 2.4f + (D() - .5f); int i = RingAt(s1); int side = k % 2 == 0 ? 1 : -1;
+                    var foot = On(s1, side * h.Half[i] * .45f); float tall = h.Height[i] * 1.15f;
+                    var lean = new Vector3((D() - .5f) * .3f, 1, (D() - .5f) * .3f).normalized;
+                    var col = Part(PrimitiveType.Cylinder, t, foot + lean * tall / 2, new Vector3(.5f + D() * .3f, tall / 2, .5f + D() * .3f), bark, Quaternion.FromToRotation(Vector3.up, lean));
+                    for (int b = 0; b < 3; b++) Part(PrimitiveType.Sphere, t, foot + lean * (tall * (.2f + D() * .6f)) + new Vector3((D() - .5f) * .5f, 0, (D() - .5f) * .5f), Vector3.one * (.5f + D() * .4f), bark);
+                    Block(foot, new Vector3(1.1f, tall, 1.1f), Quaternion.identity);
+                }
+            }
+            if (well >= 0)
+            {
+                // The Sap Well: a pool of glowing sap in a rim of pale root against the east wall (the way through stays open along the
+                // west), drips from the roof, a Keeper's votive stones round it.
+                float sw = h.Along[well]; float pr = Mathf.Min(2.4f, h.Half[well] * .36f); var pool = On(sw, h.Half[well] - pr - .7f);
+                Part(PrimitiveType.Cylinder, t, pool + Vector3.up * .06f, new Vector3(pr * 2 + .8f, .12f, pr * 2 + .8f), pale);
+                Part(PrimitiveType.Cylinder, t, pool + Vector3.up * .13f, new Vector3(pr * 2, .03f, pr * 2), sap);
+                Glow(t, pool + Vector3.up * 1.4f, 11, 1.1f, new Color(.4f, 1, .55f), 1.2f);
+                Block(pool, new Vector3(pr * 2 + .6f, .3f, pr * 2 + .6f), Quaternion.identity);
+                for (int k = 0; k < 7; k++) { float a = k * 51 * Mathf.Deg2Rad + D(); var st = pool + new Vector3(Mathf.Cos(a), 0, Mathf.Sin(a)) * (pr + .8f + D() * .4f); Part(PrimitiveType.Cube, t, st + Vector3.up * .25f, new Vector3(.35f, .5f + D() * .4f, .3f), pale, Quaternion.Euler(0, D() * 360, 0)); }
+                for (int k = 0; k < 5; k++)
+                {
+                    var top = pool + new Vector3((D() - .5f) * pr * 1.6f, h.Height[well] * .92f, (D() - .5f) * pr * 1.6f);
+                    Part(PrimitiveType.Capsule, t, top - Vector3.up * .5f, new Vector3(.06f, .5f, .06f), sap);
+                }
+            }
+            if (heart >= 0)
+            {
+                // The Root-Mother: a vast knot of root grown out of the back wall, a hollow where a face would be; roots off it into the
+                // floor and roof. Before her, lodged in the root, the cold: a black many-faced rod and hoarfrost spreading from it.
+                float sEnd = h.Length - 3.5f; var seat = On(sEnd, 0); var toDoor = On(h.Length - 20, 0) - seat; toDoor.y = 0; var face = Quaternion.LookRotation(toDoor.normalized);
+                var knot = seat + face * new Vector3(0, 0, -1.5f);
+                Part(PrimitiveType.Sphere, t, knot + Vector3.up * 2.6f, new Vector3(7, 5.2f, 4), bark, face);
+                Part(PrimitiveType.Sphere, t, knot + Vector3.up * 5.4f, new Vector3(4.2f, 3.4f, 3), bark, face);
+                Part(PrimitiveType.Sphere, t, knot + face * new Vector3(0, 5.3f, 1.4f), new Vector3(1.6f, 2.2f, 1), Tint(art.soil, new Color(.05f, .04f, .03f)), face);   // the hollow of the face
+                foreach (int side in new[] { -1, 1 }) Part(PrimitiveType.Sphere, t, knot + face * new Vector3(side * .55f, 5.6f, 1.95f), new Vector3(.22f, .14f, .1f), sap, face);   // and the sap-light in it
+                Glow(t, knot + face * new Vector3(0, 5.2f, 2.6f), 13, 1.3f, new Color(.4f, 1, .55f), 1.4f);   // her face lit from its own hollow
+                Glow(t, On(h.Length - 11, 0) + Vector3.up * 2.4f, 15, .5f, new Color(.35f, .9f, .5f), .6f);   // and a little of it reaching across the Heart
+                for (int k = 0; k < 14; k++)
+                {
+                    float a = (k * 25.7f + D() * 20) * Mathf.Deg2Rad, r = 2.6f + D() * 2.4f; var from = knot + Vector3.up * (1 + D() * 4) + face * new Vector3(Mathf.Sin(a) * 3, 0, Mathf.Cos(a) * 1.5f);
+                    var to = from + face * new Vector3(Mathf.Sin(a) * r, k % 3 == 0 ? 3 + D() * 3 : -from.y + .1f, Mathf.Cos(a) * r * .8f + 2);
+                    Limb(t, from, to, .3f + D() * .25f, .05f, bark, .12f, 7);
+                }
+                Block(knot, new Vector3(6, 7, 3.5f), face);
+                var cold = seat + face * new Vector3(1.6f, 0, 2.4f); cold.y = FloorY(cold.x, cold.z);
+                var husk = new GameObject("The cold in the root").transform; husk.SetParent(t, false); husk.localPosition = cold; husk.localRotation = face;
+                var black = Tint(art.metal, new Color(.04f, .04f, .06f));
+                Part(PrimitiveType.Cylinder, husk, new Vector3(0, .9f, 0), new Vector3(.22f, .8f, .22f), black, Quaternion.Euler(12, 30, 8));
+                Part(PrimitiveType.Cylinder, husk, new Vector3(.02f, .9f, .02f), new Vector3(.2f, .7f, .2f), black, Quaternion.Euler(-10, 75, -6));
+                Part(PrimitiveType.Sphere, husk, new Vector3(0, 1.75f, 0), new Vector3(.3f, .3f, .3f), Glowing(new Color(.45f, .2f, .7f), 1.2f));
+                for (int k = 0; k < 9; k++) Part(PrimitiveType.Sphere, husk, new Vector3((D() - .5f) * 3.2f, .03f, (D() - .5f) * 3.2f), new Vector3(.6f + D() * .9f, .05f, .5f + D() * .8f), frost);   // the hoarfrost
+                Part(PrimitiveType.Sphere, husk, new Vector3(0, .25f, 0), new Vector3(1.6f, .5f, 1.6f), pale);   // the root it is lodged in, gone pale
+                Glow(husk, new Vector3(0, 1.8f, 0), 6, .5f, new Color(.6f, .35f, .9f), .9f);
+                Interactables.Add(new ZoneInteractable { name = husk.name, prompt = "Salt the cold root", kind = "crates", position = husk.position, root = husk });
+                // Bones of what came down before, and the Pilgrim's abandoned pack by the way in.
+                for (int k = 0; k < 3; k++)
+                {
+                    var at = On(h.Along[heart] + (D() - .5f) * 8, (D() - .5f) * h.Half[heart]);
+                    for (int b = 0; b < 2; b++) Part(PrimitiveType.Cylinder, t, at + new Vector3(b * .2f, .05f, 0), new Vector3(.07f, .3f, .07f), Bone, Quaternion.Euler(0, b * 70 + k * 40, 90));
+                }
+            }
+            // Puddles of seep-water, dark, here and there (stone, not metal: nothing to reflect down here).
+            var puddle = Tint(art.stone, new Color(.12f, .11f, .1f));
+            for (float s0 = 4; s0 < h.Length - 3; s0 += 4.5f) if (D() < .4f) Part(PrimitiveType.Cylinder, t, On(s0, (D() - .5f) * h.Half[RingAt(s0)]) + Vector3.up * .012f, new Vector3(.9f + D() * .8f, .01f, .6f + D() * .6f), puddle, Along(s0) * Quaternion.Euler(0, D() * 90, 0));
         }
         /// <summary>A pitch torch in a wall: a short stick leaning out of the rock, its glowing head and flame, a flickering light.</summary>
         void Torch(Transform t, Vector3 wallAt, Vector3 inward)

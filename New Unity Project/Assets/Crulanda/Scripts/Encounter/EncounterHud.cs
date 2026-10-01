@@ -517,7 +517,8 @@ namespace Crulanda.Encounter
                     bool named = vd < 18; char m = HeadMarker(v.Name, vd, out bool grey);
                     if (!named && m == ' ' && (v.Bubble == null || Time.time >= v.BubbleUntil)) continue;
                     if (Occluded(root + Vector3.up * .85f)) continue;
-                    string title = named && v.Title != null ? Bracketed(v.Title) : null;
+                    // On an errand with goods in hand, the trade line says where they are bound: <Hen-wife · eggs to the inn>.
+                    string title = named && v.Title != null ? Bracketed(v.Carrying && v.Errand != null ? v.Title + " · " + v.Errand.id : v.Title) : null;
                     float w = Mathf.Max(Mathf.Max(named ? TextWidth(plateText, v.Name) : 0, title != null ? TextWidth(plateText, title) : 0), m != ' ' ? 28 : 0) + 8;
                     AddPlate(new Plate { dist = vd, fade = named ? Mathf.Clamp01((18 - vd) / 4) : 0, top = named ? (title != null ? -41 : -25) : -20, at = vp, v = v, named = named, name = v.Name, title = title, mark = m, grey = grey }, w);
                 }

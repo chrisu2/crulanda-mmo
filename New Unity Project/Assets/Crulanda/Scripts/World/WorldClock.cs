@@ -166,6 +166,18 @@ namespace Crulanda.World
         /// <summary>Feed scattered on the ground this long ago, and where (hens come running).</summary>
         public float FedAt = -999; public Vector3 FeedSpot;
         public bool Feeding { get { return Time.time - FedAt < 28; } }
+        /// <summary>The water pan by the ramp: where the hen-wife stands to fill it, its water (a disc that sinks as it dries), and how full it is.</summary>
+        public Vector3 pan; public Transform water; public float Level { get; private set; }
+        public float WateredAt = -999;
+        /// <summary>Filled from the well: the hens come to drink the way they come to feed.</summary>
+        public void Water() { WateredAt = FedAt = Time.time; FeedSpot = pan; Level = 1; Show(); }
+        public void Dry(float amount) { if (Level <= 0) return; Level = Mathf.Max(0, Level - amount); Show(); }
+        void Show()
+        {
+            if (water == null) return;
+            water.gameObject.SetActive(Level > .02f);
+            var p = water.localPosition; p.y = .05f + Level * .09f; water.localPosition = p;   // from the rim down into the pan
+        }
         public void SetOpen(bool open) { Open = open; if (hinge != null) hinge.localRotation = Quaternion.Euler(open ? -100 : 0, 0, 0); }
     }
 }

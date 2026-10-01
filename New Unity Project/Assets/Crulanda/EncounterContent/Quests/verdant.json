@@ -74,6 +74,12 @@
       "title": "The Shore Remembers",
       "text": "Willow-Whisper's words, as near as you remember them:\n\n'Before the first leaf there was the sea, and before the sea there was a cold that came from nowhere and went back there. The Root-Mother remembers it. That is why she sleeps so deep.\n\nThe flesh-folk in the east say the grey is a wound in the Weave, and they are right. But wounds do not have hands, and the cold you brought me had a hand on it.\n\nSomething is looking at the Shore. Not with eyes. The way frost looks at a window.\n\nWe will hold. We are wood; we are good at holding. But I think one day flesh-folk will come over that ridge in their hundreds, carrying their dead in their hearts, and the Shore will have to choose whether to let them in.\n\nWhen they come, I hope they ask first. You did.'",
       "canonStatus": "CANON-EXPANDED: the Root-Mother, the cold that unmade the cycle before this one (book3 ch.6-7), the Pale Kings' gaze on the Shore and the survivors who later come over the ridge (book3 ch.1-4) are CANON; Willow-Whisper's words here are GAME-ONLY foreshadowing."
+    },
+    {
+      "id": "doc.verdant.root_mother",
+      "title": "What the Root-Mother Dreams",
+      "text": "Set down by Sister Iselle of the Archive of Silence, from the lips of Willow-Whisper, Voice of the Wood, who would not call it a song:\n\nShe dreams of rain. Not the rain that falls; the rain that is still deciding to. She dreams of every root in the Shore at once, which is why the Shore grows the way it does, and why nothing here knows when to stop.\n\nWhen the cold got into her root she dreamed of a mirror, and in the mirror the Shore, with no green in it. Thorn-Hand went down to see and did not come up. The roots closed over the stair. We told ourselves she had closed them.\n\nA short flesh-folk went down and salted the cold. She dreams of rain again.\n\nI have asked the Voice what the mirror was. She says the Pale have a king who wears one. She says it the way you would say the name of a disease.",
+      "canonStatus": "CANON-EXPANDED: the Root-Mother, the Silent Pilgrims, the Archive of Silence and the King of Mirrors are CANON (Book 3); this page, Thorn-Hand and the dream are GAME-ONLY."
     }
   ],
   "quests": [
@@ -688,6 +694,101 @@
             "amount": 100
           }
         ]
+      }
+    },
+    {
+      "id": "main.verdant.5",
+      "title": "The Root-Mother's Deep",
+      "kind": "main",
+      "giver": "Willow-Whisper",
+      "turnIn": "Willow-Whisper",
+      "zone": "zone.verdant",
+      "level": 13,
+      "requires": [
+        "main.verdant.4"
+      ],
+      "canonStatus": "CANON-EXPANDED: the Veridian Temple, the Root-Mother and the Keepers are CANON (Book 3); the deep under the Temple, the cold in the root and the Hollow Root-Warden are GAME-ONLY.",
+      "summary": "Go down the Temple's root-stair into the Root-Mother's Deep, through the withered Keepers and the mist-walkers that have got in, bring down the Hollow Root-Warden in the Heart, and salt the cold that has lodged in the root.",
+      "offer": "\"The fog came up out of the ground, not down off the ridge. I know where.\" Willow-Whisper stands a long time with her hand flat on her own trunk, listening. \"Under the Temple. The root-stair the living roots closed. They closed it because something was wrong below, and we did not go and see. We are very old, and very slow, and we did not go and see.\"\n\n\"Go down. The Warden of the roots will not let you pass; he is not himself. Nor are the others. Lay them to rest. And at the bottom, where the Root-Mother dreams, there will be a cold thing in her root. Salt it. Grohl's salt, the First Shore's salt, any salt. Salt remembers what a thing was before.\"",
+      "progress": "\"Is it done? No. I can hear it still, down in the roots, like a tooth going bad.\"",
+      "complete": "Willow-Whisper lets out a breath that goes on for a long time, and all through Rootfast the lanterns flare green and settle. \"She is dreaming of rain again.\" She looks down at you, and the knots of her eyes are bright. \"The Warden was Thorn-Hand. He planted the Guest-Tree. We will grow him a new one.\"\n\n\"When the flesh-folk come over the ridge, and they will, I shall tell them a short one came first, and asked, and went down into the dark for us. Go and sit by the sap-pool. You have earned the warm.\"",
+      "steps": [
+        {
+          "text": "Go down the Temple's root-stair into the Root-Mother's Deep.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.verdant",
+              "at": {
+                "x": -111.5,
+                "y": 153
+              },
+              "radius": 8,
+              "text": "Go down into the Root Gallery",
+              "say": "The stair ends in a hall of roots: columns of living wood from floor to roof, and veins of sap in the walls giving a green light that is not quite enough to see by. The air is warm and smells of earth and something sweet, and under that, faintly, of lightning."
+            }
+          ]
+        },
+        {
+          "text": "Lay the withered Keepers and the mist-walkers in the deep to rest, and bring down the Hollow Root-Warden in the Heart.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.verdant",
+              "target": "mob.withered.verdant*",
+              "count": 5,
+              "text": "Withered Keepers laid to rest"
+            },
+            {
+              "type": "kill",
+              "zone": "zone.verdant",
+              "target": "mob.mistwalker.verdant*",
+              "count": 3,
+              "text": "Mist-walkers broken in the Sap Well"
+            },
+            {
+              "type": "kill",
+              "zone": "zone.verdant",
+              "target": "mob.rootwarden.verdant*",
+              "text": "The Hollow Root-Warden",
+              "say": "The Root-Warden goes down slowly, the way a tree does, and lies still. The violet light in his seams goes out, and for a moment, before it is gone, it is green."
+            }
+          ]
+        },
+        {
+          "text": "Salt the cold that has lodged in the root.",
+          "objectives": [
+            {
+              "type": "interact",
+              "zone": "zone.verdant",
+              "target": "The cold in the root",
+              "text": "Salt the cold root",
+              "say": "You press the salt into the pale root round the black rod. The hoarfrost goes grey, then wet, then is only water on living bark. Far up through the earth something enormous turns over in its sleep, and every sap-vein in the deep brightens at once."
+            }
+          ]
+        },
+        {
+          "text": "Tell Willow-Whisper it is done.",
+          "objectives": [
+            {
+              "type": "talk",
+              "zone": "zone.verdant",
+              "target": "Willow-Whisper",
+              "text": "Return to Willow-Whisper"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 820,
+        "gold": 200,
+        "reputation": [
+          {
+            "faction": "keepers",
+            "amount": 600
+          }
+        ],
+        "document": "doc.verdant.root_mother"
       }
     }
   ]

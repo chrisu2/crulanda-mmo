@@ -333,6 +333,9 @@ namespace Crulanda.Encounter
                 var seen = new System.Collections.Generic.HashSet<string>(); var line = new System.Collections.Generic.List<Villager>();
                 foreach (var v in life.Villagers) if (v.Title != null && seen.Add(v.Role)) line.Add(v);
                 var before = line.ConvertAll(v => v.transform.position);
+                // Everyone else steps out of sight for the line-ups (a drinker wandered into the errands shot), back after.
+                var bystanders = life.Villagers.FindAll(v => !v.Resident && !line.Contains(v)); var bystanderAt = bystanders.ConvertAll(v => v.transform.position);
+                foreach (var v in bystanders) v.Park();
                 // Groups of four in a row facing the camera, so nameplates don't overlap.
                 for (int g = 0; g * 4 < line.Count; g++)
                 {
@@ -346,6 +349,25 @@ namespace Crulanda.Encounter
                     yield return new WaitForSeconds(.4f);
                 }
                 for (int i = 0; i < line.Count; i++) line[i].Release(before[i]);   // back to their day, from where they were
+                // The errands: one of each trade with what they carry between the trades (eggs, water, grain, flour, bread, logs, a hide...).
+                var loads = new[] { ("henwife", Load.Eggs, 5), ("farmer", Load.Grain, 1), ("miller", Load.Flour, 1), ("baker", Load.Bread, 3), ("lumberjack", Load.Logs, 3), ("hunter", Load.Game, 1), ("herbalist", Load.Herbs, 1), ("gossip", Load.Bucket, 1), ("skinner", Load.Hide, 1), ("blacksmith", Load.Goods, 1), ("child", Load.Bucket, 1), ("leatherworker", Load.Goods, 1) };
+                var carriers = new System.Collections.Generic.List<(Villager, Load, int)>();
+                foreach (var (role, what, count) in loads) { var v = life.Villagers.Find(x => x.Role == role && !x.Resident); if (v != null) carriers.Add((v, what, count)); }
+                var wasAt = carriers.ConvertAll(c => c.Item1.transform.position);
+                for (int g = 0; g * 4 < carriers.Count; g++)
+                {
+                    for (int i = 0; i < carriers.Count; i++)
+                    {
+                        if (i < g * 4 || i >= g * 4 + 4) { carriers[i].Item1.Park(); continue; }
+                        carriers[i].Item1.StandAt(zone.Ground(new Vector2((i - g * 4 - 1.5f) * 2.6f, -8)), 180); carriers[i].Item1.ShowLoad(carriers[i].Item2, carriers[i].Item3);
+                    }
+                    motor.Teleport(zone.Ground(new Vector2(0, -15), 1.1f)); motor.SetView(0, 6, 3.2f);
+                    yield return new WaitForSeconds(1.2f);
+                    ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "99-errands-lineup-" + (g + 1) + ".png"));
+                    yield return new WaitForSeconds(.4f);
+                }
+                for (int i = 0; i < carriers.Count; i++) carriers[i].Item1.Release(wasAt[i]);
+                for (int i = 0; i < bystanders.Count; i++) bystanders[i].Release(bystanderAt[i]);
                 foreach (var r in playerRenderers) r.enabled = true;
             }
             // Nature: swimming in the first lake, then walking up on an ambush camp until something leaps out of the grass.
@@ -448,9 +470,9 @@ namespace Crulanda.Encounter
                 }
                 // Crowsfoot Hollow, the first dungeon: the camp chamber from its way in, the head of the Drop looking down it, the Store
                 // Caves from the foot of the Drop, and the Echoing Hall from the Deep Stair.
-                var hollow = Crulanda.World.Hollow.All.Find(hh => hh.Name == "Crowsfoot Hollow");
-                if (hollow != null)
+                foreach (var hollow in Crulanda.World.Hollow.All)
                 {
+                    string hs = hollow == Crulanda.World.Hollow.All[0] ? "" : "-" + hollow.Name.ToLowerInvariant().Replace("'", "").Replace(" ", "-");   // a second cave in a zone keeps its name in the shot
                     EncounterHud.Hidden = true; Crulanda.World.WorldClock.Hour = 15;
                     // The band holds still for the pictures (they would come for you, a level-1 tourist, all the way down), and you
                     // start whole.
@@ -460,10 +482,10 @@ namespace Crulanda.Encounter
                     for (int i = 0; i + 3 < hollow.Centre.Count && drop < 0; i++) if (hollow.Centre[i].y - hollow.Centre[i + 3].y > .7f) drop = hollow.Along[i];   // where the floor first falls away
                     for (int i = 0; i < hollow.Centre.Count; i++)
                         if (hollow.Along[i] > hollow.Length * .45f && hollow.Along[i] < hollow.Length * .7f && hollow.Half[i] > widest) { widest = hollow.Half[i]; stores = hollow.Along[i]; }
-                    var views = new List<(float from, float toward, float pitch, string shot)> { (6.5f, 12.5f, 10, "85-hollow-camp") };
-                    if (drop > 0) views.Add((drop - 2.5f, drop + 7, 24, "88-hollow-drop"));
-                    if (stores > 0) views.Add((stores - 8, stores + 1, 10, "89-hollow-stores"));
-                    views.Add((hollow.Length - 13, hollow.Length - 5, 10, "86-hollow-hall"));
+                    var views = new List<(float from, float toward, float pitch, string shot)> { (6.5f, 12.5f, 10, "85-hollow-camp" + hs) };
+                    if (drop > 0) views.Add((drop - 2.5f, drop + 7, 24, "88-hollow-drop" + hs));
+                    if (stores > 0) views.Add((stores - 8, stores + 1, 10, "89-hollow-stores" + hs));
+                    views.Add((hollow.Length - 13, hollow.Length - 5, 10, "86-hollow-hall" + hs));
                     foreach (var (from, toward, pitch, shot) in views)
                     {
                         var stand = hollow.At(from); var ahead = hollow.At(toward) - stand;

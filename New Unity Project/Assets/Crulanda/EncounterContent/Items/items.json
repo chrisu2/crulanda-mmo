@@ -134,6 +134,18 @@
       "description": "Hedda Thorne's bread. Eat when the fighting's done."
     },
     {
+      "id": "food.fresh_eggs",
+      "name": "Oakhaven eggs",
+      "kind": "consumable",
+      "food": true,
+      "heal": 180,
+      "quality": 1,
+      "value": 2,
+      "stack": 20,
+      "description": "Half a dozen eggs from the hen-wives' coops, brought to the stall this morning and sold on while they last. Boiled, they travel.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
       "id": "food.harrow_cheese",
       "name": "Harrow cheese",
       "kind": "consumable",
@@ -554,6 +566,21 @@
       "spirit": 6,
       "description": "A Keeper's staff of white salt-wood gone grey along half its length. The white half still hums. The grey half is cold.",
       "canonStatus": "CANON-EXPANDED: the Keepers' staves of white salt-wood that hum (book3 ch.2); Greyheart and his stave are GAME-ONLY."
+    },
+    {
+      "id": "item.wardens_crown",
+      "name": "The Root-Warden's Crown",
+      "kind": "gear",
+      "slot": "head",
+      "quality": 3,
+      "level": 13,
+      "value": 70,
+      "armor": 34,
+      "stamina": 9,
+      "strength": 6,
+      "spirit": 6,
+      "description": "A circlet of living twig that still puts out a leaf now and then. It was the crown of the Keeper who kept the roots, before the cold.",
+      "canonStatus": "GAME-ONLY: the Root-Warden and his crown; the Keepers are CANON."
     }
   ],
   "vendors": [
@@ -1018,6 +1045,28 @@
           "chance": 1.0,
           "min": 2,
           "max": 3
+        }
+      ]
+    },
+    {
+      "tag": "rootwarden",
+      "levelMin": 10,
+      "levelMax": 13,
+      "gearChance": 0.7,
+      "entries": [
+        {
+          "item": "item.wardens_crown",
+          "chance": 1.0
+        },
+        {
+          "item": "junk.grey_bark",
+          "chance": 1.0,
+          "min": 2,
+          "max": 4
+        },
+        {
+          "item": "junk.cold_sliver",
+          "chance": 0.6
         }
       ]
     }

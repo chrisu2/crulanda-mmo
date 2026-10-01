@@ -610,3 +610,35 @@ Chris shared a reference of a stylized fantasy cove and chose this look for Oakh
   falls stood on a 66-degree wall: a stepped way up the ledge's east side; a pool's shore carving no longer flattens the ledge
   behind its waterfall.
 - Zones load in 2-8 s (the Verdant Shore 7.6 s: its 1,100 props and giant groves).
+
+## 2026-10-01 — The Root-Mother's Deep, and Crowsfoot's mouth hidden in the hill (Chris: "can you also create a dungeon for the new zone? the dungeon in the first zone kind of stick out as just a rock. it needs to be built into a mountain or something and kinda hidden..no so obvious. they are bandits")
+- **Crowsfoot Hollow's mouth** is a slot in a cliff face now, not a rock on the grass: two cliff scarps either side, the Crowsfoot
+  brow raised over it, the North road ending short and a track bending through a pine thicket and round boulders to a mouth you
+  only see from the last bend.
+- **The Root-Mother's Deep**, the Verdant Shore's dungeon (GAME-ONLY, under the CANON Temple): a second cavern plan (`variant: 1`)
+  grown through earth and root. The Temple's root-stair down into the Root Gallery (living root columns), the Sap Well (a pool
+  of emerald sap against the wall, votive stones, drips from the roof), the Cold Stair, and the Heart: the Root-Mother, a vast
+  knot of root with a hollow face and sap-light in it, and the cold lodged in her root (a black rod, hoarfrost, violet light).
+  Sap veins for light instead of torches; no knoll shows on the land over it. Six camps down it (briars, withered Keepers,
+  mist-walkers) and the Hollow Root-Warden (elite 13, drops the Root-Warden's Crown). The finale quest *The Root-Mother's Deep*
+  (`main.verdant.5`), a fifth page, a Pilgrim's abandoned pack (a secret). Three new PlayMode tests (`RootDeepTests`).
+- **Found by the tests:** the sap pool sat in the middle of the passage and cut the way (and a camp) off the navmesh; it hugs
+  the east wall now and the way through runs along the west.
+
+## 2026-10-01 — Every trade has a day, and the goods go round (Chris: "the hen maiden/mother should feed the chickens in the morning. water during the day. collect eggs. each profession should have a daily ai job schedule with tasks ... she should take some eggs to the merchants to sell. some home to eat. some eggs to the inn for food for the village, etc. all job are intertwined.")
+- **Daily schedules** (`VillageWork.cs`): each trade's day is shifts (where to be, hour by hour) and errands (once a day, from an
+  hour: pick something up at one place, carry it to another, hand it over, say so). Villagers follow the shift for the hour and
+  run a due errand first; a trade whose errand needs a place the village lacks skips it.
+- **The hen-wife:** opens up and feeds at first light; eggs to the inn's kitchen at 08:24; water from the well to a new pan by the
+  ramp at 09:36 and 13:30 (the hens come to drink; the water dries over four hours); dinner at home; the afternoon feed; eggs to
+  the produce stall at 15:24; the last eggs home for the pot; the hens at dusk as before.
+- **The goods go round:** barley from the fields to the mill, flour to the bakehouse and the stall, the first loaves (the baker is
+  up at 04:36) to the inn, logs to the woodyard and firewood to the inn and the forge, the hunter's hide to the tannery and his
+  hares to the inn's pot, pelts from the snares, belts and ironwork to the stall, herbs to the stall and marigold for Mira, water
+  from the well for every house, a loaf for Mum. Every load shows in their hands: a basket of eggs (as many as were laid), a
+  bucket, sacks, a tray of loaves, logs on the shoulder, a hide, a bundle of herbs, a hare on a string, a crate.
+- **Intertwined:** deliveries fill the village's stock; whoever is at the place answers; the trades talk about each other's goods
+  ("The miller's flour came in. Thin stuff, but it rises."); and the merchant sells **Oakhaven eggs** (a new food) while the
+  hen-wife's eggs last at the stall.
+- Tests: `VillageWorkTests` (the schedules) and `VillageErrandTests` (eggs to the inn and sold on by the merchant; water to the
+  pan; barley to the mill). The capture tour adds an errands line-up (`99-errands-lineup`).

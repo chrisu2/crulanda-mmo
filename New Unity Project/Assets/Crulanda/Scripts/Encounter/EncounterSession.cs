@@ -254,8 +254,11 @@ namespace Crulanda.Encounter
             if (Items == null || v == null) return;
             int band = Zone != null ? Zone.Zone.levelMax : 2;
             VendorStock = Items.StockFor(v.Name, v.Role, band); if (VendorStock.Count == 0) return;
+            // What the village brought the stall today (the hen-wife's eggs): sold on while they last.
+            if (v.Role == "merchant" && VillageLife.Active != null && VillageLife.Active.Count("stall.eggs") > 0 && Items.Get(FreshEggs) != null) VendorStock.Insert(0, FreshEggs);
             VendorNpc = v.Name; vendorAt = v.transform.position; InventoryOpen = true; Conversation = null; v.Hold(30);
         }
+        public const string FreshEggs = "food.fresh_eggs";
         public void CloseVendor() { VendorNpc = null; VendorStock = new List<string>(); }
         public void SellBag(int i)
         {
@@ -274,7 +277,12 @@ namespace Crulanda.Encounter
         public void Buy(string item)
         {
             if (VendorNpc == null) return;
-            if (Inventory.Buy(Progress, Items, item, out var why)) { Message("Bought " + ItemName(item) + "."); Save(false); }
+            if (item == FreshEggs && (VillageLife.Active == null || VillageLife.Active.Count("stall.eggs") <= 0)) { VendorStock.Remove(item); Message("The eggs have all gone."); return; }
+            if (Inventory.Buy(Progress, Items, item, out var why))
+            {
+                Message("Bought " + ItemName(item) + "."); Save(false);
+                if (item == FreshEggs) { VillageLife.Active.Take("stall.eggs"); if (VillageLife.Active.Count("stall.eggs") == 0) VendorStock.Remove(item); }
+            }
             else Message(why);
         }
 
@@ -696,6 +704,12 @@ namespace Crulanda.Encounter
             var p = new EncounterProgress { classId = classId, playerId = EntityId.New().Value, companionId = EntityId.New().Value };
             Inventory.Ensure(p); return p;
         }
+        /// <summary>A look's odd variant from the mob's name: ash hounds, withered or grey Keepers and briars, the Hollow Root-Warden, a doe.</summary>
+        static int LookVariant(string label)
+        {
+            foreach (var word in new[] { "Ash", "Withered", "Greyheart", "Hollow Root", "Grey ", "doe" }) if (label != null && label.IndexOf(word, StringComparison.OrdinalIgnoreCase) >= 0) return 1;
+            return 0;
+        }
         /// <summary>Saves this character, remembers the other class and reloads the scene as that character.</summary>
         public bool SwitchCharacter(string classId)
         {
@@ -719,7 +733,7 @@ namespace Crulanda.Encounter
             var actor = go.AddComponent<Actor>();
             actor.Initialize(definition, label, label == "You" ? Progress.Level : level, new EntityId(id));
             go.AddComponent<Combatant>();
-            ActorVisual.Attach(go, look, label.IndexOf("Ash", StringComparison.OrdinalIgnoreCase) >= 0 ? 1 : 0);   // variant 1: ash hounds
+            ActorVisual.Attach(go, look, LookVariant(label));
             return actor;
         }
         void SpawnParty()

@@ -16,22 +16,26 @@ namespace Crulanda.Tests
     /// <summary>
     /// Households in Oakhaven (tools/wip/professions/ADDENDUM.md A): every villager and hen-wife lives behind their own household's
     /// named door and walks there at bedtime, families share one house, the hunter makes it out to his lodge in time, every home
-    /// door can be walked to, and a knock is answered by the household behind the door.
+    /// door can be walked to, and a knock is answered by the household behind the door. A household whose house is not built lodges
+    /// at the inn, and Khaven's Crypt-Keeper's Hovel answers with its article.
     /// </summary>
     public class VillageHomeTests
     {
         string root;
         void OnLoaded(Scene scene, LoadSceneMode mode) { var s = UnityEngine.Object.FindFirstObjectByType<EncounterSession>(); if (s != null) s.SaveDirectoryOverride = root; }
-        IEnumerator Load(float hour)
+        /// <summary>Oakhaven at this hour, or another zone by id; the filter changes the zone's data before it is built.</summary>
+        IEnumerator Load(float hour, string zoneId = null, Func<ZoneDefinition, ZoneDefinition> filter = null)
         {
             WorldClock.Hour = hour;
             if (root == null) { root = Path.Combine(Path.GetTempPath(), "Crulanda-home-" + Guid.NewGuid().ToString("N")); SceneManager.sceneLoaded += OnLoaded; }
+            ZoneBuilder.RequestedZoneId = zoneId; ZoneBuilder.DefinitionFilter = filter;
             yield return SceneManager.LoadSceneAsync("Oakhaven", LoadSceneMode.Single);
             for (int i = 0; i < 3; i++) yield return null;
+            ZoneBuilder.DefinitionFilter = null;
         }
         [UnityTearDown] public IEnumerator Cleanup()
         {
-            Time.timeScale = 1; WorldClock.Hour = 8.5f;
+            Time.timeScale = 1; WorldClock.Hour = 8.5f; ZoneBuilder.DefinitionFilter = null; ZoneBuilder.RequestedZoneId = null;
             if (WorldWeather.Active != null) WorldWeather.Active.Release(true);
             SceneManager.sceneLoaded -= OnLoaded;
             var empty = SceneManager.CreateScene("Empty-" + Guid.NewGuid().ToString("N")); SceneManager.SetActiveScene(empty);
@@ -61,6 +65,7 @@ namespace Crulanda.Tests
             yield return Load(19);
             var life = VillageLife.Active; Assert.IsNotNull(life, "Oakhaven has village life.");
             var folk = life.Villagers.Where(v => !v.Resident).ToList();
+            // Step 6 (the Golden Cask's household, with its innkeeper Hob Linden) raises these to 24 folk and 16 households.
             Assert.AreEqual(23, folk.Count, "Twenty villagers and three hen-wives.");
             foreach (var v in folk)
             {
@@ -165,8 +170,14 @@ namespace Crulanda.Tests
             // Night: all three abed.
             yield return StandAtDoor(s, door);
             Assert.AreSame(door, s.NearbyDoor); Assert.AreEqual("Knock · Tanner house", s.InteractPrompt);
+            Assert.AreEqual("The Tanners are abed. A child coughs, and somebody hushes her.", life.KnockLine(door), "Step 5 gives Maud wares, so a knock here will open them instead; KnockLine still answers.");
+            // The knock itself, at a house where nobody trades: Osk Farrow and Pim.
+            var farrow = s.Zone.Doors.Single(d => d.name == "Farrow house");
+            yield return StandAtDoor(s, farrow);
             s.Interact();
-            Assert.AreEqual("Tanner house: The Tanners are abed. A child coughs, and somebody hushes her.", s.Messages.Last());
+            Assert.AreEqual("Farrow house: The Farrows are abed. A child coughs, and somebody hushes him.", s.Messages.Last());
+            // A farm's folk go by the head's family name: Grete Lowe and Nan Pennock at the Brook farm.
+            Assert.AreEqual("The Lowes are abed. Somebody turns over and snores.", life.KnockLine(s.Zone.Doors.Single(d => d.name == "Brook farmhouse")));
             // Someone at home with wares for you opens up at the door: Ama Rusk sells from her stall by day.
             var rusk = s.Zone.Doors.Single(d => d.name == "Rusk house");
             Assert.IsTrue(life.AtHome(rusk).Any(v => v.Name == "Ama Rusk"), "Ama is home at night.");
@@ -190,6 +201,26 @@ namespace Crulanda.Tests
             Assert.IsTrue(maud.GoIndoors());
             Assert.AreEqual("Maud's voice, through the planks: \"Not now. Since the collectors came, this door stays barred.\"", life.KnockLine(door));
             maud.Release(maud.transform.position);
+        }
+
+        [UnityTest] public IEnumerator A_household_whose_house_is_not_built_lodges_at_the_inn()
+        {
+            yield return Load(11, null, d => { d.props = d.props.Where(p => p == null || p.name != "Crisp cottage").ToArray(); return d; });
+            var life = VillageLife.Active; var aldo = life.Find("Aldo Crisp"); var crisp = life.HouseholdOf("Aldo Crisp");
+            Assert.IsNotNull(aldo); Assert.IsNotNull(crisp); Assert.IsNull(crisp.house, "The cottage is not built.");
+            Assert.AreSame(crisp, aldo.Household);
+            Assert.IsNotNull(aldo.Home, "Aldo still has a bed."); Assert.AreEqual("rooms", aldo.Home.kind, "He lodges behind the inn's rooms door.");
+            Assert.AreNotSame(crisp, life.HouseholdAt(aldo.Home), "The rooms door is not counted as the Crisps' house.");
+        }
+
+        [UnityTest] public IEnumerator Knocking_at_the_Crypt_Keepers_Hovel_in_Khaven()
+        {
+            yield return Load(11, "zone.khaven");
+            var s = UnityEngine.Object.FindFirstObjectByType<EncounterSession>(); var life = VillageLife.Active;
+            Assert.AreEqual("zone.khaven", s.Zone.Zone.id);
+            var hovel = s.Zone.Doors.Single(d => d.name == "Crypt-Keeper's Hovel");
+            Assert.AreEqual("No answer. The Crypt-Keeper's Hovel stands empty; Ansel keeps watch elsewhere, day and night.", life.KnockLine(hovel), "A house named for a title, not a member, takes the article.");
+            Assert.AreEqual(0, life.Places["lodge"].Count, "Khaven has no lodge.");
         }
     }
 }

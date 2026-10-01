@@ -503,12 +503,15 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
     Morrow at the Crypt-Keeper's Hovel (Ansel Morrow keeps his post at the crypt; the hovel stands empty).
   - A zone with villagers and no `households` uses the derived rule: villager i takes house i (the barred doors in the order
     they were built) while houses last, the rest lodge behind the inn's rooms door, and a hen-wife joins the household of the
-    house nearest her coop. Nobody is given a door by modulo any more.
+    house nearest her coop. Nobody is given a door by modulo any more. A household whose house is not built (a missing prop,
+    or a test's filtered zone) lodges behind the inn's rooms door, and the log says so.
   - **Knocking** (`EncounterSession.Knock`): someone at home with wares or quest business for you (a gold `!` or `?`) opens
     up and deals with you at the door ("A shutter opens. "At this hour? Go on, then.""). Otherwise the household answers
     (`VillageLife.KnockLine`): all abed ("The Tanners are abed. A child coughs, and somebody hushes her."), the head out and
     someone in ("Maud's at the shop by the South road. Try there."), the head in ("Not now. Since the collectors came, this door
-    stays barred."), or nobody home ("No answer. The Tanner house is empty till supper."). A door no household lives behind
+    stays barred."), or nobody home ("No answer. The Tanner house is empty till supper."). A farm's folk go by the head's family
+    name (the Brook farm's are "The Lowes"), and a house named for somebody outside the household takes the article ("No
+    answer. The Crypt-Keeper's Hovel stands empty; Ansel keeps watch elsewhere, day and night."). A door no household lives behind
     gives the old barred-door lines; the inn's rooms door its own line.
   - Tests: `HouseholdDataTests` (EditMode: every villager in exactly one household, houses are props and not shared, Khaven's
     six, zones without households parse) and `VillageHomeTests` (PlayMode: everyone walks home to their own door by 23:30, the
@@ -519,9 +522,10 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
   Dawn, day, dusk and night keyframes blend with the zone's own `lighting` palette: ambient, fog, sky tint and exposure.
   Lamps (`NightLights`) light up after dark. The minimap rim shows a sun or moon and the time. In development builds,
   F11 skips an hour.
-- **Night routine:** villagers go home to bed from about 20:00, children first. The hunter sets off at 19:48 and spends his
-  evening in the lodge yard (his lodge is about a game hour's walk from the green). Drinkers stay at the inn until 23:00 or
-  later. Everyone wakes between about 05:50 and 07:30.
+- **Night routine:** villagers go home to bed from about 20:00, children first. A hunter who lives at a lodge (Oakhaven's
+  Garet Moss) sets off at 19:48 and spends his evening in the lodge yard (his lodge is about a game hour's walk from the
+  green); in a village without a lodge (Khaven) the hunter keeps the inn and the green and goes to bed with the rest
+  (`VillageWork.PlacesFor`). Drinkers stay at the inn until 23:00 or later. Everyone wakes between about 05:50 and 07:30.
 - **Hen coops** (prop kind `coop`, registered in `ZoneBuilder.Coops`) are raised huts with a ramp, a pop-hole door on a
   hinge, nest boxes and a feed trough. Each coop gets a hen-wife (Oakhaven: Goody Marl at Harrow, Hettie Brook at the West
   field coop by the Carder farm, Nan Pennock at Brook farm), and chickens belong to the nearest coop. Her day (Chris, 2026-10-01: "the hen

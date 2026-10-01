@@ -86,7 +86,7 @@ namespace Crulanda.Encounter
                 var names = z.life.names != null && z.life.names.Length > 0 ? z.life.names : Names;
                 string name = names[i % names.Length];
                 var household = named ? HouseholdOf(name) : i < Homes.Count ? Derived(Homes[i]) : null;
-                Settle(Villager.Spawn(this, name, role, i, household != null ? household.house : lodging, start), household);
+                Settle(Villager.Spawn(this, name, role, i, household?.house ?? lodging, start), household);
             }
             // Residents: named people with a fixed place (quest givers), e.g. a hooded stranger who never leaves the inn. One who
             // works (an innkeeper) has the role's day and a home instead. A post's keeper may be named in a household (so a knock at
@@ -99,7 +99,7 @@ namespace Crulanda.Encounter
                     if (r.works)
                     {
                         var at = RandomPlace(r.place ?? "green") ?? Zone.Ground(z.spawns.recovery);
-                        Settle(Villager.Spawn(this, r.name, r.role ?? "stranger", 60 + i, household != null ? household.house : lodging, at, null, null, r.title, r.look), household);
+                        Settle(Villager.Spawn(this, r.name, r.role ?? "stranger", 60 + i, household?.house ?? lodging, at, null, null, r.title, r.look), household);
                         continue;
                     }
                     string place = r.place ?? "green";
@@ -122,7 +122,7 @@ namespace Crulanda.Encounter
                     household = near != null ? Households.Find(h => h.house == near) ?? Derived(near) : null;
                 }
                 var start = NavMesh.SamplePosition(coop.yard, out var hit, 4, NavMesh.AllAreas) ? hit.position : coop.yard;
-                Settle(Villager.Spawn(this, name, "henwife", 40 + i, household != null ? household.house : lodging, start, coop), household);
+                Settle(Villager.Spawn(this, name, "henwife", 40 + i, household?.house ?? lodging, start, coop), household);
             }
             foreach (var group in z.life.critters)
                 for (int i = 0; i < group.count; i++)
@@ -175,7 +175,7 @@ namespace Crulanda.Encounter
             var inside = AtHome(door); var head = h.Head;
             if (inside.Count == 0)
             {
-                if (head.Resident) return "No answer. " + HouseName(h) + " stands empty; " + head.Name + " keeps watch elsewhere, day and night.";
+                if (head.Resident) return "No answer. " + HouseName(h) + " stands empty; " + FirstName(head.Name) + " keeps watch elsewhere, day and night.";
                 return "No answer. " + HouseName(h) + (WorldClock.Between(5, 18) ? " is empty till supper." : " is dark, and nobody's home.");
             }
             if (inside.Count == h.members.Count && inside.TrueForAll(v => v.Activity == "sleep" || v.Activity == "sleepitoff"))
@@ -187,7 +187,7 @@ namespace Crulanda.Encounter
             if (!inside.Contains(head))
             {
                 var where = Whereabouts(head);
-                return "A voice through the planks: \"" + FirstName(head.Name) + "'s " + (where != null ? where + ". Try there.\"" : "out. Back by supper, likely.\"");
+                return "A voice through the planks: \"" + FirstName(head.Name) + "'s " + (where != null ? where + ". Try there.\"" : "out. " + (WorldClock.Between(5, 18) ? "Back by supper, likely.\"" : "Back before long, likely.\""));
             }
             return FirstName(head.Name) + "'s voice, through the planks: \"" + (WorldClock.IsNight ? "Not at this hour." : "Not now.") + " Since the collectors came, this door stays barred.\"";
         }
@@ -223,18 +223,21 @@ namespace Crulanda.Encounter
             }
             return best;
         }
-        /// <summary>How a house is named at the start of a sentence: "The Tanner house", "Jory's house", "Moss's lodge".</summary>
+        /// <summary>How a house is named at the start of a sentence: "The Tanner house", "Jory's house", "Moss's lodge". A possessive
+        /// stays bare only when the owner is the household or one of its members ("The Crypt-Keeper's Hovel" takes the article).</summary>
         static string HouseName(Household h)
         {
             string n = h.def != null && !string.IsNullOrEmpty(h.def.house) ? h.def.house : h.house != null ? h.house.name : h.name;
-            return n.StartsWith("The ") || n.Contains("'s ") ? n : "The " + n;
+            int s = n.IndexOf("'s "); string owner = s > 0 ? n.Substring(0, s) : null;
+            return n.StartsWith("The ") || owner != null && (owner == h.name || h.members.Exists(v => FirstName(v.Name) == owner)) ? n : "The " + n;
         }
-        /// <summary>A household as its neighbours say it: one person by name, a family by its name ("The Tanners"; the Harrow farm's
-        /// folk are "The Harrows").</summary>
+        /// <summary>A household as its neighbours say it: one person by name, a family by its name ("The Tanners"); a farm's folk go by
+        /// the head's family name (the Harrow farm's are "The Harrows", the Brook farm's "The Lowes").</summary>
         static string Folk(Household h)
         {
             if (h.members.Count == 1) return FirstName(h.members[0].Name);
             string n = h.name.EndsWith(" farm") ? h.name.Substring(0, h.name.Length - 5) : h.name;
+            if (h.name.EndsWith(" farm") && h.Head != null && h.Head.Name.IndexOf(' ') > 0) n = h.Head.Name.Substring(h.Head.Name.LastIndexOf(' ') + 1);
             return n.Contains(" ") ? "Everyone in " + HouseName(h).Replace("The ", "the ") : "The " + n + "s";
         }
         static string Pronoun(Household h, Villager v)
@@ -583,7 +586,7 @@ namespace Crulanda.Encounter
         GameObject load; Load loadKind; int loadCount; Errand errand; int leg; Vector3 dropAt; bool goingIn; readonly HashSet<string> done = new HashSet<string>(); float lastHour;
         /// <summary>Night: everyone goes home to bed (staggered; drinkers stay at the inn late, children go early).</summary>
         public bool Bedtime { get { return WorldClock.Between(bedAt, wakeAt); } }
-        /// <summary>When the hunter sets off for bed: his lodge is about a game hour's walk from the green.</summary>
+        /// <summary>When a hunter who lives at a lodge sets off for bed: Oakhaven's is about a game hour's walk from the green.</summary>
         public const float HunterBed = 19.8f;
 
         public static Villager Spawn(VillageLife life, string name, string role, int index, ZoneDoor home, Vector3 at, ZoneCoop coop = null, string fixedPlace = null, string title = null, string look = null)
@@ -603,8 +606,8 @@ namespace Crulanda.Encounter
             v.Title = title ?? VillageLife.TitleFor(role); v.fixedPlace = fixedPlace;
             v.Coop = coop;
             // Bed and rising: the baker is up before dawn for the first loaves, the drinkers last to bed and last up, children early to bed;
-            // the hunter early too, for the long walk out to his lodge.
-            v.bedAt = role == "drinker" ? 23 + (index % 3) * .3f : role == "child" ? 19.8f + (index % 3) * .2f : role == "henwife" ? HerdHour : role == "baker" ? 19.6f : role == "hunter" ? HunterBed : 20.2f + (index % 5) * .25f;
+            // the hunter early too where he has a lodge, for the long walk out to it.
+            v.bedAt = role == "drinker" ? 23 + (index % 3) * .3f : role == "child" ? 19.8f + (index % 3) * .2f : role == "henwife" ? HerdHour : role == "baker" ? 19.6f : role == "hunter" && life.Places["lodge"].Count > 0 ? HunterBed : 20.2f + (index % 5) * .25f;
             v.wakeAt = role == "drinker" ? 7.5f : role == "henwife" ? 5.7f : role == "baker" ? 4.6f : 5.8f + (index % 5) * .3f;
             if (fixedPlace != null) v.bedAt = v.wakeAt = 0;   // residents keep their post day and night
             v.lastHour = WorldClock.Hour; v.index = index; v.tolerance = .85f + (index % 5) * .18f;
@@ -658,7 +661,7 @@ namespace Crulanda.Encounter
             if (Role == "drinker" && DrinkerNext()) return;
             if (StartErrand()) return;
             var shift = VillageWork.ShiftFor(Role, WorldClock.Hour);
-            GoTo(shift != null ? shift.places : Role == "child" ? new[] { "green", "green", "wander", "wander", "well" } : new[] { "wander", "green" });
+            GoTo(shift != null ? VillageWork.PlacesFor(shift, Role, life.Places["lodge"].Count > 0) : Role == "child" ? new[] { "green", "green", "wander", "wander", "well" } : new[] { "wander", "green" });
         }
         /// <summary>Walk to one of these kinds of place (a repeat weights the choice; a kind this village lacks is passed over).</summary>
         void GoTo(string[] options)
@@ -830,7 +833,8 @@ namespace Crulanda.Encounter
                 default: return ActorPose.None;
             }
         }
-        /// <summary>Indoors (every caller is at home, or fled for it).</summary>
+        /// <summary>Out of sight and counted indoors at home. Every caller is at their door, but for a flight stranded short of it, which
+        /// hides where it stopped and is not counted at home (see the flee branch of Update).</summary>
         void Hide()
         {
             state = State.Hidden; indoors = true; calmSince = Time.time; foreach (var r in renderers) r.enabled = false;
@@ -988,7 +992,12 @@ namespace Crulanda.Encounter
                 else if (Time.time - calmSince > (activity == "home" ? until - calmSince : 12)) Emerge();
                 return;
             }
-            if (state == State.Flee) { if (Arrived || Stranded) { activity = "fled"; Hide(); } return; }
+            if (state == State.Flee)
+            {
+                // Only a flight that reached the door counts as indoors; one stranded short of it hides where it stopped.
+                if (Arrived || Stranded) { activity = "fled"; Hide(); var d = transform.position - home.position; d.y = 0; indoors = d.magnitude < 3.5f; }
+                return;
+            }
             if (danger && Role != "drinker" || danger && life.EnemyNear(transform.position, 10)) { Flee(); return; }
             // Talking with the player: stand still and face them until the conversation ends, then carry on.
             if (Attending && !PassedOut)

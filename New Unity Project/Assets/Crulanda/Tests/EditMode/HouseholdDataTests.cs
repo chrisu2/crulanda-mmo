@@ -42,7 +42,7 @@ namespace Crulanda.Tests
                 Assert.Greater(h.members.Length, 0, h.name + " has members.");
                 foreach (var m in h.members)
                 {
-                    Assert.IsTrue(folk.Contains(m.name) || posts.Contains(m.name), z.id + ": " + h.name + "'s " + m.name + " is someone the village spawns.");
+                    Assert.IsTrue(folk.Contains(m.name) || posts.Contains(m.name) || m.kin == "lodger", z.id + ": " + h.name + "'s " + m.name + " is someone the village spawns (or a lodger who is not a villager).");
                     Assert.IsFalse(string.IsNullOrEmpty(m.kin), h.name + ": " + m.name + " is kin of some kind.");
                 }
                 Assert.AreEqual(1, h.members.Count(m => m.kin == "head"), h.name + " has one head.");
@@ -53,6 +53,7 @@ namespace Crulanda.Tests
         [Test] public void Oakhaven_every_villager_is_in_exactly_one_household()
         {
             var z = Zone("oakhaven");
+            // Step 6 (the Golden Cask's household, with its innkeeper Hob Linden) raises these to 24 folk and 16 households.
             Assert.AreEqual(23, Folk(z).Count, "Twenty villagers and three hen-wives.");
             EveryoneHousedOnce(z);
             Assert.AreEqual(15, z.life.households.Length, "Fifteen households (the Golden Cask's comes with its innkeeper).");
@@ -61,7 +62,6 @@ namespace Crulanda.Tests
             Assert.AreEqual("Tanner house", tanner.house);
             Assert.AreEqual("Moss's lodge", z.life.households.Single(h => h.members.Any(m => m.name == "Garet Moss")).house, "The hunter lives at his lodge.");
             Assert.AreEqual("Crisp cottage", z.life.households.Single(h => h.members.Any(m => m.name == "Aldo Crisp")).house, "The miller lives apart from his mill.");
-            foreach (var r in PostResidents(z)) Assert.IsFalse(z.life.households.Any(h => h.members.Any(m => m.name == r)), r + " keeps a post and no house.");
         }
 
         [Test] public void Every_household_house_names_a_prop_and_no_house_is_shared()

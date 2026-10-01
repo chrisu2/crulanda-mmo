@@ -50,5 +50,15 @@ namespace Crulanda.Tests
             Assert.Greater(day.errands[5].at, day.errands[1].until, "The stall's eggs come after the inn's.");
             Assert.NotNull(VillageWork.Reply("eggs", .2f)); Assert.IsNull(VillageWork.Reply("water", .2f), "The hens don't answer.");
         }
+
+        [Test] public void A_hunter_without_a_lodge_keeps_the_inn_and_the_green()
+        {
+            var dawn = VillageWork.ShiftFor("hunter", 7); var evening = VillageWork.ShiftFor("hunter", 19);
+            CollectionAssert.Contains(VillageWork.PlacesFor(dawn, "hunter", true), "lodge"); CollectionAssert.Contains(VillageWork.PlacesFor(evening, "hunter", true), "lodge");
+            CollectionAssert.AreEqual(new[] { "woods", "woods", "woods", "meadow", "meadow" }, VillageWork.PlacesFor(dawn, "hunter", false), "No lodge to pass by at dawn.");
+            CollectionAssert.AreEqual(new[] { "inn", "inn", "green" }, VillageWork.PlacesFor(evening, "hunter", false), "The evening at the inn and on the green.");
+            var smith = VillageWork.ShiftFor("blacksmith", 10); Assert.AreSame(smith.places, VillageWork.PlacesFor(smith, "blacksmith", false), "Other trades are untouched.");
+            Assert.IsNull(VillageWork.PlacesFor(null, "hunter", false));
+        }
     }
 }

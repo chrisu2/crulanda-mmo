@@ -65,7 +65,8 @@ namespace Crulanda.Encounter
                 new Errand("logs to the woodyard", 9, 11.5f, "woods", "woodpile", Load.Logs, "logs", "Two more loads and that's the big oak down."),
                 new Errand("firewood to the inn", 14.5f, 16.5f, "woodpile", "inn", Load.Logs, "wood", "Firewood for the Cask. Dry, mind, not the grey stuff."),
                 new Errand("firewood to the forge", 16, 18, "woodpile", "forge", Load.Logs, "wood", "For the hearth. Don't burn it all at once.")) },
-            // The hunter keeps to his lodge yard in the evening and goes to bed early (Villager.HunterBed): it is a long walk out.
+            // Where he lives at a lodge (Oakhaven's Garet Moss), the hunter keeps to his lodge yard in the evening and goes to bed early
+            // (Villager.HunterBed): it is a long walk out. Without one he keeps the inn and the green (see PlacesFor).
             { "hunter", new WorkDay(new[] { new Shift(Dawn, 10.5f, "woods", "woods", "woods", "meadow", "meadow", "lodge"), new Shift(10.5f, 13, "tannery", "inn", "inn"), new Shift(13, 18, "woods", "woods", "woods", "meadow", "meadow"), new Shift(18, Night, "lodge", "lodge", "inn") },
                 new Errand("the hide to the tannery", 10, 12.5f, "woods", "tannery", Load.Game, "hides", "A buck's hide, and the hares are for the Cask. Pay me for the hide."),
                 new Errand("hares to the inn", 11, 13.5f, "tannery", "inn", Load.Game, "meat", "Two hares for the pot. Don't let the drinkers see them.")) },
@@ -108,6 +109,14 @@ namespace Crulanda.Encounter
             var d = DayFor(role); if (d == null) return null;
             foreach (var s in d.shifts) if (hour >= s.from && hour < s.to) return s;
             return null;
+        }
+        static readonly string[] NoLodgeEvening = { "inn", "inn", "green" };
+        /// <summary>The places a shift sends a trade to in a village: a hunter whose village has no lodge passes it over by day and
+        /// spends the evening at the inn and on the green.</summary>
+        public static string[] PlacesFor(Shift s, string role, bool hasLodge)
+        {
+            if (s == null || role != "hunter" || hasLodge || System.Array.IndexOf(s.places, "lodge") < 0) return s?.places;
+            return s.from >= 18 ? NoLodgeEvening : System.Array.FindAll(s.places, p => p != "lodge");
         }
         /// <summary>What whoever takes a delivery says.</summary>
         public static string Reply(string good, float r)

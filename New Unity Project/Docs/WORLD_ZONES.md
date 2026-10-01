@@ -565,11 +565,14 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
     - `gamerack`, 3 x 2 m on a hillside: forked poles and a crossbar hung with a deer, two hares and a brace of pheasants; a
       rail of pelts; a hide laced in a frame; a butcher's block with a cleaver; a ring of cold stones. Place: `lodge`.
     - The inn adds a `bar` place at the open end of the bar and a barred door to the rooms upstairs (`ZoneDoor.kind` "rooms";
-      nobody's home yet). `ZoneDoor.smoke` is the house's chimney smoke.
+      nobody's home yet; trying it says the stair is kept for the inn's lodgers). `ZoneDoor.smoke` is the house's chimney smoke.
+    - Until households, the Carder farmhouse and the Crisp cottage stand empty (`VillageLife.UnsettledHouses`, left out of
+      `Homes`), so every villager and hen-wife keeps the house the old rule gave them.
+    - A villager at stand points close together (the kitchen's range and table) works and looks at the nearest one.
     - A village with a tannery yard and no leather shop has its leatherworker work the yard (`leathershop` shares the
       `tannery` places).
-  - The leatherworker keeps her shop 9 to 12 and 2 to 6 (the yard either side); the herbalist calls at her drying hut late
-    morning and evening. `VillageWorkshopTests`: every workshop place is on the navmesh and can be walked to, and Maud keeps
+  - The leatherworker keeps her shop 9 to 12 and 2 to 6 (the yard either side) and takes her wares from the shop to the stall
+    after her midday meal (12.2 to 14); the herbalist calls at her drying hut late morning and evening. `VillageWorkshopTests`: every workshop place is on the navmesh and can be walked to, and Maud keeps
     shop apart from the tannery yard.
   - Hunters and woodcutters work the groves. Herbalists gather on the open meadow.
   - Work poses: Hammer, Chop, Gather, Knead. Each trade has its own lines of talk.

@@ -40,15 +40,16 @@ namespace Crulanda.Tests
             var local = new Vector2(d.x * Mathf.Cos(a) + d.y * Mathf.Sin(a), -d.x * Mathf.Sin(a) + d.y * Mathf.Cos(a));
             return ToBox(local, Vector2.zero, f.size);
         }
-        /// <summary>How far a new building reaches from its centre: half its longer side (a workshop's from its fixed size).</summary>
+        /// <summary>How far a new building reaches from its centre: a radius over its furthest built part (a workshop's roof
+        /// corners, racks, sign and pentice as ZoneBuilder.Workshops builds them; a house's half longer side).</summary>
         static float Reach(ZoneProp p)
         {
             switch (p.kind)
             {
-                case "leathershop": return Mathf.Max(ZoneBuilder.LeatherShopSize.x, ZoneBuilder.LeatherShopSize.y) / 2;
-                case "dryhut": return Mathf.Max(ZoneBuilder.DryingHutSize.x, ZoneBuilder.DryingHutSize.y) / 2;
-                case "kitchen": return Mathf.Max(ZoneBuilder.KitchenSize.x, ZoneBuilder.KitchenSize.y) / 2;
-                case "gamerack": return 2;
+                case "leathershop": return 5;     // the hanging sign's corner (about -3, -3.9) and the roof corners (about 4.8 m)
+                case "dryhut": return 6;          // the second drying rack out in front (about 5.7 m)
+                case "kitchen": return 3.7f;      // the water butt and the roof slab's corner
+                case "gamerack": return 2.6f;     // the ring of fire stones
                 default: return Mathf.Max(p.size.x, p.size.y) / 2;
             }
         }

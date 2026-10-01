@@ -273,8 +273,10 @@ namespace Crulanda.World
             MeshPart(ZoneMeshes.GableRoof(w + 1.2f, d + 1.4f, roofH, .25f, .6f), t, new Vector3(0, top, 0), art.thatch);
             Eaves(t, w, d, top, roofH, art.thatch);
             Gables(t, w / 2, d, top, roofH, d / 2 + .7f, w / 2 + .6f, weave, 1, .18f);
-            // Herbs: four bunches on pegs under the front plate over the closed panel, five on a pole under the ceiling inside.
-            for (int i = 0; i < 4; i++) HerbBundle(t, new Vector3(-2.05f + i * .48f, top - .4f, -d / 2 - .22f), i);   // the heads clear the wattle's stakes
+            // Herbs: four bunches from a batten tied under the front rafter ends over the closed panel (clear of the corner and
+            // door posts), five on a pole under the ceiling inside.
+            Rod(t, new Vector3(-2.35f, top - .38f, -d / 2 - .22f), new Vector3(-.45f, top - .38f, -d / 2 - .22f), .05f, withy);
+            for (int i = 0; i < 4; i++) HerbBundle(t, new Vector3(-2.05f + i * .48f, top - .4f, -d / 2 - .22f), i);   // hung from the batten; the heads clear the wattle's stakes
             Rod(t, new Vector3(-w / 2 + .1f, top - .32f, .4f), new Vector3(w / 2 - .1f, top - .32f, .4f), .05f, withy);
             for (int i = 0; i < 5; i++) HerbBundle(t, new Vector3(-1.7f + i * .8f, top - .34f, .4f), i + 2);
             // The bench along the right wall, from the back: a mortar and pestle, three jars, and the still at the doorway end
@@ -361,10 +363,9 @@ namespace Crulanda.World
             var pot = PropMesh("Cook pot", () => Turned(new[] { new Vector2(0, 0), new Vector2(.15f, 0), new Vector2(.23f, .1f), new Vector2(.23f, .24f), new Vector2(.19f, .3f), new Vector2(.21f, .33f), new Vector2(.17f, .33f), new Vector2(.17f, .27f), new Vector2(0, .27f) }, 10));
             MeshPart(pot, t, new Vector3(-1.75f, .94f, -.4f), iron);
             Part(PrimitiveType.Cylinder, t, new Vector3(-1.75f, 1.225f, -.4f), new Vector3(.34f, .006f, .34f), Tint(art.cloth, new Color(.46f, .3f, .16f)));
-            Rod(t, new Vector3(-2.12f, 1.3f, -.82f), new Vector3(-2.12f, 1.82f, -.82f), .035f, iron);
-            Rod(t, new Vector3(-2.12f, 1.78f, -.82f), new Vector3(-1.75f, 1.78f, -.4f), .035f, iron);
-            Rod(t, new Vector3(-1.75f, 1.78f, -.4f), new Vector3(-1.75f, 1.5f, -.4f), .02f, iron);
-            foreach (int s in new[] { -1, 1 }) Rod(t, new Vector3(-1.75f, 1.5f, -.4f), new Vector3(-1.75f + s * .2f, 1.27f, -.4f), .018f, iron);
+            Rod(t, new Vector3(-2.12f, .94f, -.82f), new Vector3(-2.12f, 1.48f, -.82f), .035f, iron);   // the pivot, up from the plate
+            Rod(t, new Vector3(-2.12f, 1.45f, -.82f), new Vector3(-1.75f, 1.45f, -.4f), .035f, iron);   // the arm, just under the hood (its bottom at 1.5)
+            foreach (int s in new[] { -1, 1 }) Rod(t, new Vector3(-1.75f, 1.45f, -.4f), new Vector3(-1.75f + s * .2f, 1.27f, -.4f), .018f, iron);   // the pot's bail, from the arm's end
             Part(PrimitiveType.Cylinder, t, new Vector3(-1.75f, .96f, .5f), new Vector3(.32f, .02f, .32f), iron);
             Rod(t, new Vector3(-1.62f, .97f, .5f), new Vector3(-1.3f, 1, .62f), .025f, iron);
             // Firewood in the corner between the range and the inn's wall, its cut ends to the room.

@@ -75,6 +75,12 @@ namespace Crulanda.Tests
             Assert.AreEqual(1, life.Places["lodge"].Count, "One place at the game rack.");
             Assert.IsTrue(zone.Doors.Any(d => d.kind == "rooms" && !d.openable && d.name == "The Golden Cask, upstairs"), "The inn has its rooms door.");
             Assert.IsFalse(life.Homes.Any(d => d.kind == "rooms"), "Nobody lives behind the rooms door yet.");
+            Assert.IsFalse(life.Homes.Any(d => VillageLife.UnsettledHouses.Contains(d.name)), "The two new houses stand empty until households, so the old houses keep their folk.");
+            foreach (var name in VillageLife.UnsettledHouses)
+            {
+                var door = zone.Doors.Single(d => d.name == name);
+                Assert.IsTrue(NavMesh.SamplePosition(door.position, out var dh, 2, NavMesh.AllAreas) && NavMesh.CalculatePath(start.position, dh.position, NavMesh.AllAreas, path) && path.status == NavMeshPathStatus.PathComplete, name + "'s door can be walked to.");
+            }
             Assert.IsTrue(zone.Doors.Any(d => d.name == "Tanner house" && !d.openable), "The houses carry their names to their doors (Knock · Tanner house).");
             Assert.IsTrue(zone.Doors.Any(d => d.name == "Carder farmhouse") && zone.Doors.Any(d => d.name == "Crisp cottage"), "The two new houses have doors.");
         }
@@ -88,7 +94,11 @@ namespace Crulanda.Tests
                 var shift = VillageWork.ShiftFor("leatherworker", h);
                 Assert.IsNotNull(shift, "Somewhere at " + h); CollectionAssert.AreEqual(new[] { "leathershop" }, shift.places, "At her shop at " + h);
             }
-            foreach (float hour in new[] { 9.3f, 14.3f })
+            // No errand of hers starts inside a counter block (an errand takes her off her shift).
+            foreach (var e in VillageWork.DayFor("leatherworker").errands)
+                Assert.IsTrue((e.until <= 9 || e.at >= 12) && (e.until <= 14 || e.at >= 18), "'" + e.id + "' (" + e.at + " to " + e.until + ") keeps clear of the counter's hours.");
+            // Late morning too: the hour the old errand to the stall took her from the counter.
+            foreach (float hour in new[] { 9.3f, 11.25f, 14.3f })
             {
                 yield return Load(hour);
                 var zone = ZoneBuilder.Active; var life = VillageLife.Active;

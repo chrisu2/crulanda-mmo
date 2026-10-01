@@ -16,15 +16,17 @@ namespace Crulanda.Encounter
         /// <summary>The trade whose page is open, by id (capture tools set it; null = the first).</summary>
         public static string TradesPage;
         static readonly Color SkillBar = new Color(.78f, .58f, .22f), Dim = new Color(.68f, .66f, .6f);
+        GUIStyle tradeNote;
 
         void DrawTrades()
         {
             QuestStyles(); var log = session.Professions; if (log == null) return;
+            if (tradeNote == null) tradeNote = new GUIStyle(tiny) { wordWrap = false, clipping = TextClipping.Clip };
             var w = TradesRect;
             Fill(new Rect(w.x - 3, w.y - 3, w.width + 6, w.height + 6), new Color(.3f, .22f, .12f, .98f)); Fill(w, new Color(.08f, .075f, .07f, .97f));
             Shadow(new Rect(w.x + 16, w.y + 10, 300, 32), "TRADES", heading, gold);
             if (GUI.Button(new Rect(w.xMax - 124, w.y + 12, 110, 30), "Close [K]", micro)) session.ShowTrades(false);
-            var list = new Rect(w.x + 14, w.y + 54, 196, w.height - 68); var page = new Rect(list.xMax + 14, list.y, w.xMax - list.xMax - 28, list.height);
+            var list = new Rect(w.x + 14, w.y + 54, 212, w.height - 68); var page = new Rect(list.xMax + 14, list.y, w.xMax - list.xMax - 28, list.height);
             Fill(list, new Color(1, 1, 1, .04f));
             if (log.Db.Order.Count == 0) { Shadow(new Rect(page.x, page.y + 10, page.width, 30), "No trades are known here.", text, new Color(.8f, .8f, .8f)); return; }
             if (TradesPage == null || log.Db.Profession(TradesPage) == null) TradesPage = log.Db.Order[0].id;
@@ -48,7 +50,7 @@ namespace Crulanda.Encounter
                 GUI.enabled = true;
                 Shadow(new Rect(r.x + 10, r.y + 3, r.width - 20, 22), d.name, qHead, has ? Color.white : Dim);
                 if (has) UnitBar(new Rect(r.x + 10, r.y + 30, r.width - 20, 12), log.Skill(d.id) / (float)ProfessionDatabase.MaxSkill, SkillBar, log.Skill(d.id) + " / " + ProfessionDatabase.MaxSkill);
-                else Shadow(new Rect(r.x + 10, r.y + 25, r.width - 20, 22), ShortNeed(d), tiny, Dim);
+                else Shadow(new Rect(r.x + 10, r.y + 25, r.width - 14, 22), ShortNeed(d), tradeNote, Dim);
                 y += 54;
             }
             return y + 8;

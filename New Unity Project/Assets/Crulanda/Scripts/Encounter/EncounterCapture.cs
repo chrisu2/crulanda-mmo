@@ -119,8 +119,21 @@ namespace Crulanda.Encounter
                 ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "07-inn-inside.png")); yield return new WaitForSeconds(.5f);
             }
             if (session.Quests != null && zone != null && VillageLife.Active != null) { var q = CaptureQuests(directory, prefix, zone); while (q.MoveNext()) yield return q.Current; }
+            if (session.Professions != null) { var t = CaptureTrades(directory, prefix); while (t.MoveNext()) yield return t.Current; }
             yield return new WaitForSeconds(1);
             Debug.Log("UI_CAPTURE_DONE"); Application.Quit(0);
+        }
+        /// <summary>The Trades window (K) beside the bags: a skill whose tool hangs at the belt, then one still wanting its tool.</summary>
+        IEnumerator CaptureTrades(string directory, string prefix)
+        {
+            session.Conversation = null; session.QuestBookOpen = false; session.ReadingDocument = null;
+            foreach (var (item, count) in new[] { ("tool.pick", 1), ("tool.hatchet", 1), ("mat.copper_ore", 7), ("mat.yarrow", 3), ("mat.flour", 2) }) Inventory.Add(session.Progress, session.Items, item, count);
+            int pick = session.Progress.bag.FindIndex(s => s.item == "tool.pick"); if (pick >= 0) session.EquipFromBag(pick);
+            EncounterHud.TradesPage = "mining"; session.ShowTrades(true); yield return new WaitForSeconds(.6f);
+            ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "17-trades.png")); yield return new WaitForSeconds(.4f);
+            EncounterHud.TradesPage = "woodcutting"; yield return new WaitForSeconds(.3f);
+            ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "18-trades-no-tool.png")); yield return new WaitForSeconds(.4f);
+            EncounterHud.TradesPage = null; session.ShowTrades(false); session.InventoryOpen = false;
         }
         /// <summary>The quest interface: a giver's !, the offer, the quest book, the ledger in the Chronicle, a hand-in list, standing, the tracker.</summary>
         IEnumerator CaptureQuests(string directory, string prefix, Crulanda.World.ZoneBuilder zone)

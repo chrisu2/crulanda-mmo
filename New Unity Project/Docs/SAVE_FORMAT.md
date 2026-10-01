@@ -19,7 +19,7 @@ clears threat, casts, personal cooldowns, global cooldowns and temporary Guard s
 The shared ability runtime does not change the persistent schema, so no version bump is required.
 Unsupported format/type or invalid payloads are rejected. An unreadable startup save blocks overwrite.
 
-## Format history (current EncounterSave.FormatVersion = 7; formats 4-7 are described at the end)
+## Format history (current EncounterSave.FormatVersion = 8; formats 4-8 are described at the end)
 - 1: no class/talents. Read migrates to classId class.warrior with an empty talent list.
 - 2: classId + talents using the 9-node prototype ids (tank.armor, dps.power, ...). Read maps them through
   EncounterSave.LegacyTalentIds to the data-driven ids; if the mapped allocation is illegal under the new tier
@@ -31,10 +31,10 @@ Transient talent state (weapon pressure, Exposed, barriers, intercept, standard)
 
 ## Generic infrastructure
 SaveFileStore handles envelope I/O/backups. SaveMigrator chains ISaveMigration steps on the payload text.
-EncounterSave uses it from format 6 on: it registers one step per format (6 → 7: `AddDiscoveriesMigration`) and runs
-the chain in memory before reading the payload. Formats 1-5 are older than the chain and are still upgraded in memory in
+EncounterSave uses it from format 6 on: it registers one step per format (6 → 7: `AddDiscoveriesMigration`,
+7 → 8: `AddProfessionsMigration`) and runs the chain in memory before reading the payload. Formats 1-5 are older than the chain and are still upgraded in memory in
 `EncounterSave.Read`. Versions above the current one are rejected.
-To change saved fields, add the next step (7 → 8) and bump `FormatVersion`. No migration is needed for combat tuning.
+To change saved fields, add the next step (8 → 9) and bump `FormatVersion`. No migration is needed for combat tuning.
 
 ## Future world persistence
 WorldSaveData/CharacterSaveData/SimAdventurerSaveData/QuestSaveData/InventorySaveData/FactionSaveData
@@ -83,3 +83,30 @@ through it. It runs first for any save below format 5.
     `work\save-backups\20260930-1739-before-format7`.
 - Formats 1-5 load with an empty list.
 - As before, migration happens in memory on read. The file is written as format 7 on the next save.
+
+## Format 8 (2026-10-01): trades
+Two new lists at the end of the payload, for the whole professions feature (one format bump, one migration):
+- `professions`: `List<ProfessionSkill>` (`id` and `skill`), the trades the character has and the skill in each.
+  - Ids come from `EncounterContent/Professions/*.json` (`mining`, `woodcutting`, `herbalism`, `cooking`, `blacksmithing`, `alchemy`).
+  - `ProfessionLog.Bind` adds the trades everyone has from the start (`herbalism`, `cooking`) at skill 1 when they are missing, so
+    a migrated character gains those two entries at its next save. A gathering tool adds its skill at 1 when first used
+    (the tool item is used up; nothing else records it).
+  - On load: blank ids are dropped, and so is a later entry for an id already listed. A `skill` below 0 or above 100 refuses the
+    save ("Invalid profession data."): it is not loaded and the file is not changed. An id this build's content doesn't know is
+    kept in the save and ignored by `ProfessionLog`, so content can change. A known trade's skill is brought to at least 1 on bind.
+- `pouches`: `List<string>`, the trade bags worn, by item id, in the order they were put on.
+  - Written empty by this step of the build. The bags themselves arrive with the leatherworker's bags; from then each worn bag adds
+    its slots to the end of `bag` (after slot 24) in this order.
+  - On load: blank ids and repeats are dropped. More than 8 entries (`EncounterSave.MaxPouches`) refuses the save
+    ("Invalid item data."), as a `bag` longer than 96 slots already did. An unknown bag id is kept.
+- Migration 7 → 8 is `AddProfessionsMigration`, a SaveMigrator step of the same kind as 6 → 7.
+  - It inserts `"professions":[]` and `"pouches":[]`, in that order, before the payload's closing brace and leaves every other
+    character of the v7 payload as it was. A list that is already there is left alone (only the missing one is added). A payload
+    that isn't a JSON object is refused: the save isn't loaded or changed.
+  - A format-6 save runs both steps (6 → 7 → 8) in one read.
+  - The step's source was compiled outside Unity and run, read-only, on Chris's save and its `.bak` (both still format 6 on
+    2026-10-01): all 26 fields came through byte-identical, and only `discoveries`, `professions` and `pouches` were added, empty.
+    Back the save folder up to `work\save-backups\<date>-pre-format-8` before the first run of this build.
+- Formats 1-5 load with both lists empty.
+- Not saved: which nodes have been worked (they regrow in memory), known recipes (they follow from skill).
+- As before, migration happens in memory on read. The file is written as format 8 on the next save.

@@ -22,11 +22,13 @@ namespace Crulanda.Encounter
         }
         public static bool Requested
         {
-            get { var a = Environment.GetCommandLineArgs(); return Array.IndexOf(a, "--crulanda-capture") >= 0 || Array.IndexOf(a, "--crulanda-ui-capture") >= 0 || Array.IndexOf(a, "--crulanda-world-capture") >= 0; }
+            get { var a = Environment.GetCommandLineArgs(); return Array.IndexOf(a, "--crulanda-capture") >= 0 || Array.IndexOf(a, "--crulanda-ui-capture") >= 0 || Array.IndexOf(a, "--crulanda-world-capture") >= 0 || WardrobeCapture.Requested; }
         }
         IEnumerator Start()
         {
             var args = Environment.GetCommandLineArgs();
+            int wardrobe = Array.IndexOf(args, WardrobeCapture.Flag);
+            if (wardrobe >= 0 && wardrobe + 1 < args.Length) { yield return gameObject.AddComponent<WardrobeCapture>().Run(session, args[wardrobe + 1]); yield break; }
             int ui = Array.IndexOf(args, "--crulanda-ui-capture");
             if (ui >= 0 && ui + 1 < args.Length) { yield return CaptureInterface(args[ui + 1]); yield break; }
             int world = Array.IndexOf(args, "--crulanda-world-capture");

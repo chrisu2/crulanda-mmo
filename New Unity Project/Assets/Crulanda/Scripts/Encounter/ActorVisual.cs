@@ -20,6 +20,8 @@ namespace Crulanda.Encounter
         int variant; bool child, posed; string role; float stoop, swimLean, swimPhase;
         /// <summary>Held weapon/shield/staff parts, and the same kit slung on the back (shown instead while swimming).</summary>
         Transform[] held, stowed; bool gearStowed;
+        /// <summary>Class kit that worn gear replaces: the Warrior's shoulder pads, the Druid's hood. See ActorVisual.Gear.cs.</summary>
+        Transform[] classKit; ActorLook built;
         /// <summary>Villagers pass their trade (<paramref name="role"/>) to get its outfit and tool; see <see cref="Dress"/>.</summary>
         public static ActorVisual Attach(GameObject actor, ActorLook look, int variant = 0, bool child = false, string role = null)
         {
@@ -50,7 +52,8 @@ namespace Crulanda.Encounter
         { var m = new Material(Shader.Find("Standard")) { color = c }; m.SetFloat("_Glossiness", smooth); m.SetFloat("_Metallic", metal); return m; }
         Transform Part(PrimitiveType type, Transform parent, Vector3 pos, Vector3 scale, Material m, Vector3? euler = null)
         {
-            var o = GameObject.CreatePrimitive(type); Destroy(o.GetComponent<Collider>());
+            var o = GameObject.CreatePrimitive(type);
+            if (Application.isPlaying) Destroy(o.GetComponent<Collider>()); else DestroyImmediate(o.GetComponent<Collider>());   // edit mode tests build figures too
             o.transform.SetParent(parent, false); o.transform.localPosition = pos; o.transform.localScale = scale;
             if (euler.HasValue) o.transform.localEulerAngles = euler.Value;
             o.GetComponent<Renderer>().sharedMaterial = m; return o.transform;
@@ -312,6 +315,7 @@ namespace Crulanda.Encounter
         void Build(ActorLook look)
         {
             body = transform.Find("Body"); if (body == null) return;
+            built = look;
             var capsule = body.GetComponent<MeshRenderer>(); if (capsule != null) capsule.enabled = false;
             if (look == ActorLook.WeaveEater) { BuildEater(); lastPosition = transform.position; return; }
             if (look == ActorLook.Pale) { BuildPale(); lastPosition = transform.position; return; }
@@ -370,7 +374,7 @@ namespace Crulanda.Encounter
             {
                 case ActorLook.Warrior:
                 {
-                    foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Sphere, body, new Vector3(s * .31f, .58f, 0), new Vector3(.26f, .18f, .26f), accent);
+                    classKit = new[] { Part(PrimitiveType.Sphere, body, new Vector3(-.31f, .58f, 0), new Vector3(.26f, .18f, .26f), accent), Part(PrimitiveType.Sphere, body, new Vector3(.31f, .58f, 0), new Vector3(.26f, .18f, .26f), accent) };   // pads
                     var hilt = Mat(new Color(.4f, .3f, .15f)); var boards = Mat(new Color(.36f, .25f, .15f));
                     held = new[] {
                         Part(PrimitiveType.Cube, armR, new Vector3(0, -.66f, .38f), new Vector3(.05f, .06f, .9f), accent, new Vector3(20, 0, 0)),         // sword
@@ -386,7 +390,7 @@ namespace Crulanda.Encounter
                     break;
                 }
                 case ActorLook.Druid:
-                    Part(PrimitiveType.Sphere, body, new Vector3(0, .84f, -.03f), new Vector3(.36f, .38f, .38f), cloth);                 // hood
+                    classKit = new[] { Part(PrimitiveType.Sphere, body, new Vector3(0, .84f, -.03f), new Vector3(.36f, .38f, .38f), cloth) };   // hood
                     Part(PrimitiveType.Cube, body, new Vector3(0, .2f, -.17f), new Vector3(.52f, .95f, .05f), accent, new Vector3(-6, 0, 0)); // cloak
                 {
                     var staff = Mat(new Color(.35f, .25f, .15f)); var orb = Mat(new Color(.45f, .7f, .4f), .6f);

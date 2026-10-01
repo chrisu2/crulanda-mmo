@@ -1299,7 +1299,7 @@ namespace Crulanda.World
             float w = size.x, d = size.y;
             var plaster = Tint(art.plaster, Plaster[Mathf.Abs(variant) % Plaster.Length]);
             var roofMat = variant % 2 == 0 ? art.thatch : art.slate;
-            Footing(t, w + .3f, d + .3f, .6f, .5f, .9f);   // the plinth: stepped stone down to the ground and up the slope
+            Footing(t, w + .34f, d + .34f, .6f, .52f, .9f, .62f);   // the plinth: stepped stone down to the ground and up the slope (2 cm proud of the corner posts it climbs over), open behind the door
             BoxPart(t, new Vector3(0, .6f + wallHeight / 2, 0), new Vector3(w, wallHeight, d), plaster);
             // Timber framing: corner posts, a sill rail under the windows (a rail per storey on an inn) and a knee brace from each
             // corner post up to the first rail, so the door and windows sit in clear panels with nothing crossing them.

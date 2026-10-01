@@ -331,7 +331,7 @@ namespace Crulanda.World
             const float top = 2.8f, roofH = 1.6f, end = 2.4f, front = -.6f, rear = 2.1f;   // the eaves, the ridge's rise, the end walls' middles, the hearth house's front and back faces
             float G(float x, float z) { return LocalGround(t, x, z); }
             // The hearth house: the stone back wall (as before) with planks above it, the stone end wall, the plank half wall
-            // with its rail, a corner post at each end of it, and the plates the roof sits on.
+            // with its rail, a corner post at each end of it, and plates under the roof's soffit (it hides anything above it).
             float low = Mathf.Min(G(-2.5f, 1.95f), Mathf.Min(G(0, 1.95f), G(2.5f, 1.95f)));
             BoxPart(t, new Vector3(0, (1.4f + Mathf.Min(0, low) - .2f) / 2, 1.95f), new Vector3(5, 1.4f - Mathf.Min(0, low) + .2f, .3f), Masonry, null, 1);
             BoxPart(t, new Vector3(0, (1.4f + top) / 2, 2.02f), new Vector3(5, top - 1.4f, .1f), boards, null, 1);
@@ -339,9 +339,9 @@ namespace Crulanda.World
             BoxPart(t, new Vector3(end, (top + lowEnd - .2f) / 2, (front + rear) / 2), new Vector3(.3f, top - lowEnd + .2f, rear - front), Masonry, null, 1);
             BoxPart(t, new Vector3(-end, .55f, .85f), new Vector3(.12f, 1.1f, 2.5f), boards, null, 1);
             Part(PrimitiveType.Cube, t, new Vector3(-end, 1.14f, .85f), new Vector3(.18f, .08f, 2.6f), dark);
-            foreach (float z in new[] { front, 1.75f }) Stake(t, new Vector3(-end, G(-end, z) - .1f, z), .22f, top - .2f - G(-end, z) + .1f, dark);
-            Part(PrimitiveType.Cube, t, new Vector3(0, top - .1f, front), new Vector3(2 * end + .3f, .2f, .2f), dark);
-            Part(PrimitiveType.Cube, t, new Vector3(0, top - .1f, 1.95f), new Vector3(2 * end + .3f, .2f, .2f), dark);
+            foreach (float z in new[] { front, 1.75f }) Stake(t, new Vector3(-end, G(-end, z) - .1f, z), .22f, top - .45f - G(-end, z) + .1f, dark);
+            Part(PrimitiveType.Cube, t, new Vector3(0, top - .35f, front), new Vector3(2 * end + .3f, .2f, .2f), dark);
+            Part(PrimitiveType.Cube, t, new Vector3(0, top - .35f, 1.91f), new Vector3(2 * end + .3f, .2f, .12f), dark);
             BoxPart(t, new Vector3(0, .025f, .75f), new Vector3(2 * end - .2f, .05f, 2.6f), Tint(Masonry, new Color(.56f, .54f, .5f)), null, 1.2f);   // the flagged floor
             var roof = new GameObject("Smithy roof").transform; roof.SetParent(t, false); roof.localPosition = new Vector3(0, 0, (front + rear) / 2);
             float d = rear - front, w = 2 * end + .3f;   // the hearth house's walls, outer faces
@@ -349,7 +349,7 @@ namespace Crulanda.World
             Eaves(roof, w - .4f, d, top, roofH, art.slate);
             Gables(roof, w / 2, d, top, roofH, d / 2 + .7f, w / 2 + .45f, boards, 1.2f, .2f);
             // The lean-to over the anvil: slate from under the front plate down to a beam on two posts, on six rafters, a fascia at its foot.
-            const float hiY = 2.4f, loY = 1.95f, z0 = -.55f, z1 = -2.4f; float slope = (hiY - loY) / (z0 - z1), pitch = Mathf.Atan(slope) * Mathf.Rad2Deg;
+            const float hiY = 2.28f, loY = 1.95f, z0 = -.55f, z1 = -2.4f; float slope = (hiY - loY) / (z0 - z1), pitch = Mathf.Atan(slope) * Mathf.Rad2Deg;
             float Under(float z) { return hiY - (z0 - z) * slope - .04f; }   // the lean-to slab's underside over local z
             BoxPart(t, new Vector3(0, (hiY + loY) / 2, (z0 + z1) / 2), new Vector3(5.8f, .08f, Mathf.Sqrt((z0 - z1) * (z0 - z1) + (hiY - loY) * (hiY - loY)) + .05f), art.slate, Quaternion.Euler(-pitch, 0, 0), 2.5f);
             foreach (float x in new[] { -2.5f, -1.5f, -.5f, .5f, 1.5f, 2.5f }) Bar(t, new Vector3(x, Under(-.62f) - .045f, -.62f), new Vector3(x, Under(-2.3f) - .045f, -2.3f), .09f, .07f, dark);

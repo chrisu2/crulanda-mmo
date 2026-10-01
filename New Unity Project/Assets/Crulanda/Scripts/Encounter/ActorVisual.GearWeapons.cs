@@ -536,7 +536,7 @@ namespace Crulanda.Encounter
                     GPart(r, M.Rim("round.rim.hoop", outline, .04f, .014f, th / 2, bulge, c, radius), k.metal, Vector3.zero, Vector3.one);
                     break;
                 case "lid":   // a strongbox lid: iron straps and a lock plate
-                    GPart(r, Paints("round.lid.straps", th, bulge, c, radius, Strip(-.27f, .27f, -.12f, .05f), Strip(-.27f, .27f, .12f, .05f)), k.metal, Vector3.zero, Vector3.one);
+                    GPart(r, Paints("round.lid.straps", th, bulge, c, radius, Strip(-.24f, .24f, -.12f, .05f), Strip(-.24f, .24f, .12f, .05f)), k.metal, Vector3.zero, Vector3.one);
                     GPart(r, Paint("round.lid.lock", Pts(-.05f, -.04f, .05f, -.04f, .05f, .04f, -.05f, .04f), th, bulge, c, radius, .004f, .006f), k.trim, Vector3.zero, Vector3.one);
                     GBox(r, GearMats.Get(new Color(.05f, .04f, .04f)), V(0, faceTop + .004f, 0), V(.03f, .006f, .012f));                               // keyhole
                     GPart(r, M.Rim("round.rim", outline, .025f, .013f, th / 2, bulge, c, radius), k.metal, Vector3.zero, Vector3.one);

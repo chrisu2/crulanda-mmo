@@ -363,6 +363,197 @@
       "stack": 10,
       "description": "A sexton's bell, its clapper wired shut so it can't ring for anyone again.",
       "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "junk.moss_hide",
+      "name": "Moss-matted hide",
+      "kind": "junk",
+      "quality": 0,
+      "value": 7,
+      "stack": 10,
+      "description": "Thick boar hide with moss rooted in the bristles. A tanner will scrape it, eventually.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "junk.mossback_tusk",
+      "name": "Moss-green tusk",
+      "kind": "junk",
+      "quality": 0,
+      "value": 6,
+      "stack": 10,
+      "description": "Yellow-green with lichen. It still smells of the reed-beds.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "junk.velvet_tine",
+      "name": "Velvet antler tine",
+      "kind": "junk",
+      "quality": 0,
+      "value": 8,
+      "stack": 10,
+      "description": "A tine still in its velvet. Carvers pay well for it.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "junk.dappled_hide",
+      "name": "Dappled stag hide",
+      "kind": "junk",
+      "quality": 0,
+      "value": 8,
+      "stack": 10,
+      "description": "Dappled like light through leaves.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "junk.spider_chitin",
+      "name": "Canopy-spider chitin",
+      "kind": "junk",
+      "quality": 0,
+      "value": 7,
+      "stack": 10,
+      "description": "A plate of green-black shell, lighter than it looks.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "junk.venom_gland",
+      "name": "Pale-green venom gland",
+      "kind": "junk",
+      "quality": 0,
+      "value": 9,
+      "stack": 10,
+      "description": "Don't squeeze it.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "junk.briar_thorns",
+      "name": "Briar thorns",
+      "kind": "junk",
+      "quality": 0,
+      "value": 6,
+      "stack": 10,
+      "description": "A fistful of thorns as long as your finger. One of them is still twitching.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "junk.briar_heart",
+      "name": "Briar-heart knot",
+      "kind": "junk",
+      "quality": 0,
+      "value": 9,
+      "stack": 10,
+      "description": "A knot of root and thorn from the middle of a creeping briar. It has stopped moving. Mostly.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "junk.grey_bark",
+      "name": "Grey bark",
+      "kind": "junk",
+      "quality": 0,
+      "value": 9,
+      "stack": 10,
+      "description": "Keeper-bark gone grey and brittle. It crumbles like ash between your fingers, and it is cold.",
+      "canonStatus": "CANON-EXPANDED: the Veridian Keepers are CANON (book3 ch.2); their greying is GAME-ONLY."
+    },
+    {
+      "id": "junk.cold_trinket",
+      "name": "Cold trinket",
+      "kind": "junk",
+      "quality": 0,
+      "value": 10,
+      "stack": 10,
+      "description": "A ring, a button, a bead on a string: the things a person carries. This one is cold, and you can't tell any more whose it was.",
+      "canonStatus": "CANON-EXPANDED: the Void-Touchers, who have forgotten their human names (book3 ch.2); the trinket is GAME-ONLY."
+    },
+    {
+      "id": "junk.cold_sliver",
+      "name": "Sliver of cold glass",
+      "kind": "junk",
+      "quality": 0,
+      "value": 11,
+      "stack": 10,
+      "description": "A splinter of something that was never quite glass. It reflects nothing.",
+      "canonStatus": "CANON-EXPANDED: the Pale Shadows, shapes of cold glass (book3 ch.8); the sliver is GAME-ONLY."
+    },
+    {
+      "id": "food.sap_cake",
+      "name": "Sap-cake",
+      "kind": "consumable",
+      "food": true,
+      "heal": 640,
+      "quality": 1,
+      "level": 10,
+      "value": 5,
+      "stack": 20,
+      "description": "Nut-meal sweetened with a drop of sap and baked on a hot stone. Eat it under the lanterns.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "potion.dewfern",
+      "name": "Dewfern draught",
+      "kind": "consumable",
+      "heal": 520,
+      "quality": 1,
+      "level": 11,
+      "value": 18,
+      "stack": 10,
+      "description": "Morning dew shaken from fern-tops, with something green steeped in it. It tastes like a wet forest smells.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "herb.lantern_moss",
+      "name": "Lantern-moss",
+      "kind": "consumable",
+      "heal": 760,
+      "quality": 3,
+      "level": 11,
+      "value": 20,
+      "stack": 10,
+      "description": "Moss that glows like a banked coal, even picked. Chew it, and for a moment you can hear the trees.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "item.tappers_gloves",
+      "name": "Sap-Tapper's Gloves",
+      "kind": "gear",
+      "slot": "hands",
+      "quality": 3,
+      "level": 11,
+      "value": 40,
+      "armor": 26,
+      "stamina": 6,
+      "agility": 7,
+      "spirit": 4,
+      "description": "Soft hide stained green to the wrist. The sap never quite washes out, and in the dark your fingertips glow.",
+      "canonStatus": "CANON-EXPANDED: Ghost-Oaks tapped for Veridian sap (book3 ch.4); the gloves are GAME-ONLY."
+    },
+    {
+      "id": "item.ninebranch_tine",
+      "name": "Tine of the Old King",
+      "kind": "gear",
+      "slot": "neck",
+      "quality": 3,
+      "level": 13,
+      "value": 52,
+      "stamina": 9,
+      "strength": 7,
+      "agility": 6,
+      "description": "The ninth branch of Old Ninebranch's antlers on a cord of braided grass, grey creeping through it like frost through glass.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "item.greyheart_stave",
+      "name": "Greyheart's Salt-Wood Stave",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 3,
+      "level": 13,
+      "value": 66,
+      "weaponDamage": 38,
+      "stamina": 7,
+      "intellect": 8,
+      "spirit": 6,
+      "description": "A Keeper's staff of white salt-wood gone grey along half its length. The white half still hums. The grey half is cold.",
+      "canonStatus": "CANON-EXPANDED: the Keepers' staves of white salt-wood that hum (book3 ch.2); Greyheart and his stave are GAME-ONLY."
     }
   ],
   "vendors": [
@@ -393,6 +584,21 @@
       "items": [
         "potion.minor",
         "potion.healing"
+      ]
+    },
+    {
+      "npc": "Moss-Lantern",
+      "items": [
+        "food.sap_cake",
+        "potion.dewfern",
+        "potion.salt"
+      ]
+    },
+    {
+      "npc": "Ondine Varro",
+      "items": [
+        "potion.dewfern",
+        "potion.salt"
       ]
     }
   ],
@@ -662,6 +868,156 @@
         {
           "item": "junk.petrified_shard",
           "chance": 0.5
+        }
+      ]
+    },
+    {
+      "tag": "mossboar",
+      "levelMin": 10,
+      "levelMax": 13,
+      "gearChance": 0.12,
+      "entries": [
+        {
+          "item": "junk.moss_hide",
+          "chance": 0.7
+        },
+        {
+          "item": "junk.mossback_tusk",
+          "chance": 0.35
+        }
+      ]
+    },
+    {
+      "tag": "stag",
+      "levelMin": 10,
+      "levelMax": 13,
+      "gearChance": 0.12,
+      "entries": [
+        {
+          "item": "junk.velvet_tine",
+          "chance": 0.6
+        },
+        {
+          "item": "junk.dappled_hide",
+          "chance": 0.5
+        }
+      ]
+    },
+    {
+      "tag": "spider",
+      "levelMin": 10,
+      "levelMax": 13,
+      "gearChance": 0.14,
+      "entries": [
+        {
+          "item": "junk.spider_chitin",
+          "chance": 0.6
+        },
+        {
+          "item": "junk.venom_gland",
+          "chance": 0.3
+        },
+        {
+          "item": "potion.dewfern",
+          "chance": 0.05
+        }
+      ]
+    },
+    {
+      "tag": "bramble",
+      "levelMin": 10,
+      "levelMax": 13,
+      "gearChance": 0.14,
+      "entries": [
+        {
+          "item": "junk.briar_thorns",
+          "chance": 0.7,
+          "min": 1,
+          "max": 2
+        },
+        {
+          "item": "junk.briar_heart",
+          "chance": 0.25
+        }
+      ]
+    },
+    {
+      "tag": "withered",
+      "levelMin": 10,
+      "levelMax": 13,
+      "gearChance": 0.18,
+      "entries": [
+        {
+          "item": "junk.grey_bark",
+          "chance": 0.7
+        },
+        {
+          "item": "potion.dewfern",
+          "chance": 0.08
+        }
+      ]
+    },
+    {
+      "tag": "greyheart",
+      "levelMin": 10,
+      "levelMax": 13,
+      "gearChance": 0.7,
+      "entries": [
+        {
+          "item": "item.greyheart_stave",
+          "chance": 1.0
+        },
+        {
+          "item": "junk.grey_bark",
+          "chance": 1.0,
+          "min": 2,
+          "max": 3
+        }
+      ]
+    },
+    {
+      "tag": "mistwalker",
+      "levelMin": 10,
+      "levelMax": 13,
+      "gearChance": 0.2,
+      "entries": [
+        {
+          "item": "junk.cold_trinket",
+          "chance": 0.6
+        },
+        {
+          "item": "potion.dewfern",
+          "chance": 0.1
+        }
+      ]
+    },
+    {
+      "tag": "paleshadow",
+      "levelMin": 10,
+      "levelMax": 13,
+      "gearChance": 0.25,
+      "entries": [
+        {
+          "item": "junk.cold_sliver",
+          "chance": 0.8
+        }
+      ]
+    },
+    {
+      "tag": "ninebranch",
+      "levelMin": 10,
+      "levelMax": 13,
+      "gearChance": 0.7,
+      "entries": [
+        {
+          "item": "item.ninebranch_tine",
+          "chance": 1.0
+        },
+        {
+          "item": "junk.velvet_tine",
+          "chance": 1.0,
+          "min": 2,
+          "max": 3
         }
       ]
     }

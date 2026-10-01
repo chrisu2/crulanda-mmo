@@ -24,7 +24,7 @@ Status 2026-09-28. The game opens in **Oakhaven** (`Assets/Crulanda/Scenes/Oakha
   sentry) with movement-driven walk/idle animation. Stand-in until authored models exist.
 
 ## Zone size (grown 2026-09-30)
-- Oakhaven is 380 m across, Khaven 340 m, the Peaks and the Ash Rim 360 m each (they were 240-260 m). Chris, 2026-09-29:
+- Oakhaven is 380 m across, Khaven 340 m, the Peaks, the Ash Rim and the Verdant Shore 360 m each (they were 240-260 m). Chris, 2026-09-29:
   "zones do need to be bigger with more places and secrets to explore".
 - Each village core kept its coordinates. What belonged to the edge moved out with it: the exits and the arrival points into
   them, the roads to them, the creeks off the map, the Wasting's curtain (the same distance from the east edge), and the
@@ -99,6 +99,56 @@ GAME-ONLY:
 - all placement.
 Biome `ash`: grey cracked ground with no grass, dead trees and falling ash.
 
+## The Verdant Shore (CANON-EXPANDED), levels 11-13
+Canon (Book 3, *The Verdant Shore*): the western coast's "Verdant Ocean", "a forest that didn't know when to stop", giant trees
+"their trunks as wide as houses", broad flat leaves swaying "like a green tide", "a thousand shades" of green; the **Veridian
+Keepers** (native wood-beings; Oak-Bane and Willow-Whisper are named), the **Veridian Temple** and the Root-Mother, Veridian sap
+"the color of liquid emerald", the coast's salt-flats. Chris, 2026-09-30, with lush style references (style only): "next zone we
+need a truly lush zone". The game is set before the books' exodus, so the survivors, the First Seed and the Salt-Wall are not
+here; the Keepers, the Temple and the forest are. The fifth zone, 360 m, reached from the Ash Rim by the Old west road over the
+ash-mountains (the breadcrumb `main.ashrim.5`); the level cap is 13 (talent points stop at 10).
+- **The arrival:** the Ridge of Long Shadows runs along the whole east edge, 15 m up, basalt crags on its face. You arrive on its
+  crest and eleven metres on is the lookout at the lip (the Last salt-road shrine, twin of the Rim's): the Verdant Ocean below,
+  giant trees standing out of the canopy, Rootfast's lanterns 165 m off, Mossveil Falls to the right. The Ash-road winds down in
+  four legs.
+- **Places (12 landmarks, canon labels in the data):** the Ridge of Long Shadows; the Verdant Ocean (the first view); **Rootfast**,
+  five Keeper treehouses round a lamp-lit green (Willow-Whisper's at its head), glowing caps in the gaps, a rope bridge over the
+  Wending; **the Veridian Temple**, a sunk root-stair under a cage of six calcified root-arcs with giant glowing caps, approached but
+  not entered; **Mossveil Falls** into its pool, with a lookout on the ledge above (a stepped way up its east side); the Mistmere
+  and its reed-beds; the Whispering Glade (glowing caps and stags, best at night); the Fern Hollow; the Fallen Ghost-Oak (a
+  `fallen_giant`, spiders in its crown); the Salt-Flats on the coast, with tidal pools and the glass-ship scout's camp; and the
+  Pale's touch shown early: **the Greying** (a grove going grey, withered Keepers, Greyheart) and **Palemist Hollow** (mist-walkers
+  and pale shadows round an unmade heart).
+- **The Wending**, a slow river from the falls' pool west past Rootfast to the flats.
+- **People:** Willow-Whisper (elder), Oak-Bane (warden), Moss-Lantern (merchant), Alder-Knot (bark-carver) and Reed-Song (hunter), all
+  Keepers with the Keeper body and their own lines (`life.mood: keepers`); Sister Iselle, a Silent Pilgrim (`pilgrim` role: ochre
+  linen, a silver mask, a brass listening-tube, CANON look) and Ondine Varro, a glass-ship scout from Port Caelum (merchant).
+- **Camps (9):** Mistmere reed-boars (11, ambush), Antler Meadow stags (11-12), Fallen Ghost-Oak spiders (11-12), the Briar Way
+  (12-13), the Greying's withered Keepers (12-13), Palemist mist-walkers (12-13) and pale shadows (13), and two elites, **Greyheart**
+  (13) and **Old Ninebranch** (13). New looks: `keeper`, `stag`, `spider`, `bramble`.
+- **Quests:** the breadcrumb from Grohl; a main chain of four (Let the Wood Learn You, The Briar Way, Grey at the Heart, A Fog That
+  Tastes of Lightning); seven side and NPC quests; four Chronicle pages; a new faction, the Veridian Keepers. `QUEST_DESIGN.md`.
+- **The lush art** (`ZoneBuilder.Verdant`, `PlantField`): see "Painted plants and lush props" below.
+
+## Painted plants and lush props (`PlantField`, `ZoneBuilder.Verdant.cs`)
+- **PlantField:** painted fern, broad-leaf and reed cards (ZoneSceneBuilder paints them; `Crulanda/Grass` draws them, with `_Wither`
+  to drain the paint's green and `_Glow` for night-glowing flowers) and flower drifts, baked into 24 m cells and instanced near the
+  camera. Ferns in the shade round every trunk, in the groves and along the forest edge; broad leaves along the banks; reeds at the
+  waterline; flowers in drifts of one colour. A mix per biome: the meadow's, the mountain's few ferns, Khaven's withered ferns and
+  dark reeds, the verdant shore's riot (glowing flowers after dark); nothing on the ash. Its own random stream.
+- **Dead trees** (`DeadTree`, 2026-09-30, Chris: they looked like umbrellas): a tapered, bent bole on a root flare (`Bole`), three to
+  five limbs leaving it at different heights, crooked, tapering to points, branches off their length; a massive one for `dead_oak`.
+  The zone's draws are taken as the old tree took them, so nothing else moves.
+- **Props:** `giant_tree` (about 28 m at scale 1, a buttressed bole, a crown of some forty leaf clusters; variants green,
+  yellow-green, autumn); `treehouse` (a Keeper dwelling grown into a giant tree: a round house with porch, door and lantern in
+  its flare, a platform round the trunk with a small house, a stair winding up); `waterfall` (`at` its foot, falling toward -Z,
+  `size.x` wide, `lift` high: a mossy rock face, two sliding sheets, foam, mist; pair it with a pool, whose shore carving leaves the
+  ledge behind the fall alone); `mushrooms` (`size.x` radius; variant 0 red caps, 1 glowing teal, 2 pale; giant from scale 2, then
+  solid); `fallen_giant` (a giant lying where it fell, `size.x` long: root-plate at -x, broken crown at +x); `monolith` (a Silent
+  Statue); a `bridge` with `variant` 1 is a rope-and-post footbridge. The grove kind `giant` mixes giants among broadleaf.
+- **The verdant biome:** deep painted greens and moss, lush tall grass, giant trees among the forest edge (no pines), the
+  `salt` shape paint (a cracked grey-white crust, no grass, no edge trees) and a saturated emerald post grade.
+
 ## Level ladder and camps (GAME-ONLY)
 - Zones carry `levelMin`/`levelMax`, which drive con colours, the map exit labels ("Khaven Village 3-5") and the world map pins.
 - `camps` (`ZoneCamp`) fields:
@@ -116,6 +166,7 @@ Biome `ash`: grey cracked ground with no grass, dead trees and falling ash.
 | Khaven 3-5 | Whispering Wood wolves (3-4), Carrion boars (3-4, ambush), Sandthrone outrider camp (4-5), Gloom Creek hollows (5), The Grey Sexton (5, elite), Hush wolves (4-5), Plague pit hollows (4-5), Sandthrone picket (5), Mire boars (4-5), The Pale Reckoner (7, elite, harder) |
 | Peaks 6-8 | Toll-gate guards (6-7), Wolf pines pack (6-7, ambush), Rockhide wallow (7), The High Ledge (8), Captain's eyrie (8, elite), Signal-tower pickets (6-7), Shieling wolves (6-7), Scar rockhides (7-8), Old Scree-Tusk (8, elite) |
 | Ash Rim 9-10 | Ash hound pack (9), Unwoven Flats eaters (9-10), Tear-marked shrine (9-10), Cinderfold hollows (10), The Weave-Eater brood (10, elite), Ash-pit cultists (9-10), The Ash-Deacon (10, elite), Fraying eaters (9-10), Orchard hounds (9-10) |
+| Verdant Shore 11-13 | Mistmere reed-boars (11, ambush), Antler Meadow stags (11-12), Fallen Ghost-Oak spiders (11-12), The Briar Way (12-13), The Greying (12-13), Greyheart (13, elite), Palemist mist-walkers (12-13), Palemist shadows (13), Old Ninebranch (13, elite) |
 
 ## Water (`Scripts/World/ZoneWater.cs`)
 One model answers all of these, so they always agree: what is drawn (meshes), what is carved (terrain) and what is felt (motor, navmesh).
@@ -333,6 +384,7 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
     Frostbells; in the outer ring the Picket's Skim, Scored in the Mortar (the Sealed Adit) and the Spur's End (vista).
   - Ashland Rim: the Salt Line (vista in the southern gap of the Eastern Ridge), an Ash-Walker Cache, a Cultist's Hidden Letter,
     Last-Light, the Cinderfold Tin; in the outer ring a Page from the Waybook, a Bone-Carver's Bundle and Last-Light in the Grey.
+  - Verdant Shore: Above Mossveil Falls and the Mossy Outcrop (lookouts), the Tapper's Stump, a Glass-Ship's Log, Lantern-Moss.
 - The capture tour shoots one find per zone up close (`87-secret-<slug>`; the first chest, cache, herb, note or key).
 
 ## Travel
@@ -382,7 +434,7 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
 
 ## Known limits / next
 - Villagers and hens are simulated only while the player is in the zone. There is no off-screen catch-up, and the clock is not saved.
-- Four zones (levels 1-10). More candidates with canon maps: Deep Veins, Argentis/Lowtowns, Forge District, Glass Coast,
+- Five zones (levels 1-13). More candidates with canon maps: Deep Veins, Argentis/Lowtowns, Forge District, Glass Coast,
   Iron North (see `CRULANDA_LOCATIONS.md`).
 - Water:
   - It doesn't receive shadows (a transparent surface shader in the built-in pipeline).

@@ -464,6 +464,72 @@
           }
         ]
       }
+    },
+    {
+      "id": "main.ashrim.5",
+      "title": "The Old Salt Road",
+      "kind": "main",
+      "giver": "Chieftain Grohl",
+      "turnIn": "Willow-Whisper",
+      "zone": "zone.ashrim",
+      "level": 11,
+      "minLevel": 10,
+      "requires": [
+        "main.ashrim.3"
+      ],
+      "canonStatus": "CANON-EXPANDED: the Ash-Walkers and Salt of the First Sea (book1 ch.20), the Verdant Shore, the Ridge of Long Shadows and the Veridian Keepers (book3 ch.1-2) are CANON; that the Ash-Walkers' first salt came from the western shore, the old road over the mountains and Grohl's salt-cord are GAME-ONLY.",
+      "giveOnAccept": [
+        "item.salt_cord"
+      ],
+      "summary": "Take the old west road over the mountains to the Verdant Shore, and show Grohl's salt-cord to Willow-Whisper of the Veridian Keepers.",
+      "offer": "Grohl watches Mother Vane tie off the last sack of the woken salt, and doesn't like what he sees at the bottom of the cask. \"That's the old salt gone. The pans on the flats are crusting grey, and new salt from them won't bind a cooking pot.\"\n\n\"My grandmother's grandmother got the true salt in the west, past the mountains, on a shore where the forest runs down into the sea. Wood-folk keep it. They let her take it because she asked first.\" He takes a knotted cord of salt-white hemp from a peg. \"Take the old west road, from the fork by Wain's Rest. Show them this. Ask for the one they call Willow-Whisper. And ask first.\"",
+      "progress": "\"West, over the mountains. Ask first.\"",
+      "complete": "She turns the cord over in fingers of woven willow, and the knots loosen at her touch. \"An Ash-Walker knot. We have not seen one in three of your lifetimes.\" Her voice is the sound of wind going through a whole wood at once. \"You asked first. That is a beginning. Come into the green, flesh-folk, and let us see what else you are.\"",
+      "steps": [
+        {
+          "text": "Take the old west road over the mountains to the Verdant Shore.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.verdant",
+              "at": {
+                "x": 152,
+                "y": 22
+              },
+              "radius": 8,
+              "text": "Cross the mountains to the Ridge of Long Shadows",
+              "say": "The road crests the last ridge and the ash ends as if cut with a knife. Below you the world is green: a thousand greens, from moss so dark it is nearly black to new fern that seems lit from inside, a forest that doesn't know when to stop, rolling west to a line of silver that is the sea. The air doesn't taste of smoke any more."
+            }
+          ]
+        },
+        {
+          "text": "Find Willow-Whisper of the Veridian Keepers and show her Grohl's salt-cord.",
+          "objectives": [
+            {
+              "type": "deliver",
+              "zone": "zone.verdant",
+              "target": "Willow-Whisper",
+              "item": "item.salt_cord",
+              "text": "Show the salt-cord to Willow-Whisper at Rootfast",
+              "say": "\"Stop.\" The word comes out of the trees before she does: a tall, slender shape of living willow and moss, stepping out of a trunk you would have sworn was solid."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 520,
+        "gold": 120,
+        "reputation": [
+          {
+            "faction": "ashwalkers",
+            "amount": 250
+          },
+          {
+            "faction": "keepers",
+            "amount": 250
+          }
+        ]
+      }
     }
   ]
 }

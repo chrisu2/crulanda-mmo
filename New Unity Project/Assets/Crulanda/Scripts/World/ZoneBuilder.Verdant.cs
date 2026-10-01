@@ -154,6 +154,49 @@ namespace Crulanda.World
         Mesh robeCone;
 
         /// <summary>
+        /// A giant tree lying where it fell (the Fallen Ghost-Oak): its trunk along local +x, <paramref name="length"/> long and about
+        /// 4.5 m thick at scale 1, tapering toward the crown end; the upturned root-plate at -x, a wall of earth and roots; the broken
+        /// crown at +x, a heap of dead boughs; moss along the top, mushrooms in its lee. Solid: you walk round it (or over the
+        /// root-plate's rubble). Draws from its own stream (BuildProps).
+        /// </summary>
+        void FallenGiant(Transform t, float length)
+        {
+            var tr = TreeRandom(t.position); float T() { return (float)tr.NextDouble(); }
+            var bark = Tint(art.bark, Wither(new Color(.36f, .3f, .22f))); var moss = Tint(art.bark, Wither(new Color(.22f, .32f, .14f)));
+            var earth = Tint(art.soil, new Color(.22f, .17f, .11f)); var dead = Tint(art.bark, Wither(new Color(.42f, .38f, .32f)));
+            float r0 = 2.2f, ph = T() * 6.3f, seed = T() * 50;
+            // The trunk: a tube along x, resting on the ground (its underside in the soil), tapering to the crown end, a little bent.
+            Vector3 Axis(float x) { return new Vector3(x, r0 * .72f + Mathf.Sin(x * .06f + ph) * .3f, Mathf.Sin(x * .08f + ph) * .9f); }
+            float Girth(float x, float a) { float u = Mathf.Clamp01(x / length); return r0 * (1 - .45f * u) * (1 + .1f * (Mathf.PerlinNoise(Mathf.Cos(a) * 1.4f + seed, x * .18f) - .5f)) * Mathf.Clamp01((length + 1 - x) / 2.5f); }
+            var rings = new List<float>(); for (float x = 0; x <= length + 1.01f; x += 2.2f) rings.Add(x);
+            MeshPart(ZoneMeshes.Tube(Axis, Girth, rings, 20, Vector3.up, 6, .25f), t, Vector3.zero, bark).name = "Fallen trunk";
+            // Moss along its top: a strip of flattened spheres.
+            for (float x = 2; x < length - 3; x += 3.5f + T() * 2) { var c = Axis(x); Part(PrimitiveType.Sphere, t, c + new Vector3(0, Girth(x, Mathf.PI / 2) * .85f, (T() - .5f) * .8f), new Vector3(3 + T() * 2.5f, .6f, 2 + T() * 1.5f), moss); }
+            // The root-plate: a disc of earth standing on edge at the butt, roots reaching out of it every way.
+            var plate = Axis(0) + new Vector3(-.6f, r0 * .5f, 0);
+            Part(PrimitiveType.Cylinder, t, plate, new Vector3(r0 * 4.2f, .9f, r0 * 4.2f), earth, Quaternion.Euler(0, 0, 90));
+            Part(PrimitiveType.Cylinder, t, plate + new Vector3(.5f, 0, 0), new Vector3(r0 * 3.2f, .5f, r0 * 3.2f), bark, Quaternion.Euler(0, 0, 90));
+            for (int i = 0; i < 14; i++)
+            {
+                float a = T() * Mathf.PI * 2, r = r0 * (1.2f + T() * 1.3f), len = 1.5f + T() * 3; var from = plate + new Vector3(-.3f, Mathf.Cos(a) * r, Mathf.Sin(a) * r);
+                var dir = (new Vector3(-.6f - T(), Mathf.Cos(a), Mathf.Sin(a))).normalized;
+                Limb(t, from, from + dir * len, .22f + T() * .18f, .04f, bark, .05f, 7);
+            }
+            // The broken crown: a heap of dead boughs past the trunk's end.
+            var crown = Axis(length); crown.y = .4f;
+            for (int i = 0; i < 12; i++)
+            {
+                var from = crown + new Vector3(-2 + T() * 3, T() * 1.2f, (T() - .5f) * 4); var dir = (new Vector3(.4f + T(), (T() - .3f) * .8f, (T() - .5f) * 1.6f)).normalized;
+                float len = 3 + T() * 5; var mid = from + dir * len * .5f + Vector3.up * (T() - .5f);
+                Limb(t, from, mid, .25f + T() * .15f, .14f, dead, .04f, 6); Limb(t, mid, mid + (Quaternion.Euler(0, (T() - .5f) * 60, 0) * dir) * len * .5f, .14f, .03f, dead, .08f, 5);
+            }
+            // Mushrooms in its lee, ferns come on their own (PlantField).
+            for (int i = 0; i < 3; i++) { var at = Axis(length * (.2f + i * .3f)); at.y = 0; at.z += r0 * 1.1f + T(); var m = new GameObject("Mushrooms").transform; m.SetParent(t, false); m.localPosition = at; Mushrooms(m, 1.2f, i == 1 ? 1 : 2); }
+            Solid(t, new Vector3(length / 2, r0 * .75f, 0), new Vector3(length, r0 * 1.5f, r0 * 1.7f));
+            Solid(t, plate, new Vector3(1.6f, r0 * 4, r0 * 4));
+        }
+
+        /// <summary>
         /// A waterfall (its foot at the root; the water falls toward -Z, the rock face rises behind at +Z): a face of mossy boulders
         /// <paramref name="height"/> high and wider than the fall, the falling water <paramref name="width"/> wide (two sheets of
         /// streaked white-blue, sliding down at different speeds), foam where it lands, and mist drifting off the pool. Pair it with

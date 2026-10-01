@@ -177,6 +177,13 @@ namespace Crulanda.World
             return h;
         }
         /// <summary>How much of a pad's ground paint covers p (0..1): the pad right across, fading out a little past its rim.</summary>
+        /// <summary>Whether a point lies on a shape painted <paramref name="paint"/> (its blend included).</summary>
+        bool OnPaint(Vector2 p, string paint)
+        {
+            if (Zone.shapes == null) return false;
+            foreach (var s in Zone.shapes) if (s != null && s.paint == paint && ShapeCover(s, p) > .2f) return true;
+            return false;
+        }
         static float ShapeCover(ZoneShape s, Vector2 p)
         {
             float blend = Mathf.Max(.5f, s.blend), fade = blend * .6f + 1, reach = s.radius + fade;
@@ -550,6 +557,14 @@ namespace Crulanda.World
                             float cover = ShapeCover(s, p); if (cover <= 0) continue;
                             Color sc;
                             if (s.paint == "unmade") { float vein = Mathf.Abs(Mathf.PerlinNoise(x * .7f + 13, z * .7f + 29) * 2 - 1); sc = Color.Lerp(unmade * (.8f + n3 * .35f), new Color(.76f, .76f, .8f), Mathf.Clamp01((.07f - vein) * 14)); }
+                            else if (s.paint == "salt")
+                            {
+                                // Salt-flats: a grey-white crust cracked into plates, darker wet slush in the low spots.
+                                float wet = Mathf.Clamp01((Mathf.PerlinNoise(x * .04f + 17, z * .04f + 52) - .52f) * 4), plateLine = Mathf.Abs(Mathf.PerlinNoise(x * .32f + 3, z * .32f + 9) * 2 - 1);
+                                sc = Color.Lerp(new Color(.8f, .8f, .78f), new Color(.86f, .87f, .85f), n2) * (.95f + n3 * .1f);
+                                sc = Color.Lerp(sc, new Color(.55f, .57f, .58f), wet * .8f);
+                                if (plateLine < .06f) sc *= .85f;
+                            }
                             else sc = Color.Lerp(new Color(.25f, .2f, .15f), new Color(.12f, .095f, .075f), Mathf.Clamp01((n1 - .4f) * 2.5f + (n3 - .5f) * .4f));   // mud
                             c = Color.Lerp(c, sc, Mathf.Clamp01(cover * (.85f + n2 * .3f)));
                         }
@@ -855,7 +870,7 @@ namespace Crulanda.World
                 if (p.kind == "wall") WarnWallInBuilding(p);
                 // New landmark kinds draw from their own stream, after taking the draws the kind that stood here took, so
                 // every later prop, tree and rock keeps the layout it had.
-                var zoneRng = rng; int legacy = p.kind == "cave" ? 30 : p.kind == "rib" ? 6 : p.kind == "perch" || p.kind == "wallow" || p.kind == "brood" || p.kind == "cavern" || p.kind == "monolith" || p.kind == "giant_tree" || p.kind == "treehouse" || p.kind == "waterfall" || p.kind == "mushrooms" ? 0 : -1;
+                var zoneRng = rng; int legacy = p.kind == "cave" ? 30 : p.kind == "rib" ? 6 : p.kind == "perch" || p.kind == "wallow" || p.kind == "brood" || p.kind == "cavern" || p.kind == "monolith" || p.kind == "giant_tree" || p.kind == "treehouse" || p.kind == "waterfall" || p.kind == "mushrooms" || p.kind == "fallen_giant" ? 0 : -1;
                 if (legacy >= 0) { for (int k = 0; k < legacy; k++) _ = R01; rng = new System.Random(Zone.seed ^ (Mathf.RoundToInt(p.at.x * 8) * 73856093) ^ (Mathf.RoundToInt(p.at.y * 8) * 19349663)); }
                 switch (p.kind)
                 {
@@ -876,6 +891,7 @@ namespace Crulanda.World
                     case "wall": Wall(p.points, statics); DestroyImmediate(t.gameObject); break;
                     case "tower": Tower(t, p.size.x > 0 ? p.size.x : 4.4f); break;
                     case "giant_tree": GiantTree(t, p.variant); trunks.Add(p.at); break;
+                    case "fallen_giant": FallenGiant(t, p.size.x > 0 ? p.size.x : 36); break;
                     case "treehouse": Treehouse(t, p.variant); trunks.Add(p.at); break;
                     case "waterfall": Waterfall(t, p.size.x > 0 ? p.size.x : 6, p.lift > 0 ? p.lift : 10); break;
                     case "mushrooms": Mushrooms(t, p.size.x > 0 ? p.size.x : 2, p.variant); break;
@@ -3708,7 +3724,7 @@ namespace Crulanda.World
                 {
                     var at = side == 0 ? new Vector2(-edge - R01 * 3, s) : side == 1 ? new Vector2(s, edge + R01 * 3) : side == 2 ? new Vector2(s, -edge - R01 * 3) : new Vector2(edge + R01 * 3, s);
                     if (Zone.wasting != null && at.x > Zone.wasting.x - 6) continue;
-                    if (NearRoad(at, 5) || Water.NearWater(at, 1.5f)) continue;
+                    if (NearRoad(at, 5) || Water.NearWater(at, 1.5f) || OnPaint(at, "salt")) continue;   // (the coast: the flats run to the sea)
                     var spot = Spot(at, 1.8f); if (spot.HasValue) at = spot.Value;   // never growing through a grove tree
                     if (Gloom)
                     {

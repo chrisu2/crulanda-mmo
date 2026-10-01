@@ -31,7 +31,7 @@ namespace Crulanda.Encounter
             switch (role)
             {
                 case "blacksmith": case "merchant": case "baker": case "henwife": case "farmer": case "hunter": case "leatherworker":
-                case "skinner": case "lumberjack": case "herbalist": case "miller": case "elder": case "drinker": case "stranger": case "warden": return true;
+                case "skinner": case "lumberjack": case "herbalist": case "miller": case "elder": case "drinker": case "stranger": case "warden": case "pilgrim": return true;
                 default: return false;
             }
         }
@@ -760,6 +760,17 @@ namespace Crulanda.Encounter
                     Part(PrimitiveType.Cube, body, new Vector3(0, .1f, -.17f), new Vector3(.56f, 1.15f, .05f), cloak, new Vector3(-5, 0, 0));
                     foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, body, new Vector3(s * .27f, .15f, 0), new Vector3(.05f, 1.05f, .3f), cloak);
                     Part(PrimitiveType.Sphere, body, new Vector3(.22f, -.02f, .14f), new Vector3(.12f, .13f, .1f), M(.92f, .92f, .9f)); // salt pouch
+                    break;
+                case "pilgrim":
+                    // A Silent Pilgrim (CANON look, book3 ch.5): layered linen robes in ochre and sand, a polished silver mask over mouth and
+                    // nose, and a long brass listening-tube in the hand.
+                    cloth.color = new Color(.72f, .56f, .3f); legs.color = new Color(.66f, .58f, .42f);
+                    Part(PrimitiveType.Cube, body, new Vector3(0, .12f, 0), new Vector3(.52f, .9f, .34f), M(.78f, .68f, .48f));                 // the outer robe, layered
+                    Part(PrimitiveType.Cube, body, new Vector3(0, -.2f, 0), new Vector3(.56f, .5f, .38f), M(.66f, .5f, .28f));
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .86f, -.02f), new Vector3(.34f, .3f, .34f), M(.74f, .6f, .36f));              // a linen head-wrap
+                    Part(PrimitiveType.Cube, body, new Vector3(0, .77f, .14f), new Vector3(.17f, .1f, .05f), M(.85f, .86f, .9f, .9f, .8f));       // the silver mask
+                    Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.62f, .1f), new Vector3(.035f, .42f, .035f), M(.7f, .55f, .25f, .7f, .7f), new Vector3(70, 0, 0));   // the listening-tube
+                    Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.62f + .4f * Mathf.Cos(70 * Mathf.Deg2Rad), .1f + .4f * Mathf.Sin(70 * Mathf.Deg2Rad)), new Vector3(.08f, .04f, .08f), M(.7f, .55f, .25f, .7f, .7f), new Vector3(70, 0, 0));   // its bell
                     break;
                 case "warden":
                     // A Preservationist Warden (CANON look, book1 ch.5): green and brown, armour of living vine, an iron-wood staff.

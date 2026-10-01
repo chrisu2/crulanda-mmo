@@ -16,7 +16,7 @@ games are style references only: no copied names, assets, zones or creatures fro
 
 ## What exists (Unity 6000.6.3f1, built-in pipeline)
 
-- **Four zones on a level ladder, cap 10:** Oakhaven (1-2, farmland village, the Great Oak, the Golden Cask inn),
+- **Five zones on a level ladder, cap 13:** Oakhaven (1-2, farmland village, the Great Oak, the Golden Cask inn),
   Khaven Village (3-5, a walled village in permanent grim dusk beside the dead Whispering Wood), the Shattered Peaks
   (6-8, a mountain toll pass held by Sandthrone mercenaries), the Ashland Rim (9-10, grey petrified ash beside the
   Wasting, with the Ash-Walker caves and Weave-Eaters). All built from JSON by `ZoneBuilder` at load, 340-380 m across
@@ -35,6 +35,8 @@ games are style references only: no copied names, assets, zones or creatures fro
 - **Water:** stylized turquoise (Chris's chosen look): a sandy bed showing through pale shallows, foam at shores and
   around legs, a creek current, ripple rings, wading and swimming. Khaven's Gloom Creek stays murky.
 - **Camera and targeting:** trees fade when they block the view; a coloured ring under the selected target.
+- **A fifth zone, the Verdant Shore (11-13):** Book 3's giant-tree forest, with the Veridian Keepers' treehouses, the Temple, a
+  waterfall, glowing glades and the coast's salt-flats (WORLD_ZONES.md "The Verdant Shore"). The level cap is 13.
 - **Classes:** Warrior and Druid playable, with data-driven talent trees; saves per character (format 7).
 - **Docs to read next:** `WORLD_ZONES.md` (how zones are built), `QUEST_DESIGN.md`, `SAVE_FORMAT.md`,
   `CHANGELOG.md`, `CRULANDA_CANON.md` and `CRULANDA_LOCATIONS.md` (what is canon).

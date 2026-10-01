@@ -130,6 +130,22 @@ Chris's brief: "a quest appears at lvl 3 to take out the bandit and bandit king 
 - **Villager talk** (`VillageLife.HollowQuest`): Oakhaven folk mention the raids from Crowsfoot until the quest is done,
   and then thank you for it.
 
+### The Verdant Shore (levels 11-13; CANON place, GAME-ONLY quests)
+The Chronicle runs `main.ashrim.5` -> `main.verdant.1` -> 2 -> 3 -> 4 (XP and gold follow the Rim's curve, +40-60 XP a level).
+- **The Old Salt Road** (`main.ashrim.5`, Chieftain Grohl, after Heart of the Brood): the Rim's salt-pans are greying, so Grohl sends
+  you west over the ash-mountains with an Ash-Walker salt-cord, to ask the wood-folk for the salt his grandmothers took from the
+  western shore. Turned in to Willow-Whisper.
+- **Let the Wood Learn You** (11): Willow-Whisper has the wood learn you: the falls, the glade, the mere. **The Briar Way** (12):
+  Oak-Bane has you cut the briars off the old way to the Veridian Temple. **Grey at the Heart** (12): the Greying, withered Keepers
+  and Greyheart. **A Fog That Tastes of Lightning** (13): Palemist Hollow, the mist-walkers and the pale shadows: the Pale's touch
+  reaching the Shore (PROVISIONAL: Book 3's fog, foreshadowed). Willow-Whisper's last words foreshadow Book 3's survivors coming
+  over the ridge, without playing it out.
+- **Side and NPC quests:** The Reeds Go Quiet (Reed-Song), Antlers for the Carver (Alder-Knot), Silk for the Lanterns (Moss-Lantern),
+  The Three Notes (Sister Iselle, a Silent Pilgrim), Green Gold (Ondine Varro: gold at the cost of Keeper standing), The Old King of
+  the Deep Wood (Oak-Bane; Old Ninebranch), Salt of the First Shore (carried back to Mother Vane on the Rim).
+- **A new faction**, the Veridian Keepers (`keepers`, CANON), with standing from the quests. Four Chronicle pages.
+- Two named vendors: Moss-Lantern (sap-cakes, dewfern) and Ondine Varro.
+
 ### Faction introductions (CANON factions, GAME-ONLY quests)
 - **Oakhaven Folk** (village standing): earned from the NPC quests. Raises prices at the stalls, opens a room at the inn, and gets villagers to share rumours.
 - **Salt-Menders (the Alliance):** a quiet stranger at the inn asks you to spoil the collectors' supplies. Their chain works against the Concord.

@@ -9,7 +9,7 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-09-30, night)
+## RESUME HERE (updated 2026-10-01, early morning)
 **The standing direction is in `GAME_BRIEF.md` (read it first): a high-fidelity, beautiful MMO-style world, AAA quality in a classic style, judged on details, graphics, lighting, mood and visual feel.**
 Chris's rules: work in order of importance; finish each step; keep going without waiting (memory: crulanda-autonomy); tell him at each publish.
 Chris was away from 2026-09-30 evening and gave authority to carry on through the phases unattended, publishing each.
@@ -34,6 +34,12 @@ Chris was away from 2026-09-30 evening and gave authority to carry on through th
   - and now **THE ZONES GROWN** (published 2026-09-30 night): Oakhaven 380 m, Khaven 340, the Peaks and the Rim 360, with 37
     new places, 18 camps (4 named elites) and 14 secrets in the new ground; Crowsfoot Ridge over the dungeon; loads faster
     than before (parallel ground paint). Design: `WORLD_ZONES.md` "Zone size" and each zone's section, the CHANGELOG.
+  - and now **THE VERDANT SHORE** (published 2026-10-01): the fifth zone, levels 11-13 (cap 13), Book 3's giant-tree forest:
+    the Ridge of Long Shadows and the first view, Rootfast's treehouses, the Veridian Temple, Mossveil Falls, the Mistmere, the
+    Whispering Glade, the Salt-Flats, the Greying and Palemist Hollow; Keepers with their own talk; twelve quests from Grohl's
+    breadcrumb; and the lush art every zone now shares (painted ferns, broad leaves, reeds, flower drifts, giant trees,
+    waterfalls, mushrooms, real dead trees). Design: `WORLD_ZONES.md` "The Verdant Shore" and "Painted plants and lush props",
+    `QUEST_DESIGN.md`, the CHANGELOG.
 - **Weather** covers:
   - per-zone seeded schedules (7-minute spells, one severity step at a time);
   - a painted cloud layer and cloud shadows;
@@ -47,11 +53,12 @@ Chris was away from 2026-09-30 evening and gave authority to carry on through th
   - the store title, "The Quiet Trail" (the productName) or "The Land of Crulanda" as the novels and bullet-hell use;
   - that *The First Spoke* is out.
 
-**NEXT JOB, CHRIS'S CALL (2026-09-30 night): THE VERDANT SHORE, a truly lush fifth zone** (GAME_BRIEF "world direction"):
-levels 11-13 after the Ash Rim (the level cap goes to 13), the canon Verdant Shore of Book 3 (giant trees, a thousand
-greens, the Veridian Keepers, their temple), reached over the ash-mountains from the Rim. It needs the lush art first: painted
-plants (ferns, broad leaves, reeds, flower drifts), giant trees, waterfalls, mushrooms and glowing plants, the Keepers'
-treehouses, an emerald atmosphere. The painted style pass on the old zones follows, reusing all of it.
+~~THE VERDANT SHORE~~ DONE and published 2026-10-01. **NEXT JOB: THE PAINTED STYLE PASS on the four older zones**, reusing
+the lush art (the undergrowth, dead trees and glowing plants are already in them): richer saturated colour per biome, more
+plant kinds, sculpted rock with painted gradient shading, chunky stylized props (rope-and-post bridges, the `bridge`
+variant 1), a warm clear sky; each zone keeps its mood. Then: the Verdant Shore's optional extras from the zone agent's notes
+(low mist banks, glass-frog critters, a root-stair prop for the Temple, the west backdrop falling to the sea); a `hollow`
+mist-walker variant with violet-lit eyes; weather polish; audio.
 ~~ZONE SIZE~~ DONE and published (item 0c below). Then: **THE PAINTED STYLE PASS** (item 5 under "Next" below, and
 GAME_BRIEF's art direction): richer saturated colour, more plant types (ferns, broad leaves, flowers, tall grasses),
 sculpted rock with painted gradient shading, chunky stylized props (rope-and-post bridges), a warm clear sky; every zone

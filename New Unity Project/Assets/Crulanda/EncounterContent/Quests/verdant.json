@@ -1,0 +1,694 @@
+{
+  "factions": [
+    {
+      "id": "keepers",
+      "name": "The Veridian Keepers",
+      "start": 0,
+      "canonStatus": "CANON",
+      "description": "Ancient beings of living wood and moss who keep the Verdant Shore, the Shore of the First Cycle. They watch the flesh-folk with wary curiosity, and they remember everything."
+    }
+  ],
+  "items": [
+    {
+      "id": "item.salt_cord",
+      "name": "Grohl's salt-cord",
+      "description": "A cord of salt-white hemp, knotted the old Ash-Walker way. It is stiff with salt and smells of the sea, though Grohl has never seen one."
+    },
+    {
+      "id": "item.glade_light",
+      "name": "Glade-light",
+      "description": "A cap from the Whispering Glade that glows the green of shallow sea-water. It hums if you hold it to your ear."
+    },
+    {
+      "id": "item.moss_antler",
+      "name": "Moss-crowned antler",
+      "description": "A stag's antler with moss growing in the forks of its tines."
+    },
+    {
+      "id": "item.web_silk",
+      "name": "Skein of web-silk",
+      "description": "Canopy-spider silk wound on a twig. It is stronger than it has any right to be, and sticks to everything except itself."
+    },
+    {
+      "id": "item.veridian_sap",
+      "name": "Flask of Veridian sap",
+      "description": "Sap the colour of liquid emerald and thicker than honey. Keep it out of any cut: they say you would dream the forest's dreams and not want to wake."
+    },
+    {
+      "id": "item.cold_glass",
+      "name": "Greyheart's cold glass",
+      "description": "A sliver of glass with too many edges. It is colder than ice and reflects nothing at all."
+    },
+    {
+      "id": "item.void_husk",
+      "name": "Void-Husk",
+      "description": "A rod of black stone cut to too many faces, pulsing faintly like something asleep. It is cold through the leaves you wrapped it in."
+    },
+    {
+      "id": "item.shore_salt",
+      "name": "Salt of the First Shore",
+      "description": "A cake of grey-white salt-crust from the flats. Held close, it hums very faintly, like a Keeper's staff."
+    }
+  ],
+  "documents": [
+    {
+      "id": "doc.verdant.first_cycle",
+      "title": "The Song of the First Cycle",
+      "text": "What the Keepers sing to a sapling on its first night, as Willow-Whisper sang it to you:\n\nBefore the first leaf, the Mother.\nBefore the Mother, the sea,\nand the sea was salt, and the salt was song,\nand the song went up the roots.\n\nGrow slow, little one. Grow green.\nThe wood remembers all it is given.\nTake, and the wood remembers.\nHoard, and the wood remembers.\n\nWhen the cold comes over the ridge\n(and the cold comes, little one,\nit came before, it comes again)\nstand still. Hold fast. Be wood.\n\n'There is more of it,' she said, 'but the rest is for when you are older.'",
+      "canonStatus": "CANON-EXPANDED: the Root-Mother, the First Cycle, trees that remember everything and the Keepers' rule against hoarding the Weave are CANON (book3 ch.2, 7; world_bible.md), and so is the cold that ended the cycle before (book3 ch.6); the song is GAME-ONLY."
+    },
+    {
+      "id": "doc.verdant.three_notes",
+      "title": "The Three Notes",
+      "text": "Sister Iselle's page, in a small careful hand, under a drawing of three circles with the third left empty:\n\nWhispering Glade, the eleventh day.\nThe First Note (Earth): low, under hearing. The roots carry it. It does not change from dawn to dusk.\nThe Second Note (Spirit): higher, in the caps; brightest after dark, when the glade-light wakes. It changes when a creature passes, as if it were counting.\nThe Third Note: not here. Between the first two is a gap the exact shape of a note, and the glade holds it open, the way you hold a door for someone you expect.\n\nElder Orym teaches that the Third Note is Silence. I begin to think it is not silence. I think it is someone who has not yet arrived.",
+      "canonStatus": "CANON-EXPANDED: the Silent Pilgrims, Elder Orym and the Original Song's three notes, Earth, Spirit and Silence, are CANON (book3 ch.5, world_bible.md); Sister Iselle and her page are GAME-ONLY."
+    },
+    {
+      "id": "doc.verdant.ship_log",
+      "title": "A Glass-Ship's Log",
+      "text": "Three pages of a ship's log in an oilcloth packet, the ink run but readable:\n\nThe Lantern of Caelum, out of Port Caelum, charting north along the western shore. Fourth week.\nCoast all forest. No harbour, no smoke. Trees taller than our mainmast three times over. Sounded a cove under a long black ridge: good holding, deep water close in.\nPut the boat ashore on grey-white flats. Salt everywhere, in a crust you could walk on. Cut two sacks.\nNight. Lights in the forest, green and gold, moving. Nobody slept.\nMorning. The two sacks of salt are back on the flats where we cut them, set down neatly. Nobody aboard will say they did it.\nWeighed anchor. Captain says we do not come back to this shore. Captain says a great deal.\n\n(Along the margin, in another hand:) I came back.",
+      "canonStatus": "CANON-EXPANDED: Port Caelum and its glass ships (world_bible.md), the harbour below the ridge and the Salt-Flats (book3 ch.3) are CANON; the Lantern of Caelum and its log are GAME-ONLY."
+    },
+    {
+      "id": "doc.verdant.shore_remembers",
+      "title": "The Shore Remembers",
+      "text": "Willow-Whisper's words, as near as you remember them:\n\n'Before the first leaf there was the sea, and before the sea there was a cold that came from nowhere and went back there. The Root-Mother remembers it. That is why she sleeps so deep.\n\nThe flesh-folk in the east say the grey is a wound in the Weave, and they are right. But wounds do not have hands, and the cold you brought me had a hand on it.\n\nSomething is looking at the Shore. Not with eyes. The way frost looks at a window.\n\nWe will hold. We are wood; we are good at holding. But I think one day flesh-folk will come over that ridge in their hundreds, carrying their dead in their hearts, and the Shore will have to choose whether to let them in.\n\nWhen they come, I hope they ask first. You did.'",
+      "canonStatus": "CANON-EXPANDED: the Root-Mother, the cold that unmade the cycle before this one (book3 ch.6-7), the Pale Kings' gaze on the Shore and the survivors who later come over the ridge (book3 ch.1-4) are CANON; Willow-Whisper's words here are GAME-ONLY foreshadowing."
+    }
+  ],
+  "quests": [
+    {
+      "id": "main.verdant.1",
+      "title": "Let the Wood Learn You",
+      "kind": "main",
+      "giver": "Willow-Whisper",
+      "turnIn": "Willow-Whisper",
+      "zone": "zone.verdant",
+      "level": 11,
+      "requires": [
+        "main.ashrim.5"
+      ],
+      "canonStatus": "CANON-EXPANDED: Willow-Whisper, the Keepers' rule that magic here is shared and not hoarded, trees that remember everything and the forest's song are CANON (book3 ch.1-2); the walk and its three places are GAME-ONLY.",
+      "summary": "Walk the Shore so the wood can learn you: the pool under Mossveil Falls, the Whispering Glade and the shore of the Mistmere. Take nothing.",
+      "offer": "\"The trees here remember everything: the wind, the rain, every foot that crosses a root.\" Willow-Whisper lays a hand flat on the nearest trunk, as if feeling for a heartbeat. \"They do not know you yet. A thing that is not known is a stranger, and the wood is not kind to strangers.\"\n\n\"So walk it. Drink at the pool under the falls. Stand in the Whispering Glade until it hums. Go down to the Mistmere and let the mist touch your face. Take nothing. Here the Weave is a breath to be shared, not a tool to be gripped. If you hoard it, the woods will take your voice.\"",
+      "progress": "\"Walk on. The wood is still deciding what you are.\"",
+      "complete": "Willow-Whisper tilts her head, listening to something you can't hear. \"The falls know your weight. The glade knows your breath. The mere says you stood still long enough to be polite.\" The moss in her hair stirs like a smile. \"Good. Now the wood will tell me when you lie.\"\n\nThat night she sings you the song the Keepers sing to their saplings. Some of it you understand.",
+      "steps": [
+        {
+          "text": "Walk the Shore: the falls, the glade and the mere.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.verdant",
+              "at": {
+                "x": 126,
+                "y": 44
+              },
+              "radius": 8,
+              "text": "Drink at the pool under Mossveil Falls",
+              "say": "You kneel and drink. The water is so cold it rings in your teeth, and it tastes of stone and green things. Behind the roar of the falls, very low, the ridge is humming."
+            },
+            {
+              "type": "visit",
+              "zone": "zone.verdant",
+              "at": {
+                "x": 40,
+                "y": 106
+              },
+              "radius": 12,
+              "text": "Stand in the Whispering Glade",
+              "say": "You stand still among the caps. After a while the glade begins to hum, less a sound than a feeling in the soles of your feet, as if the roots were passing word of you from tree to tree."
+            },
+            {
+              "type": "visit",
+              "zone": "zone.verdant",
+              "at": {
+                "x": -53,
+                "y": -71
+              },
+              "radius": 9,
+              "text": "Let the mist of the Mistmere touch your face",
+              "say": "The mist comes off the water and lies against your skin like a cool hand. Somewhere in the reeds a glass-frog clicks, and another answers, and the whole shore clicks, and then stops, all at once, as if satisfied."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 540,
+        "gold": 125,
+        "documents": [
+          "doc.verdant.first_cycle"
+        ],
+        "reputation": [
+          {
+            "faction": "keepers",
+            "amount": 350
+          }
+        ]
+      }
+    },
+    {
+      "id": "main.verdant.2",
+      "title": "The Briar Way",
+      "kind": "main",
+      "giver": "Willow-Whisper",
+      "turnIn": "Oak-Bane",
+      "zone": "zone.verdant",
+      "level": 12,
+      "requires": [
+        "main.verdant.1"
+      ],
+      "canonStatus": "CANON-EXPANDED: Oak-Bane and his staff of white salt-wood, the Veridian Temple and the Root-Mother, and the Temple's stair of calcified roots are CANON (book3 ch.2, 7; world_bible.md); the creeping briars on the old way are GAME-ONLY. The Temple is not entered here: canon has it found and entered later.",
+      "summary": "Find Oak-Bane on the old way to the Veridian Temple, cut back the creeping briars that have closed it, and look on the Temple's root-stair.",
+      "offer": "\"There is an old way from Rootfast into the deep wood, to the Veridian Temple, where the Root-Mother sleeps.\" Willow-Whisper's voice drops, as if the name were heavy. \"We walked it every season, to sing to her. This season the briars closed over it. Briars creep, flesh-folk. They do not hunt.\"\n\n\"Oak-Bane keeps the deep wood. He will not want your help. Go to him anyway. He is less angry than he sounds, and angrier than he looks.\"",
+      "progress": "\"Well? Do the briars still move?\"",
+      "complete": "Oak-Bane says nothing for a long time. Then he lowers his staff of white salt-wood until its foot touches the top of the root-stair, and the whole wood seems to lean in to listen. \"She is dreaming,\" he says at last, in a voice like a dry branch cracking. \"She dreams of cold.\"",
+      "steps": [
+        {
+          "text": "Find Oak-Bane where the old way goes into the deep wood.",
+          "objectives": [
+            {
+              "type": "talk",
+              "zone": "zone.verdant",
+              "target": "Oak-Bane",
+              "text": "Speak with Oak-Bane on the Temple way",
+              "say": "\"You bring the scent of the Ash with you.\" Eyes like smouldering amber look you up and down. \"Willow sends me flesh-folk to cut briars. Fine. Cut. The briars on the old way move when no wind moves them. They took a fawn yesterday. They have never done that.\""
+            }
+          ]
+        },
+        {
+          "text": "Cut back the creeping briars on the Briar Way.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.verdant",
+              "target": "mob.bramble.verdant*",
+              "count": 6,
+              "text": "Creeping briars cut back"
+            }
+          ]
+        },
+        {
+          "text": "Go down to the root-stair of the Veridian Temple.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.verdant",
+              "at": {
+                "x": -110,
+                "y": 121
+              },
+              "radius": 7,
+              "text": "Look on the root-stair of the Veridian Temple",
+              "say": "Roots calcified white as old bone arch over a hollow, and a stair of the same white roots winds down and down into a green glow. Living roots have grown across it, tight as a basket. Through them you feel, more than hear, a slow heartbeat far below. Not yet, the wood seems to say. Not you, and not yet."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 600,
+        "gold": 140,
+        "reputation": [
+          {
+            "faction": "keepers",
+            "amount": 350
+          }
+        ]
+      }
+    },
+    {
+      "id": "main.verdant.3",
+      "title": "Grey at the Heart",
+      "kind": "main",
+      "giver": "Oak-Bane",
+      "turnIn": "Willow-Whisper",
+      "zone": "zone.verdant",
+      "level": 12,
+      "requires": [
+        "main.verdant.2"
+      ],
+      "canonStatus": "CANON-EXPANDED: the Keepers who merge into the bark of the trees (book3 ch.2) and the cold glass of the Pale (the Pale Shadows, geometric shapes of cold glass, book3 ch.8) are CANON images; the Greying, the withered Keepers and Greyheart are GAME-ONLY, and the Pale reaching the Shore this early is PROVISIONAL foreshadowing.",
+      "summary": "In the Greying, a grove going grey in the north-east under the ridge, lay the withered Keepers to rest and take what is lodged in the heart of Greyheart, the eldest of them. Bring it to Willow-Whisper.",
+      "offer": "\"She dreams of cold because cold has come.\" Oak-Bane points his staff north-east, toward the ridge. \"A grove there is going grey from the heart out. Three of our kin went to sing the grey out of it. They are still there. They do not sing.\"\n\n\"Greyheart was eldest of them. Now he is what the grey made of him. Lay them down, flesh-folk, so their wood can go back into the soil. And bring Willow whatever is in his heart. I will not touch it.\"",
+      "progress": "\"Do not hold it out to me. Put it down.\"",
+      "complete": "Willow-Whisper will not take it from your hand. She has you lay it on a flat stone, and looks at it for a long time: a sliver of glass with too many edges, colder than ice, that throws back no reflection at all. \"This is not the Wasting,\" she says. \"The Wasting is a wound. This is a hand.\"",
+      "steps": [
+        {
+          "text": "Lay the withered Keepers of the Greying to rest, and take what is lodged in Greyheart's heart.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.verdant",
+              "target": "mob.withered.verdant*",
+              "count": 4,
+              "text": "Withered Keepers laid to rest"
+            },
+            {
+              "type": "collect",
+              "zone": "zone.verdant",
+              "target": "kill:mob.greyheart.verdant*",
+              "item": "item.cold_glass",
+              "text": "The cold glass from Greyheart's heart",
+              "say": "In the split heartwood of Greyheart's chest something glints: a sliver of glass with too many edges. It is so cold it burns."
+            }
+          ]
+        },
+        {
+          "text": "Bring the cold glass to Willow-Whisper.",
+          "objectives": [
+            {
+              "type": "deliver",
+              "zone": "zone.verdant",
+              "target": "Willow-Whisper",
+              "item": "item.cold_glass",
+              "text": "Bring the cold glass to Willow-Whisper",
+              "say": "\"Do not hold it out to me. Put it down. There.\""
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 640,
+        "gold": 150,
+        "reputation": [
+          {
+            "faction": "keepers",
+            "amount": 400
+          }
+        ]
+      }
+    },
+    {
+      "id": "main.verdant.4",
+      "title": "A Fog That Tastes of Lightning",
+      "kind": "main",
+      "giver": "Willow-Whisper",
+      "turnIn": "Willow-Whisper",
+      "zone": "zone.verdant",
+      "level": 13,
+      "requires": [
+        "main.verdant.3"
+      ],
+      "canonStatus": "CANON-EXPANDED: the unnatural violet-tinged fog that tastes of ozone and unmaking, the Void-Touchers in the mists below the ridge who have forgotten their human names, their Void-Husks and the Pale Shadows are CANON (book3 ch.2-4, 8); Palemist Hollow, the mist-walkers and this first sighting, before the books, are GAME-ONLY.",
+      "summary": "Go down into Palemist Hollow under the Ridge of Long Shadows, break the mist-walkers and the pale shadows in the fog, and bring Willow-Whisper one of the black rods the walkers carry.",
+      "offer": "\"There is a hollow under the ridge where the mist lies all day. We have always let it lie. Mist is the Shore breathing.\" Willow-Whisper's leaves rustle, though there is no wind. \"This mist does not breathe. It is cold and dry in a wet wood. It tastes of lightning. And there are people in it, walking, who have forgotten their names.\"\n\n\"Go down into it. If they are what I fear, they carry the cold in their hands. Bring me whatever they carry. And breathe as little of that fog as you can.\"",
+      "progress": "\"You smell of it. Cold and nothing. Sit by the lanterns a while.\"",
+      "complete": "Willow-Whisper looks at the black rod for a long time, and for the first time since you met her she looks old. \"So. The Pale are looking at the Shore.\" She wraps it in fresh leaves and sets it in a hollow of the tree, and the tree closes over it, bark creeping like a slow tide. \"Not yet in strength. They are tasting us. Testing what we are made of.\"\n\n\"You have done more for this wood than any flesh-folk in a hundred of your years. The Shore will remember it. The Shore remembers everything.\"",
+      "steps": [
+        {
+          "text": "Go down into the fog in Palemist Hollow, under the ridge.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.verdant",
+              "at": {
+                "x": 114,
+                "y": -106
+              },
+              "radius": 10,
+              "text": "Go down into Palemist Hollow",
+              "say": "The fog doesn't roll in; it is simply there, a bank of mist tinged faintly violet, and as you step into it the warm wet air of the Shore turns cold and dry. It tastes of lightning and of nothing at all. At its edge the grass has gone to ash."
+            }
+          ]
+        },
+        {
+          "text": "Break the mist-walkers and the pale shadows, and take a black rod from a mist-walker.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.verdant",
+              "target": "mob.mistwalker.verdant*",
+              "count": 5,
+              "text": "Mist-walkers broken"
+            },
+            {
+              "type": "kill",
+              "zone": "zone.verdant",
+              "target": "mob.paleshadow.verdant*",
+              "count": 2,
+              "text": "Pale shadows dispersed"
+            },
+            {
+              "type": "collect",
+              "zone": "zone.verdant",
+              "target": "kill:mob.mistwalker.verdant*",
+              "item": "item.void_husk",
+              "text": "A black rod from a mist-walker",
+              "say": "The mist-walker's hand opens and lets go of a rod of black stone, cut to too many faces, faintly pulsing like something asleep."
+            }
+          ]
+        },
+        {
+          "text": "Bring the black rod to Willow-Whisper.",
+          "objectives": [
+            {
+              "type": "deliver",
+              "zone": "zone.verdant",
+              "target": "Willow-Whisper",
+              "item": "item.void_husk",
+              "text": "Bring the black rod to Willow-Whisper",
+              "say": "\"Wrap it. Not in your hand. In leaves. Give it here.\""
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 720,
+        "gold": 170,
+        "documents": [
+          "doc.verdant.shore_remembers"
+        ],
+        "reputation": [
+          {
+            "faction": "keepers",
+            "amount": 500
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.reedsong.boars",
+      "title": "The Reeds Go Quiet",
+      "kind": "npc",
+      "giver": "Reed-Song",
+      "turnIn": "Reed-Song",
+      "zone": "zone.verdant",
+      "level": 11,
+      "minLevel": 10,
+      "canonStatus": "CANON-EXPANDED: glass-frogs in the undergrowth are CANON (book3 ch.2); Reed-Song, the Mistmere and the moss-backed boars are GAME-ONLY.",
+      "summary": "Drive off six moss-backed boars rooting up the reed-beds on the far shore of the Mistmere. They lie up in the reeds.",
+      "offer": "\"Listen.\" Reed-Song is a thin, stooped Keeper the colour of wet reeds, and when she stops moving you lose her against the shore. \"The near shore sings. The glass-frogs click and answer. Now listen to the far shore.\" Nothing. \"Boars. Moss-backed, fat and bold, rooting up the reed-beds where the frogs lay. They lie up in the reeds, and they do not like to be found.\"\n\n\"Six. Then the far shore will sing again, and so will I.\"",
+      "progress": "\"Still quiet over there.\"",
+      "complete": "Reed-Song lifts her head. Across the water, faintly, a frog clicks. Then another. \"There.\" She sinks back into the reeds, content. \"The mere thanks you. It has a short memory but a long voice.\"",
+      "steps": [
+        {
+          "text": "Drive off the moss-backed boars in the reeds of the Mistmere's far shore.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.verdant",
+              "target": "mob.mossboar.verdant*",
+              "count": 6,
+              "text": "Moss-backed boars driven off"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 520,
+        "gold": 120,
+        "reputation": [
+          {
+            "faction": "keepers",
+            "amount": 250
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.alderknot.antlers",
+      "title": "Antlers for the Carver",
+      "kind": "npc",
+      "giver": "Alder-Knot",
+      "turnIn": "Alder-Knot",
+      "zone": "zone.verdant",
+      "level": 11,
+      "minLevel": 10,
+      "canonStatus": "CANON-EXPANDED: on the Shore iron rusts to nothing and the wood is worked instead (book3 ch.1, 3); Alder-Knot, the moss-antler stags and the carving are GAME-ONLY.",
+      "summary": "Bring Alder-Knot five moss-crowned antlers from the stags of the Antler Meadow, north-west of Rootfast.",
+      "offer": "Alder-Knot is all elbows and burls, with wood-shavings caught in the moss of his shoulders. \"Iron rusts on the Shore. Everything you flesh-folk carry here goes to rust-lace in a season. So I carve.\" He holds up a knife-handle of pale antler grown round with a ring of living wood. \"Antler, bound in heartwood. It lasts.\"\n\n\"The stags in the meadow are too many this year. They strip the saplings to the white. Bring me five antlers, good ones, with moss on the tines. The meadow will thank you, even if the stags don't.\"",
+      "progress": "\"Moss on the tines. The meadow ones have it.\"",
+      "complete": "Alder-Knot sorts the antlers by some measure only he understands, and keeps all five. \"Good. Handles, buckles, and one of them a comb for Willow, if she'll take it.\" A creak that might be a laugh. \"Come back when your iron rusts.\"",
+      "steps": [
+        {
+          "text": "Take moss-crowned antlers from the stags of the Antler Meadow.",
+          "objectives": [
+            {
+              "type": "collect",
+              "zone": "zone.verdant",
+              "target": "kill:mob.stag.verdant*",
+              "item": "item.moss_antler",
+              "count": 5,
+              "text": "Moss-crowned antlers"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 540,
+        "gold": 125,
+        "reputation": [
+          {
+            "faction": "keepers",
+            "amount": 250
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.mosslantern.silk",
+      "title": "Silk for the Lanterns",
+      "kind": "npc",
+      "giver": "Moss-Lantern",
+      "turnIn": "Moss-Lantern",
+      "zone": "zone.verdant",
+      "level": 12,
+      "minLevel": 10,
+      "canonStatus": "CANON-EXPANDED: Veridian sap that glows (the bioluminescent sap mortar of book3 ch.4) is CANON; sap-lanterns with spider-silk wicks, Moss-Lantern, the canopy spiders and the Fallen Ghost-Oak are GAME-ONLY.",
+      "summary": "Gather six skeins of web-silk from the canopy spiders nesting in the Fallen Ghost-Oak, west of Rootfast, for the grove's lantern-wicks.",
+      "offer": "Moss-Lantern is round and slow and smells of warm honey. All round her, little lanterns of rind and resin hang from the roots, waiting for dusk. \"Sap burns green-gold and gentle, if the wick is right. Spider-silk is the right wick. Nothing else draws it so slow.\"\n\n\"The spiders in the Fallen Ghost-Oak spin the best silk on the Shore, and lately they have grown too many and too bold to ask. Bring me six skeins. Then Rootfast will be lit tonight, and you may sit under the lanterns and eat a sap-cake. Everyone should, once.\"",
+      "progress": "\"Six skeins. Wound on a twig, if you can. It tangles.\"",
+      "complete": "Moss-Lantern twists the silk into wicks with fingers like soft roots, faster than you can follow. By the time she has finished the light is going, and one by one the lanterns of Rootfast come on, green-gold, up and down the great trunks.",
+      "steps": [
+        {
+          "text": "Take web-silk from the canopy spiders at the Fallen Ghost-Oak.",
+          "objectives": [
+            {
+              "type": "collect",
+              "zone": "zone.verdant",
+              "target": "kill:mob.spider.verdant*",
+              "item": "item.web_silk",
+              "count": 6,
+              "text": "Skeins of web-silk"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 600,
+        "gold": 140,
+        "reputation": [
+          {
+            "faction": "keepers",
+            "amount": 250
+          }
+        ]
+      }
+    },
+    {
+      "id": "side.iselle.notes",
+      "title": "The Three Notes",
+      "kind": "side",
+      "giver": "Sister Iselle",
+      "turnIn": "Sister Iselle",
+      "zone": "zone.verdant",
+      "level": 12,
+      "minLevel": 10,
+      "canonStatus": "CANON-EXPANDED: the Silent Pilgrims, their dyed linen, silver masks and brass listening-tubes, and their search for the Original Song and its three notes (Earth, Spirit, Silence) are CANON (book3 ch.5, world_bible.md); Sister Iselle, the glade-light and her page are GAME-ONLY.",
+      "summary": "Gather three caps of glade-light in the Whispering Glade for Sister Iselle, a Silent Pilgrim who has been listening there for eleven days.",
+      "offer": "The pilgrim wears layered linen the colours of ochre and sand, and a mask of polished silver over her mouth and nose. She lowers a long brass tube from her ear. \"Forgive me. I have been listening to this glade for eleven days, and it has sung the same two notes on every one of them.\"\n\n\"The Archive teaches that the Song had three notes before the cycles began: Earth, and Spirit, and a third we have lost. This glade holds the first two. I need to hear them in my hand, not only in my ear. Bring me three caps of glade-light, the ones that glow. Take them gently. They grow back.\"",
+      "progress": "\"Gently. They grow back, but they remember being picked.\"",
+      "complete": "Sister Iselle holds the glowing caps to her brass tube one after another, and you hear it too, faintly: a low hum, and over it a higher one. Then, between them, a silence that sounds as if it is waiting. She writes for a long while. \"Two notes. And the shape of where the third should be.\" She tears out the page and gives it to you. \"Keep it. The Archive has enough copies of my handwriting.\"",
+      "steps": [
+        {
+          "text": "Gather glade-light from the glowing caps in the Whispering Glade.",
+          "objectives": [
+            {
+              "type": "collect",
+              "zone": "zone.verdant",
+              "target": "Glowing caps",
+              "item": "item.glade_light",
+              "count": 3,
+              "text": "Glade-light"
+            }
+          ]
+        },
+        {
+          "text": "Bring the glade-light to Sister Iselle.",
+          "objectives": [
+            {
+              "type": "deliver",
+              "zone": "zone.verdant",
+              "target": "Sister Iselle",
+              "item": "item.glade_light",
+              "count": 3,
+              "text": "Bring the glade-light to Sister Iselle",
+              "say": "\"Hold them still. There. Do you hear it?\""
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 600,
+        "gold": 140,
+        "documents": [
+          "doc.verdant.three_notes"
+        ]
+      }
+    },
+    {
+      "id": "side.ondine.sap",
+      "title": "Green Gold",
+      "kind": "side",
+      "giver": "Ondine Varro",
+      "turnIn": "Ondine Varro",
+      "zone": "zone.verdant",
+      "level": 12,
+      "minLevel": 10,
+      "canonStatus": "CANON-EXPANDED: Port Caelum's glass ships (world_bible.md), Veridian sap 'the color of liquid emerald and thicker than honey' and the Ghost-Oaks it is tapped from (book3 ch.4), and the quarrel between harvesting the Shore and singing to it (book3 ch.3) are CANON; Ondine Varro and this errand are GAME-ONLY. Taking the sap costs standing with the Keepers.",
+      "summary": "Draw three flasks of Veridian sap from the spouts in the old Ghost-Oaks east of the Salt-Flats for Ondine Varro of Port Caelum. The Keepers will not like it.",
+      "offer": "\"House Glass pays for three things: charts, salt, and anything that glows.\" Ondine Varro taps a chart weighted down with sea-shells. \"This sap glows. In Port Caelum they say a drop of it mends a cracked hull of glass so you'd never find the seam. Nobody in Port Caelum has ever seen any.\"\n\n\"There's a stand of old Ghost-Oaks east of the flats, with spouts already cut in them. Somebody taps them. Three flasks, and I'll pay more than a season of honest work.\" She doesn't smile. \"The wood-folk won't thank you. I'm not asking them. I'm asking you.\"",
+      "progress": "\"Three flasks. Stopper them well. It creeps.\"",
+      "complete": "Ondine holds a flask to the light. The sap moves in it slowly, the colour of liquid emerald, and throws green across her face. \"Look at that.\" For a moment she forgets to be a trader. Then she remembers, and counts out more gold than you've seen since the Rim. \"House Glass remembers the people it trades with. So, I'd guess, do the trees.\"",
+      "steps": [
+        {
+          "text": "Draw Veridian sap from the spouts in the old Ghost-Oaks east of the Salt-Flats.",
+          "objectives": [
+            {
+              "type": "collect",
+              "zone": "zone.verdant",
+              "target": "Sap-spout",
+              "item": "item.veridian_sap",
+              "count": 3,
+              "text": "Flasks of Veridian sap"
+            }
+          ]
+        },
+        {
+          "text": "Bring the sap to Ondine Varro.",
+          "objectives": [
+            {
+              "type": "deliver",
+              "zone": "zone.verdant",
+              "target": "Ondine Varro",
+              "item": "item.veridian_sap",
+              "count": 3,
+              "text": "Bring the sap to Ondine Varro",
+              "say": "\"Careful. Don't let it touch your skin.\""
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 580,
+        "gold": 260,
+        "reputation": [
+          {
+            "faction": "keepers",
+            "amount": -300
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.oakbane.ninebranch",
+      "title": "The Old King of the Deep Wood",
+      "kind": "npc",
+      "giver": "Oak-Bane",
+      "turnIn": "Oak-Bane",
+      "zone": "zone.verdant",
+      "level": 13,
+      "minLevel": 10,
+      "canonStatus": "GAME-ONLY (Old Ninebranch). Oak-Bane, guardian of the deep woods, is CANON (book3 ch.2, world_bible.md).",
+      "summary": "Put down Old Ninebranch, the great stag of the deep wood west of the Antler Meadow, before the grey in his antlers spreads to the herd. He is very dangerous.",
+      "offer": "\"Old Ninebranch was a fawn when I was a sapling.\" Oak-Bane's voice is the creak of a whole tree in a wind. \"He has been king of the deep wood longer than your kind has had kings. This spring the grey got into his antlers. Now he gores anything that moves. A Keeper, yesterday. Not badly. He was always very good at it.\"\n\n\"I cannot do it. I have known him too long, and he knows how I move. You, he does not know. Make it clean.\"",
+      "progress": "\"He beds down on the knoll west of the meadow. He will have heard you coming.\"",
+      "complete": "Oak-Bane listens to you tell it, and for once he does not interrupt. \"Nine branches. I counted them every spring.\" He turns away toward the deep wood, where the old king bedded down for longer than anyone remembers. \"The Root-Mother will take him back. She takes everything back.\" A pause. \"Go. Before I decide I am angry with you.\"",
+      "steps": [
+        {
+          "text": "Put down Old Ninebranch on his knoll in the deep wood.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.verdant",
+              "target": "mob.ninebranch.verdant*",
+              "count": 1,
+              "text": "Old Ninebranch"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 720,
+        "gold": 165,
+        "reputation": [
+          {
+            "faction": "keepers",
+            "amount": 300
+          }
+        ]
+      }
+    },
+    {
+      "id": "side.verdant.salt",
+      "title": "Salt of the First Shore",
+      "kind": "side",
+      "giver": "Willow-Whisper",
+      "turnIn": "Mother Vane",
+      "zone": "zone.verdant",
+      "level": 12,
+      "minLevel": 10,
+      "requires": [
+        "main.verdant.1"
+      ],
+      "canonStatus": "CANON-EXPANDED: the Salt-Flats of the western coast (book3 ch.3), the Keepers' staves of white salt-wood (book3 ch.2), Mother Vane and Salt of the First Sea (book1 ch.20) are CANON; that the Ash-Walkers' old salt first came from these flats is GAME-ONLY.",
+      "summary": "Break three cakes of salt-crust on the Salt-Flats where the Wending meets the sea, and carry them back over the mountains to Mother Vane on the Ashland Rim.",
+      "offer": "\"The salt your Ash-Walker came for.\" Willow-Whisper turns Grohl's knotted cord in her fingers. \"The sea left it on the flats long ago, when the world was younger and the sea was taller. We make our staves from the wood that grows in it. Salt-wood. It hums.\"\n\n\"Go to the flats where the Wending meets the sea. Break three cakes of the crust, no more. Carry them back over the mountains to your Salt-Speaker. Tell her the Shore remembers her grandmothers, and that they asked first.\"",
+      "progress": "\"Three cakes. No more.\"",
+      "complete": "Mother Vane breaks a corner off one of the cakes and touches it to her tongue, and her eyes close. \"That's it. That's the old salt.\" When she opens them they are wet, which she will deny. \"The wood-folk. Still there. Still keeping it.\" She sets the cakes on the highest shelf in the cave, where the damp can't reach. \"Tell no one in the Rim how far you went for this. They'll want you to go again.\"",
+      "steps": [
+        {
+          "text": "Break cakes of salt-crust on the Salt-Flats.",
+          "objectives": [
+            {
+              "type": "collect",
+              "zone": "zone.verdant",
+              "target": "Salt-crust",
+              "item": "item.shore_salt",
+              "count": 3,
+              "text": "Cakes of salt-crust"
+            }
+          ]
+        },
+        {
+          "text": "Carry the salt over the mountains to Mother Vane on the Ashland Rim.",
+          "objectives": [
+            {
+              "type": "deliver",
+              "zone": "zone.ashrim",
+              "target": "Mother Vane",
+              "item": "item.shore_salt",
+              "count": 3,
+              "text": "Carry the salt to Mother Vane",
+              "say": "\"From the western shore? The wood-folk's shore?\" Mother Vane looks at the salt as if it might bite. \"Give it here.\""
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 560,
+        "gold": 130,
+        "reputation": [
+          {
+            "faction": "ashwalkers",
+            "amount": 400
+          },
+          {
+            "faction": "keepers",
+            "amount": 100
+          }
+        ]
+      }
+    }
+  ]
+}

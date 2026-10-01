@@ -41,6 +41,9 @@ namespace Crulanda.World
         public sealed class Lake
         {
             public ZoneLake def; public float level, radius, swimInset, bottom, ramp; public Vector3 phase;
+            /// <summary>A waterfall falls into this pool: its foot (world), and the level direction the water falls (the rock face is behind,
+            /// the other way). The shore rule leaves the ledge behind the fall alone (Carve).</summary>
+            public bool hasFall; public Vector2 fallAt, fallDir; public float fallWidth;
             /// <summary>
             /// Waterline radius toward <paramref name="dir"/> (from the centre): the mean radius swelling and pulling in smoothly
             /// by up to a fifth around the shore (three low harmonics, phased per lake), so no pond is a circle.
@@ -110,6 +113,15 @@ namespace Crulanda.World
                     k.bottom = k.level - d;
                     k.ramp = Mathf.Min(.8f * l.radius, Mathf.Max(.55f * l.radius, 1.9f * d));   // underwater bank width (slope <= ~38 deg), inside the deepest bay
                     k.swimInset = d > SwimDepth ? k.ramp * InverseSmooth(SwimDepth / d) : 0;       // swim-deep this far in from the waterline
+                    // A waterfall whose foot stands at this pool's waterline: the land behind it stays up (the ledge it falls off).
+                    if (zone.props != null)
+                        foreach (var pr in zone.props)
+                        {
+                            if (pr == null || pr.kind != "waterfall") continue;
+                            var off = pr.at - l.center; if (Mathf.Abs(off.magnitude - k.RadiusAt(off)) > 2.5f) continue;
+                            var fallsToward = Quaternion.Euler(0, pr.rotation, 0) * Vector3.back;   // the water falls toward the prop's -Z
+                            k.hasFall = true; k.fallAt = pr.at; k.fallDir = new Vector2(fallsToward.x, fallsToward.z).normalized; k.fallWidth = pr.size.x > 0 ? pr.size.x : 6;
+                        }
                     Lakes.Add(k);
                 }
         }
@@ -132,6 +144,8 @@ namespace Crulanda.World
                     hh = Mathf.Lerp(h, bank, wgt);
                 }
                 if (d < width) hh = Mathf.Min(hh, bank - c.depth * Mathf.SmoothStep(0, 1, 1 - d / width));
+                // A creek leaving a pool: its bed never cuts under the pool's rim (the pool spills over a lip into it).
+                foreach (var k in Lakes) { var off = p - k.def.center; if (off.magnitude <= k.DrawRadiusAt(off) + .5f) hh = Mathf.Max(hh, k.level - .02f); }
                 h = Mathf.Min(h, hh);
             }
             foreach (var k in Lakes)
@@ -139,6 +153,12 @@ namespace Crulanda.World
                 var off = p - k.def.center; float d = off.magnitude;
                 if (d > k.radius * 1.2f + 20) continue;
                 float r = k.RadiusAt(off), s = d - r, target;
+                if (s > 0 && k.hasFall)
+                {
+                    // Behind the fall (its back half-plane, within its width and a margin): the ledge, not a shore.
+                    var rel = p - k.fallAt; float back = -Vector2.Dot(rel, k.fallDir), across = Mathf.Abs(rel.x * k.fallDir.y - rel.y * k.fallDir.x);
+                    if (back > 0 && across < k.fallWidth / 2 + 16) continue;
+                }
                 if (s <= 0) target = Mathf.Lerp(k.bottom, k.level, Mathf.SmoothStep(0, 1, Mathf.Clamp01((d - (r - k.ramp)) / k.ramp)));
                 else
                 {

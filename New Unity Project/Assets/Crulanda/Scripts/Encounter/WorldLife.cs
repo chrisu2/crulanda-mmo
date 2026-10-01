@@ -82,7 +82,7 @@ namespace Crulanda.Encounter
                     string place = r.place ?? "green";
                     if (r.at != Vector2.zero) { place = "post:" + r.name; Places[place] = new List<Vector3>(); AddPlace(place, r.at); }   // a fixed post
                     var start = RandomPlace(place) ?? Zone.Ground(r.at != Vector2.zero ? r.at : z.spawns.recovery);
-                    var v = Villager.Spawn(this, r.name, r.role ?? "stranger", 60 + i, null, start, null, place, r.title);
+                    var v = Villager.Spawn(this, r.name, r.role ?? "stranger", 60 + i, null, start, null, place, r.title, r.look);
                     Villagers.Add(v);
                 }
             // One hen-wife per coop, living in the nearest house. The coop starts open or shut for the hour.
@@ -242,6 +242,24 @@ namespace Crulanda.Encounter
             "Don't linger by the gallows. It listens.",
             "The Sandthrone take what they like and laugh while they do it.",
             "Something white walks by the crypt at dusk. It leaves no footprints." };
+        /// <summary>The Verdant Shore (GAME-ONLY lines; the Keepers are CANON-EXPANDED): what the wood-folk say to you, what they murmur
+        /// among themselves, and each resident's own two lines.</summary>
+        static readonly string[] Keepers = {
+            "The wood knows you now. Mostly.", "Walk soft on the roots. They are older than your grandmother's grandmother, and they remember her too.",
+            "Iron rusts here. Words last longer, if you choose them well.", "Hoard nothing. The Shore takes back what is held too tight.",
+            "Listen. The trees are passing word of you from root to root.", "The lanterns wake at dusk. Stay and see them.",
+            "There is a cold in the east that was not there when I was a sapling.", "You flesh-folk are so loud. It is not your fault. You are very short.",
+            "Mind the mist below the ridge. It does not breathe.", "Willow says you asked first. That is rare in your kind." };
+        static readonly string[] KeeperChatter = { "...root to root, and the north wood answers.", "The sap runs slow this season.", "Something grey in the east. Still.", "Hush. The mere is dreaming.", "Mm. The flesh-folk again." };
+        static readonly Dictionary<string, string[]> OwnLines = new Dictionary<string, string[]> {
+            { "Willow-Whisper", new[] { "Stand still a moment. There. Now the wood can hear you.", "The Root-Mother sleeps. We sing so that she dreams well." } },
+            { "Oak-Bane", new[] { "Flesh-folk. You are still here.", "The deep wood does not need you. One day it may put up with you." } },
+            { "Moss-Lantern", new[] { "Sap-cakes, warm from the stone. One each. Well. Two.", "A lantern is only a little of the day, kept." } },
+            { "Alder-Knot", new[] { "Wood, bone and patience. That is all a tool needs.", "Your sword will rust. Bring it to me when it does." } },
+            { "Reed-Song", new[] { "Hush. The frogs are counting.", "The mere keeps its mist till noon. It is shy." } },
+            { "Sister Iselle", new[] { "I am listening. You may listen too, if you are quiet.", "The Archive has words for this glade. None of them are right." } },
+            { "Ondine Varro", new[] { "Charts, salt, and anything that glows. That's what House Glass pays for.", "There's a cove under that ridge with deep water close in. Somebody ought to be using it." } },
+        };
         static readonly string[] ChildLines = { "Are you a real adventurer?", "Mum says not to go near the grey.", "I saw a crow as big as a dog!" };
         static readonly string[] Chatter = {
             "...and the miller swore it was a wolf.", "Two coppers for a loaf now!", "Did you see the sky over the east fields?",
@@ -265,8 +283,15 @@ namespace Crulanda.Encounter
             { "elder", new[] { "I remember when the east was green to the horizon.", "The oak on the green was old when my grandmother was young. It'll see the lot of us out." } } };
         public string LineFor(Villager v, bool toPlayer)
         {
+            if (Zone.Zone.life.mood == "keepers")
+            {
+                // The Verdant Shore: the Keepers and the two travellers among them have their own lines, and none of Oakhaven's talk.
+                if (!toPlayer) return KeeperChatter[rng.Next(KeeperChatter.Length)];
+                if (OwnLines.TryGetValue(v.Name, out var own) && rng.Next(2) == 0) return own[rng.Next(own.Length)];
+                return v.Keeper ? Keepers[rng.Next(Keepers.Length)] : OwnLines.TryGetValue(v.Name, out var mine) ? mine[rng.Next(mine.Length)] : Keepers[rng.Next(Keepers.Length)];
+            }
             if (!toPlayer) return Chatter[rng.Next(Chatter.Length)];
-            if (TradeLines.TryGetValue(v.Role, out var trade) && rng.Next(3) > 0) return trade[rng.Next(trade.Length)];
+            if (!v.Keeper && TradeLines.TryGetValue(v.Role, out var trade) && rng.Next(3) > 0) return trade[rng.Next(trade.Length)];
             if (v.Role == "henwife" && v.Coop != null)
             {
                 if (WorldClock.Between(19.3f, 21)) return "Can't stop, love. Hens to put away before dark.";
@@ -298,6 +323,8 @@ namespace Crulanda.Encounter
         public string Role { get; private set; }
         /// <summary>A resident keeps one post day and night (quest givers such as the Salt-Mender at the inn).</summary>
         public bool Resident { get { return fixedPlace != null; } }
+        /// <summary>A Veridian Keeper (the Verdant Shore's wood-folk): their own body and their own lines.</summary>
+        public bool Keeper { get; private set; }
         /// <summary>Trade shown under the name (&lt;Blacksmith&gt;), or null.</summary>
         public string Title { get; private set; }
         public string Bubble { get; private set; }
@@ -313,7 +340,7 @@ namespace Crulanda.Encounter
         /// <summary>Night: everyone goes home to bed (staggered; drinkers stay at the inn late, children go early).</summary>
         public bool Bedtime { get { return WorldClock.Between(bedAt, wakeAt); } }
 
-        public static Villager Spawn(VillageLife life, string name, string role, int index, ZoneDoor home, Vector3 at, ZoneCoop coop = null, string fixedPlace = null, string title = null)
+        public static Villager Spawn(VillageLife life, string name, string role, int index, ZoneDoor home, Vector3 at, ZoneCoop coop = null, string fixedPlace = null, string title = null, string look = null)
         {
             var go = new GameObject(name); go.SetActive(false); go.transform.position = at + Vector3.up;
             go.transform.SetParent(life.transform, false); go.transform.position = at + Vector3.up;
@@ -323,7 +350,10 @@ namespace Crulanda.Encounter
             v.agent = go.AddComponent<NavMeshAgent>(); v.agent.speed = role == "child" ? 2.4f : role == "elder" ? 1.1f : 1.6f;
             v.agent.angularSpeed = 360; v.agent.acceleration = 8; v.agent.stoppingDistance = .4f; v.agent.radius = .3f; v.agent.height = 2;
             v.agent.baseOffset = role == "child" ? .66f : 1; v.agent.avoidancePriority = 60;
-            v.visual = ActorVisual.Attach(go, ActorLook.Villager, index * 5 + 3, role == "child", role);
+            // A resident's own look (a Veridian Keeper): the body of the look, calm (an even variant), and no villager's outfit.
+            v.Keeper = look == "keeper";
+            v.visual = ActorVisual.Attach(go, v.Keeper ? ActorLook.Keeper : ActorLook.Villager, v.Keeper ? (index * 2) : index * 5 + 3, role == "child", v.Keeper ? null : role);
+            if (v.Keeper) { v.agent.height = 2.6f; v.agent.baseOffset = 1; v.agent.speed = 1.3f; }
             v.Title = title ?? VillageLife.TitleFor(role); v.fixedPlace = fixedPlace;
             v.Coop = coop;
             v.bedAt = role == "drinker" ? 23 + (index % 3) * .3f : role == "child" ? 19.8f + (index % 3) * .2f : role == "henwife" ? HerdHour : 20.2f + (index % 5) * .25f;

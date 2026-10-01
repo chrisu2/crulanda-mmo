@@ -289,6 +289,23 @@ namespace Crulanda.Encounter
                 ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "96-village-dawn.png"));
                 yield return new WaitForSeconds(.4f);
             }
+            // A zone with no coop (the Verdant Shore): its heart after dark anyway, lamps lit (Rootfast's treehouse lanterns, the
+            // glade's glowing caps and flowers), from the recovery point, then dawn.
+            if (zone != null && zone.Coops.Count == 0)
+            {
+                string prefix = zone.Zone.id.Replace("zone.", "") + "-";
+                EncounterHud.Hidden = true;
+                foreach (var (name, hour, shot) in new[] { ("Rootfast", 21.5f, "95-village-night"), ("The Whispering Glade", 22.5f, "94-glade-night"), ("Rootfast", 6.4f, "96-village-dawn") })
+                {
+                    var l = Array.Find(zone.Zone.landmarks, x => x != null && x.name == name); if (l == null) continue;
+                    Crulanda.World.WorldClock.Hour = hour;
+                    var at = l.view != Vector2.zero ? l.view : l.at + new Vector2(0, -(l.radius + 10));
+                    motor.Teleport(zone.Ground(at, 1.1f)); var look = l.at - at; motor.SetView(Mathf.Atan2(look.x, look.y) * Mathf.Rad2Deg, l.viewPitch > 0 ? l.viewPitch : 14, l.viewZoom > 0 ? l.viewZoom : 11);
+                    yield return new WaitForSeconds(1.5f);
+                    ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + shot + ".png")); yield return new WaitForSeconds(.4f);
+                }
+                Crulanda.World.WorldClock.Hour = 11; EncounterHud.Hidden = false;
+            }
             // The trades: each at their workplace, then one of every trade lined up on the green with nameplates showing.
             var life = VillageLife.Active;
             if (zone != null && life != null)

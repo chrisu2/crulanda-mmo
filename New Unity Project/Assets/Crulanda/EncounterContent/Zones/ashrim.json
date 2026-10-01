@@ -94,6 +94,19 @@
         "y": -174
       },
       "radius": 5
+    },
+    {
+      "to": "zone.verdant",
+      "name": "Old west road over the mountains to the Verdant Shore (11-13)",
+      "at": {
+        "x": -173,
+        "y": -3
+      },
+      "arrive": {
+        "x": 163,
+        "y": 24.5
+      },
+      "radius": 5
     }
   ],
   "clearings": [
@@ -372,6 +385,44 @@
         {
           "x": 22.2,
           "y": 141.2
+        }
+      ]
+    },
+    {
+      "name": "Old west road",
+      "width": 4,
+      "points": [
+        {
+          "x": -180,
+          "y": -4
+        },
+        {
+          "x": -166,
+          "y": -3.1
+        },
+        {
+          "x": -148,
+          "y": -2
+        },
+        {
+          "x": -150,
+          "y": 16
+        },
+        {
+          "x": -157,
+          "y": 34
+        },
+        {
+          "x": -160,
+          "y": 52
+        },
+        {
+          "x": -159,
+          "y": 70
+        },
+        {
+          "x": -160,
+          "y": 88.1
         }
       ]
     }
@@ -1909,6 +1960,15 @@
         "y": 120
       },
       "variant": 1
+    },
+    {
+      "kind": "signpost",
+      "name": "Old west road sign",
+      "at": {
+        "x": -156.5,
+        "y": 82
+      },
+      "rotation": 90
     }
   ],
   "groves": [

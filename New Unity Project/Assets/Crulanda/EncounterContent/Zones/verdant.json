@@ -1,0 +1,2907 @@
+{
+  "id": "zone.verdant",
+  "displayName": "The Verdant Shore",
+  "subtitle": "The Verdant Ocean of the western coast, where the Veridian Keepers keep the Shore of the First Cycle",
+  "canonStatus": "CANON-EXPANDED",
+  "canonNote": "Canon (book3 ch.1-7, world_bible.md): the Verdant Shore, the 'Verdant Ocean' of the Western Coast, a forest 'that didn't know when to stop': giant trees with trunks as wide as houses, broad flat leaves that sway like a green tide, a thousand greens from obsidian moss to emerald-glowing new ferns (ch.1); the Ridge of Long Shadows, the basalt divide the survivors crest to see it, with a harbour at its foot (ch.1, 3); the Veridian Keepers, beings of living wood and moss, and Oak-Bane and Willow-Whisper (ch.2, world_bible.md); the Veridian Temple, a stair of calcified roots down to the Root-Mother (ch.7); Ghost-Oaks tapped for Veridian sap 'the color of liquid emerald' (ch.4); the Whispering Glade and the mossy outcrop over it (ch.5); glass-frogs (ch.2); the Salt-Flats (ch.3); and the mists below the ridge, where an unnatural violet fog that tastes of ozone brings the Void-Touchers and the Pale Shadows (ch.2-4, 8). The game is set before the books' exodus: the survivors, Elara's First Seed (the Veridian Pine), the Salt-Wall and Salt-Mender's Landing are not here yet, and the Pale's touch is shown early, as foreshadowing (PROVISIONAL). The mountains between the Rim and the Shore are Book 3's ash-mountains (book2 ch.26: the Ashlands of the lower North were once the forested Verdant Spine); the road over them is GAME-ONLY. GAME-ONLY: Rootfast and every Keeper but Oak-Bane and Willow-Whisper, Mossveil Falls, the Wending, the Mistmere, the Fern Hollow, the Fallen Ghost-Oak, the Antler Meadow, the Greying, Palemist Hollow (canon's 'mists below the ridge'), the creatures and camps, and all placement.",
+  "size": 360,
+  "levelMin": 11,
+  "levelMax": 13,
+  "biome": "verdant",
+  "weather": [
+    {
+      "kind": "clear",
+      "weight": 3
+    },
+    {
+      "kind": "fair",
+      "weight": 3
+    },
+    {
+      "kind": "overcast",
+      "weight": 1.5
+    },
+    {
+      "kind": "mist",
+      "weight": 2.5
+    },
+    {
+      "kind": "rain",
+      "weight": 2.5
+    },
+    {
+      "kind": "storm",
+      "weight": 1.5
+    }
+  ],
+  "worldMapPosition": {
+    "x": 0.09,
+    "y": 0.71
+  },
+  "worldMapNote": "Placed on the western coast of the game map, beyond the western mountains where Book 3's survivors come down to the sea; canon gives the Shore no spot on this chart, so the position is provisional.",
+  "flatRadius": 56,
+  "hillHeight": 5,
+  "seed": 7341,
+  "lighting": {
+    "sunPitch": 30,
+    "sunYaw": 12,
+    "sunIntensity": 1.1,
+    "sunColor": "#FFE2B0",
+    "ambientSky": "#92AE9F",
+    "ambientEquator": "#6C8560",
+    "ambientGround": "#2C3922",
+    "fogColor": "#8EB5A6",
+    "fogStart": 28,
+    "fogEnd": 235,
+    "skyTint": "#86ACA9",
+    "skyExposure": 1.1,
+    "skyHaze": 1.25
+  },
+  "spawns": {
+    "player": {
+      "x": 163,
+      "y": 24.5
+    },
+    "playerFacing": 280,
+    "companion": {
+      "x": -9,
+      "y": 33
+    },
+    "recovery": {
+      "x": -7,
+      "y": 33
+    },
+    "leash": 17,
+    "enemies": []
+  },
+  "objectives": [
+    "Find the Veridian Keepers at Rootfast",
+    "Learn what troubles the Shore"
+  ],
+  "exits": [
+    {
+      "to": "zone.ashrim",
+      "name": "Ash-road east over the mountains to the Ashland Rim",
+      "at": {
+        "x": 173,
+        "y": 26
+      },
+      "arrive": {
+        "x": -161,
+        "y": -2.8
+      },
+      "radius": 5
+    }
+  ],
+  "clearings": [
+    {
+      "name": "Rootfast green",
+      "center": {
+        "x": -4,
+        "y": 40
+      },
+      "radius": 8
+    },
+    {
+      "name": "Ridge lookout",
+      "center": {
+        "x": 152,
+        "y": 22
+      },
+      "radius": 5
+    },
+    {
+      "name": "Scout's camp",
+      "center": {
+        "x": -140,
+        "y": -32
+      },
+      "radius": 5
+    }
+  ],
+  "shapes": [
+    {
+      "name": "Ridge of Long Shadows, south shoulder",
+      "center": {
+        "x": 194,
+        "y": -46
+      },
+      "radius": 44,
+      "height": 13,
+      "blend": 30
+    },
+    {
+      "name": "Ridge of Long Shadows",
+      "center": {
+        "x": 196,
+        "y": 22
+      },
+      "radius": 46,
+      "height": 14,
+      "blend": 32
+    },
+    {
+      "name": "Ridge of Long Shadows, north shoulder",
+      "center": {
+        "x": 194,
+        "y": 88
+      },
+      "radius": 44,
+      "height": 13.5,
+      "blend": 30
+    },
+    {
+      "name": "Ridge of Long Shadows, north toe",
+      "center": {
+        "x": 190,
+        "y": 150
+      },
+      "radius": 30,
+      "height": 9,
+      "blend": 26
+    },
+    {
+      "name": "Ridge of Long Shadows, south toe",
+      "center": {
+        "x": 188,
+        "y": -118
+      },
+      "radius": 28,
+      "height": 8,
+      "blend": 24
+    },
+    {
+      "name": "Mossveil ledge",
+      "center": {
+        "x": 124,
+        "y": 77
+      },
+      "radius": 11,
+      "height": 10.5,
+      "blend": 7
+    },
+    {
+      "name": "The Whispering Glade",
+      "center": {
+        "x": 40,
+        "y": 108
+      },
+      "radius": 14,
+      "height": -1.2,
+      "blend": 10
+    },
+    {
+      "name": "The mossy outcrop",
+      "center": {
+        "x": 56,
+        "y": 121
+      },
+      "radius": 3,
+      "height": 3.5,
+      "blend": 9
+    },
+    {
+      "name": "The Veridian Temple's root-stair",
+      "center": {
+        "x": -112,
+        "y": 124
+      },
+      "radius": 8,
+      "height": -2.5,
+      "blend": 8
+    },
+    {
+      "name": "The Antler Meadow",
+      "center": {
+        "x": -62,
+        "y": 82
+      },
+      "radius": 16,
+      "height": 0,
+      "blend": 8
+    },
+    {
+      "name": "Ninebranch's knoll",
+      "center": {
+        "x": -122,
+        "y": 80
+      },
+      "radius": 4,
+      "height": 1.8,
+      "blend": 8
+    },
+    {
+      "name": "The Fallen Ghost-Oak",
+      "center": {
+        "x": -98,
+        "y": 32
+      },
+      "radius": 14,
+      "height": 0,
+      "blend": 8
+    },
+    {
+      "name": "The Mistmere hollow",
+      "center": {
+        "x": -56,
+        "y": -92
+      },
+      "radius": 22,
+      "height": -1.2,
+      "blend": 10
+    },
+    {
+      "name": "The Fern Hollow",
+      "center": {
+        "x": 34,
+        "y": -74
+      },
+      "radius": 11,
+      "height": -2.4,
+      "blend": 10
+    },
+    {
+      "name": "The Salt-Flats",
+      "paint": "salt",
+      "center": {
+        "x": -168,
+        "y": -40
+      },
+      "radius": 26,
+      "height": -1,
+      "blend": 12
+    },
+    {
+      "name": "Palemist Hollow",
+      "center": {
+        "x": 124,
+        "y": -118
+      },
+      "radius": 16,
+      "height": -3,
+      "blend": 12
+    },
+    {
+      "name": "Palemist, the cold heart",
+      "paint": "unmade",
+      "center": {
+        "x": 132,
+        "y": -126
+      },
+      "radius": 4,
+      "height": -0.5,
+      "blend": 4
+    },
+    {
+      "name": "The Greying, the grey heart",
+      "paint": "unmade",
+      "center": {
+        "x": 98,
+        "y": 152
+      },
+      "radius": 5,
+      "height": -0.4,
+      "blend": 4
+    },
+    {
+      "name": "Mossveil ledge, the way up (low)",
+      "center": {
+        "x": 140,
+        "y": 62
+      },
+      "radius": 5,
+      "height": 2.6,
+      "blend": 7
+    },
+    {
+      "name": "Mossveil ledge, the way up (middle)",
+      "center": {
+        "x": 142,
+        "y": 72
+      },
+      "radius": 5,
+      "height": 5.2,
+      "blend": 7
+    },
+    {
+      "name": "Mossveil ledge, the way up (high)",
+      "center": {
+        "x": 138,
+        "y": 82
+      },
+      "radius": 5,
+      "height": 7.9,
+      "blend": 7
+    }
+  ],
+  "roads": [
+    {
+      "name": "The Ash-road",
+      "width": 4,
+      "points": [
+        {
+          "x": 181,
+          "y": 27.5
+        },
+        {
+          "x": 173,
+          "y": 26
+        },
+        {
+          "x": 163,
+          "y": 24.5
+        },
+        {
+          "x": 152,
+          "y": 22
+        },
+        {
+          "x": 146,
+          "y": 13
+        },
+        {
+          "x": 141,
+          "y": 3
+        },
+        {
+          "x": 135,
+          "y": -5
+        },
+        {
+          "x": 126,
+          "y": -9
+        },
+        {
+          "x": 114,
+          "y": -8
+        },
+        {
+          "x": 100,
+          "y": -4
+        },
+        {
+          "x": 86,
+          "y": -2
+        },
+        {
+          "x": 70,
+          "y": -1
+        },
+        {
+          "x": 54,
+          "y": -2
+        },
+        {
+          "x": 38,
+          "y": -4
+        },
+        {
+          "x": 22,
+          "y": -5
+        },
+        {
+          "x": 8,
+          "y": -5
+        },
+        {
+          "x": 0,
+          "y": -3
+        },
+        {
+          "x": -2,
+          "y": 2
+        },
+        {
+          "x": -2,
+          "y": 14
+        },
+        {
+          "x": -3,
+          "y": 32
+        }
+      ]
+    },
+    {
+      "name": "The Temple way",
+      "width": 3,
+      "points": [
+        {
+          "x": -8,
+          "y": 46
+        },
+        {
+          "x": -15.5,
+          "y": 64
+        },
+        {
+          "x": -26,
+          "y": 80
+        },
+        {
+          "x": -40,
+          "y": 94
+        },
+        {
+          "x": -56,
+          "y": 104
+        },
+        {
+          "x": -72,
+          "y": 110
+        },
+        {
+          "x": -86,
+          "y": 114
+        },
+        {
+          "x": -100,
+          "y": 117
+        }
+      ]
+    },
+    {
+      "name": "The Glade path",
+      "width": 2.6,
+      "points": [
+        {
+          "x": 0,
+          "y": 47
+        },
+        {
+          "x": 7.5,
+          "y": 64
+        },
+        {
+          "x": 14,
+          "y": 78
+        },
+        {
+          "x": 21,
+          "y": 90
+        },
+        {
+          "x": 27,
+          "y": 98
+        }
+      ]
+    },
+    {
+      "name": "The Shore path",
+      "width": 3,
+      "points": [
+        {
+          "x": -12,
+          "y": 44
+        },
+        {
+          "x": -28.6,
+          "y": 45.2
+        },
+        {
+          "x": -44,
+          "y": 42
+        },
+        {
+          "x": -58,
+          "y": 34
+        },
+        {
+          "x": -70,
+          "y": 24
+        },
+        {
+          "x": -80,
+          "y": 16
+        },
+        {
+          "x": -85,
+          "y": 10
+        },
+        {
+          "x": -85,
+          "y": -4
+        },
+        {
+          "x": -92,
+          "y": -14
+        },
+        {
+          "x": -106,
+          "y": -24
+        },
+        {
+          "x": -122,
+          "y": -30
+        },
+        {
+          "x": -138,
+          "y": -33
+        }
+      ]
+    },
+    {
+      "name": "The Mere path",
+      "width": 3,
+      "points": [
+        {
+          "x": 22,
+          "y": -5
+        },
+        {
+          "x": 14,
+          "y": -16
+        },
+        {
+          "x": 4,
+          "y": -32
+        },
+        {
+          "x": -10,
+          "y": -48
+        },
+        {
+          "x": -24,
+          "y": -60
+        },
+        {
+          "x": -38,
+          "y": -68
+        }
+      ]
+    }
+  ],
+  "water": [
+    {
+      "name": "The Wending",
+      "width": 5,
+      "points": [
+        {
+          "x": 116.35,
+          "y": 48.73
+        },
+        {
+          "x": 104,
+          "y": 43
+        },
+        {
+          "x": 90,
+          "y": 38
+        },
+        {
+          "x": 76,
+          "y": 32
+        },
+        {
+          "x": 62,
+          "y": 27
+        },
+        {
+          "x": 48,
+          "y": 21
+        },
+        {
+          "x": 34,
+          "y": 15
+        },
+        {
+          "x": 20,
+          "y": 11
+        },
+        {
+          "x": 6,
+          "y": 8
+        },
+        {
+          "x": -10,
+          "y": 7
+        },
+        {
+          "x": -24,
+          "y": 9
+        },
+        {
+          "x": -38,
+          "y": 12
+        },
+        {
+          "x": -52,
+          "y": 11
+        },
+        {
+          "x": -66,
+          "y": 7
+        },
+        {
+          "x": -78,
+          "y": 3
+        },
+        {
+          "x": -92,
+          "y": 3
+        },
+        {
+          "x": -106,
+          "y": -5
+        },
+        {
+          "x": -120,
+          "y": -10
+        },
+        {
+          "x": -134,
+          "y": -14
+        },
+        {
+          "x": -148,
+          "y": -16
+        },
+        {
+          "x": -162,
+          "y": -17
+        },
+        {
+          "x": -176,
+          "y": -17
+        },
+        {
+          "x": -186,
+          "y": -17
+        }
+      ],
+      "depth": 1.3
+    }
+  ],
+  "lakes": [
+    {
+      "name": "Mossveil pool",
+      "center": {
+        "x": 124.5,
+        "y": 55.5
+      },
+      "radius": 9,
+      "depth": 2.4
+    },
+    {
+      "name": "The Mistmere",
+      "center": {
+        "x": -56,
+        "y": -92
+      },
+      "radius": 15,
+      "depth": 2.2
+    },
+    {
+      "name": "Tidal pool (north)",
+      "center": {
+        "x": -174,
+        "y": -32
+      },
+      "radius": 4,
+      "depth": 0.85
+    },
+    {
+      "name": "Tidal pool (middle)",
+      "center": {
+        "x": -160,
+        "y": -52
+      },
+      "radius": 5,
+      "depth": 0.9
+    },
+    {
+      "name": "Tidal pool (south)",
+      "center": {
+        "x": -150,
+        "y": -70
+      },
+      "radius": 3.5,
+      "depth": 0.8
+    }
+  ],
+  "fields": [],
+  "landmarks": [
+    {
+      "name": "The Ridge of Long Shadows",
+      "text": "The last ridge of the ash-mountains. Behind you, black basalt under a grey sky; before you, green to the edge of the world.",
+      "at": {
+        "x": 156,
+        "y": 22
+      },
+      "radius": 14,
+      "canonStatus": "CANON: the Ridge of Long Shadows, the jagged divide where the fire-scorched basalt of the North gives way to the Verdant Shore (book3 ch.1, 3). Its shape and the road over it are GAME-ONLY.",
+      "view": {
+        "x": 112,
+        "y": 4
+      },
+      "viewPitch": 14,
+      "viewZoom": 12
+    },
+    {
+      "name": "The Verdant Ocean",
+      "text": "A forest that didn't know when to stop: trunks as wide as houses, and broad leaves that move like a green tide, all the way to the sea.",
+      "at": {
+        "x": 56,
+        "y": 50
+      },
+      "radius": 30,
+      "canonStatus": "CANON: the Verdant Shore, the 'Verdant Ocean', and its look (book3 ch.1). The view from the ridge is the zone's first sight of it.",
+      "view": {
+        "x": 150.5,
+        "y": 21.5
+      },
+      "viewPitch": 7,
+      "viewZoom": 6
+    },
+    {
+      "name": "Rootfast",
+      "text": "The Keepers' bower: houses grown into the roots of the oldest trees, and lanterns of sap that light gold-green at dusk.",
+      "at": {
+        "x": -4,
+        "y": 44
+      },
+      "radius": 32,
+      "canonStatus": "GAME-ONLY: Rootfast, its treehouses and its lanterns. The Veridian Keepers, beings of living wood and moss who keep the Shore, are CANON (book3 ch.2, world_bible.md).",
+      "view": {
+        "x": -4,
+        "y": 13
+      },
+      "viewPitch": 12,
+      "viewZoom": 10
+    },
+    {
+      "name": "The Veridian Temple",
+      "text": "White roots, calcified like old bone, arch over a stair that winds down into a green glow. Living roots have closed across it. Something below is breathing.",
+      "at": {
+        "x": -112,
+        "y": 124
+      },
+      "radius": 14,
+      "canonStatus": "CANON: the Veridian Temple, the root-nexus of the forest, reached down a stair of calcified roots, where the Root-Mother sleeps (book3 ch.2, 7, 10). Its mouth here is CANON-EXPANDED; it is not entered (canon has it found and entered later).",
+      "view": {
+        "x": -96,
+        "y": 108
+      },
+      "viewPitch": 16,
+      "viewZoom": 10
+    },
+    {
+      "name": "Mossveil Falls",
+      "text": "Water out of the ridge itself, falling over moss into a pool so green it looks lit from below.",
+      "at": {
+        "x": 124,
+        "y": 60
+      },
+      "radius": 12,
+      "canonStatus": "GAME-ONLY: the falls and their name. The Shore's waters and the ridge are CANON (book3 ch.1).",
+      "view": {
+        "x": 117,
+        "y": 31
+      },
+      "viewPitch": 10,
+      "viewZoom": 8
+    },
+    {
+      "name": "The Mistmere",
+      "text": "A lake that keeps its mist till noon, and some days past it. Reeds, and glass-frogs clicking to each other across the water.",
+      "at": {
+        "x": -56,
+        "y": -92
+      },
+      "radius": 18,
+      "canonStatus": "GAME-ONLY: the Mistmere. Glass-frogs in the undergrowth are CANON (book3 ch.2); Willow-Whisper guides the lost through the mists (world_bible.md)."
+    },
+    {
+      "name": "The Whispering Glade",
+      "text": "Caps that glow at dusk the colour of the sea in shallow water. Stand still long enough and the glade hums.",
+      "at": {
+        "x": 40,
+        "y": 108
+      },
+      "radius": 16,
+      "canonStatus": "CANON: the Whispering Glade and the moss-covered outcrop over it (book3 ch.5). Its glowing caps are CANON-EXPANDED (the forest's bioluminescence, book3 ch.4, 7)."
+    },
+    {
+      "name": "The Fern Hollow",
+      "text": "Ferns taller than a man close over your head. Down here the light is green and the air is wet.",
+      "at": {
+        "x": 34,
+        "y": -74
+      },
+      "radius": 12,
+      "canonStatus": "CANON-EXPANDED: ferns as tall as men unfurling in the Verdant Ocean (book3 ch.2); the hollow is GAME-ONLY."
+    },
+    {
+      "name": "The Fallen Ghost-Oak",
+      "text": "A Ghost-Oak fell here before anyone counted years. Its crown is a hill of dead wood now, and the spiders have hung it with silk.",
+      "at": {
+        "x": -98,
+        "y": 32
+      },
+      "radius": 16,
+      "canonStatus": "CANON-EXPANDED: Ghost-Oaks are the Shore's great sap-trees (book3 ch.4-6); this fallen one and its spiders are GAME-ONLY."
+    },
+    {
+      "name": "The Salt-Flats",
+      "text": "Grey-white slush and salt-crust where the forest gives up at last, and past it the sound of the sea.",
+      "at": {
+        "x": -162,
+        "y": -42
+      },
+      "radius": 22,
+      "canonStatus": "CANON: the Salt-Flats of the western coast (book3 ch.3). The tidal pools and the glass-ship scout's camp are GAME-ONLY."
+    },
+    {
+      "name": "The Greying",
+      "text": "A stand of Ghost-Oaks gone grey from the heart out. The moss on them is dust, and nothing sings here.",
+      "at": {
+        "x": 90,
+        "y": 146
+      },
+      "radius": 18,
+      "canonStatus": "GAME-ONLY: the Greying, an early sign of the Pale's reach. The Pale Kings and their cold are CANON (book3 ch.2-8); the Pale touching the Shore before the exodus is PROVISIONAL foreshadowing."
+    },
+    {
+      "name": "Palemist Hollow",
+      "text": "A hollow under the ridge where the fog never lifts. It is cold and dry in a wet wood, and it tastes of lightning.",
+      "at": {
+        "x": 124,
+        "y": -118
+      },
+      "radius": 16,
+      "canonStatus": "CANON-EXPANDED: the mists below the ridge where the Void-Touchers gather (book3 ch.2) and the unnatural violet fog that tastes of ozone and unmaking (book3 ch.3-4); the hollow, its name and this early sighting are GAME-ONLY."
+    }
+  ],
+  "props": [
+    {
+      "kind": "treehouse",
+      "name": "Alder-Knot's tree",
+      "at": {
+        "x": -30.31,
+        "y": 32.42
+      },
+      "rotation": 250.0,
+      "scale": 1.0,
+      "size": {
+        "x": 14,
+        "y": 14
+      }
+    },
+    {
+      "kind": "treehouse",
+      "name": "The Guest-Tree",
+      "at": {
+        "x": -26.94,
+        "y": 58.06
+      },
+      "rotation": 305.0,
+      "scale": 0.95,
+      "size": {
+        "x": 14,
+        "y": 14
+      }
+    },
+    {
+      "kind": "treehouse",
+      "name": "Willow-Whisper's tree",
+      "at": {
+        "x": -4.0,
+        "y": 70.0
+      },
+      "rotation": 0.0,
+      "scale": 1.15,
+      "size": {
+        "x": 14,
+        "y": 14
+      }
+    },
+    {
+      "kind": "treehouse",
+      "name": "The Hearth-Tree",
+      "at": {
+        "x": 18.94,
+        "y": 58.06
+      },
+      "rotation": 55.0,
+      "scale": 1.0,
+      "size": {
+        "x": 14,
+        "y": 14
+      }
+    },
+    {
+      "kind": "treehouse",
+      "name": "Moss-Lantern's tree",
+      "at": {
+        "x": 22.31,
+        "y": 32.42
+      },
+      "rotation": 110.0,
+      "scale": 1.0,
+      "size": {
+        "x": 14,
+        "y": 14
+      }
+    },
+    {
+      "kind": "lamp",
+      "at": {
+        "x": -4.0,
+        "y": 50.0
+      },
+      "rotation": 0.0
+    },
+    {
+      "kind": "lamp",
+      "at": {
+        "x": 5.4,
+        "y": 43.42
+      },
+      "rotation": 70.0
+    },
+    {
+      "kind": "lamp",
+      "at": {
+        "x": 5.06,
+        "y": 35.77
+      },
+      "rotation": 115.0
+    },
+    {
+      "kind": "lamp",
+      "at": {
+        "x": 1.0,
+        "y": 31.34
+      },
+      "rotation": 150.0
+    },
+    {
+      "kind": "lamp",
+      "at": {
+        "x": -9.0,
+        "y": 31.34
+      },
+      "rotation": 210.0
+    },
+    {
+      "kind": "lamp",
+      "at": {
+        "x": -13.4,
+        "y": 36.58
+      },
+      "rotation": 250.0
+    },
+    {
+      "kind": "woodpile",
+      "name": "Alder-Knot's carving-pile",
+      "at": {
+        "x": -20,
+        "y": 30
+      },
+      "rotation": 200
+    },
+    {
+      "kind": "barrels",
+      "name": "Sap casks",
+      "at": {
+        "x": 13,
+        "y": 41
+      },
+      "variant": 2
+    },
+    {
+      "kind": "mushrooms",
+      "at": {
+        "x": 20.6,
+        "y": 45.2
+      },
+      "variant": 1,
+      "size": {
+        "x": 2.5,
+        "y": 0
+      }
+    },
+    {
+      "kind": "mushrooms",
+      "at": {
+        "x": -14,
+        "y": 25
+      },
+      "variant": 1,
+      "size": {
+        "x": 2,
+        "y": 0
+      }
+    },
+    {
+      "kind": "mushrooms",
+      "at": {
+        "x": 10,
+        "y": 51
+      },
+      "variant": 1,
+      "size": {
+        "x": 1.8,
+        "y": 0
+      }
+    },
+    {
+      "kind": "mushrooms",
+      "at": {
+        "x": -17,
+        "y": 52
+      },
+      "variant": 1,
+      "size": {
+        "x": 1.8,
+        "y": 0
+      }
+    },
+    {
+      "kind": "bridge",
+      "name": "Rootfast footbridge",
+      "at": {
+        "x": -2,
+        "y": 7.6
+      },
+      "rotation": 0,
+      "variant": 1,
+      "size": {
+        "x": 14,
+        "y": 0
+      }
+    },
+    {
+      "kind": "bridge",
+      "name": "Reed-bed footbridge",
+      "at": {
+        "x": -85,
+        "y": 3
+      },
+      "rotation": 0,
+      "variant": 1,
+      "size": {
+        "x": 14,
+        "y": 0
+      }
+    },
+    {
+      "kind": "signpost",
+      "at": {
+        "x": 4,
+        "y": -9
+      },
+      "rotation": 270
+    },
+    {
+      "kind": "signpost",
+      "at": {
+        "x": 155,
+        "y": 18.5
+      },
+      "rotation": 180
+    },
+    {
+      "kind": "wayshrine",
+      "name": "Last salt-road shrine",
+      "at": {
+        "x": 154,
+        "y": 29.5
+      },
+      "rotation": 45
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 147,
+        "y": 28
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 149.5,
+        "y": 31.5
+      },
+      "variant": 0
+    },
+    {
+      "kind": "cliff",
+      "name": "Basalt crag",
+      "at": {
+        "x": 148,
+        "y": 36
+      },
+      "rotation": 70,
+      "size": {
+        "x": 14,
+        "y": 0
+      }
+    },
+    {
+      "kind": "cliff",
+      "name": "Basalt crag (south)",
+      "at": {
+        "x": 142,
+        "y": -28
+      },
+      "rotation": 110,
+      "size": {
+        "x": 16,
+        "y": 0
+      }
+    },
+    {
+      "kind": "cliff",
+      "name": "Basalt crag (north)",
+      "at": {
+        "x": 154,
+        "y": 104
+      },
+      "rotation": 80,
+      "size": {
+        "x": 18,
+        "y": 0
+      }
+    },
+    {
+      "kind": "cliff",
+      "name": "Basalt crag (far south)",
+      "at": {
+        "x": 150,
+        "y": -78
+      },
+      "rotation": 100,
+      "size": {
+        "x": 14,
+        "y": 0
+      }
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 168,
+        "y": 8
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 172,
+        "y": 46
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 160,
+        "y": 52
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 168,
+        "y": -20
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 164,
+        "y": -46
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 170,
+        "y": 76
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 176,
+        "y": 112
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 166,
+        "y": -96
+      },
+      "variant": 1
+    },
+    {
+      "kind": "waterfall",
+      "name": "Mossveil Falls",
+      "at": {
+        "x": 124,
+        "y": 64
+      },
+      "rotation": 0,
+      "size": {
+        "x": 8,
+        "y": 0
+      },
+      "lift": 10
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 111,
+        "y": 61
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 137,
+        "y": 61
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 118,
+        "y": 39
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 135,
+        "y": 46
+      },
+      "variant": 1
+    },
+    {
+      "kind": "mushrooms",
+      "at": {
+        "x": 108,
+        "y": 56
+      },
+      "variant": 0,
+      "size": {
+        "x": 1.6,
+        "y": 0
+      }
+    },
+    {
+      "kind": "giant_tree",
+      "at": {
+        "x": 104,
+        "y": 70
+      },
+      "rotation": 40,
+      "scale": 1.2,
+      "variant": 1
+    },
+    {
+      "kind": "giant_tree",
+      "at": {
+        "x": 141,
+        "y": 54
+      },
+      "rotation": 200,
+      "scale": 1.0,
+      "variant": 0
+    },
+    {
+      "kind": "giant_tree",
+      "at": {
+        "x": 114,
+        "y": -22
+      },
+      "rotation": 15,
+      "scale": 1.3,
+      "variant": 0
+    },
+    {
+      "kind": "giant_tree",
+      "at": {
+        "x": 84,
+        "y": 56
+      },
+      "rotation": 160,
+      "scale": 1.15,
+      "variant": 1
+    },
+    {
+      "kind": "giant_tree",
+      "at": {
+        "x": 78,
+        "y": -24
+      },
+      "rotation": 280,
+      "scale": 1.35,
+      "variant": 0
+    },
+    {
+      "kind": "giant_tree",
+      "at": {
+        "x": 100,
+        "y": -36
+      },
+      "rotation": 90,
+      "scale": 1.1,
+      "variant": 2
+    },
+    {
+      "kind": "giant_tree",
+      "at": {
+        "x": 62,
+        "y": 12
+      },
+      "rotation": 210,
+      "scale": 1.25,
+      "variant": 0
+    },
+    {
+      "kind": "giant_tree",
+      "at": {
+        "x": 60,
+        "y": 62
+      },
+      "rotation": 120,
+      "scale": 1.2,
+      "variant": 0
+    },
+    {
+      "kind": "mushrooms",
+      "name": "Glowing caps",
+      "at": {
+        "x": 32,
+        "y": 102
+      },
+      "variant": 1,
+      "size": {
+        "x": 1.6,
+        "y": 0
+      },
+      "interact": "Gather glade-light from the glowing caps",
+      "item": "item.glade_light"
+    },
+    {
+      "kind": "mushrooms",
+      "name": "Glowing caps",
+      "at": {
+        "x": 46,
+        "y": 104
+      },
+      "variant": 1,
+      "size": {
+        "x": 1.6,
+        "y": 0
+      },
+      "interact": "Gather glade-light from the glowing caps",
+      "item": "item.glade_light"
+    },
+    {
+      "kind": "mushrooms",
+      "name": "Glowing caps",
+      "at": {
+        "x": 40,
+        "y": 115
+      },
+      "variant": 1,
+      "size": {
+        "x": 1.6,
+        "y": 0
+      },
+      "interact": "Gather glade-light from the glowing caps",
+      "item": "item.glade_light"
+    },
+    {
+      "kind": "mushrooms",
+      "name": "Glowing caps",
+      "at": {
+        "x": 49,
+        "y": 111
+      },
+      "variant": 1,
+      "size": {
+        "x": 1.6,
+        "y": 0
+      },
+      "interact": "Gather glade-light from the glowing caps",
+      "item": "item.glade_light"
+    },
+    {
+      "kind": "mushrooms",
+      "at": {
+        "x": 28,
+        "y": 112
+      },
+      "variant": 1,
+      "size": {
+        "x": 1.4,
+        "y": 0
+      }
+    },
+    {
+      "kind": "mushrooms",
+      "at": {
+        "x": 37,
+        "y": 96
+      },
+      "variant": 1,
+      "size": {
+        "x": 1.4,
+        "y": 0
+      }
+    },
+    {
+      "kind": "mushrooms",
+      "at": {
+        "x": 50,
+        "y": 96
+      },
+      "variant": 1,
+      "size": {
+        "x": 1.4,
+        "y": 0
+      }
+    },
+    {
+      "kind": "mushrooms",
+      "at": {
+        "x": 31,
+        "y": 121
+      },
+      "variant": 1,
+      "size": {
+        "x": 1.4,
+        "y": 0
+      }
+    },
+    {
+      "kind": "mushrooms",
+      "at": {
+        "x": 22,
+        "y": 118
+      },
+      "scale": 3.5,
+      "variant": 1,
+      "size": {
+        "x": 2.5,
+        "y": 0
+      }
+    },
+    {
+      "kind": "mushrooms",
+      "at": {
+        "x": 59,
+        "y": 99
+      },
+      "scale": 3,
+      "variant": 1,
+      "size": {
+        "x": 2.5,
+        "y": 0
+      }
+    },
+    {
+      "kind": "mushrooms",
+      "at": {
+        "x": 44,
+        "y": 123
+      },
+      "variant": 2,
+      "size": {
+        "x": 1.5,
+        "y": 0
+      }
+    },
+    {
+      "kind": "perch",
+      "name": "Outcrop rocks",
+      "at": {
+        "x": 56,
+        "y": 121
+      },
+      "rotation": 45,
+      "size": {
+        "x": 3,
+        "y": 0
+      }
+    },
+    {
+      "kind": "rib",
+      "name": "Calcified root",
+      "at": {
+        "x": -106.5,
+        "y": 133.53
+      },
+      "rotation": 210.0,
+      "size": {
+        "x": 11,
+        "y": 7.5
+      }
+    },
+    {
+      "kind": "rib",
+      "name": "Calcified root",
+      "at": {
+        "x": -101.0,
+        "y": 124.0
+      },
+      "rotation": 270.0,
+      "size": {
+        "x": 11,
+        "y": 7.5
+      }
+    },
+    {
+      "kind": "rib",
+      "name": "Calcified root",
+      "at": {
+        "x": -106.5,
+        "y": 114.47
+      },
+      "rotation": 330.0,
+      "size": {
+        "x": 11,
+        "y": 7.5
+      }
+    },
+    {
+      "kind": "rib",
+      "name": "Calcified root",
+      "at": {
+        "x": -117.5,
+        "y": 114.47
+      },
+      "rotation": 30.0,
+      "size": {
+        "x": 11,
+        "y": 7.5
+      }
+    },
+    {
+      "kind": "rib",
+      "name": "Calcified root",
+      "at": {
+        "x": -123.0,
+        "y": 124.0
+      },
+      "rotation": 90.0,
+      "size": {
+        "x": 11,
+        "y": 7.5
+      }
+    },
+    {
+      "kind": "rib",
+      "name": "Calcified root",
+      "at": {
+        "x": -117.5,
+        "y": 133.53
+      },
+      "rotation": 150.0,
+      "size": {
+        "x": 11,
+        "y": 7.5
+      }
+    },
+    {
+      "kind": "mushrooms",
+      "at": {
+        "x": -98.14,
+        "y": 132.0
+      },
+      "scale": 3,
+      "variant": 1,
+      "size": {
+        "x": 2.5,
+        "y": 0
+      }
+    },
+    {
+      "kind": "mushrooms",
+      "at": {
+        "x": -112.0,
+        "y": 109.0
+      },
+      "scale": 3.2,
+      "variant": 1,
+      "size": {
+        "x": 2.5,
+        "y": 0
+      }
+    },
+    {
+      "kind": "mushrooms",
+      "at": {
+        "x": -125.86,
+        "y": 132.0
+      },
+      "scale": 3,
+      "variant": 1,
+      "size": {
+        "x": 2.5,
+        "y": 0
+      }
+    },
+    {
+      "kind": "giant_tree",
+      "name": "Ghost-Oak",
+      "at": {
+        "x": -103.11,
+        "y": 148.43
+      },
+      "rotation": 140,
+      "scale": 1.5,
+      "variant": 0
+    },
+    {
+      "kind": "giant_tree",
+      "name": "Ghost-Oak",
+      "at": {
+        "x": -120.89,
+        "y": 99.57
+      },
+      "rotation": 320,
+      "scale": 1.5,
+      "variant": 0
+    },
+    {
+      "kind": "giant_tree",
+      "name": "Ghost-Oak",
+      "at": {
+        "x": -136.43,
+        "y": 115.11
+      },
+      "rotation": 310,
+      "scale": 1.5,
+      "variant": 0
+    },
+    {
+      "kind": "giant_tree",
+      "name": "Ghost-Oak",
+      "at": {
+        "x": -128.71,
+        "y": 143.92
+      },
+      "rotation": 80,
+      "scale": 1.5,
+      "variant": 0
+    },
+    {
+      "kind": "rock",
+      "name": "Oak-Bane's stone",
+      "at": {
+        "x": -94,
+        "y": 107.5
+      },
+      "variant": 1
+    },
+    {
+      "kind": "fallen_giant",
+      "name": "The Fallen Ghost-Oak",
+      "at": {
+        "x": -98,
+        "y": 32
+      },
+      "rotation": 20,
+      "scale": 1.0,
+      "size": {
+        "x": 36,
+        "y": 0
+      }
+    },
+    {
+      "kind": "mushrooms",
+      "at": {
+        "x": -117,
+        "y": 44
+      },
+      "variant": 2,
+      "size": {
+        "x": 2,
+        "y": 0
+      }
+    },
+    {
+      "kind": "mushrooms",
+      "at": {
+        "x": -77,
+        "y": 29
+      },
+      "variant": 0,
+      "size": {
+        "x": 1.6,
+        "y": 0
+      }
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -48,
+        "y": 92
+      },
+      "variant": 1
+    },
+    {
+      "kind": "perch",
+      "name": "Ninebranch's rocks",
+      "at": {
+        "x": -122,
+        "y": 80
+      },
+      "rotation": 270,
+      "size": {
+        "x": 4,
+        "y": 0
+      }
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -36,
+        "y": -96
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -70,
+        "y": -76
+      },
+      "variant": 1
+    },
+    {
+      "kind": "dead_oak",
+      "at": {
+        "x": -76,
+        "y": -102
+      },
+      "scale": 0.8
+    },
+    {
+      "kind": "mushrooms",
+      "at": {
+        "x": -40,
+        "y": -78
+      },
+      "variant": 2,
+      "size": {
+        "x": 1.6,
+        "y": 0
+      }
+    },
+    {
+      "kind": "giant_tree",
+      "at": {
+        "x": -30,
+        "y": -112
+      },
+      "rotation": 130,
+      "scale": 1.2,
+      "variant": 1
+    },
+    {
+      "kind": "giant_tree",
+      "at": {
+        "x": -86,
+        "y": -74
+      },
+      "rotation": 300,
+      "scale": 1.1,
+      "variant": 0
+    },
+    {
+      "kind": "mushrooms",
+      "at": {
+        "x": 28,
+        "y": -68
+      },
+      "variant": 0,
+      "size": {
+        "x": 1.8,
+        "y": 0
+      }
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 44,
+        "y": -66
+      },
+      "variant": 1
+    },
+    {
+      "kind": "giant_tree",
+      "name": "Old Ghost-Oak",
+      "at": {
+        "x": -110,
+        "y": -48
+      },
+      "rotation": 60,
+      "scale": 1.4,
+      "variant": 0
+    },
+    {
+      "kind": "barrels",
+      "name": "Sap-spout",
+      "at": {
+        "x": -106,
+        "y": -43
+      },
+      "variant": 0,
+      "interact": "Draw sap from the spout",
+      "item": "item.veridian_sap"
+    },
+    {
+      "kind": "giant_tree",
+      "name": "Old Ghost-Oak",
+      "at": {
+        "x": -124,
+        "y": -58
+      },
+      "rotation": 170,
+      "scale": 1.4,
+      "variant": 0
+    },
+    {
+      "kind": "barrels",
+      "name": "Sap-spout",
+      "at": {
+        "x": -120,
+        "y": -53
+      },
+      "variant": 0,
+      "interact": "Draw sap from the spout",
+      "item": "item.veridian_sap"
+    },
+    {
+      "kind": "giant_tree",
+      "name": "Old Ghost-Oak",
+      "at": {
+        "x": -104,
+        "y": -64
+      },
+      "rotation": 280,
+      "scale": 1.4,
+      "variant": 0
+    },
+    {
+      "kind": "barrels",
+      "name": "Sap-spout",
+      "at": {
+        "x": -100,
+        "y": -59
+      },
+      "variant": 0,
+      "interact": "Draw sap from the spout",
+      "item": "item.veridian_sap"
+    },
+    {
+      "kind": "rock",
+      "name": "Salt-crust",
+      "at": {
+        "x": -170,
+        "y": -41
+      },
+      "variant": 0,
+      "interact": "Break off a cake of salt-crust",
+      "item": "item.shore_salt"
+    },
+    {
+      "kind": "rock",
+      "name": "Salt-crust",
+      "at": {
+        "x": -155,
+        "y": -44
+      },
+      "variant": 0,
+      "interact": "Break off a cake of salt-crust",
+      "item": "item.shore_salt"
+    },
+    {
+      "kind": "rock",
+      "name": "Salt-crust",
+      "at": {
+        "x": -176,
+        "y": -54
+      },
+      "variant": 0,
+      "interact": "Break off a cake of salt-crust",
+      "item": "item.shore_salt"
+    },
+    {
+      "kind": "rock",
+      "name": "Salt-crust",
+      "at": {
+        "x": -149,
+        "y": -58
+      },
+      "variant": 0,
+      "interact": "Break off a cake of salt-crust",
+      "item": "item.shore_salt"
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -178,
+        "y": -46
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -168,
+        "y": -77
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -145,
+        "y": -49
+      },
+      "variant": 1
+    },
+    {
+      "kind": "dead_oak",
+      "at": {
+        "x": -152,
+        "y": -75
+      },
+      "scale": 0.7
+    },
+    {
+      "kind": "dead_oak",
+      "at": {
+        "x": -178,
+        "y": -70
+      },
+      "scale": 0.6
+    },
+    {
+      "kind": "dead_oak",
+      "at": {
+        "x": -135,
+        "y": -61
+      },
+      "scale": 0.8
+    },
+    {
+      "kind": "shelter",
+      "name": "Scout's lean-to",
+      "at": {
+        "x": -138,
+        "y": -26
+      },
+      "rotation": 18.4
+    },
+    {
+      "kind": "crates",
+      "at": {
+        "x": -146,
+        "y": -27
+      },
+      "rotation": 30,
+      "variant": 1
+    },
+    {
+      "kind": "barrels",
+      "name": "Ship's stores",
+      "at": {
+        "x": -133,
+        "y": -28
+      },
+      "variant": 1
+    },
+    {
+      "kind": "lamp",
+      "name": "Signal lantern",
+      "at": {
+        "x": -143,
+        "y": -37
+      },
+      "rotation": 200,
+      "variant": 1
+    },
+    {
+      "kind": "giant_tree",
+      "at": {
+        "x": 64,
+        "y": 132
+      },
+      "rotation": 10,
+      "scale": 1.1,
+      "variant": 2
+    },
+    {
+      "kind": "giant_tree",
+      "at": {
+        "x": 114,
+        "y": 128
+      },
+      "rotation": 250,
+      "scale": 1.0,
+      "variant": 2
+    },
+    {
+      "kind": "dead_oak",
+      "at": {
+        "x": 80,
+        "y": 158
+      },
+      "scale": 1.4
+    },
+    {
+      "kind": "dead_oak",
+      "at": {
+        "x": 106,
+        "y": 140
+      },
+      "scale": 1.3
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 72,
+        "y": 146
+      },
+      "variant": 1
+    },
+    {
+      "kind": "dead_oak",
+      "at": {
+        "x": 110,
+        "y": -124
+      },
+      "scale": 1.2
+    },
+    {
+      "kind": "dead_oak",
+      "at": {
+        "x": 136,
+        "y": -108
+      },
+      "scale": 1.1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 104,
+        "y": -108
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 141,
+        "y": -133
+      },
+      "variant": 1
+    }
+  ],
+  "groves": [
+    {
+      "name": "The Emerald Cathedral",
+      "kind": "giant",
+      "center": {
+        "x": -118,
+        "y": 120
+      },
+      "size": {
+        "x": 70,
+        "y": 60
+      },
+      "count": 65
+    },
+    {
+      "name": "Northwood",
+      "kind": "giant",
+      "center": {
+        "x": -34,
+        "y": 124
+      },
+      "size": {
+        "x": 70,
+        "y": 40
+      },
+      "count": 43
+    },
+    {
+      "name": "Rootfast canopy",
+      "kind": "broadleaf",
+      "center": {
+        "x": -4,
+        "y": 92
+      },
+      "size": {
+        "x": 50,
+        "y": 22
+      },
+      "count": 26
+    },
+    {
+      "name": "Glade wood",
+      "kind": "giant",
+      "center": {
+        "x": 78,
+        "y": 100
+      },
+      "size": {
+        "x": 30,
+        "y": 40
+      },
+      "count": 18
+    },
+    {
+      "name": "Ridge-foot canopy",
+      "kind": "broadleaf",
+      "center": {
+        "x": 100,
+        "y": 26
+      },
+      "size": {
+        "x": 40,
+        "y": 44
+      },
+      "count": 42
+    },
+    {
+      "name": "Riverbank canopy",
+      "kind": "broadleaf",
+      "center": {
+        "x": 48,
+        "y": 52
+      },
+      "size": {
+        "x": 40,
+        "y": 26
+      },
+      "count": 25
+    },
+    {
+      "name": "Eastwood",
+      "kind": "giant",
+      "center": {
+        "x": 60,
+        "y": -42
+      },
+      "size": {
+        "x": 60,
+        "y": 40
+      },
+      "count": 37
+    },
+    {
+      "name": "Southwood",
+      "kind": "giant",
+      "center": {
+        "x": 0,
+        "y": -82
+      },
+      "size": {
+        "x": 40,
+        "y": 40
+      },
+      "count": 25
+    },
+    {
+      "name": "Fernwood",
+      "kind": "giant",
+      "center": {
+        "x": 44,
+        "y": -100
+      },
+      "size": {
+        "x": 50,
+        "y": 22
+      },
+      "count": 17
+    },
+    {
+      "name": "Mere canopy",
+      "kind": "broadleaf",
+      "center": {
+        "x": -96,
+        "y": -96
+      },
+      "size": {
+        "x": 30,
+        "y": 40
+      },
+      "count": 29
+    },
+    {
+      "name": "Tappers' wood",
+      "kind": "broadleaf",
+      "center": {
+        "x": -116,
+        "y": -64
+      },
+      "size": {
+        "x": 30,
+        "y": 30
+      },
+      "count": 21
+    },
+    {
+      "name": "Westwood",
+      "kind": "giant",
+      "center": {
+        "x": -142,
+        "y": 50
+      },
+      "size": {
+        "x": 40,
+        "y": 50
+      },
+      "count": 31
+    },
+    {
+      "name": "Far north wood",
+      "kind": "giant",
+      "center": {
+        "x": 30,
+        "y": 162
+      },
+      "size": {
+        "x": 80,
+        "y": 28
+      },
+      "count": 34
+    },
+    {
+      "name": "Far south wood",
+      "kind": "giant",
+      "center": {
+        "x": 60,
+        "y": -152
+      },
+      "size": {
+        "x": 80,
+        "y": 40
+      },
+      "count": 49
+    },
+    {
+      "name": "South-west wood",
+      "kind": "giant",
+      "center": {
+        "x": -130,
+        "y": -140
+      },
+      "size": {
+        "x": 60,
+        "y": 50
+      },
+      "count": 46
+    },
+    {
+      "name": "North-west wood",
+      "kind": "giant",
+      "center": {
+        "x": -152,
+        "y": 160
+      },
+      "size": {
+        "x": 46,
+        "y": 30
+      },
+      "count": 21
+    },
+    {
+      "name": "Mere-path wood",
+      "kind": "giant",
+      "center": {
+        "x": -30,
+        "y": -30
+      },
+      "size": {
+        "x": 40,
+        "y": 30
+      },
+      "count": 18
+    },
+    {
+      "name": "South-east ridge-foot wood",
+      "kind": "giant",
+      "center": {
+        "x": 96,
+        "y": -80
+      },
+      "size": {
+        "x": 40,
+        "y": 40
+      },
+      "count": 25
+    },
+    {
+      "name": "North glade wood",
+      "kind": "giant",
+      "center": {
+        "x": 40,
+        "y": 138
+      },
+      "size": {
+        "x": 50,
+        "y": 20
+      },
+      "count": 15
+    },
+    {
+      "name": "North ridge-foot canopy",
+      "kind": "broadleaf",
+      "center": {
+        "x": 130,
+        "y": 110
+      },
+      "size": {
+        "x": 30,
+        "y": 30
+      },
+      "count": 21
+    },
+    {
+      "name": "Deep south wood",
+      "kind": "giant",
+      "center": {
+        "x": -34,
+        "y": -146
+      },
+      "size": {
+        "x": 80,
+        "y": 40
+      },
+      "count": 49
+    },
+    {
+      "name": "Westbank canopy",
+      "kind": "broadleaf",
+      "center": {
+        "x": -50,
+        "y": 52
+      },
+      "size": {
+        "x": 26,
+        "y": 16
+      },
+      "count": 10
+    },
+    {
+      "name": "Ridge pines",
+      "kind": "pine",
+      "center": {
+        "x": 170,
+        "y": -2
+      },
+      "size": {
+        "x": 18,
+        "y": 110
+      },
+      "count": 12
+    },
+    {
+      "name": "The Greying",
+      "kind": "dead",
+      "center": {
+        "x": 90,
+        "y": 146
+      },
+      "size": {
+        "x": 46,
+        "y": 36
+      },
+      "count": 29
+    },
+    {
+      "name": "Palemist deadwood",
+      "kind": "dead",
+      "center": {
+        "x": 122,
+        "y": -116
+      },
+      "size": {
+        "x": 36,
+        "y": 30
+      },
+      "count": 19
+    }
+  ],
+  "tallGrass": [
+    {
+      "name": "Mistmere reeds (north)",
+      "center": {
+        "x": -63,
+        "y": -73
+      },
+      "radius": 6
+    },
+    {
+      "name": "Mistmere reeds (west)",
+      "center": {
+        "x": -76,
+        "y": -88
+      },
+      "radius": 6
+    },
+    {
+      "name": "Mistmere reeds (south-east)",
+      "center": {
+        "x": -44,
+        "y": -110
+      },
+      "radius": 5
+    },
+    {
+      "name": "Wending reeds",
+      "center": {
+        "x": -62,
+        "y": 18
+      },
+      "radius": 5
+    },
+    {
+      "name": "Wending reeds (west)",
+      "center": {
+        "x": -118,
+        "y": -2
+      },
+      "radius": 5
+    },
+    {
+      "name": "Wending reeds (mouth)",
+      "center": {
+        "x": -140,
+        "y": -8
+      },
+      "radius": 5
+    },
+    {
+      "name": "Fern Hollow ferns",
+      "center": {
+        "x": 34,
+        "y": -74
+      },
+      "radius": 10
+    },
+    {
+      "name": "Meadow grass",
+      "center": {
+        "x": -77,
+        "y": 93
+      },
+      "radius": 6
+    },
+    {
+      "name": "Salt-grass",
+      "center": {
+        "x": -150,
+        "y": -41
+      },
+      "radius": 6
+    },
+    {
+      "name": "Salt-grass (south)",
+      "center": {
+        "x": -172,
+        "y": -64
+      },
+      "radius": 5
+    }
+  ],
+  "camps": [
+    {
+      "name": "Mistmere reed-boars",
+      "mob": "Moss-backed boar",
+      "tag": "mossboar",
+      "look": "boar",
+      "canonStatus": "GAME-ONLY",
+      "center": {
+        "x": -80,
+        "y": -110
+      },
+      "radius": 9,
+      "count": 5,
+      "levelMin": 11,
+      "levelMax": 11,
+      "respawn": 75,
+      "ambush": true
+    },
+    {
+      "name": "Antler Meadow stags",
+      "mob": "Moss-antler stag",
+      "tag": "stag",
+      "look": "stag",
+      "canonStatus": "GAME-ONLY",
+      "center": {
+        "x": -62,
+        "y": 82
+      },
+      "radius": 12,
+      "count": 5,
+      "levelMin": 11,
+      "levelMax": 12,
+      "respawn": 90
+    },
+    {
+      "name": "Fallen Ghost-Oak spiders",
+      "mob": "Canopy spider",
+      "tag": "spider",
+      "look": "spider",
+      "canonStatus": "GAME-ONLY (Ghost-Oaks are CANON, book3 ch.4)",
+      "center": {
+        "x": -102,
+        "y": 38
+      },
+      "radius": 11,
+      "count": 5,
+      "levelMin": 11,
+      "levelMax": 12,
+      "respawn": 90
+    },
+    {
+      "name": "The Briar Way",
+      "mob": "Creeping briar",
+      "tag": "bramble",
+      "look": "bramble",
+      "canonStatus": "GAME-ONLY",
+      "center": {
+        "x": -86,
+        "y": 132
+      },
+      "radius": 9,
+      "count": 5,
+      "levelMin": 12,
+      "levelMax": 13,
+      "respawn": 90
+    },
+    {
+      "name": "The Greying",
+      "mob": "Withered Keeper",
+      "tag": "withered",
+      "look": "keeper",
+      "canonStatus": "CANON-EXPANDED: the Veridian Keepers are CANON (book3 ch.2); Keepers withered by the Pale's cold are GAME-ONLY",
+      "center": {
+        "x": 84,
+        "y": 142
+      },
+      "radius": 12,
+      "count": 4,
+      "levelMin": 12,
+      "levelMax": 13,
+      "respawn": 90
+    },
+    {
+      "name": "Greyheart",
+      "mob": "Greyheart",
+      "tag": "greyheart",
+      "look": "keeper",
+      "canonStatus": "GAME-ONLY (a Veridian Keeper, CANON kind, withered by the Pale)",
+      "center": {
+        "x": 98,
+        "y": 152
+      },
+      "radius": 2,
+      "count": 1,
+      "levelMin": 13,
+      "levelMax": 13,
+      "respawn": 240,
+      "elite": true
+    },
+    {
+      "name": "Palemist mist-walkers",
+      "mob": "Mist-walker",
+      "tag": "mistwalker",
+      "look": "hollow",
+      "canonStatus": "CANON-EXPANDED: the Void-Touchers, people who have forgotten their human names in the mists below the ridge (book3 ch.2, 4), and the 'Mist-Walkers' corrupted by the Void (book3_outline.md ch.4); these are GAME-ONLY placement",
+      "center": {
+        "x": 116,
+        "y": -110
+      },
+      "radius": 11,
+      "count": 5,
+      "levelMin": 12,
+      "levelMax": 13,
+      "respawn": 90
+    },
+    {
+      "name": "Palemist shadows",
+      "mob": "Pale shadow",
+      "tag": "paleshadow",
+      "look": "pale",
+      "canonStatus": "CANON-EXPANDED: the Pale Shadows, geometric shapes of cold glass, scouts of the Pale Kings (book3 ch.3, 8); GAME-ONLY placement",
+      "center": {
+        "x": 132,
+        "y": -126
+      },
+      "radius": 6,
+      "count": 2,
+      "levelMin": 13,
+      "levelMax": 13,
+      "respawn": 120
+    },
+    {
+      "name": "Old Ninebranch",
+      "mob": "Old Ninebranch",
+      "tag": "ninebranch",
+      "look": "stag",
+      "canonStatus": "GAME-ONLY",
+      "center": {
+        "x": -122,
+        "y": 80
+      },
+      "radius": 3,
+      "count": 1,
+      "levelMin": 13,
+      "levelMax": 13,
+      "respawn": 240,
+      "elite": true
+    }
+  ],
+  "life": {
+    "villagers": 0,
+    "mood": "keepers",
+    "critters": [
+      {
+        "kind": "deer",
+        "center": {
+          "x": 40,
+          "y": 106
+        },
+        "radius": 12,
+        "count": 3
+      },
+      {
+        "kind": "deer",
+        "center": {
+          "x": 34,
+          "y": 62
+        },
+        "radius": 12,
+        "count": 3
+      },
+      {
+        "kind": "deer",
+        "center": {
+          "x": 8,
+          "y": -104
+        },
+        "radius": 14,
+        "count": 3
+      },
+      {
+        "kind": "deer",
+        "center": {
+          "x": -146,
+          "y": 22
+        },
+        "radius": 10,
+        "count": 2
+      },
+      {
+        "kind": "rabbit",
+        "center": {
+          "x": 8,
+          "y": 20
+        },
+        "radius": 10,
+        "count": 4
+      },
+      {
+        "kind": "rabbit",
+        "center": {
+          "x": 62,
+          "y": -20
+        },
+        "radius": 12,
+        "count": 4
+      },
+      {
+        "kind": "rabbit",
+        "center": {
+          "x": -128,
+          "y": -18
+        },
+        "radius": 10,
+        "count": 3
+      },
+      {
+        "kind": "crow",
+        "center": {
+          "x": 90,
+          "y": 146
+        },
+        "radius": 12,
+        "count": 4
+      },
+      {
+        "kind": "crow",
+        "center": {
+          "x": 124,
+          "y": -118
+        },
+        "radius": 10,
+        "count": 3
+      }
+    ],
+    "residents": [
+      {
+        "name": "Willow-Whisper",
+        "role": "elder",
+        "title": "Voice of the Wood",
+        "at": {
+          "x": -4,
+          "y": 47
+        },
+        "look": "keeper"
+      },
+      {
+        "name": "Moss-Lantern",
+        "role": "merchant",
+        "title": "Keeper of the Lanterns",
+        "at": {
+          "x": 9,
+          "y": 36
+        },
+        "look": "keeper"
+      },
+      {
+        "name": "Alder-Knot",
+        "role": "blacksmith",
+        "title": "Bark-Carver",
+        "at": {
+          "x": -17,
+          "y": 35
+        },
+        "look": "keeper"
+      },
+      {
+        "name": "Reed-Song",
+        "role": "hunter",
+        "title": "Keeper of the Mere",
+        "at": {
+          "x": -54,
+          "y": -70
+        },
+        "look": "keeper"
+      },
+      {
+        "name": "Oak-Bane",
+        "role": "warden",
+        "title": "Guardian of the Deep Wood",
+        "at": {
+          "x": -95,
+          "y": 111
+        },
+        "look": "keeper"
+      },
+      {
+        "name": "Sister Iselle",
+        "role": "pilgrim",
+        "title": "Silent Pilgrim",
+        "at": {
+          "x": 24,
+          "y": 101
+        }
+      },
+      {
+        "name": "Ondine Varro",
+        "role": "merchant",
+        "title": "Glass-Ship Scout",
+        "at": {
+          "x": -141,
+          "y": -31
+        }
+      }
+    ]
+  },
+  "secrets": [
+    {
+      "id": "secret.verdant.above-the-falls",
+      "name": "Above Mossveil Falls",
+      "kind": "vista",
+      "at": {
+        "x": 124,
+        "y": 70
+      },
+      "radius": 4,
+      "text": "From the lip of the falls the Wending runs away west in long green loops, under trees as tall as towers, all the way to a line of white that must be the sea.",
+      "xp": 210,
+      "canonStatus": "GAME-ONLY: Mossveil Falls and this lookout. The Verdant Ocean running down to the sea is CANON (book3 ch.1)."
+    },
+    {
+      "id": "secret.verdant.mossy-outcrop",
+      "name": "The Mossy Outcrop",
+      "kind": "vista",
+      "at": {
+        "x": 56,
+        "y": 121
+      },
+      "radius": 3.5,
+      "text": "A shelf of mossy rock above the Whispering Glade. From up here the glowing caps below look like a second sky, and the glade's hum comes up through the moss into your hands.",
+      "xp": 200,
+      "canonStatus": "CANON-EXPANDED: a moss-covered outcrop overlooking the Whispering Glade (book3 ch.5); the lookout is GAME-ONLY."
+    },
+    {
+      "id": "secret.verdant.tappers-stump",
+      "name": "The Tapper's Stump",
+      "kind": "cache",
+      "prompt": "Reach into the hollow stump",
+      "at": {
+        "x": -117,
+        "y": -71
+      },
+      "rotation": 40,
+      "text": "Somebody used this stump as a cupboard: a bone spout, a stoppered flask gone dry, and a pair of gloves stained green to the wrist. The Keepers let the sap be taken a little at a time, by those who ask.",
+      "item": "item.tappers_gloves",
+      "xp": 200,
+      "gold": 30,
+      "canonStatus": "CANON-EXPANDED: Ghost-Oaks tapped for Veridian sap, which must not get into a wound (book3 ch.4); the tapper, the custom and the gloves are GAME-ONLY."
+    },
+    {
+      "id": "secret.verdant.ship-log",
+      "name": "A Glass-Ship's Log",
+      "kind": "note",
+      "prompt": "Work the oilcloth packet out from under the drift-log",
+      "at": {
+        "x": -162,
+        "y": -64.5
+      },
+      "rotation": 210,
+      "text": "Pushed under a bleached drift-log above the tide-line: an oilcloth packet with a few pages of a ship's log in it, the ink run but readable.",
+      "document": "doc.verdant.ship_log",
+      "xp": 190,
+      "gold": 25,
+      "canonStatus": "CANON-EXPANDED: Port Caelum and its glass ships (world_bible.md), the harbour below the ridge and the Salt-Flats (book3 ch.3) are CANON; the ship and its log are GAME-ONLY."
+    },
+    {
+      "id": "secret.verdant.lantern-moss",
+      "name": "Lantern-Moss",
+      "kind": "herb",
+      "prompt": "Pick the lantern-moss",
+      "at": {
+        "x": 38,
+        "y": -80
+      },
+      "text": "A cushion of moss that glows like a banked coal under the ferns, gold-green and warm to the touch. The Keepers say it grows where one of them once slept for a hundred years.",
+      "item": "herb.lantern_moss",
+      "xp": 180,
+      "canonStatus": "GAME-ONLY"
+    }
+  ]
+}

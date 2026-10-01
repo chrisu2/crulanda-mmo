@@ -583,3 +583,30 @@ Chris shared a reference of a stylized fantasy cove and chose this look for Oakh
     is the game's. Only the save's format and height changed; it is restored byte for byte from the backup taken before
     format 7. An editor test run now never touches the real folder unless a test points it there.
 - **Tests:** all the zone tests (content, exits, travel, water, secrets) run on the grown zones.
+
+## 2026-09-30 — The Verdant Shore: a truly lush fifth zone, levels 11-13 (Chris: "next zone we need a truly lush zone as pictured here")
+- **Chris's call** (with lush style references, style only): a fifth zone after the Ash Rim, the canon **Verdant Shore** of Book 3,
+  so the level cap rises to 13 (talent points stop at 10).
+- **The lush art, built for it and shared by every zone:**
+  - Painted undergrowth (`PlantField`): ferns in the shade of every trunk, in the woods and along the forest edge; broad leaves along
+    the banks; reeds at the waterline; flowers in drifts of one colour; glowing flowers after dark. Each biome its own mix: Khaven's
+    ferns withered brown, nothing on the ash.
+  - **Dead trees no longer look like umbrellas** (Chris): a tapered, bent bole on a root flare, limbs at different heights, crooked,
+    tapering to points, branches off their length. The Hush's great dead tree is a tall old snag.
+  - Giant trees (28 m, buttressed, crowns of forty leaf clusters), Keeper treehouses grown into them (a round house with a lit
+    porch, a platform and a stair up the trunk), waterfalls (rock face, sliding sheets, foam, mist), mushroom clusters (red,
+    glowing teal, pale; giant ones), a fallen giant, rope-and-post footbridges, a `giant` grove kind, the `salt` paint.
+  - New creatures and people: the Veridian Keeper (bark over heartwood, sap-light in the seams, a leafy crown; withered and
+    violet-lit when corrupted), a great forest stag, a forest spider, a bramble-thing, and the Silent Pilgrim's outfit.
+- **The zone** (360 m, designed by a zone agent from Book 3 and checked against the engine's own numbers): you arrive on the Ridge of
+  Long Shadows and see the Verdant Ocean below; the Ash-road winds down to **Rootfast**, five treehouses round a lamp-lit green; the
+  Veridian Temple under its root-arcs; Mossveil Falls and its pool; the Mistmere; the Whispering Glade of glowing caps; the Fern
+  Hollow; the Fallen Ghost-Oak; the Salt-Flats on the coast; and the Pale's touch shown early at the Greying and Palemist Hollow.
+  Nine camps (two elites, Greyheart and Old Ninebranch), five Keepers with their own talk, a Silent Pilgrim and a glass-ship scout,
+  twelve quests (the breadcrumb from Grohl, a main chain of four, seven side quests), four pages, five secrets, a new faction, 17
+  items, 9 loot tables, 2 vendors. The Ash Rim gains the Old west road, its exit and signpost.
+- **Found by the tests and the tour, and fixed:** the Wending (a 10 m river) was carved straight through its pool's rim, so the pool's
+  edge floated: a creek never cuts under a pool's rim now, and the river starts just past the pool's edge; the lookout above the
+  falls stood on a 66-degree wall: a stepped way up the ledge's east side; a pool's shore carving no longer flattens the ledge
+  behind its waterfall.
+- Zones load in 2-8 s (the Verdant Shore 7.6 s: its 1,100 props and giant groves).

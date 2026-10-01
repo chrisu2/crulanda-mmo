@@ -38,7 +38,8 @@ from a read-only review of that work.
   `oakhaven-99-errands-lineup-*.png`, `oakhaven-90-coop-morning.png` (the pan) and the deep's `verdant-85/86/88/89`, publish,
   `tools\Backup.ps1`, tell Chris.
 - **Backup:** after the reboot J: came up as a different, nearly empty drive; Chris was moving the backup files back onto it.
-  BACKUP_RESULT
+  `tools\Backup.ps1` ran at this stop (01:50) and succeeded: `J:\claude\unity projects\mmo` was back, and its git head matched
+  `main`. It is additive; run it again after the next commit.
 - **Next job after the publish: the painted style pass**, prepared in `tools\wip\painted\`:
   - P1 buildings: `ZoneSceneBuilder.Painted.cs` goes in `Assets/Crulanda/Editor/` (make the class `public static partial class
     ZoneSceneBuilder`, call `PaintedTextures(art)` at the end of `EnsureArt`); `ZoneArt` gains `public Material masonry, rock;`;

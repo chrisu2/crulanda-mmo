@@ -10,7 +10,8 @@ namespace Crulanda.Tests
     /// <summary>
     /// Gear looks (loot step A1): the looks file is whole; every generated item, crafted piece and named item gets a real look
     /// (never the fallback), the same id always the same one; generated gear's variant comes from its seed and is never a
-    /// named-only variant; quality raises the trim and only rare and epic glow; look strings parse strictly.
+    /// named-only variant; quality raises the trim and only rare and epic glow; the level band sets the tier; look strings parse
+    /// strictly.
     /// </summary>
     public class GearLookTests
     {
@@ -162,6 +163,17 @@ namespace Crulanda.Tests
             // Generated gear follows the same rule.
             var db = new ItemDatabase();
             foreach (var d in Generated(db, 3)) Assert.AreEqual(d.quality >= 3, looks.Resolve(d).accents > 0, d.id);
+        }
+
+        [Test] public void Tier_follows_the_item_level()
+        {
+            var looks = Looks(); var db = new ItemDatabase();
+            for (int level = 1; level <= EncounterProgress.LevelCap; level++)
+                Assert.AreEqual(GearLooks.BandOf(level), looks.Resolve(db.Get(ItemDatabase.GearId("chest", level, 2, 3))).tier, "Generated gear's tier is its level band (level " + level + ").");
+            var named = new ItemDef { id = "craft.veridian_breastplate", name = "Breastplate", kind = "gear", slot = "chest", quality = 2, level = 11 };
+            Assert.AreEqual(4, looks.Resolve(named).tier, "A named piece's tier comes from its curve level, the required level + 1.");
+            named.level = 1; Assert.AreEqual(0, looks.Resolve(named).tier);
+            Assert.AreNotEqual(GearLooks.LookKey(looks.Resolve(db.Get(ItemDatabase.GearId("chest", 2, 2, 3)))), GearLooks.LookKey(looks.Resolve(db.Get(ItemDatabase.GearId("chest", 13, 2, 3)))), "The tier is part of the key.");
         }
 
         [Test] public void Unknown_item_falls_back_to_the_slot_default()

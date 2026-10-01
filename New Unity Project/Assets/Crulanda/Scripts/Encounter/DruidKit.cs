@@ -35,6 +35,10 @@ namespace Crulanda.Encounter
         static readonly string[] UtilityIds = { "druid.swiftroot", "druid.stillroot" };
         public const int PoolCap = 100, MaxFang = 5, ShiftCost = 25, HealRange = 25;
         static readonly Color[] FormTint = { new Color(.45f, .33f, .2f), new Color(.78f, .55f, .2f), new Color(.35f, .68f, .38f), new Color(.3f, .55f, .6f) };
+        /// <summary>How a form changes the figure (the wardrobe line-up shows the same): its build, as the Body's scale.</summary>
+        public static Vector3 FormScale(DruidForm f) { return f == DruidForm.Barkhide ? new Vector3(1.3f, 1.1f, 1.3f) : f == DruidForm.Thornclaw ? new Vector3(1.1f, .8f, 1.3f) : Vector3.one; }
+        /// <summary>The colour a form gives the Druid's own cloth (whatever armour does not cover).</summary>
+        public static Color FormColor(DruidForm f) { return FormTint[(int)f]; }
 
         readonly Dictionary<string, AbilityDefinition> abilities = new Dictionary<string, AbilityDefinition>(StringComparer.Ordinal);
         readonly Dictionary<string, ClassAbilityUnlock> unlocks = new Dictionary<string, ClassAbilityUnlock>(StringComparer.Ordinal);
@@ -172,8 +176,8 @@ namespace Crulanda.Encounter
             var body = s.Player.transform.Find("Body");
             if (body != null)
             {
-                body.localScale = Form == DruidForm.Barkhide ? new Vector3(1.3f, 1.1f, 1.3f) : Form == DruidForm.Thornclaw ? new Vector3(1.1f, .8f, 1.3f) : Vector3.one;
-                var visual = s.Player.GetComponent<ActorVisual>(); if (visual != null) visual.SetClothColor(FormTint[(int)Form]);
+                body.localScale = FormScale(Form);
+                var visual = s.Player.GetComponent<ActorVisual>(); if (visual != null) visual.SetClothColor(FormColor(Form));
             }
         }
         float FormDamage { get { return Form == DruidForm.Thornclaw ? 1 + .03f * R("tc-keen-claws") : Form == DruidForm.Thornsong ? 1 + .02f * R("ts-green-voice") : 1; } }

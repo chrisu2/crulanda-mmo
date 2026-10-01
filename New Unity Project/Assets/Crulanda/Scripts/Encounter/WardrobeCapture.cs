@@ -8,11 +8,17 @@ namespace Crulanda.Encounter
 {
     /// <summary>
     /// The wardrobe line-up (loot DESIGN.md section 8), run with <c>--crulanda-wardrobe-capture &lt;dir&gt;</c> from a windowed
-    /// player (the labels are IMGUI): bare mannequins in a quiet open spot near the zone's green, one row at a time, every
-    /// main-hand and off-hand family and variant held, each labelled with its look, then a quality ladder (poor to epic) at
-    /// dusk so the glow reads. Noon in calm weather; the HUD, the player, Mira, the enemies and the village are hidden. Rows are
-    /// seven figures wide so each weapon is big enough to judge, which takes several shots per set:
-    /// 01-weapon-rack-a..g, 02-shield-wall-a..c, 03-quality-ladder-a (blades), -b (shields), -c (lanterns).
+    /// player (the labels are IMGUI): bare mannequins in a quiet open spot near the zone's green, one row at a time, each
+    /// labelled. Noon in calm weather; the HUD, the player, Mira, the enemies and the village are hidden. Rows are a few figures
+    /// wide so each piece is big enough to judge, which takes several shots per set:
+    /// 01-weapon-rack-a..g, 02-shield-wall-a..c (every main-hand and off-hand family and variant, held);
+    /// 03-quality-ladder-a (blades), -b (shields), -c (lanterns): poor to epic at dusk so the glow reads;
+    /// 04-sets-front-a..d and 05-sets-back-a..d: full generated kits at levels 2, 5, 8, 10 and 13 (a common, b uncommon, c rare
+    /// in mail and plate; d rare in cloth and leather), front and back;
+    /// 06-helms-*, 07-shoulders-chests-*, 08-hands-legs-feet-neck-*: every armour family and variant up close;
+    /// 09-palettes-a, -b: the same kit in all ten palettes; 10-crafted: the Blacksmith's 21 pieces by metal tier;
+    /// 11-in-motion-front, -back: a rare level-13 kit standing, walking, sneaking, sitting and swimming (weapons slung);
+    /// 12-druid-forms: the Druid in that kit in each of her four forms, and bare-headed in her hood.
     /// The session is on the capture's throwaway save (EncounterCapture), so nothing here touches a real character.
     /// </summary>
     public sealed class WardrobeCapture : MonoBehaviour
@@ -41,13 +47,60 @@ namespace Crulanda.Encounter
             "shield.kite:plain/veridian", "shield.kite:slab/tollroad+glow", "shield.leaf:bronze/veridian", "shield.leaf:bark/veridian",
             "offhand.hung:lantern/oakhaven", "offhand.hung:shuttered/sandthrone+glow", "offhand.hung:moss/veridian+glow", "offhand.hung:censer/cult+glow", "offhand.hung:scale/concord"
         };
+        /// <summary>Every armour family and variant, by slot, in the palette its named pieces mostly wear.</summary>
+        public static readonly string[] HeadLooks = {
+            "head.cap:plain/oakhaven", "head.cap:flaps/khaven", "head.cap:leaf/veridian", "head.hood:cloth/pilgrim", "head.hood:oilskin/oakhaven", "head.coif:mail/tollroad",
+            "head.wrap:scarf/sandthrone", "head.kettle:plain/tollroad", "head.kettle:half/sandthrone", "head.barbute:plain/tollroad", "head.barbute:rimed/pale+glow",
+            "head.mask:bone/ashwalker", "head.mask:tear/cult+glow", "head.circlet:band/concord", "head.circlet:briar/veridian", "head.crown:tin/sandthrone", "head.crown:root/veridian+glow", "head.crown:antler/veridian"
+        };
+        public static readonly string[] ShoulderChestLooks = {
+            "shoulder.mantle:cloth/oakhaven", "shoulder.mantle:fur/pilgrim", "shoulder.mantle:hide/ashwalker", "shoulder.mantle:frayed/khaven", "shoulder.mantle:shawl/pale",
+            "shoulder.pauldron:dome/tollroad", "shoulder.pauldron:bone/ashwalker", "shoulder.spaulder:lames/tollroad", "shoulder.spaulder:glass/pale+glow", "shoulder.spaulder:bark/veridian",
+            "chest.tunic:plain/oakhaven", "chest.jerkin:leather/khaven", "chest.jerkin:hide/ashwalker", "chest.jerkin:scale/sandthrone", "chest.hauberk:mail/tollroad",
+            "chest.coat:grey/concord", "chest.coat:skirted/sandthrone", "chest.cuirass:plate/tollroad", "chest.cuirass:bark/veridian",
+            "chest.robe:vestment/pilgrim", "chest.robe:cassock/cult", "chest.robe:shroud/pale"
+        };
+        public static readonly string[] HandLooks = {
+            "hands.gloves:plain/oakhaven", "hands.gloves:fingerless/sandthrone", "hands.gloves:mitts/pilgrim", "hands.wraps:cloth/oakhaven", "hands.wraps:fur/oakhaven",
+            "hands.wraps:silk/concord", "hands.gauntlets:plate/tollroad", "hands.gauntlets:bone/ashwalker", "hands.gauntlets:glass/pale+glow", "hands.gauntlets:root/veridian+glow"
+        };
+        public static readonly string[] LegLooks = {
+            "legs.breeches:plain/oakhaven", "legs.breeches:patched/sandthrone", "legs.leggings:garter/pilgrim", "legs.leggings:hide/ashwalker", "legs.greaves:plate/tollroad", "legs.greaves:full/veridian", "legs.kilt:bone/ashwalker"
+        };
+        public static readonly string[] FeetLooks = {
+            "feet.shoes:plain/oakhaven", "feet.boots:plain/sandthrone", "feet.boots:waders/oakhaven", "feet.boots:hobnail/khaven", "feet.boots:root/veridian+glow", "feet.sabatons:plate/ashwalker"
+        };
+        public static readonly string[] NeckLooks = {
+            "neck.pendant:drop/concord", "neck.pendant:glass/pale+glow", "neck.pendant:seal/concord", "neck.pendant:signet/tollroad", "neck.pendant:ember/ashwalker", "neck.pendant:leaf/veridian",
+            "neck.pendant:vial/pale+glow", "neck.pendant:jar/pilgrim+glow", "neck.cord:beads/oakhaven", "neck.cord:knot/pilgrim", "neck.cord:fang/oakhaven", "neck.cord:tooth/ashwalker",
+            "neck.cord:tine/veridian", "neck.torc:metal/tollroad", "neck.torc:band/sandthrone", "neck.torc:wood/veridian", "neck.torc:charm/oakhaven"
+        };
+        /// <summary>The Blacksmith's 21 pieces (professions DESIGN.md 5.2) by metal tier, with the level each tier is made at.</summary>
+        public static readonly (string tier, int level, string[] items)[] Crafted = {
+            ("Copper", 2, new[] { "craft.copper_cudgel", "craft.copper_buckler", "craft.copper_gauntlets", "craft.copper_jerkin" }),
+            ("Bog-iron", 4, new[] { "craft.bogiron_hatchet", "craft.bogiron_helm", "craft.bogiron_greaves", "craft.bogiron_hauberk" }),
+            ("Ridge-steel", 7, new[] { "craft.ridgesteel_blade", "craft.ridgesteel_shield", "craft.ridgesteel_pauldrons", "craft.ridgesteel_cuirass" }),
+            ("Ash-steel", 9, new[] { "craft.ashsteel_cleaver", "craft.ashsteel_helm", "craft.ashsteel_sabatons", "craft.ashsteel_hauberk" }),
+            ("Veridian", 11, new[] { "craft.veridian_warblade", "craft.veridian_shield", "craft.veridian_legplates", "craft.veridian_breastplate" }),
+            ("Heartwood", 12, new[] { "craft.heartwood_greatblade" })
+        };
+        /// <summary>Generated kits by piece word, head to off hand: mail and plate, and cloth and leather.</summary>
+        static readonly string[] Martial = { "Cap", "Torc", "Pauldrons", "Hauberk", "Gauntlets", "Greaves", "Sabatons", "Blade", "Shield" };
+        static readonly string[] Cloth = { "Hood", "Pendant", "Mantle", "Jerkin", "Gloves", "Leggings", "Boots", "Cudgel", "Lantern" };
+        static readonly int[] SetLevels = { 2, 5, 8, 10, 13 };
         const int PerRow = 7; const float Spacing = 1.6f;
 
-        sealed class Entry { public string[] ids; public string title, sub; }
+        /// <summary>How a shot frames its row: figures per row and apart, the height looked at, the camera's pitch and margin, where the labels hang (above the figure's root, negative is below), and which way the figures face.</summary>
+        sealed class Framing
+        {
+            public int perRow = PerRow; public float spacing = Spacing, focus = .95f, pitch = 12, margin = 1.2f, label = -1.05f, yaw = 180;
+        }
+        sealed class Entry { public string[] ids; public string title, sub; public ActorLook look = ActorLook.Warrior; public ActorPose pose; public bool walk; public int form = -1, hair = -1; }
         EncounterSession session; ItemDatabase db; GearLooks looks;
         readonly List<GameObject> figures = new List<GameObject>();
         readonly List<(Transform at, string title, string sub)> labels = new List<(Transform, string, string)>();
-        GUIStyle titleStyle, subStyle;
+        readonly List<(Transform t, Vector3 home, Vector3 along)> walkers = new List<(Transform, Vector3, Vector3)>();
+        GUIStyle titleStyle, subStyle; float labelAt = -1.05f;
         Vector2 spot; float ground;
 
         public IEnumerator Run(EncounterSession s, string directory)
@@ -62,19 +115,70 @@ namespace Crulanda.Encounter
             spot = FindSpot(zone, out ground);
             Debug.Log("Wardrobe capture at " + spot + " (ground " + ground.ToString("0.0") + ").");
 
+            var weapons = new Framing { yaw = 115 }; var shields = new Framing { yaw = -115 };
             var main = Entries(MainHandLooks, "mainhand"); var off = Entries(OffHandLooks, "offhand");
-            for (int i = 0, n = 0; i < main.Count; i += PerRow, n++) yield return Shot(Path.Combine(directory, "01-weapon-rack-" + (char)('a' + n) + ".png"), main.GetRange(i, Mathf.Min(PerRow, main.Count - i)), 115, 12);
-            for (int i = 0, n = 0; i < off.Count; i += PerRow, n++) yield return Shot(Path.Combine(directory, "02-shield-wall-" + (char)('a' + n) + ".png"), off.GetRange(i, Mathf.Min(PerRow, off.Count - i)), -115, 12);
+            yield return Shots(directory, "01-weapon-rack", main, weapons, 12);
+            yield return Shots(directory, "02-shield-wall", off, shields, 12);
             // The quality ladder: the same generated piece (level 8, Ridge-forged) from poor to epic, at dusk.
-            yield return Shot(Path.Combine(directory, "03-quality-ladder-a.png"), Ladder("mainhand", "Blade"), 115, 19.3f);
-            yield return Shot(Path.Combine(directory, "03-quality-ladder-b.png"), Ladder("offhand", "Shield"), -115, 19.3f);
-            yield return Shot(Path.Combine(directory, "03-quality-ladder-c.png"), Ladder("offhand", "Lantern"), -150, 19.3f);
+            yield return Shot(Path.Combine(directory, "03-quality-ladder-a.png"), Ladder("mainhand", "Blade"), 19.3f, weapons);
+            yield return Shot(Path.Combine(directory, "03-quality-ladder-b.png"), Ladder("offhand", "Shield"), 19.3f, shields);
+            yield return Shot(Path.Combine(directory, "03-quality-ladder-c.png"), Ladder("offhand", "Lantern"), 19.3f, new Framing { yaw = -150 });
+
+            // Full generated kits by level (columns) and quality (one shot each), front and back.
+            var sets = new Framing { perRow = 5, spacing = 1.5f, pitch = 8, margin = .9f };
+            var kits = new[] { (Martial, 1), (Martial, 2), (Martial, 3), (Cloth, 3) };
+            for (int k = 0; k < kits.Length; k++)
+            {
+                var row = new List<Entry>(); foreach (int level in SetLevels) row.Add(KitEntry(kits[k].Item1, level, kits[k].Item2));
+                yield return Shot(Path.Combine(directory, "04-sets-front-" + (char)('a' + k) + ".png"), row, 12, sets);
+                yield return Shot(Path.Combine(directory, "05-sets-back-" + (char)('a' + k) + ".png"), row, 12, new Framing { perRow = 5, spacing = 1.5f, pitch = 8, margin = .9f, yaw = 0 });
+            }
+            // Every armour family and variant up close: uncommon, at the middle level band, so rims and trim show but not glow.
+            yield return Shots(directory, "06-helms", Entries(HeadLooks, "head", 7), new Framing { perRow = 4, spacing = .9f, focus = 1.62f, pitch = 6, margin = .35f, label = 1.32f, yaw = 165 }, 12);
+            yield return Shots(directory, "07-shoulders-chests", Entries(ShoulderChestLooks, null, 7), new Framing { perRow = 4, spacing = 1.05f, focus = 1.3f, pitch = 8, margin = .45f, label = -.62f, yaw = 160 }, 12);
+            var limbs = new List<Entry>(); var limbFrames = new List<Framing>();
+            void Close(string[] list, string slot, Framing frame) { var e = Entries(list, slot, 7); for (int i = 0; i < e.Count; i += frame.perRow) { limbs.AddRange(e.GetRange(i, Mathf.Min(frame.perRow, e.Count - i))); limbFrames.Add(frame); } }
+            Close(HandLooks, "hands", new Framing { perRow = 4, spacing = 1.05f, focus = 1.0f, pitch = 8, margin = .45f, label = -.75f, yaw = 135 });
+            Close(LegLooks, "legs", new Framing { perRow = 4, spacing = 1.0f, focus = .55f, pitch = 12, margin = .45f, label = .45f, yaw = 150 });
+            Close(FeetLooks, "feet", new Framing { perRow = 4, spacing = 1.0f, focus = .4f, pitch = 16, margin = .45f, label = .45f, yaw = 150 });
+            Close(NeckLooks, "neck", new Framing { perRow = 4, spacing = .9f, focus = 1.48f, pitch = 6, margin = .35f, label = -.3f, yaw = 175 });
+            for (int i = 0, used = 0; i < limbFrames.Count; i++)
+            {
+                var frame = limbFrames[i]; int n = Mathf.Min(frame.perRow, limbs.Count - used);
+                yield return Shot(Path.Combine(directory, "08-hands-legs-feet-neck-" + (char)('a' + i) + ".png"), limbs.GetRange(used, n), 12, frame); used += n;
+            }
+            // The same kit in every palette; the crafted pieces by metal tier.
+            var palettes = new List<Entry>(); foreach (var p in looks.PaletteIds) palettes.Add(PaletteEntry(p));
+            yield return Shots(directory, "09-palettes", palettes, new Framing { perRow = 5, spacing = 1.5f, pitch = 8, margin = .9f }, 12);
+            var crafted = new List<Entry>(); foreach (var c in Crafted) crafted.Add(CraftedEntry(c.tier, c.level, c.items));
+            yield return Shot(Path.Combine(directory, "10-crafted.png"), crafted, 12, new Framing { perRow = 6, spacing = 1.5f, pitch = 8, margin = .9f });
+            // In motion: a rare level-13 kit in each pose (swimming slings the weapons), then the Druid in it in each form.
+            foreach (var (name, yaw) in new[] { ("front", 180f), ("back", 0f) })
+            {
+                var poses = new List<Entry>();
+                foreach (var (title, pose, walk) in new[] { ("Standing", ActorPose.None, false), ("Walking", ActorPose.None, true), ("Sneaking", ActorPose.Sneak, false), ("Sitting", ActorPose.Sit, false), ("Swimming", ActorPose.Swim, false) })
+                { var e = KitEntry(Martial, 13, 3); e.title = title; e.pose = pose; e.walk = walk; poses.Add(e); }
+                yield return Shot(Path.Combine(directory, "11-in-motion-" + name + ".png"), poses, 12, new Framing { perRow = 5, spacing = 1.6f, pitch = 8, margin = .9f, yaw = yaw });
+            }
+            var forms = new List<Entry>();
+            foreach (DruidForm form in Enum.GetValues(typeof(DruidForm))) { var e = KitEntry(Martial, 13, 3); e.look = ActorLook.Druid; e.form = (int)form; e.title = form.ToString(); forms.Add(e); }
+            var hooded = KitEntry(Martial, 13, 3); hooded.look = ActorLook.Druid; hooded.ids[0] = null; hooded.title = "No helm: her hood"; forms.Add(hooded);
+            yield return Shot(Path.Combine(directory, "12-druid-forms.png"), forms, 12, new Framing { perRow = 5, spacing = 1.6f, pitch = 8, margin = .9f, yaw = 160 });
             Clear(); EncounterHud.Hidden = false;
             Debug.Log("WARDROBE_CAPTURE_DONE"); Application.Quit(0);
         }
 
-        /// <summary>One look per entry, as a named test item (wardrobe.N) registered with this run's own copy of the looks.</summary>
-        List<Entry> Entries(string[] list, string slot)
+        /// <summary>A list in rows of the framing's width, one shot each: name-a, name-b...</summary>
+        IEnumerator Shots(string directory, string name, List<Entry> list, Framing frame, float hour)
+        {
+            for (int i = 0, n = 0; i < list.Count; i += frame.perRow, n++)
+                yield return Shot(Path.Combine(directory, name + "-" + (char)('a' + n) + ".png"), list.GetRange(i, Mathf.Min(frame.perRow, list.Count - i)), hour, frame);
+        }
+        /// <summary>
+        /// One look per entry, as a named test item (wardrobe.N) registered with this run's own copy of the looks: uncommon, and at
+        /// <paramref name="level"/> when given (armour shows its level band). The slot is the look's own when none is given.
+        /// </summary>
+        List<Entry> Entries(string[] list, string slot, int level = 0)
         {
             var e = new List<Entry>();
             foreach (var look in list)
@@ -82,10 +186,49 @@ namespace Crulanda.Encounter
                 string id = "wardrobe." + db.Items.Count;
                 looks.Register(id, look);
                 GearLooks.TryParseLook(look, out var family, out var variant, out var palette, out bool glow);
-                db.Items[id] = new ItemDef { id = id, name = look, kind = "gear", slot = slot, quality = 2, canonStatus = "GAME-ONLY" };
+                db.Items[id] = new ItemDef { id = id, name = look, kind = "gear", slot = slot ?? GearLooks.Family(family).slot, quality = 2, level = Mathf.Max(0, level - 1), canonStatus = "GAME-ONLY" };
                 e.Add(new Entry { ids = new[] { id }, title = family + " : " + variant, sub = palette + (glow ? " + glow" : "") });
             }
             return e;
+        }
+        /// <summary>The first generated item (seeds from 0) of this slot, level and quality whose name has this piece word: the same every run.</summary>
+        string Generated(string slot, int level, int quality, string piece)
+        {
+            for (int seed = 0; seed < 10000; seed++)
+            {
+                string id = ItemDatabase.GearId(slot, level, quality, seed);
+                if (GearLooks.TrySplitGenerated(db.Get(id), out _, out var p, out _, out _) && p == piece) return id;
+            }
+            Debug.LogError("Wardrobe capture: no " + ItemDatabase.QualityNames[quality] + " level-" + level + " " + piece + " among the first 10000 seeds."); return null;
+        }
+        /// <summary>A whole generated kit: one piece per slot by word, at this level and quality.</summary>
+        Entry KitEntry(string[] pieces, int level, int quality)
+        {
+            var ids = new string[pieces.Length]; for (int s = 0; s < pieces.Length; s++) ids[s] = Generated(ItemDatabase.SlotIds[s], level, quality, pieces[s]);
+            var chest = ids[3] == null ? null : db.Get(ids[3]);
+            return new Entry { ids = ids, title = "Level " + level + " " + ItemDatabase.QualityNames[quality], sub = chest == null ? "" : chest.name };
+        }
+        /// <summary>One kit (kettle hat, torc, pauldrons, hauberk, gauntlets, greaves, boots, sword and heater) in one palette, rare at level 9.</summary>
+        Entry PaletteEntry(string palette)
+        {
+            string[] kit = { "head.kettle:plain", "neck.torc:metal", "shoulder.pauldron:dome", "chest.hauberk:mail", "hands.gauntlets:plate", "legs.greaves:plate", "feet.boots:plain", "sword.arming:straight", "shield.heater:plain" };
+            var ids = new string[kit.Length];
+            for (int s = 0; s < kit.Length; s++)
+            {
+                string id = "wardrobe." + db.Items.Count, look = kit[s] + "/" + palette; looks.Register(id, look);
+                db.Items[id] = new ItemDef { id = id, name = look, kind = "gear", slot = ItemDatabase.SlotIds[s], quality = 3, level = 8, canonStatus = "GAME-ONLY" }; ids[s] = id;
+            }
+            return new Entry { ids = ids, title = palette, sub = "rare, level 9" };
+        }
+        /// <summary>A metal tier's crafted pieces on one figure (their looks and metal tints are in looks.json; the items themselves are the professions work's).</summary>
+        Entry CraftedEntry(string tier, int level, string[] items)
+        {
+            foreach (var id in items)
+            {
+                if (!looks.Explicit.TryGetValue(id, out var look) || !GearLooks.TryParseLook(look, out var family, out _, out _, out _)) { Debug.LogError("Wardrobe capture: no look for " + id + "."); continue; }
+                if (db.Get(id) == null) db.Items[id] = new ItemDef { id = id, name = id, kind = "gear", slot = GearLooks.Family(family).slot, quality = id.Contains("heartwood") ? 3 : 2, level = level, canonStatus = "GAME-ONLY" };
+            }
+            return new Entry { ids = items, title = tier, sub = items.Length + " piece" + (items.Length == 1 ? "" : "s") + ", level " + level };
         }
         /// <summary>Five generated pieces, poor to epic, all "Ridge-forged &lt;piece&gt;" at level 8 with the family's first variant.</summary>
         List<Entry> Ladder(string slot, string piece)
@@ -153,37 +296,45 @@ namespace Crulanda.Encounter
             return true;
         }
 
-        /// <summary>One row of mannequins, each dressed in its entry, shot from the south.</summary>
-        IEnumerator Shot(string file, List<Entry> row, float yaw, float hour)
+        /// <summary>One row of mannequins, each dressed in its entry (posed, walking or in a Druid form if it says so), shot from the south.</summary>
+        IEnumerator Shot(string file, List<Entry> row, float hour, Framing frame)
         {
-            Clear(); Crulanda.World.WorldClock.Hour = hour;
+            Clear(); Crulanda.World.WorldClock.Hour = hour; labelAt = frame.label;
             var zone = Crulanda.World.ZoneBuilder.Active;
-            int n = row.Count; float width = (PerRow - 1) * Spacing;
+            int n = row.Count; float width = (frame.perRow - 1) * frame.spacing;
             for (int i = 0; i < n; i++)
             {
-                var p = spot + new Vector2((i - (n - 1) / 2f) * Spacing, 0);
+                var e = row[i]; var p = spot + new Vector2((i - (n - 1) / 2f) * frame.spacing, 0);
                 var at = zone != null ? zone.Ground(p, 1) : new Vector3(p.x, 1, p.y);
-                var go = new GameObject("Wardrobe mannequin " + row[i].title); go.transform.SetPositionAndRotation(at, Quaternion.Euler(0, yaw, 0));
+                var go = new GameObject("Wardrobe mannequin " + e.title); go.transform.SetPositionAndRotation(at, Quaternion.Euler(0, frame.yaw, 0));
                 var body = GameObject.CreatePrimitive(PrimitiveType.Capsule); body.name = "Body"; body.transform.SetParent(go.transform, false); Destroy(body.GetComponent<Collider>());
-                var look = ActorVisual.Attach(go, ActorLook.Warrior, i);
-                look.ApplyGearIds(row[i].ids, db, looks);
-                figures.Add(go); labels.Add((go.transform, row[i].title, row[i].sub));
+                var look = ActorVisual.Attach(go, e.look, e.hair >= 0 ? e.hair : i);
+                look.ApplyGearIds(Array.FindAll(e.ids, id => id != null), db, looks);
+                look.Pose = e.pose;
+                if (e.form >= 0) { body.transform.localScale = DruidKit.FormScale((DruidForm)e.form); look.SetClothColor(DruidKit.FormColor((DruidForm)e.form)); }
+                if (e.walk) walkers.Add((go.transform, at, Vector3.right));
+                figures.Add(go); labels.Add((go.transform, e.title, e.sub));
             }
-            var view = session.View; var focus = new Vector3(spot.x, ground + .95f, spot.y);
+            var view = session.View; var focus = new Vector3(spot.x, ground + frame.focus, spot.y);
             float hHalf = Mathf.Atan(Mathf.Tan(view.fieldOfView * .5f * Mathf.Deg2Rad) * view.aspect);
-            float dist = (width / 2 + 1.2f) / Mathf.Tan(hHalf), pitch = 12;
-            var cam = focus - Quaternion.Euler(pitch, 0, 0) * Vector3.forward * dist;
-            if (zone != null) cam.y = Mathf.Max(cam.y, zone.HeightAt(cam.x, cam.z) + 1.3f);
+            float dist = (width / 2 + frame.margin) / Mathf.Tan(hHalf);
+            var cam = focus - Quaternion.Euler(frame.pitch, 0, 0) * Vector3.forward * dist;
+            if (zone != null) cam.y = Mathf.Max(cam.y, zone.HeightAt(cam.x, cam.z) + .6f);
             var turn = Quaternion.LookRotation(focus - cam);
             for (float w = 0; w < .9f; w += Time.deltaTime) { view.transform.SetPositionAndRotation(cam, turn); Crulanda.World.TreeFade.UpdateAll(cam, focus, focus); yield return null; }
             view.transform.SetPositionAndRotation(cam, turn);
             ScreenCapture.CaptureScreenshot(file);
             yield return new WaitForSeconds(.5f);
         }
+        /// <summary>Walkers pace back and forth along the row at a run's pace, so the stride shows.</summary>
+        void Update()
+        {
+            foreach (var (t, home, along) in walkers) if (t != null) t.position = home + along * (Mathf.PingPong(Time.time * 2.6f, .7f) - .35f);
+        }
         void Clear()
         {
             foreach (var f in figures) if (f != null) Destroy(f);
-            figures.Clear(); labels.Clear();
+            figures.Clear(); labels.Clear(); walkers.Clear();
         }
 
         void OnGUI()
@@ -198,7 +349,7 @@ namespace Crulanda.Encounter
             foreach (var (at, title, sub) in labels)
             {
                 if (at == null) continue;
-                var sp = session.View.WorldToScreenPoint(at.position + Vector3.down * 1.05f); if (sp.z < 0) continue;
+                var sp = session.View.WorldToScreenPoint(at.position + Vector3.up * labelAt); if (sp.z < 0) continue;
                 var r = new Rect(sp.x - 95, Screen.height - sp.y + 4, 190, 40);
                 var old = GUI.color; GUI.color = new Color(0, 0, 0, .55f); GUI.DrawTexture(r, Texture2D.whiteTexture); GUI.color = old;
                 GUI.Label(new Rect(r.x, r.y + 2, r.width, 20), title, titleStyle);

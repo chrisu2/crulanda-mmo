@@ -24,15 +24,25 @@ namespace Crulanda.Encounter
         /// out, enemies in sight, the places quests send you, the roads they lead down, and the ! and ? over people. The maps draw
         /// from this list and nothing else. Hidden finds (ZoneBuilder.Secrets) are never read here: a secret is on no map.
         /// </summary>
+        static bool InCave(Vector2 at) { float y = 0; return Crulanda.World.Hollow.FloorUnder(at, ref y); }
+        /// <summary>"  3-5" after a landmark that names a cave with camps in it (the levels of its camps), else nothing.</summary>
+        static string CaveBand(Crulanda.World.ZoneDefinition z, string name)
+        {
+            var h = Crulanda.World.Hollow.All.Find(x => x.Name == name); if (h == null || z.camps == null) return "";
+            int lo = int.MaxValue, hi = int.MinValue;
+            foreach (var c in z.camps) if (c != null && h.FloorAt(c.center, out _)) { lo = Mathf.Min(lo, c.levelMin); hi = Mathf.Max(hi, c.levelMax); }
+            return lo > hi ? "" : "  " + (lo == hi ? lo.ToString() : lo + "-" + hi);
+        }
         public static void Marks(EncounterSession s, List<MapMark> into)
         {
             into.Clear(); var zone = s.Zone;
             if (zone != null)
             {
                 var z = zone.Zone;
-                foreach (var l in z.landmarks) into.Add(new MapMark { kind = MarkKind.Landmark, world = zone.Ground(l.at), text = l.name });
+                // A cave's camps are not drawn over the land above them: the cave's own landmark carries their levels ("3-5").
+                foreach (var l in z.landmarks) into.Add(new MapMark { kind = MarkKind.Landmark, world = zone.Ground(l.at), text = l.name + CaveBand(z, l.name) });
                 if (z.camps != null)
-                    foreach (var c in z.camps) if (c != null) into.Add(new MapMark { kind = MarkKind.Camp, world = zone.Ground(c.center), text = c.mob, camp = c });
+                    foreach (var c in z.camps) if (c != null && !InCave(c.center)) into.Add(new MapMark { kind = MarkKind.Camp, world = zone.Ground(c.center), text = c.mob, camp = c });
                 foreach (var e in z.exits) into.Add(new MapMark { kind = MarkKind.Exit, world = zone.Ground(e.at), text = e.name, to = ZoneById(zone, e.to) });
             }
             foreach (var enemy in s.Enemies) if (enemy != null && enemy.actor.IsAlive && !enemy.Hidden) into.Add(new MapMark { kind = MarkKind.Enemy, world = enemy.transform.position, text = enemy.actor.DisplayName });

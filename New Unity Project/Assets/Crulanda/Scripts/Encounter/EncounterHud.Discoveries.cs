@@ -13,7 +13,8 @@ namespace Crulanda.Encounter
 
         /// <summary>
         /// "DISCOVERED" over the find's name, centred high on the screen on a soft ink band ruled in gold. It fades in, holds and fades
-        /// out over EncounterSession.ToastSeconds; finds made together follow one another.
+        /// out over EncounterSession.ToastSeconds; finds made together follow one another. A cave you walk into names itself on the
+        /// same band, its levels in place of "DISCOVERED".
         /// </summary>
         void DrawDiscoveryToast()
         {
@@ -30,8 +31,9 @@ namespace Crulanda.Encounter
             Fill(r, new Color(ink.r, ink.g, ink.b, .55f * alpha));
             Fill(new Rect(r.x + 40, r.y, r.width - 80, 1.5f), new Color(gold.r, gold.g, gold.b, .75f * alpha));
             Fill(new Rect(r.x + 40, r.yMax - 1.5f, r.width - 80, 1.5f), new Color(gold.r, gold.g, gold.b, .75f * alpha));
-            Outlined(new Rect(r.x, r.y + 8, r.width, 24), "DISCOVERED", toastKicker, new Color(gold.r, gold.g, gold.b, alpha));
-            Outlined(new Rect(r.x, r.y + 32, r.width, 46), name, toastName, new Color(1, .95f, .84f, alpha));
+            string kicker = session.ToastKicker ?? "DISCOVERED";
+            if (kicker.Length > 0) Outlined(new Rect(r.x, r.y + 8, r.width, 24), kicker, toastKicker, new Color(gold.r, gold.g, gold.b, alpha));
+            Outlined(new Rect(r.x, r.y + (kicker.Length > 0 ? 32 : 21), r.width, 46), name, toastName, new Color(1, .95f, .84f, alpha));
         }
 
         /// <summary>

@@ -85,7 +85,7 @@ namespace Crulanda.Encounter
             wasInWater = inWater;
             if (direction.sqrMagnitude > .01f) transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime * 12);
             var p = transform.position;
-            if (p.y < -5 && !(wet && p.y > surface - 12)) Teleport(session.RecoveryPoint);
+            if (p.y < Crulanda.World.Hollow.Lowest && !(wet && p.y > surface - 12)) Teleport(session.RecoveryPoint);   // fell out of the world (a cave's deep floor is not that)
         }
         void LateUpdate()
         {

@@ -338,8 +338,7 @@ namespace Crulanda.Encounter
                 {
                     // A hidden find registered as a prop too is searched through SecretSpots (DiscoveryLog), never as a quest prop.
                     if (i.kind == "secret" || Time.time < i.hiddenUntil || (i.once && Progress.usedInteractables.Contains(i.Key(Zone.Zone.id)))) continue;
-                    var p = Player.transform.position;   // ground distance: the prop's origin is at its foot, the player's at the waist
-                    var d = Vector2.Distance(new Vector2(p.x, p.z), new Vector2(i.position.x, i.position.z)); if (d < bestD) { best = i; bestD = d; }
+                    var d = GroundDistance(i.position); if (d < bestD) { best = i; bestD = d; }   // the prop's origin is at its foot, the player's at the waist
                 }
                 return best;
             }
@@ -386,21 +385,46 @@ namespace Crulanda.Encounter
         public const float ToastSeconds = 3.2f;
         /// <summary>The name on the "Discovered" toast showing now (null = none). Finds made together queue up behind it.</summary>
         public string ToastName { get; private set; }
+        /// <summary>The small line over it: "DISCOVERED" for a find, a cave's levels as you walk in ("LEVELS 3-5"), or empty.</summary>
+        public string ToastKicker { get; private set; }
         /// <summary>Seconds the current toast has been showing.</summary>
         public float ToastAge { get { return ToastName == null ? 0 : Time.time - toastSince; } }
-        readonly Queue<string> toasts = new Queue<string>();
+        readonly Queue<(string kicker, string name)> toasts = new Queue<(string kicker, string name)>();
         float toastSince, nextSecretCheck; bool pocketedSynced; string vistaWaiting;
         static readonly Crulanda.World.ZoneSecret[] NoSecrets = new Crulanda.World.ZoneSecret[0];
         void StartDiscoveries()
         {
             Discoveries = new DiscoveryLog(Progress, Items, Quests != null ? Quests.Db : null);
             Discoveries.Say = Message;
-            Discoveries.Found = s => { toasts.Enqueue(DiscoveryLog.Name(s)); AdvanceToast(); };
+            Discoveries.Found = s => { toasts.Enqueue(("DISCOVERED", DiscoveryLog.Name(s))); AdvanceToast(); };
         }
         void AdvanceToast()
         {
             if (ToastName != null && Time.time - toastSince < ToastSeconds) return;
-            ToastName = toasts.Count > 0 ? toasts.Dequeue() : null; toastSince = Time.time;
+            var next = toasts.Count > 0 ? toasts.Dequeue() : (null, null); ToastKicker = next.kicker; ToastName = next.name; toastSince = Time.time;
+        }
+        // ---------- places: a cave names itself as you walk in ----------
+        Crulanda.World.Hollow placeIn; float placeSeen;
+        /// <summary>
+        /// A few metres into a cave (Hollow), its name comes up on the banner over the levels of the camps inside it ("LEVELS 3-5"),
+        /// once each time you go in: step out and back and it stays quiet; out of it for 20 s or more, and it names itself again.
+        /// </summary>
+        void TickPlaces()
+        {
+            if (Zone == null) return;
+            var p = Player.transform.position; Crulanda.World.Hollow now = null;
+            foreach (var h in Crulanda.World.Hollow.All) if (h.Depth(p) > .3f) { now = h; break; }
+            if (now == null) { if (placeIn != null && Time.time - placeSeen > 20) placeIn = null; return; }
+            placeSeen = Time.time;
+            if (now == placeIn) return;
+            placeIn = now; toasts.Enqueue((PlaceBand(now), now.Name)); AdvanceToast();
+        }
+        /// <summary>"LEVELS 3-5" from the camps standing in the passage, or empty when none does.</summary>
+        string PlaceBand(Crulanda.World.Hollow h)
+        {
+            int lo = int.MaxValue, hi = int.MinValue;
+            foreach (var c in Zone.Zone.camps) if (c != null && h.FloorAt(c.center, out _)) { lo = Mathf.Min(lo, c.levelMin); hi = Mathf.Max(hi, c.levelMax); }
+            return lo > hi ? "" : lo == hi ? "LEVEL " + lo : "LEVELS " + lo + "-" + hi;
         }
         readonly List<Crulanda.World.ZoneSecretSpot> spots = new List<Crulanda.World.ZoneSecretSpot>();
         Crulanda.World.ZoneBuilder spotsZone; Crulanda.World.ZoneSecret[] spotsDefs; int spotsBuilt = -1;
@@ -419,11 +443,22 @@ namespace Crulanda.Encounter
                 spotsZone = zone; spotsDefs = defs; spotsBuilt = zone.Secrets.Count; spots.Clear();
                 var ids = new HashSet<string>(StringComparer.Ordinal);
                 foreach (var spot in zone.Secrets) if (spot != null && spot.def != null && !string.IsNullOrEmpty(spot.def.id) && ids.Add(spot.def.id)) spots.Add(spot);
-                foreach (var d in defs) if (d != null && !string.IsNullOrEmpty(d.id) && ids.Add(d.id)) spots.Add(new Crulanda.World.ZoneSecretSpot { def = d, position = zone.Ground(d.at, d.height) });
+                foreach (var d in defs) if (d != null && !string.IsNullOrEmpty(d.id) && ids.Add(d.id)) spots.Add(new Crulanda.World.ZoneSecretSpot { def = d, position = zone.StandAt(d.at, float.NegativeInfinity, d.height) });
                 return spots;
             }
         }
-        float GroundDistance(Vector3 at) { var p = Player.transform.position; return Vector2.Distance(new Vector2(p.x, p.z), new Vector2(at.x, at.z)); }
+        /// <summary>
+        /// Ground distance from you to a thing E can use, or out of reach when a cave's rock is between you: one of you in a passage
+        /// (Hollow) and the other not, as on the hill over the Store Caves, sixteen metres above the strongbox.
+        /// </summary>
+        float GroundDistance(Vector3 at)
+        {
+            var p = Player.transform.position;
+            if (Crulanda.World.Hollow.All.Count > 0 && InHollow(p) != Crulanda.World.Hollow.InsideAny(at + Vector3.up * .3f, 0)) return float.MaxValue;
+            return Vector2.Distance(new Vector2(p.x, p.z), new Vector2(at.x, at.z));
+        }
+        Vector3 inHollowAt = new Vector3(float.NaN, 0, 0); bool inHollow;
+        bool InHollow(Vector3 p) { if (p != inHollowAt) { inHollowAt = p; inHollow = Crulanda.World.Hollow.InsideAny(p, 0); } return inHollow; }   // asked for every prop in a frame
         /// <summary>A hidden find within reach that E would search: not a lookout, not found yet (a locked chest counts; E says so).</summary>
         public Crulanda.World.ZoneSecretSpot NearbySecret
         {
@@ -693,7 +728,7 @@ namespace Crulanda.Encounter
                 // Arriving in a zone for the first time (or from the old test map): start at its entrance.
                 Progress.zoneId = Zone.Zone.id; var start = StartPoint; Progress.x = start.x; Progress.y = start.y; Progress.z = start.z;
             }
-            if (Zone != null) Progress.y = Zone.HeightAt(Progress.x, Progress.z) + 1.1f;   // always stand on the generated ground
+            if (Zone != null) Progress.y = Zone.StandAt(new Vector2(Progress.x, Progress.z), Progress.y - 1.1f, 1.1f).y;   // on the generated ground, or the cave floor you saved on
             actorsRoot = new GameObject("Encounter Actors");
             var tint = ClassDef.id == "class.druid" ? new Color(.52f, .44f, .27f) : new Color(.2f, .58f, .72f);
             Player = SpawnActor("You", content.player, new Vector3(Progress.x, Progress.y, Progress.z), tint, Progress.playerId,
@@ -796,7 +831,7 @@ namespace Crulanda.Encounter
                     var spot = camp.center + new Vector2((float)rng.NextDouble() - .5f, (float)rng.NextDouble() - .5f) * camp.radius * 2;
                     // Hunters in hiding lie where the tall grass is sure to be, not out at the corners of the camp.
                     if (camp.ambush) spot = camp.center + Vector2.ClampMagnitude(spot - camp.center, camp.radius) * EncounterEnemy.AmbushSpread(camp.radius);
-                    var point = Zone.Ground(spot, 1);
+                    var point = Zone.StandAt(spot, float.NegativeInfinity, 1);   // a camp in a cave stands on its floor
                     if (NavMesh.SamplePosition(point, out var hit, 3, NavMesh.AllAreas)) point = hit.position + Vector3.up; else continue;
                     int level = camp.levelMin + rng.Next(Mathf.Max(1, camp.levelMax - camp.levelMin + 1));
                     // Only the first mob of an elite camp is the elite (its pack stays normal).
@@ -866,7 +901,7 @@ namespace Crulanda.Encounter
             if (Debug.isDebugBuild && EncounterInput.Press(KeyCode.F11)) { Crulanda.World.WorldClock.Advance(1); Message("Time skips ahead: " + Crulanda.World.WorldClock.Text + " (dev)."); }
             if (Debug.isDebugBuild && EncounterInput.Press(KeyCode.F8) && Crulanda.World.WorldWeather.Active != null) Message("Weather: " + Crulanda.World.WorldWeather.Active.CycleForced() + " (dev).");
             if (!Player.IsAlive) { if (EncounterInput.Press(KeyCode.R)) Recover(); return; }
-            TickQuests(); TickItems(); TickDiscoveries();
+            TickQuests(); TickItems(); TickDiscoveries(); TickPlaces();
             if (Zone != null && Player.GetComponent<CharacterController>().isGrounded && !Zone.WaterAt(new Vector2(Player.transform.position.x, Player.transform.position.z), out _, out _)) lastDry = Player.transform.position;
             var motor = Player.GetComponent<AdventurerMotor>(); var look = Player.GetComponent<ActorVisual>();
             if (look != null) look.Pose = motor.Swimming ? ActorPose.Swim : motor.Sneaking ? ActorPose.Sneak : ActorPose.None;

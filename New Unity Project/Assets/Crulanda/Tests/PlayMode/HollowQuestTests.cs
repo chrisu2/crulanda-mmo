@@ -55,7 +55,7 @@ namespace Crulanda.Tests
             var q = s.Quests.Def(QuestId);
             Assert.NotNull(q, "The Crowsfoot Hollow quest is defined.");
             Assert.AreEqual(3, q.minLevel, "It waits for level 3.");
-            Assert.AreEqual(3, q.level);
+            Assert.AreEqual(4, q.level, "The quest sits in the middle of the dungeon's levels (3-5).");
             Assert.AreEqual("zone.oakhaven", q.zone);
             StringAssert.Contains("GAME-ONLY", q.canonStatus);
             Assert.NotNull(VillageLife.Active.Find(q.giver), "Nobody called '" + q.giver + "' in Oakhaven.");

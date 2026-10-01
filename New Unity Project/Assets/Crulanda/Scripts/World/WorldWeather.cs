@@ -346,7 +346,7 @@ namespace Crulanda.World
                 if (groundGloss >= 0) ground.SetFloat("_Glossiness", Mathf.Lerp(groundGloss, .32f, wet));
             }
             if (!Focus(out var cam, out var focus, out var ahead)) return;
-            bool under = zone.UnderRoof(new Vector2(cam.x, cam.z)) && Physics.Raycast(cam, Vector3.up, 20, ~0, QueryTriggerInteraction.Ignore);   // a ceiling overhead, not just beside a wall or above the roofs
+            bool under = Hollow.DepthAt(cam) > .02f || zone.UnderRoof(new Vector2(cam.x, cam.z)) && Physics.Raycast(cam, Vector3.up, 20, ~0, QueryTriggerInteraction.Ignore);   // in a cave, or under a roof   // a ceiling overhead, not just beside a wall or above the roofs
             if (under && !sheltered) { if (rain != null) rain.Clear(); if (snow != null) snow.Clear(); }
             sheltered = under;
             bool jumped = (focus - lastFocus).sqrMagnitude > 30 * 30; lastFocus = focus;

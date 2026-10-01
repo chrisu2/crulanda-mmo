@@ -63,7 +63,7 @@ namespace Crulanda.Encounter
                     p.enemies == null || p.experience < 0 || p.gold < 0 ||
                     float.IsNaN(p.x) || float.IsNaN(p.y) || float.IsNaN(p.z) ||
                     float.IsInfinity(p.x) || float.IsInfinity(p.y) || float.IsInfinity(p.z) ||
-                    Math.Abs(p.x) > 500 || Math.Abs(p.z) > 500 || p.y < -20 || p.y > 60)
+                    Math.Abs(p.x) > 500 || Math.Abs(p.z) > 500 || p.y < -60 || p.y > 60)   // (a cave's floor may lie well under the land)
                     throw new InvalidOperationException("Invalid encounter data.");
                 // Level curve changed in format 5: convert experience first so every level-based check sees the same level.
                 if (from < 5) p.experience = EncounterProgress.MigrateExperience(p.experience);

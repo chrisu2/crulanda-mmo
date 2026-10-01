@@ -21,8 +21,9 @@ namespace Crulanda.Encounter
             var sources = zone != null ? ZoneSources(zone) : LegacySources();
             float size = zone != null ? zone.Zone.size : 64;
             Physics.SyncTransforms();
-            data = NavMeshBuilder.BuildNavMeshData(NavMesh.GetSettingsByIndex(0), sources,
-                new Bounds(Vector3.zero, new Vector3(size, 40, size)), Vector3.zero, Quaternion.identity);
+            var reach = new Bounds(Vector3.zero, new Vector3(size, 40, size));
+            if (zone != null) reach = Crulanda.World.Hollow.Reach(reach);   // cave passages may run on under the hills past the edge
+            data = NavMeshBuilder.BuildNavMeshData(NavMesh.GetSettingsByIndex(0), sources, reach, Vector3.zero, Quaternion.identity);
             if (data != null) instance = NavMesh.AddNavMeshData(data);
             else Debug.LogError("Could not build encounter navigation.");
         }

@@ -174,7 +174,7 @@ namespace Crulanda.Encounter
         void Respawn()
         {
             respawnAt = float.MaxValue;
-            var at = session.Zone != null ? session.Zone.Ground(CampCenter + Random.insideUnitCircle * CampRadius * (Ambusher ? AmbushSpread(CampRadius) : 1), 0) : home;
+            var at = session.Zone != null ? session.Zone.StandAt(CampCenter + Random.insideUnitCircle * CampRadius * (Ambusher ? AmbushSpread(CampRadius) : 1), home.y) : home;   // a cave camp respawns on its floor
             if (NavMesh.SamplePosition(at, out var hit, 3, NavMesh.AllAreas)) at = hit.position;
             if (agent.isOnNavMesh) agent.Warp(at); else transform.position = at + Vector3.up;
             home = transform.position;

@@ -82,7 +82,7 @@ Biome `ash`: grey cracked ground with no grass, dead trees and falling ash.
 
 | Zone | Camps (level) |
 |---|---|
-| Oakhaven 1-2 | Harrow wood wolves (1-2), South copse boars (1-2), North pines wolves (2), Tall-grass stalkers (1-2, ambush), Brookside boars (2) |
+| Oakhaven 1-2 | Harrow wood wolves (1-2), South copse boars (1-2), North pines wolves (2), Tall-grass stalkers (1-2, ambush), Brookside boars (2); the Crowsfoot Hollow dungeon, all `harder`: Sandthrone deserters (3-5), Quartermaster Hesk (4, elite), Caddock, the Bandit King (5, elite) |
 | Khaven 3-5 | Whispering Wood wolves (3-4), Carrion boars (3-4, ambush), Sandthrone outrider camp (4-5), Gloom Creek hollows (5), The Grey Sexton (5, elite) |
 | Peaks 6-8 | Toll-gate guards (6-7), Wolf pines pack (6-7, ambush), Rockhide wallow (7), The High Ledge (8), Captain's eyrie (8, elite) |
 | Ash Rim 9-10 | Ash hound pack (9), Unwoven Flats eaters (9-10), Tear-marked shrine (9-10), Cinderfold hollows (10), The Weave-Eater brood (10, elite) |
@@ -208,36 +208,64 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
   - Capture tours hold fair weather for comparable shots, and add `80-weather-<kind>` shots (plus `81-...-pond` for rain).
 
 ## Caves you walk into (`Scripts/World/Hollow.cs`, `ZoneBuilder.Cavern`)
-- **Crowsfoot Hollow** (GAME-ONLY) is Oakhaven's cave, at the end of the North road in the north hills. It is the Sandthrone
-  deserters' hideout; there is no loading, you walk in.
-- **Data:** a `cavern` prop (`at` is the mouth, which faces -Z turned by `rotation`; `variant` picks the plan) plus a level
-  `shapes` pad under its floor.
-  - The passage (`Hollow`) comes from the plan: control points (x, z, half-width, height) smoothed into rings about every 0.7 m.
-  - It is worked out before the ground is painted, so everything else can ask whether a point is inside it and how deep.
+- **Crowsfoot Hollow** (GAME-ONLY) is Oakhaven's cave, at the end of the North road in the north hills: the Sandthrone
+  deserters' hideout, and the game's first dungeon (Chris, 2026-09-30: "the cave should be deep and the first foray into
+  dungeon crawling"). There is no loading; you walk in, and down.
+- **Data:** a `cavern` prop (`at` is the mouth, which faces -Z turned by `rotation`; `variant` picks the plan in
+  `ZoneBuilder.CavernPlan`) plus a level `shapes` pad at its mouth.
+  - The passage (`Hollow`) comes from the plan's rows (x, z, half-width, height, drop): x, z, width and height smoothed into
+    rings about every 0.7 m, the floor's drop below the mouth's ground straight between rows (the steepest row is the
+    steepest floor; none is over about 34 degrees, and feet and agents climb 45).
+  - It is worked out before the ground is built, so everything else can ask: is a point inside it (`Inside`), what floor is
+    under it (`FloorAt`, `ZoneBuilder.StandAt`), how deep in it is (`Depth`), and how much of the land it covers (`Cover`, only
+    where it runs within 3 m of the surface; deep under the land it leaves the land above alone).
 - **Build:**
-  - A lofted rock shell: faceted, faces both in and out, casting shadow both ways, one mesh collider, and a navmesh obstacle.
-  - Its floor is the levelled ground, painted bare earth.
-  - Crag lumps heap over and round it into a knoll. Each is checked to stay clear of the passage (tests hold it to that), and
-    has a collider and a navmesh obstacle.
-- **Inside Crowsfoot Hollow:**
-  - flickering torches down the walls;
-  - the deserters' camp round a fire (bedrolls, stolen grain, crates, a torn Sandthrone banner) in the first chamber;
-  - a low passage bending west;
-  - Caddock's hall: a plank throne on a stone dais between braziers, his banner, and "The deserters' plunder" (usable, for
-    the quest).
+  - The ground mesh leaves out every triangle with a corner inside the passage (`ZoneMeshes.Ground`'s cut); the rock shell,
+    thicker than a cell, covers the hole.
+  - A lofted rock shell: faceted, faces both in and out, casting shadow both ways, one mesh collider, in the navmesh.
+  - Its own floor mesh from wall foot to wall foot, earth over rock, walkable (navmesh), with a lip out of the mouth onto the
+    ground so the way in has no seam. The navmesh's bounds grow to reach it past the zone's edge (`Hollow.Reach`).
+  - Crag lumps heap over and round it into a knoll where it runs near the surface. Each is checked to stay clear of the
+    passage (tests hold it to that), and has a collider and a navmesh obstacle.
+- **The way down** (plan frame: mouth at the origin; the zone is at plus (-16, 90)):
+  - **The upper hollow:** the entrance passage north into the deserters' camp round a fire (bedrolls, stolen grain, crates,
+    barrels, a torn Sandthrone banner), then a low passage bending west.
+  - **The Drop:** a steep descent north, eleven metres down, with plank treads pegged across the floor and a rope rail on
+    posts down one wall. It takes the passage under the zone's north edge (its roof well under the boundary wall's foot) and
+    into the hills. The key to the strongbox hangs on a nail here.
+  - **The Store Caves**, 12.5 m down: the stolen stores stacked along the walls, the Quartermaster's desk (a plank on two
+    barrels, his ledger, a candle), a brazier, a side way choked with fallen rock, and the Quartermaster's strongbox.
+  - **The Deep Stair:** a winding passage east, down another three metres.
+  - **The Echoing Hall**, sixteen metres down under the northern hills, 18 m wide and 9 m high: stalagmites round its edges,
+    stalactites overhead, braziers, and at the far end Caddock's plank throne on a stone dais facing the way in, his banner
+    behind it, and "The deserters' plunder" (usable, for the quest).
+  - Flickering torches down the walls all the way (every twelfth one in the deep left dark); below 8 m, a faint blue-green
+    glow of fungus on the walls and puddles where water seeps.
+  - Braziers, the desk, the crate stacks and the plunder are solid: you and the deserters walk round them.
+- **Coming in:** a few metres in, the cave names itself on the banner over the levels of its camps ("LEVELS 3-5"), once each
+  time you go in.
 - **Light and air:**
   - With the camera's depth (0 at the mouth, 1 from about 10 m in), WorldClock cuts the skylight to a fifth, thickens the
     air to a smoky brown haze (fog 1.5-34 m), and drops sky reflections.
   - ZonePost lets the eye adjust (+30% exposure), makes firelight bloom, and adds vignette. Cloud shadows stop at the mouth.
-- **Weather:** nothing falls inside. `UnderRoof` counts the passage, and the rock is overhead.
+- **Weather:** nothing falls inside: the camera anywhere in the passage is sheltered, and no leaves or ash drift down through
+  the rock. `UnderRoof` counts the passage where it runs near the surface.
 - **Scatter:** no grass grows on the floor. Trees, bushes and edge rocks that land in it are built (their draws taken) and
   dropped, so the zone's layout elsewhere is unchanged.
-- **Camps:**
-  - Hollow lookouts: 2 on the road at the mouth.
-  - Deserters' camp: 4 at the fire.
-  - King's guard: 2 in the hall.
-  - Caddock's hall: Caddock, the Bandit King, elite, level 4.
-  - The deserters are levels 3-4.
+- **Standing in it:** camps, their respawns, secrets, and a save made down there all stand on the passage floor, not on the
+  land above (`ZoneBuilder.StandAt`). Nothing is used (E) through the rock: a prop or find inside can't be reached from the
+  hill over it, nor one outside from within.
+- **Camps** (all `harder`: up to three levels over Oakhaven's band):
+  - Hollow lookouts: 2 on the road at the mouth, level 3.
+  - Deserters' camp: 4 at the fire, levels 3-4.
+  - Drop sentries: 2 on the Drop, levels 3-4.
+  - Store Caves: 2, level 4, with **Quartermaster Hesk** (elite, level 4) at his desk.
+  - Deep Stair watch: 2, levels 4-5.
+  - King's guard: 3 in the hall, levels 4-5, and **Caddock, the Bandit King** (elite, level 5) before his throne.
+  - They come back slowly, as a dungeon's should: the lookouts in 5 minutes, the rest in 8 to 15.
+- **Loot:** deserters drop filed company badges; Hesk his stores; Caddock always drops **Caddock's Tin Crown** (head). The
+  Quartermaster's strongbox (a secret chest; its key is on the Drop) holds company silver, Hesk's Shuttered Lantern
+  (off-hand) and the King's orders (a Chronicle page).
 
 ## Secrets (hidden finds; `ZoneBuilder.BuildSecrets`)
 - **Data:** a zone's `secrets` (`ZoneSecret`, see ZoneDefinition.cs). Found and paid out by the encounter's DiscoveryLog: a lookout

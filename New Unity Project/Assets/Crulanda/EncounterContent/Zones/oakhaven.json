@@ -3,7 +3,7 @@
   "displayName": "Oakhaven",
   "subtitle": "An eastern farming village at the edge of the Wasting",
   "canonStatus": "CANON-EXPANDED",
-  "canonNote": "Canon: Oakhaven is an eastern agricultural hub erased by an accelerated, localized Wasting event that hid the Council's abduction of resonance candidates (interactive map; Oakhaven village map). This zone shows it on the eve of that erasure. Layout follows the canon village map. The Concord collectors, Mira and exact building placement are GAME-ONLY / PROVISIONAL. The wolf and boar camps and the south road to the Ashland Rim are GAME-ONLY. Crowsfoot Hollow (the cave at the end of the North road), its Sandthrone deserters and Caddock, the Bandit King are GAME-ONLY; the Sandthrone company is CANON.",
+  "canonNote": "Canon: Oakhaven is an eastern agricultural hub erased by an accelerated, localized Wasting event that hid the Council's abduction of resonance candidates (interactive map; Oakhaven village map). This zone shows it on the eve of that erasure. Layout follows the canon village map. The Concord collectors, Mira and exact building placement are GAME-ONLY / PROVISIONAL. The wolf and boar camps and the south road to the Ashland Rim are GAME-ONLY. Crowsfoot Hollow (the cave at the end of the North road, running deep under the northern hills), its Sandthrone deserters, Quartermaster Hesk and Caddock, the Bandit King are GAME-ONLY; the Sandthrone company is CANON.",
   "size": 260,
   "levelMin": 1,
   "levelMax": 2,
@@ -2237,7 +2237,7 @@
       "count": 2,
       "levelMin": 3,
       "levelMax": 3,
-      "respawn": 90,
+      "respawn": 300,
       "harder": true
     },
     {
@@ -2254,7 +2254,7 @@
       "count": 4,
       "levelMin": 3,
       "levelMax": 4,
-      "respawn": 90,
+      "respawn": 480,
       "harder": true
     },
     {
@@ -2264,14 +2264,14 @@
       "look": "deserter",
       "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
       "center": {
-        "x": -30.5,
-        "y": 114
+        "x": 2.6,
+        "y": 168.6
       },
       "radius": 3,
-      "count": 2,
+      "count": 3,
       "levelMin": 4,
-      "levelMax": 4,
-      "respawn": 120,
+      "levelMax": 5,
+      "respawn": 600,
       "harder": true
     },
     {
@@ -2281,15 +2281,84 @@
       "look": "banditking",
       "canonStatus": "GAME-ONLY",
       "center": {
-        "x": -34.6,
-        "y": 116.6
+        "x": -0.8,
+        "y": 175.6
       },
       "radius": 1.2,
+      "count": 1,
+      "levelMin": 5,
+      "levelMax": 5,
+      "elite": true,
+      "respawn": 900,
+      "harder": true
+    },
+    {
+      "name": "Drop sentries",
+      "mob": "Sandthrone deserter",
+      "tag": "deserter",
+      "look": "deserter",
+      "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
+      "center": {
+        "x": -28.7,
+        "y": 119.3
+      },
+      "radius": 1.2,
+      "count": 2,
+      "levelMin": 3,
+      "levelMax": 4,
+      "respawn": 480,
+      "harder": true
+    },
+    {
+      "name": "Store Caves",
+      "mob": "Sandthrone deserter",
+      "tag": "deserter",
+      "look": "deserter",
+      "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
+      "center": {
+        "x": -20.4,
+        "y": 140
+      },
+      "radius": 2.5,
+      "count": 2,
+      "levelMin": 4,
+      "levelMax": 4,
+      "respawn": 600,
+      "harder": true
+    },
+    {
+      "name": "The Quartermaster's desk",
+      "mob": "Quartermaster Hesk",
+      "tag": "quartermaster",
+      "look": "deserter",
+      "canonStatus": "GAME-ONLY",
+      "center": {
+        "x": -18.4,
+        "y": 142.6
+      },
+      "radius": 1,
       "count": 1,
       "levelMin": 4,
       "levelMax": 4,
       "elite": true,
-      "respawn": 300,
+      "respawn": 900,
+      "harder": true
+    },
+    {
+      "name": "Deep Stair watch",
+      "mob": "Sandthrone deserter",
+      "tag": "deserter",
+      "look": "deserter",
+      "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
+      "center": {
+        "x": -6.4,
+        "y": 151.9
+      },
+      "radius": 1.2,
+      "count": 2,
+      "levelMin": 4,
+      "levelMax": 5,
+      "respawn": 600,
       "harder": true
     }
   ],
@@ -2401,6 +2470,40 @@
       "text": "Pale bells glowing faintly in the copse's shade, this close to the grey. Hedge-wives say moonbells only grow where the ground is still sure of itself.",
       "item": "herb.moonbell",
       "xp": 20,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "secret.oakhaven.strongbox-key",
+      "name": "A Key on the Drop",
+      "kind": "key",
+      "at": {
+        "x": -26.2,
+        "y": 122.9
+      },
+      "radius": 2.5,
+      "height": 1.4,
+      "prompt": "Take the key down from its nail",
+      "text": "An iron key hangs on a nail driven into the rock, where a sentry on the Drop could reach it without looking.",
+      "xp": 15,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "secret.oakhaven.quartermasters-strongbox",
+      "name": "The Quartermaster's Strongbox",
+      "kind": "chest",
+      "at": {
+        "x": -19.3,
+        "y": 146.2
+      },
+      "radius": 2.5,
+      "rotation": 307,
+      "prompt": "Unlock the strongbox",
+      "needs": "secret.oakhaven.strongbox-key",
+      "text": "The band's pay chest, or what is left of it: a little company silver, the Quartermaster's own lantern, and the King's orders, copied fair.",
+      "xp": 60,
+      "gold": 18,
+      "item": "item.hesks_lantern",
+      "document": "doc.oakhaven.kings_orders",
       "canonStatus": "GAME-ONLY"
     }
   ]

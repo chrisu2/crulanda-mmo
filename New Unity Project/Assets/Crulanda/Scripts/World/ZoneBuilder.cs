@@ -172,6 +172,17 @@ namespace Crulanda.World
             return 1 - Mathf.SmoothStep(0, 1, (Vector2.Distance(p, s.center) - s.radius) / fade);
         }
         public Vector3 Ground(Vector2 p, float lift = 0) { return new Vector3(p.x, HeightAt(p.x, p.y) + lift, p.y); }
+        /// <summary>
+        /// Where to stand at a point: on the land, or on a cave passage's floor under it (Hollow), whichever is nearer the height
+        /// <paramref name="near"/> (where the thing was, or float.NegativeInfinity to prefer any passage floor): camps and their
+        /// respawns inside a cave, a save made down in one, and secrets tucked into one.
+        /// </summary>
+        public Vector3 StandAt(Vector2 p, float near, float lift = 0)
+        {
+            float land = HeightAt(p.x, p.y), floor = land;
+            if (Hollow.FloorUnder(p, ref floor) && (float.IsNegativeInfinity(near) || Mathf.Abs(near - floor) < Mathf.Abs(near - land))) return new Vector3(p.x, floor + lift, p.y);
+            return new Vector3(p.x, land + lift, p.y);
+        }
         static List<Vector2> Densify(Vector2[] pts, float step)
         {
             var list = new List<Vector2>();
@@ -378,7 +389,7 @@ namespace Crulanda.World
         void BuildGround()
         {
             var go = new GameObject("Ground"); go.transform.SetParent(transform, false); go.layer = 0;
-            var mesh = ZoneMeshes.Ground(Zone.size, GroundSegments, HeightAt);
+            var mesh = ZoneMeshes.Ground(Zone.size, GroundSegments, HeightAt, p => Hollow.InsideAny(p, .3f));   // no land inside a cave's passage
             var normals = mesh.normals; groundUp = new float[normals.Length]; for (int i = 0; i < normals.Length; i++) groundUp[i] = normals[i].y;
             var verts = mesh.vertices; groundN = normals; groundY = new float[verts.Length]; for (int i = 0; i < verts.Length; i++) groundY[i] = verts[i].y;
             GroundMesh = go.AddComponent<MeshFilter>(); GroundMesh.sharedMesh = mesh;
@@ -2681,16 +2692,26 @@ namespace Crulanda.World
                     Hollow.All.Add(new Hollow(string.IsNullOrEmpty(p.name) ? "cavern" : p.name, p.at, p.rotation, CavernPlan(p.variant), (x, z) => HeightAt(x, z)));
         }
         /// <summary>
-        /// A cavern's passage in its frame (mouth at the origin, facing -z): control points (x, z, half-width, height). Variant 0,
-        /// Crowsfoot Hollow: an entrance passage north into the camp chamber, a bend west through a low passage, and the deep hall.
+        /// A cavern's passage in its frame (mouth at the origin, facing -z): rows (x, z, half-width, height, floor drop below the
+        /// mouth's ground). Variant 0, Crowsfoot Hollow, the first dungeon: the entrance passage north into the deserters' camp; a
+        /// low passage west; the Drop, a steep stepped descent north that takes the passage under the zone's edge and into the
+        /// hills (its roof well under the edge's boundary); the Store Caves; a winding passage east down the Deep Stair; and the
+        /// Echoing Hall, sixteen metres down under the northern hills, where Caddock holds court. No stretch of floor is steeper
+        /// than about 34 degrees (feet and agents climb to 45).
         /// </summary>
-        static Vector4[] CavernPlan(int variant)
+        static float[][] CavernPlan(int variant)
         {
             return new[] {
-                new Vector4(0, -1.2f, 2.7f, 3.5f), new Vector4(0, 1.5f, 2.4f, 3.3f), new Vector4(.3f, 5, 2.5f, 3.4f), new Vector4(.6f, 8.5f, 4.4f, 4.4f),
-                new Vector4(1, 12, 6.4f, 5.6f), new Vector4(.5f, 15.5f, 6.1f, 5.4f), new Vector4(-1.5f, 18.5f, 4, 4.3f), new Vector4(-4.5f, 20.6f, 2.6f, 3.4f),
-                new Vector4(-8, 21.6f, 2.5f, 3.3f), new Vector4(-11.5f, 22.6f, 4.2f, 4.3f), new Vector4(-15, 24, 6.8f, 6.1f), new Vector4(-18.5f, 26, 6.4f, 5.9f),
-                new Vector4(-21, 28, 4, 4.6f), new Vector4(-22.4f, 29.4f, 1.8f, 2.4f), new Vector4(-23, 30, .3f, .4f) };
+                new[] { 0f, -1.2f, 2.7f, 3.5f, 0 }, new[] { 0f, 1.5f, 2.4f, 3.3f, 0 }, new[] { .3f, 5, 2.5f, 3.4f, 0 }, new[] { .6f, 8.5f, 4.4f, 4.4f, 0 },
+                new[] { 1f, 12, 6.4f, 5.6f, 0 }, new[] { .5f, 15.5f, 6.1f, 5.4f, 0 }, new[] { -1.5f, 18.5f, 4, 4.3f, 0 },
+                new[] { -4.5f, 20.6f, 2.6f, 3.4f, 0 }, new[] { -8f, 21.6f, 2.5f, 3.3f, -.2f },
+                new[] { -11.2f, 23.8f, 2.8f, 3.5f, -.8f }, new[] { -12.8f, 27.4f, 2.6f, 3.5f, -2.2f }, new[] { -12.6f, 31.2f, 2.5f, 3.6f, -4.4f },
+                new[] { -11.6f, 35, 2.6f, 3.7f, -7 }, new[] { -10.4f, 38.8f, 2.7f, 3.8f, -9.6f }, new[] { -9.2f, 42.4f, 3, 4, -11.4f },
+                new[] { -6.8f, 46.2f, 4.8f, 4.8f, -12.2f }, new[] { -4.4f, 50, 6, 5.4f, -12.5f }, new[] { -1.6f, 53.8f, 5.6f, 5.2f, -12.6f }, new[] { .8f, 57, 3.6f, 4.2f, -12.8f },
+                new[] { 3.6f, 59.6f, 2.5f, 3.3f, -13.1f }, new[] { 7.6f, 61.2f, 2.5f, 3.3f, -13.6f }, new[] { 11.8f, 62.6f, 2.6f, 3.4f, -14.3f }, new[] { 15.4f, 64.8f, 2.8f, 3.6f, -15.1f },
+                new[] { 17.6f, 68.6f, 3.8f, 4.4f, -15.7f },
+                new[] { 18.8f, 73.4f, 7.8f, 7.6f, -16 }, new[] { 18.6f, 78.6f, 9.2f, 8.8f, -16 }, new[] { 16.8f, 83.6f, 8.4f, 8.2f, -16 }, new[] { 14f, 87.4f, 4.6f, 5, -16 },
+                new[] { 12f, 89.6f, 1.8f, 2.2f, -16 }, new[] { 11.2f, 90.4f, .3f, .4f, -16 } };
         }
         /// <summary>
         /// A walk-in cave in a rocky knoll (GAME-ONLY: Crowsfoot Hollow, the Sandthrone deserters' hideout). You walk in off the road;
@@ -2829,6 +2850,7 @@ namespace Crulanda.World
             for (float s = 1.5f; s < h.Length; s += 2.3f)
             {
                 int i = 0; while (i + 1 < n && h.Along[i + 1] <= s) i++;
+                if (!h.NearSurface(i)) continue;   // deep under the land: nothing of the knoll shows
                 var fwd = new Vector3(-right[i].z, 0, right[i].x); float yaw = Mathf.Atan2(fwd.x, fwd.z) * Mathf.Rad2Deg;
                 // Crests: one or two rocks broken up out of the top, the bigger over the chambers.
                 for (int r = 0; r < 2; r++)
@@ -2856,57 +2878,178 @@ namespace Crulanda.World
                 Lump(BoulderAt((int)(R01 * 6)), t, p, new Vector3(size * 1.3f, size, size * 1.1f), loose, R01 * 360);
             }
 
-            // Inside: torches down the walls, alternating sides, set on the rock at about head height.
-            foreach (var (s, side) in new[] { (3.5f, 1), (9.5f, -1), (14.5f, 1), (19f, -1), (24.5f, 1), (28.5f, -1), (32.5f, 1), (36f, -1) })
+            // The floor: the passage's own, from wall foot to wall foot (the land is cut away inside, see ZoneMeshes.Ground), and a lip
+            // of it out of the mouth onto the ground outside, so the way in has no seam. Earth over rock; walkable (navmesh), solid.
             {
-                if (s > h.Length - 1) continue;
-                int i = 0; while (i + 1 < n && h.Along[i + 1] <= s) i++;
+                var fv = new List<Vector3>(); var fuv = new List<Vector2>(); var ft = new List<int>();
+                var outward = c[0] - c[1]; outward.y = 0; outward.Normalize();
+                for (int i = -1; i < n; i++)
+                {
+                    int r = Mathf.Max(0, i); Vector3 a = ring[r, 1], b = ring[r, P - 2];
+                    if (i < 0) { a += outward * 2.4f; b += outward * 2.4f; a.y = LocalGround(t, a.x, a.z) + .02f; b.y = LocalGround(t, b.x, b.z) + .02f; }   // over the land's cut edge
+                    else a.y = b.y = c[r].y;
+                    float fvv = (i < 0 ? -2.4f : h.Along[r]) / 2.4f;
+                    fv.Add(a); fv.Add(b); fuv.Add(new Vector2(0, fvv)); fuv.Add(new Vector2(Vector3.Distance(a, b) / 2.4f, fvv));
+                }
+                for (int i = 0; i < n; i++) { int o = i * 2; ft.AddRange(new[] { o, o + 2, o + 1, o + 1, o + 2, o + 3 }); }
+                if (Vector3.Cross(fv[ft[1]] - fv[ft[0]], fv[ft[2]] - fv[ft[0]]).y < 0) for (int q = 0; q < ft.Count; q += 3) { int sw = ft[q + 1]; ft[q + 1] = ft[q + 2]; ft[q + 2] = sw; }   // facing up
+                var floorMesh = new Mesh { name = h.Name + " floor" }; floorMesh.SetVertices(fv); floorMesh.SetUVs(0, fuv); floorMesh.SetTriangles(ft, 0); floorMesh.RecalculateNormals(); floorMesh.RecalculateBounds();
+                var ground = MeshPart(floorMesh, t, Vector3.zero, Tint(art.soil, new Color(.34f, .3f, .25f)));
+                ground.AddComponent<MeshCollider>().sharedMesh = floorMesh; ground.AddComponent<NavWalkable>();
+            }
+            // Where things stand inside: the passage floor under a point (in the root's frame), not the land far above it.
+            float FloorY(float x, float z)
+            {
+                var w = t.TransformPoint(new Vector3(x, 0, z)); int i = h.Nearest(new Vector2(w.x, w.z), out _);
+                return c[i].y;
+            }
+            int RingAt(float s) { int i = 0; while (i + 1 < n && h.Along[i + 1] <= s) i++; return i; }
+            Vector3 On(float s, float aside) { var w = h.At(s, aside); var l = t.InverseTransformPoint(w); l.y = c[RingAt(s)].y; return l; }
+            Quaternion Along(float s) { int i = RingAt(s); var f = new Vector3(-right[i].z, 0, right[i].x); return Quaternion.LookRotation(f); }
+            float Drop(int i) { return c[i].y - c[0].y; }
+            // The chambers, found from the passage itself: the widest ring down in the store caves' stretch, and the hall at the far end.
+            int widest(float from, float to) { int best = -1; for (int i = 0; i < n; i++) if (h.Along[i] >= from && h.Along[i] <= to && (best < 0 || h.Half[i] > h.Half[best])) best = i; return best; }
+            int store = widest(h.Length * .45f, h.Length * .7f), hall = widest(h.Length - 28, h.Length - 4);
+            // Solid where it stands: you walk round a brazier, the desk, a stack of crates or the plunder, and so do the deserters.
+            void Block(Vector3 at, Vector3 size, Quaternion rot)
+            {
+                var o = new GameObject("Solid"); o.transform.SetParent(t, false); o.transform.localPosition = at + rot * new Vector3(0, size.y / 2, 0); o.transform.localRotation = rot;
+                o.AddComponent<BoxCollider>().size = size; o.AddComponent<NavBlocker>();
+            }
+
+            // Inside: torches down the walls, alternating sides, set on the rock at about head height; every twelfth one in the deep
+            // left dark (the deserters don't waste pitch on every stretch).
+            int torchNo = 0;
+            for (float s = 3.5f; s < h.Length - 2; s += 6.6f, torchNo++)
+            {
+                int i = RingAt(s), side = torchNo % 2 == 0 ? 1 : -1;
+                if (Drop(i) < -10 && torchNo % 12 == 11) continue;
                 int best = side > 0 ? 1 : P - 2;
                 for (int k = 1; k < P - 1; k++)
                     if ((side > 0 ? k <= P / 2 : k >= P / 2) && Mathf.Abs(ring[i, k].y - c[i].y - 1.9f) < Mathf.Abs(ring[i, best].y - c[i].y - 1.9f)) best = k;
                 var wallAt = ring[i, best]; var inward = c[i] + Vector3.up * 1.9f - wallAt; inward.y = 0; inward.Normalize();
                 Torch(t, wallAt - inward * .05f, inward);
             }
-            // The camp chamber: a fire with a pot on a tripod, bedrolls round it, stolen grain, crates and barrels, a torn banner.
-            float Floor(float x, float z) { return LocalGround(t, x, z); }
             var hide = Tint(art.cloth, new Color(.5f, .4f, .29f)); var hide2 = Tint(art.cloth, new Color(.38f, .31f, .24f));
             var sand = Tint(art.cloth, new Color(.72f, .6f, .37f)); var wood = Tint(art.timber, new Color(.3f, .21f, .13f)); var sack = Tint(art.hay, new Color(.62f, .54f, .37f));
-            var fire = new Vector3(1.2f, Floor(1.2f, 12.6f), 12.6f);
+            var crate = Tint(art.timber, new Color(.44f, .32f, .2f)); var iron = Tint(art.metal, new Color(.2f, .19f, .19f));
+            // The camp chamber: a fire with a pot on a tripod, bedrolls round it, stolen grain, crates and barrels, a torn banner.
+            var fire = new Vector3(1.2f, FloorY(1.2f, 12.6f), 12.6f);
             Campfire(t, fire);
-            var iron = Tint(art.metal, new Color(.2f, .19f, .19f));
             for (int k = 0; k < 3; k++) { var q = Quaternion.Euler(0, k * 120, 0); Part(PrimitiveType.Cylinder, t, fire + q * new Vector3(0, .62f, .38f), new Vector3(.05f, .66f, .05f), wood, q * Quaternion.Euler(-26, 0, 0)); }
             Part(PrimitiveType.Cylinder, t, fire + new Vector3(0, .62f, 0), new Vector3(.42f, .2f, .42f), iron);   // the pot
             foreach (var deg in new[] { 55f, 115f, 235f, 300f })
             {
-                var q = Quaternion.Euler(0, deg, 0); var at = fire + q * new Vector3(0, 0, 2.9f); at.y = Floor(at.x, at.z);
+                var q = Quaternion.Euler(0, deg, 0); var at = fire + q * new Vector3(0, 0, 2.9f); at.y = FloorY(at.x, at.z);
                 Part(PrimitiveType.Cube, t, at + new Vector3(0, .07f, 0), new Vector3(.85f, .12f, 1.9f), deg < 180 ? hide : hide2, q);
                 Part(PrimitiveType.Cube, t, at + q * new Vector3(0, .17f, .75f), new Vector3(.55f, .14f, .3f), sand, q);   // a rolled cloak for a pillow
             }
-            for (int k = 0; k < 4; k++) Part(PrimitiveType.Sphere, t, new Vector3(4.4f + (k % 2) * .7f, Floor(4.6f, 9.8f) + .35f, 9.5f + k * .45f), new Vector3(.8f, .7f, .7f), sack, Quaternion.Euler(0, k * 40, k * 8));
-            Part(PrimitiveType.Sphere, t, new Vector3(3.6f, Floor(3.6f, 9.4f) + .12f, 9.4f), new Vector3(1.1f, .22f, .8f), Tint(art.hay, new Color(.8f, .72f, .5f)));   // spilt grain
-            for (int k = 0; k < 3; k++) Part(PrimitiveType.Cube, t, new Vector3(-3.9f + (k == 2 ? .45f : k * .9f), Floor(-3.5f, 15.6f) + (k == 2 ? 1.35f : .45f), 15.6f), Vector3.one * .9f, Tint(art.timber, new Color(.44f, .32f, .2f)), Quaternion.Euler(0, 12, 0));
-            for (int k = 0; k < 2; k++) Part(PrimitiveType.Cylinder, t, new Vector3(5.1f, Floor(5.1f, 13.6f) + .5f, 13.2f + k * .8f), new Vector3(.7f, .5f, .7f), wood);
-            Banner(t, new Vector3(-4.6f, Floor(-4.6f, 9.8f), 9.8f), 20, sand, wood, 2.9f);
+            for (int k = 0; k < 4; k++) Part(PrimitiveType.Sphere, t, new Vector3(4.4f + (k % 2) * .7f, FloorY(4.6f, 9.8f) + .35f, 9.5f + k * .45f), new Vector3(.8f, .7f, .7f), sack, Quaternion.Euler(0, k * 40, k * 8));
+            Part(PrimitiveType.Sphere, t, new Vector3(3.6f, FloorY(3.6f, 9.4f) + .12f, 9.4f), new Vector3(1.1f, .22f, .8f), Tint(art.hay, new Color(.8f, .72f, .5f)));   // spilt grain
+            for (int k = 0; k < 3; k++) Part(PrimitiveType.Cube, t, new Vector3(-3.9f + (k == 2 ? .45f : k * .9f), FloorY(-3.5f, 15.6f) + (k == 2 ? 1.35f : .45f), 15.6f), Vector3.one * .9f, crate, Quaternion.Euler(0, 12, 0));
+            for (int k = 0; k < 2; k++) Part(PrimitiveType.Cylinder, t, new Vector3(5.1f, FloorY(5.1f, 13.6f) + .5f, 13.2f + k * .8f), new Vector3(.7f, .5f, .7f), wood);
+            Banner(t, new Vector3(-4.6f, FloorY(-4.6f, 9.8f), 9.8f), 20, sand, wood, 2.9f);
             // The low passage: a dropped sack, a spent torch.
-            Part(PrimitiveType.Sphere, t, new Vector3(-7.4f, Floor(-7.4f, 20.6f) + .3f, 20.6f), new Vector3(.7f, .55f, .6f), sack, Quaternion.Euler(0, 30, 20));
-            Part(PrimitiveType.Cylinder, t, new Vector3(-9.8f, Floor(-9.8f, 22.9f) + .05f, 22.9f), new Vector3(.06f, .35f, .06f), wood, Quaternion.Euler(0, 40, 88));
-            // The deep hall: the throne on its dais facing the way in, braziers either side, the banner behind, the plunder.
-            var seat = new Vector3(-20.3f, Floor(-20.3f, 27.8f), 27.8f); var toDoor = new Vector3(-11.5f, 0, 22.6f) - seat; toDoor.y = 0;
-            var face = Quaternion.LookRotation(toDoor.normalized);
-            Throne(t, seat, face, sand, wood);
-            foreach (int k in new[] { -1, 1 }) { var at = seat + face * new Vector3(k * 2.2f, 0, .4f); at.y = Floor(at.x, at.z); Brazier(t, at, null); }
-            Banner(t, seat + face * new Vector3(0, 0, -1.6f), face.eulerAngles.y, sand, wood, 3.6f);
-            var loot = new GameObject("The deserters' plunder").transform; loot.SetParent(t, false);
-            var lootAt = seat + face * new Vector3(-3.3f, 0, .6f); lootAt.y = Floor(lootAt.x, lootAt.z); loot.localPosition = lootAt; loot.localRotation = face;
-            for (int k = 0; k < 3; k++) Part(PrimitiveType.Cube, loot, new Vector3(k == 2 ? .1f : k * .9f - .45f, k == 2 ? 1.35f : .45f, 0), Vector3.one * .9f, Tint(art.timber, new Color(.42f, .31f, .19f)), Quaternion.Euler(0, k * 9, 0));
-            for (int k = 0; k < 4; k++) Part(PrimitiveType.Sphere, loot, new Vector3(-1.3f + k * .35f, .3f, .9f + (k % 2) * .3f), new Vector3(.75f, .6f, .65f), sack, Quaternion.Euler(0, k * 50, 0));
-            Part(PrimitiveType.Cube, loot, new Vector3(1.4f, .3f, .8f), new Vector3(.9f, .6f, .6f), Tint(art.timber, new Color(.3f, .2f, .12f)));   // a chest
-            Part(PrimitiveType.Cube, loot, new Vector3(1.4f, .68f, .56f), new Vector3(.92f, .08f, .62f), Tint(art.timber, new Color(.3f, .2f, .12f)), Quaternion.Euler(-38, 0, 0));   // its lid, thrown back
-            var gold = Glowing(new Color(1, .78f, .3f), .5f);
-            for (int k = 0; k < 7; k++) Part(PrimitiveType.Sphere, loot, new Vector3(1.2f + (k % 3) * .17f, .62f + (k / 3) * .04f, .75f + (k % 2) * .14f), new Vector3(.14f, .05f, .14f), gold);
-            Interactables.Add(new ZoneInteractable { name = loot.name, prompt = "Search the deserters' plunder", kind = "crates", position = loot.position, root = loot });
-            foreach (var at in new[] { new Vector2(-14.2f, 28.3f), new Vector2(-17.5f, 20.2f), new Vector2(-12.4f, 26.1f) })
-                for (int k = 0; k < 2; k++) Part(PrimitiveType.Cylinder, t, new Vector3(at.x + k * .2f, Floor(at.x, at.y) + .05f, at.y), new Vector3(.07f, .3f, .07f), Bone, Quaternion.Euler(0, k * 70 + at.x * 10, 90));
+            Part(PrimitiveType.Sphere, t, new Vector3(-7.4f, FloorY(-7.4f, 20.6f) + .3f, 20.6f), new Vector3(.7f, .55f, .6f), sack, Quaternion.Euler(0, 30, 20));
+            Part(PrimitiveType.Cylinder, t, new Vector3(-9.8f, FloorY(-9.8f, 22.9f) + .05f, 22.9f), new Vector3(.06f, .35f, .06f), wood, Quaternion.Euler(0, 40, 88));
+
+            // The Drop, and wherever the floor runs steep: plank treads pegged across it and a rope rail on posts down one wall.
+            float lastPost = -9;
+            for (float s = 0; s < h.Length - 1; s += .55f)
+            {
+                int i = RingAt(s), j = Mathf.Min(n - 1, i + 2); float run = h.Along[j] - h.Along[i];
+                if (run <= 0 || (c[i].y - c[j].y) / run < .28f) continue;
+                var q = Along(s); float w = h.Half[i] * .62f;
+                Part(PrimitiveType.Cube, t, On(s, 0) + Vector3.up * .04f, new Vector3(w * 2, .07f, .3f), wood, q);
+                if (s - lastPost < 2.4f) continue;
+                var post = On(s, h.Half[i] * .72f);
+                Part(PrimitiveType.Cylinder, t, post + Vector3.up * .55f, new Vector3(.07f, .55f, .07f), wood);
+                if (lastPost > 0) { var prev = On(lastPost, h.Half[RingAt(lastPost)] * .72f) + Vector3.up * 1.05f; var top = post + Vector3.up * 1.05f; var d = top - prev;
+                    Part(PrimitiveType.Cylinder, t, (prev + top) / 2, new Vector3(.035f, d.magnitude / 2, .035f), Tint(art.hay, new Color(.55f, .47f, .32f)), Quaternion.FromToRotation(Vector3.up, d)); }
+                lastPost = s;
+            }
+            // The deep: a faint blue-green glow of fungus on the walls, little lights of it every so often; puddles where water seeps.
+            var fungus = Glowing(new Color(.3f, .95f, .8f), .9f); var puddle = Tint(art.stone, new Color(.2f, .18f, .15f));   // wet rock, a shade under the floor (metal went black in the dark: no reflections in a cave)
+            for (float s = 0; s < h.Length - 2; s += 2.8f)
+            {
+                int i = RingAt(s); if (Drop(i) > -8) continue;
+                foreach (int side in new[] { -1, 1 })
+                {
+                    if (R01 < .45f) continue;
+                    int k = side > 0 ? 2 + (int)(R01 * 3) : P - 3 - (int)(R01 * 3);
+                    var at = ring[i, k]; var inward = c[i] + Vector3.up * (at.y - c[i].y) - at; inward.y = 0; inward.Normalize();
+                    for (int f = 0; f < 3 + (int)(R01 * 3); f++)
+                        Part(PrimitiveType.Sphere, t, at + inward * .06f + new Vector3((R01 - .5f) * .6f, (R01 - .5f) * .5f, (R01 - .5f) * .6f), new Vector3(.16f + R01 * .1f, .05f, .12f + R01 * .08f), fungus, Quaternion.LookRotation(inward) * Quaternion.Euler(90, 0, 0));
+                }
+                if ((int)(s / 2.8f) % 5 == 0) Glow(t, c[i] + Vector3.up * 1.2f, 6, .45f, new Color(.35f, .95f, .82f), .45f);
+                if (R01 < .3f) Part(PrimitiveType.Cylinder, t, On(s, (R01 - .5f) * h.Half[i]) + Vector3.up * .015f, new Vector3(.9f + R01 * .8f, .01f, .6f + R01 * .6f), puddle, Along(s) * Quaternion.Euler(0, R01 * 90, 0));
+            }
+            // The Store Caves: the stolen stores stacked along the walls, the Quartermaster's desk (a plank on two barrels, his
+            // ledger and a candle), and a side way choked with fallen rock.
+            if (store >= 0)
+            {
+                float s0 = h.Along[store]; var q0 = Along(s0);
+                for (int k = 0; k < 5; k++)
+                {
+                    var at = On(s0 - 3 + k * 1.4f, (k % 2 == 0 ? 1 : -1) * h.Half[RingAt(s0 - 3 + k * 1.4f)] * .7f);
+                    for (int stack = 0; stack < 1 + k % 3; stack++) Part(PrimitiveType.Cube, t, at + Vector3.up * (.45f + stack * .9f), Vector3.one * .9f, crate, q0 * Quaternion.Euler(0, k * 17 + stack * 9, 0));
+                    Block(at, new Vector3(1.05f, .9f * (1 + k % 3), 1.05f), q0 * Quaternion.Euler(0, k * 17 + 9, 0));
+                    Part(PrimitiveType.Sphere, t, at + q0 * new Vector3(0, .35f, 1.1f), new Vector3(.8f, .7f, .7f), sack, Quaternion.Euler(0, k * 40, 0));
+                }
+                var desk = On(s0 + 1.5f, -h.Half[store] * .45f);
+                foreach (int b in new[] { -1, 1 }) Part(PrimitiveType.Cylinder, t, desk + q0 * new Vector3(b * .7f, .45f, 0), new Vector3(.55f, .45f, .55f), wood);
+                Part(PrimitiveType.Cube, t, desk + Vector3.up * .95f, new Vector3(2, .08f, .8f), wood, q0);
+                Part(PrimitiveType.Cube, t, desk + q0 * new Vector3(-.3f, 1.03f, 0), new Vector3(.4f, .06f, .3f), Tint(art.cloth, new Color(.4f, .22f, .14f)), q0 * Quaternion.Euler(0, 8, 0));   // the ledger
+                Part(PrimitiveType.Cylinder, t, desk + q0 * new Vector3(.5f, 1.1f, .1f), new Vector3(.06f, .08f, .06f), Tint(art.plaster, new Color(.9f, .86f, .75f)));   // a candle
+                Glow(t, desk + q0 * new Vector3(.5f, 1.4f, .1f), 5, .9f, new Color(1, .7f, .4f), .9f).gameObject.AddComponent<Flicker>();
+                Block(desk, new Vector3(2.1f, 1, .9f), q0);
+                var warm = On(s0 - 1.5f, h.Half[store] * .3f); Brazier(t, warm, null); Block(warm, new Vector3(.8f, 1.2f, .8f), Quaternion.identity);   // off the way through
+                // The choked side way: a dark mouth in the left wall and a heap of fallen rock across it.
+                int sw2 = Mathf.Min(n - 1, store + 3); var wall = ring[sw2, P - 5]; var inw = c[sw2] + Vector3.up * (wall.y - c[sw2].y) - wall; inw.y = 0; inw.Normalize();
+                Part(PrimitiveType.Sphere, t, wall - inw * .1f + Vector3.up * .3f, new Vector3(2.2f, 2.6f, .6f), Tint(art.stone, new Color(.03f, .03f, .03f)), Quaternion.LookRotation(inw));
+                for (int k = 0; k < 7; k++) Lump(BoulderAt(k), t, wall + inw * (.3f + (k % 3) * .35f) + new Vector3((R01 - .5f) * 1.6f, .2f + (k / 3) * .35f, (R01 - .5f) * 1.6f), Vector3.one * (.55f + R01 * .5f), Tint(art.stone, new Color(.38f, .36f, .33f)), R01 * 360);
+            }
+            // The Echoing Hall: stalagmites round its edges, stalactites overhead, and at the far end the throne on its dais facing the
+            // way in, braziers either side, the banner behind, the plunder.
+            if (hall >= 0)
+            {
+                var stone = Tint(art.stone, new Color(.4f, .37f, .34f));
+                if (cone == null) cone = ZoneMeshes.Cone(1, 1);
+                for (int i = 0; i < n; i++)
+                {
+                    if (h.Half[i] < 6 || h.Along[i] < h.Length - 30 || i % 2 == 1) continue;
+                    foreach (int side in new[] { -1, 1 })
+                    {
+                        if (R01 < .35f) continue;
+                        float off = h.Half[i] * (.72f + R01 * .18f) * side, tall = 1 + R01 * 1.8f;
+                        var baseAt = c[i] + right[i] * off; baseAt.y = c[i].y - .1f;
+                        MeshPart(cone, t, baseAt, stone).transform.localScale = new Vector3(.35f + R01 * .35f, tall, .35f + R01 * .35f);
+                        var hang = c[i] + right[i] * (off * .75f) + Vector3.up * h.Height[i] * .92f;
+                        MeshPart(cone, t, hang, stone, Quaternion.Euler(180, R01 * 360, 0)).transform.localScale = new Vector3(.25f + R01 * .25f, .8f + R01 * 1.4f, .25f + R01 * .25f);
+                    }
+                }
+                float sEnd = h.Length - 4.2f; var seat = On(sEnd, 0); var toDoor = On(h.Length - 20, 0) - seat; toDoor.y = 0;
+                var face = Quaternion.LookRotation(toDoor.normalized);
+                Throne(t, seat, face, sand, wood);
+                foreach (int k in new[] { -1, 1 }) { var at = seat + face * new Vector3(k * 2.4f, 0, .6f); at.y = FloorY(at.x, at.z); Brazier(t, at, null); Block(at, new Vector3(.8f, 1.2f, .8f), Quaternion.identity); }
+                foreach (int k in new[] { -1, 1 }) { var at = On(h.Along[hall], k * h.Half[hall] * .6f); Brazier(t, at, null); Block(at, new Vector3(.8f, 1.2f, .8f), Quaternion.identity); }
+                Banner(t, seat + face * new Vector3(0, 0, -1.6f), face.eulerAngles.y, sand, wood, 3.6f);
+                var loot = new GameObject("The deserters' plunder").transform; loot.SetParent(t, false);
+                var lootAt = seat + face * new Vector3(-3.4f, 0, .9f); lootAt.y = FloorY(lootAt.x, lootAt.z); loot.localPosition = lootAt; loot.localRotation = face;
+                Block(lootAt, new Vector3(1.9f, 1.8f, 1), face);   // the crates; the sacks and the open chest in front stay underfoot
+                for (int k = 0; k < 3; k++) Part(PrimitiveType.Cube, loot, new Vector3(k == 2 ? .1f : k * .9f - .45f, k == 2 ? 1.35f : .45f, 0), Vector3.one * .9f, Tint(art.timber, new Color(.42f, .31f, .19f)), Quaternion.Euler(0, k * 9, 0));
+                for (int k = 0; k < 4; k++) Part(PrimitiveType.Sphere, loot, new Vector3(-1.3f + k * .35f, .3f, .9f + (k % 2) * .3f), new Vector3(.75f, .6f, .65f), sack, Quaternion.Euler(0, k * 50, 0));
+                Part(PrimitiveType.Cube, loot, new Vector3(1.4f, .3f, .8f), new Vector3(.9f, .6f, .6f), Tint(art.timber, new Color(.3f, .2f, .12f)));   // a chest
+                Part(PrimitiveType.Cube, loot, new Vector3(1.4f, .68f, .56f), new Vector3(.92f, .08f, .62f), Tint(art.timber, new Color(.3f, .2f, .12f)), Quaternion.Euler(-38, 0, 0));   // its lid, thrown back
+                var gold = Glowing(new Color(1, .78f, .3f), .5f);
+                for (int k = 0; k < 7; k++) Part(PrimitiveType.Sphere, loot, new Vector3(1.2f + (k % 3) * .17f, .62f + (k / 3) * .04f, .75f + (k % 2) * .14f), new Vector3(.14f, .05f, .14f), gold);
+                Interactables.Add(new ZoneInteractable { name = loot.name, prompt = "Search the deserters' plunder", kind = "crates", position = loot.position, root = loot });
+                for (int k = 0; k < 4; k++)
+                {
+                    var at = On(h.Along[hall] + (R01 - .5f) * 8, (R01 - .5f) * h.Half[hall]);
+                    for (int b = 0; b < 2; b++) Part(PrimitiveType.Cylinder, t, at + new Vector3(b * .2f, .05f, 0), new Vector3(.07f, .3f, .07f), Bone, Quaternion.Euler(0, b * 70 + k * 40, 90));
+                }
+            }
         }
         /// <summary>A pitch torch in a wall: a short stick leaning out of the rock, its glowing head and flame, a flickering light.</summary>
         void Torch(Transform t, Vector3 wallAt, Vector3 inward)
@@ -3134,7 +3277,10 @@ namespace Crulanda.World
                 var at = s.at;
                 if (s.kind == "herb" || (s.kind != "vista" && scene != null)) at = SecretClear(at, scene == "camp" ? 1.9f : scene == "log" ? 1.5f : scene == "rocks" ? .9f : .5f);
                 var t = new GameObject("Secret: " + (string.IsNullOrEmpty(s.name) ? s.id : s.name)).transform; t.SetParent(all, false);
-                t.position = Ground(at); t.rotation = Quaternion.Euler(0, s.rotation, 0);
+                t.position = StandAt(at, float.NegativeInfinity); t.rotation = Quaternion.Euler(0, s.rotation, 0);   // in a cave: on its floor
+                // In a cave, a key on its nail or a page in a crack hangs on the rock itself: the nearest wall at its height, facing out.
+                if ((s.kind == "key" || s.kind == "note") && CaveWall(t.position + Vector3.up * s.height, out var wallAt, out var outOf))
+                { t.position = new Vector3(wallAt.x, t.position.y, wallAt.z) + outOf * .03f; t.rotation = Quaternion.LookRotation(-outOf); }
                 var item = new GameObject(s.kind).transform; item.SetParent(t, false); item.localPosition = Vector3.up * s.height;
                 switch (s.kind)
                 {
@@ -3185,6 +3331,25 @@ namespace Crulanda.World
             for (float d = .5f; d <= 2.51f; d += .5f)
                 for (int k = 0; k < 8; k++) { var q = at + new Vector2(Mathf.Cos(k * Mathf.PI / 4), Mathf.Sin(k * Mathf.PI / 4)) * d; if (Clear(q)) return q; }
             return at;
+        }
+        /// <summary>
+        /// The rock of a cave passage (Hollow) nearest a point in it, at the point's height: where a level ray from the passage's
+        /// middle out through the point meets the shell, and the level direction out of the rock there. False outside a passage.
+        /// </summary>
+        bool CaveWall(Vector3 p, out Vector3 wall, out Vector3 outOf)
+        {
+            wall = outOf = Vector3.zero; var q = new Vector2(p.x, p.z); var ground = GroundMesh != null ? GroundMesh.GetComponent<Collider>() : null;
+            foreach (var h in Hollow.All)
+            {
+                if (!h.FloorAt(q, out _)) continue;
+                int i = h.Nearest(q, out _); var from = new Vector3(h.Centre[i].x, p.y, h.Centre[i].z); var dir = p - from; dir.y = 0;
+                if (dir.sqrMagnitude < .01f) return false;
+                float best = float.MaxValue;
+                foreach (var hit in Physics.RaycastAll(from, dir.normalized, h.Half[i] * 1.6f + 1, ~0, QueryTriggerInteraction.Ignore))
+                    if (hit.collider is MeshCollider && hit.collider != ground && hit.distance < best) { best = hit.distance; wall = hit.point; outOf = -dir.normalized; }
+                return best < float.MaxValue;
+            }
+            return false;
         }
         /// <summary>Stone for a find's scene (cairns, stones), in the zone's own rock.</summary>
         Material SecretStone(float shade = 1)

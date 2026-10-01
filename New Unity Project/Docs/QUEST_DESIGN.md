@@ -3,7 +3,7 @@
 Status 2026-09-29: the **framework is implemented** (section 7). Oakhaven has 10 quests: Chronicle I and II, six NPC quests
 and two faction introductions. The Hollow Men, the well at night, Khaven content and Sandthrone contracts are still design only.
 2026-09-30: quests can wait for a level (`minLevel`, section 7), and Oakhaven has its first side quest, **The Tin Crown**
-(Crowsfoot Hollow, level 3; section 5).
+(Crowsfoot Hollow, level 4, from level 3; section 5). The same night Crowsfoot Hollow became the first dungeon, 16 m deep.
 Lore sources: `D:\code\crulanda` (world_bible.md, series_overview.md, book1\chapter_4.md, chapter_5.md, chapter_20.md,
 ledger_of_souls.md). Labels:
 - CANON: stated in the books.
@@ -107,18 +107,23 @@ shown. The main quest can foreshadow it (the Void-Seed and the straight grey lin
 
 ### Side quest: *The Tin Crown* (GAME-ONLY quest; CANON faction, the Sandthrone)
 Chris's brief: "a quest appears at lvl 3 to take out the bandit and bandit king in the cave so they stop harassing the villagers".
-- **Crowsfoot Hollow** (GAME-ONLY) is the walk-in cave where the North road ends in the hills north of the village: a camp
-  of **Sandthrone deserters** in the first chamber, lookouts at the mouth, and the hall of **Caddock, the Bandit King** (elite)
-  at the end of the western bend. The Sandthrone are the canon mercenary company that holds the Peaks toll; this band walked
-  away from it and lives off Oakhaven's farms.
+- **Crowsfoot Hollow** (GAME-ONLY) is the walk-in cave where the North road ends in the hills north of the village, and the
+  game's first dungeon (Chris: "the cave should be deep and the first foray into dungeon crawling"): lookouts at the mouth,
+  a camp of **Sandthrone deserters** in the first chamber, sentries down the Drop, **Quartermaster Hesk** (elite) and his
+  guards in the Store Caves, a watch on the Deep Stair, and sixteen metres down, the Echoing Hall of **Caddock, the Bandit
+  King** (elite) and his guard. Levels 3-5. The Sandthrone are the canon mercenary company that holds the Peaks toll; this
+  band walked away from it and lives off Oakhaven's farms. Layout: `WORLD_ZONES.md` "Caves you walk into".
 - **Caddock** is GAME-ONLY: a deserter sergeant who crowned himself with beaten tin. No canon Sandthrone name is used.
 - **Giver and turn-in:** Wil Carder, the farmer whose barn they emptied (Garet Moss tracked them to the hollow).
-- **Level 3, minLevel 3:** nothing shows before level 3, then a gold !.
+- **Level 4, minLevel 3:** nothing shows before level 3, then a gold !. (It was level 3 until the hollow went deep; level 4
+  sits in the middle of the dungeon's 3-5.)
 - **Steps:**
   1. Kill 6 deserters and Caddock, in either order.
   2. Search the deserters' plunder in his hall.
   3. Return to Wil.
-- **Rewards:** 110 XP, 20 gold, +300 Oakhaven Folk.
+- **Rewards:** 190 XP, 25 gold, +300 Oakhaven Folk. The dungeon pays too: Caddock always drops **Caddock's Tin Crown**
+  (head), and the Quartermaster's strongbox (a secret; its key hangs on the Drop) holds **Hesk's Shuttered Lantern** and
+  a Chronicle page, **By Order of the King**.
 - **Looks:** the deserters wear the company's sand gone to dirt: a torn tabard over company mail, a hood or head-wrap, an ochre
   scarf over the face, one leather pauldron and one mail sleeve, a falchion or a club. Each is put together differently.
   Caddock wears a long dark coat, the torn company sash, a crooked crown of beaten tin, and carries a two-handed cleaver.

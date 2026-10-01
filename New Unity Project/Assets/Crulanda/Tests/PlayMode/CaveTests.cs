@@ -51,7 +51,19 @@ namespace Crulanda.Tests
             var zone = ZoneBuilder.Active;
             Assert.IsTrue(NavMesh.SamplePosition(zone.Ground(zone.Zone.spawns.recovery, .2f), out var a, 2, NavMesh.AllAreas));
             Assert.IsTrue(NavMesh.SamplePosition(h.At(h.Length - 7) + Vector3.up * .2f, out var b, 2, NavMesh.AllAreas), "The hall's floor is on the navmesh.");
-            var path = new NavMeshPath(); NavMesh.CalculatePath(a.position, b.position, NavMesh.AllAreas, path);
+            var path = new NavMeshPath();
+            // Leg by leg down the passage first, so a break says where it is: in at the mouth, then every 6 m to the hall.
+            var outside = h.At(0) + (h.At(0) - h.At(3)).normalized * 6; outside.y = zone.HeightAt(outside.x, outside.z);
+            Assert.IsTrue(NavMesh.SamplePosition(outside + Vector3.up * .2f, out var before, 2, NavMesh.AllAreas), "The road below the mouth is on the navmesh.");
+            var from = before.position;
+            for (float s = 3; s < h.Length - 7 + 6; s += 6)
+            {
+                var at = h.At(Mathf.Min(s, h.Length - 7)) + Vector3.up * .2f;
+                Assert.IsTrue(NavMesh.SamplePosition(at, out var next, 2, NavMesh.AllAreas), "The floor " + s + " m in is on the navmesh (" + at + ").");
+                Assert.IsTrue(NavMesh.CalculatePath(from, next.position, NavMesh.AllAreas, path) && path.status == NavMeshPathStatus.PathComplete, "Walkable from " + from + " to " + next.position + " (" + s + " m in).");
+                from = next.position;
+            }
+            NavMesh.CalculatePath(a.position, b.position, NavMesh.AllAreas, path);
             Assert.AreEqual(NavMeshPathStatus.PathComplete, path.status, "A way in from the green.");
             foreach (var corner in path.corners) Assert.Less(corner.y, zone.HeightAt(corner.x, corner.z) + 1.2f, "On the ground all the way (through the mouth, not over the knoll): " + corner);
             yield return null;
@@ -109,6 +121,65 @@ namespace Crulanda.Tests
             Assert.IsNotNull(king, "Caddock is there."); Assert.IsTrue(king.Elite, "and elite");
             Assert.Greater(h.Depth(king.transform.position + Vector3.up), .9f, "Caddock holds the deep hall.");
             Assert.GreaterOrEqual(band.Count(e => h.Depth(e.transform.position + Vector3.up) > .5f), 7, "All but the lookouts are inside.");
+            yield return null;
+        }
+        [UnityTest] public IEnumerator The_hollow_runs_deep_under_the_northern_hills()
+        {
+            var h = Crowsfoot; var zone = ZoneBuilder.Active;
+            Assert.Less(h.Centre[h.Centre.Count - 1].y, h.Centre[0].y - 14, "The Echoing Hall lies fourteen metres and more below the mouth.");
+            Assert.Greater(h.Centre[h.Centre.Count - 1].z, zone.Half + 20, "It runs on under the hills past the zone's edge.");
+            Assert.Greater(h.Length, 100, "A dungeon, not a hole in a hill.");
+            // Where it passes under the zone's northern boundary, its roof is under the boundary wall's foot.
+            for (int i = 0; i < h.Centre.Count; i++)
+                if (Mathf.Abs(h.Centre[i].z - (zone.Half - 1)) < 1.2f) Assert.Less(h.Roof(i), -1, "Under the boundary at " + h.Centre[i]);
+            yield return null;
+        }
+
+        [UnityTest] public IEnumerator No_land_shows_inside_the_passage()
+        {
+            var h = Crowsfoot;
+            for (float s = 1; s < h.Length - 2; s += 1.1f)
+            {
+                var mid = h.At(s) + Vector3.up * 1.2f;
+                // The nearest thing overhead and underfoot is the cave's own rock and floor, never the zone's ground mesh.
+                var up = Physics.RaycastAll(mid, Vector3.up, 30).Where(x => x.collider.GetComponentInParent<Crulanda.Gameplay.Actor>() == null).OrderBy(x => x.distance).FirstOrDefault();
+                var down = Physics.RaycastAll(mid, Vector3.down, 30).Where(x => x.collider.GetComponentInParent<Crulanda.Gameplay.Actor>() == null).OrderBy(x => x.distance).FirstOrDefault();
+                Assert.IsTrue(up.collider != null && OfTheCave(up.collider), "Overhead " + s + " m in: " + (up.collider != null ? up.collider.name : "sky"));
+                Assert.IsTrue(down.collider != null && OfTheCave(down.collider), "Underfoot " + s + " m in: " + (down.collider != null ? down.collider.name : "nothing"));
+                Assert.AreEqual(h.At(s).y, down.point.y, .35f, "The floor is where the passage says, " + s + " m in.");
+            }
+            yield return null;
+        }
+
+        [UnityTest] public IEnumerator You_can_stand_on_every_floor_down_to_the_hall()
+        {
+            // Stood on the floor at each stage of the way down (the Drop, the Store Caves, the Deep Stair, the hall), you stay there:
+            // no falling through, and the fall-out-of-the-world catch leaves a deep cave floor alone.
+            var h = Crowsfoot; var session = UnityEngine.Object.FindFirstObjectByType<EncounterSession>();
+            foreach (var e in session.Enemies) if (e != null) e.enabled = false;   // the band holds still
+            var motor = session.Player.GetComponent<AdventurerMotor>();
+            foreach (float f in new[] { .3f, .5f, .65f, .8f, 1 })
+            {
+                var at = h.At(Mathf.Min(h.Length * f, h.Length - 5)) + Vector3.up * 1.1f;
+                motor.Teleport(at);
+                for (float t = 0; t < 1; t += Time.deltaTime) yield return null;
+                var p = session.Player.transform.position;
+                Assert.Less(Vector3.Distance(p, at), 2, "Still standing " + Mathf.RoundToInt(h.Length * f) + " m in, " + (at.y - h.Centre[0].y).ToString("0.0") + " m down (now at " + p + ").");
+            }
+            foreach (var e in session.Enemies) if (e != null) e.enabled = true;
+        }
+
+        [UnityTest] public IEnumerator Every_camp_in_the_hollow_stands_on_its_floor()
+        {
+            var h = Crowsfoot; var session = UnityEngine.Object.FindFirstObjectByType<EncounterSession>();
+            var inside = session.Enemies.FindAll(e => e != null && e.actor.IsAlive && h.Depth(e.transform.position + Vector3.up) > .3f);
+            Assert.GreaterOrEqual(inside.Count, 14, "The camp, the Drop, the Store Caves, the Deep Stair and the Hall are all manned.");
+            foreach (var e in inside)
+            {
+                int i = h.Nearest(new Vector2(e.transform.position.x, e.transform.position.z), out _);
+                Assert.AreEqual(h.Centre[i].y, e.transform.position.y, 1.6f, e.actor.DisplayName + " stands on the passage floor");
+            }
+            Assert.IsTrue(session.Enemies.Exists(e => e != null && e.persistentId != null && e.persistentId.StartsWith("mob.quartermaster.")), "Quartermaster Hesk keeps the Store Caves.");
             yield return null;
         }
     }

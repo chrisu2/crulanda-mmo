@@ -496,3 +496,47 @@ Chris shared a reference of a stylized fantasy cove and chose this look for Oakh
   - PlayMode `DiscoveryTests` (5): a lookout by walking on and paying once; a cache paying XP, gold, its item and its page;
     the key and chest; save, load and reload never paying twice; the book's counts, and no map mark.
   - PlayMode `SecretPlacementTests` (2): every secret placed by the rules, and ids, keys, items and pages all resolve.
+
+## 2026-09-30 — Crowsfoot Hollow goes deep (Chris: "the cave should be deep and the first foray into dungeon crawling")
+- **The first dungeon.** Crowsfoot Hollow now runs 114 m from its mouth and 16 m down, under Oakhaven's north edge and into
+  the hills (layout in `WORLD_ZONES.md` "Caves you walk into"):
+  - the upper hollow and the deserters' camp, as before, then the low passage west;
+  - **the Drop:** a steep descent, eleven metres down, with plank treads pegged across it and a rope rail on posts;
+  - **the Store Caves:** the stolen stores stacked along the walls, the Quartermaster's desk with his ledger and a candle, a
+    brazier, a side way choked with fallen rock;
+  - **the Deep Stair:** a winding passage down another three metres;
+  - **the Echoing Hall:** 18 m across and 9 m high, stalagmites and stalactites, braziers, and Caddock's throne at the far end
+    with the plunder beside it.
+  - Torches all the way down; below 8 m a faint blue-green glow of fungus on the walls, and puddles where water seeps.
+  - A few metres in, the cave names itself on the banner: "LEVELS 3-5" over "Crowsfoot Hollow".
+  - The maps don't draw the cave's camps over the hills above them; the "Crowsfoot Hollow  3-5" landmark stands for them.
+- **Five encounters, getting harder:** lookouts (3), the camp (3-4), sentries on the Drop (3-4), the Store Caves with
+  **Quartermaster Hesk** (a new GAME-ONLY elite, level 4), the Deep Stair watch (4-5), and Caddock (now elite level 5) with
+  three guards (4-5). The band comes back in 5 to 15 minutes, not 90 seconds, so the way stays clear while you go on down
+  and walk back out.
+- **Loot:**
+  - Caddock always drops **Caddock's Tin Crown** (head, rare).
+  - The Quartermaster's strongbox is a locked secret chest; its key hangs on a nail on the Drop. Inside: company silver,
+    **Hesk's Shuttered Lantern** (off-hand, rare) and a Chronicle page, **By Order of the King** (Caddock's orders, copied fair
+    by Hesk: "The crown is not tin.").
+  - The deserters drop filed company badges, and Hesk his stores. New loot tables for the band.
+- **The Tin Crown** is now level 4 (still offered from level 3) and pays 190 XP and 25 gold; its text sends you down to the hall.
+- **How it's built:**
+  - The passage plan gained a floor drop per row. The floor is its own mesh (earth, collider, navmesh) with a lip onto the road.
+  - The ground mesh leaves out every triangle inside the passage; the rock shell covers the hole.
+  - The knoll's crest rocks stand only where the passage runs near the surface.
+  - The navmesh reaches past the zone's edge to follow it.
+  - Braziers, the desk, the crate stacks and the plunder are solid now: you and the deserters walk round them.
+- **Standing underground** (`ZoneBuilder.StandAt`): camps and their respawns, secrets, and a save made in the cave all stand on
+  the passage floor, not on the hill far above. A key or a page in a cave hangs on the rock itself. Nothing is used (E)
+  through the rock, from the hill over the Store Caves or the other way. Rain and falling leaves stop anywhere underground.
+- **Found by the tests and the tour, and fixed:**
+  - The ground's cut bulged out in front of the mouth and left a 2 m gap between the floor's lip and the road, so nothing
+    could walk in. The cut now stops at the mouth.
+  - The fall-out-of-the-world catch (anything under y -5 goes back to the village) caught you on the way down. It now sits
+    5 m under the deepest cave floor. The save's sanity check allows positions down to y -60 for the same reason.
+  - The tour's own character was chased down the dungeon; the band now holds still for the pictures.
+- **Tests:** `CaveTests` grows to 8. It checks walkability leg by leg from the road to the hall, and adds four tests: it runs
+  deep under the northern hills; no land shows inside; you can stand on every floor down to the hall; every camp stands on
+  the passage floor, Hesk included. `HollowQuestTests` checks the new level. `ZoneContentTests` finds a camp where it
+  stands (a cave camp on its floor).

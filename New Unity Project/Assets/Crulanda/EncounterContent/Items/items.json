@@ -290,6 +290,45 @@
       "stack": 10,
       "description": "A pale flower that grew where nothing grows. It tastes of rain.",
       "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "item.hesks_lantern",
+      "name": "Hesk's Shuttered Lantern",
+      "kind": "gear",
+      "slot": "offhand",
+      "quality": 3,
+      "level": 4,
+      "value": 22,
+      "armor": 16,
+      "stamina": 3,
+      "intellect": 5,
+      "spirit": 4,
+      "description": "Tin and horn panes, with a shutter that sticks. The Quartermaster counted the band's silver by it, and it came to less every night.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "item.tin_crown",
+      "name": "Caddock's Tin Crown",
+      "kind": "gear",
+      "slot": "head",
+      "quality": 3,
+      "level": 5,
+      "value": 24,
+      "armor": 14,
+      "stamina": 5,
+      "strength": 5,
+      "description": "Beaten out of a tin plate with the back of a cleaver, and dented where it rang on the stone. He said it wasn't tin.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "junk.company_badge",
+      "name": "Filed company badge",
+      "kind": "junk",
+      "quality": 0,
+      "value": 3,
+      "stack": 10,
+      "description": "A Sandthrone company badge with the sun-and-sand filed off. The man who wore it wanted nobody to know whose he had been.",
+      "canonStatus": "GAME-ONLY: the Sandthrone company is CANON; the badge is invented."
     }
   ],
   "vendors": [
@@ -442,6 +481,52 @@
         {
           "item": "junk.pale_filament",
           "chance": 0.8
+        }
+      ]
+    },
+    {
+      "tag": "deserter",
+      "levelMin": 1,
+      "levelMax": 10,
+      "gearChance": 0.14,
+      "entries": [
+        {
+          "item": "junk.company_badge",
+          "chance": 0.6
+        },
+        {
+          "item": "potion.minor",
+          "chance": 0.12
+        }
+      ]
+    },
+    {
+      "tag": "quartermaster",
+      "levelMin": 1,
+      "levelMax": 10,
+      "gearChance": 0.7,
+      "entries": [
+        {
+          "item": "potion.minor",
+          "chance": 1.0,
+          "min": 1,
+          "max": 2
+        },
+        {
+          "item": "junk.company_badge",
+          "chance": 1.0
+        }
+      ]
+    },
+    {
+      "tag": "banditking",
+      "levelMin": 1,
+      "levelMax": 10,
+      "gearChance": 0.7,
+      "entries": [
+        {
+          "item": "item.tin_crown",
+          "chance": 1.0
         }
       ]
     }

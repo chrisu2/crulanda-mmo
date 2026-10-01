@@ -57,6 +57,7 @@ namespace Crulanda.World
             var at = new Vector3(focus.x, zone.HeightAt(focus.x, focus.z) + (ash ? 6.5f : 11), focus.z);
             // Ash hangs everywhere: fill the air at once on arrival and after a teleport (the old flakes stay behind; turning
             // the camera moves the focus 24 m at most, so a turn never refills).
+            if (Hollow.CameraDepth > .2f) { if (emission.rateOverTime.constant > 0) { emission.rateOverTime = 0; ps.Clear(); } filled = false; nextCheck = 0; return; }   // underground: nothing drifts down through the rock
             if (ash && (!filled || (at - ps.transform.position).sqrMagnitude > 30 * 30)) { ps.transform.position = at; ps.Clear(); ps.Emit(700); filled = true; }
             ps.transform.position = at;
             // The weather's wind carries them downwind (an ash squall hard); gusts strip more leaves and whip up more ash.

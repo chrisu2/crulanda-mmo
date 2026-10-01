@@ -429,15 +429,28 @@ namespace Crulanda.Encounter
                     }
                     weather.Force(weather.TourKind(), true);
                 }
-                // Crowsfoot Hollow: the camp chamber from its way in, and the King's hall from the low passage.
+                // Crowsfoot Hollow, the first dungeon: the camp chamber from its way in, the head of the Drop looking down it, the Store
+                // Caves from the foot of the Drop, and the Echoing Hall from the Deep Stair.
                 var hollow = Crulanda.World.Hollow.All.Find(hh => hh.Name == "Crowsfoot Hollow");
                 if (hollow != null)
                 {
                     EncounterHud.Hidden = true; Crulanda.World.WorldClock.Hour = 15;
-                    foreach (var (from, toward, shot) in new[] { (6.5f, 12.5f, "85-hollow-camp"), (hollow.Length - 13, hollow.Length - 5, "86-hollow-hall") })
+                    // The band holds still for the pictures (they would come for you, a level-1 tourist, all the way down), and you
+                    // start whole.
+                    foreach (var e in session.Enemies) if (e != null) e.enabled = false;
+                    session.Player.Health.ApplyHealing(session.Player.Health.Pool.Max);
+                    float drop = -1, stores = -1, widest = 0;
+                    for (int i = 0; i + 3 < hollow.Centre.Count && drop < 0; i++) if (hollow.Centre[i].y - hollow.Centre[i + 3].y > .7f) drop = hollow.Along[i];   // where the floor first falls away
+                    for (int i = 0; i < hollow.Centre.Count; i++)
+                        if (hollow.Along[i] > hollow.Length * .45f && hollow.Along[i] < hollow.Length * .7f && hollow.Half[i] > widest) { widest = hollow.Half[i]; stores = hollow.Along[i]; }
+                    var views = new List<(float from, float toward, float pitch, string shot)> { (6.5f, 12.5f, 10, "85-hollow-camp") };
+                    if (drop > 0) views.Add((drop - 2.5f, drop + 7, 24, "88-hollow-drop"));
+                    if (stores > 0) views.Add((stores - 8, stores + 1, 10, "89-hollow-stores"));
+                    views.Add((hollow.Length - 13, hollow.Length - 5, 10, "86-hollow-hall"));
+                    foreach (var (from, toward, pitch, shot) in views)
                     {
                         var stand = hollow.At(from); var ahead = hollow.At(toward) - stand;
-                        motor.Teleport(stand + Vector3.up * 1.1f); motor.SetView(Mathf.Atan2(ahead.x, ahead.z) * Mathf.Rad2Deg, 10, 5);
+                        motor.Teleport(stand + Vector3.up * 1.1f); motor.SetView(Mathf.Atan2(ahead.x, ahead.z) * Mathf.Rad2Deg, pitch, 5);
                         yield return new WaitForSeconds(1.2f);
                         ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + shot + ".png")); yield return new WaitForSeconds(.4f);
                     }
@@ -454,12 +467,12 @@ namespace Crulanda.Encounter
                     Vector3 From(float turn)
                     {
                         var c = focus + Quaternion.Euler(0, turn, 0) * back * 2.4f + Vector3.up * 1.1f;
-                        c.y = Mathf.Max(c.y, zone.HeightAt(c.x, c.z) + 1.2f); return c;
+                        c.y = Mathf.Max(c.y, zone.StandAt(new Vector2(c.x, c.z), focus.y).y + 1.2f); return c;
                     }
                     var shotFrom = From(0);
                     for (int k = 1; k < 8 && Physics.CheckSphere(shotFrom, .35f, ~0, QueryTriggerInteraction.Ignore); k++) shotFrom = From((k + 1) / 2 * (k % 2 == 1 ? 35 : -35));   // in the open: turn round it
                     var body = Array.FindAll(session.Player.GetComponentsInChildren<Renderer>(), r => r.enabled);
-                    motor.Teleport(zone.Ground(new Vector2(shotFrom.x + back.x * 2, shotFrom.z + back.z * 2), 1.1f));
+                    motor.Teleport(zone.StandAt(new Vector2(shotFrom.x + back.x * 2, shotFrom.z + back.z * 2), focus.y, 1.1f));
                     foreach (var r in body) r.enabled = false;
                     motor.enabled = false; var view = session.View.transform; var look = Quaternion.LookRotation(focus - shotFrom);
                     for (float w = 0; w < .8f; w += Time.deltaTime) { view.SetPositionAndRotation(shotFrom, look); Crulanda.World.TreeFade.UpdateAll(shotFrom, focus, focus); yield return null; }

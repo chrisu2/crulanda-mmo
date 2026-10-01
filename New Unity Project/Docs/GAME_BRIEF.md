@@ -23,14 +23,18 @@ games are style references only: no copied names, assets, zones or creatures fro
 - **Living world:** villagers with trades and daily routines, hen-wives and coops, critters with legs, a day/night
   cycle with lamps, falling leaves and ash, wind-swayed grass, respawning camps, ambushes from tall grass, breadcrumb
   quests that lead from zone to zone, a quest book, factions and standing.
-- **A walk-in cave:** Crowsfoot Hollow at the end of Oakhaven's North road, with Sandthrone deserters, Caddock the
-  Bandit King in a tin crown, and the level-3 quest "The Tin Crown" (WORLD_ZONES.md "Caves you walk into").
+- **A first dungeon, walked into with no loading:** Crowsfoot Hollow at the end of Oakhaven's North road runs 114 m and
+  16 m down under the hills: the deserters' camp, the Drop, the Store Caves (Quartermaster Hesk), the Deep Stair and the
+  Echoing Hall of Caddock the Bandit King in his tin crown; levels 3-5, the quest "The Tin Crown", a locked strongbox
+  and its key, and Caddock's crown as his drop (WORLD_ZONES.md "Caves you walk into").
+- **Secrets:** five hidden finds in every zone on no map (lookouts, caches, Chronicle pages, herbs, a key and its chest),
+  a "Discovered" toast and a Discoveries tab in the quest book (WORLD_ZONES.md "Secrets").
 - **Weather:** per-zone schedules of rain, storms, mist, flurries and ash squalls; a painted cloud layer with cloud
   shadows; wind gusts through grass and leaf crowns; wet ground and rain rings (WORLD_ZONES.md "Weather").
 - **Water:** stylized turquoise (Chris's chosen look): a sandy bed showing through pale shallows, foam at shores and
   around legs, a creek current, ripple rings, wading and swimming. Khaven's Gloom Creek stays murky.
 - **Camera and targeting:** trees fade when they block the view; a coloured ring under the selected target.
-- **Classes:** Warrior and Druid playable, with data-driven talent trees; saves per character (format 6).
+- **Classes:** Warrior and Druid playable, with data-driven talent trees; saves per character (format 7).
 - **Docs to read next:** `WORLD_ZONES.md` (how zones are built), `QUEST_DESIGN.md`, `SAVE_FORMAT.md`,
   `CHANGELOG.md`, `CRULANDA_CANON.md` and `CRULANDA_LOCATIONS.md` (what is canon).
 
@@ -54,10 +58,12 @@ reference only:
 - **Zones need to be bigger, with more places and secrets to explore.** Today nothing is hidden: every interactable is
   a map-marked quest pickup. Decided: exploration is rewarded with **discoveries + loot** (a "Discovered" toast, XP, a
   cache, a Discoveries tab in the quest book). The overall order: **tree crowns, weather, the cave, secrets in every
-  zone, then grow the zones** to about 340-380 m once there is content to fill them, then the painted style pass.
+  zone, the cave made a deep dungeon, then grow the zones** to about 340-380 m once there is content to fill them, then
+  the painted style pass. (All up to the deep dungeon are built, 2026-09-30.)
 - **Seamless caves:** a rock-shell cave built into a hillside with no loading screen, darkening as you walk in. The
-  first, **Crowsfoot Hollow**, is built (2026-09-30), the **Sandthrone deserters' cave** in Oakhaven's north hills: a level-3 quest to clear the bandits and their
-  game-only Bandit King so they stop harassing the villagers. (Sandthrone is a canon mercenary company; the Bandit King
+  first, **Crowsfoot Hollow**, is built (2026-09-30), the **Sandthrone deserters' cave** in Oakhaven's north hills: a quest
+  from level 3 to clear the bandits and their game-only Bandit King so they stop harassing the villagers. Chris: "the cave
+  should be deep and the first foray into dungeon crawling", so it is now a starter dungeon, 16 m deep. (Sandthrone is a canon mercenary company; the Bandit King
   is ours, and no canon Sandthrone name is used for him.)
 - **Camps for grinding** stay in every zone; breadcrumb quests carry the player from zone to zone.
 

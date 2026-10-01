@@ -49,6 +49,12 @@
       "title": "The Acorn Oath",
       "text": "From the chapel book of Oakhaven, the first leaf, copied fair:\n\nWe came east with nine ploughs and one sack of seed, and the land took us in.\nOn the first day we set an acorn in the middle of the square, and swore on it:\nthat while the oak stands, Oakhaven stands;\nthat no one who sleeps under it sleeps alone;\nthat every child born here has their name cut in its roots.\n\n(Below, in a newer hand:) Cut two names at the roots today, for the two the wagon took. The collectors watched us do it. Let them watch. The oak remembers.",
       "canonStatus": "GAME-ONLY: the chapel book and the oath. The Great Oak as the heart of the settlement is CANON (book1 ch.4)."
+    },
+    {
+      "id": "doc.oakhaven.kings_orders",
+      "title": "By Order of the King",
+      "text": "BY ORDER OF CADDOCK, KING OF CROWSFOOT HOLLOW\n(copied fair by Hesk, quartermaster, who can write)\n\nOne. The hall is the King's. Nobody sits in the King's chair. Nobody sits in it to see what it is like.\n\nTwo. Rations are one bowl a day, and what the King says. The Oakhaven grain is the King's grain.\n\nThree. Nobody goes down the North road by daylight. The farmers keep dogs, and the dogs have long memories.\n\nFour. The crown is not tin. Anyone heard saying it is tin stands the Drop for a week.\n\nFive. Pay is owed. Pay will be paid when the King has a kingdom.\n\n- and under it, smaller, in the same hand: Owed to Hesk, nine months. Owed to the company, everything. -",
+      "canonStatus": "GAME-ONLY: Caddock, Hesk and their orders are invented; the Sandthrone company is CANON."
     }
   ],
   "quests": [
@@ -610,16 +616,16 @@
       "giver": "Wil Carder",
       "turnIn": "Wil Carder",
       "zone": "zone.oakhaven",
-      "level": 3,
+      "level": 4,
       "minLevel": 3,
       "canonStatus": "GAME-ONLY quest; CANON faction (Sandthrone deserters)",
-      "summary": "Clear the Sandthrone deserters out of Crowsfoot Hollow at the top of the North road, bring down Caddock, their tin-crowned king, and recover what they stole from Oakhaven's farms.",
+      "summary": "Go down through Crowsfoot Hollow, the deserters' cave at the top of the North road, to the hall deep under the hills, bring down Caddock, their tin-crowned king, and recover what they stole from Oakhaven's farms.",
       "offer": "Wil Carder turns his cap round and round in his hands. \"Deserters. Sandthrone, by what's left of the colours, but no captain would own them now. Three nights they've come down the North road and had my barn: the seed-corn for spring, the hams, my da's good boots off the step.\"\n\n\"Garet tracked them to Crowsfoot Hollow, the cave where the North road gives out in the hills. There's a band of them dug in there, and one in a tin crown who calls himself king. Caddock, they say. Put them out of that hole and bring back what they took. We've nothing left to give the Concord, never mind a king.\"",
       "complete": "Wil Carder hears you out without a word. When you come to the seed-corn, still in its marked sacks, his shoulders drop.\n\n\"Spring, then. We'll have a spring.\" He looks up the North road at the dark hills. \"A king in a hole in the ground, in a tin hat, and all of us too frightened to sleep. I'll have the cart up there at first light.\"",
       "steps": [
         {
-          "text": "Clear the deserters out of Crowsfoot Hollow, where the North road ends in the hills.",
-          "say": "The hollow goes quiet but for dripping water. Whatever they carried off the farms will be at the back of the king's hall.",
+          "text": "Clear the deserters out of Crowsfoot Hollow, where the North road ends in the hills. Their king holds a hall deep under them.",
+          "say": "The hollow goes quiet but for dripping water, far down. Whatever they carried off the farms will be at the back of the king's hall.",
           "objectives": [
             {
               "type": "kill",
@@ -651,8 +657,8 @@
         }
       ],
       "rewards": {
-        "xp": 110,
-        "gold": 20,
+        "xp": 190,
+        "gold": 25,
         "reputation": [
           {
             "faction": "oakhaven",

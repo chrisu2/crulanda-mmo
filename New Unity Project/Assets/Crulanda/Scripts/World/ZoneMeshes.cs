@@ -168,22 +168,26 @@ namespace Crulanda.World
             return m;
         }
         /// <summary>Square ground grid of <paramref name="size"/> metres; UV (0..1) spans the whole zone for the painted texture.</summary>
-        public static Mesh Ground(float size, int segments, Func<float, float, float> height)
+        public static Mesh Ground(float size, int segments, Func<float, float, float> height, Func<Vector3, bool> cut = null)
         {
-            var v = new Vector3[(segments + 1) * (segments + 1)]; var uv = new Vector2[v.Length]; var t = new int[segments * segments * 6];
+            var v = new Vector3[(segments + 1) * (segments + 1)]; var uv = new Vector2[v.Length]; var tl = new List<int>(segments * segments * 6);
             for (int z = 0, i = 0; z <= segments; z++)
                 for (int x = 0; x <= segments; x++, i++)
                 {
                     float px = -size / 2 + size * x / segments, pz = -size / 2 + size * z / segments;
                     v[i] = new Vector3(px, height(px, pz), pz); uv[i] = new Vector2((float)x / segments, (float)z / segments);
                 }
-            for (int z = 0, k = 0; z < segments; z++)
+            // A cut (a walk-in cave's passage, Hollow.InsideAny) takes out every triangle with a corner inside it: the cave's rock
+            // shell, thicker than a cell, covers the hole, and its own floor is the ground there.
+            var gone = new bool[v.Length]; if (cut != null) for (int i = 0; i < v.Length; i++) gone[i] = cut(v[i]);
+            for (int z = 0; z < segments; z++)
                 for (int x = 0; x < segments; x++)
                 {
                     int i = z * (segments + 1) + x;
-                    t[k++] = i; t[k++] = i + segments + 1; t[k++] = i + 1;
-                    t[k++] = i + 1; t[k++] = i + segments + 1; t[k++] = i + segments + 2;
+                    if (!gone[i] && !gone[i + segments + 1] && !gone[i + 1]) { tl.Add(i); tl.Add(i + segments + 1); tl.Add(i + 1); }
+                    if (!gone[i + 1] && !gone[i + segments + 1] && !gone[i + segments + 2]) { tl.Add(i + 1); tl.Add(i + segments + 1); tl.Add(i + segments + 2); }
                 }
+            var t = tl.ToArray();
             // Normals from central differences on the height grid rather than from the triangles: symmetric in x and z, so a
             // curved slope or shore crossing the grid's fixed diagonals shades smoothly, not in light and dark triangles.
             var n = new Vector3[v.Length]; float step = size / segments; int row = segments + 1;

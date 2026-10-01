@@ -9,6 +9,11 @@ namespace Crulanda.World
     public sealed class ZoneDoor
     {
         public string name;
+        /// <summary>What the door is: "house" (a home's barred front door), "rooms" (the door to an inn's rooms upstairs) or "home"
+        /// (a door added to a barn somebody lives in). An openable door is the inn's own.</summary>
+        public string kind = "house";
+        /// <summary>The chimney smoke of the house behind this door, when it has a chimney (a cold hearth stops it).</summary>
+        public ParticleSystem smoke;
         public bool openable;
         public Transform hinge;
         public Collider blocker;

@@ -36,7 +36,7 @@ namespace Crulanda.Encounter
             switch (role)
             {
                 case "blacksmith": return "forge"; case "merchant": return "stall"; case "baker": return "oven";
-                case "leatherworker": case "skinner": return "tannery"; case "lumberjack": case "hunter": return "woods";
+                case "leatherworker": return "leathershop"; case "skinner": return "tannery"; case "lumberjack": case "hunter": return "woods";
                 case "herbalist": return "meadow"; case "miller": return "mill"; case "farmer": return "field"; default: return null;
             }
         }
@@ -52,10 +52,17 @@ namespace Crulanda.Encounter
             }
         }
         readonly Dictionary<Vector3, Vector3> faceAt = new Dictionary<Vector3, Vector3>();
+        readonly Dictionary<Vector3, string> placeName = new Dictionary<Vector3, string>();
         /// <summary>Where someone working at a place should look (the anvil, the counter's customers), if it is a workplace.</summary>
         public Vector3? LookFor(Vector3 at)
         {
             foreach (var kv in faceAt) if ((kv.Key - at).sqrMagnitude < 2.5f) return kv.Value;
+            return null;
+        }
+        /// <summary>The name of the workplace (the prop's name: "Tanner's leather shop") that a stand point belongs to, or null off any.</summary>
+        public string WorkplaceAt(Vector3 at)
+        {
+            foreach (var kv in placeName) if ((kv.Key - at).sqrMagnitude < 2.5f) return kv.Value;
             return null;
         }
 
@@ -127,10 +134,11 @@ namespace Crulanda.Encounter
         void FindPlaces()
         {
             var z = Zone.Zone;
-            foreach (var key in new[] { "field", "well", "green", "inn", "mill", "wander", "forge", "stall", "oven", "tannery", "woodpile", "woods", "meadow" }) Places[key] = new List<Vector3>();
-            // Trade workplaces (exact stand points, with where to look while working).
+            foreach (var key in new[] { "field", "well", "green", "inn", "mill", "wander", "forge", "stall", "oven", "tannery", "woodpile", "woods", "meadow", "leathershop", "dryhut", "kitchen", "kitchendoor", "bar", "lodge" }) Places[key] = new List<Vector3>();
+            // Trade workplaces (exact stand points, with where to look while working, and whose place it is).
             foreach (var w in Zone.Workplaces)
-                if (NavMesh.SamplePosition(w.stand, out var wh, 1.5f, NavMesh.AllAreas)) { Places[w.kind].Add(wh.position); faceAt[wh.position] = w.look; }
+                if (NavMesh.SamplePosition(w.stand, out var wh, 1.5f, NavMesh.AllAreas)) { Places[w.kind].Add(wh.position); faceAt[wh.position] = w.look; placeName[wh.position] = w.name; }
+            if (Places["leathershop"].Count == 0) Places["leathershop"] = Places["tannery"];   // a village with a tannery yard but no shop: the leatherworker works in the yard
             // Woods: inside living groves (not orchards). Meadow: open hillside between the village and the forest edge.
             foreach (var g in z.groves)
             {
@@ -144,7 +152,7 @@ namespace Crulanda.Encounter
                 if (z.wasting != null && p.x > z.wasting.x - 20) continue;
                 AddPlace("meadow", p);
             }
-            foreach (var d in Zone.Doors) if (!d.openable) Homes.Add(d);
+            foreach (var d in Zone.Doors) if (!d.openable && d.kind != "rooms") Homes.Add(d);   // the inn's rooms door is nobody's home until households say so
             foreach (var f in z.fields)
                 for (int i = 0; i < 4; i++)
                 {
@@ -621,7 +629,9 @@ namespace Crulanda.Encounter
                 case "inn": case "sleep": return ActorPose.Sit;
                 case "forge": return ActorPose.Hammer;
                 case "stall": return Role == "merchant" || Role == "baker" && life.R01 < .5f ? ActorPose.Talk : ActorPose.Knead;
-                case "oven": case "tannery": return ActorPose.Knead;
+                case "oven": case "tannery": case "leathershop": case "dryhut": case "kitchen": return ActorPose.Knead;
+                case "bar": return ActorPose.Talk;
+                case "lodge": return ActorPose.Work;
                 case "woodpile": return ActorPose.Chop;
                 case "woods": return Role == "lumberjack" ? ActorPose.Chop : Role == "hunter" || Role == "warden" ? ActorPose.None : ActorPose.Gather;
                 case "meadow": return Role == "hunter" ? ActorPose.None : ActorPose.Gather;

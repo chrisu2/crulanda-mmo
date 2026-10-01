@@ -48,6 +48,11 @@ namespace Crulanda.Encounter
         // ---------- discoveries (save format 7; older saves load with this empty) ----------
         /// <summary>Hidden finds already found, by id ("secret.&lt;zone&gt;.&lt;slug&gt;"): each pays out once, ever. See DiscoveryLog.</summary>
         public List<string> discoveries = new List<string>();
+        // ---------- trades (save format 8; older saves load with both empty) ----------
+        /// <summary>Trades learned and the skill in each (1-100): gathering skills, Cooking and crafts. See ProfessionLog.</summary>
+        public List<ProfessionSkill> professions = new List<ProfessionSkill>();
+        /// <summary>Trade bags worn, by item id, in the order they were put on. Each adds its slots to the end of <see cref="bag"/>.</summary>
+        public List<string> pouches = new List<string>();
 
         // ---------- levels (save format 5) ----------
         /// <summary>The highest level (13 since the Verdant Shore, 2026-09-30; it was 10 for the first four zones). Talent points stop

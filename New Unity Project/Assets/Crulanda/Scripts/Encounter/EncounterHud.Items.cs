@@ -37,6 +37,8 @@ namespace Crulanda.Encounter
             if (d == null) return "?";
             if (d.kind == "junk") return "✦";
             if (d.kind == "consumable") return d.food ? "Fd" : "Hp";
+            if (d.kind == "material") return "Mt";
+            if (d.kind == "tool") return "Tl";
             switch (d.slot) { case "head": return "Hd"; case "neck": return "Nk"; case "shoulders": return "Sh"; case "chest": return "Ch"; case "hands": return "Gl"; case "legs": return "Lg"; case "feet": return "Ft"; case "mainhand": return "Wp"; case "offhand": return "Of"; }
             return "?";
         }
@@ -59,7 +61,7 @@ namespace Crulanda.Encounter
             if (d == null) return;
             var lines = new List<string>();
             if (d.kind == "gear") lines.Add(ItemDatabase.SlotNames[ItemDatabase.SlotIndex(d.slot)] + "  ·  " + ItemDatabase.QualityNames[Mathf.Clamp(d.quality, 0, 4)]);
-            else lines.Add(d.kind == "junk" ? "Junk" : d.food ? "Food" : "Potion");
+            else lines.Add(d.kind == "junk" ? "Junk" : d.kind == "material" ? "Crafting material" : d.kind == "tool" ? "Tool" : d.food ? "Food" : "Potion");
             var stats = ItemDatabase.StatLines(d); if (stats.Length > 0) lines.Add(stats);
             if (d.level > 1) lines.Add((d.level > session.Progress.Level ? "<color=#ff5544>" : "") + "Requires level " + d.level + (d.level > session.Progress.Level ? "</color>" : ""));
             if (!string.IsNullOrEmpty(d.description)) lines.Add("<i>" + d.description + "</i>");
@@ -220,7 +222,7 @@ namespace Crulanda.Encounter
                 ItemSquare(new Rect(e.mousePosition.x - Slot / 2, e.mousePosition.y - Slot / 2, Slot, Slot), s);
                 if (e.type == EventType.MouseUp)
                 {
-                    bool overWindow = (bagsVisible && BagsRect.Contains(e.mousePosition)) || (charVisible && CharRect.Contains(e.mousePosition)) || (vendorVisible && VendorRect.Contains(e.mousePosition));
+                    bool overWindow = (bagsVisible && BagsRect.Contains(e.mousePosition)) || (charVisible && CharRect.Contains(e.mousePosition)) || (vendorVisible && VendorRect.Contains(e.mousePosition)) || TradesUiBlocks(e.mousePosition);
                     if (!overWindow && dragBag >= 0) confirmDestroy = dragBag;
                     dragBag = dragEquip = -1;
                 }

@@ -21,7 +21,7 @@ namespace Crulanda.Encounter
         public static bool BlocksPointer(Vector2 point)
         {
             var p = new Vector2(point.x * 1440 / Screen.width, (Screen.height - point.y) * 900 / Screen.height);
-            return paused || buildVisible || mapVisible || QuestUiBlocks(p) || ItemUiBlocks(p) || p.y > 795 || new Rect(10, 10, 350, 190).Contains(p) ||
+            return paused || buildVisible || mapVisible || QuestUiBlocks(p) || ItemUiBlocks(p) || TradesUiBlocks(p) || p.y > 795 || new Rect(10, 10, 350, 190).Contains(p) ||
                 (targetVisible && new Rect(365, 10, 350, 130).Contains(p)) || new Rect(1215, 0, 225, 240).Contains(p) ||
                 new Rect(1110, 236, 330, 200).Contains(p) || false;
         }
@@ -60,7 +60,7 @@ namespace Crulanda.Encounter
             Styles();
             inventoryVisible = session.InventoryOpen; paused = session.Paused; buildVisible = session.BuildOpen;
             mapVisible = session.MapOpen; targetVisible = session.Target != null || session.HasFriendlyFocus; bookVisible = session.QuestBookOpen; talkVisible = session.Conversation != null;
-            bagsVisible = session.InventoryOpen; charVisible = session.CharacterOpen; vendorVisible = session.VendorNpc != null;
+            bagsVisible = session.InventoryOpen; charVisible = session.CharacterOpen; vendorVisible = session.VendorNpc != null; tradesVisible = session.TradesOpen;
             GUI.matrix = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(Screen.width / 1440f, Screen.height / 900f, 1));
             GUI.color = Color.white;
             DrawWorldLabels();
@@ -70,6 +70,7 @@ namespace Crulanda.Encounter
             if (session.CharacterOpen) DrawCharacter();
             if (session.VendorNpc != null) DrawVendor();
             if (session.InventoryOpen) DrawBags();
+            if (session.TradesOpen) DrawTrades();
             if (session.BuildOpen) DrawBuild();
             if (session.MapOpen) maps.DrawWindow(session, gold, ink);
             if (session.QuestBookOpen) DrawQuestBook();
@@ -225,7 +226,7 @@ namespace Crulanda.Encounter
                 Outlined(new Rect(18, y, 455, h), msgs[i], tiny, new Color(1, .96f, .86f));
             }
             chatTop = y;
-            Shadow(new Rect(12, 774, 700, 20), "WASD move · Space jump · Right-drag look · Wheel zoom · Tab target · E interact · L quests · M map · B talents · I bags · C character", tiny, new Color(.8f, .8f, .78f));
+            Shadow(new Rect(12, 774, 780, 20), "WASD move · Space jump · Right-drag look · Wheel zoom · Tab target · E interact · L quests · M map · B talents · I bags · C character · K trades", tiny, new Color(.8f, .8f, .78f));
         }
         void DrawCenter()
         {
@@ -296,7 +297,8 @@ namespace Crulanda.Encounter
         void DrawMicroMenu()
         {
             float x = 1110, y = 842; int points = session.Talents.Available(session.Progress);
-            if (GUI.Button(new Rect(x - 80, y, 76, 30), "Character", micro)) session.CharacterOpen = !session.CharacterOpen;
+            if (GUI.Button(new Rect(x - 80, y, 76, 30), "Character", micro)) { session.CharacterOpen = !session.CharacterOpen; if (session.CharacterOpen) session.ShowTrades(false); }
+            if (session.Professions != null && GUI.Button(new Rect(x - 80, y - 34, 76, 30), "Trades", micro)) session.ShowTrades(!session.TradesOpen);
             if (GUI.Button(new Rect(x, y, 70, 30), points > 0 ? "Talents " + points : "Talents", micro)) session.BuildOpen = !session.BuildOpen;
             if (GUI.Button(new Rect(x + 74, y, 56, 30), "Bags", micro)) session.InventoryOpen = !session.InventoryOpen;
             if (GUI.Button(new Rect(x + 134, y, 56, 30), "Map", micro)) session.MapOpen = !session.MapOpen;

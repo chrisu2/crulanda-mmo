@@ -581,6 +581,253 @@
       "spirit": 6,
       "description": "A circlet of living twig that still puts out a leaf now and then. It was the crown of the Keeper who kept the roots, before the cold.",
       "canonStatus": "GAME-ONLY: the Root-Warden and his crown; the Keepers are CANON."
+    },
+    {
+      "id": "mat.copper_ore",
+      "name": "Crowsfoot copper ore",
+      "kind": "material",
+      "quality": 1,
+      "value": 1,
+      "stack": 20,
+      "trade": "forge.ore",
+      "pouch": "ore",
+      "description": "Red-veined rock from the Crowsfoot cliffs. A smith can smelt it.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "mat.bogiron_ore",
+      "name": "Carrion bog-iron ore",
+      "kind": "material",
+      "quality": 1,
+      "value": 2,
+      "stack": 20,
+      "trade": "forge.ore",
+      "pouch": "ore",
+      "description": "Rust-brown lumps from under the Carrion Cliffs. Heavy, and it stains the hands.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "mat.adit_ore",
+      "name": "Adit iron ore",
+      "kind": "material",
+      "quality": 1,
+      "value": 3,
+      "stack": 20,
+      "trade": "forge.ore",
+      "pouch": "ore",
+      "description": "Dark ore from the old workings in the Peaks. The miners left; the iron did not.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "mat.cinder_ore",
+      "name": "Cinder ore",
+      "kind": "material",
+      "quality": 1,
+      "value": 4,
+      "stack": 20,
+      "trade": "forge.ore",
+      "pouch": "ore",
+      "description": "Black rock from the Ash Rim. It still holds a little warmth.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "mat.veridian_ore",
+      "name": "Veridian ore",
+      "kind": "material",
+      "quality": 1,
+      "value": 6,
+      "stack": 20,
+      "trade": "forge.ore",
+      "pouch": "ore",
+      "description": "Blue-green ore from the Ridge of Long Shadows. It rings when struck.",
+      "canonStatus": "GAME-ONLY: the name Veridian is CANON (book3); the ore is invented."
+    },
+    {
+      "id": "mat.oak_log",
+      "name": "Harrow oak log",
+      "kind": "material",
+      "quality": 1,
+      "value": 1,
+      "stack": 20,
+      "trade": "forge.wood",
+      "pouch": "timber",
+      "description": "Wind-felled oak from the Harrow woods. Sound enough for a haft or a fire.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "mat.blackpine_log",
+      "name": "Black pine log",
+      "kind": "material",
+      "quality": 1,
+      "value": 2,
+      "stack": 20,
+      "trade": "forge.wood",
+      "pouch": "timber",
+      "description": "Khaven pine, dark and full of pitch. It burns hot.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "mat.stonepine_log",
+      "name": "Stone-pine log",
+      "kind": "material",
+      "quality": 1,
+      "value": 3,
+      "stack": 20,
+      "trade": "forge.wood",
+      "pouch": "timber",
+      "description": "Slow-grown and hard, from the high slopes. It turns an axe.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "mat.snag_wood",
+      "name": "Ash-snag wood",
+      "kind": "material",
+      "quality": 1,
+      "value": 4,
+      "stack": 20,
+      "trade": "forge.wood",
+      "pouch": "timber",
+      "description": "Grey wood from a tree that died standing. Dry right through.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "mat.ghostoak_log",
+      "name": "Ghost-oak heartwood",
+      "kind": "material",
+      "quality": 1,
+      "value": 6,
+      "stack": 20,
+      "trade": "forge.wood",
+      "pouch": "timber",
+      "description": "Pale heartwood from a Ghost-Oak the wind brought down. Nobody cuts a standing one.",
+      "canonStatus": "GAME-ONLY: Ghost-Oaks are CANON (book3 ch.4); heartwood as a material is invented."
+    },
+    {
+      "id": "mat.yarrow",
+      "name": "Meadow yarrow",
+      "kind": "material",
+      "quality": 1,
+      "value": 1,
+      "stack": 20,
+      "trade": "stall.herbs",
+      "pouch": "herb",
+      "description": "White flower-heads from the Harrow meadows. Good for a fever, a cut or a draught.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "mat.mourners_cap",
+      "name": "Mourner's cap",
+      "kind": "material",
+      "quality": 1,
+      "value": 2,
+      "stack": 20,
+      "trade": "stall.herbs",
+      "pouch": "herb",
+      "description": "A grey cap that grows where the ground has been dug. Khaven picks it and does not say where.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "mat.tarnwort",
+      "name": "Tarnwort",
+      "kind": "material",
+      "quality": 1,
+      "value": 3,
+      "stack": 20,
+      "trade": "stall.herbs",
+      "pouch": "herb",
+      "description": "Pale blue, from the cold shore of the tarn. It numbs the tongue.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "mat.cinder_thistle",
+      "name": "Cinder-thistle",
+      "kind": "material",
+      "quality": 1,
+      "value": 4,
+      "stack": 20,
+      "trade": "stall.herbs",
+      "pouch": "herb",
+      "description": "Grey leaves and an ember-coloured head. It grows in ash, and little else does.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "mat.dewfern",
+      "name": "Dewfern frond",
+      "kind": "material",
+      "quality": 1,
+      "value": 6,
+      "stack": 20,
+      "trade": "stall.herbs",
+      "pouch": "herb",
+      "description": "A frond that is still wet at noon. The draught-makers of the Shore steep it.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "mat.charcoal",
+      "name": "Charcoal",
+      "kind": "material",
+      "quality": 1,
+      "value": 1,
+      "stack": 20,
+      "trade": "forge.wood",
+      "pouch": "ore",
+      "description": "Wood burnt slow and black. A forge eats it by the basket.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "mat.flour",
+      "name": "Mill flour",
+      "kind": "material",
+      "quality": 1,
+      "value": 1,
+      "stack": 20,
+      "pouch": "larder",
+      "description": "Stone-ground at a creek mill. It keeps, if you keep it dry.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "mat.salt",
+      "name": "Rim salt",
+      "kind": "material",
+      "quality": 1,
+      "value": 1,
+      "stack": 20,
+      "pouch": "larder",
+      "description": "Grey salt raked from the pans of the Ash Rim. It cures meat and sharpens a tonic.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "mat.vial",
+      "name": "Stoppered vial",
+      "kind": "material",
+      "quality": 1,
+      "value": 1,
+      "stack": 20,
+      "pouch": "herb",
+      "description": "Thick green glass and a cork. Empty, for now.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "tool.pick",
+      "name": "Miner's pick",
+      "kind": "tool",
+      "quality": 1,
+      "value": 2,
+      "stack": 1,
+      "teaches": "mining",
+      "description": "Use it to hang it at your belt. It takes no room in your bags after that.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "tool.hatchet",
+      "name": "Woodcutter's hatchet",
+      "kind": "tool",
+      "quality": 1,
+      "value": 2,
+      "stack": 1,
+      "teaches": "woodcutting",
+      "description": "Use it to hang it at your belt. It takes no room in your bags after that.",
+      "canonStatus": "GAME-ONLY"
     }
   ],
   "vendors": [
@@ -590,13 +837,22 @@
         "potion.minor",
         "potion.healing",
         "food.brown_loaf",
-        "food.harrow_cheese"
+        "food.harrow_cheese",
+        "tool.pick",
+        "tool.hatchet",
+        "mat.flour",
+        "mat.salt",
+        "mat.vial"
       ],
       "gearForZone": true
     },
     {
       "role": "blacksmith",
-      "items": [],
+      "items": [
+        "tool.pick",
+        "tool.hatchet",
+        "mat.charcoal"
+      ],
       "gearForZone": true
     },
     {
@@ -610,7 +866,8 @@
       "role": "herbalist",
       "items": [
         "potion.minor",
-        "potion.healing"
+        "potion.healing",
+        "mat.vial"
       ]
     },
     {

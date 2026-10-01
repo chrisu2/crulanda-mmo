@@ -3302,7 +3302,9 @@ namespace Crulanda.World
                 {
                     float a = (k * 25.7f + D() * 20) * Mathf.Deg2Rad, r = 2.6f + D() * 2.4f; var from = knot + Vector3.up * (1 + D() * 4) + face * new Vector3(Mathf.Sin(a) * 3, 0, Mathf.Cos(a) * 1.5f);
                     var to = from + face * new Vector3(Mathf.Sin(a) * r, k % 3 == 0 ? 3 + D() * 3 : seat.y + .1f - from.y, Mathf.Cos(a) * r * .8f + 2);
-                    Limb(t, from, to, .3f + D() * .25f, .05f, bark, .12f, 7);
+                    float thick = .3f + D() * .25f;
+                    if (Mathf.Abs(Mathf.Sin(a)) < .45f && Mathf.Cos(a) > 0) continue;   // none down the front of her face (the draws are taken all the same)
+                    Limb(t, from, to, thick, .05f, bark, .12f, 7);
                 }
                 Block(knot, new Vector3(6, 7, 3.5f), face);
                 var cold = seat + face * new Vector3(1.6f, 0, 2.4f); cold.y = FloorY(cold.x, cold.z);

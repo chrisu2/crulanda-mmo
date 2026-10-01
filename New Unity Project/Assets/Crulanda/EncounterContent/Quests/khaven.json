@@ -39,6 +39,12 @@
       "title": "What the Captain Doesn't Count",
       "text": "A tally scratched on a scrap of hide, in an outrider's hand:\n\nKhaven toll, my share, not the Company's:\n  four pewter plates (the Vey woman's)\n  one good knife, off a pedlar who argued\n  eleven sovereigns in small coin\n  a silver thimble\n\nCaptain counts the carts. Captain doesn't count me.\nWhen the Company moves on, I don't. There's a glass ship out of Port Caelum with room for one man and no questions.",
       "canonStatus": "GAME-ONLY: the outrider and his tally. Port Caelum and its glass ships are CANON (world_bible.md)."
+    },
+    {
+      "id": "doc.khaven.listener",
+      "title": "What the Wood Repeats",
+      "text": "Leaves from a daybook, the hand careful at first and less careful toward the end:\n\nI came to Khaven to listen to the wood. My order holds that the Original Song was never lost, only scattered, and that here and there the world still hums a line of it.\n\nThird night. While the wind blows, the wood is silent. When it drops, they begin. Not words. Names.\n\nNinth night. I knew one: Tamsin Ade, from the low row by the creek. Said over and over, the way a miser counts his coin.\n\nTwelfth night. It is not the trees. Something pale stands between them, and the trees only say over what it says.\n\nFourteenth night. It does not sing. It counts. Every name in Khaven, and a number after each.\n\nFifteenth night. Tonight it said my name, and then a number.\n\n(The rest of the page is a tally: strokes in fives, line after line, down to the torn edge.)",
+      "canonStatus": "CANON-EXPANDED: the Silent Pilgrims and their belief in the Original Song are CANON, and so are the Pale Things as cosmic auditors (world_bible.md); the Listener and his daybook are GAME-ONLY. Tamsin Ade is from the sexton's register (GAME-ONLY)."
     }
   ],
   "quests": [

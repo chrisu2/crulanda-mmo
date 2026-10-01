@@ -101,10 +101,22 @@ namespace Crulanda.Tests
                     else if (Searchable(d) && spot.root.GetComponentsInChildren<Renderer>().Length == 0) problems.Add(q + "has nothing to see");
                     // Walkable to: a navmesh point near it, within reach of E (or inside a lookout's radius), on a complete path from the start.
                     float reach = Searchable(d) ? EncounterSession.UseRange - .2f : d.radius;
-                    if (!NavMesh.SamplePosition(spot.position, out var hit, Mathf.Max(2.5f, reach + 1), NavMesh.AllAreas) || Flat(hit.position, spot.position) > reach)
-                        problems.Add(q + "has no walkable ground within reach (" + reach + " m) of " + spot.position);
-                    else if (!NavMesh.CalculatePath(start.position, hit.position, NavMesh.AllAreas, path) || path.status != NavMeshPathStatus.PathComplete)
-                        problems.Add(q + "can't be walked to from the start");
+                    // The nearest navmesh may be an island on a boulder's top: try the ground round it too, the way you'd walk up to it.
+                    bool near = false, walked = false;
+                    var tries = new List<Vector3> { spot.position };
+                    for (int k = 0; k < 8; k++) foreach (float r in new[] { 1.2f, Mathf.Min(2.2f, reach) })
+                    {
+                        var round = new Vector2(spot.position.x, spot.position.z) + new Vector2(Mathf.Cos(k * Mathf.PI / 4), Mathf.Sin(k * Mathf.PI / 4)) * r;
+                        tries.Add(zone.StandAt(round, spot.position.y, .2f));
+                    }
+                    for (int k = 0; k < tries.Count && !walked; k++)
+                    {
+                        if (!NavMesh.SamplePosition(tries[k], out var hit, k == 0 ? Mathf.Max(2.5f, reach + 1) : 1, NavMesh.AllAreas) || Flat(hit.position, spot.position) > reach) continue;
+                        near = true;
+                        walked = NavMesh.CalculatePath(start.position, hit.position, NavMesh.AllAreas, path) && path.status == NavMeshPathStatus.PathComplete;
+                    }
+                    if (!near) problems.Add(q + "has no walkable ground within reach (" + reach + " m) of " + spot.position);
+                    else if (!walked) problems.Add(q + "can't be walked to from the start");
                     // Where it stands.
                     var at = new Vector2(spot.position.x, spot.position.z);
                     if (zone.InBuilding(at)) problems.Add(q + "stands in a building");

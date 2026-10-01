@@ -10,7 +10,7 @@ foreach ($m in $Modes) {
     $r = Join-Path $v "q-$m.xml"
     if (Test-Path -LiteralPath $r) { Remove-Item -LiteralPath $r }
     $p = Start-Process $unity -WindowStyle Hidden -PassThru -ArgumentList @('-batchmode', '-nographics', '-projectPath', ('"' + $v + '"'), '-runTests', '-testPlatform', $m, '-testResults', ('"' + $r + '"'), '-logFile', ('"' + (Join-Path $v "q-$m.log") + '"'))
-    $p | Wait-Process -Timeout 1200
+    $p | Wait-Process -Timeout 3600   # PlayMode loads every zone many times: give it an hour
     if (Test-Path -LiteralPath $r) {
         $x = [xml](Get-Content -LiteralPath $r); $t = $x.'test-run'
         "$m total=$($t.total) passed=$($t.passed) failed=$($t.failed)"

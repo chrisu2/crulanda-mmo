@@ -19,7 +19,8 @@ games are style references only: no copied names, assets, zones or creatures fro
 - **Four zones on a level ladder, cap 10:** Oakhaven (1-2, farmland village, the Great Oak, the Golden Cask inn),
   Khaven Village (3-5, a walled village in permanent grim dusk beside the dead Whispering Wood), the Shattered Peaks
   (6-8, a mountain toll pass held by Sandthrone mercenaries), the Ashland Rim (9-10, grey petrified ash beside the
-  Wasting, with the Ash-Walker caves and Weave-Eaters). All built from JSON by `ZoneBuilder` at load.
+  Wasting, with the Ash-Walker caves and Weave-Eaters). All built from JSON by `ZoneBuilder` at load, 340-380 m across
+  (grown 2026-09-30 with 37 new places, 18 camps and 14 secrets in the new ground).
 - **Living world:** villagers with trades and daily routines, hen-wives and coops, critters with legs, a day/night
   cycle with lamps, falling leaves and ash, wind-swayed grass, respawning camps, ambushes from tall grass, breadcrumb
   quests that lead from zone to zone, a quest book, factions and standing.
@@ -59,7 +60,7 @@ reference only:
   a map-marked quest pickup. Decided: exploration is rewarded with **discoveries + loot** (a "Discovered" toast, XP, a
   cache, a Discoveries tab in the quest book). The overall order: **tree crowns, weather, the cave, secrets in every
   zone, the cave made a deep dungeon, then grow the zones** to about 340-380 m once there is content to fill them, then
-  the painted style pass. (All up to the deep dungeon are built, 2026-09-30.)
+  the painted style pass. (All up to the zone growth are built, 2026-09-30; the painted style pass is next.)
 - **Seamless caves:** a rock-shell cave built into a hillside with no loading screen, darkening as you walk in. The
   first, **Crowsfoot Hollow**, is built (2026-09-30), the **Sandthrone deserters' cave** in Oakhaven's north hills: a quest
   from level 3 to clear the bandits and their game-only Bandit King so they stop harassing the villagers. Chris: "the cave

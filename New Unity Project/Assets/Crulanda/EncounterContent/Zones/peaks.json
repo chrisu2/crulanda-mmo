@@ -3,8 +3,8 @@
   "displayName": "The Shattered Peaks",
   "subtitle": "The Sandthrone toll road over the eastern border mountains",
   "canonStatus": "CANON-EXPANDED",
-  "canonNote": "Canon: the Shattered Peaks are a jagged range on the eastern border that holds back the Wasting while the void slowly eats through the stone (world_bible.md), and Sandthrone mercenaries hold them and charge a toll (book1 ch.5). GAME-ONLY / PROVISIONAL: this pass and its toll gate, the toll-house, the pilgrims' rest and its people, the ruined waystation, the pilgrims' cairns, the levelling camps and all placement. Mount Umbra is named on the game's world map image but not in the lore folder.",
-  "size": 260,
+  "canonNote": "Canon: the Shattered Peaks are a jagged range on the eastern border that holds back the Wasting while the void slowly eats through the stone (world_bible.md), and Sandthrone mercenaries hold them and charge a toll (book1 ch.5). GAME-ONLY / PROVISIONAL: this pass and its toll gate, the toll-house, the pilgrims' rest and its people, the ruined waystation, the pilgrims' cairns, the levelling camps and all placement. Mount Umbra is named on the game's world map image but not in the lore folder. The grown ring (2026-09-30): old mining tunnels under the Peaks are CANON (book2 ch.19), and so is the void eating the stone (world_bible.md); the signal tower, the goatherd's shieling, the sealed adit, the Cold Tarn, the Listening Shrine (the Silent Pilgrims are CANON), the Broken Post, the avalanche scar with its grey head, and their camps are GAME-ONLY.",
+  "size": 360,
   "levelMin": 6,
   "levelMax": 8,
   "biome": "mountain",
@@ -53,7 +53,7 @@
   "spawns": {
     "player": {
       "x": -88,
-      "y": -114
+      "y": -164
     },
     "playerFacing": 20,
     "companion": {
@@ -77,11 +77,11 @@
       "name": "Toll road down to Khaven Village",
       "at": {
         "x": -90,
-        "y": -123
+        "y": -173
       },
       "arrive": {
         "x": -12,
-        "y": 104
+        "y": 154
       },
       "radius": 5
     },
@@ -89,11 +89,11 @@
       "to": "zone.ashrim",
       "name": "Toll road east to the Ashland Rim",
       "at": {
-        "x": 123,
+        "x": 173,
         "y": -92
       },
       "arrive": {
-        "x": -114,
+        "x": -164,
         "y": 88
       },
       "radius": 5
@@ -139,6 +139,46 @@
         "y": -70
       },
       "radius": 8
+    },
+    {
+      "name": "Signal-tower yard",
+      "center": {
+        "x": -131,
+        "y": -123
+      },
+      "radius": 4
+    },
+    {
+      "name": "Shieling yard",
+      "center": {
+        "x": 6,
+        "y": -119
+      },
+      "radius": 4
+    },
+    {
+      "name": "Adit yard",
+      "center": {
+        "x": -145,
+        "y": -42
+      },
+      "radius": 5
+    },
+    {
+      "name": "Tarn shore",
+      "center": {
+        "x": -13.5,
+        "y": 144
+      },
+      "radius": 3
+    },
+    {
+      "name": "Scar foot",
+      "center": {
+        "x": 127,
+        "y": 25
+      },
+      "radius": 4
     }
   ],
   "shapes": [
@@ -172,6 +212,57 @@
       "radius": 7,
       "height": -0.5,
       "blend": 5
+    },
+    {
+      "name": "Signal-tower spur",
+      "center": {
+        "x": -136,
+        "y": -128
+      },
+      "radius": 7,
+      "height": 4,
+      "blend": 8
+    },
+    {
+      "name": "Tarn floor",
+      "center": {
+        "x": -24,
+        "y": 136
+      },
+      "radius": 13.5,
+      "height": -1.5,
+      "blend": 6
+    },
+    {
+      "name": "Shrine spur",
+      "center": {
+        "x": 10,
+        "y": 144
+      },
+      "radius": 4.5,
+      "height": 4.5,
+      "blend": 8
+    },
+    {
+      "name": "Spoil heap",
+      "center": {
+        "x": -136,
+        "y": -55
+      },
+      "radius": 3.5,
+      "height": 2,
+      "blend": 5
+    },
+    {
+      "name": "Grey scar",
+      "paint": "unmade",
+      "center": {
+        "x": 163,
+        "y": 31
+      },
+      "radius": 5,
+      "height": 0,
+      "blend": 4
     }
   ],
   "roads": [
@@ -179,6 +270,18 @@
       "name": "Toll road",
       "width": 5,
       "points": [
+        {
+          "x": -91,
+          "y": -180
+        },
+        {
+          "x": -87.5,
+          "y": -158
+        },
+        {
+          "x": -93,
+          "y": -143
+        },
         {
           "x": -92,
           "y": -130
@@ -250,6 +353,38 @@
         {
           "x": 130,
           "y": -100
+        },
+        {
+          "x": 139,
+          "y": -101
+        },
+        {
+          "x": 148,
+          "y": -96
+        },
+        {
+          "x": 157,
+          "y": -87
+        },
+        {
+          "x": 163,
+          "y": -83.5
+        },
+        {
+          "x": 168,
+          "y": -84
+        },
+        {
+          "x": 172,
+          "y": -88
+        },
+        {
+          "x": 175,
+          "y": -93
+        },
+        {
+          "x": 180,
+          "y": -100
         }
       ]
     },
@@ -270,10 +405,219 @@
           "y": 93
         }
       ]
+    },
+    {
+      "name": "Tower path",
+      "width": 2.5,
+      "points": [
+        {
+          "x": -92.6,
+          "y": -136
+        },
+        {
+          "x": -103,
+          "y": -134
+        },
+        {
+          "x": -114,
+          "y": -131.5
+        },
+        {
+          "x": -124,
+          "y": -129
+        }
+      ]
+    },
+    {
+      "name": "Drove track",
+      "width": 2.5,
+      "points": [
+        {
+          "x": -89.3,
+          "y": -120
+        },
+        {
+          "x": -76,
+          "y": -116
+        },
+        {
+          "x": -60,
+          "y": -120
+        },
+        {
+          "x": -44,
+          "y": -117
+        },
+        {
+          "x": -31,
+          "y": -119
+        },
+        {
+          "x": -18,
+          "y": -117.5
+        }
+      ]
+    },
+    {
+      "name": "Ore road",
+      "width": 3,
+      "points": [
+        {
+          "x": -49,
+          "y": -42
+        },
+        {
+          "x": -60,
+          "y": -44
+        },
+        {
+          "x": -72,
+          "y": -42
+        },
+        {
+          "x": -86,
+          "y": -40
+        },
+        {
+          "x": -100,
+          "y": -36
+        },
+        {
+          "x": -114,
+          "y": -31
+        },
+        {
+          "x": -128,
+          "y": -34
+        },
+        {
+          "x": -136.5,
+          "y": -39
+        },
+        {
+          "x": -140.5,
+          "y": -41
+        }
+      ]
+    },
+    {
+      "name": "Tarn path",
+      "width": 2.5,
+      "points": [
+        {
+          "x": 43,
+          "y": 75
+        },
+        {
+          "x": 34,
+          "y": 85
+        },
+        {
+          "x": 24,
+          "y": 96
+        },
+        {
+          "x": 16,
+          "y": 106
+        },
+        {
+          "x": 14,
+          "y": 118
+        },
+        {
+          "x": 8,
+          "y": 130
+        },
+        {
+          "x": -1,
+          "y": 137
+        },
+        {
+          "x": -8,
+          "y": 140
+        },
+        {
+          "x": -12,
+          "y": 141
+        }
+      ]
+    },
+    {
+      "name": "Scree path",
+      "width": 2.5,
+      "points": [
+        {
+          "x": 96.5,
+          "y": 3
+        },
+        {
+          "x": 106,
+          "y": 9
+        },
+        {
+          "x": 115,
+          "y": 15
+        },
+        {
+          "x": 121,
+          "y": 20
+        }
+      ]
     }
   ],
   "water": [],
-  "fields": [],
+  "lakes": [
+    {
+      "name": "The Cold Tarn",
+      "center": {
+        "x": -24,
+        "y": 136
+      },
+      "radius": 8,
+      "depth": 2.2
+    }
+  ],
+  "fields": [
+    {
+      "name": "Shieling hay meadow",
+      "center": {
+        "x": -2,
+        "y": -122
+      },
+      "size": {
+        "x": 12,
+        "y": 6
+      },
+      "rotation": 4,
+      "crop": "stubble"
+    }
+  ],
+  "tallGrass": [
+    {
+      "name": "Shieling meadow",
+      "center": {
+        "x": -16,
+        "y": -124
+      },
+      "radius": 5
+    },
+    {
+      "name": "Tarn sedge",
+      "center": {
+        "x": -39,
+        "y": 129
+      },
+      "radius": 4
+    },
+    {
+      "name": "Scar grass",
+      "center": {
+        "x": 122,
+        "y": 34
+      },
+      "radius": 5
+    }
+  ],
   "landmarks": [
     {
       "name": "Pilgrims' Rest",
@@ -337,6 +681,76 @@
         "y": -70
       },
       "radius": 10
+    },
+    {
+      "name": "The Signal Tower",
+      "text": "A fire-bowl burns at its foot day and night. When anyone comes up from Khaven the pickets throw on green wood, and the gate sees the smoke before it sees you.",
+      "at": {
+        "x": -136,
+        "y": -128
+      },
+      "radius": 9,
+      "canonStatus": "GAME-ONLY. The Sandthrone holding the Peaks' toll is CANON (book1 ch.5)."
+    },
+    {
+      "name": "Goatherd's Shieling",
+      "text": "The goatherd paid the toll in goats until there were none left. Only the wolves come to the fold now.",
+      "at": {
+        "x": 12,
+        "y": -120
+      },
+      "radius": 10,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The Sealed Adit",
+      "text": "An old working driven into Umbra's flank, walled up from outside. Someone scored a warning into the mortar.",
+      "at": {
+        "x": -149,
+        "y": -42
+      },
+      "radius": 9,
+      "canonStatus": "CANON-EXPANDED: old mining tunnels run under the Shattered Peaks (book2 ch.19) and the void is slowly eating the Peaks' stone (world_bible.md); this working and its seal are GAME-ONLY."
+    },
+    {
+      "name": "The Cold Tarn",
+      "text": "Snowmelt held in a bowl of rock behind the north wall. Ice rims it every dawn; pilgrims fill their skins here and don't linger.",
+      "at": {
+        "x": -24,
+        "y": 136
+      },
+      "radius": 12,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The Listening Shrine",
+      "text": "A wayside shrine on the spur above the tarn. Silent Pilgrims stop here to listen; they say the wind on this spur still remembers the old song.",
+      "at": {
+        "x": 10,
+        "y": 144
+      },
+      "radius": 8,
+      "canonStatus": "CANON-EXPANDED: the Silent Pilgrims and the Original Song are CANON (world_bible.md); the shrine is GAME-ONLY."
+    },
+    {
+      "name": "The Broken Post",
+      "text": "Whoever held the pass before the Sandthrone watched the east road from this post. The roof is long gone; the wind does the watching now.",
+      "at": {
+        "x": 147,
+        "y": -83
+      },
+      "radius": 8,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "Avalanche scar",
+      "text": "Half the mountainside came down here. At its head the rock is grey and smooth, as if something ate the stone away beneath it.",
+      "at": {
+        "x": 145,
+        "y": 28
+      },
+      "radius": 12,
+      "canonStatus": "CANON-EXPANDED: the void eating the Peaks' stone is CANON (world_bible.md); this scar is GAME-ONLY."
     }
   ],
   "props": [
@@ -985,6 +1399,391 @@
         "y": -84
       },
       "variant": 1
+    },
+    {
+      "kind": "perch",
+      "name": "Signal-tower rocks",
+      "at": {
+        "x": -136,
+        "y": -128
+      },
+      "rotation": 270,
+      "size": {
+        "x": 7,
+        "y": 0
+      }
+    },
+    {
+      "kind": "tower",
+      "name": "The Signal Tower",
+      "at": {
+        "x": -137,
+        "y": -129
+      },
+      "size": {
+        "x": 4.4,
+        "y": 0
+      }
+    },
+    {
+      "kind": "brazier",
+      "name": "Signal fire",
+      "at": {
+        "x": -132.5,
+        "y": -125.5
+      }
+    },
+    {
+      "kind": "woodpile",
+      "at": {
+        "x": -139.5,
+        "y": -124.5
+      },
+      "rotation": 80
+    },
+    {
+      "kind": "crates",
+      "at": {
+        "x": -133,
+        "y": -132
+      },
+      "rotation": 200,
+      "variant": 1
+    },
+    {
+      "kind": "ruined_house",
+      "name": "Goatherd's Shieling",
+      "at": {
+        "x": 13,
+        "y": -122
+      },
+      "rotation": 90,
+      "size": {
+        "x": 6,
+        "y": 4.5
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "Shieling fold",
+      "at": {
+        "x": 22,
+        "y": -116.5
+      },
+      "rotation": 0,
+      "size": {
+        "x": 8,
+        "y": 0
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "Shieling fold",
+      "at": {
+        "x": 26.5,
+        "y": -121.5
+      },
+      "rotation": 90,
+      "size": {
+        "x": 9,
+        "y": 0
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "Shieling fold",
+      "at": {
+        "x": 22,
+        "y": -126.5
+      },
+      "rotation": 0,
+      "size": {
+        "x": 8,
+        "y": 0
+      }
+    },
+    {
+      "kind": "woodpile",
+      "at": {
+        "x": 8,
+        "y": -126.5
+      },
+      "rotation": 10
+    },
+    {
+      "kind": "cliff",
+      "name": "Adit face",
+      "lift": -6,
+      "at": {
+        "x": -153,
+        "y": -42
+      },
+      "rotation": 90,
+      "size": {
+        "x": 26,
+        "y": 0
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "The Sealed Adit",
+      "at": {
+        "x": -148.6,
+        "y": -42
+      },
+      "rotation": 90,
+      "size": {
+        "x": 4,
+        "y": 0
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "Adit jamb",
+      "at": {
+        "x": -149.6,
+        "y": -44.3
+      },
+      "rotation": 0,
+      "size": {
+        "x": 3,
+        "y": 0
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "Adit jamb",
+      "at": {
+        "x": -149.6,
+        "y": -39.0
+      },
+      "rotation": 0,
+      "size": {
+        "x": 3,
+        "y": 0
+      }
+    },
+    {
+      "kind": "cart",
+      "name": "Ore cart",
+      "at": {
+        "x": -142,
+        "y": -47.5
+      },
+      "rotation": 200
+    },
+    {
+      "kind": "crates",
+      "name": "Pit props",
+      "at": {
+        "x": -141.5,
+        "y": -37
+      },
+      "rotation": 75,
+      "variant": 2
+    },
+    {
+      "kind": "perch",
+      "name": "Spoil heap",
+      "at": {
+        "x": -136,
+        "y": -55
+      },
+      "rotation": 20,
+      "size": {
+        "x": 3.5,
+        "y": 0
+      }
+    },
+    {
+      "kind": "signpost",
+      "at": {
+        "x": -137,
+        "y": -44.5
+      },
+      "rotation": 270
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -144,
+        "y": -33
+      },
+      "variant": 1
+    },
+    {
+      "kind": "perch",
+      "name": "Shrine spur rocks",
+      "at": {
+        "x": 10,
+        "y": 144
+      },
+      "rotation": 60,
+      "size": {
+        "x": 4.5,
+        "y": 0
+      }
+    },
+    {
+      "kind": "wayshrine",
+      "name": "The Listening Shrine",
+      "at": {
+        "x": 10.6,
+        "y": 145.2
+      },
+      "rotation": 60
+    },
+    {
+      "kind": "ruin",
+      "name": "Pilgrims' windbreak",
+      "at": {
+        "x": -25,
+        "y": 152
+      },
+      "rotation": 8,
+      "size": {
+        "x": 4,
+        "y": 0
+      }
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -41,
+        "y": 147
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -9,
+        "y": 150
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -15,
+        "y": 153.5
+      },
+      "variant": 2
+    },
+    {
+      "kind": "cliff",
+      "name": "Scar head",
+      "at": {
+        "x": 166,
+        "y": 36
+      },
+      "rotation": 95,
+      "size": {
+        "x": 22,
+        "y": 0
+      }
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 150,
+        "y": 22
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 134,
+        "y": 34
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 146,
+        "y": 40
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 130,
+        "y": 16
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 152,
+        "y": 30
+      },
+      "variant": 1
+    },
+    {
+      "kind": "cliff",
+      "name": "East wall",
+      "lift": 6,
+      "at": {
+        "x": 127,
+        "y": -42
+      },
+      "rotation": 77.5,
+      "size": {
+        "x": 56,
+        "y": 0
+      }
+    },
+    {
+      "kind": "cliff",
+      "name": "Goat-path scarp",
+      "lift": -6,
+      "at": {
+        "x": -108,
+        "y": -75
+      },
+      "rotation": 90,
+      "size": {
+        "x": 44,
+        "y": 0
+      }
+    },
+    {
+      "kind": "ruined_house",
+      "name": "The Broken Post",
+      "at": {
+        "x": 147,
+        "y": -83
+      },
+      "rotation": 330,
+      "size": {
+        "x": 6,
+        "y": 5
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "Post wall",
+      "at": {
+        "x": 140,
+        "y": -88
+      },
+      "rotation": 60,
+      "size": {
+        "x": 5,
+        "y": 0
+      }
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 154,
+        "y": -78
+      },
+      "variant": 1
     }
   ],
   "groves": [
@@ -1050,6 +1849,110 @@
       "size": {
         "x": 30,
         "y": 24
+      },
+      "count": 22
+    },
+    {
+      "name": "Tower pines",
+      "kind": "pine",
+      "center": {
+        "x": -118,
+        "y": -152
+      },
+      "size": {
+        "x": 26,
+        "y": 18
+      },
+      "count": 22
+    },
+    {
+      "name": "Shieling pines",
+      "kind": "pine",
+      "center": {
+        "x": 42,
+        "y": -140
+      },
+      "size": {
+        "x": 24,
+        "y": 18
+      },
+      "count": 24
+    },
+    {
+      "name": "Ore-road pines",
+      "kind": "pine",
+      "center": {
+        "x": -126,
+        "y": -18
+      },
+      "size": {
+        "x": 24,
+        "y": 20
+      },
+      "count": 22
+    },
+    {
+      "name": "Tarn pines",
+      "kind": "pine",
+      "center": {
+        "x": -50,
+        "y": 146
+      },
+      "size": {
+        "x": 20,
+        "y": 18
+      },
+      "count": 18
+    },
+    {
+      "name": "Umbra pines",
+      "kind": "pine",
+      "center": {
+        "x": -128,
+        "y": 82
+      },
+      "size": {
+        "x": 28,
+        "y": 24
+      },
+      "count": 24
+    },
+    {
+      "name": "South-east pines",
+      "kind": "pine",
+      "center": {
+        "x": 112,
+        "y": -140
+      },
+      "size": {
+        "x": 28,
+        "y": 20
+      },
+      "count": 20
+    },
+    {
+      "name": "Ledge pines",
+      "kind": "pine",
+      "center": {
+        "x": 98,
+        "y": 142
+      },
+      "size": {
+        "x": 28,
+        "y": 18
+      },
+      "count": 20
+    },
+    {
+      "name": "Avalanche deadfall",
+      "kind": "dead",
+      "center": {
+        "x": 146,
+        "y": 30
+      },
+      "size": {
+        "x": 30,
+        "y": 16
       },
       "count": 22
     }
@@ -1136,6 +2039,71 @@
       "levelMin": 8,
       "levelMax": 8,
       "respawn": 120
+    },
+    {
+      "name": "Signal-tower pickets",
+      "mob": "Sandthrone picket",
+      "tag": "outrider",
+      "look": "outrider",
+      "canonStatus": "CANON faction (Sandthrone), GAME-ONLY camp",
+      "center": {
+        "x": -128,
+        "y": -116
+      },
+      "radius": 8,
+      "count": 4,
+      "levelMin": 6,
+      "levelMax": 7,
+      "respawn": 90
+    },
+    {
+      "name": "Shieling wolves",
+      "mob": "Mountain wolf",
+      "tag": "wolf",
+      "look": "wolf",
+      "canonStatus": "GAME-ONLY",
+      "center": {
+        "x": 40,
+        "y": -137
+      },
+      "radius": 9,
+      "count": 5,
+      "levelMin": 6,
+      "levelMax": 7,
+      "respawn": 75
+    },
+    {
+      "name": "Scar rockhides",
+      "mob": "Rockhide boar",
+      "tag": "boar",
+      "look": "boar",
+      "canonStatus": "GAME-ONLY",
+      "center": {
+        "x": 139,
+        "y": 23
+      },
+      "radius": 9,
+      "count": 5,
+      "levelMin": 7,
+      "levelMax": 8,
+      "respawn": 75
+    },
+    {
+      "name": "Old Scree-Tusk",
+      "mob": "Old Scree-Tusk",
+      "tag": "boar",
+      "look": "boar",
+      "canonStatus": "GAME-ONLY",
+      "center": {
+        "x": 155,
+        "y": 37
+      },
+      "radius": 5,
+      "count": 1,
+      "levelMin": 8,
+      "levelMax": 8,
+      "respawn": 180,
+      "elite": true
     }
   ],
   "life": {
@@ -1194,6 +2162,69 @@
           "y": 0
         },
         "radius": 12,
+        "count": 3
+      },
+      {
+        "kind": "sheep",
+        "center": {
+          "x": 20,
+          "y": -119.5
+        },
+        "radius": 5,
+        "count": 3
+      },
+      {
+        "kind": "crow",
+        "center": {
+          "x": -136,
+          "y": -128
+        },
+        "radius": 8,
+        "count": 3
+      },
+      {
+        "kind": "deer",
+        "center": {
+          "x": -34,
+          "y": 155
+        },
+        "radius": 9,
+        "count": 3
+      },
+      {
+        "kind": "crow",
+        "center": {
+          "x": -145,
+          "y": -42
+        },
+        "radius": 7,
+        "count": 2
+      },
+      {
+        "kind": "crow",
+        "center": {
+          "x": -14,
+          "y": 76
+        },
+        "radius": 7,
+        "count": 2
+      },
+      {
+        "kind": "rabbit",
+        "center": {
+          "x": -7,
+          "y": 153
+        },
+        "radius": 7,
+        "count": 3
+      },
+      {
+        "kind": "rabbit",
+        "center": {
+          "x": 120,
+          "y": 40
+        },
+        "radius": 10,
         "count": 3
       }
     ],
@@ -1311,6 +2342,51 @@
       "item": "herb.frostbell",
       "xp": 90,
       "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "secret.peaks.pickets-skim",
+      "name": "The Picket's Skim",
+      "kind": "cache",
+      "prompt": "Search between the rocks by the tower",
+      "at": {
+        "x": -133.6,
+        "y": -128.6
+      },
+      "rotation": 90,
+      "text": "Wedged between two stones at the foot of the signal tower, where whoever has the watch can reach it without leaving the fire: a dented tin of clipped toll coin. Somebody has been skimming the Company's toll.",
+      "item": "potion.healing",
+      "xp": 100,
+      "gold": 30,
+      "canonStatus": "GAME-ONLY: the picket and his skim. The Sandthrone toll in the Peaks is CANON (book1 ch.5)."
+    },
+    {
+      "id": "secret.peaks.adit-seal",
+      "name": "Scored in the Mortar",
+      "kind": "note",
+      "prompt": "Draw the folded page out of the mortar",
+      "at": {
+        "x": -148.19,
+        "y": -41.2
+      },
+      "rotation": 270,
+      "height": 0.45,
+      "text": "Pushed into a crack in the adit's sealing wall, under a warning scored into the mortar: a folded page, the last notice of the working's foreman.",
+      "document": "doc.peaks.adit_notice",
+      "xp": 110,
+      "canonStatus": "CANON-EXPANDED: old mining tunnels under the Shattered Peaks (book2 ch.19) and the void eating the Peaks' stone (world_bible.md) are CANON; this adit, its seal and the notice are GAME-ONLY."
+    },
+    {
+      "id": "secret.peaks.spur-end",
+      "name": "The Spur's End",
+      "kind": "vista",
+      "at": {
+        "x": 12.4,
+        "y": 140.6
+      },
+      "radius": 3,
+      "text": "From the end of the spur the whole pass lies under you: the tarn's cold eye at your shoulder, the gate and the smoke of the Rest below, and the road going down and down toward Khaven. Pilgrims have left a little cairn of stones here, one for every crossing.",
+      "xp": 110,
+      "canonStatus": "CANON-EXPANDED: the Silent Pilgrims are CANON (world_bible.md); the spur, the shrine and this lookout are GAME-ONLY."
     }
   ]
 }

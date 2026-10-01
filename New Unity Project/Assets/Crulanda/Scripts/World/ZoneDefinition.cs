@@ -207,7 +207,7 @@ namespace Crulanda.World
     /// A named place, labelled over <see cref="at"/>. view (optional): where the capture tour stands to frame it, facing at
     /// (unset: from its south-west); viewPitch and viewZoom set that shot's camera (0: 17 degrees, 11 m).
     /// </summary>
-    [Serializable] public sealed class ZoneLabel { public string name, text; public Vector2 at; public float radius = 10; public Vector2 view; public float viewPitch, viewZoom; }
+    [Serializable] public sealed class ZoneLabel { public string name, text, canonStatus; public Vector2 at; public float radius = 10; public Vector2 view; public float viewPitch, viewZoom; }   // canonStatus: CANON / CANON-EXPANDED / GAME-ONLY / PROVISIONAL
 
     public static class ZoneColors
     {

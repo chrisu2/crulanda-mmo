@@ -127,11 +127,14 @@ namespace Crulanda.Tests
         {
             var h = Crowsfoot; var zone = ZoneBuilder.Active;
             Assert.Less(h.Centre[h.Centre.Count - 1].y, h.Centre[0].y - 14, "The Echoing Hall lies fourteen metres and more below the mouth.");
-            Assert.Greater(h.Centre[h.Centre.Count - 1].z, zone.Half + 20, "It runs on under the hills past the zone's edge.");
             Assert.Greater(h.Length, 100, "A dungeon, not a hole in a hill.");
-            // Where it passes under the zone's northern boundary, its roof is under the boundary wall's foot.
+            // Past the Drop it runs deep under the northern hills: three metres of rock and more between its roof and the land.
             for (int i = 0; i < h.Centre.Count; i++)
-                if (Mathf.Abs(h.Centre[i].z - (zone.Half - 1)) < 1.2f) Assert.Less(h.Roof(i), -1, "Under the boundary at " + h.Centre[i]);
+                if (h.Along[i] > 45) Assert.Greater(h.Land[i] - h.Roof(i), 3, "Rock over the passage at " + h.Centre[i] + " (land " + h.Land[i] + ", roof " + h.Roof(i) + ").");
+            // Where it passes under the zone's boundary (if it does), its roof is under the boundary wall's foot.
+            for (int i = 0; i < h.Centre.Count; i++)
+                if (Mathf.Abs(Mathf.Abs(h.Centre[i].z) - (zone.Half - 1)) < 1.2f || Mathf.Abs(Mathf.Abs(h.Centre[i].x) - (zone.Half - 1)) < 1.2f)
+                    Assert.Less(h.Roof(i), -1, "Under the boundary at " + h.Centre[i]);
             yield return null;
         }
 

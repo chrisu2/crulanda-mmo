@@ -62,6 +62,12 @@
       "title": "What the Jar Remembers",
       "text": "Unstopped, the jar gives back a voice, very far off, in no tongue you know, and yet you understand it:\n\n'...and the river said its own name, and every stone in it answered, and that was the first song. We did not make it. We only learned to hum along. Remember that, when they tell you the Weave is theirs to spend...'\n\nThen only the wind in the jar, and your own breath.",
       "canonStatus": "CANON-EXPANDED: echo-jars, the Silent Pilgrims and the Original Song are CANON (world_bible.md); the words in this jar are GAME-ONLY."
+    },
+    {
+      "id": "doc.peaks.adit_notice",
+      "title": "The Foreman's Notice",
+      "text": "NOTICE. The Umbra working is closed by the foreman's order.\n\nThe deep level has gone bad. The stone down there is grey and smooth and does not ring under the pick. It makes no sound at all. Pell put his pick into it and drew it back without its point: not broken off, gone, clean, as if it had never had one.\n\nWe have walled the mouth with good mortar. Do not open it, for any price. The grey has got into the roots of the mountain.\n\n- Bram Tolley, foreman",
+      "canonStatus": "CANON-EXPANDED: old mining tunnels under the Shattered Peaks (book2 ch.19) and the void slowly eating the Peaks' stone (world_bible.md) are CANON; the working, its foreman and this notice are GAME-ONLY."
     }
   ],
   "quests": [

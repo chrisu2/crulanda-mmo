@@ -58,6 +58,10 @@ namespace Crulanda.Tests
                 var s = UnityEngine.Object.FindFirstObjectByType<EncounterSession>();
                 var z = s.Zone.Zone; string p = z.displayName + ": ";
                 if (z.id != id) { problems.Add(p + "built " + z.id + " instead of " + id); continue; }
+                // The ground wears its painted material (a lost assignment draws it magenta).
+                var groundLook = s.Zone.GroundMesh != null ? s.Zone.GroundMesh.GetComponent<Renderer>() : null;
+                if (groundLook == null || groundLook.sharedMaterial == null || groundLook.sharedMaterial != s.Zone.GroundMaterial || groundLook.sharedMaterial.mainTexture == null)
+                    problems.Add(p + "the ground has no painted material");
                 // Player start and arrivals are walkable.
                 if (!NavMesh.SamplePosition(s.Zone.Ground(z.spawns.player), out _, 2.5f, NavMesh.AllAreas)) problems.Add(p + "player start is not walkable");
                 if (arrivals.TryGetValue(id, out var ins))

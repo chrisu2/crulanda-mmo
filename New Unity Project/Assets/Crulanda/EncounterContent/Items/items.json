@@ -329,6 +329,40 @@
       "stack": 10,
       "description": "A Sandthrone company badge with the sun-and-sand filed off. The man who wore it wanted nobody to know whose he had been.",
       "canonStatus": "GAME-ONLY: the Sandthrone company is CANON; the badge is invented."
+    },
+    {
+      "id": "item.leviathan_charm",
+      "name": "Leviathan-Tooth Charm",
+      "kind": "gear",
+      "slot": "neck",
+      "quality": 3,
+      "level": 10,
+      "value": 42,
+      "stamina": 7,
+      "strength": 6,
+      "agility": 4,
+      "description": "A tooth as long as your hand, gone to grey stone and bound in amber cord. The Ash-Walkers say an Eater won't take a man who wears old bone. They say it with a straight face.",
+      "canonStatus": "CANON-EXPANDED: Ash-Walker harpoons of petrified leviathan bone are CANON (book1 ch.20); this charm is GAME-ONLY."
+    },
+    {
+      "id": "junk.ash_hide",
+      "name": "Ash-matted hide",
+      "kind": "junk",
+      "quality": 0,
+      "value": 5,
+      "stack": 10,
+      "description": "Stiff with grey grit. It will never come clean, but a tanner will take it.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "junk.sexton_bell",
+      "name": "Cracked hand-bell",
+      "kind": "junk",
+      "quality": 0,
+      "value": 4,
+      "stack": 10,
+      "description": "A sexton's bell, its clapper wired shut so it can't ring for anyone again.",
+      "canonStatus": "GAME-ONLY"
     }
   ],
   "vendors": [
@@ -527,6 +561,107 @@
         {
           "item": "item.tin_crown",
           "chance": 1.0
+        }
+      ]
+    },
+    {
+      "tag": "hound",
+      "levelMin": 1,
+      "levelMax": 10,
+      "gearChance": 0.12,
+      "entries": [
+        {
+          "item": "junk.ash_hide",
+          "chance": 0.7
+        }
+      ]
+    },
+    {
+      "tag": "brood",
+      "levelMin": 1,
+      "levelMax": 10,
+      "gearChance": 0.7,
+      "entries": [
+        {
+          "item": "junk.static_glass",
+          "chance": 1.0,
+          "min": 1,
+          "max": 3
+        },
+        {
+          "item": "potion.salt",
+          "chance": 0.3
+        }
+      ]
+    },
+    {
+      "tag": "deacon",
+      "levelMin": 1,
+      "levelMax": 10,
+      "gearChance": 0.7,
+      "entries": [
+        {
+          "item": "junk.bone_mask",
+          "chance": 1.0
+        },
+        {
+          "item": "potion.salt",
+          "chance": 0.5
+        }
+      ]
+    },
+    {
+      "tag": "tollguard",
+      "levelMin": 1,
+      "levelMax": 10,
+      "gearChance": 0.18,
+      "entries": [
+        {
+          "item": "junk.toll_coin",
+          "chance": 0.7,
+          "max": 2
+        },
+        {
+          "item": "junk.desert_wrap",
+          "chance": 0.3
+        },
+        {
+          "item": "potion.healing",
+          "chance": 0.1
+        }
+      ]
+    },
+    {
+      "tag": "captain",
+      "levelMin": 1,
+      "levelMax": 10,
+      "gearChance": 0.7,
+      "entries": [
+        {
+          "item": "junk.toll_coin",
+          "chance": 1.0,
+          "min": 2,
+          "max": 4
+        },
+        {
+          "item": "potion.healing",
+          "chance": 0.5
+        }
+      ]
+    },
+    {
+      "tag": "sexton",
+      "levelMin": 1,
+      "levelMax": 10,
+      "gearChance": 0.7,
+      "entries": [
+        {
+          "item": "junk.sexton_bell",
+          "chance": 1.0
+        },
+        {
+          "item": "junk.petrified_shard",
+          "chance": 0.5
         }
       ]
     }

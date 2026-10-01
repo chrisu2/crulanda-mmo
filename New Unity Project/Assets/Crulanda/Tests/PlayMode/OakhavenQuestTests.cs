@@ -81,6 +81,9 @@ namespace Crulanda.Tests
             var p = session.Player.transform.position;
             session.Companion.GetComponent<UnityEngine.AI.NavMeshAgent>().Warp(p + Vector3.left * 1.2f - Vector3.up * .1f);
             sel.StandAt(p + Vector3.forward * 2.4f - Vector3.up * .1f, 180);
+            // Anyone else who happens to be passing (the village's day moves people about) steps well clear first.
+            foreach (var v in VillageLife.Active.Villagers)
+                if (v != sel && v != corwin && Vector3.Distance(v.transform.position, p) < 6) v.StandAt(p + Vector3.back * 25 + Vector3.right * 3 * VillageLife.Active.Villagers.IndexOf(v), 0);
             yield return null;
             StringAssert.Contains("Mira", session.InteractPrompt);
             session.SelectFriendly(sel, false);

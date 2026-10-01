@@ -55,6 +55,18 @@
       "title": "By Order of the King",
       "text": "BY ORDER OF CADDOCK, KING OF CROWSFOOT HOLLOW\n(copied fair by Hesk, quartermaster, who can write)\n\nOne. The hall is the King's. Nobody sits in the King's chair. Nobody sits in it to see what it is like.\n\nTwo. Rations are one bowl a day, and what the King says. The Oakhaven grain is the King's grain.\n\nThree. Nobody goes down the North road by daylight. The farmers keep dogs, and the dogs have long memories.\n\nFour. The crown is not tin. Anyone heard saying it is tin stands the Drop for a week.\n\nFive. Pay is owed. Pay will be paid when the King has a kingdom.\n\n- and under it, smaller, in the same hand: Owed to Hesk, nine months. Owed to the company, everything. -",
       "canonStatus": "GAME-ONLY: Caddock, Hesk and their orders are invented; the Sandthrone company is CANON."
+    },
+    {
+      "id": "doc.oakhaven.hallows_creek",
+      "title": "A Letter from Hallow's Creek",
+      "text": "To Ada Hollin, at Oakhaven, by the carter. (Pay him a penny. He has earned it.)\n\nAda, don't you fret over the quiet. The east meadow went pale in the night, that's all: grass and fence-posts and the old ram with them, grey as ash and light as paper, and nobody heard a thing. The reeve says it's a blight off the Peaks and will burn itself out by harvest. Oswin says it is no blight, and got his ear clipped for saying so in the yard.\n\nMother won't leave the house. I've the cart packed all the same. If it comes past the mill-race I'll bring her whether she likes it or not, and we'll come to you down the creek road. Keep a bed aired, and don't let Rowan sell the brindle cow before we've seen her.\n\nYour loving sister,\nBet. Hallow's Creek, the week before the fair.\n\n(Under it, in pencil, in another hand:) No cart came. Nobody came. The carter says there is no road past the milestone now, only grey. Rowan and I are taking the children west to Khaven before it comes to us. Whoever finds this: the east road doesn't go anywhere any more.  - A. H.",
+      "canonStatus": "CANON-EXPANDED: Hallow's Creek, the first settlement the Wasting took, is CANON (world_bible.md); the letter, Bet, the Hollins and their flight west are GAME-ONLY."
+    },
+    {
+      "id": "doc.oakhaven.watch_book",
+      "title": "The Watch Book",
+      "text": "THE WATCHTOWER ON THE EAST ROAD. Each watcher writes the weather, where the grey stands, and their name.\n\nFair. Grey at the far hedge past Hollin's. No change.  - W. Carder\nRain. Grey at the far hedge. The hedge is grey now too.  - Tobin\nFair. The grey has the hedge and two rows of Hollin's barley. You can't hear the wind in it.  - Edda P.\nOvercast. The crows won't fly over it. Counted them. They go round.  - Garet M.\nFair. Hollin's east field gone, all of it, in the one night. Ada Hollin came up and sat with me and didn't say anything.  - Sel H.\nWindy. No change. No change is good.  - W. Carder\nFair. It was nearer this morning than last night. I'd swear it. Nobody else will.  - Tobin\n\n(The rest of the page is torn out along the fold, carefully, as if someone meant to keep it.)",
+      "canonStatus": "GAME-ONLY: the watchtower and its book. The Wasting creeping across the eastern farms, unmaking rather than burning, is CANON (book1 ch.4; world_bible.md)."
     }
   ],
   "quests": [
@@ -441,7 +453,7 @@
             {
               "type": "visit",
               "at": {
-                "x": 88,
+                "x": 148,
                 "y": 40
               },
               "radius": 8,

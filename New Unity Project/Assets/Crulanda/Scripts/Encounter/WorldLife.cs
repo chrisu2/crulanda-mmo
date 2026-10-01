@@ -171,7 +171,14 @@ namespace Crulanda.Encounter
             }
             for (int i = 0; i < 24; i++) AddPlace("wander", new Vector2((R01 - .5f) * z.flatRadius * 1.6f, (R01 - .5f) * z.flatRadius * 1.6f));
         }
-        void AddPlace(string key, Vector2 at) { AddPlace(key, Zone.Ground(at), false); }
+        /// <summary>How far from the village's middle its people go to work the fields, cut wood or walk the meadows: the farms and
+        /// woods past it (a grown zone's outer ring) are the wild's, not a day's errand.</summary>
+        const float VillageReach = 125;
+        void AddPlace(string key, Vector2 at)
+        {
+            if ((key == "field" || key == "woods" || key == "meadow") && at.magnitude > VillageReach) return;
+            AddPlace(key, Zone.Ground(at), false);
+        }
         void AddPlace(string key, Vector3 world, bool exact)
         {
             if (NavMesh.SamplePosition(world, out var hit, exact ? 1.2f : 3f, NavMesh.AllAreas)) Places[key].Add(hit.position);

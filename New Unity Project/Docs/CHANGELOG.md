@@ -540,3 +540,46 @@ Chris shared a reference of a stylized fantasy cove and chose this look for Oakh
   deep under the northern hills; no land shows inside; you can stand on every floor down to the hall; every camp stands on
   the passage floor, Hesk included. `HollowQuestTests` checks the new level. `ZoneContentTests` finds a camp where it
   stands (a cave camp on its floor).
+
+## 2026-09-30 — The zones grow (Chris: "zones do need to be bigger with more places and secrets to explore")
+- **Bigger:** Oakhaven 260 → 380 m, Khaven 240 → 340 m, the Shattered Peaks and the Ashland Rim 260 → 360 m. Every village
+  core keeps its place. The exits, the roads to them, the arrival points, the creeks, the Wasting's curtain and the Peaks' and
+  Rim's entries moved out with the edge.
+- **New places in the new ground**, each a landmark with props and a canon label:
+  - Oakhaven (11): Crowsfoot Ridge over the dungeon, the Mastwood, Moss's lodge, the Old Fold, the Bound Stone, the Cider
+    Barn, Withy pool, the Old Barrow, Hollin farm, the Hallow's Creek milestone, the Watchtower.
+  - Khaven (10): the Gibbet Crossroads, the Corpse Road and its bridge, the Plague Pit, the Drowned Fields, the Carrion
+    Heights and the Charnel Barrow, the Old Bound Wall and the Fallen Watch, the Listener's Hut, the Hush.
+  - The Peaks (7): the Signal Tower, Goatherd's Shieling, the Sealed Adit, the Cold Tarn (the Peaks' first water), the
+    Listening Shrine, the Avalanche scar, the Broken Post; and two inner scarps that keep it a pass.
+  - The Ash Rim (9): Wain's Rest, the Last Orchard, the Drowned Leviathan, the Ash Pit, the Walled Mouth, the Fraying, the
+    Silent Statue (a new `monolith` prop: a robed, hooded figure of pale stone, ten metres tall, one lathed body with nothing
+    in its hood but shadow), the Hunters' Knoll, the Reach-Stones.
+- **18 new camps**, among them four named elites: Old Whitefoot (Oakhaven, 3), the Pale Reckoner (Khaven, 7), Old
+  Scree-Tusk (the Peaks, 8) and the Ash-Deacon (the Rim, 10). New loot tables for hounds, the brood, the deacon, the toll
+  guards, the captain and the sexton.
+- **14 new secrets** (Oakhaven 5, Khaven 3, the Peaks 3, the Rim 3), with five new Chronicle pages (a letter from Hallow's
+  Creek, the Watch Book, the Listener's daybook, the foreman's notice at the sealed adit, the waybook at Wain's Rest) and a
+  Leviathan-Tooth Charm.
+- Groves, fields, tall grass, clearings and critters fill the rest. Crowsfoot Ridge keeps 8 m and more of rock over the dungeon.
+- **Villagers** keep their work and walks within 125 m of the village, so the core stays busy.
+- **Loading stayed fast.** A 380 m zone's 3072 px ground paint took 20 s on one core; it now paints its rows in parallel, and
+  the grass's openness test caches the roads' boxes and the buildings. Zones load faster than the smaller ones did before:
+  Oakhaven 5.6 s (was 8.8), Khaven 3.7 (7.3), the Peaks 3.2 (7.1), the Rim 1.6 (3.8), in the built game. Each build logs its
+  time by phase.
+- **The maps:** about 4 px a metre (up to 2048), and a bigger zone's places list goes into two columns.
+- **Data:** landmarks carry `canonStatus`.
+- **Found by the tests and the tours, and fixed:**
+  - A patch put a comment before the ground's material assignment and drew every zone's ground magenta. It never shipped;
+    `ZoneContentTests` now checks that the ground wears its painted material.
+  - Khaven's flood pools were asked for 0.55-0.6 m of water; a pond is always at least 0.8 m deep.
+  - The Silent Statue was a two-metre cliff scaled up, and its rocks floated apart. Stacked primitives then read as a column
+    with things on it; it is now one lathed figure.
+  - The Picket's Skim sat west of the Signal Tower, in ground closed off by the tower, its rock ring and the woodpile (a
+    navmesh island). It moved to the tower's east side, where the way up arrives. The placement test also tries the ground round
+    a find now, the way you'd walk up to it.
+  - A quest-giver test met a villager passing by. The test now has passers-by step clear first.
+  - Two throwaway diagnostic tests run in the validation copy loaded and re-saved Chris's real save: the editor's save folder
+    is the game's. Only the save's format and height changed; it is restored byte for byte from the backup taken before
+    format 7. An editor test run now never touches the real folder unless a test points it there.
+- **Tests:** all the zone tests (content, exits, travel, water, secrets) run on the grown zones.

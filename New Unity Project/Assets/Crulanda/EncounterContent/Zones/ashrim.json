@@ -3,16 +3,28 @@
   "displayName": "The Ashland Rim",
   "subtitle": "Grey ash at the edge of the Wasting, where the Ash-Walkers hold the Eastern Ridge",
   "canonStatus": "CANON-EXPANDED",
-  "canonNote": "Canon (book1 ch.20): the Ash-Walkers live along the Wasting and fight the Weave-Eaters with Salt of the First Sea; Chieftain Grohl and Mother Vane, the Salt-Speaker, lead them from an enclave in the deep caves of the Eastern Ridge, across a plain of petrified ash. The Cult of Ash (Torvyn Embercloak, Vorn) and its iron-wired bone masks are canon (book1 ch.10, series_bible.md); the purple tear is the later House of Ash's symbol (series_bible.md), used here early (GAME-ONLY). The books also call Torvyn's cultists 'Ashwalkers'; the game keeps the Ash-Walkers of ch.20 and the Cult of Ash apart. The canon Ashlands take their full form after the Spoke fires (series_bible.md), so this pre-erasure rim is PROVISIONAL. GAME-ONLY: the zone's name and its roads to the Peaks and Oakhaven, the cult shrine's location, Cinderfold, the old ribcage, the ash hounds, the brood, and all placement.",
-  "size": 260,
+  "canonNote": "Canon (book1 ch.20): the Ash-Walkers live along the Wasting and fight the Weave-Eaters with Salt of the First Sea; Chieftain Grohl and Mother Vane, the Salt-Speaker, lead them from an enclave in the deep caves of the Eastern Ridge, across a plain of petrified ash. The Cult of Ash (Torvyn Embercloak, Vorn) and its iron-wired bone masks are canon (book1 ch.10, series_bible.md); the purple tear is the later House of Ash's symbol (series_bible.md), used here early (GAME-ONLY). The books also call Torvyn's cultists 'Ashwalkers'; the game keeps the Ash-Walkers of ch.20 and the Cult of Ash apart. The canon Ashlands take their full form after the Spoke fires (series_bible.md), so this pre-erasure rim is PROVISIONAL. GAME-ONLY: the zone's name and its roads to the Peaks and Oakhaven, the cult shrine's location, Cinderfold, the old ribcage, the ash hounds, the brood, and all placement. Grown to 360 m (2026-09-30): the Silent Statue is a canon kind (faceless monoliths in the Wasting, world_bible.md), placed here GAME-ONLY. GAME-ONLY: Wain's Rest and the old salt road, the Last Orchard, the Drowned Leviathan (harpoons of petrified leviathan bone are canon), the Walled Mouth, the Ash Pit and its Ash-Deacon, the Fraying, the Reach-Stones and the Hunters' Knoll.",
+  "size": 360,
   "levelMin": 9,
   "levelMax": 10,
   "biome": "ash",
   "weather": [
-    { "kind": "fair", "weight": 1 },
-    { "kind": "windy", "weight": 2 },
-    { "kind": "overcast", "weight": 3 },
-    { "kind": "ashsquall", "weight": 3 }
+    {
+      "kind": "fair",
+      "weight": 1
+    },
+    {
+      "kind": "windy",
+      "weight": 2
+    },
+    {
+      "kind": "overcast",
+      "weight": 3
+    },
+    {
+      "kind": "ashsquall",
+      "weight": 3
+    }
   ],
   "worldMapPosition": {
     "x": 0.72,
@@ -37,7 +49,7 @@
   },
   "spawns": {
     "player": {
-      "x": -114,
+      "x": -164,
       "y": 88
     },
     "playerFacing": 110,
@@ -61,11 +73,11 @@
       "to": "zone.peaks",
       "name": "Ridge road to the Shattered Peaks",
       "at": {
-        "x": -123,
+        "x": -173,
         "y": 90
       },
       "arrive": {
-        "x": 119,
+        "x": 169,
         "y": -84
       },
       "radius": 5
@@ -75,11 +87,11 @@
       "name": "North road to Oakhaven",
       "at": {
         "x": 4.5,
-        "y": 123
+        "y": 173
       },
       "arrive": {
         "x": -33,
-        "y": -114
+        "y": -174
       },
       "radius": 5
     }
@@ -100,6 +112,22 @@
         "y": -72
       },
       "radius": 7
+    },
+    {
+      "name": "Wain's Rest yard",
+      "center": {
+        "x": -141,
+        "y": 79
+      },
+      "radius": 8
+    },
+    {
+      "name": "The Ash Pit",
+      "center": {
+        "x": -148,
+        "y": -96
+      },
+      "radius": 13
     }
   ],
   "shapes": [
@@ -143,6 +171,67 @@
       "radius": 5,
       "height": -1.2,
       "blend": 5
+    },
+    {
+      "name": "Wain's Rest",
+      "center": {
+        "x": -141,
+        "y": 76
+      },
+      "radius": 11,
+      "height": 0,
+      "blend": 6
+    },
+    {
+      "name": "The Drowned Leviathan",
+      "center": {
+        "x": 20,
+        "y": -145
+      },
+      "radius": 18,
+      "height": -1.4,
+      "blend": 9
+    },
+    {
+      "name": "The Ash Pit",
+      "center": {
+        "x": -148,
+        "y": -96
+      },
+      "radius": 6,
+      "height": -2,
+      "blend": 9
+    },
+    {
+      "name": "The Fraying",
+      "paint": "unmade",
+      "center": {
+        "x": 115,
+        "y": -32
+      },
+      "radius": 9,
+      "height": -0.6,
+      "blend": 5
+    },
+    {
+      "name": "The Silent Statue",
+      "center": {
+        "x": 141,
+        "y": -50
+      },
+      "radius": 7,
+      "height": 0,
+      "blend": 8
+    },
+    {
+      "name": "The Hunters' Knoll",
+      "center": {
+        "x": -100,
+        "y": 152
+      },
+      "radius": 6,
+      "height": 3.5,
+      "blend": 10
     }
   ],
   "roads": [
@@ -150,6 +239,22 @@
       "name": "Ridge road",
       "width": 4.5,
       "points": [
+        {
+          "x": -180,
+          "y": 92
+        },
+        {
+          "x": -168,
+          "y": 88.6
+        },
+        {
+          "x": -152,
+          "y": 87.6
+        },
+        {
+          "x": -140,
+          "y": 91
+        },
         {
           "x": -130,
           "y": 92
@@ -188,6 +293,18 @@
       "name": "North road",
       "width": 4,
       "points": [
+        {
+          "x": 4,
+          "y": 180
+        },
+        {
+          "x": 5.2,
+          "y": 166
+        },
+        {
+          "x": 2.4,
+          "y": 150
+        },
         {
           "x": 4,
           "y": 130
@@ -235,12 +352,34 @@
           "y": -58
         }
       ]
+    },
+    {
+      "name": "Orchard lane",
+      "width": 2.6,
+      "points": [
+        {
+          "x": 2.8,
+          "y": 146.2
+        },
+        {
+          "x": 11,
+          "y": 145.2
+        },
+        {
+          "x": 18,
+          "y": 142.8
+        },
+        {
+          "x": 22.2,
+          "y": 141.2
+        }
+      ]
     }
   ],
   "water": [],
   "fields": [],
   "wasting": {
-    "x": 104,
+    "x": 154,
     "curtainHeight": 26,
     "fade": 20,
     "note": "Canon: the Wasting unmakes rather than destroys; the Ash-Walkers live along its edge (book1 ch.20)."
@@ -304,10 +443,100 @@
       "name": "The Wasting",
       "text": "Past the Ridge the world simply stops.",
       "at": {
-        "x": 96,
+        "x": 146,
         "y": 60
       },
       "radius": 10
+    },
+    {
+      "name": "Wain's Rest",
+      "text": "The last waystation on the old salt road. The wains stopped coming, and then so did everything else.",
+      "at": {
+        "x": -141,
+        "y": 75
+      },
+      "radius": 14,
+      "canonStatus": "GAME-ONLY: the waystation, the salt road and its wains. The grey that unmakes is CANON (world_bible.md)."
+    },
+    {
+      "name": "The Last Orchard",
+      "text": "Apple trees grey to the root. Nothing here rots: there is nothing left to do the rotting.",
+      "at": {
+        "x": 50,
+        "y": 148
+      },
+      "radius": 18,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The Drowned Leviathan",
+      "text": "A spine as long as a village street breaks out of the ash and dives back under. The ash was sea, once.",
+      "at": {
+        "x": 20,
+        "y": -145
+      },
+      "radius": 20,
+      "canonStatus": "CANON-EXPANDED: Ash-Walker harpoons of petrified leviathan bone, and a beast of the First Era turned to grey stone on the ash plain, are CANON (book1 ch.20); this leviathan and the old sea are GAME-ONLY."
+    },
+    {
+      "name": "The Ash Pit",
+      "text": "Where the bone-masks kneel, and burn what they take, and kneel again in what is left.",
+      "at": {
+        "x": -148,
+        "y": -96
+      },
+      "radius": 14,
+      "canonStatus": "CANON-EXPANDED: the Cult of Ash and its iron-wired bone masks are CANON (book1 ch.10); the pit and its Ash-Deacon are GAME-ONLY."
+    },
+    {
+      "name": "The Walled Mouth",
+      "text": "An Ash-Walker cave the old ones walled up, stone on stone, with salt packed into every gap. The tusks over the door are older than the wall.",
+      "at": {
+        "x": 98,
+        "y": -128
+      },
+      "radius": 12,
+      "canonStatus": "CANON-EXPANDED: the Ash-Walkers live in caves along the Wasting and bind Weave-Eaters with salt (book1 ch.20); this cave, and why it was walled, are GAME-ONLY."
+    },
+    {
+      "name": "The Fraying",
+      "text": "A grey tongue of the unmade, licking in behind the Ridge. The Eaters rise out of it like breath on cold glass.",
+      "at": {
+        "x": 115,
+        "y": -32
+      },
+      "radius": 12,
+      "canonStatus": "CANON-EXPANDED: Weave-Eaters born of the Weave's frayed threads are CANON (book1 ch.20); the Fraying is GAME-ONLY."
+    },
+    {
+      "name": "The Silent Statue",
+      "text": "A lone stone, taller than a house, standing where the grey begins. The Ash-Walkers say it had a face once, and the grey took that first.",
+      "at": {
+        "x": 141,
+        "y": -50
+      },
+      "radius": 9,
+      "canonStatus": "CANON-EXPANDED: the Silent Statues, giant faceless monoliths scattered in the Wasting, are CANON (world_bible.md); this one and its place are GAME-ONLY."
+    },
+    {
+      "name": "The Hunters' Knoll",
+      "text": "A knoll the Ash-Walker hunters lie up on to watch the plain for Eaters. They leave the hide standing for whoever needs it.",
+      "at": {
+        "x": -100,
+        "y": 152
+      },
+      "radius": 10,
+      "canonStatus": "CANON-EXPANDED: the Ash-Walkers hunt the Weave-Eaters (book1 ch.20); the knoll and its hide are GAME-ONLY."
+    },
+    {
+      "name": "The Reach-Stones",
+      "text": "A stone for every year, set where the grey stopped. Each row stands a little further west than the last.",
+      "at": {
+        "x": 138,
+        "y": 122
+      },
+      "radius": 24,
+      "canonStatus": "CANON-EXPANDED: the Wasting creeping on and erasing the world (world_bible.md) and the Ash-Walkers who remained at its edge (book1 ch.20) are CANON; the stones are GAME-ONLY."
     }
   ],
   "props": [
@@ -924,6 +1153,762 @@
         "y": -62
       },
       "variant": 1
+    },
+    {
+      "kind": "ruined_house",
+      "name": "Wain's Rest",
+      "at": {
+        "x": -146,
+        "y": 70
+      },
+      "rotation": 180,
+      "size": {
+        "x": 10,
+        "y": 6
+      }
+    },
+    {
+      "kind": "ruined_house",
+      "name": "Wain's Rest stable",
+      "at": {
+        "x": -131.5,
+        "y": 69
+      },
+      "rotation": 190,
+      "size": {
+        "x": 7,
+        "y": 5
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "Yard wall",
+      "at": {
+        "x": -153,
+        "y": 76
+      },
+      "rotation": 90,
+      "size": {
+        "x": 8,
+        "y": 0
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "Yard wall",
+      "at": {
+        "x": -126,
+        "y": 77
+      },
+      "rotation": 76,
+      "size": {
+        "x": 5,
+        "y": 0
+      }
+    },
+    {
+      "kind": "wayshrine",
+      "name": "Salt-road shrine",
+      "at": {
+        "x": -136,
+        "y": 85.6
+      },
+      "rotation": 180
+    },
+    {
+      "kind": "signpost",
+      "at": {
+        "x": -151,
+        "y": 83.9
+      },
+      "rotation": 270
+    },
+    {
+      "kind": "barrels",
+      "name": "Abandoned salt casks",
+      "at": {
+        "x": -137.5,
+        "y": 72
+      },
+      "variant": 2
+    },
+    {
+      "kind": "crates",
+      "at": {
+        "x": -149,
+        "y": 77.5
+      },
+      "rotation": 20,
+      "variant": 1
+    },
+    {
+      "kind": "ruined_house",
+      "name": "Orchard-keeper's house",
+      "at": {
+        "x": 28,
+        "y": 140
+      },
+      "rotation": 90,
+      "size": {
+        "x": 7,
+        "y": 5
+      }
+    },
+    {
+      "kind": "barrels",
+      "name": "Press barrels",
+      "at": {
+        "x": 31.5,
+        "y": 134.5
+      },
+      "variant": 1
+    },
+    {
+      "kind": "spine",
+      "name": "The Drowned Leviathan",
+      "at": {
+        "x": 20,
+        "y": -145
+      },
+      "rotation": 18,
+      "size": {
+        "x": 46,
+        "y": 3.2
+      }
+    },
+    {
+      "kind": "rib",
+      "name": "Leviathan rib",
+      "at": {
+        "x": 8.9,
+        "y": -137
+      },
+      "rotation": 198,
+      "size": {
+        "x": 4.2,
+        "y": 3.2
+      }
+    },
+    {
+      "kind": "rib",
+      "name": "Leviathan rib",
+      "at": {
+        "x": 6.3,
+        "y": -145
+      },
+      "rotation": 18,
+      "size": {
+        "x": 4.2,
+        "y": 3.2
+      }
+    },
+    {
+      "kind": "rib",
+      "name": "Leviathan rib",
+      "at": {
+        "x": 13.2,
+        "y": -138.4
+      },
+      "rotation": 198,
+      "size": {
+        "x": 4.2,
+        "y": 3.2
+      }
+    },
+    {
+      "kind": "rib",
+      "name": "Leviathan rib",
+      "at": {
+        "x": 10.6,
+        "y": -146.4
+      },
+      "rotation": 18,
+      "size": {
+        "x": 4.2,
+        "y": 3.2
+      }
+    },
+    {
+      "kind": "rib",
+      "name": "Leviathan rib",
+      "at": {
+        "x": 14.9,
+        "y": -147.8
+      },
+      "rotation": 18,
+      "size": {
+        "x": 4.2,
+        "y": 3.2
+      }
+    },
+    {
+      "kind": "rib",
+      "name": "Leviathan rib",
+      "at": {
+        "x": 21.8,
+        "y": -141.2
+      },
+      "rotation": 198,
+      "size": {
+        "x": 4.2,
+        "y": 3.2
+      }
+    },
+    {
+      "kind": "rib",
+      "name": "Leviathan rib",
+      "at": {
+        "x": 19.2,
+        "y": -149.1
+      },
+      "rotation": 18,
+      "size": {
+        "x": 4.2,
+        "y": 3.2
+      }
+    },
+    {
+      "kind": "rib",
+      "name": "Leviathan rib",
+      "at": {
+        "x": 26.1,
+        "y": -142.6
+      },
+      "rotation": 198,
+      "size": {
+        "x": 4.2,
+        "y": 3.2
+      }
+    },
+    {
+      "kind": "rib",
+      "name": "Leviathan rib",
+      "at": {
+        "x": 23.5,
+        "y": -150.5
+      },
+      "rotation": 18,
+      "size": {
+        "x": 4.2,
+        "y": 3.2
+      }
+    },
+    {
+      "kind": "rib",
+      "name": "Leviathan rib",
+      "at": {
+        "x": 30.3,
+        "y": -143.9
+      },
+      "rotation": 198,
+      "size": {
+        "x": 4.2,
+        "y": 3.2
+      }
+    },
+    {
+      "kind": "rib",
+      "name": "Leviathan rib",
+      "at": {
+        "x": 34.6,
+        "y": -145.3
+      },
+      "rotation": 198,
+      "size": {
+        "x": 4.2,
+        "y": 3.2
+      }
+    },
+    {
+      "kind": "rib",
+      "name": "Leviathan rib",
+      "at": {
+        "x": 32,
+        "y": -153.3
+      },
+      "rotation": 18,
+      "size": {
+        "x": 4.2,
+        "y": 3.2
+      }
+    },
+    {
+      "kind": "brazier",
+      "at": {
+        "x": -148,
+        "y": -92.5
+      }
+    },
+    {
+      "kind": "brazier",
+      "at": {
+        "x": -151,
+        "y": -97.8
+      }
+    },
+    {
+      "kind": "brazier",
+      "at": {
+        "x": -145,
+        "y": -97.8
+      }
+    },
+    {
+      "kind": "idol",
+      "name": "Bone-mask idol",
+      "at": {
+        "x": -135.2,
+        "y": -91.8
+      },
+      "rotation": 252
+    },
+    {
+      "kind": "idol",
+      "name": "Bone-mask idol",
+      "at": {
+        "x": -148,
+        "y": -82.5
+      },
+      "rotation": 180
+    },
+    {
+      "kind": "idol",
+      "name": "Bone-mask idol",
+      "at": {
+        "x": -160.8,
+        "y": -91.8
+      },
+      "rotation": 108
+    },
+    {
+      "kind": "idol",
+      "name": "Bone-mask idol",
+      "at": {
+        "x": -155.9,
+        "y": -106.9
+      },
+      "rotation": 36
+    },
+    {
+      "kind": "idol",
+      "name": "Bone-mask idol",
+      "at": {
+        "x": -140.1,
+        "y": -106.9
+      },
+      "rotation": 324
+    },
+    {
+      "kind": "barrels",
+      "name": "Cult stores",
+      "at": {
+        "x": -160,
+        "y": -100.5
+      },
+      "variant": 1
+    },
+    {
+      "kind": "crates",
+      "at": {
+        "x": -137,
+        "y": -103
+      },
+      "rotation": 30,
+      "variant": 2
+    },
+    {
+      "kind": "cliff",
+      "name": "Walled Mouth scarp",
+      "lift": 4,
+      "at": {
+        "x": 98,
+        "y": -124
+      },
+      "rotation": 0,
+      "size": {
+        "x": 34,
+        "y": 0
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "The Walled Mouth",
+      "at": {
+        "x": 98,
+        "y": -126.8
+      },
+      "rotation": 0,
+      "size": {
+        "x": 4.4,
+        "y": 0
+      }
+    },
+    {
+      "kind": "rib",
+      "name": "Mouth tusk",
+      "at": {
+        "x": 94.4,
+        "y": -127.2
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3,
+        "y": 4.6
+      }
+    },
+    {
+      "kind": "rib",
+      "name": "Mouth tusk",
+      "at": {
+        "x": 101.6,
+        "y": -127.2
+      },
+      "rotation": 270,
+      "size": {
+        "x": 3,
+        "y": 4.6
+      }
+    },
+    {
+      "kind": "monolith",
+      "name": "The Silent Statue",
+      "at": {
+        "x": 141,
+        "y": -50
+      },
+      "rotation": 24,
+      "scale": 1.1
+    },
+    {
+      "kind": "ruin",
+      "name": "Reach-stone",
+      "at": {
+        "x": 132.4,
+        "y": 102
+      },
+      "rotation": 84,
+      "size": {
+        "x": 1,
+        "y": 0
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "Reach-stone",
+      "at": {
+        "x": 131.6,
+        "y": 114
+      },
+      "rotation": 93,
+      "size": {
+        "x": 1,
+        "y": 0
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "Reach-stone",
+      "at": {
+        "x": 132.8,
+        "y": 126
+      },
+      "rotation": 88,
+      "size": {
+        "x": 1,
+        "y": 0
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "Reach-stone",
+      "at": {
+        "x": 131.9,
+        "y": 138
+      },
+      "rotation": 97,
+      "size": {
+        "x": 1,
+        "y": 0
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "Reach-stone",
+      "at": {
+        "x": 139.2,
+        "y": 106
+      },
+      "rotation": 91,
+      "size": {
+        "x": 1,
+        "y": 0
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "Reach-stone",
+      "at": {
+        "x": 140.1,
+        "y": 118
+      },
+      "rotation": 82,
+      "size": {
+        "x": 1,
+        "y": 0
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "Reach-stone",
+      "at": {
+        "x": 139,
+        "y": 130
+      },
+      "rotation": 95,
+      "size": {
+        "x": 1,
+        "y": 0
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "Reach-stone",
+      "at": {
+        "x": 139.9,
+        "y": 142
+      },
+      "rotation": 87,
+      "size": {
+        "x": 1,
+        "y": 0
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "Reach-stone",
+      "at": {
+        "x": 145.3,
+        "y": 100
+      },
+      "rotation": 96,
+      "size": {
+        "x": 1,
+        "y": 0
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "Reach-stone",
+      "at": {
+        "x": 144.6,
+        "y": 112
+      },
+      "rotation": 85,
+      "size": {
+        "x": 1,
+        "y": 0
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "Reach-stone",
+      "at": {
+        "x": 145.6,
+        "y": 124
+      },
+      "rotation": 90,
+      "size": {
+        "x": 1,
+        "y": 0
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "Reach-stone",
+      "at": {
+        "x": 144.8,
+        "y": 136
+      },
+      "rotation": 99,
+      "size": {
+        "x": 1,
+        "y": 0
+      }
+    },
+    {
+      "kind": "perch",
+      "name": "Knoll rocks",
+      "at": {
+        "x": -100,
+        "y": 152
+      },
+      "rotation": 315,
+      "size": {
+        "x": 6,
+        "y": 0
+      }
+    },
+    {
+      "kind": "shelter",
+      "name": "Hunters' hide",
+      "at": {
+        "x": -101,
+        "y": 154
+      },
+      "rotation": 315
+    },
+    {
+      "kind": "barrels",
+      "name": "Salt cask",
+      "at": {
+        "x": -97.5,
+        "y": 150.5
+      },
+      "variant": 0
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -166,
+        "y": 108
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -126,
+        "y": 140
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -168,
+        "y": 156
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -168,
+        "y": 40
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -136,
+        "y": 22
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -170,
+        "y": -60
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -122,
+        "y": -150
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -166,
+        "y": -166
+      },
+      "variant": 0
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -24,
+        "y": -138
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 60,
+        "y": -168
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 140,
+        "y": -110
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 104,
+        "y": 24
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 126,
+        "y": 40
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -30,
+        "y": 140
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -20,
+        "y": 166
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 80,
+        "y": 166
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 24,
+        "y": 170
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 100,
+        "y": 120
+      },
+      "variant": 1
     }
   ],
   "groves": [
@@ -991,6 +1976,149 @@
         "y": 14
       },
       "count": 14
+    },
+    {
+      "name": "The Last Orchard",
+      "kind": "dead",
+      "center": {
+        "x": 54,
+        "y": 150
+      },
+      "size": {
+        "x": 28,
+        "y": 20
+      },
+      "count": 18
+    },
+    {
+      "name": "West snags",
+      "kind": "dead",
+      "center": {
+        "x": -150,
+        "y": -14
+      },
+      "size": {
+        "x": 30,
+        "y": 44
+      },
+      "count": 16
+    },
+    {
+      "name": "Wayside snags",
+      "kind": "dead",
+      "center": {
+        "x": -160,
+        "y": 50
+      },
+      "size": {
+        "x": 20,
+        "y": 22
+      },
+      "count": 8
+    },
+    {
+      "name": "Rim-road snags",
+      "kind": "dead",
+      "center": {
+        "x": -150,
+        "y": 126
+      },
+      "size": {
+        "x": 24,
+        "y": 20
+      },
+      "count": 10
+    },
+    {
+      "name": "North snags",
+      "kind": "dead",
+      "center": {
+        "x": -62,
+        "y": 150
+      },
+      "size": {
+        "x": 30,
+        "y": 20
+      },
+      "count": 12
+    },
+    {
+      "name": "North-east snags",
+      "kind": "dead",
+      "center": {
+        "x": 110,
+        "y": 160
+      },
+      "size": {
+        "x": 22,
+        "y": 18
+      },
+      "count": 8
+    },
+    {
+      "name": "Ridge-back snags",
+      "kind": "dead",
+      "center": {
+        "x": 118,
+        "y": 74
+      },
+      "size": {
+        "x": 20,
+        "y": 28
+      },
+      "count": 8
+    },
+    {
+      "name": "Grey husks",
+      "kind": "dead",
+      "center": {
+        "x": 128,
+        "y": -152
+      },
+      "size": {
+        "x": 26,
+        "y": 24
+      },
+      "count": 10
+    },
+    {
+      "name": "Sea-floor snags",
+      "kind": "dead",
+      "center": {
+        "x": -62,
+        "y": -152
+      },
+      "size": {
+        "x": 34,
+        "y": 20
+      },
+      "count": 10
+    },
+    {
+      "name": "Pit snags",
+      "kind": "dead",
+      "center": {
+        "x": -160,
+        "y": -132
+      },
+      "size": {
+        "x": 26,
+        "y": 24
+      },
+      "count": 10
+    },
+    {
+      "name": "South-west snags",
+      "kind": "dead",
+      "center": {
+        "x": -112,
+        "y": -160
+      },
+      "size": {
+        "x": 26,
+        "y": 18
+      },
+      "count": 8
     }
   ],
   "camps": [
@@ -1074,6 +2202,71 @@
       "levelMin": 10,
       "levelMax": 10,
       "respawn": 90
+    },
+    {
+      "name": "Ash-pit cultists",
+      "mob": "Bone-masked cultist",
+      "tag": "cultist",
+      "look": "cultist",
+      "canonStatus": "CANON faction (Cult of Ash, book1 ch.10), GAME-ONLY placement",
+      "center": {
+        "x": -148,
+        "y": -96
+      },
+      "radius": 12,
+      "count": 5,
+      "levelMin": 9,
+      "levelMax": 10,
+      "respawn": 90
+    },
+    {
+      "name": "The Ash-Deacon",
+      "mob": "The Ash-Deacon",
+      "tag": "deacon",
+      "look": "cultist",
+      "canonStatus": "GAME-ONLY (a Cult of Ash officer; the Cult of Ash is CANON, book1 ch.10)",
+      "center": {
+        "x": -148,
+        "y": -96
+      },
+      "radius": 2,
+      "count": 1,
+      "levelMin": 10,
+      "levelMax": 10,
+      "respawn": 240,
+      "elite": true
+    },
+    {
+      "name": "Fraying eaters",
+      "mob": "Weave-Eater",
+      "tag": "weaveeater",
+      "look": "weaveeater",
+      "canonStatus": "CANON creature (Weave-Eaters, book1 ch.20), GAME-ONLY placement",
+      "center": {
+        "x": 115,
+        "y": -32
+      },
+      "radius": 11,
+      "count": 5,
+      "levelMin": 9,
+      "levelMax": 10,
+      "respawn": 90
+    },
+    {
+      "name": "Orchard hounds",
+      "mob": "Ash hound",
+      "tag": "hound",
+      "look": "wolf",
+      "canonStatus": "GAME-ONLY",
+      "center": {
+        "x": 56,
+        "y": 150
+      },
+      "radius": 10,
+      "count": 5,
+      "levelMin": 9,
+      "levelMax": 10,
+      "respawn": 75
     }
   ],
   "life": {
@@ -1105,6 +2298,51 @@
           "y": 92
         },
         "radius": 12,
+        "count": 3
+      },
+      {
+        "kind": "crow",
+        "center": {
+          "x": -141,
+          "y": 75
+        },
+        "radius": 10,
+        "count": 3
+      },
+      {
+        "kind": "crow",
+        "center": {
+          "x": 54,
+          "y": 150
+        },
+        "radius": 12,
+        "count": 3
+      },
+      {
+        "kind": "crow",
+        "center": {
+          "x": 20,
+          "y": -145
+        },
+        "radius": 12,
+        "count": 4
+      },
+      {
+        "kind": "crow",
+        "center": {
+          "x": -148,
+          "y": -96
+        },
+        "radius": 10,
+        "count": 3
+      },
+      {
+        "kind": "crow",
+        "center": {
+          "x": 138,
+          "y": 122
+        },
+        "radius": 14,
         "count": 3
       }
     ],
@@ -1223,6 +2461,53 @@
       "xp": 160,
       "gold": 45,
       "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "secret.ashrim.waybook",
+      "name": "A Page from the Waybook",
+      "kind": "note",
+      "prompt": "Ease the page out of the cracked wall",
+      "at": {
+        "x": -146.5,
+        "y": 66.8
+      },
+      "rotation": 0,
+      "height": 1.0,
+      "text": "A page torn out of the waystation's waybook and pushed into a crack in the back wall, as if whoever kept the book meant someone to find it. Nobody came along the road to find it.",
+      "document": "doc.ashrim.waybook",
+      "xp": 170,
+      "gold": 20,
+      "canonStatus": "GAME-ONLY: Wain's Rest, its waybook and the salt road. The copper taste of the grey's dust is CANON (book1 ch.20)."
+    },
+    {
+      "id": "secret.ashrim.carvers-bundle",
+      "name": "A Bone-Carver's Bundle",
+      "kind": "cache",
+      "prompt": "Lift the flat stone in the lee of the rib",
+      "at": {
+        "x": 18.6,
+        "y": -151.1
+      },
+      "rotation": 18,
+      "text": "Under a flat stone in the lee of a great rib, an Ash-Walker carver's bundle: harpoon blanks roughed out of the leviathan's bone, a coil of amber cord, and a charm of leviathan tooth, finished and never collected.",
+      "item": "item.leviathan_charm",
+      "xp": 180,
+      "gold": 25,
+      "canonStatus": "CANON-EXPANDED: Ash-Walker harpoons of petrified leviathan bone are CANON (book1 ch.20); the carver, the bundle and the charm are GAME-ONLY."
+    },
+    {
+      "id": "secret.ashrim.statue-light",
+      "name": "Last-Light in the Grey",
+      "kind": "herb",
+      "prompt": "Pick the last-light",
+      "at": {
+        "x": 133,
+        "y": -60
+      },
+      "text": "A few pale bells in the ash below the standing stone, faintly lit, with the grey already in the ground all round them. The Ash-Walkers say last-light grows where something refused to be unmade. Here it has company.",
+      "item": "herb.last_light",
+      "xp": 160,
+      "canonStatus": "CANON-EXPANDED: the Silent Statues, faceless monoliths in the Wasting, are CANON (world_bible.md); last-light and this patch are GAME-ONLY."
     }
   ]
 }

@@ -72,7 +72,7 @@ namespace Crulanda.Encounter
         static readonly float[] MinimapRadii = { 28, 45, 70 };
         int zoom = 1;
         Texture2D mask, dot, arrow, pin;
-        GUIStyle label, title, note, centered;
+        GUIStyle label, title, note, centered, placeSmall;
 
         void Init()
         {
@@ -100,6 +100,7 @@ namespace Crulanda.Encounter
             centered = new GUIStyle(label) { alignment = TextAnchor.MiddleCenter };
             title = new GUIStyle(GUI.skin.label) { fontSize = 24, fontStyle = FontStyle.Bold };
             note = new GUIStyle(GUI.skin.label) { fontSize = 13, wordWrap = true };
+            placeSmall = new GUIStyle(note) { wordWrap = false, clipping = TextClipping.Clip };   // a place name in a two-column list: one line
         }
         static Texture2D Circle(int size, bool ring = false)
         {
@@ -288,11 +289,11 @@ namespace Crulanda.Encounter
                 GUI.Label(new Rect(side.x + 10, y, side.width - 10, 20), e.name, note); y += 22;
             }
             y += 10; GUI.Label(new Rect(side.x, y, side.width, 22), "PLACES", label); y += 24;
-            foreach (var l in z.landmarks)
-            {
-                if (y > side.yMax - 60) break;
-                Shadowed(new Rect(side.x, y, side.width, 20), l.name, label, gold); y += 19;
-            }
+            // One column while they fit; a bigger zone's places go in two narrower columns in the smaller hand.
+            float room = side.yMax - 60 - y; bool two = z.landmarks.Length > Mathf.FloorToInt(room / 19);
+            float step = two ? 17 : 19, colW = two ? side.width / 2 - 4 : side.width; int perCol = Mathf.Max(1, Mathf.FloorToInt(room / step));
+            for (int i = 0; i < z.landmarks.Length && i < perCol * (two ? 2 : 1); i++)
+                Shadowed(new Rect(side.x + (i / perCol) * (colW + 8), y + (i % perCol) * step, colW, 20), z.landmarks[i].name, two ? placeSmall : label, gold);
             if (!string.IsNullOrEmpty(z.canonStatus)) GUI.Label(new Rect(side.x, side.yMax - 40, side.width, 40), "Lore status: " + z.canonStatus, note);
         }
         void DrawWorldMap(EncounterSession s, ZoneBuilder zone, Rect map, Color gold)

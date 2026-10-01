@@ -639,7 +639,10 @@ namespace Crulanda.Encounter
         {
             if (content == null) { Debug.LogError("Encounter content missing."); enabled = false; return; }
             Crulanda.World.WorldWeather.Turned += OnWeatherTurned;
-            if ((UseTempSave || Array.IndexOf(Environment.GetCommandLineArgs(), "--crulanda-temp-save") >= 0) && SaveDirectoryOverride == null)
+            // An editor running tests from the command line (the validation copy) never reads or writes the real save folder, even
+            // in a test that forgets to point the session elsewhere: the real folder is the player's, shared by every build.
+            bool testRun = Application.isEditor && (Application.isBatchMode || Array.IndexOf(Environment.GetCommandLineArgs(), "-runTests") >= 0);
+            if ((UseTempSave || testRun || Array.IndexOf(Environment.GetCommandLineArgs(), "--crulanda-temp-save") >= 0) && SaveDirectoryOverride == null)
             {
                 // Test runs: a fresh throwaway character that never touches the real save folder. One folder for the whole
                 // play session: travel reloads the scene, and a new folder per zone would lose the character at every road.

@@ -31,6 +31,9 @@ Chris was away from 2026-09-30 evening and gave authority to carry on through th
     (Caddock, elite 5, drops Caddock's Tin Crown). The Tin Crown is level 4. A cave-name banner, dungeon respawns, no use
     through rock, a kill plane under the deepest floor. Design: `WORLD_ZONES.md` "Caves you walk into", `QUEST_DESIGN.md`
     section 5, the CHANGELOG.
+  - and now **THE ZONES GROWN** (published 2026-09-30 night): Oakhaven 380 m, Khaven 340, the Peaks and the Rim 360, with 37
+    new places, 18 camps (4 named elites) and 14 secrets in the new ground; Crowsfoot Ridge over the dungeon; loads faster
+    than before (parallel ground paint). Design: `WORLD_ZONES.md` "Zone size" and each zone's section, the CHANGELOG.
 - **Weather** covers:
   - per-zone seeded schedules (7-minute spells, one severity step at a time);
   - a painted cloud layer and cloud shadows;
@@ -44,12 +47,10 @@ Chris was away from 2026-09-30 evening and gave authority to carry on through th
   - the store title, "The Quiet Trail" (the productName) or "The Land of Crulanda" as the novels and bullet-hell use;
   - that *The First Spoke* is out.
 
-**NEXT JOB: ZONE SIZE** (item 0c below): grow the zones (Oakhaven 380 m, Khaven 340, the Peaks 360, the Rim 360) with new
-places in the new ground: per zone 3+ landmarks, 2 camps, groves, 2 secrets; exits, roads, creeks and the Wasting move out
-with the edge. Oakhaven's north strip covers the deep dungeon: a ridge of hills over it (`shapes`), nothing within 12 m of
-its passage. Started 2026-09-30 night: four agents drafted the grown zone files in the session scratchpad `grow\` (brief:
-`grow\BRIEF.md`; integration: `grow\integrate.py`, `grow\apply_grow_code.py` for the paint and map resolution and a build-time
-log). If that scratchpad is gone, redo it from the brief's rules. Then the painted style pass.
+~~ZONE SIZE~~ DONE and published (item 0c below). **NEXT JOB: THE PAINTED STYLE PASS** (item 5 under "Next" below, and
+GAME_BRIEF's art direction): richer saturated colour, more plant types (ferns, broad leaves, flowers, tall grasses),
+sculpted rock with painted gradient shading, chunky stylized props (rope-and-post bridges), a warm clear sky; every zone
+keeps its mood (Khaven grim dusk, the Rim grey). Plan it as a few publishes, biggest visual win first.
 More walk-in caves (a crypt under Khaven, a mine in the Peaks, a sunken ruin on the Rim) can reuse the `cavern` prop: a new
 plan in `ZoneBuilder.CavernPlan(variant)` (rows: x, z, half-width, height, floor drop).
 

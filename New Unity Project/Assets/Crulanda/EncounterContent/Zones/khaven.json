@@ -3,17 +3,32 @@
   "displayName": "Khaven Village",
   "subtitle": "A walled village of gallows and crypts beside the Whispering Wood",
   "canonStatus": "CANON-EXPANDED",
-  "canonNote": "Canon (Khaven Village map): walled village with the Cracked Hearth, two Fallen Smithies, the Blood-Stone Well, the Gallows Tree and the Crypt-Keeper's Hovel; the Whispering Wood to the west, Gloom Creek, and the Carrion Cliffs. GAME-ONLY / PROVISIONAL: the Sandthrone outriders holding it, the Pale watcher at the crypt, the crypt itself, road links to Oakhaven and all exact placement. Also GAME-ONLY: the wilderness beyond the walls (the deep Whispering Wood, the north road to the Peaks, the drowned graveyard and creek barrow), the levelling camps, and the residents Wenna Coyle, Ansel Morrow and Cato Brisk. Hollow Men are a CANON creature (book1 ch.4); their presence here is GAME-ONLY.",
-  "size": 240,
+  "canonNote": "Canon (Khaven Village map): walled village with the Cracked Hearth, two Fallen Smithies, the Blood-Stone Well, the Gallows Tree and the Crypt-Keeper's Hovel; the Whispering Wood to the west, Gloom Creek, and the Carrion Cliffs. GAME-ONLY / PROVISIONAL: the Sandthrone outriders holding it, the Pale watcher at the crypt, the crypt itself, road links to Oakhaven and all exact placement. Also GAME-ONLY: the wilderness beyond the walls (the deep Whispering Wood, the north road to the Peaks, the drowned graveyard and creek barrow), the levelling camps, and the residents Wenna Coyle, Ansel Morrow and Cato Brisk. Hollow Men are a CANON creature (book1 ch.4); their presence here is GAME-ONLY. The 340 m growth (2026-09-30) adds, all GAME-ONLY in placement and story: the Hush and the Listener's Hut deeper in the Whispering Wood (the Listener is a Silent Pilgrim; the Silent Pilgrims are CANON), the corpse road with its coffin stones and bridge, the gibbet crossroads on the Gloom road, the plague pit, the drowned fields, the Carrion Heights and the Charnel Barrow above the Carrion Cliffs (the cliffs are CANON), the Old Bound Wall and the Fallen Watch on the north road, and the Pale Reckoner (the Pale Things are CANON).",
+  "size": 340,
   "levelMin": 3,
   "levelMax": 5,
   "biome": "gloom",
   "weather": [
-    { "kind": "fair", "weight": 1 },
-    { "kind": "windy", "weight": 1 },
-    { "kind": "overcast", "weight": 3 },
-    { "kind": "mist", "weight": 4 },
-    { "kind": "rain", "weight": 2 }
+    {
+      "kind": "fair",
+      "weight": 1
+    },
+    {
+      "kind": "windy",
+      "weight": 1
+    },
+    {
+      "kind": "overcast",
+      "weight": 3
+    },
+    {
+      "kind": "mist",
+      "weight": 4
+    },
+    {
+      "kind": "rain",
+      "weight": 2
+    }
   ],
   "worldMapPosition": {
     "x": 0.605,
@@ -101,10 +116,10 @@
       "name": "Gloom road to Oakhaven",
       "at": {
         "x": -96.5,
-        "y": -112
+        "y": -162
       },
       "arrive": {
-        "x": -113,
+        "x": -173,
         "y": 13
       },
       "radius": 5
@@ -114,11 +129,11 @@
       "name": "North road to the Shattered Peaks",
       "at": {
         "x": -11,
-        "y": 113
+        "y": 163
       },
       "arrive": {
         "x": -88,
-        "y": -114
+        "y": -164
       },
       "radius": 5
     }
@@ -163,6 +178,46 @@
         "y": -96
       },
       "radius": 6
+    },
+    {
+      "name": "Gibbet crossroads",
+      "center": {
+        "x": -95.8,
+        "y": -131
+      },
+      "radius": 6
+    },
+    {
+      "name": "Listener's yard",
+      "center": {
+        "x": -141,
+        "y": 28
+      },
+      "radius": 6
+    },
+    {
+      "name": "Plague pit",
+      "center": {
+        "x": -30,
+        "y": -140
+      },
+      "radius": 9
+    },
+    {
+      "name": "Barrow ground",
+      "center": {
+        "x": 139,
+        "y": -39
+      },
+      "radius": 5
+    },
+    {
+      "name": "Picket ground",
+      "center": {
+        "x": 39,
+        "y": 134
+      },
+      "radius": 6
     }
   ],
   "roads": [
@@ -197,6 +252,98 @@
         {
           "x": -100,
           "y": -118
+        },
+        {
+          "x": -100.2,
+          "y": -120.4
+        },
+        {
+          "x": -99.8,
+          "y": -122.5
+        },
+        {
+          "x": -99.2,
+          "y": -124.5
+        },
+        {
+          "x": -98.3,
+          "y": -126.7
+        },
+        {
+          "x": -97,
+          "y": -128.8
+        },
+        {
+          "x": -95.8,
+          "y": -131
+        },
+        {
+          "x": -94.7,
+          "y": -133.1
+        },
+        {
+          "x": -93.5,
+          "y": -135.3
+        },
+        {
+          "x": -92.4,
+          "y": -137.5
+        },
+        {
+          "x": -91.6,
+          "y": -139.6
+        },
+        {
+          "x": -90.9,
+          "y": -141.9
+        },
+        {
+          "x": -90.5,
+          "y": -144.1
+        },
+        {
+          "x": -90.4,
+          "y": -146.4
+        },
+        {
+          "x": -90.6,
+          "y": -148.9
+        },
+        {
+          "x": -91.2,
+          "y": -151.5
+        },
+        {
+          "x": -92,
+          "y": -154
+        },
+        {
+          "x": -92.9,
+          "y": -156
+        },
+        {
+          "x": -94.1,
+          "y": -158.1
+        },
+        {
+          "x": -95.3,
+          "y": -160.1
+        },
+        {
+          "x": -96.5,
+          "y": -162
+        },
+        {
+          "x": -97.7,
+          "y": -164.1
+        },
+        {
+          "x": -98.8,
+          "y": -166
+        },
+        {
+          "x": -100,
+          "y": -168
         }
       ]
     },
@@ -253,6 +400,324 @@
         {
           "x": -10,
           "y": 120
+        },
+        {
+          "x": -10.5,
+          "y": 123.3
+        },
+        {
+          "x": -11.3,
+          "y": 126.1
+        },
+        {
+          "x": -12.1,
+          "y": 128.8
+        },
+        {
+          "x": -12.8,
+          "y": 131.5
+        },
+        {
+          "x": -13.2,
+          "y": 134.1
+        },
+        {
+          "x": -13.4,
+          "y": 136.7
+        },
+        {
+          "x": -13.6,
+          "y": 139.3
+        },
+        {
+          "x": -13.6,
+          "y": 142
+        },
+        {
+          "x": -13.4,
+          "y": 145
+        },
+        {
+          "x": -12.9,
+          "y": 148.1
+        },
+        {
+          "x": -12.4,
+          "y": 151.1
+        },
+        {
+          "x": -12,
+          "y": 154
+        },
+        {
+          "x": -11.6,
+          "y": 157.1
+        },
+        {
+          "x": -11.3,
+          "y": 160.1
+        },
+        {
+          "x": -11,
+          "y": 163
+        },
+        {
+          "x": -10.6,
+          "y": 166.6
+        },
+        {
+          "x": -10.2,
+          "y": 170
+        }
+      ]
+    },
+    {
+      "name": "Corpse road",
+      "width": 3,
+      "points": [
+        {
+          "x": -143.6,
+          "y": 24.5
+        },
+        {
+          "x": -144.7,
+          "y": 21
+        },
+        {
+          "x": -145.9,
+          "y": 17.5
+        },
+        {
+          "x": -146.8,
+          "y": 14
+        },
+        {
+          "x": -147.4,
+          "y": 10.4
+        },
+        {
+          "x": -147.7,
+          "y": 6.7
+        },
+        {
+          "x": -147.8,
+          "y": 3
+        },
+        {
+          "x": -147.6,
+          "y": -0.8
+        },
+        {
+          "x": -147.1,
+          "y": -4.7
+        },
+        {
+          "x": -146.4,
+          "y": -8.5
+        },
+        {
+          "x": -145.3,
+          "y": -12.1
+        },
+        {
+          "x": -144,
+          "y": -15.5
+        },
+        {
+          "x": -142.6,
+          "y": -19.1
+        },
+        {
+          "x": -141.1,
+          "y": -22.8
+        },
+        {
+          "x": -139.5,
+          "y": -26.6
+        },
+        {
+          "x": -138.2,
+          "y": -30.5
+        },
+        {
+          "x": -137.2,
+          "y": -34.8
+        },
+        {
+          "x": -136.4,
+          "y": -39.4
+        },
+        {
+          "x": -135.8,
+          "y": -44
+        },
+        {
+          "x": -135.5,
+          "y": -47.9
+        },
+        {
+          "x": -135.3,
+          "y": -51.8
+        },
+        {
+          "x": -135.2,
+          "y": -55.8
+        },
+        {
+          "x": -135,
+          "y": -60
+        },
+        {
+          "x": -134.8,
+          "y": -63.9
+        },
+        {
+          "x": -134.6,
+          "y": -67.9
+        },
+        {
+          "x": -134.3,
+          "y": -72
+        },
+        {
+          "x": -134,
+          "y": -76
+        },
+        {
+          "x": -133.6,
+          "y": -80
+        },
+        {
+          "x": -133.1,
+          "y": -83.8
+        },
+        {
+          "x": -132.5,
+          "y": -87.6
+        },
+        {
+          "x": -131.8,
+          "y": -91.3
+        },
+        {
+          "x": -131.1,
+          "y": -94.9
+        },
+        {
+          "x": -130.4,
+          "y": -98.5
+        },
+        {
+          "x": -129.6,
+          "y": -102.4
+        },
+        {
+          "x": -128.8,
+          "y": -106.3
+        },
+        {
+          "x": -127.8,
+          "y": -110
+        },
+        {
+          "x": -126.5,
+          "y": -113.5
+        },
+        {
+          "x": -124.9,
+          "y": -116.9
+        },
+        {
+          "x": -123.1,
+          "y": -120.1
+        },
+        {
+          "x": -121,
+          "y": -123.1
+        },
+        {
+          "x": -118.6,
+          "y": -125.6
+        },
+        {
+          "x": -115.2,
+          "y": -127.9
+        },
+        {
+          "x": -111.5,
+          "y": -129.5
+        },
+        {
+          "x": -107.6,
+          "y": -130.6
+        },
+        {
+          "x": -103.7,
+          "y": -131
+        },
+        {
+          "x": -99.8,
+          "y": -130.8
+        },
+        {
+          "x": -95.8,
+          "y": -131
+        },
+        {
+          "x": -91.9,
+          "y": -131.9
+        },
+        {
+          "x": -88.1,
+          "y": -133.1
+        },
+        {
+          "x": -84,
+          "y": -134.4
+        },
+        {
+          "x": -80.2,
+          "y": -135.5
+        },
+        {
+          "x": -76.1,
+          "y": -136.7
+        },
+        {
+          "x": -72,
+          "y": -137.9
+        },
+        {
+          "x": -68,
+          "y": -138.8
+        },
+        {
+          "x": -64.3,
+          "y": -139.5
+        },
+        {
+          "x": -60.7,
+          "y": -140
+        },
+        {
+          "x": -57.2,
+          "y": -140.5
+        },
+        {
+          "x": -54,
+          "y": -140.8
+        },
+        {
+          "x": -50,
+          "y": -141.1
+        },
+        {
+          "x": -46.5,
+          "y": -141.2
+        },
+        {
+          "x": -41.2,
+          "y": -141.2
         }
       ]
     }
@@ -262,6 +727,18 @@
       "name": "Gloom Creek",
       "width": 4,
       "points": [
+        {
+          "x": -170.5,
+          "y": -14
+        },
+        {
+          "x": -156,
+          "y": -28
+        },
+        {
+          "x": -138,
+          "y": -16
+        },
         {
           "x": -122,
           "y": -6
@@ -301,6 +778,14 @@
         {
           "x": 122,
           "y": -92
+        },
+        {
+          "x": 146,
+          "y": -96
+        },
+        {
+          "x": 172,
+          "y": -98
         }
       ]
     }
@@ -314,6 +799,24 @@
       },
       "radius": 5.5,
       "depth": 0.85
+    },
+    {
+      "name": "Drowned field pool (west)",
+      "center": {
+        "x": 86,
+        "y": -131
+      },
+      "radius": 5,
+      "depth": 0.8
+    },
+    {
+      "name": "Drowned field pool (east)",
+      "center": {
+        "x": 123,
+        "y": -138
+      },
+      "radius": 4.5,
+      "depth": 0.8
     }
   ],
   "groves": [
@@ -420,6 +923,214 @@
         "y": 20
       },
       "count": 20
+    },
+    {
+      "name": "The Hush",
+      "kind": "dead",
+      "center": {
+        "x": -140,
+        "y": 130
+      },
+      "size": {
+        "x": 32,
+        "y": 36
+      },
+      "count": 40
+    },
+    {
+      "name": "Hush fringe wood",
+      "kind": "dead",
+      "center": {
+        "x": -126,
+        "y": 112
+      },
+      "size": {
+        "x": 52,
+        "y": 56
+      },
+      "count": 24
+    },
+    {
+      "name": "Whispering Wood (west)",
+      "kind": "dead",
+      "center": {
+        "x": -131,
+        "y": 44
+      },
+      "size": {
+        "x": 54,
+        "y": 56
+      },
+      "count": 50
+    },
+    {
+      "name": "Gloom thicket (west)",
+      "kind": "dead",
+      "center": {
+        "x": -136,
+        "y": -62
+      },
+      "size": {
+        "x": 40,
+        "y": 40
+      },
+      "count": 28
+    },
+    {
+      "name": "Gibbet scrub",
+      "kind": "dead",
+      "center": {
+        "x": -138,
+        "y": -142
+      },
+      "size": {
+        "x": 40,
+        "y": 40
+      },
+      "count": 20
+    },
+    {
+      "name": "Corpse-road scrub",
+      "kind": "dead",
+      "center": {
+        "x": -64,
+        "y": -158
+      },
+      "size": {
+        "x": 40,
+        "y": 14
+      },
+      "count": 16
+    },
+    {
+      "name": "Fever-field scrub",
+      "kind": "dead",
+      "center": {
+        "x": 22,
+        "y": -152
+      },
+      "size": {
+        "x": 40,
+        "y": 22
+      },
+      "count": 18
+    },
+    {
+      "name": "Drowned alders",
+      "kind": "dead",
+      "center": {
+        "x": 147,
+        "y": -146
+      },
+      "size": {
+        "x": 22,
+        "y": 22
+      },
+      "count": 14
+    },
+    {
+      "name": "Barrow scrub",
+      "kind": "dead",
+      "center": {
+        "x": 153,
+        "y": -20
+      },
+      "size": {
+        "x": 14,
+        "y": 32
+      },
+      "count": 14
+    },
+    {
+      "name": "Carrion scrub (east)",
+      "kind": "dead",
+      "center": {
+        "x": 148,
+        "y": 38
+      },
+      "size": {
+        "x": 28,
+        "y": 56
+      },
+      "count": 18
+    },
+    {
+      "name": "Ridge pines (north)",
+      "kind": "pine",
+      "center": {
+        "x": 124,
+        "y": 128
+      },
+      "size": {
+        "x": 60,
+        "y": 44
+      },
+      "count": 32
+    },
+    {
+      "name": "Ridge pines (east)",
+      "kind": "pine",
+      "center": {
+        "x": 116,
+        "y": 52
+      },
+      "size": {
+        "x": 22,
+        "y": 48
+      },
+      "count": 18
+    },
+    {
+      "name": "Barrow thorns",
+      "kind": "dead",
+      "center": {
+        "x": 48,
+        "y": -121
+      },
+      "size": {
+        "x": 30,
+        "y": 14
+      },
+      "count": 14
+    },
+    {
+      "name": "Heights scrub (south)",
+      "kind": "dead",
+      "center": {
+        "x": 153,
+        "y": -68
+      },
+      "size": {
+        "x": 20,
+        "y": 18
+      },
+      "count": 14
+    },
+    {
+      "name": "Fallen Watch scrub",
+      "kind": "dead",
+      "center": {
+        "x": 72,
+        "y": 151
+      },
+      "size": {
+        "x": 36,
+        "y": 18
+      },
+      "count": 14
+    },
+    {
+      "name": "Bound-wall pines",
+      "kind": "pine",
+      "center": {
+        "x": -60,
+        "y": 150
+      },
+      "size": {
+        "x": 48,
+        "y": 20
+      },
+      "count": 24
     }
   ],
   "landmarks": [
@@ -529,6 +1240,106 @@
         "y": 90
       },
       "radius": 10
+    },
+    {
+      "name": "The Gibbet Crossroads",
+      "text": "Khaven buries its hanged where four roads meet, so they can't find the way home.",
+      "at": {
+        "x": -95.8,
+        "y": -131
+      },
+      "radius": 10,
+      "canonStatus": "GAME-ONLY: the crossroads, its gibbet and the crossroads burials (the world bible asks for burial customs)."
+    },
+    {
+      "name": "The Corpse Road",
+      "text": "The wood steadings carried their dead out this way. The bearers rested the coffins on the stones.",
+      "at": {
+        "x": -138,
+        "y": -66
+      },
+      "radius": 10,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The Plague Pit",
+      "text": "The fever year filled it in a month. Nothing grows on it, and nobody asks it to.",
+      "at": {
+        "x": -30,
+        "y": -140
+      },
+      "radius": 10,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The Drowned Fields",
+      "text": "Barley ground once. Every flood takes a little more of it and gives back mud.",
+      "at": {
+        "x": 104,
+        "y": -134
+      },
+      "radius": 18,
+      "canonStatus": "GAME-ONLY: the fields. Gloom Creek is CANON (the Khaven village map)."
+    },
+    {
+      "name": "The Carrion Heights",
+      "text": "The crows sit up here in rows and watch the creek for whatever it brings down.",
+      "at": {
+        "x": 141,
+        "y": -20
+      },
+      "radius": 12,
+      "canonStatus": "CANON-EXPANDED: the Carrion Cliffs are CANON (the Khaven village map); the heights above them are GAME-ONLY."
+    },
+    {
+      "name": "The Charnel Barrow",
+      "text": "When the creek took the low graves, Khaven carried the bones up here, above any flood.",
+      "at": {
+        "x": 139,
+        "y": -48
+      },
+      "radius": 8,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The Old Bound Wall",
+      "text": "Khaven walled all of this once, when it had more worth walling in.",
+      "at": {
+        "x": -36,
+        "y": 131
+      },
+      "radius": 10,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The Fallen Watch",
+      "text": "The north watch-tower came down in a gale. The Sandthrone like what is left of it for a windbreak.",
+      "at": {
+        "x": 42,
+        "y": 138
+      },
+      "radius": 8,
+      "canonStatus": "GAME-ONLY: the tower. The Sandthrone are a CANON mercenary company; their picket here is GAME-ONLY."
+    },
+    {
+      "name": "The Listener's Hut",
+      "text": "A Silent Pilgrim came to hear what the wood says. The lamp still lights itself at dusk.",
+      "at": {
+        "x": -140,
+        "y": 32
+      },
+      "radius": 8,
+      "canonStatus": "CANON-EXPANDED: the Silent Pilgrims are CANON (world_bible.md); the Listener and his hut are GAME-ONLY."
+    },
+    {
+      "name": "The Hush",
+      "text": "The trunks crowd too close for any wind. Here even the Whispering Wood keeps quiet.",
+      "at": {
+        "x": -138,
+        "y": 130
+      },
+      "radius": 18,
+      "canonStatus": "CANON-EXPANDED: the Whispering Wood is CANON (the Khaven village map); the Hush is GAME-ONLY."
     }
   ],
   "props": [
@@ -1309,6 +2120,684 @@
         "y": 62
       },
       "variant": 2
+    },
+    {
+      "kind": "gallows",
+      "name": "The Gibbet Crossroads",
+      "at": {
+        "x": -88.4,
+        "y": -124.6
+      },
+      "rotation": 135
+    },
+    {
+      "kind": "grave",
+      "at": {
+        "x": -105.4,
+        "y": -123.6
+      },
+      "rotation": 20,
+      "variant": 1
+    },
+    {
+      "kind": "grave",
+      "at": {
+        "x": -108.4,
+        "y": -125.2
+      },
+      "rotation": -15,
+      "variant": 1
+    },
+    {
+      "kind": "grave",
+      "at": {
+        "x": -106,
+        "y": -120.4
+      },
+      "rotation": 62,
+      "variant": 1
+    },
+    {
+      "kind": "signpost",
+      "at": {
+        "x": -86.8,
+        "y": -138.8
+      },
+      "rotation": 45
+    },
+    {
+      "kind": "rock",
+      "name": "Coffin stone",
+      "at": {
+        "x": -130.5,
+        "y": -64.9
+      },
+      "variant": 0
+    },
+    {
+      "kind": "rock",
+      "name": "Coffin stone (east)",
+      "at": {
+        "x": -69.9,
+        "y": -142.5
+      },
+      "variant": 0
+    },
+    {
+      "kind": "bridge",
+      "name": "Corpse bridge",
+      "at": {
+        "x": -142.6,
+        "y": -19.1
+      },
+      "rotation": 158,
+      "size": {
+        "x": 12
+      }
+    },
+    {
+      "kind": "wayshrine",
+      "name": "Pit shrine",
+      "at": {
+        "x": -30,
+        "y": -127.6
+      },
+      "rotation": 0
+    },
+    {
+      "kind": "grave",
+      "at": {
+        "x": -34.2,
+        "y": -128.6
+      }
+    },
+    {
+      "kind": "grave",
+      "at": {
+        "x": -25.6,
+        "y": -128.4
+      }
+    },
+    {
+      "kind": "fence",
+      "name": "Pit fence",
+      "at": {
+        "x": -39.5,
+        "y": -136.5
+      },
+      "rotation": 70,
+      "size": {
+        "x": 6
+      }
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": -20.6,
+        "y": -134
+      },
+      "rotation": 58,
+      "size": {
+        "x": 6
+      }
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": -27,
+        "y": -150.5
+      },
+      "rotation": -16,
+      "size": {
+        "x": 7
+      }
+    },
+    {
+      "kind": "cart",
+      "name": "Corpse cart",
+      "at": {
+        "x": -44.6,
+        "y": -148.5
+      },
+      "rotation": 250
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -16.5,
+        "y": -141
+      },
+      "variant": 1
+    },
+    {
+      "kind": "fence",
+      "name": "Drowned fence",
+      "at": {
+        "x": 74,
+        "y": -117.5
+      },
+      "rotation": 5,
+      "size": {
+        "x": 8
+      }
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": 97,
+        "y": -118.6
+      },
+      "rotation": -8,
+      "size": {
+        "x": 7
+      }
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": 111.5,
+        "y": -125
+      },
+      "rotation": 80,
+      "size": {
+        "x": 8
+      }
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": 134.5,
+        "y": -127
+      },
+      "rotation": 95,
+      "size": {
+        "x": 6
+      }
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": 110,
+        "y": -149
+      },
+      "rotation": 3,
+      "size": {
+        "x": 8
+      }
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": 77,
+        "y": -142.5
+      },
+      "rotation": -4,
+      "size": {
+        "x": 8
+      }
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": 125.5,
+        "y": -124.5
+      },
+      "rotation": 2,
+      "size": {
+        "x": 7
+      }
+    },
+    {
+      "kind": "cart",
+      "name": "Drowned cart",
+      "at": {
+        "x": 100.5,
+        "y": -123.5
+      },
+      "rotation": 200
+    },
+    {
+      "kind": "grave",
+      "at": {
+        "x": 108,
+        "y": -141
+      },
+      "rotation": 40,
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 95,
+        "y": -143
+      },
+      "variant": 1
+    },
+    {
+      "kind": "cliff",
+      "name": "The Carrion Heights",
+      "lift": 5,
+      "at": {
+        "x": 128,
+        "y": -40
+      },
+      "rotation": 90,
+      "size": {
+        "x": 44
+      }
+    },
+    {
+      "kind": "crypt",
+      "name": "The Charnel Barrow",
+      "at": {
+        "x": 139,
+        "y": -47
+      },
+      "rotation": 180,
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 150.5,
+        "y": -32.5
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 128.6,
+        "y": -15.4
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 130.4,
+        "y": -12.2
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 128.6,
+        "y": -64.6
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 130.4,
+        "y": -67.8
+      },
+      "variant": 1
+    },
+    {
+      "kind": "ruin",
+      "at": {
+        "x": -74,
+        "y": 127
+      },
+      "rotation": -6,
+      "size": {
+        "x": 8
+      }
+    },
+    {
+      "kind": "ruin",
+      "at": {
+        "x": -55,
+        "y": 129
+      },
+      "rotation": -4,
+      "size": {
+        "x": 9
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "The Old Bound Wall",
+      "at": {
+        "x": -36,
+        "y": 131
+      },
+      "rotation": -2,
+      "size": {
+        "x": 8
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "Old north gate (west)",
+      "at": {
+        "x": -19.6,
+        "y": 132.2
+      },
+      "rotation": 0,
+      "size": {
+        "x": 3
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "Old north gate (east)",
+      "at": {
+        "x": -6.4,
+        "y": 132.2
+      },
+      "rotation": 0,
+      "size": {
+        "x": 3
+      }
+    },
+    {
+      "kind": "ruin",
+      "at": {
+        "x": 8,
+        "y": 133
+      },
+      "rotation": 2,
+      "size": {
+        "x": 8
+      }
+    },
+    {
+      "kind": "ruin",
+      "at": {
+        "x": 24.5,
+        "y": 134.4
+      },
+      "rotation": 3,
+      "size": {
+        "x": 7
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "The Fallen Watch",
+      "at": {
+        "x": 42,
+        "y": 140.6
+      },
+      "rotation": 0,
+      "size": {
+        "x": 5
+      }
+    },
+    {
+      "kind": "ruin",
+      "at": {
+        "x": 39.4,
+        "y": 138
+      },
+      "rotation": 90,
+      "size": {
+        "x": 5
+      }
+    },
+    {
+      "kind": "ruin",
+      "at": {
+        "x": 44.6,
+        "y": 138
+      },
+      "rotation": 90,
+      "size": {
+        "x": 5
+      }
+    },
+    {
+      "kind": "ruin",
+      "at": {
+        "x": 60,
+        "y": 134
+      },
+      "rotation": -3,
+      "size": {
+        "x": 8
+      }
+    },
+    {
+      "kind": "ruin",
+      "at": {
+        "x": 78,
+        "y": 131
+      },
+      "rotation": -8,
+      "size": {
+        "x": 7
+      }
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 47.5,
+        "y": 141.5
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 36.5,
+        "y": 142.5
+      },
+      "variant": 0
+    },
+    {
+      "kind": "brazier",
+      "name": "Picket brazier",
+      "at": {
+        "x": 35.8,
+        "y": 131.2
+      }
+    },
+    {
+      "kind": "crates",
+      "at": {
+        "x": 45.5,
+        "y": 131.6
+      },
+      "rotation": 20,
+      "variant": 1
+    },
+    {
+      "kind": "barrels",
+      "at": {
+        "x": 33.4,
+        "y": 137.2
+      },
+      "variant": 1
+    },
+    {
+      "kind": "ruined_house",
+      "name": "The Listener's Hut",
+      "at": {
+        "x": -140,
+        "y": 32
+      },
+      "rotation": 18,
+      "size": {
+        "x": 5,
+        "y": 4
+      }
+    },
+    {
+      "kind": "lamp",
+      "at": {
+        "x": -145.6,
+        "y": 29.2
+      },
+      "rotation": 30
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": -133.6,
+        "y": 27.4
+      },
+      "rotation": 75,
+      "size": {
+        "x": 6
+      }
+    },
+    {
+      "kind": "crates",
+      "at": {
+        "x": -135.2,
+        "y": 35.6
+      },
+      "rotation": 10,
+      "variant": 0
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -148.5,
+        "y": 40.5
+      },
+      "variant": 1
+    },
+    {
+      "kind": "dead_oak",
+      "name": "The Hush",
+      "at": {
+        "x": -141,
+        "y": 139
+      },
+      "scale": 1.25
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -152,
+        "y": 150
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -121.5,
+        "y": 108.5
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -160,
+        "y": 90
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -118,
+        "y": -152
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -60,
+        "y": -124
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 8,
+        "y": -160
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 58,
+        "y": -160
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 155,
+        "y": 10
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 158,
+        "y": 100
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 100,
+        "y": 158
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -32,
+        "y": 158
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 150,
+        "y": -152
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -160,
+        "y": -42
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -158,
+        "y": 66
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 128,
+        "y": 60
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -84,
+        "y": 158
+      },
+      "variant": 2
     }
   ],
   "life": {
@@ -1395,6 +2884,87 @@
         },
         "radius": 14,
         "count": 2
+      },
+      {
+        "kind": "crow",
+        "center": {
+          "x": -90,
+          "y": -127
+        },
+        "radius": 8,
+        "count": 4
+      },
+      {
+        "kind": "crow",
+        "center": {
+          "x": 138,
+          "y": -36
+        },
+        "radius": 14,
+        "count": 6
+      },
+      {
+        "kind": "crow",
+        "center": {
+          "x": 104,
+          "y": -133
+        },
+        "radius": 14,
+        "count": 4
+      },
+      {
+        "kind": "crow",
+        "center": {
+          "x": -30,
+          "y": -140
+        },
+        "radius": 10,
+        "count": 3
+      },
+      {
+        "kind": "rabbit",
+        "center": {
+          "x": -62,
+          "y": 140
+        },
+        "radius": 12,
+        "count": 3
+      },
+      {
+        "kind": "rabbit",
+        "center": {
+          "x": 150,
+          "y": 76
+        },
+        "radius": 12,
+        "count": 3
+      },
+      {
+        "kind": "deer",
+        "center": {
+          "x": 118,
+          "y": 128
+        },
+        "radius": 16,
+        "count": 3
+      },
+      {
+        "kind": "rabbit",
+        "center": {
+          "x": -126,
+          "y": -150
+        },
+        "radius": 10,
+        "count": 2
+      },
+      {
+        "kind": "rabbit",
+        "center": {
+          "x": 40,
+          "y": -152
+        },
+        "radius": 12,
+        "count": 3
       }
     ],
     "names": [
@@ -1519,6 +3089,218 @@
       "levelMax": 5,
       "respawn": 240,
       "elite": true
+    },
+    {
+      "name": "Hush wolves",
+      "mob": "Grey wolf",
+      "tag": "wolf",
+      "look": "wolf",
+      "canonStatus": "GAME-ONLY",
+      "center": {
+        "x": -138,
+        "y": 132
+      },
+      "radius": 10,
+      "count": 5,
+      "levelMin": 4,
+      "levelMax": 5,
+      "respawn": 75
+    },
+    {
+      "name": "Plague pit hollows",
+      "mob": "Hollow Man",
+      "tag": "hollow",
+      "look": "hollow",
+      "canonStatus": "CANON creature (Hollow Men, book1 ch.4), GAME-ONLY placement",
+      "center": {
+        "x": -30,
+        "y": -140
+      },
+      "radius": 9,
+      "count": 4,
+      "levelMin": 4,
+      "levelMax": 5,
+      "respawn": 90
+    },
+    {
+      "name": "Sandthrone picket",
+      "mob": "Sandthrone outrider",
+      "tag": "outrider",
+      "look": "outrider",
+      "canonStatus": "CANON faction (Sandthrone), GAME-ONLY camp",
+      "center": {
+        "x": 38,
+        "y": 133
+      },
+      "radius": 9,
+      "count": 4,
+      "levelMin": 5,
+      "levelMax": 5,
+      "respawn": 90
+    },
+    {
+      "name": "Mire boars",
+      "mob": "Mire boar",
+      "tag": "boar",
+      "look": "boar",
+      "canonStatus": "GAME-ONLY",
+      "center": {
+        "x": 104,
+        "y": -134
+      },
+      "radius": 10,
+      "count": 4,
+      "levelMin": 4,
+      "levelMax": 5,
+      "respawn": 75
+    },
+    {
+      "name": "The Pale Reckoner",
+      "mob": "The Pale Reckoner",
+      "tag": "pale",
+      "look": "pale",
+      "canonStatus": "CANON creature (the Pale Things as cosmic auditors, world_bible.md), GAME-ONLY character",
+      "center": {
+        "x": 139,
+        "y": -38
+      },
+      "radius": 5,
+      "count": 1,
+      "levelMin": 7,
+      "levelMax": 7,
+      "respawn": 300,
+      "elite": true,
+      "harder": true
+    }
+  ],
+  "tallGrass": [
+    {
+      "name": "Drowned field stalks",
+      "center": {
+        "x": 104,
+        "y": -127
+      },
+      "radius": 6
+    },
+    {
+      "name": "Drowned field stalks (east)",
+      "center": {
+        "x": 140,
+        "y": -128
+      },
+      "radius": 6
+    },
+    {
+      "name": "Drowned field stalks (south)",
+      "center": {
+        "x": 96,
+        "y": -151
+      },
+      "radius": 5
+    },
+    {
+      "name": "Fever-field stalks",
+      "center": {
+        "x": 68,
+        "y": -146
+      },
+      "radius": 6
+    },
+    {
+      "name": "Pit stalks",
+      "center": {
+        "x": -14,
+        "y": -153
+      },
+      "radius": 6
+    },
+    {
+      "name": "Hush fringe",
+      "center": {
+        "x": -108,
+        "y": 150
+      },
+      "radius": 6
+    },
+    {
+      "name": "North verge",
+      "center": {
+        "x": 18,
+        "y": 152
+      },
+      "radius": 7
+    },
+    {
+      "name": "Bound-wall stalks",
+      "center": {
+        "x": -44,
+        "y": 120
+      },
+      "radius": 6
+    },
+    {
+      "name": "Thicket stalks",
+      "center": {
+        "x": -153,
+        "y": -108
+      },
+      "radius": 7
+    },
+    {
+      "name": "Creekside stalks",
+      "center": {
+        "x": -114,
+        "y": -27
+      },
+      "radius": 6
+    },
+    {
+      "name": "Scarp stalks",
+      "center": {
+        "x": -73,
+        "y": 108
+      },
+      "radius": 7
+    },
+    {
+      "name": "Wall-foot stalks",
+      "center": {
+        "x": 12,
+        "y": 116
+      },
+      "radius": 6
+    },
+    {
+      "name": "Low-row stalks",
+      "center": {
+        "x": -4,
+        "y": -124
+      },
+      "radius": 6
+    },
+    {
+      "name": "Ridge stalks",
+      "center": {
+        "x": 70,
+        "y": 110
+      },
+      "radius": 7
+    },
+    {
+      "name": "Gully stalks",
+      "center": {
+        "x": 114,
+        "y": -52
+      },
+      "radius": 6
+    },
+    {
+      "name": "Pinewood stalks",
+      "center": {
+        "x": 130,
+        "y": 84
+      },
+      "radius": 7
     }
   ],
   "shapes": [
@@ -1531,6 +3313,68 @@
       "radius": 3,
       "height": 3.6,
       "blend": 11
+    },
+    {
+      "name": "Plague pit",
+      "center": {
+        "x": -30,
+        "y": -140
+      },
+      "radius": 5,
+      "height": -2,
+      "blend": 6
+    },
+    {
+      "name": "Watch knoll",
+      "center": {
+        "x": 41,
+        "y": 136
+      },
+      "radius": 5,
+      "height": 2,
+      "blend": 9
+    },
+    {
+      "name": "Drowned field (west)",
+      "paint": "mud",
+      "center": {
+        "x": 86,
+        "y": -130
+      },
+      "radius": 12,
+      "height": -0.5,
+      "blend": 6
+    },
+    {
+      "name": "Drowned field (east)",
+      "paint": "mud",
+      "center": {
+        "x": 122,
+        "y": -137
+      },
+      "radius": 10,
+      "height": -0.5,
+      "blend": 6
+    },
+    {
+      "name": "Pine knoll",
+      "center": {
+        "x": 126,
+        "y": 136
+      },
+      "radius": 2,
+      "height": 3,
+      "blend": 14
+    },
+    {
+      "name": "Hush rise",
+      "center": {
+        "x": -146,
+        "y": 146
+      },
+      "radius": 3,
+      "height": 2.4,
+      "blend": 12
     }
   ],
   "secrets": [
@@ -1610,6 +3454,52 @@
       "item": "herb.widows_lamp",
       "xp": 45,
       "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "secret.khaven.carrion-heights",
+      "name": "Where the Crows Wait",
+      "kind": "vista",
+      "at": {
+        "x": 137,
+        "y": -22
+      },
+      "radius": 5,
+      "rotation": 270,
+      "text": "A cairn of skull-sized stones on the lip of the Carrion Heights, where the crows sit in rows and wait. The old cliffs break out of the scrub below, Gloom Creek runs dull as lead past their feet, and somewhere west in the murk lies Khaven, keeping its lamps lit.",
+      "xp": 70,
+      "canonStatus": "GAME-ONLY: the heights and the cairn. The Carrion Cliffs and Gloom Creek are CANON (the Khaven village map)."
+    },
+    {
+      "id": "secret.khaven.listeners-daybook",
+      "name": "The Listener's Daybook",
+      "kind": "note",
+      "prompt": "Work the folded page out of the chink in the wall",
+      "at": {
+        "x": -139.009,
+        "y": 29.386
+      },
+      "rotation": 18,
+      "height": 1,
+      "text": "Leaves of a daybook, folded small and pushed into a chink in the hut wall where the damp couldn't reach them. The hand is careful, then less careful.",
+      "document": "doc.khaven.listener",
+      "xp": 55,
+      "canonStatus": "CANON-EXPANDED: the Silent Pilgrims and their 'Original Song' are CANON, and so are the Pale Things as cosmic auditors (world_bible.md); the Listener and his daybook are GAME-ONLY."
+    },
+    {
+      "id": "secret.khaven.coins-for-the-hanged",
+      "name": "Coins for the Hanged",
+      "kind": "cache",
+      "prompt": "Lift the flat stone at the foot of the crossroads grave",
+      "at": {
+        "x": -109.6,
+        "y": -122
+      },
+      "rotation": 200,
+      "text": "Travellers on the Gloom road leave a coin under the stone for the hanged, so the hanged won't follow them home. Nobody in Khaven would take one back. There is a tin under there, heavy with years of them, and a draught somebody left for the same reason.",
+      "item": "potion.healing",
+      "xp": 45,
+      "gold": 16,
+      "canonStatus": "GAME-ONLY: the crossroads burial and the coin custom."
     }
   ]
 }

@@ -59,11 +59,14 @@ namespace Crulanda.World
             RequestedZoneId = null;
             if (Zone == null || string.IsNullOrEmpty(Zone.id) || art == null) { Debug.LogError("Zone definition or art missing."); enabled = false; return; }
             Active = this;
+            var built = System.Diagnostics.Stopwatch.StartNew(); var phases = new System.Text.StringBuilder(); long mark = 0;
+            void Lap(string what) { long now = built.ElapsedMilliseconds; phases.Append(what).Append(' ').Append(now - mark).Append(", "); mark = now; }   // where a zone's load time goes
             rng = new System.Random(Zone.seed);
             props = new GameObject("Zone props").transform; props.SetParent(transform, false);
             statics = new GameObject("Zone static scenery").transform; statics.SetParent(transform, false);
-            PrepareRelief(); PrepareShapes(); Water = new ZoneWater(); Water.Prepare(Zone, (x, z) => HeightAt(x, z, false)); PrepareHollows();
-            BuildLighting(); BuildGround(); BuildWater(); BuildWasting(); BuildProps(); BuildGroves(); BuildExits(); BuildForestEdge(); BuildBoundaries(); BuildBackdrop();
+            PrepareRelief(); PrepareShapes(); Water = new ZoneWater(); Water.Prepare(Zone, (x, z) => HeightAt(x, z, false)); PrepareHollows(); Lap("prepare");
+            BuildLighting(); BuildGround(); Lap("ground"); BuildWater(); BuildWasting(); Lap("water"); BuildProps(); Lap("props"); BuildGroves(); BuildExits(); Lap("groves");
+            BuildForestEdge(); BuildBoundaries(); Lap("edge"); BuildBackdrop(); Lap("backdrop");
             if (art.grass != null && art.grass.Length > 0)
             {
                 // Gloom: the tufts are dry, greyed straw and no wildflowers bloom.
@@ -72,12 +75,16 @@ namespace Crulanda.World
                 var tall = Gloom ? art.grass.Select(m => new Material(m) { name = m.name + " (dead, tall)", color = Color.Lerp(m.color, new Color(.36f, .35f, .34f), .9f), enableInstancing = true }).ToArray() : null;
                 gameObject.AddComponent<GrassField>().Build(this, grass, Gloom ? null : art.flowers, Openness, Zone.seed + 99, Zone.biome == "meadow" ? 2.3f : 1.6f, TallGrassPatches(), tall, Gloom ? .8f : 1, Gloom ? .7f : 1);
             }
+            Lap("grass");
             gameObject.AddComponent<FallingLeaves>().Init(this);
             Splashes.Ensure(this); TreeFade.Begin(art.fade);
             var view = Camera.main;
             if (view != null && art.post != null && view.GetComponent<ZonePost>() == null) view.gameObject.AddComponent<ZonePost>().Init(art.post, Zone, sunLight);
             try { StaticBatchingUtility.Combine(statics.gameObject); } catch (Exception e) { Debug.LogWarning("Static batching skipped: " + e.Message); }
-            MapTexture = RenderMap(1024);   // in daylight, before the clock sets the hour
+            Lap("batching");
+            // In daylight, before the clock sets the hour; about 4 px a metre (1024 for the old 260 m zones).
+            MapTexture = RenderMap(Mathf.Clamp(Mathf.RoundToInt(Zone.size * 4 / 256f) * 256, 1024, 2048));
+            Lap("map");
             BuildSecrets();   // after the map: a hidden find must never show on the minimap or the zone map
             gameObject.AddComponent<WorldWeather>().Init(this, sunLight);   // before the clock: its first light already has the weather in it
             var clock = gameObject.AddComponent<WorldClock>(); clock.Init(sunLight, Zone.lighting, art.skybox, NightLights);
@@ -87,6 +94,8 @@ namespace Crulanda.World
             probe.timeSlicingMode = UnityEngine.Rendering.ReflectionProbeTimeSlicingMode.NoTimeSlicing; probe.clearFlags = UnityEngine.Rendering.ReflectionProbeClearFlags.Skybox;
             probe.cullingMask = 0; probe.resolution = 64; probe.hdr = true; probe.size = new Vector3(Zone.size + 40, 400, Zone.size + 40); probe.importance = 0;
             clock.Reflections = probe;
+            Lap("rest");
+            Debug.Log("Zone " + Zone.id + " (" + Zone.size + " m) built in " + built.ElapsedMilliseconds + " ms (" + phases.ToString().TrimEnd(',', ' ') + ").");
         }
         Light sunLight;
         /// <summary>North-up top-down picture of the zone (before characters spawn), used by the minimap and zone map.</summary>
@@ -401,7 +410,7 @@ namespace Crulanda.World
                 m.SetTexture("_DetailMask", DetailMask(256, (x, z) => 1 - Mathf.SmoothStep(0, 1, Mathf.InverseLerp(.3f, .95f, Unmade(x, z)))));   // none on the unmade
             }
             if (Zone.biome == "mountain") m.SetTexture("_DetailMask", DetailMask(4, (x, z) => .5f));   // half grain: in hard alpine light it was a harsh speckle
-            m.mainTexture = PaintGround(Mathf.Clamp(Mathf.RoundToInt(Zone.size * 8 / 256) * 256, 1024, 2048)); r.sharedMaterial = m; GroundMaterial = m;
+            m.mainTexture = PaintGround(Mathf.Clamp(Mathf.RoundToInt(Zone.size * 8 / 256) * 256, 1024, 3072)); r.sharedMaterial = m; GroundMaterial = m;   // paint: about 8 px a metre
             go.AddComponent<MeshCollider>().sharedMesh = mesh;
         }
         Texture2D PaintGround(int res)
@@ -439,7 +448,9 @@ namespace Crulanda.World
                 }
             // Bounding boxes let most pixels skip the per-segment distance tests (the expensive part at 2048x2048).
             var roadBox = Zone.roads.Select(r => Box(r.points, r.width / 2 + 1.3f)).ToArray();
-            for (int j = 0; j < res; j++)
+            // Rows in parallel: every pixel reads only the zone's data and the ground grid (no random stream, no Unity objects), and
+            // writes only its own texel. A 380 m zone's 3072 px paint took 20 s on one core.
+            System.Threading.Tasks.Parallel.For(0, res, j => {
                 for (int i = 0; i < res; i++)
                 {
                     float x = -half + size * (i + .5f) / res, z = -half + size * (j + .5f) / res; var p = new Vector2(x, z);
@@ -572,6 +583,7 @@ namespace Crulanda.World
                     }
                     px[j * res + i] = c;
                 }
+            });
             tex.SetPixels32(px); tex.Apply(true, true);
             return tex;
         }
@@ -825,7 +837,7 @@ namespace Crulanda.World
                 if (p.kind == "wall") WarnWallInBuilding(p);
                 // New landmark kinds draw from their own stream, after taking the draws the kind that stood here took, so
                 // every later prop, tree and rock keeps the layout it had.
-                var zoneRng = rng; int legacy = p.kind == "cave" ? 30 : p.kind == "rib" ? 6 : p.kind == "perch" || p.kind == "wallow" || p.kind == "brood" || p.kind == "cavern" ? 0 : -1;
+                var zoneRng = rng; int legacy = p.kind == "cave" ? 30 : p.kind == "rib" ? 6 : p.kind == "perch" || p.kind == "wallow" || p.kind == "brood" || p.kind == "cavern" || p.kind == "monolith" ? 0 : -1;
                 if (legacy >= 0) { for (int k = 0; k < legacy; k++) _ = R01; rng = new System.Random(Zone.seed ^ (Mathf.RoundToInt(p.at.x * 8) * 73856093) ^ (Mathf.RoundToInt(p.at.y * 8) * 19349663)); }
                 switch (p.kind)
                 {
@@ -845,6 +857,7 @@ namespace Crulanda.World
                     case "ruined_house": RuinedHouse(t, p.size.x > 0 ? p.size : new Vector2(8, 6)); break;
                     case "wall": Wall(p.points, statics); DestroyImmediate(t.gameObject); break;
                     case "tower": Tower(t, p.size.x > 0 ? p.size.x : 4.4f); break;
+                    case "monolith": Monolith(t); break;
                     case "gallows": Gallows(t); break;
                     case "crypt": Crypt(t, p.variant); break;
                     case "cliff": Cliff(t, p.size.x > 0 ? p.size.x : 20, p.lift); break;
@@ -1836,6 +1849,47 @@ namespace Crulanda.World
                 Solid(seg, new Vector3(0, 2, 0), new Vector3(1.4f, 5, len + .4f));
             }
         }
+        /// <summary>
+        /// A Silent Statue (CANON, world_bible.md: giant faceless monoliths standing in the Wasting): a robed, hooded figure of pale
+        /// weathered stone, about 10 m tall at scale 1, all one body from the hem of its robe to the crown of its hood, and nothing
+        /// in the hood but shadow. It bows a little, and stands to the knees in the rubble of the ground it stood in. Draws from
+        /// its own stream (BuildProps).
+        /// </summary>
+        void Monolith(Transform t)
+        {
+            var stone = Tint(art.stone, new Color(.56f, .56f, .58f)); var rubble = Tint(art.stone, new Color(.42f, .42f, .44f));
+            var hollow = Tint(art.stone, new Color(.06f, .06f, .07f));
+            if (statue == null)
+                // The outline, hem to crown (height, radius): the robe falls wide, narrows to the waist, swells over the shoulders,
+                // pinches at the neck under the hood, and the hood rounds off, a little peaked.
+                statue = Lathe("Silent Statue", new[] { new Vector2(0, 1.95f), new Vector2(.6f, 1.85f), new Vector2(2, 1.6f), new Vector2(3.6f, 1.36f),
+                    new Vector2(5.2f, 1.2f), new Vector2(6.3f, 1.22f), new Vector2(6.9f, 1.42f), new Vector2(7.35f, 1.3f), new Vector2(7.75f, .86f),
+                    new Vector2(8.05f, .84f), new Vector2(8.6f, .92f), new Vector2(9.15f, .86f), new Vector2(9.6f, .66f), new Vector2(9.95f, .36f),
+                    new Vector2(10.15f, .08f) }, 18, .74f);
+            var bow = Quaternion.Euler(4, 0, -1.5f);
+            MeshPart(statue, t, Vector3.zero, stone, bow);
+            Part(PrimitiveType.Sphere, t, bow * new Vector3(0, 8.55f, .5f), new Vector3(.95f, 1.25f, .5f), hollow, bow);   // the hood's empty front
+            for (int k = 0; k < 7; k++)
+            {
+                float a = (k * 51 + R01 * 25) * Mathf.Deg2Rad, r = 1.8f + R01 * .6f, size = .8f + R01 * .7f;
+                Lump(BoulderAt(k), t, new Vector3(Mathf.Cos(a) * r, .2f + R01 * .2f, Mathf.Sin(a) * r * .85f), Vector3.one * size, rubble, R01 * 360);
+            }
+            Solid(t, new Vector3(0, 4, 0), new Vector3(2.8f, 8, 2.2f));
+        }
+        Mesh statue;
+        /// <summary>A smooth surface of revolution round +y through <paramref name="profile"/> (height, radius) points, squashed
+        /// front to back (z) by <paramref name="depth"/>, closed at the bottom.</summary>
+        static Mesh Lathe(string name, Vector2[] profile, int sides, float depth)
+        {
+            var v = new List<Vector3>(); var t = new List<int>(); int row = sides + 1;
+            foreach (var pt in profile)
+                for (int k = 0; k <= sides; k++) { float a = k * Mathf.PI * 2 / sides; v.Add(new Vector3(Mathf.Cos(a) * pt.y, pt.x, Mathf.Sin(a) * pt.y * depth)); }
+            for (int r = 0; r + 1 < profile.Length; r++)
+                for (int k = 0; k < sides; k++) { int a = r * row + k, b = a + row; t.AddRange(new[] { a, b, a + 1, a + 1, b, b + 1 }); }
+            int c = v.Count; v.Add(Vector3.zero); for (int k = 0; k < sides; k++) t.AddRange(new[] { c, k, k + 1 });   // the base
+            var m = new Mesh { name = name }; m.SetVertices(v); m.SetTriangles(t, 0); m.RecalculateNormals(); m.RecalculateBounds();
+            return m;
+        }
         void Tower(Transform t, float diameter)
         {
             float h = 7.5f; var stone = Tint(art.stone, new Color(.44f, .43f, .41f));
@@ -2167,13 +2221,25 @@ namespace Crulanda.World
             }
         }
 
+        Rect[] grassRoadBox; (Vector2 at, float r)[] grassBuildings;   // Openness's caches: it is asked ~330k times on a 380 m zone
         /// <summary>How much grass should grow at a point (0 = none): open meadow is full, the village core is trampled.</summary>
         float Openness(Vector2 p)
         {
+            if (grassRoadBox == null)
+            {
+                // A road counts only within 3.3 m of its edge (the verge); a building's footprint and 1.5 m round it is bare.
+                grassRoadBox = Zone.roads.Select(r => Box(r.points, r.width / 2 + 3.5f)).ToArray();
+                grassBuildings = Zone.props.Where(o => o != null && (o.kind == "house" || o.kind == "inn" || o.kind == "barn" || o.kind == "mill" || o.kind == "ruined_house"))
+                    .Select(o => (o.at, Mathf.Max(2, Mathf.Max(o.size.x, o.size.y) * .75f) + 1.5f)).ToArray();
+            }
             float living = 1 - Unmade(p.x, p.y) / .55f; if (living <= 0) return 0;   // grass thins out along the grey's ragged front
             if (Hollow.CoverAt(p, 1.2f) > 0) return 0;   // a cave's bare floor
             float verge = 0;   // 1 at a road's edge, 0 from 2.5 m out
-            foreach (var r in Zone.roads) { float d = DistanceToPath(p, r.points) - r.width / 2; if (d < .8f) return 0; verge = Mathf.Max(verge, 1 - Mathf.Clamp01((d - .8f) / 2.5f)); }
+            for (int k = 0; k < Zone.roads.Length; k++)
+            {
+                if (!grassRoadBox[k].Contains(p)) continue;
+                var r = Zone.roads[k]; float d = DistanceToPath(p, r.points) - r.width / 2; if (d < .8f) return 0; verge = Mathf.Max(verge, 1 - Mathf.Clamp01((d - .8f) / 2.5f));
+            }
             // Grass grows down to the bank's noisy edge (the same line PaintGround draws there), never in the water.
             if (Water.Shore(p, 3) + (Mathf.PerlinNoise(p.x * .45f, p.y * .45f) - .5f) * 1.1f < 1.3f) return 0;
             foreach (var c in Zone.clearings) if (Vector2.Distance(p, c.center) < c.radius + 1) return 0;
@@ -2186,12 +2252,7 @@ namespace Crulanda.World
             float open = 1;
             foreach (var g in Zone.groves)
                 if (Mathf.Abs(p.x - g.center.x) < g.size.x / 2 && Mathf.Abs(p.y - g.center.y) < g.size.y / 2) open = g.kind == "dead" ? .15f : .45f;
-            foreach (var prop in Zone.props)
-            {
-                if (prop == null || prop.kind == "wall") continue;
-                float r = Mathf.Max(2, Mathf.Max(prop.size.x, prop.size.y) * .75f);
-                if ((prop.kind == "house" || prop.kind == "inn" || prop.kind == "barn" || prop.kind == "mill" || prop.kind == "ruined_house") && Vector2.Distance(p, prop.at) < r + 1.5f) return 0;
-            }
+            foreach (var (at, r) in grassBuildings) if ((p - at).sqrMagnitude < r * r) return 0;
             if (p.magnitude < Zone.flatRadius * .45f) open *= .35f;
             if (Zone.biome == "ash") return 0;                       // nothing grows in the ash
             if (Zone.biome == "mountain")

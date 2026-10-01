@@ -23,6 +23,20 @@ Status 2026-09-28. The game opens in **Oakhaven** (`Assets/Crulanda/Scenes/Oakha
 - Characters: `ActorVisual` builds a placeholder humanoid (Warrior, Druid, Healer/Mira, Concord collector/warden, legacy
   sentry) with movement-driven walk/idle animation. Stand-in until authored models exist.
 
+## Zone size (grown 2026-09-30)
+- Oakhaven is 380 m across, Khaven 340 m, the Peaks and the Ash Rim 360 m each (they were 240-260 m). Chris, 2026-09-29:
+  "zones do need to be bigger with more places and secrets to explore".
+- Each village core kept its coordinates. What belonged to the edge moved out with it: the exits and the arrival points into
+  them, the roads to them, the creeks off the map, the Wasting's curtain (the same distance from the east edge), and the
+  player start in the Peaks and on the Rim (they stood at the entry). The forest edge, boundaries and backdrop follow `Half`.
+- The new ground carries new places, camps, groves, fields, tall grass, critters and secrets in every zone (sections below).
+  New entries were appended, so the old props keep their random draws and the old camps their mob ids; the old groves and
+  the forest edge re-scatter inside their own areas (they draw from the zone's stream after the new props).
+- Villagers keep their errands within 125 m of the village's middle (`WorldLife.VillageReach`): the outer farms and woods
+  are the wild's.
+- The ground paint keeps about 8 px a metre (up to 3072 px) and the map about 4 px a metre (up to 2048). Each build logs its
+  time by phase ("Zone zone.oakhaven (380 m) built in ... ms (prepare ..., ground ..., ...)").
+
 ## Checking visuals without playing
 - `Crulanda.exe --crulanda-world-capture <dir>`: scenic tour screenshots (HUD hidden), isolated temp save.
 - `Crulanda.exe --crulanda-ui-capture <dir> [--crulanda-class class.druid]`: talent panel + combat HUD screenshots.
@@ -34,6 +48,11 @@ resonance candidates (source: `D:\code\crulanda\maps\interactive_map.html`, `map
 The zone is Oakhaven before that erasure (the game is set before it happens): the Great Oak on the green, the Golden Cask inn (canon name, book1\chapter_4.md), the communal well,
 fields, Oak creek with two bridges, and the Wasting eating the eastern edge as grey static.
 GAME-ONLY / PROVISIONAL: the Concord collectors and warden, Mira, exact building placement, the chapel ruin and graves, and the old wayshrine at the edge of the grey.
+The outer ring (grown to 380 m): **Crowsfoot Ridge** over the dungeon (its name GAME-ONLY; the hill above Oakhaven's valley,
+from whose crest the village is first seen, is CANON, book1 ch.4), the Mastwood, Moss's lodge, the Old Fold and Old
+Whitefoot's den, the Bound Stone, the Cider Barn and Withy pool (CANON-EXPANDED: Oakhaven's cider and deep springs), the Old
+Barrow (CANON-EXPANDED: the First Kin), Hollin farm, the Hallow's Creek milestone (CANON-EXPANDED: Hallow's Creek, the first
+settlement the Wasting took, world_bible.md) and the Watchtower on the east road. Each carries its `canonStatus` in the data.
 
 ## Khaven Village (CANON-EXPANDED)
 Canon names from `maps\khaven_village_map.png`: the Cracked Hearth, two Fallen Smithies, the Blood-Stone Well, the Gallows
@@ -44,9 +63,16 @@ rose-violet grade. The dusk holds all day: `lighting.sunHigh` keeps the sun low,
 dusky sky, while night still falls on the global clock. No Wasting here: only zones whose JSON has a `wasting` block get one.
 GAME-ONLY / PROVISIONAL: the Sandthrone outriders holding it (Sandthrone is a canon mercenary faction), the Pale watcher
 (canon "Pale Things" as cosmic auditors), the crypt and all exact placement. GAME-ONLY: the beacon mound east of the walls (a
-`Beacon mound` shape, 3.6 m, its old beacon a lookout secret), the only raised ground in the zone. GAME-ONLY looks: the Cracked Hearth's split chimney with the fire showing through (a reading of the canon name; the map draws it as the inn), the drowned graveyard's flood pool and heaved graves, and the creek barrow's turf mound.
+`Beacon mound` shape, 3.6 m, its old beacon a lookout secret). GAME-ONLY looks: the Cracked Hearth's split chimney with the fire showing through (a reading of the canon name; the map draws it as the inn), the drowned graveyard's flood pool and heaved graves, and the creek barrow's turf mound.
+Grown to 340 m (2026-09-30): the Gibbet Crossroads and the Corpse Road (a new bridge over Gloom Creek), the Plague Pit, the
+Drowned Fields, the Carrion Heights above the canon Carrion Cliffs and the Charnel Barrow on them, the Old Bound Wall and the
+Fallen Watch on it, the Listener's Hut (CANON-EXPANDED: a Silent Pilgrim's) and the Hush, the densest of the Whispering Wood.
 
 ## The Shattered Peaks (CANON-EXPANDED), levels 6-8
+Grown to 360 m (2026-09-30): the Signal Tower, Goatherd's Shieling, the Sealed Adit (CANON-EXPANDED: old mining tunnels under
+the Peaks, book2 ch.19), the Cold Tarn (the Peaks' first water, swimmable), the Listening Shrine (CANON-EXPANDED: the Silent
+Pilgrims), the Avalanche scar with a patch of unmade grey (CANON-EXPANDED: the void eating the stone) and the Broken Post.
+Two new inner scarps (the East wall, the Goat-path scarp) keep it a pass between walls, not a plain.
 Canon: a jagged range on the eastern border that holds back the Wasting while the void slowly eats the stone (world_bible.md).
 Sandthrone mercenaries hold it and charge a toll (book1 ch.5).
 GAME-ONLY / PROVISIONAL:
@@ -60,6 +86,10 @@ of it stays reachable. A cliff's `lift` raises a shelf behind it (negative: on i
 and its wall, the Eyrie crag, the North wall and the South and East scarps.
 
 ## The Ashland Rim (CANON-EXPANDED / PROVISIONAL), levels 9-10
+Grown to 360 m (2026-09-30): Wain's Rest on the salt road, the Last Orchard, the Drowned Leviathan (a spine and ribs half in
+the ash), the Ash Pit (the cult's), the Walled Mouth (an Ash-Walker cave walled up), the Fraying, the Silent Statue
+(CANON: the Silent Statues, world_bible.md), the Hunters' Knoll and the Reach-Stones (rows of stones marking the grey's yearly
+advance). Canon labels on each in the data.
 Canon (book1 ch.20): the Ash-Walkers (Chieftain Grohl, Mother Vane the Salt-Speaker) live in caves along the Wasting and fight
 Weave-Eaters with Salt of the First Sea. The Cult of Ash and its iron-wired bone masks are canon (book1 ch.10).
 The canon Ashlands only take their full form later (after the Spoke fires), so this pre-erasure rim is PROVISIONAL.
@@ -82,10 +112,10 @@ Biome `ash`: grey cracked ground with no grass, dead trees and falling ash.
 
 | Zone | Camps (level) |
 |---|---|
-| Oakhaven 1-2 | Harrow wood wolves (1-2), South copse boars (1-2), North pines wolves (2), Tall-grass stalkers (1-2, ambush), Brookside boars (2); the Crowsfoot Hollow dungeon, all `harder`: Sandthrone deserters (3-5), Quartermaster Hesk (4, elite), Caddock, the Bandit King (5, elite) |
-| Khaven 3-5 | Whispering Wood wolves (3-4), Carrion boars (3-4, ambush), Sandthrone outrider camp (4-5), Gloom Creek hollows (5), The Grey Sexton (5, elite) |
-| Peaks 6-8 | Toll-gate guards (6-7), Wolf pines pack (6-7, ambush), Rockhide wallow (7), The High Ledge (8), Captain's eyrie (8, elite) |
-| Ash Rim 9-10 | Ash hound pack (9), Unwoven Flats eaters (9-10), Tear-marked shrine (9-10), Cinderfold hollows (10), The Weave-Eater brood (10, elite) |
+| Oakhaven 1-2 | Harrow wood wolves (1-2), South copse boars (1-2), North pines wolves (2), Tall-grass stalkers (1-2, ambush), Brookside boars (2), Mastwood boars (1-2), Whitefoot's pack (2), Withy pool boars (2), Hollin farm wolves (2), Old Whitefoot (3, elite, harder); the Crowsfoot Hollow dungeon, all `harder`: Sandthrone deserters (3-5), Quartermaster Hesk (4, elite), Caddock, the Bandit King (5, elite) |
+| Khaven 3-5 | Whispering Wood wolves (3-4), Carrion boars (3-4, ambush), Sandthrone outrider camp (4-5), Gloom Creek hollows (5), The Grey Sexton (5, elite), Hush wolves (4-5), Plague pit hollows (4-5), Sandthrone picket (5), Mire boars (4-5), The Pale Reckoner (7, elite, harder) |
+| Peaks 6-8 | Toll-gate guards (6-7), Wolf pines pack (6-7, ambush), Rockhide wallow (7), The High Ledge (8), Captain's eyrie (8, elite), Signal-tower pickets (6-7), Shieling wolves (6-7), Scar rockhides (7-8), Old Scree-Tusk (8, elite) |
+| Ash Rim 9-10 | Ash hound pack (9), Unwoven Flats eaters (9-10), Tear-marked shrine (9-10), Cinderfold hollows (10), The Weave-Eater brood (10, elite), Ash-pit cultists (9-10), The Ash-Deacon (10, elite), Fraying eaters (9-10), Orchard hounds (9-10) |
 
 ## Water (`Scripts/World/ZoneWater.cs`)
 One model answers all of these, so they always agree: what is drawn (meshes), what is carved (terrain) and what is felt (motor, navmesh).
@@ -231,8 +261,8 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
   - **The upper hollow:** the entrance passage north into the deserters' camp round a fire (bedrolls, stolen grain, crates,
     barrels, a torn Sandthrone banner), then a low passage bending west.
   - **The Drop:** a steep descent north, eleven metres down, with plank treads pegged across the floor and a rope rail on
-    posts down one wall. It takes the passage under the zone's north edge (its roof well under the boundary wall's foot) and
-    into the hills. The key to the strongbox hangs on a nail here.
+    posts down one wall. It takes the passage north under Crowsfoot Ridge, the hills on the zone's north side (raised over
+    the dungeon as shapes; 8 m and more of rock over its roof). The key to the strongbox hangs on a nail here.
   - **The Store Caves**, 12.5 m down: the stolen stores stacked along the walls, the Quartermaster's desk (a plank on two
     barrels, his ledger, a candle), a brazier, a side way choked with fallen rock, and the Quartermaster's strongbox.
   - **The Deep Stair:** a winding passage east, down another three metres.
@@ -289,16 +319,20 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
   - not in a building, water, a camp, on a road, on a quest prop, at an exit, spawn or arrival;
   - keep 4 m or more off roads and bridge decks so walking past never raises the prompt;
   - keep 5 m or more from the foot of free crags (their rock lumps and scree reach past the colliders);
-  - nothing in or on Crowsfoot Hollow (it will be rebuilt as a dungeon with its own loot).
+  - nothing in or on Crowsfoot Hollow but its own strongbox and key, and nothing on the surface within 12 m of its passage
+    (a camp or find over it would be seated on its floor).
 - **Per zone** (GAME-ONLY placement; canonStatus on each):
-  - Oakhaven: the Road's End (vista), the Poacher's Cold Camp, a Salt-Mender's Drop behind the old wayshrine, a Leaf from the
-    Chapel Book (hollow stump), Moonbells.
+  - Oakhaven: the Road's End (vista, now where the ruts run into the grey), the Poacher's Cold Camp, a Salt-Mender's Drop behind
+    the old wayshrine, a Leaf from the Chapel Book (hollow stump), Moonbells; in the dungeon a Key on the Drop and the
+    Quartermaster's Strongbox; in the outer ring the Overlook (vista on Crowsfoot Ridge), the Shepherd's Tin, a Grave-Robber's
+    Bundle, a Letter from Hallow's Creek and a Page from the Watch Book.
   - Khaven: the Old Beacon (vista, on a new `Beacon mound` shape east of the walls), a Key Under the Gallows, the Outrider's Hoard
-    (chest; needs the key), a Page from the Sexton's Register (drowned chapel wall), Widow's-Lamps.
+    (chest; needs the key), a Page from the Sexton's Register (drowned chapel wall), Widow's-Lamps; in the outer ring Where the
+    Crows Wait (vista), the Listener's Daybook and Coins for the Hanged.
   - Peaks: Above the East Road (vista on the High Ledge), the Goat-Path Camp, a Silent Pilgrim's Echo-Jar, a Letter Never Sent,
-    Frostbells.
+    Frostbells; in the outer ring the Picket's Skim, Scored in the Mortar (the Sealed Adit) and the Spur's End (vista).
   - Ashland Rim: the Salt Line (vista in the southern gap of the Eastern Ridge), an Ash-Walker Cache, a Cultist's Hidden Letter,
-    Last-Light, the Cinderfold Tin.
+    Last-Light, the Cinderfold Tin; in the outer ring a Page from the Waybook, a Bone-Carver's Bundle and Last-Light in the Grey.
 - The capture tour shoots one find per zone up close (`87-secret-<slug>`; the first chest, cache, herb, note or key).
 
 ## Travel
@@ -353,7 +387,7 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
 - Water:
   - It doesn't receive shadows (a transparent surface shader in the built-in pipeline).
   - The camera stays above the surface, so there is no underwater view.
-  - Only Oakhaven has a swimmable lake.
+  - Swimmable water: Oakhaven's Brook pond and Withy pool, and the Peaks' Cold Tarn.
 - The crypt has no interior/dungeon yet; the Whispering Wood does not whisper (no audio).
 - Primitive-built art, no authored models/animation/audio; windows are flat emissive panes; no interiors.
 - The camera pulls in on scenery collisions but can still clip very thin geometry.

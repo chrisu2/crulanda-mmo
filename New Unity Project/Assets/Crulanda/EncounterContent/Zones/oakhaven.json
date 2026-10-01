@@ -3,8 +3,8 @@
   "displayName": "Oakhaven",
   "subtitle": "An eastern farming village at the edge of the Wasting",
   "canonStatus": "CANON-EXPANDED",
-  "canonNote": "Canon: Oakhaven is an eastern agricultural hub erased by an accelerated, localized Wasting event that hid the Council's abduction of resonance candidates (interactive map; Oakhaven village map). This zone shows it on the eve of that erasure. Layout follows the canon village map. The Concord collectors, Mira and exact building placement are GAME-ONLY / PROVISIONAL. The wolf and boar camps and the south road to the Ashland Rim are GAME-ONLY. Crowsfoot Hollow (the cave at the end of the North road, running deep under the northern hills), its Sandthrone deserters, Quartermaster Hesk and Caddock, the Bandit King are GAME-ONLY; the Sandthrone company is CANON.",
-  "size": 260,
+  "canonNote": "Canon: Oakhaven is an eastern agricultural hub erased by an accelerated, localized Wasting event that hid the Council's abduction of resonance candidates (interactive map; Oakhaven village map). This zone shows it on the eve of that erasure. Layout follows the canon village map. The Concord collectors, Mira and exact building placement are GAME-ONLY / PROVISIONAL. The wolf and boar camps and the south road to the Ashland Rim are GAME-ONLY. Crowsfoot Hollow (the cave at the end of the North road, running deep under the northern hills), its Sandthrone deserters, Quartermaster Hesk and Caddock, the Bandit King are GAME-ONLY; the Sandthrone company is CANON. The outer farmland (2026-09-30 growth): Crowsfoot Ridge over the hollow, the Overlook, the Mastwood and Moss's lodge, the Old Fold and Old Whitefoot, the Bound Stone, the Cider Barn, Withy pool, the Old Barrow, Hollin farm, the Hallow's Creek milestone and the Watchtower are GAME-ONLY places; the hill overlooking the valley, Oakhaven's cider and its deep springs (book1 ch.4), the First Kin (sworn by in book1 ch.4) and Hallow's Creek, the first settlement the Wasting took (world_bible.md), are CANON.",
+  "size": 380,
   "levelMin": 1,
   "levelMax": 2,
   "biome": "meadow",
@@ -128,12 +128,12 @@
       "to": "zone.khaven",
       "name": "West road to Khaven Village",
       "at": {
-        "x": -121,
+        "x": -181,
         "y": 13.5
       },
       "arrive": {
         "x": -92,
-        "y": -104
+        "y": -154
       },
       "radius": 5
     },
@@ -142,11 +142,11 @@
       "name": "South road to the Ashland Rim (dangerous, 9-10)",
       "at": {
         "x": -35,
-        "y": -123
+        "y": -183
       },
       "arrive": {
         "x": 5,
-        "y": 114
+        "y": 164
       },
       "radius": 5
     }
@@ -207,6 +207,38 @@
         "y": -98
       },
       "radius": 6
+    },
+    {
+      "name": "Lodge yard",
+      "center": {
+        "x": -100,
+        "y": 135
+      },
+      "radius": 6
+    },
+    {
+      "name": "Fold yard",
+      "center": {
+        "x": -156,
+        "y": 64
+      },
+      "radius": 5
+    },
+    {
+      "name": "Cider yard",
+      "center": {
+        "x": -131,
+        "y": -24
+      },
+      "radius": 5
+    },
+    {
+      "name": "Hollin yard",
+      "center": {
+        "x": 124,
+        "y": -64
+      },
+      "radius": 6
     }
   ],
   "roads": [
@@ -255,6 +287,22 @@
         {
           "x": -128,
           "y": 14
+        },
+        {
+          "x": -143,
+          "y": 17
+        },
+        {
+          "x": -157,
+          "y": 15.2
+        },
+        {
+          "x": -170,
+          "y": 12.9
+        },
+        {
+          "x": -188,
+          "y": 13.7
         }
       ]
     },
@@ -281,6 +329,18 @@
         {
           "x": 104,
           "y": 104
+        },
+        {
+          "x": 125,
+          "y": 117
+        },
+        {
+          "x": 145,
+          "y": 124
+        },
+        {
+          "x": 164,
+          "y": 128
         }
       ]
     },
@@ -307,6 +367,26 @@
         {
           "x": -36,
           "y": -128
+        },
+        {
+          "x": -41,
+          "y": -141
+        },
+        {
+          "x": -38.5,
+          "y": -154
+        },
+        {
+          "x": -31.8,
+          "y": -166
+        },
+        {
+          "x": -35,
+          "y": -183
+        },
+        {
+          "x": -36,
+          "y": -188
         }
       ]
     },
@@ -341,6 +421,18 @@
         {
           "x": 100,
           "y": -110
+        },
+        {
+          "x": 120,
+          "y": -128
+        },
+        {
+          "x": 140,
+          "y": -139
+        },
+        {
+          "x": 160,
+          "y": -147
         }
       ]
     },
@@ -393,6 +485,126 @@
           "y": -92
         }
       ]
+    },
+    {
+      "name": "Downs track",
+      "width": 3,
+      "points": [
+        {
+          "x": -146,
+          "y": 16.5
+        },
+        {
+          "x": -148,
+          "y": 32
+        },
+        {
+          "x": -145,
+          "y": 48
+        },
+        {
+          "x": -143.5,
+          "y": 64
+        },
+        {
+          "x": -139,
+          "y": 82
+        },
+        {
+          "x": -133,
+          "y": 100
+        },
+        {
+          "x": -129,
+          "y": 117
+        },
+        {
+          "x": -118,
+          "y": 131
+        },
+        {
+          "x": -106,
+          "y": 136
+        }
+      ]
+    },
+    {
+      "name": "Ridge path",
+      "width": 2.5,
+      "points": [
+        {
+          "x": -97,
+          "y": 131.5
+        },
+        {
+          "x": -85,
+          "y": 133
+        },
+        {
+          "x": -73,
+          "y": 133
+        },
+        {
+          "x": -64,
+          "y": 129
+        },
+        {
+          "x": -57,
+          "y": 127.5
+        },
+        {
+          "x": -52,
+          "y": 130
+        }
+      ]
+    },
+    {
+      "name": "Barrow path",
+      "width": 2.5,
+      "points": [
+        {
+          "x": -39.6,
+          "y": -148
+        },
+        {
+          "x": -24,
+          "y": -153
+        },
+        {
+          "x": -8,
+          "y": -151
+        },
+        {
+          "x": 6,
+          "y": -155
+        },
+        {
+          "x": 12.5,
+          "y": -157.5
+        }
+      ]
+    },
+    {
+      "name": "Hollin lane",
+      "width": 3,
+      "points": [
+        {
+          "x": 100,
+          "y": -110
+        },
+        {
+          "x": 110,
+          "y": -96
+        },
+        {
+          "x": 117,
+          "y": -82
+        },
+        {
+          "x": 122,
+          "y": -70
+        }
+      ]
     }
   ],
   "water": [
@@ -400,6 +612,18 @@
       "name": "Oak creek",
       "width": 4,
       "points": [
+        {
+          "x": -190,
+          "y": -66
+        },
+        {
+          "x": -170,
+          "y": -72
+        },
+        {
+          "x": -150,
+          "y": -78
+        },
         {
           "x": -130,
           "y": -70
@@ -439,6 +663,14 @@
         {
           "x": 130,
           "y": -22
+        },
+        {
+          "x": 160,
+          "y": -20.5
+        },
+        {
+          "x": 190,
+          "y": -19
         }
       ]
     }
@@ -547,10 +779,75 @@
       },
       "rotation": 8,
       "crop": "soil"
+    },
+    {
+      "name": "South furlong",
+      "center": {
+        "x": -6,
+        "y": -172
+      },
+      "size": {
+        "x": 24,
+        "y": 14
+      },
+      "rotation": 6,
+      "crop": "soil"
+    },
+    {
+      "name": "Hollin home field",
+      "center": {
+        "x": 136,
+        "y": -88
+      },
+      "size": {
+        "x": 20,
+        "y": 14
+      },
+      "rotation": 8,
+      "crop": "soil"
+    },
+    {
+      "name": "Hollin east field",
+      "center": {
+        "x": 150,
+        "y": -62
+      },
+      "size": {
+        "x": 18,
+        "y": 26
+      },
+      "rotation": -3,
+      "crop": "stubble"
+    },
+    {
+      "name": "Long acre",
+      "center": {
+        "x": 112,
+        "y": -142
+      },
+      "size": {
+        "x": 26,
+        "y": 10
+      },
+      "rotation": -38,
+      "crop": "soil"
+    },
+    {
+      "name": "Last field",
+      "center": {
+        "x": 122,
+        "y": 64
+      },
+      "size": {
+        "x": 22,
+        "y": 16
+      },
+      "rotation": 12,
+      "crop": "stubble"
     }
   ],
   "wasting": {
-    "x": 104,
+    "x": 164,
     "curtainHeight": 26,
     "fade": 20,
     "note": "Canon: the Wasting unmakes rather than destroys, leaving grey static."
@@ -593,12 +890,12 @@
       "name": "The Wasting",
       "text": "Not fire, not rot. The world simply stops.",
       "at": {
-        "x": 94,
+        "x": 154,
         "y": 4
       },
       "radius": 10,
       "view": {
-        "x": 88,
+        "x": 148,
         "y": 4
       },
       "viewPitch": 12
@@ -740,6 +1037,122 @@
       },
       "viewPitch": 10,
       "viewZoom": 10
+    },
+    {
+      "name": "Crowsfoot Ridge",
+      "text": "The north hills, splayed like a crow's foot. The hollow is in the heel of it, and the hall under the crown.",
+      "at": {
+        "x": -36,
+        "y": 152
+      },
+      "radius": 16,
+      "view": {
+        "x": -58,
+        "y": 100
+      },
+      "viewPitch": 8,
+      "viewZoom": 16,
+      "canonStatus": "GAME-ONLY name. The hill above Oakhaven's valley, from whose crest the village is first seen, is CANON (book1 ch.4)."
+    },
+    {
+      "name": "The Mastwood",
+      "text": "Old oak and beech, and a floor of mast. The Harrows turned their pigs out here once; the boars have it now.",
+      "at": {
+        "x": -130,
+        "y": 170
+      },
+      "radius": 18,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "Moss's lodge",
+      "text": "Garet Moss's hunting lodge: hides on the rail, and a lantern he leaves lit for anyone caught out after dark.",
+      "at": {
+        "x": -95,
+        "y": 140
+      },
+      "radius": 8,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The Old Fold",
+      "text": "A dry-stone fold older than anyone's grandmother. The flock comes in at dusk, and something has been taking one a week.",
+      "at": {
+        "x": -156,
+        "y": 64
+      },
+      "radius": 10,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The Bound Stone",
+      "text": "Oakhaven's west bound, an acorn cut on this side and nothing on the other. Past it the road is Khaven's, and the light goes dim and stays that way.",
+      "at": {
+        "x": -161,
+        "y": 19.5
+      },
+      "radius": 6,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The Cider Barn",
+      "text": "Oakhaven's cider is pressed here every autumn: the sweetest in the Reach, and the Cask will sell it to anyone who can carry it.",
+      "at": {
+        "x": -129,
+        "y": -15
+      },
+      "radius": 10,
+      "canonStatus": "CANON-EXPANDED: Oakhaven's cider, the finest and sweetest in the Reach, is CANON (book1 ch.4); the barn and the orchard are GAME-ONLY."
+    },
+    {
+      "name": "Withy pool",
+      "text": "Springs well up into a reedy pool under the downs: the deep water the whole valley drinks. The boars wallow at its edge.",
+      "at": {
+        "x": -160,
+        "y": -106
+      },
+      "radius": 10,
+      "canonStatus": "CANON-EXPANDED: Oakhaven's clean water from deep, untouched aquifers is CANON (book1 ch.4); the pool is GAME-ONLY."
+    },
+    {
+      "name": "The Old Barrow",
+      "text": "A turfed mound on the rise. Folk say the First Kin lie in it, and swear by them. Someone has thrown the door-stone down.",
+      "at": {
+        "x": 26,
+        "y": -158
+      },
+      "radius": 10,
+      "canonStatus": "CANON-EXPANDED: the First Kin, sworn by in book1 ch.4, are CANON; the barrow and its tale are GAME-ONLY."
+    },
+    {
+      "name": "Hollin farm",
+      "text": "Empty since spring, when the Hollins' east field went grey in a night. They left the door open and the gate on the latch.",
+      "at": {
+        "x": 124,
+        "y": -62
+      },
+      "radius": 14,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "Hallow's Creek milestone",
+      "text": "HALLOW'S CREEK, the stone says, and points down a road that runs on a few paces and stops. Hallow's Creek was the first to go.",
+      "at": {
+        "x": 152,
+        "y": -139.5
+      },
+      "radius": 8,
+      "canonStatus": "CANON-EXPANDED: Hallow's Creek, the first settlement the Wasting took, is CANON (world_bible.md); the milestone and the road to it are GAME-ONLY."
+    },
+    {
+      "name": "The Watchtower",
+      "text": "Built to watch the east road for raiders. Oakhaven takes turns up there now, watching the grey come on.",
+      "at": {
+        "x": 128,
+        "y": 98
+      },
+      "radius": 10,
+      "canonStatus": "GAME-ONLY"
     }
   ],
   "props": [
@@ -1932,6 +2345,518 @@
         "y": 90
       },
       "rotation": 0
+    },
+    {
+      "kind": "perch",
+      "name": "The Overlook rocks",
+      "at": {
+        "x": -50,
+        "y": 136.5
+      },
+      "rotation": 0,
+      "size": {
+        "x": 3
+      }
+    },
+    {
+      "kind": "tree",
+      "name": "Overlook thorn",
+      "at": {
+        "x": -57,
+        "y": 141
+      },
+      "variant": 3,
+      "scale": 1.1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -42,
+        "y": 148
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -30,
+        "y": 161
+      },
+      "variant": 2
+    },
+    {
+      "kind": "dead_oak",
+      "name": "Lightning oak",
+      "at": {
+        "x": 18,
+        "y": 157
+      },
+      "scale": 0.85
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 21,
+        "y": 172
+      },
+      "variant": 1
+    },
+    {
+      "kind": "tree",
+      "at": {
+        "x": -111,
+        "y": 147
+      },
+      "variant": 2,
+      "scale": 1.55
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -146,
+        "y": 147
+      },
+      "variant": 1
+    },
+    {
+      "kind": "barn",
+      "name": "Moss's lodge",
+      "at": {
+        "x": -93,
+        "y": 143
+      },
+      "rotation": 45,
+      "size": {
+        "x": 7,
+        "y": 5
+      }
+    },
+    {
+      "kind": "lamp",
+      "at": {
+        "x": -97.5,
+        "y": 140
+      },
+      "rotation": 45
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": -104,
+        "y": 130.5
+      },
+      "rotation": 30,
+      "size": {
+        "x": 5
+      }
+    },
+    {
+      "kind": "barrels",
+      "at": {
+        "x": -87.5,
+        "y": 139
+      },
+      "variant": 2
+    },
+    {
+      "kind": "crates",
+      "at": {
+        "x": -99,
+        "y": 147
+      },
+      "rotation": 20,
+      "variant": 1
+    },
+    {
+      "kind": "cart",
+      "at": {
+        "x": -106.5,
+        "y": 141
+      },
+      "rotation": 100
+    },
+    {
+      "kind": "ruin",
+      "name": "Fold wall",
+      "at": {
+        "x": -156,
+        "y": 71
+      },
+      "rotation": 2,
+      "size": {
+        "x": 14
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "Fold wall",
+      "at": {
+        "x": -163,
+        "y": 64
+      },
+      "rotation": 90,
+      "size": {
+        "x": 14
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "Fold wall",
+      "at": {
+        "x": -156,
+        "y": 57
+      },
+      "rotation": -1,
+      "size": {
+        "x": 14
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "Fold wall",
+      "at": {
+        "x": -149,
+        "y": 68.5
+      },
+      "rotation": 91,
+      "size": {
+        "x": 5
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "Fold wall",
+      "at": {
+        "x": -149,
+        "y": 59.5
+      },
+      "rotation": 89,
+      "size": {
+        "x": 5
+      }
+    },
+    {
+      "kind": "crates",
+      "name": "Fold trough",
+      "at": {
+        "x": -153,
+        "y": 61
+      },
+      "variant": 0
+    },
+    {
+      "kind": "barn",
+      "name": "Shepherd's hut",
+      "at": {
+        "x": -168,
+        "y": 53
+      },
+      "rotation": 225,
+      "size": {
+        "x": 5.5,
+        "y": 4
+      }
+    },
+    {
+      "kind": "haystack",
+      "at": {
+        "x": -166,
+        "y": 74
+      }
+    },
+    {
+      "kind": "tree",
+      "name": "Fold oak",
+      "at": {
+        "x": -140,
+        "y": 57
+      },
+      "variant": 1,
+      "scale": 1.3
+    },
+    {
+      "kind": "perch",
+      "name": "Whitefoot's rocks",
+      "at": {
+        "x": -164,
+        "y": 108
+      },
+      "rotation": 315,
+      "size": {
+        "x": 4
+      }
+    },
+    {
+      "kind": "grave",
+      "name": "The Bound Stone",
+      "at": {
+        "x": -161,
+        "y": 19.5
+      },
+      "scale": 1.5
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -163.5,
+        "y": 21.5
+      }
+    },
+    {
+      "kind": "signpost",
+      "at": {
+        "x": -153,
+        "y": 19
+      },
+      "rotation": 80
+    },
+    {
+      "kind": "barn",
+      "name": "The Cider Barn",
+      "at": {
+        "x": -129,
+        "y": -15
+      },
+      "rotation": 20,
+      "size": {
+        "x": 9,
+        "y": 6
+      }
+    },
+    {
+      "kind": "barrels",
+      "at": {
+        "x": -124.5,
+        "y": -21
+      },
+      "variant": 2
+    },
+    {
+      "kind": "barrels",
+      "at": {
+        "x": -133.5,
+        "y": -18
+      },
+      "variant": 1
+    },
+    {
+      "kind": "crates",
+      "at": {
+        "x": -128,
+        "y": -28.5
+      },
+      "rotation": 15,
+      "variant": 2
+    },
+    {
+      "kind": "cart",
+      "name": "Apple cart",
+      "at": {
+        "x": -132.5,
+        "y": -31.5
+      },
+      "rotation": 250
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -150.5,
+        "y": -112.5
+      }
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -171,
+        "y": -103.5
+      },
+      "variant": 1
+    },
+    {
+      "kind": "dead_oak",
+      "name": "Withy snag",
+      "at": {
+        "x": -153,
+        "y": -95.5
+      },
+      "scale": 0.5
+    },
+    {
+      "kind": "wallow",
+      "name": "Withy wallow",
+      "at": {
+        "x": -142,
+        "y": -118
+      },
+      "size": {
+        "x": 5
+      }
+    },
+    {
+      "kind": "crypt",
+      "name": "The Old Barrow",
+      "at": {
+        "x": 24,
+        "y": -158
+      },
+      "rotation": 90,
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 31,
+        "y": -147
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 14,
+        "y": -166
+      }
+    },
+    {
+      "kind": "ruined_house",
+      "name": "Hollin farmhouse",
+      "at": {
+        "x": 118,
+        "y": -58
+      },
+      "rotation": 315,
+      "size": {
+        "x": 8,
+        "y": 6
+      }
+    },
+    {
+      "kind": "barn",
+      "name": "Hollin barn",
+      "at": {
+        "x": 131,
+        "y": -54
+      },
+      "rotation": 45,
+      "size": {
+        "x": 10,
+        "y": 7
+      }
+    },
+    {
+      "kind": "cart",
+      "name": "Hollin cart",
+      "at": {
+        "x": 128,
+        "y": -73
+      },
+      "rotation": 160
+    },
+    {
+      "kind": "barrels",
+      "at": {
+        "x": 113.5,
+        "y": -66
+      },
+      "variant": 1
+    },
+    {
+      "kind": "haystack",
+      "at": {
+        "x": 139,
+        "y": -44
+      }
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": 108,
+        "y": -66
+      },
+      "rotation": 30,
+      "size": {
+        "x": 8
+      }
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": 134.9,
+        "y": -80.2
+      },
+      "rotation": -8,
+      "size": {
+        "x": 16
+      }
+    },
+    {
+      "kind": "grave",
+      "name": "Hallow's Creek milestone",
+      "at": {
+        "x": 152,
+        "y": -139.5
+      },
+      "scale": 1.35
+    },
+    {
+      "kind": "signpost",
+      "at": {
+        "x": 146,
+        "y": -136.5
+      },
+      "rotation": 70
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 156.5,
+        "y": -136
+      },
+      "variant": 1
+    },
+    {
+      "kind": "dead_oak",
+      "name": "Grey husk",
+      "at": {
+        "x": 158,
+        "y": -130
+      },
+      "scale": 0.6
+    },
+    {
+      "kind": "tower",
+      "name": "The Watchtower",
+      "at": {
+        "x": 128,
+        "y": 98
+      },
+      "rotation": 250,
+      "size": {
+        "x": 4.4
+      }
+    },
+    {
+      "kind": "lamp",
+      "at": {
+        "x": 131.4,
+        "y": 100.94
+      },
+      "rotation": 250
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 134,
+        "y": 104
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 121.5,
+        "y": 93
+      }
     }
   ],
   "groves": [
@@ -1999,6 +2924,188 @@
         "y": 16
       },
       "count": 12
+    },
+    {
+      "name": "Ridge pines",
+      "kind": "pine",
+      "center": {
+        "x": 40,
+        "y": 150
+      },
+      "size": {
+        "x": 36,
+        "y": 40
+      },
+      "count": 34
+    },
+    {
+      "name": "Hill hazels",
+      "kind": "broadleaf",
+      "center": {
+        "x": -74,
+        "y": 166
+      },
+      "size": {
+        "x": 30,
+        "y": 24
+      },
+      "count": 16
+    },
+    {
+      "name": "Mastwood",
+      "kind": "broadleaf",
+      "center": {
+        "x": -130,
+        "y": 162
+      },
+      "size": {
+        "x": 56,
+        "y": 40
+      },
+      "count": 46
+    },
+    {
+      "name": "Whitefoot's thicket",
+      "kind": "pine",
+      "center": {
+        "x": -168,
+        "y": 114
+      },
+      "size": {
+        "x": 28,
+        "y": 24
+      },
+      "count": 22
+    },
+    {
+      "name": "Cider orchard",
+      "kind": "orchard",
+      "center": {
+        "x": -150,
+        "y": -26
+      },
+      "size": {
+        "x": 30,
+        "y": 22
+      },
+      "count": 0
+    },
+    {
+      "name": "Bound copse",
+      "kind": "broadleaf",
+      "center": {
+        "x": -176,
+        "y": -12
+      },
+      "size": {
+        "x": 20,
+        "y": 18
+      },
+      "count": 14
+    },
+    {
+      "name": "Withies",
+      "kind": "broadleaf",
+      "center": {
+        "x": -177,
+        "y": -104
+      },
+      "size": {
+        "x": 14,
+        "y": 22
+      },
+      "count": 12
+    },
+    {
+      "name": "Carr wood",
+      "kind": "broadleaf",
+      "center": {
+        "x": -158,
+        "y": -150
+      },
+      "size": {
+        "x": 44,
+        "y": 34
+      },
+      "count": 26
+    },
+    {
+      "name": "Southwood",
+      "kind": "broadleaf",
+      "center": {
+        "x": -86,
+        "y": -160
+      },
+      "size": {
+        "x": 40,
+        "y": 30
+      },
+      "count": 30
+    },
+    {
+      "name": "Hollin orchard",
+      "kind": "dead",
+      "center": {
+        "x": 150,
+        "y": -31
+      },
+      "size": {
+        "x": 18,
+        "y": 14
+      },
+      "count": 12
+    },
+    {
+      "name": "Greying oaks",
+      "kind": "dead",
+      "center": {
+        "x": 150,
+        "y": -116
+      },
+      "size": {
+        "x": 16,
+        "y": 14
+      },
+      "count": 10
+    },
+    {
+      "name": "Brook spinney",
+      "kind": "broadleaf",
+      "center": {
+        "x": 80,
+        "y": -160
+      },
+      "size": {
+        "x": 30,
+        "y": 24
+      },
+      "count": 22
+    },
+    {
+      "name": "Grey wood",
+      "kind": "dead",
+      "center": {
+        "x": 150,
+        "y": 40
+      },
+      "size": {
+        "x": 20,
+        "y": 24
+      },
+      "count": 14
+    },
+    {
+      "name": "East pines",
+      "kind": "pine",
+      "center": {
+        "x": 126,
+        "y": 158
+      },
+      "size": {
+        "x": 36,
+        "y": 36
+      },
+      "count": 26
     }
   ],
   "life": {
@@ -2121,6 +3228,105 @@
         },
         "radius": 14,
         "count": 3
+      },
+      {
+        "kind": "deer",
+        "center": {
+          "x": 40,
+          "y": 152
+        },
+        "radius": 14,
+        "count": 3
+      },
+      {
+        "kind": "rabbit",
+        "center": {
+          "x": -72,
+          "y": 148
+        },
+        "radius": 16,
+        "count": 4
+      },
+      {
+        "kind": "deer",
+        "center": {
+          "x": -146,
+          "y": 150
+        },
+        "radius": 12,
+        "count": 3
+      },
+      {
+        "kind": "sheep",
+        "center": {
+          "x": -156,
+          "y": 64
+        },
+        "radius": 8,
+        "count": 6
+      },
+      {
+        "kind": "rabbit",
+        "center": {
+          "x": -136,
+          "y": 36
+        },
+        "radius": 18,
+        "count": 5
+      },
+      {
+        "kind": "deer",
+        "center": {
+          "x": -176,
+          "y": -110
+        },
+        "radius": 10,
+        "count": 2
+      },
+      {
+        "kind": "rabbit",
+        "center": {
+          "x": -150,
+          "y": -138
+        },
+        "radius": 14,
+        "count": 4
+      },
+      {
+        "kind": "crow",
+        "center": {
+          "x": 24,
+          "y": -150
+        },
+        "radius": 10,
+        "count": 4
+      },
+      {
+        "kind": "rabbit",
+        "center": {
+          "x": -60,
+          "y": -150
+        },
+        "radius": 16,
+        "count": 4
+      },
+      {
+        "kind": "crow",
+        "center": {
+          "x": 128,
+          "y": -62
+        },
+        "radius": 12,
+        "count": 5
+      },
+      {
+        "kind": "rabbit",
+        "center": {
+          "x": 120,
+          "y": 20
+        },
+        "radius": 16,
+        "count": 4
       }
     ],
     "residents": [
@@ -2360,6 +3566,88 @@
       "levelMax": 5,
       "respawn": 600,
       "harder": true
+    },
+    {
+      "name": "Mastwood boars",
+      "mob": "Wild boar",
+      "tag": "boar",
+      "look": "boar",
+      "canonStatus": "GAME-ONLY",
+      "center": {
+        "x": -128,
+        "y": 163
+      },
+      "radius": 9,
+      "count": 4,
+      "levelMin": 1,
+      "levelMax": 2,
+      "respawn": 75
+    },
+    {
+      "name": "Whitefoot's den",
+      "mob": "Old Whitefoot",
+      "tag": "wolf",
+      "look": "wolf",
+      "canonStatus": "GAME-ONLY",
+      "center": {
+        "x": -164,
+        "y": 108
+      },
+      "radius": 2.5,
+      "count": 1,
+      "levelMin": 3,
+      "levelMax": 3,
+      "elite": true,
+      "respawn": 240,
+      "harder": true
+    },
+    {
+      "name": "Whitefoot's pack",
+      "mob": "Grey wolf",
+      "tag": "wolf",
+      "look": "wolf",
+      "canonStatus": "GAME-ONLY",
+      "center": {
+        "x": -150,
+        "y": 90
+      },
+      "radius": 6,
+      "count": 3,
+      "levelMin": 2,
+      "levelMax": 2,
+      "respawn": 75
+    },
+    {
+      "name": "Withy pool boars",
+      "mob": "Wild boar",
+      "tag": "boar",
+      "look": "boar",
+      "canonStatus": "GAME-ONLY",
+      "center": {
+        "x": -142,
+        "y": -118
+      },
+      "radius": 8,
+      "count": 4,
+      "levelMin": 2,
+      "levelMax": 2,
+      "respawn": 75
+    },
+    {
+      "name": "Hollin farm wolves",
+      "mob": "Grey wolf",
+      "tag": "wolf",
+      "look": "wolf",
+      "canonStatus": "GAME-ONLY",
+      "center": {
+        "x": 115,
+        "y": -40
+      },
+      "radius": 7,
+      "count": 3,
+      "levelMin": 2,
+      "levelMax": 2,
+      "respawn": 75
     }
   ],
   "lakes": [
@@ -2371,6 +3659,15 @@
       },
       "radius": 9,
       "depth": 2.8
+    },
+    {
+      "name": "Withy pool",
+      "center": {
+        "x": -160,
+        "y": -106
+      },
+      "radius": 7,
+      "depth": 1
     }
   ],
   "tallGrass": [
@@ -2381,6 +3678,62 @@
         "y": 108
       },
       "radius": 10
+    },
+    {
+      "name": "Ridge grass",
+      "center": {
+        "x": -66,
+        "y": 152
+      },
+      "radius": 8
+    },
+    {
+      "name": "Downs grass",
+      "center": {
+        "x": -170,
+        "y": 42
+      },
+      "radius": 8
+    },
+    {
+      "name": "Reedbeds, east",
+      "center": {
+        "x": -150,
+        "y": -103
+      },
+      "radius": 5
+    },
+    {
+      "name": "Reedbeds, south",
+      "center": {
+        "x": -166,
+        "y": -115
+      },
+      "radius": 5
+    },
+    {
+      "name": "Reedbeds, west",
+      "center": {
+        "x": -169,
+        "y": -98
+      },
+      "radius": 4
+    },
+    {
+      "name": "Barrow grass",
+      "center": {
+        "x": 34,
+        "y": -168
+      },
+      "radius": 7
+    },
+    {
+      "name": "Hollin fallow",
+      "center": {
+        "x": 104,
+        "y": -72
+      },
+      "radius": 7
     }
   ],
   "shapes": [
@@ -2393,6 +3746,127 @@
       "radius": 21,
       "height": 0,
       "blend": 9
+    },
+    {
+      "name": "Crowsfoot Ridge, over the Drop",
+      "center": {
+        "x": -24,
+        "y": 138
+      },
+      "radius": 10,
+      "height": 12.4,
+      "blend": 34
+    },
+    {
+      "name": "Crowsfoot Ridge, the crown",
+      "center": {
+        "x": 0,
+        "y": 165
+      },
+      "radius": 10,
+      "height": 12.5,
+      "blend": 23
+    },
+    {
+      "name": "Crowsfoot Ridge, west toe",
+      "center": {
+        "x": -50,
+        "y": 137
+      },
+      "radius": 4,
+      "height": 9.5,
+      "blend": 22
+    },
+    {
+      "name": "Crowsfoot Ridge, east toe",
+      "center": {
+        "x": 22,
+        "y": 146
+      },
+      "radius": 5,
+      "height": 8,
+      "blend": 20
+    },
+    {
+      "name": "The Overlook",
+      "center": {
+        "x": -50,
+        "y": 136.5
+      },
+      "radius": 3,
+      "height": 10.4,
+      "blend": 7
+    },
+    {
+      "name": "Fold floor",
+      "center": {
+        "x": -156,
+        "y": 64
+      },
+      "radius": 10,
+      "height": 0,
+      "blend": 6
+    },
+    {
+      "name": "Whitefoot's rocks",
+      "center": {
+        "x": -164,
+        "y": 108
+      },
+      "radius": 4,
+      "height": 3,
+      "blend": 9
+    },
+    {
+      "name": "Withy hollow",
+      "center": {
+        "x": -160,
+        "y": -106
+      },
+      "radius": 13,
+      "height": -0.6,
+      "blend": 8
+    },
+    {
+      "name": "Withy wallow",
+      "paint": "mud",
+      "center": {
+        "x": -142,
+        "y": -118
+      },
+      "radius": 5,
+      "height": -0.5,
+      "blend": 5
+    },
+    {
+      "name": "Barrow rise",
+      "center": {
+        "x": 24,
+        "y": -158
+      },
+      "radius": 8,
+      "height": 2.2,
+      "blend": 14
+    },
+    {
+      "name": "Hollin farmyard",
+      "center": {
+        "x": 126,
+        "y": -60
+      },
+      "radius": 12,
+      "height": 0,
+      "blend": 8
+    },
+    {
+      "name": "Watchtower rise",
+      "center": {
+        "x": 128,
+        "y": 98
+      },
+      "radius": 5,
+      "height": 2.5,
+      "blend": 12
     }
   ],
   "secrets": [
@@ -2401,11 +3875,11 @@
       "name": "The Road's End",
       "kind": "vista",
       "at": {
-        "x": 94.5,
-        "y": 101.5
+        "x": 154.39,
+        "y": 129.96
       },
       "radius": 6,
-      "rotation": 40,
+      "rotation": 78,
       "text": "Someone has stacked three stones where the cart ruts run into the grey and stop, mid-rut, as if the road had been rolled up and put away. Past them nothing moves: not grass, not dust, not light.",
       "xp": 25,
       "canonStatus": "GAME-ONLY place. The Wasting unmaking the land into grey static is CANON (world_bible.md)."
@@ -2505,6 +3979,83 @@
       "item": "item.hesks_lantern",
       "document": "doc.oakhaven.kings_orders",
       "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "secret.oakhaven.overlook",
+      "name": "The Overlook",
+      "kind": "vista",
+      "at": {
+        "x": -50,
+        "y": 136.5
+      },
+      "radius": 5,
+      "rotation": 160,
+      "text": "From the knob of the hill the whole valley lies open: the Great Oak's crown over the roofs, smoke from the Cask, the mill wheel on Oak creek, the fields stitched together like a quilt. Past the farthest of them the haze is the wrong colour.",
+      "xp": 35,
+      "canonStatus": "CANON-EXPANDED: the hill over Oakhaven's verdant valley is CANON (book1 ch.4); the lookout is GAME-ONLY."
+    },
+    {
+      "id": "secret.oakhaven.shepherds-tin",
+      "name": "The Shepherd's Tin",
+      "kind": "cache",
+      "prompt": "Reach into the gap at the foot of the wall",
+      "at": {
+        "x": -158,
+        "y": 72.3
+      },
+      "rotation": 180,
+      "text": "Pushed into a gap at the foot of the fold, where the shepherds sit out of the wind: a dented tin, a heel of Harrow cheese in a cloth, a few coins, and the flock's tally scratched on the lid. The last five marks are struck through, one a week.",
+      "item": "food.harrow_cheese",
+      "xp": 30,
+      "gold": 4,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "secret.oakhaven.robbers-bundle",
+      "name": "A Grave-Robber's Bundle",
+      "kind": "cache",
+      "prompt": "Search the bundle by the barrow door",
+      "at": {
+        "x": 19,
+        "y": -156.2
+      },
+      "rotation": 90,
+      "text": "Whoever threw the door-stone down didn't stay to go in: an oilcloth bundle dropped among the stones before the door, a pick and a dark lantern, a few old coins green with age and a stoppered draught. Whatever is in the barrow, they thought better of it.",
+      "item": "potion.minor",
+      "xp": 30,
+      "gold": 8,
+      "canonStatus": "GAME-ONLY: the robber and the bundle. The First Kin are CANON (book1 ch.4); that they lie here is GAME-ONLY."
+    },
+    {
+      "id": "secret.oakhaven.hallows-creek-letter",
+      "name": "A Letter from Hallow's Creek",
+      "kind": "note",
+      "prompt": "Draw the letter out of the crack in the wall",
+      "at": {
+        "x": 122,
+        "y": -58.88
+      },
+      "rotation": 315,
+      "height": 1,
+      "text": "Folded small into a crack in the farmhouse wall, out of the rain: a letter, much read, to Ada Hollin at Oakhaven.",
+      "document": "doc.oakhaven.hallows_creek",
+      "xp": 35,
+      "canonStatus": "CANON-EXPANDED: Hallow's Creek, the first settlement the Wasting took, is CANON (world_bible.md); the letter and the Hollins are GAME-ONLY."
+    },
+    {
+      "id": "secret.oakhaven.watch-book",
+      "name": "A Page from the Watch Book",
+      "kind": "note",
+      "prompt": "Lift the flat stone at the tower's foot",
+      "at": {
+        "x": 131.72,
+        "y": 98.29
+      },
+      "rotation": 250,
+      "text": "Weighted under a flat stone at the foot of the watchtower, where the next watcher will look for it: a page torn from the watch book.",
+      "document": "doc.oakhaven.watch_book",
+      "xp": 35,
+      "canonStatus": "CANON-EXPANDED: the Wasting creeping on the eastern farms is CANON (book1 ch.4, world_bible.md); the watchtower and its book are GAME-ONLY."
     }
   ]
 }

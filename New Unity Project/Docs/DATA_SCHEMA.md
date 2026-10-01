@@ -102,7 +102,7 @@ invalid" and runs without the trades (items are unaffected).
 ```json
 "nodes": [
   { "node": "node.copper", "at": { "x": -37.5, "y": 88.2 } },
-  { "node": "node.copper_rich", "at": { "x": -12.2, "y": 99.2 }, "under": true },
+  { "node": "node.copper_rich", "at": { "x": -18.5, "y": 111.5 }, "under": true },
   { "node": "node.oak", "at": { "x": -78.5, "y": 104 }, "rotation": 0 },
   { "node": "node.yarrow", "item": "item.yarrow", "at": { "x": -104, "y": 30 } }
 ],
@@ -114,8 +114,10 @@ invalid" and runs without the trades (items are unaffected).
   stump is at its -X end, its trunk lying along +X); `under: true` stands it on a cave's floor (`Hollow`), its rock turned to the
   nearer wall; `item` an optional quest item it also gives while a quest wants it. Built by `ZoneBuilder.BuildNodes` after the map
   and the secrets, each from a stream of its own, with no colliders: no tree, rock, prop or creek moves and the navmesh is
-  unchanged. A node in a trunk, a rock, a road, water, a building, within 5.5 m of a secret or 5.2 m of another node is moved
-  clear (up to 3 m), with a warning when nothing near is clear; a windfall turns in 30 degree steps until it lies clear.
+  unchanged. A node in a trunk, a rock, a road, water, a building, within 5.5 m of a secret or 5.2 m of another node, or whose
+  footprint reaches into a camp's spread (radius x 1.42, the square's corners) or a cave's furnishings, is moved clear (up to
+  3 m), with a warning when nothing near is clear; a windfall turns in 30 degree steps until it lies clear. Place them clear in
+  the data: 3 m is a nudge, not a search.
 - `ZoneProp.node`: a herb prop worked as a node (it keeps its `interact` prompt and quest `item`).
 - The zone builder learns what a node is (name, prompt, look) from the component beside it that implements `IZoneNodeKinds`
   (the encounter session, from the trades' content). Without one it builds no nodes and warns.

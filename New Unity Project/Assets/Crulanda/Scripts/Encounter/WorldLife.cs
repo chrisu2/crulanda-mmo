@@ -354,12 +354,13 @@ namespace Crulanda.Encounter
             return pool[rng.Next(pool.Length)];
         }
         /// <summary>What the day's deliveries give people to say: the trades talk of each other's goods (see <see cref="Stock"/>),
-        /// the player's sales among them (ore to the forge, herbs to the stall, game to the inn: EncounterSession.SellBag).</summary>
+        /// the player's sales among them (ore and wood to the forge, herbs to the stall: EncounterSession.SellBag, which marks its own
+        /// as "sold." + the trade, so the merchant's fresh herbs are the player's and not the herbalist's daily errand).</summary>
         string StockLine(Villager v)
         {
             switch (v.Role)
             {
-                case "merchant": return Count("stall.eggs") > 0 ? "Eggs in from the hen-wife, if you want them. Fresh today." : Count("stall.herbs") > 0 ? "Fresh-cut herbs on the stall. Somebody's been in the meadow." : Count("stall.flour") > 0 ? "Flour from the mill, ground this afternoon. Dear, mind." : Count("stall.goods") > 0 ? "Belts and nails and hinges, all village-made. Nothing from the east." : null;
+                case "merchant": return Count("stall.eggs") > 0 ? "Eggs in from the hen-wife, if you want them. Fresh today." : Count("sold.stall.herbs") > 0 ? "Fresh-cut herbs on the stall. Somebody's been in the meadow." : Count("stall.flour") > 0 ? "Flour from the mill, ground this afternoon. Dear, mind." : Count("stall.goods") > 0 ? "Belts and nails and hinges, all village-made. Nothing from the east." : null;
                 case "baker": return Count("oven.flour") > 0 ? "The miller's flour came in. Thin stuff, but it rises." : WorldClock.Between(10, 19) ? "No flour from the mill yet today. The loaves'll be late." : null;
                 case "blacksmith":
                     if (Count("forge.ore") > 0) return Zone.Zone.id == "zone.oakhaven" ? "Someone's been up the Crowsfoot with a pick. First ore I've not had to beg for." : "Someone's been out with a pick. First ore I've not had to beg for.";
@@ -368,7 +369,7 @@ namespace Crulanda.Encounter
                 case "leatherworker": case "skinner": return Count("tannery.hides") > 0 ? "The hunter's been by with a hide. Grey at one edge; the rest'll do." : null;
                 case "henwife": return Count("stall.eggs") > 0 ? "Eggs are at the produce stall if you're wanting any. I don't sell from the yard." : Count("inn.eggs") > 0 ? "Took the Cask its eggs this morning. The rest go to the stall after dinner." : null;
                 case "drinker": case "elder": case "gossip": case "farmer":
-                    return Places["inn"].Count > 0 && Count("inn.ale") == 0 ? "The cask's run dry at the inn. The out-of-work drank it by supper." : Count("inn.game") > 0 ? (Zone.Zone.id == "zone.oakhaven" ? "Boar in the Cask's pot tonight. Somebody's been hunting." : "Boar in the inn's pot tonight. Somebody's been hunting.") : Count("inn.meat") > 0 ? "Hare in the Cask's pot tonight. The hunter's doing." : Count("inn.bread") > 0 && Count("inn.eggs") > 0 ? "Bread and eggs at the Cask today. Like old times, nearly." : Count("inn.wood") > 0 ? "The Cask's got a fire going. Dry oak, for once." : null;
+                    return Places["inn"].Count > 0 && Count("inn.ale") == 0 ? "The cask's run dry at the inn. The out-of-work drank it by supper." : Count("inn.meat") > 0 ? "Hare in the Cask's pot tonight. The hunter's doing." : Count("inn.bread") > 0 && Count("inn.eggs") > 0 ? "Bread and eggs at the Cask today. Like old times, nearly." : Count("inn.wood") > 0 ? "The Cask's got a fire going. Dry oak, for once." : null;
                 default: return null;
             }
         }

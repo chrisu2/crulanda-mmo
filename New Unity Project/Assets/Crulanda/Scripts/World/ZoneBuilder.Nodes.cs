@@ -23,11 +23,23 @@ namespace Crulanda.World
     ///   ground with its stub limbs (child "full") is what is cut. It turns (in 30 degree steps from its rotation) until it lies
     ///   clear of standing trunks, rocks, roads, water and buildings.
     /// - herb: a herb patch (Herb, variants 3-5 the trades' herbs).
-    /// A node that stands in a trunk, a rock, a road, water, a building, by a secret or another node is moved clear (up to 3 m),
-    /// with a warning when nothing near is clear. One under a cave (under) stands on its floor, its rock turned to the wall.
+    /// A node that stands in a trunk, a rock, a road, water, a building, a camp's spread or a cave's furnishings, by a secret or
+    /// another node is moved clear (up to 3 m), with a warning when nothing near is clear. One under a cave (under) stands on its
+    /// floor, its rock turned to the wall.
     /// </summary>
     public sealed partial class ZoneBuilder
     {
+        /// <summary>Where the zone's caves have their furnishings (a fire, bedrolls, stores, rail posts and treads, a desk, the
+        /// throne), each with how far round it reaches, on the ground plane (world). They have no colliders, so a node keeps clear of
+        /// them by these (NodeClear). Filled by Cavern; nothing random.</summary>
+        readonly List<(Vector2 at, float r)> keepClear = new List<(Vector2 at, float r)>();
+        /// <summary>The cave furnishings' spots that a node keeps clear of (for the tests).</summary>
+        public IReadOnlyList<(Vector2 at, float r)> KeepClearSpots { get { return keepClear; } }
+        /// <summary>Marks a cave furnishing at <paramref name="at"/> (local to the cave's root) as reaching <paramref name="r"/> metres round.</summary>
+        void KeepClear(Transform t, Vector3 at, float r) { var w = t.TransformPoint(at); keepClear.Add((new Vector2(w.x, w.z), r)); }
+        /// <summary>How far round its root a node reaches on the ground (a seam's shoulders and loose stone, a windfall's length, a
+        /// herb's leaves): it stands that far from a camp's spread and a cave's furnishings.</summary>
+        public static float NodeFootprint(string look) { return look == "ore" ? 2.1f : look == "ore_rich" ? 2.1f * 1.35f : look == "windfall" ? 3 : .6f; }
         void BuildNodes()
         {
             if (Zone.nodes == null || Zone.nodes.Length == 0) return;
@@ -45,17 +57,18 @@ namespace Crulanda.World
                 var nr = new System.Random(Zone.seed ^ (Mathf.RoundToInt(n.at.x * 8) * 73856093) ^ (Mathf.RoundToInt(n.at.y * 8) * 19349663) ^ 0x2f6e2b);
                 float R() { return (float)nr.NextDouble(); }
                 bool wood = kind.look == "windfall";
-                var at = NodeClear(n.at, n.under, wood ? .9f : .5f, placed, "'" + kind.name + "'");
+                var at = NodeClear(n.at, n.under, wood ? .9f : .5f, NodeFootprint(kind.look), placed, "'" + kind.name + "'");
                 float yaw = n.under ? WallYaw(at, n.rotation) : wood ? WindfallYaw(at, n.rotation) : n.rotation;
                 var t = new GameObject(kind.name).transform; t.SetParent(all, false);
                 t.position = n.under ? StandAt(at, float.NegativeInfinity) : Ground(at); t.rotation = Quaternion.Euler(0, yaw, 0);
                 bool under = n.under;
-                // Ground under a point of the node (local x, z) relative to its root: the cave's floor under it, or the lower of the
-                // land and the drawn ground (so nothing hangs over a dip the mesh cuts across).
+                // Ground under a point of the node (local x, z) relative to its root: the cave's floor under it (eased between its
+                // rings, as its mesh runs on a slope), or the lower of the land and the drawn ground (so nothing hangs over a dip the
+                // mesh cuts across).
                 float G(float x, float z)
                 {
                     var w = t.TransformPoint(new Vector3(x, 0, z)); float y;
-                    if (under) { y = t.position.y; Hollow.FloorUnder(new Vector2(w.x, w.z), ref y); }
+                    if (under) { y = t.position.y; Hollow.FloorSmoothUnder(new Vector2(w.x, w.z), ref y); }
                     else y = Mathf.Min(HeightAt(w.x, w.z), MeshY(w.x, w.z));
                     return y - t.position.y;
                 }
@@ -74,11 +87,13 @@ namespace Crulanda.World
         }
         /// <summary>
         /// Where a node may stand at or near at (up to 3 m away, rings of half a metre): on a cave's floor (under) or else off the
-        /// roads, out of the water and buildings and not over a cave near the surface; 2.2 m from every standing trunk; 5.5 m from
-        /// every secret (on the ground plane) and 5.2 m from every node already placed; nothing solid within r of it but the ground. At itself, with a
-        /// warning, when nothing near is clear. Draws nothing random.
+        /// roads, out of the water and buildings and not over a cave near the surface; 2.2 m from every standing trunk; its
+        /// footprint (<paramref name="foot"/>) clear of every camp's spread (a camp's mobs stand anywhere in the square of its
+        /// radius, so to its corners) and of every cave furnishing (<see cref="keepClear"/>); 5.5 m from every secret (on the ground
+        /// plane) and 5.2 m from every node already placed; nothing solid within r of it but the ground. At itself, with a warning,
+        /// when nothing near is clear. Draws nothing random.
         /// </summary>
-        Vector2 NodeClear(Vector2 at, bool under, float r, List<Vector3> placed, string what)
+        Vector2 NodeClear(Vector2 at, bool under, float r, float foot, List<Vector3> placed, string what)
         {
             var ground = GroundMesh != null ? GroundMesh.GetComponent<Collider>() : null;
             bool Clear(Vector2 q)
@@ -86,6 +101,8 @@ namespace Crulanda.World
                 float floor = 0;
                 if (under ? !Hollow.FloorUnder(q, ref floor) : NearRoad(q, 1) || Water.NearWater(q, 1) || InBuilding(q) || Hollow.CoverAt(q, 1) > 0) return false;
                 if (!under && !TrunkClear(q, 2.2f)) return false;
+                if (Zone.camps != null) foreach (var cp in Zone.camps) if (cp != null && Vector2.Distance(cp.center, q) < cp.radius * 1.42f + foot) return false;
+                foreach (var k in keepClear) if (Vector2.Distance(k.at, q) < k.r + foot) return false;
                 var c = under ? StandAt(q, float.NegativeInfinity) : Ground(q);
                 foreach (var s in Secrets) if (s != null && Vector2.Distance(new Vector2(s.position.x, s.position.z), q) < 5.5f) return false;   // on the ground plane: the secrets' tests measure so
                 foreach (var p in placed) if (Vector3.Distance(p, c) < 5.2f) return false;
@@ -142,8 +159,9 @@ namespace Crulanda.World
             (new Color(.62f, .35f, .2f), new Color(.5f, .37f, .29f), new Color(.34f, .62f, .52f), 0),     // copper: red-brown, verdigris
             (new Color(.46f, .32f, .2f), new Color(.45f, .35f, .27f), new Color(.66f, .36f, .16f), 0),    // bog-iron: brown, rust
             (new Color(.27f, .27f, .3f), new Color(.33f, .32f, .32f), new Color(.78f, .78f, .82f), 0),    // Adit iron: dark iron, a bright glint
-            (new Color(.8f, .4f, .14f), new Color(.31f, .24f, .21f), new Color(1, .55f, .2f), .7f),        // cinder: ember orange, glowing
+            (new Color(.8f, .4f, .14f), new Color(.31f, .24f, .21f), new Color(1, .5f, .16f), .7f),        // cinder: ember orange, glowing (a colour of its own: Glowing shares one material per colour, and the flames' (1, .55, .2) burn at 2.2)
             (new Color(.2f, .58f, .54f), new Color(.29f, .42f, .4f), new Color(.45f, .95f, .85f), .5f) };  // Veridian: blue-green, glowing
+        Material oreBase;   // matte ore: the metal drawn non-metallic, so it keeps its colour in a cave (no reflections there) and at night
         /// <summary>
         /// An ore seam: an outcrop of the crags' stone about a metre high, leaning back, a shoulder each side (the right one stained
         /// the ore's colour), sunk into the lowest ground under it; on its front (-Z) the seam (child "full", returned): veins of ore
@@ -156,7 +174,8 @@ namespace Crulanda.World
             float s = rich ? 1.35f : 1;
             var stone = RockTint(Zone.biome == "ash" ? new Color(.37f, .365f, .37f) : Zone.biome == "mountain" ? new Color(.35f, .335f, .31f) : new Color(.4f, .38f, .35f));   // the crags' stone
             var look = OreLooks[Mathf.Clamp(variant, 0, OreLooks.Length - 1)];
-            var stain = RockTint(look.stain); var ore = Tint(art.metal, look.ore); var fleck = look.glow > 0 ? Glowing(look.fleck, look.glow) : Tint(art.metal, look.fleck);
+            if (oreBase == null) { oreBase = new Material(art.metal) { name = "Ore" }; oreBase.SetFloat("_Metallic", 0); oreBase.SetFloat("_Glossiness", .35f); }   // Tint keys on the name: kept apart from the metal's tints
+            var stain = RockTint(look.stain); var ore = Tint(oreBase, look.ore); var fleck = look.glow > 0 ? Glowing(look.fleck, look.glow) : Tint(oreBase, look.fleck);
             // A crag lump w x h x d with its flat base a quarter of its height under the lowest ground beneath it, leaning back. Its
             // vertices (in the seam's frame) are kept, so the ore can be set into the rock's real face.
             var rock = new List<Vector3>();

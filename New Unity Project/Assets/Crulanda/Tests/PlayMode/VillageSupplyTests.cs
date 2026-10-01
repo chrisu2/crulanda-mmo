@@ -15,7 +15,8 @@ namespace Crulanda.Tests
     /// <summary>
     /// What the player sells feeds the village's day (VillageLife.Stock, cleared at 04:00 like every delivery): ore and timber
     /// go to the forge, herbs to the stall, and the trades notice: Brannoc Vell talks of the Crowsfoot ore, the merchant of the
-    /// fresh herbs. Anything with no trade key is only sold.
+    /// fresh herbs (the player's sale, marked "sold.stall.herbs", not the herbalist's own daily herbs, which leave the stall's
+    /// other news be). Anything with no trade key is only sold.
     /// </summary>
     public class VillageSupplyTests
     {
@@ -66,6 +67,25 @@ namespace Crulanda.Tests
             var merchant = life.Villagers.First(v => v.Role == "merchant"); bool herbs = false;
             for (int i = 0; i < 300 && !herbs; i++) herbs = life.LineFor(merchant, true) == "Fresh-cut herbs on the stall. Somebody's been in the meadow.";
             Assert.IsTrue(herbs, "The merchant talks of the herbs.");
+            Assert.AreEqual(3, life.Count("sold.stall.herbs"), "The sale is marked as the player's.");
+            yield return null;
+        }
+
+        [UnityTest] public IEnumerator HerbalistsOwnHerbs_DoNotSoundLikeTheSale_NorHideTheStallsGoods()
+        {
+            var s = UnityEngine.Object.FindFirstObjectByType<EncounterSession>(); var life = VillageLife.Active;
+            Assert.AreEqual(root, s.SaveDirectoryOverride, "This test saves to its own folder.");
+            // As every afternoon, the herbalist has brought her herbs to the stall ("herbs to the stall"); the player has sold none.
+            life.Stock.Remove("stall.eggs"); life.Stock.Remove("stall.flour"); life.Stock.Remove("sold.stall.herbs");
+            life.Deliver("stall.herbs", 2); life.Deliver("stall.goods", 1);
+            var merchant = life.Villagers.First(v => v.Role == "merchant"); bool goods = false;
+            for (int i = 0; i < 300; i++)
+            {
+                var line = life.LineFor(merchant, true);
+                Assert.AreNotEqual("Fresh-cut herbs on the stall. Somebody's been in the meadow.", line, "The herbalist's own herbs are no news.");
+                goods |= line == "Belts and nails and hinges, all village-made. Nothing from the east.";
+            }
+            Assert.IsTrue(goods, "The stall's goods are still talked of.");
             yield return null;
         }
     }

@@ -16,7 +16,8 @@ namespace Crulanda.Tests
     /// <summary>
     /// Gathering in Oakhaven, in the running game: a copper seam worked with a pick fills the bags, raises Mining, rests (its ore
     /// gone, its rock still there) and comes back; a rest outlives a zone reload; a Yarrow gives the herb always and the quest's
-    /// yarrow while the quest wants it (full bags then refuse only once it is no longer wanted); moving or being hit stops the work.
+    /// yarrow while the quest wants it (full bags then refuse only once it is no longer wanted); moving or being hit stops the work,
+    /// an ability the kit refuses does not; bags that filled while the work went on leave the node as it was.
     /// </summary>
     public class GatherTests
     {
@@ -199,6 +200,29 @@ namespace Crulanda.Tests
             s.Interact(); Assert.IsTrue(s.Working);
             yield return new WaitForSeconds(2.5f);
             Assert.IsFalse(s.Working); Assert.Greater(Inventory.Count(p, "mat.copper_ore"), 0);
+        }
+
+        [UnityTest] public IEnumerator BagsFilledDuringWork_NodeStays_AndARefusedAbilityLeavesTheWork()
+        {
+            yield return Open();
+            var s = Session(); var p = s.Progress; Pick(s); var seam = Seam(s);
+            yield return StandBy(s, seam);
+            // An ability the kit refuses (or one that goes off) decides whether the work goes on: only one that is used stops it.
+            s.Interact(); Assert.IsTrue(s.Working);
+            s.Select(null);
+            bool used = s.UseAbility(0);
+            if (used) Assert.IsFalse(s.Working, "An ability that goes off stops the work.");
+            else { Assert.IsTrue(s.Working, "A refused ability leaves the work alone."); Assert.IsFalse(s.Messages.Contains(EncounterSession.WorkStoppedLine)); }
+            s.CancelWork();
+            // The bags fill while the work goes on (a corpse looted, something bought): nothing goes in, the seam does not rest, and
+            // the game does not save over it.
+            for (int i = 0; i < p.bag.Count; i++) if (p.bag[i].Empty) p.bag[i] = new ItemStack { item = "tool.hatchet", count = 1 };
+            Assert.AreEqual(0, Inventory.Room(p, s.Items, "mat.copper_ore"), "The bags are full.");
+            Assert.IsFalse(s.GatherNow(seam), "Nothing fits.");
+            Assert.Contains(ProfessionLog.BagsFullLine, s.Messages);
+            Assert.AreEqual(0, Inventory.Count(p, "mat.copper_ore")); Assert.AreEqual(1, s.Professions.Skill("mining"), "No skill for nothing gathered.");
+            Assert.LessOrEqual(seam.hiddenUntil, Time.time, "The seam does not rest."); Assert.IsTrue(Shown(seam.root), "Its ore is still there.");
+            Assert.AreSame(seam, s.NearbyInteractable, "E still offers it.");
         }
     }
 }

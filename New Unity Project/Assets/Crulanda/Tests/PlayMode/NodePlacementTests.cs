@@ -19,7 +19,7 @@ namespace Crulanda.Tests
     /// - each can be walked to from the player's start, to within reach of E (EncounterSession.UseRange);
     /// - none stands in the water, in a building or on a road; each is 5 m from every secret and every other node and 2 m from
     ///   every standing trunk; the four on Crowsfoot Hollow's floor are in the cave (on its floor, not the hill over it) and no
-    ///   other is;
+    ///   other is; none reaches (ZoneBuilder.NodeFootprint) into a camp's spread or a cave's furnishings (KeepClearSpots);
     /// - nothing of theirs is solid or in the navmesh, and each has something to see (a seam's ore and a windfall's trunk as the
     ///   part that vanishes);
     /// - each is where it belongs: a windfall at the edge of a broadleaf wood, a herb in the open (in no wood and on no field), a
@@ -75,6 +75,7 @@ namespace Crulanda.Tests
             Assert.AreEqual(28, nodes.Count, "Ten ore, eight windfalls, ten herbs.");
             var problems = new List<string>();
             var container = zone.transform.Find("Zone nodes"); Assert.NotNull(container, "The nodes are built.");
+            Assert.Greater(zone.KeepClearSpots.Count, 20, "Crowsfoot Hollow's furnishings are marked for the nodes to keep clear of.");
             foreach (var c in container.GetComponentsInChildren<Collider>(true)) problems.Add("a node's '" + c.name + "' has a collider");
             if (container.GetComponentsInChildren<NavBlocker>(true).Length > 0 || container.GetComponentsInChildren<NavWalkable>(true).Length > 0) problems.Add("a node is in the navmesh");
             foreach (var i in nodes.Where(i => i.kind == "herb")) foreach (var c in i.root.GetComponentsInChildren<Collider>(true)) problems.Add("the herb '" + i.name + "' has a collider");
@@ -113,6 +114,11 @@ namespace Crulanda.Tests
                 foreach (var spot in s.SecretSpots) if (Vector3.Distance(spot.position, i.position) < 5) problems.Add(q + "is within 5 m of the secret '" + spot.def.id + "'");
                 foreach (var o in nodes) if (o != i && Vector3.Distance(o.position, i.position) < 5) problems.Add(q + "is within 5 m of '" + o.name + "' at " + o.position);
                 if (!inCave && !zone.TrunkClear(at, 2)) problems.Add(q + "is within 2 m of a tree trunk");
+                // Clear of every camp's spread (its mobs stand anywhere in the square of its radius) and of the caves' furnishings
+                // (the deserters' fire, bedrolls and stores, the Drop's treads and rail, the throne), by the node's footprint.
+                float foot = ZoneBuilder.NodeFootprint(def.look) - .05f;
+                foreach (var cp in z.camps) if (cp != null && Vector2.Distance(at, cp.center) < cp.radius * 1.42f + foot) problems.Add(q + "stands in the camp '" + cp.name + "'");
+                foreach (var spot in zone.KeepClearSpots) if (Vector2.Distance(at, spot.at) < spot.r + foot) problems.Add(q + "stands in a cave's furnishings at " + spot.at);
                 // Where it belongs.
                 if (def.look == "windfall" && !z.groves.Any(g => g != null && g.kind == "broadleaf" && OutsideRect(at, g.center, g.size) < 6 && OutsideRect(at, g.center, g.size) > -4))
                     problems.Add(q + "is no windfall at a broadleaf wood's edge");

@@ -267,8 +267,9 @@ namespace Crulanda.Encounter
             if (VendorNpc == null || i < 0 || i >= Progress.bag.Count || Progress.bag[i].Empty) return;
             string n = ItemName(Progress.bag[i].item); int count = Progress.bag[i].count; var d = Items?.Get(Progress.bag[i].item);
             int gold = Inventory.Sell(Progress, Items, i);
-            // A material sold in a village is that day's delivery to its trade (ore to the forge, herbs to the stall), and the trades notice.
-            if (d != null && !string.IsNullOrEmpty(d.trade) && VillageLife.Active != null) VillageLife.Active.Deliver(d.trade, count);
+            // A material sold in a village is that day's delivery to its trade (ore to the forge, herbs to the stall), and the trades
+            // notice; "sold." + the trade marks it as the player's (the herbalist brings the stall herbs herself every day).
+            if (d != null && !string.IsNullOrEmpty(d.trade) && VillageLife.Active != null) { VillageLife.Active.Deliver(d.trade, count); VillageLife.Active.Deliver("sold." + d.trade, count); }
             Message("Sold " + n + (count > 1 ? " x" + count : "") + " for " + gold + " gold."); Save(false);
         }
         public void SellJunk()
@@ -371,11 +372,12 @@ namespace Crulanda.Encounter
         /// <summary>
         /// E on a node: the refusals (in a fight; the trade's tool not at the belt; bags full when no quest wants what it gives),
         /// then the work on the cast bar: 2 s for ore and timber and 1.5 s for herbs, twice that when the skill is under the
-        /// node's ("hard going": low skill never refuses a node). Moving, being hit, a fight or dying stops it.
+        /// node's ("hard going": low skill never refuses a node). Nothing starts while working or casting (the two share the cast
+        /// bar). Moving, being hit, a fight or dying stops it.
         /// </summary>
         void TryGather(Crulanda.World.ZoneInteractable i)
         {
-            if (Working) return;
+            if (Working || abilities.IsCasting) return;
             var def = Professions.Db.Node(i.node);
             if (def == null) { Message("You look it over, but find nothing you need right now."); return; }
             if (InCombat) { Message(FightingLine); return; }
@@ -397,7 +399,8 @@ namespace Crulanda.Encounter
         /// <summary>
         /// A node worked to the end (the work bar's completion; tests call it straight): its yield into the bags ("+2 Crowsfoot
         /// copper ore") and the skill roll, then what a quest wants of it as before (a Yarrow gives a quest's yarrow while one is
-        /// wanted), then it rests until its respawn, and the game saves. True when something went into the bags.
+        /// wanted). Only when something went into the bags or a quest took it does it rest until its respawn and the game save;
+        /// otherwise (the bags filled while the work went on) it says why and the node stays. True when something went into the bags.
         /// </summary>
         public bool GatherNow(Crulanda.World.ZoneInteractable i)
         {
@@ -406,7 +409,7 @@ namespace Crulanda.Encounter
             int got = Professions.Gather(def, gatherRng, out string why);
             if (got > 0) FloatText(i.position, "+" + got + " " + ItemName(def.item), new Color(.86f, .95f, .66f));
             bool quest = QuestUse(i);
-            if (got == 0 && !quest && why != null) Message(why);
+            if (got == 0 && !quest) { if (why != null) Message(why); return false; }   // nothing went in and no quest took it: the node stays
             RestNode(i, def.respawn);
             Save(false);
             return got > 0;
@@ -1202,8 +1205,9 @@ namespace Crulanda.Encounter
         {
             if (Paused || Player == null || !Player.IsAlive || !ActionUnlocked(index)) return false;
             if (CooldownRemaining(index) > 0) return false;
-            CancelWork(true);   // an ability takes the hands off the work
-            return Kit.Use(index);
+            bool used = Kit.Use(index);
+            if (used) CancelWork(true);   // an ability that goes off takes the hands off the work (the work only ends in TickWork, so it gathers nothing)
+            return used;
         }
         /// <summary>The zone exit the player is standing at, if any.</summary>
         public Crulanda.World.ZoneExit NearbyExit

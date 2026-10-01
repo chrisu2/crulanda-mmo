@@ -36,6 +36,8 @@ namespace Crulanda.World
         public ZoneWeather[] weather = new ZoneWeather[0];
         /// <summary>Hidden finds (ZoneSecret): on no map; found by walking onto a lookout or searching a hidden spot.</summary>
         public ZoneSecret[] secrets = new ZoneSecret[0];
+        /// <summary>Things to gather that are not props (ore seams, windfalls, herbs; see <see cref="ZoneNode"/>). Herb props carry their own <see cref="ZoneProp.node"/>.</summary>
+        public ZoneNode[] nodes = new ZoneNode[0];
         public ZoneLife life;
         /// <summary>Level band shown on maps and exits (e.g. 1-2); camps spawn inside it.</summary>
         public int levelMin = 1, levelMax = 2;
@@ -187,13 +189,28 @@ namespace Crulanda.World
         /// (a crate); otherwise it grows back after a while (herbs).
         /// </summary>
         public string item; public bool once;
+        /// <summary>Optional: the kind of node it is to gather (a herb prop: "node.yarrow"), from the trades' content. It is then
+        /// worked with the trade's skill, and still gives item while a quest wants it.</summary>
+        public string node;
     }
+    /// <summary>
+    /// A thing to gather that is not a prop: an ore seam, a windfall, a herb. node: its kind ("node.copper") in the trades'
+    /// content, which says how it looks, what E offers and what it gives. rotation: its yaw (a seam's rock lies on its +Z side,
+    /// its ore faces -Z; a windfall's stump is at its -X end). under: on a cave's floor (Hollow), not on the land over it.
+    /// item: optional quest item it also gives while a quest wants it (as <see cref="ZoneProp.item"/>). Built after the map, from
+    /// streams of their own, with no colliders: the zone's layout and navmesh are as they were.
+    /// </summary>
+    [Serializable] public sealed class ZoneNode { public string node, item; public Vector2 at; public float rotation; public bool under; }
     /// <summary>A usable prop registered by ZoneBuilder (see ZoneProp.interact).</summary>
     public sealed class ZoneInteractable
     {
         public string name, prompt, item, kind; public bool once;
-        /// <summary>Picked or emptied things vanish (herbs regrow, crates stay empty); wagons and trees stay put.</summary>
-        public bool Vanishes { get { return kind == "herb" || kind == "crates" || kind == "barrels"; } }
+        /// <summary>The kind of node it is to gather (ZoneProp.node, ZoneNode.node), or null.</summary>
+        public string node;
+        /// <summary>Picked or emptied things vanish (herbs regrow, crates stay empty, worked nodes come back); wagons and trees stay put.</summary>
+        public bool Vanishes { get { return kind == "herb" || kind == "crates" || kind == "barrels" || node != null; } }
+        /// <summary>What vanishes while a worked node rests (a seam's ore, a windfall's trunk); null: the whole of it (a herb).</summary>
+        public Transform part;
         public Vector3 position; public Transform root;
         public float hiddenUntil;
         public string Key(string zoneId) { return zoneId + "|" + name + "|" + Mathf.RoundToInt(position.x) + "|" + Mathf.RoundToInt(position.z); }

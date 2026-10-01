@@ -5,7 +5,8 @@ namespace Crulanda.Encounter
     /// <summary>
     /// The Trades window (K): on the left one row per trade with its skill as a bar (gathering skills, then what everyone has,
     /// then the crafts and how many of them are taken up); on the right, on parchment, the chosen trade's page: what it is, how
-    /// far the skill has come, and whether its tool hangs at the belt. It stands where the character sheet does, with the bags
+    /// far the skill has come, whether its tool hangs at the belt, and for a gathering skill the guide to its seams, windfalls or
+    /// herbs (NodeGuide). It stands where the character sheet does, with the bags
     /// open beside it.
     /// </summary>
     public sealed partial class EncounterHud
@@ -83,7 +84,34 @@ namespace Crulanda.Encounter
                 : has ? null : "Not taken up.";
             if (state != null)
             { measureContent.text = state; float h = qSmall.CalcHeight(measureContent, inner); Ink(new Rect(x, py, inner, h), state, qSmall, has ? new Color(.2f, .36f, .14f) : new Color(.55f, .2f, .1f)); py += h + 10; }
+            if (d.kind == "gather") NodeGuide(log, d, x, py, inner, page.yMax - 40);
             if (!string.IsNullOrEmpty(d.canonStatus)) Ink(new Rect(x, page.yMax - 34, inner, 22), "Lore status: " + d.canonStatus, qSmall, new Color(.45f, .38f, .28f));
+        }
+        static readonly Color HardInk = new Color(.62f, .16f, .1f), TeachesInk = new Color(.66f, .34f, .04f), SometimesInk = new Color(.5f, .45f, .06f), SpentInk = new Color(.45f, .42f, .38f);
+        GUIStyle nodeInk;
+        /// <summary>
+        /// A gathering trade's guide: its kinds of node, easiest first, each with the skill it comes easily at and the zones it is
+        /// found in, coloured by the character's skill: red where it is hard going (slow, and one at a time), orange while every one
+        /// worked teaches, yellow while some do, grey once it has nothing left to teach. Rows that would run past bottom are left off.
+        /// </summary>
+        void NodeGuide(ProfessionLog log, ProfessionDef d, float x, float y, float width, float bottom)
+        {
+            var nodes = log.Db.NodesFor(d.id); if (nodes.Count == 0 || y + 46 > bottom) return;
+            if (nodeInk == null) nodeInk = new GUIStyle(qSmall) { wordWrap = false, clipping = TextClipping.Clip };
+            var brown = new Color(.42f, .22f, .05f); bool has = log.Has(d.id); int skill = log.Skill(d.id);
+            Ink(new Rect(x, y, width, 22), d.id == "mining" ? "Seams" : d.id == "woodcutting" ? "Windfalls" : "Where it grows", qHead, brown); y += 26;
+            foreach (var n in nodes)
+            {
+                if (y + 20 > bottom - 22) break;
+                var where = session.ZonesWithNode(n.id);
+                float up = ProfessionLog.GatherUpChance(skill, n.skill);
+                var c = !has ? InkBrown : skill < n.skill ? HardInk : up >= 1 ? TeachesInk : up > 0 ? SometimesInk : SpentInk;
+                Ink(new Rect(x, y, width * .46f, 20), n.name, nodeInk, c);
+                Ink(new Rect(x + width * .46f, y, width * .12f, 20), n.skill.ToString(), nodeInk, c);
+                Ink(new Rect(x + width * .58f, y, width * .42f, 20), where.Count > 0 ? string.Join(", ", where) : "not found yet", nodeInk, c);
+                y += 21;
+            }
+            if (has && y + 20 <= bottom) Ink(new Rect(x, y + 2, width, 20), "Red: hard going, slow and one at a time.", nodeInk, HardInk);
         }
     }
 }

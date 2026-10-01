@@ -99,6 +99,7 @@ namespace Crulanda.World
             MapTexture = RenderMap(Mathf.Clamp(Mathf.RoundToInt(Zone.size * 4 / 256f) * 256, 1024, 2048));
             Lap("map");
             BuildSecrets();   // after the map: a hidden find must never show on the minimap or the zone map
+            BuildNodes();     // after the secrets (they keep clear of them), each from a stream of its own: nothing else moves
             gameObject.AddComponent<WorldWeather>().Init(this, sunLight);   // before the clock: its first light already has the weather in it
             var clock = gameObject.AddComponent<WorldClock>(); clock.Init(sunLight, Zone.lighting, art.skybox, NightLights);
             // Reflections follow the real sky: a sky-only realtime probe covering the zone, refreshed by the clock.
@@ -1123,7 +1124,7 @@ namespace Crulanda.World
                 rng = zoneRng;
                 if (drop) { DestroyImmediate(t.gameObject); continue; }
                 if (!string.IsNullOrEmpty(p.interact) && t != null)
-                    Interactables.Add(new ZoneInteractable { name = string.IsNullOrEmpty(p.name) ? p.kind : p.name, prompt = p.interact, item = p.item, kind = p.kind, once = p.once, position = t.position, root = t });
+                    Interactables.Add(new ZoneInteractable { name = string.IsNullOrEmpty(p.name) ? p.kind : p.name, prompt = p.interact, item = p.item, kind = p.kind, once = p.once, node = string.IsNullOrEmpty(p.node) ? null : p.node, position = t.position, root = t });
             }
         }
         /// <summary>Half-extents of a building's footprint (a little over its walls, for roof and plinth); zero for anything else.</summary>
@@ -3378,9 +3379,11 @@ namespace Crulanda.World
             Part(PrimitiveType.Cube, t, new Vector3(1.09f, 2.2f, 0), new Vector3(.02f, .5f, .5f), Tint(art.metal, new Color(.75f, .62f, .25f)));
             Solid(t, new Vector3(0, 1.5f, 0), new Vector3(2.4f, 3, 3.8f));
         }
-        /// <summary>A herb patch: a clump of stems with flower heads (variant 0 yarrow white, 1 feverfew yellow, 2 comfrey violet).</summary>
+        /// <summary>A herb patch: a clump of stems with flower heads (variant 0 yarrow white, 1 feverfew yellow, 2 comfrey violet;
+        /// 3 tarnwort, 4 cinder-thistle and 5 dewfern are the trades' herbs, see HerbOfTheTrades). Draws nothing random.</summary>
         void Herb(Transform t, int variant)
         {
+            if (variant >= 3 && variant <= 5) { HerbOfTheTrades(t, variant); return; }
             var stem = Tint(art.foliage, new Color(.3f, .5f, .22f));
             var flower = Tint(art.foliage, new[] { new Color(.95f, .94f, .88f), new Color(.95f, .82f, .25f), new Color(.6f, .4f, .75f) }[Mathf.Abs(variant) % 3]);
             for (int i = 0; i < 7; i++)

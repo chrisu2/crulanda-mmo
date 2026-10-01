@@ -90,7 +90,35 @@ invalid" and runs without the trades (items are unaffected).
   trade's page in the Trades window (K).
 - `NodeDef`: a kind of thing worked in the world. `profession` must be a `gather` trade, `item` a known item, `skill` 1-100 (the
   skill at which it comes easily: 1, 20, 40, 60, 80 by zone), `min`-`max` the yield, `respawn` and `seconds` above zero. `look` and
-  `variant` choose the prop (`ore`, `ore_rich`, `windfall`, `herb`). Zones place nodes from the gathering step on.
+  `variant` choose the prop (`ore`, `ore_rich`, `windfall`, `herb`; variant is the tier, 0-4, and for herbs the `Herb` look, 0-5:
+  yarrow, feverfew, comfrey, tarnwort, cinder-thistle, dewfern). Zones place nodes from the gathering step on (below).
+- Gathering (`ProfessionLog`): low skill never refuses a node. Under the node's `skill` the work is hard going: twice `seconds`,
+  a yield of exactly 1, a skill point every time. Otherwise the yield is `min`-`max`, plus one a quarter of the time from 20 points
+  over. A skill point is certain under 20 over the node, half the time under 40 over, never after; skill never passes 100. Mining
+  and Woodcutting need their tool at the belt; Herbalism needs nothing. A worked node rests `respawn` seconds (kept in memory by
+  zone and place, so a zone hop does not refill it; not saved, so a restart does).
+
+### Nodes in a zone (`Zones/*.json`)
+```json
+"nodes": [
+  { "node": "node.copper", "at": { "x": -37.5, "y": 88.2 } },
+  { "node": "node.copper_rich", "at": { "x": -12.2, "y": 99.2 }, "under": true },
+  { "node": "node.oak", "at": { "x": -78.5, "y": 104 }, "rotation": 0 },
+  { "node": "node.yarrow", "item": "item.yarrow", "at": { "x": -104, "y": 30 } }
+],
+"props": [
+  { "kind": "herb", "name": "Yarrow", "at": { "x": -70, "y": 44 }, "interact": "Gather yarrow", "item": "item.yarrow", "node": "node.yarrow" }
+]
+```
+- `ZoneNode`: `node` names a `NodeDef`; `rotation` its yaw (a seam's rock lies on its +Z side and its ore faces -Z; a windfall's
+  stump is at its -X end, its trunk lying along +X); `under: true` stands it on a cave's floor (`Hollow`), its rock turned to the
+  nearer wall; `item` an optional quest item it also gives while a quest wants it. Built by `ZoneBuilder.BuildNodes` after the map
+  and the secrets, each from a stream of its own, with no colliders: no tree, rock, prop or creek moves and the navmesh is
+  unchanged. A node in a trunk, a rock, a road, water, a building, within 5.5 m of a secret or 5.2 m of another node is moved
+  clear (up to 3 m), with a warning when nothing near is clear; a windfall turns in 30 degree steps until it lies clear.
+- `ZoneProp.node`: a herb prop worked as a node (it keeps its `interact` prompt and quest `item`).
+- The zone builder learns what a node is (name, prompt, look) from the component beside it that implements `IZoneNodeKinds`
+  (the encounter session, from the trades' content). Without one it builds no nodes and warns.
 - `RecipeDef`: `profession`, `skill` 1-100, `station` (alternatives joined with `|`), at least one input, `output`, `count`
   (default 1). The file has none yet; they arrive with the stations step.
 - Skill is 1-100 (`ProfessionDatabase.MaxSkill`). What a character has learned is saved as `EncounterProgress.professions`

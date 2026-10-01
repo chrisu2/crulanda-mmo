@@ -18,6 +18,18 @@ The user requested this handoff because they ran out of tokens. Do not assume an
 Tests on 078d276: EditMode 186/186, PlayMode 83/83, 0 shader errors. Main has since gained an inn shot of the drinkers
 (`oakhaven-99-inn-drinkers.png`) and the plan documents; nothing unpublished changes play.
 
+**STOPPED 2026-10-01 evening at Chris's request (his Fable usage was at 97%): both build workflows were stopped mid-way. Nothing
+on these branches is merged, reviewed or tested. State of each branch (the branches live in the main repo, so they are backed up):**
+- `trades/b2-format8` (d4bf222): step 2 IMPLEMENTED (save format 8, materials, tools, the Trades window, docs, a PlayMode check)
+  and compile-checked by its engineer, but the review, refute and fix stages never ran. Next: run the review on it (the
+  `build-step` workflow's review/verify/fix stages, or by hand), then merge, test, publish. Chris's save is backed up first.
+- `trades/a1-buildings` (cea6425): step 1 HALF-BUILT, saved as one WIP commit (WorldLife.cs, ZoneBuilder.cs, ZoneDoor.cs, a new
+  ZoneBuilder.Workshops.cs that still needs a .meta). Not compile-checked. Next: finish step 1 from BUILD_PLAN.md on this branch.
+- `loot/a1-weapons` (f354dea, nothing yet): loot step A1 had only just started. Next: start it fresh.
+The worktrees are in the old session's scratchpad (`...\scratchpad\wt1|b2|la1`); if they are gone, `git worktree prune` and
+add new ones from the branches. To rerun a step, reuse the `build-step` workflow (its script is in the session's workflows folder;
+the prompt for each step is in this handoff's plans and `tools/wip/*/OWNER_NOTES.md`).
+
 **THREE BUILD TRACKS IN FLIGHT (each a git worktree in the scratchpad `wt` folder, on its own branch; `git worktree list`):**
 - `trades/a1-buildings` (worktree `wt/a1`): professions BUILD_PLAN step 1, the village's new buildings and named houses.
 - `trades/b2-format8` (worktree `wt/b2`): BUILD_PLAN step 2, save format 8, materials, tools, the Trades window.

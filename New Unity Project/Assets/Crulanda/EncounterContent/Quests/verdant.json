@@ -735,14 +735,14 @@
             {
               "type": "kill",
               "zone": "zone.verdant",
-              "target": "mob.withered.verdant*",
+              "target": "mob.deepwithered.verdant*",
               "count": 5,
               "text": "Withered Keepers laid to rest"
             },
             {
               "type": "kill",
               "zone": "zone.verdant",
-              "target": "mob.mistwalker.verdant*",
+              "target": "mob.deepwalker.verdant*",
               "count": 3,
               "text": "Mist-walkers broken in the Sap Well"
             },

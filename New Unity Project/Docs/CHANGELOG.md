@@ -642,3 +642,20 @@ Chris shared a reference of a stylized fantasy cove and chose this look for Oakh
   hen-wife's eggs last at the stall.
 - Tests: `VillageWorkTests` (the schedules) and `VillageErrandTests` (eggs to the inn and sold on by the merchant; water to the
   pan; barley to the mill). The capture tour adds an errands line-up (`99-errands-lineup`).
+
+## 2026-10-01 — A review of the deep and the trades' days, before publishing
+A read-only review by five reviewers, each finding checked by a second who tried to refute it, found real defects. Fixed:
+- **Grey wolves were about to become ash hounds:** a new name rule for the Verdant creatures ("Grey ") caught every Grey wolf in
+  Oakhaven and Khaven. Removed.
+- **The hens' water never showed:** the disc sat inside a solid pan. A shallow pan, the water lying in its top.
+- **The finale never gave its page** (`rewards.documents` is a list), its kills could be made at the surface camps (the deep's
+  camps have their own tags now), and its first step completed from the barrow over the Gallery (a place down a cave is
+  visited from down in the cave).
+- **The Root-Mother:** her roots "into the floor" went 14 m up to the mouth's level; her upper knot, face and eyes were above
+  the roof at the Heart's tapered end (the Heart stays tall to its back wall now); the salted cold came back after 90 seconds
+  (it stays gone, the pale root stays).
+- **The trades:** the village's stock is the day's (cleared before dawn); a delivery home says its line at the door, then goes
+  in; the hen-wife speaks of eggs at the inn or the stall only once they got there; nobody could draw water with a collector
+  seven metres from the well (villagers keep 7 m from enemies, not 12, and a blocked errand says so).
+- **Tests:** three flaky spots in `VillageErrandTests`; `run_focus.ps1` (a fast filtered run) registers the content as the full
+  run does.

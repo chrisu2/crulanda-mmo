@@ -379,12 +379,18 @@ namespace Crulanda.Encounter
             if (Quests == null || Zone == null || Time.time < nextVisitCheck) return;
             nextVisitCheck = Time.time + .5f;
             var p = Player.transform.position;
-            Quests.CheckVisits(o => (string.IsNullOrEmpty(o.zone) || o.zone == Zone.Zone.id) && (!o.night || Crulanda.World.WorldClock.Darkness > .5f) && Vector2.Distance(new Vector2(p.x, p.z), o.at) <= o.radius);
+            Quests.CheckVisits(o => (string.IsNullOrEmpty(o.zone) || o.zone == Zone.Zone.id) && (!o.night || Crulanda.World.WorldClock.Darkness > .5f) && Vector2.Distance(new Vector2(p.x, p.z), o.at) <= o.radius && OnItsLevel(o.at, p));
             if (Conversation != null && Vector3.Distance(p, Conversation.where) > 6) Conversation = null;   // walked away
             // Emptied props stay empty after a reload.
             if (!emptiedHidden) { emptiedHidden = true; foreach (var i in Zone.Interactables) if (i.once && i.Vanishes && i.root != null && Progress.usedInteractables.Contains(i.Key(Zone.Zone.id))) HideProp(i.root); }
         }
         bool emptiedHidden;
+        /// <summary>A place down a cave is visited from down in the cave, not from the hill over it: where a passage floor lies under the
+        /// place, the visitor must be standing within four metres of that floor's height. (At a cave's mouth the two are the same.)</summary>
+        static bool OnItsLevel(Vector2 place, Vector3 visitor)
+        {
+            float floor = 0; return !Crulanda.World.Hollow.FloorUnder(place, ref floor) || Mathf.Abs(visitor.y - floor) < 4;
+        }
 
         // ---------- discoveries: hidden finds on no map (ZoneSecret; save format 7) ----------
         /// <summary>What the character has found, and what finding pays (null until the session starts).</summary>

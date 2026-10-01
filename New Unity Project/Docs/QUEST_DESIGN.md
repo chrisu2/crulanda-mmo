@@ -140,8 +140,9 @@ The Chronicle runs `main.ashrim.5` -> `main.verdant.1` -> 2 -> 3 -> 4 -> 5 (XP a
   and Greyheart. **A Fog That Tastes of Lightning** (13): Palemist Hollow, the mist-walkers and the pale shadows: the Pale's touch
   reaching the Shore (PROVISIONAL: Book 3's fog, foreshadowed). **The Root-Mother's Deep** (`main.verdant.5`, 13, after the Fog):
   the fog came up out of the ground; Willow-Whisper sends you down the Temple's root-stair the living roots closed, into the
-  dungeon under the Temple (`WORLD_ZONES.md`, "Caves you walk into"): visit the Root Gallery, lay five withered Keepers and three
-  mist-walkers to rest, bring down the Hollow Root-Warden (elite 13; he was Thorn-Hand, who planted the Guest-Tree) in the Heart,
+  dungeon under the Temple (`WORLD_ZONES.md`, "Caves you walk into"): visit the Root Gallery (from inside, not from the barrow
+  above), lay five withered Keepers and three mist-walkers of the deep to rest (`mob.deepwithered.verdant*`,
+  `mob.deepwalker.verdant*`: the surface camps do not count), bring down the Hollow Root-Warden (elite 13; he was Thorn-Hand, who planted the Guest-Tree) in the Heart,
   salt the cold in the root ("The cold in the root", usable, with any salt: Grohl's, the First Shore's) and return. 820 XP, 200
   gold, Keeper standing 600, and a fifth page, *What the Root-Mother Dreams* (Sister Iselle, from Willow-Whisper's lips: the
   Pale's king who wears a mirror, named the way you would name a disease). Willow-Whisper's last words foreshadow Book 3's

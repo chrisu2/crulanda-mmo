@@ -2712,7 +2712,7 @@
     {
       "name": "Gallery withered",
       "mob": "Withered Keeper",
-      "tag": "withered",
+      "tag": "deepwithered",
       "look": "keeper",
       "canonStatus": "GAME-ONLY: the deep and its things; the Keepers, the Temple and the Void-Touchers are CANON (Book 3)",
       "center": {
@@ -2729,7 +2729,7 @@
     {
       "name": "Sap Well walkers",
       "mob": "Mist-walker",
-      "tag": "mistwalker",
+      "tag": "deepwalker",
       "look": "hollow",
       "canonStatus": "GAME-ONLY: the deep and its things; the Keepers, the Temple and the Void-Touchers are CANON (Book 3)",
       "center": {
@@ -2763,7 +2763,7 @@
     {
       "name": "The Heart's withered",
       "mob": "Withered Keeper",
-      "tag": "withered",
+      "tag": "deepwithered",
       "look": "keeper",
       "canonStatus": "GAME-ONLY: the deep and its things; the Keepers, the Temple and the Void-Touchers are CANON (Book 3)",
       "center": {

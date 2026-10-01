@@ -375,7 +375,14 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
   that the Heart is a fifth of the daylight.
 - **Camps** (all `harder`): Root-stair briars (2, 12-13), the Gallery's withered Keepers (3, 12-13), the Sap Well's mist-walkers
   (3, 13), Cold Stair briars (2, 13), the Heart's withered (2, 13) and **the Hollow Root-Warden** (elite, 13; always drops the
-  Root-Warden's Crown, head). Respawns 8-15 minutes.
+  Root-Warden's Crown, head). Respawns 8-15 minutes. The deep's Keepers and walkers carry their own tags (`deepwithered`,
+  `deepwalker`, with the surface camps' loot), so the finale counts only kills made down here.
+- **The Heart's roof** stays 8 m high to its back wall (the plan's rows at z 95 and 98), then closes at once: the Root-Mother
+  stands seven metres tall against it, face and all under the roof.
+- **Salting the cold** is once and for good (saved): the rod, its violet light and the hoarfrost go; the pale root stays.
+- **A place down a cave is visited from down in the cave** (`EncounterSession.OnItsLevel`): where a passage floor lies under a
+  quest's `visit` point, the visitor must stand within four metres of that floor's height, so the Root Gallery is not "reached"
+  from the barrow over it. At a cave's mouth the two heights are the same.
 - Tests: `RootDeepTests` (walkable leg by leg from the zone's start to the Heart; earth and root overhead and underfoot the
   whole way; dark inside, the camps on the floor, the Warden in the Heart, the cold root usable and the quest pointing at it).
 

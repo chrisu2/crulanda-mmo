@@ -9,49 +9,22 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-10-01, morning)
-**STOPPED AT A CLEAN POINT (2026-10-01 ~02:05, Chris's call). NOT PUBLISHED: the playable build is still the Verdant Shore one.**
-On `main`, unpublished: the Root-Mother's Deep, the hidden Crowsfoot mouth, the trades' daily schedules, and a first round of fixes
-from a read-only review of that work.
-- **Last full run (before the fixes below):** EditMode 186/186, PlayMode 80/81, 0 shader errors. The one failure was real and is
-  fixed: nobody could draw water because a Concord collector stands 7 m from the well and villagers kept 12 m from enemies
-  (`VillageLife.KeepClear` is 7 now; a blocked errand says so).
-- **Focused run after the fixes** (`tools\validation\run_focus.ps1`, the village, deep and Oakhaven quest fixtures): PlayMode 11/11 passed (VillageErrandTests, VillageDayTests, RootDeepTests, OakhavenQuestTests), on the review fixes of c799799 except the three test-hardening edits to VillageErrandTests, which were made after that run synced and are compiled but not yet run.
-- **The two "new failures" of the earlier stop were false:** `run_focus.ps1` mirrored Assets without registering the content, so
-  the session had no item database. It registers now, as `run_tests.ps1` does.
-- **Review fixes applied** (`tools\wip\review_fixes_1.py`, `review_fixes_2_tests.py`; the raw findings and verdicts are in
-  `tools\wip\review_724a22c_findings.md`): "Grey " no longer turns every Grey wolf into an ash hound; the hens' water shows (the
-  disc sat inside a solid pan); `main.verdant.5` awards its page (`documents`, a list); the Root-Mother's roots go down into the
-  floor, not 14 m up; the village's stock starts again before dawn; a delivery home says its line at the door before going in;
-  the hen-wife only speaks of eggs that got there; three flaky spots in `VillageErrandTests`.
-- **Update 01:56:** items 1 and 2 below are FIXED in code (`tools\wip\review_fixes_3.py`) and a focused run passed 11/11
-  (RootDeepTests, VillageErrandTests with its hardening, HollowQuestTests, ZoneContentTests): the Heart's plan stays tall to its
-  back wall (rows z 95 and 98 are 8-8.5 m high, the end at z 100.5), so the Root-Mother stands under the roof; the cold is its
-  own child ("The cold": rod, light, hoarfrost), `once`, and stays gone when salted while the pale root stays. NOT yet seen:
-  look at `verdant-86-hollow-hall.png` on the next tour. Item 3 is still open.
-- **Review findings still OPEN, do these before publishing:**
-  1. The Root-Mother's upper knot, face and eyes sit above the passage roof at the Heart's tapered end (`RootDeepInterior`,
-     `sEnd = h.Length - 3.5f`). Move the seat about 7 m into the hall (roof 8 m there) and move the camps "The Root-Warden"
-     (plan (-1.5, 90)) and "The Heart's withered" (plan (-1, 83)) clear of the knot's `Block`; rerun `RootDeepTests`, look at
-     `verdant-86-hollow-hall.png`.
-  2. "The cold in the root" is `kind = "crates"` without `once`: salted, it vanishes and comes back after 90 s. Make it stay
-     salted (see `EncounterSession.UseInteractable`, `ZoneInteractable.once`/`Vanishes`).
-  3. `main.verdant.5`'s kills are credited by the surface camps that share the tags (`withered`, `mistwalker`): give the deep's
-     camps their own tags (and loot tables), or accept it. Its first step (visit, radius 8) completes on the barrow above the
-     Gallery: needs a depth check or a smaller radius.
-- **Then:** the full run (`run_tests.ps1`), the tour (`build_and_tour.ps1 -Zones zone.oakhaven,zone.verdant`), view
-  `oakhaven-99-errands-lineup-*.png`, `oakhaven-90-coop-morning.png` (the pan) and the deep's `verdant-85/86/88/89`, publish,
-  `tools\Backup.ps1`, tell Chris.
-- **Backup:** after the reboot J: came up as a different, nearly empty drive; Chris was moving the backup files back onto it.
-  `tools\Backup.ps1` ran at this stop (01:50) and succeeded: `J:\claude\unity projects\mmo` was back, and its git head matched
-  `main`. It is additive; run it again after the next commit.
-- **Next job after the publish: the painted style pass**, prepared in `tools\wip\painted\`:
-  - P1 buildings: `ZoneSceneBuilder.Painted.cs` goes in `Assets/Crulanda/Editor/` (make the class `public static partial class
-    ZoneSceneBuilder`, call `PaintedTextures(art)` at the end of `EnsureArt`); `ZoneArt` gains `public Material masonry, rock;`;
-    `patch_buildings.py` adds `ZoneMeshes.Box` (metre UVs), `ZoneBuilder.BoxPart`, eaves, framed windows, plank doors.
-  - P2 rock: `PaintedRock.shader` goes in `Assets/Crulanda/World/Shaders/` (with a new .meta), `patch_rock.py` switches natural
-    rock to `art.rock`. Then sky and ground colour per zone (each keeps its mood), tiled masonry on towers and the keep.
-  - P3 chunky props. View captures after each part; none of this has been built or seen yet.
+## RESUME HERE (updated 2026-10-01, afternoon)
+**PUBLISHED 2026-10-01 afternoon: THE ROOT-MOTHER'S DEEP, CROWSFOOT'S HIDDEN MOUTH, and EVERY TRADE HAS A DAY.**
+Tests on the published code: EditMode 186/186, PlayMode 81/81, 0 shader errors; the tour of Oakhaven and the Verdant Shore
+viewed (the errands line-up, the coop's water pan, the deep's stair, Sap Well and Heart). A read-only review (five reviewers,
+each finding refuted or confirmed by a second) found a dozen real defects before publishing; all are fixed (CHANGELOG, "A review
+of the deep and the trades' days"; the raw findings are in `tools\wip\review_724a22c_findings.md`).
+- Small thing seen on the tour and left for the next publish: one of the Root-Mother's root limbs hangs straight down in front
+  of her face (`RootDeepInterior`, the 14 limbs: skip the ones that start front-centre; the cavern has its own random stream).
+- **NOW: THE PAINTED STYLE PASS** (Chris: "keep going with the painted style pass"). The first draft in `tools\wip\painted\` was
+  pre-checked by four agents (`precheck_results.md`: the draft textures did not tile and did not read as painted; trim floated;
+  the rock helper's name collided) and restaged as patch scripts verified on a scratch copy, in `tools\wip\painted\v2\`:
+  `p1` buildings (painted plaster, thatch, slate, masonry and timber on metre-UV walls; eaves, framed windows, plank doors),
+  `p2` natural rock (`Crulanda/PaintedRock`, `art.rock`), `p3` sky, light and ground colour per zone. Apply in that order, then
+  tests, a tour of all five zones, LOOK at the captures (nothing of this has been seen in the game yet), iterate, publish.
+  Approved texture previews: the scratchpad's `painted-review\textures\v2_*.png` (regenerate with `v2.py`).
+- `tools\validation\run_focus.ps1 -Filter '<fixtures>'` runs a few fixtures in three minutes; the full run is `run_tests.ps1`.
 
 **The standing direction is in `GAME_BRIEF.md` (read it first): a high-fidelity, beautiful MMO-style world, AAA quality in a classic style, judged on details, graphics, lighting, mood and visual feel.**
 Chris's rules: work in order of importance; finish each step; keep going without waiting (memory: crulanda-autonomy); tell him at each publish.

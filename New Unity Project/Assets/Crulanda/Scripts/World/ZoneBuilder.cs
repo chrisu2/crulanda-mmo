@@ -1324,7 +1324,9 @@ namespace Crulanda.World
             foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(s * .68f, (foot + 2.86f) / 2, -d / 2 - .12f), new Vector3(.16f, 2.86f - foot, .24f), art.timber);
             Part(PrimitiveType.Cube, t, new Vector3(0, 2.78f, -d / 2 - .12f), new Vector3(1.52f, .16f, .24f), art.timber);
             ZoneDoor front = null;
-            if (!inn) { front = new ZoneDoor { name = t.name, openable = false, position = t.TransformPoint(new Vector3(0, 1, -d / 2 - .1f)) }; Doors.Add(front); }
+            // The door's point stands on the step in front of it: behind the slab, between door and wall, the navmesh can leave a
+            // pocket of its own that a villager going home cannot path to (the Crisp cottage, 2026-10-01).
+            if (!inn) { front = new ZoneDoor { name = t.name, openable = false, position = t.TransformPoint(new Vector3(0, 1, -d / 2 - .75f)) }; Doors.Add(front); }
             for (float x = -w / 2 + 1.4f; x < w / 2 - .8f; x += 2.6f)
             {
                 if (Mathf.Abs(x) < 1.2f) continue;

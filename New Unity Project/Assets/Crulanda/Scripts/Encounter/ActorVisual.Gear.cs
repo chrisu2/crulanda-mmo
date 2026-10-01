@@ -103,6 +103,8 @@ namespace Crulanda.Encounter
             t.gameObject.SetActive(false); t.SetParent(null, false); Destroy(t.gameObject);
         }
 
+        /// <summary>How much larger than life a held weapon and a shield are drawn.</summary>
+        public const float HeldScale = 1.35f, ShieldScale = 1.15f;
         static bool Tall(string family) { return family == "polearm" || family == "staff"; }
         static bool Hung(string family) { return family == "offhand.hung"; }
         void BuildSlot(EquipSlot slot, GearLook look)
@@ -139,6 +141,9 @@ namespace Crulanda.Encounter
             }
             var t = new GameObject("Gear " + ItemDatabase.SlotNames[(int)slot] + (stow ? " (slung)" : "")).transform;
             t.SetParent(parent, false); t.localPosition = pos; t.localRotation = rot;
+            // Heroic proportions, the classic-MMO way: what is held reads larger than life (in the first wardrobe line-up a life-size
+            // blade at the hip read as a twig). The grip stays in the fist; the piece grows out from it.
+            if (main) t.localScale = Vector3.one * HeldScale; else if (slot == EquipSlot.OffHand) t.localScale = Vector3.one * (hung ? 1.1f : ShieldScale);
             return t;
         }
 

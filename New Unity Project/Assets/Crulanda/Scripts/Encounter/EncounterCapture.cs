@@ -338,7 +338,14 @@ namespace Crulanda.Encounter
                     if (worker == null || !worker.WorkAt(job.Item2)) continue;
                     var at = worker.transform.position; var facing = worker.transform.forward; facing.y = 0; facing.Normalize();
                     var side = Vector3.Cross(Vector3.up, facing);
-                    var stand = at + side * 3.6f + facing * .6f;   // from the side, so both the worker and the work show
+                    // From the side, so both the worker and the work show; inside a shop a side is a wall, so the first spot with a clear
+                    // line to the worker wins: either side, then the front (the open side every workplace faces).
+                    var stand = at + side * 3.6f + facing * .6f;
+                    foreach (var c in new[] { at + side * 3.6f + facing * .6f, at - side * 3.6f + facing * .6f, at + facing * 3.4f + side * 1.2f, at + facing * 3.4f - side * 1.2f })
+                    {
+                        var eye = zone.Ground(new Vector2(c.x, c.z), 1.6f);
+                        if (!Physics.CheckSphere(eye, .4f) && !Physics.Linecast(eye, at + Vector3.up * 1.2f)) { stand = c; break; }
+                    }
                     var d = at - stand;
                     motor.Teleport(zone.Ground(new Vector2(stand.x, stand.z), 1.1f)); motor.SetView(Mathf.Atan2(d.x, d.z) * Mathf.Rad2Deg, 12, 1.5f);
                     yield return new WaitForSeconds(1.2f);

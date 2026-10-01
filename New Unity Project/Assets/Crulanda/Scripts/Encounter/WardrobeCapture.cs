@@ -41,7 +41,7 @@ namespace Crulanda.Encounter
             "shield.kite:plain/veridian", "shield.kite:slab/tollroad+glow", "shield.leaf:bronze/veridian", "shield.leaf:bark/veridian",
             "offhand.hung:lantern/oakhaven", "offhand.hung:shuttered/sandthrone+glow", "offhand.hung:moss/veridian+glow", "offhand.hung:censer/cult+glow", "offhand.hung:scale/concord"
         };
-        const int PerRow = 7; const float Spacing = 1.6f;
+        const int PerRow = 5; const float Spacing = 1.7f;   // five to a shot, framed close enough to judge a guard or a rim
 
         sealed class Entry { public string[] ids; public string title, sub; }
         EncounterSession session; ItemDatabase db; GearLooks looks;

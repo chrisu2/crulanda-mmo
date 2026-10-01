@@ -110,9 +110,9 @@ namespace Crulanda.Tests
                 foreach (var p in places) { Assert.Less(Vector2.Distance(new Vector2(p.x, p.z), shop.at), 4.5f, "Every shop place is in the shop."); Assert.AreEqual(shop.name, life.WorkplaceAt(p)); }
                 var maud = life.Villagers.Find(v => v.Role == "leatherworker");
                 Assert.IsNotNull(maud, "Oakhaven has its leatherworker."); Assert.AreEqual("Maud Tanner", maud.Name);
-                Time.timeScale = 3;
+                Time.timeScale = 4;   // she may start on the green, 40 m off; a game hour is 25 s at this speed
                 Vector3? at = null;
-                yield return WaitUntil(() => { at = maud.Visible && maud.Activity == "leathershop" ? places.Cast<Vector3?>().FirstOrDefault(p => Flat(p.Value, maud.transform.position) < 1) : null; return at.HasValue; }, 30);
+                yield return WaitUntil(() => { at = maud.Visible && maud.Activity == "leathershop" ? places.Cast<Vector3?>().FirstOrDefault(p => Flat(p.Value, maud.transform.position) < 1) : null; return at.HasValue; }, 75);
                 Time.timeScale = 1;
                 Assert.IsTrue(at.HasValue, "At " + hour + " Maud goes to her shop and works there (now '" + maud.Activity + "', " + Vector2.Distance(new Vector2(maud.transform.position.x, maud.transform.position.z), shop.at).ToString("0") + " m from it).");
                 Assert.AreEqual("Tanner's leather shop", life.WorkplaceAt(at.Value));

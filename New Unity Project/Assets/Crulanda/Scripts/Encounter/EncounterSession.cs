@@ -707,7 +707,7 @@ namespace Crulanda.Encounter
         /// <summary>A look's odd variant from the mob's name: ash hounds, withered or grey Keepers and briars, the Hollow Root-Warden, a doe.</summary>
         static int LookVariant(string label)
         {
-            foreach (var word in new[] { "Ash", "Withered", "Greyheart", "Hollow Root", "Grey ", "doe" }) if (label != null && label.IndexOf(word, StringComparison.OrdinalIgnoreCase) >= 0) return 1;
+            foreach (var word in new[] { "Ash", "Withered", "Greyheart", "Hollow Root", "doe" }) if (label != null && label.IndexOf(word, StringComparison.OrdinalIgnoreCase) >= 0) return 1;
             return 0;
         }
         /// <summary>Saves this character, remembers the other class and reloads the scene as that character.</summary>

@@ -788,7 +788,9 @@
             "amount": 600
           }
         ],
-        "document": "doc.verdant.root_mother"
+        "documents": [
+          "doc.verdant.root_mother"
+        ]
       }
     }
   ]

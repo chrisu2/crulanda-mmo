@@ -109,6 +109,7 @@ namespace Crulanda.Encounter
             foreach (var coop in Zone.Coops) coop.Dry(Time.deltaTime / 420);   // a pan lasts about four hours
             if (Time.time < nextLay) return;
             nextLay = Time.time + 20;
+            if (WorldClock.Between(4, 5)) Stock.Clear();   // the stock is the day's deliveries: yesterday's are eaten, sold or burnt
             foreach (var coop in Zone.Coops)
             {
                 if (WorldClock.Between(4, 5)) coop.LaidToday = 0;
@@ -341,7 +342,7 @@ namespace Crulanda.Encounter
                 case "blacksmith": return Count("forge.wood") > 0 ? "The woodcutter brought oak this morning. Hearth's drawing well." : null;
                 case "miller": return Count("mill.grain") > 0 ? "Barley's in from the fields. The stone's turning on something, at least." : null;
                 case "leatherworker": case "skinner": return Count("tannery.hides") > 0 ? "The hunter's been by with a hide. Grey at one edge; the rest'll do." : null;
-                case "henwife": return v.Done("eggs to the stall") ? "Eggs are at the produce stall if you're wanting any. I don't sell from the yard." : v.Done("eggs to the inn") ? "Took the Cask its eggs this morning. The rest go to the stall after dinner." : null;
+                case "henwife": return Count("stall.eggs") > 0 ? "Eggs are at the produce stall if you're wanting any. I don't sell from the yard." : Count("inn.eggs") > 0 ? "Took the Cask its eggs this morning. The rest go to the stall after dinner." : null;
                 case "drinker": case "elder": case "gossip": case "farmer":
                     return Count("inn.meat") > 0 ? "Hare in the Cask's pot tonight. The hunter's doing." : Count("inn.bread") > 0 && Count("inn.eggs") > 0 ? "Bread and eggs at the Cask today. Like old times, nearly." : Count("inn.wood") > 0 ? "The Cask's got a fire going. Dry oak, for once." : null;
                 default: return null;
@@ -385,7 +386,7 @@ namespace Crulanda.Encounter
         VillageLife life; NavMeshAgent agent; ActorVisual visual; ZoneDoor home; Renderer[] renderers;
         State state; string activity; float until, calmSince, nextBark, nextChatter, bedAt, wakeAt, nextHerd;
         Villager partner; string fixedPlace;
-        GameObject load; Load loadKind; int loadCount; Errand errand; int leg; Vector3 dropAt; readonly HashSet<string> done = new HashSet<string>(); float lastHour;
+        GameObject load; Load loadKind; int loadCount; Errand errand; int leg; Vector3 dropAt; bool goingIn; readonly HashSet<string> done = new HashSet<string>(); float lastHour;
         /// <summary>Night: everyone goes home to bed (staggered; drinkers stay at the inn late, children go early).</summary>
         public bool Bedtime { get { return WorldClock.Between(bedAt, wakeAt); } }
 
@@ -510,7 +511,7 @@ namespace Crulanda.Encounter
             }
             return false;
         }
-        void CancelErrand() { errand = null; DropLoad(); }   // goods posed for a capture are dropped too
+        void CancelErrand() { errand = null; goingIn = false; DropLoad(); }   // goods posed for a capture are dropped too
         /// <summary>An errand's place is there but nobody can get near it for the grey-coats: say so, and let it go for today.</summary>
         void Blocked(string place)
         {
@@ -555,7 +556,7 @@ namespace Crulanda.Encounter
                 var taker = life.NearestVillager(transform.position, 6, this);
                 if (taker != null && taker.state == State.Activity) { var reply = VillageWork.Reply(e.good, life.R01); if (reply != null) taker.Say(reply, 4); taker.Face(transform.position); }
                 DropLoad();
-                if (e.to == "home" && home != null) { activity = "home"; until = Time.time + 20; Hide(); }
+                if (e.to == "home" && home != null) { activity = "home"; goingIn = true; until = Time.time + 4; }
                 errand = null;
             }
         }
@@ -744,6 +745,7 @@ namespace Crulanda.Encounter
                 {
                     partner = null;
                     if (errand != null && leg == 0) { leg = 1; Go(dropAt); }   // picked up: carry it over
+                    else if (goingIn) { goingIn = false; until = Time.time + 20; Hide(); }   // said at the door; now indoors a while
                     else ChooseNext();
                 }
             }

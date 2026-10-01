@@ -1786,7 +1786,7 @@ namespace Crulanda.World
             Part(PrimitiveType.Cube, t, new Vector3(-1.4f, .3f, -d / 2 - 1.6f), new Vector3(1.1f, .04f, .25f), art.hay);
             Part(PrimitiveType.Sphere, t, new Vector3(1.5f, .35f, -d / 2 - .5f), new Vector3(.55f, .7f, .5f), art.cloth);
             var pan = new GameObject("Water pan").transform; pan.SetParent(t, false); pan.localPosition = new Vector3(1.3f, 0, -d / 2 - 1.7f);
-            Part(PrimitiveType.Cylinder, pan, new Vector3(0, .08f, 0), new Vector3(.8f, .08f, .8f), Tint(art.metal, new Color(.3f, .3f, .32f)));
+            Part(PrimitiveType.Cylinder, pan, new Vector3(0, .05f, 0), new Vector3(.8f, .05f, .8f), Tint(art.metal, new Color(.3f, .3f, .32f)));
             var water = Part(PrimitiveType.Cylinder, pan, new Vector3(0, .06f, 0), new Vector3(.68f, .012f, .68f), Tint(art.stone, new Color(.3f, .42f, .5f)));
             water.SetActive(false);
             Solid(t, new Vector3(.2f, (floor + h + .9f) / 2, 0), new Vector3(w + .9f, floor + h + .9f, d + .2f));
@@ -3300,7 +3300,7 @@ namespace Crulanda.World
                 for (int k = 0; k < 14; k++)
                 {
                     float a = (k * 25.7f + D() * 20) * Mathf.Deg2Rad, r = 2.6f + D() * 2.4f; var from = knot + Vector3.up * (1 + D() * 4) + face * new Vector3(Mathf.Sin(a) * 3, 0, Mathf.Cos(a) * 1.5f);
-                    var to = from + face * new Vector3(Mathf.Sin(a) * r, k % 3 == 0 ? 3 + D() * 3 : -from.y + .1f, Mathf.Cos(a) * r * .8f + 2);
+                    var to = from + face * new Vector3(Mathf.Sin(a) * r, k % 3 == 0 ? 3 + D() * 3 : seat.y + .1f - from.y, Mathf.Cos(a) * r * .8f + 2);
                     Limb(t, from, to, .3f + D() * .25f, .05f, bark, .12f, 7);
                 }
                 Block(knot, new Vector3(6, 7, 3.5f), face);

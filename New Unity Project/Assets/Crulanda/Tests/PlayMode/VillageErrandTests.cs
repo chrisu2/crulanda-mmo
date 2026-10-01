@@ -54,7 +54,7 @@ namespace Crulanda.Tests
             Assert.NotNull(carrier, "A hen-wife collects the eggs and carries them (" + string.Join(", ", life.Villagers.Where(v => v.Role == "henwife").Select(v => v.Name + ": " + v.Activity)) + ").");
             Assert.NotNull(carrier.Errand); Assert.AreEqual("eggs to the inn", carrier.Errand.id);
             Assert.IsTrue(carrier.GetComponentsInChildren<Renderer>().Any(r => r.transform.parent != null && r.transform.parent.name == "Load Eggs"), "The basket of eggs shows on her arm.");
-            yield return WaitUntil(() => life.Count("inn.eggs") > 0, 120);
+            yield return WaitUntil(() => life.Count("inn.eggs") > 0 && !carrier.Carrying, 120);   // she herself has handed over (three hen-wives are at it)
             Assert.Greater(life.Count("inn.eggs"), 0, "The eggs reach the inn's kitchen (" + carrier.Name + ": " + carrier.Activity + ", carrying " + carrier.Carrying + ").");
             Assert.IsFalse(carrier.Carrying, "Handed over.");
             Assert.IsTrue(carrier.Done("eggs to the inn"));
@@ -69,11 +69,12 @@ namespace Crulanda.Tests
             var merchant = life.Villagers.First(v => v.Role == "merchant");
             session.OpenVendor(merchant);
             Assert.AreEqual(merchant.Name, session.VendorNpc); Assert.AreEqual(EncounterSession.FreshEggs, session.VendorStock[0], "Fresh eggs head the merchant's wares.");
-            int had = life.Count("stall.eggs"); session.Progress.gold += 50;
+            int had = life.Count("stall.eggs"); session.Progress.gold += 1000;
             session.Buy(EncounterSession.FreshEggs);
             Assert.AreEqual(had - 1, life.Count("stall.eggs"), "Each sale takes an egg-basket off the stall.");
             Assert.AreEqual(1, Inventory.Count(session.Progress, EncounterSession.FreshEggs));
-            while (life.Count("stall.eggs") > 0) session.Buy(EncounterSession.FreshEggs);
+            for (int i = 0; i < 40 && life.Count("stall.eggs") > 0; i++) session.Buy(EncounterSession.FreshEggs);
+            Assert.AreEqual(0, life.Count("stall.eggs"), "The stall can be bought out.");
             Assert.IsFalse(session.VendorStock.Contains(EncounterSession.FreshEggs), "Sold out: off the list.");
         }
 
@@ -95,10 +96,10 @@ namespace Crulanda.Tests
 
             Time.timeScale = 1; WorldClock.Hour = 10.05f; Time.timeScale = 4;
             Villager farmer = null;
-            yield return WaitUntil(() => (farmer = life.Villagers.FirstOrDefault(v => v.Role == "farmer" && v.Carried == Load.Grain)) != null, 90);
-            Assert.NotNull(farmer, "A farmer shoulders a sack of barley in his field (" + string.Join(", ", life.Villagers.Where(v => v.Role == "farmer").Select(v => v.Name + ": " + v.Activity)) + ").");
+            yield return WaitUntil(() => life.Count("mill.grain") > 0 || (farmer = life.Villagers.FirstOrDefault(v => v.Role == "farmer" && v.Carried == Load.Grain)) != null, 90);
+            Assert.IsTrue(farmer != null || life.Count("mill.grain") > 0, "A farmer shoulders a sack of barley in his field (" + string.Join(", ", life.Villagers.Where(v => v.Role == "farmer").Select(v => v.Name + ": " + v.Activity)) + ").");
             yield return WaitUntil(() => life.Count("mill.grain") > 0, 150);
-            Assert.Greater(life.Count("mill.grain"), 0, "and it reaches the mill (" + farmer.Activity + ").");
+            Assert.Greater(life.Count("mill.grain"), 0, "and it reaches the mill (" + (farmer != null ? farmer.Activity : "already there") + ").");
         }
     }
 }

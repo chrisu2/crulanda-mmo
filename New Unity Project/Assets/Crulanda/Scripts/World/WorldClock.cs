@@ -176,7 +176,7 @@ namespace Crulanda.World
         {
             if (water == null) return;
             water.gameObject.SetActive(Level > .02f);
-            var p = water.localPosition; p.y = .05f + Level * .09f; water.localPosition = p;   // from the rim down into the pan
+            var p = water.localPosition; p.y = .092f + Level * .02f; water.localPosition = p;   // lying in the pan's top (the pan is solid: 0 to .1), sinking as it dries
         }
         public void SetOpen(bool open) { Open = open; if (hinge != null) hinge.localRotation = Quaternion.Euler(open ? -100 : 0, 0, 0); }
     }

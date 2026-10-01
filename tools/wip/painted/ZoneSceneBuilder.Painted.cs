@@ -109,6 +109,28 @@ namespace Crulanda.EditorTools
             // Masonry is its own material: art.stone stays the natural rock of crags, boulders and cave walls.
             if (art.masonry == null) { art.masonry = Standard("Masonry", new Color(.62f, .6f, .55f), Tex("stone_painted", T, StonePixel), .08f); EditorUtility.SetDirty(art); }
             Retexture(art.timber, Tex("timber_painted", T, TimberPixel), new Color(.44f, .3f, .19f), .08f);
+            // Part 2: natural rock gets its own shader (world-projected paint, lit tops, shaded undersides) and its own strata.
+            if (art.rock == null)
+            {
+                art.rock = new Material(Shader.Find("Crulanda/PaintedRock")) { name = "Painted rock", mainTexture = Tex("rock_painted", T, RockPixel) };
+                AssetDatabase.CreateAsset(art.rock, ArtRoot + "/Painted rock.mat"); EditorUtility.SetDirty(art);
+            }
+        }
+        /// <summary>Natural rock: level strata of uneven thickness and value, broad brush mottling across them, a few dark cracks
+        /// running down through the beds, lighter worn edges under each bed. Near-white on average so zone tints keep their hue.</summary>
+        static Color RockPixel(int x, int y)
+        {
+            float wobble = (Fbm(x, y, .006f, 2) - .5f) * 60;
+            float beds = 9, by = (y + wobble) / T * beds; int bed = Mathf.FloorToInt(by); float f = by - bed;
+            float v = .8f + (Hash(bed, 21) - .5f) * .22f;
+            v += (Fbm(x, y, .012f) - .5f) * .26f + (Fbm(x, y, .07f, 2) - .5f) * .1f;   // broad strokes, then the grain
+            v *= 1 - .3f * Smooth(.12f, 0, f);   // the shadow line under a bed
+            v *= 1 + .1f * Smooth(.8f, 1, f);    // its worn, lit lip
+            // Cracks: where a slow noise crosses a threshold, in thin near-vertical lines.
+            float crack = Mathf.Abs(Fbm(x * 1.6f, y * .35f, .013f, 2) - .5f);
+            if (crack < .012f) v *= .55f + crack * 20;
+            float warm = (Fbm(x, y, .004f, 2) - .5f) * .1f;
+            return new Color(Mathf.Clamp01(v * (1 + warm)), Mathf.Clamp01(v), Mathf.Clamp01(v * (1 - warm * 1.2f)));
         }
         static void Retexture(Material m, Texture2D tex, Color color, float smoothness)
         {

@@ -9,7 +9,9 @@ namespace Crulanda.Encounter
     /// the Warrior's sword, shield and shoulder pads; the Druid's staff stays only while the main hand is empty (it yields to a
     /// main-hand item) and the hood stays until a head piece exists. Empty slots show empty. Only slots whose item changed are
     /// rebuilt. Main- and off-hand pieces are built twice, in the hand and slung on the back, and swimming shows the back copy
-    /// (the existing held/stowed switch in LateUpdate). Built so far: main hand and off hand (step A1); armour is step A2.
+    /// (the existing held/stowed switch in LateUpdate). Armour (ActorVisual.GearArmor.cs) hangs from the body and, where it
+    /// follows a limb, from extra roots on the arm and leg pivots ("Gear Hands (Arm R)"); it recolours or hides the bare body
+    /// parts it covers and gives them back when it comes off.
     /// </summary>
     public sealed partial class ActorVisual
     {
@@ -17,26 +19,39 @@ namespace Crulanda.Encounter
         bool gearDriven; Transform[] classHeld, classStowed;
         readonly Transform[] gearRoots = new Transform[ItemDatabase.SlotIds.Length], gearStows = new Transform[ItemDatabase.SlotIds.Length];
         readonly string[] gearSig = new string[ItemDatabase.SlotIds.Length];
+        /// <summary>A slot's roots on the limbs (an arm or leg each), beside its root on the body.</summary>
+        readonly List<Transform>[] gearMore = new List<Transform>[ItemDatabase.SlotIds.Length];
         /// <summary>True once worn gear has taken over from the class kit (the player in an itemised session, a mannequin).</summary>
         public bool GearDriven { get { return gearDriven; } }
-        /// <summary>The slots this build shows on the figure.</summary>
-        public static bool BuildsSlot(EquipSlot slot) { return slot == EquipSlot.MainHand || slot == EquipSlot.OffHand; }
+        /// <summary>The slots this build shows on the figure: all nine.</summary>
+        public static bool BuildsSlot(EquipSlot slot) { return (int)slot >= 0 && (int)slot < GearSlots; }
 
         /// <summary>Dresses the figure in this equipment (indexed by EquipSlot). Rebuilds only the slots whose item or look changed.</summary>
         public void ApplyGear(IList<ItemStack> equipment, ItemDatabase items, GearLooks looks)
         {
             if (body == null || armR == null || armL == null || beast || core != null || looks == null) return;
             GearInit();
+            var shows = new bool[GearSlots]; var lks = new GearLook[GearSlots]; var sigs = new string[GearSlots];
             for (int s = 0; s < GearSlots; s++)
             {
                 var stack = equipment != null && s < equipment.Count ? equipment[s] : null;
                 var d = stack == null || stack.Empty || items == null ? null : items.Get(stack.item);
-                bool show = d != null && d.kind == "gear" && ItemDatabase.SlotIndex(d.slot) == s && BuildsSlot((EquipSlot)s);
-                var look = show ? looks.Resolve(d) : default;
-                string sig = show ? d.id + "|" + GearLooks.LookKey(look) : stack == null || stack.Empty ? "" : stack.item;
-                if (gearSig[s] == sig) continue;
-                ClearSlot(s); gearSig[s] = sig;
-                if (show) BuildSlot((EquipSlot)s, look);
+                shows[s] = d != null && d.kind == "gear" && ItemDatabase.SlotIndex(d.slot) == s && BuildsSlot((EquipSlot)s);
+                lks[s] = shows[s] ? looks.Resolve(d) : default;
+                sigs[s] = shows[s] ? d.id + "|" + GearLooks.LookKey(lks[s]) : stack == null || stack.Empty ? "" : stack.item;
+            }
+            // What one piece rests on: a neck piece lies on the chest piece or over a mantle or a hood's cape, a hood's drape tucks
+            // under shoulder armour, boots go under greaves, a mantle's back drape gives way to the Druid's hung cloak.
+            Rest(shows, lks);
+            if (shows[(int)EquipSlot.Neck]) sigs[(int)EquipSlot.Neck] += "|" + wornChest + "|" + neckOver;
+            if (shows[(int)EquipSlot.Head]) sigs[(int)EquipSlot.Head] += "|" + wornShoulders;
+            if (shows[(int)EquipSlot.Feet]) sigs[(int)EquipSlot.Feet] += "|" + wornLegs;
+            if (shows[(int)EquipSlot.Shoulders]) sigs[(int)EquipSlot.Shoulders] += "|" + Cloaked;
+            for (int s = 0; s < GearSlots; s++)
+            {
+                if (gearSig[s] == sigs[s]) continue;
+                ClearSlot(s); gearSig[s] = sigs[s];
+                if (shows[s]) BuildSlot((EquipSlot)s, lks[s]);
             }
             RefreshHeld();
         }
@@ -52,9 +67,16 @@ namespace Crulanda.Encounter
             ApplyGear(worn, items, looks);
         }
 
-        /// <summary>Renderers under the slots' gear roots, held copies only (the slung copies are hidden until you swim).</summary>
-        public int GearPartCount { get { int n = 0; for (int s = 0; s < GearSlots; s++) n += Count(gearRoots[s]); return n; } }
-        public int GearParts(EquipSlot slot) { return Count(gearRoots[(int)slot]); }
+        /// <summary>Renderers under the slots' gear roots (on the body and the limbs), held copies only (the slung copies are hidden until you swim).</summary>
+        public int GearPartCount { get { int n = 0; for (int s = 0; s < GearSlots; s++) n += GearParts((EquipSlot)s); return n; } }
+        public int GearParts(EquipSlot slot)
+        {
+            int s = (int)slot, n = Count(gearRoots[s]);
+            if (gearMore[s] != null) foreach (var t in gearMore[s]) n += Count(t);
+            return n;
+        }
+        /// <summary>A slot's roots on the arms and legs (empty when it has none).</summary>
+        public IList<Transform> GearLimbRoots(EquipSlot slot) { return gearMore[(int)slot] ?? (IList<Transform>)new Transform[0]; }
         /// <summary>A slot's gear root (or its slung copy). Null when the slot shows nothing.</summary>
         public Transform GearRoot(EquipSlot slot, bool stowedCopy = false) { return (stowedCopy ? gearStows : gearRoots)[(int)slot]; }
         /// <summary>Class kit still showing: the Warrior's pads, sword and shield, the Druid's hood and staff.</summary>
@@ -73,6 +95,7 @@ namespace Crulanda.Encounter
         {
             if (gearDriven) return;
             gearDriven = true; classHeld = held; classStowed = stowed; held = stowed = null;
+            for (int s = 0; s < GearSlots; s++) gearMore[s] = new List<Transform>();
             if (built == ActorLook.Druid) return;   // the staff yields to a main-hand item (RefreshHeld); the hood waits for the head slot
             Kill(classKit); Kill(classHeld); Kill(classStowed); classKit = classHeld = classStowed = null;
         }
@@ -93,7 +116,12 @@ namespace Crulanda.Encounter
             foreach (var t in held) t.gameObject.SetActive(!gearStowed);
             foreach (var t in stowed) t.gameObject.SetActive(gearStowed);
         }
-        void ClearSlot(int s) { Kill(gearRoots[s]); Kill(gearStows[s]); gearRoots[s] = gearStows[s] = null; }
+        void ClearSlot(int s)
+        {
+            Kill(gearRoots[s]); Kill(gearStows[s]); gearRoots[s] = gearStows[s] = null;
+            if (gearMore[s] != null) { foreach (var t in gearMore[s]) Kill(t); gearMore[s].Clear(); }
+            Uncover((EquipSlot)s);
+        }
         static void Kill(Transform[] set) { if (set != null) foreach (var t in set) Kill(t); }
         /// <summary>Removes a part at once as far as counting goes: hidden and unparented now, destroyed at the end of the frame (or now in edit mode).</summary>
         static void Kill(Transform t)
@@ -110,6 +138,11 @@ namespace Crulanda.Encounter
         void BuildSlot(EquipSlot slot, GearLook look)
         {
             int s = (int)slot;
+            if (slot != EquipSlot.MainHand && slot != EquipSlot.OffHand)
+            {
+                gearRoots[s] = new GameObject("Gear " + ItemDatabase.SlotNames[s]).transform; gearRoots[s].SetParent(body, false);
+                BuildArmor(slot, look); return;
+            }
             gearRoots[s] = Mount(slot, look.family, false); BuildGear(look, gearRoots[s]);
             if (slot == EquipSlot.MainHand || slot == EquipSlot.OffHand) { gearStows[s] = Mount(slot, look.family, true); BuildGear(look, gearStows[s]); }
             if (Hung(look.family)) gearRoots[s].gameObject.AddComponent<GearHang>().wearer = transform;
@@ -151,7 +184,7 @@ namespace Crulanda.Encounter
         /// <summary>The materials one look builds with (shared, from GearMats), and the accents lit so far (for an epic's pulse).</summary>
         sealed class GearKit
         {
-            public GearLook l; public Material metal, edge, dark, wood, leather, cloth, cloth2, trim, bone, glow, rust;
+            public GearLook l; public Material metal, edge, dark, wood, leather, cloth, cloth2, trim, bone, glow, rust, plate, mail, fur;
             public readonly List<Renderer> lit = new List<Renderer>();
             public Color Emission { get { return l.glow * Mathf.Max(1.2f, l.glowPower); } }
             /// <summary>Always-lit parts of a variant (a lantern's flame, buds, a seam): dimmer on poor gear.</summary>
@@ -170,6 +203,10 @@ namespace Crulanda.Encounter
             k.bone = GearMats.Get(l.bone, .35f);
             k.glow = GearMats.Get(l.glow, .8f, 0, k.Emission);
             k.rust = GearMats.Get(new Color(.36f, .2f, .11f), .08f);
+            // Armour: polished plate, darker duller mail, matte fur.
+            k.plate = GearMats.Get(Color.Lerp(l.metal, Color.white, .08f), .48f + .07f * q, .62f + .06f * q);
+            k.mail = GearMats.Get(l.metal * .78f, .3f + .04f * q, .62f);
+            k.fur = GearMats.Get(Color.Lerp(l.cloth, l.leather, .3f), .04f);
             return k;
         }
         /// <summary>A gear part: a mesh and a shared material, no collider.</summary>

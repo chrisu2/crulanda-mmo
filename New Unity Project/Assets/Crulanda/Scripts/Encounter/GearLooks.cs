@@ -56,6 +56,8 @@ namespace Crulanda.Encounter
         public int accents; public float glowPower; public bool pulse;
         /// <summary>Poor gear carries a wear mark; uncommon and better one extra detail part.</summary>
         public bool worn, extra;
+        /// <summary>How worked the piece is, 0 to 4, from its level band (1-2 ... 11-13): armour grows more plates, rims and crests as it climbs.</summary>
+        public int tier;
     }
 
     public sealed class GearLooks
@@ -274,10 +276,10 @@ namespace Crulanda.Encounter
         }
         /// <summary>The resolver's own copy of the level bands (ItemDatabase's is private): 1-2, 3-5, 6-8, 9-10, 11-13.</summary>
         public static int BandOf(int level) { return level <= 2 ? 0 : level <= 5 ? 1 : level <= 8 ? 2 : level <= 10 ? 3 : 4; }
-        /// <summary>A short key for a resolved look (family, variant, palette, quality, glow, metal and detail), for caching rendered icons.</summary>
+        /// <summary>A short key for a resolved look (family, variant, palette, quality, glow, metal, detail and tier), for caching rendered icons.</summary>
         public static string LookKey(GearLook l)
         {
-            return l.family + ":" + l.variant + "/" + l.palette + "#" + l.quality + (l.forceGlow ? "+glow" : "") + "@" + ColorUtility.ToHtmlStringRGB(l.metal) + "~" + l.detail;
+            return l.family + ":" + l.variant + "/" + l.palette + "#" + l.quality + (l.forceGlow ? "+glow" : "") + "@" + ColorUtility.ToHtmlStringRGB(l.metal) + "~" + l.detail + "^" + l.tier;
         }
 
         /// <summary>The look of an item: its own look, else its generated name's, else its slot's fallback. Never fails.</summary>
@@ -286,19 +288,20 @@ namespace Crulanda.Encounter
             string slot = d != null && ItemDatabase.SlotIndex(d.slot) >= 0 ? d.slot : "mainhand";
             int q = d == null ? 1 : Mathf.Clamp(d.quality, 0, 4);
             string id = d != null ? d.id ?? "" : "";
+            int tier = BandOf(Mathf.Clamp(d == null ? 1 : d.level + 1, 1, EncounterProgress.LevelCap));   // the curve level: required level + 1 (DESIGN.md 3.2)
             // Its own look, if it names a family of the item's slot.
             if (explicitLooks.TryGetValue(id, out var own) && TryParseLook(own, out var fam, out var variant, out var pal, out bool glow) && Family(fam).slot == slot && palettes.ContainsKey(pal))
-                return Tint(Make(fam, variant, pal, 0, "none", q, glow, false), id);
+                return Tint(Make(fam, variant, pal, 0, "none", q, glow, false, tier), id);
             // Generated: the material word picks the palette, the piece word (by level band) the family, the seed the variant.
             if (TrySplitGenerated(d, out var material, out var piece, out int level, out int seed)
                 && materials.TryGetValue(material, out var m) && words.TryGetValue(slot + "|" + piece, out var w) && w.families.Length > 0)
             {
                 var family = Family(w.families.Length == 1 ? w.families[0] : w.families[Mathf.Clamp(BandOf(level), 0, w.families.Length - 1)]);
                 if (family != null && family.gen > 0)
-                    return Tint(Make(family.name, family.variants[Mathf.Abs(seed / 7) % family.gen], m.palette, m.shade, m.detail, q, false, false), id);
+                    return Tint(Make(family.name, family.variants[Mathf.Abs(seed / 7) % family.gen], m.palette, m.shade, m.detail, q, false, false, BandOf(Mathf.Clamp(level, 1, EncounterProgress.LevelCap))), id);
             }
             var fb = Family(fallbacks.TryGetValue(slot, out var f) ? f : "sword.arming");
-            return Tint(Make(fb.name, fb.variants[0], "oakhaven", 0, "none", q, false, true), id);
+            return Tint(Make(fb.name, fb.variants[0], "oakhaven", 0, "none", q, false, true, tier), id);
         }
 
         GearLook Tint(GearLook l, string id)
@@ -317,12 +320,12 @@ namespace Crulanda.Encounter
         /// <summary>Poor gear: 35% toward grey and 15% darker.</summary>
         static Color Faded(Color c) { float g = c.r * .3f + c.g * .59f + c.b * .11f; return Color.Lerp(c, new Color(g, g, g), .35f) * .85f; }
 
-        GearLook Make(string family, string variant, string paletteId, int shade, string detail, int q, bool glow, bool fallback)
+        GearLook Make(string family, string variant, string paletteId, int shade, string detail, int q, bool glow, bool fallback, int tier)
         {
             var p = palettes[paletteId];
             Color C(string hex) { var c = Shade(Hex(hex), shade); return q == 0 ? Faded(c) : c; }
             var l = new GearLook {
-                family = family, variant = variant, palette = paletteId, detail = string.IsNullOrEmpty(detail) ? "none" : detail, quality = q, forceGlow = glow, fallback = fallback,
+                family = family, variant = variant, palette = paletteId, detail = string.IsNullOrEmpty(detail) ? "none" : detail, quality = q, forceGlow = glow, fallback = fallback, tier = tier,
                 cloth = C(p.cloth), cloth2 = C(p.cloth2), leather = C(p.leather), metal = C(p.metal), trim = C(p.trim), wood = C(p.wood), glow = Hex(p.glow), bone = q == 0 ? Faded(Bone) : Bone
             };
             Quality(ref l, q);

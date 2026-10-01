@@ -296,6 +296,131 @@ namespace Crulanda.Encounter
         }
         /// <summary>A placement for <see cref="Many"/>.</summary>
         public static Matrix4x4 At(Vector3 pos, Vector3 euler, Vector3 scale) { return Matrix4x4.TRS(pos, Quaternion.Euler(euler), scale); }
+        /// <summary>
+        /// One mesh made of different placed meshes (a pauldron's dome, its lame and its strap): one part, not three. Built-in
+        /// primitives are swapped for generated ones of the same size, as in <see cref="Many"/>.
+        /// </summary>
+        public static Mesh Join(string key, IList<(Mesh mesh, Matrix4x4 at)> parts)
+        {
+            return Cached(key, () =>
+            {
+                var c = new CombineInstance[parts.Count]; long verts = 0;
+                for (int i = 0; i < parts.Count; i++) { var part = Combinable(parts[i].mesh); c[i] = new CombineInstance { mesh = part, transform = parts[i].at }; verts += part.vertexCount; }
+                var m = new Mesh(); if (verts > 65000) m.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
+                m.CombineMeshes(c, true, true); m.RecalculateBounds(); return m;
+            });
+        }
+
+        /// <summary>
+        /// A walled shell round the body or a limb (a breastplate, a hauberk, a hood, a greave). Rings run bottom to top, each
+        /// (half width, height, half depth, centre z) and each a rounded rectangle: <paramref name="square"/> 2 is an ellipse, higher
+        /// is boxier, so it can hug the square torso without bulging. The wall is <paramref name="thick"/> deep (the inside is the
+        /// rings drawn in by that much) and closed at the hem and at the top. <paramref name="open"/> leaves a gap in each ring of that
+        /// many degrees (one value per ring, the last repeated), centred on the direction <paramref name="gapAt"/> (degrees from +X
+        /// toward +Z: 90 is the front, 270 the back), with the cut edges walled too: a hood's face, a greave's open back. Without
+        /// gaps the seam is at <paramref name="gapAt"/> and shades smooth across.
+        /// </summary>
+        public static Mesh Shell(string key, Vector4[] rings, float thick, float square = 6, float[] open = null, float gapAt = 270, int sides = 24, bool smooth = true)
+        {
+            return Cached(key, () =>
+            {
+                var b = new Builder(); int n = rings.Length; float e = 2 / square;
+                var seams = new List<(int a, int b)>();
+                float Pow(float c) { return Mathf.Sign(c) * Mathf.Pow(Mathf.Abs(c), e); }
+                float Gap(int i) { return open == null || open.Length == 0 ? 0 : open[Mathf.Min(i, open.Length - 1)]; }
+                float Angle(int i, int j) { float o = Gap(i); return (gapAt + o / 2 + (360 - o) * j / sides) * Mathf.Deg2Rad; }
+                Vector3 Point(int i, float a, float shrink)
+                {
+                    var r = rings[i]; float w = Mathf.Max(0, r.x - shrink), d = Mathf.Max(0, r.z - shrink);
+                    return new Vector3(w * Pow(Mathf.Cos(a)), r.y, r.w + d * Pow(Mathf.Sin(a)));
+                }
+                int[] Ring(int i, float shrink)
+                {
+                    var idx = new int[sides + 1]; for (int j = 0; j <= sides; j++) idx[j] = b.Add(Point(i, Angle(i, j), shrink));
+                    seams.Add((idx[0], idx[sides])); return idx;
+                }
+                var outer = new int[n][]; var inner = new int[n][];
+                foreach (var (shrink, sign, keep) in new[] { (0f, 1f, outer), (thick, -1f, inner) })
+                {
+                    int[] lower = null;
+                    for (int i = 0; i + 1 < n; i++)
+                    {
+                        if (lower == null || !smooth) lower = Ring(i, shrink);
+                        var upper = Ring(i + 1, shrink); keep[i] = keep[i] ?? lower; keep[i + 1] = upper;
+                        var r0 = rings[i]; var r1 = rings[i + 1]; float dy = r1.y - r0.y, ds = (r1.x + r1.z - r0.x - r0.z) / 2, zc = (r0.w + r1.w) / 2;
+                        for (int j = 0; j < sides; j++)
+                        {
+                            var c = (b.v[lower[j]] + b.v[lower[j + 1]] + b.v[upper[j]] + b.v[upper[j + 1]]) / 4;
+                            var radial = new Vector3(c.x, 0, c.z - zc); if (radial.sqrMagnitude > 1e-12f) radial.Normalize();
+                            b.Quad(lower[j], upper[j], upper[j + 1], lower[j + 1], (radial * dy - Vector3.up * ds) * sign);
+                        }
+                        lower = upper;
+                    }
+                }
+                // The hem and the top: a band from the outside in, flat shaded.
+                foreach (var (i, outward) in new[] { (0, Vector3.down), (n - 1, Vector3.up) })
+                {
+                    var o = new int[sides + 1]; var u = new int[sides + 1];
+                    for (int j = 0; j <= sides; j++) { o[j] = b.Add(b.v[outer[i][j]]); u[j] = b.Add(b.v[inner[i][j]]); }
+                    for (int j = 0; j < sides; j++) b.Quad(o[j], o[j + 1], u[j + 1], u[j], outward);
+                }
+                // The cut edges of a gap, walled across.
+                if (open != null)
+                    for (int i = 0; i + 1 < n; i++)
+                        foreach (int j in new[] { 0, sides })
+                        {
+                            float a = Angle(i, j), step = j == 0 ? -.05f : .05f; var outward = Point(i, a + step, 0) - Point(i, a, 0);
+                            b.Quad(b.Add(b.v[outer[i][j]]), b.Add(b.v[outer[i + 1][j]]), b.Add(b.v[inner[i + 1][j]]), b.Add(b.v[inner[i][j]]), outward);
+                        }
+                var m = b.Build();
+                // A closed ring's first and last columns are the same points: share their normals so the seam does not show.
+                var normals = m.normals;
+                foreach (var (p, q) in seams)
+                    if ((b.v[p] - b.v[q]).sqrMagnitude < 1e-10f) { var avg = (normals[p] + normals[q]).normalized; normals[p] = normals[q] = avg; }
+                m.normals = normals; return m;
+            });
+        }
+        /// <summary>
+        /// Shell rings resampled into rows every <paramref name="step"/> up, for mail and scale. Mail: each row swells by
+        /// <paramref name="depth"/> halfway up, a soft ripple that catches the light in bands. Scales: each row's lower edge stands
+        /// proud and tucks in under the next, crisp rows of overlapping plates. Gaps (<paramref name="open"/>) are carried along.
+        /// </summary>
+        public static Vector4[] Rows(Vector4[] stations, float step, float depth, bool scales, float[] open, out float[] rowOpen)
+        {
+            var rows = new List<Vector4>(); var gaps = new List<float>();
+            float y0 = stations[0].y, y1 = stations[stations.Length - 1].y;
+            (Vector4 r, float o) Sample(float y)
+            {
+                for (int i = 0; i + 1 < stations.Length; i++)
+                    if (y <= stations[i + 1].y || i + 2 == stations.Length)
+                    {
+                        float t = Mathf.Clamp01((y - stations[i].y) / Mathf.Max(1e-5f, stations[i + 1].y - stations[i].y));
+                        float g0 = open == null ? 0 : open[Mathf.Min(i, open.Length - 1)], g1 = open == null ? 0 : open[Mathf.Min(i + 1, open.Length - 1)];
+                        var r = Vector4.Lerp(stations[i], stations[i + 1], t); r.y = y; return (r, Mathf.Lerp(g0, g1, t));
+                    }
+                return (stations[0], 0);
+            }
+            void Put(float y, float swell) { var (r, o) = Sample(y); rows.Add(new Vector4(r.x + swell, r.y, r.z + swell, r.w)); gaps.Add(o); }
+            for (float y = y0; y < y1 - step * .3f; y += step)
+            {
+                if (scales) { Put(y, depth); Put(Mathf.Min(y + step * .88f, y1), 0); }
+                else { Put(y, 0); Put(Mathf.Min(y + step * .5f, y1), depth); }
+            }
+            Put(y1, 0);
+            rowOpen = gaps.ToArray(); return rows.ToArray();
+        }
+        /// <summary>
+        /// A flat panel cut to an outline drawn in (x, y), standing up, <paramref name="thick"/> through along Z with its face domed
+        /// by <paramref name="bulge"/> toward +Z (<paramref name="front"/>) or -Z: a tabard, a back drape, a coat skirt. The outline
+        /// must be star-shaped round <paramref name="fan"/> (by default its centroid; a ragged hem needs a point nearer the top).
+        /// The dome stays centred on the centroid either way.
+        /// </summary>
+        public static Mesh Panel(string key, Vector2[] outline, float thick, float bulge = 0, bool front = true, Vector2? fan = null)
+        {
+            var o = new Vector2[outline.Length]; for (int i = 0; i < o.Length; i++) o[i] = front ? new Vector2(outline[i].x, -outline[i].y) : outline[i];
+            Vector2? fn = fan.HasValue ? (front ? new Vector2(fan.Value.x, -fan.Value.y) : fan.Value) : (Vector2?)null;
+            return Plate(key, o, thick, bulge, fn.HasValue ? Centroid(o) : (Vector2?)null, null, 0, 1, Quaternion.Euler(front ? 90 : -90, 0, 0), fn);
+        }
 
         static Vector2 Centroid(Vector2[] o) { var c = Vector2.zero; foreach (var p in o) c += p; return c / o.Length; }
         static Vector2 Reach(Vector2[] o, Vector2 c) { var r = Vector2.zero; foreach (var p in o) { r.x = Mathf.Max(r.x, Mathf.Abs(p.x - c.x)); r.y = Mathf.Max(r.y, Mathf.Abs(p.y - c.y)); } return r * 1.05f; }

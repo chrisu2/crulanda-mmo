@@ -13,7 +13,8 @@ namespace Crulanda.Tests
 {
     /// <summary>
     /// The gear binder in play (Oakhaven, a throwaway save): a fresh character holds nothing; equipping a blade puts it in the
-    /// hand and unequipping empties it; a load (F9) makes a new player figure and the binder dresses it in what was saved.
+    /// hand and unequipping empties it; a load (F9) makes a new player figure and the binder dresses it in what was saved; a chest
+    /// piece put on then shows on the body.
     /// (DESIGN.md lists this with the edit mode visual tests; it needs a running session, so it lives here.)
     /// </summary>
     public class GearBinderTests
@@ -68,6 +69,14 @@ namespace Crulanda.Tests
             Assert.AreNotSame(look, after, "The load made a new player figure.");
             Assert.AreEqual(blade, s.Progress.equipment[(int)EquipSlot.MainHand].item, "The save had the blade on.");
             Assert.Greater(after.GearParts(EquipSlot.MainHand), 0, "The binder dressed the new figure in it.");
+
+            // Armour too: a chest piece shows on the body.
+            string tunic = ItemDatabase.GearId("chest", 1, 1, 5);
+            Assert.AreEqual(0, Inventory.Add(s.Progress, s.Items, tunic, 1));
+            Assert.IsTrue(s.EquipFromBag(s.Progress.bag.FindIndex(b => b.item == tunic)), "A chest piece on.");
+            yield return Until(() => after.GearParts(EquipSlot.Chest) > 0);
+            Assert.Greater(after.GearParts(EquipSlot.Chest), 0, "The chest piece shows on the body.");
+            Assert.AreEqual("Body", after.GearRoot(EquipSlot.Chest).parent.name);
         }
     }
 }

@@ -22,6 +22,8 @@ namespace Crulanda.Encounter
         Transform[] held, stowed; bool gearStowed;
         /// <summary>Class kit that worn gear replaces: the Warrior's shoulder pads, the Druid's hood. See ActorVisual.Gear.cs.</summary>
         Transform[] classKit; ActorLook built;
+        /// <summary>The bare figure's parts that worn armour recolours, hides or tucks away (see ActorVisual.GearArmor.cs): torso, chest and shoulders; sleeves; hands; legs and hips; boots; the belt; the hair (the long fall and the bun tuck under a cap); the Druid's cloak.</summary>
+        Renderer[] baseChest, baseSleeves, baseHands, baseLegs, baseBoots; Renderer baseBelt; Transform[] hairParts; Transform hairLong, hairBun, druidCloak;
         /// <summary>Villagers pass their trade (<paramref name="role"/>) to get its outfit and tool; see <see cref="Dress"/>.</summary>
         public static ActorVisual Attach(GameObject actor, ActorLook look, int variant = 0, bool child = false, string role = null)
         {
@@ -70,8 +72,9 @@ namespace Crulanda.Encounter
         {
             bool stone = look == ActorLook.Hollow;
             Part(PrimitiveType.Cylinder, body, new Vector3(0, .64f, 0), new Vector3(.15f, .06f, .15f), skin);                          // neck
-            Part(PrimitiveType.Sphere, body, new Vector3(0, .44f, .02f), new Vector3(.47f, .34f, .31f), cloth);                        // chest
-            foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Sphere, body, new Vector3(s * .24f, .55f, 0), new Vector3(.2f, .16f, .22f), cloth); // shoulders
+            var chest = Part(PrimitiveType.Sphere, body, new Vector3(0, .44f, .02f), new Vector3(.47f, .34f, .31f), cloth).GetComponent<Renderer>();   // chest
+            var shoulders = System.Array.ConvertAll(new[] { -1, 1 }, s => Part(PrimitiveType.Sphere, body, new Vector3(s * .24f, .55f, 0), new Vector3(.2f, .16f, .22f), cloth).GetComponent<Renderer>()); // shoulders
+            baseChest = new[] { torso != null ? torso.GetComponent<Renderer>() : null, chest, shoulders[0], shoulders[1] };
             var eyeWhite = Mat(stone ? new Color(.45f, .45f, .47f) : new Color(.95f, .94f, .9f), .6f);
             var pupil = Mat(stone ? new Color(.3f, .3f, .32f) : new Color(.12f, .09f, .07f), .8f);
             var brow = Mat(stone ? new Color(.35f, .35f, .36f) : HairColors[Mathf.Abs(variant * 3 + 1) % HairColors.Length] * .8f);
@@ -89,14 +92,14 @@ namespace Crulanda.Encounter
             var hair = Mat(HairColors[Mathf.Abs(variant * 3 + 1) % HairColors.Length], .25f);
             switch (Mathf.Abs(variant) % 5)
             {
-                case 0: Part(PrimitiveType.Sphere, body, new Vector3(0, .87f, -.02f), new Vector3(.32f, .22f, .32f), hair); break;              // short
+                case 0: hairParts = new[] { Part(PrimitiveType.Sphere, body, new Vector3(0, .87f, -.02f), new Vector3(.32f, .22f, .32f), hair) }; break;   // short
                 case 1:
-                    Part(PrimitiveType.Sphere, body, new Vector3(0, .87f, -.02f), new Vector3(.33f, .24f, .33f), hair);
-                    Part(PrimitiveType.Cube, body, new Vector3(0, .7f, -.12f), new Vector3(.3f, .34f, .08f), hair); break;                      // long
+                    hairParts = new[] { Part(PrimitiveType.Sphere, body, new Vector3(0, .87f, -.02f), new Vector3(.33f, .24f, .33f), hair),
+                        hairLong = Part(PrimitiveType.Cube, body, new Vector3(0, .7f, -.12f), new Vector3(.3f, .34f, .08f), hair) }; break;          // long
                 case 2:
-                    Part(PrimitiveType.Sphere, body, new Vector3(0, .87f, -.02f), new Vector3(.32f, .22f, .32f), hair);
-                    Part(PrimitiveType.Sphere, body, new Vector3(0, .84f, -.17f), Vector3.one * .12f, hair); break;                              // tied back
-                case 3: Part(PrimitiveType.Sphere, body, new Vector3(0, .9f, -.01f), new Vector3(.3f, .15f, .3f), hair); break;               // cropped
+                    hairParts = new[] { Part(PrimitiveType.Sphere, body, new Vector3(0, .87f, -.02f), new Vector3(.32f, .22f, .32f), hair),
+                        hairBun = Part(PrimitiveType.Sphere, body, new Vector3(0, .84f, -.17f), Vector3.one * .12f, hair) }; break;                  // tied back
+                case 3: hairParts = new[] { Part(PrimitiveType.Sphere, body, new Vector3(0, .9f, -.01f), new Vector3(.3f, .15f, .3f), hair) }; break;    // cropped
                 default: break;                                                                                                                  // bald
             }
         }
@@ -354,21 +357,25 @@ namespace Crulanda.Encounter
 
             // Legs and arms hang from pivots so they can swing.
             legL = Pivot("Leg L", new Vector3(-.12f, -.08f, 0)); legR = Pivot("Leg R", new Vector3(.12f, -.08f, 0));
-            foreach (var leg in new[] { legL, legR })
+            baseLegs = new Renderer[3]; baseBoots = new Renderer[2];
+            for (int i = 0; i < 2; i++)
             {
-                Part(PrimitiveType.Capsule, leg, new Vector3(0, -.44f, 0), new Vector3(.18f, .44f, .18f), legs);
-                Part(PrimitiveType.Cube, leg, new Vector3(0, -.86f, .05f), new Vector3(.17f, .12f, .28f), boots);
+                var leg = i == 0 ? legL : legR;
+                baseLegs[i] = Part(PrimitiveType.Capsule, leg, new Vector3(0, -.44f, 0), new Vector3(.18f, .44f, .18f), legs).GetComponent<Renderer>();
+                baseBoots[i] = Part(PrimitiveType.Cube, leg, new Vector3(0, -.86f, .05f), new Vector3(.17f, .12f, .28f), boots).GetComponent<Renderer>();
             }
-            Part(PrimitiveType.Cube, body, new Vector3(0, -.02f, 0), new Vector3(.44f, .2f, .27f), legs);           // hips
+            baseLegs[2] = Part(PrimitiveType.Cube, body, new Vector3(0, -.02f, 0), new Vector3(.44f, .2f, .27f), legs).GetComponent<Renderer>();           // hips
             torso = Part(PrimitiveType.Cube, body, new Vector3(0, .3f, 0), new Vector3(.48f, .6f, .29f), cloth);
-            Part(PrimitiveType.Cube, body, new Vector3(0, .06f, 0), new Vector3(.5f, .07f, .31f), Mat(new Color(.22f, .16f, .11f))); // belt
+            baseBelt = Part(PrimitiveType.Cube, body, new Vector3(0, .06f, 0), new Vector3(.5f, .07f, .31f), Mat(new Color(.22f, .16f, .11f))).GetComponent<Renderer>(); // belt
             head = Part(PrimitiveType.Sphere, body, new Vector3(0, .8f, 0), new Vector3(.3f, .32f, .3f), skin);
             Features(look, skin);
             armL = Pivot("Arm L", new Vector3(-.31f, .53f, 0)); armR = Pivot("Arm R", new Vector3(.31f, .53f, 0));
-            foreach (var arm in new[] { armL, armR })
+            baseSleeves = new Renderer[2]; baseHands = new Renderer[2];
+            for (int i = 0; i < 2; i++)
             {
-                Part(PrimitiveType.Capsule, arm, new Vector3(0, -.3f, 0), new Vector3(.14f, .3f, .14f), cloth);
-                Part(PrimitiveType.Sphere, arm, new Vector3(0, -.62f, 0), Vector3.one * .12f, skin);
+                var arm = i == 0 ? armL : armR;
+                baseSleeves[i] = Part(PrimitiveType.Capsule, arm, new Vector3(0, -.3f, 0), new Vector3(.14f, .3f, .14f), cloth).GetComponent<Renderer>();
+                baseHands[i] = Part(PrimitiveType.Sphere, arm, new Vector3(0, -.62f, 0), Vector3.one * .12f, skin).GetComponent<Renderer>();
             }
             switch (look)
             {
@@ -391,7 +398,7 @@ namespace Crulanda.Encounter
                 }
                 case ActorLook.Druid:
                     classKit = new[] { Part(PrimitiveType.Sphere, body, new Vector3(0, .84f, -.03f), new Vector3(.36f, .38f, .38f), cloth) };   // hood
-                    Part(PrimitiveType.Cube, body, new Vector3(0, .2f, -.17f), new Vector3(.52f, .95f, .05f), accent, new Vector3(-6, 0, 0)); // cloak
+                    druidCloak = Part(PrimitiveType.Cube, body, new Vector3(0, .2f, -.17f), new Vector3(.52f, .95f, .05f), accent, new Vector3(-6, 0, 0)); // cloak
                 {
                     var staff = Mat(new Color(.35f, .25f, .15f)); var orb = Mat(new Color(.45f, .7f, .4f), .6f);
                     held = new[] { Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.45f, .08f), new Vector3(.06f, .85f, .06f), staff, new Vector3(8, 0, 0)),   // staff
@@ -821,6 +828,7 @@ namespace Crulanda.Encounter
             legL.localEulerAngles = new Vector3(swing, 0, 0); legR.localEulerAngles = new Vector3(-swing, 0, 0);
             armL.localEulerAngles = new Vector3(-swing * .8f + idle, 0, 3); armR.localEulerAngles = new Vector3(swing * .8f - idle, 0, -3);
             if (torso != null && !beast) torso.localPosition = new Vector3(0, .3f + Mathf.Abs(Mathf.Sin(phase)) * .025f * stride, 0);
+            if (gearDriven && torso != null) GearBob(torso.localPosition.y - .3f);
             if (beast && LyingLow) { armL.localEulerAngles = armR.localEulerAngles = new Vector3(80, 0, 0); legL.localEulerAngles = legR.localEulerAngles = new Vector3(-80, 0, 0); }   // lying in wait: legs folded under the belly
             if (Pose == ActorPose.None)   // combatants never use poses (their death pose moves the body)
             {

@@ -28,13 +28,13 @@ namespace Crulanda.World
             switch (zone != null ? zone.biome : "meadow")
             {
                 // Thin cold air: crisp contrast, a touch more colour and less glow, so rock, pines and the far blue ridges separate.
-                case "mountain": return new Grade { saturation = 1.08f, contrast = 1.2f, exposure = .95f, vignette = .55f, bloom = .42f, threshold = 1.1f, tint = new Color(.97f, 1, 1.04f) };
+                case "mountain": return new Grade { saturation = 1.2f, contrast = 1.2f, exposure = .95f, vignette = .5f, bloom = .42f, threshold = 1.1f, tint = new Color(.99f, 1, 1.02f) };   // the cool cast is in the skylight (peaks.json), so sunlit faces stay warm
                 // Ash: drained grey with a faint bruised-violet cast (canon sky, book1 ch.20); a sepia tint turned the ash to desert tan.
-                case "ash": return new Grade { saturation = .7f, contrast = 1.16f, exposure = .95f, vignette = .8f, bloom = .6f, threshold = .95f, tint = new Color(.99f, .985f, 1.02f) };
-                case "gloom": return new Grade { saturation = .82f, contrast = 1.12f, exposure = 1.04f, vignette = .85f, bloom = .6f, threshold = .95f, tint = new Color(1.05f, .95f, 1.03f) };   // Khaven: drained, rose-violet dusk
+                case "ash": return new Grade { saturation = .7f, contrast = 1.24f, exposure = .97f, vignette = .85f, bloom = .45f, threshold = 1.05f, tint = new Color(.99f, .985f, 1.02f) };   // less glow and more contrast, so the pale fogged ground is not lifted to a milky mid-grey
+                case "gloom": return new Grade { saturation = .86f, contrast = 1.2f, exposure = 1.04f, vignette = .85f, bloom = .65f, threshold = .9f, tint = new Color(1.04f, .96f, 1.02f) };   // Khaven: drained, rose-violet dusk; deeper darks so the lit windows and the low sun carry it
                 // The Verdant Shore: rich, saturated and a little soft, lifted toward emerald, with the glow of a humid forest.
                 case "verdant": return new Grade { saturation = 1.3f, contrast = 1.1f, exposure = 1.04f, vignette = .55f, bloom = .7f, threshold = .9f, tint = new Color(.97f, 1.03f, .97f) };
-                default: return new Grade { saturation = 1.18f, contrast = 1.14f, exposure = 1f, vignette = .6f, bloom = .55f, threshold = 1f, tint = new Color(1.03f, 1, .95f) };
+                default: return new Grade { saturation = 1.28f, contrast = 1.12f, exposure = 1.03f, vignette = .55f, bloom = .62f, threshold = .95f, tint = new Color(1.02f, 1.01f, .98f) };   // Oakhaven: a clear pastoral day, warm light and cool distance
             }
         }
         void OnRenderImage(RenderTexture src, RenderTexture dst)

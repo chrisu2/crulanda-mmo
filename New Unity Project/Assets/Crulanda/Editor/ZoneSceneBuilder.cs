@@ -13,7 +13,7 @@ namespace Crulanda.EditorTools
     /// Creates the shared zone art palette (materials + small generated surface textures) and the Oakhaven scene.
     /// Existing materials and the scene are preserved; rerunning only fills in anything missing and fixes build settings.
     /// </summary>
-    public static class ZoneSceneBuilder
+    public static partial class ZoneSceneBuilder
     {
         const string ArtRoot = "Assets/Crulanda/World/Art";
         public const string OakhavenScene = "Assets/Crulanda/Scenes/Oakhaven.unity";
@@ -249,6 +249,8 @@ namespace Crulanda.EditorTools
             if (art.fern == null) art.fern = PlantCard("Fern", fernTex, .07f);
             if (art.broadLeaf == null) art.broadLeaf = PlantCard("Broad leaf", broadTex, .05f);
             if (art.reeds == null) art.reeds = PlantCard("Reeds", reedTex, .12f);
+            PaintedTextures(art);   // the painted style pass: plaster, thatch, slate and timber repainted, and the masonry material (ZoneSceneBuilder.Painted.cs)
+            EnsurePaintedRock(art);   // and the painted natural rock (ZoneSceneBuilder.PaintedRock.cs)
             EditorUtility.SetDirty(art); AssetDatabase.SaveAssets();
             return art;
         }

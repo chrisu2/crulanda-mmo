@@ -205,7 +205,7 @@ namespace Crulanda.World
         void Waterfall(Transform t, float width, float height)
         {
             var tr = TreeRandom(t.position); float T() { return (float)tr.NextDouble(); }
-            var rock = Tint(art.stone, new Color(.44f, .44f, .42f)); var mossy = Tint(art.stone, new Color(.3f, .38f, .22f));
+            var rock = RockTint(new Color(.44f, .44f, .42f)); var mossy = RockTint(new Color(.3f, .38f, .22f));
             // The face: rows of boulders either side of the fall and behind it, the top row capped with moss.
             for (float y = -.5f; y < height + 1; y += 1.9f)
                 for (float x = -width / 2 - 4.5f; x <= width / 2 + 4.5f; x += 2.1f)

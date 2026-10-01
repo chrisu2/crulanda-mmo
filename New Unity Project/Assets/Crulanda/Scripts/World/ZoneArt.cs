@@ -43,5 +43,9 @@ namespace Crulanda.World
         public Material clouds;
         [Tooltip("Crulanda/Grass painted plant cards (PlantField): a fern frond, a broad leaf on its stalk, and a clump of reeds with their heads.")]
         public Material fern, broadLeaf, reeds;
+        [Tooltip("Painted dressed stone for plinths, chimneys, footings and hearths (art.stone stays natural rock).")]
+        public Material masonry;
+        [Tooltip("Crulanda/PaintedRock: natural rock (crags, cliffs, boulders), world-projected strata with lit tops. Null = ZoneBuilder falls back to stone.")]
+        public Material rock;
     }
 }

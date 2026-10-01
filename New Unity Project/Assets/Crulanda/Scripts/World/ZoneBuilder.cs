@@ -73,7 +73,11 @@ namespace Crulanda.World
                 var grass = Gloom ? art.grass.Select(m => new Material(m) { name = m.name + " (dry)", color = Color.Lerp(m.color, new Color(.5f, .46f, .37f), .75f), enableInstancing = true }).ToArray() : art.grass;
                 // Gloom: tall grass is dark grey dead stalks, a little shorter and thinner, so a boar or wolf breaking out of it shows.
                 var tall = Gloom ? art.grass.Select(m => new Material(m) { name = m.name + " (dead, tall)", color = Color.Lerp(m.color, new Color(.36f, .35f, .34f), .9f), enableInstancing = true }).ToArray() : null;
-                var lush = Zone.biome == "verdant" ? art.grass.Select(m => new Material(m) { name = m.name + " (lush)", color = Color.Lerp(m.color, new Color(.3f, .62f, .22f), .55f), enableInstancing = true }).ToArray() : grass;
+                // Meadow and mountain: the shared tufts are yellow-olive, so they are pulled toward each zone's turf green.
+                var lush = Zone.biome == "verdant" ? art.grass.Select(m => new Material(m) { name = m.name + " (lush)", color = Color.Lerp(m.color, new Color(.3f, .62f, .22f), .55f), enableInstancing = true }).ToArray()
+                    : Zone.biome == "meadow" ? art.grass.Select(m => new Material(m) { name = m.name + " (meadow)", color = Color.Lerp(m.color, new Color(.34f, .6f, .2f), .4f), enableInstancing = true }).ToArray()
+                    : Zone.biome == "mountain" ? art.grass.Select(m => new Material(m) { name = m.name + " (alpine)", color = Color.Lerp(m.color, new Color(.3f, .5f, .25f), .35f), enableInstancing = true }).ToArray()
+                    : grass;
                 gameObject.AddComponent<GrassField>().Build(this, lush, Gloom ? null : art.flowers, Openness, Zone.seed + 99, Zone.biome == "meadow" ? 2.3f : Zone.biome == "verdant" ? 2.8f : 1.6f, TallGrassPatches(), tall, Gloom ? .8f : Zone.biome == "verdant" ? 1.25f : 1, Gloom ? .7f : 1);
             }
             Lap("grass");
@@ -439,6 +443,7 @@ namespace Crulanda.World
             // Green is held level with red so the rose light doesn't turn them mauve.
             if (gloom) { dirt = new Color(.235f, .23f, .205f); rut = new Color(.175f, .172f, .155f); }
             if (Zone.biome == "mountain") { dirt = new Color(.4f, .35f, .28f); rut = new Color(.31f, .27f, .21f); }   // yards and roads a shade darker in the hard light
+            if (Zone.biome == "meadow") { grassA = new Color(.22f, .40f, .16f); grassB = new Color(.35f, .47f, .19f); grassC = new Color(.50f, .44f, .20f); dirt = new Color(.49f, .39f, .25f); rut = new Color(.36f, .28f, .19f); }   // Oakhaven: fresh pasture green with late-summer gold patches; warm trodden earth
             bool verdant = Zone.biome == "verdant";
             if (verdant)
             {
@@ -495,7 +500,7 @@ namespace Crulanda.World
                         // A sixth darker again than step 2's (sunlit crags still read ~140 of 255 in the tour; the aim is 110-130).
                         Color rockC = Color.Lerp(new Color(.195f, .186f, .178f), new Color(.278f, .262f, .245f), n2) * shade;
                         Color scree = Color.Lerp(new Color(.288f, .262f, .22f), new Color(.346f, .312f, .262f), (n2 + n3) * .5f) * shade;
-                        Color alp = Color.Lerp(new Color(.27f, .31f, .18f), new Color(.38f, .36f, .22f), n1);
+                        Color alp = Color.Lerp(new Color(.24f, .36f, .17f), new Color(.38f, .41f, .2f), n1);
                         c = Color.Lerp(alp, Color.Lerp(scree, rockC, Mathf.Clamp01(steep * 1.4f + (n1 - .5f) * .8f)), rock) * (.91f + n3 * .12f);
                     }
                     else if (ashen)
@@ -813,11 +818,25 @@ namespace Crulanda.World
         }
 
         // ---------- props ----------
+        /// <summary>Dressed stone; falls back to natural stone until the art asset has been regenerated.</summary>
+        Material Masonry { get { return art.masonry != null ? art.masonry : art.stone; } }
         Material Tint(Material baseMat, Color color)
         {
             string key = baseMat.name + ColorUtility.ToHtmlStringRGB(color);
             if (!tints.TryGetValue(key, out var m)) { m = new Material(baseMat) { color = color, name = key }; tints[key] = m; }
             return m;
+        }
+        Material rockBase;
+        /// <summary>Natural rock in a zone's tint: the painted rock (world-projected strata, tops lit by biome), or plain stone if the art has none.</summary>
+        Material RockTint(Color color)
+        {
+            if (art.rock == null) return Tint(art.stone, color);
+            if (rockBase == null)
+            {
+                rockBase = new Material(art.rock) { name = "Painted rock " + Zone.biome };   // the biome in the name keeps Tint's key apart per zone
+                rockBase.SetVector("_Top", Zone.biome == "ash" || Gloom ? new Vector4(1.08f, 1.08f, 1.09f, 1) : Zone.biome == "mountain" ? new Vector4(1.08f, 1.06f, 1f, 1) : new Vector4(1.18f, 1.14f, 1.02f, 1));   // ash and gloom: neutral, grey stays grey; mountain: a small lift, the crag stays under the fog
+            }
+            return Tint(rockBase, color);
         }
         float R01 { get { return (float)rng.NextDouble(); } }
         Transform Root(ZoneProp p, Transform parent)
@@ -851,6 +870,12 @@ namespace Crulanda.World
             var o = new GameObject(mesh.name); o.transform.SetParent(parent, false); o.transform.localPosition = localPos;
             if (rot.HasValue) o.transform.localRotation = rot.Value;
             o.AddComponent<MeshFilter>().sharedMesh = mesh; o.AddComponent<MeshRenderer>().sharedMaterial = m; return o;
+        }
+        /// <summary>A box whose painted texture tiles per metre (walls, plinths, chimneys) and runs on unbroken from one box of a
+        /// building to the next; see <see cref="ZoneMeshes.Box"/>.</summary>
+        GameObject BoxPart(Transform parent, Vector3 localPos, Vector3 size, Material m, Quaternion? rot = null, float tile = 2)
+        {
+            return MeshPart(ZoneMeshes.Box(size, tile, localPos), parent, localPos, m, rot);
         }
         void Solid(Transform root, Vector3 center, Vector3 size)
         {
@@ -913,9 +938,9 @@ namespace Crulanda.World
                     case "grave": { float a = R01 * 8 - 4, b = R01 * 8 - 4; if (p.variant == 1) { a = Mathf.Sign(a) * (14 + Mathf.Abs(a) * 2); b *= 2; } Part(PrimitiveType.Cube, t, new Vector3(0, p.variant == 1 ? .36f : .46f, 0), new Vector3(.6f, 1, .15f), art.stone, Quaternion.Euler(a, 0, b)); break; }   // variant 1: heaved over and half sunk (the drowned graves)
                     case "rock":
                     {
-                        float s = 1 + p.variant * .6f; var stone = art.stone;
+                        float s = 1 + p.variant * .6f; var stone = RockTint(new Color(.52f, .51f, .48f));
                         // Mountains: a loose rock left on a face the crags raised rolls to flatter ground near by and sinks by the slope.
-                        if (Zone.biome == "mountain") { stone = Tint(art.stone, MountainStone); if (string.IsNullOrEmpty(p.interact)) { var spot = FlatterSpot(p.at, 1.2f * s); t.position = Ground(spot); SinkBySlope(t, spot, s); } }
+                        if (Zone.biome == "mountain") { stone = RockTint(MountainStone); if (string.IsNullOrEmpty(p.interact)) { var spot = FlatterSpot(p.at, 1.2f * s); t.position = Ground(spot); SinkBySlope(t, spot, s); } }
                         Lump(Boulder(), t, new Vector3(0, .3f * s, 0), new Vector3(2f * s, 1.3f * s, 1.7f * s), stone, R01 * 360); if (s > 1.3f) Lump(Boulder(), t, new Vector3(.7f * s, .15f * s, .5f * s), new Vector3(.9f * s, .6f * s, .8f * s), stone, R01 * 360); Solid(t, new Vector3(0, .5f * s, 0), new Vector3(1.6f * s, 1f * s, 1.4f * s)); break;
                     }
                     case "bridge": SeatBridge(t, p.size.x > 0 ? p.size.x : 12); if (p.variant == 1) RopeBridge(t, p.size.x > 0 ? p.size.x : 12); else Bridge(t, p.size.x > 0 ? p.size.x : 12); break;
@@ -1025,15 +1050,62 @@ namespace Crulanda.World
                         Debug.LogWarning(Zone.id + ": wall '" + p.name + "' runs through '" + (string.IsNullOrEmpty(h.name) ? h.kind : h.name) + "' at " + h.at + ".");
             }
         }
-        static readonly Color[] Plaster = { new Color(.78f, .72f, .60f), new Color(.70f, .66f, .58f), new Color(.74f, .64f, .52f) };
+        static readonly Color[] Plaster = { new Color(.88f, .82f, .68f), new Color(.8f, .76f, .66f), new Color(.86f, .72f, .54f) };
+        static readonly Color[] Shutter = { new Color(.3f, .38f, .3f), new Color(.42f, .28f, .18f), new Color(.32f, .3f, .4f) };
+        /// <summary>
+        /// The eaves of a gable roof (the painted style pass, 2026-10-01): a fascia board along each eave, rafter ends hung under
+        /// the soffit from the wall out to the fascia, and a ridge cap seated on the ridge. <paramref name="w"/> and
+        /// <paramref name="d"/> are the walls' footprint, <paramref name="top"/> the wall top (the roof's eave line); the roof
+        /// reaches .7 m past the walls front and back and its slab is .25 m thick.
+        /// </summary>
+        void Eaves(Transform t, float w, float d, float top, float roofH, Material roofMat)
+        {
+            var dark = Tint(art.timber, new Color(.26f, .17f, .11f));
+            int n = Mathf.Max(1, Mathf.FloorToInt((w - .5f) / .9f));
+            foreach (int sz in new[] { -1, 1 })
+            {
+                Part(PrimitiveType.Cube, t, new Vector3(0, top - .2f, sz * (d / 2 + .72f)), new Vector3(w + 1.3f, .38f, .1f), dark);   // fascia: top-.39 .. top-.01, over the eave edge and the rafter ends
+                for (int i = 0; i <= n; i++) Part(PrimitiveType.Cube, t, new Vector3((i - n / 2f) * .9f, top - .31f, sz * (d / 2 + .33f)), new Vector3(.12f, .14f, .7f), dark);   // rafter ends: top-.38 .. top-.24, 1 cm into the soffit (top-.25), from 2 cm inside the wall face to 1 cm into the fascia
+            }
+            float sag = roofH * .17f / (d / 2 + .7f);   // how far the slope has dropped at the cap's edge
+            Part(PrimitiveType.Cube, t, new Vector3(0, top + roofH + .05f - (sag + .07f) / 2, 0), new Vector3(w + 1.3f, sag + .07f, .34f), roofMat == art.slate ? dark : Tint(art.thatch, new Color(.6f, .48f, .26f)));   // ridge cap: its bottom edges sink 2 cm into the slopes
+        }
+        /// <summary>
+        /// A framed window on a wall: <paramref name="face"/> is the point on the OUTER WALL FACE at the window's centre and
+        /// <paramref name="sz"/> the way that face looks (+1 or -1 along z). Frame, sill and shutters are all set into the wall
+        /// by 1 to 2 cm. <paramref name="glass"/> is false where the wall already has its pane (the inn's passes through the wall).
+        /// </summary>
+        void Window(Transform t, Vector3 face, float wide, float high, int sz, int variant, bool shutters, bool glass = true)
+        {
+            var frame = Tint(art.timber, new Color(.24f, .16f, .1f));
+            var at = face + new Vector3(0, 0, sz * .05f);
+            if (glass) Part(PrimitiveType.Cube, t, at, new Vector3(wide, high, .08f), art.glass);   // face+.01 .. face+.09
+            foreach (int s in new[] { -1, 1 })
+            {
+                Part(PrimitiveType.Cube, t, at + new Vector3(0, s * (high / 2 + .04f), 0), new Vector3(wide + .16f, .08f, .14f), frame);   // face-.02 .. face+.12
+                Part(PrimitiveType.Cube, t, at + new Vector3(s * (wide / 2 + .04f), 0, 0), new Vector3(.08f, high, .14f), frame);
+            }
+            Part(PrimitiveType.Cube, t, face + new Vector3(0, -high / 2 - .1f, sz * .11f), new Vector3(wide + .3f, .08f, .26f), frame);   // the sill: face-.02 .. face+.24
+            if (shutters) foreach (int s in new[] { -1, 1 })
+                Part(PrimitiveType.Cube, t, face + new Vector3(s * (wide / 2 + .24f), 0, sz * .02f), new Vector3(.3f, high + .1f, .06f), Tint(art.timber, Shutter[Mathf.Abs(variant) % Shutter.Length]));   // on the wall: face-.01 .. face+.05, 1 cm clear of the frame
+        }
+        /// <summary>A plank door facing -z: the slab (returned), three plank seams, two iron bands and a ring, the iron set 5 mm into the planks.</summary>
+        GameObject PlankDoor(Transform t, Vector3 at, float wide, float high, Material planks, float thick = .06f)
+        {
+            var slab = Part(PrimitiveType.Cube, t, at, new Vector3(wide, high, thick), planks);
+            for (int i = -1; i <= 1; i++) Part(PrimitiveType.Cube, t, at + new Vector3(i * wide / 4, 0, -thick / 2 - .005f), new Vector3(.025f, high, .01f), Tint(art.timber, new Color(.1f, .07f, .05f)));
+            foreach (float y in new[] { -high * .28f, high * .25f }) Part(PrimitiveType.Cube, t, at + new Vector3(0, y, -thick / 2 - .01f), new Vector3(wide * .92f, .09f, .03f), art.metal);
+            Part(PrimitiveType.Cylinder, t, at + new Vector3(wide * .3f, -high * .05f, -thick / 2 - .01f), new Vector3(.14f, .015f, .14f), art.metal, Quaternion.Euler(90, 0, 0));   // the ring, between the bands
+            return slab;
+        }
         void House(Transform t, Vector2 size, float wallHeight, int variant, bool inn)
         {
             float w = size.x, d = size.y;
             var plaster = Tint(art.plaster, Plaster[Mathf.Abs(variant) % Plaster.Length]);
             var roofMat = variant % 2 == 0 ? art.thatch : art.slate;
             float drop = FootDrop(t, w + .3f, d + .3f);   // on a slope the plinth reaches down to the lowest ground under it
-            Part(PrimitiveType.Cube, t, new Vector3(0, .3f - drop / 2, 0), new Vector3(w + .3f, .6f + drop, d + .3f), art.stone);
-            Part(PrimitiveType.Cube, t, new Vector3(0, .6f + wallHeight / 2, 0), new Vector3(w, wallHeight, d), plaster);
+            BoxPart(t, new Vector3(0, .3f - drop / 2, 0), new Vector3(w + .3f, .6f + drop, d + .3f), Masonry, null, 1.5f);
+            BoxPart(t, new Vector3(0, .6f + wallHeight / 2, 0), new Vector3(w, wallHeight, d), plaster);
             // Timber framing: corner posts, a sill rail under the windows (a rail per storey on an inn) and a knee brace from each
             // corner post up to the first rail, so the door and windows sit in clear panels with nothing crossing them.
             float top = .6f + wallHeight;
@@ -1052,21 +1124,24 @@ namespace Crulanda.World
             // Door faces south (-Z). It stands on the ground in a timber frame in front of the plinth (which stops at the doorway)
             // instead of hanging on the wall above it. Warm windows either side and on the back.
             float foot = Mathf.Min(0, LocalGround(t, 0, -d / 2 - .19f)) - .05f;
-            Part(PrimitiveType.Cube, t, new Vector3(0, (foot + 2.7f) / 2, -d / 2 - .19f), new Vector3(1.2f, 2.7f - foot, .06f), Tint(art.timber, new Color(.22f, .14f, .09f)));
+            PlankDoor(t, new Vector3(0, (foot + 2.7f) / 2, -d / 2 - .19f), 1.2f, 2.7f - foot, Tint(art.timber, new Color(.3f, .2f, .12f)));
             foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(s * .68f, (foot + 2.86f) / 2, -d / 2 - .12f), new Vector3(.16f, 2.86f - foot, .24f), art.timber);
             Part(PrimitiveType.Cube, t, new Vector3(0, 2.78f, -d / 2 - .12f), new Vector3(1.52f, .16f, .24f), art.timber);
             if (!inn) Doors.Add(new ZoneDoor { name = t.name, openable = false, position = t.TransformPoint(new Vector3(0, 1, -d / 2 - .1f)) });
             for (float x = -w / 2 + 1.4f; x < w / 2 - .8f; x += 2.6f)
             {
                 if (Mathf.Abs(x) < 1.2f) continue;
+                // Shutters only where they clear the corner post (inner face at w/2 - .15) and, on the door's wall, the door jamb (outer edge at .76).
                 foreach (int sz in new[] { -1, 1 })
-                    Part(PrimitiveType.Cube, t, new Vector3(x, .6f + wallHeight * (inn ? .3f : .55f), sz * (d / 2 + .05f)), new Vector3(.8f, .7f, .08f), art.glass);
+                    Window(t, new Vector3(x, .6f + wallHeight * (inn ? .3f : .55f), sz * d / 2), .8f, .7f, sz, variant, Mathf.Abs(x) + .79f <= w / 2 - .15f && (sz > 0 || Mathf.Abs(x) - .79f >= .78f));
                 if (inn) foreach (int sz in new[] { -1, 1 })
-                    Part(PrimitiveType.Cube, t, new Vector3(x, .6f + wallHeight * .78f, sz * (d / 2 + .05f)), new Vector3(.8f, .7f, .08f), art.glass);
+                    Window(t, new Vector3(x, .6f + wallHeight * .78f, sz * d / 2), .8f, .7f, sz, variant, false);
             }
             float roofH = Mathf.Max(2.2f, d * .55f);
             MeshPart(ZoneMeshes.GableRoof(w + 1.2f, d + 1.4f, roofH), t, new Vector3(0, top, 0), roofMat);
-            Part(PrimitiveType.Cube, t, new Vector3(w / 2 - 1.1f, top + roofH * .75f, d * .15f), new Vector3(.9f, roofH * 1.1f, .9f), art.stone);
+            Eaves(t, w, d, top, roofH, roofMat);
+            BoxPart(t, new Vector3(w / 2 - 1.1f, top + roofH * .75f, d * .15f), new Vector3(.9f, roofH * 1.1f, .9f), Masonry, null, 1);
+            BoxPart(t, new Vector3(w / 2 - 1.1f, top + roofH * 1.3f + .04f, d * .15f), new Vector3(1.1f, .12f, 1.1f), Tint(Masonry, new Color(.45f, .44f, .4f)), null, 1);   // the chimney's cap, 2 cm down over the stack
             if (art.particle != null) Smoke(t, new Vector3(w / 2 - 1.1f, top + roofH * 1.35f, d * .15f));
             if (inn)
             {
@@ -1094,7 +1169,7 @@ namespace Crulanda.World
             var dark = Tint(art.timber, new Color(.2f, .13f, .08f));
             GameObject WallPiece(Vector3 pos, Vector3 scale)
             {
-                var o = Part(PrimitiveType.Cube, t, pos, scale, plaster);
+                var o = BoxPart(t, pos, scale, plaster);
                 o.AddComponent<BoxCollider>(); o.AddComponent<NavBlocker>(); return o;
             }
             // Floor, skirting and walls.
@@ -1107,10 +1182,10 @@ namespace Crulanda.World
             foreach (int sx in new[] { -1, 1 }) foreach (int sz in new[] { -1, 1 })
                 Part(PrimitiveType.Cube, t, new Vector3(sx * w / 2, H / 2, sz * d / 2), new Vector3(.34f, H, .34f), art.timber);
             // Stone footing strips hug the outside of the walls only (the floor inside stays level with the ground).
-            var footing = Tint(art.stone, new Color(.45f, .44f, .41f));
-            foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(s * (w / 2 + .12f), .15f, 0), new Vector3(.25f, .3f, d + .5f), footing);
-            Part(PrimitiveType.Cube, t, new Vector3(0, .15f, d / 2 + .12f), new Vector3(w + .5f, .3f, .25f), footing);
-            foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(s * (doorW / 2 + side / 2 + .1f), .15f, -d / 2 - .12f), new Vector3(side + .3f, .3f, .25f), footing);
+            var footing = Tint(Masonry, new Color(.5f, .48f, .44f));
+            foreach (int s in new[] { -1, 1 }) BoxPart(t, new Vector3(s * (w / 2 + .12f), .15f, 0), new Vector3(.25f, .3f, d + .5f), footing, null, 1.5f);
+            BoxPart(t, new Vector3(0, .15f, d / 2 + .12f), new Vector3(w + .5f, .3f, .25f), footing, null, 1.5f);
+            foreach (int s in new[] { -1, 1 }) BoxPart(t, new Vector3(s * (doorW / 2 + side / 2 + .1f), .15f, -d / 2 - .12f), new Vector3(side + .3f, .3f, .25f), footing, null, 1.5f);
             // Storey line and braces outside; the floor above is a closed ceiling inside.
             foreach (int sz in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(0, storey, sz * (d / 2 + .02f)), new Vector3(w, .22f, wall + .1f), art.timber);
             foreach (int sx in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(sx * (w / 2 + .02f), storey, 0), new Vector3(wall + .1f, .22f, d), art.timber);
@@ -1130,16 +1205,24 @@ namespace Crulanda.World
                     if (sz < 0 && Mathf.Abs(x) < doorW) continue;
                     Part(PrimitiveType.Cube, t, new Vector3(x, 1.5f, sz * d / 2), new Vector3(.9f, .8f, wall + .1f), art.glass);
                     Part(PrimitiveType.Cube, t, new Vector3(x, storey + 1.3f, sz * d / 2), new Vector3(.8f, .7f, wall + .1f), art.glass);
+                    // Frames and sills round that glass on the outer wall face; shutters downstairs where they clear the corner post (inner face at w/2 - .17) and the door opening.
+                    Window(t, new Vector3(x, 1.5f, sz * (d / 2 + wall / 2)), .9f, .8f, sz, variant, Mathf.Abs(x) + .84f <= w / 2 - .17f && (sz > 0 || Mathf.Abs(x) - .84f >= doorW / 2 + .05f), false);
+                    Window(t, new Vector3(x, storey + 1.3f, sz * (d / 2 + wall / 2)), .8f, .7f, sz, variant, false, false);
                 }
             float roofH = Mathf.Max(2.4f, d * .5f);
             MeshPart(ZoneMeshes.GableRoof(w + 1.2f, d + 1.4f, roofH), t, new Vector3(0, H, 0), variant % 2 == 0 ? art.thatch : art.slate);
+            Eaves(t, w, d, H, roofH, variant % 2 == 0 ? art.thatch : art.slate);
             if (variant == 1) CrackedHearth(t, w, H, roofH);   // the Cracked Hearth: its chimney breast split, the fire showing through
-            else Part(PrimitiveType.Cube, t, new Vector3(w / 2 - 1.1f, H + roofH * .75f, d * .15f), new Vector3(1, roofH * 1.1f, 1), art.stone);
+            else
+            {
+                BoxPart(t, new Vector3(w / 2 - 1.1f, H + roofH * .75f, d * .15f), new Vector3(1, roofH * 1.1f, 1), Masonry, null, 1);
+                BoxPart(t, new Vector3(w / 2 - 1.1f, H + roofH * 1.3f + .04f, d * .15f), new Vector3(1.2f, .12f, 1.2f), Tint(Masonry, new Color(.45f, .44f, .4f)), null, 1);   // its cap
+            }
             // The door: a plank door on a hinge at the left jamb, plus a stone step.
             var hinge = new GameObject("Door hinge").transform; hinge.SetParent(t, false); hinge.localPosition = new Vector3(-doorW / 2, 0, -d / 2 - .02f);
-            var door = Part(PrimitiveType.Cube, hinge, new Vector3(doorW / 2, doorH / 2, 0), new Vector3(doorW, doorH, .1f), dark);
+            var door = PlankDoor(hinge, new Vector3(doorW / 2, doorH / 2, 0), doorW, doorH, dark, .1f);
             var doorCollider = door.AddComponent<BoxCollider>();
-            Part(PrimitiveType.Cube, t, new Vector3(0, .06f, -d / 2 - .55f), new Vector3(2, .12f, .8f), art.stone);
+            BoxPart(t, new Vector3(0, .06f, -d / 2 - .55f), new Vector3(2, .12f, .8f), Masonry, null, 1);
             var innDoor = new ZoneDoor { name = t.name, openable = true, hinge = hinge, blocker = doorCollider, position = t.TransformPoint(new Vector3(0, 1, -d / 2)) };
             Doors.Add(innDoor); innDoor.SetOpen(true);   // the inn keeps its door open; villagers come and go
             if (art.particle != null && variant != 1) Smoke(t, new Vector3(w / 2 - 1.1f, H + roofH * 1.4f, d * .15f));
@@ -1159,7 +1242,7 @@ namespace Crulanda.World
                 }
                 Part(PrimitiveType.Cylinder, t, new Vector3(at.x, .88f, at.y), new Vector3(.12f, .08f, .12f), art.glass);   // candle
             }
-            var hearth = Part(PrimitiveType.Cube, t, new Vector3(w / 2 - .6f, 1, .8f), new Vector3(.9f, 2, 2.4f), art.stone);
+            var hearth = BoxPart(t, new Vector3(w / 2 - .6f, 1, .8f), new Vector3(.9f, 2, 2.4f), Masonry, null, 1);
             hearth.AddComponent<BoxCollider>(); hearth.AddComponent<NavBlocker>();
             Part(PrimitiveType.Cube, t, new Vector3(w / 2 - 1.02f, .55f, .8f), new Vector3(.1f, .8f, 1.4f), art.glass);   // embers
             var fire = new GameObject("Hearth fire").AddComponent<Light>(); fire.transform.SetParent(t, false);
@@ -1212,9 +1295,9 @@ namespace Crulanda.World
         void Barn(Transform t, Vector2 size)
         {
             float w = size.x, d = size.y, h = 4.2f;
-            var boards = Tint(art.timber, new Color(.36f, .22f, .15f));
-            Part(PrimitiveType.Cube, t, new Vector3(0, h / 2, 0), new Vector3(w, h, d), boards);
-            float drop = FootDrop(t, w, d); if (drop > 0) Part(PrimitiveType.Cube, t, new Vector3(0, .1f - drop / 2, 0), new Vector3(w + .2f, drop + .2f, d + .2f), art.stone);   // stone footing on a slope
+            var boards = Tint(art.timber, new Color(.4f, .25f, .16f));
+            BoxPart(t, new Vector3(0, h / 2, 0), new Vector3(w, h, d), boards);
+            float drop = FootDrop(t, w, d); if (drop > 0) BoxPart(t, new Vector3(0, .1f - drop / 2, 0), new Vector3(w + .2f, drop + .2f, d + .2f), Masonry, null, 1.5f);   // stone footing on a slope
             for (float x = -w / 2; x <= w / 2 + .01f; x += 1.2f)
                 foreach (int sz in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(x, h / 2, sz * (d / 2 + .04f)), new Vector3(.12f, h, .08f), art.timber);
             Part(PrimitiveType.Cube, t, new Vector3(0, 1.6f, -d / 2 - .07f), new Vector3(3.2f, 3.2f, .1f), Tint(art.timber, new Color(.18f, .12f, .09f)));
@@ -1222,6 +1305,7 @@ namespace Crulanda.World
             Part(PrimitiveType.Cube, t, new Vector3(0, 1.6f, -d / 2 - .12f), new Vector3(3.3f, .2f, .06f), art.timber, Quaternion.Euler(0, 0, -44));
             float roofH = d * .5f;
             MeshPart(ZoneMeshes.GableRoof(w + 1, d + 1.4f, roofH), t, new Vector3(0, h, 0), art.thatch);
+            Eaves(t, w - .2f, d, h, roofH, art.thatch);   // the barn's roof is 1 m wider than its walls, not 1.2
             Solid(t, new Vector3(0, (h + roofH) / 2, 0), new Vector3(w + .3f, h + roofH, d + .3f));
         }
         void Well(Transform t, int variant = 0)
@@ -2033,7 +2117,7 @@ namespace Crulanda.World
         /// </summary>
         void Cliff(Transform t, float length, float lift = 0)
         {
-            var stone = Tint(art.stone, Zone.biome == "ash" ? new Color(.37f, .365f, .37f) : Zone.biome == "mountain" ? new Color(.35f, .335f, .31f) : new Color(.4f, .38f, .35f));   // ash: grey, not sandstone; mountain: darker, so a sunlit crag stays under the fog
+            var stone = RockTint(Zone.biome == "ash" ? new Color(.37f, .365f, .37f) : Zone.biome == "mountain" ? new Color(.35f, .335f, .31f) : new Color(.4f, .38f, .35f));   // ash: grey, not sandstone; mountain: darker, so a sunlit crag stays under the fog
             bool seat = Zone.biome == "mountain"; float side = Mathf.Sign(lift), rise = Mathf.Abs(lift), low = 0;
             float Y(float x, float z) { var w = t.TransformPoint(new Vector3(x, 0, z)); return HeightAt(w.x, w.z) - t.position.y; }
             var own = new System.Random(Zone.seed ^ (Mathf.RoundToInt(t.position.x * 8) * 73856093) ^ (Mathf.RoundToInt(t.position.z * 8) * 19349663)); float O() { return (float)own.NextDouble(); }
@@ -2715,7 +2799,7 @@ namespace Crulanda.World
         /// </summary>
         void Perch(Transform t, float radius)
         {
-            var mat = Tint(art.stone, Zone.biome == "mountain" ? MountainStone : new Color(.42f, .41f, .39f));   // the boulders' stone (EdgeRock)
+            var mat = RockTint(Zone.biome == "mountain" ? MountainStone : new Color(.42f, .41f, .39f));   // the boulders' stone (EdgeRock)
             for (float a = R01 * 10; a < 360; a += 18 + R01 * 10)
             {
                 if (Mathf.Abs(Mathf.DeltaAngle(a, 180)) < 38) continue;   // the way up
@@ -2735,7 +2819,7 @@ namespace Crulanda.World
             // The pools are wet mud: dark, smooth and a little glossy (a plain Standard material, no grain), so they catch the
             // sky as a sheen instead of reading as a flat grey shape.
             var pool = new Material(art.metal) { name = "Wallow pool", color = new Color(.15f, .115f, .08f) }; pool.SetFloat("_Metallic", 0); pool.SetFloat("_Glossiness", .8f);
-            var mud = Tint(art.soil, new Color(.22f, .17f, .12f)); var wet = Tint(art.soil, new Color(.16f, .12f, .085f)); var stone = Tint(art.stone, new Color(.42f, .4f, .37f));
+            var mud = Tint(art.soil, new Color(.22f, .17f, .12f)); var wet = Tint(art.soil, new Color(.16f, .12f, .085f)); var stone = RockTint(new Color(.42f, .4f, .37f));
             for (int i = 0; i < 6; i++)
             {
                 float a = i * 60 + R01 * 40, r = i == 0 ? R01 : radius * (.3f + R01 * .35f), s = i == 0 ? radius * .95f : radius * (.3f + R01 * .25f);
@@ -2769,7 +2853,7 @@ namespace Crulanda.World
         void Cave(Transform t, float length)
         {
             float H = 10, D = 7;
-            var rock = Tint(art.stone, new Color(.37f, .365f, .37f)); var dark = Tint(art.stone, new Color(.035f, .03f, .03f)); var salt = Tint(art.stone, new Color(.94f, .94f, .91f));   // rock: the ash cliffs' grey, so the face runs on into the Ridge
+            var rock = RockTint(new Color(.37f, .365f, .37f)); var dark = Tint(art.stone, new Color(.035f, .03f, .03f)); var salt = Tint(art.stone, new Color(.94f, .94f, .91f));   // rock: the ash cliffs' grey, so the face runs on into the Ridge
             var hide = Tint(art.cloth, new Color(.56f, .43f, .29f)); var hide2 = Tint(art.cloth, new Color(.67f, .55f, .39f));
             var mouths = new[] { new Vector3(0, 4.2f, 4.6f), new Vector3(-length * .32f, 2.4f, 3), new Vector3(length * .3f, 2.4f, 2.8f) };   // (x, width, height)
             float Floor(float at) { var w = t.TransformPoint(new Vector3(at, 0, 0)); return HeightAt(w.x, w.z) - t.position.y; }
@@ -2884,7 +2968,7 @@ namespace Crulanda.World
             bool roots = variant == 1;   // the Root-Mother's Deep: earth and root, not rock; sap-light, not torches
             // The shell's outside is the hillside's rock: dark and mossed in a meadow (it is dug into a brow), the zone's stone elsewhere.
             var rock = roots ? Tint(art.bark, new Color(.3f, .24f, .16f)) : Tint(art.stone, new Color(.42f, .39f, .35f));
-            var knoll = roots ? Tint(art.soil, new Color(.24f, .2f, .13f)) : Tint(art.stone, Zone.biome == "meadow" ? new Color(.33f, .34f, .29f) : new Color(.46f, .44f, .41f));
+            var knoll = roots ? Tint(art.soil, new Color(.24f, .2f, .13f)) : RockTint(Zone.biome == "meadow" ? new Color(.33f, .34f, .29f) : new Color(.46f, .44f, .41f));
             int n = h.Centre.Count; const int K = 14; int P = K + 3;
             var c = new Vector3[n]; var right = new Vector3[n];
             for (int i = 0; i < n; i++) c[i] = t.InverseTransformPoint(h.Centre[i]);
@@ -3027,7 +3111,7 @@ namespace Crulanda.World
                     if (keep < .75f && Clear(at, fx * .36f)) { Heap(at, new Vector3(fx, fy, fz), yaw + (R01 - .5f) * 14, true); foot.Add((at, right[i] * side * fx * .55f)); }
                 }
             }
-            var loose = Tint(art.stone, new Color(.4f, .38f, .35f));
+            var loose = RockTint(new Color(.4f, .38f, .35f));
             foreach (var (at, out1) in foot)   // loose rock round the knoll's foot, sunk (no colliders)
             {
                 var p = at + out1 * (1.2f + R01 * .8f); float size = .45f + R01 * .7f;
@@ -3566,7 +3650,7 @@ namespace Crulanda.World
                     case "vista":
                         if (scene == "beacon") SecretBeacon(t, R);
                         else if (scene == "salt") SecretSaltLine(t, R);
-                        else if (scene == "cairn") SecretCairn(t, R, Zone.wasting != null && Unmade(at.x, at.y) > .2f ? Tint(art.stone, new Color(.6f, .6f, .62f)) : null);   // in the grey, its top stone greyed too
+                        else if (scene == "cairn") SecretCairn(t, R, Zone.wasting != null && Unmade(at.x, at.y) > .2f ? RockTint(new Color(.6f, .6f, .62f)) : null);   // in the grey, its top stone greyed too
                         break;
                     case "cache":
                         if (Says("bundle", "oilcloth", "sack", "pack")) SecretBundle(item, R, Says("salt"));
@@ -3634,7 +3718,7 @@ namespace Crulanda.World
         Material SecretStone(float shade = 1)
         {
             var c = Zone.biome == "ash" ? new Color(.35f, .34f, .33f) : Zone.biome == "mountain" ? MountainStone : Gloom ? new Color(.39f, .38f, .37f) : new Color(.46f, .45f, .42f);
-            return Tint(art.stone, c * shade);
+            return RockTint(c * shade);
         }
         /// <summary>A small bright fleck where metal catches the light: enough to catch a curious eye, nowhere near a marker's glow.</summary>
         void Glint(Transform t, Vector3 at, float size = .02f) { Part(PrimitiveType.Sphere, t, at, Vector3.one * size, Glowing(new Color(1, .94f, .8f), .55f)).name = "Glint"; }
@@ -3773,7 +3857,7 @@ namespace Crulanda.World
         /// <summary>An old beacon: a ring of fire-cracked stones round a charred patch with burnt-out stubs, a standing stone behind it.</summary>
         void SecretBeacon(Transform t, Func<float> R)
         {
-            var soot = Tint(art.stone, new Color(.16f, .15f, .14f)); var burnt = Tint(art.stone, new Color(.28f, .26f, .24f)); var coal = Tint(art.timber, new Color(.07f, .06f, .05f));
+            var soot = Tint(art.stone, new Color(.16f, .15f, .14f)); var burnt = RockTint(new Color(.28f, .26f, .24f)); var coal = Tint(art.timber, new Color(.07f, .06f, .05f));
             float g = LocalGround(t, 0, 0);
             Part(PrimitiveType.Cylinder, t, new Vector3(0, g + .006f, 0), new Vector3(1.5f, .01f, 1.5f), soot);
             for (int k = 0; k < 7; k++)
@@ -3928,7 +4012,7 @@ namespace Crulanda.World
             if (Zone.biome == "mountain" && Steep(at, s) > 1) return;   // steeper than 45 degrees across it
             if (Hollow.CoverAt(at, 2) > 0) return;   // or in a cave
             var t = Root(new ZoneProp { kind = "rock", at = at, rotation = yaw }, statics);
-            var mat = Tint(art.stone, Zone.biome == "ash" ? new Color(.33f, .32f, .31f) : Zone.biome == "mountain" ? MountainStone : new Color(.42f, .41f, .39f));
+            var mat = RockTint(Zone.biome == "ash" ? new Color(.33f, .32f, .31f) : Zone.biome == "mountain" ? MountainStone : new Color(.42f, .41f, .39f));
             if (Zone.biome == "mountain") SinkBySlope(t, at, s);
             Lump(b0, t, new Vector3(0, .45f * s, 0), new Vector3(2.1f * s, 1.5f * s, 1.8f * s), mat, y0);
             Lump(b1, t, new Vector3(.8f * s, .25f * s, .45f * s), new Vector3(1.2f * s, .9f * s, 1.1f * s), mat, y1);
@@ -4090,7 +4174,8 @@ namespace Crulanda.World
             if (dead + pines + leafy <= 0) pines = 1;
             var spire = ZoneMeshes.Cone(1, 1, 6); var crown = ZoneMeshes.Blob(Zone.seed + 910, .55f, false, 5, 7); var crag = ZoneMeshes.Blob(Zone.seed + 920, 1.1f, true, 8, 12);
             var pineMat = Tint(art.pine, Wither(new Color(.16f, .23f, .16f))); var deadMat = Tint(art.bark, Gloom ? new Color(.55f, .54f, .53f) : new Color(.26f, .24f, .22f));   // gloom: the grey wood carries on
-            var rockMat = Tint(art.stone, ash ? new Color(.36f, .355f, .36f) : mountain ? MountainStone : new Color(.40f, .39f, .38f));
+            var rockMat = RockTint(ash ? new Color(.36f, .355f, .36f) : mountain ? MountainStone : new Color(.40f, .39f, .38f));
+            if (rockMat.HasProperty("_Scale")) { rockMat = new Material(rockMat) { name = "Backdrop rock" }; rockMat.SetFloat("_Scale", 22); }   // painted rock: 22 m a tile (beds of 2.6 to 5.7 m), so the strata still read from the zone; its own clone, the near boulders keep 5 m
             var parts = new Dictionary<(Material, int), List<CombineInstance>>();
             // The wood silhouettes' painted leaf cards (the zone's own Crulanda/Leaf materials), one card mesh per material and side,
             // so a far ridge is ragged leaf and needle like the near trees, not blobs and cones beside them; the blobs and cones when

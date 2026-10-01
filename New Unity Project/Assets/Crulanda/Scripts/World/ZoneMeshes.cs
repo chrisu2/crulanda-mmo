@@ -23,10 +23,42 @@ namespace Crulanda.World
             Quad(v, t, aL + d, aL, aR, aR + d); Quad(v, t, bR + d, bR, bL, bL + d); // eave edges
             Quad(v, t, aR + d, aR, bR, bR + d); Quad(v, t, bL + d, bL, aL, aL + d); // slab ends under the gables (left open, the eave slab read as a loose board)
             var m = Build("Gable roof", v, t);
-            // Planar UVs in metres (x along the ridge, distance up the slope) so thatch/slate textures tile at a steady scale.
+            // UVs in metres, 2.5 m a tile. The two slopes (the first eight vertices): x along the ridge, the true distance up the
+            // slope from the eave (|z| + y hardly changes up a 45 degree roof, which smeared one row of thatch over the whole slope).
+            // The rest (underside, gable ends, edges): flat, across and up.
+            float slope = Mathf.Sqrt(hd * hd + height * height);
             var uv = new List<Vector2>();
-            foreach (var p in v) uv.Add(new Vector2(p.x / 2.5f, (Mathf.Abs(p.z) + p.y) / 2.5f));
+            for (int i = 0; i < v.Count; i++)
+            {
+                var p = v[i];
+                uv.Add(i < 8 ? new Vector2(p.x / 2.5f, p.y / height * slope / 2.5f) : new Vector2((p.x + p.z) / 2.5f, p.y / 2.5f));
+            }
             m.SetUVs(0, uv); return m;
+        }
+        /// <summary>
+        /// A box with planar UVs in metres on every face (<paramref name="tile"/> metres a tile), so a painted wall texture holds
+        /// its scale on any size of wall. On the four sides u runs left to right seen from outside and v runs up; the top and
+        /// bottom use (x, z). Centred like a cube primitive. <paramref name="origin"/> is where the box sits in its building, so
+        /// the texture runs on unbroken from one box to the next on the same wall; without it the texture starts at the box's
+        /// own corner and foot.
+        /// </summary>
+        public static Mesh Box(Vector3 size, float tile = 2, Vector3? origin = null)
+        {
+            var v = new List<Vector3>(); var t = new List<int>(); var uv = new List<Vector2>();
+            float hx = size.x / 2, hy = size.y / 2, hz = size.z / 2; var o = origin ?? new Vector3(hx, hy, hz);
+            void Face(Vector3 a, Vector3 b, Vector3 c, Vector3 d, Func<Vector3, Vector2> map)
+            {
+                Quad(v, t, a, b, c, d);
+                foreach (var p in new[] { a, b, c, d }) uv.Add(map(p + o) / tile);
+            }
+            // Each face is wound clockwise seen from outside, like the roof's quads: -z, +z, +x, -x, top, bottom.
+            Face(new Vector3(-hx, -hy, -hz), new Vector3(-hx, hy, -hz), new Vector3(hx, hy, -hz), new Vector3(hx, -hy, -hz), p => new Vector2(p.x, p.y));
+            Face(new Vector3(hx, -hy, hz), new Vector3(hx, hy, hz), new Vector3(-hx, hy, hz), new Vector3(-hx, -hy, hz), p => new Vector2(-p.x, p.y));
+            Face(new Vector3(hx, -hy, -hz), new Vector3(hx, hy, -hz), new Vector3(hx, hy, hz), new Vector3(hx, -hy, hz), p => new Vector2(p.z, p.y));
+            Face(new Vector3(-hx, -hy, hz), new Vector3(-hx, hy, hz), new Vector3(-hx, hy, -hz), new Vector3(-hx, -hy, -hz), p => new Vector2(-p.z, p.y));
+            Face(new Vector3(-hx, hy, -hz), new Vector3(-hx, hy, hz), new Vector3(hx, hy, hz), new Vector3(hx, hy, -hz), p => new Vector2(p.x, p.z));
+            Face(new Vector3(-hx, -hy, hz), new Vector3(-hx, -hy, -hz), new Vector3(hx, -hy, -hz), new Vector3(hx, -hy, hz), p => new Vector2(p.x, p.z));
+            var m = Build("Box", v, t); m.SetUVs(0, uv); return m;
         }
         /// <summary>Upright cone with its base centred at the origin.</summary>
         public static Mesh Cone(float radius, float height, int sides = 10)

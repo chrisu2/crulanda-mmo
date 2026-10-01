@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Water surface
+  m_Shader: {fileID: 4800000, guid: 4e730fad8e8c47079892e349cf3538d1, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _Normal:
+        m_Texture: {fileID: 2800000, guid: 7a78f20d3f521f34a9d5b72856f9deb2, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _Bump: 0.22
+    - _DeepDepth: 2.2
+    - _FlowSpeed: 0.35
+    - _FoamWaves: 0.7
+    - _FoamWidth: 0.14
+    - _Glare: 1.2
+    - _Glow: 0.75
+    - _MidDepth: 0.55
+    - _Murk: 1.1
+    - _Refract: 0.015
+    - _SkyTint: 0.35
+    - _Sparkle: 1
+    - _Wave: 0.025
+    m_Colors:
+    - _BedTint: {r: 0.82, g: 1, b: 1, a: 1}
+    - _DeepColor: {r: 0.03, g: 0.28, b: 0.44, a: 1}
+    - _Drift: {r: 0.012, g: 0.007, b: -0.009, a: 0.011}
+    - _FoamColor: {r: 0.84, g: 0.92, b: 0.91, a: 0.85}
+    - _MidColor: {r: 0.12, g: 0.62, b: 0.66, a: 1}
+    - _ShallowColor: {r: 0.38, g: 0.92, b: 0.84, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1

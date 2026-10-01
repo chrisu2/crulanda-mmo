@@ -37,14 +37,14 @@
   "lighting": {
     "sunPitch": 16,
     "sunYaw": -48,
-    "sunIntensity": 0.9,
+    "sunIntensity": 1.0,
     "sunColor": "#D8D0C6",
-    "ambientSky": "#7C7B82",
-    "ambientEquator": "#69676C",
-    "ambientGround": "#2D2B2D",
+    "ambientSky": "#72717C",
+    "ambientEquator": "#5E5C64",
+    "ambientGround": "#262428",
     "fogColor": "#A3A1A8",
-    "fogStart": 16,
-    "fogEnd": 90,
+    "fogStart": 22,
+    "fogEnd": 105,
     "skyTint": "#9987A1"
   },
   "spawns": {

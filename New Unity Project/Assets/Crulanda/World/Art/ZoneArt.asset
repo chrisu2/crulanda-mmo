@@ -40,3 +40,20 @@ MonoBehaviour:
   - {fileID: 2100000, guid: a7b450e64624d694eaf7dcd24f088746, type: 2}
   - {fileID: 2100000, guid: 0fd3f0de0799b3d428f9fe2423dcb145, type: 2}
   worldMap: {fileID: 2800000, guid: bef170c91001ac948859ea63adef4f26, type: 3}
+  waterSurface: {fileID: 2100000, guid: d497030bcde004048bcc9b2eaf6e346d, type: 2}
+  leaf: {fileID: 2100000, guid: b43f945fbf47b054d8217a6594ebcecf, type: 2}
+  ashFlake: {fileID: 2100000, guid: adce831cd7d23c845bdea3c41666b622, type: 2}
+  splash: {fileID: 2100000, guid: a82cccc446663624eb37e1e05e5787f1, type: 2}
+  post: {fileID: 2100000, guid: 6bfd0d6994fe8214aa669d1ece0c6f21, type: 2}
+  fade: {fileID: 2100000, guid: 175e4527bad24a4459ae1de162fd55d2, type: 2}
+  leafCards:
+  - {fileID: 2100000, guid: 397ea7419331f7f4c98e0d55f5451a96, type: 2}
+  - {fileID: 2100000, guid: d8d41e66c64d06e4b86eeb31f30e6b0a, type: 2}
+  - {fileID: 2100000, guid: 4d41ff0a3af10814d96526d7f8371cf3, type: 2}
+  pineBough: {fileID: 2100000, guid: 67057a5e69b0a38439d5002b08844a18, type: 2}
+  clouds: {fileID: 2100000, guid: 4e9633a3a61da3d408c652dcab5d2c5d, type: 2}
+  fern: {fileID: 2100000, guid: ce916b86aabfa7e4a8d028d23ebf5de1, type: 2}
+  broadLeaf: {fileID: 2100000, guid: ecbe72c262b8cd443b7b675c99ec1598, type: 2}
+  reeds: {fileID: 2100000, guid: 7ab4ea9e091fd9744a2c4e00d892173d, type: 2}
+  masonry: {fileID: 2100000, guid: 590c99275cc52374da64dc1f325ed464, type: 2}
+  rock: {fileID: 2100000, guid: 0e3275c6966553a4f89cddb0a7d4881e, type: 2}

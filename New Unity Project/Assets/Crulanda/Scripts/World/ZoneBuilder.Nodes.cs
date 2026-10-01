@@ -147,8 +147,9 @@ namespace Crulanda.World
         /// <summary>
         /// An ore seam: an outcrop of the crags' stone about a metre high, leaning back, a shoulder each side (the right one stained
         /// the ore's colour), sunk into the lowest ground under it; on its front (-Z) the seam (child "full", returned): veins of ore
-        /// lumps, crystal shards standing out of the face, flecks, and broken ore at the foot. Rich: a third larger, with more ore.
-        /// Loose stone lies round the foot. No colliders. Draws only from R.
+        /// lumps set half into the rock's face (found from the lumps' own vertices, so none floats off a hollow in it), crystal shards
+        /// standing out of it, flecks, and broken ore at the foot. Rich: a third larger, with more ore. Loose stone lies round the
+        /// foot. No colliders. Draws only from R.
         /// </summary>
         Transform OreSeam(Transform t, int variant, bool rich, Func<float> R, Func<float, float, float> G)
         {
@@ -156,15 +157,27 @@ namespace Crulanda.World
             var stone = RockTint(Zone.biome == "ash" ? new Color(.37f, .365f, .37f) : Zone.biome == "mountain" ? new Color(.35f, .335f, .31f) : new Color(.4f, .38f, .35f));   // the crags' stone
             var look = OreLooks[Mathf.Clamp(variant, 0, OreLooks.Length - 1)];
             var stain = RockTint(look.stain); var ore = Tint(art.metal, look.ore); var fleck = look.glow > 0 ? Glowing(look.fleck, look.glow) : Tint(art.metal, look.fleck);
-            // A crag lump w x h x d with its flat base a quarter of its height under the lowest ground beneath it, leaning back.
-            void Rock(Transform parent, float x, float z, float w, float h, float d, Material m, float lean, float yaw)
+            // A crag lump w x h x d with its flat base a quarter of its height under the lowest ground beneath it, leaning back. Its
+            // vertices (in the seam's frame) are kept, so the ore can be set into the rock's real face.
+            var rock = new List<Vector3>();
+            void Rock(float x, float z, float w, float h, float d, Material m, float lean, float yaw)
             {
                 float low = Mathf.Min(G(x, z), Mathf.Min(G(x - w * .4f, z - d * .4f), Mathf.Min(G(x + w * .4f, z - d * .4f), G(x, z + d * .4f))));
-                MeshPart(CragRock((int)(R() * 6)), parent, new Vector3(x, low - h * .25f + .2f * h, z), m, Quaternion.Euler(lean, yaw, (R() - .5f) * 8)).transform.localScale = new Vector3(w, h, d);
+                var lump = MeshPart(CragRock((int)(R() * 6)), t, new Vector3(x, low - h * .25f + .2f * h, z), m, Quaternion.Euler(lean, yaw, (R() - .5f) * 8)).transform;
+                lump.localScale = new Vector3(w, h, d);
+                var to = Matrix4x4.TRS(lump.localPosition, lump.localRotation, lump.localScale);
+                foreach (var v in lump.GetComponent<MeshFilter>().sharedMesh.vertices) rock.Add(to.MultiplyPoint3x4(v));
             }
-            Rock(t, 0, .5f * s, 2.1f * s, 2f * s, 1.6f * s, stone, 5 + R() * 6, (R() - .5f) * 20);
-            Rock(t, -1.05f * s, .7f * s, 1.25f * s, 1.3f * s, 1.15f * s, stone, 4 + R() * 8, 20 + R() * 30);
-            Rock(t, 1.05f * s, .55f * s, 1.1f * s, 1.05f * s, 1.05f * s, stain, R() * 10, -20 - R() * 30);
+            Rock(0, .5f * s, 2.1f * s, 2f * s, 1.6f * s, stone, 5 + R() * 6, (R() - .5f) * 20);
+            Rock(-1.05f * s, .7f * s, 1.25f * s, 1.3f * s, 1.15f * s, stone, 4 + R() * 8, 20 + R() * 30);
+            Rock(1.05f * s, .55f * s, 1.1f * s, 1.05f * s, 1.05f * s, stain, R() * 10, -20 - R() * 30);
+            // Where the rock's face is at (x, y): the foremost (-Z) of its vertices near there; null where no rock is.
+            float? Face(float x, float y)
+            {
+                float best = float.MaxValue;
+                foreach (var v in rock) if (Mathf.Abs(v.x - x) < .2f * s && Mathf.Abs(v.y - y) < .16f * s && v.z < best) best = v.z;
+                return best < float.MaxValue ? best : (float?)null;
+            }
             for (int k = 0; k < 4; k++)
             {
                 // Loose stone at the foot, round the sides and front: no colliders.
@@ -172,29 +185,29 @@ namespace Crulanda.World
                 Lump(BoulderAt((int)(R() * 6)), t, new Vector3(x, G(x, z) + .18f * size * .8f - .06f, z), new Vector3(size * 1.2f, size * .8f, size), k % 2 == 0 ? stone : stain, R() * 360);
             }
             var full = new GameObject("full").transform; full.SetParent(t, false);
-            // The face runs across the front of the big lump at about z = -.25 (its sides curve back): veins along it.
-            float face = -.27f * s; int veins = rich ? 8 : 5;
+            // Veins of ore set half into the face across the big lump, flecks on them.
+            int veins = rich ? 8 : 5;
             for (int k = 0; k < veins; k++)
             {
-                float x = ((k + .5f) / veins - .5f) * 1.6f * s + (R() - .5f) * .2f, y = G(x, face) + (.18f + R() * .5f) * s, z = face + Mathf.Abs(x) * .22f + (R() - .5f) * .06f;
-                float w = (.3f + R() * .25f) * s;
-                Lump(BoulderAt((int)(R() * 6)), full, new Vector3(x, y, z), new Vector3(w, w * (.6f + R() * .3f), w * .75f), ore, R() * 360);
-                if (R() < .7f) Part(PrimitiveType.Sphere, full, new Vector3(x + (R() - .5f) * w, y + (R() - .3f) * w * .5f, z - w * .3f), Vector3.one * (.05f + R() * .05f) * s, fleck);
+                float x = ((k + .5f) / veins - .5f) * 1.5f * s + (R() - .5f) * .2f, y = G(x, 0) + (.2f + R() * .45f) * s, w = (.3f + R() * .25f) * s;
+                var at = Face(x, y); if (at == null) continue;
+                Lump(BoulderAt((int)(R() * 6)), full, new Vector3(x, y, at.Value + .03f), new Vector3(w, w * (.6f + R() * .3f), w * .75f), ore, R() * 360);
+                if (R() < .7f) Part(PrimitiveType.Sphere, full, new Vector3(x + (R() - .5f) * w * .6f, y + (R() - .3f) * w * .4f, at.Value - w * .32f), Vector3.one * (.05f + R() * .05f) * s, fleck);
             }
             int shards = rich ? 7 : 4;
             for (int k = 0; k < shards; k++)
             {
-                // Crystal shards standing out of the face, tipped toward you (-Z) and up.
-                float x = (R() - .5f) * 1.4f * s, y = G(x, face) + (.25f + R() * .45f) * s, z = face + Mathf.Abs(x) * .22f - .04f, h = (.16f + R() * .18f) * s;
-                Part(PrimitiveType.Cube, full, new Vector3(x, y + h * .3f, z), new Vector3(.07f * s, h, .07f * s), ore, Quaternion.Euler(-(25 + R() * 30), (R() - .5f) * 50, (R() - .5f) * 40));
+                // Crystal shards standing out of the face, their feet in it, tipped toward you (-Z) and up.
+                float x = (R() - .5f) * 1.3f * s, y = G(x, 0) + (.25f + R() * .4f) * s, h = (.16f + R() * .18f) * s;
+                var at = Face(x, y); if (at == null) continue;
+                Part(PrimitiveType.Cube, full, new Vector3(x, y + h * .25f, at.Value - h * .2f), new Vector3(.07f * s, h, .07f * s), ore, Quaternion.Euler(-(25 + R() * 30), (R() - .5f) * 50, (R() - .5f) * 40));
             }
             for (int k = 0; k < (rich ? 4 : 2); k++)
             {
                 // Broken ore at the foot, ready for the sack.
-                float x = (R() - .5f) * 1.3f * s, z = face - .35f - R() * .4f, size = (.14f + R() * .12f) * s;
+                float x = (R() - .5f) * 1.3f * s, size = (.14f + R() * .12f) * s, z = (Face(x, G(x, 0) + .12f * s) ?? -.4f * s) - .2f - R() * .35f;
                 Lump(BoulderAt((int)(R() * 6)), full, new Vector3(x, G(x, z) + .18f * size * .7f - .02f, z), new Vector3(size * 1.2f, size * .7f, size), ore, R() * 360);
-            }
-            return full;
+            }            return full;
         }
 
         // ---------- windfall timber ----------

@@ -10,36 +10,46 @@ Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
 ## RESUME HERE (updated 2026-10-01, afternoon)
-**PUBLISHED 2026-10-01 (four publishes; the playable build is commit ecc233b):**
+**PUBLISHED 2026-10-01 (five publishes; the playable build is commit 078d276):**
 1. The Root-Mother's Deep, Crowsfoot's hidden mouth, every trade has a day (4c579e6).
-2. The painted style pass parts 1-4: painted buildings, painted rock, sky and colour, chunky props (03fd06d).
-3. Part 5: painted masonry on towers, walls, the gate, the keep, crypts, ruins (17168d8).
-4. The out of work drink at the inn (VillageDrinkTests), and the visual review's first batch: Oakhaven's blue air, storms that
-   darken, firelit night, leafy crowns, the meadow, gables, hedges and haystacks (ecc233b).
-Tests on ecc233b: EditMode 186/186, PlayMode 83/83 (the full run was 82/83 on a flaw in the new drinker test itself, corrected
-and rerun). Design: `WORLD_ZONES.md` "The painted style pass" and "Life, day and night"; the CHANGELOG.
+2. The painted style pass parts 1-4 (03fd06d) and 3. part 5, painted masonry (17168d8).
+4. The out of work drink at the inn; the visual review's first batch (ecc233b).
+5. The visual review's second batch: Ash Rim, world edge, ruins, Peaks, caves (078d276).
+Tests on 078d276: EditMode 186/186, PlayMode 83/83, 0 shader errors. Main has since gained an inn shot of the drinkers
+(`oakhaven-99-inn-drinkers.png`) and the plan documents; nothing unpublished changes play.
 
-**IN FLIGHT when this was written:** the visual review's SECOND batch (`tools/wip/painted/v2/w2`: ash, edge, ruins, peaks, caves)
-is APPLIED in the working tree, its cave art built (`build_art.ps1`), with the full run and a five-zone tour running. If it is not
-committed as published: `run_tests.ps1`, tour, LOOK (ashrim-01/03, the *-exit shots, the ruins, peaks-01/07, the eight cave
-shots), fix, publish. The worklist is `tools/wip/painted/visual_review.md` (items 10 and 11 are still open: buildings on slopes;
-the inn and the smithy as hero buildings).
+**THREE BUILD TRACKS IN FLIGHT (each a git worktree in the scratchpad `wt` folder, on its own branch; `git worktree list`):**
+- `trades/a1-buildings` (worktree `wt/a1`): professions BUILD_PLAN step 1, the village's new buildings and named houses.
+- `trades/b2-format8` (worktree `wt/b2`): BUILD_PLAN step 2, save format 8, materials, tools, the Trades window.
+- `loot/a1-weapons` (worktree `wt/la1`): loot DESIGN step A1, weapons and shields in hand, the wardrobe capture.
+Each is built by a workflow (`build-step` / `trades-build-round`): implement -> three review lenses -> every finding refuted or
+confirmed -> fix; the result names the branch head. THEN THE LEAD: `git merge --no-ff <branch>` into main one at a time (shared
+files: `ZoneBuilder.cs`, `ZoneDefinition.cs`, `EncounterSession.cs`, `WorldLife.cs`, `items.json`, `oakhaven.json`), offline
+compile, `build_art.ps1` if art changed, `run_tests.ps1`, tour (and `Crulanda.exe --crulanda-wardrobe-capture <dir>` for loot),
+LOOK, fix, publish, backup, CHANGELOG, then start the next round from the plan's "Order at a glance" table.
+If a session dies mid-round: the branches hold whatever was committed; check `git log main..<branch>` and the workflow journal
+under `.claude/projects/D--code-mmo/<session>/subagents/workflows/`, and either rerun the step or finish it by hand.
 
-**NEXT BIG JOB (Chris, 2026-10-01): PLAYER PROFESSIONS, GATHERING AND THE VILLAGE ECONOMY.** Everything he said and decided is
-in `tools/wip/professions/OWNER_NOTES.md` (read it first): gather ore, lumber and herbs, sell or refine; two crafting professions
-chosen from Blacksmith and Alchemist with Cooking and gathering free; the leatherworker makes profession bags by quest (bring
-leathers) or purchase and spends his coin on bread and firewood for his family; every tradesperson has a purse; one named house
-per household; a workshop per trade; an innkeeper; wild animals huntable and every beast skinnable for leather; farm animals and
-cats never huntable. Design documents: `tools/wip/professions/DESIGN.md` (a three-way design panel's synthesis), `ADDENDUM.md`
-and `BUILD_PLAN.md` (households, workshops, purses, bags; one integrated build order in small publishable steps; if those two are
-missing, rerun the `professions-addendum` workflow). Hunting and skinning came after the addendum was commissioned: make sure the
-build plan has them. The save format will change (format 8): BACK UP CHRIS'S SAVE FIRST (`hel/work/save-backups`).
+**THE PLANS (read the owner notes first; they are his words and decisions):**
+- Professions, gathering, households, purses, bags, hunting: `tools/wip/professions/OWNER_NOTES.md`, `DESIGN.md`, `ADDENDUM.md`,
+  `BUILD_PLAN.md` (14 publishable steps on two tracks: A village 1, 3, 6, 7; B professions 2, 4, 5, 8-14).
+- Loot and worn appearances: `tools/wip/loot/OWNER_NOTES.md`, `DESIGN.md` (steps A1-A3 run beside professions; L1-L6 land at
+  professions step boundaries because they share the item code), `ITEMS_V1.md` (104 named items).
+- Defaults told to Chris and being built unless he objects: the leatherworker is Maud (her family: Fen the skinner, Nettie);
+  invented kin so every villager has a household, two new houses; a hide comes from searching the body (no skinning skill);
+  only a Blacksmith smelts; low skill never blocks a node; empty gear slots show empty; cloaks as a tenth slot last; boss trophies
+  become "one you do not own yet". To raise when L-steps start: a new character should not be left empty-handed (start with the
+  training blade equipped).
+- Chris's save is backed up before format 8: `hel/work/save-backups/20261001-1545-before-format8`.
 
-**How today's work was done, worth repeating:** draft -> agents pre-check (port generated textures to Python and LOOK; recompute
-geometry; a second agent tries to refute each finding) -> restage as anchor-based patch scripts verified by compiling a scratch
-copy (`tools/wip/painted/v2/...`) -> apply one batch -> `build_art.ps1` if art changed -> full tests -> tour -> LOOK -> publish.
-Before publishing gameplay, a read-only review workflow found a dozen real bugs the tests missed. Never edit Assets while a run
-is in flight (the tour mirrors Assets again): stage in `tools/wip`. `run_focus.ps1 -Filter '<fixtures>'` runs a few fixtures fast.
+**Visual worklist left** (`tools/wip/painted/visual_review.md`): item 10 (buildings on slopes) and item 11 (the inn and the smithy
+as hero buildings), held until BUILD_PLAN step 1 has merged because it edits the same builders.
+
+**How today's work was done, worth repeating:** design by a panel (readers map the code, three lenses design, one synthesis),
+critique, then build in worktrees with review and refutation before merging; for visual work, agents render and LOOK at generated
+textures before anything is built, patches are verified on scratch copies, and every batch is toured and looked at before it is
+published. Never edit Assets while a run is in flight (the tour mirrors Assets again). `run_focus.ps1 -Filter '<fixtures>'` runs
+a few fixtures fast; `build_art.ps1` builds generated art in the validation copy and brings it into the repo.
 
 **Chris asked whether to move to Unreal** (2026-10-01): answered no (the art, not the engine, is the limit; a port rewrites
 everything; a Unity lighting-pipeline trial is the cheap experiment). He did not ask for the trial.

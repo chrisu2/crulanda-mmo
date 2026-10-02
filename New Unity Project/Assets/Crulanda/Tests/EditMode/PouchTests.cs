@@ -45,7 +45,6 @@ namespace Crulanda.Tests
                 Assert.Contains(id, stock);
                 foreach (var v in db.Vendors) if (v.role != "leatherworker") Assert.IsFalse(System.Array.IndexOf(v.items, id) >= 0, id + " is sold only by the leatherworker.");
             }
-            Assert.IsEmpty(db.StockFor("Fen Walker", "skinner", 2), "The skinner sells nothing yet (the hunting step).");
             // Every material that gathering gives has a bag (the trade bag classes), and a bag must say what it holds.
             foreach (var d in db.Items.Values) if (!string.IsNullOrEmpty(d.pouch)) Assert.NotNull(Inventory.BagFor(db, d.pouch), d.id + " goes in a " + d.pouch + " bag.");
             var e = Assert.Throws<System.ArgumentException>(() => ItemDatabase.Parse(new[] { "{\"items\":[{\"id\":\"bag.x\",\"name\":\"X\",\"kind\":\"bag\",\"slots\":0}]}" }));

@@ -118,10 +118,11 @@ namespace Crulanda.Encounter
         {
             if (Quests == null) return;
             int before = Progress.Level;
-            if (!Quests.TurnIn(q, out _)) return;
-            // A bag quest pays its maker what the bag would have cost: what's left of the hides is her profit (ADDENDUM C, step 7).
+            // A bag quest pays its maker what the bag would have cost: what's left of the hides is her profit (ADDENDUM C, step 7). It is
+            // counted before the hand-in (afterwards the bag is owned), and a bag you already had is paid to you as coin, not made, so earns her nothing.
             var bagItems = q.rewards?.bagItems; int worth = 0;
-            if (bagItems != null && Items != null) foreach (var id in bagItems) { var d = Items.Get(id); if (d != null) worth += Inventory.Price(d); }
+            if (bagItems != null && Items != null) foreach (var id in bagItems) { var d = Items.Get(id); if (d != null && !(d.kind == "bag" && Inventory.Owns(Progress, id))) worth += Inventory.Price(d); }
+            if (!Quests.TurnIn(q, out _)) return;
             if (worth > 0) VillageLife.Active?.Paid(q.turnIn, worth);
             if (Progress.Level > before) { ApplyLevel(); Player.Health.ApplyHealing(Player.Health.Pool.Max); Message("Level " + Progress.Level + "! Talent points are waiting [B]."); }
             ReconcileQuests(); Save(false); ReopenConversation();
@@ -262,10 +263,11 @@ namespace Crulanda.Encounter
         {
             if (Items == null || v == null) return;
             int band = Zone != null ? Zone.Zone.levelMax : 2;
-            VendorStock = Items.StockFor(v.Name, v.Role, band); if (VendorStock.Count == 0) return;
-            // A trade bag you wear or carry is off the list: one of each is all anyone makes you.
-            VendorStock.RemoveAll(id => Items.Get(id)?.kind == "bag" && Inventory.Owns(Progress, id));
-            if (VendorStock.Count == 0) { Message(v.Name + ": " + AllBagsLine); v.Say(AllBagsLine, 6); return; }
+            var stock = Items.StockFor(v.Name, v.Role, band); if (stock.Count == 0) return;
+            // A trade bag you wear or carry is off the list: one of each is all anyone makes you. Another merchant's open window keeps its list.
+            stock.RemoveAll(id => Items.Get(id)?.kind == "bag" && Inventory.Owns(Progress, id));
+            if (stock.Count == 0) { Message(v.Name + ": " + AllBagsLine); v.Say(AllBagsLine, 6); return; }
+            VendorStock = stock;
             // What the village brought the stall today (the hen-wife's eggs): sold on while they last.
             if (v.Role == "merchant" && VillageLife.Active != null && VillageLife.Active.Count("stall.eggs") > 0 && Items.Get(FreshEggs) != null) VendorStock.Insert(0, FreshEggs);
             VendorNpc = v.Name; vendorAt = at ?? v.transform.position; InventoryOpen = true; Conversation = null; TradesOpen = false; v.Hold(30);

@@ -256,8 +256,8 @@ the coin goes to her family. Design: `tools/wip/professions/ADDENDUM.md` D. All 
   pays the bag's value in gold at turn-in instead of a second bag ("You've one already. Take the coin.").
 - `QuestDatabase.CheckItems(ItemDatabase)` cross-checks bring items, bag rewards and `unlessWorn` against the items (the quest files
   cannot see them); the session logs any problem as an error, and `QuestLogTests.Bring_hands_over_bag_items_on_talk` pins it empty.
-- Turning in a bag quest calls `VillageLife.Paid(turnIn, the bag's price)`, as buying from her does: the hook the purses (build
-  step 7) fill in. Nothing is done with it yet.
+- Turning in a bag quest for the bag itself calls `VillageLife.Paid(turnIn, the bag's price)`, as buying from her does; the coin
+  fallback pays her nothing. Paid is the hook the purses (build step 7) fill in. Nothing is done with it yet.
 
 **The quests** (giver and turn-in Maud Tanner, zone Oakhaven, ids keyed on the role):
 

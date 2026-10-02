@@ -21,6 +21,9 @@ namespace Crulanda.Encounter
         /// screen as that part grows so its foot stays above the action bar (with all four bags worn it rises over the minimap's foot).</summary>
         static Rect BagsRect { get { float h = 400 + bagsExtra; return new Rect(1054, Mathf.Min(290, 788 - h), 372, h); } }
         static float bagsExtra = TradeBagNoteH;
+        /// <summary>True when the open bags window lies over the given screen rect (the minimap's buttons then stand down, since IMGUI
+        /// gives a click to the control laid out first). bagsExtra holds the height on screen when the click arrives.</summary>
+        public static bool BagsCover(Rect r) { return bagsVisible && BagsRect.Overlaps(r); }
         const float PouchSlot = 38, PouchGap = 4, PouchLabel = 22, TradeBagNoteH = 40;
         /// <summary>The bags window's line when no trade bag is worn (GAME-ONLY).</summary>
         public const string TradeBagNote = "Trade bags: Maud Tanner makes them, by the South road in Oakhaven.";
@@ -157,7 +160,8 @@ namespace Crulanda.Encounter
         }
         /// <summary>
         /// One bag slot: its square, its tooltip (an empty trade-bag slot says what it takes), and the mouse on it: drag from it, drop
-        /// on it (a move, or worn gear taken off into it), right-click to sell it to an open merchant or else equip or use it.
+        /// on it (a move, or worn gear taken off into it), right-click to sell it to an open merchant or else equip or use it. A trade
+        /// bag is worn on right-click even at a merchant (one just bought is used at her counter); dragging it to her sells it.
         /// </summary>
         void BagSlot(Rect r, int i, ItemDef pouch, Event e, Vector2 mouse)
         {
@@ -168,7 +172,7 @@ namespace Crulanda.Encounter
             else if (p.bag[i].Empty && pouch != null && dragBag < 0 && dragEquip < 0) { tooltip = "<b>" + pouch.name + "</b>\nTakes " + Inventory.HoldsWords(pouch.holds) + "."; tooltipAt = mouse; }
             if (e.type == EventType.MouseDown && e.button == 0 && !p.bag[i].Empty) { dragBag = i; e.Use(); }
             else if (e.type == EventType.MouseDown && e.button == 1 && !p.bag[i].Empty)
-            { if (session.VendorNpc != null) session.SellBag(i); else session.EquipFromBag(i); e.Use(); }
+            { var it = session.Items?.Get(p.bag[i].item); if (session.VendorNpc != null && it?.kind != "bag") session.SellBag(i); else session.EquipFromBag(i); e.Use(); }
             else if (e.type == EventType.MouseUp && e.button == 0)
             {
                 if (dragBag >= 0) session.MoveBag(dragBag, i);

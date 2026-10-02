@@ -94,6 +94,12 @@ namespace Crulanda.Tests
             s.OpenVendor(maud);
             Assert.IsNull(s.VendorNpc, "No wares to show."); Assert.AreEqual(Maud + ": " + EncounterSession.AllBagsLine, s.Messages.Last());
             Assert.AreEqual(QuestStatus.Unavailable, s.Quests.Status(s.Quests.Def(WalletQuest), s.ZoneId), "With a wallet worn, her wallet quest is not offered.");
+            // Another merchant's window open (Ama's stall), Maud with nothing left to sell you leaves it as it was.
+            var ama = life.Find("Ama Rusk"); Assert.NotNull(ama, "Ama Rusk keeps the stall.");
+            s.OpenVendor(ama); Assert.AreEqual("Ama Rusk", s.VendorNpc); var amaStock = s.VendorStock.ToList(); Assert.IsNotEmpty(amaStock);
+            s.OpenVendor(maud);
+            Assert.AreEqual("Ama Rusk", s.VendorNpc, "Ama's window keeps her name."); CollectionAssert.AreEqual(amaStock, s.VendorStock, "And her goods.");
+            s.CloseVendor();
 
             // Save, load: the bags are worn and their rows hold what they held.
             Assert.IsFalse(s.InCombat, "Nothing is fighting at the village gate, so the save goes through.");
@@ -133,6 +139,9 @@ namespace Crulanda.Tests
             Assert.AreEqual(Maud, s.VendorNpc, "The knock opens Maud's wares."); CollectionAssert.AreEqual(Bags, s.VendorStock);
             s.Buy("bag.simples_wallet");
             Assert.AreEqual(18, s.Progress.gold); Assert.AreEqual(1, Inventory.Count(s.Progress, "bag.simples_wallet"), "Bought through the shutter.");
+            // Used at her counter (the bags window's right-click on a trade bag wears it even with her wares open), it is worn, not sold back.
+            Assert.IsTrue(s.EquipFromBag(s.Progress.bag.FindIndex(x => x.item == "bag.simples_wallet")));
+            CollectionAssert.AreEqual(new[] { "bag.simples_wallet" }, s.Progress.pouches); Assert.AreEqual(18, s.Progress.gold, "Wearing it costs nothing.");
             yield return null;
             Assert.AreEqual(Maud, s.VendorNpc, "The window stays open while you stand at her door.");
             s.CloseVendor();

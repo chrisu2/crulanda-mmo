@@ -53,6 +53,16 @@ namespace Crulanda.Encounter
         public List<ProfessionSkill> professions = new List<ProfessionSkill>();
         /// <summary>Trade bags worn, by item id, in the order they were put on. Each adds its slots to the end of <see cref="bag"/>.</summary>
         public List<string> pouches = new List<string>();
+        // ---------- the Armoury (save format 9; older saves load with all three empty) ----------
+        /// <summary>Named gear ever found (in the bags or worn at least once), by item id, in the order found. See ArmouryLog.</summary>
+        public List<string> armoury = new List<string>();
+        /// <summary>Appearances ever held, by appearance key (GearLooks.AppearanceKey: no colours, quality or tier), in the order first seen. Each gave a "NEW LOOK" toast.</summary>
+        public List<string> looks = new List<string>();
+        /// <summary>
+        /// Kill counts by loot source: a drop list id (its kills, which name its pieces in the Armoury) or a drop list id and group
+        /// ("drop.oak.caddock#1": an epic's kills and the current run without it, for pity). See LootDatabase.Roll and ArmouryLog.
+        /// </summary>
+        public List<LootLuck> lootLuck = new List<LootLuck>();
 
         // ---------- levels (save format 5) ----------
         /// <summary>The highest level (13 since the Verdant Shore, 2026-09-30; it was 10 for the first four zones). Talent points stop

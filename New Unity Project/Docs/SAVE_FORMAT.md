@@ -20,7 +20,7 @@ clears threat, casts, personal cooldowns, global cooldowns and temporary Guard s
 The shared ability runtime does not change the persistent schema, so no version bump is required.
 Unsupported format/type or invalid payloads are rejected. An unreadable startup save blocks overwrite.
 
-## Format history (current EncounterSave.FormatVersion = 8; formats 4-8 are described at the end)
+## Format history (current EncounterSave.FormatVersion = 9; formats 4-9 are described at the end)
 - 1: no class/talents. Read migrates to classId class.warrior with an empty talent list.
 - 2: classId + talents using the 9-node prototype ids (tank.armor, dps.power, ...). Read maps them through
   EncounterSave.LegacyTalentIds to the data-driven ids; if the mapped allocation is illegal under the new tier
@@ -33,9 +33,9 @@ Transient talent state (weapon pressure, Exposed, barriers, intercept, standard)
 ## Generic infrastructure
 SaveFileStore handles envelope I/O/backups. SaveMigrator chains ISaveMigration steps on the payload text.
 EncounterSave uses it from format 6 on: it registers one step per format (6 → 7: `AddDiscoveriesMigration`,
-7 → 8: `AddProfessionsMigration`) and runs the chain in memory before reading the payload. Formats 1-5 are older than the chain and are still upgraded in memory in
+7 → 8: `AddProfessionsMigration`, 8 → 9: `AddArmouryMigration`) and runs the chain in memory before reading the payload. Formats 1-5 are older than the chain and are still upgraded in memory in
 `EncounterSave.Read`. Versions above the current one are rejected.
-To change saved fields, add the next step (8 → 9) and bump `FormatVersion`. No migration is needed for combat tuning.
+To change saved fields, add the next step (9 → 10) and bump `FormatVersion`. No migration is needed for combat tuning.
 
 ## Future world persistence
 WorldSaveData/CharacterSaveData/SimAdventurerSaveData/QuestSaveData/InventorySaveData/FactionSaveData
@@ -115,3 +115,56 @@ Two new lists at the end of the payload, for the whole professions feature (one 
 - Formats 1-5 load with both lists empty.
 - Not saved: which nodes have been worked (they regrow in memory), known recipes (they follow from skill).
 - As before, migration happens in memory on read. The file is written as format 8 on the next save.
+
+## Format 9 (2026-10-01): the Armoury (loot step L3)
+Three new lists at the end of the payload, after `pouches`, in this order (one format bump, one migration):
+- `armoury`: `List<string>`, the named pieces of gear ever found, by item id (`loot.*` and the twelve older `item.*` pieces that have
+  a gear entry in the loot files), in the order found.
+  - A piece is found the first time it is in the bags or worn. It stays found after it is sold or destroyed.
+  - `ArmouryLog.Sweep` looks over `bag` and `equipment` twice a second, so loot, buying, crafting and quest rewards are all noticed.
+  - From format 9, "owned" in the drop rules means found here or held now: signature lists give a piece not yet found, and an epic
+    already found drops at a quarter of its chance and keeps no pity count.
+- `looks`: `List<string>`, every appearance that has been in the bags or worn, by appearance key (`GearLooks.AppearanceKey` of the
+  item's resolved look: family, variant, palette, crafted tint prefix and forced glow, as `family:variant/palette*tint+glow`). The
+  key holds no colours, quality, shade, detail or tier: a better copy of a piece already seen is not a new look, and retuning a hex
+  colour in `looks.json` keeps every saved key. (`GearLooks.LookKey`, which has the colours, is only the in-memory icon and render
+  key.) The first time a key is added the game raises the "NEW LOOK" toast. Generated gear adds a look and never an `armoury` entry.
+- `lootLuck`: `List<LootLuck>` (`source`, `kills`, `dry`), kill counts by loot source.
+  - `source` = a drop list id (`drop.oak.caddock`): kills of mobs that roll a list naming a zone, camp tag or mob. Any kill makes that
+    list's pieces known in the Armoury (their names show in grey). So does finding one of the list's pieces (a save from before
+    format 9 counted no kills, so wearing Caddock's Tin Crown is what names his other pieces); that adds no kill, because pity
+    reads only real kills. World lists (a level band alone) are not counted.
+  - `source` = a drop list id and group (`drop.oak.caddock#1`): an epic's pity counter, `kills` while it was unfound and `dry`, the
+    current run of kills without it. The epic is certain on the kill that would make `dry` reach the group's `pity` (10 for dungeon
+    end bosses, 25 outdoors), and `dry` goes back to 0 when it drops.
+- On load: a missing list is empty; blank ids and sources are dropped, and so is a later entry for one already listed (the first is
+  kept). A negative `kills` or `dry` refuses the save ("Invalid loot data."): it is not loaded and the file is not changed. Ids and
+  sources this build's content doesn't know are kept in the save and ignored, so content can change.
+- First bind: `ArmouryLog.Bind` (on every session start and every load) quietly marks as found the named gear in the bags or worn and
+  the named gear of hidden finds already in `discoveries` (by the gear entry's `secret:` source, or the zone secret's `item`), and
+  adds the looks of what is held. It raises no toast and changes no other field. The game writes the result on its next save.
+- Migration 8 → 9 is `AddArmouryMigration`, a SaveMigrator step of the same kind as 7 → 8.
+  - It inserts `"armoury":[]`, `"looks":[]` and `"lootLuck":[]`, in that order, before the payload's closing brace and leaves every
+    other character of the v8 payload as it was. A list that is already there is left alone (only the missing ones are added). A
+    payload that isn't a JSON object is refused: the save isn't loaded or changed.
+  - A format-6 save runs all three steps (6 → 7 → 8 → 9) in one read. Chris's Warrior save (`encounter.save.json`) was format 6 on
+    the morning of 2026-10-01 (1,329 XP in Oakhaven, the Training Blade in hand, a wolf pelt in the bags) and format 8 that evening,
+    after he played the trades build (2,137 XP, Caddock's Tin Crown and generated pieces worn, the Training Blade and a generated
+    mantle in the bags). `OwnerSaveFixtures` (in `ArmouryTests.cs`) holds both shapes, and
+    `SaveMigratorTests.V8Payload_MigratesTo9_...` migrates each one: every other field comes through as it was. On the first bind
+    the format-8 save gains `"armoury":["item.training_blade","item.tin_crown"]` (bags first, then worn) and one look for each
+    distinct appearance of the gear it holds (five pieces in the fixture, so at most five); Caddock's other pieces (the Due Cleaver,
+    the Due Coat and the Broken Oath Sabre) show as known. The format-6 save gains `"armoury":["item.training_blade"]` and the
+    blade's one look.
+  - What to expect on his real save: a later read-only check (the evening of 2026-10-01) reported the Tin Crown and five generated
+    pieces worn and the Training Blade in the bags. The rule is the same whatever he holds: `armoury` gains the named pieces held
+    (here the blade and the crown), `looks` one key for each distinct appearance held (up to one per piece of gear), `lootLuck`
+    stays empty, and nothing else changes. His second slot, `encounter-druid.save.json` (format 8, reported to hold no gear),
+    migrates too and gains the three lists empty.
+  - Back up the whole `CrulandaEncounter` folder (both character saves, their `.bak` files and `profile.save.json`) to
+    `work\save-backups\<date>-pre-format-9` before the first run of this build.
+- Formats 1-8 load with all three lists empty.
+- Not saved: the count on the Armoury tab (pieces new since the tab was last open), and whether a piece is known (it follows from
+  `lootLuck`, `armoury`, `quests` and `questsDone`).
+- An older build refuses a format-9 save (its version is above theirs) and leaves the file alone.
+- As before, migration happens in memory on read. The file is written as format 9 on the next save.

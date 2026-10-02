@@ -99,13 +99,14 @@ namespace Crulanda.Tests
                 CollectionAssert.AreEqual(new[] { "doc.oakhaven.ledger" }, p.documents);
                 CollectionAssert.AreEqual(new[] { "item.yarrow" }, p.questItems);
                 CollectionAssert.AreEqual(new[] { "zone.oakhaven|Tithe crate|55|45" }, p.usedInteractables);
-                // And the new lists (format 7's discoveries, format 8's trades), empty.
+                // And the new lists (format 7's discoveries, format 8's trades, format 9's Armoury), empty.
                 Assert.NotNull(p.discoveries); Assert.IsEmpty(p.discoveries);
                 Assert.NotNull(p.professions); Assert.IsEmpty(p.professions); Assert.NotNull(p.pouches); Assert.IsEmpty(p.pouches);
+                Assert.IsEmpty(p.armoury); Assert.IsEmpty(p.looks); Assert.IsEmpty(p.lootLuck);
                 // The next save is the current format, and reads back the same.
                 save.Write(p);
                 Assert.IsTrue(store.TryRead("encounter", out var envelope, out _));
-                Assert.AreEqual(EncounterSave.FormatVersion, envelope.formatVersion); StringAssert.EndsWith(",\"discoveries\":[],\"professions\":[],\"pouches\":[]}", envelope.payloadJson);
+                Assert.AreEqual(EncounterSave.FormatVersion, envelope.formatVersion); StringAssert.EndsWith(",\"discoveries\":[],\"professions\":[],\"pouches\":[],\"armoury\":[],\"looks\":[],\"lootLuck\":[]}", envelope.payloadJson);
                 Assert.IsTrue(save.Read(out var again, out message), message);
                 Assert.AreEqual(JsonUtility.ToJson(p), JsonUtility.ToJson(again), "A round trip in the current format changes nothing.");
             }

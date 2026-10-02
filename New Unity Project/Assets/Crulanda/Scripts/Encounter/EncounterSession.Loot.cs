@@ -95,7 +95,8 @@ namespace Crulanda.Encounter
         /// <summary>
         /// Rolls a camp body's loot as it dies: coins by level (three times as many from an elite, more with worn coin effects), and
         /// the kind's drops with a chance of gear (ItemDatabase.RollLoot, or LootDatabase.Roll once the named loot is loaded: owned
-        /// and held are what you carry or wear, luck is your gear's); then lights its beacon.
+        /// is what the Armoury has found or you carry or wear (step L3), held what you carry or wear, luck is your gear's, and the
+        /// epic pity counters are the save's lootLuck); then lights its beacon. The kill counts toward the Armoury (ArmouryLog.Killed).
         /// </summary>
         public void RollCorpse(EncounterEnemy corpse)
         {
@@ -108,7 +109,13 @@ namespace Crulanda.Encounter
             {
                 var rng = new System.Random(Random.Range(0, int.MaxValue));
                 System.Func<string, bool> has = id => Inventory.Has(Progress, id);
-                if (Loot != null) drops = Loot.Roll(LootContext.From(corpse.persistentId, Zone != null ? Zone.Zone.camps : null, corpse.actor.Level, corpse.Elite), Items, has, GearFx.luck, null, rng, has);
+                System.Func<string, bool> owned = id => (Armoury != null && Armoury.IsFound(id)) || has(id);
+                if (Loot != null)
+                {
+                    var context = LootContext.From(corpse.persistentId, Zone != null ? Zone.Zone.camps : null, corpse.actor.Level, corpse.Elite);
+                    if (Armoury != null) { Armoury.Killed(context); armouryTallies = null; }
+                    drops = Loot.Roll(context, Items, owned, GearFx.luck, Progress.lootLuck, rng, has);
+                }
                 else
                 {
                     var parts = corpse.persistentId.Split('.'); string tag = parts.Length > 1 ? parts[1] : "any";
@@ -218,9 +225,10 @@ namespace Crulanda.Encounter
         }
         /// <summary>The colour a chat line is drawn in: its loot colour, or <paramref name="plain"/>.</summary>
         public Color LineColour(string line, Color plain) { return line != null && lineColours.TryGetValue(line, out var c) ? c : plain; }
-        /// <summary>The window shuts when you walk off (beyond LootReach), die, or the body is gone or back on its feet.</summary>
+        /// <summary>The window shuts when you walk off (beyond LootReach), die, or the body is gone or back on its feet. The Armoury sweeps here too, twice a second.</summary>
         void TickLoot()
         {
+            SweepArmoury();
             if (lootBody == null) { lootBody = null; return; }   // a body destroyed by a load reads as null: forget it
             if (!Player.IsAlive || lootBody.actor == null || lootBody.actor.IsAlive || lootBody.Drops == null || Vector3.Distance(Player.transform.position, lootBody.transform.position) > LootReach
                 || Conversation != null || VendorNpc != null || TradesOpen || QuestBookOpen || MapOpen) CloseLoot();   // a window drawn under it opened: it gives way

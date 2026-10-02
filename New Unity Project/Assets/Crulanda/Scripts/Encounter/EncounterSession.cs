@@ -1070,7 +1070,7 @@ namespace Crulanda.Encounter
             SpawnParty();
             // Villagers and critters live alongside the encounter (they survive load/respawn of the party).
             if (Zone != null && Zone.Zone.life != null) new GameObject("Village life").AddComponent<VillageLife>().Init(this);
-            StartQuests(); StartDiscoveries();
+            StartQuests(); StartDiscoveries(); StartArmoury();
             Message(Zone != null ? Zone.Zone.displayName + ". " + Objective(0, "") + "." : "Recruit the healer at camp [E], then follow the path to the sentries.");
             ReconcileQuests();
             nextSave = Time.time + 30;
@@ -1620,6 +1620,7 @@ namespace Crulanda.Encounter
             if (Quests != null) { Quests.Bind(Progress); Conversation = null; emptiedHidden = false; ReconcileQuests(); }
             if (Discoveries != null) { Discoveries.Bind(Progress); pocketedSynced = false; vistaWaiting = null; }
             if (Professions != null) Professions.Bind(Progress);
+            if (Armoury != null) Armoury.Bind(Progress);
         }
         public void RepeatTrail()
         {

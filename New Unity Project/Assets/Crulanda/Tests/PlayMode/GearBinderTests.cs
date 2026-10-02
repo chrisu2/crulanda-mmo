@@ -56,8 +56,10 @@ namespace Crulanda.Tests
 
             string blade = ItemDatabase.GearId("mainhand", 1, 1, 3);   // wearable at level 1
             Assert.AreEqual(0, Inventory.Add(s.Progress, s.Items, blade, 1));
+            var trailblade = look.GearRoot(EquipSlot.MainHand);
             Assert.IsTrue(s.EquipFromBag(s.Progress.bag.FindIndex(b => b.item == blade)), "Equipped (and saved).");
-            yield return Until(() => look.GearParts(EquipSlot.MainHand) > 0);
+            yield return Until(() => !ReferenceEquals(look.GearRoot(EquipSlot.MainHand), trailblade) && look.GearParts(EquipSlot.MainHand) > 0);
+            Assert.IsFalse(ReferenceEquals(look.GearRoot(EquipSlot.MainHand), trailblade), "The binder rebuilt the hand for the new blade.");
             Assert.Greater(look.GearParts(EquipSlot.MainHand), 0, "It is in the hand.");
             Assert.AreSame(look.RightArm, look.GearRoot(EquipSlot.MainHand).parent);
 

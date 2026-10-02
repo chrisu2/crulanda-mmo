@@ -145,6 +145,32 @@ namespace Crulanda.Tests
             Assert.IsTrue(Enumerable.Range(0, 200).Any(seed => loot.Roll(caddock, items, held.Contains, 0, null, new System.Random(seed)).Any(d => list.Contains(d.item))));
         }
 
+        [Test] public void A_unique_you_hold_spends_neither_the_cap_nor_the_pity_count()
+        {
+            // Two lists for the same deserter, each certain: the first gives a unique piece, the second a plain one. A normal kill
+            // gives one named item, so the first list's piece fills the cap unless you hold it.
+            const string json = "{\"gear\": [{\"id\": \"loot.oak.due_boots\", \"look\": \"feet.boots:plain/sandthrone\", \"source\": \"mob:deserter@oakhaven\", \"unique\": true}, "
+                + "{\"id\": \"loot.oak.lookouts_breeches\", \"look\": \"legs.breeches:patched/sandthrone\", \"source\": \"mob:deserter@oakhaven\"}], "
+                + "\"drops\": [{\"id\": \"drop.test.first\", \"zone\": \"oakhaven\", \"tag\": \"deserter\", \"rank\": \"normal\", \"groups\": [{\"chance\": 1.0, \"pick\": [{\"item\": \"loot.oak.due_boots\"}]}]}, "
+                + "{\"id\": \"drop.test.second\", \"zone\": \"oakhaven\", \"tag\": \"deserter\", \"rank\": \"normal\", \"groups\": [{\"chance\": 1.0, \"pick\": [{\"item\": \"loot.oak.lookouts_breeches\"}]}]}]}";
+            var two = LootDatabase.Parse(new[] { json }, items);
+            var deserter = Mob("oakhaven", "Sandthrone deserter", elite: false);
+            Func<string, bool> boots = id => id == "loot.oak.due_boots";
+            for (int seed = 0; seed < 50; seed++)
+            {
+                var free = two.Roll(deserter, items, null, 0, null, new System.Random(seed)).Select(d => d.item).ToList();
+                Assert.Contains("loot.oak.due_boots", free); Assert.IsFalse(free.Contains("loot.oak.lookouts_breeches"), "The boots fill the cap.");
+                var held = two.Roll(deserter, items, null, 0, null, new System.Random(seed), boots).Select(d => d.item).ToList();
+                Assert.IsFalse(held.Contains("loot.oak.due_boots"), "Held, so not on the body.");
+                Assert.Contains("loot.oak.lookouts_breeches", held, "The held boots did not use up the body's one named item.");
+            }
+            // Caddock's epic, held but not counted as owned: its group is skipped, so no pity counter moves for it.
+            var pity = new List<LootLuck>(); Func<string, bool> sabre = id => id == "loot.oak.broken_oath_sabre";
+            for (int seed = 0; seed < 30; seed++)
+                Assert.IsFalse(loot.Roll(Mob("oakhaven", "Caddock, the Bandit King"), items, null, 0, pity, new System.Random(seed), sabre).Any(d => sabre(d.item)));
+            Assert.IsFalse(pity.Exists(x => x.source == "drop.oak.caddock#1"), "No pity count for an epic you cannot take.");
+        }
+
         [Test] public void A_boss_never_drops_only_junk()
         {
             foreach (var z in zones)

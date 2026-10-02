@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using Crulanda.Encounter;
+using Crulanda.Gameplay;
 using Crulanda.World;
 
 namespace Crulanda.Tests
@@ -125,23 +126,26 @@ namespace Crulanda.Tests
             Assert.IsTrue(pair.All(id => Inventory.Has(s.Progress, id)), "Both of Old Whitefoot's pieces held.");
         }
 
+        /// <summary>The health that worn gear effects and set bonuses add as flat modifiers.</summary>
+        static float SetHealth(EncounterSession s) { return s.GearFx.modifiers.Where(m => m.Stat == Crulanda.Core.StatType.MaxHealth && m.Op == ModifierOp.Flat).Sum(m => m.Value); }
+
         [UnityTest] public IEnumerator Two_pieces_of_the_Deserter_Kings_Due_add_30_health_and_the_tooltip_says_so()
         {
             var s = Session(); AtLevel(s, 6); yield return null;
             Equip(s, Cleaver);
             Assert.AreEqual(s.content.itemId, s.Progress.bag.First(b => !b.Empty && b.item == s.content.itemId).item, "The Trailblade went back to the bags.");
             int one = s.Player.Health.Pool.Max;
-            Assert.IsFalse(s.GearFx.lines.Contains("+30 health"), "One piece: no bonus.");
+            Assert.IsFalse(s.GearFx.lines.Contains("+30 health."), "One piece: no bonus."); Assert.AreEqual(0f, SetHealth(s), "No health modifier.");
             Equip(s, Coat);
             int two = s.Player.Health.Pool.Max, fromStamina = Mathf.RoundToInt(s.Items.Get(Coat).stamina * s.ClassDef.stats.healthPerStamina);
             Assert.AreEqual(one + fromStamina + 30, two, 1, "Two pieces: the coat's Stamina and +30 health.");
-            Assert.Contains("+30 health", s.GearFx.lines);
+            Assert.Contains("+30 health.", s.GearFx.lines); Assert.AreEqual(30f, SetHealth(s), "One +30 health modifier.");
             var tip = s.Loot.TooltipLines(Coat, s.Progress);
             StringAssert.Contains("The Deserter King's Due (2/4)", tip); StringAssert.Contains("  (2) +30 health", tip); StringAssert.Contains("  [3] +6 attack power", tip);
             StringAssert.Contains("Unique", tip); StringAssert.Contains("Dropped by Caddock, the Bandit King", tip);
             Assert.IsTrue(s.UnequipSlot((int)EquipSlot.Chest), "The coat comes off.");
             Assert.AreEqual(one, s.Player.Health.Pool.Max, 1, "And the bonus with it.");
-            Assert.IsFalse(s.GearFx.lines.Contains("+30 health"));
+            Assert.IsFalse(s.GearFx.lines.Contains("+30 health.")); Assert.AreEqual(0f, SetHealth(s), "The modifier went too.");
         }
 
         [UnityTest] public IEnumerator A_unique_you_hold_stays_on_the_body()

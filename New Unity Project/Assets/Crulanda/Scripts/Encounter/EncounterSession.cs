@@ -1467,7 +1467,7 @@ namespace Crulanda.Encounter
                 Quests.Notify("kill", enemy.persistentId); Quests.LootFrom(enemy.persistentId); ReconcileQuests();
                 if (Progress.Level > before) ApplyLevel();
             }
-            if (!enemy.Camp && StoryEnemies.TrueForAll(e => !e.actor.IsAlive)) Message(ZoneTitle + " is clear for now. Equip your reward [I], then save [F5].");
+            if (!enemy.Camp && StoryEnemies.TrueForAll(e => !e.actor.IsAlive)) Message(ZoneTitle + " is clear for now. " + (Inventory.IsEquipped(Progress, content.itemId) ? "Save [F5]." : "Equip your reward [I], then save [F5]."));
         }
         void ApplyLevel() { Player.SetLevel(Progress.Level); }
         /// <summary>Development builds only: jump to the prototype level cap so the whole talent tree can be reviewed.</summary>

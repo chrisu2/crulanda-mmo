@@ -16,7 +16,8 @@ namespace Crulanda.Encounter
     /// uncommon helm and junk; 03-compare-tooltip: the rare blade's tooltip against a common blade worn ("+N weapon damage" in
     /// green); 04-upgrade-arrows: the bags beside the window, the pieces that beat what is worn marked with the green arrow;
     /// 05-set-tooltip (step L2): Caddock's Tin Crown's tooltip with two pieces of the Deserter King's Due worn (the set, its
-    /// pieces, "+30 health" on and the three-piece bonus still to come, and where it drops).
+    /// pieces, "+30 health" on and the three-piece bonus still to come, and where it drops); 06-set-sheet: the character sheet
+    /// with the same two pieces worn, "Gear effects: +30 health." in green under "From gear".
     /// </summary>
     public sealed class LootCapture : MonoBehaviour
     {
@@ -103,8 +104,12 @@ namespace Crulanda.Encounter
                 yield return new WaitForSeconds(.6f);
                 ScreenCapture.CaptureScreenshot(Path.Combine(directory, "05-set-tooltip.png")); yield return new WaitForSeconds(.4f);
                 EncounterHud.PinnedTooltip = null;
+                // 06: the character sheet, the set bonus listed under the gear totals.
+                s.CharacterOpen = true; yield return new WaitForSeconds(.6f);
+                ScreenCapture.CaptureScreenshot(Path.Combine(directory, "06-set-sheet.png")); yield return new WaitForSeconds(.4f);
+                s.CharacterOpen = false;
             }
-            else Debug.LogError("Loot capture: the named loot is not loaded, so 05-set-tooltip is skipped.");
+            else Debug.LogError("Loot capture: the named loot is not loaded, so 05-set-tooltip and 06-set-sheet are skipped.");
             Debug.Log("LOOT_CAPTURE_DONE"); Application.Quit(0);
         }
     }

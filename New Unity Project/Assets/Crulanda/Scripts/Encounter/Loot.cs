@@ -248,8 +248,9 @@ namespace Crulanda.Encounter
         /// lucky groups scale by 1 + luck (luck capped at +30%), an owned epic drops a quarter as often, and an unowned epic with a
         /// pity count is certain on that kill once that many kills in a row gave nothing (the counters live in
         /// <paramref name="pity"/>; null skips them). At most one named item from a normal kill and two from an elite; epics do not
-        /// count. A unique item <paramref name="held"/> says you carry now is then left off the body (you could not take it; step
-        /// L2 passes the bags and equipment, null keeps it). An elite whose body would hold no gear gets a generated piece at its
+        /// count. A unique item <paramref name="held"/> says you carry now is left out of each group's pick, so it neither spends the
+        /// cap nor moves a pity count, and is taken off the body if the base roll left it there (you could not take it; step L2
+        /// passes the bags and equipment, null keeps it). An elite whose body would hold no gear gets a generated piece at its
         /// level (rare 35%, else uncommon), and 6% of an elite's generated rares come out epic. Named items the base roll already
         /// left on the body count toward the cap. owned may be null (nothing owned). The same seed gives the same drops.
         /// </summary>
@@ -267,7 +268,7 @@ namespace Crulanda.Encounter
                 for (int gi = 0; gi < d.groups.Length; gi++)
                 {
                     var g = d.groups[gi];
-                    var pool = new List<DropPick>(); foreach (var k in g.pick) if (!drops.Exists(x => x.item == k.item)) pool.Add(k);
+                    var pool = new List<DropPick>(); foreach (var k in g.pick) if (!drops.Exists(x => x.item == k.item) && !(held != null && IsUnique(k.item) && held(k.item))) pool.Add(k);
                     if (pool.Count == 0) continue;
                     bool epic = pool.TrueForAll(k => Quality(items, k.item) >= 4);
                     if (!epic && named >= cap) continue;

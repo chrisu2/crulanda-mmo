@@ -325,7 +325,7 @@ namespace Crulanda.Tests
             Assert.AreEqual(1f, ProfessionLog.UpChance(1, 1)); Assert.AreEqual(1f, ProfessionLog.UpChance(10, 1), "Under 10 over the recipe: every time (orange).");
             Assert.AreEqual(.5f, ProfessionLog.UpChance(11, 1)); Assert.AreEqual(.5f, ProfessionLog.UpChance(20, 1), "Under 20 over: half the time (yellow).");
             Assert.AreEqual(.1f, ProfessionLog.UpChance(21, 1)); Assert.AreEqual(.1f, ProfessionLog.UpChance(30, 1), "Under 30 over: one in ten (green).");
-            Assert.AreEqual(0f, ProfessionLog.UpChance(31, 1)); Assert.AreEqual(0f, ProfessionLog.UpChance(100, 80), "From 30 over: never (grey).");
+            Assert.AreEqual(0f, ProfessionLog.UpChance(31, 1)); Assert.AreEqual(0f, ProfessionLog.UpChance(110, 80), "From 30 over: never (grey).");
             var log = Woodcutter(out _); var p = log.Progress; var oak = log.Db.Recipe("recipe.charcoal_oak"); var wood = Entry(log, "woodcutting");
             foreach (var (skill, colour) in new[] { (1, ProfessionLog.Difficulty.Orange), (10, ProfessionLog.Difficulty.Orange), (11, ProfessionLog.Difficulty.Yellow), (21, ProfessionLog.Difficulty.Green), (31, ProfessionLog.Difficulty.Grey) })
             { wood.skill = skill; Assert.AreEqual(colour, log.DifficultyOf(oak), "Woodcutting " + skill); }

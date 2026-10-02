@@ -404,6 +404,44 @@ namespace Crulanda.Tests
             Assert.IsNull(s.CraftHelper(s.Professions.Db.Recipe("recipe.potion_minor")));
             Assert.IsNull(s.CraftHelper(s.Professions.Db.Recipe("recipe.charcoal_oak")), "Charcoal (Woodcutting) has nobody's help.");
         }
+
+        /// <summary>
+        /// Step 13 (BUILD_PLAN): Lisbet's drying hut is the herbalist's bench. At night with Lisbet abed, E there reads "Work at the bench"
+        /// and opens the Trades window on Alchemy; Blacksmithing is not taken up there; Alchemy is, and two minor healing draughts are
+        /// made from yarrow and vials on the work bar. With Blacksmithing taken up too both slots are used.
+        /// </summary>
+        [UnityTest] public IEnumerator DryingHut_IsTheBench()
+        {
+            yield return Open(23.5f);
+            var s = Session(); var p = s.Progress; var zone = s.Zone;
+            Assert.AreEqual(root, s.SaveDirectoryOverride, "This test saves to its own folder.");
+            var bench = zone.Stations.Find(x => x.kind == "bench" && x.name == "Lisbet's drying hut"); Assert.NotNull(bench, "The drying hut is a bench.");
+            var stand = zone.Workplaces.First(w => w.kind == "dryhut" && w.name == "Lisbet's drying hut");
+            yield return StandAt(s, stand.stand);
+            Assert.IsNull(s.TradeNpcNear("herbalist", EncounterSession.HelperRange), "Lisbet is abed.");
+            Assert.AreSame(bench, s.StationNear("bench")); Assert.AreSame(bench, s.StationNear(null));
+            Assert.AreEqual("Work at the bench", s.InteractPrompt);
+            s.Interact();
+            Assert.IsTrue(s.TradesOpen); Assert.AreEqual("alchemy", EncounterHud.TradesPage, "The bench opens on Alchemy..."); Assert.IsTrue(EncounterHud.TradesRecipes, "...at its recipes.");
+            Assert.IsFalse(s.CanTakeUp("blacksmithing", out var why)); Assert.AreEqual("Blacksmithing is taken up at a forge, or from a blacksmith.", why);
+            s.Messages.Clear();
+            Assert.IsTrue(s.LearnCraft("alchemy"));
+            Assert.Contains(s.Professions.Db.Profession("alchemy").takeUp, s.Messages);
+            var minor = s.Professions.Db.Recipe("recipe.potion_minor"); Assert.AreSame(bench, s.StationFor(minor));
+            Assert.AreEqual(0, Inventory.Add(p, s.Items, "mat.yarrow", 4)); Assert.AreEqual(0, Inventory.Add(p, s.Items, "mat.vial", 2));
+            int potions = Inventory.Count(p, "potion.minor");
+            Assert.IsTrue(s.CanCraft(minor, out why), why);
+            Assert.IsTrue(s.Make(minor, 2)); Assert.AreEqual("Minor healing draught", s.PlayerCastName);
+            yield return new WaitForSeconds(2 * EncounterSession.CraftSeconds + 1);
+            Assert.IsFalse(s.Working);
+            Assert.AreEqual(potions + 2, Inventory.Count(p, "potion.minor")); Assert.AreEqual(0, Inventory.Count(p, "mat.yarrow")); Assert.AreEqual(0, Inventory.Count(p, "mat.vial"));
+            Assert.Contains("You make Minor healing draught.", s.Messages); Assert.AreEqual(3, s.Professions.Skill("alchemy"));
+            StringAssert.Contains("\"alchemy\"", Saved(s));
+            // Both crafts taken (Blacksmithing as if at a forge): every slot is used, and the bench still opens on Alchemy. The content
+            // has two crafts, so a third is refused in ProfessionLogTests.ThirdCraft_IsRefused.
+            Assert.IsTrue(s.Professions.Learn("blacksmithing", out why), why);
+            Assert.AreEqual(2, s.Professions.CraftSlotsUsed); Assert.AreEqual("alchemy", s.StationTrade("bench").id);
+        }
     }
 }
 #endif

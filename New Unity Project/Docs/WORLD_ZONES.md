@@ -619,6 +619,15 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
   tour shoots each zone's own from its front (`<zone>-81-station-NN-<name>`); the UI capture shows the recipes at Vell's smithy
   (`24-station-recipes`, `25-station-charcoal-made`) and Cooking at the Cask's kitchen range (`26-cooking-recipes`,
   `27-cooking-stew-made`).
+- **The crafts (BUILD_PLAN steps 12 and 13):** Blacksmithing is taken up at any forge (Vell's smithy in Oakhaven, the
+  Pass-trader's field anvil on the Peaks, Oska's bone-anvil on the Rim, Alder-Knot's ember-stone on the Shore) or from a
+  blacksmith (Brannoc Vell, Oska, Alder-Knot); Alchemy at any herbalist's bench (Lisbet's drying hut in Oakhaven, Wenna Coyle's
+  bench in Khaven, Mother Vane's salt-bench on the Rim, Moss-Lantern's bench on the Shore) or from a herbalist (Lisbet Crane,
+  Wenna Coyle, Mother Vane). Khaven has no forge and the Peaks no bench. With the trade's own person awake within 8 m the work
+  goes twice as fast. The UI capture shows taking up Blacksmithing at the first forge (`28-craft-take-up`), the Copper-shod cudgel
+  made (`29-craft-cudgel-made`) and worn (`30-craft-cudgel-worn`), Alchemy at the first bench with two draughts made
+  (`31-craft-potion-made`), both crafts taken (`32-crafts-two-of-two`) and Forget's question (`33-craft-forget-confirm`). The
+  trainers' lines are GAME-ONLY (Mother Vane is CANON; she says the line any herbalist says).
 
 ## Travel
 - Zones list `exits` (to, name, at, arrive, radius). Standing at an exit shows "[E] <name>"; E travels (not in combat):

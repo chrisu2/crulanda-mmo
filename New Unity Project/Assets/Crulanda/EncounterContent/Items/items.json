@@ -382,6 +382,18 @@
       "description": "An Ash-Walker recipe. Burns going down."
     },
     {
+      "id": "potion.tarn",
+      "name": "Tarnwater draught",
+      "kind": "consumable",
+      "heal": 280,
+      "quality": 1,
+      "level": 6,
+      "value": 11,
+      "stack": 10,
+      "description": "Tarnwort steeped cold with a pinch of mourner's cap. It numbs going down, and then it mends.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
       "id": "item.poachers_hood",
       "name": "Poacher's Oilskin Hood",
       "kind": "gear",

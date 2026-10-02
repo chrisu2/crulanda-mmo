@@ -466,6 +466,32 @@ namespace Crulanda.Tests
         }
 
         /// <summary>
+        /// Alchemy (DESIGN 5.3): five draughts at a herbalist's bench, at skill 1, 20, 40, 60 and 80: the four that were already in the
+        /// game and the new Tarnwater draught, each from its tier's herbs and a vial, named for what it makes. The Tarnwater draught
+        /// heals 280 at level 6, between the Healing draught and the Salt-cured tonic.
+        /// </summary>
+        [Test] public void Alchemy_HasTheFivePotionsOfTheDesign()
+        {
+            var items = Items(); var db = Db(items);
+            var expect = new[] { ("recipe.potion_minor", 1, "mat.yarrow 2, mat.vial 1", "potion.minor", 90), ("recipe.potion_healing", 20, "mat.mourners_cap 2, mat.yarrow 1, mat.vial 1", "potion.healing", 200),
+                ("recipe.potion_tarn", 40, "mat.tarnwort 2, mat.mourners_cap 1, mat.vial 1", "potion.tarn", 280), ("recipe.potion_salt", 60, "mat.cinder_thistle 2, mat.salt 1, mat.vial 1", "potion.salt", 360),
+                ("recipe.potion_dewfern", 80, "mat.dewfern 2, mat.tarnwort 1, mat.vial 1", "potion.dewfern", 520) };
+            CollectionAssert.AreEqual(expect.Select(e => e.Item1), db.RecipesFor("alchemy").Select(r => r.id), "Alchemy's recipes, easiest first.");
+            foreach (var (id, skill, makings, output, heal) in expect)
+            {
+                var r = db.Recipe(id); Assert.NotNull(r, id);
+                Assert.AreEqual("alchemy", r.profession, id); Assert.AreEqual(skill, r.skill, id); Assert.AreEqual("bench", r.station, id + " is made at a herbalist's bench.");
+                Assert.AreEqual(makings, string.Join(", ", r.inputs.Select(i => i.item + " " + i.count)), id); Assert.AreEqual(output, r.output, id); Assert.AreEqual(1, r.count, id);
+                var d = items.Get(output); Assert.NotNull(d, output);
+                Assert.AreEqual("consumable", d.kind, output); Assert.IsFalse(d.food, output + " is drunk, and works in a fight."); Assert.AreEqual(heal, d.heal, output);
+                Assert.AreEqual(r.name, d.name, id + " is named for what it makes.");
+            }
+            var tarn = items.Get("potion.tarn");
+            Assert.AreEqual(6, tarn.level); Assert.AreEqual(11, tarn.value); Assert.AreEqual(10, tarn.stack); Assert.AreEqual("GAME-ONLY", tarn.canonStatus); Assert.IsFalse(string.IsNullOrEmpty(tarn.description));
+            Assert.IsFalse(items.Vendors.Any(v => (v.items ?? new string[0]).Contains("potion.tarn")), "The Tarnwater draught is made, not sold.");
+        }
+
+        /// <summary>
         /// The two crafts can be taken up and are worked beside their trade (DESIGN 4, 6.2): each says where it is taken up, what is said
         /// when it is taken up alone, and what its trade's people say: Brannoc Vell and Lisbet Crane in their own words, and a line for
         /// any other blacksmith or herbalist. The trainer roles are trades the villages have.

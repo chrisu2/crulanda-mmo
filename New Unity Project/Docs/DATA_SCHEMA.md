@@ -57,6 +57,8 @@ charge 4x), stack, armor, stamina, strength, agility, intellect, spirit, weaponD
 | `pouch` | materials, eggs, cheese | The class of trade bag that holds it: `ore`, `timber`, `herb`, `larder`. A picked-up item tops up its stacks first, then fills an empty slot of a worn bag that holds its class, then an ordinary slot. |
 | `kind: "bag"` | `bag.simples_wallet`, `bag.log_sling`, `bag.larder_scrip`, `bag.ore_poke` | A trade bag (the leatherworker's). Used once from the bags it is worn for good: it leaves the bags, its id joins the save's `pouches`, and its `slots` are added after the 24 (`Inventory.Wear`). One of each: a second is refused and kept ("You already carry one."). Stack 1. |
 | `holds`, `slots` | bags | The class its slots take (a `pouch` value) and how many (1-24). Nothing else goes in ("Only ore, bars and charcoal go in the ore-poke."). `ItemDatabase.Parse` refuses a bag without both. |
+| bars | `mat.copper_bar`, `mat.bogiron_bar`, `mat.ridgesteel_bar`, `mat.ashsteel_bar`, `mat.veridian_bar` | Kind `material` (values 4, 7, 10, 13, 19), `trade: "forge.ore"`, `pouch: "ore"`; smelted by Blacksmithing (BUILD_PLAN step 12). |
+| crafted gear | `craft.copper_cudgel` ... `craft.heartwood_greatblade` | The Blacksmith's 21 pieces (DESIGN 5.2): kind `gear`, uncommon, required at a zone's top level less one (1, 4, 7, 9, 12), with the damage or armour and value generated uncommon gear has at that level and one stat of about a quarter of its power (`ProfessionDataTests.CraftedGear_SitsOnTheGeneratedCurve`). The capstone, the Heartwood greatblade, is rare: 36 damage, +5 Strength, +5 Stamina, under every level-13 rare weapon. Their looks are in `Resources/Gear/looks.json`. |
 | meat | `junk.boar_meat` (Tough boar meat; id, name and value kept from when it was junk), `mat.wolf_haunch`, `mat.hound_flank`, `mat.mossback_chop`, `mat.venison` | Kind `material`, quality 1, stack 20, `trade: "inn.meat"`, `pouch: "larder"`; Cooking's makings (BUILD_PLAN step 10). The boar drops its meat as before (0.5); the wolf, hound, mossboar and stag tables drop theirs (0.4, 0.45, 0.5, 0.5). No vendor sells meat. "Sell junk" keeps it. |
 | foods | `food.*` | Kind `consumable`, `food: true`: eaten out of combat, `heal` over 10 s. The ten cooked foods (`food.griddle_bread` ... `food.venison_pie`) heal more than any food a vendor sells at their level (the lists, and the merchant's Oakhaven eggs) and go in no trade bag. |
 | hides | `junk.wolf_pelt`, `junk.ash_hide`, `junk.moss_hide`, `junk.dappled_hide`; from hunting (step 11) `hide.coney` (Coney skin, 1), `hide.hill_deer` (Hill-deer hide, 2), `hide.boar` (Boar hide, 2) | Kind `material`, quality 1, stack 10, `trade: "tannery.hides"`, no `pouch` (ids, names, values and the stack of 10 kept from when the first four were junk). "Sell junk" keeps them; using one says "Leather. Maud Tanner in Oakhaven works it." Sold in a village, the tannery and the leatherworker notice. |
@@ -84,7 +86,11 @@ invalid" and runs without the trades (items are unaffected).
     { "id": "mining", "name": "Mining", "kind": "gather", "tool": "tool.pick", "verb": "Mine",
       "taught": "You hang the pick at your belt. You can now mine.", "description": "...", "canonStatus": "GAME-ONLY" },
     { "id": "cooking", "name": "Cooking", "kind": "free", "station": "fire" },
-    { "id": "blacksmithing", "name": "Blacksmithing", "kind": "craft", "station": "forge", "trainerRole": "blacksmith" }
+    { "id": "blacksmithing", "name": "Blacksmithing", "kind": "craft", "station": "forge", "trainerRole": "blacksmith",
+      "learnAt": "Taken up at a forge: ...", "takeUp": "You look over the anvil, the tongs and the quench tub, and begin.",
+      "helping": "{name} works the bellows for you.",
+      "trainerLines": [ { "npc": "Brannoc Vell", "text": "Mind the scale. Copper first; it forgives you." }, { "text": "Hammer, tongs and a steady arm. ..." } ],
+      "helpLines": [ { "npc": "Brannoc Vell", "text": "Pump it slow. Let the coals do the work." }, { "text": "Here, I'll keep the fire up for you." } ] }
   ],
   "nodes": [
     { "id": "node.copper", "name": "Copper seam", "profession": "mining", "skill": 1, "item": "mat.copper_ore", "min": 1, "max": 3,
@@ -99,8 +105,22 @@ invalid" and runs without the trades (items are unaffected).
 
 - `ProfessionDef`: `kind` is `gather` (free to everyone, no limit), `free` (everyone has it from the start) or `craft` (at most
   `craftSlots` at once). `tool` is an item of kind `tool` whose `teaches` is this id; a `gather` trade with no tool is known from the
-  start. `station` is `forge`, `bench` or `fire`. `taught` is the line said when the tool is first used; `description` is the
-  trade's page in the Trades window (K).
+  start. `station` is `forge`, `bench` or `fire` (a craft must have one). `taught` is the line said when the tool is first used;
+  `description` is the trade's page in the Trades window (K). For a craft: `trainerRole` is the trade of the villagers who teach it
+  and work beside you (`blacksmith`, `herbalist`); `learnAt` says on its page where it is taken up; `takeUp` is said when it is taken
+  up with no trainer near; `trainerLines` are what a trainer says when it is taken up beside them and `helpLines` what the trade's
+  person says when they lend a hand (each `{ "npc", "text" }`: the line written for that villager by name, else the first with no
+  `npc`); `helping` is the chat line for that, `{name}` the helper. A line with no text is refused.
+- Crafts (`ProfessionLog.CanLearn`, `Learn`, `CanForget`, `Forget`; `EncounterSession.CanTakeUp`, `LearnCraft`, `ForgetCraft`;
+  BUILD_PLAN step 12): at most `craftSlots` (2) at once. A craft is taken up from its page in the Trades window ("Take up
+  Blacksmithing"), at skill 1, within 5 m of a station of its kind (nobody need be there) or 6 m of one of its trainers, awake;
+  refused, in this order: not a craft ("Everyone knows Cooking from the start.", or a gathering skill's tool), already taken up,
+  every slot used ("Two crafts already. Forget one first."), or the wrong place ("Alchemy is taken up at a herbalist's bench, or
+  from a herbalist."). A trainer near answers in their own words and turns to you; alone, `takeUp` is said. A toast says it
+  ("BLACKSMITHING / Taken up") and the game saves. Forget (its page, after a confirm: "Forget Blacksmithing? Skill 47 will be lost.")
+  removes the entry: the skill is lost, the slot is free, and it can be taken up again from 1; what was made stays. Cooking and
+  the gathering skills are never forgotten ("Cooking stays with you. It can't be forgotten."). The save format is unchanged: the
+  crafts are entries of `professions` like any trade.
 - `NodeDef`: a kind of thing worked in the world. `profession` must be a `gather` trade, `item` a known item, `skill` 1-100 (the
   skill at which it comes easily: 1, 20, 40, 60, 80 by zone), `min`-`max` the yield, `respawn` and `seconds` above zero. `look` and
   `variant` choose the prop (`ore`, `ore_rich`, `windfall`, `herb`; variant is the tier, 0-4, and for herbs the `Herb` look, 0-5:
@@ -154,7 +174,8 @@ invalid" and runs without the trades (items are unaffected).
 - A recipe can be made within 5 m (ground distance; one in a cave and one out of it never reach each other) of a station of one of
   its kinds. E there (when no one is in reach to talk to, nothing to pick up and no door at hand) reads "Work at the forge", "Work at
   the bench" or "Cook at the fire", and opens the Trades window (K) at the recipes of the trade the station serves (a fire opens on
-  Cooking, a forge on Woodcutting's charcoal until Blacksmithing is taken up). Nobody need be there, day or night.
+  Cooking; a forge on Blacksmithing once it is taken up, or while a craft slot is free to take it up there, else on Woodcutting's
+  charcoal; a bench on Alchemy). Nobody need be there, day or night.
 - The zone builder learns what a node is (name, prompt, look) from the component beside it that implements `IZoneNodeKinds`
   (the encounter session, from the trades' content). Without one it builds no nodes and warns.
 - `RecipeDef`: `profession`, `skill` 1-100, `station` (alternatives joined with `|`), at least one input, `output`, `count`
@@ -164,7 +185,14 @@ invalid" and runs without the trades (items are unaffected).
   Griddle bread (1 flour), Boar stew (2 boar meat) at 1; Harrow hearth-cake (flour and an egg, makes 2) at 5; Wolf-haunch skewer
   (2 wolf haunch, a mourner's cap) at 20; Harrow pasty (flour, Harrow cheese, boar meat) at 30; Pass-smoked loin (2 boar meat,
   tarnwort, salt) at 40; Salt-baked hound flank (2 hound flank, salt) at 60; Cinder-crust loaf (2 flour, cinder-thistle, charcoal)
-  at 70; Dewfern-glazed mossback chop (2 mossback chop, dewfern) at 80; Shore venison pie (2 venison, flour) at 90. Rules pinned by `ProfessionDataTests`: what a recipe makes (value x count) is worth at most 1.5
+  at 70; Dewfern-glazed mossback chop (2 mossback chop, dewfern) at 80; Shore venison pie (2 venison, flour) at 90.
+  Blacksmithing's 26 (BUILD_PLAN step 12, DESIGN 5.2), at a forge: five smelts, two of a tier's ore and a charcoal for one bar, at
+  1, 20, 40, 60 and 80 (copper, bog-iron, ridge-steel from Adit iron, ash-steel from cinder ore, Veridian); then the 21 pieces from
+  5 to 100, each from its tier's bars and sometimes its tier's wood (the Copper-shod cudgel: 2 copper bars and an oak log, at 5; the
+  Heartwood greatblade: 8 Veridian bars, 2 ghost-oak heartwood and 4 charcoal, at 100). Alchemy's five (BUILD_PLAN step 13, DESIGN
+  5.3), at a herbalist's bench, each with a vial: the Minor healing draught (2 yarrow) at 1, the Healing draught (2 mourner's cap,
+  yarrow) at 20, the Tarnwater draught (`potion.tarn`, new: 2 tarnwort, mourner's cap; heals 280, level 6) at 40, the Salt-cured
+  tonic (2 cinder-thistle, salt) at 60, the Dewfern draught (2 dewfern, tarnwort) at 80. Rules pinned by `ProfessionDataTests`: what a recipe makes (value x count) is worth at most 1.5
   times its inputs; a recipe from vendor goods alone never makes more than they cost to buy; every recipe's station stands somewhere.
 - Making (`ProfessionLog.CanCraft`, `Craft`; `EncounterSession.Make`): refused, in this order, without the trade (a gathering
   skill's tool: "You need a woodcutter's hatchet. Merchants sell them."; a craft: "You have not taken up Blacksmithing."), under the
@@ -172,7 +200,9 @@ invalid" and runs without the trades (items are unaffected).
   of an input ("You need Harrow oak log." or "... x2."), or with no room for what it makes ("Your bags are full."); then nothing
   changes. Otherwise the inputs leave the bags, the output goes in (onto its stacks, then a worn trade bag that holds it: charcoal
   goes in the ore-poke), and the skill rises: every time under 10 points over the recipe (orange), half the time under 20 (yellow),
-  one in ten under 30 (green), never after (grey); never past 100. Each takes 2 s on the work bar ("You make Charcoal."); Make all
+  one in ten under 30 (green), never after (grey); never past 100. Each takes 2 s on the work bar ("You make Charcoal."), 1 s
+  when the trade's own person (a blacksmith for Blacksmithing, a herbalist for Alchemy) is awake within 8 m: once a visit chat says
+  "Brannoc Vell works the bellows for you." and they say a line of their own (`EncounterSession.CraftTime`, `CraftHelper`). Make all
   goes one at a time, stops with the reason when the next cannot be made ("Your bags are full."), and moving, a blow, a fight or
   dying stops the rest. Known recipes are not saved: they follow from the skill.
 - Skill is 1-100 (`ProfessionDatabase.MaxSkill`). What a character has learned is saved as `EncounterProgress.professions`

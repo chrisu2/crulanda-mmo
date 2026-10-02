@@ -496,5 +496,21 @@ namespace Crulanda.Tests
             var d = log.Items.Get("craft.copper_cudgel");
             Assert.IsTrue(Inventory.CanEquip(d, 1, out why), why); Assert.AreEqual("mainhand", d.slot); Assert.AreEqual(7, d.weaponDamage);
         }
+
+        /// <summary>Alchemy (BUILD_PLAN step 13): taken up, two yarrow and a vial make a Minor healing draught at a herbalist's bench and
+        /// nowhere else; the Tarnwater draught waits on Alchemy 40.</summary>
+        [Test] public void Alchemy_MakesAMinorDraught_AtTheBench()
+        {
+            var log = Fresh(out _); var p = log.Progress; var minor = log.Db.Recipe("recipe.potion_minor"); var tarn = log.Db.Recipe("recipe.potion_tarn");
+            Inventory.Add(p, log.Items, "mat.yarrow", 5); Inventory.Add(p, log.Items, "mat.vial", 2);
+            Assert.IsFalse(log.CanCraft(minor, k => k == "bench", out var why)); Assert.AreEqual("You have not taken up Alchemy.", why);
+            Assert.IsTrue(log.Learn("alchemy", out why), why);
+            Assert.AreEqual(2, log.CanMake(minor), "Five yarrow and two vials: two draughts.");
+            Assert.IsFalse(log.Craft(minor, AtForge, new System.Random(1), out why)); Assert.AreEqual("You need a herbalist's bench nearby.", why);
+            Assert.IsTrue(log.Craft(minor, k => k == "bench", new System.Random(1), out why), why);
+            Assert.AreEqual(1, Inventory.Count(p, "potion.minor")); Assert.AreEqual(3, Inventory.Count(p, "mat.yarrow")); Assert.AreEqual(1, Inventory.Count(p, "mat.vial"));
+            Assert.AreEqual(2, log.Skill("alchemy"));
+            Assert.AreEqual(ProfessionLog.Difficulty.Locked, log.DifficultyOf(tarn)); Assert.IsFalse(log.CanCraft(tarn, k => k == "bench", out why)); Assert.AreEqual("That wants Alchemy 40.", why);
+        }
     }
 }

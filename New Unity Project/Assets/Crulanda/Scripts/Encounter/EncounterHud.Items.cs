@@ -260,7 +260,10 @@ namespace Crulanda.Encounter
                 var r = new Rect(4, i * rowH + 4, Slot, Slot);
                 ItemSquare(r, new ItemStack { item = d.id, count = 1 });
                 int price = Inventory.Price(d); bool afford = p.gold >= price;
-                GUI.contentColor = ItemDatabase.QualityColors[Mathf.Clamp(d.quality, 0, 4)] * .6f; GUI.Label(new Rect(r.xMax + 10, r.y + 2, 200, 22), d.name, frameName);
+                // Names in ink on the parchment: common in the window's own brown, junk in a faded one, better pieces in their colour
+                // darkened (the colour times .6 took the alpha down too, so common names were faint grey).
+                var qc = ItemDatabase.QualityColors[Mathf.Clamp(d.quality, 0, 4)];
+                GUI.contentColor = d.quality <= 0 ? new Color(.42f, .39f, .34f) : d.quality == 1 ? new Color(.2f, .13f, .07f) : new Color(qc.r * .6f, qc.g * .6f, qc.b * .6f, 1); GUI.Label(new Rect(r.xMax + 10, r.y + 2, 200, 22), d.name, frameName);
                 GUI.contentColor = afford ? new Color(.35f, .25f, .08f) : new Color(.7f, .15f, .1f); GUI.Label(new Rect(r.xMax + 10, r.y + 26, 160, 22), price + " gold" + (d.level > p.Level ? "  ·  level " + d.level : ""), tiny);
                 GUI.contentColor = Color.white;
                 GUI.enabled = afford;

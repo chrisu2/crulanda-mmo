@@ -3364,10 +3364,10 @@ namespace Crulanda.World
         /// </summary>
         void Herb(Transform t, int variant)
         {
-            if (variant >= 3 && variant <= 5) { HerbOfTheTrades(t, variant); return; }
-            int v = Mathf.Abs(variant) % 3;
+            int v = variant >= 3 && variant <= 5 ? variant : Mathf.Abs(variant) % 3;
             // Drawn a third larger than life, as the held weapons are: from the path a life-size clump is lost among the wildflowers.
             var clump = new GameObject("Clump").transform; clump.SetParent(t, false); clump.localScale = Vector3.one * (v == 1 ? 1.15f : 1.3f); t = clump;
+            if (v >= 3) { HerbOfTheTrades(t, v); return; }
             if (v == 1) { MournersCap(t); return; }
             var leaf = Tint(art.foliage, Wither(v == 0 ? new Color(.27f, .48f, .2f) : new Color(.25f, .44f, .19f)));
             var shade = Tint(art.foliage, Wither(v == 0 ? new Color(.18f, .35f, .15f) : new Color(.17f, .31f, .14f)));

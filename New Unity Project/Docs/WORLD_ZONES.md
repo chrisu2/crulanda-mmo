@@ -115,9 +115,10 @@ holds roads, clearings, camps, props, people, landmarks, exits, arrivals and a 6
 of it stays reachable. A cliff's `lift` raises a shelf behind it (negative: on its -z side): the Umbra scarp, the High ledge
 and its wall, the Eyrie crag, the North wall and the South and East scarps.
 Trades in the Peaks (GAME-ONLY, 2026-10-01; BUILD_PLAN step 8; tier 3, every node at skill 40):
-- **Ore** (Adit iron): two at the Sealed Adit's face (north and south of the secret, by the ore cart), two at the spoil heap's
-  foot, two under the Umbra scarp, one each at the feet of the East wall, the South scarp, the Goat-path scarp and the
-  Switchback crag. None in the Avalanche scar: the rockhides and Old Scree-Tusk fill it.
+- **Ore** (Adit iron): two at the Sealed Adit's face (north and south of the secret and the jambs), one by the boulder at the
+  edge of the Adit yard, two under the Umbra scarp, two under the Goat-path scarp, one each at the feet of the East wall, the
+  South scarp and the Switchback crag. None on the spoil heap (its ring of boulders fills it) or in the Avalanche scar (the
+  rockhides and Old Scree-Tusk fill it).
 - **Timber** (stone-pine windfalls): at the pine woods' edges (the Wolf pines' south edge, clear of the pack; the High, Gate,
   Ore-road, East, South and Umbra pines) and one at the Avalanche deadfall's north edge.
 - **Herbs** (tarnwort): seven round the Cold Tarn's shore and three on the Shieling's hay meadow, off the mown field.

@@ -3056,7 +3056,7 @@
     { "node": "node.veridian_rich", "at": { "x": -106, "y": 218 }, "under": true },
     { "node": "node.veridian_rich", "at": { "x": -120, "y": 218 }, "under": true },
     { "node": "node.ghostoak", "at": { "x": 122, "y": 26 }, "rotation": 90 },
-    { "node": "node.ghostoak", "at": { "x": -116, "y": -46 } },
+    { "node": "node.ghostoak", "at": { "x": -119, "y": -46.5 } },
     { "node": "node.ghostoak", "at": { "x": -133, "y": -70 }, "rotation": 90 },
     { "node": "node.ghostoak", "at": { "x": -79, "y": -88 }, "rotation": 90 },
     { "node": "node.ghostoak", "at": { "x": -48, "y": 62.5 } },

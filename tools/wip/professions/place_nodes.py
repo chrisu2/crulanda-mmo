@@ -228,7 +228,8 @@ class Zone:
             if abs(lx) <= h[0] + margin and abs(lz) <= h[1] + margin: return p.get('name') or p['kind']
         return None
     def _blockers(self):
-        """Solid things (colliders, or their spread), as circles (at, r) and boxes (at, rot, hx, hz)."""
+        """Solid things (colliders, or their spread), as circles (at, r) and boxes (at, rot, hx, hz). A perch is its whole ring of
+        boulders (out to its radius plus 4.8 m); a giant tree its root flare (4.5 m at scale 1)."""
         circ, box = [], []
         for p in self.props:
             k = p['kind']; at = V(p.get('at')); rot = p.get('rotation', 0); s = p.get('size') or {}; sx, sy = s.get('x', 0), s.get('y', 0); sc = p.get('scale', 1) or 1
@@ -250,8 +251,8 @@ class Zone:
                 box.append((at, rot, L / 2 + .4, {'fence': .4, 'hedge': .8, 'ruin': .8, 'spine': 1.6, 'fallen_giant': 3}[k], p.get('name') or k)); continue
             if k == 'ruined_house': box.append((at, rot, (sx or 8) / 2 + .5, (sy or 6) / 2 + .5, p.get('name') or k)); continue
             r = {'rock': 1.15 * (1 + p.get('variant', 0) * .6), 'crates': 1.3, 'barrels': 1.3, 'cart': 2.2, 'wagon': 3, 'stall': 2.6, 'well': 1.6, 'woodpile': 1.6, 'gallows': 1.6,
-                 'brazier': .7, 'idol': .9, 'shrine': 2.4, 'wayshrine': 1.3, 'monolith': 2.6, 'rib': (sx or 6) / 2 + .5, 'brood': (sx or 5) / 2 + .5, 'perch': (sx or 8) / 2 + 1,
-                 'cave': (sx or 20) / 2 + 2, 'giant_tree': 2.6 * sc, 'treehouse': 3.2 * sc, 'waterfall': (sx or 6) / 2 + 2, 'mushrooms': (sx or 2) * .5 * sc + .3,
+                 'brazier': .7, 'idol': .9, 'shrine': 2.4, 'wayshrine': 1.3, 'monolith': 2.6, 'rib': (sx or 6) / 2 + .5, 'brood': (sx or 5) / 2 + .5, 'perch': (sx or 8) + 4.8,
+                 'cave': (sx or 20) / 2 + 2, 'giant_tree': 4.5 * sc, 'treehouse': 4.5 * sc, 'waterfall': (sx or 6) / 2 + 2, 'mushrooms': (sx or 2) * .5 * sc + .3,
                  'dead_oak': 1 * sc, 'tree': .6, 'pine': .6, 'great_oak': 3, 'signpost': .4, 'lamp': .4, 'grave': .5, 'gate': 4, 'coop': 2, 'haystack': 1.6, 'cavern': 0,
                  'bridge': 0, 'herb': 0, 'wallow': 0}.get(k, 1.5)
             if r > 0: circ.append((at, r, p.get('name') or k))
@@ -466,13 +467,14 @@ def khaven(z):
 CANDIDATES['khaven'] = khaven
 
 def peaks(z):
-    """The Shattered Peaks, tier 3. Adit-iron seams by the Sealed Adit's face and round the spoil heap, at the feet of the Umbra,
-    Goat-path and South scarps and the Switchback crag; stone-pine windfalls at the pine woods' edges and one in the Avalanche
-    deadfall; tarnwort round the Cold Tarn and on the Shieling's hay meadow (off the mown field itself)."""
+    """The Shattered Peaks, tier 3. Adit-iron seams by the Sealed Adit's face and the boulder by its yard, at the feet of the
+    Umbra, Goat-path, East and South scarps and the Switchback crag (none on the spoil heap: its ring of boulders fills it);
+    stone-pine windfalls at the pine woods' edges and one in the Avalanche deadfall; tarnwort round the Cold Tarn and on the
+    Shieling's hay meadow (off the mown field itself)."""
     O = 'node.adit'; W = 'node.stonepine'; H = 'node.tarnwort'
     return [
         ore_at_cliff(z, 'Adit face', -10, 4, O, 'adit N'), ore_at_cliff(z, 'Adit face', 8, 4, O, 'adit S'),
-        N(O, -132.2, -55, 'spoil E', 270), N(O, -139, -57.3, 'spoil W', 52),
+        N(O, -141, -33, 'adit rock', 270), ore_at_cliff(z, 'Goat-path scarp', 16, 4, O, 'goat-path S'),
         ore_at_cliff(z, 'Umbra scarp', -8, 4, O, 'umbra N'), ore_at_cliff(z, 'Umbra scarp', 8, 4, O, 'umbra S'),
         ore_at_cliff(z, 'East wall', -6, 4, O, 'east wall'), ore_at_cliff(z, 'South scarp', 0, 4, O, 'south scarp'),
         ore_at_cliff(z, 'Goat-path scarp', 0, 4, O, 'goat-path'), ore_at_cliff(z, 'Switchback crag', 0, 4.5, O, 'switchback'),
@@ -516,7 +518,7 @@ def verdant(z):
         N(O, 157, -46, 'south shoulder', 90), N(O, 156, 88, 'north shoulder', 90),
         N(R, -109, 164.5, 'deep gallery', under=True), N(R, -97.5, 192.5, 'deep sap well', under=True),
         N(R, -106, 218, 'deep heart E', under=True), N(R, -120, 218, 'deep heart W', under=True),
-        N(W, 122, 26, 'ridge-foot E', 90), N(W, -116, -46, 'tappers N'), N(W, -133, -70, 'tappers W', 90), N(W, -79, -88, 'mere E', 90),
+        N(W, 122, 26, 'ridge-foot E', 90), N(W, -119, -46.5, 'tappers N'), N(W, -133, -70, 'tappers W', 90), N(W, -79, -88, 'mere E', 90),
         N(W, -48, 62.5, 'westbank N'), N(W, 48, 67, 'riverbank N'), N(W, 113, 108, 'ridge-foot N W', 90), N(W, -4, 105, 'rootfast N'),
         ring(-56, -92, 20, 20, 'mere NE'), ring(-56, -92, 20, 70, 'mere N'), ring(-56, -92, 20, 140, 'mere NW'), ring(-56, -92, 20, 330, 'mere SE'),
         ring(34, -74, 11, 340, 'fern E'), ring(34, -74, 11, 15, 'fern NE'), ring(34, -74, 11, 50, 'fern N'),
@@ -549,10 +551,10 @@ def run(ids, write=False):
             # Already written: the file must hold exactly these candidates (and the herb props their node).
             want = [(c['node'], round(c['at'][0], 1), round(c['at'][1], 1), round(c.get('rotation', 0) or 0, 1), bool(c.get('under')), c.get('item')) for c in cands]
             have = [(n['node'], round(n['at']['x'], 1), round(n['at']['y'], 1), round(n.get('rotation', 0), 1), bool(n.get('under')), n.get('item')) for n in written]
-            if want != have: print('  THE FILE DIFFERS FROM THE CANDIDATES'); bad += 1
+            if want != have: print('  the file differs from the candidates: --write writes them'); todo.append((zid, cands))
             if zid in HERB_PROPS and any(h.get('node') != HERB_PROPS[zid][1] for h in zone.props if h['kind'] == 'herb' and h.get('name') == HERB_PROPS[zid][0]): print('  A HERB PROP HAS NO NODE'); bad += 1
         else: todo.append((zid, cands))
-    print('problems:', bad)
+    print('problems:', bad, '' if not todo else '(to write: %s)' % ', '.join(z for z, _ in todo))
     if write:
         if bad: print('nothing written: fix the problems first')
         else:
@@ -588,7 +590,8 @@ def write_zone(zid, cands, herbprop):
             if inside and line.strip().startswith('"item":') and not line.rstrip().endswith(','):
                 out[-1] = line.rstrip() + ','; out.append(line[:len(line) - len(line.lstrip())] + '"node": "%s"' % node); inside = False; done += 1
         t = '\n'.join(out); print('  %d %s props worked as nodes' % (done, name))
-    if '"nodes"' in t: raise SystemExit(zid + ': already has a nodes array')
+    if '"nodes"' in t:   # written before: the array (always last) is written again
+        k = t.index(',\n  "nodes": ['); t = t[:k] + '\n}' + ('\n' if t.endswith('\n') else '')
     rows = []
     for c in cands:
         parts = ['"node": "%s"' % c['node']]

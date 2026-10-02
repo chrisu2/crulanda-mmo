@@ -2395,8 +2395,8 @@
   "nodes": [
     { "node": "node.adit", "at": { "x": -149, "y": -32 }, "rotation": 270 },
     { "node": "node.adit", "at": { "x": -149, "y": -50 }, "rotation": 270 },
-    { "node": "node.adit", "at": { "x": -132.2, "y": -55 }, "rotation": 270 },
-    { "node": "node.adit", "at": { "x": -139, "y": -57.3 }, "rotation": 52 },
+    { "node": "node.adit", "at": { "x": -141, "y": -33 }, "rotation": 270 },
+    { "node": "node.adit", "at": { "x": -104, "y": -91 }, "rotation": 270 },
     { "node": "node.adit", "at": { "x": -102, "y": 28 }, "rotation": 270 },
     { "node": "node.adit", "at": { "x": -102, "y": 12 }, "rotation": 270 },
     { "node": "node.adit", "at": { "x": 121.8, "y": -37 }, "rotation": 78 },

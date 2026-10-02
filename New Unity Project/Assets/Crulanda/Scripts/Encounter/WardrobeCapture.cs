@@ -388,7 +388,7 @@ namespace Crulanda.Encounter
         /// Open, dry, fairly level ground near the green with nothing standing on it or in front of it (where the camera stands,
         /// to the south): rings of candidates round the recovery point, the first clear one wins.
         /// </summary>
-        static Vector2 FindSpot(Crulanda.World.ZoneBuilder zone, out float ground)
+        internal static Vector2 FindSpot(Crulanda.World.ZoneBuilder zone, out float ground)
         {
             ground = 0; if (zone == null) return Vector2.zero;
             var home = zone.Zone.spawns.recovery; float half = zone.Zone.size / 2 - 20, width = (PerRow - 1) * Spacing + 3;

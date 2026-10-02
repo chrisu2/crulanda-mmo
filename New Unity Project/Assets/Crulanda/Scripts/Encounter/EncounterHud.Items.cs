@@ -65,6 +65,7 @@ namespace Crulanda.Encounter
             if (d != null)
             {
                 Shadow(r, Glyph(d), glyph, ItemDatabase.QualityColors[Mathf.Clamp(d.quality, 0, 4)]);
+                SquareMarks(r, d);
                 if (s.count > 1) Shadow(new Rect(r.x, r.y, r.width - 3, r.height - 1), s.count.ToString(), countStyle, Color.white);
             }
             else if (emptyLabel != null) Shadow(r, emptyLabel, new GUIStyle(countStyle) { alignment = TextAnchor.MiddleCenter, fontSize = 10 }, new Color(.5f, .48f, .42f));
@@ -90,7 +91,7 @@ namespace Crulanda.Encounter
             {
                 var worn = session.Progress.equipment[ItemDatabase.SlotIndex(d.slot)];
                 var w = worn.Empty ? null : session.Items.Get(worn.item);
-                lines.Add(w == null ? "<color=#8f8>Nothing worn in this slot</color>" : "Currently worn: " + w.name + "\n" + ItemDatabase.StatLines(w));
+                lines.Add(CompareLines(d, w));
             }
             tooltip = "<b><color=#" + ColorUtility.ToHtmlStringRGB(ItemDatabase.QualityColors[Mathf.Clamp(d.quality, 0, 4)]) + ">" + d.name + "</color></b>\n" + string.Join("\n", lines);
             tooltipAt = Event.current.mousePosition;

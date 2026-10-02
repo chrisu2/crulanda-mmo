@@ -20,11 +20,12 @@ games are style references only: no copied names, assets, zones or creatures fro
   Khaven Village (3-5, a walled village in permanent grim dusk beside the dead Whispering Wood), the Shattered Peaks
   (6-8, a mountain toll pass held by Sandthrone mercenaries), the Ashland Rim (9-10, grey petrified ash beside the
   Wasting, with the Ash-Walker caves and Weave-Eaters). All built from JSON by `ZoneBuilder` at load, 340-380 m across
-  (grown 2026-09-30 with 37 new places, 18 camps and 14 secrets in the new ground).
+  (grown 2026-09-30 with 37 new places, 18 camps and 14 secrets in the new ground); Oakhaven is 560 m since playtest note 1
+  (2026-10-01: farms, then wolf and boar country, then the hills, with the bandits' cave 270 m from the green).
 - **Living world:** villagers with trades and daily routines, hen-wives and coops, critters with legs, a day/night
   cycle with lamps, falling leaves and ash, wind-swayed grass, respawning camps, ambushes from tall grass, breadcrumb
   quests that lead from zone to zone, a quest book, factions and standing.
-- **A first dungeon, walked into with no loading:** Crowsfoot Hollow at the end of Oakhaven's North road runs 114 m and
+- **A first dungeon, walked into with no loading:** Crowsfoot Hollow, hidden in the hills past the end of Oakhaven's North road, runs 114 m and
   16 m down under the hills: the deserters' camp, the Drop, the Store Caves (Quartermaster Hesk), the Deep Stair and the
   Echoing Hall of Caddock the Bandit King in his tin crown; levels 3-5, the quest "The Tin Crown", a locked strongbox
   and its key, and Caddock's crown as his drop (WORLD_ZONES.md "Caves you walk into").

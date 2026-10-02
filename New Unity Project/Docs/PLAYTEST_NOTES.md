@@ -105,3 +105,12 @@ they read flat. Zones are generated when they load, so Unity's lightmapper canno
 zone builder: light from each torch, fire and glowing thing and from the mouth, blocked by the cave's own walls, with
 darkness in the depths and in the creases, stored on the cave's mesh (or in a light map over its plan) and used by the cave
 shader, the props and the actors alike; then haze, shafts at the mouth and a colour script per cave.
+
+## 11. Real icons for the hot bar and the items in the bags (2026-10-01) — OPEN
+> "need set icons for the hot bar. items in bags. not just letters and colors. can't tell what anything is"
+
+Today every ability on the bar is three letters ("STR", "CHA", "GUA") and every item square two letters on a colour ("Mt",
+"Lt", "Fd", "Wp", "Bg"). Fix: a painted icon for every ability and talent, and for every item: each ore, bar, log, herb,
+hide, meat, food, potion, tool, trade bag, junk and quest item its own picture, and gear by what it is (blade, axe, mace,
+staff, shield, helm, chest, gloves, legs, boots, neck, shoulders) in its own colours, with the quality still shown by the
+border.

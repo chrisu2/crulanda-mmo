@@ -1,11 +1,12 @@
-"""Gathering nodes for Khaven, the Shattered Peaks, the Ashland Rim and the Verdant Shore (BUILD_PLAN step 8, DESIGN 2.4).
+"""Gathering nodes for Oakhaven (since it grew to 560 m, playtest note 1), Khaven, the Shattered Peaks, the Ashland Rim and the
+Verdant Shore (BUILD_PLAN step 8, DESIGN 2.4).
 
 Checks every candidate node against the zone's own data before it is written, by the rules ZoneBuilder.NodeClear and the
 PlayMode NodePlacementTests apply, with a margin, plus a model of the ground (ZoneBuilder.HeightAt ported: rolling hills,
 cliff shelves, the mountains' crags held off the kept ways, landmark pads; creeks and lakes are not carved) and a walk over it
 from the player's start, so a node that would stand on a crag's face or behind one is caught here.
 
-    python place_nodes.py                 check the four zones' candidates; exit 1 on any problem
+    python place_nodes.py                 check the five zones' candidates; exit 1 on any problem
     python place_nodes.py peaks           check one zone
     python place_nodes.py --probe peaks X Y [R]   list clear, walkable spots for an ore seam near (X, Y)
     python place_nodes.py --write         check, then write the nodes arrays and the herb props' node fields
@@ -349,7 +350,7 @@ class Walk:
 # ---------------------------------------------------------------- the node kinds (professions.json) and their footprints
 KINDS = {n['id']: n for n in json.load(open(PROF, encoding='utf-8-sig'))['nodes']}
 def foot(look): return 2.1 if look == 'ore' else 2.1 * 1.35 if look == 'ore_rich' else 3 if look == 'windfall' else .6
-TIER = {'khaven': 20, 'peaks': 40, 'ashrim': 60, 'verdant': 80}
+TIER = {'oakhaven': 1, 'khaven': 20, 'peaks': 40, 'ashrim': 60, 'verdant': 80}
 
 def windfall_ok(zone, at, yaw):
     """WindfallYaw: the first of twelve turns that lies the whole windfall clear; None when none does (it lies at the best then)."""
@@ -449,6 +450,28 @@ def ore_at_cliff(zone, name, along, out, node, label=''):
 def N(node, x, y, label='', rotation=0, **kw): d = dict(node=node, at=(x, y), rotation=rotation, label=label); d.update(kw); return d
 
 CANDIDATES = {}   # filled in below, zone by zone
+
+def oakhaven(z):
+    """Oakhaven, tier 1 (560 m since playtest note 1 moved Crowsfoot Hollow out to the north hills). Copper seams at the feet of
+    the Crowsfoot scarps either side of the Hollow's mouth (they face west now, the cave turned a quarter), one by the big rock
+    south of the North pines and one on Crowsfoot Ridge's crown over the Drop; four rich seams on the Hollow's floor, where they
+    stood in the cave's own frame (the low passage past the camp chamber, the foot of the Store Caves, half-way down the Deep
+    Stair and at its foot); oak windfalls at the edges of the broadleaf woods, three near the village and five out in the wolf
+    and boar country; the eight Yarrow props on the meadows and two more."""
+    O = 'node.copper'; R = 'node.copper_rich'; W = 'node.oak'; H = 'node.yarrow'
+    cave = next(p for p in z.props if p['kind'] == 'cavern'); m = V(cave['at']); yaw = cave.get('rotation', 0)
+    def in_cave(x, y, label):   # a point of the old cave frame (mouth at (-16, 90), running north), where the cave stands now
+        w = world(m, yaw, x + 16, y - 90); return N(R, round(w[0], 1), round(w[1], 1), label, under=True)
+    def by_cave(x, y, label, rot): w = world(m, yaw, x + 16, y - 90); return N(O, round(w[0], 1), round(w[1], 1), label, (rot + yaw) % 360)
+    return [
+        by_cave(-37.5, 88.2, 'scarp N far', 0), by_cave(-27.5, 88.4, 'scarp N near', 0), by_cave(.5, 89.4, 'scarp S near', 0), by_cave(7.6, 89.4, 'scarp S far', 0),
+        N(O, 16.3, 91.5, 'north pines rock', 90), by_cave(-28, 135.5, 'ridge crown', 90),
+        in_cave(-19, 111.3, 'low passage'), in_cave(-14, 150, 'store caves foot'), in_cave(-1.5, 156, 'deep stair'), in_cave(5, 159, 'deep stair foot'),
+        N(W, 53, -14, 'grey-edge copse', 180), N(W, -78.5, 104, 'harrow wood E'), N(W, 88, 175, 'thornshaw S'), N(W, -101, -85, 'south copse', 270),
+        N(W, -80, -146, 'southwood N', 270), N(W, -100.5, 157, 'mastwood E'), N(W, 80, -145.5, 'brook spinney', 270), N(W, -213, -28, 'bound wood E', 90),
+        N(H, -104, 30, 'harrow downs', item='item.yarrow'), N(H, 24, -72, 'brook meadow', item='item.yarrow'),
+    ]
+CANDIDATES['oakhaven'] = oakhaven
 
 def khaven(z):
     """Khaven, tier 2. Bog-iron seams at the feet of the Carrion Cliffs, the Carrion Heights, the Grey scarp and the North
@@ -566,9 +589,9 @@ def run(ids, write=False):
 
 def probe(zid, x, y, r=12, look='ore'):
     allz = load_all(); zone = Zone(zid, allz); walk = Walk(zone)
-    node = {'ore': 'node.' + {'khaven': 'bogiron', 'peaks': 'adit', 'ashrim': 'cinder', 'verdant': 'veridian'}[zid],
-            'windfall': 'node.' + {'khaven': 'blackpine', 'peaks': 'stonepine', 'ashrim': 'snag', 'verdant': 'ghostoak'}[zid],
-            'herb': 'node.' + {'khaven': 'mourners_cap', 'peaks': 'tarnwort', 'ashrim': 'cinder_thistle', 'verdant': 'dewfern'}[zid]}[look]
+    node = {'ore': 'node.' + {'oakhaven': 'copper', 'khaven': 'bogiron', 'peaks': 'adit', 'ashrim': 'cinder', 'verdant': 'veridian'}[zid],
+            'windfall': 'node.' + {'oakhaven': 'oak', 'khaven': 'blackpine', 'peaks': 'stonepine', 'ashrim': 'snag', 'verdant': 'ghostoak'}[zid],
+            'herb': 'node.' + {'oakhaven': 'yarrow', 'khaven': 'mourners_cap', 'peaks': 'tarnwort', 'ashrim': 'cinder_thistle', 'verdant': 'dewfern'}[zid]}[look]
     cands = CANDIDATES[zid](zone)
     others = [(c.get('label', c['node']), c['at']) for c in cands if dist(c['at'], (x, y)) > .5]
     if zid in HERB_PROPS: others += [('prop', V(h['at'])) for h in zone.props if h['kind'] == 'herb' and h.get('name') == HERB_PROPS[zid][0]]
@@ -579,7 +602,7 @@ def probe(zid, x, y, r=12, look='ore'):
             print('ok' if not pr else '  ', q, '; '.join(pr))
 
 # ---------------------------------------------------------------- writing
-HERB_PROPS = {'khaven': ("Mourner's cap", 'node.mourners_cap')}   # existing herb props worked as nodes (the quest's still given)
+HERB_PROPS = {'oakhaven': ('Yarrow', 'node.yarrow'), 'khaven': ("Mourner's cap", 'node.mourners_cap')}   # existing herb props worked as nodes (the quest's still given)
 def num(v): v = round(float(v), 1); return str(int(v)) if v.is_integer() else str(v)
 def write_zone(zid, cands, herbprop):
     path_ = os.path.join(ZONES, zid + '.json'); raw = open(path_, 'rb').read(); crlf = b'\r\n' in raw
@@ -611,5 +634,5 @@ def write_zone(zid, cands, herbprop):
 if __name__ == '__main__':
     a = sys.argv[1:]
     if a and a[0] == '--probe': probe(a[1], float(a[2]), float(a[3]), float(a[4]) if len(a) > 4 else 12, a[5] if len(a) > 5 else 'ore'); sys.exit(0)
-    write = '--write' in a; ids = [x for x in a if not x.startswith('--')] or ['khaven', 'peaks', 'ashrim', 'verdant']
+    write = '--write' in a; ids = [x for x in a if not x.startswith('--')] or ['oakhaven', 'khaven', 'peaks', 'ashrim', 'verdant']
     sys.exit(1 if run(ids, write) else 0)

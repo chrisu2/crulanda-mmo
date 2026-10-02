@@ -109,14 +109,19 @@ shown. The main quest can foreshadow it (the Void-Seed and the straight grey lin
 
 ### Side quest: *The Tin Crown* (GAME-ONLY quest; CANON faction, the Sandthrone)
 Chris's brief: "a quest appears at lvl 3 to take out the bandit and bandit king in the cave so they stop harassing the villagers".
-- **Crowsfoot Hollow** (GAME-ONLY) is the walk-in cave where the North road ends in the hills north of the village, and the
+- **Crowsfoot Hollow** (GAME-ONLY) is the walk-in cave in the hills north of the village, 272 m from the green since playtest
+  note 1 (the North road to its end at (-32, 184), then the Crowsfoot track west round the heel of the ridge to the mouth at
+  (-120, 240), which faces away from the village; WORLD_ZONES.md "Caves you walk into"), and the
   game's first dungeon (Chris: "the cave should be deep and the first foray into dungeon crawling"): lookouts at the mouth,
   a camp of **Sandthrone deserters** in the first chamber, sentries down the Drop, **Quartermaster Hesk** (elite) and his
   guards in the Store Caves, a watch on the Deep Stair, and sixteen metres down, the Echoing Hall of **Caddock, the Bandit
   King** (elite) and his guard. Levels 3-5. The Sandthrone are the canon mercenary company that holds the Peaks toll; this
   band walked away from it and lives off Oakhaven's farms. Layout: `WORLD_ZONES.md` "Caves you walk into".
 - **Caddock** is GAME-ONLY: a deserter sergeant who crowned himself with beaten tin. No canon Sandthrone name is used.
-- **Giver and turn-in:** Wil Carder, the farmer whose barn they emptied (Garet Moss tracked them to the hollow).
+- **Giver and turn-in:** Wil Carder, the farmer whose barn they emptied (Carder's field barn, the last roof on the North road;
+  Garet Moss tracked them to the hollow). His offer and the first step's text give the way: the North road to its end, then
+  the track west round the heel of Crowsfoot Ridge. The quest has no map point of its own: its kills and the plunder are
+  marked where the camps and the prop stand.
 - **Level 4, minLevel 3:** nothing shows before level 3, then a gold !. (It was level 3 until the hollow went deep; level 4
   sits in the middle of the dungeon's 3-5.)
 - **Since 2026-10-01 (unrun):** the hollow is a dungeon in earnest. The deserters call each other, Hesk and Caddock fight with
@@ -278,11 +283,15 @@ the coin goes to her family. Design: `tools/wip/professions/ADDENDUM.md` D. All 
 
 All four are offered together (a bag already worn or carried leaves its quest off her list), and all four bags can be bought from
 her outright. Where the leathers come from (WORLD_ZONES.md, Hunting):
-- Wolves for the wallet: the Harrow wood (-106,108) and the North pines (48,106) camps, levels 1-2, pelt chance 0.7.
-- Hill deer for the sling: game, west of the Old Orchard (-96,88), under Crowsfoot Hollow (30,98), on the slopes under Crowsfoot
-  Ridge (40,152), in the Mastwood (-146,150) and by Withy pool (-176,-110). A deer always gives its hide; sneak (Ctrl) to get close.
+- Wolves for the wallet: the Upper pines (44,168) and Thornshaw (92,194) camps up the North road, levels 1-2, pelt chance
+  0.7 (they were the Harrow wood's and the North pines' until every camp moved 120 m and more from the houses, playtest note 1);
+  the Hanger, the Bound wood, Hollin farm and Whitefoot's pack give pelts too.
+- Hill deer for the sling: game, west of the Old Orchard (-96,88), by the North pines (30,98), in the Upper pines (40,152), under
+  Crowsfoot Ridge (4,206), in the Mastwood (-146,150), by the Hanger (-206,176), by Withy pool (-176,-110) and by the Ashward
+  pines (96,-232). A deer always gives its hide; sneak (Ctrl) to get close.
 - Coneys for the scrip: game, in eight groups across the fields (Harrow farm, Brook pond, the Cider Barn, the downs). Always a skin.
-- Boars for the poke: the wild boar camps (the Mastwood, Withy pool, Hollin farm, the south downs), levels 1-2, hide chance 0.7.
+- Boars for the poke: the wild boar camps (the Mastwood, the Southwood, the wallow south of Withy pool, the Brookside, Sallow
+  Bottom), levels 1-2, hide chance 0.7.
 - Each quest's lines are in Maud's voice (offer, progress, complete, the hand-over line), GAME-ONLY.
 - Maud keeps shop by the South road 9 to 12 and 2 to 6. A knock at the Tanner house when she is home opens her talk (the quest,
   with "Browse wares") or, with no quest to offer, her wares.

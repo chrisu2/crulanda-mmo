@@ -82,9 +82,10 @@ namespace Crulanda.World
                     : Zone.biome == "meadow" ? art.grass.Select(m => new Material(m) { name = m.name + " (meadow)", color = Color.Lerp(m.color, new Color(.34f, .6f, .2f), .4f), enableInstancing = true }).ToArray()
                     : Zone.biome == "mountain" ? art.grass.Select(m => new Material(m) { name = m.name + " (alpine)", color = Color.Lerp(m.color, new Color(.3f, .5f, .25f), .35f), enableInstancing = true }).ToArray()
                     : grass;
-                gameObject.AddComponent<GrassField>().Build(this, lush, Gloom ? null : art.flowers, Openness, Zone.seed + 99, Zone.biome == "meadow" ? 3f : Zone.biome == "verdant" ? 2.8f : 1.6f, TallGrassPatches(), tall, Gloom ? .8f : Zone.biome == "verdant" ? 1.25f : 1, Gloom ? .7f : 1);
-                // The grass runs on past the edge over the backdrop's near slope, thinning to nothing (the same tufts, at the field's density).
-                GetComponent<GrassField>().BuildEdge(Half, lush, Gloom ? null : art.flowers, EdgeOpenness, EdgeGround, Zone.seed + 101, Zone.biome == "meadow" ? 3f : Zone.biome == "verdant" ? 2.8f : 1.6f, EdgeDressing);
+                gameObject.AddComponent<GrassField>().Build(this, lush, Gloom ? null : art.flowers, Openness, Zone.seed + 99, Zone.biome == "meadow" ? 3f : Zone.biome == "verdant" ? 2.8f : 1.6f, TallGrassPatches(), tall, Gloom ? .8f : Zone.biome == "verdant" ? 1.25f : 1, Gloom ? .7f : 1,
+                    Zone.wildFrom > 0 ? Wild : (Func<Vector2, float>)null);
+                // The grass runs on past the edge over the backdrop's near slope, thinning to nothing (the same tufts, at the field's density at the line).
+                GetComponent<GrassField>().BuildEdge(Half, lush, Gloom ? null : art.flowers, EdgeOpenness, EdgeGround, Zone.seed + 101, (Zone.biome == "meadow" ? 3f : Zone.biome == "verdant" ? 2.8f : 1.6f) * Wild(new Vector2(Half, 0)), EdgeDressing);
             }
             Lap("grass");
             if (art.fern != null || art.broadLeaf != null || art.reeds != null) gameObject.AddComponent<PlantField>().Build(this, art, Gloom ? null : art.flowers, Openness, Zone.seed + 177, EdgeOpenness, EdgeGround, EdgeDressing);
@@ -512,7 +513,7 @@ namespace Crulanda.World
                 m.SetTexture("_DetailMask", DetailMask(256, (x, z) => (1 - Mathf.SmoothStep(0, 1, Mathf.InverseLerp(.3f, .95f, Unmade(x, z)))) * (1 - .75f * Licked(x, z))));   // none on the unmade, little on licked ground
             }
             if (Zone.biome == "mountain") m.SetTexture("_DetailMask", DetailMask(256, (x, z) => Mathf.Lerp(.5f, .9f, Mathf.Clamp01(MountainBare(x, z, out _) * 2 - .5f))));   // half grain on the turf (in hard alpine light it was a harsh speckle), nearly full on rock and scree
-            m.mainTexture = PaintGround(Mathf.Clamp(Mathf.RoundToInt(Zone.size * 8 / 256) * 256, 1024, 3072)); r.sharedMaterial = m; GroundMaterial = m;   // paint: about 8 px a metre
+            m.mainTexture = PaintGround(Mathf.Clamp(Mathf.RoundToInt(Zone.size * 8 / 256) * 256, 1024, 4096)); r.sharedMaterial = m; GroundMaterial = m;   // paint: about 8 px a metre (a 560 m zone gets 7.3 at the 4096 cap)
             go.AddComponent<MeshCollider>().sharedMesh = mesh;
         }
         Texture2D PaintGround(int res)
@@ -3111,6 +3112,15 @@ namespace Crulanda.World
             }
         }
 
+        /// <summary>The share of the open ground's grass kept at a point of a big zone's outer country (ZoneDefinition.wildFrom,
+        /// wildDensity): all of it out to wildFrom from the middle (the larger of |x| and |z|), falling evenly to wildDensity at
+        /// the edge and staying there past it. 1 everywhere in a zone that names no wildFrom. Draws nothing.</summary>
+        float Wild(Vector2 p)
+        {
+            if (Zone.wildFrom <= 0 || Zone.wildFrom >= Half) return 1;
+            float far = Mathf.Max(Mathf.Abs(p.x), Mathf.Abs(p.y));
+            return Mathf.Lerp(1, Mathf.Clamp01(Zone.wildDensity), Mathf.InverseLerp(Zone.wildFrom, Half, far));
+        }
         Rect[] grassRoadBox; (Vector2 at, float r)[] grassBuildings;   // Openness's caches: it is asked ~330k times on a 380 m zone
         /// <summary>How much grass should grow at a point (0 = none): open meadow is full, the village core is trampled.</summary>
         float Openness(Vector2 p)

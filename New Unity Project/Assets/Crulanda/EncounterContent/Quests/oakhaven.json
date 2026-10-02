@@ -443,8 +443,8 @@
       "zone": "zone.oakhaven",
       "level": 1,
       "canonStatus": "GAME-ONLY",
-      "summary": "Follow the deer tracks east toward the grey, then check the grey-edge copse.",
-      "offer": "\"You've good eyes? Then use them for me. There's a line of deer tracks heading east, toward the grey. They don't come back.\"\n\n\"Follow them as far as you dare, then look at the copse by the grey's edge south of the east road. Tell me what you see. Don't touch anything grey.\"",
+      "summary": "Follow the deer tracks east toward the grey, then check the Moonbell copse on the way home.",
+      "offer": "\"You've good eyes? Then use them for me. There's a line of deer tracks heading east, toward the grey. They don't come back.\"\n\n\"Follow them as far as you dare, then on your way back look into the Moonbell copse, south of the east road near the village. Tell me what you see. Don't touch anything grey.\"",
       "complete": "Garet listens without blinking. \"Stopped mid-stride. Grey at the roots.\" He spits. \"It's not creeping. Creeping is slow. This is... deliberate. Like something is drawing a line.\"",
       "steps": [
         {
@@ -453,7 +453,7 @@
             {
               "type": "visit",
               "at": {
-                "x": 148,
+                "x": 238,
                 "y": 40
               },
               "radius": 8,
@@ -463,7 +463,7 @@
           ]
         },
         {
-          "text": "Look over the grey-edge copse.",
+          "text": "Look over the Moonbell copse.",
           "objectives": [
             {
               "type": "visit",
@@ -472,7 +472,7 @@
                 "y": -18
               },
               "radius": 9,
-              "text": "Check the grey-edge copse",
+              "text": "Check the Moonbell copse",
               "say": "Inside the copse the grass is grey at the roots, and the birdsong stops at the treeline."
             }
           ]
@@ -631,12 +631,12 @@
       "level": 4,
       "minLevel": 3,
       "canonStatus": "GAME-ONLY quest; CANON faction (Sandthrone deserters)",
-      "summary": "Go down through Crowsfoot Hollow, the deserters' cave at the top of the North road, to the hall deep under the hills, bring down Caddock, their tin-crowned king, and recover what they stole from Oakhaven's farms.",
-      "offer": "Wil Carder turns his cap round and round in his hands. \"Deserters. Sandthrone, by what's left of the colours, but no captain would own them now. Three nights they've come down the North road and had my barn: the seed-corn for spring, the hams, my da's good boots off the step.\"\n\n\"Garet tracked them to Crowsfoot Hollow, the cave where the North road gives out in the hills. There's a band of them dug in there, and one in a tin crown who calls himself king. Caddock, they say. Put them out of that hole and bring back what they took. We've nothing left to give the Concord, never mind a king.\"",
+      "summary": "Go down through Crowsfoot Hollow, the deserters' cave in the north hills, to the hall deep under them, bring down Caddock, their tin-crowned king, and recover what they stole from Oakhaven's farms.",
+      "offer": "Wil Carder turns his cap round and round in his hands. \"Deserters. Sandthrone, by what's left of the colours, but no captain would own them now. Three nights they've come down the North road and had my barn: the seed-corn for spring, the hams, my da's good boots off the step.\"\n\n\"Garet tracked them up the North road, past my field barn and the wolf woods, to where it gives out under Crowsfoot Ridge. A track goes on west along the foot of the hill and round its heel, and the cave is there: Crowsfoot Hollow, with its mouth turned away from us. There's a band of them dug in, and one in a tin crown who calls himself king. Caddock, they say. Put them out of that hole and bring back what they took. We've nothing left to give the Concord, never mind a king.\"",
       "complete": "Wil Carder hears you out without a word. When you come to the seed-corn, still in its marked sacks, his shoulders drop.\n\n\"Spring, then. We'll have a spring.\" He looks up the North road at the dark hills. \"A king in a hole in the ground, in a tin hat, and all of us too frightened to sleep. I'll have the cart up there at first light.\"",
       "steps": [
         {
-          "text": "Clear the deserters out of Crowsfoot Hollow, where the North road ends in the hills. Their king holds a hall deep under them.",
+          "text": "Clear the deserters out of Crowsfoot Hollow: follow the North road to its end, then the track west round the heel of Crowsfoot Ridge. Their king holds a hall deep under the hill.",
           "say": "The hollow goes quiet but for dripping water, far down. Whatever they carried off the farms will be at the back of the king's hall.",
           "objectives": [
             {
@@ -689,7 +689,7 @@
       "level": 1,
       "canonStatus": "GAME-ONLY",
       "unlessWorn": "bag.simples_wallet",
-      "summary": "Bring Maud Tanner three grey wolf pelts. Wolves run in the Harrow wood and the North pines. She keeps shop by the South road, 9 to 12 and 2 to 6.",
+      "summary": "Bring Maud Tanner three grey wolf pelts. Wolves run in the Upper pines and Thornshaw, up the North road past the last fields. She keeps shop by the South road, 9 to 12 and 2 to 6.",
       "offer": "\"You've the look of someone who picks things up. Herbs, is it? They'll bruise to nothing loose in a pack.\"\n\n\"Bring me three wolf pelts, whole, not grey at the edges, and I'll cut you a wallet for them. No charge but the hides; what's left over is my profit, and the gods know I need one.\"",
       "progress": "\"Three, I said. The wolves won't skin themselves.\"",
       "complete": "Maud turns each pelt to the light and runs a thumb along the edge. \"These'll do. Sit. It's an hour's work if Nettie holds the lamp.\" The wallet she hands you smells of oak bark and smoke. \"The offcuts will buy the bread this week. So that's both of us better off.\"",
@@ -731,7 +731,7 @@
       "level": 1,
       "canonStatus": "GAME-ONLY",
       "unlessWorn": "bag.log_sling",
-      "summary": "Bring Maud Tanner three hill-deer hides. Deer graze west of the Old Orchard, in the Mastwood and on the slopes under Crowsfoot Ridge; go quietly (Ctrl) or they're gone. She keeps shop by the South road, 9 to 12 and 2 to 6.",
+      "summary": "Bring Maud Tanner three hill-deer hides. Deer graze west of the Old Orchard, in the Mastwood and on the slopes under Crowsfoot Ridge at the top of the North road; go quietly (Ctrl) or they're gone. She keeps shop by the South road, 9 to 12 and 2 to 6.",
       "offer": "\"Osk Farrow carries his logs on his bare neck all winter, and by the look of your shoulders you've started doing the same.\"\n\n\"Deer hide makes the best strap there is: it gives without stretching. Bring me three and I'll cut you a log-sling. Go quiet in the long grass, mind. A hill deer hears you think.\"",
       "progress": "\"Three hides. A deer you've only frightened doesn't count.\"",
       "complete": "Maud spreads the hides over her bench and scrapes one edge with a thumbnail. \"Clean kills. Good.\" She cuts the strap in one long pull of the knife and stitches the cinches while you wait. \"Fen will take the offcuts to the yard, and that's tomorrow's bread. Mind your neck.\"",
@@ -815,7 +815,7 @@
       "level": 2,
       "canonStatus": "GAME-ONLY",
       "unlessWorn": "bag.ore_poke",
-      "summary": "Bring Maud Tanner three boar hides. Wild boar root in the Mastwood and on the downs about Withy pool. She keeps shop by the South road, 9 to 12 and 2 to 6.",
+      "summary": "Bring Maud Tanner three boar hides. Wild boar root in the Mastwood, in the Southwood and at the wallow south of Withy pool. She keeps shop by the South road, 9 to 12 and 2 to 6.",
       "offer": "\"If you've been at the seams with a pick, you'll have worn through a sack already. Ore eats leather.\"\n\n\"Boar hide is the only thing that stands up to it. Three of them, and I'll double them into an ore-poke. Mind the tusks. Fen came back from the Mastwood with a hole in his leg once, and he's never let me forget it.\"",
       "progress": "\"Three boar hides. The boars won't come to you. Well, they might, and then you'll wish they hadn't.\"",
       "complete": "Maud has to lean her weight on the awl to get it through. \"Doubled, and the seams turned in where the stone can't get at them.\" She draws the thong tight and drops the poke on the counter with a thump. \"That'll hold a hundredweight of copper and outlast us both.\"",

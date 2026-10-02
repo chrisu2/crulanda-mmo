@@ -70,7 +70,10 @@ namespace Crulanda.World
                 var raw = new List<Vector2>();
                 foreach (var p in w.points) raw.Add(new Vector2(Mathf.Clamp(p.x, -half, half), Mathf.Clamp(p.y, -half, half)));
                 var pts = Densify(raw, 3);
-                Meander(zone, c, pts, half);
+                // The row of the point the swing is counted from (Densify lays each leg as Max(1, Ceil(length / 3)) rows).
+                int from = Mathf.Clamp(w.swingFrom, 0, raw.Count - 1), row = 0;
+                for (int i = 0; i < from; i++) row += Mathf.Max(1, Mathf.CeilToInt(Vector2.Distance(raw[i], raw[i + 1]) / 3));
+                Meander(zone, c, pts, half, from, row);
                 var lv = new float[pts.Count];
                 for (int i = 0; i < pts.Count; i++)
                 {
@@ -273,13 +276,16 @@ namespace Crulanda.World
         /// Makes a creek authored as a few straight legs look natural: the legs' corners are rounded, the line swings gently
         /// from side to side (long and short swings), and the width breathes along the flow (wide[], about +-20%). Bridges
         /// and the mill pin the line they were placed on; roads and props beside it only stop it swinging (or widening)
-        /// toward them.
+        /// toward them. The swing is counted along the flow from the authored point <paramref name="from"/> (row
+        /// <paramref name="row"/> of pts; ZonePath.swingFrom), which starts at ZonePath.swingAlong metres: points added
+        /// upstream of it leave the line downstream where it was.
         /// </summary>
-        static void Meander(ZoneDefinition zone, Creek c, List<Vector2> pts, float half)
+        static void Meander(ZoneDefinition zone, Creek c, List<Vector2> pts, float half, int from, int row)
         {
             int n = pts.Count; c.wide = new float[n]; var shift = new Vector2[n];
             for (int pass = 0; pass < 3; pass++) { var was = pts.ToArray(); for (int i = 1; i < n - 1; i++) pts[i] = (was[i - 1] + 2 * was[i] + was[i + 1]) / 4; }
-            float along = 0, sway = Mathf.Min(1.6f, c.width * .4f), seed = zone.seed % 1000 * .731f + c.def.points[0].x * .173f;
+            float along = c.def.swingAlong, sway = Mathf.Min(1.6f, c.width * .4f), seed = zone.seed % 1000 * .731f + c.def.points[from].x * .173f;
+            for (int i = 1; i <= row && i < n; i++) along -= Vector2.Distance(pts[i], pts[i - 1]);
             for (int i = 0; i < n; i++)
             {
                 if (i > 0) along += Vector2.Distance(pts[i], pts[i - 1]);

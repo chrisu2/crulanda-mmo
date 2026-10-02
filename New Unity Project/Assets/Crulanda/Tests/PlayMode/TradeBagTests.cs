@@ -134,7 +134,8 @@ namespace Crulanda.Tests
             Assert.IsTrue(s.Conversation.entries.Any(e => e.quest.id == WalletQuest)); Assert.IsNull(s.Conversation.selected, "She sells too, so it opens on the list.");
             s.Conversation = null;
             // With nothing to offer, the knock opens her wares at the door.
-            s.Progress.questsDone.Add(WalletQuest); s.Progress.gold = 30;
+            foreach (var done in new[] { WalletQuest, "npc.leatherworker.sling", "npc.leatherworker.scrip", "npc.leatherworker.poke" }) s.Progress.questsDone.Add(done);   // the hunting step's three as well
+            s.Progress.gold = 30;
             s.Interact();
             Assert.AreEqual(Maud, s.VendorNpc, "The knock opens Maud's wares."); CollectionAssert.AreEqual(Bags, s.VendorStock);
             s.Buy("bag.simples_wallet");

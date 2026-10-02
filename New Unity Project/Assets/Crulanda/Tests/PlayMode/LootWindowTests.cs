@@ -43,6 +43,8 @@ namespace Crulanda.Tests
         static EncounterSession Session() { return UnityEngine.Object.FindFirstObjectByType<EncounterSession>(); }
         static readonly string Blade = ItemDatabase.GearId("mainhand", 3, 3, 4242), Helm = ItemDatabase.GearId("head", 3, 2, 88);
         const string Fang = "junk.wolf_fang";
+        /// <summary>What E says at this body: a beast with a hide or pelt is skinned, anything else is searched.</summary>
+        static string BodyPrompt(EncounterEnemy e) { return e.Skinnable ? GameAnimals.SkinPrompt : "Search the body"; }
 
         /// <summary>
         /// A camp mob killed outright (combat has its own tests), with every other enemy stood down so nothing joins in, and the
@@ -65,7 +67,7 @@ namespace Crulanda.Tests
                     if (Vector3.Distance(v.transform.position, mob.transform.position) < 8) v.StandAt(mob.transform.position + Vector3.back * 30 + Vector3.right * 2 * VillageLife.Active.Villagers.IndexOf(v), 0);
             s.SelectFriendly(null, false);
             for (int i = 0; i < 3; i++) yield return null;
-            Assert.IsTrue(s.CanLoot(mob)); Assert.AreEqual("Search the body", s.InteractPrompt);
+            Assert.IsTrue(s.CanLoot(mob)); Assert.AreEqual(BodyPrompt(mob), s.InteractPrompt);
             got(mob);
         }
 
@@ -184,11 +186,11 @@ namespace Crulanda.Tests
             Assert.AreEqual(0, mob.Coins);
             Assert.IsTrue(s.CanLoot(mob), "and the body can still be searched,");
             Assert.AreEqual(3, LootBeacon.Showing(mob), "its beacon lit for the blade.");
-            Assert.AreNotEqual("Search the body", s.InteractPrompt, "A body with nothing that fits does not take E (Mira, nodes and doors keep it).");
+            Assert.AreNotEqual(BodyPrompt(mob), s.InteractPrompt, "A body with nothing that fits does not take E (Mira, nodes and doors keep it).");
             // Room made: E opens it again and takes the blade.
             p.bag[0].item = ""; p.bag[0].count = 0;
             yield return null;
-            Assert.AreEqual("Search the body", s.InteractPrompt, "With room, the body takes E again.");
+            Assert.AreEqual(BodyPrompt(mob), s.InteractPrompt, "With room, the body takes E again.");
             s.Interact(); Assert.IsTrue(s.LootOpen);
             s.Interact();
             Assert.AreEqual(1, Inventory.Count(p, Blade)); Assert.IsFalse(s.CanLoot(mob)); Assert.AreEqual(-1, LootBeacon.Showing(mob));

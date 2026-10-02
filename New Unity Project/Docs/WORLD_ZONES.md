@@ -633,7 +633,27 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
 - `life` in the zone JSON: villager count, mood (`wary` / `afraid`) and critter groups (chicken, rabbit, crow, deer,
   sheep, cat). `WorldLife.cs`: villagers have roles (farmer, gossip, drinker, child, elder, miller, henwife), homes
   (their household's door, below), places from the zone (fields, well, green, inn seats, mill), chat in pairs, bark at the player,
-  and flee home when fighting starts nearby. Critters never fight and scatter from the player; crows fly.
+  and flee home when fighting starts nearby. Critters never fight and scatter from the player; crows fly. The deer and rabbit
+  groups are game since step 11 (Hunting, below); hens, sheep, cats and crows stay critters: no collider, never a target.
+- **Hunting** (GAME-ONLY; BUILD_PLAN step 11, tools/wip/professions/ADDENDUM.md G): every `deer` and `rabbit` group in
+  `life.critters` is spawned by the session as game (`EncounterSession.SpawnGame`, `EncounterSession.Hunt.cs`), not by the village:
+  `count` animals on dry navmesh ground in the group's circle, from a random stream of their own (seed x 37 + 11; the zone layout and
+  the camps draw nothing more, so no tree, rock or camp moves; the village still takes the draws it took for them, so no hen, crow,
+  sheep or cat moves either, `Critter.SkipSpawn`). Each is an `EncounterEnemy` with `Game` set: an actor (a Hill deer
+  70 health, a Rabbit 15, at the zone's lowest level) with a box collider about its body and a small navmesh agent, wearing the
+  critter's body (`CritterBody`, lifted out of `Critter`) and moved by `GameAnimal`: it grazes and wanders in its circle; a player
+  moving within its notice distance (deer 16 m, rabbits 7 m; half that sneaking with Ctrl) makes it look up and watch, and after
+  0.6 s of that (2.5 s sneaking) it bolts 12-18 m (rabbits 8-12 m) on the navmesh, away from water; a blow makes it bolt at once,
+  and under 35% health it bolts at 60% pace (it can be run down). It never fights, holds no threat and is never `Engaged`.
+  Game lives in `Session.Game`, never `Session.Enemies`, so `VillageLife.Danger`, `EnemyNear`, `EnemiesCleared`, "zone is clear",
+  the trail tracker and `InCombat` ignore it (a swing at a deer is not a fight: you can eat and save). Click and Tab target it
+  (Tab picks enemies first, game only when no enemy is within 25 m); its plate shows within 12 m or when targeted, and the target
+  frame says it will not fight. Killed: no experience, no coin, the kill told to the quests; it lies on its side with its hide
+  (`GameAnimals.RollHide`: the `rabbit` or `deer` table) and a white twinkle. E beside it says "Skin the body" and takes the hide
+  with the one press, through the loot window's take-all (a lone common hide opens no window). A wolf, hound, boar or stag camp
+  body (`EncounterEnemy.Skinnable`, set by its look) says "Skin the body" too; other bodies say "Search the body". It is back after 240 s somewhere in
+  its circle. Nothing about game is saved; a load rebuilds it with the party. Oakhaven has 36 rabbits in eight groups and 14 deer in
+  five; Khaven, the Peaks and the Verdant Shore have their own groups; Ash Rim has only crows.
 - **Households** (GAME-ONLY; `life.households`, `ZoneHousehold`; tools/wip/professions/ADDENDUM.md A): each household names
   its house (a prop of kind house, mill, barn or inn) and its members with their kin ("head", "husband", "daughter",
   "lodger"); families share one house, and no two households share one. A barn lived in gets a barred door of its own

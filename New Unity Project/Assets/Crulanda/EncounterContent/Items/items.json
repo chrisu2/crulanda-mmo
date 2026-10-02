@@ -603,6 +603,39 @@
       "canonStatus": "GAME-ONLY"
     },
     {
+      "id": "hide.coney",
+      "name": "Coney skin",
+      "kind": "material",
+      "quality": 1,
+      "value": 1,
+      "stack": 10,
+      "trade": "tannery.hides",
+      "description": "Soft and thin as a glove. It takes five to make anything worth the stitching.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "hide.hill_deer",
+      "name": "Hill-deer hide",
+      "kind": "material",
+      "quality": 1,
+      "value": 2,
+      "stack": 10,
+      "trade": "tannery.hides",
+      "description": "Red-brown and close in the grain. The best strap leather in the valley starts as one of these.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "hide.boar",
+      "name": "Boar hide",
+      "kind": "material",
+      "quality": 1,
+      "value": 2,
+      "stack": 10,
+      "trade": "tannery.hides",
+      "description": "Bristled, thick as a boot sole, and it smells of the wallow.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
       "id": "junk.spider_chitin",
       "name": "Canopy-spider chitin",
       "kind": "junk",
@@ -1113,6 +1146,12 @@
       ]
     },
     {
+      "role": "skinner",
+      "items": [
+        "mat.salt"
+      ]
+    },
+    {
       "role": "herbalist",
       "items": [
         "potion.minor",
@@ -1171,6 +1210,10 @@
         {
           "item": "junk.boar_meat",
           "chance": 0.5
+        },
+        {
+          "item": "hide.boar",
+          "chance": 0.7
         }
       ]
     },
@@ -1568,6 +1611,10 @@
           "chance": 1.0,
           "min": 2,
           "max": 3
+        },
+        {
+          "item": "junk.dappled_hide",
+          "chance": 1.0
         }
       ]
     },
@@ -1622,6 +1669,30 @@
         {
           "item": "potion.dewfern",
           "chance": 0.1
+        }
+      ]
+    },
+    {
+      "tag": "rabbit",
+      "levelMin": 1,
+      "levelMax": 13,
+      "gearChance": 0,
+      "entries": [
+        {
+          "item": "hide.coney",
+          "chance": 1
+        }
+      ]
+    },
+    {
+      "tag": "deer",
+      "levelMin": 1,
+      "levelMax": 13,
+      "gearChance": 0,
+      "entries": [
+        {
+          "item": "hide.hill_deer",
+          "chance": 1
         }
       ]
     }

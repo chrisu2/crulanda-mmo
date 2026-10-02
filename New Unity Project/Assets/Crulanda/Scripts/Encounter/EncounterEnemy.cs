@@ -12,6 +12,14 @@ namespace Crulanda.Encounter
         public EncounterSession session;
         /// <summary>Camp mob: respawns in its camp and is never saved (story enemies stay dead).</summary>
         public bool Camp;
+        /// <summary>
+        /// A game animal (a deer, a rabbit: GameAnimal drives it): it never fights, bolts when hit, gives no experience and no coin,
+        /// and is in the session's Game list, not its Enemies, so the village and "zone clear" never count it. Camp is set too: it
+        /// comes back like a camp mob and its body is searched like one.
+        /// </summary>
+        public bool Game;
+        /// <summary>A beast with a hide or pelt (a wolf, hound, boar or stag camp mob, and all game): E at its body reads "Skin the body".</summary>
+        public bool Skinnable;
         public bool Elite;
         /// <summary>Base damage per swing before the class kit resolves it (scales with level).</summary>
         public float HitBase = 13;
@@ -73,6 +81,8 @@ namespace Crulanda.Encounter
         float swing, baseSpeed, slowFactor = 1, slowUntil, rootUntil;
         public bool Rooted { get { return Time.time < rootUntil; } }
         public bool Slowed { get { return Time.time < slowUntil && slowFactor < 1; } }
+        /// <summary>What its pace is multiplied by now (1 when not slowed).</summary>
+        public float SlowFactor { get { return Slowed ? slowFactor : 1; } }
         public float RootRemaining { get { return Mathf.Max(0, rootUntil - Time.time); } }
         public void Initialize()
         {
@@ -94,6 +104,7 @@ namespace Crulanda.Encounter
         {
             if (session == null || session.Paused) return;
             if (!actor.IsAlive) { if (Camp && Time.time >= respawnAt) Respawn(); return; }
+            if (Game) return;   // no threat, no aggro, no swing: GameAnimal grazes, wanders and bolts
             if (Hidden)
             {
                 // Noticing the player: about 8 m normally, 3 m if they sneak (Ctrl), never while they are dead.
@@ -162,7 +173,8 @@ namespace Crulanda.Encounter
             if (!actor.IsAlive) return;
             if (Hidden) Pounce();
             int actual = actor.GetComponent<Combatant>().Damage(Mathf.RoundToInt(damage * session.Kit.PartyDamageMultiplier(this)));
-            threat.Add(source.EntityId.Value, actual);
+            if (Game) { if (actor.IsAlive) GetComponent<GameAnimal>()?.Bolt(source != null ? source.transform.position : transform.position); }
+            else threat.Add(source.EntityId.Value, actual);
             session.FloatText(transform.position, actual.ToString(), new Color(1, .86f, .4f));
         }
         void OnDeath(Health health)
@@ -170,7 +182,8 @@ namespace Crulanda.Encounter
             Victim = null;
             if (agent.isOnNavMesh) agent.isStopped = true;
             var visual = transform.Find("Body");
-            if (visual != null) { visual.localRotation = Quaternion.Euler(0, 0, 90); visual.localPosition = new Vector3(0, -.6f, 0); }
+            if (Game) GetComponent<GameAnimal>()?.Fall();   // on its side on the ground, not tipped from an actor's height
+            else if (visual != null) { visual.localRotation = Quaternion.Euler(0, 0, 90); visual.localPosition = new Vector3(0, -.6f, 0); }
             respawnAt = Time.time + RespawnSeconds;
             session.EnemyDied(this);
         }
@@ -188,6 +201,7 @@ namespace Crulanda.Encounter
             threat.Clear(); Victim = null; Looted = false; slowUntil = rootUntil = 0;
             Drops = null; Coins = 0; LootBeacon.Clear(this);
             if (agent.isOnNavMesh) agent.isStopped = false;
+            if (Game) GetComponent<GameAnimal>()?.Stand();
             if (Ambusher) Hide();
         }
         public void RestoreDead()

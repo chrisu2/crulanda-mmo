@@ -59,10 +59,18 @@ charge 4x), stack, armor, stamina, strength, agility, intellect, spirit, weaponD
 | `holds`, `slots` | bags | The class its slots take (a `pouch` value) and how many (1-24). Nothing else goes in ("Only ore, bars and charcoal go in the ore-poke."). `ItemDatabase.Parse` refuses a bag without both. |
 | meat | `junk.boar_meat` (Tough boar meat; id, name and value kept from when it was junk), `mat.wolf_haunch`, `mat.hound_flank`, `mat.mossback_chop`, `mat.venison` | Kind `material`, quality 1, stack 20, `trade: "inn.meat"`, `pouch: "larder"`; Cooking's makings (BUILD_PLAN step 10). The boar drops its meat as before (0.5); the wolf, hound, mossboar and stag tables drop theirs (0.4, 0.45, 0.5, 0.5). No vendor sells meat. "Sell junk" keeps it. |
 | foods | `food.*` | Kind `consumable`, `food: true`: eaten out of combat, `heal` over 10 s. The ten cooked foods (`food.griddle_bread` ... `food.venison_pie`) heal more than any food a vendor sells at their level (the lists, and the merchant's Oakhaven eggs) and go in no trade bag. |
-| hides | `junk.wolf_pelt`, `junk.ash_hide`, `junk.moss_hide`, `junk.dappled_hide` | Kind `material`, quality 1, `trade: "tannery.hides"` (ids, names, values and the stack of 10 kept from when they were junk). "Sell junk" keeps them; using one says "Leather. Maud Tanner in Oakhaven works it." Sold in a village, the tannery and the leatherworker notice. |
+| hides | `junk.wolf_pelt`, `junk.ash_hide`, `junk.moss_hide`, `junk.dappled_hide`; from hunting (step 11) `hide.coney` (Coney skin, 1), `hide.hill_deer` (Hill-deer hide, 2), `hide.boar` (Boar hide, 2) | Kind `material`, quality 1, stack 10, `trade: "tannery.hides"`, no `pouch` (ids, names, values and the stack of 10 kept from when the first four were junk). "Sell junk" keeps them; using one says "Leather. Maud Tanner in Oakhaven works it." Sold in a village, the tannery and the leatherworker notice. |
 
 Kinds are `gear`, `junk`, `consumable`, `material`, `tool`, `bag`. `VendorDef`: `npc` or `role`, `items`, `gearForZone`. A role entry leaves
-`npc` out (never `""`). Vendors never sell ore, logs or herbs: those come from the world only.
+`npc` out (never `""`). Vendors never sell ore, logs or herbs: those come from the world only. The skinner (role `skinner`, Fen Walker
+in Oakhaven) sells `mat.salt` (step 11), so he buys hides like any vendor.
+
+`loot` tables (`LootTableDef`: `tag`, `levelMin`, `levelMax`, `gearChance`, `entries` of `item`, `chance`, `min`, `max`): a camp mob
+rolls every table whose tag is its id's tag or `any` (`ItemDatabase.RollLoot`, which adds generated gear at `gearChance`, never under
+0.1). The tables `rabbit` and `deer` (levels 1-13, `gearChance` 0, the hide at chance 1) are for game animals only: a game body is
+rolled by `GameAnimals.RollHide`, which reads only the tables of exactly that tag and adds no gear and no coin. Every beast's table
+drops its hide (`ItemTests.Every_beast_table_has_a_hide`): wolf pelt 0.7, boar hide 0.7, ash hide 0.7, moss hide 0.7, dappled
+stag hide 0.5, coney skin and hill-deer hide always.
 
 ## Trades (`EncounterContent/Professions/*.json`, `ProfessionDatabase`)
 Registered on `Encounter.asset` (`professionFiles`) by the same menu step, which logs "Registered N profession files.". Read

@@ -167,6 +167,8 @@ namespace Crulanda.Encounter
             Shadow(new Rect(20, 166, 320, 20), m.Activity, tiny, new Color(.85f, .9f, .85f));
             if (m.CastProgress > 0) UnitBar(new Rect(70, 186, 184, 7), m.CastProgress, new Color(.3f, .85f, .65f), "");
         }
+        /// <summary>The target frame's line under a game animal's health (GAME-ONLY).</summary>
+        public const string GameLine = "Game: it won't fight, but it will run. Skin it for its hide.";
         void DrawTargetFrame()
         {
             var t = session.Target; var a = t.actor;
@@ -174,7 +176,8 @@ namespace Crulanda.Encounter
             Portrait(new Vector2(668, 54), 74, a.IsAlive ? new Color(.85f, .2f, .15f) : new Color(.4f, .4f, .4f), a.DisplayName.Substring(0, 1), a.IsAlive ? a.Level.ToString() : null);
             Shadow(new Rect(380, 24, 240, 20), a.DisplayName, frameName, a.IsAlive ? ConColor(a.Level) : new Color(.7f, .7f, .7f));
             UnitBar(new Rect(378, 45, 244, 18), a.Health.Pool.Ratio, HealthGreen, a.IsAlive ? a.Health.Pool.Current + " / " + a.Health.Pool.Max : "Dead · press E at the body");
-            if (a.IsAlive)
+            if (a.IsAlive && t.Game) Shadow(new Rect(378, 67, 330, 20), GameLine, tiny, Color.white);
+            else if (a.IsAlive)
             {
                 float next = t.NextSwingIn, interval = session.content.enemySwingInterval;
                 UnitBar(new Rect(378, 67, 244, 7), 1 - next / Mathf.Max(.01f, interval), new Color(.85f, .45f, .3f), "");
@@ -482,20 +485,22 @@ namespace Crulanda.Encounter
         /// <summary>
         /// An enemy's plate height over its root: just above the top of its model, so wolves and boars get low plates and people
         /// keep theirs over the head (measured once from its renderers while it stands, elite scale included). Also its
-        /// "level  name" label, rebuilt only when the level changes.
+        /// "level  name" label, rebuilt only when the level changes. A game animal's root rides 1 m over its feet, so its height is
+        /// kept from the feet (always above zero) and the 1 m taken off again: a rabbit's plate sits just over its ears.
         /// </summary>
         (float height, string label) EnemyPlate(EncounterEnemy e)
         {
             var a = e.actor; bool known = enemyPlates.TryGetValue(e, out var c), dirty = !known || c.level != a.Level;
+            float lift = e.Game ? 1 : 0;
             if (dirty) { c.level = a.Level; c.label = a.Level + "  " + a.DisplayName; }
             if (c.height <= 0 && !e.Hidden && a.IsAlive)
             {
                 float top = float.MinValue;
                 foreach (var r in e.GetComponentsInChildren<Renderer>()) if (r.enabled) top = Mathf.Max(top, r.bounds.max.y);
-                c.height = top > float.MinValue ? Mathf.Clamp(top - e.transform.position.y + .45f, .3f, 1.7f * e.transform.lossyScale.y) : 1.7f; dirty = true;
+                c.height = top > float.MinValue ? Mathf.Clamp(top - e.transform.position.y + lift + .45f, .3f, 1.7f * e.transform.lossyScale.y + lift) : 1.7f; dirty = true;
             }
             if (dirty) { if (!known && enemyPlates.Count > 400) enemyPlates.Clear(); enemyPlates[e] = c; }
-            return (c.height > 0 ? c.height : 1.7f, c.label);
+            return ((c.height > 0 ? c.height : 1.7f) - lift, c.label);
         }
         /// <summary>
         /// A plate's box: its name (and trade) rows above the anchor, with the ! or ? above those. <paramref name="p"/>.top is
@@ -525,21 +530,24 @@ namespace Crulanda.Encounter
                     float w = Mathf.Max(Mathf.Max(named ? TextWidth(plateText, v.Name) : 0, title != null ? TextWidth(plateText, title) : 0), m != ' ' ? 28 : 0) + 8;
                     AddPlate(new Plate { dist = vd, fade = named ? Mathf.Clamp01((18 - vd) / 4) : 0, top = named ? (title != null ? -41 : -25) : -20, at = vp, v = v, named = named, name = v.Name, title = title, mark = m, grey = grey }, w);
                 }
-            foreach (var e in session.Enemies)
-            {
-                if (e.Hidden) continue;   // lying in wait: no nameplate
-                float d = session.Distance(e); if (d > 25) continue;
-                var (h, label) = EnemyPlate(e); var root = e.transform.position;
-                if (!ToCanvas(root + Vector3.up * h, out var ep) || ep.x < 0 || ep.x > 1440 || Occluded(root + Vector3.up * (h - .45f))) continue;
-                float w = session.Target == e ? Mathf.Max(146, TextWidth(plateText, label) + 16) : Mathf.Max(130, TextWidth(plateText, label)) + 8;
-                plates.Add(new Plate { dist = d, fade = 1, at = ep, e = e, name = label, shown = true, box = new Rect(ep.x - w / 2, ep.y - 25, w, 38) });
-            }
+            foreach (var e in session.Enemies) EnemyPlateAt(e, 25);
+            // Game animals (deer, rabbits): a plate when close or targeted, so the fields are not a sea of names.
+            foreach (var e in session.Game) EnemyPlateAt(e, session.Target == e ? 25 : 12);
             // Mira: nameplate, plus a gold ! until she has joined you (after that, whatever the quests say).
             var mira = session.Companion; if (mira == null) return;
             var head = mira.transform.position + Vector3.up * 1.4f; float md = Vector3.Distance(player, head);
             if (md >= 45 || !ToCanvas(head, out var mp) || mp.x < 0 || mp.x > 1440 || Occluded(mira.transform.position + Vector3.up * .9f)) return;
             bool mgrey = false; char mm = session.Progress.recruited ? HeadMarker("Mira", md, out mgrey) : '!';
             AddPlate(new Plate { dist = md, fade = 1, top = -29, at = mp, mira = true, named = true, name = "Mira", mark = mm, grey = mgrey }, Mathf.Max(TextWidth(centered, "Mira"), 28) + 8);
+        }
+        void EnemyPlateAt(EncounterEnemy e, float range)
+        {
+            if (e == null || e.Hidden) return;   // lying in wait: no nameplate
+            float d = session.Distance(e); if (d > range) return;
+            var (h, label) = EnemyPlate(e); var root = e.transform.position;
+            if (!ToCanvas(root + Vector3.up * h, out var ep) || ep.x < 0 || ep.x > 1440 || Occluded(root + Vector3.up * (h - .45f))) return;
+            float w = session.Target == e ? Mathf.Max(146, TextWidth(plateText, label) + 16) : Mathf.Max(130, TextWidth(plateText, label)) + 8;
+            plates.Add(new Plate { dist = d, fade = 1, at = ep, e = e, name = label, shown = true, box = new Rect(ep.x - w / 2, ep.y - 25, w, 38) });
         }
         void DrawPlate(Plate p)
         {

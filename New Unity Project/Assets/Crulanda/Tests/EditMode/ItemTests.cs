@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
 using Crulanda.Encounter;
@@ -161,6 +162,63 @@ namespace Crulanda.Tests
             var rng = new System.Random(11); int meat = 0;
             for (int n = 0; n < 400; n++) foreach (var (item, _) in db.RollLoot("boar", 2, false, rng)) if (item == "junk.boar_meat") meat++;
             Assert.That(meat, Is.InRange(160, 240), "About half of 400 boars (" + meat + ").");
+        }
+
+        /// <summary>
+        /// Hunting for hides (step 11): every beast's table drops its own hide (ADDENDUM G.1), the three new hides are materials like the
+        /// old four, and a game animal's body (GameAnimals.RollHide) always holds its hide and nothing else: no gear, no coin. Beasts are
+        /// the wolf, boar and stag camps of every zone and the game animals; the hens, sheep, cats and crows are never game.
+        /// </summary>
+        [Test] public void Every_beast_table_has_a_hide()
+        {
+            var db = Db();
+            var hides = new[] { ("hide.coney", "Coney skin", 1), ("hide.hill_deer", "Hill-deer hide", 2), ("hide.boar", "Boar hide", 2) };
+            foreach (var (id, name, value) in hides)
+            {
+                var d = db.Get(id); Assert.NotNull(d, id);
+                Assert.AreEqual(name, d.name, id); Assert.AreEqual("material", d.kind, id); Assert.AreEqual(1, d.quality, id); Assert.AreEqual(value, d.value, id); Assert.AreEqual(10, d.stack, id);
+                Assert.IsTrue(Inventory.IsHide(d), id); Assert.IsTrue(string.IsNullOrEmpty(d.pouch), id + " goes in no trade bag."); Assert.AreEqual("GAME-ONLY", d.canonStatus, id);
+            }
+            // The plan's table: each beast and the hide it gives, and how often.
+            var table = new[] { ("rabbit", "hide.coney", 1f), ("deer", "hide.hill_deer", 1f), ("wolf", "junk.wolf_pelt", .7f), ("boar", "hide.boar", .7f),
+                ("hound", "junk.ash_hide", .7f), ("mossboar", "junk.moss_hide", .7f), ("stag", "junk.dappled_hide", .5f) };
+            foreach (var (tag, hide, chance) in table)
+            {
+                var t = db.Loot.Find(x => x.tag == tag); Assert.NotNull(t, "a loot table for " + tag);
+                var e = System.Array.Find(t.entries, x => x.item == hide); Assert.NotNull(e, tag + " drops " + hide);
+                Assert.AreEqual(chance, e.chance, 1e-4f, tag + ": " + hide);
+            }
+            // Every wolf, boar and stag camp in the five zones uses a table with a hide (Old Ninebranch's trophy table among them).
+            var zones = LootTestData.Zones(); int beasts = 0;
+            foreach (var z in zones) foreach (var c in z.camps)
+            {
+                if (c == null || (c.look != "wolf" && c.look != "boar" && c.look != "stag")) continue;
+                beasts++; var t = db.Loot.Find(x => x.tag == c.tag);
+                Assert.NotNull(t, z.id + " " + c.mob + ": a loot table for " + c.tag);
+                Assert.IsTrue(t.entries.Any(x => Inventory.IsHide(db.Get(x.item)) && x.chance > 0), z.id + " " + c.mob + " (" + c.tag + ") drops a hide.");
+                Assert.IsTrue(c.levelMin >= t.levelMin && c.levelMax <= t.levelMax, z.id + " " + c.mob + ": its levels are inside its table's band.");
+            }
+            Assert.Greater(beasts, 20);
+            // Game: the deer and rabbit groups of every zone, and their bodies always hold the hide and only the hide.
+            var rng = new System.Random(11);
+            foreach (var (tag, hide, _) in table.Take(2))
+            {
+                var t = db.Loot.Find(x => x.tag == tag); Assert.AreEqual(0, t.gearChance, tag + ": no gear from game.");
+                for (int level = 1; level <= EncounterProgress.LevelCap; level++)
+                {
+                    var drops = GameAnimals.RollHide(db, tag, level, rng);
+                    Assert.AreEqual(1, drops.Count, tag + " at level " + level); Assert.AreEqual(hide, drops[0].item); Assert.AreEqual(1, drops[0].count);
+                }
+            }
+            Assert.IsEmpty(GameAnimals.RollHide(db, "wolf_never", 1, rng), "A tag with no table holds nothing.");
+            foreach (var z in zones) foreach (var g in z.life != null ? z.life.critters : new Crulanda.World.ZoneCritters[0])
+                Assert.IsTrue(GameAnimals.IsGame(g.kind) ^ GameAnimals.NeverHunted.Contains(g.kind), z.id + ": a " + g.kind + " is either game or never hunted.");
+            CollectionAssert.AreEquivalent(new[] { "deer", "rabbit" }, GameAnimals.Kinds);
+            foreach (var kind in new[] { "chicken", "sheep", "cat", "crow" }) Assert.IsFalse(GameAnimals.IsGame(kind), kind + " is never hunted.");
+            // The skinner sells salt for the curing, and buys hides at their value like anyone.
+            CollectionAssert.AreEqual(new[] { "mat.salt" }, db.StockFor("Fen Walker", "skinner", 2));
+            var p = EncounterSession.FreshProgress(); Inventory.Add(p, db, "hide.hill_deer", 2);
+            Assert.AreEqual(4, Inventory.Sell(p, db, p.bag.FindIndex(s => s.item == "hide.hill_deer")), "Two hill-deer hides sell for 4 gold.");
         }
 
         [Test] public void Vendors_sell_tools_and_makings_but_never_what_is_gathered()

@@ -720,6 +720,132 @@
           }
         ]
       }
+    },
+    {
+      "id": "npc.leatherworker.sling",
+      "title": "A Strap for the Woodyard",
+      "kind": "npc",
+      "giver": "Maud Tanner",
+      "turnIn": "Maud Tanner",
+      "zone": "zone.oakhaven",
+      "level": 1,
+      "canonStatus": "GAME-ONLY",
+      "unlessWorn": "bag.log_sling",
+      "summary": "Bring Maud Tanner three hill-deer hides. Deer graze west of the Old Orchard, in the Mastwood and on the slopes under Crowsfoot Ridge; go quietly (Ctrl) or they're gone. She keeps shop by the South road, 9 to 12 and 2 to 6.",
+      "offer": "\"Osk Farrow carries his logs on his bare neck all winter, and by the look of your shoulders you've started doing the same.\"\n\n\"Deer hide makes the best strap there is: it gives without stretching. Bring me three and I'll cut you a log-sling. Go quiet in the long grass, mind. A hill deer hears you think.\"",
+      "progress": "\"Three hides. A deer you've only frightened doesn't count.\"",
+      "complete": "Maud spreads the hides over her bench and scrapes one edge with a thumbnail. \"Clean kills. Good.\" She cuts the strap in one long pull of the knife and stitches the cinches while you wait. \"Fen will take the offcuts to the yard, and that's tomorrow's bread. Mind your neck.\"",
+      "steps": [
+        {
+          "text": "Bring three hill-deer hides to Maud Tanner at her shop by the South road.",
+          "objectives": [
+            {
+              "type": "bring",
+              "target": "Maud Tanner",
+              "item": "hide.hill_deer",
+              "count": 3,
+              "text": "Hill-deer hides for Maud Tanner",
+              "say": "Let's see them, then. Hair side up."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 25,
+        "bagItems": [
+          "bag.log_sling"
+        ],
+        "reputation": [
+          {
+            "faction": "oakhaven",
+            "amount": 75
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.leatherworker.scrip",
+      "title": "The Cook's Scrip",
+      "kind": "npc",
+      "giver": "Maud Tanner",
+      "turnIn": "Maud Tanner",
+      "zone": "zone.oakhaven",
+      "level": 2,
+      "canonStatus": "GAME-ONLY",
+      "unlessWorn": "bag.larder_scrip",
+      "summary": "Bring Maud Tanner five coney skins. Rabbits run in every field: by Harrow farm, round Brook pond and out past the Cider Barn. She keeps shop by the South road, 9 to 12 and 2 to 6.",
+      "offer": "\"Flour in one pocket, salt in the next, a joint of something in the third, and none of it touching. That's a larder-scrip. Hob at the Cask has been after one since the spring.\"\n\n\"Coney skins line it: soft, and they don't hold the damp. Five of them. The fields are thick with rabbits; you'll not have to go far.\"",
+      "progress": "\"Five. Coneys are small; I need all five.\"",
+      "complete": "\"Five, and not a tear in them.\" Maud stretches each skin over her knee and pins it. \"Nettie, the waxed thread.\" The scrip she hands over is lined in soft grey fur and smells of beeswax. \"Keep the salt dry and it'll keep your meat. That's the whole of cooking, my mother said.\"",
+      "steps": [
+        {
+          "text": "Bring five coney skins to Maud Tanner at her shop by the South road.",
+          "objectives": [
+            {
+              "type": "bring",
+              "target": "Maud Tanner",
+              "item": "hide.coney",
+              "count": 5,
+              "text": "Coney skins for Maud Tanner",
+              "say": "Put them in a pile. I'll count them."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 25,
+        "bagItems": [
+          "bag.larder_scrip"
+        ],
+        "reputation": [
+          {
+            "faction": "oakhaven",
+            "amount": 75
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.leatherworker.poke",
+      "title": "Ore Wants a Stout Bag",
+      "kind": "npc",
+      "giver": "Maud Tanner",
+      "turnIn": "Maud Tanner",
+      "zone": "zone.oakhaven",
+      "level": 2,
+      "canonStatus": "GAME-ONLY",
+      "unlessWorn": "bag.ore_poke",
+      "summary": "Bring Maud Tanner three boar hides. Wild boar root in the Mastwood and on the downs about Withy pool. She keeps shop by the South road, 9 to 12 and 2 to 6.",
+      "offer": "\"If you've been at the seams with a pick, you'll have worn through a sack already. Ore eats leather.\"\n\n\"Boar hide is the only thing that stands up to it. Three of them, and I'll double them into an ore-poke. Mind the tusks. Fen came back from the Mastwood with a hole in his leg once, and he's never let me forget it.\"",
+      "progress": "\"Three boar hides. The boars won't come to you. Well, they might, and then you'll wish they hadn't.\"",
+      "complete": "Maud has to lean her weight on the awl to get it through. \"Doubled, and the seams turned in where the stone can't get at them.\" She draws the thong tight and drops the poke on the counter with a thump. \"That'll hold a hundredweight of copper and outlast us both.\"",
+      "steps": [
+        {
+          "text": "Bring three boar hides to Maud Tanner at her shop by the South road.",
+          "objectives": [
+            {
+              "type": "bring",
+              "target": "Maud Tanner",
+              "item": "hide.boar",
+              "count": 3,
+              "text": "Boar hides for Maud Tanner",
+              "say": "On the floor with them, they'll ruin the counter."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 30,
+        "bagItems": [
+          "bag.ore_poke"
+        ],
+        "reputation": [
+          {
+            "faction": "oakhaven",
+            "amount": 75
+          }
+        ]
+      }
     }
   ]
 }

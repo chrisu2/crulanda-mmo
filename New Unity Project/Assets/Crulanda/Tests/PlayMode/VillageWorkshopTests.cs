@@ -174,10 +174,13 @@ namespace Crulanda.Tests
             // Evening: Lisbet hangs the day's herbs at her drying hut.
             var lisbet = life.Find("Lisbet Crane"); Vector3? hung = null;
             life.HandedOver += (v, e, taker) => { if (v == lisbet && e.id == "herbs to dry") hung = v.transform.position; };
-            WorldClock.Hour = 16.35f; Time.timeScale = 4;
-            yield return WaitUntil(() => hung.HasValue, 120);
+            // She chooses at once (from where she stands), so the errand's window is not lost to a long walk or a dwell begun
+            // before the clock moved (it failed that way once in a full run, never alone).
+            WorldClock.Hour = 16.35f; lisbet.Release(lisbet.transform.position); Time.timeScale = 4;
+            var trace = new System.Text.StringBuilder(); float nextT = 0;
+            yield return WaitUntil(() => { if (Time.time > nextT) { nextT = Time.time + 3; trace.Append(" | " + WorldClock.Hour.ToString("0.00") + " " + lisbet.Activity + " vis=" + lisbet.Visible + " at=" + lisbet.transform.position.ToString("0") + " danger=" + life.Danger(lisbet.transform.position)); } return hung.HasValue; }, 120);
             Time.timeScale = 1;
-            Assert.IsTrue(hung.HasValue, "Lisbet brings her herbs in to dry (now '" + lisbet.Activity + "').");
+            Assert.IsTrue(hung.HasValue, "Lisbet brings her herbs in to dry (now '" + lisbet.Activity + "')." + trace);
             var hut = At(life, "dryhut", hung.Value);
             Assert.IsTrue(hut.HasValue, "at a stand point of the drying hut (" + Flat(hung.Value, life.Places["dryhut"][0]).ToString("0.0") + " m from it)");
             Assert.AreEqual("Lisbet's drying hut", life.WorkplaceAt(hut.Value));

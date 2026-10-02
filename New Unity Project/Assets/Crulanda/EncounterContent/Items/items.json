@@ -225,7 +225,7 @@
       "name": "Griddle bread",
       "kind": "consumable",
       "food": true,
-      "heal": 160,
+      "heal": 190,
       "quality": 1,
       "level": 1,
       "value": 1,

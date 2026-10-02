@@ -33,7 +33,7 @@ namespace Crulanda.Tests
         [UnityTearDown] public IEnumerator Cleanup()
         {
             VillageEconomy.ResetAll();   // the purses are kept for the play session
-            WorldClock.Hour = 8.5f;
+            WorldClock.Hour = 8.5f; ZoneBuilder.RequestedZoneId = null;
             SceneManager.sceneLoaded -= OnLoaded;
             var empty = SceneManager.CreateScene("Empty-" + Guid.NewGuid().ToString("N")); SceneManager.SetActiveScene(empty);
             yield return SceneManager.UnloadSceneAsync("Oakhaven");
@@ -105,6 +105,34 @@ namespace Crulanda.Tests
             said = false;
             for (int i = 0; i < 300 && !said; i++) said = life.LineFor(neighbour, true) == "Boar in the Cask's pot tonight. Somebody's been hunting.";
             Assert.IsTrue(said, neighbour.Name + " talks of it.");
+            yield return null;
+        }
+
+        /// <summary>
+        /// The Shattered Peaks has people (an elder, a merchant, and the rest talking as gossips) but no inn, so meat sold there is
+        /// only sold: nobody talks of an inn's pot, or of any of the inn's news of the day.
+        /// </summary>
+        [UnityTest] public IEnumerator SellingMeat_WhereThereIsNoInn_NobodyTalksOfAPot()
+        {
+            ZoneBuilder.RequestedZoneId = "zone.peaks";
+            yield return SceneManager.LoadSceneAsync("Oakhaven", LoadSceneMode.Single);
+            for (int i = 0; i < 3; i++) yield return null;
+            var s = UnityEngine.Object.FindFirstObjectByType<EncounterSession>(); var life = VillageLife.Active;
+            Assert.AreEqual(root, s.SaveDirectoryOverride, "This test saves to its own folder.");
+            Assert.AreEqual("zone.peaks", s.Zone.Zone.id); Assert.NotNull(life, "The Peaks has its people.");
+            Assert.AreEqual(0, life.Places["inn"].Count, "The Peaks has no inn.");
+            life.Deliver("inn.meat", 3); life.Deliver("sold.inn.meat", 3);   // as EncounterSession.SellBag delivers meat sold to any merchant
+            var innNews = new[] { "Boar in the Cask's pot tonight. Somebody's been hunting.", "Meat in the pot at the inn tonight. Somebody's been hunting.",
+                "Hare in the Cask's pot tonight. The hunter's doing.", "The cask's run dry at the inn. The out-of-work drank it by supper.",
+                "Bread and eggs at the Cask today. Like old times, nearly.", "The Cask's got a fire going. Dry oak, for once." };
+            var talkers = life.Villagers.Where(v => v.Role == "elder" || v.Role == "gossip" || v.Role == "drinker" || v.Role == "farmer").ToList();
+            Assert.IsNotEmpty(talkers, "The Peaks has an elder or a gossip to talk to.");
+            foreach (var v in talkers)
+                for (int i = 0; i < 300; i++)
+                {
+                    var line = life.LineFor(v, true);
+                    CollectionAssert.DoesNotContain(innNews, line, v.Name + " talks of an inn the Peaks hasn't got.");
+                }
             yield return null;
         }
 

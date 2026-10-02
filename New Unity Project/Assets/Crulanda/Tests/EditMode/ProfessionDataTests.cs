@@ -255,7 +255,8 @@ namespace Crulanda.Tests
         /// <summary>
         /// Cooking's ten recipes (BUILD_PLAN step 10, DESIGN 5.4): made at a fire, at Cooking 1 to 90, each from the makings the design
         /// gives it. What each makes is a food (healing over 10 s, out of combat) with the design's heal, level and value, labelled, in
-        /// no trade bag, and better than any food a vendor lists for a character of its level (the vendors' heal 150 to 640 by tier).
+        /// no trade bag, and better than any food a vendor sells to a character of its level (the vendors' lists, heal 150 to 640 by tier,
+        /// and the hen-wife's eggs at the merchant's, 180, which is why griddle bread heals 190 where the design gave it 160).
         /// The meats it is cooked from are materials no vendor sells.
         /// </summary>
         [Test] public void Cooking_HasTheTenRecipesOfTheDesign()
@@ -264,7 +265,7 @@ namespace Crulanda.Tests
             // Easiest first, as RecipesFor gives them: (recipe, skill, makings, output, count, heal, level, value).
             var expect = new[] {
                 ("recipe.boar_stew", 1, "junk.boar_meat 2", "food.boar_stew", 1, 220, 1, 3),
-                ("recipe.griddle_bread", 1, "mat.flour 1", "food.griddle_bread", 1, 160, 1, 1),
+                ("recipe.griddle_bread", 1, "mat.flour 1", "food.griddle_bread", 1, 190, 1, 1),
                 ("recipe.hearth_cake", 5, "mat.flour 1, food.fresh_eggs 1", "food.hearth_cake", 2, 200, 1, 2),
                 ("recipe.wolf_skewer", 20, "mat.wolf_haunch 2, mat.mourners_cap 1", "food.wolf_skewer", 1, 340, 3, 5),
                 ("recipe.harrow_pasty", 30, "mat.flour 1, food.harrow_cheese 1, junk.boar_meat 1", "food.harrow_pasty", 1, 380, 4, 5),
@@ -274,7 +275,7 @@ namespace Crulanda.Tests
                 ("recipe.mossback_chop", 80, "mat.mossback_chop 2, mat.dewfern 1", "food.mossback_chop", 1, 820, 11, 18),
                 ("recipe.venison_pie", 90, "mat.venison 2, mat.flour 1", "food.venison_pie", 1, 900, 12, 16) };
             CollectionAssert.AreEqual(expect.Select(e => e.Item1), db.RecipesFor("cooking").Select(r => r.id), "Cooking's recipes, easiest first.");
-            var vendorFood = items.Vendors.SelectMany(v => v.items ?? new string[0]).Distinct().Select(items.Get).Where(d => d != null && d.food).ToList();
+            var vendorFood = items.Vendors.SelectMany(v => v.items ?? new string[0]).Append(EncounterSession.FreshEggs).Distinct().Select(items.Get).Where(d => d != null && d.food).ToList();
             Assert.IsNotEmpty(vendorFood);
             foreach (var (id, skill, makings, output, count, heal, level, value) in expect)
             {
@@ -289,7 +290,7 @@ namespace Crulanda.Tests
                 Assert.IsTrue(string.IsNullOrEmpty(d.pouch), output + " goes in no trade bag.");
                 Assert.IsFalse(string.IsNullOrEmpty(d.description), output); Assert.AreEqual("GAME-ONLY", d.canonStatus, output);
                 int best = vendorFood.Where(f => f.level <= level).Select(f => f.heal).DefaultIfEmpty(0).Max();
-                Assert.Greater(heal, best, output + " heals more than any food a vendor sells at level " + level + ".");
+                Assert.Greater(heal, best, output + " heals more than any food a vendor sells at level " + level + " (the merchant's eggs among them).");
             }
             foreach (var meat in new[] { "junk.boar_meat", "mat.wolf_haunch", "mat.hound_flank", "mat.mossback_chop", "mat.venison" })
             {

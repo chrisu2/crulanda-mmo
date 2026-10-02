@@ -724,7 +724,8 @@ namespace Crulanda.Encounter
                 case "innkeeper": return Places["inn"].Count > 0 && Count("inn.ale") == 0 ? "Dry. Ama's cask never sees the night out." : Count("sold.inn.meat") > 0 ? MeatSoldInnkeeper : Count("inn.meat") > 0 ? "Garet's hares are in the pot. Don't tell the out-of-work." : null;
                 case "henwife": return Count("stall.eggs") > 0 ? "Eggs are at the produce stall if you're wanting any. I don't sell from the yard." : Count("inn.eggs") > 0 ? "Took the Cask its eggs this morning. The rest go to the stall after dinner." : null;
                 case "drinker": case "elder": case "gossip": case "farmer":
-                    return Places["inn"].Count > 0 && Count("inn.ale") == 0 ? "The cask's run dry at the inn. The out-of-work drank it by supper." : Count("sold.inn.meat") > 0 ? MeatSoldLine : Count("inn.meat") > 0 ? "Hare in the Cask's pot tonight. The hunter's doing." : Count("inn.bread") > 0 && Count("inn.eggs") > 0 ? "Bread and eggs at the Cask today. Like old times, nearly." : Count("inn.wood") > 0 ? "The Cask's got a fire going. Dry oak, for once." : null;
+                    if (Places["inn"].Count == 0) return null;   // all of it is the inn's news, and a camp with no inn has none (meat sold there is only sold)
+                    return Count("inn.ale") == 0 ? "The cask's run dry at the inn. The out-of-work drank it by supper." : Count("sold.inn.meat") > 0 ? MeatSoldLine : Count("inn.meat") > 0 ? "Hare in the Cask's pot tonight. The hunter's doing." : Count("inn.bread") > 0 && Count("inn.eggs") > 0 ? "Bread and eggs at the Cask today. Like old times, nearly." : Count("inn.wood") > 0 ? "The Cask's got a fire going. Dry oak, for once." : null;
                 default: return null;
             }
         }

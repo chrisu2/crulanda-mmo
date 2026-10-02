@@ -249,7 +249,7 @@ namespace Crulanda.Tests
                 Assert.IsTrue(r.name.StartsWith("Charcoal from "), id + ": " + r.name);
                 Assert.IsTrue(db.NodesFor("woodcutting").Exists(n => n.item == log && n.skill == skill), id + ": its wood is the windfall of its tier.");
             }
-            Assert.AreEqual(5, db.Recipes.Count, "Only charcoal so far; Cooking, Blacksmithing and Alchemy follow.");
+            Assert.AreEqual(5, db.Recipes.Count(r => r.output == "mat.charcoal"), "Five charcoal recipes, one per tier (other trades' recipes may follow).");
         }
 
         /// <summary>DESIGN 5: what a recipe makes is worth at most half again what goes into it (value x count).</summary>

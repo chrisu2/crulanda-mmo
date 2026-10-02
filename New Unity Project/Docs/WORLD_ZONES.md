@@ -599,6 +599,9 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
 - **What they are:** where recipes are made: a forge, a herbalist's bench or a fire, within 5 m. A smithy, a bake oven, the
   herbalist's drying hut, an inn's kitchen and every inn's hearth are stations already (registered from their workplaces and
   `Inn()`, drawing nothing random); a zone's `stations` (see DATA_SCHEMA.md) adds the rest as props of their own.
+- **Walls:** a station behind walls is worked only from its side of them (`ZoneStationSpot.room`, `Reaches`): an inn's hearth from
+  the taproom, the drying hut's bench from inside the hut, the kitchen's range not from behind its end wall or the taproom, the
+  smithy's anvil not from behind its back wall or its stone end wall. The oven and a zone's own stations stand in the open.
 - **Looks:** a field anvil (the smithy's anvil, a hammer on its face, tongs, a water cask, an open sack of charcoal, a pan of coals
   on iron legs with every third coal glowing and a light that brightens at night), on an oak stump (the Peaks), a pale block bound
   with bone and two tusks (the Rim) or a mossed stone with its embers in a stone basin (the Shore); a herbalist's bench (mortar and
@@ -606,7 +609,7 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
   and embers, three logs burning with tongues of flame, a pot on a tripod, smoke, a log to sit on and a few split logs).
 - **Built after the nodes**, from streams of their own, with no colliders and nothing in the navmesh: no tree, prop, node, secret
   or creek point moves (`NodeStreamTests`, built with and without them). Placement (`NodePlacementTests`): each zone has the kinds
-  DESIGN 6.1 gives it, each station is walkable to within reach from the start, and a zone's own stand where the data puts them,
+  DESIGN 6.1 gives it, each station is walkable to within reach (on its side of its walls) from the start, and a zone's own stand where the data puts them,
   clear of water, buildings, roads, nodes (3 m), secrets (5 m) and trunks (2 m).
 - **Using one:** E (when nobody is in reach to talk to, nothing to pick up and no door at hand) opens the Trades window at the
   recipes of the trade the station serves; or K anywhere and the Recipes tab, which names the station in reach. The world capture

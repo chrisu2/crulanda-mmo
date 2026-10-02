@@ -490,12 +490,12 @@ namespace Crulanda.Encounter
         readonly System.Random craftRng = new System.Random();
         /// <summary>The nearest station of a kind (forge, bench, fire; null: any kind) within StationRange, or null. A smithy, a bake
         /// oven, the herbalist's drying hut, an inn's kitchen and hearth, and a zone's own anvils, benches and cookfires; nobody need
-        /// be there.</summary>
+        /// be there. One behind walls counts only from its side of them (ZoneStationSpot.Reaches: the inn's hearth from the taproom).</summary>
         public Crulanda.World.ZoneStationSpot StationNear(string kind)
         {
             if (Zone == null || Player == null) return null;
-            Crulanda.World.ZoneStationSpot best = null; float bestD = StationRange;
-            foreach (var s in Zone.Stations) { if (kind != null && s.kind != kind) continue; float d = GroundDistance(s.position); if (d <= bestD) { best = s; bestD = d; } }
+            Crulanda.World.ZoneStationSpot best = null; float bestD = StationRange; var at = Player.transform.position;
+            foreach (var s in Zone.Stations) { if (kind != null && s.kind != kind) continue; float d = GroundDistance(s.position); if (d <= bestD && s.Reaches(at)) { best = s; bestD = d; } }
             return best;
         }
         bool StationOk(string kind) { return StationNear(kind) != null; }
@@ -547,8 +547,9 @@ namespace Crulanda.Encounter
         /// Makes a recipe <paramref name="count"/> times (the Trades window's Make and Make all), one at a time on the work bar
         /// (CraftSeconds each, labelled with the recipe's name). Refused, and nothing starts, while working or casting, in a fight
         /// ("You can't do that while fighting."), or when CanCraft says why. Each one made: the inputs leave the bags, what it
-        /// makes goes in ("You make Charcoal."), the skill is rolled and the game saves; the next starts while it still can be made.
-        /// Moving, a blow, a fight or dying stops the rest (TickWork). True when the first was started.
+        /// makes goes in ("You make Charcoal."), the skill is rolled and the game saves; the next starts while it still can be made,
+        /// and when it cannot the rest stop with CanCraft's reason ("Your bags are full."). Moving, a blow, a fight or dying stops the
+        /// rest (TickWork). True when the first was started.
         /// </summary>
         public bool Make(RecipeDef r, int count)
         {
@@ -565,7 +566,7 @@ namespace Crulanda.Encounter
             Message("You make " + ItemName(r.output) + (n > 1 ? " x" + n : "") + ".");
             FloatText(Player.transform.position, "+" + n + " " + ItemName(r.output), new Color(.86f, .95f, .66f));
             Save(false);
-            if (more > 0 && Professions.CanCraft(r, StationOk, out _)) StartWork(r.name, CraftSeconds, () => MakeOne(r, more - 1));
+            if (more > 0) { if (Professions.CanCraft(r, StationOk, out var stop)) StartWork(r.name, CraftSeconds, () => MakeOne(r, more - 1)); else Message(stop); }
         }
 
         // ---------- routing between zones (maps and breadcrumbs) ----------

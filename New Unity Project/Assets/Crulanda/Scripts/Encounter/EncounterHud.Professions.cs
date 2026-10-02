@@ -43,6 +43,7 @@ namespace Crulanda.Encounter
             y = TradeGroup(log, list, y, "FOR EVERYONE", "free");
             TradeGroup(log, list, y, "CRAFTS  " + log.CraftSlotsUsed + " of " + log.Db.CraftSlots, "craft");
             TradePage(log, log.Db.Profession(TradesPage), page);
+            if (!bagsVisible && !charVisible && !vendorVisible) DrawTooltip();   // a recipe's item tooltip over the parchment (with the bags, the character sheet or a vendor open, DrawDragAndConfirm paints it after every window)
         }
         /// <summary>A heading and the rows of one kind of trade. Returns the y under them (unchanged when there is none of that kind).</summary>
         float TradeGroup(ProfessionLog log, Rect list, float y, string title, string kind)

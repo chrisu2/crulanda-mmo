@@ -235,7 +235,20 @@ namespace Crulanda.World
     [Serializable] public sealed class ZoneStation { public string kind, name, canonStatus; public Vector2 at; public float rotation; public int variant; }
     /// <summary>A station as built (ZoneBuilder.Stations): its kind (forge, bench, fire), its name, where the thing worked stands, and
     /// the prop it belongs to (a workplace's building, an inn, or a station of its own).</summary>
-    public sealed class ZoneStationSpot { public string kind, name; public Vector3 position; public Transform root; }
+    public sealed class ZoneStationSpot
+    {
+        public string kind, name; public Vector3 position; public Transform root;
+        /// <summary>For a station behind walls, the floor it is worked from, in its root's local x/z (an inn's taproom, the drying
+        /// hut; the smithy and the kitchen on their open sides); zero size for one in the open.</summary>
+        public Rect room;
+        /// <summary>Whether a spot is on the station's side of its walls: anywhere for one in the open, else inside its room. The
+        /// inn's hearth is not worked from the street through the wall.</summary>
+        public bool Reaches(Vector3 at)
+        {
+            if (room.width <= 0 || room.height <= 0 || root == null) return true;
+            var l = root.InverseTransformPoint(at); return room.Contains(new Vector2(l.x, l.z));
+        }
+    }
     /// <summary>A usable prop registered by ZoneBuilder (see ZoneProp.interact).</summary>
     public sealed class ZoneInteractable
     {

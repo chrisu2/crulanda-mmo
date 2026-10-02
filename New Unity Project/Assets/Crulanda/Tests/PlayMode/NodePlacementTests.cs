@@ -26,7 +26,8 @@ namespace Crulanda.Tests
     /// - each is where it belongs: a windfall at the edge of a wood (an oak windfall at a broadleaf wood's), a herb from the
     ///   nodes array in the open (in no wood and on no field; a herb prop worked as a node stands where the zone always had it,
     ///   and on no field), a seam near a crag or rock or on a ridge's rocky crown.
-    /// And every zone's stations (step 9; CheckStations): the kinds it should have, each walkable to within reach; its own (Oakhaven
+    /// And every zone's stations (step 9; CheckStations): the kinds it should have, each walkable to within reach on its side of its
+    /// walls (an inn's hearth from the taproom); its own (Oakhaven
     /// has none) built where the data puts them, clear of water, buildings, roads, nodes, secrets and trunks, with no colliders.
     /// </summary>
     public class NodePlacementTests
@@ -161,7 +162,7 @@ namespace Crulanda.Tests
             { "zone.ashrim", new[] { "bench", "fire", "forge" } }, { "zone.verdant", new[] { "bench", "fire", "forge" } } };
         /// <summary>
         /// The zone's stations (BUILD_PLAN step 9): the kinds DESIGN 6.1 gives it; every one can be walked to from the start, to
-        /// within reach of it (EncounterSession.StationRange); its own (field anvils, benches, cookfires, under "Zone stations") one
+        /// within reach of it (EncounterSession.StationRange) and on its side of its walls (ZoneStationSpot.Reaches); its own (field anvils, benches, cookfires, under "Zone stations") one
         /// for each in the data where the data puts it, with something to see and nothing solid or in the navmesh, out of the water,
         /// buildings and off the roads, 3 m from every node and 5 m from every secret, and 2 m from every trunk.
         /// </summary>
@@ -177,7 +178,7 @@ namespace Crulanda.Tests
                 for (int k = 0; k <= 16 && !walked; k++)
                 {
                     var c = k == 0 ? st.position : zone.StandAt(new Vector2(st.position.x, st.position.z) + new Vector2(Mathf.Cos(k * Mathf.PI / 8), Mathf.Sin(k * Mathf.PI / 8)) * (k % 2 == 0 ? 1.5f : 3f), st.position.y);
-                    if (!NavMesh.SamplePosition(c, out var hit, 1.5f, NavMesh.AllAreas) || Flat(hit.position, st.position) > EncounterSession.StationRange - .5f || Mathf.Abs(hit.position.y - st.position.y) > 2) continue;
+                    if (!NavMesh.SamplePosition(c, out var hit, 1.5f, NavMesh.AllAreas) || Flat(hit.position, st.position) > EncounterSession.StationRange - .5f || Mathf.Abs(hit.position.y - st.position.y) > 2 || !st.Reaches(hit.position)) continue;
                     walked = NavMesh.CalculatePath(start, hit.position, NavMesh.AllAreas, path) && path.status == NavMeshPathStatus.PathComplete;
                 }
                 if (!walked) problems.Add(q + "can't be walked to within reach from the start");

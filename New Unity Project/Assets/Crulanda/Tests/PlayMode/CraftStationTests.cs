@@ -70,6 +70,10 @@ namespace Crulanda.Tests
             Assert.AreEqual("Vell's smithy", forge[0].name);
             var anvil = zone.Workplaces.First(w => w.kind == "forge" && w.name == "Vell's smithy");
             Assert.Less(Flat(forge[0].position, anvil.look), .01f, "The station is the anvil.");
+            var smithy = forge[0].root;
+            Assert.IsTrue(forge[0].Reaches(anvil.stand), "Worked from the front.");
+            Assert.IsFalse(forge[0].Reaches(smithy.TransformPoint(new Vector3(-.6f, 0, 2.7f))), "Not from behind the back wall.");
+            Assert.IsFalse(forge[0].Reaches(smithy.TransformPoint(new Vector3(3, 0, .5f))), "Not through the stone end wall.");
             // Chop a windfall.
             Hatchet(s);
             var windfall = zone.Interactables.Where(i => i.node == "node.oak").OrderBy(i => Flat(i.position, anvil.stand)).First();
@@ -150,13 +154,38 @@ namespace Crulanda.Tests
             var spot = inn.TransformPoint(new Vector3(3.2f, 0, .8f)); spot.y = inn.position.y;
             yield return StandAt(s, spot);
             Assert.AreSame(hearth, s.StationNear("fire")); Assert.IsNull(s.StationNear("forge"));
-            Assert.AreEqual("Work at the fire", s.InteractPrompt, "Charcoal is the fire's only use until Cooking has recipes (step 10).");
+            bool cooks = s.Professions.Db.RecipesFor("cooking").Count > 0;
+            Assert.AreEqual(cooks ? "Cook at the fire" : "Work at the fire", s.InteractPrompt, "Cooking's prompt once it has recipes (step 10); charcoal's until then.");
+            Assert.IsTrue(hearth.Reaches(s.Player.transform.position), "The taproom is the hearth's room.");
             Hatchet(s); Inventory.Add(p, s.Items, "mat.oak_log", 1);
             var oak = s.Professions.Db.Recipe("recipe.charcoal_oak");
             Assert.AreSame(hearth, s.StationFor(oak));
             Assert.IsTrue(s.Make(oak, 1)); yield return new WaitForSeconds(2.5f);
             Assert.AreEqual(1, Inventory.Count(p, "mat.charcoal"), "Charcoal burnt at the inn's hearth."); Assert.AreEqual(0, Inventory.Count(p, "mat.oak_log"));
-            // Khaven's Cracked Hearth is built by the same Inn(), so it is a fire too (the stations' placement test checks it there).
+            // Make all stops, and says why, when the next has no room: the charcoal one short of a full stack and every other slot taken.
+            Inventory.Add(p, s.Items, "mat.oak_log", 3); Assert.AreEqual(0, Inventory.Add(p, s.Items, "mat.charcoal", 18));
+            for (int i = 0; i < Inventory.BagSize; i++) if (p.bag[i].Empty) p.bag[i] = new ItemStack { item = "tool.hatchet", count = 1 };   // tools stack to one
+            Assert.AreEqual(1, Inventory.Room(p, s.Items, "mat.charcoal")); Assert.AreEqual(3, s.Professions.CanMake(oak), "Make all offers three.");
+            s.Messages.Clear();
+            Assert.IsTrue(s.Make(oak, 3)); yield return new WaitForSeconds(EncounterSession.CraftSeconds + .5f);
+            Assert.IsFalse(s.Working, "The rest stopped.");
+            Assert.AreEqual(20, Inventory.Count(p, "mat.charcoal")); Assert.AreEqual(2, Inventory.Count(p, "mat.oak_log"), "One burnt; two left with nowhere for their charcoal.");
+            Assert.Contains(ProfessionLog.BagsFullLine, s.Messages, "Make all says why it stopped.");
+            Assert.AreEqual(ProfessionLog.BagsFullLine, s.Messages[s.Messages.Count - 1]);
+            // Outside the end wall, a stride from it and near enough to the hearth by distance alone: the wall is between, so no hearth.
+            float half = light.localPosition.x + 1.6f; Vector3? outside = null;   // the light is 1.6 m in from the end wall
+            foreach (float lz in new[] { .8f, 0, 1.6f, -.8f, 2.4f, -1.6f })
+                foreach (float lx in new[] { half + 1, half + 1.4f, half + .7f })
+                {
+                    if (outside != null || !NavMesh.SamplePosition(inn.TransformPoint(new Vector3(lx, 0, lz)), out var hit, 1.5f, NavMesh.AllAreas)) continue;
+                    if (inn.InverseTransformPoint(hit.position).x > half + .3f && Flat(hit.position, hearth.position) < EncounterSession.StationRange - .3f) outside = hit.position;
+                }
+            Assert.IsTrue(outside.HasValue, "Walkable ground outside the Golden Cask's end wall, within five metres of its hearth.");
+            yield return StandAt(s, outside.Value);
+            Assert.IsFalse(hearth.Reaches(s.Player.transform.position), "Outside the taproom.");
+            Assert.AreNotSame(hearth, s.StationNear("fire"), "The hearth is not worked through the wall."); Assert.AreNotSame(hearth, s.StationNear(null));
+            if (s.StationNear(null) == null) Assert.IsFalse(s.InteractPrompt != null && s.InteractPrompt.EndsWith("at the fire"), "No fire offered at a blank wall: " + s.InteractPrompt);
+            // Khaven's Cracked Hearth is built by the same Inn(), so it is a fire too, walled in the same way (the stations' placement test checks it there).
         }
 
         [UnityTest] public IEnumerator CaskKitchen_CountsAsFire()
@@ -177,9 +206,25 @@ namespace Crulanda.Tests
             Hatchet(s); Inventory.Add(p, s.Items, "mat.oak_log", 2);
             var oak = s.Professions.Db.Recipe("recipe.charcoal_oak");
             s.Interact();
-            Assert.IsTrue(s.TradesOpen); Assert.AreEqual("woodcutting", EncounterHud.TradesPage);
+            Assert.IsTrue(s.TradesOpen); Assert.AreEqual(s.StationTrade("fire").id, EncounterHud.TradesPage, "Woodcutting until Cooking has recipes (step 10).");
             Assert.IsTrue(s.Make(oak, 2)); yield return new WaitForSeconds(2 * EncounterSession.CraftSeconds + 1);
             Assert.AreEqual(2, Inventory.Count(p, "mat.charcoal"), "Charcoal burnt at the kitchen range."); Assert.AreEqual(0, Inventory.Count(p, "mat.oak_log"));
+            // Walls: the kitchen is open in front and at its post's end, but not worked from behind its stone end wall or from the
+            // taproom; the drying hut's bench only from inside the hut; the oven, out in the open, from anywhere in reach.
+            Assert.IsTrue(kitchen.Reaches(range.stand));
+            var lean = kitchen.root; var size = ZoneBuilder.KitchenSize;
+            Assert.IsFalse(kitchen.Reaches(lean.TransformPoint(new Vector3(-size.x / 2 - .6f, 0, -.2f))), "Not from behind the end wall.");
+            Assert.IsFalse(kitchen.Reaches(lean.TransformPoint(new Vector3(-.2f, 0, size.y / 2 + .8f))), "Not from the taproom.");
+            Assert.IsTrue(kitchen.Reaches(lean.TransformPoint(new Vector3(0, 0, -size.y / 2 - 1.5f))), "From the yard in front.");
+            var bench = zone.Stations.Find(x => x.kind == "bench" && x.name == "Lisbet's drying hut"); var hut = bench.root; var hs = ZoneBuilder.DryingHutSize;
+            Assert.IsTrue(bench.Reaches(zone.Workplaces.First(w => w.kind == "dryhut" && w.name == "Lisbet's drying hut").stand), "From where Lisbet stands at the bench.");
+            Assert.IsFalse(bench.Reaches(hut.TransformPoint(new Vector3(0, 0, hs.y / 2 + .8f))), "Not from behind the hut.");
+            Assert.IsFalse(bench.Reaches(hut.TransformPoint(new Vector3(hs.x / 2 + .8f, 0, .5f))), "Not through the wall beside the bench.");
+            var oven = zone.Stations.Find(x => x.kind == "fire" && x.name == "Thorne's bakehouse");
+            var mouth = zone.Workplaces.First(w => w.kind == "oven" && w.name == "Thorne's bakehouse");
+            Assert.IsTrue(oven.Reaches(oven.position + Vector3.forward * 3) && oven.Reaches(oven.position + Vector3.back * 3), "The oven stands in the open.");
+            yield return StandAt(s, mouth.stand);
+            Assert.AreSame(oven, s.StationNear("fire"), "At the oven's mouth the oven is the fire.");
         }
     }
 }

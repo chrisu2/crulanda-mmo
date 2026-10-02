@@ -154,12 +154,13 @@ invalid" and runs without the trades (items are unaffected).
   times its inputs; a recipe from vendor goods alone never makes more than they cost to buy; every recipe's station stands somewhere.
 - Making (`ProfessionLog.CanCraft`, `Craft`; `EncounterSession.Make`): refused, in this order, without the trade (a gathering
   skill's tool: "You need a woodcutter's hatchet. Merchants sell them."; a craft: "You have not taken up Blacksmithing."), under the
-  recipe's skill ("That wants Woodcutting 20."), with no station of its kind within 5 m ("You need a forge or a fire nearby."), short
+  recipe's skill ("That wants Woodcutting 20."), with no station of its kind within 5 m and on its side of any walls ("You need a forge or a fire nearby."), short
   of an input ("You need Harrow oak log." or "... x2."), or with no room for what it makes ("Your bags are full."); then nothing
   changes. Otherwise the inputs leave the bags, the output goes in (onto its stacks, then a worn trade bag that holds it: charcoal
   goes in the ore-poke), and the skill rises: every time under 10 points over the recipe (orange), half the time under 20 (yellow),
   one in ten under 30 (green), never after (grey); never past 100. Each takes 2 s on the work bar ("You make Charcoal."); Make all
-  goes one at a time, and moving, a blow, a fight or dying stops the rest. Known recipes are not saved: they follow from the skill.
+  goes one at a time, stops with the reason when the next cannot be made ("Your bags are full."), and moving, a blow, a fight or
+  dying stops the rest. Known recipes are not saved: they follow from the skill.
 - Skill is 1-100 (`ProfessionDatabase.MaxSkill`). What a character has learned is saved as `EncounterProgress.professions`
   (save format 8, see SAVE_FORMAT.md) and handled by `ProfessionLog`.
 

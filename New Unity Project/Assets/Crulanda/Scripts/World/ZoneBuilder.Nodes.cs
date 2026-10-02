@@ -367,6 +367,8 @@ namespace Crulanda.World
             if (kind == null || Stations.Exists(s => s.root == root && s.kind == kind)) return;
             Stations.Add(new ZoneStationSpot { kind = kind, name = name, position = at, root = root });
         }
+        /// <summary>Walls in a prop's stations: they are worked only from this floor, in the prop's local x/z (ZoneStationSpot.room). Draws nothing random.</summary>
+        void StationRoom(Transform root, Rect room) { foreach (var s in Stations) if (s.root == root) s.room = room; }
         /// <summary>
         /// The zone's own stations (GAME-ONLY): a field anvil (forge), a herbalist's bench (bench) or a cookfire (fire) where the data
         /// puts it, each from a stream of its own keyed on where it stands, under "Zone stations", with no colliders and nothing in

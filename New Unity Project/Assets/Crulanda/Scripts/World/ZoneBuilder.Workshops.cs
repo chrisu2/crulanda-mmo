@@ -321,6 +321,7 @@ namespace Crulanda.World
             Solid(t, new Vector3(bx, .45f, .5f), new Vector3(.6f, .9f, 2.2f));
             Workplace(t, "dryhut", new Vector3(bx - .95f, 0, .5f), new Vector3(bx, 1, .5f));
             Workplace(t, "dryhut", new Vector3(-1.45f, 0, -d / 2 - 2), new Vector3(-1.45f, 1.1f, -d / 2 - 1));
+            StationRoom(t, new Rect(-w / 2, -d / 2, w, d));   // the bench is worked inside the hut, not through its wattle
         }
 
         // ---------- the inn's kitchen ----------
@@ -404,6 +405,7 @@ namespace Crulanda.World
             Workplace(t, "kitchen", new Vector3(-.75f, 0, -.2f), new Vector3(-1.75f, .95f, -.2f));
             Workplace(t, "kitchen", new Vector3(-.2f, 0, 0), new Vector3(-.2f, .9f, 1.05f));
             foreach (float x in new[] { -1f, 0, 1 }) Workplace(t, "kitchendoor", new Vector3(x, 0, -2.2f), new Vector3(x, 1, 0));
+            StationRoom(t, Rect.MinMaxRect(-w / 2 + .175f, -d / 2 - 9, w / 2 + 9, d / 2));   // open in front and at the post's end; not from behind the end wall or the taproom
         }
 
         // ---------- the hunter's game rack ----------

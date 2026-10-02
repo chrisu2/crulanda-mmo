@@ -205,7 +205,7 @@ namespace Crulanda.Encounter
             session.WorkAtStation(st); EncounterHud.TradesRecipe = "recipe.charcoal_oak"; yield return new WaitForSeconds(.6f);
             ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "24-station-recipes.png")); yield return new WaitForSeconds(.4f);
             var oak = session.Professions.Db.Recipe("recipe.charcoal_oak");
-            if (oak != null) { session.Make(oak, session.Professions.CanMake(oak)); float until = Time.time + 6 * EncounterSession.CraftSeconds + 2; while (session.Working && Time.time < until) yield return null; }
+            if (oak != null) { int n = session.Professions.CanMake(oak); session.Make(oak, n); float until = Time.time + n * EncounterSession.CraftSeconds + 2; while (session.Working && Time.time < until) yield return null; }   // every log in the bags (the bags shot's nine too): wait for them all
             yield return new WaitForSeconds(.5f);
             ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "25-station-charcoal-made.png")); yield return new WaitForSeconds(.4f);
             EncounterHud.TradesPage = null; EncounterHud.TradesRecipes = false; EncounterHud.TradesRecipe = null; session.ShowTrades(false); session.InventoryOpen = false;

@@ -3592,6 +3592,7 @@
         "name": "Tanner",
         "house": "Tanner house",
         "canonStatus": "GAME-ONLY",
+        "stipend": 3,
         "members": [
           {
             "name": "Maud Tanner",
@@ -3685,6 +3686,10 @@
         "name": "Jory",
         "house": "Jory's house",
         "canonStatus": "GAME-ONLY",
+        "stipend": 2,
+        "needs": [
+          "bread"
+        ],
         "members": [
           {
             "name": "Jory",

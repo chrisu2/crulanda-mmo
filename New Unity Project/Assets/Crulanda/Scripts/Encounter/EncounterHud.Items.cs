@@ -64,7 +64,10 @@ namespace Crulanda.Encounter
             Fill(r, new Color(.09f, .1f, .11f)); Fill(new Rect(r.x, r.y, r.width, r.height / 2), new Color(1, 1, 1, .04f));
             if (d != null)
             {
-                Shadow(r, Glyph(d), glyph, ItemDatabase.QualityColors[Mathf.Clamp(d.quality, 0, 4)]);
+                // Its painted icon (playtest note 11, Resources/Icons via IconDb); the letters only for anything without one.
+                var icon = IconDb.Item(d);
+                if (icon != null) GUI.DrawTexture(new Rect(r.x + 1, r.y + 1, r.width - 2, r.height - 2), icon, ScaleMode.ScaleToFit);
+                else Shadow(r, Glyph(d), glyph, ItemDatabase.QualityColors[Mathf.Clamp(d.quality, 0, 4)]);
                 SquareMarks(r, d);
                 if (s.count > 1) Shadow(new Rect(r.x, r.y, r.width - 3, r.height - 1), s.count.ToString(), countStyle, Color.white);
             }

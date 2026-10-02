@@ -87,9 +87,12 @@ namespace Crulanda.Encounter
                 GUI.enabled = Live(TradesPage != d.id);
                 if (GUI.Button(r, GUIContent.none, qList)) TradesPage = d.id;
                 GUI.enabled = Live(true);
-                Shadow(new Rect(r.x + 10, r.y + 3, r.width - 20, 22), d.name, qHead, has ? Color.white : Dim);
-                if (has) UnitBar(new Rect(r.x + 10, r.y + 30, r.width - 20, 12), log.Skill(d.id) / (float)ProfessionDatabase.MaxSkill, SkillBar, log.Skill(d.id) + " / " + ProfessionDatabase.MaxSkill);
-                else Shadow(new Rect(r.x + 10, r.y + 25, r.width - 14, 22), ShortNeed(d), tradeNote, d.kind == "craft" && session.CanTakeUp(d.id, out _) ? gold : Dim);
+                // The trade's painted icon at the left (playtest note 11), dimmed until it is taken up.
+                var icon = IconDb.Trade(d.id); float ix = icon != null ? 46 : 0;
+                if (icon != null) { GUI.color = has ? Color.white : new Color(.55f, .55f, .55f); GUI.DrawTexture(new Rect(r.x + 6, r.y + 5, 40, 40), icon, ScaleMode.ScaleToFit); GUI.color = Color.white; }
+                Shadow(new Rect(r.x + 10 + ix, r.y + 3, r.width - 20 - ix, 22), d.name, qHead, has ? Color.white : Dim);
+                if (has) UnitBar(new Rect(r.x + 10 + ix, r.y + 30, r.width - 20 - ix, 12), log.Skill(d.id) / (float)ProfessionDatabase.MaxSkill, SkillBar, log.Skill(d.id) + " / " + ProfessionDatabase.MaxSkill);
+                else Shadow(new Rect(r.x + 10 + ix, r.y + 25, r.width - 14 - ix, 22), ShortNeed(d), tradeNote, d.kind == "craft" && session.CanTakeUp(d.id, out _) ? gold : Dim);
                 y += 54;
             }
             return y + 8;

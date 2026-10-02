@@ -12,7 +12,7 @@ namespace Crulanda.Encounter
     {
         public EncounterSession session;
         static bool inventoryVisible, paused, buildVisible, mapVisible, targetVisible;
-        GUIStyle heading, text, small, tiny, button, number, compact, tile, denseAction, abbrev, keybind, frameName, barText, micro;
+        GUIStyle heading, text, small, tiny, button, number, compact, tile, tileIcon, denseAction, abbrev, keybind, frameName, barText, micro;
         readonly Color ink = new Color(.045f, .065f, .075f, .94f);
         readonly Color gold = new Color(.91f, .76f, .43f);
         static readonly Color HealthGreen = new Color(.12f, .72f, .16f);
@@ -40,6 +40,7 @@ namespace Crulanda.Encounter
             compact = new GUIStyle(button) { fontSize = 13, padding = new RectOffset(4, 4, 3, 3) };
             denseAction = new GUIStyle(button) { fontSize = 11, padding = new RectOffset(2, 2, 2, 2), wordWrap = true };
             tile = new GUIStyle(GUI.skin.button) { fontSize = 12, wordWrap = true, alignment = TextAnchor.UpperCenter, padding = new RectOffset(4, 4, 6, 4) };
+            tileIcon = new GUIStyle(tile) { fontSize = 11, padding = new RectOffset(3, 3, 44, 2) };   // under the talent's icon
             abbrev = new GUIStyle(GUI.skin.label) { fontSize = 17, fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleCenter };
             keybind = new GUIStyle(GUI.skin.label) { fontSize = 12, fontStyle = FontStyle.Bold, alignment = TextAnchor.UpperLeft, padding = new RectOffset(3, 0, 1, 0) };
             frameName = new GUIStyle(GUI.skin.label) { fontSize = 15, fontStyle = FontStyle.Bold, clipping = TextClipping.Clip };
@@ -277,7 +278,14 @@ namespace Crulanda.Encounter
                 Fill(r, locked == null ? new Color(.16f, .2f, .24f) : new Color(.1f, .1f, .1f));
                 Fill(new Rect(r.x, r.y, r.width, r.height / 2), new Color(1, 1, 1, .05f));
                 bool cooling = remaining > 0 && a.cooldown > 0;
-                if (!cooling) Shadow(r, Abbreviation(a.name), abbrev, locked == null ? Color.white : new Color(.45f, .45f, .45f));
+                // Its painted icon (playtest note 11): an ability's own, or the talent that gives it; greyed while locked.
+                var icon = IconDb.Ability(a.id) ?? IconDb.Talent(a.id);
+                if (icon != null)
+                {
+                    GUI.color = locked == null ? Color.white : new Color(.42f, .42f, .42f);
+                    GUI.DrawTexture(new Rect(r.x + 1, r.y + 1, r.width - 2, r.height - 2), icon, ScaleMode.ScaleToFit); GUI.color = Color.white;
+                }
+                else if (!cooling) Shadow(r, Abbreviation(a.name), abbrev, locked == null ? Color.white : new Color(.45f, .45f, .45f));
                 if (cooling)
                 {
                     float frac = Mathf.Clamp01(remaining / Mathf.Max(a.cooldown, .01f));
@@ -385,7 +393,15 @@ namespace Crulanda.Encounter
                     GUI.color = edge; GUI.DrawTexture(new Rect(r.x - 2, r.y - 2, r.width + 4, r.height + 4), Texture2D.whiteTexture); GUI.color = Color.white;
                     GUI.contentColor = rank > 0 || canAdd ? Color.white : new Color(.6f, .62f, .63f);
                     string kind = n.kind == "active" ? "ACTION" : n.kind == "modifier" ? "MODIFIES" : "";
-                    if (GUI.Button(r, n.name + "\n" + (kind.Length > 0 ? kind + "\n" : "") + rank + "/" + n.max, tile) && canAdd) session.ChangeTalent(n.id, 1);
+                    // Its painted icon at the top (playtest note 11), the name and rank under it; the old text tile without one.
+                    var icon = IconDb.Talent(n.id);
+                    if (icon == null) { if (GUI.Button(r, n.name + "\n" + (kind.Length > 0 ? kind + "\n" : "") + rank + "/" + n.max, tile) && canAdd) session.ChangeTalent(n.id, 1); }
+                    else
+                    {
+                        if (GUI.Button(r, n.name + "\n" + (kind.Length > 0 ? kind + "  " : "") + rank + "/" + n.max, tileIcon) && canAdd) session.ChangeTalent(n.id, 1);
+                        GUI.color = rank > 0 || canAdd ? Color.white : new Color(.5f, .5f, .5f);
+                        GUI.DrawTexture(new Rect(r.center.x - 18, r.y + 5, 36, 36), icon, ScaleMode.ScaleToFit); GUI.color = Color.white;
+                    }
                     GUI.contentColor = Color.white;
                     if (r.Contains(mouse))
                     {

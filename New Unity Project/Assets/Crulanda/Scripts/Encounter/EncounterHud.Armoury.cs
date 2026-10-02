@@ -91,7 +91,9 @@ namespace Crulanda.Encounter
                 bool known = e.state == ArmouryLog.State.Known;
                 Fill(new Rect(sq.x - 2, sq.y - 2, sq.width + 4, sq.height + 4), known ? new Color(.47f, .44f, .4f) : new Color(.36f, .31f, .25f));
                 Fill(sq, known ? new Color(.2f, .19f, .18f) : new Color(.12f, .11f, .1f));
-                Shadow(sq, Glyph(new ItemDef { kind = "gear", slot = e.slot }), glyph, known ? new Color(.62f, .6f, .56f) : new Color(.36f, .34f, .31f));
+                var silhouette = IconDb.Slot(e.slot);   // the slot's grey silhouette, fainter for one not yet seen
+                if (silhouette != null) { GUI.color = new Color(1, 1, 1, known ? .75f : .4f); GUI.DrawTexture(new Rect(sq.x + 1, sq.y + 1, sq.width - 2, sq.height - 2), silhouette, ScaleMode.ScaleToFit); GUI.color = Color.white; }
+                else Shadow(sq, Glyph(new ItemDef { kind = "gear", slot = e.slot }), glyph, known ? new Color(.62f, .6f, .56f) : new Color(.36f, .34f, .31f));
                 name = known ? e.name : slot + "  ·  unknown"; line = known ? slot + (e.source != null ? "  ·  " + e.source : "") : ArmouryLog.UnknownLine(e.sourceKind);
                 ink = known ? new Color(.45f, .42f, .38f) : new Color(.5f, .44f, .36f);
             }

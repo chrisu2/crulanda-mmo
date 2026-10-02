@@ -174,6 +174,9 @@ shapes += [
     {'name': 'Sallow bottom', 'center': P(160, -214), 'radius': 12, 'height': -0.7, 'blend': 10},
     {'name': 'Sallow wallow', 'paint': 'mud', 'center': P(150, -208), 'radius': 4.5, 'height': -0.5, 'blend': 5},
     {'name': 'Crowsfoot Ridge, east shoulder', 'center': P(-8, 236), 'radius': 6, 'height': 8.5, 'blend': 26},
+    # Foothills either end of the ridge, so the north reads as hill country and the mouth lies in a fold between two hills.
+    {'name': 'Crowsfoot Ridge, west knee', 'center': P(-162, 258), 'radius': 8, 'height': 7, 'blend': 28},
+    {'name': 'North downs', 'center': P(62, 262), 'radius': 8, 'height': 6, 'blend': 30},
 ]
 new_props = [
     # Carder's field barn on the North road, the last roof before the wild: the deserters had it three nights running.

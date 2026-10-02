@@ -70,7 +70,8 @@ note 1 says what the lead must run).
   Bottom** in the south-east (a wet hollow, a wallow, boars) and **the Bound wood** by the west bound; ten woods (Greyback
   Shaw, the Ridge pines on the ridge's south face, Hill pines, the Pale wood by the grey, Alder holt, the Sallows, Ashward
   pines, the Bound wood, Lark hill thorns, the Hanger), three fields, three patches of tall grass, seven critter groups,
-  three secrets (below, "Secrets"), loose rocks and lone trees. The hill the Overlook stands on stays where it was, a hill of
+  three secrets (below, "Secrets"), loose rocks and lone trees. Three hill shapes beside the moved ridge (an east shoulder, a
+  west knee and the North downs, 6 to 8.5 m) make the north read as hill country, and put the mouth in a fold between two hills. The hill the Overlook stands on stays where it was, a hill of
   its own now the ridge has gone from behind it; two loose rocks that lay on the old ridge went with it.
 - **The streams:** the zone's layout is still one random stream, and a bigger zone legitimately re-rolls it, as the last growth
   did: grove trees, the forest edge, scatter and grass fall anew, the creek's swing re-phases along its whole length (it is

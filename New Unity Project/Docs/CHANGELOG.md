@@ -908,3 +908,11 @@ A read-only review by five reviewers, each finding checked by a second who tried
   the cat stands (the tip flicks now and then), swings low behind it when it walks, and stands straight up with the tip
   hooked over at a trot.
 - Tests: the hunting and village fixtures 14/14; Oakhaven toured, with a new line-up shot of the animals.
+
+## 2026-10-02 afternoon — Icons (playtest note 11)
+- **A picture for everything** (Chris: "can't tell what anything is"): 693 painted icons. Every item (each ore, bar, log,
+  herb, hide, meat, food, potion, tool, bag, junk and quest item its own), every ability and talent, the trades, and gear by
+  what it is in its own colours, the quality still on the border. On the action bar, in the bags and trade bags, on worn
+  gear, in the Armoury, the loot window and the recipes, on the talent tiles and the trades list.
+- Tests: EditMode 377/377 (a new test keeps every item, ability, talent and trade covered); the bag, loot, Armoury and
+  trades fixtures 22/22; the HUD shots looked at.

@@ -240,7 +240,7 @@ zone builder: light from each torch, fire and glowing thing and from the mouth, 
 darkness in the depths and in the creases, stored on the cave's mesh (or in a light map over its plan) and used by the cave
 shader, the props and the actors alike; then haze, shafts at the mouth and a colour script per cave.
 
-## 11. Real icons for the hot bar and the items in the bags (2026-10-01) — OPEN
+## 11. Real icons for the hot bar and the items in the bags (2026-10-01) — FIXED (published 2026-10-02 14:12)
 > "need set icons for the hot bar. items in bags. not just letters and colors. can't tell what anything is"
 
 Today every ability on the bar is three letters ("STR", "CHA", "GUA") and every item square two letters on a colour ("Mt",

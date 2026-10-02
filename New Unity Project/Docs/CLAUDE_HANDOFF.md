@@ -763,6 +763,7 @@ resumed with `Workflow({scriptPath, resumeFromRunId})` (finished agents replay f
 - 13:50 build: notes 4 and 7 (CritterBody: designer 0's sheep and jointed cat tail from the stopped art-notes run, previews in
   `scratchpad\artnotes\critters\d0`); the Oakhaven tour now shoots `oakhaven-98-critters-lineup` and `-cats`. HuntTests and
   VillageHomeTests 14/14.
-- **Open notes:** 9 (bloom and sun), 10 (baked cave lighting), 11 (real icons), 12 (smooth characters, "build them in code"),
+- **Note 11 icons PUBLISHED 14:12** (main: IconDb, Resources/Icons, tools/art/make_icons.py; rerun it after adding items).
+- **Open notes:** 9 (bloom and sun), 10 (baked cave lighting), 12 (smooth characters, "build them in code"),
   13 (high-fantasy colour), 14 (the PDF: draft committed, not checked). The stopped run's previews for 9, 10, 11 and 13 are in
   `scratchpad\artnotes\{sun,caves,icons,colour}` (no code in their worktrees). Ask Chris which next; work solo.

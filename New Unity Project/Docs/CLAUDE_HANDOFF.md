@@ -10,7 +10,7 @@ Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
 ## RESUME HERE (updated 2026-10-01, night)
-**PUBLISHED 2026-10-01 (ten publishes; the playable build is main at 4fdc85b, published 23:10):**
+**PUBLISHED 2026-10-01/02 (eleven publishes; the playable build is main at f046de3, published 2026-10-02 00:20):**
 1. The Root-Mother's Deep, Crowsfoot's hidden mouth, every trade has a day (4c579e6).
 2. The painted style pass parts 1-4 (03fd06d) and 3. part 5, painted masonry (17168d8).
 4. The out of work drink at the inn; the visual review's first batch (ecc233b).
@@ -39,6 +39,11 @@ The user requested this handoff because they ran out of tokens. Do not assume an
    Tests: EditMode 319/320 (1 skipped), PlayMode 150/151: `HuntTests.Game_bolts_and_sneaking_gets_closer` is INTERMITTENT (a
    rabbit that should bolt stood and watched, at (25.9, -68.4) by the Brook pond; alert reset twice, so GameAnimal.Bolt gave up
    or its path ended at once; passed alone and on a second fixture run). Published with that known. Oakhaven toured only.
+11. **Round 6: trades steps 12 and 13, loot L3, polish:** blacksmithing (five smelts, 21 pieces) and the two-craft rule with
+   take up and forget, alchemy (five potions), the Armoury (SAVE FORMAT 9; Chris's save backed up to
+   `save-backups/20261001-2315-before-format9`), rare and epic gear that glows on the body, no talking through walls, herbs
+   that follow the slope, the rabbit's bolt hardened. Tests: EditMode 341/341, PlayMode 154/158 with all four failures fixed
+   (three test-text bugs, and mourner's cap buried on two Khaven banks) and their fixtures 11/11.
 **Long runs go detached:** `tools\validation\start_detached.ps1 [-Arguments '-NoTests' | '-NoTour' | '-NoBuild' | '-Zones zone.khaven,zone.verdant']`
 runs `full_run.ps1` outside the tool's process tree; wait for `hel\work\full-run.done` (the log is mixed-encoding: read the result
 XMLs and logs directly). `-NoTour` builds and takes the HUD, wardrobe and loot shots but tours no zone; `-NoBuild` is tests only.
@@ -47,23 +52,26 @@ visible creature or villager looks keep them; tour just the zones a round touche
 Assets while a run is in flight (it mirrors Assets).
 
 **CHRIS'S PLAYTEST NOTES COME FIRST: `Docs/PLAYTEST_NOTES.md`** (he jots issues as he plays; log each there, fix them in the
-next rounds, tell him which build has the fix). Open on 2026-10-01 night: (1) the bandit camp is far too close to the village
-and he had asked for the zone to be expanded; (2) elites and the Bandit King are too easy for their loot; (3) mobs are not
-social (he pulls them one at a time).
-**BUILDING NOW, TWO WORKFLOW RUNS (`build-step-resume`):**
-- Run wf_58bb391f-c7f, the notes: `fix/n23-social-elites` (worktree `scratchpad\wt\n23`: social aggro by kind, elites and
-  bosses retuned with moves of their own, a balance table) and `fix/n1-oakhaven-grows` (`wt\n1`: Oakhaven grown to about
-  560 m, the whole of Crowsfoot Hollow moved 250-300 m out, the new ground dressed, every zone checked for camps within 120 m
-  of a village). n1 changes the world's look: full Oakhaven tour, and any other zone it touched.
-- Run wf_f6d5019e-818, round 6: `trades/b12-smithing-alchemy` (`wt\b12`: steps 12 and 13, the two-craft rule),
-  `loot/l3-armoury` (`wt\ll3`: SAVE FORMAT 9, back up Chris's save before merging) and `polish/p6-glow-talk-slopes`
-  (`wt\p6`: worn rare/epic glow, no talking through walls, herbs that follow the slope).
-When each reports: merge one at a time on an integration branch (round3/4/5 were done this way), compile, full detached check,
-look, publish. Merge the notes run first if both are ready.
-**To do by hand next (small):** harden `GameAnimal.Bolt` (pick a flee point with a COMPLETE path via NavMesh.CalculatePath and
-SetPath, try half the run and then any direction before standing its ground) and keep the diagnostics now in the rabbit test's
-failure message. Then step 14 (depth and tuning) and loot L4-L6 after round 6.
-**Still open:** nothing else beyond the two runs above (p6 covers the glow, the wall check and the slope).
+next rounds, tell him which build has the fix). Fourteen notes by 2026-10-02 00:30; note 8 is praise (the lights), the rest are work.
+**IN FLIGHT (2026-10-02 00:30), in order of what to do when each comes back:**
+1. **Round 7 = notes 1, 2, 3** on branch `round7` (worktree `scratchpad\wt\int7`; merged from `fix/n23-social-elites` and
+   `fix/n1-oakhaven-grows`; compile ALL OK; NOT run): Oakhaven grown to 560 m with Crowsfoot Hollow moved to (-120, 240) and
+   turned; social aggro by kind; elites at 5.5x health with a named heavy blow, enrage and a call; guards. Fast-forward main to
+   it, run the full check with tests and tours of Oakhaven, Khaven and the Ash Rim (arrival points moved), look at everything
+   note 1's write-up lists (and the fight shots in `ui-captures\elite`), check the build log's zone build time (estimate
+   13 s editor, 11 s player) and frame cost (the ground is one 401k-triangle mesh), publish. Open decision for Chris in note 1:
+   the 120 m rule elsewhere (default taken: Oakhaven now; Khaven next if he wants it; the outposts keep their camps).
+2. **Art notes** (workflow `art-notes`, run wf_1ca487e1-45f): `fix/n4-sheep` (`wt\n4`: sheep, cats' tails, a critter line-up
+   shot), `fix/n56-ore-windfall` (`wt\n6`: less green ore, done by hand; the lumber trees), `fix/n9-sun` (`wt\n9`: sun and
+   bloom, then baked cave lighting), `fix/n11-icons` (`wt\n11`: generated icons for abilities and every item). And run
+   wf_99f8008d-998: `fix/n13-colour` (`wt\n13`: high-fantasy palettes). Each: design panel with previews, judges, build,
+   review, verify, fix. Previews are in `scratchpad\artnotes\<item>`. Merge after round 7; all change the look: tour.
+3. **Characters** (workflow `characters-design`, run wf_755e3e44-eb0; Chris chose "build them in code"): maps, three designs
+   with rendered previews, judges, the plan in `tools/wip/characters` on branch `plan/characters` (`wt\c0`), critics, then
+   step C1 (his own character smooth and moving, behind a switch) built and reviewed on that branch.
+4. **The PDF** (workflow `history-pdf`, run wf_e1fd6182-250): `Docs/Crulanda-Everything-Built-So-Far.pdf`, generator in
+   `tools/docs`. When it reports: open it, commit it, send it to Chris.
+**Then:** step 14 (depth and tuning), loot L4-L6, and whatever he notes next.
 
 **THE PLANS (read the owner notes first; they are his words and decisions):**
 - Professions, gathering, households, purses, bags, hunting: `tools/wip/professions/OWNER_NOTES.md`, `DESIGN.md`, `ADDENDUM.md`,

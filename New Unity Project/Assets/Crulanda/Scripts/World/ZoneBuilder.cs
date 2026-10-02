@@ -3356,21 +3356,73 @@ namespace Crulanda.World
             Part(PrimitiveType.Cube, t, new Vector3(1.09f, 2.2f, 0), new Vector3(.02f, .5f, .5f), Tint(art.metal, new Color(.75f, .62f, .25f)));
             Solid(t, new Vector3(0, 1.5f, 0), new Vector3(2.4f, 3, 3.8f));
         }
-        /// <summary>A herb patch: a clump of stems with flower heads (variant 0 yarrow white, 1 feverfew yellow, 2 comfrey violet;
-        /// 3 tarnwort, 4 cinder-thistle and 5 dewfern are the trades' herbs, see HerbOfTheTrades). Draws nothing random.</summary>
+        /// <summary>
+        /// A herb patch, knee-high so it reads from the path above the meadow grass and its wildflowers: 0 yarrow (feathery leaves
+        /// under flat white heads of tiny florets), 1 mourner's cap (a cluster of grey, black-gilled caps on a dark damp patch, as
+        /// Wenna tells it), 2 comfrey (broad leaves under nodding violet bells); 3 tarnwort, 4 cinder-thistle and 5 dewfern are the
+        /// trades' herbs, see HerbOfTheTrades. Fixed tables: draws nothing random.
+        /// </summary>
         void Herb(Transform t, int variant)
         {
             if (variant >= 3 && variant <= 5) { HerbOfTheTrades(t, variant); return; }
-            var stem = Tint(art.foliage, new Color(.3f, .5f, .22f));
-            var flower = Tint(art.foliage, new[] { new Color(.95f, .94f, .88f), new Color(.95f, .82f, .25f), new Color(.6f, .4f, .75f) }[Mathf.Abs(variant) % 3]);
-            for (int i = 0; i < 7; i++)
+            int v = Mathf.Abs(variant) % 3;
+            if (v == 1) { MournersCap(t); return; }
+            var leaf = Tint(art.foliage, Wither(v == 0 ? new Color(.27f, .48f, .2f) : new Color(.25f, .44f, .19f)));
+            var shade = Tint(art.foliage, Wither(v == 0 ? new Color(.18f, .35f, .15f) : new Color(.17f, .31f, .14f)));
+            var stem = Tint(art.foliage, Wither(new Color(.32f, .5f, .23f)));
+            var bloom = Tint(art.foliage, v == 0 ? new Color(.97f, .95f, .87f) : new Color(.6f, .42f, .82f));
+            var heart = Tint(art.foliage, v == 0 ? new Color(.86f, .82f, .66f) : new Color(.44f, .28f, .64f));
+            // The leaves round the foot: long and feathery for yarrow (two narrow blades a leaf), broad and rough for comfrey.
+            for (int i = 0; i < 9; i++)
             {
-                float a = i * 51, r = .12f + (i % 3) * .12f, h = .35f + (i % 4) * .08f;
-                var at = Quaternion.Euler(0, a, 0) * new Vector3(r, 0, 0);
-                Part(PrimitiveType.Cube, t, at + new Vector3(0, h / 2, 0), new Vector3(.03f, h, .03f), stem, Quaternion.Euler(8, a, 6));
-                Part(PrimitiveType.Sphere, t, at + new Vector3(0, h + .02f, 0), new Vector3(.12f, .06f, .12f), flower);
+                var q = Quaternion.Euler(0, i * 40 + 7, 0); float l = .34f + (i % 3) * .07f;
+                if (v == 0)
+                    for (int k = -1; k <= 1; k += 2)
+                        Part(PrimitiveType.Cube, t, q * new Vector3(k * .02f, .08f, l * .45f), new Vector3(.05f, .012f, l), (i + k) % 2 == 0 ? leaf : shade, q * Quaternion.Euler(-26, k * 9, 0));
+                else Part(PrimitiveType.Sphere, t, q * new Vector3(0, .07f, l * .45f), new Vector3(.2f, .04f, l), i % 2 == 0 ? leaf : shade, q * Quaternion.Euler(-16, 0, 0));
             }
-            for (int i = 0; i < 4; i++) Part(PrimitiveType.Cube, t, new Vector3(0, .06f, 0), new Vector3(.34f, .02f, .09f), stem, Quaternion.Euler(0, i * 45, 0));
+            // Stems leaning out from the crown, each with its head: yarrow's flat crown of florets, comfrey's hanging bells.
+            for (int i = 0; i < 9; i++)
+            {
+                float a = i * 40 + 20, r = .04f + (i % 3) * .08f, h = .52f + (i % 4) * .08f;
+                var at = Quaternion.Euler(0, a, 0) * new Vector3(r, 0, 0); var lean = Quaternion.Euler(5 + (i % 3) * 5, a, 0);
+                Part(PrimitiveType.Cube, t, at + lean * new Vector3(0, h / 2, 0), new Vector3(.03f, h, .03f), stem, lean);
+                var top = at + lean * new Vector3(0, h, 0);
+                if (v == 0)
+                {
+                    Part(PrimitiveType.Cylinder, t, top, new Vector3(.21f, .018f, .21f), heart);
+                    for (int k = 0; k < 4; k++) Part(PrimitiveType.Sphere, t, top + Quaternion.Euler(0, k * 90 + i * 23, 0) * new Vector3(.055f, .022f, 0), new Vector3(.09f, .045f, .09f), bloom);
+                }
+                else
+                {
+                    // Comfrey: the stem curls over at the top and four bells hang from it, the lowest open-mouthed.
+                    var curl = top + lean * new Vector3(0, .02f, .06f);
+                    Part(PrimitiveType.Cube, t, (top + curl) / 2, new Vector3(.025f, .025f, .09f), stem, lean * Quaternion.Euler(-30, 0, 0));
+                    for (int k = 0; k < 4; k++)
+                        Part(PrimitiveType.Sphere, t, curl + lean * new Vector3((k - 1.5f) * .035f, -.05f - (k % 2) * .03f, .02f), new Vector3(.055f, .085f, .055f), k == 3 ? heart : bloom, lean * Quaternion.Euler(0, 0, (k - 1.5f) * 14));
+                }
+            }
+        }
+        /// <summary>Mourner's cap: grey caps with black gills in a tight cluster, the tallest in the middle, their stalks sunk a little
+        /// so none stands clear of a bank's slope. Fixed tables: draws nothing random.</summary>
+        void MournersCap(Transform t)
+        {
+            var stalk = Tint(art.plaster, Wither(new Color(.74f, .71f, .64f)));
+            var cap = Tint(art.plaster, Wither(new Color(.5f, .49f, .47f)));
+            var crown = Tint(art.plaster, Wither(new Color(.38f, .37f, .36f)));
+            var gill = Tint(art.plaster, new Color(.08f, .07f, .07f));
+            // Each cap: where it stands, how tall, how wide, and how far it leans out from the cluster.
+            var caps = new[] { (new Vector2(0, .1f), .36f, .3f, 6f), (new Vector2(-.15f, -.02f), .28f, .25f, 14f), (new Vector2(.16f, 0), .3f, .27f, 12f),
+                (new Vector2(-.05f, -.16f), .2f, .2f, 18f), (new Vector2(.1f, -.17f), .16f, .17f, 22f), (new Vector2(-.26f, .12f), .18f, .18f, 20f), (new Vector2(.27f, .14f), .14f, .15f, 24f) };
+            foreach (var (at, h, w, tilt) in caps)
+            {
+                float yaw = Mathf.Atan2(at.x, at.y) * Mathf.Rad2Deg; var lean = Quaternion.Euler(0, yaw, 0) * Quaternion.Euler(tilt, 0, 0);
+                var foot = new Vector3(at.x, -.08f, at.y); var top = foot + lean * new Vector3(0, h + .08f, 0);
+                Part(PrimitiveType.Cylinder, t, (foot + top) / 2, new Vector3(w * .24f, (h + .08f) / 2, w * .24f), stalk, lean);
+                Part(PrimitiveType.Cylinder, t, top - lean * new Vector3(0, .012f, 0), new Vector3(w * .92f, .01f, w * .92f), gill, lean);   // the black gills under the rim
+                Part(PrimitiveType.Sphere, t, top + lean * new Vector3(0, .02f, 0), new Vector3(w, w * .42f, w), cap, lean);
+                Part(PrimitiveType.Sphere, t, top + lean * new Vector3(0, .055f, 0), new Vector3(w * .45f, w * .22f, w * .45f), crown, lean);
+            }
         }
         /// <summary>
         /// Woodpile: logs with pale cut ends stacked between stakes, a chopping block with an axe in it, split wood scattered

@@ -8,7 +8,8 @@ namespace Crulanda.Encounter
     /// A paper fight for tuning mobs and elites (playtest note 2): one player against one or more mobs, stepped a tenth of a
     /// second at a time, with the class kits' base abilities (no talents), the game's own damage rule (CombatMath) and Mira's
     /// two spells. It is a ruler, not the game: threat, movement and the navmesh are left out, every mob stays on the player,
-    /// and a Druid stays in one form. EliteBalanceTests holds the numbers it must give.
+    /// and a Druid stays in one form. An elite's call is in it: a mob marked <see cref="Mob.called"/> stands out of the fight
+    /// until the elite calls, and then comes. EliteBalanceTests holds the numbers it must give.
     /// </summary>
     public static class EliteBalance
     {
@@ -59,6 +60,11 @@ namespace Crulanda.Encounter
         public sealed class Mob
         {
             public int level, health; public float hit; public EliteMove move;
+            /// <summary>
+            /// It answers the elite's call: out of the fight until the elite is at its move's callAt, then the beat
+            /// (SocialAggro.CallBeat) and <see cref="walk"/> seconds on the way. With no elite in the fight it is there from the start.
+            /// </summary>
+            public bool called; public float walk;
         }
         public struct Result
         {
@@ -107,12 +113,18 @@ namespace Crulanda.Encounter
                 level = level, health = (int)Math.Round(EncounterEnemy.MobHealth(level, false, elite, beast) * (elite ? move.health : 1)),
                 hit = EncounterEnemy.MobHit(level, false, elite) * (elite ? move.hit : 1), move = move };
         }
+        /// <summary>A normal camp mob that answers the elite's call from <paramref name="metres"/> away at <paramref name="speed"/> metres a second.</summary>
+        public static Mob Answerer(int level, bool beast, float metres, float speed)
+        {
+            var m = CampMob(level, beast); m.called = true; m.walk = metres / Math.Max(.1f, speed); return m;
+        }
 
         /// <summary>
         /// Fights it out. <paramref name="careful"/>: the player answers every heavy blow (a Warrior raises Guard when it is
         /// ready and steps out when it is not; a Druid steps out), which costs the time out of reach. Careless: stands in all of
         /// it and never guards. <paramref name="mira"/>: she heals under 78% and throws her bolt above 80%, and a Warrior pays
-        /// for Challenge to keep the mobs off her. The player kills the mobs in order; all of them swing from the start.
+        /// for Challenge to keep the mobs off her. The player kills the mobs in order (of those that are there); all of them
+        /// swing from the start, but for those that answer the elite's call (<see cref="Mob.called"/>), who swing once they arrive.
         /// </summary>
         public static Result Fight(Fighter f, IList<Mob> mobs, bool mira, bool careful, Numbers n = null, float limit = 600)
         {
@@ -126,12 +138,16 @@ namespace Crulanda.Encounter
             float swing = f.kit == Kit.Thornclaw ? n.playerSwing * .8f : n.playerSwing, nextAuto = swing, awayFrom = -1, awayUntil = -1, bleedAt = -1; int bleedTicks = 0;
             float bark = 0; int fang = 0;
             float mana = n.miraMana, healAt = 0, healLands = -1, boltAt = 0;
-            int target = 0;
+            // The elite's call: -1 until an elite in the fight is at its callAt (0, the start, when there is no elite to call).
+            float calledAt = 0; for (int i = 0; i < count; i++) if (mobs[i].move != null && !string.IsNullOrEmpty(mobs[i].move.call)) calledAt = -1;
+            bool Here(int i, float now) { return !mobs[i].called || (calledAt >= 0 && now >= calledAt + (calledAt > 0 ? SocialAggro.CallBeat + mobs[i].walk : 0)); }
             for (float t = 0; t < limit; t += dt)
             {
-                while (target < count && hp[target] <= 0) target++;
-                if (target >= count) return End(true, t, taken, health, f, hp, total);
-                bool away = t >= awayFrom && t < awayUntil;
+                // The first in the order who is alive and there; those still on their way are waited for.
+                int target = -1; bool any = false;
+                for (int i = 0; i < count; i++) { if (hp[i] <= 0) continue; any = true; if (target < 0 && Here(i, t)) target = i; }
+                if (!any) return End(true, t, taken, health, f, hp, total);
+                bool away = (t >= awayFrom && t < awayUntil) || target < 0;
                 // ---------- the player ----------
                 vigor = Math.Min(n.vigorMax, vigor + n.vigorRegen * dt);
                 float dealt = 0;
@@ -165,11 +181,12 @@ namespace Crulanda.Encounter
                     if (healLands < 0 && t >= healAt && mana >= n.healCost && health < f.health * .78f) { mana -= n.healCost; healAt = t + n.healCooldown; healLands = t + n.healCast; }
                     else if (healLands < 0 && t >= boltAt && health > f.health * .8f) { boltAt = t + n.boltCooldown; dealt += n.boltPower; }
                 }
-                hp[target] -= dealt * tough[target];
+                if (target >= 0) hp[target] -= dealt * tough[target];
+                if (calledAt < 0) for (int i = 0; i < count; i++) if (mobs[i].move != null && hp[i] <= mobs[i].health * mobs[i].move.callAt) calledAt = t;
                 // ---------- the mobs ----------
                 for (int i = 0; i < count; i++)
                 {
-                    if (hp[i] <= 0) continue;
+                    if (hp[i] <= 0 || !Here(i, t)) continue;
                     var m = mobs[i].move;
                     float interval = n.enemySwing * (m != null && hp[i] <= mobs[i].health * m.enrageAt ? m.enrageHaste : 1);
                     if (release[i] >= 0)

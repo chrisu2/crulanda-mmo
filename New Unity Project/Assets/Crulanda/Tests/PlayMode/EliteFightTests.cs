@@ -180,6 +180,14 @@ namespace Crulanda.Tests
             yield return null; yield return null;
             Assert.AreEqual(8, s.Progress.Level, "The save came back at level 8.");
             Assert.AreEqual(baseHealth + 7 * HealerCompanion.HealthPerLevel, s.Companion.actor.Health.Pool.Max, "Mira has " + HealerCompanion.HealthPerLevel + " more health for each of your levels.");
+            // The save held her level-1 health (every save from before she grew holds exactly that for a whole Mira).
+            Assert.AreEqual(baseHealth, s.Companion.BaseHealth);
+            Assert.AreEqual(s.Companion.actor.Health.Pool.Max, s.Companion.actor.Health.Pool.Current, "A save from before she grew loads her whole, not wounded.");
+            // A Mira who really is wounded comes back wounded.
+            s.Companion.actor.Health.Pool.SetCurrent(baseHealth + 20);
+            s.Save(false); s.Load();
+            Assert.AreEqual(baseHealth + 20, s.Companion.actor.Health.Pool.Current, "Her wounds are kept.");   // read at once: resting mends her 7 a second
+            yield return null;
             Assert.Greater(HealerCompanion.HealFor(s.content.healingAbility.power, 8), s.content.healingAbility.power * 2, "And her heal has more than doubled.");
         }
     }

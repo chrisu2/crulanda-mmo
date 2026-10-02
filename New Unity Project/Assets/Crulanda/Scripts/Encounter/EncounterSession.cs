@@ -1050,7 +1050,7 @@ namespace Crulanda.Encounter
             var friend = SpawnActor("Mira · provisional healer", content.healer, friendPoint, new Color(.45f, .76f, .57f), Progress.companionId, ActorLook.Healer);
             AddAgent(friend.gameObject, 4.6f);
             Companion = friend.gameObject.AddComponent<HealerCompanion>(); Companion.actor = friend; Companion.session = this;
-            friend.gameObject.SetActive(true); Companion.MatchLevel(Progress.Level); SetHealth(friend, Progress.companionHealth); friend.Resource.Pool.SetCurrent(Progress.mana);
+            friend.gameObject.SetActive(true); Companion.MatchLevel(Progress.Level); SetHealth(friend, CompanionHealthFromSave()); friend.Resource.Pool.SetCurrent(Progress.mana);
             Enemies.Clear();
             foreach (var spawn in EnemySpawns())
             {

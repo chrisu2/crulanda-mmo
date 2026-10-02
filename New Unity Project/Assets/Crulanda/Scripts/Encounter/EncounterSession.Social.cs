@@ -14,10 +14,32 @@ namespace Crulanda.Encounter
         List<int>[] guardCamps; Crulanda.World.ZoneDefinition guardCampsOf;
         NavMeshPath socialPath; float lastShoutAt = -99;
         /// <summary>
-        /// Threat a mob that joins a fight holds on whoever pulled: half again what one of Mira's heals draws at this level, so it
-        /// comes for the puller and not for her first heal. A second heal with no blow landed on it does turn it, as on any mob.
+        /// Threat a mob that joins a fight holds on whoever pulled: three times what one of Mira's heals draws at this level. A
+        /// heal's threat is shared out among the mobs in the fight (<see cref="HealThreat"/>), so the mobs of a pull stay on the
+        /// puller while he works through them, and only a long fight with no blow landed on one lets her heals turn it.
         /// </summary>
-        public float JoinThreat { get { return Mathf.Max(EncounterEnemy.JoinThreat, .75f * HealerCompanion.HealFor(content.healingAbility.power, Player != null ? Player.Level : 1)); } }
+        public float JoinThreat { get { return Mathf.Max(EncounterEnemy.JoinThreat, 1.5f * HealerCompanion.HealFor(content.healingAbility.power, Player != null ? Player.Level : 1)); } }
+        /// <summary>
+        /// A companion's heal draws threat: half of what it healed, shared out among the mobs in the fight (one mob takes all of
+        /// it, as it always did; each of four takes a quarter). Given to each in full it turned every mob of a pull on the healer
+        /// by her second heal, since the puller's blows land on one mob at a time.
+        /// </summary>
+        public void HealThreat(Actor healer, int healed)
+        {
+            if (healer == null || healed <= 0) return;
+            int n = 0; foreach (var enemy in Enemies) if (enemy != null && enemy.Engaged) n++;
+            if (n == 0) return;
+            foreach (var enemy in Enemies) if (enemy != null && enemy.Engaged) enemy.threat.Add(healer.EntityId.Value, healed * .5f / n);
+        }
+        /// <summary>
+        /// Mira's health as the save holds it. A save from before she grew with your level holds her old full health (her level-1
+        /// health, whatever your level): that is read as whole, not as wounded. No format change: the field means what it did.
+        /// </summary>
+        int CompanionHealthFromSave()
+        {
+            int saved = Progress.companionHealth;
+            return saved == Companion.BaseHealth ? Companion.actor.Health.Pool.Max : saved;
+        }
         /// <summary>For each camp of this zone, the camps that guard it (SocialAggro.GuardCamps), worked out once a zone.</summary>
         List<int>[] GuardCamps
         {
@@ -78,6 +100,8 @@ namespace Crulanda.Encounter
         /// earshot come after a beat, kin in a neighbouring camp among them. A solitary beast brings nobody. When the player was
         /// sneaking and the mob only noticed them (<paramref name="noticed"/>), the reach is short: the edge of a camp can be
         /// peeled. An elite's guards (its camp and the camps paired with it) always come, from further, however it was pulled.
+        /// The elite itself does not come running for a guard or for kin unless the caller stands right beside it
+        /// (<see cref="SocialAggro.LordReach"/>): a careful player clears the guards first and then fights the lord.
         /// </summary>
         public void RaiseAlarm(EncounterEnemy caller, Actor puller, bool noticed)
         {
@@ -91,6 +115,7 @@ namespace Crulanda.Encounter
             foreach (var e in Enemies)
             {
                 if (e == null || e == caller || e.CampIndex < 0 || !e.CanAnswer) continue;
+                if (!lord && e.Elite && e.Camp && Vector3.Distance(caller.transform.position, e.transform.position) > SocialAggro.LordReach) continue;
                 float r = 0;
                 if (lord && GuardOf(e, caller)) r = SocialAggro.GuardReach;
                 else if (reach > 0 && e.Social != SocialKind.Solitary &&
@@ -114,18 +139,28 @@ namespace Crulanda.Encounter
         }
         /// <summary>
         /// An elite's call (EliteMove.call, once a fight): its guards and its kin within the move's reach who are not yet in the
-        /// fight come after a beat. Nothing is said when nobody can answer. Returns how many are coming.
+        /// fight come after a beat. Every guard who hears comes; of its other kin the nearest, and no more than the move's
+        /// callMost when it sets one. Nothing is said when nobody can answer. Returns how many are coming.
         /// </summary>
         public int Rally(EncounterEnemy lord, Actor puller)
         {
             if (lord == null || lord.Move == null || puller == null || lord.CampIndex < 0) return 0;
-            int n = 0;
+            int n = 0; List<EncounterEnemy> kin = null;
             foreach (var e in Enemies)
             {
                 if (e == null || e == lord || e.CampIndex < 0 || !e.CanAnswer) continue;
-                if (!GuardOf(e, lord) && (string.IsNullOrEmpty(lord.Kin) || e.Kin != lord.Kin)) continue;
+                bool guard = GuardOf(e, lord);
+                if (!guard && (string.IsNullOrEmpty(lord.Kin) || e.Kin != lord.Kin)) continue;
                 if (!SocialNear(lord, e, lord.Move.callReach)) continue;
-                e.Answer(lord, puller, SocialAggro.CallBeat + SocialAggro.CallStagger * n); n++;
+                if (guard) { e.Answer(lord, puller, SocialAggro.CallBeat + SocialAggro.CallStagger * n); n++; }
+                else { if (kin == null) kin = new List<EncounterEnemy>(); kin.Add(e); }
+            }
+            if (kin != null)
+            {
+                var at = lord.transform.position;
+                kin.Sort((a, b) => (a.transform.position - at).sqrMagnitude.CompareTo((b.transform.position - at).sqrMagnitude));
+                int most = lord.Move.callMost > 0 ? Mathf.Min(lord.Move.callMost, kin.Count) : kin.Count;
+                for (int i = 0; i < most; i++) { kin[i].Answer(lord, puller, SocialAggro.CallBeat + SocialAggro.CallStagger * n); n++; }
             }
             if (n == 0) return 0;
             if (!string.IsNullOrEmpty(lord.Move.callShort)) FloatText(lord.transform.position + Vector3.up * .5f, lord.Move.callShort, new Color(1, .82f, .35f));

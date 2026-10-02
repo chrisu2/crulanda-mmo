@@ -9,7 +9,8 @@ namespace Crulanda.Encounter
     ///   <see cref="blow"/> times its swing, if they are still inside the mark. Stepping out avoids it; Guard blunts it.
     /// - The enrage: at <see cref="enrageAt"/> of its health it swings <see cref="enrageHaste"/> times as far apart (faster) until it dies or resets.
     /// - The call: at <see cref="callAt"/> of its health it calls once, and its camp, its guards and its kin within
-    ///   <see cref="callReach"/> metres come (nothing is said when nobody can answer).
+    ///   <see cref="callReach"/> metres come (nothing is said when nobody can answer). <see cref="callMost"/> is the most of its
+    ///   kin, beyond its guards, who answer (the nearest; 0 = all who hear): a call across a hillside reaches a whole camp.
     /// <see cref="health"/> and <see cref="hit"/> multiply the elite's health and swing: a dungeon's end boss is a step harder.
     /// </summary>
     public sealed class EliteMove
@@ -19,6 +20,7 @@ namespace Crulanda.Encounter
         public float windup = 2, blow = 4, reach = 3.8f, every = 11, first = 4;
         public float enrageAt = .3f, enrageHaste = .65f, callAt = .6f, callReach = 22;
         public float health = 1, hit = 1;
+        public int callMost;
     }
 
     /// <summary>The twelve camp elites' moves, by the camp's mob name, and a plain one for any elite not listed.</summary>
@@ -38,14 +40,15 @@ namespace Crulanda.Encounter
                 call = "Old Whitefoot throws back its head and howls. The wood answers.", callShort = "Howl",
                 enrage = "Old Whitefoot's hackles rise. It stops circling." },
             // ---------- Khaven ----------
-            new EliteMove { mob = "The Grey Sexton", name = "Gravedigger's Swing", windup = 2.2f, blow = 4.3f, reach = 3.8f, every = 11,
+            new EliteMove { mob = "The Grey Sexton", name = "Gravedigger's Swing", windup = 2.2f, blow = 4.3f, reach = 3.8f, every = 11, callReach = 40, callMost = 2,
                 call = "The Grey Sexton beats its spade on a stone, and the graves listen.", callShort = "Knell",
                 enrage = "The Grey Sexton digs faster, as if the grave were late." },
+            // No pale camp stands in Khaven today: the Reckoner's call is ready for one, and until then nobody answers it.
             new EliteMove { mob = "The Pale Reckoner", name = "The Reckoning", windup = 2.4f, blow = 4.6f, reach = 3.6f, every = 12,
                 call = "The Pale Reckoner raises one hand, and the pale things come to be counted.", callShort = "Tally",
                 enrage = "The Pale Reckoner stops counting and starts collecting." },
             // ---------- The Peaks ----------
-            new EliteMove { mob = "Sandthrone captain", name = "Eyrie Cleave", windup = 1.7f, blow = 3.8f, reach = 3.6f, every = 10,
+            new EliteMove { mob = "Sandthrone captain", name = "Eyrie Cleave", windup = 1.7f, blow = 3.8f, reach = 3.6f, every = 10, callReach = 50, callMost = 2,
                 call = "The captain roars: \"Toll-guard! To the eyrie!\"", callShort = "To the eyrie!",
                 enrage = "The captain throws caution after his shield." },
             new EliteMove { mob = "Old Scree-Tusk", name = "Tusk-Heave", windup = 1.8f, blow = 4, reach = 4.4f, every = 10,

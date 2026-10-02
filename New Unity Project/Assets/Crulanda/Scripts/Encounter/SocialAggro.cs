@@ -24,6 +24,8 @@ namespace Crulanda.Encounter
         public const float PackReach = 9, CallReach = 12, SneakReach = 3.5f;
         /// <summary>An elite's guards come from this far, however it was pulled; a non-elite camp guards an elite when its edge is within GuardPairing of the elite's centre.</summary>
         public const float GuardReach = 16, GuardPairing = 8;
+        /// <summary>A guard's or a kinsman's alarm brings a camp's elite only from this near: beside it. Further off the elite stays where it is, so its guards can be cleared first.</summary>
+        public const float LordReach = 3.5f;
         /// <summary>Seconds between a call and the first to answer it, and between each who answers and the next.</summary>
         public const float CallBeat = 1.2f, CallStagger = .15f;
         /// <summary>Nobody answers across more than this much height (a camp on the hill over a cave; half the reach when that is more), or when the walk round is more than twice the reach and 4 m.</summary>

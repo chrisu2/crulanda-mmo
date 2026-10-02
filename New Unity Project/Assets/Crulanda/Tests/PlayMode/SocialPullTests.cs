@@ -120,7 +120,8 @@ namespace Crulanda.Tests
     /// - a boar stays single with another boar beside it;
     /// - a deserter's shout is read in the chat and over his head, and brings his camp and kin from the next camp after a beat;
     /// - sneaking peels one wolf from another that would have come;
-    /// - an elite's guards come from further than a call carries;
+    /// - an elite's guards come from further than a call carries, and a guard's shout brings the elite only from beside it;
+    /// - Mira's heals do not turn the mobs that joined a pull on her (their threat is shared out among the mobs in the fight);
     /// - a linked group whose leash breaks heals and goes home together, and stays home.
     /// The pulls are made with a blow from 7 m (outside every mob's 5 m notice) unless the test is about being noticed.
     /// </summary>
@@ -150,6 +151,15 @@ namespace Crulanda.Tests
             Assert.IsFalse(Said(s, "shouts"), "A pack says nothing.");
             yield return Wait(1.5f);
             Assert.IsFalse(far.Engaged, "The wolf 14 m off was out of reach and stays where it is."); Assert.IsNull(far.Group); Assert.IsFalse(far.Answering);
+            // Mira heals twice. Her threat is shared out among the wolves in the fight, so the one that joined (and has not been
+            // touched) stays on whoever pulled. Given to each in full, her second heal turned it.
+            s.Progress.recruited = true; var mira = s.Companion.actor;
+            Assert.AreSame(mira, s.PartyActor(mira.EntityId.Value), "Mira is in the party: her threat counts.");
+            int heal = HealerCompanion.HealFor(s.content.healingAbility.power, s.Player.Level);
+            Assert.Less(heal, s.JoinThreat, "Two heals' threat, unshared, is less than what a joiner holds on the puller.");
+            s.HealThreat(mira, heal); s.HealThreat(mira, heal);
+            yield return null; yield return null;
+            Assert.IsTrue(b.Engaged); Assert.AreSame(s.Player, b.Victim, "Two of Mira's heals later the wolf that joined is still on whoever pulled, not on her.");
         }
 
         [UnityTest] public IEnumerator A_boar_stays_single_with_another_beside_it()
@@ -262,6 +272,68 @@ namespace Crulanda.Tests
             Assert.IsFalse(other.Engaged, "The deserter who is no guard was out of earshot and stays."); Assert.IsFalse(other.Answering);
         }
 
+        /// <summary>The king on the stage, a guard <paramref name="near"/> metres east of him, a second guard 3 m to that guard's side, and the player 7 m beyond the first guard, out of everyone's notice.</summary>
+        static void KingAndGuards(EncounterSession s, float near, out EncounterEnemy king, out EncounterEnemy first, out EncounterEnemy second)
+        {
+            var stage = Stage(s); var lord = Named(s, "Caddock, the Bandit King");
+            var guards = s.Enemies.FindAll(e => e != lord && e.actor.IsAlive && s.GuardOf(e, lord));
+            Assert.GreaterOrEqual(guards.Count, 2, "The king's guard stands with him.");
+            king = lord; first = guards[0]; second = guards[1];
+            StandDown(s, king, first, second);
+            Place(s, king, stage); var mid = king.transform.position;
+            PlaceNear(s, first, mid, near, 90, 45, 135);
+            var on = first.transform.position - mid; on.y = 0; float bearing = Mathf.Atan2(on.x, on.z) * Mathf.Rad2Deg;
+            PlaceNear(s, second, first.transform.position, 3, bearing + 90, bearing - 90);
+            PutPlayer(s, first.transform.position, 7, bearing);
+            Assert.Greater(Flat(s.Player.transform.position, king.transform.position), 6.5f, "The king cannot notice you himself from there.");
+            Assert.Greater(Flat(s.Player.transform.position, second.transform.position), 5.5f, "Nor can the second guard.");
+            Assert.Less(Vector3.Distance(first.transform.position, second.transform.position), SocialAggro.CallReach - 2, "The second guard is in the first's earshot.");
+        }
+
+        [UnityTest] public IEnumerator A_guards_shout_brings_his_fellows_and_not_the_king_across_the_hall()
+        {
+            var s = Session(); Sturdy(s);
+            KingAndGuards(s, 8, out var king, out var first, out var second);
+            float apart = Vector3.Distance(king.transform.position, first.transform.position);
+            Assert.Greater(apart, SocialAggro.LordReach + 1, "The guard does not stand beside the king."); Assert.Less(apart, SocialAggro.CallReach - 1, "But well within earshot of him.");
+            yield return null;
+            Assert.IsFalse(king.Engaged || first.Engaged || second.Engaged, "Nobody has noticed you.");
+            s.Messages.Clear();
+            first.Receive(1, s.Player);
+            yield return Until(() => first.Engaged && second.Engaged, SocialAggro.CallBeat + 1.5f);
+            Assert.IsTrue(first.Engaged, "The guard you hit comes for you."); Assert.IsTrue(second.Engaged, "And his fellow, at his shout.");
+            Assert.IsTrue(s.Messages.Exists(m => m.StartsWith(first.Name)), "The shout is in the chat." + Chat(s));
+            yield return Wait(1.5f);
+            Assert.IsFalse(king.Engaged, "The king stays before his throne: his guard can be cleared first."); Assert.IsFalse(king.Answering); Assert.IsNull(king.Group);
+            Assert.AreEqual(king.actor.Health.Pool.Max, king.actor.Health.Pool.Current);
+        }
+
+        [UnityTest] public IEnumerator A_guard_beside_the_king_brings_him_and_he_brings_the_rest()
+        {
+            var s = Session(); Sturdy(s);
+            KingAndGuards(s, 2.5f, out var king, out var first, out var second);
+            Assert.Less(Vector3.Distance(king.transform.position, first.transform.position), SocialAggro.LordReach - .3f, "The guard stands beside the king.");
+            // A third of the guard far across the hall: out of the first guard's earshot, within the king's reach for his guards.
+            var third = s.Enemies.Find(e => e != king && e != first && e != second && e.actor.IsAlive && s.GuardOf(e, king));
+            if (third != null)
+            {
+                third.enabled = true; PlaceNear(s, third, king.transform.position, 12, 270, 225, 315);
+                Assert.Greater(Vector3.Distance(first.transform.position, third.transform.position), SocialAggro.CallReach + .5f, "Out of the guard's earshot.");
+                Assert.Less(Vector3.Distance(king.transform.position, third.transform.position), SocialAggro.GuardReach - .5f, "Within the king's reach for his guards.");
+            }
+            yield return null;
+            Assert.IsFalse(king.Engaged || first.Engaged, "Nobody has noticed you.");
+            first.Receive(1, s.Player);
+            yield return Until(() => king.Engaged && second.Engaged, SocialAggro.CallBeat + 2);
+            Assert.IsTrue(first.Engaged); Assert.IsTrue(second.Engaged, "His fellow comes at the shout.");
+            Assert.IsTrue(king.Engaged, "The king, a stride from the guard you hit, comes too."); Assert.AreSame(s.Player, king.Victim);
+            if (third != null)
+            {
+                yield return Until(() => third.Engaged, SocialAggro.CallBeat + 2);
+                Assert.IsTrue(third.Engaged, "And the king, drawn in, brings the guard the first shout did not reach.");
+            }
+        }
+
         [UnityTest] public IEnumerator A_linked_group_resets_together_and_stays_home()
         {
             var s = Session(); Sturdy(s); var stage = Stage(s);
@@ -285,8 +357,10 @@ namespace Crulanda.Tests
             Assert.AreEqual(a.actor.Health.Pool.Max, a.actor.Health.Pool.Current, "Whole again."); Assert.AreEqual(b.actor.Health.Pool.Max, b.actor.Health.Pool.Current, "Both of them.");
             Assert.IsNull(a.Group); Assert.IsNull(b.Group); Assert.IsTrue(a.Evading && b.Evading, "On their way home they notice nobody.");
             Assert.IsTrue(Said(s, "break off"), "The chat says they went home." + Chat(s));
-            yield return Until(() => Flat(a.transform.position, a.Home) < 1.5f && Flat(b.transform.position, b.Home) < 1.5f, 8);
-            Assert.Less(Flat(a.transform.position, a.Home), 1.5f, "The first is home."); Assert.Less(Flat(b.transform.position, b.Home), 1.5f, "The second is home.");
+            // Home is as near as its agent stops (a beast halts 2.1 m short of where it is sent).
+            float nearA = a.GetComponent<NavMeshAgent>().stoppingDistance + .6f, nearB = b.GetComponent<NavMeshAgent>().stoppingDistance + .6f;
+            yield return Until(() => Flat(a.transform.position, a.Home) < nearA && Flat(b.transform.position, b.Home) < nearB, 8);
+            Assert.Less(Flat(a.transform.position, a.Home), nearA, "The first is home."); Assert.Less(Flat(b.transform.position, b.Home), nearB, "The second is home.");
             yield return Wait(EncounterEnemy.EvadeSeconds + 1);
             Assert.IsFalse(a.Engaged || b.Engaged, "And they stay there: no coming and going.");
             Assert.IsFalse(s.InCombat, "The fight is over.");

@@ -17,6 +17,9 @@ namespace Crulanda.Tests
     /// The targets:
     /// - an elite of the player's level kills a careless player who is alone, whatever the class;
     /// - with Mira and careful play it falls, with health to spare;
+    /// - the fight as the zone gives it: an elite's guards (the rest of its camp and its paired camps) come when it is pulled
+    ///   and can be cleared first as a pull of their own, and its kin answer its call at 60%. Guards first and then the elite
+    ///   with its call answered is won by every kit; pulling the elite with every guard up is in the table and is not promised;
     /// - a careful Warrior alone does not get it down: it wants Mira;
     /// - an elite two levels above the player is not a solo kill for any kit, however careful;
     /// - a dungeon's end boss is a step harder than an outdoor named elite of its level;
@@ -27,16 +30,62 @@ namespace Crulanda.Tests
     {
         static readonly EliteBalance.Kit[] Kits = { EliteBalance.Kit.Warrior, EliteBalance.Kit.Barkhide, EliteBalance.Kit.Thornclaw };
         static EncounterContent content; static EliteBalance.Numbers numbers; static List<(ZoneCamp camp, EliteMove move, bool beast)> elites;
+        static Dictionary<ZoneCamp, (ZoneDefinition zone, int index)> where;
         [OneTimeSetUp] public void Load()
         {
             content = UnityEditor.AssetDatabase.LoadAssetAtPath<EncounterContent>("Assets/Crulanda/EncounterContent/Encounter.asset");
             Assert.NotNull(content, "Encounter.asset is there.");
             numbers = EliteBalance.Numbers.From(content);
-            elites = new List<(ZoneCamp, EliteMove, bool)>();
+            elites = new List<(ZoneCamp, EliteMove, bool)>(); where = new Dictionary<ZoneCamp, (ZoneDefinition, int)>();
             foreach (var z in LootTestData.Zones())
-                foreach (var c in z.camps ?? new ZoneCamp[0])
-                    if (c != null && c.elite) { bool beast = Beast(c.look); elites.Add((c, EliteMoves.For(c.mob, beast), beast)); }
+                for (int i = 0; i < (z.camps ?? new ZoneCamp[0]).Length; i++)
+                {
+                    var c = z.camps[i]; if (c == null || !c.elite) continue;
+                    bool beast = Beast(c.look); elites.Add((c, EliteMoves.For(c.mob, beast), beast)); where[c] = (z, i);
+                }
             Assert.AreEqual(12, elites.Count);
+        }
+        // A camp mob's pace by its look (EncounterSession.SpawnCamps).
+        static float Pace(string look) { return look == "wolf" ? 4.2f : look == "boar" ? 3.8f : look == "weaveeater" ? 3.4f : 2.8f; }
+        /// <summary>
+        /// The mobs that come when the elite is pulled (EncounterSession.RaiseAlarm): the rest of its own camp and every mob of
+        /// its guard camps, each at its camp's top level. The worst case: all of them stand within a guard's reach.
+        /// </summary>
+        static List<EliteBalance.Mob> Guards(ZoneCamp camp)
+        {
+            var (zone, index) = where[camp]; var mobs = new List<EliteBalance.Mob>();
+            for (int n = 1; n < camp.count; n++) mobs.Add(EliteBalance.CampMob(camp.levelMax, Beast(camp.look)));
+            var guards = SocialAggro.GuardCamps(zone.camps)[index];
+            if (guards != null) foreach (int g in guards) for (int n = 0; n < zone.camps[g].count; n++) mobs.Add(EliteBalance.CampMob(zone.camps[g].levelMax, Beast(zone.camps[g].look)));
+            return mobs;
+        }
+        /// <summary>
+        /// The kin who answer the elite's call (EncounterSession.Rally): mobs of the other camps of its people, not its guards,
+        /// whose edge is within the call's reach, the nearest camp first and callMost at most, each at its camp's top level and
+        /// walking from its camp's centre.
+        /// </summary>
+        static List<EliteBalance.Mob> Answerers(ZoneCamp camp, EliteMove move)
+        {
+            var mobs = new List<EliteBalance.Mob>(); if (string.IsNullOrEmpty(move.call)) return mobs;
+            var (zone, index) = where[camp]; var guards = SocialAggro.GuardCamps(zone.camps)[index]; string kin = SocialAggro.Kin(camp.look);
+            var near = new List<(ZoneCamp camp, float far)>();
+            for (int c = 0; c < zone.camps.Length; c++)
+            {
+                var other = zone.camps[c]; if (c == index || other == null || other.elite || (guards != null && guards.Contains(c)) || SocialAggro.Kin(other.look) != kin) continue;
+                float far = Vector2.Distance(other.center, camp.center); if (far - other.radius <= move.callReach) near.Add((other, far));
+            }
+            foreach (var (other, far) in near.OrderBy(x => x.far))
+                for (int n = 0; n < other.count && (move.callMost <= 0 || mobs.Count < move.callMost); n++) mobs.Add(EliteBalance.Answerer(other.levelMax, Beast(other.look), far, Pace(other.look)));
+            return mobs;
+        }
+        static EliteBalance.Result Fight(EliteBalance.Kit kit, int playerLevel, IEnumerable<EliteBalance.Mob> mobs, bool mira = true, bool careful = true)
+        {
+            return EliteBalance.Fight(EliteBalance.Geared(kit, Rules(kit), playerLevel), mobs.ToList(), mira, careful, numbers);
+        }
+        /// <summary>The elite on paper, and with it those who answer its call.</summary>
+        static List<EliteBalance.Mob> WithCall(ZoneCamp camp, EliteMove move, bool beast)
+        {
+            var mobs = new List<EliteBalance.Mob> { EliteBalance.CampMob(camp.levelMax, beast, move) }; mobs.AddRange(Answerers(camp, move)); return mobs;
         }
         // ActorVisual.IsBeast by look name: beasts and Weave-Eaters are a little lighter in health.
         static bool Beast(string look) { return look == "wolf" || look == "boar" || look == "weaveeater" || look == "stag" || look == "spider" || look == "bramble"; }
@@ -87,6 +136,14 @@ namespace Crulanda.Tests
                         .Append(" | Mira careful ").Append(EliteBalance.Cell(Fight(kit, level, camp, move, beast, true, true))).Append('\n');
                     t.Append("   level ").Append(below).Append(": alone careful ").Append(EliteBalance.Cell(Fight(kit, below, camp, move, beast, false, true)))
                         .Append(" | Mira careful ").Append(EliteBalance.Cell(Fight(kit, below, camp, move, beast, true, true))).Append('\n');
+                    // The fight as the zone gives it (Mira, careful): the guards as a pull of their own, the elite with its call answered, and everything at once.
+                    var guards = Guards(camp); var answer = Answerers(camp, move); if (guards.Count == 0 && answer.Count == 0) continue;
+                    t.Append("   as it stands (").Append(guards.Count).Append(" guards, ").Append(answer.Count).Append(" answer its call):");
+                    if (guards.Count > 0) t.Append(" the guards alone ").Append(EliteBalance.Cell(Fight(kit, level, guards))).Append(" |");
+                    t.Append(" it, its call answered ").Append(EliteBalance.Cell(Fight(kit, level, WithCall(camp, move, beast))));
+                    if (guards.Count > 0) t.Append(" | all at once, guards first ").Append(EliteBalance.Cell(Fight(kit, level, guards.Concat(WithCall(camp, move, beast)))))
+                        .Append(" | all at once, it first ").Append(EliteBalance.Cell(Fight(kit, level, WithCall(camp, move, beast).Concat(guards))));
+                    t.Append('\n');
                 }
                 t.Append("-- normal mobs of the player's level: one, and four at once\n");
                 foreach (int level in new[] { 1, 2, 3, 5, 8, 10, 13 })
@@ -114,6 +171,58 @@ namespace Crulanda.Tests
                     Assert.GreaterOrEqual(cared.playerLeft, .15f, who + "with something to spare (" + EliteBalance.Cell(cared) + ").");
                     Assert.That(cared.seconds, Is.InRange(20f, 100f), who + "a fight, not a slog (" + EliteBalance.Cell(cared) + ").");
                 }
+        }
+
+        [Test] public void The_fight_as_the_zone_gives_it_is_won_guards_first_and_with_the_call_answered()
+        {
+            // An elite is not met alone where the zone gives it guards or kin in earshot. The careful way through, for every kit
+            // with Mira: the guards as a pull of their own (a guard's alarm does not bring the elite: SocialAggro.LordReach),
+            // then the elite, whose call at 60% brings its kin.
+            int guarded = 0, answered = 0;
+            foreach (var kit in Kits)
+                foreach (var (camp, move, beast) in elites)
+                {
+                    int level = camp.levelMax; string who = kit + " level " + level + " against " + camp.mob + ": ";
+                    var guards = Guards(camp); var answer = Answerers(camp, move);
+                    if (guards.Count > 0)
+                    {
+                        guarded++;
+                        var first = Fight(kit, level, guards);
+                        Assert.IsTrue(first.won, who + "its " + guards.Count + " guards, pulled without it, fall (" + EliteBalance.Cell(first) + ").");
+                        Assert.GreaterOrEqual(first.playerLeft, .5f, who + "and leave the player fit for the elite after a rest (" + EliteBalance.Cell(first) + ").");
+                    }
+                    if (answer.Count > 0)
+                    {
+                        answered++;
+                        Assert.IsTrue(answer.All(m => m.called && m.walk > 0), who + "those who answer come from their own camp.");
+                        var called = Fight(kit, level, WithCall(camp, move, beast));
+                        Assert.IsTrue(called.won, who + "with its call answered by " + answer.Count + " it still falls to care and Mira (" + EliteBalance.Cell(called) + ").");
+                        Assert.GreaterOrEqual(called.playerLeft, CallMargin, who + "with something to spare (" + EliteBalance.Cell(called) + ").");
+                        Assert.LessOrEqual(called.playerLeft, Fight(kit, level, camp, move, beast, true, true).playerLeft + .25f, who + "and the call does not make it easier.");
+                    }
+                }
+            // Six elites stand with guards (Caddock, Hesk, the Brood Weave-Eater's broodmate, the Ash-Deacon, Greyheart, the
+            // Root-Warden) and four have kin in earshot of their call (Hesk, Old Whitefoot, the Grey Sexton, the Sandthrone captain).
+            Assert.AreEqual(6 * Kits.Length, guarded, "Six elites have guards."); Assert.AreEqual(4 * Kits.Length, answered, "Four elites' calls are answered by kin.");
+        }
+        /// <summary>The least health a careful player with Mira ends with when an elite's call is answered.</summary>
+        const float CallMargin = .1f;
+
+        [Test] public void A_called_mob_stands_out_of_the_paper_fight_until_the_elite_calls()
+        {
+            var f = EliteBalance.Geared(EliteBalance.Kit.Warrior, Rules(EliteBalance.Kit.Warrior), 5);
+            var move = EliteMoves.For("The Grey Sexton", false); Assert.IsFalse(string.IsNullOrEmpty(move.call));
+            EliteBalance.Mob Lord() { return EliteBalance.CampMob(5, false, move); }
+            var alone = EliteBalance.Fight(f, new[] { Lord() }, true, true, numbers);
+            var early = EliteBalance.Fight(f, new[] { Lord(), EliteBalance.CampMob(5, false), EliteBalance.CampMob(5, false) }, true, true, numbers);
+            var late = EliteBalance.Fight(f, new[] { Lord(), EliteBalance.Answerer(5, false, 28, 2.8f), EliteBalance.Answerer(5, false, 28, 2.8f) }, true, true, numbers);
+            Assert.Greater(late.taken, alone.taken, "Two who answer the call cost more than the elite alone.");
+            Assert.Less(late.taken, early.taken, "And less than two who were there from the first blow: they come at 60% and have ten seconds to walk.");
+            Assert.Greater(late.seconds, alone.seconds, "The fight is longer by the two.");
+            // With no elite to call them they are simply there.
+            var pack = EliteBalance.Fight(f, new[] { EliteBalance.Answerer(5, false, 28, 2.8f), EliteBalance.Answerer(5, false, 28, 2.8f) }, false, true, numbers);
+            var plain = EliteBalance.Fight(f, Pack(5, 2), false, true, numbers);
+            Assert.AreEqual(plain.taken, pack.taken); Assert.AreEqual(plain.seconds, pack.seconds, 1e-3f);
         }
 
         [Test] public void A_careful_Warrior_alone_does_not_get_an_elite_of_his_level_down()

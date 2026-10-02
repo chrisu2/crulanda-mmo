@@ -57,13 +57,20 @@ makes the same calls in the editor and logs the same table (`ELITE_BALANCE`).
     by the data (`guards` on the elite's camp: guard camp names, comma-separated, or `none`) or, when that is empty, every
     non-elite camp whose edge is within 8 m of the elite's centre. Today that pairs Caddock with the King's guard, Hesk with
     the Store Caves, the Ash-Deacon with the Ash-pit cultists, Greyheart with the Greying and the Root-Warden with the Heart's
-    withered. Pulling a guard brings the elite like any campmate (within the kind's reach), so guards can be peeled by sneaking
-    and the elite cannot be peeled from its guards.
+    withered. The Brood Weave-Eater's one broodmate (its own camp) comes the same way.
+  - **a guard does not bring its elite** unless it stands right beside it (`SocialAggro.LordReach`, 3.5 m). A guard's or a
+    kinsman's alarm brings fellow guards and kin as usual; the elite stays where it is. So the careful way is the classic one:
+    clear the guards as a pull of their own, then fight the elite. Pull the elite first and every guard within 16 m comes. An
+    elite still notices the player by itself within 5 m, and an elite that is drawn in brings the rest of its guards.
   - Nobody answers through rock: the two must be within the reach in a straight line, on much the same level, and the walk
     between them (navmesh path) no longer than twice the reach and 4 m.
-- A mob that answers holds threat on **whoever pulled** (`EncounterSession.JoinThreat`: at least 30, and half again what one of
-  Mira's heals draws at the player's level), so it comes for the puller and not for her first heal. It raises no alarm of its
-  own, so a pull does not run through a whole camp. An elite that is drawn in still brings its guards.
+- A mob that answers holds threat on **whoever pulled** (`EncounterSession.JoinThreat`: at least 30, and three times what one
+  of Mira's heals draws at the player's level). A heal's threat (half of what it healed) is now **shared out among the mobs in
+  the fight** (`EncounterSession.HealThreat`): given to each in full, as it was, her second heal turned every untouched mob of
+  a pull on her, because the puller's blows land on one mob at a time. One mob alone takes all of it, as before. With four
+  mobs at level 1 a joiner holds 63 on the puller and each heal adds 5 for Mira; at level 13 it holds 177 and each heal adds 15
+  of four or 30 of two. A mob nobody touches for most of a minute while she heals does turn in the end. A mob that answers
+  raises no alarm of its own, so a pull does not run through a whole camp. An elite that is drawn in still brings its guards.
 - **Leash and reset** (`FightGroup`): the mobs of one pull are linked. They leash from where the pull began (the first mob's
   home), by their target's distance only, so those who came from across the camp are not sent back for having come. When the
   leash breaks they all heal and go home together ("... and the rest break off and go back to their places."), and for 3 s on
@@ -86,9 +93,18 @@ makes the same calls in the editor and logs the same table (`ELITE_BALANCE`).
   ..."). The reach is always past the player's own 3.2 m, so the answer is to step away, not to stand at arm's length.
 - **The enrage.** At 30% health (35% for the two bosses), once a fight: its swings come 1.54 times as often (1.67 for the
   bosses), a line of its own in the chat, "Enraged!" over it, "ENRAGED" in the target frame, and it looms a little larger.
-- **The call.** At 60% health, once a fight: its guards and its kin within 22 m (32 m for Old Whitefoot's howl, which reaches
-  his pack) who are not yet in the fight come after the beat, as part of its group. Nothing is said when nobody can answer.
-  Old Scree-Tusk and Old Ninebranch are solitary beasts and call nobody.
+- **The call.** At 60% health, once a fight: its guards and its kin within 22 m who are not yet in the fight come after the
+  beat, as part of its group. Three calls carry further, to the camp of kin that is there to hear them: Old Whitefoot's howl
+  32 m (his pack of three), the Grey Sexton's knell 40 m (the Gloom Creek hollows) and the Sandthrone captain's shout 50 m
+  (the Toll-gate guards). Every guard who hears comes; of other kin the Sexton and the captain bring the nearest two and no
+  more (`EliteMove.callMost`), because a whole camp of four or five on top of an elite is not a fight a Warrior with Mira
+  wins. Who answers today: Hesk's call brings the Deep Stair watch (two), Whitefoot's his pack (three), the Sexton's two
+  hollows, the captain's two toll-guards; for Caddock, the Brood Weave-Eater, the Ash-Deacon, Greyheart and the Root-Warden it
+  brings any guard not yet in the fight. **The Pale Reckoner has nobody to call:** no pale camp stands in Khaven today, so its
+  tally is never heard until one does (`SocialRulesTests.An_elites_call_has_someone_to_answer_it` names it as the one
+  exception). Nothing is said when nobody can answer. Old Scree-Tusk and Old Ninebranch are solitary beasts and call nobody.
+  Unseen: whether the walk from the Toll-gate up to the eyrie is short enough for the guards to answer (the walk may be no
+  longer than twice the reach and 4 m, the climb no more than half the reach).
 - **Overmatched.** For each level a camp elite stands above the player (five at most) it hits 12% harder and takes 6% less
   from the party (`EncounterEnemy.OverHit`, `OverTough`). Normal mobs never do. This is what keeps an elite two levels up from
   being a solo kill at every level, not only the low ones.
@@ -102,9 +118,9 @@ makes the same calls in the editor and logs the same table (`ELITE_BALANCE`).
 | Caddock, the Bandit King (dungeon end boss) | 5 | The King's Due | 2 s | x4.3 | 3.8 m | 11 s | at 35%, swings x1.67 as often | at 60%, 22 m |
 | Quartermaster Hesk | 4 | Short Weight | 1.8 s | x3.8 | 3.4 m | 10 s | at 30%, swings x1.54 as often | at 60%, 22 m |
 | Old Whitefoot | 3 | Throat-Lunge | 1.5 s | x3.5 | 4.2 m | 9 s | at 30%, swings x1.54 as often | at 60%, 32 m |
-| The Grey Sexton | 5 | Gravedigger's Swing | 2.2 s | x4.3 | 3.8 m | 11 s | at 30%, swings x1.54 as often | at 60%, 22 m |
-| The Pale Reckoner | 7 | The Reckoning | 2.4 s | x4.6 | 3.6 m | 12 s | at 30%, swings x1.54 as often | at 60%, 22 m |
-| Sandthrone captain | 8 | Eyrie Cleave | 1.7 s | x3.8 | 3.6 m | 10 s | at 30%, swings x1.54 as often | at 60%, 22 m |
+| The Grey Sexton | 5 | Gravedigger's Swing | 2.2 s | x4.3 | 3.8 m | 11 s | at 30%, swings x1.54 as often | at 60%, 40 m, two at most |
+| The Pale Reckoner | 7 | The Reckoning | 2.4 s | x4.6 | 3.6 m | 12 s | at 30%, swings x1.54 as often | at 60%, 22 m (no pale camp in Khaven today: nobody answers) |
+| Sandthrone captain | 8 | Eyrie Cleave | 1.7 s | x3.8 | 3.6 m | 10 s | at 30%, swings x1.54 as often | at 60%, 50 m, two at most |
 | Old Scree-Tusk | 8 | Tusk-Heave | 1.8 s | x4 | 4.4 m | 10 s | at 30%, swings x1.54 as often | none (a solitary beast) |
 | Brood Weave-Eater | 10 | Fraying Lash | 2 s | x3.8 | 4 m | 10 s | at 30%, swings x1.54 as often | at 60%, 22 m |
 | The Ash-Deacon | 10 | Cinder Benediction | 2.2 s | x4 | 3.8 m | 11 s | at 30%, swings x1.54 as often | at 60%, 22 m |
@@ -121,7 +137,8 @@ rule. **Careful** means every heavy blow is answered: a Warrior raises Guard whe
 Druid steps out; stepping out costs the time out of reach. **Careless** means standing in all of it and never guarding. The
 player wears on-curve gear: one generated uncommon piece in every slot at the player's level, suffix stats averaged over sixty
 seeds a slot. Left out: threat (every mob stays on the player; with Mira a Warrior pays for Challenge), movement, talents (ten
-points by level 10 make the real player stronger), the elite's call, and a Druid changing form.
+points by level 10 make the real player stronger), and a Druid changing form. The elite's call is in it where a table says so:
+those who answer stand out of the fight until the elite is at 60%, then come after the beat and their walk.
 
 | Player level (Warrior, geared) | Health | Armour | Attack power | Mira's heal |
 |---|---|---|---|---|
@@ -215,10 +232,74 @@ points by level 10 make the real player stronger), the elite's call, and a Druid
 | 10 | wins 6 s, 95% left, took 30 | wins 23 s, 61% left, took 240 | wins 21 s, 83% left, took 200 |
 | 13 | wins 5 s, 97% left, took 20 | wins 21 s, 74% left, took 200 | wins 21 s, 89% left, took 200 |
 
-What the table says, and what `EliteBalanceTests` asserts:
+**The fight as the zone gives it** (player of the elite's level, with Mira, careful). The tables above fight each elite
+alone. Six of the twelve stand with guards who come when the elite is pulled, and four have kin who answer the call at 60%.
+"The guards alone" is the guards pulled without the elite (a guard's alarm does not bring it). "It, its call answered" is the
+elite after that, with its kin coming at 60%. "All at once" is the elite pulled with every guard up (each guard counted at its
+camp's top level and all of them in reach: the worst case), killing the guards first or the elite first.
+
+**Warrior**
+
+| Elite | Guards | Answer its call | The guards alone | It, its call answered | All at once, guards first | All at once, it first |
+|---|---|---|---|---|---|---|
+| Caddock, the Bandit King | 3 (level 5) | nobody | wins 26 s, 89% left, took 180 | wins 56 s, 19% left, took 944 | dies 61 s, mob 27% left, took 1062 | dies 41 s, mob 50% left, took 987 |
+| Quartermaster Hesk | 2 (level 4) | 2 (level 5, from 15 m) | wins 16 s, 92% left, took 90 | wins 69 s, 34% left, took 838 | dies 62 s, mob 26% left, took 913 | dies 40 s, mob 51% left, took 833 |
+| Old Whitefoot | none | 3 (level 2, from 23 m) | - | wins 61 s, 37% left, took 684 | - | - |
+| The Grey Sexton | none | 2 (level 5, from 32 m) | - | wins 61 s, 52% left, took 807 | - | - |
+| Sandthrone captain | none | 2 (level 7, from 47 m) | - | wins 64 s, 66% left, took 971 | - | - |
+| Brood Weave-Eater | 1 (level 10) | nobody | wins 5 s, 97% left, took 20 | wins 37 s, 77% left, took 744 | wins 45 s, 88% left, took 872 | wins 45 s, 87% left, took 878 |
+| The Ash-Deacon | 5 (level 10) | nobody | wins 43 s, 84% left, took 500 | wins 45 s, 80% left, took 921 | dies 62 s, mob 32% left, took 1566 | dies 42 s, mob 51% left, took 1483 |
+| Greyheart | 4 (level 13) | nobody | wins 34 s, 88% left, took 330 | wins 43 s, 83% left, took 1086 | dies 74 s, mob 10% left, took 2042 | wins 80 s, 6% left, took 1942 |
+| The Hollow Root-Warden | 2 (level 13) | nobody | wins 16 s, 88% left, took 100 | wins 56 s, 32% left, took 1612 | dies 69 s, mob 6% left, took 2004 | dies 55 s, mob 23% left, took 1936 |
+
+**Druid, Barkhide**
+
+| Elite | Guards | Answer its call | The guards alone | It, its call answered | All at once, guards first | All at once, it first |
+|---|---|---|---|---|---|---|
+| Caddock, the Bandit King | 3 (level 5) | nobody | wins 29 s, 86% left, took 184 | wins 71 s, 92% left, took 828 | wins 107 s, 85% left, took 1364 | wins 104 s, 61% left, took 1620 |
+| Quartermaster Hesk | 2 (level 4) | 2 (level 5, from 15 m) | wins 19 s, 87% left, took 96 | wins 84 s, 94% left, took 799 | wins 108 s, 92% left, took 1078 | wins 111 s, 71% left, took 1409 |
+| Old Whitefoot | none | 3 (level 2, from 23 m) | - | wins 78 s, 64% left, took 672 | - | - |
+| The Grey Sexton | none | 2 (level 5, from 32 m) | - | wins 79 s, 96% left, took 818 | - | - |
+| Sandthrone captain | none | 2 (level 7, from 47 m) | - | wins 81 s, 95% left, took 923 | - | - |
+| Brood Weave-Eater | 1 (level 10) | nobody | wins 8 s, 96% left, took 27 | wins 49 s, 93% left, took 686 | wins 59 s, 88% left, took 811 | wins 57 s, 94% left, took 866 |
+| The Ash-Deacon | 5 (level 10) | nobody | wins 50 s, 93% left, took 504 | wins 59 s, 79% left, took 882 | wins 116 s, 93% left, took 2063 | wins 113 s, 88% left, took 2322 |
+| Greyheart | 4 (level 13) | nobody | wins 40 s, 86% left, took 351 | wins 56 s, 83% left, took 944 | wins 103 s, 90% left, took 1985 | wins 96 s, 92% left, took 1979 |
+| The Hollow Root-Warden | 2 (level 13) | nobody | wins 19 s, 89% left, took 99 | wins 70 s, 80% left, took 1430 | wins 94 s, 73% left, took 2049 | wins 91 s, 92% left, took 1970 |
+
+**Druid, Thornclaw**
+
+| Elite | Guards | Answer its call | The guards alone | It, its call answered | All at once, guards first | All at once, it first |
+|---|---|---|---|---|---|---|
+| Caddock, the Bandit King | 3 (level 5) | nobody | wins 15 s, 90% left, took 108 | wins 34 s, 58% left, took 504 | wins 50 s, 51% left, took 798 | wins 48 s, 17% left, took 936 |
+| Quartermaster Hesk | 2 (level 4) | 2 (level 5, from 15 m) | wins 10 s, 83% left, took 54 | wins 39 s, 78% left, took 437 | wins 52 s, 68% left, took 652 | wins 50 s, 35% left, took 761 |
+| Old Whitefoot | none | 3 (level 2, from 23 m) | - | wins 36 s, 79% left, took 336 | - | - |
+| The Grey Sexton | none | 2 (level 5, from 32 m) | - | wins 38 s, 90% left, took 376 | - | - |
+| Sandthrone captain | none | 2 (level 7, from 47 m) | - | wins 39 s, 81% left, took 534 | - | - |
+| Brood Weave-Eater | 1 (level 10) | nobody | wins 4 s, 97% left, took 20 | wins 27 s, 78% left, took 432 | wins 30 s, 82% left, took 506 | wins 31 s, 91% left, took 552 |
+| The Ash-Deacon | 5 (level 10) | nobody | wins 26 s, 83% left, took 300 | wins 30 s, 69% left, took 486 | wins 61 s, 29% left, took 1322 | wins 57 s, 18% left, took 1390 |
+| Greyheart | 4 (level 13) | nobody | wins 21 s, 89% left, took 200 | wins 30 s, 71% left, took 576 | wins 51 s, 69% left, took 1180 | wins 51 s, 80% left, took 1216 |
+| The Hollow Root-Warden | 2 (level 13) | nobody | wins 11 s, 92% left, took 60 | wins 38 s, 83% left, took 840 | wins 49 s, 68% left, took 1190 | wins 49 s, 85% left, took 1180 |
+
+What these say, plainly:
+- **Clear the guards first.** Every kit wins the guards' pull with four fifths of its health left and then the elite with its
+  call answered (the least is the Warrior against Caddock, 19% left, and against the Root-Warden, 32%).
+- **Pulling a guarded elite with every guard up is a death for a Warrior, even with Mira**: Caddock with his three, Hesk with
+  his two and the stair watch, the Ash-Deacon with his five, the Root-Warden with his two; Greyheart with all four is won
+  with 6% left only by killing him first. Both Druid forms win these (Barkhide easily). This is meant: an end boss's hall is
+  not walked into. What made it unfair before this fix was that a guard's shout brought the elite, so there was no other way.
+- **Hesk's two stand close to his desk** (the Store Caves' centre is 3.3 m from it): a guard within 3.5 m of him brings him.
+  Pull the further guard (the nearer one answers the shout without bringing Hesk). If both stand beside him the fight is all
+  at once, which a Warrior loses by a quarter of their health. Unseen; if it is so in the game, pair them further apart in
+  the data or shorten `LordReach`.
+- **The Ash-Deacon stands in the middle of his five**: any of them within 3.5 m of him brings him and, through him, all five.
+  Pull one from the edge of the pit.
+
+What the tables say, and what `EliteBalanceTests` asserts:
 - An elite of the player's level kills a careless player who is alone: every kit, every elite.
 - With Mira and careful play it falls with health to spare: every kit, every elite (the least is the Warrior against Caddock,
   19% left; a dungeon's end boss is a step harder than every outdoor elite of its level).
+- As the zone gives it: the guards alone fall with at least half the player's health left, and the elite with its call
+  answered falls with at least a tenth left: every kit, every guarded or answered elite. All at once is logged, not asserted.
 - A careful Warrior alone does not get any of the twelve down. It wants Mira.
 - An elite two levels above the player is not a solo kill: every kit, every elite, however careful.
 - A normal mob alone is as it was (8 to 11 s, nine tenths of the health left). Four at once cost a Warrior alone between two
@@ -239,11 +320,14 @@ What it also says, plainly:
 
 ### Tests (all unrun)
 - EditMode: `SocialRulesTests` (kinds for every camp, the data's override, reaches, calls and kin, guard pairs, the twelve
-  moves, overmatch, the mob curve), `EliteBalanceTests` (the kit numbers against Encounter.asset, the table, the targets above).
+  moves, every call has someone to answer it but the Pale Reckoner's, overmatch, the mob curve), `EliteBalanceTests` (the kit
+  numbers against Encounter.asset, the table, the targets above, the fight as the zone gives it, the called mob's arrival).
 - PlayMode, Oakhaven, own save folder: `SocialPullTests` (a wolf pack comes together and a far wolf stays; a boar stays single;
   a deserter's shout is in the chat and over his head and brings camp and kin after the beat; sneaking peels one wolf; an
-  elite's guards come from further than a call carries; a linked group resets together and stays home), `EliteFightTests` (the
-  wind-up taken standing and avoided by stepping out; Guard blunts it; the enrage and its timed swings; the call brings kin;
-  overmatch; Mira's health follows the level).
+  elite's guards come from further than a call carries; a guard's shout brings his fellows and not the king across the hall;
+  a guard beside the king brings him and he brings the rest; two of Mira's heals do not turn a wolf that joined; a linked
+  group resets together and stays home), `EliteFightTests` (the wind-up taken standing and avoided by stepping out; Guard
+  blunts it; the enrage and its timed swings; the call brings kin; overmatch; Mira's health follows the level, an older save
+  loads her whole and a wounded Mira stays wounded).
 - To look at (no test sees them): `Crulanda.exe --crulanda-elite-capture <folder>` (windowed) takes 01-pack-pull, 02-shout,
   03-camp-comes, 04-heavy-blow (the mark and the cast bar) and 05-enraged.

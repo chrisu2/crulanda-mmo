@@ -68,6 +68,7 @@ namespace Crulanda.Tests
             Assert.Less(SocialAggro.SneakReach, 5, "Shorter than the 5 m a mob notices you from: a mob beside the one you were noticed by can stay asleep.");
             Assert.Greater(SocialAggro.PackReach, 5); Assert.Greater(SocialAggro.CallReach, SocialAggro.PackReach, "A shout carries further than a pack's glance.");
             Assert.Greater(SocialAggro.GuardReach, SocialAggro.CallReach, "An elite's guards come from further than a call carries.");
+            Assert.Less(SocialAggro.LordReach, 5, "A guard's alarm brings its elite only from right beside it, nearer than the 5 m a mob notices you from: guards can be cleared first.");
             Assert.Greater(SocialAggro.CallBeat, .5f, "The beat after a shout is long enough to read.");
         }
 
@@ -156,6 +157,36 @@ namespace Crulanda.Tests
                 Assert.AreEqual(SocialAggro.KindFor(camp) == SocialKind.Solitary, string.IsNullOrEmpty(EliteMoves.For(camp.mob, false).call), camp.mob + ": a call only if it is not a solitary beast.");
             // An elite the table does not know still has a blow: a lunge for a beast.
             Assert.AreNotSame(plain, EliteMoves.For("nobody at all", true)); Assert.IsFalse(string.IsNullOrEmpty(plain.name));
+        }
+
+        [Test] public void An_elites_call_has_someone_to_answer_it()
+        {
+            // "A call that brings the camp": every elite with a call has guards, campmates or kin within the call's reach. The one
+            // exception is named: no pale camp stands in Khaven, so nobody answers the Pale Reckoner until one does.
+            var unanswered = new List<string>();
+            foreach (var z in zones)
+            {
+                var guards = SocialAggro.GuardCamps(z.camps);
+                for (int e = 0; e < z.camps.Length; e++)
+                {
+                    var lord = z.camps[e]; if (lord == null || !lord.elite) continue;
+                    var m = EliteMoves.For(lord.mob, false); if (string.IsNullOrEmpty(m.call)) continue;
+                    bool answered = lord.count > 1 || guards[e] != null;
+                    for (int c = 0; c < z.camps.Length; c++)
+                    {
+                        var kin = z.camps[c]; if (c == e || kin == null || SocialAggro.Kin(kin.look) != SocialAggro.Kin(lord.look)) continue;
+                        if (Vector2.Distance(kin.center, lord.center) - kin.radius > m.callReach) continue;
+                        answered = true;
+                        // The paper fight (EliteBalanceTests) counts those who answer as normal mobs: no second elite within a call.
+                        Assert.IsFalse(kin.elite, lord.mob + "'s call reaches " + kin.mob + ", another elite. Shorten the call or count it in the balance table.");
+                    }
+                    if (!answered) unanswered.Add(lord.mob);
+                }
+            }
+            CollectionAssert.AreEquivalent(new[] { "The Pale Reckoner" }, unanswered, "When a pale camp stands within its call, take the Reckoner off this list and out of the docs' exception.");
+            // A call across a hillside reaches a whole camp: the Sexton and the captain bring two, not all of them.
+            Assert.AreEqual(2, EliteMoves.For("The Grey Sexton", false).callMost); Assert.AreEqual(2, EliteMoves.For("Sandthrone captain", false).callMost);
+            Assert.AreEqual(0, EliteMoves.For("Old Whitefoot", true).callMost, "The howl brings the whole pack.");
         }
 
         [Test] public void Overmatch_only_counts_levels_above_the_player()

@@ -9,6 +9,10 @@ SaveEnvelope contains formatVersion, payloadType, gameVersion, savedAtUtc and pa
 formatVersion: 1. payloadType: CrulandaEncounter. DTO: EncounterProgress.
 - playerId and companionId: stable instance IDs, restored before actor activation.
 - experience, health, mana (healer), companionHealth.
+  - Since 2026-10-01 Mira's full health grows with the player's level (130 at level 1, 22 more a level). companionHealth is
+    still her current health and the format did not change. A saved value of exactly her level-1 full health (130) is read as
+    full health at any level (`EncounterSession.CompanionHealthFromSave`), so a save from before she grew loads her whole and
+    not wounded. Any other value is her health as saved.
 - x/y/z: player position; bounds and finite values validated at load.
 - recruited, relationship, gold.
 - inventory: item-ID list; equippedItem: item ID.

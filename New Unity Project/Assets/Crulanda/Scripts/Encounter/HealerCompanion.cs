@@ -23,6 +23,8 @@ namespace Crulanda.Encounter
         public const float HealPerLevel = .15f; public const int HealthPerLevel = 22;
         public static int HealFor(int power, int playerLevel, float perLevel = HealPerLevel) { return Mathf.RoundToInt(power * (1 + perLevel * (Mathf.Max(1, playerLevel) - 1))); }
         int baseHealth;
+        /// <summary>Her health at level 1 (what every save held for a whole Mira before she grew with your level).</summary>
+        public int BaseHealth { get { return baseHealth; } }
         /// <summary>Sets her health for the player's level (her own level stays 1: nothing reads it).</summary>
         public void MatchLevel(int playerLevel)
         {
@@ -75,8 +77,7 @@ namespace Crulanda.Encounter
                     if (!recipient.IsAlive) return;
                     int healed = recipient.GetComponent<Combatant>().Heal(HealFor(heal.power, session.Player.Level));
                     session.FloatText(recipient.transform.position, "+" + healed, new Color(.3f,1,.7f));
-                    foreach (var enemy in session.Enemies)
-                        if (enemy.Engaged) enemy.threat.Add(actor.EntityId.Value, healed * .5f);
+                    session.HealThreat(actor, healed);   // shared out among the mobs in the fight (EncounterSession.Social)
                 });
                 if (result == AbilityStartResult.Started)
                 {

@@ -494,8 +494,10 @@ namespace Crulanda.Encounter
         }
         /// <summary>
         /// The trade a station opens the Trades window on: the first (in the content's order) whose own station it is and that the
-        /// character has, with recipes there (Cooking at a fire); else the first the character has with a recipe there (Woodcutting's
-        /// charcoal at a forge or a fire); else the first with a recipe there; else the one whose station it is.
+        /// character has, with recipes there (Cooking at a fire, Blacksmithing at a forge once taken up); else the craft whose own
+        /// station it is while a craft slot is free (Blacksmithing at a forge, to be taken up there); else the first the character has
+        /// with a recipe there (Woodcutting's charcoal at a forge or a fire); else the first with a recipe there; else the one whose
+        /// station it is.
         /// </summary>
         public ProfessionDef StationTrade(string kind)
         {
@@ -503,7 +505,8 @@ namespace Crulanda.Encounter
             var db = Professions.Db;
             bool Makes(ProfessionDef d) { return db.RecipesFor(d.id).Exists(r => Array.IndexOf(ProfessionDatabase.Stations(r.station), kind) >= 0); }
             bool Own(ProfessionDef d) { return Array.IndexOf(ProfessionDatabase.Stations(d.station), kind) >= 0; }
-            return db.Order.Find(d => Own(d) && Professions.Has(d.id) && Makes(d)) ?? db.Order.Find(d => Professions.Has(d.id) && Makes(d)) ?? db.Order.Find(Makes) ?? db.Order.Find(Own);
+            return db.Order.Find(d => Own(d) && Professions.Has(d.id) && Makes(d)) ?? db.Order.Find(d => Own(d) && d.kind == "craft" && Professions.CanLearn(d.id, out _))
+                ?? db.Order.Find(d => Professions.Has(d.id) && Makes(d)) ?? db.Order.Find(Makes) ?? db.Order.Find(Own);
         }
         /// <summary>What E offers at a station: "Work at the forge", "Work at the bench", or at a fire "Cook at the fire" when it opens
         /// on Cooking ("Work at the fire" while the fire's only use is another trade's, such as charcoal).</summary>
@@ -528,14 +531,15 @@ namespace Crulanda.Encounter
         /// ("You can't do that while fighting."), or when CanCraft says why. Each one made: the inputs leave the bags, what it
         /// makes goes in ("You make Charcoal."), the skill is rolled and the game saves; the next starts while it still can be made,
         /// and when it cannot the rest stop with CanCraft's reason ("Your bags are full."). Moving, a blow, a fight or dying stops the
-        /// rest (TickWork). True when the first was started.
+        /// rest (TickWork). With the trade's own person awake beside you each one takes half as long (CraftTime). True when the first
+        /// was started.
         /// </summary>
         public bool Make(RecipeDef r, int count)
         {
             if (Professions == null || r == null || count < 1 || Player == null || !Player.IsAlive || Working || abilities.IsCasting) return false;
             if (InCombat) { Message(FightingLine); return false; }
             if (!CanCraft(r, out var why)) { Message(why); return false; }
-            StartWork(r.name, CraftSeconds, () => MakeOne(r, count - 1));
+            StartWork(r.name, StartCraft(r), () => MakeOne(r, count - 1));
             return true;
         }
         void MakeOne(RecipeDef r, int more)
@@ -545,7 +549,104 @@ namespace Crulanda.Encounter
             Message("You make " + ItemName(r.output) + (n > 1 ? " x" + n : "") + ".");
             FloatText(Player.transform.position, "+" + n + " " + ItemName(r.output), new Color(.86f, .95f, .66f));
             Save(false);
-            if (more > 0) { if (Professions.CanCraft(r, StationOk, out var stop)) StartWork(r.name, CraftSeconds, () => MakeOne(r, more - 1)); else Message(stop); }
+            if (more > 0) { if (Professions.CanCraft(r, StationOk, out var stop)) StartWork(r.name, StartCraft(r), () => MakeOne(r, more - 1)); else Message(stop); }
+        }
+
+        // ---------- crafts: taking one up, forgetting it, and the trade's own people (DESIGN 4, 6.2; BUILD_PLAN step 12) ----------
+        /// <summary>How near a trainer (a villager of the craft's trainer role) must be to start you off at a craft away from its station.</summary>
+        public const float TrainerRange = 6;
+        /// <summary>How near the trade's own person must be, awake, to lend a hand at the work (it then goes twice as fast).</summary>
+        public const float HelperRange = 8;
+        /// <summary>What taking up a craft says when no trainer is near and the craft has no line of its own (GAME-ONLY).</summary>
+        public const string TakeUpAloneLine = "You look over the tools and begin.";
+        /// <summary>
+        /// The nearest villager of a trade (blacksmith, herbalist) within <paramref name="range"/> (ground distance, as E measures) who is
+        /// awake and about: in sight, not abed or on the way there, not slumped over a table. Null when there is none, or no village.
+        /// </summary>
+        public Villager TradeNpcNear(string role, float range)
+        {
+            if (string.IsNullOrEmpty(role) || Player == null || VillageLife.Active == null) return null;
+            Villager best = null; float bestD = range;
+            foreach (var v in VillageLife.Active.Villagers)
+            {
+                if (v == null || v.Role != role || !v.Visible || v.PassedOut || v.Activity == "sleep") continue;
+                float d = GroundDistance(v.transform.position); if (d <= bestD) { best = v; bestD = d; }
+            }
+            return best;
+        }
+        /// <summary>
+        /// Whether a craft can be taken up here and now, and why not: ProfessionLog.CanLearn (a craft, not yet taken up, a slot free:
+        /// "Two crafts already. Forget one first."), then the place: a station of its kind within StationRange (a forge for
+        /// Blacksmithing, a herbalist's bench for Alchemy; nobody need be there), or one of its trainers awake within TrainerRange.
+        /// </summary>
+        public bool CanTakeUp(string id, out string why)
+        {
+            if (Professions == null) { why = "You have no trade to speak of yet."; return false; }
+            if (!Professions.CanLearn(id, out why)) return false;
+            var d = Professions.Db.Profession(id);
+            foreach (var kind in ProfessionDatabase.Stations(d.station)) if (StationNear(kind) != null) return true;
+            if (TradeNpcNear(d.trainerRole, TrainerRange) != null) return true;
+            why = d.name + " is taken up at " + ProfessionLog.StationWords(d.station) + (string.IsNullOrEmpty(d.trainerRole) ? "." : ", or from a " + d.trainerRole + ".");
+            return false;
+        }
+        /// <summary>
+        /// Takes up a craft (the Trades window's "Take up" button) when CanTakeUp allows it, at skill 1. A trainer near answers in their
+        /// own words, turning to you ("Brannoc Vell: Mind the scale. Copper first; it forgives you."); with nobody there the craft's own
+        /// line is said ("You look over the anvil, the tongs and the quench tub, and begin."). A toast says it ("BLACKSMITHING / Taken
+        /// up") and the game saves. Refused with CanTakeUp's reason otherwise. True when it was taken up.
+        /// </summary>
+        public bool LearnCraft(string id)
+        {
+            if (!CanTakeUp(id, out var why)) { if (why != null) Message(why); return false; }
+            var d = Professions.Db.Profession(id); var trainer = TradeNpcNear(d.trainerRole, TrainerRange);
+            if (!Professions.Learn(id, out why)) { Message(why); return false; }
+            var line = trainer != null ? ProfessionDatabase.LineFor(d.trainerLines, trainer.Name) : null;
+            if (line != null) { Message(trainer.Name + ": " + line); trainer.Say(line, 7); trainer.FacePlayer(); }
+            else Message(string.IsNullOrEmpty(d.takeUp) ? TakeUpAloneLine : d.takeUp);
+            ShowToast(d.name.ToUpperInvariant(), "Taken up");
+            Save(false);
+            return true;
+        }
+        /// <summary>
+        /// Forgets a craft that was taken up (the Trades window's Forget, after its confirm): the skill is lost, the slot is free, work in
+        /// hand stops and the game saves ("You put Blacksmithing aside. Skill 47 is lost."). Cooking and the gathering skills are refused
+        /// with why ("Cooking stays with you. It can't be forgotten."). True when it was forgotten.
+        /// </summary>
+        public bool ForgetCraft(string id)
+        {
+            if (Professions == null) return false;
+            if (!Professions.CanForget(id, out var why)) { Message(why); return false; }
+            var d = Professions.Db.Profession(id); int skill = Professions.Skill(id);
+            CancelWork();
+            Professions.Forget(id);
+            Message("You put " + d.name + " aside. Skill " + skill + " is lost.");
+            Save(false);
+            return true;
+        }
+        /// <summary>The trade's own person awake beside you for a recipe (a blacksmith at the forge for Blacksmithing's), or null: only
+        /// a trade with a trainer role has one.</summary>
+        public Villager CraftHelper(RecipeDef r)
+        {
+            var d = r == null || Professions == null ? null : Professions.Db.Profession(r.profession);
+            return d == null || string.IsNullOrEmpty(d.trainerRole) ? null : TradeNpcNear(d.trainerRole, HelperRange);
+        }
+        /// <summary>How long making one of a recipe takes now: CraftSeconds, or half that with the trade's own person awake within HelperRange.</summary>
+        public float CraftTime(RecipeDef r) { return CraftHelper(r) != null ? CraftSeconds / 2 : CraftSeconds; }
+        string helpedBy; float helpedUntil;
+        /// <summary>The work time for the next one made, and the helper's word: the first time they lend a hand on a visit, chat says so
+        /// ("Brannoc Vell works the bellows for you.") and they say a line of their own. A visit lasts while you keep at the work; a
+        /// minute away from it and the next one is a new visit.</summary>
+        float StartCraft(RecipeDef r)
+        {
+            var helper = CraftHelper(r); if (helper == null) return CraftSeconds;
+            if (helper.Name != helpedBy || Time.time > helpedUntil)
+            {
+                var d = Professions.Db.Profession(r.profession);
+                if (!string.IsNullOrEmpty(d.helping)) Message(d.helping.Replace("{name}", helper.Name));
+                var line = ProfessionDatabase.LineFor(d.helpLines, helper.Name); if (line != null) helper.Say(line, 5);
+            }
+            helpedBy = helper.Name; helpedUntil = Time.time + 60;
+            return CraftSeconds / 2;
         }
 
         // ---------- routing between zones (maps and breadcrumbs) ----------

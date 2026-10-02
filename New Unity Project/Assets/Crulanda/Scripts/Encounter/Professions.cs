@@ -22,8 +22,19 @@ namespace Crulanda.Encounter
     /// few a character may hold). tool: the item that teaches it (kind tool, with teaches = this id); a gathering skill with no
     /// tool is known from the start. station: where its recipes are made (forge, bench or fire; alternatives joined with |).
     /// taught: the line said when its tool is first used.
+    /// A craft: trainerRole is the trade of the villagers who teach it and work beside you (blacksmith, herbalist); learnAt says
+    /// where it is taken up; takeUp is said when it is taken up with no trainer near; trainerLines are what a trainer says when it
+    /// is taken up beside them, and helpLines what the trade's person says when they lend a hand at the work (each by trainer
+    /// name, and one with no name for any other); helping is the chat line for that ({name} is the helper).
     /// </summary>
-    [Serializable] public sealed class ProfessionDef { public string id, name, kind, tool, verb, station, trainerRole, description, taught, canonStatus; }
+    [Serializable] public sealed class ProfessionDef
+    {
+        public string id, name, kind, tool, verb, station, trainerRole, description, taught, canonStatus;
+        public string learnAt, takeUp, helping;
+        public TradeLine[] trainerLines = new TradeLine[0], helpLines = new TradeLine[0];
+    }
+    /// <summary>A line a trade's person says: npc is who says it (empty: any of that trade).</summary>
+    [Serializable] public sealed class TradeLine { public string npc, text; }
     /// <summary>
     /// A kind of thing that can be worked in the world (an ore seam, a windfall, a herb). skill: the skill at which it comes
     /// easily. min-max: how many of item one working gives. respawn: seconds until it can be worked again. seconds: how long
@@ -64,7 +75,7 @@ namespace Crulanda.Encounter
         /// Reads the profession files against the item database. Every problem is collected and thrown as one ArgumentException:
         /// - a trade, node or recipe with no id, or an id used twice; a trade with no name or an unknown kind;
         /// - a tool that is not an item of kind tool, or that teaches another trade; a tool item that teaches no known trade;
-        /// - a station that is not forge, bench or fire;
+        /// - a station that is not forge, bench or fire; a craft with no station; a trainer or help line with no text;
         /// - a node whose trade is not a gathering skill, whose item is unknown, whose skill is outside 1-100, whose yield is
         ///   below 1 or has min over max, or whose respawn or working time is not above zero;
         /// - a recipe with an unknown trade, output or input, no inputs, a count below 1, a skill outside 1-100 or no station.
@@ -98,6 +109,9 @@ namespace Crulanda.Encounter
                         else if (tool.teaches != d.id) errors.Add(p + "its tool '" + d.tool + "' teaches '" + tool.teaches + "'.");
                     }
                     if (!string.IsNullOrEmpty(d.station)) foreach (var s in Stations(d.station)) if (Array.IndexOf(StationKinds, s) < 0) errors.Add(p + "unknown station '" + s + "'.");
+                    foreach (var l in d.trainerLines ?? new TradeLine[0]) if (l == null || string.IsNullOrEmpty(l.text)) errors.Add(p + "a trainer line with no text.");
+                    foreach (var l in d.helpLines ?? new TradeLine[0]) if (l == null || string.IsNullOrEmpty(l.text)) errors.Add(p + "a help line with no text.");
+                    if (d.kind == "craft" && string.IsNullOrEmpty(d.station)) errors.Add(p + "a craft with no station.");
                     db.professions[d.id] = d; db.Order.Add(d);
                 }
             }
@@ -161,12 +175,21 @@ namespace Crulanda.Encounter
         }
         /// <summary>A trade every character has from the start: Cooking, and a gathering skill that needs no tool (Herbalism).</summary>
         public static bool FromTheStart(ProfessionDef d) { return d != null && (d.kind == "free" || (d.kind == "gather" && string.IsNullOrEmpty(d.tool))); }
+        /// <summary>The line a trade's person says: the one written for them by name, else the first written for anyone, else null.</summary>
+        public static string LineFor(TradeLine[] lines, string npc)
+        {
+            if (lines == null) return null;
+            foreach (var l in lines) if (l != null && !string.IsNullOrEmpty(l.text) && !string.IsNullOrEmpty(l.npc) && l.npc == npc) return l.text;
+            foreach (var l in lines) if (l != null && !string.IsNullOrEmpty(l.text) && string.IsNullOrEmpty(l.npc)) return l.text;
+            return null;
+        }
     }
 
     /// <summary>
     /// What a character knows of the trades: which skills are learned and how far each has come (EncounterProgress.professions,
     /// save format 8). A gathering tool (a pick, a hatchet) is used once from the bags: it teaches its skill at 1 and hangs at the
-    /// belt from then on, taking no bag slot; a second one is refused and kept. Gathering: whether a node can be worked, how long
+    /// belt from then on, taking no bag slot; a second one is refused and kept. Crafts: taken up at 1, at most Db.CraftSlots at
+    /// once, and forgotten at will (the skill goes with it); Cooking and the gathering skills are never forgotten. Gathering: whether a node can be worked, how long
     /// it takes, what it yields and the skill roll (the session runs the work bar and rests the node). Making: whether a recipe can
     /// be made (the trade, the skill, a station near, the inputs, room), how many times the bags allow, its colour, and the making
     /// itself with its skill roll (the session runs the work bar and says where the stations are). Pure logic over the progress,
@@ -238,6 +261,54 @@ namespace Crulanda.Encounter
             var s = Progress.bag[bagIndex];
             if (!UseTool(Items.Get(s.item), out why)) return false;
             s.count--; if (s.count <= 0) { s.item = ""; s.count = 0; }
+            return true;
+        }
+
+        // ---------- crafts: taking one up and forgetting it (DESIGN 4; BUILD_PLAN step 12) ----------
+        static readonly string[] CountWords = { "No", "One", "Two", "Three", "Four", "Five", "Six" };
+        /// <summary>Why another craft can't be taken up with every slot used: "Two crafts already. Forget one first."</summary>
+        public string CraftsFullLine
+        {
+            get { int n = Db.CraftSlots; return (n < CountWords.Length ? CountWords[n] : n.ToString()) + (n == 1 ? " craft" : " crafts") + " already. Forget one first."; }
+        }
+        /// <summary>
+        /// Whether a craft can be taken up, and why not, in this order: no such trade; a trade that is not a craft (everyone has
+        /// Cooking and Herbalism; Mining and Woodcutting come with their tool); already taken up; every craft slot used
+        /// (CraftsFullLine). Where it is taken up (at its station or beside its trainer) is the session's to say.
+        /// </summary>
+        public bool CanLearn(string id, out string why)
+        {
+            why = null; var d = Db.Profession(id);
+            if (d == null) { why = "There is no such trade."; return false; }
+            if (d.kind != "craft") { why = ProfessionDatabase.FromTheStart(d) ? "Everyone knows " + d.name + " from the start." : NotKnownLine(d, d.name + " is not taken up; it is learned."); return false; }
+            if (Has(id)) { why = "You have taken up " + d.name + " already."; return false; }
+            if (CraftSlotsUsed >= Db.CraftSlots) { why = CraftsFullLine; return false; }
+            return true;
+        }
+        /// <summary>Takes up a craft at skill 1, when CanLearn allows it; nothing is said (the session speaks for the trainer). False, with
+        /// why, and nothing changed otherwise.</summary>
+        public bool Learn(string id, out string why)
+        {
+            if (!CanLearn(id, out why)) return false;
+            Progress.professions.Add(new ProfessionSkill { id = id, skill = 1 });
+            return true;
+        }
+        /// <summary>Whether a trade can be forgotten, and why not: only a craft that has been taken up can. Cooking and the gathering
+        /// skills stay for good.</summary>
+        public bool CanForget(string id, out string why)
+        {
+            why = null; var d = Db.Profession(id);
+            if (d == null) { why = "There is no such trade."; return false; }
+            if (d.kind != "craft") { why = d.name + " stays with you. It can't be forgotten."; return false; }
+            if (!Has(id)) { why = "You have not taken up " + d.name + "."; return false; }
+            return true;
+        }
+        /// <summary>Forgets a craft that was taken up: its entry and its skill are gone and its slot is free. False, and nothing changed,
+        /// when CanForget refuses (Cooking, a gathering skill, a craft not taken up).</summary>
+        public bool Forget(string id)
+        {
+            if (!CanForget(id, out _)) return false;
+            Progress.professions.RemoveAll(s => s != null && s.id == id);
             return true;
         }
 

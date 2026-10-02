@@ -360,6 +360,41 @@ namespace Crulanda.Encounter
             if (sel != null) { var f = Face(sel, 7f); while (f.MoveNext()) yield return f.Current; }
             ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "16-tracker.png")); yield return new WaitForSeconds(.4f);
         }
+        /// <summary>
+        /// The animals' line-up (playtest notes 4 and 7: the sheep, the cats' tails): a black-faced, a white-faced and a dark sheep
+        /// (one walking, head up), a cat standing with its tail hung and one at a trot with it up, side on from five metres at
+        /// eye height with the player hidden: <prefix>98-critters-lineup.png, then the cats close: <prefix>98-critters-cats.png.
+        /// Built for the shots on the green and gone after.
+        /// </summary>
+        IEnumerator CaptureCritters(string directory, string prefix, Crulanda.World.ZoneBuilder zone)
+        {
+            var motor = session.Player.GetComponent<AdventurerMotor>();
+            var row = new GameObject("Critter line-up").transform; var animals = new List<(CritterBody body, float v)>();
+            var spec = new[] { ("sheep", .2f, 3f, 0f), ("sheep", .6f, 1f, .5f), ("sheep", .5f, 11f, 0f), ("cat", .1f, 2f, 0f), ("cat", .5f, 4f, 3f) };   // kind, colour, seed, pace (0: standing)
+            for (int i = 0; i < spec.Length; i++)
+            {
+                var (kind, r, seed, v) = spec[i];
+                var t = new GameObject(kind).transform; t.SetParent(row, false);
+                t.position = zone.Ground(new Vector2(-3.4f + i * 1.7f, -11)); t.rotation = Quaternion.Euler(0, 90, 0);   // facing +X: side on to the camera
+                animals.Add((CritterBody.Build(t, kind, r, seed), v));
+            }
+            var body = Array.FindAll(session.Player.GetComponentsInChildren<Renderer>(), x => x.enabled); foreach (var x in body) x.enabled = false;
+            motor.Teleport(zone.Ground(new Vector2(0, -18), 1.1f)); motor.enabled = false; var view = session.View.transform;
+            foreach (var (shot, eye, focus) in new[] { ("lineup", new Vector3(0, 1.3f, -16), new Vector3(0, .35f, -11)), ("cats", new Vector3(2.55f, .75f, -13.4f), new Vector3(2.55f, .25f, -11)) })
+            {
+                var cam = new Vector3(eye.x, zone.Ground(new Vector2(eye.x, eye.z)).y + eye.y, eye.z); var at = new Vector3(focus.x, zone.Ground(new Vector2(focus.x, focus.z)).y + focus.y, focus.z);
+                var look = Quaternion.LookRotation(at - cam);
+                for (float w = 0; w < 1.4f; w += Time.deltaTime)
+                {
+                    foreach (var (b, v) in animals) if (v > 0) b.Stride(v); else b.Rest();
+                    view.SetPositionAndRotation(cam, look); yield return null;
+                }
+                view.SetPositionAndRotation(cam, look); ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "98-critters-" + shot + ".png"));
+                yield return new WaitForSeconds(.4f);
+            }
+            motor.enabled = true; foreach (var x in body) x.enabled = true;
+            UnityEngine.Object.Destroy(row.gameObject);
+        }
         /// <summary>Scenic tour of a generated zone with the HUD hidden: one shot per (place, yaw, pitch, zoom).</summary>
         IEnumerator CaptureWorldTour(string directory)
         {
@@ -583,6 +618,7 @@ namespace Crulanda.Encounter
                     yield return new WaitForSeconds(.4f);
                 }
                 for (int i = 0; i < carriers.Count; i++) carriers[i].Item1.Release(wasAt[i]);
+                yield return CaptureCritters(directory, prefix, zone);
                 // The out of work at the inn: one with a tankard, the next slumped over the table, seen from the table by the door.
                 if (life.Places.TryGetValue("inn", out var seats) && seats.Count >= 8)
                 {

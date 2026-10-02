@@ -30,6 +30,15 @@ namespace Crulanda.Encounter
         float stepRate = 12, legLen, stride, tuck; bool atRest;
         // Torso height and half-thickness (m) for lying on its side when it dies (LieDown).
         float torso, flank;
+        // A sheep's Head is an unscaled neck pivot: at neckUp with the head carried, at neckDown and turned GrazeDeg with
+        // the muzzle in the grass. nod (0-1) eases between them (see Nod).
+        Vector3 neckUp, neckDown; float nod; const float GrazeDeg = 62;
+        // A cat's tail: nested pivots, root to tip, each carrying one short capsule lying back along -Z. Pitch per joint in
+        // degrees (positive lifts) for the three carriages; tailWalk and tailUp (0-1) ease between them (see Tail).
+        Transform[] tail; float tailWalk, tailUp; const float TailSeg = .062f;
+        static readonly float[] TailHang = { -42, -8, 8, 14, 20, 24 };     // standing: down and away, the tip curling up
+        static readonly float[] TailLevel = { -16, 2, 5, 8, 10, 12 };      // walking: carried low behind, the tip lifting
+        static readonly float[] TailHigh = { 60, 16, 8, -6, -24, -34 };    // trotting: straight up, the tip hooked over
         static readonly Dictionary<Color, Material> mats = new Dictionary<Color, Material>();
         static Material Mat(Color c)
         {
@@ -62,7 +71,8 @@ namespace Crulanda.Encounter
         }
         /// <summary>
         /// Builds a body of this kind (chicken, rabbit, crow, deer, sheep; anything else is a cat) under <paramref name="owner"/>.
-        /// <paramref name="r"/> (0-1) picks its colouring; <paramref name="seed"/> its socks and the phase of its idle motions.
+        /// <paramref name="r"/> (0-1) picks its colouring (the wool's shade, the coat); <paramref name="seed"/> a sheep's face, a dark
+        /// sheep, its size, a cat's socks and the phase of the idle motions (playtest notes 4 and 7: the sheep, the cats' tails).
         /// </summary>
         public static CritterBody Build(Transform owner, string kind, float r, float seed, float lift = 0)
         {
@@ -137,12 +147,46 @@ namespace Crulanda.Encounter
                     Part(PrimitiveType.Sphere, body, new Vector3(0, 1.05f, -.62f), Vector3.one * .14f, new Color(.9f, .88f, .82f));
                     break;
                 case "sheep":
-                    Speed = .5f; FleeSpeed = 2.4f; FleeRadius = 3; torso = .62f; flank = .37f;
-                    var wool = Color.Lerp(new Color(.9f, .88f, .82f), new Color(.8f, .77f, .7f), r);
-                    Part(PrimitiveType.Sphere, body, new Vector3(0, .62f, 0), new Vector3(.75f, .6f, 1f), wool);
-                    Head = Part(PrimitiveType.Sphere, body, new Vector3(0, .7f, .55f), new Vector3(.25f, .28f, .32f), new Color(.12f, .11f, .1f));
-                    // Hips up inside the fleece (the old legs stopped just short of it at the corners).
-                    foreach (int sx in new[] { -1, 1 }) foreach (int sz in new[] { -1, 1 }) Leg(new Vector3(sx * .2f, .47f, sz * .28f), .08f, new Color(.12f, .11f, .1f), sx == sz ? 0 : .5f, 20);
+                    Speed = .5f; FleeSpeed = 2.4f; FleeRadius = 3; torso = .51f; flank = .37f;
+                    // The flock varies with no data change: four wool shades by r (few enough to share materials); by seed,
+                    // two in five are white-faced on pale shanks, the rest black-faced, and about one in eleven is a dark sheep.
+                    bool darkSheep = seed % 11 < 1, whiteFace = !darkSheep && seed % 5 < 2;
+                    var wool = darkSheep ? new Color(.25f, .2f, .16f) : Color.Lerp(new Color(.95f, .92f, .84f), new Color(.84f, .8f, .7f), Mathf.Min(3, Mathf.Floor(r * 4)) / 3);
+                    Color woolLo = wool * .92f, woolHi = Color.Lerp(wool, Color.white, darkSheep ? .12f : .3f);   // under-wool; sunlit top
+                    var face = whiteFace ? new Color(.86f, .79f, .68f) : new Color(.17f, .14f, .13f);
+                    var shin = whiteFace ? face * .92f : face;
+                    var hoof = whiteFace ? new Color(.3f, .25f, .2f) : new Color(.1f, .09f, .08f);
+                    var nose = whiteFace ? new Color(.42f, .3f, .27f) : new Color(.08f, .07f, .07f);
+                    var eye = whiteFace ? new Color(.1f, .08f, .07f) : new Color(.82f, .68f, .38f);
+                    // A fleece of overlapping lumps, deep enough to hide the top half of the legs: barrel, rump, shoulders,
+                    // two paler lumps along the back, a brisket, a flank each side and a stub of a tail.
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .51f, -.02f), new Vector3(.66f, .56f, .9f), wool);
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .58f, -.34f), new Vector3(.6f, .6f, .5f), wool);
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .58f, .26f), new Vector3(.58f, .58f, .48f), wool);
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .72f, -.1f), new Vector3(.42f, .28f, .4f), woolHi);
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .77f, .2f), new Vector3(.36f, .28f, .34f), woolHi);
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .44f, .38f), new Vector3(.42f, .42f, .34f), woolLo);
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .52f, -.6f), new Vector3(.13f, .2f, .13f), wool, new Vector3(20, 0, 0));
+                    foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Sphere, body, new Vector3(s * .22f, .46f, -.04f), new Vector3(.34f, .46f, .6f), woolLo);
+                    // The head hangs from an unscaled neck pivot (children of a squashed sphere shear when it turns): a woolly
+                    // ruff, a dark skull and a long muzzle that make a wedge, a nose, a wool cap, ears out sideways, two eyes.
+                    neckUp = new Vector3(0, .68f, .36f); neckDown = new Vector3(0, .46f, .48f);
+                    Head = new GameObject("Neck").transform; Head.SetParent(body, false); Head.localPosition = neckUp;
+                    Part(PrimitiveType.Sphere, Head, new Vector3(0, -.02f, .04f), new Vector3(.36f, .36f, .34f), wool);
+                    Part(PrimitiveType.Sphere, Head, new Vector3(0, .03f, .2f), new Vector3(.22f, .23f, .28f), face, new Vector3(20, 0, 0));
+                    Part(PrimitiveType.Sphere, Head, new Vector3(0, -.045f, .33f), new Vector3(.15f, .15f, .27f), face, new Vector3(22, 0, 0));
+                    Part(PrimitiveType.Sphere, Head, new Vector3(0, -.088f, .445f), new Vector3(.09f, .06f, .05f), nose);
+                    Part(PrimitiveType.Sphere, Head, new Vector3(0, .14f, .12f), new Vector3(.2f, .13f, .2f), woolHi);
+                    foreach (int s in new[] { -1, 1 })
+                    {
+                        Part(PrimitiveType.Sphere, Head, new Vector3(s * .16f, .07f, .13f), new Vector3(.18f, .055f, .1f), face, new Vector3(0, s * 15, -s * 20));
+                        Part(PrimitiveType.Sphere, Head, new Vector3(s * .092f, .075f, .275f), Vector3.one * .036f, eye);
+                    }
+                    // Short sturdy legs, hips up inside the fleece (25 cm shows beneath it), each on a hoof; diagonal pairs step together.
+                    foreach (int sx in new[] { -1, 1 }) foreach (int sz in new[] { -1, 1 })
+                        Part(PrimitiveType.Cylinder, Leg(new Vector3(sx * .17f, .38f, sz * .3f - .01f), .12f, shin, sx == sz ? 0 : .5f, 20), new Vector3(0, -.345f, .008f), new Vector3(.138f, .035f, .138f), hoof);
+                    // Big ewes and small: the whole body scaled about its feet, and the step rate with it so the feet do not slide.
+                    float size = Mathf.Lerp(.92f, 1.06f, seed * .37f % 1); body.localScale = Vector3.one * size; stepRate /= size;
                     break;
                 default: // cat
                     Speed = .9f; FleeSpeed = 4.5f; FleeRadius = 4; torso = .26f; flank = .09f;
@@ -150,12 +194,56 @@ namespace Crulanda.Encounter
                     Part(PrimitiveType.Capsule, body, new Vector3(0, .26f, 0), new Vector3(.18f, .22f, .18f), coat, new Vector3(90, 0, 0));
                     Head = Part(PrimitiveType.Sphere, body, new Vector3(0, .38f, .22f), Vector3.one * .15f, coat);
                     foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, Head, new Vector3(s * .28f, .45f, 0), new Vector3(.2f, .3f, .1f), coat, new Vector3(0, 0, s * 15));
-                    Part(PrimitiveType.Cylinder, body, new Vector3(0, .38f, -.28f), new Vector3(.04f, .2f, .04f), coat, new Vector3(-50, 0, 0));
-                    // Four slim legs (diagonal pairs step together) on small paws; some cats wear white socks.
-                    var paw = seed % 10 < 3 ? new Color(.9f, .88f, .82f) : Color.Lerp(coat, Color.white, .12f);
+                    // Some cats wear white socks, and a white tip to the tail with them.
+                    bool socks = seed % 10 < 3;
+                    var paw = socks ? new Color(.9f, .88f, .82f) : Color.Lerp(coat, Color.white, .12f);
+                    // The tail: six short capsules on nested pivots from the rump, tapering, each overlapping the next so a
+                    // bend stays round. Tail() curves it.
+                    tail = new Transform[6]; var joint = body;
+                    for (int i = 0; i < tail.Length; i++)
+                    {
+                        var j = new GameObject("Tail").transform; j.SetParent(joint, false);
+                        j.localPosition = i == 0 ? new Vector3(0, .31f, -.2f) : new Vector3(0, 0, -TailSeg);
+                        float w = Mathf.Lerp(.05f, .032f, i / 5f);
+                        Part(PrimitiveType.Capsule, j, new Vector3(0, 0, -TailSeg / 2), new Vector3(w, (TailSeg + w) / 2, w), socks && i == 5 ? paw : coat, new Vector3(90, 0, 0));
+                        tail[i] = joint = j;
+                    }
+                    Tail(0, 0, 0);
+                    // Four slim legs (diagonal pairs step together) on small paws.
                     foreach (int sx in new[] { -1, 1 }) foreach (int sz in new[] { -1, 1 })
                         Part(PrimitiveType.Sphere, Leg(new Vector3(sx * .055f, .22f, sz * .14f), .05f, coat, sx == sz ? 0 : .5f, 28), new Vector3(0, -.202f, .015f), new Vector3(.065f, .036f, .085f), paw);
                     break;
+            }
+        }
+        /// <summary>
+        /// A sheep's neck, eased toward head up (0) or muzzle in the grass (1) at <paramref name="rate"/> per second: the neck
+        /// pivot sinks and reaches forward as it turns, so the muzzle ends on the ground ahead of the forefeet.
+        /// <paramref name="look"/>: a turn of the head in degrees, only while it is up; <paramref name="bob"/>: a pitch on top.
+        /// </summary>
+        void Nod(float to, float rate, float look = 0, float bob = 0)
+        {
+            nod = Mathf.MoveTowards(nod, to, Time.deltaTime * rate);
+            float e = Mathf.SmoothStep(0, 1, nod);
+            Head.localPosition = Vector3.Lerp(neckUp, neckDown, e);
+            Head.localEulerAngles = new Vector3(e * GrazeDeg + bob, look * (1 - e), 0);
+        }
+        /// <summary>
+        /// A cat's tail for this frame. <paramref name="walk"/> (0-1): carried low behind and swaying with the stride, a wave
+        /// running down it; <paramref name="up"/> (0-1): carried straight up with the tip hooked over; neither: hanging in a
+        /// curve, swaying slowly. <paramref name="flick"/> (0-1): how much the tip flicks, in bursts every few seconds.
+        /// </summary>
+        void Tail(float walk, float up, float flick)
+        {
+            if (tail == null) return;
+            tailWalk = Mathf.MoveTowards(tailWalk, walk, Time.deltaTime * 3); tailUp = Mathf.MoveTowards(tailUp, up, Time.deltaTime * 2.5f);
+            float t = Time.time + seed;
+            float idle = Mathf.Sin(t * .9f) * 5 * (1 - tailWalk);
+            float tip = flick * Mathf.Sin(t * 9) * Mathf.Max(0, Mathf.Sin(t * .7f) - .55f) * 57;
+            for (int i = 0; i < tail.Length; i++)
+            {
+                float pitch = Mathf.Lerp(Mathf.Lerp(TailHang[i], TailLevel[i], tailWalk), TailHigh[i], tailUp);
+                float yaw = Mathf.Sin(phase - i * .55f) * 9 * tailWalk * (1 - .4f * tailUp) + idle + (i >= tail.Length - 2 ? tip : 0);
+                tail[i].localEulerAngles = new Vector3(pitch, yaw, 0);
             }
         }
         /// <summary>
@@ -167,7 +255,9 @@ namespace Crulanda.Encounter
             phase += Time.deltaTime * (Kind == "rabbit" ? Mathf.Min(v, 2.2f) * 5.5f : Mathf.Min(v * stepRate, 24));
             if (Kind == "rabbit") Root.localPosition = new Vector3(0, Lift + Mathf.Abs(Mathf.Sin(phase)) * Mathf.Lerp(.16f, .28f, (v - 1) / 5), 0);
             Legs(1);
-            if (Head != null && Kind != "deer") Head.localEulerAngles = Vector3.zero;
+            if (Kind == "sheep") Nod(0, 4, 0, Mathf.Sin(phase * 2) * 2.5f);   // head up quickly, nodding a little with each step
+            else if (Head != null && Kind != "deer") Head.localEulerAngles = Vector3.zero;
+            Tail(1, Mathf.InverseLerp(1.4f, 3, v), 0);   // a walk (0.9 m/s) carries it low; from a trot up it goes up
         }
         /// <summary>
         /// Legs: swung in the gait while stepping (easing in and out), tucked back under the tail in flight. Walkers dip as
@@ -189,11 +279,19 @@ namespace Crulanda.Encounter
             if (Head == null) return;
             float t = Time.time + seed;
             if (Kind == "chicken" || Kind == "crow") Head.localEulerAngles = new Vector3(Mathf.Max(0, Mathf.Sin(t * 5)) * 55, 0, 0);
-            else if (Kind == "sheep" || Kind == "deer") Head.localEulerAngles = new Vector3(Mathf.Sin(t * .4f) > 0 ? 40 : 0, 0, 0);
+            // A sheep grazes for eight seconds, tugging at the grass, then lifts its head and looks about for eight.
+            else if (Kind == "sheep") Nod(Mathf.Sin(t * .4f) > 0 ? 1 : 0, 1.6f, Mathf.Sin(t * .7f) * 20, Mathf.Sin(t * 9) * 3 * nod);
+            else if (Kind == "deer") Head.localEulerAngles = new Vector3(Mathf.Sin(t * .4f) > 0 ? 40 : 0, 0, 0);
             else Head.localEulerAngles = new Vector3(0, Mathf.Sin(t * .8f) * 35, 0);
+            Tail(0, 0, 1);
         }
         /// <summary>Head up and still: an animal that has noticed something and is watching it.</summary>
-        public void Alert() { Root.localPosition = new Vector3(0, Lift, 0); Legs(0); if (Head != null) Head.localEulerAngles = Vector3.zero; }
+        public void Alert()
+        {
+            Root.localPosition = new Vector3(0, Lift, 0); Legs(0);
+            if (Kind == "sheep") Nod(0, 4); else if (Head != null) Head.localEulerAngles = Vector3.zero;
+            Tail(0, 0, 0);
+        }
         /// <summary>Wings out and beating at <paramref name="flap"/> degrees (a crow in flight; others have no wings).</summary>
         public void Flap(float flap)
         {
@@ -217,6 +315,8 @@ namespace Crulanda.Encounter
             stride = tuck = 0; atRest = false;
             foreach (var l in legs) l.hip.localEulerAngles = Vector3.zero;
             if (Head != null) Head.localEulerAngles = Vector3.zero;
+            if (Kind == "sheep") { nod = 0; Head.localPosition = neckUp; }
+            if (tail != null) { tailWalk = tailUp = 0; for (int i = 0; i < tail.Length; i++) tail[i].localEulerAngles = Vector3.zero; }
             // Rolled 90 degrees about its length the torso swings from torso-height up to torso-height aside: shift it back over
             // the spot it stood on and up by the flank, so it lies on the ground rather than in it.
             Root.localRotation = Quaternion.Euler(0, 0, 90); Root.localPosition = new Vector3(torso, Lift + flank, 0);

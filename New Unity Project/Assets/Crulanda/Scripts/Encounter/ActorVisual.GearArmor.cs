@@ -121,7 +121,7 @@ namespace Crulanda.Encounter
                     var join = new (Mesh, Matrix4x4)[list.Count]; for (int i = 0; i < list.Count; i++) join[i] = (list[i].mesh, list[i].m);
                     t = GPart(root, M.Join(JoinKey(list), join), mat, Vector3.zero, Vector3.one);
                 }
-                if (g.Item2 == "glow") f.k.lit.Add(t.GetComponent<Renderer>());
+                if (g.Item2 == "glow") { t.name = AccentName; f.k.lit.Add(t.GetComponent<Renderer>()); }
             }
             Finish(f.k, gearRoots[s]);
         }

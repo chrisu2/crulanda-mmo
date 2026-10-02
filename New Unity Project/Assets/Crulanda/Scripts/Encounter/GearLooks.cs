@@ -40,7 +40,8 @@ namespace Crulanda.Encounter
     /// <summary>
     /// A resolved look. Colours are final (palette, shade, metal tint and quality applied). Quality: poor is faded with one wear
     /// detail and no trim; common has plain trim; uncommon has the palette's trim and one extra part; rare polished trim and one
-    /// glowing accent; epic gold-toned trim and two pulsing accents. <c>+glow</c> in a look string forces at least one accent.
+    /// glowing accent; epic gold-toned trim and two pulsing accents, brighter. Nothing below rare has an accent. <c>+glow</c> in a
+    /// look string forces at least one accent, dimmer.
     /// </summary>
     public struct GearLook
     {
@@ -133,6 +134,15 @@ namespace Crulanda.Encounter
         public static readonly Color Bone = new Color(.86f, .82f, .72f);
         /// <summary>Epic trim leans toward this gold.</summary>
         public static readonly Color Gold = new Color(.85f, .66f, .2f);
+        /// <summary>
+        /// How bright an accent burns, times its colour: a rare piece's, an epic's at the top of its pulse (GearGlow) and a forced glow's
+        /// (+glow) on a lesser piece. Rare and epic burn well over the bloom's threshold by day as well as by night, so the camera's bloom
+        /// haloes them and the quality reads at a glance on the body: a rare piece gleams, an epic one glows and breathes.
+        /// </summary>
+        public const float RareGlow = 3, EpicGlow = 5, ForcedGlow = 1.5f;
+        /// <summary>A palette's glow as its accents show it: its hue at full value and at least 65% saturation, so a pale glow (pilgrim
+        /// cream, the Concord's white-blue) reads as a colour and not as polished metal.</summary>
+        public static Color Gleam(Color glow) { Color.RGBToHSV(glow, out float h, out float s, out _); var c = Color.HSVToRGB(h, Mathf.Max(s, .65f), 1); c.a = 1; return c; }
 
         readonly Dictionary<string, GearPalette> palettes = new Dictionary<string, GearPalette>(StringComparer.Ordinal);
         readonly Dictionary<string, GearMaterialWord> materials = new Dictionary<string, GearMaterialWord>(StringComparer.Ordinal);
@@ -329,7 +339,7 @@ namespace Crulanda.Encounter
                 cloth = C(p.cloth), cloth2 = C(p.cloth2), leather = C(p.leather), metal = C(p.metal), trim = C(p.trim), wood = C(p.wood), glow = Hex(p.glow), bone = q == 0 ? Faded(Bone) : Bone
             };
             Quality(ref l, q);
-            if (glow) { l.accents = Mathf.Max(l.accents, 1); l.glowPower = Mathf.Max(l.glowPower, 1.5f); }
+            if (glow) { l.accents = Mathf.Max(l.accents, 1); l.glowPower = Mathf.Max(l.glowPower, ForcedGlow); }
             return l;
         }
         /// <summary>The quality treatment (DESIGN.md section 2.4) on a look whose colours are set.</summary>
@@ -341,8 +351,8 @@ namespace Crulanda.Encounter
                 case 0: l.trimColor = l.metal; l.trimSmooth = .15f; l.trimMetal = .2f; break;
                 case 1: l.trimColor = l.metal; l.trimSmooth = .35f; l.trimMetal = .4f; break;
                 case 2: l.trimColor = l.trim; l.trimSmooth = .5f; l.trimMetal = .6f; break;
-                case 3: l.trimColor = l.trim; l.trimSmooth = .7f; l.trimMetal = .8f; l.accents = 1; l.glowPower = 1.5f; break;
-                default: l.trimColor = Color.Lerp(l.trim, GearLooks.Gold, .6f); l.trimSmooth = .78f; l.trimMetal = .9f; l.accents = 2; l.glowPower = 2.5f; l.pulse = true; break;
+                case 3: l.trimColor = l.trim; l.trimSmooth = .7f; l.trimMetal = .8f; l.accents = 1; l.glowPower = RareGlow; break;
+                default: l.trimColor = Color.Lerp(l.trim, GearLooks.Gold, .6f); l.trimSmooth = .78f; l.trimMetal = .9f; l.accents = 2; l.glowPower = EpicGlow; l.pulse = true; break;
             }
         }
     }

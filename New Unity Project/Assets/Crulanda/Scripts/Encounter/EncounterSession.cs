@@ -1273,12 +1273,13 @@ namespace Crulanda.Encounter
             if (Companion != null && Hit(Companion.transform.position, .95f, out float md) && md < best) { best = md; pick = null; mira = true; }
             SelectFriendly(pick, mira);
         }
-        /// <summary>Who E would talk to: the selected friend when in reach, otherwise the nearest of Mira and the villagers.</summary>
+        /// <summary>Who E would talk to: the selected friend when in reach, otherwise the nearest of Mira and the villagers. In reach
+        /// is within talk range with nothing solid between (<see cref="InTalkReach"/>): nobody is talked to through a wall.</summary>
         (Villager villager, bool mira) TalkTarget()
         {
             var p = Player.transform.position;
             if (FocusMira && CompanionInReach) return (null, true);
-            if (FocusVillager != null && FocusVillager.Visible && Vector3.Distance(p, FocusVillager.transform.position) < TalkRange) return (FocusVillager, false);
+            if (FocusVillager != null && FocusVillager.Visible && InTalkReach(FocusVillager.transform.position, FocusVillager.Role == "child")) return (FocusVillager, false);
             // Nothing selected: whoever is nearest, favouring the one you are facing when two are close.
             var fwd = Player.transform.forward;
             float Reach(Vector3 at) { var d = at - p; d.y = 0; return d.magnitude - .9f * Mathf.Max(0, Vector3.Dot(fwd, d.normalized)); }
@@ -1286,7 +1287,7 @@ namespace Crulanda.Encounter
             if (VillageLife.Active != null)
                 foreach (var cand in VillageLife.Active.Villagers)
                 {
-                    if (!cand.Visible || Vector3.Distance(p, cand.transform.position) >= TalkRange) continue;
+                    if (!cand.Visible || !InTalkReach(cand.transform.position, cand.Role == "child")) continue;
                     float r = Reach(cand.transform.position); if (r < bestReach) { bestReach = r; best = cand; }
                 }
             if (CompanionInReach && (best == null || Reach(Companion.transform.position) <= bestReach)) return (null, true);
@@ -1336,7 +1337,36 @@ namespace Crulanda.Encounter
             return true;
         }
         public const float TalkRange = 3.5f, DoorRange = 2.6f;
-        public bool CompanionInReach { get { return Companion != null && Vector3.Distance(Player.transform.position, Companion.transform.position) < TalkRange; } }
+        /// <summary>Mira is near enough to talk to, with nothing solid between (<see cref="InTalkReach"/>).</summary>
+        public bool CompanionInReach { get { return Companion != null && InTalkReach(Companion.transform.position); } }
+        static readonly RaycastHit[] talkHits = new RaycastHit[16];
+        /// <summary>
+        /// Whether someone standing at <paramref name="at"/> (their root, about a metre over their feet; a child's lower) can be
+        /// talked to: within talk range, and a clear line from the player's head to theirs, or to a hand either side of it, as a
+        /// station's walls are kept by its room (ZoneStationSpot.Reaches). Walls, roofs, rock and the ground block it, cast both ways
+        /// (a one-sided mesh blocks only from its front); people, trees and triggers don't, and a counter, a table or a door's step is
+        /// below the line. The side lines keep a post or a pole from ending a conversation that a wall would.
+        /// </summary>
+        bool InTalkReach(Vector3 at, bool child = false)
+        {
+            if (Player == null) return false;
+            var p = Player.transform.position; if (Vector3.Distance(p, at) >= TalkRange) return false;
+            Vector3 eye = p + Vector3.up * .55f, head = at + Vector3.up * (child ? .35f : .55f), side = Vector3.Cross(Vector3.up, head - eye); side.y = 0;
+            side = side.sqrMagnitude > .0001f ? side.normalized * .25f : Vector3.zero;
+            return TalkLineClear(eye, head) || TalkLineClear(eye, head + side) || TalkLineClear(eye, head - side);
+        }
+        static bool TalkLineClear(Vector3 a, Vector3 b) { return TalkRayClear(a, b) && TalkRayClear(b, a); }
+        static bool TalkRayClear(Vector3 from, Vector3 to)
+        {
+            var line = to - from; float length = line.magnitude; if (length < .01f) return true;
+            int n = Physics.RaycastNonAlloc(from, line / length, talkHits, length, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+            for (int i = 0; i < n; i++)
+            {
+                var c = talkHits[i].collider;
+                if (c.GetComponentInParent<Actor>() == null && c.GetComponentInParent<Villager>() == null && c.GetComponentInParent<Crulanda.World.TreeFade>() == null) return false;
+            }
+            return true;
+        }
         /// <summary>A body that still has something to take (camp mobs until looted; story enemies by their saved record).</summary>
         public bool CanLoot(EncounterEnemy e) { return e != null && !e.actor.IsAlive && (e.Camp ? !e.Looted : !Progress.FindEnemy(e.persistentId).looted); }
         EncounterEnemy LootableCorpse { get { return Enemies.Find(e => CanLoot(e) && Distance(e) < 3.6f && (!e.Camp || CanTakeAny(e))) ?? SkinnableBody; } }

@@ -3373,15 +3373,63 @@ namespace Crulanda.World
         /// A herb patch, knee-high so it reads from the path above the meadow grass and its wildflowers: 0 yarrow (feathery leaves
         /// under flat white heads of tiny florets), 1 mourner's cap (a cluster of grey, black-gilled caps on a dark damp patch, as
         /// Wenna tells it), 2 comfrey (broad leaves under nodding violet bells); 3 tarnwort, 4 cinder-thistle and 5 dewfern are the
-        /// trades' herbs, see HerbOfTheTrades. Fixed tables: draws nothing random.
+        /// trades' herbs, see HerbOfTheTrades. The clump (child "Clump") is then laid on the ground it grows from (LayOnGround), so on
+        /// a slope nothing of it hangs over the downhill side; <paramref name="groundY"/> is that ground's height at a world point
+        /// (x, z), the land's when not given (a node in a cave gives its floor's). Fixed tables: draws nothing random.
         /// </summary>
-        void Herb(Transform t, int variant)
+        void Herb(Transform t, int variant, Func<float, float, float> groundY = null)
         {
             int v = variant >= 3 && variant <= 5 ? variant : Mathf.Abs(variant) % 3;
             // Drawn a third larger than life, as the held weapons are: from the path a life-size clump is lost among the wildflowers.
-            var clump = new GameObject("Clump").transform; clump.SetParent(t, false); clump.localScale = Vector3.one * (v == 1 ? 1.15f : 1.3f); t = clump;
-            if (v >= 3) { HerbOfTheTrades(t, v); return; }
-            if (v == 1) { MournersCap(t); return; }
+            var clump = new GameObject("Clump").transform; clump.SetParent(t, false); clump.localScale = Vector3.one * (v == 1 ? 1.15f : 1.3f);
+            if (v >= 3) HerbOfTheTrades(clump, v); else if (v == 1) MournersCap(clump); else MeadowHerb(clump, v);
+            LayOnGround(clump, groundY ?? LandY);
+        }
+        /// <summary>The most a herb's clump leans with the slope it grows on, in degrees; on steeper ground the rest is taken up by sinking it.</summary>
+        const float HerbTilt = 22;
+        /// <summary>The drawn land's height at a world point: the lower of the land and its mesh (as under a node).</summary>
+        float LandY(float x, float z) { return Mathf.Min(HeightAt(x, z), MeshY(x, z)); }
+        /// <summary>
+        /// Lays a herb's clump on the ground it grows from (a bank, a hillside). It leans with the slope under its reach (a plane
+        /// fitted to the ground under the middle of every part and on a grid of a fifth of its reach out to its farthest part), by at
+        /// most <see cref="HerbTilt"/> degrees, and is then sunk until the plane it stands on is nowhere above the ground at those
+        /// points (and 2 cm more), so no leaf or frond hangs over the downhill side. On level ground it stays as built (a lean under a
+        /// degree is none, and so is a sink under 5 mm).
+        /// <paramref name="groundY"/>: the ground's height at a world point (x, z). Draws nothing random.
+        /// </summary>
+        void LayOnGround(Transform clump, Func<float, float, float> groundY)
+        {
+            var o = clump.position;
+            List<Vector2> Under()
+            {
+                var pts = new List<Vector2>(); float reach = 0;
+                foreach (var r in clump.GetComponentsInChildren<Renderer>())
+                {
+                    var b = r.bounds; pts.Add(new Vector2(b.center.x, b.center.z));
+                    foreach (float x in new[] { b.min.x, b.max.x }) foreach (float z in new[] { b.min.z, b.max.z }) reach = Mathf.Max(reach, Vector2.Distance(new Vector2(x, z), new Vector2(o.x, o.z)));
+                }
+                for (int i = -5; i <= 5; i++) for (int k = -5; k <= 5; k++) if (i * i + k * k <= 25) pts.Add(new Vector2(o.x + i * reach / 5, o.z + k * reach / 5));
+                return pts;
+            }
+            // The slope: the plane best fitting the ground under it (least squares).
+            var under = Under(); int n = under.Count; var ys = new float[n]; float mx = 0, mz = 0, my = 0;
+            for (int i = 0; i < n; i++) { ys[i] = groundY(under[i].x, under[i].y); mx += under[i].x; mz += under[i].y; my += ys[i]; }
+            mx /= n; mz /= n; my /= n;
+            float sxx = 0, sxz = 0, szz = 0, sxy = 0, szy = 0;
+            for (int i = 0; i < n; i++) { float dx = under[i].x - mx, dz = under[i].y - mz, dy = ys[i] - my; sxx += dx * dx; sxz += dx * dz; szz += dz * dz; sxy += dx * dy; szy += dz * dy; }
+            float det = sxx * szz - sxz * sxz, ax = 0, az = 0;   // the ground's rise along x and along z
+            if (Mathf.Abs(det) > 1e-6f) { ax = (sxy * szz - szy * sxz) / det; az = (szy * sxx - sxy * sxz) / det; }
+            var normal = new Vector3(-ax, 1, -az).normalized;
+            if (Vector3.Angle(Vector3.up, normal) >= 1) clump.rotation = Quaternion.RotateTowards(Quaternion.identity, Quaternion.FromToRotation(Vector3.up, normal), HerbTilt) * clump.parent.rotation;
+            // Sunk until the plane it stands on is under the ground beneath every part (measured as leaned).
+            var up = clump.up; float sink = float.MinValue;
+            foreach (var c in Under()) sink = Mathf.Max(sink, o.y - (up.x * (c.x - o.x) + up.z * (c.y - o.z)) / up.y - groundY(c.x, c.y));
+            if (sink > .005f) clump.position = o - Vector3.up * (sink + .02f);
+        }
+        /// <summary>Yarrow (0: feathery leaves under flat white heads of tiny florets) and comfrey (2: broad leaves under nodding
+        /// violet bells), as Herb variants. Fixed tables: draws nothing random.</summary>
+        void MeadowHerb(Transform t, int v)
+        {
             var leaf = Tint(art.foliage, Wither(v == 0 ? new Color(.27f, .48f, .2f) : new Color(.25f, .44f, .19f)));
             var shade = Tint(art.foliage, Wither(v == 0 ? new Color(.18f, .35f, .15f) : new Color(.17f, .31f, .14f)));
             var stem = Tint(art.foliage, Wither(new Color(.32f, .5f, .23f)));

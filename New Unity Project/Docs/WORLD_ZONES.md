@@ -578,7 +578,9 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
     its mesh runs between the rings (`Hollow.FloorSmooth`), so nothing floats on a slope.
   - windfall: a snapped stump with a splintered top (it stays) and the trunk lying beside it with stub limbs (cut away while it
     rests); bark by tier (oak, black pine, stone-pine, the ash's charred snag, pale ghost-oak).
-  - herb: the herb patches (`Herb`), with the trades' tarnwort, cinder-thistle and dewfern as variants 3-5.
+  - herb: the herb patches (`Herb`), with the trades' tarnwort, cinder-thistle and dewfern as variants 3-5. On a slope the clump
+    leans with the ground (at most 22 degrees) and is sunk the rest of the way, so nothing of it floats over the downhill side
+    (`ZoneBuilder.LayOnGround`; herb props too; draws nothing random; `NodePlacementTests.EveryHerb_LiesOnTheGround`).
 - **Placement** (moved clear at build, up to 3 m, and tested by `NodePlacementTests`): reachable from the player start to within
   reach of E; out of water, buildings and off roads; 5 m from secrets and from each other, 2 m from trunks; rich seams only on a
   cave floor. Seams by crags and rocks or on a ridge's crown, windfalls at a wood's edge (Oakhaven's oak at broadleaf woods),

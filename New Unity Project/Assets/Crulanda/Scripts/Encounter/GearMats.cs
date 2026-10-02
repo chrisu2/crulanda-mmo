@@ -15,7 +15,8 @@ namespace Crulanda.Encounter
         public static int Count { get { return cache.Count; } }
         static int Q(float x) { return Mathf.RoundToInt(x * 255); }
 
-        /// <summary>A solid material; an emission above black lights it (rare and epic accents, lantern cores).</summary>
+        /// <summary>A solid material; an emission above black lights it (rare and epic accents, lantern cores). Emission may run well
+        /// above 1 (an epic accent burns at five times its colour), so the bloom takes it.</summary>
         public static Material Get(Color c, float smooth = .15f, float metal = 0, Color emission = default)
         {
             string key = Q(c.r) + "," + Q(c.g) + "," + Q(c.b) + "|" + Mathf.RoundToInt(smooth * 100) + "|" + Mathf.RoundToInt(metal * 100) + "|" + Q(emission.r / 4) + "," + Q(emission.g / 4) + "," + Q(emission.b / 4);

@@ -755,3 +755,14 @@ resumed with `Workflow({scriptPath, resumeFromRunId})` (finished agents replay f
   ends) and bucked in two with pale cut ends, the lopped crown as a low heap of bare branches that stays when the logs are
   taken. Port it into `ZoneBuilder.Nodes.cs` Windfall (within -2.9..+2.5 m along X for WindfallYaw), then note 15 (find the
   tree builder whose limbs float), then merge note 5 (ore, `fix/n56-ore-windfall`), one build for all three.
+
+## UPDATE 2026-10-02 afternoon: notes 4, 5, 6, 7 and 15 PUBLISHED (main dd653fa, build of 13:49)
+- 13:41 build: note 6 felled lumber trees (Windfall rebuilt; preview tools in `tools/wip/render`, design `tools/wip/windfall`),
+  note 15 limbs joined (ZoneBuilder.LimbAt; TreeLimbTests with ZoneBuilder.RecordWood), note 5 ore (fix/n56-ore-windfall
+  merged). Full check: EditMode 372/372, PlayMode 174/174, five zones toured.
+- 13:50 build: notes 4 and 7 (CritterBody: designer 0's sheep and jointed cat tail from the stopped art-notes run, previews in
+  `scratchpad\artnotes\critters\d0`); the Oakhaven tour now shoots `oakhaven-98-critters-lineup` and `-cats`. HuntTests and
+  VillageHomeTests 14/14.
+- **Open notes:** 9 (bloom and sun), 10 (baked cave lighting), 11 (real icons), 12 (smooth characters, "build them in code"),
+  13 (high-fantasy colour), 14 (the PDF: draft committed, not checked). The stopped run's previews for 9, 10, 11 and 13 are in
+  `scratchpad\artnotes\{sun,caves,icons,colour}` (no code in their worktrees). Ask Chris which next; work solo.

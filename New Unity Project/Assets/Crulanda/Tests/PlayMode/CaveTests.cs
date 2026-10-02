@@ -18,7 +18,9 @@ namespace Crulanda.Tests
     /// - walkable from the village green to the King's hall, through the mouth, not over the knoll;
     /// - walled and roofed all the way in, with nothing solid standing in the passage;
     /// - dark and dry inside, lit and rained on outside;
-    /// - nothing grows in it, and the deserters hold it: the lookouts at the mouth, the rest inside, Caddock in the hall.
+    /// - nothing grows in it, and the deserters hold it: the lookouts at the mouth, the rest inside, Caddock in the hall;
+    /// - it lies 250 to 300 m from the green, inside the zone's edge, its mouth turned from the village and hidden by its hill
+    ///   until the track's last bend (playtest note 1).
     /// </summary>
     public class CaveTests
     {
@@ -135,6 +137,33 @@ namespace Crulanda.Tests
             for (int i = 0; i < h.Centre.Count; i++)
                 if (Mathf.Abs(Mathf.Abs(h.Centre[i].z) - (zone.Half - 1)) < 1.2f || Mathf.Abs(Mathf.Abs(h.Centre[i].x) - (zone.Half - 1)) < 1.2f)
                     Assert.Less(h.Roof(i), -1, "Under the boundary at " + h.Centre[i]);
+            yield return null;
+        }
+        [UnityTest] public IEnumerator The_hollow_lies_out_in_the_north_hills_with_its_back_to_the_village()
+        {
+            // Playtest note 1: the mouth stood 100 m from the green, 25 m past the Woodyard. It is 250 to 300 m out now, inside the
+            // zone's edge all the way down, and turned from the village: from the green, from the North road's end and from the
+            // first of the Crowsfoot track the hill stands between you and it. You see it from the track's last bend.
+            var h = Crowsfoot; var zone = ZoneBuilder.Active; var z = zone.Zone;
+            var mouth = new Vector2(h.Centre[0].x, h.Centre[0].z); var green = z.spawns.recovery;
+            Assert.That(Vector2.Distance(mouth, green), Is.InRange(250f, 300f), "The mouth, from the green.");
+            var outward = h.At(0) - h.At(3); var facing = new Vector2(outward.x, outward.z).normalized;
+            Assert.Less(Vector2.Dot(facing, (green - mouth).normalized), 0, "The mouth faces away from the village.");
+            for (int i = 0; i < h.Centre.Count; i++)
+                Assert.Less(Mathf.Max(Mathf.Abs(h.Centre[i].x), Mathf.Abs(h.Centre[i].z)) + h.Half[i] * 1.2f, zone.Half - 10, "The passage is inside the zone's edge at " + h.Centre[i]);
+            var north = Array.Find(z.roads, r => r.name == "North road"); var track = Array.Find(z.roads, r => r.name == "Crowsfoot track");
+            Assert.IsNotNull(north, "The North road."); Assert.IsNotNull(track, "The Crowsfoot track.");
+            // How far the land stands over the straight line from a standing eye to a man's height in the mouth.
+            float Hidden(Vector2 from)
+            {
+                float eye = zone.HeightAt(from.x, from.y) + 1.7f, mark = h.Centre[0].y + 1.5f, over = float.MinValue, d = Vector2.Distance(from, mouth);
+                for (float s = 2; s < d - 2; s += 1) { var p = Vector2.Lerp(from, mouth, s / d); over = Mathf.Max(over, zone.HeightAt(p.x, p.y) - Mathf.Lerp(eye, mark, s / d)); }
+                return over;
+            }
+            Assert.Greater(Hidden(green), 3, "From the green the hill hides the mouth.");
+            Assert.Greater(Hidden(north.points[north.points.Length - 1]), 3, "From the North road's end the hill hides the mouth.");
+            Assert.Greater(Hidden(track.points[1]), 3, "From the first of the track the hill hides the mouth.");
+            Assert.Less(Hidden(track.points[track.points.Length - 3]), 1, "From the track's last bend you see it.");
             yield return null;
         }
 

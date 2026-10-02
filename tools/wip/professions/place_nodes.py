@@ -487,7 +487,7 @@ def khaven(z):
         ore_at_cliff(z, 'North ridge', 0, -5.5, O, 'north ridge'),
         N(W, -14, 42, 'N pines S1'), N(W, 24, 42, 'N pines S2'), N(W, 58, 64, 'ridge W', 90), N(W, 80, 48, 'ridge S'),
         N(W, 130, 46, 'ridge-east E', 90), N(W, 112, 104, 'ridge-north S'), N(W, -66, 138, 'bound-wall S'), N(W, -86, 150, 'bound-wall W', 90),
-        N(H, -14, -104, 'graves W', item='item.mourners_cap'), N(H, 10, -114, 'graves S', item='item.mourners_cap'), N(H, 26, -112, 'graves E', item='item.mourners_cap'),
+        N(H, -3.5, -177.3, 'graves W', item='item.mourners_cap'), N(H, 20.5, -187.3, 'graves S', item='item.mourners_cap'), N(H, 36.5, -185.3, 'graves E', item='item.mourners_cap'),   # round the drowned graveyard (moved out with it, 2026-10-02)
     ]
 CANDIDATES['khaven'] = khaven
 

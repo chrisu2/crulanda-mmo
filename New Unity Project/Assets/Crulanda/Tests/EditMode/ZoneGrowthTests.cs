@@ -68,11 +68,7 @@ namespace Crulanda.Tests
                 { "Store Caves", "down the cave, under the ridge" }, { "The Quartermaster's desk", "down the cave, under the ridge" },
                 { "Deep Stair watch", "down the cave, under the ridge" }, { "King's guard", "down the cave, under the ridge" },
                 { "Caddock's hall", "down the cave, under the ridge" } } },
-            { "khaven", new Dictionary<string, string> {
-                { "Whispering Wood wolves", "open: the wood is a built place 80 m from the inn" }, { "Carrion boars", "open: under the Carrion Cliffs, 81 m" },
-                { "Sandthrone outrider camp", "open: Khaven is walled and Sandthrone-held; their camp is 73 m from its houses" },
-                { "Gloom Creek hollows", "open: the creek's hollows, 73 m" }, { "The Grey Sexton", "open: the drowned graveyard, 83 m" },
-                { "Sandthrone picket", "open: 116 m" } } },
+            { "khaven", new Dictionary<string, string>() },   // grown to 410 m: every camp 125 m and more from its houses (2026-10-02)
             { "peaks", new Dictionary<string, string> {
                 { "Toll-gate guards", "open: the Sandthrone's toll-gate, 70 m from Pilgrims' Rest (no village here)" }, { "Wolf pines pack", "open: 74 m from Pilgrims' Rest" },
                 { "Rockhide wallow", "open: 94 m from Pilgrims' Rest" }, { "Captain's eyrie", "open: the Sandthrone's own keep, 117 m from Pilgrims' Rest" } } },

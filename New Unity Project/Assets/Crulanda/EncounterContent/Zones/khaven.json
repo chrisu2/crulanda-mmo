@@ -4,7 +4,7 @@
   "subtitle": "A walled village of gallows and crypts beside the Whispering Wood",
   "canonStatus": "CANON-EXPANDED",
   "canonNote": "Canon (Khaven Village map): walled village with the Cracked Hearth, two Fallen Smithies, the Blood-Stone Well, the Gallows Tree and the Crypt-Keeper's Hovel; the Whispering Wood to the west, Gloom Creek, and the Carrion Cliffs. GAME-ONLY / PROVISIONAL: the Sandthrone outriders holding it, the Pale watcher at the crypt, the crypt itself, road links to Oakhaven and all exact placement. Also GAME-ONLY: the wilderness beyond the walls (the deep Whispering Wood, the north road to the Peaks, the drowned graveyard and creek barrow), the levelling camps, and the residents Wenna Coyle, Ansel Morrow and Cato Brisk. Hollow Men are a CANON creature (book1 ch.4); their presence here is GAME-ONLY. The 340 m growth (2026-09-30) adds, all GAME-ONLY in placement and story: the Hush and the Listener's Hut deeper in the Whispering Wood (the Listener is a Silent Pilgrim; the Silent Pilgrims are CANON), the corpse road with its coffin stones and bridge, the gibbet crossroads on the Gloom road, the plague pit, the drowned fields, the Carrion Heights and the Charnel Barrow above the Carrion Cliffs (the cliffs are CANON), the Old Bound Wall and the Fallen Watch on the north road, and the Pale Reckoner (the Pale Things are CANON).",
-  "size": 340,
+  "size": 410,
   "levelMin": 3,
   "levelMax": 5,
   "biome": "gloom",
@@ -116,7 +116,7 @@
       "name": "Gloom road to Oakhaven",
       "at": {
         "x": -96.5,
-        "y": -162
+        "y": -197
       },
       "arrive": {
         "x": -263,
@@ -129,7 +129,7 @@
       "name": "North road to the Shattered Peaks",
       "at": {
         "x": -11,
-        "y": 163
+        "y": 198
       },
       "arrive": {
         "x": -88,
@@ -166,16 +166,16 @@
     {
       "name": "Outrider camp",
       "center": {
-        "x": 30,
-        "y": 90
+        "x": 95.5,
+        "y": 125.98
       },
       "radius": 7
     },
     {
       "name": "Drowned graveyard",
       "center": {
-        "x": 6,
-        "y": -96
+        "x": 16.47,
+        "y": -169.26
       },
       "radius": 6
     },
@@ -214,8 +214,8 @@
     {
       "name": "Picket ground",
       "center": {
-        "x": 39,
-        "y": 134
+        "x": 42.01,
+        "y": 143.54
       },
       "radius": 6
     }
@@ -343,7 +343,7 @@
         },
         {
           "x": -100,
-          "y": -168
+          "y": -203
         }
       ]
     },
@@ -467,7 +467,7 @@
         },
         {
           "x": -10.2,
-          "y": 170
+          "y": 205
         }
       ]
     },
@@ -728,6 +728,10 @@
       "width": 4,
       "points": [
         {
+          "x": -205.5,
+          "y": -14
+        },
+        {
           "x": -170.5,
           "y": -14
         },
@@ -786,16 +790,22 @@
         {
           "x": 172,
           "y": -98
+        },
+        {
+          "x": 207,
+          "y": -98
         }
-      ]
+      ],
+      "swingFrom": 1,
+      "swingAlong": -1.05
     }
   ],
   "lakes": [
     {
       "name": "Drowned graves",
       "center": {
-        "x": 4,
-        "y": -99
+        "x": 14.47,
+        "y": -172.26
       },
       "radius": 5.5,
       "depth": 0.85
@@ -863,8 +873,8 @@
       "name": "Deep Whispering Wood",
       "kind": "dead",
       "center": {
-        "x": -88,
-        "y": 36
+        "x": -130.83,
+        "y": 52.78
       },
       "size": {
         "x": 36,
@@ -1189,8 +1199,8 @@
       "name": "Deep Whispering Wood",
       "text": "Past the walls the grey trunks crowd close enough to touch.",
       "at": {
-        "x": -88,
-        "y": 36
+        "x": -130.83,
+        "y": 52.78
       },
       "radius": 18
     },
@@ -1207,13 +1217,13 @@
       "name": "Drowned graveyard",
       "text": "When the creek floods, it takes the low graves.",
       "at": {
-        "x": 5,
-        "y": -99
+        "x": 15.47,
+        "y": -172.26
       },
       "radius": 10,
       "view": {
-        "x": 17,
-        "y": -97
+        "x": 27.47,
+        "y": -170.26
       },
       "viewPitch": 28
     },
@@ -1221,13 +1231,13 @@
       "name": "Creek barrow",
       "text": "Old Hobb Garner asked to be buried with his spade.",
       "at": {
-        "x": 44,
-        "y": -100
+        "x": 54.47,
+        "y": -173.26
       },
       "radius": 8,
       "view": {
-        "x": 48,
-        "y": -90
+        "x": 58.47,
+        "y": -163.26
       },
       "viewPitch": 18,
       "viewZoom": 10
@@ -1236,8 +1246,8 @@
       "name": "Outrider camp",
       "text": "Sandthrone tents of a sort, and everything they 'tolled' off Khaven.",
       "at": {
-        "x": 30,
-        "y": 90
+        "x": 95.5,
+        "y": 125.98
       },
       "radius": 10
     },
@@ -1315,8 +1325,8 @@
       "name": "The Fallen Watch",
       "text": "The north watch-tower came down in a gale. The Sandthrone like what is left of it for a windbreak.",
       "at": {
-        "x": 42,
-        "y": 138
+        "x": 45.01,
+        "y": 147.54
       },
       "radius": 8,
       "canonStatus": "GAME-ONLY: the tower. The Sandthrone are a CANON mercenary company; their picket here is GAME-ONLY."
@@ -1848,8 +1858,8 @@
       "kind": "crates",
       "name": "Stolen goods crate",
       "at": {
-        "x": 22,
-        "y": 97
+        "x": 87.5,
+        "y": 132.98
       },
       "rotation": 15,
       "variant": 2,
@@ -1861,8 +1871,8 @@
       "kind": "crates",
       "name": "Stolen goods crate",
       "at": {
-        "x": 39,
-        "y": 84
+        "x": 104.5,
+        "y": 119.98
       },
       "rotation": 70,
       "variant": 1,
@@ -1874,8 +1884,8 @@
       "kind": "crates",
       "name": "Stolen goods crate",
       "at": {
-        "x": 24,
-        "y": 82
+        "x": 89.5,
+        "y": 117.98
       },
       "rotation": 40,
       "variant": 0,
@@ -1887,24 +1897,24 @@
       "kind": "cart",
       "name": "Outrider cart",
       "at": {
-        "x": 40,
-        "y": 96
+        "x": 105.5,
+        "y": 131.98
       },
       "rotation": 30
     },
     {
       "kind": "barrels",
       "at": {
-        "x": 20,
-        "y": 89
+        "x": 85.5,
+        "y": 124.98
       },
       "variant": 2
     },
     {
       "kind": "lamp",
       "at": {
-        "x": 31,
-        "y": 94
+        "x": 96.5,
+        "y": 129.98
       },
       "rotation": 200,
       "variant": 1
@@ -1912,8 +1922,8 @@
     {
       "kind": "grave",
       "at": {
-        "x": 1,
-        "y": -97
+        "x": 11.47,
+        "y": -170.26
       },
       "rotation": 20,
       "variant": 1
@@ -1921,8 +1931,8 @@
     {
       "kind": "grave",
       "at": {
-        "x": 0.5,
-        "y": -100.5
+        "x": 10.97,
+        "y": -173.76
       },
       "rotation": -35,
       "variant": 1
@@ -1930,8 +1940,8 @@
     {
       "kind": "grave",
       "at": {
-        "x": 7,
-        "y": -96
+        "x": 17.47,
+        "y": -169.26
       },
       "rotation": 70,
       "variant": 1
@@ -1939,15 +1949,15 @@
     {
       "kind": "grave",
       "at": {
-        "x": 11,
-        "y": -97
+        "x": 21.47,
+        "y": -170.26
       }
     },
     {
       "kind": "grave",
       "at": {
-        "x": 6,
-        "y": -103.5
+        "x": 16.47,
+        "y": -176.76
       },
       "rotation": 150,
       "variant": 1
@@ -1955,8 +1965,8 @@
     {
       "kind": "grave",
       "at": {
-        "x": 9,
-        "y": -103
+        "x": 19.47,
+        "y": -176.26
       },
       "rotation": -60,
       "variant": 1
@@ -1965,8 +1975,8 @@
       "kind": "ruin",
       "name": "Drowned chapel wall",
       "at": {
-        "x": 16,
-        "y": -104
+        "x": 26.47,
+        "y": -177.26
       },
       "rotation": 10,
       "size": {
@@ -1978,8 +1988,8 @@
       "kind": "crypt",
       "name": "Creek barrow",
       "at": {
-        "x": 44,
-        "y": -100
+        "x": 54.47,
+        "y": -173.26
       },
       "rotation": 160,
       "variant": 1
@@ -2519,8 +2529,8 @@
     {
       "kind": "ruin",
       "at": {
-        "x": 24.5,
-        "y": 134.4
+        "x": 27.51,
+        "y": 143.94
       },
       "rotation": 3,
       "size": {
@@ -2531,8 +2541,8 @@
       "kind": "ruin",
       "name": "The Fallen Watch",
       "at": {
-        "x": 42,
-        "y": 140.6
+        "x": 45.01,
+        "y": 150.14
       },
       "rotation": 0,
       "size": {
@@ -2542,8 +2552,8 @@
     {
       "kind": "ruin",
       "at": {
-        "x": 39.4,
-        "y": 138
+        "x": 42.41,
+        "y": 147.54
       },
       "rotation": 90,
       "size": {
@@ -2553,8 +2563,8 @@
     {
       "kind": "ruin",
       "at": {
-        "x": 44.6,
-        "y": 138
+        "x": 47.61,
+        "y": 147.54
       },
       "rotation": 90,
       "size": {
@@ -2586,16 +2596,16 @@
     {
       "kind": "rock",
       "at": {
-        "x": 47.5,
-        "y": 141.5
+        "x": 50.51,
+        "y": 151.04
       },
       "variant": 1
     },
     {
       "kind": "rock",
       "at": {
-        "x": 36.5,
-        "y": 142.5
+        "x": 39.51,
+        "y": 152.04
       },
       "variant": 0
     },
@@ -2603,15 +2613,15 @@
       "kind": "brazier",
       "name": "Picket brazier",
       "at": {
-        "x": 35.8,
-        "y": 131.2
+        "x": 38.81,
+        "y": 140.74
       }
     },
     {
       "kind": "crates",
       "at": {
-        "x": 45.5,
-        "y": 131.6
+        "x": 48.51,
+        "y": 141.14
       },
       "rotation": 20,
       "variant": 1
@@ -2619,8 +2629,8 @@
     {
       "kind": "barrels",
       "at": {
-        "x": 33.4,
-        "y": 137.2
+        "x": 36.41,
+        "y": 146.74
       },
       "variant": 1
     },
@@ -3091,8 +3101,8 @@
       "look": "wolf",
       "canonStatus": "GAME-ONLY",
       "center": {
-        "x": -86,
-        "y": 44
+        "x": -128.83,
+        "y": 60.78
       },
       "radius": 10,
       "count": 5,
@@ -3107,8 +3117,8 @@
       "look": "boar",
       "canonStatus": "GAME-ONLY",
       "center": {
-        "x": 86,
-        "y": -44
+        "x": 118.75,
+        "y": -80.81
       },
       "radius": 10,
       "count": 4,
@@ -3124,8 +3134,8 @@
       "look": "outrider",
       "canonStatus": "CANON faction (Sandthrone), GAME-ONLY camp",
       "center": {
-        "x": 30,
-        "y": 90
+        "x": 95.5,
+        "y": 125.98
       },
       "radius": 10,
       "count": 4,
@@ -3140,8 +3150,8 @@
       "look": "hollow",
       "canonStatus": "CANON creature (Hollow Men, book1 ch.4), GAME-ONLY placement",
       "center": {
-        "x": 6,
-        "y": -90
+        "x": 16.47,
+        "y": -163.26
       },
       "radius": 10,
       "count": 4,
@@ -3156,8 +3166,8 @@
       "look": "hollow",
       "canonStatus": "CANON creature (Hollow Man), GAME-ONLY character",
       "center": {
-        "x": 38,
-        "y": -92
+        "x": 48.47,
+        "y": -165.26
       },
       "radius": 5,
       "count": 1,
@@ -3205,8 +3215,8 @@
       "look": "outrider",
       "canonStatus": "CANON faction (Sandthrone), GAME-ONLY camp",
       "center": {
-        "x": 38,
-        "y": 133
+        "x": 41.01,
+        "y": 142.54
       },
       "radius": 9,
       "count": 4,
@@ -3403,8 +3413,8 @@
     {
       "name": "Watch knoll",
       "center": {
-        "x": 41,
-        "y": 136
+        "x": 44.01,
+        "y": 145.54
       },
       "radius": 5,
       "height": 2,
@@ -3507,8 +3517,8 @@
       "kind": "note",
       "prompt": "Tease the page out of the wall",
       "at": {
-        "x": 16.274,
-        "y": -104.46
+        "x": 26.74,
+        "y": -177.72
       },
       "rotation": 10,
       "height": 0.5,
@@ -3597,11 +3607,8 @@
     { "node": "node.blackpine", "at": { "x": 112, "y": 104 } },
     { "node": "node.blackpine", "at": { "x": -66, "y": 138 } },
     { "node": "node.blackpine", "at": { "x": -86, "y": 150 }, "rotation": 90 },
-    { "node": "node.mourners_cap", "item": "item.mourners_cap", "at": { "x": -14, "y": -104 } },
-    { "node": "node.mourners_cap", "item": "item.mourners_cap", "at": { "x": 10, "y": -114 } },
-    { "node": "node.mourners_cap", "item": "item.mourners_cap", "at": { "x": 26, "y": -112 } }
-  ],
-  "stations": [
-    { "kind": "bench", "name": "Wenna Coyle's bench", "at": { "x": -17, "y": -12 }, "rotation": 90, "canonStatus": "GAME-ONLY" }
+    { "node": "node.mourners_cap", "item": "item.mourners_cap", "at": { "x": -3.5, "y": -177.3 } },
+    { "node": "node.mourners_cap", "item": "item.mourners_cap", "at": { "x": 20.5, "y": -187.3 } },
+    { "node": "node.mourners_cap", "item": "item.mourners_cap", "at": { "x": 36.5, "y": -185.3 } }
   ]
 }

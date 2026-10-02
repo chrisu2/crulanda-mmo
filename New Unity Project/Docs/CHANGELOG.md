@@ -890,3 +890,12 @@ A read-only review by five reviewers, each finding checked by a second who tried
 - Tests: EditMode 367/369 in the full run, then 372/372 with three new tests; PlayMode 169/173, the four failures fixed (one
   was the stations, one the rabbit, two the data) and their fixtures 10/10; the four zones toured, the Ash Rim again after
   the Fraying moved.
+
+## 2026-10-02 afternoon — Felled lumber trees, joined limbs, less green ore (playtest notes 6, 15 and 5)
+- **Lumber trees look chopped down** (Chris: "need to look chopped down"): an axe-cut stump with a pale face and darker
+  heartwood, the axe's chips round it; the trunk limbed (short stubs with pale cuts, nothing poking up) and cut in two, each
+  cut end pale; the lopped branches heaped low beside it. Chopping takes the logs; the stump, chips and branches stay.
+- **Limbs meet their trees** (Chris: "a few trees are disjointed in the limb area"): the Verdant giants' branches stood up to
+  a metre above their great limbs, and the dead trees' twigs floated off theirs; every branch now grows out of its limb.
+- **Less green in the ore:** copper shows a hint of dull patina on one vein in three; the seam reads ore-red.
+- Tests: EditMode 372/372, PlayMode 174/174 (a new test checks every limb in all five zones); all five zones toured.

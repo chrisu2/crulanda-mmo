@@ -3,7 +3,7 @@
   "displayName": "Oakhaven",
   "subtitle": "An eastern farming village at the edge of the Wasting",
   "canonStatus": "CANON-EXPANDED",
-  "canonNote": "Canon: Oakhaven is an eastern agricultural hub erased by an accelerated, localized Wasting event that hid the Council's abduction of resonance candidates (interactive map; Oakhaven village map). This zone shows it on the eve of that erasure. Layout follows the canon village map. The Concord collectors, Mira and exact building placement are GAME-ONLY / PROVISIONAL. The wolf and boar camps and the south road to the Ashland Rim are GAME-ONLY. Crowsfoot Hollow (the cave past the end of the North road, in the west heel of Crowsfoot Ridge, running deep under the northern hills), its Sandthrone deserters, Quartermaster Hesk and Caddock, the Bandit King are GAME-ONLY; the Sandthrone company is CANON. The second growth (2026-10-01, 380 to 560 m, playtest note 1): the hollow and Crowsfoot Ridge moved out to the north hills, and Carder's field barn, Greyback Shaw, the Carter's Rest, Lark Hill, Sallow Bottom and the Bound wood are GAME-ONLY places. The outer farmland (2026-09-30 growth): Crowsfoot Ridge over the hollow, the Overlook, the Mastwood and Moss's lodge, the Old Fold and Old Whitefoot, the Bound Stone, the Cider Barn, Withy pool, the Old Barrow, Hollin farm, the Hallow's Creek milestone and the Watchtower are GAME-ONLY places; the hill overlooking the valley, Oakhaven's cider and its deep springs (book1 ch.4), the First Kin (sworn by in book1 ch.4) and Hallow's Creek, the first settlement the Wasting took (world_bible.md), are CANON.",
+  "canonNote": "Canon: Oakhaven is an eastern agricultural hub erased by an accelerated, localized Wasting event that hid the Council's abduction of resonance candidates (interactive map; Oakhaven village map). This zone shows it on the eve of that erasure. Layout follows the canon village map. The Concord collectors, Mira and exact building placement are GAME-ONLY / PROVISIONAL. The wolf and boar camps and the south road to the Ashland Rim are GAME-ONLY. Crowsfoot Hollow (the cave past the end of the North road, in the west heel of Crowsfoot Ridge, running deep under the northern hills), its Sandthrone deserters, Quartermaster Hesk and Caddock, the Bandit King are GAME-ONLY; the Sandthrone company is CANON. The second growth (2026-10-01, 380 to 560 m, playtest note 1): the hollow and Crowsfoot Ridge moved out to the north hills, and Carder's field barn, Thornshaw, the Carter's Rest, Lark Hill, Sallow Bottom and the Bound wood are GAME-ONLY places. The outer farmland (2026-09-30 growth): Crowsfoot Ridge over the hollow, the Overlook, the Mastwood and Moss's lodge, the Old Fold and Old Whitefoot, the Bound Stone, the Cider Barn, Withy pool, the Old Barrow, Hollin farm, the Hallow's Creek milestone and the Watchtower are GAME-ONLY places; the hill overlooking the valley, Oakhaven's cider and its deep springs (book1 ch.4), the First Kin (sworn by in book1 ch.4) and Hallow's Creek, the first settlement the Wasting took (world_bible.md), are CANON.",
   "size": 560,
   "levelMin": 1,
   "levelMax": 2,
@@ -1409,8 +1409,8 @@
       "canonStatus": "GAME-ONLY"
     },
     {
-      "name": "Greyback Shaw",
-      "text": "Oak and thorn too thick to plough. The grey-backed wolves lie up in it by day, and the north farms count their lambs twice.",
+      "name": "Thornshaw",
+      "text": "Oak and thorn too thick to plough. The wolves lie up in it by day, and the north farms count their lambs twice.",
       "at": {
         "x": 92,
         "y": 196
@@ -3359,7 +3359,7 @@
         "x": -232,
         "y": -206
       },
-      "rotation": 0,
+      "rotation": 225,
       "size": {
         "x": 3,
         "y": 0
@@ -3836,7 +3836,7 @@
       "count": 16
     },
     {
-      "name": "Greyback Shaw",
+      "name": "Thornshaw",
       "kind": "broadleaf",
       "center": {
         "x": 92,
@@ -4586,7 +4586,7 @@
       "respawn": 75
     },
     {
-      "name": "Greyback Shaw wolves",
+      "name": "Thornshaw wolves",
       "mob": "Grey wolf",
       "tag": "wolf",
       "look": "wolf",
@@ -5428,7 +5428,7 @@
       "rotation": 40,
       "text": "From the stones on the crown the whole south-west lies open: the West road a pale thread to the bound, Withy pool like a dropped coin, the Great Oak a green smudge over the roofs. Westward the sky is the colour of a bruise, and stays that colour.",
       "xp": 35,
-      "canonStatus": "GAME-ONLY place. Khaven lying west of Oakhaven under a dusk that does not lift is CANON-EXPANDED (the Khaven village map; the permanent dusk is the game's reading)."
+      "canonStatus": "GAME-ONLY: the hill and the view. Khaven Village is CANON (khaven_village_map.png); that it lies up the West road from Oakhaven, under a dusk that holds all day, is the game's."
     },
     {
       "id": "secret.oakhaven.carters-stash",

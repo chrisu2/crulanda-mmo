@@ -276,7 +276,7 @@ the coin goes to her family. Design: `tools/wip/professions/ADDENDUM.md` D. All 
 
 All four are offered together (a bag already worn or carried leaves its quest off her list), and all four bags can be bought from
 her outright. Where the leathers come from (WORLD_ZONES.md, Hunting):
-- Wolves for the wallet: the Upper pines (44,168) and Greyback Shaw (92,194) camps up the North road, levels 1-2, pelt chance
+- Wolves for the wallet: the Upper pines (44,168) and Thornshaw (92,194) camps up the North road, levels 1-2, pelt chance
   0.7 (they were the Harrow wood's and the North pines' until every camp moved 120 m and more from the houses, playtest note 1);
   the Hazel bank, the Bound wood, Hollin farm and Whitefoot's pack give pelts too.
 - Hill deer for the sling: game, west of the Old Orchard (-96,88), by the North pines (30,98), in the Upper pines (40,152), under

@@ -65,10 +65,10 @@ note 1 says what the lead must run).
   the inn or the mill; `ZoneGrowthTests`): every wolf and boar camp moved out into the ring, and three were added (table
   under "Level ladder and camps"). The Concord collectors in the village are story enemies and stay.
 - **New ground** (GAME-ONLY, canonStatus on each): **Carder's field barn** (the last roof on the North road; the deserters
-  had it three nights running), **Greyback Shaw** (the north-east wolf wood), **the Carter's Rest** on the West road (an
+  had it three nights running), **Thornshaw** (the north-east wolf wood), **the Carter's Rest** on the West road (an
   oak, a wayside shrine, room to turn a wain), **Lark Hill** in the south-west (a bare down with a ring of stones), **Sallow
-  Bottom** in the south-east (a wet hollow, a wallow, boars) and **the Bound wood** by the west bound; ten woods (Greyback
-  Shaw, the Ridge pines on the ridge's south face, Hill pines, the Pale wood by the grey, Alder holt, the Sallows, Ashward
+  Bottom** in the south-east (a wet hollow, a wallow, boars) and **the Bound wood** by the west bound; ten woods (Thornshaw,
+  the Ridge pines on the ridge's south face, Hill pines, the Pale wood by the grey, Alder holt, the Sallows, Ashward
   pines, the Bound wood, Lark hill thorns, the Hanger), three fields, three patches of tall grass, seven critter groups,
   three secrets (below, "Secrets"), loose rocks and lone trees. Three hill shapes beside the moved ridge (an east shoulder, a
   west knee and the North downs, 6 to 8.5 m) make the north read as hill country, and put the mouth in a fold between two hills. The hill the Overlook stands on stays where it was, a hill of
@@ -118,8 +118,8 @@ Barrow (CANON-EXPANDED: the First Kin), Hollin farm, the Hallow's Creek mileston
 settlement the Wasting took, world_bible.md) and the Watchtower on the east road. Each carries its `canonStatus` in the data.
 Grown to 560 m (2026-10-01, playtest note 1; "Zone size" above): Crowsfoot Ridge and the hollow under it now stand along the
 north edge, 270 m from the green; Old Whitefoot's den is out on the north-west downs at (-222, 120), the Bound Stone at the new
-west bound and Hollin farm and the milestone by the grey, 90 m further east. New, all GAME-ONLY: Carder's field barn, Greyback
-Shaw, the Carter's Rest, Lark Hill, Sallow Bottom and the Bound wood. The lay of the land from the green outward: farms and
+west bound and Hollin farm and the milestone by the grey, 90 m further east. New, all GAME-ONLY: Carder's field barn, Thornshaw
+, the Carter's Rest, Lark Hill, Sallow Bottom and the Bound wood. The lay of the land from the green outward: farms and
 fields, then wolf and boar country, then (north) the hills.
 The trades' buildings (GAME-ONLY, 2026-10-01; `tools/wip/professions/BUILD_PLAN.md` step 1): the ten village houses carry
 names, so a door reads "Knock · Tanner house" (Reed, Farrow, Crane, the Elder's, Rusk, Jory's, Vell, Pell, Thorne, Tanner); two
@@ -138,8 +138,8 @@ Trades in Oakhaven (GAME-ONLY, 2026-10-01; BUILD_PLAN step 4; tier 1, every node
   script's margins. Mining needs a
   pick (merchants, the smith).
 - **Timber** (Harrow oak windfalls): at the edges of the broadleaf woods, the stump on the wood's side: three near the village
-  (the Grey-edge copse, the Harrow wood's east edge, the South copse) and five out in the wolf and boar country (Greyback
-  Shaw, the Southwood, the Mastwood, the Brook spinney and the Bound wood). Woodcutting needs a hatchet.
+  (the Grey-edge copse, the Harrow wood's east edge, the South copse) and five out in the wolf and boar country (Thornshaw,
+  the Southwood, the Mastwood, the Brook spinney and the Bound wood). Woodcutting needs a hatchet.
 - **Herbs** (yarrow): the eight Yarrow props on the meadows (still the quest's yarrow while Lisbet's quest wants it) and two more,
   on the Harrow downs west of the farm and on the meadow north of Brook pond. Bare hands.
 - Selling ore or timber in the village is the forge's delivery for the day, herbs the stall's: Brannoc Vell talks of the
@@ -372,7 +372,7 @@ mood. How it was made: a first draft was pre-checked by agents who ported the ge
 - Mobs that can't reach you for 4 s give up the chase and reset.
 - **Oakhaven's camps stand 125 m and more from every house** (the rule is 120 m: a house, the inn, the mill; playtest note 1,
   `ZoneGrowthTests`). Where they are since the 560 m growth, clockwise from the north: Upper pines wolves (44, 168; they were
-  the Harrow wood's), Greyback Shaw wolves (92, 194; the North pines'), Brookside boars (166, -2), Hollin farm wolves
+  the Harrow wood's), Thornshaw wolves (92, 194; the North pines'), Brookside boars (166, -2), Hollin farm wolves
   (205, -40), Sallow Bottom boars (160, -214; new), the Tall-grass stalkers (-6, -214, with the tall grass's landmark),
   Southwood boars (-100, -186; the South copse's), Withy pool boars at their wallow (-174, -128), Bound wood wolves
   (-234, -36; new), Whitefoot's pack (-210, 104) and den (-222, 120), Mastwood boars (-132, 168), Hazel bank wolves
@@ -383,7 +383,7 @@ mood. How it was made: a first draft was pre-checked by agents who ported the ge
 
 | Zone | Camps (level) |
 |---|---|
-| Oakhaven 1-2 | Upper pines wolves (1-2), Southwood boars (1-2), Greyback Shaw wolves (2), Tall-grass stalkers (1-2, ambush), Brookside boars (2), Mastwood boars (1-2), Whitefoot's pack (2), Withy pool boars (2), Hollin farm wolves (2), Hazel bank wolves (2), Sallow Bottom boars (2), Bound wood wolves (1-2), Old Whitefoot (3, elite, harder); the Crowsfoot Hollow dungeon, all `harder`: Sandthrone deserters (3-5), Quartermaster Hesk (4, elite), Caddock, the Bandit King (5, elite) |
+| Oakhaven 1-2 | Upper pines wolves (1-2), Southwood boars (1-2), Thornshaw wolves (2), Tall-grass stalkers (1-2, ambush), Brookside boars (2), Mastwood boars (1-2), Whitefoot's pack (2), Withy pool boars (2), Hollin farm wolves (2), Hazel bank wolves (2), Sallow Bottom boars (2), Bound wood wolves (1-2), Old Whitefoot (3, elite, harder); the Crowsfoot Hollow dungeon, all `harder`: Sandthrone deserters (3-5), Quartermaster Hesk (4, elite), Caddock, the Bandit King (5, elite) |
 | Khaven 3-5 | Whispering Wood wolves (3-4), Carrion boars (3-4, ambush), Sandthrone outrider camp (4-5), Gloom Creek hollows (5), The Grey Sexton (5, elite), Hush wolves (4-5), Plague pit hollows (4-5), Sandthrone picket (5), Mire boars (4-5), The Pale Reckoner (7, elite, harder) |
 | Peaks 6-8 | Toll-gate guards (6-7), Wolf pines pack (6-7, ambush), Rockhide wallow (7), The High Ledge (8), Captain's eyrie (8, elite), Signal-tower pickets (6-7), Shieling wolves (6-7), Scar rockhides (7-8), Old Scree-Tusk (8, elite) |
 | Ash Rim 9-10 | Ash hound pack (9), Unwoven Flats eaters (9-10), Tear-marked shrine (9-10), Cinderfold hollows (10), The Weave-Eater brood (10, elite), Ash-pit cultists (9-10), The Ash-Deacon (10, elite), Fraying eaters (9-10), Orchard hounds (9-10) |

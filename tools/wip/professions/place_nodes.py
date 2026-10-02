@@ -467,7 +467,7 @@ def oakhaven(z):
         by_cave(-37.5, 88.2, 'scarp N far', 0), by_cave(-27.5, 88.4, 'scarp N near', 0), by_cave(.5, 89.4, 'scarp S near', 0), by_cave(7.6, 89.4, 'scarp S far', 0),
         N(O, 16.3, 91.5, 'north pines rock', 90), by_cave(-28, 135.5, 'ridge crown', 90),
         in_cave(-19, 111.3, 'low passage'), in_cave(-14, 150, 'store caves foot'), in_cave(-1.5, 156, 'deep stair'), in_cave(5, 159, 'deep stair foot'),
-        N(W, 53, -14, 'grey-edge copse', 180), N(W, -78.5, 104, 'harrow wood E'), N(W, 88, 175, 'greyback shaw S'), N(W, -101, -85, 'south copse', 270),
+        N(W, 53, -14, 'grey-edge copse', 180), N(W, -78.5, 104, 'harrow wood E'), N(W, 88, 175, 'thornshaw S'), N(W, -101, -85, 'south copse', 270),
         N(W, -80, -146, 'southwood N', 270), N(W, -100.5, 157, 'mastwood E'), N(W, 80, -145.5, 'brook spinney', 270), N(W, -213, -28, 'bound wood E', 90),
         N(H, -104, 30, 'harrow downs', item='item.yarrow'), N(H, 24, -72, 'brook meadow', item='item.yarrow'),
     ]

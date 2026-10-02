@@ -689,7 +689,7 @@
       "level": 1,
       "canonStatus": "GAME-ONLY",
       "unlessWorn": "bag.simples_wallet",
-      "summary": "Bring Maud Tanner three grey wolf pelts. Wolves run in the Upper pines and Greyback Shaw, up the North road past the last fields. She keeps shop by the South road, 9 to 12 and 2 to 6.",
+      "summary": "Bring Maud Tanner three grey wolf pelts. Wolves run in the Upper pines and Thornshaw, up the North road past the last fields. She keeps shop by the South road, 9 to 12 and 2 to 6.",
       "offer": "\"You've the look of someone who picks things up. Herbs, is it? They'll bruise to nothing loose in a pack.\"\n\n\"Bring me three wolf pelts, whole, not grey at the edges, and I'll cut you a wallet for them. No charge but the hides; what's left over is my profit, and the gods know I need one.\"",
       "progress": "\"Three, I said. The wolves won't skin themselves.\"",
       "complete": "Maud turns each pelt to the light and runs a thumb along the edge. \"These'll do. Sit. It's an hour's work if Nettie holds the lamp.\" The wallet she hands you smells of oak bark and smoke. \"The offcuts will buy the bread this week. So that's both of us better off.\"",

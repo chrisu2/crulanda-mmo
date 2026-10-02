@@ -48,7 +48,7 @@ hostile within about 120 m of a village's houses) in every zone.
   in a cliff, scarps either side, the brow over it, nothing floating or cut), `20-crowsfoot-ridge` (the ridge from the North
   road's end: a line of hills, no mouth to be seen, the Ridge pines on its face), `85-hollow-camp`, `88-hollow-drop`,
   `89-hollow-stores`, `86-hollow-hall` (the cave inside as it was: the furnishings re-roll, so look for anything standing in
-  a wall or in the way), `34-carders-field-barn`, `35-greyback-shaw`, `36-the-carters-rest`, `37-lark-hill`,
+  a wall or in the way), `34-carders-field-barn`, `35-thornshaw`, `36-the-carters-rest`, `37-lark-hill`,
   `38-sallow-bottom`, `39-the-bound-wood`, `40-exit` (the West road's waystone at the new edge), `05-the-wasting` and
   `87-secret-...`; `18-the-tall-grass`, `99-ambush-before` and `99-ambush-sprung` (the stalkers' new patch by the South road);
   every `80-node-NN` of the hollow's seams; and from the green, north: how the hills read on the skyline at 270 m through

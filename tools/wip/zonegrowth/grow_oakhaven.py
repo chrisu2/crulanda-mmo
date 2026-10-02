@@ -44,7 +44,7 @@ z['canonNote'] = z['canonNote'].replace(
     "Crowsfoot Hollow (the cave at the end of the North road, running deep under the northern hills)",
     "Crowsfoot Hollow (the cave past the end of the North road, in the west heel of Crowsfoot Ridge, running deep under the northern hills)").replace(
     "The outer farmland (2026-09-30 growth):",
-    "The second growth (2026-10-01, 380 to 560 m, playtest note 1): the hollow and Crowsfoot Ridge moved out to the north hills, and Carder's field barn, Greyback Shaw, the Carter's Rest, Lark Hill, Sallow Bottom and the Bound wood are GAME-ONLY places. The outer farmland (2026-09-30 growth):")
+    "The second growth (2026-10-01, 380 to 560 m, playtest note 1): the hollow and Crowsfoot Ridge moved out to the north hills, and Carder's field barn, Thornshaw, the Carter's Rest, Lark Hill, Sallow Bottom and the Bound wood are GAME-ONLY places. The outer farmland (2026-09-30 growth):")
 assert 'second growth' in z['canonNote'] and 'west heel' in z['canonNote']
 
 # ---- exits, roads, creek, the Wasting: out with the edge
@@ -127,7 +127,7 @@ def camp(name, x, y, newname=None):
     if newname: cp['name'] = newname
 camp('Harrow wood wolves', 44, 168, 'Upper pines wolves')
 camp('South copse boars', -100, -186, 'Southwood boars')
-camp('North pines wolves', 92, 194, 'Greyback Shaw wolves')
+camp('North pines wolves', 92, 194, 'Thornshaw wolves')
 camp('Tall-grass stalkers', -6, -214)
 camp('Brookside boars', 166, -2)
 camp('Mastwood boars', -132, 168)
@@ -156,7 +156,7 @@ z['fields'] += [
 ]
 z['clearings'] += [{'name': 'Field barn yard', 'center': P(0, 128), 'radius': 5}, {'name': "Carter's rest", 'center': P(-216, 20), 'radius': 5}]
 z['groves'] += [
-    {'name': 'Greyback Shaw', 'kind': 'broadleaf', 'center': P(92, 196), 'size': P(56, 36), 'count': 40},
+    {'name': 'Thornshaw', 'kind': 'broadleaf', 'center': P(92, 196), 'size': P(56, 36), 'count': 40},
     {'name': 'Ridge pines', 'kind': 'pine', 'center': P(-60, 201), 'size': P(60, 22), 'count': 30},
     {'name': 'Hill pines', 'kind': 'pine', 'center': P(20, 240), 'size': P(52, 30), 'count': 30},
     {'name': 'Pale wood', 'kind': 'dead', 'center': P(232, 208), 'size': P(22, 40), 'count': 16},
@@ -194,7 +194,7 @@ new_props = [
     {'kind': 'wayshrine', 'name': "Carter's shrine", 'at': P(-224, 22), 'rotation': 0},
     {'kind': 'rock', 'at': P(-227.5, 25), 'variant': 1},
     # Lark Hill in the south-west: thorn and stone on a bare down.
-    {'kind': 'perch', 'name': 'Lark hill stones', 'at': P(-232, -206), 'rotation': 0, 'size': P(3, 0)},
+    {'kind': 'perch', 'name': 'Lark hill stones', 'at': P(-232, -206), 'rotation': 225, 'size': P(3, 0)},   # the way up (the ring's gap, its -Z) faces north-east, the way you come
     {'kind': 'tree', 'name': 'Lark hill thorn', 'at': P(-225, -212), 'variant': 3, 'scale': 1.05},
     # Sallow Bottom in the south-east, where the ground never dries.
     {'kind': 'wallow', 'name': 'Sallow wallow', 'at': P(150, -208), 'size': P(4.5, 0)},
@@ -223,7 +223,7 @@ props[-6:-6] = new_props
 assert [q.get('name') for q in props[-6:]] == SIX and len(props) == 188 + len(new_props)
 lm += [
     {'name': "Carder's field barn", 'text': "Wil Carder's barn on the north fields, the last roof on the North road. The door hangs off one hinge and the seed-corn is gone.", 'at': P(8, 128), 'radius': 9, 'canonStatus': 'GAME-ONLY'},
-    {'name': 'Greyback Shaw', 'text': "Oak and thorn too thick to plough. The grey-backed wolves lie up in it by day, and the north farms count their lambs twice.", 'at': P(92, 196), 'radius': 16, 'canonStatus': 'GAME-ONLY'},
+    {'name': 'Thornshaw', 'text': "Oak and thorn too thick to plough. The wolves lie up in it by day, and the north farms count their lambs twice.", 'at': P(92, 196), 'radius': 16, 'canonStatus': 'GAME-ONLY'},
     {'name': "The Carter's Rest", 'text': "Half way to the bound: an oak, a shrine and room to turn a wain. Khaven's carters water their horses here and do not stay the night.", 'at': P(-218, 21), 'radius': 8, 'canonStatus': 'GAME-ONLY'},
     {'name': 'Lark Hill', 'text': "A bare down with a ring of stones on its crown. Larks go up from it all summer, and from the top you can see the road to both ends.", 'at': P(-232, -206), 'radius': 10, 'canonStatus': 'GAME-ONLY'},
     {'name': 'Sallow Bottom', 'text': "The ground never dries here. The Brook farm's pigs went wild in the sallows two winters back, and nobody has gone to fetch them.", 'at': P(160, -214), 'radius': 12, 'canonStatus': 'GAME-ONLY'},
@@ -232,7 +232,7 @@ lm += [
 z['secrets'] += [
     {'id': 'secret.oakhaven.long-view', 'name': 'The Long View', 'kind': 'vista', 'at': P(-232, -206), 'radius': 5, 'rotation': 40,
      'text': "From the stones on the crown the whole south-west lies open: the West road a pale thread to the bound, Withy pool like a dropped coin, the Great Oak a green smudge over the roofs. Westward the sky is the colour of a bruise, and stays that colour.",
-     'xp': 35, 'canonStatus': 'GAME-ONLY place. Khaven lying west of Oakhaven under a dusk that does not lift is CANON-EXPANDED (the Khaven village map; the permanent dusk is the game\'s reading).'},
+     'xp': 35, 'canonStatus': "GAME-ONLY: the hill and the view. Khaven Village is CANON (khaven_village_map.png); that it lies up the West road from Oakhaven, under a dusk that holds all day, is the game's."},
     {'id': 'secret.oakhaven.carters-stash', 'name': "The Carter's Stash", 'kind': 'cache', 'prompt': 'Reach in behind the shrine', 'at': P(-224, 23.3), 'rotation': 180,
      'text': "A tin pushed in behind the wayside shrine, where a carter could reach it from the box without getting down: a few coins against a broken axle, a heel of cheese gone hard, and a lucky acorn on a thong.",
      'item': 'food.harrow_cheese', 'xp': 25, 'gold': 6, 'canonStatus': 'GAME-ONLY'},

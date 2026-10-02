@@ -113,7 +113,7 @@ namespace Crulanda.Encounter
                 if (Loot != null)
                 {
                     var context = LootContext.From(corpse.persistentId, Zone != null ? Zone.Zone.camps : null, corpse.actor.Level, corpse.Elite);
-                    if (Armoury != null) Armoury.Killed(context);
+                    if (Armoury != null) { Armoury.Killed(context); armouryTallies = null; }
                     drops = Loot.Roll(context, Items, owned, GearFx.luck, Progress.lootLuck, rng, has);
                 }
                 else

@@ -16,7 +16,7 @@ namespace Crulanda.Encounter
         public ArmouryLog Armoury { get; private set; }
         /// <summary>Pieces that brought something new to the Armoury since its tab was last open (not saved).</summary>
         public int ArmouryUnseen { get; private set; }
-        float nextArmourySweep;
+        float nextArmourySweep, armouryTalliesAt; List<ArmouryLog.Tally> armouryTallies; EncounterProgress armouryTalliesOf;
         readonly List<string> newLooks = new List<string>(); readonly HashSet<string> armouryFresh = new HashSet<string>();
         void StartArmoury()
         {
@@ -37,7 +37,7 @@ namespace Crulanda.Encounter
             if (Armoury == null || Time.time < nextArmourySweep) return;
             nextArmourySweep = Time.time + .5f; newLooks.Clear(); armouryFresh.Clear();
             Armoury.Sweep();
-            ArmouryUnseen += armouryFresh.Count;
+            ArmouryUnseen += armouryFresh.Count; if (armouryFresh.Count > 0) armouryTallies = null;
             if (newLooks.Count == 1) ShowToast("NEW LOOK", ItemName(newLooks[0]));
             else if (newLooks.Count > 1) ShowToast(newLooks.Count + " NEW LOOKS", ItemName(newLooks[0]) + " and " + (newLooks.Count - 1) + " more");
         }
@@ -45,11 +45,13 @@ namespace Crulanda.Encounter
         public void SeenArmoury() { ArmouryUnseen = 0; }
         /// <summary>
         /// The quest book's Armoury tab: every zone, this one first and the rest by level, then the pieces that drop anywhere, each with
-        /// its named pieces (ArmouryLog.TallyOf). Without the named loot there is nothing to list.
+        /// its named pieces (ArmouryLog.TallyOf). Without the named loot there is nothing to list. The book asks for it on every GUI
+        /// event, so the list is kept for a quarter of a second (real time: the book may be open while the game is paused).
         /// </summary>
         public List<ArmouryLog.Tally> ArmouryTallies()
         {
-            var list = new List<ArmouryLog.Tally>();
+            if (armouryTallies != null && armouryTalliesOf == Progress && Time.unscaledTime - armouryTalliesAt < .25f) return armouryTallies;
+            var list = armouryTallies = new List<ArmouryLog.Tally>(); armouryTalliesAt = Time.unscaledTime; armouryTalliesOf = Progress;
             if (Armoury == null || Loot == null) return list;
             var zones = Zone != null ? Zone.AllZones().FindAll(z => z != null) : new List<Crulanda.World.ZoneDefinition>();
             string here = Zone != null ? Zone.Zone.id : null;

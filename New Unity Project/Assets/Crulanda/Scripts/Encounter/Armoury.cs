@@ -39,6 +39,8 @@ namespace Crulanda.Encounter
         readonly HashSet<string> found = new HashSet<string>(StringComparer.Ordinal), seenLooks = new HashSet<string>(StringComparer.Ordinal), swept = new HashSet<string>(StringComparer.Ordinal);
         /// <summary>For each named piece, the drop lists (naming a zone, camp or mob) whose kills make it known.</summary>
         readonly Dictionary<string, List<string>> revealedBy = new Dictionary<string, List<string>>(StringComparer.Ordinal);
+        /// <summary>Each named piece's group in the book (ZoneOf), worked out once.</summary>
+        readonly Dictionary<string, string> zoneOf = new Dictionary<string, string>(StringComparer.Ordinal);
 
         /// <param name="secrets">Every zone's hidden finds (optional): a find already found that holds a named piece counts that piece as found.</param>
         public ArmouryLog(EncounterProgress progress, ItemDatabase items, LootDatabase loot, GearLooks looks, IEnumerable<ZoneSecret> secrets = null)
@@ -192,7 +194,8 @@ namespace Crulanda.Encounter
             if (Loot == null) return t;
             foreach (var g in Loot.GearOrder)
             {
-                if (ZoneOf(g, Loot) != zone) continue;
+                if (!zoneOf.TryGetValue(g.id, out var z)) zoneOf[g.id] = z = ZoneOf(g, Loot);
+                if (z != zone) continue;
                 var e = EntryOf(g); t.entries.Add(e); if (e.state == State.Found) t.found++;
             }
             return t;

@@ -2570,5 +2570,35 @@
       "xp": 160,
       "canonStatus": "CANON-EXPANDED: the Silent Statues, faceless monoliths in the Wasting, are CANON (world_bible.md); last-light and this patch are GAME-ONLY."
     }
+  ],
+  "nodes": [
+    { "node": "node.cinder", "at": { "x": 77.5, "y": 38 }, "rotation": 90 },
+    { "node": "node.cinder", "at": { "x": 77.5, "y": -36 }, "rotation": 90 },
+    { "node": "node.cinder", "at": { "x": 79.6, "y": 69.2 }, "rotation": 80 },
+    { "node": "node.cinder", "at": { "x": 79.6, "y": -71.2 }, "rotation": 100 },
+    { "node": "node.cinder", "at": { "x": -58, "y": -116.5 } },
+    { "node": "node.cinder", "at": { "x": -42, "y": -116.5 } },
+    { "node": "node.cinder", "at": { "x": -114.5, "y": -22 }, "rotation": 90 },
+    { "node": "node.cinder", "at": { "x": -114.5, "y": -40 }, "rotation": 90 },
+    { "node": "node.cinder", "at": { "x": -86, "y": 107.5 } },
+    { "node": "node.cinder", "at": { "x": 86, "y": -128 } },
+    { "node": "node.snag", "at": { "x": -80, "y": -6 } },
+    { "node": "node.snag", "at": { "x": -67, "y": 99 } },
+    { "node": "node.snag", "at": { "x": 25, "y": 62 }, "rotation": 90 },
+    { "node": "node.snag", "at": { "x": 27, "y": -100 }, "rotation": 90 },
+    { "node": "node.snag", "at": { "x": -81, "y": -96 }, "rotation": 90 },
+    { "node": "node.snag", "at": { "x": -133, "y": -24 }, "rotation": 90 },
+    { "node": "node.snag", "at": { "x": 106, "y": 74 }, "rotation": 90 },
+    { "node": "node.snag", "at": { "x": -62, "y": 138 } },
+    { "node": "node.cinder_thistle", "at": { "x": -120, "y": -60 } },
+    { "node": "node.cinder_thistle", "at": { "x": -30, "y": -60 } },
+    { "node": "node.cinder_thistle", "at": { "x": 10, "y": -20 } },
+    { "node": "node.cinder_thistle", "at": { "x": -10, "y": 50 } },
+    { "node": "node.cinder_thistle", "at": { "x": -120, "y": 110 } },
+    { "node": "node.cinder_thistle", "at": { "x": 110, "y": -90 } },
+    { "node": "node.cinder_thistle", "at": { "x": 40, "y": -120 } },
+    { "node": "node.cinder_thistle", "at": { "x": -60, "y": 80 } },
+    { "node": "node.cinder_thistle", "at": { "x": 120, "y": 10 } },
+    { "node": "node.cinder_thistle", "at": { "x": -128, "y": 44 } }
   ]
 }

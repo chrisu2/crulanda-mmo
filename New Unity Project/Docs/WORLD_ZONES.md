@@ -88,6 +88,15 @@ GAME-ONLY / PROVISIONAL: the Sandthrone outriders holding it (Sandthrone is a ca
 Grown to 340 m (2026-09-30): the Gibbet Crossroads and the Corpse Road (a new bridge over Gloom Creek), the Plague Pit, the
 Drowned Fields, the Carrion Heights above the canon Carrion Cliffs and the Charnel Barrow on them, the Old Bound Wall and the
 Fallen Watch on it, the Listener's Hut (CANON-EXPANDED: a Silent Pilgrim's) and the Hush, the densest of the Whispering Wood.
+Trades in Khaven (GAME-ONLY, 2026-10-01; BUILD_PLAN step 8; tier 2, every node at skill 20):
+- **Ore** (Carrion bog-iron): at the feet of the Carrion Cliffs (two on the long cliff's creek side, one off the east cliff,
+  one under the low cliff, one behind the far cliff, clear of the Carrion boars), two under the Carrion Heights' face, two at
+  the Grey scarp's foot and one behind the North ridge (clear of the outriders' camp).
+- **Timber** (black-pine windfalls): at the pine woods' edges: two below the North pines, the Ridge pines' west and south
+  edges, the east edge of the eastern Ridge pines, below the northern Ridge pines and two by the Bound-wall pines.
+- **Herbs** (mourner's cap): the seven Mourner's cap props on Gloom Creek's banks are worked as nodes (still the quest's caps
+  while Wenna's quest wants them), and three more round the Drowned graveyard (west, south and east of it, outside the
+  hollows' camp), which count for the quest too.
 
 ## The Shattered Peaks (CANON-EXPANDED), levels 6-8
 Grown to 360 m (2026-09-30): the Signal Tower, Goatherd's Shieling, the Sealed Adit (CANON-EXPANDED: old mining tunnels under
@@ -105,6 +114,13 @@ Relief (`ZoneBuilder.Crag`): steep knolls, rock ribs and walls climbing to the z
 holds roads, clearings, camps, props, people, landmarks, exits, arrivals and a 6 m way from each to its nearest road, so all
 of it stays reachable. A cliff's `lift` raises a shelf behind it (negative: on its -z side): the Umbra scarp, the High ledge
 and its wall, the Eyrie crag, the North wall and the South and East scarps.
+Trades in the Peaks (GAME-ONLY, 2026-10-01; BUILD_PLAN step 8; tier 3, every node at skill 40):
+- **Ore** (Adit iron): two at the Sealed Adit's face (north and south of the secret, by the ore cart), two at the spoil heap's
+  foot, two under the Umbra scarp, one each at the feet of the East wall, the South scarp, the Goat-path scarp and the
+  Switchback crag. None in the Avalanche scar: the rockhides and Old Scree-Tusk fill it.
+- **Timber** (stone-pine windfalls): at the pine woods' edges (the Wolf pines' south edge, clear of the pack; the High, Gate,
+  Ore-road, East, South and Umbra pines) and one at the Avalanche deadfall's north edge.
+- **Herbs** (tarnwort): seven round the Cold Tarn's shore and three on the Shieling's hay meadow, off the mown field.
 
 ## The Ashland Rim (CANON-EXPANDED / PROVISIONAL), levels 9-10
 Grown to 360 m (2026-09-30): Wain's Rest on the salt road, the Last Orchard, the Drowned Leviathan (a spine and ribs half in
@@ -119,6 +135,15 @@ GAME-ONLY:
 - the shrine's location, Cinderfold, the ash hounds and the brood;
 - all placement.
 Biome `ash`: grey cracked ground with no grass, dead trees and falling ash.
+Trades on the Rim (GAME-ONLY, 2026-10-01; BUILD_PLAN step 8; tier 4, every node at skill 60): thin pickings, spread out and
+one at a time.
+- **Ore** (cinder): at the feet of the Eastern Ridge (its north, south, far north and far south crags, on the enclave's side),
+  the South rim, the West scarp, the North rim and the Walled Mouth scarp (west of the Mouth). None on the Ash Pit's rim: the
+  cultists' camp fills it.
+- **Timber** (fallen ash-snags): one at the edge of each of eight dead woods (the Ashen snags south of the hounds, Cinderfold
+  orchard, the Rim, South, West and Ridge-back snags, the Grey thicket, the North snags). None in the Last Orchard, where the
+  orchard hounds lie.
+- **Herbs** (cinder-thistle): single plants in the open ash between the woods, the ridge and the pit, none by Last-Light.
 
 ## The Verdant Shore (CANON-EXPANDED), levels 11-13
 Canon (Book 3, *The Verdant Shore*): the western coast's "Verdant Ocean", "a forest that didn't know when to stop", giant trees
@@ -152,6 +177,15 @@ ash-mountains (the breadcrumb `main.ashrim.5`); the level cap is 13 (talent poin
   Tastes of Lightning, The Root-Mother's Deep); seven side and NPC quests; five Chronicle pages; a new faction, the Veridian Keepers.
   `QUEST_DESIGN.md`.
 - **The lush art** (`ZoneBuilder.Verdant`, `PlantField`): see "Painted plants and lush props" below.
+- **Trades** (GAME-ONLY, 2026-10-01; BUILD_PLAN step 8; tier 5, every node at skill 80; a level-13 character with a low skill
+  works them at once, as "hard going"): rich pickings.
+  - Ore (Veridian): at the feet of the four basalt crags and on the Ridge of Long Shadows' south and north shoulders; four
+    rich seams on the Root-Mother's Deep's floor: past the Gallery, at the Sap Well's far end, and either side of the Heart,
+    each clear of the deep's withered, walkers and briars.
+  - Timber (ghost-oak windfalls): at the edges of the Ridge-foot, Westbank, Riverbank, Rootfast and north Ridge-foot
+    canopies, two by the Tappers' wood and one by the Mere canopy. None by the Fallen Ghost-Oak: its spiders' camp fills it.
+  - Herbs (dewfern): four round the Mistmere's shore and six round the Fern Hollow, among the ferns' edge, clear of
+    Lantern-Moss.
 
 ## Painted plants and lush props (`PlantField`, `ZoneBuilder.Verdant.cs`)
 - **PlantField:** painted fern, broad-leaf and reed cards (ZoneSceneBuilder paints them; `Crulanda/Grass` draws them, with `_Wither`
@@ -530,7 +564,9 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
   - herb: the herb patches (`Herb`), with the trades' tarnwort, cinder-thistle and dewfern as variants 3-5.
 - **Placement** (moved clear at build, up to 3 m, and tested by `NodePlacementTests`): reachable from the player start to within
   reach of E; out of water, buildings and off roads; 5 m from secrets and from each other, 2 m from trunks; rich seams only on a
-  cave floor. Seams by crags and rocks, windfalls at broadleaf wood edges, herbs in the open meadow. A node's footprint
+  cave floor. Seams by crags and rocks or on a ridge's crown, windfalls at a wood's edge (Oakhaven's oak at broadleaf woods),
+  herbs in the open (a herb prop worked as a node stays where the zone had it). Every zone has ten ore, eight windfalls and ten
+  herbs at its tier (`ProfessionDataTests.EveryZone_HasTenOreEightTimberTenHerbNodes`). A node's footprint
   (`ZoneBuilder.NodeFootprint`: a seam 2.1 m round, a rich one 2.8 m, a windfall 3 m, a herb 0.6 m) stays out of every camp's
   spread (its radius out to the square's corners, x 1.42) and off a cave's furnishings, which have no colliders, so `Cavern`
   marks each one it places (`ZoneBuilder.KeepClearSpots`: the camp's fire, bedrolls, grain, crates and barrels, the Drop's
@@ -538,6 +574,10 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
 - **Working one** (E; the rules are in DATA_SCHEMA.md, "Trades"): the work bar is the cast bar; moving, a blow, a fight or dying
   stops it. A worked node rests (`respawn`), also across a zone hop; a restart refills it.
 - The world capture tour shoots every node from a few metres off its face (`<zone>-80-node-NN-<name>`).
+- **Placing more:** `tools/wip/professions/place_nodes.py` checks candidate nodes for Khaven, the Peaks, the Rim and the Verdant
+  Shore against the zone data by these rules with a margin, over a model of the ground (the height function ported, the walk
+  from the player's start), and writes them (`--write`); `--probe <zone> <x> <y>` lists clear spots near a point. It cannot
+  see the random grove trees or the strewn boulders, so the PlayMode tests stay the judge.
 
 ## Travel
 - Zones list `exits` (to, name, at, arrive, radius). Standing at an exit shows "[E] <name>"; E travels (not in combat):

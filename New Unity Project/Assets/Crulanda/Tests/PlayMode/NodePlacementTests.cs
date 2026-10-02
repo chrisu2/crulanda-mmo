@@ -15,15 +15,17 @@ using Crulanda.World;
 namespace Crulanda.Tests
 {
     /// <summary>
-    /// Oakhaven's nodes (seams, windfalls, herbs) as ZoneBuilder builds them:
+    /// Every zone's nodes (seams, windfalls, herbs) as ZoneBuilder builds them, ten ore, eight windfalls and ten herbs in each:
     /// - each can be walked to from the player's start, to within reach of E (EncounterSession.UseRange);
     /// - none stands in the water, in a building or on a road; each is 5 m from every secret and every other node and 2 m from
-    ///   every standing trunk; the four on Crowsfoot Hollow's floor are in the cave (on its floor, not the hill over it) and no
-    ///   other is; none reaches (ZoneBuilder.NodeFootprint) into a camp's spread or a cave's furnishings (KeepClearSpots);
+    ///   every standing trunk; those the data puts under (Crowsfoot Hollow's four, the Root-Mother's Deep's four) are in the cave
+    ///   (on its floor, not the hill over it) and no other is; none reaches (ZoneBuilder.NodeFootprint) into a camp's spread or a
+    ///   cave's furnishings (KeepClearSpots);
     /// - nothing of theirs is solid or in the navmesh, and each has something to see (a seam's ore and a windfall's trunk as the
     ///   part that vanishes);
-    /// - each is where it belongs: a windfall at the edge of a broadleaf wood, a herb in the open (in no wood and on no field), a
-    ///   seam near a crag or rock or on the ridge's rocky crown.
+    /// - each is where it belongs: a windfall at the edge of a wood (an oak windfall at a broadleaf wood's), a herb from the
+    ///   nodes array in the open (in no wood and on no field; a herb prop worked as a node stands where the zone always had it,
+    ///   and on no field), a seam near a crag or rock or on a ridge's rocky crown.
     /// Stations join this test with the stations step (9); Oakhaven needs none of its own.
     /// </summary>
     public class NodePlacementTests
@@ -67,25 +69,43 @@ namespace Crulanda.Tests
             return ox > 0 || oz > 0 ? new Vector2(Mathf.Max(0, ox), Mathf.Max(0, oz)).magnitude : Mathf.Max(ox, oz);
         }
 
-        [UnityTest] public IEnumerator EveryNodeAndStation_IsReachable()
+        [UnityTest, Timeout(600000)] public IEnumerator EveryNodeAndStation_IsReachable()
         {
-            var s = UnityEngine.Object.FindFirstObjectByType<EncounterSession>(); var zone = s.Zone; var z = zone.Zone;
+            var first = UnityEngine.Object.FindFirstObjectByType<EncounterSession>();
+            var zones = first.Zone.AllZones().Select(z => z.id).ToList();
+            Assert.AreEqual(5, zones.Count, "Oakhaven, Khaven, the Peaks, the Ashland Rim and the Verdant Shore are registered.");
+            var problems = new List<string>();
+            foreach (var id in zones)
+            {
+                ZoneBuilder.RequestedZoneId = id;
+                yield return SceneManager.LoadSceneAsync("Oakhaven", LoadSceneMode.Single);
+                for (int f = 0; f < 4; f++) yield return null;
+                var s = UnityEngine.Object.FindFirstObjectByType<EncounterSession>();
+                if (s.Zone.Zone.id != id) { problems.Add(id + ": built " + s.Zone.Zone.id + " instead"); continue; }
+                Check(s, problems);
+            }
+            Assert.IsEmpty(problems, string.Join("\n", problems));
+        }
+        /// <summary>The nodes of the zone in play, each problem named with the zone.</summary>
+        static void Check(EncounterSession s, List<string> problems)
+        {
+            var zone = s.Zone; var z = zone.Zone; string zp = z.displayName + ": ";
             Assert.NotNull(s.Professions, "The trades' content loaded (Encounter.asset lists it).");
             var nodes = zone.Interactables.Where(i => i.node != null).ToList();
-            Assert.AreEqual(28, nodes.Count, "Ten ore, eight windfalls, ten herbs.");
-            var problems = new List<string>();
-            var container = zone.transform.Find("Zone nodes"); Assert.NotNull(container, "The nodes are built.");
-            Assert.Greater(zone.KeepClearSpots.Count, 20, "Crowsfoot Hollow's furnishings are marked for the nodes to keep clear of.");
-            foreach (var c in container.GetComponentsInChildren<Collider>(true)) problems.Add("a node's '" + c.name + "' has a collider");
-            if (container.GetComponentsInChildren<NavBlocker>(true).Length > 0 || container.GetComponentsInChildren<NavWalkable>(true).Length > 0) problems.Add("a node is in the navmesh");
-            foreach (var i in nodes.Where(i => i.kind == "herb")) foreach (var c in i.root.GetComponentsInChildren<Collider>(true)) problems.Add("the herb '" + i.name + "' has a collider");
-            Assert.IsTrue(NavMesh.SamplePosition(zone.Ground(z.spawns.player), out var start, 2.5f, NavMesh.AllAreas), "The player's start is walkable.");
+            if (nodes.Count != 28) problems.Add(zp + nodes.Count + " nodes, not ten ore, eight windfalls and ten herbs");
+            var container = zone.transform.Find("Zone nodes");
+            if (container == null) { problems.Add(zp + "no nodes are built"); return; }
+            if (z.id == "zone.oakhaven" && zone.KeepClearSpots.Count <= 20) problems.Add(zp + "Crowsfoot Hollow's furnishings are not marked for the nodes to keep clear of");
+            foreach (var c in container.GetComponentsInChildren<Collider>(true)) problems.Add(zp + "a node's '" + c.name + "' has a collider");
+            if (container.GetComponentsInChildren<NavBlocker>(true).Length > 0 || container.GetComponentsInChildren<NavWalkable>(true).Length > 0) problems.Add(zp + "a node is in the navmesh");
+            foreach (var i in nodes.Where(i => i.kind == "herb")) foreach (var c in i.root.GetComponentsInChildren<Collider>(true)) problems.Add(zp + "the herb '" + i.name + "' has a collider");
+            if (!NavMesh.SamplePosition(zone.Ground(z.spawns.player), out var start, 2.5f, NavMesh.AllAreas)) { problems.Add(zp + "the player's start is not walkable"); return; }
             var path = new NavMeshPath(); var keys = new HashSet<string>();
-            int under = 0;
+            int under = 0, wantUnder = z.nodes.Count(n => n != null && n.under);
             foreach (var i in nodes)
             {
                 var def = s.Professions.Db.Node(i.node);
-                string q = "'" + i.name + "' at " + i.position + " ";
+                string q = zp + "'" + i.name + "' at " + i.position + " ";
                 if (def == null) { problems.Add(q + "is no known node"); continue; }
                 if (!keys.Add(i.Key(z.id))) problems.Add(q + "shares its respawn key with another node");
                 if (i.root == null || i.root.GetComponentsInChildren<Renderer>().Length == 0) problems.Add(q + "has nothing to see");
@@ -120,21 +140,19 @@ namespace Crulanda.Tests
                 foreach (var cp in z.camps) if (cp != null && Vector2.Distance(at, cp.center) < cp.radius * 1.42f + foot) problems.Add(q + "stands in the camp '" + cp.name + "'");
                 foreach (var spot in zone.KeepClearSpots) if (Vector2.Distance(at, spot.at) < spot.r + foot) problems.Add(q + "stands in a cave's furnishings at " + spot.at);
                 // Where it belongs.
-                if (def.look == "windfall" && !z.groves.Any(g => g != null && g.kind == "broadleaf" && OutsideRect(at, g.center, g.size) < 6 && OutsideRect(at, g.center, g.size) > -4))
-                    problems.Add(q + "is no windfall at a broadleaf wood's edge");
+                if (def.look == "windfall" && !z.groves.Any(g => g != null && g.kind != "orchard" && (def.id != "node.oak" || g.kind == "broadleaf") && OutsideRect(at, g.center, g.size) < 6 && OutsideRect(at, g.center, g.size) > -4))
+                    problems.Add(q + (def.id == "node.oak" ? "is no windfall at a broadleaf wood's edge" : "is no windfall at a wood's edge"));
                 if (def.look == "herb")
                 {
-                    if (z.groves.Any(g => g != null && OutsideRect(at, g.center, g.size) < 0)) problems.Add(q + "is a herb in a wood, not on the meadow");
+                    if (i.kind == "node" && z.groves.Any(g => g != null && OutsideRect(at, g.center, g.size) < 0)) problems.Add(q + "is a herb in a wood, not in the open");
                     if (z.fields.Any(f => f != null && OutsideRect(at, f.center, f.size, f.rotation) < .5f)) problems.Add(q + "is a herb on a ploughed field");
                 }
                 if (def.look == "ore" && !z.props.Any(p => p != null && (p.kind == "cliff" || p.kind == "rock" || p.kind == "perch") && Vector2.Distance(p.at, at) < (p.kind == "cliff" ? (p.size.x > 0 ? p.size.x : 20) / 2 + 4 : 6))
                     && !z.shapes.Any(sh => sh != null && sh.height > 8 && Vector2.Distance(sh.center, at) < sh.radius))
                     problems.Add(q + "is a seam with no crag or rock by it, and not on a ridge's crown");
             }
-            Assert.AreEqual(4, under, "The four rich seams are in Crowsfoot Hollow.");
+            if (under != wantUnder) problems.Add(zp + under + " nodes in a cave, where the data puts " + wantUnder + " under (rich seams on a cave floor)");
             // The stations step (9) adds its stations here; Oakhaven's forge, oven, inn hearth and drying bench are workplaces.
-            Assert.IsEmpty(problems, string.Join("\n", problems));
-            yield return null;
         }
     }
 }

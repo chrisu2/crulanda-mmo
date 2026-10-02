@@ -2391,5 +2391,35 @@
       "xp": 110,
       "canonStatus": "CANON-EXPANDED: the Silent Pilgrims are CANON (world_bible.md); the spur, the shrine and this lookout are GAME-ONLY."
     }
+  ],
+  "nodes": [
+    { "node": "node.adit", "at": { "x": -149, "y": -32 }, "rotation": 270 },
+    { "node": "node.adit", "at": { "x": -149, "y": -50 }, "rotation": 270 },
+    { "node": "node.adit", "at": { "x": -132.2, "y": -55 }, "rotation": 270 },
+    { "node": "node.adit", "at": { "x": -139, "y": -57.3 }, "rotation": 52 },
+    { "node": "node.adit", "at": { "x": -102, "y": 28 }, "rotation": 270 },
+    { "node": "node.adit", "at": { "x": -102, "y": 12 }, "rotation": 270 },
+    { "node": "node.adit", "at": { "x": 121.8, "y": -37 }, "rotation": 78 },
+    { "node": "node.adit", "at": { "x": 10, "y": -104 }, "rotation": 180 },
+    { "node": "node.adit", "at": { "x": -104, "y": -75 }, "rotation": 270 },
+    { "node": "node.adit", "at": { "x": 60.1, "y": 21.8 }, "rotation": 60 },
+    { "node": "node.stonepine", "at": { "x": -59, "y": 32 } },
+    { "node": "node.stonepine", "at": { "x": -44, "y": 84 } },
+    { "node": "node.stonepine", "at": { "x": -3, "y": 38 }, "rotation": 90 },
+    { "node": "node.stonepine", "at": { "x": -133, "y": -8 } },
+    { "node": "node.stonepine", "at": { "x": 70, "y": -62 }, "rotation": 90 },
+    { "node": "node.stonepine", "at": { "x": -12, "y": -59 } },
+    { "node": "node.stonepine", "at": { "x": 137, "y": 40.5 } },
+    { "node": "node.stonepine", "at": { "x": -112, "y": 82 }, "rotation": 90 },
+    { "node": "node.tarnwort", "at": { "x": -36.5, "y": 136 } },
+    { "node": "node.tarnwort", "at": { "x": -12, "y": 131 } },
+    { "node": "node.tarnwort", "at": { "x": -30.3, "y": 125.2 } },
+    { "node": "node.tarnwort", "at": { "x": -24, "y": 123.5 } },
+    { "node": "node.tarnwort", "at": { "x": -17.8, "y": 125.2 } },
+    { "node": "node.tarnwort", "at": { "x": -24, "y": 148.5 } },
+    { "node": "node.tarnwort", "at": { "x": -34.8, "y": 142.2 } },
+    { "node": "node.tarnwort", "at": { "x": -10.5, "y": -126.8 } },
+    { "node": "node.tarnwort", "at": { "x": 6, "y": -136 } },
+    { "node": "node.tarnwort", "at": { "x": -12.5, "y": -114.6 } }
   ]
 }

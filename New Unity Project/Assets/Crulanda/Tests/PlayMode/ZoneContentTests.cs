@@ -72,10 +72,10 @@ namespace Crulanda.Tests
                 {
                     var path = new NavMeshPath();
                     foreach (var e in z.exits)
-                        if (!NavMesh.SamplePosition(s.Zone.Ground(e.at), out var to, Mathf.Max(2.5f, e.radius), NavMesh.AllAreas) || !NavMesh.CalculatePath(start.position, to.position, NavMesh.AllAreas, path) || path.status != NavMeshPathStatus.PathComplete)
+                        if (!NavMesh.SamplePosition(s.Zone.Ground(e.at), out var to, Mathf.Max(2.5f, e.radius), NavMesh.AllAreas) || !NavReach.Walkable(start.position, to.position))
                             problems.Add(p + "exit to " + e.to + " can't be walked to from the start");
                     foreach (var camp in z.camps)   // where the camp stands: on the land, or on a cave's floor under it (StandAt, as it spawns)
-                        if (!NavMesh.SamplePosition(s.Zone.StandAt(camp.center, float.NegativeInfinity), out var to, Mathf.Max(2.5f, camp.radius), NavMesh.AllAreas) || !NavMesh.CalculatePath(start.position, to.position, NavMesh.AllAreas, path) || path.status != NavMeshPathStatus.PathComplete)
+                        if (!NavMesh.SamplePosition(s.Zone.StandAt(camp.center, float.NegativeInfinity), out var to, Mathf.Max(2.5f, camp.radius), NavMesh.AllAreas) || !NavReach.Walkable(start.position, to.position))
                             problems.Add(p + "camp '" + camp.name + "' can't be walked to from the start");
                 }
                 // Camps: most of each pack must find walkable ground; levels inside the zone's band.

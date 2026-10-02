@@ -113,7 +113,7 @@ namespace Crulanda.Tests
                     {
                         if (!NavMesh.SamplePosition(tries[k], out var hit, k == 0 ? Mathf.Max(2.5f, reach + 1) : 1, NavMesh.AllAreas) || Flat(hit.position, spot.position) > reach) continue;
                         near = true;
-                        walked = NavMesh.CalculatePath(start.position, hit.position, NavMesh.AllAreas, path) && path.status == NavMeshPathStatus.PathComplete;
+                        walked = NavReach.Walkable(start.position, hit.position);
                     }
                     if (!near) problems.Add(q + "has no walkable ground within reach (" + reach + " m) of " + spot.position);
                     else if (!walked) problems.Add(q + "can't be walked to from the start");

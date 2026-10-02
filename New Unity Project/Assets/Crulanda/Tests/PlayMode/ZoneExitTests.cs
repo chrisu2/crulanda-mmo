@@ -62,7 +62,7 @@ namespace Crulanda.Tests
             }
         }
 
-        [UnityTest] public IEnumerator Every_exit_can_be_walked_into_and_travelled()
+        [UnityTest, Timeout(420000)] public IEnumerator Every_exit_can_be_walked_into_and_travelled()   // five zones, Oakhaven now 560 m (about 13 s to build): past the 180 s default
         {
             var problems = new List<string>();
             var first = UnityEngine.Object.FindFirstObjectByType<EncounterSession>();

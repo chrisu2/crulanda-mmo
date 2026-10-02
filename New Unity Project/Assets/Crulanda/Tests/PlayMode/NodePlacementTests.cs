@@ -189,7 +189,7 @@ namespace Crulanda.Tests
                 {
                     if (!NavMesh.SamplePosition(tries[k], out var hit, k == 0 ? 2.5f : 1, NavMesh.AllAreas) || Flat(hit.position, i.position) > reach || Mathf.Abs(hit.position.y - i.position.y) > 2) continue;
                     near = true;
-                    walked = NavMesh.CalculatePath(start.position, hit.position, NavMesh.AllAreas, path) && path.status == NavMeshPathStatus.PathComplete;
+                    walked = NavReach.Walkable(start.position, hit.position);
                 }
                 if (!near) problems.Add(q + "has no walkable ground within reach (" + reach + " m)");
                 else if (!walked) problems.Add(q + "can't be walked to from the start");
@@ -247,7 +247,7 @@ namespace Crulanda.Tests
                 {
                     var c = k == 0 ? st.position : zone.StandAt(new Vector2(st.position.x, st.position.z) + new Vector2(Mathf.Cos(k * Mathf.PI / 8), Mathf.Sin(k * Mathf.PI / 8)) * (k % 2 == 0 ? 1.5f : 3f), st.position.y);
                     if (!NavMesh.SamplePosition(c, out var hit, 1.5f, NavMesh.AllAreas) || Flat(hit.position, st.position) > EncounterSession.StationRange - .5f || Mathf.Abs(hit.position.y - st.position.y) > 2 || !st.Reaches(hit.position)) continue;
-                    walked = NavMesh.CalculatePath(start, hit.position, NavMesh.AllAreas, path) && path.status == NavMeshPathStatus.PathComplete;
+                    walked = NavReach.Walkable(start, hit.position);
                 }
                 if (!walked) problems.Add(q + "can't be walked to within reach from the start");
             }

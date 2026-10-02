@@ -153,13 +153,16 @@ namespace Crulanda.Tests
             Assert.IsFalse(far.Engaged, "The wolf 14 m off was out of reach and stays where it is."); Assert.IsNull(far.Group); Assert.IsFalse(far.Answering);
             // Mira heals twice. Her threat is shared out among the wolves in the fight, so the one that joined (and has not been
             // touched) stays on whoever pulled. Given to each in full, her second heal turned it.
+            // Recruited, she follows you: she stands beside you, not back in the Golden Cask (a wolf turned on her there is past its
+            // leash at once, and the whole pack goes home).
             s.Progress.recruited = true; var mira = s.Companion.actor;
+            s.Companion.GetComponent<UnityEngine.AI.NavMeshAgent>().Warp(s.Player.transform.position + s.Player.transform.right * 2); yield return null;
             Assert.AreSame(mira, s.PartyActor(mira.EntityId.Value), "Mira is in the party: her threat counts.");
             int heal = HealerCompanion.HealFor(s.content.healingAbility.power, s.Player.Level);
             Assert.Less(heal, s.JoinThreat, "Two heals' threat, unshared, is less than what a joiner holds on the puller.");
             s.HealThreat(mira, heal); s.HealThreat(mira, heal);
             yield return null; yield return null;
-            Assert.IsTrue(b.Engaged); Assert.AreSame(s.Player, b.Victim, "Two of Mira's heals later the wolf that joined is still on whoever pulled, not on her.");
+            Assert.IsTrue(b.Engaged, "The wolf that joined is still in the fight (alive " + b.actor.IsAlive + ", health " + b.actor.Health.Pool.Ratio.ToString("0.00") + ", group " + (b.Group != null) + ", " + Vector3.Distance(b.transform.position, s.Player.transform.position).ToString("0.0") + " m from you, the first wolf engaged " + a.Engaged + ", you alive " + s.Player.IsAlive + ")."); Assert.AreSame(s.Player, b.Victim, "Two of Mira's heals later the wolf that joined is still on whoever pulled, not on her.");
         }
 
         [UnityTest] public IEnumerator A_boar_stays_single_with_another_beside_it()

@@ -65,9 +65,9 @@ namespace Crulanda.Tests
                 Assert.IsTrue(NavMesh.CalculatePath(from, next.position, NavMesh.AllAreas, path) && path.status == NavMeshPathStatus.PathComplete, "Walkable from " + from + " to " + next.position + " (" + s + " m in).");
                 from = next.position;
             }
-            NavMesh.CalculatePath(a.position, b.position, NavMesh.AllAreas, path);
-            Assert.AreEqual(NavMeshPathStatus.PathComplete, path.status, "A way in from the green.");
-            foreach (var corner in path.corners) Assert.Less(corner.y, zone.HeightAt(corner.x, corner.z) + 1.2f, "On the ground all the way (through the mouth, not over the knoll): " + corner);
+            var corners = new System.Collections.Generic.List<Vector3>();
+            Assert.IsTrue(NavReach.Walkable(a.position, b.position, corners), "A way in from the green.");
+            foreach (var corner in corners) Assert.Less(corner.y, zone.HeightAt(corner.x, corner.z) + 1.2f, "On the ground all the way (through the mouth, not over the knoll): " + corner);
             yield return null;
         }
 

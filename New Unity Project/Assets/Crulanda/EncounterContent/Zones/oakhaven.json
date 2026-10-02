@@ -1434,8 +1434,8 @@
       "name": "Lark Hill",
       "text": "A bare down with a ring of stones on its crown. Larks go up from it all summer, and from the top you can see the road to both ends.",
       "at": {
-        "x": -232,
-        "y": -206
+        "x": -226,
+        "y": -212
       },
       "radius": 10,
       "canonStatus": "GAME-ONLY"

@@ -14,7 +14,9 @@ namespace Crulanda.Encounter
     /// 01-beams-day and 01-beams-night: the white twinkle, the green glint and column, the blue beam and the purple beam with its
     /// ring (the HUD, the player and the village hidden); 02-loot-window: the window over a body holding coins, a rare blade, an
     /// uncommon helm and junk; 03-compare-tooltip: the rare blade's tooltip against a common blade worn ("+N weapon damage" in
-    /// green); 04-upgrade-arrows: the bags beside the window, the pieces that beat what is worn marked with the green arrow.
+    /// green); 04-upgrade-arrows: the bags beside the window, the pieces that beat what is worn marked with the green arrow;
+    /// 05-set-tooltip (step L2): Caddock's Tin Crown's tooltip with two pieces of the Deserter King's Due worn (the set, its
+    /// pieces, "+30 health" on and the three-piece bonus still to come, and where it drops).
     /// </summary>
     public sealed class LootCapture : MonoBehaviour
     {
@@ -92,6 +94,17 @@ namespace Crulanda.Encounter
             s.InventoryOpen = true; yield return new WaitForSeconds(.6f);
             ScreenCapture.CaptureScreenshot(Path.Combine(directory, "04-upgrade-arrows.png")); yield return new WaitForSeconds(.4f);
             s.InventoryOpen = false; s.CloseLoot();
+            // 05: a set piece's tooltip, two of the set worn.
+            if (s.Loot != null)
+            {
+                foreach (var id in new[] { "loot.oak.due_cleaver", "loot.oak.due_coat" }) if (Inventory.Add(s.Progress, s.Items, id, 1) == 0) s.EquipFromBag(s.Progress.bag.FindIndex(x => x.item == id));
+                Inventory.Add(s.Progress, s.Items, "item.tin_crown", 1);
+                EncounterHud.PinnedTooltip = "item.tin_crown"; EncounterHud.PinnedTooltipAt = new Vector2(700, 560);
+                yield return new WaitForSeconds(.6f);
+                ScreenCapture.CaptureScreenshot(Path.Combine(directory, "05-set-tooltip.png")); yield return new WaitForSeconds(.4f);
+                EncounterHud.PinnedTooltip = null;
+            }
+            else Debug.LogError("Loot capture: the named loot is not loaded, so 05-set-tooltip is skipped.");
             Debug.Log("LOOT_CAPTURE_DONE"); Application.Quit(0);
         }
     }

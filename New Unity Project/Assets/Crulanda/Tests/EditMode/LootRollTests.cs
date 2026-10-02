@@ -10,11 +10,11 @@ using Crulanda.World;
 namespace Crulanda.Tests
 {
     /// <summary>
-    /// Rolling the loot database (loot DESIGN.md 3.4 and 3.6, step A3, against the drafted files; nothing in the game rolls it
-    /// until step L2): a seed gives the same body; named items stay inside their caps; signature lists give what you do not own
-    /// and replace the old 100% trophies; an elite never leaves only junk; rates match the table; luck lifts only lucky groups
-    /// and is capped; elites sometimes drop a generated epic; pity makes an epic certain and owning it makes it rarer; set bonuses
-    /// and effects total, cap and clear. Pure logic: no scene, no session and no save.
+    /// Rolling the loot database (loot DESIGN.md 3.4 and 3.6; the logic from step A3, live in the game from step L2): a seed
+    /// gives the same body; named items stay inside their caps; signature lists give what you do not own and replace the old
+    /// 100% trophies; a unique you hold is left off the body (step L2); an elite never leaves only junk; rates match the table;
+    /// luck lifts only lucky groups and is capped; elites sometimes drop a generated epic; pity makes an epic certain and owning
+    /// it makes it rarer; set bonuses and effects total, cap and clear. Pure logic: no scene, no session and no save.
     /// </summary>
     public class LootRollTests
     {
@@ -114,6 +114,35 @@ namespace Crulanda.Tests
                 }
                 for (int seed = 0; seed < 400; seed++) Assert.LessOrEqual(loot.Roll(c, items, null, 0, null, new System.Random(seed)).Count(d => d.item == trophy), 1, mob + " drops the trophy once at most.");
             }
+        }
+
+        [Test] public void A_unique_you_hold_is_left_off_the_body_and_the_boss_still_leaves_gear()
+        {
+            // As the game rolls it (step L2): owned and held are both what you carry or wear.
+            var caddock = Mob("oakhaven", "Caddock, the Bandit King");
+            var list = new[] { "item.tin_crown", "loot.oak.due_cleaver", "loot.oak.due_coat" };
+            var held = new HashSet<string>(list) { "loot.oak.broken_oath_sabre" };
+            for (int seed = 0; seed < 2000; seed++)
+            {
+                var drops = loot.Roll(caddock, items, held.Contains, 0, null, new System.Random(seed), held.Contains);
+                Assert.IsFalse(drops.Any(d => held.Contains(d.item)), "Nothing you hold that is unique comes again: " + Key(drops));
+                Assert.IsTrue(drops.Any(d => items.Get(d.item).kind == "gear"), "Caddock still leaves gear: " + Key(drops));
+            }
+            // Old Whitefoot twice: the mantle, then the fang (or the other way round), never the one you hold.
+            var whitefoot = Mob("oakhaven", "Old Whitefoot"); var pair = new[] { "loot.oak.whitefoot_mantle", "loot.oak.whitefoot_fang" };
+            var mine = new HashSet<string>(); int seedAt = 0;
+            for (int kill = 0; kill < 2; kill++)
+            {
+                string got = null;
+                for (int tries = 0; tries < 60 && got == null; tries++, seedAt++)
+                    got = loot.Roll(whitefoot, items, mine.Contains, 0, null, new System.Random(seedAt), mine.Contains).Select(d => d.item).FirstOrDefault(pair.Contains);
+                Assert.NotNull(got, "His list pays half the time."); Assert.IsFalse(mine.Contains(got)); mine.Add(got);
+            }
+            CollectionAssert.AreEquivalent(pair, mine, "Both of Old Whitefoot's pieces held.");
+            for (int seed = 0; seed < 500; seed++)
+                Assert.IsFalse(loot.Roll(whitefoot, items, mine.Contains, 0, null, new System.Random(seed), mine.Contains).Any(d => pair.Contains(d.item)), "Neither comes again while held.");
+            // Without held (the rates above), an owned list still pays at 35%: that is what the Armoury's "ever found" needs later.
+            Assert.IsTrue(Enumerable.Range(0, 200).Any(seed => loot.Roll(caddock, items, held.Contains, 0, null, new System.Random(seed)).Any(d => list.Contains(d.item))));
         }
 
         [Test] public void A_boss_never_drops_only_junk()

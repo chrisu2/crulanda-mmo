@@ -10,8 +10,8 @@ namespace Crulanda.Encounter
     // ============================================================================================
     // The loot database (loot DESIGN.md section 3): named gear by zone and boss, with looks, sources, drop lists, sets and the
     // few effects the game can carry out. Data: loot.<zone>.json, ordinary item files (items, vendors) with three more sections
-    // (gear, drops, sets) that ItemDatabase ignores and LootDatabase reads. Until step L2 the files sit in EncounterContent/Loot,
-    // where nothing loads them but the tests and the wardrobe capture, so the running game does not change.
+    // (gear, drops, sets) that ItemDatabase ignores and LootDatabase reads. Since step L2 they sit in EncounterContent/Items with
+    // the other item files, and EncounterSession.LoadLoot reads them after the items.
     // ============================================================================================
     [Serializable] public sealed class LootFile
     {
@@ -224,6 +224,8 @@ namespace Crulanda.Encounter
         }
 
         public GearMeta Meta(string id) { return id != null && Gear.TryGetValue(id, out var g) ? g : null; }
+        /// <summary>True for an item whose gear entry is unique: you may carry one at a time.</summary>
+        public bool IsUnique(string id) { var g = Meta(id); return g != null && g.unique; }
         /// <summary>The set an item belongs to (the set that lists it), or null.</summary>
         public SetDef SetOf(string id)
         {
@@ -246,11 +248,12 @@ namespace Crulanda.Encounter
         /// lucky groups scale by 1 + luck (luck capped at +30%), an owned epic drops a quarter as often, and an unowned epic with a
         /// pity count is certain on that kill once that many kills in a row gave nothing (the counters live in
         /// <paramref name="pity"/>; null skips them). At most one named item from a normal kill and two from an elite; epics do not
-        /// count. An elite whose body would hold no gear gets a generated piece at its level (rare 35%, else uncommon), and 6% of
-        /// an elite's generated rares come out epic. Named items the base roll already left on the body count toward the cap.
-        /// owned may be null (nothing owned). The same seed gives the same drops.
+        /// count. A unique item <paramref name="held"/> says you carry now is then left off the body (you could not take it; step
+        /// L2 passes the bags and equipment, null keeps it). An elite whose body would hold no gear gets a generated piece at its
+        /// level (rare 35%, else uncommon), and 6% of an elite's generated rares come out epic. Named items the base roll already
+        /// left on the body count toward the cap. owned may be null (nothing owned). The same seed gives the same drops.
         /// </summary>
-        public List<LootDrop> Roll(LootContext c, ItemDatabase items, Func<string, bool> owned, float luck, List<LootLuck> pity, System.Random rng)
+        public List<LootDrop> Roll(LootContext c, ItemDatabase items, Func<string, bool> owned, float luck, List<LootLuck> pity, System.Random rng, Func<string, bool> held = null)
         {
             items = items ?? Items; owned = owned ?? (_ => false);
             var matched = Matching(c); var drops = new List<LootDrop>();
@@ -292,6 +295,7 @@ namespace Crulanda.Encounter
                     drops.Add(new LootDrop(picked, 1));
                     if (Quality(items, picked) < 4) named++;
                 }
+            if (held != null) drops.RemoveAll(x => IsUnique(x.item) && held(x.item));
             if (c.elite && !drops.Exists(x => { var i = items.Get(x.item); return i != null && i.kind == "gear"; }))
             {
                 int q = rng.NextDouble() < RescueRareChance ? 3 : 2;
@@ -315,26 +319,36 @@ namespace Crulanda.Encounter
             return pool[pool.Count - 1].item;
         }
 
+        /// <summary>What a tooltip line from <see cref="TooltipParts"/> is, so the HUD can colour it.</summary>
+        public enum TipLine { Unique, Effect, Set, PieceWorn, PieceMissing, BonusOn, BonusOff, Source }
         /// <summary>
         /// The tooltip's loot lines for an item: "Unique", its effects, its set with the pieces worn and each bonus (marked when
         /// it is on), and where it comes from (a hidden find never names its place). Empty for an item without a gear entry.
         /// </summary>
         public string TooltipLines(string id, EncounterProgress p)
         {
-            var g = Meta(id); if (g == null) return "";
             var l = new List<string>();
-            if (g.unique) l.Add("Unique");
-            foreach (var e in g.effects ?? new GearEffect[0]) l.Add(e.text);
+            foreach (var (line, kind) in TooltipParts(id, p))
+                l.Add(kind == TipLine.PieceWorn ? "  * " + line : kind == TipLine.PieceMissing ? "    " + line : kind == TipLine.BonusOn ? "  " + line : kind == TipLine.BonusOff ? "  [" + line.Substring(1, line.IndexOf(')') - 1) + "]" + line.Substring(line.IndexOf(')') + 1) : line);
+            return string.Join("\n", l);
+        }
+        /// <summary>The lines of <see cref="TooltipLines"/> without their marks, each with its kind. A bonus line reads "(2) +30 health", on or off.</summary>
+        public List<(string line, TipLine kind)> TooltipParts(string id, EncounterProgress p)
+        {
+            var l = new List<(string, TipLine)>();
+            var g = Meta(id); if (g == null) return l;
+            if (g.unique) l.Add(("Unique", TipLine.Unique));
+            foreach (var e in g.effects ?? new GearEffect[0]) l.Add((e.text, TipLine.Effect));
             var s = SetOf(id);
             if (s != null)
             {
                 int worn = SetWorn(s, p);
-                l.Add(s.name + " (" + worn + "/" + s.pieces.Length + ")");
-                foreach (var piece in s.pieces) { var d = Items.Get(piece); l.Add((p != null && Inventory.IsEquipped(p, piece) ? "  * " : "    ") + (d != null ? d.name : piece)); }
-                foreach (var b in s.bonuses) foreach (var e in b.effects) l.Add((worn >= b.count ? "  (" : "  [") + b.count + (worn >= b.count ? ") " : "] ") + e.text);
+                l.Add((s.name + " (" + worn + "/" + s.pieces.Length + ")", TipLine.Set));
+                foreach (var piece in s.pieces) { var d = Items.Get(piece); l.Add((d != null ? d.name : piece, p != null && Inventory.IsEquipped(p, piece) ? TipLine.PieceWorn : TipLine.PieceMissing)); }
+                foreach (var b in s.bonuses) foreach (var e in b.effects) l.Add(("(" + b.count + ") " + e.text, worn >= b.count ? TipLine.BonusOn : TipLine.BonusOff));
             }
-            string from = SourceText(g.source, ZoneName); if (from != null) l.Add(from);
-            return string.Join("\n", l);
+            string from = SourceText(g.source, ZoneName); if (from != null) l.Add((from, TipLine.Source));
+            return l;
         }
         /// <summary>Names a short zone id ("ashrim") for the tooltip ("The Ashland Rim"); set by whoever loads the zones. Null shows the id capitalised.</summary>
         public Func<string, string> ZoneName;

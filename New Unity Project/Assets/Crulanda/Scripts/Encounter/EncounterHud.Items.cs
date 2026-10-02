@@ -84,6 +84,7 @@ namespace Crulanda.Encounter
             if (Inventory.IsHide(d)) lines.Add(EncounterSession.HideLine);
             var holder = string.IsNullOrEmpty(d.pouch) ? null : Inventory.BagFor(session.Items, d.pouch);
             if (holder != null) lines.Add("Goes in " + Article(holder.name) + " " + LowerFirst(holder.name) + ".");
+            var named = LootLines(d); if (named != null) lines.Add(named);
             if (d.level > 1) lines.Add((d.level > session.Progress.Level ? "<color=#ff5544>" : "") + "Requires level " + d.level + (d.level > session.Progress.Level ? "</color>" : ""));
             if (!string.IsNullOrEmpty(d.description)) lines.Add("<i>" + d.description + "</i>");
             lines.Add("Sells for " + (d.value) + " gold");

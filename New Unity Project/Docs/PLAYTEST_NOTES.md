@@ -62,3 +62,17 @@ What the fix needs: a sheep that reads as a sheep in the painted style from 5 m 
 lumps, short sturdy legs with wool to the knee and dark hooves, a dark wedge of a face with a muzzle and ears out sideways,
 a wool cap, a tail; a head that goes down to the grass when it grazes. Then a line-up shot of every animal in the capture
 tour, so the others can be judged the same way.
+
+## 5. Less green in the ore (2026-10-01) — OPEN
+> "less green in the ore"
+
+The copper seams' verdigris: after the first fix (beads pressed flat) seven lumps in ten still carry a bright green patch
+(`OreSeam`, fleck (.30, .55, .46)), so a seam reads as orange and green. Fix: a hint of patina only: fewer patches, smaller,
+duller and nearer the rock's own colour.
+
+## 6. Lumber trees: just four or five sticks standing up (2026-10-01) — OPEN
+> "lumber trees . trunk just has 4-5 stick stickup up. make it more broken/chopped down looking"
+
+Measured (`ZoneBuilder.Nodes.cs` `Windfall`): the fallen trunk carries four thin stub limbs, two of them pointing up 0.9 to
+1.4 m, on a plain tapered log beside a small stump. Fix: a tree that reads as broken or felled: a torn, splintered stump,
+a heavy trunk with snapped boughs and torn bark, and the litter of a fall (or of an axe) round it.

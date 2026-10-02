@@ -38,12 +38,14 @@ namespace Crulanda.Encounter
                 var group = groups[g]; if (group == null || !GameAnimals.IsGame(group.kind)) continue;
                 for (int n = 0; n < group.count; n++)
                 {
-                    // Start on dry, walkable ground (never on a creek or pond bed), as a critter does.
-                    var spot = group.center + new Vector2(R() - .5f, R() - .5f) * group.radius * 1.6f;
-                    for (int tries = 0; tries < 12 && Zone.WaterAt(spot, out _, out _); tries++) spot = group.center + new Vector2(R() - .5f, R() - .5f) * group.radius * 1.6f;
-                    float look = R(), seed = R() * 100, turn = R() * 360;
-                    if (!NavMesh.SamplePosition(Zone.Ground(spot), out var hit, 3, NavMesh.AllAreas) || Zone.WaterAt(new Vector2(hit.position.x, hit.position.z), out _, out _)) continue;
-                    SpawnGameAnimal(group, "game." + group.kind + "." + zoneShort + "." + g + "." + n, hit.position + Vector3.up, Quaternion.Euler(0, turn, 0), level, look, seed);
+                    // Start on dry ground on the navmesh (never on a creek or pond bed): a few tries in the circle, else it is left out.
+                    float look = R(), seed = R() * 100, turn = R() * 360; Vector3? at = null;
+                    for (int tries = 0; tries < 12 && !at.HasValue; tries++)
+                    {
+                        var spot = group.center + new Vector2(R() - .5f, R() - .5f) * group.radius * 1.6f;
+                        if (!Zone.WaterAt(spot, out _, out _) && NavMesh.SamplePosition(Zone.Ground(spot), out var hit, 3, NavMesh.AllAreas) && !Zone.WaterAt(new Vector2(hit.position.x, hit.position.z), out _, out _)) at = hit.position;
+                    }
+                    if (at.HasValue) SpawnGameAnimal(group, "game." + group.kind + "." + zoneShort + "." + g + "." + n, at.Value + Vector3.up, Quaternion.Euler(0, turn, 0), level, look, seed);
                 }
             }
         }

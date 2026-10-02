@@ -156,7 +156,7 @@ namespace Crulanda.World
         // ---------- ore seams ----------
         /// <summary>Each tier's ore: the ore's own colour, the stain it leaves in the rock, and its flecks (glowing when glow > 0).</summary>
         static readonly (Color ore, Color stain, Color fleck, float glow)[] OreLooks = {
-            (new Color(.62f, .35f, .2f), new Color(.5f, .37f, .29f), new Color(.34f, .62f, .52f), 0),     // copper: red-brown, verdigris
+            (new Color(.52f, .28f, .15f), new Color(.5f, .37f, .29f), new Color(.3f, .55f, .46f), 0),     // copper: deep red-brown, a verdigris bloom
             (new Color(.46f, .32f, .2f), new Color(.45f, .35f, .27f), new Color(.66f, .36f, .16f), 0),    // bog-iron: brown, rust
             (new Color(.27f, .27f, .3f), new Color(.33f, .32f, .32f), new Color(.78f, .78f, .82f), 0),    // Adit iron: dark iron, a bright glint
             (new Color(.8f, .4f, .14f), new Color(.31f, .24f, .21f), new Color(1, .5f, .16f), .7f),        // cinder: ember orange, glowing (a colour of its own: Glowing shares one material per colour, and the flames' (1, .55, .2) burn at 2.2)
@@ -210,8 +210,10 @@ namespace Crulanda.World
             {
                 float x = ((k + .5f) / veins - .5f) * 1.5f * s + (R() - .5f) * .2f, y = G(x, 0) + (.2f + R() * .45f) * s, w = (.3f + R() * .25f) * s;
                 var at = Face(x, y); if (at == null) continue;
-                Lump(BoulderAt((int)(R() * 6)), full, new Vector3(x, y, at.Value + .03f), new Vector3(w, w * (.6f + R() * .3f), w * .75f), ore, R() * 360);
-                if (R() < .7f) Part(PrimitiveType.Sphere, full, new Vector3(x + (R() - .5f) * w * .6f, y + (R() - .3f) * w * .4f, at.Value - w * .32f), Vector3.one * (.05f + R() * .05f) * s, fleck);
+                // Faceted lumps (a crag's shape, not a boulder's: rounded ones read as potatoes), and on most a fleck: flat on the face, a
+                // bloom of verdigris or rust or a glint (as round beads they read as peas). The draws are the ones they always took.
+                Lump(CragRock((int)(R() * 6)), full, new Vector3(x, y, at.Value + .03f), new Vector3(w, w * (.6f + R() * .3f), w * .75f), ore, R() * 360);
+                if (R() < .7f) { float fx = (R() - .5f) * w * .6f, fy = (R() - .3f) * w * .4f, fs = (.05f + R() * .05f) * s; Part(PrimitiveType.Sphere, full, new Vector3(x + fx, y + fy, at.Value - w * .3f), new Vector3(fs * 2.6f, fs * 1.8f, fs * .35f), fleck, Quaternion.Euler(0, 0, (fx + fy) * 900)); }
             }
             int shards = rich ? 7 : 4;
             for (int k = 0; k < shards; k++)

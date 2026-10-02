@@ -441,12 +441,12 @@ namespace Crulanda.Encounter
                 if (i.node != null && Time.time >= i.hiddenUntil && nodeReadyAt.TryGetValue(i.Key(Zone.Zone.id), out var at) && at > Time.time) RestNode(i, at - Time.time);
         }
         // The work bar: gathering (and later crafting) shares the cast bar with abilities.
-        string workName; float workStart, workSeconds; Vector3 workAt; int workHealth; Action workDone;
+        string workName; float workStart, workSeconds; Vector3 workAt; int workHealth; Action workDone; RecipeDef workRecipe;
         /// <summary>Whether the player is at work (a node being worked) on the cast bar.</summary>
         public bool Working { get { return workDone != null; } }
-        void StartWork(string name, float seconds, Action done)
+        void StartWork(string name, float seconds, Action done, RecipeDef recipe = null)
         {
-            workName = name; workStart = Time.time; workSeconds = Mathf.Max(.1f, seconds); workAt = Player.transform.position; workHealth = Player.Health.Pool.Current; workDone = done;
+            workRecipe = recipe; workName = name; workStart = Time.time; workSeconds = Mathf.Max(.1f, seconds); workAt = Player.transform.position; workHealth = Player.Health.Pool.Current; workDone = done;
         }
         /// <summary>Stops the work in hand, if any (nothing is gathered), saying so when <paramref name="say"/>.</summary>
         public void CancelWork(bool say = false) { if (workDone == null) return; workDone = null; workName = null; if (say) Message(WorkStoppedLine); }
@@ -494,10 +494,10 @@ namespace Crulanda.Encounter
         }
         /// <summary>
         /// The trade a station opens the Trades window on: the first (in the content's order) whose own station it is and that the
-        /// character has, with recipes there (Cooking at a fire, Blacksmithing at a forge once taken up); else the craft whose own
-        /// station it is while a craft slot is free (Blacksmithing at a forge, to be taken up there); else the first the character has
-        /// with a recipe there (Woodcutting's charcoal at a forge or a fire); else the first with a recipe there; else the one whose
-        /// station it is.
+        /// character has, with recipes there (Cooking at a fire, Blacksmithing at a forge once taken up); else the first the character
+        /// has with a recipe there (Woodcutting's charcoal at a forge or a fire); else the craft whose own station it is while a craft
+        /// slot is free (Blacksmithing at a forge, to be taken up there); else the first with a recipe there; else the one whose station
+        /// it is.
         /// </summary>
         public ProfessionDef StationTrade(string kind)
         {
@@ -505,8 +505,8 @@ namespace Crulanda.Encounter
             var db = Professions.Db;
             bool Makes(ProfessionDef d) { return db.RecipesFor(d.id).Exists(r => Array.IndexOf(ProfessionDatabase.Stations(r.station), kind) >= 0); }
             bool Own(ProfessionDef d) { return Array.IndexOf(ProfessionDatabase.Stations(d.station), kind) >= 0; }
-            return db.Order.Find(d => Own(d) && Professions.Has(d.id) && Makes(d)) ?? db.Order.Find(d => Own(d) && d.kind == "craft" && Professions.CanLearn(d.id, out _))
-                ?? db.Order.Find(d => Professions.Has(d.id) && Makes(d)) ?? db.Order.Find(Makes) ?? db.Order.Find(Own);
+            return db.Order.Find(d => Own(d) && Professions.Has(d.id) && Makes(d)) ?? db.Order.Find(d => Professions.Has(d.id) && Makes(d))
+                ?? db.Order.Find(d => Own(d) && d.kind == "craft" && Professions.CanLearn(d.id, out _)) ?? db.Order.Find(Makes) ?? db.Order.Find(Own);
         }
         /// <summary>What E offers at a station: "Work at the forge", "Work at the bench", or at a fire "Cook at the fire" when it opens
         /// on Cooking ("Work at the fire" while the fire's only use is another trade's, such as charcoal).</summary>
@@ -539,7 +539,7 @@ namespace Crulanda.Encounter
             if (Professions == null || r == null || count < 1 || Player == null || !Player.IsAlive || Working || abilities.IsCasting) return false;
             if (InCombat) { Message(FightingLine); return false; }
             if (!CanCraft(r, out var why)) { Message(why); return false; }
-            StartWork(r.name, StartCraft(r), () => MakeOne(r, count - 1));
+            StartWork(r.name, StartCraft(r), () => MakeOne(r, count - 1), r);
             return true;
         }
         void MakeOne(RecipeDef r, int more)
@@ -549,7 +549,7 @@ namespace Crulanda.Encounter
             Message("You make " + ItemName(r.output) + (n > 1 ? " x" + n : "") + ".");
             FloatText(Player.transform.position, "+" + n + " " + ItemName(r.output), new Color(.86f, .95f, .66f));
             Save(false);
-            if (more > 0) { if (Professions.CanCraft(r, StationOk, out var stop)) StartWork(r.name, StartCraft(r), () => MakeOne(r, more - 1)); else Message(stop); }
+            if (more > 0) { if (Professions.CanCraft(r, StationOk, out var stop)) StartWork(r.name, StartCraft(r), () => MakeOne(r, more - 1), r); else Message(stop); }
         }
 
         // ---------- crafts: taking one up, forgetting it, and the trade's own people (DESIGN 4, 6.2; BUILD_PLAN step 12) ----------
@@ -608,8 +608,8 @@ namespace Crulanda.Encounter
             return true;
         }
         /// <summary>
-        /// Forgets a craft that was taken up (the Trades window's Forget, after its confirm): the skill is lost, the slot is free, work in
-        /// hand stops and the game saves ("You put Blacksmithing aside. Skill 47 is lost."). Cooking and the gathering skills are refused
+        /// Forgets a craft that was taken up (the Trades window's Forget, after its confirm): the skill is lost, the slot is free, its own work
+        /// in hand stops and the game saves ("You put Blacksmithing aside. Skill 47 is lost."). Cooking and the gathering skills are refused
         /// with why ("Cooking stays with you. It can't be forgotten."). True when it was forgotten.
         /// </summary>
         public bool ForgetCraft(string id)
@@ -617,7 +617,7 @@ namespace Crulanda.Encounter
             if (Professions == null) return false;
             if (!Professions.CanForget(id, out var why)) { Message(why); return false; }
             var d = Professions.Db.Profession(id); int skill = Professions.Skill(id);
-            CancelWork();
+            if (Working && workRecipe != null && workRecipe.profession == id) CancelWork(true);   // only its own work: charcoal or a node goes on
             Professions.Forget(id);
             Message("You put " + d.name + " aside. Skill " + skill + " is lost.");
             Save(false);

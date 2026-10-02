@@ -92,8 +92,8 @@ namespace Crulanda.Tests
             Assert.AreEqual("Work at the forge", s.InteractPrompt);
             s.Interact();
             Assert.IsTrue(s.TradesOpen, "E at the forge opens the Trades window..."); Assert.IsTrue(s.InventoryOpen, "...beside the bags...");
-            Assert.AreEqual("blacksmithing", EncounterHud.TradesPage, "...on Blacksmithing, the forge's own craft, which can be taken up here (step 12)..."); Assert.IsTrue(EncounterHud.TradesRecipes, "...at its recipes.");
-            Assert.IsFalse(s.Professions.Has("blacksmithing")); Assert.IsTrue(s.Professions.Has("woodcutting"), "Charcoal is Woodcutting's, a click away in the list.");
+            Assert.AreEqual("woodcutting", EncounterHud.TradesPage, "...on Woodcutting, whose charcoal is made at a forge..."); Assert.IsTrue(EncounterHud.TradesRecipes, "...at its recipes.");
+            Assert.IsFalse(s.Professions.Has("blacksmithing")); Assert.IsTrue(s.CanTakeUp("blacksmithing", out _), "Blacksmithing's Take up is a click away in the list.");
             Assert.AreSame(forge[0], s.StationFor(oak));
             Assert.IsTrue(s.CanCraft(oak, out var why), why);
             // Make one: two seconds on the work bar.
@@ -108,6 +108,8 @@ namespace Crulanda.Tests
             // Make all: the rest of the logs, one after another.
             int rest = Inventory.Count(p, "mat.oak_log"); Assert.AreEqual(rest, s.Professions.CanMake(oak));
             Assert.IsTrue(s.Make(oak, rest));
+            Assert.IsTrue(s.Professions.Learn("blacksmithing", out why), why); Assert.IsTrue(s.ForgetCraft("blacksmithing"));
+            Assert.IsTrue(s.Working, "Forgetting another craft leaves the charcoal going."); Assert.AreEqual(oak.name, s.PlayerCastName);
             yield return new WaitForSeconds(rest * EncounterSession.CraftSeconds + 1);
             Assert.IsFalse(s.Working);
             Assert.AreEqual(0, Inventory.Count(p, "mat.oak_log"), "Every log burnt."); Assert.AreEqual(logs, Inventory.Count(p, "mat.charcoal"), "A charcoal for each.");

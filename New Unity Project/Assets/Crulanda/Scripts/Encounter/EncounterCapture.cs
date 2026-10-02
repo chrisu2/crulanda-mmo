@@ -206,7 +206,7 @@ namespace Crulanda.Encounter
             session.SelectFriendly(null, false);
             var face = st.position - at; face.y = 0; if (face.sqrMagnitude > .01f) motor.SetView(Quaternion.LookRotation(face).eulerAngles.y + 30, 20, 5);
             yield return new WaitForSeconds(.8f);
-            session.WorkAtStation(st); EncounterHud.TradesPage = "woodcutting"; EncounterHud.TradesRecipe = "recipe.charcoal_oak"; yield return new WaitForSeconds(.6f);   // a forge opens on Blacksmithing while it can be taken up (step 12): charcoal is Woodcutting's
+            session.WorkAtStation(st); EncounterHud.TradesRecipe = "recipe.charcoal_oak"; yield return new WaitForSeconds(.6f);
             ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "24-station-recipes.png")); yield return new WaitForSeconds(.4f);
             var oak = session.Professions.Db.Recipe("recipe.charcoal_oak");
             if (oak != null) { int n = session.Professions.CanMake(oak); session.Make(oak, n); float until = Time.time + n * EncounterSession.CraftSeconds + 2; while (session.Working && Time.time < until) yield return null; }   // every log in the bags (the bags shot's nine too): wait for them all
@@ -267,7 +267,7 @@ namespace Crulanda.Encounter
             void MakeSome(string recipe, int most) { var r = log.Db.Recipe(recipe); if (r != null) session.Make(r, Mathf.Min(most, log.CanMake(r))); }   // the bags may hold more from the shots before
             IEnumerator Wait() { float until = Time.time + 30; while (session.Working && Time.time < until) yield return null; yield return new WaitForSeconds(.5f); }
             var by = StandBy(forge); while (by.MoveNext()) yield return by.Current;
-            session.WorkAtStation(forge); EncounterHud.TradesRecipes = false; yield return new WaitForSeconds(.6f);
+            session.WorkAtStation(forge); EncounterHud.TradesPage = "blacksmithing"; EncounterHud.TradesRecipes = false; yield return new WaitForSeconds(.6f);   // the charcoal shot left Woodcutting held: the forge opens on it
             ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "28-craft-take-up.png")); yield return new WaitForSeconds(.4f);
             session.LearnCraft("blacksmithing");
             foreach (var (item, count) in new[] { ("mat.copper_ore", 8), ("mat.charcoal", 4), ("mat.oak_log", 1) }) Inventory.Add(p, session.Items, item, count);

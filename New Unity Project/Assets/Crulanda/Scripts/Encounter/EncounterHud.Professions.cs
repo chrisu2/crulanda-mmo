@@ -38,7 +38,7 @@ namespace Crulanda.Encounter
         {
             QuestStyles(); ItemStyles(); var log = session.Professions; if (log == null) return;
             if (tradeNote == null) tradeNote = new GUIStyle(tiny) { wordWrap = false, clipping = TextClipping.Clip };
-            if (Time.frameCount - tradesDrawnFrame > 1 && tradesDrawnFrame >= 0) TradesForget = null;   // the window was shut between: the question went with it
+            if (tradesDrawnFrame < 0 || Time.frameCount - tradesDrawnFrame > 1) TradesForget = null;   // the window was shut between, or this is a new scene's HUD: the question went with it
             tradesDrawnFrame = Time.frameCount;
             if (TradesForget != null && !log.Has(TradesForget)) TradesForget = null;
             var w = TradesRect;
@@ -303,11 +303,12 @@ namespace Crulanda.Encounter
             if (GUI.Button(new Rect(x, py, 110, 32), "Make", micro)) session.Make(rec, 1);
             if (GUI.Button(new Rect(x + 120, py, 150, 32), "Make all (" + all2 + ")", micro)) session.Make(rec, all2);
             GUI.enabled = Live(true);
-            if (can && session.CraftHelper(rec) != null) Ink(new Rect(x + 280, py + 6, inner - 280, 22), session.CraftHelper(rec).Name + " lends a hand", nodeInk, GoodInk);
+            var helper = can ? session.CraftHelper(rec) : null;
             py += 38;
             if (!can && why != null && why != ProfessionLog.StationWanted(rec.station) && py + 20 <= page.yMax - 6)
             { measureContent.text = why; float h = Mathf.Min(qSmall.CalcHeight(measureContent, inner), page.yMax - 6 - py); Ink(new Rect(x, py, inner, h), why, qSmall, HardInk); }
-            else if (session.Working && py + 20 <= page.yMax - 6) Ink(new Rect(x, py, inner, 22), "At work: moving stops it.", qSmall, InkBrown);
+            else if (session.Working && py + 20 <= page.yMax - 6) Ink(new Rect(x, py, inner, 22), helper != null ? "At work, " + helper.Name + " beside you: moving stops it." : "At work: moving stops it.", nodeInk, InkBrown);
+            else if (helper != null && py + 20 <= page.yMax - 6) Ink(new Rect(x, py, inner, 22), helper.Name + " lends a hand: each one takes half the time.", nodeInk, GoodInk);
         }
     }
 }

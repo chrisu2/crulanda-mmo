@@ -765,3 +765,32 @@ A read-only review by five reviewers, each finding checked by a second who tried
   missed the window once in the full run (never alone); she now chooses at once when the test moves the clock.
 - Tests: EditMode 285/286 (one skipped until crafted gear exists), PlayMode 115/116 with the one failure fixed (its fixture 6/6
   after); five zones toured with a shot of every node; the bag UI shots 19-23 and the named-loot wardrobe 13-18 viewed.
+
+## 2026-10-01 — Your coin feeds a family, the first thing to make, and loot that shines (Chris: "so he can buy food/lumber for his family"; "gather ore, lumber, herbs etc and sell or refine"; "start catering to the people who love loot")
+- **Purses and spending** (BUILD_PLAN step 7): every household has a purse. What you pay Maud for a bag reaches the Tanner
+  house, and her family spends it where you can see: Nettie fetches a loaf from the baker's stall, Fen carries firewood home
+  from the woodyard, and the chimney smokes again. Short of coin they go without and say so ("Can't stretch to firewood
+  today."); with no trade bag sold, the Tanners' hearth is cold at dusk two days in three while the rest of the village smokes.
+  After 18:00 the coin waits for tomorrow ("That's tomorrow's fire."). The out of work still drink with empty purses.
+- **Stations and charcoal** (step 9): "Work at the forge" at Vell's smithy (at night too, with nobody there), the bakehouse
+  oven, Lisbet's bench and the Golden Cask's kitchen range and hearth all count; Khaven, the Peaks, the Ash Rim and the Verdant
+  Shore have their own field anvils, herbalist's benches and cookfires. A recipe pane in the Trades window (Make, Make all) and
+  the first five recipes: charcoal from each tier's wood, into your ore-poke if you wear one. Recipes teach every time while
+  orange, half the time yellow, one in ten green, never grey.
+- **Loot feel** (loot step L1): loot is rolled when a mob dies and lies on the body. Bodies show what they hold: a white
+  twinkle for coins and junk, a green glint and column for uncommon, a blue beam for rare, a purple beam with a turning ring for
+  epic, bright enough to read at night. E opens a loot window (Take all [E]); what doesn't fit stays on the body instead of
+  being lost. Tooltips compare against what you wear ("+9 weapon damage" in green, losses in red, "An upgrade"), with green
+  arrows on better pieces in your bags, at vendors and in the loot window, and a coloured call-out for every rare or epic.
+- **Smaller:** the rarer herbs (tarnwort, cinder-thistle, dewfern) drawn a third larger like yarrow; vendor item names in dark
+  ink on the parchment (common names were faint grey).
+- **Found by the full check and fixed:** Khaven's Cracked Hearth had a front door the navmesh closed (the walls' padding
+  and the agent's width left a one-voxel thread that broke at that inn's angle), so nobody could walk into its taproom; the
+  jambs' colliders now stop short of the opening (nothing visible changes). Two tests were wrong, not the game: one expected
+  "Work at the fire" with Mira standing beside the hearth (talking to her rightly comes first), one put the "grey" skill-up
+  case at 20 points over instead of 30. Dewfern's fronds ran into the ground (their pitch was the wrong way round); it now
+  rises and arches, silvery blue-green with lit dew.
+- Tests: EditMode 310/312 (one skipped until crafted gear exists; the one failure was the wrong grey case, fixed), PlayMode
+  133/135 (both failures fixed; their fixtures 6/6 after); all five zones toured with a shot of every station, then Khaven and
+  the Verdant Shore toured again after the door and dewfern fixes; the HUD shots 24-25 (recipes, charcoal made) and the loot
+  shots 01-04 viewed.

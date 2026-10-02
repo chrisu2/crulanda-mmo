@@ -28,7 +28,10 @@ MOVES_WITH = {'grave', 'crypt', 'ruin', 'ruined_house', 'crates', 'barrels', 'ca
 # Per zone: the new size, the homes that are not homes (the enemy's own buildings), and how far a camp's place reaches.
 CONF = {
     'khaven':  {'size': 410, 'not_homes': [], 'reach': 22},
-    'peaks':   {'size': 430, 'not_homes': ['Toll-house', "Captain's eyrie"], 'reach': 22},
+    'peaks':   {'size': 430, 'not_homes': ['Toll-house', "Captain's eyrie"], 'reach': 22,
+                # The Sandthrone's own toll-gate on the road and their captain's keep stay where they are: their guards stand at
+                # their gate and their captain at his keep (ZoneGrowthTests.NearHomes names them).
+                'stay': ['Toll-gate guards', "Captain's eyrie"]},
     'ashrim':  {'size': 430, 'not_homes': [], 'reach': 22},
     'verdant': {'size': 430, 'not_homes': [], 'reach': 22},
 }
@@ -69,7 +72,7 @@ def plan(zn):
     H, H2 = z['size'] / 2, conf['size'] / 2; grow = H2 - H
     homes = homes_of(z, conf)
     near = lambda p: min((dist(p, h[1]) for h in homes), default=999)
-    flagged = [i for i, c in enumerate(z['camps']) if near(xy(c['center'])) < RULE - 5 and not c.get('under')]
+    flagged = [i for i, c in enumerate(z['camps']) if near(xy(c['center'])) < RULE - 5 and not c.get('under') and c['name'] not in conf.get('stay', [])]
     ents = entities(z)
     # A camp's place: the things within its reach, each given to the nearest flagged camp (never a home, the core, an exit).
     homeset = {h[1] for h in homes}

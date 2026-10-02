@@ -70,8 +70,8 @@ namespace Crulanda.Tests
                 { "Caddock's hall", "down the cave, under the ridge" } } },
             { "khaven", new Dictionary<string, string>() },   // grown to 410 m: every camp 125 m and more from its houses (2026-10-02)
             { "peaks", new Dictionary<string, string> {
-                { "Toll-gate guards", "open: the Sandthrone's toll-gate, 70 m from Pilgrims' Rest (no village here)" }, { "Wolf pines pack", "open: 74 m from Pilgrims' Rest" },
-                { "Rockhide wallow", "open: 94 m from Pilgrims' Rest" }, { "Captain's eyrie", "open: the Sandthrone's own keep, 117 m from Pilgrims' Rest" } } },
+                { "Toll-gate guards", "the Sandthrone's toll-gate on the road, 70 m from Pilgrims' Rest: the guards stand at their gate" },
+                { "Captain's eyrie", "the Sandthrone's own keep, 117 m from Pilgrims' Rest" } } },   // grown to 430 m; the beasts moved out (2026-10-02)
             { "ashrim", new Dictionary<string, string> {
                 { "Fraying eaters", "open: the enclave fights the Weave-Eaters at its door, 50 m" }, { "The Weave-Eater brood", "open: 77 m" },
                 { "Unwoven Flats eaters", "open: 85 m" }, { "Cinderfold hollows", "open: 91 m from the hunters' hide" } } },

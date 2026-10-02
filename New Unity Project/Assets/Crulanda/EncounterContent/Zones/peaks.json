@@ -4,7 +4,7 @@
   "subtitle": "The Sandthrone toll road over the eastern border mountains",
   "canonStatus": "CANON-EXPANDED",
   "canonNote": "Canon: the Shattered Peaks are a jagged range on the eastern border that holds back the Wasting while the void slowly eats through the stone (world_bible.md), and Sandthrone mercenaries hold them and charge a toll (book1 ch.5). GAME-ONLY / PROVISIONAL: this pass and its toll gate, the toll-house, the pilgrims' rest and its people, the ruined waystation, the pilgrims' cairns, the levelling camps and all placement. Mount Umbra is named on the game's world map image but not in the lore folder. The grown ring (2026-09-30): old mining tunnels under the Peaks are CANON (book2 ch.19), and so is the void eating the stone (world_bible.md); the signal tower, the goatherd's shieling, the sealed adit, the Cold Tarn, the Listening Shrine (the Silent Pilgrims are CANON), the Broken Post, the avalanche scar with its grey head, and their camps are GAME-ONLY.",
-  "size": 360,
+  "size": 430,
   "levelMin": 6,
   "levelMax": 8,
   "biome": "mountain",
@@ -80,7 +80,7 @@
       "name": "Toll road down to Khaven Village",
       "at": {
         "x": -90,
-        "y": -173
+        "y": -208
       },
       "arrive": {
         "x": -12,
@@ -92,7 +92,7 @@
       "to": "zone.ashrim",
       "name": "Toll road east to the Ashland Rim",
       "at": {
-        "x": 173,
+        "x": 208,
         "y": -92
       },
       "arrive": {
@@ -138,8 +138,8 @@
     {
       "name": "Rockhide wallow",
       "center": {
-        "x": 40,
-        "y": -70
+        "x": 67.29,
+        "y": -107.03
       },
       "radius": 8
     },
@@ -209,8 +209,8 @@
       "name": "Rockhide wallow",
       "paint": "mud",
       "center": {
-        "x": 40,
-        "y": -70
+        "x": 67.29,
+        "y": -107.03
       },
       "radius": 7,
       "height": -0.5,
@@ -275,7 +275,7 @@
       "points": [
         {
           "x": -91,
-          "y": -180
+          "y": -215
         },
         {
           "x": -87.5,
@@ -386,7 +386,7 @@
           "y": -93
         },
         {
-          "x": 180,
+          "x": 215,
           "y": -100
         }
       ]
@@ -680,8 +680,8 @@
       "name": "Rockhide wallow",
       "text": "Boars with hides like the scree they sleep on.",
       "at": {
-        "x": 40,
-        "y": -70
+        "x": 67.29,
+        "y": -107.03
       },
       "radius": 10
     },
@@ -909,8 +909,8 @@
       "kind": "wallow",
       "name": "Rockhide wallow mud",
       "at": {
-        "x": 40,
-        "y": -70
+        "x": 67.29,
+        "y": -107.03
       },
       "size": {
         "x": 6,
@@ -1398,8 +1398,8 @@
     {
       "kind": "rock",
       "at": {
-        "x": 30,
-        "y": -84
+        "x": 57.29,
+        "y": -121.03
       },
       "variant": 1
     },
@@ -1794,8 +1794,8 @@
       "name": "Wolf pines",
       "kind": "pine",
       "center": {
-        "x": -72,
-        "y": 52
+        "x": -103.99,
+        "y": 93.85
       },
       "size": {
         "x": 40,
@@ -1984,8 +1984,8 @@
       "look": "wolf",
       "canonStatus": "GAME-ONLY",
       "center": {
-        "x": -72,
-        "y": 54
+        "x": -103.99,
+        "y": 95.85
       },
       "radius": 10,
       "count": 5,
@@ -2001,8 +2001,8 @@
       "look": "boar",
       "canonStatus": "GAME-ONLY",
       "center": {
-        "x": 40,
-        "y": -70
+        "x": 67.29,
+        "y": -107.03
       },
       "radius": 10,
       "count": 5,
@@ -2403,14 +2403,14 @@
     { "node": "node.adit", "at": { "x": 10, "y": -104 }, "rotation": 180 },
     { "node": "node.adit", "at": { "x": -104, "y": -75 }, "rotation": 270 },
     { "node": "node.adit", "at": { "x": 60.1, "y": 21.8 }, "rotation": 60 },
-    { "node": "node.stonepine", "at": { "x": -59, "y": 32 } },
+    { "node": "node.stonepine", "at": { "x": -91, "y": 73.8 } },
     { "node": "node.stonepine", "at": { "x": -44, "y": 84 } },
     { "node": "node.stonepine", "at": { "x": -3, "y": 38 }, "rotation": 90 },
     { "node": "node.stonepine", "at": { "x": -133, "y": -8 } },
     { "node": "node.stonepine", "at": { "x": 70, "y": -62 }, "rotation": 90 },
     { "node": "node.stonepine", "at": { "x": -12, "y": -59 } },
     { "node": "node.stonepine", "at": { "x": 137, "y": 40.5 } },
-    { "node": "node.stonepine", "at": { "x": -112, "y": 82 }, "rotation": 90 },
+    { "node": "node.stonepine", "at": { "x": -128, "y": 67.5 } },
     { "node": "node.tarnwort", "at": { "x": -36.5, "y": 136 } },
     { "node": "node.tarnwort", "at": { "x": -12, "y": 131 } },
     { "node": "node.tarnwort", "at": { "x": -30.3, "y": 125.2 } },
@@ -2421,9 +2421,5 @@
     { "node": "node.tarnwort", "at": { "x": -10.5, "y": -126.8 } },
     { "node": "node.tarnwort", "at": { "x": 6, "y": -136 } },
     { "node": "node.tarnwort", "at": { "x": -10.5, "y": -116.6 } }
-  ],
-  "stations": [
-    { "kind": "forge", "name": "Pass-trader's field anvil", "at": { "x": -24, "y": 0 }, "rotation": 325, "canonStatus": "GAME-ONLY" },
-    { "kind": "fire", "name": "Pass cookfire", "at": { "x": -29.5, "y": 5.5 }, "rotation": 325, "canonStatus": "GAME-ONLY" }
   ]
 }

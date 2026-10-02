@@ -61,7 +61,7 @@ namespace Crulanda.Tests
             yield return Until(() => !ReferenceEquals(look.GearRoot(EquipSlot.MainHand), trailblade) && look.GearParts(EquipSlot.MainHand) > 0);
             Assert.IsFalse(ReferenceEquals(look.GearRoot(EquipSlot.MainHand), trailblade), "The binder rebuilt the hand for the new blade.");
             Assert.Greater(look.GearParts(EquipSlot.MainHand), 0, "It is in the hand.");
-            Assert.AreSame(look.RightArm, look.GearRoot(EquipSlot.MainHand).parent);
+            Assert.AreSame(look.RightArm.Find("Forearm R") ?? look.RightArm, look.GearRoot(EquipSlot.MainHand).parent);
 
             Assert.IsTrue(Inventory.Unequip(s.Progress, (int)EquipSlot.MainHand), "Taken off, not saved.");
             yield return Until(() => look.GearParts(EquipSlot.MainHand) == 0);

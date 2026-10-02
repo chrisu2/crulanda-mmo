@@ -1013,6 +1013,7 @@ namespace Crulanda.Encounter
             {
                 var c = pivot.GetChild(i);
                 if (c == foreL || c == foreR || c == shinL || c == shinR || !c.gameObject.activeSelf) continue;
+                if (c.name.StartsWith("Gear ", System.StringComparison.Ordinal)) continue;   // worn gear on a limb is skinned to its joints (SkinnedPart)
                 if (c.childCount > 0 || c.GetComponent<Renderer>() != null) return true;
             }
             return false;

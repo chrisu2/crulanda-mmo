@@ -767,3 +767,20 @@ resumed with `Workflow({scriptPath, resumeFromRunId})` (finished agents replay f
 - **Open notes:** 9 (bloom and sun), 10 (baked cave lighting), 12 (smooth characters, "build them in code"),
   13 (high-fantasy colour), 14 (the PDF: draft committed, not checked). The stopped run's previews for 9, 10, 11 and 13 are in
   `scratchpad\artnotes\{sun,caves,icons,colour}` (no code in their worktrees). Ask Chris which next; work solo.
+
+## UPDATE 2026-10-02 late afternoon: notes 11, 13, 16 PUBLISHED (15:33); note 12 (smooth characters) IN HAND, solo
+- Published 14:12: note 11 icons. 15:33: note 13 colour (gear palettes, people, village) and note 16 (Khaven sign lantern).
+- Ultracode was switched on for the session; Chris chose "Solo, as today" (memory crulanda-usage-budget).
+- **Note 12, the smooth figure** (Chris: "still have the bubble forms/armor/characters"). Plan and state:
+  - C1a DONE on main (c933194): SmoothBody.cs lofts one skinned body per region on a skeleton (Body, Spine, Chest, Neck, Head;
+    Arm L/R + Forearm + Hand; Leg L/R + Shin + Foot), shoulder/hip pivots unchanged; head, face and hair on the Head bone;
+    knees/elbows/feet in ActorVisual.WalkJoints/Bend; a limb carrying something rigid stays near straight (Carries).
+    ActorVisual.Smooth=false gives the old block figure. Reference + preview: tools/wip/characters/body.py with
+    tools/wip/render/mesh_view.py (preview-v2.png sent to Chris). EditMode 378/378 after the gear tests were moved to regions.
+    Full check (tests, build, Oakhaven tour, wardrobe/fight shots) started 15:39.
+  - C1b NEXT: held weapons/shields on the forearm bones (hand point (-.005,-.335,.01) in Forearm R space; shield
+    (-.095,-.095,.06) in Forearm L); limb armour skinned to (pivot, lower bone[, foot]) in ActorVisual.GearArmor Fitted for
+    roots off the body (weights by y: elbow at -.285, knee at -.43, ankle at -.84 in pivot space), cached; GearPartCount to
+    count Renderers; tests: main hand parent "Forearm R", enemy "Body/Arm R/..." paths.
+  - C2: rounder armour shells (square 3-4 on the smooth torso), cloth that moves (verlet bones: tabards, skirts, capes, robes,
+    the long hair fall); C3: outfits (Dress) and class kits refitted; Pale and Keeper smooth.

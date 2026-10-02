@@ -392,6 +392,31 @@ namespace Crulanda.Encounter
                 view.SetPositionAndRotation(cam, look); ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "98-critters-" + shot + ".png"));
                 yield return new WaitForSeconds(.4f);
             }
+            // The people (playtest note 12, the smooth figure): a farmer and the warrior walking past side on, knees and elbows in the
+            // stride, and a herbalist sitting; two shots a quarter of a stride apart: <prefix>98-figures-walk-1.png and -2.png.
+            row.gameObject.SetActive(false);
+            var people = new GameObject("Figure line-up").transform; var walkers = new List<(Transform t, Vector3 from, float pace)>();
+            foreach (var (look, variant, role, x, pace) in new[] { (ActorLook.Villager, 3, "farmer", -2.2f, 1.4f), (ActorLook.Warrior, 0, (string)null, 0f, 1.7f), (ActorLook.Villager, 8, "herbalist", 2.2f, 0f) })
+            {
+                var go = new GameObject("Figure " + look); go.transform.SetParent(people, false); new GameObject("Body").transform.SetParent(go.transform, false);
+                var from = zone.Ground(new Vector2(x - pace * .9f, -11)) + Vector3.up; go.transform.SetPositionAndRotation(from, Quaternion.Euler(0, 90, 0));
+                var fig = ActorVisual.Attach(go, look, variant, false, role); if (pace == 0) fig.Pose = ActorPose.Sit;
+                walkers.Add((go.transform, from, pace));
+            }
+            var eyeAt = zone.Ground(new Vector2(0, -14.6f)) + Vector3.up * 1.15f; var lookAt = Quaternion.LookRotation(zone.Ground(new Vector2(0, -11)) + Vector3.up * .95f - eyeAt);
+            float walked = 0;
+            for (int shot = 1; shot <= 2; shot++)
+            {
+                for (float w = 0; w < (shot == 1 ? .9f : .2f); w += Time.deltaTime)
+                {
+                    walked += Time.deltaTime;
+                    foreach (var (t, from, pace) in walkers) if (pace > 0) t.position = from + t.forward * pace * walked;
+                    view.SetPositionAndRotation(eyeAt, lookAt); yield return null;
+                }
+                view.SetPositionAndRotation(eyeAt, lookAt); ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "98-figures-walk-" + shot + ".png"));
+                yield return null;
+            }
+            UnityEngine.Object.Destroy(people.gameObject);
             motor.enabled = true; foreach (var x in body) x.enabled = true;
             UnityEngine.Object.Destroy(row.gameObject);
         }

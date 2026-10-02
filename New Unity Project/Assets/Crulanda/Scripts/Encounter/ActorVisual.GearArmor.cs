@@ -112,7 +112,13 @@ namespace Crulanda.Encounter
             foreach (var g in order)
             {
                 var list = groups[g]; var root = SlotRoot(s, g.Item1); var mat = RoleMat(f, g.Item2); Transform t;
-                if (list.Count == 1)
+                if (g.Item1 != OnBody && foreL != null)
+                {
+                    // The smooth figure: a limb's armour bends with its elbow or knee (playtest note 12, step C1b).
+                    var join = new (Mesh, Matrix4x4)[list.Count]; for (int i = 0; i < list.Count; i++) join[i] = (list[i].mesh, list[i].m);
+                    t = SkinnedPart(root, g.Item1, M.Join(JoinKey(list), join), mat);
+                }
+                else if (list.Count == 1)
                 {
                     var p = list[0]; t = GPart(root, p.mesh, mat, p.m.GetColumn(3), p.m.lossyScale); t.localRotation = p.m.rotation;
                 }
@@ -141,6 +147,40 @@ namespace Crulanda.Encounter
             }
             ulong h = 14695981039346656037UL; foreach (char ch in sb.ToString()) { h ^= ch; h *= 1099511628211UL; }
             return "a.join." + h.ToString("x16") + "." + list.Count;
+        }
+        /// <summary>
+        /// A limb's armour on the smooth figure as one skinned part (playtest note 12, step C1b): the joined mesh, in the shoulder or
+        /// hip pivot's space, weighted to the pivot above the elbow or knee and to the forearm or shin below it (blended over 8 cm
+        /// across the joint), and on a leg to the foot below the ankle, so a vambrace, a greave or a boot bends with the limb. The
+        /// skinned mesh is made once per mesh and limb (<see cref="SkinnedLimb"/>).
+        /// </summary>
+        Transform SkinnedPart(Transform root, int at, Mesh mesh, Material m)
+        {
+            bool arm = at == OnArmL || at == OnArmR, left = at == OnArmL || at == OnLegL;
+            var pivot = root.parent; var lower = arm ? (left ? foreL : foreR) : (left ? shinL : shinR); var end = arm ? (left ? handL : handR) : (left ? footL : footR);
+            var go = new GameObject("Gear part"); go.transform.SetParent(root, false);
+            var smr = go.AddComponent<SkinnedMeshRenderer>();
+            smr.sharedMesh = SkinnedLimb(mesh, arm, lower.localPosition, lower.localPosition + end.localPosition);
+            smr.bones = new[] { pivot, lower, end }; smr.rootBone = pivot; smr.sharedMaterial = m; smr.quality = SkinQuality.Bone2;
+            var b = mesh.bounds; b.Expand(.2f); smr.localBounds = b;
+            return go.transform;
+        }
+        static readonly Dictionary<(Mesh, bool), Mesh> skinnedLimbs = new Dictionary<(Mesh, bool), Mesh>();
+        /// <summary>A copy of a limb piece's mesh with bone weights (pivot, lower bone, foot) and bind poses for them; cached.</summary>
+        static Mesh SkinnedLimb(Mesh src, bool arm, Vector3 lowerAt, Vector3 endAt)
+        {
+            if (skinnedLimbs.TryGetValue((src, arm), out var m) && m != null) return m;
+            m = Object.Instantiate(src); m.name = src.name + (arm ? " (arm, skinned)" : " (leg, skinned)");
+            var v = m.vertices; var w = new BoneWeight[v.Length];
+            for (int i = 0; i < v.Length; i++)
+            {
+                float y = v[i].y;
+                if (!arm && y < endAt.y + .04f) { float f = Mathf.Clamp01((endAt.y + .04f - y) / .06f); w[i] = new BoneWeight { boneIndex0 = 1, weight0 = 1 - f, boneIndex1 = 2, weight1 = f }; continue; }
+                float u = Mathf.Clamp01((lowerAt.y + .04f - y) / .08f); u = u * u * (3 - 2 * u);
+                w[i] = new BoneWeight { boneIndex0 = 0, weight0 = 1 - u, boneIndex1 = 1, weight1 = u };
+            }
+            m.boneWeights = w; m.bindposes = new[] { Matrix4x4.identity, Matrix4x4.Translate(-lowerAt), Matrix4x4.Translate(-endAt) };
+            skinnedLimbs[(src, arm)] = m; return m;
         }
         /// <summary>A slot's root on the body, or its root on an arm or leg (made the first time it is needed).</summary>
         Transform SlotRoot(int s, int at)

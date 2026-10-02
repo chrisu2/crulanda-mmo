@@ -89,7 +89,8 @@ namespace Crulanda.Encounter
                 return n;
             }
         }
-        static int Count(Transform root) { return root == null ? 0 : root.GetComponentsInChildren<MeshRenderer>(true).Length; }
+        /// <summary>Renderers under a root: mesh parts, and on the smooth figure a limb's skinned armour (SkinnedPart).</summary>
+        static int Count(Transform root) { return root == null ? 0 : root.GetComponentsInChildren<Renderer>(true).Length; }
 
         void GearInit()
         {
@@ -172,6 +173,9 @@ namespace Crulanda.Encounter
                 else if (hung) { pos = new Vector3(-.31f, .08f, -.12f); rot = Quaternion.Euler(0, 90, 0); }   // clear of the hip and thigh; a balance's beam runs fore and aft
                 else { pos = new Vector3(0, .3f, -.24f); rot = Quaternion.Euler(0, -90, 90); }
             }
+            // On the smooth figure the hand is on the forearm (the elbow bends): the same place, measured from the elbow (rest
+            // rotations are identity, so it is the shoulder's offset less the elbow's).
+            if (!stow && foreR != null) { var fore = parent == armR ? foreR : foreL; pos -= fore.localPosition; parent = fore; }
             var t = new GameObject("Gear " + ItemDatabase.SlotNames[(int)slot] + (stow ? " (slung)" : "")).transform;
             t.SetParent(parent, false); t.localPosition = pos; t.localRotation = rot;
             // Heroic proportions, the classic-MMO way: what is held reads larger than life (in the first wardrobe line-up a life-size

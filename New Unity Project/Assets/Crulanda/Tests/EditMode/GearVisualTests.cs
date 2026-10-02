@@ -27,7 +27,7 @@ namespace Crulanda.Tests
             return ActorVisual.Attach(go, look);
         }
         static GearLooks Looks() { return GearLooks.Parse(Resources.Load<TextAsset>("Gear/looks").text); }
-        static int Renderers(Transform t) { return t.GetComponentsInChildren<MeshRenderer>(true).Length; }
+        static int Renderers(Transform t) { return t.GetComponentsInChildren<Renderer>(true).Length; }   // mesh parts and skinned limb armour
         static Transform LeftArm(ActorVisual v) { return v.transform.Find("Body/Arm L"); }
         /// <summary>The smooth figure's region renderer (SmoothBody, playtest note 12): "Body/Smooth sleeves", "Body/Smooth hands"...</summary>
         static SkinnedMeshRenderer Region(ActorVisual v, string name) { var t = v.transform.Find("Body/Smooth " + name); return t != null ? t.GetComponent<SkinnedMeshRenderer>() : null; }
@@ -69,11 +69,11 @@ namespace Crulanda.Tests
         /// <summary>Under a gear root (named "Gear ..."), looking no higher than the figure itself (the test figure's own name starts "Gear").</summary>
         static bool InGear(Transform t) { for (; t != null && t.GetComponent<ActorVisual>() == null; t = t.parent) if (t.name.StartsWith("Gear ")) return true; return false; }
         /// <summary>All of a slot's parts: its root on the body and its roots on the limbs.</summary>
-        static List<MeshRenderer> SlotParts(ActorVisual v, EquipSlot s)
+        static List<Renderer> SlotParts(ActorVisual v, EquipSlot s)
         {
-            var list = new List<MeshRenderer>();
-            if (v.GearRoot(s) != null) list.AddRange(v.GearRoot(s).GetComponentsInChildren<MeshRenderer>(true));
-            foreach (var t in v.GearLimbRoots(s)) list.AddRange(t.GetComponentsInChildren<MeshRenderer>(true));
+            var list = new List<Renderer>();
+            if (v.GearRoot(s) != null) list.AddRange(v.GearRoot(s).GetComponentsInChildren<Renderer>(true));
+            foreach (var t in v.GearLimbRoots(s)) list.AddRange(t.GetComponentsInChildren<Renderer>(true));
             return list;
         }
 
@@ -98,9 +98,9 @@ namespace Crulanda.Tests
             string blade = GeneratedPiece(db, "mainhand", 5, 2, "Blade"), shield = GeneratedPiece(db, "offhand", 5, 2, "Shield"), lantern = GeneratedPiece(db, "offhand", 5, 2, "Lantern");
             v.ApplyGearIds(new[] { blade, shield }, db, looks);
             Assert.That(v.GearParts(EquipSlot.MainHand), Is.InRange(1, 12), "A blade in the right hand.");
-            Assert.AreSame(v.RightArm, v.GearRoot(EquipSlot.MainHand).parent, "It follows the right arm.");
+            Assert.AreSame(v.RightArm.Find("Forearm R") ?? v.RightArm, v.GearRoot(EquipSlot.MainHand).parent, "It follows the right forearm, so the hand (the elbow bends).");
             Assert.That(v.GearParts(EquipSlot.OffHand), Is.InRange(1, 12), "A shield on the left arm.");
-            Assert.AreSame(LeftArm(v), v.GearRoot(EquipSlot.OffHand).parent);
+            Assert.AreSame(LeftArm(v).Find("Forearm L") ?? LeftArm(v), v.GearRoot(EquipSlot.OffHand).parent);
             foreach (var s in new[] { EquipSlot.MainHand, EquipSlot.OffHand })
             {
                 var back = v.GearRoot(s, true);
@@ -109,7 +109,7 @@ namespace Crulanda.Tests
                 Assert.AreEqual(v.GearParts(s), Renderers(back), "The slung copy is the same piece.");
             }
             v.ApplyGearIds(new[] { blade, lantern }, db, looks);
-            Assert.AreSame(LeftArm(v), v.GearRoot(EquipSlot.OffHand).parent, "A lantern hangs from the left hand.");
+            Assert.AreSame(LeftArm(v).Find("Forearm L") ?? LeftArm(v), v.GearRoot(EquipSlot.OffHand).parent, "A lantern hangs from the left hand (on the forearm, the elbow bends).");
             Assert.NotNull(v.GearRoot(EquipSlot.OffHand).GetComponent<GearHang>(), "And keeps hanging straight.");
             Assert.AreEqual("offhand.hung", looks.Resolve(db.Get(lantern)).family);
             // Armour: every slot shows, on the body and, for hands, legs and feet, on both limbs.
@@ -352,7 +352,7 @@ namespace Crulanda.Tests
                         int lit = 0; foreach (var r in parts) if (r.sharedMaterial != null && r.sharedMaterial.IsKeywordEnabled("_EMISSION")) lit++;
                         if (q >= 3) Assert.GreaterOrEqual(lit, hand ? q - 2 : 1, what + ": rare and epic have glowing accents.");
                         Assert.AreEqual(q == 4, root.GetComponent<GearGlow>() != null, what + ": only epic pulses.");
-                        foreach (var r in parts) { var mesh = r.GetComponent<MeshFilter>().sharedMesh; Assert.NotNull(mesh, what + " has every mesh."); Assert.Greater(mesh.vertexCount, 0, what + ": no empty part."); Assert.NotNull(r.sharedMaterial, what + ": every part has a material."); }
+                        foreach (var r in parts) { var mesh = r is SkinnedMeshRenderer sk ? sk.sharedMesh : r.GetComponent<MeshFilter>().sharedMesh; Assert.NotNull(mesh, what + " has every mesh."); Assert.Greater(mesh.vertexCount, 0, what + ": no empty part."); Assert.NotNull(r.sharedMaterial, what + ": every part has a material."); }
                     }
             }
             Assert.AreEqual(146 * combos.Length, built, "146 variants (47 main-hand, 19 off-hand, 80 armour), seven quality and level pairs each.");
@@ -377,7 +377,7 @@ namespace Crulanda.Tests
                             string id = "fit." + family.name + "." + variant + "." + q + "." + level, look = family.name + ":" + variant + "/" + palettes[n++ % palettes.Count];
                             looks.Register(id, look); db.Items[id] = new ItemDef { id = id, name = look, kind = "gear", slot = family.slot, quality = q, level = level - 1 };
                             v.ApplyGearIds(new[] { id }, db, looks);
-                            var parts = SlotParts(v, slot); var anchored = new HashSet<MeshRenderer>();
+                            var parts = SlotParts(v, slot); var anchored = new HashSet<Renderer>();
                             foreach (var p in parts) foreach (var b in body) { var e = b; e.Expand(.08f); if (e.Intersects(p.bounds)) { anchored.Add(p); break; } }
                             for (bool grew = true; grew;)
                             {

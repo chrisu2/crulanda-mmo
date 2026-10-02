@@ -18,8 +18,8 @@ namespace Crulanda.Encounter
         static bool bagsVisible, charVisible, vendorVisible;
         static readonly Rect CharRect = new Rect(190, 110, 470, 600), VendorRect = new Rect(670, 110, 370, 600);
         /// <summary>The bags window: 400 tall with the trade bags' part under the grid (bagsExtra, set as it is drawn), rising up the
-        /// screen as that part grows so it stays on a 900-high canvas.</summary>
-        static Rect BagsRect { get { float h = 400 + bagsExtra; return new Rect(1054, Mathf.Min(290, 894 - h), 372, h); } }
+        /// screen as that part grows so its foot stays above the action bar (with all four bags worn it rises over the minimap's foot).</summary>
+        static Rect BagsRect { get { float h = 400 + bagsExtra; return new Rect(1054, Mathf.Min(290, 788 - h), 372, h); } }
         static float bagsExtra = TradeBagNoteH;
         const float PouchSlot = 38, PouchGap = 4, PouchLabel = 22, TradeBagNoteH = 40;
         /// <summary>The bags window's line when no trade bag is worn (GAME-ONLY).</summary>

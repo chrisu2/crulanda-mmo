@@ -50,7 +50,7 @@ namespace Crulanda.Tests
                 foreach (var step in q.steps)
                     foreach (var o in step.objectives)
                     {
-                        if (o.type == "talk" || o.type == "deliver") { if (o.target != "Mira") Assert.NotNull(life.Find(o.target), q.id + ": no '" + o.target + "'."); }
+                        if (o.type == "talk" || o.type == "deliver" || o.type == "bring") { if (o.target != "Mira") Assert.NotNull(life.Find(o.target), q.id + ": no '" + o.target + "'."); }
                         if (o.type == "interact" || (o.type == "collect" && !o.target.StartsWith("kill:")))
                             Assert.IsTrue(session.Zone.Interactables.Exists(i => i.name == o.target), q.id + ": no interactable '" + o.target + "'.");
                     }

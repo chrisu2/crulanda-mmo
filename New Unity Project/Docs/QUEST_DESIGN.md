@@ -55,6 +55,7 @@ items, reputation and unlocks. Text: offer / progress / complete, plus canonStat
 | `kill` enemy tag x N | Drive off 5 Concord collectors |
 | `collect` item x N from source (loot / node / critter / prop) | 5 yarrow from the meadow |
 | `deliver` item to npc | Take the eggs to Hedda Thorne |
+| `bring` bag item x N to npc | Three grey wolf pelts for Maud Tanner |
 | `visit` place / landmark / radius | Walk the straight grey line |
 | `interact` prop | Search the black-iron wagon |
 | `herd` critters to target | Shoo 3 stray hens into the coop |
@@ -104,6 +105,7 @@ shown. The main quest can foreshadow it (the Void-Seed and the straight grey lin
 | Aldo Crisp, miller | *The Wheel Won't Turn*: clear the drift jamming the water wheel | interact |
 | Corwin Ashby, elder | *Sleep Now, Stone and Sky*: collect the verses of the old Oakhaven lullaby (CANON lullaby) | talk chain, Chronicle |
 | Pim and the children | *Hide and Seek*: find the three hiding children | visit |
+| Maud Tanner, leatherworker | *A Wallet for Simples*: three grey wolf pelts for a herb wallet (built: section 9) | bring, bag reward |
 
 ### Side quest: *The Tin Crown* (GAME-ONLY quest; CANON faction, the Sandthrone)
 Chris's brief: "a quest appears at lvl 3 to take out the bandit and bandit king in the cave so they stop harassing the villagers".
@@ -239,6 +241,41 @@ Content lives in `Quests/khaven.json`, `peaks.json` and `ashrim.json`.
 
 When a tracked step's target is in another zone, the tracker shows "→ Travel to X (via Y)", and a gold ring marks the exit
 to take (`EncounterSession.ExitToward`, `HudMaps.QuestMarks`).
+
+## 9. The leatherworker's bag quests (2026-10-01, trades step 5)
+The owner asked for it: the leatherworker makes bags for the trades, earned by quest (bring her leathers) or bought outright, and
+the coin goes to her family. Design: `tools/wip/professions/ADDENDUM.md` D. All GAME-ONLY.
+
+**Quest data** (`Quests.cs`):
+- Objective `bring`: `item` is an item for the bags (a pelt, a hide; not a quest item), `count`, `target` an NPC. Progress counts
+  what the bags hold, but carrying enough is not handing it over: talking to the target with enough takes `count` of it from the
+  bags and completes the objective. The target shows a gold ? while you carry enough, a grey one before.
+- `rewards.bagItems`: items given into the bags at turn-in (a trade bag). With no free ordinary slot the turn-in is refused with
+  "Make room in your bags first." and nothing changes (the hides stay handed over; the quest waits, ready to turn in).
+- `unlessWorn` (on the quest): a trade bag's id. The quest is not offered while that bag is worn or carried. One already taken on
+  pays the bag's value in gold at turn-in instead of a second bag ("You've one already. Take the coin.").
+- `QuestDatabase.CheckItems(ItemDatabase)` cross-checks bring items, bag rewards and `unlessWorn` against the items (the quest files
+  cannot see them); the session logs any problem as an error, and `QuestLogTests.Bring_hands_over_bag_items_on_talk` pins it empty.
+- Turning in a bag quest calls `VillageLife.Paid(turnIn, the bag's price)`, as buying from her does: the hook the purses (build
+  step 7) fill in. Nothing is done with it yet.
+
+**The quests** (giver and turn-in Maud Tanner, zone Oakhaven, ids keyed on the role):
+
+| Quest id | Title | Level | Bring | Reward | Ships with |
+|---|---|---|---|---|---|
+| `npc.leatherworker.wallet` | A Wallet for Simples | 1 | 3 Grey wolf pelts | Simples-wallet, 20 XP, Oakhaven +75 | built |
+| `npc.leatherworker.sling` | A Strap for the Woodyard | 1 | 3 Hill-deer hides | Log-sling, 25 XP, +75 | hunting step (11) |
+| `npc.leatherworker.scrip` | The Cook's Scrip | 2 | 5 Coney skins | Larder-scrip, 25 XP, +75 | hunting step (11) |
+| `npc.leatherworker.poke` | Ore Wants a Stout Bag | 2 | 3 Boar hides | Ore-poke, 30 XP, +75 | hunting step (11) |
+
+The other three wait for hunting (the hides they ask for do not exist yet); all four bags can be bought from her now.
+- Wolves for the wallet: the Harrow wood (-106,108) and the North pines (48,106) camps, levels 1-2, pelt chance 0.7.
+- Maud keeps shop by the South road 9 to 12 and 2 to 6. A knock at the Tanner house when she is home opens her talk (the quest,
+  with "Browse wares") or, with no quest to offer, her wares.
+
+**Tests**: EditMode `QuestLogTests.Bring_hands_over_bag_items_on_talk`, `.Bring_without_enough_changes_nothing`,
+`.A_bag_quest_is_not_offered_once_the_bag_is_worn_or_carried`, `.TurnIn_with_the_bag_already_worn_pays_gold`,
+`.TurnIn_with_full_bags_is_refused_and_nothing_is_lost`; PlayMode `TradeBagTests` (the wallet earned and worn end to end).
 
 **Next**
 - Quest rewards that give real equipment: `reward.items` exists in the data but nothing grants it yet. Gear comes only from camp loot and merchants.

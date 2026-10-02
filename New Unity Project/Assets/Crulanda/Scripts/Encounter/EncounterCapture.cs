@@ -122,6 +122,7 @@ namespace Crulanda.Encounter
             }
             if (session.Quests != null && zone != null && VillageLife.Active != null) { var q = CaptureQuests(directory, prefix, zone); while (q.MoveNext()) yield return q.Current; }
             if (session.Professions != null) { var t = CaptureTrades(directory, prefix); while (t.MoveNext()) yield return t.Current; }
+            if (session.Items != null) { var b = CaptureBags(directory, prefix); while (b.MoveNext()) yield return b.Current; }
             yield return new WaitForSeconds(1);
             Debug.Log("UI_CAPTURE_DONE"); Application.Quit(0);
         }
@@ -135,6 +136,49 @@ namespace Crulanda.Encounter
             ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "17-trades.png")); yield return new WaitForSeconds(.4f);
             EncounterHud.TradesPage = "woodcutting"; yield return new WaitForSeconds(.3f);
             ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "18-trades-no-tool.png")); yield return new WaitForSeconds(.4f);
+            EncounterHud.TradesPage = null; session.ShowTrades(false); session.InventoryOpen = false;
+        }
+        /// <summary>
+        /// The leatherworker's bags: the bags window with no trade bag worn (the line saying where to get one), Maud Tanner's wallet
+        /// quest offer, her wares beside the bags, the bags window with all four worn and things in their rows, and the Trades
+        /// window's bag line. Maud is dealt with where the player stands, so her window stays open wherever she is.
+        /// </summary>
+        IEnumerator CaptureBags(string directory, string prefix)
+        {
+            var p = session.Progress; var maud = VillageLife.Active?.Find("Maud Tanner"); var here = session.Player.transform.position;
+            string[] bags = { "bag.simples_wallet", "bag.ore_poke", "bag.log_sling", "bag.larder_scrip" };
+            session.Conversation = null; session.QuestBookOpen = false; session.ShowTrades(false); session.CloseVendor();
+            session.InventoryOpen = true; yield return new WaitForSeconds(.5f);
+            ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "19-bags-no-trade-bag.png")); yield return new WaitForSeconds(.4f);
+            if (maud != null && session.Quests != null)
+            {
+                session.InventoryOpen = false;
+                session.QuestTalk(maud.Name, here); var wallet = session.Quests.Def("npc.leatherworker.wallet");
+                if (session.Conversation != null && wallet != null) session.Conversation.selected = wallet;
+                yield return new WaitForSeconds(.5f);
+                ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "20-bag-quest-offer.png")); yield return new WaitForSeconds(.4f);
+                session.Conversation = null;
+            }
+            if (maud != null)
+            {
+                p.gold += 100; session.OpenVendor(maud, here); yield return new WaitForSeconds(.5f);
+                ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "21-leatherworker-wares.png")); yield return new WaitForSeconds(.4f);
+                foreach (var id in bags) session.Buy(id);
+                session.CloseVendor();
+            }
+            foreach (var id in bags) { if (!Inventory.Owns(p, id)) Inventory.Add(p, session.Items, id, 1); int i = p.bag.FindIndex(s => s.item == id); if (i >= 0) session.EquipFromBag(i); }
+            // What the bags already held goes into its trade bag, then a gathering trip's worth on top.
+            for (int i = 0; i < Inventory.BagSize && i < p.bag.Count; i++)
+            {
+                var d = session.Items.Get(p.bag[i].item); if (d == null || string.IsNullOrEmpty(d.pouch)) continue;
+                for (int j = Inventory.BagSize; j < p.bag.Count; j++) if (p.bag[j].Empty && Inventory.Accepts(p, session.Items, j, d)) { Inventory.Move(p, session.Items, i, j); break; }
+            }
+            foreach (var (item, count) in new[] { ("mat.yarrow", 14), ("mat.vial", 3), ("mat.copper_ore", 26), ("mat.charcoal", 4), ("mat.oak_log", 9), ("mat.flour", 2), ("food.harrow_cheese", 1), ("junk.wolf_pelt", 4) })
+                Inventory.Add(p, session.Items, item, count);
+            session.InventoryOpen = true; yield return new WaitForSeconds(.5f);
+            ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "22-bags-trade-rows.png")); yield return new WaitForSeconds(.4f);
+            EncounterHud.TradesPage = "mining"; session.ShowTrades(true); yield return new WaitForSeconds(.5f);
+            ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "23-trades-bag-line.png")); yield return new WaitForSeconds(.4f);
             EncounterHud.TradesPage = null; session.ShowTrades(false); session.InventoryOpen = false;
         }
         /// <summary>The quest interface: a giver's !, the offer, the quest book, the ledger in the Chronicle, a hand-in list, standing, the tracker.</summary>

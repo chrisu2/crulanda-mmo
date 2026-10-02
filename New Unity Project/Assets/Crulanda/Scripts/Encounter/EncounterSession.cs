@@ -315,7 +315,7 @@ namespace Crulanda.Encounter
         /// <summary>What a hide or pelt says when used from the bags, and on its tooltip (GAME-ONLY).</summary>
         public const string HideLine = "Leather. Maud Tanner in Oakhaven works it.";
         /// <summary>What the leatherworker says when every bag she makes is already yours (GAME-ONLY).</summary>
-        public const string AllBagsLine = "\"That's one of every bag I cut, and all of them on you. Come back when one wears through.\"";
+        public const string AllBagsLine = "That's one of every bag I cut, and all of them on you. Come back when one wears through.";
         static ProfessionDatabase professionCache; static EncounterContent professionCacheFor; static ItemDatabase professionCacheItems; static bool professionCacheBad;
         /// <summary>The trades' content read against the items (cached), or null when it is missing or invalid (logged once).</summary>
         ProfessionDatabase ProfessionContent()
@@ -372,7 +372,6 @@ namespace Crulanda.Encounter
             TradesOpen = open;
             if (open) { CharacterOpen = false; CloseVendor(); InventoryOpen = true; }
         }
-        /// <summary>A gathering tool used from the bags: it teaches its skill and hangs at the belt, or is refused and kept ("You already carry one.").</summary>
         /// <summary>A trade bag used from the bags: worn for good, its slots added under the bags' 24, or refused and kept ("You already carry one.").</summary>
         bool WearBag(int bagIndex)
         {
@@ -382,6 +381,7 @@ namespace Crulanda.Encounter
             Message("You hang the " + char.ToLowerInvariant(d.name[0]) + d.name.Substring(1) + " at your hip: " + d.slots + " slots for " + Inventory.HoldsWords(d.holds) + ".");
             Save(false); return true;
         }
+        /// <summary>A gathering tool used from the bags: it teaches its skill and hangs at the belt, or is refused and kept ("You already carry one.").</summary>
         bool UseTool(int bagIndex)
         {
             if (Professions == null) { Message("You have no use for that yet."); return false; }

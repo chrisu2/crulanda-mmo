@@ -13,6 +13,11 @@ namespace Crulanda.Encounter
     public sealed partial class ActorVisual : MonoBehaviour
     {
         Transform body, legL, legR, armL, armR, torso, head;
+        /// <summary>The smooth figure's other bones (playtest note 12; SmoothBody): the spine, the elbows, wrists, knees and ankles.
+        /// Null on a block figure (<see cref="Smooth"/> off) and on beasts, the Pale and the Keeper.</summary>
+        Transform spine, headBone, foreL, foreR, handL, handR, shinL, shinR, footL, footR;
+        /// <summary>People are built smooth (SmoothBody); off, the old block figure (for comparison). Read when a figure is built.</summary>
+        public static bool Smooth = true;
         Material cloth, accent;
         Vector3 lastPosition; float phase, speed;
 
@@ -316,6 +321,84 @@ namespace Crulanda.Encounter
             }
         }
 
+        /// <summary>The old block figure (Smooth off): capsule limbs on four pivots, a cube torso, hips and boots, a sphere head.</summary>
+        void BuildBlock(ActorLook look, Material skin, Material legs, Material boots)
+        {
+
+            // Legs and arms hang from pivots so they can swing.
+            legL = Pivot("Leg L", new Vector3(-.12f, -.08f, 0)); legR = Pivot("Leg R", new Vector3(.12f, -.08f, 0));
+            baseLegs = new Renderer[3]; baseBoots = new Renderer[2];
+            for (int i = 0; i < 2; i++)
+            {
+                var leg = i == 0 ? legL : legR;
+                baseLegs[i] = Part(PrimitiveType.Capsule, leg, new Vector3(0, -.44f, 0), new Vector3(.18f, .44f, .18f), legs).GetComponent<Renderer>();
+                baseBoots[i] = Part(PrimitiveType.Cube, leg, new Vector3(0, -.86f, .05f), new Vector3(.17f, .12f, .28f), boots).GetComponent<Renderer>();
+            }
+            baseLegs[2] = Part(PrimitiveType.Cube, body, new Vector3(0, -.02f, 0), new Vector3(.44f, .2f, .27f), legs).GetComponent<Renderer>();           // hips
+            torso = Part(PrimitiveType.Cube, body, new Vector3(0, .3f, 0), new Vector3(.48f, .6f, .29f), cloth);
+            baseBelt = Part(PrimitiveType.Cube, body, new Vector3(0, .06f, 0), new Vector3(.5f, .07f, .31f), Mat(new Color(.22f, .16f, .11f))).GetComponent<Renderer>(); // belt
+            head = Part(PrimitiveType.Sphere, body, new Vector3(0, .8f, 0), new Vector3(.3f, .32f, .3f), skin);
+            Features(look, skin);
+            armL = Pivot("Arm L", new Vector3(-.31f, .53f, 0)); armR = Pivot("Arm R", new Vector3(.31f, .53f, 0));
+            baseSleeves = new Renderer[2]; baseHands = new Renderer[2];
+            for (int i = 0; i < 2; i++)
+            {
+                var arm = i == 0 ? armL : armR;
+                baseSleeves[i] = Part(PrimitiveType.Capsule, arm, new Vector3(0, -.3f, 0), new Vector3(.14f, .3f, .14f), cloth).GetComponent<Renderer>();
+                baseHands[i] = Part(PrimitiveType.Sphere, arm, new Vector3(0, -.62f, 0), Vector3.one * .12f, skin).GetComponent<Renderer>();
+            }
+        }
+        /// <summary>
+        /// The smooth figure (playtest note 12; SmoothBody): one skinned body per region on a skeleton whose shoulder and hip pivots
+        /// are the old ones ("Arm L/R", "Leg L/R"), with elbows, wrists, knees and ankles under them; the head, face and hair ride
+        /// the Head bone. The regions worn gear covers are the base* renderers, one each.
+        /// </summary>
+        void BuildSmooth(ActorLook look, Material skin, Material legs, Material boots)
+        {
+            var belt = Mat(new Color(.22f, .16f, .11f));
+            var mats = new Material[SmoothBody.RegionCount];
+            mats[(int)SmoothBody.Region.Chest] = cloth; mats[(int)SmoothBody.Region.Sleeves] = cloth; mats[(int)SmoothBody.Region.Belt] = belt;
+            mats[(int)SmoothBody.Region.Legs] = legs; mats[(int)SmoothBody.Region.Boots] = boots; mats[(int)SmoothBody.Region.Hands] = skin; mats[(int)SmoothBody.Region.Neck] = skin;
+            var bones = SmoothBody.Build(body, mats, skin, out var rs, out var headPart);
+            spine = bones[SmoothBody.Spine]; headBone = bones[SmoothBody.Head];
+            armL = bones[SmoothBody.ArmL]; armR = bones[SmoothBody.ArmR]; foreL = bones[SmoothBody.ForearmL]; foreR = bones[SmoothBody.ForearmR]; handL = bones[SmoothBody.HandL]; handR = bones[SmoothBody.HandR];
+            legL = bones[SmoothBody.LegL]; legR = bones[SmoothBody.LegR]; shinL = bones[SmoothBody.ShinL]; shinR = bones[SmoothBody.ShinR]; footL = bones[SmoothBody.FootL]; footR = bones[SmoothBody.FootR];
+            baseChest = new[] { rs[(int)SmoothBody.Region.Chest] }; baseSleeves = new[] { rs[(int)SmoothBody.Region.Sleeves] }; baseHands = new[] { rs[(int)SmoothBody.Region.Hands] };
+            baseLegs = new[] { rs[(int)SmoothBody.Region.Legs] }; baseBoots = new[] { rs[(int)SmoothBody.Region.Boots] }; baseBelt = rs[(int)SmoothBody.Region.Belt];
+            // Where the old torso cube stood: the walk's bob moves it (and the spine with it), and GearBob reads it.
+            torso = new GameObject("Torso").transform; torso.SetParent(body, false); torso.localPosition = new Vector3(0, .3f, 0);
+            head = headPart;
+            SmoothFace(look, skin);
+        }
+        /// <summary>The face on the smooth head (the old one's eyes, brows, ears, nose and mouth, set on its surface) and the hair:
+        /// a cap (short), the cap and a fall down the back (long), the cap and a bun (tied back), cropped short, or bald.</summary>
+        void SmoothFace(ActorLook look, Material skin)
+        {
+            bool stone = look == ActorLook.Hollow; var hb = headBone; var o = -SmoothBody.Rest[SmoothBody.Head];
+            var eyeWhite = Mat(stone ? new Color(.45f, .45f, .47f) : new Color(.95f, .94f, .9f), .6f);
+            var pupil = Mat(stone ? new Color(.3f, .3f, .32f) : new Color(.12f, .09f, .07f), .8f);
+            var brow = Mat(stone ? new Color(.35f, .35f, .36f) : HairColors[Mathf.Abs(variant * 3 + 1) % HairColors.Length] * .8f);
+            foreach (int s in new[] { -1, 1 })
+            {
+                Part(PrimitiveType.Sphere, hb, new Vector3(s * .058f, .838f, .14f) + o, new Vector3(.052f, .044f, .03f), eyeWhite);
+                if (!stone) Part(PrimitiveType.Sphere, hb, new Vector3(s * .058f, .837f, .154f) + o, Vector3.one * .025f, pupil);
+                Part(PrimitiveType.Cube, hb, new Vector3(s * .06f, .874f, .146f) + o, new Vector3(.058f, .013f, .02f), brow, new Vector3(0, 0, s * -8));
+                Part(PrimitiveType.Sphere, hb, new Vector3(s * .143f, .815f, .0f) + o, new Vector3(.045f, .078f, .052f), skin);                  // ears
+            }
+            Part(PrimitiveType.Sphere, hb, new Vector3(0, .8f, .164f) + o, new Vector3(.048f, .068f, .058f), skin);                           // nose
+            Part(PrimitiveType.Cube, hb, new Vector3(0, .748f, .152f) + o, new Vector3(.07f, .012f, .01f), Mat(stone ? new Color(.3f, .3f, .31f) : new Color(.45f, .2f, .18f))); // mouth
+            if (stone) return;
+            var hair = Mat(HairColors[Mathf.Abs(variant * 3 + 1) % HairColors.Length], .25f);
+            Transform Hair(Mesh m) { var g = new GameObject(m.name); g.transform.SetParent(hb, false); g.AddComponent<MeshFilter>().sharedMesh = m; g.AddComponent<MeshRenderer>().sharedMaterial = hair; return g.transform; }
+            switch (Mathf.Abs(variant) % 5)
+            {
+                case 0: hairParts = new[] { Hair(SmoothBody.HairMesh(false)) }; break;                                                              // short
+                case 1: hairParts = new[] { Hair(SmoothBody.HairMesh(false)), hairLong = Hair(SmoothBody.HairFallMesh) }; break;                    // long
+                case 2: hairParts = new[] { Hair(SmoothBody.HairMesh(false)), hairBun = Part(PrimitiveType.Sphere, hb, new Vector3(0, .83f, -.18f) + o, Vector3.one * .13f, hair) }; break;   // tied back
+                case 3: hairParts = new[] { Hair(SmoothBody.HairMesh(true)) }; break;                                                               // cropped
+                default: break;                                                                                                                    // bald
+            }
+        }
         void Build(ActorLook look)
         {
             body = transform.Find("Body"); if (body == null) return;
@@ -356,28 +439,8 @@ namespace Crulanda.Encounter
             var legs = Mat(legC); var boots = Mat(new Color(.18f, .13f, .1f));
             if (look == ActorLook.Warden) body.localScale = new Vector3(1.08f, 1.12f, 1.08f);
 
-            // Legs and arms hang from pivots so they can swing.
-            legL = Pivot("Leg L", new Vector3(-.12f, -.08f, 0)); legR = Pivot("Leg R", new Vector3(.12f, -.08f, 0));
-            baseLegs = new Renderer[3]; baseBoots = new Renderer[2];
-            for (int i = 0; i < 2; i++)
-            {
-                var leg = i == 0 ? legL : legR;
-                baseLegs[i] = Part(PrimitiveType.Capsule, leg, new Vector3(0, -.44f, 0), new Vector3(.18f, .44f, .18f), legs).GetComponent<Renderer>();
-                baseBoots[i] = Part(PrimitiveType.Cube, leg, new Vector3(0, -.86f, .05f), new Vector3(.17f, .12f, .28f), boots).GetComponent<Renderer>();
-            }
-            baseLegs[2] = Part(PrimitiveType.Cube, body, new Vector3(0, -.02f, 0), new Vector3(.44f, .2f, .27f), legs).GetComponent<Renderer>();           // hips
-            torso = Part(PrimitiveType.Cube, body, new Vector3(0, .3f, 0), new Vector3(.48f, .6f, .29f), cloth);
-            baseBelt = Part(PrimitiveType.Cube, body, new Vector3(0, .06f, 0), new Vector3(.5f, .07f, .31f), Mat(new Color(.22f, .16f, .11f))).GetComponent<Renderer>(); // belt
-            head = Part(PrimitiveType.Sphere, body, new Vector3(0, .8f, 0), new Vector3(.3f, .32f, .3f), skin);
-            Features(look, skin);
-            armL = Pivot("Arm L", new Vector3(-.31f, .53f, 0)); armR = Pivot("Arm R", new Vector3(.31f, .53f, 0));
-            baseSleeves = new Renderer[2]; baseHands = new Renderer[2];
-            for (int i = 0; i < 2; i++)
-            {
-                var arm = i == 0 ? armL : armR;
-                baseSleeves[i] = Part(PrimitiveType.Capsule, arm, new Vector3(0, -.3f, 0), new Vector3(.14f, .3f, .14f), cloth).GetComponent<Renderer>();
-                baseHands[i] = Part(PrimitiveType.Sphere, arm, new Vector3(0, -.62f, 0), Vector3.one * .12f, skin).GetComponent<Renderer>();
-            }
+            if (Smooth) BuildSmooth(look, skin, legs, boots);
+            else BuildBlock(look, skin, legs, boots);
             switch (look)
             {
                 case ActorLook.Warrior:
@@ -840,6 +903,7 @@ namespace Crulanda.Encounter
             legL.localEulerAngles = new Vector3(swing, 0, 0); legR.localEulerAngles = new Vector3(-swing, 0, 0);
             armL.localEulerAngles = new Vector3(-swing * .8f + idle, 0, 3); armR.localEulerAngles = new Vector3(swing * .8f - idle, 0, -3);
             if (torso != null && !beast) torso.localPosition = new Vector3(0, .3f + Mathf.Abs(Mathf.Sin(phase)) * .025f * stride, 0);
+            if (spine != null) { spine.localPosition = SmoothBody.Rest[SmoothBody.Spine] + new Vector3(0, torso.localPosition.y - .3f, 0); WalkJoints(stride); }
             if (gearDriven && torso != null) GearBob(torso.localPosition.y - .3f);
             if (beast && LyingLow) { armL.localEulerAngles = armR.localEulerAngles = new Vector3(80, 0, 0); legL.localEulerAngles = legR.localEulerAngles = new Vector3(-80, 0, 0); }   // lying in wait: legs folded under the belly
             if (Pose == ActorPose.None)   // combatants never use poses (their death pose moves the body)
@@ -860,6 +924,7 @@ namespace Crulanda.Encounter
                     swimPhase += Time.deltaTime * (stride > .1f ? 4.5f : 2);
                     armL.localEulerAngles = new Vector3(-120 + Mathf.Sin(swimPhase) * 70, 0, 25); armR.localEulerAngles = new Vector3(-120 + Mathf.Sin(swimPhase + Mathf.PI) * 70, 0, -25);
                     legL.localEulerAngles = new Vector3(Mathf.Sin(swimPhase * 1.6f) * 25, 0, 0); legR.localEulerAngles = new Vector3(-Mathf.Sin(swimPhase * 1.6f) * 25, 0, 0);
+                    Bend(18 + Mathf.Max(0, Mathf.Cos(swimPhase * 1.6f)) * 30, 18 + Mathf.Max(0, -Mathf.Cos(swimPhase * 1.6f)) * 30, -20, -20);
                     swimLean = Mathf.MoveTowards(swimLean, stride > .1f ? 55 : 18, 150 * Time.deltaTime);
                     // Lean about the chest, not the hips, so the head stays up out of the water.
                     var chest = new Vector3(0, .45f, 0); var tilt = Quaternion.Euler(swimLean, 0, 0);
@@ -869,6 +934,7 @@ namespace Crulanda.Encounter
                 case ActorPose.Sneak:    // crouched, knees bent, arms held close
                     legL.localEulerAngles = new Vector3(-35 + swing * .6f, 0, 0); legR.localEulerAngles = new Vector3(-35 - swing * .6f, 0, 0);
                     armL.localEulerAngles = new Vector3(-30, 0, 10); armR.localEulerAngles = new Vector3(-30, 0, -10);
+                    Bend(55 - swing * .5f, 55 + swing * .5f, -35, -35);
                     lean += 22; break;
                 case ActorPose.Hammer:   // steady strikes on the anvil with the right hand; the left holds the work
                 {
@@ -881,6 +947,7 @@ namespace Crulanda.Encounter
                     armL.localEulerAngles = armR.localEulerAngles = new Vector3(-axe, 0, 0); lean += axe < 40 ? 14 : 0; break;
                 }
                 case ActorPose.Gather:   // bent over, picking at the ground
+                    Bend(25, 25, -25, -30);
                     armL.localEulerAngles = new Vector3(-50 + Mathf.Sin(t * 2) * 12, 0, 8); armR.localEulerAngles = new Vector3(-55 + Mathf.Sin(t * 2.6f + 1) * 16, 0, -8);
                     lean += 38; break;
                 case ActorPose.Knead:    // both hands pushing forward in turn (dough, hides, a stall's wares)
@@ -893,25 +960,62 @@ namespace Crulanda.Encounter
                     float gesture = Mathf.Max(0, Mathf.Sin(t * 1.3f)) * 55;
                     armR.localEulerAngles = new Vector3(-gesture, 0, -12 - gesture * .2f); break;
                 case ActorPose.Sit:
-                    legL.localEulerAngles = legR.localEulerAngles = new Vector3(-80, 0, 0);
+                    legL.localEulerAngles = legR.localEulerAngles = new Vector3(-80, 0, 0); Bend(85, 85, -30, -30);
                     armL.localEulerAngles = new Vector3(-35, 0, 8); armR.localEulerAngles = new Vector3(-35 + Mathf.Sin(t) * 10, 0, -8); break;
                 case ActorPose.Cower:
                     armL.localEulerAngles = new Vector3(-150, 0, 25); armR.localEulerAngles = new Vector3(-150, 0, -25); break;
                 case ActorPose.Drink:    // seated with a tankard: the right arm lifts it to the mouth every few seconds, the head tipping back
                 {
-                    legL.localEulerAngles = legR.localEulerAngles = new Vector3(-80, 0, 0);
+                    legL.localEulerAngles = legR.localEulerAngles = new Vector3(-80, 0, 0); Bend(85, 85, -30, -20);
                     float k = Mathf.Repeat(t * .28f, 1), lift = k < .18f ? Mathf.SmoothStep(0, 1, k / .18f) : k < .45f ? 1 : k < .6f ? 1 - Mathf.SmoothStep(0, 1, (k - .45f) / .15f) : 0;
                     armL.localEulerAngles = new Vector3(-35, 0, 8); armR.localEulerAngles = new Vector3(-40 - lift * 85, 0, -8 + lift * 18);
                     lean -= lift * 8; break;
                 }
                 case ActorPose.Slump:    // passed out over the table: folded forward, arms out, breathing slow
-                    legL.localEulerAngles = legR.localEulerAngles = new Vector3(-80, 0, 0);
+                    legL.localEulerAngles = legR.localEulerAngles = new Vector3(-80, 0, 0); Bend(85, 85, -15, -15);
                     armL.localEulerAngles = new Vector3(-110, 0, 22); armR.localEulerAngles = new Vector3(-105, 0, -26);
                     lean += 62 + Mathf.Sin(t * .6f) * 1.5f; break;
             }
             // Sitting lowers the whole figure onto the seat; everything else stands.
             body.localPosition = new Vector3(0, Pose == ActorPose.Sit || Pose == ActorPose.Drink || Pose == ActorPose.Slump ? -.45f * (child ? .66f : 1) : Pose == ActorPose.Sneak ? -.28f : Pose == ActorPose.Swim ? -.15f : 0, 0);
             body.localEulerAngles = new Vector3(lean, 0, 0);
+        }
+        /// <summary>
+        /// The smooth figure's knees, ankles and elbows for this frame of the walk (playtest note 12): a knee bends most as its leg
+        /// swings through and a little as it takes the weight, the foot stays nearly level, an elbow trails more as its arm swings
+        /// forward. A limb that carries something rigid (a weapon or shield in hand, worn armour, a tankard) stays nearly straight,
+        /// so the thing still sits on it, until worn gear follows the joints.
+        /// </summary>
+        void WalkJoints(float stride)
+        {
+            float c = Mathf.Cos(phase), kneeL = (Mathf.Max(0, -c) * 50 + 5) * stride, kneeR = (Mathf.Max(0, c) * 50 + 5) * stride;
+            float elbowL = -(5 + Mathf.Max(0, -Signed(armL.localEulerAngles.x)) * .55f), elbowR = -(5 + Mathf.Max(0, -Signed(armR.localEulerAngles.x)) * .55f);
+            Bend(kneeL, kneeR, elbowL, elbowR);
+        }
+        /// <summary>Sets the knees (positive bends the shin back), the elbows (negative brings the forearm forward) and levels the
+        /// feet; a limb carrying something rigid keeps within a few degrees of straight.</summary>
+        void Bend(float kneeL, float kneeR, float elbowL, float elbowR)
+        {
+            if (shinL == null) return;
+            if (Carries(legL)) kneeL = Mathf.Min(kneeL, 6); if (Carries(legR)) kneeR = Mathf.Min(kneeR, 6);
+            if (Carries(armL)) elbowL = Mathf.Max(elbowL, -5); if (Carries(armR)) elbowR = Mathf.Max(elbowR, -5);
+            shinL.localEulerAngles = new Vector3(kneeL, 0, 0); shinR.localEulerAngles = new Vector3(kneeR, 0, 0);
+            footL.localEulerAngles = new Vector3(-(Signed(legL.localEulerAngles.x) + kneeL) * .6f, 0, 0);
+            footR.localEulerAngles = new Vector3(-(Signed(legR.localEulerAngles.x) + kneeR) * .6f, 0, 0);
+            foreL.localEulerAngles = new Vector3(elbowL, 0, 0); foreR.localEulerAngles = new Vector3(elbowR, 0, 0);
+        }
+        static float Signed(float degrees) { return degrees > 180 ? degrees - 360 : degrees; }
+        /// <summary>True when something rigid hangs from this shoulder or hip pivot besides the limb's own lower bone: a held
+        /// weapon or shield, worn armour's limb root, a tankard.</summary>
+        bool Carries(Transform pivot)
+        {
+            for (int i = 0; i < pivot.childCount; i++)
+            {
+                var c = pivot.GetChild(i);
+                if (c == foreL || c == foreR || c == shinL || c == shinR || !c.gameObject.activeSelf) continue;
+                if (c.childCount > 0 || c.GetComponent<Renderer>() != null) return true;
+            }
+            return false;
         }
     }
 }

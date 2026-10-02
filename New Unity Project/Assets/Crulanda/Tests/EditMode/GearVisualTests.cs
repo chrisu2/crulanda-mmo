@@ -29,6 +29,15 @@ namespace Crulanda.Tests
         static GearLooks Looks() { return GearLooks.Parse(Resources.Load<TextAsset>("Gear/looks").text); }
         static int Renderers(Transform t) { return t.GetComponentsInChildren<MeshRenderer>(true).Length; }
         static Transform LeftArm(ActorVisual v) { return v.transform.Find("Body/Arm L"); }
+        /// <summary>The smooth figure's region renderer (SmoothBody, playtest note 12): "Body/Smooth sleeves", "Body/Smooth hands"...</summary>
+        static SkinnedMeshRenderer Region(ActorVisual v, string name) { var t = v.transform.Find("Body/Smooth " + name); return t != null ? t.GetComponent<SkinnedMeshRenderer>() : null; }
+        /// <summary>Where a skinned region stands at rest (its mesh's bounds through its transform): edit mode never skins.</summary>
+        static Bounds RestBounds(SkinnedMeshRenderer sk)
+        {
+            var b = sk.sharedMesh.bounds; var m = sk.transform.localToWorldMatrix; var w = new Bounds(m.MultiplyPoint3x4(b.center), Vector3.zero);
+            for (int i = 0; i < 8; i++) w.Encapsulate(m.MultiplyPoint3x4(b.center + Vector3.Scale(b.extents, new Vector3(i % 2 == 0 ? -1 : 1, i / 2 % 2 == 0 ? -1 : 1, i / 4 == 0 ? -1 : 1))));
+            return w;
+        }
         static readonly EquipSlot[] Armour = { EquipSlot.Head, EquipSlot.Neck, EquipSlot.Shoulders, EquipSlot.Chest, EquipSlot.Hands, EquipSlot.Legs, EquipSlot.Feet };
         /// <summary>A generated item whose name has this piece word ("Blade", "Shield", "Lantern").</summary>
         static string GeneratedPiece(ItemDatabase db, string slot, int level, int quality, string piece, int skip = 0)
@@ -76,8 +85,9 @@ namespace Crulanda.Tests
             Assert.IsTrue(v.GearDriven);
             Assert.AreEqual(0, v.ClassKitParts, "No pads, no class sword or shield.");
             Assert.AreEqual(0, v.GearPartCount);
-            Assert.AreEqual(2, Renderers(v.RightArm), "The right arm is a sleeve and a hand.");
-            Assert.AreEqual(2, Renderers(LeftArm(v)), "So is the left.");
+            Assert.AreEqual(0, Renderers(v.RightArm), "The right arm carries nothing: its sleeve and hand are the smooth body's.");
+            Assert.AreEqual(0, Renderers(LeftArm(v)), "Nor does the left.");
+            foreach (var r in new[] { "chest", "sleeves", "hands", "legs", "boots", "belt", "neck" }) Assert.NotNull(Region(v, r), "The smooth body's " + r + ".");
             foreach (EquipSlot s in System.Enum.GetValues(typeof(EquipSlot))) { Assert.IsNull(v.GearRoot(s), s + " shows nothing."); Assert.AreEqual(0, v.GearLimbRoots(s).Count); }
             Assert.IsTrue(v.HairShowing, "The hair shows.");
         }
@@ -118,7 +128,7 @@ namespace Crulanda.Tests
                 var legs = v.GearLimbRoots(s); Assert.AreEqual(2, legs.Count, s + " on both legs.");
                 CollectionAssert.AreEquivalent(new[] { "Leg L", "Leg R" }, new[] { legs[0].parent.name, legs[1].parent.name });
             }
-            Assert.That(Renderers(v.RightArm), Is.GreaterThan(2), "The glove is on the right arm, so it swings with it.");
+            Assert.That(Renderers(v.RightArm), Is.GreaterThan(0), "The glove is on the right arm, so it swings with it.");
             // Taking the lantern off empties the hand; the chest piece goes too.
             v.ApplyGearIds(new[] { blade }, db, looks);
             Assert.IsNull(v.GearRoot(EquipSlot.Chest)); Assert.IsNull(v.GearRoot(EquipSlot.OffHand), "Taking the lantern off empties the hand.");
@@ -136,7 +146,7 @@ namespace Crulanda.Tests
                 {
                     v.ApplyGearIds(Kit(db, 9, 3, pieces), db, looks);
                     int changed = 0; foreach (var kv in bare.parts) if (kv.Key.sharedMaterial != kv.Value.Item1) changed++;
-                    Assert.Greater(changed, 4, look + " in " + string.Join(", ", pieces) + ": the armour recolours what it covers.");
+                    Assert.GreaterOrEqual(changed, 2, look + " in " + string.Join(", ", pieces) + ": the armour recolours what it covers (on the smooth body each region is one renderer: a jerkin covers nothing, leggings and boots do).");
                     v.ApplyGearIds(new string[0], db, looks);
                     foreach (var kv in bare.parts)
                     {
@@ -357,7 +367,7 @@ namespace Crulanda.Tests
                 var go = new GameObject("Fit test figure"); new GameObject("Body").transform.SetParent(go.transform, false); made.Add(go);
                 var v = ActorVisual.Attach(go, ActorLook.Warrior, hair);
                 v.ApplyGearIds(new string[0], db, looks);
-                var body = new List<Bounds>(); foreach (var r in v.GetComponentsInChildren<MeshRenderer>(false)) if (!InGear(r.transform)) body.Add(r.bounds);
+                var body = new List<Bounds>(); foreach (var r in v.GetComponentsInChildren<Renderer>(false)) if (!InGear(r.transform)) body.Add(r is SkinnedMeshRenderer sk ? RestBounds(sk) : r.bounds);
                 foreach (var family in GearLooks.Families)
                 {
                     var slot = (EquipSlot)ItemDatabase.SlotIndex(family.slot); if (slot == EquipSlot.MainHand || slot == EquipSlot.OffHand) continue;
@@ -407,7 +417,7 @@ namespace Crulanda.Tests
             var v = Figure(); var worn = EncounterSession.FreshProgress().equipment;
             Assert.IsFalse(GearBinder.Dress(v, worn, null, Looks()), "No item database: the binder leaves the figure alone.");
             Assert.IsFalse(v.GearDriven); Assert.AreEqual(6, v.ClassKitParts, "The Warrior keeps the sword, shield and pads.");
-            Assert.AreEqual(4, Renderers(v.RightArm), "Sleeve, hand, sword and guard.");
+            Assert.AreEqual(2, Renderers(v.RightArm), "The sword and its guard (the sleeve and hand are the smooth body's).");
         }
 
         [Test] public void Druid_staff_yields_to_a_main_hand_item()
@@ -434,7 +444,7 @@ namespace Crulanda.Tests
             Assert.AreEqual(3, v.ClassKitParts, "Cap off: the hood is back.");
             Assert.Less(cape.localPosition.z, hung.z - .05f, "Over a hauberk the cloak hangs further back, clear of the mail.");
             // A form recolours the Druid's own cloth: the sleeves under a tunic do not change, the bare ones do.
-            var sleeve = v.transform.Find("Body/Arm R").GetChild(0).GetComponent<Renderer>();
+            Renderer sleeve = Region(v, "sleeves");
             v.ApplyGearIds(new[] { GeneratedPiece(db, "chest", 6, 2, "Tunic") }, db, looks);
             var tunic = sleeve.sharedMaterial; var before = tunic.color;
             v.SetClothColor(new Color(.8f, .1f, .1f));
@@ -458,7 +468,8 @@ namespace Crulanda.Tests
             Assert.IsFalse(king.GearDriven);
             // Villagers are not gear-driven either: their bodies are built as before.
             var villager = Figure(ActorLook.Villager, "Villager"); Assert.IsFalse(villager.GearDriven);
-            Assert.AreEqual(2, Renderers(villager.RightArm), "A villager's arm is a sleeve and a hand.");
+            Assert.AreEqual(0, Renderers(villager.RightArm), "A villager's arm carries nothing: the smooth body has its sleeve and hand.");
+            Assert.NotNull(Region(villager, "sleeves"));
         }
     }
 }

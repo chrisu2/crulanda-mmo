@@ -226,12 +226,24 @@ namespace Crulanda.Encounter
         {
             if (on == hairTucked) return;
             hairTucked = on;
+            // On the smooth figure the hair rides the Head bone (its own frame): the fall shortens to the nape, keeping its top
+            // under the brim, and the bun tucks a little lower and closer.
+            bool smooth = headBone != null;
             if (hairLong != null)
             {
-                if (on) { hairLongPos = hairLong.localPosition; hairLongScale = hairLong.localScale; hairLong.localPosition = new Vector3(0, .7f, -.12f); hairLong.localScale = new Vector3(.3f, .3f, .08f); }
+                if (on)
+                {
+                    hairLongPos = hairLong.localPosition; hairLongScale = hairLong.localScale;
+                    if (smooth) { hairLong.localScale = Vector3.Scale(hairLongScale, new Vector3(1, .55f, 1)); hairLong.localPosition = hairLongPos + new Vector3(0, .063f, 0); }
+                    else { hairLong.localPosition = new Vector3(0, .7f, -.12f); hairLong.localScale = new Vector3(.3f, .3f, .08f); }
+                }
                 else { hairLong.localPosition = hairLongPos; hairLong.localScale = hairLongScale; }
             }
-            if (hairBun != null) { if (on) { hairBunPos = hairBun.localPosition; hairBun.localPosition = new Vector3(0, .82f, -.165f); } else hairBun.localPosition = hairBunPos; }
+            if (hairBun != null)
+            {
+                if (on) { hairBunPos = hairBun.localPosition; hairBun.localPosition = smooth ? hairBunPos + new Vector3(0, -.015f, .012f) : new Vector3(0, .82f, -.165f); }
+                else hairBun.localPosition = hairBunPos;
+            }
         }
         /// <summary>The Druid's cloak hangs from the back of the shoulders, falling clear of whatever is worn over the chest.</summary>
         void HangCloak(bool on)

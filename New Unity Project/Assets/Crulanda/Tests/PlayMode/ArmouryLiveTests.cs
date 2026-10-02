@@ -105,7 +105,7 @@ namespace Crulanda.Tests
             Assert.IsFalse(s.InCombat, "Out of combat, so the game saves.");
             s.Save(false);
             string file = Path.Combine(root, EncounterSave.SlotFor(s.ClassDef.id) + ".save.json");
-            Assert.IsTrue(File.Exists(file), "Saved to the test's folder."); StringAssert.Contains("\"source\":\"drop.oak.caddock#1\"", File.ReadAllText(file));
+            Assert.IsTrue(File.Exists(file), "Saved to the test's folder."); StringAssert.Contains("{\\\"source\\\":\\\"drop.oak.caddock#1\\\",\\\"kills\\\":1,", File.ReadAllText(file));   // the payload is a JSON string inside the envelope, so its quotes are escaped
             s.Progress.lootLuck.Clear();
             Assert.AreEqual(ArmouryLog.State.Unknown, s.Armoury.StateOf("loot.oak.due_cleaver"), "Forgotten in memory");
             s.Load(); yield return null;

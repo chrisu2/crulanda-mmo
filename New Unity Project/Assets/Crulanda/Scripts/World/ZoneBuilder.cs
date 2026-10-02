@@ -3389,6 +3389,8 @@ namespace Crulanda.World
         /// Peaks tarnwort's 0.64 slope is about 33 degrees, a creek bank less), so its leaves lie on the slope and are not buried by the
         /// sink. On steeper ground the rest is taken up by sinking it.</summary>
         const float HerbTilt = 40;
+        /// <summary>The least a mourner's cap's gills stand over the ground once its cluster is laid on a slope.</summary>
+        const float GillClear = .05f;
         /// <summary>The drawn land's height at a world point: the lower of the land and its mesh (as under a node).</summary>
         float LandY(float x, float z) { return Mathf.Min(HeightAt(x, z), MeshY(x, z)); }
         /// <summary>
@@ -3425,6 +3427,37 @@ namespace Crulanda.World
             if (Mathf.Abs(det) > 1e-6f) { ax = (sxy * szz - szy * sxz) / det; az = (szy * sxx - sxy * sxz) / det; }
             var normal = new Vector3(-ax, 1, -az).normalized;
             if (Vector3.Angle(Vector3.up, normal) >= 1) clump.rotation = Quaternion.RotateTowards(Quaternion.identity, Quaternion.FromToRotation(Vector3.up, normal), HerbTilt) * clump.parent.rotation;
+            // A cluster on stalks (mourner's cap: its parts named "Stalk" and "Gills") stands on its stalks' feet, built under its
+            // plane. It is sunk only until no foot is clear of the ground (and 2 cm more), and never so far that a cap's gills come
+            // within GillClear of it (raised, where the ground rises round it); a stalk whose foot is then still clear is lengthened
+            // down its own line into the ground. Sinking its plane under a bank's crest buried the small caps.
+            float RimOver(Transform cyl, int at)   // a cylinder's lower rim (0-7) and its middle (8), over the ground
+            {
+                var w = cyl.TransformPoint(at == 8 ? new Vector3(0, -1, 0) : new Vector3(.5f * Mathf.Cos(at * Mathf.PI / 4), -1, .5f * Mathf.Sin(at * Mathf.PI / 4)));
+                return w.y - groundY(w.x, w.z);
+            }
+            float need = float.MinValue, room = float.MaxValue; var stalks = new List<Transform>(); bool stalked = false;
+            foreach (var part in clump.GetComponentsInChildren<Transform>())
+            {
+                bool foot = part.name == "Stalk"; if (!foot && part.name != "Gills") continue;
+                stalked = true; if (foot) stalks.Add(part);
+                for (int q = 0; q <= 8; q++) { float over = RimOver(part, q); if (foot) need = Mathf.Max(need, over); else room = Mathf.Min(room, over); }
+            }
+            if (stalked)
+            {
+                float drop = Mathf.Min(Mathf.Max(0, need + .02f), room - GillClear);
+                if (Mathf.Abs(drop) > .005f) clump.position = o - Vector3.up * drop;
+                foreach (var stalk in stalks)
+                    for (int pass = 0; pass < 4; pass++)
+                    {
+                        float high = float.MinValue; for (int q = 0; q <= 8; q++) high = Mathf.Max(high, RimOver(stalk, q));
+                        if (high <= -.01f) break;
+                        float more = (high + .03f) / Mathf.Max(.4f, stalk.up.y);   // longer by this, at its foot (its top, cap and gills stay)
+                        stalk.position -= stalk.up * (more / 2);
+                        var size = stalk.localScale; size.y += more / 2 / clump.lossyScale.y; stalk.localScale = size;
+                    }
+                return;
+            }
             // Sunk until the plane it stands on is under the ground beneath every part (measured as leaned).
             var up = clump.up; float sink = float.MinValue;
             foreach (var c in Under()) sink = Mathf.Max(sink, o.y - (up.x * (c.x - o.x) + up.z * (c.y - o.z)) / up.y - groundY(c.x, c.y));
@@ -3485,8 +3518,8 @@ namespace Crulanda.World
             {
                 float yaw = Mathf.Atan2(at.x, at.y) * Mathf.Rad2Deg; var lean = Quaternion.Euler(0, yaw, 0) * Quaternion.Euler(tilt, 0, 0);
                 var foot = new Vector3(at.x, -.08f, at.y); var top = foot + lean * new Vector3(0, h + .08f, 0);
-                Part(PrimitiveType.Cylinder, t, (foot + top) / 2, new Vector3(w * .24f, (h + .08f) / 2, w * .24f), stalk, lean);
-                Part(PrimitiveType.Cylinder, t, top - lean * new Vector3(0, .012f, 0), new Vector3(w * .92f, .01f, w * .92f), gill, lean);   // the black gills under the rim
+                Part(PrimitiveType.Cylinder, t, (foot + top) / 2, new Vector3(w * .24f, (h + .08f) / 2, w * .24f), stalk, lean).name = "Stalk";
+                Part(PrimitiveType.Cylinder, t, top - lean * new Vector3(0, .012f, 0), new Vector3(w * .92f, .01f, w * .92f), gill, lean).name = "Gills";   // the black gills under the rim
                 Part(PrimitiveType.Sphere, t, top + lean * new Vector3(0, .02f, 0), new Vector3(w, w * .42f, w), cap, lean);
                 Part(PrimitiveType.Sphere, t, top + lean * new Vector3(0, .055f, 0), new Vector3(w * .45f, w * .22f, w * .45f), crown, lean);
             }

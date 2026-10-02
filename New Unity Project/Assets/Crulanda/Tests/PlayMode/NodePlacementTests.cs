@@ -114,7 +114,7 @@ namespace Crulanda.Tests
                     float y = zone.HeightAt(x, z);
                     return ground != null && ground.Raycast(new Ray(new Vector3(x, y + 50, z), Vector3.down), out var hit, 200) ? Mathf.Min(y, hit.point.y) : y;
                 }
-                int here = 0;
+                int here = 0, onStalks = 0;
                 foreach (var clump in zone.GetComponentsInChildren<Transform>(true).Where(t => t.name == "Clump"))
                 {
                     if (Hollow.InsideAny(clump.position + Vector3.up * .3f, 0)) continue;
@@ -128,11 +128,30 @@ namespace Crulanda.Tests
                             worst = Mathf.Max(worst, PlaneY(c) - Ground(c.x, c.y));
                         sunk = Mathf.Max(sunk, Ground(b.center.x, b.center.z) - PlaneY(new Vector2(b.center.x, b.center.z)));
                     }
-                    if (worst > .05f) problems.Add(zone.Zone.displayName + ": the herb '" + clump.parent.name + "' at " + clump.parent.position + " stands " + (worst * 100).ToString("0") + " cm over the ground under its edge");
-                    if (sunk > .06f) problems.Add(zone.Zone.displayName + ": the herb '" + clump.parent.name + "' at " + clump.parent.position + " is sunk " + (sunk * 100).ToString("0") + " cm under the ground at its root or a part (its leaves are buried)");
+                    // A cluster on stalks (mourner's cap) stands on its stalks' feet, built under its plane, and is judged by what shows:
+                    // no stalk's foot clear of the ground, and every cap's gills (their whole rim) 4 cm over it.
+                    var standing = clump.GetComponentsInChildren<Transform>().Where(x => x.name == "Stalk" || x.name == "Gills").ToList();
+                    bool stalked = standing.Count > 0;
+                    if (stalked)
+                    {
+                        onStalks++; float clear = float.MinValue, gills = float.MaxValue;
+                        foreach (var part in standing)
+                            for (int k = 0; k <= 8; k++)
+                            {
+                                var at = part.TransformPoint(k == 8 ? new Vector3(0, -1, 0) : new Vector3(.5f * Mathf.Cos(k * Mathf.PI / 4), -1, .5f * Mathf.Sin(k * Mathf.PI / 4)));
+                                float over = at.y - Ground(at.x, at.z);
+                                if (part.name == "Stalk") clear = Mathf.Max(clear, over); else gills = Mathf.Min(gills, over);
+                            }
+                        if (standing.Count != 14) problems.Add(zone.Zone.displayName + ": the herb '" + clump.parent.name + "' at " + clump.parent.position + " has " + standing.Count + " stalks and gills, not seven of each");
+                        if (clear > .01f) problems.Add(zone.Zone.displayName + ": the herb '" + clump.parent.name + "' at " + clump.parent.position + " has a stalk whose foot stands " + (clear * 100).ToString("0") + " cm clear of the ground");
+                        if (gills < .04f) problems.Add(zone.Zone.displayName + ": the herb '" + clump.parent.name + "' at " + clump.parent.position + " has a cap whose gills are " + (gills * 100).ToString("0") + " cm over the ground (buried, or too low to see)");
+                    }
+                    if (!stalked && worst > .05f) problems.Add(zone.Zone.displayName + ": the herb '" + clump.parent.name + "' at " + clump.parent.position + " stands " + (worst * 100).ToString("0") + " cm over the ground under its edge");
+                    if (!stalked && sunk > .06f) problems.Add(zone.Zone.displayName + ": the herb '" + clump.parent.name + "' at " + clump.parent.position + " is sunk " + (sunk * 100).ToString("0") + " cm under the ground at its root or a part (its leaves are buried)");
                     float lean = Vector3.Angle(Vector3.up, up); if (lean > steepest) { steepest = lean; steepestAt = zone.Zone.displayName + " '" + clump.parent.name + "'"; }
                 }
                 if (here < 10) problems.Add(zone.Zone.displayName + ": only " + here + " herbs found on the land");
+                if (id == "zone.khaven" && onStalks < 10) problems.Add(zone.Zone.displayName + ": only " + onStalks + " mourner's-cap clusters stand on named stalks, not its ten");
             }
             TestContext.WriteLine(herbs + " herbs; the steepest leans " + steepest.ToString("0") + " degrees (" + steepestAt + ").");
             Assert.IsEmpty(problems, string.Join("\n", problems));

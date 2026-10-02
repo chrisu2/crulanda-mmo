@@ -333,7 +333,7 @@ namespace Crulanda.Tests
             Assert.IsTrue(s.Professions.Has("blacksmithing")); Assert.AreEqual(1, s.Professions.Skill("blacksmithing")); Assert.AreEqual(1, s.Professions.CraftSlotsUsed);
             Assert.Contains(s.Professions.Db.Profession("blacksmithing").takeUp, s.Messages, "With nobody there, the craft's own words.");
             Assert.IsFalse(s.LearnCraft("blacksmithing"), "Once is enough."); Assert.Contains("You have taken up Blacksmithing already.", s.Messages);
-            StringAssert.Contains("\"blacksmithing\"", Saved(s), "Saved.");
+            StringAssert.Contains("{\\\"id\\\":\\\"blacksmithing\\\",\\\"skill\\\":1}", Saved(s), "Saved.");   // the payload is a JSON string inside the envelope, so its quotes are escaped
             Assert.AreEqual("blacksmithing", s.StationTrade("forge").id, "The forge opens on it from now on.");
             // Four copper bars, two seconds each with nobody to work the bellows; each teaches.
             Assert.AreEqual(EncounterSession.CraftSeconds, s.CraftTime(bar));
@@ -364,7 +364,7 @@ namespace Crulanda.Tests
             Assert.Contains("You put Blacksmithing aside. Skill 6 is lost.", s.Messages);
             Assert.IsFalse(s.Professions.Has("blacksmithing")); Assert.AreEqual(0, s.Professions.CraftSlotsUsed);
             Assert.AreEqual("craft.copper_cudgel", p.equipment[(int)EquipSlot.MainHand].item, "The cudgel stays worn.");
-            StringAssert.DoesNotContain("\"blacksmithing\"", Saved(s), "Forgotten in the save too.");
+            StringAssert.DoesNotContain("\\\"blacksmithing\\\"", Saved(s), "Forgotten in the save too.");
             Assert.IsFalse(s.ForgetCraft("cooking")); Assert.Contains("Cooking stays with you. It can't be forgotten.", s.Messages); Assert.IsTrue(s.Professions.Has("cooking"));
         }
 
@@ -438,7 +438,7 @@ namespace Crulanda.Tests
             Assert.IsFalse(s.Working);
             Assert.AreEqual(potions + 2, Inventory.Count(p, "potion.minor")); Assert.AreEqual(0, Inventory.Count(p, "mat.yarrow")); Assert.AreEqual(0, Inventory.Count(p, "mat.vial"));
             Assert.Contains("You make Minor healing draught.", s.Messages); Assert.AreEqual(3, s.Professions.Skill("alchemy"));
-            StringAssert.Contains("\"alchemy\"", Saved(s));
+            StringAssert.Contains("{\\\"id\\\":\\\"alchemy\\\",\\\"skill\\\":3}", Saved(s));
             // Both crafts taken (Blacksmithing as if at a forge): every slot is used, and the bench still opens on Alchemy. The content
             // has two crafts, so a third is refused in ProfessionLogTests.ThirdCraft_IsRefused.
             Assert.IsTrue(s.Professions.Learn("blacksmithing", out why), why);

@@ -76,3 +76,32 @@ duller and nearer the rock's own colour.
 Measured (`ZoneBuilder.Nodes.cs` `Windfall`): the fallen trunk carries four thin stub limbs, two of them pointing up 0.9 to
 1.4 m, on a plain tapered log beside a small stump. Fix: a tree that reads as broken or felled: a torn, splintered stump,
 a heavy trunk with snapped boughs and torn bark, and the litter of a fall (or of an axe) round it.
+
+## 7. Cats' tails need to be more flexible (2026-10-01) — OPEN
+> "cats tails need to be more flexible"
+
+Measured (`CritterBody.Make`, the cat): the tail is one rigid cylinder set at a fixed angle. Fix: a tail of several short
+segments that curves, sways as the cat walks, lifts when it trots and curls and flicks when it sits or looks about.
+
+## 8. Lights look better (2026-10-01) — KEEP
+> "lights look better"
+
+The night pass (firelit windows and lamps, the moonlit blue base). Nothing to fix: do not regress it.
+
+## 9. Bloom and sun effects? (2026-10-01) — OPEN
+> "bloom sun effects?"
+
+What exists (`ZonePost`, `Post.shader`): bloom on lamps, windows, embers and the sun, and sun shafts when the sun is in view,
+both tuned low; they evidently do not read in play. Fix: a sun that reads: a visible disc with a warm halo, glare and light
+shafts when you look toward it (strongest low in the sky, through trees and at dawn and dusk), glints on water, and bloom
+that shows on bright sky and firelight without washing the painted colours out. Add tour shots that face the sun at dawn,
+noon and dusk so it can be judged.
+
+## 10. Baked lighting in the caves, more atmospheric (2026-10-01) — OPEN
+> "need baked lighting in the caves. more atmospheric"
+
+The caves (Crowsfoot Hollow, the Root-Mother's Deep) are lit evenly by the zone's ambient light with a few live lights, so
+they read flat. Zones are generated when they load, so Unity's lightmapper cannot bake them; the bake has to be done by the
+zone builder: light from each torch, fire and glowing thing and from the mouth, blocked by the cave's own walls, with
+darkness in the depths and in the creases, stored on the cave's mesh (or in a light map over its plan) and used by the cave
+shader, the props and the actors alike; then haze, shafts at the mouth and a colour script per cave.

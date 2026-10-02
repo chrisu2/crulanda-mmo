@@ -54,9 +54,12 @@ charge 4x), stack, armor, stamina, strength, agility, intellect, spirit, weaponD
 | `kind: "tool"` | `tool.pick`, `tool.hatchet` | Used once from the bags: teaches the trade in `teaches` at skill 1 and is used up. A second one is refused and kept. Stack 1. |
 | `teaches` | tools | A profession id. `ProfessionDatabase.Parse` refuses a tool that teaches an unknown trade. |
 | `trade` | materials | The village stock key a sale of it feeds: `forge.ore`, `forge.wood`, `stall.herbs` (used from the gathering step on). |
-| `pouch` | materials | The class of trade bag that holds it: `ore`, `timber`, `herb`, `larder` (used from the bags step on). |
+| `pouch` | materials, eggs, cheese | The class of trade bag that holds it: `ore`, `timber`, `herb`, `larder`. A picked-up item tops up its stacks first, then fills an empty slot of a worn bag that holds its class, then an ordinary slot. |
+| `kind: "bag"` | `bag.simples_wallet`, `bag.log_sling`, `bag.larder_scrip`, `bag.ore_poke` | A trade bag (the leatherworker's). Used once from the bags it is worn for good: it leaves the bags, its id joins the save's `pouches`, and its `slots` are added after the 24 (`Inventory.Wear`). One of each: a second is refused and kept ("You already carry one."). Stack 1. |
+| `holds`, `slots` | bags | The class its slots take (a `pouch` value) and how many (1-24). Nothing else goes in ("Only ore, bars and charcoal go in the ore-poke."). `ItemDatabase.Parse` refuses a bag without both. |
+| hides | `junk.wolf_pelt`, `junk.ash_hide`, `junk.moss_hide`, `junk.dappled_hide` | Kind `material`, quality 1, `trade: "tannery.hides"` (ids, names, values and the stack of 10 kept from when they were junk). "Sell junk" keeps them; using one says "Leather. Maud Tanner in Oakhaven works it." Sold in a village, the tannery and the leatherworker notice. |
 
-Kinds are `gear`, `junk`, `consumable`, `material`, `tool`. `VendorDef`: `npc` or `role`, `items`, `gearForZone`. A role entry leaves
+Kinds are `gear`, `junk`, `consumable`, `material`, `tool`, `bag`. `VendorDef`: `npc` or `role`, `items`, `gearForZone`. A role entry leaves
 `npc` out (never `""`). Vendors never sell ore, logs or herbs: those come from the world only.
 
 ## Trades (`EncounterContent/Professions/*.json`, `ProfessionDatabase`)

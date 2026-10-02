@@ -73,11 +73,11 @@ namespace Crulanda.Tests
         {
             var db = Db(); var p = EncounterSession.FreshProgress();
             string worn = ItemDatabase.GearId("feet", 2, 0, 1), sound = ItemDatabase.GearId("feet", 2, 1, 1);
-            Inventory.Add(p, db, "junk.wolf_pelt", 3); Inventory.Add(p, db, "mat.copper_ore", 5); Inventory.Add(p, db, "mat.yarrow", 2);
+            Inventory.Add(p, db, "junk.wolf_fang", 3); Inventory.Add(p, db, "mat.copper_ore", 5); Inventory.Add(p, db, "mat.yarrow", 2);
             Inventory.Add(p, db, "mat.charcoal", 1); Inventory.Add(p, db, "tool.pick", 1); Inventory.Add(p, db, worn, 1); Inventory.Add(p, db, sound, 1); Inventory.Add(p, db, "potion.minor", 2);
-            int expected = 3 * db.Get("junk.wolf_pelt").value + db.Get(worn).value;
+            int expected = 3 * db.Get("junk.wolf_fang").value + db.Get(worn).value;
             Assert.AreEqual(expected, Inventory.SellJunk(p, db)); Assert.AreEqual(expected, p.gold);
-            Assert.AreEqual(0, Inventory.Count(p, "junk.wolf_pelt")); Assert.AreEqual(0, Inventory.Count(p, worn), "Poor gear goes with the junk.");
+            Assert.AreEqual(0, Inventory.Count(p, "junk.wolf_fang")); Assert.AreEqual(0, Inventory.Count(p, worn), "Poor gear goes with the junk.");
             Assert.AreEqual(5, Inventory.Count(p, "mat.copper_ore")); Assert.AreEqual(2, Inventory.Count(p, "mat.yarrow")); Assert.AreEqual(1, Inventory.Count(p, "mat.charcoal"));
             Assert.AreEqual(1, Inventory.Count(p, "tool.pick")); Assert.AreEqual(1, Inventory.Count(p, sound)); Assert.AreEqual(2, Inventory.Count(p, "potion.minor"));
             Assert.AreEqual(0, Inventory.SellJunk(p, db), "Nothing left to sell as junk."); Assert.AreEqual(expected, p.gold);
@@ -89,10 +89,36 @@ namespace Crulanda.Tests
                 if (d.kind == "material") materials++; else tools++;
                 Assert.IsFalse(Inventory.IsJunk(d), d.id); Assert.AreEqual(1, d.quality, d.id); Assert.GreaterOrEqual(d.value, 1, d.id);
                 Assert.IsFalse(Inventory.CanEquip(d, 13, out _), d.id); Assert.IsFalse(string.IsNullOrEmpty(d.canonStatus), d.id + " is labelled.");
-                if (d.kind == "material") Assert.AreEqual(20, d.stack, d.id); else { Assert.AreEqual(1, d.stack, d.id); Assert.IsFalse(string.IsNullOrEmpty(d.teaches), d.id); }
+                // Hides kept the stack of ten they had as junk (the bags step made them materials).
+                if (d.kind == "material") Assert.AreEqual(Inventory.IsHide(d) ? 10 : 20, d.stack, d.id); else { Assert.AreEqual(1, d.stack, d.id); Assert.IsFalse(string.IsNullOrEmpty(d.teaches), d.id); }
             }
             Assert.GreaterOrEqual(materials, 19, "Fifteen raw materials, charcoal, flour, salt and vials."); Assert.AreEqual(2, tools);
-            Assert.IsTrue(Inventory.IsJunk(db.Get("junk.wolf_pelt"))); Assert.IsFalse(Inventory.IsJunk(null)); Assert.IsFalse(Inventory.IsJunk(db.Get("potion.minor")));
+            Assert.IsTrue(Inventory.IsJunk(db.Get("junk.wolf_fang"))); Assert.IsFalse(Inventory.IsJunk(null)); Assert.IsFalse(Inventory.IsJunk(db.Get("potion.minor")));
+        }
+
+        [Test] public void Hides_are_materials_and_SellJunk_keeps_them()
+        {
+            var db = Db(); var p = EncounterSession.FreshProgress();
+            // The four hides the beasts drop today: materials now, their ids, names, values and stacks as they were.
+            var hides = new[] { ("junk.wolf_pelt", "Grey wolf pelt", 2), ("junk.ash_hide", "Ash-matted hide", 5), ("junk.moss_hide", "Moss-matted hide", 7), ("junk.dappled_hide", "Dappled stag hide", 8) };
+            foreach (var (id, name, value) in hides)
+            {
+                var d = db.Get(id); Assert.NotNull(d, id);
+                Assert.AreEqual("material", d.kind, id); Assert.AreEqual(1, d.quality, id); Assert.AreEqual(name, d.name, id); Assert.AreEqual(value, d.value, id); Assert.AreEqual(10, d.stack, id);
+                Assert.AreEqual(Inventory.HideTrade, d.trade, id + " is a delivery to the tannery when sold in a village.");
+                Assert.IsTrue(Inventory.IsHide(d), id); Assert.IsFalse(Inventory.IsJunk(d), id); Assert.IsTrue(string.IsNullOrEmpty(d.pouch), id + " goes in no trade bag.");
+            }
+            Assert.IsFalse(Inventory.IsHide(db.Get("mat.copper_ore"))); Assert.IsFalse(Inventory.IsHide(db.Get("junk.wolf_fang")));
+            // "Sell junk" sells the fangs and tusks and leaves every hide.
+            foreach (var (id, _, _) in hides) Assert.AreEqual(0, Inventory.Add(p, db, id, 3), id);
+            Inventory.Add(p, db, "junk.wolf_fang", 2); Inventory.Add(p, db, "junk.boar_tusk", 1);
+            int expected = 2 * db.Get("junk.wolf_fang").value + db.Get("junk.boar_tusk").value;
+            Assert.AreEqual(expected, Inventory.SellJunk(p, db));
+            foreach (var (id, _, _) in hides) Assert.AreEqual(3, Inventory.Count(p, id), id + " is kept.");
+            Assert.AreEqual(0, Inventory.Count(p, "junk.wolf_fang")); Assert.AreEqual(0, Inventory.Count(p, "junk.boar_tusk"));
+            // The wolf still drops its pelt as often as before.
+            var wolf = db.Loot.Find(t => t.tag == "wolf"); Assert.NotNull(wolf);
+            Assert.AreEqual(.7f, System.Array.Find(wolf.entries, e => e.item == "junk.wolf_pelt").chance, 1e-4f);
         }
 
         [Test] public void Vendors_sell_tools_and_makings_but_never_what_is_gathered()

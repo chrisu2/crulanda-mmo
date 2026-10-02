@@ -545,7 +545,7 @@ namespace Crulanda.Encounter
                     if (Count("forge.ore") > 0) return Zone.Zone.id == "zone.oakhaven" ? "Someone's been up the Crowsfoot with a pick. First ore I've not had to beg for." : "Someone's been out with a pick. First ore I've not had to beg for.";
                     return Count("forge.wood") > 0 ? "The woodcutter brought oak this morning. Hearth's drawing well." : null;
                 case "miller": return Count("mill.grain") > 0 ? "Barley's in from the fields. The stone's turning on something, at least." : null;
-                case "leatherworker": case "skinner": return Count("tannery.hides") > 0 ? "The hunter's been by with a hide. Grey at one edge; the rest'll do." : null;
+                case "leatherworker": case "skinner": return Count("sold.tannery.hides") > 0 ? "Somebody's been selling pelts in the village. Clean ones, too; not a grey edge among them." : Count("tannery.hides") > 0 ? "The hunter's been by with a hide. Grey at one edge; the rest'll do." : null;
                 case "innkeeper": return Places["inn"].Count > 0 && Count("inn.ale") == 0 ? "Dry. Ama's cask never sees the night out." : Count("inn.meat") > 0 ? "Garet's hares are in the pot. Don't tell the out-of-work." : null;
                 case "henwife": return Count("stall.eggs") > 0 ? "Eggs are at the produce stall if you're wanting any. I don't sell from the yard." : Count("inn.eggs") > 0 ? "Took the Cask its eggs this morning. The rest go to the stall after dinner." : null;
                 case "drinker": case "elder": case "gossip": case "farmer":

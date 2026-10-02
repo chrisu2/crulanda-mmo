@@ -15,10 +15,11 @@
     {
       "id": "junk.wolf_pelt",
       "name": "Grey wolf pelt",
-      "kind": "junk",
-      "quality": 0,
+      "kind": "material",
+      "quality": 1,
       "value": 2,
       "stack": 10,
+      "trade": "tannery.hides",
       "description": "The skinner will want it, or any merchant.",
       "canonStatus": "GAME-ONLY"
     },
@@ -142,6 +143,7 @@
       "quality": 1,
       "value": 2,
       "stack": 20,
+      "pouch": "larder",
       "description": "Half a dozen eggs from the hen-wives' coops, brought to the stall this morning and sold on while they last. Boiled, they travel.",
       "canonStatus": "GAME-ONLY"
     },
@@ -154,7 +156,8 @@
       "quality": 1,
       "level": 3,
       "value": 2,
-      "stack": 20
+      "stack": 20,
+      "pouch": "larder"
     },
     {
       "id": "food.mountain_jerky",
@@ -359,10 +362,11 @@
     {
       "id": "junk.ash_hide",
       "name": "Ash-matted hide",
-      "kind": "junk",
-      "quality": 0,
+      "kind": "material",
+      "quality": 1,
       "value": 5,
       "stack": 10,
+      "trade": "tannery.hides",
       "description": "Stiff with grey grit. It will never come clean, but a tanner will take it.",
       "canonStatus": "GAME-ONLY"
     },
@@ -379,10 +383,11 @@
     {
       "id": "junk.moss_hide",
       "name": "Moss-matted hide",
-      "kind": "junk",
-      "quality": 0,
+      "kind": "material",
+      "quality": 1,
       "value": 7,
       "stack": 10,
+      "trade": "tannery.hides",
       "description": "Thick boar hide with moss rooted in the bristles. A tanner will scrape it, eventually.",
       "canonStatus": "GAME-ONLY"
     },
@@ -409,10 +414,11 @@
     {
       "id": "junk.dappled_hide",
       "name": "Dappled stag hide",
-      "kind": "junk",
-      "quality": 0,
+      "kind": "material",
+      "quality": 1,
       "value": 8,
       "stack": 10,
+      "trade": "tannery.hides",
       "description": "Dappled like light through leaves.",
       "canonStatus": "GAME-ONLY"
     },
@@ -828,6 +834,54 @@
       "teaches": "woodcutting",
       "description": "Use it to hang it at your belt. It takes no room in your bags after that.",
       "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "bag.simples_wallet",
+      "name": "Simples-wallet",
+      "kind": "bag",
+      "quality": 1,
+      "value": 3,
+      "stack": 1,
+      "holds": "herb",
+      "slots": 6,
+      "description": "Oak-bark leather folded three ways, with a stiff flap so the herbs lie flat and keep their leaves. Maud Tanner's stitching, small and close.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "bag.log_sling",
+      "name": "Log-sling",
+      "kind": "bag",
+      "quality": 1,
+      "value": 4,
+      "stack": 1,
+      "holds": "timber",
+      "slots": 6,
+      "description": "A broad hide strap and two cinches, cut to carry split logs on the shoulder without barking your neck raw.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "bag.larder_scrip",
+      "name": "Larder-scrip",
+      "kind": "bag",
+      "quality": 1,
+      "value": 5,
+      "stack": 1,
+      "holds": "larder",
+      "slots": 8,
+      "description": "A lined satchel with a waxed inner pocket: meat, meal and salt kept apart, and kept dry.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "bag.ore_poke",
+      "name": "Ore-poke",
+      "kind": "bag",
+      "quality": 1,
+      "value": 6,
+      "stack": 1,
+      "holds": "ore",
+      "slots": 8,
+      "description": "A round sack of doubled hide, drawn shut with a thong. Ore wears through anything thinner by spring.",
+      "canonStatus": "GAME-ONLY"
     }
   ],
   "vendors": [
@@ -867,6 +921,15 @@
       "items": [
         "food.brown_loaf",
         "food.harrow_cheese"
+      ]
+    },
+    {
+      "role": "leatherworker",
+      "items": [
+        "bag.simples_wallet",
+        "bag.log_sling",
+        "bag.larder_scrip",
+        "bag.ore_poke"
       ]
     },
     {

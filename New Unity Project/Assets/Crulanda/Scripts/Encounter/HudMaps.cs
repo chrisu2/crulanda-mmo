@@ -212,9 +212,11 @@ namespace Crulanda.Encounter
             if (weather != null && weather.Kind != WeatherKind.Clear && weather.Kind != WeatherKind.Fair)
                 Shadowed(new Rect(r.xMax - 70, r.y + 38, 100, 18), WeatherSchedule.Name(weather.Kind), centered, night ? new Color(.72f, .78f, .92f) : new Color(.86f, .84f, .74f));
             // Corner mask: square HUD corners hidden under the round frame.
-            if (GUI.Button(new Rect(r.xMax - 18, r.yMax - 30, 24, 24), "+")) zoom = Mathf.Max(0, zoom - 1);
-            if (GUI.Button(new Rect(r.xMax - 18, r.yMax - 4, 24, 24), "−")) zoom = Mathf.Min(MinimapRadii.Length - 1, zoom + 1);
-            if (GUI.Button(new Rect(r.x - 10, r.yMax - 16, 28, 24), "M")) s.MapOpen = !s.MapOpen;
+            // The buttons stand down under the bags window (three or four trade bags worn), so a press meant for a slot reaches it.
+            Rect plus = new Rect(r.xMax - 18, r.yMax - 30, 24, 24), minus = new Rect(r.xMax - 18, r.yMax - 4, 24, 24), map = new Rect(r.x - 10, r.yMax - 16, 28, 24);
+            if (!EncounterHud.BagsCover(plus) && GUI.Button(plus, "+")) zoom = Mathf.Max(0, zoom - 1);
+            if (!EncounterHud.BagsCover(minus) && GUI.Button(minus, "−")) zoom = Mathf.Min(MinimapRadii.Length - 1, zoom + 1);
+            if (!EncounterHud.BagsCover(map) && GUI.Button(map, "M")) s.MapOpen = !s.MapOpen;
         }
 
         // ---------- zone / world map window ----------

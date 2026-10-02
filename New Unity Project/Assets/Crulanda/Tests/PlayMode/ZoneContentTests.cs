@@ -101,7 +101,7 @@ namespace Crulanda.Tests
                         {
                             string oz = !string.IsNullOrEmpty(o.zone) ? o.zone : qz;
                             if (oz != id) continue;
-                            if ((o.type == "talk" || o.type == "deliver") && o.target != "Mira" && s.ZoneOfPerson(o.target) == null) problems.Add(p + q.id + " talks to '" + o.target + "', who lives nowhere");
+                            if ((o.type == "talk" || o.type == "deliver" || o.type == "bring") && o.target != "Mira" && s.ZoneOfPerson(o.target) == null) problems.Add(p + q.id + " talks to '" + o.target + "', who lives nowhere");
                             if ((o.type == "interact" || (o.type == "collect" && o.target != null && !o.target.StartsWith("kill:"))) && !s.Zone.Interactables.Exists(x => x.name == o.target))
                                 problems.Add(p + q.id + " needs prop '" + o.target + "' (not in this zone)");
                             if (o.type == "kill" && !s.Enemies.Exists(e => QuestLog.Matches(o.target, e.persistentId))) problems.Add(p + q.id + " kills '" + o.target + "' but nothing here matches");

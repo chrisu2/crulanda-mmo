@@ -270,5 +270,79 @@ namespace Crulanda.Tests
             }
             finally { if (Directory.Exists(root)) Directory.Delete(root, true); }
         }
+
+        // ---------- trade bags in the save (the bags step) ----------
+        static ItemDatabase Items()
+        {
+            var dir = Path.Combine(Application.dataPath, "Crulanda", "EncounterContent", "Items");
+            var texts = new List<string>(); foreach (var f in Directory.GetFiles(dir, "*.json")) texts.Add(File.ReadAllText(f));
+            return ItemDatabase.Parse(texts);
+        }
+
+        [Test] public void Pouches_round_trip_with_their_slots()
+        {
+            string root = Temp();
+            try
+            {
+                var db = Items(); var p = EncounterSession.FreshProgress();
+                foreach (var b in new[] { "bag.simples_wallet", "bag.ore_poke" })
+                {
+                    Inventory.Add(p, db, b, 1); Assert.IsTrue(Inventory.Wear(p, db, p.bag.FindIndex(s => s.item == b), out var why), why);
+                }
+                Inventory.Add(p, db, "mat.yarrow", 23); Inventory.Add(p, db, "mat.copper_ore", 4); Inventory.Add(p, db, "potion.minor", 1);
+                Assert.AreEqual(Inventory.BagSize + 6 + 8, p.bag.Count);
+                var save = new EncounterSave(root, TestTalents.Warrior()); save.Write(p);
+                Assert.IsTrue(save.Read(out var loaded, out var message), message);
+                CollectionAssert.AreEqual(new[] { "bag.simples_wallet", "bag.ore_poke" }, loaded.pouches, "Worn, in the order put on.");
+                Assert.AreEqual(Inventory.BagSize + 14, loaded.bag.Count, "The trade bags' slots come back with the 24.");
+                Assert.AreEqual("mat.yarrow", loaded.bag[Inventory.BagSize].item); Assert.AreEqual(20, loaded.bag[Inventory.BagSize].count);
+                Assert.AreEqual("mat.yarrow", loaded.bag[Inventory.BagSize + 1].item); Assert.AreEqual(3, loaded.bag[Inventory.BagSize + 1].count);
+                Assert.AreEqual("mat.copper_ore", loaded.bag[Inventory.BagSize + 6].item); Assert.AreEqual(4, loaded.bag[Inventory.BagSize + 6].count);
+                Assert.AreEqual("potion.minor", loaded.bag[0].item);
+                // Brought up to date after a load: nothing is added or lost, and the rules hold where they were.
+                Inventory.EnsurePouches(loaded, db); Assert.AreEqual(Inventory.BagSize + 14, loaded.bag.Count);
+                Assert.AreSame(db.Get("bag.ore_poke"), Inventory.PouchAt(loaded, db, Inventory.BagSize + 6));
+                Assert.AreEqual(0, Inventory.Add(loaded, db, "mat.charcoal", 2)); Assert.AreEqual("mat.charcoal", loaded.bag[Inventory.BagSize + 7].item);
+                save.Write(loaded);
+                Assert.IsTrue(save.Read(out var again, out message), message);
+                Assert.AreEqual(JsonUtility.ToJson(loaded), JsonUtility.ToJson(again));
+            }
+            finally { if (Directory.Exists(root)) Directory.Delete(root, true); }
+        }
+
+        [Test] public void An_unknown_pouch_is_kept_and_ignored()
+        {
+            string root = Temp();
+            try
+            {
+                var db = Items();
+                // A save from a build that had a bag this one does not: its eight slots came first and still hold ore.
+                var p = EncounterSession.FreshProgress();
+                p.pouches.Add("bag.of_holding"); p.pouches.Add("bag.simples_wallet");
+                while (p.bag.Count < Inventory.BagSize + 8 + 6) p.bag.Add(new ItemStack());
+                p.bag[Inventory.BagSize] = new ItemStack { item = "mat.copper_ore", count = 5 };
+                p.bag[Inventory.BagSize + 9] = new ItemStack { item = "potion.minor", count = 1 };
+                var save = new EncounterSave(root, TestTalents.Warrior()); save.Write(p);
+                Assert.IsTrue(save.Read(out var loaded, out var message), message);
+                CollectionAssert.AreEqual(new[] { "bag.of_holding", "bag.simples_wallet" }, loaded.pouches, "The unknown bag is kept in the save.");
+                Inventory.EnsurePouches(loaded, db);
+                Assert.AreEqual(Inventory.BagSize + 14, loaded.bag.Count, "Never shortened.");
+                // Ignored: only the wallet has slots, and they start straight after the 24.
+                var ranges = Inventory.Pouches(loaded, db);
+                Assert.AreEqual(1, ranges.Count); Assert.AreEqual("bag.simples_wallet", ranges[0].bag.id); Assert.AreEqual(Inventory.BagSize, ranges[0].start);
+                Assert.IsFalse(Inventory.Accepts(loaded, db, Inventory.BagSize + 9, db.Get("mat.yarrow")), "Past every known bag a slot takes nothing new.");
+                Assert.IsNull(Inventory.PouchAt(loaded, db, Inventory.BagSize + 9));
+                Assert.AreEqual(0, Inventory.Add(loaded, db, "mat.yarrow", 3));
+                Assert.AreNotEqual("mat.yarrow", loaded.bag[Inventory.BagSize + 9].item); Assert.AreEqual("mat.yarrow", loaded.bag[Inventory.BagSize + 1].item, "Yarrow goes in the wallet's first free slot.");
+                // What is there can still be taken out, and counts.
+                Assert.AreEqual(5, Inventory.Count(loaded, "mat.copper_ore")); Assert.AreEqual(1, Inventory.Count(loaded, "potion.minor"));
+                Assert.IsTrue(Inventory.Move(loaded, db, Inventory.BagSize + 9, 2)); Assert.AreEqual("potion.minor", loaded.bag[2].item); Assert.IsTrue(loaded.bag[Inventory.BagSize + 9].Empty);
+                Assert.IsFalse(Inventory.Move(loaded, db, 2, Inventory.BagSize + 9, out var why), "It doesn't go back."); Assert.AreEqual("Nothing more goes in there.", why);
+                // And it writes back as it was read.
+                save.Write(loaded); Assert.IsTrue(save.Read(out var again, out message), message);
+                CollectionAssert.AreEqual(loaded.pouches, again.pouches); Assert.AreEqual(loaded.bag.Count, again.bag.Count);
+            }
+            finally { if (Directory.Exists(root)) Directory.Delete(root, true); }
+        }
     }
 }

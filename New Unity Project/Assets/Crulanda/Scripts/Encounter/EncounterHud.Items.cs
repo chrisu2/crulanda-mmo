@@ -5,7 +5,8 @@ namespace Crulanda.Encounter
 {
     /// <summary>
     /// Items UI:
-    /// - Bags (I): a 24-slot grid.
+    /// - Bags (I): a 24-slot grid, and under it one labelled row per trade bag worn ("Ore-poke 3/8"), its slots taking only what
+    ///   that bag holds; with none worn, a line on where to get one.
     /// - Character sheet (C): nine equipment slots around your stats.
     /// - Merchant window: opens when you talk to a merchant.
     /// Drag and drop moves items: bag to bag (move/stack), bag to equipment slot (equip), equipment slot to bag (take off),
@@ -15,13 +16,23 @@ namespace Crulanda.Encounter
     public sealed partial class EncounterHud
     {
         static bool bagsVisible, charVisible, vendorVisible;
-        static readonly Rect BagsRect = new Rect(1054, 290, 372, 400), CharRect = new Rect(190, 110, 470, 600), VendorRect = new Rect(670, 110, 370, 600);
+        static readonly Rect CharRect = new Rect(190, 110, 470, 600), VendorRect = new Rect(670, 110, 370, 600);
+        /// <summary>The bags window: 400 tall with the trade bags' part under the grid (bagsExtra, set as it is drawn), rising up the
+        /// screen as that part grows so its foot stays above the action bar (with all four bags worn it rises over the minimap's foot).</summary>
+        static Rect BagsRect { get { float h = 400 + bagsExtra; return new Rect(1054, Mathf.Min(290, 788 - h), 372, h); } }
+        static float bagsExtra = TradeBagNoteH;
+        /// <summary>True when the open bags window lies over the given screen rect (the minimap's buttons then stand down, since IMGUI
+        /// gives a click to the control laid out first). bagsExtra holds the height on screen when the click arrives.</summary>
+        public static bool BagsCover(Rect r) { return bagsVisible && BagsRect.Overlaps(r); }
+        const float PouchSlot = 38, PouchGap = 4, PouchLabel = 22, TradeBagNoteH = 40;
+        /// <summary>The bags window's line when no trade bag is worn (GAME-ONLY).</summary>
+        public const string TradeBagNote = "Trade bags: Maud Tanner makes them, by the South road in Oakhaven.";
         static bool ItemUiBlocks(Vector2 p)
         { return (bagsVisible && BagsRect.Contains(p)) || (charVisible && CharRect.Contains(p)) || (vendorVisible && VendorRect.Contains(p)) || confirmDestroy >= 0; }
         const float Slot = 52, Gap = 6;
         // Drag state: from a bag slot (>= 0) or an equipment slot (dragEquip >= 0).
         int dragBag = -1, dragEquip = -1; static int confirmDestroy = -1;
-        GUIStyle glyph, countStyle, tipTitle, tipBody;
+        GUIStyle glyph, countStyle, tipTitle, tipBody, pouchNote;
         Vector2 vendorScroll;
 
         void ItemStyles()
@@ -31,14 +42,17 @@ namespace Crulanda.Encounter
             countStyle = new GUIStyle(GUI.skin.label) { fontSize = 12, fontStyle = FontStyle.Bold, alignment = TextAnchor.LowerRight };
             tipTitle = new GUIStyle(GUI.skin.label) { fontSize = 15, fontStyle = FontStyle.Bold, wordWrap = true };
             tipBody = new GUIStyle(GUI.skin.label) { fontSize = 13, wordWrap = true };
+            pouchNote = new GUIStyle(GUI.skin.label) { fontSize = 12, alignment = TextAnchor.MiddleRight, wordWrap = false, clipping = TextClipping.Clip };
         }
         static string Glyph(ItemDef d)
         {
             if (d == null) return "?";
             if (d.kind == "junk") return "✦";
             if (d.kind == "consumable") return d.food ? "Fd" : "Hp";
+            if (Inventory.IsHide(d)) return "Lt";
             if (d.kind == "material") return "Mt";
             if (d.kind == "tool") return "Tl";
+            if (d.kind == "bag") return "Bg";
             switch (d.slot) { case "head": return "Hd"; case "neck": return "Nk"; case "shoulders": return "Sh"; case "chest": return "Ch"; case "hands": return "Gl"; case "legs": return "Lg"; case "feet": return "Ft"; case "mainhand": return "Wp"; case "offhand": return "Of"; }
             return "?";
         }
@@ -61,8 +75,14 @@ namespace Crulanda.Encounter
             if (d == null) return;
             var lines = new List<string>();
             if (d.kind == "gear") lines.Add(ItemDatabase.SlotNames[ItemDatabase.SlotIndex(d.slot)] + "  ·  " + ItemDatabase.QualityNames[Mathf.Clamp(d.quality, 0, 4)]);
-            else lines.Add(d.kind == "junk" ? "Junk" : d.kind == "material" ? "Crafting material" : d.kind == "tool" ? "Tool" : d.food ? "Food" : "Potion");
+            else lines.Add(d.kind == "junk" ? "Junk" : Inventory.IsHide(d) ? "Hide" : d.kind == "material" ? "Crafting material" : d.kind == "tool" ? "Tool" : d.kind == "bag" ? "Trade bag" : d.food ? "Food" : "Potion");
             var stats = ItemDatabase.StatLines(d); if (stats.Length > 0) lines.Add(stats);
+            if (d.kind == "bag")
+                lines.Add(Inventory.Wears(session.Progress, d.id) ? "<color=#8f8>Worn: " + d.slots + " slots for " + Inventory.HoldsWords(d.holds) + ".</color>"
+                    : "Trade bag: " + d.slots + " slots for " + Inventory.HoldsWords(d.holds) + ". Use it to wear it.");
+            if (Inventory.IsHide(d)) lines.Add(EncounterSession.HideLine);
+            var holder = string.IsNullOrEmpty(d.pouch) ? null : Inventory.BagFor(session.Items, d.pouch);
+            if (holder != null) lines.Add("Goes in " + Article(holder.name) + " " + LowerFirst(holder.name) + ".");
             if (d.level > 1) lines.Add((d.level > session.Progress.Level ? "<color=#ff5544>" : "") + "Requires level " + d.level + (d.level > session.Progress.Level ? "</color>" : ""));
             if (!string.IsNullOrEmpty(d.description)) lines.Add("<i>" + d.description + "</i>");
             lines.Add("Sells for " + (d.value) + " gold");
@@ -75,6 +95,8 @@ namespace Crulanda.Encounter
             tooltip = "<b><color=#" + ColorUtility.ToHtmlStringRGB(ItemDatabase.QualityColors[Mathf.Clamp(d.quality, 0, 4)]) + ">" + d.name + "</color></b>\n" + string.Join("\n", lines);
             tooltipAt = Event.current.mousePosition;
         }
+        /// <summary>"a" or "an" before a word (by its first letter).</summary>
+        static string Article(string word) { return !string.IsNullOrEmpty(word) && "aeiouAEIOU".IndexOf(word[0]) >= 0 ? "an" : "a"; }
         void DrawTooltip()
         {
             if (tooltip == null) return;
@@ -87,35 +109,76 @@ namespace Crulanda.Encounter
         }
 
         // ---------- bags ----------
+        /// <summary>The trade bags' rows under the 24 slots: each worn bag the content knows (its first slot and how many), then any
+        /// slots past them that still hold something (a bag no longer made), so they can be emptied.</summary>
+        List<(ItemDef bag, int start, int count)> PouchRows(EncounterProgress p)
+        {
+            var rows = new List<(ItemDef, int, int)>(); if (session.Items == null) return rows;
+            int end = Inventory.BagSize;
+            foreach (var r in Inventory.Pouches(p, session.Items)) { rows.Add((r.bag, r.start, r.count)); end = r.start + r.count; }
+            for (int i = end; i < p.bag.Count; i++) if (!p.bag[i].Empty) { rows.Add((null, end, p.bag.Count - end)); break; }
+            return rows;
+        }
+        /// <summary>A trade bag's row: its label, its slots eight to a line, and a gap.</summary>
+        static float PouchRowH(int count) { return PouchLabel + Mathf.CeilToInt(count / 8f) * (PouchSlot + PouchGap) + 6; }
         void DrawBags()
         {
-            ItemStyles(); var p = session.Progress; var w = BagsRect;
+            ItemStyles(); var p = session.Progress;
+            var rows = PouchRows(p); float extra = rows.Count == 0 ? TradeBagNoteH : 6; foreach (var row in rows) extra += PouchRowH(row.count);
+            bagsExtra = extra; var w = BagsRect;
             Fill(new Rect(w.x - 3, w.y - 3, w.width + 6, w.height + 6), new Color(.3f, .22f, .12f, .98f)); Fill(w, new Color(.08f, .075f, .07f, .97f));
             Shadow(new Rect(w.x + 14, w.y + 8, 200, 28), "BAGS", heading, gold);
             Shadow(new Rect(w.x + 150, w.y + 12, 210, 24), p.gold + " gold  ·  " + Inventory.FreeSlots(p) + " free", text, new Color(1, .86f, .4f));
             var e = Event.current; var mouse = e.mousePosition;
             for (int i = 0; i < p.bag.Count && i < Inventory.BagSize; i++)
+                BagSlot(new Rect(w.x + 14 + (i % 6) * (Slot + Gap), w.y + 48 + (i / 6) * (Slot + Gap), Slot, Slot), i, null, e, mouse);
+            float y = w.y + 48 + 4 * (Slot + Gap) + 4;
+            if (rows.Count == 0) Shadow(new Rect(w.x + 14, y, w.width - 28, TradeBagNoteH), TradeBagNote, tiny, new Color(.82f, .74f, .56f));
+            else
             {
-                var r = new Rect(w.x + 14 + (i % 6) * (Slot + Gap), w.y + 48 + (i / 6) * (Slot + Gap), Slot, Slot);
-                bool dragging = dragBag == i;
-                ItemSquare(r, dragging ? null : p.bag[i]);
-                if (!r.Contains(mouse)) continue;
-                if (!p.bag[i].Empty && dragBag < 0 && dragEquip < 0) ItemTooltip(session.Items?.Get(p.bag[i].item), true);
-                if (e.type == EventType.MouseDown && e.button == 0 && !p.bag[i].Empty) { dragBag = i; e.Use(); }
-                else if (e.type == EventType.MouseDown && e.button == 1 && !p.bag[i].Empty)
-                { if (session.VendorNpc != null) session.SellBag(i); else session.EquipFromBag(i); e.Use(); }
-                else if (e.type == EventType.MouseUp && e.button == 0)
+                float ry = y + 6;
+                foreach (var (bag, start, count) in rows)
                 {
-                    if (dragBag >= 0) session.MoveBag(dragBag, i);
-                    else if (dragEquip >= 0) session.UnequipSlot(dragEquip, i);
-                    dragBag = dragEquip = -1; e.Use();
+                    int used = 0; for (int k = 0; k < count && start + k < p.bag.Count; k++) if (!p.bag[start + k].Empty) used++;
+                    string label = (bag != null ? bag.name : "Loose slots") + "  " + used + "/" + count;
+                    measureContent.text = label; float lw = frameName.CalcSize(measureContent).x;
+                    Shadow(new Rect(w.x + 14, ry, w.width - 28, PouchLabel), label, frameName, bag != null ? gold : new Color(.7f, .66f, .6f));
+                    string note = bag != null ? Inventory.HoldsWords(bag.holds) : "a bag no longer made: empty them out";
+                    measureContent.text = note; var noteRect = new Rect(w.x + 14 + lw + 12, ry + 1, w.width - 28 - lw - 12, PouchLabel);
+                    if (pouchNote.CalcSize(measureContent).x <= noteRect.width) Shadow(noteRect, note, pouchNote, new Color(.7f, .66f, .58f));
+                    ry += PouchLabel;
+                    for (int k = 0; k < count && start + k < p.bag.Count; k++)
+                        BagSlot(new Rect(w.x + 14 + (k % 8) * (PouchSlot + PouchGap), ry + (k / 8) * (PouchSlot + PouchGap), PouchSlot, PouchSlot), start + k, bag, e, mouse);
+                    ry += Mathf.CeilToInt(count / 8f) * (PouchSlot + PouchGap) + 6;
                 }
             }
-            float y = w.y + 48 + 4 * (Slot + Gap) + 4;
+            y += extra;
             GUI.Label(new Rect(w.x + 14, y, w.width - 28, 40), "Drag to move · right-click to " + (session.VendorNpc != null ? "sell" : "equip / use") + " · drag out of the window to destroy", tiny);
             if (session.PotionCooldown > 0) Shadow(new Rect(w.x + 14, y + 36, 300, 20), "Potion ready in " + Mathf.CeilToInt(session.PotionCooldown) + "s", tiny, new Color(.9f, .7f, .5f));
             if (session.VendorNpc != null && GUI.Button(new Rect(w.x + 14, w.yMax - 44, 150, 32), "Sell junk", micro)) session.SellJunk();
             if (GUI.Button(new Rect(w.xMax - 124, w.yMax - 44, 110, 32), "Close [I]", micro)) { session.InventoryOpen = false; session.CloseVendor(); }
+        }
+        /// <summary>
+        /// One bag slot: its square, its tooltip (an empty trade-bag slot says what it takes), and the mouse on it: drag from it, drop
+        /// on it (a move, or worn gear taken off into it), right-click to sell it to an open merchant or else equip or use it. A trade
+        /// bag is worn on right-click even at a merchant (one just bought is used at her counter); dragging it to her sells it.
+        /// </summary>
+        void BagSlot(Rect r, int i, ItemDef pouch, Event e, Vector2 mouse)
+        {
+            var p = session.Progress;
+            ItemSquare(r, dragBag == i ? null : p.bag[i]);
+            if (!r.Contains(mouse)) return;
+            if (!p.bag[i].Empty && dragBag < 0 && dragEquip < 0) ItemTooltip(session.Items?.Get(p.bag[i].item), true);
+            else if (p.bag[i].Empty && pouch != null && dragBag < 0 && dragEquip < 0) { tooltip = "<b>" + pouch.name + "</b>\nTakes " + Inventory.HoldsWords(pouch.holds) + "."; tooltipAt = mouse; }
+            if (e.type == EventType.MouseDown && e.button == 0 && !p.bag[i].Empty) { dragBag = i; e.Use(); }
+            else if (e.type == EventType.MouseDown && e.button == 1 && !p.bag[i].Empty)
+            { var it = session.Items?.Get(p.bag[i].item); if (session.VendorNpc != null && it?.kind != "bag") session.SellBag(i); else session.EquipFromBag(i); e.Use(); }
+            else if (e.type == EventType.MouseUp && e.button == 0)
+            {
+                if (dragBag >= 0) session.MoveBag(dragBag, i);
+                else if (dragEquip >= 0) session.UnequipSlot(dragEquip, i);
+                dragBag = dragEquip = -1; e.Use();
+            }
         }
 
         // ---------- character sheet ----------

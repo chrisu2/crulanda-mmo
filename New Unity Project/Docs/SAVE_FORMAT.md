@@ -95,8 +95,12 @@ Two new lists at the end of the payload, for the whole professions feature (one 
     save ("Invalid profession data."): it is not loaded and the file is not changed. An id this build's content doesn't know is
     kept in the save and ignored by `ProfessionLog`, so content can change. A known trade's skill is brought to at least 1 on bind.
 - `pouches`: `List<string>`, the trade bags worn, by item id, in the order they were put on.
-  - Written empty by this step of the build. The bags themselves arrive with the leatherworker's bags; from then each worn bag adds
-    its slots to the end of `bag` (after slot 24) in this order.
+  - Each worn bag adds its slots to the end of `bag` (after slot 24) in this order (the leatherworker's bags, trades step 5):
+    the wallet's 6, the sling's 6, the scrip's 8, the poke's 8, so four bags make a 52-slot `bag`. The list and the slots are
+    saved as they are; on load the session pads `bag` to cover every known worn bag (`Inventory.EnsurePouches`) and never
+    shortens it.
+  - An unknown bag id (content that no longer has it) has no slots: the known bags' slots are counted from slot 24 without it,
+    and slots past them take nothing new but can be emptied.
   - On load: blank ids and repeats are dropped. More than 8 entries (`EncounterSave.MaxPouches`) refuses the save
     ("Invalid item data."), as a `bag` longer than 96 slots already did. An unknown bag id is kept.
 - Migration 7 → 8 is `AddProfessionsMigration`, a SaveMigrator step of the same kind as 6 → 7.

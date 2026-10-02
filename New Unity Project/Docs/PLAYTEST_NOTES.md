@@ -249,14 +249,19 @@ hide, meat, food, potion, tool, trade bag, junk and quest item its own picture, 
 staff, shield, helm, chest, gloves, legs, boots, neck, shoulders) in its own colours, with the quality still shown by the
 border.
 
-## 12. Armour too blocky; retire the block characters (2026-10-02) — OPEN (needs Chris's choice of approach)
+## 12. Armour too blocky; retire the block characters (2026-10-02, again "still have the bubble forms/armor/characters") — IN HAND
 > "armor and weapons look good but armor is way too blocky. needs to feel flowing. time to retire the block characters"
 
 Every figure (the player, Mira, villagers, people among the mobs) is built in code from boxes, capsules and spheres, and the
 armour is fitted to those blocks. He likes the gear's designs; the bodies and the stiffness are what must go: smooth bodies,
 cloth that hangs and moves (capes, robes, tabards, skirts, hair), armour that follows the form.
 
-## 13. More colour: high fantasy, not pale (2026-10-02) — OPEN
+Chris chose to build them in code. Plan (tools/wip/characters): C1a one smooth skinned body for every person (a shaped torso,
+neck, tapered limbs with elbows and knees, hands, boots; hair and face on the head bone), the regions armour covers kept as
+separate renderers; C1b limb armour and held weapons skinned to the new joints, full bends for all; C2 rounder armour and
+cloth that moves (tabards, skirts, capes, robes, hair). Previewed first with mesh_view.py (tools/wip/characters/preview-v2.png).
+
+## 13. More colour: high fantasy, not pale (2026-10-02) — FIXED (published 2026-10-02 15:33)
 > "more colors as well seems like all is muted pallets..need high fantasy not pale"
 
 The gear palettes (`Resources/Gear/looks.json`), villagers' clothes and much of the world sit in muted earth tones. Fix:
@@ -277,3 +282,11 @@ measures each limb's root against the trunk it belongs to.
 Found (note 15): branches started on the straight line between a bowed limb's ends while the limb sags below it: the Verdant
 giants' branches up to a metre over their great limbs, the dead trees' twigs and forks off theirs. They now start on the
 bowed line (ZoneBuilder.LimbAt); TreeLimbTests checks every limb's root in all five zones.
+
+## 16. The light under the sign looks like neon (2026-10-02) — FIXED (published 2026-10-02 15:33)
+> "the light under the sign looks like neon. it should probably be laterns or candles"
+
+Found: Khaven's inn sign (the second inn's, an ember pot) had four thin bars glowing at 2.2x zig-zagging across the bottom
+of the board, its "cracks". Now: three short cracks on the pot itself, embers just showing, and a candle lantern hung under
+the sign on a short chain (an open iron cage under a little roof, a wax candle and its flame, a small warm light that grows
+after dark).

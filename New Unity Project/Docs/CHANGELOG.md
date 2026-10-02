@@ -916,3 +916,15 @@ A read-only review by five reviewers, each finding checked by a second who tried
   gear, in the Armoury, the loot window and the recipes, on the talent tiles and the trades list.
 - Tests: EditMode 377/377 (a new test keeps every item, ability, talent and trade covered); the bag, loot, Armoury and
   trades fixtures 22/22; the HUD shots looked at.
+
+## 2026-10-02 afternoon — High-fantasy colour, and a lantern under Khaven's sign (playtest notes 13 and 16)
+- **Colour** (Chris: "need high fantasy not pale"): the gear's ten region palettes re-dyed in jewel tones (Oakhaven green
+  and russet, the Sandthrone saffron and crimson, the Concord royal blue on white, Khaven deep violet, the Toll road sky
+  blue...), a second and third dye for the material words, rarer cloth richer and deeper, poor drained grey. The classes and
+  enemies, the Concord's white tabard and gold sigil, and every villager's trade clothes in madder, weld green, woad, ochre and
+  heather. The village: painted shutters and doors (withered in Khaven, drained under the ash), bolder awnings with pennants
+  on the stalls, bright produce and terracotta, window boxes in six colours, the Golden Cask's green sign in a gold frame.
+- **The sign's light** (Chris: "looks like neon. it should probably be laterns or candles"): Khaven's inn sign lost its four
+  glowing bars; a candle lantern hangs under it, and the pot's cracks only just glow.
+- Tests: EditMode 378/378, PlayMode 173/174 in the full run (a villager walking home cut it fine; the fixture passed twice
+  after); all five zones toured, the wardrobe and the village looked at; Khaven toured again with the lantern.

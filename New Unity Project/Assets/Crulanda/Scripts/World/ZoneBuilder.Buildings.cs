@@ -316,8 +316,21 @@ namespace Crulanda.World
             else
             {
                 MeshPart(PropMesh("Sign pot", () => Turned(new[] { new Vector2(0, 0), new Vector2(.12f, 0), new Vector2(.19f, .08f), new Vector2(.19f, .2f), new Vector2(.15f, .26f), new Vector2(.17f, .28f), new Vector2(.13f, .28f), new Vector2(.13f, .23f), new Vector2(0, .23f) }, 10)), t, new Vector3(sx, by - .12f, zb - .23f), iron);
-                var crack = Glowing(new Color(1, .42f, .14f), 2.2f);
-                for (int i = 0; i < 4; i++) Part(PrimitiveType.Cube, t, new Vector3(sx - .45f + i * .3f, by - .3f + (i % 2) * .05f, zb - .04f), new Vector3(.33f, .035f, .012f), crack, Quaternion.Euler(0, 0, i % 2 == 0 ? 12 : -14));
+                // The pot's cracks: three short ones on its face, embers just showing (four long glowing bars across the board read as
+                // neon: playtest note 16).
+                var crack = Glowing(new Color(1, .42f, .14f), 1.1f);
+                for (int i = 0; i < 3; i++) Part(PrimitiveType.Cube, t, new Vector3(sx - .07f + i * .07f, by - .03f + (i % 2) * .04f, zb - .41f), new Vector3(.08f, .014f, .01f), crack, Quaternion.Euler(0, 0, i % 2 == 0 ? 38 : -32));
+                // A candle lantern hung under the sign on a short chain (Chris: "it should probably be lanterns or candles"): an open iron
+                // cage under a little roof, a wax candle on its floor and its flame, lit more after dark.
+                float ly = by - .86f;
+                Rod(t, new Vector3(sx, by - .55f, zb), new Vector3(sx, ly + .13f, zb), .012f, iron);
+                MeshPart(PropMesh("Sign lantern roof", () => ZoneMeshes.Cone(.12f, .09f, 4)), t, new Vector3(sx, ly + .1f, zb), iron, Quaternion.Euler(0, 45, 0));
+                Part(PrimitiveType.Cube, t, new Vector3(sx, ly + .085f, zb), new Vector3(.17f, .02f, .17f), iron);
+                Part(PrimitiveType.Cube, t, new Vector3(sx, ly - .1f, zb), new Vector3(.19f, .03f, .19f), iron);
+                foreach (int a in new[] { -1, 1 }) foreach (int b in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(sx + a * .075f, ly - .005f, zb + b * .075f), new Vector3(.016f, .19f, .016f), iron);
+                Part(PrimitiveType.Cylinder, t, new Vector3(sx, ly - .045f, zb), new Vector3(.05f, .045f, .05f), Tint(art.timber, new Color(.92f, .86f, .7f)));   // the candle
+                Part(PrimitiveType.Sphere, t, new Vector3(sx, ly + .025f, zb), new Vector3(.028f, .05f, .028f), Glowing(new Color(1, .74f, .32f), 2.6f));   // its flame
+                Glow(t, new Vector3(sx, ly, zb), 4.5f, .4f, new Color(1, .7f, .38f), 1.1f);
             }
             // A bench under the first front window, and barrels at the far corner, clear of the window boxes.
             float bx = frontWindows.Count > 0 ? frontWindows[0] : -w / 2 + 1.5f, bz = face - .32f, bg = LocalGround(t, bx, bz);

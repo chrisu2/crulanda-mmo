@@ -51,3 +51,14 @@ What the fix needs: social aggro by kind. When a mob joins a fight, others of it
 (wolves, hounds) come together; people (deserters, cultists, Concord) call out and bring those in earshot, with a short
 delay and a shout so it reads; solitary beasts (boar, stags) stay single. Sneaking (Ctrl) should still let a careful player
 peel the edge of a camp. A boss always fights with its guards.
+
+## 4. The sheep look like bugs on sticks (2026-10-01) — OPEN
+> "fix the sheep. looks like bugs on sticks"
+
+Measured (`CritterBody.Make`, case "sheep"): a sheep is one pale ellipsoid (0.75 x 0.6 x 1.0 m), a black ball for a head and
+four thin black cylinders 8 cm thick and 47 cm long. From any distance that is a white tick on black legs.
+
+What the fix needs: a sheep that reads as a sheep in the painted style from 5 m and from 30 m: a deep woolly fleece built of
+lumps, short sturdy legs with wool to the knee and dark hooves, a dark wedge of a face with a muzzle and ears out sideways,
+a wool cap, a tail; a head that goes down to the grass when it grazes. Then a line-up shot of every animal in the capture
+tour, so the others can be judged the same way.

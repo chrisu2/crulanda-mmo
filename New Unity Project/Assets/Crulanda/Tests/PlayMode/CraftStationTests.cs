@@ -153,6 +153,13 @@ namespace Crulanda.Tests
             // In the taproom, a little way in front of the hearth.
             var spot = inn.TransformPoint(new Vector3(3.2f, 0, .8f)); spot.y = inn.position.y;
             yield return StandAt(s, spot);
+            // Mira, not yet recruited, waits in the taproom beside this hearth (spawns.companion, about 1.8 m from the spot). E talks to
+            // someone at hand before it offers a station, so while she is in reach she is asked first. Send her out to the green
+            // (as Recover() does) so that E reaches the fire.
+            if (s.CompanionInReach) Assert.AreEqual("Recruit Mira", s.InteractPrompt, "Talking to someone at hand comes before working at a station.");
+            s.Companion.GetComponent<NavMeshAgent>().Warp(s.RecoveryPoint + Vector3.right * 2.5f - Vector3.up * .1f);
+            yield return null;
+            Assert.IsFalse(s.CompanionInReach, "Mira is out of talk range.");
             Assert.AreSame(hearth, s.StationNear("fire")); Assert.IsNull(s.StationNear("forge"));
             bool cooks = s.Professions.Db.RecipesFor("cooking").Count > 0;
             Assert.AreEqual(cooks ? "Cook at the fire" : "Work at the fire", s.InteractPrompt, "Cooking's prompt once it has recipes (step 10); charcoal's until then.");

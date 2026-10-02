@@ -1396,7 +1396,14 @@ namespace Crulanda.World
             WallPiece(new Vector3(0, H / 2, d / 2), new Vector3(w, H, wall));
             foreach (int s in new[] { -1, 1 }) WallPiece(new Vector3(s * w / 2, H / 2, 0), new Vector3(wall, H, d));
             float side = (w - doorW) / 2;
-            foreach (int s in new[] { -1, 1 }) WallPiece(new Vector3(s * (doorW / 2 + side / 2), H / 2, -d / 2), new Vector3(side, H, wall));
+            foreach (int s in new[] { -1, 1 })
+            {
+                // The jambs' colliders stop .1 m short of the opening (the plaster doesn't): EncounterNavigation pads every blocker
+                // by .1 m and the navmesh erodes by the agent's .5 m, which left the 1.6 m door a one-voxel diagonal thread that broke
+                // at some angles to the grid (the Cracked Hearth's taproom was cut off from Khaven). The nav gap is now 1.6 m.
+                var jamb = WallPiece(new Vector3(s * (doorW / 2 + side / 2), H / 2, -d / 2), new Vector3(side, H, wall)).GetComponent<BoxCollider>();
+                jamb.size -= new Vector3(.1f, 0, 0); jamb.center += new Vector3(s * .05f, 0, 0);
+            }
             WallPiece(new Vector3(0, doorH + (H - doorH) / 2, -d / 2), new Vector3(doorW, H - doorH, wall));
             foreach (int sx in new[] { -1, 1 }) foreach (int sz in new[] { -1, 1 })
                 Part(PrimitiveType.Cube, t, new Vector3(sx * w / 2, H / 2, sz * d / 2), new Vector3(.34f, H, .34f), art.timber);

@@ -738,3 +738,20 @@ resumed with `Workflow({scriptPath, resumeFromRunId})` (finished agents replay f
   the player so it does not arise in play, but a far-off heal could be used to reset a fight.
 - **Next, one at a time, asking Chris before anything with several agents:** the art notes (4-13) by hand, starting with
   what is already built on its branch: note 5 (ore green) on `fix/n56-ore-windfall`. Then send him the PDF draft.
+
+## UPDATE 2026-10-02 midday: the other four zones grown, PUBLISHED (main 4c5dcc7, build of 12:27)
+- Chris said "yes. grow about 20%": Khaven 410 m, the Peaks, the Ash Rim and the Verdant Shore 430 m; every camp within
+  about 120 m of a home moved out whole to 125 m and more (`tools/wip/zonegrowth/grow_zone.py`, one zone a run; WORLD_ZONES.md
+  "The other four zones grown"; ZoneGrowthTests.NearHomes names the ones left by design).
+- The check found four things, all fixed: place_nodes.py's writer dropped the stations after the nodes (fixed; stations
+  restored from d9afc92); exits and arrivals left off their roads where a road's last bend changed (snapped back along the
+  road); the Fraying placed past the Ash Rim's Wasting curtain (grow_zone.py now keeps 15 m inside a curtain); a rabbit could
+  respawn in the Brook pond (GameAnimal.NearestDry). New EditMode tests: exits on roads in every zone, nothing in the unmade,
+  the creeks' line. EditMode 372/372; PlayMode fixtures 10/10 after; the zones toured.
+- Chris's new notes while playing: **15** (a few trees' limbs do not meet their trunks) and **6 again** (the lumber trees still
+  have sticks poking up; "need to look chopped down").
+- **NEXT (in hand):** note 6, the felled tree. Design previewed with the software renderer (`scratchpad\artnotes\windfall\d3`,
+  gen.py v2): an axe-cut stump (pale face, heartwood, a short hinge ridge, chips), the trunk limbed (flush stubs with pale
+  ends) and bucked in two with pale cut ends, the lopped crown as a low heap of bare branches that stays when the logs are
+  taken. Port it into `ZoneBuilder.Nodes.cs` Windfall (within -2.9..+2.5 m along X for WindfallYaw), then note 15 (find the
+  tree builder whose limbs float), then merge note 5 (ore, `fix/n56-ore-windfall`), one build for all three.

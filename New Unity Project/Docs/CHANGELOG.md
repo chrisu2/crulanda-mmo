@@ -867,3 +867,26 @@ A read-only review by five reviewers, each finding checked by a second who tried
   about 13 s to build). One social test recruited Mira while she stood in the Golden Cask.
 - Tests: EditMode 369/369, PlayMode 167/173 in the full run, the six failures fixed (four were the tests) and their fixtures
   34/34 after; Oakhaven, Khaven and the Ash Rim toured; the fight shots (pack pull, shout, heavy blow, enrage) viewed.
+
+## 2026-10-02 — The other four zones grow, and their camps move back from the homes (Chris: "yes. grow about 20%")
+- **Bigger:** Khaven 340 to 410 m; the Shattered Peaks, the Ashland Rim and the Verdant Shore 360 to 430 m. The edges, the
+  exits, the roads' ends and the creeks went out 35 m; every village stayed exactly where it was. The exits and the points
+  where you arrive stand on their roads as before, 9 to 12 m apart. Coming over the mountains into the Verdant Shore, you now
+  arrive on the crest of the Ridge of Long Shadows.
+- **Camps back from the homes:** every camp that stood within about 120 m of a home moved out whole with its place, to 125 m
+  and more. Khaven: the drowned graveyard with the Grey Sexton, the Sandthrone outriders, the picket at the Fallen Watch, the
+  Deep Whispering Wood wolves and the Carrion boars. The Peaks: the Wolf pines pack and the rockhide wallow. The Ash Rim: the
+  Fraying, the Weave-Eater brood and the Unwoven Flats eaters. The Verdant Shore: the Greying with Greyheart, the Mistmere
+  reed-boars, Old Ninebranch on his knoll, the Fallen Ghost-Oak with its spiders, and the Antler Meadow with its stags.
+- **Left by design:** the Sandthrone's own toll-gate and keep on the Peaks, the hollows by the Ash Rim's empty hunters' hide,
+  and the Briar Way at the door of the Root-Mother's Deep. The Ash Rim's Wasting stays where it stands (its places line it).
+- **Found by the check and fixed:** the tool that wrote the gathering nodes had dropped six crafting stations (Wenna Coyle's
+  bench, the Pass-trader's anvil and cookfire, the Verdant Shore's ember-stone, bench and Hearth-Tree fire): back. The exits
+  had gone straight out while their roads' last bends changed, leaving four exits and arrivals off the road (one arrival in
+  the Peaks stood on the pass's steep side): each back on its road. The Fraying had gone out past the Ash Rim's Wasting into
+  the unmade, where nothing walks: it now lies 21 m inside it, south-east, by the grey husks. A rabbit that came back in the
+  Brook pond could stay in the water (a group circle over a pond missed the dry part six times running): it now finds the
+  nearest dry ground. New tests hold every exit to its road, nothing in the unmade, and the creeks to their old line.
+- Tests: EditMode 367/369 in the full run, then 372/372 with three new tests; PlayMode 169/173, the four failures fixed (one
+  was the stations, one the rabbit, two the data) and their fixtures 10/10; the four zones toured, the Ash Rim again after
+  the Fraying moved.

@@ -265,18 +265,26 @@ the coin goes to her family. Design: `tools/wip/professions/ADDENDUM.md` D. All 
 | Quest id | Title | Level | Bring | Reward | Ships with |
 |---|---|---|---|---|---|
 | `npc.leatherworker.wallet` | A Wallet for Simples | 1 | 3 Grey wolf pelts | Simples-wallet, 20 XP, Oakhaven +75 | built |
-| `npc.leatherworker.sling` | A Strap for the Woodyard | 1 | 3 Hill-deer hides | Log-sling, 25 XP, +75 | hunting step (11) |
-| `npc.leatherworker.scrip` | The Cook's Scrip | 2 | 5 Coney skins | Larder-scrip, 25 XP, +75 | hunting step (11) |
-| `npc.leatherworker.poke` | Ore Wants a Stout Bag | 2 | 3 Boar hides | Ore-poke, 30 XP, +75 | hunting step (11) |
+| `npc.leatherworker.sling` | A Strap for the Woodyard | 1 | 3 Hill-deer hides | Log-sling, 25 XP, +75 | built (hunting, step 11) |
+| `npc.leatherworker.scrip` | The Cook's Scrip | 2 | 5 Coney skins | Larder-scrip, 25 XP, +75 | built (hunting, step 11) |
+| `npc.leatherworker.poke` | Ore Wants a Stout Bag | 2 | 3 Boar hides | Ore-poke, 30 XP, +75 | built (hunting, step 11) |
 
-The other three wait for hunting (the hides they ask for do not exist yet); all four bags can be bought from her now.
+All four are offered together (a bag already worn or carried leaves its quest off her list), and all four bags can be bought from
+her outright. Where the leathers come from (WORLD_ZONES.md, Hunting):
 - Wolves for the wallet: the Harrow wood (-106,108) and the North pines (48,106) camps, levels 1-2, pelt chance 0.7.
+- Hill deer for the sling: game, west of the Old Orchard (-96,88), under Crowsfoot Hollow (30,98), on the slopes under Crowsfoot
+  Ridge (40,152), in the Mastwood (-146,150) and by Withy pool (-176,-110). A deer always gives its hide; sneak (Ctrl) to get close.
+- Coneys for the scrip: game, in eight groups across the fields (Harrow farm, Brook pond, the Cider Barn, the downs). Always a skin.
+- Boars for the poke: the wild boar camps (the Mastwood, Withy pool, Hollin farm, the south downs), levels 1-2, hide chance 0.7.
+- Each quest's lines are in Maud's voice (offer, progress, complete, the hand-over line), GAME-ONLY.
 - Maud keeps shop by the South road 9 to 12 and 2 to 6. A knock at the Tanner house when she is home opens her talk (the quest,
   with "Browse wares") or, with no quest to offer, her wares.
 
 **Tests**: EditMode `QuestLogTests.Bring_hands_over_bag_items_on_talk`, `.Bring_without_enough_changes_nothing`,
 `.A_bag_quest_is_not_offered_once_the_bag_is_worn_or_carried`, `.TurnIn_with_the_bag_already_worn_pays_gold`,
 `.TurnIn_with_full_bags_is_refused_and_nothing_is_lost`; PlayMode `TradeBagTests` (the wallet earned and worn end to end).
+Step 11 adds EditMode `QuestDataTests.Bring_and_bag_rewards_name_real_items` (all four quests: real hides some beast drops, each bag
+she sells earned by exactly one quest) and PlayMode `HuntTests` (the hides got by hunting).
 
 **Next**
 - Quest rewards that give real equipment: `reward.items` exists in the data but nothing grants it yet. Gear comes only from camp loot and merchants.

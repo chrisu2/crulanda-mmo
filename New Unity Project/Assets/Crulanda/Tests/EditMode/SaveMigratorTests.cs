@@ -429,7 +429,7 @@ namespace Crulanda.Tests
             var items = LootTestData.Items(); var looks = LootTestData.Looks(); var loot = LootTestData.Loot(items, looks);
             var secrets = new List<Crulanda.World.ZoneSecret>(); foreach (var z in LootTestData.Zones()) if (z.secrets != null) secrets.AddRange(z.secrets);
             // His evening save holds the blade in the bags and Caddock's crown on his head: both are found, and his five pieces of gear
-            // give five looks. His morning save held the blade alone.
+            // give a look each (fewer if two share an appearance). His morning save held the blade alone.
             var cases = new[] {
                 (format: 8, payload: v8, held: (System.Action<EncounterProgress>)AsTheOwnersV8Held, found: new[] { "item.training_blade", "item.tin_crown" },
                     lookOf: new[] { "gen.shoulders.5.1.9496", "item.training_blade", "item.tin_crown", "gen.feet.4.3.2421", "gen.mainhand.5.3.5107" }),
@@ -453,9 +453,13 @@ namespace Crulanda.Tests
                     var log = new ArmouryLog(p, items, loot, looks, secrets); log.NewItem = said.Add; log.NewLook = said.Add; log.Bind(p);
                     Assert.IsEmpty(said, "What he already holds raises no toast.");
                     CollectionAssert.AreEqual(c.found, p.armoury, "The named pieces he holds are found (bags first, then what he wears); junk, potions and generated gear are not entries.");
-                    var expected = new List<string>(); foreach (var id in c.lookOf) expected.Add(log.LookOf(items.Get(id)));
+                    var expected = new List<string>(); foreach (var id in c.lookOf) { var key = log.LookOf(items.Get(id)); if (!expected.Contains(key)) expected.Add(key); }
                     CollectionAssert.AreEqual(expected, p.looks, "One look for each piece of gear he holds.");
                     Assert.IsEmpty(p.lootLuck, "No kills are counted for him.");
+                    // The crown he wears meets Caddock: the rest of Caddock's list is named in the book, though no kill was ever counted.
+                    var caddocks = new[] { "loot.oak.due_cleaver", "loot.oak.due_coat", "loot.oak.broken_oath_sabre" };
+                    foreach (var id in caddocks) Assert.AreEqual(c.format == 8 ? ArmouryLog.State.Known : ArmouryLog.State.Unknown, log.StateOf(id), id + " (format " + c.format + ").");
+                    Assert.AreEqual(ArmouryLog.State.Unknown, log.StateOf("loot.oak.whitefoot_mantle"), "Another boss's piece stays unknown.");
                     before.armoury = new List<string>(p.armoury); before.looks = new List<string>(p.looks);
                     Assert.AreEqual(JsonUtility.ToJson(before), JsonUtility.ToJson(p), "Nothing else changed.");
                     c.held(p);
@@ -469,7 +473,7 @@ namespace Crulanda.Tests
                     Assert.IsTrue(save.Read(out var again, out message), message);
                     Assert.AreEqual(JsonUtility.ToJson(p), JsonUtility.ToJson(again));
                     new ArmouryLog(again, items, loot, looks, secrets);
-                    Assert.AreEqual(c.found.Length, again.armoury.Count); Assert.AreEqual(c.lookOf.Length, again.looks.Count, "Binding again adds nothing.");
+                    Assert.AreEqual(c.found.Length, again.armoury.Count); Assert.AreEqual(expected.Count, again.looks.Count, "Binding again adds nothing.");
                 }
                 finally { if (Directory.Exists(root)) Directory.Delete(root, true); }
             }

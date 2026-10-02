@@ -58,6 +58,8 @@ namespace Crulanda.Encounter
         public bool worn, extra;
         /// <summary>How worked the piece is, 0 to 4, from its level band (1-2 ... 11-13): armour grows more plates, rims and crests as it climbs.</summary>
         public int tier;
+        /// <summary>The looks.json tint prefix whose metal replaced the palette's (crafted pieces), or null.</summary>
+        public string tint;
     }
 
     public sealed class GearLooks
@@ -281,6 +283,15 @@ namespace Crulanda.Encounter
         {
             return l.family + ":" + l.variant + "/" + l.palette + "#" + l.quality + (l.forceGlow ? "+glow" : "") + "@" + ColorUtility.ToHtmlStringRGB(l.metal) + "~" + l.detail + "^" + l.tier;
         }
+        /// <summary>
+        /// A look as the Armoury counts it and the save keeps it (EncounterProgress.looks): family, variant, palette, crafted tint and
+        /// forced glow. Quality, shade, detail and tier are left out, so a better or higher piece of the same make is not a new look,
+        /// and no colour is in it, so retuning a palette or tint hex in looks.json keeps every saved key.
+        /// </summary>
+        public static string AppearanceKey(GearLook l)
+        {
+            return l.family + ":" + l.variant + "/" + l.palette + (string.IsNullOrEmpty(l.tint) ? "" : "*" + l.tint) + (l.forceGlow ? "+glow" : "");
+        }
 
         /// <summary>The look of an item: its own look, else its generated name's, else its slot's fallback. Never fails.</summary>
         public GearLook Resolve(ItemDef d)
@@ -306,7 +317,7 @@ namespace Crulanda.Encounter
 
         GearLook Tint(GearLook l, string id)
         {
-            foreach (var (prefix, metal) in tints) if (id.StartsWith(prefix, StringComparison.Ordinal)) { l.metal = l.quality == 0 ? Faded(metal) : metal; if (l.quality == 1) l.trimColor = l.metal; break; }
+            foreach (var (prefix, metal) in tints) if (id.StartsWith(prefix, StringComparison.Ordinal)) { l.metal = l.quality == 0 ? Faded(metal) : metal; if (l.quality == 1) l.trimColor = l.metal; l.tint = prefix; break; }
             return l;
         }
         static Color Hex(string s) { ColorUtility.TryParseHtmlString(s ?? "", out var c); c.a = 1; return c; }

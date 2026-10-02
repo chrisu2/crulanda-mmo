@@ -7,9 +7,10 @@ namespace Crulanda.Encounter
     /// <summary>
     /// The Armoury (loot DESIGN.md 4, rows 8-10; step L3): every named piece of gear in the land, by zone and source, and what the
     /// character has found of it. A named piece counts as found the first time it is in the bags or worn, and stays found after it is
-    /// sold; every appearance (GearLooks.LookKey) that has been in the bags is a look seen. Both are kept in the save
+    /// sold; every appearance (GearLooks.AppearanceKey) that has been in the bags is a look seen. Both are kept in the save
     /// (EncounterProgress.armoury and looks, format 9), and so are the kills of each loot source (lootLuck): killing a mob whose drop
-    /// list names a zone, camp or mob makes that list's pieces known by name in the book, and an epic's run of kills without it
+    /// list names a zone, camp or mob makes that list's pieces known by name in the book (so does finding one of its pieces, which
+    /// is how a save from before the kills were counted knows its boss), and an epic's run of kills without it
     /// makes it certain in the end (LootDatabase.Roll). Hidden finds and rare world drops stay unknown until found, and a hidden
     /// find never names its place. Sweep looks over the bags and equipment (the session calls it twice a second), so buying,
     /// crafting, quest rewards and loot are all noticed without a hook in their code; Bind does the same quietly, so what the
@@ -39,6 +40,8 @@ namespace Crulanda.Encounter
         readonly HashSet<string> found = new HashSet<string>(StringComparer.Ordinal), seenLooks = new HashSet<string>(StringComparer.Ordinal), swept = new HashSet<string>(StringComparer.Ordinal);
         /// <summary>For each named piece, the drop lists (naming a zone, camp or mob) whose kills make it known.</summary>
         readonly Dictionary<string, List<string>> revealedBy = new Dictionary<string, List<string>>(StringComparer.Ordinal);
+        /// <summary>For each of those drop lists, the named pieces it drops: finding one of them meets the list's source too.</summary>
+        readonly Dictionary<string, List<string>> picksOf = new Dictionary<string, List<string>>(StringComparer.Ordinal);
         /// <summary>Each named piece's group in the book (ZoneOf), worked out once.</summary>
         readonly Dictionary<string, string> zoneOf = new Dictionary<string, string>(StringComparer.Ordinal);
 
@@ -51,10 +54,12 @@ namespace Crulanda.Encounter
                 foreach (var d in Loot.Drops)
                 {
                     if (!Reveals(d)) continue;
+                    var picks = picksOf[d.id] = new List<string>();
                     foreach (var g in d.groups) foreach (var k in g.pick)
                     {
                         if (!revealedBy.TryGetValue(k.item, out var lists)) revealedBy[k.item] = lists = new List<string>();
                         if (!lists.Contains(d.id)) lists.Add(d.id);
+                        if (!picks.Contains(k.item)) picks.Add(k.item);
                     }
                 }
             Bind(progress);
@@ -112,8 +117,8 @@ namespace Crulanda.Encounter
             Progress.armoury.Add(id); if (tell) NewItem(id);
             return true;
         }
-        /// <summary>A piece of gear's appearance as built (GearLooks.LookKey of its resolved look), or null for anything else or without the looks.</summary>
-        public string LookOf(ItemDef d) { return Looks == null || d == null || d.kind != "gear" ? null : GearLooks.LookKey(Looks.Resolve(d)); }
+        /// <summary>A piece of gear's appearance (GearLooks.AppearanceKey of its resolved look: no colours, quality or tier), or null for anything else or without the looks.</summary>
+        public string LookOf(ItemDef d) { return Looks == null || d == null || d.kind != "gear" ? null : GearLooks.AppearanceKey(Looks.Resolve(d)); }
 
         /// <summary>
         /// A camp mob died: each drop list it rolls that names a zone, camp or mob counts the kill (lootLuck, by the list's id), which
@@ -139,8 +144,8 @@ namespace Crulanda.Encounter
         public bool HasSeenLook(string key) { return key != null && seenLooks.Contains(key); }
         public int LooksSeen { get { return seenLooks.Count; } }
         /// <summary>
-        /// Found once it has been held. Otherwise known when its source has been met: a boss or camp piece once a mob of a list that
-        /// drops it has died, a quest reward once the quest is taken or done, a merchant's piece always (it is on the shelf). Hidden
+        /// Found once it has been held. Otherwise known when its source has been met: a boss or camp piece once a list that drops it
+        /// has been met, which is when a mob of that list has died or one of the list's pieces has been found, a quest reward once the quest is taken or done, a merchant's piece always (it is on the shelf). Hidden
         /// finds and world drops are unknown until found. Anything without a gear entry is unknown.
         /// </summary>
         public State StateOf(string itemId)
@@ -150,7 +155,7 @@ namespace Crulanda.Encounter
             string kind = LootDatabase.SourceKind(g.source);
             switch (kind)
             {
-                case "boss": case "mob": return revealedBy.TryGetValue(itemId, out var lists) && lists.Exists(l => KillsOf(l) > 0) ? State.Known : State.Unknown;
+                case "boss": case "mob": return revealedBy.TryGetValue(itemId, out var lists) && lists.Exists(l => KillsOf(l) > 0 || (picksOf.TryGetValue(l, out var ps) && ps.Exists(IsFound))) ? State.Known : State.Unknown;
                 case "quest":
                     {
                         string q = g.source.Substring(kind.Length + 1);

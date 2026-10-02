@@ -56,7 +56,7 @@ namespace Crulanda.Encounter
         // ---------- the Armoury (save format 9; older saves load with all three empty) ----------
         /// <summary>Named gear ever found (in the bags or worn at least once), by item id, in the order found. See ArmouryLog.</summary>
         public List<string> armoury = new List<string>();
-        /// <summary>Appearances ever held, by look key (GearLooks.LookKey), in the order first seen. Each gave a "NEW LOOK" toast.</summary>
+        /// <summary>Appearances ever held, by appearance key (GearLooks.AppearanceKey: no colours, quality or tier), in the order first seen. Each gave a "NEW LOOK" toast.</summary>
         public List<string> looks = new List<string>();
         /// <summary>
         /// Kill counts by loot source: a drop list id (its kills, which name its pieces in the Armoury) or a drop list id and group

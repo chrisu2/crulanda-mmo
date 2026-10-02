@@ -155,9 +155,12 @@ namespace Crulanda.Encounter
             foreach (var group in z.life.critters)
                 for (int i = 0; i < group.count; i++)
                     Critters.Add(Critter.Spawn(this, group.kind, group.center, group.radius));
+            StartEconomy();
         }
         static readonly string[] KeeperNames = { "Goody Marl", "Hettie Brook", "Nan Pennock", "Old Sorrel" };
         public static string[] DefaultNames { get { return Names; } }
+        /// <summary>The trades of the default villagers, by index (before a trade this village lacks a place for falls back).</summary>
+        public static string[] DefaultRoles { get { return Roles; } }
         public static string[] KeeperNamesList { get { return KeeperNames; } }
 
         // ---------- households: who lives behind which door ----------
@@ -190,8 +193,172 @@ namespace Crulanda.Encounter
         void Settle(Villager v, Household household) { Villagers.Add(v); v.Household = household; if (household != null) household.members.Add(v); }
         /// <summary>Who is indoors behind this door now (hidden at home: abed, at dinner, or fled in).</summary>
         public List<Villager> AtHome(ZoneDoor door) { return Villagers.FindAll(v => v.Home == door && v.Indoors); }
-        /// <summary>The player paid this villager this much coin. Kept for the purses (ADDENDUM C); nothing is done with it yet.</summary>
-        public void Paid(string npc, int coin) { }
+        /// <summary>
+        /// The player paid this villager this much coin (a purchase, or a bag made for a quest's hides): it goes into their household's
+        /// purse. Before the shops shut the household plans again and sets out for what it can now afford ("That's the fire lit
+        /// tonight."); after, the coin waits for the morning, and a house that went without firewood today says so once ("That's
+        /// tomorrow's fire."). Past the cap it goes to the tithe-man.
+        /// </summary>
+        public void Paid(string npc, int coin)
+        {
+            var v = Find(npc); var h = v != null ? v.Household : HouseholdOf(npc); var p = PurseOf(h);
+            if (p == null || coin <= 0) return;
+            bool late = WorldClock.Hour >= ShopsShut;
+            int over = Economy.Earn(p, coin, !late, out var claimed);
+            string line = over > 0 ? (p.said.Add("tithe") ? TitheLine : null)
+                : late ? (Economy.Live(p, "firewood") && (p.cold || !p.met.Contains("firewood") && !p.claimed.Contains("firewood")) && p.said.Add("tomorrow") ? TomorrowLine : null)
+                : claimed != null && claimed.Contains("firewood") ? TonightLine
+                : claimed != null && claimed.Contains("bread") ? "That's bread on the board tonight. Bless you." : null;
+            if (line == null || v == null) return;
+            Session.Message(v.Name + ": " + line);
+            if (Time.time >= v.BubbleUntil) v.Say(line, 6);   // a quest's own last words keep the bubble
+        }
+        public const string TonightLine = "That's the fire lit tonight. Bless you.", TomorrowLine = "That's tomorrow's fire. Bless you.";
+        const string TitheLine = "More than we'll spend. The tithe-man will have the rest.";
+
+        // ---------- purses: what each household buys, and who goes without (ADDENDUM C; VillageEconomy) ----------
+        /// <summary>The village's purses for this character (see <see cref="VillageEconomy"/>).</summary>
+        public VillageEconomy Economy { get; private set; }
+        /// <summary>From this hour the coin the player pays waits for the next morning.</summary>
+        public const float ShopsShut = 18;
+        /// <summary>From this hour a house that went without firewood today lets its fire die, and its chimney stops smoking until the next.</summary>
+        public const float ColdFrom = 17;
+        /// <summary>A household with nobody to send further than this from the green buys on the books.</summary>
+        const float BooksReach = 100;
+        /// <summary>A household's purse (null: no household, or no economy).</summary>
+        public Purse PurseOf(Household h) { return h != null && Economy != null ? Economy.PurseOf(h.name) : null; }
+        void StartEconomy()
+        {
+            string root = Session.SaveDirectoryOverride ?? System.IO.Path.Combine(Application.persistentDataPath, "CrulandaEncounter");
+            Economy = VillageEconomy.For(root + "|" + EncounterSave.SlotFor(Session.ClassDef != null ? Session.ClassDef.id : null), Zone.Zone.id);
+            foreach (var h in Households) Economy.Open(h.name, h.def != null ? h.def.stipend : 6, h.def?.needs, h.members.ConvertAll(m => m.Role), BagsFor(h));
+            if (Economy.Turned(WorldClock.Hour)) Economy.NewDay(); else Economy.PlanAll();
+            // The part of today before the session began went by off-screen: what was claimed for errands already over is bought.
+            SettleDue(true);
+            // Wood bought before this scene (a bundle still being carried when the player left) is home by now.
+            foreach (var p in Economy.Purses) if (p.met.Contains("firewood")) p.cold = false;
+        }
+        /// <summary>Trade bags the player wears, counted for the leatherworker's household (0 for every other).</summary>
+        int BagsFor(Household h)
+        {
+            if (h == null || !h.members.Exists(m => m.Role == "leatherworker") || Session.Progress == null || Session.Items == null) return 0;
+            return Inventory.Pouches(Session.Progress, Session.Items).Count;
+        }
+        /// <summary>The purses' part of the village's tick: a new day's stipends and plans, what is bought on the books, and the hearths.</summary>
+        void Purses()
+        {
+            if (Economy == null) return;
+            if (Economy.Turned(WorldClock.Hour)) { foreach (var h in Households) Economy.SetBags(h.name, BagsFor(h)); Economy.NewDay(); }
+            SettleDue(false);
+            float hour = WorldClock.Hour, woodUntil = VillageWork.ShopFor("firewood").until;
+            foreach (var h in Households)
+            {
+                var p = PurseOf(h); if (p == null) continue;
+                bool wood = Economy.Live(p, "firewood");
+                if (!wood) p.cold = false;
+                else if (hour >= ColdFrom && !p.met.Contains("firewood") && (!p.claimed.Contains("firewood") || hour >= woodUntil)) p.cold = true;
+                h.ApplyHearth(p.cold);
+            }
+        }
+        /// <summary>Buy what is claimed and due: on the books for a household with nobody to send, once the need's window has opened;
+        /// with <paramref name="closedToo"/> (a session starting) also what a household's errand window has already closed on.</summary>
+        void SettleDue(bool closedToo)
+        {
+            float hour = WorldClock.Hour;
+            foreach (var h in Households)
+            {
+                var p = PurseOf(h); if (p == null) continue;
+                foreach (var e in VillageWork.Shopping)
+                    if (p.claimed.Contains(e.need) && hour >= e.at && (OnTheBooks(h, e.need) || closedToo && hour >= e.until) && Economy.Settle(p, e.need) && e.need == "firewood") p.cold = false;
+            }
+        }
+        /// <summary>Who in a household goes for a need: a member other than the head, not a drinker, a hen-wife, a post-keeper or the
+        /// innkeeper. Bread goes to a child first, firewood only to a grown-up, eggs to a grown-up first. Null: nobody to send.</summary>
+        public Villager Runner(Household h, string need)
+        {
+            if (h == null) return null;
+            Villager head = h.Head, adult = null, child = null;
+            foreach (var m in h.members)
+            {
+                if (m == head || m.Resident || m.Coop != null || m.Role == "drinker" || m.Role == "innkeeper") continue;
+                if (m.Role == "child") { if (child == null) child = m; } else if (adult == null) adult = m;
+            }
+            return need == "bread" ? child ?? adult : need == "firewood" ? adult : adult ?? child;
+        }
+        /// <summary>A need bought on the books, with no walk: a household of one, one with nobody to send for it, or one living out
+        /// past the village (more than <see cref="BooksReach"/> from the green), so the smiths and merchants stay at their shops.</summary>
+        public bool OnTheBooks(Household h, string need)
+        {
+            if (h.members.Count < 2 || Runner(h, need) == null || h.house == null) return true;
+            var green = Zone.Zone.clearings.Length > 0 ? Zone.Zone.clearings[0].center : Vector2.zero;
+            return Vector2.Distance(new Vector2(h.house.position.x, h.house.position.z), green) > BooksReach;
+        }
+        /// <summary>The household's shopping this villager should go for now: an errand in its window, the coin claimed, and this
+        /// villager the one to send (a child's own midday loaf comes first). One the household is short of is said once instead.</summary>
+        public List<Errand> ShoppingFor(Villager v)
+        {
+            var list = new List<Errand>(); var h = v.Household; var p = PurseOf(h); if (p == null) return list;
+            float hour = WorldClock.Hour; var own = VillageWork.DayFor(v.Role);
+            foreach (var e in VillageWork.Shopping)
+            {
+                if (hour < e.at || hour >= e.until || Runner(h, e.need) != v || OnTheBooks(h, e.need)) continue;
+                if (own != null && System.Array.Exists(own.errands, x => x.need == e.need && hour < x.until && !v.Done(x.id))) continue;
+                if (p.claimed.Contains(e.need)) list.Add(e);
+                else SayShort(v, p, e.need);
+            }
+            return list;
+        }
+        /// <summary>Whether a villager's own errand that buys a need (the child's loaf) may run: yes while its coin is claimed, and
+        /// always with no purse (as before the purses). Short of it, they say so once.</summary>
+        public bool MayFetch(Villager v, Errand e)
+        {
+            var p = PurseOf(v.Household); if (p == null || e.need == null || p.claimed.Contains(e.need)) return true;
+            SayShort(v, p, e.need); return false;
+        }
+        void SayShort(Villager v, Purse p, string need)
+        {
+            if (p.met.Contains(need) || Economy.ShortOf(p) != need || !p.said.Add(need)) return;
+            var line = VillageWork.ShortLine(need, v.Role == "child"); if (line != null) v.Say(line, 4);
+        }
+        /// <summary>Goods picked up on an errand that buys a need: paid for now. False when the coin is no longer there for it.</summary>
+        public bool Fetched(Villager v, Errand e)
+        {
+            var p = PurseOf(v.Household); return p == null || e.need == null || Economy.Settle(p, e.need);
+        }
+        /// <summary>An errand that buys a need ended. Handed over at home, or given up once paid at pick-up (the goods go home with
+        /// them): firewood lights the hearth. Given up before pick-up: with <paramref name="again"/> the claim is kept and true is
+        /// returned, so the runner sets out again while its window is open (a flight, bedtime, a capture); without, the claim is let
+        /// go (the place could not be reached).</summary>
+        public bool ErrandEnded(Villager v, Errand e, bool carried, bool again = false)
+        {
+            var h = v.Household; var p = PurseOf(h); if (p == null || e.need == null) return false;
+            if (!carried && !p.met.Contains(e.need)) { if (again && p.claimed.Contains(e.need)) return true; Economy.Release(p, e.need); return false; }
+            if (e.need == "firewood") { p.cold = false; h.ApplyHearth(false); }
+            return false;
+        }
+        /// <summary>Whoever keeps the shop for a need (the head of the selling household: Hedda Thorne for bread, Ama Rusk for eggs),
+        /// or null when the zone has none.</summary>
+        public Villager Seller(string need)
+        {
+            var seller = Economy != null ? Economy.SellerOf(need) : null; var h = seller != null ? Households.Find(x => x.name == seller.household) : null;
+            return h != null ? h.Head : null;
+        }
+        /// <summary>The first name of whoever keeps the shop for a need (the baker for bread), for the shopper's pick-up line.</summary>
+        public string SellerName(string need) { var s = Seller(need); return s != null ? FirstName(s.Name) : null; }
+        /// <summary>What a household short of firewood says to the player (one talk in three; see <see cref="LineFor"/>), only where the
+        /// player can pay them (a member has wares or quest business). Null for a warm house, and before dusk for one that went cold
+        /// last night but has its wood bought or on the way today.</summary>
+        public string PurseLine(Villager v)
+        {
+            var h = v.Household; var p = PurseOf(h); if (p == null || !Economy.Live(p, "firewood")) return null;
+            bool dusk = WorldClock.Hour >= ColdFrom, without = !p.met.Contains("firewood") && !p.claimed.Contains("firewood");
+            bool cold = dusk && p.cold || without && (p.cold || dusk);
+            if (!cold || !h.members.Exists(m => Session.IsVendor(m) || Session.Quests != null && Session.Progress != null && Session.Quests.For(m.Name, Session.ZoneId, Session.Progress.Level).Count > 0)) return null;
+            if (Economy.Live(p, "bread") && !p.met.Contains("bread") && !p.claimed.Contains("bread")) return "Cold hearth again tonight. Wood's three coppers we haven't got.";
+            var child = h.members.Find(m => m.Role == "child");
+            if (child == v) return "No fire again. I sleep in my coat.";
+            return "We've bread. No fire; " + (child != null ? FirstName(child.Name) + " sleeps in " + Possessive(h, child) + " coat." : "we sleep in our coats.");
+        }
 
         /// <summary>
         /// What a knock at a household's door gets (GAME-ONLY): who is abed, where the head of the house is if they are out, or
@@ -268,6 +435,7 @@ namespace Crulanda.Encounter
             if (h.name.EndsWith(" farm") && h.Head != null && h.Head.Name.IndexOf(' ') > 0) n = h.Head.Name.Substring(h.Head.Name.LastIndexOf(' ') + 1);
             return n.Contains(" ") ? "Everyone in " + HouseName(h).Replace("The ", "the ") : "The " + n + "s";
         }
+        static string Possessive(Household h, Villager v) { var p = Pronoun(h, v); return p == "her" ? "her" : p == "him" ? "his" : "their"; }
         static string Pronoun(Household h, Villager v)
         {
             string kin = h.KinOf(v);
@@ -281,7 +449,8 @@ namespace Crulanda.Encounter
             string first = name.Substring(0, space);
             return first == "Old" || first == "Goody" || first == "Warden" || first == "Sister" ? name : first;
         }
-        /// <summary>Hens lay through the working day, one egg each at most; the count resets before dawn. The water pan dries out.</summary>
+        /// <summary>Hens lay through the working day, one egg each at most; the count resets before dawn. The water pan dries out. The
+        /// purses keep their day (<see cref="Purses"/>).</summary>
         void Update()
         {
             foreach (var coop in Zone.Coops) coop.Dry(Time.deltaTime / 420);   // a pan lasts about four hours
@@ -295,6 +464,7 @@ namespace Crulanda.Encounter
                 int hens = 0; foreach (var c in Critters) if (c.Coop == coop) hens++;
                 if (coop.LaidToday < hens && R01 < .35f) { coop.Eggs++; coop.LaidToday++; }
             }
+            Purses();
         }
         float nextLay;
         public IEnumerable<Critter> HensOf(ZoneCoop coop) { foreach (var c in Critters) if (c.Coop == coop) yield return c; }
@@ -517,6 +687,7 @@ namespace Crulanda.Encounter
             if (v.PassedOut) return "Zzz...";
             if (!toPlayer) return Chatter[rng.Next(Chatter.Length)];
             if (rng.Next(3) == 0) { var day = StockLine(v); if (day != null) return day; }
+            var purse = PurseLine(v); if (purse != null && rng.Next(3) == 0) return purse;
             if (v.Role == "innkeeper" && Session.Progress != null && !Session.Progress.recruited && rng.Next(3) == 0) return InnkeeperOnMira;
             if (!v.Keeper && TradeLines.TryGetValue(v.Role, out var trade) && rng.Next(3) > 0) return trade[rng.Next(trade.Length)];
             if (v.Role == "henwife" && v.Coop != null)
@@ -576,6 +747,13 @@ namespace Crulanda.Encounter
                 if (def != null) foreach (var m in def.members) if (m != null && m.kin == "head") { var v = members.Find(x => x.Name == m.name); if (v != null) return v; }
                 return members.Count > 0 ? members[0] : null;
             }
+        }
+        /// <summary>Light or put out the chimney of their house (its smoke's emission; a door with no chimney is passed over).</summary>
+        public void ApplyHearth(bool cold)
+        {
+            if (house == null || house.smoke == null) return;
+            var em = house.smoke.emission; if (em.enabled == !cold) return;
+            em.enabled = !cold;
         }
         /// <summary>How a member is kin ("head", "daughter"), or null.</summary>
         public string KinOf(Villager v)
@@ -754,16 +932,26 @@ namespace Crulanda.Encounter
             float hour = WorldClock.Hour;
             if (hour < lastHour - 6) done.Clear();   // a new day (or the clock jumped back to the morning)
             lastHour = hour;
+            // The household's shopping first, when its purse has the coin claimed (VillageLife.ShoppingFor): the family sets out when paid.
+            foreach (var e in life.ShoppingFor(this)) if (!done.Contains(e.id)) { if (Begin(e)) return true; life.ErrandEnded(this, e, false); }
             var day = VillageWork.DayFor(Role); if (day == null) return false;
             foreach (var e in day.errands)
             {
                 if (done.Contains(e.id) || hour < e.at || hour >= e.until) continue;
-                done.Add(e.id);
-                var from = Resolve(e.from); if (!from.HasValue) { Blocked(e.from); continue; }
-                Vector3? to = null; if (e.to != null) { to = HandOverAt(e.door) ?? Resolve(e.to, e.toRole); if (!to.HasValue) { Blocked(e.to); continue; } }
-                errand = e; leg = 0; dropAt = to ?? from.Value; activity = e.id; Go(from.Value); return true;
+                if (e.need != null && !life.MayFetch(this, e)) { done.Add(e.id); continue; }   // the child's loaf, with no coin for bread
+                if (Begin(e)) return true;
             }
             return false;
+        }
+        /// <summary>Set off on an errand (marked done for today either way); false when its places are not in this village or are blocked.</summary>
+        bool Begin(Errand e)
+        {
+            done.Add(e.id);
+            // Buying for the household: from the seller's own place (Ama Rusk's Produce stall for eggs), where the coin goes.
+            var keeper = e.need != null ? life.Seller(e.need) : null;
+            var from = keeper != null && life.OwnPlaces(keeper, e.from) != null ? life.RandomPlace(e.from, keeper) : Resolve(e.from, e.fromRole); if (!from.HasValue) { Blocked(e.from); return false; }
+            Vector3? to = null; if (e.to != null) { to = HandOverAt(e.door) ?? Resolve(e.to, e.toRole); if (!to.HasValue) { Blocked(e.to); return false; } }
+            errand = e; leg = 0; dropAt = to ?? from.Value; activity = e.id; Go(from.Value); return true;
         }
         /// <summary>Where goods are handed over at a door (<see cref="Errand.door"/>: the kitchen's back door, the bar), or null when
         /// the village has no such place. Hen-wives come to the kitchen together, so each takes a spot nobody else is bound for.</summary>
@@ -799,7 +987,14 @@ namespace Crulanda.Encounter
             }
             return best;
         }
-        void CancelErrand() { errand = null; goingIn = false; DropLoad(); }   // goods posed for a capture are dropped too
+        /// <summary>Give up the errand (goods posed for a capture are dropped too). A purchase not yet picked up keeps its coin set
+        /// aside and is tried again while its window is open; with <paramref name="again"/> false (the place could not be reached)
+        /// its coin is let go.</summary>
+        void CancelErrand(bool again = true)
+        {
+            if (errand != null && errand.need != null && life.ErrandEnded(this, errand, leg > 0, again)) done.Remove(errand.id);
+            errand = null; goingIn = false; DropLoad();
+        }
         /// <summary>An errand's place is there but nobody can get near it for the grey-coats: say so, and let it go for today.</summary>
         void Blocked(string place)
         {
@@ -828,11 +1023,14 @@ namespace Crulanda.Encounter
             var look = life.LookFor(transform.position); if (look.HasValue) Face(look.Value);
             if (leg == 0)
             {
+                // Buying for the household: paid at pick-up; with the coin gone (a claim let go), they come away with nothing.
+                if (e.need != null && !life.Fetched(this, e)) { errand = null; visual.Pose = ActorPose.None; until = Time.time + 3; Say(VillageWork.ShortLine(e.need, Role == "child"), 4); return; }
                 int n = e.amount;
                 if (e.from == "nest") { n = Coop.Eggs; Coop.Eggs = 0; Face(Coop.door + (Coop.nest - Coop.door) * 2); }
                 if (e.from == "trough") { Coop.FedAt = Time.time; Coop.FeedSpot = Coop.trough; Face(Coop.trough + (Coop.trough - Coop.yard)); }
                 visual.Pose = e.pose; until = Time.time + e.work; loadCount = n;
                 string pick = e.from == "nest" ? EggLine(n) : e.pickupLine ?? (e.to == null ? e.line : null);
+                if (pick != null && pick.Contains("{seller}")) { var seller = life.SellerName(e.need); pick = seller != null ? pick.Replace("{seller}", seller) : pick.Replace(", {seller}", ""); }
                 if (pick != null) Say(pick, 4);
                 if (e.to == null || n == 0) { errand = null; return; }   // a task done on the spot, or nothing to carry
                 if (e.load != Load.None) Carry(e.load, n);
@@ -846,6 +1044,7 @@ namespace Crulanda.Encounter
                 var taker = Taker(e);
                 if (taker != null) { var reply = VillageWork.Reply(e.good, life.R01); if (reply != null) taker.Say(reply, 4); taker.Face(transform.position); }
                 life.HandOver(this, e, taker);
+                if (e.need != null) life.ErrandEnded(this, e, true);   // bought and brought home: firewood lights the hearth
                 DropLoad();
                 if (e.to == "home" && home != null) { activity = "home"; goingIn = true; until = Time.time + 4; }
                 errand = null;
@@ -1107,7 +1306,7 @@ namespace Crulanda.Encounter
                 until = Mathf.Max(until, Time.time + 3);
             }
             if (Interrupted) { partner = null; ChooseNext(); return; }
-            if (state == State.Travel && Stranded) { partner = null; CancelErrand(); activity = "wander"; var alt = life.RandomPlace("wander"); if (alt.HasValue) Go(alt.Value); else { state = State.Activity; until = Time.time + 5; } return; }
+            if (state == State.Travel && Stranded) { partner = null; CancelErrand(false); activity = "wander"; var alt = life.RandomPlace("wander"); if (alt.HasValue) Go(alt.Value); else { state = State.Activity; until = Time.time + 5; } return; }
             if (state == State.Travel && Arrived) StartActivity();
             if (state == State.Activity)
             {

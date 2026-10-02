@@ -30,6 +30,7 @@ namespace Crulanda.Tests
         }
         [UnityTearDown] public IEnumerator Cleanup()
         {
+            VillageEconomy.ResetAll();   // the purses are kept for the play session
             Time.timeScale = 1; WorldClock.Hour = 8.5f;
             SceneManager.sceneLoaded -= OnLoaded;
             var empty = SceneManager.CreateScene("Empty-" + Guid.NewGuid().ToString("N"));

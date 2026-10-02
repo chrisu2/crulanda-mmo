@@ -13,12 +13,14 @@ namespace Crulanda.Encounter
     /// picked up (scattering feed). Places are the village's place kinds ("well", "stall", "inn"...), "home", or the hen-wife's
     /// "nest", "trough" and "pan". "{n}" in a line is the count carried. <see cref="door"/> is the kind of place the goods are
     /// handed over at when the village has one (the kitchen's back door, the bar); the stock key stays <see cref="to"/>'s.
-    /// <see cref="toRole"/> sends a delivery to a place of that trade (the merchant's stall, not the baker's).
+    /// <see cref="toRole"/> sends a delivery to a place of that trade (the merchant's stall, not the baker's), and
+    /// <see cref="fromRole"/> fetches from one. An errand with a <see cref="need"/> buys it for the household: it runs only while
+    /// the household's purse has claimed the coin, which is paid when the goods are picked up (see <see cref="VillageEconomy"/>).
     /// </summary>
     public sealed class Errand
     {
         public string id; public float at, until; public string from, to; public Load load; public string good; public int amount = 1;
-        public string door, toRole;
+        public string door, toRole, fromRole, need;
         public string line, pickupLine; public float work = 5; public ActorPose pose = ActorPose.Work, dropPose = ActorPose.Work;
         public Errand(string id, float at, float until, string from, string to, Load load = Load.None, string good = null, string line = null, string pickupLine = null)
         { this.id = id; this.at = at; this.until = until; this.from = from; this.to = to; this.load = load; this.good = good; this.line = line; this.pickupLine = pickupLine; }
@@ -96,7 +98,7 @@ namespace Crulanda.Encounter
                 new Errand("the morning's water", 6.5f, 8.5f, "well", "home", Load.Bucket, "water", "Water's bitter again. Iron, my gran says."),
                 new Errand("the evening's water", 16.5f, 18.5f, "well", "home", Load.Bucket, "water")) },
             { "child", new WorkDay(new[] { new Shift(6.5f, 11.5f, "green", "green", "wander", "wander", "well"), new Shift(11.5f, 13, "home"), new Shift(13, 17, "green", "green", "wander", "wander", "well"), new Shift(17, 20, "green", "home") },
-                new Errand("a loaf for Mum", 11, 13, "oven", "home", Load.Bread, "bread", null, "Mum says a loaf, and no eating the crust."),
+                new Errand("a loaf for Mum", 11, 13, "oven", "home", Load.Bread, "bread", null, "Mum says a loaf, and no eating the crust.") { need = "bread" },
                 new Errand("chores", 16.5f, 18.5f, "well", "home", Load.Bucket, "water", "Chores.")) },
             { "elder", new WorkDay(new[] { new Shift(7, 12, "green", "green", "green", "inn"), new Shift(12, 14, "inn", "inn", "green"), new Shift(14, 18, "green", "green", "green", "inn"), new Shift(18, Night, "inn", "home") }) },
             // The out of work (the drinkers, and any trade whose workplace the village lacks): loiter the morning away, then the inn, where
@@ -120,6 +122,29 @@ namespace Crulanda.Encounter
                 new Errand("dinner to the tables", 12.2f, 14, "kitchen", "inn", Load.Bread, "dinner", "Dinner. Mind the bowl; it's hotter than it looks.")) },
         };
         public static WorkDay DayFor(string role) { return Days.TryGetValue(role, out var d) ? d : null; }
+        /// <summary>
+        /// A household's shopping (GAME-ONLY; ADDENDUM C.2): bread from the baker's stall, a bundle from the woodyard, eggs from a
+        /// merchant's stall, each carried home in its window. Run by a member with hands to spare, and only while the purse has the
+        /// coin claimed for it; a household with nobody to send (one person, or a farm out past the village) buys on the books at
+        /// the hour the window opens. "{seller}" in the pick-up line is the seller's first name. Goods carried home deliver no stock.
+        /// </summary>
+        public static readonly Errand[] Shopping = {
+            new Errand("bread for the house", 9, 18, "stall", "home", Load.Bread, null, "Bread for the board.", "A loaf, {seller}. The small one.") { need = "bread", fromRole = "baker" },
+            new Errand("firewood for the hearth", 14, 19.5f, "woodpile", "home", Load.Logs, null, "Wood for the fire. We'll be warm tonight.", "A bundle, {seller}. Dry, if you've any.") { need = "firewood" },
+            new Errand("eggs for the house", 15.5f, 18.5f, "stall", "home", Load.Eggs, null, "Eggs for the pot.", "Three eggs, {seller}. Whatever the hens could spare.") { need = "eggs", fromRole = "merchant", amount = 3 } };
+        /// <summary>The shopping errand that fetches a need, or null.</summary>
+        public static Errand ShopFor(string need) { return System.Array.Find(Shopping, e => e.need == need); }
+        /// <summary>What the member who would have gone says when the household cannot stretch to a need.</summary>
+        public static string ShortLine(string need, bool child)
+        {
+            switch (need)
+            {
+                case "bread": return child ? "Mum says there's no loaf today." : "No bread today. The heel of yesterday's will have to do.";
+                case "firewood": return "Can't stretch to firewood today.";
+                case "eggs": return "No eggs this week. Coin's thin.";
+                default: return null;
+            }
+        }
         /// <summary>The shift a trade is on at an hour, or null when their day has no shift for it (bed, or a role without a day).</summary>
         public static Shift ShiftFor(string role, float hour)
         {

@@ -257,7 +257,8 @@ the coin goes to her family. Design: `tools/wip/professions/ADDENDUM.md` D. All 
 - `QuestDatabase.CheckItems(ItemDatabase)` cross-checks bring items, bag rewards and `unlessWorn` against the items (the quest files
   cannot see them); the session logs any problem as an error, and `QuestLogTests.Bring_hands_over_bag_items_on_talk` pins it empty.
 - Turning in a bag quest for the bag itself calls `VillageLife.Paid(turnIn, the bag's price)`, as buying from her does; the coin
-  fallback pays her nothing. Paid is the hook the purses (build step 7) fill in. Nothing is done with it yet.
+  fallback pays her nothing. The coin goes into the Tanners' purse, and the family sets out for what it can now afford: in play
+  their firewood and eggs, since Nettie has bought their loaf on the stipend by early afternoon (see WORLD_ZONES.md, Purses).
 
 **The quests** (giver and turn-in Maud Tanner, zone Oakhaven, ids keyed on the role):
 

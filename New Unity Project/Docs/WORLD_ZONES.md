@@ -638,9 +638,11 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
   - A trade whose errand needs a place the village lacks (no mill, no tannery) skips it for the day. Deliveries go to the
     place where someone of that trade is working now (the stall with the merchant behind it), else any of that kind. An
     errand's `door` is where it is handed over when the village has one (`kitchendoor`, `bar`; the stock key stays the inn's),
-    and whoever keeps the kitchen or the bar within 12 m answers. An errand's `toRole` sends it to a place of that trade: the
-    smith's, miller's, leatherworker's and herbalist's wares and the afternoon's eggs go to a merchant's stall (her own while she
-    is at her dinner), never the baker's. `VillageLife.HandedOver` reports each hand-over (carrier, errand, who answered).
+    and only the innkeeper answers there, at work or passing within reach (4 m of the kitchen's door, 3 m of the bar), whatever
+    he is about; when he is away nobody does, never another carrier. Elsewhere whoever is nearest within 6 m, stood at their
+    work and carrying nothing of their own, answers. An errand's `toRole` sends it to a place of that trade: the smith's,
+    miller's, leatherworker's and herbalist's wares and the afternoon's eggs go to the stall where a merchant is at work, else
+    to one of the merchants' own stalls at random (so while Ama is at her dinner it may be Tamsin's), never the baker's. `VillageLife.HandedOver` reports each hand-over (carrier, errand, who answered).
   - **The out of work drink** (Chris, 2026-10-01: "have unemployed npc show up at the inn and drink till gone or passed out"):
     the drinkers, and anyone whose trade this village has no place for (a smith with no forge, a farmer with no fields: in a
     village with an inn they become drinkers), loiter the morning away and are at the inn from 11:00. Each round is a tankard off
@@ -688,7 +690,8 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
     fields within 60 m of home when there are any. Oakhaven: Brannoc Vell, Vell's smithy; Hedda Thorne, Thorne's bakehouse and
     the Bread stall; Ama Rusk, the Produce stall; Tamsin Reed, Cloth and pots; Fen Walker, the Tannery yard; Maud Tanner, her
     leather shop; Lisbet Crane, her drying hut; Hob Linden, the Cask's kitchen and the Golden Cask's bar; Garet Moss, his game
-    rack; Osk Farrow, the Woodyard; Aldo Crisp, the mill.
+    rack; Osk Farrow, the Woodyard; Aldo Crisp, the mill (listed for the record; the mill's stand point is not a named
+    workplace, so he works it as anyone of the kind would).
   - The leatherworker keeps her shop 9 to 12 and 2 to 6 (the yard either side), fetches the tanned hides from the yard first
     thing (7.5 to 9) and takes her wares from the shop to the stall after her midday meal (12.2 to 14); the herbalist calls at
     her drying hut late morning and evening and hangs her evening herbs there.
@@ -701,8 +704,9 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
     Ama's cask never sees the night out." The drinkers drink as before; he never serves or stops them.
   - `VillageWorkshopTests`: every workshop place is on the navmesh and can be walked to; Maud keeps shop apart from the tannery
     yard; each trade stands at its own workshop (Ama, Tamsin and Hedda each at her own stall; Lisbet's herbs to her hut); eggs,
-    the first loaves and the hares are handed over at the kitchen's door and Hob answers; Hob is abed by 23:30 and in the kitchen
-    at first light. `WorkshopDataTests.Every_workshop_owner_is_a_villager`.
+    the first loaves and the hares are handed over at the kitchen's door and Hob answers, and with Hob away nobody does; Hob is
+    abed by 23:30 and in the kitchen at first light. `WorkshopDataTests.Every_workshop_owner_is_a_villager` and
+    `The_innkeeper_sells_bread_and_cheese`.
   - Hunters and woodcutters work the groves. Herbalists gather on the open meadow.
   - Work poses: Hammer, Chop, Gather, Knead. Each trade has its own lines of talk.
   - Oakhaven has Vell's smithy, Market row (three stalls), Thorne's bakehouse, the Tannery yard, the Woodyard, Tanner's leather

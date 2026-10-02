@@ -18,7 +18,8 @@ namespace Crulanda.Tests
     /// a villager stands to work there is on the navmesh where the builder put it and can be walked to, and the leatherworker
     /// keeps shop at her own counter, apart from the tannery yard. Each trade works its own workshop (life.workshops: the three
     /// stall-keepers their own stalls, the herbalist's herbs to her hut); eggs, the first loaves and the hares go round to the
-    /// kitchen's back door, where the innkeeper, Hob Linden, answers; and he goes up to bed by 23:30 and is in the kitchen at first light.
+    /// kitchen's back door, where the innkeeper, Hob Linden, answers (and with him away, nobody); and he goes up to bed by 23:30 and
+    /// is in the kitchen at first light.
     /// </summary>
     public class VillageWorkshopTests
     {
@@ -197,7 +198,9 @@ namespace Crulanda.Tests
             bool Keep() { if (hob.Activity != "kitchen" || Time.realtimeSinceStartup > rewarp) { hob.WorkAt("kitchen"); rewarp = Time.realtimeSinceStartup + 4; } return true; }
             Time.timeScale = 4;
             yield return WaitUntil(() => Keep() && log.Any(x => x.e.id == "eggs to the inn") && log.Any(x => x.e.id == "first loaves to the inn"), 150);
-            Time.timeScale = 1; WorldClock.Hour = Mathf.Max(WorldClock.Hour, 12.6f); Time.timeScale = 4;   // past the hide's window: the hares are next
+            Time.timeScale = 1; WorldClock.Hour = Mathf.Max(WorldClock.Hour, 12.6f);   // past the hide's window: the hares are next
+            var garet = life.Villagers.First(v => v.Role == "hunter"); garet.Release(life.Places["tannery"][0]);   // he chooses now, at the tannery, not whenever his walk ends
+            Time.timeScale = 4;
             yield return WaitUntil(() => Keep() && log.Any(x => x.e.id == "hares to the inn"), 150);
             Time.timeScale = 1;
             foreach (var (id, good, carrier) in new[] { ("eggs to the inn", "eggs", "henwife"), ("first loaves to the inn", "bread", "baker"), ("hares to the inn", "meat", "hunter") })
@@ -215,6 +218,27 @@ namespace Crulanda.Tests
                 }
                 Assert.Greater(life.Count("inn." + good), 0, "The inn's stock of " + good + " is kept (inn." + good + ").");
             }
+        }
+
+        [UnityTest] public IEnumerator Nobody_answers_at_the_kitchen_door_while_the_innkeeper_is_away()
+        {
+            yield return Load(8.45f);
+            var life = VillageLife.Active; var hob = life.Find("Hob Linden"); Assert.IsNotNull(hob);
+            hob.Park();   // away from the kitchen: the hen-wives stand at the next spots, but none of them answers for him
+            var log = new System.Collections.Generic.List<(Villager who, Errand e, Villager taker, Vector3 at)>();
+            life.HandedOver += (v, e, taker) => log.Add((v, e, taker, v.transform.position));
+            foreach (var c in life.Zone.Coops) { c.Eggs = 4; c.FedAt = Time.time; }
+            Time.timeScale = 4;
+            yield return WaitUntil(() => log.Any(x => x.e.door == VillageWork.KitchenDoor), 150);
+            Time.timeScale = 1;
+            var handed = log.Where(x => x.e.door == VillageWork.KitchenDoor).ToList();
+            Assert.Greater(handed.Count, 0, "Eggs or loaves come to the kitchen's door (" + string.Join(", ", life.Villagers.Where(v => v.Role == "henwife" || v.Role == "baker").Select(v => v.Name + ": " + v.Activity)) + ").");
+            foreach (var x in handed)
+            {
+                Assert.IsTrue(At(life, "kitchendoor", x.at).HasValue, x.who.Name + " hands " + x.e.good + " over at the kitchen's door.");
+                Assert.IsNull(x.taker, "With Hob away nobody answers " + x.who.Name + " at the kitchen's door (not " + x.taker?.Name + ").");
+            }
+            hob.Release(life.Places["kitchen"][0]);
         }
 
         [UnityTest] public IEnumerator The_innkeeper_is_abed_by_2330()

@@ -407,7 +407,7 @@ namespace Crulanda.Encounter
         }
         /// <summary>A place of this kind where someone is at work right now (the stall with the merchant behind it), so an errand goes to
         /// them. With a <paramref name="role"/>, only someone of that trade, and when none is at work there, one of that trade's own
-        /// places all the same (a merchant's stall while she is at her dinner).</summary>
+        /// places all the same (one of the merchants' stalls, at random, while none is behind one).</summary>
         public Vector3? WorkedPlace(string kind, Villager except, string role = null)
         {
             if (!Places.TryGetValue(kind, out var list) || list.Count == 0) return null;
@@ -773,19 +773,31 @@ namespace Crulanda.Encounter
             foreach (var p in spots) if (!life.Villagers.Exists(v => v != this && v.errand != null && (v.dropAt - p).sqrMagnitude < .25f)) return p;
             return spots[life.Next(spots.Count)];
         }
-        /// <summary>Who answers a hand-over: at a door, whoever keeps the kitchen or the bar within 12 m (the innkeeper); otherwise
-        /// whoever is nearest within 6 m. Only someone stood at their work answers.</summary>
+        /// <summary>Who answers a hand-over. At a door (the kitchen's back door, the bar): only the innkeeper (where there is none,
+        /// whoever keeps the kitchen or the bar), at work or passing by within reach of it, whatever he is about (the pot on, the
+        /// dinner); else nobody, never another carrier. The reach (4 m at the kitchen's door, 3 m at the bar) takes in the range and
+        /// the table but not the taproom through the wall. Otherwise whoever is nearest within 6 m, stood at their work and not
+        /// carrying goods of their own.</summary>
         Villager Taker(Errand e)
         {
-            Villager best = null; float bestD = 12 * 12;
-            if (e.door != null)
+            Villager best = null; float bestD;
+            if (e.door != null && life.Places.TryGetValue(e.door, out var spots) && spots.Count > 0)
+            {
+                bestD = e.door == VillageWork.Bar ? 3 * 3 : 4 * 4;
                 foreach (var v in life.Villagers)
                 {
-                    if (v == this || !v.Visible || v.state != State.Activity || v.activity != "kitchen" && v.activity != "bar") continue;
+                    if (v == this || !v.Visible || v.state == State.Flee || v.Role != "innkeeper" && (v.errand != null || v.activity != "kitchen" && v.activity != "bar")) continue;
                     float d = (v.transform.position - transform.position).sqrMagnitude; if (d < bestD) { bestD = d; best = v; }
                 }
-            if (best == null) best = life.NearestVillager(transform.position, 6, this);
-            return best != null && best.state == State.Activity ? best : null;
+                return best;
+            }
+            bestD = 6 * 6;
+            foreach (var v in life.Villagers)
+            {
+                if (v == this || !v.Visible || v.state != State.Activity || v.errand != null) continue;
+                float d = (v.transform.position - transform.position).sqrMagnitude; if (d < bestD) { bestD = d; best = v; }
+            }
+            return best;
         }
         void CancelErrand() { errand = null; goingIn = false; DropLoad(); }   // goods posed for a capture are dropped too
         /// <summary>An errand's place is there but nobody can get near it for the grey-coats: say so, and let it go for today.</summary>

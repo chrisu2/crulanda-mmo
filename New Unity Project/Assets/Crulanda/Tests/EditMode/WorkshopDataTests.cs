@@ -114,6 +114,15 @@ namespace Crulanda.Tests
             CollectionAssert.AreEquivalent(new[] { "Quill", "Mira" }, cask.members.Where(m => m.kin == "lodger").Select(m => m.name).ToArray());
         }
 
+        /// <summary>The innkeeper sells bread and cheese across the bar: the role-keyed vendor entry in items.json.</summary>
+        [Test] public void The_innkeeper_sells_bread_and_cheese()
+        {
+            var dir = Path.Combine(Application.dataPath, "Crulanda", "EncounterContent", "Items");
+            var db = Crulanda.Encounter.ItemDatabase.Parse(Directory.GetFiles(dir, "*.json").Select(File.ReadAllText).ToList());
+            CollectionAssert.AreEquivalent(new[] { "food.brown_loaf", "food.harrow_cheese" }, db.StockFor("Hob Linden", "innkeeper", 2), "Hob sells bread and cheese.");
+            foreach (var id in new[] { "food.brown_loaf", "food.harrow_cheese" }) Assert.IsNotNull(db.Get(id), id + " is an item.");
+        }
+
         [Test] public void New_props_keep_clear_of_groves_and_the_creek()
         {
             var z = Oakhaven; var problems = new List<string>();

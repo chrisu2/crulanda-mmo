@@ -189,6 +189,16 @@ namespace Crulanda.Tests
             // at rare, two at epic), and only epic ones pulse; uncommon and lesser pieces have none, and nothing on them glows as bright.
             // The second time round makes no new materials: every accent of one palette and quality shares one.
             Assert.GreaterOrEqual(GearGlow.Low * GearLooks.EpicGlow, GearLooks.RareGlow - .001f, "At its dimmest an epic accent burns as bright as a rare one.");
+            // Through the post stack's ACES tone map (Post.shader) every palette's accent core keeps its colour at rare and at epic,
+            // not flattened to cream or ice with the colour only in the bloom's halo.
+            float Aces(float x) { return Mathf.Clamp01(x * (2.51f * x + .03f) / (x * (2.43f * x + .59f) + .14f)); }
+            foreach (var p in JsonUtility.FromJson<GearLookFile>(Resources.Load<TextAsset>("Gear/looks").text).palettes)
+                foreach (float k in new[] { GearLooks.RareGlow, GearLooks.EpicGlow })
+                {
+                    ColorUtility.TryParseHtmlString(p.glow, out var glow); var g = GearLooks.Gleam(glow) * k;
+                    float hi = Mathf.Max(Aces(g.r), Aces(g.g), Aces(g.b)), lo = Mathf.Min(Aces(g.r), Aces(g.g), Aces(g.b));
+                    Assert.Less(lo / hi, .7f, "The " + p.id + " accent at " + k + "x keeps its colour through the tone map.");
+                }
             var db = new ItemDatabase(); var looks = Looks(); var v = Figure(); int mats = 0;
             for (int round = 0; round < 2; round++)
             {
@@ -209,7 +219,7 @@ namespace Crulanda.Tests
                                 own++; accentMats.Add(m);
                                 Assert.GreaterOrEqual(e, (q >= 4 ? GearLooks.EpicGlow : GearLooks.RareGlow) - .05f, what + ": a " + s + " accent burns bright enough to bloom by day.");
                                 Color.RGBToHSV(m.GetColor("_EmissionColor"), out _, out float sat, out _);
-                                Assert.GreaterOrEqual(sat, .6f, what + ": a " + s + " accent glows in a colour, not white.");
+                                Assert.GreaterOrEqual(sat, .85f, what + ": a " + s + " accent glows in a colour, not white.");
                             }
                             accents += own; if (own > 0) palettes.Add(looks.Resolve(db.Get(ids[(int)s])).palette);
                             var root = v.GearRoot(s); var pulse = root != null ? root.GetComponent<GearGlow>() : null;

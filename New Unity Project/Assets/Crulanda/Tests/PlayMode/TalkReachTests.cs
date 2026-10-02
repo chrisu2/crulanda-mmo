@@ -76,6 +76,7 @@ namespace Crulanda.Tests
             s.SelectFriendly(null, true); yield return null;
             Assert.IsFalse(s.CompanionInReach, "Not even with her selected.");
             Assert.IsFalse(OffersMira(s), "Selecting her does not reach through the wall either: " + s.InteractPrompt);
+            Assert.IsFalse(s.FocusInTalkReach, "The friend frame does not offer [E] talk through the wall.");
 
             // In the taproom, a little way in front of the hearth (about 1.8 m from her): E asks her to join.
             var spot = inn.TransformPoint(new Vector3(3.2f, 0, .8f)); spot.y = inn.position.y;
@@ -83,6 +84,8 @@ namespace Crulanda.Tests
             Assert.Less(Vector3.Distance(s.Player.transform.position, mira.position), EncounterSession.TalkRange, "Near her in the taproom.");
             Assert.IsTrue(s.CompanionInReach, "Mira is talked to from inside the taproom.");
             Assert.AreEqual("Recruit Mira", s.InteractPrompt);
+            s.SelectFriendly(null, true); yield return null;
+            Assert.IsTrue(s.FocusInTalkReach, "Selected in the taproom, the friend frame offers [E] talk.");
         }
     }
 }

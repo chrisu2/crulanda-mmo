@@ -140,9 +140,11 @@ namespace Crulanda.Encounter
         /// haloes them and the quality reads at a glance on the body: a rare piece gleams, an epic one glows and breathes.
         /// </summary>
         public const float RareGlow = 3, EpicGlow = 5, ForcedGlow = 1.5f;
-        /// <summary>A palette's glow as its accents show it: its hue at full value and at least 65% saturation, so a pale glow (pilgrim
-        /// cream, the Concord's white-blue) reads as a colour and not as polished metal.</summary>
-        public static Color Gleam(Color glow) { Color.RGBToHSV(glow, out float h, out float s, out _); var c = Color.HSVToRGB(h, Mathf.Max(s, .65f), 1); c.a = 1; return c; }
+        /// <summary>A palette's glow as its accents show it: its hue at full value and at least 90% saturation, so a pale glow (pilgrim
+        /// cream, the Concord's white-blue) reads as a colour and not as polished metal. The weakest channel is kept that low because
+        /// the post stack's ACES tone map flattens a bright colour toward white: at 3x and 5x a paler gleam's core would show cream or
+        /// ice, its colour left only in the bloom's halo.</summary>
+        public static Color Gleam(Color glow) { Color.RGBToHSV(glow, out float h, out float s, out _); var c = Color.HSVToRGB(h, Mathf.Max(s, .9f), 1); c.a = 1; return c; }
 
         readonly Dictionary<string, GearPalette> palettes = new Dictionary<string, GearPalette>(StringComparer.Ordinal);
         readonly Dictionary<string, GearMaterialWord> materials = new Dictionary<string, GearMaterialWord>(StringComparer.Ordinal);

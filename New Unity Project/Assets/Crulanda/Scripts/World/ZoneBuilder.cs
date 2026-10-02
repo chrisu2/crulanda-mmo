@@ -3385,15 +3385,19 @@ namespace Crulanda.World
             if (v >= 3) HerbOfTheTrades(clump, v); else if (v == 1) MournersCap(clump); else MeadowHerb(clump, v);
             LayOnGround(clump, groundY ?? LandY);
         }
-        /// <summary>The most a herb's clump leans with the slope it grows on, in degrees; on steeper ground the rest is taken up by sinking it.</summary>
-        const float HerbTilt = 22;
+        /// <summary>The most a herb's clump leans with the slope it grows on, in degrees: past the steepest ground a herb grows on (a
+        /// Peaks tarnwort's 0.64 slope is about 33 degrees, a creek bank less), so its leaves lie on the slope and are not buried by the
+        /// sink. On steeper ground the rest is taken up by sinking it.</summary>
+        const float HerbTilt = 40;
         /// <summary>The drawn land's height at a world point: the lower of the land and its mesh (as under a node).</summary>
         float LandY(float x, float z) { return Mathf.Min(HeightAt(x, z), MeshY(x, z)); }
         /// <summary>
         /// Lays a herb's clump on the ground it grows from (a bank, a hillside). It leans with the slope under its reach (a plane
         /// fitted to the ground under the middle of every part and on a grid of a fifth of its reach out to its farthest part), by at
         /// most <see cref="HerbTilt"/> degrees, and is then sunk until the plane it stands on is nowhere above the ground at those
-        /// points (and 2 cm more), so no leaf or frond hangs over the downhill side. On level ground it stays as built (a lean under a
+        /// points (and 2 cm more), so no leaf or frond hangs over the downhill side. Leaning that far, the sink on any slope a herb grows
+        /// on is a few centimetres, so the leaves round its foot lie on the ground and are not buried. The clump turns and sinks whole
+        /// (its heads, bells and fronds are separate parts and would come apart). On level ground it stays as built (a lean under a
         /// degree is none, and so is a sink under 5 mm).
         /// <paramref name="groundY"/>: the ground's height at a world point (x, z). Draws nothing random.
         /// </summary>

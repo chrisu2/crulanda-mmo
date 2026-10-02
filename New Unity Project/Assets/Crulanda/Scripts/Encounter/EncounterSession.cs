@@ -1339,6 +1339,9 @@ namespace Crulanda.Encounter
         public const float TalkRange = 3.5f, DoorRange = 2.6f;
         /// <summary>Mira is near enough to talk to, with nothing solid between (<see cref="InTalkReach"/>).</summary>
         public bool CompanionInReach { get { return Companion != null && InTalkReach(Companion.transform.position); } }
+        /// <summary>The selected friend (Mira or a villager) can be talked to now, by the same rule as TalkTarget: in talk range with
+        /// nothing solid between (<see cref="InTalkReach"/>). The friend frame offers [E] only then.</summary>
+        public bool FocusInTalkReach { get { return FocusMira ? CompanionInReach : FocusVillager != null && FocusVillager.Visible && InTalkReach(FocusVillager.transform.position, FocusVillager.Role == "child"); } }
         static readonly RaycastHit[] talkHits = new RaycastHit[16];
         /// <summary>
         /// Whether someone standing at <paramref name="at"/> (their root, about a metre over their feet; a child's lower) can be

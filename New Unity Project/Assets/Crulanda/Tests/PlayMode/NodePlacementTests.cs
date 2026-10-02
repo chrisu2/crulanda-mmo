@@ -92,7 +92,8 @@ namespace Crulanda.Tests
         /// <summary>
         /// Every herb in every zone (the nodes' and the herb props', each a "Clump" under its root) follows the ground it grows from:
         /// under every part of it (the corners and middle of the part's footprint) the plane the clump stands on is no more than 5 cm
-        /// above the ground, so nothing of it floats over a slope's downhill side (a Peaks tarnwort stands on a 0.64 slope). The
+        /// above the ground, so nothing of it floats over a slope's downhill side (a Peaks tarnwort stands on a 0.64 slope); and at its
+        /// root and under the middle of every part that plane is no more than 6 cm under the ground, so its leaves are not buried. The
         /// ground is the lower of the land and its drawn mesh, as the nodes' own. Herbs in a cave stand on its floor and are left out.
         /// </summary>
         [UnityTest, Timeout(600000)] public IEnumerator EveryHerb_LiesOnTheGround()
@@ -118,14 +119,17 @@ namespace Crulanda.Tests
                 {
                     if (Hollow.InsideAny(clump.position + Vector3.up * .3f, 0)) continue;
                     here++; herbs++;
-                    Vector3 o = clump.position, up = clump.up; float worst = float.MinValue;
+                    Vector3 o = clump.position, up = clump.up; float worst = float.MinValue, sunk = Ground(o.x, o.z) - o.y;
+                    float PlaneY(Vector2 c) { return o.y - (up.x * (c.x - o.x) + up.z * (c.y - o.z)) / up.y; }
                     foreach (var r in clump.GetComponentsInChildren<Renderer>())
                     {
                         var b = r.bounds;
                         foreach (var c in new[] { new Vector2(b.min.x, b.min.z), new Vector2(b.min.x, b.max.z), new Vector2(b.max.x, b.min.z), new Vector2(b.max.x, b.max.z), new Vector2(b.center.x, b.center.z) })
-                            worst = Mathf.Max(worst, o.y - (up.x * (c.x - o.x) + up.z * (c.y - o.z)) / up.y - Ground(c.x, c.y));
+                            worst = Mathf.Max(worst, PlaneY(c) - Ground(c.x, c.y));
+                        sunk = Mathf.Max(sunk, Ground(b.center.x, b.center.z) - PlaneY(new Vector2(b.center.x, b.center.z)));
                     }
                     if (worst > .05f) problems.Add(zone.Zone.displayName + ": the herb '" + clump.parent.name + "' at " + clump.parent.position + " stands " + (worst * 100).ToString("0") + " cm over the ground under its edge");
+                    if (sunk > .06f) problems.Add(zone.Zone.displayName + ": the herb '" + clump.parent.name + "' at " + clump.parent.position + " is sunk " + (sunk * 100).ToString("0") + " cm under the ground at its root or a part (its leaves are buried)");
                     float lean = Vector3.Angle(Vector3.up, up); if (lean > steepest) { steepest = lean; steepestAt = zone.Zone.displayName + " '" + clump.parent.name + "'"; }
                 }
                 if (here < 10) problems.Add(zone.Zone.displayName + ": only " + here + " herbs found on the land");

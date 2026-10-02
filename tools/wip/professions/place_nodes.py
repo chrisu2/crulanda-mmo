@@ -362,7 +362,7 @@ def windfall_ok(zone, at, yaw):
 
 def check(zone, walk, n, others):
     """Every rule the node would break, as words (empty: it is fine)."""
-    probs = []; at = n['at']; kind = KINDS.get(n['node']); under = n.get('under', False)
+    probs = []; at = n['at']; kind = KINDS.get(n['node']); under = n.get('under', False); fixed = bool(n.get('prop')) and not under
     if not kind: return ['unknown node ' + n['node']]
     look = kind['look']; f = foot(look)
     if kind['skill'] != TIER[zone.id]: probs.append('tier %d is not the zone\'s %d' % (kind['skill'], TIER[zone.id]))
@@ -373,12 +373,12 @@ def check(zone, walk, n, others):
         if not cave: probs.append('not over a cave floor')
         elif cave[1] < 1.2: probs.append('%.1f m from the cave wall' % cave[1])
         if look != 'ore_rich': probs.append('under, but no rich seam')
-    elif n.get('prop'):
-        # A herb prop worked as a node stands where the zone always had it (moving it would move the grove trees round it):
-        # only the water itself and the other nodes are its business here.
+    elif fixed:
+        # A herb prop worked as a node stands where the zone always had it (moving it would move the grove trees round it): the
+        # rules about the open ground round it (roads, banks, buildings, cave cover) are the zone's, but camps, secrets, the other
+        # nodes, trunks and fields still hold, as NodePlacementTests applies them to every node.
         for pts, w, name in zone.creeks:
             if path(at, pts) < w * .8: probs.append('in ' + name)
-        return probs
     else:
         r = zone.road_near(at, 1.5)
         if r: probs.append('road ' + r)
@@ -411,12 +411,13 @@ def check(zone, walk, n, others):
         if not any(-1 <= o <= 3 for o, k, name in groves): probs.append('no wood\'s edge (%s)' % ', '.join('%s %+.1f' % (name, o) for o, k, name in sorted(groves)[:2]))
         if not under and windfall_ok(zone, at, n.get('rotation', 0)) is None: probs.append('no way to lie clear')
     if look == 'herb':
-        inside = [name for o, k, name in groves if o < 3]
-        if inside: probs.append('herb by or in a wood: ' + ', '.join(inside))
+        if not fixed:   # the test keeps only placed herbs out of the woods (a herb prop may grow in a grove)
+            inside = [name for o, k, name in groves if o < 3]
+            if inside: probs.append('herb by or in a wood: ' + ', '.join(inside))
+            for c, r, name in zone.tall:
+                if dist(at, c) < r + 1 and not (n['node'] == 'node.dewfern' and 'fern' in name.lower()): probs.append('herb in tall grass')   # dewfern grows with the ferns
         for c, s, rot, name in zone.fields:
-            if outside_rect(at, c, s, rot) < 3: probs.append('herb on the field ' + name)
-        for c, r, name in zone.tall:
-            if dist(at, c) < r + 1 and not (n['node'] == 'node.dewfern' and 'fern' in name.lower()): probs.append('herb in tall grass')   # dewfern grows with the ferns
+            if outside_rect(at, c, s, rot) < (.5 if fixed else 3): probs.append('herb on the field ' + name)
     if look in ('ore', 'ore_rich') and not under:
         for o, k, name in groves:
             if o < 1.5: probs.append('seam in the wood ' + name)
@@ -432,7 +433,8 @@ def check(zone, walk, n, others):
     if not under:
         if not walk.reachable(at): probs.append('no walk to it from the start')
         st = walk.steep(at, .7)
-        if st > .8: probs.append('steep ground (%.2f)' % st)
+        if not fixed and st > .8: probs.append('steep ground (%.2f)' % st)
+        elif not fixed and look == 'herb' and st > .5: probs.append('steep ground for a herb (%.2f): its leaves stand level' % st)
     return probs
 
 # ---------------------------------------------------------------- the candidates, zone by zone (see the notes on each)
@@ -482,7 +484,7 @@ def peaks(z):
         N(W, 70, -62, 'east pines W', 90), N(W, -12, -59, 'south pines N'), N(W, 137, 40.5, 'deadfall N'), N(W, -112, 82, 'umbra pines E', 90),
         N(H, -36.5, 136, 'tarn W'), N(H, -12, 131, 'tarn E'), N(H, -30.3, 125.2, 'tarn S1'), N(H, -24, 123.5, 'tarn S2'), N(H, -17.8, 125.2, 'tarn SE'),
         N(H, -24, 148.5, 'tarn N'), N(H, -34.8, 142.2, 'tarn NW'),
-        N(H, -10.5, -126.8, 'meadow W'), N(H, 6, -136, 'meadow S'), N(H, -12.5, -114.6, 'meadow N'),
+        N(H, -10.5, -126.8, 'meadow W'), N(H, 6, -136, 'meadow S'), N(H, -10.5, -116.6, 'meadow N'),
     ]
 CANDIDATES['peaks'] = peaks
 
@@ -507,17 +509,18 @@ CANDIDATES['ashrim'] = ashrim
 
 def verdant(z):
     """The Verdant Shore, tier 5: rich pickings. Veridian seams at the feet of the basalt crags and on the Ridge of Long Shadows'
-    shoulders, and four rich ones on the Root-Mother's Deep's floor (the Gallery's far end, the Sap Well's, both sides of the
-    Heart: each clear of the deep's withered, walkers and briars); ghost-oak windfalls at the edges of the canopy woods and the
-    Tappers' wood (none by the Fallen Ghost-Oak, where the spiders nest); dewfern round the Mistmere's shore and the Fern Hollow."""
+    shoulders, and four rich ones on the Root-Mother's Deep's floor (the Gallery's far end, the Sap Well's against its wall, two at
+    the foot of the Cold Stair: each clear of the deep's withered, walkers and briars, and none in the Root-Warden's Heart);
+    ghost-oak windfalls at the edges of the canopy woods and the Tappers' wood (none by the Fallen Ghost-Oak, where the spiders
+    nest); dewfern round the Mistmere's shore and the Fern Hollow."""
     O = 'node.veridian'; R = 'node.veridian_rich'; W = 'node.ghostoak'; H = 'node.dewfern'
     def ring(cx, cy, r, a, label): return N(H, round(cx + math.cos(math.radians(a)) * r, 1), round(cy + math.sin(math.radians(a)) * r, 1), label)
     return [
         ore_at_cliff(z, 'Basalt crag', 0, 4.5, O, 'crag'), ore_at_cliff(z, 'Basalt crag (south)', 0, 4.5, O, 'crag S'),
         ore_at_cliff(z, 'Basalt crag (north)', 0, 4.5, O, 'crag N'), ore_at_cliff(z, 'Basalt crag (far south)', 0, 4.5, O, 'crag far S'),
         N(O, 157, -46, 'south shoulder', 90), N(O, 156, 88, 'north shoulder', 90),
-        N(R, -109, 164.5, 'deep gallery', under=True), N(R, -97.5, 192.5, 'deep sap well', under=True),
-        N(R, -106, 218, 'deep heart E', under=True), N(R, -120, 218, 'deep heart W', under=True),
+        N(R, -109, 164.5, 'deep gallery', under=True), N(R, -95.8, 193.9, 'deep sap well', under=True),
+        N(R, -109.2, 203.6, 'deep cold stair E', under=True), N(R, -115.7, 205.5, 'deep cold stair W', under=True),
         N(W, 122, 26, 'ridge-foot E', 90), N(W, -119, -46.5, 'tappers N'), N(W, -133, -70, 'tappers W', 90), N(W, -79, -88, 'mere E', 90),
         N(W, -48, 62.5, 'westbank N'), N(W, 48, 67, 'riverbank N'), N(W, 113, 108, 'ridge-foot N W', 90), N(W, -4, 105, 'rootfast N'),
         ring(-56, -92, 20, 20, 'mere NE'), ring(-56, -92, 20, 70, 'mere N'), ring(-56, -92, 20, 140, 'mere NW'), ring(-56, -92, 20, 330, 'mere SE'),

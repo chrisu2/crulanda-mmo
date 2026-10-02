@@ -2420,6 +2420,6 @@
     { "node": "node.tarnwort", "at": { "x": -34.8, "y": 142.2 } },
     { "node": "node.tarnwort", "at": { "x": -10.5, "y": -126.8 } },
     { "node": "node.tarnwort", "at": { "x": 6, "y": -136 } },
-    { "node": "node.tarnwort", "at": { "x": -12.5, "y": -114.6 } }
+    { "node": "node.tarnwort", "at": { "x": -10.5, "y": -116.6 } }
   ]
 }

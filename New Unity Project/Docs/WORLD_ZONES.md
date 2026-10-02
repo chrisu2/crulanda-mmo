@@ -181,8 +181,9 @@ ash-mountains (the breadcrumb `main.ashrim.5`); the level cap is 13 (talent poin
 - **Trades** (GAME-ONLY, 2026-10-01; BUILD_PLAN step 8; tier 5, every node at skill 80; a level-13 character with a low skill
   works them at once, as "hard going"): rich pickings.
   - Ore (Veridian): at the feet of the four basalt crags and on the Ridge of Long Shadows' south and north shoulders; four
-    rich seams on the Root-Mother's Deep's floor: past the Gallery, at the Sap Well's far end, and either side of the Heart,
-    each clear of the deep's withered, walkers and briars.
+    rich seams on the Root-Mother's Deep's floor, each with its rock against the passage wall: past the Gallery, at the Sap
+    Well's far end, and two at the foot of the Cold Stair. Each is clear of the deep's withered, walkers and briars, and none is
+    in the Heart, so the Root-Warden need not be cleared to work them.
   - Timber (ghost-oak windfalls): at the edges of the Ridge-foot, Westbank, Riverbank, Rootfast and north Ridge-foot
     canopies, two by the Tappers' wood and one by the Mere canopy. None by the Fallen Ghost-Oak: its spiders' camp fills it.
   - Herbs (dewfern): four round the Mistmere's shore and six round the Fern Hollow, among the ferns' edge, clear of
@@ -578,7 +579,9 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
 - **Placing more:** `tools/wip/professions/place_nodes.py` checks candidate nodes for Khaven, the Peaks, the Rim and the Verdant
   Shore against the zone data by these rules with a margin, over a model of the ground (the height function ported, the walk
   from the player's start), and writes them (`--write`); `--probe <zone> <x> <y>` lists clear spots near a point. It cannot
-  see the random grove trees or the strewn boulders, so the PlayMode tests stay the judge.
+  see the random grove trees or the strewn boulders, so the PlayMode tests stay the judge. A herb prop worked as a node keeps
+  its place but still faces the camp, secret, node, trunk and field rules; a placed herb stays off ground steeper than 0.5 (its
+  leaves stand level and do not follow a slope).
 
 ## Travel
 - Zones list `exits` (to, name, at, arrive, radius). Standing at an exit shows "[E] <name>"; E travels (not in combat):

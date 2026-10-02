@@ -678,6 +678,48 @@
           }
         ]
       }
+    },
+    {
+      "id": "npc.leatherworker.wallet",
+      "title": "A Wallet for Simples",
+      "kind": "npc",
+      "giver": "Maud Tanner",
+      "turnIn": "Maud Tanner",
+      "zone": "zone.oakhaven",
+      "level": 1,
+      "canonStatus": "GAME-ONLY",
+      "unlessWorn": "bag.simples_wallet",
+      "summary": "Bring Maud Tanner three grey wolf pelts. Wolves run in the Harrow wood and the North pines. She keeps shop by the South road, 9 to 12 and 2 to 6.",
+      "offer": "\"You've the look of someone who picks things up. Herbs, is it? They'll bruise to nothing loose in a pack.\"\n\n\"Bring me three wolf pelts, whole, not grey at the edges, and I'll cut you a wallet for them. No charge but the hides; what's left over is my profit, and the gods know I need one.\"",
+      "progress": "\"Three, I said. The wolves won't skin themselves.\"",
+      "complete": "Maud turns each pelt to the light and runs a thumb along the edge. \"These'll do. Sit. It's an hour's work if Nettie holds the lamp.\" The wallet she hands you smells of oak bark and smoke. \"The offcuts will buy the bread this week. So that's both of us better off.\"",
+      "steps": [
+        {
+          "text": "Bring three grey wolf pelts to Maud Tanner at her shop by the South road.",
+          "objectives": [
+            {
+              "type": "bring",
+              "target": "Maud Tanner",
+              "item": "junk.wolf_pelt",
+              "count": 3,
+              "text": "Grey wolf pelts for Maud Tanner",
+              "say": "Lay them on the counter, fur down. Let me have a look at what you've brought me."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 20,
+        "bagItems": [
+          "bag.simples_wallet"
+        ],
+        "reputation": [
+          {
+            "faction": "oakhaven",
+            "amount": 75
+          }
+        ]
+      }
     }
   ]
 }

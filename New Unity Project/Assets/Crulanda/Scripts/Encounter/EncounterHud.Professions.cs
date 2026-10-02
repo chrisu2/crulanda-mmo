@@ -5,7 +5,7 @@ namespace Crulanda.Encounter
     /// <summary>
     /// The Trades window (K): on the left one row per trade with its skill as a bar (gathering skills, then what everyone has,
     /// then the crafts and how many of them are taken up); on the right, on parchment, the chosen trade's page: what it is, how
-    /// far the skill has come, whether its tool hangs at the belt, and for a gathering skill the guide to its seams, windfalls or
+    /// far the skill has come, whether its tool hangs at the belt, and for a gathering skill its trade bag (worn, or who makes it) and the guide to its seams, windfalls or
     /// herbs (NodeGuide). It stands where the character sheet does, with the bags
     /// open beside it.
     /// </summary>
@@ -65,6 +65,14 @@ namespace Crulanda.Encounter
             return "Needs a " + word + " (merchants)";
         }
         static string LowerFirst(string s) { return string.IsNullOrEmpty(s) ? s : char.ToLowerInvariant(s[0]) + s.Substring(1); }
+        /// <summary>Who makes the trade bags, and where (GAME-ONLY).</summary>
+        const string BagMaker = "Maud Tanner, Oakhaven";
+        /// <summary>The trade bag that holds what a gathering trade's nodes give (the ore-poke for Mining), or null.</summary>
+        ItemDef BagForTrade(ProfessionLog log, ProfessionDef d)
+        {
+            foreach (var n in log.Db.NodesFor(d.id)) { var item = session.Items?.Get(n.item); var bag = item == null ? null : Inventory.BagFor(session.Items, item.pouch); if (bag != null) return bag; }
+            return null;
+        }
         void TradePage(ProfessionLog log, ProfessionDef d, Rect page)
         {
             Fill(page, Parchment);
@@ -84,6 +92,16 @@ namespace Crulanda.Encounter
                 : has ? null : "Not taken up.";
             if (state != null)
             { measureContent.text = state; float h = qSmall.CalcHeight(measureContent, inner); Ink(new Rect(x, py, inner, h), state, qSmall, has ? new Color(.2f, .36f, .14f) : new Color(.55f, .2f, .1f)); py += h + 10; }
+            // The trade bag for what this skill gathers: worn, carried, or who makes it.
+            var bag = d.kind == "gather" ? BagForTrade(log, d) : null;
+            if (bag != null)
+            {
+                bool worn = Inventory.Wears(session.Progress, bag.id), carried = !worn && Inventory.Count(session.Progress, bag.id) > 0;
+                string line = worn ? bag.name + ": worn. " + bag.slots + " slots for " + Inventory.HoldsWords(bag.holds) + "."
+                    : carried ? bag.name + ": in your bags. Use it to wear it." : "No " + LowerFirst(bag.name) + " (" + BagMaker + "). It keeps " + Inventory.HoldsWords(bag.holds) + " out of your bags.";
+                measureContent.text = line; float h = qSmall.CalcHeight(measureContent, inner);
+                Ink(new Rect(x, py, inner, h), line, qSmall, worn ? new Color(.2f, .36f, .14f) : carried ? new Color(.42f, .22f, .05f) : InkBrown); py += h + 10;
+            }
             if (d.kind == "gather") NodeGuide(log, d, x, py, inner, page.yMax - 40);
             if (!string.IsNullOrEmpty(d.canonStatus)) Ink(new Rect(x, page.yMax - 34, inner, 22), "Lore status: " + d.canonStatus, qSmall, new Color(.45f, .38f, .28f));
         }

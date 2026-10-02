@@ -70,7 +70,8 @@ namespace Crulanda.Encounter
                     var texts = new List<string>(); foreach (var f in content.questFiles) if (f != null) texts.Add(f.text);
                     questCache = QuestDatabase.Parse(texts); questCacheFor = content;
                 }
-                Quests = new QuestLog(questCache, Progress);
+                Quests = new QuestLog(questCache, Progress) { Items = Items };
+                if (Items != null) { var unknown = questCache.CheckItems(Items); if (unknown.Count > 0) Debug.LogError("Quest content names items that are not right:\n" + string.Join("\n", unknown)); }
                 Quests.Say = (text, speaker) => {
                     if (speaker == null) { Message(text); return; }
                     Message(speaker + ": " + text);
@@ -118,6 +119,10 @@ namespace Crulanda.Encounter
             if (Quests == null) return;
             int before = Progress.Level;
             if (!Quests.TurnIn(q, out _)) return;
+            // A bag quest pays its maker what the bag would have cost: what's left of the hides is her profit (ADDENDUM C, step 7).
+            var bagItems = q.rewards?.bagItems; int worth = 0;
+            if (bagItems != null && Items != null) foreach (var id in bagItems) { var d = Items.Get(id); if (d != null) worth += Inventory.Price(d); }
+            if (worth > 0) VillageLife.Active?.Paid(q.turnIn, worth);
             if (Progress.Level > before) { ApplyLevel(); Player.Health.ApplyHealing(Player.Health.Pool.Max); Message("Level " + Progress.Level + "! Talent points are waiting [B]."); }
             ReconcileQuests(); Save(false); ReopenConversation();
         }
@@ -195,7 +200,8 @@ namespace Crulanda.Encounter
             var d = Items?.Get(Progress.bag[bagIndex].item);
             if (d != null && d.kind == "consumable") return UseItem(bagIndex);
             if (d != null && d.kind == "tool") return UseTool(bagIndex);
-            if (d != null && d.kind == "material") { Message(MaterialLine); return false; }
+            if (d != null && d.kind == "bag") return WearBag(bagIndex);
+            if (d != null && d.kind == "material") { Message(Inventory.IsHide(d) ? HideLine : MaterialLine); return false; }
             string why;
             bool ok = Items != null ? Inventory.Equip(Progress, Items, bagIndex, Progress.Level, out why) : LegacyEquip(bagIndex, out why);
             if (!ok) { if (why != null) Message(why); return false; }
@@ -214,7 +220,7 @@ namespace Crulanda.Encounter
             if (!Inventory.Unequip(Progress, slot, toBag)) { Message(Inventory.FreeSlots(Progress) == 0 ? "Your bags are full." : "Can't put that there."); return false; }
             ApplyEquipment(); Save(false); return true;
         }
-        public void MoveBag(int a, int b) { if (Items != null) { Inventory.Move(Progress, Items, a, b); } }
+        public void MoveBag(int a, int b) { if (Items != null && !Inventory.Move(Progress, Items, a, b, out var why)) Message(why); }
         public void DestroyBag(int i)
         {
             if (i < 0 || i >= Progress.bag.Count || Progress.bag[i].Empty) return;
@@ -257,6 +263,9 @@ namespace Crulanda.Encounter
             if (Items == null || v == null) return;
             int band = Zone != null ? Zone.Zone.levelMax : 2;
             VendorStock = Items.StockFor(v.Name, v.Role, band); if (VendorStock.Count == 0) return;
+            // A trade bag you wear or carry is off the list: one of each is all anyone makes you.
+            VendorStock.RemoveAll(id => Items.Get(id)?.kind == "bag" && Inventory.Owns(Progress, id));
+            if (VendorStock.Count == 0) { Message(v.Name + ": " + AllBagsLine); v.Say(AllBagsLine, 6); return; }
             // What the village brought the stall today (the hen-wife's eggs): sold on while they last.
             if (v.Role == "merchant" && VillageLife.Active != null && VillageLife.Active.Count("stall.eggs") > 0 && Items.Get(FreshEggs) != null) VendorStock.Insert(0, FreshEggs);
             VendorNpc = v.Name; vendorAt = at ?? v.transform.position; InventoryOpen = true; Conversation = null; TradesOpen = false; v.Hold(30);
@@ -283,10 +292,15 @@ namespace Crulanda.Encounter
         {
             if (VendorNpc == null) return;
             if (item == FreshEggs && (VillageLife.Active == null || VillageLife.Active.Count("stall.eggs") <= 0)) { VendorStock.Remove(item); Message("The eggs have all gone."); return; }
+            var d = Items?.Get(item);
+            if (d != null && d.kind == "bag" && Inventory.Owns(Progress, item)) { VendorStock.Remove(item); Message(Inventory.AlreadyWornLine); return; }
             if (Inventory.Buy(Progress, Items, item, out var why))
             {
-                Message("Bought " + ItemName(item) + "."); Save(false);
+                Message("Bought " + ItemName(item) + "." + (d != null && d.kind == "bag" ? " Use it from your bags to wear it." : "")); Save(false);
                 if (item == FreshEggs) { VillageLife.Active.Take("stall.eggs"); if (VillageLife.Active.Count("stall.eggs") == 0) VendorStock.Remove(item); }
+                if (d != null && d.kind == "bag") VendorStock.Remove(item);
+                // The coin goes to the seller's household (ADDENDUM C: the purses, step 7, spend it).
+                VillageLife.Active?.Paid(VendorNpc, Inventory.Price(d));
             }
             else Message(why);
         }
@@ -298,6 +312,10 @@ namespace Crulanda.Encounter
         public bool TradesOpen { get; private set; }
         /// <summary>What using a crafting material from the bags says.</summary>
         public const string MaterialLine = "A crafting material. Press K.";
+        /// <summary>What a hide or pelt says when used from the bags, and on its tooltip (GAME-ONLY).</summary>
+        public const string HideLine = "Leather. Maud Tanner in Oakhaven works it.";
+        /// <summary>What the leatherworker says when every bag she makes is already yours (GAME-ONLY).</summary>
+        public const string AllBagsLine = "\"That's one of every bag I cut, and all of them on you. Come back when one wears through.\"";
         static ProfessionDatabase professionCache; static EncounterContent professionCacheFor; static ItemDatabase professionCacheItems; static bool professionCacheBad;
         /// <summary>The trades' content read against the items (cached), or null when it is missing or invalid (logged once).</summary>
         ProfessionDatabase ProfessionContent()
@@ -355,6 +373,15 @@ namespace Crulanda.Encounter
             if (open) { CharacterOpen = false; CloseVendor(); InventoryOpen = true; }
         }
         /// <summary>A gathering tool used from the bags: it teaches its skill and hangs at the belt, or is refused and kept ("You already carry one.").</summary>
+        /// <summary>A trade bag used from the bags: worn for good, its slots added under the bags' 24, or refused and kept ("You already carry one.").</summary>
+        bool WearBag(int bagIndex)
+        {
+            if (Items == null) return false;
+            var d = Items.Get(Progress.bag[bagIndex].item);
+            if (!Inventory.Wear(Progress, Items, bagIndex, out var why)) { if (why != null) Message(why); return false; }
+            Message("You hang the " + char.ToLowerInvariant(d.name[0]) + d.name.Substring(1) + " at your hip: " + d.slots + " slots for " + Inventory.HoldsWords(d.holds) + ".");
+            Save(false); return true;
+        }
         bool UseTool(int bagIndex)
         {
             if (Professions == null) { Message("You have no use for that yet."); return false; }
@@ -495,7 +522,7 @@ namespace Crulanda.Encounter
             {
                 if (Quests.ObjectiveDone(s, i)) continue;
                 var o = step.objectives[i];
-                string z = !string.IsNullOrEmpty(o.zone) ? o.zone : (o.type == "talk" || o.type == "deliver") ? ZoneOfPerson(o.target) : null;
+                string z = !string.IsNullOrEmpty(o.zone) ? o.zone : (o.type == "talk" || o.type == "deliver" || o.type == "bring") ? ZoneOfPerson(o.target) : null;
                 if (z != null && z != Zone.Zone.id) return z;
             }
             return null;
@@ -936,7 +963,7 @@ namespace Crulanda.Encounter
             if (GetComponent<TargetRing>() == null) gameObject.AddComponent<TargetRing>().session = this;
             Player.gameObject.SetActive(true);
             playerStats = Player.gameObject.AddComponent<DerivedStatsController>();
-            Inventory.Ensure(Progress);
+            Inventory.Ensure(Progress); if (Items != null) Inventory.EnsurePouches(Progress, Items);
             playerStats.Configure(ClassDef.stats, 0);
 
             Player.ConfigureResource(ClassDef.resource, ClassDef.maxResource);

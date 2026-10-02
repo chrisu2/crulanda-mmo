@@ -501,7 +501,7 @@ namespace Crulanda.Encounter
                     if (Count("forge.ore") > 0) return Zone.Zone.id == "zone.oakhaven" ? "Someone's been up the Crowsfoot with a pick. First ore I've not had to beg for." : "Someone's been out with a pick. First ore I've not had to beg for.";
                     return Count("forge.wood") > 0 ? "The woodcutter brought oak this morning. Hearth's drawing well." : null;
                 case "miller": return Count("mill.grain") > 0 ? "Barley's in from the fields. The stone's turning on something, at least." : null;
-                case "leatherworker": case "skinner": return Count("tannery.hides") > 0 ? "The hunter's been by with a hide. Grey at one edge; the rest'll do." : null;
+                case "leatherworker": case "skinner": return Count("sold.tannery.hides") > 0 ? "Somebody's been selling pelts in the village. Clean ones, too; not a grey edge among them." : Count("tannery.hides") > 0 ? "The hunter's been by with a hide. Grey at one edge; the rest'll do." : null;
                 case "henwife": return Count("stall.eggs") > 0 ? "Eggs are at the produce stall if you're wanting any. I don't sell from the yard." : Count("inn.eggs") > 0 ? "Took the Cask its eggs this morning. The rest go to the stall after dinner." : null;
                 case "drinker": case "elder": case "gossip": case "farmer":
                     return Places["inn"].Count > 0 && Count("inn.ale") == 0 ? "The cask's run dry at the inn. The out-of-work drank it by supper." : Count("inn.meat") > 0 ? "Hare in the Cask's pot tonight. The hunter's doing." : Count("inn.bread") > 0 && Count("inn.eggs") > 0 ? "Bread and eggs at the Cask today. Like old times, nearly." : Count("inn.wood") > 0 ? "The Cask's got a fire going. Dry oak, for once." : null;

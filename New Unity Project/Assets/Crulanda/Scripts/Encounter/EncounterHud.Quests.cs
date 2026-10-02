@@ -195,6 +195,7 @@ namespace Crulanda.Encounter
             if (r.xp > 0) parts.Add(r.xp + " experience");
             if (r.gold > 0) parts.Add(r.gold + " gold");
             foreach (var i in r.items) parts.Add(session.Quests.Db.ItemName(i));
+            foreach (var i in r.bagItems ?? new string[0]) parts.Add(session.ItemName(i) + (Inventory.Owns(session.Progress, i) ? " (you have one: its worth in gold instead)" : ""));
             foreach (var d in r.documents) parts.Add("Chronicle page: " + (session.Quests.Db.Documents.TryGetValue(d, out var doc) ? doc.title : d));
             foreach (var s in r.reputation) parts.Add((s.amount > 0 ? "+" : "") + s.amount + " standing with " + (session.Quests.Db.Factions.TryGetValue(s.faction, out var f) ? f.name : s.faction));
             return parts.Count == 0 ? "None but thanks." : string.Join("\n", parts);

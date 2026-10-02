@@ -127,6 +127,117 @@ namespace Crulanda.Tests
             Assert.IsTrue(said.Exists(l => l.Contains("You are now Trusted")));
         }
 
+        // ---------- the leatherworker's bag quests (bring, bag rewards, unlessWorn) ----------
+        static ItemDatabase RealItems()
+        {
+            var dir = Path.Combine(Application.dataPath, "Crulanda", "EncounterContent", "Items");
+            var texts = new List<string>(); foreach (var f in Directory.GetFiles(dir, "*.json")) texts.Add(File.ReadAllText(f));
+            return ItemDatabase.Parse(texts);
+        }
+        const string Wallet = "npc.leatherworker.wallet", Maud = "Maud Tanner", Pelt = "junk.wolf_pelt", WalletBag = "bag.simples_wallet";
+        /// <summary>A fresh character with the item database bound, the wallet quest accepted.</summary>
+        static QuestLog WithWalletQuest(out List<string> said)
+        {
+            var log = Fresh(out said); log.Items = RealItems();
+            Assert.IsTrue(log.Accept(log.Def(Wallet), "zone.oakhaven"), "Maud offers the wallet at level 1.");
+            return log;
+        }
+
+        [Test] public void Bring_hands_over_bag_items_on_talk()
+        {
+            var items = RealItems(); var db = RealContent();
+            CollectionAssert.IsEmpty(db.CheckItems(items), "Every bring item, bag reward and unlessWorn names a real item (and the last two a trade bag).");
+            var q = db.Quests[Wallet];
+            Assert.AreEqual(Maud, q.giver); Assert.AreEqual(Maud, q.turnIn); Assert.AreEqual(WalletBag, q.unlessWorn); CollectionAssert.AreEqual(new[] { WalletBag }, q.rewards.bagItems);
+            var o = q.steps[0].objectives[0]; Assert.AreEqual("bring", o.type); Assert.AreEqual(Pelt, o.item); Assert.AreEqual(3, o.count); Assert.AreEqual(Maud, o.target);
+
+            var log = Fresh(out var said, db); log.Items = items;
+            Assert.AreEqual('!', log.Marker(Maud, "zone.oakhaven", 1, out bool grey)); Assert.IsFalse(grey);
+            Assert.IsTrue(log.Accept(q, "zone.oakhaven"));
+            var s = log.State(Wallet); var p = log.Progress;
+            Assert.AreEqual(0, log.Count(s, 0)); Assert.AreEqual("Grey wolf pelts for Maud Tanner: 0/3", log.ObjectiveLine(s, 0));
+            // Pelts in the bags count, but carrying them is not handing them over.
+            Inventory.Add(p, items, Pelt, 4); Inventory.Add(p, items, "junk.wolf_fang", 2);
+            log.Notify("item", Pelt); log.Reconcile(f => false, t => 0);
+            Assert.AreEqual(3, log.Count(s, 0)); Assert.IsFalse(log.ObjectiveDone(s, 0)); Assert.AreEqual(QuestStatus.Active, log.Status(q, "zone.oakhaven"));
+            Assert.AreEqual('?', log.Marker(Maud, "zone.oakhaven", 1, out grey)); Assert.IsFalse(grey, "A gold ? over Maud: you carry enough.");
+            Assert.IsFalse(log.TalkTo("Fen Walker"), "Only Maud takes them."); Assert.AreEqual(4, Inventory.Count(p, Pelt));
+            // Talking to Maud hands over three, and the quest is ready to turn in.
+            Assert.IsTrue(log.TalkTo(Maud));
+            Assert.AreEqual(1, Inventory.Count(p, Pelt), "Three pelts handed over; the fourth is still yours."); Assert.AreEqual(2, Inventory.Count(p, "junk.wolf_fang"));
+            Assert.AreEqual(QuestStatus.ReadyToTurnIn, log.Status(q, "zone.oakhaven"));
+            Assert.IsTrue(said.Exists(l => l.StartsWith(Maud + ": Lay them on the counter")), "Maud's line as she takes them.");
+            Assert.IsFalse(log.TalkTo(Maud), "Nothing more to hand over.");
+            // Turned in: the wallet goes in the bags (not the quest bag), with the experience and the standing.
+            int xp = p.experience;
+            Assert.IsTrue(log.TurnIn(q, out int gained)); Assert.AreEqual(20, gained); Assert.AreEqual(xp + 20, p.experience);
+            Assert.AreEqual(1, Inventory.Count(p, WalletBag)); Assert.AreEqual(0, log.ItemCount(WalletBag)); Assert.IsTrue(log.IsDone(Wallet));
+            Assert.AreEqual(75, log.Standing("oakhaven"));
+            Assert.IsTrue(said.Exists(l => l.StartsWith("Received: Simples-wallet.")));
+            Assert.AreEqual(QuestStatus.Done, log.Status(q, "zone.oakhaven")); Assert.AreEqual(' ', log.Marker(Maud, "zone.oakhaven", 1, out _));
+        }
+
+        [Test] public void Bring_without_enough_changes_nothing()
+        {
+            var log = WithWalletQuest(out _); var p = log.Progress; var s = log.State(Wallet);
+            Inventory.Add(p, log.Items, Pelt, 2);
+            Assert.AreEqual('?', log.Marker(Maud, "zone.oakhaven", 1, out bool grey)); Assert.IsTrue(grey, "A grey ?: not enough yet.");
+            Assert.IsFalse(log.TalkTo(Maud));
+            Assert.AreEqual(2, Inventory.Count(p, Pelt), "Two pelts are not handed over."); Assert.AreEqual(2, log.Count(s, 0)); Assert.IsFalse(log.ObjectiveDone(s, 0));
+            Assert.AreEqual(QuestStatus.Active, log.Status(log.Def(Wallet), "zone.oakhaven"));
+            Assert.IsFalse(log.TurnIn(log.Def(Wallet), out _)); Assert.AreEqual(0, Inventory.Count(p, WalletBag));
+            // Quest-bag items of the same name don't count: only the bags.
+            p.questItems.Add(Pelt); Assert.IsFalse(log.TalkTo(Maud)); Assert.AreEqual(2, Inventory.Count(p, Pelt));
+        }
+
+        [Test] public void A_bag_quest_is_not_offered_once_the_bag_is_worn_or_carried()
+        {
+            var items = RealItems();
+            // Carried (bought from her, not yet worn).
+            var log = Fresh(out _); log.Items = items; var q = log.Def(Wallet);
+            Assert.AreEqual(QuestStatus.Available, log.Status(q, "zone.oakhaven"));
+            Inventory.Add(log.Progress, items, WalletBag, 1);
+            Assert.AreEqual(QuestStatus.Unavailable, log.Status(q, "zone.oakhaven"));
+            Assert.IsFalse(log.For(Maud, "zone.oakhaven", 1).Exists(e => e.quest.id == Wallet)); Assert.AreEqual(' ', log.Marker(Maud, "zone.oakhaven", 1, out _));
+            Assert.IsFalse(log.Accept(q, "zone.oakhaven"));
+            // Worn.
+            Assert.IsTrue(Inventory.Wear(log.Progress, items, log.Progress.bag.FindIndex(x => x.item == WalletBag), out _));
+            Assert.AreEqual(0, Inventory.Count(log.Progress, WalletBag));
+            Assert.AreEqual(QuestStatus.Unavailable, log.Status(q, "zone.oakhaven")); Assert.IsFalse(log.Accept(q, "zone.oakhaven"));
+            // Another character, without one, is offered it.
+            var other = Fresh(out _); other.Items = items; Assert.AreEqual(QuestStatus.Available, other.Status(q, "zone.oakhaven"));
+        }
+
+        [Test] public void TurnIn_with_the_bag_already_worn_pays_gold()
+        {
+            var log = WithWalletQuest(out var said); var p = log.Progress; var q = log.Def(Wallet);
+            // Taken on, then the wallet bought and worn before the pelts came in.
+            Inventory.Add(p, log.Items, WalletBag, 1); Assert.IsTrue(Inventory.Wear(p, log.Items, p.bag.FindIndex(x => x.item == WalletBag), out _));
+            Assert.AreEqual(QuestStatus.Active, log.Status(q, "zone.oakhaven"), "A quest already taken on stays.");
+            Inventory.Add(p, log.Items, Pelt, 3); Assert.IsTrue(log.TalkTo(Maud));
+            int gold = p.gold, pouches = p.pouches.Count, slots = p.bag.Count;
+            Assert.IsTrue(log.TurnIn(q, out _));
+            Assert.AreEqual(gold + log.Items.Get(WalletBag).value, p.gold, "The wallet's worth in gold instead.");
+            Assert.AreEqual(0, Inventory.Count(p, WalletBag), "No second wallet."); Assert.AreEqual(pouches, p.pouches.Count); Assert.AreEqual(slots, p.bag.Count);
+            Assert.IsTrue(said.Contains(Maud + ": " + QuestLog.HaveOneLine)); Assert.IsTrue(log.IsDone(Wallet));
+        }
+
+        [Test] public void TurnIn_with_full_bags_is_refused_and_nothing_is_lost()
+        {
+            var log = WithWalletQuest(out var said); var p = log.Progress; var q = log.Def(Wallet);
+            Inventory.Add(p, log.Items, Pelt, 3); Assert.IsTrue(log.TalkTo(Maud));
+            for (int i = 0; i < Inventory.BagSize; i++) if (p.bag[i].Empty) p.bag[i] = new ItemStack { item = "potion.minor", count = 1 };
+            Assert.AreEqual(0, Inventory.FreeSlots(p));
+            int xp = p.experience, gold = p.gold;
+            Assert.IsFalse(log.TurnIn(q, out _));
+            Assert.IsTrue(said.Contains(QuestLog.MakeRoomLine)); Assert.AreEqual("Make room in your bags first.", QuestLog.MakeRoomLine);
+            Assert.AreEqual(QuestStatus.ReadyToTurnIn, log.Status(q, "zone.oakhaven"), "Still waiting, the pelts still counted as handed over.");
+            Assert.AreEqual(xp, p.experience); Assert.AreEqual(gold, p.gold); Assert.AreEqual(0, log.Standing("oakhaven")); Assert.IsFalse(log.IsDone(Wallet));
+            // A slot freed, it goes through.
+            p.bag[3] = new ItemStack();
+            Assert.IsTrue(log.TurnIn(q, out _)); Assert.AreEqual(WalletBag, p.bag[3].item); Assert.AreEqual(xp + 20, p.experience);
+        }
+
         [Test] public void Quest_state_survives_a_save_round_trip()
         {
             var root = Path.Combine(Path.GetTempPath(), "Crulanda-quests-" + System.Guid.NewGuid().ToString("N"));

@@ -26,10 +26,12 @@ namespace Crulanda.Encounter
     /// Steps run in order; a step is done when all its objectives are.
     /// level: offered up to 3 levels early, with a grey ! until then. minLevel (optional, 0 = none): below it the quest is
     /// not offered, shows no ! at all, and can't be accepted (the Crowsfoot Hollow quest waits for level 3).
+    /// unlessWorn (optional): a trade bag's item id; the quest is not offered while that bag is worn or carried (the leatherworker's
+    /// bag quests), and one taken on before pays the bag's value in gold instead of a second bag.
     /// </summary>
     [Serializable] public sealed class QuestDef
     {
-        public string id, title, kind = "side", giver, turnIn, zone, canonStatus;
+        public string id, title, kind = "side", giver, turnIn, zone, canonStatus, unlessWorn;
         public int level = 1, minLevel;
         public string[] requires = new string[0];
         public string requiresFaction; public int requiresStanding;
@@ -50,7 +52,8 @@ namespace Crulanda.Encounter
     /// - collect: have count of item; target is where it comes from, an interactable name or "kill:&lt;enemy&gt;".
     /// - interact: use a named interactable.
     /// - visit: stand within radius of at, optionally at night.
-    /// For talk and deliver, say is the NPC's line. document: a page revealed when the objective completes.
+    /// - bring: hand count of an item from the bags (not the quest bag: pelts, hides) to target; talking to them with enough takes them.
+    /// For talk, deliver and bring, say is the NPC's line. document: a page revealed when the objective completes.
     /// </summary>
     [Serializable] public sealed class QuestObjectiveDef
     {
@@ -60,10 +63,11 @@ namespace Crulanda.Encounter
         public int count = 1;
         public Vector2 at; public float radius = 6; public bool night;
     }
+    /// <summary>items: quest items (the quest bag). bagItems: items for the bags (a trade bag), refused while the bags have no room.</summary>
     [Serializable] public sealed class QuestRewardDef
     {
         public int xp, gold;
-        public string[] items = new string[0], documents = new string[0];
+        public string[] items = new string[0], documents = new string[0], bagItems = new string[0];
         public StandingChange[] reputation = new StandingChange[0];
     }
     [Serializable] public sealed class StandingChange { public string faction; public int amount; }
@@ -83,7 +87,7 @@ namespace Crulanda.Encounter
         public readonly List<FactionDef> FactionOrder = new List<FactionDef>();
         public readonly Dictionary<string, QuestItemDef> Items = new Dictionary<string, QuestItemDef>(StringComparer.Ordinal);
         public readonly Dictionary<string, DocumentDef> Documents = new Dictionary<string, DocumentDef>(StringComparer.Ordinal);
-        static readonly HashSet<string> Types = new HashSet<string> { "flag", "kill", "talk", "deliver", "collect", "interact", "visit" };
+        static readonly HashSet<string> Types = new HashSet<string> { "flag", "kill", "talk", "deliver", "collect", "interact", "visit", "bring" };
         static readonly HashSet<string> Kinds = new HashSet<string> { "main", "side", "npc", "faction" };
 
         public static QuestDatabase Parse(IEnumerable<string> jsonFiles)
@@ -132,6 +136,7 @@ namespace Crulanda.Encounter
                         if (o == null || !Types.Contains(o.type ?? "")) { errors.Add(p + "step " + s + " has an unknown objective type '" + o?.type + "'."); continue; }
                         if (o.count < 1) errors.Add(p + "step " + s + " objective count must be at least 1.");
                         if ((o.type == "deliver" || o.type == "collect") && (string.IsNullOrEmpty(o.item) || !Items.ContainsKey(o.item))) errors.Add(p + "step " + s + " needs a known item.");
+                        if (o.type == "bring" && string.IsNullOrEmpty(o.item)) errors.Add(p + "step " + s + " bring needs an item.");
                         if (o.type != "visit" && string.IsNullOrEmpty(o.target)) errors.Add(p + "step " + s + " " + o.type + " needs a target.");
                         if (!string.IsNullOrEmpty(o.document) && !Documents.ContainsKey(o.document)) errors.Add(p + "unknown document '" + o.document + "'.");
                     }
@@ -142,6 +147,24 @@ namespace Crulanda.Encounter
             foreach (var r in rw.reputation ?? new StandingChange[0]) if (r == null || !Factions.ContainsKey(r.faction ?? "")) errors.Add(p + "reputation for unknown faction '" + r?.faction + "'.");
         }
         public string ItemName(string id) { return id != null && Items.TryGetValue(id, out var i) ? i.name : id; }
+        /// <summary>
+        /// What the quests name from the item database, checked against it (the quest files cannot see it): every bring objective's
+        /// item, every bagItems reward and every unlessWorn must be a real item, and the last two a trade bag. The problems found.
+        /// </summary>
+        public List<string> CheckItems(ItemDatabase items)
+        {
+            var errors = new List<string>(); if (items == null) return errors;
+            foreach (var q in Ordered)
+            {
+                string p = "Quest '" + q.id + "': ";
+                foreach (var step in q.steps ?? new QuestStepDef[0])
+                    foreach (var o in step?.objectives ?? new QuestObjectiveDef[0])
+                        if (o != null && o.type == "bring" && items.Get(o.item) == null) errors.Add(p + "brings unknown item '" + o.item + "'.");
+                foreach (var b in (q.rewards ?? new QuestRewardDef()).bagItems ?? new string[0]) if (items.Get(b)?.kind != "bag") errors.Add(p + "gives '" + b + "', which is not a trade bag.");
+                if (!string.IsNullOrEmpty(q.unlessWorn) && items.Get(q.unlessWorn)?.kind != "bag") errors.Add(p + "unlessWorn '" + q.unlessWorn + "' is not a trade bag.");
+            }
+            return errors;
+        }
     }
 
     /// <summary>
@@ -156,6 +179,10 @@ namespace Crulanda.Encounter
         public Action<string, string> Say = (t, s) => { };
         /// <summary>A document was revealed (the HUD opens it to read).</summary>
         public Action<string> Revealed = id => { };
+        /// <summary>The item database, for bring objectives' names and bag rewards (the session sets it; without it a quest that gives
+        /// a bag cannot be turned in).</summary>
+        public ItemDatabase Items;
+        public const string MakeRoomLine = "Make room in your bags first.", HaveOneLine = "You've one already. Take the coin.";
         public QuestLog(QuestDatabase db, EncounterProgress progress) { Db = db; Bind(progress); }
         public void Bind(EncounterProgress progress)
         {
@@ -166,6 +193,7 @@ namespace Crulanda.Encounter
             if (Progress.documents == null) Progress.documents = new List<string>();
             if (Progress.questItems == null) Progress.questItems = new List<string>();
             if (Progress.usedInteractables == null) Progress.usedInteractables = new List<string>();
+            if (Progress.pouches == null) Progress.pouches = new List<string>();
         }
 
         // ---------- queries ----------
@@ -180,6 +208,7 @@ namespace Crulanda.Encounter
             if (!string.IsNullOrEmpty(q.zone) && q.zone != zoneId) return QuestStatus.Unavailable;
             foreach (var r in q.requires) if (!IsDone(r)) return QuestStatus.Unavailable;
             if (!string.IsNullOrEmpty(q.requiresFaction) && Standing(q.requiresFaction) < q.requiresStanding) return QuestStatus.Unavailable;
+            if (!string.IsNullOrEmpty(q.unlessWorn) && Owns(q.unlessWorn)) return QuestStatus.Unavailable;
             return QuestStatus.Available;
         }
         public QuestStepDef CurrentStep(QuestState s) { var q = Def(s.id); return q == null || s.step >= q.steps.Length ? null : q.steps[s.step]; }
@@ -188,20 +217,35 @@ namespace Crulanda.Encounter
             foreach (var s in Progress.quests) { var q = Def(s.id); if (q != null) yield return (q, s); }
         }
         public int ItemCount(string item) { int n = 0; foreach (var i in Progress.questItems) if (i == item) n++; return n; }
-        /// <summary>Progress on an objective of the current step (collect counts come from the quest bag).</summary>
+        /// <summary>How many of an item the bags hold (a bring objective's pelts and hides).</summary>
+        public int BagCount(string item) { return Progress.bag == null ? 0 : Inventory.Count(Progress, item); }
+        /// <summary>Whether a trade bag is worn or carried.</summary>
+        bool Owns(string bag) { return Inventory.Wears(Progress, bag) || BagCount(bag) > 0; }
+        /// <summary>Progress on an objective of the current step (collect counts come from the quest bag; a bring objective not yet
+        /// handed over counts what the bags hold).</summary>
         public int Count(QuestState s, int objective)
         {
             var step = CurrentStep(s); if (step == null) return 0;
             var o = step.objectives[objective];
             if (o.type == "collect") return Math.Min(o.count, ItemCount(o.item));
-            return objective < s.counts.Count ? s.counts[objective] : 0;
+            int stored = objective < s.counts.Count ? s.counts[objective] : 0;
+            if (o.type == "bring") return Math.Min(o.count, Math.Max(stored, BagCount(o.item)));
+            return stored;
         }
-        public bool ObjectiveDone(QuestState s, int objective) { var step = CurrentStep(s); return step != null && Count(s, objective) >= step.objectives[objective].count; }
+        /// <summary>Whether an objective of the current step is done. A bring objective is done once handed over, not while carried.</summary>
+        public bool ObjectiveDone(QuestState s, int objective)
+        {
+            var step = CurrentStep(s); if (step == null) return false;
+            var o = step.objectives[objective];
+            if (o.type == "bring") return objective < s.counts.Count && s.counts[objective] >= o.count;
+            return Count(s, objective) >= o.count;
+        }
         public string ObjectiveLine(QuestState s, int objective)
         {
             var o = CurrentStep(s).objectives[objective];
             string text = !string.IsNullOrEmpty(o.text) ? o.text : o.type == "kill" ? "Defeat " + o.target : o.type == "collect" ? Db.ItemName(o.item) :
-                o.type == "deliver" ? "Bring " + Db.ItemName(o.item) + " to " + o.target : o.type == "talk" ? "Speak with " + o.target : o.type == "interact" ? o.target : "Go there";
+                o.type == "deliver" ? "Bring " + Db.ItemName(o.item) + " to " + o.target : o.type == "bring" ? "Bring " + (Items?.Get(o.item)?.name ?? o.item) + " to " + o.target :
+                o.type == "talk" ? "Speak with " + o.target : o.type == "interact" ? o.target : "Go there";
             return o.count > 1 ? text + ": " + Count(s, objective) + "/" + o.count : text;
         }
 
@@ -253,17 +297,31 @@ namespace Crulanda.Encounter
             Say("Quest abandoned: " + q.title, null);
             return true;
         }
-        /// <summary>Hands in a finished quest and pays out. Returns false if it isn't ready.</summary>
+        /// <summary>
+        /// Hands in a finished quest and pays out. Returns false if it isn't ready, or (saying "Make room in your bags first.") when it
+        /// gives something for the bags and they have no room for it: then nothing changes. A trade bag already worn or carried is paid
+        /// as its value in gold instead ("You've one already. Take the coin.").
+        /// </summary>
         public bool TurnIn(QuestDef q, out int xp)
         {
             xp = 0; var s = q == null ? null : State(q.id);
             if (s == null || s.step < q.steps.Length) return false;
-            Progress.quests.Remove(s); Progress.questsDone.Add(q.id);
             var r = q.rewards ?? new QuestRewardDef();
-            xp = r.xp; Progress.experience += r.xp; Progress.gold += r.gold;
+            var bags = new List<ItemDef>(); int coin = 0;
+            foreach (var id in r.bagItems ?? new string[0])
+            {
+                var d = Items?.Get(id); if (d == null) return false;   // no item content: it waits until there is
+                if (d.kind == "bag" && Owns(id)) coin += d.value; else bags.Add(d);
+            }
+            if (bags.Count > 0 && Inventory.FreeSlots(Progress) < bags.Count) { Say(MakeRoomLine, null); return false; }
+            Progress.quests.Remove(s); Progress.questsDone.Add(q.id);
+            xp = r.xp; Progress.experience += r.xp; Progress.gold += r.gold + coin;
             foreach (var i in r.items) Progress.questItems.Add(i);
+            foreach (var d in bags) Inventory.Add(Progress, Items, d.id, 1);
             foreach (var d in r.documents) Reveal(d);
             Say((q.IsMain ? "Chronicle complete: " : "Quest complete: ") + q.title + (r.xp > 0 ? "  +" + r.xp + " XP" : "") + (r.gold > 0 ? "  +" + r.gold + " gold" : ""), null);
+            foreach (var d in bags) Say("Received: " + d.name + "." + (d.kind == "bag" ? " Use it from your bags [I] to wear it." : ""), null);
+            if (coin > 0) { Say(HaveOneLine, q.turnIn == "auto" ? null : q.turnIn); Say("Received " + coin + " gold.", null); }
             foreach (var c in r.reputation) ChangeStanding(c.faction, c.amount);
             return true;
         }
@@ -337,13 +395,18 @@ namespace Crulanda.Encounter
                 for (int i = 0; i < step.objectives.Length; i++)
                 {
                     var o = step.objectives[i];
-                    if ((o.type != "talk" && o.type != "deliver") || !Matches(o.target, npc)) continue;
+                    if ((o.type != "talk" && o.type != "deliver" && o.type != "bring") || !Matches(o.target, npc)) continue;
                     while (s.counts.Count <= i) s.counts.Add(0);
                     if (s.counts[i] >= o.count) continue;
                     if (o.type == "deliver")
                     {
                         if (ItemCount(o.item) < o.count) continue;
                         for (int k = 0; k < o.count; k++) Progress.questItems.Remove(o.item);
+                    }
+                    if (o.type == "bring")
+                    {
+                        if (BagCount(o.item) < o.count) continue;
+                        Inventory.Remove(Progress, o.item, o.count);
                     }
                     s.counts[i] = o.count; any = true; Completed(o, npc);
                 }
@@ -465,7 +528,7 @@ namespace Crulanda.Encounter
                 if (s.step >= q.steps.Length && q.turnIn == npc) return '?';
                 var step = CurrentStep(s); if (step == null) continue;
                 foreach (var o in step.objectives)
-                    if ((o.type == "talk" || (o.type == "deliver" && ItemCount(o.item) >= o.count)) && Matches(o.target, npc) && !ObjectiveDoneFor(s, step, o)) return '?';
+                    if ((o.type == "talk" || (o.type == "deliver" && ItemCount(o.item) >= o.count) || (o.type == "bring" && BagCount(o.item) >= o.count)) && Matches(o.target, npc) && !ObjectiveDoneFor(s, step, o)) return '?';
             }
             foreach (var q in Db.Ordered)
                 if (q.giver == npc && q.giver != "auto" && level >= q.minLevel && Status(q, zoneId) == QuestStatus.Available) { grey = q.level > level + 3; return '!'; }

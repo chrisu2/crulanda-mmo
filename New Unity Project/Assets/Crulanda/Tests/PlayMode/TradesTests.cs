@@ -79,11 +79,11 @@ namespace Crulanda.Tests
             Assert.AreEqual(1, Inventory.Count(p, "tool.pick")); Assert.Contains("You already carry one.", session.Messages); Assert.AreEqual(1, trades.Skill("mining"));
 
             // A material is not gear, and "Sell junk" leaves it.
-            Assert.AreEqual(0, Inventory.Add(p, session.Items, "mat.copper_ore", 4)); Assert.AreEqual(0, Inventory.Add(p, session.Items, "junk.wolf_pelt", 2));
+            Assert.AreEqual(0, Inventory.Add(p, session.Items, "mat.copper_ore", 4)); Assert.AreEqual(0, Inventory.Add(p, session.Items, "junk.wolf_fang", 2));
             Assert.IsFalse(session.EquipFromBag(p.bag.FindIndex(s => s.item == "mat.copper_ore")));
             Assert.Contains(EncounterSession.MaterialLine, session.Messages);
             session.OpenVendor(merchant); session.SellJunk();
-            Assert.AreEqual(4, Inventory.Count(p, "mat.copper_ore")); Assert.AreEqual(1, Inventory.Count(p, "tool.pick")); Assert.AreEqual(0, Inventory.Count(p, "junk.wolf_pelt"));
+            Assert.AreEqual(4, Inventory.Count(p, "mat.copper_ore")); Assert.AreEqual(1, Inventory.Count(p, "tool.pick")); Assert.AreEqual(0, Inventory.Count(p, "junk.wolf_fang"));
 
             // The Trades window: it takes the character sheet's place, shuts the merchant and opens the bags; a merchant shuts it.
             session.CharacterOpen = true; session.InventoryOpen = false;

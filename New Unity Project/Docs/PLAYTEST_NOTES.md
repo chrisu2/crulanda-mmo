@@ -19,3 +19,30 @@ Hesk, the quest's objective points, its secrets and the rich copper seams) well 
 village and the bandits: farms and fields first, then wolves and boar, then the hills and the hidden mouth. Target: the
 mouth about 280 m from the green (three times today's distance). Also check the other camps against the same rule (nothing
 hostile within about 120 m of a village's houses) in every zone.
+
+## 2. Elites are too easy for the loot they give (2026-10-01) — OPEN
+> "elite was too easy for the loot obtain."
+
+Measured (`EncounterEnemy.MobHealth` / `MobHit`): a camp elite is a normal mob of its level with 2.2 times the health and 1.4
+times the hit, drawn 1.18 times the size. It has no ability of its own, its camp does not come to its aid (see note 3), and
+with Mira healing nothing threatens the player. From loot step L1 an elite is the only source of a blue beam, and from L2 each
+drops its own named rare or epic, so the reward has outgrown the fight.
+The twelve camp elites: Caddock, Quartermaster Hesk, Old Whitefoot (Oakhaven); the Grey Sexton, the Pale Reckoner (Khaven);
+the Sandthrone captain, Old Scree-Tusk (Peaks); the Brood Weave-Eater, the Ash-Deacon (Ash Rim); Greyheart, Old Ninebranch,
+the Hollow Root-Warden (Verdant Shore).
+
+What the fix needs: elites that are a fight. More health and a harder hit; one or two moves of their own that the player must
+answer (a wound-up heavy blow to step out of or guard, an enrage when low, a call that brings the camp); their guards joined
+to them; and bosses at a dungeon's end harder than the outdoor named beasts. Tune so an elite of the player's level is
+dangerous alone and wants Mira, and one two levels up is not a solo kill.
+
+## 3. Mobs are not social: they pull one at a time (2026-10-01) — OPEN
+> "some mobs need to be more social. i can pull them easy 1 at a time even when they stand next to each other"
+
+Measured (`EncounterEnemy.Update`): every mob notices the player by itself, within 5 m and with a clear line; nothing links
+it to its neighbours. Hitting or walking up to one of four wolves, or one of Caddock's guards, brings that one alone.
+
+What the fix needs: social aggro by kind. When a mob joins a fight, others of its camp within reach join too: pack beasts
+(wolves, hounds) come together; people (deserters, cultists, Concord) call out and bring those in earshot, with a short
+delay and a shout so it reads; solitary beasts (boar, stags) stay single. Sneaking (Ctrl) should still let a careful player
+peel the edge of a camp. A boss always fights with its guards.

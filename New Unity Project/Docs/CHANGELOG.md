@@ -712,3 +712,30 @@ A read-only review by five reviewers, each finding checked by a second who tried
   house's door point now stands on its step); held weapons drawn life-size read as twigs (now 1.35x, shields 1.15x).
 - How it was built: each piece on its own branch, reviewed through three lenses with every finding refuted or confirmed by a
   second reviewer (21 defects fixed before merging), then the full tests, five zone tours and a wardrobe line-up of every weapon.
+
+## 2026-10-01 — Homes, gathering, armour you can see, and buildings that sit in the land (Chris: "each npc has their own house"; "we need to gather ore, lumber, herbs etc"; "each has a different visual appearance when worn")
+- **Everyone has a home** (BUILD_PLAN step 3): every Oakhaven villager lives behind their own household's named door (15
+  households; Khaven 5). Families share a house (the Tanners: Maud, Fen and Nettie), farmers live with their hen-wife, Aldo Crisp
+  has his cottage and Garet Moss his lodge, where he goes to bed earlier. Knocking gets an answer: someone home with wares or
+  quest business opens the door; otherwise the household tells you where the head of the house is, or that they're abed.
+- **Gathering in Oakhaven** (step 4): copper seams on the rocks (and rich ones in Crowsfoot Hollow), windfall oaks to cut and
+  yarrow to pick. A work bar, a skill that rises as you work, nodes that rest and come back (even across a zone hop), and a
+  village that notices what you sell: Vell talks about the ore, the merchant about herbs. A shot of every node in the tour.
+- **Armour you can see** (loot step A2): every head, neck, shoulder, chest, hand, leg and foot piece has its own built shape
+  (caps, hoods, coifs, kettle hats, barbutes, masks, circlets and crowns; torcs and pendants; mantles and pauldrons; tunics,
+  jerkins, hauberks, coats, cuirasses and robes; gloves and gauntlets; breeches, leggings and greaves; shoes, boots and
+  sabatons). Better pieces gain surcoats, edging and badges. Armour recolours what it covers, hides or tucks the hair under a
+  helm, and gives the bare body back exactly when it comes off. The wardrobe capture now lines up sets, helms, chests, limbs
+  and palettes (shots 04-12).
+- **Buildings sit into the land** (visual worklist items 10 and 11): houses, the mill and barns stand on a stepped stone
+  footing that climbs and terraces with the ground, with a threshold and steps at each door. The Golden Cask and Khaven's
+  Cracked Hearth are hero buildings: a jettied upper front, dormers, window boxes, a porch with a hanging lantern and a sign
+  twice the size. Vell's smithy is a slate-roofed hearth house with a lean-to over the anvil (glowing coals, hood and chimney,
+  bellows, quench trough, racks and a grindstone).
+- **From Chris's look and the full check:** copper ore was round orange lumps with green beads ("what are the green
+  peas/circles on the ore?"); it's now faceted red-brown ore with the verdigris pressed flat on the face. Yarrow drew smaller
+  than the meadow's own wildflowers; the herbs are now knee-high clumps (yarrow's flat white heads over feathery leaves,
+  comfrey's nodding bells). Mourner's cap drew yellow flowers but Wenna's quest calls it a black-gilled mushroom, so it is now
+  a cluster of grey caps. One armour test was wrong, not the armour (it skipped the whole body because the test figure's own
+  name starts with "Gear").
+- Tests: EditMode 240/240 (after the test fix), PlayMode 108/108; five zone tours and the wardrobe.

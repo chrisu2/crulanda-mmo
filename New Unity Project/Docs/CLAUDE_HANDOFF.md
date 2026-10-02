@@ -9,32 +9,36 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-10-01, afternoon)
-**PUBLISHED 2026-10-01 (five publishes; the playable build is commit 078d276):**
+## RESUME HERE (updated 2026-10-01, night)
+**PUBLISHED 2026-10-01 (seven publishes; the playable build is the main commit that adds this note):**
 1. The Root-Mother's Deep, Crowsfoot's hidden mouth, every trade has a day (4c579e6).
 2. The painted style pass parts 1-4 (03fd06d) and 3. part 5, painted masonry (17168d8).
 4. The out of work drink at the inn; the visual review's first batch (ecc233b).
 5. The visual review's second batch: Ash Rim, world edge, ruins, Peaks, caves (078d276).
-Tests on 078d276: EditMode 186/186, PlayMode 83/83, 0 shader errors. Main has since gained an inn shot of the drinkers
-(`oakhaven-99-inn-drinkers.png`) and the plan documents; nothing unpublished changes play.
+6. Trades steps 1-2 (format 8, materials, tools, the Trades window, new buildings, Maud's leather shop) and loot A1 (weapons in
+   hand) (4979457).
+7. **Trades steps 3-4 (households and homes; gathering in Oakhaven), loot A2 (armour on the body), visual items 10-11 (buildings
+   on slopes; the inns and the smithy as hero buildings)**, plus Chris's ore fix (no more green "peas"), knee-high herbs and
+   mourner's cap as a mushroom. Tests on this round: EditMode 240/240 (one test was wrong: its figure's own name started "Gear"),
+   PlayMode 108/108; five zones toured and the wardrobe 01-12 viewed. The tour/captures were rerun after the ore and herb fixes.
+**Long runs go detached:** `tools\validation\start_detached.ps1 [-Arguments '-NoTests' | '-NoTour' | '-Zones zone.oakhaven -NoTests']`
+runs `full_run.ps1` outside the tool's process tree; wait for `hel\work\full-run.done` (the log is mixed-encoding: read the result
+XMLs and logs directly). Never edit the repo's Assets while a run is in flight (it mirrors Assets).
 
-**PUBLISHED 2026-10-01 evening (sixth publish): trades step 2 (save format 8, materials, tools, the Trades window), trades step
-1 (the new buildings, named houses, Maud's leather shop), loot step A1 (weapons and shields in hand).** Tests: EditMode 221/221,
-PlayMode 89/89, 0 shader errors; five zones toured; the HUD captures (`ui-captures\warrior-17-trades.png`) and the wardrobe
-line-up (`ui-captures\wardrobe\`, 10 weapon racks, 4 shield walls, 3 quality ladders) viewed. Fixed after the first check: house
-door points on the step (the Crisp cottage door was unreachable), held gear 1.35x and shields 1.15x, trade shots that find a clear
-view. Still to polish (loot): the quality ladder's rare and epic glow is faint; the Golden Cask's leather-shop trade shot was
-inside a wall (fixed in the capture code after this build, not yet seen).
-**Long runs now go detached:** `toolsalidation\start_detached.ps1 [-Arguments '-NoTour' | '-Zones zone.oakhaven -NoTests']`
-runs `full_run.ps1` outside the tool's process tree; wait for `hel\workull-run.done` (the log is mixed-encoding: read the result
-XMLs and logs directly).
-
-**NEXT ROUND (worktrees made, nothing built yet; branches at main):** `trades/a3-households` (BUILD_PLAN step 3),
-`trades/b4-gathering` (step 4), `loot/a2-armour` (loot A2), `visual/w3-slopes-hero` (visual worklist items 10 and 11). Worktrees
-in the session scratchpad `wt\a3|b4|la2|v11` with `compile-<key>.py` beside them (`wt\mk_compile.py <keys>` makes more). The
-workflow that builds a round is saved at `.claude/projects/D--code-mmo/<session>/workflows/scripts/build-step-resume-*.js`
-(modes: implement, finish, review); its last args (the briefs for these four) are in that run's journal. Do the publish of main
-first, then start this round from the new main (recreate the branches if main moved).
+**NEXT ROUND, BUILT AND MERGED ON `round3` (not on main yet; nothing run in Unity):** trades step 5 (`trades/b5-bags`: Maud's four
+trade bags, bought or earned by "A Wallet for Simples", bag rows in the bags window), step 6 (`trades/a6-workshop-days`: Hob
+Linden the innkeeper behind the bar selling bread and cheese, deliveries at the kitchen door), step 8
+(`trades/b8-nodes-four-zones`: ten ore, eight timber, ten herbs in each of the other four zones, `tools/wip/professions/place_nodes.py`)
+and loot A3 (`loot/a3-ledger`: Loot.cs, six loot files in EncounterContent/Loot, unregistered; wardrobe shots 13-18). Each was
+reviewed through three lenses with refutation (25 findings confirmed and fixed). The integration worktree is the session
+scratchpad's `wt\int` (branch `round3`, two conflicts resolved: items.json keeps both the innkeeper and leatherworker vendors;
+WorldLife.StockLine keeps b5's sold-pelts line and a6's innkeeper line); `compile-int.py` is ALL OK. To finish it: merge main into
+round3 (or round3 into main), run the full detached check WITH tests, look at the UI captures 19-23 (bags), wardrobe 13-18, the
+other zones' node shots (`<zone>-80-node-*`), then publish.
+**Small things queued for that round:** yarrow is visible now but still small from 7 m: scale the yarrow and comfrey clumps about
+1.3x and make yarrow's head one bright white (the beige disc under the florets makes it read as a mushroom cap). The hauberk's
+surcoat panels read as flat stickers front and back. The quality ladder's rare and epic glow is faint. b8's review left a tarnwort
+node on a 0.64 slope (the herb mesh does not follow the ground).
 
 **THE PLANS (read the owner notes first; they are his words and decisions):**
 - Professions, gathering, households, purses, bags, hunting: `tools/wip/professions/OWNER_NOTES.md`, `DESIGN.md`, `ADDENDUM.md`,
@@ -48,8 +52,10 @@ first, then start this round from the new main (recreate the branches if main mo
   training blade equipped).
 - Chris's save is backed up before format 8: `hel/work/save-backups/20261001-1545-before-format8`.
 
-**Visual worklist left** (`tools/wip/painted/visual_review.md`): item 10 (buildings on slopes) and item 11 (the inn and the smithy
-as hero buildings), held until BUILD_PLAN step 1 has merged because it edits the same builders.
+**Visual worklist** (`tools/wip/painted/visual_review.md`): items 10 (buildings on slopes) and 11 (the inns and the smithy as
+hero buildings) are done and published (2026-10-01 night), so all 14 ranked items are done. The reviewers' raw lists
+below them still hold smaller things: Mossveil Falls as a flat rectangle, mud/puddle/fire-bed discs, the giant trunks' straight
+moss line, the salt flats' squiggles, neon ferns on the Peaks' scree, hard-edged tall-grass discs.
 
 **How today's work was done, worth repeating:** design by a panel (readers map the code, three lenses design, one synthesis),
 critique, then build in worktrees with review and refutation before merging; for visual work, agents render and LOOK at generated

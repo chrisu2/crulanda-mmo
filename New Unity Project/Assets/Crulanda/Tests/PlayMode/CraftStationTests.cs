@@ -17,7 +17,8 @@ namespace Crulanda.Tests
     /// Making things at a station in Oakhaven, in the running game (BUILD_PLAN step 9): chop a windfall and burn the logs to
     /// charcoal at Vell's smithy at night with nobody there (E offers "Work at the forge" and opens the Trades window at Woodcutting's
     /// recipes; Make and Make all go on the work bar; the charcoal is in the bags and the save), and ten metres off it is refused. The
-    /// Golden Cask's hearth and the Cask's kitchen are fires to make it at.
+    /// Golden Cask's hearth and the Cask's kitchen are fires to make it at, and Cooking's (step 10): E there reads "Cook at the fire"
+    /// and opens Cooking's recipes, and a boar stew cooked at the kitchen range is eaten.
     /// </summary>
     public class CraftStationTests
     {
@@ -154,8 +155,8 @@ namespace Crulanda.Tests
             var spot = inn.TransformPoint(new Vector3(3.2f, 0, .8f)); spot.y = inn.position.y;
             yield return StandAt(s, spot);
             Assert.AreSame(hearth, s.StationNear("fire")); Assert.IsNull(s.StationNear("forge"));
-            bool cooks = s.Professions.Db.RecipesFor("cooking").Count > 0;
-            Assert.AreEqual(cooks ? "Cook at the fire" : "Work at the fire", s.InteractPrompt, "Cooking's prompt once it has recipes (step 10); charcoal's until then.");
+            Assert.IsNotEmpty(s.Professions.Db.RecipesFor("cooking"), "Cooking has its recipes (step 10).");
+            Assert.AreEqual("Cook at the fire", s.InteractPrompt, "A fire is the cook's: everyone cooks.");
             Assert.IsTrue(hearth.Reaches(s.Player.transform.position), "The taproom is the hearth's room.");
             Hatchet(s); Inventory.Add(p, s.Items, "mat.oak_log", 1);
             var oak = s.Professions.Db.Recipe("recipe.charcoal_oak");
@@ -206,7 +207,8 @@ namespace Crulanda.Tests
             Hatchet(s); Inventory.Add(p, s.Items, "mat.oak_log", 2);
             var oak = s.Professions.Db.Recipe("recipe.charcoal_oak");
             s.Interact();
-            Assert.IsTrue(s.TradesOpen); Assert.AreEqual(s.StationTrade("fire").id, EncounterHud.TradesPage, "Woodcutting until Cooking has recipes (step 10).");
+            Assert.IsTrue(s.TradesOpen); Assert.AreEqual("cooking", EncounterHud.TradesPage, "A fire opens on Cooking (step 10), whatever else is made there.");
+            Assert.AreEqual("cooking", s.StationTrade("fire").id); Assert.AreSame(kitchen, s.StationFor(oak), "Charcoal is still burnt at the range.");
             Assert.IsTrue(s.Make(oak, 2)); yield return new WaitForSeconds(2 * EncounterSession.CraftSeconds + 1);
             Assert.AreEqual(2, Inventory.Count(p, "mat.charcoal"), "Charcoal burnt at the kitchen range."); Assert.AreEqual(0, Inventory.Count(p, "mat.oak_log"));
             // Walls: the kitchen is open in front and at its post's end, but not worked from behind its stone end wall or from the
@@ -225,6 +227,56 @@ namespace Crulanda.Tests
             Assert.IsTrue(oven.Reaches(oven.position + Vector3.forward * 3) && oven.Reaches(oven.position + Vector3.back * 3), "The oven stands in the open.");
             yield return StandAt(s, mouth.stand);
             Assert.AreSame(oven, s.StationNear("fire"), "At the oven's mouth the oven is the fire.");
+        }
+
+        /// <summary>
+        /// The owner's check for step 10 (BUILD_PLAN): Cooking at the Cask's kitchen range at night, with nobody there and no trade
+        /// taken up. E reads "Cook at the fire" and opens the Trades window at Cooking's recipes; two boar meat make a Boar stew on the
+        /// work bar (Cooking 1 to 2, and saved); the stew is eaten and heals over ten seconds; and "Sell junk" at the inn keeps the
+        /// meat and sells the tusks.
+        /// </summary>
+        [UnityTest] public IEnumerator BoarStew_AtTheCaskKitchen_IsCookedAndEaten()
+        {
+            yield return Open(2);
+            var s = Session(); var p = s.Progress; var zone = s.Zone;
+            Assert.AreEqual(root, s.SaveDirectoryOverride, "This test saves to its own folder.");
+            var kitchen = zone.Stations.Find(x => x.kind == "fire" && x.name == "The Cask's kitchen"); Assert.NotNull(kitchen, "The Cask's kitchen is a fire.");
+            var range = zone.Workplaces.First(w => w.kind == "kitchen" && w.name == "The Cask's kitchen");
+            var stew = s.Professions.Db.Recipe("recipe.boar_stew"); Assert.NotNull(stew, "Cooking has its recipes.");
+            Assert.AreEqual(1, s.Professions.Skill("cooking"), "Everyone cooks, from the start.");
+            Assert.AreEqual(0, Inventory.Add(p, s.Items, "junk.boar_meat", 5)); Assert.AreEqual(0, Inventory.Add(p, s.Items, "junk.boar_tusk", 2));
+            yield return StandAt(s, range.stand);
+            Assert.Greater(WorldClock.Darkness, .5f, "Night.");
+            Assert.AreSame(kitchen, s.StationNear("fire"));
+            Assert.AreEqual("Cook at the fire", s.InteractPrompt);
+            s.Interact();
+            Assert.IsTrue(s.TradesOpen, "E at the range opens the Trades window..."); Assert.AreEqual("cooking", EncounterHud.TradesPage, "...on Cooking..."); Assert.IsTrue(EncounterHud.TradesRecipes, "...at its recipes.");
+            Assert.AreSame(kitchen, s.StationFor(stew));
+            Assert.IsTrue(s.CanCraft(stew, out var why), why); Assert.AreEqual(2, s.Professions.CanMake(stew), "Five meat: two stews.");
+            Assert.IsTrue(s.Make(stew, 1)); Assert.IsTrue(s.Working); Assert.AreEqual("Boar stew", s.PlayerCastName);
+            Assert.AreEqual(0, Inventory.Count(p, "food.boar_stew"), "Nothing until the work is done.");
+            yield return new WaitForSeconds(EncounterSession.CraftSeconds + .5f);
+            Assert.IsFalse(s.Working);
+            Assert.AreEqual(1, Inventory.Count(p, "food.boar_stew")); Assert.AreEqual(3, Inventory.Count(p, "junk.boar_meat"), "Two meat went in the pot.");
+            Assert.Contains("You make Boar stew.", s.Messages);
+            Assert.AreEqual(2, s.Professions.Skill("cooking"), "Boar stew at Cooking 1 teaches every time.");
+            StringAssert.Contains("food.boar_stew", File.ReadAllText(Path.Combine(root, EncounterSave.SlotFor(s.ClassDef.id) + ".save.json")), "Saved.");
+            // Eat it: food heals over ten seconds, out of combat.
+            s.ShowTrades(false);
+            var health = s.Player.Health; int missing = Mathf.Min(health.Pool.Max - 1, 400);
+            health.ApplyDamage(missing); int before = health.Pool.Current; missing = health.Pool.Max - before;
+            Assert.IsFalse(s.InCombat, "Hurt, but not in a fight.");
+            Assert.IsTrue(s.UseItem(p.bag.FindIndex(x => x.item == "food.boar_stew")), "The stew is eaten.");
+            Assert.Contains("Used Boar stew.", s.Messages); Assert.AreEqual(0, Inventory.Count(p, "food.boar_stew"));
+            yield return new WaitForSeconds(4.5f);
+            int healed = health.Pool.Current - before;
+            Assert.GreaterOrEqual(healed, Mathf.Min(missing, 80), "Four and a half seconds of a 220-point stew, besides resting (" + healed + " of " + missing + ").");
+            // "Sell junk" at the inn: the tusks go, the meat stays for the pot.
+            var keeper = VillageLife.Active.Villagers.FirstOrDefault(v => v.Role == "innkeeper"); Assert.NotNull(keeper, "The Cask has its innkeeper.");
+            s.OpenVendor(keeper, s.Player.transform.position); Assert.AreEqual(keeper.Name, s.VendorNpc);
+            int gold = p.gold; s.SellJunk(); s.CloseVendor();
+            Assert.GreaterOrEqual(p.gold - gold, 2 * s.Items.Get("junk.boar_tusk").value, "The tusks are sold.");
+            Assert.AreEqual(0, Inventory.Count(p, "junk.boar_tusk")); Assert.AreEqual(3, Inventory.Count(p, "junk.boar_meat"), "The meat is kept.");
         }
     }
 }

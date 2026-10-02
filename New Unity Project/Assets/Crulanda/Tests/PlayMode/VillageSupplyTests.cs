@@ -72,6 +72,42 @@ namespace Crulanda.Tests
             yield return null;
         }
 
+        /// <summary>
+        /// Meat sold in the village (BUILD_PLAN step 10: boar meat and the beasts' meats are materials whose trade is "inn.meat") goes
+        /// to the inn's pot as the player's ("sold.inn.meat"), and the innkeeper and the village talk of somebody's hunting, not of the
+        /// hunter's hares.
+        /// </summary>
+        [UnityTest] public IEnumerator SellingMeat_FeedsTheInnsPot_AndTheVillageRemarks()
+        {
+            var s = UnityEngine.Object.FindFirstObjectByType<EncounterSession>(); var life = VillageLife.Active; var p = s.Progress;
+            Assert.AreEqual(root, s.SaveDirectoryOverride, "This test saves to its own folder.");
+            var keeper = life.Villagers.First(v => v.Role == "innkeeper");
+            int pot = life.Count("inn.meat"); Assert.AreEqual(0, life.Count("sold.inn.meat"));
+            Assert.AreEqual(0, Inventory.Add(p, s.Items, "junk.boar_meat", 4)); Assert.AreEqual(0, Inventory.Add(p, s.Items, "mat.wolf_haunch", 2));
+            // All in one frame: a merchant's window shuts when you are not beside them.
+            s.OpenVendor(keeper); Assert.AreEqual(keeper.Name, s.VendorNpc, "The innkeeper buys and sells.");
+            int gold = p.gold;
+            s.SellBag(p.bag.FindIndex(x => x.item == "junk.boar_meat")); s.SellBag(p.bag.FindIndex(x => x.item == "mat.wolf_haunch"));
+            Assert.AreEqual(gold + 6, p.gold, "A gold a piece.");
+            Assert.AreEqual(pot + 6, life.Count("inn.meat"), "The meat is the inn's pot today."); Assert.AreEqual(6, life.Count("sold.inn.meat"), "The sale is marked as the player's.");
+            s.CloseVendor();
+            life.Deliver("inn.ale", 1);   // the cask is in, so a dry inn is nobody's first news
+            const string Hares = "Garet's hares are in the pot. Don't tell the out-of-work.";
+            bool said = false;
+            for (int i = 0; i < 300 && !said; i++)
+            {
+                var line = life.LineFor(keeper, true); Assert.AreNotEqual(Hares, line, "Meat the player sold is not the hunter's hares.");
+                said = line == "Somebody's been selling meat in the village. It's all in the pot; the stew's not thin tonight.";
+            }
+            Assert.IsTrue(said, keeper.Name + " talks of the meat.");
+            var neighbour = life.Villagers.FirstOrDefault(v => (v.Role == "farmer" || v.Role == "elder" || v.Role == "gossip") && !v.PassedOut);
+            Assert.NotNull(neighbour, "Oakhaven has a farmer, an elder or a gossip to talk to.");
+            said = false;
+            for (int i = 0; i < 300 && !said; i++) said = life.LineFor(neighbour, true) == "Boar in the Cask's pot tonight. Somebody's been hunting.";
+            Assert.IsTrue(said, neighbour.Name + " talks of it.");
+            yield return null;
+        }
+
         [UnityTest] public IEnumerator HerbalistsOwnHerbs_DoNotSoundLikeTheSale_NorHideTheStallsGoods()
         {
             var s = UnityEngine.Object.FindFirstObjectByType<EncounterSession>(); var life = VillageLife.Active;

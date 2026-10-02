@@ -320,6 +320,39 @@ namespace Crulanda.Tests
             Assert.IsTrue(log.Craft(oak, AtFire, new System.Random(7), out why), why);
         }
 
+        /// <summary>
+        /// Cooking is everyone's from the start (BUILD_PLAN step 10, DESIGN 5.4): with no tool and nothing taken up, two boar meat make
+        /// a Boar stew at a fire and nowhere else; the meat comes out of a worn larder-scrip and the stew goes in the ordinary bags; and
+        /// the hearth-cake waits on Cooking 5, takes the hen-wife's eggs and makes two.
+        /// </summary>
+        [Test] public void Cooking_BoarStew_AtAnyFire_FromTheStart()
+        {
+            var log = Fresh(out var said); var p = log.Progress; var stew = log.Db.Recipe("recipe.boar_stew"); var ups = new List<int>();
+            log.SkillUp = (id, skill) => { Assert.AreEqual("cooking", id); ups.Add(skill); };
+            Assert.NotNull(stew); Assert.AreEqual(ProfessionLog.Difficulty.Orange, log.DifficultyOf(stew), "Cooking 1 makes it at once and learns from it.");
+            Inventory.Add(p, log.Items, "bag.larder_scrip", 1); Assert.IsTrue(Inventory.Wear(p, log.Items, Slot(p, "bag.larder_scrip"), out var why), why);
+            Assert.AreEqual(0, Inventory.Add(p, log.Items, "junk.boar_meat", 5));
+            Assert.GreaterOrEqual(Slot(p, "junk.boar_meat"), Inventory.BagSize, "Boar meat is the larder-scrip's.");
+            Assert.AreEqual(2, log.CanMake(stew), "Five meat make two stews.");
+            string before = Snapshot(p);
+            Assert.IsFalse(log.CanCraft(stew, AtForge, out why)); Assert.AreEqual("You need a fire nearby.", why);
+            Assert.IsFalse(log.Craft(stew, k => k == "bench", new System.Random(8), out why)); Assert.AreEqual("You need a fire nearby.", why);
+            Assert.AreEqual(before, Snapshot(p), "Nothing is cooked away from a fire.");
+            Assert.IsTrue(log.Craft(stew, AtFire, new System.Random(8), out why), why);
+            Assert.AreEqual(3, Inventory.Count(p, "junk.boar_meat")); Assert.AreEqual(1, Inventory.Count(p, "food.boar_stew"));
+            Assert.Less(Slot(p, "food.boar_stew"), Inventory.BagSize, "Cooked food is no larder stuff: it goes in the ordinary bags.");
+            Assert.AreEqual(2, log.Skill("cooking")); CollectionAssert.AreEqual(new[] { 2 }, ups);
+            // The hearth-cake wants Cooking 5, flour and the hen-wife's eggs, and makes two.
+            var cake = log.Db.Recipe("recipe.hearth_cake"); Inventory.Add(p, log.Items, "mat.flour", 1); Inventory.Add(p, log.Items, "food.fresh_eggs", 1);
+            Assert.AreEqual(ProfessionLog.Difficulty.Locked, log.DifficultyOf(cake));
+            Assert.IsFalse(log.CanCraft(cake, AtFire, out why)); Assert.AreEqual("That wants Cooking 5.", why);
+            Entry(log, "cooking").skill = 5;
+            Assert.IsTrue(log.Craft(cake, AtFire, new System.Random(8), out why), why);
+            Assert.AreEqual(2, Inventory.Count(p, "food.hearth_cake")); Assert.AreEqual(0, Inventory.Count(p, "mat.flour")); Assert.AreEqual(0, Inventory.Count(p, "food.fresh_eggs"));
+            Assert.AreEqual(1, p.bag.FindAll(s => s.item == "food.hearth_cake").Count, "The two stack.");
+            Assert.IsEmpty(said, "The session says what was made; the log says nothing.");
+        }
+
         [Test] public void Craft_SkillUp_FollowsTheColours()
         {
             Assert.AreEqual(1f, ProfessionLog.UpChance(1, 1)); Assert.AreEqual(1f, ProfessionLog.UpChance(10, 1), "Under 10 over the recipe: every time (orange).");

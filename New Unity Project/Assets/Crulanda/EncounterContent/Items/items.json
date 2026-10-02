@@ -46,11 +46,61 @@
     {
       "id": "junk.boar_meat",
       "name": "Tough boar meat",
-      "kind": "junk",
-      "quality": 0,
+      "kind": "material",
+      "quality": 1,
       "value": 1,
-      "stack": 10,
+      "stack": 20,
+      "trade": "inn.meat",
+      "pouch": "larder",
       "description": "Needs a long stew.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "mat.wolf_haunch",
+      "name": "Lean wolf haunch",
+      "kind": "material",
+      "quality": 1,
+      "value": 1,
+      "stack": 20,
+      "trade": "inn.meat",
+      "pouch": "larder",
+      "description": "Dark and stringy. Charred on a stick with something strong beside it, it does.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "mat.hound_flank",
+      "name": "Ash-hound flank",
+      "kind": "material",
+      "quality": 1,
+      "value": 4,
+      "stack": 20,
+      "trade": "inn.meat",
+      "pouch": "larder",
+      "description": "Grey meat that smells of smoke before it has been near a fire. Salt draws it out.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "mat.mossback_chop",
+      "name": "Mossback chop",
+      "kind": "material",
+      "quality": 1,
+      "value": 5,
+      "stack": 20,
+      "trade": "inn.meat",
+      "pouch": "larder",
+      "description": "A thick chop off a mossback, the fat faintly green. It wants something sharp to cut it.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "mat.venison",
+      "name": "Shore venison",
+      "kind": "material",
+      "quality": 1,
+      "value": 6,
+      "stack": 20,
+      "trade": "inn.meat",
+      "pouch": "larder",
+      "description": "Fine-grained and dark, off a stag of the Shore. Too good to eat in a hurry.",
       "canonStatus": "GAME-ONLY"
     },
     {
@@ -169,6 +219,136 @@
       "level": 6,
       "value": 4,
       "stack": 20
+    },
+    {
+      "id": "food.griddle_bread",
+      "name": "Griddle bread",
+      "kind": "consumable",
+      "food": true,
+      "heal": 160,
+      "quality": 1,
+      "level": 1,
+      "value": 1,
+      "stack": 20,
+      "description": "Flour and water slapped flat and turned once on a hot stone. Eat it while it's warm; it won't wait.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "food.boar_stew",
+      "name": "Boar stew",
+      "kind": "consumable",
+      "food": true,
+      "heal": 220,
+      "quality": 1,
+      "level": 1,
+      "value": 3,
+      "stack": 20,
+      "description": "Tough boar meat, stewed until it gave in. It sticks to the ribs and stays there.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "food.hearth_cake",
+      "name": "Harrow hearth-cake",
+      "kind": "consumable",
+      "food": true,
+      "heal": 200,
+      "quality": 1,
+      "level": 1,
+      "value": 2,
+      "stack": 20,
+      "description": "Flour and egg baked in the ashes, the way the Harrow farms have always done it. Knock the ash off first.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "food.wolf_skewer",
+      "name": "Wolf-haunch skewer",
+      "kind": "consumable",
+      "food": true,
+      "heal": 340,
+      "quality": 1,
+      "level": 3,
+      "value": 5,
+      "stack": 20,
+      "description": "Lean wolf cut small and charred on a green stick with mourner's cap. Better than it sounds.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "food.harrow_pasty",
+      "name": "Harrow pasty",
+      "kind": "consumable",
+      "food": true,
+      "heal": 380,
+      "quality": 1,
+      "level": 4,
+      "value": 5,
+      "stack": 20,
+      "description": "Boar and Harrow cheese folded into a crust and crimped shut. Farm folk carry them to the fields in a coat pocket.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "food.smoked_loin",
+      "name": "Pass-smoked loin",
+      "kind": "consumable",
+      "food": true,
+      "heal": 520,
+      "quality": 1,
+      "level": 6,
+      "value": 8,
+      "stack": 20,
+      "description": "Boar loin rubbed with salt and tarnwort and hung in the smoke until it keeps. A meal for the high road.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "food.salt_flank",
+      "name": "Salt-baked hound flank",
+      "kind": "consumable",
+      "food": true,
+      "heal": 700,
+      "quality": 1,
+      "level": 9,
+      "value": 12,
+      "stack": 20,
+      "description": "Ash-hound flank packed in Rim salt and baked in the coals. Crack the crust and eat it hot.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "food.cinder_loaf",
+      "name": "Cinder-crust loaf",
+      "kind": "consumable",
+      "food": true,
+      "heal": 660,
+      "quality": 1,
+      "level": 9,
+      "value": 8,
+      "stack": 20,
+      "description": "A loaf baked straight on the charcoal, cinder-thistle in the dough. Black outside, sweet within.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "food.mossback_chop",
+      "name": "Dewfern-glazed mossback chop",
+      "kind": "consumable",
+      "food": true,
+      "heal": 820,
+      "quality": 1,
+      "level": 11,
+      "value": 18,
+      "stack": 20,
+      "description": "A thick mossback chop under a glaze of dewfern. Rich, green-smelling, and gone too quickly.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "food.venison_pie",
+      "name": "Shore venison pie",
+      "kind": "consumable",
+      "food": true,
+      "heal": 900,
+      "quality": 1,
+      "level": 12,
+      "value": 16,
+      "stack": 20,
+      "description": "Shore venison under a flour crust, the kind of pie that is baked for a homecoming.",
+      "canonStatus": "GAME-ONLY"
     },
     {
       "id": "potion.minor",
@@ -971,6 +1151,10 @@
           "item": "junk.wolf_fang",
           "chance": 0.35,
           "max": 2
+        },
+        {
+          "item": "mat.wolf_haunch",
+          "chance": 0.4
         }
       ]
     },
@@ -1133,6 +1317,10 @@
         {
           "item": "junk.ash_hide",
           "chance": 0.7
+        },
+        {
+          "item": "mat.hound_flank",
+          "chance": 0.45
         }
       ]
     },
@@ -1238,6 +1426,10 @@
         {
           "item": "junk.mossback_tusk",
           "chance": 0.35
+        },
+        {
+          "item": "mat.mossback_chop",
+          "chance": 0.5
         }
       ]
     },
@@ -1253,6 +1445,10 @@
         },
         {
           "item": "junk.dappled_hide",
+          "chance": 0.5
+        },
+        {
+          "item": "mat.venison",
           "chance": 0.5
         }
       ]

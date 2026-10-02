@@ -126,6 +126,7 @@ namespace Crulanda.Encounter
             if (session.Professions != null) { var t = CaptureTrades(directory, prefix); while (t.MoveNext()) yield return t.Current; }
             if (session.Items != null) { var b = CaptureBags(directory, prefix); while (b.MoveNext()) yield return b.Current; }
             if (session.Professions != null && zone != null) { var st = CaptureStation(directory, prefix, zone); while (st.MoveNext()) yield return st.Current; }
+            if (session.Professions != null && zone != null) { var ck = CaptureCooking(directory, prefix, zone); while (ck.MoveNext()) yield return ck.Current; }
             yield return new WaitForSeconds(1);
             Debug.Log("UI_CAPTURE_DONE"); Application.Quit(0);
         }
@@ -210,6 +211,33 @@ namespace Crulanda.Encounter
             if (oak != null) { int n = session.Professions.CanMake(oak); session.Make(oak, n); float until = Time.time + n * EncounterSession.CraftSeconds + 2; while (session.Working && Time.time < until) yield return null; }   // every log in the bags (the bags shot's nine too): wait for them all
             yield return new WaitForSeconds(.5f);
             ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "25-station-charcoal-made.png")); yield return new WaitForSeconds(.4f);
+            EncounterHud.TradesPage = null; EncounterHud.TradesRecipes = false; EncounterHud.TradesRecipe = null; session.ShowTrades(false); session.InventoryOpen = false;
+        }
+        /// <summary>
+        /// Cooking (trades step 10): at the zone's kitchen range (the Cask's kitchen in Oakhaven; else its first fire), nobody about,
+        /// boar meat, flour and eggs in the bags: E's prompt over the world, the Trades window at Cooking's recipes on Boar stew
+        /// (26-cooking-recipes), then the same after Make all, the stew in the bags (27-cooking-stew-made).
+        /// </summary>
+        IEnumerator CaptureCooking(string directory, string prefix, Crulanda.World.ZoneBuilder zone)
+        {
+            var st = zone.Stations.Find(x => x.kind == "fire" && zone.Workplaces.Exists(w => w.kind == "kitchen" && w.name == x.name)) ?? zone.Stations.Find(x => x.kind == "fire"); if (st == null) yield break;
+            var p = session.Progress; var motor = session.Player.GetComponent<AdventurerMotor>();
+            session.Conversation = null; session.QuestBookOpen = false; session.ShowTrades(false); session.CloseVendor(); session.InventoryOpen = false;
+            foreach (var e in session.Enemies) e.ResetFight();
+            foreach (var (item, count) in new[] { ("junk.boar_meat", 6), ("mat.flour", 2), ("food.fresh_eggs", 1) }) Inventory.Add(p, session.Items, item, count);
+            var stand = zone.Workplaces.Find(w => w.kind == "kitchen" && w.name == st.name) ?? zone.Workplaces.Find(w => w.name == st.name);
+            var at = stand != null ? stand.stand : st.position + Vector3.back * 1.2f;
+            motor.Teleport(at + Vector3.up * 1.1f);
+            if (VillageLife.Active != null) foreach (var v in VillageLife.Active.Villagers) if (Vector3.Distance(v.transform.position, at) < 10) v.Park();
+            session.SelectFriendly(null, false);
+            var face = st.position - at; face.y = 0; if (face.sqrMagnitude > .01f) motor.SetView(Quaternion.LookRotation(face).eulerAngles.y + 30, 20, 5);
+            yield return new WaitForSeconds(.8f);
+            session.WorkAtStation(st); EncounterHud.TradesRecipe = "recipe.boar_stew"; yield return new WaitForSeconds(.6f);
+            ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "26-cooking-recipes.png")); yield return new WaitForSeconds(.4f);
+            var stew = session.Professions.Db.Recipe("recipe.boar_stew");
+            if (stew != null) { int n = session.Professions.CanMake(stew); session.Make(stew, n); float until = Time.time + n * EncounterSession.CraftSeconds + 2; while (session.Working && Time.time < until) yield return null; }
+            yield return new WaitForSeconds(.5f);
+            ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "27-cooking-stew-made.png")); yield return new WaitForSeconds(.4f);
             EncounterHud.TradesPage = null; EncounterHud.TradesRecipes = false; EncounterHud.TradesRecipe = null; session.ShowTrades(false); session.InventoryOpen = false;
         }
         /// <summary>The quest interface: a giver's !, the offer, the quest book, the ledger in the Chronicle, a hand-in list, standing, the tracker.</summary>

@@ -74,6 +74,7 @@ namespace Crulanda.Encounter
         /// <summary>How alert it is: seconds of the player moving inside its notice distance (it bolts at WarySneaking or WaryWalking).</summary>
         public float Alertness { get { return alert; } }
         NavMeshAgent agent; State state; float until, alert, boltUntil; Vector3 lastPlayer = new Vector3(float.NaN, 0, 0);
+        NavMeshPath boltPath;   // made on the first bolt (a NavMeshPath cannot be made in a field initialiser)
 
         /// <summary>Gives a game animal (an EncounterEnemy made by EncounterSession.SpawnGame) its body and behaviour.</summary>
         public static GameAnimal Attach(EncounterEnemy enemy, string kind, Vector2 home, float radius, float look, float seed)
@@ -150,15 +151,21 @@ namespace Crulanda.Encounter
             var me = transform.position; var away = me - from; away.y = 0;
             away = away.sqrMagnitude > .01f ? away.normalized : transform.forward;
             float run = Kind == "deer" ? 12 + UnityEngine.Random.value * 6 : 8 + UnityEngine.Random.value * 4;
-            Vector3? to = null;
-            for (int tries = 0; tries < 8 && !to.HasValue; tries++)
-            {
-                var dir = Quaternion.Euler(0, (tries % 2 == 0 ? 1 : -1) * tries * 22, 0) * away;
-                to = PickPoint(new Vector2(me.x + dir.x * run, me.z + dir.z * run), 2.5f);
-            }
+            // Somewhere it can truly run to: a whole path there (not the far bank of a creek, not a ledge the navmesh does not join),
+            // found now and handed to the agent, so the bolt starts this frame. Away first, swinging wider each try; then half as
+            // far; only with no such ground at all does it stand and watch. (A rabbit by the Brook pond once stood and watched a
+            // walking player: its flight was given up, or ended the frame it began.)
+            Vector3? to = null; if (boltPath == null) boltPath = new NavMeshPath();
+            for (int pass = 0; pass < 2 && !to.HasValue; pass++)
+                for (int tries = 0; tries < 8 && !to.HasValue; tries++)
+                {
+                    var dir = Quaternion.Euler(0, (tries % 2 == 0 ? 1 : -1) * tries * 22, 0) * away; float far = pass == 0 ? run : run * .5f;
+                    var p = PickPoint(new Vector2(me.x + dir.x * far, me.z + dir.z * far), 2.5f);
+                    if (p.HasValue && NavMesh.CalculatePath(agent.nextPosition, p.Value, NavMesh.AllAreas, boltPath) && boltPath.status == NavMeshPathStatus.PathComplete) to = p;
+                }
             alert = 0;
-            if (!to.HasValue) { state = State.Wary; return; }   // nowhere to run: it stands its ground and watches
-            agent.isStopped = false; agent.SetDestination(to.Value); state = State.Bolt; boltUntil = Time.time + 6;
+            if (!to.HasValue || !agent.SetPath(boltPath)) { state = State.Wary; return; }   // nowhere to run: it stands its ground and watches
+            agent.isStopped = false; state = State.Bolt; boltUntil = Time.time + 6;
         }
         /// <summary>A dry point on the navmesh near <paramref name="around"/> (within <paramref name="range"/>), inside the zone, or null.</summary>
         Vector3? PickPoint(Vector2 around, float range)

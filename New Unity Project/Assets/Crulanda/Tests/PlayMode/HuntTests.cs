@@ -164,7 +164,22 @@ namespace Crulanda.Tests
             Assert.AreEqual(7, r.NoticeDistance(false), .01f); Assert.AreEqual(3.5f, r.NoticeDistance(true), .01f);
             yield return Approach(s, rabbit, rdir, 12, 6, 5.2f);
             float t = 0; while (!r.Bolting && t < 1.5f) { Put(s, rabbit, rdir, 6 - t); t += Time.deltaTime; yield return null; }
-            Assert.IsTrue(r.Bolting, "A walking player at 6 m sends a rabbit off within a second.");
+            var ra = rabbit.GetComponent<UnityEngine.AI.NavMeshAgent>();
+            string diag = "";
+            if (!r.Bolting)
+            {
+                var rp = rabbit.transform.position; UnityEngine.AI.NavMesh.FindClosestEdge(rp, out var edge, UnityEngine.AI.NavMesh.AllAreas);
+                diag = " DIAG hasPath " + ra.hasPath + " pending " + ra.pathPending + " status " + ra.pathStatus + " edge " + edge.distance.ToString("0.00") + " agentRadius " + ra.radius + " baseOffset " + ra.baseOffset + " water " + s.Zone.WaterAt(new Vector2(rp.x, rp.z), out _, out _);
+                for (int k = 0; k < 8; k++)
+                {
+                    var dir8 = Quaternion.Euler(0, k * 45, 0) * Vector3.forward; var q = new Vector2(rp.x + dir8.x * 10, rp.z + dir8.z * 10);
+                    bool wet = s.Zone.WaterAt(q, out _, out _); bool on = UnityEngine.AI.NavMesh.SamplePosition(s.Zone.Ground(q), out var h8, 2, UnityEngine.AI.NavMesh.AllAreas);
+                    var path = new UnityEngine.AI.NavMeshPath(); bool calc = on && UnityEngine.AI.NavMesh.CalculatePath(ra.nextPosition, h8.position, UnityEngine.AI.NavMesh.AllAreas, path);
+                    diag += " | " + (k * 45) + ": wet " + wet + " mesh " + on + " path " + (calc ? path.status.ToString() : "none");
+                }
+            }
+            Assert.IsTrue(r.Bolting, "A walking player at 6 m sends a rabbit off within a second (watching " + r.Watching + ", alert " + r.Alertness.ToString("0.00") + ", on the navmesh " + (ra != null && ra.isOnNavMesh)
+                + ", rabbit at " + rabbit.transform.position.ToString("0.0") + ", player " + Flat(s.Player.transform.position, rabbit.transform.position).ToString("0.0") + " m off at " + s.Player.transform.position.ToString("0.0") + ")." + diag);
             // A blow sends a calm animal off at once.
             var calm = s.Game.FirstOrDefault(g => g.actor.IsAlive && Animal(g).Kind == "rabbit" && g != rabbit && !Animal(g).Bolting && Flat(g.transform.position, s.Player.transform.position) > 20);
             Assert.NotNull(calm, "Another rabbit, far off and grazing.");

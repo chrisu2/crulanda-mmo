@@ -10,7 +10,7 @@ Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
 ## RESUME HERE (updated 2026-10-01, night)
-**PUBLISHED 2026-10-01 (nine publishes; the playable build is main at c9f6868):**
+**PUBLISHED 2026-10-01 (ten publishes; the playable build is main at 4fdc85b, published 23:10):**
 1. The Root-Mother's Deep, Crowsfoot's hidden mouth, every trade has a day (4c579e6).
 2. The painted style pass parts 1-4 (03fd06d) and 3. part 5, painted masonry (17168d8).
 4. The out of work drink at the inn; the visual review's first batch (ecc233b).
@@ -32,6 +32,13 @@ The user requested this handoff because they ran out of tokens. Do not assume an
    trades' herbs 1.3x, dewfern rebuilt (its fronds ran into the ground), vendor names in ink, Khaven's inn door fixed for the
    navmesh (its taproom was cut off). Tests: EditMode 310/312 (1 skipped; one wrong test fixed), PlayMode 133/135 (both
    failures fixed: a test bug and the Khaven door; their fixtures 6/6); five zones toured, then Khaven and Verdant again.
+10. **Trades steps 10 and 11 and loot L2 (round 5):** cooking (ten recipes at any fire, meats from the beasts), hunting (deer and
+   rabbits are game, never hens, sheep or cats; "Skin the body"; three new hides; Maud's other three bag quests; the skinner
+   sells salt), named loot live (the six loot files in Items, uniques by inventory, sets, vendor pieces; new characters start
+   with the Trailblade). Chris's save backed up first (`save-backups/20261001-2235-pre-loot`; it was still format 6 on disk).
+   Tests: EditMode 319/320 (1 skipped), PlayMode 150/151: `HuntTests.Game_bolts_and_sneaking_gets_closer` is INTERMITTENT (a
+   rabbit that should bolt stood and watched, at (25.9, -68.4) by the Brook pond; alert reset twice, so GameAnimal.Bolt gave up
+   or its path ended at once; passed alone and on a second fixture run). Published with that known. Oakhaven toured only.
 **Long runs go detached:** `tools\validation\start_detached.ps1 [-Arguments '-NoTests' | '-NoTour' | '-NoBuild' | '-Zones zone.khaven,zone.verdant']`
 runs `full_run.ps1` outside the tool's process tree; wait for `hel\work\full-run.done` (the log is mixed-encoding: read the result
 XMLs and logs directly). `-NoTour` builds and takes the HUD, wardrobe and loot shots but tours no zone; `-NoBuild` is tests only.
@@ -39,16 +46,24 @@ XMLs and logs directly). `-NoTour` builds and takes the HUD, wardrobe and loot s
 visible creature or villager looks keep them; tour just the zones a round touches when that is enough). Never edit the repo's
 Assets while a run is in flight (it mirrors Assets).
 
-**NEXT ROUND (round 5), MERGED ON BRANCH `round5`, NOT RUN IN UNITY:** trades step 10 (cooking: ten recipes, meats from the
-beasts, boar stew at the Cask), step 11 (hunting: deer and rabbits huntable, never hens, sheep or cats; three new hides; the
-other three bag quests; the skinner sells salt) and loot L2 (named loot live: the six loot files moved into Items, uniques by
-inventory, sets, vendor pieces, new characters start with the Trailblade). Integration worktree `scratchpad\wt\int5` (branch
-`round5`, built from main at c9f6868; conflicts resolved in ItemTests.cs (both tests kept) and DATA_SCHEMA.md (b11's hides row);
-`compile-int5.py` ALL OK). To finish: back up Chris's save (L2 is the first time `loot.*` ids can enter it), fast-forward main
-to round5, run the full check with tests and an Oakhaven tour (the deer and rabbits; `-Zones zone.oakhaven`), look at the HUD
-shots 26-27 (cooking) and the wardrobe, publish.
-**Still open:** the quality ladder's rare and epic glow on worn gear is faint; a tarnwort node on a 0.64 slope (the herb mesh
-does not follow the ground); TalkTarget has no wall check (Mira can be offered through the Golden Cask's end wall).
+**CHRIS'S PLAYTEST NOTES COME FIRST: `Docs/PLAYTEST_NOTES.md`** (he jots issues as he plays; log each there, fix them in the
+next rounds, tell him which build has the fix). Open on 2026-10-01 night: (1) the bandit camp is far too close to the village
+and he had asked for the zone to be expanded; (2) elites and the Bandit King are too easy for their loot; (3) mobs are not
+social (he pulls them one at a time).
+**BUILDING NOW, TWO WORKFLOW RUNS (`build-step-resume`):**
+- Run wf_58bb391f-c7f, the notes: `fix/n23-social-elites` (worktree `scratchpad\wt\n23`: social aggro by kind, elites and
+  bosses retuned with moves of their own, a balance table) and `fix/n1-oakhaven-grows` (`wt\n1`: Oakhaven grown to about
+  560 m, the whole of Crowsfoot Hollow moved 250-300 m out, the new ground dressed, every zone checked for camps within 120 m
+  of a village). n1 changes the world's look: full Oakhaven tour, and any other zone it touched.
+- Run wf_f6d5019e-818, round 6: `trades/b12-smithing-alchemy` (`wt\b12`: steps 12 and 13, the two-craft rule),
+  `loot/l3-armoury` (`wt\ll3`: SAVE FORMAT 9, back up Chris's save before merging) and `polish/p6-glow-talk-slopes`
+  (`wt\p6`: worn rare/epic glow, no talking through walls, herbs that follow the slope).
+When each reports: merge one at a time on an integration branch (round3/4/5 were done this way), compile, full detached check,
+look, publish. Merge the notes run first if both are ready.
+**To do by hand next (small):** harden `GameAnimal.Bolt` (pick a flee point with a COMPLETE path via NavMesh.CalculatePath and
+SetPath, try half the run and then any direction before standing its ground) and keep the diagnostics now in the rabbit test's
+failure message. Then step 14 (depth and tuning) and loot L4-L6 after round 6.
+**Still open:** nothing else beyond the two runs above (p6 covers the glow, the wall check and the slope).
 
 **THE PLANS (read the owner notes first; they are his words and decisions):**
 - Professions, gathering, households, purses, bags, hunting: `tools/wip/professions/OWNER_NOTES.md`, `DESIGN.md`, `ADDENDUM.md`,

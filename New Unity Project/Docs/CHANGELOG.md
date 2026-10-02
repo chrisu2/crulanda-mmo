@@ -794,3 +794,24 @@ A read-only review by five reviewers, each finding checked by a second who tried
   133/135 (both failures fixed; their fixtures 6/6 after); all five zones toured with a shot of every station, then Khaven and
   the Verdant Shore toured again after the door and dewfern fixes; the HUD shots 24-25 (recipes, charcoal made) and the loot
   shots 01-04 viewed.
+
+## 2026-10-01 — Cooking, hunting for hides, and named loot goes live (Chris: "blacksmith, alchemist, cook"; "this also means all animals are huntable for their leather"; "farm animals stay . not huntable"; "start building a database of loot")
+- **Cooking** (BUILD_PLAN step 10): everyone cooks, at any fire: E at the Golden Cask's hearth or kitchen range, the bakehouse
+  oven or a camp's cookfire reads "Cook at the fire". Ten recipes, from griddle bread and boar stew to venison pie, each better
+  than what a vendor sells at its level. Wolves, hounds, mossboars and stags now drop meat, boar meat is a cook's material
+  ("Sell junk" keeps it), and meat goes in the larder-scrip. Sell meat in the village and Hob and the drinkers talk about the
+  pot.
+- **Hunting** (step 11): deer and rabbits are game. They graze and wander, look up when you come near and bolt if you keep
+  coming; sneaking (Ctrl) gets you close; a hit sends them off, and a badly hurt one limps and can be run down. No experience
+  and no coin: E at the body reads "Skin the body" and gives its hide. Wolves, boar, hounds and stags give theirs the same way.
+  **Hens, sheep, cats and crows can never be targeted.** The village does not flee from a deer. Fen the skinner sells salt, and
+  Maud's other three bags can now be earned: the log-sling for three hill-deer hides, the larder-scrip for five coney skins,
+  the ore-poke for three boar hides.
+- **Named loot is live** (loot step L2): the 104 named pieces drop from their mobs, elites and bosses. Each boss gives one
+  piece of its list you do not hold yet; a unique you hold is never offered twice; set pieces count toward their bonus;
+  tooltips show Unique, the effects, the set and where it comes from; five merchants sell a named piece each; rare gear from
+  elites can come out epic. A new character starts with the Trailblade in hand (existing saves are untouched).
+- Tests: EditMode 319/320 (one skipped until crafted gear exists), PlayMode 150/151. The one failure,
+  `HuntTests.Game_bolts_and_sneaking_gets_closer`, is intermittent (it failed in the full run and once in its fixture, and passed
+  twice after): at some spots a rabbit that should bolt stands and watches instead. Published with that known; the fix follows.
+  Oakhaven toured only (Chris: skip the tours on rounds that don't change the world's look); the HUD shots 26-27 (cooking) viewed.

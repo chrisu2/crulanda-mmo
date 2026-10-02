@@ -22,7 +22,7 @@ namespace Crulanda.World
     /// - windfall: a tree snapped off by the wind: the splintered stump at the -X end stays; the trunk lying along +X on the
     ///   ground with its stub limbs (child "full") is what is cut. It turns (in 30 degree steps from its rotation) until it lies
     ///   clear of standing trunks, rocks, roads, water and buildings.
-    /// - herb: a herb patch (Herb, variants 3-5 the trades' herbs).
+    /// - herb: a herb patch (Herb, variants 3-5 the trades' herbs), leaning with a slope and sunk into it so nothing hangs over it.
     /// A node that stands in a trunk, a rock, a road, water, a building, a camp's spread or a cave's furnishings, by a secret or
     /// another node is moved clear (up to 3 m), with a warning when nothing near is clear. One under a cave (under) stands on its
     /// floor, its rock turned to the wall.
@@ -78,7 +78,7 @@ namespace Crulanda.World
                     case "ore": part = OreSeam(t, kind.variant, false, R, G); break;
                     case "ore_rich": part = OreSeam(t, kind.variant, true, R, G); break;
                     case "windfall": part = Windfall(t, kind.variant, R, G); break;
-                    case "herb": Herb(t, kind.variant); break;
+                    case "herb": Herb(t, kind.variant, (x, z) => { if (!under) return LandY(x, z); float y = t.position.y; Hollow.FloorSmoothUnder(new Vector2(x, z), ref y); return y; }); break;   // laid on the ground under it (a slope, a cave's floor)
                     default: Debug.LogWarning(Zone.id + ": node '" + n.node + "' has an unknown look '" + kind.look + "'."); DestroyImmediate(t.gameObject); continue;
                 }
                 placed.Add(t.position);

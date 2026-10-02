@@ -26,6 +26,7 @@ namespace Crulanda.Tests
     /// - each is where it belongs: a windfall at the edge of a wood (an oak windfall at a broadleaf wood's), a herb from the
     ///   nodes array in the open (in no wood and on no field; a herb prop worked as a node stands where the zone always had it,
     ///   and on no field), a seam near a crag or rock or on a ridge's rocky crown.
+    /// Every herb lies on the ground it grows from, nothing of it over a slope (EveryHerb_LiesOnTheGround).
     /// And every zone's stations (step 9; CheckStations): the kinds it should have, each walkable to within reach on its side of its
     /// walls (an inn's hearth from the taproom); its own (Oakhaven
     /// has none) built where the data puts them, clear of water, buildings, roads, nodes, secrets and trunks, with no colliders.
@@ -86,6 +87,54 @@ namespace Crulanda.Tests
                 if (s.Zone.Zone.id != id) { problems.Add(id + ": built " + s.Zone.Zone.id + " instead"); continue; }
                 Check(s, problems);
             }
+            Assert.IsEmpty(problems, string.Join("\n", problems));
+        }
+        /// <summary>
+        /// Every herb in every zone (the nodes' and the herb props', each a "Clump" under its root) follows the ground it grows from:
+        /// under every part of it (the corners and middle of the part's footprint) the plane the clump stands on is no more than 5 cm
+        /// above the ground, so nothing of it floats over a slope's downhill side (a Peaks tarnwort stands on a 0.64 slope); and at its
+        /// root and under the middle of every part that plane is no more than 6 cm under the ground, so its leaves are not buried. The
+        /// ground is the lower of the land and its drawn mesh, as the nodes' own. Herbs in a cave stand on its floor and are left out.
+        /// </summary>
+        [UnityTest, Timeout(600000)] public IEnumerator EveryHerb_LiesOnTheGround()
+        {
+            var first = UnityEngine.Object.FindFirstObjectByType<EncounterSession>();
+            var zones = first.Zone.AllZones().Select(z => z.id).ToList();
+            var problems = new List<string>(); int herbs = 0; float steepest = 0; string steepestAt = "";
+            foreach (var id in zones)
+            {
+                ZoneBuilder.RequestedZoneId = id;
+                yield return SceneManager.LoadSceneAsync("Oakhaven", LoadSceneMode.Single);
+                for (int f = 0; f < 4; f++) yield return null;
+                var zone = UnityEngine.Object.FindFirstObjectByType<EncounterSession>().Zone;
+                if (zone.Zone.id != id) { problems.Add(id + ": built " + zone.Zone.id + " instead"); continue; }
+                var ground = zone.GroundMesh != null ? zone.GroundMesh.GetComponent<Collider>() : null;
+                float Ground(float x, float z)
+                {
+                    float y = zone.HeightAt(x, z);
+                    return ground != null && ground.Raycast(new Ray(new Vector3(x, y + 50, z), Vector3.down), out var hit, 200) ? Mathf.Min(y, hit.point.y) : y;
+                }
+                int here = 0;
+                foreach (var clump in zone.GetComponentsInChildren<Transform>(true).Where(t => t.name == "Clump"))
+                {
+                    if (Hollow.InsideAny(clump.position + Vector3.up * .3f, 0)) continue;
+                    here++; herbs++;
+                    Vector3 o = clump.position, up = clump.up; float worst = float.MinValue, sunk = Ground(o.x, o.z) - o.y;
+                    float PlaneY(Vector2 c) { return o.y - (up.x * (c.x - o.x) + up.z * (c.y - o.z)) / up.y; }
+                    foreach (var r in clump.GetComponentsInChildren<Renderer>())
+                    {
+                        var b = r.bounds;
+                        foreach (var c in new[] { new Vector2(b.min.x, b.min.z), new Vector2(b.min.x, b.max.z), new Vector2(b.max.x, b.min.z), new Vector2(b.max.x, b.max.z), new Vector2(b.center.x, b.center.z) })
+                            worst = Mathf.Max(worst, PlaneY(c) - Ground(c.x, c.y));
+                        sunk = Mathf.Max(sunk, Ground(b.center.x, b.center.z) - PlaneY(new Vector2(b.center.x, b.center.z)));
+                    }
+                    if (worst > .05f) problems.Add(zone.Zone.displayName + ": the herb '" + clump.parent.name + "' at " + clump.parent.position + " stands " + (worst * 100).ToString("0") + " cm over the ground under its edge");
+                    if (sunk > .06f) problems.Add(zone.Zone.displayName + ": the herb '" + clump.parent.name + "' at " + clump.parent.position + " is sunk " + (sunk * 100).ToString("0") + " cm under the ground at its root or a part (its leaves are buried)");
+                    float lean = Vector3.Angle(Vector3.up, up); if (lean > steepest) { steepest = lean; steepestAt = zone.Zone.displayName + " '" + clump.parent.name + "'"; }
+                }
+                if (here < 10) problems.Add(zone.Zone.displayName + ": only " + here + " herbs found on the land");
+            }
+            TestContext.WriteLine(herbs + " herbs; the steepest leans " + steepest.ToString("0") + " degrees (" + steepestAt + ").");
             Assert.IsEmpty(problems, string.Join("\n", problems));
         }
         /// <summary>The nodes of the zone in play, each problem named with the zone.</summary>

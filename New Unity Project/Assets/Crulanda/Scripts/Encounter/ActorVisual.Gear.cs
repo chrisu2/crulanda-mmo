@@ -181,12 +181,15 @@ namespace Crulanda.Encounter
         }
 
         // ---------- parts and materials ----------
+        /// <summary>What a glowing accent (rare and epic, or a forced glow) is called, so it can be told from the piece's other parts.</summary>
+        public const string AccentName = "Gear accent";
         /// <summary>The materials one look builds with (shared, from GearMats), and the accents lit so far (for an epic's pulse).</summary>
         sealed class GearKit
         {
             public GearLook l; public Material metal, edge, dark, wood, leather, cloth, cloth2, trim, bone, glow, rust, plate, mail, fur;
             public readonly List<Renderer> lit = new List<Renderer>();
-            public Color Emission { get { return l.glow * Mathf.Max(1.2f, l.glowPower); } }
+            /// <summary>An accent's emission: the palette's glow made vivid (GearLooks.Gleam), times the quality's strength.</summary>
+            public Color Emission { get { return GearLooks.Gleam(l.glow) * Mathf.Max(1.2f, l.glowPower); } }
             /// <summary>Always-lit parts of a variant (a lantern's flame, buds, a seam): dimmer on poor gear.</summary>
             public Material Lit(float k) { return GearMats.Get(l.glow, .8f, 0, l.glow * k * (l.quality == 0 ? .6f : 1)); }
         }
@@ -201,7 +204,7 @@ namespace Crulanda.Encounter
             k.cloth = GearMats.Get(l.cloth, .1f); k.cloth2 = GearMats.Get(l.cloth2, .1f);
             k.trim = l.hasTrim ? GearMats.Get(l.trimColor, l.trimSmooth, l.trimMetal) : k.dark;
             k.bone = GearMats.Get(l.bone, .35f);
-            k.glow = GearMats.Get(l.glow, .8f, 0, k.Emission);
+            k.glow = GearMats.Get(GearLooks.Gleam(l.glow), .8f, 0, k.Emission);   // one material per palette and quality, shared by every accent of them
             k.rust = GearMats.Get(new Color(.36f, .2f, .11f), .08f);
             // Armour: polished plate, darker duller mail, matte fur.
             k.plate = GearMats.Get(Color.Lerp(l.metal, Color.white, .08f), .48f + .07f * q, .62f + .06f * q);
@@ -229,11 +232,11 @@ namespace Crulanda.Encounter
         /// <summary>A cube placement stretched between two points (a string, a bar), for GearMeshes.Many.</summary>
         static Matrix4x4 Stick(Vector3 a, Vector3 b, float w) { return Matrix4x4.TRS((a + b) / 2, Quaternion.FromToRotation(Vector3.up, b - a), new Vector3(w, (b - a).magnitude, w)); }
 
-        /// <summary>Accent n (1 at rare, 2 at epic, or 1 when the look asks for a glow): a glowing part, pulsing on epic gear.</summary>
+        /// <summary>Accent n (1 at rare, 2 at epic, or 1 when the look asks for a glow): a glowing part (named AccentName), pulsing on epic gear.</summary>
         static void Accent(GearKit k, int n, Transform root, Mesh mesh, Vector3 pos, Vector3 scale, Vector3? euler = null)
         {
             if (k.l.accents < n) return;
-            k.lit.Add(GPart(root, mesh, k.glow, pos, scale, euler).GetComponent<Renderer>());
+            var t = GPart(root, mesh, k.glow, pos, scale, euler); t.name = AccentName; k.lit.Add(t.GetComponent<Renderer>());
         }
         /// <summary>The uncommon-and-better extra part, in the trim.</summary>
         static void Extra(GearKit k, Transform root, Mesh mesh, Vector3 pos, Vector3 scale, Vector3? euler = null) { if (k.l.extra) GPart(root, mesh, k.trim, pos, scale, euler); }

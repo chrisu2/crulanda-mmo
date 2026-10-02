@@ -12,7 +12,7 @@ After all three enemies die, Repeat Trail starts a new patrol while retaining pr
 WASD movement; Space jump; hold right mouse to orbit; wheel zoom.
 Tab cycles living enemies within 25m; left click selects an enemy.
 The HUD shows the next automatic swing, a swing progress bar, or the out-of-range state. Auto-attacks swing every 2.6 seconds independently of ability cooldowns. 1 Strike (also starts auto-attacks); 2 Challenge (taunt); 3 Guard.
-E recruits/revives the healer or loots a nearby corpse: a camp body holding gear opens the loot window, where E takes all (what does not fit stays on the body). I opens inventory.
+E recruits/revives the healer or loots a nearby corpse: a camp body holding gear opens the loot window, where E takes all (what does not fit stays on the body). E talks only to someone within 3.5 m with nothing solid between (a wall blocks it; a counter, a table or a door's step does not: `EncounterSession.InTalkReach`). I opens inventory.
 F5 saves outside combat; F9 loads. Esc pauses. R recovers after death.
 
 ## Architecture

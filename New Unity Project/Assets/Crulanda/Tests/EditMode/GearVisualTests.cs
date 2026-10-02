@@ -12,7 +12,8 @@ namespace Crulanda.Tests
     /// while swimming is slung on the back; barbutes and hoods hide the hair, open helms do not; a full kit stays inside the part
     /// budget; every family and variant builds at every quality and level band and sits on the figure; arcs curve and rods are
     /// capped; a pendant hangs in front of a mantle and boots go under greaves; a session with no items keeps the class kit;
-    /// the Druid keeps her staff and hood until a piece replaces them; enemies' own weapons and Caddock's crown are untouched.
+    /// the Druid keeps her staff and hood until a piece replaces them; enemies' own weapons and Caddock's crown are untouched;
+    /// rare and epic pieces carry bright accents in a vivid colour (only epic ones pulse) and lesser ones none.
     /// Built in edit mode on bare figures (no scene, no save).
     /// </summary>
     public class GearVisualTests
@@ -179,6 +180,63 @@ namespace Crulanda.Tests
             v.ApplyGearIds(swapFeet, db, looks); Assert.AreSame(neck, v.GearRoot(EquipSlot.Neck), "New boots leave the pendant alone.");
             var swapChest = (string[])b.Clone(); swapChest[3] = GeneratedPiece(db, "chest", 11, 4, "Hauberk");
             v.ApplyGearIds(swapChest, db, looks); Assert.AreNotSame(neck, v.GearRoot(EquipSlot.Neck), "A hauberk lifts the pendant onto its collar.");
+        }
+
+        [Test] public void Rare_and_epic_accents_glow_in_colour_and_lesser_gear_stays_unlit()
+        {
+            // The quality ladder on the body: both generated kits (a blade, a shield and a lantern among them), poor to epic, worn
+            // twice. Rare and epic pieces carry accents lit well over the bloom's threshold in a vivid colour (a weapon or shield one
+            // at rare, two at epic), and only epic ones pulse; uncommon and lesser pieces have none, and nothing on them glows as bright.
+            // The second time round makes no new materials: every accent of one palette and quality shares one.
+            Assert.GreaterOrEqual(GearGlow.Low * GearLooks.EpicGlow, GearLooks.RareGlow - .001f, "At its dimmest an epic accent burns as bright as a rare one.");
+            // Through the post stack's ACES tone map (Post.shader) every palette's accent core keeps its colour at rare and at epic,
+            // not flattened to cream or ice with the colour only in the bloom's halo.
+            float Aces(float x) { return Mathf.Clamp01(x * (2.51f * x + .03f) / (x * (2.43f * x + .59f) + .14f)); }
+            foreach (var p in JsonUtility.FromJson<GearLookFile>(Resources.Load<TextAsset>("Gear/looks").text).palettes)
+                foreach (float k in new[] { GearLooks.RareGlow, GearLooks.EpicGlow })
+                {
+                    ColorUtility.TryParseHtmlString(p.glow, out var glow); var g = GearLooks.Gleam(glow) * k;
+                    float hi = Mathf.Max(Aces(g.r), Aces(g.g), Aces(g.b)), lo = Mathf.Min(Aces(g.r), Aces(g.g), Aces(g.b));
+                    Assert.Less(lo / hi, .7f, "The " + p.id + " accent at " + k + "x keeps its colour through the tone map.");
+                }
+            var db = new ItemDatabase(); var looks = Looks(); var v = Figure(); int mats = 0;
+            for (int round = 0; round < 2; round++)
+            {
+                if (round == 1) mats = GearMats.Count;
+                foreach (var pieces in new[] { Martial, Cloth })
+                    for (int q = 0; q <= 4; q++)
+                    {
+                        var ids = Kit(db, 13, q, pieces); v.ApplyGearIds(ids, db, looks);
+                        string what = pieces[7] + " kit at " + ItemDatabase.QualityNames[q];
+                        var accentMats = new HashSet<Material>(); var palettes = new HashSet<string>(); int accents = 0; float otherGlow = 0;
+                        foreach (EquipSlot s in System.Enum.GetValues(typeof(EquipSlot)))
+                        {
+                            int own = 0;
+                            foreach (var r in SlotParts(v, s))
+                            {
+                                var m = r.sharedMaterial; float e = m != null && m.IsKeywordEnabled("_EMISSION") ? m.GetColor("_EmissionColor").maxColorComponent : 0;
+                                if (r.name != ActorVisual.AccentName) { otherGlow = Mathf.Max(otherGlow, e); continue; }
+                                own++; accentMats.Add(m);
+                                Assert.GreaterOrEqual(e, (q >= 4 ? GearLooks.EpicGlow : GearLooks.RareGlow) - .05f, what + ": a " + s + " accent burns bright enough to bloom by day.");
+                                Color.RGBToHSV(m.GetColor("_EmissionColor"), out _, out float sat, out _);
+                                Assert.GreaterOrEqual(sat, .85f, what + ": a " + s + " accent glows in a colour, not white.");
+                            }
+                            accents += own; if (own > 0) palettes.Add(looks.Resolve(db.Get(ids[(int)s])).palette);
+                            var root = v.GearRoot(s); var pulse = root != null ? root.GetComponent<GearGlow>() : null;
+                            bool hand = s == EquipSlot.MainHand || s == EquipSlot.OffHand;
+                            if (q >= 3 && hand) Assert.GreaterOrEqual(own, q - 2, what + ": the " + s + " piece has " + (q - 2) + " glowing accents.");
+                            if (q == 4 && own > 0) { Assert.NotNull(pulse, what + ": the epic " + s + " piece pulses."); Assert.AreEqual(own, pulse.Accents, what + ": every accent of the " + s + " piece pulses."); }
+                            else Assert.IsNull(pulse, what + ": only epic accents pulse (" + s + ").");
+                        }
+                        if (q <= 2)
+                        {
+                            Assert.AreEqual(0, accents, what + ": no glowing accents below rare.");
+                            Assert.Less(otherGlow, 2, what + ": nothing (a lantern's flame, an ember seam) glows as bright as a rare accent.");
+                        }
+                        else Assert.LessOrEqual(accentMats.Count, palettes.Count, what + ": one accent material per palette, shared by every piece of it.");
+                    }
+            }
+            Assert.AreEqual(mats, GearMats.Count, "No new materials the second time round.");
         }
 
         [Test] public void Pendant_hangs_in_front_of_a_mantle_and_boots_go_under_greaves()

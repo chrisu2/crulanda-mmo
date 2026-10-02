@@ -25,3 +25,11 @@ $l = Start-Process $exe -PassThru -ArgumentList @('--crulanda-loot-capture', ('"
 $l | Wait-Process -Timeout 240
 Select-String -LiteralPath $llog -Pattern 'LOOT_CAPTURE_DONE|Exception|Loot capture' | Select-Object -First 5 | ForEach-Object Line
 Get-ChildItem $ld -Filter '*.png' | Select-Object -ExpandProperty Name
+# The fight shots (playtest notes 2 and 3): a pack pulled together, a shout and the camp coming, an elite's wound-up blow and its enrage.
+$ed = Join-Path $ui 'elite'
+New-Item -ItemType Directory -Force $ed | Out-Null
+$elog = Join-Path $ed 'elite.log'
+$e = Start-Process $exe -PassThru -ArgumentList @('--crulanda-elite-capture', ('"' + $ed + '"'), '--crulanda-zone', 'zone.oakhaven', '-screen-width', '1440', '-screen-height', '900', '-screen-fullscreen', '0', '-logFile', ('"' + $elog + '"'))
+$e | Wait-Process -Timeout 300
+Select-String -LiteralPath $elog -Pattern 'ELITE_CAPTURE_DONE|Exception|Elite capture' | Select-Object -First 5 | ForEach-Object Line
+Get-ChildItem $ed -Filter '*.png' | Select-Object -ExpandProperty Name

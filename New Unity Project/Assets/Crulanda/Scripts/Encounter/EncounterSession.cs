@@ -10,7 +10,7 @@ using EntityId = Crulanda.Core.EntityId;
 
 namespace Crulanda.Encounter
 {
-    public sealed class EncounterSession : MonoBehaviour, Crulanda.World.IZoneNodeKinds
+    public sealed partial class EncounterSession : MonoBehaviour, Crulanda.World.IZoneNodeKinds
     {
         public EncounterContent content;
         [NonSerialized] public string SaveDirectoryOverride;
@@ -173,28 +173,6 @@ namespace Crulanda.Encounter
             playerStats.SetEquipmentBonus(t.weaponDamage);
         }
         public string ItemName(string id) { var d = Items?.Get(id); return d != null ? d.name : id; }
-        /// <summary>Camp corpses: coins by level, the kind's drops and a chance of gear, straight into the bags.</summary>
-        void LootCamp(EncounterEnemy corpse)
-        {
-            corpse.Looted = true;
-            int coins = 1 + corpse.actor.Level * 2 + UnityEngine.Random.Range(0, corpse.actor.Level + 2);
-            if (corpse.Elite) coins *= 3;
-            Progress.gold += coins;
-            var found = new List<string>(); var lost = new List<string>();
-            if (Items != null)
-            {
-                string tag = corpse.persistentId.Split('.').Length > 1 ? corpse.persistentId.Split('.')[1] : "any";
-                foreach (var (item, count) in Items.RollLoot(tag, corpse.actor.Level, corpse.Elite, new System.Random(UnityEngine.Random.Range(0, int.MaxValue))))
-                {
-                    int left = Inventory.Add(Progress, Items, item, count);
-                    var d = Items.Get(item); string n = d != null ? d.name : item;
-                    if (left < count) found.Add(n + (count - left > 1 ? " x" + (count - left) : ""));
-                    if (left > 0) lost.Add(n);
-                }
-            }
-            Message("Looted " + coins + " gold" + (found.Count > 0 ? ", " + string.Join(", ", found) : "") + ".");
-            if (lost.Count > 0) Message("Your bags are full. Left behind: " + string.Join(", ", lost) + ".");
-        }
         public bool EquipFromBag(int bagIndex)
         {
             if (Items == null && Progress.bag[bagIndex].item != content.itemId) return false;
@@ -1197,7 +1175,8 @@ namespace Crulanda.Encounter
             if (EncounterInput.Press(KeyCode.Escape))
             {
                 // Esc closes open windows (conversation, quest book, map) before it pauses.
-                if (Conversation != null && !Paused) Conversation = null;
+                if (LootOpen && !Paused) CloseLoot();
+                else if (Conversation != null && !Paused) Conversation = null;
                 else if (VendorNpc != null && !Paused) CloseVendor();
                 else if (TradesOpen && !Paused) TradesOpen = false;
                 else if ((CharacterOpen || InventoryOpen) && !Paused) { CharacterOpen = false; InventoryOpen = false; }
@@ -1219,6 +1198,7 @@ namespace Crulanda.Encounter
             if (EncounterInput.Press(KeyCode.F10)) PrototypeLevelCap();
             if (Debug.isDebugBuild && EncounterInput.Press(KeyCode.F11)) { Crulanda.World.WorldClock.Advance(1); Message("Time skips ahead: " + Crulanda.World.WorldClock.Text + " (dev)."); }
             if (Debug.isDebugBuild && EncounterInput.Press(KeyCode.F8) && Crulanda.World.WorldWeather.Active != null) Message("Weather: " + Crulanda.World.WorldWeather.Active.CycleForced() + " (dev).");
+            TickLoot();
             if (!Player.IsAlive) { if (EncounterInput.Press(KeyCode.R)) Recover(); return; }
             TickQuests(); TickItems(); TickDiscoveries(); TickPlaces(); TickNodes(); TickWork();
             if (Zone != null && Player.GetComponent<CharacterController>().isGrounded && !Zone.WaterAt(new Vector2(Player.transform.position.x, Player.transform.position.z), out _, out _)) lastDry = Player.transform.position;
@@ -1357,7 +1337,7 @@ namespace Crulanda.Encounter
         public bool CompanionInReach { get { return Companion != null && Vector3.Distance(Player.transform.position, Companion.transform.position) < TalkRange; } }
         /// <summary>A body that still has something to take (camp mobs until looted; story enemies by their saved record).</summary>
         public bool CanLoot(EncounterEnemy e) { return e != null && !e.actor.IsAlive && (e.Camp ? !e.Looted : !Progress.FindEnemy(e.persistentId).looted); }
-        EncounterEnemy LootableCorpse { get { return Enemies.Find(e => CanLoot(e) && Distance(e) < 3.6f); } }
+        EncounterEnemy LootableCorpse { get { return Enemies.Find(e => CanLoot(e) && Distance(e) < 3.6f && (!e.Camp || CanTakeAny(e))); } }
         public Crulanda.World.ZoneDoor NearbyDoor
         {
             get
@@ -1378,6 +1358,7 @@ namespace Crulanda.Encounter
             get
             {
                 if (Player == null || !Player.IsAlive || Paused) return null;
+                if (LootOpen) return "Take all";
                 var exit = NearbyExit; if (exit != null) return exit.name;
                 if (LootableCorpse != null) return "Search the body";
                 var (villager, mira) = TalkTarget();
@@ -1402,11 +1383,12 @@ namespace Crulanda.Encounter
         public void Interact()
         {
             if (!Player.IsAlive || Paused) return;
+            if (LootOpen) { TakeAllLoot(); return; }
             var exit = NearbyExit; if (exit != null) { TravelTo(exit); return; }
             var corpse = LootableCorpse;
             if (corpse != null)
             {
-                if (corpse.Camp) { LootCamp(corpse); return; }
+                if (corpse.Camp) { OpenLoot(corpse); return; }
                 if (Progress.Loot(corpse.persistentId))
                 {
                     if (!Inventory.Has(Progress, content.itemId) && Items != null && Inventory.Add(Progress, Items, content.itemId, 1) == 0)
@@ -1470,6 +1452,7 @@ namespace Crulanda.Encounter
         public void EnemyDied(EncounterEnemy enemy)
         {
             if (restoring) return;
+            if (enemy.Camp) RollCorpse(enemy);   // the loot is decided as it dies, so the body can show it
             int before = Progress.Level;
             int xp = EncounterProgress.KillXp(enemy.actor.Level, Progress.Level, enemy.Elite);
             if (enemy.Camp) Progress.experience += xp;

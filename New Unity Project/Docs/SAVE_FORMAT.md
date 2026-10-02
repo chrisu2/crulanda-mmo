@@ -12,7 +12,7 @@ formatVersion: 1. payloadType: CrulandaEncounter. DTO: EncounterProgress.
 - x/y/z: player position; bounds and finite values validated at load.
 - recruited, relationship, gold.
 - inventory: item-ID list; equippedItem: item ID.
-- enemies: records of id, dead and looted; prevent duplicate rewards after reload.
+- enemies: records of id, dead and looted; prevent duplicate rewards after reload. Camp mobs are not saved, and neither is what lies on their bodies (loot step L1: drops are rolled when a mob dies and live on the body until it is emptied or respawns) or an open loot window.
 
 Combat saves are rejected. Automatic saves occur outside combat; load reconstructs actors and
 clears threat, casts, personal cooldowns, global cooldowns and temporary Guard state.

@@ -19,6 +19,10 @@ namespace Crulanda.Encounter
         public Vector2 CampCenter; public float CampRadius = 8;
         /// <summary>Camp corpses: searched already (story corpses record this in the save instead).</summary>
         public bool Looted;
+        /// <summary>Camp corpses: what lies on the body, rolled when it died (EncounterSession.RollCorpse); null while it lives. Not saved.</summary>
+        public System.Collections.Generic.List<LootDrop> Drops;
+        /// <summary>Camp corpses: the coins on the body, rolled with the drops.</summary>
+        public int Coins;
         float respawnAt;
         // ---------- ambush ----------
         /// <summary>Lies low in tall grass: no nameplate, no map dot, can't be targeted, until you come close.</summary>
@@ -182,6 +186,7 @@ namespace Crulanda.Encounter
             if (visual != null) { visual.localRotation = Quaternion.identity; visual.localPosition = Vector3.zero; }
             actor.Health.Revive(actor.Health.Pool.Max); actor.Health.ApplyHealing(actor.Health.Pool.Max);
             threat.Clear(); Victim = null; Looted = false; slowUntil = rootUntil = 0;
+            Drops = null; Coins = 0; LootBeacon.Clear(this);
             if (agent.isOnNavMesh) agent.isStopped = false;
             if (Ambusher) Hide();
         }

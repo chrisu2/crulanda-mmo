@@ -14,12 +14,15 @@ namespace Crulanda.Tests
     /// capped; a pendant hangs in front of a mantle and boots go under greaves; a session with no items keeps the class kit;
     /// the Druid keeps her staff and hood until a piece replaces them; enemies' own weapons and Caddock's crown are untouched;
     /// rare and epic pieces carry bright accents in a vivid colour (only epic ones pulse) and lesser ones none.
-    /// Built in edit mode on bare figures (no scene, no save).
+    /// Built in edit mode on bare figures (no scene, no save), on the smooth figure: the gear's own shapes and places are tested
+    /// here, on the skeleton they were made for; ModelFigureTests puts them on the models.
     /// </summary>
     public class GearVisualTests
     {
         readonly List<GameObject> made = new List<GameObject>();
-        [TearDown] public void TearDown() { foreach (var g in made) if (g != null) Object.DestroyImmediate(g); made.Clear(); }
+        bool models;
+        [SetUp] public void SmoothFigures() { models = ActorVisual.Models; ActorVisual.Models = false; }
+        [TearDown] public void TearDown() { foreach (var g in made) if (g != null) Object.DestroyImmediate(g); made.Clear(); ActorVisual.Models = models; }
 
         ActorVisual Figure(ActorLook look = ActorLook.Warrior, string name = "Gear test figure")
         {

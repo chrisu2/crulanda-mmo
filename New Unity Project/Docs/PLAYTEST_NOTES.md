@@ -261,6 +261,27 @@ neck, tapered limbs with elbows and knees, hands, boots; hair and face on the he
 separate renderers; C1b limb armour and held weapons skinned to the new joints, full bends for all; C2 rounder armour and
 cloth that moves (tabards, skirts, capes, robes, hair). Previewed first with mesh_view.py (tools/wip/characters/preview-v2.png).
 
+C1a and C1b were published 2026-10-02 16:58; Chris: "that still looks REALLY blocky". He then chose real models over code
+("Find real models", "Quaternius free", "need females also"), and asked that the armour be refit, not redone.
+**C3, real models (2026-10-02 evening):** the Quaternius kits (CC0, quaternius.com; tools/wip/characters/quaternius_import.py
+brings them into Resources/Characters):
+- **The kits:** Universal Base Characters for the heads, eyes, brows and hair, Modular Character Outfits - Fantasy (Peasant
+  and Ranger, men's and women's) for the clothes, and the Universal Animation Library's clips for the motion.
+- **ModelFigure:** builds each person from the outfit's skeleton, with the head cut at the collar, a hairstyle and a beard,
+  dyed shirt, breeches and hood, skin tones as tints, and men and women by name or trade.
+- **The frames (ActorVisual.Model.cs):** the old pivots ("Arm R" > "Forearm R" > "Hand R" and so on, plus head, chest and
+  hips frames) ride the model's bones, scaled to its proportions. Tools, weapons, slung kit and all the worn armour keep
+  their numbers and sit on the model; limb armour is slimmed to the model's limbs.
+- **Poses:** sitting, swimming, sneaking, talking, gathering and dying are the kit's clips; hammering, chopping, hoeing,
+  kneading, drinking, cowering and slumping put the old pose's arm angles on the model's arms.
+- **Gone on models:** the old flat-board aprons, tabards, capes and the ball hoods. A ball hood becomes the outfit's hood,
+  and Collectors and Wardens wear Concord white.
+- **Editor capture:** FigureCapture draws every look, trade, pose and an armour kit without a build
+  (hel/work/ui-captures/figures).
+
+The kits' paid tier ($20, Quaternius) adds knight, noble and wizard outfits; that is Chris's to buy. Still to come: the armour's
+own shapes (C2, rounder plate, cloth that moves), a carrying pose for loads.
+
 ## 13. More colour: high fantasy, not pale (2026-10-02) — FIXED (published 2026-10-02 15:33)
 > "more colors as well seems like all is muted pallets..need high fantasy not pale"
 

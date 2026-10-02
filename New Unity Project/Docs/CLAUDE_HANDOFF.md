@@ -784,3 +784,38 @@ resumed with `Workflow({scriptPath, resumeFromRunId})` (finished agents replay f
     count Renderers; tests: main hand parent "Forearm R", enemy "Body/Arm R/..." paths.
   - C2: rounder armour shells (square 3-4 on the smooth torso), cloth that moves (verlet bones: tabards, skirts, capes, robes,
     the long hair fall); C3: outfits (Dress) and class kits refitted; Pale and Keeper smooth.
+
+## UPDATE 2026-10-02 evening: note 12 C1a+C1b PUBLISHED (16:58); then REAL MODELS (C3), Chris AFK till ~22:30
+- C1b (limb armour and held gear skinned to the elbows and knees) published with C1a at 16:58; full check EditMode 378/378,
+  PlayMode 174/174. Chris: "that still looks REALLY blocky" -> chose real models: "Find real models", "Quaternius free",
+  "need females also"; armour to be REFIT, not redone. He granted download authority ("you have authority to download and
+  do what is need to make this a success"). Purchases stay his: Quaternius' $20 tier adds knight/noble/wizard outfits.
+- **The kits** (CC0): Universal Base Characters, Modular Character Outfits - Fantasy (Peasant, Ranger; m/f), Universal
+  Animation Library (UAL1_Standard, 43 clips). Zips in the session scratchpad; `tools/wip/characters/quaternius_import.py
+  <zip folder>` extracts into `Resources/Characters/{Bodies,Hair,Outfits,Animations,Textures}` (ORM -> MetalSmooth + Occlusion).
+  `Editor/CharacterImport.cs`: humanoid import, texture types, clip settings (loop the _Loop clips, root baked into the pose),
+  the kit materials (`Resources/Characters/Materials/*.mat`, so their shader variants ship), `Report()` (bones/meshes/clips to
+  CharacterReport.txt beside the validation project) and `Prepare()`.
+- **ModelFigure.cs**: the outfit's skeleton (male outfits use the slighter "Regular" skeleton; heads and necks match the
+  Superhero body exactly), the Superhero head cut at the collar (HeadOnly: triangles >= half weighted to Head/neck), its eyes
+  and brows, hair (male: SimpleParted/Buzzed/bald; female: Long/Buns/BuzzedFemale), beard, a hood (Ranger's, on any outfit),
+  tints (skin, hair, shirt, breeches, hood), turned 180 (the files face -Z). Motion: a PlayableGraph mixer (idle/walk/jog/
+  sprint by speed, sit, swim, sneak/crouch, talk, gather, death). Edit mode cannot run a graph on an Animator: `Sample` uses
+  AnimationClip.SampleAnimation.
+- **ActorVisual.Model.cs**: `ActorVisual.Models` (default on; off = the smooth figure). Frames rebuilt on the model's bones in
+  its bind pose and copied from them every LateUpdate: Arm/Forearm/Hand and Leg/Shin/Foot (-Y down the bone, +Z front,
+  scaled by limb length against .57 and .84), Head/Chest/Hips frames (old body space mapped onto the model's head, chest,
+  hips). Gear slot roots on the head/chest/hips frames (SlotParent), limb armour skinned as before but slimmed (ArmGirth .8,
+  LegGirth .72; SkinnedLimb cache keyed by joints and girth). Cover/Bare dye the model's cloth (or hands for gloves) and hide
+  its belts/bracers. Old kit on the body is remapped to the frames by height; flat boards (aprons, tabards, capes, shawls)
+  and skirt drums are left off, round head balls become the outfit's hood. Poses: PoseOf -> clip slot or old arm angles
+  (PoseArm onto the model's arms), back bends for stoop/slump, swim lift from the clip's head height, ambushers crouch,
+  the dead play Death01; the Body is only written for poses that lean/drop (elites' wind-up lean survives).
+  `Preview(pose, walk, t)` / `PreviewDead()` pose it in edit mode. Women by name list/trade (Female()).
+- **Editor/FigureCapture.cs** (`run_method.ps1 -Method Crulanda.EditorTools.FigureCapture.Run -Tag figures -Graphics`):
+  people, trades, poses, armour and faces to `hel\work\ui-captures\figures` in about a minute, no build.
+- `tools/validation/run_method.ps1` (new; `-Graphics` keeps the GPU). GPU skinning turned on (ProjectSettings, both copies).
+- Tests: GearVisualTests run on the smooth figure (Models off); new ModelFigureTests (5); focus run 21/21. GearBinderTests
+  accepts the chest frame. WorldLife's tankard hangs from `RightHandle` (rides the forearm).
+- **Metas**: robocopy /MIR deletes what Unity made in the validation copy; copy new .meta/.mat files back after each Unity run
+  (done for the kit, the materials, the scripts).

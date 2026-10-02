@@ -160,18 +160,28 @@ namespace Crulanda.Encounter
             var pivot = root.parent; var lower = arm ? (left ? foreL : foreR) : (left ? shinL : shinR); var end = arm ? (left ? handL : handR) : (left ? footL : footR);
             var go = new GameObject("Gear part"); go.transform.SetParent(root, false);
             var smr = go.AddComponent<SkinnedMeshRenderer>();
-            smr.sharedMesh = SkinnedLimb(mesh, arm, lower.localPosition, lower.localPosition + end.localPosition);
+            smr.sharedMesh = SkinnedLimb(mesh, arm, lower.localPosition, lower.localPosition + end.localPosition, model == null ? 1 : arm ? ArmGirth : LegGirth);
             smr.bones = new[] { pivot, lower, end }; smr.rootBone = pivot; smr.sharedMaterial = m; smr.quality = SkinQuality.Bone2;
             var b = mesh.bounds; b.Expand(.2f); smr.localBounds = b;
             return go.transform;
         }
-        static readonly Dictionary<(Mesh, bool), Mesh> skinnedLimbs = new Dictionary<(Mesh, bool), Mesh>();
-        /// <summary>A copy of a limb piece's mesh with bone weights (pivot, lower bone, foot) and bind poses for them; cached.</summary>
-        static Mesh SkinnedLimb(Mesh src, bool arm, Vector3 lowerAt, Vector3 endAt)
+        /// <summary>How much slimmer limb armour is on a model than on the old figure (whose arms and legs were thick capsules):
+        /// across the limb only, and on a leg not along the foot.</summary>
+        public const float ArmGirth = .8f, LegGirth = .72f;
+        static readonly Dictionary<(Mesh, bool, Vector3, Vector3, float), Mesh> skinnedLimbs = new Dictionary<(Mesh, bool, Vector3, Vector3, float), Mesh>();
+        /// <summary>A copy of a limb piece's mesh with bone weights (pivot, lower bone, foot) and bind poses for them, slimmed by
+        /// <paramref name="girth"/> round the limb's axis; cached per mesh, limb, joints and girth.</summary>
+        static Mesh SkinnedLimb(Mesh src, bool arm, Vector3 lowerAt, Vector3 endAt, float girth = 1)
         {
-            if (skinnedLimbs.TryGetValue((src, arm), out var m) && m != null) return m;
+            var key = (src, arm, lowerAt, endAt, girth);
+            if (skinnedLimbs.TryGetValue(key, out var m) && m != null) return m;
             m = Object.Instantiate(src); m.name = src.name + (arm ? " (arm, skinned)" : " (leg, skinned)");
             var v = m.vertices; var w = new BoneWeight[v.Length];
+            if (girth != 1)
+            {
+                for (int i = 0; i < v.Length; i++) { var p = v[i]; v[i] = new Vector3(p.x * girth, p.y, !arm && p.y < endAt.y ? p.z : p.z * girth); }
+                m.vertices = v; m.RecalculateBounds();
+            }
             for (int i = 0; i < v.Length; i++)
             {
                 float y = v[i].y;
@@ -180,7 +190,7 @@ namespace Crulanda.Encounter
                 w[i] = new BoneWeight { boneIndex0 = 0, weight0 = 1 - u, boneIndex1 = 1, weight1 = u };
             }
             m.boneWeights = w; m.bindposes = new[] { Matrix4x4.identity, Matrix4x4.Translate(-lowerAt), Matrix4x4.Translate(-endAt) };
-            skinnedLimbs[(src, arm)] = m; return m;
+            skinnedLimbs[key] = m; return m;
         }
         /// <summary>A slot's root on the body, or its root on an arm or leg (made the first time it is needed).</summary>
         Transform SlotRoot(int s, int at)
@@ -257,9 +267,24 @@ namespace Crulanda.Encounter
         void Cover(Renderer[] parts, Material m)
         {
             if (parts == null || m == null) return;
+            if (model != null)   // a model's cloth is dyed, its weave kept; its belts go under a chest piece, its bracers under gloves
+            {
+                foreach (var r in parts) model.Cover(r, m.color, parts == baseHands);
+                if (parts == baseChest) model.ShowExtras("Belt", false); else if (parts == baseHands) model.ShowExtras("Bracer", false);
+                return;
+            }
             foreach (var r in parts) if (r != null) { if (!bareMats.ContainsKey(r)) bareMats[r] = r.sharedMaterial; r.sharedMaterial = m; }
         }
-        void Bare(Renderer[] parts) { if (parts != null) foreach (var r in parts) if (r != null && bareMats.TryGetValue(r, out var m)) r.sharedMaterial = m; }
+        void Bare(Renderer[] parts)
+        {
+            if (model != null)
+            {
+                if (parts != null) foreach (var r in parts) model.Uncover(r, parts == baseHands);
+                if (parts == baseChest) model.ShowExtras("Belt", true); else if (parts == baseHands) model.ShowExtras("Bracer", true);
+                return;
+            }
+            if (parts != null) foreach (var r in parts) if (r != null && bareMats.TryGetValue(r, out var m)) r.sharedMaterial = m;
+        }
         void ShowHair(bool on) { if (hairParts != null) foreach (var h in hairParts) if (h != null) h.gameObject.SetActive(on); }
         /// <summary>Under a cap, a kettle hat or a head-wrap the long fall of hair stops under the brim and a bun sits just below it.</summary>
         void Tuck(bool on)

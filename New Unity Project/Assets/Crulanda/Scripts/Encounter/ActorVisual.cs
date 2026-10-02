@@ -49,7 +49,7 @@ namespace Crulanda.Encounter
             new Color(.54f, .27f, .1f), new Color(.42f, .22f, .43f), new Color(.7f, .62f, .45f) };
         static readonly Color[] Skins = { new Color(.8f, .64f, .52f), new Color(.68f, .52f, .4f), new Color(.52f, .38f, .28f), new Color(.86f, .72f, .6f) };
         /// <summary>Recolours the outfit's main cloth (e.g. Druid forms).</summary>
-        public void SetClothColor(Color c) { if (cloth != null) cloth.color = c; }
+        public void SetClothColor(Color c) { if (cloth != null) cloth.color = c; if (model != null) { model.Cover(model.Torso, c, false); model.Cover(model.Arms, c, false); } }
         /// <summary>The right arm's shoulder pivot (the hand is .62 down it): what a villager's tankard hangs from.</summary>
         public Transform RightArm { get { return armR; } }
         /// <summary>0 sober to 1 reeling: the body rolls and pitches with the stride (a drinker walking home).</summary>
@@ -439,13 +439,16 @@ namespace Crulanda.Encounter
             var legs = Mat(legC); var boots = Mat(new Color(.18f, .13f, .1f));
             if (look == ActorLook.Warden) body.localScale = new Vector3(1.08f, 1.12f, 1.08f);
 
-            if (Smooth) BuildSmooth(look, skin, legs, boots);
+            if (BuildModel(look, clothC, accentC, legC, skin.color)) { }   // a model (ActorVisual.Model.cs); its kit hangs on its frames
+            else if (Smooth) BuildSmooth(look, skin, legs, boots);
             else BuildBlock(look, skin, legs, boots);
+            bool modelled = model != null;   // a model shows its own clothes, hood, hair and beard: the old figure's stand-ins for them are left off
             switch (look)
             {
                 case ActorLook.Warrior:
                 {
-                    classKit = new[] { Part(PrimitiveType.Sphere, body, new Vector3(-.31f, .58f, 0), new Vector3(.26f, .18f, .26f), accent), Part(PrimitiveType.Sphere, body, new Vector3(.31f, .58f, 0), new Vector3(.26f, .18f, .26f), accent) };   // pads
+                    if (modelled) classKit = model.Extras.FindAll(r => r.name.Contains("Pauldron")).ConvertAll(r => r.transform).ToArray();   // the outfit's own pauldron
+                    else classKit = new[] { Part(PrimitiveType.Sphere, body, new Vector3(-.31f, .58f, 0), new Vector3(.26f, .18f, .26f), accent), Part(PrimitiveType.Sphere, body, new Vector3(.31f, .58f, 0), new Vector3(.26f, .18f, .26f), accent) };   // pads
                     var hilt = Mat(new Color(.4f, .3f, .15f)); var boards = Mat(new Color(.36f, .25f, .15f));
                     held = new[] {
                         Part(PrimitiveType.Cube, armR, new Vector3(0, -.66f, .38f), new Vector3(.05f, .06f, .9f), accent, new Vector3(20, 0, 0)),         // sword
@@ -461,8 +464,12 @@ namespace Crulanda.Encounter
                     break;
                 }
                 case ActorLook.Druid:
-                    classKit = new[] { Part(PrimitiveType.Sphere, body, new Vector3(0, .84f, -.03f), new Vector3(.36f, .38f, .38f), cloth) };   // hood
-                    druidCloak = Part(PrimitiveType.Cube, body, new Vector3(0, .2f, -.17f), new Vector3(.52f, .95f, .05f), accent, new Vector3(-6, 0, 0)); // cloak
+                    if (modelled) classKit = model.Hood != null ? new[] { model.Hood.transform } : new Transform[0];   // the outfit's hood
+                    else
+                    {
+                        classKit = new[] { Part(PrimitiveType.Sphere, body, new Vector3(0, .84f, -.03f), new Vector3(.36f, .38f, .38f), cloth) };   // hood
+                        druidCloak = Part(PrimitiveType.Cube, body, new Vector3(0, .2f, -.17f), new Vector3(.52f, .95f, .05f), accent, new Vector3(-6, 0, 0)); // cloak
+                    }
                 {
                     var staff = Mat(new Color(.35f, .25f, .15f)); var orb = Mat(new Color(.3f, .8f, .4f), .6f);
                     held = new[] { Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.45f, .08f), new Vector3(.06f, .85f, .06f), staff, new Vector3(8, 0, 0)),   // staff
@@ -472,8 +479,8 @@ namespace Crulanda.Encounter
                 }
                     break;
                 case ActorLook.Healer:
-                    Part(PrimitiveType.Cylinder, body, new Vector3(0, -.5f, 0), new Vector3(.52f, .45f, .44f), cloth);                  // robe skirt
-                    Part(PrimitiveType.Sphere, body, new Vector3(0, .84f, -.03f), new Vector3(.35f, .37f, .37f), accent);                 // hood
+                    if (!modelled) Part(PrimitiveType.Cylinder, body, new Vector3(0, -.5f, 0), new Vector3(.52f, .45f, .44f), cloth);                  // robe skirt
+                    if (!modelled) Part(PrimitiveType.Sphere, body, new Vector3(0, .84f, -.03f), new Vector3(.35f, .37f, .37f), accent);                 // hood
                     Part(PrimitiveType.Cube, body, new Vector3(0, .3f, .15f), new Vector3(.12f, .55f, .02f), accent);                     // stole
                     break;
                 case ActorLook.Collector:
@@ -488,7 +495,7 @@ namespace Crulanda.Encounter
                     break;
                 case ActorLook.Outrider:
                     // Sandthrone mercenary: sand-coloured wraps, a head scarf and a bearded axe.
-                    Part(PrimitiveType.Sphere, body, new Vector3(0, .84f, 0), new Vector3(.34f, .26f, .34f), cloth);
+                    if (!modelled) Part(PrimitiveType.Sphere, body, new Vector3(0, .84f, 0), new Vector3(.34f, .26f, .34f), cloth);
                     Part(PrimitiveType.Cube, body, new Vector3(0, .1f, 0), new Vector3(.54f, .45f, .33f), accent);
                     Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.5f, .2f), new Vector3(.05f, .5f, .05f), Mat(new Color(.3f, .22f, .14f)), new Vector3(60, 0, 0));
                     Part(PrimitiveType.Cube, armR, new Vector3(0, -.45f, .55f), new Vector3(.04f, .34f, .26f), Mat(new Color(.55f, .56f, .58f), .5f, .5f), new Vector3(60, 0, 0));
@@ -500,7 +507,7 @@ namespace Crulanda.Encounter
                     // Plain folk: an apron or a hat or a headscarf, chosen by variant; children are smaller.
                     if (variant % 3 == 0) Part(PrimitiveType.Cube, body, new Vector3(0, -.05f, .15f), new Vector3(.4f, .6f, .02f), Mat(new Color(.78f, .74f, .64f)));
                     if (variant % 4 == 1) { Part(PrimitiveType.Cylinder, body, new Vector3(0, .95f, 0), new Vector3(.46f, .02f, .46f), Mat(new Color(.62f, .52f, .3f))); Part(PrimitiveType.Cylinder, body, new Vector3(0, 1.0f, 0), new Vector3(.26f, .07f, .26f), Mat(new Color(.62f, .52f, .3f))); }
-                    if (variant % 4 == 2) Part(PrimitiveType.Sphere, body, new Vector3(0, .84f, -.02f), new Vector3(.33f, .3f, .34f), accent);
+                    if (variant % 4 == 2 && !modelled) Part(PrimitiveType.Sphere, body, new Vector3(0, .84f, -.02f), new Vector3(.33f, .3f, .34f), accent);   // (a model wears the hood)
                     if (child) body.localScale = new Vector3(.68f, .66f, .68f);
                     break;
                 case ActorLook.Hollow:
@@ -512,8 +519,8 @@ namespace Crulanda.Encounter
                     break;
                 case ActorLook.Cultist:
                     // Cult of Ash (CANON cult, book1 series bible): bone mask, purple tear, soot-black robes. GAME-ONLY styling.
-                    Part(PrimitiveType.Cylinder, body, new Vector3(0, -.5f, 0), new Vector3(.54f, .45f, .46f), cloth);
-                    Part(PrimitiveType.Sphere, body, new Vector3(0, .85f, -.04f), new Vector3(.37f, .39f, .39f), cloth);
+                    if (!modelled) Part(PrimitiveType.Cylinder, body, new Vector3(0, -.5f, 0), new Vector3(.54f, .45f, .46f), cloth);
+                    if (!modelled) Part(PrimitiveType.Sphere, body, new Vector3(0, .85f, -.04f), new Vector3(.37f, .39f, .39f), cloth);
                     Part(PrimitiveType.Sphere, body, new Vector3(0, .8f, .1f), new Vector3(.26f, .3f, .14f), accent);                         // bone mask
                     var tear = Mat(new Color(.55f, .2f, .8f), .8f); tear.EnableKeyword("_EMISSION"); tear.SetColor("_EmissionColor", new Color(.5f, .15f, .8f) * 1.8f);
                     Part(PrimitiveType.Cube, body, new Vector3(.06f, .74f, .17f), new Vector3(.03f, .1f, .01f), tear);
@@ -523,6 +530,7 @@ namespace Crulanda.Encounter
                 case ActorLook.Deserter: BuildDeserter(); break;
                 case ActorLook.BanditKing: BuildBanditKing(); break;
             }
+            if (modelled) Remap();
             if (stowed != null) foreach (var g in stowed) g.gameObject.SetActive(false);   // shown only while swimming
             lastPosition = transform.position;
         }
@@ -700,8 +708,13 @@ namespace Crulanda.Encounter
             var iron = M(.32f, .32f, .34f, .55f, .7f); var wood = M(.42f, .3f, .18f); var leather = M(.46f, .24f, .11f);
             void Apron(Material m, float length, float width = .42f) { Part(PrimitiveType.Cube, body, new Vector3(0, .42f - length / 2, .16f), new Vector3(width, length, .03f), m); }
             void Brim(Material m, float width, float crown, float crownH) { Part(PrimitiveType.Cylinder, body, new Vector3(0, .94f, 0), new Vector3(width, .015f, width), m); Part(PrimitiveType.Cylinder, body, new Vector3(0, .94f + crownH, 0), new Vector3(crown, crownH, crown), m); }
-            void Beard(Color c, float size) { Part(PrimitiveType.Cube, body, new Vector3(0, .68f - size * .2f, .12f), new Vector3(.22f, .12f + size * .2f, .08f), Mat(c)); }
-            void Skirt(Material m) { Part(PrimitiveType.Cylinder, body, new Vector3(0, -.45f, 0), new Vector3(.5f, .42f, .42f), m); }
+            // On a model the beard, the hoods and the hair are the kit's (TradeSpec), and skirts, bare forearms and boxy jerkins,
+            // waistcoats and robes are left off: its own clothes show.
+            bool modelled = model != null;
+            void Beard(Color c, float size) { if (!modelled) Part(PrimitiveType.Cube, body, new Vector3(0, .68f - size * .2f, .12f), new Vector3(.22f, .12f + size * .2f, .08f), Mat(c)); }
+            void Skirt(Material m) { if (!modelled) Part(PrimitiveType.Cylinder, body, new Vector3(0, -.45f, 0), new Vector3(.5f, .42f, .42f), m); }
+            void Bare(Transform arm) { if (!modelled) Part(PrimitiveType.Capsule, arm, new Vector3(0, -.47f, 0), new Vector3(.15f, .15f, .15f), skin); }
+            Transform Hood(Material m, Vector3 pos, Vector3 scale) { return modelled ? null : Part(PrimitiveType.Sphere, body, pos, scale, m); }
             // A tool held in the right hand, pointing forward like a carried hammer or axe (it swings with the arm).
             void HandTool(Material handle, float length, Material head, Vector3 headScale, float headAt = 1)
             {
@@ -714,7 +727,7 @@ namespace Crulanda.Encounter
                     // Broad, soot-dark shirt with bare forearms, a long leather apron, a skullcap, and a hammer.
                     cloth.color = new Color(.24f, .22f, .22f); legs.color = new Color(.2f, .17f, .15f);
                     body.localScale = new Vector3(1.14f, 1.02f, 1.1f);
-                    foreach (var arm in new[] { armL, armR }) Part(PrimitiveType.Capsule, arm, new Vector3(0, -.47f, 0), new Vector3(.15f, .15f, .15f), skin);
+                    foreach (var arm in new[] { armL, armR }) Bare(arm);
                     Apron(leather, 1.02f, .46f);
                     Part(PrimitiveType.Cube, body, new Vector3(0, .5f, .16f), new Vector3(.03f, .2f, .02f), leather);       // apron strap
                     Part(PrimitiveType.Sphere, body, new Vector3(0, .87f, -.01f), new Vector3(.31f, .2f, .31f), M(.7f, .13f, .09f)); // skullcap
@@ -724,10 +737,10 @@ namespace Crulanda.Encounter
                 case "merchant":
                     // Plump, in a long burgundy coat with gold buttons, a feathered wide hat and a coin purse.
                     cloth.color = new Color(.5f, .05f, .12f); legs.color = new Color(.16f, .12f, .2f);
-                    Part(PrimitiveType.Sphere, body, new Vector3(0, .26f, .06f), new Vector3(.5f, .5f, .38f), cloth);           // belly
-                    Part(PrimitiveType.Cylinder, body, new Vector3(0, -.34f, 0), new Vector3(.52f, .3f, .38f), cloth);           // coat skirts
+                    if (!modelled) Part(PrimitiveType.Sphere, body, new Vector3(0, .26f, .06f), new Vector3(.5f, .5f, .38f), cloth);           // belly
+                    if (!modelled) Part(PrimitiveType.Cylinder, body, new Vector3(0, -.34f, 0), new Vector3(.52f, .3f, .38f), cloth);           // coat skirts
                     var gold = M(.98f, .76f, .22f, .7f, .8f);
-                    for (int i = 0; i < 4; i++) Part(PrimitiveType.Sphere, body, new Vector3(0, .42f - i * .14f, .25f - Mathf.Abs(i - 1.5f) * .02f), Vector3.one * .05f, gold);
+                    if (!modelled) for (int i = 0; i < 4; i++) Part(PrimitiveType.Sphere, body, new Vector3(0, .42f - i * .14f, .25f - Mathf.Abs(i - 1.5f) * .02f), Vector3.one * .05f, gold);
                     Part(PrimitiveType.Cube, body, new Vector3(0, .6f, .12f), new Vector3(.3f, .08f, .08f), M(.95f, .93f, .86f)); // collar
                     var hatM = M(.12f, .1f, .14f); Brim(hatM, .56f, .28f, .09f);
                     Part(PrimitiveType.Cube, body, new Vector3(.14f, 1.12f, -.08f), new Vector3(.03f, .3f, .06f), M(.1f, .62f, .4f), new Vector3(-30, 0, -25)); // feather
@@ -746,7 +759,7 @@ namespace Crulanda.Encounter
                     // Long skirt, a shawl and a red kerchief; a feed pouch on the apron.
                     cloth.color = new Color(.58f, .24f, .2f); Skirt(M(.17f, .29f, .54f));
                     Apron(M(.9f, .86f, .74f), .8f, .36f);
-                    Part(PrimitiveType.Sphere, body, new Vector3(0, .86f, -.02f), new Vector3(.33f, .28f, .34f), M(.82f, .14f, .1f));   // kerchief
+                    Hood(M(.82f, .14f, .1f), new Vector3(0, .86f, -.02f), new Vector3(.33f, .28f, .34f));   // kerchief
                     Part(PrimitiveType.Cube, body, new Vector3(0, .54f, -.01f), new Vector3(.56f, .16f, .34f), M(.8f, .6f, .2f));     // shawl
                     Part(PrimitiveType.Cube, body, new Vector3(.1f, -.1f, .19f), new Vector3(.16f, .14f, .05f), M(.72f, .62f, .44f)); // feed pouch
                     break;
@@ -763,8 +776,8 @@ namespace Crulanda.Encounter
                 case "hunter":
                     // Green hood and cape, leather jerkin, bow and quiver on the back.
                     cloth.color = new Color(.18f, .42f, .17f); legs.color = new Color(.36f, .24f, .13f);
-                    Part(PrimitiveType.Sphere, body, new Vector3(0, .85f, -.03f), new Vector3(.36f, .37f, .38f), M(.12f, .36f, .15f));  // hood
-                    Part(PrimitiveType.Cube, body, new Vector3(0, .32f, .01f), new Vector3(.5f, .44f, .31f), leather);                 // jerkin
+                    Hood(M(.12f, .36f, .15f), new Vector3(0, .85f, -.03f), new Vector3(.36f, .37f, .38f));  // hood
+                    if (!modelled) Part(PrimitiveType.Cube, body, new Vector3(0, .32f, .01f), new Vector3(.5f, .44f, .31f), leather);                 // jerkin
                     Part(PrimitiveType.Cube, body, new Vector3(0, .25f, -.17f), new Vector3(.5f, .8f, .03f), M(.12f, .36f, .15f), new Vector3(-6, 0, 0)); // cape
                     Part(PrimitiveType.Cylinder, body, new Vector3(.14f, .45f, -.22f), new Vector3(.13f, .24f, .13f), leather, new Vector3(0, 0, -18)); // quiver
                     for (int i = 0; i < 3; i++) Part(PrimitiveType.Cube, body, new Vector3(.2f + i * .03f, .72f, -.22f), new Vector3(.03f, .06f, .03f), M(.82f, .18f, .12f), new Vector3(0, 0, -18));
@@ -797,8 +810,8 @@ namespace Crulanda.Encounter
                     cloth.color = new Color(.64f, .1f, .08f); legs.color = new Color(.18f, .26f, .46f);
                     body.localScale = new Vector3(1.1f, 1.04f, 1.08f);
                     var check = M(.1f, .06f, .06f);
-                    foreach (float y in new[] { .15f, .42f }) foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, body, new Vector3(0, y, s * .147f), new Vector3(.49f, .05f, .005f), check);
-                    foreach (float x in new[] { -.12f, .12f }) foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, body, new Vector3(x, .3f, s * .148f), new Vector3(.04f, .6f, .005f), check);
+                    if (!modelled) foreach (float y in new[] { .15f, .42f }) foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, body, new Vector3(0, y, s * .147f), new Vector3(.49f, .05f, .005f), check);
+                    if (!modelled) foreach (float x in new[] { -.12f, .12f }) foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, body, new Vector3(x, .3f, s * .148f), new Vector3(.04f, .6f, .005f), check);
                     Part(PrimitiveType.Sphere, body, new Vector3(0, .9f, 0), new Vector3(.32f, .26f, .32f), M(.16f, .38f, .2f));        // knit cap
                     Part(PrimitiveType.Cylinder, body, new Vector3(0, .84f, 0), new Vector3(.33f, .04f, .33f), M(.13f, .32f, .17f));
                     Beard(new Color(.42f, .24f, .12f), 1);
@@ -807,7 +820,7 @@ namespace Crulanda.Encounter
                 case "herbalist":
                     // Sage robe with a moss shawl and hood, a herb satchel with sprigs, and a small sickle.
                     cloth.color = new Color(.3f, .52f, .26f); Skirt(M(.2f, .42f, .22f));
-                    Part(PrimitiveType.Sphere, body, new Vector3(0, .85f, -.03f), new Vector3(.35f, .36f, .37f), M(.16f, .42f, .2f));    // hood
+                    Hood(M(.16f, .42f, .2f), new Vector3(0, .85f, -.03f), new Vector3(.35f, .36f, .37f));    // hood
                     Part(PrimitiveType.Cube, body, new Vector3(0, .54f, -.01f), new Vector3(.56f, .16f, .34f), M(.16f, .42f, .2f));      // shawl
                     Part(PrimitiveType.Cube, body, new Vector3(-.3f, -.02f, .02f), new Vector3(.12f, .22f, .26f), M(.55f, .48f, .32f)); // satchel
                     for (int i = 0; i < 4; i++) Part(PrimitiveType.Cube, body, new Vector3(-.3f, .14f, -.06f + i * .05f), new Vector3(.02f, .14f, .02f), M(.3f, .7f, .22f), new Vector3(i * 8 - 12, 0, 0));
@@ -825,7 +838,7 @@ namespace Crulanda.Encounter
                 case "elder":
                     // Grey hair, a shawl, a walking stick and a slight stoop.
                     cloth.color = new Color(.4f, .22f, .48f);
-                    Part(PrimitiveType.Sphere, body, new Vector3(0, .84f, -.03f), new Vector3(.31f, .3f, .32f), M(.78f, .78f, .76f));   // grey hair
+                    Hood(M(.78f, .78f, .76f), new Vector3(0, .84f, -.03f), new Vector3(.31f, .3f, .32f));   // grey hair
                     Part(PrimitiveType.Cube, body, new Vector3(0, .54f, -.01f), new Vector3(.56f, .16f, .34f), M(.66f, .38f, .18f));     // shawl
                     Beard(new Color(.8f, .8f, .78f), .8f);
                     Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.95f, .08f), new Vector3(.03f, .36f, .03f), wood);
@@ -835,8 +848,8 @@ namespace Crulanda.Encounter
                     // A Salt-Mender contact: charcoal cloak and deep hood hiding the face, a salt pouch at the belt.
                     cloth.color = new Color(.2f, .2f, .22f); legs.color = new Color(.16f, .15f, .15f);
                     var cloak = M(.17f, .17f, .19f);
-                    Part(PrimitiveType.Sphere, body, new Vector3(0, .85f, -.02f), new Vector3(.38f, .4f, .4f), cloak);                 // hood
-                    Part(PrimitiveType.Cube, body, new Vector3(0, .8f, .13f), new Vector3(.22f, .24f, .06f), M(.04f, .04f, .05f));     // shadowed face
+                    Hood(cloak, new Vector3(0, .85f, -.02f), new Vector3(.38f, .4f, .4f));                 // hood
+                    if (!modelled) Part(PrimitiveType.Cube, body, new Vector3(0, .8f, .13f), new Vector3(.22f, .24f, .06f), M(.04f, .04f, .05f));     // shadowed face
                     Part(PrimitiveType.Cube, body, new Vector3(0, .1f, -.17f), new Vector3(.56f, 1.15f, .05f), cloak, new Vector3(-5, 0, 0));
                     foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, body, new Vector3(s * .27f, .15f, 0), new Vector3(.05f, 1.05f, .3f), cloak);
                     Part(PrimitiveType.Sphere, body, new Vector3(.22f, -.02f, .14f), new Vector3(.12f, .13f, .1f), M(.92f, .92f, .9f)); // salt pouch
@@ -845,9 +858,9 @@ namespace Crulanda.Encounter
                     // A Silent Pilgrim (CANON look, book3 ch.5): layered linen robes in ochre and sand, a polished silver mask over mouth and
                     // nose, and a long brass listening-tube in the hand.
                     cloth.color = new Color(.86f, .58f, .16f); legs.color = new Color(.7f, .56f, .34f);
-                    Part(PrimitiveType.Cube, body, new Vector3(0, .12f, 0), new Vector3(.52f, .9f, .34f), M(.9f, .76f, .44f));                 // the outer robe, layered
-                    Part(PrimitiveType.Cube, body, new Vector3(0, -.2f, 0), new Vector3(.56f, .5f, .38f), M(.76f, .44f, .12f));
-                    Part(PrimitiveType.Sphere, body, new Vector3(0, .86f, -.02f), new Vector3(.34f, .3f, .34f), M(.84f, .62f, .24f));              // a linen head-wrap
+                    if (!modelled) Part(PrimitiveType.Cube, body, new Vector3(0, .12f, 0), new Vector3(.52f, .9f, .34f), M(.9f, .76f, .44f));                 // the outer robe, layered
+                    if (!modelled) Part(PrimitiveType.Cube, body, new Vector3(0, -.2f, 0), new Vector3(.56f, .5f, .38f), M(.76f, .44f, .12f));
+                    Hood(M(.84f, .62f, .24f), new Vector3(0, .86f, -.02f), new Vector3(.34f, .3f, .34f));              // a linen head-wrap
                     Part(PrimitiveType.Cube, body, new Vector3(0, .77f, .14f), new Vector3(.17f, .1f, .05f), M(.85f, .86f, .9f, .9f, .8f));       // the silver mask
                     Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.62f, .1f), new Vector3(.035f, .42f, .035f), M(.9f, .62f, .2f, .7f, .7f), new Vector3(70, 0, 0));   // the listening-tube
                     Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.62f + .4f * Mathf.Cos(70 * Mathf.Deg2Rad), .1f + .4f * Mathf.Sin(70 * Mathf.Deg2Rad)), new Vector3(.08f, .04f, .08f), M(.9f, .62f, .2f, .7f, .7f), new Vector3(70, 0, 0));   // its bell
@@ -859,15 +872,15 @@ namespace Crulanda.Encounter
                     for (int i = 0; i < 5; i++) Part(PrimitiveType.Cube, body, new Vector3(0, .05f + i * .13f, 0), new Vector3(.5f, .05f, .31f), vine, new Vector3(0, 0, i % 2 == 0 ? 12 : -12));
                     foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Sphere, body, new Vector3(s * .31f, .58f, 0), new Vector3(.24f, .16f, .24f), bark);
                     for (int i = 0; i < 6; i++) Part(PrimitiveType.Sphere, body, new Vector3(Mathf.Sin(i) * .24f, .1f + i * .1f, .16f), Vector3.one * .06f, M(.4f, .74f, .2f)); // leaves
-                    Part(PrimitiveType.Sphere, body, new Vector3(0, .86f, -.02f), new Vector3(.34f, .3f, .35f), M(.16f, .38f, .14f));   // hood
+                    Hood(M(.16f, .38f, .14f), new Vector3(0, .86f, -.02f), new Vector3(.34f, .3f, .35f));   // hood
                     Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.4f, .08f), new Vector3(.06f, .95f, .06f), M(.24f, .24f, .22f, .4f, .3f)); // iron-wood staff
                     Part(PrimitiveType.Sphere, armR, new Vector3(0, .55f, .08f), new Vector3(.14f, .1f, .14f), vine);
                     break;
                 case "innkeeper":
                     // Shirt-sleeves rolled to the elbow, a brown waistcoat, a long white apron, a red cloth over the shoulder and keys at the belt.
                     cloth.color = new Color(.9f, .86f, .74f); legs.color = new Color(.26f, .2f, .17f);
-                    foreach (var arm in new[] { armL, armR }) Part(PrimitiveType.Capsule, arm, new Vector3(0, -.47f, 0), new Vector3(.15f, .15f, .15f), skin);
-                    Part(PrimitiveType.Cube, body, new Vector3(0, .36f, 0), new Vector3(.5f, .46f, .31f), M(.13f, .38f, .24f));                 // waistcoat
+                    foreach (var arm in new[] { armL, armR }) Bare(arm);
+                    if (!modelled) Part(PrimitiveType.Cube, body, new Vector3(0, .36f, 0), new Vector3(.5f, .46f, .31f), M(.13f, .38f, .24f));                 // waistcoat
                     Apron(M(.95f, .93f, .86f), .86f);
                     Part(PrimitiveType.Cube, body, new Vector3(-.19f, .6f, 0), new Vector3(.1f, .04f, .34f), M(.82f, .14f, .1f));            // the cloth over the shoulder
                     Part(PrimitiveType.Cube, body, new Vector3(-.19f, .48f, .17f), new Vector3(.1f, .22f, .02f), M(.82f, .14f, .1f));
@@ -876,7 +889,7 @@ namespace Crulanda.Encounter
                     break;
                 case "drinker":
                     // (The tankard is not part of the outfit: it is in the hand only at the inn, see Villager.DrinkRound.)
-                    if (variant % 2 == 0) Part(PrimitiveType.Sphere, body, new Vector3(0, .84f, -.02f), new Vector3(.33f, .3f, .34f), accent);
+                    if (variant % 2 == 0) Hood(accent, new Vector3(0, .84f, -.02f), new Vector3(.33f, .3f, .34f));
                     break;
             }
             body.localEulerAngles = new Vector3(stoop, 0, 0);
@@ -885,6 +898,7 @@ namespace Crulanda.Encounter
         void LateUpdate()
         {
             if (core != null) { Drift(); return; }
+            if (model != null) { ModelLate(); return; }
             if (body == null || legL == null) return;
             // Swimming: the kit goes on the back, so no sword stands out of the water like a mast.
             bool stow = Pose == ActorPose.Swim;

@@ -80,7 +80,7 @@ namespace Crulanda.Tests
             Assert.IsTrue(s.EquipFromBag(s.Progress.bag.FindIndex(b => b.item == tunic)), "A chest piece on.");
             yield return Until(() => after.GearParts(EquipSlot.Chest) > 0);
             Assert.Greater(after.GearParts(EquipSlot.Chest), 0, "The chest piece shows on the body.");
-            Assert.AreEqual("Body", after.GearRoot(EquipSlot.Chest).parent.name);
+            Assert.AreEqual(after.Model != null ? "Chest frame" : "Body", after.GearRoot(EquipSlot.Chest).parent.name, "On the body (on a model, its chest's frame).");
         }
     }
 }

@@ -1159,7 +1159,7 @@ namespace Crulanda.Encounter
         float Reeling { get { return Role == "drinker" && tolerance > 0 ? Mathf.Clamp01((drunk / tolerance - .45f) / .55f) : 0; } }
         void ShowTankard(bool on)
         {
-            if (on && tankard == null && visual != null && visual.RightArm != null) tankard = LoadProps.Tankard(visual.RightArm);
+            if (on && tankard == null && visual != null && visual.RightHandle != null) tankard = LoadProps.Tankard(visual.RightHandle);
             if (tankard != null) tankard.SetActive(on);
         }
         /// <summary>

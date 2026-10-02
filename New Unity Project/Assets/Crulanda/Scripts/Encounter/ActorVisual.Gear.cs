@@ -141,7 +141,7 @@ namespace Crulanda.Encounter
             int s = (int)slot;
             if (slot != EquipSlot.MainHand && slot != EquipSlot.OffHand)
             {
-                gearRoots[s] = new GameObject("Gear " + ItemDatabase.SlotNames[s]).transform; gearRoots[s].SetParent(body, false);
+                gearRoots[s] = new GameObject("Gear " + ItemDatabase.SlotNames[s]).transform; gearRoots[s].SetParent(SlotParent(slot), false);   // on a model, the head's or the chest's frame
                 BuildArmor(slot, look); return;
             }
             gearRoots[s] = Mount(slot, look.family, false); BuildGear(look, gearRoots[s]);
@@ -167,7 +167,7 @@ namespace Crulanda.Encounter
             }
             else
             {
-                parent = body;
+                parent = model != null ? chestFrame : body;
                 if (main && tall) { pos = new Vector3(0, .25f, -.27f); rot = Quaternion.Euler(0, 0, -40) * Quaternion.Euler(0, 90, 0); }
                 else if (main) { pos = new Vector3(.26f, .66f, -.2f); rot = Quaternion.Euler(0, 0, 145) * Quaternion.Euler(0, 90, 0); }
                 else if (hung) { pos = new Vector3(-.31f, .08f, -.12f); rot = Quaternion.Euler(0, 90, 0); }   // clear of the hip and thigh; a balance's beam runs fore and aft

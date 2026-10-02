@@ -3366,12 +3366,14 @@ namespace Crulanda.World
         {
             if (variant >= 3 && variant <= 5) { HerbOfTheTrades(t, variant); return; }
             int v = Mathf.Abs(variant) % 3;
+            // Drawn a third larger than life, as the held weapons are: from the path a life-size clump is lost among the wildflowers.
+            var clump = new GameObject("Clump").transform; clump.SetParent(t, false); clump.localScale = Vector3.one * (v == 1 ? 1.15f : 1.3f); t = clump;
             if (v == 1) { MournersCap(t); return; }
             var leaf = Tint(art.foliage, Wither(v == 0 ? new Color(.27f, .48f, .2f) : new Color(.25f, .44f, .19f)));
             var shade = Tint(art.foliage, Wither(v == 0 ? new Color(.18f, .35f, .15f) : new Color(.17f, .31f, .14f)));
             var stem = Tint(art.foliage, Wither(new Color(.32f, .5f, .23f)));
             var bloom = Tint(art.foliage, v == 0 ? new Color(.97f, .95f, .87f) : new Color(.6f, .42f, .82f));
-            var heart = Tint(art.foliage, v == 0 ? new Color(.86f, .82f, .66f) : new Color(.44f, .28f, .64f));
+            var heart = Tint(art.foliage, v == 0 ? new Color(.97f, .95f, .87f) : new Color(.44f, .28f, .64f));   // yarrow's head one white (a beige disc made it a mushroom cap)
             // The leaves round the foot: long and feathery for yarrow (two narrow blades a leaf), broad and rough for comfrey.
             for (int i = 0; i < 9; i++)
             {
@@ -3390,8 +3392,8 @@ namespace Crulanda.World
                 var top = at + lean * new Vector3(0, h, 0);
                 if (v == 0)
                 {
-                    Part(PrimitiveType.Cylinder, t, top, new Vector3(.21f, .018f, .21f), heart);
-                    for (int k = 0; k < 4; k++) Part(PrimitiveType.Sphere, t, top + Quaternion.Euler(0, k * 90 + i * 23, 0) * new Vector3(.055f, .022f, 0), new Vector3(.09f, .045f, .09f), bloom);
+                    Part(PrimitiveType.Cylinder, t, top, new Vector3(.17f, .018f, .17f), heart);
+                    for (int k = 0; k < 5; k++) Part(PrimitiveType.Sphere, t, top + Quaternion.Euler(0, k * 72 + i * 23, 0) * new Vector3(.065f, .022f, 0), new Vector3(.09f, .05f, .09f), bloom);
                 }
                 else
                 {

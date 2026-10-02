@@ -869,8 +869,8 @@ namespace Crulanda.Encounter
         }
         /// <summary>
         /// A hauberk: a mail shirt to mid-thigh, split at the front of the skirt, short mail sleeves over padded ones and a belt. From
-        /// the third band a sleeveless surcoat over it (narrow, so the mail shows at the sides), edged from the fourth, with a badge
-        /// in the last.
+        /// the third band a sleeveless surcoat over it, belted at the waist and slit at the front of the hem (the mail shows at the
+        /// sides and through the slit; a narrow plain panel read as a sticker), edged from the fourth, with a badge in the last.
         /// </summary>
         void Hauberk(Fit f)
         {
@@ -885,10 +885,16 @@ namespace Crulanda.Encounter
             Belt(f, "leather", .014f, .02f);
             if (f.tier >= 2)
             {
-                f.Add("cloth", M.Panel("a.hauberk.surcoat", Pts(-.12f, 0, .12f, 0, .13f, -.7f, -.13f, -.7f), .01f, .012f, true), V(0, .56f, .214f), One, V(-5, 0, 0));
-                f.Add("cloth", M.Panel("a.hauberk.surcoat.back", Pts(-.12f, 0, .12f, 0, .13f, -.7f, -.13f, -.7f), .01f, .012f, false), V(0, .56f, -.198f), One, V(5, 0, 0));
+                // Wider than the old strip, flaring to the hem, the front slit up to the knee; the back hangs whole. A strap over each at the
+                // waist (the hauberk's own belt is under the panel there).
+                f.Add("cloth", M.Panel("a.hauberk.surcoat2", Pts(-.16f, 0, .16f, 0, .19f, -.72f, .025f, -.72f, 0, -.58f, -.025f, -.72f, -.19f, -.72f), .01f, .012f, true, new Vector2(0, -.3f)), V(0, .56f, .214f), One, V(-5, 0, 0));
+                f.Add("cloth", M.Panel("a.hauberk.surcoat2.back", Pts(-.16f, 0, .16f, 0, .19f, -.72f, -.19f, -.72f), .01f, .012f, false), V(0, .56f, -.198f), One, V(5, 0, 0));
+                f.Add("leather", M.Many("a.hauberk.surcoat2.belt", Cube, M.At(V(0, -.535f, .022f), V0, V(.36f, .052f, .012f))), V(0, .56f, .214f), One, V(-5, 0, 0));
+                f.Add("leather", M.Many("a.hauberk.surcoat2.belt.back", Cube, M.At(V(0, -.535f, -.022f), V0, V(.36f, .052f, .012f))), V(0, .56f, -.198f), One, V(5, 0, 0));
+                f.Add(f.tier >= 1 ? "trim" : "dark", M.Many("a.hauberk.surcoat2.buckle", Cube, M.At(V(0, -.535f, .03f), V0, V(.05f, .046f, .01f))), V(0, .56f, .214f), One, V(-5, 0, 0));
             }
-            if (f.tier >= 3) f.Add("trim", M.Many("a.hauberk.surcoat.edge", Cube, M.At(V(.124f, -.35f, .009f), V(0, 0, -.8f), V(.012f, .7f, .006f)), M.At(V(-.124f, -.35f, .009f), V(0, 0, .8f), V(.012f, .7f, .006f)), M.At(V(0, -.7f, .009f), V0, V(.26f, .012f, .006f))), V(0, .56f, .214f), One, V(-5, 0, 0));
+            if (f.tier >= 3) f.Add("trim", M.Many("a.hauberk.surcoat2.edge", Cube, M.At(V(.174f, -.36f, .009f), V(0, 0, -2.4f), V(.012f, .72f, .006f)), M.At(V(-.174f, -.36f, .009f), V(0, 0, 2.4f), V(.012f, .72f, .006f)),
+                M.At(V(.107f, -.72f, .009f), V0, V(.165f, .012f, .006f)), M.At(V(-.107f, -.72f, .009f), V0, V(.165f, .012f, .006f))), V(0, .56f, .214f), One, V(-5, 0, 0));
             if (f.tier >= 4) f.Add("trim", M.Panel("a.hauberk.badge", Pts(0, .05f, .045f, 0, 0, -.05f, -.045f, 0), .006f, .004f, true), V(0, .38f, .232f), One, V(-5, 0, 0));
             f.Fancy(OnBody, M.Many("a.belt.studs", Sphere, M.At(V(.12f, 0, 0), V0, S(.018f)), M.At(V(-.12f, 0, 0), V0, S(.018f)), M.At(V(.2f, 0, -.05f), V0, S(.018f)), M.At(V(-.2f, 0, -.05f), V0, S(.018f))), V(0, .057f, .184f), One);
             f.Glow(1, OnBody, Sphere, V(0, .057f, .203f), V(.026f, .026f, .012f));

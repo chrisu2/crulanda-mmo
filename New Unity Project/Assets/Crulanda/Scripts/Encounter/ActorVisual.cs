@@ -35,7 +35,7 @@ namespace Crulanda.Encounter
             switch (role)
             {
                 case "blacksmith": case "merchant": case "baker": case "henwife": case "farmer": case "hunter": case "leatherworker":
-                case "skinner": case "lumberjack": case "herbalist": case "miller": case "elder": case "drinker": case "stranger": case "warden": case "pilgrim": return true;
+                case "skinner": case "lumberjack": case "herbalist": case "miller": case "elder": case "drinker": case "stranger": case "warden": case "pilgrim": case "innkeeper": return true;
                 default: return false;
             }
         }
@@ -798,6 +798,17 @@ namespace Crulanda.Encounter
                     Part(PrimitiveType.Sphere, body, new Vector3(0, .86f, -.02f), new Vector3(.34f, .3f, .35f), M(.26f, .32f, .18f));   // hood
                     Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.4f, .08f), new Vector3(.06f, .95f, .06f), M(.24f, .24f, .22f, .4f, .3f)); // iron-wood staff
                     Part(PrimitiveType.Sphere, armR, new Vector3(0, .55f, .08f), new Vector3(.14f, .1f, .14f), vine);
+                    break;
+                case "innkeeper":
+                    // Shirt-sleeves rolled to the elbow, a brown waistcoat, a long white apron, a red cloth over the shoulder and keys at the belt.
+                    cloth.color = new Color(.84f, .8f, .7f); legs.color = new Color(.26f, .22f, .2f);
+                    foreach (var arm in new[] { armL, armR }) Part(PrimitiveType.Capsule, arm, new Vector3(0, -.47f, 0), new Vector3(.15f, .15f, .15f), skin);
+                    Part(PrimitiveType.Cube, body, new Vector3(0, .36f, 0), new Vector3(.5f, .46f, .31f), M(.4f, .26f, .16f));                 // waistcoat
+                    Apron(M(.92f, .9f, .84f), .86f);
+                    Part(PrimitiveType.Cube, body, new Vector3(-.19f, .6f, 0), new Vector3(.1f, .04f, .34f), M(.66f, .24f, .2f));            // the cloth over the shoulder
+                    Part(PrimitiveType.Cube, body, new Vector3(-.19f, .48f, .17f), new Vector3(.1f, .22f, .02f), M(.66f, .24f, .2f));
+                    Part(PrimitiveType.Cylinder, body, new Vector3(.25f, -.04f, .08f), new Vector3(.1f, .01f, .1f), iron, new Vector3(0, 0, 90)); // ring of keys
+                    Beard(new Color(.36f, .24f, .14f), .3f);
                     break;
                 case "drinker":
                     // (The tankard is not part of the outfit: it is in the hand only at the inn, see Villager.DrinkRound.)

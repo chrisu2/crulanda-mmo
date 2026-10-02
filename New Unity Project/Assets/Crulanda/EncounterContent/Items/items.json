@@ -863,6 +863,13 @@
       ]
     },
     {
+      "role": "innkeeper",
+      "items": [
+        "food.brown_loaf",
+        "food.harrow_cheese"
+      ]
+    },
+    {
       "role": "herbalist",
       "items": [
         "potion.minor",

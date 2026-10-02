@@ -84,6 +84,36 @@ namespace Crulanda.Tests
             Assert.Less(kitchenDoor + jamb, w / 2 - 1.05f, "The kitchen door clears the hearth.");
         }
 
+        [Test] public void Every_workshop_owner_is_a_villager()
+        {
+            var z = Oakhaven;
+            // Everyone Oakhaven spawns who works: villagers by the default names, and residents who work (the innkeeper).
+            var names = z.life.names != null && z.life.names.Length > 0 ? z.life.names : Crulanda.Encounter.VillageLife.DefaultNames;
+            var folk = new HashSet<string>(); for (int i = 0; i < z.life.villagers; i++) folk.Add(names[i % names.Length]);
+            foreach (var r in z.life.residents.Where(r => r != null && r.works)) folk.Add(r.name);
+            Assert.Contains("Hob Linden", folk.ToList(), "The innkeeper is one of the village.");
+            var hob = z.life.residents.Single(r => r != null && r.name == "Hob Linden");
+            Assert.AreEqual("innkeeper", hob.role); Assert.AreEqual("Innkeeper", hob.title); Assert.IsTrue(hob.works, "Hob works the inn's day; he does not keep a post.");
+            Assert.AreEqual(2, System.Array.IndexOf(z.life.residents, hob), "Hob comes third, after Quill and Warden Ivel (a resident's place in the list seeds their look).");
+            Assert.Greater(z.life.workshops.Length, 0, "Oakhaven names its workshops.");
+            var owners = new Dictionary<string, string>();
+            foreach (var w in z.life.workshops)
+            {
+                Assert.IsTrue(folk.Contains(w.who), "The workshop '" + w.prop + "' belongs to '" + w.who + "', who is one of the village.");
+                Assert.AreEqual(1, z.props.Count(p => p != null && p.name == w.prop), "'" + w.prop + "' is one prop of the zone.");
+                Assert.IsFalse(owners.ContainsKey(w.prop), "'" + w.prop + "' has one owner (" + (owners.ContainsKey(w.prop) ? owners[w.prop] : "") + " and " + w.who + ").");
+                owners[w.prop] = w.who;
+            }
+            // Each new workshop has its trade, and each trade with stands of its own keeps them.
+            foreach (var (prop, who) in new[] { ("Tanner's leather shop", "Maud Tanner"), ("Lisbet's drying hut", "Lisbet Crane"), ("The Cask's kitchen", "Hob Linden"), ("The Golden Cask", "Hob Linden"), ("Moss's game rack", "Garet Moss"),
+                ("Produce stall", "Ama Rusk"), ("Cloth and pots", "Tamsin Reed"), ("Bread stall", "Hedda Thorne"), ("Thorne's bakehouse", "Hedda Thorne"), ("Vell's smithy", "Brannoc Vell") })
+                Assert.AreEqual(who, owners.TryGetValue(prop, out var o) ? o : null, prop + " is " + who + "'s.");
+            // The Golden Cask's household is the innkeeper's: Hob at its head, Quill and Mira lodging.
+            var cask = z.life.households.Single(h => h.house == "The Golden Cask");
+            Assert.AreEqual("Hob Linden", cask.members.Single(m => m.kin == "head").name);
+            CollectionAssert.AreEquivalent(new[] { "Quill", "Mira" }, cask.members.Where(m => m.kin == "lodger").Select(m => m.name).ToArray());
+        }
+
         [Test] public void New_props_keep_clear_of_groves_and_the_creek()
         {
             var z = Oakhaven; var problems = new List<string>();

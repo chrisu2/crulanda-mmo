@@ -561,12 +561,13 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
   `VillageLife.Households`, `HouseholdOf`); a resident who keeps a post can be named in a household (so a knock names them)
   and still keeps the post day and night. `stipend` (default 6) and `needs` (default bread, firewood, eggs) are read by the
   purses, a later step.
-  - Oakhaven, 15 households: Vell, Thorne, **Tanner** (Maud Tanner, leatherworker; Fen Walker, skinner, her husband; Nettie,
+  - Oakhaven, 16 households: Vell, Thorne, **Tanner** (Maud Tanner, leatherworker; Fen Walker, skinner, her husband; Nettie,
     their daughter), Rusk, Reed, Farrow (Osk and his son Pim), Crane, Ashby (the Elder's house), Pell (Old Tobin and his wife
     Edda), Jory (alone, Jory's house), Harrow farm (Sel Harrow, Ilse Brandt the hand, Goody Marl their aunt), **Carder farm**
     (Wil Carder and Hettie Brook, his aunt, in the new Carder farmhouse), Brook farm (Grete Lowe, Nan Pennock lodging), **Crisp**
     (Aldo Crisp in the new Crisp cottage; nobody sleeps at the mill) and **Moss** (Garet Moss at his lodge, a barn with a home
-    door). Quill and Warden Ivel keep their posts. The Golden Cask's household comes with its innkeeper.
+    door), and **The Golden Cask** (Hob Linden, the innkeeper, who sleeps over his inn behind the rooms door; Quill and Mira
+    lodge there). Quill and Warden Ivel keep their posts.
   - Khaven, 5: Grane, Vey (Dorra Vey and Old Kestrel, her father), Jenn (Mattock Jenn and Siv Harl, his wife), Tabor, and
     Morrow at the Crypt-Keeper's Hovel (Ansel Morrow keeps his post at the crypt; the hovel stands empty).
   - A zone with villagers and no `households` uses the derived rule: villager i takes house i (the barred doors in the order
@@ -590,7 +591,8 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
   Dawn, day, dusk and night keyframes blend with the zone's own `lighting` palette: ambient, fog, sky tint and exposure.
   Lamps (`NightLights`) light up after dark. The minimap rim shows a sun or moon and the time. In development builds,
   F11 skips an hour.
-- **Night routine:** villagers go home to bed from about 20:00, children first. A hunter who lives at a lodge (Oakhaven's
+- **Night routine:** villagers go home to bed from about 20:00, children first. The innkeeper is up at 05:24 and goes up to
+  bed at 22:48. A hunter who lives at a lodge (Oakhaven's
   Garet Moss) sets off at 19:48 and spends his evening in the lodge yard (his lodge is about a game hour's walk from the
   green); in a village without a lodge (Khaven) the hunter keeps the inn and the green and goes to bed with the rest
   (`VillageWork.PlacesFor`). Drinkers stay at the inn until 23:00 or later. Everyone wakes between about 05:50 and 07:30.
@@ -602,7 +604,8 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
   - 05:45: opens the coop, and the hens come down the ramp one by one from 06:00; then the morning feed at the trough, and
     every hen in the yard comes running.
   - 08:24: collects the eggs from the nest boxes (hens lay up to one each through the day) and carries the basket, eggs
-    showing in it, to the inn's kitchen.
+    showing in it, round to the kitchen's back door at the inn, where the innkeeper answers (each hen-wife takes a hand-over
+    spot nobody else is bound for).
   - 09:36 and 13:30: draws water at the well and carries the bucket back to fill the water pan by the ramp; the hens come to
     drink, and the water sinks as the day dries it (about four hours).
   - 12:12-13:30: dinner at home.
@@ -624,14 +627,20 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
     oven.flour, forge.wood...). Whoever is working at the place answers ("Ta, Goody. Warm, are they?"); the trades talk about
     each other's goods ("The miller's flour came in. Thin stuff, but it rises."); and the merchant's wares gain the eggs.
   - The chain: the farmer's barley to the mill (10:00) and seed-corn home; the miller's flour to the bakehouse (11:00) and the
-    stall; the baker (up at 04:36) takes the first loaves to the inn (07:00) and a second batch to the stall; the woodcutter's logs
+    stall; the baker (up at 04:36) takes the first loaves to the inn's kitchen door (07:00) and a second batch to her own stall; the woodcutter's logs
     to the woodyard, then firewood to the inn and the forge; the smith fetches oak for the forge and takes ironwork to the
-    stall; the hunter's hide to the tannery and his hares to the inn's pot; the skinner's pelts from the snares; the
-    leatherworker's belts to the stall; the herbalist's herbs to the stall, marigold for Mira at the inn, and herbs home to dry;
-    the merchant shutters up at 17:48 and carries what didn't sell home; gossips and children fetch water from the well
+    stall; the hunter's hide to the tannery and his hares round to the kitchen door; the skinner's pelts from the snares; the
+    leatherworker's tanned hides from the yard to her shop (07:30) and her belts to the stall; the herbalist's herbs to the
+    stall, marigold for Mira at the inn, and herbs to dry at her drying hut; the merchant rolls the cask behind the bar and
+    shutters up at 17:48, carrying what didn't sell home; the innkeeper draws water for the pot (06:00), puts the pot on
+    (10:30) and carries dinner out to the tables (12:12); gossips and children fetch water from the well
     (and a child fetches a loaf for Mum); the elders sit on the green and at the inn; drinkers drink.
   - A trade whose errand needs a place the village lacks (no mill, no tannery) skips it for the day. Deliveries go to the
-    place where someone of that trade is working now (the stall with the merchant behind it), else any of that kind.
+    place where someone of that trade is working now (the stall with the merchant behind it), else any of that kind. An
+    errand's `door` is where it is handed over when the village has one (`kitchendoor`, `bar`; the stock key stays the inn's),
+    and whoever keeps the kitchen or the bar within 12 m answers. An errand's `toRole` sends it to a place of that trade: the
+    smith's, miller's, leatherworker's and herbalist's wares and the afternoon's eggs go to a merchant's stall (her own while she
+    is at her dinner), never the baker's. `VillageLife.HandedOver` reports each hand-over (carrier, errand, who answered).
   - **The out of work drink** (Chris, 2026-10-01: "have unemployed npc show up at the inn and drink till gone or passed out"):
     the drinkers, and anyone whose trade this village has no place for (a smith with no forge, a farmer with no fields: in a
     village with an inn they become drinkers), loiter the morning away and are at the inn from 11:00. Each round is a tankard off
@@ -641,7 +650,7 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
     fold over the table and snore for three to five hours (`ActorPose.Slump`; "Zzz..." is all you get from them), the rest say
     goodnight and reel home (`ActorVisual.Stagger`); spent, they stay indoors until morning. `VillageDrinkTests`.
   - Tests: `VillageWorkTests` (every trade's day covers its hours; every errand runs between known places in a window and
-    carries a good; the hen-wife's seven) and `VillageErrandTests` (eggs reach the inn in a basket you can see and the merchant
+    carries a good; the hen-wife's seven; the innkeeper's day from first light to the last table) and `VillageErrandTests` (eggs reach the inn in a basket you can see and the merchant
     sells them on; water fills the pan and the hens come; the farmer's barley reaches the mill).
 - **Trades** (GAME-ONLY):
   - Villagers take trades in this order: blacksmith, farmer, merchant, baker, gossip, hunter, drinker, child,
@@ -668,15 +677,32 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
     - `gamerack`, 3 x 2 m on a hillside: forked poles and a crossbar hung with a deer, two hares and a brace of pheasants; a
       rail of pelts; a hide laced in a frame; a butcher's block with a cleaver; a ring of cold stones. Place: `lodge`.
     - The inn adds a `bar` place at the open end of the bar and a barred door to the rooms upstairs (`ZoneDoor.kind` "rooms";
-      nobody in Oakhaven lodges there yet; trying it says the stair is kept for the inn's lodgers). `ZoneDoor.smoke` is the
+      Oakhaven's innkeeper goes up to bed through it; trying it says the stair is kept for the inn's lodgers). `ZoneDoor.smoke` is the
       house's chimney smoke.
     - The Carder farmhouse and the Crisp cottage are lived in (see Households).
     - A villager at stand points close together (the kitchen's range and table) works and looks at the nearest one.
     - A village with a tannery yard and no leather shop has its leatherworker work the yard (`leathershop` shares the
       `tannery` places).
-  - The leatherworker keeps her shop 9 to 12 and 2 to 6 (the yard either side) and takes her wares from the shop to the stall
-    after her midday meal (12.2 to 14); the herbalist calls at her drying hut late morning and evening. `VillageWorkshopTests`: every workshop place is on the navmesh and can be walked to, and Maud keeps
-    shop apart from the tannery yard.
+  - **Whose workshop** (`life.workshops`: `{ who, prop }`, GAME-ONLY): a trade works its own props' stand points rather than any
+    of the kind (`VillageLife.PlaceFor`, `OwnPlaces`, `WorkshopsOf`), on its shifts and on its errands; a farmer works the
+    fields within 60 m of home when there are any. Oakhaven: Brannoc Vell, Vell's smithy; Hedda Thorne, Thorne's bakehouse and
+    the Bread stall; Ama Rusk, the Produce stall; Tamsin Reed, Cloth and pots; Fen Walker, the Tannery yard; Maud Tanner, her
+    leather shop; Lisbet Crane, her drying hut; Hob Linden, the Cask's kitchen and the Golden Cask's bar; Garet Moss, his game
+    rack; Osk Farrow, the Woodyard; Aldo Crisp, the mill.
+  - The leatherworker keeps her shop 9 to 12 and 2 to 6 (the yard either side), fetches the tanned hides from the yard first
+    thing (7.5 to 9) and takes her wares from the shop to the stall after her midday meal (12.2 to 14); the herbalist calls at
+    her drying hut late morning and evening and hangs her evening herbs there.
+  - **The innkeeper** (GAME-ONLY; Oakhaven's Hob Linden, role `innkeeper`, `<Innkeeper>`, a resident who `works`, listed third
+    so the residents before him keep their looks): shirt-sleeves, waistcoat, white apron and a cloth on the shoulder. Up at
+    05:24 for the kitchen; 07:00 to 11:30 kitchen and bar; 11:30 to 14:00 mostly the bar; 14:00 to 17:00 kitchen, bar and well;
+    from 17:00 the bar until he goes up at 22:48. He sells brown loaves and Harrow cheese (vendor role `innkeeper`). Talk: "Ale's
+    thin and the stew's thinner. Sit where you like."; before Mira joins you, "Mira's in the corner. Don't crowd her; she's the
+    only mender we've got."; with hares in, "Garet's hares are in the pot. Don't tell the out-of-work."; with the cask dry, "Dry.
+    Ama's cask never sees the night out." The drinkers drink as before; he never serves or stops them.
+  - `VillageWorkshopTests`: every workshop place is on the navmesh and can be walked to; Maud keeps shop apart from the tannery
+    yard; each trade stands at its own workshop (Ama, Tamsin and Hedda each at her own stall; Lisbet's herbs to her hut); eggs,
+    the first loaves and the hares are handed over at the kitchen's door and Hob answers; Hob is abed by 23:30 and in the kitchen
+    at first light. `WorkshopDataTests.Every_workshop_owner_is_a_villager`.
   - Hunters and woodcutters work the groves. Herbalists gather on the open meadow.
   - Work poses: Hammer, Chop, Gather, Knead. Each trade has its own lines of talk.
   - Oakhaven has Vell's smithy, Market row (three stalls), Thorne's bakehouse, the Tannery yard, the Woodyard, Tanner's leather

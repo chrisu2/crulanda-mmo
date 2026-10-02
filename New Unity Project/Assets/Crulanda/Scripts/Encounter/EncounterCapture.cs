@@ -348,7 +348,7 @@ namespace Crulanda.Encounter
                 EncounterHud.Hidden = false;
                 var playerRenderers = Array.FindAll(session.Player.GetComponentsInChildren<Renderer>(), r => r.enabled);
                 foreach (var r in playerRenderers) r.enabled = false;   // the camera looks past where we stand
-                var jobs = new[] { ("blacksmith", "forge"), ("merchant", "stall"), ("baker", "oven"), ("leatherworker", "leathershop"), ("herbalist", "dryhut"), ("lumberjack", "woodpile") };
+                var jobs = new[] { ("blacksmith", "forge"), ("merchant", "stall"), ("baker", "oven"), ("leatherworker", "leathershop"), ("herbalist", "dryhut"), ("lumberjack", "woodpile"), ("innkeeper", "bar") };
                 foreach (var job in jobs)
                 {
                     Villager worker = null;

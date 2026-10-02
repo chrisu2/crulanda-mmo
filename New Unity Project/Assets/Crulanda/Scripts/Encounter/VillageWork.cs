@@ -11,11 +11,14 @@ namespace Crulanda.Encounter
     /// walk to <see cref="from"/>, pick up the <see cref="load"/>, carry it to <see cref="to"/>, hand it over (the village's stock
     /// of <see cref="good"/> there grows by <see cref="amount"/>) and say so. A task with no <see cref="to"/> is done where it is
     /// picked up (scattering feed). Places are the village's place kinds ("well", "stall", "inn"...), "home", or the hen-wife's
-    /// "nest", "trough" and "pan". "{n}" in a line is the count carried.
+    /// "nest", "trough" and "pan". "{n}" in a line is the count carried. <see cref="door"/> is the kind of place the goods are
+    /// handed over at when the village has one (the kitchen's back door, the bar); the stock key stays <see cref="to"/>'s.
+    /// <see cref="toRole"/> sends a delivery to a place of that trade (the merchant's stall, not the baker's).
     /// </summary>
     public sealed class Errand
     {
         public string id; public float at, until; public string from, to; public Load load; public string good; public int amount = 1;
+        public string door, toRole;
         public string line, pickupLine; public float work = 5; public ActorPose pose = ActorPose.Work, dropPose = ActorPose.Work;
         public Errand(string id, float at, float until, string from, string to, Load load = Load.None, string good = null, string line = null, string pickupLine = null)
         { this.id = id; this.at = at; this.until = until; this.from = from; this.to = to; this.load = load; this.good = good; this.line = line; this.pickupLine = pickupLine; }
@@ -40,13 +43,20 @@ namespace Crulanda.Encounter
     /// farmer's grain goes to the mill, the miller's flour to the bakehouse and the stall, the first loaves to the inn, the hunter's
     /// hides to the tannery and his hares to the inn's pot, wood to the forge and the inn's hearth, herbs to the stall and to Mira,
     /// the smith's and the leatherworker's wares to the stall, and the hen-wife's eggs to the inn, the stall and her own pot. The
-    /// leatherworker keeps her own shop (9 to 12 and 2 to 6, the tannery yard either side, her wares to the stall from the shop
-    /// after her midday meal) and the herbalist calls in at her drying
-    /// hut; in a village without them the leatherworker works the tannery yard and the herbalist passes the hut over.
+    /// leatherworker keeps her own shop (9 to 12 and 2 to 6, the tannery yard either side, the tanned hides fetched from the yard
+    /// first thing, her wares to the stall from the shop after her midday meal) and the herbalist calls in at her drying hut and
+    /// hangs the evening's herbs there; in a village without them the leatherworker works the tannery yard and the herbalist
+    /// passes the hut over. The innkeeper keeps the Cask's kitchen and the bar from first light to the last table; eggs, the first
+    /// loaves and the hares go round the back to the kitchen's door, and the cask is rolled behind the bar. Deliveries to the stall
+    /// go to a merchant's stall; the baker takes her own loaves to her own.
     /// </summary>
     public static class VillageWork
     {
         const float Dawn = 5.8f, Night = 20.6f;
+        /// <summary>The innkeeper's hours: up before the hen-wives' eggs, abed through the rooms door after the last table.</summary>
+        public const float InnkeeperUp = 5.4f, InnkeeperBed = 22.8f;
+        /// <summary>Where goods for the inn's kitchen are handed over, and where the cask goes (place kinds; see <see cref="Errand.door"/>).</summary>
+        public const string KitchenDoor = "kitchendoor", Bar = "bar";
         static readonly Dictionary<string, WorkDay> Days = new Dictionary<string, WorkDay>
         {
             { "farmer", new WorkDay(new[] { new Shift(Dawn, 12, "field", "field", "field", "field", "well", "green"), new Shift(12, 13.2f, "inn", "inn", "well"), new Shift(13.2f, 18, "field", "field", "field", "field", "well", "green"), new Shift(18, Night, "green", "inn", "home") },
@@ -54,13 +64,13 @@ namespace Crulanda.Encounter
                 new Errand("seed-corn home", 16.5f, 18.5f, "field", "home", Load.Grain, "grain", "Seed-corn. It sleeps under my bed, where the grey-coats won't look.")) },
             { "miller", new WorkDay(new[] { new Shift(6.5f, 12, "mill", "mill", "mill", "well"), new Shift(12, 13, "inn"), new Shift(13, 17.5f, "mill", "mill", "mill", "green"), new Shift(17.5f, Night, "inn", "inn", "green") },
                 new Errand("flour to the bakehouse", 11, 13.5f, "mill", "oven", Load.Flour, "flour", "Flour for the morning's loaves. Don't ask me what it tastes of."),
-                new Errand("flour to the stall", 15.5f, 17.5f, "mill", "stall", Load.Flour, "flour", "Flour, ground fine. Sell it dear; there's less every year.")) },
+                new Errand("flour to the stall", 15.5f, 17.5f, "mill", "stall", Load.Flour, "flour", "Flour, ground fine. Sell it dear; there's less every year.") { toRole = "merchant" }) },
             { "baker", new WorkDay(new[] { new Shift(4.6f, 7.5f, "oven"), new Shift(7.5f, 11.5f, "stall", "stall", "stall", "oven"), new Shift(11.5f, 13, "oven", "oven", "well"), new Shift(13, 17, "stall", "stall", "stall", "oven"), new Shift(17, 19.6f, "well", "green", "home") },
-                new Errand("first loaves to the inn", 7, 9.5f, "oven", "inn", Load.Bread, "bread", "First loaves, still warm. The Cask gets the best of them."),
+                new Errand("first loaves to the inn", 7, 9.5f, "oven", "inn", Load.Bread, "bread", "First loaves, still warm. The Cask gets the best of them.") { door = KitchenDoor },
                 new Errand("loaves to the stall", 12.5f, 14.5f, "oven", "stall", Load.Bread, "bread", "Second batch. Mind, the crust's dark; the flour's thin.")) },
             { "blacksmith", new WorkDay(new[] { new Shift(6.5f, 12.5f, "forge", "forge", "forge", "forge", "forge", "well"), new Shift(12.5f, 13.3f, "well", "inn"), new Shift(13.3f, 18, "forge", "forge", "forge", "forge", "forge"), new Shift(18, Night, "inn", "inn", "green") },
                 new Errand("oak for the forge", 8.5f, 11, "woodpile", "forge", Load.Logs, "wood", "Oak for the fire. Charcoal's dear; oak's not.", "Dry, this. Good."),
-                new Errand("ironwork to the stall", 16.8f, 18.5f, "forge", "stall", Load.Goods, "goods", "Nails, hinges and a hook. Sell what you can.")) },
+                new Errand("ironwork to the stall", 16.8f, 18.5f, "forge", "stall", Load.Goods, "goods", "Nails, hinges and a hook. Sell what you can.") { toRole = "merchant" }) },
             { "lumberjack", new WorkDay(new[] { new Shift(Dawn, 11, "woods", "woods", "woods", "woodpile"), new Shift(11, 12, "inn", "well"), new Shift(12, 17, "woods", "woods", "woods", "woodpile"), new Shift(17, Night, "inn", "inn", "green") },
                 new Errand("logs to the woodyard", 9, 11.5f, "woods", "woodpile", Load.Logs, "logs", "Two more loads and that's the big oak down."),
                 new Errand("firewood to the inn", 14.5f, 16.5f, "woodpile", "inn", Load.Logs, "wood", "Firewood for the Cask. Dry, mind, not the grey stuff."),
@@ -69,17 +79,18 @@ namespace Crulanda.Encounter
             // (Villager.HunterBed): it is a long walk out. Without one he keeps the inn and the green (see PlacesFor).
             { "hunter", new WorkDay(new[] { new Shift(Dawn, 10.5f, "woods", "woods", "woods", "meadow", "meadow", "lodge"), new Shift(10.5f, 13, "tannery", "inn", "inn"), new Shift(13, 18, "woods", "woods", "woods", "meadow", "meadow"), new Shift(18, Night, "lodge", "lodge", "inn") },
                 new Errand("the hide to the tannery", 10, 12.5f, "woods", "tannery", Load.Game, "hides", "A buck's hide, and the hares are for the Cask. Pay me for the hide."),
-                new Errand("hares to the inn", 11, 13.5f, "tannery", "inn", Load.Game, "meat", "Two hares for the pot. Don't let the drinkers see them.")) },
+                new Errand("hares to the inn", 11, 13.5f, "tannery", "inn", Load.Game, "meat", "Two hares for the pot. Don't let the drinkers see them.") { door = KitchenDoor }) },
             { "skinner", new WorkDay(new[] { new Shift(7, 12, "tannery", "tannery", "tannery", "well"), new Shift(12, 13, "inn", "well"), new Shift(13, 17.5f, "tannery", "tannery", "tannery", "woods"), new Shift(17.5f, Night, "green", "inn") },
                 new Errand("pelts from the snares", 14.5f, 17, "woods", "tannery", Load.Hide, "hides", "Rabbit, mostly. Snares were full.", "Snares. Let's see... rabbit. Rabbit. Rabbit.")) },
             { "leatherworker", new WorkDay(new[] { new Shift(7, 9, "tannery", "leathershop"), new Shift(9, 12, "leathershop"), new Shift(12, 13, "inn"), new Shift(13, 14, "tannery", "leathershop"), new Shift(14, 18, "leathershop"), new Shift(18, Night, "green", "inn") },
-                new Errand("leather to the stall", 12.2f, 14, "leathershop", "stall",Load.Goods, "goods", "Belts, a bridle, two purses. Coin or trade.")) },
+                new Errand("tanned hides from the yard", 7.5f, 9, "tannery", "leathershop", Load.Hide, "leather", "Three sides, dry enough. Fen says mind the grey one."),
+                new Errand("leather to the stall", 12.2f, 14, "leathershop", "stall",Load.Goods, "goods", "Belts, a bridle, two purses. Coin or trade.") { toRole = "merchant" }) },
             { "herbalist", new WorkDay(new[] { new Shift(Dawn, 10.5f, "meadow", "meadow", "meadow", "woods"), new Shift(10.5f, 12.5f, "stall", "inn", "green", "dryhut"), new Shift(12.5f, 16.5f, "meadow", "meadow", "woods", "woods"), new Shift(16.5f, Night, "green", "green", "inn", "dryhut") },
-                new Errand("herbs to the stall", 10.3f, 12.5f, "meadow", "stall", Load.Herbs, "herbs", "Comfrey and yarrow for the stall. The marigold's for Mira."),
+                new Errand("herbs to the stall", 10.3f, 12.5f, "meadow", "stall", Load.Herbs, "herbs", "Comfrey and yarrow for the stall. The marigold's for Mira.") { toRole = "merchant" },
                 new Errand("marigold for Mira", 11, 13.5f, "stall", "inn", Load.Herbs, "herbs", "Marigold and comfrey, for whoever's bleeding this week."),
-                new Errand("herbs to dry", 16.3f, 18.5f, "meadow", "home", Load.Herbs, "herbs")) },
+                new Errand("herbs to dry", 16.3f, 18.5f, "meadow", "dryhut", Load.Herbs, "herbs")) },
             { "merchant", new WorkDay(new[] { new Shift(7.3f, 12.5f, "stall", "stall", "stall", "stall", "green"), new Shift(12.5f, 13.3f, "well", "inn"), new Shift(13.3f, 18, "stall", "stall", "stall", "stall"), new Shift(18, Night, "inn", "inn", "green") },
-                new Errand("a cask for the inn", 8.6f, 11, "stall", "inn", Load.Goods, "ale", "Ale for the Cask. Make it last the night, for once.") { amount = 12 },
+                new Errand("a cask for the inn", 8.6f, 11, "stall", "inn", Load.Goods, "ale", "Ale for the Cask. Make it last the night, for once.") { amount = 12, door = Bar },
                 new Errand("shutters up", 17.8f, 19.5f, "stall", "home", Load.Goods, "goods", "Shutters up. What didn't sell comes home.")) },
             { "gossip", new WorkDay(new[] { new Shift(Dawn, 8, "well", "well", "green"), new Shift(8, 12, "green", "green", "green", "well"), new Shift(12, 13.5f, "inn", "inn", "well"), new Shift(13.5f, 17, "green", "green", "well", "wander"), new Shift(17, Night, "inn", "green", "home") },
                 new Errand("the morning's water", 6.5f, 8.5f, "well", "home", Load.Bucket, "water", "Water's bitter again. Iron, my gran says."),
@@ -95,12 +106,18 @@ namespace Crulanda.Encounter
             // the first to the inn's kitchen, the second to the produce stall, the last home for the pot. Dusk is the hens' (Villager.KeeperNext).
             { "henwife", new WorkDay(new[] { new Shift(5.7f, 12.2f, "yard", "yard", "yard", "well", "green"), new Shift(12.2f, 13.5f, "home"), new Shift(13.5f, 18, "yard", "yard", "yard", "well", "green"), new Shift(18, 19.3f, "yard") },
                 new Errand("the morning feed", 5.7f, 9.6f, "trough", null, Load.None, null, "Chook-chook-chook-chook!") { work = 16 },
-                new Errand("eggs to the inn", 8.4f, 11.5f, "nest", "inn", Load.Eggs, "eggs", "{n} eggs for the Cask's kitchen. Mind, they're warm yet."),
+                new Errand("eggs to the inn", 8.4f, 11.5f, "nest", "inn", Load.Eggs, "eggs", "{n} eggs for the Cask's kitchen. Mind, they're warm yet.") { door = KitchenDoor },
                 new Errand("water for the hens", 9.6f, 12, "well", "pan", Load.Bucket, "water", "There. Drink up, girls.", "Bitter or not, they'll drink it."),
                 new Errand("the afternoon's water", 13.5f, 15.5f, "well", "pan", Load.Bucket, "water", "There. Drink up, girls."),
                 new Errand("the afternoon feed", 14.6f, 17, "trough", null, Load.None, null, "Chook-chook-chook-chook!") { work = 16 },
-                new Errand("eggs to the stall", 15.4f, 17.2f, "nest", "stall", Load.Eggs, "eggs", "{n} eggs, fresh. And don't start about the Concord's tax."),
+                new Errand("eggs to the stall", 15.4f, 17.2f, "nest", "stall", Load.Eggs, "eggs", "{n} eggs, fresh. And don't start about the Concord's tax.") { toRole = "merchant" },
                 new Errand("eggs for the pot", 17.2f, 18.6f, "nest", "home", Load.Eggs, "eggs", "{n} for the pot.")) },
+            // The innkeeper (GAME-ONLY; Oakhaven's Hob Linden, who sleeps over the Golden Cask): the kitchen from first light, then the
+            // bar and the kitchen turn about until the last table. Water for the pot, the pot on, and dinner out to the tables.
+            { "innkeeper", new WorkDay(new[] { new Shift(InnkeeperUp, 7, "kitchen"), new Shift(7, 11.5f, "kitchen", "kitchen", "bar"), new Shift(11.5f, 14, "bar", "bar", "kitchen"), new Shift(14, 17, "kitchen", "bar", "well"), new Shift(17, InnkeeperBed, "bar", "bar", "bar", "kitchen") },
+                new Errand("water for the pot", 6, 7.5f, "well", "kitchen", Load.Bucket, "water", "Bitter or not, it boils."),
+                new Errand("the pot on", 10.5f, 12.5f, "kitchen", null, Load.None, null, "Pot's on. Hare if Garet's been by; barley if he hasn't.") { work = 14 },
+                new Errand("dinner to the tables", 12.2f, 14, "kitchen", "inn", Load.Bread, "dinner", "Dinner. Mind the bowl; it's hotter than it looks.")) },
         };
         public static WorkDay DayFor(string role) { return Days.TryGetValue(role, out var d) ? d : null; }
         /// <summary>The shift a trade is on at an hour, or null when their day has no shift for it (bed, or a role without a day).</summary>
@@ -133,6 +150,7 @@ namespace Crulanda.Encounter
                 case "herbs": return r < .5f ? "Put them to dry." : "Comfrey. Bless you.";
                 case "goods": return r < .5f ? "Leave it on the counter." : "I'll see what sells.";
                 case "ale": return r < .5f ? "About time. They're through the last one." : "Roll it behind the bar.";
+                case "dinner": return r < .5f ? "Stew again? ...Go on, then." : "Smells like hare. Bless you.";
                 default: return null;
             }
         }

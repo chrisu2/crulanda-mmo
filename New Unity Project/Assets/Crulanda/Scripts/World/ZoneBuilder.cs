@@ -1599,20 +1599,21 @@ namespace Crulanda.World
                 var from = axis(top * u);
                 var mid = from + outward * reach * (.42f + T() * .16f) + aside * ((T() - .5f) * reach * .35f) + Vector3.up * rise * (.25f + T() * .3f);
                 var end = mid + (Quaternion.AngleAxis((T() - .5f) * 50, Vector3.up) * outward) * reach * .5f + Vector3.up * rise * (.45f + T() * .3f);
-                Limb(root, from, mid, rb, rb * .6f, mat, .05f + T() * .06f, 8);
-                Limb(root, mid, end, rb * .6f, .035f, mat, .08f + T() * .08f, 7);   // to a point: no capped stub
+                float bowIn = .05f + T() * .06f; Limb(root, from, mid, rb, rb * .6f, mat, bowIn, 8);
+                float bowOut = .08f + T() * .08f; Limb(root, mid, end, rb * .6f, .035f, mat, bowOut, 7);   // to a point: no capped stub
                 int subs = 1 + (int)(T() * 3);
                 for (int k = 0; k < subs; k++)
                 {
-                    // Off the limb's length, each turning its own way and climbing; a fork on some.
-                    float s = .3f + T() * .55f; var at2 = s < .55f ? Vector3.Lerp(from, mid, s / .55f) : Vector3.Lerp(mid, end, (s - .55f) / .45f);
+                    // Off the limb's length (on its bowed line, not the straight one between its ends), each turning its own way and
+                    // climbing; a fork on some, off the branch's own bowed line.
+                    float s = .3f + T() * .55f; var at2 = s < .55f ? LimbAt(from, mid, bowIn, s / .55f) : LimbAt(mid, end, bowOut, (s - .55f) / .45f);
                     float rAt = Mathf.Lerp(rb, .035f, s) * .62f;
                     var dir = (Quaternion.AngleAxis((k % 2 == 0 ? 1 : -1) * (35 + T() * 45), Vector3.up) * outward + Vector3.up * (.3f + T() * 1)).normalized;
                     float len = reach * (.32f + T() * .35f) * (1.1f - s * .5f); var tip = at2 + dir * len;
-                    Limb(root, at2, tip, rAt, .025f, mat, .1f + T() * .08f, 6);
+                    float bowBranch = .1f + T() * .08f; Limb(root, at2, tip, rAt, .025f, mat, bowBranch, 6);
                     if (T() < .6f)
                     {
-                        var at3 = Vector3.Lerp(at2, tip, .55f + T() * .2f); var d2 = (Quaternion.AngleAxis((T() - .5f) * 100, Vector3.up) * dir + Vector3.up * (.3f + T() * .5f)).normalized;
+                        var at3 = LimbAt(at2, tip, bowBranch, .55f + T() * .2f); var d2 = (Quaternion.AngleAxis((T() - .5f) * 100, Vector3.up) * dir + Vector3.up * (.3f + T() * .5f)).normalized;
                         Limb(root, at3, at3 + d2 * len * (.35f + T() * .25f), rAt * .5f, .02f, mat, .1f, 5);
                     }
                 }
@@ -1905,7 +1906,9 @@ namespace Crulanda.World
                 for (int i = 0; i < n; i++) ridge += w[i] * Mathf.Pow(Mathf.Max(0, Mathf.Cos(a - at[i])), 5);
                 return (r + r0 * flare * (.22f + .9f * ridge)) * Mathf.Clamp01((top - y) / (r0 * 1.6f));
             }
-            MeshPart(ZoneMeshes.Tube(Axis, Radius, new[] { -.45f, -.2f, -.05f, .08f, .2f, .36f, .58f, top * .3f, top * .48f, top * .66f, top * .82f, top * .93f, top }, 14, Vector3.right, 2, .5f), t, Vector3.zero, bark).name = "Trunk";
+            var rings = new[] { -.45f, -.2f, -.05f, .08f, .2f, .36f, .58f, top * .3f, top * .48f, top * .66f, top * .82f, top * .93f, top };
+            MeshPart(ZoneMeshes.Tube(Axis, Radius, rings, 14, Vector3.right, 2, .5f), t, Vector3.zero, bark).name = "Trunk";
+            Record(t, Axis, Radius, rings, true);
             return Axis;
         }
         /// <summary>
@@ -1921,7 +1924,44 @@ namespace Crulanda.World
             if (sag.y > 0) sag = -sag;
             Vector3 C(float s) { return from + d * s + sag * (4 * s * (1 - s)); }
             float R(float s, float a) { return Mathf.Lerp(r0, tip, s) * (1 + .35f * Mathf.Exp(-s * 9)) * Mathf.Clamp01((1.05f - s) / .1f); }
-            MeshPart(ZoneMeshes.Tube(C, R, new[] { 0, .12f, .26f, .42f, .58f, .74f, .88f, .97f, 1.05f }, sides, side.normalized, 1, len * .5f), t, Vector3.zero, bark).name = "Limb";
+            var rings = new[] { 0, .12f, .26f, .42f, .58f, .74f, .88f, .97f, 1.05f };
+            MeshPart(ZoneMeshes.Tube(C, R, rings, sides, side.normalized, 1, len * .5f), t, Vector3.zero, bark).name = "Limb";
+            Record(t, C, R, rings, false);
+        }
+        /// <summary>
+        /// The point <paramref name="s"/> (0 to 1) of the way along a <see cref="Limb"/> from <paramref name="from"/> to
+        /// <paramref name="to"/> bowed by <paramref name="bow"/>: on its axis, where a branch off it starts. (A point on the
+        /// straight line between its ends floats above it by up to bow times its length: playtest note 15, "a few trees are
+        /// disjointed in the limb area": the Verdant giants' branches a metre over their limbs, the dead trees' twigs.)
+        /// </summary>
+        static Vector3 LimbAt(Vector3 from, Vector3 to, float bow, float s)
+        {
+            var d = to - from; float len = d.magnitude; if (len < .05f) return Vector3.Lerp(from, to, s); var dir = d / len;
+            var side = Vector3.Cross(dir, Vector3.up); if (side.sqrMagnitude < 1e-4f) side = Vector3.right;
+            var sag = Vector3.Cross(side.normalized, dir) * len * bow;   // as Limb bows it
+            if (sag.y > 0) sag = -sag;
+            return from + d * s + sag * (4 * s * (1 - s));
+        }
+        /// <summary>
+        /// For the tests (playtest note 15; TreeLimbTests): when on as a zone builds, every trunk's and limb's axis as built, by its
+        /// tree's root (in the tree's own space): points along it with its mean radius at each, and where a limb starts. Off in play,
+        /// and nothing is kept.
+        /// </summary>
+        public static bool RecordWood;
+        public sealed class WoodAxis { public Vector3[] pts; public float[] r; public bool trunk; public Vector3? from; }
+        public readonly Dictionary<Transform, List<WoodAxis>> Wood = new Dictionary<Transform, List<WoodAxis>>();
+        void Record(Transform tree, Func<float, Vector3> centre, Func<float, float, float> radius, IList<float> rings, bool trunk)
+        {
+            if (!RecordWood) return;
+            if (!Wood.TryGetValue(tree, out var list)) Wood[tree] = list = new List<WoodAxis>();
+            var w = new WoodAxis { pts = new Vector3[rings.Count], r = new float[rings.Count], trunk = trunk, from = trunk ? (Vector3?)null : centre(rings[0]) };
+            for (int i = 0; i < rings.Count; i++)
+            {
+                w.pts[i] = centre(rings[i]); float sum = 0;
+                for (int k = 0; k < 8; k++) sum += radius(rings[i], k * Mathf.PI / 4);
+                w.r[i] = sum / 8;
+            }
+            list.Add(w);
         }
         Mesh[] oakLeaves;
         /// <summary>
@@ -1956,7 +1996,9 @@ namespace Crulanda.World
             // Two parts cut from the one surface (they meet without a seam): the flare, low and wide, and the bole, tall and narrow,
             // so the camera only counts as inside the tree (TreeFade) when it really is.
             MeshPart(ZoneMeshes.Tube(Axis, Girth, new[] { -.6f, -.42f, -.26f, -.13f, 0, .12f, .26f, .42f, .6f, .82f, 1.05f, 1.3f }, 32, Vector3.right, 3, .5f), t, Vector3.zero, bark).name = "Oak root flare";
-            MeshPart(ZoneMeshes.Tube(Axis, Girth, new[] { 1.3f, 1.65f, 2f, 2.4f, 2.8f, 3.2f, 3.55f, 3.85f, 4.15f, 4.5f, 4.9f, 5.35f, 5.8f, 6.2f, 6.5f }, 32, Vector3.right, 3, .5f), t, Vector3.zero, bark).name = "Oak bole";
+            var boleRings = new[] { 1.3f, 1.65f, 2f, 2.4f, 2.8f, 3.2f, 3.55f, 3.85f, 4.15f, 4.5f, 4.9f, 5.35f, 5.8f, 6.2f, 6.5f };
+            MeshPart(ZoneMeshes.Tube(Axis, Girth, boleRings, 32, Vector3.right, 3, .5f), t, Vector3.zero, bark).name = "Oak bole";
+            Record(t, Axis, Girth, boleRings, true);
             // Surface roots: one out of each buttress and two between, flattened, sinking into the turf as they thin. One mesh.
             var roots = new List<CombineInstance>();
             for (int i = 0; i < Buttresses + 2; i++)
@@ -1981,7 +2023,9 @@ namespace Crulanda.World
                 Vector3 p0 = Axis(y0), p2 = p0 + outward * reach + Vector3.up * rise, p1 = p0 + outward * reach * .55f + Vector3.up * rise * .12f;
                 Vector3 C(float s) { return (1 - s) * (1 - s) * p0 + 2 * s * (1 - s) * p1 + s * s * p2; }
                 float R(float s, float a) { return Mathf.Lerp(rb, .12f, s) * (1 + .3f * Mathf.Exp(-s * 7)) * (1 + .05f * Mathf.Sin(a * 3 + s * 9)) * Mathf.Clamp01((1.06f - s) / .1f); }
-                MeshPart(ZoneMeshes.Tube(C, R, new[] { 0, .08f, .17f, .27f, .38f, .5f, .62f, .74f, .86f, .96f, 1.06f }, 14, Vector3.Cross(Vector3.up, outward), 2, 2.5f), t, Vector3.zero, bark).name = "Oak limb";
+                var limbRings = new[] { 0, .08f, .17f, .27f, .38f, .5f, .62f, .74f, .86f, .96f, 1.06f };
+                MeshPart(ZoneMeshes.Tube(C, R, limbRings, 14, Vector3.Cross(Vector3.up, outward), 2, 2.5f), t, Vector3.zero, bark).name = "Oak limb";
+                Record(t, C, R, limbRings, false);
                 tips.Add((p2 + Vector3.up * .25f, 3.1f + T() * .5f));
                 for (int k = 0; k < 3; k++)
                 {
@@ -2083,7 +2127,9 @@ namespace Crulanda.World
             float top = 1.1f + h * .94f;
             Vector3 Axis(float s) { return new Vector3(0, s, 0); }
             float Radius(float s, float a) { return Mathf.Lerp(.24f, .04f, Mathf.Clamp01(s / top)) * (1 + .35f * Mathf.Exp(-Mathf.Max(0, s + .3f) / .45f)) * Mathf.Clamp01((top - s) / .3f); }
-            MeshPart(ZoneMeshes.Tube(Axis, Radius, new[] { -.3f, -.1f, .1f, .4f, top * .2f, top * .4f, top * .6f, top * .8f, top * .92f, top }, 8, Vector3.right, 2, .5f), t, Vector3.zero, art.bark).name = "Trunk";
+            var rings = new[] { -.3f, -.1f, .1f, .4f, top * .2f, top * .4f, top * .6f, top * .8f, top * .92f, top };
+            MeshPart(ZoneMeshes.Tube(Axis, Radius, rings, 8, Vector3.right, 2, .5f), t, Vector3.zero, art.bark).name = "Trunk";
+            Record(t, Axis, Radius, rings, true);
             // Five or six tiers of painted bough cards (no solid cones), six to eight boughs each fanning out from the trunk and
             // drooping 20-35 degrees, every card 1.6 tier radii across, so the boughs overlap round a tier and the tiers overlap
             // down the tree: no trunk shows between them, and the silhouette is a full triangle, widest at the foot. Each bough

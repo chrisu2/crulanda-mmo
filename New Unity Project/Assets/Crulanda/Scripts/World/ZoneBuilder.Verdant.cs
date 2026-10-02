@@ -38,7 +38,9 @@ namespace Crulanda.World
             }
             // Two parts of the one surface (they meet without a seam): the mossy flare, low and wide, and the bark of the bole.
             MeshPart(ZoneMeshes.Tube(Axis, Girth, new[] { -.9f, -.5f, -.2f, .1f, .4f, .8f, 1.3f, 1.9f, 2.6f, 3.4f }, 28, Vector3.right, 4, .3f), t, Vector3.zero, moss).name = "Giant root flare";
-            MeshPart(ZoneMeshes.Tube(Axis, Girth, new[] { 3.4f, 4.6f, 6, 7.5f, 9, 10.5f, 12, 13.5f, h, h + .8f, h + 1.5f }, 28, Vector3.right, 4, .3f), t, Vector3.zero, bark).name = "Giant bole";
+            var boleRings = new[] { 3.4f, 4.6f, 6, 7.5f, 9, 10.5f, 12, 13.5f, h, h + .8f, h + 1.5f };
+            MeshPart(ZoneMeshes.Tube(Axis, Girth, boleRings, 28, Vector3.right, 4, .3f), t, Vector3.zero, bark).name = "Giant bole";
+            Record(t, Axis, Girth, boleRings, true);
             // Surface roots out of the buttresses, flattened, sinking into the ground as they thin.
             var roots = new List<CombineInstance>();
             for (int i = 0; i < Buttresses; i++)
@@ -64,7 +66,7 @@ namespace Crulanda.World
                 ends.Add(to); spots.Add((to + Vector3.up * 1.6f, 6 + T() * 2, i % 3 == 1));
                 for (int k = 0; k < 2; k++)
                 {
-                    var p = Vector3.Lerp(from, to, .45f + k * .25f);
+                    var p = LimbAt(from, to, .14f, .45f + k * .25f);   // on the great limb's bowed line (it sags a metre and more below the straight one)
                     var dir = (Quaternion.Euler(0, (k == 0 ? 1 : -1) * (30 + T() * 25), 0) * outward + Vector3.up * (.45f + T() * .4f)).normalized;
                     var end = p + dir * (3.6f + T() * 2.2f);
                     Limb(t, p, end, r0 * .13f, .07f, bark, .1f, 8); ends.Add(end);

@@ -19,9 +19,9 @@ namespace Crulanda.World
     /// - ore: an outcrop of the zone's crag stone (the crags' faceted lumps, sunk into the lowest ground under it), one shoulder
     ///   stained the ore's colour; the seam itself (child "full") is veins of ore lumps, crystal shards and flecks on its front
     ///   (-Z). ore_rich: the same, larger, with more ore. Mined out, the bare rock stays.
-    /// - windfall: a tree snapped off by the wind: the splintered stump at the -X end stays; the trunk lying along +X on the
-    ///   ground with its stub limbs (child "full") is what is cut. It turns (in 30 degree steps from its rotation) until it lies
-    ///   clear of standing trunks, rocks, roads, water and buildings.
+    /// - windfall: a felled tree, limbed and bucked: the axe-cut stump at the -X end, its chips and the lopped crown's low heap
+    ///   of branches stay; the two logs lying along +X on the ground (child "full") are what is cut. It turns (in 30 degree
+    ///   steps from its rotation) until it lies clear of standing trunks, rocks, roads, water and buildings.
     /// - herb: a herb patch (Herb, variants 3-5 the trades' herbs), leaning with a slope and sunk into it so nothing hangs over it.
     /// A node that stands in a trunk, a rock, a road, water, a building, a camp's spread or a cave's furnishings, by a secret or
     /// another node is moved clear (up to 3 m), with a warning when nothing near is clear. One under a cave (under) stands on its
@@ -240,55 +240,115 @@ namespace Crulanda.World
             (new Color(.15f, .13f, .12f), new Color(.3f, .25f, .2f)),
             (new Color(.72f, .72f, .68f), new Color(.8f, .78f, .7f)) };
         /// <summary>
-        /// A windfall: a tree the wind snapped off. At its -X end the stump (a short bole on a root flare, its top a splintered
-        /// break of pale wood) stays; from just past it the trunk (child "full", returned) lies along +X on the ground for 4.4-5 m,
-        /// tapering, its broken end splintered, with four stub limbs; it follows the ground and never hangs over a dip. No
-        /// colliders. Draws only from R.
+        /// A windfall, felled and worked (playtest note 6, Chris: "need to look chopped down"). At its -X end the stump stays: cut
+        /// low with an axe on its root flare, its pale face tipped a little toward the fall, the heartwood darker, a short ridge of
+        /// the hinge's torn fibres across it, and the axe's chips round it. Along +X the trunk (child "full", returned) lies limbed
+        /// and bucked in two, every cut end pale, its lopped limbs short stubs with pale ends (nothing stands up off it); the
+        /// lopped crown lies in a low heap of bare branches beside it and stays when the logs are taken. All of it from -2.9 to
+        /// +2.5 m along X (WindfallYaw); it follows the ground, each log lowered until no stretch of it floats. No colliders.
+        /// Draws only from R. (Designed on the software renderer: tools/wip/windfall.)
         /// </summary>
         Transform Windfall(Transform t, int variant, Func<float> R, Func<float, float, float> G)
         {
             var look = WoodLooks[Mathf.Clamp(variant, 0, WoodLooks.Length - 1)];
-            var bark = Tint(art.bark, Wither(look.bark)); var heart = Tint(art.timber, Wither(look.wood));
-            float r0 = .27f + R() * .05f, len = 4.4f + R() * .6f, sx = -2.7f;
-            // The stump: its top is the break, splinters standing round the rim; the root flare sunk into the ground round its foot.
-            float gs = Mathf.Min(G(sx, 0), Mathf.Min(G(sx - r0, 0), G(sx + r0, 0))), sh = .45f + R() * .2f;
-            Part(PrimitiveType.Cylinder, t, new Vector3(sx, gs + sh / 2 - .1f, 0), new Vector3(r0 * 2.3f, sh / 2 + .1f, r0 * 2.3f), bark);
-            Part(PrimitiveType.Cylinder, t, new Vector3(sx, gs + sh - .08f, 0), new Vector3(r0 * 2.1f, .09f, r0 * 2.1f), heart);
-            for (int k = 0; k < 6; k++)
+            Color Shade(Color c, float k) { return new Color(c.r * k, c.g * k, c.b * k, 1); }
+            var bark = Tint(art.bark, Wither(look.bark)); var wood = Tint(art.timber, Wither(look.wood));
+            var heart = Tint(art.timber, Wither(Shade(look.wood, .82f))); var pith = Tint(art.timber, Wither(Shade(look.wood, .5f)));
+            var pale = Tint(art.timber, Wither(Color.Lerp(look.wood, Color.white, .18f)));
+            // A round face square to its axis; a straight round length of wood with open ends (capped by faces, or sunk in the ground).
+            void Face(Transform par, Vector3 at, Vector3 axis, float rad, float thick, Material mat) { Part(PrimitiveType.Cylinder, par, at, new Vector3(rad * 2, thick / 2, rad * 2), mat, Quaternion.FromToRotation(Vector3.up, axis)); }
+            void Round(Transform par, Vector3 from, Vector3 to, float ra, float rb, string name)
             {
-                var q = Quaternion.Euler(0, k * 60 + R() * 25, 0); var p = new Vector3(sx, 0, 0) + q * new Vector3(0, 0, r0 * .8f);
-                Part(PrimitiveType.Cube, t, new Vector3(p.x, gs + sh + .02f + R() * .08f, p.z), new Vector3(.05f + R() * .04f, .14f + R() * .22f, .04f), k % 2 == 0 ? heart : bark, q * Quaternion.Euler(-8 - R() * 16, 0, (R() - .5f) * 24));
+                var span = to - from; var across = Vector3.Cross(span.normalized, Vector3.up); if (across.sqrMagnitude < 1e-4f) across = Vector3.right;
+                MeshPart(ZoneMeshes.Tube(u => from + span * u, (u, w) => Mathf.Lerp(ra, rb, u) * (1 + .04f * Mathf.Sin(w * 5 + u * 9)), new[] { 0, .25f, .5f, .75f, 1 }, 10, across.normalized, 1, span.magnitude * .5f), par, Vector3.zero, bark).name = name;
             }
-            for (int k = 0; k < 4; k++)
+            void Chip(Transform par, Vector3 at, Vector3 size, Material mat, Vector3 fwd, Vector3 up) { Part(PrimitiveType.Cube, par, at, size, mat, Quaternion.LookRotation(fwd.sqrMagnitude > 1e-4f ? fwd : Vector3.forward, up)); }
+            // Lowers a log lying from lo to hi (radii ra, rb) until no stretch of it floats more than a quarter of its girth.
+            void Settle(ref Vector3 lo, ref Vector3 hi, float ra, float rb)
             {
-                var q = Quaternion.Euler(0, k * 90 + 45 + R() * 20, 0); var p = new Vector3(sx, 0, 0) + q * new Vector3(0, 0, r0 * 1.15f);
-                Part(PrimitiveType.Sphere, t, new Vector3(p.x, G(p.x, p.z) + .03f, p.z), new Vector3(.2f, .15f, .46f) * (r0 / .27f), bark, q * Quaternion.Euler(14, 0, 0));
+                float lift = 0;
+                for (int k = 0; k <= 8; k++) { float f = k / 8f; var c = Vector3.Lerp(lo, hi, f); lift = Mathf.Max(lift, c.y - Mathf.Lerp(ra, rb, f) * .75f - G(c.x, c.z)); }
+                if (lift > 0) { lo.y -= lift; hi.y -= lift; }
             }
-            // The trunk, lying on the ground from the break to its top (narrower there), lowered until no stretch of it floats.
-            var full = new GameObject("full").transform; full.SetParent(t, false);
-            float ax = sx + .4f, bx = ax + len, r1 = r0 * .58f;
-            var a = new Vector3(ax, G(ax, 0) + r0 * .7f, 0); var b = new Vector3(bx, G(bx, 0) + r1 * .55f, 0);
-            float lift = 0;
-            for (int k = 1; k < 8; k++) { float f = k / 8f; var c = Vector3.Lerp(a, b, f); lift = Mathf.Max(lift, c.y - Mathf.Lerp(r0, r1, f) * .75f - G(c.x, 0)); }
-            if (lift > 0) { a.y -= lift; b.y -= lift; }
-            var dir = (b - a).normalized;
-            Limb(full, a, b, r0, r1, bark, .02f, 10);
-            // The break: the trunk's flared, open end closed by pale torn wood, splinters reaching back toward the stump.
-            Part(PrimitiveType.Cylinder, full, a - dir * .01f, new Vector3(r0 * 2.6f, .02f, r0 * 2.6f), heart, Quaternion.FromToRotation(Vector3.up, dir));
+
+            // The stump: a short bole on a root flare, cut low and nearly level.
+            float r0 = .29f + R() * .05f, sx = -2.6f, rs = r0 * 1.06f;
+            float gs = Mathf.Min(Mathf.Min(G(sx, 0), G(sx - rs, 0)), Mathf.Min(G(sx + rs, 0), Mathf.Min(G(sx, -rs), G(sx, rs)))), hs = .38f + R() * .16f;
+            var top = new Vector3(sx, gs + hs, 0);
+            Round(t, new Vector3(sx, gs - .3f, 0), top, rs * 1.32f, rs, "Stump");
             for (int k = 0; k < 5; k++)
             {
-                var round = Quaternion.AngleAxis(k * 72 + R() * 30, dir) * Vector3.Cross(dir, Vector3.forward).normalized;
-                var p = a + round * r0 * (.3f + R() * .7f) - dir * .1f;
-                Part(PrimitiveType.Cube, full, p, new Vector3(.04f + R() * .03f, .04f, .18f + R() * .2f), k % 2 == 0 ? heart : bark, Quaternion.LookRotation(-dir + round * (R() - .5f) * .3f));
+                float an = (k * 72 + R() * 30) * Mathf.Deg2Rad; var o = new Vector3(Mathf.Cos(an), 0, Mathf.Sin(an)); var p = new Vector3(sx, 0, 0) + o * rs * 1.1f;
+                Part(PrimitiveType.Sphere, t, new Vector3(p.x, G(p.x, p.z) + .04f, p.z), new Vector3(rs * .55f, rs * .45f, rs * 1.3f), bark, Quaternion.LookRotation(o) * Quaternion.Euler(14, 0, 0));
             }
-            // Stub limbs: two up, two out to the sides, snapped short.
-            for (int k = 0; k < 4; k++)
+            // The cut: a pale face tipped a little toward the fall (+X), the heartwood darker, the pith.
+            float tilt = (4 + R() * 4) * Mathf.Deg2Rad; var n = new Vector3(Mathf.Sin(tilt), Mathf.Cos(tilt), 0);
+            Face(t, top - Vector3.up * .02f, n, rs * .97f, .05f, wood);
+            Face(t, top + n * .006f - Vector3.up * .02f, n, rs * .55f, .05f, heart);
+            Part(PrimitiveType.Sphere, t, top + n * .012f - Vector3.up * .005f, new Vector3(.05f, .02f, .05f), pith);
+            // The hinge: a short ridge of torn fibres across the face, toward the fall side.
+            for (int k = 0; k < 5; k++)
             {
-                float f = .3f + k * .17f + R() * .08f; var from = Vector3.Lerp(a, b, f);
-                var side = new Vector3(0, 0, k % 2 == 0 ? 1 : -1); var up = k < 2 ? .9f + R() * .5f : .2f + R() * .2f;
-                var to = from + (dir * (.3f + R() * .3f) + side * (k < 2 ? .35f : 1) + Vector3.up * up).normalized * (.55f + R() * .55f);
-                to.y = Mathf.Max(to.y, G(to.x, to.z) + .08f);
-                Limb(full, from, to, r0 * (.36f - f * .12f), .025f, bark, .1f, 6);
+                float zz = (k - 2) / 2.2f * rs * .75f + (R() - .5f) * .05f, xx = sx + rs * .28f + (R() - .5f) * .04f, h = .05f + R() * .07f;
+                float w = .03f + R() * .02f, d = .02f + R() * .015f; var up = new Vector3(.35f + R() * .3f, 1, (R() - .5f) * .3f).normalized;
+                Chip(t, new Vector3(xx, top.y + h / 2 - .01f, zz), new Vector3(w, h, d), k % 2 == 1 ? pale : wood, Vector3.right, up);
+            }
+            // Chips: the axe's, thrown mostly toward the fall side, flat on the ground.
+            for (int k = 0; k < 13; k++)
+            {
+                float an = (R() - .5f) * Mathf.PI * 1.5f + (k % 3 != 0 ? 0 : Mathf.PI), d = rs + .2f + R() * 1.1f;
+                float x = Mathf.Max(sx - .25f, sx + Mathf.Cos(an) * d), z = Mathf.Sin(an) * d;
+                var size = new Vector3(.06f + R() * .07f, .014f, .03f + R() * .04f); var fwd = new Vector3(Mathf.Cos(R() * 6.3f), (R() - .5f) * .25f, Mathf.Sin(R() * 6.3f));
+                Chip(t, new Vector3(x, G(x, z) + .008f, z), size, k % 4 == 0 ? bark : k % 2 == 1 ? wood : pale, fwd, Vector3.up);
+            }
+
+            // The logs: the trunk limbed and bucked in two, lying where it fell, every cut end pale.
+            var full = new GameObject("full").transform; full.SetParent(t, false);
+            float ax = sx + rs + .25f, len = 4.2f + R() * .3f, cut = .58f + R() * .08f, gap = .14f + R() * .08f, r1 = r0 * .62f, rc = r0 + (r1 - r0) * cut;
+            float bx = ax + len * cut; var a = new Vector3(ax, G(ax, 0) + r0 * .86f, 0); var b = new Vector3(bx, G(bx, 0) + rc * .86f, 0);
+            float roll = (R() - .5f) * .5f, yaw = (R() - .5f) * 14 * Mathf.Deg2Rad, dl = len * (1 - cut) - gap;
+            var c2 = new Vector3(bx + gap, G(bx + gap, roll) + rc * .86f, roll); var e = c2 + new Vector3(Mathf.Cos(yaw), 0, Mathf.Sin(yaw)) * dl; e.y = G(e.x, e.z) + r1 * .86f;
+            Settle(ref a, ref b, r0, rc); Settle(ref c2, ref e, rc * .97f, r1);
+            Round(full, a, b, r0, rc, "Log"); Round(full, c2, e, rc * .97f, r1, "Log");
+            foreach (var (p, q, r) in new[] { (a, b, r0), (b, a, rc), (c2, e, rc * .97f), (e, c2, r1) })
+            {
+                var o = (p - q).normalized; Face(full, p + o * .01f, o, r * .97f, .03f, wood); Face(full, p + o * .02f, o, r * .55f, .03f, heart);
+            }
+            // The hinge's fibres on the butt, pointing back at the stump.
+            for (int k = 0; k < 3; k++)
+            {
+                var o = new Vector3(0, R() - .3f, R() - .5f).normalized; float at = .3f + R() * .4f, l = .1f + R() * .08f; var fwd = new Vector3(-1, (R() - .5f) * .3f, (R() - .5f) * .3f);
+                Chip(full, a + o * r0 * at - new Vector3(.04f, 0, 0), new Vector3(.025f, .025f, l), pale, fwd, Vector3.up);
+            }
+            // Lopped limbs: short stubs flush with the bark, a pale cut on each (none of them a stick).
+            for (int log = 0; log < 2; log++)
+            {
+                Vector3 p = log == 0 ? a : c2, q = log == 0 ? b : e; float rp = log == 0 ? r0 : rc, rq = log == 0 ? rc : r1;
+                for (int k = 0; k < (log == 0 ? 3 : 2); k++)
+                {
+                    float f = .25f + k * .25f + R() * .12f, rr = Mathf.Lerp(rp, rq, f); var ctr = Vector3.Lerp(p, q, f);
+                    float an = (-60 + R() * 240) * Mathf.Deg2Rad; var o = (new Vector3(0, Mathf.Sin(an), Mathf.Cos(an)) + (q - p).normalized * .35f).normalized;
+                    var from = ctr + o * rr * .7f; var tip = ctr + o * (rr + .06f + R() * .07f); float st = .04f + R() * .03f;
+                    Round(full, from, tip, st * 1.25f, st, "Stub"); Face(full, tip, o, st * .95f, .02f, pale);
+                }
+            }
+
+            // The lopped crown, heaped low beside the top log and past the cut: it stays when the logs are taken.
+            float sideZ = R() < .5f ? 1 : -1;
+            for (int k = 0; k < 7; k++)
+            {
+                float x0 = .2f + R() * 1.6f, z0 = sideZ * (rc + .25f + R() * .55f) + roll;
+                float an = ((R() - .5f) * 70 + (k % 3 == 0 ? 180 : 0)) * Mathf.Deg2Rad, l = .7f + R() * .8f;
+                var p = new Vector3(x0, G(x0, z0) + .05f, z0); var q = p + new Vector3(Mathf.Cos(an), 0, Mathf.Sin(an)) * l; q.y = G(q.x, q.z) + .03f + R() * .1f;
+                q.x = Mathf.Min(q.x, 2.45f); if (k % 2 == 1) q.y += R() * .12f;
+                float br = .035f + R() * .03f;
+                Limb(t, p, q, br, .012f, bark, .05f, 6);
+                for (int j = 0; j < 3; j++)
+                {
+                    var m = LimbAt(p, q, .05f, .3f + j * .22f); var tw = m + (q - p + new Vector3(0, .1f + R() * .25f, (R() - .5f) * 1.8f)).normalized * (.25f + R() * .35f);
+                    tw.x = Mathf.Min(tw.x, 2.45f); tw.y = Mathf.Max(tw.y, G(tw.x, tw.z) + .02f);
+                    Limb(t, m, tw, br * .6f, .008f, bark, .05f, 5);
+                }
             }
             return full;
         }

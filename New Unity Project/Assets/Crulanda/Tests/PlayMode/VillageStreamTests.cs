@@ -36,6 +36,7 @@ namespace Crulanda.Tests
         }
         [UnityTearDown] public IEnumerator Cleanup()
         {
+            VillageEconomy.ResetAll();   // the purses are kept for the play session
             ZoneBuilder.DefinitionFilter = null; ZoneBuilder.RequestedZoneId = null;
             if (WorldWeather.Active != null) WorldWeather.Active.Release(true);
             WorldClock.Hour = 8.5f;

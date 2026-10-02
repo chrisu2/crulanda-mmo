@@ -604,7 +604,7 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
   villager, hen-wife and working resident goes home to their household's door (`Villager.Home`, `Villager.Household`,
   `VillageLife.Households`, `HouseholdOf`); a resident who keeps a post can be named in a household (so a knock names them)
   and still keeps the post day and night. `stipend` (default 6) and `needs` (default bread, firewood, eggs) are read by the
-  purses, a later step.
+  purses (below).
   - Oakhaven, 16 households: Vell, Thorne, **Tanner** (Maud Tanner, leatherworker; Fen Walker, skinner, her husband; Nettie,
     their daughter), Rusk, Reed, Farrow (Osk and his son Pim), Crane, Ashby (the Elder's house), Pell (Old Tobin and his wife
     Edda), Jory (alone, Jory's house), Harrow farm (Sel Harrow, Ilse Brandt the hand, Goody Marl their aunt), **Carder farm**
@@ -630,6 +630,40 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
     six, zones without households parse) and `VillageHomeTests` (PlayMode: everyone walks home to their own door by 23:30, the
     Tanners share a house, farmers live with their hen-wife, the hunter makes it from the inn to his lodge in time, every home
     door is on the navmesh, knocking names the household).
+- **Purses** (GAME-ONLY; `Scripts/Encounter/VillageEconomy.cs`, `VillageLife.Economy`; tools/wip/professions/ADDENDUM.md C):
+  one purse per household. Money comes in two ways only: the household's daily `stipend` (from outside the village) and the
+  player. It moves between households only when one buys bread (2, paid to the baker's household), firewood (3, the woodcutter's)
+  or eggs (1, the first merchant's, and only where there are hens). Deliveries between the trades carry no price.
+  - Each morning (the hour dropping by more than six, as a villager's errands tell a new day) a purse takes its stipend, up to a
+    cap of 40, and plans: it walks its `needs` in order and claims each one it can afford, stopping at the first it cannot. A
+    household never buys what its own trade makes (the baker bread, the woodcutter and the hunter firewood, a hen-wife or a
+    merchant eggs), and the inn does not shop.
+  - A claim is paid when the goods are picked up. A household with a spare pair of hands sends someone, where you can see it
+    (`VillageWork.Shopping`): "bread for the house" (9-18, the baker's stall to home; a child goes first, after their own midday
+    "a loaf for Mum", which now runs only when bread is claimed), "firewood for the hearth" (14-19:30, the woodyard to home, a
+    grown-up who is not the head: Fen Walker for the Tanners) and "eggs for the house" (15:30-18:30). A household of one, one with
+    nobody to send, or one living more than 100 m from the green buys on the books at the hour the window opens, so the smiths and
+    merchants stay at their shops. An errand given up before pick-up lets its claim go.
+  - Short of coin, the errand is not run and the one who would have gone says so once ("Can't stretch to firewood today.", "Mum
+    says there's no loaf today."). A house whose firewood went unmet has its chimney smoke switched off (`ZoneDoor.smoke`'s
+    emission, `Household.ApplyHearth`) from 17:00 until wood is next brought home; every other chimney smokes as before. Where the
+    player can pay them (a member has wares or quests), a cold household says so one talk in three ("We've bread. No fire;
+    Nettie sleeps in her coat.").
+  - The player's coin (`VillageLife.Paid`: a purchase, or a bag Maud makes for a quest's hides) goes into the seller's household,
+    which plans again and sets out at once ("That's the fire lit tonight. Bless you."). After 18:00 it waits for the morning
+    ("That's tomorrow's fire. Bless you."); past the cap the tithe-man has the rest. Buying never needs stock, and selling to a
+    vendor never draws on a purse.
+  - Not saved. Purses live for the play session, keyed by the character (save folder and slot) and the zone, and are cleared when
+    another character plays. What lasts is the saved bags: each trade bag the character wears adds 2 a day to the leatherworker's
+    household and 6 to its first purse of a session.
+  - Oakhaven: the Tanners have a stipend of 3, and Jory 2 and bread only; everyone else 6 and all three. With no player only the
+    Tanners go without: bread every day, firewood every third day, so their chimney is cold at dusk two days in three. One worn bag
+    keeps them warm every day, also after a restart. Khaven has no baker, woodyard or hens, so its purses buy nothing.
+  - Tests: `VillageEconomyTests` (EditMode, over Oakhaven's data: only the Tanners go without, their bread and firewood days, one
+    bag keeps them warm, needs in order, the cap, a purchase reaches the seller, no household buys its own trade, a released
+    claim) and `VillagePurseTests` (PlayMode: buying from Maud at 15:00 sends Nettie for a loaf and Fen for firewood, short of
+    coin they go without and say so, a house without firewood goes cold while the rest keep smoking, the drinkers drink with
+    every purse at nothing). Village tests call `VillageEconomy.ResetAll()` in teardown.
 - **Day/night** (`Scripts/World/WorldClock.cs`): one game day lasts 40 real minutes and starts at 08:30. The hour
   continues across zone travel (it is not saved yet). The directional light is the sun by day and a pale moon at night.
   Dawn, day, dusk and night keyframes blend with the zone's own `lighting` palette: ambient, fog, sky tint and exposure.

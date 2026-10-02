@@ -708,3 +708,13 @@ Roadmap, Phase 2 plan, build matrix and known-issues docs received dated handoff
 The completed matrix and earlier browser preview remain available in outputs.
 There were no active background Unity test/build processes at the last completion check.
 No new calculator browser server was launched, and no new UI screenshot was captured.
+
+## STOPPED 2026-10-02 ~00:40 (Chris's usage limit)
+All agent work was stopped. Nothing is lost: each worktree keeps what its agents had committed, and each workflow can be
+resumed with `Workflow({scriptPath, resumeFromRunId})` (finished agents replay from cache).
+- Round 7 (notes 1-3) is on main (61a2e94, compile ALL OK, EditMode 369/369). Its detached full check was left running
+  locally (no cost); read `hel\work\full-run.done`, `q-PlayMode.xml` and the tour shots, fix, publish.
+- Stopped workflows (resume or rerun): art notes wf_1ca487e1-45f (sheep/cats, lumber trees, sun, caves, icons), colour
+  wf_99f8008d-998, characters wf_755e3e44-eb0, history PDF wf_e1fd6182-250 (its research notes are in
+  `scratchpad\history`; `tools/docs` holds a partial generator, uncommitted).
+- Ask Chris before starting multi-agent runs again: tonight's used his Fable allowance and his 5-hour limit.

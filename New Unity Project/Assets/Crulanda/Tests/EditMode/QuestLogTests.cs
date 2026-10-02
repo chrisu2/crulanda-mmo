@@ -174,7 +174,8 @@ namespace Crulanda.Tests
             Assert.AreEqual(1, Inventory.Count(p, WalletBag)); Assert.AreEqual(0, log.ItemCount(WalletBag)); Assert.IsTrue(log.IsDone(Wallet));
             Assert.AreEqual(75, log.Standing("oakhaven"));
             Assert.IsTrue(said.Exists(l => l.StartsWith("Received: Simples-wallet.")));
-            Assert.AreEqual(QuestStatus.Done, log.Status(q, "zone.oakhaven")); Assert.AreEqual(' ', log.Marker(Maud, "zone.oakhaven", 1, out _));
+            Assert.AreEqual(QuestStatus.Done, log.Status(q, "zone.oakhaven")); Assert.IsFalse(log.For(Maud, "zone.oakhaven", 1).Exists(e => e.quest.id == Wallet), "Done, it is off her list.");
+            Assert.AreEqual('!', log.Marker(Maud, "zone.oakhaven", 1, out _), "Her next bag quest (the hunting step's log-sling) is offered instead.");
         }
 
         [Test] public void Bring_without_enough_changes_nothing()
@@ -198,7 +199,10 @@ namespace Crulanda.Tests
             Assert.AreEqual(QuestStatus.Available, log.Status(q, "zone.oakhaven"));
             Inventory.Add(log.Progress, items, WalletBag, 1);
             Assert.AreEqual(QuestStatus.Unavailable, log.Status(q, "zone.oakhaven"));
-            Assert.IsFalse(log.For(Maud, "zone.oakhaven", 1).Exists(e => e.quest.id == Wallet)); Assert.AreEqual(' ', log.Marker(Maud, "zone.oakhaven", 1, out _));
+            Assert.IsFalse(log.For(Maud, "zone.oakhaven", 1).Exists(e => e.quest.id == Wallet));
+            // Her other three bags carried as well, she has nothing left to offer.
+            foreach (var bag in new[] { "bag.log_sling", "bag.larder_scrip", "bag.ore_poke" }) Inventory.Add(log.Progress, items, bag, 1);
+            Assert.AreEqual(' ', log.Marker(Maud, "zone.oakhaven", 1, out _));
             Assert.IsFalse(log.Accept(q, "zone.oakhaven"));
             // Worn.
             Assert.IsTrue(Inventory.Wear(log.Progress, items, log.Progress.bag.FindIndex(x => x.item == WalletBag), out _));

@@ -908,7 +908,7 @@ namespace Crulanda.Encounter
         public void StopAutoAttack() { AutoAttack = false; }
         public readonly List<string> Messages = new List<string>();
         public readonly List<CombatText> Floating = new List<CombatText>();
-        public bool InCombat { get { return (AutoAttack && Target != null && Target.actor.IsAlive) || Enemies.Exists(e => e != null && e.Engaged); } }
+        public bool InCombat { get { return FightingTarget || Enemies.Exists(e => e != null && e.Engaged); } }
         public int WeaponDamage { get { return Player == null ? 0 : Player.Stats.GetRounded(StatType.AttackPower); } }
         float nextSwing, nextRegen, nextSave;
         EncounterSave saves;
@@ -1069,7 +1069,7 @@ namespace Crulanda.Encounter
                 else if (spawn.veteran) a.Stats.SetBase(StatType.MaxHealth, content.veteranHealth);
                 if (Progress.FindEnemy(spawn.id).dead) enemy.RestoreDead();
             }
-            SpawnCamps();
+            SpawnCamps(); SpawnGame();
             restoring = false;
         }
         struct EnemySpawn { public string id, name; public Vector3 point; public bool veteran; public ActorLook look; public int level; }
@@ -1295,6 +1295,7 @@ namespace Crulanda.Encounter
         {
             var nearby = Enemies.FindAll(e => e.actor.IsAlive && !e.Hidden && Distance(e) < 25);
             nearby.Sort((a,b) => Distance(a).CompareTo(Distance(b)));
+            if (nearby.Count == 0) nearby = NearbyGame();   // no enemy near: the game animals (hunting step)
             if (nearby.Count == 0) { Target = null; return; }
             Select(nearby[(nearby.IndexOf(Target) + 1) % nearby.Count]);
         }
@@ -1323,7 +1324,7 @@ namespace Crulanda.Encounter
             // Only a fight you are actually in stops you: something after you nearby. A mob stuck chasing you from the far side
             // of the zone must not bar every road out.
             var chaser = Enemies.Find(e => e != null && e.Engaged && Distance(e) < 40);
-            if (!Player.IsAlive || chaser != null || (AutoAttack && Target != null && Target.actor.IsAlive && Distance(Target) < 40))
+            if (!Player.IsAlive || chaser != null || (FightingTarget && Distance(Target) < 40))
             { Message(chaser != null ? "You can't travel while fighting: " + chaser.actor.DisplayName + " is still after you." : "You can't travel while fighting."); return false; }
             if (saves == null || saveBlocked) { Message("Travel disabled to protect an unreadable save."); return false; }
             Save(false);
@@ -1337,7 +1338,7 @@ namespace Crulanda.Encounter
         public bool CompanionInReach { get { return Companion != null && Vector3.Distance(Player.transform.position, Companion.transform.position) < TalkRange; } }
         /// <summary>A body that still has something to take (camp mobs until looted; story enemies by their saved record).</summary>
         public bool CanLoot(EncounterEnemy e) { return e != null && !e.actor.IsAlive && (e.Camp ? !e.Looted : !Progress.FindEnemy(e.persistentId).looted); }
-        EncounterEnemy LootableCorpse { get { return Enemies.Find(e => CanLoot(e) && Distance(e) < 3.6f && (!e.Camp || CanTakeAny(e))); } }
+        EncounterEnemy LootableCorpse { get { return Enemies.Find(e => CanLoot(e) && Distance(e) < 3.6f && (!e.Camp || CanTakeAny(e))) ?? SkinnableBody; } }
         public Crulanda.World.ZoneDoor NearbyDoor
         {
             get
@@ -1360,7 +1361,7 @@ namespace Crulanda.Encounter
                 if (Player == null || !Player.IsAlive || Paused) return null;
                 if (LootOpen) return "Take all";
                 var exit = NearbyExit; if (exit != null) return exit.name;
-                if (LootableCorpse != null) return "Search the body";
+                var body = LootableCorpse; if (body != null) return body.Game ? GameAnimals.SkinPrompt : "Search the body";
                 var (villager, mira) = TalkTarget();
                 if (mira) return !Progress.recruited ? "Recruit Mira" : !Companion.actor.IsAlive ? "Revive Mira" : "Talk to Mira";
                 if (villager != null) return "Talk to " + villager.Name;
@@ -1452,6 +1453,7 @@ namespace Crulanda.Encounter
         public void EnemyDied(EncounterEnemy enemy)
         {
             if (restoring) return;
+            if (enemy.Game) { GameDied(enemy); return; }   // no experience, no coin, no "zone clear" (EncounterSession.Hunt)
             if (enemy.Camp) RollCorpse(enemy);   // the loot is decided as it dies, so the body can show it
             int before = Progress.Level;
             int xp = EncounterProgress.KillXp(enemy.actor.Level, Progress.Level, enemy.Elite);

@@ -73,8 +73,7 @@ namespace Crulanda.Tests
                 { "Toll-gate guards", "the Sandthrone's toll-gate on the road, 70 m from Pilgrims' Rest: the guards stand at their gate" },
                 { "Captain's eyrie", "the Sandthrone's own keep, 117 m from Pilgrims' Rest" } } },   // grown to 430 m; the beasts moved out (2026-10-02)
             { "ashrim", new Dictionary<string, string> {
-                { "Fraying eaters", "open: the enclave fights the Weave-Eaters at its door, 50 m" }, { "The Weave-Eater brood", "open: 77 m" },
-                { "Unwoven Flats eaters", "open: 85 m" }, { "Cinderfold hollows", "open: 91 m from the hunters' hide" } } },
+                { "Cinderfold hollows", "91 m from the hunters' hide, where nobody lives (the Ash-Walkers are all at the enclave)" } } },   // grown to 430 m (2026-10-02)
             { "verdant", new Dictionary<string, string> {
                 { "Antler Meadow stags", "open: the meadow is 43 m from the Guest-Tree" }, { "Fallen Ghost-Oak spiders", "open: 72 m" },
                 { "The Briar Way", "open: 95 m" }, { "Old Ninebranch", "open: 98 m" }, { "Mistmere reed-boars", "open: 102 m from the scout's lean-to" },

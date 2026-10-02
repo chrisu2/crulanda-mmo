@@ -4,7 +4,7 @@
   "subtitle": "Grey ash at the edge of the Wasting, where the Ash-Walkers hold the Eastern Ridge",
   "canonStatus": "CANON-EXPANDED",
   "canonNote": "Canon (book1 ch.20): the Ash-Walkers live along the Wasting and fight the Weave-Eaters with Salt of the First Sea; Chieftain Grohl and Mother Vane, the Salt-Speaker, lead them from an enclave in the deep caves of the Eastern Ridge, across a plain of petrified ash. The Cult of Ash (Torvyn Embercloak, Vorn) and its iron-wired bone masks are canon (book1 ch.10, series_bible.md); the purple tear is the later House of Ash's symbol (series_bible.md), used here early (GAME-ONLY). The books also call Torvyn's cultists 'Ashwalkers'; the game keeps the Ash-Walkers of ch.20 and the Cult of Ash apart. The canon Ashlands take their full form after the Spoke fires (series_bible.md), so this pre-erasure rim is PROVISIONAL. GAME-ONLY: the zone's name and its roads to the Peaks and Oakhaven, the cult shrine's location, Cinderfold, the old ribcage, the ash hounds, the brood, and all placement. Grown to 360 m (2026-09-30): the Silent Statue is a canon kind (faceless monoliths in the Wasting, world_bible.md), placed here GAME-ONLY. GAME-ONLY: Wain's Rest and the old salt road, the Last Orchard, the Drowned Leviathan (harpoons of petrified leviathan bone are canon), the Walled Mouth, the Ash Pit and its Ash-Deacon, the Fraying, the Reach-Stones and the Hunters' Knoll.",
-  "size": 360,
+  "size": 430,
   "levelMin": 9,
   "levelMax": 10,
   "biome": "ash",
@@ -73,7 +73,7 @@
       "to": "zone.peaks",
       "name": "Ridge road to the Shattered Peaks",
       "at": {
-        "x": -173,
+        "x": -208,
         "y": 90
       },
       "arrive": {
@@ -87,7 +87,7 @@
       "name": "North road to Oakhaven",
       "at": {
         "x": 4.5,
-        "y": 173
+        "y": 208
       },
       "arrive": {
         "x": -34,
@@ -99,7 +99,7 @@
       "to": "zone.verdant",
       "name": "Old west road over the mountains to the Verdant Shore (11-13)",
       "at": {
-        "x": -173,
+        "x": -208,
         "y": -3
       },
       "arrive": {
@@ -178,8 +178,8 @@
       "name": "The brood",
       "paint": "unmade",
       "center": {
-        "x": 54,
-        "y": -86
+        "x": 43.57,
+        "y": -134.9
       },
       "radius": 5,
       "height": -1.2,
@@ -219,8 +219,8 @@
       "name": "The Fraying",
       "paint": "unmade",
       "center": {
-        "x": 115,
-        "y": -32
+        "x": 183.87,
+        "y": -64.14
       },
       "radius": 9,
       "height": -0.6,
@@ -253,7 +253,7 @@
       "width": 4.5,
       "points": [
         {
-          "x": -180,
+          "x": -215,
           "y": 92
         },
         {
@@ -308,7 +308,7 @@
       "points": [
         {
           "x": 4,
-          "y": 180
+          "y": 215
         },
         {
           "x": 5.2,
@@ -393,7 +393,7 @@
       "width": 4,
       "points": [
         {
-          "x": -180,
+          "x": -215,
           "y": -4
         },
         {
@@ -449,8 +449,8 @@
       "name": "The Unwoven Flats",
       "text": "The ash here is too smooth, as if something licked it clean.",
       "at": {
-        "x": -10,
-        "y": -40
+        "x": -56.62,
+        "y": -21.91
       },
       "radius": 16,
       "ground": "licked"
@@ -486,8 +486,8 @@
       "name": "The brood",
       "text": "Where the Eaters grow fat at the Wasting's edge.",
       "at": {
-        "x": 54,
-        "y": -86
+        "x": 43.57,
+        "y": -134.9
       },
       "radius": 10
     },
@@ -554,8 +554,8 @@
       "name": "The Fraying",
       "text": "A grey tongue of the unmade, licking in behind the Ridge. The Eaters rise out of it like breath on cold glass.",
       "at": {
-        "x": 115,
-        "y": -32
+        "x": 183.87,
+        "y": -64.14
       },
       "radius": 12,
       "canonStatus": "CANON-EXPANDED: Weave-Eaters born of the Weave's frayed threads are CANON (book1 ch.20); the Fraying is GAME-ONLY."
@@ -990,8 +990,8 @@
       "kind": "brood",
       "name": "Brood nest",
       "at": {
-        "x": 54,
-        "y": -86
+        "x": 43.57,
+        "y": -134.9
       },
       "size": {
         "x": 5,
@@ -2190,8 +2190,8 @@
       "look": "weaveeater",
       "canonStatus": "CANON creature (Weave-Eaters, book1 ch.20), GAME-ONLY placement",
       "center": {
-        "x": -10,
-        "y": -40
+        "x": -56.62,
+        "y": -21.91
       },
       "radius": 12,
       "count": 5,
@@ -2238,8 +2238,8 @@
       "look": "weaveeater",
       "canonStatus": "CANON creature, GAME-ONLY brood",
       "center": {
-        "x": 54,
-        "y": -86
+        "x": 43.57,
+        "y": -134.9
       },
       "radius": 7,
       "count": 2,
@@ -2304,8 +2304,8 @@
       "look": "weaveeater",
       "canonStatus": "CANON creature (Weave-Eaters, book1 ch.20), GAME-ONLY placement",
       "center": {
-        "x": 115,
-        "y": -32
+        "x": 183.87,
+        "y": -64.14
       },
       "radius": 11,
       "count": 5,
@@ -2572,38 +2572,245 @@
     }
   ],
   "nodes": [
-    { "node": "node.cinder", "at": { "x": 77.5, "y": 38 }, "rotation": 90 },
-    { "node": "node.cinder", "at": { "x": 77.5, "y": -36 }, "rotation": 90 },
-    { "node": "node.cinder", "at": { "x": 79.6, "y": 69.2 }, "rotation": 80 },
-    { "node": "node.cinder", "at": { "x": 79.6, "y": -71.2 }, "rotation": 100 },
-    { "node": "node.cinder", "at": { "x": -58, "y": -116.5 } },
-    { "node": "node.cinder", "at": { "x": -42, "y": -116.5 } },
-    { "node": "node.cinder", "at": { "x": -114.5, "y": -22 }, "rotation": 90 },
-    { "node": "node.cinder", "at": { "x": -114.5, "y": -40 }, "rotation": 90 },
-    { "node": "node.cinder", "at": { "x": -86, "y": 107.5 } },
-    { "node": "node.cinder", "at": { "x": 86, "y": -128 } },
-    { "node": "node.snag", "at": { "x": -80, "y": -6 } },
-    { "node": "node.snag", "at": { "x": -67, "y": 99 } },
-    { "node": "node.snag", "at": { "x": 25, "y": 62 }, "rotation": 90 },
-    { "node": "node.snag", "at": { "x": 27, "y": -100 }, "rotation": 90 },
-    { "node": "node.snag", "at": { "x": -81, "y": -96 }, "rotation": 90 },
-    { "node": "node.snag", "at": { "x": -133, "y": -24 }, "rotation": 90 },
-    { "node": "node.snag", "at": { "x": 106, "y": 74 }, "rotation": 90 },
-    { "node": "node.snag", "at": { "x": -62, "y": 138 } },
-    { "node": "node.cinder_thistle", "at": { "x": -120, "y": -60 } },
-    { "node": "node.cinder_thistle", "at": { "x": -30, "y": -60 } },
-    { "node": "node.cinder_thistle", "at": { "x": 10, "y": -20 } },
-    { "node": "node.cinder_thistle", "at": { "x": -10, "y": 50 } },
-    { "node": "node.cinder_thistle", "at": { "x": -120, "y": 110 } },
-    { "node": "node.cinder_thistle", "at": { "x": 110, "y": -90 } },
-    { "node": "node.cinder_thistle", "at": { "x": 40, "y": -120 } },
-    { "node": "node.cinder_thistle", "at": { "x": -60, "y": 80 } },
-    { "node": "node.cinder_thistle", "at": { "x": 120, "y": 10 } },
-    { "node": "node.cinder_thistle", "at": { "x": -128, "y": 44 } }
+    {
+      "node": "node.cinder",
+      "at": {
+        "x": 77.5,
+        "y": 38
+      },
+      "rotation": 90
+    },
+    {
+      "node": "node.cinder",
+      "at": {
+        "x": 77.5,
+        "y": -36
+      },
+      "rotation": 90
+    },
+    {
+      "node": "node.cinder",
+      "at": {
+        "x": 79.6,
+        "y": 69.2
+      },
+      "rotation": 80
+    },
+    {
+      "node": "node.cinder",
+      "at": {
+        "x": 79.6,
+        "y": -71.2
+      },
+      "rotation": 100
+    },
+    {
+      "node": "node.cinder",
+      "at": {
+        "x": -58,
+        "y": -116.5
+      }
+    },
+    {
+      "node": "node.cinder",
+      "at": {
+        "x": -42,
+        "y": -116.5
+      }
+    },
+    {
+      "node": "node.cinder",
+      "at": {
+        "x": -114.5,
+        "y": -22
+      },
+      "rotation": 90
+    },
+    {
+      "node": "node.cinder",
+      "at": {
+        "x": -114.5,
+        "y": -40
+      },
+      "rotation": 90
+    },
+    {
+      "node": "node.cinder",
+      "at": {
+        "x": -86,
+        "y": 107.5
+      }
+    },
+    {
+      "node": "node.cinder",
+      "at": {
+        "x": 86,
+        "y": -128
+      }
+    },
+    {
+      "node": "node.snag",
+      "at": {
+        "x": -80,
+        "y": -6
+      }
+    },
+    {
+      "node": "node.snag",
+      "at": {
+        "x": -67,
+        "y": 99
+      }
+    },
+    {
+      "node": "node.snag",
+      "at": {
+        "x": 25,
+        "y": 62
+      },
+      "rotation": 90
+    },
+    {
+      "node": "node.snag",
+      "at": {
+        "x": 27,
+        "y": -100
+      },
+      "rotation": 90
+    },
+    {
+      "node": "node.snag",
+      "at": {
+        "x": -81,
+        "y": -96
+      },
+      "rotation": 90
+    },
+    {
+      "node": "node.snag",
+      "at": {
+        "x": -133,
+        "y": -24
+      },
+      "rotation": 90
+    },
+    {
+      "node": "node.snag",
+      "at": {
+        "x": 106,
+        "y": 74
+      },
+      "rotation": 90
+    },
+    {
+      "node": "node.snag",
+      "at": {
+        "x": -62,
+        "y": 138
+      }
+    },
+    {
+      "node": "node.cinder_thistle",
+      "at": {
+        "x": -120,
+        "y": -60
+      }
+    },
+    {
+      "node": "node.cinder_thistle",
+      "at": {
+        "x": -30,
+        "y": -60
+      }
+    },
+    {
+      "node": "node.cinder_thistle",
+      "at": {
+        "x": 10,
+        "y": -20
+      }
+    },
+    {
+      "node": "node.cinder_thistle",
+      "at": {
+        "x": -10,
+        "y": 50
+      }
+    },
+    {
+      "node": "node.cinder_thistle",
+      "at": {
+        "x": -120,
+        "y": 110
+      }
+    },
+    {
+      "node": "node.cinder_thistle",
+      "at": {
+        "x": 110,
+        "y": -90
+      }
+    },
+    {
+      "node": "node.cinder_thistle",
+      "at": {
+        "x": 40,
+        "y": -120
+      }
+    },
+    {
+      "node": "node.cinder_thistle",
+      "at": {
+        "x": -60,
+        "y": 80
+      }
+    },
+    {
+      "node": "node.cinder_thistle",
+      "at": {
+        "x": 120,
+        "y": 10
+      }
+    },
+    {
+      "node": "node.cinder_thistle",
+      "at": {
+        "x": -128,
+        "y": 44
+      }
+    }
   ],
   "stations": [
-    { "kind": "forge", "name": "Oska's bone-anvil", "at": { "x": 56, "y": 22 }, "rotation": 225, "variant": 1, "canonStatus": "GAME-ONLY" },
-    { "kind": "bench", "name": "Mother Vane's salt-bench", "at": { "x": 64, "y": -6 }, "rotation": 315, "canonStatus": "GAME-ONLY: Mother Vane is CANON (book1 ch.20); her bench is invented." },
-    { "kind": "fire", "name": "Enclave cookfire", "at": { "x": 60, "y": -18 }, "rotation": 140, "canonStatus": "GAME-ONLY" }
+    {
+      "kind": "forge",
+      "name": "Oska's bone-anvil",
+      "at": {
+        "x": 56,
+        "y": 22
+      },
+      "rotation": 225,
+      "variant": 1,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "kind": "bench",
+      "name": "Mother Vane's salt-bench",
+      "at": {
+        "x": 64,
+        "y": -6
+      },
+      "rotation": 315,
+      "canonStatus": "GAME-ONLY: Mother Vane is CANON (book1 ch.20); her bench is invented."
+    },
+    {
+      "kind": "fire",
+      "name": "Enclave cookfire",
+      "at": {
+        "x": 60,
+        "y": -18
+      },
+      "rotation": 140,
+      "canonStatus": "GAME-ONLY"
+    }
   ]
 }

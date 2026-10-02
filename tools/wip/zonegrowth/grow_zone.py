@@ -32,7 +32,7 @@ CONF = {
                 # The Sandthrone's own toll-gate on the road and their captain's keep stay where they are: their guards stand at
                 # their gate and their captain at his keep (ZoneGrowthTests.NearHomes names them).
                 'stay': ['Toll-gate guards', "Captain's eyrie"]},
-    'ashrim':  {'size': 430, 'not_homes': [], 'reach': 22},
+    'ashrim':  {'size': 430, 'not_homes': ["Hunters' hide"], 'reach': 22},   # nobody lives at the hunters' hide: all four Ash-Walkers are at the enclave
     'verdant': {'size': 430, 'not_homes': [], 'reach': 22},
 }
 

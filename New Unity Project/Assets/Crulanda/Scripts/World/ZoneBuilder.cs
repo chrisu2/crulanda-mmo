@@ -1231,7 +1231,12 @@ namespace Crulanda.World
             }
         }
         static readonly Color[] Plaster = { new Color(.88f, .82f, .68f), new Color(.8f, .76f, .66f), new Color(.86f, .72f, .54f) };
-        static readonly Color[] Shutter = { new Color(.3f, .38f, .3f), new Color(.42f, .28f, .18f), new Color(.32f, .3f, .4f) };
+        // Painted shutters and doors (playtest note 13, "need high fantasy not pale"), times the timber grain: green, madder red,
+        // woad blue, ochre; doors oiled oak, oxblood, blue, bottle green and ochre.
+        static readonly Color[] Shutter = { new Color(.12f, .5f, .22f), new Color(.8f, .15f, .1f), new Color(.16f, .34f, .86f), new Color(.95f, .62f, .14f) };
+        static readonly Color[] Door = { new Color(.5f, .3f, .15f), new Color(.7f, .12f, .08f), new Color(.14f, .3f, .74f), new Color(.12f, .46f, .22f), new Color(.9f, .6f, .14f) };
+        /// <summary>House paint in this zone: as given in a living village, withered in a gloom, half-drained under the ash.</summary>
+        Color Paint(Color c) { if (Zone.biome == "ash") { float g = c.grayscale; return Color.Lerp(c, new Color(g, g, g, c.a), .5f); } return Wither(c); }
         /// <summary>
         /// The eaves of a gable roof (the painted style pass, 2026-10-01): a fascia board along each eave, rafter ends hung under
         /// the soffit from the wall out to the fascia, and a ridge cap seated on the ridge. <paramref name="w"/> and
@@ -1302,7 +1307,7 @@ namespace Crulanda.World
             }
             Part(PrimitiveType.Cube, t, face + new Vector3(0, -high / 2 - .1f, sz * .11f), new Vector3(wide + .3f, .08f, .26f), frame);   // the sill: face-.02 .. face+.24
             if (shutters) foreach (int s in new[] { -1, 1 })
-                Part(PrimitiveType.Cube, t, face + new Vector3(s * (wide / 2 + .24f), 0, sz * .02f), new Vector3(.3f, high + .1f, .06f), Tint(art.timber, Shutter[Mathf.Abs(variant) % Shutter.Length]));   // on the wall: face-.01 .. face+.05, 1 cm clear of the frame
+                Part(PrimitiveType.Cube, t, face + new Vector3(s * (wide / 2 + .24f), 0, sz * .02f), new Vector3(.3f, high + .1f, .06f), Tint(art.timber, Paint(Shutter[Mathf.Abs(variant) % Shutter.Length])));   // on the wall: face-.01 .. face+.05, 1 cm clear of the frame
         }
         /// <summary>A plank door facing -z: the slab (returned), three plank seams, two iron bands and a ring, the iron set 5 mm into the planks.</summary>
         GameObject PlankDoor(Transform t, Vector3 at, float wide, float high, Material planks, float thick = .06f)
@@ -1339,7 +1344,7 @@ namespace Crulanda.World
             // ground across the doorway, so the grass never cuts it, with steps up to it where the ground falls away in front
             // (DoorSteps). Warm windows either side and on the back.
             float foot = Mathf.Clamp(DoorGround(t, 0, -d / 2 - .3f, 1.2f) + .03f, -.25f, .65f);
-            PlankDoor(t, new Vector3(0, (foot + 2.7f) / 2, -d / 2 - .19f), 1.2f, 2.7f - foot, Tint(art.timber, new Color(.3f, .2f, .12f)));
+            PlankDoor(t, new Vector3(0, (foot + 2.7f) / 2, -d / 2 - .19f), 1.2f, 2.7f - foot, Tint(art.timber, Paint(Door[Mathf.Abs(variant * 2 + 1) % Door.Length])));
             foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(s * .68f, (foot + 2.86f) / 2, -d / 2 - .12f), new Vector3(.16f, 2.86f - foot, .24f), art.timber);
             DoorSteps(t, 0, -d / 2 - .15f, foot, 1.5f);
             Part(PrimitiveType.Cube, t, new Vector3(0, 2.78f, -d / 2 - .12f), new Vector3(1.52f, .16f, .24f), art.timber);
@@ -3274,7 +3279,8 @@ namespace Crulanda.World
             NightLights.Add(new NightLight { light = l, dayIntensity = intensity, nightIntensity = night });
             return l;
         }
-        static readonly Color[][] Awnings = { new[] { new Color(.62f, .2f, .16f), new Color(.86f, .8f, .66f) }, new[] { new Color(.2f, .34f, .52f), new Color(.86f, .8f, .66f) }, new[] { new Color(.32f, .45f, .22f), new Color(.8f, .66f, .3f) } };
+        static readonly Color[][] Awnings = { new[] { new Color(.66f, .08f, .07f), new Color(.96f, .9f, .74f) }, new[] { new Color(.07f, .2f, .6f), new Color(.96f, .9f, .74f) }, new[] { new Color(.08f, .36f, .14f), new Color(.9f, .6f, .12f) } };
+        static readonly Color[] Pennants = { new Color(.66f, .08f, .07f), new Color(.9f, .6f, .12f), new Color(.07f, .2f, .6f), new Color(.08f, .36f, .14f) };
         /// <summary>
         /// Market stall: an awning on four stout posts and two rails, a scalloped valance, a plank counter of goods (variant:
         /// 0 baskets of produce, 1 bolts of cloth and pots, 2 bread, all under dyed stripes; 3 Ash-Walker, GAME-ONLY look: two
@@ -3288,6 +3294,11 @@ namespace Crulanda.World
                 if (hide) Part(PrimitiveType.Cylinder, t, new Vector3(sx * 1.4f, sz > 0 ? 1.25f : 1.1f, sz * .9f), new Vector3(.13f, sz > 0 ? 1.25f : 1.1f, .13f), Bone);
                 else Part(PrimitiveType.Cube, t, new Vector3(sx * 1.4f, sz > 0 ? 1.25f : 1.1f, sz * .9f), new Vector3(.16f, sz > 0 ? 2.5f : 2.2f, .16f), art.timber);
             if (!hide) foreach (int sz in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(0, sz > 0 ? 2.42f : 2.12f, sz * .9f), new Vector3(3.1f, .1f, .1f), art.timber);   // rails under the awning, their ends past the posts
+            if (!hide && !Gloom) foreach (int sx in new[] { -1, 1 })   // a pennant on a pole at each back post (playtest note 13)
+            {
+                Part(PrimitiveType.Cylinder, t, new Vector3(sx * 1.4f, 2.72f, .9f), new Vector3(.03f, .22f, .03f), art.timber);
+                Part(PrimitiveType.Cube, t, new Vector3(sx * 1.4f + .17f, 2.84f, .9f), new Vector3(.32f, .16f, .02f), Tint(art.cloth, Pennants[(Mathf.Abs(variant) + (sx > 0 ? 1 : 0)) % Pennants.Length]));
+            }
             for (int i = 0; i < 6; i++)   // stripes, or one hide per half
                 Part(PrimitiveType.Cube, t, new Vector3(-1.25f + i * .5f, 2.35f, 0), new Vector3(.5f, .05f, 2.3f), Tint(art.cloth, colors[hide ? i / 3 : i % 2]), Quaternion.Euler(-9, 0, hide ? (i / 3) * 3 - 1.5f : 0));
             var scallop = PropMesh("Awning scallop", () =>
@@ -3310,12 +3321,12 @@ namespace Crulanda.World
                 {
                     case 0:   // baskets of apples, turnips and cabbages, heaped over the rim
                         MeshPart(PropMesh("Basket", () => Turned(new[] { new Vector2(0, 0), new Vector2(.13f, 0), new Vector2(.19f, .14f), new Vector2(.165f, .14f), new Vector2(.12f, .03f), new Vector2(0, .03f) }, 10, .25f)), t, at + new Vector3(0, -.03f, 0), art.hay);
-                        var produce = new[] { new Color(.7f, .15f, .12f), new Color(.85f, .75f, .6f), new Color(.4f, .6f, .25f), new Color(.8f, .55f, .15f) }[i % 4];
+                        var produce = new[] { new Color(.86f, .1f, .08f), new Color(.92f, .8f, .56f), new Color(.3f, .68f, .18f), new Color(.96f, .52f, .08f) }[i % 4];
                         for (int k = 0; k < 3; k++) Part(PrimitiveType.Sphere, t, at + new Vector3((k - 1) * .09f, .12f + (k % 2) * .03f, (k % 2) * .08f - .04f), Vector3.one * .15f, Tint(art.foliage, produce));
                         break;
                     case 1:   // bolts of cloth laid across the counter, and clay pots
-                        if (i % 2 == 0) Part(PrimitiveType.Cylinder, t, at + new Vector3(0, .07f, 0), new Vector3(.2f, .26f, .2f), Tint(art.cloth, Color.HSVToRGB(R(), .5f, .6f)), Quaternion.Euler(90, 0, 0));
-                        else MeshPart(PropMesh("Pot", () => Turned(new[] { new Vector2(0, 0), new Vector2(.07f, 0), new Vector2(.13f, .1f), new Vector2(.13f, .16f), new Vector2(.07f, .24f), new Vector2(.09f, .28f), new Vector2(.06f, .28f), new Vector2(.06f, .25f), new Vector2(0, .25f) }, 10)), t, at + new Vector3(0, -.03f, 0), Tint(art.stone, new Color(.62f, .4f, .28f)));
+                        if (i % 2 == 0) Part(PrimitiveType.Cylinder, t, at + new Vector3(0, .07f, 0), new Vector3(.2f, .26f, .2f), Tint(art.cloth, Color.HSVToRGB(R(), .8f, .6f)), Quaternion.Euler(90, 0, 0));
+                        else MeshPart(PropMesh("Pot", () => Turned(new[] { new Vector2(0, 0), new Vector2(.07f, 0), new Vector2(.13f, .1f), new Vector2(.13f, .16f), new Vector2(.07f, .24f), new Vector2(.09f, .28f), new Vector2(.06f, .28f), new Vector2(.06f, .25f), new Vector2(0, .25f) }, 10)), t, at + new Vector3(0, -.03f, 0), Tint(art.stone, new Color(.82f, .38f, .18f)));
                         break;
                     case 3:   // salt blocks, bone harpoon heads, strips of dried meat
                         if (i % 3 == 0) Part(PrimitiveType.Cube, t, at + new Vector3(0, .1f, 0), new Vector3(.24f, .2f, .2f), Tint(art.stone, new Color(.94f, .94f, .91f)), Quaternion.Euler(0, R() * 40 - 20, 0));
@@ -3643,7 +3654,7 @@ namespace Crulanda.World
         {
             float half = width / 2, top = 4.4f, step = width / 6;
             var stone = Dressed(new Color(.44f, .43f, .41f)); var iron = Tint(art.metal, new Color(.2f, .2f, .22f)); var planks = Tint(art.timber, new Color(.3f, .21f, .14f));
-            var sand = Tint(art.cloth, new Color(.78f, .63f, .38f)); var rust = Tint(art.cloth, new Color(.5f, .15f, .1f));
+            var sand = Tint(art.cloth, new Color(.9f, .66f, .24f)); var rust = Tint(art.cloth, new Color(.72f, .1f, .06f));
             // One mesh of dressed stone: the span, reaching into both towers, a string course under its battlements, two stepped
             // corbels a side round the arch (level courses, where two cubes stood on edge), and the merlons.
             var blocks = new List<CombineInstance> { Ashlar(new Vector3(0, top + .7f, 0), new Vector3(width + 3, 1.4f, 2.6f)), Ashlar(new Vector3(0, top + 1.32f, 0), new Vector3(width + 3, .2f, 2.84f)) };
@@ -3687,7 +3698,7 @@ namespace Crulanda.World
         {
             float w = size.x, d = size.y, h = 5;
             var stone = Dressed(new Color(.47f, .45f, .42f)); var dark = Tint(art.timber, new Color(.2f, .14f, .1f)); var iron = Tint(art.metal, new Color(.2f, .2f, .22f));
-            var sand = Tint(art.cloth, new Color(.78f, .63f, .38f)); var rust = Tint(art.cloth, new Color(.5f, .15f, .1f)); var slit = Tint(art.timber, new Color(.05f, .04f, .03f));
+            var sand = Tint(art.cloth, new Color(.9f, .66f, .24f)); var rust = Tint(art.cloth, new Color(.72f, .1f, .06f)); var slit = Tint(art.timber, new Color(.05f, .04f, .03f));
             BoxPart(t, new Vector3(0, -.75f, 0), new Vector3(w + .7f, 1.7f, d + .7f), Dressed(new Color(.4f, .39f, .37f)), null, 1.75f);   // footing: a low plinth, deep where the perch falls away
             // The hall's stone is one mesh: the body, the string course, the merlons, and the door's surround and step below.
             var blocks = new List<CombineInstance> { Ashlar(new Vector3(0, h / 2, 0), new Vector3(w, h, d)), Ashlar(new Vector3(0, h + .1f, 0), new Vector3(w + .3f, .2f, d + .3f)) };
@@ -4583,7 +4594,7 @@ namespace Crulanda.World
             Part(PrimitiveType.Cylinder, t, at + q * new Vector3(.5f, height - .1f, 0), new Vector3(.05f, .55f, .05f), wood, q * Quaternion.Euler(0, 0, 90));
             Part(PrimitiveType.Cube, t, at + q * new Vector3(.28f, height - .75f, 0), new Vector3(.5f, 1.25f, .03f), cloth, q);
             Part(PrimitiveType.Cube, t, at + q * new Vector3(.78f, height - .55f, 0), new Vector3(.46f, .85f, .03f), cloth, q * Quaternion.Euler(0, 0, 3));
-            Part(PrimitiveType.Cube, t, at + q * new Vector3(.5f, height - .42f, -.01f), new Vector3(.9f, .08f, .03f), Tint(art.cloth, new Color(.45f, .2f, .12f)), q);
+            Part(PrimitiveType.Cube, t, at + q * new Vector3(.5f, height - .42f, -.01f), new Vector3(.9f, .08f, .03f), Tint(art.cloth, new Color(.72f, .1f, .06f)), q);
         }
         /// <summary>The Bandit King's throne: a stone dais, a plank seat with a high back and arms, a cloak thrown over it, crossed bones over the top.</summary>
         void Throne(Transform t, Vector3 at, Quaternion face, Material cloth, Material wood)

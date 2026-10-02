@@ -211,7 +211,10 @@ invalid" and runs without the trades (items are unaffected).
 ## Gear looks (loot steps A1 and A2)
 What worn gear looks like. Data: `Assets/Crulanda/Resources/Gear/looks.json`, loaded with `Resources.Load` (no registration in `Encounter.asset`; it must not go in `EncounterContent/Items`, where every JSON is read as an item file). Code: `GearLooks` (resolver), `GearMeshes`, `GearMats`, `ActorVisual.Gear.cs`, `ActorVisual.GearWeapons.cs` and `ActorVisual.GearArmor.cs`, `GearBinder`. Nothing about looks is saved: a look is worked out from the item id and its `ItemDef` each time.
 - A look string is `family[:variant]/palette[+glow]`, for example `shield.round:hide/sandthrone` or `knife:glass/pale+glow`. No variant means the family's first; `+glow` lights one accent whatever the quality. `GearLooks.Families` lists the 54 families and 146 variants (loot `DESIGN.md` 2.3); the first `gen` variants of a family may go to generated gear, the rest are for named items.
-- `palettes`: id and seven `#RRGGBB` colours (cloth, cloth2, leather, metal, trim, wood, glow).
+- `palettes`: id and seven `#RRGGBB` colours (cloth, cloth2, leather, metal, trim, wood, glow); optional `clothB`/`cloth2B`
+  (the dye a shade-1 material word wears) and `clothC`/`cloth2C` (shade 2), else the shade only darkens or lightens the cloth;
+  optional `fur` (else cloth mixed into leather). Saturated, jewel-toned dyes since playtest note 13; cloth gets richer and
+  deeper with quality (`GearLooks.Rich`) and poor is drained 55% toward grey.
 - `materials`: a generated name's first word (Homespun ... Sap-steeped): its palette, a `shade` (0 as is, 1 darker and cooler, 2 lighter and warmer) and a `detail` (a small mark: a ring on a grip or haft, a mark on a helm's band, a belt or a pauldron: rivets, band, cord, bone, ember, leaf...; a Riveted jerkin is studded all over, the brigandine look).
 - `words`: a generated name's piece word in a slot (Blade, Hatchet, Cudgel, Buckler, Shield, Lantern, Cap ... Torc): one family, or five by level band (1-2, 3-5, 6-8, 9-10, 11-13). Generated variant = (seed / 7) % gen. If the Materials or Pieces words in `Items.cs` change, change this file in the same commit (`GearLookTests` fails otherwise).
 - `fallbacks`: each slot's family for anything else (in the oakhaven palette). Nothing renders as missing.

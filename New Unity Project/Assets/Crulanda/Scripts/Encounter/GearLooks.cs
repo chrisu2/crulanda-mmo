@@ -19,8 +19,11 @@ namespace Crulanda.Encounter
         public GearTint[] tints = new GearTint[0];
         public GearLookDef[] looks = new GearLookDef[0];
     }
-    /// <summary>A region's colours, as "#RRGGBB": two cloths, leather, metal, trim, wood and the glow of its rare and epic accents.</summary>
-    [Serializable] public sealed class GearPalette { public string id, cloth, cloth2, leather, metal, trim, wood, glow; }
+    /// <summary>A region's colours, as "#RRGGBB": two cloths, leather, metal, trim, wood and the glow of its rare and epic accents.
+    /// Optional: <c>clothB</c>/<c>cloth2B</c> are the dye of shade-1 material words and <c>clothC</c>/<c>cloth2C</c> of shade-2 ones
+    /// (without them the shade only darkens or lightens the cloth); <c>fur</c> is fur's own colour (without it, cloth mixed into
+    /// leather). Saturated, jewel-toned dyes since playtest note 13 ("need high fantasy not pale").</summary>
+    [Serializable] public sealed class GearPalette { public string id, cloth, cloth2, leather, metal, trim, wood, glow, clothB, cloth2B, clothC, cloth2C, fur; }
     /// <summary>A generated name's material word: its palette, a shade (0 as is, 1 darker and cooler, 2 lighter and warmer) and a small detail part.</summary>
     [Serializable] public sealed class GearMaterialWord { public string word, palette, detail; public int shade; }
     /// <summary>A generated name's piece word in a slot: one family for every level, or five by level band (1-2, 3-5, 6-8, 9-10, 11-13).</summary>
@@ -46,7 +49,7 @@ namespace Crulanda.Encounter
     public struct GearLook
     {
         public string family, variant, palette, detail; public int quality;
-        public Color cloth, cloth2, leather, metal, trim, wood, glow, bone;
+        public Color cloth, cloth2, leather, metal, trim, wood, glow, bone, fur;
         /// <summary>The look string asked for a glow.</summary>
         public bool forceGlow;
         /// <summary>Nothing matched: the slot's fallback family in the oakhaven palette.</summary>
@@ -135,7 +138,7 @@ namespace Crulanda.Encounter
         /// <summary>Bone and horn (tusks, skulls, harpoon heads): the same in every palette.</summary>
         public static readonly Color Bone = new Color(.86f, .82f, .72f);
         /// <summary>Epic trim leans toward this gold.</summary>
-        public static readonly Color Gold = new Color(.85f, .66f, .2f);
+        public static readonly Color Gold = new Color(1f, .64f, .18f);   // redder: a metal's colour is multiplied by the blue sky it reflects
         /// <summary>
         /// How bright an accent burns, times its colour: a rare piece's, an epic's at the top of its pulse (GearGlow) and a forced glow's
         /// (+glow) on a lesser piece. Rare and epic burn well over the bloom's threshold by day as well as by night, so the camera's bloom
@@ -183,6 +186,8 @@ namespace Crulanda.Encounter
                 if (g.palettes.ContainsKey(p.id)) { errors.Add("Duplicate palette '" + p.id + "'."); continue; }
                 foreach (var (field, hex) in new[] { ("cloth", p.cloth), ("cloth2", p.cloth2), ("leather", p.leather), ("metal", p.metal), ("trim", p.trim), ("wood", p.wood), ("glow", p.glow) })
                     if (!ColorUtility.TryParseHtmlString(hex ?? "", out _)) errors.Add("Palette '" + p.id + "' has a bad " + field + " colour '" + hex + "'.");
+                foreach (var (field, hex) in new[] { ("clothB", p.clothB), ("cloth2B", p.cloth2B), ("clothC", p.clothC), ("cloth2C", p.cloth2C), ("fur", p.fur) })
+                    if (!string.IsNullOrEmpty(hex) && !ColorUtility.TryParseHtmlString(hex, out _)) errors.Add("Palette '" + p.id + "' has a bad " + field + " colour '" + hex + "'.");
                 g.palettes[p.id] = p;
             }
             foreach (var m in f.materials ?? new GearMaterialWord[0])
@@ -340,17 +345,33 @@ namespace Crulanda.Encounter
             if (shade == 2) { var l = Color.Lerp(c, Color.white, .12f); return new Color(Mathf.Min(1, l.r * 1.03f), l.g, l.b * .96f); }
             return c;
         }
-        /// <summary>Poor gear: 35% toward grey and 15% darker.</summary>
-        static Color Faded(Color c) { float g = c.r * .3f + c.g * .59f + c.b * .11f; return Color.Lerp(c, new Color(g, g, g), .35f) * .85f; }
+        /// <summary>Poor gear: 55% toward grey and 22% darker (the palettes are saturated now: at 35% poor still read as dyed).</summary>
+        static Color Faded(Color c) { float g = c.r * .3f + c.g * .59f + c.b * .11f; return Color.Lerp(c, new Color(g, g, g), .55f) * .78f; }
+        /// <summary>How rich a dye is by quality: common a little plainer, uncommon the palette's own, rare and epic more saturated
+        /// and deeper (a jewel tone is dark and saturated, not light).</summary>
+        static readonly float[] DyeSat = { 1, .9f, 1, 1.08f, 1.14f }, DyeVal = { 1, 1, 1, .94f, .88f };
+        static Color Rich(Color c, int q)
+        {
+            Color.RGBToHSV(c, out float h, out float s, out float v);
+            var o = Color.HSVToRGB(h, Mathf.Min(1, s * DyeSat[q]), Mathf.Min(1, v * DyeVal[q])); o.a = 1; return o;
+        }
 
         GearLook Make(string family, string variant, string paletteId, int shade, string detail, int q, bool glow, bool fallback, int tier)
         {
             var p = palettes[paletteId];
             Color C(string hex) { var c = Shade(Hex(hex), shade); return q == 0 ? Faded(c) : c; }
+            // Cloth: a shade-1 or shade-2 material word wears the palette's second or third dye when the palette has one.
+            Color Dye(string hex, string b, string c3)
+            {
+                string alt = shade == 1 ? b : shade == 2 ? c3 : null;
+                var c = string.IsNullOrEmpty(alt) ? Shade(Hex(hex), shade) : Hex(alt);
+                return q == 0 ? Faded(c) : Rich(c, Mathf.Clamp(q, 0, 4));
+            }
             var l = new GearLook {
                 family = family, variant = variant, palette = paletteId, detail = string.IsNullOrEmpty(detail) ? "none" : detail, quality = q, forceGlow = glow, fallback = fallback, tier = tier,
-                cloth = C(p.cloth), cloth2 = C(p.cloth2), leather = C(p.leather), metal = C(p.metal), trim = C(p.trim), wood = C(p.wood), glow = Hex(p.glow), bone = q == 0 ? Faded(Bone) : Bone
+                cloth = Dye(p.cloth, p.clothB, p.clothC), cloth2 = Dye(p.cloth2, p.cloth2B, p.cloth2C), leather = C(p.leather), metal = C(p.metal), trim = C(p.trim), wood = C(p.wood), glow = Hex(p.glow), bone = q == 0 ? Faded(Bone) : Bone
             };
+            l.fur = string.IsNullOrEmpty(p.fur) ? Color.Lerp(l.cloth, l.leather, .3f) : q == 0 ? Faded(Hex(p.fur)) : Hex(p.fur);
             Quality(ref l, q);
             if (glow) { l.accents = Mathf.Max(l.accents, 1); l.glowPower = Mathf.Max(l.glowPower, ForcedGlow); }
             return l;
@@ -363,9 +384,9 @@ namespace Crulanda.Encounter
             {
                 case 0: l.trimColor = l.metal; l.trimSmooth = .15f; l.trimMetal = .2f; break;
                 case 1: l.trimColor = l.metal; l.trimSmooth = .35f; l.trimMetal = .4f; break;
-                case 2: l.trimColor = l.trim; l.trimSmooth = .5f; l.trimMetal = .6f; break;
-                case 3: l.trimColor = l.trim; l.trimSmooth = .7f; l.trimMetal = .8f; l.accents = 1; l.glowPower = RareGlow; break;
-                default: l.trimColor = Color.Lerp(l.trim, GearLooks.Gold, .6f); l.trimSmooth = .78f; l.trimMetal = .9f; l.accents = 2; l.glowPower = EpicGlow; l.pulse = true; break;
+                case 2: l.trimColor = l.trim; l.trimSmooth = .55f; l.trimMetal = .65f; break;
+                case 3: l.trimColor = l.trim; l.trimSmooth = .76f; l.trimMetal = .82f; l.accents = 1; l.glowPower = RareGlow; break;
+                default: l.trimColor = Color.Lerp(l.trim, GearLooks.Gold, .6f); l.trimSmooth = .86f; l.trimMetal = .92f; l.accents = 2; l.glowPower = EpicGlow; l.pulse = true; break;
             }
         }
     }

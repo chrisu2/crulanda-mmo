@@ -203,5 +203,19 @@ namespace Crulanda.Tests
                 + "\"fallbacks\":[{\"slot\":\"mainhand\",\"family\":\"axe.giant\"}],\"looks\":[{\"item\":\"x\",\"look\":\"sword.spork/oakhaven\"}]}"));
             StringAssert.Contains("axe.giant", e.Message); StringAssert.Contains("sword.spork", e.Message); StringAssert.Contains("No fallback family for slot 'head'", e.Message);
         }
+
+        /// <summary>Playtest note 13 ("need high fantasy not pale"): a shade-1 material word wears the palette's second dye, the
+        /// palette id (and so the saved appearance key) is unchanged, rarer cloth is richer, and poor cloth is drab.</summary>
+        [Test] public void Shade_words_wear_the_palettes_other_dyes_and_quality_deepens_the_cloth()
+        {
+            var looks = Looks();
+            GearLook Of(string name, int q) { return looks.Resolve(new ItemDef { id = "gen.chest.5." + q + ".14", name = name, kind = "gear", slot = "chest", quality = q, level = 4 }); }
+            ColorUtility.TryParseHtmlString("#8A3212", out var russet);
+            Assert.That(Vector4.Distance(russet, Of("Frayed Tunic", 2).cloth), Is.LessThan(.01f), "Frayed (shade 1) wears oakhaven's second dye.");
+            Assert.AreEqual(Of("Homespun Tunic", 2).palette, Of("Frayed Tunic", 2).palette, "The palette id, and so the saved appearance key, is unchanged.");
+            float Sat(Color c) { Color.RGBToHSV(c, out _, out float sat, out _); return sat; }
+            for (int q = 2; q <= 4; q++) Assert.GreaterOrEqual(Sat(Of("Homespun Tunic", q).cloth), Sat(Of("Homespun Tunic", q - 1).cloth), "Richer cloth at quality " + q + ".");
+            Assert.Less(Sat(Of("Homespun Tunic", 0).cloth), Sat(Of("Homespun Tunic", 1).cloth), "Poor is drab.");
+        }
     }
 }

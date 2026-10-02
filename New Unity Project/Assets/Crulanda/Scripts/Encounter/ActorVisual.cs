@@ -39,8 +39,9 @@ namespace Crulanda.Encounter
                 default: return false;
             }
         }
-        static readonly Color[] VillagerCloth = { new Color(.55f, .42f, .28f), new Color(.38f, .45f, .32f), new Color(.52f, .3f, .24f), new Color(.34f, .38f, .48f),
-            new Color(.6f, .55f, .42f), new Color(.45f, .33f, .4f), new Color(.3f, .34f, .28f) };
+        // Dyed wool (madder, weld green, woad, ochre, russet, heather) and one undyed oatmeal (playtest note 13: high fantasy, not pale).
+        static readonly Color[] VillagerCloth = { new Color(.56f, .15f, .12f), new Color(.21f, .42f, .17f), new Color(.16f, .28f, .52f), new Color(.7f, .49f, .15f),
+            new Color(.54f, .27f, .1f), new Color(.42f, .22f, .43f), new Color(.7f, .62f, .45f) };
         static readonly Color[] Skins = { new Color(.8f, .64f, .52f), new Color(.68f, .52f, .4f), new Color(.52f, .38f, .28f), new Color(.86f, .72f, .6f) };
         /// <summary>Recolours the outfit's main cloth (e.g. Druid forms).</summary>
         public void SetClothColor(Color c) { if (cloth != null) cloth.color = c; }
@@ -331,20 +332,20 @@ namespace Crulanda.Encounter
             Color clothC, accentC, legC;
             switch (look)
             {
-                case ActorLook.Warrior: clothC = new Color(.17f, .36f, .47f); accentC = new Color(.55f, .56f, .58f); legC = new Color(.25f, .2f, .16f); break;
-                case ActorLook.Druid: clothC = new Color(.36f, .44f, .26f); accentC = new Color(.42f, .31f, .2f); legC = new Color(.3f, .24f, .17f); break;
-                case ActorLook.Healer: clothC = new Color(.55f, .7f, .58f); accentC = new Color(.85f, .82f, .7f); legC = new Color(.4f, .5f, .42f); break;
-                case ActorLook.Collector: clothC = new Color(.4f, .45f, .55f); accentC = new Color(.62f, .64f, .68f); legC = new Color(.2f, .21f, .25f); break;
-                case ActorLook.Warden: clothC = new Color(.26f, .29f, .39f); accentC = new Color(.72f, .72f, .76f); legC = new Color(.16f, .17f, .2f); break;
-                case ActorLook.Outrider: clothC = new Color(.66f, .52f, .32f); accentC = new Color(.5f, .48f, .45f); legC = new Color(.36f, .27f, .18f); break;
+                case ActorLook.Warrior: clothC = new Color(.08f, .2f, .56f); accentC = new Color(.76f, .78f, .82f); legC = new Color(.32f, .2f, .12f); break;
+                case ActorLook.Druid: clothC = new Color(.1f, .38f, .16f); accentC = new Color(.56f, .24f, .09f); legC = new Color(.34f, .23f, .13f); break;
+                case ActorLook.Healer: clothC = new Color(.1f, .44f, .36f); accentC = new Color(.95f, .86f, .6f); legC = new Color(.1f, .3f, .27f); break;
+                case ActorLook.Collector: clothC = new Color(.14f, .22f, .54f); accentC = new Color(.76f, .78f, .82f); legC = new Color(.12f, .14f, .24f); break;
+                case ActorLook.Warden: clothC = new Color(.08f, .15f, .46f); accentC = new Color(.8f, .82f, .86f); legC = new Color(.09f, .1f, .2f); break;
+                case ActorLook.Outrider: clothC = new Color(.74f, .42f, .12f); accentC = new Color(.56f, .36f, .2f); legC = new Color(.4f, .25f, .14f); break;
                 case ActorLook.Hollow: clothC = new Color(.5f, .5f, .51f); accentC = new Color(.4f, .4f, .42f); legC = new Color(.44f, .44f, .45f); skin = Mat(new Color(.56f, .56f, .57f), .05f); break;
-                case ActorLook.Cultist: clothC = new Color(.14f, .12f, .14f); accentC = new Color(.86f, .82f, .72f); legC = new Color(.12f, .1f, .11f); break;
+                case ActorLook.Cultist: clothC = new Color(.11f, .08f, .13f); accentC = new Color(.88f, .84f, .72f); legC = new Color(.1f, .07f, .11f); break;
                 // Sandthrone sand gone to dirt (tinted per figure in BuildDeserter); faces weathered to any shade.
                 case ActorLook.Deserter:
-                    clothC = new Color(.55f, .45f, .3f); accentC = new Color(.44f, .44f, .45f); legC = new Color(.33f, .26f, .19f);
+                    clothC = new Color(.6f, .46f, .26f); accentC = new Color(.44f, .44f, .46f); legC = new Color(.34f, .25f, .17f);
                     skin = Mat(Skins[(FigureSeed() & 0x7fffffff) % Skins.Length]); break;
                 // The coat's near-black brown (torso and sleeves), dark breeches, a face gone red-brown in the wind.
-                case ActorLook.BanditKing: clothC = new Color(.15f, .12f, .11f); accentC = new Color(.6f, .46f, .27f); legC = new Color(.22f, .18f, .15f); skin = Mat(new Color(.7f, .53f, .4f)); break;
+                case ActorLook.BanditKing: clothC = new Color(.13f, .09f, .09f); accentC = new Color(.84f, .6f, .2f); legC = new Color(.36f, .1f, .08f); skin = Mat(new Color(.7f, .53f, .4f)); break;
                 case ActorLook.Villager:
                     clothC = VillagerCloth[Mathf.Abs(variant) % VillagerCloth.Length]; accentC = VillagerCloth[Mathf.Abs(variant * 3 + 2) % VillagerCloth.Length] * .8f;
                     legC = new Color(.3f, .25f, .2f) * (.8f + (variant % 3) * .15f); skin = Mat(Skins[Mathf.Abs(variant * 7) % Skins.Length]); break;
@@ -400,7 +401,7 @@ namespace Crulanda.Encounter
                     classKit = new[] { Part(PrimitiveType.Sphere, body, new Vector3(0, .84f, -.03f), new Vector3(.36f, .38f, .38f), cloth) };   // hood
                     druidCloak = Part(PrimitiveType.Cube, body, new Vector3(0, .2f, -.17f), new Vector3(.52f, .95f, .05f), accent, new Vector3(-6, 0, 0)); // cloak
                 {
-                    var staff = Mat(new Color(.35f, .25f, .15f)); var orb = Mat(new Color(.45f, .7f, .4f), .6f);
+                    var staff = Mat(new Color(.35f, .25f, .15f)); var orb = Mat(new Color(.3f, .8f, .4f), .6f);
                     held = new[] { Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.45f, .08f), new Vector3(.06f, .85f, .06f), staff, new Vector3(8, 0, 0)),   // staff
                         Part(PrimitiveType.Sphere, armR, new Vector3(0, .38f, .15f), Vector3.one * .13f, orb) };
                     stowed = new[] { Part(PrimitiveType.Cylinder, body, new Vector3(0, .25f, -.28f), new Vector3(.06f, .85f, .06f), staff, new Vector3(0, 0, -40)),   // across the back (behind the cloak) for swimming
@@ -415,8 +416,8 @@ namespace Crulanda.Encounter
                 case ActorLook.Collector:
                 case ActorLook.Warden:
                     Part(PrimitiveType.Sphere, body, new Vector3(0, .86f, 0), new Vector3(.34f, .24f, .34f), accent);                     // helmet
-                    Part(PrimitiveType.Cube, body, new Vector3(0, .15f, .15f), new Vector3(.36f, .7f, .03f), Mat(new Color(.72f, .72f, .74f))); // Concord tabard
-                    Part(PrimitiveType.Cube, body, new Vector3(0, .32f, .165f), new Vector3(.14f, .14f, .01f), Mat(new Color(.75f, .62f, .25f), .6f, .5f)); // sigil
+                    Part(PrimitiveType.Cube, body, new Vector3(0, .15f, .15f), new Vector3(.36f, .7f, .03f), Mat(new Color(.93f, .93f, .95f))); // Concord tabard
+                    Part(PrimitiveType.Cube, body, new Vector3(0, .32f, .165f), new Vector3(.14f, .14f, .01f), Mat(new Color(.98f, .76f, .2f), .7f, .6f)); // sigil
                     float pole = look == ActorLook.Warden ? 1.1f : .9f;
                     Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.35f, .1f), new Vector3(.05f, pole, .05f), Mat(new Color(.3f, .22f, .14f)));
                     Part(PrimitiveType.Cube, armR, new Vector3(0, -.35f + pole, .1f), look == ActorLook.Warden ? new Vector3(.05f, .3f, .28f) : new Vector3(.04f, .22f, .06f), accent);
@@ -470,7 +471,7 @@ namespace Crulanda.Encounter
             return seed ^ (Mathf.RoundToInt(at.x * 10) * 73856093) ^ (Mathf.RoundToInt(at.z * 10) * 19349663);
         }
         static Color Dim(Color c, float k) { return new Color(c.r * k, c.g * k, c.b * k); }
-        static readonly Color[] Scarves = { new Color(.46f, .25f, .15f), new Color(.5f, .35f, .18f), new Color(.38f, .2f, .14f) };   // red ochre, dark ochre, brick
+        static readonly Color[] Scarves = { new Color(.6f, .2f, .12f), new Color(.7f, .46f, .14f), new Color(.5f, .18f, .12f) };   // madder, ochre, brick
 
         /// <summary>
         /// A Sandthrone deserter (CANON company, GAME-ONLY band): the company's sand gone to dirt. A torn sand tabard over company
@@ -633,7 +634,7 @@ namespace Crulanda.Encounter
         void Dress(string trade, Material skin, Material legs)
         {
             Material M(float r, float g, float b, float smooth = .15f, float metal = 0) { return Mat(new Color(r, g, b), smooth, metal); }
-            var iron = M(.32f, .32f, .34f, .55f, .7f); var wood = M(.42f, .3f, .18f); var leather = M(.36f, .23f, .13f);
+            var iron = M(.32f, .32f, .34f, .55f, .7f); var wood = M(.42f, .3f, .18f); var leather = M(.46f, .24f, .11f);
             void Apron(Material m, float length, float width = .42f) { Part(PrimitiveType.Cube, body, new Vector3(0, .42f - length / 2, .16f), new Vector3(width, length, .03f), m); }
             void Brim(Material m, float width, float crown, float crownH) { Part(PrimitiveType.Cylinder, body, new Vector3(0, .94f, 0), new Vector3(width, .015f, width), m); Part(PrimitiveType.Cylinder, body, new Vector3(0, .94f + crownH, 0), new Vector3(crown, crownH, crown), m); }
             void Beard(Color c, float size) { Part(PrimitiveType.Cube, body, new Vector3(0, .68f - size * .2f, .12f), new Vector3(.22f, .12f + size * .2f, .08f), Mat(c)); }
@@ -648,30 +649,30 @@ namespace Crulanda.Encounter
             {
                 case "blacksmith":
                     // Broad, soot-dark shirt with bare forearms, a long leather apron, a skullcap, and a hammer.
-                    cloth.color = new Color(.26f, .24f, .23f); legs.color = new Color(.2f, .18f, .16f);
+                    cloth.color = new Color(.24f, .22f, .22f); legs.color = new Color(.2f, .17f, .15f);
                     body.localScale = new Vector3(1.14f, 1.02f, 1.1f);
                     foreach (var arm in new[] { armL, armR }) Part(PrimitiveType.Capsule, arm, new Vector3(0, -.47f, 0), new Vector3(.15f, .15f, .15f), skin);
                     Apron(leather, 1.02f, .46f);
                     Part(PrimitiveType.Cube, body, new Vector3(0, .5f, .16f), new Vector3(.03f, .2f, .02f), leather);       // apron strap
-                    Part(PrimitiveType.Sphere, body, new Vector3(0, .87f, -.01f), new Vector3(.31f, .2f, .31f), M(.45f, .14f, .1f)); // skullcap
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .87f, -.01f), new Vector3(.31f, .2f, .31f), M(.7f, .13f, .09f)); // skullcap
                     Beard(new Color(.18f, .12f, .08f), .5f);
                     HandTool(wood, .5f, iron, new Vector3(.1f, .1f, .16f));
                     break;
                 case "merchant":
                     // Plump, in a long burgundy coat with gold buttons, a feathered wide hat and a coin purse.
-                    cloth.color = new Color(.46f, .12f, .17f); legs.color = new Color(.2f, .16f, .2f);
+                    cloth.color = new Color(.5f, .05f, .12f); legs.color = new Color(.16f, .12f, .2f);
                     Part(PrimitiveType.Sphere, body, new Vector3(0, .26f, .06f), new Vector3(.5f, .5f, .38f), cloth);           // belly
                     Part(PrimitiveType.Cylinder, body, new Vector3(0, -.34f, 0), new Vector3(.52f, .3f, .38f), cloth);           // coat skirts
-                    var gold = M(.85f, .68f, .25f, .7f, .8f);
+                    var gold = M(.98f, .76f, .22f, .7f, .8f);
                     for (int i = 0; i < 4; i++) Part(PrimitiveType.Sphere, body, new Vector3(0, .42f - i * .14f, .25f - Mathf.Abs(i - 1.5f) * .02f), Vector3.one * .05f, gold);
-                    Part(PrimitiveType.Cube, body, new Vector3(0, .6f, .12f), new Vector3(.3f, .08f, .08f), M(.9f, .88f, .8f)); // collar
-                    var hatM = M(.15f, .12f, .14f); Brim(hatM, .56f, .28f, .09f);
-                    Part(PrimitiveType.Cube, body, new Vector3(.14f, 1.12f, -.08f), new Vector3(.03f, .3f, .06f), M(.3f, .6f, .4f), new Vector3(-30, 0, -25)); // feather
-                    Part(PrimitiveType.Sphere, body, new Vector3(-.27f, -.05f, .1f), new Vector3(.12f, .15f, .1f), M(.55f, .42f, .2f)); // purse
+                    Part(PrimitiveType.Cube, body, new Vector3(0, .6f, .12f), new Vector3(.3f, .08f, .08f), M(.95f, .93f, .86f)); // collar
+                    var hatM = M(.12f, .1f, .14f); Brim(hatM, .56f, .28f, .09f);
+                    Part(PrimitiveType.Cube, body, new Vector3(.14f, 1.12f, -.08f), new Vector3(.03f, .3f, .06f), M(.1f, .62f, .4f), new Vector3(-30, 0, -25)); // feather
+                    Part(PrimitiveType.Sphere, body, new Vector3(-.27f, -.05f, .1f), new Vector3(.12f, .15f, .1f), M(.6f, .42f, .16f)); // purse
                     break;
                 case "baker":
                     // All in flour-white: a white cap puffed on top, a white apron, and a loaf under the arm.
-                    cloth.color = new Color(.9f, .88f, .82f); legs.color = new Color(.62f, .57f, .5f);
+                    cloth.color = new Color(.92f, .9f, .84f); legs.color = new Color(.3f, .42f, .62f);
                     var white = M(.97f, .96f, .93f);
                     Apron(white, .92f);
                     Part(PrimitiveType.Cylinder, body, new Vector3(0, .98f, 0), new Vector3(.28f, .08f, .28f), white);
@@ -680,37 +681,37 @@ namespace Crulanda.Encounter
                     break;
                 case "henwife":
                     // Long skirt, a shawl and a red kerchief; a feed pouch on the apron.
-                    cloth.color = new Color(.5f, .4f, .3f); Skirt(M(.38f, .4f, .48f));
-                    Apron(M(.8f, .76f, .66f), .8f, .36f);
-                    Part(PrimitiveType.Sphere, body, new Vector3(0, .86f, -.02f), new Vector3(.33f, .28f, .34f), M(.66f, .2f, .16f));   // kerchief
-                    Part(PrimitiveType.Cube, body, new Vector3(0, .54f, -.01f), new Vector3(.56f, .16f, .34f), M(.55f, .5f, .38f));     // shawl
+                    cloth.color = new Color(.58f, .24f, .2f); Skirt(M(.17f, .29f, .54f));
+                    Apron(M(.9f, .86f, .74f), .8f, .36f);
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .86f, -.02f), new Vector3(.33f, .28f, .34f), M(.82f, .14f, .1f));   // kerchief
+                    Part(PrimitiveType.Cube, body, new Vector3(0, .54f, -.01f), new Vector3(.56f, .16f, .34f), M(.8f, .6f, .2f));     // shawl
                     Part(PrimitiveType.Cube, body, new Vector3(.1f, -.1f, .19f), new Vector3(.16f, .14f, .05f), M(.72f, .62f, .44f)); // feed pouch
                     break;
                 case "farmer":
                     // Wide straw hat, a denim bib over a work shirt, and a pitchfork.
-                    cloth.color = variant % 2 == 0 ? new Color(.62f, .55f, .4f) : new Color(.5f, .52f, .38f); legs.color = new Color(.28f, .32f, .42f);
-                    Part(PrimitiveType.Cube, body, new Vector3(0, .2f, .15f), new Vector3(.36f, .44f, .02f), M(.3f, .35f, .47f));      // bib
-                    foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, body, new Vector3(s * .12f, .5f, .15f), new Vector3(.04f, .2f, .02f), M(.3f, .35f, .47f));
-                    Brim(M(.78f, .66f, .36f), .62f, .26f, .07f);
+                    cloth.color = variant % 2 == 0 ? new Color(.74f, .52f, .2f) : new Color(.3f, .52f, .26f); legs.color = new Color(.17f, .28f, .52f);
+                    Part(PrimitiveType.Cube, body, new Vector3(0, .2f, .15f), new Vector3(.36f, .44f, .02f), M(.17f, .28f, .52f));      // bib
+                    foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, body, new Vector3(s * .12f, .5f, .15f), new Vector3(.04f, .2f, .02f), M(.17f, .28f, .52f));
+                    Brim(M(.9f, .74f, .32f), .62f, .26f, .07f);
                     Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.45f, .08f), new Vector3(.035f, .85f, .035f), wood);
                     for (int i = -1; i <= 1; i++) Part(PrimitiveType.Cube, armR, new Vector3(i * .05f, .47f, .08f), new Vector3(.02f, .2f, .02f), iron);
                     Part(PrimitiveType.Cube, armR, new Vector3(0, .38f, .08f), new Vector3(.14f, .02f, .02f), iron);
                     break;
                 case "hunter":
                     // Green hood and cape, leather jerkin, bow and quiver on the back.
-                    cloth.color = new Color(.25f, .34f, .2f); legs.color = new Color(.3f, .25f, .17f);
-                    Part(PrimitiveType.Sphere, body, new Vector3(0, .85f, -.03f), new Vector3(.36f, .37f, .38f), M(.2f, .28f, .16f));  // hood
+                    cloth.color = new Color(.18f, .42f, .17f); legs.color = new Color(.36f, .24f, .13f);
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .85f, -.03f), new Vector3(.36f, .37f, .38f), M(.12f, .36f, .15f));  // hood
                     Part(PrimitiveType.Cube, body, new Vector3(0, .32f, .01f), new Vector3(.5f, .44f, .31f), leather);                 // jerkin
-                    Part(PrimitiveType.Cube, body, new Vector3(0, .25f, -.17f), new Vector3(.5f, .8f, .03f), M(.2f, .28f, .16f), new Vector3(-6, 0, 0)); // cape
+                    Part(PrimitiveType.Cube, body, new Vector3(0, .25f, -.17f), new Vector3(.5f, .8f, .03f), M(.12f, .36f, .15f), new Vector3(-6, 0, 0)); // cape
                     Part(PrimitiveType.Cylinder, body, new Vector3(.14f, .45f, -.22f), new Vector3(.13f, .24f, .13f), leather, new Vector3(0, 0, -18)); // quiver
-                    for (int i = 0; i < 3; i++) Part(PrimitiveType.Cube, body, new Vector3(.2f + i * .03f, .72f, -.22f), new Vector3(.03f, .06f, .03f), M(.85f, .85f, .8f), new Vector3(0, 0, -18));
+                    for (int i = 0; i < 3; i++) Part(PrimitiveType.Cube, body, new Vector3(.2f + i * .03f, .72f, -.22f), new Vector3(.03f, .06f, .03f), M(.82f, .18f, .12f), new Vector3(0, 0, -18));
                     Part(PrimitiveType.Cube, body, new Vector3(-.05f, .3f, -.21f), new Vector3(.035f, 1.25f, .035f), wood, new Vector3(0, 0, 24));   // bow
                     Part(PrimitiveType.Cube, body, new Vector3(-.02f, .3f, -.19f), new Vector3(.008f, 1.15f, .008f), M(.85f, .82f, .7f), new Vector3(0, 0, 24)); // string
                     break;
                 case "leatherworker":
                     // Tan work clothes, a leather apron and cap, a satchel on a cross-strap, and a roll of hide.
-                    cloth.color = new Color(.62f, .5f, .34f); legs.color = new Color(.34f, .26f, .18f);
-                    Apron(M(.52f, .34f, .18f), .8f);
+                    cloth.color = new Color(.76f, .52f, .24f); legs.color = new Color(.36f, .24f, .14f);
+                    Apron(M(.56f, .24f, .12f), .8f);
                     Part(PrimitiveType.Cylinder, body, new Vector3(0, .93f, 0), new Vector3(.31f, .05f, .31f), leather);                // cap
                     Part(PrimitiveType.Cube, body, new Vector3(0, .32f, .165f), new Vector3(.05f, .75f, .02f), leather, new Vector3(0, 0, 38)); // strap
                     Part(PrimitiveType.Cube, body, new Vector3(-.3f, -.02f, 0), new Vector3(.1f, .24f, .28f), leather);                 // satchel
@@ -718,51 +719,51 @@ namespace Crulanda.Encounter
                     break;
                 case "skinner":
                     // Fur hat, a stained apron, pelts over the shoulder and a skinning knife.
-                    cloth.color = new Color(.36f, .31f, .27f); legs.color = new Color(.25f, .21f, .17f);
-                    Apron(M(.6f, .55f, .48f), .9f);
-                    var stain = M(.42f, .1f, .08f);
+                    cloth.color = new Color(.44f, .3f, .2f); legs.color = new Color(.27f, .2f, .15f);
+                    Apron(M(.7f, .62f, .46f), .9f);
+                    var stain = M(.5f, .08f, .06f);
                     Part(PrimitiveType.Cube, body, new Vector3(.08f, .05f, .18f), new Vector3(.14f, .1f, .01f), stain);
                     Part(PrimitiveType.Cube, body, new Vector3(-.1f, -.25f, .18f), new Vector3(.1f, .14f, .01f), stain);
-                    Part(PrimitiveType.Sphere, body, new Vector3(0, .9f, 0), new Vector3(.36f, .26f, .36f), M(.45f, .38f, .3f));        // fur hat
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .9f, 0), new Vector3(.36f, .26f, .36f), M(.5f, .38f, .26f));        // fur hat
                     Part(PrimitiveType.Sphere, body, new Vector3(-.22f, .55f, -.1f), new Vector3(.34f, .16f, .5f), M(.55f, .42f, .3f), new Vector3(0, 0, 30)); // pelt
                     Part(PrimitiveType.Sphere, body, new Vector3(-.12f, .45f, -.18f), new Vector3(.4f, .12f, .3f), M(.4f, .4f, .38f), new Vector3(0, 0, 20));  // pelt
                     HandTool(wood, .22f, M(.75f, .76f, .78f, .7f, .8f), new Vector3(.02f, .05f, .2f), 1.6f);
                     break;
                 case "lumberjack":
                     // Red plaid shirt, knit cap, big beard, and an axe.
-                    cloth.color = new Color(.62f, .15f, .13f); legs.color = new Color(.24f, .26f, .32f);
+                    cloth.color = new Color(.64f, .1f, .08f); legs.color = new Color(.18f, .26f, .46f);
                     body.localScale = new Vector3(1.1f, 1.04f, 1.08f);
-                    var check = M(.12f, .08f, .08f);
+                    var check = M(.1f, .06f, .06f);
                     foreach (float y in new[] { .15f, .42f }) foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, body, new Vector3(0, y, s * .147f), new Vector3(.49f, .05f, .005f), check);
                     foreach (float x in new[] { -.12f, .12f }) foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, body, new Vector3(x, .3f, s * .148f), new Vector3(.04f, .6f, .005f), check);
-                    Part(PrimitiveType.Sphere, body, new Vector3(0, .9f, 0), new Vector3(.32f, .26f, .32f), M(.25f, .3f, .22f));        // knit cap
-                    Part(PrimitiveType.Cylinder, body, new Vector3(0, .84f, 0), new Vector3(.33f, .04f, .33f), M(.22f, .27f, .2f));
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .9f, 0), new Vector3(.32f, .26f, .32f), M(.16f, .38f, .2f));        // knit cap
+                    Part(PrimitiveType.Cylinder, body, new Vector3(0, .84f, 0), new Vector3(.33f, .04f, .33f), M(.13f, .32f, .17f));
                     Beard(new Color(.42f, .24f, .12f), 1);
                     HandTool(wood, .8f, iron, new Vector3(.04f, .22f, .18f));
                     break;
                 case "herbalist":
                     // Sage robe with a moss shawl and hood, a herb satchel with sprigs, and a small sickle.
-                    cloth.color = new Color(.48f, .55f, .4f); Skirt(M(.4f, .46f, .33f));
-                    Part(PrimitiveType.Sphere, body, new Vector3(0, .85f, -.03f), new Vector3(.35f, .36f, .37f), M(.3f, .4f, .26f));    // hood
-                    Part(PrimitiveType.Cube, body, new Vector3(0, .54f, -.01f), new Vector3(.56f, .16f, .34f), M(.3f, .4f, .26f));      // shawl
+                    cloth.color = new Color(.3f, .52f, .26f); Skirt(M(.2f, .42f, .22f));
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .85f, -.03f), new Vector3(.35f, .36f, .37f), M(.16f, .42f, .2f));    // hood
+                    Part(PrimitiveType.Cube, body, new Vector3(0, .54f, -.01f), new Vector3(.56f, .16f, .34f), M(.16f, .42f, .2f));      // shawl
                     Part(PrimitiveType.Cube, body, new Vector3(-.3f, -.02f, .02f), new Vector3(.12f, .22f, .26f), M(.55f, .48f, .32f)); // satchel
-                    for (int i = 0; i < 4; i++) Part(PrimitiveType.Cube, body, new Vector3(-.3f, .14f, -.06f + i * .05f), new Vector3(.02f, .14f, .02f), M(.3f, .6f, .25f), new Vector3(i * 8 - 12, 0, 0));
-                    Part(PrimitiveType.Sphere, body, new Vector3(-.3f, .21f, 0), Vector3.one * .05f, M(.8f, .7f, .3f));                // a flower
+                    for (int i = 0; i < 4; i++) Part(PrimitiveType.Cube, body, new Vector3(-.3f, .14f, -.06f + i * .05f), new Vector3(.02f, .14f, .02f), M(.3f, .7f, .22f), new Vector3(i * 8 - 12, 0, 0));
+                    Part(PrimitiveType.Sphere, body, new Vector3(-.3f, .21f, 0), Vector3.one * .05f, M(.96f, .76f, .18f));                // a flower
                     HandTool(wood, .2f, M(.7f, .7f, .72f, .6f, .7f), new Vector3(.02f, .14f, .16f), 1.5f);
                     break;
                 case "miller":
                     // Flour-dusted shirt and cap, a sack of meal on the shoulder.
-                    cloth.color = new Color(.82f, .79f, .72f); legs.color = new Color(.48f, .44f, .38f);
-                    Part(PrimitiveType.Cylinder, body, new Vector3(0, .93f, .02f), new Vector3(.32f, .05f, .34f), M(.62f, .6f, .54f));
-                    Part(PrimitiveType.Cube, body, new Vector3(0, .93f, .16f), new Vector3(.22f, .02f, .1f), M(.62f, .6f, .54f));       // cap peak
+                    cloth.color = new Color(.86f, .82f, .72f); legs.color = new Color(.5f, .36f, .2f);
+                    Part(PrimitiveType.Cylinder, body, new Vector3(0, .93f, .02f), new Vector3(.32f, .05f, .34f), M(.26f, .4f, .62f));
+                    Part(PrimitiveType.Cube, body, new Vector3(0, .93f, .16f), new Vector3(.22f, .02f, .1f), M(.26f, .4f, .62f));       // cap peak
                     Part(PrimitiveType.Sphere, body, new Vector3(-.22f, .74f, -.06f), new Vector3(.3f, .4f, .26f), M(.74f, .66f, .5f), new Vector3(0, 0, 20)); // sack
-                    Apron(M(.88f, .86f, .8f), .7f);
+                    Apron(M(.92f, .9f, .82f), .7f);
                     break;
                 case "elder":
                     // Grey hair, a shawl, a walking stick and a slight stoop.
-                    cloth.color = new Color(.4f, .36f, .42f);
+                    cloth.color = new Color(.4f, .22f, .48f);
                     Part(PrimitiveType.Sphere, body, new Vector3(0, .84f, -.03f), new Vector3(.31f, .3f, .32f), M(.78f, .78f, .76f));   // grey hair
-                    Part(PrimitiveType.Cube, body, new Vector3(0, .54f, -.01f), new Vector3(.56f, .16f, .34f), M(.5f, .44f, .36f));     // shawl
+                    Part(PrimitiveType.Cube, body, new Vector3(0, .54f, -.01f), new Vector3(.56f, .16f, .34f), M(.66f, .38f, .18f));     // shawl
                     Beard(new Color(.8f, .8f, .78f), .8f);
                     Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.95f, .08f), new Vector3(.03f, .36f, .03f), wood);
                     stoop = 8;
@@ -780,33 +781,33 @@ namespace Crulanda.Encounter
                 case "pilgrim":
                     // A Silent Pilgrim (CANON look, book3 ch.5): layered linen robes in ochre and sand, a polished silver mask over mouth and
                     // nose, and a long brass listening-tube in the hand.
-                    cloth.color = new Color(.72f, .56f, .3f); legs.color = new Color(.66f, .58f, .42f);
-                    Part(PrimitiveType.Cube, body, new Vector3(0, .12f, 0), new Vector3(.52f, .9f, .34f), M(.78f, .68f, .48f));                 // the outer robe, layered
-                    Part(PrimitiveType.Cube, body, new Vector3(0, -.2f, 0), new Vector3(.56f, .5f, .38f), M(.66f, .5f, .28f));
-                    Part(PrimitiveType.Sphere, body, new Vector3(0, .86f, -.02f), new Vector3(.34f, .3f, .34f), M(.74f, .6f, .36f));              // a linen head-wrap
+                    cloth.color = new Color(.86f, .58f, .16f); legs.color = new Color(.7f, .56f, .34f);
+                    Part(PrimitiveType.Cube, body, new Vector3(0, .12f, 0), new Vector3(.52f, .9f, .34f), M(.9f, .76f, .44f));                 // the outer robe, layered
+                    Part(PrimitiveType.Cube, body, new Vector3(0, -.2f, 0), new Vector3(.56f, .5f, .38f), M(.76f, .44f, .12f));
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .86f, -.02f), new Vector3(.34f, .3f, .34f), M(.84f, .62f, .24f));              // a linen head-wrap
                     Part(PrimitiveType.Cube, body, new Vector3(0, .77f, .14f), new Vector3(.17f, .1f, .05f), M(.85f, .86f, .9f, .9f, .8f));       // the silver mask
-                    Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.62f, .1f), new Vector3(.035f, .42f, .035f), M(.7f, .55f, .25f, .7f, .7f), new Vector3(70, 0, 0));   // the listening-tube
-                    Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.62f + .4f * Mathf.Cos(70 * Mathf.Deg2Rad), .1f + .4f * Mathf.Sin(70 * Mathf.Deg2Rad)), new Vector3(.08f, .04f, .08f), M(.7f, .55f, .25f, .7f, .7f), new Vector3(70, 0, 0));   // its bell
+                    Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.62f, .1f), new Vector3(.035f, .42f, .035f), M(.9f, .62f, .2f, .7f, .7f), new Vector3(70, 0, 0));   // the listening-tube
+                    Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.62f + .4f * Mathf.Cos(70 * Mathf.Deg2Rad), .1f + .4f * Mathf.Sin(70 * Mathf.Deg2Rad)), new Vector3(.08f, .04f, .08f), M(.9f, .62f, .2f, .7f, .7f), new Vector3(70, 0, 0));   // its bell
                     break;
                 case "warden":
                     // A Preservationist Warden (CANON look, book1 ch.5): green and brown, armour of living vine, an iron-wood staff.
-                    cloth.color = new Color(.3f, .38f, .22f); legs.color = new Color(.32f, .24f, .16f);
-                    var vine = M(.22f, .45f, .18f); var bark = M(.3f, .22f, .14f);
+                    cloth.color = new Color(.2f, .46f, .18f); legs.color = new Color(.36f, .24f, .13f);
+                    var vine = M(.12f, .5f, .15f); var bark = M(.3f, .22f, .14f);
                     for (int i = 0; i < 5; i++) Part(PrimitiveType.Cube, body, new Vector3(0, .05f + i * .13f, 0), new Vector3(.5f, .05f, .31f), vine, new Vector3(0, 0, i % 2 == 0 ? 12 : -12));
                     foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Sphere, body, new Vector3(s * .31f, .58f, 0), new Vector3(.24f, .16f, .24f), bark);
-                    for (int i = 0; i < 6; i++) Part(PrimitiveType.Sphere, body, new Vector3(Mathf.Sin(i) * .24f, .1f + i * .1f, .16f), Vector3.one * .06f, M(.35f, .6f, .25f)); // leaves
-                    Part(PrimitiveType.Sphere, body, new Vector3(0, .86f, -.02f), new Vector3(.34f, .3f, .35f), M(.26f, .32f, .18f));   // hood
+                    for (int i = 0; i < 6; i++) Part(PrimitiveType.Sphere, body, new Vector3(Mathf.Sin(i) * .24f, .1f + i * .1f, .16f), Vector3.one * .06f, M(.4f, .74f, .2f)); // leaves
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .86f, -.02f), new Vector3(.34f, .3f, .35f), M(.16f, .38f, .14f));   // hood
                     Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.4f, .08f), new Vector3(.06f, .95f, .06f), M(.24f, .24f, .22f, .4f, .3f)); // iron-wood staff
                     Part(PrimitiveType.Sphere, armR, new Vector3(0, .55f, .08f), new Vector3(.14f, .1f, .14f), vine);
                     break;
                 case "innkeeper":
                     // Shirt-sleeves rolled to the elbow, a brown waistcoat, a long white apron, a red cloth over the shoulder and keys at the belt.
-                    cloth.color = new Color(.84f, .8f, .7f); legs.color = new Color(.26f, .22f, .2f);
+                    cloth.color = new Color(.9f, .86f, .74f); legs.color = new Color(.26f, .2f, .17f);
                     foreach (var arm in new[] { armL, armR }) Part(PrimitiveType.Capsule, arm, new Vector3(0, -.47f, 0), new Vector3(.15f, .15f, .15f), skin);
-                    Part(PrimitiveType.Cube, body, new Vector3(0, .36f, 0), new Vector3(.5f, .46f, .31f), M(.4f, .26f, .16f));                 // waistcoat
-                    Apron(M(.92f, .9f, .84f), .86f);
-                    Part(PrimitiveType.Cube, body, new Vector3(-.19f, .6f, 0), new Vector3(.1f, .04f, .34f), M(.66f, .24f, .2f));            // the cloth over the shoulder
-                    Part(PrimitiveType.Cube, body, new Vector3(-.19f, .48f, .17f), new Vector3(.1f, .22f, .02f), M(.66f, .24f, .2f));
+                    Part(PrimitiveType.Cube, body, new Vector3(0, .36f, 0), new Vector3(.5f, .46f, .31f), M(.13f, .38f, .24f));                 // waistcoat
+                    Apron(M(.95f, .93f, .86f), .86f);
+                    Part(PrimitiveType.Cube, body, new Vector3(-.19f, .6f, 0), new Vector3(.1f, .04f, .34f), M(.82f, .14f, .1f));            // the cloth over the shoulder
+                    Part(PrimitiveType.Cube, body, new Vector3(-.19f, .48f, .17f), new Vector3(.1f, .22f, .02f), M(.82f, .14f, .1f));
                     Part(PrimitiveType.Cylinder, body, new Vector3(.25f, -.04f, .08f), new Vector3(.1f, .01f, .1f), iron, new Vector3(0, 0, 90)); // ring of keys
                     Beard(new Color(.36f, .24f, .14f), .3f);
                     break;

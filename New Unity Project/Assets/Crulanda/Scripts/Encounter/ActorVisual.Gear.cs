@@ -209,7 +209,7 @@ namespace Crulanda.Encounter
             // Armour: polished plate, darker duller mail, matte fur.
             k.plate = GearMats.Get(Color.Lerp(l.metal, Color.white, .08f), .48f + .07f * q, .62f + .06f * q);
             k.mail = GearMats.Get(l.metal * .78f, .3f + .04f * q, .62f);
-            k.fur = GearMats.Get(Color.Lerp(l.cloth, l.leather, .3f), .04f);
+            k.fur = GearMats.Get(l.fur, .04f);   // the palette's own fur (playtest note 13), else cloth into leather (GearLooks.Make)
             return k;
         }
         /// <summary>A gear part: a mesh and a shared material, no collider.</summary>

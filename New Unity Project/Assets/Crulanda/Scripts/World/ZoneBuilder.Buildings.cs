@@ -131,7 +131,7 @@ namespace Crulanda.World
         }
 
         // ---------- the inn's front ----------
-        static readonly Color[] Blooms = { new Color(.86f, .24f, .2f), new Color(.95f, .8f, .3f), new Color(.92f, .9f, .86f), new Color(.6f, .42f, .78f) };
+        static readonly Color[] Blooms = { new Color(.95f, .12f, .1f), new Color(1f, .8f, .1f), new Color(.98f, .96f, .9f), new Color(.6f, .24f, .9f), new Color(.98f, .4f, .62f), new Color(.16f, .4f, .95f) };
         /// <summary>
         /// A window box of planks on two brackets, <paramref name="wide"/> long, centred on <paramref name="at"/> with the wall
         /// behind it (+z): earth, leafy clumps with flowers in four colours, and leaves trailing over its front; in a gloom only
@@ -139,7 +139,7 @@ namespace Crulanda.World
         /// </summary>
         void FlowerBox(Transform t, Vector3 at, float wide, Func<float> R)
         {
-            var planks = Tint(art.timber, new Color(.36f, .25f, .16f)); var leaf = Tint(art.foliage, new Color(.26f, .44f, .2f));
+            var planks = Tint(art.timber, new Color(.36f, .25f, .16f)); var leaf = Tint(art.foliage, new Color(.16f, .5f, .14f));
             // Every piece of one material goes into one mesh (a box is a few objects, not a dozen spheres): the inn's front is
             // not static-batched (its door moves), so each object would be a draw call of its own.
             var parts = new Dictionary<Material, List<CombineInstance>>();
@@ -304,8 +304,8 @@ namespace Crulanda.World
             foreach (int k in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(sx + k * .6f, sy - .155f, zb), new Vector3(.03f, .2f, .03f), iron);
             Vector2[] Octagon(float hx, float hy, float cut) { return new[] { new Vector2(-hx, -hy + cut), new Vector2(-hx, hy - cut), new Vector2(-hx + cut, hy), new Vector2(hx - cut, hy), new Vector2(hx, hy - cut), new Vector2(hx, -hy + cut), new Vector2(hx - cut, -hy), new Vector2(-hx + cut, -hy) }; }
             bool cask = variant != 1;
-            var gold = Tint(art.metal, new Color(.86f, .66f, .26f));
-            MeshPart(PropMesh("Inn sign board", () => Cutout(Octagon(.8f, .55f, .1f), .07f)), t, new Vector3(sx, by, zb), Tint(art.timber, cask ? new Color(.2f, .32f, .22f) : new Color(.17f, .14f, .12f)));
+            var gold = Tint(art.metal, new Color(1f, .68f, .2f));
+            MeshPart(PropMesh("Inn sign board", () => Cutout(Octagon(.8f, .55f, .1f), .07f)), t, new Vector3(sx, by, zb), Tint(art.timber, cask ? new Color(.1f, .5f, .26f) : new Color(.17f, .14f, .12f)));
             MeshPart(PropMesh("Inn sign frame", () => Cutout(Octagon(.86f, .61f, .12f), .05f)), t, new Vector3(sx, by, zb + .045f), cask ? gold : iron);
             if (cask)
             {

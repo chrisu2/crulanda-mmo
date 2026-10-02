@@ -1,15 +1,15 @@
 {
   "palettes": [
-    { "id": "oakhaven",   "cloth": "#8C6B47", "cloth2": "#5F7350", "leather": "#5A3F28", "metal": "#7A7770", "trim": "#9A8A68", "wood": "#6B4A2B", "glow": "#FFD98A" },
-    { "id": "concord",    "cloth": "#6E737F", "cloth2": "#B8B8BC", "leather": "#34363F", "metal": "#9EA3AD", "trim": "#BF9E40", "wood": "#4D3823", "glow": "#DCE6FF" },
-    { "id": "sandthrone", "cloth": "#A88552", "cloth2": "#8A3B2A", "leather": "#5C4630", "metal": "#70706F", "trim": "#B5893C", "wood": "#5A4127", "glow": "#FFB347" },
-    { "id": "khaven",     "cloth": "#4C4A58", "cloth2": "#6B6470", "leather": "#3A3038", "metal": "#5B5F66", "trim": "#8F8F95", "wood": "#3F3530", "glow": "#A64DFF" },
-    { "id": "tollroad",   "cloth": "#5B6B80", "cloth2": "#8E2F2A", "leather": "#4A3B2E", "metal": "#A9B0BA", "trim": "#C9CCD2", "wood": "#54402C", "glow": "#9FD0FF" },
-    { "id": "pilgrim",    "cloth": "#C9C0A8", "cloth2": "#8D8672", "leather": "#6A5A44", "metal": "#8C8A84", "trim": "#D8D2BC", "wood": "#7A6244", "glow": "#FFF2C0" },
-    { "id": "ashwalker",  "cloth": "#3A3634", "cloth2": "#D8CDB4", "leather": "#2A2523", "metal": "#4E4A48", "trim": "#D9CFBA", "wood": "#2E2622", "glow": "#FF6A1F" },
-    { "id": "cult",       "cloth": "#231F24", "cloth2": "#DBD1B8", "leather": "#1C191B", "metal": "#3C3840", "trim": "#DBD1B8", "wood": "#2E2620", "glow": "#8C33CC" },
-    { "id": "veridian",   "cloth": "#2F5A3C", "cloth2": "#7A5A2E", "leather": "#4B3A22", "metal": "#8A7A45", "trim": "#C9A548", "wood": "#5E3E22", "glow": "#E8B84A" },
-    { "id": "pale",       "cloth": "#C8D4DC", "cloth2": "#8FA3B3", "leather": "#6E7C88", "metal": "#B9C6D0", "trim": "#E6EEF4", "wood": "#7C8790", "glow": "#9FE8FF" }
+    { "id": "oakhaven", "cloth": "#1F5C20", "cloth2": "#8A3212", "leather": "#5E2C14", "metal": "#BEBFC4", "trim": "#F09A2C", "wood": "#6E4420", "glow": "#FFD060", "fur": "#9A7448", "clothB": "#8A3212", "cloth2B": "#C06A18", "clothC": "#C06A18", "cloth2C": "#1F5C20" },
+    { "id": "concord", "cloth": "#122A82", "cloth2": "#E6E6EC", "leather": "#161B30", "metal": "#C8CEDC", "trim": "#FF9E2A", "wood": "#4D3823", "glow": "#BFD4FF", "fur": "#E6E4DE" },
+    { "id": "sandthrone", "cloth": "#B8641A", "cloth2": "#7E0C10", "leather": "#5A3018", "metal": "#9A5A34", "trim": "#F0A034", "wood": "#63431F", "glow": "#FFA228", "fur": "#A07840" },
+    { "id": "khaven", "cloth": "#4A1A60", "cloth2": "#1C1722", "leather": "#2A1A20", "metal": "#3A4048", "trim": "#CFC6AC", "wood": "#352A2A", "glow": "#A64DFF", "fur": "#332A30", "clothC": "#5E1218", "cloth2C": "#B8AE94" },
+    { "id": "tollroad", "cloth": "#2F66B0", "cloth2": "#E8EEF4", "leather": "#4E3A2E", "metal": "#C2CADA", "trim": "#E6ECF4", "wood": "#5A4026", "glow": "#6FC8FF", "fur": "#ECE8DC", "clothB": "#17308A", "cloth2B": "#D6E0EE" },
+    { "id": "pilgrim", "cloth": "#CC5C10", "cloth2": "#EADDB4", "leather": "#6E4420", "metal": "#CDD2DC", "trim": "#F0A034", "wood": "#7A5A34", "glow": "#FFE28A", "fur": "#D8C8A0" },
+    { "id": "ashwalker", "cloth": "#2A2627", "cloth2": "#FF4800", "leather": "#1E1918", "metal": "#3B3637", "trim": "#E86A2C", "wood": "#2E2420", "glow": "#FF6A1F", "fur": "#4A4240", "clothB": "#A81C08", "cloth2B": "#2A2627", "clothC": "#45287A", "cloth2C": "#E8E2D0" },
+    { "id": "cult", "cloth": "#1C161F", "cloth2": "#6A20D0", "leather": "#18131A", "metal": "#2F2A36", "trim": "#DBD1B8", "wood": "#2A2020", "glow": "#9A3CFF", "fur": "#2A222C" },
+    { "id": "veridian", "cloth": "#0A5234", "cloth2": "#0A5068", "leather": "#523216", "metal": "#A8602E", "trim": "#FF9A2A", "wood": "#5E3A1C", "glow": "#FFC23A", "fur": "#6E5830", "clothB": "#D85A12", "cloth2B": "#0A5234", "clothC": "#084A60", "cloth2C": "#D85A12" },
+    { "id": "pale", "cloth": "#CFE0EE", "cloth2": "#2F7FC0", "leather": "#5A7288", "metal": "#BCD0E2", "trim": "#F2F7FB", "wood": "#7C8790", "glow": "#7FE4FF", "fur": "#F0F2F2" }
   ],
   "materials": [
     { "word": "Homespun",     "palette": "oakhaven",   "shade": 0, "detail": "none" },
@@ -63,9 +63,9 @@
     { "slot": "legs", "family": "legs.breeches" }, { "slot": "feet", "family": "feet.shoes" }, { "slot": "neck", "family": "neck.cord" }
   ],
   "tints": [
-    { "prefix": "craft.copper_",     "metal": "#B87345" }, { "prefix": "craft.bogiron_",   "metal": "#4F4A46" },
-    { "prefix": "craft.ridgesteel_", "metal": "#A9B0BA" }, { "prefix": "craft.ashsteel_",  "metal": "#3E3B3D" },
-    { "prefix": "craft.veridian_",   "metal": "#7F8F52" }, { "prefix": "craft.heartwood_", "metal": "#6B3A22" }
+    { "prefix": "craft.copper_",     "metal": "#B87345" }, { "prefix": "craft.bogiron_",   "metal": "#4A4038" },
+    { "prefix": "craft.ridgesteel_", "metal": "#8EA4C6" }, { "prefix": "craft.ashsteel_",  "metal": "#3E3B3D" },
+    { "prefix": "craft.veridian_",   "metal": "#7C9A3E" }, { "prefix": "craft.heartwood_", "metal": "#7A3418" }
   ],
   "looks": [
     { "item": "craft.copper_cudgel",         "look": "club:studded/oakhaven" },

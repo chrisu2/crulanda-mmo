@@ -15,9 +15,11 @@ namespace Crulanda.Tests
 {
     /// <summary>
     /// The purses in Oakhaven (tools/wip/professions/ADDENDUM.md C): what the player pays the leatherworker, her family spends where
-    /// you can see it (Nettie carries a loaf home and Fen a bundle of firewood, and the Tanner chimney is lit when the wood is in);
-    /// short of coin they go without and say so; a house that went without firewood stops smoking at dusk while every other chimney
-    /// keeps on; and the drinkers drink with every purse at nothing.
+    /// you can see it (on the day's stipend Nettie has bought the loaf by then, so Fen carries a bundle of firewood home, and the
+    /// Tanner chimney is lit when the wood is in; only with every purse emptied by the test does Nettie go for a loaf on the
+    /// player's coin as well); a run given up before pick-up is set out on again; short of coin they go without and say so; a house
+    /// that went without firewood stops smoking at dusk while every other chimney keeps on; a zone loaded again finds the wood home;
+    /// and the drinkers drink with every purse at nothing.
     /// </summary>
     public class VillagePurseTests
     {
@@ -60,7 +62,47 @@ namespace Crulanda.Tests
         /// <summary>Send someone off afresh from a spot (where a shift had taken them is not the test's business).</summary>
         static void SetOff(Villager v, string from = null) { if (from != null) Assert.IsTrue(v.WorkAt(from), v.Name + " can stand at the " + from); v.Release(v.transform.position); }
 
-        [UnityTest] public IEnumerator Buying_from_the_leatherworker_at_1500_sends_her_family_for_bread_and_firewood()
+        [UnityTest] public IEnumerator With_the_days_stipend_buying_from_the_leatherworker_at_1500_sends_Fen_for_firewood()
+        {
+            yield return Open(13.9f);
+            var s = Session(); var life = VillageLife.Active;
+            var maud = life.Find(Maud); var fen = life.Find("Fen Walker"); var nettie = life.Find("Nettie");
+            var tanner = life.HouseholdOf(Maud); var purse = life.PurseOf(tanner);
+            Assert.IsTrue(purse.claimed.Contains("bread"), "The stipend stretches to the loaf (" + Tell(purse) + ").");
+            SetOff(nettie);
+            Assert.AreEqual("bread for the house", nettie.Errand?.id, Tell(nettie));
+            Time.timeScale = 4;
+            yield return WaitUntil(() => purse.met.Contains("bread"), 150);
+            Assert.IsTrue(purse.met.Contains("bread"), "Nettie buys the loaf on the stipend before the player comes (" + Tell(purse) + ", " + Tell(nettie) + ").");
+            Time.timeScale = 1;
+            var home = new List<(Villager who, Errand e, Vector3 at)>();
+            life.HandedOver += (v, e, taker) => { if (e.need != null) home.Add((v, e, v.transform.position)); };
+
+            WorldClock.Hour = 15;
+            BuyWallet(s, maud);
+            CollectionAssert.AreEquivalent(new[] { "firewood", "eggs" }, purse.claimed, "The player's coin buys the wood and the eggs (" + Tell(purse) + ").");
+            Assert.Contains(Maud + ": " + VillageLife.TonightLine, s.Messages);
+            SetOff(fen, "tannery"); SetOff(nettie);
+            Assert.AreEqual("firewood for the hearth", fen.Errand?.id, Tell(fen));
+            Assert.IsFalse(nettie.Errand != null && nettie.Errand.need != null, "Nettie has no shopping left today (" + Tell(nettie) + ").");
+            var ama = life.Seller("eggs"); Assert.AreEqual("Ama Rusk", ama?.Name, "Eggs are paid to the Rusks.");
+            var stalls = life.OwnPlaces(ama, "stall"); Assert.NotNull(stalls, "Ama keeps a stall.");
+            foreach (var at in stalls) Assert.AreEqual("Produce stall", life.WorkplaceAt(at), "and fetched from Ama's own stall.");
+
+            Time.timeScale = 4; float start = WorldClock.Hour; bool wood = false;
+            yield return WaitUntil(() => (wood |= fen.Carried == Load.Logs) || WorldClock.Hour > start + 1.5f, 150);
+            Assert.IsTrue(wood, "Fen carries a bundle of firewood (" + Tell(fen) + ").");
+            Assert.Less(WorldClock.Hour, start + 1, "within a game hour of the purchase.");
+            yield return WaitUntil(() => home.Any(h => h.who == fen && h.e.need == "firewood"), 150);
+            var drop = home.FirstOrDefault(h => h.who == fen && h.e.need == "firewood");
+            Assert.NotNull(drop.who, "Fen brings the firewood home (" + Tell(fen) + ").");
+            Assert.Less(Vector3.Distance(drop.at, tanner.house.position), 3.5f, "He hands it over at the Tanner house door.");
+            Assert.IsFalse(purse.cold, "Wood in, the fire is lit.");
+        }
+
+        /// <summary>Only with every purse emptied by the test (never so in play: the stipend buys the Tanners' loaf by early afternoon)
+        /// does the player's coin send Nettie for a loaf as well as Fen for firewood.</summary>
+        [UnityTest] public IEnumerator With_every_purse_empty_buying_from_the_leatherworker_at_1500_sends_her_family_for_bread_and_firewood()
         {
             VillageEconomy.StartingCoin = 0;   // nothing in any purse: only the player's coin buys today
             yield return Open(13.9f);
@@ -121,6 +163,7 @@ namespace Crulanda.Tests
             yield return WaitUntil(() => purse.cold, 30);
             Assert.IsTrue(purse.cold, "No firewood: the Tanner hearth is cold from 17:00 (" + Tell(purse) + ").");
             Assert.AreEqual("We've bread. No fire; Nettie sleeps in her coat.", life.PurseLine(maud), "What the Tanners say to the player.");
+            Assert.AreEqual("No fire again. I sleep in my coat.", life.PurseLine(life.Find("Nettie")), "Nettie says it of herself.");
             bool heard = false; for (int i = 0; i < 80 && !heard; i++) heard = life.LineFor(maud, true) == life.PurseLine(maud);
             Assert.IsTrue(heard, "Maud says it when you talk to her (one talk in three).");
             Assert.IsNull(life.PurseLine(life.Find("Brannoc Vell")), "A warm house has nothing to say of it.");
@@ -130,6 +173,62 @@ namespace Crulanda.Tests
             BuyWallet(s, maud);
             Assert.AreEqual(before + 12, purse.coin); Assert.IsFalse(purse.claimed.Contains("firewood"), "Nobody goes for firewood after the shops shut (" + Tell(purse) + ").");
             Assert.Contains(Maud + ": " + VillageLife.TomorrowLine, s.Messages);
+            life.Paid(Maud, 5);
+            Assert.AreEqual(1, s.Messages.Count(m => m == Maud + ": " + VillageLife.TomorrowLine), "She says it once an evening.");
+            life.Paid("Brannoc Vell", 5);   // his wood was bought on the books at 14:00
+            Assert.IsFalse(s.Messages.Contains("Brannoc Vell: " + VillageLife.TomorrowLine), "A warm house says nothing of tomorrow's fire (" + Tell(life.PurseOf(life.HouseholdOf("Brannoc Vell"))) + ").");
+
+            // The next morning the coin is there for the wood: the chimney stays out till it is home, but nobody says tonight will be cold.
+            WorldClock.Hour = 10;
+            yield return WaitUntil(() => purse.claimed.Contains("firewood"), 30);
+            Assert.IsTrue(purse.claimed.Contains("firewood"), "A new day: the firewood is claimed (" + Tell(purse) + ").");
+            Assert.IsTrue(purse.cold, "The hearth stays cold till the wood is home.");
+            Assert.IsNull(life.PurseLine(maud), "With the wood on the way, Maud does not say tonight will be cold.");
+        }
+
+        [UnityTest] public IEnumerator A_run_given_up_before_pick_up_is_set_out_on_again_and_one_given_up_after_lights_the_fire()
+        {
+            yield return Open(14.5f);
+            var s = Session(); var life = VillageLife.Active; var maud = life.Find(Maud); var fen = life.Find("Fen Walker");
+            var tanner = life.HouseholdOf(Maud); var purse = life.PurseOf(tanner);
+            BuyWallet(s, maud);
+            Assert.IsTrue(purse.claimed.Contains("firewood"), Tell(purse));
+            SetOff(fen, "tannery");
+            Assert.AreEqual("firewood for the hearth", fen.Errand?.id, Tell(fen));
+
+            // Called away before he reaches the woodyard (as a flight from the collectors or bedtime would): the coin stays set aside,
+            fen.StandAt(fen.transform.position, 0);
+            Assert.IsNull(fen.Errand, Tell(fen));
+            Assert.IsTrue(purse.claimed.Contains("firewood"), "The coin for the wood is still set aside (" + Tell(purse) + ").");
+            // and he sets out for it again.
+            fen.Release(fen.transform.position);
+            Assert.AreEqual("firewood for the hearth", fen.Errand?.id, "Fen sets out for the wood again (" + Tell(fen) + ").");
+
+            // Called away once the bundle is paid for at the woodyard: it goes home with him, and the fire is lit.
+            purse.cold = true; tanner.ApplyHearth(true);
+            Assert.IsTrue(life.Fetched(fen, fen.Errand), "Paid at pick-up (" + Tell(purse) + ").");
+            fen.StandAt(fen.transform.position, 0);
+            Assert.IsFalse(purse.cold, "The wood went home with him: the hearth is lit (" + Tell(purse) + ").");
+            Assert.IsTrue(tanner.house.smoke.emission.enabled, "and the Tanner chimney smokes.");
+            fen.Release(fen.transform.position);
+            Assert.AreNotEqual("firewood for the hearth", fen.Errand?.id, "Bought, it is not fetched again (" + Tell(fen) + ").");
+        }
+
+        [UnityTest] public IEnumerator A_zone_loaded_again_finds_wood_bought_while_away_home()
+        {
+            yield return Open(17.3f);
+            var purse = VillageLife.Active.PurseOf(VillageLife.Active.HouseholdOf(Maud));
+            // The player leaves while Fen carries home a bundle paid for at the woodyard, on a cold evening.
+            purse.cold = true; purse.claimed.Remove("firewood"); purse.met.Add("firewood");
+            yield return SceneManager.LoadSceneAsync("Oakhaven", LoadSceneMode.Single);
+            for (int i = 0; i < 3; i++) yield return null;
+            Assert.AreEqual(root, Session().SaveDirectoryOverride, "This test saves to its own folder.");
+            var life = VillageLife.Active; var tanner = life.HouseholdOf(Maud);
+            Assert.AreSame(purse, life.PurseOf(tanner), "The purses live for the play session.");
+            Assert.IsFalse(purse.cold, "The wood is home: the hearth is lit (" + Tell(purse) + ").");
+            Time.timeScale = 4;
+            yield return WaitUntil(() => false, 6);   // past a tick of the purses (20 s of game time)
+            Assert.IsTrue(tanner.house.smoke.emission.enabled, "and the Tanner chimney smokes (" + Tell(purse) + ").");
         }
 
         [UnityTest] public IEnumerator A_house_without_firewood_goes_cold_and_the_rest_keep_smoking()

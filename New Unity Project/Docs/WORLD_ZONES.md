@@ -641,17 +641,26 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
   - A claim is paid when the goods are picked up. A household with a spare pair of hands sends someone, where you can see it
     (`VillageWork.Shopping`): "bread for the house" (9-18, the baker's stall to home; a child goes first, after their own midday
     "a loaf for Mum", which now runs only when bread is claimed), "firewood for the hearth" (14-19:30, the woodyard to home, a
-    grown-up who is not the head: Fen Walker for the Tanners) and "eggs for the house" (15:30-18:30). A household of one, one with
-    nobody to send, or one living more than 100 m from the green buys on the books at the hour the window opens, so the smiths and
-    merchants stay at their shops. An errand given up before pick-up lets its claim go.
+    grown-up who is not the head: Fen Walker for the Tanners) and "eggs for the house" (15:30-18:30, Ama Rusk's Produce stall to
+    home). The shopper goes to the seller's own place (the one whose household is paid), where it has one. A household of one, one
+    with nobody to send, or one living more than 100 m from the green buys on the books at the hour the window opens, so the smiths
+    and merchants stay at their shops. The household's claimed shopping comes before a member's own errands (`Villager.StartErrand`),
+    so the family sets out as soon as it is paid; a role errand whose window closes meanwhile waits for the next day (ADDENDUM C.5
+    had it after; this follows C.2.8's "sets out at once"). An errand given up before pick-up (a flight from the collectors, bedtime)
+    keeps its coin set aside and is set out on again while its window is open; one whose place cannot be reached (blocked by the
+    grey-coats, or no path) lets its claim go. Goods already paid for at pick-up go home with the runner, so firewood still lights
+    the hearth.
   - Short of coin, the errand is not run and the one who would have gone says so once ("Can't stretch to firewood today.", "Mum
     says there's no loaf today."). A house whose firewood went unmet has its chimney smoke switched off (`ZoneDoor.smoke`'s
     emission, `Household.ApplyHearth`) from 17:00 until wood is next brought home; every other chimney smokes as before. Where the
     player can pay them (a member has wares or quests), a cold household says so one talk in three ("We've bread. No fire;
-    Nettie sleeps in her coat.").
+    Nettie sleeps in her coat."; Nettie herself: "No fire again. I sleep in my coat."): from 17:00, and earlier in the day only
+    while the house is still cold and has no wood bought or on the way. A zone loaded again finds wood bought while it was away
+    home, and that hearth lit.
   - The player's coin (`VillageLife.Paid`: a purchase, or a bag Maud makes for a quest's hides) goes into the seller's household,
-    which plans again and sets out at once ("That's the fire lit tonight. Bless you."). After 18:00 it waits for the morning
-    ("That's tomorrow's fire. Bless you."); past the cap the tithe-man has the rest. Buying never needs stock, and selling to a
+    which plans again and sets out at once ("That's the fire lit tonight. Bless you."). After 18:00 it waits for the morning, and a
+    house that went without firewood today says so once ("That's tomorrow's fire. Bless you."; a warm house says nothing); past the
+    cap the tithe-man has the rest. Buying never needs stock, and selling to a
     vendor never draws on a purse.
   - Not saved. Purses live for the play session, keyed by the character (save folder and slot) and the zone, and are cleared when
     another character plays. What lasts is the saved bags: each trade bag the character wears adds 2 a day to the leatherworker's
@@ -661,9 +670,14 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
     keeps them warm every day, also after a restart. Khaven has no baker, woodyard or hens, so its purses buy nothing.
   - Tests: `VillageEconomyTests` (EditMode, over Oakhaven's data: only the Tanners go without, their bread and firewood days, one
     bag keeps them warm, needs in order, the cap, a purchase reaches the seller, no household buys its own trade, a released
-    claim) and `VillagePurseTests` (PlayMode: buying from Maud at 15:00 sends Nettie for a loaf and Fen for firewood, short of
-    coin they go without and say so, a house without firewood goes cold while the rest keep smoking, the drinkers drink with
-    every purse at nothing). Village tests call `VillageEconomy.ResetAll()` in teardown.
+    claim) and `VillagePurseTests` (PlayMode: with the day's stipend, Nettie has the Tanners' loaf home before 15:00, so buying
+    from Maud at 15:00 sends Fen for firewood and eggs; only with every purse emptied by the test (`VillageEconomy.StartingCoin =
+    0`, never so in play) does the purchase send Nettie for a loaf as well; a run given up before pick-up is set out on again, and
+    one given up after it lights the fire; short of coin they go without and say so, once; a house without firewood goes cold
+    while the rest keep smoking; a zone loaded again finds the wood home; the drinkers drink with every purse at nothing). Village
+    tests call `VillageEconomy.ResetAll()` in teardown.
+  - At stipend 3 and bread 2 Nettie buys the Tanners' loaf every day by early afternoon ("a loaf for Mum", 11-13), so the player's coin buys their
+    firewood (and eggs), not their bread. Showing a loaf bought with the player's coin would take other numbers (step 14).
 - **Day/night** (`Scripts/World/WorldClock.cs`): one game day lasts 40 real minutes and starts at 08:30. The hour
   continues across zone travel (it is not saved yet). The directional light is the sun by day and a pale moon at night.
   Dawn, day, dusk and night keyframes blend with the zone's own `lighting` palette: ambient, fog, sky tint and exposure.

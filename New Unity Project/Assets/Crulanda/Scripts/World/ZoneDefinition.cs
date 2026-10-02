@@ -38,6 +38,9 @@ namespace Crulanda.World
         public ZoneSecret[] secrets = new ZoneSecret[0];
         /// <summary>Things to gather that are not props (ore seams, windfalls, herbs; see <see cref="ZoneNode"/>). Herb props carry their own <see cref="ZoneProp.node"/>.</summary>
         public ZoneNode[] nodes = new ZoneNode[0];
+        /// <summary>Where the trades' recipes are made that is no villager's workplace (a field anvil, a bench, a cookfire; see
+        /// <see cref="ZoneStation"/>). A smithy, a bake oven, the herbalist's drying hut, an inn's kitchen and its hearth are stations already.</summary>
+        public ZoneStation[] stations = new ZoneStation[0];
         public ZoneLife life;
         /// <summary>Level band shown on maps and exits (e.g. 1-2); camps spawn inside it.</summary>
         public int levelMin = 1, levelMax = 2;
@@ -222,6 +225,30 @@ namespace Crulanda.World
     /// streams of their own, with no colliders: the zone's layout and navmesh are as they were.
     /// </summary>
     [Serializable] public sealed class ZoneNode { public string node, item; public Vector2 at; public float rotation; public bool under; }
+    /// <summary>
+    /// A station of the trades that is no villager's workplace (GAME-ONLY): kind forge (a field anvil and its coal pan; variant 1
+    /// on a bone-bound block, 2 on a mossed stone with its embers in a stone basin), bench (a herbalist's bench with a drying rail)
+    /// or fire (a cookfire in a ring of stones, a pot on a tripod). name is what the Trades window calls it ("Forge: Oska's
+    /// bone-anvil"). rotation: its yaw (its front, where you stand, faces -Z). Built after the nodes, each from a stream of its own,
+    /// with no colliders: the zone's layout and navmesh are as they were.
+    /// </summary>
+    [Serializable] public sealed class ZoneStation { public string kind, name, canonStatus; public Vector2 at; public float rotation; public int variant; }
+    /// <summary>A station as built (ZoneBuilder.Stations): its kind (forge, bench, fire), its name, where the thing worked stands, and
+    /// the prop it belongs to (a workplace's building, an inn, or a station of its own).</summary>
+    public sealed class ZoneStationSpot
+    {
+        public string kind, name; public Vector3 position; public Transform root;
+        /// <summary>For a station behind walls, the floor it is worked from, in its root's local x/z (an inn's taproom, the drying
+        /// hut; the smithy and the kitchen on their open sides); zero size for one in the open.</summary>
+        public Rect room;
+        /// <summary>Whether a spot is on the station's side of its walls: anywhere for one in the open, else inside its room. The
+        /// inn's hearth is not worked from the street through the wall.</summary>
+        public bool Reaches(Vector3 at)
+        {
+            if (room.width <= 0 || room.height <= 0 || root == null) return true;
+            var l = root.InverseTransformPoint(at); return room.Contains(new Vector2(l.x, l.z));
+        }
+    }
     /// <summary>A usable prop registered by ZoneBuilder (see ZoneProp.interact).</summary>
     public sealed class ZoneInteractable
     {

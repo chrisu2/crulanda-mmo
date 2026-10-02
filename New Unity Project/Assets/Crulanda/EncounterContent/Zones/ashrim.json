@@ -2600,5 +2600,10 @@
     { "node": "node.cinder_thistle", "at": { "x": -60, "y": 80 } },
     { "node": "node.cinder_thistle", "at": { "x": 120, "y": 10 } },
     { "node": "node.cinder_thistle", "at": { "x": -128, "y": 44 } }
+  ],
+  "stations": [
+    { "kind": "forge", "name": "Oska's bone-anvil", "at": { "x": 56, "y": 22 }, "rotation": 225, "variant": 1, "canonStatus": "GAME-ONLY" },
+    { "kind": "bench", "name": "Mother Vane's salt-bench", "at": { "x": 64, "y": -6 }, "rotation": 315, "canonStatus": "GAME-ONLY: Mother Vane is CANON (book1 ch.20); her bench is invented." },
+    { "kind": "fire", "name": "Enclave cookfire", "at": { "x": 60, "y": -18 }, "rotation": 140, "canonStatus": "GAME-ONLY" }
   ]
 }

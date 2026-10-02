@@ -81,7 +81,7 @@ invalid" and runs without the trades (items are unaffected).
       "respawn": 180, "seconds": 2, "look": "ore", "variant": 0, "prompt": "Mine the copper seam" }
   ],
   "recipes": [
-    { "id": "recipe.charcoal_oak", "name": "Charcoal", "profession": "woodcutting", "skill": 1, "station": "forge|fire",
+    { "id": "recipe.charcoal_oak", "name": "Charcoal from oak", "profession": "woodcutting", "skill": 1, "station": "forge|fire",
       "inputs": [ { "item": "mat.oak_log", "count": 1 } ], "output": "mat.charcoal", "count": 1 }
   ]
 }
@@ -122,10 +122,45 @@ invalid" and runs without the trades (items are unaffected).
   3 m), with a warning when nothing near is clear; a windfall turns in 30 degree steps until it lies clear. Place them clear in
   the data: 3 m is a nudge, not a search.
 - `ZoneProp.node`: a herb prop worked as a node (it keeps its `interact` prompt and quest `item`).
+
+### Stations in a zone (`Zones/*.json`, BUILD_PLAN step 9)
+```json
+"stations": [
+  { "kind": "forge", "name": "Oska's bone-anvil", "at": { "x": 56, "y": 22 }, "rotation": 225, "variant": 1, "canonStatus": "GAME-ONLY" },
+  { "kind": "bench", "name": "Mother Vane's salt-bench", "at": { "x": 64, "y": -6 }, "rotation": 315, "canonStatus": "GAME-ONLY: ..." },
+  { "kind": "fire", "name": "Enclave cookfire", "at": { "x": 60, "y": -18 }, "rotation": 140, "canonStatus": "GAME-ONLY" }
+]
+```
+- A station is where recipes are made: `kind` is `forge`, `bench` or `fire`; `name` is what the Trades window calls it ("Forge:
+  Oska's bone-anvil"); `rotation` its yaw (its front, where you stand, faces -Z); `variant` a forge's look (0 a field anvil on an oak
+  stump with a pan of coals, 1 on a block of pale stone bound with bone, 2 on a mossed stone with a stone basin of embers). A bench
+  is a herbalist's bench with a drying rail; a fire a cookfire in a ring of stones with a pot on a tripod.
+- Built by `ZoneBuilder.BuildStations` after the nodes, under "Zone stations", each from a stream of its own keyed on where it
+  stands, with no colliders and nothing in the navmesh, so nothing else moves (`NodeStreamTests` builds every zone with and
+  without them). Placed in the data clear of roads, water, buildings, nodes, secrets and trunks (`NodePlacementTests`).
+- Villagers' workplaces are stations too, with no data: a `forge` prop (forge, at its anvil), an `oven` (fire, at its mouth), a
+  `dryhut` (bench, at the bench), a `kitchen` (fire, at the range) and every `inn` (fire, at its hearth, named after the inn).
+  `ZoneBuilder.StationKind` maps them; `ZoneBuilder.Stations` lists every station of the zone.
+- A recipe can be made within 5 m (ground distance; one in a cave and one out of it never reach each other) of a station of one of
+  its kinds. E there (when no one is in reach to talk to, nothing to pick up and no door at hand) reads "Work at the forge", "Work at
+  the bench", "Cook at the fire" (or "Work at the fire" while the fire's only use is charcoal), and opens the Trades window (K) at
+  the recipes of the trade the station serves. Nobody need be there, day or night.
 - The zone builder learns what a node is (name, prompt, look) from the component beside it that implements `IZoneNodeKinds`
   (the encounter session, from the trades' content). Without one it builds no nodes and warns.
 - `RecipeDef`: `profession`, `skill` 1-100, `station` (alternatives joined with `|`), at least one input, `output`, `count`
-  (default 1). The file has none yet; they arrive with the stations step.
+  (default 1); an item named on two input lines is summed. The file has the five charcoal recipes (BUILD_PLAN step 9, DESIGN 5.1):
+  one log of each tier's wood (oak, black pine, stone-pine, ash-snag, ghost-oak) makes 1 to 5 charcoal at a forge or a fire, at
+  Woodcutting 1, 20, 40, 60 and 80. Rules pinned by `ProfessionDataTests`: what a recipe makes (value x count) is worth at most 1.5
+  times its inputs; a recipe from vendor goods alone never makes more than they cost to buy; every recipe's station stands somewhere.
+- Making (`ProfessionLog.CanCraft`, `Craft`; `EncounterSession.Make`): refused, in this order, without the trade (a gathering
+  skill's tool: "You need a woodcutter's hatchet. Merchants sell them."; a craft: "You have not taken up Blacksmithing."), under the
+  recipe's skill ("That wants Woodcutting 20."), with no station of its kind within 5 m and on its side of any walls ("You need a forge or a fire nearby."), short
+  of an input ("You need Harrow oak log." or "... x2."), or with no room for what it makes ("Your bags are full."); then nothing
+  changes. Otherwise the inputs leave the bags, the output goes in (onto its stacks, then a worn trade bag that holds it: charcoal
+  goes in the ore-poke), and the skill rises: every time under 10 points over the recipe (orange), half the time under 20 (yellow),
+  one in ten under 30 (green), never after (grey); never past 100. Each takes 2 s on the work bar ("You make Charcoal."); Make all
+  goes one at a time, stops with the reason when the next cannot be made ("Your bags are full."), and moving, a blow, a fight or
+  dying stops the rest. Known recipes are not saved: they follow from the skill.
 - Skill is 1-100 (`ProfessionDatabase.MaxSkill`). What a character has learned is saved as `EncounterProgress.professions`
   (save format 8, see SAVE_FORMAT.md) and handled by `ProfessionLog`.
 

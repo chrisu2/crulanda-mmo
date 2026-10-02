@@ -3600,5 +3600,8 @@
     { "node": "node.mourners_cap", "item": "item.mourners_cap", "at": { "x": -14, "y": -104 } },
     { "node": "node.mourners_cap", "item": "item.mourners_cap", "at": { "x": 10, "y": -114 } },
     { "node": "node.mourners_cap", "item": "item.mourners_cap", "at": { "x": 26, "y": -112 } }
+  ],
+  "stations": [
+    { "kind": "bench", "name": "Wenna Coyle's bench", "at": { "x": -17, "y": -12 }, "rotation": 90, "canonStatus": "GAME-ONLY" }
   ]
 }

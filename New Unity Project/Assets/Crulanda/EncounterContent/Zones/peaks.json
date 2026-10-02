@@ -2421,5 +2421,9 @@
     { "node": "node.tarnwort", "at": { "x": -10.5, "y": -126.8 } },
     { "node": "node.tarnwort", "at": { "x": 6, "y": -136 } },
     { "node": "node.tarnwort", "at": { "x": -10.5, "y": -116.6 } }
+  ],
+  "stations": [
+    { "kind": "forge", "name": "Pass-trader's field anvil", "at": { "x": -24, "y": 0 }, "rotation": 325, "canonStatus": "GAME-ONLY" },
+    { "kind": "fire", "name": "Pass cookfire", "at": { "x": -29.5, "y": 5.5 }, "rotation": 325, "canonStatus": "GAME-ONLY" }
   ]
 }

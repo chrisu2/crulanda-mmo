@@ -344,5 +344,224 @@ namespace Crulanda.World
                 }
             }
         }
+
+        // ---------- the trades' stations (DESIGN 6.1, ADDENDUM B.5) ----------
+        /// <summary>The kinds of station a recipe is made at.</summary>
+        public static readonly string[] StationKinds = { "forge", "bench", "fire" };
+        /// <summary>
+        /// Where the trades' recipes are made, each with its kind, its name and where the thing worked stands: a smithy (forge), a
+        /// bake oven and an inn's kitchen (fire), the herbalist's drying hut (bench), an inn's hearth (fire, named after the inn), and
+        /// the zone's own stations (<see cref="ZoneDefinition.stations"/>). Never a workplace for villagers (VillageLife's places are
+        /// the Workplaces, untouched).
+        /// </summary>
+        public readonly List<ZoneStationSpot> Stations = new List<ZoneStationSpot>();
+        /// <summary>The player's station at a villager's workplace of this kind (forge: forge; oven, kitchen: fire; dryhut: bench), or
+        /// null for a workplace that is none (a stall, the tannery, the woodpile, a kitchen's hand-over spots, the bar).</summary>
+        public static string StationKind(string workplace)
+        {
+            switch (workplace) { case "forge": return "forge"; case "oven": case "kitchen": return "fire"; case "dryhut": return "bench"; default: return null; }
+        }
+        /// <summary>Registers a station: one of each kind for each prop (a smithy's second workplace adds none). Draws nothing random.</summary>
+        void AddStation(string kind, string name, Vector3 at, Transform root)
+        {
+            if (kind == null || Stations.Exists(s => s.root == root && s.kind == kind)) return;
+            Stations.Add(new ZoneStationSpot { kind = kind, name = name, position = at, root = root });
+        }
+        /// <summary>Walls in a prop's stations: they are worked only from this floor, in the prop's local x/z (ZoneStationSpot.room). Draws nothing random.</summary>
+        void StationRoom(Transform root, Rect room) { foreach (var s in Stations) if (s.root == root) s.room = room; }
+        /// <summary>
+        /// The zone's own stations (GAME-ONLY): a field anvil (forge), a herbalist's bench (bench) or a cookfire (fire) where the data
+        /// puts it, each from a stream of its own keyed on where it stands, under "Zone stations", with no colliders and nothing in
+        /// the navmesh, so every tree, rock, prop, node and creek stands where it stood. Built after the nodes; one of an unknown kind is
+        /// left out with a warning.
+        /// </summary>
+        void BuildStations()
+        {
+            if (Zone.stations == null || Zone.stations.Length == 0) return;
+            var all = new GameObject("Zone stations").transform; all.SetParent(transform, false);
+            foreach (var s in Zone.stations)
+            {
+                if (s == null) continue;
+                if (Array.IndexOf(StationKinds, s.kind) < 0) { Debug.LogWarning(Zone.id + ": station '" + s.name + "' at " + s.at + " is of no kind the trades know ('" + s.kind + "'); left out."); continue; }
+                var sr = new System.Random(Zone.seed ^ (Mathf.RoundToInt(s.at.x * 8) * 73856093) ^ (Mathf.RoundToInt(s.at.y * 8) * 19349663) ^ 0x51a7e5);
+                float R() { return (float)sr.NextDouble(); }
+                var t = new GameObject(string.IsNullOrEmpty(s.name) ? s.kind : s.name).transform; t.SetParent(all, false);
+                t.position = Ground(s.at); t.rotation = Quaternion.Euler(0, s.rotation, 0);
+                switch (s.kind)
+                {
+                    case "forge": FieldAnvil(t, s.variant, R); break;
+                    case "bench": HerbBench(t, R); break;
+                    default: Cookfire(t, R); break;
+                }
+                AddStation(s.kind, t.name, t.position, t);
+            }
+        }
+        /// <summary>The lowest ground under a round footprint of radius r at local (x, z), relative to the root.</summary>
+        float FootUnder(Transform t, float x, float z, float r)
+        {
+            float low = LocalGround(t, x, z);
+            for (int k = 0; k < 6; k++) low = Mathf.Min(low, LocalGround(t, x + Mathf.Cos(k * 1.047f) * r, z + Mathf.Sin(k * 1.047f) * r));
+            return low;
+        }
+        /// <summary>
+        /// A field anvil (GAME-ONLY): the smith's iron anvil (foot, waist, face, horn), a hammer on its face, its top at .55 over the
+        /// ground, on a block sunk into the ground under it: variant 0 an oak stump, 1 a block of pale stone bound with two bands of
+        /// bone and two tusks leaning on it (the Ash-Walkers'), 2 a mossed stone (the Keepers'). Beside it the fire: variants 0 and 1 a
+        /// pan of coals on three iron legs, every third coal glowing; variant 2 a stone basin of embers on the ground. Tongs lean on
+        /// the block; a water cask and an open sack of charcoal stand by. No colliders. Draws only from R.
+        /// </summary>
+        void FieldAnvil(Transform t, int variant, Func<float> R)
+        {
+            var iron = Tint(art.metal, new Color(.22f, .22f, .24f)); var dark = Tint(art.timber, new Color(.25f, .17f, .11f));
+            var coal = Tint(art.stone, new Color(.11f, .1f, .1f)); var ember = Glowing(new Color(1, .42f, .12f), 2.4f);
+            float foot = FootUnder(t, 0, 0, .36f), top = Mathf.Max(0, foot) + .55f;
+            switch (variant)
+            {
+                case 1:
+                {
+                    var pale = Tint(art.stone, new Color(.7f, .68f, .62f));
+                    Part(PrimitiveType.Cube, t, new Vector3(0, (foot - .12f + top) / 2, 0), new Vector3(.64f, top - foot + .12f, .52f), pale, Quaternion.Euler(0, (R() - .5f) * 8, 0));
+                    foreach (float y in new[] { foot + .16f, top - .12f }) Part(PrimitiveType.Cube, t, new Vector3(0, y, 0), new Vector3(.68f, .07f, .56f), Bone);   // the bands
+                    foreach (int s in new[] { -1, 1 }) Rod(t, new Vector3(s * .5f, LocalGround(t, s * .5f, .3f), .3f), new Vector3(s * .34f, top + .35f + R() * .1f, .18f), .07f, Bone);   // the tusks, their points over the block
+                    break;
+                }
+                case 2:
+                {
+                    var stone = RockTint(Wither(new Color(.38f, .4f, .36f)));
+                    Part(PrimitiveType.Sphere, t, new Vector3(0, top - .4f, 0), new Vector3(.95f, .8f, .82f), stone, Quaternion.Euler(0, R() * 360, 0));
+                    Part(PrimitiveType.Sphere, t, new Vector3(-.12f, top - .08f, .14f), new Vector3(.62f, .16f, .5f), Tint(art.foliage, new Color(.26f, .46f, .2f)));   // moss on its crown, round the anvil's foot
+                    break;
+                }
+                default:
+                    MeshPart2(PropMesh("Anvil stump", () => TwoTone(Turned(new[] { new Vector2(.36f, 0), new Vector2(.32f, .15f), new Vector2(.3f, .55f) }, 10), Turned(new[] { new Vector2(.3f, .55f), new Vector2(0, .55f) }, 10))), t, new Vector3(0, top - .55f, 0), art.bark, Tint(art.timber, new Color(.62f, .5f, .34f)));
+                    if (top - .55f > foot + .02f) Part(PrimitiveType.Cylinder, t, new Vector3(0, (foot - .1f + top - .55f) / 2, 0), new Vector3(.72f, (top - .55f - foot + .1f) / 2, .72f), art.bark);   // the stump's foot down to the ground on a slope
+                    break;
+            }
+            // The anvil, as at a smithy, a hammer on its face.
+            Part(PrimitiveType.Cube, t, new Vector3(0, top + .05f, 0), new Vector3(.34f, .1f, .5f), iron);
+            Part(PrimitiveType.Cube, t, new Vector3(0, top + .16f, 0), new Vector3(.18f, .12f, .34f), iron);
+            Part(PrimitiveType.Cube, t, new Vector3(0, top + .28f, -.04f), new Vector3(.3f, .12f, .6f), iron);
+            MeshPart(PropMesh("Anvil horn", () => ZoneMeshes.Cone(.07f, .3f, 8)), t, new Vector3(0, top + .27f, .26f), iron, Quaternion.Euler(90, 0, 0));
+            Rod(t, new Vector3(-.12f, top + .36f, -.22f), new Vector3(.1f, top + .36f, .08f), .03f, art.timber);
+            Part(PrimitiveType.Cube, t, new Vector3(-.14f, top + .375f, -.25f), new Vector3(.07f, .07f, .15f), iron, Quaternion.Euler(0, 36, 0));
+            foreach (float x in new[] { -.36f, -.32f }) Bar(t, new Vector3(x, LocalGround(t, x, -.36f) + .02f, -.36f), new Vector3(x + .06f, top - .05f, -.22f), .03f, .02f, iron);   // tongs against the block
+            // The fire beside it.
+            float px = .95f, pz = .15f, pg = FootUnder(t, px, pz, .36f);
+            if (variant == 2)
+            {
+                var stone = RockTint(Wither(new Color(.34f, .33f, .31f)));
+                Part(PrimitiveType.Cylinder, t, new Vector3(px, pg + .08f, pz), new Vector3(.82f, .12f, .82f), stone);
+                Part(PrimitiveType.Cylinder, t, new Vector3(px, pg + .2f, pz), new Vector3(.62f, .01f, .62f), Tint(art.stone, new Color(.16f, .14f, .13f)));
+            }
+            else
+            {
+                float panY = pg + .5f;
+                for (int k = 0; k < 3; k++) { float a = k * 2.094f + .5f; Rod(t, new Vector3(px + Mathf.Cos(a) * .32f, LocalGround(t, px + Mathf.Cos(a) * .32f, pz + Mathf.Sin(a) * .32f), pz + Mathf.Sin(a) * .32f), new Vector3(px + Mathf.Cos(a) * .24f, panY, pz + Mathf.Sin(a) * .24f), .04f, iron); }
+                Part(PrimitiveType.Cylinder, t, new Vector3(px, panY, pz), new Vector3(.72f, .04f, .72f), iron);
+                Part(PrimitiveType.Cylinder, t, new Vector3(px, panY + .045f, pz), new Vector3(.76f, .012f, .76f), iron);   // its rim
+            }
+            float bed = variant == 2 ? pg + .2f : pg + .54f;
+            for (int i = 0; i < 12; i++)
+            {
+                float a = i * 2.39996f, r = .055f * Mathf.Sqrt(i + 1), size = .11f + (i % 3) * .025f;
+                Lump(BoulderAt(i % 6), t, new Vector3(px + Mathf.Cos(a) * r, bed + .03f + (.2f - r) * .2f, pz + Mathf.Sin(a) * r), new Vector3(size, size * .6f, size), i % 3 == 0 ? ember : coal, i * 47 + R() * 30);
+            }
+            Glow(t, new Vector3(px, bed + .4f, pz), 4.5f, 1, new Color(1, .5f, .2f), 1.8f);
+            // A water cask to quench in, and an open sack of charcoal.
+            Barrel(t, new Vector3(-.85f, LocalGround(t, -.85f, .35f), .35f), .55f, R() * 360);
+            Part(PrimitiveType.Cylinder, t, new Vector3(-.85f, LocalGround(t, -.85f, .35f) + .5f, .35f), new Vector3(.3f, .005f, .3f), art.water);
+            var sacking = Tint(art.cloth, new Color(.5f, .44f, .34f)); float sg = LocalGround(t, -.75f, .95f);
+            Part(PrimitiveType.Sphere, t, new Vector3(-.75f, sg + .2f, .95f), new Vector3(.46f, .44f, .42f), sacking);
+            Part(PrimitiveType.Cylinder, t, new Vector3(-.75f, sg + .4f, .95f), new Vector3(.3f, .04f, .28f), sacking);   // the rolled-down mouth
+            for (int i = 0; i < 4; i++) Lump(BoulderAt(i + 2), t, new Vector3(-.75f + (i % 2 - .5f) * .1f, sg + .42f + (i / 2) * .04f, .95f + (i / 2 - .5f) * .08f), new Vector3(.1f, .06f, .1f), coal, i * 61);
+        }
+        /// <summary>
+        /// A herbalist's bench (GAME-ONLY): a plank bench with a shelf under it, on it a mortar and pestle, three jars, a row of
+        /// stoppered vials and a cut bunch laid ready (on the Ash Rim two blocks of salt as well); behind it a rail on two posts hung
+        /// with drying bunches (bone posts on the Rim); a basket of cut herbs at its end. No colliders. Draws only from R.
+        /// </summary>
+        void HerbBench(Transform t, Func<float> R)
+        {
+            bool ash = Zone.biome == "ash";
+            var dark = Tint(art.timber, new Color(.3f, .21f, .14f)); var post = ash ? Bone : Tint(art.timber, new Color(.4f, .3f, .2f));
+            const float top = .82f;
+            Part(PrimitiveType.Cube, t, new Vector3(0, top, 0), new Vector3(1.6f, .07f, .55f), art.timber);
+            foreach (int sx in new[] { -1, 1 }) foreach (int sz in new[] { -1, 1 })
+            {
+                float x = sx * .7f, z = sz * .2f, g = LocalGround(t, x, z) - .05f;
+                Part(PrimitiveType.Cube, t, new Vector3(x, (g + top) / 2, z), new Vector3(.08f, top - g, .08f), dark);
+            }
+            Part(PrimitiveType.Cube, t, new Vector3(0, .3f, 0), new Vector3(1.44f, .04f, .44f), dark);   // the shelf
+            float on = top + .035f;
+            MeshPart(PropMesh("Mortar", () => Turned(new[] { new Vector2(0, 0), new Vector2(.08f, 0), new Vector2(.13f, .12f), new Vector2(.13f, .15f), new Vector2(.1f, .15f), new Vector2(.06f, .05f), new Vector2(0, .05f) }, 10)), t, new Vector3(-.55f, on, .02f), Tint(art.stone, new Color(.62f, .6f, .56f)));
+            Rod(t, new Vector3(-.55f, on + .07f, .02f), new Vector3(-.47f, on + .22f, .1f), .035f, Tint(art.stone, new Color(.7f, .68f, .62f)));
+            Jar(t, new Vector3(-.2f, on, .12f), new Color(.62f, .4f, .28f));
+            Jar(t, new Vector3(.02f, on, .14f), new Color(.5f, .46f, .36f), .8f);
+            Jar(t, new Vector3(.24f, on, .1f), new Color(.36f, .44f, .4f), 1.15f);
+            var glass = Tint(art.stone, new Color(.34f, .5f, .4f)); var cork = Tint(art.timber, new Color(.6f, .46f, .3f));
+            for (int k = 0; k < 4; k++) { var v = new Vector3(.45f + k * .075f, on, -.14f); Part(PrimitiveType.Cylinder, t, v + new Vector3(0, .06f, 0), new Vector3(.05f, .06f, .05f), glass); Part(PrimitiveType.Cylinder, t, v + new Vector3(0, .135f, 0), new Vector3(.025f, .015f, .025f), cork); }
+            // A cut bunch laid ready, its heads to the front.
+            Part(PrimitiveType.Capsule, t, new Vector3(-.05f, on + .03f, -.12f), new Vector3(.08f, .17f, .08f), Tint(art.foliage, Wither(new Color(.36f, .5f, .24f))), Quaternion.Euler(0, 75 + R() * 20, 90));
+            for (int k = 0; k < 3; k++) Part(PrimitiveType.Sphere, t, new Vector3(-.2f + k * .04f, on + .05f, -.17f + (k % 2) * .03f), new Vector3(.07f, .05f, .07f), Tint(art.foliage, HerbHeads[k % HerbHeads.Length]));
+            if (ash) foreach (float x in new[] { .52f, .66f }) Part(PrimitiveType.Cube, t, new Vector3(x, on + .07f, .12f), new Vector3(.12f, .14f, .1f), Tint(art.stone, new Color(.94f, .94f, .91f)), Quaternion.Euler(0, R() * 30 - 15, 0));
+            // The drying rail behind it, hung with bunches.
+            foreach (int sx in new[] { -1, 1 }) Rod(t, new Vector3(sx * .78f, LocalGround(t, sx * .78f, .48f) - .05f, .48f), new Vector3(sx * .78f, 1.78f, .48f), .07f, post);
+            Rod(t, new Vector3(-.88f, 1.72f, .48f), new Vector3(.88f, 1.72f, .48f), .05f, post);
+            for (int k = 0; k < 4; k++) HerbBundle(t, new Vector3(-.52f + k * .35f, 1.7f, .48f), k + (int)(R() * 3), .85f);
+            // A basket of cut herbs at its end.
+            float bg = LocalGround(t, 1.1f, -.1f);
+            MeshPart(PropMesh("Herb basket", () => Turned(new[] { new Vector2(0, 0), new Vector2(.2f, 0), new Vector2(.27f, .26f), new Vector2(.24f, .26f), new Vector2(.18f, .04f), new Vector2(0, .04f) }, 12, .3f)), t, new Vector3(1.1f, bg + .005f, -.1f), art.hay);
+            Part(PrimitiveType.Sphere, t, new Vector3(1.1f, bg + .23f, -.1f), new Vector3(.44f, .2f, .44f), Tint(art.foliage, Wither(new Color(.4f, .52f, .26f))));
+        }
+        /// <summary>
+        /// A cookfire (GAME-ONLY): a ring of nine stones round a bed of ash and embers, three split logs burning in it with tongues
+        /// of flame, a pot hung from an iron tripod over it, its smoke, and a light that glows brighter at night; a log to sit on and
+        /// a few logs stacked by it. No colliders. Draws only from R.
+        /// </summary>
+        void Cookfire(Transform t, Func<float> R)
+        {
+            var iron = Tint(art.metal, new Color(.2f, .2f, .22f)); var stone = RockTint(Wither(new Color(.42f, .4f, .37f)));
+            var coal = Tint(art.stone, new Color(.11f, .1f, .1f)); var ember = Glowing(new Color(1, .42f, .12f), 2.4f); var flame = Glowing(new Color(1, .55f, .2f), 2.2f);
+            float g = FootUnder(t, 0, 0, .6f);
+            Part(PrimitiveType.Cylinder, t, new Vector3(0, LocalGround(t, 0, 0) + .015f, 0), new Vector3(1.05f, .015f, 1.05f), Tint(art.stone, new Color(.22f, .21f, .2f)));   // the ash bed
+            for (int k = 0; k < 9; k++)
+            {
+                float a = k * 40 * Mathf.Deg2Rad + R() * .2f, r = .58f + R() * .06f, x = Mathf.Cos(a) * r, z = Mathf.Sin(a) * r, s = .24f + R() * .08f;
+                Lump(BoulderAt((int)(R() * 6)), t, new Vector3(x, LocalGround(t, x, z) + s * .2f, z), new Vector3(s * 1.15f, s * .7f, s), stone, R() * 360);
+            }
+            for (int i = 0; i < 9; i++)
+            {
+                float a = i * 2.39996f, r = .06f * Mathf.Sqrt(i + 1), size = .1f + (i % 3) * .025f;
+                Lump(BoulderAt(i % 6), t, new Vector3(Mathf.Cos(a) * r, LocalGround(t, 0, 0) + .04f, Mathf.Sin(a) * r), new Vector3(size, size * .55f, size), i % 2 == 0 ? ember : coal, i * 53);
+            }
+            // Three split logs leaning in, their ends charred, and the flames between them.
+            for (int k = 0; k < 3; k++)
+            {
+                var q = Quaternion.Euler(0, k * 120 + R() * 20, 0); var from = q * new Vector3(0, 0, .42f); from.y = LocalGround(t, from.x, from.z) + .05f;
+                Rod(t, from, new Vector3(0, LocalGround(t, 0, 0) + .2f, 0) + q * new Vector3(0, 0, .06f), .11f, art.bark);
+            }
+            var tongue = PropMesh("Flame", () => ZoneMeshes.Cone(.1f, .34f, 6));
+            for (int k = 0; k < 3; k++) MeshPart(tongue, t, new Vector3((k - 1) * .07f, LocalGround(t, 0, 0) + .06f, (k % 2) * .06f - .03f), flame, Quaternion.Euler((k - 1) * 8, k * 50, (k - 1) * -10)).transform.localScale = new Vector3(1, .8f + k % 2 * .45f, 1);
+            // The tripod and the pot on its chain.
+            var apex = new Vector3(0, g + 1.45f, 0);
+            for (int k = 0; k < 3; k++) { float a = k * 2.094f + .3f; var fp = new Vector3(Mathf.Cos(a) * .82f, 0, Mathf.Sin(a) * .82f); fp.y = LocalGround(t, fp.x, fp.z) - .03f; Rod(t, fp, apex + (fp - apex).normalized * -.05f, .045f, iron); }
+            Rod(t, apex, apex + Vector3.down * .62f, .015f, iron);
+            var pot = PropMesh("Cook pot", () => Turned(new[] { new Vector2(0, 0), new Vector2(.15f, 0), new Vector2(.23f, .1f), new Vector2(.23f, .24f), new Vector2(.19f, .3f), new Vector2(.21f, .33f), new Vector2(.17f, .33f), new Vector2(.17f, .27f), new Vector2(0, .27f) }, 10));
+            float potY = apex.y - .62f - .33f;
+            MeshPart(pot, t, new Vector3(0, potY, 0), iron);
+            Part(PrimitiveType.Cylinder, t, new Vector3(0, potY + .285f, 0), new Vector3(.34f, .006f, .34f), Tint(art.cloth, new Color(.46f, .3f, .16f)));   // the stew
+            foreach (int s in new[] { -1, 1 }) Rod(t, new Vector3(0, apex.y - .62f, 0), new Vector3(s * .2f, potY + .3f, 0), .015f, iron);   // its bail
+            if (art.particle != null) Smoke(t, new Vector3(0, apex.y + .1f, 0));
+            Glow(t, new Vector3(0, LocalGround(t, 0, 0) + .45f, 0), 5, 1.1f, new Color(1, .55f, .25f), 1.9f);
+            // A log to sit on, and a few split logs stacked by it.
+            float lx = 1.45f, lz = .35f;
+            Part(PrimitiveType.Cylinder, t, new Vector3(lx, LocalGround(t, lx, lz) + .17f, lz), new Vector3(.34f, .55f, .34f), art.bark, Quaternion.Euler(90, 20 + R() * 20, 0));
+            for (int row = 0; row < 2; row++)
+                for (int i = 0; i < 3 - row; i++)
+                {
+                    float x = -1.35f + row * .1f + i * .22f, z = .55f;
+                    Part(PrimitiveType.Cylinder, t, new Vector3(x, LocalGround(t, x, z) + .1f + row * .18f, z), new Vector3(.2f, .3f, .2f), art.bark, Quaternion.Euler(90, 0, 0));
+                }
+        }
     }
 }

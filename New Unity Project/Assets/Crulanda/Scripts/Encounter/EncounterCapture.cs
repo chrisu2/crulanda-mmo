@@ -123,6 +123,7 @@ namespace Crulanda.Encounter
             if (session.Quests != null && zone != null && VillageLife.Active != null) { var q = CaptureQuests(directory, prefix, zone); while (q.MoveNext()) yield return q.Current; }
             if (session.Professions != null) { var t = CaptureTrades(directory, prefix); while (t.MoveNext()) yield return t.Current; }
             if (session.Items != null) { var b = CaptureBags(directory, prefix); while (b.MoveNext()) yield return b.Current; }
+            if (session.Professions != null && zone != null) { var st = CaptureStation(directory, prefix, zone); while (st.MoveNext()) yield return st.Current; }
             yield return new WaitForSeconds(1);
             Debug.Log("UI_CAPTURE_DONE"); Application.Quit(0);
         }
@@ -180,6 +181,34 @@ namespace Crulanda.Encounter
             EncounterHud.TradesPage = "mining"; session.ShowTrades(true); yield return new WaitForSeconds(.5f);
             ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "23-trades-bag-line.png")); yield return new WaitForSeconds(.4f);
             EncounterHud.TradesPage = null; session.ShowTrades(false); session.InventoryOpen = false;
+        }
+        /// <summary>
+        /// Making things at a station (trades step 9): at the zone's first forge (Vell's smithy in Oakhaven), nobody about, the hatchet
+        /// at the belt and logs in the bags: E's prompt over the world, the Trades window at Woodcutting's recipes (24-station-recipes),
+        /// then the same after Make all, the charcoal in the bags (25-station-charcoal-made).
+        /// </summary>
+        IEnumerator CaptureStation(string directory, string prefix, Crulanda.World.ZoneBuilder zone)
+        {
+            var st = zone.Stations.Find(x => x.kind == "forge") ?? (zone.Stations.Count > 0 ? zone.Stations[0] : null); if (st == null) yield break;
+            var p = session.Progress; var motor = session.Player.GetComponent<AdventurerMotor>();
+            session.Conversation = null; session.QuestBookOpen = false; session.ShowTrades(false); session.CloseVendor(); session.InventoryOpen = false;
+            foreach (var e in session.Enemies) e.ResetFight();
+            if (!session.Professions.Has("woodcutting")) { Inventory.Add(p, session.Items, "tool.hatchet", 1); int h = p.bag.FindIndex(s => s.item == "tool.hatchet"); if (h >= 0) session.EquipFromBag(h); }
+            Inventory.Add(p, session.Items, "mat.oak_log", 6); Inventory.Add(p, session.Items, "mat.blackpine_log", 2);
+            var stand = zone.Workplaces.Find(w => w.name == st.name);
+            var at = stand != null ? stand.stand : st.position + Vector3.back * 1.2f;
+            motor.Teleport(at + Vector3.up * 1.1f);
+            if (VillageLife.Active != null) foreach (var v in VillageLife.Active.Villagers) if (Vector3.Distance(v.transform.position, at) < 10) v.Park();
+            session.SelectFriendly(null, false);
+            var face = st.position - at; face.y = 0; if (face.sqrMagnitude > .01f) motor.SetView(Quaternion.LookRotation(face).eulerAngles.y + 30, 20, 5);
+            yield return new WaitForSeconds(.8f);
+            session.WorkAtStation(st); EncounterHud.TradesRecipe = "recipe.charcoal_oak"; yield return new WaitForSeconds(.6f);
+            ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "24-station-recipes.png")); yield return new WaitForSeconds(.4f);
+            var oak = session.Professions.Db.Recipe("recipe.charcoal_oak");
+            if (oak != null) { int n = session.Professions.CanMake(oak); session.Make(oak, n); float until = Time.time + n * EncounterSession.CraftSeconds + 2; while (session.Working && Time.time < until) yield return null; }   // every log in the bags (the bags shot's nine too): wait for them all
+            yield return new WaitForSeconds(.5f);
+            ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "25-station-charcoal-made.png")); yield return new WaitForSeconds(.4f);
+            EncounterHud.TradesPage = null; EncounterHud.TradesRecipes = false; EncounterHud.TradesRecipe = null; session.ShowTrades(false); session.InventoryOpen = false;
         }
         /// <summary>The quest interface: a giver's !, the offer, the quest book, the ledger in the Chronicle, a hand-in list, standing, the tracker.</summary>
         IEnumerator CaptureQuests(string directory, string prefix, Crulanda.World.ZoneBuilder zone)
@@ -328,6 +357,21 @@ namespace Crulanda.Encounter
                     motor.SetView(Quaternion.LookRotation(-face).eulerAngles.y, 22, 4.5f);
                     yield return new WaitForSeconds(.6f);
                     ScreenCapture.CaptureScreenshot(Path.Combine(directory, zone.Zone.id.Replace("zone.", "") + "-80-node-" + (k++).ToString("00") + "-" + node.name.ToLowerInvariant().Replace(' ', '-').Replace("'", "") + ".png"));
+                    yield return new WaitForSeconds(.4f);
+                    foreach (var r in body) r.enabled = true;
+                }
+                // The zone's own stations (a field anvil, a bench, a cookfire) from 3.5 m off their front, the player hidden:
+                // <zone>-81-station-NN-<name>.png.
+                k = 0;
+                foreach (var st in zone.Stations)
+                {
+                    if (st.root == null || st.root.parent == null || st.root.parent.name != "Zone stations") continue;
+                    var face = st.root.rotation * Vector3.back; var from = st.position + face * 3.5f;
+                    motor.Teleport(zone.StandAt(new Vector2(from.x, from.z), st.position.y, 1.1f));
+                    var body = Array.FindAll(session.Player.GetComponentsInChildren<Renderer>(), r => r.enabled); foreach (var r in body) r.enabled = false;
+                    motor.SetView(Quaternion.LookRotation(-face).eulerAngles.y, 20, 5);
+                    yield return new WaitForSeconds(.6f);
+                    ScreenCapture.CaptureScreenshot(Path.Combine(directory, zone.Zone.id.Replace("zone.", "") + "-81-station-" + (k++).ToString("00") + "-" + st.name.ToLowerInvariant().Replace(' ', '-').Replace("'", "") + ".png"));
                     yield return new WaitForSeconds(.4f);
                     foreach (var r in body) r.enabled = true;
                 }

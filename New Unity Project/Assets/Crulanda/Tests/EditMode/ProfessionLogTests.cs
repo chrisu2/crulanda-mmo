@@ -1,11 +1,13 @@
+using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using Crulanda.Encounter;
 
 namespace Crulanda.Tests
 {
-    /// <summary>What a character knows of the trades (ProfessionLog) over the real content: what everyone starts with, and tools
-    /// that teach a skill once and are used up.</summary>
+    /// <summary>What a character knows of the trades (ProfessionLog) over the real content: what everyone starts with, tools that
+    /// teach a skill once and are used up, gathering, and making things at a station (charcoal: the inputs, the room, the station,
+    /// the skill, and the colours of what still teaches).</summary>
     public class ProfessionLogTests
     {
         static ProfessionLog Fresh(out List<string> said)
@@ -186,6 +188,163 @@ namespace Crulanda.Tests
             mining.skill = 21; seen.Clear();
             for (int i = 0; i < 400; i++) seen.Add(log.RollGather(copper, rng).count);
             CollectionAssert.AreEquivalent(new[] { 1, 2, 3, 4 }, seen, "From 20 over, one more now and then.");
+        }
+
+        // ---------- making things at a station (DESIGN 4, 5, 6.1; BUILD_PLAN step 9) ----------
+        static readonly Func<string, bool> AtForge = k => k == "forge", AtFire = k => k == "fire", Nowhere = k => false;
+        static ProfessionLog Woodcutter(out List<string> said) { var log = Fresh(out said); Learn(log, "tool.hatchet"); said.Clear(); return log; }
+        static string Snapshot(EncounterProgress p) { return UnityEngine.JsonUtility.ToJson(p); }
+
+        [Test] public void Craft_RemovesInputs_AddsOutput()
+        {
+            var log = Woodcutter(out var said); var p = log.Progress; var oak = log.Db.Recipe("recipe.charcoal_oak"); var ups = new List<int>();
+            log.SkillUp = (id, skill) => { Assert.AreEqual("woodcutting", id); ups.Add(skill); };
+            Assert.AreEqual("forge|fire", oak.station); Assert.AreEqual("mat.charcoal", oak.output); Assert.AreEqual(1, oak.count);
+            Assert.AreEqual(0, Inventory.Add(p, log.Items, "mat.oak_log", 3));
+            Assert.AreEqual(3, log.CanMake(oak));
+            Assert.IsTrue(log.CanCraft(oak, AtForge, out var why), why); Assert.IsNull(why);
+            Assert.IsTrue(log.Craft(oak, AtForge, new System.Random(1), out why), why);
+            Assert.AreEqual(2, Inventory.Count(p, "mat.oak_log"), "One log burnt."); Assert.AreEqual(1, Inventory.Count(p, "mat.charcoal"), "One charcoal made.");
+            Assert.AreEqual(2, log.Skill("woodcutting"), "Woodcutting 1 at a recipe of 1 teaches every time."); CollectionAssert.AreEqual(new[] { 2 }, ups);
+            Assert.IsEmpty(said, "The session says what was made; the log says nothing.");
+            // A fire does as well as a forge.
+            Assert.IsTrue(log.Craft(oak, AtFire, new System.Random(1), out why), why);
+            Assert.AreEqual(1, Inventory.Count(p, "mat.oak_log")); Assert.AreEqual(2, Inventory.Count(p, "mat.charcoal"));
+            // A better wood makes more: a black pine log makes two at Woodcutting 20.
+            Entry(log, "woodcutting").skill = 20; Inventory.Add(p, log.Items, "mat.blackpine_log", 1);
+            Assert.IsTrue(log.Craft(log.Db.Recipe("recipe.charcoal_blackpine"), AtForge, new System.Random(1), out why), why);
+            Assert.AreEqual(4, Inventory.Count(p, "mat.charcoal")); Assert.AreEqual(0, Inventory.Count(p, "mat.blackpine_log"));
+            Assert.AreEqual(1, p.bag.FindAll(s => s.item == "mat.charcoal").Count, "The charcoal stacks.");
+        }
+
+        [Test] public void Craft_PutsCharcoal_InAWornOrePoke()
+        {
+            var log = Woodcutter(out _); var p = log.Progress; var oak = log.Db.Recipe("recipe.charcoal_oak");
+            Inventory.Add(p, log.Items, "bag.ore_poke", 1); Assert.IsTrue(Inventory.Wear(p, log.Items, p.bag.FindIndex(s => s.item == "bag.ore_poke"), out var why), why);
+            Inventory.Add(p, log.Items, "mat.oak_log", 2);
+            Assert.IsTrue(log.Craft(oak, AtForge, new System.Random(2), out why), why);
+            int at = p.bag.FindIndex(s => s.item == "mat.charcoal");
+            Assert.GreaterOrEqual(at, Inventory.BagSize, "Charcoal is the ore-poke's: it goes in the poke's slots, not the ordinary ones.");
+            Assert.AreEqual("bag.ore_poke", Inventory.PouchAt(p, log.Items, at)?.id);
+        }
+
+        [Test] public void Craft_MissingReagent_ChangesNothing()
+        {
+            var log = Woodcutter(out var said); var p = log.Progress; var oak = log.Db.Recipe("recipe.charcoal_oak"); int ups = 0; log.SkillUp = (id, s) => ups++;
+            Inventory.Add(p, log.Items, "mat.blackpine_log", 2);   // another wood is not this recipe's
+            string before = Snapshot(p);
+            Assert.AreEqual(0, log.CanMake(oak));
+            Assert.IsFalse(log.CanCraft(oak, AtForge, out var why)); Assert.AreEqual("You need Harrow oak log.", why);
+            Assert.IsFalse(log.Craft(oak, AtForge, new System.Random(3), out why)); Assert.AreEqual("You need Harrow oak log.", why);
+            Assert.AreEqual(before, Snapshot(p), "Nothing in the bags or the skills changed."); Assert.AreEqual(0, ups); Assert.IsEmpty(said);
+            // A recipe taking two of one thing wants both.
+            var two = new RecipeDef { id = "recipe.test_two", name = "Test", profession = "woodcutting", skill = 1, station = "forge", output = "mat.charcoal", inputs = new[] { new RecipeInput { item = "mat.oak_log", count = 2 } } };
+            Inventory.Add(p, log.Items, "mat.oak_log", 1);
+            Assert.AreEqual(0, log.CanMake(two)); Assert.IsFalse(log.Craft(two, AtForge, new System.Random(3), out why)); Assert.AreEqual("You need Harrow oak log x2.", why);
+            Assert.AreEqual(1, Inventory.Count(p, "mat.oak_log"));
+        }
+
+        [Test] public void Craft_FullBags_ChangesNothing()
+        {
+            var log = Woodcutter(out _); var p = log.Progress; var oak = log.Db.Recipe("recipe.charcoal_oak"); int ups = 0; log.SkillUp = (id, s) => ups++;
+            Assert.AreEqual(0, Inventory.Add(p, log.Items, "mat.oak_log", 1));
+            for (int i = 0; i < Inventory.BagSize; i++) if (p.bag[i].Empty) p.bag[i] = new ItemStack { item = "tool.hatchet", count = 1 };   // tools stack to one: every slot taken
+            Assert.AreEqual(0, Inventory.Room(p, log.Items, "mat.charcoal"));
+            string before = Snapshot(p);
+            Assert.IsFalse(log.CanCraft(oak, AtForge, out var why)); Assert.AreEqual(ProfessionLog.BagsFullLine, why);
+            Assert.IsFalse(log.Craft(oak, AtForge, new System.Random(4), out why)); Assert.AreEqual(ProfessionLog.BagsFullLine, why);
+            Assert.AreEqual(before, Snapshot(p), "The log is not burnt when the charcoal has nowhere to go."); Assert.AreEqual(0, ups);
+            // A stack of charcoal with room on it takes what is made.
+            p.bag[5] = new ItemStack { item = "mat.charcoal", count = 19 };
+            Assert.IsTrue(log.Craft(oak, AtForge, new System.Random(4), out why), why);
+            Assert.AreEqual(20, p.bag[5].count); Assert.AreEqual(0, Inventory.Count(p, "mat.oak_log"));
+        }
+
+        [Test] public void CanMake_CountsAcrossSplitStacks()
+        {
+            var log = Woodcutter(out _); var p = log.Progress; var oak = log.Db.Recipe("recipe.charcoal_oak");
+            Inventory.Add(p, log.Items, "bag.log_sling", 1); Assert.IsTrue(Inventory.Wear(p, log.Items, p.bag.FindIndex(s => s.item == "bag.log_sling"), out var why), why);
+            p.bag[0] = new ItemStack { item = "mat.oak_log", count = 20 };
+            p.bag[7] = new ItemStack { item = "mat.oak_log", count = 3 };
+            int sling = Inventory.BagSize; Assert.AreEqual("bag.log_sling", Inventory.PouchAt(p, log.Items, sling)?.id);
+            p.bag[sling] = new ItemStack { item = "mat.oak_log", count = 4 };
+            Assert.AreEqual(27, Inventory.Count(p, "mat.oak_log"));
+            Assert.AreEqual(27, log.CanMake(oak), "Every stack counts: two in the bags and one in the log-sling.");
+            // Two inputs: the scarcer one decides; an item named on two lines is summed.
+            var mixed = new RecipeDef { id = "recipe.test_mixed", profession = "woodcutting", station = "forge", output = "mat.charcoal",
+                inputs = new[] { new RecipeInput { item = "mat.oak_log", count = 1 }, new RecipeInput { item = "mat.oak_log", count = 1 }, new RecipeInput { item = "mat.flour", count = 1 } } };
+            Assert.AreEqual(0, log.CanMake(mixed), "No flour.");
+            p.bag[3] = new ItemStack { item = "mat.flour", count = 2 }; p.bag[9] = new ItemStack { item = "mat.flour", count = 3 };
+            Assert.AreEqual(5, log.CanMake(mixed), "Five flour, against thirteen times two logs.");
+            p.bag[3].count = 20;
+            Assert.AreEqual(13, log.CanMake(mixed), "Twenty-three flour: now the logs decide, two a time.");
+            Assert.AreEqual(0, log.CanMake(null)); Assert.AreEqual(0, log.CanMake(new RecipeDef { id = "recipe.empty" }));
+            // Making spends from the stacks and the count follows.
+            Assert.IsTrue(log.Craft(oak, AtForge, new System.Random(5), out why), why); Assert.AreEqual(26, log.CanMake(oak));
+        }
+
+        [Test] public void Craft_BelowSkill_IsRefused()
+        {
+            var log = Fresh(out var said); var p = log.Progress; var pine = log.Db.Recipe("recipe.charcoal_blackpine");
+            Inventory.Add(p, log.Items, "mat.blackpine_log", 2); Inventory.Add(p, log.Items, "mat.oak_log", 2);
+            // No hatchet: charcoal is Woodcutting's, so the hatchet comes first.
+            Assert.IsFalse(log.CanCraft(log.Db.Recipe("recipe.charcoal_oak"), AtForge, out var why)); Assert.AreEqual("You need a woodcutter's hatchet. Merchants sell them.", why);
+            Assert.AreEqual(ProfessionLog.Difficulty.Locked, log.DifficultyOf(log.Db.Recipe("recipe.charcoal_oak")));
+            Learn(log, "tool.hatchet");
+            Assert.AreEqual(ProfessionLog.Difficulty.Orange, log.DifficultyOf(log.Db.Recipe("recipe.charcoal_oak")));
+            // Woodcutting 1 against a recipe of 20: refused, and nothing changes.
+            string before = Snapshot(p);
+            Assert.AreEqual(ProfessionLog.Difficulty.Locked, log.DifficultyOf(pine));
+            Assert.AreEqual(2, log.CanMake(pine), "The bags hold the makings all the same.");
+            Assert.IsFalse(log.CanCraft(pine, AtForge, out why)); Assert.AreEqual("That wants Woodcutting 20.", why);
+            Assert.IsFalse(log.Craft(pine, AtForge, new System.Random(6), out why)); Assert.AreEqual("That wants Woodcutting 20.", why);
+            Assert.AreEqual(before, Snapshot(p));
+            // A craft not taken up says so.
+            var smelt = new RecipeDef { id = "recipe.test_smelt", profession = "blacksmithing", skill = 1, station = "forge", output = "mat.charcoal", inputs = new[] { new RecipeInput { item = "mat.oak_log" } } };
+            Assert.IsFalse(log.CanCraft(smelt, AtForge, out why)); Assert.AreEqual("You have not taken up Blacksmithing.", why);
+            Assert.IsFalse(log.CanCraft(null, AtForge, out why)); Assert.IsNotNull(why);
+            Assert.AreEqual(ProfessionLog.Difficulty.Locked, log.DifficultyOf(smelt));
+        }
+
+        [Test] public void Craft_WithoutStation_IsRefused()
+        {
+            var log = Woodcutter(out _); var p = log.Progress; var oak = log.Db.Recipe("recipe.charcoal_oak");
+            Inventory.Add(p, log.Items, "mat.oak_log", 2); string before = Snapshot(p);
+            Assert.IsFalse(log.CanCraft(oak, Nowhere, out var why)); Assert.AreEqual("You need a forge or a fire nearby.", why);
+            Assert.IsFalse(log.CanCraft(oak, null, out why)); Assert.AreEqual("You need a forge or a fire nearby.", why);
+            Assert.IsFalse(log.Craft(oak, k => k == "bench", new System.Random(7), out why), "A herbalist's bench is no place to burn charcoal."); Assert.AreEqual("You need a forge or a fire nearby.", why);
+            Assert.AreEqual(before, Snapshot(p));
+            Assert.AreEqual("You need a herbalist's bench nearby.", ProfessionLog.StationWanted("bench"));
+            Assert.AreEqual("a forge or a fire", ProfessionLog.StationWords("forge|fire"));
+            // With a station it goes.
+            Assert.IsTrue(log.Craft(oak, AtFire, new System.Random(7), out why), why);
+        }
+
+        [Test] public void Craft_SkillUp_FollowsTheColours()
+        {
+            Assert.AreEqual(1f, ProfessionLog.UpChance(1, 1)); Assert.AreEqual(1f, ProfessionLog.UpChance(10, 1), "Under 10 over the recipe: every time (orange).");
+            Assert.AreEqual(.5f, ProfessionLog.UpChance(11, 1)); Assert.AreEqual(.5f, ProfessionLog.UpChance(20, 1), "Under 20 over: half the time (yellow).");
+            Assert.AreEqual(.1f, ProfessionLog.UpChance(21, 1)); Assert.AreEqual(.1f, ProfessionLog.UpChance(30, 1), "Under 30 over: one in ten (green).");
+            Assert.AreEqual(0f, ProfessionLog.UpChance(31, 1)); Assert.AreEqual(0f, ProfessionLog.UpChance(100, 80), "From 30 over: never (grey).");
+            var log = Woodcutter(out _); var p = log.Progress; var oak = log.Db.Recipe("recipe.charcoal_oak"); var wood = Entry(log, "woodcutting");
+            foreach (var (skill, colour) in new[] { (1, ProfessionLog.Difficulty.Orange), (10, ProfessionLog.Difficulty.Orange), (11, ProfessionLog.Difficulty.Yellow), (21, ProfessionLog.Difficulty.Green), (31, ProfessionLog.Difficulty.Grey) })
+            { wood.skill = skill; Assert.AreEqual(colour, log.DifficultyOf(oak), "Woodcutting " + skill); }
+            // Yellow: about half of 400 makings teach (the skill is put back each time).
+            int rose = 0; var rng = new System.Random(13);
+            for (int i = 0; i < 400; i++)
+            {
+                wood.skill = 15; Inventory.Add(p, log.Items, "mat.oak_log", 1);
+                Assert.IsTrue(log.Craft(oak, AtForge, rng, out var why), why);
+                if (wood.skill == 16) rose++;
+                Inventory.Remove(p, "mat.charcoal", 1);
+            }
+            Assert.That(rose, Is.InRange(160, 240), "About half of 400 (" + rose + ").");
+            // Grey teaches nothing, and nothing passes 100.
+            wood.skill = 40; for (int i = 0; i < 50; i++) { Inventory.Add(p, log.Items, "mat.oak_log", 1); Assert.IsTrue(log.Craft(oak, AtForge, rng, out _)); Inventory.Remove(p, "mat.charcoal", 1); }
+            Assert.AreEqual(40, wood.skill);
+            wood.skill = 100; Inventory.Add(p, log.Items, "mat.ghostoak_log", 1);
+            Assert.IsTrue(log.Craft(log.Db.Recipe("recipe.charcoal_ghostoak"), AtForge, rng, out var w), w); Assert.AreEqual(100, wood.skill);
+            Assert.AreEqual(5, Inventory.Count(p, "mat.charcoal"), "A ghost-oak log makes five.");
         }
     }
 }

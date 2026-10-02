@@ -482,6 +482,7 @@ namespace Crulanda.World
             Solid(t, new Vector3(-1.65f, .27f, .8f), new Vector3(1.1f, .54f, .5f));
             Workplace(t, "forge", new Vector3(-.6f, 0, -1.15f), new Vector3(-.6f, .9f, -.2f));
             Workplace(t, "forge", new Vector3(1.2f, 0, -.3f), new Vector3(1.2f, 1, 1.1f));
+            StationRoom(t, Rect.MinMaxRect(-end - 9, -9, end, 1.95f));   // open in front and over the half wall; not from behind the back wall or the stone end wall
         }
     }
 }

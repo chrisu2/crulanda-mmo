@@ -14,9 +14,10 @@ using Crulanda.World;
 namespace Crulanda.Tests
 {
     /// <summary>
-    /// Every zone built with and without its nodes (the nodes array and the herb props' node fields): every tree trunk, every
-    /// piece of scenery and every prop, every point of the creeks, every secret and every usable prop stands where it stood, so
-    /// the seams, windfalls and herbs were added without moving the world (each zone's layout is one random stream).
+    /// Every zone built with and without its nodes and its own stations (the nodes array, the herb props' node fields and the
+    /// stations array): every tree trunk, every piece of scenery and every prop, every point of the creeks, every secret and every
+    /// usable prop stands where it stood, so the seams, windfalls, herbs, field anvils, benches and cookfires were added without
+    /// moving the world (each zone's layout is one random stream).
     /// </summary>
     public class NodeStreamTests
     {
@@ -26,7 +27,7 @@ namespace Crulanda.Tests
         {
             WorldClock.Hour = 11;
             if (root == null) { root = Path.Combine(Path.GetTempPath(), "Crulanda-nodestream-" + Guid.NewGuid().ToString("N")); SceneManager.sceneLoaded += OnLoaded; }
-            ZoneBuilder.DefinitionFilter = withoutNodes ? (Func<ZoneDefinition, ZoneDefinition>)(d => { d.nodes = new ZoneNode[0]; foreach (var p in d.props) if (p != null) p.node = null; return d; }) : null;
+            ZoneBuilder.DefinitionFilter = withoutNodes ? (Func<ZoneDefinition, ZoneDefinition>)(d => { d.nodes = new ZoneNode[0]; d.stations = new ZoneStation[0]; foreach (var p in d.props) if (p != null) p.node = null; return d; }) : null;
             ZoneBuilder.RequestedZoneId = zoneId;
             yield return SceneManager.LoadSceneAsync("Oakhaven", LoadSceneMode.Single);
             for (int i = 0; i < 3; i++) yield return null;
@@ -70,14 +71,18 @@ namespace Crulanda.Tests
                 var without = ZoneBuilder.Active; Assert.IsNotNull(without); string zp = id + ": ";
                 if (without.Zone.id != id) { problems.Add(zp + "built " + without.Zone.id + " instead"); continue; }
                 Assert.IsEmpty(without.Zone.nodes, zp + "built without the nodes."); Assert.IsNull(without.transform.Find("Zone nodes"), zp + "no nodes built");
+                Assert.IsNull(without.transform.Find("Zone stations"), zp + "no station props built");
                 Assert.IsFalse(without.Interactables.Any(i => i.node != null), zp + "no herb prop is worked as a node");
-                var before = Read(without);
+                var before = Read(without); int ownless = without.Stations.Count;
                 yield return Load(id, false);
                 var with = ZoneBuilder.Active;
                 int array = with.Zone.nodes.Length, props = with.Zone.props.Count(p => p != null && !string.IsNullOrEmpty(p.node));
                 if (array == 0 || with.transform.Find("Zone nodes") == null) { problems.Add(zp + "has no nodes built"); continue; }
                 if (with.transform.Find("Zone nodes").childCount != array) problems.Add(zp + with.transform.Find("Zone nodes").childCount + " of the " + array + " nodes in its array are built");
                 if (with.Interactables.Count(i => i.node != null) != 28 || array + props != 28) problems.Add(zp + array + " nodes and " + props + " herb props worked as nodes, " + with.Interactables.Count(i => i.node != null) + " built: not twenty-eight");
+                int stations = with.Zone.stations.Length; var built = with.transform.Find("Zone stations");
+                if ((built != null ? built.childCount : 0) != stations) problems.Add(zp + (built != null ? built.childCount : 0) + " of its " + stations + " stations are built");
+                if (with.Stations.Count != ownless + stations) problems.Add(zp + "the workplaces' and inns' stations changed: " + ownless + " without its own, " + with.Stations.Count + " with " + stations);
                 var after = Read(with);
                 if (before.trunks.Count != after.trunks.Count) problems.Add(zp + "trees were dropped or added: " + before.trunks.Count + " then " + after.trunks.Count);
                 else for (int i = 0; i < before.trunks.Count; i++) if (Vector2.Distance(before.trunks[i], after.trunks[i]) >= .001f) { problems.Add(zp + "trunk " + i + " moved from " + before.trunks[i] + " to " + after.trunks[i]); break; }

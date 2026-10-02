@@ -167,8 +167,10 @@ namespace Crulanda.Encounter
     /// What a character knows of the trades: which skills are learned and how far each has come (EncounterProgress.professions,
     /// save format 8). A gathering tool (a pick, a hatchet) is used once from the bags: it teaches its skill at 1 and hangs at the
     /// belt from then on, taking no bag slot; a second one is refused and kept. Gathering: whether a node can be worked, how long
-    /// it takes, what it yields and the skill roll (the session runs the work bar and rests the node). Pure logic over the
-    /// progress, like QuestLog and DiscoveryLog, so it is tested without a scene.
+    /// it takes, what it yields and the skill roll (the session runs the work bar and rests the node). Making: whether a recipe can
+    /// be made (the trade, the skill, a station near, the inputs, room), how many times the bags allow, its colour, and the making
+    /// itself with its skill roll (the session runs the work bar and says where the stations are). Pure logic over the progress,
+    /// like QuestLog and DiscoveryLog, so it is tested without a scene.
     /// </summary>
     public sealed class ProfessionLog
     {
@@ -251,14 +253,16 @@ namespace Crulanda.Encounter
             hard = false; why = null;
             var trade = n == null ? null : Db.Profession(n.profession);
             if (trade == null) { why = "You can't work that."; return false; }
-            if (!Has(trade.id))
-            {
-                var tool = Items?.Get(trade.tool);
-                why = tool != null ? "You need a " + char.ToLowerInvariant(tool.name[0]) + tool.name.Substring(1) + ". Merchants sell them." : "You don't know how to work that.";
-                return false;
-            }
+            if (!Has(trade.id)) { why = NotKnownLine(trade, "You don't know how to work that."); return false; }
             hard = Skill(trade.id) < n.skill;
             return true;
+        }
+        /// <summary>Why a trade the character does not have refuses: its tool ("You need a miner's pick. Merchants sell them."), or
+        /// <paramref name="otherwise"/> for a trade no tool teaches.</summary>
+        string NotKnownLine(ProfessionDef trade, string otherwise)
+        {
+            var tool = Items?.Get(trade.tool);
+            return tool != null ? "You need a " + char.ToLowerInvariant(tool.name[0]) + tool.name.Substring(1) + ". Merchants sell them." : otherwise;
         }
         /// <summary>How long working a node takes: its seconds, twice that when it is hard going.</summary>
         public float WorkSeconds(NodeDef n, bool hard) { return hard ? n.seconds * 2 : n.seconds; }
@@ -298,6 +302,82 @@ namespace Crulanda.Encounter
             int got = count - Inventory.Add(Progress, Items, item, count);
             if (got > 0) Gathered(n, rng);
             return got;
+        }
+
+        // ---------- making things at a station (DESIGN 4, 5, 6.1) ----------
+        /// <summary>How a recipe stands for the character, the recipe list's colour: Locked (the trade not had, or its skill under the
+        /// recipe's), Orange (every one made teaches), Yellow (half do), Green (one in ten), Grey (nothing left to teach).</summary>
+        public enum Difficulty { Locked, Orange, Yellow, Green, Grey }
+        /// <summary>The chance that making a recipe of skill <paramref name="recipeSkill"/> raises the skill: certain under 10 points over
+        /// it, even under 20, one in ten under 30, never from 30 over.</summary>
+        public static float UpChance(int skill, int recipeSkill) { return skill < recipeSkill + 10 ? 1 : skill < recipeSkill + 20 ? .5f : skill < recipeSkill + 30 ? .1f : 0; }
+        public Difficulty DifficultyOf(RecipeDef r)
+        {
+            if (r == null || !Has(r.profession) || Skill(r.profession) < r.skill) return Difficulty.Locked;
+            float up = UpChance(Skill(r.profession), r.skill);
+            return up >= 1 ? Difficulty.Orange : up >= .5f ? Difficulty.Yellow : up > 0 ? Difficulty.Green : Difficulty.Grey;
+        }
+        /// <summary>What a recipe takes, by item (an item named on two lines is summed), each at least one.</summary>
+        public static Dictionary<string, int> Needs(RecipeDef r)
+        {
+            var need = new Dictionary<string, int>(StringComparer.Ordinal);
+            if (r?.inputs != null) foreach (var i in r.inputs) if (i != null && !string.IsNullOrEmpty(i.item)) need[i.item] = (need.TryGetValue(i.item, out var n) ? n : 0) + Math.Max(1, i.count);
+            return need;
+        }
+        /// <summary>How many times the bags hold everything a recipe takes, counting every stack of each input wherever it lies (split
+        /// stacks, a trade bag's slots). 0 for a recipe with no inputs.</summary>
+        public int CanMake(RecipeDef r)
+        {
+            var need = Needs(r); if (need.Count == 0 || Progress.bag == null) return 0;
+            int times = int.MaxValue;
+            foreach (var kv in need) times = Math.Min(times, Inventory.Count(Progress, kv.Key) / kv.Value);
+            return times;
+        }
+        /// <summary>The station words for a station field: "forge|fire" is "a forge or a fire".</summary>
+        public static string StationWords(string station)
+        {
+            var words = new List<string>();
+            foreach (var s in ProfessionDatabase.Stations(station)) words.Add(s == "bench" ? "a herbalist's bench" : s == "forge" ? "a forge" : s == "fire" ? "a fire" : "a " + s);
+            return string.Join(" or ", words);
+        }
+        /// <summary>Why a recipe can't be made away from its station: "You need a forge or a fire nearby."</summary>
+        public static string StationWanted(string station) { return "You need " + StationWords(station) + " nearby."; }
+        /// <summary>
+        /// Whether a recipe can be made now, and why not, in this order: the trade not had (a gathering skill's tool, or "You have not
+        /// taken up Blacksmithing."); the skill under the recipe's ("That wants Woodcutting 20."); no station of its kind near
+        /// (<paramref name="stationNear"/> is asked for each kind it may be made at; null: none is near); an input short ("You need
+        /// Harrow oak log.", "... x2." for two); no room in the bags for what it makes (BagsFullLine). Nothing changes.
+        /// </summary>
+        public bool CanCraft(RecipeDef r, Func<string, bool> stationNear, out string why)
+        {
+            why = null;
+            var trade = r == null ? null : Db.Profession(r.profession);
+            if (trade == null) { why = "You can't make that."; return false; }
+            if (!Has(trade.id)) { why = NotKnownLine(trade, "You have not taken up " + trade.name + "."); return false; }
+            if (Skill(trade.id) < r.skill) { why = "That wants " + trade.name + " " + r.skill + "."; return false; }
+            if (stationNear == null || !Array.Exists(ProfessionDatabase.Stations(r.station), k => stationNear(k))) { why = StationWanted(r.station); return false; }
+            foreach (var kv in Needs(r))
+                if (Inventory.Count(Progress, kv.Key) < kv.Value) { var d = Items?.Get(kv.Key); why = "You need " + (d != null ? d.name : kv.Key) + (kv.Value > 1 ? " x" + kv.Value : "") + "."; return false; }
+            if (Items == null || Inventory.Room(Progress, Items, r.output) < Math.Max(1, r.count)) { why = BagsFullLine; return false; }
+            return true;
+        }
+        /// <summary>
+        /// Makes a recipe once: when CanCraft allows it, its inputs leave the bags (from the last stack back), what it makes goes in
+        /// (onto its stacks, then a worn trade bag that holds it, then the ordinary slots), and the skill is rolled (see
+        /// <see cref="UpChance"/>; SkillUp is told; never past 100). False, with why, and nothing changed otherwise.
+        /// </summary>
+        public bool Craft(RecipeDef r, Func<string, bool> stationNear, System.Random rng, out string why)
+        {
+            if (!CanCraft(r, stationNear, out why)) return false;
+            foreach (var kv in Needs(r)) Inventory.Remove(Progress, kv.Key, kv.Value);
+            Inventory.Add(Progress, Items, r.output, Math.Max(1, r.count));   // room was made sure of before anything left the bags
+            var e = Entry(r.profession);
+            if (e != null && e.skill < ProfessionDatabase.MaxSkill)
+            {
+                float chance = UpChance(e.skill, r.skill);
+                if (chance >= 1 || (chance > 0 && rng != null && rng.NextDouble() < chance)) { e.skill++; SkillUp(r.profession, e.skill); }
+            }
+            return true;
         }
     }
 }

@@ -99,7 +99,7 @@ namespace Crulanda.Encounter
         {
             public int perRow = PerRow; public float spacing = Spacing, focus = .95f, pitch = 12, margin = 1.2f, label = -1.05f, yaw = 180;
         }
-        sealed class Entry { public string[] ids; public string title, sub; public ActorLook look = ActorLook.Warrior; public ActorPose pose; public bool walk; public int form = -1, hair = -1; }
+        sealed class Entry { public string[] ids; public string title, sub; public ActorLook look = ActorLook.Warrior; public ActorPose pose; public bool walk; public int form = -1, hair = -1; public float yaw = float.NaN; }
         EncounterSession session; ItemDatabase db; GearLooks looks;
         readonly List<GameObject> figures = new List<GameObject>();
         readonly List<(Transform at, string title, string sub)> labels = new List<(Transform, string, string)>();
@@ -284,7 +284,7 @@ namespace Crulanda.Encounter
             catch (ArgumentException e) { Debug.LogError("Wardrobe capture: the loot files do not parse, so shots 13-18 are skipped:\n" + e.Message); yield break; }
             if (loot.Gear.Count == 0) { Debug.LogError("Wardrobe capture: no loot files (Crulanda > World > Build Oakhaven writes Resources/Gear/LootDraft.asset), so shots 13-18 are skipped."); yield break; }
             db = named;
-            var frame = new Framing { perRow = 4, spacing = 1.3f, pitch = 8, margin = .7f, yaw = 160 };
+            var frame = new Framing { perRow = 4, spacing = 1.7f, pitch = 8, margin = .7f, yaw = 160 };
             foreach (var (shot, prefix, zone) in NamedZones) yield return Rows(directory, shot + "-named-" + zone, NamedGroups(loot, prefix, zone), frame);
         }
         /// <summary>Groups packed into rows of the framing's width, a group never split unless it is wider than a row; one shot a row.</summary>
@@ -313,7 +313,9 @@ namespace Crulanda.Encounter
             Entry One(string id, string from)
             {
                 shown.Add(id); var d = db.Get(id);
-                return new Entry { ids = new[] { id }, title = d != null ? d.name : id, sub = (d != null ? ItemDatabase.QualityNames[d.quality] : "?") + ", " + from };
+                // Weapons and shields turn side-on as in shots 01 and 02, so a blade is not pointed at the camera and a shield shows its face.
+                float yaw = d == null ? float.NaN : d.slot == "mainhand" ? 115 : d.slot == "offhand" && looks.Resolve(d).family != "offhand.hung" ? -115 : float.NaN;
+                return new Entry { ids = new[] { id }, title = d != null ? d.name : id, sub = (d != null ? ItemDatabase.QualityNames[d.quality] : "?") + ", " + from, yaw = yaw };
             }
             string From(string id)
             {
@@ -427,7 +429,7 @@ namespace Crulanda.Encounter
             {
                 var e = row[i]; var p = spot + new Vector2((i - (n - 1) / 2f) * frame.spacing, 0);
                 var at = zone != null ? zone.Ground(p, 1) : new Vector3(p.x, 1, p.y);
-                var go = new GameObject("Wardrobe mannequin " + e.title); go.transform.SetPositionAndRotation(at, Quaternion.Euler(0, frame.yaw, 0));
+                var go = new GameObject("Wardrobe mannequin " + e.title); go.transform.SetPositionAndRotation(at, Quaternion.Euler(0, float.IsNaN(e.yaw) ? frame.yaw : e.yaw, 0));
                 var body = GameObject.CreatePrimitive(PrimitiveType.Capsule); body.name = "Body"; body.transform.SetParent(go.transform, false); Destroy(body.GetComponent<Collider>());
                 var look = ActorVisual.Attach(go, e.look, e.hair >= 0 ? e.hair : i);
                 look.ApplyGearIds(Array.FindAll(e.ids, id => id != null), db, looks);
@@ -471,11 +473,12 @@ namespace Crulanda.Encounter
             {
                 if (at == null) continue;
                 var sp = session.View.WorldToScreenPoint(at.position + Vector3.up * labelAt); if (sp.z < 0) continue;
+                float titleHeight = Mathf.Max(20, titleStyle.CalcHeight(new GUIContent(title), 190));   // a long name wraps to a second line
                 float subHeight = Mathf.Max(20, subStyle.CalcHeight(new GUIContent(sub), 190));   // a long source wraps to a second line
-                var r = new Rect(sp.x - 95, Screen.height - sp.y + 4, 190, 20 + subHeight);
+                var r = new Rect(sp.x - 95, Screen.height - sp.y + 4, 190, titleHeight + subHeight);
                 var old = GUI.color; GUI.color = new Color(0, 0, 0, .55f); GUI.DrawTexture(r, Texture2D.whiteTexture); GUI.color = old;
-                GUI.Label(new Rect(r.x, r.y + 2, r.width, 20), title, titleStyle);
-                GUI.Label(new Rect(r.x, r.y + 20, r.width, subHeight), sub, subStyle);
+                GUI.Label(new Rect(r.x, r.y + 2, r.width, titleHeight), title, titleStyle);
+                GUI.Label(new Rect(r.x, r.y + titleHeight, r.width, subHeight), sub, subStyle);
             }
         }
     }

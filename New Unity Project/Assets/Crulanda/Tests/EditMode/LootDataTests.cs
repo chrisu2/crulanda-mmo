@@ -214,6 +214,22 @@ namespace Crulanda.Tests
             Assert.AreEqual(43, counts["mob"], "43 from ordinary mobs.");
         }
 
+        [Test] public void A_mob_source_names_its_zone_by_its_display_name()
+        {
+            var items = LootTestData.Items(); var loot = LootTestData.Loot(items); var zones = LootTestData.Zones();
+            Func<string, string> name = s => { var z = zones.Find(x => x.id == "zone." + s); return z != null ? z.displayName : null; };
+            foreach (var g in loot.GearOrder.Where(g => LootDatabase.SourceKind(g.source) == "mob"))
+            {
+                var zone = zones.Find(x => x.id == "zone." + g.source.Substring(g.source.IndexOf('@') + 1));
+                Assert.AreEqual("Dropped in " + zone.displayName, LootDatabase.SourceText(g.source, name), g.id);
+            }
+            Assert.AreEqual("Dropped in The Ashland Rim", LootDatabase.SourceText("mob:cultist@ashrim", name));
+            Assert.AreEqual("Dropped in Oakhaven", LootDatabase.SourceText("mob:wolf@oakhaven"), "Without names the short id is capitalised.");
+            loot.ZoneName = name;
+            var harrow = loot.GearOrder.First(g => g.source == "mob:any@oakhaven");
+            StringAssert.EndsWith("Dropped in Oakhaven", loot.TooltipLines(harrow.id, null), "The tooltip uses the loader's names.");
+        }
+
         [Test] public void Every_elite_camp_has_a_signature_list()
         {
             var items = LootTestData.Items(); var loot = LootTestData.Loot(items); int elites = 0;
@@ -221,7 +237,7 @@ namespace Crulanda.Tests
                 foreach (var c in z.camps.Where(c => c != null && c.elite))
                 {
                     elites++;
-                    var ctx = new LootContext { zone = z.id.Replace("zone.", ""), tag = c.tag, mob = c.mob, level = c.levelMax, elite = true };
+                    var ctx = new LootContext { zone = z.id.Replace("zone.", ""), tag = LootContext.CampTag(c), mob = c.mob, level = c.levelMax, elite = true };
                     var lists = loot.Matching(ctx).Where(d => d.groups.Any(g => g.signature)).ToList();
                     Assert.AreEqual(1, lists.Count, c.mob + " (" + z.id + ") has one signature list.");
                     var pieces = lists[0].groups.Where(g => g.signature).SelectMany(g => g.pick).Select(k => k.item).ToList();

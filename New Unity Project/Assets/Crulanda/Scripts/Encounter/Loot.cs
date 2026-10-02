@@ -87,6 +87,8 @@ namespace Crulanda.Encounter
             }
             return c;
         }
+        /// <summary>The tag a camp's mobs carry in their ids: its tag, else its look, else "mob" (as EncounterSession.SpawnCamps names them).</summary>
+        public static string CampTag(ZoneCamp c) { return string.IsNullOrEmpty(c.tag) ? (c.look ?? "mob") : c.tag; }
     }
 
     public sealed class LootDatabase
@@ -245,7 +247,8 @@ namespace Crulanda.Encounter
         /// pity count is certain on that kill once that many kills in a row gave nothing (the counters live in
         /// <paramref name="pity"/>; null skips them). At most one named item from a normal kill and two from an elite; epics do not
         /// count. An elite whose body would hold no gear gets a generated piece at its level (rare 35%, else uncommon), and 6% of
-        /// an elite's generated rares come out epic. owned may be null (nothing owned). The same seed gives the same drops.
+        /// an elite's generated rares come out epic. Named items the base roll already left on the body count toward the cap.
+        /// owned may be null (nothing owned). The same seed gives the same drops.
         /// </summary>
         public List<LootDrop> Roll(LootContext c, ItemDatabase items, Func<string, bool> owned, float luck, List<LootLuck> pity, System.Random rng)
         {
@@ -256,7 +259,7 @@ namespace Crulanda.Encounter
             foreach (var (item, count) in items.RollLoot(string.IsNullOrEmpty(c.tag) ? "any" : c.tag, c.level, c.elite, rng))
                 if (!signature.Contains(item)) drops.Add(new LootDrop(item, count));
             float lucky = 1 + Mathf.Clamp(luck, 0, GearEffects.LuckCap);
-            int named = 0, cap = c.elite ? EliteCap : NormalCap;
+            int named = drops.FindAll(x => Meta(x.item) != null && Quality(items, x.item) < 4).Count, cap = c.elite ? EliteCap : NormalCap;
             foreach (var d in matched)
                 for (int gi = 0; gi < d.groups.Length; gi++)
                 {
@@ -330,18 +333,27 @@ namespace Crulanda.Encounter
                 foreach (var piece in s.pieces) { var d = Items.Get(piece); l.Add((p != null && Inventory.IsEquipped(p, piece) ? "  * " : "    ") + (d != null ? d.name : piece)); }
                 foreach (var b in s.bonuses) foreach (var e in b.effects) l.Add((worn >= b.count ? "  (" : "  [") + b.count + (worn >= b.count ? ") " : "] ") + e.text);
             }
-            string from = SourceText(g.source); if (from != null) l.Add(from);
+            string from = SourceText(g.source, ZoneName); if (from != null) l.Add(from);
             return string.Join("\n", l);
         }
-        /// <summary>A source in words: "Dropped by Old Whitefoot", "Sold by Ama Rusk", "A quest reward"...</summary>
-        public static string SourceText(string source)
+        /// <summary>Names a short zone id ("ashrim") for the tooltip ("The Ashland Rim"); set by whoever loads the zones. Null shows the id capitalised.</summary>
+        public Func<string, string> ZoneName;
+        /// <summary>
+        /// A source in words: "Dropped by Old Whitefoot", "Sold by Ama Rusk", "A quest reward"... A mob source names its zone
+        /// through <paramref name="zoneName"/> (short id to display name), else the short id capitalised.
+        /// </summary>
+        public static string SourceText(string source, Func<string, string> zoneName = null)
         {
             string kind = SourceKind(source); if (kind == null) return null;
             string rest = source.Substring(kind.Length + 1);
             switch (kind)
             {
                 case "boss": return "Dropped by " + rest;
-                case "mob": return "Dropped in " + rest.Substring(rest.IndexOf('@') + 1);
+                case "mob":
+                    {
+                        string z = rest.Substring(rest.IndexOf('@') + 1), n = zoneName != null ? zoneName(z) : null;
+                        return "Dropped in " + (!string.IsNullOrEmpty(n) ? n : z.Length > 0 ? char.ToUpperInvariant(z[0]) + z.Substring(1) : z);
+                    }
                 case "quest": return "A quest reward";
                 case "vendor": return "Sold by " + rest;
                 case "world": return "A rare find anywhere (levels " + rest + ")";
@@ -395,7 +407,7 @@ namespace Crulanda.Encounter
                         {
                             string tag = rest.Substring(0, rest.IndexOf('@')), zone = rest.Substring(rest.IndexOf('@') + 1); var z = ZoneOf(zone);
                             if (z == null) { problems.Add(p + "no zone '" + zone + "'."); break; }
-                            if (tag != "any" && !Array.Exists(z.camps ?? new ZoneCamp[0], c => c != null && c.tag == tag)) problems.Add(p + "no '" + tag + "' camp in " + zone + ".");
+                            if (tag != "any" && !Array.Exists(z.camps ?? new ZoneCamp[0], c => c != null && LootContext.CampTag(c) == tag)) problems.Add(p + "no '" + tag + "' camp in " + zone + ".");
                             if (!Drops(g.id, d => d.zone == zone && (tag == "any" ? string.IsNullOrEmpty(d.tag) : d.tag == tag))) problems.Add(p + "no " + tag + " drop list in " + zone + " has it.");
                             break;
                         }
@@ -424,7 +436,7 @@ namespace Crulanda.Encounter
                 var z = string.IsNullOrEmpty(d.zone) ? null : ZoneOf(d.zone);
                 if (!string.IsNullOrEmpty(d.zone) && z == null) problems.Add(p + "no zone '" + d.zone + "'.");
                 var camps = new List<ZoneCamp>(); foreach (var zz in z != null ? new List<ZoneDefinition> { z } : zoneList) foreach (var c in zz.camps ?? new ZoneCamp[0]) if (c != null) camps.Add(c);
-                if (!string.IsNullOrEmpty(d.tag) && !camps.Exists(c => c.tag == d.tag)) problems.Add(p + "no '" + d.tag + "' camp.");
+                if (!string.IsNullOrEmpty(d.tag) && !camps.Exists(c => LootContext.CampTag(c) == d.tag)) problems.Add(p + "no '" + d.tag + "' camp.");
                 if (!string.IsNullOrEmpty(d.mob) && !camps.Exists(c => c.mob == d.mob)) problems.Add(p + "no camp of '" + d.mob + "'.");
                 foreach (var g in d.groups) foreach (var k in g.pick) if (loot.Meta(k.item) == null) problems.Add(p + "'" + k.item + "' has no gear entry.");
             }
@@ -432,7 +444,7 @@ namespace Crulanda.Encounter
                 foreach (var c in z.camps ?? new ZoneCamp[0])
                 {
                     if (c == null || !c.elite) continue;
-                    var ctx = new LootContext { zone = z.id.Replace("zone.", ""), tag = c.tag, mob = c.mob, level = c.levelMax, elite = true };
+                    var ctx = new LootContext { zone = z.id.Replace("zone.", ""), tag = LootContext.CampTag(c), mob = c.mob, level = c.levelMax, elite = true };
                     if (!loot.Drops.Exists(d => d.mob == c.mob && Matches(d, ctx) && Array.Exists(d.groups, g => g.signature))) problems.Add("Elite '" + c.mob + "' (" + z.id + ") has no signature list.");
                 }
             return problems;

@@ -18,9 +18,12 @@ namespace Crulanda.World
         readonly List<CellData> cells = new List<CellData>();
         Mesh tuft;
 
-        /// <summary>Bakes the tufts. Tall patches may use their own materials (<paramref name="tallGrass"/>), height and density scales.</summary>
+        /// <summary>Bakes the tufts. Tall patches may use their own materials (<paramref name="tallGrass"/>), height and density scales.
+        /// <paramref name="thin"/> (optional) is the share of the open ground's tufts kept at a point (1: all): a tuft it drops is
+        /// dropped before the ground is asked anything, by where it stands (no draw from the stream), so a zone without it is sown
+        /// exactly as before. The tall patches are not thinned.</summary>
         public void Build(ZoneBuilder zone, Material[] grass, Material[] flowers, System.Func<Vector2, float> openness, int seed, float density, List<(Vector2 center, float radius)> tall = null,
-            Material[] tallGrass = null, float tallHeight = 1, float tallDensity = 1)
+            Material[] tallGrass = null, float tallHeight = 1, float tallDensity = 1, System.Func<Vector2, float> thin = null)
         {
             if (tallGrass == null || tallGrass.Length == 0) tallGrass = grass;
             if (grass == null || grass.Length == 0) return;
@@ -46,6 +49,7 @@ namespace Crulanda.World
             for (int i = 0; i < count; i++)
             {
                 var p = new Vector2((float)rng.NextDouble() * size - half, (float)rng.NextDouble() * size - half);
+                if (thin != null) { float keep = thin(p); if (keep < 1 && Hash(p) >= keep) continue; }
                 float open = openness(p);
                 if (open <= 0 || rng.NextDouble() > open) continue;
                 int cx = Mathf.Clamp((int)((p.x + half) / Cell), 0, perAxis - 1), cz = Mathf.Clamp((int)((p.y + half) / Cell), 0, perAxis - 1);

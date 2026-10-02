@@ -15,6 +15,12 @@ namespace Crulanda.World
         public float flatRadius = 50;       // village ground stays flat inside this radius
         public float hillHeight = 3;        // rolling ground outside it
         public int seed = 1;
+        /// <summary>
+        /// A big zone's outer country: from wildFrom metres out from the middle (the larger of |x| and |z|; 0: nowhere) the open
+        /// ground's grass thins, down to wildDensity of the full meadow at the edge, so the tufts to sow (load time, memory) grow
+        /// less than the zone's area. Tall grass patches keep their density (an ambusher lies in them).
+        /// </summary>
+        public float wildFrom, wildDensity = 1;
         public ZoneLighting lighting = new ZoneLighting();
         public ZoneSpawns spawns = new ZoneSpawns();
         public ZonePath[] roads = new ZonePath[0];

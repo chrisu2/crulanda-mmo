@@ -3,8 +3,8 @@
   "displayName": "Oakhaven",
   "subtitle": "An eastern farming village at the edge of the Wasting",
   "canonStatus": "CANON-EXPANDED",
-  "canonNote": "Canon: Oakhaven is an eastern agricultural hub erased by an accelerated, localized Wasting event that hid the Council's abduction of resonance candidates (interactive map; Oakhaven village map). This zone shows it on the eve of that erasure. Layout follows the canon village map. The Concord collectors, Mira and exact building placement are GAME-ONLY / PROVISIONAL. The wolf and boar camps and the south road to the Ashland Rim are GAME-ONLY. Crowsfoot Hollow (the cave at the end of the North road, running deep under the northern hills), its Sandthrone deserters, Quartermaster Hesk and Caddock, the Bandit King are GAME-ONLY; the Sandthrone company is CANON. The outer farmland (2026-09-30 growth): Crowsfoot Ridge over the hollow, the Overlook, the Mastwood and Moss's lodge, the Old Fold and Old Whitefoot, the Bound Stone, the Cider Barn, Withy pool, the Old Barrow, Hollin farm, the Hallow's Creek milestone and the Watchtower are GAME-ONLY places; the hill overlooking the valley, Oakhaven's cider and its deep springs (book1 ch.4), the First Kin (sworn by in book1 ch.4) and Hallow's Creek, the first settlement the Wasting took (world_bible.md), are CANON.",
-  "size": 380,
+  "canonNote": "Canon: Oakhaven is an eastern agricultural hub erased by an accelerated, localized Wasting event that hid the Council's abduction of resonance candidates (interactive map; Oakhaven village map). This zone shows it on the eve of that erasure. Layout follows the canon village map. The Concord collectors, Mira and exact building placement are GAME-ONLY / PROVISIONAL. The wolf and boar camps and the south road to the Ashland Rim are GAME-ONLY. Crowsfoot Hollow (the cave past the end of the North road, in the west heel of Crowsfoot Ridge, running deep under the northern hills), its Sandthrone deserters, Quartermaster Hesk and Caddock, the Bandit King are GAME-ONLY; the Sandthrone company is CANON. The second growth (2026-10-01, 380 to 560 m, playtest note 1): the hollow and Crowsfoot Ridge moved out to the north hills, and Carder's field barn, Greyback Shaw, the Carter's Rest, Lark Hill, Sallow Bottom and the Bound wood are GAME-ONLY places. The outer farmland (2026-09-30 growth): Crowsfoot Ridge over the hollow, the Overlook, the Mastwood and Moss's lodge, the Old Fold and Old Whitefoot, the Bound Stone, the Cider Barn, Withy pool, the Old Barrow, Hollin farm, the Hallow's Creek milestone and the Watchtower are GAME-ONLY places; the hill overlooking the valley, Oakhaven's cider and its deep springs (book1 ch.4), the First Kin (sworn by in book1 ch.4) and Hallow's Creek, the first settlement the Wasting took (world_bible.md), are CANON.",
+  "size": 560,
   "levelMin": 1,
   "levelMax": 2,
   "biome": "meadow",
@@ -42,6 +42,8 @@
   "flatRadius": 58,
   "hillHeight": 5,
   "seed": 1771,
+  "wildFrom": 160,
+  "wildDensity": 0.45,
   "lighting": {
     "sunPitch": 27,
     "sunYaw": -38,
@@ -131,7 +133,7 @@
       "to": "zone.khaven",
       "name": "West road to Khaven Village",
       "at": {
-        "x": -181,
+        "x": -271,
         "y": 13.5
       },
       "arrive": {
@@ -145,7 +147,7 @@
       "name": "South road to the Ashland Rim (dangerous, 9-10)",
       "at": {
         "x": -35,
-        "y": -183
+        "y": -273
       },
       "arrive": {
         "x": 5,
@@ -238,10 +240,26 @@
     {
       "name": "Hollin yard",
       "center": {
-        "x": 124,
+        "x": 214,
         "y": -64
       },
       "radius": 6
+    },
+    {
+      "name": "Field barn yard",
+      "center": {
+        "x": 0,
+        "y": 128
+      },
+      "radius": 5
+    },
+    {
+      "name": "Carter's rest",
+      "center": {
+        "x": -216,
+        "y": 20
+      },
+      "radius": 5
     }
   ],
   "roads": [
@@ -264,6 +282,26 @@
         {
           "x": -13,
           "y": 72
+        },
+        {
+          "x": -12,
+          "y": 96
+        },
+        {
+          "x": -8,
+          "y": 120
+        },
+        {
+          "x": -11,
+          "y": 146
+        },
+        {
+          "x": -19,
+          "y": 168
+        },
+        {
+          "x": -32,
+          "y": 184
         }
       ]
     },
@@ -306,6 +344,30 @@
         {
           "x": -188,
           "y": 13.7
+        },
+        {
+          "x": -205,
+          "y": 12
+        },
+        {
+          "x": -222,
+          "y": 15.5
+        },
+        {
+          "x": -240,
+          "y": 14.5
+        },
+        {
+          "x": -257,
+          "y": 13
+        },
+        {
+          "x": -271,
+          "y": 13.5
+        },
+        {
+          "x": -278,
+          "y": 13.7
         }
       ]
     },
@@ -338,11 +400,23 @@
           "y": 117
         },
         {
-          "x": 145,
+          "x": 150,
+          "y": 121
+        },
+        {
+          "x": 180,
+          "y": 119
+        },
+        {
+          "x": 208,
+          "y": 122
+        },
+        {
+          "x": 235,
           "y": 124
         },
         {
-          "x": 164,
+          "x": 254,
           "y": 128
         }
       ]
@@ -388,8 +462,28 @@
           "y": -183
         },
         {
+          "x": -39,
+          "y": -200
+        },
+        {
+          "x": -34,
+          "y": -220
+        },
+        {
+          "x": -31,
+          "y": -240
+        },
+        {
+          "x": -34,
+          "y": -258
+        },
+        {
+          "x": -35,
+          "y": -273
+        },
+        {
           "x": -36,
-          "y": -188
+          "y": -278
         }
       ]
     },
@@ -430,11 +524,23 @@
           "y": -128
         },
         {
-          "x": 140,
+          "x": 145,
+          "y": -134
+        },
+        {
+          "x": 175,
+          "y": -137
+        },
+        {
+          "x": 205,
+          "y": -135
+        },
+        {
+          "x": 230,
           "y": -139
         },
         {
-          "x": 160,
+          "x": 250,
           "y": -147
         }
       ]
@@ -532,7 +638,7 @@
       ]
     },
     {
-      "name": "Ridge path",
+      "name": "Overlook path",
       "width": 2.5,
       "points": [
         {
@@ -592,19 +698,19 @@
       "width": 3,
       "points": [
         {
-          "x": 100,
+          "x": 205,
+          "y": -135
+        },
+        {
+          "x": 208,
           "y": -110
         },
         {
-          "x": 110,
-          "y": -96
+          "x": 210,
+          "y": -88
         },
         {
-          "x": 117,
-          "y": -82
-        },
-        {
-          "x": 122,
+          "x": 212,
           "y": -70
         }
       ]
@@ -614,24 +720,40 @@
       "width": 2.2,
       "points": [
         {
-          "x": -13,
-          "y": 72
+          "x": -32,
+          "y": 184
         },
         {
-          "x": -7,
-          "y": 77
+          "x": -50,
+          "y": 188
         },
         {
-          "x": -3,
-          "y": 82
+          "x": -70,
+          "y": 187
         },
         {
-          "x": -8,
-          "y": 86.5
+          "x": -92,
+          "y": 191
         },
         {
-          "x": -16,
-          "y": 88.5
+          "x": -112,
+          "y": 199
+        },
+        {
+          "x": -128,
+          "y": 211
+        },
+        {
+          "x": -128,
+          "y": 227
+        },
+        {
+          "x": -123.5,
+          "y": 232
+        },
+        {
+          "x": -121.5,
+          "y": 240
         }
       ]
     }
@@ -641,6 +763,18 @@
       "name": "Oak creek",
       "width": 4,
       "points": [
+        {
+          "x": -280,
+          "y": -72
+        },
+        {
+          "x": -248,
+          "y": -66
+        },
+        {
+          "x": -218,
+          "y": -61
+        },
         {
           "x": -190,
           "y": -66
@@ -700,6 +834,18 @@
         {
           "x": 190,
           "y": -19
+        },
+        {
+          "x": 220,
+          "y": -21
+        },
+        {
+          "x": 250,
+          "y": -18
+        },
+        {
+          "x": 280,
+          "y": -17
         }
       ]
     }
@@ -825,7 +971,7 @@
     {
       "name": "Hollin home field",
       "center": {
-        "x": 136,
+        "x": 226,
         "y": -88
       },
       "size": {
@@ -838,7 +984,7 @@
     {
       "name": "Hollin east field",
       "center": {
-        "x": 150,
+        "x": 240,
         "y": -62
       },
       "size": {
@@ -873,10 +1019,49 @@
       },
       "rotation": 12,
       "crop": "stubble"
+    },
+    {
+      "name": "Top field",
+      "center": {
+        "x": -36,
+        "y": 164
+      },
+      "size": {
+        "x": 20,
+        "y": 14
+      },
+      "rotation": 4,
+      "crop": "stubble"
+    },
+    {
+      "name": "Carder north acre",
+      "center": {
+        "x": 8,
+        "y": 146
+      },
+      "size": {
+        "x": 24,
+        "y": 16
+      },
+      "rotation": 5,
+      "crop": "soil"
+    },
+    {
+      "name": "West strips",
+      "center": {
+        "x": -192,
+        "y": 36
+      },
+      "size": {
+        "x": 22,
+        "y": 14
+      },
+      "rotation": -4,
+      "crop": "stubble"
     }
   ],
   "wasting": {
-    "x": 164,
+    "x": 254,
     "curtainHeight": 26,
     "fade": 20,
     "note": "Canon: the Wasting unmakes rather than destroys, leaving grey static."
@@ -919,12 +1104,12 @@
       "name": "The Wasting",
       "text": "Not fire, not rot. The world simply stops.",
       "at": {
-        "x": 154,
+        "x": 244,
         "y": 4
       },
       "radius": 10,
       "view": {
-        "x": 148,
+        "x": 238,
         "y": 4
       },
       "viewPitch": 12
@@ -1047,22 +1232,22 @@
       "name": "The tall grass",
       "text": "Something moves in it when the wind drops. Sneak (Ctrl) if you must cross.",
       "at": {
-        "x": 6,
-        "y": -108
+        "x": -6,
+        "y": -214
       },
       "radius": 10
     },
     {
       "name": "Crowsfoot Hollow",
-      "text": "A cave in the north hills. Lately, smoke by night.",
+      "text": "A cave in the north hills, in the west heel of the ridge where nobody looks. Lately, smoke by night.",
       "at": {
-        "x": -16,
-        "y": 93
+        "x": -117,
+        "y": 240
       },
       "radius": 10,
       "view": {
-        "x": -4,
-        "y": 80
+        "x": -130,
+        "y": 228
       },
       "viewPitch": 8,
       "viewZoom": 9
@@ -1071,16 +1256,16 @@
       "name": "Crowsfoot Ridge",
       "text": "The north hills, splayed like a crow's foot. The hollow is in the heel of it, and the hall under the crown.",
       "at": {
-        "x": -36,
-        "y": 152
+        "x": -45,
+        "y": 224
       },
       "radius": 16,
       "view": {
-        "x": -58,
-        "y": 100
+        "x": -34,
+        "y": 172
       },
       "viewPitch": 8,
-      "viewZoom": 16,
+      "viewZoom": 18,
       "canonStatus": "GAME-ONLY name. The hill above Oakhaven's valley, from whose crest the village is first seen, is CANON (book1 ch.4)."
     },
     {
@@ -1117,7 +1302,7 @@
       "name": "The Bound Stone",
       "text": "Oakhaven's west bound, an acorn cut on this side and nothing on the other. Past it the road is Khaven's, and the light goes dim and stays that way.",
       "at": {
-        "x": -161,
+        "x": -251,
         "y": 19.5
       },
       "radius": 6,
@@ -1157,7 +1342,7 @@
       "name": "Hollin farm",
       "text": "Empty since spring, when the Hollins' east field went grey in a night. They left the door open and the gate on the latch.",
       "at": {
-        "x": 124,
+        "x": 214,
         "y": -62
       },
       "radius": 14,
@@ -1167,7 +1352,7 @@
       "name": "Hallow's Creek milestone",
       "text": "HALLOW'S CREEK, the stone says, and points down a road that runs on a few paces and stops. Hallow's Creek was the first to go.",
       "at": {
-        "x": 152,
+        "x": 242,
         "y": -139.5
       },
       "radius": 8,
@@ -1211,6 +1396,66 @@
         "y": 37
       },
       "radius": 6,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "Carder's field barn",
+      "text": "Wil Carder's barn on the north fields, the last roof on the North road. The door hangs off one hinge and the seed-corn is gone.",
+      "at": {
+        "x": 8,
+        "y": 128
+      },
+      "radius": 9,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "Greyback Shaw",
+      "text": "Oak and thorn too thick to plough. The grey-backed wolves lie up in it by day, and the north farms count their lambs twice.",
+      "at": {
+        "x": 92,
+        "y": 196
+      },
+      "radius": 16,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The Carter's Rest",
+      "text": "Half way to the bound: an oak, a shrine and room to turn a wain. Khaven's carters water their horses here and do not stay the night.",
+      "at": {
+        "x": -218,
+        "y": 21
+      },
+      "radius": 8,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "Lark Hill",
+      "text": "A bare down with a ring of stones on its crown. Larks go up from it all summer, and from the top you can see the road to both ends.",
+      "at": {
+        "x": -232,
+        "y": -206
+      },
+      "radius": 10,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "Sallow Bottom",
+      "text": "The ground never dries here. The Brook farm's pigs went wild in the sallows two winters back, and nobody has gone to fetch them.",
+      "at": {
+        "x": 160,
+        "y": -214
+      },
+      "radius": 12,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The Bound wood",
+      "text": "The last wood before the bound. Its wolves cross the West road at dusk, and the carters whip up when they pass it.",
+      "at": {
+        "x": -236,
+        "y": -32
+      },
+      "radius": 14,
       "canonStatus": "GAME-ONLY"
     }
   ],
@@ -2418,10 +2663,10 @@
       "kind": "cavern",
       "name": "Crowsfoot Hollow",
       "at": {
-        "x": -16,
-        "y": 90
+        "x": -120,
+        "y": 240
       },
-      "rotation": 0
+      "rotation": 90
     },
     {
       "kind": "perch",
@@ -2448,16 +2693,16 @@
     {
       "kind": "rock",
       "at": {
-        "x": -42,
-        "y": 148
+        "x": -62,
+        "y": 266
       },
       "variant": 1
     },
     {
       "kind": "rock",
       "at": {
-        "x": -30,
-        "y": 161
+        "x": -49,
+        "y": 254
       },
       "variant": 2
     },
@@ -2655,8 +2900,8 @@
       "kind": "perch",
       "name": "Whitefoot's rocks",
       "at": {
-        "x": -164,
-        "y": 108
+        "x": -222,
+        "y": 120
       },
       "rotation": 315,
       "size": {
@@ -2667,7 +2912,7 @@
       "kind": "grave",
       "name": "The Bound Stone",
       "at": {
-        "x": -161,
+        "x": -251,
         "y": 19.5
       },
       "scale": 1.5
@@ -2675,14 +2920,14 @@
     {
       "kind": "rock",
       "at": {
-        "x": -163.5,
+        "x": -253.5,
         "y": 21.5
       }
     },
     {
       "kind": "signpost",
       "at": {
-        "x": -153,
+        "x": -243,
         "y": 19
       },
       "rotation": 80
@@ -2762,8 +3007,8 @@
       "kind": "wallow",
       "name": "Withy wallow",
       "at": {
-        "x": -142,
-        "y": -118
+        "x": -174,
+        "y": -128
       },
       "size": {
         "x": 5
@@ -2798,7 +3043,7 @@
       "kind": "ruined_house",
       "name": "Hollin farmhouse",
       "at": {
-        "x": 118,
+        "x": 208,
         "y": -58
       },
       "rotation": 315,
@@ -2811,7 +3056,7 @@
       "kind": "barn",
       "name": "Hollin barn",
       "at": {
-        "x": 131,
+        "x": 221,
         "y": -54
       },
       "rotation": 45,
@@ -2824,7 +3069,7 @@
       "kind": "cart",
       "name": "Hollin cart",
       "at": {
-        "x": 128,
+        "x": 218,
         "y": -73
       },
       "rotation": 160
@@ -2832,7 +3077,7 @@
     {
       "kind": "barrels",
       "at": {
-        "x": 113.5,
+        "x": 203.5,
         "y": -66
       },
       "variant": 1
@@ -2840,14 +3085,14 @@
     {
       "kind": "haystack",
       "at": {
-        "x": 139,
+        "x": 229,
         "y": -44
       }
     },
     {
       "kind": "fence",
       "at": {
-        "x": 108,
+        "x": 198,
         "y": -66
       },
       "rotation": 30,
@@ -2858,7 +3103,7 @@
     {
       "kind": "fence",
       "at": {
-        "x": 134.9,
+        "x": 224.9,
         "y": -80.2
       },
       "rotation": -8,
@@ -2870,7 +3115,7 @@
       "kind": "grave",
       "name": "Hallow's Creek milestone",
       "at": {
-        "x": 152,
+        "x": 242,
         "y": -139.5
       },
       "scale": 1.35
@@ -2878,7 +3123,7 @@
     {
       "kind": "signpost",
       "at": {
-        "x": 146,
+        "x": 236,
         "y": -136.5
       },
       "rotation": 70
@@ -2886,7 +3131,7 @@
     {
       "kind": "rock",
       "at": {
-        "x": 156.5,
+        "x": 246.5,
         "y": -136
       },
       "variant": 1
@@ -2895,7 +3140,7 @@
       "kind": "dead_oak",
       "name": "Grey husk",
       "at": {
-        "x": 158,
+        "x": 248,
         "y": -130
       },
       "scale": 0.6
@@ -2937,42 +3182,42 @@
     },
     {
       "kind": "rock",
-      "name": "Crowsfoot boulder, east",
+      "name": "Crowsfoot boulder, south",
       "at": {
-        "x": -8,
-        "y": 91
+        "x": -119,
+        "y": 232
       },
-      "rotation": 40,
+      "rotation": 130,
       "scale": 1.4
     },
     {
       "kind": "rock",
-      "name": "Crowsfoot boulder, west",
+      "name": "Crowsfoot boulder, north",
       "at": {
-        "x": -23,
-        "y": 86
+        "x": -124,
+        "y": 247
       },
-      "rotation": 120,
+      "rotation": 210,
       "scale": 1.6
     },
     {
       "kind": "rock",
       "name": "Crowsfoot boulder, track",
       "at": {
-        "x": -1,
-        "y": 86
+        "x": -124,
+        "y": 225
       },
-      "rotation": 200,
+      "rotation": 290,
       "scale": 1.2
     },
     {
       "kind": "cliff",
-      "name": "Crowsfoot scarp, west",
+      "name": "Crowsfoot scarp, north",
       "at": {
-        "x": -31,
-        "y": 92
+        "x": -118,
+        "y": 255
       },
-      "rotation": 0,
+      "rotation": 90,
       "size": {
         "x": 18,
         "y": 0
@@ -2981,12 +3226,12 @@
     },
     {
       "kind": "cliff",
-      "name": "Crowsfoot scarp, east",
+      "name": "Crowsfoot scarp, south",
       "at": {
-        "x": -1,
-        "y": 93
+        "x": -117,
+        "y": 225
       },
-      "rotation": 0,
+      "rotation": 90,
       "size": {
         "x": 18,
         "y": 0
@@ -3056,6 +3301,277 @@
         "y": 137
       },
       "rotation": 45
+    },
+    {
+      "kind": "barn",
+      "name": "Carder's field barn",
+      "at": {
+        "x": 8,
+        "y": 128
+      },
+      "rotation": 90,
+      "size": {
+        "x": 9,
+        "y": 6
+      }
+    },
+    {
+      "kind": "cart",
+      "name": "Tipped cart",
+      "at": {
+        "x": -1,
+        "y": 133.5
+      },
+      "rotation": 290
+    },
+    {
+      "kind": "crates",
+      "at": {
+        "x": 2.5,
+        "y": 123
+      },
+      "rotation": 25,
+      "variant": 0
+    },
+    {
+      "kind": "haystack",
+      "at": {
+        "x": 14,
+        "y": 124.5
+      }
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": 8,
+        "y": 136.6
+      },
+      "rotation": 5,
+      "size": {
+        "x": 22,
+        "y": 0
+      }
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": -36,
+        "y": 156
+      },
+      "rotation": 4,
+      "size": {
+        "x": 18,
+        "y": 0
+      }
+    },
+    {
+      "kind": "signpost",
+      "at": {
+        "x": -28.5,
+        "y": 187.5
+      },
+      "rotation": 300
+    },
+    {
+      "kind": "tree",
+      "name": "Halfway oak",
+      "at": {
+        "x": -218,
+        "y": 28
+      },
+      "variant": 1,
+      "scale": 1.5
+    },
+    {
+      "kind": "cart",
+      "name": "Carter's wain",
+      "at": {
+        "x": -213,
+        "y": 22
+      },
+      "rotation": 80
+    },
+    {
+      "kind": "barrels",
+      "at": {
+        "x": -218.5,
+        "y": 19.5
+      },
+      "variant": 1
+    },
+    {
+      "kind": "wayshrine",
+      "name": "Carter's shrine",
+      "at": {
+        "x": -224,
+        "y": 22
+      },
+      "rotation": 0
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -227.5,
+        "y": 25
+      },
+      "variant": 1
+    },
+    {
+      "kind": "perch",
+      "name": "Lark hill stones",
+      "at": {
+        "x": -232,
+        "y": -206
+      },
+      "rotation": 0,
+      "size": {
+        "x": 3,
+        "y": 0
+      }
+    },
+    {
+      "kind": "tree",
+      "name": "Lark hill thorn",
+      "at": {
+        "x": -225,
+        "y": -212
+      },
+      "variant": 3,
+      "scale": 1.05
+    },
+    {
+      "kind": "wallow",
+      "name": "Sallow wallow",
+      "at": {
+        "x": 150,
+        "y": -208
+      },
+      "size": {
+        "x": 4.5,
+        "y": 0
+      }
+    },
+    {
+      "kind": "dead_oak",
+      "name": "Sallow snag",
+      "at": {
+        "x": 171,
+        "y": -206
+      },
+      "scale": 0.55
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 146,
+        "y": -221
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -58,
+        "y": 180
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -101,
+        "y": 189
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -144,
+        "y": 226
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 8,
+        "y": 214
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 44,
+        "y": 256
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -178,
+        "y": 236
+      },
+      "variant": 2
+    },
+    {
+      "kind": "dead_oak",
+      "name": "Crow oak",
+      "at": {
+        "x": -152,
+        "y": 200
+      },
+      "scale": 0.8
+    },
+    {
+      "kind": "tree",
+      "at": {
+        "x": -4,
+        "y": 106
+      },
+      "variant": 2
+    },
+    {
+      "kind": "tree",
+      "at": {
+        "x": 26,
+        "y": 126
+      },
+      "variant": 0
+    },
+    {
+      "kind": "tree",
+      "at": {
+        "x": -206,
+        "y": 47
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 196,
+        "y": 88
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -250,
+        "y": -120
+      },
+      "variant": 2
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 20,
+        "y": -250
+      },
+      "variant": 1
     }
   ],
   "groves": [
@@ -3125,7 +3641,7 @@
       "count": 12
     },
     {
-      "name": "Ridge pines",
+      "name": "Upper pines",
       "kind": "pine",
       "center": {
         "x": 40,
@@ -3167,8 +3683,8 @@
       "name": "Whitefoot's thicket",
       "kind": "pine",
       "center": {
-        "x": -168,
-        "y": 114
+        "x": -226,
+        "y": 126
       },
       "size": {
         "x": 28,
@@ -3190,7 +3706,7 @@
       "count": 0
     },
     {
-      "name": "Bound copse",
+      "name": "Downs copse",
       "kind": "broadleaf",
       "center": {
         "x": -176,
@@ -3232,20 +3748,20 @@
       "name": "Southwood",
       "kind": "broadleaf",
       "center": {
-        "x": -86,
-        "y": -160
+        "x": -92,
+        "y": -170
       },
       "size": {
-        "x": 40,
-        "y": 30
+        "x": 48,
+        "y": 44
       },
-      "count": 30
+      "count": 44
     },
     {
       "name": "Hollin orchard",
       "kind": "dead",
       "center": {
-        "x": 150,
+        "x": 240,
         "y": -31
       },
       "size": {
@@ -3258,7 +3774,7 @@
       "name": "Greying oaks",
       "kind": "dead",
       "center": {
-        "x": 150,
+        "x": 240,
         "y": -116
       },
       "size": {
@@ -3284,7 +3800,7 @@
       "name": "Grey wood",
       "kind": "dead",
       "center": {
-        "x": 150,
+        "x": 240,
         "y": 40
       },
       "size": {
@@ -3310,14 +3826,144 @@
       "name": "Crowsfoot thicket",
       "kind": "pine",
       "center": {
-        "x": 1,
-        "y": 79
+        "x": -131,
+        "y": 223
       },
       "size": {
-        "x": 18,
-        "y": 16
+        "x": 16,
+        "y": 18
       },
       "count": 16
+    },
+    {
+      "name": "Greyback Shaw",
+      "kind": "broadleaf",
+      "center": {
+        "x": 92,
+        "y": 196
+      },
+      "size": {
+        "x": 56,
+        "y": 36
+      },
+      "count": 40
+    },
+    {
+      "name": "Ridge pines",
+      "kind": "pine",
+      "center": {
+        "x": -60,
+        "y": 201
+      },
+      "size": {
+        "x": 60,
+        "y": 22
+      },
+      "count": 30
+    },
+    {
+      "name": "Hill pines",
+      "kind": "pine",
+      "center": {
+        "x": 20,
+        "y": 240
+      },
+      "size": {
+        "x": 52,
+        "y": 30
+      },
+      "count": 30
+    },
+    {
+      "name": "Pale wood",
+      "kind": "dead",
+      "center": {
+        "x": 232,
+        "y": 208
+      },
+      "size": {
+        "x": 22,
+        "y": 40
+      },
+      "count": 16
+    },
+    {
+      "name": "Alder holt",
+      "kind": "broadleaf",
+      "center": {
+        "x": 172,
+        "y": 8
+      },
+      "size": {
+        "x": 34,
+        "y": 26
+      },
+      "count": 18
+    },
+    {
+      "name": "Sallows",
+      "kind": "broadleaf",
+      "center": {
+        "x": 160,
+        "y": -216
+      },
+      "size": {
+        "x": 44,
+        "y": 30
+      },
+      "count": 24
+    },
+    {
+      "name": "Ashward pines",
+      "kind": "pine",
+      "center": {
+        "x": 66,
+        "y": -240
+      },
+      "size": {
+        "x": 52,
+        "y": 28
+      },
+      "count": 26
+    },
+    {
+      "name": "Bound wood",
+      "kind": "broadleaf",
+      "center": {
+        "x": -236,
+        "y": -32
+      },
+      "size": {
+        "x": 40,
+        "y": 34
+      },
+      "count": 30
+    },
+    {
+      "name": "Lark hill thorns",
+      "kind": "broadleaf",
+      "center": {
+        "x": -206,
+        "y": -222
+      },
+      "size": {
+        "x": 20,
+        "y": 18
+      },
+      "count": 8
+    },
+    {
+      "name": "Hanger",
+      "kind": "broadleaf",
+      "center": {
+        "x": -222,
+        "y": 196
+      },
+      "size": {
+        "x": 44,
+        "y": 36
+      },
+      "count": 28
     }
   ],
   "life": {
@@ -3525,7 +4171,7 @@
       {
         "kind": "crow",
         "center": {
-          "x": 128,
+          "x": 218,
           "y": -62
         },
         "radius": 12,
@@ -3539,6 +4185,69 @@
         },
         "radius": 16,
         "count": 4
+      },
+      {
+        "kind": "rabbit",
+        "center": {
+          "x": -2,
+          "y": 112
+        },
+        "radius": 16,
+        "count": 5
+      },
+      {
+        "kind": "deer",
+        "center": {
+          "x": 4,
+          "y": 206
+        },
+        "radius": 14,
+        "count": 3
+      },
+      {
+        "kind": "rabbit",
+        "center": {
+          "x": -222,
+          "y": 44
+        },
+        "radius": 16,
+        "count": 4
+      },
+      {
+        "kind": "deer",
+        "center": {
+          "x": -206,
+          "y": 176
+        },
+        "radius": 12,
+        "count": 3
+      },
+      {
+        "kind": "crow",
+        "center": {
+          "x": 6,
+          "y": 130
+        },
+        "radius": 10,
+        "count": 4
+      },
+      {
+        "kind": "rabbit",
+        "center": {
+          "x": 196,
+          "y": 62
+        },
+        "radius": 16,
+        "count": 4
+      },
+      {
+        "kind": "deer",
+        "center": {
+          "x": 96,
+          "y": -232
+        },
+        "radius": 12,
+        "count": 2
       }
     ],
     "residents": [
@@ -3845,14 +4554,14 @@
   },
   "camps": [
     {
-      "name": "Harrow wood wolves",
+      "name": "Upper pines wolves",
       "mob": "Grey wolf",
       "tag": "wolf",
       "look": "wolf",
       "canonStatus": "GAME-ONLY",
       "center": {
-        "x": -106,
-        "y": 108
+        "x": 44,
+        "y": 168
       },
       "radius": 9,
       "count": 4,
@@ -3861,14 +4570,14 @@
       "respawn": 75
     },
     {
-      "name": "South copse boars",
+      "name": "Southwood boars",
       "mob": "Wild boar",
       "tag": "boar",
       "look": "boar",
       "canonStatus": "GAME-ONLY",
       "center": {
-        "x": -96,
-        "y": -104
+        "x": -100,
+        "y": -186
       },
       "radius": 10,
       "count": 4,
@@ -3877,14 +4586,14 @@
       "respawn": 75
     },
     {
-      "name": "North pines wolves",
+      "name": "Greyback Shaw wolves",
       "mob": "Grey wolf",
       "tag": "wolf",
       "look": "wolf",
       "canonStatus": "GAME-ONLY",
       "center": {
-        "x": 48,
-        "y": 106
+        "x": 92,
+        "y": 194
       },
       "radius": 9,
       "count": 4,
@@ -3898,8 +4607,8 @@
       "tag": "wolf",
       "look": "wolf",
       "center": {
-        "x": 6,
-        "y": -108
+        "x": -6,
+        "y": -214
       },
       "radius": 9,
       "count": 4,
@@ -3915,8 +4624,8 @@
       "tag": "boar",
       "look": "boar",
       "center": {
-        "x": 76,
-        "y": -56
+        "x": 166,
+        "y": -2
       },
       "radius": 9,
       "count": 4,
@@ -3932,8 +4641,8 @@
       "look": "deserter",
       "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
       "center": {
-        "x": -16,
-        "y": 84.5
+        "x": -125.5,
+        "y": 240
       },
       "radius": 3,
       "count": 2,
@@ -3949,8 +4658,8 @@
       "look": "deserter",
       "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
       "center": {
-        "x": -15,
-        "y": 102.3
+        "x": -107.7,
+        "y": 239
       },
       "radius": 3.5,
       "count": 4,
@@ -3966,8 +4675,8 @@
       "look": "deserter",
       "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
       "center": {
-        "x": 2.6,
-        "y": 168.6
+        "x": -41.4,
+        "y": 221.4
       },
       "radius": 3,
       "count": 3,
@@ -3983,8 +4692,8 @@
       "look": "banditking",
       "canonStatus": "GAME-ONLY",
       "center": {
-        "x": -0.8,
-        "y": 175.6
+        "x": -34.4,
+        "y": 224.8
       },
       "radius": 1.2,
       "count": 1,
@@ -4001,8 +4710,8 @@
       "look": "deserter",
       "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
       "center": {
-        "x": -28.7,
-        "y": 119.3
+        "x": -90.7,
+        "y": 252.7
       },
       "radius": 1.2,
       "count": 2,
@@ -4018,8 +4727,8 @@
       "look": "deserter",
       "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
       "center": {
-        "x": -20.4,
-        "y": 140
+        "x": -70,
+        "y": 244.4
       },
       "radius": 2.5,
       "count": 2,
@@ -4035,8 +4744,8 @@
       "look": "deserter",
       "canonStatus": "GAME-ONLY",
       "center": {
-        "x": -18.4,
-        "y": 142.6
+        "x": -67.4,
+        "y": 242.4
       },
       "radius": 1,
       "count": 1,
@@ -4053,8 +4762,8 @@
       "look": "deserter",
       "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
       "center": {
-        "x": -6.4,
-        "y": 151.9
+        "x": -58.1,
+        "y": 230.4
       },
       "radius": 1.2,
       "count": 2,
@@ -4070,8 +4779,8 @@
       "look": "boar",
       "canonStatus": "GAME-ONLY",
       "center": {
-        "x": -128,
-        "y": 163
+        "x": -132,
+        "y": 168
       },
       "radius": 9,
       "count": 4,
@@ -4086,8 +4795,8 @@
       "look": "wolf",
       "canonStatus": "GAME-ONLY",
       "center": {
-        "x": -164,
-        "y": 108
+        "x": -222,
+        "y": 120
       },
       "radius": 2.5,
       "count": 1,
@@ -4104,8 +4813,8 @@
       "look": "wolf",
       "canonStatus": "GAME-ONLY",
       "center": {
-        "x": -150,
-        "y": 90
+        "x": -210,
+        "y": 104
       },
       "radius": 6,
       "count": 3,
@@ -4120,8 +4829,8 @@
       "look": "boar",
       "canonStatus": "GAME-ONLY",
       "center": {
-        "x": -142,
-        "y": -118
+        "x": -174,
+        "y": -128
       },
       "radius": 8,
       "count": 4,
@@ -4136,12 +4845,60 @@
       "look": "wolf",
       "canonStatus": "GAME-ONLY",
       "center": {
-        "x": 115,
+        "x": 205,
         "y": -40
       },
       "radius": 7,
       "count": 3,
       "levelMin": 2,
+      "levelMax": 2,
+      "respawn": 75
+    },
+    {
+      "name": "Hazel bank wolves",
+      "mob": "Grey wolf",
+      "tag": "wolf",
+      "look": "wolf",
+      "canonStatus": "GAME-ONLY",
+      "center": {
+        "x": -72,
+        "y": 172
+      },
+      "radius": 7,
+      "count": 3,
+      "levelMin": 2,
+      "levelMax": 2,
+      "respawn": 75
+    },
+    {
+      "name": "Sallow Bottom boars",
+      "mob": "Wild boar",
+      "tag": "boar",
+      "look": "boar",
+      "canonStatus": "GAME-ONLY",
+      "center": {
+        "x": 160,
+        "y": -214
+      },
+      "radius": 8,
+      "count": 4,
+      "levelMin": 2,
+      "levelMax": 2,
+      "respawn": 75
+    },
+    {
+      "name": "Bound wood wolves",
+      "mob": "Grey wolf",
+      "tag": "wolf",
+      "look": "wolf",
+      "canonStatus": "GAME-ONLY",
+      "center": {
+        "x": -234,
+        "y": -36
+      },
+      "radius": 8,
+      "count": 4,
+      "levelMin": 1,
       "levelMax": 2,
       "respawn": 75
     }
@@ -4226,18 +4983,42 @@
     {
       "name": "Hollin fallow",
       "center": {
-        "x": 104,
+        "x": 194,
         "y": -72
       },
       "radius": 7
+    },
+    {
+      "name": "Wold grass",
+      "center": {
+        "x": -238,
+        "y": 66
+      },
+      "radius": 9
+    },
+    {
+      "name": "Shaw grass",
+      "center": {
+        "x": 56,
+        "y": 226
+      },
+      "radius": 8
+    },
+    {
+      "name": "Sour meadow",
+      "center": {
+        "x": 112,
+        "y": -196
+      },
+      "radius": 8
     }
   ],
   "shapes": [
     {
       "name": "Crowsfoot Hollow brow",
       "center": {
-        "x": -19,
-        "y": 112
+        "x": -98,
+        "y": 243
       },
       "radius": 13,
       "height": 11,
@@ -4246,8 +5027,8 @@
     {
       "name": "Crowsfoot Ridge, over the Drop",
       "center": {
-        "x": -24,
-        "y": 138
+        "x": -72,
+        "y": 248
       },
       "radius": 10,
       "height": 12.4,
@@ -4256,15 +5037,15 @@
     {
       "name": "Crowsfoot Ridge, the crown",
       "center": {
-        "x": 0,
-        "y": 165
+        "x": -45,
+        "y": 224
       },
       "radius": 10,
       "height": 12.5,
       "blend": 23
     },
     {
-      "name": "Crowsfoot Ridge, west toe",
+      "name": "Overlook hill",
       "center": {
         "x": -50,
         "y": 137
@@ -4274,10 +5055,10 @@
       "blend": 22
     },
     {
-      "name": "Crowsfoot Ridge, east toe",
+      "name": "Crowsfoot Ridge, south toe",
       "center": {
-        "x": 22,
-        "y": 146
+        "x": -64,
+        "y": 202
       },
       "radius": 5,
       "height": 8,
@@ -4306,8 +5087,8 @@
     {
       "name": "Whitefoot's rocks",
       "center": {
-        "x": -164,
-        "y": 108
+        "x": -222,
+        "y": 120
       },
       "radius": 4,
       "height": 3,
@@ -4327,8 +5108,8 @@
       "name": "Withy wallow",
       "paint": "mud",
       "center": {
-        "x": -142,
-        "y": -118
+        "x": -174,
+        "y": -128
       },
       "radius": 5,
       "height": -0.5,
@@ -4347,7 +5128,7 @@
     {
       "name": "Hollin farmyard",
       "center": {
-        "x": 126,
+        "x": 216,
         "y": -60
       },
       "radius": 12,
@@ -4365,14 +5146,65 @@
       "blend": 12
     },
     {
-      "name": "Crowsfoot Hollow brow, west",
+      "name": "Crowsfoot Hollow brow, north",
       "center": {
-        "x": -32,
-        "y": 118
+        "x": -92,
+        "y": 256
       },
       "radius": 8,
       "height": 11.5,
       "blend": 10
+    },
+    {
+      "name": "Lark hill",
+      "center": {
+        "x": -232,
+        "y": -206
+      },
+      "radius": 4,
+      "height": 7,
+      "blend": 24
+    },
+    {
+      "name": "Lark hill crown",
+      "center": {
+        "x": -232,
+        "y": -206
+      },
+      "radius": 3,
+      "height": 7.8,
+      "blend": 7
+    },
+    {
+      "name": "Sallow bottom",
+      "center": {
+        "x": 160,
+        "y": -214
+      },
+      "radius": 12,
+      "height": -0.7,
+      "blend": 10
+    },
+    {
+      "name": "Sallow wallow",
+      "paint": "mud",
+      "center": {
+        "x": 150,
+        "y": -208
+      },
+      "radius": 4.5,
+      "height": -0.5,
+      "blend": 5
+    },
+    {
+      "name": "Crowsfoot Ridge, east shoulder",
+      "center": {
+        "x": -8,
+        "y": 236
+      },
+      "radius": 6,
+      "height": 8.5,
+      "blend": 26
     }
   ],
   "secrets": [
@@ -4381,7 +5213,7 @@
       "name": "The Road's End",
       "kind": "vista",
       "at": {
-        "x": 154.39,
+        "x": 244.39,
         "y": 129.96
       },
       "radius": 6,
@@ -4457,26 +5289,27 @@
       "name": "A Key on the Drop",
       "kind": "key",
       "at": {
-        "x": -26.2,
-        "y": 122.9
+        "x": -87.1,
+        "y": 250.2
       },
       "radius": 2.5,
       "height": 1.4,
       "prompt": "Take the key down from its nail",
       "text": "An iron key hangs on a nail driven into the rock, where a sentry on the Drop could reach it without looking.",
       "xp": 15,
-      "canonStatus": "GAME-ONLY"
+      "canonStatus": "GAME-ONLY",
+      "rotation": 90
     },
     {
       "id": "secret.oakhaven.quartermasters-strongbox",
       "name": "The Quartermaster's Strongbox",
       "kind": "chest",
       "at": {
-        "x": -19.3,
-        "y": 146.2
+        "x": -63.8,
+        "y": 243.3
       },
       "radius": 2.5,
-      "rotation": 307,
+      "rotation": 37,
       "prompt": "Unlock the strongbox",
       "needs": "secret.oakhaven.strongbox-key",
       "text": "The band's pay chest, or what is left of it: a little company silver, the Quartermaster's own lantern, and the King's orders, copied fair.",
@@ -4538,7 +5371,7 @@
       "kind": "note",
       "prompt": "Draw the letter out of the crack in the wall",
       "at": {
-        "x": 122,
+        "x": 212,
         "y": -58.88
       },
       "rotation": 315,
@@ -4562,27 +5395,73 @@
       "document": "doc.oakhaven.watch_book",
       "xp": 35,
       "canonStatus": "CANON-EXPANDED: the Wasting creeping on the eastern farms is CANON (book1 ch.4, world_bible.md); the watchtower and its book are GAME-ONLY."
+    },
+    {
+      "id": "secret.oakhaven.long-view",
+      "name": "The Long View",
+      "kind": "vista",
+      "at": {
+        "x": -232,
+        "y": -206
+      },
+      "radius": 5,
+      "rotation": 40,
+      "text": "From the stones on the crown the whole south-west lies open: the West road a pale thread to the bound, Withy pool like a dropped coin, the Great Oak a green smudge over the roofs. Westward the sky is the colour of a bruise, and stays that colour.",
+      "xp": 35,
+      "canonStatus": "GAME-ONLY place. Khaven lying west of Oakhaven under a dusk that does not lift is CANON-EXPANDED (the Khaven village map; the permanent dusk is the game's reading)."
+    },
+    {
+      "id": "secret.oakhaven.carters-stash",
+      "name": "The Carter's Stash",
+      "kind": "cache",
+      "prompt": "Reach in behind the shrine",
+      "at": {
+        "x": -224,
+        "y": 23.3
+      },
+      "rotation": 180,
+      "text": "A tin pushed in behind the wayside shrine, where a carter could reach it from the box without getting down: a few coins against a broken axle, a heel of cheese gone hard, and a lucky acorn on a thong.",
+      "item": "food.harrow_cheese",
+      "xp": 25,
+      "gold": 6,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "secret.oakhaven.carder-sack",
+      "name": "A Sack with the Carder Mark",
+      "kind": "cache",
+      "prompt": "Search the sack under the stone",
+      "at": {
+        "x": -54,
+        "y": 195.5
+      },
+      "rotation": 200,
+      "text": "Dropped where the track starts to climb and kicked under a stone to be fetched later: a seed-corn sack with the Carder mark burnt into it, a purse somebody skimmed from the king's share, and a stoppered draught. Whoever hid it has not been back.",
+      "item": "potion.minor",
+      "xp": 30,
+      "gold": 7,
+      "canonStatus": "GAME-ONLY"
     }
   ],
   "nodes": [
-    { "node": "node.copper", "at": { "x": -37.5, "y": 88.2 } },
-    { "node": "node.copper", "at": { "x": -27.5, "y": 88.4 } },
-    { "node": "node.copper", "at": { "x": 0.5, "y": 89.4 } },
-    { "node": "node.copper", "at": { "x": 6.2, "y": 89.4 } },
+    { "node": "node.copper", "at": { "x": -121.8, "y": 261.5 }, "rotation": 90 },
+    { "node": "node.copper", "at": { "x": -121.6, "y": 251.5 }, "rotation": 90 },
+    { "node": "node.copper", "at": { "x": -120.6, "y": 223.5 }, "rotation": 90 },
+    { "node": "node.copper", "at": { "x": -120.6, "y": 216.4 }, "rotation": 90 },
     { "node": "node.copper", "at": { "x": 16.3, "y": 91.5 }, "rotation": 90 },
-    { "node": "node.copper", "at": { "x": -30, "y": 134 }, "rotation": 90 },
-    { "node": "node.copper_rich", "at": { "x": -18.5, "y": 111.5 }, "under": true },
-    { "node": "node.copper_rich", "at": { "x": -14, "y": 150 }, "under": true },
-    { "node": "node.copper_rich", "at": { "x": -2, "y": 155.5 }, "under": true },
-    { "node": "node.copper_rich", "at": { "x": 3.5, "y": 157.5 }, "under": true },
+    { "node": "node.copper", "at": { "x": -74.5, "y": 252 }, "rotation": 180 },
+    { "node": "node.copper_rich", "at": { "x": -98.7, "y": 243 }, "under": true },
+    { "node": "node.copper_rich", "at": { "x": -60, "y": 238 }, "under": true },
+    { "node": "node.copper_rich", "at": { "x": -54, "y": 225.5 }, "under": true },
+    { "node": "node.copper_rich", "at": { "x": -51, "y": 219 }, "under": true },
     { "node": "node.oak", "at": { "x": 53, "y": -14 }, "rotation": 180 },
     { "node": "node.oak", "at": { "x": -78.5, "y": 104 } },
-    { "node": "node.oak", "at": { "x": -101, "y": 81.5 }, "rotation": 90 },
+    { "node": "node.oak", "at": { "x": 88, "y": 175 } },
     { "node": "node.oak", "at": { "x": -101, "y": -85 }, "rotation": 270 },
-    { "node": "node.oak", "at": { "x": -80, "y": -143 }, "rotation": 270 },
+    { "node": "node.oak", "at": { "x": -80, "y": -146 }, "rotation": 270 },
     { "node": "node.oak", "at": { "x": -100.5, "y": 157 } },
     { "node": "node.oak", "at": { "x": 80, "y": -145.5 }, "rotation": 270 },
-    { "node": "node.oak", "at": { "x": -164, "y": -7 } },
+    { "node": "node.oak", "at": { "x": -213, "y": -28 }, "rotation": 90 },
     { "node": "node.yarrow", "item": "item.yarrow", "at": { "x": -104, "y": 30 } },
     { "node": "node.yarrow", "item": "item.yarrow", "at": { "x": 24, "y": -72 } }
   ]

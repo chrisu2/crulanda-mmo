@@ -210,11 +210,12 @@ namespace Crulanda.Tests
         [UnityTest] public IEnumerator Respawn_clears_drops_and_beacon()
         {
             var s = Session(); Assert.AreEqual(root, s.SaveDirectoryOverride, "This test saves to its own folder.");
-            EncounterEnemy mob = null; yield return KillOne(s, m => mob = m, 1.5f);
+            EncounterEnemy mob = null; yield return KillOne(s, m => mob = m, 4);
             s.PutLoot(mob, 2, new[] { new LootDrop(Blade, 1) });
             s.Interact(); Assert.IsTrue(s.LootOpen);
             Assert.AreEqual(3, LootBeacon.Showing(mob));
-            yield return new WaitForSeconds(2.5f);
+            Assert.IsFalse(mob.actor.IsAlive, "Still down while the window is open.");
+            yield return new WaitForSeconds(4.5f);
             Assert.IsTrue(mob.actor.IsAlive, "It is back on its feet.");
             Assert.IsNull(mob.Drops, "Its drops are gone"); Assert.AreEqual(0, mob.Coins);
             Assert.AreEqual(-1, LootBeacon.Showing(mob), "and its beacon is out,");

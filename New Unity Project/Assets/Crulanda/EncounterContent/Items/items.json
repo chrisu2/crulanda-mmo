@@ -1415,6 +1415,10 @@
           "chance": 1.0,
           "min": 2,
           "max": 3
+        },
+        {
+          "item": "junk.dappled_hide",
+          "chance": 1.0
         }
       ]
     },

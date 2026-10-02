@@ -114,6 +114,28 @@ namespace Crulanda.Tests
             Assert.IsFalse(s.EquipFromBag(p.bag.FindIndex(x => x.item == "hide.hill_deer"))); Assert.AreEqual(EncounterSession.HideLine, s.Messages.Last());
         }
 
+        [UnityTest] public IEnumerator A_wolf_body_is_skinned_and_a_deserter_searched()
+        {
+            var s = Session(); Assert.AreEqual(root, s.SaveDirectoryOverride, "This test saves to its own folder.");
+            Assert.IsTrue(s.Enemies.Any(e => e.Camp && !e.Skinnable), "Oakhaven's deserters have no hide: their bodies are searched.");
+            Assert.IsTrue(s.Game.All(g => g.Skinnable), "Every game animal is skinned.");
+            // A camp wolf out in the open, killed, with its pelt on the body and the player beside it.
+            var wolf = s.Enemies.FirstOrDefault(e => e.Camp && e.Skinnable && !e.Elite && !e.Hidden && e.actor.IsAlive && e.persistentId.Contains("wolf") && !Hollow.InsideAny(e.transform.position, 0)
+                && s.Zone.Zone.exits.All(x => Vector2.Distance(x.at, new Vector2(e.transform.position.x, e.transform.position.z)) > x.radius + 6));
+            Assert.NotNull(wolf, "Oakhaven has a camp wolf out in the open.");
+            foreach (var e in s.Enemies) e.enabled = false;
+            wolf.RespawnSeconds = 600; wolf.actor.Health.ApplyDamage(100000); yield return null;
+            Assert.IsFalse(wolf.actor.IsAlive);
+            s.PutLoot(wolf, 0, new[] { new LootDrop("junk.wolf_pelt", 1) });
+            s.Player.GetComponent<AdventurerMotor>().Teleport(wolf.transform.position + new Vector3(0, .1f, -1.6f));
+            if (VillageLife.Active != null)
+                foreach (var v in VillageLife.Active.Villagers)
+                    if (Vector3.Distance(v.transform.position, wolf.transform.position) < 8) v.StandAt(wolf.transform.position + Vector3.back * 30 + Vector3.right * 2 * VillageLife.Active.Villagers.IndexOf(v), 0);
+            s.SelectFriendly(null, false);
+            for (int i = 0; i < 3; i++) yield return null;
+            Assert.IsTrue(s.CanLoot(wolf)); Assert.AreEqual(GameAnimals.SkinPrompt, s.InteractPrompt, "A wolf's body is skinned for its pelt.");
+        }
+
         [UnityTest] public IEnumerator Game_bolts_and_sneaking_gets_closer()
         {
             var s = Session(); Assert.AreEqual(root, s.SaveDirectoryOverride, "This test saves to its own folder.");

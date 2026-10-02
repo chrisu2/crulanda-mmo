@@ -64,7 +64,7 @@ namespace Crulanda.Encounter
             agent.radius = deer ? .4f : .2f; agent.height = deer ? 1.8f : .5f; agent.baseOffset = 1; agent.stoppingDistance = .3f;
             agent.obstacleAvoidanceType = ObstacleAvoidanceType.LowQualityObstacleAvoidance;
             var e = go.AddComponent<EncounterEnemy>(); e.actor = a; e.persistentId = id; e.session = this;
-            e.Camp = true; e.Game = true; e.RespawnSeconds = GameAnimals.RespawnSeconds; e.CampCenter = group.center; e.CampRadius = group.radius;
+            e.Camp = true; e.Game = true; e.Skinnable = true; e.RespawnSeconds = GameAnimals.RespawnSeconds; e.CampCenter = group.center; e.CampRadius = group.radius;
             GameAnimal.Attach(e, group.kind, group.center, group.radius, look, seed);
             go.SetActive(true); e.Initialize(); Game.Add(e);
             a.Stats.SetBase(StatType.MaxHealth, GameAnimals.Health(group.kind));

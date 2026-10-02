@@ -93,8 +93,9 @@ namespace Crulanda.Tests
                     else if (TotalLength(path) > len * 2.2f) problems.Add(p + bridge.name + ": crossing takes a detour (" + TotalLength(path) + " m)");
                     if (zone.WaterAt(new Vector2(bridge.position.x, bridge.position.z), out float surface, out _) && bridge.position.y + 1.13f < surface + .5f) problems.Add(p + bridge.name + ": arch too close to the water");
                 }
-                // Critters and trees stay out of the water.
+                // Critters, game and trees stay out of the water.
                 if (VillageLife.Active != null) foreach (var c in VillageLife.Active.Critters) if (c.Kind != "crow" && zone.WaterAt(new Vector2(c.transform.position.x, c.transform.position.z), out _, out float cd) && cd > .15f) problems.Add(p + c.Kind + " stands in water");
+                foreach (var g in s.Game) if (g != null && g.actor.IsAlive && zone.WaterAt(new Vector2(g.transform.position.x, g.transform.position.z), out _, out float gd) && gd > .15f) problems.Add(p + g.actor.DisplayName + " stands in water");
                 foreach (var t in zone.LeafTrees) if (water.NearWater(new Vector2(t.x, t.z), 0)) problems.Add(p + "tree planted in water at " + t);
             }
             Assert.IsEmpty(problems, string.Join("\n", problems));

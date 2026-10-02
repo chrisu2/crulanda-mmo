@@ -153,9 +153,11 @@ namespace Crulanda.Encounter
                 Settle(Villager.Spawn(this, name, "henwife", 40 + i, household?.house ?? lodging, start, coop), household);
             }
             // Deer and rabbits are game the player can hunt: the session spawns them (EncounterSession.SpawnGame), not the village.
+            // Their draws are still taken from this stream, so the hens, crows, sheep and cats after them stand where they always did.
             foreach (var group in z.life.critters)
-                for (int i = 0; i < group.count && !GameAnimals.IsGame(group.kind); i++)
-                    Critters.Add(Critter.Spawn(this, group.kind, group.center, group.radius));
+                for (int i = 0; i < group.count; i++)
+                    if (GameAnimals.IsGame(group.kind)) Critter.SkipSpawn(this, group.center, group.radius);
+                    else Critters.Add(Critter.Spawn(this, group.kind, group.center, group.radius));
             StartEconomy();
         }
         static readonly string[] KeeperNames = { "Goody Marl", "Hettie Brook", "Nan Pennock", "Old Sorrel" };
@@ -1396,6 +1398,13 @@ namespace Crulanda.Encounter
                 if (c.Coop != null) { c.fedSeen = c.Coop.FedAt; if (!c.Coop.Open || WorldClock.Between(c.RoostHour, 6)) c.Roost(); }
             }
             return c;
+        }
+        /// <summary>Takes the draws <see cref="Spawn"/> would take for one critter, in the same order, so a group spawned elsewhere (game) leaves the village stream as it was.</summary>
+        public static void SkipSpawn(VillageLife life, Vector2 center, float radius)
+        {
+            var start = center + new Vector2(life.R01 - .5f, life.R01 - .5f) * radius * 1.6f;
+            for (int tries = 0; tries < 12 && life.Zone.WaterAt(start, out _, out _); tries++) start = center + new Vector2(life.R01 - .5f, life.R01 - .5f) * radius * 1.6f;
+            _ = life.R01; _ = life.R01; _ = life.R01; _ = life.R01;   // facing, seed, body, until
         }
         /// <summary>Each hen heads in on her own around dusk (staggered over most of an hour).</summary>
         float RoostHour { get { return 18.6f + (seed % 10) * .09f; } }

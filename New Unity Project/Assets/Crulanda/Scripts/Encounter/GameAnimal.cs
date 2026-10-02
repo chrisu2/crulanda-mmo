@@ -23,7 +23,7 @@ namespace Crulanda.Encounter
         public static string Name(string kind) { return kind == "deer" ? "Hill deer" : "Rabbit"; }
         /// <summary>Seconds a game animal lies before it is back, somewhere in its group's circle.</summary>
         public const float RespawnSeconds = 240;
-        /// <summary>What E offers at a game animal's body.</summary>
+        /// <summary>What E offers at the body of game or of a beast with a hide or pelt (EncounterEnemy.Skinnable).</summary>
         public const string SkinPrompt = "Skin the body";
         /// <summary>A badly hurt animal (under this share of its health) bolts at only <see cref="WoundedPace"/> of its pace: it can be run down.</summary>
         public const float Wounded = .35f, WoundedPace = .6f;

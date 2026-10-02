@@ -18,6 +18,8 @@ namespace Crulanda.Encounter
         /// comes back like a camp mob and its body is searched like one.
         /// </summary>
         public bool Game;
+        /// <summary>A beast with a hide or pelt (a wolf, hound, boar or stag camp mob, and all game): E at its body reads "Skin the body".</summary>
+        public bool Skinnable;
         public bool Elite;
         /// <summary>Base damage per swing before the class kit resolves it (scales with level).</summary>
         public float HitBase = 13;

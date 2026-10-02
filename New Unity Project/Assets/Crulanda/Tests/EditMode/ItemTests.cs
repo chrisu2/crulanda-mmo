@@ -146,12 +146,11 @@ namespace Crulanda.Tests
                 var e = System.Array.Find(t.entries, x => x.item == hide); Assert.NotNull(e, tag + " drops " + hide);
                 Assert.AreEqual(chance, e.chance, 1e-4f, tag + ": " + hide);
             }
-            // Every wolf, boar and stag camp in the five zones uses a table with a hide. Old Ninebranch's own trophy table is the one
-            // beast without one (reported with step 11; its table is the loot work's, not this step's).
+            // Every wolf, boar and stag camp in the five zones uses a table with a hide (Old Ninebranch's trophy table among them).
             var zones = LootTestData.Zones(); int beasts = 0;
             foreach (var z in zones) foreach (var c in z.camps)
             {
-                if (c == null || (c.look != "wolf" && c.look != "boar" && c.look != "stag") || c.tag == "ninebranch") continue;
+                if (c == null || (c.look != "wolf" && c.look != "boar" && c.look != "stag")) continue;
                 beasts++; var t = db.Loot.Find(x => x.tag == c.tag);
                 Assert.NotNull(t, z.id + " " + c.mob + ": a loot table for " + c.tag);
                 Assert.IsTrue(t.entries.Any(x => Inventory.IsHide(db.Get(x.item)) && x.chance > 0), z.id + " " + c.mob + " (" + c.tag + ") drops a hide.");

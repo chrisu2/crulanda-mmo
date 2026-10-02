@@ -485,20 +485,22 @@ namespace Crulanda.Encounter
         /// <summary>
         /// An enemy's plate height over its root: just above the top of its model, so wolves and boars get low plates and people
         /// keep theirs over the head (measured once from its renderers while it stands, elite scale included). Also its
-        /// "level  name" label, rebuilt only when the level changes.
+        /// "level  name" label, rebuilt only when the level changes. A game animal's root rides 1 m over its feet, so its height is
+        /// kept from the feet (always above zero) and the 1 m taken off again: a rabbit's plate sits just over its ears.
         /// </summary>
         (float height, string label) EnemyPlate(EncounterEnemy e)
         {
             var a = e.actor; bool known = enemyPlates.TryGetValue(e, out var c), dirty = !known || c.level != a.Level;
+            float lift = e.Game ? 1 : 0;
             if (dirty) { c.level = a.Level; c.label = a.Level + "  " + a.DisplayName; }
             if (c.height <= 0 && !e.Hidden && a.IsAlive)
             {
                 float top = float.MinValue;
                 foreach (var r in e.GetComponentsInChildren<Renderer>()) if (r.enabled) top = Mathf.Max(top, r.bounds.max.y);
-                c.height = top > float.MinValue ? Mathf.Clamp(top - e.transform.position.y + .45f, .3f, 1.7f * e.transform.lossyScale.y) : 1.7f; dirty = true;
+                c.height = top > float.MinValue ? Mathf.Clamp(top - e.transform.position.y + lift + .45f, .3f, 1.7f * e.transform.lossyScale.y + lift) : 1.7f; dirty = true;
             }
             if (dirty) { if (!known && enemyPlates.Count > 400) enemyPlates.Clear(); enemyPlates[e] = c; }
-            return (c.height > 0 ? c.height : 1.7f, c.label);
+            return ((c.height > 0 ? c.height : 1.7f) - lift, c.label);
         }
         /// <summary>
         /// A plate's box: its name (and trade) rows above the anchor, with the ! or ? above those. <paramref name="p"/>.top is

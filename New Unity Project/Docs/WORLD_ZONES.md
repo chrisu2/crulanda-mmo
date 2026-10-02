@@ -634,7 +634,8 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
 - **Hunting** (GAME-ONLY; BUILD_PLAN step 11, tools/wip/professions/ADDENDUM.md G): every `deer` and `rabbit` group in
   `life.critters` is spawned by the session as game (`EncounterSession.SpawnGame`, `EncounterSession.Hunt.cs`), not by the village:
   `count` animals on dry navmesh ground in the group's circle, from a random stream of their own (seed x 37 + 11; the zone layout and
-  the camps draw nothing more, so no tree, rock or camp moves). Each is an `EncounterEnemy` with `Game` set: an actor (a Hill deer
+  the camps draw nothing more, so no tree, rock or camp moves; the village still takes the draws it took for them, so no hen, crow,
+  sheep or cat moves either, `Critter.SkipSpawn`). Each is an `EncounterEnemy` with `Game` set: an actor (a Hill deer
   70 health, a Rabbit 15, at the zone's lowest level) with a box collider about its body and a small navmesh agent, wearing the
   critter's body (`CritterBody`, lifted out of `Critter`) and moved by `GameAnimal`: it grazes and wanders in its circle; a player
   moving within its notice distance (deer 16 m, rabbits 7 m; half that sneaking with Ctrl) makes it look up and watch, and after
@@ -645,7 +646,8 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
   (Tab picks enemies first, game only when no enemy is within 25 m); its plate shows within 12 m or when targeted, and the target
   frame says it will not fight. Killed: no experience, no coin, the kill told to the quests; it lies on its side with its hide
   (`GameAnimals.RollHide`: the `rabbit` or `deer` table) and a white twinkle. E beside it says "Skin the body" and takes the hide
-  with the one press, through the loot window's take-all (a lone common hide opens no window). It is back after 240 s somewhere in
+  with the one press, through the loot window's take-all (a lone common hide opens no window). A wolf, hound, boar or stag camp
+  body (`EncounterEnemy.Skinnable`, set by its look) says "Skin the body" too; other bodies say "Search the body". It is back after 240 s somewhere in
   its circle. Nothing about game is saved; a load rebuilds it with the party. Oakhaven has 36 rabbits in eight groups and 14 deer in
   five; Khaven, the Peaks and the Verdant Shore have their own groups; Ash Rim has only crows.
 - **Households** (GAME-ONLY; `life.households`, `ZoneHousehold`; tools/wip/professions/ADDENDUM.md A): each household names

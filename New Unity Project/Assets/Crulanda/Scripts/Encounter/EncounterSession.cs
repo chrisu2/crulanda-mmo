@@ -1136,7 +1136,7 @@ namespace Crulanda.Encounter
                     AddAgent(a.gameObject, look == ActorLook.Wolf ? 4.2f : look == ActorLook.Boar ? 3.8f : look == ActorLook.WeaveEater ? 3.4f : 2.8f, beast ? .6f : .45f);
                     var enemy = a.gameObject.AddComponent<EncounterEnemy>(); enemy.actor = a; enemy.persistentId = id; enemy.session = this;
                     enemy.Camp = true; enemy.Elite = elite; enemy.RespawnSeconds = Mathf.Max(20, camp.respawn); enemy.CampCenter = camp.center; enemy.CampRadius = camp.radius;
-                    enemy.Ambusher = camp.ambush;
+                    enemy.Ambusher = camp.ambush; enemy.Skinnable = look == ActorLook.Wolf || look == ActorLook.Boar || look == ActorLook.Stag;
                     a.gameObject.SetActive(true); enemy.Initialize(); Enemies.Add(enemy);
                     if (camp.ambush) enemy.Hide();
                     a.Stats.SetBase(StatType.MaxHealth, EncounterEnemy.MobHealth(level, false, elite, beast));
@@ -1361,7 +1361,7 @@ namespace Crulanda.Encounter
                 if (Player == null || !Player.IsAlive || Paused) return null;
                 if (LootOpen) return "Take all";
                 var exit = NearbyExit; if (exit != null) return exit.name;
-                var body = LootableCorpse; if (body != null) return body.Game ? GameAnimals.SkinPrompt : "Search the body";
+                var body = LootableCorpse; if (body != null) return body.Game || body.Skinnable ? GameAnimals.SkinPrompt : "Search the body";
                 var (villager, mira) = TalkTarget();
                 if (mira) return !Progress.recruited ? "Recruit Mira" : !Companion.actor.IsAlive ? "Revive Mira" : "Talk to Mira";
                 if (villager != null) return "Talk to " + villager.Name;

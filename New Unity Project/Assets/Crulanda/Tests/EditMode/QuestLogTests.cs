@@ -182,6 +182,8 @@ namespace Crulanda.Tests
         {
             var log = WithWalletQuest(out _); var p = log.Progress; var s = log.State(Wallet);
             Inventory.Add(p, log.Items, Pelt, 2);
+            // Her other three bags carried, so no offer outranks the grey ? for the quest in progress.
+            foreach (var bag in new[] { "bag.log_sling", "bag.larder_scrip", "bag.ore_poke" }) Inventory.Add(p, log.Items, bag, 1);
             Assert.AreEqual('?', log.Marker(Maud, "zone.oakhaven", 1, out bool grey)); Assert.IsTrue(grey, "A grey ?: not enough yet.");
             Assert.IsFalse(log.TalkTo(Maud));
             Assert.AreEqual(2, Inventory.Count(p, Pelt), "Two pelts are not handed over."); Assert.AreEqual(2, log.Count(s, 0)); Assert.IsFalse(log.ObjectiveDone(s, 0));

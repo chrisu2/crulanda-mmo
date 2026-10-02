@@ -119,6 +119,13 @@ namespace Crulanda.World
         public bool harder;
         /// <summary>Lie hidden in tall grass until you come close (much closer if you sneak, holding Ctrl), then leap out.</summary>
         public bool ambush;
+        /// <summary>How its mobs answer when one of them joins a fight: "pack" (those near come at once), "call" (it shouts and those
+        /// in earshot come after a beat), "solitary" (nobody comes). Empty = by its look: wolves, Weave-Eaters, spiders and briars
+        /// pack, boar and stags are solitary, people call (SocialAggro.KindFor in the game's code).</summary>
+        public string social;
+        /// <summary>On an elite's camp: the camps whose mobs are its guards and always fight beside it, by name, comma-separated
+        /// ("none" for no guards). Empty = every non-elite camp whose edge is within 8 m of this camp's centre.</summary>
+        public string guards;
     }
     /// <summary>Walk into the radius and press E to travel; you arrive at <see cref="arrive"/> in the other zone.</summary>
     [Serializable] public sealed class ZoneExit { public string to, name; public Vector2 at, arrive; public float radius = 5; }

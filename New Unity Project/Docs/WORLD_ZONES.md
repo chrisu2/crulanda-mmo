@@ -296,7 +296,10 @@ mood. How it was made: a first draft was pre-checked by agents who ported the ge
   - `name`, `mob` (display name), `tag` (the loot table and default look) and `look`;
   - `center`, `radius` and `count`;
   - `levelMin`/`levelMax`, `elite`, `ambush` and `respawn` (seconds, default 75). Camp mobs have ids `mob.<tag>.<zone>.<camp>.<n>`, respawn after dying, and are not saved.
-- Mob stats scale by level (`EncounterEnemy.MobHealth` / `MobHit`), with separate multipliers for beasts, story enemies and elites.
+  - `social` (optional): how the camp's mobs answer when one of them joins a fight: `pack`, `call` or `solitary`. Empty = by the look (wolves, Weave-Eaters, spiders and briars pack; boar and stags are solitary; people call). No camp sets it today.
+  - `guards` (optional, on an elite's camp): the camps that guard it, by name, comma-separated, or `none`. Empty = every non-elite camp whose edge is within 8 m of the elite camp's centre. No camp sets it today; if an elite's camp or its guard camp is moved apart, set it.
+- Mob stats scale by level (`EncounterEnemy.MobHealth` / `MobHit`), with separate multipliers for beasts, story enemies and elites. A camp elite has 5.5 times a normal mob's health and 3 times its hit (more with level), a move of its own (`EliteMoves`: a wound-up heavy blow, an enrage, a call) and, at a dungeon's end, a quarter more health again.
+- **Social aggro** (2026-10-01, unrun): a camp mob that joins a fight brings the others of its camp near it, by kind (a pack at once within 9 m; people after a shout and a beat within 12 m, kin in the next camp too; solitary beasts nobody; 3.5 m when a sneaking player was only noticed), and an elite's guards always when the elite is pulled (a guard's alarm brings the elite only from within 3.5 m, so guards can be cleared first). The rules, the elites' moves and the balance table are in `COMBAT_SYSTEMS_VALIDATION.md`, "Social aggro and elites".
 - **Ambush camps** hide their mobs lowered into tall grass: no nameplate, no map dot, and they can't be targeted.
   They pounce when you come within 8 m, or 3 m while sneaking (hold Ctrl).
 - Mobs that can't reach you for 4 s give up the chase and reset.
@@ -489,7 +492,10 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
   - Drop sentries: 2 on the Drop, levels 3-4.
   - Store Caves: 2, level 4, with **Quartermaster Hesk** (elite, level 4) at his desk.
   - Deep Stair watch: 2, levels 4-5.
-  - King's guard: 3 in the hall, levels 4-5, and **Caddock, the Bandit King** (elite, level 5) before his throne.
+  - King's guard: 3 in the hall, levels 4-5, and **Caddock, the Bandit King** (elite, level 5) before his throne. The guard
+    is his (the camps pair by standing together): pull him and they all come. Pull a guard and the other guards come at his
+    shout but the king does not, unless that guard stands within 3.5 m of him: clear the guard first, then fight the king.
+    Hesk and the Store Caves' two are paired the same way, and stand closer to him (unrun, unseen).
   - They come back slowly, as a dungeon's should: the lookouts in 5 minutes, the rest in 8 to 15.
 - **Loot:** deserters drop filed company badges; Hesk his stores; Caddock always drops **Caddock's Tin Crown** (head). The
   Quartermaster's strongbox (a secret chest; its key is on the Drop) holds company silver, Hesk's Shuttered Lantern

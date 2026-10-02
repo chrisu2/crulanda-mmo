@@ -57,7 +57,7 @@ namespace Crulanda.Tests
             var ids = day.errands.Select(e => e.id).ToArray();
             CollectionAssert.AreEqual(new[] { "water for the pot", "the pot on", "dinner to the tables" }, ids);
             var water = day.errands[0]; Assert.AreEqual("well", water.from); Assert.AreEqual("kitchen", water.to); Assert.AreEqual(Load.Bucket, water.load);
-            var pot = day.errands[1]; Assert.AreEqual("kitchen", pot.from); Assert.IsNull(pot.to, "The pot is put on in the kitchen."); Assert.AreEqual(14, pot.work);
+            var pot = day.errands[1]; Assert.AreEqual("kitchen", pot.from); Assert.IsNull(pot.to, "The pot is put on in the kitchen."); Assert.AreEqual(14f, pot.work);
             var dinner = day.errands[2]; Assert.AreEqual("kitchen", dinner.from); Assert.AreEqual("inn", dinner.to); Assert.AreEqual("dinner", dinner.good);
             Assert.NotNull(VillageWork.Reply("dinner", .2f), "Somebody at the tables answers.");
             // The deliveries to the inn go round the back to the kitchen's door; the cask goes behind the bar. Stock keys are unchanged.

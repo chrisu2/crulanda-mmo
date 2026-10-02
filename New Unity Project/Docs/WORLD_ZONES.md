@@ -74,6 +74,9 @@ Trades in Oakhaven (GAME-ONLY, 2026-10-01; BUILD_PLAN step 4; tier 1, every node
   on the Harrow downs west of the farm and on the meadow north of Brook pond. Bare hands.
 - Selling ore or timber in the village is the forge's delivery for the day, herbs the stall's: Brannoc Vell talks of the
   Crowsfoot ore, the merchant of the fresh herbs.
+- **Stations** (BUILD_PLAN step 9): Vell's smithy is the forge (at its anvil); Thorne's bakehouse oven, the Cask's kitchen range
+  and the Golden Cask's hearth are fires; Lisbet's drying hut is the herbalist's bench. None of its own. Charcoal is burnt at any of
+  the forge and fires, day or night, with or without Vell.
 
 ## Khaven Village (CANON-EXPANDED)
 Canon names from `maps\khaven_village_map.png`: the Cracked Hearth, two Fallen Smithies, the Blood-Stone Well, the Gallows
@@ -97,6 +100,8 @@ Trades in Khaven (GAME-ONLY, 2026-10-01; BUILD_PLAN step 8; tier 2, every node a
 - **Herbs** (mourner's cap): the seven Mourner's cap props on Gloom Creek's banks are worked as nodes (still the quest's caps
   while Wenna's quest wants them), and three more round the Drowned graveyard (west, south and east of it, outside the
   hollows' camp), which count for the quest too.
+- **Stations** (BUILD_PLAN step 9): Wenna Coyle's bench beside her (-17,-12), facing the lamp; the Cracked Hearth's hearth is a
+  fire. No forge: ore is carried to Oakhaven.
 
 ## The Shattered Peaks (CANON-EXPANDED), levels 6-8
 Grown to 360 m (2026-09-30): the Signal Tower, Goatherd's Shieling, the Sealed Adit (CANON-EXPANDED: old mining tunnels under
@@ -122,6 +127,8 @@ Trades in the Peaks (GAME-ONLY, 2026-10-01; BUILD_PLAN step 8; tier 3, every nod
 - **Timber** (stone-pine windfalls): at the pine woods' edges (the Wolf pines' south edge, clear of the pack; the High, Gate,
   Ore-road, East, South and Umbra pines) and one at the Avalanche deadfall's north edge.
 - **Herbs** (tarnwort): seven round the Cold Tarn's shore and three on the Shieling's hay meadow, off the mown field.
+- **Stations** (BUILD_PLAN step 9): the Pass-trader's field anvil (-24,0) by the stall, and the Pass cookfire (-29.5,5.5) off the
+  Pilgrim cart (DESIGN 6.1's (-31,2) stood in the cart). No bench: herbs are carried to Khaven or the Rim.
 
 ## The Ashland Rim (CANON-EXPANDED / PROVISIONAL), levels 9-10
 Grown to 360 m (2026-09-30): Wain's Rest on the salt road, the Last Orchard, the Drowned Leviathan (a spine and ribs half in
@@ -145,6 +152,9 @@ one at a time.
   orchard, the Rim, South, West and Ridge-back snags, the Grey thicket, the North snags). None in the Last Orchard, where the
   orchard hounds lie.
 - **Herbs** (cinder-thistle): single plants in the open ash between the woods, the ridge and the pit, none by Last-Light.
+- **Stations** (BUILD_PLAN step 9): Oska's bone-anvil (56,22), the anvil on a block of pale stone bound with bone; Mother Vane's
+  salt-bench (64,-6), salt blocks among her jars and a drying rail on bone posts; the Enclave cookfire (60,-18). Each keeper stands
+  behind their own.
 
 ## The Verdant Shore (CANON-EXPANDED), levels 11-13
 Canon (Book 3, *The Verdant Shore*): the western coast's "Verdant Ocean", "a forest that didn't know when to stop", giant trees
@@ -188,6 +198,8 @@ ash-mountains (the breadcrumb `main.ashrim.5`); the level cap is 13 (talent poin
     canopies, two by the Tappers' wood and one by the Mere canopy. None by the Fallen Ghost-Oak: its spiders' camp fills it.
   - Herbs (dewfern): four round the Mistmere's shore and six round the Fern Hollow, among the ferns' edge, clear of
     Lantern-Moss.
+  - Stations (BUILD_PLAN step 9): Alder-Knot's ember-stone (-19,37), an anvil on a mossed stone with its embers in a stone
+    basin; Moss-Lantern's bench (11,38); the Hearth-Tree fire (17,52) at the tree's foot (DESIGN 6.1's (17,55) stood in its roots).
 
 ## Painted plants and lush props (`PlantField`, `ZoneBuilder.Verdant.cs`)
 - **PlantField:** painted fern, broad-leaf and reed cards (ZoneSceneBuilder paints them; `Crulanda/Grass` draws them, with `_Wither`
@@ -582,6 +594,24 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
   see the random grove trees or the strewn boulders, so the PlayMode tests stay the judge. A herb prop worked as a node keeps
   its place but still faces the camp, secret, node, trunk and field rules; a placed herb stays off ground steeper than 0.5 (its
   leaves stand level and do not follow a slope).
+
+## Stations (`ZoneBuilder.Stations`, `BuildStations` in `ZoneBuilder.Nodes.cs`; GAME-ONLY; BUILD_PLAN step 9)
+- **What they are:** where recipes are made: a forge, a herbalist's bench or a fire, within 5 m. A smithy, a bake oven, the
+  herbalist's drying hut, an inn's kitchen and every inn's hearth are stations already (registered from their workplaces and
+  `Inn()`, drawing nothing random); a zone's `stations` (see DATA_SCHEMA.md) adds the rest as props of their own.
+- **Looks:** a field anvil (the smithy's anvil, a hammer on its face, tongs, a water cask, an open sack of charcoal, a pan of coals
+  on iron legs with every third coal glowing and a light that brightens at night), on an oak stump (the Peaks), a pale block bound
+  with bone and two tusks (the Rim) or a mossed stone with its embers in a stone basin (the Shore); a herbalist's bench (mortar and
+  pestle, jars, stoppered vials, a cut bunch, a drying rail of bunches behind, a basket of herbs); a cookfire (a ring of stones, ash
+  and embers, three logs burning with tongues of flame, a pot on a tripod, smoke, a log to sit on and a few split logs).
+- **Built after the nodes**, from streams of their own, with no colliders and nothing in the navmesh: no tree, prop, node, secret
+  or creek point moves (`NodeStreamTests`, built with and without them). Placement (`NodePlacementTests`): each zone has the kinds
+  DESIGN 6.1 gives it, each station is walkable to within reach from the start, and a zone's own stand where the data puts them,
+  clear of water, buildings, roads, nodes (3 m), secrets (5 m) and trunks (2 m).
+- **Using one:** E (when nobody is in reach to talk to, nothing to pick up and no door at hand) opens the Trades window at the
+  recipes of the trade the station serves; or K anywhere and the Recipes tab, which names the station in reach. The world capture
+  tour shoots each zone's own from its front (`<zone>-81-station-NN-<name>`); the UI capture shows the recipes at Vell's smithy
+  (`24-station-recipes`, `25-station-charcoal-made`).
 
 ## Travel
 - Zones list `exits` (to, name, at, arrive, radius). Standing at an exit shows "[E] <name>"; E travels (not in combat):

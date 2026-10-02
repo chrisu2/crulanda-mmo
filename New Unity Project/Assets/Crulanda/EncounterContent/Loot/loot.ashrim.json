@@ -1,0 +1,57 @@
+{
+  "items": [
+    {"id": "loot.ash.tear_marked_mask", "name": "Tear-Marked Bone Mask", "kind": "gear", "slot": "head", "quality": 2, "level": 9, "value": 30, "armor": 19, "stamina": 7, "strength": 4, "spirit": 3, "description": "One painted tear. They all weep the same.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.ash.skull_knob_staff", "name": "Skull-Knob Staff", "kind": "gear", "slot": "mainhand", "quality": 2, "level": 9, "value": 42, "weaponDamage": 25, "stamina": 5, "intellect": 6, "spirit": 3, "description": "It is not a large skull. Do not ask.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.ash.cinder_sewn_vestment", "name": "Cinder-Sewn Vestment", "kind": "gear", "slot": "chest", "quality": 2, "level": 9, "value": 30, "armor": 30, "stamina": 8, "strength": 6, "description": "The hem is always warm.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.ash.ash_hound_wraps", "name": "Ash-Hound Wraps", "kind": "gear", "slot": "hands", "quality": 2, "level": 8, "value": 27, "armor": 17, "stamina": 5, "agility": 7, "description": "Grey fur that leaves grey on everything.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.ash.harpoon_line_boots", "name": "Harpoon-Line Boots", "kind": "gear", "slot": "feet", "quality": 2, "level": 8, "value": 27, "armor": 17, "stamina": 7, "agility": 5, "description": "Soled with old line, for decks that are long gone.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.ash.static_glass_shiv", "name": "Static-Glass Shiv", "kind": "gear", "slot": "mainhand", "quality": 2, "level": 9, "value": 42, "weaponDamage": 25, "stamina": 4, "agility": 10, "description": "It hums against your teeth.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.ash.unwoven_cord", "name": "Cord of Unwoven Thread", "kind": "gear", "slot": "neck", "quality": 2, "level": 9, "value": 30, "stamina": 6, "strength": 4, "agility": 4, "description": "Thread the eaters pulled out of something.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.ash.cinderfold_greaves", "name": "Cinderfold Greaves", "kind": "gear", "slot": "legs", "quality": 2, "level": 9, "value": 30, "armor": 30, "stamina": 9, "strength": 5, "description": "Somebody marched a long way in these before they stopped.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.ash.brood_glass_ward", "name": "Brood-Glass Ward", "kind": "gear", "slot": "offhand", "quality": 3, "level": 9, "value": 40, "armor": 44, "stamina": 16, "strength": 10, "description": "Grown, not made.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.ash.threadcutter", "name": "Threadcutter", "kind": "gear", "slot": "mainhand", "quality": 3, "level": 9, "value": 56, "weaponDamage": 30, "stamina": 10, "strength": 8, "agility": 8, "description": "It parts cloth, rope and anything else that holds together.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.ash.weave_eaten_mantle", "name": "Weave-Eaten Mantle", "kind": "gear", "slot": "shoulders", "quality": 3, "level": 9, "value": 40, "armor": 24, "stamina": 11, "agility": 10, "description": "More hole than mantle, and stronger for it.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.ash.the_deacons_censer", "name": "The Deacon's Censer", "kind": "gear", "slot": "offhand", "quality": 3, "level": 9, "value": 40, "armor": 44, "stamina": 10, "intellect": 10, "spirit": 6, "description": "It burns something that was not wood.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.ash.cassock_of_the_last_sermon", "name": "Cassock of the Last Sermon", "kind": "gear", "slot": "chest", "quality": 3, "level": 9, "value": 40, "armor": 37, "stamina": 15, "strength": 11, "description": "He promised them an ending. He was the only one who got it.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.ash.deacons_ash_treads", "name": "Ash-Pit Treads", "kind": "gear", "slot": "feet", "quality": 3, "level": 9, "value": 40, "armor": 24, "stamina": 11, "agility": 10, "description": "They leave no prints in ash.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.ash.ember_that_remembers", "name": "The Ember That Remembers", "kind": "gear", "slot": "neck", "quality": 4, "level": 9, "value": 50, "stamina": 14, "strength": 12, "agility": 6, "description": "It was a hearth once, in a house, in a town.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.ash.line_hauler_gauntlets", "name": "Grohl's Line-Hauler Gauntlets", "kind": "gear", "slot": "hands", "quality": 2, "level": 8, "value": 27, "armor": 17, "stamina": 6, "strength": 6, "description": "For hauling in something that does not want to come.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.ash.oskas_bone_kilt", "name": "Oska's Bone-Plate Kilt", "kind": "gear", "slot": "legs", "quality": 3, "level": 8, "value": 36, "armor": 34, "stamina": 10, "strength": 9, "description": "Every plate carved from the same rib.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.ash.old_salt_road_pauldrons", "name": "Pauldrons of the Old Salt Road", "kind": "gear", "slot": "shoulders", "quality": 3, "level": 9, "value": 40, "armor": 24, "stamina": 12, "strength": 9, "description": "The Ash-Walkers give these to people who are leaving.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.ash.cask_head_shield", "name": "Sefa's Cask-Head Shield", "kind": "gear", "slot": "offhand", "quality": 2, "level": 9, "value": 30, "armor": 35, "stamina": 9, "strength": 5, "description": "The end of a salt cask, still stamped.", "canonStatus": "GAME-ONLY"}
+  ],
+  "vendors": [
+    {"npc": "Sefa Brine", "items": ["loot.ash.cask_head_shield"]}
+  ],
+  "gear": [
+    {"id": "loot.ash.tear_marked_mask", "look": "head.mask:tear/cult", "source": "mob:cultist@ashrim"},
+    {"id": "loot.ash.skull_knob_staff", "look": "staff:skull/cult", "source": "mob:cultist@ashrim"},
+    {"id": "loot.ash.cinder_sewn_vestment", "look": "chest.robe:vestment/cult", "source": "mob:cultist@ashrim"},
+    {"id": "loot.ash.ash_hound_wraps", "look": "hands.wraps:fur/ashwalker", "source": "mob:hound@ashrim"},
+    {"id": "loot.ash.harpoon_line_boots", "look": "feet.boots:plain/ashwalker", "source": "mob:hound@ashrim"},
+    {"id": "loot.ash.static_glass_shiv", "look": "knife:glass/pale+glow", "source": "mob:weaveeater@ashrim"},
+    {"id": "loot.ash.unwoven_cord", "look": "neck.cord:beads/ashwalker", "source": "mob:weaveeater@ashrim"},
+    {"id": "loot.ash.cinderfold_greaves", "look": "legs.greaves:plate/ashwalker", "source": "mob:hollow@ashrim"},
+    {"id": "loot.ash.brood_glass_ward", "look": "shield.heater:glass/ashwalker+glow", "source": "boss:Brood Weave-Eater", "boss": true, "unique": true},
+    {"id": "loot.ash.threadcutter", "look": "knife:sickle/ashwalker+glow", "source": "boss:Brood Weave-Eater", "boss": true, "unique": true},
+    {"id": "loot.ash.weave_eaten_mantle", "look": "shoulder.mantle:frayed/ashwalker", "source": "boss:Brood Weave-Eater", "boss": true, "unique": true},
+    {"id": "loot.ash.the_deacons_censer", "look": "offhand.hung:censer/cult+glow", "source": "boss:The Ash-Deacon", "boss": true, "unique": true},
+    {"id": "loot.ash.cassock_of_the_last_sermon", "look": "chest.robe:cassock/cult", "source": "boss:The Ash-Deacon", "boss": true, "unique": true},
+    {"id": "loot.ash.deacons_ash_treads", "look": "feet.boots:plain/cult", "source": "boss:The Ash-Deacon", "boss": true, "unique": true},
+    {"id": "loot.ash.ember_that_remembers", "look": "neck.pendant:ember/ashwalker+glow", "source": "boss:The Ash-Deacon", "boss": true, "unique": true, "effects": [{"kind": "restRegen", "amount": 10, "text": "+10 health per rest tick out of combat."}]},
+    {"id": "loot.ash.line_hauler_gauntlets", "look": "hands.gauntlets:bone/ashwalker", "source": "quest:npc.grohl.hounds"},
+    {"id": "loot.ash.oskas_bone_kilt", "look": "legs.kilt:bone/ashwalker", "source": "quest:npc.oska.bone"},
+    {"id": "loot.ash.old_salt_road_pauldrons", "look": "shoulder.pauldron:bone/ashwalker", "source": "quest:main.ashrim.5"},
+    {"id": "loot.ash.cask_head_shield", "look": "shield.round:cask/ashwalker", "source": "vendor:Sefa Brine"}
+  ],
+  "drops": [
+    {"id": "drop.ash.brood", "zone": "ashrim", "mob": "Brood Weave-Eater", "rank": "elite", "groups": [{"chance": 0.5, "signature": true, "pick": [{"item": "loot.ash.brood_glass_ward"}, {"item": "loot.ash.threadcutter"}]}, {"chance": 0.15, "lucky": true, "pick": [{"item": "loot.ash.weave_eaten_mantle"}]}]},
+    {"id": "drop.ash.deacon", "zone": "ashrim", "mob": "The Ash-Deacon", "rank": "elite", "groups": [{"chance": 0.5, "signature": true, "pick": [{"item": "loot.ash.the_deacons_censer"}, {"item": "loot.ash.cassock_of_the_last_sermon"}]}, {"chance": 0.15, "lucky": true, "pick": [{"item": "loot.ash.deacons_ash_treads"}]}, {"chance": 0.04, "lucky": true, "pity": 25, "pick": [{"item": "loot.ash.ember_that_remembers"}]}]},
+    {"id": "drop.ash.cultists", "zone": "ashrim", "tag": "cultist", "rank": "normal", "groups": [{"chance": 0.03, "lucky": true, "pick": [{"item": "loot.ash.tear_marked_mask"}, {"item": "loot.ash.skull_knob_staff"}, {"item": "loot.ash.cinder_sewn_vestment"}]}]},
+    {"id": "drop.ash.hounds", "zone": "ashrim", "tag": "hound", "rank": "normal", "groups": [{"chance": 0.03, "lucky": true, "pick": [{"item": "loot.ash.ash_hound_wraps"}, {"item": "loot.ash.harpoon_line_boots"}]}]},
+    {"id": "drop.ash.eaters", "zone": "ashrim", "tag": "weaveeater", "rank": "normal", "groups": [{"chance": 0.03, "lucky": true, "pick": [{"item": "loot.ash.static_glass_shiv"}, {"item": "loot.ash.unwoven_cord"}]}]},
+    {"id": "drop.ash.cinderfold", "zone": "ashrim", "tag": "hollow", "rank": "normal", "groups": [{"chance": 0.04, "lucky": true, "pick": [{"item": "loot.ash.cinderfold_greaves"}]}]}
+  ],
+  "sets": [
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "items": [
+    {"id": "loot.oak.whitefoot_mantle", "name": "Whitefoot's Winter Mantle", "kind": "gear", "slot": "shoulders", "quality": 3, "level": 2, "value": 12, "armor": 7, "stamina": 4, "agility": 4, "description": "The one white paw is still on it.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.oak.whitefoot_fang", "name": "The Old Dog's Tooth", "kind": "gear", "slot": "neck", "quality": 3, "level": 2, "value": 12, "stamina": 3, "strength": 3, "agility": 2, "description": "Longer than a thumb, and yellow as old butter.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.oak.den_mothers_wraps", "name": "Den-Mother's Paw Wraps", "kind": "gear", "slot": "hands", "quality": 2, "level": 2, "value": 9, "armor": 6, "stamina": 2, "agility": 2, "description": "Wound from the bedding of the den.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.oak.hollin_pitchfork", "name": "Hollin's Bent Pitchfork", "kind": "gear", "slot": "mainhand", "quality": 2, "level": 1, "value": 8, "weaponDamage": 7, "stamina": 2, "strength": 2, "description": "Bent on a wolf, by the look of it.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.oak.mastwood_tuskguard", "name": "Mastwood Tusk-Guard", "kind": "gear", "slot": "offhand", "quality": 2, "level": 1, "value": 6, "armor": 7, "stamina": 3, "strength": 1, "description": "Two tusks and a barrel lid. It works.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.oak.brookside_waders", "name": "Brookside Waders", "kind": "gear", "slot": "feet", "quality": 2, "level": 1, "value": 6, "armor": 4, "stamina": 2, "agility": 2, "description": "Greased against the brook.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.oak.greycoat_tabard", "name": "Collector's Turned Coat", "kind": "gear", "slot": "chest", "quality": 2, "level": 1, "value": 6, "armor": 6, "stamina": 3, "strength": 1, "description": "Grey outside. Someone has stitched oak leaves into the lining.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.oak.brannocs_good_iron", "name": "Brannoc's Good Iron", "kind": "gear", "slot": "mainhand", "quality": 2, "level": 1, "value": 8, "weaponDamage": 7, "stamina": 1, "strength": 3, "description": "He made it for you, so he sharpened it twice.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.oak.saltmenders_cord", "name": "Salt-Mender's Knotted Cord", "kind": "gear", "slot": "neck", "quality": 2, "level": 1, "value": 6, "stamina": 2, "spirit": 2, "description": "Nine knots, one for each thing mended.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.oak.ivels_leaf_cap", "name": "Ivel's Leaf-Stitched Cap", "kind": "gear", "slot": "head", "quality": 2, "level": 1, "value": 6, "armor": 4, "stamina": 2, "agility": 2, "description": "Roots before ruin, sewn inside the brim.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.oak.market_day_breeches", "name": "Market-Day Breeches", "kind": "gear", "slot": "legs", "quality": 2, "level": 1, "value": 6, "armor": 6, "stamina": 2, "agility": 2, "description": "Kept for best, and for the road.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.oak.deserters_falchion", "name": "Company-Issue Falchion", "kind": "gear", "slot": "mainhand", "quality": 2, "level": 3, "value": 17, "weaponDamage": 12, "stamina": 2, "strength": 3, "description": "The company mark has been filed off.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.oak.sandthrone_halfhelm", "name": "Sand-Scoured Half-Helm", "kind": "gear", "slot": "head", "quality": 2, "level": 3, "value": 12, "armor": 8, "stamina": 3, "strength": 2, "description": "Polished by a desert that is a long way from here.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.oak.lookouts_breeches", "name": "Lookout's Patched Breeches", "kind": "gear", "slot": "legs", "quality": 2, "level": 3, "value": 12, "armor": 12, "stamina": 2, "agility": 3, "description": "Worn thin at the knees from watching the road.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.oak.hesks_counting_gloves", "name": "Hesk's Counting Gloves", "kind": "gear", "slot": "hands", "quality": 3, "level": 3, "value": 16, "armor": 10, "stamina": 4, "strength": 3, "agility": 3, "description": "Fingertips cut away for the coins.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.oak.strongbox_lid", "name": "The Quartermaster's Strongbox Lid", "kind": "gear", "slot": "offhand", "quality": 3, "level": 3, "value": 16, "armor": 18, "stamina": 6, "strength": 4, "description": "Iron-bound, and nothing under it any more.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.oak.due_cleaver", "name": "Caddock's Notched Cleaver", "kind": "gear", "slot": "mainhand", "quality": 3, "level": 4, "value": 28, "weaponDamage": 17, "stamina": 5, "strength": 8, "description": "A notch for every man who called him captain.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.oak.due_coat", "name": "The King's Stolen Coat", "kind": "gear", "slot": "chest", "quality": 3, "level": 4, "value": 20, "armor": 19, "stamina": 8, "strength": 5, "description": "Cut for a bigger man with a better name.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.oak.due_boots", "name": "Boots of the Deep Stair", "kind": "gear", "slot": "feet", "quality": 3, "level": 4, "value": 20, "armor": 12, "stamina": 5, "agility": 6, "description": "Quiet on stone. They had to be.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.oak.broken_oath_sabre", "name": "Broken-Oath Sabre", "kind": "gear", "slot": "mainhand", "quality": 4, "level": 4, "value": 35, "weaponDamage": 20, "stamina": 7, "strength": 9, "description": "Snapped across a knee and forged whole again by worse hands.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.oak.harrow_luck_knot", "name": "Harrow Wood Luck-Knot", "kind": "gear", "slot": "neck", "quality": 3, "level": 2, "value": 12, "stamina": 2, "agility": 2, "description": "Tied by a child, lost by a poacher, found by you.", "canonStatus": "GAME-ONLY"}
+  ],
+  "vendors": [
+    {"npc": "Ama Rusk", "items": ["loot.oak.market_day_breeches"]}
+  ],
+  "gear": [
+    {"id": "loot.oak.whitefoot_mantle", "look": "shoulder.mantle:fur/pilgrim", "source": "boss:Old Whitefoot", "boss": true, "unique": true},
+    {"id": "loot.oak.whitefoot_fang", "look": "neck.cord:fang/oakhaven", "source": "boss:Old Whitefoot", "boss": true, "unique": true},
+    {"id": "loot.oak.den_mothers_wraps", "look": "hands.wraps:fur/oakhaven", "source": "boss:Old Whitefoot", "boss": true, "unique": true},
+    {"id": "loot.oak.hollin_pitchfork", "look": "polearm:fork/oakhaven", "source": "mob:wolf@oakhaven"},
+    {"id": "loot.oak.mastwood_tuskguard", "look": "shield.buckler:tusk/oakhaven", "source": "mob:boar@oakhaven"},
+    {"id": "loot.oak.brookside_waders", "look": "feet.boots:waders/oakhaven", "source": "mob:boar@oakhaven"},
+    {"id": "loot.oak.greycoat_tabard", "look": "chest.coat:grey/concord", "source": "quest:main.oakhaven.3"},
+    {"id": "loot.oak.brannocs_good_iron", "look": "sword.short:plain/oakhaven", "source": "quest:npc.brannoc.iron"},
+    {"id": "loot.oak.saltmenders_cord", "look": "neck.cord:knot/pilgrim", "source": "quest:faction.saltmenders.1"},
+    {"id": "loot.oak.ivels_leaf_cap", "look": "head.cap:leaf/veridian", "source": "quest:faction.preservationists.1"},
+    {"id": "loot.oak.market_day_breeches", "look": "legs.breeches:plain/oakhaven", "source": "vendor:Ama Rusk"},
+    {"id": "loot.oak.deserters_falchion", "look": "sword.falchion:clipped/sandthrone", "source": "mob:deserter@oakhaven"},
+    {"id": "loot.oak.sandthrone_halfhelm", "look": "head.kettle:half/sandthrone", "source": "mob:deserter@oakhaven"},
+    {"id": "loot.oak.lookouts_breeches", "look": "legs.breeches:patched/sandthrone", "source": "mob:deserter@oakhaven"},
+    {"id": "loot.oak.hesks_counting_gloves", "look": "hands.gloves:fingerless/sandthrone", "source": "boss:Quartermaster Hesk", "boss": true, "unique": true},
+    {"id": "loot.oak.strongbox_lid", "look": "shield.round:lid/sandthrone", "source": "boss:Quartermaster Hesk", "boss": true, "unique": true},
+    {"id": "loot.oak.due_cleaver", "look": "cleaver:notched/sandthrone", "source": "boss:Caddock, the Bandit King", "boss": true, "unique": true, "set": "set.crowsfoot"},
+    {"id": "loot.oak.due_coat", "look": "chest.coat:skirted/sandthrone", "source": "boss:Caddock, the Bandit King", "boss": true, "unique": true, "set": "set.crowsfoot"},
+    {"id": "loot.oak.due_boots", "look": "feet.boots:plain/sandthrone", "source": "mob:deserter@oakhaven", "unique": true, "set": "set.crowsfoot"},
+    {"id": "loot.oak.broken_oath_sabre", "look": "sword.sabre:broken/sandthrone+glow", "source": "boss:Caddock, the Bandit King", "boss": true, "unique": true, "effects": [{"kind": "onKillHeal", "amount": 12, "text": "Each kill restores 12 health."}]},
+    {"id": "loot.oak.harrow_luck_knot", "look": "neck.cord:knot/oakhaven", "source": "mob:any@oakhaven", "effects": [{"kind": "luck", "amount": 10, "text": "+10% luck on lucky drops."}]}
+  ],
+  "drops": [
+    {"id": "drop.oak.whitefoot", "zone": "oakhaven", "mob": "Old Whitefoot", "rank": "elite", "groups": [{"chance": 0.5, "signature": true, "pick": [{"item": "loot.oak.whitefoot_mantle"}, {"item": "loot.oak.whitefoot_fang"}]}, {"chance": 0.15, "lucky": true, "pick": [{"item": "loot.oak.den_mothers_wraps"}]}]},
+    {"id": "drop.oak.hesk", "zone": "oakhaven", "mob": "Quartermaster Hesk", "rank": "elite", "groups": [{"chance": 1.0, "signature": true, "pick": [{"item": "loot.oak.hesks_counting_gloves"}, {"item": "loot.oak.strongbox_lid"}]}]},
+    {"id": "drop.oak.caddock", "zone": "oakhaven", "mob": "Caddock, the Bandit King", "rank": "elite", "groups": [{"chance": 1.0, "signature": true, "pick": [{"item": "item.tin_crown"}, {"item": "loot.oak.due_cleaver"}, {"item": "loot.oak.due_coat"}]}, {"chance": 0.1, "lucky": true, "pity": 10, "pick": [{"item": "loot.oak.broken_oath_sabre"}]}]},
+    {"id": "drop.oak.wolves", "zone": "oakhaven", "tag": "wolf", "rank": "normal", "groups": [{"chance": 0.03, "lucky": true, "pick": [{"item": "loot.oak.hollin_pitchfork"}]}]},
+    {"id": "drop.oak.boars", "zone": "oakhaven", "tag": "boar", "rank": "normal", "groups": [{"chance": 0.03, "lucky": true, "pick": [{"item": "loot.oak.mastwood_tuskguard"}, {"item": "loot.oak.brookside_waders"}]}]},
+    {"id": "drop.oak.deserters", "zone": "oakhaven", "tag": "deserter", "rank": "normal", "groups": [{"chance": 0.03, "lucky": true, "pick": [{"item": "loot.oak.deserters_falchion"}, {"item": "loot.oak.sandthrone_halfhelm"}, {"item": "loot.oak.lookouts_breeches"}]}]},
+    {"id": "drop.oak.deepstair", "zone": "oakhaven", "tag": "deserter", "rank": "normal", "levelMin": 4, "groups": [{"chance": 0.04, "lucky": true, "pick": [{"item": "loot.oak.due_boots"}]}]},
+    {"id": "drop.oak.harrow", "zone": "oakhaven", "groups": [{"chance": 0.004, "lucky": true, "pick": [{"item": "loot.oak.harrow_luck_knot"}]}]}
+  ],
+  "sets": [
+    {"id": "set.crowsfoot", "name": "The Deserter King's Due", "pieces": ["loot.oak.due_cleaver", "loot.oak.due_coat", "loot.oak.due_boots", "item.tin_crown"], "bonuses": [{"count": 2, "effects": [{"kind": "stat", "stat": "MaxHealth", "amount": 30, "text": "+30 health."}]}, {"count": 3, "effects": [{"kind": "stat", "stat": "AttackPower", "amount": 6, "text": "+6 attack power."}]}]}
+  ]
+}

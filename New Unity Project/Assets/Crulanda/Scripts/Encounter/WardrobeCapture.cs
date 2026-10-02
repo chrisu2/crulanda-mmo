@@ -18,7 +18,11 @@ namespace Crulanda.Encounter
     /// 06-helms-*, 07-shoulders-chests-*, 08-hands-legs-feet-neck-*: every armour family and variant up close;
     /// 09-palettes-a, -b: the same kit in all ten palettes; 10-crafted: the Blacksmith's 21 pieces by metal tier;
     /// 11-in-motion-front, -back: a rare level-13 kit standing, walking, sneaking, sitting and swimming (weapons slung);
-    /// 12-druid-forms: the Druid in that kit in each of her four forms, and bare-headed in her hood.
+    /// 12-druid-forms: the Druid in that kit in each of her four forms, and bare-headed in her hood;
+    /// 13-named-oakhaven-*, 14-named-khaven-*, 15-named-peaks-*, 16-named-ashrim-*, 17-named-verdant-*, 18-named-world-*: every
+    /// named item of the loot database (step A3) on its own mannequin at its own level and quality, labelled with its name, quality
+    /// and source; each boss's list together, then each set (its other pieces and one figure wearing the whole set), then the
+    /// zone's drop lists, quest rewards and merchants' pieces; the world's drops and the named items already in the game last.
     /// The session is on the capture's throwaway save (EncounterCapture), so nothing here touches a real character.
     /// </summary>
     public sealed class WardrobeCapture : MonoBehaviour
@@ -166,6 +170,7 @@ namespace Crulanda.Encounter
             foreach (DruidForm form in Enum.GetValues(typeof(DruidForm))) { var e = KitEntry(Martial, 13, 3); e.look = ActorLook.Druid; e.form = (int)form; e.title = form.ToString(); forms.Add(e); }
             var hooded = KitEntry(Martial, 13, 3); hooded.look = ActorLook.Druid; hooded.ids[0] = null; hooded.title = "No helm: her hood"; forms.Add(hooded);
             yield return Shot(Path.Combine(directory, "12-druid-forms.png"), forms, 12, new Framing { perRow = 5, spacing = 1.6f, pitch = 8, margin = .9f, yaw = 160 });
+            yield return NamedShots(directory);
             Clear(); EncounterHud.Hidden = false;
             Debug.Log("WARDROBE_CAPTURE_DONE"); Application.Quit(0);
         }
@@ -259,6 +264,110 @@ namespace Crulanda.Encounter
                 e.Add(new Entry { ids = new[] { found }, title = ItemDatabase.QualityNames[q], sub = db.Get(found).name + "  (" + l.family + " : " + l.variant + ")" });
             }
             return e;
+        }
+
+        /// <summary>The named-item shots: number, the id prefix of the zone's items and the zone (the world's file last).</summary>
+        static readonly (string shot, string prefix, string zone)[] NamedZones = {
+            ("13", "oak", "oakhaven"), ("14", "kha", "khaven"), ("15", "pea", "peaks"), ("16", "ash", "ashrim"), ("17", "ver", "verdant"), ("18", "world", "world")
+        };
+        /// <summary>
+        /// Shots 13-18: the game's item files and the drafted loot files (LootDraft) parsed together, every named item on a
+        /// mannequin, grouped (see the class summary). Skipped with an error when there are no loot files or they do not parse.
+        /// </summary>
+        IEnumerator NamedShots(string directory)
+        {
+            var texts = new List<string>();
+            if (session.content != null) foreach (var f in session.content.itemFiles ?? new TextAsset[0]) if (f != null) texts.Add(f.text);
+            foreach (var t in LootDraft.Texts()) if (!texts.Contains(t)) texts.Add(t);
+            ItemDatabase named; LootDatabase loot;
+            try { named = ItemDatabase.Parse(texts); loot = LootDatabase.Parse(texts, named, looks); }
+            catch (ArgumentException e) { Debug.LogError("Wardrobe capture: the loot files do not parse, so shots 13-18 are skipped:\n" + e.Message); yield break; }
+            if (loot.Gear.Count == 0) { Debug.LogError("Wardrobe capture: no loot files (Crulanda > World > Build Oakhaven writes Resources/Gear/LootDraft.asset), so shots 13-18 are skipped."); yield break; }
+            db = named;
+            var frame = new Framing { perRow = 4, spacing = 1.3f, pitch = 8, margin = .7f, yaw = 160 };
+            foreach (var (shot, prefix, zone) in NamedZones) yield return Rows(directory, shot + "-named-" + zone, NamedGroups(loot, prefix, zone), frame);
+        }
+        /// <summary>Groups packed into rows of the framing's width, a group never split unless it is wider than a row; one shot a row.</summary>
+        IEnumerator Rows(string directory, string name, List<List<Entry>> groups, Framing frame)
+        {
+            var rows = new List<List<Entry>>(); var row = new List<Entry>();
+            foreach (var g in groups)
+            {
+                if (g.Count == 0) continue;
+                if (row.Count > 0 && row.Count + g.Count > frame.perRow) { rows.Add(row); row = new List<Entry>(); }
+                foreach (var e in g) { if (row.Count == frame.perRow) { rows.Add(row); row = new List<Entry>(); } row.Add(e); }
+            }
+            if (row.Count > 0) rows.Add(row);
+            for (int i = 0; i < rows.Count; i++) yield return Shot(Path.Combine(directory, name + "-" + (char)('a' + i) + ".png"), rows[i], 12, frame);
+        }
+        /// <summary>
+        /// One zone's named items, grouped: each boss's list (signature pieces, rare table, epic), each set the zone's items belong
+        /// to (its pieces not already shown, then the whole set on one figure), each drop list of ordinary mobs, the quest rewards,
+        /// the merchants' pieces. The world: its drops, then the named items already in the game that no list drops.
+        /// </summary>
+        List<List<Entry>> NamedGroups(LootDatabase loot, string prefix, string zone)
+        {
+            var groups = new List<List<Entry>>(); var shown = new HashSet<string>(); bool world = zone == "world";
+            string Pct(float chance) { return (chance * 100).ToString("0.##") + "%"; }
+            bool Mine(string id) { return id.StartsWith("loot." + prefix + ".", StringComparison.Ordinal); }
+            Entry One(string id, string from)
+            {
+                shown.Add(id); var d = db.Get(id);
+                return new Entry { ids = new[] { id }, title = d != null ? d.name : id, sub = (d != null ? ItemDatabase.QualityNames[d.quality] : "?") + ", " + from };
+            }
+            string From(string id)
+            {
+                var g = loot.Meta(id); string kind = g == null ? null : LootDatabase.SourceKind(g.source); if (kind == null) return "no source";
+                string where = g.source.Substring(kind.Length + 1);
+                foreach (var d in loot.Drops)
+                    foreach (var grp in d.groups)
+                        if (Array.Exists(grp.pick, k => k.item == id))
+                            return kind == "world" ? "world drop, levels " + where + ", " + Pct(grp.chance) + (string.IsNullOrEmpty(d.rank) ? "" : " (" + d.rank + ")")
+                                : (string.IsNullOrEmpty(d.tag) ? "any camp" : d.tag) + (d.levelMin > 1 ? " level " + d.levelMin + "+" : "") + ", " + Pct(grp.chance);
+                return kind == "quest" ? "quest " + where : kind == "vendor" ? "sold by " + where : kind == "secret" ? "a hidden find" : kind + " " + where;
+            }
+            if (!world)
+            {
+                foreach (var d in loot.Drops)
+                {
+                    if (d.zone != zone || string.IsNullOrEmpty(d.mob)) continue;
+                    var g = new List<Entry>();
+                    foreach (var grp in d.groups)
+                        foreach (var k in grp.pick)
+                            if (!shown.Contains(k.item)) g.Add(One(k.item, d.mob + ", " + (grp.signature ? "signature" : db.Get(k.item)?.quality == 4 ? "epic " + Pct(grp.chance) : "rare table " + Pct(grp.chance))));
+                    groups.Add(g);
+                }
+                foreach (var s in loot.SetOrder)
+                {
+                    if (!Array.Exists(s.pieces, Mine)) continue;
+                    var g = new List<Entry>();
+                    foreach (var piece in s.pieces) if (!shown.Contains(piece)) g.Add(One(piece, From(piece)));
+                    g.Add(new Entry { ids = s.pieces, title = s.name, sub = "the whole set, " + s.pieces.Length + " pieces" });
+                    groups.Add(g);
+                }
+            }
+            foreach (var d in loot.Drops)
+            {
+                if (world ? !string.IsNullOrEmpty(d.zone) : d.zone != zone || !string.IsNullOrEmpty(d.mob)) continue;
+                var g = new List<Entry>();
+                foreach (var grp in d.groups) foreach (var k in grp.pick) if (Mine(k.item) && !shown.Contains(k.item)) g.Add(One(k.item, From(k.item)));
+                groups.Add(g);
+            }
+            foreach (var kind in new[] { "quest", "vendor" })
+            {
+                var g = new List<Entry>();
+                foreach (var m in loot.GearOrder) if (Mine(m.id) && !shown.Contains(m.id) && LootDatabase.SourceKind(m.source) == kind) g.Add(One(m.id, From(m.id)));
+                groups.Add(g);
+            }
+            var rest = new List<Entry>();
+            foreach (var m in loot.GearOrder)
+            {
+                bool listed = loot.Drops.Exists(d => Array.Exists(d.groups, grp => Array.Exists(grp.pick, k => k.item == m.id)));
+                if (shown.Contains(m.id) || !(Mine(m.id) || (world && m.legacy && !listed))) continue;
+                rest.Add(One(m.id, m.legacy ? "already in the game, " + From(m.id) : From(m.id)));
+            }
+            groups.Add(rest);
+            return groups;
         }
 
         /// <summary>Hides everything that is not the line-up: the HUD, the player and Mira, the enemies, the village; noon, calm weather.</summary>
@@ -362,10 +471,11 @@ namespace Crulanda.Encounter
             {
                 if (at == null) continue;
                 var sp = session.View.WorldToScreenPoint(at.position + Vector3.up * labelAt); if (sp.z < 0) continue;
-                var r = new Rect(sp.x - 95, Screen.height - sp.y + 4, 190, 40);
+                float subHeight = Mathf.Max(20, subStyle.CalcHeight(new GUIContent(sub), 190));   // a long source wraps to a second line
+                var r = new Rect(sp.x - 95, Screen.height - sp.y + 4, 190, 20 + subHeight);
                 var old = GUI.color; GUI.color = new Color(0, 0, 0, .55f); GUI.DrawTexture(r, Texture2D.whiteTexture); GUI.color = old;
                 GUI.Label(new Rect(r.x, r.y + 2, r.width, 20), title, titleStyle);
-                GUI.Label(new Rect(r.x, r.y + 20, r.width, 20), sub, subStyle);
+                GUI.Label(new Rect(r.x, r.y + 20, r.width, subHeight), sub, subStyle);
             }
         }
     }

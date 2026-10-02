@@ -1,0 +1,53 @@
+{
+  "items": [
+    {"id": "loot.kha.outrider_bearded_axe", "name": "Outrider's Bearded Axe", "kind": "gear", "slot": "mainhand", "quality": 2, "level": 4, "value": 21, "weaponDamage": 14, "stamina": 3, "strength": 4, "description": "Hooks a shield as well as it splits one.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.kha.dune_scarf", "name": "Dune-Red Head Scarf", "kind": "gear", "slot": "head", "quality": 2, "level": 4, "value": 15, "armor": 9, "stamina": 3, "agility": 4, "description": "Still smells of a hotter country.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.kha.picket_shield", "name": "Picket's Hide Shield", "kind": "gear", "slot": "offhand", "quality": 2, "level": 4, "value": 15, "armor": 18, "stamina": 5, "strength": 2, "description": "Stretched hide, drummed tight.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.kha.gloom_creek_waders", "name": "Gloom Creek Waders", "kind": "gear", "slot": "feet", "quality": 2, "level": 4, "value": 15, "armor": 9, "stamina": 4, "agility": 3, "description": "The creek gave them back. It does not give much back.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.kha.petrified_knuckle", "name": "Petrified Knuckle", "kind": "gear", "slot": "mainhand", "quality": 2, "level": 4, "value": 21, "weaponDamage": 14, "stamina": 5, "strength": 2, "description": "It was a hand once.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.kha.carrion_hide_leggings", "name": "Carrion-Hide Leggings", "kind": "gear", "slot": "legs", "quality": 2, "level": 3, "value": 12, "armor": 12, "stamina": 3, "agility": 2, "description": "Cured twice, and it needed it.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.kha.hush_pelt", "name": "Hush-Wolf Pelt", "kind": "gear", "slot": "shoulders", "quality": 2, "level": 4, "value": 15, "armor": 9, "stamina": 3, "agility": 4, "description": "The wolves of the Hush make no sound. Neither does this.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.kha.sextons_spade", "name": "The Sexton's Spade", "kind": "gear", "slot": "mainhand", "quality": 3, "level": 4, "value": 28, "weaponDamage": 17, "stamina": 7, "strength": 6, "description": "He dug every grave in Khaven, and then his own.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.kha.shawl_of_the_uncounted", "name": "Shawl of the Uncounted", "kind": "gear", "slot": "shoulders", "quality": 3, "level": 4, "value": 20, "armor": 12, "stamina": 8, "strength": 5, "description": "One thread for each name he never wrote down.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.kha.mourners_iron_band", "name": "Mourner's Iron Band", "kind": "gear", "slot": "neck", "quality": 3, "level": 4, "value": 20, "stamina": 6, "strength": 5, "description": "Worn until the grief is done, so it is never taken off.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.kha.pane_of_the_final_sum", "name": "Pane of the Final Sum", "kind": "gear", "slot": "offhand", "quality": 3, "level": 6, "value": 28, "armor": 31, "stamina": 9, "strength": 9, "description": "Cold glass. Your reflection is a little behind you.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.kha.cold_count_gauntlets", "name": "Gauntlets of the Cold Count", "kind": "gear", "slot": "hands", "quality": 3, "level": 6, "value": 28, "armor": 17, "stamina": 9, "strength": 9, "description": "The fingers keep count on their own.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.kha.the_unpaid_debt", "name": "The Unpaid Debt", "kind": "gear", "slot": "neck", "quality": 4, "level": 6, "value": 35, "stamina": 10, "strength": 8, "agility": 4, "description": "It was owed to the Reckoner. Now it is owed to you.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.kha.wood_edge_jerkin", "name": "Wenna's Wood-Edge Jerkin", "kind": "gear", "slot": "chest", "quality": 2, "level": 3, "value": 12, "armor": 12, "stamina": 3, "agility": 2, "description": "Her brother's. He does not go to the wood any more.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.kha.hold_breakers_maul", "name": "Hold-Breaker's Maul", "kind": "gear", "slot": "mainhand", "quality": 2, "level": 3, "value": 17, "weaponDamage": 12, "stamina": 2, "strength": 3, "description": "For doors, mostly.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.kha.morrows_road_greaves", "name": "Morrow's Road Greaves", "kind": "gear", "slot": "legs", "quality": 3, "level": 4, "value": 20, "armor": 19, "stamina": 6, "strength": 5, "description": "Ansel walked north in these once. He came back.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.kha.tallow_proofed_capelet", "name": "Cato's Tallow-Proofed Capelet", "kind": "gear", "slot": "shoulders", "quality": 2, "level": 4, "value": 15, "armor": 9, "stamina": 4, "agility": 3, "description": "Sheds rain, and smells of candles.", "canonStatus": "GAME-ONLY"}
+  ],
+  "vendors": [
+    {"npc": "Cato Brisk", "items": ["loot.kha.tallow_proofed_capelet"]}
+  ],
+  "gear": [
+    {"id": "loot.kha.outrider_bearded_axe", "look": "axe.bearded:plain/sandthrone", "source": "mob:outrider@khaven"},
+    {"id": "loot.kha.dune_scarf", "look": "head.wrap:scarf/sandthrone", "source": "mob:outrider@khaven"},
+    {"id": "loot.kha.picket_shield", "look": "shield.round:hide/sandthrone", "source": "mob:outrider@khaven"},
+    {"id": "loot.kha.gloom_creek_waders", "look": "feet.boots:waders/khaven", "source": "mob:hollow@khaven"},
+    {"id": "loot.kha.petrified_knuckle", "look": "mace.flanged:fist/khaven", "source": "mob:hollow@khaven"},
+    {"id": "loot.kha.carrion_hide_leggings", "look": "legs.leggings:hide/khaven", "source": "mob:boar@khaven"},
+    {"id": "loot.kha.hush_pelt", "look": "shoulder.mantle:fur/khaven", "source": "mob:wolf@khaven"},
+    {"id": "loot.kha.sextons_spade", "look": "polearm:spade/khaven", "source": "boss:The Grey Sexton", "boss": true, "unique": true},
+    {"id": "loot.kha.shawl_of_the_uncounted", "look": "shoulder.mantle:shawl/khaven", "source": "boss:The Grey Sexton", "boss": true, "unique": true},
+    {"id": "loot.kha.mourners_iron_band", "look": "neck.torc:band/khaven", "source": "boss:The Grey Sexton", "boss": true, "unique": true},
+    {"id": "loot.kha.pane_of_the_final_sum", "look": "shield.heater:glass/pale+glow", "source": "boss:The Pale Reckoner", "boss": true, "unique": true},
+    {"id": "loot.kha.cold_count_gauntlets", "look": "hands.gauntlets:glass/pale", "source": "boss:The Pale Reckoner", "boss": true, "unique": true},
+    {"id": "loot.kha.the_unpaid_debt", "look": "neck.pendant:glass/pale+glow", "source": "boss:The Pale Reckoner", "boss": true, "unique": true, "effects": [{"kind": "stat", "stat": "MaxHealth", "amount": 5, "percent": true, "text": "+5% maximum health."}]},
+    {"id": "loot.kha.wood_edge_jerkin", "look": "chest.jerkin:leather/khaven", "source": "quest:npc.wenna.wolves"},
+    {"id": "loot.kha.hold_breakers_maul", "look": "hammer.war:maul/khaven", "source": "quest:main.khaven.1"},
+    {"id": "loot.kha.morrows_road_greaves", "look": "legs.greaves:plate/khaven", "source": "quest:main.khaven.3"},
+    {"id": "loot.kha.tallow_proofed_capelet", "look": "shoulder.mantle:cloth/khaven", "source": "vendor:Cato Brisk"}
+  ],
+  "drops": [
+    {"id": "drop.kha.sexton", "zone": "khaven", "mob": "The Grey Sexton", "rank": "elite", "groups": [{"chance": 0.5, "signature": true, "pick": [{"item": "loot.kha.sextons_spade"}, {"item": "loot.kha.shawl_of_the_uncounted"}]}, {"chance": 0.15, "lucky": true, "pick": [{"item": "loot.kha.mourners_iron_band"}]}]},
+    {"id": "drop.kha.reckoner", "zone": "khaven", "mob": "The Pale Reckoner", "rank": "elite", "groups": [{"chance": 0.5, "signature": true, "pick": [{"item": "loot.kha.pane_of_the_final_sum"}, {"item": "loot.kha.cold_count_gauntlets"}]}, {"chance": 0.04, "lucky": true, "pity": 25, "pick": [{"item": "loot.kha.the_unpaid_debt"}]}]},
+    {"id": "drop.kha.outriders", "zone": "khaven", "tag": "outrider", "rank": "normal", "groups": [{"chance": 0.03, "lucky": true, "pick": [{"item": "loot.kha.outrider_bearded_axe"}, {"item": "loot.kha.dune_scarf"}, {"item": "loot.kha.picket_shield"}]}]},
+    {"id": "drop.kha.hollows", "zone": "khaven", "tag": "hollow", "rank": "normal", "groups": [{"chance": 0.03, "lucky": true, "pick": [{"item": "loot.kha.gloom_creek_waders"}, {"item": "loot.kha.petrified_knuckle"}]}]},
+    {"id": "drop.kha.boars", "zone": "khaven", "tag": "boar", "rank": "normal", "groups": [{"chance": 0.03, "lucky": true, "pick": [{"item": "loot.kha.carrion_hide_leggings"}]}]},
+    {"id": "drop.kha.wolves", "zone": "khaven", "tag": "wolf", "rank": "normal", "groups": [{"chance": 0.03, "lucky": true, "pick": [{"item": "loot.kha.hush_pelt"}]}]}
+  ],
+  "sets": [
+  ]
+}

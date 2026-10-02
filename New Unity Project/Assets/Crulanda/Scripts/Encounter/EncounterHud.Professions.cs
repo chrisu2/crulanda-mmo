@@ -7,8 +7,10 @@ namespace Crulanda.Encounter
     /// then the crafts and how many of them are taken up); on the right, on parchment, the chosen trade's page: what it is, how
     /// far the skill has come, whether its tool hangs at the belt, and for a gathering skill its trade bag (worn, or who makes it) and the guide to its seams, windfalls or
     /// herbs (NodeGuide). A trade with recipes has a second tab, its recipes (RecipePage): the list coloured by what each still
-    /// teaches, the chosen one's makings, the station in reach, and Make and Make all. It stands where the character sheet does,
-    /// with the bags open beside it; E at a station opens it on the station's trade, at its recipes.
+    /// teaches, the chosen one's makings, the station in reach, and Make and Make all. A craft not taken up offers "Take up" where
+    /// it can be taken up (at its station, or beside one of its trainers), and one taken up offers "Forget", which asks first. It
+    /// stands where the character sheet does, with the bags open beside it; E at a station opens it on the station's trade, at its
+    /// recipes.
     /// </summary>
     public sealed partial class EncounterHud
     {
@@ -23,27 +25,55 @@ namespace Crulanda.Encounter
         public static string TradesRecipe;
         /// <summary>The Recipes tab lists only what can be made from the bags now.</summary>
         public static bool TradesCanMakeOnly;
+        /// <summary>The craft whose Forget is being confirmed, by id (null: none). While it is set the rest of the window waits on the
+        /// answer. Capture tools set it; closing the window drops it.</summary>
+        public static string TradesForget;
         static readonly Color SkillBar = new Color(.78f, .58f, .22f), Dim = new Color(.68f, .66f, .6f);
         GUIStyle tradeNote;
+        int tradesDrawnFrame = -10;
+        /// <summary>Whether a control in the Trades window answers: never while a Forget is being confirmed.</summary>
+        static bool Live(bool on) { return on && TradesForget == null; }
 
         void DrawTrades()
         {
             QuestStyles(); ItemStyles(); var log = session.Professions; if (log == null) return;
             if (tradeNote == null) tradeNote = new GUIStyle(tiny) { wordWrap = false, clipping = TextClipping.Clip };
+            if (tradesDrawnFrame < 0 || Time.frameCount - tradesDrawnFrame > 1) TradesForget = null;   // the window was shut between, or this is a new scene's HUD: the question went with it
+            tradesDrawnFrame = Time.frameCount;
+            if (TradesForget != null && !log.Has(TradesForget)) TradesForget = null;
             var w = TradesRect;
             Fill(new Rect(w.x - 3, w.y - 3, w.width + 6, w.height + 6), new Color(.3f, .22f, .12f, .98f)); Fill(w, new Color(.08f, .075f, .07f, .97f));
             Shadow(new Rect(w.x + 16, w.y + 10, 300, 32), "TRADES", heading, gold);
+            GUI.enabled = Live(true);
             if (GUI.Button(new Rect(w.xMax - 124, w.y + 12, 110, 30), "Close [K]", micro)) session.ShowTrades(false);
             var list = new Rect(w.x + 14, w.y + 54, 212, w.height - 68); var page = new Rect(list.xMax + 14, list.y, w.xMax - list.xMax - 28, list.height);
             Fill(list, new Color(1, 1, 1, .04f));
-            if (log.Db.Order.Count == 0) { Shadow(new Rect(page.x, page.y + 10, page.width, 30), "No trades are known here.", text, new Color(.8f, .8f, .8f)); return; }
+            if (log.Db.Order.Count == 0) { GUI.enabled = true; Shadow(new Rect(page.x, page.y + 10, page.width, 30), "No trades are known here.", text, new Color(.8f, .8f, .8f)); return; }
             if (TradesPage == null || log.Db.Profession(TradesPage) == null) TradesPage = log.Db.Order[0].id;
             float y = list.y + 8;
             y = TradeGroup(log, list, y, "GATHERING", "gather");
             y = TradeGroup(log, list, y, "FOR EVERYONE", "free");
             TradeGroup(log, list, y, "CRAFTS  " + log.CraftSlotsUsed + " of " + log.Db.CraftSlots, "craft");
             TradePage(log, log.Db.Profession(TradesPage), page);
-            if (!bagsVisible && !charVisible && !vendorVisible) DrawTooltip();   // a recipe's item tooltip over the parchment (with the bags, the character sheet or a vendor open, DrawDragAndConfirm paints it after every window)
+            GUI.enabled = true;
+            if (TradesForget != null) ForgetConfirm(log, page);
+            else if (!bagsVisible && !charVisible && !vendorVisible) DrawTooltip();   // a recipe's item tooltip over the parchment (with the bags, the character sheet or a vendor open, DrawDragAndConfirm paints it after every window)
+        }
+        /// <summary>
+        /// The question before a craft is forgotten, over the page: "Forget Blacksmithing?", what is lost ("Skill 47 will be lost."),
+        /// that it can be taken up again from the start, and Forget or Keep. Everything else in the window waits on it.
+        /// </summary>
+        void ForgetConfirm(ProfessionLog log, Rect page)
+        {
+            var d = log.Db.Profession(TradesForget); if (d == null) { TradesForget = null; return; }
+            var r = new Rect(page.x + (page.width - 360) / 2, page.y + 150, 360, 196);
+            Fill(new Rect(page.x, page.y, page.width, page.height), new Color(0, 0, 0, .35f));
+            Fill(new Rect(r.x - 3, r.y - 3, r.width + 6, r.height + 6), new Color(.5f, .15f, .1f)); Fill(r, new Color(.08f, .07f, .07f, .98f));
+            Shadow(new Rect(r.x + 18, r.y + 14, r.width - 36, 30), "Forget " + d.name + "?", heading, gold);
+            string body = "Skill " + log.Skill(d.id) + " will be lost. You can take " + d.name + " up again, from 1, wherever it is taught.";
+            Shadow(new Rect(r.x + 18, r.y + 52, r.width - 36, 80), body, small, new Color(.9f, .88f, .82f));
+            if (GUI.Button(new Rect(r.x + 18, r.yMax - 54, 150, 38), "Forget", button)) { string id = TradesForget; TradesForget = null; session.ForgetCraft(id); }
+            if (GUI.Button(new Rect(r.xMax - 168, r.yMax - 54, 150, 38), "Keep it", button)) TradesForget = null;
         }
         /// <summary>A heading and the rows of one kind of trade. Returns the y under them (unchanged when there is none of that kind).</summary>
         float TradeGroup(ProfessionLog log, Rect list, float y, string title, string kind)
@@ -54,23 +84,48 @@ namespace Crulanda.Encounter
             {
                 if (d.kind != kind) continue;
                 var r = new Rect(list.x + 6, y, list.width - 12, 50); bool has = log.Has(d.id);
-                GUI.enabled = TradesPage != d.id;
+                GUI.enabled = Live(TradesPage != d.id);
                 if (GUI.Button(r, GUIContent.none, qList)) TradesPage = d.id;
-                GUI.enabled = true;
+                GUI.enabled = Live(true);
                 Shadow(new Rect(r.x + 10, r.y + 3, r.width - 20, 22), d.name, qHead, has ? Color.white : Dim);
                 if (has) UnitBar(new Rect(r.x + 10, r.y + 30, r.width - 20, 12), log.Skill(d.id) / (float)ProfessionDatabase.MaxSkill, SkillBar, log.Skill(d.id) + " / " + ProfessionDatabase.MaxSkill);
-                else Shadow(new Rect(r.x + 10, r.y + 25, r.width - 14, 22), ShortNeed(d), tradeNote, Dim);
+                else Shadow(new Rect(r.x + 10, r.y + 25, r.width - 14, 22), ShortNeed(d), tradeNote, d.kind == "craft" && session.CanTakeUp(d.id, out _) ? gold : Dim);
                 y += 54;
             }
             return y + 8;
         }
-        /// <summary>Why a trade's row has no bar, in a few words: "Needs a pick (merchants)", or "Not taken up" for a craft.</summary>
+        /// <summary>Why a trade's row has no bar, in a few words: "Needs a pick (merchants)"; for a craft "Take up Blacksmithing" where
+        /// it can be taken up now, "Two crafts already" with every slot used, else "Not taken up".</summary>
         string ShortNeed(ProfessionDef d)
         {
+            if (d.kind == "craft")
+            {
+                var log = session.Professions;
+                if (log != null && log.CraftSlotsUsed >= log.Db.CraftSlots) return log.CraftsFullLine.Substring(0, log.CraftsFullLine.IndexOf('.'));
+                return session.CanTakeUp(d.id, out _) ? "Take up " + d.name : "Not taken up";
+            }
             var tool = string.IsNullOrEmpty(d.tool) ? null : session.Items?.Get(d.tool);
             if (tool == null) return "Not taken up";
             string word = tool.name.Substring(tool.name.LastIndexOf(' ') + 1);
             return "Needs a " + word + " (merchants)";
+        }
+        /// <summary>
+        /// A craft's place in the character's life, on its page at <paramref name="y"/>: not taken up, the "Take up Blacksmithing" button
+        /// (live only where it can be taken up), why not when it can't ("Two crafts already. Forget one first.", or where it is taught),
+        /// and where it is taught (learnAt); taken up, nothing here (Forget sits at the foot of the page). Returns the y under it.
+        /// </summary>
+        float TakeUpBlock(ProfessionLog log, ProfessionDef d, float x, float y, float width, bool full)
+        {
+            if (d.kind != "craft" || log.Has(d.id)) return y;
+            bool can = session.CanTakeUp(d.id, out string why);
+            GUI.enabled = Live(can);
+            if (GUI.Button(new Rect(x, y, full ? 250 : 210, full ? 36 : 28), "Take up " + d.name, full ? button : micro) && session.LearnCraft(d.id)) { TradesRecipes = true; TradesRecipe = null; }
+            GUI.enabled = Live(true);
+            y += full ? 42 : 32;
+            if (!full) return y;
+            if (!can && why != null) { measureContent.text = why; float h = qSmall.CalcHeight(measureContent, width); Ink(new Rect(x, y, width, h), why, qSmall, HardInk); y += h + 6; }
+            if (!string.IsNullOrEmpty(d.learnAt)) { measureContent.text = d.learnAt; float h = qSmall.CalcHeight(measureContent, width); Ink(new Rect(x, y, width, h), d.learnAt, qSmall, InkBrown); y += h + 8; }
+            return y;
         }
         static string LowerFirst(string s) { return string.IsNullOrEmpty(s) ? s : char.ToLowerInvariant(s[0]) + s.Substring(1); }
         /// <summary>Who makes the trade bags, and where (GAME-ONLY).</summary>
@@ -90,9 +145,9 @@ namespace Crulanda.Encounter
             bool recipes = log.Db.RecipesFor(d.id).Count > 0;
             if (recipes)
             {
-                GUI.enabled = TradesRecipes; if (GUI.Button(new Rect(page.xMax - 176, page.y + 14, 76, 26), "About", micro)) TradesRecipes = false;
-                GUI.enabled = !TradesRecipes; if (GUI.Button(new Rect(page.xMax - 96, page.y + 14, 76, 26), "Recipes", micro)) TradesRecipes = true;
-                GUI.enabled = true;
+                GUI.enabled = Live(TradesRecipes); if (GUI.Button(new Rect(page.xMax - 176, page.y + 14, 76, 26), "About", micro)) TradesRecipes = false;
+                GUI.enabled = Live(!TradesRecipes); if (GUI.Button(new Rect(page.xMax - 96, page.y + 14, 76, 26), "Recipes", micro)) TradesRecipes = true;
+                GUI.enabled = Live(true);
                 if (TradesRecipes) { RecipePage(log, d, page); return; }
             }
             Ink(new Rect(x, py, recipes ? inner - 170 : inner, 32), d.name, qTitle, brown); py += 34;
@@ -109,6 +164,9 @@ namespace Crulanda.Encounter
                 : has ? null : "Not taken up.";
             if (state != null)
             { measureContent.text = state; float h = qSmall.CalcHeight(measureContent, inner); Ink(new Rect(x, py, inner, h), state, qSmall, has ? new Color(.2f, .36f, .14f) : new Color(.55f, .2f, .1f)); py += h + 10; }
+            // A craft: take it up here, or where it is taught; once taken up, Forget at the foot of the page (it asks first).
+            py = TakeUpBlock(log, d, x, py, inner, true);
+            if (d.kind == "craft" && has && GUI.Button(new Rect(x, page.yMax - 80, 210, 32), "Forget " + d.name + "...", micro)) TradesForget = d.id;
             // The trade bag for what this skill gathers: worn, carried, or who makes it.
             var bag = d.kind == "gather" ? BagForTrade(log, d) : null;
             if (bag != null)
@@ -183,6 +241,7 @@ namespace Crulanda.Encounter
             var brown = new Color(.42f, .22f, .05f); var items = session.Items;
             Ink(new Rect(x, py, inner - 170, 32), d.name, qTitle, brown); py += 38;
             if (has) UnitBar(new Rect(x, py + 2, inner, 18), skill / (float)ProfessionDatabase.MaxSkill, SkillBar, "Skill " + skill + " of " + ProfessionDatabase.MaxSkill);
+            else if (d.kind == "craft" && session.CanTakeUp(d.id, out _)) { TakeUpBlock(log, d, x, py - 2, inner, false); py += 2; }   // at its station or beside a trainer: the button where the bar will be
             else Ink(new Rect(x, py, inner, 22), ShortNeed(d), qSmall, HardInk);
             py += 30;
             // The list.
@@ -240,14 +299,16 @@ namespace Crulanda.Encounter
             py += 28;
             // Make, Make all, and why not.
             bool can = session.CanCraft(rec, out string why); int all2 = can ? log.CanMake(rec) : 0;
-            GUI.enabled = can && !session.Working;
+            GUI.enabled = Live(can && !session.Working);
             if (GUI.Button(new Rect(x, py, 110, 32), "Make", micro)) session.Make(rec, 1);
             if (GUI.Button(new Rect(x + 120, py, 150, 32), "Make all (" + all2 + ")", micro)) session.Make(rec, all2);
-            GUI.enabled = true;
+            GUI.enabled = Live(true);
+            var helper = can ? session.CraftHelper(rec) : null;
             py += 38;
             if (!can && why != null && why != ProfessionLog.StationWanted(rec.station) && py + 20 <= page.yMax - 6)
             { measureContent.text = why; float h = Mathf.Min(qSmall.CalcHeight(measureContent, inner), page.yMax - 6 - py); Ink(new Rect(x, py, inner, h), why, qSmall, HardInk); }
-            else if (session.Working && py + 20 <= page.yMax - 6) Ink(new Rect(x, py, inner, 22), "At work: moving stops it.", qSmall, InkBrown);
+            else if (session.Working && py + 20 <= page.yMax - 6) Ink(new Rect(x, py, inner, 22), helper != null ? "At work, " + helper.Name + " beside you: moving stops it." : "At work: moving stops it.", nodeInk, InkBrown);
+            else if (helper != null && py + 20 <= page.yMax - 6) Ink(new Rect(x, py, inner, 22), helper.Name + " lends a hand: each one takes half the time.", nodeInk, GoodInk);
         }
     }
 }

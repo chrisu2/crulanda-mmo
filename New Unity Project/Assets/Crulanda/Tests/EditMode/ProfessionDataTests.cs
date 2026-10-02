@@ -12,7 +12,8 @@ namespace Crulanda.Tests
     /// design says, and a bad file is caught with every problem named.</summary>
     public class ProfessionDataTests
     {
-        static List<string> Texts(string folder)
+        /// <summary>Every JSON file in an EncounterContent folder (Items, Professions), as text.</summary>
+        public static List<string> Texts(string folder)
         {
             var texts = new List<string>();
             foreach (var f in Directory.GetFiles(Path.Combine(Application.dataPath, "Crulanda", "EncounterContent", folder), "*.json")) texts.Add(File.ReadAllText(f));
@@ -371,6 +372,150 @@ namespace Crulanda.Tests
             Assert.AreEqual("forge", Crulanda.World.ZoneBuilder.StationKind("forge")); Assert.AreEqual("fire", Crulanda.World.ZoneBuilder.StationKind("oven"));
             Assert.AreEqual("fire", Crulanda.World.ZoneBuilder.StationKind("kitchen")); Assert.AreEqual("bench", Crulanda.World.ZoneBuilder.StationKind("dryhut"));
             Assert.IsNull(Crulanda.World.ZoneBuilder.StationKind("kitchendoor")); Assert.IsNull(Crulanda.World.ZoneBuilder.StationKind("stall")); Assert.IsNull(Crulanda.World.ZoneBuilder.StationKind("tannery"));
+        }
+
+        // ---------- the crafts (DESIGN 5.2, 5.3; BUILD_PLAN steps 12 and 13) ----------
+        /// <summary>The Blacksmith's 21 pieces by the skill each is made at, with its makings (DESIGN 5.2).</summary>
+        static readonly (int skill, string item, string makings)[] Pieces = {
+            (5, "craft.copper_cudgel", "mat.copper_bar 2, mat.oak_log 1"), (8, "craft.copper_buckler", "mat.copper_bar 1, mat.oak_log 2"),
+            (12, "craft.copper_gauntlets", "mat.copper_bar 2"), (16, "craft.copper_jerkin", "mat.copper_bar 3"),
+            (24, "craft.bogiron_hatchet", "mat.bogiron_bar 3, mat.blackpine_log 1"), (28, "craft.bogiron_helm", "mat.bogiron_bar 2"),
+            (32, "craft.bogiron_greaves", "mat.bogiron_bar 3"), (36, "craft.bogiron_hauberk", "mat.bogiron_bar 4"),
+            (44, "craft.ridgesteel_blade", "mat.ridgesteel_bar 3, mat.stonepine_log 1"), (48, "craft.ridgesteel_shield", "mat.ridgesteel_bar 2, mat.stonepine_log 2"),
+            (52, "craft.ridgesteel_pauldrons", "mat.ridgesteel_bar 3"), (56, "craft.ridgesteel_cuirass", "mat.ridgesteel_bar 4"),
+            (64, "craft.ashsteel_cleaver", "mat.ashsteel_bar 3, mat.snag_wood 1"), (68, "craft.ashsteel_helm", "mat.ashsteel_bar 3"),
+            (72, "craft.ashsteel_sabatons", "mat.ashsteel_bar 3"), (76, "craft.ashsteel_hauberk", "mat.ashsteel_bar 4"),
+            (84, "craft.veridian_warblade", "mat.veridian_bar 4, mat.ghostoak_log 1"), (88, "craft.veridian_shield", "mat.veridian_bar 3, mat.ghostoak_log 2"),
+            (92, "craft.veridian_legplates", "mat.veridian_bar 4"), (96, "craft.veridian_breastplate", "mat.veridian_bar 5"),
+            (100, "craft.heartwood_greatblade", "mat.veridian_bar 8, mat.ghostoak_log 2, mat.charcoal 4") };
+
+        /// <summary>
+        /// Blacksmithing (DESIGN 5.2): five smelts at a forge, each two of its tier's ore and a charcoal for one bar, at skill 1, 20, 40,
+        /// 60 and 80; the bars are materials the ore-poke holds and selling them feeds the smith's ore; then the 21 pieces at the skills
+        /// and from the makings the design gives, each named for what it makes, made of its own tier's bars.
+        /// </summary>
+        [Test] public void Blacksmithing_HasTheFiveSmeltsAndTwentyOnePieces()
+        {
+            var items = Items(); var db = Db(items);
+            var smelts = new[] { ("recipe.copper_bar", "mat.copper_ore", "mat.copper_bar", 1, 4), ("recipe.bogiron_bar", "mat.bogiron_ore", "mat.bogiron_bar", 20, 7),
+                ("recipe.ridgesteel_bar", "mat.adit_ore", "mat.ridgesteel_bar", 40, 10), ("recipe.ashsteel_bar", "mat.cinder_ore", "mat.ashsteel_bar", 60, 13), ("recipe.veridian_bar", "mat.veridian_ore", "mat.veridian_bar", 80, 19) };
+            var all = db.RecipesFor("blacksmithing");
+            Assert.AreEqual(26, all.Count, "Five smelts and 21 pieces.");
+            Assert.IsTrue(all.All(r => r.station == "forge"), "Everything a smith makes is made at a forge.");
+            foreach (var (id, ore, bar, skill, value) in smelts)
+            {
+                var r = db.Recipe(id); Assert.NotNull(r, id);
+                Assert.AreEqual("blacksmithing", r.profession, id); Assert.AreEqual(skill, r.skill, id);
+                Assert.AreEqual(ore + " 2, mat.charcoal 1", string.Join(", ", r.inputs.Select(i => i.item + " " + i.count)), id);
+                Assert.AreEqual(bar, r.output, id); Assert.AreEqual(1, r.count, id);
+                Assert.IsTrue(db.NodesFor("mining").Exists(n => n.item == ore && n.skill == skill), id + ": its ore is mined at the same tier.");
+                var d = items.Get(bar); Assert.NotNull(d, bar);
+                Assert.AreEqual("material", d.kind, bar); Assert.AreEqual(1, d.quality, bar); Assert.AreEqual(20, d.stack, bar); Assert.AreEqual(value, d.value, bar);
+                Assert.AreEqual("forge.ore", d.trade, bar + " sold in a village feeds the smith's ore."); Assert.AreEqual("ore", d.pouch, bar + " goes in the ore-poke.");
+                Assert.AreEqual(r.name, d.name, id); Assert.AreEqual("GAME-ONLY", d.canonStatus, bar); Assert.IsFalse(string.IsNullOrEmpty(d.description), bar);
+            }
+            foreach (var (skill, item, makings) in Pieces)
+            {
+                var r = all.Find(x => x.output == item); Assert.NotNull(r, item + " has a recipe.");
+                Assert.AreEqual("recipe." + item.Substring("craft.".Length), r.id); Assert.AreEqual(skill, r.skill, item); Assert.AreEqual(1, r.count, item);
+                Assert.AreEqual(makings, string.Join(", ", r.inputs.Select(i => i.item + " " + i.count)), item);
+                var d = items.Get(item); Assert.NotNull(d, item); Assert.AreEqual(r.name, d.name, item + ": the recipe is named for what it makes.");
+                string tier = item.Substring(6, item.IndexOf('_') - 6); if (tier == "heartwood") tier = "veridian";
+                Assert.IsTrue(r.inputs.Any(i => i.item == "mat." + tier + "_bar"), item + " is made of " + tier + " bars.");
+            }
+            CollectionAssert.AreEqual(smelts.Select(x => x.Item1).Concat(Pieces.Select(p => "recipe." + p.item.Substring(6))).OrderBy(x => db.Recipe(x).skill).ThenBy(x => x, StringComparer.Ordinal), all.Select(r => r.id), "Easiest first.");
+        }
+
+        /// <summary>
+        /// The crafted pieces sit on the generated-gear curve (DESIGN 5.2): each is gear of its slot, uncommon, required at its zone's top
+        /// level less one, with the damage or armour and the value generated uncommon gear has at that level, and one stat of about a
+        /// quarter of the curve's power. The capstone is the one rare: required at 12, 36 damage (under the 38 of every level-13 rare
+        /// weapon), +5 Strength and +5 Stamina. Every piece has its own look in looks.json and a line in the world's voice.
+        /// </summary>
+        [Test] public void CraftedGear_SitsOnTheGeneratedCurve()
+        {
+            var items = Items(); var looks = GearLooks.Parse(Resources.Load<TextAsset>("Gear/looks").text);
+            var crafted = items.Items.Values.Where(d => d.id.StartsWith("craft.", StringComparison.Ordinal)).ToList();
+            CollectionAssert.AreEquivalent(Pieces.Select(p => p.item), crafted.Select(d => d.id), "The 21 pieces, and nothing else, are craft.* items.");
+            foreach (var d in crafted)
+            {
+                Assert.AreEqual("gear", d.kind, d.id); Assert.GreaterOrEqual(ItemDatabase.SlotIndex(d.slot), 0, d.id);
+                Assert.IsTrue(new[] { 1, 4, 7, 9, 12 }.Contains(d.level), d.id + " is required at a zone's top level less one (" + d.level + ").");
+                var l = looks.Resolve(d); Assert.IsFalse(l.fallback, d.id + " has its own look."); Assert.AreEqual(d.slot, GearLooks.Family(l.family).slot, d.id);
+                Assert.IsFalse(string.IsNullOrEmpty(d.description), d.id); Assert.IsTrue(d.canonStatus != null && d.canonStatus.StartsWith("GAME-ONLY"), d.id);
+                int stats = d.stamina + d.strength + d.agility + d.intellect + d.spirit;
+                if (d.id == "craft.heartwood_greatblade")
+                {
+                    Assert.AreEqual(3, d.quality, "The capstone is rare."); Assert.AreEqual(12, d.level); Assert.AreEqual("mainhand", d.slot);
+                    Assert.LessOrEqual(d.weaponDamage, 36); Assert.Less(d.weaponDamage, items.Get(ItemDatabase.GearId("mainhand", 13, 3, 0)).weaponDamage, "Under a generated level-13 rare.");
+                    Assert.AreEqual(5, d.strength); Assert.AreEqual(5, d.stamina); Assert.AreEqual(10, stats);
+                    continue;
+                }
+                var gen = items.Get(ItemDatabase.GearId(d.slot, d.level + 1, 2, 0));
+                Assert.AreEqual(2, d.quality, d.id + " is uncommon.");
+                Assert.That(d.weaponDamage, Is.InRange(gen.weaponDamage - 1, gen.weaponDamage + 1), d.id + ": damage on the curve at level " + (d.level + 1));
+                Assert.That(d.armor, Is.InRange(gen.armor - 1, gen.armor + 1), d.id + ": armour on the curve at level " + (d.level + 1));
+                Assert.AreEqual(gen.value, d.value, d.id + ": value is generated gear's.");
+                Assert.AreEqual(gen.level, d.level, d.id);
+                Assert.AreEqual(Mathf.Max(1, Mathf.RoundToInt((d.level + 1) * 1.35f / 4)), stats, d.id + ": one stat of about a quarter of the curve's power.");
+                Assert.AreEqual(1, new[] { d.stamina, d.strength, d.agility, d.intellect, d.spirit }.Count(x => x > 0), d.id + " has one stat.");
+                // Above the vendor's common of its level, which has no stat to speak of.
+                var common = items.Get(ItemDatabase.GearId(d.slot, d.level + 1, 1, 0));
+                Assert.Greater(d.weaponDamage + d.armor, common.weaponDamage + common.armor, d.id + " beats the vendor's common.");
+            }
+        }
+
+        /// <summary>
+        /// Alchemy (DESIGN 5.3): five draughts at a herbalist's bench, at skill 1, 20, 40, 60 and 80: the four that were already in the
+        /// game and the new Tarnwater draught, each from its tier's herbs and a vial, named for what it makes. The Tarnwater draught
+        /// heals 280 at level 6, between the Healing draught and the Salt-cured tonic.
+        /// </summary>
+        [Test] public void Alchemy_HasTheFivePotionsOfTheDesign()
+        {
+            var items = Items(); var db = Db(items);
+            var expect = new[] { ("recipe.potion_minor", 1, "mat.yarrow 2, mat.vial 1", "potion.minor", 90), ("recipe.potion_healing", 20, "mat.mourners_cap 2, mat.yarrow 1, mat.vial 1", "potion.healing", 200),
+                ("recipe.potion_tarn", 40, "mat.tarnwort 2, mat.mourners_cap 1, mat.vial 1", "potion.tarn", 280), ("recipe.potion_salt", 60, "mat.cinder_thistle 2, mat.salt 1, mat.vial 1", "potion.salt", 360),
+                ("recipe.potion_dewfern", 80, "mat.dewfern 2, mat.tarnwort 1, mat.vial 1", "potion.dewfern", 520) };
+            CollectionAssert.AreEqual(expect.Select(e => e.Item1), db.RecipesFor("alchemy").Select(r => r.id), "Alchemy's recipes, easiest first.");
+            foreach (var (id, skill, makings, output, heal) in expect)
+            {
+                var r = db.Recipe(id); Assert.NotNull(r, id);
+                Assert.AreEqual("alchemy", r.profession, id); Assert.AreEqual(skill, r.skill, id); Assert.AreEqual("bench", r.station, id + " is made at a herbalist's bench.");
+                Assert.AreEqual(makings, string.Join(", ", r.inputs.Select(i => i.item + " " + i.count)), id); Assert.AreEqual(output, r.output, id); Assert.AreEqual(1, r.count, id);
+                var d = items.Get(output); Assert.NotNull(d, output);
+                Assert.AreEqual("consumable", d.kind, output); Assert.IsFalse(d.food, output + " is drunk, and works in a fight."); Assert.AreEqual(heal, d.heal, output);
+                Assert.AreEqual(r.name, d.name, id + " is named for what it makes.");
+            }
+            var tarn = items.Get("potion.tarn");
+            Assert.AreEqual(6, tarn.level); Assert.AreEqual(11, tarn.value); Assert.AreEqual(10, tarn.stack); Assert.AreEqual("GAME-ONLY", tarn.canonStatus); Assert.IsFalse(string.IsNullOrEmpty(tarn.description));
+            Assert.IsFalse(items.Vendors.Any(v => (v.items ?? new string[0]).Contains("potion.tarn")), "The Tarnwater draught is made, not sold.");
+        }
+
+        /// <summary>
+        /// The two crafts can be taken up and are worked beside their trade (DESIGN 4, 6.2): each says where it is taken up, what is said
+        /// when it is taken up alone, and what its trade's people say: Brannoc Vell and Lisbet Crane in their own words, and a line for
+        /// any other blacksmith or herbalist. The trainer roles are trades the villages have.
+        /// </summary>
+        [Test] public void Crafts_say_where_they_are_taken_up_and_their_trainers_have_words()
+        {
+            var db = Db(Items());
+            foreach (var (id, trainer, role) in new[] { ("blacksmithing", "Brannoc Vell", "blacksmith"), ("alchemy", "Lisbet Crane", "herbalist") })
+            {
+                var d = db.Profession(id);
+                Assert.AreEqual(role, d.trainerRole, id);
+                Assert.IsFalse(string.IsNullOrEmpty(d.learnAt), id + " says where it is taken up."); Assert.IsFalse(string.IsNullOrEmpty(d.takeUp), id + " has its words for taking it up alone.");
+                Assert.IsTrue(d.helping != null && d.helping.Contains("{name}"), id + ": the chat line for a helper names them.");
+                Assert.IsNotNull(ProfessionDatabase.LineFor(d.trainerLines, trainer), id + ": " + trainer + " has a line.");
+                Assert.AreNotEqual(ProfessionDatabase.LineFor(d.trainerLines, "Nobody In Particular"), ProfessionDatabase.LineFor(d.trainerLines, trainer), id + ": " + trainer + "'s line is their own.");
+                Assert.IsNotNull(ProfessionDatabase.LineFor(d.trainerLines, "Nobody In Particular"), id + ": any other trainer has a line.");
+                Assert.IsNotNull(ProfessionDatabase.LineFor(d.helpLines, trainer), id + ": " + trainer + " has words while helping.");
+                Assert.IsNotNull(ProfessionDatabase.LineFor(d.helpLines, "Nobody In Particular"), id + ": and anyone of the trade.");
+            }
+            Assert.AreEqual("Mind the scale. Copper first; it forgives you.", ProfessionDatabase.LineFor(db.Profession("blacksmithing").trainerLines, "Brannoc Vell"));
+            Assert.IsNull(ProfessionDatabase.LineFor(null, "Brannoc Vell")); Assert.IsNull(ProfessionDatabase.LineFor(new[] { new TradeLine { npc = "Oska", text = "Only for Oska." } }, "Brannoc Vell"));
+            // A craft line with no text is refused with the rest of a bad file.
+            var e = Assert.Throws<ArgumentException>(() => ProfessionDatabase.Parse(new[] { "{ \"professions\": [ { \"id\": \"tanning\", \"name\": \"Tanning\", \"kind\": \"craft\", \"trainerLines\": [ { \"npc\": \"Maud Tanner\" } ] } ] }" }, Items()));
+            StringAssert.Contains("Profession 'tanning': a trainer line with no text", e.Message); StringAssert.Contains("Profession 'tanning': a craft with no station", e.Message);
         }
     }
 }

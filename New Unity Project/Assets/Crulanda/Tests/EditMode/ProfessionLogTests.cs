@@ -379,5 +379,138 @@ namespace Crulanda.Tests
             Assert.IsTrue(log.Craft(log.Db.Recipe("recipe.charcoal_ghostoak"), AtForge, rng, out var w), w); Assert.AreEqual(100, wood.skill);
             Assert.AreEqual(5, Inventory.Count(p, "mat.charcoal"), "A ghost-oak log makes five.");
         }
+
+        // ---------- crafts: two at most, taken up and forgotten (DESIGN 4; BUILD_PLAN step 12) ----------
+        /// <summary>
+        /// The owner's rule: two crafts at once. With a third craft in the content (Tanning, made up for the test), Blacksmithing and
+        /// Alchemy taken up leave no slot, so the third is refused and nothing changes; forgetting one frees the slot for it. A trade
+        /// that is not a craft is never taken up: Cooking and Herbalism are everyone's, Mining comes with its pick.
+        /// </summary>
+        [Test] public void ThirdCraft_IsRefused()
+        {
+            var items = ProfessionDataTests.Items();
+            var texts = ProfessionDataTests.Texts("Professions");
+            texts.Add("{ \"professions\": [ { \"id\": \"tanning\", \"name\": \"Tanning\", \"kind\": \"craft\", \"station\": \"bench\", \"trainerRole\": \"leatherworker\" } ] }");
+            var db = ProfessionDatabase.Parse(texts, items); Assert.AreEqual(2, db.CraftSlots); Assert.AreEqual("craft", db.Profession("tanning").kind);
+            var log = new ProfessionLog(db, items, EncounterSession.FreshProgress()); var said = new List<string>(); log.Say = said.Add;
+            Assert.AreEqual(0, log.CraftSlotsUsed);
+            Assert.IsTrue(log.CanLearn("blacksmithing", out var why), why); Assert.IsNull(why);
+            Assert.IsTrue(log.Learn("blacksmithing", out why), why);
+            Assert.IsTrue(log.Has("blacksmithing")); Assert.AreEqual(1, log.Skill("blacksmithing"), "A craft starts at 1."); Assert.AreEqual(1, log.CraftSlotsUsed);
+            Assert.IsFalse(log.Learn("blacksmithing", out why)); Assert.AreEqual("You have taken up Blacksmithing already.", why);
+            Assert.AreEqual(1, log.Progress.professions.FindAll(s => s.id == "blacksmithing").Count, "Taken up once.");
+            Assert.IsTrue(log.Learn("alchemy", out why), why); Assert.AreEqual(2, log.CraftSlotsUsed);
+            // Both slots used: the third is refused, and nothing changes.
+            string before = Snapshot(log.Progress);
+            Assert.IsFalse(log.CanLearn("tanning", out why)); Assert.AreEqual("Two crafts already. Forget one first.", why); Assert.AreEqual(log.CraftsFullLine, why);
+            Assert.IsFalse(log.Learn("tanning", out why)); Assert.AreEqual("Two crafts already. Forget one first.", why);
+            Assert.AreEqual(before, Snapshot(log.Progress)); Assert.IsFalse(log.Has("tanning")); Assert.AreEqual(0, log.Skill("tanning"));
+            // Not crafts: never taken up.
+            Assert.IsFalse(log.CanLearn("cooking", out why)); Assert.AreEqual("Everyone knows Cooking from the start.", why);
+            Assert.IsFalse(log.CanLearn("herbalism", out why)); Assert.AreEqual("Everyone knows Herbalism from the start.", why);
+            Assert.IsFalse(log.CanLearn("mining", out why)); Assert.AreEqual("You need a miner's pick. Merchants sell them.", why);
+            Assert.IsFalse(log.CanLearn("fletching", out why)); Assert.AreEqual("There is no such trade.", why);
+            Assert.IsFalse(log.CanLearn(null, out why)); Assert.IsNotNull(why);
+            Assert.AreEqual(before, Snapshot(log.Progress));
+            // Forgetting one frees its slot, and the third can be taken up.
+            Assert.IsTrue(log.Forget("alchemy")); Assert.AreEqual(1, log.CraftSlotsUsed);
+            Assert.IsTrue(log.Learn("tanning", out why), why); Assert.AreEqual(2, log.CraftSlotsUsed); Assert.IsTrue(log.Has("tanning"));
+            Assert.IsFalse(log.CanLearn("alchemy", out why)); Assert.AreEqual("Two crafts already. Forget one first.", why);
+            Assert.IsEmpty(said, "The log says nothing; the session speaks for the trainer.");
+        }
+
+        /// <summary>
+        /// Forget: the craft's entry and skill are gone and its slot is free; the other craft stays; it can be taken up again, from 1; its
+        /// recipes go with it (a copper bar is refused); and a save written after it binds without it.
+        /// </summary>
+        [Test] public void Forget_FreesSlot_AndDropsSkill()
+        {
+            var log = Fresh(out var said); var p = log.Progress;
+            Assert.IsTrue(log.Learn("blacksmithing", out var why), why); Entry(log, "blacksmithing").skill = 47;
+            Assert.IsTrue(log.Learn("alchemy", out why), why); Entry(log, "alchemy").skill = 12;
+            Assert.AreEqual(2, log.CraftSlotsUsed);
+            Assert.IsTrue(log.CanForget("blacksmithing", out why), why); Assert.IsNull(why);
+            Assert.IsTrue(log.Forget("blacksmithing"));
+            Assert.IsFalse(log.Has("blacksmithing")); Assert.AreEqual(0, log.Skill("blacksmithing")); Assert.AreEqual(1, log.CraftSlotsUsed, "The slot is free.");
+            Assert.IsNull(p.professions.Find(s => s.id == "blacksmithing"), "The entry leaves the save.");
+            Assert.IsTrue(log.Has("alchemy")); Assert.AreEqual(12, log.Skill("alchemy"), "The other craft is kept as it was.");
+            Assert.IsFalse(log.Forget("blacksmithing"), "Forgetting it twice changes nothing.");
+            Assert.IsFalse(log.CanForget("blacksmithing", out why)); Assert.AreEqual("You have not taken up Blacksmithing.", why);
+            // Its recipes went with it.
+            Inventory.Add(p, log.Items, "mat.copper_ore", 2); Inventory.Add(p, log.Items, "mat.charcoal", 1);
+            Assert.IsFalse(log.CanCraft(log.Db.Recipe("recipe.copper_bar"), AtForge, out why)); Assert.AreEqual("You have not taken up Blacksmithing.", why);
+            Assert.AreEqual(ProfessionLog.Difficulty.Locked, log.DifficultyOf(log.Db.Recipe("recipe.copper_bar")));
+            // A save written now binds without it, and Alchemy is still there.
+            var copy = UnityEngine.JsonUtility.FromJson<EncounterProgress>(Snapshot(p)); log.Bind(copy);
+            Assert.IsFalse(log.Has("blacksmithing")); Assert.AreEqual(12, log.Skill("alchemy")); Assert.AreEqual(1, log.CraftSlotsUsed);
+            // Taken up again, it starts from 1.
+            Assert.IsTrue(log.Learn("blacksmithing", out why), why); Assert.AreEqual(1, log.Skill("blacksmithing"));
+            Assert.IsEmpty(said);
+        }
+
+        /// <summary>Cooking stays for good (DESIGN 4), and so do the gathering skills: Forget refuses them with why and changes nothing.
+        /// A craft not taken up and a trade the content does not have are refused too.</summary>
+        [Test] public void Cooking_CannotBeForgotten()
+        {
+            var log = Fresh(out _); var p = log.Progress; Learn(log, "tool.pick");
+            Entry(log, "cooking").skill = 30; Entry(log, "mining").skill = 12;
+            string before = Snapshot(p);
+            Assert.IsFalse(log.CanForget("cooking", out var why)); Assert.AreEqual("Cooking stays with you. It can't be forgotten.", why);
+            Assert.IsFalse(log.Forget("cooking")); Assert.AreEqual(30, log.Skill("cooking"));
+            Assert.IsFalse(log.CanForget("herbalism", out why)); Assert.AreEqual("Herbalism stays with you. It can't be forgotten.", why); Assert.IsFalse(log.Forget("herbalism"));
+            Assert.IsFalse(log.Forget("mining")); Assert.AreEqual(12, log.Skill("mining"), "The pick stays at the belt.");
+            Assert.IsFalse(log.CanForget("alchemy", out why)); Assert.AreEqual("You have not taken up Alchemy.", why); Assert.IsFalse(log.Forget("alchemy"));
+            Assert.IsFalse(log.Forget("fletching")); Assert.IsFalse(log.Forget(null));
+            Assert.AreEqual(before, Snapshot(p), "Nothing changed.");
+        }
+
+        /// <summary>
+        /// The owner's check, in the log (BUILD_PLAN step 12): taken up at 1, Blacksmithing smelts Crowsfoot copper into bars at a forge
+        /// and nowhere else; the Copper-shod cudgel waits on Blacksmithing 5 ("That wants Blacksmithing 5."), then takes two bars and an
+        /// oak log; the bars go in a worn ore-poke and the cudgel in the ordinary bags; and the cudgel can be worn at level 1.
+        /// </summary>
+        [Test] public void Blacksmithing_SmeltsCopper_ThenMakesTheCudgel()
+        {
+            var log = Fresh(out _); var p = log.Progress; var bar = log.Db.Recipe("recipe.copper_bar"); var cudgel = log.Db.Recipe("recipe.copper_cudgel"); var ups = new List<int>();
+            log.SkillUp = (id, skill) => { Assert.AreEqual("blacksmithing", id); ups.Add(skill); };
+            Inventory.Add(p, log.Items, "mat.copper_ore", 8); Inventory.Add(p, log.Items, "mat.charcoal", 4); Inventory.Add(p, log.Items, "mat.oak_log", 1);
+            Assert.IsFalse(log.CanCraft(bar, AtForge, out var why)); Assert.AreEqual("You have not taken up Blacksmithing.", why);
+            Assert.IsTrue(log.Learn("blacksmithing", out why), why);
+            Assert.AreEqual(ProfessionLog.Difficulty.Orange, log.DifficultyOf(bar)); Assert.AreEqual(4, log.CanMake(bar));
+            Assert.IsFalse(log.Craft(bar, AtFire, new System.Random(1), out why), "A fire is no forge."); Assert.AreEqual("You need a forge nearby.", why);
+            Inventory.Add(p, log.Items, "bag.ore_poke", 1); Assert.IsTrue(Inventory.Wear(p, log.Items, Slot(p, "bag.ore_poke"), out why), why);
+            for (int i = 0; i < 4; i++) Assert.IsTrue(log.Craft(bar, AtForge, new System.Random(i), out why), why);
+            Assert.AreEqual(4, Inventory.Count(p, "mat.copper_bar")); Assert.AreEqual(0, Inventory.Count(p, "mat.copper_ore")); Assert.AreEqual(0, Inventory.Count(p, "mat.charcoal"));
+            Assert.GreaterOrEqual(Slot(p, "mat.copper_bar"), Inventory.BagSize, "Bars go in the ore-poke.");
+            CollectionAssert.AreEqual(new[] { 2, 3, 4, 5 }, ups, "Every copper bar teaches at Blacksmithing 1 to 4.");
+            // The cudgel at Blacksmithing 5.
+            Entry(log, "blacksmithing").skill = 4; string before = Snapshot(p);
+            Assert.AreEqual(ProfessionLog.Difficulty.Locked, log.DifficultyOf(cudgel));
+            Assert.IsFalse(log.CanCraft(cudgel, AtForge, out why)); Assert.AreEqual("That wants Blacksmithing 5.", why); Assert.AreEqual(before, Snapshot(p));
+            Entry(log, "blacksmithing").skill = 5;
+            Assert.AreEqual(ProfessionLog.Difficulty.Orange, log.DifficultyOf(cudgel)); Assert.AreEqual(1, log.CanMake(cudgel), "Four bars but one log: one cudgel.");
+            Assert.IsTrue(log.Craft(cudgel, AtForge, new System.Random(9), out why), why);
+            Assert.AreEqual(1, Inventory.Count(p, "craft.copper_cudgel")); Assert.AreEqual(2, Inventory.Count(p, "mat.copper_bar")); Assert.AreEqual(0, Inventory.Count(p, "mat.oak_log"));
+            Assert.Less(Slot(p, "craft.copper_cudgel"), Inventory.BagSize, "Gear goes in the ordinary bags.");
+            Assert.AreEqual(6, log.Skill("blacksmithing"));
+            var d = log.Items.Get("craft.copper_cudgel");
+            Assert.IsTrue(Inventory.CanEquip(d, 1, out why), why); Assert.AreEqual("mainhand", d.slot); Assert.AreEqual(7, d.weaponDamage);
+        }
+
+        /// <summary>Alchemy (BUILD_PLAN step 13): taken up, two yarrow and a vial make a Minor healing draught at a herbalist's bench and
+        /// nowhere else; the Tarnwater draught waits on Alchemy 40.</summary>
+        [Test] public void Alchemy_MakesAMinorDraught_AtTheBench()
+        {
+            var log = Fresh(out _); var p = log.Progress; var minor = log.Db.Recipe("recipe.potion_minor"); var tarn = log.Db.Recipe("recipe.potion_tarn");
+            Inventory.Add(p, log.Items, "mat.yarrow", 5); Inventory.Add(p, log.Items, "mat.vial", 2);
+            Assert.IsFalse(log.CanCraft(minor, k => k == "bench", out var why)); Assert.AreEqual("You have not taken up Alchemy.", why);
+            Assert.IsTrue(log.Learn("alchemy", out why), why);
+            Assert.AreEqual(2, log.CanMake(minor), "Five yarrow and two vials: two draughts.");
+            Assert.IsFalse(log.Craft(minor, AtForge, new System.Random(1), out why)); Assert.AreEqual("You need a herbalist's bench nearby.", why);
+            Assert.IsTrue(log.Craft(minor, k => k == "bench", new System.Random(1), out why), why);
+            Assert.AreEqual(1, Inventory.Count(p, "potion.minor")); Assert.AreEqual(3, Inventory.Count(p, "mat.yarrow")); Assert.AreEqual(1, Inventory.Count(p, "mat.vial"));
+            Assert.AreEqual(2, log.Skill("alchemy"));
+            Assert.AreEqual(ProfessionLog.Difficulty.Locked, log.DifficultyOf(tarn)); Assert.IsFalse(log.CanCraft(tarn, k => k == "bench", out why)); Assert.AreEqual("That wants Alchemy 40.", why);
+        }
     }
 }

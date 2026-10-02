@@ -18,7 +18,9 @@ namespace Crulanda.Tests
     /// charcoal at Vell's smithy at night with nobody there (E offers "Work at the forge" and opens the Trades window at Woodcutting's
     /// recipes; Make and Make all go on the work bar; the charcoal is in the bags and the save), and ten metres off it is refused. The
     /// Golden Cask's hearth and the Cask's kitchen are fires to make it at, and Cooking's (step 10): E there reads "Cook at the fire"
-    /// and opens Cooking's recipes, and a boar stew cooked at the kitchen range is eaten.
+    /// and opens Cooking's recipes, and a boar stew cooked at the kitchen range is eaten. The crafts (steps 12 and 13): Blacksmithing
+    /// taken up at the smithy at night, copper smelted and the cudgel made and worn, then forgotten; Vell starting you off and working
+    /// the bellows; and Lisbet's drying hut as the herbalist's bench, where Alchemy is taken up and a draught made.
     /// </summary>
     public class CraftStationTests
     {
@@ -35,7 +37,7 @@ namespace Crulanda.Tests
         [UnityTearDown] public IEnumerator Cleanup()
         {
             Time.timeScale = 1; WorldClock.Hour = 8.5f; EncounterSession.ForgetRestingNodes();
-            EncounterHud.TradesPage = null; EncounterHud.TradesRecipes = false; EncounterHud.TradesRecipe = null; EncounterHud.TradesCanMakeOnly = false;
+            EncounterHud.TradesPage = null; EncounterHud.TradesRecipes = false; EncounterHud.TradesRecipe = null; EncounterHud.TradesCanMakeOnly = false; EncounterHud.TradesForget = null;
             if (WorldWeather.Active != null) WorldWeather.Active.Release(true);
             SceneManager.sceneLoaded -= OnLoaded;
             var empty = SceneManager.CreateScene("Empty-" + Guid.NewGuid().ToString("N")); SceneManager.SetActiveScene(empty);
@@ -91,6 +93,7 @@ namespace Crulanda.Tests
             s.Interact();
             Assert.IsTrue(s.TradesOpen, "E at the forge opens the Trades window..."); Assert.IsTrue(s.InventoryOpen, "...beside the bags...");
             Assert.AreEqual("woodcutting", EncounterHud.TradesPage, "...on Woodcutting, whose charcoal is made at a forge..."); Assert.IsTrue(EncounterHud.TradesRecipes, "...at its recipes.");
+            Assert.IsFalse(s.Professions.Has("blacksmithing")); Assert.IsTrue(s.CanTakeUp("blacksmithing", out _), "Blacksmithing's Take up is a click away in the list.");
             Assert.AreSame(forge[0], s.StationFor(oak));
             Assert.IsTrue(s.CanCraft(oak, out var why), why);
             // Make one: two seconds on the work bar.
@@ -105,6 +108,8 @@ namespace Crulanda.Tests
             // Make all: the rest of the logs, one after another.
             int rest = Inventory.Count(p, "mat.oak_log"); Assert.AreEqual(rest, s.Professions.CanMake(oak));
             Assert.IsTrue(s.Make(oak, rest));
+            Assert.IsTrue(s.Professions.Learn("blacksmithing", out why), why); Assert.IsTrue(s.ForgetCraft("blacksmithing"));
+            Assert.IsTrue(s.Working, "Forgetting another craft leaves the charcoal going."); Assert.AreEqual(oak.name, s.PlayerCastName);
             yield return new WaitForSeconds(rest * EncounterSession.CraftSeconds + 1);
             Assert.IsFalse(s.Working);
             Assert.AreEqual(0, Inventory.Count(p, "mat.oak_log"), "Every log burnt."); Assert.AreEqual(logs, Inventory.Count(p, "mat.charcoal"), "A charcoal for each.");
@@ -284,6 +289,160 @@ namespace Crulanda.Tests
             int gold = p.gold; s.SellJunk(); s.CloseVendor();
             Assert.GreaterOrEqual(p.gold - gold, 2 * s.Items.Get("junk.boar_tusk").value, "The tusks are sold.");
             Assert.AreEqual(0, Inventory.Count(p, "junk.boar_tusk")); Assert.AreEqual(3, Inventory.Count(p, "junk.boar_meat"), "The meat is kept.");
+        }
+
+        // ---------- the crafts (BUILD_PLAN steps 12 and 13) ----------
+        string Saved(EncounterSession s) { return File.ReadAllText(Path.Combine(root, EncounterSave.SlotFor(s.ClassDef.id) + ".save.json")); }
+        /// <summary>Walkable ground about <paramref name="distance"/> from a spot, out of reach of every station, or null.</summary>
+        static Vector3? Away(ZoneBuilder zone, Vector3 from, float distance)
+        {
+            for (int k = 0; k < 16; k++)
+            {
+                var c = from + Quaternion.Euler(0, k * 22.5f, 0) * Vector3.forward * distance;
+                if (!NavMesh.SamplePosition(c, out var hit, 1.5f, NavMesh.AllAreas) || Math.Abs(Flat(hit.position, from) - distance) > 1.5f) continue;
+                if (zone.Stations.Any(x => Flat(x.position, hit.position) < EncounterSession.StationRange + 1)) continue;
+                return hit.position;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// The owner's check for step 12 (BUILD_PLAN): at Vell's smithy at night with nobody there, E opens the Trades window on
+        /// Blacksmithing and it can be taken up; taking it up says the craft's own words and saves; copper ore is smelted into bars on the
+        /// work bar (Blacksmithing 1 to 5), the bars into the Copper-shod cudgel, and the cudgel is worn. Away from every station, with
+        /// nobody about, Alchemy can't be taken up and says where it can. Forget frees the slot and the save forgets it too; the cudgel
+        /// stays worn; Cooking can't be forgotten.
+        /// </summary>
+        [UnityTest] public IEnumerator TakeUpBlacksmithing_AtTheForge_AtNight_Works()
+        {
+            yield return Open(23.5f);
+            var s = Session(); var p = s.Progress; var zone = s.Zone;
+            Assert.AreEqual(root, s.SaveDirectoryOverride, "This test saves to its own folder.");
+            var bar = s.Professions.Db.Recipe("recipe.copper_bar"); var cudgel = s.Professions.Db.Recipe("recipe.copper_cudgel"); Assert.NotNull(bar); Assert.NotNull(cudgel);
+            var anvil = zone.Workplaces.First(w => w.kind == "forge" && w.name == "Vell's smithy");
+            yield return StandAt(s, anvil.stand);
+            Assert.Greater(WorldClock.Darkness, .5f, "Night.");
+            Assert.IsNull(s.TradeNpcNear("blacksmith", EncounterSession.HelperRange), "No blacksmith about.");
+            Assert.IsFalse(s.Professions.Has("blacksmithing")); Assert.AreEqual(0, s.Professions.CraftSlotsUsed, "A new character has no craft.");
+            Assert.AreEqual("Work at the forge", s.InteractPrompt);
+            s.Interact();
+            Assert.IsTrue(s.TradesOpen); Assert.AreEqual("blacksmithing", EncounterHud.TradesPage, "E at the forge opens on Blacksmithing, to be taken up there.");
+            Assert.IsTrue(s.CanTakeUp("blacksmithing", out var why), why);
+            s.Messages.Clear();
+            Assert.IsTrue(s.LearnCraft("blacksmithing"));
+            Assert.IsTrue(s.Professions.Has("blacksmithing")); Assert.AreEqual(1, s.Professions.Skill("blacksmithing")); Assert.AreEqual(1, s.Professions.CraftSlotsUsed);
+            Assert.Contains(s.Professions.Db.Profession("blacksmithing").takeUp, s.Messages, "With nobody there, the craft's own words.");
+            Assert.IsFalse(s.LearnCraft("blacksmithing"), "Once is enough."); Assert.Contains("You have taken up Blacksmithing already.", s.Messages);
+            StringAssert.Contains("\"blacksmithing\"", Saved(s), "Saved.");
+            Assert.AreEqual("blacksmithing", s.StationTrade("forge").id, "The forge opens on it from now on.");
+            // Four copper bars, two seconds each with nobody to work the bellows; each teaches.
+            Assert.AreEqual(EncounterSession.CraftSeconds, s.CraftTime(bar));
+            Assert.AreEqual(0, Inventory.Add(p, s.Items, "mat.copper_ore", 8)); Assert.AreEqual(0, Inventory.Add(p, s.Items, "mat.charcoal", 4)); Assert.AreEqual(0, Inventory.Add(p, s.Items, "mat.oak_log", 1));
+            Assert.IsFalse(s.CanCraft(cudgel, out why)); Assert.AreEqual("That wants Blacksmithing 5.", why);
+            Assert.IsTrue(s.Make(bar, 4)); Assert.AreEqual("Copper bar", s.PlayerCastName);
+            yield return new WaitForSeconds(4 * EncounterSession.CraftSeconds + 1);
+            Assert.IsFalse(s.Working);
+            Assert.AreEqual(4, Inventory.Count(p, "mat.copper_bar")); Assert.AreEqual(0, Inventory.Count(p, "mat.copper_ore")); Assert.Contains("You make Copper bar.", s.Messages);
+            Assert.AreEqual(5, s.Professions.Skill("blacksmithing"));
+            // The cudgel, and it is worn.
+            Assert.IsTrue(s.CanCraft(cudgel, out why), why);
+            Assert.IsTrue(s.Make(cudgel, 1)); yield return new WaitForSeconds(EncounterSession.CraftSeconds + .5f);
+            Assert.IsFalse(s.Working);
+            Assert.AreEqual(1, Inventory.Count(p, "craft.copper_cudgel")); Assert.AreEqual(2, Inventory.Count(p, "mat.copper_bar")); Assert.Contains("You make Copper-shod cudgel.", s.Messages);
+            Assert.AreEqual(6, s.Professions.Skill("blacksmithing"));
+            Assert.IsTrue(s.EquipFromBag(p.bag.FindIndex(x => x.item == "craft.copper_cudgel")), "Worn at level 1.");
+            Assert.AreEqual("craft.copper_cudgel", p.equipment[(int)EquipSlot.MainHand].item);
+            StringAssert.Contains("craft.copper_cudgel", Saved(s));
+            // Away from every station, with nobody about, Alchemy can't be taken up and says where it can.
+            var away = Away(zone, anvil.stand, 12); Assert.IsTrue(away.HasValue, "Walkable ground twelve metres from the smithy, out of reach of every station.");
+            yield return StandAt(s, away.Value);
+            Assert.IsNull(s.TradeNpcNear("herbalist", EncounterSession.TrainerRange));
+            Assert.IsFalse(s.CanTakeUp("alchemy", out why)); Assert.AreEqual("Alchemy is taken up at a herbalist's bench, or from a herbalist.", why);
+            Assert.IsFalse(s.LearnCraft("alchemy")); Assert.IsFalse(s.Professions.Has("alchemy")); Assert.Contains(why, s.Messages);
+            // Forget: the slot is free and the skill lost, in the save too; what was made stays made.
+            Assert.IsTrue(s.ForgetCraft("blacksmithing"));
+            Assert.Contains("You put Blacksmithing aside. Skill 6 is lost.", s.Messages);
+            Assert.IsFalse(s.Professions.Has("blacksmithing")); Assert.AreEqual(0, s.Professions.CraftSlotsUsed);
+            Assert.AreEqual("craft.copper_cudgel", p.equipment[(int)EquipSlot.MainHand].item, "The cudgel stays worn.");
+            StringAssert.DoesNotContain("\"blacksmithing\"", Saved(s), "Forgotten in the save too.");
+            Assert.IsFalse(s.ForgetCraft("cooking")); Assert.Contains("Cooking stays with you. It can't be forgotten.", s.Messages); Assert.IsTrue(s.Professions.Has("cooking"));
+        }
+
+        /// <summary>
+        /// With Brannoc Vell at his anvil (as by day), he starts you off in his own words and turns to you, and he lends a hand at the
+        /// work: "Brannoc Vell works the bellows for you." once for the visit, and each bar takes one second instead of two. Gone from the
+        /// anvil, he lends no hand.
+        /// </summary>
+        [UnityTest] public IEnumerator Vell_at_the_anvil_starts_you_off_and_works_the_bellows()
+        {
+            yield return Open(23.5f);
+            var s = Session(); var p = s.Progress; var zone = s.Zone;
+            var anvil = zone.Workplaces.First(w => w.kind == "forge" && w.name == "Vell's smithy");
+            yield return StandAt(s, anvil.stand);
+            var vell = VillageLife.Active.Find("Brannoc Vell"); Assert.NotNull(vell); Assert.AreEqual("blacksmith", vell.Role);
+            var beside = anvil.stand + (anvil.look - anvil.stand).normalized * .2f + Vector3.Cross(Vector3.up, (anvil.look - anvil.stand).normalized) * 1.4f;
+            if (NavMesh.SamplePosition(beside, out var hit, 1.5f, NavMesh.AllAreas)) beside = hit.position;
+            vell.StandAt(beside, 0); yield return null;
+            Assert.Less(Flat(vell.transform.position, anvil.stand), 3, "Vell is at his anvil, beside the player.");
+            Assert.AreSame(vell, s.TradeNpcNear("blacksmith", EncounterSession.TrainerRange));
+            s.Messages.Clear();
+            Assert.IsTrue(s.LearnCraft("blacksmithing"));
+            Assert.Contains("Brannoc Vell: Mind the scale. Copper first; it forgives you.", s.Messages);
+            Assert.AreEqual("Mind the scale. Copper first; it forgives you.", vell.Bubble, "He says it aloud.");
+            var bar = s.Professions.Db.Recipe("recipe.copper_bar");
+            Inventory.Add(p, s.Items, "mat.copper_ore", 4); Inventory.Add(p, s.Items, "mat.charcoal", 2);
+            Assert.AreSame(vell, s.CraftHelper(bar)); Assert.AreEqual(EncounterSession.CraftSeconds / 2, s.CraftTime(bar));
+            Assert.IsTrue(s.Make(bar, 2));
+            Assert.Contains("Brannoc Vell works the bellows for you.", s.Messages);
+            s.Messages.Clear();   // chat keeps six lines: from here on, the second bar must not say it again
+            yield return new WaitForSeconds(2 * EncounterSession.CraftSeconds / 2 + .6f);
+            Assert.IsFalse(s.Working, "Two bars in the time one takes alone.");
+            Assert.AreEqual(2, Inventory.Count(p, "mat.copper_bar"));
+            Assert.AreEqual(0, s.Messages.Count(m => m.EndsWith("works the bellows for you.")), "Said once for the visit.");
+            // Gone, he lends no hand.
+            vell.Park();
+            Assert.IsNull(s.CraftHelper(bar)); Assert.AreEqual(EncounterSession.CraftSeconds, s.CraftTime(bar));
+            // A smith's help is the smith's: a herbalist's recipe has no blacksmith to help it.
+            Assert.IsNull(s.CraftHelper(s.Professions.Db.Recipe("recipe.potion_minor")));
+            Assert.IsNull(s.CraftHelper(s.Professions.Db.Recipe("recipe.charcoal_oak")), "Charcoal (Woodcutting) has nobody's help.");
+        }
+
+        /// <summary>
+        /// Step 13 (BUILD_PLAN): Lisbet's drying hut is the herbalist's bench. At night with Lisbet abed, E there reads "Work at the bench"
+        /// and opens the Trades window on Alchemy; Blacksmithing is not taken up there; Alchemy is, and two minor healing draughts are
+        /// made from yarrow and vials on the work bar. With Blacksmithing taken up too both slots are used.
+        /// </summary>
+        [UnityTest] public IEnumerator DryingHut_IsTheBench()
+        {
+            yield return Open(23.5f);
+            var s = Session(); var p = s.Progress; var zone = s.Zone;
+            Assert.AreEqual(root, s.SaveDirectoryOverride, "This test saves to its own folder.");
+            var bench = zone.Stations.Find(x => x.kind == "bench" && x.name == "Lisbet's drying hut"); Assert.NotNull(bench, "The drying hut is a bench.");
+            var stand = zone.Workplaces.First(w => w.kind == "dryhut" && w.name == "Lisbet's drying hut");
+            yield return StandAt(s, stand.stand);
+            Assert.IsNull(s.TradeNpcNear("herbalist", EncounterSession.HelperRange), "Lisbet is abed.");
+            Assert.AreSame(bench, s.StationNear("bench")); Assert.AreSame(bench, s.StationNear(null));
+            Assert.AreEqual("Work at the bench", s.InteractPrompt);
+            s.Interact();
+            Assert.IsTrue(s.TradesOpen); Assert.AreEqual("alchemy", EncounterHud.TradesPage, "The bench opens on Alchemy..."); Assert.IsTrue(EncounterHud.TradesRecipes, "...at its recipes.");
+            Assert.IsFalse(s.CanTakeUp("blacksmithing", out var why)); Assert.AreEqual("Blacksmithing is taken up at a forge, or from a blacksmith.", why);
+            s.Messages.Clear();
+            Assert.IsTrue(s.LearnCraft("alchemy"));
+            Assert.Contains(s.Professions.Db.Profession("alchemy").takeUp, s.Messages);
+            var minor = s.Professions.Db.Recipe("recipe.potion_minor"); Assert.AreSame(bench, s.StationFor(minor));
+            Assert.AreEqual(0, Inventory.Add(p, s.Items, "mat.yarrow", 4)); Assert.AreEqual(0, Inventory.Add(p, s.Items, "mat.vial", 2));
+            int potions = Inventory.Count(p, "potion.minor");
+            Assert.IsTrue(s.CanCraft(minor, out why), why);
+            Assert.IsTrue(s.Make(minor, 2)); Assert.AreEqual("Minor healing draught", s.PlayerCastName);
+            yield return new WaitForSeconds(2 * EncounterSession.CraftSeconds + 1);
+            Assert.IsFalse(s.Working);
+            Assert.AreEqual(potions + 2, Inventory.Count(p, "potion.minor")); Assert.AreEqual(0, Inventory.Count(p, "mat.yarrow")); Assert.AreEqual(0, Inventory.Count(p, "mat.vial"));
+            Assert.Contains("You make Minor healing draught.", s.Messages); Assert.AreEqual(3, s.Professions.Skill("alchemy"));
+            StringAssert.Contains("\"alchemy\"", Saved(s));
+            // Both crafts taken (Blacksmithing as if at a forge): every slot is used, and the bench still opens on Alchemy. The content
+            // has two crafts, so a third is refused in ProfessionLogTests.ThirdCraft_IsRefused.
+            Assert.IsTrue(s.Professions.Learn("blacksmithing", out why), why);
+            Assert.AreEqual(2, s.Professions.CraftSlotsUsed); Assert.AreEqual("alchemy", s.StationTrade("bench").id);
         }
     }
 }

@@ -127,6 +127,7 @@ namespace Crulanda.Encounter
             if (session.Items != null) { var b = CaptureBags(directory, prefix); while (b.MoveNext()) yield return b.Current; }
             if (session.Professions != null && zone != null) { var st = CaptureStation(directory, prefix, zone); while (st.MoveNext()) yield return st.Current; }
             if (session.Professions != null && zone != null) { var ck = CaptureCooking(directory, prefix, zone); while (ck.MoveNext()) yield return ck.Current; }
+            if (session.Professions != null && zone != null) { var cr = CaptureCrafts(directory, prefix, zone); while (cr.MoveNext()) yield return cr.Current; }
             yield return new WaitForSeconds(1);
             Debug.Log("UI_CAPTURE_DONE"); Application.Quit(0);
         }
@@ -238,6 +239,61 @@ namespace Crulanda.Encounter
             if (stew != null) { int n = session.Professions.CanMake(stew); session.Make(stew, n); float until = Time.time + n * EncounterSession.CraftSeconds + 2; while (session.Working && Time.time < until) yield return null; }
             yield return new WaitForSeconds(.5f);
             ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "27-cooking-stew-made.png")); yield return new WaitForSeconds(.4f);
+            EncounterHud.TradesPage = null; EncounterHud.TradesRecipes = false; EncounterHud.TradesRecipe = null; session.ShowTrades(false); session.InventoryOpen = false;
+        }
+        /// <summary>
+        /// The crafts (trades steps 12 and 13), nobody about: at the zone's first forge, Blacksmithing's page with "Take up" (28-craft-take-up);
+        /// taken up, four copper bars smelted and the Copper-shod cudgel made, on its recipe (29-craft-cudgel-made); the cudgel worn on
+        /// the character sheet (30-craft-cudgel-worn); at the zone's first bench (Lisbet's drying hut), Alchemy taken up and two minor
+        /// draughts made (31-craft-potion-made); Alchemy's page with both crafts taken (32-crafts-two-of-two); and Forget's question on
+        /// Blacksmithing (33-craft-forget-confirm), answered Keep.
+        /// </summary>
+        IEnumerator CaptureCrafts(string directory, string prefix, Crulanda.World.ZoneBuilder zone)
+        {
+            var forge = zone.Stations.Find(x => x.kind == "forge"); var bench = zone.Stations.Find(x => x.kind == "bench"); if (forge == null) yield break;
+            var p = session.Progress; var motor = session.Player.GetComponent<AdventurerMotor>(); var log = session.Professions;
+            session.Conversation = null; session.QuestBookOpen = false; session.ShowTrades(false); session.CloseVendor(); session.InventoryOpen = false; session.CharacterOpen = false;
+            foreach (var e in session.Enemies) e.ResetFight();
+            IEnumerator StandBy(Crulanda.World.ZoneStationSpot st)
+            {
+                var stand = zone.Workplaces.Find(w => w.name == st.name && Crulanda.World.ZoneBuilder.StationKind(w.kind) == st.kind) ?? zone.Workplaces.Find(w => w.name == st.name);
+                var at = stand != null ? stand.stand : st.position + Vector3.back * 1.2f;
+                motor.Teleport(at + Vector3.up * 1.1f);
+                if (VillageLife.Active != null) foreach (var v in VillageLife.Active.Villagers) if (Vector3.Distance(v.transform.position, at) < 10) v.Park();
+                session.SelectFriendly(null, false);
+                var face = st.position - at; face.y = 0; if (face.sqrMagnitude > .01f) motor.SetView(Quaternion.LookRotation(face).eulerAngles.y + 30, 20, 5);
+                yield return new WaitForSeconds(.8f);
+            }
+            void MakeSome(string recipe, int most) { var r = log.Db.Recipe(recipe); if (r != null) session.Make(r, Mathf.Min(most, log.CanMake(r))); }   // the bags may hold more from the shots before
+            IEnumerator Wait() { float until = Time.time + 30; while (session.Working && Time.time < until) yield return null; yield return new WaitForSeconds(.5f); }
+            var by = StandBy(forge); while (by.MoveNext()) yield return by.Current;
+            session.WorkAtStation(forge); EncounterHud.TradesPage = "blacksmithing"; EncounterHud.TradesRecipes = false; yield return new WaitForSeconds(.6f);   // the charcoal shot left Woodcutting held: the forge opens on it
+            ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "28-craft-take-up.png")); yield return new WaitForSeconds(.4f);
+            session.LearnCraft("blacksmithing");
+            foreach (var (item, count) in new[] { ("mat.copper_ore", 8), ("mat.charcoal", 4), ("mat.oak_log", 1) }) Inventory.Add(p, session.Items, item, count);
+            MakeSome("recipe.copper_bar", 4); var w = Wait(); while (w.MoveNext()) yield return w.Current;
+            EncounterHud.TradesRecipes = true; EncounterHud.TradesRecipe = "recipe.copper_cudgel";
+            MakeSome("recipe.copper_cudgel", 1); w = Wait(); while (w.MoveNext()) yield return w.Current;
+            ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "29-craft-cudgel-made.png")); yield return new WaitForSeconds(.4f);
+            int cudgel = p.bag.FindIndex(s => s.item == "craft.copper_cudgel"); if (cudgel >= 0) session.EquipFromBag(cudgel);
+            session.ShowTrades(false); session.CharacterOpen = true; session.InventoryOpen = true; yield return new WaitForSeconds(.6f);
+            ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "30-craft-cudgel-worn.png")); yield return new WaitForSeconds(.4f);
+            session.CharacterOpen = false; session.InventoryOpen = false;
+            if (bench != null)
+            {
+                by = StandBy(bench); while (by.MoveNext()) yield return by.Current;
+                session.WorkAtStation(bench); session.LearnCraft("alchemy");
+                foreach (var (item, count) in new[] { ("mat.yarrow", 4), ("mat.vial", 2) }) Inventory.Add(p, session.Items, item, count);
+                EncounterHud.TradesRecipes = true; EncounterHud.TradesRecipe = "recipe.potion_minor";
+                MakeSome("recipe.potion_minor", 2); w = Wait(); while (w.MoveNext()) yield return w.Current;
+                ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "31-craft-potion-made.png")); yield return new WaitForSeconds(.4f);
+                EncounterHud.TradesRecipes = false; yield return new WaitForSeconds(.4f);
+                ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "32-crafts-two-of-two.png")); yield return new WaitForSeconds(.4f);
+            }
+            EncounterHud.TradesPage = "blacksmithing"; EncounterHud.TradesRecipes = false; session.ShowTrades(true); yield return new WaitForSeconds(.3f);
+            EncounterHud.TradesForget = "blacksmithing"; yield return new WaitForSeconds(.5f);   // set once the window is up: shutting it drops the question
+            ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "33-craft-forget-confirm.png")); yield return new WaitForSeconds(.4f);
+            EncounterHud.TradesForget = null;
             EncounterHud.TradesPage = null; EncounterHud.TradesRecipes = false; EncounterHud.TradesRecipe = null; session.ShowTrades(false); session.InventoryOpen = false;
         }
         /// <summary>The quest interface: a giver's !, the offer, the quest book, the ledger in the Chronicle, a hand-in list, standing, the tracker.</summary>

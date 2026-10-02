@@ -16,6 +16,19 @@ namespace Crulanda.Encounter
         NavMeshAgent agent;
         Actor castingTarget;
         float nextRegen, nextCatchUp;
+        /// <summary>
+        /// Mira keeps pace with you (playtest note 2: an elite of your level wants her, at every level): each of your levels past
+        /// the first adds <see cref="HealPerLevel"/> of her heal and <see cref="HealthPerLevel"/> health. Her mana and its cost stay.
+        /// </summary>
+        public const float HealPerLevel = .15f; public const int HealthPerLevel = 22;
+        public static int HealFor(int power, int playerLevel, float perLevel = HealPerLevel) { return Mathf.RoundToInt(power * (1 + perLevel * (Mathf.Max(1, playerLevel) - 1))); }
+        int baseHealth;
+        /// <summary>Sets her health for the player's level (her own level stays 1: nothing reads it).</summary>
+        public void MatchLevel(int playerLevel)
+        {
+            if (baseHealth <= 0) baseHealth = actor.Health.Pool.Max;
+            actor.Stats.SetBase(Crulanda.Core.StatType.MaxHealth, baseHealth + HealthPerLevel * (Mathf.Max(1, playerLevel) - 1));
+        }
         void Awake() { agent = GetComponent<NavMeshAgent>(); }
         bool Spend(int cost)
         {
@@ -60,7 +73,7 @@ namespace Crulanda.Encounter
             {
                 var result = abilities.TryStart(heal, Time.time, Spend, () => {
                     if (!recipient.IsAlive) return;
-                    int healed = recipient.GetComponent<Combatant>().Heal(heal.power);
+                    int healed = recipient.GetComponent<Combatant>().Heal(HealFor(heal.power, session.Player.Level));
                     session.FloatText(recipient.transform.position, "+" + healed, new Color(.3f,1,.7f));
                     foreach (var enemy in session.Enemies)
                         if (enemy.Engaged) enemy.threat.Add(actor.EntityId.Value, healed * .5f);

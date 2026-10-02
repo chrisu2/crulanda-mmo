@@ -1050,7 +1050,7 @@ namespace Crulanda.Encounter
             var friend = SpawnActor("Mira · provisional healer", content.healer, friendPoint, new Color(.45f, .76f, .57f), Progress.companionId, ActorLook.Healer);
             AddAgent(friend.gameObject, 4.6f);
             Companion = friend.gameObject.AddComponent<HealerCompanion>(); Companion.actor = friend; Companion.session = this;
-            friend.gameObject.SetActive(true); SetHealth(friend, Progress.companionHealth); friend.Resource.Pool.SetCurrent(Progress.mana);
+            friend.gameObject.SetActive(true); Companion.MatchLevel(Progress.Level); SetHealth(friend, Progress.companionHealth); friend.Resource.Pool.SetCurrent(Progress.mana);
             Enemies.Clear();
             foreach (var spawn in EnemySpawns())
             {
@@ -1144,6 +1144,7 @@ namespace Crulanda.Encounter
                     a.Health.ApplyHealing(a.Health.Pool.Max);
                     enemy.HitBase = EncounterEnemy.MobHit(level, false, elite);
                     if (elite) a.transform.localScale = Vector3.one * 1.18f;
+                    ConfigureSocial(enemy, camp, c, level, beast);   // its kind, its kin and, for the elite, its move (EncounterSession.Social)
                 }
             }
         }
@@ -1471,7 +1472,7 @@ namespace Crulanda.Encounter
             }
             if (!enemy.Camp && StoryEnemies.TrueForAll(e => !e.actor.IsAlive)) Message(ZoneTitle + " is clear for now. " + (Inventory.IsEquipped(Progress, content.itemId) ? "Save [F5]." : "Equip your reward [I], then save [F5]."));
         }
-        void ApplyLevel() { Player.SetLevel(Progress.Level); }
+        void ApplyLevel() { Player.SetLevel(Progress.Level); if (Companion != null) Companion.MatchLevel(Progress.Level); }
         /// <summary>Development builds only: jump to the prototype level cap so the whole talent tree can be reviewed.</summary>
         public bool PrototypeLevelCap()
         {

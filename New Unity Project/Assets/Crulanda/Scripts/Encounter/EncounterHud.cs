@@ -179,10 +179,13 @@ namespace Crulanda.Encounter
             if (a.IsAlive && t.Game) Shadow(new Rect(378, 67, 330, 20), GameLine, tiny, Color.white);
             else if (a.IsAlive)
             {
-                float next = t.NextSwingIn, interval = session.content.enemySwingInterval;
-                UnitBar(new Rect(378, 67, 244, 7), 1 - next / Mathf.Max(.01f, interval), new Color(.85f, .45f, .3f), "");
-                var extra = session.Kit.TargetStatus(t);
-                Shadow(new Rect(378, 78, 330, 20), (next > 0 ? "Swing in " + next.ToString("0.0") + "s" : "Swing ready") + (string.IsNullOrEmpty(extra) ? "" : "  ·  " + extra), tiny, Color.white);
+                float next = t.NextSwingIn, interval = t.SwingInterval;
+                var extra = WithEnrage(t, session.Kit.TargetStatus(t));
+                if (!DrawBlowBar(t))   // an elite drawing back shows its heavy blow as a cast bar instead (EncounterHud.Elite)
+                {
+                    UnitBar(new Rect(378, 67, 244, 7), 1 - next / Mathf.Max(.01f, interval), new Color(.85f, .45f, .3f), "");
+                    Shadow(new Rect(378, 78, 330, 20), (next > 0 ? "Swing in " + next.ToString("0.0") + "s" : "Swing ready") + (string.IsNullOrEmpty(extra) ? "" : "  ·  " + extra), tiny, Color.white);
+                }
                 if (t.Victim != null) Shadow(new Rect(378, 96, 330, 20), "Target of target: " + t.Victim.DisplayName, tiny, new Color(.85f, .85f, .85f));
             }
         }

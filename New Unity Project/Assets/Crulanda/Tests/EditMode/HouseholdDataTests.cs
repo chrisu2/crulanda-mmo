@@ -53,10 +53,10 @@ namespace Crulanda.Tests
         [Test] public void Oakhaven_every_villager_is_in_exactly_one_household()
         {
             var z = Zone("oakhaven");
-            // Step 6 (the Golden Cask's household, with its innkeeper Hob Linden) raises these to 24 folk and 16 households.
-            Assert.AreEqual(23, Folk(z).Count, "Twenty villagers and three hen-wives.");
+            Assert.AreEqual(24, Folk(z).Count, "Twenty villagers, three hen-wives and the innkeeper.");
             EveryoneHousedOnce(z);
-            Assert.AreEqual(15, z.life.households.Length, "Fifteen households (the Golden Cask's comes with its innkeeper).");
+            Assert.AreEqual(16, z.life.households.Length, "Sixteen households, the Golden Cask's among them.");
+            Assert.AreEqual("The Golden Cask", z.life.households.Single(h => h.members.Any(m => m.name == "Hob Linden")).house, "The innkeeper lives over his inn.");
             var tanner = z.life.households.Single(h => h.name == "Tanner");
             CollectionAssert.AreEqual(new[] { "Maud Tanner", "Fen Walker", "Nettie" }, tanner.members.Select(m => m.name).ToArray(), "Maud, her husband the skinner and their daughter.");
             Assert.AreEqual("Tanner house", tanner.house);

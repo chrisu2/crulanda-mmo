@@ -37,7 +37,7 @@ namespace Crulanda.Encounter
             {
                 case "blacksmith": return "forge"; case "merchant": return "stall"; case "baker": return "oven";
                 case "leatherworker": return "leathershop"; case "skinner": return "tannery"; case "lumberjack": case "hunter": return "woods";
-                case "herbalist": return "meadow"; case "miller": return "mill"; case "farmer": return "field"; default: return null;
+                case "herbalist": return "meadow"; case "miller": return "mill"; case "farmer": return "field"; case "innkeeper": return "inn"; default: return null;
             }
         }
         /// <summary>WoW-style subtitle under a villager's name, e.g. &lt;Blacksmith&gt;. Null for folk without a trade.</summary>
@@ -48,6 +48,7 @@ namespace Crulanda.Encounter
                 case "blacksmith": return "Blacksmith"; case "merchant": return "Merchant"; case "baker": return "Baker"; case "henwife": return "Hen-wife";
                 case "farmer": return "Farmer"; case "hunter": return "Hunter"; case "leatherworker": return "Leatherworker"; case "skinner": return "Skinner";
                 case "lumberjack": return "Woodcutter"; case "herbalist": return "Herbalist"; case "miller": return "Miller"; case "elder": return "Village Elder";
+                case "innkeeper": return "Innkeeper";
                 default: return null;
             }
         }
@@ -68,6 +69,33 @@ namespace Crulanda.Encounter
             foreach (var kv in placeName) { float d = (kv.Key - at).sqrMagnitude; if (d < bd) { bd = d; best = kv.Value; } }
             return best;
         }
+        // Whose workshop a prop is (life.workshops): its owner's props by name, and each prop's owner.
+        readonly Dictionary<string, List<string>> workshopsOf = new Dictionary<string, List<string>>();
+        readonly Dictionary<string, string> ownerOf = new Dictionary<string, string>();
+        /// <summary>The props this villager works at by the zone's <c>life.workshops</c> ("Produce stall"), empty for none.</summary>
+        public List<string> WorkshopsOf(string name) { return name != null && workshopsOf.TryGetValue(name, out var l) ? l : new List<string>(); }
+        /// <summary>A villager's own places of a kind, or null when they have none: the stand points of their own workshops (the baker's
+        /// stall, Hob Linden's kitchen), and for a farmer the fields within 60 m of home.</summary>
+        public List<Vector3> OwnPlaces(Villager v, string kind)
+        {
+            if (v == null || !Places.TryGetValue(kind, out var all) || all.Count == 0) return null;
+            if (workshopsOf.TryGetValue(v.Name, out var props))
+            {
+                var mine = all.FindAll(p => placeName.TryGetValue(p, out var n) && props.Contains(n));
+                if (mine.Count > 0) return mine;
+            }
+            if (kind == "field" && v.Role == "farmer" && v.Home != null)
+            {
+                var near = all.FindAll(p => Vector2.Distance(new Vector2(p.x, p.z), new Vector2(v.Home.position.x, v.Home.position.z)) < 60);
+                if (near.Count > 0) return near;
+            }
+            return null;
+        }
+        /// <summary>Where a villager works at a kind of place: their own (see <see cref="OwnPlaces"/>), else any of the kind.</summary>
+        public List<Vector3> PlaceFor(Villager v, string kind) { return OwnPlaces(v, kind) ?? (Places.TryGetValue(kind, out var all) ? all : new List<Vector3>()); }
+        /// <summary>Goods handed over at the end of an errand: who carried them, the errand, and who answered (null: nobody did).</summary>
+        public event System.Action<Villager, Errand, Villager> HandedOver;
+        internal void HandOver(Villager carrier, Errand e, Villager taker) { HandedOver?.Invoke(carrier, e, taker); }
 
         public void Init(EncounterSession session)
         {
@@ -281,6 +309,12 @@ namespace Crulanda.Encounter
             foreach (var w in Zone.Workplaces)
                 if (NavMesh.SamplePosition(w.stand, out var wh, 1.5f, NavMesh.AllAreas)) { Places[w.kind].Add(wh.position); faceAt[wh.position] = w.look; placeName[wh.position] = w.name; }
             if (Places["leathershop"].Count == 0) Places["leathershop"] = Places["tannery"];   // a village with a tannery yard but no shop: the leatherworker works in the yard
+            foreach (var w in z.life.workshops)
+            {
+                if (w == null || string.IsNullOrEmpty(w.who) || string.IsNullOrEmpty(w.prop)) continue;
+                if (!workshopsOf.TryGetValue(w.who, out var props)) workshopsOf[w.who] = props = new List<string>();
+                props.Add(w.prop); ownerOf[w.prop] = w.who;
+            }
             // Woods: inside living groves (not orchards). Meadow: open hillside between the village and the forest edge.
             foreach (var g in z.groves)
             {
@@ -338,10 +372,12 @@ namespace Crulanda.Encounter
             if (NavMesh.SamplePosition(world, out var hit, exact ? 1.2f : 3f, NavMesh.AllAreas)) Places[key].Add(hit.position);
         }
         /// <summary>A random place of a kind, avoiding spots near living enemies (villagers steer clear of the collectors, though
-        /// they will draw water with one across the square: <see cref="KeepClear"/>).</summary>
-        public Vector3? RandomPlace(string key)
+        /// they will draw water with one across the square: <see cref="KeepClear"/>). With <paramref name="who"/>, one of their own
+        /// places of the kind when they have any (<see cref="PlaceFor"/>).</summary>
+        public Vector3? RandomPlace(string key, Villager who = null)
         {
-            if (!Places.TryGetValue(key, out var list) || list.Count == 0) return null;
+            var list = who != null ? PlaceFor(who, key) : Places.TryGetValue(key, out var all) ? all : null;
+            if (list == null || list.Count == 0) return null;
             for (int tries = 0; tries < 8; tries++)
             {
                 var p = list[rng.Next(list.Count)];
@@ -369,18 +405,22 @@ namespace Crulanda.Encounter
             foreach (var v in Villagers) { if (!v.Visible || v == except) continue; float d = (v.transform.position - p).sqrMagnitude; if (d < bestD) { best = v; bestD = d; } }
             return best;
         }
-        /// <summary>A place of this kind where someone is at work right now (the stall with the merchant behind it), so an errand goes to them.</summary>
-        public Vector3? WorkedPlace(string kind, Villager except)
+        /// <summary>A place of this kind where someone is at work right now (the stall with the merchant behind it), so an errand goes to
+        /// them. With a <paramref name="role"/>, only someone of that trade, and when none is at work there, one of that trade's own
+        /// places all the same (one of the merchants' stalls, at random, while none is behind one).</summary>
+        public Vector3? WorkedPlace(string kind, Villager except, string role = null)
         {
             if (!Places.TryGetValue(kind, out var list) || list.Count == 0) return null;
             foreach (var v in Villagers)
             {
-                if (v == except || !v.Visible || v.Activity != kind) continue;
+                if (v == except || !v.Visible || v.Activity != kind || role != null && v.Role != role) continue;
                 Vector3? best = null; float bestD = 2.5f * 2.5f;
                 foreach (var p in list) { float d = (p - v.transform.position).sqrMagnitude; if (d < bestD) { bestD = d; best = p; } }
                 if (best.HasValue) return best;
             }
-            return null;
+            if (role == null) return null;
+            var theirs = list.FindAll(p => placeName.TryGetValue(p, out var n) && ownerOf.TryGetValue(n, out var who) && Find(who) is Villager o && o.Role == role);
+            return theirs.Count > 0 ? theirs[rng.Next(theirs.Count)] : (Vector3?)null;
         }
 
         // ---------- the village's stock: goods carried between the trades ----------
@@ -461,7 +501,10 @@ namespace Crulanda.Encounter
             { "leatherworker", new[] { "Good hides are scarce. Half of what comes in is grey at the edges.", "A proper belt outlasts a man. Mine outlasted two." } },
             { "skinner", new[] { "Stinks, I know. So does hunger.", "Bring me pelts and I'll pay fair. Rabbit, deer, anything that isn't grey." } },
             { "miller", new[] { "The wheel still turns. There's less to put under the stone every year.", "Flour's flour. Don't ask where the grain's been." } },
-            { "elder", new[] { "I remember when the east was green to the horizon.", "The oak on the green was old when my grandmother was young. It'll see the lot of us out." } } };
+            { "elder", new[] { "I remember when the east was green to the horizon.", "The oak on the green was old when my grandmother was young. It'll see the lot of us out." } },
+            { "innkeeper", new[] { "Ale's thin and the stew's thinner. Sit where you like.", "The Cask stood before the Concord and it'll stand after." } } };
+        /// <summary>The innkeeper on Mira, while she still sits in the corner of his taproom (before she joins you).</summary>
+        const string InnkeeperOnMira = "Mira's in the corner. Don't crowd her; she's the only mender we've got.";
         public string LineFor(Villager v, bool toPlayer)
         {
             if (Zone.Zone.life.mood == "keepers")
@@ -474,6 +517,7 @@ namespace Crulanda.Encounter
             if (v.PassedOut) return "Zzz...";
             if (!toPlayer) return Chatter[rng.Next(Chatter.Length)];
             if (rng.Next(3) == 0) { var day = StockLine(v); if (day != null) return day; }
+            if (v.Role == "innkeeper" && Session.Progress != null && !Session.Progress.recruited && rng.Next(3) == 0) return InnkeeperOnMira;
             if (!v.Keeper && TradeLines.TryGetValue(v.Role, out var trade) && rng.Next(3) > 0) return trade[rng.Next(trade.Length)];
             if (v.Role == "henwife" && v.Coop != null)
             {
@@ -502,6 +546,7 @@ namespace Crulanda.Encounter
                     return Count("forge.wood") > 0 ? "The woodcutter brought oak this morning. Hearth's drawing well." : null;
                 case "miller": return Count("mill.grain") > 0 ? "Barley's in from the fields. The stone's turning on something, at least." : null;
                 case "leatherworker": case "skinner": return Count("tannery.hides") > 0 ? "The hunter's been by with a hide. Grey at one edge; the rest'll do." : null;
+                case "innkeeper": return Places["inn"].Count > 0 && Count("inn.ale") == 0 ? "Dry. Ama's cask never sees the night out." : Count("inn.meat") > 0 ? "Garet's hares are in the pot. Don't tell the out-of-work." : null;
                 case "henwife": return Count("stall.eggs") > 0 ? "Eggs are at the produce stall if you're wanting any. I don't sell from the yard." : Count("inn.eggs") > 0 ? "Took the Cask its eggs this morning. The rest go to the stall after dinner." : null;
                 case "drinker": case "elder": case "gossip": case "farmer":
                     return Places["inn"].Count > 0 && Count("inn.ale") == 0 ? "The cask's run dry at the inn. The out-of-work drank it by supper." : Count("inn.meat") > 0 ? "Hare in the Cask's pot tonight. The hunter's doing." : Count("inn.bread") > 0 && Count("inn.eggs") > 0 ? "Bread and eggs at the Cask today. Like old times, nearly." : Count("inn.wood") > 0 ? "The Cask's got a fire going. Dry oak, for once." : null;
@@ -610,9 +655,10 @@ namespace Crulanda.Encounter
             v.Title = title ?? VillageLife.TitleFor(role); v.fixedPlace = fixedPlace;
             v.Coop = coop;
             // Bed and rising: the baker is up before dawn for the first loaves, the drinkers last to bed and last up, children early to bed;
-            // the hunter early too where he has a lodge, for the long walk out to it.
-            v.bedAt = role == "drinker" ? 23 + (index % 3) * .3f : role == "child" ? 19.8f + (index % 3) * .2f : role == "henwife" ? HerdHour : role == "baker" ? 19.6f : role == "hunter" && life.Places["lodge"].Count > 0 ? HunterBed : 20.2f + (index % 5) * .25f;
-            v.wakeAt = role == "drinker" ? 7.5f : role == "henwife" ? 5.7f : role == "baker" ? 4.6f : 5.8f + (index % 5) * .3f;
+            // the hunter early too where he has a lodge, for the long walk out to it; the innkeeper up at first light and last to bed
+            // but the drinkers.
+            v.bedAt = role == "drinker" ? 23 + (index % 3) * .3f : role == "child" ? 19.8f + (index % 3) * .2f : role == "henwife" ? HerdHour : role == "baker" ? 19.6f : role == "hunter" && life.Places["lodge"].Count > 0 ? HunterBed : role == "innkeeper" ? VillageWork.InnkeeperBed : 20.2f + (index % 5) * .25f;
+            v.wakeAt = role == "drinker" ? 7.5f : role == "henwife" ? 5.7f : role == "baker" ? 4.6f : role == "innkeeper" ? VillageWork.InnkeeperUp : 5.8f + (index % 5) * .3f;
             if (fixedPlace != null) v.bedAt = v.wakeAt = 0;   // residents keep their post day and night
             v.lastHour = WorldClock.Hour; v.index = index; v.tolerance = .85f + (index % 5) * .18f;
             go.SetActive(true);
@@ -673,7 +719,7 @@ namespace Crulanda.Encounter
             for (int tries = 0; tries < 4; tries++)
             {
                 activity = options[life.Next(options.Length)];
-                var target = activity == "home" || activity == "yard" ? Resolve(activity) : life.RandomPlace(activity);
+                var target = activity == "home" || activity == "yard" ? Resolve(activity) : life.RandomPlace(activity, this);   // their own stall, shop or fields first
                 if (target.HasValue) { Go(target.Value); return; }
             }
             activity = "wander"; var alt = life.RandomPlace("wander") ?? life.RandomPlace("green");
@@ -714,10 +760,44 @@ namespace Crulanda.Encounter
                 if (done.Contains(e.id) || hour < e.at || hour >= e.until) continue;
                 done.Add(e.id);
                 var from = Resolve(e.from); if (!from.HasValue) { Blocked(e.from); continue; }
-                Vector3? to = null; if (e.to != null) { to = Resolve(e.to); if (!to.HasValue) { Blocked(e.to); continue; } }
+                Vector3? to = null; if (e.to != null) { to = HandOverAt(e.door) ?? Resolve(e.to, e.toRole); if (!to.HasValue) { Blocked(e.to); continue; } }
                 errand = e; leg = 0; dropAt = to ?? from.Value; activity = e.id; Go(from.Value); return true;
             }
             return false;
+        }
+        /// <summary>Where goods are handed over at a door (<see cref="Errand.door"/>: the kitchen's back door, the bar), or null when
+        /// the village has no such place. Hen-wives come to the kitchen together, so each takes a spot nobody else is bound for.</summary>
+        Vector3? HandOverAt(string door)
+        {
+            if (door == null || !life.Places.TryGetValue(door, out var spots) || spots.Count == 0) return null;
+            foreach (var p in spots) if (!life.Villagers.Exists(v => v != this && v.errand != null && (v.dropAt - p).sqrMagnitude < .25f)) return p;
+            return spots[life.Next(spots.Count)];
+        }
+        /// <summary>Who answers a hand-over. At a door (the kitchen's back door, the bar): only the innkeeper (where there is none,
+        /// whoever keeps the kitchen or the bar), at work or passing by within reach of it, whatever he is about (the pot on, the
+        /// dinner); else nobody, never another carrier. The reach (4 m at the kitchen's door, 3 m at the bar) takes in the range and
+        /// the table but not the taproom through the wall. Otherwise whoever is nearest within 6 m, stood at their work and not
+        /// carrying goods of their own.</summary>
+        Villager Taker(Errand e)
+        {
+            Villager best = null; float bestD;
+            if (e.door != null && life.Places.TryGetValue(e.door, out var spots) && spots.Count > 0)
+            {
+                bestD = e.door == VillageWork.Bar ? 3 * 3 : 4 * 4;
+                foreach (var v in life.Villagers)
+                {
+                    if (v == this || !v.Visible || v.state == State.Flee || v.Role != "innkeeper" && (v.errand != null || v.activity != "kitchen" && v.activity != "bar")) continue;
+                    float d = (v.transform.position - transform.position).sqrMagnitude; if (d < bestD) { bestD = d; best = v; }
+                }
+                return best;
+            }
+            bestD = 6 * 6;
+            foreach (var v in life.Villagers)
+            {
+                if (v == this || !v.Visible || v.state != State.Activity || v.errand != null) continue;
+                float d = (v.transform.position - transform.position).sqrMagnitude; if (d < bestD) { bestD = d; best = v; }
+            }
+            return best;
         }
         void CancelErrand() { errand = null; goingIn = false; DropLoad(); }   // goods posed for a capture are dropped too
         /// <summary>An errand's place is there but nobody can get near it for the grey-coats: say so, and let it go for today.</summary>
@@ -726,8 +806,9 @@ namespace Crulanda.Encounter
             if (!life.Places.TryGetValue(place, out var l) || l.Count == 0 || life.R01 > .7f) return;
             Say(place == "well" ? "Can't get to the well with that grey-coat stood by it." : "Not with the grey-coats about. It'll keep.", 4);
         }
-        /// <summary>Where an errand's place is: home, the coop's spots, or a kind of place (where one of that trade is working now, if any).</summary>
-        Vector3? Resolve(string place)
+        /// <summary>Where an errand's place is: home, the coop's spots, one of their own places of the kind (the baker's loaves to her
+        /// own stall), or a kind of place (where one of that trade, or of <paramref name="role"/>, is working now, if any).</summary>
+        Vector3? Resolve(string place, string role = null)
         {
             switch (place)
             {
@@ -737,7 +818,8 @@ namespace Crulanda.Encounter
                 case "pan": return Coop != null ? Coop.pan : (Vector3?)null;
                 case "yard": return Coop != null ? Around(Coop.yard, 3) : null;
             }
-            return life.WorkedPlace(place, this) ?? life.RandomPlace(place);
+            if (life.OwnPlaces(this, place) != null) return life.RandomPlace(place, this);
+            return life.WorkedPlace(place, this, role) ?? life.RandomPlace(place);
         }
         /// <summary>At the end of an errand's leg: pick up (what the place yields shows in the hands), or hand over and say so.</summary>
         void ErrandArrive()
@@ -761,8 +843,9 @@ namespace Crulanda.Encounter
                 if (e.good != null) life.Deliver(e.to + "." + e.good, Mathf.Max(1, loadCount));
                 if (e.to == "pan") { Coop.Water(); Face(Coop.pan + (Coop.pan - Coop.yard)); }
                 if (e.line != null) Say(e.line.Replace("{n}", loadCount.ToString()), 5);
-                var taker = life.NearestVillager(transform.position, 6, this);
-                if (taker != null && taker.state == State.Activity) { var reply = VillageWork.Reply(e.good, life.R01); if (reply != null) taker.Say(reply, 4); taker.Face(transform.position); }
+                var taker = Taker(e);
+                if (taker != null) { var reply = VillageWork.Reply(e.good, life.R01); if (reply != null) taker.Say(reply, 4); taker.Face(transform.position); }
+                life.HandOver(this, e, taker);
                 DropLoad();
                 if (e.to == "home" && home != null) { activity = "home"; goingIn = true; until = Time.time + 4; }
                 errand = null;

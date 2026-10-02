@@ -3556,6 +3556,13 @@
           "x": -80,
           "y": 83
         }
+      },
+      {
+        "name": "Hob Linden",
+        "role": "innkeeper",
+        "title": "Innkeeper",
+        "place": "bar",
+        "works": true
       }
     ],
     "households": [
@@ -3755,6 +3762,79 @@
             "kin": "head"
           }
         ]
+      },
+      {
+        "name": "The Golden Cask",
+        "house": "The Golden Cask",
+        "canonStatus": "GAME-ONLY",
+        "members": [
+          {
+            "name": "Hob Linden",
+            "kin": "head"
+          },
+          {
+            "name": "Quill",
+            "kin": "lodger"
+          },
+          {
+            "name": "Mira",
+            "kin": "lodger"
+          }
+        ]
+      }
+    ],
+    "workshops": [
+      {
+        "who": "Brannoc Vell",
+        "prop": "Vell's smithy"
+      },
+      {
+        "who": "Hedda Thorne",
+        "prop": "Thorne's bakehouse"
+      },
+      {
+        "who": "Hedda Thorne",
+        "prop": "Bread stall"
+      },
+      {
+        "who": "Ama Rusk",
+        "prop": "Produce stall"
+      },
+      {
+        "who": "Tamsin Reed",
+        "prop": "Cloth and pots"
+      },
+      {
+        "who": "Fen Walker",
+        "prop": "Tannery yard"
+      },
+      {
+        "who": "Maud Tanner",
+        "prop": "Tanner's leather shop"
+      },
+      {
+        "who": "Lisbet Crane",
+        "prop": "Lisbet's drying hut"
+      },
+      {
+        "who": "Hob Linden",
+        "prop": "The Cask's kitchen"
+      },
+      {
+        "who": "Hob Linden",
+        "prop": "The Golden Cask"
+      },
+      {
+        "who": "Garet Moss",
+        "prop": "Moss's game rack"
+      },
+      {
+        "who": "Osk Farrow",
+        "prop": "Woodyard"
+      },
+      {
+        "who": "Aldo Crisp",
+        "prop": "Oak creek mill"
       }
     ]
   },

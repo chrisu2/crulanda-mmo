@@ -65,16 +65,17 @@ namespace Crulanda.Tests
             yield return Load(19);
             var life = VillageLife.Active; Assert.IsNotNull(life, "Oakhaven has village life.");
             var folk = life.Villagers.Where(v => !v.Resident).ToList();
-            // Step 6 (the Golden Cask's household, with its innkeeper Hob Linden) raises these to 24 folk and 16 households.
-            Assert.AreEqual(23, folk.Count, "Twenty villagers and three hen-wives.");
+            Assert.AreEqual(24, folk.Count, "Twenty villagers, three hen-wives and the innkeeper.");
             foreach (var v in folk)
             {
                 Assert.IsNotNull(v.Household, v.Name + " has a household."); Assert.IsNotNull(v.Home, v.Name + " has a home.");
                 Assert.AreSame(v.Household.house, v.Home, v.Name + " lives in the household's house.");
-                Assert.AreEqual(v.Household.def.house, v.Home.name, v.Name + "'s door is named for the house.");
+                // The innkeeper's house is his inn: he goes in by its door to the rooms upstairs.
+                Assert.AreEqual(v.Home.kind == "rooms" ? v.Household.def.house + ", upstairs" : v.Household.def.house, v.Home.name, v.Name + "'s door is named for the house.");
                 CollectionAssert.Contains(v.Household.members, v);
             }
-            Assert.AreEqual(15, life.Households.Count);
+            Assert.AreEqual(16, life.Households.Count);
+            Assert.AreEqual("rooms", life.Find("Hob Linden").Home.kind, "Hob Linden sleeps over the Golden Cask.");
             Assert.AreEqual(life.Households.Count, life.Households.Select(h => h.house).Distinct().Count(), "No two households share a door.");
             Assert.IsTrue(life.Households.All(h => h.house != null), "Every house is built and has a door.");
             // Past everyone's bedtime but the drinkers': they walk home from wherever they are and go in at their own door.

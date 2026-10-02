@@ -286,7 +286,7 @@ namespace Crulanda.Encounter
                 ItemSquare(new Rect(e.mousePosition.x - Slot / 2, e.mousePosition.y - Slot / 2, Slot, Slot), s);
                 if (e.type == EventType.MouseUp)
                 {
-                    bool overWindow = (bagsVisible && BagsRect.Contains(e.mousePosition)) || (charVisible && CharRect.Contains(e.mousePosition)) || (vendorVisible && VendorRect.Contains(e.mousePosition)) || TradesUiBlocks(e.mousePosition);
+                    bool overWindow = (bagsVisible && BagsRect.Contains(e.mousePosition)) || (charVisible && CharRect.Contains(e.mousePosition)) || (vendorVisible && VendorRect.Contains(e.mousePosition)) || TradesUiBlocks(e.mousePosition) || LootUiBlocks(e.mousePosition);
                     if (!overWindow && dragBag >= 0) confirmDestroy = dragBag;
                     dragBag = dragEquip = -1;
                 }

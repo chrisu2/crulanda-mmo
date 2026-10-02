@@ -30,9 +30,9 @@ namespace Crulanda.Encounter
             var old = Of(e); if (old != null && old.Quality == quality) return;
             Clear(e);
             var go = new GameObject(Name); go.transform.SetParent(e.transform, false);
-            // On the ground under the root (camp roots ride a metre above their feet), at world scale.
+            // On the ground under the root (camp roots ride a metre above their feet, times their scale), at world scale.
             float s = Mathf.Max(.01f, e.transform.lossyScale.y);
-            go.transform.position = e.transform.position - Vector3.up; go.transform.localScale = Vector3.one / s;
+            go.transform.position = e.transform.position - Vector3.up * s; go.transform.localScale = Vector3.one / s;
             go.AddComponent<LootBeacon>().Build(quality, e.persistentId);
         }
         /// <summary>Puts out the beacon over a body, if it has one.</summary>

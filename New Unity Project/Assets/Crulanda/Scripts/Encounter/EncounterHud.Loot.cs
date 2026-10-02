@@ -21,10 +21,10 @@ namespace Crulanda.Encounter
         public static string PinnedTooltip; public static Vector2 PinnedTooltipAt;
         static readonly Color Gain = new Color(.3f, 1, .3f);
         const string GainHex = "#4dff4d", LossHex = "#ff5547";
-        GUIStyle lootSub;
+        GUIStyle lootSub, lootName, lootTitle;
 
         /// <summary>The window for this many rows (coins and things), beside the character sheet and clear of the bags.</summary>
-        static Rect LootRectFor(int rows) { return new Rect(680, 170, 330, LootTop + Mathf.Max(1, rows) * LootRowH + LootFoot); }
+        static Rect LootRectFor(int rows) { return new Rect(680, 170, 366, LootTop + Mathf.Max(1, rows) * LootRowH + LootFoot); }
 
         /// <summary>The loot window when it is open, and a pinned tooltip (captures). The tooltip is drawn here unless an item window will draw it later.</summary>
         void DrawLoot()
@@ -37,11 +37,13 @@ namespace Crulanda.Encounter
         void LootWindow()
         {
             ItemStyles(); if (lootSub == null) lootSub = new GUIStyle(tiny) { wordWrap = false, clipping = TextClipping.Clip };
+            if (lootName == null) lootName = new GUIStyle(frameName) { fontSize = 13, wordWrap = false, clipping = TextClipping.Clip };
+            if (lootTitle == null) lootTitle = new GUIStyle(frameName) { wordWrap = false };   // long names clip on one line, never wrap out of their row
             var body = session.LootBody; var items = session.LootItems; int coins = session.LootCoins;
             var w = lootRect = LootRectFor(items.Count + (coins > 0 ? 1 : 0));
             int best = session.BestQuality(items); var edge = best >= 2 ? LootBeacon.Colour(best) * .8f : new Color(.3f, .22f, .12f);
             Fill(new Rect(w.x - 3, w.y - 3, w.width + 6, w.height + 6), new Color(edge.r, edge.g, edge.b, .98f)); Fill(w, new Color(.08f, .075f, .07f, .97f));
-            Shadow(new Rect(w.x + 14, w.y + 8, w.width - 28, 24), body != null ? body.actor.DisplayName : "Loot", frameName, gold);
+            Shadow(new Rect(w.x + 14, w.y + 8, w.width - 28, 24), body != null ? body.actor.DisplayName : "Loot", lootTitle, gold);
             Shadow(new Rect(w.x + 14, w.y + 30, w.width - 28, 20), "Click a row to take it", lootSub, new Color(.7f, .66f, .58f));
             var e = Event.current; var mouse = e.mousePosition; float y = w.y + LootTop;
             if (coins > 0)
@@ -65,8 +67,8 @@ namespace Crulanda.Encounter
                 if (d != null)
                 {
                     int q = Mathf.Clamp(d.quality, 0, 4);
-                    Shadow(new Rect(r.xMax + 12, r.y + 4, w.width - Slot - 50, 22), d.name, frameName, q == 0 ? ItemDatabase.QualityColors[0] : LootBeacon.Colour(q));
-                    Shadow(new Rect(r.xMax + 12, r.y + 27, w.width - Slot - 50, 20), LootKind(d, drop.count), lootSub, new Color(.75f, .72f, .66f));
+                    Shadow(new Rect(r.xMax + 12, r.y + 4, w.width - Slot - 40, 22), d.name, lootName, q == 0 ? ItemDatabase.QualityColors[0] : LootBeacon.Colour(q));
+                    Shadow(new Rect(r.xMax + 12, r.y + 27, w.width - Slot - 40, 20), LootKind(d, drop.count), lootSub, new Color(.75f, .72f, .66f));
                     if (row.Contains(mouse)) ItemTooltip(d, true);
                 }
                 if (e.type == EventType.MouseDown && (e.button == 0 || e.button == 1) && row.Contains(mouse)) { session.TakeLoot(i); e.Use(); return; }

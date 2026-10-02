@@ -184,9 +184,11 @@ namespace Crulanda.Tests
             Assert.AreEqual(0, mob.Coins);
             Assert.IsTrue(s.CanLoot(mob), "and the body can still be searched,");
             Assert.AreEqual(3, LootBeacon.Showing(mob), "its beacon lit for the blade.");
+            Assert.AreNotEqual("Search the body", s.InteractPrompt, "A body with nothing that fits does not take E (Mira, nodes and doors keep it).");
             // Room made: E opens it again and takes the blade.
             p.bag[0].item = ""; p.bag[0].count = 0;
             yield return null;
+            Assert.AreEqual("Search the body", s.InteractPrompt, "With room, the body takes E again.");
             s.Interact(); Assert.IsTrue(s.LootOpen);
             s.Interact();
             Assert.AreEqual(1, Inventory.Count(p, Blade)); Assert.IsFalse(s.CanLoot(mob)); Assert.AreEqual(-1, LootBeacon.Showing(mob));
@@ -205,6 +207,37 @@ namespace Crulanda.Tests
             Assert.IsFalse(s.LootOpen, "Walked off: it shuts.");
             Assert.IsTrue(s.CanLoot(mob), "And the helm is still on the body.");
             Assert.AreEqual(2, LootBeacon.Showing(mob));
+        }
+
+        [UnityTest] public IEnumerator The_window_shuts_the_windows_under_it_and_gives_way_to_them()
+        {
+            var s = Session(); Assert.AreEqual(root, s.SaveDirectoryOverride, "This test saves to its own folder.");
+            EncounterEnemy mob = null; yield return KillOne(s, m => mob = m);
+            s.PutLoot(mob, 2, new[] { new LootDrop(Helm, 1) });
+            // Windows drawn before the loot window would take its clicks: opening it shuts them.
+            s.Conversation = new EncounterSession.QuestConversation { npc = "Mira", where = s.Player.transform.position }; s.QuestBookOpen = true;
+            s.OpenLoot(mob); Assert.IsTrue(s.LootOpen);
+            Assert.IsNull(s.Conversation, "The conversation shut."); Assert.IsFalse(s.QuestBookOpen, "The quest book shut.");
+            yield return null;
+            Assert.IsTrue(s.LootOpen, "Nothing else open: it stays.");
+            // One of them opened while it is up: the loot window gives way, and the helm stays on the body.
+            s.QuestBookOpen = true;
+            for (int i = 0; i < 2; i++) yield return null;
+            Assert.IsFalse(s.LootOpen, "The quest book opened over it: it shut.");
+            Assert.IsTrue(s.CanLoot(mob)); Assert.AreEqual(2, LootBeacon.Showing(mob));
+        }
+
+        [UnityTest] public IEnumerator An_elite_body_beacon_stands_on_the_ground()
+        {
+            var s = Session(); Assert.AreEqual(root, s.SaveDirectoryOverride, "This test saves to its own folder.");
+            EncounterEnemy mob = null; yield return KillOne(s, m => mob = m);
+            // An elite's root rides 1.18 m above its feet (its agent's base offset of 1, times its scale).
+            mob.transform.localScale = Vector3.one * 1.18f;
+            LootBeacon.Clear(mob); LootBeacon.Show(mob, 4);
+            var beacon = LootBeacon.Of(mob); Assert.NotNull(beacon);
+            Assert.AreEqual(mob.transform.position.y - 1.18f, beacon.transform.position.y, .02f, "The beacon's foot is on the ground, not in the air.");
+            Assert.AreEqual(1, beacon.transform.lossyScale.y, .01f, "At world scale.");
+            yield return null;
         }
 
         [UnityTest] public IEnumerator Respawn_clears_drops_and_beacon()

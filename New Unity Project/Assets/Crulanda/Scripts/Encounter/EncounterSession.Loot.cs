@@ -83,13 +83,17 @@ namespace Crulanda.Encounter
             if (corpse == null || !corpse.Camp || !CanLoot(corpse)) return;
             if (corpse.Drops == null) RollCorpse(corpse);   // it died while the party was being restored: roll now
             lootBody = corpse;
-            if (!WorthAWindow(corpse.Drops)) TakeAllLoot();
+            if (!WorthAWindow(corpse.Drops)) { TakeAllLoot(); return; }
+            // The windows drawn before it would take its clicks, so they shut while it is open (TickLoot shuts it if one opens).
+            Conversation = null; if (VendorNpc != null) CloseVendor(); TradesOpen = false; QuestBookOpen = false; ReadingDocument = null; MapOpen = false;
         }
+        /// <summary>Whether E on this camp body would take anything now: coins, a thing the bags have room for, or loot not yet rolled. A body with nothing that fits leaves E to Mira, villagers, nodes and doors.</summary>
+        bool CanTakeAny(EncounterEnemy e) { return e.Drops == null || e.Coins > 0 || Items == null || e.Drops.Exists(d => Inventory.Room(Progress, Items, d.item) > 0); }
         public void CloseLoot() { lootBody = null; }
         /// <summary>Take all [E]: the coins, then each thing in order; what does not fit stays on the body. The window shuts either way.</summary>
         public void TakeAllLoot()
         {
-            var body = LootBody; if (body == null) return;
+            var body = LootBody; if (body == null || body.Drops == null || body.actor.IsAlive) { CloseLoot(); return; }
             TakeCoins(body); int kept = 0;
             for (int i = 0; i < body.Drops.Count; i++) kept += TakeDrop(body, i);
             body.Drops.RemoveAll(d => d.count <= 0);
@@ -105,7 +109,7 @@ namespace Crulanda.Encounter
             AfterTake(body); return left == 0;
         }
         /// <summary>A click on the coins row.</summary>
-        public void TakeLootCoins() { var body = LootBody; if (body == null) return; TakeCoins(body); AfterTake(body); }
+        public void TakeLootCoins() { var body = LootBody; if (body == null || body.Drops == null || body.actor.IsAlive) { CloseLoot(); return; } TakeCoins(body); AfterTake(body); }
         void TakeCoins(EncounterEnemy body)
         {
             if (body.Coins <= 0) return;
@@ -123,7 +127,7 @@ namespace Crulanda.Encounter
         /// <summary>An emptied body is done with (looted, its beacon out, its window shut); otherwise its beacon shows the best of what is left.</summary>
         void AfterTake(EncounterEnemy body)
         {
-            if (body.Coins <= 0 && body.Drops.Count == 0) { body.Looted = true; LootBeacon.Clear(body); if (lootBody == body) CloseLoot(); }
+            if (body.Coins <= 0 && (body.Drops == null || body.Drops.Count == 0)) { body.Looted = true; LootBeacon.Clear(body); if (lootBody == body) CloseLoot(); }
             else ShowBeacon(body);
         }
         /// <summary>The rarity call-out: a chat line in the item's quality colour, and a "RARE" or "EPIC" toast over its name.</summary>
@@ -146,7 +150,8 @@ namespace Crulanda.Encounter
         void TickLoot()
         {
             if (lootBody == null) { lootBody = null; return; }   // a body destroyed by a load reads as null: forget it
-            if (!Player.IsAlive || lootBody.actor == null || lootBody.actor.IsAlive || lootBody.Drops == null || Vector3.Distance(Player.transform.position, lootBody.transform.position) > LootReach) CloseLoot();
+            if (!Player.IsAlive || lootBody.actor == null || lootBody.actor.IsAlive || lootBody.Drops == null || Vector3.Distance(Player.transform.position, lootBody.transform.position) > LootReach
+                || Conversation != null || VendorNpc != null || TradesOpen || QuestBookOpen || MapOpen) CloseLoot();   // a window drawn under it opened: it gives way
         }
     }
 }

@@ -1250,7 +1250,7 @@ namespace Crulanda.Encounter
         public bool CompanionInReach { get { return Companion != null && Vector3.Distance(Player.transform.position, Companion.transform.position) < TalkRange; } }
         /// <summary>A body that still has something to take (camp mobs until looted; story enemies by their saved record).</summary>
         public bool CanLoot(EncounterEnemy e) { return e != null && !e.actor.IsAlive && (e.Camp ? !e.Looted : !Progress.FindEnemy(e.persistentId).looted); }
-        EncounterEnemy LootableCorpse { get { return Enemies.Find(e => CanLoot(e) && Distance(e) < 3.6f); } }
+        EncounterEnemy LootableCorpse { get { return Enemies.Find(e => CanLoot(e) && Distance(e) < 3.6f && (!e.Camp || CanTakeAny(e))); } }
         public Crulanda.World.ZoneDoor NearbyDoor
         {
             get

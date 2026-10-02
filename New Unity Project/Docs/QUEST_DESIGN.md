@@ -119,6 +119,10 @@ Chris's brief: "a quest appears at lvl 3 to take out the bandit and bandit king 
 - **Giver and turn-in:** Wil Carder, the farmer whose barn they emptied (Garet Moss tracked them to the hollow).
 - **Level 4, minLevel 3:** nothing shows before level 3, then a gold !. (It was level 3 until the hollow went deep; level 4
   sits in the middle of the dungeon's 3-5.)
+- **Since 2026-10-01 (unrun):** the hollow is a dungeon in earnest. The deserters call each other, Hesk and Caddock fight with
+  their guards, and Caddock is a dungeon end boss with a wound-up blow (The King's Due), an enrage and a call. On paper a
+  level-5 Warrior needs Mira and careful play to bring him down, with a fifth of his health left, and a level-3 character
+  cannot. The quest still opens at 3: the six deserters can be had at the mouth and the first chamber; the king wants level 5.
 - **Steps:**
   1. Kill 6 deserters and Caddock, in either order.
   2. Search the deserters' plunder in his hall.

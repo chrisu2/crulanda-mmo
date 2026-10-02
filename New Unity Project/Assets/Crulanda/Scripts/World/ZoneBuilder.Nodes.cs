@@ -303,18 +303,21 @@ namespace Crulanda.World
         {
             if (variant == 5)
             {
-                var frond = Tint(art.foliage, Wither(new Color(.28f, .58f, .3f))); var dark = Tint(art.foliage, Wither(new Color(.2f, .42f, .22f))); var dew = Glowing(new Color(.85f, .95f, 1), .25f);
+                // Silvery blue-green, not the meadow ferns' yellow-green, so a dewfern reads as one among them; the dew lit a little.
+                var frond = Tint(art.foliage, Wither(new Color(.36f, .62f, .54f))); var dark = Tint(art.foliage, Wither(new Color(.24f, .46f, .4f))); var dew = Glowing(new Color(.8f, .95f, 1), .6f);
                 for (int i = 0; i < 7; i++)
                 {
-                    var q = Quaternion.Euler(0, i * 51 + 10, 0); var p = new Vector3(0, .03f, 0); float pitch = 62 - (i % 3) * 6;
+                    var q = Quaternion.Euler(0, i * 51 + 10, 0); var p = new Vector3(0, .03f, 0); float pitch = 70 - (i % 3) * 6;
                     for (int k = 0; k < 4; k++)
                     {
-                        // Each piece a little flatter than the last: up from the crown, then out and over.
-                        var r = q * Quaternion.Euler(pitch - k * 26, 0, 0); var along = r * Vector3.forward; float l = .17f - k * .02f;
-                        Part(PrimitiveType.Cube, t, p + along * l / 2, new Vector3(.11f - k * .018f, .012f, l), k % 2 == 0 ? frond : dark, r);
+                        // Each piece a little flatter than the last: up from the crown, then out and over (a pitch about X turns +Z down,
+                        // so it is negated: drawn as written before, most of every frond ran into the ground and only its tip showed).
+                        var r = q * Quaternion.Euler(-(pitch - k * 26), 0, 0); var along = r * Vector3.forward; float l = .26f - k * .03f;
+                        Part(PrimitiveType.Cube, t, p + along * l / 2, new Vector3(.13f - k * .02f, .012f, l), k % 2 == 0 ? frond : dark, r);
                         p += along * l;
+                        if (k == 1 && i % 2 == 1) Part(PrimitiveType.Sphere, t, p + Vector3.up * .012f, Vector3.one * .03f, dew);
                     }
-                    if (i % 2 == 0) Part(PrimitiveType.Sphere, t, p + Vector3.up * .01f, Vector3.one * .025f, dew);
+                    Part(PrimitiveType.Sphere, t, p + Vector3.up * .012f, Vector3.one * .036f, dew);   // a bead at every frond's tip
                 }
                 return;
             }

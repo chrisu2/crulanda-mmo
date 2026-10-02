@@ -74,10 +74,8 @@ namespace Crulanda.Tests
                 { "Captain's eyrie", "the Sandthrone's own keep, 117 m from Pilgrims' Rest" } } },   // grown to 430 m; the beasts moved out (2026-10-02)
             { "ashrim", new Dictionary<string, string> {
                 { "Cinderfold hollows", "91 m from the hunters' hide, where nobody lives (the Ash-Walkers are all at the enclave)" } } },   // grown to 430 m (2026-10-02)
-            { "verdant", new Dictionary<string, string> {
-                { "Antler Meadow stags", "open: the meadow is 43 m from the Guest-Tree" }, { "Fallen Ghost-Oak spiders", "open: 72 m" },
-                { "The Briar Way", "open: 95 m" }, { "Old Ninebranch", "open: 98 m" }, { "Mistmere reed-boars", "open: 102 m from the scout's lean-to" },
-                { "The Greying", "open: 106 m" } } },
+            { "verdant", new Dictionary<string, string> {   // grown to 430 m (2026-10-02)
+                { "The Briar Way", "guards the way to the Root-Mother's Deep, 95 m from the Guest-Tree: it stays at the dungeon's door" } } },
         };
         /// <summary>The cave's own camps: the deserters, their quartermaster and their king.</summary>
         static bool OfTheHollow(ZoneCamp c) { return c.tag == "deserter" || c.tag == "quartermaster" || c.tag == "banditking"; }

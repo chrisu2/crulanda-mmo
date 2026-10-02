@@ -544,7 +544,7 @@ def verdant(z):
         N(O, 157, -46, 'south shoulder', 90), N(O, 156, 88, 'north shoulder', 90),
         N(R, -109, 164.5, 'deep gallery', under=True), N(R, -95.8, 193.9, 'deep sap well', under=True),
         N(R, -109.2, 203.6, 'deep cold stair E', under=True), N(R, -115.7, 205.5, 'deep cold stair W', under=True),
-        N(W, 122, 26, 'ridge-foot E', 90), N(W, -119, -46.5, 'tappers N'), N(W, -133, -70, 'tappers W', 90), N(W, -79, -88, 'mere E', 90),
+        N(W, 122, 26, 'ridge-foot E', 90), N(W, -119, -46.5, 'tappers N'), N(W, -133, -70, 'tappers W', 90), N(W, -99.5, -112, 'mere W', 90),
         N(W, -48, 62.5, 'westbank N'), N(W, 48, 67, 'riverbank N'), N(W, 113, 108, 'ridge-foot N W', 90), N(W, -4, 105, 'rootfast N'),
         ring(-56, -92, 20, 20, 'mere NE'), ring(-56, -92, 20, 70, 'mere N'), ring(-56, -92, 20, 140, 'mere NW'), ring(-56, -92, 20, 330, 'mere SE'),
         ring(34, -74, 11, 340, 'fern E'), ring(34, -74, 11, 15, 'fern NE'), ring(34, -74, 11, 50, 'fern N'),

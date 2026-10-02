@@ -33,7 +33,12 @@ CONF = {
                 # their gate and their captain at his keep (ZoneGrowthTests.NearHomes names them).
                 'stay': ['Toll-gate guards', "Captain's eyrie"]},
     'ashrim':  {'size': 430, 'not_homes': ["Hunters' hide"], 'reach': 22},   # nobody lives at the hunters' hide: all four Ash-Walkers are at the enclave
-    'verdant': {'size': 430, 'not_homes': [], 'reach': 22},
+    'verdant': {'size': 430, 'not_homes': [], 'reach': 22,
+                # The Briar Way guards the way to the Root-Mother's Deep and stays at its door (as Crowsfoot's deserters do).
+                'stay': ['The Briar Way'],
+                # Spots chosen by eye (the search found only far corners for these): the stags' meadow north of Rootfast, Old
+                # Ninebranch west on his knoll, the Fallen Ghost-Oak and its spiders north-west, past the temple.
+                'targets': {'Antler Meadow stags': (-40, 190), 'Old Ninebranch': (-155, 100), 'Fallen Ghost-Oak spiders': (-165, 150)}},
 }
 
 
@@ -111,6 +116,11 @@ def plan(zn):
         if g: g.append(ci)
         else: groups.append([ci])
     for g in groups:
+        for k, c2 in enumerate(z['camps']):
+            if k not in g and k not in flagged and not c2.get('under') and c2['name'] not in conf.get('stay', []) and any(dist(xy(c2['center']), xy(z['camps'][j]['center'])) < 35 for j in g): g.append(k)
+    for k in [k for g in groups for k in g]:
+        if k not in flagged: flagged.append(k)
+    for g in groups:
         ci = g[0]; c = z['camps'][ci]
         C = (sum(z['camps'][k]['center']['x'] for k in g) / len(g), sum(z['camps'][k]['center']['y'] for k in g) / len(g))
         members = [(coll, i, p, lab) for coll, i, p, lab in ents if owner.get((coll, i)) in g]
@@ -119,7 +129,20 @@ def plan(zn):
         hub = min(homes, key=lambda h: dist(C, h[1]))[1]
         bearing = math.atan2(C[1] - hub[1], C[0] - hub[0])
         best = None
-        for step in range(0, 140, 2):                  # how far out along a bearing
+        def ok(d):
+            moved = [(p[0] + d[0], p[1] + d[1]) for p in pts]
+            return (all(near(moved[k]) >= RULE for k in range(len(g))) and not any(max(abs(q[0]), abs(q[1])) > H2 - 10 for q in moved)
+                and not any(line_dist(q, w) < 9 for q in moved for w in water) and not any(line_dist(q, r) < 7 for q in moved for r in roads)
+                and not any(dist(q, lc) < lr + 6 for q in moved for lc, lr in lakes) and not any(dist(q, e) < 30 for q in moved for e in exits)
+                and not any(dist(q, o) < 9 for q in moved for o, _ in others)
+                and not any(dist(moved[0], xy(z['camps'][k]['center'])) < 40 for k in range(len(z['camps'])) if k not in flagged)
+                and not any(dist(moved[0], m['to']) < 45 for m in moves.values()))
+        want = conf.get('targets', {}).get(c['name'])
+        if want:
+            d = (want[0] - centres[0][0], want[1] - centres[0][1])
+            if ok(d): best = (0, d, (C[0] + d[0], C[1] + d[1]), round(dist(C, (C[0] + d[0], C[1] + d[1]))), 0)
+            else: print('  (the chosen spot for %s fails a check: searching)' % c['name'])
+        for step in (range(0, 140, 2) if not best else ()):   # how far out along a bearing
             for turn in range(0, 91, 5):               # how far the bearing swings from its own
                 for sgn in ((1,) if turn == 0 else (1, -1)):
                     a = bearing + sgn * math.radians(turn)

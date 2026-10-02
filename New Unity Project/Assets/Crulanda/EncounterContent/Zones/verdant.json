@@ -4,7 +4,7 @@
   "subtitle": "The Verdant Ocean of the western coast, where the Veridian Keepers keep the Shore of the First Cycle",
   "canonStatus": "CANON-EXPANDED",
   "canonNote": "Canon (book3 ch.1-7, world_bible.md): the Verdant Shore, the 'Verdant Ocean' of the Western Coast, a forest 'that didn't know when to stop': giant trees with trunks as wide as houses, broad flat leaves that sway like a green tide, a thousand greens from obsidian moss to emerald-glowing new ferns (ch.1); the Ridge of Long Shadows, the basalt divide the survivors crest to see it, with a harbour at its foot (ch.1, 3); the Veridian Keepers, beings of living wood and moss, and Oak-Bane and Willow-Whisper (ch.2, world_bible.md); the Veridian Temple, a stair of calcified roots down to the Root-Mother (ch.7); Ghost-Oaks tapped for Veridian sap 'the color of liquid emerald' (ch.4); the Whispering Glade and the mossy outcrop over it (ch.5); glass-frogs (ch.2); the Salt-Flats (ch.3); and the mists below the ridge, where an unnatural violet fog that tastes of ozone brings the Void-Touchers and the Pale Shadows (ch.2-4, 8). The game is set before the books' exodus: the survivors, Elara's First Seed (the Veridian Pine), the Salt-Wall and Salt-Mender's Landing are not here yet, and the Pale's touch is shown early, as foreshadowing (PROVISIONAL). The mountains between the Rim and the Shore are Book 3's ash-mountains (book2 ch.26: the Ashlands of the lower North were once the forested Verdant Spine); the road over them is GAME-ONLY. GAME-ONLY: Rootfast and every Keeper but Oak-Bane and Willow-Whisper, Mossveil Falls, the Wending, the Mistmere, the Fern Hollow, the Fallen Ghost-Oak, the Antler Meadow, the Greying, Palemist Hollow (canon's 'mists below the ridge'), the creatures and camps, and all placement. The Root-Mother's Deep under the Temple (its root-stair, Sap Well, the cold in the root and the Hollow Root-Warden) is GAME-ONLY.",
-  "size": 360,
+  "size": 430,
   "levelMin": 11,
   "levelMax": 13,
   "biome": "verdant",
@@ -83,7 +83,7 @@
       "to": "zone.ashrim",
       "name": "Ash-road east over the mountains to the Ashland Rim",
       "at": {
-        "x": 173,
+        "x": 208,
         "y": 26
       },
       "arrive": {
@@ -213,8 +213,8 @@
     {
       "name": "The Antler Meadow",
       "center": {
-        "x": -62,
-        "y": 82
+        "x": -40,
+        "y": 190
       },
       "radius": 16,
       "height": 0,
@@ -223,8 +223,8 @@
     {
       "name": "Ninebranch's knoll",
       "center": {
-        "x": -122,
-        "y": 80
+        "x": -155,
+        "y": 100
       },
       "radius": 4,
       "height": 1.8,
@@ -233,8 +233,8 @@
     {
       "name": "The Fallen Ghost-Oak",
       "center": {
-        "x": -98,
-        "y": 32
+        "x": -161,
+        "y": 144
       },
       "radius": 14,
       "height": 0,
@@ -350,7 +350,7 @@
       "width": 4,
       "points": [
         {
-          "x": 181,
+          "x": 216,
           "y": 27.5
         },
         {
@@ -676,6 +676,10 @@
         {
           "x": -186,
           "y": -17
+        },
+        {
+          "x": -221,
+          "y": -17
         }
       ],
       "depth": 1.3
@@ -844,8 +848,8 @@
       "name": "The Fallen Ghost-Oak",
       "text": "A Ghost-Oak fell here before anyone counted years. Its crown is a hill of dead wood now, and the spiders have hung it with silk.",
       "at": {
-        "x": -98,
-        "y": 32
+        "x": -161,
+        "y": 144
       },
       "radius": 16,
       "canonStatus": "CANON-EXPANDED: Ghost-Oaks are the Shore's great sap-trees (book3 ch.4-6); this fallen one and its spiders are GAME-ONLY."
@@ -864,8 +868,8 @@
       "name": "The Greying",
       "text": "A stand of Ghost-Oaks gone grey from the heart out. The moss on them is dust, and nothing sings here.",
       "at": {
-        "x": 90,
-        "y": 146
+        "x": 93.16,
+        "y": 168.52
       },
       "radius": 18,
       "canonStatus": "GAME-ONLY: the Greying, an early sign of the Pale's reach. The Pale Kings and their cold are CANON (book3 ch.2-8); the Pale touching the Shore before the exodus is PROVISIONAL foreshadowing."
@@ -1722,8 +1726,8 @@
       "kind": "fallen_giant",
       "name": "The Fallen Ghost-Oak",
       "at": {
-        "x": -98,
-        "y": 32
+        "x": -161,
+        "y": 144
       },
       "rotation": 20,
       "scale": 1.0,
@@ -1735,8 +1739,8 @@
     {
       "kind": "mushrooms",
       "at": {
-        "x": -117,
-        "y": 44
+        "x": -180,
+        "y": 156
       },
       "variant": 2,
       "size": {
@@ -1759,8 +1763,8 @@
     {
       "kind": "rock",
       "at": {
-        "x": -48,
-        "y": 92
+        "x": -26,
+        "y": 200
       },
       "variant": 1
     },
@@ -1768,8 +1772,8 @@
       "kind": "perch",
       "name": "Ninebranch's rocks",
       "at": {
-        "x": -122,
-        "y": 80
+        "x": -155,
+        "y": 100
       },
       "rotation": 270,
       "size": {
@@ -1796,8 +1800,8 @@
     {
       "kind": "dead_oak",
       "at": {
-        "x": -76,
-        "y": -102
+        "x": -62.36,
+        "y": -121.75
       },
       "scale": 0.8
     },
@@ -2071,8 +2075,8 @@
     {
       "kind": "dead_oak",
       "at": {
-        "x": 80,
-        "y": 158
+        "x": 83.16,
+        "y": 180.52
       },
       "scale": 1.4
     },
@@ -2087,8 +2091,8 @@
     {
       "kind": "rock",
       "at": {
-        "x": 72,
-        "y": 146
+        "x": 75.16,
+        "y": 168.52
       },
       "variant": 1
     },
@@ -2257,8 +2261,8 @@
       "name": "Mere canopy",
       "kind": "broadleaf",
       "center": {
-        "x": -96,
-        "y": -96
+        "x": -82.36,
+        "y": -115.75
       },
       "size": {
         "x": 30,
@@ -2439,8 +2443,8 @@
       "name": "The Greying",
       "kind": "dead",
       "center": {
-        "x": 90,
-        "y": 146
+        "x": 93.16,
+        "y": 168.52
       },
       "size": {
         "x": 46,
@@ -2522,8 +2526,8 @@
     {
       "name": "Meadow grass",
       "center": {
-        "x": -77,
-        "y": 93
+        "x": -55,
+        "y": 201
       },
       "radius": 6
     },
@@ -2552,8 +2556,8 @@
       "look": "boar",
       "canonStatus": "GAME-ONLY",
       "center": {
-        "x": -80,
-        "y": -110
+        "x": -66.36,
+        "y": -129.75
       },
       "radius": 9,
       "count": 5,
@@ -2569,8 +2573,8 @@
       "look": "stag",
       "canonStatus": "GAME-ONLY",
       "center": {
-        "x": -62,
-        "y": 82
+        "x": -40,
+        "y": 190
       },
       "radius": 12,
       "count": 5,
@@ -2585,8 +2589,8 @@
       "look": "spider",
       "canonStatus": "GAME-ONLY (Ghost-Oaks are CANON, book3 ch.4)",
       "center": {
-        "x": -102,
-        "y": 38
+        "x": -165,
+        "y": 150
       },
       "radius": 11,
       "count": 5,
@@ -2617,8 +2621,8 @@
       "look": "keeper",
       "canonStatus": "CANON-EXPANDED: the Veridian Keepers are CANON (book3 ch.2); Keepers withered by the Pale's cold are GAME-ONLY",
       "center": {
-        "x": 84,
-        "y": 142
+        "x": 87.16,
+        "y": 164.52
       },
       "radius": 12,
       "count": 4,
@@ -2633,8 +2637,8 @@
       "look": "keeper",
       "canonStatus": "GAME-ONLY (a Veridian Keeper, CANON kind, withered by the Pale)",
       "center": {
-        "x": 98,
-        "y": 152
+        "x": 101.16,
+        "y": 174.52
       },
       "radius": 2,
       "count": 1,
@@ -2682,8 +2686,8 @@
       "look": "stag",
       "canonStatus": "GAME-ONLY",
       "center": {
-        "x": -122,
-        "y": 80
+        "x": -155,
+        "y": 100
       },
       "radius": 3,
       "count": 1,
@@ -3058,7 +3062,7 @@
     { "node": "node.ghostoak", "at": { "x": 122, "y": 26 }, "rotation": 90 },
     { "node": "node.ghostoak", "at": { "x": -119, "y": -46.5 } },
     { "node": "node.ghostoak", "at": { "x": -133, "y": -70 }, "rotation": 90 },
-    { "node": "node.ghostoak", "at": { "x": -79, "y": -88 }, "rotation": 90 },
+    { "node": "node.ghostoak", "at": { "x": -99.5, "y": -112 }, "rotation": 90 },
     { "node": "node.ghostoak", "at": { "x": -48, "y": 62.5 } },
     { "node": "node.ghostoak", "at": { "x": 48, "y": 67 } },
     { "node": "node.ghostoak", "at": { "x": 113, "y": 108 }, "rotation": 90 },
@@ -3073,10 +3077,5 @@
     { "node": "node.dewfern", "at": { "x": 25.6, "y": -66.9 } },
     { "node": "node.dewfern", "at": { "x": 23, "y": -75 } },
     { "node": "node.dewfern", "at": { "x": 26.9, "y": -82.4 } }
-  ],
-  "stations": [
-    { "kind": "forge", "name": "Alder-Knot's ember-stone", "at": { "x": -19, "y": 37 }, "rotation": 135, "variant": 2, "canonStatus": "GAME-ONLY" },
-    { "kind": "bench", "name": "Moss-Lantern's bench", "at": { "x": 11, "y": 38 }, "rotation": 225, "canonStatus": "GAME-ONLY" },
-    { "kind": "fire", "name": "Hearth-Tree fire", "at": { "x": 17, "y": 52 }, "rotation": 115, "canonStatus": "GAME-ONLY" }
   ]
 }

@@ -22,6 +22,11 @@ hostile within about 120 m of a village's houses) in every zone.
 
 ## 2. Elites are too easy for the loot they give (2026-10-01) — OPEN
 > "elite was too easy for the loot obtain."
+> "bandit king way too easy for the loot obtained" (the same night, after killing Caddock)
+
+Caddock, the Bandit King, the end of the first dungeon, is a level 5 elite: 528 health and about 25 a swing, alone in the
+fight (his deserters two metres away do not join), no move of his own, and he gives the Tin Crown, a blue beam and from L2
+his crown, cleaver or coat. A dungeon's end boss must be the hardest fight in its zone.
 
 Measured (`EncounterEnemy.MobHealth` / `MobHit`): a camp elite is a normal mob of its level with 2.2 times the health and 1.4
 times the hit, drawn 1.18 times the size. It has no ability of its own, its camp does not come to its aid (see note 3), and

@@ -84,11 +84,11 @@
       "name": "Ash-road east over the mountains to the Ashland Rim",
       "at": {
         "x": 208,
-        "y": 26
+        "y": 27.2
       },
       "arrive": {
         "x": -196,
-        "y": -2.8
+        "y": -3.7
       },
       "radius": 5
     }

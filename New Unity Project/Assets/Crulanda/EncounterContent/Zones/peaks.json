@@ -79,12 +79,12 @@
       "to": "zone.khaven",
       "name": "Toll road down to Khaven Village",
       "at": {
-        "x": -90,
+        "x": -90.6,
         "y": -208
       },
       "arrive": {
-        "x": -12,
-        "y": 189
+        "x": -10.4,
+        "y": 188.9
       },
       "radius": 5
     },
@@ -93,11 +93,11 @@
       "name": "Toll road east to the Ashland Rim",
       "at": {
         "x": 208,
-        "y": -92
+        "y": -98.8
       },
       "arrive": {
-        "x": -199,
-        "y": 88
+        "x": -198.8,
+        "y": 90.8
       },
       "radius": 5
     }

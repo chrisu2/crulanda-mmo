@@ -115,7 +115,7 @@
       "to": "zone.oakhaven",
       "name": "Gloom road to Oakhaven",
       "at": {
-        "x": -96.5,
+        "x": -99.8,
         "y": -197
       },
       "arrive": {
@@ -128,12 +128,12 @@
       "to": "zone.peaks",
       "name": "North road to the Shattered Peaks",
       "at": {
-        "x": -11,
+        "x": -10.3,
         "y": 198
       },
       "arrive": {
-        "x": -88,
-        "y": -199
+        "x": -90,
+        "y": -198.8
       },
       "radius": 5
     }

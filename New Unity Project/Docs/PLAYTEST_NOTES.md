@@ -197,8 +197,13 @@ The copper seams' verdigris: after the first fix (beads pressed flat) seven lump
 (`OreSeam`, fleck (.30, .55, .46)), so a seam reads as orange and green. Fix: a hint of patina only: fewer patches, smaller,
 duller and nearer the rock's own colour.
 
-## 6. Lumber trees: just four or five sticks standing up (2026-10-01) — OPEN
+## 6. Lumber trees: just four or five sticks standing up (2026-10-01, again 2026-10-02) — OPEN, NEXT
 > "lumber trees . trunk just has 4-5 stick stickup up. make it more broken/chopped down looking"
+
+> (2026-10-02, playing the build with the zones grown) "the lumber trees the trunk still has 4-5 stick poking up. need to looked
+> chopped down"
+
+Not built yet: the stopped art-notes run left only the ore half of `fix/n56-ore-windfall` done. Next after the zone growth.
 
 Measured (`ZoneBuilder.Nodes.cs` `Windfall`): the fallen trunk carries four thin stub limbs, two of them pointing up 0.9 to
 1.4 m, on a plain tapered log beside a small stump. Fix: a tree that reads as broken or felled: a torn, splintered stump,
@@ -258,3 +263,11 @@ still; then the same eye over the villagers and the world's accents, without los
 
 ## 14. A PDF of everything done since the start (2026-10-02) — OPEN
 > "give me a pdf of all items/process/builds/additions/subtractions to this whole game since we started"
+
+## 15. A few trees are disjointed in the limb area (2026-10-02) — OPEN
+> "a few trees are disjointed in the limb area"
+
+Some trees' boughs do not meet their trunks: limbs float beside or above the trunk, or start part-way out of it. To find
+which tree builders do it (the broadleaf and giant trees' boughs and leaf cards, the dead and pine trees' limbs), at what
+sizes and on what slopes, then join every bough to its trunk (rooted inside the bark, never floating), with a test that
+measures each limb's root against the trunk it belongs to.

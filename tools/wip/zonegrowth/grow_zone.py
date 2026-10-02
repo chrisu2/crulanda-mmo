@@ -12,7 +12,8 @@ What it does, in the zone's own frame (the village stays exactly where it is):
 - Each camp nearer than 125 m to a home moves, whole: the camp and everything that belongs to its place (its landmark and
   that landmark's view, the props, clearings, groves, lakes, hills, tall grass, secrets, gathering nodes and critter groups
   within its reach), by one translation, to the nearest spot (preferring its own bearing from the village) where it is
-  125 m or more from every home, inside the new edge, off the water and the roads, and clear of every other place.
+  125 m or more from every home, inside the new edge (and the Wasting's curtain), off the water and the roads, and clear of
+  every other place.
 Nothing else moves. Homes are props of kind house, inn, mill, treehouse, shelter and keep, and any household's house, less
 the enemy's own buildings named per zone.
 """
@@ -108,6 +109,9 @@ def plan(zn):
     water = [[xy(p) for p in w['points']] for w in z.get('water', [])]
     lakes = [(xy(l['center']), l.get('radius', 5)) for l in z.get('lakes', [])]
     exits = [xy(e['at']) for e in z['exits']]
+    # The Wasting's curtain is the zone's east edge where it has one (the Ash Rim's stays where it stands: its places line it):
+    # past it is the unmade, where nothing walks. A moved place keeps 15 m inside it (a camp's reach, and its landmark's).
+    east = z['wasting']['x'] - 15 if 'wasting' in z else H2 - 10
     moves = {}
     others = [(p, lab) for coll, i, p, lab in ents if (coll, i) not in owner and coll not in ('groves', 'critters')]   # a camp may stand in a wood
     groups = []
@@ -131,7 +135,7 @@ def plan(zn):
         best = None
         def ok(d):
             moved = [(p[0] + d[0], p[1] + d[1]) for p in pts]
-            return (all(near(moved[k]) >= RULE for k in range(len(g))) and not any(max(abs(q[0]), abs(q[1])) > H2 - 10 for q in moved)
+            return (all(near(moved[k]) >= RULE for k in range(len(g))) and not any(max(abs(q[0]), abs(q[1])) > H2 - 10 or q[0] > east for q in moved)
                 and not any(line_dist(q, w) < 9 for q in moved for w in water) and not any(line_dist(q, r) < 7 for q in moved for r in roads)
                 and not any(dist(q, lc) < lr + 6 for q in moved for lc, lr in lakes) and not any(dist(q, e) < 30 for q in moved for e in exits)
                 and not any(dist(q, o) < 9 for q in moved for o, _ in others)
@@ -150,7 +154,7 @@ def plan(zn):
                     d = (target[0] - C[0], target[1] - C[1])
                     moved = [(p[0] + d[0], p[1] + d[1]) for p in pts]
                     if any(near(moved[k]) < RULE for k in range(len(g))): continue
-                    if any(max(abs(q[0]), abs(q[1])) > H2 - 10 for q in moved): continue
+                    if any(max(abs(q[0]), abs(q[1])) > H2 - 10 or q[0] > east for q in moved): continue
                     if any(line_dist(q, w) < 9 for q in moved for w in water): continue
                     if any(line_dist(q, r) < 7 for q in moved for r in roads): continue
                     if any(dist(q, lc) < lr + 6 for q in moved for lc, lr in lakes): continue

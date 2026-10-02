@@ -181,12 +181,28 @@ namespace Crulanda.Encounter
         }
         /// <summary>It fell: it lies on its side where it dropped and stops moving.</summary>
         public void Fall() { if (agent != null && agent.isOnNavMesh) agent.ResetPath(); state = State.Graze; alert = 0; Body.LieDown(); }
-        /// <summary>Back after its respawn: on its feet, grazing; moved out of the water if its new spot is wet.</summary>
+        /// <summary>Back after its respawn: on its feet, grazing; moved out of the water if its new spot is wet (somewhere dry in its
+        /// group's circle, else the nearest dry ground: a circle that takes in a pond can miss the dry part six times running).</summary>
         public void Stand()
         {
             Body.StandUp(); state = State.Graze; alert = 0; until = Time.time + 1 + UnityEngine.Random.value * 3;
             var zone = Enemy.session.Zone; var at = transform.position;
-            if (zone != null && agent != null && agent.isOnNavMesh && zone.WaterAt(new Vector2(at.x, at.z), out _, out _)) { var p = PickPoint(Home, Radius); if (p.HasValue) agent.Warp(p.Value); }
+            if (zone == null || agent == null || !zone.WaterAt(new Vector2(at.x, at.z), out _, out _)) return;
+            var p = PickPoint(Home, Radius) ?? NearestDry(new Vector2(at.x, at.z));
+            if (p.HasValue) agent.Warp(p.Value);
+        }
+        /// <summary>The nearest dry point on the navmesh to <paramref name="from"/>, in rings of twelve every 3 m out to 30 m, or null.</summary>
+        Vector3? NearestDry(Vector2 from)
+        {
+            var zone = Enemy.session.Zone;
+            for (float r = 3; r <= 30; r += 3)
+                for (int k = 0; k < 12; k++)
+                {
+                    float a = k * Mathf.PI / 6; var p = from + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * r;
+                    if (Mathf.Abs(p.x) > zone.Half - 4 || Mathf.Abs(p.y) > zone.Half - 4 || zone.WaterAt(p, out _, out _)) continue;
+                    if (NavMesh.SamplePosition(zone.Ground(p), out var hit, 2, NavMesh.AllAreas) && !zone.WaterAt(new Vector2(hit.position.x, hit.position.z), out _, out _)) return hit.position;
+                }
+            return null;
         }
     }
 }

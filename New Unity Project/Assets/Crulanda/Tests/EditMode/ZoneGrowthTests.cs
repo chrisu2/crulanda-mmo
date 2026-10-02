@@ -109,6 +109,29 @@ namespace Crulanda.Tests
             Assert.AreEqual(-half, creek.points[0].x, .01f, "Oak creek comes in at the west edge"); Assert.AreEqual(half, creek.points[creek.points.Length - 1].x, .01f, "and runs out at the east.");
         }
 
+        [Test] public void In_every_zone_the_exits_and_arrivals_stand_on_their_roads()
+        {
+            // As Oakhaven's above, for all five: an exit at the edge on its road, and the arrival by it a few metres inside the exit
+            // that leads back, on the road. (When the other four grew, their roads' ends went out with the edge and bent less; the
+            // exits and arrivals went with them, along the road, not straight out.)
+            var problems = new List<string>(); var zones = Files.Select(f => Zone(f)).ToList();
+            foreach (var z in zones)
+            {
+                float half = z.size / 2;
+                foreach (var e in z.exits)
+                {
+                    string name = z.id + ": '" + e.name + "'";
+                    if (Cheb(e.at) < half - 12 || Cheb(e.at) > half - 5) problems.Add(name + " at " + e.at + " is not at the edge");
+                    if (!z.roads.Any(r => ToPath(e.at, r.points) < r.width / 2)) problems.Add(name + " at " + e.at + " is off its road");
+                    var to = zones.Single(t => t.id == e.to);
+                    if (!to.roads.Any(r => ToPath(e.arrive, r.points) < r.width / 2)) problems.Add(name + ": the arrival at " + e.arrive + " is off the road");
+                    if (!to.exits.Any(back => back.to == z.id && Vector2.Distance(back.at, e.arrive) < 15 && Vector2.Distance(back.at, e.arrive) > back.radius + 1))
+                        problems.Add(name + ": the arrival at " + e.arrive + " is not just inside the exit that leads back");
+                }
+            }
+            Assert.IsEmpty(problems, string.Join("\n", problems));
+        }
+
         [Test] public void Nothing_in_Oakhaven_is_placed_past_the_edge_or_in_the_unmade()
         {
             var z = Zone("oakhaven"); float half = z.size / 2; var problems = new List<string>();
@@ -131,6 +154,28 @@ namespace Crulanda.Tests
             foreach (var c in z.life.critters) In(c.kind + " group", c.center, c.radius);
             foreach (var e in z.spawns.enemies) In("story enemy '" + e.name + "'", e.at, 0);
             In("the player's start", z.spawns.player, 5); In("the recovery point", z.spawns.recovery, 5);
+            Assert.IsEmpty(problems, string.Join("\n", problems));
+        }
+
+        [Test] public void Nothing_stands_in_the_unmade_in_any_zone()
+        {
+            // The Wasting's curtain is the east edge of the zones that have one (Oakhaven's moved out with its edge; the Ash Rim's
+            // stands where it stood, its places along it): past it is the unmade, where nothing walks. When the Ash Rim grew, the
+            // Fraying first went out past it.
+            var problems = new List<string>(); int zones = 0;
+            foreach (var file in Files)
+            {
+                if (!Read("Zones", file).Contains("\"wasting\"")) continue;
+                var z = Zone(file); float w = z.wasting.x; zones++;
+                void In(string what, Vector2 at, float reach) { if (at.x + reach > w) problems.Add(file + ": " + what + " at " + at + " stands in the unmade (the curtain is at x " + w + ")"); }
+                foreach (var c in z.camps) In("camp '" + c.name + "'", c.center, c.radius);
+                foreach (var l in z.landmarks) In("landmark '" + l.name + "'", l.at, 0);
+                foreach (var s in z.secrets) In("secret '" + s.id + "'", s.at, 0);
+                foreach (var n in z.nodes) In("node " + n.node, n.at, 10);
+                foreach (var s in z.stations) In("station '" + s.name + "'", s.at, 0);
+                foreach (var p in z.props) if (p != null && p.kind != "wall") In("prop " + p.kind + " '" + p.name + "'", p.at, 0);
+            }
+            Assert.AreEqual(2, zones, "Oakhaven and the Ashland Rim have the Wasting.");
             Assert.IsEmpty(problems, string.Join("\n", problems));
         }
 

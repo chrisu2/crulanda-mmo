@@ -96,3 +96,12 @@ both tuned low; they evidently do not read in play. Fix: a sun that reads: a vis
 shafts when you look toward it (strongest low in the sky, through trees and at dawn and dusk), glints on water, and bloom
 that shows on bright sky and firelight without washing the painted colours out. Add tour shots that face the sun at dawn,
 noon and dusk so it can be judged.
+
+## 10. Baked lighting in the caves, more atmospheric (2026-10-01) — OPEN
+> "need baked lighting in the caves. more atmospheric"
+
+The caves (Crowsfoot Hollow, the Root-Mother's Deep) are lit evenly by the zone's ambient light with a few live lights, so
+they read flat. Zones are generated when they load, so Unity's lightmapper cannot bake them; the bake has to be done by the
+zone builder: light from each torch, fire and glowing thing and from the mouth, blocked by the cave's own walls, with
+darkness in the depths and in the creases, stored on the cave's mesh (or in a light map over its plan) and used by the cave
+shader, the props and the actors alike; then haze, shafts at the mouth and a colour script per cave.

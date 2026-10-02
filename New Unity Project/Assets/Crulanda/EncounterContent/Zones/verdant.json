@@ -3043,5 +3043,35 @@
       "item": "potion.dewfern",
       "canonStatus": "GAME-ONLY: the pack; the Silent Pilgrims are CANON."
     }
+  ],
+  "nodes": [
+    { "node": "node.veridian", "at": { "x": 143.8, "y": 34.5 }, "rotation": 70 },
+    { "node": "node.veridian", "at": { "x": 137.8, "y": -26.5 }, "rotation": 110 },
+    { "node": "node.veridian", "at": { "x": 149.6, "y": 103.2 }, "rotation": 80 },
+    { "node": "node.veridian", "at": { "x": 145.6, "y": -77.2 }, "rotation": 100 },
+    { "node": "node.veridian", "at": { "x": 157, "y": -46 }, "rotation": 90 },
+    { "node": "node.veridian", "at": { "x": 156, "y": 88 }, "rotation": 90 },
+    { "node": "node.veridian_rich", "at": { "x": -109, "y": 164.5 }, "under": true },
+    { "node": "node.veridian_rich", "at": { "x": -95.8, "y": 193.9 }, "under": true },
+    { "node": "node.veridian_rich", "at": { "x": -109.2, "y": 203.6 }, "under": true },
+    { "node": "node.veridian_rich", "at": { "x": -115.7, "y": 205.5 }, "under": true },
+    { "node": "node.ghostoak", "at": { "x": 122, "y": 26 }, "rotation": 90 },
+    { "node": "node.ghostoak", "at": { "x": -119, "y": -46.5 } },
+    { "node": "node.ghostoak", "at": { "x": -133, "y": -70 }, "rotation": 90 },
+    { "node": "node.ghostoak", "at": { "x": -79, "y": -88 }, "rotation": 90 },
+    { "node": "node.ghostoak", "at": { "x": -48, "y": 62.5 } },
+    { "node": "node.ghostoak", "at": { "x": 48, "y": 67 } },
+    { "node": "node.ghostoak", "at": { "x": 113, "y": 108 }, "rotation": 90 },
+    { "node": "node.ghostoak", "at": { "x": -4, "y": 105 } },
+    { "node": "node.dewfern", "at": { "x": -37.2, "y": -85.2 } },
+    { "node": "node.dewfern", "at": { "x": -49.2, "y": -73.2 } },
+    { "node": "node.dewfern", "at": { "x": -71.3, "y": -79.1 } },
+    { "node": "node.dewfern", "at": { "x": -38.7, "y": -102 } },
+    { "node": "node.dewfern", "at": { "x": 44.3, "y": -77.8 } },
+    { "node": "node.dewfern", "at": { "x": 44.6, "y": -71.2 } },
+    { "node": "node.dewfern", "at": { "x": 41.1, "y": -65.6 } },
+    { "node": "node.dewfern", "at": { "x": 25.6, "y": -66.9 } },
+    { "node": "node.dewfern", "at": { "x": 23, "y": -75 } },
+    { "node": "node.dewfern", "at": { "x": 26.9, "y": -82.4 } }
   ]
 }

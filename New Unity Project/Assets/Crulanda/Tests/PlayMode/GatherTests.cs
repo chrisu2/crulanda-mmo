@@ -17,17 +17,19 @@ namespace Crulanda.Tests
     /// Gathering in Oakhaven, in the running game: a copper seam worked with a pick fills the bags, raises Mining, rests (its ore
     /// gone, its rock still there) and comes back; a rest outlives a zone reload; a Yarrow gives the herb always and the quest's
     /// yarrow while the quest wants it (full bags then refuse only once it is no longer wanted); moving or being hit stops the work,
-    /// an ability the kit refuses does not; bags that filled while the work went on leave the node as it was.
+    /// an ability the kit refuses does not; bags that filled while the work went on leave the node as it was. In the Verdant Shore
+    /// a new miner works a Veridian seam at once, as hard going (BUILD_PLAN step 8: low skill never refuses a node).
     /// </summary>
     public class GatherTests
     {
         string root;
         void OnLoaded(Scene scene, LoadSceneMode mode) { var s = UnityEngine.Object.FindFirstObjectByType<EncounterSession>(); if (s != null) s.SaveDirectoryOverride = root; }
-        IEnumerator Open(float hour = 10)
+        IEnumerator Open(float hour = 10, string zone = null)
         {
             WorldClock.Hour = hour; EncounterSession.ForgetRestingNodes();
             root = Path.Combine(Path.GetTempPath(), "Crulanda-gather-" + Guid.NewGuid().ToString("N"));
             SceneManager.sceneLoaded += OnLoaded;
+            ZoneBuilder.RequestedZoneId = zone;
             yield return SceneManager.LoadSceneAsync("Oakhaven", LoadSceneMode.Single);
             for (int i = 0; i < 3; i++) yield return null;
         }
@@ -112,6 +114,29 @@ namespace Crulanda.Tests
             Assert.LessOrEqual(seam.hiddenUntil, Time.time);
             Assert.IsTrue(Shown(seam.root), "Its ore is back.");
             Assert.AreSame(seam, s.NearbyInteractable, "E offers it again.");
+        }
+
+        [UnityTest] public IEnumerator VeridianSeam_NewMiner_WorksItAtOnce_AsHardGoing()
+        {
+            yield return Open(10, "zone.verdant");
+            var s = Session(); var p = s.Progress; var trades = s.Professions;
+            Assert.AreEqual("zone.verdant", s.Zone.Zone.id); Assert.AreEqual(root, s.SaveDirectoryOverride, "This test saves to its own folder.");
+            var pos = s.Player.transform.position;
+            var seam = s.Zone.Interactables.Where(i => i.node == "node.veridian").OrderBy(i => Flat(i.position, pos)).First();
+            Assert.AreEqual("Veridian seam", seam.name); Assert.AreEqual("Mine the Veridian seam", seam.prompt);
+            yield return StandBy(s, seam);
+            Pick(s);
+            Assert.AreEqual(1, trades.Skill("mining"), "A new miner.");
+            Assert.AreSame(seam, s.NearbyInteractable);
+            s.Interact();
+            Assert.IsTrue(s.Working, "Low skill never refuses a node."); Assert.Contains("Hard going: this wants Mining 80.", s.Messages);
+            yield return new WaitForSeconds(2.5f);
+            Assert.IsTrue(s.Working, "Hard going takes twice as long.");
+            yield return new WaitForSeconds(2);
+            Assert.IsFalse(s.Working, "Done in four seconds.");
+            Assert.AreEqual(1, Inventory.Count(p, "mat.veridian_ore"), "Hard going yields exactly one.");
+            Assert.AreEqual(2, trades.Skill("mining"), "And the skill point is certain.");
+            Assert.Greater(seam.hiddenUntil, Time.time + 170, "It rests.");
         }
 
         [UnityTest] public IEnumerator Respawn_SurvivesZoneReload()

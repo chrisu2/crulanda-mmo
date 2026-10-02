@@ -1769,7 +1769,8 @@
       },
       "variant": 1,
       "interact": "Pick mourner's cap",
-      "item": "item.mourners_cap"
+      "item": "item.mourners_cap",
+      "node": "node.mourners_cap"
     },
     {
       "kind": "herb",
@@ -1780,7 +1781,8 @@
       },
       "variant": 1,
       "interact": "Pick mourner's cap",
-      "item": "item.mourners_cap"
+      "item": "item.mourners_cap",
+      "node": "node.mourners_cap"
     },
     {
       "kind": "herb",
@@ -1791,7 +1793,8 @@
       },
       "variant": 1,
       "interact": "Pick mourner's cap",
-      "item": "item.mourners_cap"
+      "item": "item.mourners_cap",
+      "node": "node.mourners_cap"
     },
     {
       "kind": "herb",
@@ -1802,7 +1805,8 @@
       },
       "variant": 1,
       "interact": "Pick mourner's cap",
-      "item": "item.mourners_cap"
+      "item": "item.mourners_cap",
+      "node": "node.mourners_cap"
     },
     {
       "kind": "herb",
@@ -1813,7 +1817,8 @@
       },
       "variant": 1,
       "interact": "Pick mourner's cap",
-      "item": "item.mourners_cap"
+      "item": "item.mourners_cap",
+      "node": "node.mourners_cap"
     },
     {
       "kind": "herb",
@@ -1824,7 +1829,8 @@
       },
       "variant": 1,
       "interact": "Pick mourner's cap",
-      "item": "item.mourners_cap"
+      "item": "item.mourners_cap",
+      "node": "node.mourners_cap"
     },
     {
       "kind": "herb",
@@ -1835,7 +1841,8 @@
       },
       "variant": 1,
       "interact": "Pick mourner's cap",
-      "item": "item.mourners_cap"
+      "item": "item.mourners_cap",
+      "node": "node.mourners_cap"
     },
     {
       "kind": "crates",
@@ -3570,5 +3577,28 @@
       "gold": 16,
       "canonStatus": "GAME-ONLY: the crossroads burial and the coin custom."
     }
+  ],
+  "nodes": [
+    { "node": "node.bogiron", "at": { "x": 38, "y": -47 }, "rotation": 340 },
+    { "node": "node.bogiron", "at": { "x": 53.1, "y": -41.5 }, "rotation": 340 },
+    { "node": "node.bogiron", "at": { "x": 62.3, "y": -19.2 }, "rotation": 285 },
+    { "node": "node.bogiron", "at": { "x": 70.8, "y": -70.3 }, "rotation": 15 },
+    { "node": "node.bogiron", "at": { "x": 104, "y": -31.2 }, "rotation": 260 },
+    { "node": "node.bogiron", "at": { "x": 124, "y": -28 }, "rotation": 90 },
+    { "node": "node.bogiron", "at": { "x": 124, "y": -48 }, "rotation": 90 },
+    { "node": "node.bogiron", "at": { "x": -94.2, "y": 90.1 }, "rotation": 30 },
+    { "node": "node.bogiron", "at": { "x": -86.5, "y": 85.6 }, "rotation": 30 },
+    { "node": "node.bogiron", "at": { "x": 43.5, "y": 109.5 }, "rotation": 175 },
+    { "node": "node.blackpine", "at": { "x": -14, "y": 42 } },
+    { "node": "node.blackpine", "at": { "x": 24, "y": 42 } },
+    { "node": "node.blackpine", "at": { "x": 58, "y": 64 }, "rotation": 90 },
+    { "node": "node.blackpine", "at": { "x": 80, "y": 48 } },
+    { "node": "node.blackpine", "at": { "x": 130, "y": 46 }, "rotation": 90 },
+    { "node": "node.blackpine", "at": { "x": 112, "y": 104 } },
+    { "node": "node.blackpine", "at": { "x": -66, "y": 138 } },
+    { "node": "node.blackpine", "at": { "x": -86, "y": 150 }, "rotation": 90 },
+    { "node": "node.mourners_cap", "item": "item.mourners_cap", "at": { "x": -14, "y": -104 } },
+    { "node": "node.mourners_cap", "item": "item.mourners_cap", "at": { "x": 10, "y": -114 } },
+    { "node": "node.mourners_cap", "item": "item.mourners_cap", "at": { "x": 26, "y": -112 } }
   ]
 }

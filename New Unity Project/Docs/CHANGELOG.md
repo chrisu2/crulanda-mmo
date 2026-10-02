@@ -815,3 +815,34 @@ A read-only review by five reviewers, each finding checked by a second who tried
   `HuntTests.Game_bolts_and_sneaking_gets_closer`, is intermittent (it failed in the full run and once in its fixture, and passed
   twice after): at some spots a rabbit that should bolt stands and watches instead. Published with that known; the fix follows.
   Oakhaven toured only (Chris: skip the tours on rounds that don't change the world's look); the HUD shots 26-27 (cooking) viewed.
+
+## 2026-10-01 — A blacksmith and an alchemist, the Armoury, and three loose ends (Chris: "have a profession for the character. blacksmith, alchemist, cook"; "start building a database of loot")
+- **Blacksmithing and the two-craft rule** (BUILD_PLAN step 12): take up Blacksmithing at a forge (E at Vell's smithy; the
+  Trades window's craft page has a Take up button). Five smelts turn ore and charcoal into bars, and 21 pieces can be made and
+  worn, from the Copper-shod cudgel up to a rare capstone; crafted gear sits on the same curve as found gear and stays under
+  the named rares of its level. Two crafts at most: a third is refused until you Forget one (with a confirm; the skill is lost).
+  With the trade's own person near and awake, each piece takes one second instead of two ("Brannoc Vell works the bellows for
+  you."), and he has words for it.
+- **Alchemy** (step 13): take it up at a herbalist's bench (Lisbet's drying hut, Wenna's in Khaven). Five potions from the
+  herbs of each zone and a bought vial, among them the new Tarnwater draught.
+- **The Armoury** (loot step L3; save format 9): a fifth tab in the quest book lists every named piece by zone and source:
+  silhouettes for what you have not found, grey names once you know the source, full colour with its tooltip once found, with
+  a found / total count per zone. A "NEW LOOK" toast the first time an appearance enters your bags. The purple piece of a boss
+  is now certain by the 10th dry kill in a dungeon and the 25th outdoors. Chris's save was backed up first
+  (`save-backups/20261001-2315-before-format9`); it migrates on its next save, with what he holds marked found.
+- **Rare and epic gear glows on the body:** the accents now carry their palette's colour at full strength (rare a clear gleam,
+  epic brighter and pulsing); uncommon and below stay unlit.
+- **No talking through walls:** talking needs a clear line between heads, so Mira is no longer offered from outside the Golden
+  Cask's wall; stall counters, the bar and doorsteps do not block it.
+- **Herbs follow the ground:** a clump on a slope leans with it and sits on it, instead of floating on the downhill side.
+- **Game animals bolt only to ground they can reach** (the intermittent rabbit of the last publish).
+- **Found by the full check and fixed:** two of Khaven's mourner's-cap clusters on the creek's bank were sunk until their small
+  caps were buried (the new slope rule sank the cluster's plane; a cluster on stalks now settles by its stalks' feet and its
+  gills). Three new tests searched the save file for text that is stored escaped (the game saved correctly); fixed, and a
+  check that passed without testing anything is now real.
+- Tests: EditMode 341/341, PlayMode 154/158, the four failures fixed and their fixtures 11/11 after; the Peaks, Oakhaven and
+  then Khaven toured; the HUD shots 28-33 (crafts), the Armoury shot and the quality ladder viewed.
+- **Chris's notes from playing the earlier builds are in `PLAYTEST_NOTES.md`** (14 by the end of the night): the bandit camp
+  too close, elites and the Bandit King too easy, mobs not social, the sheep, the ore's green, the lumber trees, cats' tails,
+  sun and bloom, cave lighting, icons, blocky characters, pale colours, and a PDF of everything built. None of their fixes
+  is in this build except what the rounds above already held; they follow.

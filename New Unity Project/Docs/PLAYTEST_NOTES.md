@@ -114,3 +114,20 @@ Today every ability on the bar is three letters ("STR", "CHA", "GUA") and every 
 hide, meat, food, potion, tool, trade bag, junk and quest item its own picture, and gear by what it is (blade, axe, mace,
 staff, shield, helm, chest, gloves, legs, boots, neck, shoulders) in its own colours, with the quality still shown by the
 border.
+
+## 12. Armour too blocky; retire the block characters (2026-10-02) — OPEN (needs Chris's choice of approach)
+> "armor and weapons look good but armor is way too blocky. needs to feel flowing. time to retire the block characters"
+
+Every figure (the player, Mira, villagers, people among the mobs) is built in code from boxes, capsules and spheres, and the
+armour is fitted to those blocks. He likes the gear's designs; the bodies and the stiffness are what must go: smooth bodies,
+cloth that hangs and moves (capes, robes, tabards, skirts, hair), armour that follows the form.
+
+## 13. More colour: high fantasy, not pale (2026-10-02) — OPEN
+> "more colors as well seems like all is muted pallets..need high fantasy not pale"
+
+The gear palettes (`Resources/Gear/looks.json`), villagers' clothes and much of the world sit in muted earth tones. Fix:
+saturated, confident colour: jewel-toned cloth, heraldic contrasts, gold and blued steel that gleam, rarer gear richer
+still; then the same eye over the villagers and the world's accents, without losing each zone's mood.
+
+## 14. A PDF of everything done since the start (2026-10-02) — OPEN
+> "give me a pdf of all items/process/builds/additions/subtractions to this whole game since we started"

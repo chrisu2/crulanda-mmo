@@ -703,9 +703,13 @@ namespace Crulanda.Encounter
             if (pool == Wary && Zone.Zone.id == "zone.oakhaven") pool = Session.Quests != null && Session.Quests.IsDone(HollowQuest) ? WaryAfterHollow : WaryRaided;
             return pool[rng.Next(pool.Length)];
         }
+        /// <summary>The innkeeper, and the village, on meat the player sold today (a sale of anything whose trade is "inn.meat").</summary>
+        const string MeatSoldInnkeeper = "Somebody's been selling meat in the village. It's all in the pot; the stew's not thin tonight.";
+        string MeatSoldLine { get { return Zone.Zone.id == "zone.oakhaven" ? "Boar in the Cask's pot tonight. Somebody's been hunting." : "Meat in the pot at the inn tonight. Somebody's been hunting."; } }
         /// <summary>What the day's deliveries give people to say: the trades talk of each other's goods (see <see cref="Stock"/>),
-        /// the player's sales among them (ore and wood to the forge, herbs to the stall: EncounterSession.SellBag, which marks its own
-        /// as "sold." + the trade, so the merchant's fresh herbs are the player's and not the herbalist's daily errand).</summary>
+        /// the player's sales among them (ore and wood to the forge, herbs to the stall, meat to the inn's pot: EncounterSession.SellBag,
+        /// which marks its own as "sold." + the trade, so the merchant's fresh herbs are the player's and not the herbalist's daily
+        /// errand, and meat sold in the village is somebody's hunting and not the hunter's hares).</summary>
         string StockLine(Villager v)
         {
             switch (v.Role)
@@ -717,10 +721,11 @@ namespace Crulanda.Encounter
                     return Count("forge.wood") > 0 ? "The woodcutter brought oak this morning. Hearth's drawing well." : null;
                 case "miller": return Count("mill.grain") > 0 ? "Barley's in from the fields. The stone's turning on something, at least." : null;
                 case "leatherworker": case "skinner": return Count("sold.tannery.hides") > 0 ? "Somebody's been selling pelts in the village. Clean ones, too; not a grey edge among them." : Count("tannery.hides") > 0 ? "The hunter's been by with a hide. Grey at one edge; the rest'll do." : null;
-                case "innkeeper": return Places["inn"].Count > 0 && Count("inn.ale") == 0 ? "Dry. Ama's cask never sees the night out." : Count("inn.meat") > 0 ? "Garet's hares are in the pot. Don't tell the out-of-work." : null;
+                case "innkeeper": return Places["inn"].Count > 0 && Count("inn.ale") == 0 ? "Dry. Ama's cask never sees the night out." : Count("sold.inn.meat") > 0 ? MeatSoldInnkeeper : Count("inn.meat") > 0 ? "Garet's hares are in the pot. Don't tell the out-of-work." : null;
                 case "henwife": return Count("stall.eggs") > 0 ? "Eggs are at the produce stall if you're wanting any. I don't sell from the yard." : Count("inn.eggs") > 0 ? "Took the Cask its eggs this morning. The rest go to the stall after dinner." : null;
                 case "drinker": case "elder": case "gossip": case "farmer":
-                    return Places["inn"].Count > 0 && Count("inn.ale") == 0 ? "The cask's run dry at the inn. The out-of-work drank it by supper." : Count("inn.meat") > 0 ? "Hare in the Cask's pot tonight. The hunter's doing." : Count("inn.bread") > 0 && Count("inn.eggs") > 0 ? "Bread and eggs at the Cask today. Like old times, nearly." : Count("inn.wood") > 0 ? "The Cask's got a fire going. Dry oak, for once." : null;
+                    if (Places["inn"].Count == 0) return null;   // all of it is the inn's news, and a camp with no inn has none (meat sold there is only sold)
+                    return Count("inn.ale") == 0 ? "The cask's run dry at the inn. The out-of-work drank it by supper." : Count("sold.inn.meat") > 0 ? MeatSoldLine : Count("inn.meat") > 0 ? "Hare in the Cask's pot tonight. The hunter's doing." : Count("inn.bread") > 0 && Count("inn.eggs") > 0 ? "Bread and eggs at the Cask today. Like old times, nearly." : Count("inn.wood") > 0 ? "The Cask's got a fire going. Dry oak, for once." : null;
                 default: return null;
             }
         }

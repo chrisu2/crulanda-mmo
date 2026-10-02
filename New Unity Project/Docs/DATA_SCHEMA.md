@@ -50,13 +50,15 @@ charge 4x), stack, armor, stamina, strength, agility, intellect, spirit, weaponD
 
 | Field | On | Meaning |
 |---|---|---|
-| `kind: "material"` | ore, logs, herbs, charcoal, flour, salt, vials | Something gathered or refined that recipes use. Quality 1, stack 20. Using it from the bags says "A crafting material. Press K." "Sell junk" never takes it (`Inventory.IsJunk`: kind junk, or quality 0). |
+| `kind: "material"` | ore, logs, herbs, charcoal, flour, salt, vials, meat | Something gathered or refined that recipes use. Quality 1, stack 20. Using it from the bags says "A crafting material. Press K." "Sell junk" never takes it (`Inventory.IsJunk`: kind junk, or quality 0). |
 | `kind: "tool"` | `tool.pick`, `tool.hatchet` | Used once from the bags: teaches the trade in `teaches` at skill 1 and is used up. A second one is refused and kept. Stack 1. |
 | `teaches` | tools | A profession id. `ProfessionDatabase.Parse` refuses a tool that teaches an unknown trade. |
-| `trade` | materials | The village stock key a sale of it feeds: `forge.ore`, `forge.wood`, `stall.herbs` (used from the gathering step on). |
+| `trade` | materials | The village stock key a sale of it feeds: `forge.ore`, `forge.wood`, `stall.herbs` (used from the gathering step on), `tannery.hides`, `inn.meat` (the inn's pot: the innkeeper and the village talk of "somebody's hunting"). |
 | `pouch` | materials, eggs, cheese | The class of trade bag that holds it: `ore`, `timber`, `herb`, `larder`. A picked-up item tops up its stacks first, then fills an empty slot of a worn bag that holds its class, then an ordinary slot. |
 | `kind: "bag"` | `bag.simples_wallet`, `bag.log_sling`, `bag.larder_scrip`, `bag.ore_poke` | A trade bag (the leatherworker's). Used once from the bags it is worn for good: it leaves the bags, its id joins the save's `pouches`, and its `slots` are added after the 24 (`Inventory.Wear`). One of each: a second is refused and kept ("You already carry one."). Stack 1. |
 | `holds`, `slots` | bags | The class its slots take (a `pouch` value) and how many (1-24). Nothing else goes in ("Only ore, bars and charcoal go in the ore-poke."). `ItemDatabase.Parse` refuses a bag without both. |
+| meat | `junk.boar_meat` (Tough boar meat; id, name and value kept from when it was junk), `mat.wolf_haunch`, `mat.hound_flank`, `mat.mossback_chop`, `mat.venison` | Kind `material`, quality 1, stack 20, `trade: "inn.meat"`, `pouch: "larder"`; Cooking's makings (BUILD_PLAN step 10). The boar drops its meat as before (0.5); the wolf, hound, mossboar and stag tables drop theirs (0.4, 0.45, 0.5, 0.5). No vendor sells meat. "Sell junk" keeps it. |
+| foods | `food.*` | Kind `consumable`, `food: true`: eaten out of combat, `heal` over 10 s. The ten cooked foods (`food.griddle_bread` ... `food.venison_pie`) heal more than any food a vendor sells at their level (the lists, and the merchant's Oakhaven eggs) and go in no trade bag. |
 | hides | `junk.wolf_pelt`, `junk.ash_hide`, `junk.moss_hide`, `junk.dappled_hide` | Kind `material`, quality 1, `trade: "tannery.hides"` (ids, names, values and the stack of 10 kept from when they were junk). "Sell junk" keeps them; using one says "Leather. Maud Tanner in Oakhaven works it." Sold in a village, the tannery and the leatherworker notice. |
 
 Kinds are `gear`, `junk`, `consumable`, `material`, `tool`, `bag`. `VendorDef`: `npc` or `role`, `items`, `gearForZone`. A role entry leaves
@@ -143,14 +145,18 @@ invalid" and runs without the trades (items are unaffected).
   `ZoneBuilder.StationKind` maps them; `ZoneBuilder.Stations` lists every station of the zone.
 - A recipe can be made within 5 m (ground distance; one in a cave and one out of it never reach each other) of a station of one of
   its kinds. E there (when no one is in reach to talk to, nothing to pick up and no door at hand) reads "Work at the forge", "Work at
-  the bench", "Cook at the fire" (or "Work at the fire" while the fire's only use is charcoal), and opens the Trades window (K) at
-  the recipes of the trade the station serves. Nobody need be there, day or night.
+  the bench" or "Cook at the fire", and opens the Trades window (K) at the recipes of the trade the station serves (a fire opens on
+  Cooking, a forge on Woodcutting's charcoal until Blacksmithing is taken up). Nobody need be there, day or night.
 - The zone builder learns what a node is (name, prompt, look) from the component beside it that implements `IZoneNodeKinds`
   (the encounter session, from the trades' content). Without one it builds no nodes and warns.
 - `RecipeDef`: `profession`, `skill` 1-100, `station` (alternatives joined with `|`), at least one input, `output`, `count`
   (default 1); an item named on two input lines is summed. The file has the five charcoal recipes (BUILD_PLAN step 9, DESIGN 5.1):
   one log of each tier's wood (oak, black pine, stone-pine, ash-snag, ghost-oak) makes 1 to 5 charcoal at a forge or a fire, at
-  Woodcutting 1, 20, 40, 60 and 80. Rules pinned by `ProfessionDataTests`: what a recipe makes (value x count) is worth at most 1.5
+  Woodcutting 1, 20, 40, 60 and 80. Cooking's ten (BUILD_PLAN step 10, DESIGN 5.4), at a fire, from Cooking 1, which everyone has:
+  Griddle bread (1 flour), Boar stew (2 boar meat) at 1; Harrow hearth-cake (flour and an egg, makes 2) at 5; Wolf-haunch skewer
+  (2 wolf haunch, a mourner's cap) at 20; Harrow pasty (flour, Harrow cheese, boar meat) at 30; Pass-smoked loin (2 boar meat,
+  tarnwort, salt) at 40; Salt-baked hound flank (2 hound flank, salt) at 60; Cinder-crust loaf (2 flour, cinder-thistle, charcoal)
+  at 70; Dewfern-glazed mossback chop (2 mossback chop, dewfern) at 80; Shore venison pie (2 venison, flour) at 90. Rules pinned by `ProfessionDataTests`: what a recipe makes (value x count) is worth at most 1.5
   times its inputs; a recipe from vendor goods alone never makes more than they cost to buy; every recipe's station stands somewhere.
 - Making (`ProfessionLog.CanCraft`, `Craft`; `EncounterSession.Make`): refused, in this order, without the trade (a gathering
   skill's tool: "You need a woodcutter's hatchet. Merchants sell them."; a craft: "You have not taken up Blacksmithing."), under the

@@ -121,6 +121,48 @@ namespace Crulanda.Tests
             Assert.AreEqual(.7f, System.Array.Find(wolf.entries, e => e.item == "junk.wolf_pelt").chance, 1e-4f);
         }
 
+        /// <summary>
+        /// Boar meat is a cook's material now (BUILD_PLAN step 10; DESIGN 2.1, 8.1): its id, name, value and description as they were,
+        /// kind material at quality 1 in stacks of 20, the larder-scrip's, and a delivery to the inn's pot when sold in a village. The
+        /// four new meats are the same, each dropped by its beast at the design's chance; no vendor sells any of them; and "Sell junk"
+        /// sells the tusks and fangs and keeps every meat.
+        /// </summary>
+        [Test] public void BoarMeat_IsMaterial()
+        {
+            var db = Db(); var p = EncounterSession.FreshProgress();
+            var meats = new[] { ("junk.boar_meat", "Tough boar meat", 1, "boar", .5f), ("mat.wolf_haunch", "Lean wolf haunch", 1, "wolf", .4f), ("mat.hound_flank", "Ash-hound flank", 4, "hound", .45f),
+                ("mat.mossback_chop", "Mossback chop", 5, "mossboar", .5f), ("mat.venison", "Shore venison", 6, "stag", .5f) };
+            foreach (var (id, name, value, beast, chance) in meats)
+            {
+                var d = db.Get(id); Assert.NotNull(d, id);
+                Assert.AreEqual("material", d.kind, id); Assert.AreEqual(1, d.quality, id); Assert.AreEqual(name, d.name, id); Assert.AreEqual(value, d.value, id); Assert.AreEqual(20, d.stack, id);
+                Assert.AreEqual("inn.meat", d.trade, id + " goes to the inn's pot when sold in a village."); Assert.AreEqual("larder", d.pouch, id + " is the larder-scrip's.");
+                Assert.IsFalse(Inventory.IsJunk(d), id); Assert.IsFalse(Inventory.IsHide(d), id); Assert.IsFalse(string.IsNullOrEmpty(d.canonStatus), id + " is labelled.");
+                var table = db.Loot.Find(t => t.tag == beast); Assert.NotNull(table, beast);
+                var drop = System.Array.Find(table.entries, e => e.item == id); Assert.NotNull(drop, "The " + beast + " drops " + id + ".");
+                Assert.AreEqual(chance, drop.chance, 1e-4f, beast);
+                foreach (var v in db.Vendors) Assert.IsFalse(System.Array.IndexOf(v.items, id) >= 0, id + " is sold by a vendor.");
+            }
+            Assert.AreEqual("Needs a long stew.", db.Get("junk.boar_meat").description);
+            Assert.AreEqual("bag.larder_scrip", Inventory.BagFor(db, "larder").id, "The larder-scrip holds the meat.");
+            // The beasts' other drops are as they were.
+            var boar = db.Loot.Find(t => t.tag == "boar");
+            Assert.AreEqual(.6f, System.Array.Find(boar.entries, e => e.item == "junk.boar_tusk").chance, 1e-4f);
+            Assert.AreEqual(.7f, System.Array.Find(db.Loot.Find(t => t.tag == "hound").entries, e => e.item == "junk.ash_hide").chance, 1e-4f);
+            Assert.AreEqual(.5f, System.Array.Find(db.Loot.Find(t => t.tag == "stag").entries, e => e.item == "junk.dappled_hide").chance, 1e-4f);
+            // "Sell junk" sells the tusks and fangs and keeps the meat.
+            foreach (var (id, _, _, _, _) in meats) Assert.AreEqual(0, Inventory.Add(p, db, id, 4), id);
+            Inventory.Add(p, db, "junk.boar_tusk", 2); Inventory.Add(p, db, "junk.wolf_fang", 1);
+            int expected = 2 * db.Get("junk.boar_tusk").value + db.Get("junk.wolf_fang").value;
+            Assert.AreEqual(expected, Inventory.SellJunk(p, db)); Assert.AreEqual(expected, p.gold);
+            foreach (var (id, _, _, _, _) in meats) Assert.AreEqual(4, Inventory.Count(p, id), id + " is kept.");
+            Assert.AreEqual(0, Inventory.Count(p, "junk.boar_tusk")); Assert.AreEqual(0, Inventory.Count(p, "junk.wolf_fang"));
+            // A boar still gives its meat about half the time.
+            var rng = new System.Random(11); int meat = 0;
+            for (int n = 0; n < 400; n++) foreach (var (item, _) in db.RollLoot("boar", 2, false, rng)) if (item == "junk.boar_meat") meat++;
+            Assert.That(meat, Is.InRange(160, 240), "About half of 400 boars (" + meat + ").");
+        }
+
         [Test] public void Vendors_sell_tools_and_makings_but_never_what_is_gathered()
         {
             var db = Db();

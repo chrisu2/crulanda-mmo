@@ -76,7 +76,10 @@ Trades in Oakhaven (GAME-ONLY, 2026-10-01; BUILD_PLAN step 4; tier 1, every node
   Crowsfoot ore, the merchant of the fresh herbs.
 - **Stations** (BUILD_PLAN step 9): Vell's smithy is the forge (at its anvil); Thorne's bakehouse oven, the Cask's kitchen range
   and the Golden Cask's hearth are fires; Lisbet's drying hut is the herbalist's bench. None of its own. Charcoal is burnt at any of
-  the forge and fires, day or night, with or without Vell.
+  the forge and fires, day or night, with or without Vell. Every fire is the cook's (step 10): "Cook at the fire" at the kitchen
+  range, the hearth or the oven opens Cooking's recipes, and the boars of the South copse, the Brookside, the Mastwood and the
+  Withy pool give the boar meat for a stew. Meat sold in the village goes to the Cask's pot, and Hob Linden and the village talk of
+  it.
 
 ## Khaven Village (CANON-EXPANDED)
 Canon names from `maps\khaven_village_map.png`: the Cracked Hearth, two Fallen Smithies, the Blood-Stone Well, the Gallows
@@ -614,7 +617,8 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
 - **Using one:** E (when nobody is in reach to talk to, nothing to pick up and no door at hand) opens the Trades window at the
   recipes of the trade the station serves; or K anywhere and the Recipes tab, which names the station in reach. The world capture
   tour shoots each zone's own from its front (`<zone>-81-station-NN-<name>`); the UI capture shows the recipes at Vell's smithy
-  (`24-station-recipes`, `25-station-charcoal-made`).
+  (`24-station-recipes`, `25-station-charcoal-made`) and Cooking at the Cask's kitchen range (`26-cooking-recipes`,
+  `27-cooking-stew-made`).
 
 ## Travel
 - Zones list `exits` (to, name, at, arrive, radius). Standing at an exit shows "[E] <name>"; E travels (not in combat):

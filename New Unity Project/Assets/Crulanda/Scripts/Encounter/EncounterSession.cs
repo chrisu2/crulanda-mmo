@@ -171,6 +171,7 @@ namespace Crulanda.Encounter
             Add(StatType.Intellect, t.intellect); Add(StatType.Spirit, t.spirit); Add(StatType.Armor, t.armor);
             Player.Stats.AddModifiers(mods);
             playerStats.SetEquipmentBonus(t.weaponDamage);
+            ApplyGearEffects();
         }
         public string ItemName(string id) { var d = Items?.Get(id); return d != null ? d.name : id; }
         public bool EquipFromBag(int bagIndex)
@@ -952,7 +953,7 @@ namespace Crulanda.Encounter
             if (saves.Read(out var p, out var message)) { Progress = p; if (message != null) Message(message); }
             else
             {
-                Progress = FreshProgress(ClassDef.id);
+                Progress = FreshProgress(ClassDef.id); ArmNewCharacter();
                 if (message != "File not found.") { Message("Save could not be loaded: " + message); saveBlocked = true; }
             }
             if (StartClassOverride == null) CharacterProfile.Remember(root, ClassDef.id);
@@ -964,7 +965,7 @@ namespace Crulanda.Encounter
                 return;
             }
             View = Camera.main;
-            LoadItems(); LoadProfessions();
+            LoadItems(); LoadLoot(); LoadProfessions();
             SpawnParty();
             // Villagers and critters live alongside the encounter (they survive load/respawn of the party).
             if (Zone != null && Zone.Zone.life != null) new GameObject("Village life").AddComponent<VillageLife>().Init(this);
@@ -1232,7 +1233,7 @@ namespace Crulanda.Encounter
             if (Time.time >= nextRegen)
             {
                 nextRegen = Time.time + 1; Player.Resource.Pool.Change(InCombat ? ClassDef.combatRegen : ClassDef.restingRegen);
-                if (!InCombat) { Player.Health.ApplyHealing(7); if (Companion.actor.IsAlive) Companion.actor.Health.ApplyHealing(7); }
+                if (!InCombat) { Player.Health.ApplyHealing(RestRegen); if (Companion.actor.IsAlive) Companion.actor.Health.ApplyHealing(7); }
             }
             if (!InCombat && Time.time > nextSave) { Save(false); nextSave = Time.time + 30; }
             Floating.RemoveAll(f => f.expires < Time.time);
@@ -1455,6 +1456,7 @@ namespace Crulanda.Encounter
             if (restoring) return;
             if (enemy.Game) { GameDied(enemy); return; }   // no experience, no coin, no "zone clear" (EncounterSession.Hunt)
             if (enemy.Camp) RollCorpse(enemy);   // the loot is decided as it dies, so the body can show it
+            OnKillEffects();
             int before = Progress.Level;
             int xp = EncounterProgress.KillXp(enemy.actor.Level, Progress.Level, enemy.Elite);
             if (enemy.Camp) Progress.experience += xp;
@@ -1467,7 +1469,7 @@ namespace Crulanda.Encounter
                 Quests.Notify("kill", enemy.persistentId); Quests.LootFrom(enemy.persistentId); ReconcileQuests();
                 if (Progress.Level > before) ApplyLevel();
             }
-            if (!enemy.Camp && StoryEnemies.TrueForAll(e => !e.actor.IsAlive)) Message(ZoneTitle + " is clear for now. Equip your reward [I], then save [F5].");
+            if (!enemy.Camp && StoryEnemies.TrueForAll(e => !e.actor.IsAlive)) Message(ZoneTitle + " is clear for now. " + (Inventory.IsEquipped(Progress, content.itemId) ? "Save [F5]." : "Equip your reward [I], then save [F5]."));
         }
         void ApplyLevel() { Player.SetLevel(Progress.Level); }
         /// <summary>Development builds only: jump to the prototype level cap so the whole talent tree can be reviewed.</summary>

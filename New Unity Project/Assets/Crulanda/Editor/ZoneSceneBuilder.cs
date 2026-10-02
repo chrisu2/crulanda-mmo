@@ -28,12 +28,12 @@ namespace Crulanda.EditorTools
             else Debug.Log("Oakhaven scene already exists; preserving it (only the zone registry is refreshed).");
             RegisterZones();
             RegisterQuests();
-            RegisterLootDraft();
+            RemoveLootDraft();
             EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(OakhavenScene, true), new EditorBuildSettingsScene(EncounterBuilder.ScenePath, true) };
             AssetDatabase.SaveAssets();
             Debug.Log("OAKHAVEN_BUILT");
         }
-        /// <summary>Points the encounter content at every quest, item and profession JSON (EncounterContent/Quests, Items, Professions), so new files are never left out.</summary>
+        /// <summary>Points the encounter content at every quest, item and profession JSON (EncounterContent/Quests, Items, Professions), so new files are never left out. The loot files (loot.*.json) are item files.</summary>
         static void RegisterQuests()
         {
             var content = AssetDatabase.LoadAssetAtPath<EncounterContent>("Assets/Crulanda/EncounterContent/Encounter.asset");
@@ -52,6 +52,8 @@ namespace Crulanda.EditorTools
                 string path = AssetDatabase.GUIDToAssetPath(guid);
                 if (path.EndsWith(".json")) items.Add(AssetDatabase.LoadAssetAtPath<TextAsset>(path));
             }
+            // By name: items.json, then the six loot files (loot.ashrim ... loot.world), whose drop lists roll in this order.
+            items.Sort((a, b) => string.CompareOrdinal(a.name, b.name));
             content.itemFiles = items.ToArray();
             // Trades (EncounterContent/Professions): the folder may be missing in an older checkout, and FindAssets warns about that.
             var trades = new System.Collections.Generic.List<TextAsset>();
@@ -67,30 +69,14 @@ namespace Crulanda.EditorTools
             Debug.Log("Registered " + files.Count + " quest files and " + items.Count + " item files.");
             Debug.Log("Registered " + trades.Count + " profession files.");
         }
-        /// <summary>
-        /// Points Resources/Gear/LootDraft.asset at the drafted loot files (EncounterContent/Loot) so the wardrobe capture can read
-        /// them in a player. The game itself does not load them until step L2 moves them into EncounterContent/Items.
-        /// </summary>
-        static void RegisterLootDraft()
+        /// <summary>Where step A3's wardrobe stand-in (LootDraft) was written; step L2 loads the loot files as item files, so it is removed.</summary>
+        const string OldLootDraft = "Assets/Crulanda/Resources/Gear/LootDraft.asset";
+        /// <summary>Removes the A3 LootDraft asset (its script is gone, so it would load as a missing script in every build).</summary>
+        static void RemoveLootDraft()
         {
-            var files = new System.Collections.Generic.List<TextAsset>();
-            if (AssetDatabase.IsValidFolder(LootDraft.Folder))
-                foreach (var guid in AssetDatabase.FindAssets("t:TextAsset", new[] { LootDraft.Folder }))
-                {
-                    string path = AssetDatabase.GUIDToAssetPath(guid);
-                    if (path.EndsWith(".json")) files.Add(AssetDatabase.LoadAssetAtPath<TextAsset>(path));
-                }
-            files.Sort((a, b) => string.CompareOrdinal(a.name, b.name));
-            const string asset = "Assets/Crulanda/Resources/" + LootDraft.ResourcePath + ".asset";
-            var draft = AssetDatabase.LoadAssetAtPath<LootDraft>(asset);
-            if (draft == null)
-            {
-                if (files.Count == 0) return;
-                draft = ScriptableObject.CreateInstance<LootDraft>(); AssetDatabase.CreateAsset(draft, asset);
-            }
-            draft.files = files.ToArray();
-            EditorUtility.SetDirty(draft);
-            Debug.Log("Registered " + files.Count + " drafted loot files for the wardrobe.");
+            if (!File.Exists(OldLootDraft)) return;
+            AssetDatabase.DeleteAsset(OldLootDraft);
+            Debug.Log("Removed " + OldLootDraft + " (the loot files are item files now).");
         }
 
         static void CreateScene(ZoneArt art)

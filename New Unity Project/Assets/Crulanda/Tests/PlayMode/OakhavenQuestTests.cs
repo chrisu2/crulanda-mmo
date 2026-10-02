@@ -106,14 +106,12 @@ namespace Crulanda.Tests
             session.SelectFriendly(null, true);   // click Mira, then E (the inn is busy; E alone talks to whoever is nearest)
             session.Interact(); Assert.IsTrue(session.Progress.recruited);
             Assert.AreEqual(1, log.State(chronicle.id).step);
-            // 2. The collectors (killed outright; combat has its own tests).
+            // 2. The collectors (killed outright; combat has its own tests). 3. The blade: a new character already holds the
+            // Tempered Trailblade (loot step L2), so arming yourself is done the moment the collectors are.
+            Assert.IsTrue(Inventory.IsEquipped(session.Progress, session.content.itemId), "The Trailblade is in hand from the start.");
             foreach (var e in session.Enemies) e.actor.Health.ApplyDamage(100000);
             yield return null;
-            Assert.AreEqual(2, log.State(chronicle.id).step);
-            // 3. The blade.
-            Assert.IsTrue(session.Progress.Loot(session.Enemies[0].persistentId)); Inventory.Add(session.Progress, session.Items, session.content.itemId, 1);
-            session.Equip();
-            Assert.AreEqual(3, log.State(chronicle.id).step);
+            Assert.AreEqual(3, log.State(chronicle.id).step, "The collectors driven off, and the blade already in hand.");
             // 4. The wagon: the ledger, and the page opens to read.
             var wagon = session.Zone.Interactables.Find(i => i.name == "Bureau wagon");
             motor.Teleport(wagon.position + (session.Zone.Ground(new Vector2(wagon.position.x, wagon.position.z - 2.6f), 1.1f) - wagon.position));

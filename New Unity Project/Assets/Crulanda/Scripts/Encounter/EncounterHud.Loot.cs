@@ -10,7 +10,8 @@ namespace Crulanda.Encounter
     ///   that fits, and the rest stays on the body;
     /// - the green upgrade arrow on item squares (bags, merchants, the loot window) for gear you can wear that beats what you wear;
     /// - the better-or-worse lines on a gear tooltip ("+3 weapon damage" in green, "-2 Stamina" in red);
-    /// - the colours of the rarity call-outs: loot chat lines and the "RARE" and "EPIC" toasts.
+    /// - the colours of the rarity call-outs: loot chat lines and the "RARE" and "EPIC" toasts;
+    /// - a named piece's tooltip lines (step L2): unique, effects, its set and bonuses, and its source.
     /// </summary>
     public sealed partial class EncounterHud
     {
@@ -116,6 +117,28 @@ namespace Crulanda.Encounter
             foreach (var (line, gain) in deltas) l.Add("<color=" + (gain ? GainHex : LossHex) + ">" + line + "</color>");
             if (worn != null && deltas.Count == 0) l.Add("The same as what you wear.");
             if (LootJudge.IsUpgrade(d, worn, session.Progress.Level)) l.Add("<color=" + GainHex + "><b>An upgrade</b></color>");
+            return string.Join("\n", l);
+        }
+        /// <summary>
+        /// A named piece's tooltip lines (step L2; LootDatabase.TooltipParts): "Unique", its effects in green, its set in gold with
+        /// the pieces worn bright and the rest grey, each bonus green when it is on and grey when not, and where it comes from.
+        /// Null for anything without a gear entry, or when the named loot is not loaded.
+        /// </summary>
+        string LootLines(ItemDef d)
+        {
+            if (d == null || session.Loot == null) return null;
+            var parts = session.Loot.TooltipParts(d.id, session.Progress); if (parts.Count == 0) return null;
+            var l = new List<string>();
+            foreach (var (line, kind) in parts)
+                switch (kind)
+                {
+                    case LootDatabase.TipLine.Effect: case LootDatabase.TipLine.BonusOn: l.Add("<color=" + GainHex + ">" + (kind == LootDatabase.TipLine.BonusOn ? "  " : "") + line + "</color>"); break;
+                    case LootDatabase.TipLine.Set: l.Add("<color=#ffd24d>" + line + "</color>"); break;
+                    case LootDatabase.TipLine.PieceWorn: l.Add("<color=#f2e6c4>  " + line + "</color>"); break;
+                    case LootDatabase.TipLine.PieceMissing: case LootDatabase.TipLine.BonusOff: l.Add("<color=#8c867a>  " + line + "</color>"); break;
+                    case LootDatabase.TipLine.Source: l.Add("<color=#c8bfa8>" + line + "</color>"); break;
+                    default: l.Add(line); break;
+                }
             return string.Join("\n", l);
         }
         /// <summary>The rarity call-out toast's colours: a "RARE" or "EPIC" kicker in its quality's colour over the name in a lighter tint. False for any other toast.</summary>

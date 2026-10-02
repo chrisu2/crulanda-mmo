@@ -271,18 +271,17 @@ namespace Crulanda.Encounter
             ("13", "oak", "oakhaven"), ("14", "kha", "khaven"), ("15", "pea", "peaks"), ("16", "ash", "ashrim"), ("17", "ver", "verdant"), ("18", "world", "world")
         };
         /// <summary>
-        /// Shots 13-18: the game's item files and the drafted loot files (LootDraft) parsed together, every named item on a
+        /// Shots 13-18: the game's item files (the loot files among them since step L2) parsed afresh, every named item on a
         /// mannequin, grouped (see the class summary). Skipped with an error when there are no loot files or they do not parse.
         /// </summary>
         IEnumerator NamedShots(string directory)
         {
             var texts = new List<string>();
             if (session.content != null) foreach (var f in session.content.itemFiles ?? new TextAsset[0]) if (f != null) texts.Add(f.text);
-            foreach (var t in LootDraft.Texts()) if (!texts.Contains(t)) texts.Add(t);
             ItemDatabase named; LootDatabase loot;
             try { named = ItemDatabase.Parse(texts); loot = LootDatabase.Parse(texts, named, looks); }
             catch (ArgumentException e) { Debug.LogError("Wardrobe capture: the loot files do not parse, so shots 13-18 are skipped:\n" + e.Message); yield break; }
-            if (loot.Gear.Count == 0) { Debug.LogError("Wardrobe capture: no loot files (Crulanda > World > Build Oakhaven writes Resources/Gear/LootDraft.asset), so shots 13-18 are skipped."); yield break; }
+            if (loot.Gear.Count == 0) { Debug.LogError("Wardrobe capture: no loot files among the item files (Crulanda > World > Build Oakhaven registers EncounterContent/Items), so shots 13-18 are skipped."); yield break; }
             db = named;
             var frame = new Framing { perRow = 4, spacing = 1.7f, pitch = 8, margin = .7f, yaw = 160 };
             foreach (var (shot, prefix, zone) in NamedZones) yield return Rows(directory, shot + "-named-" + zone, NamedGroups(loot, prefix, zone), frame);

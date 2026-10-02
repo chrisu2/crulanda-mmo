@@ -84,6 +84,7 @@ namespace Crulanda.Encounter
             if (Inventory.IsHide(d)) lines.Add(EncounterSession.HideLine);
             var holder = string.IsNullOrEmpty(d.pouch) ? null : Inventory.BagFor(session.Items, d.pouch);
             if (holder != null) lines.Add("Goes in " + Article(holder.name) + " " + LowerFirst(holder.name) + ".");
+            var named = LootLines(d); if (named != null) lines.Add(named);
             if (d.level > 1) lines.Add((d.level > session.Progress.Level ? "<color=#ff5544>" : "") + "Requires level " + d.level + (d.level > session.Progress.Level ? "</color>" : ""));
             if (!string.IsNullOrEmpty(d.description)) lines.Add("<i>" + d.description + "</i>");
             lines.Add("Sells for " + (d.value) + " gold");
@@ -241,6 +242,8 @@ namespace Crulanda.Encounter
             y += left.Length * 24 + 10;
             var t = session.Items != null ? Inventory.Totals(p, session.Items) : new ItemDef();
             GUI.Label(new Rect(w.x + 24, y, w.width - 48, 40), "From gear: +" + t.weaponDamage + " weapon damage, " + t.armor + " armor, +" + (t.stamina + t.strength + t.agility + t.intellect + t.spirit) + " attributes.", tiny);
+            if (session.GearFx != null && session.GearFx.lines.Count > 0)
+            { GUI.contentColor = new Color(.3f, 1f, .3f); GUI.Label(new Rect(w.x + 24, y + 24, w.width - 170, 46), "Gear effects: " + string.Join(" ", session.GearFx.lines), tiny); GUI.contentColor = Color.white; }
             if (GUI.Button(new Rect(w.xMax - 124, w.yMax - 44, 110, 32), "Close [C]", micro)) session.CharacterOpen = false;
         }
 

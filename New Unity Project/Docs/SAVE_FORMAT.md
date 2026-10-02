@@ -13,6 +13,7 @@ formatVersion: 1. payloadType: CrulandaEncounter. DTO: EncounterProgress.
 - recruited, relationship, gold.
 - inventory: item-ID list; equippedItem: item ID.
 - enemies: records of id, dead and looted; prevent duplicate rewards after reload. Camp mobs are not saved, and neither is what lies on their bodies (loot step L1: drops are rolled when a mob dies and live on the body until it is emptied or respawns) or an open loot window.
+- Named loot (loot step L2) adds no field and no format step: its `loot.*` ids sit in the bags and equipment like any item id, and set bonuses, effects and uniqueness are worked out from them on load. An older build shows a `loot.*` id as "?" and keeps it. A new character in the zones is saved with the Tempered Trailblade already in the main hand; saved characters are not changed.
 
 Combat saves are rejected. Automatic saves occur outside combat; load reconstructs actors and
 clears threat, casts, personal cooldowns, global cooldowns and temporary Guard state.

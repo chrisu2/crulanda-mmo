@@ -12,8 +12,8 @@ using Crulanda.World;
 namespace Crulanda.Tests
 {
     /// <summary>
-    /// The gear binder in play (Oakhaven, a throwaway save): a fresh character holds nothing; equipping a blade puts it in the
-    /// hand and unequipping empties it; a load (F9) makes a new player figure and the binder dresses it in what was saved; a chest
+    /// The gear binder in play (Oakhaven, a throwaway save): a new character holds the Tempered Trailblade (loot step L2);
+    /// equipping another blade puts it in the hand and unequipping empties it; a load (F9) makes a new player figure and the binder dresses it in what was saved; a chest
     /// piece put on then shows on the body.
     /// (DESIGN.md lists this with the edit mode visual tests; it needs a running session, so it lives here.)
     /// </summary>
@@ -49,13 +49,17 @@ namespace Crulanda.Tests
             StringAssert.StartsWith(Path.GetTempPath(), s.SaveDirectoryOverride ?? "", "A throwaway save.");
             var look = s.Player.GetComponent<ActorVisual>();
             Assert.IsTrue(look.GearDriven, "Gear drives the player's figure.");
-            Assert.AreEqual(0, look.GearParts(EquipSlot.MainHand), "A fresh character holds nothing.");
-            if (s.Druid == null) Assert.AreEqual(0, look.ClassKitParts, "No class sword, shield or pads.");
+            Assert.AreEqual(s.content.itemId, s.Progress.equipment[(int)EquipSlot.MainHand].item, "A new character starts with the Tempered Trailblade (loot step L2).");
+            yield return Until(() => look.GearParts(EquipSlot.MainHand) > 0);
+            Assert.Greater(look.GearParts(EquipSlot.MainHand), 0, "It is in the hand.");
+            if (s.Druid == null) Assert.AreEqual(0, look.ClassKitParts, "No class sword, shield or pads: the hand holds the Trailblade's own look.");
 
             string blade = ItemDatabase.GearId("mainhand", 1, 1, 3);   // wearable at level 1
             Assert.AreEqual(0, Inventory.Add(s.Progress, s.Items, blade, 1));
+            var trailblade = look.GearRoot(EquipSlot.MainHand);
             Assert.IsTrue(s.EquipFromBag(s.Progress.bag.FindIndex(b => b.item == blade)), "Equipped (and saved).");
-            yield return Until(() => look.GearParts(EquipSlot.MainHand) > 0);
+            yield return Until(() => !ReferenceEquals(look.GearRoot(EquipSlot.MainHand), trailblade) && look.GearParts(EquipSlot.MainHand) > 0);
+            Assert.IsFalse(ReferenceEquals(look.GearRoot(EquipSlot.MainHand), trailblade), "The binder rebuilt the hand for the new blade.");
             Assert.Greater(look.GearParts(EquipSlot.MainHand), 0, "It is in the hand.");
             Assert.AreSame(look.RightArm, look.GearRoot(EquipSlot.MainHand).parent);
 

@@ -10,11 +10,74 @@ namespace Crulanda.Encounter
     /// first), and what does not fit stays on the body until there is room. A body with only coins, junk and common things is
     /// emptied with the one press. Everything taken is a chat line in its quality's colour, and a rare or epic piece raises a
     /// "RARE" or "EPIC" toast over its name. Nothing here is saved: a body keeps its loot until it is emptied or the mob respawns.
+    /// Named loot (step L2): the loot files are item files, read again by LoadLoot for their drop lists, sets and effects. A camp
+    /// body rolls the named drops too (signature lists give a piece you do not hold yet; a unique you hold never drops again and
+    /// cannot be taken twice), and what you wear adds its effects and set bonuses (ApplyGearEffects, OnKillEffects, RestRegen,
+    /// coins and luck on the roll), worked out again from the equipment whenever it changes, so nothing new is saved.
     /// </summary>
     public sealed partial class EncounterSession
     {
-        /// <summary>The named loot (DESIGN.md 3). Null until step L2 loads it; while null a body holds the base roll (ItemDatabase.RollLoot).</summary>
+        /// <summary>The named loot (DESIGN.md 3), or null when the loot files are missing or invalid; then a body holds the base roll (ItemDatabase.RollLoot).</summary>
         public LootDatabase Loot { get; private set; }
+        static LootDatabase lootCache; static ItemDatabase lootCacheItems; static bool lootCacheBad;
+        /// <summary>
+        /// Reads the drop lists, sets and effects of the item files (the loot files among them) against the items, after LoadItems,
+        /// and registers the named looks with the gear looks. Cached while the items are the same. A bad file is logged once and
+        /// leaves the named loot off (the items, vendors and base roll stay).
+        /// </summary>
+        void LoadLoot()
+        {
+            Loot = null;
+            if (Items == null || content == null || content.itemFiles == null) return;
+            if (lootCacheItems != Items)
+            {
+                lootCache = null; lootCacheBad = false; lootCacheItems = Items;
+                try { var texts = new List<string>(); foreach (var f in content.itemFiles) if (f != null) texts.Add(f.text); lootCache = LootDatabase.Parse(texts, Items, GearLooks.Load()); }
+                catch (System.ArgumentException e) { Debug.LogError("Loot content invalid:\n" + e.Message); lootCacheBad = true; }
+            }
+            if (lootCacheBad || lootCache == null || lootCache.Gear.Count == 0) return;
+            Loot = lootCache;
+            Loot.ZoneName = id => { var z = Zone != null ? Zone.AllZones().Find(d => d.id == "zone." + id) : null; return z != null ? z.displayName : null; };
+        }
+        /// <summary>A unique piece you already carry or wear: it never drops again and cannot be taken from a body.</summary>
+        public bool HoldsUnique(string item) { return Loot != null && Loot.IsUnique(item) && Inventory.Has(Progress, item); }
+        /// <summary>What taking a unique piece you already hold says.</summary>
+        public static string UniqueLine(string name) { return "You already have " + name + ". It is unique."; }
+
+        /// <summary>What worn named gear and sets add up to now (empty without named loot); worked out again by ApplyGearEffects.</summary>
+        public GearEffectTotals GearFx { get; private set; } = new GearEffectTotals();
+        readonly object gearEffectSource = new object();
+        /// <summary>
+        /// The effects of the named gear worn and the set bonuses switched on (GearEffects.Compute): stat effects become modifiers
+        /// from their own source, cleared and added again each time (the end of ApplyEquipment calls it); the rest is kept in GearFx.
+        /// </summary>
+        void ApplyGearEffects()
+        {
+            if (Player == null) return;
+            Player.Stats.RemoveModifiersFromSource(gearEffectSource);
+            GearFx = GearEffects.Compute(Progress, Items, Loot, gearEffectSource);
+            if (GearFx.modifiers.Count > 0) Player.Stats.AddModifiers(GearFx.modifiers);
+        }
+        /// <summary>A kill's gear effects: health and resource back, while you stand.</summary>
+        void OnKillEffects()
+        {
+            if (Player == null || !Player.IsAlive) return;
+            if (GearFx.onKillHeal > 0) Player.Health.ApplyHealing(GearFx.onKillHeal);
+            if (GearFx.onKillPower > 0 && Player.Resource != null) Player.Resource.Pool.Change(GearFx.onKillPower);
+        }
+        /// <summary>Health back each second out of combat: 7, and what worn gear adds (capped at +20).</summary>
+        int RestRegen { get { return 7 + GearFx.restRegen; } }
+        /// <summary>
+        /// A new character in the zones starts with the Tempered Trailblade in hand (loot step L2, the owner's call), so the empty
+        /// hands of the gear looks are never the first thing seen. Saved characters are never changed; the old Quiet Trail keeps
+        /// its blade as the sentries' reward.
+        /// </summary>
+        void ArmNewCharacter()
+        {
+            if (Zone == null || Progress == null || string.IsNullOrEmpty(content.itemId)) return;
+            Inventory.Ensure(Progress);
+            if (Progress.equipment[(int)EquipSlot.MainHand].Empty) Progress.equipment[(int)EquipSlot.MainHand] = new ItemStack { item = content.itemId, count = 1 };
+        }
         /// <summary>What taking says when the bags could not hold everything.</summary>
         public const string BodyKeepsLine = "Your bags are full. The rest stays on the body.";
         /// <summary>The loot window shuts when you are further than this from the body.</summary>
@@ -30,19 +93,22 @@ namespace Crulanda.Encounter
         public int LootCoins { get { return lootBody != null ? lootBody.Coins : 0; } }
 
         /// <summary>
-        /// Rolls a camp body's loot as it dies: coins by level (three times as many from an elite), and the kind's drops with a
-        /// chance of gear (ItemDatabase.RollLoot, or LootDatabase.Roll once the named loot is loaded); then lights its beacon.
+        /// Rolls a camp body's loot as it dies: coins by level (three times as many from an elite, more with worn coin effects), and
+        /// the kind's drops with a chance of gear (ItemDatabase.RollLoot, or LootDatabase.Roll once the named loot is loaded: owned
+        /// and held are what you carry or wear, luck is your gear's); then lights its beacon.
         /// </summary>
         public void RollCorpse(EncounterEnemy corpse)
         {
             if (corpse == null) return;
             int coins = 1 + corpse.actor.Level * 2 + Random.Range(0, corpse.actor.Level + 2);
             if (corpse.Elite) coins *= 3;
+            if (GearFx.coins > 0) coins = Mathf.RoundToInt(coins * (1 + GearFx.coins));
             var drops = new List<LootDrop>();
             if (Items != null)
             {
                 var rng = new System.Random(Random.Range(0, int.MaxValue));
-                if (Loot != null) drops = Loot.Roll(LootContext.From(corpse.persistentId, Zone != null ? Zone.Zone.camps : null, corpse.actor.Level, corpse.Elite), Items, id => Inventory.Has(Progress, id), 0, null, rng);
+                System.Func<string, bool> has = id => Inventory.Has(Progress, id);
+                if (Loot != null) drops = Loot.Roll(LootContext.From(corpse.persistentId, Zone != null ? Zone.Zone.camps : null, corpse.actor.Level, corpse.Elite), Items, has, GearFx.luck, null, rng, has);
                 else
                 {
                     var parts = corpse.persistentId.Split('.'); string tag = parts.Length > 1 ? parts[1] : "any";
@@ -88,14 +154,14 @@ namespace Crulanda.Encounter
             Conversation = null; if (VendorNpc != null) CloseVendor(); TradesOpen = false; QuestBookOpen = false; ReadingDocument = null; MapOpen = false;
         }
         /// <summary>Whether E on this camp body would take anything now: coins, a thing the bags have room for, or loot not yet rolled. A body with nothing that fits leaves E to Mira, villagers, nodes and doors.</summary>
-        bool CanTakeAny(EncounterEnemy e) { return e.Drops == null || e.Coins > 0 || Items == null || e.Drops.Exists(d => Inventory.Room(Progress, Items, d.item) > 0); }
+        bool CanTakeAny(EncounterEnemy e) { return e.Drops == null || e.Coins > 0 || Items == null || e.Drops.Exists(d => Inventory.Room(Progress, Items, d.item) > 0 && !HoldsUnique(d.item)); }
         public void CloseLoot() { lootBody = null; }
         /// <summary>Take all [E]: the coins, then each thing in order; what does not fit stays on the body. The window shuts either way.</summary>
         public void TakeAllLoot()
         {
             var body = LootBody; if (body == null || body.Drops == null || body.actor.IsAlive) { CloseLoot(); return; }
             TakeCoins(body); int kept = 0;
-            for (int i = 0; i < body.Drops.Count; i++) kept += TakeDrop(body, i);
+            for (int i = 0; i < body.Drops.Count; i++) kept += TakeDrop(body, i, out _);
             body.Drops.RemoveAll(d => d.count <= 0);
             if (kept > 0) Message(BodyKeepsLine);
             CloseLoot(); AfterTake(body);
@@ -104,9 +170,9 @@ namespace Crulanda.Encounter
         public bool TakeLoot(int index)
         {
             var body = LootBody; if (body == null || body.Drops == null || index < 0 || index >= body.Drops.Count) return false;
-            int left = TakeDrop(body, index); body.Drops.RemoveAll(d => d.count <= 0);
+            int left = TakeDrop(body, index, out bool refused); body.Drops.RemoveAll(d => d.count <= 0);
             if (left > 0) Message(BodyKeepsLine);
-            AfterTake(body); return left == 0;
+            AfterTake(body); return left == 0 && !refused;
         }
         /// <summary>A click on the coins row.</summary>
         public void TakeLootCoins() { var body = LootBody; if (body == null || body.Drops == null || body.actor.IsAlive) { CloseLoot(); return; } TakeCoins(body); AfterTake(body); }
@@ -115,10 +181,16 @@ namespace Crulanda.Encounter
             if (body.Coins <= 0) return;
             Progress.gold += body.Coins; Message("Looted " + body.Coins + " gold."); body.Coins = 0;
         }
-        /// <summary>One thing off the body into the bags (Inventory.Add: onto its stacks, then a worn trade bag of its class, then the bags). Returns how many stayed on the body.</summary>
-        int TakeDrop(EncounterEnemy body, int i)
+        /// <summary>
+        /// One thing off the body into the bags (Inventory.Add: onto its stacks, then a worn trade bag of its class, then the bags).
+        /// Returns how many stayed on the body for want of room. A unique piece you already hold is <paramref name="refused"/>: it
+        /// stays on the body and says why.
+        /// </summary>
+        int TakeDrop(EncounterEnemy body, int i, out bool refused)
         {
+            refused = false;
             var drop = body.Drops[i]; if (drop.count <= 0) return 0;
+            if (HoldsUnique(drop.item)) { refused = true; Message(UniqueLine(ItemName(drop.item))); return 0; }
             int left = Items != null ? Inventory.Add(Progress, Items, drop.item, drop.count) : drop.count;
             if (drop.count - left > 0) Received(drop.item, drop.count - left);
             body.Drops[i] = new LootDrop(drop.item, left);

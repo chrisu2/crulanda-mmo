@@ -107,12 +107,12 @@
           ]
         },
         {
-          "text": "Arm yourself with a recovered blade [I].",
+          "text": "Keep the Tempered Trailblade in hand [I].",
           "objectives": [
             {
               "type": "flag",
               "target": "equipped:item.training_blade",
-              "text": "Equip a recovered blade [I]"
+              "text": "Tempered Trailblade in hand [I]"
             }
           ]
         },

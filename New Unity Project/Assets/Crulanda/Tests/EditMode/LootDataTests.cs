@@ -11,21 +11,16 @@ using Crulanda.World;
 namespace Crulanda.Tests
 {
     /// <summary>
-    /// The loot files read from disk, wherever they sit (EncounterContent/Loot while drafted, EncounterContent/Items from step L2),
-    /// with the core item file, the zones and the quests: shared by the loot data and roll tests.
+    /// The loot files read from disk (EncounterContent/Items since step L2, beside the core item file), with the core items, the
+    /// zones and the quests: shared by the loot data and roll tests.
     /// </summary>
     public static class LootTestData
     {
         public static string Content { get { return Path.Combine(Application.dataPath, "Crulanda", "EncounterContent"); } }
-        /// <summary>Every loot.*.json in the Loot and Items folders, by file name.</summary>
+        /// <summary>Every loot.*.json in the Items folder, by file name (the order the scene builder registers them in).</summary>
         public static List<string> LootPaths()
         {
-            var paths = new List<string>();
-            foreach (var folder in new[] { "Loot", "Items" })
-            {
-                var dir = Path.Combine(Content, folder);
-                if (Directory.Exists(dir)) paths.AddRange(Directory.GetFiles(dir, "loot.*.json"));
-            }
+            var paths = new List<string>(Directory.GetFiles(Path.Combine(Content, "Items"), "loot.*.json"));
             paths.Sort((a, b) => string.CompareOrdinal(Path.GetFileName(a), Path.GetFileName(b)));
             return paths;
         }
@@ -60,7 +55,8 @@ namespace Crulanda.Tests
     }
 
     /// <summary>
-    /// The loot database's data (loot DESIGN.md 3 and 7, step A3): the six files parse with the core items, alone and together;
+    /// The loot database's data (loot DESIGN.md 3 and 7, steps A3 and L2): the six files are item files, registered with the rest
+    /// (the old drafts folder and its stand-in are gone); they parse with the core items, alone and together;
     /// ids follow the scheme and never go away; named gear has generated gear's armour, damage and value and its stat budget;
     /// every named item has a look, a source that exists, flavour and a canon label; every elite has a signature list and every
     /// zone named gear in every slot; drop groups, sets and effects stay inside the rules.
@@ -83,6 +79,31 @@ namespace Crulanda.Tests
             Assert.AreEqual(49, named.Count(id => items.Get(id).quality == 2), "49 uncommon.");
             Assert.AreEqual(48, named.Count(id => items.Get(id).quality == 3), "48 rare.");
             Assert.AreEqual(7, named.Count(id => items.Get(id).quality == 4), "7 epic.");
+        }
+
+        /// <summary>
+        /// Step L2: the loot files sit with the item files (their .meta files moved with them, GUIDs kept), the drafts folder is
+        /// gone, and Encounter.asset lists all seven item files. The validation scripts register them (Crulanda > World > Build
+        /// Oakhaven) before the tests run.
+        /// </summary>
+        [Test] public void The_loot_files_are_registered_item_files()
+        {
+            Assert.IsFalse(Directory.Exists(Path.Combine(LootTestData.Content, "Loot")), "EncounterContent/Loot is gone: the loot files are item files.");
+            var guids = new Dictionary<string, string> {
+                { "loot.ashrim", "9f701a55d07c4f4299fbb7c48497aeb4" }, { "loot.khaven", "103ac81766944eeb9928acfa11d938c2" }, { "loot.oakhaven", "256143be1814496f9a1bddd5c4fc0913" },
+                { "loot.peaks", "af637de598024e20b5544b2751570efa" }, { "loot.verdant", "8551b0a84e6e40eabece9e15ae762d17" }, { "loot.world", "09624b8f2d254830aac358cd2c9554c3" } };
+            foreach (var kv in guids)
+            {
+                string path = "Assets/Crulanda/EncounterContent/Items/" + kv.Key + ".json";
+                Assert.AreEqual(kv.Value, UnityEditor.AssetDatabase.AssetPathToGUID(path), path + " kept its GUID.");
+            }
+            var content = UnityEditor.AssetDatabase.LoadAssetAtPath<EncounterContent>("Assets/Crulanda/EncounterContent/Encounter.asset");
+            Assert.NotNull(content, "Encounter.asset loads.");
+            var names = (content.itemFiles ?? new TextAsset[0]).Where(f => f != null).Select(f => f.name).ToList();
+            foreach (var name in new[] { "items" }.Concat(guids.Keys))
+                CollectionAssert.Contains(names, name, "Encounter.asset does not list " + name + ".json. Run Crulanda > World > Build Oakhaven to register it.");
+            CollectionAssert.AreEqual(names.OrderBy(n => n, StringComparer.Ordinal).ToList(), names, "The item files are registered by name, so the drop lists roll in the tests' order.");
+            Assert.IsNull(Resources.Load("Gear/LootDraft"), "The A3 stand-in (Resources/Gear/LootDraft.asset) is gone.");
         }
 
         [Test] public void Each_loot_file_parses_alone_beside_the_core_file()

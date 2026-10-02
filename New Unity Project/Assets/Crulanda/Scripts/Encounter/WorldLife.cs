@@ -1073,8 +1073,12 @@ namespace Crulanda.Encounter
             return true;
         }
         static string EggLine(int n) { return n >= 5 ? n + " eggs. Good girls." : n >= 2 ? n + " eggs. They're off-lay; it's the grey, I'd wager." : n == 1 ? "Just the one. Well. It's something." : "Nothing. Off-lay, the lot of you."; }
-        void Carry(Load what, int count) { DropLoad(); loadKind = what; loadCount = count; load = LoadProps.Build(transform, what, count); }
-        void DropLoad() { if (load != null) Destroy(load); load = null; loadKind = Load.None; }
+        void Carry(Load what, int count)
+        {
+            DropLoad(); loadKind = what; loadCount = count; load = LoadProps.Build(transform, what, count);
+            if (visual != null) visual.Carry = what == Load.Bread || what == Load.Goods ? ActorVisual.Carrying.Front : what == Load.Grain || what == Load.Flour || what == Load.Logs ? ActorVisual.Carrying.Shoulder : ActorVisual.Carrying.Side;
+        }
+        void DropLoad() { if (load != null) Destroy(load); load = null; loadKind = Load.None; if (visual != null) visual.Carry = ActorVisual.Carrying.None; }
         /// <summary>Capture/debug: go straight to a place of this kind and work there for a minute.</summary>
         public bool WorkAt(string place)
         {

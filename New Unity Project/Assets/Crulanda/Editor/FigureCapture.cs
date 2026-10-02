@@ -41,6 +41,9 @@ namespace Crulanda.EditorTools
             Row("poses-1", new[] { Po(ActorPose.None, 1.5f, .3f), Po(ActorPose.None, 3.6f, .2f), Po(ActorPose.None, 6.5f, .2f), Po(ActorPose.Sneak, 1.2f, .5f), Po(ActorPose.Sneak, 0, .5f), Po(ActorPose.Swim, 1.6f, .4f) }, 90);
             Row("poses-2", new[] { Po(ActorPose.Sit, 0, .5f), Po(ActorPose.Talk, 0, 1.2f), Po(ActorPose.Gather, 0, 2.5f), Po(ActorPose.Cower, 0, .5f), Po(ActorPose.Hammer, 0, .45f), Po(ActorPose.Chop, 0, .55f) }, 90);
             Row("poses-3", new[] { Po(ActorPose.Knead, 0, .3f), Po(ActorPose.Work, 0, .3f), Po(ActorPose.Drink, 0, 1.2f), Po(ActorPose.Slump, 0, .5f), Po(ActorPose.None, 0, .5f, dead: true) }, 90);
+            // Carrying, side on, walking: a basket of eggs, a bucket, bread, a sack of grain, logs, goods.
+            Row("carry", new[] { Ca(Load.Eggs, 5, ActorVisual.Carrying.Side), Ca(Load.Bucket, 1, ActorVisual.Carrying.Side), Ca(Load.Bread, 3, ActorVisual.Carrying.Front),
+                Ca(Load.Grain, 1, ActorVisual.Carrying.Shoulder), Ca(Load.Logs, 3, ActorVisual.Carrying.Shoulder), Ca(Load.Goods, 1, ActorVisual.Carrying.Front) }, 90);
             // Armour: the martial kit and the cloth kit, on the warrior and the druid, front and walking side on.
             var martial = Kit(db, 7, 3, "Cap", "Torc", "Pauldrons", "Hauberk", "Gauntlets", "Greaves", "Sabatons", "Blade", "Shield");
             var cloth = Kit(db, 5, 2, "Hood", "Pendant", "Mantle", "Tunic", "Wraps", "Breeches", "Shoes", "Cudgel", "Lantern");
@@ -52,7 +55,8 @@ namespace Crulanda.EditorTools
             Debug.Log("FIGURE_CAPTURE_DONE");
         }
 
-        sealed class Spec { public ActorLook look; public int variant; public string role, name; public ActorPose pose; public float walk, time = .4f; public bool dead; public string[] gear; public ItemDatabase db; public GearLooks looks; }
+        sealed class Spec { public ActorLook look; public int variant; public string role, name; public ActorPose pose; public float walk, time = .4f; public bool dead; public string[] gear; public ItemDatabase db; public GearLooks looks; public Load load; public int count; public ActorVisual.Carrying carry; }
+        static Spec Ca(Load load, int count, ActorVisual.Carrying carry) { return new Spec { look = ActorLook.Villager, variant = 13, role = "baker", name = "Ama Rusk", walk = 1.5f, time = .3f, load = load, count = count, carry = carry }; }
         static Spec P(ActorLook look, int variant = 0, string role = null, string name = null, string[] gear = null, ItemDatabase db = null, GearLooks looks = null, float walk = 0)
         { return new Spec { look = look, variant = variant, role = role, name = name ?? look.ToString(), gear = gear, db = db, looks = looks, walk = walk }; }
         static Spec V(string role, string name, int variant) { return new Spec { look = ActorLook.Villager, variant = variant, role = role, name = name }; }
@@ -72,6 +76,7 @@ namespace Crulanda.EditorTools
                 new GameObject("Body").transform.SetParent(go.transform, false);
                 var v = ActorVisual.Attach(go, s.look, s.variant, s.role == "child", s.role);
                 if (s.gear != null) v.ApplyGearIds(s.gear, s.db, s.looks);
+                if (s.carry != ActorVisual.Carrying.None) { LoadProps.Build(go.transform, s.load, s.count); v.Carry = s.carry; }
                 if (s.dead) v.PreviewDead(); else v.Preview(s.pose, s.walk, s.time);
             }
             float width = specs.Length * gap + .3f, halfH = Mathf.Tan(cam.fieldOfView * .5f * Mathf.Deg2Rad), aspect = 16f / 9;

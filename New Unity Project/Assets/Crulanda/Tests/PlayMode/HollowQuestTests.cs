@@ -106,7 +106,7 @@ namespace Crulanda.Tests
             foreach (var e in s.Enemies.Where(e => e.persistentId.StartsWith("mob.deserter.")))
                 Assert.IsTrue(e.transform.Find("Body/Arm R/Falchion") != null || e.transform.Find("Body/Arm R/Club") != null, e.persistentId + " carries a deserter's falchion or club.");
             var king = s.Enemies.First(e => e.persistentId.StartsWith("mob.banditking."));
-            Assert.NotNull(king.transform.Find("Body/Tin crown"), "Caddock wears the tin crown.");
+            Assert.NotNull(king.transform.Find("Body/Tin crown") ?? king.transform.Find("Body/Head frame/Tin crown"), "Caddock wears the tin crown (on a model, on its head's frame).");
             Assert.NotNull(king.transform.Find("Body/Arm R/Cleaver"), "Caddock carries the cleaver.");
             // The plunder in the deep chamber.
             var plunder = s.Zone.Interactables.Find(i => i.name == Plunder);

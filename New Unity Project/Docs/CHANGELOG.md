@@ -928,3 +928,28 @@ A read-only review by five reviewers, each finding checked by a second who tried
   glowing bars; a candle lantern hangs under it, and the pot's cracks only just glow.
 - Tests: EditMode 378/378, PlayMode 173/174 in the full run (a villager walking home cut it fine; the fixture passed twice
   after); all five zones toured, the wardrobe and the village looked at; Khaven toured again with the lantern.
+
+## 2026-10-02 evening — Real people: every person is a model (playtest note 12)
+- **The smooth figure** (16:58: one skinned body for every person, knees and elbows; limb armour and held gear bending with
+  them) was still "REALLY blocky" (Chris). He chose real models: the Quaternius kits (CC0), men and women.
+- **People as models**: textured heads with faces, eyes and brows, real hair (short, parted, buzzed, long, buns) and beards,
+  peasant and ranger outfits in each trade's dyes, the outfit's hood for the hooded trades and classes, skin tones and hair
+  colours from the old palettes, women by name and trade (the hen-wives, Hedda, Maud, Lisbet, the Druid...). The Warrior
+  and the Druid wear the ranger's leathers; Collectors and Wardens Concord white.
+- **They move**: a real walk, jog and sprint matched to their speed, an idle that breathes, sitting at the inn, kneeling to
+  gather, crouching to sneak, swimming with the face out of the water, talking with their hands, falling dead. Hammering,
+  chopping, hoeing, kneading, drinking and slumping over the table use the old poses' arms on the new bodies.
+- **Gear refit, not redone**: every weapon, tool, shield, lantern and armour piece keeps its design and sits on the model:
+  helmets on the head, chest pieces on the chest, vambraces and greaves bending at the elbows and knees (slimmed to the
+  model's limbs); armour dyes the clothes under it and hides the outfit's belts and bracers. Hats, masks, crowns, satchels,
+  sigils and the hunter's bow stay; the old flat aprons, tabards, capes and ball hoods are gone from the models.
+- **Rounder armour on the models**: chest plate, mail, coats, jerkins, tunics, robes and belts are built round (they were
+  square to hold the old figure's cube torso), with their own meshes; the smooth figure keeps the old ones.
+- **Carrying**: a villager with a load holds it: the right arm out to a basket, bucket, hide, herbs or game at the hip, both
+  arms forward under bread or goods, a hand up to steady a sack or logs on the shoulder.
+- Fixes found by the first full run: parts a model leaves off are unparented before they are destroyed (a villager caches
+  its renderers as it is built, and coming out of a house touched a destroyed one); an elder's stoop and a sleeper's slump
+  bend the back only on frames the figure's clips posed it (off screen they would have bent it again every frame).
+- **True colours on the leathers**: the ranger outfit's green cloth has a bleached copy, so dyes come out true: the Warrior
+  in his blue, the Concord's Collectors and Wardens in white, the Sandthrone outriders in sand, cultists in soot black,
+  deserters in their faded sand, Caddock in near-black; the Druid and the hunters keep the green.

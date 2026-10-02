@@ -819,3 +819,17 @@ resumed with `Workflow({scriptPath, resumeFromRunId})` (finished agents replay f
   accepts the chest frame. WorldLife's tankard hangs from `RightHandle` (rides the forearm).
 - **Metas**: robocopy /MIR deletes what Unity made in the validation copy; copy new .meta/.mat files back after each Unity run
   (done for the kit, the materials, the scripts).
+- Committed 4078ab7 (models). The first full run (18:20) was STOPPED in PlayMode: `Villager.Emerge` hit a destroyed
+  MeshRenderer (Remap destroyed old board parts after WorldLife cached the villager's renderers) -> parts are now hidden and
+  unparented first (Kill). Follow-ups in the same round: rounder shells on models (GearArmor `Shell`, RoundSquare 3.2, keys
+  "+.round"), carry poses (`ActorVisual.Carry`, set by WorldLife Carry/DropLoad; FigureCapture "carry" row), the off-screen
+  guard (`ModelFigure.Visible`: PoseArm and back bends only when the Animator posed the bones). Markers: hel\work\c3-start.marker
+  (round3-start.marker is stale, 16:55).
+- `Ranger_White` kit material: T_Ranger_White_BaseColor.png (tools/wip/characters/concord: the green cloth bleached to linen
+  white by hue, leather and metal kept; other maps the Ranger's). `Spec.bleach` picks it for the Warrior, Collector, Warden,
+  Outrider, Cultist, Deserter, Bandit King and the stranger. Clip start offsets now hash the figure's name (no global Random).
+- NEXT for the models (seen in FigureCapture, not yet done): face pieces sit ~4 cm high (the head frame is lifted .12 for
+  helmets; masks and mouth scarves want a face frame at the old .8 -> HeadBone+.07); big balls on the chest still read as
+  bubbles (the skinner's pelt, the warden's bark pauldrons, the deserters' leather pauldron: drop chest spheres >= .2 on
+  models); the stranger's side panels; children are scaled adults; the armour's own designs (C2 proper: plate shapes, moving
+  cloth); a Peasant "bleached" copy for truer villager dyes; the $20 Quaternius tier (Chris's to buy) for knights/nobles.

@@ -53,14 +53,15 @@ namespace Crulanda.EditorTools
         /// <summary>The kit's texture sets, each a Standard material asset (so its normal-map and metallic-map variants ship in a
         /// build): skin light and dark for each body, the outfits, the outfits' own skin, hair and the eyes.</summary>
         static readonly string[] Sets = { "Superhero_Male_Light", "Superhero_Male_Dark", "Superhero_Female_Light", "Superhero_Female_Dark", "Regular_Male_Dark", "Regular_Female_Dark",
-            "Peasant", "Ranger", "Hair_1", "Hair_2", "Eye_Brown" };
+            "Peasant", "Ranger", "Ranger_White", "Hair_1", "Hair_2", "Eye_Brown" };
         static void Materials()
         {
             string dir = Root + "Materials"; if (!AssetDatabase.IsValidFolder(dir)) AssetDatabase.CreateFolder(Root.TrimEnd('/'), "Materials");
             Texture2D T(string name) { return AssetDatabase.LoadAssetAtPath<Texture2D>(Root + "Textures/T_" + name + ".png"); }
             foreach (var set in Sets)
             {
-                string body = set.Replace("_Light", "").Replace("_Dark", "").Replace("_Brown", "");
+                // Ranger_White is the Ranger's colours with its green cloth bleached (tools/wip/characters/concord), its other maps the Ranger's.
+                string body = set == "Ranger_White" ? "Ranger" : set.Replace("_Light", "").Replace("_Dark", "").Replace("_Brown", "");
                 var path = dir + "/" + set + ".mat"; var m = AssetDatabase.LoadAssetAtPath<Material>(path);
                 if (m == null) { m = new Material(Shader.Find("Standard")); AssetDatabase.CreateAsset(m, path); }
                 var albedo = T(set + "_BaseColor") ?? T(set); m.mainTexture = albedo; m.color = Color.white;

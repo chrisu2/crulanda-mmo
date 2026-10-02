@@ -21,11 +21,12 @@ namespace Crulanda.Encounter
         /// <summary>
         /// What a figure is: sex, hairstyle (0 short, 1 long, 2 tied back, 3 cropped, 4 bald; each sex has its own cuts), a beard,
         /// the outfit, a hood (the Ranger's, on either outfit), the tints for skin, hair, shirt and breeches (white leaves the
-        /// texture as it is), stone (a Hollow Man: everything grey) and a scale.
+        /// texture as it is), stone (a Hollow Man: everything grey), bleach (a Ranger outfit's green cloth bleached white, so the
+        /// tints dye it true: the Concord's white, the Warrior's blue, a cultist's black) and a scale.
         /// </summary>
         public struct Spec
         {
-            public bool female, beard, hood, stone; public int hair; public Kit kit;
+            public bool female, beard, hood, stone, bleach; public int hair; public Kit kit;
             public Color skin, hairColour, shirt, breeches, hoodColour; public float scale;
         }
 
@@ -72,7 +73,7 @@ namespace Crulanda.Encounter
             if (n.Contains("hair") || n.Contains("brow") || n.Contains("beard")) return (n.Contains("2") ? "Hair_2" : "Hair_1", s.stone ? stone * .8f : s.hairColour);
             if (n.Contains("regular")) return ("Regular_" + sex + "_Dark", s.stone ? stone : s.skin);
             if (n.Contains("superhero")) return ("Superhero_" + sex + "_Light", s.stone ? stone : s.skin);
-            string set = n.Contains("ranger") ? "Ranger" : "Peasant";
+            string set = n.Contains("ranger") ? (s.bleach ? "Ranger_White" : "Ranger") : "Peasant";
             if (s.stone) return (set, stone);
             if (piece == Hood) return (set, s.hoodColour);
             if (piece == Torso || piece == Arms) return (set, s.shirt);
@@ -166,7 +167,9 @@ namespace Crulanda.Encounter
             f.FindBones();
             return f;
         }
-        static void Kill(GameObject g) { if (Application.isPlaying) { g.SetActive(false); Object.Destroy(g); } else Object.DestroyImmediate(g); }
+        /// <summary>Gone at once as far as anyone looking at the figure goes: hidden and unparented, destroyed at the end of the
+        /// frame (or now in edit mode). A villager caches its renderers right after it is built.</summary>
+        static void Kill(GameObject g) { if (Application.isPlaying) { g.SetActive(false); g.transform.SetParent(null, false); Object.Destroy(g); } else Object.DestroyImmediate(g); }
         /// <summary>Moves a skinned mesh onto this figure's skeleton, bone by bone by name. False (and the mesh is left) if a bone is missing.</summary>
         bool Move(SkinnedMeshRenderer smr)
         {
@@ -220,6 +223,9 @@ namespace Crulanda.Encounter
             UpperLegL = B("thigh_l", HumanBodyBones.LeftUpperLeg); UpperLegR = B("thigh_r", HumanBodyBones.RightUpperLeg); LowerLegL = B("calf_l", HumanBodyBones.LeftLowerLeg); LowerLegR = B("calf_r", HumanBodyBones.RightLowerLeg);
             FootL = B("foot_l", HumanBodyBones.LeftFoot); FootR = B("foot_r", HumanBodyBones.RightFoot); BallL = B("ball_l", HumanBodyBones.LeftToes); BallR = B("ball_r", HumanBodyBones.RightToes);
         }
+        /// <summary>True when the figure was drawn last frame (so its Animator, which culls its bones when it is not, posed them
+        /// this frame).</summary>
+        public bool Visible { get { foreach (var r in Renderers) if (r != null && r.isVisible) return true; return false; } }
         /// <summary>True when every bone the frames hang on was found.</summary>
         public bool Complete { get { return Hips && Spine && Chest && HeadBone && UpperArmL && UpperArmR && LowerArmL && LowerArmR && HandL && HandR && UpperLegL && UpperLegR && LowerLegL && LowerLegR && FootL && FootR; } }
 
@@ -254,10 +260,18 @@ namespace Crulanda.Encounter
             {
                 var p = AnimationClipPlayable.Create(graph, found[i].Item2); p.SetApplyFootIK(true);
                 graph.Connect(p, 0, mixer, i); slots.Add((p, found[i].Item2, found[i].Item1 != "death" && found[i].Item1 != "gather")); slotOf[found[i].Item1] = i;
-                p.SetTime(Random.value * found[i].Item2.length);   // no two figures step in time
+                p.SetTime(Stagger(label, i) * found[i].Item2.length);   // no two figures step in time
             }
             if (slotOf.TryGetValue("idle", out int idle)) { weights[idle] = 1; mixer.SetInputWeight(idle, 1); }
             output.SetSourcePlayable(mixer); graph.Play();
+        }
+        /// <summary>Where in a clip a figure starts (0 to 1), from its name: fixed per figure and taking nothing from the shared
+        /// random stream (others draw from it in a set order).</summary>
+        static float Stagger(string label, int slot)
+        {
+            uint h = 2166136261u; foreach (char ch in label ?? "") { h ^= ch; h *= 16777619u; }
+            h ^= (uint)slot * 2654435761u; h ^= h >> 13; h *= 0x5bd1e995u; h ^= h >> 15;
+            return (h & 0xffff) / 65536f;
         }
         public void StopMotion() { if (graph.IsValid()) graph.Destroy(); }
         /// <summary>The clip a slot plays (null if the library lacks it).</summary>

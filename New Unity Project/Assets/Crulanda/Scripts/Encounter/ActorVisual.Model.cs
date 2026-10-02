@@ -29,6 +29,10 @@ namespace Crulanda.Encounter
         struct Follow { public Transform frame, bone; public Quaternion rot; public Vector3 pos; public bool place; }
         readonly List<Follow> follows = new List<Follow>();
         Crulanda.Gameplay.Actor actorRef; float armWeight, swimLift; bool dropped, leaned; Vector3 poseArmL, poseArmR; float poseElbowL, poseElbowR;
+        /// <summary>What the hands carry, for a model's arms (WorldLife sets it with the load): none; beside the right hip (a basket,
+        /// a bucket, a hide, herbs, game); in front in both arms (bread, goods); on the right shoulder (a sack, logs).</summary>
+        public enum Carrying { None, Side, Front, Shoulder }
+        public Carrying Carry;
         /// <summary>Where a thing carried in the right hand hangs (a tankard): its (0, -.62, 0) is the hand, as on the right arm's
         /// pivot, but it rides the forearm, so it stays in the hand as the elbow bends.</summary>
         public Transform RightHandle { get { return handleR != null ? handleR : armR; } }
@@ -58,7 +62,7 @@ namespace Crulanda.Encounter
         /// <summary>A cloth tint from a colour: the hue as a dye (<see cref="ModelFigure.Dye"/>), and dark colours darken the cloth.</summary>
         static Color ClothTint(Color c, float strength)
         {
-            float k = Mathf.Clamp(Mathf.Lerp(1, c.maxColorComponent / .7f, .6f), .35f, 1.1f);
+            float k = Mathf.Clamp(Mathf.Lerp(1, c.maxColorComponent / .7f, .8f), .3f, 1.1f);   // soot black and charcoal come out dark on bleached cloth
             return Gain(ModelFigure.Dye(c, strength), k);
         }
         /// <summary>What this person's model is: the outfit, sex, hair, hood and dyes, from the look, the trade and the variant.</summary>
@@ -74,16 +78,16 @@ namespace Crulanda.Encounter
             s.beard = !s.female && Mathf.Abs(variant * 5 + 1) % 4 == 0;
             switch (look)
             {
-                case ActorLook.Warrior: s.kit = ModelFigure.Kit.Ranger; s.hair = 0; s.beard = false; break;
+                case ActorLook.Warrior: s.kit = ModelFigure.Kit.Ranger; s.bleach = true; s.hair = 0; s.beard = false; break;   // his blue
                 case ActorLook.Druid: s.kit = ModelFigure.Kit.Ranger; s.hood = true; s.hoodColour = ClothTint(clothC, .8f); s.hair = 1; break;
                 case ActorLook.Healer: s.hood = true; s.hair = 2; break;
-                case ActorLook.Collector: case ActorLook.Warden: s.kit = ModelFigure.Kit.Ranger; s.shirt = ClothTint(new Color(.93f, .93f, .95f), .15f); break;   // Concord white, for the tabard
+                case ActorLook.Collector: case ActorLook.Warden: s.kit = ModelFigure.Kit.Ranger; s.bleach = true; s.shirt = ClothTint(new Color(.93f, .93f, .95f), .15f); break;   // Concord white, for the tabard
                 case ActorLook.Sentry: s.kit = ModelFigure.Kit.Ranger; break;
-                case ActorLook.Outrider: s.kit = ModelFigure.Kit.Ranger; s.hood = true; s.hoodColour = ClothTint(clothC, .7f); break;
-                case ActorLook.Cultist: s.kit = ModelFigure.Kit.Ranger; s.hood = true; s.hoodColour = ClothTint(clothC, .8f); break;
+                case ActorLook.Outrider: s.kit = ModelFigure.Kit.Ranger; s.bleach = true; s.hood = true; s.hoodColour = ClothTint(clothC, .7f); break;
+                case ActorLook.Cultist: s.kit = ModelFigure.Kit.Ranger; s.bleach = true; s.hood = true; s.hoodColour = ClothTint(clothC, .8f); break;
                 case ActorLook.Hollow: s.stone = true; break;
-                case ActorLook.Deserter: s.kit = (FigureSeed() & 1) == 0 ? ModelFigure.Kit.Ranger : ModelFigure.Kit.Peasant; s.hood = (FigureSeed() & 6) == 2; s.hoodColour = ClothTint(clothC, .6f); break;
-                case ActorLook.BanditKing: s.kit = ModelFigure.Kit.Ranger; s.beard = true; s.hair = 3; break;
+                case ActorLook.Deserter: s.kit = (FigureSeed() & 1) == 0 ? ModelFigure.Kit.Ranger : ModelFigure.Kit.Peasant; s.bleach = true; s.hood = (FigureSeed() & 6) == 2; s.hoodColour = ClothTint(clothC, .6f); break;
+                case ActorLook.BanditKing: s.kit = ModelFigure.Kit.Ranger; s.bleach = true; s.beard = true; s.hair = 3; break;
                 case ActorLook.Villager: s = TradeSpec(s, variant); break;
             }
             return s;
@@ -110,7 +114,7 @@ namespace Crulanda.Encounter
                 case "herbalist": Wear(C(.3f, .52f, .26f), C(.2f, .42f, .22f)); Hood(C(.16f, .42f, .2f)); break;
                 case "miller": Wear(C(.86f, .82f, .72f), C(.5f, .36f, .2f)); break;
                 case "elder": Wear(C(.4f, .22f, .48f), C(.3f, .25f, .2f)); s.hairColour = Gain(C(.8f, .8f, .78f), 1.25f); s.beard = !s.female; break;
-                case "stranger": s.kit = ModelFigure.Kit.Ranger; Wear(C(.2f, .2f, .22f), C(.16f, .15f, .15f)); Hood(C(.17f, .17f, .19f)); break;
+                case "stranger": s.kit = ModelFigure.Kit.Ranger; s.bleach = true; Wear(C(.2f, .2f, .22f), C(.16f, .15f, .15f)); Hood(C(.17f, .17f, .19f)); break;
                 case "pilgrim": Wear(C(.86f, .58f, .16f), C(.7f, .56f, .34f)); Hood(C(.84f, .62f, .24f)); break;
                 case "warden": s.kit = ModelFigure.Kit.Ranger; Wear(C(.2f, .46f, .18f), C(.36f, .24f, .13f)); Hood(C(.16f, .38f, .14f)); break;
                 case "innkeeper": Wear(C(.9f, .86f, .74f), C(.26f, .2f, .17f)); s.beard = !s.female; break;
@@ -226,13 +230,13 @@ namespace Crulanda.Encounter
                 if (onHead && ball && !kit.Contains(c) && c.localScale.x >= .3f && c.localScale.y >= c.localScale.x * .85f && c.localPosition.y < .95f)
                 {
                     var r = c.GetComponent<Renderer>(); model.AddHood(ClothTint(r != null && r.sharedMaterial != null ? r.sharedMaterial.color : Color.gray, .8f));
-                    if (Application.isPlaying) Destroy(c.gameObject); else DestroyImmediate(c.gameObject); continue;
+                    Kill(c); continue;   // hidden and unparented now (a villager caches its renderers next)
                 }
                 // A flat board (an apron, a tabard, a cape, a shawl) or a skirt's drum would stand off the model's own clothes:
                 // left off; what is small (a pouch, a sigil, a strap, keys, a quiver, a bow) stays.
                 var mesh = c.GetComponent<MeshFilter>() != null ? c.GetComponent<MeshFilter>().sharedMesh : null; var k = c.localScale;
                 bool board = mesh != null && (mesh.name.StartsWith("Cube") && (k.x >= .45f || k.x >= .3f && k.y >= .3f) || mesh.name.StartsWith("Cylinder") && k.x >= .45f);
-                if (!onHead && board && !kit.Contains(c)) { if (Application.isPlaying) Destroy(c.gameObject); else DestroyImmediate(c.gameObject); continue; }
+                if (!onHead && board && !kit.Contains(c)) { Kill(c); continue; }
                 c.SetParent(onHead ? headFrame : c.localPosition.y < -.1f ? hipsFrame : chestFrame, false);
             }
         }
@@ -281,6 +285,18 @@ namespace Crulanda.Encounter
             }
             return p;
         }
+        /// <summary>The arms for what is carried (over the walk or the idle): the right arm out to the load at the hip, both arms
+        /// forward under a load in front, the right hand up at the shoulder to steady a sack.</summary>
+        void CarryArms(ref PoseState p)
+        {
+            p.arms = true;
+            switch (Carry)
+            {
+                case Carrying.Side: p.armR = new Vector3(-12, 0, -22); p.elbowR = -12; p.armL = new Vector3(Mathf.Sin(phase) * 18 * Mathf.Clamp01(speed / 2), 0, 6); p.elbowL = -15; break;
+                case Carrying.Front: p.armL = new Vector3(-55, 0, 10); p.armR = new Vector3(-55, 0, -10); p.elbowL = p.elbowR = -45; break;
+                case Carrying.Shoulder: p.armR = new Vector3(-25, 0, -18); p.elbowR = -140; p.armL = new Vector3(Mathf.Sin(phase) * 18 * Mathf.Clamp01(speed / 2), 0, 6); p.elbowL = -15; break;
+            }
+        }
         /// <summary>A model's frame: the clip for the pose (walking wins over a standing pose), the arms for the poses without a
         /// clip, the back, the lean, then the frames.</summary>
         void ModelLate()
@@ -294,19 +310,21 @@ namespace Crulanda.Encounter
             }
             var delta = transform.position - lastPosition; delta.y = 0; lastPosition = transform.position;
             float dt = Time.deltaTime, target = dt > 0 ? delta.magnitude / dt : 0;
-            speed = Mathf.Lerp(speed, target, dt * 8);
+            speed = Mathf.Lerp(speed, target, dt * 8); phase += dt * (2.2f + speed * 1.6f);
             bool dead = actorRef != null && !actorRef.IsAlive, moving = speed > 1.1f, travel = Pose == ActorPose.Swim || Pose == ActorPose.Sneak;
             var p = PoseOf(moving && !travel ? ActorPose.None : Pose, speed, Time.time + variant * .7f);
+            if (!p.arms && p.slot == null && Carry != Carrying.None) CarryArms(ref p);
             if (LyingLow) p = new PoseState { slot = "crouch" };   // an ambusher in wait (EncounterEnemy.Hide), crouched in the grass
             if (dead) { p = new PoseState { slot = "death" }; body.localRotation = Quaternion.identity; body.localPosition = Vector3.zero; }
             model.Drive(speed, p.slot, dt);
             if (p.arms) { poseArmL = p.armL; poseArmR = p.armR; poseElbowL = p.elbowL; poseElbowR = p.elbowR; }
             armWeight = Mathf.MoveTowards(armWeight, p.arms ? 1 : 0, dt * 4);
-            Shape(p, armWeight, dead, dt);
+            // Off screen the Animator leaves the bones as they were (CullUpdateTransforms): bending them again would bend them twice.
+            Shape(p, armWeight, dead, dt, model.Animator.cullingMode == AnimatorCullingMode.AlwaysAnimate || model.Visible);
         }
         /// <summary>After the clip: the pose's arms (blended by <paramref name="arms"/>), the back's bend, the figure's lean and drop
         /// (and a drinker's reel), then the frames follow.</summary>
-        void Shape(PoseState p, float arms, bool dead, float dt)
+        void Shape(PoseState p, float arms, bool dead, float dt, bool fresh)
         {
             // Swimming: the clip lies the figure along the ground; it is lifted so the face rides just over the water (the motor
             // floats the actor .3 under the surface).
@@ -317,13 +335,13 @@ namespace Crulanda.Encounter
                 p.drop = swimLift;
             }
             else swimLift = 0;
-            if (arms > 0)
+            if (arms > 0 && fresh)
             {
                 PoseArm(armL, foreL, model.UpperArmL, model.LowerArmL, poseArmL, poseElbowL, arms);
                 PoseArm(armR, foreR, model.UpperArmR, model.LowerArmR, poseArmR, poseElbowR, arms);
             }
             // An elder's stoop and a sleeper's slump bend the back, not the legs.
-            float bend = stoop + p.bend;
+            float bend = fresh ? stoop + p.bend : 0;
             if (bend != 0 && model.Spine != null) model.Spine.rotation = Quaternion.AngleAxis(bend * .5f, body.right) * model.Spine.rotation;
             if (bend != 0 && model.Chest != null) model.Chest.rotation = Quaternion.AngleAxis(bend * .5f, body.right) * model.Chest.rotation;
             // The figure as a whole moves only for a pose that leans or drops it, or a drinker's reel, and is put back once after:
@@ -332,7 +350,7 @@ namespace Crulanda.Encounter
             {
                 if (p.drop != 0 || LyingLow) { body.localPosition = new Vector3(0, p.drop, 0); dropped = true; }
                 else if (dropped) { body.localPosition = Vector3.zero; dropped = false; }
-                if (Stagger > 0) { staggering = true; phase += dt * (2.2f + speed * 1.6f); body.localEulerAngles = new Vector3(p.lean + Mathf.Sin(phase * .5f) * 6 * Stagger, 0, Mathf.Sin(phase * .5f + 1.1f) * 14 * Stagger); }
+                if (Stagger > 0) { staggering = true; body.localEulerAngles = new Vector3(p.lean + Mathf.Sin(phase * .5f) * 6 * Stagger, 0, Mathf.Sin(phase * .5f + 1.1f) * 14 * Stagger); }
                 else if (p.lean != 0) { body.localEulerAngles = new Vector3(p.lean, 0, 0); leaned = true; }
                 else if (staggering || leaned) { staggering = leaned = false; body.localEulerAngles = Vector3.zero; }
             }
@@ -346,12 +364,13 @@ namespace Crulanda.Encounter
         public void Preview(ActorPose pose, float walk, float time)
         {
             if (model == null) return;
-            Pose = pose; speed = walk;
+            Pose = pose; speed = walk; phase = time * (2.2f + walk * 1.6f);
             var p = PoseOf(pose, walk, time);
+            if (!p.arms && p.slot == null && Carry != Carrying.None) CarryArms(ref p);
             string slot = p.slot ?? (walk > 5.2f ? "sprint" : walk > 2.2f ? "run" : walk > .15f ? "walk" : "idle");
             model.Sample(slot, time);
             if (p.arms) { poseArmL = p.armL; poseArmR = p.armR; poseElbowL = p.elbowL; poseElbowR = p.elbowR; }
-            Shape(p, p.arms ? 1 : 0, false, 0);
+            Shape(p, p.arms ? 1 : 0, false, 0, true);
         }
         /// <summary>Edit mode: the model lying dead (the death clip's last frame).</summary>
         public void PreviewDead() { if (model == null) return; model.Sample("death", 99); body.localRotation = Quaternion.identity; body.localPosition = Vector3.zero; SyncFrames(); }

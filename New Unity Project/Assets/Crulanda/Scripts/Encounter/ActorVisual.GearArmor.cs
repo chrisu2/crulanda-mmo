@@ -78,7 +78,7 @@ namespace Crulanda.Encounter
         /// <summary>A round ring about local Y (a band on a limb, a collar, a brim's edge): radius r0 to r1, from y0 to y1.</summary>
         static Mesh Ring(float r0, float r1, float y0, float y1, int sides = 16) { return M.Lathe("a.ring." + K(r0, r1, y0, y1, sides), Pts(r0, y0, r1, y0, r1, y1, r0, y1, r0, y0), sides); }
         /// <summary>An oval band round the body (a belt, a hem): <paramref name="h"/> tall from the ring's height, its wall <paramref name="t"/> deep.</summary>
-        static Mesh Band(Vector4 ring, float h, float t, float square = 6) { return M.Shell("a.band." + K(ring.x, ring.y, ring.z, ring.w, h, t, square), new[] { ring, new Vector4(ring.x, ring.y + h, ring.z, ring.w) }, t, square); }
+        static Mesh Band(Vector4 ring, float h, float t, float square = 6) { return Shell("a.band." + K(ring.x, ring.y, ring.z, ring.w, h, t, square), new[] { ring, new Vector4(ring.x, ring.y + h, ring.z, ring.w) }, t, square); }
         /// <summary>A small leaf (in the XY plane, stem at the origin, facing +Z).</summary>
         static Mesh Leaf { get { return M.Panel("a.leaf", Pts(0, 0, .02f, .022f, .024f, .045f, 0, .075f, -.024f, .045f, -.02f, .022f), .006f, .003f); } }
         /// <summary>A flat fin standing along the head from front to back (a helmet's comb), drawn as (z, y).</summary>
@@ -87,17 +87,34 @@ namespace Crulanda.Encounter
         void BuildArmor(EquipSlot slot, GearLook l)
         {
             var f = new Fit(Kit(l)) { bald = Bald, shoulders = wornShoulders, chest = wornChest, legs = wornLegs, neckOver = neckOver, cloaked = Cloaked };
-            switch (slot)
+            roundShells = model != null;
+            try
             {
-                case EquipSlot.Head: Head(f); break;
-                case EquipSlot.Neck: Neck(f); break;
-                case EquipSlot.Shoulders: Shoulders(f); break;
-                case EquipSlot.Chest: Chest(f); break;
-                case EquipSlot.Hands: Hands(f); break;
-                case EquipSlot.Legs: Legs(f); break;
-                case EquipSlot.Feet: Feet(f); break;
+                switch (slot)
+                {
+                    case EquipSlot.Head: Head(f); break;
+                    case EquipSlot.Neck: Neck(f); break;
+                    case EquipSlot.Shoulders: Shoulders(f); break;
+                    case EquipSlot.Chest: Chest(f); break;
+                    case EquipSlot.Hands: Hands(f); break;
+                    case EquipSlot.Legs: Legs(f); break;
+                    case EquipSlot.Feet: Feet(f); break;
+                }
             }
+            finally { roundShells = false; }
             Fitted(slot, f);
+        }
+        /// <summary>True while a model's armour is built: its shells come out rounder (<see cref="Shell"/>).</summary>
+        static bool roundShells;
+        /// <summary>How square a shell may be on a model (GearMeshes.Shell's superellipse power): the old figure's cube torso needed
+        /// shells of 6 to 8 to hold its corners; the model's body is round, so its plate, mail and leather follow it (playtest
+        /// note 12, C2).</summary>
+        public const float RoundSquare = 3.2f;
+        /// <summary>GearMeshes.Shell, rounder on a model (its own cached mesh).</summary>
+        static Mesh Shell(string key, Vector4[] rings, float thick, float square = 6, float[] open = null, float gapAt = 270, int sides = 24, bool smooth = true)
+        {
+            if (roundShells && square > RoundSquare) { key += ".round"; square = RoundSquare; }
+            return M.Shell(key, rings, thick, square, open, gapAt, sides, smooth);
         }
         /// <summary>Builds a piece's parts: one per role and limb, joined from everything of that role there.</summary>
         void Fitted(EquipSlot slot, Fit f)
@@ -411,7 +428,7 @@ namespace Crulanda.Encounter
             rings.AddRange(new[] { Rg(.3f, .64f, .21f, -.03f), Rg(.2f, .69f, .18f, -.03f), Rg(.19f, .76f, .19f, -.025f), Rg(.19f, .85f, .2f, -.03f), Rg(.175f, .95f, .19f, -.04f), Rg(.115f, 1.025f, .135f, -.05f), Rg(0, 1.055f, 0, -.06f) });
             gaps.AddRange(new[] { 0f, 30, 80, 110, 80, 0, 0 });
             string main = f.v == "oilskin" ? "oil" : "cloth";
-            f.Add(main, M.Shell("a.hood" + (f.shoulders ? ".short" : ""), rings.ToArray(), .02f, 2.2f, gaps.ToArray(), 90, 28), V0, One);
+            f.Add(main, Shell("a.hood" + (f.shoulders ? ".short" : ""), rings.ToArray(), .02f, 2.2f, gaps.ToArray(), 90, 28), V0, One);
             if (f.v == "oilskin") f.Add(main, M.Plate("a.hood.brim", Pts(-.13f, 0, .13f, 0, .11f, .06f, .06f, .09f, 0, .1f, -.06f, .09f, -.11f, .06f), .012f), V(0, .962f, .085f), One, V(12, 0, 0));
             var hem = rings[0]; string hemRole = f.tier >= 1 ? "trim" : "cloth2";
             f.Add(hemRole, Band(new Vector4(hem.x + .006f, hem.y - .004f, hem.z + .006f, hem.w), .03f, .012f, 2.2f), V0, One);
@@ -434,7 +451,7 @@ namespace Crulanda.Encounter
         {
             var st = new[] { Rg(.215f, .635f, .17f, -.01f), Rg(.185f, .68f, .165f, -.01f), Rg(.192f, .74f, .18f, -.01f), Rg(.196f, .84f, .195f, -.01f), Rg(.18f, .94f, .18f, -.02f) };
             var rows = M.Rows(st, .022f, .0045f, false, new[] { 0f, 20, 60, 100, 70 }, out var rowGaps);
-            f.Add("mail", M.Shell("a.coif", Cat(rows, new[] { Rg(.11f, 1.015f, .115f, -.02f), Rg(0, 1.04f, 0, -.02f) }), .016f, 2.2f, Cat(rowGaps, new[] { 0f, 0 }), 90, 28), V0, One);
+            f.Add("mail", Shell("a.coif", Cat(rows, new[] { Rg(.11f, 1.015f, .115f, -.02f), Rg(0, 1.04f, 0, -.02f) }), .016f, 2.2f, Cat(rowGaps, new[] { 0f, 0 }), 90, 28), V0, One);
             f.Add(f.tier >= 1 ? "leather" : "cloth2", Band(Rg(.222f, .62f, .177f, -.01f), .035f, .014f, 2.2f), V0, One);   // the collar
             if (f.tier >= 2) f.Add("trim", Band(Rg(.19f, .915f, .19f, -.02f), .03f, .012f, 2.2f), V0, One);                  // a brow band over the mail
             if (f.tier >= 3) f.Add("plate", M.Lathe("a.coif.plate", Pts(.19f, .925f, .192f, .96f, .16f, 1.01f, .09f, 1.045f, 0, 1.06f), 16, true), V(0, 0, -.015f), One);
@@ -751,7 +768,7 @@ namespace Crulanda.Encounter
             var sides = new[] { Rg(.42f, .47f, .26f, -.02f), Rg(.4f, .52f, .25f, -.02f), Rg(.33f, .6f, .22f, -.02f), Rg(.25f, .65f, .19f, -.02f) };
             var top = new[] { Rg(.15f, .665f, .145f, -.02f), Rg(.12f, .67f, .12f, -.02f) };
             var rings = fur ? Cat(M.Rows(sides, .032f, .012f, true, null, out _), top) : Cat(sides, top);
-            f.Add(main, M.Shell("a.mantle." + (fur ? "fur" : "cloth"), rings, .016f, 3, null, 270, 28, !fur), V0, One);
+            f.Add(main, Shell("a.mantle." + (fur ? "fur" : "cloth"), rings, .016f, 3, null, 270, 28, !fur), V0, One);
             // The ragged hem is fanned from near the top edge, where every notch can be seen whole.
             var drape = hide || v == "frayed"
                 ? M.Panel("a.mantle.drape.rag2", Pts(-.23f, 0, .23f, 0, .22f, -.24f, .17f, -.33f, .12f, -.28f, .06f, -.37f, 0, -.31f, -.07f, -.36f, -.13f, -.29f, -.19f, -.34f, -.22f, -.25f), .014f, .015f, false, new Vector2(0, -.03f))
@@ -767,12 +784,12 @@ namespace Crulanda.Encounter
             if (v == "shawl")
                 f.Both("cloth2", M.Panel("a.mantle.shawl.end", Pts(-.06f, 0, .06f, 0, .05f, -.3f, 0, -.32f, -.05f, -.3f), .01f, .004f, true), V(.09f, .5f, .234f), One, V(-8, 0, 10));
             // The collar: a band, or a thick fur roll.
-            if (fur) f.Add("fur", M.Shell("a.mantle.furroll", new[] { Rg(.17f, .63f, .16f, -.02f), Rg(.155f, .67f, .145f, -.02f), Rg(.135f, .695f, .125f, -.02f) }, .035f, 2.4f), V0, One);
+            if (fur) f.Add("fur", Shell("a.mantle.furroll", new[] { Rg(.17f, .63f, .16f, -.02f), Rg(.155f, .67f, .145f, -.02f), Rg(.135f, .695f, .125f, -.02f) }, .035f, 2.4f), V0, One);
             else if (f.tier >= 1) f.Add("cloth2", Band(Rg(.13f, .655f, .13f, -.02f), .03f, .015f, 2.4f), V0, One);
             if (f.tier >= 2 || f.l.extra) f.Add("trim", Band(Rg(.426f, .465f, .266f, -.02f), .03f, .012f, 3), V0, One);   // an embroidered hem
             if (f.tier >= 2) f.Add("trim", Sphere, V(0, .64f, .19f), V(.04f, .04f, .022f));                                // the clasp
             if (f.tier >= 3) f.Both("trim", M.Lathe("a.pauldron.dome", Pts(.135f, -.008f, .152f, 0, .153f, .03f, .132f, .074f, .082f, .104f, 0, .115f), 18, true), V(.33f, .585f, 0), V(.55f, .5f, .6f), V(0, 0, -40));   // seated on the shoulder's bend
-            if (f.tier >= 4) f.Add("cloth2", M.Shell("a.mantle.upper", new[] { Rg(.36f, .575f, .232f, -.02f), Rg(.3f, .635f, .207f, -.02f), Rg(.24f, .683f, .182f, -.02f), Rg(.15f, .7f, .152f, -.02f), Rg(.13f, .705f, .132f, -.02f) }, .014f, 3, null, 270, 28), V0, One);
+            if (f.tier >= 4) f.Add("cloth2", Shell("a.mantle.upper", new[] { Rg(.36f, .575f, .232f, -.02f), Rg(.3f, .635f, .207f, -.02f), Rg(.24f, .683f, .182f, -.02f), Rg(.15f, .7f, .152f, -.02f), Rg(.13f, .705f, .132f, -.02f) }, .014f, 3, null, 270, 28), V0, One);
             f.Glow(1, OnBody, Sphere, V(0, .64f, .188f), V(.026f, .026f, .014f));
             f.Glow(2, OnBody, M.Many("a.mantle.gems", Sphere, M.At(V(.2f, .5f, .24f), V0, S(.024f)), M.At(V(-.2f, .5f, .24f), V0, S(.024f))), Matrix4x4.identity);
             if (f.cloaked) f.Rust(OnBody, V(-.14f, .5f, .232f), V(.06f, .05f, .01f), V(0, -20, 0)); else f.Rust(OnBody, V(.08f, .32f, -.287f), V(.06f, .05f, .01f));
@@ -826,8 +843,8 @@ namespace Crulanda.Encounter
             f.Both(main, M.Lathe("a.pauldron.dome", Pts(.135f, -.008f, .152f, 0, .153f, .03f, .132f, .074f, .082f, .104f, 0, .115f), 18, true), frame);
             f.Both(f.tier >= 2 ? "trim" : "dark", M.Lathe("a.pauldron.rim", Pts(.146f, -.014f, .162f, -.014f, .162f, .012f, .146f, .012f, .146f, -.014f), 20), frame);
             int lames = f.tier >= 2 ? 3 : 2;
-            var lameR = M.Shell("a.spaulder.lame.r", new[] { Rg(.094f, -.075f, .094f), Rg(.087f, 0, .087f) }, .012f, 2, new[] { 150f }, 180, 16);
-            var lameL = M.Shell("a.spaulder.lame.l", new[] { Rg(.094f, -.075f, .094f), Rg(.087f, 0, .087f) }, .012f, 2, new[] { 150f }, 0, 16);
+            var lameR = Shell("a.spaulder.lame.r", new[] { Rg(.094f, -.075f, .094f), Rg(.087f, 0, .087f) }, .012f, 2, new[] { 150f }, 180, 16);
+            var lameL = Shell("a.spaulder.lame.l", new[] { Rg(.094f, -.075f, .094f), Rg(.087f, 0, .087f) }, .012f, 2, new[] { 150f }, 0, 16);
             for (int i = 0; i < lames; i++)
             {
                 float top = -.015f - i * .07f;
@@ -878,7 +895,7 @@ namespace Crulanda.Encounter
         void Tunic(Fit f)
         {
             Cover(baseChest, RoleMat(f, "cloth")); Cover(baseSleeves, RoleMat(f, "cloth"));
-            f.Add("cloth", M.Shell("a.tunic.skirt", new[] { Rg(.29f, -.24f, .2f, 0), Rg(.272f, -.1f, .178f, .002f), Rg(.262f, .04f, .162f, .004f), Rg(.262f, .09f, .162f, .006f) }, .014f, 5), V0, One);
+            f.Add("cloth", Shell("a.tunic.skirt", new[] { Rg(.29f, -.24f, .2f, 0), Rg(.272f, -.1f, .178f, .002f), Rg(.262f, .04f, .162f, .004f), Rg(.262f, .09f, .162f, .006f) }, .014f, 5), V0, One);
             f.Add("cloth2", Band(Rg(.293f, -.245f, .203f, 0), .035f, .012f, 5), V0, One);
             f.Add("cloth2", Ring(.078f, .104f, .598f, .632f, 18), V0, One);   // the collar
             Belt(f, "leather", 0);
@@ -906,7 +923,7 @@ namespace Crulanda.Encounter
             string v = f.v; bool scale = v == "scale", hide = v == "hide"; string main = scale ? "scale" : hide ? "hide" : "leather";
             var sides = Cat(new[] { Rg(.276f, -.13f, .178f, 0) }, Torso());
             var rings = scale ? Cat(M.Rows(sides, .045f, .011f, true, null, out _), new[] { Yoke() }) : Cat(sides, new[] { Yoke() });
-            f.Add(main, M.Shell(scale ? "a.jerkin.scale" : "a.jerkin", rings, .02f, 8, null, 270, 28, !scale), V0, One);
+            f.Add(main, Shell(scale ? "a.jerkin.scale" : "a.jerkin", rings, .02f, 8, null, 270, 28, !scale), V0, One);
             float Front(float y) { return y < .1f ? .168f : y < .3f ? Mathf.Lerp(.168f, .184f, (y - .1f) / .2f) : y < .44f ? Mathf.Lerp(.184f, .201f, (y - .3f) / .14f) : Mathf.Lerp(.201f, .184f, (y - .44f) / .12f); }
             float Back(float y) { return y < .1f ? -.157f : y < .3f ? Mathf.Lerp(-.156f, -.16f, (y - .1f) / .2f) : y < .44f ? Mathf.Lerp(-.16f, -.169f, (y - .3f) / .14f) : Mathf.Lerp(-.169f, -.16f, (y - .44f) / .12f); }
             if (!scale)
@@ -923,7 +940,7 @@ namespace Crulanda.Encounter
                 f.Add(OnBody, "dark", M.Join("a.jerkin.lacing", edges), Matrix4x4.identity);
             }
             else f.Add(OnBody, "leather", M.Join("a.jerkin.edging", new[] { (Band(Rg(.282f, -.135f, .184f, 0), .03f, .012f, 8), Matrix4x4.identity), (Band(Rg(.13f, .66f, .12f, -.005f), .025f, .014f, 4), Matrix4x4.identity) }), Matrix4x4.identity);
-            if (hide) f.Add("fur", M.Shell("a.jerkin.furcollar", new[] { Rg(.16f, .64f, .15f, -.005f), Rg(.14f, .685f, .13f, -.005f) }, .035f, 3), V0, One);
+            if (hide) f.Add("fur", Shell("a.jerkin.furcollar", new[] { Rg(.16f, .64f, .15f, -.005f), Rg(.14f, .685f, .13f, -.005f) }, .035f, 3), V0, One);
             if (f.l.detail == "rivets")   // brigandine: studded front and back
             {
                 var studs = new List<Matrix4x4>();
@@ -954,7 +971,7 @@ namespace Crulanda.Encounter
             Cover(baseChest, RoleMat(f, "mail")); Cover(baseSleeves, RoleMat(f, "leather"));
             var st = Cat(new[] { Rg(.31f, -.3f, .225f, 0), Rg(.29f, -.18f, .2f, .002f) }, Torso(.004f));
             var rows = M.Rows(st, .024f, .005f, false, new[] { 30f, 14, 0 }, out var rowGaps);
-            f.Add("mail", M.Shell("a.hauberk", Cat(rows, new[] { Yoke(.004f) }), .016f, 7, Cat(rowGaps, new[] { 0f }), 90, 28), V0, One);
+            f.Add("mail", Shell("a.hauberk", Cat(rows, new[] { Yoke(.004f) }), .016f, 7, Cat(rowGaps, new[] { 0f }), 90, 28), V0, One);
             var sleeve = new List<Vector2> { new Vector2(.074f, -.3f), new Vector2(.098f, -.3f) };
             for (float y = -.288f; y < -.01f; y += .012f) sleeve.Add(new Vector2(sleeve.Count % 2 == 0 ? .089f : .093f, y));
             sleeve.Add(new Vector2(.088f, 0)); sleeve.Add(new Vector2(.07f, 0));
@@ -988,7 +1005,7 @@ namespace Crulanda.Encounter
         {
             bool skirted = f.v == "skirted"; string main = skirted ? "leather" : "cloth";
             Cover(baseChest, RoleMat(f, main)); Cover(baseSleeves, RoleMat(f, main));
-            f.Add(main, M.Shell("a.coat", Cat(Torso(.002f), new[] { Yoke(.002f) }), .016f, 8), V0, One);
+            f.Add(main, Shell("a.coat", Cat(Torso(.002f), new[] { Yoke(.002f) }), .016f, 8), V0, One);
             var skirt = M.Panel("a.coat.skirt", Pts(-.1f, 0, .1f, 0, .12f, -.5f, -.12f, -.5f), .014f, .01f, true);
             var narrow = M.Panel("a.coat.skirt.narrow", Pts(-.05f, 0, .05f, 0, .06f, -.5f, -.06f, -.5f), .014f, .008f, true);
             foreach (var (a, mesh) in new[] { (45f, narrow), (135f, narrow), (0f, skirt), (180f, skirt), (250f, skirt), (290f, skirt) })
@@ -1021,9 +1038,9 @@ namespace Crulanda.Encounter
         {
             bool bark = f.v == "bark"; string main = bark ? "bark" : "plate";
             Cover(baseChest, RoleMat(f, "cloth2")); Cover(baseSleeves, RoleMat(f, "cloth2"));
-            f.Add(main, M.Shell("a.cuirass", Cat(Torso(.003f, .02f), new[] { Yoke(.003f) }), .022f, 8), V0, One);   // boxy enough to hold the torso's back corners
-            f.Add(main, M.Shell("a.cuirass.fauld1", new[] { Rg(.276f, -.13f, .18f, .004f), Rg(.27f, -.05f, .172f, .006f) }, .015f, 6), V0, One);
-            f.Add(main, M.Shell("a.cuirass.fauld2", new[] { Rg(.29f, -.21f, .196f, .002f), Rg(.282f, -.13f, .186f, .004f) }, .015f, 6), V0, One);
+            f.Add(main, Shell("a.cuirass", Cat(Torso(.003f, .02f), new[] { Yoke(.003f) }), .022f, 8), V0, One);   // boxy enough to hold the torso's back corners
+            f.Add(main, Shell("a.cuirass.fauld1", new[] { Rg(.276f, -.13f, .18f, .004f), Rg(.27f, -.05f, .172f, .006f) }, .015f, 6), V0, One);
+            f.Add(main, Shell("a.cuirass.fauld2", new[] { Rg(.29f, -.21f, .196f, .002f), Rg(.282f, -.13f, .186f, .004f) }, .015f, 6), V0, One);
             f.Add(main, M.Lathe("a.cuirass.gorget", Pts(.108f, .632f, .13f, .632f, .126f, .672f, .11f, .676f, .108f, .632f), 20), V0, One);
             if (!bark)   // the ridge down the middle, following the plate (its front is straight between the shell's rings)
             {
@@ -1054,7 +1071,7 @@ namespace Crulanda.Encounter
         {
             Cover(baseChest, RoleMat(f, "cloth")); Cover(baseSleeves, RoleMat(f, "cloth"));
             var skirt = new[] { Rg(.31f, -.93f, .235f, 0), Rg(.29f, -.55f, .205f, 0), Rg(.272f, -.2f, .178f, .002f), Rg(.262f, -.04f, .162f, .004f), Rg(.262f, .09f, .162f, .006f) };
-            f.Add("cloth", M.Shell("a.robe", skirt, .016f, 4), V0, One);
+            f.Add("cloth", Shell("a.robe", skirt, .016f, 4), V0, One);
             f.Add(f.tier >= 3 ? "trim" : "cloth2", Band(Rg(.314f, -.935f, .239f, 0), .045f, .012f, 4), V0, One);
             f.Add("cloth2", Band(Rg(.27f, .06f, .17f, .006f), .036f, .014f), V0, One);   // the cord belt, over the skirt's top edge
             f.Add("cloth2", M.Many("a.robe.cord.ends", Cube, M.At(V(.04f, -.12f, 0), V(0, 0, 4), V(.016f, .26f, .016f)), M.At(V(.08f, -.1f, 0), V(0, 0, -3), V(.016f, .22f, .016f))), V(0, .07f, .186f), One, V(-4, 0, 0));
@@ -1244,10 +1261,10 @@ namespace Crulanda.Encounter
         {
             bool full = f.v == "full"; string main = f.tier >= 2 || full ? "plate" : "leather2";
             Cover(baseLegs, RoleMat(f, "leather"));
-            f.Pair(OnLegR, main, M.Shell("a.greave.shin", new[] { Rg(.1f, -.8f, .1f, .008f), Rg(.108f, -.7f, .108f, .008f), Rg(.11f, -.58f, .11f, .008f), Rg(.1f, -.5f, .1f, .006f) }, .014f, 2.4f, new[] { 150f }, 270, 18), V0, One);
+            f.Pair(OnLegR, main, Shell("a.greave.shin", new[] { Rg(.1f, -.8f, .1f, .008f), Rg(.108f, -.7f, .108f, .008f), Rg(.11f, -.58f, .11f, .008f), Rg(.1f, -.5f, .1f, .006f) }, .014f, 2.4f, new[] { 150f }, 270, 18), V0, One);
             f.Pair(OnLegR, main, M.Lathe("a.greave.knee", Pts(.075f, 0, .07f, .025f, .045f, .05f, 0, .062f), 14, true), V(0, -.44f, .058f), One, V(90, 0, 0));
             f.Pair(OnLegR, main, M.Many("a.greave.wings", Sphere, M.At(V(.07f, 0, 0), V0, V(.03f, .07f, .06f)), M.At(V(-.07f, 0, 0), V0, V(.03f, .07f, .06f))), V(0, -.44f, .045f), One);
-            if (full) f.Pair(OnLegR, main, M.Shell("a.greave.thigh", new[] { Rg(.112f, -.38f, .112f, .008f), Rg(.112f, -.12f, .115f, .01f) }, .014f, 2.4f, new[] { 160f }, 270, 18), V0, One);
+            if (full) f.Pair(OnLegR, main, Shell("a.greave.thigh", new[] { Rg(.112f, -.38f, .112f, .008f), Rg(.112f, -.12f, .115f, .01f) }, .014f, 2.4f, new[] { 160f }, 270, 18), V0, One);
             f.Pair(OnLegR, "trim", M.Many("a.greave.straps", M.Lathe("a.greave.strap", Pts(.091f, -.008f, .098f, -.008f, .098f, .008f, .091f, .008f, .091f, -.008f), 14), M.At(V(0, -.56f, 0), V0, One), M.At(V(0, -.74f, 0), V0, One)), Matrix4x4.identity);
             if (f.tier >= 3) f.Pair(OnLegR, "trim", M.Rod("a.greave.ridge", new[] { V(0, -.52f, .112f), V(0, -.65f, .124f), V(0, -.79f, .108f) }, .007f, .006f), Matrix4x4.identity);
             if (f.tier >= 4) f.Pair(OnLegR, main, M.Cone(), V(0, -.44f, .115f), V(.04f, .07f, .04f), V(90, 0, 0));
@@ -1349,7 +1366,7 @@ namespace Crulanda.Encounter
             Cover(baseBoots, RoleMat(f, "dark"));
             f.Pair(OnLegR, main, Sphere, V(0, -.865f, .16f), V(.18f, .11f, .2f));
             f.Pair(OnLegR, main, M.Many("a.sabaton.lames", Cube, M.At(V(0, -.795f, .06f), V(-8, 0, 0), V(.185f, .022f, .07f)), M.At(V(0, -.81f, .125f), V(-20, 0, 0), V(.18f, .022f, .07f))), Matrix4x4.identity);
-            f.Pair(OnLegR, main, M.Shell("a.sabaton.shaft", new[] { Rg(.096f, -.8f, .096f, .01f), Rg(.1f, -.62f, .1f, .01f) }, .012f, 2.2f, new[] { 130f }, 270, 16), V0, One);
+            f.Pair(OnLegR, main, Shell("a.sabaton.shaft", new[] { Rg(.096f, -.8f, .096f, .01f), Rg(.1f, -.62f, .1f, .01f) }, .012f, 2.2f, new[] { 130f }, 270, 16), V0, One);
             f.Pair(OnLegR, f.tier >= 2 ? "trim" : "dark", M.Many("a.sabaton.edges", Cube, M.At(V(0, -.79f, .094f), V(-8, 0, 0), V(.187f, .008f, .008f)), M.At(V(0, -.8f, .158f), V(-20, 0, 0), V(.182f, .008f, .008f))), Matrix4x4.identity);
             if (f.tier >= 3) f.Pair(OnLegR, "trim", Ring(.1f, .108f, -.63f, -.615f), V0, One);
             if (f.tier >= 4) f.Pair(OnLegR, main, M.Cone(), V(0, -.66f, .1f), V(.03f, .05f, .03f), V(90, 0, 0));

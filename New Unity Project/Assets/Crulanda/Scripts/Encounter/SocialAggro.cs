@@ -26,7 +26,7 @@ namespace Crulanda.Encounter
         public const float GuardReach = 16, GuardPairing = 8;
         /// <summary>Seconds between a call and the first to answer it, and between each who answers and the next.</summary>
         public const float CallBeat = 1.2f, CallStagger = .15f;
-        /// <summary>Nobody answers across more than this much height (a camp on the hill over a cave), or when the walk round is more than twice the reach and 4 m.</summary>
+        /// <summary>Nobody answers across more than this much height (a camp on the hill over a cave; half the reach when that is more), or when the walk round is more than twice the reach and 4 m.</summary>
         public const float MaxClimb = 4;
 
         /// <summary>A camp's kind: what its data says (social: "pack", "call" or "solitary"), else by its look.</summary>

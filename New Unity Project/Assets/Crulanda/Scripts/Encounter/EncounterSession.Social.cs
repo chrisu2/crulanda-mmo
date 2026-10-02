@@ -13,6 +13,11 @@ namespace Crulanda.Encounter
     {
         List<int>[] guardCamps; Crulanda.World.ZoneDefinition guardCampsOf;
         NavMeshPath socialPath; float lastShoutAt = -99;
+        /// <summary>
+        /// Threat a mob that joins a fight holds on whoever pulled: half again what one of Mira's heals draws at this level, so it
+        /// comes for the puller and not for her first heal. A second heal with no blow landed on it does turn it, as on any mob.
+        /// </summary>
+        public float JoinThreat { get { return Mathf.Max(EncounterEnemy.JoinThreat, .75f * HealerCompanion.HealFor(content.healingAbility.power, Player != null ? Player.Level : 1)); } }
         /// <summary>For each camp of this zone, the camps that guard it (SocialAggro.GuardCamps), worked out once a zone.</summary>
         List<int>[] GuardCamps
         {
@@ -51,13 +56,14 @@ namespace Crulanda.Encounter
             return (a < g.Length && g[a] != null && g[a].Contains(b)) || (b < g.Length && g[b] != null && g[b].Contains(a));
         }
         /// <summary>
-        /// Near enough to answer: within reach in a straight line, on much the same level, and not a long walk round (the next
-        /// gallery of a cave can be three metres through rock). When the navmesh cannot say, the straight line decides.
+        /// Near enough to answer: within reach in a straight line, on much the same level (4 m, or half the reach on a long call
+        /// across a hillside), and not a long walk round (the next gallery of a cave can be three metres through rock). When the
+        /// navmesh cannot say, the straight line decides.
         /// </summary>
         bool SocialNear(EncounterEnemy from, EncounterEnemy to, float reach)
         {
             Vector3 a = from.transform.position, b = to.transform.position;
-            if (Mathf.Abs(a.y - b.y) > SocialAggro.MaxClimb || Vector3.Distance(a, b) > reach) return false;
+            if (Mathf.Abs(a.y - b.y) > Mathf.Max(SocialAggro.MaxClimb, reach * .5f) || Vector3.Distance(a, b) > reach) return false;
             if (!NavMesh.SamplePosition(a, out var ha, 2.5f, NavMesh.AllAreas) || !NavMesh.SamplePosition(b, out var hb, 2.5f, NavMesh.AllAreas)) return true;
             if (socialPath == null) socialPath = new NavMeshPath();
             if (!NavMesh.CalculatePath(ha.position, hb.position, NavMesh.AllAreas, socialPath)) return true;

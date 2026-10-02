@@ -36,7 +36,7 @@ namespace Crulanda.Encounter
         /// <summary>Going home after a broken leash: it notices nobody and answers no call until this passes (a blow still turns it).</summary>
         public bool Evading { get { return Time.time < evadeUntil; } }
         public Vector3 Home { get { return home; } }
-        /// <summary>Threat a mob that joins holds on whoever pulled: it comes for them, not for the healer's first heal.</summary>
+        /// <summary>The least threat a mob that joins holds on whoever pulled (EncounterSession.JoinThreat raises it with Mira's heal).</summary>
         public const float JoinThreat = 30;
         public const float EvadeSeconds = 3;
         bool inFight, alarmed, struck;
@@ -67,7 +67,7 @@ namespace Crulanda.Encounter
             if (Group == null) { Group = g; g.members.Add(this); }
             if (inFight) return;   // it found the fight by itself in the meantime: it only takes the group's leash
             if (Hidden) Unhide();
-            threat.Add(who.EntityId.Value, JoinThreat);
+            threat.Add(who.EntityId.Value, session.JoinThreat);
             // An elite that is drawn in still brings its own guards (Engage raises its alarm); anyone else comes quietly.
             alarmed = !(Elite && Camp);
         }

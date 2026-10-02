@@ -30,6 +30,24 @@ namespace Crulanda.Encounter
             public int healPower = 42, healCost = 18; public float healPerLevel = HealerCompanion.HealPerLevel; public float healCooldown = 3.5f, healCast = 1.5f;
             public int boltPower = 7; public float boltCooldown = 4;
             public int miraMana = 120;
+            /// <summary>The same numbers read from the game's content (abilities by id, Guard's status, Mira's two spells, the Warrior's Vigor).</summary>
+            public static Numbers From(EncounterContent c)
+            {
+                var n = new Numbers(); if (c == null) return n;
+                Crulanda.Abilities.AbilityDefinition A(string id) { return Array.Find(c.abilities, a => a != null && a.id == id); }
+                n.playerSwing = c.playerSwingInterval; n.enemySwing = c.enemySwingInterval;
+                var strike = A("ability.strike"); if (strike != null) { n.strikePower = strike.power; n.strikeCost = strike.cost; n.strikeCooldown = strike.cooldown; n.globalCooldown = strike.globalCooldown; }
+                var guard = A("ability.guard"); if (guard != null) { n.guardCost = guard.cost; n.guardCooldown = guard.cooldown; }
+                var status = c.FindStatus("status.guard"); if (status != null) { n.guardSeconds = status.duration; n.guardMultiplier = status.incomingDamageMultiplier; }
+                var challenge = A("ability.challenge"); if (challenge != null) { n.challengeCost = challenge.cost; n.challengeCooldown = challenge.cooldown; }
+                if (c.playerClass != null) { n.vigorMax = c.playerClass.maxResource; n.vigorRegen = c.playerClass.combatRegen; }
+                var bough = A("druid.bough_strike"); if (bough != null) { n.boughPower = bough.power; n.boughCooldown = bough.cooldown; }
+                var rake = A("druid.rake"); if (rake != null) n.rakePower = rake.power;
+                var tear = A("druid.tear"); if (tear != null) n.tearPower = tear.power;
+                if (c.healingAbility != null) { n.healPower = c.healingAbility.power; n.healCost = c.healingAbility.cost; n.healCooldown = c.healingAbility.cooldown; n.healCast = c.healingAbility.castTime; }
+                if (c.boltAbility != null) { n.boltPower = c.boltAbility.power; n.boltCooldown = c.boltAbility.cooldown; }
+                return n;
+            }
         }
 
         /// <summary>The player on paper: a class kit at a level, with what its gear gives.</summary>
@@ -181,6 +199,11 @@ namespace Crulanda.Encounter
             int d = CombatMath.Damage((int)Math.Round(raw), f.armor, multiplier); taken += d;
             if (f.kit == Kit.Barkhide) bark = Math.Min(100, bark + 5);
             return d;
+        }
+        /// <summary>A result as a table cell: "wins 43 s, 80% left, took 405" or "dies 31 s, mob 31% left, took 432".</summary>
+        public static string Cell(Result r)
+        {
+            return (r.won ? "wins " : "dies ") + r.seconds.ToString("0") + " s, " + (r.won ? (r.playerLeft * 100).ToString("0") + "% left" : "mob " + (r.mobsLeft * 100).ToString("0") + "% left") + ", took " + r.taken;
         }
         static Result End(bool won, float t, int taken, float health, Fighter f, float[] hp, float total)
         {

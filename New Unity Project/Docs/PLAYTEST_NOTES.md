@@ -179,7 +179,7 @@ What was built (2026-10-01; same section of `COMBAT_SYSTEMS_VALIDATION.md`):
   breaks they all heal and go home together and stay there.
 - Not done: nothing has been run or seen.
 
-## 4. The sheep look like bugs on sticks (2026-10-01) — OPEN
+## 4. The sheep look like bugs on sticks (2026-10-01) — FIXED (published 2026-10-02 13:50)
 > "fix the sheep. looks like bugs on sticks"
 
 Measured (`CritterBody.Make`, case "sheep"): a sheep is one pale ellipsoid (0.75 x 0.6 x 1.0 m), a black ball for a head and
@@ -211,7 +211,7 @@ Measured (`ZoneBuilder.Nodes.cs` `Windfall`): the fallen trunk carries four thin
 1.4 m, on a plain tapered log beside a small stump. Fix: a tree that reads as broken or felled: a torn, splintered stump,
 a heavy trunk with snapped boughs and torn bark, and the litter of a fall (or of an axe) round it.
 
-## 7. Cats' tails need to be more flexible (2026-10-01) — OPEN
+## 7. Cats' tails need to be more flexible (2026-10-01) — FIXED (published 2026-10-02 13:50)
 > "cats tails need to be more flexible"
 
 Measured (`CritterBody.Make`, the cat): the tail is one rigid cylinder set at a fixed angle. Fix: a tail of several short

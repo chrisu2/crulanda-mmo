@@ -899,3 +899,12 @@ A read-only review by five reviewers, each finding checked by a second who tried
   a metre above their great limbs, and the dead trees' twigs floated off theirs; every branch now grows out of its limb.
 - **Less green in the ore:** copper shows a hint of dull patina on one vein in three; the seam reads ore-red.
 - Tests: EditMode 372/372, PlayMode 174/174 (a new test checks every limb in all five zones); all five zones toured.
+
+## 2026-10-02 afternoon — Sheep and cats (playtest notes 4 and 7)
+- **Sheep** (Chris: "looks like bugs on sticks"): a deep fleece of wool lumps, a dark wedge of a face with ears out sideways and
+  a wool cap, short sturdy legs on hooves; some white-faced, now and then a dark sheep, big ewes and small. They graze nose in
+  the grass, tugging at it, then lift their heads to look about, and nod as they walk.
+- **Cats' tails** (Chris: "cats tails need to be more flexible"): a tail of six joints that hangs in a curve and sways when
+  the cat stands (the tip flicks now and then), swings low behind it when it walks, and stands straight up with the tip
+  hooked over at a trot.
+- Tests: the hunting and village fixtures 14/14; Oakhaven toured, with a new line-up shot of the animals.

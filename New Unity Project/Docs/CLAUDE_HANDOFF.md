@@ -728,3 +728,13 @@ resumed with `Workflow({scriptPath, resumeFromRunId})` (finished agents replay f
 2. Send Chris the PDF draft and ask if he wants it checked.
 3. His notes 4-13 (PLAYTEST_NOTES.md), one at a time, by hand: 5 (ore green) is done on `fix/n56-ore-windfall` and only needs
    merging; then whichever he picks. Worktrees under `scratchpad\wt` hold any partial work from the stopped runs.
+
+## UPDATE 2026-10-02 morning (worked alone, no agents, at Chris's request: "dont overload the system")
+- **Round 7 PUBLISHED** (main e6cd39b): Chris's notes 1-3 (Oakhaven 560 m with Crowsfoot Hollow moved out; social pulls;
+  harder elites and Bandit King). The full run's six PlayMode failures were four test bugs (one long path across the big
+  zone, which Unity's pathfinder gives up on: tests now use `Tests/PlayMode/NavReach.Walkable`), Lark Hill's map mark on its
+  secret (moved), and a test timeout; fixtures 34/34 after. Oakhaven's player build of the zone is now 11.6-13.5 s (was 6.4).
+- Note for later: a mob that turns on a party member standing past its leash resets its whole group at once. Mira follows
+  the player so it does not arise in play, but a far-off heal could be used to reset a fight.
+- **Next, one at a time, asking Chris before anything with several agents:** the art notes (4-13) by hand, starting with
+  what is already built on its branch: note 5 (ore green) on `fix/n56-ore-windfall`. Then send him the PDF draft.

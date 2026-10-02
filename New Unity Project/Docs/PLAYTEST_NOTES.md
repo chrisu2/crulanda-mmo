@@ -4,7 +4,7 @@ Chris jots these down as he plays. Each note keeps his words, what was measured,
 Status: OPEN (not started), PLANNED (design decided), BUILT (code and tests written; not yet run in Unity, seen or published),
 FIXED (published; says which publish).
 
-## 1. The bandit camp is way too close to the village (2026-10-01) — BUILT (merged; in its full check)
+## 1. The bandit camp is way too close to the village (2026-10-01) — FIXED (published 2026-10-02 morning)
 > "one thing i notice is the bandit camp is way too close to the village. i asked before to expand the zone."
 
 **DECISION NEEDED (Chris):** the 120 m rule holds in Oakhaven only. Either **(a)** grow Khaven, the Peaks, the Ash Rim and
@@ -114,7 +114,7 @@ hostile within about 120 m of a village's houses) in every zone.
 - `tools/wip/professions/place_nodes.py` was edited (the plan named it) and `tools/wip/zonegrowth` added, in a tree the step
   was otherwise told to leave alone.
 
-## 2. Elites are too easy for the loot they give (2026-10-01) — BUILT (merged; in its full check)
+## 2. Elites are too easy for the loot they give (2026-10-01) — FIXED (published 2026-10-02 morning)
 > "elite was too easy for the loot obtain."
 > "bandit king way too easy for the loot obtained" (the same night, after killing Caddock)
 
@@ -154,7 +154,7 @@ What was built (2026-10-01; `COMBAT_SYSTEMS_VALIDATION.md`, "Social aggro and el
 - Not done: nothing has been run or seen. The Druid's Barkhide form can still solo an outdoor elite of its level with care
   (it heals itself); that is the class kit, and is written up beside the table.
 
-## 3. Mobs are not social: they pull one at a time (2026-10-01) — BUILT (merged; in its full check)
+## 3. Mobs are not social: they pull one at a time (2026-10-01) — FIXED (published 2026-10-02 morning)
 > "some mobs need to be more social. i can pull them easy 1 at a time even when they stand next to each other"
 
 Measured (`EncounterEnemy.Update`): every mob notices the player by itself, within 5 m and with a clear line; nothing links

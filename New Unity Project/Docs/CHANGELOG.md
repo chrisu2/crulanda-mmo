@@ -846,3 +846,24 @@ A read-only review by five reviewers, each finding checked by a second who tried
   too close, elites and the Bandit King too easy, mobs not social, the sheep, the ore's green, the lumber trees, cats' tails,
   sun and bloom, cave lighting, icons, blocky characters, pale colours, and a PDF of everything built. None of their fixes
   is in this build except what the rounds above already held; they follow.
+
+## 2026-10-02 — The bandits pushed out, mobs that pull together, elites worth their loot (Chris, playing: "the bandit camp is way too close to the village. i asked before to expand the zone"; "some mobs need to be more social. i can pull them easy 1 at a time"; "elite was too easy for the loot obtain"; "bandit king way too easy for the loot obtained")
+- **Oakhaven grows to 560 m and Crowsfoot Hollow moves out:** the cave's mouth is now 272 m from the green (it was 100 m),
+  hidden in the west heel of Crowsfoot Ridge along the north edge and facing away from the village; the North road and the
+  Crowsfoot track lead to it round the ridge. Between: the farms and the north fields, then wolf and boar woods, then the
+  hills. Every camp in Oakhaven now stands 125 m or more from the village's houses. New ground: Carder's field barn,
+  Thornshaw, the Carter's Rest, Lark Hill, Sallow Bottom, the Bound wood, ten woods and three secrets. The village itself did
+  not move. (The other four zones still have camps within 120 m of homes: Chris's call whether to grow them too.)
+- **Social pulls:** wolves and hounds come as a pack; deserters, cultists and the Concord shout and bring those in earshot
+  (and the next camp of their kind) a moment later; boar and stags stay single. Sneaking still lets a careful player peel
+  one from the edge of a camp. An elite always fights with its guards.
+- **Elites are a fight:** five and a half times a normal mob's health, a harder hit, and a named heavy blow each that they
+  wind up with a mark on the ground and a cast bar (step out of it, or Guard it); they enrage when low and call for help once.
+  Caddock and the Root-Warden, the dungeons' end bosses, are harder still. Mira's heals and health now grow with your level.
+  On paper: alone and careless you die; with Mira and care you win; two levels under, you don't.
+- **Found by the check and fixed:** the reach tests asked for one path across the whole 560 m zone in a single search, which
+  the pathfinder gives up on (the cave was fine, walkable leg by leg); they now follow a long path on from where it stops.
+  Lark Hill's map mark sat on its own secret; moved down the hill. The zone-exit test needed longer (Oakhaven now takes
+  about 13 s to build). One social test recruited Mira while she stood in the Golden Cask.
+- Tests: EditMode 369/369, PlayMode 167/173 in the full run, the six failures fixed (four were the tests) and their fixtures
+  34/34 after; Oakhaven, Khaven and the Ash Rim toured; the fight shots (pack pull, shout, heavy blow, enrage) viewed.

@@ -482,6 +482,92 @@ namespace Crulanda.Encounter
             var done = workDone; workDone = null; workName = null; done();
         }
 
+        // ---------- stations: making things (ZoneBuilder.Stations; DESIGN 6.1, BUILD_PLAN step 9) ----------
+        /// <summary>How near a station must be (ground distance, as E measures) for its recipes to be made, and for E to offer it.</summary>
+        public const float StationRange = 5;
+        /// <summary>How long making one thing takes on the work bar.</summary>
+        public const float CraftSeconds = 2;
+        readonly System.Random craftRng = new System.Random();
+        /// <summary>The nearest station of a kind (forge, bench, fire; null: any kind) within StationRange, or null. A smithy, a bake
+        /// oven, the herbalist's drying hut, an inn's kitchen and hearth, and a zone's own anvils, benches and cookfires; nobody need
+        /// be there.</summary>
+        public Crulanda.World.ZoneStationSpot StationNear(string kind)
+        {
+            if (Zone == null || Player == null) return null;
+            Crulanda.World.ZoneStationSpot best = null; float bestD = StationRange;
+            foreach (var s in Zone.Stations) { if (kind != null && s.kind != kind) continue; float d = GroundDistance(s.position); if (d <= bestD) { best = s; bestD = d; } }
+            return best;
+        }
+        bool StationOk(string kind) { return StationNear(kind) != null; }
+        /// <summary>The station a recipe would be made at now: the nearest of its kinds in reach, or null.</summary>
+        public Crulanda.World.ZoneStationSpot StationFor(RecipeDef r)
+        {
+            Crulanda.World.ZoneStationSpot best = null;
+            if (r == null || Player == null) return null;
+            foreach (var kind in ProfessionDatabase.Stations(r.station)) { var s = StationNear(kind); if (s != null && (best == null || GroundDistance(s.position) < GroundDistance(best.position))) best = s; }
+            return best;
+        }
+        /// <summary>Whether a recipe can be made here and now, and why not (ProfessionLog.CanCraft with the stations in reach).</summary>
+        public bool CanCraft(RecipeDef r, out string why)
+        {
+            if (Professions == null) { why = "You have no trade to speak of yet."; return false; }
+            return Professions.CanCraft(r, StationOk, out why);
+        }
+        /// <summary>
+        /// The trade a station opens the Trades window on: the first (in the content's order) whose own station it is and that the
+        /// character has, with recipes there (Cooking at a fire); else the first the character has with a recipe there (Woodcutting's
+        /// charcoal at a forge or a fire); else the first with a recipe there; else the one whose station it is.
+        /// </summary>
+        public ProfessionDef StationTrade(string kind)
+        {
+            if (Professions == null) return null;
+            var db = Professions.Db;
+            bool Makes(ProfessionDef d) { return db.RecipesFor(d.id).Exists(r => Array.IndexOf(ProfessionDatabase.Stations(r.station), kind) >= 0); }
+            bool Own(ProfessionDef d) { return Array.IndexOf(ProfessionDatabase.Stations(d.station), kind) >= 0; }
+            return db.Order.Find(d => Own(d) && Professions.Has(d.id) && Makes(d)) ?? db.Order.Find(d => Professions.Has(d.id) && Makes(d)) ?? db.Order.Find(Makes) ?? db.Order.Find(Own);
+        }
+        /// <summary>What E offers at a station: "Work at the forge", "Work at the bench", or at a fire "Cook at the fire" when it opens
+        /// on Cooking ("Work at the fire" while the fire's only use is another trade's, such as charcoal).</summary>
+        public string StationPrompt(Crulanda.World.ZoneStationSpot s)
+        {
+            if (s == null) return null;
+            if (s.kind == "fire") return StationTrade("fire")?.id == "cooking" ? "Cook at the fire" : "Work at the fire";
+            return "Work at the " + s.kind;
+        }
+        /// <summary>E at a station: the Trades window opens on the trade it serves (StationTrade), at its recipes.</summary>
+        public void WorkAtStation(Crulanda.World.ZoneStationSpot s)
+        {
+            if (s == null) return;
+            if (Professions == null) { Message("You have no trade to speak of yet."); return; }
+            var trade = StationTrade(s.kind);
+            if (trade != null && trade.id != EncounterHud.TradesPage) { EncounterHud.TradesPage = trade.id; EncounterHud.TradesRecipe = null; }
+            EncounterHud.TradesRecipes = true; ShowTrades(true);
+        }
+        /// <summary>
+        /// Makes a recipe <paramref name="count"/> times (the Trades window's Make and Make all), one at a time on the work bar
+        /// (CraftSeconds each, labelled with the recipe's name). Refused, and nothing starts, while working or casting, in a fight
+        /// ("You can't do that while fighting."), or when CanCraft says why. Each one made: the inputs leave the bags, what it
+        /// makes goes in ("You make Charcoal."), the skill is rolled and the game saves; the next starts while it still can be made.
+        /// Moving, a blow, a fight or dying stops the rest (TickWork). True when the first was started.
+        /// </summary>
+        public bool Make(RecipeDef r, int count)
+        {
+            if (Professions == null || r == null || count < 1 || Player == null || !Player.IsAlive || Working || abilities.IsCasting) return false;
+            if (InCombat) { Message(FightingLine); return false; }
+            if (!CanCraft(r, out var why)) { Message(why); return false; }
+            StartWork(r.name, CraftSeconds, () => MakeOne(r, count - 1));
+            return true;
+        }
+        void MakeOne(RecipeDef r, int more)
+        {
+            if (!Professions.Craft(r, StationOk, craftRng, out var why)) { Message(why); return; }
+            int n = Math.Max(1, r.count);
+            Message("You make " + ItemName(r.output) + (n > 1 ? " x" + n : "") + ".");
+            FloatText(Player.transform.position, "+" + n + " " + ItemName(r.output), new Color(.86f, .95f, .66f));
+            Save(false);
+            if (more > 0 && Professions.CanCraft(r, StationOk, out _)) StartWork(r.name, CraftSeconds, () => MakeOne(r, more - 1));
+        }
+
         // ---------- routing between zones (maps and breadcrumbs) ----------
         /// <summary>The exit out of this zone on the shortest road to <paramref name="zoneId"/> (by number of zones crossed), or null.</summary>
         public Crulanda.World.ZoneExit ExitToward(string zoneId)
@@ -1301,7 +1387,7 @@ namespace Crulanda.Encounter
                 if (usable != null) return usable.prompt;
                 var door = NearbyDoor;
                 if (door != null) return door.openable ? (door.Open ? "Close the door" : "Open the door") + " · " + door.name : (door.kind == "rooms" ? "Try the door · " : "Knock · ") + door.name;
-                return null;
+                return StationPrompt(StationNear(null));   // last: a station reaches farther than a door, so a door at hand is knocked at first
             }
         }
         static readonly string[] BarredDoorLines = {
@@ -1355,6 +1441,7 @@ namespace Crulanda.Encounter
                 else Knock(door);
                 return;
             }
+            var station = StationNear(null); if (station != null) { WorkAtStation(station); return; }
             Message("Nothing to interact with here.");
         }
         /// <summary>What answering a knock says when someone home has wares or quest business for you (GAME-ONLY).</summary>

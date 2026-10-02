@@ -228,6 +228,102 @@ namespace Crulanda.Tests
             CollectionAssert.AreEqual(new[] { "forge", "fire" }, ProfessionDatabase.Stations("forge|fire"));
             CollectionAssert.AreEqual(new[] { "bench" }, ProfessionDatabase.Stations("bench"));
             Assert.IsEmpty(ProfessionDatabase.Stations(null)); Assert.IsEmpty(ProfessionDatabase.Stations(""));
+            CollectionAssert.AreEqual(ProfessionDatabase.StationKinds, Crulanda.World.ZoneBuilder.StationKinds, "The zone builder and the trades know the same kinds of station.");
+        }
+
+        // ---------- recipes and stations (DESIGN 5, 6.1, 7; BUILD_PLAN step 9) ----------
+        /// <summary>The five charcoal recipes (DESIGN 5.1): one log of each tier's wood makes 1 to 5 charcoal at a forge or a fire, at
+        /// Woodcutting 1, 20, 40, 60 and 80.</summary>
+        [Test] public void Charcoal_IsMadeFromEachTiersWood()
+        {
+            var items = Items(); var db = Db(items);
+            var expect = new[] { ("recipe.charcoal_oak", "mat.oak_log", 1, 1), ("recipe.charcoal_blackpine", "mat.blackpine_log", 20, 2), ("recipe.charcoal_stonepine", "mat.stonepine_log", 40, 3),
+                ("recipe.charcoal_snag", "mat.snag_wood", 60, 4), ("recipe.charcoal_ghostoak", "mat.ghostoak_log", 80, 5) };
+            CollectionAssert.AreEqual(expect.Select(e => e.Item1), db.RecipesFor("woodcutting").Select(r => r.id), "Woodcutting's recipes, easiest first.");
+            foreach (var (id, log, skill, count) in expect)
+            {
+                var r = db.Recipe(id); Assert.NotNull(r, id);
+                Assert.AreEqual("woodcutting", r.profession, id); Assert.AreEqual(skill, r.skill, id); Assert.AreEqual("forge|fire", r.station, id);
+                Assert.AreEqual(1, r.inputs.Length, id); Assert.AreEqual(log, r.inputs[0].item, id); Assert.AreEqual(1, r.inputs[0].count, id);
+                Assert.AreEqual("mat.charcoal", r.output, id); Assert.AreEqual(count, r.count, id);
+                Assert.IsTrue(r.name.StartsWith("Charcoal from "), id + ": " + r.name);
+                Assert.IsTrue(db.NodesFor("woodcutting").Exists(n => n.item == log && n.skill == skill), id + ": its wood is the windfall of its tier.");
+            }
+            Assert.AreEqual(5, db.Recipes.Count, "Only charcoal so far; Cooking, Blacksmithing and Alchemy follow.");
+        }
+
+        /// <summary>DESIGN 5: what a recipe makes is worth at most half again what goes into it (value x count).</summary>
+        [Test] public void Recipes_NeverBeatTheirInputs()
+        {
+            var items = Items(); var db = Db(items); var problems = new List<string>();
+            Assert.IsNotEmpty(db.Recipes);
+            foreach (var r in db.Recipes)
+            {
+                int made = items.Get(r.output).value * Math.Max(1, r.count), cost = 0;
+                foreach (var i in r.inputs) cost += items.Get(i.item).value * Math.Max(1, i.count);
+                if (made > 1.5f * cost) problems.Add(r.id + ": makes " + made + " gold of " + r.output + " from " + cost + " gold of inputs (at most " + 1.5f * cost + ")");
+            }
+            Assert.IsEmpty(problems, string.Join("\n", problems));
+        }
+
+        /// <summary>DESIGN 5, 7: no gold loop. A recipe whose every input a vendor sells (the hen-wife's eggs at the merchant's
+        /// included) never makes more than those inputs cost to buy; and no vendor sells what is gathered (ore, logs, herbs).</summary>
+        [Test] public void Recipes_FromVendorGoods_NeverProfit()
+        {
+            var items = Items(); var db = Db(items); var problems = new List<string>();
+            var sold = new HashSet<string>(items.Vendors.SelectMany(v => v.items ?? new string[0])) { EncounterSession.FreshEggs };
+            foreach (var r in db.Recipes)
+            {
+                if (!r.inputs.All(i => sold.Contains(i.item))) continue;
+                int made = items.Get(r.output).value * Math.Max(1, r.count), price = 0;
+                foreach (var i in r.inputs) price += Inventory.Price(items.Get(i.item)) * Math.Max(1, i.count);
+                if (made > price) problems.Add(r.id + ": its inputs cost " + price + " gold at a vendor and what it makes sells for " + made);
+            }
+            foreach (var n in db.Nodes) if (sold.Contains(n.item)) problems.Add(n.item + " is gathered (" + n.id + ") and a vendor sells it too");
+            Assert.IsTrue(sold.Contains("mat.charcoal"), "Smiths sell charcoal (4 gold) for those with no wood to burn.");
+            Assert.IsEmpty(problems, string.Join("\n", problems));
+        }
+
+        /// <summary>
+        /// Every recipe can be made somewhere: a kind of station it names stands in some zone, from the zones' data: a zone's own
+        /// stations (ZoneStation), and the props that are stations (a forge, a bake oven, the herbalist's drying hut, an inn's
+        /// kitchen, an inn's hearth). Each zone has the stations DESIGN 6.1 gives it (Khaven no forge, the Peaks no bench), and a
+        /// zone's own stations are of a known kind, named, labelled and named once.
+        /// </summary>
+        [Test] public void EveryRecipeStation_ExistsSomewhere()
+        {
+            var db = Db(Items()); var zones = Zones(); var problems = new List<string>(); var everywhere = new HashSet<string>();
+            var want = new Dictionary<string, string[]> { { "oakhaven", new[] { "bench", "fire", "forge" } }, { "khaven", new[] { "bench", "fire" } }, { "peaks", new[] { "fire", "forge" } },
+                { "ashrim", new[] { "bench", "fire", "forge" } }, { "verdant", new[] { "bench", "fire", "forge" } } };
+            foreach (var kv in zones)
+            {
+                var z = kv.Value; var kinds = new SortedSet<string>(StringComparer.Ordinal); var names = new HashSet<string>();
+                foreach (var p in z.props ?? new Crulanda.World.ZoneProp[0])
+                {
+                    if (p == null) continue;
+                    var k = p.kind == "inn" ? "fire" : Crulanda.World.ZoneBuilder.StationKind(p.kind);
+                    if (k != null) kinds.Add(k);
+                }
+                foreach (var s in z.stations ?? new Crulanda.World.ZoneStation[0])
+                {
+                    if (s == null) { problems.Add(kv.Key + ": a null station"); continue; }
+                    if (Array.IndexOf(ProfessionDatabase.StationKinds, s.kind) < 0) problems.Add(kv.Key + ": the station '" + s.name + "' is a '" + s.kind + "'");
+                    if (string.IsNullOrEmpty(s.name)) problems.Add(kv.Key + ": a station at " + s.at + " has no name");
+                    else if (!names.Add(s.name)) problems.Add(kv.Key + ": two stations are called '" + s.name + "'");
+                    if (string.IsNullOrEmpty(s.canonStatus) || !s.canonStatus.StartsWith("GAME-ONLY")) problems.Add(kv.Key + ": the station '" + s.name + "' is not labelled GAME-ONLY");
+                    if (s.variant < 0 || s.variant > 2) problems.Add(kv.Key + ": the station '" + s.name + "' has variant " + s.variant);
+                    kinds.Add(s.kind);
+                }
+                if (want.TryGetValue(kv.Key, out var w) && !kinds.SequenceEqual(w)) problems.Add(kv.Key + ": stations " + string.Join(", ", kinds) + ", where DESIGN 6.1 has " + string.Join(", ", w));
+                everywhere.UnionWith(kinds);
+            }
+            CollectionAssert.AreEquivalent(ProfessionDatabase.StationKinds, everywhere, "A forge, a bench and a fire each stand somewhere.");
+            foreach (var r in db.Recipes) if (!ProfessionDatabase.Stations(r.station).Any(everywhere.Contains)) problems.Add(r.id + ": no " + r.station + " stands in any zone");
+            foreach (var d in db.Order) if (!string.IsNullOrEmpty(d.station) && !ProfessionDatabase.Stations(d.station).Any(everywhere.Contains)) problems.Add(d.id + ": its " + d.station + " stands in no zone");
+            Assert.IsEmpty(problems, string.Join("\n", problems));
+            Assert.AreEqual("forge", Crulanda.World.ZoneBuilder.StationKind("forge")); Assert.AreEqual("fire", Crulanda.World.ZoneBuilder.StationKind("oven"));
+            Assert.AreEqual("fire", Crulanda.World.ZoneBuilder.StationKind("kitchen")); Assert.AreEqual("bench", Crulanda.World.ZoneBuilder.StationKind("dryhut"));
+            Assert.IsNull(Crulanda.World.ZoneBuilder.StationKind("kitchendoor")); Assert.IsNull(Crulanda.World.ZoneBuilder.StationKind("stall")); Assert.IsNull(Crulanda.World.ZoneBuilder.StationKind("tannery"));
         }
     }
 }

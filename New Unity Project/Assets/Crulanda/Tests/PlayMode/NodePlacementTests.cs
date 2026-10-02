@@ -26,7 +26,8 @@ namespace Crulanda.Tests
     /// - each is where it belongs: a windfall at the edge of a wood (an oak windfall at a broadleaf wood's), a herb from the
     ///   nodes array in the open (in no wood and on no field; a herb prop worked as a node stands where the zone always had it,
     ///   and on no field), a seam near a crag or rock or on a ridge's rocky crown.
-    /// Stations join this test with the stations step (9); Oakhaven needs none of its own.
+    /// And every zone's stations (step 9; CheckStations): the kinds it should have, each walkable to within reach; its own (Oakhaven
+    /// has none) built where the data puts them, clear of water, buildings, roads, nodes, secrets and trunks, with no colliders.
     /// </summary>
     public class NodePlacementTests
     {
@@ -152,7 +153,57 @@ namespace Crulanda.Tests
                     problems.Add(q + "is a seam with no crag or rock by it, and not on a ridge's crown");
             }
             if (under != wantUnder) problems.Add(zp + under + " nodes in a cave, where the data puts " + wantUnder + " under (rich seams on a cave floor)");
-            // The stations step (9) adds its stations here; Oakhaven's forge, oven, inn hearth and drying bench are workplaces.
+            CheckStations(s, nodes, start.position, problems);
+        }
+        /// <summary>Each zone's stations (DESIGN 6.1): which kinds it has (the workplaces' and the inn's, and its own).</summary>
+        static readonly Dictionary<string, string[]> StationKinds = new Dictionary<string, string[]> {
+            { "zone.oakhaven", new[] { "bench", "fire", "forge" } }, { "zone.khaven", new[] { "bench", "fire" } }, { "zone.peaks", new[] { "fire", "forge" } },
+            { "zone.ashrim", new[] { "bench", "fire", "forge" } }, { "zone.verdant", new[] { "bench", "fire", "forge" } } };
+        /// <summary>
+        /// The zone's stations (BUILD_PLAN step 9): the kinds DESIGN 6.1 gives it; every one can be walked to from the start, to
+        /// within reach of it (EncounterSession.StationRange); its own (field anvils, benches, cookfires, under "Zone stations") one
+        /// for each in the data where the data puts it, with something to see and nothing solid or in the navmesh, out of the water,
+        /// buildings and off the roads, 3 m from every node and 5 m from every secret, and 2 m from every trunk.
+        /// </summary>
+        static void CheckStations(EncounterSession s, List<ZoneInteractable> nodes, Vector3 start, List<string> problems)
+        {
+            var zone = s.Zone; var z = zone.Zone; string zp = z.displayName + ": "; var path = new NavMeshPath();
+            var kinds = new SortedSet<string>(zone.Stations.Select(x => x.kind), StringComparer.Ordinal);
+            if (StationKinds.TryGetValue(z.id, out var want) && !kinds.SequenceEqual(want)) problems.Add(zp + "stations " + string.Join(", ", kinds) + ", where DESIGN 6.1 has " + string.Join(", ", want));
+            foreach (var st in zone.Stations)
+            {
+                string q = zp + "the " + st.kind + " '" + st.name + "' at " + st.position + " ";
+                bool walked = false;
+                for (int k = 0; k <= 16 && !walked; k++)
+                {
+                    var c = k == 0 ? st.position : zone.StandAt(new Vector2(st.position.x, st.position.z) + new Vector2(Mathf.Cos(k * Mathf.PI / 8), Mathf.Sin(k * Mathf.PI / 8)) * (k % 2 == 0 ? 1.5f : 3f), st.position.y);
+                    if (!NavMesh.SamplePosition(c, out var hit, 1.5f, NavMesh.AllAreas) || Flat(hit.position, st.position) > EncounterSession.StationRange - .5f || Mathf.Abs(hit.position.y - st.position.y) > 2) continue;
+                    walked = NavMesh.CalculatePath(start, hit.position, NavMesh.AllAreas, path) && path.status == NavMeshPathStatus.PathComplete;
+                }
+                if (!walked) problems.Add(q + "can't be walked to within reach from the start");
+            }
+            var own = z.stations ?? new ZoneStation[0]; var container = zone.transform.Find("Zone stations");
+            if (own.Length == 0) { if (container != null) problems.Add(zp + "builds stations it has none of"); return; }
+            if (container == null) { problems.Add(zp + "its " + own.Length + " stations are not built"); return; }
+            if (container.childCount != own.Length) problems.Add(zp + container.childCount + " of its " + own.Length + " stations are built");
+            foreach (var c in container.GetComponentsInChildren<Collider>(true)) problems.Add(zp + "a station's '" + c.name + "' has a collider");
+            if (container.GetComponentsInChildren<NavBlocker>(true).Length > 0 || container.GetComponentsInChildren<NavWalkable>(true).Length > 0) problems.Add(zp + "a station is in the navmesh");
+            foreach (var d in own)
+            {
+                var st = zone.Stations.Find(x => x.name == d.name && x.kind == d.kind);
+                string q = zp + "the " + d.kind + " '" + d.name + "' ";
+                if (st == null || st.root == null || !st.root.IsChildOf(container)) { problems.Add(q + "is not built"); continue; }
+                var at = new Vector2(st.position.x, st.position.z);
+                if (Vector2.Distance(at, d.at) > .01f) problems.Add(q + "stands at " + at + ", not where the data puts it (" + d.at + ")");
+                if (st.root.GetComponentsInChildren<Renderer>().Length < 10) problems.Add(q + "has next to nothing to see");
+                if (zone.WaterAt(at, out _, out _)) problems.Add(q + "stands in the water");
+                if (zone.InBuilding(at)) problems.Add(q + "stands in a building");
+                foreach (var r in z.roads) if (r != null && r.points.Length > 1 && ToPath(at, r.points) < r.width / 2 + .5f) problems.Add(q + "stands on " + r.name);
+                foreach (var n in nodes) if (Flat(n.position, st.position) < 3) problems.Add(q + "is within 3 m of the node '" + n.name + "' at " + n.position);
+                foreach (var spot in s.SecretSpots) if (Flat(spot.position, st.position) < 5) problems.Add(q + "is within 5 m of the secret '" + spot.def.id + "'");
+                if (!zone.TrunkClear(at, 2)) problems.Add(q + "is within 2 m of a tree trunk");
+                if (Hollow.InsideAny(st.position + Vector3.up * .3f, 0)) problems.Add(q + "is in a cave");
+            }
         }
     }
 }

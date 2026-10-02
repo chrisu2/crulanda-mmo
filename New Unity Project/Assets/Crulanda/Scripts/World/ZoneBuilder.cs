@@ -100,6 +100,7 @@ namespace Crulanda.World
             Lap("map");
             BuildSecrets();   // after the map: a hidden find must never show on the minimap or the zone map
             BuildNodes();     // after the secrets (they keep clear of them), each from a stream of its own: nothing else moves
+            BuildStations();  // the trades' stations of their own (field anvils, benches, cookfires): streams of their own, no colliders
             gameObject.AddComponent<WorldWeather>().Init(this, sunLight);   // before the clock: its first light already has the weather in it
             var clock = gameObject.AddComponent<WorldClock>(); clock.Init(sunLight, Zone.lighting, art.skybox, NightLights);
             // Reflections follow the real sky: a sky-only realtime probe covering the zone, refreshed by the clock.
@@ -1471,6 +1472,7 @@ namespace Crulanda.World
             Part(PrimitiveType.Cube, t, new Vector3(w / 2 - 1.02f, .55f, .8f), new Vector3(.1f, .8f, 1.4f), art.glass);   // embers
             var fire = new GameObject("Hearth fire").AddComponent<Light>(); fire.transform.SetParent(t, false);
             fire.transform.localPosition = new Vector3(w / 2 - 1.6f, 1, .8f); fire.type = LightType.Point; fire.range = 9; fire.intensity = 1.8f; fire.color = new Color(1, .55f, .25f);
+            AddStation("fire", t.name, Ground(new Vector2(fire.transform.position.x, fire.transform.position.z)), t);   // the hearth is a fire to cook at, named after the inn
             var room = new GameObject("Taproom light").AddComponent<Light>(); room.transform.SetParent(t, false);
             room.transform.localPosition = new Vector3(-1, storey - .6f, 0); room.type = LightType.Point; room.range = 8; room.intensity = 1.1f; room.color = new Color(1, .78f, .5f);
             // Outside: the framing, the jetty, the porch with its lantern, the sign, window boxes, a bench and barrels (InnFront).
@@ -3191,12 +3193,15 @@ namespace Crulanda.World
         }
 
         // ---------- trades: workplaces for villagers (front faces -Z) ----------
-        /// <summary>Workplaces by trade (forge, stall, oven, tannery, woodpile); villagers of that trade work there.</summary>
+        /// <summary>Workplaces by trade (forge, stall, oven, tannery, woodpile); villagers of that trade work there. A smithy, a bake
+        /// oven, the herbalist's drying hut and an inn's kitchen are the player's stations too (StationKind): one each, at the thing
+        /// its first workplace looks at (the anvil, the oven's mouth, the bench, the range).</summary>
         public readonly List<ZoneWorkplace> Workplaces = new List<ZoneWorkplace>();
         void Workplace(Transform t, string kind, Vector3 stand, Vector3 look)
         {
             var s = t.TransformPoint(stand); var l = t.TransformPoint(look);
             Workplaces.Add(new ZoneWorkplace { kind = kind, name = t.name, stand = Ground(new Vector2(s.x, s.z)), look = l });
+            AddStation(StationKind(kind), t.name, Ground(new Vector2(l.x, l.z)), t);
         }
         Light Glow(Transform t, Vector3 at, float range, float intensity, Color color, float night)
         {

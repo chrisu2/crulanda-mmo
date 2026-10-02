@@ -1,5 +1,5 @@
-# After build_and_tour.ps1 has built the player: the HUD captures (the Trades window and the rest) and the wardrobe line-up
-# (every weapon and shield, loot step A1). Runs the built player windowed, never against the owner's save (the captures use a
+# After build_and_tour.ps1 has built the player: the HUD captures (the Trades window and the rest), the wardrobe line-up
+# (every piece of gear) and the loot shots (loot step L1). Runs the built player windowed, never against the owner's save (the captures use a
 # throwaway character directory).
 $v = 'C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation'
 $exe = Join-Path $v 'Builds\Crulanda\Crulanda.exe'
@@ -16,3 +16,11 @@ $w = Start-Process $exe -PassThru -ArgumentList @('--crulanda-wardrobe-capture',
 $w | Wait-Process -Timeout 420
 Select-String -LiteralPath $wlog -Pattern 'WARDROBE_CAPTURE_DONE|Exception|spot' | Select-Object -First 6 | ForEach-Object Line
 Get-ChildItem $wd -Filter '*.png' | Select-Object -ExpandProperty Name
+# The loot shots (loot step L1): beams by quality day and night, the loot window, the compare tooltip and the upgrade arrows.
+$ld = Join-Path $ui 'loot'
+New-Item -ItemType Directory -Force $ld | Out-Null
+$llog = Join-Path $ld 'loot.log'
+$l = Start-Process $exe -PassThru -ArgumentList @('--crulanda-loot-capture', ('"' + $ld + '"'), '--crulanda-class', 'class.warrior', '-screen-width', '1440', '-screen-height', '900', '-screen-fullscreen', '0', '-logFile', ('"' + $llog + '"'))
+$l | Wait-Process -Timeout 240
+Select-String -LiteralPath $llog -Pattern 'LOOT_CAPTURE_DONE|Exception|Loot capture' | Select-Object -First 5 | ForEach-Object Line
+Get-ChildItem $ld -Filter '*.png' | Select-Object -ExpandProperty Name

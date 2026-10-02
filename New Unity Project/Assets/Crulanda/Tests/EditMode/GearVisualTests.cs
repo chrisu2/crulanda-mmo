@@ -56,7 +56,8 @@ namespace Crulanda.Tests
             foreach (var t in v.GetComponentsInChildren<Transform>(true)) if (!InGear(t)) places[t] = (t.localPosition, t.localRotation, t.localScale);
             return (parts, places);
         }
-        static bool InGear(Transform t) { for (; t != null; t = t.parent) if (t.name.StartsWith("Gear ")) return true; return false; }
+        /// <summary>Under a gear root (named "Gear ..."), looking no higher than the figure itself (the test figure's own name starts "Gear").</summary>
+        static bool InGear(Transform t) { for (; t != null && t.GetComponent<ActorVisual>() == null; t = t.parent) if (t.name.StartsWith("Gear ")) return true; return false; }
         /// <summary>All of a slot's parts: its root on the body and its roots on the limbs.</summary>
         static List<MeshRenderer> SlotParts(ActorVisual v, EquipSlot s)
         {

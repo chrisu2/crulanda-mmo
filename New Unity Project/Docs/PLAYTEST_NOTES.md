@@ -76,3 +76,23 @@ duller and nearer the rock's own colour.
 Measured (`ZoneBuilder.Nodes.cs` `Windfall`): the fallen trunk carries four thin stub limbs, two of them pointing up 0.9 to
 1.4 m, on a plain tapered log beside a small stump. Fix: a tree that reads as broken or felled: a torn, splintered stump,
 a heavy trunk with snapped boughs and torn bark, and the litter of a fall (or of an axe) round it.
+
+## 7. Cats' tails need to be more flexible (2026-10-01) — OPEN
+> "cats tails need to be more flexible"
+
+Measured (`CritterBody.Make`, the cat): the tail is one rigid cylinder set at a fixed angle. Fix: a tail of several short
+segments that curves, sways as the cat walks, lifts when it trots and curls and flicks when it sits or looks about.
+
+## 8. Lights look better (2026-10-01) — KEEP
+> "lights look better"
+
+The night pass (firelit windows and lamps, the moonlit blue base). Nothing to fix: do not regress it.
+
+## 9. Bloom and sun effects? (2026-10-01) — OPEN
+> "bloom sun effects?"
+
+What exists (`ZonePost`, `Post.shader`): bloom on lamps, windows, embers and the sun, and sun shafts when the sun is in view,
+both tuned low; they evidently do not read in play. Fix: a sun that reads: a visible disc with a warm halo, glare and light
+shafts when you look toward it (strongest low in the sky, through trees and at dawn and dusk), glints on water, and bloom
+that shows on bright sky and firelight without washing the painted colours out. Add tour shots that face the sun at dawn,
+noon and dusk so it can be judged.

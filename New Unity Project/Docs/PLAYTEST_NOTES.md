@@ -29,7 +29,7 @@ hostile within about 120 m of a village's houses) in every zone.
   its end at (-32, 184) and the Crowsfoot track west along the ridge's foot and round its heel. The ridge hides the mouth
   from the green, from the road and from the track until its last bend.
 - Between: Carder's field barn and the north fields, then the wolf and boar woods, then the hills. Every camp in Oakhaven
-  stands 125 m and more from every house (a house, the inn, the mill); all eleven outdoor camps moved, and three were added.
+  stands 125 m and more from every house (a house, the inn, the mill); all ten outdoor camps moved, and three were added.
 - Six new places, ten woods, three secrets; the nodes re-placed by the placement script (the hollow's nine seams went with it).
 
 **What the lead must run and look at** (nothing below has been run):
@@ -44,8 +44,8 @@ hostile within about 120 m of a village's houses) in every zone.
 - The build log's "Zone zone.oakhaven (560 m) built in N ms (...)": the estimate is about 13 s in the editor and 11 s in the
   player (7.6 and 6.4 at 380 m). If it is much over, the ground paint's cap (4096, `BuildGround`) and `wildDensity` are the
   two knobs.
-- The world tour (`--crulanda-world-capture`), Oakhaven (file names start `oakhaven-`): `19-crowsfoot-hollow` (the mouth from the track's last bend: a slot
-  in a cliff, scarps either side, the brow over it, nothing floating or cut), `20-crowsfoot-ridge` (the ridge from the North
+- The world tour (`--crulanda-world-capture`), Oakhaven (file names start `oakhaven-`): `19-crowsfoot-hollow` (the mouth from
+  the track's last bend: a slot in a cliff, scarps either side, the brow over it, nothing floating or cut), `20-crowsfoot-ridge` (the ridge from the North
   road's end: a line of hills, no mouth to be seen, the Ridge pines on its face), `85-hollow-camp`, `88-hollow-drop`,
   `89-hollow-stores`, `86-hollow-hall` (the cave inside as it was: the furnishings re-roll, so look for anything standing in
   a wall or in the way), `34-carders-field-barn`, `35-thornshaw`, `36-the-carters-rest`, `37-lark-hill`,
@@ -74,6 +74,13 @@ hostile within about 120 m of a village's houses) in every zone.
 - Every wolf and boar camp of Oakhaven moved, not only the bandits: the rule puts level-1 beasts 125 m from the nearest
   house, so the first kill is a longer walk than it was. If that is too far for the first minutes, the rule could spare
   beasts and hold for the deserters alone.
+- Left where they were, though their words speak of the grey: the Grey-edge copse and its Moonbells (62, -18), the second
+  point of Garet's deer-track quest there, and the Old wayshrine (86, 20). They were 100 m and 78 m from the curtain after the
+  last growth and are 190 m and 168 m from it now. They are the village's near quests; moving them out is a choice, not a fix.
+- Saves: no format change. A character saved in Oakhaven stands where it stood (one saved down the old cave stands on the
+  meadow by the North road now). Mob ids, secret ids and quest progress are unchanged; resting nodes that moved are full again.
+- `tools/wip/professions/place_nodes.py` was edited (the plan named it) and `tools/wip/zonegrowth` added, in a tree the step
+  was otherwise told to leave alone.
 
 ## 2. Elites are too easy for the loot they give (2026-10-01) — OPEN
 > "elite was too easy for the loot obtain."

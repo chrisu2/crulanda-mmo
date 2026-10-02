@@ -10,7 +10,7 @@ Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
 ## RESUME HERE (updated 2026-10-01, night)
-**PUBLISHED 2026-10-01 (eight publishes; the playable build is main at 678ff05, plus a test-only fix after it):**
+**PUBLISHED 2026-10-01 (nine publishes; the playable build is main at c9f6868):**
 1. The Root-Mother's Deep, Crowsfoot's hidden mouth, every trade has a day (4c579e6).
 2. The painted style pass parts 1-4 (03fd06d) and 3. part 5, painted masonry (17168d8).
 4. The out of work drink at the inn; the visual review's first batch (ecc233b).
@@ -26,20 +26,29 @@ The user requested this handoff because they ran out of tokens. Do not assume an
    ledger drafted (104 named items, unregistered, on mannequins in wardrobe 13-18); herbs 1.3x and the hauberk's surcoat belted.
    Tests: EditMode 285/286 (1 skipped), PlayMode 115/116, the one failure (Lisbet's drying errand, a timing flake in the test)
    fixed in 78d0528 and its fixture 6/6.
-**Long runs go detached:** `tools\validation\start_detached.ps1 [-Arguments '-NoTests' | '-NoTour' | '-Zones zone.oakhaven -NoTests']`
+9. **Trades steps 7 and 9 and loot L1 (round 4):** purses (what you pay Maud feeds and warms the Tanner house; a cold chimney
+   when they go without), stations and charcoal (forge, oven, bench, the Cask's range and hearth, field stations in four zones,
+   the recipe pane), loot feel (beams on bodies by quality, the loot window, compare lines and upgrade arrows, call-outs); the
+   trades' herbs 1.3x, dewfern rebuilt (its fronds ran into the ground), vendor names in ink, Khaven's inn door fixed for the
+   navmesh (its taproom was cut off). Tests: EditMode 310/312 (1 skipped; one wrong test fixed), PlayMode 133/135 (both
+   failures fixed: a test bug and the Khaven door; their fixtures 6/6); five zones toured, then Khaven and Verdant again.
+**Long runs go detached:** `tools\validation\start_detached.ps1 [-Arguments '-NoTests' | '-NoTour' | '-NoBuild' | '-Zones zone.khaven,zone.verdant']`
 runs `full_run.ps1` outside the tool's process tree; wait for `hel\work\full-run.done` (the log is mixed-encoding: read the result
-XMLs and logs directly). Never edit the repo's Assets while a run is in flight (it mirrors Assets).
+XMLs and logs directly). `-NoTour` builds and takes the HUD, wardrobe and loot shots but tours no zone; `-NoBuild` is tests only.
+**Chris's rule (2026-10-01): skip the zone tours on rounds that don't change how the world looks** (World code, zone data, art,
+visible creature or villager looks keep them; tour just the zones a round touches when that is enough). Never edit the repo's
+Assets while a run is in flight (it mirrors Assets).
 
-**NEXT ROUND, BUILDING NOW (workflow `build-step-resume`, run wf_d6ef8bf8-df2):** trades step 7 (`trades/a7-purses`, worktree
-`scratchpad\wt\a7`), step 9 (`trades/b9-stations`, `wt\b9`) and loot L1 (`loot/l1-feel`, `wt\ll1`), all branched from 678ff05.
-When it reports: merge one at a time on an integration branch (as round3 was), compile, run the full detached check with tests,
-look at the captures, publish.
-**Queued small fixes for that round (not made yet):** the trades' herbs (tarnwort, cinder-thistle, dewfern: `HerbOfTheTrades`)
-are life-size and hard to see in the node shots: give them the same 1.3x clump as yarrow (move the clump creation in `Herb`
-above the `HerbOfTheTrades` call). The vendor window draws item names in `QualityColors[q] * .6f`, which also takes the alpha
-to .6, so common names are faint grey on parchment at every vendor (`EncounterHud.Items.cs` DrawVendor): darken the RGB only,
-alpha 1. Still open: the quality ladder's rare and epic glow is faint; a tarnwort node on a 0.64 slope (herb mesh does not follow
-the ground).
+**NEXT ROUND (round 5), MERGED ON BRANCH `round5`, NOT RUN IN UNITY:** trades step 10 (cooking: ten recipes, meats from the
+beasts, boar stew at the Cask), step 11 (hunting: deer and rabbits huntable, never hens, sheep or cats; three new hides; the
+other three bag quests; the skinner sells salt) and loot L2 (named loot live: the six loot files moved into Items, uniques by
+inventory, sets, vendor pieces, new characters start with the Trailblade). Integration worktree `scratchpad\wt\int5` (branch
+`round5`, built from main at c9f6868; conflicts resolved in ItemTests.cs (both tests kept) and DATA_SCHEMA.md (b11's hides row);
+`compile-int5.py` ALL OK). To finish: back up Chris's save (L2 is the first time `loot.*` ids can enter it), fast-forward main
+to round5, run the full check with tests and an Oakhaven tour (the deer and rabbits; `-Zones zone.oakhaven`), look at the HUD
+shots 26-27 (cooking) and the wardrobe, publish.
+**Still open:** the quality ladder's rare and epic glow on worn gear is faint; a tarnwort node on a 0.64 slope (the herb mesh
+does not follow the ground); TalkTarget has no wall check (Mira can be offered through the Golden Cask's end wall).
 
 **THE PLANS (read the owner notes first; they are his words and decisions):**
 - Professions, gathering, households, purses, bags, hunting: `tools/wip/professions/OWNER_NOTES.md`, `DESIGN.md`, `ADDENDUM.md`,

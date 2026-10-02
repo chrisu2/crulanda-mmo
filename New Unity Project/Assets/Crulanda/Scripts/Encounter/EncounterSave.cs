@@ -11,16 +11,17 @@ namespace Crulanda.Encounter
     /// quests, faction standing, Chronicle pages and the quest bag (empty when loading 1-3; the Chronicle catches up from
     /// what the character has already done). v1 (no talents) and v2 (9-node prototype ids) migrate on read; the migrated
     /// form is written on the next save. From format 6 on, each format step is a SaveMigrator step on the payload text
-    /// (6 → 7: <see cref="AddDiscoveriesMigration"/>, 7 → 8: <see cref="AddProfessionsMigration"/>), run before the payload is read.
+    /// (6 → 7: <see cref="AddDiscoveriesMigration"/>, 7 → 8: <see cref="AddProfessionsMigration"/>, 8 → 9: <see cref="AddArmouryMigration"/>),
+    /// run before the payload is read.
     /// </summary>
     public sealed class EncounterSave
     {
-        public const int FormatVersion = 8;   // 5: level curve (experience migrated). 6: bag + equipment slots (old item list moved in). 7: discoveries. 8: trades (professions, pouches)
+        public const int FormatVersion = 9;   // 5: level curve (experience migrated). 6: bag + equipment slots (old item list moved in). 7: discoveries. 8: trades (professions, pouches). 9: the Armoury (armoury, looks, lootLuck)
         /// <summary>The most trade bags a save may list as worn.</summary>
         public const int MaxPouches = 8;
         /// <summary>The payload steps from format 6 on. Formats 1-5 are older than this chain and are upgraded in memory in Read.</summary>
         static readonly SaveMigrator Steps = CreateSteps();
-        static SaveMigrator CreateSteps() { var m = new SaveMigrator(); m.Register(new AddDiscoveriesMigration()); m.Register(new AddProfessionsMigration()); return m; }
+        static SaveMigrator CreateSteps() { var m = new SaveMigrator(); m.Register(new AddDiscoveriesMigration()); m.Register(new AddProfessionsMigration()); m.Register(new AddArmouryMigration()); return m; }
         /// <summary>9-node prototype ids (format 2) -> the nodes they became in the data-driven Warrior tree.</summary>
         public static readonly Dictionary<string, string> LegacyTalentIds = new Dictionary<string, string>(StringComparer.Ordinal) {
             { "tank.armor", "tk-tempered-armor" }, { "tank.challenge", "tk-steady-challenge" }, { "tank.bulwark", "tk-bulwark" },
@@ -101,6 +102,17 @@ namespace Crulanda.Encounter
                 var worn = new HashSet<string>(StringComparer.Ordinal);
                 p.pouches.RemoveAll(id => !worn.Add(id));
                 if (p.pouches.Count > MaxPouches) throw new InvalidOperationException("Invalid item data.");
+                // Format 9: the Armoury (named gear found, looks seen) and the loot kill counts. Formats 1-8 have none of the three.
+                // A blank id or source is nothing and is dropped, and so is a later entry for one already listed. An id this content
+                // doesn't know is kept (ArmouryLog ignores it), but a negative count is not a save this game wrote.
+                if (p.armoury == null) p.armoury = new List<string>();
+                if (p.looks == null) p.looks = new List<string>();
+                if (p.lootLuck == null) p.lootLuck = new List<LootLuck>();
+                foreach (var list in new[] { p.armoury, p.looks }) { list.RemoveAll(string.IsNullOrEmpty); var once = new HashSet<string>(StringComparer.Ordinal); list.RemoveAll(id => !once.Add(id)); }
+                p.lootLuck.RemoveAll(l => l == null || string.IsNullOrEmpty(l.source));
+                foreach (var l in p.lootLuck) if (l.kills < 0 || l.dry < 0) throw new InvalidOperationException("Invalid loot data.");
+                var sources = new HashSet<string>(StringComparer.Ordinal);
+                p.lootLuck.RemoveAll(l => !sources.Add(l.source));
                 // Format 6: the old item list and single weapon become bag slots and the main-hand slot.
                 Inventory.Ensure(p);
                 if (from < 6)
@@ -178,6 +190,32 @@ namespace Crulanda.Encounter
             string body = json.Substring(0, json.Length - 1).TrimEnd();
             if (!professions) body += (body.EndsWith("{") ? "" : ",") + "\"professions\":[]";
             if (!pouches) body += (body.EndsWith("{") ? "" : ",") + "\"pouches\":[]";
+            return body + "}";
+        }
+    }
+
+    /// <summary>
+    /// Save format 8 → 9: adds the three empty lists of the Armoury, <c>armoury</c> (named gear found), <c>looks</c> (appearances
+    /// seen) and <c>lootLuck</c> (loot kill counts and pity). An edit on the payload text, like <see cref="AddProfessionsMigration"/>:
+    /// each list that is missing goes in before the closing brace, in that order, and every other character of the format-8 payload
+    /// stays exactly as it was. A payload that already has all three is left alone; one that isn't a JSON object is refused (the save
+    /// is then not loaded, not changed). What the character already holds is marked found when the Armoury first binds to it
+    /// (ArmouryLog.Bind), not here.
+    /// </summary>
+    public sealed class AddArmouryMigration : ISaveMigration
+    {
+        public int FromVersion { get { return 8; } }
+        public int ToVersion { get { return 9; } }
+        static readonly string[] Lists = { "armoury", "looks", "lootLuck" };
+        static readonly Regex[] Has = { new Regex("\"armoury\"\\s*:"), new Regex("\"looks\"\\s*:"), new Regex("\"lootLuck\"\\s*:") };
+        public string Migrate(string payloadJson)
+        {
+            string json = (payloadJson ?? "").Trim();
+            if (json.Length < 2 || json[0] != '{' || json[json.Length - 1] != '}') throw new SaveMigrationException("The save's payload is not a JSON object.");
+            bool all = true; foreach (var h in Has) all &= h.IsMatch(json);
+            if (all) return payloadJson;
+            string body = json.Substring(0, json.Length - 1).TrimEnd();
+            for (int i = 0; i < Lists.Length; i++) if (!Has[i].IsMatch(json)) body += (body.EndsWith("{") ? "" : ",") + "\"" + Lists[i] + "\":[]";
             return body + "}";
         }
     }

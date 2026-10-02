@@ -17,7 +17,8 @@ namespace Crulanda.Encounter
     /// green); 04-upgrade-arrows: the bags beside the window, the pieces that beat what is worn marked with the green arrow;
     /// 05-set-tooltip (step L2): Caddock's Tin Crown's tooltip with two pieces of the Deserter King's Due worn (the set, its
     /// pieces, "+30 health" on and the three-piece bonus still to come, and where it drops); 06-set-sheet: the character sheet
-    /// with the same two pieces worn, "Gear effects: +30 health." in green under "From gear".
+    /// with the same two pieces worn, "Gear effects: +30 health." in green under "From gear"; 07-armoury (step L3): the quest book's
+    /// Armoury tab on Oakhaven, what was taken here found, Caddock's pieces named after one kill, the rest silhouettes.
     /// </summary>
     public sealed class LootCapture : MonoBehaviour
     {
@@ -31,6 +32,8 @@ namespace Crulanda.Encounter
             ("Epic", 31, new[] { (ItemDatabase.GearId("offhand", 9, 4, 977), 1) }),
         };
         EncounterSession session;
+        /// <summary>What the capture puts in the bags is taken into the Armoury at once and quietly, so no "NEW LOOK" toast lies over a shot.</summary>
+        void Quiet() { if (session.Armoury != null) session.Armoury.Bind(session.Progress); }
 
         public IEnumerator Run(EncounterSession s, string directory)
         {
@@ -43,6 +46,7 @@ namespace Crulanda.Encounter
             s.Progress.experience = EncounterProgress.XpForLevel(8); s.Player.SetLevel(8);
             string worn = ItemDatabase.GearId("mainhand", 6, 1, 3);
             if (Inventory.Add(s.Progress, s.Items, worn, 1) == 0) s.EquipFromBag(s.Progress.bag.FindIndex(x => x.item == worn));
+            Quiet();
             var weather = Crulanda.World.WorldWeather.Active; if (weather != null) weather.Force(weather.TourKind(), true);
             // The rest of the world holds still: every other enemy stands down, and the village is put away.
             foreach (var e in s.Enemies) if (e != null && !camp.GetRange(0, Bodies.Length).Contains(e)) { e.enabled = false; foreach (var r in e.GetComponentsInChildren<Renderer>(true)) r.enabled = false; }
@@ -92,6 +96,7 @@ namespace Crulanda.Encounter
             // 04: the bags beside the window: two pieces that beat what is worn (an empty slot, a better blade) and two that do not.
             foreach (var id in new[] { ItemDatabase.GearId("feet", 6, 2, 31), ItemDatabase.GearId("mainhand", 8, 2, 77), ItemDatabase.GearId("mainhand", 3, 0, 12), ItemDatabase.GearId("legs", 13, 3, 5) })
                 Inventory.Add(s.Progress, s.Items, id, 1);
+            Quiet();
             s.InventoryOpen = true; yield return new WaitForSeconds(.6f);
             ScreenCapture.CaptureScreenshot(Path.Combine(directory, "04-upgrade-arrows.png")); yield return new WaitForSeconds(.4f);
             s.InventoryOpen = false; s.CloseLoot();
@@ -100,6 +105,7 @@ namespace Crulanda.Encounter
             {
                 foreach (var id in new[] { "loot.oak.due_cleaver", "loot.oak.due_coat" }) if (Inventory.Add(s.Progress, s.Items, id, 1) == 0) s.EquipFromBag(s.Progress.bag.FindIndex(x => x.item == id));
                 Inventory.Add(s.Progress, s.Items, "item.tin_crown", 1);
+                Quiet();
                 EncounterHud.PinnedTooltip = "item.tin_crown"; EncounterHud.PinnedTooltipAt = new Vector2(700, 560);
                 yield return new WaitForSeconds(.6f);
                 ScreenCapture.CaptureScreenshot(Path.Combine(directory, "05-set-tooltip.png")); yield return new WaitForSeconds(.4f);
@@ -108,6 +114,19 @@ namespace Crulanda.Encounter
                 s.CharacterOpen = true; yield return new WaitForSeconds(.6f);
                 ScreenCapture.CaptureScreenshot(Path.Combine(directory, "06-set-sheet.png")); yield return new WaitForSeconds(.4f);
                 s.CharacterOpen = false;
+                // 07: the quest book's Armoury tab on Oakhaven (step L3): the pieces held found in colour, Caddock's list named in
+                // grey after one kill of him, the rest silhouettes. Bound again first, so what was added here raises no toasts.
+                if (s.Armoury != null && s.Zone != null)
+                {
+                    int c = Array.FindIndex(s.Zone.Zone.camps, x => x != null && x.elite && x.mob == "Caddock, the Bandit King");
+                    if (c >= 0) s.Armoury.Killed(LootContext.From("mob." + LootContext.CampTag(s.Zone.Zone.camps[c]) + "." + s.Zone.Zone.id.Replace("zone.", "") + "." + c + ".0", s.Zone.Zone.camps, s.Zone.Zone.camps[c].levelMax, true));
+                    Inventory.Add(s.Progress, s.Items, "loot.oak.whitefoot_mantle", 1);
+                    s.Armoury.Bind(s.Progress);
+                    EncounterHud.BookTab = "armoury"; s.QuestBookOpen = true; yield return new WaitForSeconds(.8f);
+                    ScreenCapture.CaptureScreenshot(Path.Combine(directory, "07-armoury.png")); yield return new WaitForSeconds(.4f);
+                    s.QuestBookOpen = false; EncounterHud.BookTab = "quests";
+                }
+                else Debug.LogError("Loot capture: no Armoury or no zone, so 07-armoury is skipped.");
             }
             else Debug.LogError("Loot capture: the named loot is not loaded, so 05-set-tooltip and 06-set-sheet are skipped.");
             Debug.Log("LOOT_CAPTURE_DONE"); Application.Quit(0);

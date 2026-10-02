@@ -10,7 +10,7 @@ Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
 ## RESUME HERE (updated 2026-10-01, night)
-**PUBLISHED 2026-10-01 (seven publishes; the playable build is the main commit that adds this note):**
+**PUBLISHED 2026-10-01 (eight publishes; the playable build is main at 678ff05, plus a test-only fix after it):**
 1. The Root-Mother's Deep, Crowsfoot's hidden mouth, every trade has a day (4c579e6).
 2. The painted style pass parts 1-4 (03fd06d) and 3. part 5, painted masonry (17168d8).
 4. The out of work drink at the inn; the visual review's first batch (ecc233b).
@@ -21,24 +21,25 @@ The user requested this handoff because they ran out of tokens. Do not assume an
    on slopes; the inns and the smithy as hero buildings)**, plus Chris's ore fix (no more green "peas"), knee-high herbs and
    mourner's cap as a mushroom. Tests on this round: EditMode 240/240 (one test was wrong: its figure's own name started "Gear"),
    PlayMode 108/108; five zones toured and the wardrobe 01-12 viewed. The tour/captures were rerun after the ore and herb fixes.
+8. **Trades steps 5, 6 and 8 and loot A3 (round3):** Maud's four trade bags (bought, or "A Wallet for Simples"), Hob Linden the
+   innkeeper and every trade at its own workshop, ten ore / eight timber / ten herbs in each of the other four zones, the loot
+   ledger drafted (104 named items, unregistered, on mannequins in wardrobe 13-18); herbs 1.3x and the hauberk's surcoat belted.
+   Tests: EditMode 285/286 (1 skipped), PlayMode 115/116, the one failure (Lisbet's drying errand, a timing flake in the test)
+   fixed in 78d0528 and its fixture 6/6.
 **Long runs go detached:** `tools\validation\start_detached.ps1 [-Arguments '-NoTests' | '-NoTour' | '-Zones zone.oakhaven -NoTests']`
 runs `full_run.ps1` outside the tool's process tree; wait for `hel\work\full-run.done` (the log is mixed-encoding: read the result
 XMLs and logs directly). Never edit the repo's Assets while a run is in flight (it mirrors Assets).
 
-**NEXT ROUND, BUILT AND MERGED ON `round3` (not on main yet; nothing run in Unity):** trades step 5 (`trades/b5-bags`: Maud's four
-trade bags, bought or earned by "A Wallet for Simples", bag rows in the bags window), step 6 (`trades/a6-workshop-days`: Hob
-Linden the innkeeper behind the bar selling bread and cheese, deliveries at the kitchen door), step 8
-(`trades/b8-nodes-four-zones`: ten ore, eight timber, ten herbs in each of the other four zones, `tools/wip/professions/place_nodes.py`)
-and loot A3 (`loot/a3-ledger`: Loot.cs, six loot files in EncounterContent/Loot, unregistered; wardrobe shots 13-18). Each was
-reviewed through three lenses with refutation (25 findings confirmed and fixed). The integration worktree is the session
-scratchpad's `wt\int` (branch `round3`, two conflicts resolved: items.json keeps both the innkeeper and leatherworker vendors;
-WorldLife.StockLine keeps b5's sold-pelts line and a6's innkeeper line); `compile-int.py` is ALL OK. To finish it: merge main into
-round3 (or round3 into main), run the full detached check WITH tests, look at the UI captures 19-23 (bags), wardrobe 13-18, the
-other zones' node shots (`<zone>-80-node-*`), then publish.
-**Small things queued for that round:** yarrow is visible now but still small from 7 m: scale the yarrow and comfrey clumps about
-1.3x and make yarrow's head one bright white (the beige disc under the florets makes it read as a mushroom cap). The hauberk's
-surcoat panels read as flat stickers front and back. The quality ladder's rare and epic glow is faint. b8's review left a tarnwort
-node on a 0.64 slope (the herb mesh does not follow the ground).
+**NEXT ROUND, BUILDING NOW (workflow `build-step-resume`, run wf_d6ef8bf8-df2):** trades step 7 (`trades/a7-purses`, worktree
+`scratchpad\wt\a7`), step 9 (`trades/b9-stations`, `wt\b9`) and loot L1 (`loot/l1-feel`, `wt\ll1`), all branched from 678ff05.
+When it reports: merge one at a time on an integration branch (as round3 was), compile, run the full detached check with tests,
+look at the captures, publish.
+**Queued small fixes for that round (not made yet):** the trades' herbs (tarnwort, cinder-thistle, dewfern: `HerbOfTheTrades`)
+are life-size and hard to see in the node shots: give them the same 1.3x clump as yarrow (move the clump creation in `Herb`
+above the `HerbOfTheTrades` call). The vendor window draws item names in `QualityColors[q] * .6f`, which also takes the alpha
+to .6, so common names are faint grey on parchment at every vendor (`EncounterHud.Items.cs` DrawVendor): darken the RGB only,
+alpha 1. Still open: the quality ladder's rare and epic glow is faint; a tarnwort node on a 0.64 slope (herb mesh does not follow
+the ground).
 
 **THE PLANS (read the owner notes first; they are his words and decisions):**
 - Professions, gathering, households, purses, bags, hunting: `tools/wip/professions/OWNER_NOTES.md`, `DESIGN.md`, `ADDENDUM.md`,

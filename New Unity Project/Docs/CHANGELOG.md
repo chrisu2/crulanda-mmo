@@ -739,3 +739,29 @@ A read-only review by five reviewers, each finding checked by a second who tried
   a cluster of grey caps. One armour test was wrong, not the armour (it skipped the whole body because the test figure's own
   name starts with "Gear").
 - Tests: EditMode 240/240 (after the test fix), PlayMode 108/108; five zone tours and the wardrobe.
+
+## 2026-10-01 — Trade bags, the innkeeper, gathering in every zone, and the loot ledger drafted (Chris: "have the leatherworker make bags for professions by quest (gather leathers) or just buy them outright from him"; "each profession has their own workshop"; "start building a database of loot")
+- **Trade bags from Maud** (BUILD_PLAN step 5): four bags, the Simples-wallet (herbs, 6 slots, 12 gold), the Log-sling
+  (timber, 6, 16), the Larder-scrip (eggs, cheese and the larder, 8, 20) and the Ore-poke (ore, bars and charcoal, 8, 24).
+  Buy them from Maud Tanner, or earn the wallet with "A Wallet for Simples" (bring her three grey wolf pelts). Use a bag to
+  wear it; its slots show as their own labelled row under your bags, and what you gather goes into it first. The coin goes to
+  Maud's household. Hides are now materials Maud works, and she notices when someone sells good pelts.
+- **The Golden Cask has an innkeeper** (step 6): Hob Linden is up before dawn and behind the bar till late, selling brown
+  loaves and Harrow cheese. The hen-wives hand eggs over at the kitchen's back door, the baker brings the first loaves, the
+  hunter his hares, and Hob comes out to take them; dinner goes out to the tables. Every trade works its own workshop:
+  Ama, Tamsin and Hedda keep their own stalls, the tanned hides go from the yard to Maud's shop, herbs to the drying hut.
+- **Gathering in every zone** (step 8): ten ore seams, eight windfalls and ten herbs each in Khaven (bog-iron, black pine,
+  mourner's cap), the Shattered Peaks (Adit iron, stone pine, tarnwort), the Ashland Rim (cinder ore, ash-snags and single
+  cinder-thistles: thin pickings) and the Verdant Shore (Veridian ore, ghost-oak, dewfern, and rich seams down in the
+  Root-Mother's Deep). Every node was placed by a script that checks it against roads, water, buildings, camps, secrets and the
+  caves, and walks to it from the zone's start.
+- **The loot ledger, drafted** (loot step A3): 104 named items across the five zones and the world, each with its look, its
+  stats on the gear curve, where it drops and a line of flavour; boss and elite drop lists, two sets, and the roll rules (one
+  named item per kill, two per elite, luck capped). Nothing drops yet: the wardrobe shows them on mannequins (shots 13-18) so
+  the looks can be judged first.
+- **Smaller:** herbs drawn a third larger than life (yarrow's head all white); the hauberk's surcoat wider, slit at the hem
+  and belted.
+- **Found by the full check and fixed:** one workshop test waited for Lisbet to choose her drying errand of her own accord and
+  missed the window once in the full run (never alone); she now chooses at once when the test moves the clock.
+- Tests: EditMode 285/286 (one skipped until crafted gear exists), PlayMode 115/116 with the one failure fixed (its fixture 6/6
+  after); five zones toured with a shot of every node; the bag UI shots 19-23 and the named-loot wardrobe 13-18 viewed.

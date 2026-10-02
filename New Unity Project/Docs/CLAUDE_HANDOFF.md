@@ -718,3 +718,13 @@ resumed with `Workflow({scriptPath, resumeFromRunId})` (finished agents replay f
   wf_99f8008d-998, characters wf_755e3e44-eb0, history PDF wf_e1fd6182-250 (its research notes are in
   `scratchpad\history`; `tools/docs` holds a partial generator, uncommitted).
 - Ask Chris before starting multi-agent runs again: tonight's used his Fable allowance and his 5-hour limit.
+- The history PDF's writer finished a DRAFT before the stop: `Docs/Crulanda-Everything-Built-So-Far.pdf` (96 pages), built by
+  `tools/docs/make_history_pdf.py` from `tools/docs/history_content.md`. It was NOT fact-checked or page-checked (the
+  checkers never ran). Committed as a draft; check it before calling it final.
+
+### NEXT SESSION, IN ORDER (cheap first; ask Chris before any multi-agent run, with a cost estimate)
+1. Read `hel\work\full-run.done` and `encounter-validation\q-PlayMode.xml` for round 7 (notes 1-3, main at 61a2e94). Fix
+   failures by hand, look at the tour shots note 1's write-up lists and `ui-captures\elite`, publish, back up.
+2. Send Chris the PDF draft and ask if he wants it checked.
+3. His notes 4-13 (PLAYTEST_NOTES.md), one at a time, by hand: 5 (ore green) is done on `fix/n56-ore-windfall` and only needs
+   merging; then whichever he picks. Worktrees under `scratchpad\wt` hold any partial work from the stopped runs.

@@ -7,7 +7,8 @@ FIXED (published; says which publish).
 ## 1. The bandit camp is way too close to the village (2026-10-01) — FIXED (published 2026-10-02 morning)
 > "one thing i notice is the bandit camp is way too close to the village. i asked before to expand the zone."
 
-**DECISION NEEDED (Chris):** the 120 m rule holds in Oakhaven only. Either **(a)** grow Khaven, the Peaks, the Ash Rim and
+**DECIDED (Chris, 2026-10-02: "yes. grow about 20%"):** the other four zones grew about 20% and their camps moved out (WORLD_ZONES.md,
+"The other four zones grown"). Before that, the 120 m rule held in Oakhaven only. Either **(a)** grow Khaven, the Peaks, the Ash Rim and
 the Verdant Shore the same way, one zone a step, or **(b)** hold the rule for open villages only (Khaven is walled and
 Sandthrone-held; the Rim's enclave fights at its door; Pilgrims' Rest and Rootfast are not villages). Until that is
 answered the every-zone part of this note is open and the note is not FIXED on publish. `ZoneGrowthTests.NearHomes` names

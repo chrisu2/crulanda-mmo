@@ -3077,5 +3077,10 @@
     { "node": "node.dewfern", "at": { "x": 25.6, "y": -66.9 } },
     { "node": "node.dewfern", "at": { "x": 23, "y": -75 } },
     { "node": "node.dewfern", "at": { "x": 26.9, "y": -82.4 } }
+  ],
+  "stations": [
+    { "kind": "forge", "name": "Alder-Knot's ember-stone", "at": { "x": -19, "y": 37 }, "rotation": 135, "variant": 2, "canonStatus": "GAME-ONLY" },
+    { "kind": "bench", "name": "Moss-Lantern's bench", "at": { "x": 11, "y": 38 }, "rotation": 225, "canonStatus": "GAME-ONLY" },
+    { "kind": "fire", "name": "Hearth-Tree fire", "at": { "x": 17, "y": 52 }, "rotation": 115, "canonStatus": "GAME-ONLY" }
   ]
 }

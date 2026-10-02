@@ -616,8 +616,10 @@ def write_zone(zid, cands, herbprop):
             if inside and line.strip().startswith('"item":') and not line.rstrip().endswith(','):
                 out[-1] = line.rstrip() + ','; out.append(line[:len(line) - len(line.lstrip())] + '"node": "%s"' % node); inside = False; done += 1
         t = '\n'.join(out); print('  %d %s props worked as nodes' % (done, name))
-    if '"nodes"' in t:   # written before: the array (always last) is written again
-        k = t.index(',\n  "nodes": ['); t = t[:k] + '\n}' + ('\n' if t.endswith('\n') else '')
+    tail = ''
+    if '"nodes"' in t:   # written before: the array is written again where it stands; what follows it (the stations) is kept
+        k = t.index(',\n  "nodes": ['); e = t.index('\n  ]', k) + len('\n  ]'); tail = t[e:]
+        t = t[:k] + '\n}' + ('\n' if t.endswith('\n') else '')
     rows = []
     for c in cands:
         parts = ['"node": "%s"' % c['node']]
@@ -627,7 +629,7 @@ def write_zone(zid, cands, herbprop):
         if c.get('under'): parts.append('"under": true')
         rows.append('    { ' + ', '.join(parts) + ' }')
     end = '\n' if t.endswith('\n') else ''; body = t.rstrip(); assert body.endswith('}'); body = body[:-1].rstrip(); assert body.endswith(']')
-    t = body + ',\n  "nodes": [\n' + ',\n'.join(rows) + '\n  ]\n}' + end
+    t = body + ',\n  "nodes": [\n' + ',\n'.join(rows) + '\n  ]' + (tail if tail else '\n}' + end)
     json.loads(t)
     open(path_, 'wb').write(t.replace('\n', nl).encode('utf-8'))
 

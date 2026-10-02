@@ -17,7 +17,8 @@ namespace Crulanda.Tests
     ///   story enemies, not camps), and Crowsfoot Hollow's mouth and every one of its camps lie 250 to 300 m from the green;
     /// - in every zone, the camps within 120 m of a home (Moss's lodge and the other zones' homes included) are the ones
     ///   named in NearHomes, each with its reason, and no others: the rule is open outside Oakhaven's village (playtest note 1);
-    /// - Oak creek runs through the village on the line it had before three points were put on its west end;
+    /// - Oak creek runs through the village on the line it had before three points were put on its west end, and the other
+    ///   zones' creeks run where they ran before those zones grew (2026-10-02);
     /// - the fields the villagers work are the ones they always worked: the new fields lie past the village's reach;
     /// - the quests' points in Oakhaven are inside it, and the deer tracks still stop at the grey;
     /// - only Oakhaven thins its grass (ZoneDefinition.wildFrom), and only past the farms.
@@ -55,8 +56,8 @@ namespace Crulanda.Tests
         }
         /// <summary>
         /// The camps that stand within 120 m of a home today, by zone file, each with why. Oakhaven's are all by Moss's lodge,
-        /// the hunter's home out in the Mastwood, never by a house of the village. The other four zones were measured and not
-        /// moved: whether to grow them or hold the rule for open villages only is Chris's choice (PLAYTEST_NOTES.md note 1).
+        /// the hunter's home out in the Mastwood, never by a house of the village. The other four zones grew about 20% and
+        /// their camps moved out (Chris, 2026-10-02; PLAYTEST_NOTES.md note 1): what is left near a home stands there by design.
         /// A camp that moves clear, or a new one that comes near, fails the test until this list says so.
         /// </summary>
         static readonly Dictionary<string, Dictionary<string, string>> NearHomes = new Dictionary<string, Dictionary<string, string>>
@@ -171,7 +172,43 @@ namespace Crulanda.Tests
             }
             Assert.Greater(rows, 80, "The creek's rows through the village.");
             Assert.Less(worst, .05f, "Oak creek's line moved " + worst.ToString("0.00") + " m at " + at + ".");
-            foreach (var file in Files) if (file != "oakhaven") foreach (var w in Zone(file).water) { Assert.AreEqual(0, w.swingFrom, file + ": " + w.name); Assert.AreEqual(0, w.swingAlong, file + ": " + w.name); }
+        }
+
+        /// <summary>The creeks the other four zones' growth lengthened (2026-10-02): the zone's size before, and how many points
+        /// were put before the creek's old first point (its ZonePath.swingFrom) and past its old last one.</summary>
+        static readonly (string file, string creek, float size, int before, int after)[] Lengthened =
+        {
+            ("khaven", "Gloom Creek", 340, 1, 1),   // 35 m on each end
+            ("verdant", "The Wending", 360, 0, 1),  // 35 m on its west end, where it runs out; its spring did not move
+        };
+
+        [Test] public void The_grown_zones_creeks_run_where_they_ran_before_they_were_lengthened()
+        {
+            // As in Oak creek's test: built as they stand, and as they were authored at the old size, without the points put on
+            // their ends and counted from their first point. The rows 20 m and more inside the old edge are compared (the old
+            // ends' corners were rounded with the new points). No other creek was lengthened.
+            foreach (var l in Lengthened)
+            {
+                var grown = Zone(l.file); var was = Zone(l.file); var creek = was.water.Single(w => w.name == l.creek);
+                Assert.AreEqual(l.before, grown.water.Single(w => w.name == l.creek).swingFrom, l.file + ": " + l.creek + " is counted from its old first point.");
+                was.size = l.size; creek.points = creek.points.Skip(l.before).Take(creek.points.Length - l.before - l.after).ToArray(); creek.swingFrom = 0; creek.swingAlong = 0;
+                var now = new ZoneWater(); now.Prepare(grown, (x, y) => 0); var then = new ZoneWater(); then.Prepare(was, (x, y) => 0);
+                Vector2[] a = now.Creeks.Single(c => c.def.name == l.creek).pts, b = then.Creeks.Single(c => c.def.name == l.creek).pts;
+                int rows = 0; float worst = 0; Vector2 at = Vector2.zero;
+                foreach (var p in a)
+                {
+                    if (Cheb(p) >= l.size / 2 - 20) continue;
+                    rows++; float d = ToPath(p, b); if (d > worst) { worst = d; at = p; }
+                }
+                Assert.Greater(rows, 60, l.file + ": " + l.creek + "'s rows inside the old edge.");
+                Assert.Less(worst, .05f, l.file + ": " + l.creek + "'s line moved " + worst.ToString("0.00") + " m at " + at + ".");
+            }
+            foreach (var file in Files)
+                foreach (var w in Zone(file).water)
+                {
+                    if (file == "oakhaven" || Lengthened.Any(l => l.file == file && l.creek == w.name && l.before > 0)) continue;
+                    Assert.AreEqual(0, w.swingFrom, file + ": " + w.name); Assert.AreEqual(0, w.swingAlong, file + ": " + w.name);
+                }
         }
 
         [Test] public void No_camp_in_Oakhaven_stands_within_120_m_of_a_house()

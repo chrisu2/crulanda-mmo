@@ -24,8 +24,8 @@ Status 2026-09-28. The game opens in **Oakhaven** (`Assets/Crulanda/Scenes/Oakha
   sentry) with movement-driven walk/idle animation. Stand-in until authored models exist.
 
 ## Zone size (grown 2026-09-30)
-- Oakhaven is 560 m across (380 m until playtest note 1; "Oakhaven grown to 560 m" below), Khaven 340 m, the Peaks, the Ash Rim
-  and the Verdant Shore 360 m each (they were 240-260 m). Chris, 2026-09-29:
+- Oakhaven is 560 m across (380 m until playtest note 1; "Oakhaven grown to 560 m" below), Khaven 410 m, the Peaks, the Ash Rim
+  and the Verdant Shore 430 m each (340 and 360 m until 2026-10-02, 240-260 m before that; "The other four zones grown" below). Chris, 2026-09-29:
   "zones do need to be bigger with more places and secrets to explore".
 - Each village core kept its coordinates. What belonged to the edge moved out with it: the exits and the arrival points into
   them, the roads to them, the creeks off the map, the Wasting's curtain (the same distance from the east edge), and the
@@ -405,9 +405,18 @@ mood. How it was made: a first draft was pre-checked by agents who ported the ge
   Southwood boars (-100, -186; the South copse's), Withy pool boars at their wallow (-174, -128), Bound wood wolves
   (-234, -36; new), Whitefoot's pack (-210, 104) and den (-222, 120), Hanger wolves (-222, 196; new, in the Hanger, the
   north-west wood, 140 m from Moss's lodge), Mastwood boars (-132, 168). Camps keep their place in the list, so mob ids are what they were; the three new ones are last.
-- **The other four zones do not keep that rule** and were not changed: they are 340 to 360 m, laid out with their camps 50 to
-  100 m from the hub, and most camps belong to a built place (PLAYTEST_NOTES.md note 1 has the measured list and the choice
-  to make).
+- **The other four zones grown** (2026-10-02; Chris: "yes. grow about 20%"): Khaven 340 to 410 m, the Peaks, the Ash Rim and
+  the Verdant Shore 360 to 430 m, made by `tools/wip/zonegrowth/grow_zone.py` (one zone a run). The edge, the exits (and the
+  neighbours' arrival points for them), the roads' ends and the creeks' ends went out 35 m; the creeks keep their line (their
+  swing is counted from their old first point). Every camp nearer than 125 m to a home moved out whole with its place (its
+  landmark, props, clearing, wood, hill, tall grass and secrets; guards and elites with it): Khaven's drowned graveyard and the
+  Grey Sexton together, the Sandthrone outriders, the picket at the Fallen Watch, the Deep Whispering Wood wolves, the Carrion
+  boars (the cliffs stay); the Peaks' Wolf pines pack and rockhide wallow; the Ash Rim's Fraying, the Weave-Eater brood and the
+  Unwoven Flats eaters; the Verdant Shore's Greying with Greyheart, the Mistmere reed-boars, Old Ninebranch on his knoll, the
+  Fallen Ghost-Oak with its spiders and the Antler Meadow with its stags. The village cores did not move. Left where they stand,
+  by design (ZoneGrowthTests.NearHomes names them): the Sandthrone's toll-gate and their captain's keep on the Peaks, the
+  Cinderfold hollows by the Ash Rim's empty hunters' hide, and the Briar Way at the Root-Mother's Deep's door. Gathering nodes
+  that stood by a moved place moved with it (place_nodes.py).
 
 | Zone | Camps (level) |
 |---|---|

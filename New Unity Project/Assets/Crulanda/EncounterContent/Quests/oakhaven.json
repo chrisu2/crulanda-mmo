@@ -443,8 +443,8 @@
       "zone": "zone.oakhaven",
       "level": 1,
       "canonStatus": "GAME-ONLY",
-      "summary": "Follow the deer tracks east toward the grey, then check the grey-edge copse.",
-      "offer": "\"You've good eyes? Then use them for me. There's a line of deer tracks heading east, toward the grey. They don't come back.\"\n\n\"Follow them as far as you dare, then look at the copse by the grey's edge south of the east road. Tell me what you see. Don't touch anything grey.\"",
+      "summary": "Follow the deer tracks east toward the grey, then check the Moonbell copse on the way home.",
+      "offer": "\"You've good eyes? Then use them for me. There's a line of deer tracks heading east, toward the grey. They don't come back.\"\n\n\"Follow them as far as you dare, then on your way back look into the Moonbell copse, south of the east road near the village. Tell me what you see. Don't touch anything grey.\"",
       "complete": "Garet listens without blinking. \"Stopped mid-stride. Grey at the roots.\" He spits. \"It's not creeping. Creeping is slow. This is... deliberate. Like something is drawing a line.\"",
       "steps": [
         {
@@ -463,7 +463,7 @@
           ]
         },
         {
-          "text": "Look over the grey-edge copse.",
+          "text": "Look over the Moonbell copse.",
           "objectives": [
             {
               "type": "visit",
@@ -472,7 +472,7 @@
                 "y": -18
               },
               "radius": 9,
-              "text": "Check the grey-edge copse",
+              "text": "Check the Moonbell copse",
               "say": "Inside the copse the grass is grey at the roots, and the birdsong stops at the treeline."
             }
           ]

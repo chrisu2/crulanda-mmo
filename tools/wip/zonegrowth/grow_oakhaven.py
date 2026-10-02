@@ -66,6 +66,9 @@ r = find(roads, 'Hollin lane'); r['points'] = pts(205, -135, 208, -110, 210, -88
 r = find(roads, 'Ridge path'); r['name'] = 'Overlook path'
 r = find(roads, 'Crowsfoot track'); r['points'] = pts(-32, 184, -50, 188, -70, 187, -92, 191, -112, 199, -128, 211, -128, 227, -123.5, 232, -121.5, 240)
 w = z['water'][0]; assert w['points'][0] == P(-190, -66) and w['points'][-1] == P(190, -19)
+# The creek's swing is counted from its old west end (ZonePath.swingFrom: the fourth point once three are put before it), so
+# its line through the village is the one it had. swingAlong: the old first point was clamped 1 m inside the 380 m edge.
+w['swingFrom'] = 3; w['swingAlong'] = -0.88
 w['points'] = pts(-280, -72, -248, -66, -218, -61) + w['points'] + pts(220, -21, 250, -18, 280, -17)
 
 # ---- Crowsfoot Hollow, whole: the cave, its scarps and boulders, its camps, its key and strongbox, the ridge over it
@@ -120,6 +123,9 @@ for kind, x, y in (('grave', -161, 19.5), ('rock', -163.5, 21.5), ('signpost', -
     p = prop_at(kind, x, y); p['at'] = E(p['at'], -90)
 l = find(lm, 'The Bound Stone'); l['at'] = E(l['at'], -90)
 find(z['groves'], 'Bound copse')['name'] = 'Downs copse'
+# The copse south of the east road stays by the village; the grey's edge is 190 m east of it now, so it is named for its bells.
+find(z['groves'], 'Grey-edge copse')['name'] = 'Moonbell copse'
+s = find(z['secrets'], 'secret.oakhaven.moonbells', 'id'); assert ', this close to the grey.' in s['text']; s['text'] = s['text'].replace(', this close to the grey.', '.')
 
 # ---- wolf and boar country: every camp 125 m and more from every house (the farms and fields lie inside that)
 def camp(name, x, y, newname=None):
@@ -135,7 +141,8 @@ camp("Whitefoot's den", -222, 120); camp("Whitefoot's pack", -210, 104)
 camp('Withy pool boars', -174, -128)
 camp('Hollin farm wolves', 205, -40)
 def wild(name, mob, tag, x, y, radius, count, lo, hi): return {'name': name, 'mob': mob, 'tag': tag, 'look': tag, 'canonStatus': 'GAME-ONLY', 'center': P(x, y), 'radius': radius, 'count': count, 'levelMin': lo, 'levelMax': hi, 'respawn': 75}
-camps += [wild('Hazel bank wolves', 'Grey wolf', 'wolf', -72, 172, 7, 3, 2, 2),
+# (The third wolf camp lies up in the Hanger, 140 m from Moss's lodge: a hunter's lodge is a home too.)
+camps += [wild('Hanger wolves', 'Grey wolf', 'wolf', -222, 196, 7, 3, 2, 2),
           wild('Sallow Bottom boars', 'Wild boar', 'boar', 160, -214, 8, 4, 2, 2),
           wild('Bound wood wolves', 'Grey wolf', 'wolf', -234, -36, 8, 4, 1, 2)]
 l = find(lm, 'The tall grass'); l['at'] = P(-6, -214)
@@ -177,6 +184,9 @@ shapes += [
     # Foothills either end of the ridge, so the north reads as hill country and the mouth lies in a fold between two hills.
     {'name': 'Crowsfoot Ridge, west knee', 'center': P(-162, 258), 'radius': 8, 'height': 7, 'blend': 28},
     {'name': 'North downs', 'center': P(62, 262), 'radius': 8, 'height': 6, 'blend': 30},
+    # Two rises west and south-west of the mouth: from the Mastwood, the Old Fold and the West road the land stands over it.
+    {'name': 'Crowsfoot Ridge, west spur', 'center': P(-150, 214), 'radius': 8, 'height': 7, 'blend': 14},
+    {'name': 'Crowsfoot Ridge, heel rise', 'center': P(-128, 190), 'radius': 5, 'height': 5, 'blend': 10},
 ]
 new_props = [
     # Carder's field barn on the North road, the last roof before the wild: the deserters had it three nights running.

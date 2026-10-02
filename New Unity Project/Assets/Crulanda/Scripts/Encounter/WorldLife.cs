@@ -494,9 +494,12 @@ namespace Crulanda.Encounter
                 if (g.kind == "orchard") continue;
                 for (int i = 0; i < 6; i++) AddPlace("woods", g.center + new Vector2((R01 - .5f) * g.size.x * .8f, (R01 - .5f) * g.size.y * .8f));
             }
+            // A zone with outer wild country (wildFrom) looks no further than the villagers go: AddPlace drops what lies past
+            // VillageReach, and a ring out to a far edge would leave the list short. Other zones draw as they always did.
+            float outer = z.wildFrom > 0 ? Mathf.Min(z.size / 2 - 18, VillageReach) : z.size / 2 - 18;
             for (int i = 0; i < 40 && Places["meadow"].Count < 14; i++)
             {
-                float a = R01 * Mathf.PI * 2, r = Mathf.Lerp(z.flatRadius + 6, z.size / 2 - 18, R01);
+                float a = R01 * Mathf.PI * 2, r = Mathf.Lerp(z.flatRadius + 6, outer, R01);
                 var p = new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * r;
                 if (z.wasting != null && p.x > z.wasting.x - 20) continue;
                 AddPlace("meadow", p);

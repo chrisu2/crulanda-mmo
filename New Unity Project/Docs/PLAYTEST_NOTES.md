@@ -7,6 +7,12 @@ which publish).
 ## 1. The bandit camp is way too close to the village (2026-10-01) — BUILT (branch `fix/n1-oakhaven-grows`; compile-checked, not run, not toured, not published)
 > "one thing i notice is the bandit camp is way too close to the village. i asked before to expand the zone."
 
+**DECISION NEEDED (Chris):** the 120 m rule holds in Oakhaven only. Either **(a)** grow Khaven, the Peaks, the Ash Rim and
+the Verdant Shore the same way, one zone a step, or **(b)** hold the rule for open villages only (Khaven is walled and
+Sandthrone-held; the Rim's enclave fights at its door; Pilgrims' Rest and Rootfast are not villages). Until that is
+answered the every-zone part of this note is open and the note is not FIXED on publish. `ZoneGrowthTests.NearHomes` names
+every camp that breaks the rule today (20 in the four other zones), so nothing new can creep in meanwhile.
+
 Measured in `oakhaven.json` (the village green is at about (-8, -8)):
 - The first Sandthrone deserters stand at (-16, 84.5): 93 m north of the green and only about 25 m past the Woodyard
   (-24, 60). Crowsfoot Hollow's mouth is at (-16, 93), 100 m out. That is a 15-20 second walk from the Great Oak.
@@ -29,11 +35,17 @@ hostile within about 120 m of a village's houses) in every zone.
   its end at (-32, 184) and the Crowsfoot track west along the ridge's foot and round its heel. The ridge hides the mouth
   from the green, from the road and from the track until its last bend.
 - Between: Carder's field barn and the north fields, then the wolf and boar woods, then the hills. Every camp in Oakhaven
-  stands 125 m and more from every house (a house, the inn, the mill); all ten outdoor camps moved, and three were added.
+  stands 125 m and more from every house of the village (a house, the inn, the mill); all ten outdoor camps moved, and three
+  were added.
+- After review: the third new wolf camp stood 36 m from Moss's lodge (a home: Garet sleeps there). It is the **Hanger
+  wolves** now, at (-222, 196) in the north-west wood, 140 m from the lodge. Two low rises west of the mouth hide it from
+  the Mastwood, the Old Fold and the West road as well. Oak creek keeps the line it had through the village (its swing is
+  counted from its old west end). The copse by the village is the **Moonbell copse**, and Garet's quest sends you to it on
+  the way home. The villagers' meadow places are looked for within their reach, so all fourteen are found.
 - Six new places, ten woods, three secrets; the nodes re-placed by the placement script (the hollow's nine seams went with it).
 
 **What the lead must run and look at** (nothing below has been run):
-- EditMode: `ZoneGrowthTests` (new), and the data tests that read Oakhaven (`WorkshopDataTests`, `HouseholdDataTests`,
+- EditMode: `ZoneGrowthTests` (new; it also holds the every-zone list of camps near homes and the creek's line), and the data tests that read Oakhaven (`WorkshopDataTests`, `HouseholdDataTests`,
   `ProfessionDataTests`, `VillageEconomyTests`, `LootRollTests`, `QuestDataTests`).
 - PlayMode: `CaveTests` (one new test), `HollowQuestTests`, `ZoneContentTests`, `SecretPlacementTests`, `NodePlacementTests`,
   `NodeStreamTests`, `VillageStreamTests`, `WaterTests`, `ZoneExitTests`, `ZoneTravelTests`, `TempSaveTravelTests`, `HuntTests`,
@@ -44,6 +56,11 @@ hostile within about 120 m of a village's houses) in every zone.
 - The build log's "Zone zone.oakhaven (560 m) built in N ms (...)": the estimate is about 13 s in the editor and 11 s in the
   player (7.6 and 6.4 at 380 m). If it is much over, the ground paint's cap (4096, `BuildGround`) and `wildDensity` are the
   two knobs.
+- Frame time, on the green and at the hollow's mouth, against the 380 m build. The ground is one shadow-casting mesh that
+  is never culled: 401,000 triangles (was 185,000), drawn about six times a frame (four shadow cascades, the depth texture,
+  the main pass), so about 2.4 M triangles a frame against 1.1 M. Unmeasured; if it costs, WORLD_ZONES.md ("Load and frame
+  cost") says how to cut the ground into renderers that cull. No code was changed for it.
+- `WorldLife` in Oakhaven: `Places["meadow"]` should hold 14 (log it, or watch Lisbet's dawn round).
 - The world tour (`--crulanda-world-capture`), Oakhaven (file names start `oakhaven-`): `19-crowsfoot-hollow` (the mouth from
   the track's last bend: a slot in a cliff, scarps either side, the brow over it, nothing floating or cut), `20-crowsfoot-ridge` (the ridge from the North
   road's end: a line of hills, no mouth to be seen, the Ridge pines on its face), `85-hollow-camp`, `88-hollow-drop`,
@@ -53,6 +70,10 @@ hostile within about 120 m of a village's houses) in every zone.
   `87-secret-...`; `18-the-tall-grass`, `99-ambush-before` and `99-ambush-sprung` (the stalkers' new patch by the South road);
   every `80-node-NN` of the hollow's seams; and from the green, north: how the hills read on the skyline at 270 m through
   the fog (fog ends at 330 m), and east: how the Wasting's curtain reads from the village now it stands at 254 m, not 164.
+- Stand in the Mastwood (-130, 170), at the Crow oak (-152, 200) and at the Old Fold (-156, 64) and look to the mouth
+  (north-east): two low rises (the west spur, the heel rise; 5 and 7 m, sides of about 37 degrees at their steepest) should
+  hide the scarps and the hole and read as part of the ridge, not as two lumps. Then Oak creek through the village: the
+  mill, both bridges, the rock at (12, -52) and the crates at (-64, -55) should sit by the water as in the last build.
 - Walk it: green to the mouth by the road and the track (about 330 m on foot); the level-1 start, where the first wolves are
   now about 180 m from the green (Upper pines) and the tall grass is 110 m south of the start, not beside it.
 
@@ -60,7 +81,7 @@ hostile within about 120 m of a village's houses) in every zone.
 - The Wasting's curtain moved out with the edge, as the plan said and the last growth did. It is 90 m further from the
   village. If it should stay the presence it was, it can stand anywhere west of the edge (`wasting.x`): the ground behind
   it is flat unmade, and what stands by the grey would move back with it.
-- "No hostile camp within about 120 m of a village's houses" holds in Oakhaven only. Measured in the other four zones
+- (The decision at the top of this note.) "No hostile camp within about 120 m of a village's houses" holds in Oakhaven only. Measured in the other four zones
   (`tools/wip/zonegrowth/rule120.py`; nearest house, inn or shelter, in metres): Khaven: Whispering Wood wolves 80, Carrion
   boars 81, the outriders' camp 73, Gloom Creek hollows 73, the Grey Sexton 83, the picket 116. The Peaks (no village; from
   Pilgrims' Rest): Wolf pines 74, Rockhide wallow 94; the toll-gate guards and the eyrie stand at the Sandthrone's own
@@ -74,9 +95,20 @@ hostile within about 120 m of a village's houses) in every zone.
 - Every wolf and boar camp of Oakhaven moved, not only the bandits: the rule puts level-1 beasts 125 m from the nearest
   house, so the first kill is a longer walk than it was. If that is too far for the first minutes, the rule could spare
   beasts and hold for the deserters alone.
-- Left where they were, though their words speak of the grey: the Grey-edge copse and its Moonbells (62, -18), the second
-  point of Garet's deer-track quest there, and the Old wayshrine (86, 20). They were 100 m and 78 m from the curtain after the
-  last growth and are 190 m and 168 m from it now. They are the village's near quests; moving them out is a choice, not a fix.
+- **Moss's lodge is a home outside the village, and the rule does not hold for it.** It stands at (-93, 143) in the
+  Mastwood and could not move in this step (a household's door; the village tests name it). The Mastwood boars are 46 m
+  from it by intent (the hunter lives among his game; 41 m before the growth). Crowsfoot Hollow's mouth is 102 m from it
+  as the crow flies, with the ridge's heel between and the mouth out of its sight (the old mouth was 92 m from it), and
+  the cave's camps lie under the ridge 94 to 110 m off. The tests name these and allow no others. If the lodge should be
+  as safe as a village house, the lodge has to move south (about 30 m), which moves Garet's home, yard and game rack.
+- Left where they were: the copse south of the east road and its Moonbells (62, -18), the second point of Garet's
+  deer-track quest there, and the Old wayshrine (86, 20). The copse was 100 m from the curtain after the last growth and is
+  190 m from it now, so its name and the quest's words were changed, not its place: it is the Moonbell copse, and Garet
+  says "on your way back look into the Moonbell copse". The quest still walks out 240 m to the grey and back. The other
+  way (move the copse, its secret, its windfall and the quest's point out to about (212, 18)) takes a level-1 quest spot
+  150 m further from the village; that is Chris's choice.
+- The two rises added west of the mouth change heights there, so the scatter and grove trees round them re-roll once more
+  (the same stream, the same unpublished growth).
 - Saves: no format change. A character saved in Oakhaven stands where it stood (one saved down the old cave stands on the
   meadow by the North road now). Mob ids, secret ids and quest progress are unchanged; resting nodes that moved are full again.
 - `tools/wip/professions/place_nodes.py` was edited (the plan named it) and `tools/wip/zonegrowth` added, in a tree the step

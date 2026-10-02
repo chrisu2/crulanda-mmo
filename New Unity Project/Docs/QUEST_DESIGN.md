@@ -278,7 +278,7 @@ All four are offered together (a bag already worn or carried leaves its quest of
 her outright. Where the leathers come from (WORLD_ZONES.md, Hunting):
 - Wolves for the wallet: the Upper pines (44,168) and Thornshaw (92,194) camps up the North road, levels 1-2, pelt chance
   0.7 (they were the Harrow wood's and the North pines' until every camp moved 120 m and more from the houses, playtest note 1);
-  the Hazel bank, the Bound wood, Hollin farm and Whitefoot's pack give pelts too.
+  the Hanger, the Bound wood, Hollin farm and Whitefoot's pack give pelts too.
 - Hill deer for the sling: game, west of the Old Orchard (-96,88), by the North pines (30,98), in the Upper pines (40,152), under
   Crowsfoot Ridge (4,206), in the Mastwood (-146,150), by the Hanger (-206,176), by Withy pool (-176,-110) and by the Ashward
   pines (96,-232). A deer always gives its hide; sneak (Ctrl) to get close.

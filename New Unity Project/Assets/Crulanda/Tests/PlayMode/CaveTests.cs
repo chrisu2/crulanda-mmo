@@ -143,7 +143,8 @@ namespace Crulanda.Tests
         {
             // Playtest note 1: the mouth stood 100 m from the green, 25 m past the Woodyard. It is 250 to 300 m out now, inside the
             // zone's edge all the way down, and turned from the village: from the green, from the North road's end and from the
-            // first of the Crowsfoot track the hill stands between you and it. You see it from the track's last bend.
+            // first of the Crowsfoot track the hill stands between you and it, and from the country west of it two lower rises
+            // do. You see it from the track's last bend.
             var h = Crowsfoot; var zone = ZoneBuilder.Active; var z = zone.Zone;
             var mouth = new Vector2(h.Centre[0].x, h.Centre[0].z); var green = z.spawns.recovery;
             Assert.That(Vector2.Distance(mouth, green), Is.InRange(250f, 300f), "The mouth, from the green.");
@@ -163,6 +164,11 @@ namespace Crulanda.Tests
             Assert.Greater(Hidden(green), 3, "From the green the hill hides the mouth.");
             Assert.Greater(Hidden(north.points[north.points.Length - 1]), 3, "From the North road's end the hill hides the mouth.");
             Assert.Greater(Hidden(track.points[1]), 3, "From the first of the track the hill hides the mouth.");
+            // From the west and south-west two lower rises do it (the ridge's west spur and heel rise): the boar wood, the fold, the road.
+            Assert.Greater(Hidden(new Vector2(-130, 170)), 1.5f, "From the Mastwood the heel hides the mouth.");
+            Assert.Greater(Hidden(new Vector2(-132, 168)), 1.5f, "From the Mastwood boars' ground the heel hides the mouth.");
+            Assert.Greater(Hidden(new Vector2(-156, 64)), 1.5f, "From the Old Fold the spur hides the mouth.");
+            Assert.Greater(Hidden(new Vector2(-150, 16)), 1.5f, "From the West road the spur hides the mouth.");
             Assert.Less(Hidden(track.points[track.points.Length - 3]), 1, "From the track's last bend you see it.");
             yield return null;
         }

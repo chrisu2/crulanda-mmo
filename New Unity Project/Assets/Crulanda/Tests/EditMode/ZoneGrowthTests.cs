@@ -13,8 +13,11 @@ namespace Crulanda.Tests
     /// - the zone is 560 m, and what belongs to its edge stands at the edge: the exits on their roads, the arrivals from Khaven
     ///   and the Ashland Rim just inside them, the Wasting's curtain 26 m inside the east edge, Oak creek running off both sides;
     /// - nothing is placed past the edge or in the unmade;
-    /// - no camp stands within 120 m of a house (a house, the inn or the mill; the Concord collectors are story enemies, not
-    ///   camps), and Crowsfoot Hollow's mouth and every one of its camps lie 250 to 300 m from the green;
+    /// - no camp stands within 120 m of a house of the village (a house, the inn or the mill; the Concord collectors are
+    ///   story enemies, not camps), and Crowsfoot Hollow's mouth and every one of its camps lie 250 to 300 m from the green;
+    /// - in every zone, the camps within 120 m of a home (Moss's lodge and the other zones' homes included) are the ones
+    ///   named in NearHomes, each with its reason, and no others: the rule is open outside Oakhaven's village (playtest note 1);
+    /// - Oak creek runs through the village on the line it had before three points were put on its west end;
     /// - the fields the villagers work are the ones they always worked: the new fields lie past the village's reach;
     /// - the quests' points in Oakhaven are inside it, and the deer tracks still stop at the grey;
     /// - only Oakhaven thins its grass (ZoneDefinition.wildFrom), and only past the farms.
@@ -37,8 +40,50 @@ namespace Crulanda.Tests
             }
             return best;
         }
-        /// <summary>The village's houses: where people live (a house, the inn, the mill). Barns, a hunter's lodge and ruins are not.</summary>
+        /// <summary>The village's houses: a house, the inn, the mill. Barns and ruins are not, and Moss's lodge (a barn out in the
+        /// Mastwood) is a home but not of the village: Homes counts it.</summary>
         static List<ZoneProp> Houses(ZoneDefinition z) { return z.props.Where(p => p != null && (p.kind == "house" || p.kind == "inn" || p.kind == "mill")).ToList(); }
+        /// <summary>Buildings of a home's kind that are the enemy's own: the Sandthrone's toll-house in the Peaks.</summary>
+        static readonly string[] EnemyBuildings = { "Toll-house" };
+        /// <summary>Where people live, in any zone: a house, an inn, a mill, a treehouse, a shelter, and whatever a household
+        /// names as its house (Moss's lodge is a barn). As tools/wip/zonegrowth/rule120.py counts them, less the enemy's own.</summary>
+        static List<ZoneProp> Homes(ZoneDefinition z)
+        {
+            var named = new HashSet<string>(z.life.households.Where(h => h != null && !string.IsNullOrEmpty(h.house)).Select(h => h.house));
+            return z.props.Where(p => p != null && System.Array.IndexOf(EnemyBuildings, p.name) < 0
+                && (p.kind == "house" || p.kind == "inn" || p.kind == "mill" || p.kind == "treehouse" || p.kind == "shelter" || (!string.IsNullOrEmpty(p.name) && named.Contains(p.name)))).ToList();
+        }
+        /// <summary>
+        /// The camps that stand within 120 m of a home today, by zone file, each with why. Oakhaven's are all by Moss's lodge,
+        /// the hunter's home out in the Mastwood, never by a house of the village. The other four zones were measured and not
+        /// moved: whether to grow them or hold the rule for open villages only is Chris's choice (PLAYTEST_NOTES.md note 1).
+        /// A camp that moves clear, or a new one that comes near, fails the test until this list says so.
+        /// </summary>
+        static readonly Dictionary<string, Dictionary<string, string>> NearHomes = new Dictionary<string, Dictionary<string, string>>
+        {
+            { "oakhaven", new Dictionary<string, string> {
+                { "Mastwood boars", "the hunter lives among his game: the lodge stands in the boar wood by design (46 m)" },
+                { "Hollow lookouts", "the lodge is 102 m from the mouth as the crow flies, the ridge's heel between (it was 92 m from the old mouth)" },
+                { "Deserters' camp", "down the cave, under the ridge" }, { "Drop sentries", "down the cave, under the ridge" },
+                { "Store Caves", "down the cave, under the ridge" }, { "The Quartermaster's desk", "down the cave, under the ridge" },
+                { "Deep Stair watch", "down the cave, under the ridge" }, { "King's guard", "down the cave, under the ridge" },
+                { "Caddock's hall", "down the cave, under the ridge" } } },
+            { "khaven", new Dictionary<string, string> {
+                { "Whispering Wood wolves", "open: the wood is a built place 80 m from the inn" }, { "Carrion boars", "open: under the Carrion Cliffs, 81 m" },
+                { "Sandthrone outrider camp", "open: Khaven is walled and Sandthrone-held; their camp is 73 m from its houses" },
+                { "Gloom Creek hollows", "open: the creek's hollows, 73 m" }, { "The Grey Sexton", "open: the drowned graveyard, 83 m" },
+                { "Sandthrone picket", "open: 116 m" } } },
+            { "peaks", new Dictionary<string, string> {
+                { "Toll-gate guards", "open: the Sandthrone's toll-gate, 70 m from Pilgrims' Rest (no village here)" }, { "Wolf pines pack", "open: 74 m from Pilgrims' Rest" },
+                { "Rockhide wallow", "open: 94 m from Pilgrims' Rest" }, { "Captain's eyrie", "open: the Sandthrone's own keep, 117 m from Pilgrims' Rest" } } },
+            { "ashrim", new Dictionary<string, string> {
+                { "Fraying eaters", "open: the enclave fights the Weave-Eaters at its door, 50 m" }, { "The Weave-Eater brood", "open: 77 m" },
+                { "Unwoven Flats eaters", "open: 85 m" }, { "Cinderfold hollows", "open: 91 m from the hunters' hide" } } },
+            { "verdant", new Dictionary<string, string> {
+                { "Antler Meadow stags", "open: the meadow is 43 m from the Guest-Tree" }, { "Fallen Ghost-Oak spiders", "open: 72 m" },
+                { "The Briar Way", "open: 95 m" }, { "Old Ninebranch", "open: 98 m" }, { "Mistmere reed-boars", "open: 102 m from the scout's lean-to" },
+                { "The Greying", "open: 106 m" } } },
+        };
         /// <summary>The cave's own camps: the deserters, their quartermaster and their king.</summary>
         static bool OfTheHollow(ZoneCamp c) { return c.tag == "deserter" || c.tag == "quartermaster" || c.tag == "banditking"; }
 
@@ -95,8 +140,50 @@ namespace Crulanda.Tests
             Assert.IsEmpty(problems, string.Join("\n", problems));
         }
 
+        [Test] public void The_camps_within_120_m_of_a_home_are_the_ones_named_in_every_zone()
+        {
+            var problems = new List<string>();
+            foreach (var file in Files)
+            {
+                var z = Zone(file); var homes = Homes(z); var known = NearHomes[file]; var near = new HashSet<string>();
+                Assert.IsNotEmpty(homes, file + " has homes to measure from.");
+                if (file == "oakhaven") Assert.AreEqual(17, homes.Count, "The village's sixteen and Moss's lodge.");
+                foreach (var c in z.camps)
+                {
+                    var h = homes.OrderBy(x => Vector2.Distance(c.center, x.at)).First(); float d = Vector2.Distance(c.center, h.at);
+                    if (d >= 120) continue;
+                    near.Add(c.name);
+                    if (!known.ContainsKey(c.name)) problems.Add(file + ": '" + c.name + "' at " + c.center + " is " + d.ToString("0") + " m from " + h.name + " and is not named in NearHomes");
+                    else if (file == "oakhaven") Assert.AreEqual("Moss's lodge", h.name, "'" + c.name + "' is named for the lodge alone.");
+                }
+                foreach (var name in known.Keys) if (!near.Contains(name)) problems.Add(file + ": '" + name + "' is named in NearHomes and is gone or no longer within 120 m of a home: take it off the list");
+            }
+            Assert.IsEmpty(problems, string.Join("\n", problems));
+        }
+
+        [Test] public void Oak_creek_runs_through_the_village_where_it_ran_before_it_was_lengthened()
+        {
+            // The swing is counted from the creek's old west end (ZonePath.swingFrom, swingAlong), so the three points put before
+            // it leave the line through the village alone. Built as it stands, and as it was authored at 380 m: without those three
+            // points or the ones past the old east end, counted from its first point. The land's height plays no part in the line.
+            var grown = Zone("oakhaven"); var was = Zone("oakhaven"); var creek = was.water.Single();
+            Assert.AreEqual(3, grown.water.Single().swingFrom, "Counted from the old first point,"); Assert.AreEqual(new Vector2(-190, -66), creek.points[3], "which is (-190, -66).");
+            was.size = 380; creek.points = creek.points.Skip(3).Where(p => Mathf.Abs(p.x) <= 190).ToArray(); creek.swingFrom = 0; creek.swingAlong = 0;
+            var now = new ZoneWater(); now.Prepare(grown, (x, y) => 0); var then = new ZoneWater(); then.Prepare(was, (x, y) => 0);
+            Vector2[] a = now.Creeks.Single().pts, b = then.Creeks.Single().pts; int rows = 0; float worst = 0; Vector2 at = Vector2.zero;
+            foreach (var p in a)
+            {
+                if (Mathf.Abs(p.x) >= 150) continue;
+                rows++; float d = ToPath(p, b); if (d > worst) { worst = d; at = p; }
+            }
+            Assert.Greater(rows, 80, "The creek's rows through the village.");
+            Assert.Less(worst, .05f, "Oak creek's line moved " + worst.ToString("0.00") + " m at " + at + ".");
+            foreach (var file in Files) if (file != "oakhaven") foreach (var w in Zone(file).water) { Assert.AreEqual(0, w.swingFrom, file + ": " + w.name); Assert.AreEqual(0, w.swingAlong, file + ": " + w.name); }
+        }
+
         [Test] public void No_camp_in_Oakhaven_stands_within_120_m_of_a_house()
         {
+            // The village's own houses, with no exception. (Moss's lodge, out in the Mastwood, is the test above's.)
             var z = Zone("oakhaven"); var houses = Houses(z); var problems = new List<string>();
             Assert.AreEqual(16, houses.Count, "Fourteen houses, the Golden Cask and the mill.");
             foreach (var c in z.camps)
@@ -162,7 +249,7 @@ namespace Crulanda.Tests
                             if (q.id == "npc.garet.tracks" && o.at.x > z.wasting.x - 40) tracks = true;
                         }
             }
-            Assert.GreaterOrEqual(visits, 2, "The deer tracks and the grey-edge copse, at least.");
+            Assert.GreaterOrEqual(visits, 2, "The deer tracks and the Moonbell copse, at least.");
             Assert.IsTrue(tracks, "Garet's deer tracks are followed to within sight of the grey.");
         }
 

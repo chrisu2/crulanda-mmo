@@ -56,14 +56,20 @@ note 1 says what the lead must run).
   26 m inside the east edge as before). What stood by the grey stays by it, 90 m further east: the Wasting's landmark, the
   Road's End, the Grey wood and the deer-track quest's point, Hollin farm with its fields, orchard, lane, wolves and letter,
   the Greying oaks, the Hallow's Creek milestone. The Bound Stone stands at the new west bound (-251, 19.5). The Watchtower,
-  the Old wayshrine and the Grey-edge copse stay where they were.
+  the Old wayshrine and the copse south of the east road stay where they were; the copse is 190 m from the grey now, so it
+  is the **Moonbell copse** (it was the Grey-edge copse), and Garet's deer-track quest sends you to it "on the way home".
 - **Crowsfoot Hollow, whole** (see "Caves you walk into"): turned a quarter and set down with its mouth at (-120, 240), 272 m
   from the green.
 - **The country between, in rings:** the farms and fields nearest (the old ones, and north of them Carder's field barn and
   two fields on the North road, which now runs on to (-32, 184)); then wolf and boar country, a ring of woods and rough grass
-  from about 130 m to 250 m out; then the hills along the north edge. **No camp stands within 120 m of a house** (a house,
-  the inn or the mill; `ZoneGrowthTests`): every wolf and boar camp moved out into the ring, and three were added (table
-  under "Level ladder and camps"). The Concord collectors in the village are story enemies and stay.
+  from about 130 m to 250 m out; then the hills along the north edge. **No camp stands within 120 m of a house of the
+  village** (a house, the inn or the mill; `ZoneGrowthTests`): every wolf and boar camp moved out into the ring, and three
+  were added (table under "Level ladder and camps"). The Concord collectors in the village are story enemies and stay.
+  **Moss's lodge** (-93, 143) is a home too (Garet Moss sleeps there), but it is the hunter's, out in the Mastwood and not
+  of the village. By it stand, by name and no others (`ZoneGrowthTests.NearHomes`): the Mastwood boars, 46 m off (he lives
+  among his game; they were 41 m off before the growth), and Crowsfoot Hollow, whose mouth is 102 m from the lodge as the
+  crow flies with the ridge's heel between (the old mouth was 92 m from it) and whose camps lie under the ridge 94 to
+  110 m off. No wolf camp is within 120 m of the lodge.
 - **New ground** (GAME-ONLY, canonStatus on each): **Carder's field barn** (the last roof on the North road; the deserters
   had it three nights running), **Thornshaw** (the north-east wolf wood), **the Carter's Rest** on the West road (an
   oak, a wayside shrine, room to turn a wain), **Lark Hill** in the south-west (a bare down with a ring of stones), **Sallow
@@ -71,12 +77,18 @@ note 1 says what the lead must run).
   the Ridge pines on the ridge's south face, Hill pines, the Pale wood by the grey, Alder holt, the Sallows, Ashward
   pines, the Bound wood, Lark hill thorns, the Hanger), three fields, three patches of tall grass, seven critter groups,
   three secrets (below, "Secrets"), loose rocks and lone trees. Three hill shapes beside the moved ridge (an east shoulder, a
-  west knee and the North downs, 6 to 8.5 m) make the north read as hill country, and put the mouth in a fold between two hills. The hill the Overlook stands on stays where it was, a hill of
+  west knee and the North downs, 6 to 8.5 m) make the north read as hill country, and put the mouth in a fold between two hills.
+  Two lower rises west and south-west of the mouth (the **west spur** at (-150, 214), 7 m, and the **heel rise** at
+  (-128, 190), 5 m) stand between it and the Mastwood, the Old Fold and the West road. The hill the Overlook stands on stays where it was, a hill of
   its own now the ridge has gone from behind it; two loose rocks that lay on the old ridge went with it.
 - **The streams:** the zone's layout is still one random stream, and a bigger zone legitimately re-rolls it, as the last growth
-  did: grove trees, the forest edge, scatter and grass fall anew, the creek's swing re-phases along its whole length (it is
-  measured from the creek's west end, which moved), and the village's own stream (where people potter on the meadows, the
-  woods they cut in: the Crowsfoot thicket is no longer one of them) shifts. Props keep their list order, so the village's
+  did: grove trees, the forest edge, scatter and grass fall anew, and the village's own stream (where people potter on the
+  meadows, the woods they cut in: the Crowsfoot thicket is no longer one of them) shifts. **Oak creek does not move through
+  the village:** its swing was counted from its first point, which went 90 m west, so the creek now names its old west end
+  (`ZonePath.swingFrom` 3, `swingAlong` -0.88; `ZoneWater.Meander`) and its line from x = -150 to 150 is the one it had (the
+  model puts it within a centimetre; `ZoneGrowthTests.Oak_creek_runs_through_the_village_where_it_ran_before_it_was_lengthened`).
+  The villagers' meadow places are looked for no further out than they go (`WorldLife.FindPlaces`, 125 m in a zone with
+  `wildFrom`), so the bigger zone still finds all fourteen. Props keep their list order, so the village's
   buildings take the draws they took. The cave's own stream is keyed on where the cave stands, so its furnishings and knoll
   re-roll too.
 - **Load and frame cost** (estimates; nothing was run). The last logged editor builds of the 380 m zone were 7.5 to 8.9 s
@@ -89,15 +101,27 @@ note 1 says what the lead must run).
     1.8 times the paint time and 29 MB more texture; drop the cap back to 3072 in `BuildGround` if the load matters more.
   - Estimate: ground about 5 s, grass about 4.6 s, groves about 1.4 s (some 700 grove trees, were 447), edge 0.6 s, the
     rest 1.2 s: **about 13 s in the editor, about 11 s in the player** (was 7.6 and 6.4). The navmesh (built after, not in
-    that log line) covers 2.17 times the ground. Per frame: grass is drawn within 70 m of the camera as before; the ground is
-    one mesh of 401,000 triangles (was 185,000); trees and props are static batches, more of them in a long view.
+    that log line) covers 2.17 times the ground. Per frame: grass is drawn within 70 m of the camera as before; trees and
+    props are static batches, more of them in a long view.
+  - **The ground is the one per-frame cost that grew with the whole area.** It is one mesh of 401,000 triangles (was
+    185,000) in one shadow-casting renderer whose bounds are the whole zone, so it is never culled: it is drawn about six
+    times a frame (four shadow cascades, the camera's depth texture, the main pass), about 2.4 M triangles a frame against
+    1.1 M at 380 m, wherever you stand, the cave included. Unmeasured. The supervised run should compare frame time on the
+    green and at the hollow's mouth with the 380 m build. Only if that shows a cost: keep `GroundMesh`, its collider and the
+    navmesh source as they are, turn that one renderer off (leave its material on it: `ZoneContentTests` reads it) and draw
+    the same vertex grid as about 8 by 8 child renderers sharing `GroundMaterial`, which the frustum and the cascades can
+    cull. Do not turn the ground's shadows off: the ridge and the brow would stop shading the land. It draws nothing from
+    the zone's stream.
 - **How it was checked without Unity:** `tools/wip/zonegrowth/grow_oakhaven.py` made the data (and makes it again, byte for
   byte), `tools/wip/professions/place_nodes.py oakhaven` checks and writes the nodes, `tools/wip/zonegrowth/verify_oakhaven.py`
   checks the layout over the placement script's model of the ground: the land over the moved cave is within 0.6 m of what it
   lay under before, with 15 m of rock over its roof past the Drop; every camp's spread is walkable; no new or lengthened road is steeper than
   0.37 (the Crowsfoot track 0.33); every secret, exit, arrival and landmark is reachable; the highest ground on the boundary
   line is 5.9 m (the wall is 11 m); from the green, the North road's end and the first of the track, the hill stands 8.7 to
-  9.1 m over the sight line to the mouth, and from the track's last bend it does not.
+  9.1 m over the sight line to the mouth, and from the track's last bend it does not. From the west the two lower rises
+  stand over it by less: 2.9 m from the Mastwood, 2.8 from its boars, 2.65 from the Old Fold, 3.0 from the West road, 2.3
+  from the Crow oak, 3.9 from the Hanger; about 1 m along the one line the track itself comes in by. Within some 40 m of the
+  mouth, west of it, you see it.
 
 ## Checking visuals without playing
 - `Crulanda.exe --crulanda-world-capture <dir>`: scenic tour screenshots (HUD hidden), isolated temp save.
@@ -138,7 +162,7 @@ Trades in Oakhaven (GAME-ONLY, 2026-10-01; BUILD_PLAN step 4; tier 1, every node
   script's margins. Mining needs a
   pick (merchants, the smith).
 - **Timber** (Harrow oak windfalls): at the edges of the broadleaf woods, the stump on the wood's side: three near the village
-  (the Grey-edge copse, the Harrow wood's east edge, the South copse) and five out in the wolf and boar country (Thornshaw,
+  (the Moonbell copse, the Harrow wood's east edge, the South copse) and five out in the wolf and boar country (Thornshaw,
   the Southwood, the Mastwood, the Brook spinney and the Bound wood). Woodcutting needs a hatchet.
 - **Herbs** (yarrow): the eight Yarrow props on the meadows (still the quest's yarrow while Lisbet's quest wants it) and two more,
   on the Harrow downs west of the farm and on the meadow north of Brook pond. Bare hands.
@@ -370,20 +394,21 @@ mood. How it was made: a first draft was pre-checked by agents who ported the ge
 - **Ambush camps** hide their mobs lowered into tall grass: no nameplate, no map dot, and they can't be targeted.
   They pounce when you come within 8 m, or 3 m while sneaking (hold Ctrl).
 - Mobs that can't reach you for 4 s give up the chase and reset.
-- **Oakhaven's camps stand 125 m and more from every house** (the rule is 120 m: a house, the inn, the mill; playtest note 1,
-  `ZoneGrowthTests`). Where they are since the 560 m growth, clockwise from the north: Upper pines wolves (44, 168; they were
+- **Oakhaven's camps stand 125 m and more from every house of the village** (the rule is 120 m: a house, the inn, the mill;
+  playtest note 1, `ZoneGrowthTests`; Moss's lodge in the Mastwood is the hunter's home outside the village, and the boars
+  and the hollow by it are named exceptions, see "Oakhaven grown to 560 m"). Where they are since the 560 m growth, clockwise from the north: Upper pines wolves (44, 168; they were
   the Harrow wood's), Thornshaw wolves (92, 194; the North pines'), Brookside boars (166, -2), Hollin farm wolves
   (205, -40), Sallow Bottom boars (160, -214; new), the Tall-grass stalkers (-6, -214, with the tall grass's landmark),
   Southwood boars (-100, -186; the South copse's), Withy pool boars at their wallow (-174, -128), Bound wood wolves
-  (-234, -36; new), Whitefoot's pack (-210, 104) and den (-222, 120), Mastwood boars (-132, 168), Hazel bank wolves
-  (-72, 172; new). Camps keep their place in the list, so mob ids are what they were; the three new ones are last.
+  (-234, -36; new), Whitefoot's pack (-210, 104) and den (-222, 120), Hanger wolves (-222, 196; new, in the Hanger, the
+  north-west wood, 140 m from Moss's lodge), Mastwood boars (-132, 168). Camps keep their place in the list, so mob ids are what they were; the three new ones are last.
 - **The other four zones do not keep that rule** and were not changed: they are 340 to 360 m, laid out with their camps 50 to
   100 m from the hub, and most camps belong to a built place (PLAYTEST_NOTES.md note 1 has the measured list and the choice
   to make).
 
 | Zone | Camps (level) |
 |---|---|
-| Oakhaven 1-2 | Upper pines wolves (1-2), Southwood boars (1-2), Thornshaw wolves (2), Tall-grass stalkers (1-2, ambush), Brookside boars (2), Mastwood boars (1-2), Whitefoot's pack (2), Withy pool boars (2), Hollin farm wolves (2), Hazel bank wolves (2), Sallow Bottom boars (2), Bound wood wolves (1-2), Old Whitefoot (3, elite, harder); the Crowsfoot Hollow dungeon, all `harder`: Sandthrone deserters (3-5), Quartermaster Hesk (4, elite), Caddock, the Bandit King (5, elite) |
+| Oakhaven 1-2 | Upper pines wolves (1-2), Southwood boars (1-2), Thornshaw wolves (2), Tall-grass stalkers (1-2, ambush), Brookside boars (2), Mastwood boars (1-2), Whitefoot's pack (2), Withy pool boars (2), Hollin farm wolves (2), Hanger wolves (2), Sallow Bottom boars (2), Bound wood wolves (1-2), Old Whitefoot (3, elite, harder); the Crowsfoot Hollow dungeon, all `harder`: Sandthrone deserters (3-5), Quartermaster Hesk (4, elite), Caddock, the Bandit King (5, elite) |
 | Khaven 3-5 | Whispering Wood wolves (3-4), Carrion boars (3-4, ambush), Sandthrone outrider camp (4-5), Gloom Creek hollows (5), The Grey Sexton (5, elite), Hush wolves (4-5), Plague pit hollows (4-5), Sandthrone picket (5), Mire boars (4-5), The Pale Reckoner (7, elite, harder) |
 | Peaks 6-8 | Toll-gate guards (6-7), Wolf pines pack (6-7, ambush), Rockhide wallow (7), The High Ledge (8), Captain's eyrie (8, elite), Signal-tower pickets (6-7), Shieling wolves (6-7), Scar rockhides (7-8), Old Scree-Tusk (8, elite) |
 | Ash Rim 9-10 | Ash hound pack (9), Unwoven Flats eaters (9-10), Tear-marked shrine (9-10), Cinderfold hollows (10), The Weave-Eater brood (10, elite), Ash-pit cultists (9-10), The Ash-Deacon (10, elite), Fraying eaters (9-10), Orchard hounds (9-10) |
@@ -523,10 +548,11 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
   landmarks. A quarter turn exactly: a camp's spread is an upright square, so each covers the same floor it did. The model
   puts the land over the passage within 0.6 m of what it lay under before.
 - **The way there:** the North road runs on from the Woodyard past Carder's field barn and the last fields, between the
-  Upper pines' wolves and the Hazel bank's, to its end under the ridge at (-32, 184). The Crowsfoot track (2.2 m) goes on
+  Upper pines' wolves and the Mastwood, to its end under the ridge at (-32, 184). The Crowsfoot track (2.2 m) goes on
   west along the ridge's foot under the Ridge pines, round the south scarp's end, and north through the thicket to the
   mouth. The ridge and the south scarp's shelf stand between the mouth and the village, the road and all of the track but
-  its last 30 m (`CaveTests.The_hollow_lies_out_in_the_north_hills_with_its_back_to_the_village`).
+  its last 30 m; west and south-west of the mouth the ridge's west spur and heel rise stand between it and the Mastwood,
+  the Old Fold and the West road (`CaveTests.The_hollow_lies_out_in_the_north_hills_with_its_back_to_the_village`).
 - **Hidden in the hill** (Chris, 2026-10-01: "the dungeon in the first zone kind of stick out as just a rock. it needs to be
   built into a mountain or something and kinda hidden..no so obvious. they are bandits"): the mouth is a slot in a cliff face,
   not a rock on the grass. Two cliff scarps (`Crowsfoot scarp, north` and `south`, 18 m, lifted 10 m) stand either side of it and

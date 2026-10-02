@@ -173,8 +173,11 @@ namespace Crulanda.World
     /// A road or creek. depth (creeks only): the channel's depth below its banks. The water surface sits 0.42 m under the
     /// bank, so the water in the middle is depth - 0.42 deep. The default 1.1 is a wading creek (0.68 m); swimming needs
     /// about 1.9 or more. See ZoneWater.
+    /// swingFrom, swingAlong (creeks only): the point its side-to-side swing is counted from, and the metres already run
+    /// there. A creek lengthened upstream names its old first point, so its line downstream stays where it was
+    /// (ZoneWater.Meander). 0 and 0: from the first point, as every creek was.
     /// </summary>
-    [Serializable] public sealed class ZonePath { public string name; public float width = 4; public Vector2[] points = new Vector2[0]; public float depth = 1.1f; }
+    [Serializable] public sealed class ZonePath { public string name; public float width = 4; public Vector2[] points = new Vector2[0]; public float depth = 1.1f; public int swingFrom; public float swingAlong; }
     /// <summary>
     /// A lake or pond. radius is the mean waterline (the shore wanders up to a fifth in and out around it); depth is the
     /// water's depth in the middle (a flat bottom, a bank under about 38 degrees, a gentle shore). Deeper than about

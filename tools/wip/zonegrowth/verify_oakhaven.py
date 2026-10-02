@@ -6,7 +6,9 @@ It uses tools/wip/professions/place_nodes.py's model (ZoneBuilder.HeightAt porte
 the player's start) and prints, for the zone file as it stands:
 - the cave: its rings, the rock over its roof past the Drop (CaveTests wants more than 3 m), how the land over it compares with
   the land it lay under before the move (commit f4106d3, read through git), and how far it stays inside the edge;
-- every camp: its nearest house (125 m and more is the rule's margin over 120), whether its spread is walkable, whether a cave
+- every camp: its nearest house of the village (a house, the inn, the mill; 125 m and more is the rule's margin over 120),
+  and how far it is from Moss's lodge, the one home outside the village, when that is under 120 m (the Mastwood boars
+  and the hollow's own camps are the named exceptions there, as in ZoneGrowthTests.NearHomes), whether its spread is walkable, whether a cave
   camp's spread stays within the passage;
 - every road's steepest stretch, the exits and arrivals, every secret, landmark, prop, field and grove, the highest ground on
   the boundary line (the boundary's wall is 11 m), the game animals' circles.
@@ -62,6 +64,9 @@ def main():
     green = (-8, -8); mouth = V(next(p for p in z.props if p['kind'] == 'cavern')['at'])
     print('mouth', mouth, 'from the green %.1f m, from the Great Oak %.1f m' % (dist(mouth, green), dist(mouth, (0, 0))))
     houses = [(p.get('name'), V(p['at'])) for p in z.props if p['kind'] in ('house', 'inn', 'mill')]
+    homes = {h.get('house') for h in z.z['life'].get('households', [])}   # a household's house of any kind: Moss's lodge is a barn
+    lodges = [(p.get('name'), V(p['at'])) for p in z.props if p.get('name') in homes and p['kind'] not in ('house', 'inn', 'mill')]
+    by_lodge = ('Mastwood boars', 'Hollow lookouts', "Deserters' camp", 'Drop sentries', 'Store Caves', "The Quartermaster's desk", 'Deep Stair watch', "King's guard", "Caddock's hall")
     print('== camps (nearest house)')
     for c in z.z['camps']:
         at = V(c['center']); n = min(houses, key=lambda h: dist(h[1], at)); d0 = dist(n[1], at)
@@ -69,6 +74,11 @@ def main():
         r = c['radius']; pts = [(at[0] + dx * r, at[1] + dy * r) for dx in (-1, 0, 1) for dy in (-1, 0, 1)]
         notes = []
         if d0 < 125: notes.append('TOO NEAR A HOUSE')
+        lodge = ''
+        for ln, lat in lodges:
+            if dist(lat, at) < 120:
+                lodge = ' [%.1f m from %s%s]' % (dist(lat, at), ln, ', a named exception' if c['name'] in by_lodge else '')
+                if c['name'] not in by_lodge: notes.append('TOO NEAR ' + ln)
         if cave:
             for q in pts:
                 if not z.cave_at(q): notes.append('spread leaves the passage at %s' % (q,)); break
@@ -84,7 +94,7 @@ def main():
             if max(abs(at[0]), abs(at[1])) > z.half - 20: notes.append('in the forest edge')
             if z.wasting and at[0] + r > z.wasting['x'] - z.wasting.get('fade', 20): notes.append('in the grey')
         if notes: bad += 1
-        print('  %-26s (%7.1f,%7.1f) L%d-%d %5.1f m from %-18s %s%s' % (c['name'], at[0], at[1], c['levelMin'], c['levelMax'], d0, n[0], 'in the cave ' if cave else '', '; '.join(notes)))
+        print('  %-26s (%7.1f,%7.1f) L%d-%d %5.1f m from %-18s %s%s' % (c['name'], at[0], at[1], c['levelMin'], c['levelMax'], d0, n[0], 'in the cave ' if cave else '', '; '.join(notes) + lodge))
     cs = [(c['name'], V(c['center']), c['radius']) for c in z.z['camps'] if not z.cave_at(V(c['center']))]
     for i in range(len(cs)):
         for j in range(i + 1, len(cs)):

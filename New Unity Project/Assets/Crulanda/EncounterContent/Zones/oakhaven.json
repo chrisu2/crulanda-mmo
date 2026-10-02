@@ -847,7 +847,9 @@
           "x": 280,
           "y": -17
         }
-      ]
+      ],
+      "swingFrom": 3,
+      "swingAlong": -0.88
     }
   ],
   "fields": [
@@ -3628,7 +3630,7 @@
       "count": 35
     },
     {
-      "name": "Grey-edge copse",
+      "name": "Moonbell copse",
       "kind": "broadleaf",
       "center": {
         "x": 62,
@@ -4855,14 +4857,14 @@
       "respawn": 75
     },
     {
-      "name": "Hazel bank wolves",
+      "name": "Hanger wolves",
       "mob": "Grey wolf",
       "tag": "wolf",
       "look": "wolf",
       "canonStatus": "GAME-ONLY",
       "center": {
-        "x": -72,
-        "y": 172
+        "x": -222,
+        "y": 196
       },
       "radius": 7,
       "count": 3,
@@ -5225,6 +5227,26 @@
       "radius": 8,
       "height": 6,
       "blend": 30
+    },
+    {
+      "name": "Crowsfoot Ridge, west spur",
+      "center": {
+        "x": -150,
+        "y": 214
+      },
+      "radius": 8,
+      "height": 7,
+      "blend": 14
+    },
+    {
+      "name": "Crowsfoot Ridge, heel rise",
+      "center": {
+        "x": -128,
+        "y": 190
+      },
+      "radius": 5,
+      "height": 5,
+      "blend": 10
     }
   ],
   "secrets": [
@@ -5299,7 +5321,7 @@
         "x": 62,
         "y": -18
       },
-      "text": "Pale bells glowing faintly in the copse's shade, this close to the grey. Hedge-wives say moonbells only grow where the ground is still sure of itself.",
+      "text": "Pale bells glowing faintly in the copse's shade. Hedge-wives say moonbells only grow where the ground is still sure of itself.",
       "item": "herb.moonbell",
       "xp": 20,
       "canonStatus": "GAME-ONLY"

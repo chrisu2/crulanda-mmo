@@ -1,6 +1,7 @@
 """Every camp of every zone and its nearest house (playtest note 1's rule: nothing hostile within about 120 m of a village's
-houses). Homes here are props of kind house, inn, mill, treehouse, shelter and keep, so the list also shows the enemy's own
-buildings (the Peaks' toll-house and eyrie): read it with the zone in mind.
+houses). Homes here are props of kind house, inn, mill, treehouse, shelter and keep, and whatever a household names as its
+house (Moss's lodge in Oakhaven is a barn), so the list also shows the enemy's own buildings (the Peaks' toll-house and
+eyrie): read it with the zone in mind. ZoneGrowthTests.NearHomes is the list this makes, less those two buildings.
 
     python tools/wip/zonegrowth/rule120.py
 """
@@ -10,7 +11,8 @@ for zn in ['oakhaven','khaven','peaks','ashrim','verdant']:
     z=json.load(open(Z%zn,encoding='utf-8-sig'))
     kinds={}
     for p in z['props']: kinds[p['kind']]=kinds.get(p['kind'],0)+1
-    homes=[(p.get('name') or p['kind'],p['at']['x'],p['at']['y'],p['kind']) for p in z['props'] if p['kind'] in('house','inn','mill','treehouse','shelter','keep')]
+    named={h.get('house') for h in z.get('life',{}).get('households',[])}
+    homes=[(p.get('name') or p['kind'],p['at']['x'],p['at']['y'],p['kind']) for p in z['props'] if p['kind'] in('house','inn','mill','treehouse','shelter','keep') or (p.get('name') and p.get('name') in named)]
     print('==',zn,z['size'],'m,',len(homes),'homes')
     print('   kinds',{k:v for k,v in kinds.items() if k in('house','inn','mill','barn','ruined_house','treehouse','shelter','keep','cave','tower')})
     for i,c in enumerate(z['camps']):

@@ -125,6 +125,7 @@ namespace Crulanda.Encounter
                 ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "07-inn-inside.png")); yield return new WaitForSeconds(.5f);
             }
             if (session.Quests != null && zone != null && VillageLife.Active != null) { var q = CaptureQuests(directory, prefix, zone); while (q.MoveNext()) yield return q.Current; }
+            if (session.Boards != null && zone != null) { var bd = CaptureBoard(directory, prefix, zone); while (bd.MoveNext()) yield return bd.Current; }
             if (session.Professions != null) { var t = CaptureTrades(directory, prefix); while (t.MoveNext()) yield return t.Current; }
             if (session.Items != null) { var b = CaptureBags(directory, prefix); while (b.MoveNext()) yield return b.Current; }
             if (session.Professions != null && zone != null) { var st = CaptureStation(directory, prefix, zone); while (st.MoveNext()) yield return st.Current; }
@@ -297,6 +298,31 @@ namespace Crulanda.Encounter
             ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "33-craft-forget-confirm.png")); yield return new WaitForSeconds(.4f);
             EncounterHud.TradesForget = null;
             EncounterHud.TradesPage = null; EncounterHud.TradesRecipes = false; EncounterHud.TradesRecipe = null; session.ShowTrades(false); session.InventoryOpen = false;
+        }
+        /// <summary>The notice board (Bounties): the board by the inn with its pinned notices, the day's postings open, and the
+        /// quest book with the first posting taken.</summary>
+        IEnumerator CaptureBoard(string directory, string prefix, Crulanda.World.ZoneBuilder zone)
+        {
+            var board = session.Zone.Interactables.Find(i => i.kind == "board");
+            if (board == null) yield break;
+            var motor = session.Player.GetComponent<AdventurerMotor>();
+            Crulanda.World.WorldClock.Hour = 10; session.Conversation = null; session.QuestBookOpen = false;
+            var forward = board.root != null ? board.root.forward : Vector3.forward;   // the notices hang on the board's -z face
+            var from = board.position - forward * 4.5f; from.y = zone.HeightAt(from.x, from.z) + 1.1f;
+            motor.Teleport(from); motor.SetView(Quaternion.LookRotation(forward).eulerAngles.y, 10, 3.5f);
+            var body = Array.FindAll(session.Player.GetComponentsInChildren<Renderer>(), r => r.enabled);
+            foreach (var r in body) r.enabled = false;   // look past ourselves at the board
+            yield return new WaitForSeconds(.8f);
+            ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "34-notice-board.png")); yield return new WaitForSeconds(.4f);
+            foreach (var r in body) r.enabled = true;
+            session.UseInteractable(board); yield return new WaitForSeconds(.5f);
+            ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "35-board-postings.png")); yield return new WaitForSeconds(.4f);
+            var first = session.Conversation != null && session.Conversation.entries != null && session.Conversation.entries.Count > 0 ? session.Conversation.entries[0].quest : null;
+            session.Conversation = null;
+            if (first == null) yield break;
+            session.AcceptQuest(first); EncounterHud.BookTab = "quests"; session.QuestBookOpen = true; yield return new WaitForSeconds(.6f);
+            ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "36-bounty-taken.png")); yield return new WaitForSeconds(.4f);
+            session.QuestBookOpen = false;
         }
         /// <summary>The quest interface: a giver's !, the offer, the quest book, the ledger in the Chronicle, a hand-in list, standing, the tracker.</summary>
         IEnumerator CaptureQuests(string directory, string prefix, Crulanda.World.ZoneBuilder zone)

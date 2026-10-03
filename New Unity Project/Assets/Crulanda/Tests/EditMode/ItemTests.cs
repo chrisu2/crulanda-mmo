@@ -67,7 +67,7 @@ namespace Crulanda.Tests
             Inventory.Add(p, db, "junk.static_glass", 3);
             int before = p.gold; int i = p.bag.FindIndex(s => s.item == "junk.static_glass");
             Assert.AreEqual(3 * db.Get("junk.static_glass").value, Inventory.Sell(p, db, i)); Assert.AreEqual(before + 24, p.gold); Assert.IsTrue(p.bag[i].Empty);
-            p.gold = 0; Assert.IsFalse(Inventory.Buy(p, db, "potion.healing", out var why)); StringAssert.Contains("gold", why);
+            p.gold = 0; Assert.IsFalse(Inventory.Buy(p, db, "potion.healing", out var why)); StringAssert.Contains("crowns", why);
         }
 
         [Test] public void SellJunk_KeepsMaterials()

@@ -159,7 +159,7 @@ namespace Crulanda.Tests
             Assert.AreEqual(1, Inventory.Count(p, "potion.minor")); Assert.Contains("doc.oakhaven.lullaby", p.documents);
             CollectionAssert.AreEqual(new[] { cache.id }, p.discoveries);
             Assert.AreEqual(1, toasts.Count); Assert.AreSame(cache, toasts[0]);
-            Assert.AreEqual("Discovered: The mill-cache. Something was left here.  +40 XP  +12 gold  +" + log.Items.Get("potion.minor").name, said[0]);
+            Assert.AreEqual("Discovered: The mill-cache. Something was left here.  +40 XP  +12 crowns  +" + log.Items.Get("potion.minor").name, said[0]);
             StringAssert.StartsWith("New page in your Chronicle: ", said[1]);
             Assert.AreEqual(DiscoveryLog.Result.AlreadyFound, log.Discover(cache), "Once only.");
             Assert.AreEqual(40, p.experience); Assert.AreEqual(12, p.gold); Assert.AreEqual(1, Inventory.Count(p, "potion.minor")); Assert.AreEqual(1, toasts.Count);

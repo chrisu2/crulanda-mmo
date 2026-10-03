@@ -186,7 +186,7 @@ namespace Crulanda.Encounter
         void TakeCoins(EncounterEnemy body)
         {
             if (body.Coins <= 0) return;
-            Progress.gold += body.Coins; Message("Looted " + body.Coins + " gold."); body.Coins = 0;
+            Progress.gold += body.Coins; Message("Looted " + body.Coins + " crowns."); body.Coins = 0;
         }
         /// <summary>
         /// One thing off the body into the bags (Inventory.Add: onto its stacks, then a worn trade bag of its class, then the bags).

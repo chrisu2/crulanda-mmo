@@ -92,6 +92,9 @@ namespace Crulanda.Tests
                 foreach (var q in db.Ordered)
                 {
                     string qz = string.IsNullOrEmpty(q.zone) ? null : q.zone;
+                    // A bounty is posted on and paid at the zone's notice board; its courier spawns only when the rare
+                    // posting is taken (BountyBoardTests covers that). The zone owes it a board and nothing else.
+                    if (q.kind == "bounty") { if (qz == id && !s.Zone.Interactables.Exists(x => x.name == Bounties.BoardName)) problems.Add(p + q.id + " is posted on a notice board this zone has not got"); continue; }
                     if (qz == id)
                     {
                         if (q.giver != "auto" && q.giver != "Mira" && (life == null || life.Find(q.giver) == null)) problems.Add(p + q.id + " giver '" + q.giver + "' missing");

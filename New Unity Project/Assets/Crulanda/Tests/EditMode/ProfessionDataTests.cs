@@ -400,7 +400,7 @@ namespace Crulanda.Tests
             var smelts = new[] { ("recipe.copper_bar", "mat.copper_ore", "mat.copper_bar", 1, 4), ("recipe.bogiron_bar", "mat.bogiron_ore", "mat.bogiron_bar", 20, 7),
                 ("recipe.ridgesteel_bar", "mat.adit_ore", "mat.ridgesteel_bar", 40, 10), ("recipe.ashsteel_bar", "mat.cinder_ore", "mat.ashsteel_bar", 60, 13), ("recipe.veridian_bar", "mat.veridian_ore", "mat.veridian_bar", 80, 19) };
             var all = db.RecipesFor("blacksmithing");
-            Assert.AreEqual(26, all.Count, "Five smelts and 21 pieces.");
+            Assert.AreEqual(31, all.Count, "Five smelts, 21 pieces and the five resonance-tempered weapons (the notice boards' shard).");
             Assert.IsTrue(all.All(r => r.station == "forge"), "Everything a smith makes is made at a forge.");
             foreach (var (id, ore, bar, skill, value) in smelts)
             {
@@ -423,7 +423,10 @@ namespace Crulanda.Tests
                 string tier = item.Substring(6, item.IndexOf('_') - 6); if (tier == "heartwood") tier = "veridian";
                 Assert.IsTrue(r.inputs.Any(i => i.item == "mat." + tier + "_bar"), item + " is made of " + tier + " bars.");
             }
-            CollectionAssert.AreEqual(smelts.Select(x => x.Item1).Concat(Pieces.Select(p => "recipe." + p.item.Substring(6))).OrderBy(x => db.Recipe(x).skill).ThenBy(x => x, StringComparer.Ordinal), all.Select(r => r.id), "Easiest first.");
+            var tempered = all.Where(r => r.id.StartsWith("recipe.tempered_")).Select(r => r.id).ToList();
+            Assert.AreEqual(5, tempered.Count, "The five resonance-tempered weapons (the notice boards' Aether-Geode shard; 2026-10-03).");
+            Assert.IsTrue(tempered.All(id => db.Recipe(id).inputs.Any(i => i.item == "mat.geode_shard")), "Each needs the shard.");
+            CollectionAssert.AreEqual(smelts.Select(x => x.Item1).Concat(Pieces.Select(p => "recipe." + p.item.Substring(6))).Concat(tempered).OrderBy(x => db.Recipe(x).skill).ThenBy(x => x, StringComparer.Ordinal), all.Select(r => r.id), "Easiest first.");
         }
 
         /// <summary>

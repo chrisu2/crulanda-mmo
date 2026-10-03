@@ -45,6 +45,8 @@ namespace Crulanda.Tests
             foreach (var q in session.Quests.Db.Ordered)
             {
                 if (q.zone != "zone.oakhaven") continue;
+                // A bounty is posted on and paid at the notice board, not by a person (BountyBoardTests reads its postings).
+                if (q.kind == "bounty") { Assert.IsTrue(session.Zone.Interactables.Exists(i => i.name == Bounties.BoardName), q.id + ": no notice board in Oakhaven."); continue; }
                 foreach (var who in new[] { q.giver, q.turnIn })
                     if (who != "auto" && who != "Mira") Assert.NotNull(life.Find(who), q.id + ": nobody called '" + who + "' in Oakhaven.");
                 foreach (var step in q.steps)

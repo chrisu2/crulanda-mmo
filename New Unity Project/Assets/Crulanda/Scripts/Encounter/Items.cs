@@ -416,7 +416,7 @@ namespace Crulanda.Encounter
         {
             why = null; var d = db.Get(item); if (d == null) { why = "Not for sale."; return false; }
             int price = Price(d);
-            if (p.gold < price) { why = "You need " + price + " gold."; return false; }
+            if (p.gold < price) { why = "You need " + price + " crowns."; return false; }
             if (Add(p, db, item, 1) > 0) { why = "Your bags are full."; return false; }
             p.gold -= price; return true;
         }

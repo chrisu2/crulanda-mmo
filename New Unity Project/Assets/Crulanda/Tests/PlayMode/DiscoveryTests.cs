@@ -172,7 +172,7 @@ namespace Crulanda.Tests
             Assert.Contains(vista.id, s.Progress.discoveries);
             Assert.AreEqual(xp + 40, s.Progress.experience); Assert.AreEqual(gold + 12, s.Progress.gold);
             Assert.AreEqual("Test Lookout", s.ToastName, "The Discovered toast names it.");
-            Assert.IsTrue(s.Messages.Exists(m => m.Contains("Test Lookout") && m.Contains("Left here for the test.") && m.Contains("+40 XP") && m.Contains("+12 gold")),
+            Assert.IsTrue(s.Messages.Exists(m => m.Contains("Test Lookout") && m.Contains("Left here for the test.") && m.Contains("+40 XP") && m.Contains("+12 crowns")),
                 "A chat line with its text and rewards: " + string.Join(" | ", s.Messages));
             yield return new WaitForSeconds(EncounterSession.ToastSeconds);
             Assert.IsNull(s.ToastName, "The toast fades after about 3 s.");

@@ -2838,6 +2838,17 @@
       "rotation": 20,
       "variant": 1,
       "interact": "Search the deserters' strongbox"
+    },
+    {
+      "kind": "board",
+      "name": "Notice board",
+      "at": {
+        "x": -5,
+        "y": 24
+      },
+      "rotation": 140,
+      "interact": "Read the notices",
+      "canonStatus": "CANON-EXPANDED (the Bureau and the Seekers post their wanted bills; the village its bounties)"
     }
   ],
   "life": {

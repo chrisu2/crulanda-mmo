@@ -1970,6 +1970,17 @@
         "y": 82
       },
       "rotation": 90
+    },
+    {
+      "kind": "board",
+      "name": "Notice board",
+      "at": {
+        "x": 67,
+        "y": 0
+      },
+      "rotation": 270,
+      "interact": "Read the notices",
+      "canonStatus": "CANON-EXPANDED (the Bureau and the Seekers post their wanted bills; the village its bounties)"
     }
   ],
   "groves": [

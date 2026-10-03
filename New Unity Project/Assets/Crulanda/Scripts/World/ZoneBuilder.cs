@@ -1106,6 +1106,7 @@ namespace Crulanda.World
                     }
                     case "bridge": SeatBridge(t, p.size.x > 0 ? p.size.x : 12); if (p.variant == 1) RopeBridge(t, p.size.x > 0 ? p.size.x : 12); else Bridge(t, p.size.x > 0 ? p.size.x : 12); break;
                     case "signpost": Signpost(t); break;
+                    case "board": NoticeBoard(t); break;
                     case "ruin": Ruin(t, p.size.x > 0 ? p.size.x : 6); break;
                     case "gate": Gate(t, p.size.x > 0 ? p.size.x : 6.4f); break;
                     case "keep": Stronghold(t, p.size.x > 0 ? p.size : new Vector2(7, 6)); break;
@@ -2329,6 +2330,20 @@ namespace Crulanda.World
             }
         }
         /// <summary>A fingerpost: a hewn post leaning a little, its board cut to a point and hung a touch crooked on two pegs.</summary>
+        /// <summary>A notice board (2026-10-03, the bounty boards): two posts, a wide board under a little pent roof, and a few
+        /// pale notices pinned to it at odd angles. Its prop carries interact "Read the notices"; the session opens the board.</summary>
+        void NoticeBoard(Transform t)
+        {
+            foreach (float x in new[] { -.7f, .7f }) Stake(t, new Vector3(x, -.1f, 0), .14f, 2.1f, art.timber, Quaternion.identity);
+            Part(PrimitiveType.Cube, t, new Vector3(0, 1.35f, 0), new Vector3(1.7f, .9f, .06f), Tint(art.timber, new Color(.42f, .31f, .19f)));
+            Part(PrimitiveType.Cube, t, new Vector3(0, 1.86f, -.06f), new Vector3(1.9f, .05f, .3f), Tint(art.timber, new Color(.3f, .22f, .13f)), Quaternion.Euler(-12, 0, 0));   // the pent roof
+            var paper = Tint(art.timber, new Color(.86f, .8f, .66f));
+            foreach (var (x, y, tilt, w, h) in new[] { (-.5f, 1.4f, 4f, .34f, .42f), (-.05f, 1.32f, -6f, .3f, .36f), (.45f, 1.45f, 3f, .36f, .3f), (.3f, 1.05f, -3f, .28f, .22f) })
+            {
+                Part(PrimitiveType.Cube, t, new Vector3(x, y, -.04f), new Vector3(w, h, .01f), paper, Quaternion.Euler(0, 0, tilt));
+                Part(PrimitiveType.Sphere, t, new Vector3(x, y + h / 2 - .03f, -.05f), Vector3.one * .03f, Tint(art.timber, new Color(.2f, .14f, .09f)));   // the nail
+            }
+        }
         void Signpost(Transform t)
         {
             Stake(t, new Vector3(0, -.1f, 0), .2f, 2.44f, art.timber, Quaternion.Euler(0, 0, 2));

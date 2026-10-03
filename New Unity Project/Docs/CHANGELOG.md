@@ -1021,7 +1021,7 @@ A read-only review by five reviewers, each finding checked by a second who tried
 - Still their old bodies: spiders, the bramble-things, and the village's hens, sheep, cats, crows and rabbits.
 - Tests: EditMode 392/392, PlayMode 173/174 (Sel Harrow's walk home timed out once; the fixture passed alone 8/8); ModelBeastTests (the boar); Oakhaven toured; no errors in any game log.
 
-## 2026-10-03 — Khaven filled out: four camps and five quests (published with the boards round, below)
+## 2026-10-03 — Khaven filled out: four camps and five quests (published 17:25 with the boards round, below)
 - Chris: "lets work on quests and camps", zone by zone, Khaven first (it had 10 camps and 9 quests for levels 3-5; Oakhaven 21
   and 16). Khaven has no book canon (only its map), so everything here is GAME-ONLY, leaning on canon where it can: Hollow Men,
   the Sandthrone company, the Pale Kings' counting.
@@ -1034,3 +1034,18 @@ A read-only review by five reviewers, each finding checked by a second who tried
   charnel silk from the spiders, for a dye she will not name); What the Listener Heard (Old Kestrel: the Listener's Hut, the
   Hush after dark, then Wenna); The Mother of the Hush (Wenna: the Hush-Mother, after her wolves).
 - Tests: EditMode 392/392 after the silk icon (391/392 before it), PlayMode 174/174; Khaven toured; no errors in any game log.
+
+## 2026-10-03 — Notice boards, rare postings and silver crowns (published 17:25)
+- **Silver crowns** (Chris: "we need book canon"): the coin is the books' silver crown ("forty crowns", "a thousand crowns")
+  everywhere it is named: bags, vendors, loot, quest rewards. The save keeps the same number.
+- **Notice boards** (Chris: "zone bounty boards, rare quests appear 1-2% of the time giving valuable components for building
+  gear"): a board stands by each zone's inn or hall, read with E like a stall. Each game day (the clock passing six) it draws
+  three postings from the zone's pool: village bounties (kill six of a camp, bring skins or herbs, walk somewhere after dark)
+  paid in crowns, and Sandthrone contracts (CANON company) that pay more and cost Salt-Mender standing. Bounties are
+  repeatable: paid, one leaves the board for the day and may be drawn again another day. A reload shows the same notices.
+- **The rare posting** (1.5% a slot a day, about one in sixty-seven): a Bureau courier (CANON: the Investigation Bureau) is
+  crossing the zone's first road with an Aether-Geode shard in a lead box (CANON: the Council's resonance fuel, fossilised
+  memory). Taking the posting puts the courier on the road, two levels over the zone; his death pays the shard, bars of the
+  tier above the zone's, crowns and Salt-Mender standing. The **Aether-Geode shard** is the component for five
+  **resonance-tempered** weapons at the forge (three bars, a wood and a shard a tier: rare-quality gear).
+- Tests: EditMode 396/396, PlayMode 175/175 (OakhavenQuestTests and ZoneContentTests taught that a bounty is the board's, re-run green); BountyTests (4), BountyBoardTests (1); Oakhaven toured; no errors in any game log.

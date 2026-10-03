@@ -36,6 +36,9 @@ namespace Crulanda.Encounter
         public string[] requires = new string[0];
         public string requiresFaction; public int requiresStanding;
         public string summary, offer, progress, complete;
+        /// <summary>Bounties (kind "bounty", giver "board"): rare = the zone's rare posting (Bounties.RareChance a slot a day);
+        /// poster = who put it up ("sandthrone": a mercenary contract; else the village).</summary>
+        public bool rare; public string poster;
         public string[] giveOnAccept = new string[0];
         public QuestStepDef[] steps = new QuestStepDef[0];
         public QuestRewardDef rewards = new QuestRewardDef();
@@ -88,7 +91,7 @@ namespace Crulanda.Encounter
         public readonly Dictionary<string, QuestItemDef> Items = new Dictionary<string, QuestItemDef>(StringComparer.Ordinal);
         public readonly Dictionary<string, DocumentDef> Documents = new Dictionary<string, DocumentDef>(StringComparer.Ordinal);
         static readonly HashSet<string> Types = new HashSet<string> { "flag", "kill", "talk", "deliver", "collect", "interact", "visit", "bring" };
-        static readonly HashSet<string> Kinds = new HashSet<string> { "main", "side", "npc", "faction" };
+        static readonly HashSet<string> Kinds = new HashSet<string> { "main", "side", "npc", "faction", "bounty" };
 
         public static QuestDatabase Parse(IEnumerable<string> jsonFiles)
         {
@@ -160,7 +163,7 @@ namespace Crulanda.Encounter
                 foreach (var step in q.steps ?? new QuestStepDef[0])
                     foreach (var o in step?.objectives ?? new QuestObjectiveDef[0])
                         if (o != null && o.type == "bring" && items.Get(o.item) == null) errors.Add(p + "brings unknown item '" + o.item + "'.");
-                foreach (var b in (q.rewards ?? new QuestRewardDef()).bagItems ?? new string[0]) if (items.Get(b)?.kind != "bag") errors.Add(p + "gives '" + b + "', which is not a trade bag.");
+                foreach (var b in (q.rewards ?? new QuestRewardDef()).bagItems ?? new string[0]) if (items.Get(b)?.kind != "bag" && items.Get(b)?.kind != "material") errors.Add(p + "gives '" + b + "', which is not a trade bag or a material.");
                 if (!string.IsNullOrEmpty(q.unlessWorn) && items.Get(q.unlessWorn)?.kind != "bag") errors.Add(p + "unlessWorn '" + q.unlessWorn + "' is not a trade bag.");
             }
             return errors;
@@ -202,7 +205,7 @@ namespace Crulanda.Encounter
         public bool IsDone(string id) { return Progress.questsDone.Contains(id); }
         public QuestStatus Status(QuestDef q, string zoneId)
         {
-            if (IsDone(q.id)) return QuestStatus.Done;
+            if (q.kind != "bounty" && IsDone(q.id)) return QuestStatus.Done;   // a bounty is never done for good: the board draws it again another day
             var s = State(q.id);
             if (s != null) return s.step >= q.steps.Length ? QuestStatus.ReadyToTurnIn : QuestStatus.Active;
             if (!string.IsNullOrEmpty(q.zone) && q.zone != zoneId) return QuestStatus.Unavailable;
@@ -284,7 +287,7 @@ namespace Crulanda.Encounter
             if (q == null || Status(q, zoneId) != QuestStatus.Available || Progress.Level < q.minLevel) return false;
             var s = new QuestState { id = q.id }; Progress.quests.Add(s);
             foreach (var item in q.giveOnAccept) Progress.questItems.Add(item);
-            Say((q.IsMain ? "Chronicle begun: " : "Quest accepted: ") + q.title, null);
+            Say((q.IsMain ? "Chronicle begun: " : q.kind == "bounty" ? "Bounty taken: " : "Quest accepted: ") + q.title, null);
             PrepareStep(q, s);
             return true;
         }
@@ -314,14 +317,14 @@ namespace Crulanda.Encounter
                 if (d.kind == "bag" && Owns(id)) coin += d.value; else bags.Add(d);
             }
             if (bags.Count > 0 && Inventory.FreeSlots(Progress) < bags.Count) { Say(MakeRoomLine, null); return false; }
-            Progress.quests.Remove(s); Progress.questsDone.Add(q.id);
+            Progress.quests.Remove(s); if (q.kind != "bounty") Progress.questsDone.Add(q.id);
             xp = r.xp; Progress.experience += r.xp; Progress.gold += r.gold + coin;
             foreach (var i in r.items) Progress.questItems.Add(i);
             foreach (var d in bags) Inventory.Add(Progress, Items, d.id, 1);
             foreach (var d in r.documents) Reveal(d);
-            Say((q.IsMain ? "Chronicle complete: " : "Quest complete: ") + q.title + (r.xp > 0 ? "  +" + r.xp + " XP" : "") + (r.gold > 0 ? "  +" + r.gold + " gold" : ""), null);
+            Say((q.IsMain ? "Chronicle complete: " : q.kind == "bounty" ? "Bounty paid: " : "Quest complete: ") + q.title + (r.xp > 0 ? "  +" + r.xp + " XP" : "") + (r.gold > 0 ? "  +" + r.gold + " crowns" : ""), null);
             foreach (var d in bags) Say("Received: " + d.name + "." + (d.kind == "bag" ? " Use it from your bags [I] to wear it." : ""), null);
-            if (coin > 0) { Say(HaveOneLine, q.turnIn == "auto" ? null : q.turnIn); Say("Received " + coin + " gold.", null); }
+            if (coin > 0) { Say(HaveOneLine, q.turnIn == "auto" ? null : q.turnIn); Say("Received " + coin + " crowns.", null); }
             foreach (var c in r.reputation) ChangeStanding(c.faction, c.amount);
             return true;
         }

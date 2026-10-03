@@ -3512,6 +3512,17 @@
       "variant": 1
     },
     {
+      "kind": "board",
+      "name": "Notice board",
+      "at": {
+        "x": -22,
+        "y": -27
+      },
+      "rotation": 40,
+      "interact": "Read the notices",
+      "canonStatus": "CANON-EXPANDED (the Bureau and the Seekers post their wanted bills; the village its bounties)"
+    },
+    {
       "kind": "house",
       "name": "Carder farmhouse",
       "at": {
@@ -5531,25 +5542,162 @@
     }
   ],
   "nodes": [
-    { "node": "node.copper", "at": { "x": -121.8, "y": 261.5 }, "rotation": 90 },
-    { "node": "node.copper", "at": { "x": -121.6, "y": 251.5 }, "rotation": 90 },
-    { "node": "node.copper", "at": { "x": -120.6, "y": 223.5 }, "rotation": 90 },
-    { "node": "node.copper", "at": { "x": -120.6, "y": 216.4 }, "rotation": 90 },
-    { "node": "node.copper", "at": { "x": 16.3, "y": 91.5 }, "rotation": 90 },
-    { "node": "node.copper", "at": { "x": -74.5, "y": 252 }, "rotation": 180 },
-    { "node": "node.copper_rich", "at": { "x": -98.7, "y": 243 }, "under": true },
-    { "node": "node.copper_rich", "at": { "x": -60, "y": 238 }, "under": true },
-    { "node": "node.copper_rich", "at": { "x": -54, "y": 225.5 }, "under": true },
-    { "node": "node.copper_rich", "at": { "x": -51, "y": 219 }, "under": true },
-    { "node": "node.oak", "at": { "x": 53, "y": -14 }, "rotation": 180 },
-    { "node": "node.oak", "at": { "x": -78.5, "y": 104 } },
-    { "node": "node.oak", "at": { "x": 88, "y": 175 } },
-    { "node": "node.oak", "at": { "x": -101, "y": -85 }, "rotation": 270 },
-    { "node": "node.oak", "at": { "x": -80, "y": -146 }, "rotation": 270 },
-    { "node": "node.oak", "at": { "x": -100.5, "y": 157 } },
-    { "node": "node.oak", "at": { "x": 80, "y": -145.5 }, "rotation": 270 },
-    { "node": "node.oak", "at": { "x": -213, "y": -28 }, "rotation": 90 },
-    { "node": "node.yarrow", "item": "item.yarrow", "at": { "x": -104, "y": 30 } },
-    { "node": "node.yarrow", "item": "item.yarrow", "at": { "x": 24, "y": -72 } }
+    {
+      "node": "node.copper",
+      "at": {
+        "x": -121.8,
+        "y": 261.5
+      },
+      "rotation": 90
+    },
+    {
+      "node": "node.copper",
+      "at": {
+        "x": -121.6,
+        "y": 251.5
+      },
+      "rotation": 90
+    },
+    {
+      "node": "node.copper",
+      "at": {
+        "x": -120.6,
+        "y": 223.5
+      },
+      "rotation": 90
+    },
+    {
+      "node": "node.copper",
+      "at": {
+        "x": -120.6,
+        "y": 216.4
+      },
+      "rotation": 90
+    },
+    {
+      "node": "node.copper",
+      "at": {
+        "x": 16.3,
+        "y": 91.5
+      },
+      "rotation": 90
+    },
+    {
+      "node": "node.copper",
+      "at": {
+        "x": -74.5,
+        "y": 252
+      },
+      "rotation": 180
+    },
+    {
+      "node": "node.copper_rich",
+      "at": {
+        "x": -98.7,
+        "y": 243
+      },
+      "under": true
+    },
+    {
+      "node": "node.copper_rich",
+      "at": {
+        "x": -60,
+        "y": 238
+      },
+      "under": true
+    },
+    {
+      "node": "node.copper_rich",
+      "at": {
+        "x": -54,
+        "y": 225.5
+      },
+      "under": true
+    },
+    {
+      "node": "node.copper_rich",
+      "at": {
+        "x": -51,
+        "y": 219
+      },
+      "under": true
+    },
+    {
+      "node": "node.oak",
+      "at": {
+        "x": 53,
+        "y": -14
+      },
+      "rotation": 180
+    },
+    {
+      "node": "node.oak",
+      "at": {
+        "x": -78.5,
+        "y": 104
+      }
+    },
+    {
+      "node": "node.oak",
+      "at": {
+        "x": 88,
+        "y": 175
+      }
+    },
+    {
+      "node": "node.oak",
+      "at": {
+        "x": -101,
+        "y": -85
+      },
+      "rotation": 270
+    },
+    {
+      "node": "node.oak",
+      "at": {
+        "x": -80,
+        "y": -146
+      },
+      "rotation": 270
+    },
+    {
+      "node": "node.oak",
+      "at": {
+        "x": -100.5,
+        "y": 157
+      }
+    },
+    {
+      "node": "node.oak",
+      "at": {
+        "x": 80,
+        "y": -145.5
+      },
+      "rotation": 270
+    },
+    {
+      "node": "node.oak",
+      "at": {
+        "x": -213,
+        "y": -28
+      },
+      "rotation": 90
+    },
+    {
+      "node": "node.yarrow",
+      "item": "item.yarrow",
+      "at": {
+        "x": -104,
+        "y": 30
+      }
+    },
+    {
+      "node": "node.yarrow",
+      "item": "item.yarrow",
+      "at": {
+        "x": 24,
+        "y": -72
+      }
+    }
   ]
 }

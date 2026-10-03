@@ -31,7 +31,7 @@ namespace Crulanda.Encounter
             qList = new GUIStyle(GUI.skin.button) { fontSize = 14, alignment = TextAnchor.MiddleLeft, wordWrap = true, padding = new RectOffset(10, 6, 4, 4) };
         }
         void Ink(Rect r, string s, GUIStyle style, Color c) { GUI.contentColor = c; GUI.Label(r, s, style); GUI.contentColor = Color.white; }
-        static string KindLabel(QuestDef q) { return q.kind == "main" ? "Chronicle" : q.kind == "npc" ? "Village work" : q.kind == "faction" ? "Faction" : "Side quest"; }
+        static string KindLabel(QuestDef q) { return q.kind == "main" ? "Chronicle" : q.kind == "npc" ? "Village work" : q.kind == "faction" ? "Faction" : q.kind == "bounty" ? (q.rare ? "Rare posting" : q.poster == "sandthrone" ? "Sandthrone contract" : "Bounty") : "Side quest"; }
 
         /// <summary>The ! or ? over someone's head, or ' ' (no quests here, or too far away).</summary>
         char HeadMarker(string npc, float distance, out bool grey)
@@ -146,7 +146,8 @@ namespace Crulanda.Encounter
             float y = w.y + 56;
             if (c.selected == null)
             {
-                Ink(new Rect(w.x + 24, y, w.width - 48, 40), "\"What can I do for you?\"", qBody, InkBrown); y += 44;
+                bool board = c.npc == Bounties.BoardName;
+                Ink(new Rect(w.x + 24, y, w.width - 48, 40), board ? (c.entries.Count == 0 ? "Rain-marks and old nails. Nothing to read today." : "Pinned to the board:") : "\"What can I do for you?\"", qBody, InkBrown); y += 44;
                 foreach (var (q, st) in c.entries)
                 {
                     string mark = st == QuestStatus.ReadyToTurnIn ? "?  " : "!  ";
@@ -155,7 +156,7 @@ namespace Crulanda.Encounter
                 }
                 var seller = VillageLife.Active?.Find(c.npc);
                 if (session.IsVendor(seller) && GUI.Button(new Rect(w.x + 24, w.yMax - 52, 170, 36), "Browse wares", button)) session.OpenVendor(seller);
-                if (GUI.Button(new Rect(w.xMax - 154, w.yMax - 52, 130, 36), "Goodbye", button)) session.Conversation = null;
+                if (GUI.Button(new Rect(w.xMax - 154, w.yMax - 52, 130, 36), board ? "Step away" : "Goodbye", button)) session.Conversation = null;
                 return;
             }
             var quest = c.selected; var status = log.Status(quest, session.ZoneId);
@@ -194,9 +195,9 @@ namespace Crulanda.Encounter
         {
             var r = q.rewards ?? new QuestRewardDef(); var parts = new List<string>();
             if (r.xp > 0) parts.Add(r.xp + " experience");
-            if (r.gold > 0) parts.Add(r.gold + " gold");
+            if (r.gold > 0) parts.Add(r.gold + " silver crowns");
             foreach (var i in r.items) parts.Add(session.Quests.Db.ItemName(i));
-            foreach (var i in r.bagItems ?? new string[0]) parts.Add(session.ItemName(i) + (Inventory.Owns(session.Progress, i) ? " (you have one: its worth in gold instead)" : ""));
+            foreach (var i in r.bagItems ?? new string[0]) parts.Add(session.ItemName(i) + (Inventory.Owns(session.Progress, i) ? " (you have one: its worth in crowns instead)" : ""));
             foreach (var d in r.documents) parts.Add("Chronicle page: " + (session.Quests.Db.Documents.TryGetValue(d, out var doc) ? doc.title : d));
             foreach (var s in r.reputation) parts.Add((s.amount > 0 ? "+" : "") + s.amount + " standing with " + (session.Quests.Db.Factions.TryGetValue(s.faction, out var f) ? f.name : s.faction));
             return parts.Count == 0 ? "None but thanks." : string.Join("\n", parts);

@@ -138,7 +138,7 @@ namespace Crulanda.Tests
             Assert.AreEqual(2, Inventory.Count(s.Progress, Fang));
             Assert.IsFalse(s.CanLoot(mob), "The body is empty.");
             Assert.AreEqual(-1, LootBeacon.Showing(mob), "Its beacon is out.");
-            Assert.Contains("Looted 5 gold.", s.Messages);
+            Assert.Contains("Looted 5 crowns.", s.Messages);
             Assert.Contains("Looted: " + s.Items.Get(Fang).name + " x2.", s.Messages);
         }
 

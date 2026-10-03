@@ -90,7 +90,7 @@ namespace Crulanda.Encounter
             var named = LootLines(d); if (named != null) lines.Add(named);
             if (d.level > 1) lines.Add((d.level > session.Progress.Level ? "<color=#ff5544>" : "") + "Requires level " + d.level + (d.level > session.Progress.Level ? "</color>" : ""));
             if (!string.IsNullOrEmpty(d.description)) lines.Add("<i>" + d.description + "</i>");
-            lines.Add("Sells for " + (d.value) + " gold");
+            lines.Add("Sells for " + (d.value) + " crowns");
             if (compare && d.kind == "gear")
             {
                 var worn = session.Progress.equipment[ItemDatabase.SlotIndex(d.slot)];
@@ -133,7 +133,7 @@ namespace Crulanda.Encounter
             bagsExtra = extra; var w = BagsRect;
             Fill(new Rect(w.x - 3, w.y - 3, w.width + 6, w.height + 6), new Color(.3f, .22f, .12f, .98f)); Fill(w, new Color(.08f, .075f, .07f, .97f));
             Shadow(new Rect(w.x + 14, w.y + 8, 200, 28), "BAGS", heading, gold);
-            Shadow(new Rect(w.x + 150, w.y + 12, 210, 24), p.gold + " gold  ·  " + Inventory.FreeSlots(p) + " free", text, new Color(1, .86f, .4f));
+            Shadow(new Rect(w.x + 150, w.y + 12, 210, 24), p.gold + " crowns  ·  " + Inventory.FreeSlots(p) + " free", text, new Color(1, .86f, .4f));
             var e = Event.current; var mouse = e.mousePosition;
             for (int i = 0; i < p.bag.Count && i < Inventory.BagSize; i++)
                 BagSlot(new Rect(w.x + 14 + (i % 6) * (Slot + Gap), w.y + 48 + (i / 6) * (Slot + Gap), Slot, Slot), i, null, e, mouse);
@@ -256,7 +256,7 @@ namespace Crulanda.Encounter
             ItemStyles(); var w = VendorRect; var p = session.Progress;
             Fill(new Rect(w.x - 3, w.y - 3, w.width + 6, w.height + 6), new Color(.3f, .22f, .12f, .98f)); Fill(w, new Color(.9f, .84f, .7f, .98f));
             GUI.contentColor = new Color(.2f, .13f, .07f); GUI.Label(new Rect(w.x + 16, w.y + 10, w.width - 32, 30), session.VendorNpc + "'s wares", heading);
-            GUI.Label(new Rect(w.x + 16, w.y + 42, w.width - 32, 22), "You have " + p.gold + " gold. Drag or right-click items in your bags to sell.", tiny); GUI.contentColor = Color.white;
+            GUI.Label(new Rect(w.x + 16, w.y + 42, w.width - 32, 22), "You have " + p.gold + " crowns. Drag or right-click items in your bags to sell.", tiny); GUI.contentColor = Color.white;
             var view = new Rect(w.x + 12, w.y + 70, w.width - 24, w.height - 130);
             var stock = session.VendorStock; float rowH = Slot + 8;
             vendorScroll = GUI.BeginScrollView(view, vendorScroll, new Rect(0, 0, view.width - 20, stock.Count * rowH));

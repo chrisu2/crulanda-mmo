@@ -35,6 +35,11 @@ namespace Crulanda.Encounter
         public List<ItemStack> bag = new List<ItemStack>();
         public List<ItemStack> equipment = new List<ItemStack>();
         public List<EnemyRecord> enemies = new List<EnemyRecord>();
+        // ---------- notice boards (2026-10-03; older saves load with zero days and no boards, and draw on first use) ----------
+        /// <summary>Game days passed (the clock crossing six in the morning while playing): what the boards draw by.</summary>
+        public int days;
+        /// <summary>Each zone's notice board: the day it was drawn, its postings, the ones handed in today. See Bounties.</summary>
+        public List<BoardState> boards = new List<BoardState>();
         // ---------- quests (save format 4; older saves load with these empty) ----------
         public List<QuestState> quests = new List<QuestState>();
         public List<string> questsDone = new List<string>();

@@ -76,7 +76,7 @@ namespace Crulanda.Encounter
         {
             string r = "";
             if (s.xp > 0) r += "  +" + s.xp + " XP";
-            if (s.gold > 0) r += "  +" + s.gold + " gold";
+            if (s.gold > 0) r += "  +" + s.gold + " crowns";
             if (item != null) r += "  +" + item.name;
             return r;
         }

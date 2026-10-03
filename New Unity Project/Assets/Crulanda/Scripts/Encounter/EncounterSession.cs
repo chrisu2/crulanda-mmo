@@ -58,6 +58,37 @@ namespace Crulanda.Encounter
         /// <summary>Chronicle page being read in the quest book (null = none).</summary>
         [NonSerialized] public string ReadingDocument;   // not serialized: Unity would start it as "" instead of null
         public sealed class QuestConversation { public string npc; public QuestDef selected; public List<(QuestDef quest, QuestStatus status)> entries; public Vector3 where; }
+        /// <summary>The zone's notice boards and their postings (Bounties.cs); null with no quest content.</summary>
+        public Bounties Boards;
+        float lastHour = -1; EncounterEnemy courier; bool courierDone;
+        /// <summary>Reading a notice board (a "board" prop): the conversation window with today's postings on it.</summary>
+        void OpenBoard(Crulanda.World.ZoneInteractable board)
+        {
+            if (Boards == null || Zone == null) { Message("Rain-marks and old nails. Nothing you can read."); return; }
+            Quests.TalkTo("board"); ReconcileQuests();   // skins and herbs brought for a posting are pinned to the board
+            var list = Boards.Entries(ZoneId, Progress.Level);
+            Conversation = new QuestConversation { npc = Bounties.BoardName, entries = list, selected = null, where = board.position };
+        }
+        /// <summary>The rare posting's Bureau courier (CANON: the Council's Investigation Bureau), abroad on the zone's first road,
+        /// two levels over the zone, while the posting is taken on and not yet paid.</summary>
+        void SpawnCourier()
+        {
+            if (courier != null || Zone == null || Zone.Zone.roads == null || Zone.Zone.roads.Length == 0) return;
+            var road = Zone.Zone.roads[0]; var spot = road.points[road.points.Length * 2 / 3];
+            var point = Zone.Ground(spot);
+            if (NavMesh.SamplePosition(point, out var hit, 4, NavMesh.AllAreas)) point = hit.position;
+            string id = Bounties.CourierId(ZoneId);
+            var a = SpawnActor("Bureau courier", content.enemy, point + Vector3.up, Color.grey, id, ActorLook.Collector, Zone.Zone.levelMax + 2);
+            AddAgent(a.gameObject, 3.2f);
+            var enemy = a.gameObject.AddComponent<EncounterEnemy>(); enemy.actor = a; enemy.persistentId = id; enemy.session = this; enemy.Camp = false;
+            a.gameObject.SetActive(true); enemy.Initialize(); Enemies.Add(enemy); courier = enemy;
+        }
+        void DespawnCourier()
+        {
+            if (courier == null) return;
+            Enemies.Remove(courier); if (Target == courier) Select(null);
+            courier.gameObject.SetActive(false); Destroy(courier.gameObject); courier = null;
+        }
         public string ZoneId { get { return Zone != null ? Zone.Zone.id : null; } }
         static QuestDatabase questCache; static EncounterContent questCacheFor;
         void StartQuests()
@@ -70,7 +101,7 @@ namespace Crulanda.Encounter
                     var texts = new List<string>(); foreach (var f in content.questFiles) if (f != null) texts.Add(f.text);
                     questCache = QuestDatabase.Parse(texts); questCacheFor = content;
                 }
-                Quests = new QuestLog(questCache, Progress) { Items = Items };
+                Quests = new QuestLog(questCache, Progress) { Items = Items }; Boards = new Bounties(Quests);
                 if (Items != null) { var unknown = questCache.CheckItems(Items); if (unknown.Count > 0) Debug.LogError("Quest content names items that are not right:\n" + string.Join("\n", unknown)); }
                 Quests.Say = (text, speaker) => {
                     if (speaker == null) { Message(text); return; }
@@ -112,6 +143,7 @@ namespace Crulanda.Encounter
         public void AcceptQuest(QuestDef q)
         {
             if (Quests == null || Zone == null || !Quests.Accept(q, Zone.Zone.id)) return;
+            if (q.kind == "bounty" && q.rare) SpawnCourier();
             ReconcileQuests(); Save(false); ReopenConversation();
         }
         public void CompleteQuest(QuestDef q)
@@ -123,6 +155,7 @@ namespace Crulanda.Encounter
             var bagItems = q.rewards?.bagItems; int worth = 0;
             if (bagItems != null && Items != null) foreach (var id in bagItems) { var d = Items.Get(id); if (d != null && !(d.kind == "bag" && Inventory.Owns(Progress, id))) worth += Inventory.Price(d); }
             if (!Quests.TurnIn(q, out _)) return;
+            if (q.kind == "bounty" && Boards != null) { Boards.Finished(ZoneId, q.id); if (q.rare) DespawnCourier(); }
             if (worth > 0) VillageLife.Active?.Paid(q.turnIn, worth);
             if (Progress.Level > before) { ApplyLevel(); Player.Health.ApplyHealing(Player.Health.Pool.Max); Message("Level " + Progress.Level + "! Talent points are waiting [B]."); }
             ReconcileQuests(); Save(false); ReopenConversation();
@@ -130,7 +163,7 @@ namespace Crulanda.Encounter
         void ReopenConversation()
         {
             if (Conversation == null) return;
-            var list = Quests.For(Conversation.npc, ZoneId, Progress.Level);
+            var list = Conversation.npc == Bounties.BoardName && Boards != null ? Boards.Entries(ZoneId, Progress.Level) : Quests.For(Conversation.npc, ZoneId, Progress.Level);
             if (list.Count == 0) { Conversation = null; return; }
             Conversation.entries = list; Conversation.selected = list.Count == 1 ? list[0].quest : null;
         }
@@ -261,13 +294,13 @@ namespace Crulanda.Encounter
             // A material sold in a village is that day's delivery to its trade (ore to the forge, herbs to the stall), and the trades
             // notice; "sold." + the trade marks it as the player's (the herbalist brings the stall herbs herself every day).
             if (d != null && !string.IsNullOrEmpty(d.trade) && VillageLife.Active != null) { VillageLife.Active.Deliver(d.trade, count); VillageLife.Active.Deliver("sold." + d.trade, count); }
-            Message("Sold " + n + (count > 1 ? " x" + count : "") + " for " + gold + " gold."); Save(false);
+            Message("Sold " + n + (count > 1 ? " x" + count : "") + " for " + gold + " crowns."); Save(false);
         }
         public void SellJunk()
         {
             if (VendorNpc == null) return;
             int total = Inventory.SellJunk(Progress, Items);
-            Message(total > 0 ? "Sold your junk for " + total + " gold." : "Nothing worth selling as junk."); Save(false);
+            Message(total > 0 ? "Sold your junk for " + total + " crowns." : "Nothing worth selling as junk."); Save(false);
         }
         public void Buy(string item)
         {
@@ -716,6 +749,7 @@ namespace Crulanda.Encounter
         }
         public void UseInteractable(Crulanda.World.ZoneInteractable i)
         {
+            if (i.kind == "board") { OpenBoard(i); return; }
             if (i.node != null && Professions != null) { TryGather(i); return; }   // a node (a seam, a windfall, a herb) is worked with its trade
             if (Quests == null) { Message("Nothing here you need."); return; }
             if (!QuestUse(i)) { Message(string.IsNullOrEmpty(i.item) ? "You look it over, but find nothing you need right now." : "You don't need any of this right now."); return; }
@@ -1275,6 +1309,11 @@ namespace Crulanda.Encounter
         {
             if (Player == null) return;
             AdvanceToast();
+            // The day turns at six in the morning: the boards draw again (Bounties). A rare posting taken on keeps its courier abroad.
+            if (lastHour >= 0 && Bounties.DayTurned(lastHour, Crulanda.World.WorldClock.Hour)) Progress.days++;
+            lastHour = Crulanda.World.WorldClock.Hour;
+            if (courier == null && Boards != null && Zone != null && Boards.ActiveRare(ZoneId) != null && !courierDone) SpawnCourier();
+            if (courier != null && !courier.actor.IsAlive) courierDone = true;
             if (EncounterInput.Press(KeyCode.Escape))
             {
                 // Esc closes open windows (conversation, quest book, map) before it pauses.
@@ -1529,8 +1568,8 @@ namespace Crulanda.Encounter
                 if (Progress.Loot(corpse.persistentId))
                 {
                     if (!Inventory.Has(Progress, content.itemId) && Items != null && Inventory.Add(Progress, Items, content.itemId, 1) == 0)
-                    { Message("Looted 8 gold. " + content.itemName + " is in your bags [I]."); InventoryOpen = true; }
-                    else Message("Looted 8 gold.");
+                    { Message("Looted 8 crowns. " + content.itemName + " is in your bags [I]."); InventoryOpen = true; }
+                    else Message("Looted 8 crowns.");
                 }
                 return;
             }

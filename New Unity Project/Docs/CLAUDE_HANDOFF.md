@@ -9,16 +9,22 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-10-03, afternoon)
-**The playable build:** published 2026-10-03 14:42: the boars (CraftPix, animated in code), on top of the farm animals (13:06,
-632853a), the real animals (01:59, d24ecf2) and the feet (00:44, 2e18462).
-**Last full run:** EditMode 392/392, PlayMode 173/174 (Sel Harrow's walk home timed out once; the fixture passed alone 8/8), build OK, Oakhaven toured, all shots, no exceptions
-in any game log, no shader errors.
+## RESUME HERE (updated 2026-10-03, evening)
+**NEXT JOB IS WRITTEN UP:** `Docs/NEXT_PEAKS.md` (the Shattered Peaks filled out: 4 camps + 5 quests, then publish, handoff and
+shut the computer down). Chris chose to run it in a new session; its paste-in prompt is at the bottom of that file.
+**The playable build:** published 2026-10-03 17:25: notice boards with bounties and the rare courier posting, silver crowns, Khaven's
+four camps and five quests (12d8ddc), on top of the boars (14:42), the farm animals (13:06) and the real animals (01:59).
+**Last full run:** EditMode 396/396, PlayMode 175/175 (two zone tests failed on the board's postings in the full run and were
+taught that a bounty belongs to the notice board; re-run green), build OK, Oakhaven toured, all shots, no exceptions in any game
+log, no shader errors.
 **Nothing in flight:** everything is committed, published and backed up.
-**What the game has now (newest first):** boars (CraftPix, moved in code); farm animals in Oakhaven (horses, a donkey, cows); real animals (wolves, ash hounds, Old Whitefoot, the forest stags and does, the hill
-deer: Quaternius models through `ModelBeast`); foot armour that follows the foot; armour that follows the form and hats fitted to
-the heads; every person a Quaternius model (`ModelFigure`, old gear refitted onto frames on its bones); before that the
-professions, loot, hunting, the five grown zones and the painted style (see the numbered history below and CHANGELOG.md).
+**What the game has now (newest first):** notice boards (one a zone by the inn or hall: three postings a game day, village bounties
+and Sandthrone contracts, a 1.5%-a-slot rare posting whose Bureau courier carries an Aether-Geode shard, the component for five
+resonance-tempered weapons at the forge); the coin is the silver crown; Khaven's Scarp hollows, Thicket deserters, Heights scree
+spiders and the Hush-Mother with five quests; boars (CraftPix, moved in code); farm animals in Oakhaven; real animals (Quaternius
+models through `ModelBeast`); foot armour; armour and hats fitted to the form; every person a Quaternius model (`ModelFigure`);
+before that the professions, loot, hunting, the five grown zones and the painted style (see the numbered history below and
+CHANGELOG.md).
 
 **Open (ask Chris before starting; he skims: put the question first or use the question prompt):**
 1. **Farm animals are in Oakhaven** (published 2026-10-03 13:06): more could go to the other zones' farms and towns (Khaven,
@@ -930,11 +936,27 @@ resumed with `Workflow({scriptPath, resumeFromRunId})` (finished agents replay f
   their atlas (Atlas()), facing from hips to head in any direction (Shape.yaw), Hips falls back to Spine_2, Neck to Neck.
   ActorVisual.Beasts: Boar coats by name (wild .56/.49/.43, Carrion, Mire, Rockhide/Scree, gloom x.8), height .95 (elite 1.1).
   CreatureCapture rows beasts-boar, beasts-boar-moves; sheet tools/wip/characters/show/8-boar.jpg.
-- **Round 10, Khaven camps and quests (PUBLISHED 2026-10-03 with the boards round, below, see git log)**: khaven.json camps 10-13 appended (Scarp hollows
+- **Round 10, Khaven camps and quests (PUBLISHED 2026-10-03 17:25 with the boards round, below; commit 12d8ddc)**: khaven.json camps 10-13 appended (Scarp hollows
   (-100,115) hollow x5 L4-5; Thicket deserters (-150,-108) deserter x5 ambush; Heights scree spiders (160,25) spider x5 L5;
   The Hush-Mother (-165,112) tag wolf x1 L6, not elite: an elite needs a signature loot list and the 104-item count is pinned by
   LootDataTests), a "Deserters' strongbox" crates prop (interact only) and "The Thicket" landmark; Quests/khaven.json +5 quests
   and item.charnel_silk (collect from kill:mob.spider.khaven*). Quest kill targets by camp index: mob.hollow.khaven.10.* and
   mob.wolf.khaven.13.*. Rules met on the way: a new tag needs a SocialRulesTests kind and (for beasts) an ItemTests hide table;
   camps 125 m+ from houses (ZoneGrowthTests). Zone maps: scratchpad zonemap.py.
+- **Round 11, notice boards + crowns (PUBLISHED 2026-10-03 17:25, the boards commit, see git log)**: `Bounties.cs` (BoardState in Progress.boards; Progress.days
+  ticks when the clock crosses 06:00 in EncounterSession.Update; Board(zone) draws Slots=3 from the zone's kind "bounty" quests,
+  giver/turnIn "board", seeded by zone+day; RareChance .015 a slot; Entries(); Finished(); ActiveRare(); CourierId()). No save
+  format bump: the two new Progress fields are declared BEFORE the lists the save tests pin (payload tail unchanged; older saves
+  load with days 0). Quests: kind "bounty" (never in questsDone; QuestDef.rare/poster). Session: UseInteractable on a "board"
+  prop -> OpenBoard (TalkTo("board") first so bring postings hand over; conversation npc = Bounties.BoardName; HUD intro "Pinned to
+  the board:"); AcceptQuest of a rare posting -> SpawnCourier (ActorLook.Collector, level zone max+2, on roads[0] two thirds
+  along, Camp=false, Enemies.Add); CompleteQuest -> Boards.Finished + DespawnCourier; Update respawns a courier for an active
+  rare posting on load. ZoneBuilder prop kind "board" (NoticeBoard: two stakes, a board, a pent roof, four pinned notices).
+  Content: Quests/bounties.json (22 postings: Oakhaven 4+1, Khaven 4+1, Peaks 3+1, Ash Rim 3+1, Verdant 3+1; kill targets by camp
+  tag, bring items are gathered/hunted materials only, visits at night); items.json mat.geode_shard (value 30, CANON-EXPANDED)
+  + temper.{copper,bogiron,ridgesteel,ashsteel,veridian} (quality 1 shard, stack 20; the craft.* curve tests pin their 21 pieces) (quality 3, mainhand); professions.json recipe.tempered_* (3
+  bars + wood + shard; value <= 1.5x cost); looks.json looks on the concord palette; a "board" prop in each zone by the inn/hall.
+  "gold" -> "crowns" in every user-facing string (Discoveries, HUD Items/Quests, Loot, Session, Items.cs, Quests.cs; the data
+  fields stay "gold"). Encounter.asset must list bounties.json (the register step adds it; copy the asset back from the validation
+  copy).
 

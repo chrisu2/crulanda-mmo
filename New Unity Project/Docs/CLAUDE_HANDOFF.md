@@ -9,7 +9,39 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-10-01, night)
+## RESUME HERE (updated 2026-10-03, small hours; Chris had the computer shut down after this)
+**The playable build:** published 2026-10-03 01:59 (build of 01:48; the real animals; commit below in git log: 'Real animals').
+**Last full run:** EditMode 390/390, PlayMode 174/174, build OK, Oakhaven toured, HUD/wardrobe/loot/fight shots, no exceptions in any game log, no shader errors.
+**Nothing in flight:** everything is committed, published and backed up; the computer was shut down at Chris's request.
+**What the game has now (newest first):** real animals (wolves, ash hounds, Old Whitefoot, the forest stags and does, the hill
+deer: Quaternius models through `ModelBeast`); foot armour that follows the foot; armour that follows the form and hats fitted to
+the heads; every person a Quaternius model (`ModelFigure`, old gear refitted onto frames on its bones); before that the
+professions, loot, hunting, the five grown zones and the painted style (see the numbered history below and CHANGELOG.md).
+
+**Open (ask Chris before starting; he skims: put the question first or use the question prompt):**
+1. **Farm animals for village life** (my suggestion): the same pack has Horse, Horse_White, Donkey, Cow, Bull, Alpaca, Fox,
+   Husky and Shiba Inu, rigged and animated like the wolf. The zip is kept at `tools/wip/animals/source/AnimatedAnimalPack.zip`
+   (git-ignored); `python tools/wip/animals/animals_import.py <zip> Horse Donkey Cow` brings them in. They would need a
+   CritterBody kind each (calm: they amble off, never bolt), and ZoneCritters groups in the farms (zone data: tour those zones).
+2. **Still primitives** (the free pack has none): boars, spiders, the bramble-things, and the village's hens, sheep, cats, crows
+   and rabbits. The farm pack's sheep has no walk; the only animated pig is cube-styled. A paid pack (or Quaternius's $20
+   tier for the people) is Chris's purchase.
+3. Playtest notes 9 (bloom and sun) and 10 (baked cave lighting) are OPEN; note 12's armour designs could go further (plate
+   shapes, pauldrons); note 14's PDF was last brought up to date 2026-10-02 21:45 (`tools/docs/make_history_pdf.py`).
+
+**How to work (the rules that matter):** read `D:\code\mmo\CLAUDE.md` first. Sync into the validation copy and test there, never
+in Chris's open project. Never edit the repo's Assets while a run is in flight (`run_tests.ps1` and `build_and_tour.ps1` both
+mirror Assets when they start); stage elsewhere and apply after the build's mirror. Fast checks: `tools\validation\run_focus.ps1
+-Filter <fixtures> -Platform EditMode|PlayMode`; renders in a minute: `run_method.ps1 -Method Crulanda.EditorTools.FigureCapture.Run
+-Graphics` (people) or `...CreatureCapture.Run -Graphics` (animals), to `hel\work\ui-captures\figures`. The full check:
+`start_detached.ps1 -Arguments '-Zones zone.oakhaven'` (or `-NoTour` when nothing visible changed), then wait for
+`hel\work\full-run.done` (summary lines; fixed 2026-10-03 to read the mixed-encoding log). After the first Unity run of new
+files, copy their new `.meta` files back from the validation copy (its robocopy /MIR deletes them otherwise). Publish:
+robocopy `encounter-validation\Builds\Crulanda` to `hel\outputs\Crulanda-Playable` /MIR /XF *.log while Crulanda.exe is not
+running; copy this file to `hel\outputs\Crulanda-Claude-Handoff.md`; commit (repo-local author, Opus 5.5 trailer); then
+`tools\Backup.ps1`. Tests never touch Chris's save (SaveDirectoryOverride); back it up before any save-format change.
+
+## Resume notes as of 2026-10-01 night (history)
 **PUBLISHED 2026-10-01/02 (eleven publishes; the playable build is main at f046de3, published 2026-10-02 00:20):**
 1. The Root-Mother's Deep, Crowsfoot's hidden mouth, every trade has a day (4c579e6).
 2. The painted style pass parts 1-4 (03fd06d) and 3. part 5, painted masonry (17168d8).
@@ -857,4 +889,22 @@ resumed with `Workflow({scriptPath, resumeFromRunId})` (finished agents replay f
   (heel to toe: z, half-width, half-height, middle) as a squarish oval, mapped section by section (`AlongFoot`), clearance
   kept at LimbGap. The hand is still box to box. Full run (c3f-start.marker): EditMode 384/384, PlayMode 174/174, Oakhaven
   toured.
+- **Round 7, real animals (PUBLISHED 2026-10-03 01:59)**: `Resources/Creatures` (Wolf, Stag, Deer FBX from the poly.pizza
+  bundle "Animated Animal Pack" = Quaternius Ultimate Animated Animals, CC0; Quaternius's Google Drive was over its download
+  quota; `tools/wip/animals/animals_import.py` copies them from the zip). `Editor/CreatureImport.cs`: Generic rig, materials
+  by description, readable, normals smoothed 70, the "AnimalArmature|X" takes kept and named X, loops for idles/walk/gallop/
+  eating; `CreatureImport.Report` writes CreatureReport.txt. `ModelBeast.cs`: Build(parent, kind, ground, height, Coat, shade)
+  measures the rest pose from the baked skin (renderer bounds carry a margin) and scales so the head (never the antlers) stands
+  at `height`; colours are the file's (linear, x.8 diffuse factor: undone, then to gamma) or a Coat by material name, with
+  `Native` coats for Stag/Deer; `Rounded` (PN-triangle midpoints, normals per colour patch; NB Vector3.normalized is zero under
+  1e-5 and these meshes are at 1/100 scale: `Unit`); a PlayableGraph with slots idle/idle2/headlow/eat/walk/run/attack/kick/
+  hitL/hitR/death/jump, ticked by its own Driver component (so a dead game animal's death plays on); Drive(speed, standing);
+  Play(one-shot); Die/Revive; Sample for edit mode. `Hips` = the "Back" bone (Body is the low root). `ActorVisual.Beasts.cs`:
+  BuildModelBeast for Wolf (ash = variant odd; Old Whitefoot by name; gloom), Stag (doe = Deer kind); BeastLate (dead: body set
+  upright, death held; LyingLow: headlow; standing: idle/idle2 or eat/idle; fighting: idle); Strike (EncounterEnemy swing and
+  elite ReleaseBlow), Flinch (Receive). CritterBody "deer": MakeModel (r < .5 Stag 1.75 m, else Deer 1.55 m); Stride/Rest/
+  Alert/LieDown/StandUp drive the model; Part uses DestroyImmediate in edit mode. Heights: wolf 1.0 (elite 1.12), stag 1.9,
+  doe 1.6 (elite x1.1). `Editor/CreatureCapture.cs` rows beasts-1/before/round/wolf/stag; sheet tools/wip/characters/show/
+  6-animals.jpg. Batch PlayMode draws nothing: the Animator (CullUpdateTransforms) leaves bones be, so PlayMode tests check
+  state (Model.Dead), EditMode tests check poses (Sample).
 

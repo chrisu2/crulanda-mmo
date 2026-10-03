@@ -406,6 +406,7 @@ namespace Crulanda.Encounter
             var capsule = body.GetComponent<MeshRenderer>(); if (capsule != null) capsule.enabled = false;
             if (look == ActorLook.WeaveEater) { BuildEater(); lastPosition = transform.position; return; }
             if (look == ActorLook.Pale) { BuildPale(); lastPosition = transform.position; return; }
+            if ((look == ActorLook.Wolf || look == ActorLook.Stag) && BuildModelBeast(look)) { lastPosition = transform.position; return; }   // ActorVisual.Beasts.cs
             if (look == ActorLook.Stag) { BuildStag(); lastPosition = transform.position; return; }
             if (look == ActorLook.Spider) { BuildSpider(); lastPosition = transform.position; return; }
             if (look == ActorLook.Bramble) { BuildBramble(); lastPosition = transform.position; return; }
@@ -898,6 +899,7 @@ namespace Crulanda.Encounter
         void LateUpdate()
         {
             if (core != null) { Drift(); return; }
+            if (beastModel != null) { BeastLate(); return; }
             if (model != null) { ModelLate(); return; }
             if (body == null || legL == null) return;
             // Swimming: the kit goes on the back, so no sword stands out of the water like a mast.

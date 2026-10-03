@@ -97,7 +97,10 @@ namespace Crulanda.Tests
             Assert.IsTrue(s.Messages.Where(m => m.StartsWith("Hill deer")).All(m => !m.Contains("XP") && m.Contains("no experience")), "And no experience is.");
             Assert.AreEqual(0, deer.Coins, "No coin on a deer.");
             Assert.AreEqual(1, deer.Drops.Count); Assert.AreEqual("hide.hill_deer", deer.Drops[0].item); Assert.AreEqual(1, deer.Drops[0].count);
-            Assert.AreEqual(90, Animal(deer).Body.Root.localEulerAngles.z, 1, "On its side.");
+            // (Its death pose itself is ModelBeastTests': a batch run draws nothing, so an Animator here leaves its bones be.)
+            var fallen = Animal(deer).Body;
+            if (fallen.Model != null) { Assert.IsTrue(fallen.Model.Dead, "A modelled deer falls in its own death."); Assert.Less(Quaternion.Angle(fallen.Root.localRotation, Quaternion.identity), 1, "Not rolled over as well."); }
+            else Assert.AreEqual(90, fallen.Root.localEulerAngles.z, 1, "On its side.");
             Assert.Less(Animal(deer).Body.Root.position.y, deer.transform.position.y, "On the ground, not where an actor's body would tip.");
             Assert.AreEqual(1, LootBeacon.Showing(deer), "A white twinkle on the body.");
             // Skinned: E beside the body ("Skin the body") puts the hide in the bags with the one press.

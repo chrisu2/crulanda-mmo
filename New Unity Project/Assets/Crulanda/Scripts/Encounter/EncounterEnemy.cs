@@ -37,6 +37,9 @@ namespace Crulanda.Encounter
         public bool Ambusher;
         public bool Hidden { get; private set; }
         float lungeUntil, unreachableSince = -1;
+        ActorVisual figure;
+        /// <summary>Its figure (a modelled beast attacks and flinches; see ActorVisual.Beasts.cs).</summary>
+        ActorVisual Figure { get { if (figure == null) figure = GetComponent<ActorVisual>(); return figure; } }
         public void Hide()
         {
             Hidden = true; var body = transform.Find("Body"); var look = GetComponent<ActorVisual>();
@@ -161,6 +164,7 @@ namespace Crulanda.Encounter
             {
                 if (Move != null && Time.time >= nextBlowAt) { BeginBlow(); return; }
                 swing = Time.time + SwingInterval;
+                if (Figure != null) Figure.Strike();
                 int damage = session.Kit.ResolveEnemyHit(this, Victim, Mathf.RoundToInt(HitBase * OverHitNow));
                 session.FloatText(Victim.transform.position, "−" + damage, new Color(1, .45f, .35f));
             }
@@ -199,6 +203,7 @@ namespace Crulanda.Encounter
             if (!actor.IsAlive) return;
             if (Hidden) Pounce();
             int actual = actor.GetComponent<Combatant>().Damage(Mathf.RoundToInt(damage * session.Kit.PartyDamageMultiplier(this) * OverTakenNow));
+            if (actor.IsAlive && Figure != null) Figure.Flinch();
             if (Game) { if (actor.IsAlive) GetComponent<GameAnimal>()?.Bolt(source != null ? source.transform.position : transform.position); }
             else { if (!inFight) struck = true; threat.Add(source.EntityId.Value, actual); }   // struck: it was hit before it noticed anyone, so sneaking does not quieten its alarm
             session.FloatText(transform.position, actual.ToString(), new Color(1, .86f, .4f));

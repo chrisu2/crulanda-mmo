@@ -984,3 +984,18 @@ A read-only review by five reviewers, each finding checked by a second who tried
   foot) onto the model's own boot at the same point (ModelArmour: the foot's cross-sections in the cage), so the armour
   narrows to the toe, rises over the instep and rounds at the heel like the shoe under it.
 - Tests: EditMode 384/384, PlayMode 174/174; Oakhaven toured; no errors in any game log.
+
+## 2026-10-03 — Real animals: wolves, ash hounds, stags and deer (published 01:59)
+- **The beasts are models now** (Chris chose real animal models after the people): Quaternius's Ultimate Animated Animal
+  Pack (CC0; the wolf, the stag and the deer) replaces the block bodies of wolves, ash hounds, the forest stags and does, and
+  the hill deer you hunt. Grey wolves are grey (darker in Khaven's dusk); ash hounds are charcoal with eyes like embers; Old
+  Whitefoot is a size bigger, grizzled, his muzzle, chest and feet gone white (GAME-ONLY); camp elites stand a size bigger
+  than their packs. The stag wears a russet coat and a wide crown of antlers, the doe a warm brown.
+- **They move like animals**: a real walk and gallop matched to their speed, no two of a pack in step; standing, wolves look
+  about and deer graze; a wolf lying in wait puts its head down; a blow lands with a bite, an antler charge or a doe's kick;
+  struck, they flinch one way then the other; killed, they fall in their own death where they stood (no more tipping over).
+- **Rounder than the file**: the pack is low-poly and flat-shaded; every triangle is split in four with the new corners set
+  out on the curve of the surface, so outlines and shading come out soft among the painted ones.
+- Boars, spiders, the bramble-things and the village's hens, sheep, cats, crows and rabbits keep their bodies: the pack has
+  none of them (the farm pack's sheep has no walk, the only animated pig is cube-styled).
+- Tests: EditMode 390/390, PlayMode 174/174; ModelBeastTests (6 new); Oakhaven toured; wardrobe, loot and fight shots; no errors in any game log.

@@ -24,6 +24,18 @@ namespace Crulanda.Encounter
         /// at its feet; -1 for a game animal, whose transform rides 1 m up like every actor's (its agent's base offset).</summary>
         public float Lift { get; private set; }
         Transform wingL, wingR; float phase, seed;
+        ModelBeast model;
+        /// <summary>The animal's model (game deer: the pack's stag or deer; <see cref="ModelBeast"/>), or null for a body of primitives.</summary>
+        public ModelBeast Model { get { return model; } }
+        /// <summary>Wears the pack's animal of this kind, its head <paramref name="height"/> m up, if it is in the build.</summary>
+        bool MakeModel(string animal, float height, float walk, float run)
+        {
+            model = ModelBeast.Build(Root, animal, 0, height, null, .94f + seed * 7.3f % 1 * .12f);
+            if (model == null) return false;
+            Head = model.Head; model.WalkPace = walk; model.RunPace = run;
+            model.StartMotion(animal + seed.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture));
+            return true;
+        }
         // Legs on hip pivots (see Leg): lag is the leg's place in the stride in radians, or -1 to swing with a rabbit's hop;
         // amp its swing in degrees (negative reaches forward). stepRate: phase per m/s that keeps a planted foot from sliding.
         readonly List<(Transform hip, float lag, float amp)> legs = new List<(Transform, float, float)>();
@@ -47,7 +59,8 @@ namespace Crulanda.Encounter
         }
         static Transform Part(PrimitiveType type, Transform parent, Vector3 pos, Vector3 scale, Color c, Vector3? euler = null)
         {
-            var o = GameObject.CreatePrimitive(type); Object.Destroy(o.GetComponent<Collider>());
+            var o = GameObject.CreatePrimitive(type);
+            if (Application.isPlaying) Object.Destroy(o.GetComponent<Collider>()); else Object.DestroyImmediate(o.GetComponent<Collider>());   // edit mode tests build bodies too
             o.transform.SetParent(parent, false); o.transform.localPosition = pos; o.transform.localScale = scale;
             if (euler.HasValue) o.transform.localEulerAngles = euler.Value;
             o.GetComponent<Renderer>().sharedMaterial = Mat(c); o.GetComponent<Renderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off; return o.transform;
@@ -137,6 +150,7 @@ namespace Crulanda.Encounter
                     break;
                 case "deer":
                     Speed = 1.2f; FleeSpeed = 7.5f; FleeRadius = 16; torso = 1; flank = .23f;
+                    if (MakeModel(r < .5f ? "Stag" : "Deer", r < .5f ? 1.75f : 1.55f, 1.2f, 7)) break;   // as the old body: antlered when r is under a half
                     var hide = new Color(.5f, .34f, .2f);
                     Part(PrimitiveType.Capsule, body, new Vector3(0, 1f, 0), new Vector3(.45f, .6f, .45f), hide, new Vector3(90, 0, 0));
                     // Hips tucked up inside the body so the leg tops stay hidden as they swing; diagonal pairs step together.
@@ -252,6 +266,7 @@ namespace Crulanda.Encounter
         /// </summary>
         public void Stride(float v)
         {
+            if (model != null) { model.Drive(v, "idle"); return; }
             phase += Time.deltaTime * (Kind == "rabbit" ? Mathf.Min(v, 2.2f) * 5.5f : Mathf.Min(v * stepRate, 24));
             if (Kind == "rabbit") Root.localPosition = new Vector3(0, Lift + Mathf.Abs(Mathf.Sin(phase)) * Mathf.Lerp(.16f, .28f, (v - 1) / 5), 0);
             Legs(1);
@@ -265,6 +280,7 @@ namespace Crulanda.Encounter
         /// </summary>
         public void Legs(float moving, bool flying = false)
         {
+            if (model != null) return;
             stride = Mathf.MoveTowards(stride, moving, Time.deltaTime * 5); tuck = Mathf.MoveTowards(tuck, flying ? 1 : 0, Time.deltaTime * 4);
             if (stride == 0 && tuck == 0) { if (atRest) return; atRest = true; } else atRest = false;
             foreach (var l in legs)
@@ -275,6 +291,8 @@ namespace Crulanda.Encounter
         /// <summary>Standing still: chickens and crows peck, sheep and deer graze (head down), rabbits and cats look around.</summary>
         public void Rest()
         {
+            // A modelled deer grazes eight seconds or so, then lifts its head and looks about.
+            if (model != null) { float tm = Time.time + seed; model.Drive(0, Mathf.Sin(tm * .4f) > 0 ? "eat" : Mathf.Sin(tm * .13f) > .3f ? "idle2" : "idle"); return; }
             Root.localPosition = new Vector3(0, Lift, 0); Legs(0);
             if (Head == null) return;
             float t = Time.time + seed;
@@ -288,6 +306,7 @@ namespace Crulanda.Encounter
         /// <summary>Head up and still: an animal that has noticed something and is watching it.</summary>
         public void Alert()
         {
+            if (model != null) { model.Drive(0, "idle"); return; }
             Root.localPosition = new Vector3(0, Lift, 0); Legs(0);
             if (Kind == "sheep") Nod(0, 4); else if (Head != null) Head.localEulerAngles = Vector3.zero;
             Tail(0, 0, 0);
@@ -312,6 +331,7 @@ namespace Crulanda.Encounter
         /// <summary>Dead: rolled onto its side where it fell, the torso resting on the ground and the legs out straight.</summary>
         public void LieDown()
         {
+            if (model != null) { model.Die(); return; }   // it falls in its own death, where it stood
             stride = tuck = 0; atRest = false;
             foreach (var l in legs) l.hip.localEulerAngles = Vector3.zero;
             if (Head != null) Head.localEulerAngles = Vector3.zero;
@@ -322,6 +342,6 @@ namespace Crulanda.Encounter
             Root.localRotation = Quaternion.Euler(0, 0, 90); Root.localPosition = new Vector3(torso, Lift + flank, 0);
         }
         /// <summary>On its feet again (a game animal back after its respawn).</summary>
-        public void StandUp() { Root.localRotation = Quaternion.identity; Root.localPosition = new Vector3(0, Lift, 0); atRest = false; Legs(0); }
+        public void StandUp() { if (model != null) model.Revive(); Root.localRotation = Quaternion.identity; Root.localPosition = new Vector3(0, Lift, 0); atRest = false; Legs(0); }
     }
 }

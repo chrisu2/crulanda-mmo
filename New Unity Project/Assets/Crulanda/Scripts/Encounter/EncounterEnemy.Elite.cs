@@ -63,6 +63,7 @@ namespace Crulanda.Encounter
         {
             var v = Victim; float reach = Move.reach;
             CancelBlow();
+            if (Figure != null) Figure.Strike();
             swing = Time.time + SwingInterval; nextBlowAt = Time.time + Move.every;
             if (v == null || !v.IsAlive) return;
             var gap = v.transform.position - transform.position;

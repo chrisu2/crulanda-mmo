@@ -27,10 +27,11 @@ namespace Crulanda.Encounter
         ModelBeast model;
         /// <summary>The animal's model (game deer: the pack's stag or deer; <see cref="ModelBeast"/>), or null for a body of primitives.</summary>
         public ModelBeast Model { get { return model; } }
-        /// <summary>Wears the pack's animal of this kind, its head <paramref name="height"/> m up, if it is in the build.</summary>
-        bool MakeModel(string animal, float height, float walk, float run)
+        /// <summary>Wears the pack's animal of this kind, its head <paramref name="height"/> m up, in <paramref name="coat"/> (null:
+        /// its own colours), if it is in the build.</summary>
+        bool MakeModel(string animal, float height, float walk, float run, ModelBeast.Coat coat = null)
         {
-            model = ModelBeast.Build(Root, animal, 0, height, null, .94f + seed * 7.3f % 1 * .12f);
+            model = ModelBeast.Build(Root, animal, 0, height, coat, .94f + seed * 7.3f % 1 * .12f);
             if (model == null) return false;
             Head = model.Head; model.WalkPace = walk; model.RunPace = run;
             model.StartMotion(animal + seed.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture));
@@ -94,6 +95,45 @@ namespace Crulanda.Encounter
             b.Make(kind, r);
             return b;
         }
+        /// <summary>The old deer's body (a capsule on four legs, a neck, a head, antlers if asked, a pale scut), scaled by
+        /// <paramref name="size"/> about the feet: the deer with models off, and the farm animals' stand-in.</summary>
+        void PlainBeast(Color hide, bool antlers, float size)
+        {
+            var body = Root;
+            Part(PrimitiveType.Capsule, body, new Vector3(0, 1f, 0) * size, new Vector3(.45f, .6f, .45f) * size, hide, new Vector3(90, 0, 0));
+            // Hips tucked up inside the body so the leg tops stay hidden as they swing; diagonal pairs step together.
+            foreach (int sx in new[] { -1, 1 }) foreach (int sz in new[] { -1, 1 }) Leg(new Vector3(sx * .15f, .92f, sz * .42f) * size, .08f * size, hide * .8f, sx == sz ? 0 : .5f, 22);
+            Part(PrimitiveType.Capsule, body, new Vector3(0, 1.35f, .55f) * size, new Vector3(.18f, .32f, .18f) * size, hide, new Vector3(35, 0, 0));
+            Head = Part(PrimitiveType.Sphere, body, new Vector3(0, 1.62f, .78f) * size, new Vector3(.2f, .2f, .32f) * size, hide);
+            if (antlers) foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cylinder, Head, new Vector3(s * .5f, 1.4f, -.3f), new Vector3(.12f, .9f, .12f), new Color(.7f, .62f, .5f), new Vector3(-10, 0, s * 25));
+            Part(PrimitiveType.Sphere, body, new Vector3(0, 1.05f, -.62f) * size, Vector3.one * .14f * size, new Color(.9f, .88f, .82f));
+        }
+        /// <summary>A farm animal's coat by r (null: the file's own): horses chestnut, bay, grey or black; cows brown and cream, red,
+        /// dun, or black with a white belly; donkeys grey or brown.</summary>
+        static ModelBeast.Coat FarmCoat(string kind, float r)
+        {
+            int pick = Mathf.Clamp((int)(r * 4), 0, 3);
+            switch (kind)
+            {
+                case "horse":
+                    switch (pick)
+                    {
+                        case 0: return null;   // chestnut, as the pack paints it
+                        case 1: return new ModelBeast.Coat().Set("Main", new Color(.36f, .21f, .12f)).Set("Main_Dark", new Color(.22f, .13f, .08f)).Set("Main_Light", new Color(.44f, .27f, .15f)).Set("Hair", new Color(.07f, .06f, .05f));   // bay
+                        case 2: return new ModelBeast.Coat().Set("Main", new Color(.74f, .73f, .7f)).Set("Main_Dark", new Color(.58f, .57f, .55f)).Set("Main_Light", new Color(.86f, .85f, .82f)).Set("Hair", new Color(.5f, .49f, .47f)).Set("Muzzle", new Color(.3f, .28f, .27f));   // grey
+                        default: return new ModelBeast.Coat().Set("Main", new Color(.14f, .13f, .12f)).Set("Main_Dark", new Color(.09f, .09f, .08f)).Set("Main_Light", new Color(.2f, .19f, .18f)).Set("Hair", new Color(.05f, .05f, .05f));   // black
+                    }
+                case "cow":
+                    switch (pick)
+                    {
+                        case 0: return null;   // brown and cream, as the pack paints it
+                        case 1: return new ModelBeast.Coat().Set("Main", new Color(.46f, .24f, .13f));   // red
+                        case 2: return new ModelBeast.Coat().Set("Main", new Color(.74f, .6f, .42f)).Set("Main_Light", new Color(.88f, .82f, .7f));   // dun
+                        default: return new ModelBeast.Coat().Set("Main", new Color(.13f, .12f, .11f)).Set("Main_Light", new Color(.86f, .84f, .8f));   // black, white beneath
+                    }
+                default: return r < .5f ? null : new ModelBeast.Coat().Set("Main", new Color(.42f, .33f, .25f)).Set("Main_Light", new Color(.78f, .74f, .66f));   // a donkey: grey, or brown
+            }
+        }
         void Make(string kind, float r)
         {
             var body = Root;
@@ -151,15 +191,20 @@ namespace Crulanda.Encounter
                 case "deer":
                     Speed = 1.2f; FleeSpeed = 7.5f; FleeRadius = 16; torso = 1; flank = .23f;
                     if (MakeModel(r < .5f ? "Stag" : "Deer", r < .5f ? 1.75f : 1.55f, 1.2f, 7)) break;   // as the old body: antlered when r is under a half
-                    var hide = new Color(.5f, .34f, .2f);
-                    Part(PrimitiveType.Capsule, body, new Vector3(0, 1f, 0), new Vector3(.45f, .6f, .45f), hide, new Vector3(90, 0, 0));
-                    // Hips tucked up inside the body so the leg tops stay hidden as they swing; diagonal pairs step together.
-                    foreach (int sx in new[] { -1, 1 }) foreach (int sz in new[] { -1, 1 }) Leg(new Vector3(sx * .15f, .92f, sz * .42f), .08f, hide * .8f, sx == sz ? 0 : .5f, 22);
-                    Part(PrimitiveType.Capsule, body, new Vector3(0, 1.35f, .55f), new Vector3(.18f, .32f, .18f), hide, new Vector3(35, 0, 0));
-                    Head = Part(PrimitiveType.Sphere, body, new Vector3(0, 1.62f, .78f), new Vector3(.2f, .2f, .32f), hide);
-                    if (r < .5f) foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cylinder, Head, new Vector3(s * .5f, 1.4f, -.3f), new Vector3(.12f, .9f, .12f), new Color(.7f, .62f, .5f), new Vector3(-10, 0, s * 25));
-                    Part(PrimitiveType.Sphere, body, new Vector3(0, 1.05f, -.62f), Vector3.one * .14f, new Color(.9f, .88f, .82f));
+                    PlainBeast(new Color(.5f, .34f, .2f), r < .5f, 1);
                     break;
+                // Farm animals (2026-10-03, GAME-ONLY: the horses at the Golden Cask and Carder's field barn, the miller's donkey, the
+                // Brook and Harrow cows): the pack's horse, donkey and cow, each in a coat by r. They graze most of the day, amble a few
+                // steps off when walked into, and are never hunted. With models off, a plain beast of the old deer's body, scaled.
+                case "horse": case "donkey": case "cow":
+                {
+                    bool horse = kind == "horse", donkey = kind == "donkey";
+                    Speed = horse ? 1.3f : donkey ? .9f : .7f; FleeSpeed = horse ? 2.2f : 1.8f; FleeRadius = horse ? 2.2f : 1.8f;
+                    torso = horse ? 1.3f : donkey ? .9f : 1.1f; flank = horse ? .35f : donkey ? .28f : .42f;
+                    if (MakeModel(horse ? "Horse" : donkey ? "Donkey" : "Cow", horse ? 2.15f : 1.6f, horse ? 1.5f : donkey ? 1.1f : .9f, horse ? 6 : 4.5f, FarmCoat(kind, r))) break;
+                    PlainBeast(horse ? new Color(.55f, .37f, .22f) : donkey ? new Color(.47f, .47f, .46f) : new Color(.56f, .38f, .22f), false, horse ? 1.25f : donkey ? .85f : 1.05f);
+                    break;
+                }
                 case "sheep":
                     Speed = .5f; FleeSpeed = 2.4f; FleeRadius = 3; torso = .51f; flank = .37f;
                     // The flock varies with no data change: four wool shades by r (few enough to share materials); by seed,
@@ -291,8 +336,12 @@ namespace Crulanda.Encounter
         /// <summary>Standing still: chickens and crows peck, sheep and deer graze (head down), rabbits and cats look around.</summary>
         public void Rest()
         {
-            // A modelled deer grazes eight seconds or so, then lifts its head and looks about.
-            if (model != null) { float tm = Time.time + seed; model.Drive(0, Mathf.Sin(tm * .4f) > 0 ? "eat" : Mathf.Sin(tm * .13f) > .3f ? "idle2" : "idle"); return; }
+            // A modelled deer grazes eight seconds or so, then lifts its head and looks about; farm animals graze two thirds of the time.
+            if (model != null)
+            {
+                float tm = Time.time + seed; bool farm = Kind == "horse" || Kind == "donkey" || Kind == "cow";
+                model.Drive(0, Mathf.Sin(tm * (farm ? .23f : .4f)) > (farm ? -.45f : 0) ? "eat" : Mathf.Sin(tm * .13f) > .3f ? "idle2" : "idle"); return;
+            }
             Root.localPosition = new Vector3(0, Lift, 0); Legs(0);
             if (Head == null) return;
             float t = Time.time + seed;

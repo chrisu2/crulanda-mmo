@@ -9,20 +9,21 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-10-03, small hours; Chris had the computer shut down after this)
-**The playable build:** published 2026-10-03 01:59 (build of 01:48; the real animals, commit d24ecf2; before it the feet, 2e18462, published 00:44).
-**Last full run:** EditMode 390/390, PlayMode 174/174, build OK, Oakhaven toured, HUD/wardrobe/loot/fight shots, no exceptions in any game log, no shader errors.
-**Nothing in flight:** everything is committed, published and backed up; the computer was shut down at Chris's request.
-**What the game has now (newest first):** real animals (wolves, ash hounds, Old Whitefoot, the forest stags and does, the hill
+## RESUME HERE (updated 2026-10-03, 13:10)
+**The playable build:** published 2026-10-03 13:06 (build of 12:57): the farm animals in Oakhaven, on top of the real animals
+(01:59, d24ecf2) and the feet (00:44, 2e18462).
+**Last full run:** EditMode 391/391, PlayMode 174/174, build OK, Oakhaven toured (the inn front shows a grey horse at the porch),
+HUD/wardrobe/loot/fight shots, no exceptions in any game log, no shader errors.
+**Nothing in flight:** everything is committed, published and backed up.
+**What the game has now (newest first):** farm animals in Oakhaven (horses, a donkey, cows); real animals (wolves, ash hounds, Old Whitefoot, the forest stags and does, the hill
 deer: Quaternius models through `ModelBeast`); foot armour that follows the foot; armour that follows the form and hats fitted to
 the heads; every person a Quaternius model (`ModelFigure`, old gear refitted onto frames on its bones); before that the
 professions, loot, hunting, the five grown zones and the painted style (see the numbered history below and CHANGELOG.md).
 
 **Open (ask Chris before starting; he skims: put the question first or use the question prompt):**
-1. **Farm animals for village life** (my suggestion): the same pack has Horse, Horse_White, Donkey, Cow, Bull, Alpaca, Fox,
-   Husky and Shiba Inu, rigged and animated like the wolf. The zip is kept at `tools/wip/animals/source/AnimatedAnimalPack.zip`
-   (git-ignored); `python tools/wip/animals/animals_import.py <zip> Horse Donkey Cow` brings them in. They would need a
-   CritterBody kind each (calm: they amble off, never bolt), and ZoneCritters groups in the farms (zone data: tour those zones).
+1. **Farm animals are in Oakhaven** (published 2026-10-03 13:06): more could go to the other zones' farms and towns (Khaven,
+   the Ash Rim's steadings), using the same kinds ("horse", "donkey", "cow") in their life.critters, at the END of each list.
+   The pack also has Bull, Alpaca, Fox, Husky and Shiba Inu (zip at `tools/wip/animals/source/AnimatedAnimalPack.zip`).
 2. **Still primitives** (the free pack has none): boars, spiders, the bramble-things, and the village's hens, sheep, cats, crows
    and rabbits. The farm pack's sheep has no walk; the only animated pig is cube-styled. A paid pack (or Quaternius's $20
    tier for the people) is Chris's purchase.
@@ -907,4 +908,13 @@ resumed with `Workflow({scriptPath, resumeFromRunId})` (finished agents replay f
   doe 1.6 (elite x1.1). `Editor/CreatureCapture.cs` rows beasts-1/before/round/wolf/stag; sheet tools/wip/characters/show/
   6-animals.jpg. Batch PlayMode draws nothing: the Animator (CullUpdateTransforms) leaves bones be, so PlayMode tests check
   state (Model.Dead), EditMode tests check poses (Sample).
+- **Round 8, farm animals (PUBLISHED 2026-10-03 13:06, commit see git log: Farm animals)**: Horse, Donkey and Cow FBX added to Resources/Creatures
+  (`animals_import.py <zip> Horse Donkey Cow`); CritterBody kinds "horse", "donkey", "cow" (MakeModel with `FarmCoat(kind, r)`:
+  four horse coats, four cow coats, two donkey coats; heights 2.15 / 1.6 / 1.6 m; Speed 1.3/.9/.7, FleeSpeed 2.2/1.8,
+  FleeRadius 2.2/1.8; Rest grazes two thirds of the time; models off: `PlainBeast`, the old deer's body scaled, which the deer
+  now uses too). GameAnimals.NeverHunted gains horse, donkey, cow. Oakhaven's life.critters gains five groups at the END of the
+  list (the earlier critters' spawn draws unchanged): horse (-8.5,-9) r1.5 x1 (the Cask), horse (22,128) r6 x2 (Carder's field
+  barn), donkey (-63,-49) r2 x1 (the mill), cow (92,-119) r8 x4 (Brook), cow (-114,50) r6 x3 (Harrow); canonNote labels them
+  GAME-ONLY. CreatureCapture rows beasts-farm and beasts-cows; sheet tools/wip/characters/show/7-farm.jpg. Zone map plots:
+  scratchpad zonemap.py (roads, water, props, critters, camps on a 10 m grid).
 

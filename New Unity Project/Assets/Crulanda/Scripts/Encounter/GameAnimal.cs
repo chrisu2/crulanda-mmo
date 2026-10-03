@@ -14,8 +14,9 @@ namespace Crulanda.Encounter
     {
         /// <summary>The kinds of a zone's critter groups (ZoneLife.critters) that are game.</summary>
         public static readonly string[] Kinds = { "deer", "rabbit" };
-        /// <summary>The animals that are never hunted: the farm's hens and sheep, the village cats, and the crows (no leather).</summary>
-        public static readonly string[] NeverHunted = { "chicken", "sheep", "cat", "crow" };
+        /// <summary>The animals that are never hunted: the farm's hens, sheep, cows, horses and donkeys, the village cats, and the
+        /// crows (no leather).</summary>
+        public static readonly string[] NeverHunted = { "chicken", "sheep", "cat", "crow", "horse", "donkey", "cow" };
         public static bool IsGame(string kind) { return kind != null && Array.IndexOf(Kinds, kind) >= 0; }
         /// <summary>Health: a rabbit 15, a deer 70, whatever the zone's level.</summary>
         public static int Health(string kind) { return kind == "deer" ? 70 : 15; }

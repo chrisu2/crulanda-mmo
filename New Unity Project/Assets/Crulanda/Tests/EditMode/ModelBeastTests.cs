@@ -120,6 +120,31 @@ namespace Crulanda.Tests
             Assert.IsNull(CritterBody.Build(go3.transform, "chicken", .3f, 1).Model, "Hens keep their own bodies (the pack has none).");
         }
 
+        [Test] public void Farm_animals_are_horses_donkeys_and_cows_never_hunted()
+        {
+            Assume.That(ModelBeast.Available("Horse") && ModelBeast.Available("Donkey") && ModelBeast.Available("Cow"));
+            var colours = new HashSet<string>();
+            foreach (var (kind, animal, height) in new[] { ("horse", "Horse", 2.15f), ("donkey", "Donkey", 1.6f), ("cow", "Cow", 1.6f) })
+            {
+                Assert.Contains(kind, GameAnimals.NeverHunted, "A " + kind + " is never hunted."); Assert.IsFalse(GameAnimals.IsGame(kind));
+                foreach (var r in new[] { .1f, .3f, .6f, .9f })
+                {
+                    var go = new GameObject("Farm " + kind + " " + r); made.Add(go);
+                    var c = CritterBody.Build(go.transform, kind, r, 7);
+                    Assert.NotNull(c.Model, kind + " is a model."); Assert.AreEqual(animal, c.Model.Kind);
+                    Assert.AreEqual(height, c.Model.Height, .001f, kind + "'s height.");
+                    var b = Extent(c.Model, true); Assert.AreEqual(go.transform.position.y, b.min.y, .06f, kind + ": its feet on the ground.");
+                    Assert.Less(c.Speed, 1.5f, kind + " walks."); Assert.Less(c.FleeSpeed, 2.5f, kind + " only ambles off."); Assert.Less(c.FleeRadius, 2.5f, kind + " lets you come close.");
+                    colours.Add(kind + ":" + string.Join(",", System.Array.ConvertAll(c.Model.Renderers[0].sharedMaterials, m => ColorUtility.ToHtmlStringRGB(m.color))));
+                }
+            }
+            Assert.GreaterOrEqual(colours.Count, 8, "Horses, cows and donkeys come in more than one coat.");
+            ModelBeast.Enabled = false;
+            var plain = new GameObject("Plain cow"); made.Add(plain);
+            var old = CritterBody.Build(plain.transform, "cow", .5f, 3);
+            Assert.IsNull(old.Model, "Animal models off: a plain beast."); Assert.Greater(plain.GetComponentsInChildren<Renderer>().Length, 5, "Built of parts.");
+        }
+
         [Test] public void Models_off_builds_the_old_bodies()
         {
             ActorVisual.Models = false;

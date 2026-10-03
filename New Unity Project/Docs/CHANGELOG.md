@@ -999,3 +999,12 @@ A read-only review by five reviewers, each finding checked by a second who tried
 - Boars, spiders, the bramble-things and the village's hens, sheep, cats, crows and rabbits keep their bodies: the pack has
   none of them (the farm pack's sheep has no walk, the only animated pig is cube-styled).
 - Tests: EditMode 390/390, PlayMode 174/174; ModelBeastTests (6 new); Oakhaven toured; wardrobe, loot and fight shots; no errors in any game log.
+
+## 2026-10-03 — Farm animals in Oakhaven (published 13:06)
+- **Horses, a donkey and cows** (Chris chose them next): the same Quaternius pack's horse, donkey and cow (CC0) live in the
+  village as critters. A horse stands tethered before the Golden Cask and two graze by Carder's field barn; the miller's
+  donkey waits by Oak creek mill; four cows graze the Brook farm pasture and three below the Harrow fence (all GAME-ONLY).
+- They come in coats: horses chestnut, bay, grey or black; cows brown and cream, red, dun, or black with a white belly;
+  donkeys grey or brown. They graze two thirds of the time and look about the rest, walk to a new spot now and then, and
+  amble a few steps off when you walk into them. They are never hunted.
+- Tests: EditMode 391/391, PlayMode 174/174; ModelBeastTests (farm animals); Oakhaven toured; no errors in any game log.

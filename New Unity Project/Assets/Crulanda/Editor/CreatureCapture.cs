@@ -36,10 +36,14 @@ namespace Crulanda.EditorTools
             Row("beasts-round", new[] { F(B(ActorLook.Wolf, 0, "idle", .5f)), B(ActorLook.Wolf, 0, "idle", .5f), F(B(ActorLook.Stag, 0, "idle", .5f)), B(ActorLook.Stag, 0, "idle", .5f), F(B(ActorLook.Stag, 1, "idle", .5f)), B(ActorLook.Stag, 1, "idle", .5f) }, 2f);
             Row("beasts-wolf", new[] { B(ActorLook.Wolf, 0, "walk", .3f), B(ActorLook.Wolf, 0, "run", .2f), B(ActorLook.Wolf, 0, "attack", .35f), B(ActorLook.Wolf, 0, "hitL", .2f), B(ActorLook.Wolf, 0, "headlow", .5f), B(ActorLook.Wolf, 0, "death", 10) }, 1.8f);
             Row("beasts-stag", new[] { B(ActorLook.Stag, 0, "walk", .3f), B(ActorLook.Stag, 0, "run", .25f), B(ActorLook.Stag, 0, "attack", .45f), B(ActorLook.Stag, 0, "eat", 1f), B(ActorLook.Stag, 1, "kick", .4f), B(ActorLook.Stag, 0, "death", 10) }, 2.6f);
+            // The farm animals (2026-10-03): a villager for scale, the horse's four coats, the donkey's two, the cow's four.
+            Row("beasts-farm", new[] { P(ActorLook.Villager, 23, null, 0), K("horse", .1f, "idle", .5f), K("horse", .3f, "eat", 1), K("horse", .6f, "idle", .9f), K("horse", .9f, "walk", .3f),
+                K("donkey", .2f, "idle", .4f), K("donkey", .7f, "eat", 1.4f) }, 2.8f);
+            Row("beasts-cows", new[] { P(ActorLook.Villager, 23, null, 0), K("cow", .1f, "idle", .5f), K("cow", .3f, "eat", 2), K("cow", .6f, "idle", 1.2f), K("cow", .9f, "walk", .4f) }, 3f);
             Debug.Log("CREATURE_CAPTURE_DONE");
         }
 
-        sealed class Spec { public ActorLook look; public int variant; public string slot; public float time; public bool person, old, deer, flat; public float r; public string name; }
+        sealed class Spec { public ActorLook look; public int variant; public string slot; public float time; public bool person, old, deer, flat; public float r; public string name, kind = "deer"; }
         /// <summary>The same, its mesh left as the file has it (ModelBeast.Round off).</summary>
         static Spec F(Spec s) { s.flat = true; s.name += " (file)"; return s; }
         static Spec Named(Spec s, string name) { s.name = name; return s; }
@@ -47,6 +51,8 @@ namespace Crulanda.EditorTools
         static Spec B(ActorLook look, int variant, string slot, float time) { return new Spec { look = look, variant = variant, slot = slot, time = time, name = look + " " + variant }; }
         static Spec Old(ActorLook look, int variant) { return new Spec { look = look, variant = variant, old = true, name = "Old " + look + " " + variant }; }
         static Spec D(float r, string slot, float time) { return new Spec { deer = true, r = r, slot = slot, time = time, name = "Hill deer " + r }; }
+        /// <summary>A village or game animal of this kind (CritterBody), coloured by <paramref name="r"/>.</summary>
+        static Spec K(string kind, float r, string slot, float time) { return new Spec { deer = true, kind = kind, r = r, slot = slot, time = time, name = kind + " " + r }; }
 
         /// <summary>A row of animals side on (facing +X), <paramref name="gap"/> m apart, drawn from the side, and the shot saved.</summary>
         static void Row(string shot, Spec[] specs, float gap)
@@ -61,7 +67,7 @@ namespace Crulanda.EditorTools
                 if (s.deer)
                 {
                     go.transform.SetPositionAndRotation(new Vector3(x0 + i * gap, 0, 0), Quaternion.Euler(0, 90, 0));
-                    var c = CritterBody.Build(go.transform, "deer", s.r, 3 + i, 0);
+                    var c = CritterBody.Build(go.transform, s.kind, s.r, 3 + i, 0);
                     if (c.Model != null) { c.Model.Sample(s.slot, s.time); top = Mathf.Max(top, c.Model.Height + .6f); }
                     continue;
                 }

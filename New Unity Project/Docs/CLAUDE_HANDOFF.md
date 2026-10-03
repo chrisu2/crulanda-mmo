@@ -833,3 +833,10 @@ resumed with `Workflow({scriptPath, resumeFromRunId})` (finished agents replay f
   bubbles (the skinner's pelt, the warden's bark pauldrons, the deserters' leather pauldron: drop chest spheres >= .2 on
   models); the stranger's side panels; children are scaled adults; the armour's own designs (C2 proper: plate shapes, moving
   cloth); a Peasant "bleached" copy for truer villager dyes; the $20 Quaternius tier (Chris's to buy) for knights/nobles.
+- **PUBLISHED 2026-10-02 19:37 (d618963, build of 19:27)**: models + round 2. Full run 2: EditMode 383/383, PlayMode 173/174
+  (HollowQuestTests' crown path, fixed in d618963). Backup OK.
+- Round 3 (uncommitted at 19:38, in full run 3): `Face frame` (old face .835 eyes/.745 mouth -> HeadBone+.10/.04; items with
+  y<.87 and z>=.09 on the head), chest Spheres >= .2 left off, Peasant figures `bleach` (their Ranger hood dyes true), the
+  merchant's collar box off models. `round3_toggle.py` (scratchpad) can back it in or out.
+- **PUBLISHED 2026-10-02 20:38 (round 3, build of 20:28)**: full run 3 EditMode 383/383, PlayMode 174/174, Oakhaven toured,
+  HUD/wardrobe/loot/fight shots; no exceptions in any player log. Chris was sent tools/wip/characters/models-preview.jpg.

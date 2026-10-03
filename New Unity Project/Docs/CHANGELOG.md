@@ -953,3 +953,9 @@ A read-only review by five reviewers, each finding checked by a second who tried
 - **True colours on the leathers**: the ranger outfit's green cloth has a bleached copy, so dyes come out true: the Warrior
   in his blue, the Concord's Collectors and Wardens in white, the Sandthrone outriders in sand, cultists in soot black,
   deserters in their faded sand, Caddock in near-black; the Druid and the hunters keep the green.
+- Published 2026-10-02 19:37 (d618963): the models, rounder armour, carrying and true colours. Full run: EditMode 383/383,
+  PlayMode 173/174 (a test looked for Caddock's crown at its old place; fixed), Oakhaven toured, wardrobe, loot and fight
+  shots taken.
+- **Round 3** (published 2026-10-02 20:38; full run EditMode 383/383, PlayMode 174/174, Oakhaven toured, no errors in any game log): masks and mouth scarves sit on the model's face (a face frame), balls on the body (a pelt, bark
+  and leather pauldrons) are left off, hoods on peasant outfits take their colour true (Mira's cream, a hen-wife's red
+  kerchief), the merchant's collar box is gone.

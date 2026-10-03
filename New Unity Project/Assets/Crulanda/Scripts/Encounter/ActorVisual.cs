@@ -741,7 +741,7 @@ namespace Crulanda.Encounter
                     if (!modelled) Part(PrimitiveType.Cylinder, body, new Vector3(0, -.34f, 0), new Vector3(.52f, .3f, .38f), cloth);           // coat skirts
                     var gold = M(.98f, .76f, .22f, .7f, .8f);
                     if (!modelled) for (int i = 0; i < 4; i++) Part(PrimitiveType.Sphere, body, new Vector3(0, .42f - i * .14f, .25f - Mathf.Abs(i - 1.5f) * .02f), Vector3.one * .05f, gold);
-                    Part(PrimitiveType.Cube, body, new Vector3(0, .6f, .12f), new Vector3(.3f, .08f, .08f), M(.95f, .93f, .86f)); // collar
+                    if (!modelled) Part(PrimitiveType.Cube, body, new Vector3(0, .6f, .12f), new Vector3(.3f, .08f, .08f), M(.95f, .93f, .86f)); // collar (a model has its own)
                     var hatM = M(.12f, .1f, .14f); Brim(hatM, .56f, .28f, .09f);
                     Part(PrimitiveType.Cube, body, new Vector3(.14f, 1.12f, -.08f), new Vector3(.03f, .3f, .06f), M(.1f, .62f, .4f), new Vector3(-30, 0, -25)); // feather
                     Part(PrimitiveType.Sphere, body, new Vector3(-.27f, -.05f, .1f), new Vector3(.12f, .15f, .1f), M(.6f, .42f, .16f)); // purse

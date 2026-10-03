@@ -25,7 +25,7 @@ namespace Crulanda.Encounter
         ModelFigure model;
         /// <summary>The figure's model (null on a smooth, block or beast figure).</summary>
         public ModelFigure Model { get { return model; } }
-        Transform headFrame, chestFrame, hipsFrame, handleR;
+        Transform headFrame, faceFrame, chestFrame, hipsFrame, handleR;
         struct Follow { public Transform frame, bone; public Quaternion rot; public Vector3 pos; public bool place; }
         readonly List<Follow> follows = new List<Follow>();
         Crulanda.Gameplay.Actor actorRef; float armWeight, swimLift; bool dropped, leaned; Vector3 poseArmL, poseArmR; float poseElbowL, poseElbowR;
@@ -90,6 +90,9 @@ namespace Crulanda.Encounter
                 case ActorLook.BanditKing: s.kit = ModelFigure.Kit.Ranger; s.bleach = true; s.beard = true; s.hair = 3; break;
                 case ActorLook.Villager: s = TradeSpec(s, variant); break;
             }
+            // On a peasant's outfit only the hood is the ranger's: bleached, it takes its colour true (Mira's cream, a hen-wife's
+            // red kerchief), not the ranger's green under a tint.
+            if (s.kit == ModelFigure.Kit.Peasant) s.bleach = true;
             return s;
         }
         /// <summary>A trade's model: the outfit and its dyes (the old outfit's colours), a hood for the hooded trades, a beard,
@@ -158,6 +161,10 @@ namespace Crulanda.Encounter
             var sh = new Vector3(.58f, .8f, .72f);
             var headAt = L(m.HeadBone) + new Vector3(0, .12f * s, .01f * s);   // a little high, so a helmet's rim clears the eyes
             headFrame = Region("Head frame", m.HeadBone, headAt - new Vector3(0, .8f * sh.y, 0), sh);
+            // Face: the old face (eyes at .835, mouth at .745) onto the model's (eyes about .1 above the Head bone, mouth .04), for
+            // what is worn over it: a mask, a scarf over the nose and mouth, a tear.
+            var fs = new Vector3(.58f, .67f, .72f);
+            faceFrame = Region("Face frame", m.HeadBone, L(m.HeadBone) + new Vector3(0, .077f * s, .01f * s) - new Vector3(0, .8f * fs.y, 0), fs);
             // Chest: the old shoulder line (.53) and belt (.06) onto the model's shoulder joints and lower spine; the width from
             // the shoulders (the old pivots at .31 onto the outside of the model's).
             var shL = L(m.UpperArmL); var shR = L(m.UpperArmR); float shoulderY = (shL.y + shR.y) / 2, waistY = L(m.Spine).y;
@@ -217,7 +224,7 @@ namespace Crulanda.Encounter
             for (int i = 0; i < body.childCount; i++)
             {
                 var c = body.GetChild(i);
-                if (c == model.Model || c == headFrame || c == chestFrame || c == hipsFrame || c == armL || c == armR || c == legL || c == legR) continue;
+                if (c == model.Model || c == headFrame || c == faceFrame || c == chestFrame || c == hipsFrame || c == armL || c == armR || c == legL || c == legR) continue;
                 parts.Add(c);
             }
             var kit = new HashSet<Transform>();   // what is carried (in hand, slung, the class kit) is never left off
@@ -235,9 +242,11 @@ namespace Crulanda.Encounter
                 // A flat board (an apron, a tabard, a cape, a shawl) or a skirt's drum would stand off the model's own clothes:
                 // left off; what is small (a pouch, a sigil, a strap, keys, a quiver, a bow) stays.
                 var mesh = c.GetComponent<MeshFilter>() != null ? c.GetComponent<MeshFilter>().sharedMesh : null; var k = c.localScale;
-                bool board = mesh != null && (mesh.name.StartsWith("Cube") && (k.x >= .45f || k.x >= .3f && k.y >= .3f) || mesh.name.StartsWith("Cylinder") && k.x >= .45f);
+                bool board = mesh != null && (mesh.name.StartsWith("Cube") && (k.x >= .45f || k.x >= .3f && k.y >= .3f) || mesh.name.StartsWith("Cylinder") && k.x >= .45f
+                    || mesh.name.StartsWith("Sphere") && k.x >= .2f);   // and a ball on the body (a pelt, a bark or leather pauldron, a belly)
                 if (!onHead && board && !kit.Contains(c)) { Kill(c); continue; }
-                c.SetParent(onHead ? headFrame : c.localPosition.y < -.1f ? hipsFrame : chestFrame, false);
+                bool onFace = onHead && c.localPosition.y < .87f && c.localPosition.z >= .09f;   // in front of the face: a mask, a scarf, a tear
+                c.SetParent(onFace ? faceFrame : onHead ? headFrame : c.localPosition.y < -.1f ? hipsFrame : chestFrame, false);
             }
         }
 

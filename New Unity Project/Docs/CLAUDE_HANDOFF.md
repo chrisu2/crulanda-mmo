@@ -10,7 +10,7 @@ Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
 ## RESUME HERE (updated 2026-10-03, small hours; Chris had the computer shut down after this)
-**The playable build:** published 2026-10-03 01:59 (build of 01:48; the real animals; commit below in git log: 'Real animals').
+**The playable build:** published 2026-10-03 01:59 (build of 01:48; the real animals, commit d24ecf2; before it the feet, 2e18462, published 00:44).
 **Last full run:** EditMode 390/390, PlayMode 174/174, build OK, Oakhaven toured, HUD/wardrobe/loot/fight shots, no exceptions in any game log, no shader errors.
 **Nothing in flight:** everything is committed, published and backed up; the computer was shut down at Chris's request.
 **What the game has now (newest first):** real animals (wolves, ash hounds, Old Whitefoot, the forest stags and does, the hill

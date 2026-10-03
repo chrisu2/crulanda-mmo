@@ -851,3 +851,10 @@ resumed with `Workflow({scriptPath, resumeFromRunId})` (finished agents replay f
   bones). Hats: `HeadOutline` (skull, and skull+hair) in head-frame space; `HatFit` (rim to eyes+.065, crown to clear the skull
   +.03), `Cap` (head shells for ball and pillbox caps), peaks to the front rim; armour head.cap/kettle/wrap/circlet/crown use it.
   Swim still = "swim" slowed to .35. Mira's hood = her cloth. ModelFigureTests 6 (new: armour follows the form, hats).
+- **PUBLISHED 2026-10-02 23:44 (round 5, efba82b)**: armour that follows the form and fitted hats (see CHANGELOG).
+- **Round 6, feet (PUBLISHED 2026-10-03 00:44)**: `ModelArmour` cages keep a leg's foot as sections along z (`fz0`, `nf`, `fc`
+  middles, `fr` radii per angle; convex hull per 1.5 cm section with its neighbours); the old boot is `FootZ/FootW/FootH/FootY`
+  (heel to toe: z, half-width, half-height, middle) as a squarish oval, mapped section by section (`AlongFoot`), clearance
+  kept at LimbGap. The hand is still box to box. Full run (c3f-start.marker): EditMode 384/384, PlayMode 174/174, Oakhaven
+  toured.
+

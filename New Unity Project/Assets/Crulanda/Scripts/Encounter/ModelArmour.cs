@@ -108,6 +108,16 @@ namespace Crulanda.Encounter
         /// <summary>The old wrist and ankle (pivot space): below them the hand and the foot, mapped as boxes.</summary>
         const float Wrist = -.565f, Ankle = -.8f, Blend = .03f;
         static readonly Bounds OldHand = new Bounds(new Vector3(0, -.645f, .025f), new Vector3(.108f, .16f, .09f));
+        static readonly float[] FootZ = { -.08f, -.05f, 0, .06f, .12f, .17f, .205f };
+        static readonly float[] FootW = { .05f, .057f, .06f, .061f, .059f, .053f, .038f };
+        static readonly float[] FootH = { .054f, .07f, .076f, .058f, .045f, .036f, .028f };
+        static readonly float[] FootY = { -.952f, -.942f, -.938f, -.954f, -.966f, -.972f, -.974f };
+        static float AlongFoot(float[] v, float z)
+        {
+            if (z <= FootZ[0]) return v[0]; int n = FootZ.Length; if (z >= FootZ[n - 1]) return v[n - 1];
+            for (int i = 0; i + 1 < n; i++) if (z >= FootZ[i] && z <= FootZ[i + 1]) return Mathf.Lerp(v[i], v[i + 1], (z - FootZ[i]) / (FootZ[i + 1] - FootZ[i]));
+            return v[n - 1];
+        }
         static readonly Bounds OldFoot = new Bounds(new Vector3(0, -.85f, .062f), new Vector3(.122f, .1f, .285f));
 
         static float Lerp(float[] ys, float[] vs, float y)
@@ -146,6 +156,8 @@ namespace Crulanda.Encounter
         internal sealed class Cage
         {
             public Frame frame; public float y0; public int ny; public float[,] r; public Bounds box; public bool hasBox;
+            /// <summary>A leg's foot, heel to toe: per section along z, its middle (x, y) and its radius at each angle round it.</summary>
+            public float fz0; public int nf; public Vector2[] fc; public float[,] fr;
             public float R(float y, float a)
             {
                 float fy = Mathf.Clamp((y - y0) / DY, 0, ny - 1.001f); int iy = (int)fy; float ty = fy - iy;
@@ -197,6 +209,29 @@ namespace Crulanda.Encounter
             {
                 var b = new Bounds(boxPts[0], Vector3.zero); foreach (var p in boxPts) b.Encapsulate(p);
                 cage.box = b; cage.hasBox = true;
+                if (!Arm(f))
+                {
+                    // The foot in sections along its length (heel to toe), each a convex outline round its own middle.
+                    cage.fz0 = b.min.z; cage.nf = Mathf.Max(2, Mathf.CeilToInt(b.size.z / DY) + 1);
+                    var sec = new List<Vector2>[cage.nf]; for (int i = 0; i < cage.nf; i++) sec[i] = new List<Vector2>();
+                    foreach (var p in boxPts) { int iz = Mathf.Clamp(Mathf.RoundToInt((p.z - cage.fz0) / DY), 0, cage.nf - 1); sec[iz].Add(new Vector2(p.x, p.y)); }
+                    cage.fc = new Vector2[cage.nf]; cage.fr = new float[cage.nf, NA]; var haveF = new bool[cage.nf];
+                    for (int iz = 0; iz < cage.nf; iz++)
+                    {
+                        var pts = new List<Vector2>(sec[iz]); if (iz > 0) pts.AddRange(sec[iz - 1]); if (iz + 1 < cage.nf) pts.AddRange(sec[iz + 1]);
+                        if (pts.Count < 5) continue;
+                        Vector2 lo2 = pts[0], hi2 = pts[0]; foreach (var q in pts) { lo2 = Vector2.Min(lo2, q); hi2 = Vector2.Max(hi2, q); }
+                        var mid = (lo2 + hi2) / 2; cage.fc[iz] = mid;
+                        var rel = pts.ConvertAll(q => q - mid); var hull = Hull(rel); if (hull.Count < 3) continue;
+                        for (int ia = 0; ia < NA; ia++) { float a = 2 * Mathf.PI * ia / NA; cage.fr[iz, ia] = Ray(hull, a); }
+                        haveF[iz] = true;
+                    }
+                    for (int iz = 0; iz < cage.nf; iz++)
+                    {
+                        if (haveF[iz]) continue; int k = iz; while (k < cage.nf && !haveF[k]) k++; if (k >= cage.nf) { k = iz; while (k >= 0 && !haveF[k]) k--; }
+                        if (k < 0 || k >= cage.nf) continue; cage.fc[iz] = cage.fc[k]; for (int ia = 0; ia < NA; ia++) cage.fr[iz, ia] = cage.fr[k, ia];
+                    }
+                }
             }
             return cage;
         }
@@ -247,7 +282,24 @@ namespace Crulanda.Encounter
                 tube = new Vector3(Mathf.Sin(a) * rn, v.y, Mathf.Cos(a) * rn);
                 if (v.y >= under || !cage.hasBox) return tube;
             }
-            // The hand or the foot: the old box onto the model's, axis by axis (the hand's flat side turns with it).
+            if (!arm && cage.nf > 1)
+            {
+                float t = Mathf.InverseLerp(FootZ[0] - .015f, FootZ[FootZ.Length - 1], v.z), zn = cage.box.min.z + t * cage.box.size.z;
+                if (v.z < FootZ[0] - .015f) zn = cage.box.min.z + (v.z - (FootZ[0] - .015f));   // behind the heel: as far behind the new one
+                if (v.z > FootZ[FootZ.Length - 1]) zn = cage.box.max.z + (v.z - FootZ[FootZ.Length - 1]);
+                float yc = AlongFoot(FootY, v.z) + .08f, w0 = AlongFoot(FootW, v.z), h0 = AlongFoot(FootH, v.z);
+                float ang = Mathf.Atan2(v.x, v.y - yc), rr = new Vector2(v.x, v.y - yc).magnitude;
+                float s0 = Mathf.Abs(Mathf.Sin(ang)), c0 = Mathf.Abs(Mathf.Cos(ang));
+                float old = 1 / Mathf.Pow(Mathf.Pow(s0 / w0, 2.6f) + Mathf.Pow(c0 / h0, 2.6f), 1 / 2.6f);
+                float fz = Mathf.Clamp((zn - cage.fz0) / DY, 0, cage.nf - 1.001f); int i0 = (int)fz; float tz = fz - i0;
+                float fa = Mathf.Repeat(ang / (2 * Mathf.PI), 1) * NA; int a0 = (int)fa % NA, a1 = (a0 + 1) % NA; float ta = fa - (int)fa;
+                float rNew = Mathf.Lerp(Mathf.Lerp(cage.fr[i0, a0], cage.fr[i0, a1], ta), Mathf.Lerp(cage.fr[i0 + 1, a0], cage.fr[i0 + 1, a1], ta), tz);
+                var mid = Vector2.Lerp(cage.fc[i0], cage.fc[i0 + 1], tz);
+                float rn = Close(rNew, rr - old, LimbGap);
+                var foot = new Vector3(mid.x + Mathf.Sin(ang) * rn, mid.y + Mathf.Cos(ang) * rn, zn);
+                return Vector3.Lerp(tube, foot, Mathf.Clamp01((under - v.y) / Blend));
+            }
+            // The hand: the old box onto the model's, axis by axis (the hand's flat side turns with it).
             var ob = arm ? OldHand : OldFoot; var nb = cage.box;
             Vector3 u = new Vector3((v.x - ob.min.x) / ob.size.x, (v.y - ob.min.y) / ob.size.y, (v.z - ob.min.z) / ob.size.z);
             var box = new Vector3(nb.min.x + u.x * nb.size.x, nb.min.y + u.y * nb.size.y, nb.min.z + u.z * nb.size.z);

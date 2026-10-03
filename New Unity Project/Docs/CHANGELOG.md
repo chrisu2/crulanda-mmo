@@ -977,3 +977,10 @@ A read-only review by five reviewers, each finding checked by a second who tried
   hood is her teal; the miller's flour sack no longer turns into a hood.
 - Tests: EditMode 384/384, PlayMode 173/174 (the crown test looked one level too high: on a model it sits in the fitted
   hat; fixed); Oakhaven toured, wardrobe, loot and fight shots; no errors in any game log.
+
+## 2026-10-03 small hours — Sabatons shaped like the feet (playtest note 12, part three; published 00:44)
+- **Foot armour follows the foot**: sabatons, shoes and boots were warped onto the model's foot as a box, so they came out
+  square-toed and boxy. Now the old boot is taken section by section from heel to toe (its oval at each point along the
+  foot) onto the model's own boot at the same point (ModelArmour: the foot's cross-sections in the cage), so the armour
+  narrows to the toe, rises over the instep and rounds at the heel like the shoe under it.
+- Tests: EditMode 384/384, PlayMode 174/174; Oakhaven toured; no errors in any game log.

@@ -17,4 +17,6 @@ if (-not $NoBuild) { Step { & 'D:\code\mmo\tools\validation\build_and_tour.ps1' 
 if (-not $NoBuild) { Step { 'shader errors: ' + (Select-String -LiteralPath (Join-Path $work 'encounter-validation\tour-build.log') -Pattern 'Shader error' | Measure-Object).Count } }
 if (-not $NoExtra -and -not $NoBuild) { Step { & 'D:\code\mmo\tools\validation\capture_extra.ps1' } }
 "finished $(Get-Date -Format 'yyyy-MM-dd HH:mm')" | Out-File $log -Append -Encoding utf8
-Select-String -LiteralPath $log -Pattern 'total=|FAIL|Build Finished|BUILD FAILED|CAPTURE_DONE|shader errors|NO RESULTS|Exception' | ForEach-Object Line | Out-File $done -Encoding utf8
+# The log mixes UTF-8 (Out-File) and UTF-16 (Tee-Object) lines, which Select-String misreads (full-run.done came out empty on
+# 2026-10-03): read it raw with the NULs dropped.
+([System.IO.File]::ReadAllText($log) -replace "`0", '') -split "`n" | Where-Object { $_ -match 'total=|FAIL|Build Finished|BUILD FAILED|CAPTURE_DONE|shader errors|NO RESULTS|Exception' } | ForEach-Object { $_.Trim() } | Out-File $done -Encoding utf8

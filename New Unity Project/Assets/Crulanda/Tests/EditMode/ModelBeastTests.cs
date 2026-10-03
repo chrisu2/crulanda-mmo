@@ -54,8 +54,8 @@ namespace Crulanda.Tests
 
         [Test] public void Wolves_hounds_stags_and_does_stand_on_the_ground_facing_forward()
         {
-            Assume.That(ModelBeast.Available("Wolf") && ModelBeast.Available("Stag") && ModelBeast.Available("Deer"));
-            foreach (var (look, variant, kind, height) in new[] { (ActorLook.Wolf, 0, "Wolf", 1f), (ActorLook.Wolf, 1, "Wolf", 1f), (ActorLook.Stag, 0, "Stag", 1.9f), (ActorLook.Stag, 1, "Deer", 1.6f) })
+            Assume.That(ModelBeast.Available("Wolf") && ModelBeast.Available("Stag") && ModelBeast.Available("Deer") && ModelBeast.Available("Boar"));
+            foreach (var (look, variant, kind, height) in new[] { (ActorLook.Wolf, 0, "Wolf", 1f), (ActorLook.Wolf, 1, "Wolf", 1f), (ActorLook.Stag, 0, "Stag", 1.9f), (ActorLook.Stag, 1, "Deer", 1.6f), (ActorLook.Boar, 0, "Boar", .95f) })
             {
                 var v = Beast(look, variant); var m = v.BeastModel; string what = look + " " + variant;
                 Assert.NotNull(m, what + " is a model."); Assert.AreEqual(kind, m.Kind, what + " wears the " + kind + ".");
@@ -102,6 +102,25 @@ namespace Crulanda.Tests
                 foreach (var p in mesh.vertices) low = Mathf.Min(low, w.MultiplyPoint3x4(p).y);
             }
             Object.DestroyImmediate(mesh); return low;
+        }
+
+        [Test] public void The_boar_is_moved_by_the_code()
+        {
+            Assume.That(ModelBeast.Available("Boar"));
+            var v = Beast(ActorLook.Boar, 0, "Wild boar"); var m = v.BeastModel; float ground = v.transform.position.y - 1;
+            Assert.IsTrue(m.Procedural, "CraftPix's boar has no clips: the code moves it.");
+            Assert.IsTrue(m.Renderers.TrueForAll(r => System.Array.TrueForAll(r.sharedMaterials, x => x.mainTexture != null)), "It keeps its palette texture.");
+            float standing = m.Hips.position.y - ground;
+            var legs = new List<Transform>(); foreach (var t in m.Model.GetComponentsInChildren<Transform>()) if (t.name.StartsWith("Front_Knee_L") || t.name.StartsWith("Hind_Knee_L")) legs.Add(t);
+            Assert.AreEqual(2, legs.Count, "It has its front and hind knees.");
+            v.BeastPreview("walk", 0); var a = legs[0].position; var b0 = legs[1].position;
+            v.BeastPreview("walk", m.ClipLength("walk") * .25f);
+            Assert.Greater(Vector3.Distance(a, legs[0].position) + Vector3.Distance(b0, legs[1].position), .04f, "A quarter of a stride on, its legs have moved.");
+            v.BeastPreview("attack", .26f); Assert.Greater(v.transform.InverseTransformPoint(m.Model.position).z, .05f, "Its charge lunges forward.");
+            v.BeastPreview("death", 2);
+            Assert.Less(m.Hips.position.y - ground, standing * .7f, "Dead, it lies on its side.");
+            Assert.Greater(Lowest(m), ground - .12f, "On the ground, not in it.");
+            v.BeastPreview("idle", 0); Assert.AreEqual(standing, m.Hips.position.y - ground, .02f, "And up again as it was.");
         }
 
         [Test] public void Game_deer_wear_the_stag_or_the_deer()

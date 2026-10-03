@@ -40,6 +40,11 @@ namespace Crulanda.EditorTools
             Row("beasts-farm", new[] { P(ActorLook.Villager, 23, null, 0), K("horse", .1f, "idle", .5f), K("horse", .3f, "eat", 1), K("horse", .6f, "idle", .9f), K("horse", .9f, "walk", .3f),
                 K("donkey", .2f, "idle", .4f), K("donkey", .7f, "eat", 1.4f) }, 2.8f);
             Row("beasts-cows", new[] { P(ActorLook.Villager, 23, null, 0), K("cow", .1f, "idle", .5f), K("cow", .3f, "eat", 2), K("cow", .6f, "idle", 1.2f), K("cow", .9f, "walk", .4f) }, 3f);
+            // The boar (CraftPix, moved by the code): the old one beside the new, the kinds, and its motions.
+            Row("beasts-boar", new[] { Old(ActorLook.Boar, 0), Named(B(ActorLook.Boar, 0, "idle", .5f), "Wild boar"), Named(B(ActorLook.Boar, 0, "idle", .5f), "Carrion boar"),
+                Named(B(ActorLook.Boar, 0, "idle", .5f), "Mire boar"), Named(B(ActorLook.Boar, 0, "idle", .5f), "Rockhide boar"), Named(B(ActorLook.Boar, 0, "idle", .5f), "Old Scree-Tusk (elite)"), P(ActorLook.Warrior, 0, null, 0) }, 1.6f);
+            Row("beasts-boar-moves", new[] { B(ActorLook.Boar, 0, "walk", .1f), B(ActorLook.Boar, 0, "walk", .3f), B(ActorLook.Boar, 0, "run", .1f), B(ActorLook.Boar, 0, "eat", 1),
+                B(ActorLook.Boar, 0, "attack", .1f), B(ActorLook.Boar, 0, "attack", .26f), B(ActorLook.Boar, 0, "headlow", 1), B(ActorLook.Boar, 0, "death", 2) }, 1.5f);
             Debug.Log("CREATURE_CAPTURE_DONE");
         }
 

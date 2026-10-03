@@ -31,6 +31,14 @@ namespace Crulanda.EditorTools
             m.importNormals = ModelImporterNormals.Calculate; m.normalCalculationMode = ModelImporterNormalCalculationMode.AreaAndAngleWeighted;
             m.normalSmoothingAngle = Smoothing; m.importTangents = ModelImporterTangents.None;
         }
+        /// <summary>A palette texture (CraftPix's swatches): no mipmaps or compression to bleed one swatch into the next.</summary>
+        void OnPreprocessTexture()
+        {
+            if (!assetPath.StartsWith(Root)) return;
+            var t = (TextureImporter)assetImporter;
+            t.textureType = TextureImporterType.Default; t.sRGBTexture = true; t.mipmapEnabled = false; t.filterMode = FilterMode.Bilinear;
+            t.wrapMode = TextureWrapMode.Clamp; t.textureCompression = TextureImporterCompression.Uncompressed; t.alphaSource = TextureImporterAlphaSource.None;
+        }
         static readonly string[] Loops = { "Idle", "Idle_2", "Idle_2_HeadLow", "Idle_Headlow", "Walk", "Gallop", "Eating" };
         void OnPreprocessAnimation()
         {

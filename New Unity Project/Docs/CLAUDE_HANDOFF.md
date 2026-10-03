@@ -9,13 +9,13 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-10-03, 13:10)
-**The playable build:** published 2026-10-03 13:06 (build of 12:57): the farm animals in Oakhaven, on top of the real animals
-(01:59, d24ecf2) and the feet (00:44, 2e18462).
-**Last full run:** EditMode 391/391, PlayMode 174/174, build OK, Oakhaven toured (the inn front shows a grey horse at the porch),
-HUD/wardrobe/loot/fight shots, no exceptions in any game log, no shader errors.
+## RESUME HERE (updated 2026-10-03, afternoon)
+**The playable build:** published 2026-10-03 14:42: the boars (CraftPix, animated in code), on top of the farm animals (13:06,
+632853a), the real animals (01:59, d24ecf2) and the feet (00:44, 2e18462).
+**Last full run:** EditMode 392/392, PlayMode 173/174 (Sel Harrow's walk home timed out once; the fixture passed alone 8/8), build OK, Oakhaven toured, all shots, no exceptions
+in any game log, no shader errors.
 **Nothing in flight:** everything is committed, published and backed up.
-**What the game has now (newest first):** farm animals in Oakhaven (horses, a donkey, cows); real animals (wolves, ash hounds, Old Whitefoot, the forest stags and does, the hill
+**What the game has now (newest first):** boars (CraftPix, moved in code); farm animals in Oakhaven (horses, a donkey, cows); real animals (wolves, ash hounds, Old Whitefoot, the forest stags and does, the hill
 deer: Quaternius models through `ModelBeast`); foot armour that follows the foot; armour that follows the form and hats fitted to
 the heads; every person a Quaternius model (`ModelFigure`, old gear refitted onto frames on its bones); before that the
 professions, loot, hunting, the five grown zones and the painted style (see the numbered history below and CHANGELOG.md).
@@ -24,9 +24,10 @@ professions, loot, hunting, the five grown zones and the painted style (see the 
 1. **Farm animals are in Oakhaven** (published 2026-10-03 13:06): more could go to the other zones' farms and towns (Khaven,
    the Ash Rim's steadings), using the same kinds ("horse", "donkey", "cow") in their life.critters, at the END of each list.
    The pack also has Bull, Alpaca, Fox, Husky and Shiba Inu (zip at `tools/wip/animals/source/AnimatedAnimalPack.zip`).
-2. **Still primitives** (the free pack has none): boars, spiders, the bramble-things, and the village's hens, sheep, cats, crows
-   and rabbits. The farm pack's sheep has no walk; the only animated pig is cube-styled. A paid pack (or Quaternius's $20
-   tier for the people) is Chris's purchase.
+2. **Still primitives**: spiders, the bramble-things, and the village's hens, sheep, cats, crows and rabbits. The CraftPix set
+   (zip kept) also has a hare, fox, bear, owl, squirrel, hedgehog: the procedural mode can move them (the hare could be the
+   game rabbit). A paid pack (polyperfect Low Poly Animated Animals, $50 on sale, has spider/hen/sheep/cat/rabbit with real
+   animations) was offered on 2026-10-03; Chris did not choose it then.
 3. Playtest notes 9 (bloom and sun) and 10 (baked cave lighting) are OPEN; note 12's armour designs could go further (plate
    shapes, pauldrons); note 14's PDF was last brought up to date 2026-10-02 21:45 (`tools/docs/make_history_pdf.py`).
 
@@ -917,4 +918,16 @@ resumed with `Workflow({scriptPath, resumeFromRunId})` (finished agents replay f
   barn), donkey (-63,-49) r2 x1 (the mill), cow (92,-119) r8 x4 (Brook), cow (-114,50) r6 x3 (Harrow); canonNote labels them
   GAME-ONLY. CreatureCapture rows beasts-farm and beasts-cows; sheet tools/wip/characters/show/7-farm.jpg. Zone map plots:
   scratchpad zonemap.py (roads, water, props, critters, camps on a 10 m grid).
+- **Round 9, boars (PUBLISHED 2026-10-03 14:42)**: CraftPix "Free Wild Animal 3D Low Poly Models" (free-game-assets.itch.io, no
+  login there; craftpix.net itself wants an account; licence: CraftPix freebie, commercial use OK, no redistribution of the
+  art; zip kept at tools/wip/animals/source/CraftPix-Free-Wild-Animal-3D-Models.zip, git-ignored): Resources/Creatures/Boar.fbx
+  + wild_animals_map.png (a 64x64 palette; CreatureImport: no mipmaps, uncompressed) + CraftPix-License.txt. The set's models
+  are RIGGED, NO CLIPS: `ModelBeast.Proc.cs` (partial) moves them: MakeRig finds the chest/rear spine (Neck's and Tail_1's
+  parents), legs = chains of 3+ bones hanging from them (side and front by position in the animal's frame), Pose() resets to
+  rest and swings legs about the animal's right axis (diagonal pairs, middle joint folds on the forward swing), neck/head/tail,
+  and moves/rolls the whole model (lunge, drop, death roll 88 deg about its middle onto the ground: halfWidth). Slots as the
+  clip animals (idle, idle2, eat, headlow, walk, run, attack, kick, hitL/R, death, jump). ModelBeast: textured materials keep
+  their atlas (Atlas()), facing from hips to head in any direction (Shape.yaw), Hips falls back to Spine_2, Neck to Neck.
+  ActorVisual.Beasts: Boar coats by name (wild .56/.49/.43, Carrion, Mire, Rockhide/Scree, gloom x.8), height .95 (elite 1.1).
+  CreatureCapture rows beasts-boar, beasts-boar-moves; sheet tools/wip/characters/show/8-boar.jpg.
 

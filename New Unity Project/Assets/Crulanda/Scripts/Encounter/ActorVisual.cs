@@ -406,7 +406,7 @@ namespace Crulanda.Encounter
             var capsule = body.GetComponent<MeshRenderer>(); if (capsule != null) capsule.enabled = false;
             if (look == ActorLook.WeaveEater) { BuildEater(); lastPosition = transform.position; return; }
             if (look == ActorLook.Pale) { BuildPale(); lastPosition = transform.position; return; }
-            if ((look == ActorLook.Wolf || look == ActorLook.Stag) && BuildModelBeast(look)) { lastPosition = transform.position; return; }   // ActorVisual.Beasts.cs
+            if ((look == ActorLook.Wolf || look == ActorLook.Stag || look == ActorLook.Boar) && BuildModelBeast(look)) { lastPosition = transform.position; return; }   // ActorVisual.Beasts.cs
             if (look == ActorLook.Stag) { BuildStag(); lastPosition = transform.position; return; }
             if (look == ActorLook.Spider) { BuildSpider(); lastPosition = transform.position; return; }
             if (look == ActorLook.Bramble) { BuildBramble(); lastPosition = transform.position; return; }

@@ -1,0 +1,4 @@
+Boar.fbx and wild_animals_map.png: "Free Wild Animal 3D Low Poly Models" by CraftPix.net (free-game-assets.itch.io, 2022), taken
+2026-10-03 (Chris's pick). CraftPix freebie licence (https://craftpix.net/file-licenses/, section 2): free to use in personal and
+commercial games and to modify; the source files may not be resold or redistributed as art. No attribution required; credited
+in the game's credits all the same. Rigged, with no animations: ModelBeast moves its skeleton in code.

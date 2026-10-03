@@ -16,7 +16,7 @@ namespace Crulanda.Encounter
     /// for, its feet on the ground. Worn by beasts (ActorVisual.Beasts.cs: wolves and ash hounds, stags and does) and by game deer
     /// (CritterBody).
     /// </summary>
-    public sealed class ModelBeast
+    public sealed partial class ModelBeast
     {
         /// <summary>Off: beasts and game animals keep their primitive bodies (read when one is built).</summary>
         public static bool Enabled = true;
@@ -78,12 +78,14 @@ namespace Crulanda.Encounter
             return new Color(G(c.r), G(c.g), G(c.b), 1);
         }
         static bool Shiny(string name) { var n = name.ToLowerInvariant(); return n.Contains("eye") || n.Contains("nose") || n == "material.011"; }
-        /// <summary>A matte Standard material in this colour (eyes and noses a little glossy), or glowing; one per colour, shared.</summary>
-        static Material Mat(string name, Color c, bool glowing, Color glow)
+        /// <summary>A matte Standard material in this colour (eyes and noses a little glossy), or glowing, on a palette texture if
+        /// the file paints with one (CraftPix's animals: an atlas of colour swatches); one per colour, shared.</summary>
+        static Material Mat(string name, Color c, bool glowing, Color glow, Texture atlas = null)
         {
-            string key = name + "/" + Hex(c) + (glowing ? "/" + Hex(glow) : "");
+            string key = name + "/" + Hex(c) + (glowing ? "/" + Hex(glow) : "") + (atlas != null ? "/" + atlas.name : "");
             if (mats.TryGetValue(key, out var m) && m != null) return m;
             m = new Material(Shader.Find("Standard")) { color = c, name = "Creature " + key };
+            if (atlas != null) m.mainTexture = atlas;
             m.SetFloat("_Glossiness", Shiny(name) ? .55f : .1f); m.SetFloat("_Metallic", 0);
             if (glowing) { m.EnableKeyword("_EMISSION"); m.SetColor("_EmissionColor", glow); m.globalIlluminationFlags = MaterialGlobalIlluminationFlags.RealtimeEmissive; }
             mats[key] = m; return m;
@@ -99,6 +101,13 @@ namespace Crulanda.Encounter
                 default: return null;
             }
         }
+        /// <summary>The palette texture a material paints with: its own, or the one of its name beside the models (CraftPix's
+        /// "Wild_animals_map" is Resources/Creatures/wild_animals_map.png); null for the flat-coloured pack.</summary>
+        static Texture Atlas(Material m, string name)
+        {
+            if (m != null && m.HasProperty("_MainTex") && m.mainTexture != null) return m.mainTexture;
+            return name.EndsWith("_map", System.StringComparison.OrdinalIgnoreCase) ? Resources.Load<Texture2D>("Creatures/" + name.ToLowerInvariant()) : null;
+        }
         void Colour(Coat coat, float shade)
         {
             if (coat == null) coat = Native(Kind);
@@ -108,10 +117,11 @@ namespace Crulanda.Encounter
                 for (int i = 0; i < own.Length; i++)
                 {
                     string n = own[i] != null ? own[i].name.Replace(" (Instance)", "") : "";
-                    Color c = coat != null && coat.Colours.TryGetValue(n, out var set) ? set : FileColour(own[i]);
+                    var atlas = Atlas(own[i], n);
+                    Color c = coat != null && coat.Colours.TryGetValue(n, out var set) ? set : atlas != null ? Color.white : FileColour(own[i]);
                     bool glowing = coat != null && coat.Glowing.Contains(n);
                     if (!glowing && !Shiny(n)) c = new Color(c.r * shade, c.g * shade, c.b * shade, 1);   // no two of a herd quite alike
-                    own[i] = Mat(n, c, glowing, coat != null ? coat.Glow : Color.black);
+                    own[i] = Mat(n, c, glowing, coat != null ? coat.Glow : Color.black, atlas);
                 }
                 r.sharedMaterials = own;
             }
@@ -217,7 +227,7 @@ namespace Crulanda.Encounter
 
         // ------------------------------------------------------------------------------------------------- building
         /// <summary>Its rest pose in the file, measured once: the feet's and the head's heights, its length and which way it faces.</summary>
-        struct Shape { public float feet, top, back, front; public bool turned; }
+        struct Shape { public float feet, top, back, front, half, yaw; }
         static readonly Dictionary<string, Shape> shapes = new Dictionary<string, Shape>();
         /// <summary>The stag's antlers (their own mesh in the file): never counted in its height.</summary>
         public static bool Antlers(Renderer r) { return r != null && r.name.IndexOf("Horn", System.StringComparison.OrdinalIgnoreCase) >= 0; }
@@ -227,7 +237,7 @@ namespace Crulanda.Encounter
             // Its skin in the rest pose, vertex by vertex, in the model's space (a renderer's bounds carry a margin: measured by
             // them, a wolf stood 6 cm off the ground); the antlers are left out of the height.
             Bounds b = default; bool any = false; Bounds all = default; bool anyAll = false;
-            var inv = Model.worldToLocalMatrix; var baked = new Mesh();
+            var inv = Model.worldToLocalMatrix; var baked = new Mesh(); var points = new List<Vector3>();
             foreach (var r in Renderers)
             {
                 Vector3[] verts; Matrix4x4 w = inv * r.transform.localToWorldMatrix;   // BakeMesh(true) keeps the renderer's scale out
@@ -235,7 +245,7 @@ namespace Crulanda.Encounter
                 else { var mf = r.GetComponent<MeshFilter>(); if (mf == null || mf.sharedMesh == null) continue; verts = mf.sharedMesh.vertices; }
                 foreach (var v in verts)
                 {
-                    var p = w.MultiplyPoint3x4(v);
+                    var p = w.MultiplyPoint3x4(v); points.Add(p);
                     if (!anyAll) { all = new Bounds(p, Vector3.zero); anyAll = true; } else all.Encapsulate(p);
                     if (Antlers(r)) continue;
                     if (!any) { b = new Bounds(p, Vector3.zero); any = true; } else b.Encapsulate(p);
@@ -243,10 +253,14 @@ namespace Crulanda.Encounter
             }
             if (Application.isPlaying) Object.Destroy(baked); else Object.DestroyImmediate(baked);
             if (!any) b = all;
-            s.feet = b.min.y; s.top = b.max.y; s.back = all.min.z; s.front = all.max.z;
-            // Facing: the head is ahead of the hips.
-            if (Head != null && Hips != null) s.turned = inv.MultiplyPoint3x4(Head.position).z < inv.MultiplyPoint3x4(Hips.position).z;
-            if (s.turned) { float f = -s.back; s.back = -s.front; s.front = f; }
+            s.feet = b.min.y; s.top = b.max.y;
+            // Facing: from the hips to the head, whichever way the file has it (the pack faces +Z, CraftPix's along X).
+            var dir = Vector3.forward;
+            if (Head != null && Hips != null) { var d = inv.MultiplyPoint3x4(Head.position) - inv.MultiplyPoint3x4(Hips.position); d.y = 0; if (d.sqrMagnitude > 1e-8f) dir = d.normalized; }
+            s.yaw = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
+            var side = Vector3.Cross(Vector3.up, dir); s.back = float.MaxValue; s.front = float.MinValue; s.half = 0;
+            foreach (var p in points) { float f = Vector3.Dot(p, dir); s.back = Mathf.Min(s.back, f); s.front = Mathf.Max(s.front, f); s.half = Mathf.Max(s.half, Mathf.Abs(Vector3.Dot(p, side))); }
+            if (points.Count == 0) { s.back = all.min.z; s.front = all.max.z; s.half = all.extents.x; }
             shapes[Kind] = s; return s;
         }
 
@@ -265,7 +279,7 @@ namespace Crulanda.Encounter
             b.Animator.applyRootMotion = false; b.Animator.cullingMode = AnimatorCullingMode.CullUpdateTransforms; b.Animator.runtimeAnimatorController = null;
             b.bones = new Dictionary<string, Transform>();
             foreach (var t in go.GetComponentsInChildren<Transform>(true)) if (!b.bones.ContainsKey(t.name)) b.bones[t.name] = t;
-            b.Hips = b.Bone("Back") ?? b.Bone("Body"); b.Head = b.Bone("Head"); b.Neck = b.Bone("Neck1");
+            b.Hips = b.Bone("Back") ?? b.Bone("Spine_2") ?? b.Bone("Body"); b.Head = b.Bone("Head"); b.Neck = b.Bone("Neck1") ?? b.Bone("Neck");
             foreach (var r in go.GetComponentsInChildren<Renderer>(true))
             {
                 r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On; r.receiveShadows = true;
@@ -276,10 +290,12 @@ namespace Crulanda.Encounter
             var shape = b.Measure();
             float fileHeight = Mathf.Max(.01f, shape.top - shape.feet);
             b.Scale = height / fileHeight; b.Height = height; b.Length = (shape.front - shape.back) * b.Scale;
-            b.Model.localRotation = Quaternion.Euler(0, shape.turned ? 180 : 0, 0);
+            b.Model.localRotation = Quaternion.Euler(0, -shape.yaw, 0);
             b.Model.localScale = Vector3.one * b.Scale;
             b.Model.localPosition = new Vector3(0, ground - shape.feet * b.Scale, 0);
+            b.basePos = b.Model.localPosition; b.baseRot = b.Model.localRotation; b.halfWidth = shape.half * b.Scale;
             b.Colour(coat, shade);
+            if (SlotClip(kind, "walk") == null) b.MakeRig();   // no clips in the file: the code moves it (ModelBeast.Proc.cs)
             return b;
         }
 
@@ -328,6 +344,7 @@ namespace Crulanda.Encounter
         public void StartMotion(string label)
         {
             if (!Application.isPlaying || graph.IsValid() || Animator == null) return;
+            if (proc) { if (Model.GetComponent<Driver>() == null) Model.gameObject.AddComponent<Driver>().beast = this; return; }
             Model.gameObject.AddComponent<Driver>().beast = this;
             graph = PlayableGraph.Create("Beast " + label); graph.SetTimeUpdateMode(DirectorUpdateMode.GameTime);
             var output = AnimationPlayableOutput.Create(graph, "Beast", Animator);
@@ -351,7 +368,7 @@ namespace Crulanda.Encounter
         }
         public void StopMotion() { if (graph.IsValid()) graph.Destroy(); }
         public bool Moving { get { return graph.IsValid(); } }
-        public bool Has(string slot) { return slotOf.ContainsKey(slot); }
+        public bool Has(string slot) { return proc ? procLengths.ContainsKey(slot) : slotOf.ContainsKey(slot); }
         /// <summary>Dead: its death played and its last frame held (<see cref="Die"/>) until <see cref="Revive"/>.</summary>
         public bool Dead { get { return dead; } }
         /// <summary>A one-shot (an attack, a flinch) is playing.</summary>
@@ -359,7 +376,9 @@ namespace Crulanda.Encounter
         /// <summary>Plays a one-shot over whatever it is doing (attack, kick, hitL, hitR, jump), easing in and out.</summary>
         public void Play(string slot)
         {
-            if (dead || !slotOf.TryGetValue(slot, out int i)) return;
+            if (dead) return;
+            if (proc) { if (procLengths.ContainsKey(slot)) { shot = slot; shotTime = 0; } return; }
+            if (!slotOf.TryGetValue(slot, out int i)) return;
             shot = slot; shotTime = 0; slots[i].p.SetTime(0); slots[i].p.SetSpeed(1);
         }
         /// <summary>It falls: its death, played once, its last frame held.</summary>
@@ -367,19 +386,21 @@ namespace Crulanda.Encounter
         {
             if (dead) return;
             dead = true;
+            if (proc) { shot = "death"; shotTime = 0; return; }
             if (slotOf.TryGetValue("death", out int i)) { shot = "death"; shotTime = 0; slots[i].p.SetTime(0); slots[i].p.SetSpeed(1); }
         }
         /// <summary>On its feet again (respawned).</summary>
         public void Revive() { dead = false; shot = null; shotWeight = 0; }
         /// <summary>What it is doing now: going at <paramref name="speed"/> m/s, and when it stands, <paramref name="standing"/>
         /// (idle, idle2, headlow, eat). Kept until the next call; the model eases toward it every frame.</summary>
-        public void Drive(float speed, string standing) { pace = speed; rest = standing != null && slotOf.ContainsKey(standing) ? standing : "idle"; }
+        public void Drive(float speed, string standing) { pace = speed; rest = standing != null && (proc ? procLengths.ContainsKey(standing) : slotOf.ContainsKey(standing)) ? standing : "idle"; }
         /// <summary>
         /// One frame: the pace blends standing, the walk and the gallop, each cycle's rate matched to the ground; a one-shot eases in
         /// over it and out at its end; dead, the death holds. Weights ease over a quarter second, so nothing pops.
         /// </summary>
         void Tick(float dt)
         {
+            if (proc) { ProcTick(dt); return; }
             if (!graph.IsValid()) return;
             float speed = pace;
             System.Array.Clear(want, 0, want.Length);
@@ -416,11 +437,12 @@ namespace Crulanda.Encounter
         /// its last frame). A PlayableGraph does not pose an Animator outside play mode.</summary>
         public void Sample(string slot, float time)
         {
+            if (proc) { ProcSample(slot, time); return; }
             var c = SlotClip(Kind, slot); if (c == null || Model == null || c.length <= 0) return;
             bool loop = false; foreach (var (s, _, l) in Motions) if (s == slot) loop = l;
             c.SampleAnimation(Model.gameObject, loop ? time % c.length : Mathf.Min(time, c.length));
         }
         /// <summary>The length of a slot's clip for this kind, in seconds (0 if it has none).</summary>
-        public float ClipLength(string slot) { var c = SlotClip(Kind, slot); return c != null ? c.length : 0; }
+        public float ClipLength(string slot) { if (proc) return ProcLength(slot); var c = SlotClip(Kind, slot); return c != null ? c.length : 0; }
     }
 }

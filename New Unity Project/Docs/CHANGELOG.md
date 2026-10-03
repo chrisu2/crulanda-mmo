@@ -1008,3 +1008,15 @@ A read-only review by five reviewers, each finding checked by a second who tried
   donkeys grey or brown. They graze two thirds of the time and look about the rest, walk to a new spot now and then, and
   amble a few steps off when you walk into them. They are never hunted.
 - Tests: EditMode 391/391, PlayMode 174/174; ModelBeastTests (farm animals); Oakhaven toured; no errors in any game log.
+
+## 2026-10-03 — Boars (published 14:42)
+- **Real boars** (Chris found CraftPix's free "Wild Animal 3D Low Poly Models"; free for commercial games, kept with its licence):
+  the eleven boar camps in Oakhaven, Khaven, the Peaks and the Verdant wear CraftPix's wild boar. Wild boars are dark
+  grey-brown, carrion boars ashen, mire boars muddy, the Peaks' rockhides stone grey; Old Scree-Tusk stands a size bigger.
+- **Animated in code**: the free models come rigged but with no animations, so the game moves the skeleton itself (ModelBeast,
+  procedural mode): a trot in diagonal pairs matched to its speed, the knees folding as each foot comes forward, the body
+  bobbing; standing it looks about or roots with its head down; lying in wait it crouches; its blow is a charge with a toss of
+  the tusks; struck it flinches; killed it rolls onto its side. The same code can move the set's hare, fox, bear, owl,
+  squirrel and hedgehog later.
+- Still their old bodies: spiders, the bramble-things, and the village's hens, sheep, cats, crows and rabbits.
+- Tests: EditMode 392/392, PlayMode 173/174 (Sel Harrow's walk home timed out once; the fixture passed alone 8/8); ModelBeastTests (the boar); Oakhaven toured; no errors in any game log.

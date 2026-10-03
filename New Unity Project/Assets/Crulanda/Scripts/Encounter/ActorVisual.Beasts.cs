@@ -17,7 +17,7 @@ namespace Crulanda.Encounter
         public ModelBeast BeastModel { get { return beastModel; } }
         EncounterEnemy enemyRef; bool hitLeft; float beastPhase;
         /// <summary>The pack's animal a beast wears: the wolf for wolves and ash hounds; the stag, or the deer for a doe.</summary>
-        static string BeastKind(ActorLook look, int variant) { return look == ActorLook.Wolf ? "Wolf" : look == ActorLook.Stag ? (variant % 2 == 1 ? "Deer" : "Stag") : null; }
+        static string BeastKind(ActorLook look, int variant) { return look == ActorLook.Wolf ? "Wolf" : look == ActorLook.Stag ? (variant % 2 == 1 ? "Deer" : "Stag") : look == ActorLook.Boar ? "Boar" : null; }
         /// <summary>Builds a wolf, ash hound, stag or doe as a model (when models are on and the animal is in the build); false
         /// leaves it to the old body.</summary>
         bool BuildModelBeast(ActorLook look)
@@ -38,6 +38,20 @@ namespace Crulanda.Encounter
                 else if (gloom) coat = new ModelBeast.Coat().Set("Main", new Color(.28f, .26f, .25f)).Set("Main_Light", new Color(.45f, .42f, .39f));
                 else coat = new ModelBeast.Coat().Set("Main", new Color(.4f, .39f, .37f)).Set("Main_Light", new Color(.64f, .62f, .58f));   // a grey wolf (the file's is near white)
                 height = elite ? 1.12f : 1; walk = 1.2f; run = 5; LieDepth = .3f;
+            }
+            else if (look == ActorLook.Boar)
+            {
+                // CraftPix's boar (moved by the code: ModelBeast.Proc.cs), its hide by its kind: the carrion boars ashen, the mire boars
+                // muddy, the Peaks' rockhides stone grey; darker in Khaven's dusk.
+                var zone = Crulanda.World.ZoneBuilder.Active; bool gloom = zone != null && zone.Zone != null && zone.Zone.biome == "gloom";
+                // (The palette's boar is a pale farm pig's beige: a wild boar is dark, grey-brown.)
+                string n = name ?? ""; Color hide = new Color(.56f, .49f, .43f);
+                if (n.Contains("Carrion")) hide = new Color(.66f, .62f, .6f);
+                else if (n.Contains("Mire")) hide = new Color(.5f, .5f, .4f);
+                else if (n.Contains("Rockhide") || n.Contains("Scree")) hide = new Color(.6f, .6f, .64f);
+                if (gloom) hide *= .8f;
+                coat = new ModelBeast.Coat().Set("Wild_animals_map", new Color(hide.r, hide.g, hide.b, 1));
+                height = elite ? 1.1f : .95f; walk = 1.1f; run = 4.2f; LieDepth = .2f;
             }
             else { bool doe = variant % 2 == 1; height = (doe ? 1.6f : 1.9f) * (elite ? 1.1f : 1); walk = 1.4f; run = 4.5f; LieDepth = .45f; }
             int seed = FigureSeed(); float shade = .94f + Mathf.Abs(seed % 13) * .01f; beastPhase = (seed & 255) * .37f;

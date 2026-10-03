@@ -19,6 +19,11 @@
       "id": "item.khaven_goods",
       "name": "Khaven's goods",
       "description": "Candles, a bolt of wool, a family's pewter: taken from Khaven as 'toll'."
+    },
+    {
+      "id": "item.charnel_silk",
+      "name": "Charnel silk",
+      "description": "A skein of grey spider-silk from the Carrion Heights, strong as cord and cold to hold. Dorra Vey says it takes a dye like nothing else."
     }
   ],
   "documents": [
@@ -434,6 +439,236 @@
       "rewards": {
         "xp": 160,
         "gold": 35
+      }
+    },
+    {
+      "id": "npc.ansel.scarp",
+      "title": "The Bound Wall Breaks",
+      "kind": "npc",
+      "giver": "Ansel Morrow",
+      "turnIn": "Ansel Morrow",
+      "zone": "zone.khaven",
+      "level": 4,
+      "requires": [
+        "npc.ansel.hollows"
+      ],
+      "canonStatus": "CANON creature (Hollow Men), GAME-ONLY quest",
+      "summary": "Hollow Men are coming down off the grey scarp north of the old bound wall. See the wall for yourself, then put them down.",
+      "offer": "\"The old bound wall. My father's father helped set it, every stone, to keep what's in the graveyard in. Nobody said what to do when they come from the other side.\" Ansel looks north. \"There's grey things walking on the scarp above it. Not ours. Older. Go and look at the wall, so you know what I mean, and then do what you did at the creek.\"",
+      "complete": "\"Five. And the wall still standing.\" Ansel nods once. \"That's the first good news this ground has had in a month. Keep it to yourself; good news scares them worse than the other kind.\"",
+      "steps": [
+        {
+          "text": "See the Old Bound Wall, north of the village.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.khaven",
+              "at": {
+                "x": -36,
+                "y": 131
+              },
+              "radius": 9,
+              "text": "Stand at the Old Bound Wall",
+              "say": "The wall is older than the village: long stones laid without mortar, and every tenth one cut with a mark like a closed eye. Beyond it the ground rises grey to the scarp, and something up there is walking very slowly, the way the hollows walk."
+            }
+          ]
+        },
+        {
+          "text": "Put down the Hollow Men on the grey scarp.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.khaven",
+              "target": "mob.hollow.khaven.10.*",
+              "count": 5,
+              "text": "Scarp hollows put down"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 130,
+        "gold": 20
+      }
+    },
+    {
+      "id": "npc.cato.thicket",
+      "title": "Toll Without a Captain",
+      "kind": "npc",
+      "giver": "Cato Brisk",
+      "turnIn": "Cato Brisk",
+      "zone": "zone.khaven",
+      "level": 4,
+      "requires": [
+        "npc.cato.spoils"
+      ],
+      "canonStatus": "GAME-ONLY quest; CANON company (Sandthrone)",
+      "summary": "Sandthrone deserters are taking their own toll on the Corpse Road from a thicket south of it. Clear them and search what they have taken.",
+      "offer": "Cato Brisk counts coins into a cloth and ties it. \"Outriders I can bargain with. These aren't outriders. Deserters, lying up in the blackthorn south of the Corpse Road, and they stop carts with a rope across the way and take what they like.\" He tucks the cloth away. \"My chandler's boy came back without his cart or his boots. Go through the thicket. Whatever they've boxed up, bring word of it.\"",
+      "complete": "\"Boots. Three pair, and one of them the boy's.\" Cato turns the ledger-book you found over in his hands. \"A toll-book, with no captain's mark. They were keeping the Sandthrone's own accounts for themselves. I'll see the outriders hear of it. Let them hang each other for once.\"",
+      "steps": [
+        {
+          "text": "Clear the deserters out of the Thicket, south of the Corpse Road.",
+          "say": "The blackthorn is cut into a bower from the inside, with a rope slung across the road and a bell on it.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.khaven",
+              "target": "mob.deserter.khaven.*",
+              "count": 5,
+              "text": "Thicket deserters"
+            }
+          ]
+        },
+        {
+          "text": "Search the deserters' strongbox.",
+          "objectives": [
+            {
+              "type": "interact",
+              "zone": "zone.khaven",
+              "target": "Deserters' strongbox",
+              "text": "Search the deserters' strongbox",
+              "say": "Three pairs of boots, a sack of tallow candles with the chandler's mark, and under them a toll-book in a Sandthrone hand, every cart on the Corpse Road for a month, and not one coin of it sent up the road."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 120,
+        "gold": 20
+      }
+    },
+    {
+      "id": "side.khaven.silk",
+      "title": "Silk on the Heights",
+      "kind": "side",
+      "giver": "Dorra Vey",
+      "turnIn": "Dorra Vey",
+      "zone": "zone.khaven",
+      "level": 5,
+      "minLevel": 4,
+      "canonStatus": "GAME-ONLY",
+      "summary": "Dorra Vey wants spider-silk from the scree below the Carrion Heights, for a dye she will not name.",
+      "offer": "Dorra Vey keeps her voice down, though there is nobody near. \"The scree under the Carrion Heights, on the east side. There are spiders in it now, big as dogs, and their silk is grey and strong and takes a colour like nothing I've worked.\" She shows you a thread wound on her finger, the red of a hanged man's face. \"Five skeins. Don't tell Wenna. She'd call it unlucky.\"",
+      "complete": "Dorra winds the skeins onto a spindle, one after another, without looking at you. \"Grey as the pit. Watch.\" She dips an end in a pot by the hearth and it comes out the colour of fresh blood. \"There. Now that's a colour for a shroud.\"",
+      "steps": [
+        {
+          "text": "Take silk from the charnel spiders on the scree under the Carrion Heights.",
+          "objectives": [
+            {
+              "type": "collect",
+              "zone": "zone.khaven",
+              "target": "kill:mob.spider.khaven*",
+              "item": "item.charnel_silk",
+              "count": 5,
+              "text": "Skeins of charnel silk",
+              "say": "A skein of grey silk comes away from the spider's spinnerets, cold and heavier than it looks."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 140,
+        "gold": 25
+      }
+    },
+    {
+      "id": "side.khaven.listener",
+      "title": "What the Listener Heard",
+      "kind": "side",
+      "giver": "Old Kestrel",
+      "turnIn": "Old Kestrel",
+      "zone": "zone.khaven",
+      "level": 3,
+      "canonStatus": "GAME-ONLY",
+      "summary": "Old Kestrel wants to know what the Listener heard before the Hush took him. Go to the Listener's Hut, then to the Hush at night, and tell Wenna Coyle what you find.",
+      "offer": "Old Kestrel sits with a blanket over his knees though the day is warm. \"There was a man lived west of the wood, in a hut, and he listened. To the ground, to the trees, to the dead. The Listener, they called him; he had another name once. One night he walked up to the Hush and he didn't come back.\" The old man's hands shake. \"Go to his hut. Then go up to the Hush when it's dark, and stand still, and listen the way he did. Then tell Wenna what you heard. She'll know. I'm too old to hear it myself.\"",
+      "complete": "Old Kestrel listens with his eyes shut. When you finish he opens them. \"A name. He heard a name, and he went up to answer it.\" He pulls the blanket higher. \"Mine's not one he'd have heard. I made sure of that, years ago. Thank you. Don't go up there again.\"",
+      "steps": [
+        {
+          "text": "Go to the Listener's Hut, west of the Whispering Wood.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.khaven",
+              "at": {
+                "x": -140,
+                "y": 32
+              },
+              "radius": 8,
+              "text": "Stand in the Listener's Hut",
+              "say": "The hut has no roof. There is a chair in the middle of the floor facing the north wall, and on the wall, scratched a thousand times over, one word: LISTEN."
+            }
+          ]
+        },
+        {
+          "text": "Stand in the Hush after dark, and listen.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.khaven",
+              "at": {
+                "x": -138,
+                "y": 130
+              },
+              "radius": 10,
+              "night": true,
+              "text": "Listen in the Hush at night",
+              "say": "The wood goes quiet in a way that is not silence. Under it, very low, something is saying a name over and over, patiently, like someone calling a dog that has run off. It is not your name. Not yet."
+            }
+          ]
+        },
+        {
+          "text": "Tell Wenna Coyle what you heard.",
+          "objectives": [
+            {
+              "type": "talk",
+              "zone": "zone.khaven",
+              "target": "Wenna Coyle",
+              "text": "Tell Wenna Coyle",
+              "say": "\"A name. It's always a name.\" Wenna ties a knot in the cord at her wrist, and another. \"Tell Kestrel I said he's right to be afraid, and tell him I said it kindly.\""
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 90,
+        "gold": 10
+      }
+    },
+    {
+      "id": "npc.wenna.hushmother",
+      "title": "The Mother of the Hush",
+      "kind": "npc",
+      "giver": "Wenna Coyle",
+      "turnIn": "Wenna Coyle",
+      "zone": "zone.khaven",
+      "level": 6,
+      "minLevel": 5,
+      "requires": [
+        "npc.wenna.wolves"
+      ],
+      "canonStatus": "GAME-ONLY",
+      "summary": "The grey wolves of the Hush answer to one old she-wolf, bigger than any of them. Kill her at the western edge of the Hush, and the wood may go quiet.",
+      "offer": "\"The wolves you culled. They weren't the trouble; they were the trouble's children.\" Wenna draws a shape in the ash of her hearth: a wolf, and a bigger one behind it. \"There's a she-wolf in the Hush older than I am, grey to the eyes, and the wood's got into her all the way down. The Hush-Mother, the hunters call her, when they'll say it at all. She lies up at the far west edge of the wood. Go in the day, go alone, and come back.\"",
+      "complete": "Wenna takes the grey tuft you bring and holds it to the lamp. It does not catch. She puts it in the fire anyway and watches it until it does. \"That's the last of her. The wood will breed another in time; they always do. But not in my time, and not in yours.\" She unties the knotted cord from her wrist and gives it to you. \"Wear that. It's done its work here.\"",
+      "steps": [
+        {
+          "text": "Kill the Hush-Mother at the western edge of the Hush.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.khaven",
+              "target": "mob.wolf.khaven.13.*",
+              "text": "The Hush-Mother",
+              "say": "She goes down without a sound, and for the first time since you came to Khaven the wood is quiet all the way through."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 170,
+        "gold": 30
       }
     }
   ]

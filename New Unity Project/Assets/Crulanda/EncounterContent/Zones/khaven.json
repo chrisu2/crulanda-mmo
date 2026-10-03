@@ -3,7 +3,7 @@
   "displayName": "Khaven Village",
   "subtitle": "A walled village of gallows and crypts beside the Whispering Wood",
   "canonStatus": "CANON-EXPANDED",
-  "canonNote": "Canon (Khaven Village map): walled village with the Cracked Hearth, two Fallen Smithies, the Blood-Stone Well, the Gallows Tree and the Crypt-Keeper's Hovel; the Whispering Wood to the west, Gloom Creek, and the Carrion Cliffs. GAME-ONLY / PROVISIONAL: the Sandthrone outriders holding it, the Pale watcher at the crypt, the crypt itself, road links to Oakhaven and all exact placement. Also GAME-ONLY: the wilderness beyond the walls (the deep Whispering Wood, the north road to the Peaks, the drowned graveyard and creek barrow), the levelling camps, and the residents Wenna Coyle, Ansel Morrow and Cato Brisk. Hollow Men are a CANON creature (book1 ch.4); their presence here is GAME-ONLY. The 340 m growth (2026-09-30) adds, all GAME-ONLY in placement and story: the Hush and the Listener's Hut deeper in the Whispering Wood (the Listener is a Silent Pilgrim; the Silent Pilgrims are CANON), the corpse road with its coffin stones and bridge, the gibbet crossroads on the Gloom road, the plague pit, the drowned fields, the Carrion Heights and the Charnel Barrow above the Carrion Cliffs (the cliffs are CANON), the Old Bound Wall and the Fallen Watch on the north road, and the Pale Reckoner (the Pale Things are CANON).",
+  "canonNote": "Canon (Khaven Village map): walled village with the Cracked Hearth, two Fallen Smithies, the Blood-Stone Well, the Gallows Tree and the Crypt-Keeper's Hovel; the Whispering Wood to the west, Gloom Creek, and the Carrion Cliffs. GAME-ONLY / PROVISIONAL: the Sandthrone outriders holding it, the Pale watcher at the crypt, the crypt itself, road links to Oakhaven and all exact placement. Also GAME-ONLY: the wilderness beyond the walls (the deep Whispering Wood, the north road to the Peaks, the drowned graveyard and creek barrow), the levelling camps, and the residents Wenna Coyle, Ansel Morrow and Cato Brisk. Hollow Men are a CANON creature (book1 ch.4); their presence here is GAME-ONLY. The 340 m growth (2026-09-30) adds, all GAME-ONLY in placement and story: the Hush and the Listener's Hut deeper in the Whispering Wood (the Listener is a Silent Pilgrim; the Silent Pilgrims are CANON), the corpse road with its coffin stones and bridge, the gibbet crossroads on the Gloom road, the plague pit, the drowned fields, the Carrion Heights and the Charnel Barrow above the Carrion Cliffs (the cliffs are CANON), the Old Bound Wall and the Fallen Watch on the north road, and the Pale Reckoner (the Pale Things are CANON). The Scarp hollows, the Thicket deserters, the Heights scree spiders, the Hush-Mother and the Thicket (2026-10-03) are GAME-ONLY.",
   "size": 410,
   "levelMin": 3,
   "levelMax": 5,
@@ -1350,6 +1350,14 @@
       },
       "radius": 18,
       "canonStatus": "CANON-EXPANDED: the Whispering Wood is CANON (the Khaven village map); the Hush is GAME-ONLY."
+    },
+    {
+      "name": "The Thicket",
+      "at": {
+        "x": -150,
+        "y": -108
+      },
+      "note": "GAME-ONLY: the blackthorn tangle south of the Corpse Road where the toll road's deserters lie up."
     }
   ],
   "props": [
@@ -2819,6 +2827,17 @@
         "y": 158
       },
       "variant": 2
+    },
+    {
+      "kind": "crates",
+      "name": "Deserters' strongbox",
+      "at": {
+        "x": -146,
+        "y": -104
+      },
+      "rotation": 20,
+      "variant": 1,
+      "interact": "Search the deserters' strongbox"
     }
   ],
   "life": {
@@ -3257,6 +3276,71 @@
       "respawn": 300,
       "elite": true,
       "harder": true
+    },
+    {
+      "name": "Scarp hollows",
+      "mob": "Hollow Man",
+      "tag": "hollow",
+      "look": "hollow",
+      "canonStatus": "CANON creature, GAME-ONLY camp",
+      "center": {
+        "x": -100,
+        "y": 115
+      },
+      "radius": 9,
+      "count": 5,
+      "levelMin": 4,
+      "levelMax": 5,
+      "respawn": 75
+    },
+    {
+      "name": "Thicket deserters",
+      "mob": "Sandthrone deserter",
+      "tag": "deserter",
+      "look": "deserter",
+      "canonStatus": "GAME-ONLY (CANON company: Sandthrone)",
+      "center": {
+        "x": -150,
+        "y": -108
+      },
+      "radius": 9,
+      "count": 5,
+      "levelMin": 4,
+      "levelMax": 5,
+      "respawn": 75,
+      "ambush": true
+    },
+    {
+      "name": "Heights scree spiders",
+      "mob": "Charnel spider",
+      "tag": "spider",
+      "look": "spider",
+      "canonStatus": "GAME-ONLY",
+      "center": {
+        "x": 160,
+        "y": 25
+      },
+      "radius": 9,
+      "count": 5,
+      "levelMin": 5,
+      "levelMax": 5,
+      "respawn": 75
+    },
+    {
+      "name": "The Hush-Mother",
+      "mob": "The Hush-Mother",
+      "tag": "wolf",
+      "look": "wolf",
+      "canonStatus": "GAME-ONLY",
+      "center": {
+        "x": -165,
+        "y": 112
+      },
+      "radius": 5,
+      "count": 1,
+      "levelMin": 6,
+      "levelMax": 6,
+      "respawn": 240
     }
   ],
   "tallGrass": [
@@ -3589,29 +3673,180 @@
     }
   ],
   "nodes": [
-    { "node": "node.bogiron", "at": { "x": 38, "y": -47 }, "rotation": 340 },
-    { "node": "node.bogiron", "at": { "x": 53.1, "y": -41.5 }, "rotation": 340 },
-    { "node": "node.bogiron", "at": { "x": 62.3, "y": -19.2 }, "rotation": 285 },
-    { "node": "node.bogiron", "at": { "x": 70.8, "y": -70.3 }, "rotation": 15 },
-    { "node": "node.bogiron", "at": { "x": 104, "y": -31.2 }, "rotation": 260 },
-    { "node": "node.bogiron", "at": { "x": 124, "y": -28 }, "rotation": 90 },
-    { "node": "node.bogiron", "at": { "x": 124, "y": -48 }, "rotation": 90 },
-    { "node": "node.bogiron", "at": { "x": -94.2, "y": 90.1 }, "rotation": 30 },
-    { "node": "node.bogiron", "at": { "x": -86.5, "y": 85.6 }, "rotation": 30 },
-    { "node": "node.bogiron", "at": { "x": 43.5, "y": 109.5 }, "rotation": 175 },
-    { "node": "node.blackpine", "at": { "x": -14, "y": 42 } },
-    { "node": "node.blackpine", "at": { "x": 24, "y": 42 } },
-    { "node": "node.blackpine", "at": { "x": 58, "y": 64 }, "rotation": 90 },
-    { "node": "node.blackpine", "at": { "x": 80, "y": 48 } },
-    { "node": "node.blackpine", "at": { "x": 130, "y": 46 }, "rotation": 90 },
-    { "node": "node.blackpine", "at": { "x": 112, "y": 104 } },
-    { "node": "node.blackpine", "at": { "x": -66, "y": 138 } },
-    { "node": "node.blackpine", "at": { "x": -86, "y": 150 }, "rotation": 90 },
-    { "node": "node.mourners_cap", "item": "item.mourners_cap", "at": { "x": -3.5, "y": -177.3 } },
-    { "node": "node.mourners_cap", "item": "item.mourners_cap", "at": { "x": 20.5, "y": -187.3 } },
-    { "node": "node.mourners_cap", "item": "item.mourners_cap", "at": { "x": 36.5, "y": -185.3 } }
+    {
+      "node": "node.bogiron",
+      "at": {
+        "x": 38,
+        "y": -47
+      },
+      "rotation": 340
+    },
+    {
+      "node": "node.bogiron",
+      "at": {
+        "x": 53.1,
+        "y": -41.5
+      },
+      "rotation": 340
+    },
+    {
+      "node": "node.bogiron",
+      "at": {
+        "x": 62.3,
+        "y": -19.2
+      },
+      "rotation": 285
+    },
+    {
+      "node": "node.bogiron",
+      "at": {
+        "x": 70.8,
+        "y": -70.3
+      },
+      "rotation": 15
+    },
+    {
+      "node": "node.bogiron",
+      "at": {
+        "x": 104,
+        "y": -31.2
+      },
+      "rotation": 260
+    },
+    {
+      "node": "node.bogiron",
+      "at": {
+        "x": 124,
+        "y": -28
+      },
+      "rotation": 90
+    },
+    {
+      "node": "node.bogiron",
+      "at": {
+        "x": 124,
+        "y": -48
+      },
+      "rotation": 90
+    },
+    {
+      "node": "node.bogiron",
+      "at": {
+        "x": -94.2,
+        "y": 90.1
+      },
+      "rotation": 30
+    },
+    {
+      "node": "node.bogiron",
+      "at": {
+        "x": -86.5,
+        "y": 85.6
+      },
+      "rotation": 30
+    },
+    {
+      "node": "node.bogiron",
+      "at": {
+        "x": 43.5,
+        "y": 109.5
+      },
+      "rotation": 175
+    },
+    {
+      "node": "node.blackpine",
+      "at": {
+        "x": -14,
+        "y": 42
+      }
+    },
+    {
+      "node": "node.blackpine",
+      "at": {
+        "x": 24,
+        "y": 42
+      }
+    },
+    {
+      "node": "node.blackpine",
+      "at": {
+        "x": 58,
+        "y": 64
+      },
+      "rotation": 90
+    },
+    {
+      "node": "node.blackpine",
+      "at": {
+        "x": 80,
+        "y": 48
+      }
+    },
+    {
+      "node": "node.blackpine",
+      "at": {
+        "x": 130,
+        "y": 46
+      },
+      "rotation": 90
+    },
+    {
+      "node": "node.blackpine",
+      "at": {
+        "x": 112,
+        "y": 104
+      }
+    },
+    {
+      "node": "node.blackpine",
+      "at": {
+        "x": -66,
+        "y": 138
+      }
+    },
+    {
+      "node": "node.blackpine",
+      "at": {
+        "x": -86,
+        "y": 150
+      },
+      "rotation": 90
+    },
+    {
+      "node": "node.mourners_cap",
+      "item": "item.mourners_cap",
+      "at": {
+        "x": -3.5,
+        "y": -177.3
+      }
+    },
+    {
+      "node": "node.mourners_cap",
+      "item": "item.mourners_cap",
+      "at": {
+        "x": 20.5,
+        "y": -187.3
+      }
+    },
+    {
+      "node": "node.mourners_cap",
+      "item": "item.mourners_cap",
+      "at": {
+        "x": 36.5,
+        "y": -185.3
+      }
+    }
   ],
   "stations": [
-    { "kind": "bench", "name": "Wenna Coyle's bench", "at": { "x": -17, "y": -12 }, "rotation": 90, "canonStatus": "GAME-ONLY" }
+    {
+      "kind": "bench",
+      "name": "Wenna Coyle's bench",
+      "at": {
+        "x": -17,
+        "y": -12
+      },
+      "rotation": 90,
+      "canonStatus": "GAME-ONLY"
+    }
   ]
 }

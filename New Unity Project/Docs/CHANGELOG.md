@@ -1020,3 +1020,17 @@ A read-only review by five reviewers, each finding checked by a second who tried
   squirrel and hedgehog later.
 - Still their old bodies: spiders, the bramble-things, and the village's hens, sheep, cats, crows and rabbits.
 - Tests: EditMode 392/392, PlayMode 173/174 (Sel Harrow's walk home timed out once; the fixture passed alone 8/8); ModelBeastTests (the boar); Oakhaven toured; no errors in any game log.
+
+## 2026-10-03 — Khaven filled out: four camps and five quests (published with the boards round, below)
+- Chris: "lets work on quests and camps", zone by zone, Khaven first (it had 10 camps and 9 quests for levels 3-5; Oakhaven 21
+  and 16). Khaven has no book canon (only its map), so everything here is GAME-ONLY, leaning on canon where it can: Hollow Men,
+  the Sandthrone company, the Pale Kings' counting.
+- **Camps:** the Scarp hollows (Hollow Men walking the grey scarp above the Old Bound Wall), the Thicket deserters (Sandthrone
+  deserters lying up in the blackthorn south of the Corpse Road, an ambush camp with a strongbox), the Heights scree spiders
+  (charnel spiders in the scree under the Carrion Heights), and the Hush-Mother (one old she-wolf, level 6, at the west edge
+  of the Hush).
+- **Quests:** The Bound Wall Breaks (Ansel: see the wall, put down the scarp hollows); Toll Without a Captain (Cato: clear the
+  thicket, search the deserters' strongbox and its captainless toll-book); Silk on the Heights (Dorra Vey: five skeins of
+  charnel silk from the spiders, for a dye she will not name); What the Listener Heard (Old Kestrel: the Listener's Hut, the
+  Hush after dark, then Wenna); The Mother of the Hush (Wenna: the Hush-Mother, after her wolves).
+- Tests: EditMode 392/392 after the silk icon (391/392 before it), PlayMode 174/174; Khaven toured; no errors in any game log.

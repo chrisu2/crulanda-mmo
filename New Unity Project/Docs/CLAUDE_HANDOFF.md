@@ -930,4 +930,11 @@ resumed with `Workflow({scriptPath, resumeFromRunId})` (finished agents replay f
   their atlas (Atlas()), facing from hips to head in any direction (Shape.yaw), Hips falls back to Spine_2, Neck to Neck.
   ActorVisual.Beasts: Boar coats by name (wild .56/.49/.43, Carrion, Mire, Rockhide/Scree, gloom x.8), height .95 (elite 1.1).
   CreatureCapture rows beasts-boar, beasts-boar-moves; sheet tools/wip/characters/show/8-boar.jpg.
+- **Round 10, Khaven camps and quests (PUBLISHED 2026-10-03 with the boards round, below, see git log)**: khaven.json camps 10-13 appended (Scarp hollows
+  (-100,115) hollow x5 L4-5; Thicket deserters (-150,-108) deserter x5 ambush; Heights scree spiders (160,25) spider x5 L5;
+  The Hush-Mother (-165,112) tag wolf x1 L6, not elite: an elite needs a signature loot list and the 104-item count is pinned by
+  LootDataTests), a "Deserters' strongbox" crates prop (interact only) and "The Thicket" landmark; Quests/khaven.json +5 quests
+  and item.charnel_silk (collect from kill:mob.spider.khaven*). Quest kill targets by camp index: mob.hollow.khaven.10.* and
+  mob.wolf.khaven.13.*. Rules met on the way: a new tag needs a SocialRulesTests kind and (for beasts) an ItemTests hide table;
+  camps 125 m+ from houses (ZoneGrowthTests). Zone maps: scratchpad zonemap.py.
 

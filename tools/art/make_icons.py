@@ -1806,6 +1806,7 @@ ITEMS = {
     # ores, bars, logs
     'mat.copper_ore': ('ore', ore, ('#6b5a50', '#e8873a')), 'mat.bogiron_ore': ('ore', ore, ('#4a3a34', '#a8502e')), 'mat.adit_ore': ('ore', ore, ('#5a6470', '#c8d4e0')),
     'mat.cinder_ore': ('ore', ore, ('#2e2a2c', '#ff6a1f'), dict(hot='#ff6a1f')), 'mat.veridian_ore': ('ore', ore, ('#4a5a44', '#b8d850')),
+    'mat.geode_shard': ('ore', shard, ('#a8b4c4',), dict(mat='gem', glowc='#cfe0ff', spark=True)),
     'mat.copper_bar': ('ore', bar, ('#c97a43',)), 'mat.bogiron_bar': ('ore', bar, ('#6a5a54',)), 'mat.ridgesteel_bar': ('ore', bar, ('#b4bcc8',)),
     'mat.ashsteel_bar': ('ore', bar, ('#4a464c',)), 'mat.veridian_bar': ('ore', bar, ('#8fa458',)),
     'mat.oak_log': ('wood', log, ('#7a5230', '#e2c48a')), 'mat.blackpine_log': ('wood', log, ('#3a3230', '#e8c860')), 'mat.stonepine_log': ('wood', log, ('#8a8a86', '#d8c8a8')),
@@ -1846,7 +1847,7 @@ QUEST = {
     'item.egg_basket': (eggs, (), dict(basket=True)), 'item.flour_sample': (twist,), 'item.clean_grain': (sack, ('#b89a5e', '#e0b850'), dict(mark='wheat')), 'item.yarrow': (herb_yarrow,),
     'item.concord_iron': (ironbars,), 'item.toll_ledger': (book, ('#7a5a34', '#b5893c')), 'item.escort_orders': (letter,), 'item.rockhide': (pelt, ('#8a8a88',), dict(stone=True, belly='#a8a8a4')),
     'item.mender_letters': (letter, ('#e8eef2',), dict(broken=False, pouch_=True)), 'item.pilgrim_journal': (book, ('#1e1c20', '#6a6a6a'), dict(wrap='#8a7a5a')), 'item.salt_cord': (cordknots,),
-    'item.glade_light': (herb_cap, ('#3fae6a', '#bfffd0', '#d9e8d0'), dict(glowc='#5fe08a', spots='#d8ffe0')), 'item.moss_antler': (tine, ('#b89a7a',), dict(moss=True)), 'item.web_silk': (skein,),
+    'item.glade_light': (herb_cap, ('#3fae6a', '#bfffd0', '#d9e8d0'), dict(glowc='#5fe08a', spots='#d8ffe0')), 'item.moss_antler': (tine, ('#b89a7a',), dict(moss=True)), 'item.web_silk': (skein,), 'item.charnel_silk': (skein,),
     'item.veridian_sap': (flask, ('#2fd070',), dict(shape='round', glowc='#40e080', cork='#8a5a3a')), 'item.cold_glass': (shard, ('#d8f0ff', 'gem'), dict(glowc='#9fe8ff', thin=True, spark=True)),
     'item.void_husk': (husk,), 'item.shore_salt': (salt, (), dict(crust=True)),
 }

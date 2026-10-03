@@ -53,6 +53,7 @@ namespace Crulanda.Encounter
             if (kitMats.TryGetValue(key, out var m) && m != null) return m;
             var asset = Resources.Load<Material>("Characters/Materials/" + set);
             m = asset != null ? new Material(asset) : new Material(Shader.Find("Standard"));
+            if (asset == null) m.SetFloat("_Glossiness", .08f);   // no kit material (Stone): plain and matte
             m.color = new Color(tint.r, tint.g, tint.b, 1); m.name = "Kit " + key; kitMats[key] = m; return m;
         }
         /// <summary>A dye that shifts the cloth's hue to <paramref name="c"/> but keeps its light and dark: the colour scaled to
@@ -68,8 +69,9 @@ namespace Crulanda.Encounter
         (string set, Color tint) SetFor(string material, Renderer piece)
         {
             string n = material.ToLowerInvariant(); var s = spec; string sex = s.female ? "Female" : "Male";
-            var stone = new Color(.62f, .62f, .64f);
-            if (n.Contains("eye")) return ("Eye_Brown", s.stone ? stone : Color.white);
+            var stone = new Color(.5f, .5f, .52f);
+            if (s.stone) return ("Stone", n.Contains("eye") ? stone * .7f : stone);   // a Hollow Man: grey stone all through (no texture: KitMat's plain matte)
+            if (n.Contains("eye")) return ("Eye_Brown", Color.white);
             if (n.Contains("hair") || n.Contains("brow") || n.Contains("beard")) return (n.Contains("2") ? "Hair_2" : "Hair_1", s.stone ? stone * .8f : s.hairColour);
             if (n.Contains("regular")) return ("Regular_" + sex + "_Dark", s.stone ? stone : s.skin);
             if (n.Contains("superhero")) return ("Superhero_" + sex + "_Light", s.stone ? stone : s.skin);

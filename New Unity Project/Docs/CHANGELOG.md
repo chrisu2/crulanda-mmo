@@ -959,3 +959,5 @@ A read-only review by five reviewers, each finding checked by a second who tried
 - **Round 3** (published 2026-10-02 20:38; full run EditMode 383/383, PlayMode 174/174, Oakhaven toured, no errors in any game log): masks and mouth scarves sit on the model's face (a face frame), balls on the body (a pelt, bark
   and leather pauldrons) are left off, hoods on peasant outfits take their colour true (Mira's cream, a hen-wife's red
   kerchief), the merchant's collar box is gone.
+- **Round 4** (published 2026-10-02 21:38; full run EditMode 383/383, PlayMode 174/174, Oakhaven toured, no errors in any game log): villagers vary a little in height (a village is not all one size); children have a child's larger head; the
+  Hollow Men are grey stone statues through and through (one matte stone, the cracks and the violet shard on it).

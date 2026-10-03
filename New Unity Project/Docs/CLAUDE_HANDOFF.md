@@ -840,3 +840,7 @@ resumed with `Workflow({scriptPath, resumeFromRunId})` (finished agents replay f
   merchant's collar box off models. `round3_toggle.py` (scratchpad) can back it in or out.
 - **PUBLISHED 2026-10-02 20:38 (round 3, build of 20:28)**: full run 3 EditMode 383/383, PlayMode 174/174, Oakhaven toured,
   HUD/wardrobe/loot/fight shots; no exceptions in any player log. Chris was sent tools/wip/characters/models-preview.jpg.
+- Round 4 (full run 4 started 20:39): villager height .96-1.04 (Spec.scale by variant), `ChildHead` 1.22 (Head bone scaled
+  before the frames; head and face frames scale with it), stone figures use KitMat("Stone") (no asset: plain matte grey).
+- **PUBLISHED 2026-10-02 21:38 (round 4, build of 21:29)**: full run 4 EditMode 383/383, PlayMode 174/174, Oakhaven toured,
+  all shots taken, no exceptions in any player log.

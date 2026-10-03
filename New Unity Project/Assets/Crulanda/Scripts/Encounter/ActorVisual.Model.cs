@@ -69,6 +69,7 @@ namespace Crulanda.Encounter
         ModelFigure.Spec SpecFor(ActorLook look, Color clothC, Color accentC, Color legC, Color skinC)
         {
             var s = new ModelFigure.Spec { female = Female(look), hair = Mathf.Abs(variant) % 5, kit = ModelFigure.Kit.Peasant, scale = 1 };
+            if (look == ActorLook.Villager) s.scale = .96f + Mathf.Abs(variant * 37 + 11) % 9 * .01f;   // a village is not all one height
             // Skin: the kit's texture times the old palette's tone against its fairest (so the four tones keep their spread).
             var fair = new Color(.86f, .72f, .6f);
             s.skin = new Color(Mathf.Min(1.05f, skinC.r / fair.r), Mathf.Min(1.05f, skinC.g / fair.g), Mathf.Min(1.05f, skinC.b / fair.b));
@@ -135,6 +136,7 @@ namespace Crulanda.Encounter
             if (m == null) return false;
             if (!m.Complete) { var g = m.Model.gameObject; if (Application.isPlaying) Destroy(g); else DestroyImmediate(g); return false; }
             model = m; actorRef = GetComponent<Crulanda.Gameplay.Actor>();
+            if (child) m.HeadBone.localScale = Vector3.one * ChildHead;   // a child's head is large for the body (the clips turn bones, they never scale them)
             Frames();
             // What armour recolours (Cover): the shirt, the sleeves (and, for gloves, the bare hands), the breeches, the shoes.
             baseChest = new[] { m.Torso }; baseSleeves = new[] { m.Arms }; baseHands = new[] { m.Arms }; baseLegs = new[] { m.Legs }; baseBoots = new[] { m.Feet };
@@ -145,6 +147,8 @@ namespace Crulanda.Encounter
             m.StartMotion(name);
             return true;
         }
+        /// <summary>How much larger a child's head is drawn (the body is the adult's, scaled down with the Body).</summary>
+        public const float ChildHead = 1.22f;
         /// <summary>The frames, made in the model's bind pose (arms out, legs straight).</summary>
         void Frames()
         {
@@ -158,13 +162,14 @@ namespace Crulanda.Encounter
             handleR = new GameObject("Handle R").transform; handleR.SetParent(foreR, false); handleR.localPosition = -foreR.localPosition;
             // Head: the old head's middle (.8 up) onto the model's (about .09 above its Head bone); the old head was a ball .3
             // across and .32 tall, the model's is about .17 across, .25 tall and .21 deep.
-            var sh = new Vector3(.58f, .8f, .72f);
-            var headAt = L(m.HeadBone) + new Vector3(0, .12f * s, .01f * s);   // a little high, so a helmet's rim clears the eyes
+            float hs = m.HeadBone.localScale.y;   // a child's larger head
+            var sh = new Vector3(.58f, .8f, .72f) * hs;
+            var headAt = L(m.HeadBone) + new Vector3(0, .12f * s, .01f * s) * hs;   // a little high, so a helmet's rim clears the eyes
             headFrame = Region("Head frame", m.HeadBone, headAt - new Vector3(0, .8f * sh.y, 0), sh);
             // Face: the old face (eyes at .835, mouth at .745) onto the model's (eyes about .1 above the Head bone, mouth .04), for
             // what is worn over it: a mask, a scarf over the nose and mouth, a tear.
-            var fs = new Vector3(.58f, .67f, .72f);
-            faceFrame = Region("Face frame", m.HeadBone, L(m.HeadBone) + new Vector3(0, .077f * s, .01f * s) - new Vector3(0, .8f * fs.y, 0), fs);
+            var fs = new Vector3(.58f, .67f, .72f) * hs;
+            faceFrame = Region("Face frame", m.HeadBone, L(m.HeadBone) + new Vector3(0, .077f * s, .01f * s) * hs - new Vector3(0, .8f * fs.y, 0), fs);
             // Chest: the old shoulder line (.53) and belt (.06) onto the model's shoulder joints and lower spine; the width from
             // the shoulders (the old pivots at .31 onto the outside of the model's).
             var shL = L(m.UpperArmL); var shR = L(m.UpperArmR); float shoulderY = (shL.y + shR.y) / 2, waistY = L(m.Spine).y;

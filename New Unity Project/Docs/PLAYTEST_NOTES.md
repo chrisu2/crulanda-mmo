@@ -249,7 +249,7 @@ hide, meat, food, potion, tool, trade bag, junk and quest item its own picture, 
 staff, shield, helm, chest, gloves, legs, boots, neck, shoulders) in its own colours, with the quality still shown by the
 border.
 
-## 12. Armour too blocky; retire the block characters (2026-10-02, again "still have the bubble forms/armor/characters") — IN HAND
+## 12. Armour too blocky; retire the block characters (2026-10-02, again "still have the bubble forms/armor/characters") — CHARACTERS DONE (real models published 2026-10-02 19:37 and 20:38); armour designs still to reshape
 > "armor and weapons look good but armor is way too blocky. needs to feel flowing. time to retire the block characters"
 
 Every figure (the player, Mira, villagers, people among the mobs) is built in code from boxes, capsules and spheres, and the

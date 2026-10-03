@@ -4,8 +4,8 @@
 @cover: world-captures/oakhaven-03-the-golden-cask.png
 @covercaption: Oakhaven: the Golden Cask and the village well, from the build check of 1 October 2026.
 @covernote: Written for Chris on 2 October 2026 (playtest note 14).
-@covernote2: The record runs to commit f046de3 on main, 2 October 2026, 00:06. Rebuild this PDF with tools\docs\make_history_pdf.py.
-@footer: Record to 2 Oct 2026
+@covernote2: The record runs to commit 8ce2e33 on main, 2 October 2026, 21:38 (first written at 00:26 the same day, brought up to date that evening). Rebuild this PDF with tools\docs\make_history_pdf.py.
+@footer: Record to 2 Oct 2026, 21:38
 @author: Crulanda project
 
 # At a glance
@@ -16,7 +16,7 @@ Crulanda is a single-player game that feels like logging in to a classic MMORPG.
 
 The game is set before Oakhaven is erased. You start in Oakhaven, find Mira the healer in the Golden Cask, and follow the story west and north through five zones, from level 1 to level 13.
 
-Work began on 28 September 2026. This document covers five calendar days: 28 September to the first minutes of 2 October.
+Work began on 28 September 2026. This document covers five calendar days: 28 September to the evening of 2 October.
 
 ## The numbers that matter
 
@@ -35,42 +35,39 @@ Work began on 28 September 2026. This document covers five calendar days: 28 Sep
 140 | gathering nodes
 2 | playable classes
 9 | save formats so far
-24 | builds published
-171 | commits in git
+35 | builds published
+219 | commits in git
 {/tiles}
 
-- **Tests:** 499 automatic tests are in the project today (341 EditMode, 158 PlayMode). On 28 September there were 115.
+- **Tests:** 557 automatic tests are in the project today (383 EditMode, 174 PlayMode), all passing at the last publish. On 28 September there were 115.
+- **The world counts** above (places, camps, mobs, secrets, items, recipes, nodes) were made from the data on the morning of 2 October. Later that day Oakhaven grew to 560 m and the other four zones by about 20%, which added places and moved camps; those totals were not counted again.
 - **Size:** 200 C# files with about 45,400 lines; 8 shaders made for the game; 21 data files with about 23,600 lines; 28 documents.
 - **People and animals:** 26 villagers, 21 named residents, 21 households; 81 rabbits and 39 deer to hunt; crows, sheep, chickens and cats that cannot be hunted.
 
 ## What is in the build you can play now
 
-The playable build is `Crulanda.exe` in the `Crulanda-Playable` folder. Its files were written at 23:04 on 1 October. It is publish 24 (round 5). It holds everything marked [PUBLISHED] in this document:
+The playable build is `Crulanda.exe` in the `Crulanda-Playable` folder. It is publish 35, copied at 21:38 on 2 October. It holds everything marked [PUBLISHED] in this document:
 
-- Five zones: Oakhaven, Khaven Village, the Shattered Peaks, the Ashland Rim and the Verdant Shore.
+- Five zones, grown on 2 October: Oakhaven at 560 m with Crowsfoot Hollow moved out into the north hills, the other four at 410 to 430 m, every camp 125 m or more from the homes (but a few left by design).
 - Two dungeons: Crowsfoot Hollow and the Root-Mother's Deep.
 - Day and night, weather in every zone, water you can wade and swim.
-- The painted look on buildings, rock, masonry and caves.
+- The painted look on buildings, rock, masonry and caves; high-fantasy colour on the gear, the people and the village; a candle lantern under Khaven's inn sign.
+- **Real people:** every person is a textured, animated model (men and women, faces, hair, beards, hoods), with your weapons and armour refit onto them.
 - The Warrior and the Druid, with talents. Mira the healer at your side.
-- 56 quests, the Chronicle, six factions with standing, 42 hidden finds.
-- A village that works: every trade has a day, goods go round, households have purses, the out of work drink at the inn.
-- Gathering in every zone, Maud's four trade bags, stations, charcoal, cooking (ten recipes) and hunting for hides.
-- Weapons and armour that show on your body, loot beams, the loot window, compare tooltips, and all 104 named pieces dropping.
+- Mobs that pull together, and elites with a named heavy blow, an enrage and a call for help.
+- 56 quests, the Chronicle, six factions with standing, the hidden finds.
+- A village that works: every trade has a day, goods go round, households have purses, the out of work drink at the inn; villagers carry their loads in their arms.
+- Gathering in every zone, Maud's four trade bags, stations, charcoal, cooking, hunting for hides, Blacksmithing and Alchemy (two crafts at a time), the Armoury.
+- Weapons and armour that show on your body, loot beams, the loot window, compare tooltips, all 104 named pieces dropping.
+- 693 painted icons on the bars, the bags and every screen; sheep that read as sheep, cats with tails that move, felled lumber trees, limbs that meet their trees, ore without the green.
 
 ## Built, but not yet in your build
 
-These are finished and merged on the main branch (round 6, merged at 23:14 on 1 October). No record says they have been copied to the playable folder yet. A full check of this build ran late on 1 October and another began at 00:06 on 2 October.
-
-- **Blacksmithing:** 5 smelts and 21 pieces to make at a forge. [BUILT, NOT YET PUBLISHED]
-- **Alchemy:** 5 draughts at a herbalist's bench. [BUILT, NOT YET PUBLISHED]
-- **The two-craft rule:** you may hold two crafts and can forget one. [BUILT, NOT YET PUBLISHED]
-- **The Armoury:** a record of every named piece and look you have found. Save format 9. [BUILT, NOT YET PUBLISHED]
-- **Polish:** a stronger glow on worn rare and epic gear; no talking through walls; herbs that lean with the slope. [BUILT, NOT YET PUBLISHED]
+Nothing. Everything built and merged by 21:38 on 2 October is in the playable build.
 
 ## Being built next
 
-- **Your playtest notes come first.** Three are being built on branches that are not merged yet: Oakhaven grown to about 560 m with Crowsfoot Hollow moved far from the village (note 1); mobs that come together and elites with moves of their own (notes 2 and 3); less green on the ore (note 5). [IN PROGRESS]
-- **Then the rest of the notes:** the sheep, the fallen timber, cats' tails, sun and bloom, cave lighting, real icons, flowing characters, high-fantasy colour. [PLANNED]
+- **Your playtest notes still come first.** Open: 9 (the sun and bloom), 10 (baked light in the caves), 14 (this document, kept up to date). Note 12's characters are done; the armour's own shapes are next (rounder plate, cloth that moves). [PLANNED]
 - **Trades step 14:** elixirs, "well fed" meals, a smith who makes a piece from the ore you sell him. [PLANNED]
 - **Loot steps L4 to L6:** quests that hand out their named gear, a turnable figure and icons on the character sheet, cloaks as a tenth slot. [PLANNED]
 
@@ -90,7 +87,7 @@ These are finished and merged on the main branch (round 6, merged at 23:14 on 1 
 
 A publish means: the tests ran, the game was built, the zones were toured and the pictures were looked at, and then the build was copied to the `Crulanda-Playable` folder for you to play.
 
-There are 24 publishes on record, plus the builds made before git existed. Times are the times of the commit that recorded the publish; the copy itself happened a few minutes before. The test column is EditMode / PlayMode tests passing at that build.
+There are 35 publishes on record, plus the builds made before git existed. Times are the times of the commit that recorded the publish; the copy itself happened a few minutes before. The test column is EditMode / PlayMode tests passing at that build.
 
 {table: widths=5,13,62,20; size=8}
 | # | When | What the build contained | Tests |
@@ -118,14 +115,24 @@ There are 24 publishes on record, plus the builds made before git existed. Times
 | 21 | 1 Oct 20:42 | Round 2: households and homes, gathering in Oakhaven, armour shown on your body, buildings that sit into slopes, the hero inns and smithy. | 240 / 108 |
 | 22 | 1 Oct 21:25 | Round 3: Maud's trade bags, Hob Linden the innkeeper, gathering in every zone, the loot list drafted (104 named pieces, not yet dropping). | 285 of 286 / 115 of 116 |
 | 23 | 1 Oct 22:32 | Round 4: household purses, stations and charcoal, loot beams, the loot window, compare tooltips. | 310 of 312 / 133 of 135 |
-| 24 | 1 Oct 23:11 | Round 5: cooking, hunting for hides, named loot dropping. **This is the build in your folder now.** | 319 of 320 / 150 of 151 |
-| - | merged 1 Oct 23:14 | Round 6: Blacksmithing, Alchemy, the two-craft rule, the Armoury (save format 9), glow, no talk through walls, herbs on slopes. [BUILT, NOT YET PUBLISHED] | 341 / 158 tests exist; no result recorded |
+| 24 | 1 Oct 23:11 | Round 5: cooking, hunting for hides, named loot dropping. | 319 of 320 / 150 of 151 |
+| 25 | 2 Oct 00:16 | Round 6: Blacksmithing, Alchemy, the two-craft rule, the Armoury (save format 9), glow, no talk through walls, herbs on slopes. | 341 / 154 of 158 (all four fixed) |
+| 26 | 2 Oct 10:57 | Round 7, your notes 1 to 3: Oakhaven grown to 560 m with Crowsfoot Hollow moved out; mobs that pull together; elites with a heavy blow, an enrage and a call. | 369 / 167 of 173 (all six fixed) |
+| 27 | 2 Oct 12:30 | The other four zones grown about 20%; their camps moved 125 m and more from the homes. | 372 / 169 of 173 (all four fixed) |
+| 28 | 2 Oct 13:41 | Notes 6, 15 and 5: felled lumber trees, limbs joined to their trees, less green in the ore. | 372 / 174 |
+| 29 | 2 Oct 13:50 | Notes 4 and 7: sheep with fleece and faces, cats with six-jointed tails; a line-up picture of the animals. | 372 / fixtures 14 of 14 |
+| 30 | 2 Oct 14:12 | Note 11: 693 painted icons. | 377 / fixtures 22 of 22 |
+| 31 | 2 Oct 15:33 | Notes 13 and 16: high-fantasy colour on the gear, the people and the village; a candle lantern under Khaven's sign. | 378 / 173 of 174 (a timing flake; passed twice after) |
+| 32 | 2 Oct 16:58 | Note 12, first try: the smooth figure (one skinned body for every person, with knees and elbows); limb armour bending with them. | 378 / 174 |
+| 33 | 2 Oct 19:37 | Note 12: **real models** for every person (Quaternius kits, men and women, animated); the gear refit onto them; rounder armour; carrying; true colours. | 383 / 173 of 174 (a test path; fixed) |
+| 34 | 2 Oct 20:38 | Models, round 3: faces for masks and scarves, no balls on the body, hoods in their true colours. | 383 / 174 |
+| 35 | 2 Oct 21:38 | Models, round 4: heights vary, children's heads, stone Hollow Men. **This is the build in your folder now.** | 383 / 174 |
 
 Notes on this table:
 
 - Where a test count reads "285 of 286", the missing ones were a test skipped on purpose, or a test that was itself wrong and was fixed right after. Publish 24 went out with one known flaky test (a rabbit that should bolt sometimes stood and watched); the fix went in with the publish commit.
 - Publishes 11 to 14 and publish 2 are called published by the handoff document, not by their own commit messages. Publish 18's own commit says it was not yet published at that moment. So the count of 24 could be off by one or two.
-- The handoff counts ten publishes on 1 October. They are numbers 15 to 24 here.
+- The handoff counts ten publishes on 1 October. They are numbers 15 to 24 here. Publishes 25 to 35 are on 2 October; each has its own commit.
 
 # What was added
 
@@ -588,6 +595,20 @@ The plan has 14 steps on two tracks. Steps 1, 3, 6 and 7 are the village steps a
 
 **Still to come for the screens:** real painted icons for abilities and items in place of letters (note 11). [PLANNED] The HUD is drawn for a 1440 by 900 screen and stretches on other shapes.
 
+## 2 October: your playtest notes, played out
+
+You played on the evening of 1 October and wrote sixteen notes. On 2 October they were built one at a time, each checked in full and published:
+
+- **The bandits pushed out** (note 1): Oakhaven grew to 560 m; Crowsfoot Hollow's mouth is now 272 m from the green, in the west heel of Crowsfoot Ridge; new ground between (Carder's field barn, Thornshaw, the Carter's Rest, Lark Hill, Sallow Bottom, the Bound wood). Every Oakhaven camp stands 125 m or more from a house. [PUBLISHED]
+- **Mobs that pull together** (note 3): wolves and hounds come as a pack; deserters, cultists and the Concord shout for those in earshot; boar and stags stay single; sneaking still peels the edge. [PUBLISHED]
+- **Elites worth their loot** (note 2): five and a half times a mob's health, a named heavy blow wound up with a mark on the ground, an enrage, a call for help; the dungeon bosses harder still; Mira grows with your level. [PUBLISHED]
+- **The other four zones grown** about 20%, their camps moved back from the homes. [PUBLISHED]
+- **Felled lumber trees** (note 6), **limbs that meet their trees** (note 15), **less green in the ore** (note 5). [PUBLISHED]
+- **Sheep** with fleece, faces and grazing heads (note 4); **cats' tails** in six joints that sway and flick (note 7). [PUBLISHED]
+- **693 painted icons** (note 11) for every item, ability, talent and trade, on every screen. [PUBLISHED]
+- **High-fantasy colour** (note 13) on the gear's ten palettes, the classes, the enemies, the villagers and the village; **a candle lantern** under Khaven's sign (note 16). [PUBLISHED]
+- **Real people** (note 12). First a smooth figure built in code (published 16:58), which you found "still REALLY blocky". Then real models: the Quaternius character kits (free, CC0), men and women, with faces, hair, beards, peasant and ranger outfits, hoods, and the Universal Animation Library's moves (walk, jog, sprint, idle, sit, kneel, crouch, swim, talk, die). Every weapon, tool and armour piece was refit onto them, not redone: helmets on the head, chest pieces on the chest, limb armour bending at elbows and knees. Villagers carry their loads in their arms. The Concord wear white, the Warrior his blue; children have a child's head; the Hollow Men are stone. [PUBLISHED]
+
 # What was changed or fixed
 
 Changes and fixes, in the order they came. Things that were removed or replaced outright are in the next chapter.
@@ -652,9 +673,12 @@ Changes and fixes, in the order they came. Things that were removed or replaced 
 - **Tests that were wrong, not the game** (found and corrected): an armour test that skipped the whole body; a workshop test with bad timing; a skill-up test with the wrong number; a hearth test with Mira in the way.
 - **The long check runs with no window** on your desktop, so closing a window cannot kill it.
 
-## 2 October (first minutes)
+## 2 October
 
-- **Mourner's cap in Khaven:** two clusters on the creek bank were sunk with their small caps buried. Fixed. Three test checks on the save were tightened. [BUILT, NOT YET PUBLISHED]
+- **Mourner's cap in Khaven:** two clusters on the creek bank were sunk with their small caps buried. Fixed. Three test checks on the save were tightened. [PUBLISHED]
+- **Round 7's check:** the tests asked the pathfinder for one path across the whole 560 m zone, which it gives up on; they now follow a long path on from where it stops. Lark Hill's map mark sat on its own secret. A recruited Mira stood in the Golden Cask during a wolf-pack test. Fixed.
+- **The grown zones' check:** the tool that wrote the gathering nodes had dropped six crafting stations (back); four exits and arrivals had gone off their roads (each back on its road); the Fraying had gone out past the Ash Rim's Wasting into the unmade (moved back inside it); a rabbit could come back in the Brook pond and stay in the water (it now finds dry ground). New tests hold all of it.
+- **The models' first check:** parts a model leaves off were destroyed a moment after a villager remembered its renderers, so coming out of a house touched a destroyed one; they are now hidden and unparented first. A test looked for Caddock's crown at its old place. Fixed before the publish.
 
 # What was taken out
 
@@ -805,14 +829,17 @@ Almost nothing was deleted as a file. Git records only three deleted files in th
 | Rare spawns, chests that roll for your weakest slot, salvage, weapon speeds, two-handers, sockets | Cut from the first loot plan | Listed there as cut or for later |
 | Unity's own light baking for the caves | Cannot be used | Zones are built when they load. The zone builder must do the baking itself (note 10) |
 
-## Still to be retired, in your words
+## Retired on 2 October, in your words
 
-These are asked for and not yet done. Each is in the playtest notes chapter.
-
-- **The block characters** (note 12): "time to retire the block characters".
+- **The block characters** (note 12): "time to retire the block characters". Every person is now a textured, animated model; the code-built figures remain only as a fallback.
 - **The muted colours** (note 13): "need high fantasy not pale".
 - **The letter icons** (note 11): "can't tell what anything is".
-- The sheep (note 4), the green on the ore (note 5), the stick-like windfall (note 6), the cat's stiff tail (note 7).
+- The sheep (note 4), the green on the ore (note 5), the stick-like windfall (note 6), the cat's stiff tail (note 7), the neon bars under Khaven's sign (note 16).
+
+## Still to be retired
+
+- **The armour's chunky shapes** (note 12): the pieces are refit onto the models and rounder, but their designs are the old ones.
+- The beasts are still built in code from simple shapes.
 
 # How the work is done
 
@@ -948,46 +975,45 @@ A quicker check runs only the named tests, in about three minutes, before the fu
 
 You started giving notes as you played on the evening of 1 October. They are logged in `Docs\PLAYTEST_NOTES.md` with your words, what was measured, and what the fix needs. They come before any other work.
 
-Status in the notes file at the time of writing: 13 open, 1 to keep. None is in a published build yet.
+Status on the evening of 2 October: sixteen notes; thirteen fixed and published, one to keep (8), two open (9 and 10), and this document (14).
 
 {table: widths=4,36,20,28,12; size=8}
 | # | Your words | What was measured | What the fix needs | Status |
-| 1 | "one thing i notice is the bandit camp is way too close to the village. i asked before to expand the zone." | The first deserters stand 93 m from the green. The cave mouth is 100 m out: a 15 to 20 second walk from the Great Oak. | Grow Oakhaven again. Move all of Crowsfoot Hollow out, mouth about 280 m from the green. Nothing hostile within about 120 m of any village. | [OPEN] Being built on a branch: Oakhaven at 560 m. Not merged. |
-| 2 | "elite was too easy for the loot obtain." and "bandit king way too easy for the loot obtained" | Caddock has 528 health and hits for about 25, alone, with no move of his own. An elite is a normal mob with 2.2 times the health and 1.4 times the hit. There are twelve. | More health and a harder hit. One or two moves each. Guards who join. Dungeon bosses harder than outdoor beasts. | [OPEN] Being built on a branch. Not merged. |
-| 3 | "some mobs need to be more social. i can pull them easy 1 at a time even when they stand next to each other" | Each mob notices you alone, within 5 m. | Pack beasts come together. People call those in earshot. Solitary beasts stay single. Sneaking still peels the edge. | [OPEN] Being built on the same branch as note 2. |
-| 4 | "fix the sheep. looks like bugs on sticks" | One pale blob, a black ball for a head, four thin black legs. | A woolly fleece, short sturdy legs, a dark face with ears, a tail, a grazing head. Then a line-up picture of every animal. | [OPEN] |
-| 5 | "less green in the ore" | Seven lumps in ten still carry a bright green patch. | A hint of patina only. | [OPEN] One commit on a branch. Not merged. |
-| 6 | "lumber trees . trunk just has 4-5 stick stickup up. make it more broken/chopped down looking" | Four thin stub limbs, two pointing up, a plain log, a small stump. | A torn stump, a heavy trunk with snapped boughs, the litter of a fall. | [OPEN] |
-| 7 | "cats tails need to be more flexible" | The tail is one stiff rod. | A tail in segments that curves, sways and flicks. | [OPEN] |
+| 1 | "one thing i notice is the bandit camp is way too close to the village. i asked before to expand the zone." | The first deserters stand 93 m from the green. The cave mouth is 100 m out: a 15 to 20 second walk from the Great Oak. | Grow Oakhaven again. Move all of Crowsfoot Hollow out, mouth about 280 m from the green. Nothing hostile within about 120 m of any village. | [FIXED] Published 2 Oct 10:57. |
+| 2 | "elite was too easy for the loot obtain." and "bandit king way too easy for the loot obtained" | Caddock has 528 health and hits for about 25, alone, with no move of his own. An elite is a normal mob with 2.2 times the health and 1.4 times the hit. There are twelve. | More health and a harder hit. One or two moves each. Guards who join. Dungeon bosses harder than outdoor beasts. | [FIXED] Published 2 Oct 10:57. |
+| 3 | "some mobs need to be more social. i can pull them easy 1 at a time even when they stand next to each other" | Each mob notices you alone, within 5 m. | Pack beasts come together. People call those in earshot. Solitary beasts stay single. Sneaking still peels the edge. | [FIXED] Published 2 Oct 10:57. |
+| 4 | "fix the sheep. looks like bugs on sticks" | One pale blob, a black ball for a head, four thin black legs. | A woolly fleece, short sturdy legs, a dark face with ears, a tail, a grazing head. Then a line-up picture of every animal. | [FIXED] Published 2 Oct 13:50. |
+| 5 | "less green in the ore" | Seven lumps in ten still carry a bright green patch. | A hint of patina only. | [FIXED] Published 2 Oct 13:41. |
+| 6 | "lumber trees . trunk just has 4-5 stick stickup up. make it more broken/chopped down looking" | Four thin stub limbs, two pointing up, a plain log, a small stump. | A torn stump, a heavy trunk with snapped boughs, the litter of a fall. | [FIXED] Published 2 Oct 13:41. |
+| 7 | "cats tails need to be more flexible" | The tail is one stiff rod. | A tail in segments that curves, sways and flicks. | [FIXED] Published 2 Oct 13:50. |
 | 8 | "lights look better" | The new night: firelit windows and lamps on a moonlit blue base. | Nothing. Do not lose it. | [KEEP] |
 | 9 | "bloom sun effects?" | Bloom and sun shafts exist but are tuned low and do not show in play. | A sun you can see, a warm halo, glare, shafts, glints on water, without washing out the colours. | [OPEN] |
 | 10 | "need baked lighting in the caves. more atmospheric" | Caves are lit evenly, with a few live lights. | Light baked by the zone builder from each torch and fire, blocked by walls. Haze. Shafts at the mouth. | [OPEN] |
-| 11 | "need set icons for the hot bar. items in bags. not just letters and colors. can't tell what anything is" | Abilities are three letters. Items are two letters on a colour. | A painted icon for every ability, talent and item. | [OPEN] |
-| 12 | "armor and weapons look good but armor is way too blocky. needs to feel flowing. time to retire the block characters" | Every figure is built in code from boxes, capsules and balls. | Smooth bodies, cloth that hangs and moves, armour that follows the form. | [OPEN] Needs your choice of approach. |
-| 13 | "more colors as well seems like all is muted pallets..need high fantasy not pale" | Gear colours, villagers' clothes and much of the world are muted earth tones. | Jewel tones, heraldic contrast, gold and blued steel. Each zone keeps its mood. | [OPEN] |
-| 14 | "give me a pdf of all items/process/builds/additions/subtractions to this whole game since we started" | | This document. | [OPEN] in the notes file. Answered by this PDF. |
+| 11 | "need set icons for the hot bar. items in bags. not just letters and colors. can't tell what anything is" | Abilities are three letters. Items are two letters on a colour. | A painted icon for every ability, talent and item. | [FIXED] Published 2 Oct 14:12. |
+| 12 | "armor and weapons look good but armor is way too blocky. needs to feel flowing. time to retire the block characters" | Every figure is built in code from boxes, capsules and balls. | Smooth bodies, cloth that hangs and moves, armour that follows the form. | [FIXED] Real models published 2 Oct 19:37, 20:38 and 21:38; the armour's shapes next. |
+| 13 | "more colors as well seems like all is muted pallets..need high fantasy not pale" | Gear colours, villagers' clothes and much of the world are muted earth tones. | Jewel tones, heraldic contrast, gold and blued steel. Each zone keeps its mood. | [FIXED] Published 2 Oct 15:33. |
+| 14 | "give me a pdf of all items/process/builds/additions/subtractions to this whole game since we started" | | This document. | [OPEN] This document, brought up to date on the evening of 2 October. |
+| 15 | "a few trees are disjointed in the limb area" | The Verdant giants' branches stood up to a metre above their limbs; dead trees' twigs floated. | Every branch grows out of its limb. | [FIXED] Published 2 Oct 13:41. |
+| 16 | "the light under the sign looks like neon. it should probably be laterns or candles" | Four glowing bars under Khaven's inn sign. | A candle lantern. | [FIXED] Published 2 Oct 15:33. |
 
-Notes 12 to 14 are dated 2 October in the notes file; they were logged at 23:58 on 1 October.
+Notes 12 to 14 are dated 2 October in the notes file; they were logged at 23:58 on 1 October. Notes 15 and 16 came on 2 October.
 
 # What is being built now and next
 
 ## Now
 
-- **Round 6 is waiting to be published.** Blacksmithing, Alchemy, the two-craft rule, the Armoury and the polish items are merged. Your save was backed up before format 9. A full check was run on this build late on 1 October and again from 00:06 on 2 October. The result is not written down yet. [BUILT, NOT YET PUBLISHED]
-- **Note 1** is on the branch `fix/n1-oakhaven-grows`: Oakhaven grown to 560 m, Crowsfoot Hollow moved out into the north hills, new ground dressed (foothills, Thornshaw, Lark Hill). Seven commits. [IN PROGRESS]
-- **Notes 2 and 3** are on the branch `fix/n23-social-elites`: social aggro by kind, elites and bosses with moves of their own, a balance table. Four commits. [IN PROGRESS]
-- **Note 5** is on the branch `fix/n56-ore-windfall`: ore with only a hint of patina. One commit. Note 6 is not started there yet. [IN PROGRESS]
-- Work folders are open for notes 4, 9 and 11, with nothing committed yet.
+- **Everything built is published** (publish 35, 21:38 on 2 October). [PUBLISHED]
 
 ## Next
 
-- The remaining playtest notes: 4, 6, 7, 9, 10, 11, 12, 13. Note 12 needs your choice of approach first. [PLANNED]
+- **The armour's own shapes** (note 12, part two): rounder plate, mail and leather that follow the body, cloth that moves (tabards, skirts, capes, robes, long hair). [PLANNED]
+- **Note 9:** a sun you can see, a warm halo, glare and shafts, glints on water. **Note 10:** light baked into the caves from each torch and fire, haze, shafts at the mouth. [PLANNED]
 - Trades step 14: elixirs, "well fed" meals, the smith's daily piece, a tuning pass. [PLANNED]
 - Loot L4: quests give their named gear. L5: a turnable figure and icons. L6: cloaks. [PLANNED]
 
 ## Decisions waiting on you
 
-- **How to replace the block characters** (note 12).
+- **More outfits for the models:** the Quaternius kits' paid tier (about $20) adds knight, noble and wizard outfits. Buying it is yours to do.
 - **The store title:** "The Quiet Trail" or "The Land of Crulanda". And whether *The First Spoke* is out.
 - **The class roster:** 20 candidates; the target of up to 15 is unresolved.
 
@@ -997,17 +1023,15 @@ Notes 12 to 14 are dated 2 October in the notes file; they were logged at 23:58 
 - The clock and the weather are not saved; each launch starts at 08:30.
 - Villagers, hens and eggs only live while you are in their zone. The village's stock and purses are not saved.
 - The HUD is drawn for one screen shape and stretches on others.
-- Every figure is made of simple shapes, with no made models or animation. Windows are flat glowing panes.
+- People are made models with animation; the beasts are still built from simple shapes. The armour keeps its first chunky designs. Windows are flat glowing panes.
 - Only the Warrior and the Druid can be played. 49 of their 104 designed talents are not playable yet.
 - From the brief's big plan, still not started: simulated adventurers who level and group with you (only Mira exists), and group play.
 
 # Where this record is uncertain
 
 - **28 September has no git.** The repository begins at 02:14 on 29 September with the whole prototype as one commit. Seven early changelog entries carry no date. Their order is known; their hours are not.
-- **The count of 24 publishes** could be off by one or two. Four are called published only by the handoff; one says in its own commit that it was not yet published.
-- **Round 6** is on the main branch. No commit, changelog entry or handoff line says it was published, and the playable folder's files are dated 23:04, which is round 5. A check of round 6 has run; its result is not recorded. This document treats round 6 as built and not yet published.
-- **The fix branches** for notes 1, 2, 3 and 5 are not merged. How complete they are is not known from the record.
-- **Test numbers** before 29 September come from the documents. From 29 September they are counts of tests in the code, which matched the reported results at every publish where both exist. No result is recorded for the 499 tests at the latest commit.
+- **The count of 35 publishes** could be off by one or two for the days before 2 October. Four are called published only by the handoff; one says in its own commit that it was not yet published. Every publish on 2 October has its own commit.
+- **Test numbers** before 29 September come from the documents. From 29 September they are counts of tests in the code, which matched the reported results at every publish where both exist. All 557 tests passed at publish 35.
 - **The Unreal question** is recorded in one line of the handoff, in summary, not in your words.
 - **The earlier assistant** is not named in any document.
 - **The inventory in the appendices** was counted by a script from the game's data files at commit 9dfaa46 (1 October, 23:58). The one later commit changed no data. Which camps belong to each dungeon is worked out from the zone notes, not from a field in the data.

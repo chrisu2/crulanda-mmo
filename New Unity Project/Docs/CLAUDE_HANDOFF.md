@@ -844,3 +844,10 @@ resumed with `Workflow({scriptPath, resumeFromRunId})` (finished agents replay f
   before the frames; head and face frames scale with it), stone figures use KitMat("Stone") (no asset: plain matte grey).
 - **PUBLISHED 2026-10-02 21:38 (round 4, build of 21:29)**: full run 4 EditMode 383/383, PlayMode 174/174, Oakhaven toured,
   all shots taken, no exceptions in any player log.
+- **Round 5 (night, in full run 4 started ~23:05):** `ModelArmour.cs` (Cloud of the model's clothes in the bind pose by piece:
+  shirt = torso, sleeves = arms, trousers/boots = legs; cages per frame from convex outlines per 1.5 cm band; Warp keeps
+  BodyGap .62 / LimbGap .55 of the old clearance; hands/feet as boxes; weights from the 4 nearest cloth points, skirts lean to
+  the pelvis). GearArmor.Fitted sends every non-head group on a model to `ModelPart` (SkinnedMeshRenderer on the model's 65
+  bones). Hats: `HeadOutline` (skull, and skull+hair) in head-frame space; `HatFit` (rim to eyes+.065, crown to clear the skull
+  +.03), `Cap` (head shells for ball and pillbox caps), peaks to the front rim; armour head.cap/kettle/wrap/circlet/crown use it.
+  Swim still = "swim" slowed to .35. Mira's hood = her cloth. ModelFigureTests 6 (new: armour follows the form, hats).

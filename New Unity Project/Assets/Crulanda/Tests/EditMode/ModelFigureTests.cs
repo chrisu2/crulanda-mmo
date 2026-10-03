@@ -89,11 +89,15 @@ namespace Crulanda.Tests
             Assert.AreSame(v.RightArm.Find("Forearm R"), v.GearRoot(EquipSlot.MainHand).parent, "The blade follows the right forearm.");
             Assert.Less(Vector3.Distance(v.GearRoot(EquipSlot.MainHand).position, m.HandR.position), .14f, "The grip is in the right hand.");
             Assert.AreEqual("Head frame", v.GearRoot(EquipSlot.Head).parent.name); Assert.AreEqual("Chest frame", v.GearRoot(EquipSlot.Chest).parent.name);
-            Assert.Less(Vector3.Distance(v.GearRoot(EquipSlot.Head).TransformPoint(new Vector3(0, .8f, 0)), m.HeadBone.position + Vector3.up * .12f), .06f, "The helmet's head is the model's.");
+            Assert.Less(Vector3.Distance(v.GearRoot(EquipSlot.Head).TransformPoint(new Vector3(0, .8f, 0)), m.HeadBone.position + Vector3.up * .12f), .1f, "The cap is on the model's head.");
             var hands = v.GearLimbRoots(EquipSlot.Hands); Assert.AreEqual(2, hands.Count);
             CollectionAssert.AreEquivalent(new[] { "Arm L", "Arm R" }, new[] { hands[0].parent.name, hands[1].parent.name });
             foreach (var r in v.GetComponentsInChildren<SkinnedMeshRenderer>(true))
-                if (r.name == "Gear part") Assert.AreEqual(3, r.bones.Length, "A limb piece is skinned to its three frames.");
+                if (r.name == "Gear part")
+                {
+                    Assert.AreEqual(m.Cloud.bones.Length, r.bones.Length, "Worn armour is skinned to the model's own bones.");
+                    Assert.IsTrue(System.Array.TrueForAll(r.bones, b => b != null && b.IsChildOf(m.Model)), "Every one of them the model's.");
+                }
             Assert.AreEqual(0, v.ClassKitParts, "Gear drives it: the class kit (the outfit's pauldron, the sword and shield) is gone.");
         }
 
@@ -112,6 +116,38 @@ namespace Crulanda.Tests
             Assert.IsTrue(v.HairShowing);
             v.ApplyGearIds(new[] { hood }, db, looks); Assert.IsFalse(v.HairShowing, "A hood hides the hair.");
             v.ApplyGearIds(new string[0], db, looks); Assert.IsTrue(v.HairShowing, "Bare-headed again.");
+        }
+
+        [Test] public void Armour_follows_the_form_and_hats_sit_on_the_head()
+        {
+            Assume.That(ModelFigure.Available);
+            var db = new ItemDatabase(); var looks = Looks(); var v = Figure(ActorLook.Warrior); var m = v.Model;
+            v.ApplyGearIds(new[] { Piece(db, "chest", 7, 3, "Hauberk"), Piece(db, "hands", 7, 3, "Gauntlets"), Piece(db, "legs", 7, 3, "Greaves") }, db, looks);
+            v.Preview(ActorPose.None, 0, .4f);
+            // The hauberk hugs the torso: its shell (the chest slot's skinned parts) stands within a hand of the model's chest.
+            foreach (var r in v.GearRoot(EquipSlot.Chest).GetComponentsInChildren<SkinnedMeshRenderer>(true))
+            {
+                var baked = new Mesh(); r.BakeMesh(baked, true); var w = r.transform.localToWorldMatrix; float far = 0;
+                foreach (var p in baked.vertices) { var q = w.MultiplyPoint3x4(p); if (q.y > m.Hips.position.y && q.y < m.Neck.position.y) far = Mathf.Max(far, new Vector2(q.x - m.Chest.position.x, q.z - m.Chest.position.z).magnitude); }
+                Assert.Less(far, .32f, r.sharedMesh.name + ": the chest armour stands within 32 cm of the spine (the old chunky shell stood off it).");
+            }
+            // A glove rides the hand: skinned to the hand's bones, it goes where the hand goes.
+            var hands = v.GearLimbRoots(EquipSlot.Hands); Assert.AreEqual(2, hands.Count);
+            bool onHand = false;
+            foreach (var r in hands[0].GetComponentsInChildren<SkinnedMeshRenderer>(true))
+                foreach (var bw in r.sharedMesh.boneWeights) { var b = r.bones[bw.boneIndex0]; if (b == m.HandL || b == m.HandR || b.IsChildOf(m.HandL) || b.IsChildOf(m.HandR)) { onHand = true; break; } }
+            Assert.IsTrue(onHand, "A gauntlet's weights are on the hand's bones.");
+            // Hats: the farmer's brim sits between the brows and the crown of the head, not perched on top.
+            var farmer = Figure(ActorLook.Villager, 23, "farmer", "Garet Moss"); var fm = farmer.Model;
+            var hat = farmer.transform.Find("Body/Head frame/Hat"); Assert.NotNull(hat, "The farmer's hat is fitted (Body/Head frame/Hat).");
+            float brim = float.MaxValue; foreach (var r in hat.GetComponentsInChildren<Renderer>()) brim = Mathf.Min(brim, r.bounds.min.y);
+            float eyes = fm.HeadBone.position.y + .1f;
+            Assert.That(brim - eyes, Is.InRange(.0f, .1f), "The brim sits just above the brows.");
+            // A cap hugs the head: the smith's skullcap is a shell of his head, no wider than a head and a half.
+            var smith = Figure(ActorLook.Villager, 3, "blacksmith", "Brannoc Vell");
+            Renderer cap = null; foreach (var r in smith.transform.Find("Body/Head frame").GetComponentsInChildren<MeshRenderer>()) if (r.GetComponent<MeshFilter>().sharedMesh.name == "Cap (fitted)") cap = r;
+            Assert.NotNull(cap, "The skullcap is made over as a fitted cap.");
+            Assert.Less(cap.bounds.size.x, .26f, "Hugging the head (a head is about 16 cm across).");
         }
 
         [Test] public void Women_swimmers_and_the_dead()

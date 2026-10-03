@@ -41,6 +41,15 @@ namespace Crulanda.Encounter
         public Transform Hips, Spine, Chest, Neck, HeadBone, UpperArmL, UpperArmR, LowerArmL, LowerArmR, HandL, HandR, UpperLegL, UpperLegR, LowerLegL, LowerLegR, FootL, FootR, MiddleL, MiddleR, BallL, BallR;
         Spec spec;
         Dictionary<string, Transform> bones;
+        /// <summary>The model's clothes in its bind pose, for armour that follows the form (ModelArmour); shared by models of one kind.</summary>
+        public ModelArmour.Cloud Cloud;
+        /// <summary>This figure's bones for a list of bone names (a cloud's), in that order.</summary>
+        public Transform[] BonesFor(string[] names)
+        {
+            var list = new Transform[names.Length];
+            for (int i = 0; i < names.Length; i++) list[i] = bones.TryGetValue(names[i], out var t) ? t : Model;
+            return list;
+        }
 
         // ------------------------------------------------------------------------------------------------- materials
         static readonly Dictionary<string, Material> kitMats = new Dictionary<string, Material>();
@@ -167,6 +176,9 @@ namespace Crulanda.Encounter
             if (s.beard && !s.female) { var b = f.Take(Resources.Load<GameObject>("Characters/Hair/Hair_Beard"), null); if (b != null) f.Hair.Add(b); }
             foreach (var r in f.Renderers) f.Retexture(r);
             f.FindBones();
+            // Its clothes as they stand now, in the bind pose (before any clip plays): what worn armour is fitted to.
+            f.Cloud = ModelArmour.CloudOf(sex + "_" + s.kit, f.Model, new[] { f.Torso as SkinnedMeshRenderer, f.Arms as SkinnedMeshRenderer, f.Legs as SkinnedMeshRenderer, f.Feet as SkinnedMeshRenderer, f.Head as SkinnedMeshRenderer },
+                new[] { ModelArmour.Piece.Torso, ModelArmour.Piece.Arms, ModelArmour.Piece.Legs, ModelArmour.Piece.Legs, ModelArmour.Piece.Head });
             return f;
         }
         /// <summary>Gone at once as far as anyone looking at the figure goes: hidden and unparented, destroyed at the end of the
@@ -311,7 +323,7 @@ namespace Crulanda.Encounter
             {
                 want[ps] = 1;
                 if (pose != current && !slots[ps].loop) slots[ps].p.SetTime(0);
-                if (pose == "swim" || pose == "sneak") slots[ps].p.SetSpeed(Mathf.Clamp(speed / (pose == "swim" ? 1.6f : 1.2f), .5f, 1.6f));
+                if (pose == "swim" || pose == "sneak") slots[ps].p.SetSpeed(Mathf.Clamp(speed / (pose == "swim" ? 1.6f : 1.2f), pose == "swim" ? .35f : .5f, 1.6f));
             }
             else
             {

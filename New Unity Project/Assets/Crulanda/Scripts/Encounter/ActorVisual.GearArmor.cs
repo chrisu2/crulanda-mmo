@@ -129,7 +129,13 @@ namespace Crulanda.Encounter
             foreach (var g in order)
             {
                 var list = groups[g]; var root = SlotRoot(s, g.Item1); var mat = RoleMat(f, g.Item2); Transform t;
-                if (g.Item1 != OnBody && foreL != null)
+                if (model != null && slot != EquipSlot.Head)
+                {
+                    // A model: fitted to its form and skinned to its bones (playtest note 12, part two). The head's pieces stay rigid on it.
+                    var join = new (Mesh, Matrix4x4)[list.Count]; for (int i = 0; i < list.Count; i++) join[i] = (list[i].mesh, list[i].m);
+                    t = ModelPart(root, g.Item1, M.Join(JoinKey(list), join), mat);
+                }
+                else if (g.Item1 != OnBody && foreL != null)
                 {
                     // The smooth figure: a limb's armour bends with its elbow or knee (playtest note 12, step C1b).
                     var join = new (Mesh, Matrix4x4)[list.Count]; for (int i = 0; i < list.Count; i++) join[i] = (list[i].mesh, list[i].m);
@@ -146,6 +152,9 @@ namespace Crulanda.Encounter
                 }
                 if (g.Item2 == "glow") { t.name = AccentName; f.k.lit.Add(t.GetComponent<Renderer>()); }
             }
+            // On a model a cap, a kettle hat, a wrap, a circlet or a crown is worn like a hat: down to the brow, its crown round
+            // the head (ActorVisual.Model.cs, HatFit). Hoods, coifs, barbutes and masks were drawn round the whole head and stay.
+            if (model != null && slot == EquipSlot.Head && HatLike(f.l.family) && HatFit(new[] { gearRoots[s] }, out float dy, out float k)) WearHat(gearRoots[s], dy, k);
             Finish(f.k, gearRoots[s]);
         }
         /// <summary>
@@ -342,6 +351,7 @@ namespace Crulanda.Encounter
             neck.localPosition = new Vector3(0, neckStill ? 0 : lift, 0);
         }
         static bool Starts(string s, string prefix) { return s.StartsWith(prefix, System.StringComparison.Ordinal); }
+        static bool HatLike(string family) { return family == "head.cap" || family == "head.kettle" || family == "head.wrap" || family == "head.circlet" || family == "head.crown"; }
         /// <summary>True when the chest piece (family:variant:tN) is a shell a neck piece lies on: a jerkin, hauberk, coat or cuirass.</summary>
         static bool OnShell(string chest) { return Starts(chest, "chest.jerkin") || Starts(chest, "chest.hauberk") || Starts(chest, "chest.coat") || Starts(chest, "chest.cuirass"); }
         /// <summary>The Druid's cloak is hung back over chest armour, and then stands in for a mantle's back drape.</summary>

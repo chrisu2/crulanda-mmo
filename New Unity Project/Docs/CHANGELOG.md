@@ -961,3 +961,19 @@ A read-only review by five reviewers, each finding checked by a second who tried
   kerchief), the merchant's collar box is gone.
 - **Round 4** (published 2026-10-02 21:38; full run EditMode 383/383, PlayMode 174/174, Oakhaven toured, no errors in any game log): villagers vary a little in height (a village is not all one size); children have a child's larger head; the
   Hollow Men are grey stone statues through and through (one matte stone, the cracks and the violet shard on it).
+
+## 2026-10-02 night — Armour that follows the form, hats that fit (playtest note 12, part two; published 23:44)
+- **Armour follows the form** (Chris: "armor is way too blocky. needs to feel flowing"): every worn piece on a model but the
+  head's is warped from the old figure's body onto the model's clothes (ModelArmour: the old torso, arm and leg shapes against
+  the model's outline per height; a share of the old clearance kept) and skinned to the model's own bones with the weights of
+  the clothes under it, so mail, plate, leather and cloth hug the torso and limbs and bend, twist and sway with them; a skirt's
+  hem keeps some of the hips' weight so it does not tear between the legs. Pauldrons sit on the shoulders, greaves on the shins.
+- **Hats fit the heads** (Chris: "the hats definitely do not fit properly on the heads"): the old hats perched on the old
+  figure's big round head. On a model, a hat comes down until its brim sits just above the brows and its crown widens to clear
+  the head; caps (the smith's skullcap, the knit cap, the fur hat, the leatherworker's and miller's caps, the Concord helmet)
+  are made over as shells of the model's own head and hair. The armour's caps, kettle hats, wraps, circlets and crowns are worn
+  the same way; hoods, coifs, barbutes and masks stay drawn round the whole head.
+- **Swimming still** is the slow stroke (the treading clip stood with arms straight out, like a figure with no pose); Mira's
+  hood is her teal; the miller's flour sack no longer turns into a hood.
+- Tests: EditMode 384/384, PlayMode 173/174 (the crown test looked one level too high: on a model it sits in the fitted
+  hat; fixed); Oakhaven toured, wardrobe, loot and fight shots; no errors in any game log.

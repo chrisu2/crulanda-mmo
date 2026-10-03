@@ -38,7 +38,7 @@ namespace Crulanda.EditorTools
             Row("trades-2", new[] { V("herbalist", "Lisbet Crane", 33), V("miller", "Aldo Crisp", 38), V("elder", "Old Tobin", 43), V("stranger", "A Stranger", 48), V("pilgrim", "Pilgrim", 53), V("innkeeper", "Maud Tanner", 58) });
             Row("trades-3", new[] { V("leatherworker", "Edda Pell", 63), V("lumberjack", "Hob Linden", 68), V("skinner", "Osk Farrow", 73), V("warden", "Fen Walker", 78), V("drinker", "Jory", 83), V("gossip", "Grete Lowe", 88), V("child", "Pim", 93) });
             // Poses, side on (facing +X).
-            Row("poses-1", new[] { Po(ActorPose.None, 1.5f, .3f), Po(ActorPose.None, 3.6f, .2f), Po(ActorPose.None, 6.5f, .2f), Po(ActorPose.Sneak, 1.2f, .5f), Po(ActorPose.Sneak, 0, .5f), Po(ActorPose.Swim, 1.6f, .4f) }, 90);
+            Row("poses-1", new[] { Po(ActorPose.None, 1.5f, .3f), Po(ActorPose.None, 3.6f, .2f), Po(ActorPose.None, 6.5f, .2f), Po(ActorPose.Sneak, 1.2f, .5f), Po(ActorPose.Sneak, 0, .5f), Po(ActorPose.Swim, 1.6f, .4f), Po(ActorPose.Swim, 0, .8f) }, 90);
             Row("poses-2", new[] { Po(ActorPose.Sit, 0, .5f), Po(ActorPose.Talk, 0, 1.2f), Po(ActorPose.Gather, 0, 2.5f), Po(ActorPose.Cower, 0, .5f), Po(ActorPose.Hammer, 0, .45f), Po(ActorPose.Chop, 0, .55f) }, 90);
             Row("poses-3", new[] { Po(ActorPose.Knead, 0, .3f), Po(ActorPose.Work, 0, .3f), Po(ActorPose.Drink, 0, 1.2f), Po(ActorPose.Slump, 0, .5f), Po(ActorPose.None, 0, .5f, dead: true) }, 90);
             // Carrying, side on, walking: a basket of eggs, a bucket, bread, a sack of grain, logs, goods.
@@ -50,6 +50,9 @@ namespace Crulanda.EditorTools
             var late = Kit(db, 11, 4, "Cap", "Torc", "Spaulders", "Hauberk", "Gauntlets", "Greaves", "Sabatons", "Blade", "Shield");
             foreach (var (shot, yaw, walk) in new[] { ("armour-front", 0f, 0f), ("armour-walk", 90f, 1.6f) })
                 Row(shot, new[] { P(ActorLook.Warrior, 0, null, null, martial, db, looks, walk), P(ActorLook.Warrior, 1, null, null, late, db, looks, walk), P(ActorLook.Druid, 0, null, null, cloth, db, looks, walk), P(ActorLook.Warrior, 2, null, null, new string[0], db, looks, walk) }, yaw);
+            // Hats, close (Chris: "the hats definitely do not fit properly on the heads").
+            Row("hats-1", new[] { V("blacksmith", "Brannoc Vell", 3), V("merchant", "Wil Carder", 8), V("baker", "Ama Rusk", 13), V("farmer", "Garet Moss", 23), V("lumberjack", "Hob Linden", 68) }, 0, close: true);
+            Row("hats-2", new[] { V("skinner", "Osk Farrow", 73), V("leatherworker", "Edda Pell", 63), V("miller", "Aldo Crisp", 38), V("gossip", "Grete Lowe", 5), P(ActorLook.Collector), P(ActorLook.BanditKing) }, 0, close: true);
             // Faces: close.
             Row("faces", new[] { V("blacksmith", "Brannoc Vell", 3), V("henwife", "Hedda Thorne", 40), V("farmer", "Ama Rusk", 24), P(ActorLook.Warrior), P(ActorLook.Druid) }, 0, close: true);
             Debug.Log("FIGURE_CAPTURE_DONE");

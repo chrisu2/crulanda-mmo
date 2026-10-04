@@ -362,3 +362,36 @@ sack, one 70 cm sphere: now a slumped burlap sack with a gathered, corded neck, 
 A struck deer bolted 12 to 18 m and grazed again, inside a 25 m bolt's reach. Now a deer bolts 25 to 35 m (a rabbit 12 to
 16), and a hurt animal that pulls up with the hunter within 35 m (GameAnimal.HurtFleeDistance) bolts again; badly hurt it
 still limps, so it can be run down.
+
+## 23-31. Chris's play session, 2026-10-04 ~03:00 (all OPEN)
+> "need to improve fps . about 60-70 on a 5070ti. trees still have issue but look better. need to implement fighting
+> animations. no swings on swords. need to see thru building when it blocks camera. merchants still show gold. horse comes
+> into the inn. drinkers dont drink they just pour it over their head. also no one is sitting correctly. my helm is also too
+> big and orbits my head." (five shots: a dead tree, the smithy roof over the player, the merchant window, the inn, drinkers)
+
+- **23. FPS 60-70 on an RTX 5070 Ti.** Too low for this art. Profile first (frame debugger / stats in a capture run):
+  suspects are draw calls (every prop and figure is many separate primitives, little batching or instancing), grass, realtime
+  shadow distance, the post chain (bloom, shafts, the new full-resolution sun pass, cloud shadows) and per-frame scripts
+  (VillageLife, TreeFade over every tree). Target: 144+ at 1440p.
+- **24. Dead trees still disjointed.** Better than before, but each limb's three lengths show seams: a length's tip and the
+  next length's start do not meet (ring sizes differ, the bow offsets the end, capped ends show). Join the lengths as one
+  tube along a polyline (one Limb with several points) instead of separate tubes.
+- **25. No fighting animations: swords don't swing.** Melee hits play no swing; casts no cast pose. The Quaternius figures
+  carry attack clips (ModelFigure slots); hook auto-attack swings, ability strikes and casts to them, with the held weapon
+  following the hand.
+- **26. See through buildings that block the camera.** Under the smithy's pent roof the camera sits above the roof and the
+  player is hidden. Roofs (and walls) between the camera and the player should fade like trees (TreeFade), or the camera
+  pull in under them; AdventurerMotor's spherecast already ignores trees and actors, not roofs.
+- **27. Merchants still show "gold".** EncounterHud.Items.cs:275 (the wares' price: price + " gold") and EncounterHud.Loot.cs:57
+  (the loot window's coins). Crowns everywhere (the window header already says crowns).
+- **28. A horse walks into the Golden Cask.** The inn's horse (CritterBody kind "horse" round the Cask) wanders through the
+  door into the taproom. Keep farm animals out of buildings (their wander points must be outside house footprints, or the
+  doors' navmesh closed to critters).
+- **29. Drinkers pour the drink over their heads.** ActorPose.Drink (ActorVisual.Model.cs ~464) lifts the right arm too high
+  and too far back: the tankard ends above the head. The lift should bring the hand to the mouth (elbow bent, upper arm
+  forward ~60 degrees), not straight up.
+- **30. No one sits correctly.** The "sit" clip leaves figures floating beside their stools (seat too far behind, arms out
+  straight like a pushed cart). Seat height and offset per stool/bench; arms resting on the table or knees.
+- **31. The player's helm is too big and orbits the head.** The Tin crown (a named helm) sits wide of the head and swings
+  round it as the head turns: it is parented with an offset to a frame whose pivot is not the head's. Fit helms like hats
+  (HatFit) and parent at the head bone's own pivot.

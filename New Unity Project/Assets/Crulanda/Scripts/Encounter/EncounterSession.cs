@@ -1030,6 +1030,17 @@ namespace Crulanda.Encounter
             return result;
         }
         public bool EnemyInRange(EncounterEnemy enemy, float range) { return enemy != null && enemy.actor.IsAlive && Distance(enemy) <= range; }
+        /// <summary>How far past its range a cast or a blow still lands when it goes off (the target stepped back while it was
+        /// drawn or cast): the classic leeway, so a bolt loosed at the edge of range is not lost (playtest note 20).</summary>
+        public const float LandingLeeway = 5;
+        /// <summary>Whether a cast or a blow begun on <paramref name="enemy"/> lands now: alive and within its range plus the leeway.
+        /// One that is alive but out of reach says so, so a lost cast is never silent.</summary>
+        public bool LandsOn(EncounterEnemy enemy, float range)
+        {
+            if (enemy == null || !enemy.actor.IsAlive) return false;
+            if (Distance(enemy) <= range + LandingLeeway) return true;
+            Message("Out of range."); return false;
+        }
         public bool RequireEnemyInRange(float range)
         {
             if (EnemyInRange(Target, range)) return true;

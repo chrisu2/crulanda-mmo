@@ -133,6 +133,8 @@ namespace Crulanda.Encounter
                     Body.Stride(agent.velocity.magnitude);
                     if (Arrived() || (state == State.Bolt && Time.time > boltUntil))
                     {
+                        // Hurt, with the hunter still close: off again, not grazing within reach (playtest note 22).
+                        if (state == State.Bolt && s.Player.IsAlive && d < HurtFleeDistance && Enemy.actor.Health.Pool.Ratio < 1) { Bolt(player); break; }
                         // After a bolt it stands a while longer before it wanders again.
                         float rest = state == State.Bolt ? 4 : 1.5f; Halt();
                         state = State.Graze; until = Time.time + rest + UnityEngine.Random.value * 5;
@@ -140,6 +142,8 @@ namespace Crulanda.Encounter
                     break;
             }
         }
+        /// <summary>A hurt animal that pulls up with the hunter nearer than this bolts again.</summary>
+        public const float HurtFleeDistance = 35;
         bool Arrived() { return agent.isOnNavMesh && !agent.pathPending && (!agent.hasPath || agent.remainingDistance <= agent.stoppingDistance + .2f); }
         void Halt() { if (agent.isOnNavMesh) { agent.ResetPath(); agent.velocity = Vector3.zero; } }
         /// <summary>
@@ -151,7 +155,7 @@ namespace Crulanda.Encounter
             if (Enemy == null || !Enemy.actor.IsAlive || agent == null || !agent.isOnNavMesh) return;
             var me = transform.position; var away = me - from; away.y = 0;
             away = away.sqrMagnitude > .01f ? away.normalized : transform.forward;
-            float run = Kind == "deer" ? 12 + UnityEngine.Random.value * 6 : 8 + UnityEngine.Random.value * 4;
+            float run = Kind == "deer" ? 25 + UnityEngine.Random.value * 10 : 12 + UnityEngine.Random.value * 4;   // out of a bolt's reach (playtest note 22)
             // Somewhere it can truly run to: a whole path there (not the far bank of a creek, not a ledge the navmesh does not join),
             // found now and handed to the agent, so the bolt starts this frame. Away first, swinging wider each try; then half as
             // far; only with no such ground at all does it stand and watch. (A rabbit by the Brook pond once stood and watched a
@@ -166,7 +170,7 @@ namespace Crulanda.Encounter
                 }
             alert = 0;
             if (!to.HasValue || !agent.SetPath(boltPath)) { state = State.Wary; return; }   // nowhere to run: it stands its ground and watches
-            agent.isStopped = false; state = State.Bolt; boltUntil = Time.time + 6;
+            agent.isStopped = false; state = State.Bolt; boltUntil = Time.time + 9;
         }
         /// <summary>A dry point on the navmesh near <paramref name="around"/> (within <paramref name="range"/>), inside the zone, or null.</summary>
         Vector3? PickPoint(Vector2 around, float range)

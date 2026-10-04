@@ -67,7 +67,7 @@ namespace Crulanda.Encounter
                 if (status != null) { OnGuard(status); return; }
                 if (a.effect == AbilityEffect.Intercept) { if (InterceptBlocker() == null) Intercept(); return; }
                 if (a.effect == AbilityEffect.Rally) { Muster(); return; }
-                if (!s.EnemyInRange(target, a.range)) return;
+                if (!s.LandsOn(target, a.range)) return;
                 s.BeginAutoAttack();
                 if (a.effect == AbilityEffect.Damage)
                 {

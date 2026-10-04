@@ -340,3 +340,25 @@ range is 2.5 to 22 m (was 4 to 17).
 A staff was held mid-shaft in the right fist and swung with the run cycle, so it whipped across the body. Built: running
 out of a fight, a staff or a polearm goes on the back (its slung copy); stopping or fighting brings it to hand. Enemies
 keep theirs drawn while engaged.
+
+## 20. Thornbolt does nothing to a wolf at range (2026-10-03) — FIXED (published 2026-10-04 00:48)
+> "i shoot thornbolt at wolf and he just stands there not taking damage"
+
+A cast was checked against its range when it began and again when it landed; a target that drifted a step past 25 m in the
+1.8 s cast took nothing, silently, and never noticed. Built: EncounterSession.LandsOn: a cast or blow lands within its range
+plus 5 m (LandingLeeway), and one that cannot says "Out of range." (DruidKit's casts, WarriorKit's blows).
+
+## 21. Floating boulders all over the map; a big egg by the coop (2026-10-03) — FIXED (published 2026-10-04 00:48)
+> "floating boulders all throughout the map" (the Overlook's rocks) · "what is this big egg thing?" (by a hen coop)
+
+A perch's boulders sat on the lowest of three ground samples along the line out from its centre and none across it, and a
+loose rock on the ground under its centre only, so on a knob or a slope one side hung in the air. Both now sit on the lowest
+ground under their whole footprint (3 x 3 samples; no random draws added, nothing else moved). The egg was the coop's grain
+sack, one 70 cm sphere: now a slumped burlap sack with a gathered, corded neck, leaning on the coop.
+
+## 22. A hit deer runs ten feet and stops (2026-10-03) — FIXED (published 2026-10-04 00:48)
+> "thornbolt worked on the deer but he would only run about 10 feet and stop so easy kill"
+
+A struck deer bolted 12 to 18 m and grazed again, inside a 25 m bolt's reach. Now a deer bolts 25 to 35 m (a rabbit 12 to
+16), and a hurt animal that pulls up with the hunter within 35 m (GameAnimal.HurtFleeDistance) bolts again; badly hurt it
+still limps, so it can be run down.

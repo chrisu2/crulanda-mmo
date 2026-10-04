@@ -188,7 +188,7 @@ namespace Crulanda.Encounter
         {
             if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
             return Start(a, () => {
-                if (!s.EnemyInRange(t, a.range)) return;
+                if (!s.LandsOn(t, a.range)) return;
                 s.BeginAutoAttack(); int d = Dmg(a.power + s.WeaponDamage * .5f);
                 t.Receive(d, s.Player); t.threat.Add(s.Player.EntityId.Value, d); GainBark(12);
                 int extra = R("bh-rooted-stance");
@@ -205,7 +205,7 @@ namespace Crulanda.Encounter
         {
             if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
             return Start(a, () => {
-                if (!s.EnemyInRange(t, a.range)) return;
+                if (!s.LandsOn(t, a.range)) return;
                 t.threat.Taunt(s.Player.EntityId.Value, Now, a.duration);
                 foreach (var o in s.Enemies)
                     if (o.actor.IsAlive && s.Distance(o) <= 8) o.threat.Add(s.Player.EntityId.Value, 20);
@@ -245,7 +245,7 @@ namespace Crulanda.Encounter
         {
             if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
             return Start(a, () => {
-                if (!s.EnemyInRange(t, a.range)) return;
+                if (!s.LandsOn(t, a.range)) return;
                 s.BeginAutoAttack(); t.Receive(Dmg(a.power + s.WeaponDamage * .6f), s.Player);
                 bool low = t.actor.Health.Pool.Ratio < .35f;
                 int scent = R("tc-scent-of-blood");
@@ -259,7 +259,7 @@ namespace Crulanda.Encounter
         {
             if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
             return Start(a, () => {
-                if (!s.EnemyInRange(t, a.range)) return;
+                if (!s.LandsOn(t, a.range)) return;
                 var from = s.Player.transform.position; var offset = from - t.transform.position; offset.y = 0;
                 var landing = t.transform.position + (offset.sqrMagnitude > .01f ? offset.normalized : Vector3.back) * 1.6f; landing.y = from.y;
                 s.Player.GetComponent<AdventurerMotor>().Teleport(landing);
@@ -271,7 +271,7 @@ namespace Crulanda.Encounter
         {
             if (!Need(Fang >= 1, "Tear needs Fang; Rake or Lunge first.") || !s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
             return Start(a, () => {
-                if (!s.EnemyInRange(t, a.range) || Fang < 1) return;
+                if (!s.LandsOn(t, a.range) || Fang < 1) return;
                 int f = FinisherFang; Fang = 0; lungeAt = -99;
                 t.Receive(Dmg(a.power * f + s.WeaponDamage * .5f), s.Player);
             });
@@ -280,7 +280,7 @@ namespace Crulanda.Encounter
         {
             if (!Need(FinisherFang >= 3, "Rending Flurry needs 3 Fang.") || !s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
             return Start(a, () => {
-                if (!s.EnemyInRange(t, a.range) || FinisherFang < 3) return;
+                if (!s.LandsOn(t, a.range) || FinisherFang < 3) return;
                 int f = FinisherFang; Fang = 0; lungeAt = -99; int strikes = 2 * f - 2;
                 int each = Dmg(a.power + s.WeaponDamage * .3f);
                 periodic.Add("flurry", t, Now, 2f / strikes, strikes, each, (e, i) => {
@@ -375,7 +375,7 @@ namespace Crulanda.Encounter
         {
             if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
             return Start(a, () => {
-                if (!s.EnemyInRange(t, a.range)) return;
+                if (!s.LandsOn(t, a.range)) return;
                 t.Receive(Dmg(a.power + Level), s.Player); Alternate("seedshot");
                 if (R("ts-pollen-veil") > 0) veiledUntil[t] = Now + 6;
                 if (R("ts-germinate") > 0) seeded.Add(t);
@@ -390,7 +390,7 @@ namespace Crulanda.Encounter
             var def = instant ? With(a, a.cost, 0) : a;
             return Start(def, () => {
                 if (instant) CadenceCharges = Mathf.Max(0, CadenceCharges - 1);
-                if (!s.EnemyInRange(t, a.range)) return;
+                if (!s.LandsOn(t, a.range)) return;
                 float bonus = seeded.Remove(t) ? 1 + .15f * R("ts-germinate") : 1;
                 t.Receive(Dmg((a.power + 2 * Level) * bonus), s.Player); Alternate("thornbolt");
             });
@@ -398,12 +398,12 @@ namespace Crulanda.Encounter
         bool BriarSnare(AbilityDefinition a)
         {
             if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
-            return Start(a, () => { if (s.EnemyInRange(t, a.range)) t.Slow(.4f, a.duration); });
+            return Start(a, () => { if (s.LandsOn(t, a.range)) t.Slow(.4f, a.duration); });
         }
         bool Stillroot(AbilityDefinition a)
         {
             if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
-            return Start(With(a, 0, 0), () => { if (s.EnemyInRange(t, a.range)) { t.Root(a.duration + R("ts-stillroot-cast")); s.Message("Stillroot holds the target in place."); } });
+            return Start(With(a, 0, 0), () => { if (s.LandsOn(t, a.range)) { t.Root(a.duration + R("ts-stillroot-cast")); s.Message("Stillroot holds the target in place."); } });
         }
         bool Bramblestorm(AbilityDefinition a)
         {
@@ -411,7 +411,7 @@ namespace Crulanda.Encounter
             if (!Need(Glimmer >= min, "Bramblestorm needs " + min + " Glimmer; alternate Seedshot and Thornbolt.") || !s.RequireEnemyInRange(a.range)) return false;
             var t = s.Target;
             return Start(a, () => {
-                if (!s.EnemyInRange(t, a.range) || Glimmer < min) return;
+                if (!s.LandsOn(t, a.range) || Glimmer < min) return;
                 int spent = Glimmer; Glimmer = 0; stormCenter = t.transform.position;
                 int per = Dmg(spent * .8f / 6);
                 var motor = s.Player.GetComponent<AdventurerMotor>();

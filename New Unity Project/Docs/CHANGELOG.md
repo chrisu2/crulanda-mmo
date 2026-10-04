@@ -1087,3 +1087,9 @@ A read-only review by five reviewers, each finding checked by a second who tried
 - **A staff on the run (note 19):** running out of a fight, a staff or a polearm goes on the back; stopping or fighting
   brings it to hand (ActorVisual.Fighting, set by the session: an enemy while engaged, anyone else while the player fights).
 - Tests: EditMode 396/396, PlayMode 175/175; Oakhaven toured; no errors in any game log.
+
+## 2026-10-04 — Casts land at the edge of range; grounded boulders; a grain sack; deer that flee (published 00:48)
+- Playtest notes 20-22 (PLAYTEST_NOTES.md): EncounterSession.LandsOn (range + 5 m, "Out of range." when not); perch and
+  rock boulders seated on the lowest ground under their footprint; the coop's grain sack; deer bolt 25-35 m and a hurt
+  animal keeps fleeing while the hunter is within 35 m.
+- Tests: EditMode 396/396, PlayMode 175/175; Oakhaven toured; no errors in any game log.

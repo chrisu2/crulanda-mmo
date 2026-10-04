@@ -1102,6 +1102,13 @@ namespace Crulanda.World
                         float s = 1 + p.variant * .6f; var stone = RockTint(new Color(.52f, .51f, .48f));
                         // Mountains: a loose rock left on a face the crags raised rolls to flatter ground near by and sinks by the slope.
                         if (Zone.biome == "mountain") { stone = RockTint(MountainStone); if (string.IsNullOrEmpty(p.interact)) { var spot = FlatterSpot(p.at, 1.2f * s); t.position = Ground(spot); SinkBySlope(t, spot, s); } }
+                        else
+                        {
+                            // On a slope the ground falls away under one side: seated on the lowest ground under it (playtest note 21).
+                            float low = t.position.y;
+                            foreach (float k in new[] { -.9f, 0, .9f }) foreach (float j in new[] { -.8f, 0, .8f }) low = Mathf.Min(low, HeightAt(t.position.x + k * s, t.position.z + j * s));
+                            t.position += Vector3.up * (low - t.position.y) * .85f;
+                        }
                         Lump(Boulder(), t, new Vector3(0, .3f * s, 0), new Vector3(2f * s, 1.3f * s, 1.7f * s), stone, R01 * 360); if (s > 1.3f) Lump(Boulder(), t, new Vector3(.7f * s, .15f * s, .5f * s), new Vector3(.9f * s, .6f * s, .8f * s), stone, R01 * 360); Solid(t, new Vector3(0, .5f * s, 0), new Vector3(1.6f * s, 1f * s, 1.4f * s)); if (Zone.biome == "mountain" && string.IsNullOrEmpty(p.interact)) RockSkirt(t, s * .8f, stone); break;
                     }
                     case "bridge": SeatBridge(t, p.size.x > 0 ? p.size.x : 12); if (p.variant == 1) RopeBridge(t, p.size.x > 0 ? p.size.x : 12); else Bridge(t, p.size.x > 0 ? p.size.x : 12); break;
@@ -2451,7 +2458,15 @@ namespace Crulanda.World
             // the water sinks as the day dries it).
             Part(PrimitiveType.Cube, t, new Vector3(-1.4f, .18f, -d / 2 - 1.6f), new Vector3(1.2f, .25f, .35f), dark);
             Part(PrimitiveType.Cube, t, new Vector3(-1.4f, .3f, -d / 2 - 1.6f), new Vector3(1.1f, .04f, .25f), art.hay);
-            Part(PrimitiveType.Sphere, t, new Vector3(1.5f, .35f, -d / 2 - .5f), new Vector3(.55f, .7f, .5f), art.cloth);
+            // The grain sack (playtest note 21: one tall sphere read as a giant egg): a slumped burlap body wider than it is tall,
+            // a gathered neck and its cord, leaning back against the coop.
+            var burlap = Tint(art.cloth, new Color(.62f, .52f, .36f)); var sack = new GameObject("Grain sack").transform;
+            sack.SetParent(t, false); sack.localPosition = new Vector3(1.5f, 0, -d / 2 - .45f); sack.localRotation = Quaternion.Euler(-8, 15, 0);
+            Part(PrimitiveType.Sphere, sack, new Vector3(0, .2f, 0), new Vector3(.52f, .42f, .44f), burlap);
+            Part(PrimitiveType.Sphere, sack, new Vector3(0, .38f, 0), new Vector3(.4f, .3f, .36f), burlap);
+            Part(PrimitiveType.Cylinder, sack, new Vector3(0, .56f, 0), new Vector3(.13f, .07f, .13f), burlap);
+            Part(PrimitiveType.Cylinder, sack, new Vector3(0, .54f, 0), new Vector3(.15f, .015f, .15f), Tint(art.timber, new Color(.35f, .27f, .17f)));   // the cord
+            Part(PrimitiveType.Sphere, sack, new Vector3(0, .65f, 0), new Vector3(.17f, .1f, .17f), burlap);   // the gathered top
             var pan = new GameObject("Water pan").transform; pan.SetParent(t, false); pan.localPosition = new Vector3(1.3f, 0, -d / 2 - 1.7f);
             Part(PrimitiveType.Cylinder, pan, new Vector3(0, .05f, 0), new Vector3(.8f, .05f, .8f), Tint(art.metal, new Color(.3f, .3f, .32f)));
             var water = Part(PrimitiveType.Cylinder, pan, new Vector3(0, .06f, 0), new Vector3(.68f, .012f, .68f), Tint(art.stone, new Color(.3f, .42f, .5f)));
@@ -3759,7 +3774,10 @@ namespace Crulanda.World
             {
                 if (Mathf.Abs(Mathf.DeltaAngle(a, 180)) < 38) continue;   // the way up
                 var dir = Quaternion.Euler(0, a, 0) * Vector3.forward; float r = radius + .6f + R01 * 2.2f, s = 1.8f + R01 * 1.8f, lo = float.MaxValue;
-                foreach (float k in new[] { -.7f, 0, .7f }) { var w = t.TransformPoint(dir * (r + k * s)); lo = Mathf.Min(lo, HeightAt(w.x, w.z)); }   // sit on the downhill side
+                // Sit on the lowest ground anywhere under it, along the line out and across it (playtest note 21: on a knob the
+                // ground fell away beside a boulder seated only along the line, and its far side hung in the air).
+                var across = Quaternion.Euler(0, a + 90, 0) * Vector3.forward;
+                foreach (float k in new[] { -.7f, 0, .7f }) foreach (float j in new[] { -.7f, 0, .7f }) { var w = t.TransformPoint(dir * (r + k * s) + across * (j * s)); lo = Mathf.Min(lo, HeightAt(w.x, w.z)); }
                 var at = dir * r + Vector3.up * (lo - t.position.y);
                 Lump(Boulder(), t, at + new Vector3(0, .1f * s, 0), new Vector3(1.5f * s, 1.3f * s, 1.3f * s), mat, R01 * 360);
                 Solid(t, at + new Vector3(0, .5f * s, 0), new Vector3(1.1f * s, s, 1.1f * s));

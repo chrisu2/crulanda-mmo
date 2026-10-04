@@ -896,7 +896,10 @@ namespace Crulanda.Encounter
             body.localEulerAngles = new Vector3(stoop, 0, 0);
         }
 
-        void LateUpdate()
+        // Timed for the performance probe (playtest note 23).
+        static readonly Unity.Profiling.ProfilerMarker perfMark = new Unity.Profiling.ProfilerMarker("PERF.ActorVisual");
+        void LateUpdate() { using (perfMark.Auto()) LateUpdateTimed(); }
+        void LateUpdateTimed()
         {
             if (core != null) { Drift(); return; }
             if (beastModel != null) { BeastLate(); return; }

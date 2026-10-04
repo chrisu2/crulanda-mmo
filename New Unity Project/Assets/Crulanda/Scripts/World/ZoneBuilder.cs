@@ -30,9 +30,17 @@ namespace Crulanda.World
             foreach (var z in zones) if (z != null && JsonUtility.FromJson<ZoneDefinition>(z.text)?.id == id) return true;
             return false;
         }
-        public ZoneDefinition FindZone(string id)
+        /// <summary>A zone by id, from the zones parsed once (<see cref="AllZones"/>). It parsed every zone's JSON at each call, and the HUD
+        /// asked for each road out every frame: 2 ms and most of 770 KB of garbage a frame (playtest note 23).</summary>
+        /// <summary>The zone to build, parsed fresh from its JSON (this zone's own copy, which the build may adjust).</summary>
+        ZoneDefinition ParsedZone(string id)
         {
             foreach (var z in zones) { var d = z == null ? null : ParseZone(z.text); if (d != null && d.id == id) return d; }
+            return null;
+        }
+        public ZoneDefinition FindZone(string id)
+        {
+            foreach (var d in AllZones()) if (d != null && d.id == id) return d;
             return null;
         }
         /// <summary>
@@ -58,7 +66,7 @@ namespace Crulanda.World
 
         void Awake()
         {
-            Zone = (RequestedZoneId != null ? FindZone(RequestedZoneId) : null) ?? ParseZone(zoneJson != null ? zoneJson.text : "{}");
+            Zone = (RequestedZoneId != null ? ParsedZone(RequestedZoneId) : null) ?? ParseZone(zoneJson != null ? zoneJson.text : "{}");
             RequestedZoneId = null;
             if (Zone != null && DefinitionFilter != null) Zone = DefinitionFilter(Zone);
             if (Zone == null || string.IsNullOrEmpty(Zone.id) || art == null) { Debug.LogError("Zone definition or art missing."); enabled = false; return; }
@@ -206,6 +214,17 @@ namespace Crulanda.World
             return 1 - Mathf.SmoothStep(0, 1, (Vector2.Distance(p, s.center) - s.radius) / fade);
         }
         public Vector3 Ground(Vector2 p, float lift = 0) { return new Vector3(p.x, HeightAt(p.x, p.y) + lift, p.y); }
+        /// <summary>
+        /// <see cref="Ground"/> for points that never move (a landmark, a camp, an exit, a quest place), worked out once: the HUD asked
+        /// for every landmark's height every frame for its place names and the minimap, and the terrain's height is costly (playtest
+        /// note 23: 2.1 ms a frame).
+        /// </summary>
+        public Vector3 GroundFixed(Vector2 p, float lift = 0)
+        {
+            if (!fixedGround.TryGetValue(p, out float h)) { if (fixedGround.Count > 4000) fixedGround.Clear(); fixedGround[p] = h = HeightAt(p.x, p.y); }
+            return new Vector3(p.x, h + lift, p.y);
+        }
+        readonly Dictionary<Vector2, float> fixedGround = new Dictionary<Vector2, float>();
         /// <summary>
         /// Where to stand at a point: on the land, or on a cave passage's floor under it (Hollow), whichever is nearer the height
         /// <paramref name="near"/> (where the thing was, or float.NegativeInfinity to prefer any passage floor): camps and their
@@ -2524,6 +2543,8 @@ namespace Crulanda.World
             Solid(t, new Vector3(.2f, (floor + h + .9f) / 2, 0), new Vector3(w + .9f, floor + h + .9f, d + .2f));
             var coop = new ZoneCoop { name = name, hinge = hinge, door = t.TransformPoint(new Vector3(0, 0, -d / 2 - 1.7f)), yard = t.TransformPoint(new Vector3(0, 0, -d / 2 - 4.5f)),
                 nest = t.TransformPoint(new Vector3(w / 2 + 1.1f, 0, 0)), trough = t.TransformPoint(new Vector3(-1.4f, 0, -d / 2 - 2.3f)), pan = t.TransformPoint(new Vector3(1.3f, 0, -d / 2 - 2.4f)), water = water.transform };
+            coop.rampFoot = Ground(new Vector2(t.TransformPoint(new Vector3(0, 0, -d / 2 - 1.45f)).x, t.TransformPoint(new Vector3(0, 0, -d / 2 - 1.45f)).z), .03f);
+            coop.popHole = t.TransformPoint(new Vector3(0, floor + .04f, -d / 2 - .05f));
             coop.SetOpen(false); Coops.Add(coop);
         }
         /// <summary>

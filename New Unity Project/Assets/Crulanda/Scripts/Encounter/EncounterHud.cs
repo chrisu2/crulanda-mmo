@@ -59,7 +59,10 @@ namespace Crulanda.Encounter
         // Each part is timed (the capture tour's performance probe reads these markers).
         static readonly Unity.Profiling.ProfilerMarker mWorld = new Unity.Profiling.ProfilerMarker("HUD.WorldLabels"), mFrames = new Unity.Profiling.ProfilerMarker("HUD.Frames"),
             mMap = new Unity.Profiling.ProfilerMarker("HUD.Minimap"), mPanels = new Unity.Profiling.ProfilerMarker("HUD.Panels"), mWindows = new Unity.Profiling.ProfilerMarker("HUD.Windows");
+        static readonly Unity.Profiling.ProfilerMarker mGather = new Unity.Profiling.ProfilerMarker("HUD.Gather"), mLayout = new Unity.Profiling.ProfilerMarker("HUD.Layout"),
+            mDraw = new Unity.Profiling.ProfilerMarker("HUD.DrawPlates"), mPlaces = new Unity.Profiling.ProfilerMarker("HUD.PlaceNames");
         void Awake() { useGUILayout = false; }
+        void LateUpdate() { TickPaperDoll(); }
         void OnGUI()
         {
             if (Hidden || session == null || session.Player == null) return;
@@ -642,13 +645,15 @@ namespace Crulanda.Encounter
         void DrawPlaceNames(Vector3 player)
         {
             if (session.Zone == null) return;
-            foreach (var l in session.Zone.Zone.landmarks) PlaceName(player, session.Zone.Ground(l.at, 7.2f), l.name, 38, gold);
+            foreach (var l in session.Zone.Zone.landmarks) PlaceName(player, session.Zone.GroundFixed(l.at, 7.2f), l.name, 38, gold);
             foreach (var e in session.Zone.Zone.exits)
             {
                 var to = session.Zone.FindZone(e.to); if (to == null) continue;
-                PlaceName(player, session.Zone.Ground(e.at, 6.5f), "Road to " + to.displayName + "  " + HudMaps.Band(to), 60, HudMaps.BandColor(to, session.Progress.Level));
+                string rk = e.to + "|" + e.name; if (!roads.TryGetValue(rk, out var road)) roads[rk] = road = "Road to " + to.displayName + "  " + HudMaps.Band(to);
+                PlaceName(player, session.Zone.GroundFixed(e.at, 6.5f), road, 60, HudMaps.BandColor(to, session.Progress.Level));
             }
         }
+        readonly System.Collections.Generic.Dictionary<string, string> roads = new System.Collections.Generic.Dictionary<string, string>();
         void PlaceName(Vector3 player, Vector3 at, string name, float reach, Color colour)
         {
             float d = Vector3.Distance(player, at);
@@ -668,9 +673,11 @@ namespace Crulanda.Encounter
                 centered = new GUIStyle(text) { alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold, wordWrap = false };
                 plateText = new GUIStyle(small) { alignment = TextAnchor.MiddleCenter, wordWrap = false };
             }
+            var g = mGather.Auto();
             CollectHudRects(); taken.Clear(); plates.Clear();
             var player = session.Player.transform.position;
             GatherPlates(player);
+            g.Dispose(); var lay = mLayout.Auto();
             // Nearest first: each keeps its natural place if it can, and farther ones stack above it.
             for (int i = 1; i < plates.Count; i++) { var p = plates[i]; int j = i - 1; while (j >= 0 && plates[j].dist > p.dist) { plates[j + 1] = plates[j]; j--; } plates[j + 1] = p; }
             for (int i = 0; i < plates.Count; i++)
@@ -678,9 +685,11 @@ namespace Crulanda.Encounter
                 var p = plates[i]; if (p.box.height <= 0) continue;   // only speaking: the bubble finds its own room
                 var r = p.box; p.shown = Place(ref r, 200); p.at += r.position - p.box.position; p.box = r; plates[i] = p;
             }
+            lay.Dispose(); var dr = mDraw.Auto();
             for (int i = plates.Count - 1; i >= 0; i--) if (plates[i].shown) DrawPlate(plates[i]);   // nearer plates on top
             for (int i = 0; i < plates.Count; i++) if (plates[i].shown && plates[i].v != null) DrawBubble(plates[i]);
-            DrawPlaceNames(player);
+            dr.Dispose();
+            using (mPlaces.Auto()) DrawPlaceNames(player);
             foreach (var f in session.Floating)
             {
                 var p = session.View.WorldToScreenPoint(f.position + Vector3.up * (1.3f - (f.expires - Time.time)));

@@ -12,11 +12,10 @@ The user requested this handoff because they ran out of tokens. Do not assume an
 ## RESUME HERE (updated 2026-10-03, evening)
 **NEXT (2026-10-04 15:50):**
 1. Nothing in flight: committed, published 15:50, backed up. Done today: notes 24, 25, 26, 28, 30, camera below level, full screen.
-1b. **FPS (note 23) continues:** the probe (end of every zone tour, `<zone>-perf.txt`) says CPU-bound. Left: the IMGUI HUD
-   (~4.3 ms: nameplates/place names 2.1 ms; the cure is moving the HUD to uGUI or UI Toolkit, a big job), scripts (~3.8 ms:
-   villagers, critters, enemies, TreeFade over 1,257 trees each frame), critters built of many primitives (rabbits 637
-   renderers), 7,539 static renderers left (trees carry several materials each), 949 materials. IL2CPP is not installed (only
-   Mono); a release build gave +5%: publish release builds (`EncounterBuildPlayer.Build` with `--crulanda-release`).
+1b. **FPS (note 23):** 94 (start of day) -> 104 -> 145 fps in Oakhaven at 1440x900 (published 19:20). The cause of most of it was
+   ZoneBuilder.FindZone re-parsing every zone's JSON per call from the HUD every frame. Left, per frame: camera ~2.3 ms (7,539
+   static renderers, 949 materials, critters built of many primitives), GUI ~1.8 ms (IMGUI; fine now), scripts ~2.3 ms. A UI
+   Toolkit HUD was tried and dropped (needs a ThemeStyleSheet and a font asset with font data). Probe: `<zone>-perf.txt`.
 2. **Make PlayMode efficient (Chris: "i want the most efficient playmode. whatever that takes").** Timings of the last full
    run (00:47, scratchpad copy `playmode-timing-20261004.xml`; re-measure from `encounter-validation\q-PlayMode.xml`): 175
    tests, 56 min of fixtures, no single hog: VillageWorkshop 259 s, VillagePurse 239, ZoneExit 233 (1 test), VillageHome 178,

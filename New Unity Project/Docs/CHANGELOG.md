@@ -1139,3 +1139,19 @@ A read-only review by five reviewers, each finding checked by a second who tried
 - **Full screen by default:** the build set the game to windowed; it is full screen now, and the capture runs put the player's
   own screen setting back after them (tools/validation/screen_prefs.ps1).
 - Tests: EditMode 399/399, PlayMode 175/175; Oakhaven and Khaven toured; no errors in any game log; published as a release build.
+
+## 2026-10-04 — FPS: the HUD's hidden cost found; your figure in the character sheet; hens queue up the ramp (published 19:20)
+- **FPS (note 23; Chris chose "rebuild hud"):** a UI Toolkit layer for the nameplates was tried and dropped (without a theme
+  and with the built-in font unusable as a signed-distance font it cost 20 ms a frame, and the nameplates' drawing was never
+  the cost). Timing each part of the label pass found it: `ZoneBuilder.FindZone` parsed every zone's JSON at every call, and
+  the place names asked for each road out every frame (2 ms and most of 770 KB of garbage a frame). FindZone now uses the
+  zones parsed once (the zone being built still parses its own fresh copy); landmarks', camps' and exits' heights for the
+  HUD and the minimap are worked out once (`GroundFixed`); quest markers are re-asked every 0.4 s; critters more than 90 m
+  away hold still and moving ones sample the ground every 20 cm. Oakhaven at 1440x900: 104 to 145 fps (development build),
+  HUD 4.4 to 1.8 ms, garbage 770 KB to 38 KB a frame. The probe now times the HUD's parts and the main scripts.
+- **Paper doll (Chris: "fix the paper doll in the character sheet so he looks like your character"):** the character sheet
+  shows your own figure, rendered live by a camera of its own (your parts on a spare layer for the one render), framed on
+  the figure's bounds and lit by its own lamp. UI capture shot 38.
+- **Hens (Chris: "can they walk up the plank", "wait in line"):** at dusk they queue behind the ramp's foot in the order they
+  come, climb it one at a time and go in at the pop-hole; in the morning they come down one at a time.
+- Tests: EditMode 399/399, PlayMode 175/175; Oakhaven toured; no errors in any game log; published as a release build.

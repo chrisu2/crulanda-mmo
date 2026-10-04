@@ -1375,7 +1375,10 @@ namespace Crulanda.Encounter
             return null;
         }
         public bool IsLivingPartyMember(string id) { var a = PartyActor(id); return a != null && a.IsAlive; }
-        void Update()
+        // Timed for the performance probe (playtest note 23).
+        static readonly Unity.Profiling.ProfilerMarker perfMark = new Unity.Profiling.ProfilerMarker("PERF.Session");
+        void Update() { using (perfMark.Auto()) UpdateTimed(); }
+        void UpdateTimed()
         {
             if (Player == null) return;
             AdvanceToast();

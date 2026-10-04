@@ -41,15 +41,15 @@ namespace Crulanda.Encounter
                 var z = zone.Zone;
                 // A cave's camps are not drawn over the land above them: the cave's own landmark carries their levels ("3-5").
                 // A place not yet explored is a "?" (Achievements: walk there and it is named).
-                foreach (var l in z.landmarks) into.Add(new MapMark { kind = MarkKind.Landmark, world = zone.Ground(l.at), text = s.Feats == null || s.Feats.Explored(z, l) ? l.name + CaveBand(z, l.name) : "?" });
+                foreach (var l in z.landmarks) into.Add(new MapMark { kind = MarkKind.Landmark, world = zone.GroundFixed(l.at), text = s.Feats == null || s.Feats.Explored(z, l) ? l.name + CaveBand(z, l.name) : "?" });
                 if (z.camps != null)
-                    foreach (var c in z.camps) if (c != null && !InCave(c.center)) into.Add(new MapMark { kind = MarkKind.Camp, world = zone.Ground(c.center), text = c.mob, camp = c });
-                foreach (var e in z.exits) into.Add(new MapMark { kind = MarkKind.Exit, world = zone.Ground(e.at), text = e.name, to = ZoneById(zone, e.to) });
+                    foreach (var c in z.camps) if (c != null && !InCave(c.center)) into.Add(new MapMark { kind = MarkKind.Camp, world = zone.GroundFixed(c.center), text = c.mob, camp = c });
+                foreach (var e in z.exits) into.Add(new MapMark { kind = MarkKind.Exit, world = zone.GroundFixed(e.at), text = e.name, to = ZoneById(zone, e.to) });
             }
             foreach (var enemy in s.Enemies) if (enemy != null && enemy.actor.IsAlive && !enemy.Hidden) into.Add(new MapMark { kind = MarkKind.Enemy, world = enemy.transform.position, text = enemy.actor.DisplayName });
             if (s.Quests == null || zone == null) return;
             foreach (var (q, o, done) in s.Quests.Places())
-                if (!done && (string.IsNullOrEmpty(o.zone) || o.zone == s.ZoneId)) into.Add(new MapMark { kind = MarkKind.QuestPlace, world = zone.Ground(o.at), text = q.title });
+                if (!done && (string.IsNullOrEmpty(o.zone) || o.zone == s.ZoneId)) into.Add(new MapMark { kind = MarkKind.QuestPlace, world = zone.GroundFixed(o.at), text = q.title });
             // Breadcrumbs: a quest step waiting in another zone rings the exit on the road there.
             foreach (var (q, st) in s.Quests.Active())
             {

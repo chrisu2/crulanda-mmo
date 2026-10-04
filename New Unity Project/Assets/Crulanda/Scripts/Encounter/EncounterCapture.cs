@@ -327,6 +327,10 @@ namespace Crulanda.Encounter
             EncounterHud.BookTab = "achievements"; yield return new WaitForSeconds(.6f);
             ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "37-achievements.png")); yield return new WaitForSeconds(.4f);
             session.QuestBookOpen = false;
+            // The character sheet with your own figure as its paper doll (EncounterHud.PaperDoll.cs).
+            session.CharacterOpen = true; yield return new WaitForSeconds(.8f);
+            ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "38-character-sheet.png")); yield return new WaitForSeconds(.4f);
+            session.CharacterOpen = false;
         }
         /// <summary>The quest interface: a giver's !, the offer, the quest book, the ledger in the Chronicle, a hand-in list, standing, the tracker.</summary>
         IEnumerator CaptureQuests(string directory, string prefix, Crulanda.World.ZoneBuilder zone)
@@ -955,7 +959,7 @@ namespace Crulanda.Encounter
             // build records them without a profiler attached.
             Crulanda.World.WorldClock.Hour = 12; Crulanda.World.WorldClock.Advance(0); yield return new WaitForSeconds(.6f);
             var names = new[] { ("Internal", "Main Thread"), ("Internal", "Render Thread"), ("Scripts", "BehaviourUpdate"), ("Scripts", "LateBehaviourUpdate"),
-                ("Scripts", "CoroutinesDelayedCalls"), ("Scripts", "HUD.WorldLabels"), ("Scripts", "HUD.Frames"), ("Scripts", "HUD.Minimap"), ("Scripts", "HUD.Panels"), ("Scripts", "HUD.Windows"), ("Gui", "GUI.Repaint"), ("Gui", "GUIUtility.ProcessEvent"), ("Animation", "Director.ProcessFrame"), ("Animation", "PreLateUpdate.DirectorUpdateAnimationBegin"),
+                ("Scripts", "CoroutinesDelayedCalls"), ("Scripts", "PERF.VillageLife"), ("Scripts", "PERF.Villager"), ("Scripts", "PERF.Critter"), ("Scripts", "PERF.Enemy"), ("Scripts", "PERF.ActorVisual"), ("Scripts", "PERF.Session"), ("Scripts", "PERF.GameAnimal"), ("Scripts", "PERF.TreeFade"), ("Scripts", "HUD.WorldLabels"), ("Scripts", "HUD.Gather"), ("Scripts", "HUD.Layout"), ("Scripts", "HUD.DrawPlates"), ("Scripts", "HUD.PlaceNames"), ("Scripts", "HUD.Frames"), ("Scripts", "HUD.Minimap"), ("Scripts", "HUD.Panels"), ("Scripts", "HUD.Windows"), ("Gui", "GUI.Repaint"), ("Gui", "GUIUtility.ProcessEvent"), ("Animation", "Director.ProcessFrame"), ("Animation", "PreLateUpdate.DirectorUpdateAnimationBegin"),
                 ("Animation", "PreLateUpdate.DirectorUpdateAnimationEnd"), ("Animation", "MeshSkinning.Update"), ("Render", "Camera.Render"), ("Render", "Shadows.RenderShadowMap"), ("Render", "Culling"),
                 ("Render", "PostLateUpdate.UpdateAllRenderers"), ("Physics", "Physics.Processing"), ("Physics", "Physics.Simulate"), ("Render", "Gfx.WaitForPresentOnGfxThread"),
                 ("Render", "Batches Count"), ("Render", "SetPass Calls Count"), ("Render", "Draw Calls Count"), ("Render", "Triangles Count"), ("Render", "Shadow Casters Count"), ("Memory", "GC Allocated In Frame") };

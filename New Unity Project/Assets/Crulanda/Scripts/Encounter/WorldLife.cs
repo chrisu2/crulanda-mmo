@@ -454,7 +454,10 @@ namespace Crulanda.Encounter
         }
         /// <summary>Hens lay through the working day, one egg each at most; the count resets before dawn. The water pan dries out. The
         /// purses keep their day (<see cref="Purses"/>).</summary>
-        void Update()
+        // Timed for the performance probe (playtest note 23).
+        static readonly Unity.Profiling.ProfilerMarker perfMark = new Unity.Profiling.ProfilerMarker("PERF.VillageLife");
+        void Update() { using (perfMark.Auto()) UpdateTimed(); }
+        void UpdateTimed()
         {
             foreach (var coop in Zone.Coops) coop.Dry(Time.deltaTime / 420);   // a pan lasts about four hours
             if (Time.time < nextLay) return;
@@ -1286,7 +1289,10 @@ namespace Crulanda.Encounter
         bool Arrived { get { return agent.enabled && agent.isOnNavMesh && !agent.pathPending && agent.pathStatus == NavMeshPathStatus.PathComplete && agent.remainingDistance <= agent.stoppingDistance + .25f; } }
         /// <summary>Came to the end of a path that could not reach the place (e.g. across deep water).</summary>
         bool Stranded { get { return agent.enabled && agent.isOnNavMesh && !agent.pathPending && agent.pathStatus != NavMeshPathStatus.PathComplete && agent.remainingDistance <= agent.stoppingDistance + .25f; } }
-        void Update()
+        // Timed for the performance probe (playtest note 23).
+        static readonly Unity.Profiling.ProfilerMarker perfMark = new Unity.Profiling.ProfilerMarker("PERF.Villager");
+        void Update() { using (perfMark.Auto()) UpdateTimed(); }
+        void UpdateTimed()
         {
             if (life == null || !agent.isOnNavMesh) return;
             bool danger = life.Danger(transform.position);
@@ -1385,7 +1391,8 @@ namespace Crulanda.Encounter
     /// </summary>
     public sealed class Critter : MonoBehaviour
     {
-        enum State { Idle, Walk, Flee, Fly, Feed, Return, Roost }
+        enum State { Idle, Walk, Flee, Fly, Feed, Return, Roost, Climb, Descend }
+        float rampT;
         public string Kind { get; private set; }
         /// <summary>A hen's coop: she roosts inside at night, rushes the feed, and heads in at dusk.</summary>
         public ZoneCoop Coop { get; private set; }
@@ -1426,7 +1433,7 @@ namespace Crulanda.Encounter
         }
         /// <summary>Each hen heads in on her own around dusk (staggered over most of an hour).</summary>
         float RoostHour { get { return 18.6f + (seed % 10) * .09f; } }
-        public void Shoo() { if (Coop == null || state == State.Roost || state == State.Return) return; state = State.Return; target = Coop.door; }
+        public void Shoo() { if (Coop == null || state == State.Roost || state == State.Return || state == State.Climb) return; state = State.Return; target = Coop.rampFoot != Vector3.zero ? Coop.rampFoot : Coop.door; }
         void Roost()
         {
             state = State.Roost; foreach (var r in rends) r.enabled = false;
@@ -1439,21 +1446,45 @@ namespace Crulanda.Encounter
             switch (state)
             {
                 case State.Roost:
-                    if (Coop.Open && WorldClock.Between(6, RoostHour) && Time.time > until)
+                    if (Coop.Open && WorldClock.Between(6, RoostHour) && Time.time > until && Time.time >= Coop.RampNext)
                     {
+                        Coop.RampNext = Time.time + .9f;   // one down the ramp at a time
+                        // Out of the pop-hole and down the ramp (Chris: they walked out of nowhere).
                         foreach (var r in rends) r.enabled = true;
-                        transform.position = Coop.door; transform.rotation = Quaternion.LookRotation(Coop.yard - Coop.door);
-                        var p = PickPoint(new Vector2(Coop.yard.x, Coop.yard.z), 2.5f);
-                        if (p.HasValue) { target = p.Value; state = State.Walk; } else { state = State.Idle; until = Time.time + 2; }
+                        transform.position = Coop.popHole; state = State.Descend; rampT = 0;
                     }
                     return true;
+                case State.Descend: case State.Climb:
+                {
+                    // Along the ramp, hen pace, a little bob: up from its foot to the pop-hole (then in), or down.
+                    float len = Mathf.Max(.5f, Vector3.Distance(Coop.rampFoot, Coop.popHole));
+                    rampT = Mathf.Min(1, rampT + Time.deltaTime * 1.1f / len);
+                    var from = state == State.Climb ? Coop.rampFoot : Coop.popHole; var to = state == State.Climb ? Coop.popHole : Coop.rampFoot;
+                    transform.position = Vector3.Lerp(from, to, rampT);
+                    var flat = to - from; flat.y = 0; if (flat.sqrMagnitude > .001f) transform.rotation = Quaternion.LookRotation(flat);
+                    body.Stride(1.1f);
+                    if (rampT < 1) return true;
+                    if (state == State.Climb) { Roost(); return true; }
+                    var p = PickPoint(new Vector2(Coop.yard.x, Coop.yard.z), 2.5f);
+                    if (p.HasValue) { target = p.Value; state = State.Walk; } else { state = State.Idle; until = Time.time + 2; }
+                    return true;
+                }
                 case State.Return:
-                    if (Step(1.6f))
-                    {
-                        if (Coop.Open) Roost();
-                        else { state = State.Idle; until = Time.time + 4; }   // shut out: huddle by the door
-                    }
+                {
+                    // In line for the ramp: to its place (moving up as the one ahead climbs), and at the front, up when the ramp is clear.
+                    Coop.RampQueue.RemoveAll(h => h == null);
+                    int place = Coop.RampQueue.IndexOf(this); if (place < 0) { Coop.RampQueue.Add(this); place = Coop.RampQueue.Count - 1; }
+                    target = Coop.QueueSpot(place);
+                    if (!Step(1.6f)) return true;
+                    body.Rest();
+                    var ahead = Coop.popHole - transform.position; ahead.y = 0;
+                    if (ahead.sqrMagnitude > .01f) transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(ahead), Time.deltaTime * 6);
+                    if (place != 0 || Time.time < Coop.RampNext) return true;
+                    Coop.RampQueue.Remove(this);
+                    if (Coop.Open) { Coop.RampNext = Time.time + .9f; state = State.Climb; rampT = 0; transform.position = Coop.rampFoot; }   // up the ramp, then in
+                    else { state = State.Idle; until = Time.time + 4; }   // shut out: huddle by the door
                     return true;
+                }
             }
             if (state != State.Flee && state != State.Fly && WorldClock.Between(RoostHour, 6))
             {
@@ -1480,12 +1511,19 @@ namespace Crulanda.Encounter
             }
             return null;
         }
-        void Update()
+        // Timed for the performance probe (playtest note 23).
+        static readonly Unity.Profiling.ProfilerMarker perfMark = new Unity.Profiling.ProfilerMarker("PERF.Critter");
+        void Update() { using (perfMark.Auto()) UpdateTimed(); }
+        /// <summary>Beyond this from the player a critter holds still (playtest note 23, fps: a few hundred rabbits, crows and sheep
+        /// out of sight all walking, flocking and finding the ground every frame); a hen keeps to its coop's day, near or far.</summary>
+        const float AwakeWithin = 90;
+        void UpdateTimed()
         {
             if (life == null || life.Session.Player == null) return;
-            if (Coop != null && HenRoutine()) return;
             var me = transform.position; var player = life.Session.Player.transform.position;
             float playerDist = Vector3.Distance(new Vector3(me.x, 0, me.z), new Vector3(player.x, 0, player.z));
+            if (playerDist > AwakeWithin && Coop == null && state != State.Fly) return;
+            if (Coop != null && HenRoutine()) return;
             if (state != State.Flee && state != State.Fly && playerDist < body.FleeRadius)
             {
                 var away = me - player; away.y = 0; away = away.sqrMagnitude > .01f ? away.normalized : transform.forward;
@@ -1529,13 +1567,20 @@ namespace Crulanda.Encounter
             return false;
         }
         /// <summary>Moves along the ground toward the target; returns true on arrival.</summary>
+        Vector2 groundAt = new Vector2(float.MaxValue, 0); float groundY, groundSlope;
         bool Step(float v)
         {
             var me = transform.position; var to = target - me; to.y = 0;
             if (to.magnitude < .3f) return true;
             var dir = to.normalized; var next = me + dir * v * Time.deltaTime;
-            if (life.Zone.WaterAt(new Vector2(next.x, next.z), out _, out _)) return true;   // stop at the water's edge
-            next.y = life.Zone.HeightAt(next.x, next.z);
+            // The ground (and the water's edge) is looked at again every 20 cm, not every frame (playtest note 23, fps).
+            if ((new Vector2(next.x, next.z) - groundAt).sqrMagnitude > .04f)
+            {
+                if (life.Zone.WaterAt(new Vector2(next.x, next.z), out _, out _)) return true;   // stop at the water's edge
+                groundAt = new Vector2(next.x, next.z); groundY = life.Zone.HeightAt(next.x, next.z); groundSlope = 0;
+                var ahead = next + dir * .2f; groundSlope = (life.Zone.HeightAt(ahead.x, ahead.z) - groundY) / .2f;
+            }
+            next.y = groundY + groundSlope * Vector2.Dot(new Vector2(next.x, next.z) - groundAt, new Vector2(dir.x, dir.z));
             transform.position = next; transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), Time.deltaTime * 8);
             body.Stride(v);
             return false;

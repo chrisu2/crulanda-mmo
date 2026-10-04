@@ -34,10 +34,17 @@ namespace Crulanda.Encounter
         static string KindLabel(QuestDef q) { return q.kind == "main" ? "Chronicle" : q.kind == "npc" ? "Village work" : q.kind == "faction" ? "Faction" : q.kind == "bounty" ? (q.rare ? "Rare posting" : q.poster == "sandthrone" ? "Sandthrone contract" : "Bounty") : "Side quest"; }
 
         /// <summary>The ! or ? over someone's head, or ' ' (no quests here, or too far away).</summary>
+        // Each person's marker is worked out again every 0.4 s, not every frame (playtest note 23: the quest log was asked for every
+        // villager in sight, every frame).
+        readonly System.Collections.Generic.Dictionary<string, (float until, char m, bool grey)> markers = new System.Collections.Generic.Dictionary<string, (float, char, bool)>();
         char HeadMarker(string npc, float distance, out bool grey)
         {
             grey = false;
-            return session.Quests == null || session.Zone == null || distance > 45 ? ' ' : session.Quests.Marker(npc, session.ZoneId, session.Progress.Level, out grey);
+            if (session.Quests == null || session.Zone == null || distance > 45 || npc == null) return ' ';
+            if (markers.TryGetValue(npc, out var k) && Time.unscaledTime < k.until) { grey = k.grey; return k.m; }
+            char m = session.Quests.Marker(npc, session.ZoneId, session.Progress.Level, out grey);
+            if (markers.Count > 500) markers.Clear();
+            markers[npc] = (Time.unscaledTime + .4f, m, grey); return m;
         }
         /// <summary>Draws a head marker centred on <paramref name="at"/> (the nameplate pass places it above the name).</summary>
         void DrawHeadMarker(char m, bool grey, Vector2 at)

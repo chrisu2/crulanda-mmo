@@ -199,6 +199,18 @@ namespace Crulanda.World
         public string name;
         /// <summary>Foot of the ramp; yard in front; nest-box side; feed trough. World positions at ground level.</summary>
         public Vector3 door, yard, nest, trough;
+        /// <summary>The ramp's foot on the ground and its top at the pop-hole: the hens walk up it to roost and down it in the morning (Chris, 2026-10-04).</summary>
+        public Vector3 rampFoot, popHole;
+        /// <summary>One hen on the ramp at a time (Chris: "they will have to wait in line so they are not running over each other"): the
+        /// rest wait in a line behind its foot, in the order they came, and the next may set off when this time has come.</summary>
+        public readonly System.Collections.Generic.List<MonoBehaviour> RampQueue = new System.Collections.Generic.List<MonoBehaviour>();
+        public float RampNext;
+        /// <summary>Where the hen <paramref name="place"/>th in the line waits: the ramp's foot, then back from it, away from the coop.</summary>
+        public Vector3 QueueSpot(int place)
+        {
+            var away = rampFoot - popHole; away.y = 0; away = away.sqrMagnitude > .001f ? away.normalized : Vector3.back;
+            return rampFoot + away * (place == 0 ? 0 : .35f + .42f * place);
+        }
         public Transform hinge;
         public bool Open { get; private set; }
         /// <summary>Eggs waiting in the nest boxes (hens lay through the day; the hen-wife collects).</summary>

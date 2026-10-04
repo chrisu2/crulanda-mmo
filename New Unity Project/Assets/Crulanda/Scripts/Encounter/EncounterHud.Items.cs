@@ -205,10 +205,14 @@ namespace Crulanda.Encounter
             var mid = new Rect(w.x + 100, w.y + 64, w.width - 200, 250);
             Fill(mid, new Color(1, 1, 1, .03f));
             float cx = mid.center.x;
-            Disc(new Rect(cx - 22, mid.y + 20, 44, 44), new Color(.76f, .6f, .48f));
-            Fill(new Rect(cx - 34, mid.y + 68, 68, 86), p.equipment[3].Empty ? new Color(.35f, .3f, .25f) : ItemDatabase.QualityColors[Mathf.Clamp(session.Items?.Get(p.equipment[3].item)?.quality ?? 1, 0, 4)] * .55f);
-            Fill(new Rect(cx - 54, mid.y + 70, 18, 78), new Color(.35f, .3f, .25f)); Fill(new Rect(cx + 36, mid.y + 70, 18, 78), new Color(.35f, .3f, .25f));
-            Fill(new Rect(cx - 30, mid.y + 156, 26, 84), new Color(.28f, .24f, .2f)); Fill(new Rect(cx + 4, mid.y + 156, 26, 84), new Color(.28f, .24f, .2f));
+            // Your own figure, as you stand (EncounterHud.PaperDoll.cs); the old block figure only until its first picture.
+            if (!DrawPaperDoll(mid))
+            {
+                Disc(new Rect(cx - 22, mid.y + 20, 44, 44), new Color(.76f, .6f, .48f));
+                Fill(new Rect(cx - 34, mid.y + 68, 68, 86), p.equipment[3].Empty ? new Color(.35f, .3f, .25f) : ItemDatabase.QualityColors[Mathf.Clamp(session.Items?.Get(p.equipment[3].item)?.quality ?? 1, 0, 4)] * .55f);
+                Fill(new Rect(cx - 54, mid.y + 70, 18, 78), new Color(.35f, .3f, .25f)); Fill(new Rect(cx + 36, mid.y + 70, 18, 78), new Color(.35f, .3f, .25f));
+                Fill(new Rect(cx - 30, mid.y + 156, 26, 84), new Color(.28f, .24f, .2f)); Fill(new Rect(cx + 4, mid.y + 156, 26, 84), new Color(.28f, .24f, .2f));
+            }
             var e = Event.current; var mouse = e.mousePosition;
             for (int slot = 0; slot < ItemDatabase.SlotIds.Length; slot++)
             {

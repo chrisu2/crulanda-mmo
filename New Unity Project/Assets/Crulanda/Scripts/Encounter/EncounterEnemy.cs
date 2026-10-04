@@ -121,7 +121,10 @@ namespace Crulanda.Encounter
         }
         /// <summary>Root: cannot move, can still strike whatever is in reach. Leash distance still applies.</summary>
         public void Root(float seconds) { if (actor.IsAlive && seconds > 0) rootUntil = Mathf.Max(rootUntil, Time.time + seconds); }
-        void Update()
+        // Timed for the performance probe (playtest note 23).
+        static readonly Unity.Profiling.ProfilerMarker perfMark = new Unity.Profiling.ProfilerMarker("PERF.Enemy");
+        void Update() { using (perfMark.Auto()) UpdateTimed(); }
+        void UpdateTimed()
         {
             if (session == null || session.Paused) return;
             if (!actor.IsAlive) { if (Camp && Time.time >= respawnAt) Respawn(); return; }

@@ -46,7 +46,9 @@ namespace Crulanda.World
         /// Fades every tree that blocks the line from the camera to the player's head or body, or that the camera sits
         /// inside, and brings back the rest. Call once per frame after the camera has moved.
         /// </summary>
-        public static void UpdateAll(Vector3 camera, Vector3 head, Vector3 body)
+        static readonly Unity.Profiling.ProfilerMarker perfMark = new Unity.Profiling.ProfilerMarker("PERF.TreeFade");
+        public static void UpdateAll(Vector3 camera, Vector3 head, Vector3 body) { using (perfMark.Auto()) UpdateAllTimed(camera, head, body); }
+        static void UpdateAllTimed(Vector3 camera, Vector3 head, Vector3 body)
         {
             if (FadeTemplate == null) return;
             float dt = Mathf.Min(Time.deltaTime, .1f);

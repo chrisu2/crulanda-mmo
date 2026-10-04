@@ -92,7 +92,10 @@ namespace Crulanda.Encounter
             if (SneakingOverride.HasValue) return SneakingOverride.Value;
             var motor = s.Player.GetComponent<AdventurerMotor>(); return motor != null && motor.Sneaking;
         }
-        void Update()
+        // Timed for the performance probe (playtest note 23).
+        static readonly Unity.Profiling.ProfilerMarker perfMark = new Unity.Profiling.ProfilerMarker("PERF.GameAnimal");
+        void Update() { using (perfMark.Auto()) UpdateTimed(); }
+        void UpdateTimed()
         {
             var s = Enemy != null ? Enemy.session : null;
             if (s == null || s.Paused || s.Player == null || agent == null || !Enemy.actor.IsAlive) return;

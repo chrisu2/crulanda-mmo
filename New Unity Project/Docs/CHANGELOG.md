@@ -1093,3 +1093,19 @@ A read-only review by five reviewers, each finding checked by a second who tried
   rock boulders seated on the lowest ground under their footprint; the coop's grain sack; deer bolt 25-35 m and a hurt
   animal keeps fleeing while the hunter is within 35 m.
 - Tests: EditMode 396/396, PlayMode 175/175; Oakhaven toured; no errors in any game log.
+
+## 2026-10-04 — Points of interest and achievements (committed 01:20, NOT YET PUBLISHED: needs its full run)
+- Chris: "need to implement POI in game for discovery and achievement points"; chose every landmark a POI, an Achievements
+  tab with points and titles.
+- **POIs:** every zone's landmarks. Walking into one the first time (within its radius, 6 to 18 m) shows "DISCOVERED" and
+  pays exploration experience (15 + 8 x the zone's level: 23 at Oakhaven, 63 in the Peaks). Unexplored places are a "?" on
+  the minimap and zone map, and "? ? ?" in the map's PLACES list (with "x / y" explored).
+- **Achievements** (Achievements.cs), worked out from the content: in each zone Explorer of (every place), Secrets of (every
+  secret), The Deeds of (every quest, bounties aside), Terror of (every camp elite); across Crulanda The Wayfarer, Keeper of
+  Secrets, The Steadfast, The Unbowed (all of each, with titles), Paid in Crowns (10 bounties), Bounty Hunter (50, title),
+  The Courier's Bane (a rare posting, title), Journeyman (a trade at 75), Master of a Trade (100, title). Points shown in the
+  quest book's new Achievements tab and on the character sheet; a title can be worn from the tab and shows over the player
+  frame. A save from before records past deeds at once, quietly, in one line.
+- Exploring and earning are off in test runs and capture tours (no surprise toasts in tests or shots); a test turns them on.
+- Tests: AchievementTests (3, EditMode); focused EditMode 34/34 and PlayMode 22/22 (Discovery, Armoury, Bounty board,
+  Encounter loop). The full run is the next session's first step.

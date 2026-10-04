@@ -156,6 +156,7 @@ namespace Crulanda.Encounter
             if (bagItems != null && Items != null) foreach (var id in bagItems) { var d = Items.Get(id); if (d != null && !(d.kind == "bag" && Inventory.Owns(Progress, id))) worth += Inventory.Price(d); }
             if (!Quests.TurnIn(q, out _)) return;
             if (q.kind == "bounty" && Boards != null) { Boards.Finished(ZoneId, q.id); if (q.rare) DespawnCourier(); }
+            if (q.kind == "bounty") { Progress.bounties++; if (q.rare) Progress.rares++; }   // Achievements count them
             if (worth > 0) VillageLife.Active?.Paid(q.turnIn, worth);
             if (Progress.Level > before) { ApplyLevel(); Player.Health.ApplyHealing(Player.Health.Pool.Max); Message("Level " + Progress.Level + "! Talent points are waiting [B]."); }
             ReconcileQuests(); Save(false); ReopenConversation();
@@ -826,6 +827,47 @@ namespace Crulanda.Encounter
         /// A few metres into a cave (Hollow), its name comes up on the banner over the levels of the camps inside it ("LEVELS 3-5"),
         /// once each time you go in: step out and back and it stays quiet; out of it for 20 s or more, and it names itself again.
         /// </summary>
+        // ---------- points of interest and achievements (Achievements) ----------
+        /// <summary>Points of interest and achievements: the zone's places, explored by walking into them, and the deeds counted.</summary>
+        public Achievements Feats { get; private set; }
+        /// <summary>Exploring and earning are on in play; off in test runs and capture tours (a toast in the middle of a test or a
+        /// shot), where a test that wants them turns them on.</summary>
+        [NonSerialized] public bool Exploring;
+        float nextPoi, nextFeat; bool featsPrimed;
+        void TickFeats()
+        {
+            if (Zone == null || Progress == null || Player == null) return;
+            if (Feats == null) { Feats = new Achievements(Progress, Zone.AllZones(), Quests != null ? Quests.Db : null); Feats.Earned = OnEarned; featsPrimed = false; }
+            if (!Exploring || Paused || !Player.IsAlive) return;
+            if (!featsPrimed)
+            {
+                // A save from before achievements: what was already done is recorded at once, quietly, in one line.
+                featsPrimed = true; var old = Feats.Check(true);
+                if (old.Count > 0) Message("Achievements recorded from your past deeds: " + old.Count + " (" + Feats.Points + " points). See the quest book [L].");
+            }
+            if (Time.time >= nextPoi) { nextPoi = Time.time + .25f; ExplorePlaces(); }
+            if (Time.time >= nextFeat) { nextFeat = Time.time + 1; Feats.Check(); }
+        }
+        /// <summary>Explores any place of this zone the player stands in: its name on the banner, its experience, and the maps name it.</summary>
+        public void ExplorePlaces()
+        {
+            if (Feats == null || Zone == null) return;
+            var z = Zone.Zone; var p = Player.transform.position;
+            foreach (var l in Achievements.Pois(z))
+            {
+                if (Feats.Explored(z, l) || new Vector2(p.x - l.at.x, p.z - l.at.y).magnitude > Achievements.Reach(l)) continue;
+                Feats.Explore(z, l); int before = Progress.Level, xp = Achievements.PoiXp(z);
+                Progress.experience += xp;
+                Message("Discovered: " + l.name + "  +" + xp + " XP");
+                toasts.Enqueue(("DISCOVERED", l.name)); AdvanceToast();
+                if (Progress.Level > before) { ApplyLevel(); Player.Health.ApplyHealing(40); Message("Level " + Progress.Level + "! Health and weapon damage increased."); }
+            }
+        }
+        void OnEarned(AchievementDef a)
+        {
+            toasts.Enqueue((Achievements.Kicker + "  +" + a.points, a.name)); AdvanceToast();
+            Message("Achievement: " + a.name + " (+" + a.points + " points)" + (a.title != null ? ". Title earned: \"" + a.title + "\" (wear it from the Achievements tab [L])." : "."));
+        }
         void TickPlaces()
         {
             if (Zone == null) return;
@@ -1073,6 +1115,7 @@ namespace Crulanda.Encounter
             // An editor running tests from the command line (the validation copy) never reads or writes the real save folder, even
             // in a test that forgets to point the session elsewhere: the real folder is the player's, shared by every build.
             bool testRun = Application.isEditor && (Application.isBatchMode || Array.IndexOf(Environment.GetCommandLineArgs(), "-runTests") >= 0);
+            Exploring = !testRun && !UseTempSave && !EncounterCapture.Requested && SaveDirectoryOverride == null;
             if ((UseTempSave || testRun || Array.IndexOf(Environment.GetCommandLineArgs(), "--crulanda-temp-save") >= 0) && SaveDirectoryOverride == null)
             {
                 // Test runs: a fresh throwaway character that never touches the real save folder. One folder for the whole
@@ -1355,7 +1398,7 @@ namespace Crulanda.Encounter
             if (Debug.isDebugBuild && EncounterInput.Press(KeyCode.F8) && Crulanda.World.WorldWeather.Active != null) Message("Weather: " + Crulanda.World.WorldWeather.Active.CycleForced() + " (dev).");
             TickLoot();
             if (!Player.IsAlive) { if (EncounterInput.Press(KeyCode.R)) Recover(); return; }
-            TickQuests(); TickItems(); TickDiscoveries(); TickPlaces(); TickNodes(); TickWork();
+            TickQuests(); TickItems(); TickDiscoveries(); TickPlaces(); TickFeats(); TickNodes(); TickWork();
             if (Zone != null && Player.GetComponent<CharacterController>().isGrounded && !Zone.WaterAt(new Vector2(Player.transform.position.x, Player.transform.position.z), out _, out _)) lastDry = Player.transform.position;
             var motor = Player.GetComponent<AdventurerMotor>(); var look = Player.GetComponent<ActorVisual>();
             if (look != null) look.Pose = motor.Swimming ? ActorPose.Swim : motor.Sneaking ? ActorPose.Sneak : ActorPose.None;
@@ -1643,6 +1686,7 @@ namespace Crulanda.Encounter
             if (restoring) return;
             if (enemy.Game) { GameDied(enemy); return; }   // no experience, no coin, no "zone clear" (EncounterSession.Hunt)
             if (enemy.Camp) RollCorpse(enemy);   // the loot is decided as it dies, so the body can show it
+            if (enemy.Camp && enemy.Elite) { if (Feats != null) Feats.Slain(enemy.persistentId); else { var k = Achievements.EliteKey(enemy.persistentId); if (k != null && !Progress.elitesSlain.Contains(k)) Progress.elitesSlain.Add(k); } }
             OnKillEffects();
             int before = Progress.Level;
             int xp = EncounterProgress.KillXp(enemy.actor.Level, Progress.Level, enemy.Elite);
@@ -1707,6 +1751,7 @@ namespace Crulanda.Encounter
             if (Discoveries != null) { Discoveries.Bind(Progress); pocketedSynced = false; vistaWaiting = null; }
             if (Professions != null) Professions.Bind(Progress);
             if (Armoury != null) Armoury.Bind(Progress);
+            if (Feats != null) { Feats.Bind(Progress); featsPrimed = false; }
         }
         public void RepeatTrail()
         {

@@ -322,6 +322,10 @@ namespace Crulanda.Encounter
             if (first == null) yield break;
             session.AcceptQuest(first); EncounterHud.BookTab = "quests"; session.QuestBookOpen = true; yield return new WaitForSeconds(.6f);
             ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "36-bounty-taken.png")); yield return new WaitForSeconds(.4f);
+            // The Achievements tab (Achievements): a few places explored here first, so the zone's line shows progress.
+            if (session.Feats != null) { int k = 0; foreach (var l in Achievements.Pois(zone.Zone)) if (k++ < 6) session.Feats.Explore(zone.Zone, l); session.Feats.Check(true); }
+            EncounterHud.BookTab = "achievements"; yield return new WaitForSeconds(.6f);
+            ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "37-achievements.png")); yield return new WaitForSeconds(.4f);
             session.QuestBookOpen = false;
         }
         /// <summary>The quest interface: a giver's !, the offer, the quest book, the ledger in the Chronicle, a hand-in list, standing, the tracker.</summary>

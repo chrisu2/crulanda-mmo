@@ -1,0 +1,1870 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="175" result="Passed" total="175" passed="175" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-10-04 03:42:22Z" end-time="2026-10-04 04:38:18Z" duration="3356.1920761">
+  <test-suite type="TestSuite" id="1223" name="Crulanda - The Quiet Trail" fullname="Crulanda - The Quiet Trail" runstate="Runnable" testcasecount="175" result="Passed" start-time="2026-10-04 03:42:22Z" end-time="2026-10-04 04:38:18Z" duration="3356.192076" total="175" passed="175" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <test-suite type="Assembly" id="1218" name="Crulanda.Tests.PlayMode.dll" fullname="C:/Users/chris/Documents/Codex/2026-09-28/hel/work/encounter-validation/Library/ScriptAssemblies/Crulanda.Tests.PlayMode.dll" runstate="Runnable" testcasecount="175" result="Passed" start-time="2026-10-04 03:42:22Z" end-time="2026-10-04 04:38:18Z" duration="3356.185592" total="175" passed="175" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="21616" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="EditorOnly" value="False" />
+      </properties>
+      <test-suite type="TestSuite" id="1219" name="Crulanda" fullname="Crulanda" runstate="Runnable" testcasecount="175" result="Passed" start-time="2026-10-04 03:42:22Z" end-time="2026-10-04 04:38:18Z" duration="3356.184452" total="175" passed="175" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1220" name="Tests" fullname="Crulanda.Tests" runstate="Runnable" testcasecount="175" result="Passed" start-time="2026-10-04 03:42:22Z" end-time="2026-10-04 04:38:18Z" duration="3356.183121" total="175" passed="175" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestFixture" id="1001" name="ActorSmokeTests" fullname="Crulanda.Tests.ActorSmokeTests" classname="Crulanda.Tests.ActorSmokeTests" runstate="Runnable" testcasecount="8" result="Passed" start-time="2026-10-04 03:42:22Z" end-time="2026-10-04 03:42:22Z" duration="0.036230" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1005" name="Actor_initializes_from_archetype_and_registers" fullname="Crulanda.Tests.ActorSmokeTests.Actor_initializes_from_archetype_and_registers" methodname="Actor_initializes_from_archetype_and_registers" classname="Crulanda.Tests.ActorSmokeTests" runstate="Runnable" seed="716753659" result="Passed" start-time="2026-10-04 03:42:22Z" end-time="2026-10-04 03:42:22Z" duration="0.016689" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1009" name="Disabled_actors_leave_the_registry" fullname="Crulanda.Tests.ActorSmokeTests.Disabled_actors_leave_the_registry" methodname="Disabled_actors_leave_the_registry" classname="Crulanda.Tests.ActorSmokeTests" runstate="Runnable" seed="414568443" result="Passed" start-time="2026-10-04 03:42:22Z" end-time="2026-10-04 03:42:22Z" duration="0.000983" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1007" name="Healing_is_capped_and_blocked_while_dead" fullname="Crulanda.Tests.ActorSmokeTests.Healing_is_capped_and_blocked_while_dead" methodname="Healing_is_capped_and_blocked_while_dead" classname="Crulanda.Tests.ActorSmokeTests" runstate="Runnable" seed="357729736" result="Passed" start-time="2026-10-04 03:42:22Z" end-time="2026-10-04 03:42:22Z" duration="0.003206" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[[Actors] Smoke Actor died.
+]]></output>
+            </test-case>
+            <test-case id="1006" name="Lethal_damage_kills_once_and_publishes_event" fullname="Crulanda.Tests.ActorSmokeTests.Lethal_damage_kills_once_and_publishes_event" methodname="Lethal_damage_kills_once_and_publishes_event" classname="Crulanda.Tests.ActorSmokeTests" runstate="Runnable" seed="1295185924" result="Passed" start-time="2026-10-04 03:42:22Z" end-time="2026-10-04 03:42:22Z" duration="0.001292" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[[Actors] Smoke Actor died.
+]]></output>
+            </test-case>
+            <test-case id="1004" name="Maximum_reduction_to_zero_health_publishes_death_once" fullname="Crulanda.Tests.ActorSmokeTests.Maximum_reduction_to_zero_health_publishes_death_once" methodname="Maximum_reduction_to_zero_health_publishes_death_once" classname="Crulanda.Tests.ActorSmokeTests" runstate="Runnable" seed="1746741522" result="Passed" start-time="2026-10-04 03:42:22Z" end-time="2026-10-04 03:42:22Z" duration="0.001146" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[[Actors] Smoke Actor died.
+]]></output>
+            </test-case>
+            <test-case id="1008" name="Raising_max_health_via_stats_preserves_the_ratio" fullname="Crulanda.Tests.ActorSmokeTests.Raising_max_health_via_stats_preserves_the_ratio" methodname="Raising_max_health_via_stats_preserves_the_ratio" classname="Crulanda.Tests.ActorSmokeTests" runstate="Runnable" seed="1958277052" result="Passed" start-time="2026-10-04 03:42:22Z" end-time="2026-10-04 03:42:22Z" duration="0.000966" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1002" name="Reinitialize_clears_previous_stats_and_modifiers" fullname="Crulanda.Tests.ActorSmokeTests.Reinitialize_clears_previous_stats_and_modifiers" methodname="Reinitialize_clears_previous_stats_and_modifiers" classname="Crulanda.Tests.ActorSmokeTests" runstate="Runnable" seed="1659463354" result="Passed" start-time="2026-10-04 03:42:22Z" end-time="2026-10-04 03:42:22Z" duration="0.001100" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1003" name="Restored_identity_survives_activation" fullname="Crulanda.Tests.ActorSmokeTests.Restored_identity_survives_activation" methodname="Restored_identity_survives_activation" classname="Crulanda.Tests.ActorSmokeTests" runstate="Runnable" seed="1813778429" result="Passed" start-time="2026-10-04 03:42:22Z" end-time="2026-10-04 03:42:22Z" duration="0.001375" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1010" name="ArmouryLiveTests" fullname="Crulanda.Tests.ArmouryLiveTests" classname="Crulanda.Tests.ArmouryLiveTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-04 03:42:22Z" end-time="2026-10-04 03:42:54Z" duration="32.105758" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1011" name="A_new_look_raises_a_toast_and_counts_on_the_tab" fullname="Crulanda.Tests.ArmouryLiveTests.A_new_look_raises_a_toast_and_counts_on_the_tab" methodname="A_new_look_raises_a_toast_and_counts_on_the_tab" classname="Crulanda.Tests.ArmouryLiveTests" runstate="Runnable" seed="1875773254" result="Passed" start-time="2026-10-04 03:42:22Z" end-time="2026-10-04 03:42:41Z" duration="19.236518" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11212 ms (prepare 18, ground 3603, water 124, props 556, groves 1220, edge 464, backdrop 381, grass 4287, plants 378, batching 52, map 2, rest 127).
+]]></output>
+            </test-case>
+            <test-case id="1012" name="Killing_Caddock_names_his_pieces_and_the_counts_survive_a_load" fullname="Crulanda.Tests.ArmouryLiveTests.Killing_Caddock_names_his_pieces_and_the_counts_survive_a_load" methodname="Killing_Caddock_names_his_pieces_and_the_counts_survive_a_load" classname="Crulanda.Tests.ArmouryLiveTests" runstate="Runnable" seed="758836836" result="Passed" start-time="2026-10-04 03:42:41Z" end-time="2026-10-04 03:42:54Z" duration="12.868503" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 10965 ms (prepare 10, ground 3562, water 108, props 408, groves 1246, edge 495, backdrop 358, grass 4295, plants 367, batching 53, map 2, rest 61).
+[Actors] Caddock, the Bandit King (elite) died.
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1013" name="BountyBoardTests" fullname="Crulanda.Tests.BountyBoardTests" classname="Crulanda.Tests.BountyBoardTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-10-04 03:42:54Z" end-time="2026-10-04 03:43:18Z" duration="24.818880" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1014" name="The_board_by_the_Cask_pays_a_wolf_bounty_in_crowns_and_the_rare_courier_pays_the_shard" fullname="Crulanda.Tests.BountyBoardTests.The_board_by_the_Cask_pays_a_wolf_bounty_in_crowns_and_the_rare_courier_pays_the_shard" methodname="The_board_by_the_Cask_pays_a_wolf_bounty_in_crowns_and_the_rare_courier_pays_the_shard" classname="Crulanda.Tests.BountyBoardTests" runstate="Runnable" seed="1840936488" result="Passed" start-time="2026-10-04 03:42:54Z" end-time="2026-10-04 03:43:18Z" duration="24.814500" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 10803 ms (prepare 7, ground 3460, water 106, props 387, groves 1193, edge 479, backdrop 369, grass 4330, plants 364, batching 45, map 1, rest 62).
+[Actors] Grey wolf died.
+[Actors] Grey wolf died.
+[Actors] Grey wolf died.
+[Actors] Grey wolf died.
+[Actors] Grey wolf died.
+[Actors] Grey wolf died.
+[Actors] Bureau courier died.
+Zone zone.oakhaven (560 m) built in 10939 ms (prepare 7, ground 3513, water 122, props 382, groves 1180, edge 501, backdrop 376, grass 4383, plants 360, batching 51, map 2, rest 62).
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1015" name="BuildingGroundTests" fullname="Crulanda.Tests.BuildingGroundTests" classname="Crulanda.Tests.BuildingGroundTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-04 03:43:18Z" end-time="2026-10-04 03:44:25Z" duration="66.639077" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1016" name="Every_building_stands_on_stone_down_to_the_ground" fullname="Crulanda.Tests.BuildingGroundTests.Every_building_stands_on_stone_down_to_the_ground" methodname="Every_building_stands_on_stone_down_to_the_ground" classname="Crulanda.Tests.BuildingGroundTests" runstate="Runnable" seed="997196577" result="Passed" start-time="2026-10-04 03:43:19Z" end-time="2026-10-04 03:44:13Z" duration="54.107411" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 10820 ms (prepare 10, ground 3419, water 124, props 391, groves 1221, edge 497, backdrop 356, grass 4312, plants 363, batching 54, map 1, rest 72).
+Zone zone.ashrim (430 m) built in 4388 ms (prepare 0, ground 1375, water 75, props 69, groves 1253, edge 1165, backdrop 109, grass 212, plants 1, batching 58, map 1, rest 70).
+Zone zone.khaven (410 m) built in 7634 ms (prepare 4, ground 2158, water 21, props 133, groves 2361, edge 1195, backdrop 248, grass 1258, plants 120, batching 78, map 1, rest 57).
+Zone zone.oakhaven (560 m) built in 11040 ms (prepare 13, ground 3597, water 110, props 417, groves 1228, edge 499, backdrop 357, grass 4331, plants 360, batching 55, map 2, rest 71).
+Zone zone.peaks (430 m) built in 4730 ms (prepare 727, ground 2492, water 1, props 74, groves 148, edge 163, backdrop 175, grass 853, plants 24, batching 13, map 2, rest 58).
+Zone zone.verdant (430 m) built in 9595 ms (prepare 3, ground 1539, water 18, props 1380, groves 2397, edge 1094, backdrop 196, grass 2117, plants 728, batching 59, map 1, rest 63).
+]]></output>
+            </test-case>
+            <test-case id="1017" name="The_smithy_and_the_inn_still_work_after_their_rebuild" fullname="Crulanda.Tests.BuildingGroundTests.The_smithy_and_the_inn_still_work_after_their_rebuild" methodname="The_smithy_and_the_inn_still_work_after_their_rebuild" classname="Crulanda.Tests.BuildingGroundTests" runstate="Runnable" seed="1642566631" result="Passed" start-time="2026-10-04 03:44:13Z" end-time="2026-10-04 03:44:25Z" duration="12.449203" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 10974 ms (prepare 7, ground 3528, water 108, props 411, groves 1242, edge 505, backdrop 358, grass 4326, plants 360, batching 55, map 1, rest 73).
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1018" name="CameraAndTargetTests" fullname="Crulanda.Tests.CameraAndTargetTests" classname="Crulanda.Tests.CameraAndTargetTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-04 03:44:25Z" end-time="2026-10-04 03:44:51Z" duration="26.290480" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1019" name="A_tree_between_the_camera_and_the_player_fades_and_comes_back" fullname="Crulanda.Tests.CameraAndTargetTests.A_tree_between_the_camera_and_the_player_fades_and_comes_back" methodname="A_tree_between_the_camera_and_the_player_fades_and_comes_back" classname="Crulanda.Tests.CameraAndTargetTests" runstate="Runnable" seed="1417830140" result="Passed" start-time="2026-10-04 03:44:25Z" end-time="2026-10-04 03:44:39Z" duration="13.817633" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11089 ms (prepare 7, ground 3657, water 112, props 414, groves 1232, edge 499, backdrop 356, grass 4335, plants 360, batching 54, map 1, rest 62).
+]]></output>
+            </test-case>
+            <test-case id="1020" name="The_target_ring_marks_what_is_selected" fullname="Crulanda.Tests.CameraAndTargetTests.The_target_ring_marks_what_is_selected" methodname="The_target_ring_marks_what_is_selected" classname="Crulanda.Tests.CameraAndTargetTests" runstate="Runnable" seed="1935759650" result="Passed" start-time="2026-10-04 03:44:39Z" end-time="2026-10-04 03:44:51Z" duration="12.466142" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 10950 ms (prepare 7, ground 3535, water 108, props 424, groves 1236, edge 489, backdrop 358, grass 4309, plants 367, batching 53, map 1, rest 63).
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1021" name="CaveTests" fullname="Crulanda.Tests.CaveTests" classname="Crulanda.Tests.CaveTests" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-10-04 03:44:51Z" end-time="2026-10-04 03:46:49Z" duration="117.389524" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1030" name="Every_camp_in_the_hollow_stands_on_its_floor" fullname="Crulanda.Tests.CaveTests.Every_camp_in_the_hollow_stands_on_its_floor" methodname="Every_camp_in_the_hollow_stands_on_its_floor" classname="Crulanda.Tests.CaveTests" runstate="Runnable" seed="690931948" result="Passed" start-time="2026-10-04 03:44:51Z" end-time="2026-10-04 03:45:04Z" duration="12.632319" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11201 ms (prepare 10, ground 3682, water 117, props 406, groves 1267, edge 492, backdrop 365, grass 4366, plants 371, batching 54, map 1, rest 70).
+]]></output>
+            </test-case>
+            <test-case id="1024" name="Inside_is_dark_and_dry_and_outside_is_not" fullname="Crulanda.Tests.CaveTests.Inside_is_dark_and_dry_and_outside_is_not" methodname="Inside_is_dark_and_dry_and_outside_is_not" classname="Crulanda.Tests.CaveTests" runstate="Runnable" seed="1788361925" result="Passed" start-time="2026-10-04 03:45:04Z" end-time="2026-10-04 03:45:16Z" duration="12.401346" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 10929 ms (prepare 10, ground 3526, water 110, props 414, groves 1231, edge 470, backdrop 357, grass 4338, plants 358, batching 50, map 2, rest 63).
+]]></output>
+            </test-case>
+            <test-case id="1028" name="No_land_shows_inside_the_passage" fullname="Crulanda.Tests.CaveTests.No_land_shows_inside_the_passage" methodname="No_land_shows_inside_the_passage" classname="Crulanda.Tests.CaveTests" runstate="Runnable" seed="1451126575" result="Passed" start-time="2026-10-04 03:45:16Z" end-time="2026-10-04 03:45:29Z" duration="12.387992" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 10954 ms (prepare 10, ground 3570, water 117, props 401, groves 1213, edge 482, backdrop 360, grass 4327, plants 362, batching 48, map 2, rest 62).
+]]></output>
+            </test-case>
+            <test-case id="1025" name="Nothing_grows_in_the_hollow_and_the_deserters_hold_it" fullname="Crulanda.Tests.CaveTests.Nothing_grows_in_the_hollow_and_the_deserters_hold_it" methodname="Nothing_grows_in_the_hollow_and_the_deserters_hold_it" classname="Crulanda.Tests.CaveTests" runstate="Runnable" seed="715346758" result="Passed" start-time="2026-10-04 03:45:29Z" end-time="2026-10-04 03:45:41Z" duration="12.238113" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 10821 ms (prepare 10, ground 3400, water 118, props 399, groves 1225, edge 504, backdrop 363, grass 4325, plants 359, batching 53, map 2, rest 63).
+]]></output>
+            </test-case>
+            <test-case id="1022" name="The_hollow_is_walkable_from_the_green_to_the_kings_hall" fullname="Crulanda.Tests.CaveTests.The_hollow_is_walkable_from_the_green_to_the_kings_hall" methodname="The_hollow_is_walkable_from_the_green_to_the_kings_hall" classname="Crulanda.Tests.CaveTests" runstate="Runnable" seed="102281546" result="Passed" start-time="2026-10-04 03:45:41Z" end-time="2026-10-04 03:45:54Z" duration="12.562287" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11003 ms (prepare 9, ground 3610, water 108, props 405, groves 1219, edge 480, backdrop 360, grass 4331, plants 363, batching 54, map 2, rest 62).
+]]></output>
+            </test-case>
+            <test-case id="1027" name="The_hollow_lies_out_in_the_north_hills_with_its_back_to_the_village" fullname="Crulanda.Tests.CaveTests.The_hollow_lies_out_in_the_north_hills_with_its_back_to_the_village" methodname="The_hollow_lies_out_in_the_north_hills_with_its_back_to_the_village" classname="Crulanda.Tests.CaveTests" runstate="Runnable" seed="1327867729" result="Passed" start-time="2026-10-04 03:45:54Z" end-time="2026-10-04 03:46:06Z" duration="12.409640" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11025 ms (prepare 6, ground 3629, water 116, props 411, groves 1221, edge 478, backdrop 368, grass 4318, plants 364, batching 49, map 2, rest 63).
+]]></output>
+            </test-case>
+            <test-case id="1026" name="The_hollow_runs_deep_under_the_northern_hills" fullname="Crulanda.Tests.CaveTests.The_hollow_runs_deep_under_the_northern_hills" methodname="The_hollow_runs_deep_under_the_northern_hills" classname="Crulanda.Tests.CaveTests" runstate="Runnable" seed="655827031" result="Passed" start-time="2026-10-04 03:46:06Z" end-time="2026-10-04 03:46:19Z" duration="12.658388" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11001 ms (prepare 9, ground 3604, water 109, props 390, groves 1239, edge 483, backdrop 368, grass 4305, plants 377, batching 52, map 2, rest 63).
+]]></output>
+            </test-case>
+            <test-case id="1023" name="The_passage_is_walled_and_roofed_and_clear_down_the_middle" fullname="Crulanda.Tests.CaveTests.The_passage_is_walled_and_roofed_and_clear_down_the_middle" methodname="The_passage_is_walled_and_roofed_and_clear_down_the_middle" classname="Crulanda.Tests.CaveTests" runstate="Runnable" seed="1801369378" result="Passed" start-time="2026-10-04 03:46:19Z" end-time="2026-10-04 03:46:31Z" duration="12.616117" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11135 ms (prepare 10, ground 3758, water 117, props 384, groves 1207, edge 501, backdrop 367, grass 4308, plants 366, batching 47, map 1, rest 69).
+]]></output>
+            </test-case>
+            <test-case id="1029" name="You_can_stand_on_every_floor_down_to_the_hall" fullname="Crulanda.Tests.CaveTests.You_can_stand_on_every_floor_down_to_the_hall" methodname="You_can_stand_on_every_floor_down_to_the_hall" classname="Crulanda.Tests.CaveTests" runstate="Runnable" seed="2118227049" result="Passed" start-time="2026-10-04 03:46:31Z" end-time="2026-10-04 03:46:49Z" duration="17.474413" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11121 ms (prepare 10, ground 3597, water 118, props 402, groves 1179, edge 474, backdrop 368, grass 4475, plants 375, batching 53, map 1, rest 69).
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1031" name="CombatIntegrationTests" fullname="Crulanda.Tests.CombatIntegrationTests" classname="Crulanda.Tests.CombatIntegrationTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-10-04 03:46:49Z" end-time="2026-10-04 03:46:49Z" duration="0.310103" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1032" name="Guard_expires_and_death_removes_effects" fullname="Crulanda.Tests.CombatIntegrationTests.Guard_expires_and_death_removes_effects" methodname="Guard_expires_and_death_removes_effects" classname="Crulanda.Tests.CombatIntegrationTests" runstate="Runnable" seed="158788204" result="Passed" start-time="2026-10-04 03:46:49Z" end-time="2026-10-04 03:46:49Z" duration="0.151368" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[[Actors] Combat test died.
+]]></output>
+            </test-case>
+            <test-case id="1035" name="Lethal_stat_change_clears_effects_without_leaving_modifiers" fullname="Crulanda.Tests.CombatIntegrationTests.Lethal_stat_change_clears_effects_without_leaving_modifiers" methodname="Lethal_stat_change_clears_effects_without_leaving_modifiers" classname="Crulanda.Tests.CombatIntegrationTests" runstate="Runnable" seed="1039222969" result="Passed" start-time="2026-10-04 03:46:49Z" end-time="2026-10-04 03:46:49Z" duration="0.001253" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[[Actors] Combat test died.
+]]></output>
+            </test-case>
+            <test-case id="1034" name="One_effect_applies_its_stat_changes_together" fullname="Crulanda.Tests.CombatIntegrationTests.One_effect_applies_its_stat_changes_together" methodname="One_effect_applies_its_stat_changes_together" classname="Crulanda.Tests.CombatIntegrationTests" runstate="Runnable" seed="676226976" result="Passed" start-time="2026-10-04 03:46:49Z" end-time="2026-10-04 03:46:49Z" duration="0.000735" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1033" name="Primary_stat_buffs_recalculate_and_expire_without_drifting" fullname="Crulanda.Tests.CombatIntegrationTests.Primary_stat_buffs_recalculate_and_expire_without_drifting" methodname="Primary_stat_buffs_recalculate_and_expire_without_drifting" classname="Crulanda.Tests.CombatIntegrationTests" runstate="Runnable" seed="1804312495" result="Passed" start-time="2026-10-04 03:46:49Z" end-time="2026-10-04 03:46:49Z" duration="0.150731" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1036" name="CraftStationTests" fullname="Crulanda.Tests.CraftStationTests" classname="Crulanda.Tests.CraftStationTests" runstate="Runnable" testcasecount="7" result="Passed" start-time="2026-10-04 03:46:49Z" end-time="2026-10-04 03:49:09Z" duration="139.719901" total="7" passed="7" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1040" name="BoarStew_AtTheCaskKitchen_IsCookedAndEaten" fullname="Crulanda.Tests.CraftStationTests.BoarStew_AtTheCaskKitchen_IsCookedAndEaten" methodname="BoarStew_AtTheCaskKitchen_IsCookedAndEaten" classname="Crulanda.Tests.CraftStationTests" runstate="Runnable" seed="1872294104" result="Passed" start-time="2026-10-04 03:46:49Z" end-time="2026-10-04 03:47:09Z" duration="19.527079" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11052 ms (prepare 10, ground 3574, water 118, props 441, groves 1263, edge 500, backdrop 356, grass 4313, plants 361, batching 49, map 2, rest 65).
+]]></output>
+            </test-case>
+            <test-case id="1039" name="CaskKitchen_CountsAsFire" fullname="Crulanda.Tests.CraftStationTests.CaskKitchen_CountsAsFire" methodname="CaskKitchen_CountsAsFire" classname="Crulanda.Tests.CraftStationTests" runstate="Runnable" seed="1194996626" result="Passed" start-time="2026-10-04 03:47:09Z" end-time="2026-10-04 03:47:26Z" duration="17.293174" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 10916 ms (prepare 12, ground 3534, water 109, props 414, groves 1222, edge 473, backdrop 365, grass 4306, plants 366, batching 49, map 1, rest 65).
+]]></output>
+            </test-case>
+            <test-case id="1037" name="Charcoal_AtVellsSmithy_Works_TenMetresAway_Refused" fullname="Crulanda.Tests.CraftStationTests.Charcoal_AtVellsSmithy_Works_TenMetresAway_Refused" methodname="Charcoal_AtVellsSmithy_Works_TenMetresAway_Refused" classname="Crulanda.Tests.CraftStationTests" runstate="Runnable" seed="1317283292" result="Passed" start-time="2026-10-04 03:47:26Z" end-time="2026-10-04 03:47:55Z" duration="29.125060" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11124 ms (prepare 7, ground 3504, water 109, props 386, groves 1347, edge 491, backdrop 361, grass 4435, plants 364, batching 54, map 2, rest 64).
+]]></output>
+            </test-case>
+            <test-case id="1043" name="DryingHut_IsTheBench" fullname="Crulanda.Tests.CraftStationTests.DryingHut_IsTheBench" methodname="DryingHut_IsTheBench" classname="Crulanda.Tests.CraftStationTests" runstate="Runnable" seed="603099998" result="Passed" start-time="2026-10-04 03:47:55Z" end-time="2026-10-04 03:48:12Z" duration="17.347778" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 10939 ms (prepare 7, ground 3577, water 109, props 398, groves 1258, edge 483, backdrop 359, grass 4276, plants 361, batching 48, map 1, rest 62).
+]]></output>
+            </test-case>
+            <test-case id="1038" name="GoldenCaskHearth_CountsAsFire" fullname="Crulanda.Tests.CraftStationTests.GoldenCaskHearth_CountsAsFire" methodname="GoldenCaskHearth_CountsAsFire" classname="Crulanda.Tests.CraftStationTests" runstate="Runnable" seed="1849819008" result="Passed" start-time="2026-10-04 03:48:12Z" end-time="2026-10-04 03:48:30Z" duration="17.512056" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 10909 ms (prepare 7, ground 3546, water 116, props 392, groves 1224, edge 469, backdrop 366, grass 4312, plants 357, batching 56, map 1, rest 63).
+]]></output>
+            </test-case>
+            <test-case id="1041" name="TakeUpBlacksmithing_AtTheForge_AtNight_Works" fullname="Crulanda.Tests.CraftStationTests.TakeUpBlacksmithing_AtTheForge_AtNight_Works" methodname="TakeUpBlacksmithing_AtTheForge_AtNight_Works" classname="Crulanda.Tests.CraftStationTests" runstate="Runnable" seed="1702452818" result="Passed" start-time="2026-10-04 03:48:30Z" end-time="2026-10-04 03:48:54Z" duration="24.077534" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11062 ms (prepare 7, ground 3572, water 109, props 428, groves 1260, edge 490, backdrop 361, grass 4354, plants 364, batching 54, map 1, rest 62).
+]]></output>
+            </test-case>
+            <test-case id="1042" name="Vell_at_the_anvil_starts_you_off_and_works_the_bellows" fullname="Crulanda.Tests.CraftStationTests.Vell_at_the_anvil_starts_you_off_and_works_the_bellows" methodname="Vell_at_the_anvil_starts_you_off_and_works_the_bellows" classname="Crulanda.Tests.CraftStationTests" runstate="Runnable" seed="1981379865" result="Passed" start-time="2026-10-04 03:48:54Z" end-time="2026-10-04 03:49:09Z" duration="14.835604" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 10847 ms (prepare 13, ground 3476, water 118, props 398, groves 1188, edge 480, backdrop 363, grass 4334, plants 359, batching 49, map 2, rest 67).
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1044" name="DiscoveryTests" fullname="Crulanda.Tests.DiscoveryTests" classname="Crulanda.Tests.DiscoveryTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-10-04 03:49:09Z" end-time="2026-10-04 03:50:32Z" duration="83.012362" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1047" name="A_chest_stays_locked_until_its_key_is_found" fullname="Crulanda.Tests.DiscoveryTests.A_chest_stays_locked_until_its_key_is_found" methodname="A_chest_stays_locked_until_its_key_is_found" classname="Crulanda.Tests.DiscoveryTests" runstate="Runnable" seed="807556271" result="Passed" start-time="2026-10-04 03:49:09Z" end-time="2026-10-04 03:49:21Z" duration="12.290258" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 10901 ms (prepare 7, ground 3548, water 122, props 398, groves 1220, edge 487, backdrop 366, grass 4274, plants 363, batching 52, map 1, rest 63).
+]]></output>
+            </test-case>
+            <test-case id="1045" name="A_lookout_is_found_by_walking_onto_it_and_pays_once" fullname="Crulanda.Tests.DiscoveryTests.A_lookout_is_found_by_walking_onto_it_and_pays_once" methodname="A_lookout_is_found_by_walking_onto_it_and_pays_once" classname="Crulanda.Tests.DiscoveryTests" runstate="Runnable" seed="1310691012" result="Passed" start-time="2026-10-04 03:49:21Z" end-time="2026-10-04 03:49:41Z" duration="19.471154" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 10881 ms (prepare 7, ground 3528, water 114, props 393, groves 1188, edge 478, backdrop 364, grass 4327, plants 362, batching 54, map 2, rest 64).
+]]></output>
+            </test-case>
+            <test-case id="1048" name="Finds_survive_save_and_load_and_a_reload_and_never_pay_twice" fullname="Crulanda.Tests.DiscoveryTests.Finds_survive_save_and_load_and_a_reload_and_never_pay_twice" methodname="Finds_survive_save_and_load_and_a_reload_and_never_pay_twice" classname="Crulanda.Tests.DiscoveryTests" runstate="Runnable" seed="482543257" result="Passed" start-time="2026-10-04 03:49:41Z" end-time="2026-10-04 03:50:07Z" duration="26.657588" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 10891 ms (prepare 10, ground 3506, water 109, props 395, groves 1228, edge 492, backdrop 363, grass 4318, plants 356, batching 50, map 2, rest 62).
+Zone zone.oakhaven (560 m) built in 10805 ms (prepare 10, ground 3462, water 110, props 411, groves 1230, edge 489, backdrop 359, grass 4258, plants 355, batching 50, map 2, rest 69).
+]]></output>
+            </test-case>
+            <test-case id="1046" name="Searching_a_cache_pays_xp_gold_its_item_and_its_page" fullname="Crulanda.Tests.DiscoveryTests.Searching_a_cache_pays_xp_gold_its_item_and_its_page" methodname="Searching_a_cache_pays_xp_gold_its_item_and_its_page" classname="Crulanda.Tests.DiscoveryTests" runstate="Runnable" seed="874339781" result="Passed" start-time="2026-10-04 03:50:07Z" end-time="2026-10-04 03:50:19Z" duration="12.224417" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 10859 ms (prepare 7, ground 3492, water 110, props 398, groves 1215, edge 498, backdrop 363, grass 4294, plants 362, batching 55, map 1, rest 64).
+]]></output>
+            </test-case>
+            <test-case id="1049" name="The_book_counts_found_of_total_per_zone_and_no_map_marks_a_secret" fullname="Crulanda.Tests.DiscoveryTests.The_book_counts_found_of_total_per_zone_and_no_map_marks_a_secret" methodname="The_book_counts_found_of_total_per_zone_and_no_map_marks_a_secret" classname="Crulanda.Tests.DiscoveryTests" runstate="Runnable" seed="1761535937" result="Passed" start-time="2026-10-04 03:50:19Z" end-time="2026-10-04 03:50:32Z" duration="12.362900" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 10896 ms (prepare 8, ground 3485, water 109, props 405, groves 1223, edge 475, backdrop 364, grass 4342, plants 361, batching 52, map 2, rest 70).
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1050" name="DruidLoopTests" fullname="Crulanda.Tests.DruidLoopTests" classname="Crulanda.Tests.DruidLoopTests" runstate="Runnable" testcasecount="11" result="Passed" start-time="2026-10-04 03:50:32Z" end-time="2026-10-04 03:51:02Z" duration="30.635567" total="11" passed="11" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1053" name="Barkhide_builds_bark_from_strikes_and_blows_and_barkmend_spends_it" fullname="Crulanda.Tests.DruidLoopTests.Barkhide_builds_bark_from_strikes_and_blows_and_barkmend_spends_it" methodname="Barkhide_builds_bark_from_strikes_and_blows_and_barkmend_spends_it" classname="Crulanda.Tests.DruidLoopTests" runstate="Runnable" seed="536769810" result="Passed" start-time="2026-10-04 03:50:32Z" end-time="2026-10-04 03:50:35Z" duration="3.304715" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1060" name="Bramblestorm_spends_glimmer_and_damages_the_area" fullname="Crulanda.Tests.DruidLoopTests.Bramblestorm_spends_glimmer_and_damages_the_area" methodname="Bramblestorm_spends_glimmer_and_damages_the_area" classname="Crulanda.Tests.DruidLoopTests" runstate="Runnable" seed="1204730908" result="Passed" start-time="2026-10-04 03:50:35Z" end-time="2026-10-04 03:50:39Z" duration="3.381322" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1059" name="Burst_bloom_consumes_seedling_for_a_big_heal" fullname="Crulanda.Tests.DruidLoopTests.Burst_bloom_consumes_seedling_for_a_big_heal" methodname="Burst_bloom_consumes_seedling_for_a_big_heal" classname="Crulanda.Tests.DruidLoopTests" runstate="Runnable" seed="626853092" result="Passed" start-time="2026-10-04 03:50:39Z" end-time="2026-10-04 03:50:42Z" duration="3.277773" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1051" name="Druid_is_a_separate_character_with_its_own_save" fullname="Crulanda.Tests.DruidLoopTests.Druid_is_a_separate_character_with_its_own_save" methodname="Druid_is_a_separate_character_with_its_own_save" classname="Crulanda.Tests.DruidLoopTests" runstate="Runnable" seed="1050093589" result="Passed" start-time="2026-10-04 03:50:42Z" end-time="2026-10-04 03:50:42Z" duration="0.086113" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1061" name="Druid_save_round_trips_talents_and_respec_keeps_form" fullname="Crulanda.Tests.DruidLoopTests.Druid_save_round_trips_talents_and_respec_keeps_form" methodname="Druid_save_round_trips_talents_and_respec_keeps_form" classname="Crulanda.Tests.DruidLoopTests" runstate="Runnable" seed="1560459518" result="Passed" start-time="2026-10-04 03:50:42Z" end-time="2026-10-04 03:50:42Z" duration="0.164316" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1057" name="Heartwood_brace_is_talent_gated_and_reduces_damage" fullname="Crulanda.Tests.DruidLoopTests.Heartwood_brace_is_talent_gated_and_reduces_damage" methodname="Heartwood_brace_is_talent_gated_and_reduces_damage" classname="Crulanda.Tests.DruidLoopTests" runstate="Runnable" seed="1936662510" result="Passed" start-time="2026-10-04 03:50:42Z" end-time="2026-10-04 03:50:44Z" duration="1.715147" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1058" name="Rending_flurry_spends_fang_over_two_seconds" fullname="Crulanda.Tests.DruidLoopTests.Rending_flurry_spends_fang_over_two_seconds" methodname="Rending_flurry_spends_fang_over_two_seconds" classname="Crulanda.Tests.DruidLoopTests" runstate="Runnable" seed="1803699402" result="Passed" start-time="2026-10-04 03:50:44Z" end-time="2026-10-04 03:50:48Z" duration="3.981133" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1055" name="Rootmend_seedling_heals_over_time_and_builds_sap" fullname="Crulanda.Tests.DruidLoopTests.Rootmend_seedling_heals_over_time_and_builds_sap" methodname="Rootmend_seedling_heals_over_time_and_builds_sap" classname="Crulanda.Tests.DruidLoopTests" runstate="Runnable" seed="1404943991" result="Passed" start-time="2026-10-04 03:50:48Z" end-time="2026-10-04 03:50:52Z" duration="3.880539" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1052" name="Shifting_costs_breath_and_never_refills_pools" fullname="Crulanda.Tests.DruidLoopTests.Shifting_costs_breath_and_never_refills_pools" methodname="Shifting_costs_breath_and_never_refills_pools" classname="Crulanda.Tests.DruidLoopTests" runstate="Runnable" seed="254380510" result="Passed" start-time="2026-10-04 03:50:52Z" end-time="2026-10-04 03:50:55Z" duration="3.279152" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1054" name="Thornclaw_rake_bleeds_and_tear_spends_fang" fullname="Crulanda.Tests.DruidLoopTests.Thornclaw_rake_bleeds_and_tear_spends_fang" methodname="Thornclaw_rake_bleeds_and_tear_spends_fang" classname="Crulanda.Tests.DruidLoopTests" runstate="Runnable" seed="1146229777" result="Passed" start-time="2026-10-04 03:50:55Z" end-time="2026-10-04 03:50:59Z" duration="3.877591" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1056" name="Thornsong_alternation_builds_glimmer_and_stillroot_roots" fullname="Crulanda.Tests.DruidLoopTests.Thornsong_alternation_builds_glimmer_and_stillroot_roots" methodname="Thornsong_alternation_builds_glimmer_and_stillroot_roots" classname="Crulanda.Tests.DruidLoopTests" runstate="Runnable" seed="142041545" result="Passed" start-time="2026-10-04 03:50:59Z" end-time="2026-10-04 03:51:02Z" duration="3.679802" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1062" name="EliteFightTests" fullname="Crulanda.Tests.EliteFightTests" classname="Crulanda.Tests.EliteFightTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-10-04 03:51:02Z" end-time="2026-10-04 03:53:01Z" duration="118.614974" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1067" name="An_elite_above_your_level_hits_harder_and_is_harder_to_hurt" fullname="Crulanda.Tests.EliteFightTests.An_elite_above_your_level_hits_harder_and_is_harder_to_hurt" methodname="An_elite_above_your_level_hits_harder_and_is_harder_to_hurt" classname="Crulanda.Tests.EliteFightTests" runstate="Runnable" seed="1149317487" result="Passed" start-time="2026-10-04 03:51:02Z" end-time="2026-10-04 03:51:16Z" duration="13.147849" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11695 ms (prepare 7, ground 4349, water 119, props 402, groves 1216, edge 492, backdrop 359, grass 4281, plants 355, batching 51, map 2, rest 62).
+]]></output>
+            </test-case>
+            <test-case id="1063" name="An_elite_winds_up_its_blow_and_stepping_away_avoids_it_while_standing_still_takes_it" fullname="Crulanda.Tests.EliteFightTests.An_elite_winds_up_its_blow_and_stepping_away_avoids_it_while_standing_still_takes_it" methodname="An_elite_winds_up_its_blow_and_stepping_away_avoids_it_while_standing_still_takes_it" classname="Crulanda.Tests.EliteFightTests" runstate="Runnable" seed="1770574089" result="Passed" start-time="2026-10-04 03:51:16Z" end-time="2026-10-04 03:51:48Z" duration="32.090744" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 10904 ms (prepare 7, ground 3515, water 119, props 403, groves 1213, edge 484, backdrop 364, grass 4303, plants 370, batching 53, map 2, rest 71).
+]]></output>
+            </test-case>
+            <test-case id="1066" name="An_elites_call_brings_its_kin_from_beyond_a_packs_reach" fullname="Crulanda.Tests.EliteFightTests.An_elites_call_brings_its_kin_from_beyond_a_packs_reach" methodname="An_elites_call_brings_its_kin_from_beyond_a_packs_reach" classname="Crulanda.Tests.EliteFightTests" runstate="Runnable" seed="303213318" result="Passed" start-time="2026-10-04 03:51:48Z" end-time="2026-10-04 03:52:07Z" duration="19.278863" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11033 ms (prepare 7, ground 3631, water 120, props 405, groves 1217, edge 486, backdrop 366, grass 4323, plants 367, batching 48, map 2, rest 61).
+]]></output>
+            </test-case>
+            <test-case id="1065" name="An_enraged_elite_swings_faster_and_a_reset_calms_it" fullname="Crulanda.Tests.EliteFightTests.An_enraged_elite_swings_faster_and_a_reset_calms_it" methodname="An_enraged_elite_swings_faster_and_a_reset_calms_it" classname="Crulanda.Tests.EliteFightTests" runstate="Runnable" seed="796215673" result="Passed" start-time="2026-10-04 03:52:07Z" end-time="2026-10-04 03:52:29Z" duration="22.253551" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 10948 ms (prepare 7, ground 3516, water 122, props 400, groves 1232, edge 502, backdrop 368, grass 4315, plants 361, batching 60, map 1, rest 64).
+]]></output>
+            </test-case>
+            <test-case id="1064" name="Guard_blunts_the_heavy_blow" fullname="Crulanda.Tests.EliteFightTests.Guard_blunts_the_heavy_blow" methodname="Guard_blunts_the_heavy_blow" classname="Crulanda.Tests.EliteFightTests" runstate="Runnable" seed="2069902978" result="Passed" start-time="2026-10-04 03:52:29Z" end-time="2026-10-04 03:52:48Z" duration="18.918796" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 10864 ms (prepare 7, ground 3471, water 107, props 395, groves 1208, edge 488, backdrop 358, grass 4352, plants 365, batching 49, map 3, rest 61).
+]]></output>
+            </test-case>
+            <test-case id="1068" name="Miras_health_follows_your_level" fullname="Crulanda.Tests.EliteFightTests.Miras_health_follows_your_level" methodname="Miras_health_follows_your_level" classname="Crulanda.Tests.EliteFightTests" runstate="Runnable" seed="1039029710" result="Passed" start-time="2026-10-04 03:52:48Z" end-time="2026-10-04 03:53:01Z" duration="12.923582" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 10868 ms (prepare 7, ground 3525, water 115, props 389, groves 1213, edge 481, backdrop 366, grass 4298, plants 364, batching 46, map 1, rest 63).
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1069" name="EncounterLoopTests" fullname="Crulanda.Tests.EncounterLoopTests" classname="Crulanda.Tests.EncounterLoopTests" runstate="Runnable" testcasecount="14" result="Passed" start-time="2026-10-04 03:53:01Z" end-time="2026-10-04 03:54:30Z" duration="88.439217" total="14" passed="14" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1079" name="Auto_attacks_continue_while_strike_is_on_cooldown" fullname="Crulanda.Tests.EncounterLoopTests.Auto_attacks_continue_while_strike_is_on_cooldown" methodname="Auto_attacks_continue_while_strike_is_on_cooldown" classname="Crulanda.Tests.EncounterLoopTests" runstate="Runnable" seed="890213649" result="Passed" start-time="2026-10-04 03:53:01Z" end-time="2026-10-04 03:53:04Z" duration="2.879329" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1073" name="Breaching_blow_is_talent_gated_spends_pressure_and_exposes" fullname="Crulanda.Tests.EncounterLoopTests.Breaching_blow_is_talent_gated_spends_pressure_and_exposes" methodname="Breaching_blow_is_talent_gated_spends_pressure_and_exposes" classname="Crulanda.Tests.EncounterLoopTests" runstate="Runnable" seed="1974088698" result="Passed" start-time="2026-10-04 03:53:04Z" end-time="2026-10-04 03:53:06Z" duration="1.665274" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1078" name="Class_unlocks_block_costs_and_effects_until_required_level" fullname="Crulanda.Tests.EncounterLoopTests.Class_unlocks_block_costs_and_effects_until_required_level" methodname="Class_unlocks_block_costs_and_effects_until_required_level" classname="Crulanda.Tests.EncounterLoopTests" runstate="Runnable" seed="1438999284" result="Passed" start-time="2026-10-04 03:53:06Z" end-time="2026-10-04 03:53:06Z" duration="0.063681" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1083" name="Death_recovery_keeps_equipment_and_repositions_party" fullname="Crulanda.Tests.EncounterLoopTests.Death_recovery_keeps_equipment_and_repositions_party" methodname="Death_recovery_keeps_equipment_and_repositions_party" classname="Crulanda.Tests.EncounterLoopTests" runstate="Runnable" seed="57566369" result="Passed" start-time="2026-10-04 03:53:06Z" end-time="2026-10-04 03:53:06Z" duration="0.067051" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[[Actors] You died.
+]]></output>
+            </test-case>
+            <test-case id="1072" name="Dps_signature_cleaves_and_combat_blocks_respec" fullname="Crulanda.Tests.EncounterLoopTests.Dps_signature_cleaves_and_combat_blocks_respec" methodname="Dps_signature_cleaves_and_combat_blocks_respec" classname="Crulanda.Tests.EncounterLoopTests" runstate="Runnable" seed="1012188645" result="Passed" start-time="2026-10-04 03:53:06Z" end-time="2026-10-04 03:53:06Z" duration="0.129985" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1074" name="Guard_exposes_attacker_and_timed_guard_refunds_vigor" fullname="Crulanda.Tests.EncounterLoopTests.Guard_exposes_attacker_and_timed_guard_refunds_vigor" methodname="Guard_exposes_attacker_and_timed_guard_refunds_vigor" classname="Crulanda.Tests.EncounterLoopTests" runstate="Runnable" seed="1016683255" result="Passed" start-time="2026-10-04 03:53:06Z" end-time="2026-10-04 03:53:06Z" duration="0.115730" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1075" name="Intercept_moves_to_mira_and_takes_her_next_blow" fullname="Crulanda.Tests.EncounterLoopTests.Intercept_moves_to_mira_and_takes_her_next_blow" methodname="Intercept_moves_to_mira_and_takes_her_next_blow" classname="Crulanda.Tests.EncounterLoopTests" runstate="Runnable" seed="937486709" result="Passed" start-time="2026-10-04 03:53:06Z" end-time="2026-10-04 03:53:06Z" duration="0.117103" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1082" name="Keyboard_movement_and_camera_follow_work" fullname="Crulanda.Tests.EncounterLoopTests.Keyboard_movement_and_camera_follow_work" methodname="Keyboard_movement_and_camera_follow_work" classname="Crulanda.Tests.EncounterLoopTests" runstate="Runnable" seed="1960519613" result="Passed" start-time="2026-10-04 03:53:06Z" end-time="2026-10-04 03:53:07Z" duration="0.763844" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1076" name="Muster_barrier_absorbs_and_plants_standard" fullname="Crulanda.Tests.EncounterLoopTests.Muster_barrier_absorbs_and_plants_standard" methodname="Muster_barrier_absorbs_and_plants_standard" classname="Crulanda.Tests.EncounterLoopTests" runstate="Runnable" seed="388248214" result="Passed" start-time="2026-10-04 03:53:07Z" end-time="2026-10-04 03:53:07Z" duration="0.128329" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1081" name="Recruit_fight_heal_loot_equip_save_and_reload" fullname="Crulanda.Tests.EncounterLoopTests.Recruit_fight_heal_loot_equip_save_and_reload" methodname="Recruit_fight_heal_loot_equip_save_and_reload" classname="Crulanda.Tests.EncounterLoopTests" runstate="Runnable" seed="1995776476" result="Passed" start-time="2026-10-04 03:53:07Z" end-time="2026-10-04 03:54:29Z" duration="81.991253" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[[Actors] Trail sentry 1 died.
+PACING_MEASUREMENT sentry.0 21.4 seconds
+[Actors] Trail sentry 2 died.
+PACING_MEASUREMENT sentry.1 25.4 seconds
+[Actors] Veteran sentry died.
+PACING_MEASUREMENT sentry.2 33.0 seconds
+[Actors] Trail sentry 1 died.
+[Actors] Trail sentry 2 died.
+[Actors] Veteran sentry died.
+]]></output>
+            </test-case>
+            <test-case id="1080" name="Solid_scenery_blocks_player_and_navigation" fullname="Crulanda.Tests.EncounterLoopTests.Solid_scenery_blocks_player_and_navigation" methodname="Solid_scenery_blocks_player_and_navigation" classname="Crulanda.Tests.EncounterLoopTests" runstate="Runnable" seed="1313670135" result="Passed" start-time="2026-10-04 03:54:29Z" end-time="2026-10-04 03:54:29Z" duration="0.071265" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1077" name="Support_challenge_and_guard_help_nearby_companion" fullname="Crulanda.Tests.EncounterLoopTests.Support_challenge_and_guard_help_nearby_companion" methodname="Support_challenge_and_guard_help_nearby_companion" classname="Crulanda.Tests.EncounterLoopTests" runstate="Runnable" seed="1328550755" result="Passed" start-time="2026-10-04 03:54:29Z" end-time="2026-10-04 03:54:29Z" duration="0.145409" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1070" name="Talent_stats_persist_and_respec_without_stacking" fullname="Crulanda.Tests.EncounterLoopTests.Talent_stats_persist_and_respec_without_stacking" methodname="Talent_stats_persist_and_respec_without_stacking" classname="Crulanda.Tests.EncounterLoopTests" runstate="Runnable" seed="1108421000" result="Passed" start-time="2026-10-04 03:54:29Z" end-time="2026-10-04 03:54:29Z" duration="0.156020" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1071" name="Tank_signature_modifies_guard_and_respec_clears_it" fullname="Crulanda.Tests.EncounterLoopTests.Tank_signature_modifies_guard_and_respec_clears_it" methodname="Tank_signature_modifies_guard_and_respec_clears_it" classname="Crulanda.Tests.EncounterLoopTests" runstate="Runnable" seed="1681393686" result="Passed" start-time="2026-10-04 03:54:29Z" end-time="2026-10-04 03:54:30Z" duration="0.139068" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1084" name="GatherTests" fullname="Crulanda.Tests.GatherTests" classname="Crulanda.Tests.GatherTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-10-04 03:54:30Z" end-time="2026-10-04 03:56:18Z" duration="108.577538" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1090" name="BagsFilledDuringWork_NodeStays_AndARefusedAbilityLeavesTheWork" fullname="Crulanda.Tests.GatherTests.BagsFilledDuringWork_NodeStays_AndARefusedAbilityLeavesTheWork" methodname="BagsFilledDuringWork_NodeStays_AndARefusedAbilityLeavesTheWork" classname="Crulanda.Tests.GatherTests" runstate="Runnable" seed="1928111632" result="Passed" start-time="2026-10-04 03:54:30Z" end-time="2026-10-04 03:54:43Z" duration="13.791989" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12437 ms (prepare 7, ground 5015, water 110, props 394, groves 1207, edge 505, backdrop 368, grass 4355, plants 363, batching 50, map 1, rest 62).
+]]></output>
+            </test-case>
+            <test-case id="1085" name="CopperSeam_WithPick_FillsBag_HidesAndReturns" fullname="Crulanda.Tests.GatherTests.CopperSeam_WithPick_FillsBag_HidesAndReturns" methodname="CopperSeam_WithPick_FillsBag_HidesAndReturns" classname="Crulanda.Tests.GatherTests" runstate="Runnable" seed="1731681827" result="Passed" start-time="2026-10-04 03:54:43Z" end-time="2026-10-04 03:55:01Z" duration="17.890066" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 10928 ms (prepare 7, ground 3514, water 120, props 408, groves 1217, edge 492, backdrop 366, grass 4319, plants 371, batching 51, map 1, rest 62).
+]]></output>
+            </test-case>
+            <test-case id="1089" name="Moving_CancelsWork" fullname="Crulanda.Tests.GatherTests.Moving_CancelsWork" methodname="Moving_CancelsWork" classname="Crulanda.Tests.GatherTests" runstate="Runnable" seed="1696355436" result="Passed" start-time="2026-10-04 03:55:01Z" end-time="2026-10-04 03:55:21Z" duration="19.965850" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 10928 ms (prepare 9, ground 3534, water 107, props 412, groves 1214, edge 481, backdrop 357, grass 4327, plants 374, batching 50, map 2, rest 61).
+]]></output>
+            </test-case>
+            <test-case id="1087" name="Respawn_SurvivesZoneReload" fullname="Crulanda.Tests.GatherTests.Respawn_SurvivesZoneReload" methodname="Respawn_SurvivesZoneReload" classname="Crulanda.Tests.GatherTests" runstate="Runnable" seed="1068035956" result="Passed" start-time="2026-10-04 03:55:21Z" end-time="2026-10-04 03:55:46Z" duration="24.871508" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 10907 ms (prepare 13, ground 3462, water 108, props 419, groves 1223, edge 496, backdrop 363, grass 4352, plants 363, batching 45, map 1, rest 62).
+Zone zone.oakhaven (560 m) built in 11048 ms (prepare 9, ground 3443, water 128, props 399, groves 1244, edge 504, backdrop 367, grass 4456, plants 374, batching 55, map 1, rest 68).
+]]></output>
+            </test-case>
+            <test-case id="1086" name="VeridianSeam_NewMiner_WorksItAtOnce_AsHardGoing" fullname="Crulanda.Tests.GatherTests.VeridianSeam_NewMiner_WorksItAtOnce_AsHardGoing" methodname="VeridianSeam_NewMiner_WorksItAtOnce_AsHardGoing" classname="Crulanda.Tests.GatherTests" runstate="Runnable" seed="565495536" result="Passed" start-time="2026-10-04 03:55:46Z" end-time="2026-10-04 03:56:01Z" duration="15.233231" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.verdant (430 m) built in 10028 ms (prepare 3, ground 1567, water 21, props 1426, groves 2522, edge 1160, backdrop 203, grass 2250, plants 750, batching 58, map 1, rest 67).
+]]></output>
+            </test-case>
+            <test-case id="1088" name="Yarrow_GivesBagHerbAlways_AndQuestItemWhenWanted" fullname="Crulanda.Tests.GatherTests.Yarrow_GivesBagHerbAlways_AndQuestItemWhenWanted" methodname="Yarrow_GivesBagHerbAlways_AndQuestItemWhenWanted" classname="Crulanda.Tests.GatherTests" runstate="Runnable" seed="704225395" result="Passed" start-time="2026-10-04 03:56:01Z" end-time="2026-10-04 03:56:18Z" duration="16.823140" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11292 ms (prepare 7, ground 3606, water 123, props 413, groves 1273, edge 504, backdrop 378, grass 4497, plants 368, batching 57, map 1, rest 65).
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1091" name="GearBinderTests" fullname="Crulanda.Tests.GearBinderTests" classname="Crulanda.Tests.GearBinderTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-10-04 03:56:18Z" end-time="2026-10-04 03:56:31Z" duration="13.366195" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1092" name="Binder_redresses_the_player_after_equip_unequip_and_load" fullname="Crulanda.Tests.GearBinderTests.Binder_redresses_the_player_after_equip_unequip_and_load" methodname="Binder_redresses_the_player_after_equip_unequip_and_load" classname="Crulanda.Tests.GearBinderTests" runstate="Runnable" seed="1520249592" result="Passed" start-time="2026-10-04 03:56:18Z" end-time="2026-10-04 03:56:31Z" duration="13.359907" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11400 ms (prepare 7, ground 3703, water 115, props 434, groves 1290, edge 515, backdrop 380, grass 4464, plants 364, batching 56, map 2, rest 70).
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1093" name="HollowQuestTests" fullname="Crulanda.Tests.HollowQuestTests" classname="Crulanda.Tests.HollowQuestTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-10-04 03:56:31Z" end-time="2026-10-04 03:57:37Z" duration="65.879606" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1098" name="A_mob_does_not_notice_you_through_solid_scenery" fullname="Crulanda.Tests.HollowQuestTests.A_mob_does_not_notice_you_through_solid_scenery" methodname="A_mob_does_not_notice_you_through_solid_scenery" classname="Crulanda.Tests.HollowQuestTests" runstate="Runnable" seed="1396464105" result="Passed" start-time="2026-10-04 03:56:31Z" end-time="2026-10-04 03:56:46Z" duration="14.386699" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11309 ms (prepare 7, ground 3622, water 114, props 430, groves 1289, edge 526, backdrop 372, grass 4454, plants 374, batching 54, map 2, rest 65).
+]]></output>
+            </test-case>
+            <test-case id="1097" name="Clear_the_hollow_search_the_plunder_and_hand_it_in" fullname="Crulanda.Tests.HollowQuestTests.Clear_the_hollow_search_the_plunder_and_hand_it_in" methodname="Clear_the_hollow_search_the_plunder_and_hand_it_in" classname="Crulanda.Tests.HollowQuestTests" runstate="Runnable" seed="1860088024" result="Passed" start-time="2026-10-04 03:56:46Z" end-time="2026-10-04 03:56:59Z" duration="12.982525" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11417 ms (prepare 7, ground 3701, water 113, props 438, groves 1303, edge 523, backdrop 376, grass 4466, plants 368, batching 52, map 2, rest 68).
+[Actors] Sandthrone deserter died.
+[Actors] Sandthrone deserter died.
+[Actors] Sandthrone deserter died.
+[Actors] Sandthrone deserter died.
+[Actors] Sandthrone deserter died.
+[Actors] Sandthrone deserter died.
+[Actors] Sandthrone deserter died.
+[Actors] Sandthrone deserter died.
+[Actors] Sandthrone deserter died.
+[Actors] Sandthrone deserter died.
+[Actors] Sandthrone deserter died.
+[Actors] Sandthrone deserter died.
+[Actors] Sandthrone deserter died.
+[Actors] Sandthrone deserter died.
+[Actors] Sandthrone deserter died.
+[Actors] Caddock, the Bandit King (elite) died.
+]]></output>
+            </test-case>
+            <test-case id="1096" name="Its_kill_targets_are_the_hollow_camps_and_its_plunder_can_be_searched" fullname="Crulanda.Tests.HollowQuestTests.Its_kill_targets_are_the_hollow_camps_and_its_plunder_can_be_searched" methodname="Its_kill_targets_are_the_hollow_camps_and_its_plunder_can_be_searched" classname="Crulanda.Tests.HollowQuestTests" runstate="Runnable" seed="77803055" result="Passed" start-time="2026-10-04 03:56:59Z" end-time="2026-10-04 03:57:12Z" duration="12.917253" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11383 ms (prepare 10, ground 3693, water 120, props 419, groves 1266, edge 505, backdrop 392, grass 4485, plants 367, batching 59, map 2, rest 65).
+]]></output>
+            </test-case>
+            <test-case id="1095" name="Not_offered_or_marked_at_level_2_and_offered_by_its_giver_at_level_3" fullname="Crulanda.Tests.HollowQuestTests.Not_offered_or_marked_at_level_2_and_offered_by_its_giver_at_level_3" methodname="Not_offered_or_marked_at_level_2_and_offered_by_its_giver_at_level_3" classname="Crulanda.Tests.HollowQuestTests" runstate="Runnable" seed="135606292" result="Passed" start-time="2026-10-04 03:57:12Z" end-time="2026-10-04 03:57:25Z" duration="12.771721" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11247 ms (prepare 7, ground 3599, water 124, props 415, groves 1265, edge 507, backdrop 370, grass 4470, plants 363, batching 56, map 1, rest 70).
+]]></output>
+            </test-case>
+            <test-case id="1094" name="The_tin_crown_waits_for_level_3_and_its_giver_lives_in_Oakhaven" fullname="Crulanda.Tests.HollowQuestTests.The_tin_crown_waits_for_level_3_and_its_giver_lives_in_Oakhaven" methodname="The_tin_crown_waits_for_level_3_and_its_giver_lives_in_Oakhaven" classname="Crulanda.Tests.HollowQuestTests" runstate="Runnable" seed="1287230454" result="Passed" start-time="2026-10-04 03:57:25Z" end-time="2026-10-04 03:57:37Z" duration="12.815581" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11277 ms (prepare 10, ground 3640, water 122, props 416, groves 1266, edge 512, backdrop 373, grass 4452, plants 368, batching 53, map 2, rest 63).
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1099" name="HuntTests" fullname="Crulanda.Tests.HuntTests" classname="Crulanda.Tests.HuntTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-10-04 03:57:37Z" end-time="2026-10-04 03:59:06Z" duration="88.944802" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1100" name="A_deer_can_be_targeted_killed_and_skinned" fullname="Crulanda.Tests.HuntTests.A_deer_can_be_targeted_killed_and_skinned" methodname="A_deer_can_be_targeted_killed_and_skinned" classname="Crulanda.Tests.HuntTests" runstate="Runnable" seed="1535880298" result="Passed" start-time="2026-10-04 03:57:37Z" end-time="2026-10-04 03:57:50Z" duration="12.778268" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11268 ms (prepare 7, ground 3640, water 123, props 420, groves 1252, edge 508, backdrop 371, grass 4454, plants 365, batching 56, map 1, rest 71).
+[Actors] Hill deer died.
+]]></output>
+            </test-case>
+            <test-case id="1101" name="A_wolf_body_is_skinned_and_a_deserter_searched" fullname="Crulanda.Tests.HuntTests.A_wolf_body_is_skinned_and_a_deserter_searched" methodname="A_wolf_body_is_skinned_and_a_deserter_searched" classname="Crulanda.Tests.HuntTests" runstate="Runnable" seed="1416633119" result="Passed" start-time="2026-10-04 03:57:50Z" end-time="2026-10-04 03:58:03Z" duration="12.858391" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11359 ms (prepare 10, ground 3637, water 124, props 417, groves 1266, edge 513, backdrop 376, grass 4515, plants 373, batching 54, map 2, rest 72).
+[Actors] Grey wolf died.
+]]></output>
+            </test-case>
+            <test-case id="1104" name="Chickens_sheep_and_cats_cannot_be_targeted" fullname="Crulanda.Tests.HuntTests.Chickens_sheep_and_cats_cannot_be_targeted" methodname="Chickens_sheep_and_cats_cannot_be_targeted" classname="Crulanda.Tests.HuntTests" runstate="Runnable" seed="377598064" result="Passed" start-time="2026-10-04 03:58:03Z" end-time="2026-10-04 03:58:16Z" duration="12.865327" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11365 ms (prepare 10, ground 3587, water 125, props 424, groves 1291, edge 521, backdrop 380, grass 4525, plants 373, batching 54, map 2, rest 73).
+]]></output>
+            </test-case>
+            <test-case id="1102" name="Game_bolts_and_sneaking_gets_closer" fullname="Crulanda.Tests.HuntTests.Game_bolts_and_sneaking_gets_closer" methodname="Game_bolts_and_sneaking_gets_closer" classname="Crulanda.Tests.HuntTests" runstate="Runnable" seed="1632796170" result="Passed" start-time="2026-10-04 03:58:16Z" end-time="2026-10-04 03:58:35Z" duration="18.958523" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11389 ms (prepare 7, ground 3629, water 126, props 423, groves 1294, edge 514, backdrop 377, grass 4519, plants 377, batching 55, map 1, rest 67).
+]]></output>
+            </test-case>
+            <test-case id="1105" name="Game_never_counts_as_an_enemy_for_the_village" fullname="Crulanda.Tests.HuntTests.Game_never_counts_as_an_enemy_for_the_village" methodname="Game_never_counts_as_an_enemy_for_the_village" classname="Crulanda.Tests.HuntTests" runstate="Runnable" seed="549132342" result="Passed" start-time="2026-10-04 03:58:35Z" end-time="2026-10-04 03:58:49Z" duration="14.512274" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11544 ms (prepare 7, ground 3711, water 119, props 445, groves 1320, edge 531, backdrop 374, grass 4537, plants 377, batching 53, map 1, rest 69).
+[Actors] Hill deer died.
+]]></output>
+            </test-case>
+            <test-case id="1103" name="Game_returns_after_its_respawn" fullname="Crulanda.Tests.HuntTests.Game_returns_after_its_respawn" methodname="Game_returns_after_its_respawn" classname="Crulanda.Tests.HuntTests" runstate="Runnable" seed="1271158652" result="Passed" start-time="2026-10-04 03:58:49Z" end-time="2026-10-04 03:59:06Z" duration="16.961935" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11467 ms (prepare 13, ground 3684, water 117, props 439, groves 1295, edge 531, backdrop 367, grass 4511, plants 387, batching 55, map 2, rest 66).
+[Actors] Rabbit died.
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1106" name="LootWindowTests" fullname="Crulanda.Tests.LootWindowTests" classname="Crulanda.Tests.LootWindowTests" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-10-04 03:59:06Z" end-time="2026-10-04 04:01:07Z" duration="120.924749" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1107" name="A_dead_camp_mob_carries_its_drops_and_a_beacon" fullname="Crulanda.Tests.LootWindowTests.A_dead_camp_mob_carries_its_drops_and_a_beacon" methodname="A_dead_camp_mob_carries_its_drops_and_a_beacon" classname="Crulanda.Tests.LootWindowTests" runstate="Runnable" seed="1827718560" result="Passed" start-time="2026-10-04 03:59:06Z" end-time="2026-10-04 03:59:19Z" duration="13.001843" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11474 ms (prepare 7, ground 3703, water 125, props 423, groves 1249, edge 506, backdrop 387, grass 4555, plants 386, batching 58, map 1, rest 74).
+[Actors] Grey wolf died.
+]]></output>
+            </test-case>
+            <test-case id="1114" name="An_elite_body_beacon_stands_on_the_ground" fullname="Crulanda.Tests.LootWindowTests.An_elite_body_beacon_stands_on_the_ground" methodname="An_elite_body_beacon_stands_on_the_ground" classname="Crulanda.Tests.LootWindowTests" runstate="Runnable" seed="1724295726" result="Passed" start-time="2026-10-04 03:59:19Z" end-time="2026-10-04 03:59:32Z" duration="13.032932" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11469 ms (prepare 7, ground 3764, water 128, props 419, groves 1278, edge 515, backdrop 374, grass 4475, plants 382, batching 54, map 1, rest 72).
+[Actors] Grey wolf died.
+]]></output>
+            </test-case>
+            <test-case id="1108" name="Beacon_colour_is_the_best_quality_on_the_body" fullname="Crulanda.Tests.LootWindowTests.Beacon_colour_is_the_best_quality_on_the_body" methodname="Beacon_colour_is_the_best_quality_on_the_body" classname="Crulanda.Tests.LootWindowTests" runstate="Runnable" seed="1389945192" result="Passed" start-time="2026-10-04 03:59:32Z" end-time="2026-10-04 03:59:45Z" duration="12.969604" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11419 ms (prepare 7, ground 3714, water 121, props 420, groves 1281, edge 517, backdrop 376, grass 4482, plants 375, batching 52, map 2, rest 72).
+[Actors] Grey wolf died.
+]]></output>
+            </test-case>
+            <test-case id="1111" name="Full_bags_leave_the_item_on_the_body" fullname="Crulanda.Tests.LootWindowTests.Full_bags_leave_the_item_on_the_body" methodname="Full_bags_leave_the_item_on_the_body" classname="Crulanda.Tests.LootWindowTests" runstate="Runnable" seed="817645348" result="Passed" start-time="2026-10-04 03:59:45Z" end-time="2026-10-04 03:59:58Z" duration="12.925664" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11403 ms (prepare 7, ground 3636, water 123, props 426, groves 1291, edge 517, backdrop 377, grass 4532, plants 372, batching 50, map 2, rest 70).
+[Actors] Grey wolf died.
+]]></output>
+            </test-case>
+            <test-case id="1110" name="Gear_opens_the_window_and_E_takes_all" fullname="Crulanda.Tests.LootWindowTests.Gear_opens_the_window_and_E_takes_all" methodname="Gear_opens_the_window_and_E_takes_all" classname="Crulanda.Tests.LootWindowTests" runstate="Runnable" seed="478556343" result="Passed" start-time="2026-10-04 03:59:58Z" end-time="2026-10-04 04:00:11Z" duration="12.881462" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11369 ms (prepare 7, ground 3720, water 120, props 425, groves 1232, edge 493, backdrop 385, grass 4484, plants 376, batching 51, map 2, rest 74).
+[Actors] Grey wolf died.
+]]></output>
+            </test-case>
+            <test-case id="1109" name="Junk_only_bodies_loot_with_one_press" fullname="Crulanda.Tests.LootWindowTests.Junk_only_bodies_loot_with_one_press" methodname="Junk_only_bodies_loot_with_one_press" classname="Crulanda.Tests.LootWindowTests" runstate="Runnable" seed="1897695906" result="Passed" start-time="2026-10-04 04:00:11Z" end-time="2026-10-04 04:00:24Z" duration="12.888652" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11326 ms (prepare 7, ground 3687, water 128, props 411, groves 1237, edge 494, backdrop 388, grass 4484, plants 371, batching 53, map 2, rest 64).
+[Actors] Grey wolf died.
+]]></output>
+            </test-case>
+            <test-case id="1115" name="Respawn_clears_drops_and_beacon" fullname="Crulanda.Tests.LootWindowTests.Respawn_clears_drops_and_beacon" methodname="Respawn_clears_drops_and_beacon" classname="Crulanda.Tests.LootWindowTests" runstate="Runnable" seed="153427910" result="Passed" start-time="2026-10-04 04:00:24Z" end-time="2026-10-04 04:00:41Z" duration="17.369818" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11403 ms (prepare 7, ground 3672, water 125, props 422, groves 1284, edge 512, backdrop 377, grass 4510, plants 372, batching 54, map 1, rest 67).
+[Actors] Grey wolf died.
+]]></output>
+            </test-case>
+            <test-case id="1112" name="The_window_closes_when_you_walk_away" fullname="Crulanda.Tests.LootWindowTests.The_window_closes_when_you_walk_away" methodname="The_window_closes_when_you_walk_away" classname="Crulanda.Tests.LootWindowTests" runstate="Runnable" seed="1237899717" result="Passed" start-time="2026-10-04 04:00:41Z" end-time="2026-10-04 04:00:54Z" duration="13.009185" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11444 ms (prepare 7, ground 3696, water 114, props 438, groves 1296, edge 528, backdrop 369, grass 4503, plants 370, batching 56, map 1, rest 66).
+[Actors] Grey wolf died.
+]]></output>
+            </test-case>
+            <test-case id="1113" name="The_window_shuts_the_windows_under_it_and_gives_way_to_them" fullname="Crulanda.Tests.LootWindowTests.The_window_shuts_the_windows_under_it_and_gives_way_to_them" methodname="The_window_shuts_the_windows_under_it_and_gives_way_to_them" classname="Crulanda.Tests.LootWindowTests" runstate="Runnable" seed="321013630" result="Passed" start-time="2026-10-04 04:00:54Z" end-time="2026-10-04 04:01:07Z" duration="12.837059" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11351 ms (prepare 7, ground 3636, water 121, props 426, groves 1287, edge 517, backdrop 378, grass 4473, plants 375, batching 57, map 2, rest 72).
+[Actors] Grey wolf died.
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1116" name="NamedLootTests" fullname="Crulanda.Tests.NamedLootTests" classname="Crulanda.Tests.NamedLootTests" runstate="Runnable" testcasecount="7" result="Passed" start-time="2026-10-04 04:01:07Z" end-time="2026-10-04 04:02:49Z" duration="101.994994" total="7" passed="7" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1121" name="A_unique_you_hold_stays_on_the_body" fullname="Crulanda.Tests.NamedLootTests.A_unique_you_hold_stays_on_the_body" methodname="A_unique_you_hold_stays_on_the_body" classname="Crulanda.Tests.NamedLootTests" runstate="Runnable" seed="1920186953" result="Passed" start-time="2026-10-04 04:01:07Z" end-time="2026-10-04 04:01:20Z" duration="13.234573" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11563 ms (prepare 7, ground 3927, water 124, props 420, groves 1276, edge 517, backdrop 374, grass 4407, plants 370, batching 68, map 2, rest 71).
+[Actors] Grey wolf died.
+]]></output>
+            </test-case>
+            <test-case id="1123" name="Ama_Rusk_sells_the_Market_Day_Breeches" fullname="Crulanda.Tests.NamedLootTests.Ama_Rusk_sells_the_Market_Day_Breeches" methodname="Ama_Rusk_sells_the_Market_Day_Breeches" classname="Crulanda.Tests.NamedLootTests" runstate="Runnable" seed="651147518" result="Passed" start-time="2026-10-04 04:01:20Z" end-time="2026-10-04 04:01:35Z" duration="14.409735" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12557 ms (prepare 7, ground 4146, water 122, props 469, groves 1403, edge 555, backdrop 386, grass 4929, plants 400, batching 63, map 2, rest 75).
+]]></output>
+            </test-case>
+            <test-case id="1118" name="Caddock_gives_crown_cleaver_or_coat_never_one_you_hold_until_all_three_are_yours" fullname="Crulanda.Tests.NamedLootTests.Caddock_gives_crown_cleaver_or_coat_never_one_you_hold_until_all_three_are_yours" methodname="Caddock_gives_crown_cleaver_or_coat_never_one_you_hold_until_all_three_are_yours" classname="Crulanda.Tests.NamedLootTests" runstate="Runnable" seed="1814961977" result="Passed" start-time="2026-10-04 04:01:35Z" end-time="2026-10-04 04:01:50Z" duration="15.072873" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 13229 ms (prepare 7, ground 4742, water 130, props 481, groves 1421, edge 571, backdrop 403, grass 4948, plants 386, batching 65, map 3, rest 72).
+[Actors] Caddock, the Bandit King (elite) died.
+]]></output>
+            </test-case>
+            <test-case id="1117" name="Named_loot_is_live_and_a_new_character_holds_the_Trailblade" fullname="Crulanda.Tests.NamedLootTests.Named_loot_is_live_and_a_new_character_holds_the_Trailblade" methodname="Named_loot_is_live_and_a_new_character_holds_the_Trailblade" classname="Crulanda.Tests.NamedLootTests" runstate="Runnable" seed="603913094" result="Passed" start-time="2026-10-04 04:01:50Z" end-time="2026-10-04 04:02:05Z" duration="15.127492" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 13260 ms (prepare 8, ground 4745, water 124, props 492, groves 1479, edge 610, backdrop 392, grass 4886, plants 384, batching 66, map 2, rest 72).
+]]></output>
+            </test-case>
+            <test-case id="1119" name="Old_Whitefoot_gives_his_mantle_and_his_fang_one_after_the_other" fullname="Crulanda.Tests.NamedLootTests.Old_Whitefoot_gives_his_mantle_and_his_fang_one_after_the_other" methodname="Old_Whitefoot_gives_his_mantle_and_his_fang_one_after_the_other" classname="Crulanda.Tests.NamedLootTests" runstate="Runnable" seed="1511384768" result="Passed" start-time="2026-10-04 04:02:05Z" end-time="2026-10-04 04:02:20Z" duration="15.052256" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 13268 ms (prepare 7, ground 4776, water 126, props 491, groves 1447, edge 597, backdrop 393, grass 4890, plants 400, batching 66, map 2, rest 73).
+[Actors] Old Whitefoot (elite) died.
+]]></output>
+            </test-case>
+            <test-case id="1122" name="The_Broken_Oath_Sabre_heals_on_a_kill" fullname="Crulanda.Tests.NamedLootTests.The_Broken_Oath_Sabre_heals_on_a_kill" methodname="The_Broken_Oath_Sabre_heals_on_a_kill" classname="Crulanda.Tests.NamedLootTests" runstate="Runnable" seed="672591384" result="Passed" start-time="2026-10-04 04:02:20Z" end-time="2026-10-04 04:02:35Z" duration="14.925841" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12736 ms (prepare 7, ground 4418, water 128, props 449, groves 1388, edge 578, backdrop 399, grass 4860, plants 376, batching 62, map 1, rest 70).
+[Actors] Grey wolf died.
+]]></output>
+            </test-case>
+            <test-case id="1120" name="Two_pieces_of_the_Deserter_Kings_Due_add_30_health_and_the_tooltip_says_so" fullname="Crulanda.Tests.NamedLootTests.Two_pieces_of_the_Deserter_Kings_Due_add_30_health_and_the_tooltip_says_so" methodname="Two_pieces_of_the_Deserter_Kings_Due_add_30_health_and_the_tooltip_says_so" classname="Crulanda.Tests.NamedLootTests" runstate="Runnable" seed="298660783" result="Passed" start-time="2026-10-04 04:02:35Z" end-time="2026-10-04 04:02:49Z" duration="14.163511" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12468 ms (prepare 7, ground 4478, water 115, props 457, groves 1336, edge 547, backdrop 377, grass 4629, plants 381, batching 65, map 3, rest 73).
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1124" name="NodePlacementTests" fullname="Crulanda.Tests.NodePlacementTests" classname="Crulanda.Tests.NodePlacementTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-04 04:02:49Z" end-time="2026-10-04 04:04:48Z" duration="118.396835" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1126" name="EveryHerb_LiesOnTheGround" fullname="Crulanda.Tests.NodePlacementTests.EveryHerb_LiesOnTheGround" methodname="EveryHerb_LiesOnTheGround" classname="Crulanda.Tests.NodePlacementTests" runstate="Runnable" seed="114998224" result="Passed" start-time="2026-10-04 04:02:49Z" end-time="2026-10-04 04:03:49Z" duration="59.443233" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="Timeout" value="600000" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11817 ms (prepare 7, ground 3958, water 130, props 428, groves 1333, edge 538, backdrop 382, grass 4535, plants 370, batching 65, map 1, rest 70).
+Zone zone.ashrim (430 m) built in 4844 ms (prepare 0, ground 1614, water 84, props 65, groves 1376, edge 1238, backdrop 114, grass 220, plants 0, batching 68, map 2, rest 63).
+Zone zone.khaven (410 m) built in 8486 ms (prepare 4, ground 2428, water 18, props 137, groves 2639, edge 1350, backdrop 257, grass 1364, plants 136, batching 92, map 1, rest 60).
+Zone zone.oakhaven (560 m) built in 12014 ms (prepare 11, ground 4006, water 123, props 455, groves 1358, edge 537, backdrop 376, grass 4630, plants 386, batching 60, map 2, rest 70).
+Zone zone.peaks (430 m) built in 5191 ms (prepare 761, ground 2832, water 1, props 77, groves 158, edge 182, backdrop 176, grass 905, plants 25, batching 15, map 1, rest 58).
+Zone zone.verdant (430 m) built in 10475 ms (prepare 3, ground 1768, water 29, props 1438, groves 2573, edge 1227, backdrop 210, grass 2317, plants 770, batching 67, map 2, rest 71).
+50 herbs; the steepest leans 33 degrees (The Shattered Peaks 'Tarnwort').
+]]></output>
+            </test-case>
+            <test-case id="1125" name="EveryNodeAndStation_IsReachable" fullname="Crulanda.Tests.NodePlacementTests.EveryNodeAndStation_IsReachable" methodname="EveryNodeAndStation_IsReachable" classname="Crulanda.Tests.NodePlacementTests" runstate="Runnable" seed="996185768" result="Passed" start-time="2026-10-04 04:03:49Z" end-time="2026-10-04 04:04:48Z" duration="58.947318" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="Timeout" value="600000" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11890 ms (prepare 12, ground 3930, water 116, props 448, groves 1330, edge 543, backdrop 374, grass 4613, plants 385, batching 64, map 1, rest 74).
+Zone zone.ashrim (430 m) built in 4694 ms (prepare 0, ground 1501, water 79, props 64, groves 1349, edge 1240, backdrop 114, grass 220, plants 0, batching 62, map 1, rest 64).
+Zone zone.khaven (410 m) built in 8384 ms (prepare 4, ground 2399, water 21, props 139, groves 2602, edge 1333, backdrop 261, grass 1352, plants 123, batching 87, map 1, rest 62).
+Zone zone.oakhaven (560 m) built in 11751 ms (prepare 7, ground 3822, water 128, props 435, groves 1324, edge 535, backdrop 384, grass 4610, plants 376, batching 60, map 2, rest 68).
+Zone zone.peaks (430 m) built in 5269 ms (prepare 762, ground 2845, water 0, props 79, groves 167, edge 195, backdrop 180, grass 937, plants 27, batching 15, map 1, rest 61).
+Zone zone.verdant (430 m) built in 10305 ms (prepare 3, ground 1691, water 27, props 1405, groves 2547, edge 1239, backdrop 212, grass 2281, plants 753, batching 70, map 1, rest 76).
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1127" name="NodeStreamTests" fullname="Crulanda.Tests.NodeStreamTests" classname="Crulanda.Tests.NodeStreamTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-10-04 04:04:48Z" end-time="2026-10-04 04:06:19Z" duration="91.390187" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1128" name="TreesAndScenery_Unmoved" fullname="Crulanda.Tests.NodeStreamTests.TreesAndScenery_Unmoved" methodname="TreesAndScenery_Unmoved" classname="Crulanda.Tests.NodeStreamTests" runstate="Runnable" seed="1669975162" result="Passed" start-time="2026-10-04 04:04:48Z" end-time="2026-10-04 04:06:19Z" duration="91.384772" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="Timeout" value="900000" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11967 ms (prepare 10, ground 3973, water 119, props 466, groves 1380, edge 550, backdrop 370, grass 4643, plants 384, batching 64, map 2, rest 6).
+Zone zone.oakhaven (560 m) built in 12214 ms (prepare 7, ground 4169, water 120, props 472, groves 1361, edge 559, backdrop 375, grass 4627, plants 387, batching 60, map 2, rest 75).
+Zone zone.khaven (410 m) built in 8238 ms (prepare 4, ground 2406, water 21, props 131, groves 2573, edge 1300, backdrop 258, grass 1329, plants 122, batching 87, map 1, rest 6).
+Zone zone.khaven (410 m) built in 8272 ms (prepare 4, ground 2333, water 22, props 129, groves 2582, edge 1317, backdrop 261, grass 1334, plants 127, batching 87, map 1, rest 75).
+Zone zone.peaks (430 m) built in 5125 ms (prepare 753, ground 2777, water 1, props 79, groves 157, edge 185, backdrop 180, grass 947, plants 27, batching 14, map 1, rest 4).
+Zone zone.peaks (430 m) built in 5161 ms (prepare 750, ground 2756, water 1, props 69, groves 175, edge 188, backdrop 180, grass 934, plants 26, batching 17, map 2, rest 63).
+Zone zone.ashrim (430 m) built in 4668 ms (prepare 0, ground 1501, water 83, props 72, groves 1354, edge 1251, backdrop 116, grass 223, plants 0, batching 61, map 2, rest 5).
+Zone zone.ashrim (430 m) built in 4716 ms (prepare 0, ground 1491, water 79, props 76, groves 1359, edge 1253, backdrop 116, grass 218, plants 1, batching 59, map 1, rest 63).
+Zone zone.verdant (430 m) built in 10599 ms (prepare 3, ground 1733, water 19, props 1458, groves 2687, edge 1249, backdrop 216, grass 2397, plants 765, batching 67, map 1, rest 4).
+Zone zone.verdant (430 m) built in 10565 ms (prepare 3, ground 1758, water 25, props 1463, groves 2640, edge 1221, backdrop 213, grass 2334, plants 770, batching 65, map 1, rest 72).
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1129" name="OakhavenQuestTests" fullname="Crulanda.Tests.OakhavenQuestTests" classname="Crulanda.Tests.OakhavenQuestTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-10-04 04:06:19Z" end-time="2026-10-04 04:07:03Z" duration="44.424572" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1132" name="Chronicle_one_from_Mira_to_the_ledger_and_the_elder" fullname="Crulanda.Tests.OakhavenQuestTests.Chronicle_one_from_Mira_to_the_ledger_and_the_elder" methodname="Chronicle_one_from_Mira_to_the_ledger_and_the_elder" classname="Crulanda.Tests.OakhavenQuestTests" runstate="Runnable" seed="2083191792" result="Passed" start-time="2026-10-04 04:06:19Z" end-time="2026-10-04 04:06:33Z" duration="13.712290" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11963 ms (prepare 10, ground 3927, water 118, props 456, groves 1369, edge 553, backdrop 376, grass 4649, plants 381, batching 53, map 3, rest 68).
+[Actors] Concord collector died.
+[Actors] Concord collector died.
+[Actors] Concord warden died.
+[Actors] Concord collector died.
+[Actors] Concord collector died.
+[Actors] Grey wolf died.
+[Actors] Grey wolf died.
+[Actors] Grey wolf died.
+[Actors] Grey wolf died.
+[Actors] Wild boar died.
+[Actors] Wild boar died.
+[Actors] Wild boar died.
+[Actors] Wild boar died.
+[Actors] Grey wolf died.
+[Actors] Grey wolf died.
+[Actors] Grey wolf died.
+[Actors] Grey wolf died.
+[Actors] Grey wolf died.
+[Actors] Grey wolf died.
+[Actors] Grey wolf died.
+[Actors] Grey wolf died.
+[Actors] Wild boar died.
+[Actors] Wild boar died.
+[Actors] Wild boar died.
+[Actors] Wild boar died.
+[Actors] Sandthrone deserter died.
+[Actors] Sandthrone deserter died.
+[Actors] Sandthrone deserter died.
+[Actors] Sandthrone deserter died.
+[Actors] Sandthrone deserter died.
+[Actors] Sandthrone deserter died.
+[Actors] Sandthrone deserter died.
+[Actors] Sandthrone deserter died.
+[Actors] Sandthrone deserter died.
+[Actors] Caddock, the Bandit King (elite) died.
+[Actors] Sandthrone deserter died.
+[Actors] Sandthrone deserter died.
+[Actors] Sandthrone deserter died.
+[Actors] Sandthrone deserter died.
+[Actors] Quartermaster Hesk (elite) died.
+[Actors] Sandthrone deserter died.
+[Actors] Sandthrone deserter died.
+[Actors] Wild boar died.
+[Actors] Wild boar died.
+[Actors] Wild boar died.
+[Actors] Wild boar died.
+[Actors] Old Whitefoot (elite) died.
+[Actors] Grey wolf died.
+[Actors] Grey wolf died.
+[Actors] Grey wolf died.
+[Actors] Wild boar died.
+[Actors] Wild boar died.
+[Actors] Wild boar died.
+[Actors] Wild boar died.
+[Actors] Grey wolf died.
+[Actors] Grey wolf died.
+[Actors] Grey wolf died.
+[Actors] Grey wolf died.
+[Actors] Grey wolf died.
+[Actors] Grey wolf died.
+[Actors] Wild boar died.
+[Actors] Wild boar died.
+[Actors] Wild boar died.
+[Actors] Wild boar died.
+[Actors] Grey wolf died.
+[Actors] Grey wolf died.
+[Actors] Grey wolf died.
+[Actors] Grey wolf died.
+]]></output>
+            </test-case>
+            <test-case id="1130" name="Every_quest_giver_lives_in_Oakhaven_and_every_quest_place_exists" fullname="Crulanda.Tests.OakhavenQuestTests.Every_quest_giver_lives_in_Oakhaven_and_every_quest_place_exists" methodname="Every_quest_giver_lives_in_Oakhaven_and_every_quest_place_exists" classname="Crulanda.Tests.OakhavenQuestTests" runstate="Runnable" seed="219313393" result="Passed" start-time="2026-10-04 04:06:33Z" end-time="2026-10-04 04:06:47Z" duration="14.486671" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12795 ms (prepare 14, ground 4410, water 121, props 475, groves 1428, edge 586, backdrop 389, grass 4839, plants 395, batching 61, map 2, rest 75).
+]]></output>
+            </test-case>
+            <test-case id="1131" name="Quest_givers_stand_still_while_you_talk_and_the_selected_friend_is_who_E_talks_to" fullname="Crulanda.Tests.OakhavenQuestTests.Quest_givers_stand_still_while_you_talk_and_the_selected_friend_is_who_E_talks_to" methodname="Quest_givers_stand_still_while_you_talk_and_the_selected_friend_is_who_E_talks_to" classname="Crulanda.Tests.OakhavenQuestTests" runstate="Runnable" seed="1598797489" result="Passed" start-time="2026-10-04 04:06:47Z" end-time="2026-10-04 04:07:03Z" duration="16.220265" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12542 ms (prepare 7, ground 4439, water 128, props 437, groves 1357, edge 547, backdrop 383, grass 4731, plants 381, batching 60, map 1, rest 71).
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1133" name="RootDeepTests" fullname="Crulanda.Tests.RootDeepTests" classname="Crulanda.Tests.RootDeepTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-10-04 04:07:03Z" end-time="2026-10-04 04:07:38Z" duration="34.503104" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1136" name="Dark_inside_the_warden_in_the_heart_and_the_cold_root_to_salt" fullname="Crulanda.Tests.RootDeepTests.Dark_inside_the_warden_in_the_heart_and_the_cold_root_to_salt" methodname="Dark_inside_the_warden_in_the_heart_and_the_cold_root_to_salt" classname="Crulanda.Tests.RootDeepTests" runstate="Runnable" seed="962125283" result="Passed" start-time="2026-10-04 04:07:03Z" end-time="2026-10-04 04:07:15Z" duration="11.538086" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.verdant (430 m) built in 10708 ms (prepare 6, ground 1841, water 19, props 1458, groves 2667, edge 1251, backdrop 214, grass 2341, plants 771, batching 63, map 1, rest 76).
+]]></output>
+            </test-case>
+            <test-case id="1135" name="Earth_and_root_all_the_way_and_no_land_inside" fullname="Crulanda.Tests.RootDeepTests.Earth_and_root_all_the_way_and_no_land_inside" methodname="Earth_and_root_all_the_way_and_no_land_inside" classname="Crulanda.Tests.RootDeepTests" runstate="Runnable" seed="1664730786" result="Passed" start-time="2026-10-04 04:07:15Z" end-time="2026-10-04 04:07:26Z" duration="11.451230" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.verdant (430 m) built in 10667 ms (prepare 3, ground 1816, water 20, props 1462, groves 2628, edge 1255, backdrop 213, grass 2362, plants 759, batching 67, map 2, rest 80).
+]]></output>
+            </test-case>
+            <test-case id="1134" name="The_deep_is_walkable_from_the_start_down_to_the_heart" fullname="Crulanda.Tests.RootDeepTests.The_deep_is_walkable_from_the_start_down_to_the_heart" methodname="The_deep_is_walkable_from_the_start_down_to_the_heart" classname="Crulanda.Tests.RootDeepTests" runstate="Runnable" seed="1781338222" result="Passed" start-time="2026-10-04 04:07:26Z" end-time="2026-10-04 04:07:38Z" duration="11.505421" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.verdant (430 m) built in 10700 ms (prepare 3, ground 1831, water 28, props 1459, groves 2643, edge 1245, backdrop 211, grass 2359, plants 785, batching 61, map 1, rest 74).
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1137" name="SecretPlacementTests" fullname="Crulanda.Tests.SecretPlacementTests" classname="Crulanda.Tests.SecretPlacementTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-04 04:07:38Z" end-time="2026-10-04 04:08:54Z" duration="75.684468" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1138" name="Every_zone_builds_its_secrets_where_they_can_be_found" fullname="Crulanda.Tests.SecretPlacementTests.Every_zone_builds_its_secrets_where_they_can_be_found" methodname="Every_zone_builds_its_secrets_where_they_can_be_found" classname="Crulanda.Tests.SecretPlacementTests" runstate="Runnable" seed="139437678" result="Passed" start-time="2026-10-04 04:07:38Z" end-time="2026-10-04 04:08:40Z" duration="61.602990" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12537 ms (prepare 8, ground 4316, water 122, props 485, groves 1413, edge 565, backdrop 383, grass 4736, plants 375, batching 63, map 1, rest 70).
+Zone zone.ashrim (430 m) built in 4950 ms (prepare 0, ground 1661, water 81, props 67, groves 1374, edge 1284, backdrop 119, grass 229, plants 0, batching 67, map 1, rest 67).
+Zone zone.khaven (410 m) built in 8735 ms (prepare 6, ground 2621, water 21, props 135, groves 2651, edge 1368, backdrop 261, grass 1377, plants 137, batching 92, map 1, rest 65).
+Zone zone.oakhaven (560 m) built in 12400 ms (prepare 8, ground 4316, water 126, props 446, groves 1356, edge 541, backdrop 385, grass 4703, plants 384, batching 62, map 2, rest 71).
+Zone zone.peaks (430 m) built in 5430 ms (prepare 761, ground 3001, water 1, props 89, groves 167, edge 183, backdrop 174, grass 951, plants 25, batching 15, map 2, rest 61).
+Zone zone.verdant (430 m) built in 10619 ms (prepare 4, ground 1816, water 28, props 1476, groves 2601, edge 1226, backdrop 211, grass 2376, plants 746, batching 63, map 2, rest 70).
+]]></output>
+            </test-case>
+            <test-case id="1139" name="Secret_ids_needs_items_and_pages_hold_together" fullname="Crulanda.Tests.SecretPlacementTests.Secret_ids_needs_items_and_pages_hold_together" methodname="Secret_ids_needs_items_and_pages_hold_together" classname="Crulanda.Tests.SecretPlacementTests" runstate="Runnable" seed="1299077734" result="Passed" start-time="2026-10-04 04:08:40Z" end-time="2026-10-04 04:08:54Z" duration="14.075105" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12389 ms (prepare 7, ground 4294, water 116, props 453, groves 1363, edge 549, backdrop 375, grass 4719, plants 380, batching 60, map 2, rest 71).
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1140" name="SocialPullTests" fullname="Crulanda.Tests.SocialPullTests" classname="Crulanda.Tests.SocialPullTests" runstate="Runnable" testcasecount="8" result="Passed" start-time="2026-10-04 04:08:54Z" end-time="2026-10-04 04:11:05Z" duration="131.357977" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1142" name="A_boar_stays_single_with_another_beside_it" fullname="Crulanda.Tests.SocialPullTests.A_boar_stays_single_with_another_beside_it" methodname="A_boar_stays_single_with_another_beside_it" classname="Crulanda.Tests.SocialPullTests" runstate="Runnable" seed="815958039" result="Passed" start-time="2026-10-04 04:08:54Z" end-time="2026-10-04 04:09:10Z" duration="16.089871" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12435 ms (prepare 10, ground 4375, water 132, props 452, groves 1345, edge 539, backdrop 387, grass 4677, plants 378, batching 62, map 2, rest 76).
+]]></output>
+            </test-case>
+            <test-case id="1143" name="A_deserters_shout_is_read_in_the_chat_and_brings_the_camp_after_a_beat" fullname="Crulanda.Tests.SocialPullTests.A_deserters_shout_is_read_in_the_chat_and_brings_the_camp_after_a_beat" methodname="A_deserters_shout_is_read_in_the_chat_and_brings_the_camp_after_a_beat" classname="Crulanda.Tests.SocialPullTests" runstate="Runnable" seed="542326615" result="Passed" start-time="2026-10-04 04:09:10Z" end-time="2026-10-04 04:09:26Z" duration="16.405657" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12380 ms (prepare 10, ground 4354, water 127, props 438, groves 1336, edge 544, backdrop 384, grass 4675, plants 379, batching 60, map 1, rest 72).
+]]></output>
+            </test-case>
+            <test-case id="1147" name="A_guard_beside_the_king_brings_him_and_he_brings_the_rest" fullname="Crulanda.Tests.SocialPullTests.A_guard_beside_the_king_brings_him_and_he_brings_the_rest" methodname="A_guard_beside_the_king_brings_him_and_he_brings_the_rest" classname="Crulanda.Tests.SocialPullTests" runstate="Runnable" seed="2054767768" result="Passed" start-time="2026-10-04 04:09:26Z" end-time="2026-10-04 04:09:43Z" duration="16.480577" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12272 ms (prepare 10, ground 4253, water 129, props 439, groves 1343, edge 538, backdrop 389, grass 4661, plants 383, batching 55, map 2, rest 70).
+]]></output>
+            </test-case>
+            <test-case id="1146" name="A_guards_shout_brings_his_fellows_and_not_the_king_across_the_hall" fullname="Crulanda.Tests.SocialPullTests.A_guards_shout_brings_his_fellows_and_not_the_king_across_the_hall" methodname="A_guards_shout_brings_his_fellows_and_not_the_king_across_the_hall" classname="Crulanda.Tests.SocialPullTests" runstate="Runnable" seed="190501447" result="Passed" start-time="2026-10-04 04:09:43Z" end-time="2026-10-04 04:09:59Z" duration="16.585926" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12230 ms (prepare 10, ground 4306, water 131, props 437, groves 1322, edge 530, backdrop 375, grass 4611, plants 373, batching 61, map 2, rest 72).
+]]></output>
+            </test-case>
+            <test-case id="1148" name="A_linked_group_resets_together_and_stays_home" fullname="Crulanda.Tests.SocialPullTests.A_linked_group_resets_together_and_stays_home" methodname="A_linked_group_resets_together_and_stays_home" classname="Crulanda.Tests.SocialPullTests" runstate="Runnable" seed="1991092341" result="Passed" start-time="2026-10-04 04:09:59Z" end-time="2026-10-04 04:10:18Z" duration="18.440082" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12238 ms (prepare 13, ground 4286, water 128, props 438, groves 1344, edge 532, backdrop 383, grass 4608, plants 379, batching 58, map 2, rest 67).
+]]></output>
+            </test-case>
+            <test-case id="1141" name="A_wolf_pack_comes_together_and_a_wolf_out_of_reach_stays" fullname="Crulanda.Tests.SocialPullTests.A_wolf_pack_comes_together_and_a_wolf_out_of_reach_stays" methodname="A_wolf_pack_comes_together_and_a_wolf_out_of_reach_stays" classname="Crulanda.Tests.SocialPullTests" runstate="Runnable" seed="1091257125" result="Passed" start-time="2026-10-04 04:10:18Z" end-time="2026-10-04 04:10:33Z" duration="15.565642" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12344 ms (prepare 13, ground 4301, water 116, props 455, groves 1347, edge 553, backdrop 376, grass 4673, plants 380, batching 57, map 2, rest 71).
+]]></output>
+            </test-case>
+            <test-case id="1145" name="An_elites_guards_come_from_further_than_a_call_carries" fullname="Crulanda.Tests.SocialPullTests.An_elites_guards_come_from_further_than_a_call_carries" methodname="An_elites_guards_come_from_further_than_a_call_carries" classname="Crulanda.Tests.SocialPullTests" runstate="Runnable" seed="346124377" result="Passed" start-time="2026-10-04 04:10:33Z" end-time="2026-10-04 04:10:50Z" duration="16.509072" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12460 ms (prepare 7, ground 4332, water 130, props 445, groves 1364, edge 549, backdrop 388, grass 4727, plants 380, batching 60, map 2, rest 76).
+]]></output>
+            </test-case>
+            <test-case id="1144" name="Sneaking_peels_one_wolf_from_another_that_would_have_come" fullname="Crulanda.Tests.SocialPullTests.Sneaking_peels_one_wolf_from_another_that_would_have_come" methodname="Sneaking_peels_one_wolf_from_another_that_would_have_come" classname="Crulanda.Tests.SocialPullTests" runstate="Runnable" seed="607391559" result="Passed" start-time="2026-10-04 04:10:50Z" end-time="2026-10-04 04:11:05Z" duration="15.273511" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12314 ms (prepare 14, ground 4234, water 133, props 459, groves 1362, edge 547, backdrop 377, grass 4672, plants 375, batching 62, map 2, rest 77).
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1149" name="TalkReachTests" fullname="Crulanda.Tests.TalkReachTests" classname="Crulanda.Tests.TalkReachTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-10-04 04:11:05Z" end-time="2026-10-04 04:11:20Z" duration="14.863215" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1150" name="Mira_NotThroughTheGoldenCasksEndWall_FromTheTaproomYes" fullname="Crulanda.Tests.TalkReachTests.Mira_NotThroughTheGoldenCasksEndWall_FromTheTaproomYes" methodname="Mira_NotThroughTheGoldenCasksEndWall_FromTheTaproomYes" classname="Crulanda.Tests.TalkReachTests" runstate="Runnable" seed="265961994" result="Passed" start-time="2026-10-04 04:11:05Z" end-time="2026-10-04 04:11:20Z" duration="14.854633" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 13103 ms (prepare 7, ground 4537, water 126, props 480, groves 1433, edge 609, backdrop 407, grass 4964, plants 397, batching 67, map 2, rest 74).
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1151" name="TempSaveTravelTests" fullname="Crulanda.Tests.TempSaveTravelTests" classname="Crulanda.Tests.TempSaveTravelTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-10-04 04:11:20Z" end-time="2026-10-04 04:11:45Z" duration="24.946664" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1152" name="Talents_level_and_gear_survive_travel_on_a_temp_save" fullname="Crulanda.Tests.TempSaveTravelTests.Talents_level_and_gear_survive_travel_on_a_temp_save" methodname="Talents_level_and_gear_survive_travel_on_a_temp_save" classname="Crulanda.Tests.TempSaveTravelTests" runstate="Runnable" seed="738042380" result="Passed" start-time="2026-10-04 04:11:20Z" end-time="2026-10-04 04:11:45Z" duration="24.938722" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12870 ms (prepare 7, ground 4572, water 116, props 455, groves 1369, edge 577, backdrop 377, grass 4872, plants 382, batching 66, map 1, rest 76).
+Zone zone.khaven (410 m) built in 9115 ms (prepare 4, ground 2840, water 19, props 156, groves 2781, edge 1364, backdrop 269, grass 1393, plants 127, batching 96, map 1, rest 65).
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1153" name="TradeBagTests" fullname="Crulanda.Tests.TradeBagTests" classname="Crulanda.Tests.TradeBagTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-10-04 04:11:45Z" end-time="2026-10-04 04:12:30Z" duration="45.586164" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1156" name="A_wallet_earned_with_three_pelts_fills_with_yarrow_and_survives_a_reload" fullname="Crulanda.Tests.TradeBagTests.A_wallet_earned_with_three_pelts_fills_with_yarrow_and_survives_a_reload" methodname="A_wallet_earned_with_three_pelts_fills_with_yarrow_and_survives_a_reload" classname="Crulanda.Tests.TradeBagTests" runstate="Runnable" seed="1520133660" result="Passed" start-time="2026-10-04 04:11:45Z" end-time="2026-10-04 04:12:00Z" duration="14.982458" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12699 ms (prepare 14, ground 4396, water 111, props 453, groves 1364, edge 549, backdrop 374, grass 4894, plants 402, batching 65, map 3, rest 74).
+]]></output>
+            </test-case>
+            <test-case id="1155" name="Knocking_at_night_opens_her_wares" fullname="Crulanda.Tests.TradeBagTests.Knocking_at_night_opens_her_wares" methodname="Knocking_at_night_opens_her_wares" classname="Crulanda.Tests.TradeBagTests" runstate="Runnable" seed="189681045" result="Passed" start-time="2026-10-04 04:12:00Z" end-time="2026-10-04 04:12:15Z" duration="15.085635" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 13257 ms (prepare 10, ground 4640, water 118, props 484, groves 1455, edge 616, backdrop 385, grass 4978, plants 419, batching 69, map 3, rest 80).
+]]></output>
+            </test-case>
+            <test-case id="1154" name="The_leatherworker_sells_the_four_bags_and_a_worn_one_leaves_her_list" fullname="Crulanda.Tests.TradeBagTests.The_leatherworker_sells_the_four_bags_and_a_worn_one_leaves_her_list" methodname="The_leatherworker_sells_the_four_bags_and_a_worn_one_leaves_her_list" classname="Crulanda.Tests.TradeBagTests" runstate="Runnable" seed="59481626" result="Passed" start-time="2026-10-04 04:12:15Z" end-time="2026-10-04 04:12:30Z" duration="15.511002" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 13181 ms (prepare 7, ground 4622, water 128, props 490, groves 1442, edge 606, backdrop 398, grass 4954, plants 385, batching 69, map 2, rest 78).
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1157" name="TradesTests" fullname="Crulanda.Tests.TradesTests" classname="Crulanda.Tests.TradesTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-10-04 04:12:30Z" end-time="2026-10-04 04:12:44Z" duration="13.578910" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1158" name="A_pick_bought_from_the_merchant_hangs_at_the_belt_and_the_trades_window_opens" fullname="Crulanda.Tests.TradesTests.A_pick_bought_from_the_merchant_hangs_at_the_belt_and_the_trades_window_opens" methodname="A_pick_bought_from_the_merchant_hangs_at_the_belt_and_the_trades_window_opens" classname="Crulanda.Tests.TradesTests" runstate="Runnable" seed="1118687156" result="Passed" start-time="2026-10-04 04:12:30Z" end-time="2026-10-04 04:12:44Z" duration="13.570010" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11668 ms (prepare 7, ground 3861, water 125, props 425, groves 1298, edge 522, backdrop 377, grass 4562, plants 370, batching 53, map 2, rest 66).
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1159" name="TreeLimbTests" fullname="Crulanda.Tests.TreeLimbTests" classname="Crulanda.Tests.TreeLimbTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-10-04 04:12:44Z" end-time="2026-10-04 04:13:49Z" duration="65.313848" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1160" name="Every_limb_grows_out_of_its_tree" fullname="Crulanda.Tests.TreeLimbTests.Every_limb_grows_out_of_its_tree" methodname="Every_limb_grows_out_of_its_tree" classname="Crulanda.Tests.TreeLimbTests" runstate="Runnable" seed="379736204" result="Passed" start-time="2026-10-04 04:12:44Z" end-time="2026-10-04 04:13:49Z" duration="65.307375" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="Timeout" value="600000" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11511 ms (prepare 7, ground 3786, water 129, props 426, groves 1330, edge 530, backdrop 372, grass 4413, plants 378, batching 67, map 1, rest 72).
+Zone zone.ashrim (430 m) built in 5196 ms (prepare 0, ground 1774, water 83, props 65, groves 1450, edge 1329, backdrop 124, grass 224, plants 0, batching 76, map 2, rest 69).
+Zone zone.khaven (410 m) built in 8993 ms (prepare 4, ground 2660, water 22, props 145, groves 2756, edge 1434, backdrop 266, grass 1418, plants 130, batching 90, map 1, rest 67).
+Zone zone.oakhaven (560 m) built in 13680 ms (prepare 7, ground 4859, water 130, props 527, groves 1541, edge 635, backdrop 387, grass 5032, plants 410, batching 70, map 2, rest 80).
+Zone zone.peaks (430 m) built in 5885 ms (prepare 768, ground 3326, water 1, props 89, groves 182, edge 210, backdrop 194, grass 999, plants 28, batching 19, map 2, rest 67).
+Zone zone.verdant (430 m) built in 11404 ms (prepare 11, ground 1970, water 21, props 1494, groves 2819, edge 1356, backdrop 223, grass 2526, plants 812, batching 72, map 1, rest 99).
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1161" name="VillageDayTests" fullname="Crulanda.Tests.VillageDayTests" classname="Crulanda.Tests.VillageDayTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-10-04 04:13:49Z" end-time="2026-10-04 04:14:37Z" duration="47.840115" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1164" name="At_dusk_the_hens_go_in_and_the_door_is_shut" fullname="Crulanda.Tests.VillageDayTests.At_dusk_the_hens_go_in_and_the_door_is_shut" methodname="At_dusk_the_hens_go_in_and_the_door_is_shut" classname="Crulanda.Tests.VillageDayTests" runstate="Runnable" seed="928997161" result="Passed" start-time="2026-10-04 04:13:49Z" end-time="2026-10-04 04:14:07Z" duration="17.593374" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 13145 ms (prepare 10, ground 4624, water 117, props 504, groves 1492, edge 607, backdrop 402, grass 4846, plants 399, batching 67, map 2, rest 75).
+]]></output>
+            </test-case>
+            <test-case id="1162" name="At_night_hens_roost_behind_shut_doors_and_the_village_sleeps" fullname="Crulanda.Tests.VillageDayTests.At_night_hens_roost_behind_shut_doors_and_the_village_sleeps" methodname="At_night_hens_roost_behind_shut_doors_and_the_village_sleeps" classname="Crulanda.Tests.VillageDayTests" runstate="Runnable" seed="1639238012" result="Passed" start-time="2026-10-04 04:14:07Z" end-time="2026-10-04 04:14:22Z" duration="15.332407" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 13483 ms (prepare 7, ground 4703, water 130, props 615, groves 1464, edge 598, backdrop 380, grass 4997, plants 431, batching 68, map 4, rest 86).
+]]></output>
+            </test-case>
+            <test-case id="1163" name="By_day_the_hen_wife_opens_up_and_scatters_feed" fullname="Crulanda.Tests.VillageDayTests.By_day_the_hen_wife_opens_up_and_scatters_feed" methodname="By_day_the_hen_wife_opens_up_and_scatters_feed" classname="Crulanda.Tests.VillageDayTests" runstate="Runnable" seed="1114261822" result="Passed" start-time="2026-10-04 04:14:22Z" end-time="2026-10-04 04:14:37Z" duration="14.908641" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12765 ms (prepare 7, ground 4596, water 141, props 466, groves 1408, edge 554, backdrop 390, grass 4680, plants 383, batching 60, map 2, rest 78).
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1165" name="VillageDrinkTests" fullname="Crulanda.Tests.VillageDrinkTests" classname="Crulanda.Tests.VillageDrinkTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-04 04:14:37Z" end-time="2026-10-04 04:15:33Z" duration="55.918288" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1167" name="One_who_has_had_enough_passes_out_over_the_table_and_another_says_goodnight" fullname="Crulanda.Tests.VillageDrinkTests.One_who_has_had_enough_passes_out_over_the_table_and_another_says_goodnight" methodname="One_who_has_had_enough_passes_out_over_the_table_and_another_says_goodnight" classname="Crulanda.Tests.VillageDrinkTests" runstate="Runnable" seed="427105417" result="Passed" start-time="2026-10-04 04:14:37Z" end-time="2026-10-04 04:15:02Z" duration="24.891256" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12577 ms (prepare 8, ground 4165, water 135, props 466, groves 1408, edge 558, backdrop 394, grass 4907, plants 386, batching 64, map 2, rest 84).
+]]></output>
+            </test-case>
+            <test-case id="1166" name="The_out_of_work_drink_at_the_inn_until_the_ale_is_gone_then_go_home" fullname="Crulanda.Tests.VillageDrinkTests.The_out_of_work_drink_at_the_inn_until_the_ale_is_gone_then_go_home" methodname="The_out_of_work_drink_at_the_inn_until_the_ale_is_gone_then_go_home" classname="Crulanda.Tests.VillageDrinkTests" runstate="Runnable" seed="1131089165" result="Passed" start-time="2026-10-04 04:15:02Z" end-time="2026-10-04 04:15:33Z" duration="31.018898" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 13222 ms (prepare 8, ground 4683, water 135, props 469, groves 1465, edge 587, backdrop 386, grass 4954, plants 397, batching 62, map 2, rest 74).
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1168" name="VillageErrandTests" fullname="Crulanda.Tests.VillageErrandTests" classname="Crulanda.Tests.VillageErrandTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-04 04:15:33Z" end-time="2026-10-04 04:17:28Z" duration="114.612809" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1169" name="The_hen_wife_carries_her_eggs_to_the_inn_and_the_merchant_sells_them_on" fullname="Crulanda.Tests.VillageErrandTests.The_hen_wife_carries_her_eggs_to_the_inn_and_the_merchant_sells_them_on" methodname="The_hen_wife_carries_her_eggs_to_the_inn_and_the_merchant_sells_them_on" classname="Crulanda.Tests.VillageErrandTests" runstate="Runnable" seed="1219378355" result="Passed" start-time="2026-10-04 04:15:33Z" end-time="2026-10-04 04:16:31Z" duration="57.785376" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12566 ms (prepare 7, ground 4290, water 135, props 457, groves 1398, edge 562, backdrop 396, grass 4795, plants 382, batching 63, map 2, rest 79).
+]]></output>
+            </test-case>
+            <test-case id="1170" name="Water_from_the_well_fills_the_hens_pan_and_the_farmer_takes_his_barley_to_the_mill" fullname="Crulanda.Tests.VillageErrandTests.Water_from_the_well_fills_the_hens_pan_and_the_farmer_takes_his_barley_to_the_mill" methodname="Water_from_the_well_fills_the_hens_pan_and_the_farmer_takes_his_barley_to_the_mill" classname="Crulanda.Tests.VillageErrandTests" runstate="Runnable" seed="393290902" result="Passed" start-time="2026-10-04 04:16:31Z" end-time="2026-10-04 04:17:28Z" duration="56.818839" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 13485 ms (prepare 7, ground 5093, water 113, props 454, groves 1417, edge 595, backdrop 393, grass 4886, plants 395, batching 61, map 2, rest 69).
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1171" name="VillageHomeTests" fullname="Crulanda.Tests.VillageHomeTests" classname="Crulanda.Tests.VillageHomeTests" runstate="Runnable" testcasecount="8" result="Passed" start-time="2026-10-04 04:17:28Z" end-time="2026-10-04 04:20:26Z" duration="178.209992" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1178" name="A_household_whose_house_is_not_built_lodges_at_the_inn" fullname="Crulanda.Tests.VillageHomeTests.A_household_whose_house_is_not_built_lodges_at_the_inn" methodname="A_household_whose_house_is_not_built_lodges_at_the_inn" classname="Crulanda.Tests.VillageHomeTests" runstate="Runnable" seed="565171200" result="Passed" start-time="2026-10-04 04:17:28Z" end-time="2026-10-04 04:17:43Z" duration="15.049987" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 13372 ms (prepare 7, ground 5328, water 128, props 424, groves 1319, edge 547, backdrop 391, grass 4710, plants 387, batching 59, map 2, rest 70).
+Household 'Crisp': no door for the house 'Crisp cottage'; they lodge at the inn.
+]]></output>
+            </test-case>
+            <test-case id="1172" name="Every_villager_sleeps_behind_their_own_named_door" fullname="Crulanda.Tests.VillageHomeTests.Every_villager_sleeps_behind_their_own_named_door" methodname="Every_villager_sleeps_behind_their_own_named_door" classname="Crulanda.Tests.VillageHomeTests" runstate="Runnable" seed="1445427657" result="Passed" start-time="2026-10-04 04:17:43Z" end-time="2026-10-04 04:18:35Z" duration="51.928411" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12613 ms (prepare 7, ground 4343, water 119, props 470, groves 1385, edge 569, backdrop 384, grass 4786, plants 400, batching 66, map 2, rest 82).
+]]></output>
+            </test-case>
+            <test-case id="1174" name="Farmers_live_with_the_hen_wife_at_their_farm" fullname="Crulanda.Tests.VillageHomeTests.Farmers_live_with_the_hen_wife_at_their_farm" methodname="Farmers_live_with_the_hen_wife_at_their_farm" classname="Crulanda.Tests.VillageHomeTests" runstate="Runnable" seed="355278337" result="Passed" start-time="2026-10-04 04:18:35Z" end-time="2026-10-04 04:18:49Z" duration="14.712016" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 13013 ms (prepare 20, ground 4970, water 127, props 442, groves 1334, edge 540, backdrop 389, grass 4678, plants 376, batching 62, map 2, rest 73).
+]]></output>
+            </test-case>
+            <test-case id="1176" name="Home_doors_are_on_the_navmesh" fullname="Crulanda.Tests.VillageHomeTests.Home_doors_are_on_the_navmesh" methodname="Home_doors_are_on_the_navmesh" classname="Crulanda.Tests.VillageHomeTests" runstate="Runnable" seed="1106169473" result="Passed" start-time="2026-10-04 04:18:49Z" end-time="2026-10-04 04:19:04Z" duration="14.199201" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12508 ms (prepare 7, ground 4358, water 116, props 462, groves 1371, edge 557, backdrop 383, grass 4743, plants 375, batching 64, map 2, rest 70).
+]]></output>
+            </test-case>
+            <test-case id="1179" name="Knocking_at_the_Crypt_Keepers_Hovel_in_Khaven" fullname="Crulanda.Tests.VillageHomeTests.Knocking_at_the_Crypt_Keepers_Hovel_in_Khaven" methodname="Knocking_at_the_Crypt_Keepers_Hovel_in_Khaven" classname="Crulanda.Tests.VillageHomeTests" runstate="Runnable" seed="946950527" result="Passed" start-time="2026-10-04 04:19:04Z" end-time="2026-10-04 04:19:13Z" duration="9.503949" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.khaven (410 m) built in 8580 ms (prepare 3, ground 2578, water 20, props 139, groves 2611, edge 1330, backdrop 263, grass 1363, plants 125, batching 86, map 1, rest 61).
+]]></output>
+            </test-case>
+            <test-case id="1177" name="Knocking_names_the_household" fullname="Crulanda.Tests.VillageHomeTests.Knocking_names_the_household" methodname="Knocking_names_the_household" classname="Crulanda.Tests.VillageHomeTests" runstate="Runnable" seed="594927837" result="Passed" start-time="2026-10-04 04:19:13Z" end-time="2026-10-04 04:19:27Z" duration="14.042879" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12321 ms (prepare 13, ground 4230, water 118, props 465, groves 1378, edge 551, backdrop 378, grass 4687, plants 366, batching 65, map 2, rest 68).
+]]></output>
+            </test-case>
+            <test-case id="1175" name="The_hunter_is_hidden_by_2330_starting_from_the_inn" fullname="Crulanda.Tests.VillageHomeTests.The_hunter_is_hidden_by_2330_starting_from_the_inn" methodname="The_hunter_is_hidden_by_2330_starting_from_the_inn" classname="Crulanda.Tests.VillageHomeTests" runstate="Runnable" seed="554331602" result="Passed" start-time="2026-10-04 04:19:27Z" end-time="2026-10-04 04:20:11Z" duration="43.760840" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12441 ms (prepare 10, ground 4280, water 128, props 453, groves 1354, edge 545, backdrop 395, grass 4752, plants 382, batching 62, map 1, rest 79).
+]]></output>
+            </test-case>
+            <test-case id="1173" name="The_Tanners_share_one_house" fullname="Crulanda.Tests.VillageHomeTests.The_Tanners_share_one_house" methodname="The_Tanners_share_one_house" classname="Crulanda.Tests.VillageHomeTests" runstate="Runnable" seed="1770003243" result="Passed" start-time="2026-10-04 04:20:11Z" end-time="2026-10-04 04:20:26Z" duration="15.004652" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 13385 ms (prepare 7, ground 5475, water 118, props 450, groves 1322, edge 545, backdrop 377, grass 4597, plants 368, batching 57, map 2, rest 67).
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1180" name="VillagePurseTests" fullname="Crulanda.Tests.VillagePurseTests" classname="Crulanda.Tests.VillagePurseTests" runstate="Runnable" testcasecount="7" result="Passed" start-time="2026-10-04 04:20:26Z" end-time="2026-10-04 04:24:25Z" duration="238.899870" total="7" passed="7" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1186" name="A_house_without_firewood_goes_cold_and_the_rest_keep_smoking" fullname="Crulanda.Tests.VillagePurseTests.A_house_without_firewood_goes_cold_and_the_rest_keep_smoking" methodname="A_house_without_firewood_goes_cold_and_the_rest_keep_smoking" classname="Crulanda.Tests.VillagePurseTests" runstate="Runnable" seed="643726781" result="Passed" start-time="2026-10-04 04:20:26Z" end-time="2026-10-04 04:21:14Z" duration="47.962180" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12087 ms (prepare 7, ground 4210, water 128, props 436, groves 1304, edge 523, backdrop 373, grass 4598, plants 377, batching 55, map 1, rest 75).
+]]></output>
+            </test-case>
+            <test-case id="1184" name="A_run_given_up_before_pick_up_is_set_out_on_again_and_one_given_up_after_lights_the_fire" fullname="Crulanda.Tests.VillagePurseTests.A_run_given_up_before_pick_up_is_set_out_on_again_and_one_given_up_after_lights_the_fire" methodname="A_run_given_up_before_pick_up_is_set_out_on_again_and_one_given_up_after_lights_the_fire" classname="Crulanda.Tests.VillagePurseTests" runstate="Runnable" seed="1321647277" result="Passed" start-time="2026-10-04 04:21:14Z" end-time="2026-10-04 04:21:28Z" duration="13.696934" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 11835 ms (prepare 7, ground 3897, water 114, props 464, groves 1311, edge 542, backdrop 373, grass 4604, plants 378, batching 67, map 1, rest 77).
+]]></output>
+            </test-case>
+            <test-case id="1185" name="A_zone_loaded_again_finds_wood_bought_while_away_home" fullname="Crulanda.Tests.VillagePurseTests.A_zone_loaded_again_finds_wood_bought_while_away_home" methodname="A_zone_loaded_again_finds_wood_bought_while_away_home" classname="Crulanda.Tests.VillagePurseTests" runstate="Runnable" seed="742025515" result="Passed" start-time="2026-10-04 04:21:28Z" end-time="2026-10-04 04:22:03Z" duration="35.631481" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 13365 ms (prepare 7, ground 4679, water 119, props 484, groves 1476, edge 606, backdrop 405, grass 5029, plants 408, batching 70, map 1, rest 81).
+Zone zone.oakhaven (560 m) built in 12753 ms (prepare 7, ground 4559, water 134, props 463, groves 1460, edge 559, backdrop 383, grass 4675, plants 376, batching 59, map 2, rest 76).
+]]></output>
+            </test-case>
+            <test-case id="1187" name="Drinkers_drink_with_every_purse_at_zero" fullname="Crulanda.Tests.VillagePurseTests.Drinkers_drink_with_every_purse_at_zero" methodname="Drinkers_drink_with_every_purse_at_zero" classname="Crulanda.Tests.VillagePurseTests" runstate="Runnable" seed="1018026857" result="Passed" start-time="2026-10-04 04:22:03Z" end-time="2026-10-04 04:22:28Z" duration="25.156049" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12845 ms (prepare 7, ground 4568, water 136, props 465, groves 1420, edge 573, backdrop 394, grass 4760, plants 380, batching 68, map 1, rest 73).
+]]></output>
+            </test-case>
+            <test-case id="1183" name="Short_of_coin_they_go_without_and_say_so" fullname="Crulanda.Tests.VillagePurseTests.Short_of_coin_they_go_without_and_say_so" methodname="Short_of_coin_they_go_without_and_say_so" classname="Crulanda.Tests.VillagePurseTests" runstate="Runnable" seed="321716579" result="Passed" start-time="2026-10-04 04:22:28Z" end-time="2026-10-04 04:22:53Z" duration="24.473194" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12625 ms (prepare 7, ground 4398, water 121, props 477, groves 1390, edge 572, backdrop 381, grass 4742, plants 395, batching 64, map 1, rest 77).
+]]></output>
+            </test-case>
+            <test-case id="1182" name="With_every_purse_empty_buying_from_the_leatherworker_at_1500_sends_her_family_for_bread_and_firewood" fullname="Crulanda.Tests.VillagePurseTests.With_every_purse_empty_buying_from_the_leatherworker_at_1500_sends_her_family_for_bread_and_firewood" methodname="With_every_purse_empty_buying_from_the_leatherworker_at_1500_sends_her_family_for_bread_and_firewood" classname="Crulanda.Tests.VillagePurseTests" runstate="Runnable" seed="889064657" result="Passed" start-time="2026-10-04 04:22:53Z" end-time="2026-10-04 04:23:37Z" duration="44.289227" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 13187 ms (prepare 11, ground 4882, water 131, props 510, groves 1487, edge 622, backdrop 391, grass 4631, plants 379, batching 64, map 2, rest 77).
+]]></output>
+            </test-case>
+            <test-case id="1181" name="With_the_days_stipend_buying_from_the_leatherworker_at_1500_sends_Fen_for_firewood" fullname="Crulanda.Tests.VillagePurseTests.With_the_days_stipend_buying_from_the_leatherworker_at_1500_sends_Fen_for_firewood" methodname="With_the_days_stipend_buying_from_the_leatherworker_at_1500_sends_Fen_for_firewood" classname="Crulanda.Tests.VillagePurseTests" runstate="Runnable" seed="1759277202" result="Passed" start-time="2026-10-04 04:23:37Z" end-time="2026-10-04 04:24:25Z" duration="47.681485" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 13612 ms (prepare 7, ground 5102, water 143, props 470, groves 1502, edge 591, backdrop 392, grass 4880, plants 374, batching 65, map 2, rest 84).
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1188" name="VillageStreamTests" fullname="Crulanda.Tests.VillageStreamTests" classname="Crulanda.Tests.VillageStreamTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-04 04:24:25Z" end-time="2026-10-04 04:25:07Z" duration="42.682736" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1190" name="New_floors_are_dry_and_bare" fullname="Crulanda.Tests.VillageStreamTests.New_floors_are_dry_and_bare" methodname="New_floors_are_dry_and_bare" classname="Crulanda.Tests.VillageStreamTests" runstate="Runnable" seed="1767583984" result="Passed" start-time="2026-10-04 04:24:25Z" end-time="2026-10-04 04:24:40Z" duration="14.850678" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 13160 ms (prepare 7, ground 4774, water 142, props 491, groves 1442, edge 577, backdrop 407, grass 4793, plants 389, batching 63, map 3, rest 72).
+]]></output>
+            </test-case>
+            <test-case id="1189" name="NewVillageProps_LeaveTreesSceneryAndCreekUnmoved" fullname="Crulanda.Tests.VillageStreamTests.NewVillageProps_LeaveTreesSceneryAndCreekUnmoved" methodname="NewVillageProps_LeaveTreesSceneryAndCreekUnmoved" classname="Crulanda.Tests.VillageStreamTests" runstate="Runnable" seed="1227601499" result="Passed" start-time="2026-10-04 04:24:40Z" end-time="2026-10-04 04:25:07Z" duration="27.823865" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12176 ms (prepare 7, ground 4284, water 117, props 427, groves 1332, edge 550, backdrop 366, grass 4593, plants 371, batching 57, map 2, rest 70).
+Household 'Carder farm': no door for the house 'Carder farmhouse'; they lodge at the inn.
+Household 'Crisp': no door for the house 'Crisp cottage'; they lodge at the inn.
+Zone zone.oakhaven (560 m) built in 12298 ms (prepare 7, ground 4213, water 127, props 449, groves 1352, edge 552, backdrop 396, grass 4679, plants 389, batching 60, map 2, rest 72).
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1191" name="VillageSupplyTests" fullname="Crulanda.Tests.VillageSupplyTests" classname="Crulanda.Tests.VillageSupplyTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-10-04 04:25:07Z" end-time="2026-10-04 04:26:11Z" duration="63.282248" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1195" name="HerbalistsOwnHerbs_DoNotSoundLikeTheSale_NorHideTheStallsGoods" fullname="Crulanda.Tests.VillageSupplyTests.HerbalistsOwnHerbs_DoNotSoundLikeTheSale_NorHideTheStallsGoods" methodname="HerbalistsOwnHerbs_DoNotSoundLikeTheSale_NorHideTheStallsGoods" classname="Crulanda.Tests.VillageSupplyTests" runstate="Runnable" seed="196193696" result="Passed" start-time="2026-10-04 04:25:07Z" end-time="2026-10-04 04:25:21Z" duration="14.033922" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12325 ms (prepare 7, ground 4221, water 135, props 458, groves 1361, edge 550, backdrop 394, grass 4680, plants 387, batching 57, map 4, rest 71).
+]]></output>
+            </test-case>
+            <test-case id="1193" name="SellingMeat_FeedsTheInnsPot_AndTheVillageRemarks" fullname="Crulanda.Tests.VillageSupplyTests.SellingMeat_FeedsTheInnsPot_AndTheVillageRemarks" methodname="SellingMeat_FeedsTheInnsPot_AndTheVillageRemarks" classname="Crulanda.Tests.VillageSupplyTests" runstate="Runnable" seed="882250123" result="Passed" start-time="2026-10-04 04:25:21Z" end-time="2026-10-04 04:25:36Z" duration="14.143327" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12456 ms (prepare 7, ground 4297, water 120, props 466, groves 1341, edge 563, backdrop 371, grass 4766, plants 400, batching 58, map 2, rest 65).
+]]></output>
+            </test-case>
+            <test-case id="1194" name="SellingMeat_WhereThereIsNoInn_NobodyTalksOfAPot" fullname="Crulanda.Tests.VillageSupplyTests.SellingMeat_WhereThereIsNoInn_NobodyTalksOfAPot" methodname="SellingMeat_WhereThereIsNoInn_NobodyTalksOfAPot" classname="Crulanda.Tests.VillageSupplyTests" runstate="Runnable" seed="1274610988" result="Passed" start-time="2026-10-04 04:25:36Z" end-time="2026-10-04 04:25:57Z" duration="20.984659" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12527 ms (prepare 7, ground 4213, water 116, props 474, groves 1385, edge 551, backdrop 388, grass 4877, plants 377, batching 57, map 4, rest 78).
+Zone zone.peaks (430 m) built in 5860 ms (prepare 788, ground 3258, water 2, props 85, groves 181, edge 211, backdrop 187, grass 1026, plants 30, batching 20, map 2, rest 70).
+]]></output>
+            </test-case>
+            <test-case id="1192" name="SellingOre_DeliversForgeOre_AndVellRemarks" fullname="Crulanda.Tests.VillageSupplyTests.SellingOre_DeliversForgeOre_AndVellRemarks" methodname="SellingOre_DeliversForgeOre_AndVellRemarks" classname="Crulanda.Tests.VillageSupplyTests" runstate="Runnable" seed="904542732" result="Passed" start-time="2026-10-04 04:25:57Z" end-time="2026-10-04 04:26:11Z" duration="14.108177" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12431 ms (prepare 7, ground 4401, water 118, props 468, groves 1395, edge 561, backdrop 372, grass 4602, plants 377, batching 58, map 2, rest 70).
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1196" name="VillageWorkshopTests" fullname="Crulanda.Tests.VillageWorkshopTests" classname="Crulanda.Tests.VillageWorkshopTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-10-04 04:26:11Z" end-time="2026-10-04 04:30:30Z" duration="258.895035" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1199" name="Each_trade_stands_at_its_own_workshop" fullname="Crulanda.Tests.VillageWorkshopTests.Each_trade_stands_at_its_own_workshop" methodname="Each_trade_stands_at_its_own_workshop" classname="Crulanda.Tests.VillageWorkshopTests" runstate="Runnable" seed="1155667646" result="Passed" start-time="2026-10-04 04:26:11Z" end-time="2026-10-04 04:27:36Z" duration="84.858699" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12399 ms (prepare 7, ground 4178, water 123, props 434, groves 1366, edge 597, backdrop 414, grass 4755, plants 385, batching 61, map 3, rest 76).
+]]></output>
+            </test-case>
+            <test-case id="1200" name="Eggs_loaves_and_hares_are_handed_over_at_the_kitchen" fullname="Crulanda.Tests.VillageWorkshopTests.Eggs_loaves_and_hares_are_handed_over_at_the_kitchen" methodname="Eggs_loaves_and_hares_are_handed_over_at_the_kitchen" classname="Crulanda.Tests.VillageWorkshopTests" runstate="Runnable" seed="893002827" result="Passed" start-time="2026-10-04 04:27:36Z" end-time="2026-10-04 04:28:15Z" duration="39.222491" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 13895 ms (prepare 7, ground 5781, water 130, props 464, groves 1392, edge 541, backdrop 386, grass 4681, plants 377, batching 64, map 3, rest 69).
+]]></output>
+            </test-case>
+            <test-case id="1197" name="Every_workshop_stand_is_reachable" fullname="Crulanda.Tests.VillageWorkshopTests.Every_workshop_stand_is_reachable" methodname="Every_workshop_stand_is_reachable" classname="Crulanda.Tests.VillageWorkshopTests" runstate="Runnable" seed="894165084" result="Passed" start-time="2026-10-04 04:28:15Z" end-time="2026-10-04 04:28:30Z" duration="15.324407" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 13608 ms (prepare 7, ground 5446, water 119, props 465, groves 1371, edge 574, backdrop 380, grass 4710, plants 390, batching 64, map 3, rest 79).
+]]></output>
+            </test-case>
+            <test-case id="1201" name="Nobody_answers_at_the_kitchen_door_while_the_innkeeper_is_away" fullname="Crulanda.Tests.VillageWorkshopTests.Nobody_answers_at_the_kitchen_door_while_the_innkeeper_is_away" methodname="Nobody_answers_at_the_kitchen_door_while_the_innkeeper_is_away" classname="Crulanda.Tests.VillageWorkshopTests" runstate="Runnable" seed="1240577877" result="Passed" start-time="2026-10-04 04:28:30Z" end-time="2026-10-04 04:28:56Z" duration="26.357849" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12311 ms (prepare 7, ground 4271, water 118, props 471, groves 1358, edge 550, backdrop 375, grass 4636, plants 390, batching 61, map 2, rest 72).
+]]></output>
+            </test-case>
+            <test-case id="1202" name="The_innkeeper_is_abed_by_2330" fullname="Crulanda.Tests.VillageWorkshopTests.The_innkeeper_is_abed_by_2330" methodname="The_innkeeper_is_abed_by_2330" classname="Crulanda.Tests.VillageWorkshopTests" runstate="Runnable" seed="1693467910" result="Passed" start-time="2026-10-04 04:28:56Z" end-time="2026-10-04 04:29:26Z" duration="29.149667" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12214 ms (prepare 11, ground 4208, water 118, props 456, groves 1334, edge 549, backdrop 374, grass 4650, plants 385, batching 55, map 3, rest 71).
+]]></output>
+            </test-case>
+            <test-case id="1198" name="The_leatherworker_keeps_shop_apart_from_the_tannery_yard" fullname="Crulanda.Tests.VillageWorkshopTests.The_leatherworker_keeps_shop_apart_from_the_tannery_yard" methodname="The_leatherworker_keeps_shop_apart_from_the_tannery_yard" classname="Crulanda.Tests.VillageWorkshopTests" runstate="Runnable" seed="520597042" result="Passed" start-time="2026-10-04 04:29:26Z" end-time="2026-10-04 04:30:30Z" duration="63.973728" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12107 ms (prepare 7, ground 4202, water 128, props 431, groves 1312, edge 525, backdrop 385, grass 4611, plants 377, batching 58, map 3, rest 68).
+Zone zone.oakhaven (560 m) built in 12099 ms (prepare 7, ground 4160, water 119, props 467, groves 1324, edge 544, backdrop 374, grass 4601, plants 377, batching 52, map 2, rest 72).
+Zone zone.oakhaven (560 m) built in 12312 ms (prepare 7, ground 4342, water 129, props 446, groves 1310, edge 522, backdrop 386, grass 4663, plants 379, batching 60, map 2, rest 66).
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1203" name="WaterTests" fullname="Crulanda.Tests.WaterTests" classname="Crulanda.Tests.WaterTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-04 04:30:30Z" end-time="2026-10-04 04:31:48Z" duration="78.597073" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1204" name="Drawn_carved_and_felt_water_agree_in_every_zone" fullname="Crulanda.Tests.WaterTests.Drawn_carved_and_felt_water_agree_in_every_zone" methodname="Drawn_carved_and_felt_water_agree_in_every_zone" classname="Crulanda.Tests.WaterTests" runstate="Runnable" seed="294461097" result="Passed" start-time="2026-10-04 04:30:30Z" end-time="2026-10-04 04:31:31Z" duration="61.167544" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12289 ms (prepare 7, ground 4346, water 129, props 450, groves 1312, edge 525, backdrop 372, grass 4634, plants 388, batching 55, map 2, rest 69).
+Zone zone.ashrim (430 m) built in 4755 ms (prepare 0, ground 1617, water 85, props 57, groves 1330, edge 1207, backdrop 114, grass 214, plants 0, batching 66, map 2, rest 63).
+Zone zone.khaven (410 m) built in 8439 ms (prepare 7, ground 2583, water 20, props 135, groves 2511, edge 1289, backdrop 262, grass 1360, plants 125, batching 81, map 1, rest 65).
+Zone zone.oakhaven (560 m) built in 12305 ms (prepare 7, ground 4207, water 123, props 462, groves 1364, edge 557, backdrop 372, grass 4687, plants 389, batching 63, map 1, rest 73).
+Zone zone.peaks (430 m) built in 5771 ms (prepare 768, ground 3255, water 1, props 84, groves 182, edge 206, backdrop 177, grass 974, plants 26, batching 17, map 1, rest 80).
+Zone zone.verdant (430 m) built in 10814 ms (prepare 3, ground 1911, water 25, props 1466, groves 2599, edge 1261, backdrop 216, grass 2412, plants 762, batching 69, map 1, rest 89).
+]]></output>
+            </test-case>
+            <test-case id="1205" name="Wading_and_swimming_in_Oakhaven" fullname="Crulanda.Tests.WaterTests.Wading_and_swimming_in_Oakhaven" methodname="Wading_and_swimming_in_Oakhaven" classname="Crulanda.Tests.WaterTests" runstate="Runnable" seed="1552659403" result="Passed" start-time="2026-10-04 04:31:31Z" end-time="2026-10-04 04:31:48Z" duration="17.419594" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12823 ms (prepare 7, ground 4535, water 131, props 465, groves 1401, edge 564, backdrop 395, grass 4809, plants 382, batching 60, map 2, rest 72).
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1206" name="WeatherTests" fullname="Crulanda.Tests.WeatherTests" classname="Crulanda.Tests.WeatherTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-10-04 04:31:48Z" end-time="2026-10-04 04:33:00Z" duration="71.757970" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1209" name="Every_kind_keeps_the_fog_in_its_band_and_the_light_readable" fullname="Crulanda.Tests.WeatherTests.Every_kind_keeps_the_fog_in_its_band_and_the_light_readable" methodname="Every_kind_keeps_the_fog_in_its_band_and_the_light_readable" classname="Crulanda.Tests.WeatherTests" runstate="Runnable" seed="1331103041" result="Passed" start-time="2026-10-04 04:31:48Z" end-time="2026-10-04 04:32:03Z" duration="14.512565" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12572 ms (prepare 7, ground 4427, water 120, props 465, groves 1382, edge 554, backdrop 379, grass 4708, plants 388, batching 61, map 2, rest 79).
+]]></output>
+            </test-case>
+            <test-case id="1208" name="No_rain_falls_on_a_camera_under_a_roof" fullname="Crulanda.Tests.WeatherTests.No_rain_falls_on_a_camera_under_a_roof" methodname="No_rain_falls_on_a_camera_under_a_roof" classname="Crulanda.Tests.WeatherTests" runstate="Runnable" seed="1455860621" result="Passed" start-time="2026-10-04 04:32:03Z" end-time="2026-10-04 04:32:17Z" duration="14.351466" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12517 ms (prepare 7, ground 4335, water 118, props 473, groves 1366, edge 567, backdrop 375, grass 4753, plants 375, batching 67, map 3, rest 78).
+]]></output>
+            </test-case>
+            <test-case id="1207" name="Rain_falls_wets_the_ground_and_clearing_dries_it" fullname="Crulanda.Tests.WeatherTests.Rain_falls_wets_the_ground_and_clearing_dries_it" methodname="Rain_falls_wets_the_ground_and_clearing_dries_it" classname="Crulanda.Tests.WeatherTests" runstate="Runnable" seed="875768167" result="Passed" start-time="2026-10-04 04:32:17Z" end-time="2026-10-04 04:32:32Z" duration="14.586145" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12747 ms (prepare 15, ground 4481, water 121, props 470, groves 1393, edge 574, backdrop 382, grass 4781, plants 391, batching 64, map 2, rest 73).
+]]></output>
+            </test-case>
+            <test-case id="1211" name="The_wind_reaches_the_shaders_and_the_clouds_are_up" fullname="Crulanda.Tests.WeatherTests.The_wind_reaches_the_shaders_and_the_clouds_are_up" methodname="The_wind_reaches_the_shaders_and_the_clouds_are_up" classname="Crulanda.Tests.WeatherTests" runstate="Runnable" seed="166273627" result="Passed" start-time="2026-10-04 04:32:32Z" end-time="2026-10-04 04:32:46Z" duration="14.244535" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12509 ms (prepare 7, ground 4361, water 116, props 476, groves 1390, edge 571, backdrop 383, grass 4685, plants 380, batching 61, map 3, rest 76).
+]]></output>
+            </test-case>
+            <test-case id="1210" name="The_zone_weather_follows_its_schedule_and_a_turn_is_announced" fullname="Crulanda.Tests.WeatherTests.The_zone_weather_follows_its_schedule_and_a_turn_is_announced" methodname="The_zone_weather_follows_its_schedule_and_a_turn_is_announced" classname="Crulanda.Tests.WeatherTests" runstate="Runnable" seed="182501124" result="Passed" start-time="2026-10-04 04:32:46Z" end-time="2026-10-04 04:33:00Z" duration="14.054347" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12328 ms (prepare 7, ground 4304, water 116, props 449, groves 1321, edge 555, backdrop 367, grass 4697, plants 384, batching 58, map 1, rest 69).
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1212" name="ZoneContentTests" fullname="Crulanda.Tests.ZoneContentTests" classname="Crulanda.Tests.ZoneContentTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-10-04 04:33:00Z" end-time="2026-10-04 04:34:01Z" duration="61.368922" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1213" name="Every_zone_builds_with_its_camps_people_props_and_roads" fullname="Crulanda.Tests.ZoneContentTests.Every_zone_builds_with_its_camps_people_props_and_roads" methodname="Every_zone_builds_with_its_camps_people_props_and_roads" classname="Crulanda.Tests.ZoneContentTests" runstate="Runnable" seed="631738005" result="Passed" start-time="2026-10-04 04:33:00Z" end-time="2026-10-04 04:34:01Z" duration="61.361527" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12223 ms (prepare 7, ground 4178, water 118, props 483, groves 1352, edge 552, backdrop 382, grass 4638, plants 375, batching 65, map 3, rest 70).
+Zone zone.ashrim (430 m) built in 4719 ms (prepare 0, ground 1529, water 85, props 65, groves 1354, edge 1217, backdrop 112, grass 219, plants 0, batching 68, map 2, rest 68).
+Zone zone.khaven (410 m) built in 8650 ms (prepare 4, ground 2546, water 18, props 135, groves 2628, edge 1351, backdrop 267, grass 1411, plants 128, batching 87, map 2, rest 73).
+Zone zone.oakhaven (560 m) built in 12434 ms (prepare 7, ground 4187, water 134, props 458, groves 1349, edge 554, backdrop 393, grass 4811, plants 397, batching 67, map 3, rest 74).
+Zone zone.peaks (430 m) built in 5558 ms (prepare 776, ground 3072, water 1, props 84, groves 182, edge 194, backdrop 183, grass 957, plants 26, batching 15, map 1, rest 67).
+Zone zone.verdant (430 m) built in 10923 ms (prepare 3, ground 1865, water 20, props 1498, groves 2741, edge 1269, backdrop 217, grass 2381, plants 767, batching 75, map 3, rest 84).
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1214" name="ZoneExitTests" fullname="Crulanda.Tests.ZoneExitTests" classname="Crulanda.Tests.ZoneExitTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-10-04 04:34:01Z" end-time="2026-10-04 04:37:55Z" duration="233.200832" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1215" name="Every_exit_can_be_walked_into_and_travelled" fullname="Crulanda.Tests.ZoneExitTests.Every_exit_can_be_walked_into_and_travelled" methodname="Every_exit_can_be_walked_into_and_travelled" classname="Crulanda.Tests.ZoneExitTests" runstate="Runnable" seed="1946780248" result="Passed" start-time="2026-10-04 04:34:01Z" end-time="2026-10-04 04:37:55Z" duration="233.195775" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="Timeout" value="420000" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12146 ms (prepare 7, ground 4252, water 128, props 439, groves 1322, edge 529, backdrop 375, grass 4583, plants 371, batching 66, map 3, rest 71).
+Zone zone.ashrim (430 m) built in 4960 ms (prepare 0, ground 1646, water 82, props 70, groves 1402, edge 1278, backdrop 117, grass 227, plants 1, batching 65, map 2, rest 70).
+Zone zone.peaks (430 m) built in 5409 ms (prepare 749, ground 2989, water 0, props 74, groves 171, edge 192, backdrop 180, grass 953, plants 26, batching 15, map 1, rest 59).
+Zone zone.ashrim (430 m) built in 4892 ms (prepare 0, ground 1597, water 85, props 75, groves 1393, edge 1273, backdrop 115, grass 220, plants 1, batching 66, map 1, rest 66).
+Zone zone.peaks (430 m) built in 5411 ms (prepare 741, ground 3005, water 1, props 76, groves 174, edge 189, backdrop 180, grass 939, plants 26, batching 16, map 1, rest 63).
+Zone zone.ashrim (430 m) built in 4819 ms (prepare 0, ground 1595, water 81, props 78, groves 1360, edge 1249, backdrop 116, grass 217, plants 0, batching 57, map 1, rest 65).
+Zone zone.ashrim (430 m) built in 4792 ms (prepare 0, ground 1593, water 87, props 65, groves 1341, edge 1235, backdrop 112, grass 223, plants 0, batching 60, map 3, rest 73).
+Zone zone.verdant (430 m) built in 10584 ms (prepare 3, ground 1837, water 21, props 1464, groves 2583, edge 1210, backdrop 213, grass 2343, plants 772, batching 63, map 1, rest 74).
+Zone zone.khaven (410 m) built in 8520 ms (prepare 4, ground 2533, water 18, props 139, groves 2600, edge 1325, backdrop 258, grass 1362, plants 122, batching 91, map 2, rest 66).
+Zone zone.verdant (430 m) built in 10621 ms (prepare 3, ground 1834, water 25, props 1453, groves 2608, edge 1223, backdrop 210, grass 2339, plants 766, batching 66, map 2, rest 92).
+Zone zone.ashrim (430 m) built in 5167 ms (prepare 0, ground 1697, water 87, props 80, groves 1457, edge 1351, backdrop 119, grass 233, plants 1, batching 69, map 1, rest 72).
+Zone zone.khaven (410 m) built in 8851 ms (prepare 9, ground 2787, water 24, props 148, groves 2680, edge 1321, backdrop 256, grass 1352, plants 124, batching 87, map 2, rest 61).
+Zone zone.ashrim (430 m) built in 4751 ms (prepare 0, ground 1548, water 86, props 61, groves 1355, edge 1235, backdrop 113, grass 222, plants 0, batching 60, map 2, rest 69).
+Zone zone.oakhaven (560 m) built in 12205 ms (prepare 7, ground 4134, water 124, props 443, groves 1341, edge 535, backdrop 388, grass 4718, plants 379, batching 58, map 3, rest 75).
+Zone zone.oakhaven (560 m) built in 12028 ms (prepare 7, ground 4277, water 125, props 443, groves 1310, edge 519, backdrop 374, grass 4447, plants 386, batching 64, map 3, rest 73).
+Zone zone.khaven (410 m) built in 8654 ms (prepare 4, ground 2662, water 20, props 154, groves 2607, edge 1348, backdrop 248, grass 1334, plants 122, batching 90, map 2, rest 63).
+Zone zone.oakhaven (560 m) built in 12501 ms (prepare 10, ground 4320, water 131, props 458, groves 1364, edge 539, backdrop 389, grass 4771, plants 387, batching 61, map 1, rest 70).
+Zone zone.khaven (410 m) built in 8789 ms (prepare 4, ground 2638, water 19, props 142, groves 2688, edge 1353, backdrop 261, grass 1391, plants 130, batching 91, map 1, rest 71).
+Zone zone.peaks (430 m) built in 5487 ms (prepare 751, ground 3065, water 0, props 65, groves 182, edge 193, backdrop 174, grass 952, plants 25, batching 15, map 2, rest 63).
+Zone zone.peaks (430 m) built in 5358 ms (prepare 747, ground 2918, water 1, props 65, groves 189, edge 192, backdrop 183, grass 950, plants 26, batching 17, map 1, rest 69).
+Zone zone.khaven (410 m) built in 8561 ms (prepare 4, ground 2597, water 18, props 140, groves 2620, edge 1315, backdrop 250, grass 1335, plants 129, batching 87, map 1, rest 65).
+Zone zone.peaks (430 m) built in 5659 ms (prepare 757, ground 3166, water 1, props 90, groves 191, edge 206, backdrop 176, grass 955, plants 26, batching 15, map 1, rest 75).
+Zone zone.khaven (410 m) built in 8764 ms (prepare 4, ground 2512, water 22, props 145, groves 2646, edge 1406, backdrop 275, grass 1450, plants 130, batching 90, map 1, rest 83).
+Zone zone.peaks (430 m) built in 5401 ms (prepare 751, ground 2993, water 1, props 80, groves 165, edge 188, backdrop 178, grass 941, plants 26, batching 16, map 1, rest 61).
+Zone zone.verdant (430 m) built in 10484 ms (prepare 3, ground 1763, water 19, props 1460, groves 2611, edge 1201, backdrop 213, grass 2320, plants 766, batching 58, map 1, rest 69).
+Zone zone.peaks (430 m) built in 5233 ms (prepare 728, ground 2865, water 1, props 76, groves 166, edge 184, backdrop 178, grass 935, plants 25, batching 15, map 1, rest 59).
+Zone zone.khaven (410 m) built in 8438 ms (prepare 7, ground 2504, water 21, props 132, groves 2549, edge 1333, backdrop 262, grass 1357, plants 123, batching 81, map 2, rest 67).
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1216" name="ZoneTravelTests" fullname="Crulanda.Tests.ZoneTravelTests" classname="Crulanda.Tests.ZoneTravelTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-10-04 04:37:55Z" end-time="2026-10-04 04:38:18Z" duration="23.164965" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1217" name="Oakhaven_builds_and_west_road_travels_to_khaven" fullname="Crulanda.Tests.ZoneTravelTests.Oakhaven_builds_and_west_road_travels_to_khaven" methodname="Oakhaven_builds_and_west_road_travels_to_khaven" classname="Crulanda.Tests.ZoneTravelTests" runstate="Runnable" seed="2052288834" result="Passed" start-time="2026-10-04 04:37:55Z" end-time="2026-10-04 04:38:18Z" duration="23.158578" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Zone zone.oakhaven (560 m) built in 12122 ms (prepare 13, ground 4085, water 116, props 452, groves 1351, edge 550, backdrop 375, grass 4670, plants 378, batching 61, map 1, rest 70).
+Zone zone.khaven (410 m) built in 8419 ms (prepare 4, ground 2532, water 19, props 135, groves 2545, edge 1314, backdrop 256, grass 1336, plants 127, batching 90, map 2, rest 59).
+Saving results to: C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation\q-PlayMode.xml
+]]></output>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

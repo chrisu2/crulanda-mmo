@@ -40,7 +40,8 @@ namespace Crulanda.Encounter
             {
                 var z = zone.Zone;
                 // A cave's camps are not drawn over the land above them: the cave's own landmark carries their levels ("3-5").
-                foreach (var l in z.landmarks) into.Add(new MapMark { kind = MarkKind.Landmark, world = zone.Ground(l.at), text = l.name + CaveBand(z, l.name) });
+                // A place not yet explored is a "?" (Achievements: walk there and it is named).
+                foreach (var l in z.landmarks) into.Add(new MapMark { kind = MarkKind.Landmark, world = zone.Ground(l.at), text = s.Feats == null || s.Feats.Explored(z, l) ? l.name + CaveBand(z, l.name) : "?" });
                 if (z.camps != null)
                     foreach (var c in z.camps) if (c != null && !InCave(c.center)) into.Add(new MapMark { kind = MarkKind.Camp, world = zone.Ground(c.center), text = c.mob, camp = c });
                 foreach (var e in z.exits) into.Add(new MapMark { kind = MarkKind.Exit, world = zone.Ground(e.at), text = e.name, to = ZoneById(zone, e.to) });
@@ -290,12 +291,16 @@ namespace Crulanda.Encounter
                 Shadowed(new Rect(side.x, y, side.width, 20), to.displayName + "  " + Band(to), label, BandColor(to, s.Progress.Level)); y += 20;
                 GUI.Label(new Rect(side.x + 10, y, side.width - 10, 20), e.name, note); y += 22;
             }
-            y += 10; GUI.Label(new Rect(side.x, y, side.width, 22), "PLACES", label); y += 24;
+            int known = s.Feats != null ? s.Feats.ExploredIn(z) : z.landmarks.Length;
+            y += 10; GUI.Label(new Rect(side.x, y, side.width, 22), "PLACES  (" + known + " / " + (s.Feats != null ? s.Feats.PoisIn(z) : z.landmarks.Length) + ")", label); y += 24;
             // One column while they fit; a bigger zone's places go in two narrower columns in the smaller hand.
             float room = side.yMax - 60 - y; bool two = z.landmarks.Length > Mathf.FloorToInt(room / 19);
             float step = two ? 17 : 19, colW = two ? side.width / 2 - 4 : side.width; int perCol = Mathf.Max(1, Mathf.FloorToInt(room / step));
             for (int i = 0; i < z.landmarks.Length && i < perCol * (two ? 2 : 1); i++)
-                Shadowed(new Rect(side.x + (i / perCol) * (colW + 8), y + (i % perCol) * step, colW, 20), z.landmarks[i].name, two ? placeSmall : label, gold);
+            {
+                bool seen = s.Feats == null || s.Feats.Explored(z, z.landmarks[i]);
+                Shadowed(new Rect(side.x + (i / perCol) * (colW + 8), y + (i % perCol) * step, colW, 20), seen ? z.landmarks[i].name : "? ? ?", two ? placeSmall : label, seen ? gold : new Color(.6f, .58f, .52f));
+            }
             if (!string.IsNullOrEmpty(z.canonStatus)) GUI.Label(new Rect(side.x, side.yMax - 40, side.width, 40), "Lore status: " + z.canonStatus, note);
         }
         void DrawWorldMap(EncounterSession s, ZoneBuilder zone, Rect map, Color gold)

@@ -40,6 +40,17 @@ namespace Crulanda.Encounter
         public int days;
         /// <summary>Each zone's notice board: the day it was drawn, its postings, the ones handed in today. See Bounties.</summary>
         public List<BoardState> boards = new List<BoardState>();
+        // ---------- points of interest and achievements (2026-10-03; older saves load with these empty and record past deeds) ----------
+        /// <summary>Places explored, "zone.id|landmark name": each paid its exploration experience once. See Achievements.</summary>
+        public List<string> explored = new List<string>();
+        /// <summary>Achievements earned, by id ("explore.oakhaven", "bounty.10"...), in the order earned.</summary>
+        public List<string> achievements = new List<string>();
+        /// <summary>The title worn (an earned achievement's), or empty.</summary>
+        public string title;
+        /// <summary>Notice-board bounties handed in, and rare postings seen through.</summary>
+        public int bounties, rares;
+        /// <summary>Camp elites killed, by camp ("mob.captain.peaks.3").</summary>
+        public List<string> elitesSlain = new List<string>();
         // ---------- quests (save format 4; older saves load with these empty) ----------
         public List<QuestState> quests = new List<QuestState>();
         public List<string> questsDone = new List<string>();

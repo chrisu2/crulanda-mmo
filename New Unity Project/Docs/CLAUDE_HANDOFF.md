@@ -10,8 +10,23 @@ Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
 ## RESUME HERE (updated 2026-10-03, evening)
-**NEXT:** Peaks done (round 12). Note 9 done (23:35). Next: notes 20-22 (Thornbolt lost at range, floating boulders + the coop's sack, deer flee too short), then POIs + achievements (Chris chose: every landmark a POI with XP and map reveal; an Achievements tab with points and titles), then the Ash Rim's
-camps and quests (`Docs/NEXT_PEAKS.md` "After Peaks"). Chris said not to shut the computer down until he says.
+**NEXT (2026-10-04 01:20, Chris stopped for the night; do NOT shut the computer down unless he says):**
+1. **POIs + achievements are committed but NOT published.** Run the full check (`start_detached.ps1 -Arguments '-Zones
+   zone.oakhaven'`; it now also shoots `warrior-37-achievements.png` and the zone map shows "?" places), then publish, a
+   CHANGELOG line ("published HH:MM"), commit, back up. If a PlayMode test trips on a "DISCOVERED" toast or message, the
+   session's `Exploring` flag is the switch (off in test runs and captures; a test sets `s.Exploring = true`).
+2. **Make PlayMode efficient (Chris: "i want the most efficient playmode. whatever that takes").** Timings of the last full
+   run (00:47, scratchpad copy `playmode-timing-20261004.xml`; re-measure from `encounter-validation\q-PlayMode.xml`): 175
+   tests, 56 min of fixtures, no single hog: VillageWorkshop 259 s, VillagePurse 239, ZoneExit 233 (1 test), VillageHome 178,
+   CraftStation 140, SocialPull 131, LootWindow 121, EliteFight 119, NodePlacement 118, Cave 117, VillageErrand 115, Gather
+   109, NamedLoot 102 ... Each fixture reloads the Oakhaven scene (~10 s a load) and many wait fixed seconds. Plan agreed:
+   (a) the runner picks what to run from the files changed since the last green run (art, shaders, zone data only: EditMode +
+   build + tour, no PlayMode; gameplay code: the fixtures covering those files; core (session, save, ability runtime): all);
+   (b) fixtures share one scene load ([OneTimeSetUp]) and fixed waits become wait-until-true with a timeout; (c) split
+   PlayMode across two validation copies run side by side; (d) every playtest bug gets a regression test (boulders touch the
+   ground, a hit deer ends out of spell range, a cast lands at range + 5 m, a brim within 1.65 crowns, a staff slung on the run).
+3. Then the Ash Rim's camps and quests (`Docs/NEXT_PEAKS.md` "After Peaks"), playtest note 10 (cave lighting), armour.
+Chris's save is not precious to him (memory `crulanda-save-not-precious`): no save-compat effort for his sake.
 **The playable build:** published 2026-10-04 00:48: notes 20-22 (casts land at range + 5 m, grounded boulders, the coop sack, deer flee 25-35 m); before it 2026-10-03 23:35: the sun (note 9), hats, wheel zoom and staff slinging (notes 17-19); before it 22:25: the Peaks filled out (4 camps, 5 quests); before it 21:05: the dead trees rebuilt (playtest note 16: snags with heavy crooked limbs, blunt broken tops) and the board capture, on top of 17:25: notice boards with bounties and the rare courier posting, silver crowns, Khaven's
 four camps and five quests (12d8ddc), on top of the boars (14:42), the farm animals (13:06) and the real animals (01:59).
 **Last full run (2026-10-04 00:47):** EditMode 396/396, PlayMode 175/175 (56 min of fixtures), Oakhaven toured, no exceptions. 23:33: EditMode 396/396, PlayMode 175/175, Oakhaven toured, no exceptions. 22:21: EditMode 396/396, PlayMode 175/175, build OK, the Peaks toured, no exceptions. 21:01: EditMode 396/396, PlayMode 175/175, build OK, Khaven toured, no exceptions in any game log. Before it, 17:19: EditMode 396/396, PlayMode 175/175 (two zone tests failed on the board's postings in the full run and were
@@ -971,4 +986,14 @@ resumed with `Workflow({scriptPath, resumeFromRunId})` (finished agents replay f
   1-per-notch or 120-per-notch; AdventurerMotor 1.2 m a notch, 2.5-22 m. Staff: ActorVisual.ModelLate slings held gear
   taller than 1.3 m (HeldTall, measured in hand, cached per held array) when speed > 3.2 (back below 2.2), unless
   ActorVisual.Fighting(gameObject).
+- **Round 14, notes 20-22 (PUBLISHED 2026-10-04 00:48)**: EncounterSession.LandsOn/LandingLeeway (DruidKit casts, WarriorKit
+  blows); ZoneBuilder Perch boulders and "rock" props seated on the lowest of 3 x 3 ground samples under them; Coop's grain
+  sack rebuilt; GameAnimal bolt 25-35 m (deer), 12-16 (others), boltUntil 9 s, HurtFleeDistance 35 re-bolt.
+- **Round 15, POIs + achievements (COMMITTED 2026-10-04 01:20, NOT PUBLISHED)**: Achievements.cs (pure: Pois, Reach 6-18 m,
+  PoiXp 15 + 8 x levelMin, EliteKey/EliteKeys "mob.<tag>.<zone>.<camp>", Check(quiet), Titles, Wear); EncounterProgress
+  explored, achievements, title, bounties, rares, elitesSlain (declared after boards, before quests: no format bump);
+  EncounterSession Feats (made in TickFeats once the zone is up), Exploring (off for test runs, temp saves and captures),
+  ExplorePlaces every .25 s, Check every 1 s, quiet prime after a load, bounties/rares counted in CompleteQuest, elites in
+  EnemyDied; HUD: EncounterHud.Achievements.cs (the tab), six book tabs at 111 px, the title over the player frame, points on
+  the character sheet; HudMaps "?" for unexplored places. AchievementTests (3).
 

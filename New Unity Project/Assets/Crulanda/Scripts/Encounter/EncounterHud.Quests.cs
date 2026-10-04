@@ -215,12 +215,12 @@ namespace Crulanda.Encounter
             // A newly revealed page jumps to the Chronicle once; after that the reader can switch tabs freely.
             if (!string.IsNullOrEmpty(session.ReadingDocument) && session.ReadingDocument != lastReading) BookTab = "chronicle";
             lastReading = session.ReadingDocument;
-            string[] tabs = { "quests", "chronicle", "standing", "discoveries", "armoury" };
-            string[] names = { "Quests", "Chronicle", "Standing", "Discoveries", "Armoury" + (session.ArmouryUnseen > 0 ? "  +" + session.ArmouryUnseen : "") };
+            string[] tabs = { "quests", "chronicle", "standing", "discoveries", "achievements", "armoury" };
+            string[] names = { "Quests", "Chronicle", "Standing", "Discoveries", "Achievements", "Armoury" + (session.ArmouryUnseen > 0 ? "  +" + session.ArmouryUnseen : "") };
             for (int i = 0; i < tabs.Length; i++)
             {
                 GUI.enabled = BookTab != tabs[i];
-                if (GUI.Button(new Rect(w.x + 260 + i * 122, w.y + 16, 116, 30), names[i], micro)) { BookTab = tabs[i]; if (tabs[i] != "chronicle") session.ReadingDocument = null; }
+                if (GUI.Button(new Rect(w.x + 236 + i * 111, w.y + 16, 106, 30), names[i], micro)) { BookTab = tabs[i]; if (tabs[i] != "chronicle") session.ReadingDocument = null; }
                 GUI.enabled = true;
             }
             if (GUI.Button(new Rect(w.xMax - 124, w.y + 16, 100, 30), "Close [L]", micro)) { session.QuestBookOpen = false; session.ReadingDocument = null; }
@@ -229,6 +229,7 @@ namespace Crulanda.Encounter
             if (BookTab == "quests") BookQuests(log, list, page);
             else if (BookTab == "chronicle") BookChronicle(log, list, page);
             else if (BookTab == "discoveries") BookDiscoveries(list, page);
+            else if (BookTab == "achievements") BookAchievements(list, page);
             else if (BookTab == "armoury") BookArmoury(list, page);
             else BookStanding(log, new Rect(list.x, list.y, w.width - 40, list.height));
         }

@@ -85,9 +85,23 @@ namespace Crulanda.Encounter
             beastModel.Drive(LyingLow ? 0 : speed, rest);
         }
         /// <summary>A blow as it lands (EncounterEnemy): a modelled beast attacks (a wolf bites, a stag drives its antlers, a doe kicks).</summary>
-        public void Strike() { if (beastModel != null) beastModel.Play(beastModel.Kind == "Deer" ? "kick" : "attack"); }
+        public void Strike()
+        {
+            if (beastModel != null) { beastModel.Play(beastModel.Kind == "Deer" ? "kick" : "attack"); return; }
+            // A modelled person (playtest note 25): a sword's swing armed (anything held), a jab or a cross bare-handed.
+            if (model != null) model.Act(held != null && held.Length > 0 && !gearStowed ? "swing" : (punchLeft = !punchLeft) ? "jab" : "cross");
+        }
+        bool punchLeft;
+        /// <summary>A spell let fly (an instant one, or a cast as it completes): the release over the walk.</summary>
+        public void CastRelease() { if (model != null) model.Act("castshot"); }
+        /// <summary>A cast being drawn: the spell pose held over the walk.</summary>
+        public bool Casting { set { if (model != null) model.Casting = value; } }
         /// <summary>Struck (EncounterEnemy.Receive): a modelled beast flinches, one way then the other, unless it is mid-attack.</summary>
-        public void Flinch() { if (beastModel != null && !beastModel.Busy && !beastModel.Dead) beastModel.Play((hitLeft = !hitLeft) ? "hitL" : "hitR"); }
+        public void Flinch()
+        {
+            if (beastModel != null) { if (!beastModel.Busy && !beastModel.Dead) beastModel.Play((hitLeft = !hitLeft) ? "hitL" : "hitR"); return; }
+            if (model != null) model.Act((hitLeft = !hitLeft) ? "hit" : "hithead");
+        }
         /// <summary>Edit mode (captures, tests): a modelled beast posed <paramref name="time"/> seconds into one of its motions.</summary>
         public void BeastPreview(string slot, float time) { if (beastModel != null) beastModel.Sample(slot, time); }
     }

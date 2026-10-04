@@ -410,3 +410,7 @@ Status 2026-10-04 04:44: 27 (gold labels), 29 (drinking), 31 (the Tin crown's si
 "orbit" was its crooked tilt, now nearly level) and 32 FIXED and published. Still OPEN: 23 (fps), 24 (tree seams), 25
 (combat animations), 26 (roofs blocking the camera), 28 (the horse in the inn), 30 (sitting: seat offset; the drinkers'
 arms are fixed).
+
+Status 2026-10-04 15:50: 24 (tree joins), 25 (combat animations), 26 (see-through buildings), 28 (the horse) and 30 (sitting)
+FIXED and published; 23 (fps) IMPROVED (94 to 104 fps in Oakhaven at 1440x900; HUD and scripts still the largest costs, see
+CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have a up and down"), full screen by default.

@@ -245,6 +245,54 @@ namespace Crulanda.Encounter
 
         // ------------------------------------------------------------------------------------------------- motion
         PlayableGraph graph; AnimationMixerPlayable mixer;
+        // ---------- the upper body: blows, flinches and casts over the walk (playtest note 25) ----------
+        /// <summary>One-shot and held motions of the arms and back, played over whatever the legs are doing.</summary>
+        static readonly (string slot, string clip)[] Actions = {
+            ("swing", "Sword_Attack"), ("jab", "Punch_Jab"), ("cross", "Punch_Cross"), ("hit", "Hit_Chest"), ("hithead", "Hit_Head"),
+            ("castloop", "Spell_Simple_Idle_Loop"), ("castshot", "Spell_Simple_Shoot") };
+        AnimationLayerMixerPlayable layers; AnimationMixerPlayable upper;
+        readonly List<(AnimationClipPlayable p, AnimationClip c)> acts = new List<(AnimationClipPlayable, AnimationClip)>();
+        readonly Dictionary<string, int> actOf = new Dictionary<string, int>();
+        string acting; float actUntil, layerWeight; bool casting;
+        /// <summary>True while a blow, a flinch or a cast's release is playing.</summary>
+        public bool Acting { get { return acting != null && Time.time < actUntil; } }
+        /// <summary>Plays an upper-body motion once ("swing", "jab", "cross", "hit", "hithead", "castshot"); a flinch never cuts a blow.</summary>
+        public void Act(string slot)
+        {
+            if (!graph.IsValid() || !actOf.TryGetValue(slot, out int i)) return;
+            bool flinch = slot == "hit" || slot == "hithead";
+            if (flinch && Acting && acting != "hit" && acting != "hithead") return;
+            var (p, c) = acts[i]; p.SetTime(0); p.SetSpeed(flinch ? 1.4f : 1.25f);
+            acting = slot; actUntil = Time.time + c.length / (flinch ? 1.4f : 1.25f);
+        }
+        /// <summary>Holds the spell pose while a cast is drawn (the release is <see cref="Act"/>("castshot")).</summary>
+        public bool Casting { get { return casting; } set { casting = value; } }
+        /// <summary>The spine and all above it (arms, neck, head), as transform paths under the figure's Animator.</summary>
+        AvatarMask UpperMask()
+        {
+            var m = new AvatarMask();
+            m.AddTransformPath(Animator.transform, true);
+            for (int i = 0; i < m.transformCount; i++) { var path = m.GetTransformPath(i); m.SetTransformActive(i, path.Contains("spine_01")); }
+            for (int i = 0; i < (int)AvatarMaskBodyPart.LastBodyPart; i++)
+            {
+                var part = (AvatarMaskBodyPart)i;
+                m.SetHumanoidBodyPartActive(part, part == AvatarMaskBodyPart.Body || part == AvatarMaskBodyPart.Head || part == AvatarMaskBodyPart.LeftArm || part == AvatarMaskBodyPart.RightArm
+                    || part == AvatarMaskBodyPart.LeftFingers || part == AvatarMaskBodyPart.RightFingers);
+            }
+            return m;
+        }
+        /// <summary>Each frame (from <see cref="Drive"/>): the action's weight in, held while it plays or a cast is drawn, then out.</summary>
+        void DriveUpper(float dt)
+        {
+            if (!layers.IsValid()) return;
+            bool on = Acting || casting;
+            string slot = Acting ? acting : casting ? "castloop" : null;
+            for (int i = 0; i < acts.Count; i++) upper.SetInputWeight(i, slot != null && actOf.TryGetValue(slot, out int s) && s == i ? 1 : 0);
+            if (!Acting) acting = null;
+            layerWeight = Mathf.MoveTowards(layerWeight, on ? 1 : 0, dt * (on ? 12 : 5));
+            layers.SetInputWeight(1, layerWeight);
+            if (slot == "castloop" && actOf.TryGetValue("castloop", out int cl)) { var (p, c) = acts[cl]; if (c.length > 0 && p.GetTime() > c.length) p.SetTime(p.GetTime() % c.length); }
+        }
         readonly List<(AnimationClipPlayable p, AnimationClip c, bool loop)> slots = new List<(AnimationClipPlayable, AnimationClip, bool)>();
         readonly Dictionary<string, int> slotOf = new Dictionary<string, int>(); float[] weights; string current;
         static AnimationClip[] library;
@@ -277,7 +325,23 @@ namespace Crulanda.Encounter
                 p.SetTime(Stagger(label, i) * found[i].Item2.length);   // no two figures step in time
             }
             if (slotOf.TryGetValue("idle", out int idle)) { weights[idle] = 1; mixer.SetInputWeight(idle, 1); }
-            output.SetSourcePlayable(mixer); graph.Play();
+            // The upper body's layer over the mixer (playtest note 25): its clips, a mask from the spine up, weight 0 until a blow.
+            var actions = new List<(string, AnimationClip)>();
+            foreach (var (slot, clip) in Actions) { var c = Clip(clip); if (c != null) actions.Add((slot, c)); }
+            if (actions.Count > 0)
+            {
+                upper = AnimationMixerPlayable.Create(graph, actions.Count);
+                for (int i = 0; i < actions.Count; i++)
+                {
+                    var p = AnimationClipPlayable.Create(graph, actions[i].Item2); graph.Connect(p, 0, upper, i); acts.Add((p, actions[i].Item2)); actOf[actions[i].Item1] = i;
+                }
+                layers = AnimationLayerMixerPlayable.Create(graph, 2);
+                graph.Connect(mixer, 0, layers, 0); graph.Connect(upper, 0, layers, 1);
+                layers.SetInputWeight(0, 1); layers.SetInputWeight(1, 0); layers.SetLayerMaskFromAvatarMask(1, UpperMask());
+                output.SetSourcePlayable(layers);
+            }
+            else output.SetSourcePlayable(mixer);
+            graph.Play();
         }
         /// <summary>Where in a clip a figure starts (0 to 1), from its name: fixed per figure and taking nothing from the shared
         /// random stream (others draw from it in a set order).</summary>
@@ -289,7 +353,7 @@ namespace Crulanda.Encounter
         }
         public void StopMotion() { if (graph.IsValid()) graph.Destroy(); }
         /// <summary>The clip a slot plays (null if the library lacks it).</summary>
-        public static AnimationClip SlotClip(string slot) { foreach (var (s, clip) in Motions) if (s == slot) return Clip(clip); return null; }
+        public static AnimationClip SlotClip(string slot) { foreach (var (s, clip) in Motions) if (s == slot) return Clip(clip); foreach (var (s, clip) in Actions) if (s == slot) return Clip(clip); return null; }
         /// <summary>Edit mode (captures, tests): poses the figure at <paramref name="time"/> seconds into a slot's clip, once
         /// (AnimationClip.SampleAnimation: a PlayableGraph does not pose an Animator outside play mode).</summary>
         public void Sample(string slot, float time)
@@ -333,6 +397,7 @@ namespace Crulanda.Encounter
                 Rate("walk", Mathf.Clamp(speed / 1.4f, .7f, 1.6f)); Rate("run", Mathf.Clamp(speed / 3.6f, .75f, 1.5f)); Rate("sprint", Mathf.Clamp(speed / 6.5f, .8f, 1.4f));
             }
             current = pose;
+            DriveUpper(dt);
             float sum = 0;
             for (int i = 0; i < weights.Length; i++) { weights[i] = Mathf.MoveTowards(weights[i], want[i], dt * 4); sum += weights[i]; }
             for (int i = 0; i < weights.Length; i++)

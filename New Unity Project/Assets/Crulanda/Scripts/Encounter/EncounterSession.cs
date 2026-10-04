@@ -1057,6 +1057,17 @@ namespace Crulanda.Encounter
         public float CooldownRemaining(AbilityDefinition ability) { return abilities.Remaining(ability, Time.time); }
         /// <summary>A cast in progress, or work (gathering) on the same bar.</summary>
         public bool PlayerCasting { get { return abilities.IsCasting || Working; } }
+        /// <summary>The player's figure (blows, flinches and casts on it: playtest note 25).</summary>
+        ActorVisual PlayerFigure { get { if (playerFigure == null && Player != null) playerFigure = Player.GetComponent<ActorVisual>(); return playerFigure; } }
+        ActorVisual playerFigure; bool castPosed;
+        /// <summary>A cast being drawn holds the spell pose; when it ends standing (not moved off it), the spell is let fly.</summary>
+        void TickCastPose()
+        {
+            var f = PlayerFigure; if (f == null) return;
+            bool drawing = abilities.IsCasting;
+            if (castPosed && !drawing && Player.IsAlive && !Player.GetComponent<AdventurerMotor>().Moving) f.CastRelease();
+            if (drawing != castPosed) { f.Casting = drawing; castPosed = drawing; }
+        }
         public float PlayerCastProgress { get { return abilities.IsCasting ? abilities.CastProgress(Time.time) : Working ? Mathf.Clamp01((Time.time - workStart) / workSeconds) : 0; } }
         public string PlayerCastName { get { return abilities.IsCasting ? abilities.Casting.name : workName; } }
 
@@ -1069,6 +1080,9 @@ namespace Crulanda.Encounter
                 Player.Resource.Pool.Change(-cost); return true;
             }, effect);
             if (result == AbilityStartResult.InsufficientResource) Message("Not enough " + ClassDef.resource + ".");
+            // An instant blow or spell on a target shows (playtest note 25): a swing in melee, a release at range. Casts are TickCastPose's.
+            if (result == AbilityStartResult.Started && a.castTime <= 0 && Target != null && Target.actor.IsAlive)
+            { if (Kit.MeleeAutoAttacks || Distance(Target) < 3.5f) PlayerFigure?.Strike(); else PlayerFigure?.CastRelease(); }
             return result;
         }
         public bool EnemyInRange(EncounterEnemy enemy, float range) { return enemy != null && enemy.actor.IsAlive && Distance(enemy) <= range; }
@@ -1398,7 +1412,7 @@ namespace Crulanda.Encounter
             if (Debug.isDebugBuild && EncounterInput.Press(KeyCode.F8) && Crulanda.World.WorldWeather.Active != null) Message("Weather: " + Crulanda.World.WorldWeather.Active.CycleForced() + " (dev).");
             TickLoot();
             if (!Player.IsAlive) { if (EncounterInput.Press(KeyCode.R)) Recover(); return; }
-            TickQuests(); TickItems(); TickDiscoveries(); TickPlaces(); TickFeats(); TickNodes(); TickWork();
+            TickQuests(); TickItems(); TickDiscoveries(); TickPlaces(); TickFeats(); TickNodes(); TickWork(); TickCastPose();
             if (Zone != null && Player.GetComponent<CharacterController>().isGrounded && !Zone.WaterAt(new Vector2(Player.transform.position.x, Player.transform.position.z), out _, out _)) lastDry = Player.transform.position;
             var motor = Player.GetComponent<AdventurerMotor>(); var look = Player.GetComponent<ActorVisual>();
             if (look != null) look.Pose = motor.Swimming ? ActorPose.Swim : motor.Sneaking ? ActorPose.Sneak : ActorPose.None;
@@ -1426,7 +1440,7 @@ namespace Crulanda.Encounter
             Kit.Tick(InCombat);
             if (AutoAttack && !Kit.MeleeAutoAttacks) AutoAttack = false;
             if (AutoAttack && Target != null && Target.actor.IsAlive && Time.time >= nextSwing && Distance(Target) < 3.2f)
-            { nextSwing = Time.time + Kit.SwingInterval(content.playerSwingInterval); Target.Receive(WeaponDamage, Player); Kit.OnAutoHit(); }
+            { nextSwing = Time.time + Kit.SwingInterval(content.playerSwingInterval); PlayerFigure?.Strike(); Target.Receive(WeaponDamage, Player); Kit.OnAutoHit(); }
             if (Time.time >= nextRegen)
             {
                 nextRegen = Time.time + 1; Player.Resource.Pool.Change(InCombat ? ClassDef.combatRegen : ClassDef.restingRegen);

@@ -431,13 +431,16 @@ namespace Crulanda.Encounter
 
         /// <summary>What a pose does to a model this moment: the clip's slot (null: the walk cycle), the arms' old pivot angles when the
         /// pose works them, a lean of the whole figure, a drop (swimming) and a bend of the back.</summary>
-        struct PoseState { public string slot; public bool arms; public Vector3 armL, armR; public float elbowL, elbowR, lean, drop, bend; }
+        /// <summary>The sitting clip puts the hips this far behind where the figure stands: a seated body is moved forward by it, so a
+        /// villager placed on a stool sits on it and not beside it (playtest note 30).</summary>
+        const float SitShift = .42f;
+        struct PoseState { public string slot; public bool arms; public Vector3 armL, armR; public float elbowL, elbowR, lean, drop, bend, shift; }
         PoseState PoseOf(ActorPose pose, float speed, float t)
         {
             var p = new PoseState();
             switch (pose)
             {
-                case ActorPose.Sit: p.slot = "sit"; break;
+                case ActorPose.Sit: p.slot = "sit"; p.shift = SitShift; break;
                 case ActorPose.Swim: p.slot = "swim"; break;   // still or moving: the stroke (slowed when still); the tread clip read as no pose at all
                 case ActorPose.Sneak: p.slot = speed > .3f ? "sneak" : "crouch"; break;
                 case ActorPose.Talk: p.slot = "talk"; break;
@@ -463,12 +466,12 @@ namespace Crulanda.Encounter
                 }
                 case ActorPose.Drink:    // seated, the right arm lifting the tankard to the mouth every few seconds
                 {
-                    p.slot = "sit";
+                    p.slot = "sit"; p.shift = SitShift;
                     float k = Mathf.Repeat(t * .28f, 1), lift = k < .18f ? Mathf.SmoothStep(0, 1, k / .18f) : k < .45f ? 1 : k < .6f ? 1 - Mathf.SmoothStep(0, 1, (k - .45f) / .15f) : 0;
                     p.arms = true; p.armL = new Vector3(-18, 0, 10); p.armR = new Vector3(-40 - lift * 25, 0, -8 + lift * 22); p.elbowL = -72; p.elbowR = -30 - lift * 95; break;   // hand to the mouth (playtest note 29: it went over the head)
                 }
                 case ActorPose.Slump:    // passed out over the table: the back folds forward, the arms out on the table
-                    p.slot = "sit"; p.arms = true; p.armL = new Vector3(-110, 0, 22); p.armR = new Vector3(-105, 0, -26); p.elbowL = p.elbowR = -15;
+                    p.slot = "sit"; p.shift = SitShift; p.arms = true; p.armL = new Vector3(-110, 0, 22); p.armR = new Vector3(-105, 0, -26); p.elbowL = p.elbowR = -15;
                     p.bend = 40 + Mathf.Sin(t * .6f) * 1.5f; break;
             }
             return p;
@@ -558,7 +561,7 @@ namespace Crulanda.Encounter
             // otherwise the body is left to others (an elite's wind-up lean, an ambusher's crouch, a death).
             if (!dead)
             {
-                if (p.drop != 0 || LyingLow) { body.localPosition = new Vector3(0, p.drop, 0); dropped = true; }
+                if (p.drop != 0 || p.shift != 0 || LyingLow) { body.localPosition = new Vector3(0, p.drop, p.shift); dropped = true; }
                 else if (dropped) { body.localPosition = Vector3.zero; dropped = false; }
                 if (Stagger > 0) { staggering = true; body.localEulerAngles = new Vector3(p.lean + Mathf.Sin(phase * .5f) * 6 * Stagger, 0, Mathf.Sin(phase * .5f + 1.1f) * 14 * Stagger); }
                 else if (p.lean != 0) { body.localEulerAngles = new Vector3(p.lean, 0, 0); leaned = true; }
@@ -571,6 +574,9 @@ namespace Crulanda.Encounter
         /// <paramref name="walk"/> m/s when the pose is none (the walk cycle's clip by speed), its frames following. Play mode drives
         /// itself (ModelLate).
         /// </summary>
+        /// <summary>Edit mode (captures): a modelled person <paramref name="time"/> seconds into an upper-body action ("swing", "jab",
+        /// "castshot", "hit"...), whole body, the frames (and what is held) following.</summary>
+        public void PreviewAct(string slot, float time) { if (model == null) return; model.Sample(slot, time); SyncFrames(); }
         public void Preview(ActorPose pose, float walk, float time)
         {
             if (model == null) return;

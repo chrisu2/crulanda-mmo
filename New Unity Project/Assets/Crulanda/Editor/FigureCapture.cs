@@ -50,6 +50,9 @@ namespace Crulanda.EditorTools
             var late = Kit(db, 11, 4, "Cap", "Torc", "Spaulders", "Hauberk", "Gauntlets", "Greaves", "Sabatons", "Blade", "Shield");
             foreach (var (shot, yaw, walk) in new[] { ("armour-front", 0f, 0f), ("armour-walk", 90f, 1.6f) })
                 Row(shot, new[] { P(ActorLook.Warrior, 0, null, null, martial, db, looks, walk), P(ActorLook.Warrior, 1, null, null, late, db, looks, walk), P(ActorLook.Druid, 0, null, null, cloth, db, looks, walk), P(ActorLook.Warrior, 2, null, null, new string[0], db, looks, walk) }, yaw);
+            // Fighting (playtest note 25): the warrior armed, a sword's swing through, a jab, a flinch, a spell drawn and let fly.
+            Spec A(string act, float t, string[] gear = null) { var x = P(ActorLook.Warrior, 0, null, act + " " + t, gear ?? martial, db, looks); x.act = act; x.time = t; return x; }
+            Row("fight", new[] { A("swing", .15f), A("swing", .35f), A("swing", .55f), A("jab", .2f, new string[0]), A("hit", .2f), A("castloop", .5f, new string[0]), A("castshot", .25f, new string[0]) }, 90);
             // Named head pieces on the players, close (playtest note 31: "tin crown is also way too big", "orbits my head").
             var named = ItemDatabase.Parse(new System.Collections.Generic.List<string> { System.IO.File.ReadAllText("Assets/Crulanda/EncounterContent/Items/items.json") });
             Row("helms-named", new[] { P(ActorLook.Warrior, 0, null, "Tin crown", new[] { "item.tin_crown" }, named, looks), P(ActorLook.Druid, 0, null, "Tin crown (druid)", new[] { "item.tin_crown" }, named, looks),
@@ -62,7 +65,7 @@ namespace Crulanda.EditorTools
             Debug.Log("FIGURE_CAPTURE_DONE");
         }
 
-        sealed class Spec { public ActorLook look; public int variant; public string role, name; public ActorPose pose; public float walk, time = .4f; public bool dead; public string[] gear; public ItemDatabase db; public GearLooks looks; public Load load; public int count; public ActorVisual.Carrying carry; }
+        sealed class Spec { public string act; public ActorLook look; public int variant; public string role, name; public ActorPose pose; public float walk, time = .4f; public bool dead; public string[] gear; public ItemDatabase db; public GearLooks looks; public Load load; public int count; public ActorVisual.Carrying carry; }
         static Spec Ca(Load load, int count, ActorVisual.Carrying carry) { return new Spec { look = ActorLook.Villager, variant = 13, role = "baker", name = "Ama Rusk", walk = 1.5f, time = .3f, load = load, count = count, carry = carry }; }
         static Spec P(ActorLook look, int variant = 0, string role = null, string name = null, string[] gear = null, ItemDatabase db = null, GearLooks looks = null, float walk = 0)
         { return new Spec { look = look, variant = variant, role = role, name = name ?? look.ToString(), gear = gear, db = db, looks = looks, walk = walk }; }
@@ -85,6 +88,7 @@ namespace Crulanda.EditorTools
                 if (s.gear != null) v.ApplyGearIds(s.gear, s.db, s.looks);
                 if (s.carry != ActorVisual.Carrying.None) { LoadProps.Build(go.transform, s.load, s.count); v.Carry = s.carry; }
                 if (s.dead) v.PreviewDead(); else v.Preview(s.pose, s.walk, s.time);
+                if (s.act != null) v.PreviewAct(s.act, s.time);
             }
             float width = specs.Length * gap + .3f, halfH = Mathf.Tan(cam.fieldOfView * .5f * Mathf.Deg2Rad), aspect = 16f / 9;
             float dist = close ? (width / 2) / (halfH * aspect) : Mathf.Max((width / 2) / (halfH * aspect), 1.15f / halfH);

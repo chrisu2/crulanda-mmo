@@ -1115,3 +1115,27 @@ A read-only review by five reviewers, each finding checked by a second who tried
   when selected; drinkers bring the tankard to the mouth and rest the other forearm on the table; crowns and circlets on the
   models are drawn a fifth smaller and nearly level, and the hat fit widens them at most 1.2x.
 - Tests: focused EditMode 38/38, PlayMode 20/20; full run (no tour) EditMode, PlayMode, build and captures green.
+
+## 2026-10-04 — Swings and casts, see-through buildings, sitting, the horse, tree joins, fps, the camera (published 15:50)
+- **Combat animations (note 25):** the figures' graph has an upper-body layer (spine up, AvatarMask) over the walk and the
+  poses: a blow swings (Sword_Attack armed; a jab or a cross bare-handed), a hit flinches (Hit_Chest / Hit_Head), a cast holds
+  the spell pose and lets fly (Spell_Simple_Idle_Loop / Shoot), all from the Universal Animation Library already in the game.
+  Enemies' blows and hits, the player's auto-attack swings, instant abilities on a target and casts drive it. FigureCapture
+  has a "fight" row.
+- **See-through buildings (note 26):** RoofFade: any building whose big parts (roof, walls) come between the camera and the
+  player fades like a tree.
+- **Sitting (note 29/30):** the sitting clip puts the hips 0.42 m behind the figure, so a seated body is moved forward onto its
+  seat; inn seats face their tables.
+- **The horse (note 28):** critters other than cats never pick a point inside a building.
+- **Dead-tree joins (note 24):** a crooked limb's continuing lengths have no collar and no pinched end; they run on into the next.
+- **FPS (note 23):** measured first (a performance probe at the end of each zone tour: fps with each suspect switched off,
+  Unity's frame counters, renderer and material counts, in `<zone>-perf.txt`). The game was CPU-bound (lights, post and MSAA
+  each changed nothing). Static scenery merged per thing and material (18,772 renderers to 7,539 in Oakhaven; shadow casters
+  3,266 to 1,346; camera 3.4 to 2.3 ms); the HUD's layout pass switched off and its labels' widths and sight lines cached; world
+  tints rounded to 1/48. Oakhaven at 1440x900: 94 to 104 fps (development build), 109 in a release build. Still the largest:
+  the IMGUI HUD (about 4.3 ms, 2.1 of it nameplates and place names) and scripts (about 3.8 ms).
+- **The camera:** orbits down to 40 degrees below level (it stopped at 12 above): out of doors it rides along the ground and
+  looks up past you.
+- **Full screen by default:** the build set the game to windowed; it is full screen now, and the capture runs put the player's
+  own screen setting back after them (tools/validation/screen_prefs.ps1).
+- Tests: EditMode 399/399, PlayMode 175/175; Oakhaven and Khaven toured; no errors in any game log; published as a release build.

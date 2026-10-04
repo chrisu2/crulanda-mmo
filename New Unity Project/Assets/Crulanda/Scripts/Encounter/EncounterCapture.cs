@@ -915,7 +915,82 @@ namespace Crulanda.Encounter
                 }
             }
             EncounterHud.Hidden = false;
+            if (zone != null) { var pf = PerfProbe(directory, zone); while (pf.MoveNext()) yield return pf.Current; }
             Debug.Log("WORLD_CAPTURE_DONE"); Application.Quit(0);
+        }
+        /// <summary>
+        /// Playtest note 23 ("need to improve fps"): frames a second at a fixed view over the village, the frame cap off, at noon and
+        /// at night, then with each suspect switched off in turn (shadows, the extra lights, the post chain, MSAA, the grass and plants,
+        /// the villagers). Logged as "PERF label fps ms" and written to &lt;zone&gt;-perf.txt beside the shots.
+        /// </summary>
+        IEnumerator PerfProbe(string directory, Crulanda.World.ZoneBuilder zone)
+        {
+            QualitySettings.vSyncCount = 0; Application.targetFrameRate = -1;
+            var motor = session.Player.GetComponent<AdventurerMotor>(); motor.enabled = true;
+            motor.Teleport(zone.Ground(zone.Zone.spawns.recovery, 1.1f)); motor.SetView(30, 18, 11);
+            var lines = new List<string>(); float fps = 0;
+            IEnumerator Measure(string label)
+            {
+                yield return new WaitForSeconds(.6f);
+                int frames = 0; float t0 = Time.realtimeSinceStartup;
+                while (Time.realtimeSinceStartup - t0 < 2.5f) { frames++; yield return null; }
+                fps = frames / (Time.realtimeSinceStartup - t0);
+                var line = "PERF " + label + " " + fps.ToString("0") + " fps " + (1000 / Mathf.Max(1, fps)).ToString("0.0") + " ms"; Debug.Log(line); lines.Add(line);
+            }
+            var post = session.View.GetComponent<Crulanda.World.ZonePost>();
+            var fields = new List<Behaviour>(); fields.AddRange(FindObjectsByType<Crulanda.World.GrassField>(FindObjectsSortMode.None)); fields.AddRange(FindObjectsByType<Crulanda.World.PlantField>(FindObjectsSortMode.None));
+            foreach (var hour in new[] { 12f, 22f })
+            {
+                Crulanda.World.WorldClock.Hour = hour; Crulanda.World.WorldClock.Advance(0); string h = hour < 18 ? "noon" : "night";
+                IEnumerator M(string l) { return Measure(h + " " + l); }
+                var m = M("all"); while (m.MoveNext()) yield return m.Current;
+                var sh = QualitySettings.shadows; QualitySettings.shadows = ShadowQuality.Disable; m = M("no-shadows"); while (m.MoveNext()) yield return m.Current; QualitySettings.shadows = sh;
+                int pl = QualitySettings.pixelLightCount; QualitySettings.pixelLightCount = 1; m = M("1-pixel-light"); while (m.MoveNext()) yield return m.Current; QualitySettings.pixelLightCount = pl;
+                if (post != null) { post.enabled = false; m = M("no-post"); while (m.MoveNext()) yield return m.Current; post.enabled = true; }
+                int aa = QualitySettings.antiAliasing; QualitySettings.antiAliasing = 0; m = M("no-msaa"); while (m.MoveNext()) yield return m.Current; QualitySettings.antiAliasing = aa;
+                foreach (var f in fields) f.enabled = false; m = M("no-grass"); while (m.MoveNext()) yield return m.Current; foreach (var f in fields) f.enabled = true;
+                var life = VillageLife.Active; if (life != null) { life.gameObject.SetActive(false); m = M("no-villagers"); while (m.MoveNext()) yield return m.Current; life.gameObject.SetActive(true); }
+            }
+            // Where the frame goes (noon, everything on): Unity's own counters and markers, averaged over 120 frames. A development
+            // build records them without a profiler attached.
+            Crulanda.World.WorldClock.Hour = 12; Crulanda.World.WorldClock.Advance(0); yield return new WaitForSeconds(.6f);
+            var names = new[] { ("Internal", "Main Thread"), ("Internal", "Render Thread"), ("Scripts", "BehaviourUpdate"), ("Scripts", "LateBehaviourUpdate"),
+                ("Scripts", "CoroutinesDelayedCalls"), ("Scripts", "HUD.WorldLabels"), ("Scripts", "HUD.Frames"), ("Scripts", "HUD.Minimap"), ("Scripts", "HUD.Panels"), ("Scripts", "HUD.Windows"), ("Gui", "GUI.Repaint"), ("Gui", "GUIUtility.ProcessEvent"), ("Animation", "Director.ProcessFrame"), ("Animation", "PreLateUpdate.DirectorUpdateAnimationBegin"),
+                ("Animation", "PreLateUpdate.DirectorUpdateAnimationEnd"), ("Animation", "MeshSkinning.Update"), ("Render", "Camera.Render"), ("Render", "Shadows.RenderShadowMap"), ("Render", "Culling"),
+                ("Render", "PostLateUpdate.UpdateAllRenderers"), ("Physics", "Physics.Processing"), ("Physics", "Physics.Simulate"), ("Render", "Gfx.WaitForPresentOnGfxThread"),
+                ("Render", "Batches Count"), ("Render", "SetPass Calls Count"), ("Render", "Draw Calls Count"), ("Render", "Triangles Count"), ("Render", "Shadow Casters Count"), ("Memory", "GC Allocated In Frame") };
+            var recs = new List<(string, Unity.Profiling.ProfilerRecorder)>();
+            foreach (var (cat, n) in names)
+            {
+                var c = cat == "Internal" ? Unity.Profiling.ProfilerCategory.Internal : cat == "Scripts" ? Unity.Profiling.ProfilerCategory.Scripts : cat == "Gui" ? Unity.Profiling.ProfilerCategory.Gui
+                    : cat == "Animation" ? Unity.Profiling.ProfilerCategory.Animation : cat == "Physics" ? Unity.Profiling.ProfilerCategory.Physics : cat == "Memory" ? Unity.Profiling.ProfilerCategory.Memory : Unity.Profiling.ProfilerCategory.Render;
+                recs.Add((n, Unity.Profiling.ProfilerRecorder.StartNew(c, n, 1, Unity.Profiling.ProfilerRecorderOptions.SumAllSamplesInFrame | Unity.Profiling.ProfilerRecorderOptions.Default)));
+            }
+            var sums = new double[recs.Count]; int count = 0;
+            for (int f = 0; f < 120; f++) { yield return null; for (int i = 0; i < recs.Count; i++) sums[i] += recs[i].Item2.LastValue; count++; }
+            for (int i = 0; i < recs.Count; i++)
+            {
+                var (n, r) = recs[i]; double avg = sums[i] / count;
+                bool time = r.UnitType == Unity.Profiling.ProfilerMarkerDataUnit.TimeNanoseconds;
+                var line = "PROF " + n + " " + (r.Valid ? (time ? (avg / 1e6).ToString("0.00") + " ms" : avg.ToString("0")) : "n/a"); Debug.Log(line); lines.Add(line);
+                r.Dispose();
+            }
+            int figures = 0; foreach (var v in FindObjectsByType<ActorVisual>(FindObjectsSortMode.None)) if (v.Model != null) figures++;
+            lines.Add("COUNT figures " + figures + ", trees " + Crulanda.World.TreeFade.All.Count + ", buildings " + Crulanda.World.RoofFade.All.Count + ", renderers " + FindObjectsByType<Renderer>(FindObjectsSortMode.None).Length + ", behaviours " + FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None).Length);
+            // Renderers by the zone's top-level group and by material: where the 25,000 come from.
+            var groups = new Dictionary<string, int>(); var mats = new HashSet<Material>(); int visible = 0;
+            foreach (var r in FindObjectsByType<Renderer>(FindObjectsSortMode.None))
+            {
+                if (!r.enabled || !r.gameObject.activeInHierarchy) continue; visible++;
+                foreach (var m in r.sharedMaterials) if (m != null) mats.Add(m);
+                var t = r.transform; while (t.parent != null && t.parent.parent != null) t = t.parent;
+                string g = t.parent == null ? t.name : t.name; groups[g] = groups.TryGetValue(g, out var c) ? c + 1 : 1;
+            }
+            lines.Add("COUNT enabled renderers " + visible + ", distinct materials " + mats.Count);
+            var top = new List<KeyValuePair<string, int>>(groups); top.Sort((x, y) => y.Value.CompareTo(x.Value));
+            for (int i = 0; i < top.Count && i < 15; i++) lines.Add("GROUP " + top[i].Key + " " + top[i].Value);
+            File.WriteAllLines(Path.Combine(directory, zone.Zone.id.Replace("zone.", "") + "-perf.txt"), lines);
+            Application.targetFrameRate = 60;
         }
         /// <summary>Prop kinds whose front (door or open side) faces local -Z: their landmark shots look at that side.</summary>
         static readonly string[] Fronted = { "house", "inn", "barn", "mill", "coop", "forge", "stall", "oven", "tannery", "woodpile", "wagon", "crypt", "leathershop", "dryhut", "kitchen", "gamerack" };

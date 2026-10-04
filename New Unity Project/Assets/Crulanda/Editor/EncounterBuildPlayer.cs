@@ -17,7 +17,9 @@ namespace Crulanda.EditorTools
             PlayerSettings.productName = "Crulanda - The Quiet Trail";   // also names the save folder; do not change casually
             PlayerSettings.defaultScreenWidth = 1440;
             PlayerSettings.defaultScreenHeight = 900;
-            PlayerSettings.fullScreenMode = UnityEngine.FullScreenMode.Windowed;
+            // Full screen by default (2026-10-04, Chris: "can't get it to full screen": this was Windowed); the capture runs ask for a
+            // window on the command line (-screen-fullscreen 0) and screen_prefs.ps1 puts his own setting back after them.
+            PlayerSettings.fullScreenMode = UnityEngine.FullScreenMode.FullScreenWindow;
             // Pick up any new zone or quest JSON (registers them on the scene and the encounter content; preserves the rest).
             if (File.Exists(ZoneSceneBuilder.OakhavenScene)) ZoneSceneBuilder.BuildOakhaven();
             var report = BuildPipeline.BuildPlayer(new BuildPlayerOptions {
@@ -27,7 +29,7 @@ namespace Crulanda.EditorTools
                     : new[] { EncounterBuilder.ScenePath },
                 locationPathName = ExePath,
                 target = BuildTarget.StandaloneWindows64,
-                options = BuildOptions.Development
+                options = Array.IndexOf(Environment.GetCommandLineArgs(), "--crulanda-release") >= 0 ? BuildOptions.None : BuildOptions.Development
             });
             if (report.summary.result != BuildResult.Succeeded)
                 throw new Exception("Player build failed: " + report.summary.result);

@@ -531,7 +531,12 @@ namespace Crulanda.Encounter
                 if (!door.openable || door.hinge == null) continue;
                 var inn = door.hinge.parent;
                 foreach (var table in new[] { new Vector2(2.2f, -1.6f), new Vector2(2.8f, 1.3f), new Vector2(-2.8f, -1.9f) })
-                    for (int k = 0; k < 3; k++) { float a = k * 120 * Mathf.Deg2Rad; AddPlace("inn", inn.TransformPoint(new Vector3(table.x + Mathf.Cos(a) * .95f, 0, table.y + Mathf.Sin(a) * .95f)), true); }
+                    for (int k = 0; k < 3; k++)
+                    {
+                        float a = k * 120 * Mathf.Deg2Rad; int had = Places["inn"].Count;
+                        AddPlace("inn", inn.TransformPoint(new Vector3(table.x + Mathf.Cos(a) * .95f, 0, table.y + Mathf.Sin(a) * .95f)), true);
+                        if (Places["inn"].Count > had) faceAt[Places["inn"][had]] = inn.TransformPoint(new Vector3(table.x, 0, table.y));   // a seat faces its table (playtest note 30)
+                    }
             }
             for (int i = 0; i < 24; i++) AddPlace("wander", new Vector2((R01 - .5f) * z.flatRadius * 1.6f, (R01 - .5f) * z.flatRadius * 1.6f));
         }
@@ -1069,6 +1074,7 @@ namespace Crulanda.Encounter
             if (!life.Places.TryGetValue("inn", out var seats) || seats.Count == 0 || !agent.isOnNavMesh) return false;
             foreach (var r in renderers) r.enabled = true; CancelErrand();
             agent.Warp(seats[seat % seats.Count]); agent.isStopped = true; state = State.Activity; until = Time.time + 60; enabled = false;
+            var table = life.LookFor(transform.position); if (table.HasValue) Face(table.Value);
             activity = slumped ? "passedout" : "inn"; visual.Pose = slumped ? ActorPose.Slump : ActorPose.Drink; ShowTankard(!slumped);
             return true;
         }
@@ -1469,7 +1475,8 @@ namespace Crulanda.Encounter
             {
                 var p = life.Zone.Ground(around + new Vector2(life.R01 - .5f, life.R01 - .5f) * range * 2);
                 if (NavMesh.SamplePosition(p, out var hit, 2, NavMesh.AllAreas) && !NavMesh.Raycast(transform.position, hit.position, out _, NavMesh.AllAreas)
-                    && !life.Zone.WaterAt(new Vector2(hit.position.x, hit.position.z), out _, out _) && !CrossesWater(transform.position, hit.position)) return hit.position;
+                    && !life.Zone.WaterAt(new Vector2(hit.position.x, hit.position.z), out _, out _) && !CrossesWater(transform.position, hit.position)
+                    && (Kind == "cat" || !life.Zone.InBuilding(new Vector2(hit.position.x, hit.position.z)))) return hit.position;   // no horse in the taproom (playtest note 28); a cat may go in
             }
             return null;
         }

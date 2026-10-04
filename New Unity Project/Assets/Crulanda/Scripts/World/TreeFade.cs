@@ -114,7 +114,7 @@ namespace Crulanda.World
             }
             alpha = target = 1;
         }
-        static Material FadeOf(Material solidMat)
+        internal static Material FadeOf(Material solidMat)
         {
             if (solidMat == null) return null;
             if (!fadeCopies.TryGetValue(solidMat, out var f) || f == null)

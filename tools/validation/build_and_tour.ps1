@@ -9,6 +9,7 @@ Select-String -LiteralPath (Join-Path $v 'tour-build.log') -Pattern 'Build Finis
 if (-not (Select-String -LiteralPath (Join-Path $v 'tour-build.log') -Pattern 'Build Finished, Result: Success' -Quiet)) { 'BUILD FAILED - tour skipped'; exit 1 }
 $cap = 'C:\Users\chris\Documents\Codex\2026-09-28\hel\work\world-captures'
 New-Item -ItemType Directory -Force $cap | Out-Null
+& (Join-Path $PSScriptRoot 'screen_prefs.ps1') -Save   # the captures must not leave Chris's game windowed
 foreach ($z in $Zones) {
     $log = Join-Path $cap ("tour-" + $z + ".log")
     $g = Start-Process (Join-Path $v 'Builds\Crulanda\Crulanda.exe') -PassThru -ArgumentList @('--crulanda-world-capture', ('"' + $cap + '"'), '--crulanda-zone', $z, '-screen-width', '1440', '-screen-height', '900', '-screen-fullscreen', '0', '-logFile', ('"' + $log + '"'))
@@ -16,3 +17,4 @@ foreach ($z in $Zones) {
     Select-String -LiteralPath $log -Pattern 'WORLD_CAPTURE_DONE|Exception' | Select-Object -First 3 | ForEach-Object Line
 }
 Get-ChildItem $cap -Filter '*.png' | Where-Object { $_.LastWriteTime -gt (Get-Date).AddMinutes(-10) } | Select-Object -ExpandProperty Name
+& (Join-Path $PSScriptRoot 'screen_prefs.ps1') -Restore

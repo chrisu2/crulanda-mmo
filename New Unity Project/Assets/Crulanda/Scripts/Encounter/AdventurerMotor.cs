@@ -26,7 +26,7 @@ namespace Crulanda.Encounter
             var pointer = EncounterInput.Pointer;
             if (!session.Paused && EncounterInput.Orbit && !EncounterHud.BlocksPointer(pointer))
             {
-                if (orbiting) { var delta = pointer - previousPointer; yaw += delta.x * .2f; pitch = Mathf.Clamp(pitch - delta.y * .15f, 12, 70); }
+                if (orbiting) { var delta = pointer - previousPointer; yaw += delta.x * .2f; pitch = Mathf.Clamp(pitch - delta.y * .15f, MinPitch, 75); }
                 orbiting = true;
             }
             else orbiting = false;
@@ -87,18 +87,26 @@ namespace Crulanda.Encounter
             var p = transform.position;
             if (p.y < Crulanda.World.Hollow.Lowest && !(wet && p.y > surface - 12)) Teleport(session.RecoveryPoint);   // fell out of the world (a cave's deep floor is not that)
         }
+        /// <summary>How far below level the orbit goes (Chris, 2026-10-04: "camera should also have a up and down"): under the horizon the
+        /// camera runs along the ground and tilts up at the sky, as in the classic MMOs. It was 12 degrees above level at the lowest.</summary>
+        const float MinPitch = -40;
         void LateUpdate()
         {
             if (view == null) return;
             var pivot = transform.position + Vector3.up * .6f;
+            var zoneHere = Crulanda.World.ZoneBuilder.Active; bool inCave = false;
+            foreach (var h in Crulanda.World.Hollow.All) if (h.Depth(transform.position) > .1f) { inCave = true; break; }
+            var groundCollider = zoneHere != null && zoneHere.GroundMesh != null && !inCave ? zoneHere.GroundMesh.GetComponent<Collider>() : null;
             var rotation = Quaternion.Euler(pitch, yaw, 0);
             // Camera collision: pull in toward the player when scenery is in the way. Not characters, and not trees: the
             // camera looks through a tree instead (it fades, below), so turning among trees doesn't yank the view in.
             float allowed = distance;
             foreach (var hit in Physics.SphereCastAll(pivot, .3f, -(rotation * Vector3.forward), distance, ~0, QueryTriggerInteraction.Ignore))
-                if (hit.collider.GetComponentInParent<Crulanda.Gameplay.Actor>() == null && hit.collider.GetComponentInParent<Crulanda.World.TreeFade>() == null && hit.distance > .05f)
+                if (hit.collider != groundCollider && hit.collider.GetComponentInParent<Crulanda.Gameplay.Actor>() == null && hit.collider.GetComponentInParent<Crulanda.World.TreeFade>() == null && hit.distance > .05f)
                     allowed = Mathf.Min(allowed, hit.distance);
             var camAt = pivot - rotation * Vector3.forward * Mathf.Max(1.2f, allowed);
+            // Out of doors the ground does not pull the camera in: it rides along the grass (looking up past you), never under it.
+            if (groundCollider != null) { float g = zoneHere.HeightAt(camAt.x, camAt.z) + .35f; if (camAt.y < g) camAt.y = g; }
             // Keep the camera above any water surface (no looking up at the water from underneath).
             var zone = Crulanda.World.ZoneBuilder.Active;
             if (zone != null && zone.WaterAt(new Vector2(camAt.x, camAt.z), out float s, out _) && camAt.y < s + .2f) camAt.y = s + .2f;
@@ -106,9 +114,10 @@ namespace Crulanda.Encounter
             view.transform.rotation = rotation;
             // Trees between the camera and you turn see-through.
             Crulanda.World.TreeFade.UpdateAll(camAt, transform.position + Vector3.up * .7f, transform.position);
+            Crulanda.World.RoofFade.UpdateAll(camAt, transform.position + Vector3.up * 1.5f, transform.position + Vector3.up * .7f);
         }
         /// <summary>Orbit camera framing (capture tools and cutscene-style framing).</summary>
-        public void SetView(float yawDegrees, float pitchDegrees, float zoom) { yaw = yawDegrees; pitch = Mathf.Clamp(pitchDegrees, 5, 85); distance = Mathf.Clamp(zoom, 2, 60); }
+        public void SetView(float yawDegrees, float pitchDegrees, float zoom) { yaw = yawDegrees; pitch = Mathf.Clamp(pitchDegrees, MinPitch, 85); distance = Mathf.Clamp(zoom, 2, 60); }
         public void Teleport(Vector3 point)
         {
             controller.enabled = false; transform.position = point; controller.enabled = true; vertical = 0;

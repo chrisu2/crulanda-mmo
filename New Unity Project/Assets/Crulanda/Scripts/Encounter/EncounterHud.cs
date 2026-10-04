@@ -55,6 +55,11 @@ namespace Crulanda.Encounter
             disc.Apply();
         }
 
+        // Playtest note 23 (fps): the HUD drew a whole layout pass before every repaint though it uses no GUILayout; switched off.
+        // Each part is timed (the capture tour's performance probe reads these markers).
+        static readonly Unity.Profiling.ProfilerMarker mWorld = new Unity.Profiling.ProfilerMarker("HUD.WorldLabels"), mFrames = new Unity.Profiling.ProfilerMarker("HUD.Frames"),
+            mMap = new Unity.Profiling.ProfilerMarker("HUD.Minimap"), mPanels = new Unity.Profiling.ProfilerMarker("HUD.Panels"), mWindows = new Unity.Profiling.ProfilerMarker("HUD.Windows");
+        void Awake() { useGUILayout = false; }
         void OnGUI()
         {
             if (Hidden || session == null || session.Player == null) return;
@@ -64,10 +69,11 @@ namespace Crulanda.Encounter
             bagsVisible = session.InventoryOpen; charVisible = session.CharacterOpen; vendorVisible = session.VendorNpc != null; tradesVisible = session.TradesOpen;
             GUI.matrix = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(Screen.width / 1440f, Screen.height / 900f, 1));
             GUI.color = Color.white;
-            DrawWorldLabels();
-            DrawPlayerFrame(); DrawPartyFrame(); if (session.Target != null) DrawTargetFrame(); else if (session.HasFriendlyFocus) DrawFriendFrame();
-            maps.DrawMinimap(session, gold);
-            DrawQuestTracker(); DrawChat(); DrawCenter(); DrawActionBar(); DrawMicroMenu(); DrawXpBar();
+            using (mWorld.Auto()) DrawWorldLabels();
+            using (mFrames.Auto()) { DrawPlayerFrame(); DrawPartyFrame(); if (session.Target != null) DrawTargetFrame(); else if (session.HasFriendlyFocus) DrawFriendFrame(); }
+            using (mMap.Auto()) maps.DrawMinimap(session, gold);
+            using (mPanels.Auto()) { DrawQuestTracker(); DrawChat(); DrawCenter(); DrawActionBar(); DrawMicroMenu(); DrawXpBar(); }
+            var windows = mWindows.Auto();
             if (session.CharacterOpen) DrawCharacter();
             if (session.VendorNpc != null) DrawVendor();
             if (session.InventoryOpen) DrawBags();
@@ -86,6 +92,7 @@ namespace Crulanda.Encounter
             }
             if (session.InventoryOpen || session.CharacterOpen || session.VendorNpc != null) DrawDragAndConfirm();
             if (session.Paused) DrawPause();
+            windows.Dispose();
         }
 
         // ---------- helpers ----------
@@ -440,7 +447,23 @@ namespace Crulanda.Encounter
             var s = session.View.WorldToScreenPoint(world); p = new Vector2(s.x * 1440 / Screen.width, (Screen.height - s.y) * 900 / Screen.height);
             return s.z > 0 && p.x > -100 && p.x < 1540 && p.y > 0 && p.y < 900;
         }
-        float TextWidth(GUIStyle style, string s) { measure.text = s; return style.CalcSize(measure).x; }
+        // Text widths and sight lines are kept (playtest note 23, fps: the nameplates and place names cost 2.2 ms a frame, measuring
+        // every label and casting a ray for each, every frame). A width never changes; a sight line is looked at again every 0.2 s.
+        readonly System.Collections.Generic.Dictionary<GUIStyle, System.Collections.Generic.Dictionary<string, float>> widths = new System.Collections.Generic.Dictionary<GUIStyle, System.Collections.Generic.Dictionary<string, float>>();
+        float TextWidth(GUIStyle style, string s)
+        {
+            if (!widths.TryGetValue(style, out var known)) widths[style] = known = new System.Collections.Generic.Dictionary<string, float>();
+            if (!known.TryGetValue(s, out var w)) { if (known.Count > 2000) known.Clear(); measure.text = s; known[s] = w = style.CalcSize(measure).x; }
+            return w;
+        }
+        readonly System.Collections.Generic.Dictionary<object, (float until, bool hidden)> sight = new System.Collections.Generic.Dictionary<object, (float, bool)>();
+        bool Occluded(object key, Vector3 point, float slack = .3f)
+        {
+            if (sight.TryGetValue(key, out var known) && Time.unscaledTime < known.until) return known.hidden;
+            if (sight.Count > 1000) sight.Clear();
+            bool hidden = Occluded(point, slack); sight[key] = (Time.unscaledTime + .15f + (key.GetHashCode() & 7) * .01f, hidden);
+            return hidden;
+        }
         string Bracketed(string title) { if (!bracketed.TryGetValue(title, out var s)) bracketed[title] = s = "<" + title + ">"; return s; }
         /// <summary>The HUD panels showing this frame: unit frames, minimap, quest tracker, chat, the centre prompt and bars, and the bars along the bottom.</summary>
         void CollectHudRects()
@@ -544,7 +567,7 @@ namespace Crulanda.Encounter
                     // Soft nameplates when close (name, and the trade in angle brackets beneath it), the quest marker, and speech.
                     bool named = vd < 18; char m = HeadMarker(v.Name, vd, out bool grey);
                     if (!named && m == ' ' && (v.Bubble == null || Time.time >= v.BubbleUntil)) continue;
-                    if (Occluded(root + Vector3.up * .85f)) continue;
+                    if (Occluded(v, root + Vector3.up * .85f)) continue;
                     // On an errand with goods in hand, the trade line says where they are bound: <Hen-wife · eggs to the inn>.
                     string title = named && v.Title != null ? Bracketed(v.Carrying && v.Errand != null ? v.Title + " · " + v.Errand.id : v.Title) : null;
                     float w = Mathf.Max(Mathf.Max(named ? TextWidth(plateText, v.Name) : 0, title != null ? TextWidth(plateText, title) : 0), m != ' ' ? 28 : 0) + 8;
@@ -556,7 +579,7 @@ namespace Crulanda.Encounter
             // Mira: nameplate, plus a gold ! until she has joined you (after that, whatever the quests say).
             var mira = session.Companion; if (mira == null) return;
             var head = mira.transform.position + Vector3.up * 1.4f; float md = Vector3.Distance(player, head);
-            if (md >= 45 || !ToCanvas(head, out var mp) || mp.x < 0 || mp.x > 1440 || Occluded(mira.transform.position + Vector3.up * .9f)) return;
+            if (md >= 45 || !ToCanvas(head, out var mp) || mp.x < 0 || mp.x > 1440 || Occluded(mira, mira.transform.position + Vector3.up * .9f)) return;
             bool mgrey = false; char mm = session.Progress.recruited ? HeadMarker("Mira", md, out mgrey) : '!';
             AddPlate(new Plate { dist = md, fade = 1, top = -29, at = mp, mira = true, named = true, name = "Mira", mark = mm, grey = mgrey }, Mathf.Max(TextWidth(centered, "Mira"), 28) + 8);
         }
@@ -565,7 +588,7 @@ namespace Crulanda.Encounter
             if (e == null || e.Hidden) return;   // lying in wait: no nameplate
             float d = session.Distance(e); if (d > range) return;
             var (h, label) = EnemyPlate(e); var root = e.transform.position;
-            if (!ToCanvas(root + Vector3.up * h, out var ep) || ep.x < 0 || ep.x > 1440 || Occluded(root + Vector3.up * (h - .45f))) return;
+            if (!ToCanvas(root + Vector3.up * h, out var ep) || ep.x < 0 || ep.x > 1440 || Occluded(e, root + Vector3.up * (h - .45f))) return;
             float w = session.Target == e ? Mathf.Max(146, TextWidth(plateText, label) + 16) : Mathf.Max(130, TextWidth(plateText, label)) + 8;
             plates.Add(new Plate { dist = d, fade = 1, at = ep, e = e, name = label, shown = true, box = new Rect(ep.x - w / 2, ep.y - 25, w, 38) });
         }
@@ -629,7 +652,7 @@ namespace Crulanda.Encounter
         void PlaceName(Vector3 player, Vector3 at, string name, float reach, Color colour)
         {
             float d = Vector3.Distance(player, at);
-            if (d > reach || !ToCanvas(at, out var p) || p.x < 0 || p.x > 1440 || Occluded(at, 8)) return;
+            if (d > reach || !ToCanvas(at, out var p) || p.x < 0 || p.x > 1440 || Occluded(name, at, 8)) return;
             float w = TextWidth(centered, name) + 10; var r = new Rect(p.x - w / 2, Mathf.Max(4, p.y - 14), w, 28);
             if (!Place(ref r, 40)) return;
             GUI.color = new Color(1, 1, 1, Mathf.Clamp01((reach - d) / 10));

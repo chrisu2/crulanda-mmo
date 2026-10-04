@@ -94,7 +94,9 @@ namespace Crulanda.World
             Splashes.Ensure(this); TreeFade.Begin(art.fade);
             var view = Camera.main;
             if (view != null && art.post != null && view.GetComponent<ZonePost>() == null) view.gameObject.AddComponent<ZonePost>().Init(art.post, Zone, sunLight);
+            int before = MergeStatics();
             try { StaticBatchingUtility.Combine(statics.gameObject); } catch (Exception e) { Debug.LogWarning("Static batching skipped: " + e.Message); }
+            Debug.Log("Static scenery merged: " + before + " renderers into " + statics.GetComponentsInChildren<MeshRenderer>().Length + ".");
             Lap("batching");
             // In daylight, before the clock sets the hour; about 4 px a metre (1024 for the old 260 m zones).
             MapTexture = RenderMap(Mathf.Clamp(Mathf.RoundToInt(Zone.size * 4 / 256f) * 256, 1024, 2048));
@@ -958,8 +960,52 @@ namespace Crulanda.World
         // ---------- props ----------
         /// <summary>Dressed stone; falls back to natural stone until the art asset has been regenerated.</summary>
         Material Masonry { get { return art.masonry != null ? art.masonry : art.stone; } }
+        /// <summary>
+        /// Playtest note 23 (fps): the static scenery was some 18,800 renderers in Oakhaven (every tree, house, fence and rock a heap of
+        /// primitives), so culling, shadows and draw calls cost the CPU most of a frame. Each thing in it (each child of the static
+        /// scenery: a tree, a house, a cairn) has its plain parts merged into one mesh per material and shadow mode, in its own space,
+        /// so it still fades as a whole (TreeFade, RoofFade) and nothing else moves. Left as they are: parts with a script on them (a
+        /// flicker, a pulse), parts with more than one material, hidden ones, and parts something finds by name (a building's
+        /// "Footing" and "Door steps"). Colliders and the parts' transforms stay; only their mesh renderers go. Returns how many
+        /// renderers there were.
+        /// </summary>
+        int MergeStatics()
+        {
+            int total = 0;
+            var groups = new Dictionary<(Material, UnityEngine.Rendering.ShadowCastingMode, bool), List<CombineInstance>>();
+            var merged = new List<MeshRenderer>();
+            foreach (Transform root in statics)
+            {
+                groups.Clear(); merged.Clear();
+                var w2l = root.worldToLocalMatrix;
+                foreach (var mr in root.GetComponentsInChildren<MeshRenderer>())
+                {
+                    total++;
+                    if (!mr.enabled || mr.sharedMaterials.Length != 1 || mr.sharedMaterial == null || mr.name == "Footing" || mr.name == "Door steps") continue;
+                    var mf = mr.GetComponent<MeshFilter>(); if (mf == null || mf.sharedMesh == null || mf.sharedMesh.subMeshCount != 1 || !mf.sharedMesh.isReadable) continue;
+                    if (mr.GetComponent<MonoBehaviour>() != null) continue;
+                    var key = (mr.sharedMaterial, mr.shadowCastingMode, mr.receiveShadows);
+                    if (!groups.TryGetValue(key, out var list)) groups[key] = list = new List<CombineInstance>();
+                    list.Add(new CombineInstance { mesh = mf.sharedMesh, subMeshIndex = 0, transform = w2l * mr.localToWorldMatrix }); merged.Add(mr);
+                }
+                if (merged.Count < 2) continue;
+                foreach (var kv in groups)
+                {
+                    var mesh = new Mesh { name = root.name + " (merged)", indexFormat = UnityEngine.Rendering.IndexFormat.UInt32 };
+                    mesh.CombineMeshes(kv.Value.ToArray(), true, true); mesh.RecalculateBounds();
+                    var go = new GameObject("Merged " + kv.Key.Item1.name); go.transform.SetParent(root, false);
+                    go.AddComponent<MeshFilter>().sharedMesh = mesh;
+                    var r = go.AddComponent<MeshRenderer>(); r.sharedMaterial = kv.Key.Item1; r.shadowCastingMode = kv.Key.Item2; r.receiveShadows = kv.Key.Item3;
+                }
+                foreach (var mr in merged) { var mf = mr.GetComponent<MeshFilter>(); DestroyImmediate(mr); if (mf != null) DestroyImmediate(mf); }
+            }
+            return total;
+        }
         Material Tint(Material baseMat, Color color)
         {
+            // Rounded to 1/48 a channel (playtest note 23, fps): randomised tints (each dead tree's bark, each stone) made thousands of
+            // near-identical materials, 3,500 material switches a frame; a step this small is not seen.
+            color = new Color(Mathf.Round(color.r * 48) / 48, Mathf.Round(color.g * 48) / 48, Mathf.Round(color.b * 48) / 48, color.a);
             string key = baseMat.name + ColorUtility.ToHtmlStringRGB(color);
             if (!tints.TryGetValue(key, out var m)) { m = new Material(baseMat) { color = color, name = key }; tints[key] = m; }
             return m;
@@ -1133,6 +1179,7 @@ namespace Crulanda.World
                 }
                 rng = zoneRng;
                 if (drop) { DestroyImmediate(t.gameObject); continue; }
+                if (t != null && Footprint(p).x > 0) t.gameObject.AddComponent<RoofFade>();   // see-through when it hides the player (playtest note 26)
                 if (!string.IsNullOrEmpty(p.interact) && t != null)
                     Interactables.Add(new ZoneInteractable { name = string.IsNullOrEmpty(p.name) ? p.kind : p.name, prompt = p.interact, item = p.item, kind = p.kind, once = p.once, node = string.IsNullOrEmpty(p.node) ? null : p.node, position = t.position, root = t });
             }
@@ -1617,7 +1664,7 @@ namespace Crulanda.World
                 for (int seg = 0; seg < 3; seg++)
                 {
                     var to = from + dir * segLen; float bow = .06f + T() * .06f, rEnd = r * (seg == 2 ? .35f : .6f);
-                    Limb(root, from, to, r, rEnd, mat, bow, seg == 0 ? 8 : 7);
+                    Limb(root, from, to, r, rEnd, mat, bow, 8, seg == 0, seg == 2);
                     // Forks off this length (on its bowed line), turning their own way, some drooping; most fork once more.
                     int subs = seg == 2 ? 1 : 1 + (int)(T() * 2);
                     for (int k = 0; k < subs; k++)
@@ -1936,14 +1983,17 @@ namespace Crulanda.World
         /// where it leaves the wood it grows from, and bowed a little below the straight line so it sets out flatter and turns
         /// upward. Closed at the tip. Local metres, like the parts round it.
         /// </summary>
-        void Limb(Transform t, Vector3 from, Vector3 to, float r0, float tip, Material bark, float bow = .12f, int sides = 8)
+        void Limb(Transform t, Vector3 from, Vector3 to, float r0, float tip, Material bark, float bow = .12f, int sides = 8, bool collar = true, bool closed = true)
         {
             var d = to - from; float len = d.magnitude; if (len < .05f) return; var dir = d / len;
             var side = Vector3.Cross(dir, Vector3.up); if (side.sqrMagnitude < 1e-4f) side = Vector3.right;
             var sag = Vector3.Cross(side.normalized, dir) * len * bow;   // perpendicular to the limb, on its underside
             if (sag.y > 0) sag = -sag;
             Vector3 C(float s) { return from + d * s + sag * (4 * s * (1 - s)); }
-            float R(float s, float a) { return Mathf.Lerp(r0, tip, s) * (1 + .35f * Mathf.Exp(-s * 9)) * Mathf.Clamp01((1.05f - s) / .1f); }
+            // collar: swelling where it leaves the wood it grows from; closed: drawn in to its tip. A length that carries on from
+            // another has neither, and runs on past its end into the next, so a crooked limb shows no knot or waist at its joints
+            // (playtest note 24).
+            float R(float s, float a) { return Mathf.Lerp(r0, tip, s) * (collar ? 1 + .35f * Mathf.Exp(-s * 9) : 1) * (closed ? Mathf.Clamp01((1.05f - s) / .1f) : 1); }
             var rings = new[] { 0, .12f, .26f, .42f, .58f, .74f, .88f, .97f, 1.05f };
             MeshPart(ZoneMeshes.Tube(C, R, rings, sides, side.normalized, 1, len * .5f), t, Vector3.zero, bark).name = "Limb";
             Record(t, C, R, rings, false);

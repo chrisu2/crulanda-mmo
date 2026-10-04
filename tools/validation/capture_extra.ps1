@@ -6,6 +6,7 @@ $exe = Join-Path $v 'Builds\Crulanda\Crulanda.exe'
 if (-not (Test-Path $exe)) { 'NO PLAYER BUILD'; exit 1 }
 $ui = 'C:\Users\chris\Documents\Codex\2026-09-28\hel\work\ui-captures'
 $log = Join-Path $ui 'hud.log'
+& (Join-Path $PSScriptRoot 'screen_prefs.ps1') -Save   # the captures must not leave Chris's game windowed
 $g = Start-Process $exe -PassThru -ArgumentList @('--crulanda-ui-capture', ('"' + $ui + '"'), '--crulanda-class', 'class.warrior', '-screen-width', '1440', '-screen-height', '900', '-screen-fullscreen', '0', '-logFile', ('"' + $log + '"'))
 $g | Wait-Process -Timeout 240
 Select-String -LiteralPath $log -Pattern 'CAPTURE_DONE|Exception|could not' | Select-Object -First 5 | ForEach-Object Line
@@ -33,3 +34,4 @@ $e = Start-Process $exe -PassThru -ArgumentList @('--crulanda-elite-capture', ('
 $e | Wait-Process -Timeout 300
 Select-String -LiteralPath $elog -Pattern 'ELITE_CAPTURE_DONE|Exception|Elite capture' | Select-Object -First 5 | ForEach-Object Line
 Get-ChildItem $ed -Filter '*.png' | Select-Object -ExpandProperty Name
+& (Join-Path $PSScriptRoot 'screen_prefs.ps1') -Restore

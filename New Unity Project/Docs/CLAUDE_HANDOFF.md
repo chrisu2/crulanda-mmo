@@ -10,14 +10,13 @@ Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
 ## RESUME HERE (updated 2026-10-03, evening)
-**NEXT (2026-10-04 04:44; Chris asked for a shutdown after this save):**
-1. Nothing in flight: everything committed, published 04:44, backed up.
-1b. **Open playtest notes (PLAYTEST_NOTES.md 23-31):** 23 FPS 60-70 on a 5070 Ti (profile first: draw calls, grass, shadows,
-   the post chain incl. the full-res sun pass, per-frame scripts); 24 dead-tree limb seams (join a limb's lengths into one
-   tube along a polyline); 25 no swing/cast animations (hook the Quaternius attack clips to auto-attack, strikes, casts); 26
-   roofs that block the camera should fade like TreeFade or pull the camera in; 28 the horse wanders into the Golden Cask
-   (keep critters' wander points outside house footprints); 30 sitting: figures float beside their stools (seat offset). Done
-   tonight: 27, 29, 31, 32. FigureCapture has a "helms-named" close-up row for head pieces.
+**NEXT (2026-10-04 15:50):**
+1. Nothing in flight: committed, published 15:50, backed up. Done today: notes 24, 25, 26, 28, 30, camera below level, full screen.
+1b. **FPS (note 23) continues:** the probe (end of every zone tour, `<zone>-perf.txt`) says CPU-bound. Left: the IMGUI HUD
+   (~4.3 ms: nameplates/place names 2.1 ms; the cure is moving the HUD to uGUI or UI Toolkit, a big job), scripts (~3.8 ms:
+   villagers, critters, enemies, TreeFade over 1,257 trees each frame), critters built of many primitives (rabbits 637
+   renderers), 7,539 static renderers left (trees carry several materials each), 949 materials. IL2CPP is not installed (only
+   Mono); a release build gave +5%: publish release builds (`EncounterBuildPlayer.Build` with `--crulanda-release`).
 2. **Make PlayMode efficient (Chris: "i want the most efficient playmode. whatever that takes").** Timings of the last full
    run (00:47, scratchpad copy `playmode-timing-20261004.xml`; re-measure from `encounter-validation\q-PlayMode.xml`): 175
    tests, 56 min of fixtures, no single hog: VillageWorkshop 259 s, VillagePurse 239, ZoneExit 233 (1 test), VillageHome 178,

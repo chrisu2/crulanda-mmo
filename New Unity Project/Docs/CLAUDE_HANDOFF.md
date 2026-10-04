@@ -11,10 +11,7 @@ The user requested this handoff because they ran out of tokens. Do not assume an
 
 ## RESUME HERE (updated 2026-10-03, evening)
 **NEXT (2026-10-04 01:20, Chris stopped for the night; do NOT shut the computer down unless he says):**
-1. **POIs + achievements are committed but NOT published.** Run the full check (`start_detached.ps1 -Arguments '-Zones
-   zone.oakhaven'`; it now also shoots `warrior-37-achievements.png` and the zone map shows "?" places), then publish, a
-   CHANGELOG line ("published HH:MM"), commit, back up. If a PlayMode test trips on a "DISCOVERED" toast or message, the
-   session's `Exploring` flag is the switch (off in test runs and captures; a test sets `s.Exploring = true`).
+1. POIs + achievements: PUBLISHED 2026-10-04 02:48 (full run EditMode 399/399, PlayMode 175/175). Nothing in flight.
 2. **Make PlayMode efficient (Chris: "i want the most efficient playmode. whatever that takes").** Timings of the last full
    run (00:47, scratchpad copy `playmode-timing-20261004.xml`; re-measure from `encounter-validation\q-PlayMode.xml`): 175
    tests, 56 min of fixtures, no single hog: VillageWorkshop 259 s, VillagePurse 239, ZoneExit 233 (1 test), VillageHome 178,
@@ -27,9 +24,9 @@ The user requested this handoff because they ran out of tokens. Do not assume an
    ground, a hit deer ends out of spell range, a cast lands at range + 5 m, a brim within 1.65 crowns, a staff slung on the run).
 3. Then the Ash Rim's camps and quests (`Docs/NEXT_PEAKS.md` "After Peaks"), playtest note 10 (cave lighting), armour.
 Chris's save is not precious to him (memory `crulanda-save-not-precious`): no save-compat effort for his sake.
-**The playable build:** published 2026-10-04 00:48: notes 20-22 (casts land at range + 5 m, grounded boulders, the coop sack, deer flee 25-35 m); before it 2026-10-03 23:35: the sun (note 9), hats, wheel zoom and staff slinging (notes 17-19); before it 22:25: the Peaks filled out (4 camps, 5 quests); before it 21:05: the dead trees rebuilt (playtest note 16: snags with heavy crooked limbs, blunt broken tops) and the board capture, on top of 17:25: notice boards with bounties and the rare courier posting, silver crowns, Khaven's
+**The playable build:** published 2026-10-04 02:48: POIs + achievements; before it 00:48: notes 20-22 (casts land at range + 5 m, grounded boulders, the coop sack, deer flee 25-35 m); before it 2026-10-03 23:35: the sun (note 9), hats, wheel zoom and staff slinging (notes 17-19); before it 22:25: the Peaks filled out (4 camps, 5 quests); before it 21:05: the dead trees rebuilt (playtest note 16: snags with heavy crooked limbs, blunt broken tops) and the board capture, on top of 17:25: notice boards with bounties and the rare courier posting, silver crowns, Khaven's
 four camps and five quests (12d8ddc), on top of the boars (14:42), the farm animals (13:06) and the real animals (01:59).
-**Last full run (2026-10-04 00:47):** EditMode 396/396, PlayMode 175/175 (56 min of fixtures), Oakhaven toured, no exceptions. 23:33: EditMode 396/396, PlayMode 175/175, Oakhaven toured, no exceptions. 22:21: EditMode 396/396, PlayMode 175/175, build OK, the Peaks toured, no exceptions. 21:01: EditMode 396/396, PlayMode 175/175, build OK, Khaven toured, no exceptions in any game log. Before it, 17:19: EditMode 396/396, PlayMode 175/175 (two zone tests failed on the board's postings in the full run and were
+**Last full run (2026-10-04 02:47):** EditMode 399/399, PlayMode 175/175, Oakhaven toured, no exceptions. 00:47: EditMode 396/396, PlayMode 175/175 (56 min of fixtures), Oakhaven toured, no exceptions. 23:33: EditMode 396/396, PlayMode 175/175, Oakhaven toured, no exceptions. 22:21: EditMode 396/396, PlayMode 175/175, build OK, the Peaks toured, no exceptions. 21:01: EditMode 396/396, PlayMode 175/175, build OK, Khaven toured, no exceptions in any game log. Before it, 17:19: EditMode 396/396, PlayMode 175/175 (two zone tests failed on the board's postings in the full run and were
 taught that a bounty belongs to the notice board; re-run green), build OK, Oakhaven toured, all shots, no exceptions in any game
 log, no shader errors.
 **Nothing in flight:** everything is committed, published and backed up.
@@ -989,7 +986,7 @@ resumed with `Workflow({scriptPath, resumeFromRunId})` (finished agents replay f
 - **Round 14, notes 20-22 (PUBLISHED 2026-10-04 00:48)**: EncounterSession.LandsOn/LandingLeeway (DruidKit casts, WarriorKit
   blows); ZoneBuilder Perch boulders and "rock" props seated on the lowest of 3 x 3 ground samples under them; Coop's grain
   sack rebuilt; GameAnimal bolt 25-35 m (deer), 12-16 (others), boltUntil 9 s, HurtFleeDistance 35 re-bolt.
-- **Round 15, POIs + achievements (COMMITTED 2026-10-04 01:20, NOT PUBLISHED)**: Achievements.cs (pure: Pois, Reach 6-18 m,
+- **Round 15, POIs + achievements (PUBLISHED 2026-10-04 02:48)**: Achievements.cs (pure: Pois, Reach 6-18 m,
   PoiXp 15 + 8 x levelMin, EliteKey/EliteKeys "mob.<tag>.<zone>.<camp>", Check(quiet), Titles, Wear); EncounterProgress
   explored, achievements, title, bounties, rares, elitesSlain (declared after boards, before quests: no format bump);
   EncounterSession Feats (made in TickFeats once the zone is up), Exploring (off for test runs, temp saves and captures),

@@ -1094,7 +1094,7 @@ A read-only review by five reviewers, each finding checked by a second who tried
   animal keeps fleeing while the hunter is within 35 m.
 - Tests: EditMode 396/396, PlayMode 175/175; Oakhaven toured; no errors in any game log.
 
-## 2026-10-04 — Points of interest and achievements (committed 01:20, NOT YET PUBLISHED: needs its full run)
+## 2026-10-04 — Points of interest and achievements (published 02:48)
 - Chris: "need to implement POI in game for discovery and achievement points"; chose every landmark a POI, an Achievements
   tab with points and titles.
 - **POIs:** every zone's landmarks. Walking into one the first time (within its radius, 6 to 18 m) shows "DISCOVERED" and
@@ -1108,4 +1108,4 @@ A read-only review by five reviewers, each finding checked by a second who tried
   frame. A save from before records past deeds at once, quietly, in one line.
 - Exploring and earning are off in test runs and capture tours (no surprise toasts in tests or shots); a test turns them on.
 - Tests: AchievementTests (3, EditMode); focused EditMode 34/34 and PlayMode 22/22 (Discovery, Armoury, Bounty board,
-  Encounter loop). The full run is the next session's first step.
+  Encounter loop); full run EditMode 399/399, PlayMode 175/175, Oakhaven toured, no errors in any game log.

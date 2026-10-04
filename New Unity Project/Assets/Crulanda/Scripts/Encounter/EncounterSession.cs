@@ -1056,6 +1056,8 @@ namespace Crulanda.Encounter
         void Start()
         {
             if (content == null) { Debug.LogError("Encounter content missing."); enabled = false; return; }
+            // Who keeps a staff in hand on the run (playtest note 19): an enemy while engaged; anyone else while the player fights.
+            ActorVisual.Fighting = go => { var e = go.GetComponent<EncounterEnemy>(); return e != null ? e.Engaged : InCombat; };
             Crulanda.World.WorldWeather.Turned += OnWeatherTurned;
             // An editor running tests from the command line (the validation copy) never reads or writes the real save folder, even
             // in a test that forgets to point the session elsewhere: the real folder is the player's, shared by every build.

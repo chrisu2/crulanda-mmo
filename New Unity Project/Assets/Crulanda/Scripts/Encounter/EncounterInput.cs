@@ -96,7 +96,10 @@ namespace Crulanda.Encounter
         } }
         public static float Zoom { get {
 #if ENABLE_INPUT_SYSTEM
-            return Mouse.current == null ? 0 : Mouse.current.scroll.ReadValue().y / 120f;
+            // A notch is 1 under the Input System's uniform scroll (1.20's default) and 120 under the old Windows units: either is
+            // one step (playtest note 18: the wheel moved the camera about a centimetre a notch).
+            if (Mouse.current == null) return 0; float y = Mouse.current.scroll.ReadValue().y;
+            return Mathf.Abs(y) > 10 ? y / 120f : y;
 #else
             return Input.mouseScrollDelta.y;
 #endif

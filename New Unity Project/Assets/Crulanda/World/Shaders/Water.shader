@@ -179,6 +179,10 @@ Shader "Crulanda/Water"
             float cut = lerp(0.7, 0.56, lobe), aa = fwidth(h);
             float spark = smoothstep(cut - aa, cut + 0.06 + aa, h) * saturate(1 - aa * 4) * show * wet;
             float3 glint = _LightColor0.rgb * spark * lerp(0.14, 0.75, lobe) * _Sparkle;
+            // The sun's path itself (playtest note 9: glints on water): along the narrow reflection the brightest blobs go past
+            // the paint's cap, so the bloom catches them as glints, a few and soft (the bloom's prefilter keeps one pixel from flaring).
+            float path = pow(saturate(dot(R, _WorldSpaceLightPos0.xyz)), 120) * spark * _Sparkle;
+            float3 sunGlint = _LightColor0.rgb * path * 2.2;
 
             // Foam: a soft band hugging whatever the water touches (banks, rocks, posts, legs; from the depth texture), its width
             // wobbling slowly, and on still water a thinner line washing in toward the shore every few seconds (half as much on
@@ -198,7 +202,7 @@ Shader "Crulanda/Water"
             // pond (a glowing rim), so it greys down with the light (dim is about 1 by day, 0.4 on a moonlit night).
             o.Albedo = _FoamColor.rgb * lerp(0.35, 1, dim);
             o.Alpha = foam;                                                  // only the foam has a body; the rest is emission
-            o.Emission = min(water + glint, _Glare) * (1 - foam);
+            o.Emission = (min(water + glint, _Glare) + sunGlint) * (1 - foam);
             o.Smoothness = 0;
             o.Metallic = 0;
         }

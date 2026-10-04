@@ -31,7 +31,7 @@ namespace Crulanda.Encounter
             }
             else orbiting = false;
             previousPointer = pointer;
-            if (!session.Paused && !EncounterHud.BlocksPointer(pointer)) distance = Mathf.Clamp(distance - EncounterInput.Zoom, 4, 17);
+            if (!session.Paused && !EncounterHud.BlocksPointer(pointer)) distance = Mathf.Clamp(distance - EncounterInput.Zoom * 1.2f, 2.5f, 22);   // close over the shoulder to a wide view
             if (!session.Player.IsAlive) { Swimming = Sneaking = false; return; }   // the dead neither swim nor sneak
             if (session.Paused || session.BuildOpen) return;
             var move = Vector2.ClampMagnitude(EncounterInput.Move, 1);

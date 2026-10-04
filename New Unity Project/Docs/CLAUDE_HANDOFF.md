@@ -10,11 +10,11 @@ Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
 ## RESUME HERE (updated 2026-10-03, evening)
-**NEXT:** Peaks done (round 12). In progress next: playtest note 9, bloom and sun (Chris, 2026-10-03), then the Ash Rim's
+**NEXT:** Peaks done (round 12). Note 9 done (23:35). Next: notes 20-22 (Thornbolt lost at range, floating boulders + the coop's sack, deer flee too short), then POIs + achievements (Chris chose: every landmark a POI with XP and map reveal; an Achievements tab with points and titles), then the Ash Rim's
 camps and quests (`Docs/NEXT_PEAKS.md` "After Peaks"). Chris said not to shut the computer down until he says.
-**The playable build:** published 2026-10-03 22:25: the Peaks filled out (4 camps, 5 quests); before it 21:05: the dead trees rebuilt (playtest note 16: snags with heavy crooked limbs, blunt broken tops) and the board capture, on top of 17:25: notice boards with bounties and the rare courier posting, silver crowns, Khaven's
+**The playable build:** published 2026-10-03 23:35: the sun (note 9), hats, wheel zoom and staff slinging (notes 17-19); before it 22:25: the Peaks filled out (4 camps, 5 quests); before it 21:05: the dead trees rebuilt (playtest note 16: snags with heavy crooked limbs, blunt broken tops) and the board capture, on top of 17:25: notice boards with bounties and the rare courier posting, silver crowns, Khaven's
 four camps and five quests (12d8ddc), on top of the boars (14:42), the farm animals (13:06) and the real animals (01:59).
-**Last full run (22:21):** EditMode 396/396, PlayMode 175/175, build OK, the Peaks toured, no exceptions. 21:01: EditMode 396/396, PlayMode 175/175, build OK, Khaven toured, no exceptions in any game log. Before it, 17:19: EditMode 396/396, PlayMode 175/175 (two zone tests failed on the board's postings in the full run and were
+**Last full run (23:33):** EditMode 396/396, PlayMode 175/175, Oakhaven toured, no exceptions. 22:21: EditMode 396/396, PlayMode 175/175, build OK, the Peaks toured, no exceptions. 21:01: EditMode 396/396, PlayMode 175/175, build OK, Khaven toured, no exceptions in any game log. Before it, 17:19: EditMode 396/396, PlayMode 175/175 (two zone tests failed on the board's postings in the full run and were
 taught that a bounty belongs to the notice board; re-run green), build OK, Oakhaven toured, all shots, no exceptions in any game
 log, no shader errors.
 **Nothing in flight:** everything is committed, published and backed up.
@@ -964,4 +964,11 @@ resumed with `Workflow({scriptPath, resumeFromRunId})` (finished agents replay f
   The Umbra Watcher (-140,40) pale x1 L8, not elite), a "False pilgrims' packs" crates prop (inserted before the board), the
   canonNote; Quests/peaks.json +5 (npc.maddoc.adit, npc.tarsk.tarn, faction.sandthrone.2 (reputation copied from
   faction.sandthrone.1), side.peaks.shrine (Maddoc -> Tarsk, night visit), npc.yara.watcher). No new items, tags or looks.
+- **Round 13, the sun + notes 17-19 (PUBLISHED 2026-10-03 23:35, see git log)**: ZonePost.Sun (pass 5 of Post.shader: disc,
+  halo, glow on sky pixels from the depth texture; corner rays now always set by Rays()); shafts x .6 x (1 + 1.3 low); veil in
+  the composite; Water.shader sunGlint (pow 120 lobe, uncapped). EncounterCapture world tour: 82-sun-dawn/noon/dusk (6.3, 12,
+  18.7 h, weather forced Clear, camera set directly). Hats: brim <= 1.65 crown before HatFit. Zoom: EncounterInput.Zoom takes
+  1-per-notch or 120-per-notch; AdventurerMotor 1.2 m a notch, 2.5-22 m. Staff: ActorVisual.ModelLate slings held gear
+  taller than 1.3 m (HeldTall, measured in hand, cached per held array) when speed > 3.2 (back below 2.2), unless
+  ActorVisual.Fighting(gameObject).
 

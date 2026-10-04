@@ -222,7 +222,7 @@ segments that curves, sways as the cat walks, lifts when it trots and curls and 
 
 The night pass (firelit windows and lamps, the moonlit blue base). Nothing to fix: do not regress it.
 
-## 9. Bloom and sun effects? (2026-10-01) — OPEN
+## 9. Bloom and sun effects? (2026-10-01) — FIXED (published 2026-10-03 23:35)
 > "bloom sun effects?"
 
 What exists (`ZonePost`, `Post.shader`): bloom on lamps, windows, embers and the sun, and sun shafts when the sun is in view,
@@ -319,3 +319,24 @@ The dead tree's limbs were long thin spears that all climbed from the top of the
 and sharpened posts). Note 15 had put the twigs back on the limbs but not changed the limbs. Built: DeadTree's limbs start
 lower, heavy, crooked in three turning lengths with forks that droop and fork again, ending in snapped stubs; the snag's top
 is blunt and broken. Before/after: hel\work\world-captures\khaven-21-the-hush.png (Chris's shot was the same stop).
+
+## 17. Hats too big (2026-10-03) — FIXED (published 2026-10-03 23:35)
+> "hats too big" (with a shot of Tamsin Reed and a Salt-Mender in the Golden Cask, wide-brimmed hats)
+
+The hat fitter (ActorVisual.Model HatFit/WearHat) grows a whole hat round the model's head, brim and crown alike, up to 1.9x,
+so the crown clears the hair; the brims were sized for the old figure's big round head, so they came out as cartwheels.
+Built: a brim is sized from its crown before the fit (no wider than 1.65 crowns); the crown still fits as before.
+
+## 18. The wheel should zoom the camera in and out (2026-10-03) — FIXED (published 2026-10-03 23:35)
+> "need to zoom in and out with scroll wheel"
+
+The zoom was there, but Input System 1.20 reports a wheel notch as 1 and the code divided it by 120 (the old Windows
+units), so a notch moved the camera about a centimetre. Built: either kind of value is one step; a notch is 1.2 m; the
+range is 2.5 to 22 m (was 4 to 17).
+
+## 19. Running with a staff looks awkward (2026-10-03) — FIXED (published 2026-10-03 23:35)
+> "she runs awkwardly with the stave" (with a clip of the run)
+
+A staff was held mid-shaft in the right fist and swung with the run cycle, so it whipped across the body. Built: running
+out of a fight, a staff or a polearm goes on the back (its slung copy); stopping or fighting brings it to hand. Enemies
+keep theirs drawn while engaged.

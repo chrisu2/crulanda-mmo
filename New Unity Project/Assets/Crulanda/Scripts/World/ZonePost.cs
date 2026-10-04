@@ -5,7 +5,10 @@ namespace Crulanda.World
     /// <summary>
     /// Camera post-processing for generated zones (built-in pipeline, HDR camera):
     /// - bloom on lamps, windows, embers and the sun;
-    /// - sun shafts when the sun is in view;
+    /// - the sun itself (playtest note 9): a disc and a warm halo on the sky in HDR, cut by whatever stands in front, so the
+    ///   bloom spreads it and the shafts streak it through trees and roofs; warmest and widest low in the sky; a veil of glare
+    ///   when you look into it;
+    /// - sun shafts when the sun is in view, strongest at dawn and dusk;
     /// - a filmic (ACES) tone map;
     /// - colour grading that follows the zone's biome, the hour and the weather (cooler at night, with firelight kept warm;
     ///   darker and duller under rain);
@@ -62,6 +65,11 @@ namespace Crulanda.World
             mat.SetFloat("_Saturation", Mathf.Lerp(g.saturation, .9f, dark)); mat.SetFloat("_Contrast", g.contrast); mat.SetFloat("_Lift", dark);
             mat.SetFloat("_Vignette", g.vignette + dark * .15f);
             mat.SetColor("_Tint", Color.Lerp(Color.Lerp(g.tint, new Color(.9f, .95f, 1.1f), dark), new Color(1.08f, .96f, .88f), dusk * .6f));
+            // The frame's corner rays (the sun pass and the cloud shadows find each pixel's direction from them).
+            Rays();
+            // The sun on the sky, in HDR, before anything takes the frame.
+            RenderTexture sunlit = Sun(src, g, dark);
+            if (sunlit != null) src = sunlit;
             // Bloom: prefilter at half size, blur down the chain, then back up additively.
             int w = src.width / 2, h = src.height / 2;
             var format = src.format;
@@ -82,7 +90,9 @@ namespace Crulanda.World
                 if (vp.z > 0 && toSun.y > .02f)
                 {
                     float onScreen = Mathf.Clamp01(1.4f - Mathf.Max(Mathf.Abs(vp.x - .5f), Mathf.Abs(vp.y - .5f)) * 2);
-                    shaftStrength = onScreen * (1 - dark) * .45f * Mathf.Clamp01(1 - WorldWeather.Now.clouds * 1.15f);   // cloud cover hides the sun
+                    // Strongest low in the sky (dawn and dusk, when it streams through the trees), a touch even at noon.
+                    float low = 1 + 1.3f * (1 - Mathf.Clamp01(toSun.y / .6f));
+                    shaftStrength = onScreen * (1 - dark) * .6f * low * Mathf.Clamp01(1 - WorldWeather.Now.clouds * 1.15f) * (1 - Hollow.CameraDepth);   // cloud cover hides the sun
                     mat.SetVector("_SunScreen", new Vector4(vp.x, vp.y, 1, 0));
                     if (shaftStrength > .01f) { shafts = RenderTexture.GetTemporary(src.width / 4, src.height / 4, 0, format); Graphics.Blit(down[0], shafts, mat, 3); }
                 }
@@ -93,6 +103,39 @@ namespace Crulanda.World
             Graphics.Blit(src, dst, mat, 4);
             for (int i = 0; i < levels; i++) { RenderTexture.ReleaseTemporary(down[i]); down[i] = null; }
             if (shafts != null) RenderTexture.ReleaseTemporary(shafts);
+            if (sunlit != null) RenderTexture.ReleaseTemporary(sunlit);
+        }
+        /// <summary>
+        /// The sun's disc, halo and glow drawn onto the sky (pass 5) into a temporary HDR copy of the frame, or null when there is
+        /// no sun to see (night, below the horizon, a closed cloud lid, a cave). Low in the sky it is warmer, its halo wider and
+        /// its glare stronger; under broken cloud it dims with the cover. The veil (glare over the whole frame) is set here too.
+        /// </summary>
+        RenderTexture Sun(RenderTexture src, Grade g, float dark)
+        {
+            mat.SetVector("_SunShape", Vector4.zero); mat.SetColor("_SunColor", Color.black);
+            if (sun == null || dark > .6f) return null;
+            var toSun = -sun.transform.forward; if (toSun.y < -.03f) return null;
+            float clear = Mathf.Clamp01(1 - WorldWeather.Now.clouds * 1.2f) * (1 - Hollow.CameraDepth) * (1 - dark / .6f);
+            if (clear < .01f) return null;
+            float low = 1 - Mathf.Clamp01(toSun.y / .5f);   // 1 at the horizon, 0 from about 30 degrees up
+            var colour = Color.Lerp(sun.color, new Color(1, .55f, .26f), .75f * low); colour = Color.Lerp(colour, new Color(1, .97f, .9f), .2f * (1 - low));   // gold to orange as it sinks
+            mat.SetVector("_SunDir", toSun);
+            mat.SetColor("_SunColor", colour * clear);
+            // Disc, halo, wide glow; the veil grows as the sun nears the middle of the frame.
+            var vp = cam.WorldToViewportPoint(cam.transform.position + toSun * 1000);
+            float facing = vp.z > 0 ? Mathf.Clamp01(1 - new Vector2(vp.x - .5f, vp.y - .5f).magnitude * 1.6f) : 0;
+            mat.SetVector("_SunShape", new Vector4(4f, .35f + .45f * low, .07f + .18f * low, .012f * facing * facing * (1 + low)));   // tuned on the 82-sun shots: no milky veil, no blown sky
+            var lit = RenderTexture.GetTemporary(src.width, src.height, 0, src.format);
+            Graphics.Blit(src, lit, mat, 5);
+            return lit;
+        }
+        /// <summary>Rays through the frame's corners, scaled to one metre of eye depth: ground point = camera + ray * eye depth.</summary>
+        void Rays()
+        {
+            var t = cam.transform; mat.SetVector("_CamPos", t.position);
+            cam.CalculateFrustumCorners(new Rect(0, 0, 1, 1), 1, Camera.MonoOrStereoscopicEye.Mono, corners);   // bottom-left, top-left, top-right, bottom-right
+            mat.SetVector("_RayBL", t.TransformVector(corners[0])); mat.SetVector("_RayTL", t.TransformVector(corners[1]));
+            mat.SetVector("_RayTR", t.TransformVector(corners[2])); mat.SetVector("_RayBR", t.TransformVector(corners[3]));
         }
         readonly Vector3[] corners = new Vector3[4];
         /// <summary>
@@ -116,11 +159,6 @@ namespace Crulanda.World
             mat.SetVector("_CloudDrift", WorldWeather.CloudDrift); mat.SetVector("_CloudSun", toSun);
             mat.SetFloat("_CloudHeight", WorldWeather.CloudHeight); mat.SetFloat("_CloudTile", WorldWeather.CloudTile);
             mat.SetVector("_CloudFog", new Vector4(RenderSettings.fogStartDistance, RenderSettings.fogEndDistance, 0, 0));
-            // Rays through the frame's corners, scaled to one metre of eye depth: ground point = camera + ray * eye depth.
-            var t = cam.transform; mat.SetVector("_CamPos", t.position);
-            cam.CalculateFrustumCorners(new Rect(0, 0, 1, 1), 1, Camera.MonoOrStereoscopicEye.Mono, corners);   // bottom-left, top-left, top-right, bottom-right
-            mat.SetVector("_RayBL", t.TransformVector(corners[0])); mat.SetVector("_RayTL", t.TransformVector(corners[1]));
-            mat.SetVector("_RayTR", t.TransformVector(corners[2])); mat.SetVector("_RayBR", t.TransformVector(corners[3]));
         }
     }
 }

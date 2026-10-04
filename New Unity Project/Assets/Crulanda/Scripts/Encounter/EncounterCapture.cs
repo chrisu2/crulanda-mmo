@@ -517,6 +517,29 @@ namespace Crulanda.Encounter
                 ScreenCapture.CaptureScreenshot(file);
                 yield return new WaitForSeconds(.4f);
             }
+            // Into the sun (playtest note 9): from the entrance, the player hidden, facing the sun at dawn, noon and dusk under a
+            // clear sky, the sun a little above the middle of the frame: <zone>-82-sun-dawn|noon|dusk.png.
+            if (zone != null && Crulanda.World.WorldWeather.Active != null && RenderSettings.sun != null)
+            {
+                var weather = Crulanda.World.WorldWeather.Active; var body = Array.FindAll(session.Player.GetComponentsInChildren<Renderer>(), r => r.enabled);
+                weather.Force(Crulanda.World.WeatherKind.Clear, true);
+                foreach (var r in body) r.enabled = false;
+                var stand = zone.Ground(zone.Zone.spawns.player, 1.7f); motor.Teleport(stand - Vector3.up * .6f); motor.enabled = false;
+                var view = session.View.transform;
+                foreach (var (hour, name) in new[] { (6.3f, "dawn"), (12f, "noon"), (18.7f, "dusk") })
+                {
+                    Crulanda.World.WorldClock.Hour = hour; Crulanda.World.WorldClock.Advance(0);
+                    yield return null;
+                    var toSun = -RenderSettings.sun.transform.forward; var flat = new Vector3(toSun.x, 0, toSun.z).normalized;
+                    float elevation = Mathf.Asin(Mathf.Clamp(toSun.y, -1, 1)) * Mathf.Rad2Deg, pitch = Mathf.Max(elevation - 9, -4);
+                    var look = Quaternion.LookRotation(flat) * Quaternion.Euler(-pitch, 0, 0);
+                    for (float w = 0; w < .8f; w += Time.deltaTime) { view.SetPositionAndRotation(stand, look); yield return null; }
+                    ScreenCapture.CaptureScreenshot(Path.Combine(directory, zone.Zone.id.Replace("zone.", "") + "-82-sun-" + name + ".png"));
+                    yield return new WaitForSeconds(.4f);
+                }
+                motor.enabled = true; foreach (var r in body) r.enabled = true;
+                weather.Force(weather.TourKind(), true); Crulanda.World.WorldClock.Hour = 10; Crulanda.World.WorldClock.Advance(0);
+            }
             // Every node to gather (a seam, a windfall, a herb patch) from three metres off its face (a windfall side on), the
             // player hidden: <zone>-80-node-NN-<name>.png.
             if (zone != null)

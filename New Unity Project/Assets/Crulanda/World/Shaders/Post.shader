@@ -1,7 +1,8 @@
 // Crulanda post-processing for the built-in pipeline (camera OnRenderImage):
 // 0 bright-pass prefilter, 1 blur down, 2 blur up (additive), 3 sun shafts (radial blur toward the sun),
 // 4 composite: cloud shadows, bloom + shafts, exposure, ACES filmic tone map, saturation/contrast/tint grade (firelight
-//   kept warm at night), vignette.
+//   kept warm at night), vignette; 5 sun: the sun's disc and warm halo added to the sky in HDR before the bloom and the
+//   shafts take the frame (playtest note 9), so trees and roofs in front of it cut it and its rays.
 Shader "Hidden/Crulanda/Post"
 {
     Properties { _MainTex ("", 2D) = "white" {} }
@@ -11,6 +12,8 @@ Shader "Hidden/Crulanda/Post"
     sampler2D _Bloom; sampler2D _Shafts;
     float _Threshold, _Knee, _BloomIntensity, _ShaftIntensity, _Exposure, _Contrast, _Saturation, _Vignette, _Lift;
     float4 _Tint, _SunScreen;
+    // The sun pass (ZonePost.Sun): direction to the sun (world), its colour * strength, x disc, y halo, z wide glow, w veil.
+    float4 _SunDir, _SunColor, _SunShape;
     // Cloud shadows (ZonePost.CloudShadows): x strength (0: off), y cloud cover, z edge softness.
     UNITY_DECLARE_DEPTH_TEXTURE(_CameraDepthTexture);
     sampler2D _CloudTex; float4 _CloudShadow, _CloudDrift, _CloudSun, _CamPos, _RayBL, _RayBR, _RayTL, _RayTR, _CloudFog; float _CloudHeight, _CloudTile;
@@ -46,20 +49,41 @@ Shader "Hidden/Crulanda/Post"
         for (int k = 0; k < 28; k++) { acc += tex2D(_MainTex, uv).rgb * w; w *= 0.93; uv += step; }
         return half4(acc * (_SunScreen.z / 11), 1);
     }
+    // The view ray through this pixel (world, unnormalised) from the frame's corner rays.
+    float3 ViewRay(float2 suv) { return lerp(lerp(_RayBL.xyz, _RayBR.xyz, suv.x), lerp(_RayTL.xyz, _RayTR.xyz, suv.x), suv.y); }
+    float2 ScreenUV(float2 uv)
+    {
+        float2 suv = uv;
+        #if UNITY_UV_STARTS_AT_TOP
+        if (_MainTex_TexelSize.y < 0) suv.y = 1 - suv.y;
+        #endif
+        return suv;
+    }
+    // The sun on the sky: a hot disc about two degrees across with a soft rim (painted, not a pin-prick), a warm halo and a
+    // wide glow, only where the sky shows (the depth texture's far plane), so whatever stands in front cuts it; the bloom
+    // spreads it back over their edges and the shafts streak it through the gaps.
+    half4 fragSun(v2f i) : SV_Target
+    {
+        half3 c = tex2D(_MainTex, i.uv).rgb;
+        float2 suv = ScreenUV(i.uv);
+        float raw = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, suv);
+        float sky = smoothstep(0.96, 0.995, Linear01Depth(raw));
+        float cosA = dot(normalize(ViewRay(suv)), _SunDir.xyz), ang = acos(clamp(cosA, -1, 1));
+        float disc = 1 - smoothstep(0.014, 0.019, ang);
+        float glow = _SunShape.x * disc + _SunShape.y * exp(-ang / 0.06) + _SunShape.z * exp(-ang / 0.3);
+        return half4(c + _SunColor.rgb * glow * sky, 1);
+    }
     half3 ACES(half3 x) { return saturate((x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14)); }
     // How much sunlight reaches this pixel's ground point past the cloud layer (1 = all). The point comes from the depth
     // texture and the frame's corner rays; the cloud is the one toward the sun from it, cut from the sky's own noise, cover
     // and drift (Crulanda/Clouds), so the shadows move with the clouds overhead. The sky, and far land in the haze, keep theirs.
     half CloudLight(float2 uv)
     {
-        float2 suv = uv;
-        #if UNITY_UV_STARTS_AT_TOP
-        if (_MainTex_TexelSize.y < 0) suv.y = 1 - suv.y;
-        #endif
+        float2 suv = ScreenUV(uv);
         float raw = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, suv);
         if (Linear01Depth(raw) > 0.98) return 1;
         float eye = LinearEyeDepth(raw);
-        float3 ray = lerp(lerp(_RayBL.xyz, _RayBR.xyz, suv.x), lerp(_RayTL.xyz, _RayTR.xyz, suv.x), suv.y);
+        float3 ray = ViewRay(suv);
         float3 p = _CamPos.xyz + ray * eye;
         float2 at = (p.xz + _CloudSun.xz / max(_CloudSun.y, 0.25) * (_CloudHeight - p.y) - _CloudDrift.xy) / _CloudTile;
         float n = tex2D(_CloudTex, at).r * 0.65 + tex2D(_CloudTex, at * 2.7 + 0.37).r * 0.35;
@@ -73,6 +97,7 @@ Shader "Hidden/Crulanda/Post"
         half3 c = tex2D(_MainTex, i.uv).rgb;
         if (_CloudShadow.x > 0.001) c *= CloudLight(i.uv);
         c += tex2D(_Bloom, i.uv).rgb * _BloomIntensity + tex2D(_Shafts, i.uv).rgb * _ShaftIntensity;
+        c += _SunColor.rgb * _SunShape.w;   // veiling glare: looking into the sun washes a little light over the whole frame
         c = ACES(c * _Exposure);
         half l = dot(c, half3(0.2126, 0.7152, 0.0722));
         // Firelight after dark (_Lift = darkness): bright warm pixels (lit windows, lamp glass, the ground under a lamp) keep
@@ -115,6 +140,10 @@ Shader "Hidden/Crulanda/Post"
         Pass { CGPROGRAM
             #pragma vertex vert
             #pragma fragment fragComposite
+            ENDCG }
+        Pass { CGPROGRAM
+            #pragma vertex vert
+            #pragma fragment fragSun
             ENDCG }
     }
 }

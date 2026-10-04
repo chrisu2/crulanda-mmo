@@ -1074,3 +1074,16 @@ A read-only review by five reviewers, each finding checked by a second who tried
   tally in a Sandthrone hand; +Sandthrone, -Salt-Menders); What the Shrine Hears (Maddoc, then Tarsk: the Listening Shrine
   at night reads the toll-gate's tally back); The Thing Under the Umbra Scarp (Yara Quell).
 - Tests: EditMode 396/396, PlayMode 175/175; the Peaks toured; no errors in any game log.
+
+## 2026-10-03 — A sun that reads; hats, the wheel, a staff on the run (published 23:35)
+- **The sun (playtest note 9):** ZonePost draws the sun's disc and a warm halo onto the sky in HDR (Post.shader pass 5)
+  before the bloom and the shafts take the frame, so trees and roofs cut it and the bloom spreads it over their edges; gold
+  to orange as it sinks, its halo wider low in the sky; shafts strongest at dawn and dusk; a faint veil of glare looking
+  into it. The water's sun path goes past the paint's cap so the bloom catches a few soft glints. Tuned on new tour shots,
+  `<zone>-82-sun-dawn|noon|dusk.png` (the first pass washed the frame milky).
+- **Hats (note 17):** a brim is sized from its crown (no wider than 1.65 crowns) before the hat is fitted to the model's head.
+- **The wheel (note 18):** Input System 1.20 reports a notch as 1 and the camera divided it by 120: a notch now zooms 1.2 m,
+  2.5 to 22 m.
+- **A staff on the run (note 19):** running out of a fight, a staff or a polearm goes on the back; stopping or fighting
+  brings it to hand (ActorVisual.Fighting, set by the session: an enemy while engaged, anyone else while the player fights).
+- Tests: EditMode 396/396, PlayMode 175/175; Oakhaven toured; no errors in any game log.

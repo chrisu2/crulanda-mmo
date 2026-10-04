@@ -277,6 +277,11 @@ namespace Crulanda.Encounter
                     hats.Remove(c);
                 }
             }
+            // A brim no wider than 1.65 crowns (playtest note 17, "hats too big"): the fit below grows both, so the crown still clears.
+            var crown = hats.Find(c => Kind(c).StartsWith("Cylinder") && c.localScale.y > .03f);
+            if (crown != null) foreach (var b in hats)
+                if (Kind(b).StartsWith("Cylinder") && b.localScale.y <= .03f && b.localScale.x > crown.localScale.x * 1.65f)
+                    b.localScale = new Vector3(crown.localScale.x * 1.65f, b.localScale.y, crown.localScale.z * 1.65f);
             if (hats.Count > 0 && HatFit(hats, out float drop, out float grow))
             {
                 var hat = new GameObject("Hat").transform; hat.SetParent(headFrame, false); WearHat(hat, drop, grow);
@@ -480,11 +485,33 @@ namespace Crulanda.Encounter
                 case Carrying.Shoulder: p.armR = new Vector3(-25, 0, -18); p.elbowR = -140; p.armL = new Vector3(Mathf.Sin(phase) * 18 * Mathf.Clamp01(speed / 2), 0, 6); p.elbowL = -15; break;
             }
         }
+        /// <summary>Whether this figure is in a fight (EncounterSession sets it: an enemy while engaged, anyone else while the player
+        /// fights). A tall weapon stays in hand then, running or not.</summary>
+        public static System.Func<GameObject, bool> Fighting;
+        bool runSlung; Transform[] tallOf; bool tall;
+        /// <summary>Whether what is held reaches past 1.3 m (a staff, a polearm) and has a slung copy to go on the back.</summary>
+        bool HeldTall()
+        {
+            if (held == null || stowed == null || stowed.Length == 0) return false;
+            if (tallOf == held) return tall;
+            tallOf = held; tall = false;
+            foreach (var g in held)
+            {
+                if (g == null) continue; if (!g.gameObject.activeInHierarchy) { tallOf = null; return false; }   // measured in hand (put away, its bounds are empty)
+                var rs = g.GetComponentsInChildren<Renderer>(true); if (rs.Length == 0) continue;
+                var b = rs[0].bounds; foreach (var r in rs) b.Encapsulate(r.bounds);
+                if (Mathf.Max(b.size.x, Mathf.Max(b.size.y, b.size.z)) > 1.3f) tall = true;
+            }
+            return tall;
+        }
         /// <summary>A model's frame: the clip for the pose (walking wins over a standing pose), the arms for the poses without a
         /// clip, the back, the lean, then the frames.</summary>
         void ModelLate()
         {
-            bool stow = Pose == ActorPose.Swim;
+            // Running out of a fight with a staff or a polearm: slung on the back, not whipping about in the fist (playtest note 19,
+            // "she runs awkwardly with the stave"); in hand again to stop or to fight. A little give either side so it does not flicker.
+            if (speed > 3.2f) runSlung = true; else if (speed < 2.2f) runSlung = false;
+            bool stow = Pose == ActorPose.Swim || runSlung && HeldTall() && (Fighting == null || !Fighting(gameObject));
             if (held != null && stow != gearStowed)
             {
                 gearStowed = stow;

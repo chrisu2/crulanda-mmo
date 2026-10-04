@@ -15,7 +15,7 @@ The user requested this handoff because they ran out of tokens. Do not assume an
 1b. **Chris's playtest notes 23-31 (2026-10-04 ~03:00, PLAYTEST_NOTES.md):** FPS 60-70 on a 5070 Ti; dead trees' limb
    seams; no swing/cast animations; see through roofs that block the camera; "gold" left in the merchant window and loot
    window; the horse walks into the inn; drinkers pour over their heads; no one sits right; the player's helm too big and
-   orbiting the head. Suggested order: 27 (a string) -> 31, 29, 30 (figure fit and poses) -> 28 -> 26 -> 25 (combat
+   orbiting the head; 32: Mira steals E (only when selected, once recruited). Suggested order: 27 (a string) -> 32 (one line) -> 31, 29, 30 (figure fit and poses) -> 28 -> 26 -> 25 (combat
    animation) -> 24 -> 23 (profile first). Ask Chris which first if he is around.
 2. **Make PlayMode efficient (Chris: "i want the most efficient playmode. whatever that takes").** Timings of the last full
    run (00:47, scratchpad copy `playmode-timing-20261004.xml`; re-measure from `encounter-validation\q-PlayMode.xml`): 175

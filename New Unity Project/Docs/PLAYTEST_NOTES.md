@@ -395,3 +395,13 @@ still limps, so it can be run down.
 - **31. The player's helm is too big and orbits the head.** The Tin crown (a named helm) sits wide of the head and swings
   round it as the head turns: it is parented with an offset to a frame whose pivot is not the head's. Fit helms like hats
   (HatFit) and parent at the head bone's own pivot.
+
+## 32. Mira steals E when you talk to people or mine (2026-10-04) — OPEN
+> "mira gets to close when i try to talk to people or mine. i should have to target her to interact." (Mira at the
+> player's shoulder by a rock and a villager)
+
+EncounterSession.TalkTarget (~line 1490): with nothing selected, Mira wins E whenever she is in reach and at least as near
+as the nearest villager, and the talk target is asked before nodes (NearestUse), so a following Mira beats both a villager
+and a seam. Fix: once recruited and alive, Mira answers E only when she is selected (FocusMira); unrecruited ("Recruit
+Mira") and fallen ("Revive Mira") she still answers by nearness. Check EncounterLoopTests and any test that talks to her
+without selecting her. Maybe also: she keeps a step further back while the player works or talks.

@@ -63,6 +63,11 @@ No new quest items (so no icons, no Encounter.asset change). Update `canonNote` 
 6. Chris asked (2026-10-03): after Peaks, save progress, write the handoff, then **shut down the computer**
    (`Stop-Computer -Force` via the PowerShell tool, after the backup has finished and Unity/Crulanda.exe are closed).
 
+## After Peaks (Chris, 2026-10-03 21:20: "lets do your recommendation")
+1. Playtest note 9, bloom and sun (open; lifts every screenshot). Then 2. the Ash Rim's camps + quests, same shape as Khaven
+and the Peaks. Each is its own round: tests, full run, publish, docs, commit, backup. Shut the computer down only after the
+LAST round Chris asks for in that session, or when he says so.
+
 ## Paste this to start the new session
 ```
 Read Docs/NEXT_PEAKS.md and do it: fill out the Shattered Peaks with the 4 camps and 5 quests it describes, test (focused,

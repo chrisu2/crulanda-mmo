@@ -311,3 +311,11 @@ Found: Khaven's inn sign (the second inn's, an ember pot) had four thin bars glo
 of the board, its "cracks". Now: three short cracks on the pot itself, embers just showing, and a candle lantern hung under
 the sign on a short chain (an open iron cage under a little roof, a wax candle and its flame, a small warm light that grows
 after dark).
+
+## 16. The Hush's dead tree is still broken (2026-10-03) — FIXED (published 2026-10-03 21:05)
+> "this tree is still broke. im glad you screenshot it i brought it up quite some time ago." (with the Hush capture)
+
+The dead tree's limbs were long thin spears that all climbed from the top of the bole (an antler; the grove's husks, brooms
+and sharpened posts). Note 15 had put the twigs back on the limbs but not changed the limbs. Built: DeadTree's limbs start
+lower, heavy, crooked in three turning lengths with forks that droop and fork again, ending in snapped stubs; the snag's top
+is blunt and broken. Before/after: hel\work\world-captures\khaven-21-the-hush.png (Chris's shot was the same stop).

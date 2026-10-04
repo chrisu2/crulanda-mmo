@@ -1592,43 +1592,50 @@ namespace Crulanda.World
             var tr = TreeRandom(root.position); float T() { return (float)tr.NextDouble(); }
             bool massive = girth > .6f;
             // A massive one (a dead_oak prop) is a great old tree: tall, a broad but not squat bole, long heavy limbs.
-            float top = (massive ? trunkH * 2.6f : trunkH * 1.55f) * (.9f + T() * .2f), r0 = massive ? trunkR * .62f : Mathf.Max(.13f, trunkR * .75f);
-            var axis = Bole(root, tr, top, r0, mat);
-            int n = (massive ? 4 : 3) + (int)(T() * 3); float turn = T() * 360;
+            float top = (massive ? trunkH * 2.1f : trunkH * 1.35f) * (.9f + T() * .2f), r0 = massive ? trunkR * .66f : Mathf.Max(.14f, trunkR * .8f);
+            var axis = Bole(root, tr, top, r0, mat, .45f);   // a snapped-off top
+            // Playtest 2026-10-03 ("this tree is still broke"): the limbs were long thin spears, all climbing, so the tree read as an
+            // antler or a broom. A dead oak's limbs are short for its height, heavy where they leave the bole, crooked in three
+            // lengths that each turn a little, and end in snapped stubs; forks off every length, some drooping, each forked again.
+            int n = (massive ? 5 : 4) + (int)(T() * 2); float turn = T() * 360;
             for (int i = 0; i < n; i++)
             {
-                // Up the trunk from about 40% to 90%, lowest first; the lower limbs reach further and flatter, the upper ones climb.
-                float u = .4f + .5f * (i + T() * .7f) / n, yaw = turn + i * 360f / n + (T() - .5f) * 60;
-                var outward = Quaternion.Euler(0, yaw, 0) * Vector3.right; var aside = Vector3.Cross(Vector3.up, outward);
-                float reach = top * (massive ? .36f + T() * .24f : .3f + T() * .22f) * (1.25f - u * .55f), rise = reach * (.35f + T() * .75f) * (.6f + u * .7f);
-                float rb = r0 * (massive ? .3f + T() * .1f : .4f + T() * .14f) * (1.15f - u * .4f);
-                var from = axis(top * u);
-                var mid = from + outward * reach * (.42f + T() * .16f) + aside * ((T() - .5f) * reach * .35f) + Vector3.up * rise * (.25f + T() * .3f);
-                var end = mid + (Quaternion.AngleAxis((T() - .5f) * 50, Vector3.up) * outward) * reach * .5f + Vector3.up * rise * (.45f + T() * .3f);
-                float bowIn = .05f + T() * .06f; Limb(root, from, mid, rb, rb * .6f, mat, bowIn, 8);
-                float bowOut = .08f + T() * .08f; Limb(root, mid, end, rb * .6f, .035f, mat, bowOut, 7);   // to a point: no capped stub
-                int subs = 1 + (int)(T() * 3);
-                for (int k = 0; k < subs; k++)
+                // Up the trunk from about a third to four fifths, lowest first: the low limbs heavy and near level, the upper ones shorter and climbing.
+                float u = .32f + .48f * (i + T() * .6f) / n, yaw = turn + i * 360f / n + (T() - .5f) * 70;
+                var outward = Quaternion.Euler(0, yaw, 0) * Vector3.right;
+                float reach = top * (massive ? .32f + T() * .18f : .32f + T() * .2f) * (1.3f - u * .6f);
+                float r = r0 * (massive ? .5f + T() * .14f : .5f + T() * .16f) * (1.2f - u * .45f);
+                var from = axis(top * u); var dir = (outward + Vector3.up * (.05f + u * .4f + T() * .3f)).normalized;
+                float segLen = reach * (.45f + T() * .1f);
+                for (int seg = 0; seg < 3; seg++)
                 {
-                    // Off the limb's length (on its bowed line, not the straight one between its ends), each turning its own way and
-                    // climbing; a fork on some, off the branch's own bowed line.
-                    float s = .3f + T() * .55f; var at2 = s < .55f ? LimbAt(from, mid, bowIn, s / .55f) : LimbAt(mid, end, bowOut, (s - .55f) / .45f);
-                    float rAt = Mathf.Lerp(rb, .035f, s) * .62f;
-                    var dir = (Quaternion.AngleAxis((k % 2 == 0 ? 1 : -1) * (35 + T() * 45), Vector3.up) * outward + Vector3.up * (.3f + T() * 1)).normalized;
-                    float len = reach * (.32f + T() * .35f) * (1.1f - s * .5f); var tip = at2 + dir * len;
-                    float bowBranch = .1f + T() * .08f; Limb(root, at2, tip, rAt, .025f, mat, bowBranch, 6);
-                    if (T() < .6f)
+                    var to = from + dir * segLen; float bow = .06f + T() * .06f, rEnd = r * (seg == 2 ? .35f : .6f);
+                    Limb(root, from, to, r, rEnd, mat, bow, seg == 0 ? 8 : 7);
+                    // Forks off this length (on its bowed line), turning their own way, some drooping; most fork once more.
+                    int subs = seg == 2 ? 1 : 1 + (int)(T() * 2);
+                    for (int k = 0; k < subs; k++)
                     {
-                        var at3 = LimbAt(at2, tip, bowBranch, .55f + T() * .2f); var d2 = (Quaternion.AngleAxis((T() - .5f) * 100, Vector3.up) * dir + Vector3.up * (.3f + T() * .5f)).normalized;
-                        Limb(root, at3, at3 + d2 * len * (.35f + T() * .25f), rAt * .5f, .02f, mat, .1f, 5);
+                        float s2 = .35f + T() * .5f; var at2 = LimbAt(from, to, bow, s2); float rAt = Mathf.Lerp(r, rEnd, s2) * .6f;
+                        var d2 = (Quaternion.AngleAxis((T() - .5f) * 110, Vector3.up) * dir + Vector3.up * (T() * .9f - .25f)).normalized;
+                        float len = segLen * (.5f + T() * .6f); var tip = at2 + d2 * len; float bb = .08f + T() * .08f;
+                        Limb(root, at2, tip, rAt, rAt * .3f, mat, bb, 6);
+                        if (T() < .7f)
+                        {
+                            var at3 = LimbAt(at2, tip, bb, .5f + T() * .3f); float rs = rAt * .45f;
+                            var d3 = (Quaternion.AngleAxis((T() - .5f) * 120, Vector3.up) * d2 + Vector3.up * (T() * .8f - .2f)).normalized;
+                            Limb(root, at3, at3 + d3 * len * (.4f + T() * .3f), rs, rs * .3f, mat, .1f, 5);
+                        }
                     }
+                    // The next length: a kink in plan and in pitch, thinner and shorter.
+                    from = to; r = rEnd; segLen *= .75f;
+                    dir = (Quaternion.AngleAxis((T() - .5f) * 60, Vector3.up) * dir + Vector3.up * ((T() - .5f) * .5f + .15f)).normalized;
                 }
             }
             // The leader's broken top: a last short twig or two just under the snag.
             for (int k = 0, m = 1 + (int)(T() * 2); k < m; k++)
             {
                 var from = axis(top * (.86f + T() * .06f)); var dir = (Quaternion.Euler(0, T() * 360, 0) * Vector3.right + Vector3.up * (.6f + T() * .8f)).normalized;
-                Limb(root, from, from + dir * top * (.12f + T() * .1f), r0 * .22f, .02f, mat, .08f, 5);
+                Limb(root, from, from + dir * top * (.08f + T() * .06f), r0 * .26f, r0 * .07f, mat, .08f, 5);
             }
             var cap = root.gameObject.AddComponent<CapsuleCollider>(); cap.center = new Vector3(0, top / 2, 0); cap.height = top; cap.radius = r0;
             root.gameObject.AddComponent<NavBlocker>(); root.gameObject.AddComponent<TreeFade>();
@@ -1898,7 +1905,7 @@ namespace Crulanda.World
         /// gently bent, a few degrees off plumb and a little gnarled, on a root flare (a swell and four or five buttress ridges that
         /// sink into the soil, where a pipe had a collar). Closed at the top. Returns its axis, where a limb from a height starts.
         /// </summary>
-        Func<float, Vector3> Bole(Transform t, System.Random tr, float top, float r0, Material bark)
+        Func<float, Vector3> Bole(Transform t, System.Random tr, float top, float r0, Material bark, float close = 1.6f)
         {
             float T() { return (float)tr.NextDouble(); }
             float lx = (T() - .5f) * .1f, lz = (T() - .5f) * .1f, bend = (T() - .5f) * r0 * .9f, ph = T() * 6.3f, seed = T() * 60;
@@ -1910,7 +1917,7 @@ namespace Crulanda.World
                 float r = r0 * (1 - .42f * Mathf.Clamp01(y / top)) * (1 + .16f * (Mathf.PerlinNoise(Mathf.Cos(a) + seed, Mathf.Sin(a) + y * 1.4f) - .5f));
                 float flare = Mathf.Exp(-Mathf.Max(0, y + .1f) / (r0 * 2.1f)), ridge = 0;   // a long, concave swell, not a boot
                 for (int i = 0; i < n; i++) ridge += w[i] * Mathf.Pow(Mathf.Max(0, Mathf.Cos(a - at[i])), 5);
-                return (r + r0 * flare * (.22f + .9f * ridge)) * Mathf.Clamp01((top - y) / (r0 * 1.6f));
+                return (r + r0 * flare * (.22f + .9f * ridge)) * Mathf.Clamp01((top - y) / (r0 * close));   // close: a dead snag ends blunt, not in a spear
             }
             var rings = new[] { -.45f, -.2f, -.05f, .08f, .2f, .36f, .58f, top * .3f, top * .48f, top * .66f, top * .82f, top * .93f, top };
             MeshPart(ZoneMeshes.Tube(Axis, Radius, rings, 14, Vector3.right, 2, .5f), t, Vector3.zero, bark).name = "Trunk";

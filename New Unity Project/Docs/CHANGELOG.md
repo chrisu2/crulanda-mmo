@@ -1049,3 +1049,14 @@ A read-only review by five reviewers, each finding checked by a second who tried
   tier above the zone's, crowns and Salt-Mender standing. The **Aether-Geode shard** is the component for five
   **resonance-tempered** weapons at the forge (three bars, a wood and a shard a tier: rare-quality gear).
 - Tests: EditMode 396/396, PlayMode 175/175 (OakhavenQuestTests and ZoneContentTests taught that a bounty is the board's, re-run green); BountyTests (4), BountyBoardTests (1); Oakhaven toured; no errors in any game log.
+
+## 2026-10-03 — Dead trees: snags with heavy crooked limbs, not spears (published 21:05)
+- Chris, with a shot of the Hush's great dead oak: "this tree is still broke... i brought it up quite some time ago." The
+  limbs were five-to-eight-metre needles leaving the top of the bole and all climbing, so the tree read as an antler or a
+  broom, and the small husks' boles ended in long spear points.
+- `ZoneBuilder.DeadTree`: five or six limbs from a third of the way up, heavy where they leave the bole, three crooked
+  lengths that each turn in plan and pitch, forks off every length (some drooping, most forked again), ending in snapped
+  stubs; the boles a little shorter and ending blunt and broken (`Bole(close)`, default unchanged for living trees). Every
+  dead tree uses it: Khaven's Whispering Wood and the Hush, the Ash Rim's husks, Oakhaven's dead oaks. Playtest note 16.
+- Also today: the UI capture photographs the notice board, its postings and a bounty taken (shots 34-36).
+- Tests: EditMode 396/396, PlayMode 175/175; Khaven toured; no errors in any game log.

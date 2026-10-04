@@ -12,9 +12,9 @@ The user requested this handoff because they ran out of tokens. Do not assume an
 ## RESUME HERE (updated 2026-10-03, evening)
 **NEXT JOB IS WRITTEN UP:** `Docs/NEXT_PEAKS.md` (the Shattered Peaks filled out: 4 camps + 5 quests, then publish, handoff and
 shut the computer down). Chris chose to run it in a new session; its paste-in prompt is at the bottom of that file.
-**The playable build:** published 2026-10-03 17:25: notice boards with bounties and the rare courier posting, silver crowns, Khaven's
+**The playable build:** published 2026-10-03 21:05: the dead trees rebuilt (playtest note 16: snags with heavy crooked limbs, blunt broken tops) and the board capture, on top of 17:25: notice boards with bounties and the rare courier posting, silver crowns, Khaven's
 four camps and five quests (12d8ddc), on top of the boars (14:42), the farm animals (13:06) and the real animals (01:59).
-**Last full run:** EditMode 396/396, PlayMode 175/175 (two zone tests failed on the board's postings in the full run and were
+**Last full run (21:01):** EditMode 396/396, PlayMode 175/175, build OK, Khaven toured, no exceptions in any game log. Before it, 17:19: EditMode 396/396, PlayMode 175/175 (two zone tests failed on the board's postings in the full run and were
 taught that a bounty belongs to the notice board; re-run green), build OK, Oakhaven toured, all shots, no exceptions in any game
 log, no shader errors.
 **Nothing in flight:** everything is committed, published and backed up.

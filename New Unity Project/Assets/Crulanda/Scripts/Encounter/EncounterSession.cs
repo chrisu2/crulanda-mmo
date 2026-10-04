@@ -1487,7 +1487,10 @@ namespace Crulanda.Encounter
                     if (!cand.Visible || !InTalkReach(cand.transform.position, cand.Role == "child")) continue;
                     float r = Reach(cand.transform.position); if (r < bestReach) { bestReach = r; best = cand; }
                 }
-            if (CompanionInReach && (best == null || Reach(Companion.transform.position) <= bestReach)) return (null, true);
+            // Once she walks with you, Mira answers E only when selected (playtest note 32: at your shoulder she took E from the
+            // villager you meant and the seam you were mining); to recruit or revive her, being near is enough.
+            bool hers = !Progress.recruited || Companion == null || !Companion.actor.IsAlive;
+            if (hers && CompanionInReach && (best == null || Reach(Companion.transform.position) <= bestReach)) return (null, true);
             return (best, false);
         }
         public void CycleTarget()

@@ -50,6 +50,10 @@ namespace Crulanda.EditorTools
             var late = Kit(db, 11, 4, "Cap", "Torc", "Spaulders", "Hauberk", "Gauntlets", "Greaves", "Sabatons", "Blade", "Shield");
             foreach (var (shot, yaw, walk) in new[] { ("armour-front", 0f, 0f), ("armour-walk", 90f, 1.6f) })
                 Row(shot, new[] { P(ActorLook.Warrior, 0, null, null, martial, db, looks, walk), P(ActorLook.Warrior, 1, null, null, late, db, looks, walk), P(ActorLook.Druid, 0, null, null, cloth, db, looks, walk), P(ActorLook.Warrior, 2, null, null, new string[0], db, looks, walk) }, yaw);
+            // Named head pieces on the players, close (playtest note 31: "tin crown is also way too big", "orbits my head").
+            var named = ItemDatabase.Parse(new System.Collections.Generic.List<string> { System.IO.File.ReadAllText("Assets/Crulanda/EncounterContent/Items/items.json") });
+            Row("helms-named", new[] { P(ActorLook.Warrior, 0, null, "Tin crown", new[] { "item.tin_crown" }, named, looks), P(ActorLook.Druid, 0, null, "Tin crown (druid)", new[] { "item.tin_crown" }, named, looks),
+                P(ActorLook.Warrior, 1, null, "Bare", new string[0], named, looks) }, 0, close: true);
             // Hats, close (Chris: "the hats definitely do not fit properly on the heads").
             Row("hats-1", new[] { V("blacksmith", "Brannoc Vell", 3), V("merchant", "Wil Carder", 8), V("baker", "Ama Rusk", 13), V("farmer", "Garet Moss", 23), V("lumberjack", "Hob Linden", 68) }, 0, close: true);
             Row("hats-2", new[] { V("skinner", "Osk Farrow", 73), V("leatherworker", "Edda Pell", 63), V("miller", "Aldo Crisp", 38), V("gossip", "Grete Lowe", 5), P(ActorLook.Collector), P(ActorLook.BanditKing) }, 0, close: true);

@@ -78,7 +78,8 @@ namespace Crulanda.Tests
             Assert.Less(Vector3.Distance(at, corwin.transform.position), 1f, "He waits while the conversation is open.");
             session.Conversation = null;
 
-            // Mira is closest, so E defaults to her; selecting a villager makes E talk to them instead. On the open green (Corwin may be
+            // Mira is closest, but once she walks with you E passes her by (playtest note 32) for the villager ahead; selecting her makes
+            // E talk to her, and selecting a villager makes E talk to them. On the open green (Corwin may be
             // anywhere in the inn by now, and a warp beside a table misses the navmesh), with both of them straight ahead.
             var sel = VillageLife.Active.Find("Sel Harrow");
             motor.Teleport(session.Zone.Ground(session.Zone.Zone.spawns.recovery) + Vector3.up * .1f); yield return null;
@@ -89,7 +90,8 @@ namespace Crulanda.Tests
             foreach (var v in VillageLife.Active.Villagers)
                 if (v != sel && v != corwin && Vector3.Distance(v.transform.position, p) < 6) v.StandAt(p + Vector3.back * 25 + Vector3.right * 3 * VillageLife.Active.Villagers.IndexOf(v), 0);
             yield return null;
-            StringAssert.Contains("Mira", session.InteractPrompt);
+            if (session.Progress.recruited) Assert.AreEqual("Talk to Sel Harrow", session.InteractPrompt, "Nothing selected: not Mira, though nearer.");
+            else StringAssert.Contains("Mira", session.InteractPrompt);
             session.SelectFriendly(sel, false);
             Assert.AreEqual("Talk to Sel Harrow", session.InteractPrompt);
             session.SelectFriendly(null, true);

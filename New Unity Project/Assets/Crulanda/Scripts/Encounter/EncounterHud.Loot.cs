@@ -54,7 +54,7 @@ namespace Crulanda.Encounter
                 var r = new Rect(w.x + 14, y, Slot, Slot);
                 Fill(new Rect(r.x - 2, r.y - 2, r.width + 4, r.height + 4), new Color(.62f, .5f, .2f)); Fill(r, new Color(.09f, .1f, .11f));
                 Disc(new Rect(r.x + 14, r.y + 14, 24, 24), new Color(1, .82f, .3f)); Disc(new Rect(r.x + 19, r.y + 19, 14, 14), new Color(.85f, .62f, .15f));
-                Shadow(new Rect(r.xMax + 12, r.y + 14, 220, 24), coins + " gold", frameName, new Color(1, .86f, .4f));
+                Shadow(new Rect(r.xMax + 12, r.y + 14, 220, 24), coins + " crowns", frameName, new Color(1, .86f, .4f));
                 if (e.type == EventType.MouseDown && (e.button == 0 || e.button == 1) && row.Contains(mouse)) { session.TakeLootCoins(); e.Use(); return; }
                 y += LootRowH;
             }

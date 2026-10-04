@@ -272,7 +272,7 @@ namespace Crulanda.Encounter
                 // darkened (the colour times .6 took the alpha down too, so common names were faint grey).
                 var qc = ItemDatabase.QualityColors[Mathf.Clamp(d.quality, 0, 4)];
                 GUI.contentColor = d.quality <= 0 ? new Color(.42f, .39f, .34f) : d.quality == 1 ? new Color(.2f, .13f, .07f) : new Color(qc.r * .6f, qc.g * .6f, qc.b * .6f, 1); GUI.Label(new Rect(r.xMax + 10, r.y + 2, 200, 22), d.name, frameName);
-                GUI.contentColor = afford ? new Color(.35f, .25f, .08f) : new Color(.7f, .15f, .1f); GUI.Label(new Rect(r.xMax + 10, r.y + 26, 160, 22), price + " gold" + (d.level > p.Level ? "  ·  level " + d.level : ""), tiny);
+                GUI.contentColor = afford ? new Color(.35f, .25f, .08f) : new Color(.7f, .15f, .1f); GUI.Label(new Rect(r.xMax + 10, r.y + 26, 160, 22), price + " crowns" + (d.level > p.Level ? "  ·  level " + d.level : ""), tiny);
                 GUI.contentColor = Color.white;
                 GUI.enabled = afford;
                 if (GUI.Button(new Rect(view.width - 90, r.y + 12, 64, 28), "Buy", micro)) session.Buy(d.id);

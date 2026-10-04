@@ -154,7 +154,13 @@ namespace Crulanda.Encounter
             }
             // On a model a cap, a kettle hat, a wrap, a circlet or a crown is worn like a hat: down to the brow, its crown round
             // the head (ActorVisual.Model.cs, HatFit). Hoods, coifs, barbutes and masks were drawn round the whole head and stay.
-            if (model != null && slot == EquipSlot.Head && HatLike(f.l.family) && HatFit(new[] { gearRoots[s] }, out float dy, out float k)) WearHat(gearRoots[s], dy, k);
+            if (model != null && slot == EquipSlot.Head && HatLike(f.l.family) && HatFit(new[] { gearRoots[s] }, out float dy, out float k))
+            {
+                // A crown or a circlet sits snug at the brow: the fit may not flare it out (playtest note 31: the Tin crown stood
+                // twice the head's width).
+                if (f.l.family == "head.crown" || f.l.family == "head.circlet") k = Mathf.Min(k, 1.2f);
+                WearHat(gearRoots[s], dy, k);
+            }
             Finish(f.k, gearRoots[s]);
         }
         /// <summary>
@@ -581,12 +587,14 @@ namespace Crulanda.Encounter
         /// </summary>
         void Crown(Fit f)
         {
-            float s = f.bald ? .78f : 1;
+            // On a model a crown is drawn a fifth smaller and nearly level (playtest note 31: "tin crown is also way too big"; the
+            // old head was bigger, and a crooked ring made HatFit widen it a further fifth so its low side cleared the brow).
+            float s = (f.bald ? .78f : 1) * (model != null ? .8f : 1); float crook = model != null ? .35f : 1;
             switch (f.v)
             {
                 case "tin":
                 {
-                    var at = Fit.At(V(0, f.bald ? .89f : .925f, -.02f * s), V(4, 0, -6), One * s); var tin = new List<(Mesh, Matrix4x4)>();
+                    var at = Fit.At(V(0, f.bald ? .89f : .925f, -.02f * s), V(4 * crook, 0, -6 * crook), One * s); var tin = new List<(Mesh, Matrix4x4)>();
                     for (int i = 0; i < 12; i++) { float a = i * 30; tin.Add((Cube, M.At(new Vector3(Mathf.Sin(a * Mathf.Deg2Rad), 0, Mathf.Cos(a * Mathf.Deg2Rad)) * .165f, V(0, a, 0), V(.092f, .05f, .024f)))); }
                     float[] off = { 0, 7, -5, 4, -8, 6, -3 }, tall = { .145f, .1f, .125f, .11f, .15f, .095f, .12f };
                     for (int i = 0; i < 7; i++)

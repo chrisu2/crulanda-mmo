@@ -465,7 +465,7 @@ namespace Crulanda.Encounter
                 {
                     p.slot = "sit";
                     float k = Mathf.Repeat(t * .28f, 1), lift = k < .18f ? Mathf.SmoothStep(0, 1, k / .18f) : k < .45f ? 1 : k < .6f ? 1 - Mathf.SmoothStep(0, 1, (k - .45f) / .15f) : 0;
-                    p.arms = true; p.armL = new Vector3(-35, 0, 8); p.armR = new Vector3(-40 - lift * 85, 0, -8 + lift * 18); p.elbowL = -40; p.elbowR = -30 - lift * 60; break;
+                    p.arms = true; p.armL = new Vector3(-18, 0, 10); p.armR = new Vector3(-40 - lift * 25, 0, -8 + lift * 22); p.elbowL = -72; p.elbowR = -30 - lift * 95; break;   // hand to the mouth (playtest note 29: it went over the head)
                 }
                 case ActorPose.Slump:    // passed out over the table: the back folds forward, the arms out on the table
                     p.slot = "sit"; p.arms = true; p.armL = new Vector3(-110, 0, 22); p.armR = new Vector3(-105, 0, -26); p.elbowL = p.elbowR = -15;

@@ -1060,3 +1060,17 @@ A read-only review by five reviewers, each finding checked by a second who tried
   dead tree uses it: Khaven's Whispering Wood and the Hush, the Ash Rim's husks, Oakhaven's dead oaks. Playtest note 16.
 - Also today: the UI capture photographs the notice board, its postings and a bounty taken (shots 34-36).
 - Tests: EditMode 396/396, PlayMode 175/175; Khaven toured; no errors in any game log.
+
+## 2026-10-03 — The Shattered Peaks filled out: four camps and five quests (published 22:25)
+- Chris: quests and camps zone by zone (Khaven first, now the Peaks: 9 camps and 9 quests for levels 6-8 before). The
+  grown ring's empty landmarks get their camps. CANON leaned on: the Hollow Men, the old mining tunnels under the Peaks
+  (book2 ch.19), the Pale Things as watchers and auditors, the Sandthrone holding the pass; everything placed is GAME-ONLY.
+- **Camps:** Adit hollows (Hollow Men out of the Sealed Adit, L7-8), Tarn shadows (pale shadows at the Cold Tarn, L8),
+  False pilgrims (grey robes over Company mail at the Broken Post, an ambush camp with their packs to search, L7-8), and
+  the Umbra Watcher (one Pale Thing under the south Umbra scarp, L8; moved from the brief's spot, 23 m from the Wolf pines
+  pack, which it would have called).
+- **Quests:** What the Mine Gave Back (Maddoc: the bricked adit, scratched from inside; the hollows); Shadows on the Cold
+  Tarn (Tarsk); Grey Robes on the East Road (Hadrik Sull, a Sandthrone contract: kill the false pilgrims, find the gate's
+  tally in a Sandthrone hand; +Sandthrone, -Salt-Menders); What the Shrine Hears (Maddoc, then Tarsk: the Listening Shrine
+  at night reads the toll-gate's tally back); The Thing Under the Umbra Scarp (Yara Quell).
+- Tests: EditMode 396/396, PlayMode 175/175; the Peaks toured; no errors in any game log.

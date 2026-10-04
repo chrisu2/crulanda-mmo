@@ -490,6 +490,230 @@
           }
         ]
       }
+    },
+    {
+      "id": "npc.maddoc.adit",
+      "title": "What the Mine Gave Back",
+      "kind": "npc",
+      "giver": "Maddoc Vire",
+      "turnIn": "Maddoc Vire",
+      "zone": "zone.peaks",
+      "level": 7,
+      "requires": [
+        "npc.maddoc.cairns"
+      ],
+      "canonStatus": "CANON creature (Hollow Men) and tunnels (book2 ch.19); GAME-ONLY quest",
+      "summary": "Hollow Men are walking out of the old mine west of the Rest. Look at the Sealed Adit, then put them down.",
+      "offer": "Maddoc keeps his book shut on his knee. \"The old adit, west along the ore road. The Company bricked it up the year they took the gate. Said the tunnels ran too far east, under the grey.\" He looks at the window, not at you. \"Something's come out of it anyway. Grey things, walking slow. Go and look at the bricks first. Then do what has to be done.\"",
+      "complete": "\"Five.\" Maddoc opens the book and writes nothing in it. \"They were miners once, likely. Somebody's sons.\" He closes it. \"Don't tell me what the bricks looked like. I've an idea.\"",
+      "steps": [
+        {
+          "text": "Look at the Sealed Adit, at the end of the ore road.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.peaks",
+              "at": {
+                "x": -149,
+                "y": -42
+              },
+              "radius": 9,
+              "text": "Look at the Sealed Adit",
+              "say": "The bricks across the adit are Company work, and the mortar is new. Near the bottom it has been scratched away in long grooves, from the inside, by something with more patience than strength."
+            }
+          ]
+        },
+        {
+          "text": "Put down the Hollow Men out of the adit.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.peaks",
+              "target": "mob.hollow.peaks.9.*",
+              "count": 5,
+              "text": "Adit hollows put down"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 190,
+        "gold": 35
+      }
+    },
+    {
+      "id": "npc.tarsk.tarn",
+      "title": "Shadows on the Cold Tarn",
+      "kind": "npc",
+      "giver": "Tarsk",
+      "turnIn": "Tarsk",
+      "zone": "zone.peaks",
+      "level": 8,
+      "requires": [
+        "npc.tarsk.pale"
+      ],
+      "canonStatus": "CANON-EXPANDED (the Pale Things); GAME-ONLY quest",
+      "summary": "Pale shadows stand in the shallows of the Cold Tarn, north under the wall. Tarsk wants them gone.",
+      "offer": "Tarsk is sharpening nothing; the blade is already sharp. \"The tarn. North, under the wall. Three shadows stand in the shallows at dusk, looking down.\" He tests the edge on his thumb. \"The pale ones on the ledge look at the road. These look at the water. I don't know what's in the water. I'd rather they stopped.\"",
+      "complete": "Tarsk nods once. \"Good.\" A long pause. \"Did you look? In the water?\" He doesn't wait for an answer. \"No. Better not.\"",
+      "steps": [
+        {
+          "text": "Clear the pale shadows from the Cold Tarn.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.peaks",
+              "target": "mob.paleshadow.peaks.10.*",
+              "count": 3,
+              "text": "Tarn shadows",
+              "say": "The last shadow comes apart like breath on a cold morning, and the tarn is only water again."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 220,
+        "gold": 40
+      }
+    },
+    {
+      "id": "faction.sandthrone.2",
+      "title": "Grey Robes on the East Road",
+      "kind": "faction",
+      "giver": "Hadrik Sull",
+      "turnIn": "Hadrik Sull",
+      "zone": "zone.peaks",
+      "level": 7,
+      "requires": [
+        "faction.sandthrone.1"
+      ],
+      "canonStatus": "CANON factions (Sandthrone, Salt-Menders), GAME-ONLY quest",
+      "summary": "Men in pilgrims' grey are stopping carts at the Broken Post on the eastern descent. Hadrik wants them dead and their packs searched.",
+      "offer": "Hadrik turns a coin over his knuckles. \"Pilgrims at the Broken Post. Grey robes, cairn-stones, very holy.\" The coin stops. \"Pilgrims don't stop carts. These do, and the carts they stop are carts my gate let through. Somebody is selling the gate's tally. Kill the pilgrims, open their packs, and bring me the name of whoever is doing the selling. Same terms as before.\"",
+      "complete": "Hadrik reads the list twice, then folds it very small. \"A Sandthrone hand. One of mine.\" He pays you without counting. \"The Company is grateful. The Company is also going to be busy for a few days.\"",
+      "steps": [
+        {
+          "text": "Kill the false pilgrims at the Broken Post.",
+          "say": "Under the grey robes, Company mail.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.peaks",
+              "target": "mob.cultist.peaks.11.*",
+              "count": 5,
+              "text": "False pilgrims"
+            }
+          ]
+        },
+        {
+          "text": "Search the false pilgrims' packs.",
+          "objectives": [
+            {
+              "type": "interact",
+              "zone": "zone.peaks",
+              "target": "False pilgrims' packs",
+              "text": "Search the false pilgrims' packs",
+              "say": "Cairn-stones for show, Company knives for use, and folded small in a boot a list of every cart the gate let through this month, in a Sandthrone hand."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 200,
+        "gold": 45,
+        "reputation": [
+          {
+            "faction": "sandthrone",
+            "amount": 600
+          },
+          {
+            "faction": "saltmenders",
+            "amount": -400
+          }
+        ]
+      }
+    },
+    {
+      "id": "side.peaks.shrine",
+      "title": "What the Shrine Hears",
+      "kind": "side",
+      "giver": "Maddoc Vire",
+      "turnIn": "Tarsk",
+      "zone": "zone.peaks",
+      "level": 6,
+      "canonStatus": "GAME-ONLY (the Silent Pilgrims are CANON; this shrine is not theirs by any book)",
+      "summary": "Maddoc wants someone to stand at the Listening Shrine after dark and tell Tarsk what it says.",
+      "offer": "\"There's a shrine up on the north spur. No idol in it. Just an ear, cut in the stone.\" Maddoc rubs his own ear without noticing. \"The pilgrims used to stand there at night and listen. They'd come down quiet. Go up after dark and listen. Then tell Tarsk, not me. He'll know what it means. I'm too old to want to.\"",
+      "complete": "Tarsk listens without moving. \"Numbers. The gate's numbers.\" He spits to one side. \"The stone has been counting what goes through the pass. Or something is counting, and using the stone to say it.\" He looks east. \"The pale ones count too.\"",
+      "steps": [
+        {
+          "text": "Stand at the Listening Shrine after dark.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.peaks",
+              "at": {
+                "x": 10,
+                "y": 144
+              },
+              "radius": 8,
+              "night": true,
+              "text": "Listen at the shrine at night",
+              "say": "The wind goes through the cut ear in the stone and comes out as a voice, very low, saying numbers: carts and mules and heads, one by one, the toll-gate's tally read back to the dark."
+            }
+          ]
+        },
+        {
+          "text": "Tell Tarsk what the shrine said.",
+          "objectives": [
+            {
+              "type": "talk",
+              "zone": "zone.peaks",
+              "target": "Tarsk",
+              "text": "Tell Tarsk"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 110,
+        "gold": 15
+      }
+    },
+    {
+      "id": "npc.yara.watcher",
+      "title": "The Thing Under the Umbra Scarp",
+      "kind": "npc",
+      "giver": "Yara Quell",
+      "turnIn": "Yara Quell",
+      "zone": "zone.peaks",
+      "level": 8,
+      "minLevel": 7,
+      "requires": [
+        "npc.yara.rockhide"
+      ],
+      "canonStatus": "CANON-EXPANDED (a Pale Thing); GAME-ONLY quest",
+      "summary": "One pale shape stands under the Umbra scarp west of the Rest, counting whoever passes. Yara's drovers won't go near it.",
+      "offer": "Yara is tallying her own stock and keeps losing count. \"There's a thing under the Umbra scarp, west. Pale. It stands and it watches the goat path, and my drovers say it counts them as they go by. Out loud.\" She puts the slate down. \"Three of them have quit. I can't buy what doesn't come up the path. Make it stop counting.\"",
+      "complete": "\"It's gone?\" Yara picks the slate back up. \"Then they'll come back. Drovers always come back, for money.\" She marks something. \"I'll not ask what it was. You'll not tell me. That's a fair trade.\"",
+      "steps": [
+        {
+          "text": "Kill the Umbra Watcher under the Umbra scarp.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.peaks",
+              "target": "mob.pale.peaks.12.*",
+              "text": "The Umbra Watcher",
+              "say": "It stops counting halfway through a number, and the scarp is very quiet."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 230,
+        "gold": 45
+      }
     }
   ]
 }

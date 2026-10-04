@@ -10,11 +10,11 @@ Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
 ## RESUME HERE (updated 2026-10-03, evening)
-**NEXT JOB IS WRITTEN UP:** `Docs/NEXT_PEAKS.md` (the Shattered Peaks filled out: 4 camps + 5 quests, then publish, handoff and
-shut the computer down). Chris chose to run it in a new session; its paste-in prompt is at the bottom of that file.
-**The playable build:** published 2026-10-03 21:05: the dead trees rebuilt (playtest note 16: snags with heavy crooked limbs, blunt broken tops) and the board capture, on top of 17:25: notice boards with bounties and the rare courier posting, silver crowns, Khaven's
+**NEXT:** Peaks done (round 12). In progress next: playtest note 9, bloom and sun (Chris, 2026-10-03), then the Ash Rim's
+camps and quests (`Docs/NEXT_PEAKS.md` "After Peaks"). Chris said not to shut the computer down until he says.
+**The playable build:** published 2026-10-03 22:25: the Peaks filled out (4 camps, 5 quests); before it 21:05: the dead trees rebuilt (playtest note 16: snags with heavy crooked limbs, blunt broken tops) and the board capture, on top of 17:25: notice boards with bounties and the rare courier posting, silver crowns, Khaven's
 four camps and five quests (12d8ddc), on top of the boars (14:42), the farm animals (13:06) and the real animals (01:59).
-**Last full run (21:01):** EditMode 396/396, PlayMode 175/175, build OK, Khaven toured, no exceptions in any game log. Before it, 17:19: EditMode 396/396, PlayMode 175/175 (two zone tests failed on the board's postings in the full run and were
+**Last full run (22:21):** EditMode 396/396, PlayMode 175/175, build OK, the Peaks toured, no exceptions. 21:01: EditMode 396/396, PlayMode 175/175, build OK, Khaven toured, no exceptions in any game log. Before it, 17:19: EditMode 396/396, PlayMode 175/175 (two zone tests failed on the board's postings in the full run and were
 taught that a bounty belongs to the notice board; re-run green), build OK, Oakhaven toured, all shots, no exceptions in any game
 log, no shader errors.
 **Nothing in flight:** everything is committed, published and backed up.
@@ -959,4 +959,9 @@ resumed with `Workflow({scriptPath, resumeFromRunId})` (finished agents replay f
   "gold" -> "crowns" in every user-facing string (Discoveries, HUD Items/Quests, Loot, Session, Items.cs, Quests.cs; the data
   fields stay "gold"). Encounter.asset must list bounties.json (the register step adds it; copy the asset back from the validation
   copy).
+- **Round 12, the Peaks' camps and quests (PUBLISHED 2026-10-03 22:25, see git log)**: peaks.json camps 9-12 appended (Adit
+  hollows (-128,-62) hollow x5 L7-8; Tarn shadows (-52,152) paleshadow x3 L8; False pilgrims (140,-70) cultist x5 ambush;
+  The Umbra Watcher (-140,40) pale x1 L8, not elite), a "False pilgrims' packs" crates prop (inserted before the board), the
+  canonNote; Quests/peaks.json +5 (npc.maddoc.adit, npc.tarsk.tarn, faction.sandthrone.2 (reputation copied from
+  faction.sandthrone.1), side.peaks.shrine (Maddoc -> Tarsk, night visit), npc.yara.watcher). No new items, tags or looks.
 

@@ -22,6 +22,11 @@ The user requested this handoff because they ran out of tokens. Do not assume an
    (b) fixtures share one scene load ([OneTimeSetUp]) and fixed waits become wait-until-true with a timeout; (c) split
    PlayMode across two validation copies run side by side; (d) every playtest bug gets a regression test (boulders touch the
    ground, a hit deer ends out of spell range, a cast lands at range + 5 m, a brim within 1.65 crowns, a staff slung on the run).
+2b. **The captures overwrite Chris's screen mode** (2026-10-04: "can't get it to full screen"): the tour and UI captures launch
+   the same product (company Crulanda, product "Crulanda - The Quiet Trail") with `-screen-fullscreen 0 -screen-width 1440`,
+   and Unity saves the last mode in HKCU\Software\Crulanda\Crulanda - The Quiet Trail, so his playable build opens windowed.
+   Fix: pass the window size without saving it (e.g. the captures restore the registry values after, or the capture builds use
+   their own product name), and keep his default FullScreenWindow. Workaround told to him: Alt+Enter, or `-screen-fullscreen 1`.
 3. Then the Ash Rim's camps and quests (`Docs/NEXT_PEAKS.md` "After Peaks"), playtest note 10 (cave lighting), armour.
 Chris's save is not precious to him (memory `crulanda-save-not-precious`): no save-compat effort for his sake.
 **The playable build:** published 2026-10-04 02:48: POIs + achievements; before it 00:48: notes 20-22 (casts land at range + 5 m, grounded boulders, the coop sack, deer flee 25-35 m); before it 2026-10-03 23:35: the sun (note 9), hats, wheel zoom and staff slinging (notes 17-19); before it 22:25: the Peaks filled out (4 camps, 5 quests); before it 21:05: the dead trees rebuilt (playtest note 16: snags with heavy crooked limbs, blunt broken tops) and the board capture, on top of 17:25: notice boards with bounties and the rare courier posting, silver crowns, Khaven's

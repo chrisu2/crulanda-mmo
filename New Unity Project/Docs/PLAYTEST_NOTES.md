@@ -396,7 +396,7 @@ still limps, so it can be run down.
   round it as the head turns: it is parented with an offset to a frame whose pivot is not the head's. Fit helms like hats
   (HatFit) and parent at the head bone's own pivot.
 
-## 32. Mira steals E when you talk to people or mine (2026-10-04) — OPEN
+## 32. Mira steals E when you talk to people or mine (2026-10-04) — FIXED (published 2026-10-04 04:44)
 > "mira gets to close when i try to talk to people or mine. i should have to target her to interact." (Mira at the
 > player's shoulder by a rock and a villager)
 
@@ -405,3 +405,8 @@ as the nearest villager, and the talk target is asked before nodes (NearestUse),
 and a seam. Fix: once recruited and alive, Mira answers E only when she is selected (FocusMira); unrecruited ("Recruit
 Mira") and fallen ("Revive Mira") she still answers by nearness. Check EncounterLoopTests and any test that talks to her
 without selecting her. Maybe also: she keeps a step further back while the player works or talks.
+
+Status 2026-10-04 04:44: 27 (gold labels), 29 (drinking), 31 (the Tin crown's size: drawn smaller, fit capped at 1.2x; the
+"orbit" was its crooked tilt, now nearly level) and 32 FIXED and published. Still OPEN: 23 (fps), 24 (tree seams), 25
+(combat animations), 26 (roofs blocking the camera), 28 (the horse in the inn), 30 (sitting: seat offset; the drinkers'
+arms are fixed).

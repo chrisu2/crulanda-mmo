@@ -1109,3 +1109,9 @@ A read-only review by five reviewers, each finding checked by a second who tried
 - Exploring and earning are off in test runs and capture tours (no surprise toasts in tests or shots); a test turns them on.
 - Tests: AchievementTests (3, EditMode); focused EditMode 34/34 and PlayMode 22/22 (Discovery, Armoury, Bounty board,
   Encounter loop); full run EditMode 399/399, PlayMode 175/175, Oakhaven toured, no errors in any game log.
+
+## 2026-10-04 — Quick playtest fixes: crowns, Mira, drinking, the Tin crown (published 04:44)
+- Notes 27, 29, 31, 32: the wares' prices and the loot window's coins say crowns; a recruited, living Mira answers E only
+  when selected; drinkers bring the tankard to the mouth and rest the other forearm on the table; crowns and circlets on the
+  models are drawn a fifth smaller and nearly level, and the hat fit widens them at most 1.2x.
+- Tests: focused EditMode 38/38, PlayMode 20/20; full run (no tour) EditMode, PlayMode, build and captures green.

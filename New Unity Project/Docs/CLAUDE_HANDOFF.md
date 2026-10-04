@@ -10,13 +10,14 @@ Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
 ## RESUME HERE (updated 2026-10-03, evening)
-**NEXT (2026-10-04 01:20, Chris stopped for the night; do NOT shut the computer down unless he says):**
-1. POIs + achievements: PUBLISHED 2026-10-04 02:48 (full run EditMode 399/399, PlayMode 175/175). Nothing in flight.
-1b. **Chris's playtest notes 23-31 (2026-10-04 ~03:00, PLAYTEST_NOTES.md):** FPS 60-70 on a 5070 Ti; dead trees' limb
-   seams; no swing/cast animations; see through roofs that block the camera; "gold" left in the merchant window and loot
-   window; the horse walks into the inn; drinkers pour over their heads; no one sits right; the player's helm too big and
-   orbiting the head; 32: Mira steals E (only when selected, once recruited). Suggested order: 27 (a string) -> 32 (one line) -> 31, 29, 30 (figure fit and poses) -> 28 -> 26 -> 25 (combat
-   animation) -> 24 -> 23 (profile first). Ask Chris which first if he is around.
+**NEXT (2026-10-04 04:44; Chris asked for a shutdown after this save):**
+1. Nothing in flight: everything committed, published 04:44, backed up.
+1b. **Open playtest notes (PLAYTEST_NOTES.md 23-31):** 23 FPS 60-70 on a 5070 Ti (profile first: draw calls, grass, shadows,
+   the post chain incl. the full-res sun pass, per-frame scripts); 24 dead-tree limb seams (join a limb's lengths into one
+   tube along a polyline); 25 no swing/cast animations (hook the Quaternius attack clips to auto-attack, strikes, casts); 26
+   roofs that block the camera should fade like TreeFade or pull the camera in; 28 the horse wanders into the Golden Cask
+   (keep critters' wander points outside house footprints); 30 sitting: figures float beside their stools (seat offset). Done
+   tonight: 27, 29, 31, 32. FigureCapture has a "helms-named" close-up row for head pieces.
 2. **Make PlayMode efficient (Chris: "i want the most efficient playmode. whatever that takes").** Timings of the last full
    run (00:47, scratchpad copy `playmode-timing-20261004.xml`; re-measure from `encounter-validation\q-PlayMode.xml`): 175
    tests, 56 min of fixtures, no single hog: VillageWorkshop 259 s, VillagePurse 239, ZoneExit 233 (1 test), VillageHome 178,
@@ -34,7 +35,7 @@ The user requested this handoff because they ran out of tokens. Do not assume an
    their own product name), and keep his default FullScreenWindow. Workaround told to him: Alt+Enter, or `-screen-fullscreen 1`.
 3. Then the Ash Rim's camps and quests (`Docs/NEXT_PEAKS.md` "After Peaks"), playtest note 10 (cave lighting), armour.
 Chris's save is not precious to him (memory `crulanda-save-not-precious`): no save-compat effort for his sake.
-**The playable build:** published 2026-10-04 02:48: POIs + achievements; before it 00:48: notes 20-22 (casts land at range + 5 m, grounded boulders, the coop sack, deer flee 25-35 m); before it 2026-10-03 23:35: the sun (note 9), hats, wheel zoom and staff slinging (notes 17-19); before it 22:25: the Peaks filled out (4 camps, 5 quests); before it 21:05: the dead trees rebuilt (playtest note 16: snags with heavy crooked limbs, blunt broken tops) and the board capture, on top of 17:25: notice boards with bounties and the rare courier posting, silver crowns, Khaven's
+**The playable build:** published 2026-10-04 04:44: quick fixes (crowns in the shop/loot, Mira only when selected, drinking, the Tin crown); before it 02:48: POIs + achievements; before it 00:48: notes 20-22 (casts land at range + 5 m, grounded boulders, the coop sack, deer flee 25-35 m); before it 2026-10-03 23:35: the sun (note 9), hats, wheel zoom and staff slinging (notes 17-19); before it 22:25: the Peaks filled out (4 camps, 5 quests); before it 21:05: the dead trees rebuilt (playtest note 16: snags with heavy crooked limbs, blunt broken tops) and the board capture, on top of 17:25: notice boards with bounties and the rare courier posting, silver crowns, Khaven's
 four camps and five quests (12d8ddc), on top of the boars (14:42), the farm animals (13:06) and the real animals (01:59).
 **Last full run (2026-10-04 02:47):** EditMode 399/399, PlayMode 175/175, Oakhaven toured, no exceptions. 00:47: EditMode 396/396, PlayMode 175/175 (56 min of fixtures), Oakhaven toured, no exceptions. 23:33: EditMode 396/396, PlayMode 175/175, Oakhaven toured, no exceptions. 22:21: EditMode 396/396, PlayMode 175/175, build OK, the Peaks toured, no exceptions. 21:01: EditMode 396/396, PlayMode 175/175, build OK, Khaven toured, no exceptions in any game log. Before it, 17:19: EditMode 396/396, PlayMode 175/175 (two zone tests failed on the board's postings in the full run and were
 taught that a bounty belongs to the notice board; re-run green), build OK, Oakhaven toured, all shots, no exceptions in any game

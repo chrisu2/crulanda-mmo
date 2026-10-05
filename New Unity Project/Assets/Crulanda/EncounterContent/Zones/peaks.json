@@ -2203,9 +2203,9 @@
       "canonStatus": "GAME-ONLY",
       "center": {
         "x": -44,
-        "y": 96
+        "y": 104
       },
-      "radius": 10,
+      "radius": 8,
       "count": 3,
       "levelMin": 7,
       "levelMax": 8,

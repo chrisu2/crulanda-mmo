@@ -9,19 +9,11 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-10-04 23:30)
-**NEXT (2026-10-05):** Round 20 (treants, motion, classic MMO controls, bears, drowned dead, model spiders and crows; see the
-round's entry at the end) is committed but NOT published. A full run started 23:02 (marker hel/work/c41-start.marker;
-results in hel/work/full-run.done and full-run.log). First EditMode pass failed 3 (icons, skeleton call words, NearHomes):
-fixed after it started, so: (1) read full-run.done, fix any PlayMode/tour problems; (2) rerun EditMode (run_focus.ps1
--Platform EditMode); (3) CreatureCapture.Run (-Graphics) and check the crow's new tip-over death (beasts-dead.png, last
-crow; written after the run started); (4) copy new .meta files back from the validation copy (KI folders, Treant/Bear/
-Spider/Raven/Skeleton pngs+fbx, BearClips, CreatureSkins/Bear); (5) release build, publish, commit, Backup.ps1.
-**Full run result (00:2x):** EditMode 396/399 (the 3 already fixed); PlayMode 173/175: two camps sit on things: peaks
-"High pines bears" (-44,96) covers the node 'Windfall stone-pine' (-44,84) and khaven "The drowned dead" (32,-178) covers
-'secret.khaven.sextons-page': move both camps (and creature_camps.py, NearHomes text) clear. Build OK, 4 tours done, 0 shader errors.
-Chris liked: treant colours by type, the skeleton crumble, bears/spiders. Still open: efficient PlayMode, captures overwrite
-the screen mode, note 10 cave lighting.
+## RESUME HERE (updated 2026-10-05 morning)
+**NEXT:** Round 20 (treants, 8-way motion, classic MMO controls, bears, drowned dead, model spiders and crows) is PUBLISHED and
+committed: all green (EditMode 399/399, PlayMode 175/175 with the two camps moved: peaks "High pines bears" now (-44,104) r8,
+khaven "The drowned dead" (38,-176) r5). Waiting on Chris's playtest. Open: efficient PlayMode, captures overwrite the screen
+mode, note 10 cave lighting, more fps.
 
 ## Earlier resume notes (2026-10-03/04)
 **NEXT (2026-10-04 15:50):**
@@ -1030,7 +1022,7 @@ resumed with `Workflow({scriptPath, resumeFromRunId})` (finished agents replay f
   FREE" (Unity Asset Store) can improve the figures' motion: yes, the figures are Humanoid (CharacterImport: animationType
   Human), so its clips retarget; he is downloading it through the Package Manager (My Assets); unpack the .unitypackage from
   %APPDATA%/Unity/Asset Store-5.x/ into the repo (a .unitypackage is a tar.gz of GUID folders: asset, asset.meta, pathname).
-- **Round 20, treants, motion, controls and new creatures (COMMITTED 2026-10-04 23:30, NOT PUBLISHED)**: assets Chris picked, each in the repo
+- **Round 20, treants, motion, controls and new creatures (PUBLISHED 2026-10-05)**: assets Chris picked, each in the repo
   with its license note: Kevin Iglesias's Human Basic Motions FREE (Resources/Characters/Animations/KI, tools/wip/characters/
   ki_import.py; ModelFigure blends 8-way walk/run/sprint by heading, AdventurerMotor classic MMO facing); Tennessippi's Treant Pack
   (CC0; Resources/Creatures/Treant1-2.fbx, Resources/CreatureSkins/Treant incl. _Grey/_Rot/_Glow from tools/wip/treants/skins.py;

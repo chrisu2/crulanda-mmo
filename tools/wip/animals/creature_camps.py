@@ -45,7 +45,7 @@ quests('oakhaven', [
 # The Peaks: mountain bears in the high pines.
 at = camps('peaks', [
     {"name": "High pines bears", "mob": "Mountain bear", "tag": "bear", "look": "bear", "canonStatus": "GAME-ONLY",
-     "center": {"x": -44, "y": 96}, "radius": 10, "count": 3, "levelMin": 7, "levelMax": 8, "respawn": 90},
+     "center": {"x": -44, "y": 104}, "radius": 8, "count": 3, "levelMin": 7, "levelMax": 8, "respawn": 90},
 ], 'Mountain bears in the high pines', " Mountain bears in the high pines (2026-10-04): GAME-ONLY.")
 Z = 'zone.peaks'
 quests('peaks', [
@@ -63,7 +63,7 @@ quests('peaks', [
 at = camps('khaven', [
     {"name": "The drowned dead", "mob": "Drowned dead", "tag": "drowned", "look": "skeleton",
      "canonStatus": "GAME-ONLY (the old dead of the drowned graveyard's low graves)",
-     "center": {"x": 32, "y": -178}, "radius": 6, "count": 4, "levelMin": 5, "levelMax": 5, "respawn": 90},
+     "center": {"x": 38, "y": -176}, "radius": 5, "count": 4, "levelMin": 5, "levelMax": 5, "respawn": 90},
 ], 'The drowned dead (2026', " The drowned dead (2026-10-04): the old bones the creek gave back, risen at the drowned graveyard; GAME-ONLY.")
 Z = 'zone.khaven'
 quests('khaven', [

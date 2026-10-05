@@ -3360,10 +3360,10 @@
       "look": "skeleton",
       "canonStatus": "GAME-ONLY (the old dead of the drowned graveyard's low graves)",
       "center": {
-        "x": 32,
-        "y": -178
+        "x": 38,
+        "y": -176
       },
-      "radius": 6,
+      "radius": 5,
       "count": 4,
       "levelMin": 5,
       "levelMax": 5,

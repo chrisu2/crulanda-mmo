@@ -1178,7 +1178,7 @@ A read-only review by five reviewers, each finding checked by a second who tried
 - The zone-by-zone camps and quests (Khaven, the Peaks, the Ash Rim, the Verdant Shore) are done: 16 camps and 20 quests added.
 - Tests: EditMode 399/399, PlayMode 175/175; the Verdant Shore toured (204 fps); no errors in any game log; release build.
 
-## 2026-10-04 — Treant Keepers, better motion, classic MMO controls, bears, the drowned dead, model spiders and crows (committed 23:30, NOT yet published)
+## 2026-10-04 — Treant Keepers, better motion, classic MMO controls, bears, the drowned dead, model spiders and crows (published 2026-10-05)
 - **Motion (Chris: "could we use this for better motion?"):** Kevin Iglesias's Human Basic Motions FREE (Asset Store EULA;
   Resources/Characters/Animations/KI, 64 in-place clips, tools/wip/characters/ki_import.py). The figures stand in two idles,
   talk with their own talk clip, and walk, run and sprint in eight directions: the walk cycle blends the two directions nearest
@@ -1202,4 +1202,4 @@ A read-only review by five reviewers, each finding checked by a second who tried
 - **Spiders and crows (Ashen Marches):** every spider is the crypt spider, coloured by where it lives (Khaven's charnel spiders
   bone and ash, the ridge's basalt spiders black, the canopy spiders moss green); the village crows are carrion ravens that hop
   and fly on their own wingbeat; a dead crow keels over onto its side.
-- Tests: first pass EditMode 396/399 (missing icons, the skeletons' call, the bears near homes): all three fixed, not yet re-run. PlayMode, build and tours of Oakhaven, Khaven, the Peaks and the Verdant Shore were still running at commit.
+- Tests: EditMode 399/399; PlayMode 175/175 after the Peaks bears moved off a stone-pine node and the drowned dead off the Sexton's page (both rerun); Oakhaven, Khaven, the Peaks and the Verdant Shore toured; release build.

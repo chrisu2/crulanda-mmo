@@ -75,7 +75,7 @@ namespace Crulanda.Tests
             { "peaks", new Dictionary<string, string> {
                 { "Toll-gate guards", "the Sandthrone's toll-gate on the road, 70 m from Pilgrims' Rest: the guards stand at their gate" },
                 { "Captain's eyrie", "the Sandthrone's own keep, 117 m from Pilgrims' Rest" },
-                { "High pines bears", "in the high pines under the tarn, 94 m from Pilgrims' Rest across the gate pines and the road" } } },   // grown to 430 m; the beasts moved out (2026-10-02)
+                { "High pines bears", "in the high pines under the tarn, about 100 m from Pilgrims' Rest across the gate pines and the road" } } },   // grown to 430 m; the beasts moved out (2026-10-02)
             { "ashrim", new Dictionary<string, string> {
                 { "Cinderfold hollows", "91 m from the hunters' hide, where nobody lives (the Ash-Walkers are all at the enclave)" } } },   // grown to 430 m (2026-10-02)
             { "verdant", new Dictionary<string, string> {   // grown to 430 m (2026-10-02)

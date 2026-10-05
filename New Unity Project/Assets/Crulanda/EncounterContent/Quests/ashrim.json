@@ -530,6 +530,277 @@
           }
         ]
       }
+    },
+    {
+      "id": "npc.brine.raiders",
+      "title": "Salt on the Old Road",
+      "kind": "npc",
+      "giver": "Sefa Brine",
+      "turnIn": "Sefa Brine",
+      "zone": "zone.ashrim",
+      "level": 9,
+      "requires": [
+        "npc.brine.casks"
+      ],
+      "canonStatus": "CANON company (Sandthrone); GAME-ONLY quest",
+      "summary": "Sandthrone riders are taking the salt carts on the old road west, by Wain's Rest. Clear them and see what the last cart was carrying.",
+      "offer": "Sefa Brine has stopped counting on her fingers. \"The bone-masks steal salt and keep it. These ones sell it.\" She taps the table. \"Sandthrone riders, on the old road past Wain's Rest. My last cart went over in the ditch there and the carter walked home without his boots. Clear the road. Then look in the cart and tell me what they left.\"",
+      "complete": "\"A Peaks tally-stick, notched for salt.\" Sefa turns it over and her mouth goes thin. \"So the toll-gate buys what its own riders steal from us. Of course it does.\" She drops the stick in the fire. \"You've done the Ash-Walkers a good turn. They'll hear of it.\"",
+      "steps": [
+        {
+          "text": "Clear the Sandthrone raiders from the old salt road, south of Wain's Rest.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.ashrim",
+              "target": "mob.outrider.ashrim.9.*",
+              "count": 5,
+              "text": "Salt-road raiders"
+            }
+          ]
+        },
+        {
+          "text": "Search the overturned salt cart.",
+          "objectives": [
+            {
+              "type": "interact",
+              "zone": "zone.ashrim",
+              "target": "Overturned salt cart",
+              "text": "Search the overturned salt cart",
+              "say": "The salt is gone. Under the tilt, wedged where a man would hide it, a tally-stick notched in the Peaks' way: so many casks, so many crowns, and the toll-gate's mark."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 400,
+        "gold": 90,
+        "reputation": [
+          {
+            "faction": "ashwalkers",
+            "amount": 250
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.grohl.mouth",
+      "title": "What Comes Out of the Wall",
+      "kind": "npc",
+      "giver": "Chieftain Grohl",
+      "turnIn": "Chieftain Grohl",
+      "zone": "zone.ashrim",
+      "level": 10,
+      "requires": [
+        "npc.grohl.hounds"
+      ],
+      "canonStatus": "CANON creature (Hollow Men); GAME-ONLY quest",
+      "summary": "Something is coming out of the Walled Mouth in the south-east. Grohl wants the wall looked at and the Hollow Men put down.",
+      "offer": "Grohl is mending a harpoon-line and doesn't stop. \"Our grandfathers walled a cave mouth in the south-east. Stone on stone, salt in every joint. We don't say what's in it.\" He pulls a knot tight. \"Grey men are walking out of it now. Go and look at the wall, so you know I'm not a liar. Then put them down. Five.\"",
+      "complete": "\"Five.\" Grohl sets the line down for the first time. \"And the wall?\" You tell him. He is quiet a long while. \"Then it isn't keeping anything in any more. It's just a wall.\" He picks the line up again. \"Thank you. Don't go inside.\"",
+      "steps": [
+        {
+          "text": "Look at the Walled Mouth.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.ashrim",
+              "at": {
+                "x": 98,
+                "y": -128
+              },
+              "radius": 10,
+              "text": "Look at the Walled Mouth",
+              "say": "Salt-white mortar in every joint, and in the middle of the wall a gap a man could walk through, the stones pushed outward from the inside, not pulled down from this side."
+            }
+          ]
+        },
+        {
+          "text": "Put down the Hollow Men out of the Walled Mouth.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.ashrim",
+              "target": "mob.hollow.ashrim.10.*",
+              "count": 5,
+              "text": "Walled Mouth hollows put down"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 420,
+        "gold": 95,
+        "reputation": [
+          {
+            "faction": "ashwalkers",
+            "amount": 250
+          }
+        ]
+      }
+    },
+    {
+      "id": "side.ashrim.stones",
+      "title": "The Reach-Stones",
+      "kind": "side",
+      "giver": "Mother Vane",
+      "turnIn": "Mother Vane",
+      "zone": "zone.ashrim",
+      "level": 10,
+      "canonStatus": "CANON-EXPANDED (the Pale Things); GAME-ONLY quest",
+      "summary": "Mother Vane wants to know what stands among the Reach-Stones at night, and wants it gone.",
+      "offer": "Mother Vane pours salt from one hand to the other. \"The Reach-Stones, north-east, by the grey. We set them to mark how far the Wasting had come. Every year a little nearer.\" The salt runs out. \"Now there are pale things standing among them at night, as if they were counting the stones too. Go at night. See them. Then send them back to wherever they count from.\"",
+      "complete": "\"Three.\" Vane takes a pinch of salt and lets it fall on the back of your hand, which is not a thing she does lightly. \"The stones are ours to count. Not theirs.\" She looks east. \"For now.\"",
+      "steps": [
+        {
+          "text": "Go to the Reach-Stones after dark.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.ashrim",
+              "at": {
+                "x": 138,
+                "y": 122
+              },
+              "radius": 16,
+              "night": true,
+              "text": "Stand among the Reach-Stones at night",
+              "say": "Three pale shapes stand among the stones, quite still, each facing a stone, the way a clerk faces a ledger."
+            }
+          ]
+        },
+        {
+          "text": "Clear the pale shadows from the Reach-Stones.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.ashrim",
+              "target": "mob.paleshadow.ashrim.11.*",
+              "count": 3,
+              "text": "Reach-Stone shadows"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 420,
+        "gold": 90,
+        "reputation": [
+          {
+            "faction": "ashwalkers",
+            "amount": 250
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.oska.jaw",
+      "title": "Cinder-Jaw",
+      "kind": "npc",
+      "giver": "Oska",
+      "turnIn": "Oska",
+      "zone": "zone.ashrim",
+      "level": 10,
+      "minLevel": 9,
+      "requires": [
+        "npc.oska.bone"
+      ],
+      "canonStatus": "GAME-ONLY",
+      "summary": "An old ash hound the Ash-Walkers call Cinder-Jaw hunts alone in the far west, past the Ash Pit. Oska wants it dead.",
+      "offer": "Oska sets the harpoon down, which she does not do. \"There's a hound in the far west, past the Ash Pit. Old. Older than any hound should get. Cinder-Jaw, we call it. It took my brother's harpoon in its mouth once and walked away with it.\" She picks the harpoon back up. \"I made this one for it. You'll have to do, instead.\"",
+      "complete": "Oska looks at you a while, then at the harpoon in her hands. \"Good.\" She hangs it on the wall, unused. \"That one can stay new.\"",
+      "steps": [
+        {
+          "text": "Kill Old Cinder-Jaw, far west past the Ash Pit.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.ashrim",
+              "target": "mob.hound.ashrim.12.*",
+              "text": "Old Cinder-Jaw",
+              "say": "The old hound goes down slowly, and the ash it was made of goes on falling for a while after."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 440,
+        "gold": 100,
+        "reputation": [
+          {
+            "faction": "ashwalkers",
+            "amount": 250
+          }
+        ]
+      }
+    },
+    {
+      "id": "side.ashrim.statue",
+      "title": "The Silent Statue",
+      "kind": "side",
+      "giver": "Chieftain Grohl",
+      "turnIn": "Mother Vane",
+      "zone": "zone.ashrim",
+      "level": 9,
+      "canonStatus": "CANON kind (the faceless statues in the Wasting, world_bible.md); GAME-ONLY quest",
+      "summary": "Grohl wants someone to look at the Silent Statue by the grey and tell Mother Vane what they see.",
+      "offer": "\"There's a statue east of here, at the edge of the grey. No face. It was further away when I was a boy.\" Grohl says it plainly, as a man says the river is high. \"Go and look at it. Then go to the edge of the Wasting and look at that. Then tell Vane. She keeps the count of such things.\"",
+      "complete": "Vane listens with her eyes shut. \"Nearer,\" she says. \"Always nearer, and never seen walking.\" She opens them. \"Thank you. I'll mark it. One day I'll mark it at the enclave's door, and on that day we go.\"",
+      "steps": [
+        {
+          "text": "Look at the Silent Statue.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.ashrim",
+              "at": {
+                "x": 141,
+                "y": -50
+              },
+              "radius": 9,
+              "text": "Look at the Silent Statue",
+              "say": "It has no face, only the smooth stone where a face would be, turned west toward the enclave. There are no footprints in the ash round it. There never are."
+            }
+          ]
+        },
+        {
+          "text": "Stand at the edge of the Wasting.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.ashrim",
+              "at": {
+                "x": 146,
+                "y": 60
+              },
+              "radius": 10,
+              "text": "Stand at the edge of the Wasting",
+              "say": "Past the last of the ash the world is not grey so much as not finished: a texture without a picture. It makes no sound. You find you have been holding your breath."
+            }
+          ]
+        },
+        {
+          "text": "Tell Mother Vane what you saw.",
+          "objectives": [
+            {
+              "type": "talk",
+              "zone": "zone.ashrim",
+              "target": "Mother Vane",
+              "text": "Tell Mother Vane"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 300,
+        "gold": 60,
+        "reputation": [
+          {
+            "faction": "ashwalkers",
+            "amount": 250
+          }
+        ]
+      }
     }
   ]
 }

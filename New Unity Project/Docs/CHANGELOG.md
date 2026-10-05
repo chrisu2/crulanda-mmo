@@ -1155,3 +1155,16 @@ A read-only review by five reviewers, each finding checked by a second who tried
 - **Hens (Chris: "can they walk up the plank", "wait in line"):** at dusk they queue behind the ramp's foot in the order they
   come, climb it one at a time and go in at the pop-hole; in the morning they come down one at a time.
 - Tests: EditMode 399/399, PlayMode 175/175; Oakhaven toured; no errors in any game log; published as a release build.
+
+## 2026-10-04 — The Ash Rim filled out: four camps and five quests (published 20:45)
+- Chris: zone by zone (Khaven, the Peaks, now the Ash Rim: 9 camps and 10 quests for levels 9-10 before). CANON leaned on:
+  the Sandthrone company, the Hollow Men, the Pale Things as watchers, the faceless Silent Statues in the Wasting, the
+  Ash-Walkers and their salt (book1 ch.20). All placement GAME-ONLY.
+- **Camps:** Salt-road raiders (Sandthrone, on the old salt road by Wain's Rest, with an overturned salt cart to search),
+  Walled Mouth hollows, Reach-Stone shadows (three Pale Things among the stones that mark the Wasting's advance), Old
+  Cinder-Jaw (a lone old ash hound in the far west; level 10, the hounds' loot band; "look": "wolf" as the other hounds, so
+  it packs).
+- **Quests:** Salt on the Old Road (Sefa Brine: a Peaks tally-stick shows the toll-gate buys the stolen salt), What Comes
+  Out of the Wall (Grohl), The Reach-Stones (Mother Vane, at night), Cinder-Jaw (Oska), The Silent Statue (Grohl, then Vane:
+  the statue and the Wasting's edge).
+- Tests: EditMode 399/399, PlayMode 175/175; the Ash Rim toured (235 fps); no errors in any game log; release build.

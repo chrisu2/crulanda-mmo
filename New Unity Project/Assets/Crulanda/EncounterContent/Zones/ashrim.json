@@ -3,7 +3,7 @@
   "displayName": "The Ashland Rim",
   "subtitle": "Grey ash at the edge of the Wasting, where the Ash-Walkers hold the Eastern Ridge",
   "canonStatus": "CANON-EXPANDED",
-  "canonNote": "Canon (book1 ch.20): the Ash-Walkers live along the Wasting and fight the Weave-Eaters with Salt of the First Sea; Chieftain Grohl and Mother Vane, the Salt-Speaker, lead them from an enclave in the deep caves of the Eastern Ridge, across a plain of petrified ash. The Cult of Ash (Torvyn Embercloak, Vorn) and its iron-wired bone masks are canon (book1 ch.10, series_bible.md); the purple tear is the later House of Ash's symbol (series_bible.md), used here early (GAME-ONLY). The books also call Torvyn's cultists 'Ashwalkers'; the game keeps the Ash-Walkers of ch.20 and the Cult of Ash apart. The canon Ashlands take their full form after the Spoke fires (series_bible.md), so this pre-erasure rim is PROVISIONAL. GAME-ONLY: the zone's name and its roads to the Peaks and Oakhaven, the cult shrine's location, Cinderfold, the old ribcage, the ash hounds, the brood, and all placement. Grown to 360 m (2026-09-30): the Silent Statue is a canon kind (faceless monoliths in the Wasting, world_bible.md), placed here GAME-ONLY. GAME-ONLY: Wain's Rest and the old salt road, the Last Orchard, the Drowned Leviathan (harpoons of petrified leviathan bone are canon), the Walled Mouth, the Ash Pit and its Ash-Deacon, the Fraying, the Reach-Stones and the Hunters' Knoll.",
+  "canonNote": "Canon (book1 ch.20): the Ash-Walkers live along the Wasting and fight the Weave-Eaters with Salt of the First Sea; Chieftain Grohl and Mother Vane, the Salt-Speaker, lead them from an enclave in the deep caves of the Eastern Ridge, across a plain of petrified ash. The Cult of Ash (Torvyn Embercloak, Vorn) and its iron-wired bone masks are canon (book1 ch.10, series_bible.md); the purple tear is the later House of Ash's symbol (series_bible.md), used here early (GAME-ONLY). The books also call Torvyn's cultists 'Ashwalkers'; the game keeps the Ash-Walkers of ch.20 and the Cult of Ash apart. The canon Ashlands take their full form after the Spoke fires (series_bible.md), so this pre-erasure rim is PROVISIONAL. GAME-ONLY: the zone's name and its roads to the Peaks and Oakhaven, the cult shrine's location, Cinderfold, the old ribcage, the ash hounds, the brood, and all placement. Grown to 360 m (2026-09-30): the Silent Statue is a canon kind (faceless monoliths in the Wasting, world_bible.md), placed here GAME-ONLY. GAME-ONLY: Wain's Rest and the old salt road, the Last Orchard, the Drowned Leviathan (harpoons of petrified leviathan bone are canon), the Walled Mouth, the Ash Pit and its Ash-Deacon, the Fraying, the Reach-Stones and the Hunters' Knoll. The filled-out rim (2026-10-04): Sandthrone salt-raiders on the old salt road by Wain's Rest (CANON company, GAME-ONLY camp), Hollow Men out of the Walled Mouth (CANON creature), pale shadows among the Reach-Stones (CANON-EXPANDED: the Pale Things as watchers), Old Cinder-Jaw in the far west, and their quests; all placement GAME-ONLY.",
   "size": 430,
   "levelMin": 9,
   "levelMax": 10,
@@ -1972,6 +1972,16 @@
       "rotation": 90
     },
     {
+      "kind": "cart",
+      "name": "Overturned salt cart",
+      "at": {
+        "x": -142,
+        "y": 47
+      },
+      "rotation": 120,
+      "interact": "Search the overturned salt cart"
+    },
+    {
       "kind": "board",
       "name": "Notice board",
       "at": {
@@ -2339,6 +2349,70 @@
       "levelMin": 9,
       "levelMax": 10,
       "respawn": 75
+    },
+    {
+      "name": "Salt-road raiders",
+      "mob": "Sandthrone salt-raider",
+      "tag": "outrider",
+      "look": "outrider",
+      "canonStatus": "CANON company (Sandthrone), GAME-ONLY camp on the old salt road",
+      "center": {
+        "x": -150,
+        "y": 40
+      },
+      "radius": 9,
+      "count": 5,
+      "levelMin": 9,
+      "levelMax": 10,
+      "respawn": 90
+    },
+    {
+      "name": "Walled Mouth hollows",
+      "mob": "Hollow Man",
+      "tag": "hollow",
+      "look": "hollow",
+      "canonStatus": "CANON creature (Hollow Men, book1 ch.4), GAME-ONLY placement",
+      "center": {
+        "x": 104,
+        "y": -146
+      },
+      "radius": 9,
+      "count": 5,
+      "levelMin": 10,
+      "levelMax": 10,
+      "respawn": 90
+    },
+    {
+      "name": "Reach-Stone shadows",
+      "mob": "Pale shadow",
+      "tag": "paleshadow",
+      "look": "pale",
+      "canonStatus": "CANON-EXPANDED (the Pale Things as watchers, world_bible.md); GAME-ONLY camp",
+      "center": {
+        "x": 138,
+        "y": 122
+      },
+      "radius": 7,
+      "count": 3,
+      "levelMin": 10,
+      "levelMax": 10,
+      "respawn": 120
+    },
+    {
+      "name": "Old Cinder-Jaw",
+      "mob": "Old Cinder-Jaw",
+      "tag": "hound",
+      "look": "wolf",
+      "canonStatus": "GAME-ONLY (an ash hound grown old)",
+      "center": {
+        "x": -186,
+        "y": -40
+      },
+      "radius": 5,
+      "count": 1,
+      "levelMin": 10,
+      "levelMax": 10,
+      "respawn": 180
     }
   ],
   "life": {

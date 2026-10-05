@@ -1002,4 +1002,9 @@ resumed with `Workflow({scriptPath, resumeFromRunId})` (finished agents replay f
   ExplorePlaces every .25 s, Check every 1 s, quiet prime after a load, bounties/rares counted in CompleteQuest, elites in
   EnemyDied; HUD: EncounterHud.Achievements.cs (the tab), six book tabs at 111 px, the title over the player frame, points on
   the character sheet; HudMaps "?" for unexplored places. AchievementTests (3).
+- **Round 18, the Ash Rim's camps and quests (PUBLISHED 2026-10-04 20:45)**: ashrim.json camps 9-12 (Salt-road raiders
+  (-150,40) outrider x5 L9-10; Walled Mouth hollows (104,-146) hollow x5 L10; Reach-Stone shadows (138,122) paleshadow x3 L10;
+  Old Cinder-Jaw (-186,-40) hound x1 L10, look wolf), the "Overturned salt cart" prop, the canonNote; Quests/ashrim.json +5
+  (npc.brine.raiders, npc.grohl.mouth, side.ashrim.stones (night visit), npc.oska.jaw, side.ashrim.statue). Learned: a hound
+  camp's look is "wolf" (SocialAggro packs by look); a beast camp's levels must sit in its loot table's band (ItemTests).
 

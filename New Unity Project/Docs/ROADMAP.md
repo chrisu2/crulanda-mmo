@@ -1,53 +1,44 @@
 # Project roadmap
 
-Updated 2026-09-28. PROJECT_MASTER.md remains the design brief; this file records implementation status.
-User direction: continue development from these documents, handle technical validation automatically,
-and request play feedback only at meaningful gameplay milestones. Do not gate each feature on manual user testing.
+Updated 2026-10-05 (rewritten: the 2026-09-28 version had fallen behind). PROJECT_MASTER.md remains the design brief; this file
+records where each of its phases stands and the order of the work. Update it every round that moves a phase.
 
-## Current state
-- Phase 0 integrated and validated in Unity 6000.6.3f1.
-- First playable encounter implemented: movement/camera, targeting, three player abilities,
-  threat, recruitable healer, death/recovery, XP, loot/equipment, save/load and repeatable patrol.
-- User confirmed the playable build worked without issues, then reported combat was too fast.
-- Slower combat pass: fresh-character fights measured 20.8s, 24.4s, 30.8s; 11 PlayMode tests passed.
-- Completed development milestone: replaced prototype ability timing with shared per-actor ability runtime,
-  global cooldowns, casts, cancellation and authored ability identities/effects. Verified: 118 EditMode and 11 PlayMode tests; Windows build succeeded.
+## Phases (PROJECT_MASTER.md)
 
-| Phase | Goal | Status |
+| Phase | Goal | Status (2026-10-05) |
 |---|---|---|
-| 0 | Foundation | Integrated and validated; Git baseline and warning cleanup still outstanding |
-| 1 | Combat sandbox | MVP complete: shared abilities, combat, timed effects and derived stats validated |
-| 2 | First class loops | In progress: class profiles, unlock gates and hybrid build-graph rules implemented |
-| 3 | Inventory/items/vendors | One-item loot/equipment loop exists; generic inventory/vendors not started |
-| 4 | Questing | Not started; objective HUD is not a quest system |
-| 5 | SimAdventurer MVP | One persistent companion prototype; world population/offscreen simulation not started |
-| 6 | Group gameplay | Player + healer recruitment only; full parties/roles/loot rules not started |
-| 7 | First dungeon | Not started |
-| 8 | Vertical slice | Not started |
+| 0 | Foundation | Done |
+| 1 | Combat sandbox | Done: shared abilities, threat, elites, level scaling (mobs above you hit harder, red at +3) |
+| 2 | Class loops | Warrior and Druid with talent trees; Mira's healer kit. Paladin, Ranger and Mage next (Phase 5.1) |
+| 3 | Inventory, items, vendors | Done: bags, gear and looks, named loot and legendaries, vendors, professions and crafting, chests |
+| 4 | Questing | Done: five zones of quests, the chronicle, notice boards and bounties, discoveries, achievements |
+| 5 | **SimAdventurers** (the brief's "most important feature") | **Now** (see below) |
+| 6 | Group gameplay | You and Mira only; full parties come with 5.6 |
+| 7 | First dungeon | Done: Crowsfoot Hollow (Oakhaven) and the Root-Mother's Deep (Verdant Shore) |
+| 8 | Vertical slice | In progress alongside: world art, polish and the playtest-note rounds |
 
-## Next work, in order
-1. Phase 2 foundation implemented: class profiles, owned abilities, unlock gates, action bars and build-graph rules.
-2. Build the first playable Warrior Tank/DPS/Support tree, with allocation UI, defining effects, respec and versioned saves.
-3. Extend to Druid Tank/Melee/Healer/Ranged paths, then equipment restrictions and trainers. See CLASS_BUILD_MATRIX.md.
-4. Phase 3: reusable inventory/equipment, item definitions and vendors.
-5. Later phases: questing, persistent companion profiles, population simulation and full groups.
+## Phase 5 plan (Chris chose 2026-10-05: Phase 5 now; classes Paladin, Ranger, Mage; faster tests first)
 
-Phase 1 exit checks: 130 EditMode tests passed, 15 PlayMode tests passed, Windows player build succeeded.
-See PHASE1_EXIT.md and COMBAT_SYSTEMS_VALIDATION.md for scope and evidence.
-See PHASE2_CLASS_LOOPS.md for the next implementation sequence.
-Avoid expanding the race/class roster or finalizing locations before consulting the Crulanda novels.
-The starter prototype uses provisional game-only names. Eight races/fifteen classes are caps, not immediate deliverables.
+| Step | What gets done | Size |
+|---|---|---|
+| 5.0 Groundwork | Faster test runs: run only the tests a change touches; one scene load per test fixture; wait-until instead of fixed waits; PlayMode split across two validation copies. This roadmap kept current. | 1 round |
+| 5.1 Class kits | Paladin, Ranger, Mage: 8-10 abilities each, an AI rotation, gear rules and looks, playable by the player too (full talent trees later). Names provisional until checked against the books. | 3 rounds |
+| 5.2 Sim profiles | ~20 persistent SimAdventurers (stable ids; name, race, class, level, gear, personality, home zone), saved; materialised as figures in the player's zone, dematerialised when away. | 2 rounds |
+| 5.3 In-world life | Utility-AI activities: questing (camp mobs), gathering, travelling the roads, shopping, resting at inns, dying and the corpse run, levelling and gearing up; personality weights the choices. | 3 rounds |
+| 5.4 Offscreen world | Coarse simulation of the unloaded: levels, zone moves, online and offline hours by the world clock. | 1-2 rounds |
+| 5.5 Chat and memory | Say, Zone, Whisper and System channels from personality and event templates; a who list and friends; compact social memory and relationships (Stranger to Friend or Rival). | 2 rounds |
+| 5.6 Groups (Phase 6) | Invite, accept, leave, party frames, roles, assist, shared kill credit, need and greed, sims inviting the player, dungeon runs with sims. | 3 rounds |
+
+About 15-17 rounds. No external language model: local state machines and utility AI only (brief section 13).
+
+## Queued around Phase 5
+- The Ash-Walker enclave's interior (playtest note 40).
+- Art rounds from Chris's assets: Stylized Nature MegaKit, Medieval Village MegaKit, Fantasy Props MegaKit, Stylized Megapack
+  2in1, Medieval props, HQ Rock Pack, the Ashen Marches sentinel helm.
+- Sound: ambience, weapon hits (slash, pierce, blunt each different), spells, mobs; music later.
+- Standing: playtest notes as they come (Docs/PLAYTEST_NOTES.md), frame rate, cave lighting (note 10).
 
 ## Validation policy
-- Agent runs compilation, targeted unit/integration tests and builds for material changes.
-- User feedback is for combat feel, pacing, companion behavior and Crulanda identity.
-- No repeated user replay is needed for the slower-combat pass.
-- Save compatibility and unchanged reward deduplication are regression requirements.
-- Phase 1 completion includes the shared systems and automated checks, not just the prototype encounter.
-
-
-
-Full-roster design coverage: CLASS_BUILD_MATRIX.md now covers all 12 initial classes plus later candidates (20 entries, 61 proposed paths, with Rogue/Assassin grouped). Every eventual class receives 3–4 paths. Warrior/Druid are implementation slices, not the limit of the matrix. Candidate merges and the final roster remain unresolved.
-
-## Handoff update — 2026-09-28
-Warrior nine-node talent prototype is now implemented with B-key UI, live effects, allocation/refund/respec and v1-to-v2 save migration. Verified: 142 EditMode tests, 22 PlayMode tests, Windows build success. UI has not been visually inspected and user has not tested this talent build. Earlier statements above saying no playable tree or schema 1 are historical. Full-class node calculator remains unfinished. See CLAUDE_HANDOFF.md for authoritative current status and next work.
+Every round: compile offline, the tests the change touches (all of them once 5.0 lands for core changes), a player build and
+the tours the change can be seen in, then publish, commit and back up (CLAUDE.md). Chris plays the published build; his notes
+open the next round.

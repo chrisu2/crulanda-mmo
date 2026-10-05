@@ -10,7 +10,9 @@ Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
 ## RESUME HERE (updated 2026-10-05, late morning)
-**NEXT:** Round 21 (see its CHANGELOG entry; PLAYTEST_NOTES 33-46) is PUBLISHED (midday 2026-10-05), committed and backed up; waiting on Chris's playtest. Then, in this order:
+**PHASE 5 NOW (Chris, 2026-10-05):** see Docs/ROADMAP.md (rewritten): 5.0 faster tests first, then 5.1 class kits Paladin,
+Ranger, Mage, then sim profiles, in-world life, offscreen world, chat and memory, groups.
+**Before that:** Round 21 (see its CHANGELOG entry; PLAYTEST_NOTES 33-46) is PUBLISHED (midday 2026-10-05), committed and backed up; waiting on Chris's playtest. Then, in this order:
 1. **Make PlayMode efficient** (Chris asked 2026-10-04; still NOT built): (a) run_tests picks fixtures from the files changed since
    the last green run (art/shader/zone data: EditMode + build + tour only; gameplay code: the fixtures covering those files;
    core: all); (b) fixtures share one scene load ([OneTimeSetUp]); (c) fixed waits become wait-until with a timeout; (d) PlayMode

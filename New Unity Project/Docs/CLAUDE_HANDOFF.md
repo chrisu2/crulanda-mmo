@@ -17,6 +17,9 @@ fixed after it started, so: (1) read full-run.done, fix any PlayMode/tour proble
 -Platform EditMode); (3) CreatureCapture.Run (-Graphics) and check the crow's new tip-over death (beasts-dead.png, last
 crow; written after the run started); (4) copy new .meta files back from the validation copy (KI folders, Treant/Bear/
 Spider/Raven/Skeleton pngs+fbx, BearClips, CreatureSkins/Bear); (5) release build, publish, commit, Backup.ps1.
+**Full run result (00:2x):** EditMode 396/399 (the 3 already fixed); PlayMode 173/175: two camps sit on things: peaks
+"High pines bears" (-44,96) covers the node 'Windfall stone-pine' (-44,84) and khaven "The drowned dead" (32,-178) covers
+'secret.khaven.sextons-page': move both camps (and creature_camps.py, NearHomes text) clear. Build OK, 4 tours done, 0 shader errors.
 Chris liked: treant colours by type, the skeleton crumble, bears/spiders. Still open: efficient PlayMode, captures overwrite
 the screen mode, note 10 cave lighting.
 

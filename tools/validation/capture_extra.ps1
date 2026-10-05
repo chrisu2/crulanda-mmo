@@ -1,7 +1,7 @@
 # After build_and_tour.ps1 has built the player: the HUD captures (the Trades window and the rest), the wardrobe line-up
 # (every piece of gear) and the loot shots (loot steps L1 and L2). Runs the built player windowed, never against the owner's save (the captures use a
 # throwaway character directory).
-$v = 'C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation'
+$v = if ($env:CRULANDA_VCOPY) { $env:CRULANDA_VCOPY } else { 'C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation' }   # lane B sets CRULANDA_VCOPY (full_run.ps1)
 $exe = Join-Path $v 'Builds\Crulanda\Crulanda.exe'
 if (-not (Test-Path $exe)) { 'NO PLAYER BUILD'; exit 1 }
 $ui = 'C:\Users\chris\Documents\Codex\2026-09-28\hel\work\ui-captures'

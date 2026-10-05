@@ -1,4 +1,4 @@
-$v = 'C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation'
+$v = if ($env:CRULANDA_VCOPY) { $env:CRULANDA_VCOPY } else { 'C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation' }   # lane B sets CRULANDA_VCOPY (full_run.ps1)
 $unity = 'D:\unity\Hub\Editor\6000.6.3f1\Editor\Unity.exe'
 robocopy 'D:\code\mmo\New Unity Project\Assets' (Join-Path $v 'Assets') /MIR /NFL /NDL /NJH /NJS /NP | Out-Null
 $p = Start-Process $unity -WindowStyle Hidden -PassThru -ArgumentList @('-batchmode', '-nographics', '-quit', '-projectPath', ('"' + $v + '"'), '-executeMethod', 'Crulanda.EditorTools.EncounterBuildPlayer.Build', '-logFile', ('"' + (Join-Path $v 'hud-build.log') + '"'))

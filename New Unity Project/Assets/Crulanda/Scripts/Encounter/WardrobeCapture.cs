@@ -257,7 +257,8 @@ namespace Crulanda.Encounter
                 for (int seed = 0; seed < 10000 && found == null; seed++)
                 {
                     string id = ItemDatabase.GearId(slot, 8, q, seed); var d = db.Get(id);
-                    if (GearLooks.TrySplitGenerated(d, out var material, out var p, out _, out _) && material == "Ridge-forged" && p == piece && looks.Resolve(d).variant == GearLooks.Family(looks.Resolve(d).family).variants[0]) found = id;
+                    if (GearLooks.TrySplitGenerated(d, out var material, out var p, out _, out _) && material == "Ridge-forged" && p == piece
+                        && (looks.Resolve(d).family.StartsWith("model.") || looks.Resolve(d).variant == GearLooks.Family(looks.Resolve(d).family).variants[0])) found = id;   // uncommon and better blades and shields wear models (2026-10-05)
                 }
                 if (found == null) { Debug.LogError("Wardrobe capture: no " + ItemDatabase.QualityNames[q] + " Ridge-forged " + piece + " among the first 10000 seeds."); continue; }
                 var l = looks.Resolve(db.Get(found));

@@ -21,7 +21,7 @@ records where each of its phases stands and the order of the work. Update it eve
 
 | Step | What gets done | Size |
 |---|---|---|
-| 5.0 Groundwork | Faster test runs: run only the tests a change touches; one scene load per test fixture; wait-until instead of fixed waits; PlayMode split across two validation copies. This roadmap kept current. | 1 round |
+| 5.0 Groundwork (DONE 2026-10-05) | Faster test runs: run only the tests a change touches; one scene load per test fixture; wait-until instead of fixed waits; PlayMode split across two validation copies. Landed as: select_tests.ps1 (only the fixtures a change names; NONE for art and docs) and two lanes (tests in encounter-validation, build, tours and captures in encounter-validation-b at the same time); a docs-only round took 12 min. Shared scene loads and wait-until left for later (most fixture time is simulated village days, not loading). | 1 round |
 | 5.1 Class kits | Paladin, Ranger, Mage: 8-10 abilities each, an AI rotation, gear rules and looks, playable by the player too (full talent trees later). Names provisional until checked against the books. | 3 rounds |
 | 5.2 Sim profiles | ~20 persistent SimAdventurers (stable ids; name, race, class, level, gear, personality, home zone), saved; materialised as figures in the player's zone, dematerialised when away. | 2 rounds |
 | 5.3 In-world life | Utility-AI activities: questing (camp mobs), gathering, travelling the roads, shopping, resting at inns, dying and the corpse run, levelling and gearing up; personality weights the choices. | 3 rounds |

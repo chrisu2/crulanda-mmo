@@ -17,6 +17,10 @@ namespace Crulanda.Encounter
         public bool Swimming { get; private set; }
         /// <summary>Holding Ctrl: half speed, and hidden hunters only notice you from much closer.</summary>
         public bool Sneaking { get; private set; }
+        /// <summary>Running (toggled with "/"); walking otherwise. Kept for the session.</summary>
+        public static bool Running;
+        /// <summary>A walk and a run on foot, in m/s (the walk at the walk cycle's own pace, ModelFigure).</summary>
+        public const float WalkSpeed = 1.9f, RunSpeed = 5.2f;
         float nextSplash, leftWater = -10; bool wasInWater;
         void Awake() { controller = GetComponent<CharacterController>(); }
         void Update()
@@ -34,6 +38,9 @@ namespace Crulanda.Encounter
             if (!session.Paused && !EncounterHud.BlocksPointer(pointer)) distance = Mathf.Clamp(distance - EncounterInput.Zoom * 1.2f, 2.5f, 22);   // close over the shoulder to a wide view
             if (!session.Player.IsAlive) { Swimming = Sneaking = false; return; }   // the dead neither swim nor sneak
             if (session.Paused || session.BuildOpen) return;
+            // Walking by default; "/" (or the keypad's) toggles running (Chris, 2026-10-05: the default movement "is not a run
+            // animation but walk, unless explicit run is toggled on").
+            if (EncounterInput.Press(KeyCode.Slash)) { Running = !Running; session.Message(Running ? "Running." : "Walking."); }
             var move = Vector2.ClampMagnitude(EncounterInput.Move, 1);
             Vector3 direction = Quaternion.Euler(0, yaw, 0) * new Vector3(move.x, 0, move.y);
             // Water (surface and depth come from the same model the water is drawn with).
@@ -47,7 +54,7 @@ namespace Crulanda.Encounter
             Swimming = inWater && depth > (Swimming ? 1.25f : 1.45f);
             Sneaking = EncounterInput.Sneak && !Swimming;
             float wade = inWater ? Mathf.Lerp(1, .6f, Mathf.Clamp01(depth / 1.3f)) : 1;
-            float speed = 5.2f * session.Kit.MoveSpeedMultiplier * (Swimming ? .55f : wade) * (Sneaking ? .5f : 1);
+            float speed = (Running ? RunSpeed : WalkSpeed) * session.Kit.MoveSpeedMultiplier * (Swimming ? .55f : wade) * (Sneaking ? .5f : 1);
             // Classic MMO movement (Chris, 2026-10-04): on foot you face where the camera looks and walk any way from there; backing
             // up is slower. Swimming still turns you into the stroke.
             if (!Swimming && move.y < 0) speed *= Mathf.Lerp(1, .55f, Mathf.Clamp01(-move.y / Mathf.Max(.01f, move.magnitude)));

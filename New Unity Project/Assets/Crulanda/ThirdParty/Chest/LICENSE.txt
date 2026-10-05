@@ -1,0 +1,2 @@
+From the Unity Asset Store (see tools/wip/weapons/weapons_import.py), under the standard Asset Store EULA. Downloaded by
+Chris Underwood 2026-10-05 to his Asset Store account; used in this game, not to be redistributed as assets.

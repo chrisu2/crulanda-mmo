@@ -1203,3 +1203,24 @@ A read-only review by five reviewers, each finding checked by a second who tried
   bone and ash, the ridge's basalt spiders black, the canopy spiders moss green); the village crows are carrion ravens that hop
   and fly on their own wingbeat; a dead crow keels over onto its side.
 - Tests: EditMode 399/399; PlayMode 175/175 after the Peaks bears moved off a stone-pine node and the drowned dead off the Sexton's page (both rerun); Oakhaven, Khaven, the Peaks and the Verdant Shore toured; release build.
+
+## 2026-10-05 — Round 21: fixes from the morning's play, model weapons and legendaries, chests, twin moons (published 2026-10-05 midday)
+- **Fixes (notes 33-43):** everyone faced and walked backwards (Human Basic Motions and the Idle MoCap clips turned 180 at
+  import); animations slowed toward their own pace; the Tin crown snug on the head; the paper doll framed feet to head;
+  distant hill and mountain ranges on the horizon (DistantRanges); cattails in clumps; crags as one face, no balanced knobs;
+  gathering above the skill refuses ("Requires Mining 60."); three levels up is red, and every mob above you hits 25% harder
+  and takes 10% less a level; common gear always has level-scaled Stamina.
+- **Walking by default** (1.9 m/s); "/" toggles running; villagers and children walk; Mira keeps your pace.
+- **Mocap idles** (Morro Motion's Idle MoCap): stances, looking about, a cough; the cold idles on the Peaks.
+- **One Menu button** in place of the row of HUD buttons.
+- **Model weapons and shields** (Blink's swords and RPG weapons, Lumo-Art's cartoon weapons, SICS low-poly weapons, Ashen
+  Marches' equipment): generated uncommon, rare and epic pieces wear them by quality, the glowing ones only at epic; bag icons
+  rendered from the models (Editor/ModelIcons).
+- **Legendary quality** (orange): five legendary weapons, one per zone's chief boss: Kingsbane, the Last Tithe (Caddock),
+  The Reckoner's Frost (the Pale Reckoner), The Toll Unpaid (the Sandthrone captain; Sergi Nicols' Staff of Pain), Cinderheart
+  (the Ash-Deacon), The Green Wrath (the Hollow Root-Warden). 0.5% by day, 0.65% by night. All GAME-ONLY.
+- **Treasure chests** (quiArt's animated chest) beside the outdoor elite camps: crowns, a piece of gear, sometimes a potion;
+  they refill after 20 minutes.
+- **The twin moons, The Eye and The Tear** (CANON, book1 ch.1; their looks GAME-ONLY): The Eye large and pale with a grey iris
+  ring, its light the night's; The Tear smaller and silver-blue, an hour and a half behind on a lower arc. Tour shot 97-moons.
+- Tests: EditMode 401/401 and PlayMode 175/175 (the last few count and walking-speed expectations fixed and rerun: EditMode in full, EncounterLoop and NamedLoot); all five zones toured, no shader errors; release build.

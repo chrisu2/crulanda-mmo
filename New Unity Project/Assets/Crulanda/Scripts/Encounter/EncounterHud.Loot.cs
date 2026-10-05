@@ -67,7 +67,7 @@ namespace Crulanda.Encounter
                 ItemSquare(r, new ItemStack { item = drop.item, count = drop.count });
                 if (d != null)
                 {
-                    int q = Mathf.Clamp(d.quality, 0, 4);
+                    int q = Mathf.Clamp(d.quality, 0, ItemDatabase.MaxQuality);
                     Shadow(new Rect(r.xMax + 12, r.y + 4, w.width - Slot - 40, 22), d.name, lootName, q == 0 ? ItemDatabase.QualityColors[0] : LootBeacon.Colour(q));
                     Shadow(new Rect(r.xMax + 12, r.y + 27, w.width - Slot - 40, 20), LootKind(d, drop.count), lootSub, new Color(.75f, .72f, .66f));
                     if (row.Contains(mouse)) ItemTooltip(d, true);
@@ -81,8 +81,8 @@ namespace Crulanda.Encounter
         /// <summary>A row's second line: "Rare  ·  Main hand", or what kind of thing it is, with the count when there are several.</summary>
         static string LootKind(ItemDef d, int count)
         {
-            string kind = d.kind == "gear" ? ItemDatabase.QualityNames[Mathf.Clamp(d.quality, 0, 4)] + "  ·  " + ItemDatabase.SlotNames[Mathf.Max(0, ItemDatabase.SlotIndex(d.slot))]
-                : d.kind == "junk" ? "Junk" : Inventory.IsHide(d) ? "Hide" : d.kind == "material" ? "Crafting material" : d.kind == "consumable" ? (d.food ? "Food" : "Potion") : ItemDatabase.QualityNames[Mathf.Clamp(d.quality, 0, 4)];
+            string kind = d.kind == "gear" ? ItemDatabase.QualityNames[Mathf.Clamp(d.quality, 0, ItemDatabase.MaxQuality)] + "  ·  " + ItemDatabase.SlotNames[Mathf.Max(0, ItemDatabase.SlotIndex(d.slot))]
+                : d.kind == "junk" ? "Junk" : Inventory.IsHide(d) ? "Hide" : d.kind == "material" ? "Crafting material" : d.kind == "consumable" ? (d.food ? "Food" : "Potion") : ItemDatabase.QualityNames[Mathf.Clamp(d.quality, 0, ItemDatabase.MaxQuality)];
             return count > 1 ? kind + "  ·  " + count : kind;
         }
 

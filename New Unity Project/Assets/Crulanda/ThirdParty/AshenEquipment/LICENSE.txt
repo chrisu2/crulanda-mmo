@@ -1,0 +1,2 @@
+From "Ashen Marches - Free 100" by ChillLands (https://chilllands.itch.io/ashen-marches-free). Free for use in finished games;
+the source files are not to be redistributed on their own (see Resources/Creatures/LICENSE-AshenMarches.txt).

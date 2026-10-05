@@ -14,7 +14,7 @@ namespace Crulanda.Tests
         [TestCase(10, 10, ConDifficulty.Even)]
         [TestCase(10, 11, ConDifficulty.Even)]
         [TestCase(10, 12, ConDifficulty.Tough)]
-        [TestCase(10, 13, ConDifficulty.Tough)]
+        [TestCase(10, 13, ConDifficulty.Dangerous)]
         [TestCase(10, 14, ConDifficulty.Dangerous)]
         [TestCase(10, 15, ConDifficulty.Dangerous)]
         [TestCase(10, 16, ConDifficulty.Deadly)]

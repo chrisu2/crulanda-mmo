@@ -20,7 +20,8 @@
     {"id": "loot.oak.due_coat", "name": "The King's Stolen Coat", "kind": "gear", "slot": "chest", "quality": 3, "level": 4, "value": 20, "armor": 19, "stamina": 8, "strength": 5, "description": "Cut for a bigger man with a better name.", "canonStatus": "GAME-ONLY"},
     {"id": "loot.oak.due_boots", "name": "Boots of the Deep Stair", "kind": "gear", "slot": "feet", "quality": 3, "level": 4, "value": 20, "armor": 12, "stamina": 5, "agility": 6, "description": "Quiet on stone. They had to be.", "canonStatus": "GAME-ONLY"},
     {"id": "loot.oak.broken_oath_sabre", "name": "Broken-Oath Sabre", "kind": "gear", "slot": "mainhand", "quality": 4, "level": 4, "value": 35, "weaponDamage": 20, "stamina": 7, "strength": 9, "description": "Snapped across a knee and forged whole again by worse hands.", "canonStatus": "GAME-ONLY"},
-    {"id": "loot.oak.harrow_luck_knot", "name": "Harrow Wood Luck-Knot", "kind": "gear", "slot": "neck", "quality": 3, "level": 2, "value": 12, "stamina": 2, "agility": 2, "description": "Tied by a child, lost by a poacher, found by you.", "canonStatus": "GAME-ONLY"}
+    {"id": "loot.oak.harrow_luck_knot", "name": "Harrow Wood Luck-Knot", "kind": "gear", "slot": "neck", "quality": 3, "level": 2, "value": 12, "stamina": 2, "agility": 2, "description": "Tied by a child, lost by a poacher, found by you.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.oak.kingsbane", "name": "Kingsbane, the Last Tithe", "kind": "gear", "slot": "mainhand", "quality": 5, "level": 4, "value": 42, "weaponDamage": 23, "stamina": 10, "strength": 12, "description": "The tithe it took was always more than the law allowed. It burns still.", "canonStatus": "GAME-ONLY"}
   ],
   "vendors": [
     {"npc": "Ama Rusk", "items": ["loot.oak.market_day_breeches"]}
@@ -46,12 +47,13 @@
     {"id": "loot.oak.due_coat", "look": "chest.coat:skirted/sandthrone", "source": "boss:Caddock, the Bandit King", "boss": true, "unique": true, "set": "set.crowsfoot"},
     {"id": "loot.oak.due_boots", "look": "feet.boots:plain/sandthrone", "source": "mob:deserter@oakhaven", "unique": true, "set": "set.crowsfoot"},
     {"id": "loot.oak.broken_oath_sabre", "look": "sword.sabre:broken/sandthrone+glow", "source": "boss:Caddock, the Bandit King", "boss": true, "unique": true, "effects": [{"kind": "onKillHeal", "amount": 12, "text": "Each kill restores 12 health."}]},
-    {"id": "loot.oak.harrow_luck_knot", "look": "neck.cord:knot/oakhaven", "source": "mob:any@oakhaven", "effects": [{"kind": "luck", "amount": 10, "text": "+10% luck on lucky drops."}]}
+    {"id": "loot.oak.harrow_luck_knot", "look": "neck.cord:knot/oakhaven", "source": "mob:any@oakhaven", "effects": [{"kind": "luck", "amount": 10, "text": "+10% luck on lucky drops."}]},
+    {"id": "loot.oak.kingsbane", "look": "model.weapon:Sword13_Orange/sandthrone", "source": "boss:Caddock, the Bandit King"}
   ],
   "drops": [
     {"id": "drop.oak.whitefoot", "zone": "oakhaven", "mob": "Old Whitefoot", "rank": "elite", "groups": [{"chance": 0.5, "signature": true, "pick": [{"item": "loot.oak.whitefoot_mantle"}, {"item": "loot.oak.whitefoot_fang"}]}, {"chance": 0.15, "lucky": true, "pick": [{"item": "loot.oak.den_mothers_wraps"}]}]},
     {"id": "drop.oak.hesk", "zone": "oakhaven", "mob": "Quartermaster Hesk", "rank": "elite", "groups": [{"chance": 1.0, "signature": true, "pick": [{"item": "loot.oak.hesks_counting_gloves"}, {"item": "loot.oak.strongbox_lid"}]}]},
-    {"id": "drop.oak.caddock", "zone": "oakhaven", "mob": "Caddock, the Bandit King", "rank": "elite", "groups": [{"chance": 1.0, "signature": true, "pick": [{"item": "item.tin_crown"}, {"item": "loot.oak.due_cleaver"}, {"item": "loot.oak.due_coat"}]}, {"chance": 0.1, "lucky": true, "pity": 10, "pick": [{"item": "loot.oak.broken_oath_sabre"}]}]},
+    {"id": "drop.oak.caddock", "zone": "oakhaven", "mob": "Caddock, the Bandit King", "rank": "elite", "groups": [{"chance": 1.0, "signature": true, "pick": [{"item": "item.tin_crown"}, {"item": "loot.oak.due_cleaver"}, {"item": "loot.oak.due_coat"}]}, {"chance": 0.1, "lucky": true, "pity": 10, "pick": [{"item": "loot.oak.broken_oath_sabre"}]}, {"chance": 0.005, "lucky": true, "pick": [{"item": "loot.oak.kingsbane"}]}]},
     {"id": "drop.oak.wolves", "zone": "oakhaven", "tag": "wolf", "rank": "normal", "groups": [{"chance": 0.03, "lucky": true, "pick": [{"item": "loot.oak.hollin_pitchfork"}]}]},
     {"id": "drop.oak.boars", "zone": "oakhaven", "tag": "boar", "rank": "normal", "groups": [{"chance": 0.03, "lucky": true, "pick": [{"item": "loot.oak.mastwood_tuskguard"}, {"item": "loot.oak.brookside_waders"}]}]},
     {"id": "drop.oak.deserters", "zone": "oakhaven", "tag": "deserter", "rank": "normal", "groups": [{"chance": 0.03, "lucky": true, "pick": [{"item": "loot.oak.deserters_falchion"}, {"item": "loot.oak.sandthrone_halfhelm"}, {"item": "loot.oak.lookouts_breeches"}]}]},

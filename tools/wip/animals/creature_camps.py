@@ -45,7 +45,7 @@ quests('oakhaven', [
 # The Peaks: mountain bears in the high pines.
 at = camps('peaks', [
     {"name": "High pines bears", "mob": "Mountain bear", "tag": "bear", "look": "bear", "canonStatus": "GAME-ONLY",
-     "center": {"x": -44, "y": 104}, "radius": 8, "count": 3, "levelMin": 7, "levelMax": 8, "respawn": 90},
+     "center": {"x": -44, "y": 99}, "radius": 7, "count": 3, "levelMin": 7, "levelMax": 8, "respawn": 90},
 ], 'Mountain bears in the high pines', " Mountain bears in the high pines (2026-10-04): GAME-ONLY.")
 Z = 'zone.peaks'
 quests('peaks', [

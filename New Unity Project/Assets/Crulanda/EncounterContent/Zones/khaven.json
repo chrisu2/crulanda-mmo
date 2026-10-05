@@ -2840,6 +2840,28 @@
       "interact": "Search the deserters' strongbox"
     },
     {
+      "kind": "chest",
+      "name": "Chest at the Grey Sexton",
+      "at": {
+        "x": 53.72,
+        "y": -160.01
+      },
+      "rotation": 225,
+      "interact": "Open the chest",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "kind": "chest",
+      "name": "Chest at the Pale Reckoner",
+      "at": {
+        "x": 144.25,
+        "y": -32.75
+      },
+      "rotation": 225,
+      "interact": "Open the chest",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
       "kind": "board",
       "name": "Notice board",
       "at": {

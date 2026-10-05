@@ -78,7 +78,7 @@ namespace Crulanda.World
             statics = new GameObject("Zone static scenery").transform; statics.SetParent(transform, false);
             PrepareRelief(); PrepareShapes(); Water = new ZoneWater(); Water.Prepare(Zone, (x, z) => HeightAt(x, z, false)); PrepareHollows(); Lap("prepare");
             BuildLighting(); BuildGround(); Lap("ground"); BuildWater(); BuildWasting(); Lap("water"); BuildProps(); BuildHomeDoors(); Lap("props"); BuildGroves(); BuildExits(); Lap("groves");
-            BuildForestEdge(); BuildBoundaries(); Lap("edge"); BuildBackdrop(); Lap("backdrop");
+            BuildForestEdge(); BuildBoundaries(); Lap("edge"); BuildBackdrop(); DistantRanges.Build(transform, Zone, Half + BackdropWidth); Lap("backdrop");
             if (art.grass != null && art.grass.Length > 0)
             {
                 // Gloom: the tufts are dry, greyed straw and no wildflowers bloom.
@@ -515,7 +515,7 @@ namespace Crulanda.World
             RenderSettings.fogColor = ZoneColors.Parse(l.fogColor, Color.grey); RenderSettings.fogStartDistance = l.fogStart; RenderSettings.fogEndDistance = l.fogEnd;
             if (art.skybox != null) { RenderSettings.skybox = art.skybox; RenderSettings.sun = sun; }
             var cam = Camera.main;
-            if (cam != null) { cam.clearFlags = art.skybox != null ? CameraClearFlags.Skybox : CameraClearFlags.SolidColor; cam.backgroundColor = RenderSettings.fogColor; cam.depthTextureMode |= DepthTextureMode.Depth; cam.farClipPlane = Mathf.Max(cam.farClipPlane, (Half + BackdropWidth) * 2.9f); }
+            if (cam != null) { cam.clearFlags = art.skybox != null ? CameraClearFlags.Skybox : CameraClearFlags.SolidColor; cam.backgroundColor = RenderSettings.fogColor; cam.depthTextureMode |= DepthTextureMode.Depth; cam.farClipPlane = Mathf.Max(cam.farClipPlane, (Half + BackdropWidth) * 2.75f + Half * 1.45f + 40); }   // far enough for the distant ranges (DistantRanges) from a corner
         }
 
         // ---------- ground ----------
@@ -1194,6 +1194,7 @@ namespace Crulanda.World
                     case "idol": Idol(t); break;
                     case "wayshrine": Wayshrine(t); break;
                     case "cavern": Cavern(t, Hollow.All.Find(h => h.Name == t.name), p.variant); break;
+                    case "chest": TreasureChest(t); break;
                     default: Debug.LogWarning("Unknown zone prop kind '" + p.kind + "'."); break;
                 }
                 rng = zoneRng;
@@ -1203,6 +1204,22 @@ namespace Crulanda.World
                     Interactables.Add(new ZoneInteractable { name = string.IsNullOrEmpty(p.name) ? p.kind : p.name, prompt = p.interact, item = p.item, kind = p.kind, once = p.once, node = string.IsNullOrEmpty(p.node) ? null : p.node, position = t.position, root = t });
             }
         }
+        /// <summary>
+        /// A treasure chest (2026-10-05, Chris's animated chest: "use in the loot table"): quiArt's wooden chest, a little under a
+        /// metre wide, its lid driven by ChestLid; solid. The session fills it and opens it (EncounterSession.OpenChest).
+        /// </summary>
+        void TreasureChest(Transform t)
+        {
+            var src = Resources.Load<GameObject>("Props/Chest_Wood"); if (src == null) { Crate(t, new Vector3(0, .41f, 0), .82f, 0); return; }
+            var go = Instantiate(src, t, false); go.name = "Chest";
+            foreach (var c in go.GetComponentsInChildren<Collider>(true)) DestroyImmediate(c);
+            var b = new Bounds(); bool any = false;
+            foreach (var r in go.GetComponentsInChildren<Renderer>(true)) { r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On; if (!any) { b = r.bounds; any = true; } else b.Encapsulate(r.bounds); }
+            if (any) { float s = .95f / Mathf.Max(.01f, Mathf.Max(b.size.x, b.size.z)); go.transform.localScale = Vector3.one * s; go.transform.localPosition = new Vector3(0, (t.position.y - b.min.y) * s, 0); }
+            go.AddComponent<ChestLid>().Init(go);
+            Solid(t, new Vector3(0, .35f, 0), new Vector3(1, .7f, .7f));
+        }
+
         /// <summary>
         /// A barn a household lives in (Moss's lodge) has no door of its own to knock at: it gets a barred one ("home") a little
         /// out from the middle of its big doors on the -Z side, so villagers have somewhere to go in. Draws nothing random.
@@ -3013,13 +3030,15 @@ namespace Crulanda.World
                 // in the mountains it grows down further wherever the ground falls away under its footprint (Sink), its top where it was.
                 float hA = Mathf.Max(2.5f, h * (.5f + O() * .15f)), szA = d * .85f + O() * .5f;
                 float xA = x + (O() - .5f) * .8f, zA = zf + f * (szA / 2 - .3f), wA = w + 1.8f + O() * .8f, sink = seat ? Sink(xA, foot - .3f, zA, wA, szA) : 0;
-                Rock(xA, foot - .3f - sink, zA, wA, hA + sink * 1.4f, szA, scarp ? f * (1 + O() * 3) : (O() - .5f) * 8, (O() - .5f) * 4, (O() - .5f) * 30);
+                Rock(xA, foot - .3f - sink, zA, wA, hA + sink * 1.4f, szA, scarp ? f * (1 + O() * 3) : (O() - .5f) * 5, (O() - .5f) * 3, (O() - .5f) * 18);
                 // The upper mass: set back (.8-1.6 m on a scarp, .3-.8 on a free crag), its top .95-1.15 of the way from the foot to
                 // the crest, so the crest is ragged; tall enough (.65-.85 of the height) that its base sits well down in the base lump.
-                float hB = Mathf.Max(2.5f, h * (.65f + O() * .2f)), szB = d * .75f + O() * .4f, topB = foot + h * (.95f + O() * .2f), zB = zf + f * ((scarp ? .8f + O() * .8f : .3f + O() * .5f) + szB / 2);
-                Rock(x + (O() - .5f) * 1.4f, topB - hB, zB, w + 1.2f + O() * .8f, hB, szB, scarp ? f * (2 + ra * 5) : ra * 14 - 7, rc * 6 - 3, scarp ? rb * 16 - 8 : rb * 30 - 15);
-                // A crest knob on two steps in three, part sunk into the upper mass's top, some standing a couple of metres over it.
-                if (O() < .65f) { float hC = 1.6f + O() * 2.2f; Rock(x + (O() - .5f) * 2.2f, topB - hC * (.35f + O() * .4f), zB + f * (O() - .5f) * 1.2f, 1.8f + O() * 1.6f, hC, 1.6f + O() * 1.2f, (O() - .5f) * 16, (O() - .5f) * 16, O() * 360); }
+                // (2026-10-05, Chris: "boulders still unnatural looking": the leaning upper masses and the crest knobs read as boulders
+                // piled up and balanced on one another.) Now the upper mass stands nearly upright, deep in the base (its base at a
+                // third of the height), a little wider so the steps run together into one face, its crest varying by under a metre;
+                // no knobs.
+                float hB = Mathf.Max(2.5f, h * (.72f + O() * .12f)), szB = d * .8f + O() * .3f, topB = foot + h * (.96f + O() * .1f), zB = zf + f * ((scarp ? .8f + O() * .6f : .25f + O() * .3f) + szB / 2);
+                Rock(x + (O() - .5f) * .8f, topB - hB, zB, w + 1.8f + O() * .6f, hB, szB, scarp ? f * (2 + ra * 4) : ra * 5 - 2.5f, rc * 4 - 2, scarp ? rb * 12 - 6 : rb * 16 - 8);
             }
             for (float x = -length / 2; x < length / 2; x += 2.2f)
             {

@@ -15,7 +15,7 @@ namespace Crulanda.Gameplay
             if (diff <= -5) return ConDifficulty.Trivial;
             if (diff <= -2) return ConDifficulty.Easy;
             if (diff <= 1) return ConDifficulty.Even;
-            if (diff <= 3) return ConDifficulty.Tough;
+            if (diff <= 2) return ConDifficulty.Tough;   // three levels up is red (Chris, 2026-10-05: a level 10 at level 7 "should be red")
             if (diff <= 5) return ConDifficulty.Dangerous;
             return ConDifficulty.Deadly;
         }

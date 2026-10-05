@@ -42,7 +42,16 @@ namespace Crulanda.Encounter
                 if (!any) { box = r.bounds; any = true; } else box.Encapsulate(r.bounds);
             }
             if (!any) box = new Bounds(t.position + Vector3.up * .9f, new Vector3(.6f, 1.8f, .4f));
-            float half = box.size.y * .56f, dist = half / Mathf.Tan(dollCam.fieldOfView * .5f * Mathf.Deg2Rad);
+            // A skinned mesh's bounds are loose (the doll came out small, Chris 2026-10-05): framed on the skeleton when there is one,
+            // feet to the top of the head (and a hat), filling the frame.
+            var anim = session.Player.GetComponentInChildren<Animator>();
+            if (anim != null && anim.isHuman && anim.GetBoneTransform(HumanBodyBones.Head) != null && anim.GetBoneTransform(HumanBodyBones.LeftFoot) != null)
+            {
+                float head = anim.GetBoneTransform(HumanBodyBones.Head).position.y + .3f;
+                float feet = Mathf.Min(anim.GetBoneTransform(HumanBodyBones.LeftFoot).position.y, anim.GetBoneTransform(HumanBodyBones.RightFoot).position.y) - .1f;
+                var c = anim.GetBoneTransform(HumanBodyBones.Hips).position; box = new Bounds(new Vector3(c.x, (head + feet) / 2, c.z), new Vector3(.6f, head - feet, .4f));
+            }
+            float half = box.size.y * .53f, dist = half / Mathf.Tan(dollCam.fieldOfView * .5f * Mathf.Deg2Rad);
             var aim = box.center;
             dollCam.transform.position = aim + faces * dist + Vector3.up * .15f; dollCam.transform.LookAt(aim);
             // Only your figure: its parts to the doll's layer for the one render, then back.

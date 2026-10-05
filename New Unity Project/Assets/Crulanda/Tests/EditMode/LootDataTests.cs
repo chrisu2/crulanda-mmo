@@ -72,8 +72,8 @@ namespace Crulanda.Tests
             Assert.AreEqual(6, paths.Count, "Six loot files: " + string.Join(", ", paths.Select(Path.GetFileName)));
             var items = LootTestData.Items(); var loot = LootTestData.Loot(items, LootTestData.Looks());
             var named = items.Items.Keys.Where(k => k.StartsWith("loot.", StringComparison.Ordinal)).ToList();
-            Assert.AreEqual(104, named.Count, "104 named items (ITEMS_V1.md).");
-            Assert.AreEqual(104 + 12, loot.Gear.Count, "A gear entry for each, and for the twelve named items already in the game.");
+            Assert.AreEqual(109, named.Count, "104 named items (ITEMS_V1.md) and the five legendaries (2026-10-05).");
+            Assert.AreEqual(109 + 12, loot.Gear.Count, "A gear entry for each, and for the twelve named items already in the game.");
             Assert.AreEqual(12, loot.GearOrder.Count(g => g.legacy));
             Assert.AreEqual(2, loot.Sets.Count, "Two sets.");
             Assert.AreEqual(49, named.Count(id => items.Get(id).quality == 2), "49 uncommon.");
@@ -167,7 +167,7 @@ namespace Crulanda.Tests
                 Assert.AreEqual(gen.value, d.value, d.id + ": value is generated gear's.");
                 Assert.AreEqual(gen.level, d.level, d.id + ": required level is the curve level less one.");
             }
-            Assert.AreEqual(104, n);
+            Assert.AreEqual(109, n);
         }
 
         [Test] public void Named_gear_stat_budgets_hold()
@@ -176,8 +176,8 @@ namespace Crulanda.Tests
             foreach (var g in loot.GearOrder.Where(g => !g.legacy))
             {
                 var d = items.Get(g.id); int curve = d.level + 1;
-                float power = curve * (d.quality == 2 ? 1.35f : d.quality == 3 ? 1.7f : 2.1f), k = Mathf.Max(1, power / 4);
-                float per = d.quality == 2 ? 4 : d.quality == 4 || signature.Contains(g.id) ? 6 : 5;
+                float power = curve * (d.quality == 2 ? 1.35f : d.quality == 3 ? 1.7f : d.quality == 4 ? 2.1f : 2.5f), k = Mathf.Max(1, power / 4);
+                float per = d.quality == 5 ? 7 : d.quality == 2 ? 4 : d.quality == 4 || signature.Contains(g.id) ? 6 : 5;
                 int budget = Mathf.RoundToInt(per * k), total = d.stamina + d.strength + d.agility + d.intellect + d.spirit;
                 bool charm = (g.effects ?? new GearEffect[0]).Any(e => e.kind == "luck");
                 Assert.LessOrEqual(total, budget, d.id + ": " + total + " stat points against a budget of " + budget + " (" + per + "k, k = " + k + ").");
@@ -196,7 +196,7 @@ namespace Crulanda.Tests
                 Assert.IsFalse(string.IsNullOrWhiteSpace(d.name), d.id + " has a name.");
                 Assert.IsFalse(string.IsNullOrWhiteSpace(d.description), d.id + " has its line of flavour.");
                 Assert.AreEqual("GAME-ONLY", d.canonStatus, d.id + " is labelled GAME-ONLY.");
-                Assert.That(d.quality, Is.InRange(2, 4), d.id + " is uncommon, rare or epic.");
+                Assert.That(d.quality, Is.InRange(2, 5), d.id + " is uncommon, rare, epic or legendary.");
                 Assert.IsFalse((d.name + d.description).Contains("—"), d.id + ": no em-dashes.");
             }
             foreach (var g in loot.GearOrder.Where(g => g.legacy)) Assert.IsFalse(string.IsNullOrEmpty(items.Get(g.id).canonStatus), g.id + " keeps its canon label.");
@@ -231,7 +231,7 @@ namespace Crulanda.Tests
             Assert.AreEqual(15, counts["quest"], "Fifteen quest rewards.");
             Assert.AreEqual(5, counts["vendor"], "Five vendor pieces.");
             Assert.AreEqual(6, counts["world"], "Six world drops.");
-            Assert.AreEqual(35, counts["boss"], "24 signature pieces, 5 from rare tables, 6 epics.");
+            Assert.AreEqual(40, counts["boss"], "24 signature pieces, 5 from rare tables, 6 epics, 5 legendaries.");
             Assert.AreEqual(43, counts["mob"], "43 from ordinary mobs.");
         }
 
@@ -300,6 +300,7 @@ namespace Crulanda.Tests
                     if (g.pity > 0) Assert.IsTrue(epic, d.id + ": only epics have a pity count.");
                     if (epic && !string.IsNullOrEmpty(d.mob)) { Assert.IsTrue(g.lucky, d.id); Assert.That(g.pity, Is.EqualTo(10).Or.EqualTo(25), d.id + ": certain by the 10th (dungeon) or 25th (outdoor) dry kill."); Assert.That(g.chance, Is.EqualTo(.1f).Or.EqualTo(.04f), d.id); }
                     if (!g.signature && !epic) Assert.IsTrue(g.lucky, d.id + ": every other group is lucky.");
+                    if (g.pick.All(k => items.Get(k.item).quality == 5)) Assert.That(g.chance, Is.LessThanOrEqualTo(.005f), d.id + ": a legendary is one in two hundred by day at most (Chris, 2026-10-05; Loot.LegendaryNight by night).");
                     if (string.IsNullOrEmpty(d.zone) && string.IsNullOrEmpty(d.mob)) Assert.That(g.chance, Is.LessThanOrEqualTo(.02f), d.id + ": world drops are rare.");
                 }
         }

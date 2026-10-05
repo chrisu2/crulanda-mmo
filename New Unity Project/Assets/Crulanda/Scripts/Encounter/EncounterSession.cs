@@ -354,9 +354,9 @@ namespace Crulanda.Encounter
             Professions.Say = Message;
             Professions.SkillUp = (id, skill) => {
                 var trade = db.Profession(id); Message(trade.name + " " + skill + ".");
-                // A new tier comes easily: at 20, 40, 60 and 80 the next kind of node stops being hard going.
+                // A new tier opens: at 20, 40, 60 and 80 the next kind of node can be worked.
                 var tier = skill > 1 ? db.NodesFor(id).Find(n => n.skill == skill) : null;
-                if (tier != null) ShowToast(trade.name.ToUpperInvariant(), tier.name + "s come easily now");
+                if (tier != null) ShowToast(trade.name.ToUpperInvariant(), "You can work " + tier.name.ToLowerInvariant() + "s now");
             };
         }
         /// <summary>The zone builder asks what a kind of node is (IZoneNodeKinds): from the trades' content, before the session starts.</summary>
@@ -415,7 +415,7 @@ namespace Crulanda.Encounter
         /// <summary>
         /// E on a node: the refusals (in a fight; the trade's tool not at the belt; bags full when no quest wants what it gives),
         /// then the work on the cast bar: 2 s for ore and timber and 1.5 s for herbs, twice that when the skill is under the
-        /// node's ("hard going": low skill never refuses a node). Nothing starts while working or casting (the two share the cast
+        /// node's (a node above the skill refuses: "Requires Mining 60."). Nothing starts while working or casting (the two share the cast
         /// bar). Moving, being hit, a fight or dying stops it.
         /// </summary>
         void TryGather(Crulanda.World.ZoneInteractable i)
@@ -428,7 +428,6 @@ namespace Crulanda.Encounter
             bool questWants = Quests != null && !string.IsNullOrEmpty(i.item) && Quests.Wants(i.item, i.name);
             if (Inventory.Room(Progress, Items, def.item) == 0 && !questWants) { Message(ProfessionLog.BagsFullLine); return; }
             var trade = Professions.Db.Profession(def.profession);
-            if (hard) Message("Hard going: this wants " + trade.name + " " + def.skill + ".");
             StartWork(WorkLabel(trade.verb), Professions.WorkSeconds(def, hard), () => GatherNow(i));
         }
         /// <summary>"Mining", "Cutting", "Gathering": the work bar's label from the trade's verb.</summary>
@@ -751,6 +750,7 @@ namespace Crulanda.Encounter
         public void UseInteractable(Crulanda.World.ZoneInteractable i)
         {
             if (i.kind == "board") { OpenBoard(i); return; }
+            if (i.kind == "chest") { OpenChest(i); return; }   // EncounterSession.Loot.cs
             if (i.node != null && Professions != null) { TryGather(i); return; }   // a node (a seam, a windfall, a herb) is worked with its trade
             if (Quests == null) { Message("Nothing here you need."); return; }
             if (!QuestUse(i)) { Message(string.IsNullOrEmpty(i.item) ? "You look it over, but find nothing you need right now." : "You don't need any of this right now."); return; }

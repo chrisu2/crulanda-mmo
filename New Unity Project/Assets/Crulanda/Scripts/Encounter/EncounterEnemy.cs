@@ -89,11 +89,16 @@ namespace Crulanda.Encounter
         }
         /// <summary>
         /// Overmatched: for each level a camp elite stands above the player (five at most) it hits <see cref="OverHit"/> harder and
-        /// takes <see cref="OverTough"/> less from the party, so one two levels up is not a solo kill at any level. Normal mobs never do.
+        /// takes <see cref="OverTough"/> less from the party, so one two levels up is not a solo kill at any level. Normal mobs: see OvermatchHitNormal.
         /// </summary>
         public const float OverHit = .12f, OverTough = .06f;
         public static float OvermatchHit(int eliteLevel, int playerLevel) { return 1 + OverHit * Mathf.Clamp(eliteLevel - playerLevel, 0, 5); }
         public static float OvermatchTaken(int eliteLevel, int playerLevel) { return 1 - OverTough * Mathf.Clamp(eliteLevel - playerLevel, 0, 5); }
+        /// <summary>A normal mob above the player (2026-10-05): a quarter harder a level and a tenth tougher, five levels at most, so
+        /// a red mob three up hits three quarters harder and takes a third less: not a fight to take alone.</summary>
+        public const float OverHitNormal = .25f, OverToughNormal = .1f;
+        public static float OvermatchHitNormal(int mobLevel, int playerLevel) { return 1 + OverHitNormal * Mathf.Clamp(mobLevel - playerLevel, 0, 5); }
+        public static float OvermatchTakenNormal(int mobLevel, int playerLevel) { return 1 - OverToughNormal * Mathf.Clamp(mobLevel - playerLevel, 0, 5); }
         public readonly EncounterThreat threat = new EncounterThreat();
         public Actor Victim { get; private set; }
         public bool Engaged { get { return Victim != null && actor.IsAlive; } }

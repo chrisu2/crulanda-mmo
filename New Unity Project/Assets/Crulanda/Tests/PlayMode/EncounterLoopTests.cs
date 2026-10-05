@@ -266,6 +266,7 @@ namespace Crulanda.Tests
             var keyboard = InputSystem.AddDevice<Keyboard>();
             try
             {
+                AdventurerMotor.Running = true;   // running ("/"): walking by default would cover under 2 m in the time
                 var start = session.Player.transform.position;
                 var cameraStart = session.View.transform.position;
                 float finish = Time.time + .7f;
@@ -281,6 +282,7 @@ namespace Crulanda.Tests
                 Assert.Greater(session.View.transform.position.z - cameraStart.z, 2f);
             }
             finally {
+                AdventurerMotor.Running = false;
                 InputSystem.RemoveDevice(keyboard);
                 foreach (var existing in otherKeyboards) InputSystem.EnableDevice(existing);
                 InputSystem.settings.editorInputBehaviorInPlayMode = previousBehavior;

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using Crulanda.Gameplay;
 
@@ -245,7 +246,7 @@ namespace Crulanda.Encounter
                 Outlined(new Rect(18, y, 455, h), msgs[i], tiny, session.LineColour(msgs[i], new Color(1, .96f, .86f)));   // loot lines in their quality's colour
             }
             chatTop = y;
-            Shadow(new Rect(12, 774, 880, 20), "WASD move · Space jump · Right-drag look · Wheel zoom · Tab target · E interact · L quests · M map · B talents · I bags · C character · K trades", tiny, new Color(.8f, .8f, .78f));
+            Shadow(new Rect(12, 774, 880, 20), "WASD move · / run · Space jump · Right-drag look · Wheel zoom · Tab target · E interact · L quests · M map · B talents · I bags · C character · K trades", tiny, new Color(.8f, .8f, .78f));
         }
         void DrawCenter()
         {
@@ -320,17 +321,39 @@ namespace Crulanda.Encounter
                 GUI.Label(new Rect(tr.x + 10, tr.y + 8, 380, h), hover, small);
             }
         }
+        /// <summary>
+        /// One Menu button at the bottom right (Chris, 2026-10-05: the row of Trades, Character, Talents, Bags, Map, Save and Load
+        /// "should be condensed into one menu button"): it opens a short list over itself, each line with its key, and a choice
+        /// shuts the list. A gold dot on the button (and on Talents) while talent points wait.
+        /// </summary>
+        bool menuOpen;
         void DrawMicroMenu()
         {
-            float x = 1110, y = 842; int points = session.Talents.Available(session.Progress);
-            if (GUI.Button(new Rect(x - 80, y, 76, 30), "Character", micro)) { session.CharacterOpen = !session.CharacterOpen; if (session.CharacterOpen) session.ShowTrades(false); }
-            if (session.Professions != null && GUI.Button(new Rect(x - 80, y - 34, 76, 30), "Trades", micro)) session.ShowTrades(!session.TradesOpen);
-            if (GUI.Button(new Rect(x, y, 70, 30), points > 0 ? "Talents " + points : "Talents", micro)) session.BuildOpen = !session.BuildOpen;
-            if (GUI.Button(new Rect(x + 74, y, 56, 30), "Bags", micro)) session.InventoryOpen = !session.InventoryOpen;
-            if (GUI.Button(new Rect(x + 134, y, 56, 30), "Map", micro)) session.MapOpen = !session.MapOpen;
-            if (GUI.Button(new Rect(x + 194, y, 56, 30), "Save", micro)) session.Save();
-            if (GUI.Button(new Rect(x + 254, y, 56, 30), "Load", micro)) session.Load();
-            if (points > 0) Disc(new Rect(x + 60, y - 6, 14, 14), new Color(1, .82f, .2f));
+            int points = session.Talents.Available(session.Progress);
+            var button = new Rect(1330, 842, 96, 30);
+            if (GUI.Button(button, menuOpen ? "Menu  ▼" : "Menu  ▲", micro)) menuOpen = !menuOpen;
+            if (points > 0) Disc(new Rect(button.xMax - 10, button.y - 6, 14, 14), new Color(1, .82f, .2f));
+            if (!menuOpen) return;
+            var items = new List<(string label, System.Action act)> {
+                ("Character   [C]", () => { session.CharacterOpen = !session.CharacterOpen; if (session.CharacterOpen) session.ShowTrades(false); }),
+                (points > 0 ? "Talents " + points + "   [B]" : "Talents   [B]", () => session.BuildOpen = !session.BuildOpen),
+                ("Bags   [I]", () => session.InventoryOpen = !session.InventoryOpen),
+            };
+            if (session.Professions != null) items.Add(("Trades   [K]", () => session.ShowTrades(!session.TradesOpen)));
+            items.Add(("Map   [M]", () => session.MapOpen = !session.MapOpen));
+            items.Add(("Save", () => session.Save()));
+            items.Add(("Load", () => session.Load()));
+            float w = 170, h = 32, top = button.y - 6 - items.Count * (h + 2);
+            var panel = new Rect(button.xMax - w - 6, top - 6, w + 12, items.Count * (h + 2) + 8);
+            Fill(panel, new Color(.04f, .05f, .07f, .94f)); Fill(new Rect(panel.x, panel.y, panel.width, 2), gold);
+            for (int k = 0; k < items.Count; k++)
+            {
+                var r = new Rect(panel.x + 6, top + k * (h + 2), w, h);
+                if (GUI.Button(r, items[k].label, micro)) { menuOpen = false; items[k].act(); }
+                if (points > 0 && items[k].label.StartsWith("Talents")) Disc(new Rect(r.xMax - 12, r.y - 4, 12, 12), new Color(1, .82f, .2f));
+            }
+            // A click anywhere else shuts it.
+            if (Event.current.type == EventType.MouseDown && !panel.Contains(Event.current.mousePosition) && !button.Contains(Event.current.mousePosition)) menuOpen = false;
         }
         void DrawXpBar()
         {

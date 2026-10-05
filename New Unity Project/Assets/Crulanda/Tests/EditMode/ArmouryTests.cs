@@ -125,8 +125,10 @@ namespace Crulanda.Tests
             CollectionAssert.AreEqual(new[] { gen, twins[0] }, newLooks); Assert.AreEqual(2, p.looks.Count);
             // A different quality of the same piece is the same look, and a rare that looks like it raises no toast.
             var d = items.Get(gen); var better = new ItemDef { id = d.id, kind = d.kind, slot = d.slot, level = d.level, name = d.name, quality = 3 };
-            Assert.AreEqual(log.LookOf(d), log.LookOf(better), "A different quality of the same piece is the same look.");
-            string rare = Enumerable.Range(0, 2000).Select(seed => ItemDatabase.GearId("mainhand", 4, 3, seed)).FirstOrDefault(id => log.LookOf(items.Get(id)) == p.looks[0]);
+            // (A model weapon is the exception: its model is chosen by quality, GearLooks.GeneratedModel.)
+            if (!log.LookOf(d).StartsWith("model.")) Assert.AreEqual(log.LookOf(d), log.LookOf(better), "A different quality of the same piece is the same look.");
+            // (Blades wear models by quality now, so the look-alike is another uncommon blade of the same model: still nothing new.)
+            string rare = Enumerable.Range(0, 2000).Select(seed => ItemDatabase.GearId("mainhand", 4, 2, seed + 3000)).FirstOrDefault(id => log.LookOf(items.Get(id)) == p.looks[0]);
             Assert.NotNull(rare, "Some rare blade of that level looks like it.");
             Inventory.Add(p, items, rare, 1); Assert.AreEqual(0, log.Sweep(), "The rare copy is nothing new."); Assert.AreEqual(2, newLooks.Count);
             // Saved keys carry no colours, quality or tier, so retuning looks.json keeps them.

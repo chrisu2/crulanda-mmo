@@ -111,6 +111,8 @@ namespace Crulanda.Encounter
         public const float SignatureOwnedShare = .35f;
         /// <summary>An epic you own drops at this share of its chance.</summary>
         public const float EpicOwnedShare = .25f;
+        /// <summary>A legendary's chance by night over by day (.5% becomes .65%; WorldClock.IsNight).</summary>
+        public const float LegendaryNight = 1.3f;
         /// <summary>Share of an elite's generated rares that come out epic instead (same slot, level and seed).</summary>
         public const float GeneratedEpicChance = .06f;
         /// <summary>The generated piece an elite adds when it would drop only junk is rare this often, else uncommon.</summary>
@@ -279,6 +281,8 @@ namespace Crulanda.Encounter
                         if (unowned.Count > 0) pool = unowned; else chance *= SignatureOwnedShare;
                     }
                     if (g.lucky) chance *= lucky;
+                    // A legendary comes a little more often at night (Chris, 2026-10-05: ".5% during the day and .65% at night").
+                    if (pool.TrueForAll(k => Quality(items, k.item) >= 5) && Crulanda.World.WorldClock.IsNight) chance *= LegendaryNight;
                     bool allOwned = pool.TrueForAll(k => owned(k.item));
                     if (epic && allOwned) chance *= EpicOwnedShare;
                     LootLuck counter = null;

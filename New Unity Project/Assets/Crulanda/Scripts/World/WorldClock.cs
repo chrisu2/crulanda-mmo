@@ -38,6 +38,7 @@ namespace Crulanda.World
         public void Init(Light sunLight, ZoneLighting lighting, Material skybox, System.Collections.Generic.List<NightLight> nightLights)
         {
             Instance = this; sun = sunLight; day = lighting; lamps = nightLights;
+            TwinMoons.Ensure(transform);   // The Eye and The Tear (CANON)
             if (skybox != null)
             {
                 sky = new Material(skybox); RenderSettings.skybox = sky;
@@ -100,6 +101,9 @@ namespace Crulanda.World
             float high = day.sunHigh > 0 ? day.sunHigh : Mathf.Max(day.sunPitch * 1.6f, 45);
             float elevation = moon ? 38 : Mathf.Lerp(4, high, Mathf.Sin(Mathf.Clamp01((Hour - 5.6f) / 14.6f) * Mathf.PI));
             float yaw = day.sunYaw + (moon ? 180 : (Hour - 12) * 12);
+            // By night the light is The Eye's (TwinMoons), shining from where it stands (never lower than 18 degrees, so the night
+            // stays readable while it rises and sets).
+            if (moon) { TwinMoons.Eye(Hour, out float e, out float b); elevation = Mathf.Max(18, e); yaw = b + 180; }
             if (sun != null)
             {
                 sun.transform.rotation = Quaternion.Euler(elevation, yaw, 0); sun.color = look.sun;
@@ -129,7 +133,7 @@ namespace Crulanda.World
                 var tint = Color.Lerp(skyTint, Flat(skyTint, 1) * 1.03f, .85f * w.dim);
                 if (sky.HasProperty("_SkyTint")) sky.SetColor("_SkyTint", Color.Lerp(tint, new Color(.18f, .24f, .48f), d));
                 if (sky.HasProperty("_AtmosphereThickness")) sky.SetFloat("_AtmosphereThickness", Mathf.Lerp(atmosphere * (1 - .35f * w.dim), .55f, d));
-                if (sky.HasProperty("_SunSize")) sky.SetFloat("_SunSize", Mathf.Lerp(sunSize, .018f, d) * (1 - .9f * w.clouds));
+                if (sky.HasProperty("_SunSize")) sky.SetFloat("_SunSize", Mathf.Lerp(sunSize, .0001f, d) * (1 - .9f * w.clouds));   // by night the moons are TwinMoons' own
                 // Below the horizon the sky is the fog, so anything seen past the backdrop fades into fog like the land does, at
                 // every hour, not into a brown plane. This gamma-space procedural sky draws its ground as colour * sqrt(exposure).
                 if (sky.HasProperty("_GroundColor")) sky.SetColor("_GroundColor", fog / Mathf.Sqrt(Mathf.Max(.09f, exposure)));

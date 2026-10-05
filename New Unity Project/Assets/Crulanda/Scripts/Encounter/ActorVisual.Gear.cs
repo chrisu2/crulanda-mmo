@@ -134,7 +134,7 @@ namespace Crulanda.Encounter
 
         /// <summary>How much larger than life a held weapon and a shield are drawn.</summary>
         public const float HeldScale = 1.35f, ShieldScale = 1.15f;
-        static bool Tall(string family) { return family == "polearm" || family == "staff"; }
+        static bool Tall(string family) { return family == "polearm" || family == "staff" || family == "model.tall"; }
         static bool Hung(string family) { return family == "offhand.hung"; }
         void BuildSlot(EquipSlot slot, GearLook look)
         {

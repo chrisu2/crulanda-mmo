@@ -50,6 +50,8 @@ namespace Crulanda.Encounter
                 case "shield.kite": KiteShield(k, root); break;
                 case "shield.leaf": LeafShield(k, root); break;
                 case "offhand.hung": HungPiece(k, root); break;
+                case "model.weapon": case "model.tall": ModelGear(k, root, false); break;   // ActorVisual.GearModels.cs
+                case "model.shield": ModelGear(k, root, true); break;
                 default: return;   // armour families: step A2
             }
             Finish(k, root);

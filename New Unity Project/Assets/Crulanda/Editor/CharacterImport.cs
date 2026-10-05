@@ -17,7 +17,7 @@ namespace Crulanda.EditorTools
     {
         const string Root = "Assets/Crulanda/Resources/Characters/";
         /// <summary>Bumped when the import settings change, so Unity imports the models and clips again.</summary>
-        public override uint GetVersion() { return 2; }
+        public override uint GetVersion() { return 6; }
         void OnPreprocessModel()
         {
             if (!assetPath.StartsWith(Root)) return;
@@ -41,10 +41,11 @@ namespace Crulanda.EditorTools
                 || file.EndsWith("@Idle01") || file.EndsWith("@Idle02") || file.EndsWith("@Jump01"));
             foreach (var c in clips)
             {
-                c.loopTime = c.name.EndsWith("_Loop") || kiLoop;
+                c.loopTime = c.name.EndsWith("_Loop") || kiLoop || assetPath.Contains("/Animations/Morro/");   // Morro Motion's idles all loop
                 // Kevin's strafes and diagonals face forward by the body's own heading, not the root's as authored (as authored, a
                 // strafe to the left turned the whole figure a quarter round).
-                c.lockRootRotation = true; c.keepOriginalOrientation = !ki;
+                c.lockRootRotation = true; c.keepOriginalOrientation = true;
+                if (ki || assetPath.Contains("/Animations/Morro/")) c.rotationOffset = 180;   // the KI and Morro files face the other way from the Quaternius figures (2026-10-05: everyone walked backwards)
                 c.lockRootHeightY = true; c.keepOriginalPositionY = true;
                 c.lockRootPositionXZ = true; c.keepOriginalPositionXZ = true;
             }

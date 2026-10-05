@@ -69,6 +69,8 @@ namespace Crulanda.Encounter
             {
                 agent.isStopped = distance < 3;
                 if (!agent.isStopped) agent.SetDestination(session.Player.transform.position - session.Player.transform.forward * 2);
+                // She keeps your pace: a walk while you walk (hurrying when she has fallen behind), a run while you run.
+                agent.speed = AdventurerMotor.Running ? 5.6f : distance > 9 ? 4.2f : 2.3f;
             }
             var recipient = actor.Health.Pool.Ratio < session.Player.Health.Pool.Ratio ? actor : session.Player;
             if (recipient.Health.Pool.Ratio < .78f && Vector3.Distance(recipient.transform.position, transform.position) <= heal.range)

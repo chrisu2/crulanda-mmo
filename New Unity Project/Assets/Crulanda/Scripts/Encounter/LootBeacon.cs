@@ -26,7 +26,7 @@ namespace Crulanda.Encounter
         {
             if (e == null) return;
             if (quality < 0) { Clear(e); return; }
-            quality = Mathf.Clamp(quality, 0, 4);
+            quality = Mathf.Clamp(quality, 0, ItemDatabase.MaxQuality);
             var old = Of(e); if (old != null && old.Quality == quality) return;
             Clear(e);
             var go = new GameObject(Name); go.transform.SetParent(e.transform, false);
@@ -46,20 +46,21 @@ namespace Crulanda.Encounter
         /// <summary>The quality a body's beacon shows, or -1 when it has none.</summary>
         public static int Showing(EncounterEnemy e) { var b = Of(e); return b != null ? b.Quality : -1; }
         /// <summary>How high a quality's beam stands: none for poor and common, 1.2 m uncommon, 4 m rare, 7 m epic.</summary>
-        public static float BeamHeight(int quality) { return quality >= 4 ? 7 : quality == 3 ? 4 : quality == 2 ? 1.2f : 0; }
+        public static float BeamHeight(int quality) { return quality >= 5 ? 10 : quality >= 4 ? 7 : quality == 3 ? 4 : quality == 2 ? 1.2f : 0; }
         /// <summary>A quality's colour as the beacons, the loot window and the call-outs show it: the item colours, with blue and purple lifted so they read on dark ground and in the chat.</summary>
         public static Color Colour(int quality)
         {
-            switch (Mathf.Clamp(quality, 0, 4))
+            switch (Mathf.Clamp(quality, 0, ItemDatabase.MaxQuality))
             {
                 case 2: return new Color(.25f, 1, .2f);
                 case 3: return new Color(.22f, .56f, 1);
                 case 4: return new Color(.76f, .36f, 1);
+                case 5: return new Color(1, .56f, .1f);   // legendary: orange
                 default: return Color.white;
             }
         }
         /// <summary>How much brighter than its colour a quality's beacon burns (above 1 the bloom takes it).</summary>
-        static float Intensity(int quality) { return quality >= 4 ? 3 : quality == 3 ? 2.4f : quality == 2 ? 1.6f : 1.25f; }
+        static float Intensity(int quality) { return quality >= 5 ? 3.4f : quality >= 4 ? 3 : quality == 3 ? 2.4f : quality == 2 ? 1.6f : 1.25f; }
 
         void Build(int quality, string id)
         {
@@ -108,9 +109,9 @@ namespace Crulanda.Encounter
         static void Shared()
         {
             if (mats != null && mats[0] != null && beamMesh != null) return;
-            mats = new Material[5];
+            mats = new Material[ItemDatabase.MaxQuality + 1];
             var shader = Shader.Find("Sprites/Default");
-            for (int q = 0; q < 5; q++)
+            for (int q = 0; q <= ItemDatabase.MaxQuality; q++)
             {
                 var c = Colour(q); float k = Intensity(q);
                 // Sprites/Default: vertex colour times _Color, blended, unlit and two-sided; drawn after the world's glass and water.

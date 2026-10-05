@@ -187,7 +187,7 @@ namespace Crulanda.Encounter
         GUIStyle nodeInk;
         /// <summary>
         /// A gathering trade's guide: its kinds of node, easiest first, each with the skill it comes easily at and the zones it is
-        /// found in, coloured by the character's skill: red where it is hard going (slow, and one at a time), orange while every one
+        /// found in, coloured by the character's skill: red where the skill is too low to work it, orange while every one
         /// worked teaches, yellow while some do, grey once it has nothing left to teach. Rows that would run past bottom are left off.
         /// </summary>
         void NodeGuide(ProfessionLog log, ProfessionDef d, float x, float y, float width, float bottom)
@@ -207,7 +207,7 @@ namespace Crulanda.Encounter
                 Ink(new Rect(x + width * .58f, y, width * .42f, 20), where.Count > 0 ? string.Join(", ", where) : "not found yet", nodeInk, c);
                 y += 21;
             }
-            if (has && y + 20 <= bottom) Ink(new Rect(x, y + 2, width, 20), "Red: hard going, slow and one at a time.", nodeInk, HardInk);
+            if (has && y + 20 <= bottom) Ink(new Rect(x, y + 2, width, 20), "Red: your skill is too low to work it.", nodeInk, HardInk);
         }
 
         // ---------- the Recipes tab ----------

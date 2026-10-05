@@ -1982,6 +1982,28 @@
       "interact": "Search the overturned salt cart"
     },
     {
+      "kind": "chest",
+      "name": "Chest at the Weave-Eater brood",
+      "at": {
+        "x": 50.22,
+        "y": -128.25
+      },
+      "rotation": 225,
+      "interact": "Open the chest",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "kind": "chest",
+      "name": "Chest at the Ash-Deacon",
+      "at": {
+        "x": -144.85,
+        "y": -92.85
+      },
+      "rotation": 225,
+      "interact": "Open the chest",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
       "kind": "board",
       "name": "Notice board",
       "at": {

@@ -628,6 +628,10 @@ namespace Crulanda.Encounter
                 yield return new WaitForSeconds(1.5f);
                 ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "95-village-night.png"));
                 yield return new WaitForSeconds(.4f);
+                // The twin moons (TwinMoons): looking up toward the south-south-east, where both stand at this hour.
+                motor.SetView(150, -35, 6); yield return new WaitForSeconds(1f);
+                ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "97-moons.png"));
+                yield return new WaitForSeconds(.4f);
                 Crulanda.World.WorldClock.Hour = 6.4f;
                 yield return new WaitForSeconds(1f);
                 ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "96-village-dawn.png"));

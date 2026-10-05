@@ -3512,6 +3512,17 @@
       "variant": 1
     },
     {
+      "kind": "chest",
+      "name": "Chest at Whitefoot's den",
+      "at": {
+        "x": -218.5,
+        "y": 123.5
+      },
+      "rotation": 225,
+      "interact": "Open the chest",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
       "kind": "board",
       "name": "Notice board",
       "at": {

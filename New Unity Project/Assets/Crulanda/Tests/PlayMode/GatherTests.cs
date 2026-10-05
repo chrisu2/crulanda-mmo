@@ -18,7 +18,7 @@ namespace Crulanda.Tests
     /// gone, its rock still there) and comes back; a rest outlives a zone reload; a Yarrow gives the herb always and the quest's
     /// yarrow while the quest wants it (full bags then refuse only once it is no longer wanted); moving or being hit stops the work,
     /// an ability the kit refuses does not; bags that filled while the work went on leave the node as it was. In the Verdant Shore
-    /// a new miner works a Veridian seam at once, as hard going (BUILD_PLAN step 8: low skill never refuses a node).
+    /// a new miner is refused a Veridian seam (a node above the skill refuses; Chris, 2026-10-05).
     /// </summary>
     public class GatherTests
     {
@@ -116,7 +116,7 @@ namespace Crulanda.Tests
             Assert.AreSame(seam, s.NearbyInteractable, "E offers it again.");
         }
 
-        [UnityTest] public IEnumerator VeridianSeam_NewMiner_WorksItAtOnce_AsHardGoing()
+        [UnityTest] public IEnumerator VeridianSeam_NewMiner_IsRefused()
         {
             yield return Open(10, "zone.verdant");
             var s = Session(); var p = s.Progress; var trades = s.Professions;
@@ -129,14 +129,10 @@ namespace Crulanda.Tests
             Assert.AreEqual(1, trades.Skill("mining"), "A new miner.");
             Assert.AreSame(seam, s.NearbyInteractable);
             s.Interact();
-            Assert.IsTrue(s.Working, "Low skill never refuses a node."); Assert.Contains("Hard going: this wants Mining 80.", s.Messages);
-            yield return new WaitForSeconds(2.5f);
-            Assert.IsTrue(s.Working, "Hard going takes twice as long.");
-            yield return new WaitForSeconds(2);
-            Assert.IsFalse(s.Working, "Done in four seconds.");
-            Assert.AreEqual(1, Inventory.Count(p, "mat.veridian_ore"), "Hard going yields exactly one.");
-            Assert.AreEqual(2, trades.Skill("mining"), "And the skill point is certain.");
-            Assert.Greater(seam.hiddenUntil, Time.time + 170, "It rests.");
+            // A node above the skill refuses (Chris, 2026-10-05): nothing starts, nothing is gathered or learned.
+            Assert.IsFalse(s.Working, "Mining 1 can't work a seam of 80."); Assert.Contains("Requires Mining 80.", s.Messages);
+            yield return new WaitForSeconds(.5f);
+            Assert.AreEqual(0, Inventory.Count(p, "mat.veridian_ore")); Assert.AreEqual(1, trades.Skill("mining"));
         }
 
         [UnityTest] public IEnumerator Respawn_SurvivesZoneReload()

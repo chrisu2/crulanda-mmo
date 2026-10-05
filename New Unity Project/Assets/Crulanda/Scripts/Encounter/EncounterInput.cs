@@ -43,6 +43,7 @@ namespace Crulanda.Encounter
                 case KeyCode.Alpha9: return k.digit9Key.wasPressedThisFrame;
                 case KeyCode.Alpha0: return k.digit0Key.wasPressedThisFrame;
                 case KeyCode.Space: return k.spaceKey.wasPressedThisFrame;
+                case KeyCode.Slash: return k.slashKey.wasPressedThisFrame || k.numpadDivideKey.wasPressedThisFrame;   // the run toggle
             }
             return false;
 #else

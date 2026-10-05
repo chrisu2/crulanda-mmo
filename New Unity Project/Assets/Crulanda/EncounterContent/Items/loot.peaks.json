@@ -16,7 +16,8 @@
     {"id": "loot.pea.rockfall", "name": "Rockfall", "kind": "gear", "slot": "offhand", "quality": 4, "level": 7, "value": 40, "armor": 44, "stamina": 15, "strength": 10, "description": "A slab of slate with a strap. It has already fallen on someone.", "canonStatus": "GAME-ONLY"},
     {"id": "loot.pea.seekers_sealed_pendant", "name": "Seeker's Sealed Pendant", "kind": "gear", "slot": "neck", "quality": 2, "level": 6, "value": 21, "stamina": 5, "strength": 4, "description": "The wax is unbroken. Leave it that way.", "canonStatus": "GAME-ONLY"},
     {"id": "loot.pea.salt_rimed_helm", "name": "Tarsk's Salt-Rimed Helm", "kind": "gear", "slot": "head", "quality": 3, "level": 7, "value": 32, "armor": 19, "stamina": 10, "strength": 7, "description": "White at the edges, like a tide-line.", "canonStatus": "GAME-ONLY"},
-    {"id": "loot.pea.quells_climbing_gloves", "name": "Yara's Climbing Gloves", "kind": "gear", "slot": "hands", "quality": 2, "level": 7, "value": 24, "armor": 15, "stamina": 5, "agility": 6, "description": "Palms of goat-hide. She does not sell the bad pairs.", "canonStatus": "GAME-ONLY"}
+    {"id": "loot.pea.quells_climbing_gloves", "name": "Yara's Climbing Gloves", "kind": "gear", "slot": "hands", "quality": 2, "level": 7, "value": 24, "armor": 15, "stamina": 5, "agility": 6, "description": "Palms of goat-hide. She does not sell the bad pairs.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.pea.the_toll_unpaid", "name": "The Toll Unpaid", "kind": "gear", "slot": "mainhand", "quality": 5, "level": 7, "value": 67, "weaponDamage": 35, "stamina": 12, "intellect": 16, "spirit": 7, "description": "Every coin the gate ever took is still owed to someone. The staff remembers who.", "canonStatus": "GAME-ONLY"}
   ],
   "vendors": [
     {"npc": "Yara Quell", "items": ["loot.pea.quells_climbing_gloves"]}
@@ -38,10 +39,11 @@
     {"id": "loot.pea.rockfall", "look": "shield.kite:slab/tollroad+glow", "source": "boss:Old Scree-Tusk", "boss": true, "unique": true, "effects": [{"kind": "stat", "stat": "Armor", "amount": 10, "percent": true, "text": "+10% armour."}]},
     {"id": "loot.pea.seekers_sealed_pendant", "look": "neck.pendant:seal/pilgrim", "source": "quest:main.peaks.2"},
     {"id": "loot.pea.salt_rimed_helm", "look": "head.barbute:rimed/tollroad", "source": "quest:main.peaks.3"},
-    {"id": "loot.pea.quells_climbing_gloves", "look": "hands.gloves:plain/tollroad", "source": "vendor:Yara Quell"}
+    {"id": "loot.pea.quells_climbing_gloves", "look": "hands.gloves:plain/tollroad", "source": "vendor:Yara Quell"},
+    {"id": "loot.pea.the_toll_unpaid", "look": "model.tall:StaffOfPain/tollroad", "source": "boss:Sandthrone captain"}
   ],
   "drops": [
-    {"id": "drop.pea.captain", "zone": "peaks", "mob": "Sandthrone captain", "rank": "elite", "groups": [{"chance": 0.5, "signature": true, "pick": [{"item": "loot.pea.the_captains_toll"}, {"item": "loot.pea.eyrie_cuirass"}]}, {"chance": 0.15, "lucky": true, "pick": [{"item": "loot.pea.signet_of_the_toll_road"}]}]},
+    {"id": "drop.pea.captain", "zone": "peaks", "mob": "Sandthrone captain", "rank": "elite", "groups": [{"chance": 0.5, "signature": true, "pick": [{"item": "loot.pea.the_captains_toll"}, {"item": "loot.pea.eyrie_cuirass"}]}, {"chance": 0.15, "lucky": true, "pick": [{"item": "loot.pea.signet_of_the_toll_road"}]}, {"chance": 0.005, "lucky": true, "pick": [{"item": "loot.pea.the_toll_unpaid"}]}]},
     {"id": "drop.pea.screetusk", "zone": "peaks", "mob": "Old Scree-Tusk", "rank": "elite", "groups": [{"chance": 0.5, "signature": true, "pick": [{"item": "loot.pea.scree_tusk"}, {"item": "loot.pea.scree_hide_legguards"}]}, {"chance": 0.04, "lucky": true, "pity": 25, "pick": [{"item": "loot.pea.rockfall"}]}]},
     {"id": "drop.pea.tollguards", "zone": "peaks", "tag": "tollguard", "rank": "normal", "groups": [{"chance": 0.03, "lucky": true, "pick": [{"item": "loot.pea.tollkeepers_billhook"}, {"item": "loot.pea.toll_gate_kettle"}]}]},
     {"id": "drop.pea.pickets", "zone": "peaks", "tag": "outrider", "rank": "normal", "groups": [{"chance": 0.03, "lucky": true, "pick": [{"item": "loot.pea.signal_tower_mitts"}]}]},

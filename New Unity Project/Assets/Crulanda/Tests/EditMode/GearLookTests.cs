@@ -47,7 +47,7 @@ namespace Crulanda.Tests
         {
             var looks = Looks();   // Parse refuses unknown families, palettes and variants anywhere in the file
             CollectionAssert.IsSubsetOf(new[] { "oakhaven", "concord", "sandthrone", "khaven", "tollroad", "pilgrim", "ashwalker", "cult", "veridian", "pale" }, new List<string>(looks.PaletteIds));
-            Assert.AreEqual(54, GearLooks.Families.Length, "54 shape families (DESIGN.md 2.3).");
+            Assert.AreEqual(57, GearLooks.Families.Length, "54 shape families (DESIGN.md 2.3) and the three model families (2026-10-05).");
             int variants = 0; var names = new HashSet<string>();
             foreach (var f in GearLooks.Families)
             {
@@ -55,7 +55,7 @@ namespace Crulanda.Tests
                 Assert.GreaterOrEqual(ItemDatabase.SlotIndex(f.slot), 0, f.name + " is in a real slot.");
                 Assert.That(f.gen, Is.InRange(0, f.variants.Length), f.name + " lets generated gear use some of its variants.");
                 Assert.AreEqual(f.variants.Length, new HashSet<string>(f.variants).Count, f.name + " names each variant once.");
-                variants += f.variants.Length;
+                if (!f.name.StartsWith("model.")) variants += f.variants.Length;   // the drawn ones (the models are the packs')
             }
             Assert.AreEqual(146, variants, "146 variants (DESIGN.md 2.3).");
             foreach (var kv in looks.Explicit) Assert.IsTrue(looks.IsValid(kv.Value, out var why), kv.Key + ": " + why);
@@ -136,6 +136,7 @@ namespace Crulanda.Tests
             foreach (var d in Generated(db, 70))
             {
                 var l = looks.Resolve(d); var fam = GearLooks.Family(l.family); int index = Array.IndexOf(fam.variants, l.variant);
+                if (l.family.StartsWith("model.")) { Assert.GreaterOrEqual(index, 0, d.id + ": its model is one of the family's."); continue; }   // chosen by quality (GearLooks.GeneratedModel)
                 GearLooks.TrySplitGenerated(d, out _, out _, out _, out int seed);
                 Assert.That(index, Is.InRange(0, fam.gen - 1), d.id + " got " + l.family + ":" + l.variant + ", which is for named items only.");
                 Assert.AreEqual(seed / 7 % fam.gen, index, d.id + ": variant = (seed / 7) % gen.");

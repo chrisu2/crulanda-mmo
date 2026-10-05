@@ -158,7 +158,9 @@ namespace Crulanda.Encounter
             {
                 // A crown or a circlet sits snug at the brow: the fit may not flare it out (playtest note 31: the Tin crown stood
                 // twice the head's width).
-                if (f.l.family == "head.crown" || f.l.family == "head.circlet") k = Mathf.Min(k, 1.2f);
+                // Then (2026-10-05, "crown still not fitting": a loose ring round the hair) it sits a little higher, where the head
+                // narrows, and is never widened past its own size: snug on the head like a band.
+                if (f.l.family == "head.crown" || f.l.family == "head.circlet") { dy += .025f; HatFit(new[] { gearRoots[s] }, out _, out float snug, dy); k = Mathf.Min(snug, 1f); }
                 WearHat(gearRoots[s], dy, k);
             }
             Finish(f.k, gearRoots[s]);

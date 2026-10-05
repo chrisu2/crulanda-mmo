@@ -1800,6 +1800,28 @@
       "interact": "Search the false pilgrims' packs"
     },
     {
+      "kind": "chest",
+      "name": "Chest at Captain's eyrie",
+      "at": {
+        "x": 63.95,
+        "y": 101.95
+      },
+      "rotation": 225,
+      "interact": "Open the chest",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "kind": "chest",
+      "name": "Chest at Old Scree-Tusk",
+      "at": {
+        "x": 160.25,
+        "y": 42.25
+      },
+      "rotation": 225,
+      "interact": "Open the chest",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
       "kind": "board",
       "name": "Notice board",
       "at": {
@@ -2203,9 +2225,9 @@
       "canonStatus": "GAME-ONLY",
       "center": {
         "x": -44,
-        "y": 104
+        "y": 99
       },
-      "radius": 8,
+      "radius": 7,
       "count": 3,
       "levelMin": 7,
       "levelMax": 8,

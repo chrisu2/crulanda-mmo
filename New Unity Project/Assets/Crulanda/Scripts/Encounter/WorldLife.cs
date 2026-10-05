@@ -842,7 +842,7 @@ namespace Crulanda.Encounter
             var body = GameObject.CreatePrimitive(PrimitiveType.Capsule); body.name = "Body"; Object.Destroy(body.GetComponent<Collider>());
             body.transform.SetParent(go.transform, false);
             var v = go.AddComponent<Villager>(); v.life = life; v.Name = name; v.Role = role; v.home = home;
-            v.agent = go.AddComponent<NavMeshAgent>(); v.agent.speed = role == "child" ? 2.4f : role == "elder" ? 1.1f : 1.6f;
+            v.agent = go.AddComponent<NavMeshAgent>(); v.agent.speed = role == "child" ? 1.9f : role == "elder" ? 1.1f : 1.6f;   // everyone walks (Chris, 2026-10-05)
             v.agent.angularSpeed = 360; v.agent.acceleration = 8; v.agent.stoppingDistance = .4f; v.agent.radius = .3f; v.agent.height = 2;
             v.agent.baseOffset = role == "child" ? .66f : 1; v.agent.avoidancePriority = 60;
             // A resident's own look (a Veridian Keeper): the body of the look, calm (an even variant), and no villager's outfit.
@@ -885,7 +885,7 @@ namespace Crulanda.Encounter
         {
             if (!agent.enabled || !agent.isOnNavMesh) return;
             float reel = Reeling; visual.Stagger = reel; ShowTankard(false);
-            agent.speed = (Role == "child" ? 2.4f : Role == "elder" ? 1.1f : 1.6f) * speedScale * (1 - .35f * reel);
+            agent.speed = (Role == "child" ? 1.9f : Role == "elder" ? 1.1f : 1.6f) * speedScale * (1 - .35f * reel);
             agent.isStopped = false; agent.SetDestination(target); state = State.Travel; visual.Pose = ActorPose.None;
         }
         /// <summary>
@@ -1270,7 +1270,7 @@ namespace Crulanda.Encounter
             }
             if (!anyOut || WorldClock.Between(22, 5.5f)) { activity = "close"; Go(Coop.door); return; }
             if (!agent.isOnNavMesh) return;
-            agent.isStopped = false; agent.speed = 2.2f; visual.Pose = ActorPose.None;
+            agent.isStopped = false; agent.speed = 1.8f; visual.Pose = ActorPose.None;
             if (straggler != null)
             {
                 var from = straggler.transform.position - Coop.door; from.y = 0;

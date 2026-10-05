@@ -23,7 +23,8 @@
     {"id": "loot.ver.leggings_the_wood_learned", "name": "Leggings the Wood Learned", "kind": "gear", "slot": "legs", "quality": 2, "level": 10, "value": 33, "armor": 33, "stamina": 9, "agility": 6, "description": "The brambles part for them now.", "canonStatus": "GAME-ONLY"},
     {"id": "loot.ver.oak_banes_carved_torc", "name": "Oak-Bane's Carved Torc", "kind": "gear", "slot": "neck", "quality": 3, "level": 12, "value": 52, "stamina": 12, "strength": 9, "agility": 7, "description": "Carved the night the Old King fell.", "canonStatus": "GAME-ONLY"},
     {"id": "loot.ver.lantern_of_the_deeps_quiet", "name": "Lantern of the Deep's Quiet", "kind": "gear", "slot": "offhand", "quality": 3, "level": 12, "value": 52, "armor": 57, "stamina": 14, "intellect": 8, "spirit": 6, "description": "Lantern-moss under glass. It dims when something is listening.", "canonStatus": "GAME-ONLY"},
-    {"id": "loot.ver.sap_sealed_boots", "name": "Ondine's Sap-Sealed Boots", "kind": "gear", "slot": "feet", "quality": 2, "level": 11, "value": 36, "armor": 23, "stamina": 8, "agility": 8, "description": "Green gold, she calls it, and charges accordingly.", "canonStatus": "GAME-ONLY"}
+    {"id": "loot.ver.sap_sealed_boots", "name": "Ondine's Sap-Sealed Boots", "kind": "gear", "slot": "feet", "quality": 2, "level": 11, "value": 36, "armor": 23, "stamina": 8, "agility": 8, "description": "Green gold, she calls it, and charges accordingly.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.ver.the_green_wrath", "name": "The Green Wrath", "kind": "gear", "slot": "mainhand", "quality": 5, "level": 12, "value": 109, "weaponDamage": 55, "stamina": 24, "strength": 22, "agility": 11, "description": "The forest's patience is long. This is what is left when it runs out.", "canonStatus": "GAME-ONLY"}
   ],
   "vendors": [
     {"npc": "Ondine Varro", "items": ["loot.ver.sap_sealed_boots"]}
@@ -52,12 +53,13 @@
     {"id": "loot.ver.leggings_the_wood_learned", "look": "legs.leggings:garter/veridian", "source": "quest:main.verdant.1"},
     {"id": "loot.ver.oak_banes_carved_torc", "look": "neck.torc:wood/veridian", "source": "quest:npc.oakbane.ninebranch"},
     {"id": "loot.ver.lantern_of_the_deeps_quiet", "look": "offhand.hung:moss/veridian+glow", "source": "quest:main.verdant.5"},
-    {"id": "loot.ver.sap_sealed_boots", "look": "feet.boots:plain/veridian", "source": "vendor:Ondine Varro"}
+    {"id": "loot.ver.sap_sealed_boots", "look": "feet.boots:plain/veridian", "source": "vendor:Ondine Varro"},
+    {"id": "loot.ver.the_green_wrath", "look": "model.weapon:Sword15_Earth/veridian", "source": "boss:The Hollow Root-Warden"}
   ],
   "drops": [
     {"id": "drop.ver.greyheart", "zone": "verdant", "mob": "Greyheart", "rank": "elite", "groups": [{"chance": 0.5, "signature": true, "pick": [{"item": "item.greyheart_stave"}, {"item": "loot.ver.greyhearts_withered_boughs"}, {"item": "loot.ver.ward_of_living_heartwood"}]}, {"chance": 0.04, "lucky": true, "pity": 25, "pick": [{"item": "loot.ver.the_last_green_leaf"}]}]},
     {"id": "drop.ver.ninebranch", "zone": "verdant", "mob": "Old Ninebranch", "rank": "elite", "groups": [{"chance": 0.5, "signature": true, "pick": [{"item": "item.ninebranch_tine"}, {"item": "loot.ver.crown_of_nine_branches"}, {"item": "loot.ver.the_old_kings_hide"}]}]},
-    {"id": "drop.ver.rootwarden", "zone": "verdant", "mob": "The Hollow Root-Warden", "rank": "elite", "groups": [{"chance": 1.0, "signature": true, "pick": [{"item": "item.wardens_crown"}, {"item": "loot.ver.vigil_bark_plate"}, {"item": "loot.ver.the_wardens_root_maul"}]}, {"chance": 0.1, "lucky": true, "pity": 10, "pick": [{"item": "loot.ver.the_root_mothers_patience"}]}]},
+    {"id": "drop.ver.rootwarden", "zone": "verdant", "mob": "The Hollow Root-Warden", "rank": "elite", "groups": [{"chance": 1.0, "signature": true, "pick": [{"item": "item.wardens_crown"}, {"item": "loot.ver.vigil_bark_plate"}, {"item": "loot.ver.the_wardens_root_maul"}]}, {"chance": 0.1, "lucky": true, "pity": 10, "pick": [{"item": "loot.ver.the_root_mothers_patience"}]}, {"chance": 0.005, "lucky": true, "pick": [{"item": "loot.ver.the_green_wrath"}]}]},
     {"id": "drop.ver.mossboars", "zone": "verdant", "tag": "mossboar", "rank": "normal", "groups": [{"chance": 0.03, "lucky": true, "pick": [{"item": "loot.ver.reed_wader_boots"}]}]},
     {"id": "drop.ver.stags", "zone": "verdant", "tag": "stag", "rank": "normal", "groups": [{"chance": 0.03, "lucky": true, "pick": [{"item": "loot.ver.velvet_tine_club"}, {"item": "loot.ver.dappled_hide_mantle"}]}]},
     {"id": "drop.ver.spiders", "zone": "verdant", "tag": "spider", "rank": "normal", "groups": [{"chance": 0.03, "lucky": true, "pick": [{"item": "loot.ver.canopy_silk_wraps"}, {"item": "loot.ver.chitin_buckler"}]}]},

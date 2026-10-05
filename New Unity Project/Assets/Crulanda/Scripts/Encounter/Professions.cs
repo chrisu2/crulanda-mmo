@@ -316,8 +316,8 @@ namespace Crulanda.Encounter
         public const string BagsFullLine = "Your bags are full.";
         /// <summary>
         /// Whether the character can work a node: they need its trade (a gathering skill with a tool is learned by hanging the tool
-        /// at the belt; why then names it: "You need a miner's pick. Merchants sell them."). Skill never refuses a node: under the
-        /// node's skill the work is only hard going (<paramref name="hard"/>): slower, a yield of one, a skill point every time.
+        /// at the belt; why then names it: "You need a miner's pick. Merchants sell them.") and the node's skill ("Requires Mining
+        /// 60."). <paramref name="hard"/> is always false now (it was the old slow, one-at-a-time work under the node's skill).
         /// </summary>
         public bool CanGather(NodeDef n, out bool hard, out string why)
         {
@@ -325,7 +325,9 @@ namespace Crulanda.Encounter
             var trade = n == null ? null : Db.Profession(n.profession);
             if (trade == null) { why = "You can't work that."; return false; }
             if (!Has(trade.id)) { why = NotKnownLine(trade, "You don't know how to work that."); return false; }
-            hard = Skill(trade.id) < n.skill;
+            // A node above the skill refuses (Chris, 2026-10-05: "above my mining level i should not be able to gather it. this
+            // for all professions"; it used to be "hard going": slow and one at a time). hard stays for the callers, always false.
+            if (Skill(trade.id) < n.skill) { why = "Requires " + trade.name + " " + n.skill + "."; return false; }
             return true;
         }
         /// <summary>Why a trade the character does not have refuses: its tool ("You need a miner's pick. Merchants sell them."), or

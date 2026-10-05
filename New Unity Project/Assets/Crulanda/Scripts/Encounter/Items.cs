@@ -50,8 +50,11 @@ namespace Crulanda.Encounter
         public readonly List<LootTableDef> Loot = new List<LootTableDef>();
         public static readonly string[] SlotIds = { "head", "neck", "shoulders", "chest", "hands", "legs", "feet", "mainhand", "offhand" };
         public static readonly string[] SlotNames = { "Head", "Neck", "Shoulders", "Chest", "Hands", "Legs", "Feet", "Main hand", "Off hand" };
-        public static readonly string[] QualityNames = { "Poor", "Common", "Uncommon", "Rare", "Epic" };
-        public static readonly Color[] QualityColors = { new Color(.62f, .62f, .62f), new Color(1, 1, 1), new Color(.12f, 1, 0), new Color(0, .44f, .87f), new Color(.64f, .21f, .93f) };
+        public static readonly string[] QualityNames = { "Poor", "Common", "Uncommon", "Rare", "Epic", "Legendary" };
+        /// <summary>The highest quality: legendary (2026-10-05, Chris: the brightest glowing weapons "epic or legendary only"). Only
+        /// named pieces are legendary; generated gear stops at epic.</summary>
+        public const int MaxQuality = 5;
+        public static readonly Color[] QualityColors = { new Color(.62f, .62f, .62f), new Color(1, 1, 1), new Color(.12f, 1, 0), new Color(0, .44f, .87f), new Color(.64f, .21f, .93f), new Color(1, .5f, 0) };
 
         public static ItemDatabase Parse(IEnumerable<string> jsonFiles)
         {
@@ -109,14 +112,14 @@ namespace Crulanda.Encounter
         };
         static int BandOf(int level) { return level <= 2 ? 0 : level <= 5 ? 1 : level <= 8 ? 2 : level <= 10 ? 3 : 4; }
         /// <summary>A generated gear id for this slot, level and quality (the seed picks name and suffix).</summary>
-        public static string GearId(string slot, int level, int quality, int seed) { return "gen." + slot + "." + Mathf.Clamp(level, 1, EncounterProgress.LevelCap) + "." + Mathf.Clamp(quality, 0, 4) + "." + Mathf.Abs(seed % 10000); }
+        public static string GearId(string slot, int level, int quality, int seed) { return "gen." + slot + "." + Mathf.Clamp(level, 1, EncounterProgress.LevelCap) + "." + Mathf.Clamp(quality, 0, MaxQuality) + "." + Mathf.Abs(seed % 10000); }
         static ItemDef Generate(string id)
         {
             var parts = id.Split('.');
             if (parts.Length != 5 || SlotIndex(parts[1]) < 0 || !int.TryParse(parts[2], out int level) || !int.TryParse(parts[3], out int q) || !int.TryParse(parts[4], out int seed)) return null;
             string slot = parts[1]; var rng = new System.Random(seed * 7919 + level * 31 + q);
             string material = Materials[BandOf(level)][rng.Next(3)], piece = Pieces[slot][rng.Next(3)];
-            float power = level * (q <= 0 ? .5f : q == 1 ? 1 : q == 2 ? 1.35f : q == 3 ? 1.7f : 2.1f);
+            float power = level * (q <= 0 ? .5f : q == 1 ? 1 : q == 2 ? 1.35f : q == 3 ? 1.7f : q == 4 ? 2.1f : 2.5f);   // legendary 2.5 (named only)
             var d = new ItemDef { id = id, kind = "gear", slot = slot, level = Mathf.Max(1, level - 1), quality = q, canonStatus = "GAME-ONLY" };
             bool weapon = slot == "mainhand", jewel = slot == "neck";
             d.name = (q == 0 ? "Worn " : "") + material + " " + piece;
@@ -129,7 +132,9 @@ namespace Crulanda.Encounter
                 d.stamina = Mathf.RoundToInt(s.sta * k); d.strength = Mathf.RoundToInt(s.str * k); d.agility = Mathf.RoundToInt(s.agi * k);
                 d.intellect = Mathf.RoundToInt(s.intel * k); d.spirit = Mathf.RoundToInt(s.spi * k);
             }
-            else if (q == 1 && (jewel || rng.Next(3) == 0)) d.stamina = Mathf.Max(1, Mathf.RoundToInt(power / 3));
+            // Common gear always carries a little Stamina by its level (Chris, 2026-10-05: a level-2 shield's +1 Stamina looked better
+            // than a level-10 buckler with none), so a higher piece wins on stats as well as armour.
+            else if (q == 1) { rng.Next(3); d.stamina = Mathf.Max(1, Mathf.RoundToInt(power / 3)); }
             d.value = Mathf.Max(1, Mathf.RoundToInt(level * (1 + q) * (weapon ? 1.4f : 1)));
             d.description = q == 0 ? "It has seen better days." : null;
             return d;

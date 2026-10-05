@@ -106,11 +106,14 @@ namespace Crulanda.World
             // Broad leaves along the banks, reeds at the waterline: candidates over the zone, kept where the shore is right.
             if (zone.Water != null && (leaf != null || reed != null) && (mix.leafWater > 0 || mix.reedLine > 0))
             {
+                // Reeds stand in clumps here and there along the water, not in a line down every bank (Chris, 2026-10-05: "way too
+                // many. should be clumped together in random spots"): only where a slow noise is high, a sixth or so of the shore.
+                float rx = R() * 500, ry = R() * 500;
                 for (int k = 0, n = Mathf.RoundToInt(z.size * z.size * .35f); k < n; k++)
                 {
                     var p = new Vector2((R() - .5f) * z.size, (R() - .5f) * z.size); float pick = R(), size = R();
                     float shore = zone.Water.Shore(p, 5); if (shore >= 5) continue;
-                    if (shore > -.7f && shore < .45f && reed != null && pick < mix.reedLine) { Plant(reedMesh, reed, p, .75f + size * .5f, -.1f); Reeds++; }
+                    if (shore > -.7f && shore < .45f && reed != null && pick < mix.reedLine * 1.4f && Mathf.PerlinNoise(rx + p.x * .045f, ry + p.y * .045f) > .66f) { Plant(reedMesh, reed, p, .75f + size * .5f, -.1f); Reeds++; }
                     else if (shore > 1 && shore < 4.5f && leaf != null && pick < mix.leafWater && Ground(p) && NotOnTrunk(zone, p)) { Plant(leafMesh, leaf, p, .7f + size * .6f); BroadLeaves++; }
                 }
             }

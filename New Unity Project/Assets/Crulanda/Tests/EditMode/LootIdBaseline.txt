@@ -103,3 +103,8 @@ loot.world.hares_foot_torc
 loot.world.helm_with_no_makers_mark
 loot.world.pilgrims_last_mile
 loot.world.vial_of_the_first_sea
+loot.oak.kingsbane
+loot.kha.the_reckoners_frost
+loot.pea.the_toll_unpaid
+loot.ash.cinderheart
+loot.ver.the_green_wrath

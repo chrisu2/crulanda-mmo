@@ -322,7 +322,7 @@ namespace Crulanda.Encounter
                 if (c != null && !c.name.StartsWith("__preview__")) return c;
             return null;
         }
-        bool ki;
+        bool ki; readonly List<string> morroIdles = new List<string>();
         /// <summary>Starts the figure's graph (play mode only; in edit mode the figure keeps its bind pose).</summary>
         public void StartMotion(string label)
         {
@@ -339,6 +339,20 @@ namespace Crulanda.Encounter
                 var w = KiClip(spec.female, "Walk01_" + DirFiles[d]); if (w != null) kiClips.Add(("w." + Dirs[d], w));
                 var r = KiClip(spec.female, "Run01_" + DirFiles[d]); if (r != null) kiClips.Add(("r." + Dirs[d], r));
                 var s = KiClip(spec.female, "Sprint01_" + DirFiles[d]); if (s != null) kiClips.Add(("s." + Dirs[d], s));
+            }
+            // Morro Motion's motion-captured idles (Resources/Characters/Animations/Morro; Chris, 2026-10-05: "use the idle mocap ... for
+            // npcs standing around or when your character just stands"): stances and looking about everywhere, a cough now and
+            // then, and in the mountains' cold the cold idles instead.
+            var zone = Crulanda.World.ZoneBuilder.Active; bool cold = zone != null && zone.Zone != null && zone.Zone.biome == "mountain";
+            var stand = cold ? new[] { "Cold_Idle_01_MB_v01", "Cold_Idle_02_MBv01", "Cold_Idle_03_MB_v01", "Cold_Idle_04_MB_v02" }
+                             : new[] { "Idle_Stance_01_MB_v01", "Idle_Stance_02_MB_v01", "Looking_Around_01_MB_v01", "Looking_Around_02_MB_v01", "Idle_Stance_01_MB_v01", "Coughing_Idle_MB_v01" };
+            morroIdles.Clear();
+            for (int i = 0; i < stand.Length; i++)
+            {
+                AnimationClip c = null;
+                foreach (var x in Resources.LoadAll<AnimationClip>("Characters/Animations/Morro/" + stand[i])) if (x != null && !x.name.StartsWith("__preview__")) { c = x; break; }
+                if (c == null) continue;
+                string slot = "m." + i; kiClips.Add((slot, c)); morroIdles.Add(slot);
             }
             ki = kiClips.Exists(k => k.Item1 == "w.F") && kiClips.Exists(k => k.Item1 == "r.F") && kiClips.Exists(k => k.Item1 == "k.idle");
             if (ki) found.AddRange(kiClips);
@@ -426,8 +440,13 @@ namespace Crulanda.Encounter
             {
                 float walk = Mathf.InverseLerp(.15f, 1.2f, speed), run = Mathf.InverseLerp(2.2f, 3.6f, speed), sprint = Mathf.InverseLerp(5.2f, 6.8f, speed);
                 // Standing: the first idle, and now and then the second for a while (each figure on its own beat).
-                bool second = slotOf.ContainsKey("k.idle2") && Mathf.Repeat(Time.time * .04f + idleBeat, 1) > .82f;
-                Set(want, second ? "k.idle2" : "k.idle", 1 - walk);
+                // Standing: the mocap idles in turn, about 18 s each (each figure on its own beat), or Kevin's two.
+                if (morroIdles.Count > 0) Set(want, morroIdles[Mathf.Abs(Mathf.FloorToInt(Time.time / 18f + idleBeat * 7)) % morroIdles.Count], 1 - walk);
+                else
+                {
+                    bool second = slotOf.ContainsKey("k.idle2") && Mathf.Repeat(Time.time * .04f + idleBeat, 1) > .82f;
+                    Set(want, second ? "k.idle2" : "k.idle", 1 - walk);
+                }
                 // Moving: the two directions nearest the heading, by how near each is.
                 float a = Mathf.Repeat(Mathf.Atan2(heading.x, heading.y) * Mathf.Rad2Deg, 360) / 45f; int i0 = Mathf.FloorToInt(a) % 8, i1 = (i0 + 1) % 8; float t = a - Mathf.Floor(a);
                 void Way(string kind, float w)
@@ -438,7 +457,8 @@ namespace Crulanda.Encounter
                     Add(want, s0, w * (1 - t)); Add(want, s1, w * t);
                 }
                 Way("w", walk * (1 - run)); Way("r", walk * run * (1 - sprint)); Way("s", walk * run * sprint);
-                foreach (var d in Dirs) { Rate("w." + d, Mathf.Clamp(speed / 1.4f, .7f, 1.6f)); Rate("r." + d, Mathf.Clamp(speed / 3.6f, .75f, 1.5f)); Rate("s." + d, Mathf.Clamp(speed / 6.5f, .8f, 1.4f)); }
+                // Rates kept near the clips' own (Chris, 2026-10-05: "animations are too fast"): a walk paced for 1.6 m/s, a run for 4.6, a sprint for 7.
+                foreach (var d in Dirs) { Rate("w." + d, Mathf.Clamp(speed / 1.6f, .6f, 1.2f)); Rate("r." + d, Mathf.Clamp(speed / 4.6f, .7f, 1.15f)); Rate("s." + d, Mathf.Clamp(speed / 7f, .8f, 1.1f)); }
             }
             else
             {

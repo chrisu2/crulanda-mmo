@@ -101,6 +101,6 @@ namespace Crulanda.Encounter
             Ink(new Rect(sq.xMax + 10, r.y + 24, r.width - 56, 20), line, armSub, new Color(.4f, .32f, .22f));
         }
         /// <summary>A quality's colour dark enough to read on parchment (poor and common in ink).</summary>
-        static Color ParchmentQuality(int q) { return q <= 1 ? InkBrown : Color.Lerp(ItemDatabase.QualityColors[Mathf.Clamp(q, 0, 4)], Color.black, .3f); }
+        static Color ParchmentQuality(int q) { return q <= 1 ? InkBrown : Color.Lerp(ItemDatabase.QualityColors[Mathf.Clamp(q, 0, ItemDatabase.MaxQuality)], Color.black, .3f); }
     }
 }

@@ -16,7 +16,8 @@
     {"id": "loot.kha.wood_edge_jerkin", "name": "Wenna's Wood-Edge Jerkin", "kind": "gear", "slot": "chest", "quality": 2, "level": 3, "value": 12, "armor": 12, "stamina": 3, "agility": 2, "description": "Her brother's. He does not go to the wood any more.", "canonStatus": "GAME-ONLY"},
     {"id": "loot.kha.hold_breakers_maul", "name": "Hold-Breaker's Maul", "kind": "gear", "slot": "mainhand", "quality": 2, "level": 3, "value": 17, "weaponDamage": 12, "stamina": 2, "strength": 3, "description": "For doors, mostly.", "canonStatus": "GAME-ONLY"},
     {"id": "loot.kha.morrows_road_greaves", "name": "Morrow's Road Greaves", "kind": "gear", "slot": "legs", "quality": 3, "level": 4, "value": 20, "armor": 19, "stamina": 6, "strength": 5, "description": "Ansel walked north in these once. He came back.", "canonStatus": "GAME-ONLY"},
-    {"id": "loot.kha.tallow_proofed_capelet", "name": "Cato's Tallow-Proofed Capelet", "kind": "gear", "slot": "shoulders", "quality": 2, "level": 4, "value": 15, "armor": 9, "stamina": 4, "agility": 3, "description": "Sheds rain, and smells of candles.", "canonStatus": "GAME-ONLY"}
+    {"id": "loot.kha.tallow_proofed_capelet", "name": "Cato's Tallow-Proofed Capelet", "kind": "gear", "slot": "shoulders", "quality": 2, "level": 4, "value": 15, "armor": 9, "stamina": 4, "agility": 3, "description": "Sheds rain, and smells of candles.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.kha.the_reckoners_frost", "name": "The Reckoner's Frost", "kind": "gear", "slot": "mainhand", "quality": 5, "level": 6, "value": 59, "weaponDamage": 31, "stamina": 14, "strength": 10, "agility": 7, "description": "Cold enough to stop a count in the middle. Whose, it does not say.", "canonStatus": "GAME-ONLY"}
   ],
   "vendors": [
     {"npc": "Cato Brisk", "items": ["loot.kha.tallow_proofed_capelet"]}
@@ -38,11 +39,12 @@
     {"id": "loot.kha.wood_edge_jerkin", "look": "chest.jerkin:leather/khaven", "source": "quest:npc.wenna.wolves"},
     {"id": "loot.kha.hold_breakers_maul", "look": "hammer.war:maul/khaven", "source": "quest:main.khaven.1"},
     {"id": "loot.kha.morrows_road_greaves", "look": "legs.greaves:plate/khaven", "source": "quest:main.khaven.3"},
-    {"id": "loot.kha.tallow_proofed_capelet", "look": "shoulder.mantle:cloth/khaven", "source": "vendor:Cato Brisk"}
+    {"id": "loot.kha.tallow_proofed_capelet", "look": "shoulder.mantle:cloth/khaven", "source": "vendor:Cato Brisk"},
+    {"id": "loot.kha.the_reckoners_frost", "look": "model.weapon:Sword15_Frost/pale", "source": "boss:The Pale Reckoner"}
   ],
   "drops": [
     {"id": "drop.kha.sexton", "zone": "khaven", "mob": "The Grey Sexton", "rank": "elite", "groups": [{"chance": 0.5, "signature": true, "pick": [{"item": "loot.kha.sextons_spade"}, {"item": "loot.kha.shawl_of_the_uncounted"}]}, {"chance": 0.15, "lucky": true, "pick": [{"item": "loot.kha.mourners_iron_band"}]}]},
-    {"id": "drop.kha.reckoner", "zone": "khaven", "mob": "The Pale Reckoner", "rank": "elite", "groups": [{"chance": 0.5, "signature": true, "pick": [{"item": "loot.kha.pane_of_the_final_sum"}, {"item": "loot.kha.cold_count_gauntlets"}]}, {"chance": 0.04, "lucky": true, "pity": 25, "pick": [{"item": "loot.kha.the_unpaid_debt"}]}]},
+    {"id": "drop.kha.reckoner", "zone": "khaven", "mob": "The Pale Reckoner", "rank": "elite", "groups": [{"chance": 0.5, "signature": true, "pick": [{"item": "loot.kha.pane_of_the_final_sum"}, {"item": "loot.kha.cold_count_gauntlets"}]}, {"chance": 0.04, "lucky": true, "pity": 25, "pick": [{"item": "loot.kha.the_unpaid_debt"}]}, {"chance": 0.005, "lucky": true, "pick": [{"item": "loot.kha.the_reckoners_frost"}]}]},
     {"id": "drop.kha.outriders", "zone": "khaven", "tag": "outrider", "rank": "normal", "groups": [{"chance": 0.03, "lucky": true, "pick": [{"item": "loot.kha.outrider_bearded_axe"}, {"item": "loot.kha.dune_scarf"}, {"item": "loot.kha.picket_shield"}]}]},
     {"id": "drop.kha.hollows", "zone": "khaven", "tag": "hollow", "rank": "normal", "groups": [{"chance": 0.03, "lucky": true, "pick": [{"item": "loot.kha.gloom_creek_waders"}, {"item": "loot.kha.petrified_knuckle"}]}]},
     {"id": "drop.kha.boars", "zone": "khaven", "tag": "boar", "rank": "normal", "groups": [{"chance": 0.03, "lucky": true, "pick": [{"item": "loot.kha.carrion_hide_leggings"}]}]},

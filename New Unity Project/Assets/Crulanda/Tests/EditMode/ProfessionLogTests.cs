@@ -117,26 +117,18 @@ namespace Crulanda.Tests
             Assert.AreEqual(2f, log.WorkSeconds(copper, false)); Assert.AreEqual(1.5f, log.WorkSeconds(log.Db.Node("node.yarrow"), false));
         }
 
-        [Test] public void Gather_UnderSkill_IsHardGoing_YieldsOne_AlwaysSkillsUp()
+        [Test] public void Gather_UnderSkill_Refuses()
         {
-            var log = Fresh(out _); var p = log.Progress; var cap = log.Db.Node("node.mourners_cap"); var ups = new List<int>();
-            log.SkillUp = (id, skill) => { Assert.AreEqual("herbalism", id); ups.Add(skill); };
+            var log = Fresh(out _); var p = log.Progress; var cap = log.Db.Node("node.mourners_cap"); int ups = 0; log.SkillUp = (id, skill) => ups++;
             Assert.AreEqual(20, cap.skill);
-            // Low skill never blocks a node: a herbalist of 1 picks mourner's cap at once, slowly, one at a time.
-            Assert.IsTrue(log.CanGather(cap, out bool hard, out var why), why); Assert.IsTrue(hard, "Herbalism 1 against a node of 20 is hard going.");
-            Assert.AreEqual(3f, log.WorkSeconds(cap, true), "Herbs: 1.5 s, twice that when hard going."); Assert.AreEqual(4f, log.WorkSeconds(log.Db.Node("node.bogiron"), true), "Ore: 2 s, twice that.");
-            var rng = new System.Random(7);
-            for (int i = 0; i < 19; i++)
-            {
-                int before = log.Skill("herbalism");
-                Assert.AreEqual(1, log.Gather(cap, rng, out why), "Hard going yields exactly one (gather " + i + ").");
-                Assert.AreEqual(before + 1, log.Skill("herbalism"), "Every hard-going gather teaches.");
-            }
-            Assert.AreEqual(19, Inventory.Count(p, "mat.mourners_cap")); Assert.AreEqual(20, log.Skill("herbalism"));
-            CollectionAssert.AreEqual(new[] { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 }, ups);
-            // At the node's own skill it is no longer hard going: the yield is the node's range (1-2).
-            Assert.IsTrue(log.CanGather(cap, out hard, out _)); Assert.IsFalse(hard);
-            var seen = new HashSet<int>(); for (int i = 0; i < 60; i++) seen.Add(log.RollGather(cap, rng).count);
+            // A node above the skill refuses, for every trade (Chris, 2026-10-05): a herbalist of 1 can't pick mourner's cap.
+            Assert.IsFalse(log.CanGather(cap, out _, out var why)); Assert.AreEqual("Requires Herbalism 20.", why);
+            Assert.AreEqual(0, log.Gather(cap, new System.Random(7), out why), "Nothing gathered."); Assert.AreEqual(0, ups, "Nothing learned.");
+            Assert.AreEqual(0, Inventory.Count(p, "mat.mourners_cap"));
+            // At the node's own skill it can be worked: the yield is the node's range (1-2).
+            p.professions.Find(e => e.id == "herbalism").skill = 20;
+            Assert.IsTrue(log.CanGather(cap, out bool hard, out why), why); Assert.IsFalse(hard);
+            var rng = new System.Random(7); var seen = new HashSet<int>(); for (int i = 0; i < 60; i++) seen.Add(log.RollGather(cap, rng).count);
             CollectionAssert.IsSubsetOf(seen, new[] { 1, 2 }); Assert.AreEqual(2, seen.Count, "Both 1 and 2 turn up.");
         }
 

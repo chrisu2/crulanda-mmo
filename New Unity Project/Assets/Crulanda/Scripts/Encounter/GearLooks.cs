@@ -68,6 +68,10 @@ namespace Crulanda.Encounter
 
     public sealed class GearLooks
     {
+        // The model families' variants: declared before Families, which reads them (static fields start in the order written).
+        public static readonly string[] ModelWeapons = { "Ashen_gth_equi_arming_sword", "Ashen_dun_equi_crescent_sabre", "Ashen_nth_equi_bearded_axe", "Ashen_nth_equi_flanged_mace", "Ashen_dun_equi_parrying_dagger", "Ashen_nth_equi_rondel_dagger", "Axe1H_Basic", "Axe1H_Epic", "Axe1H_Medium", "Axe2H_Basic", "Axe2H_Epic", "Axe2H_Medium", "Cartoon_Dagger", "Cartoon_Espadon", "Cartoon_Sword_01", "Cartoon_Sword_02", "Cartoon_Sword_03", "Cartoon_Sword_04", "Mace1H_Basic", "Mace1H_Epic", "Mace1H_Medium", "Mace2H_Basic", "Mace2H_Epic", "Mace2H_Medium", "Sics_Dagger", "Sics_Sword", "Sword10_Bone", "Sword10_Brown", "Sword10_Dark", "Sword11_Blood", "Sword11_Bone", "Sword11_Dark", "Sword12_Green", "Sword12_Purple", "Sword12_Red", "Sword13_Blue", "Sword13_Cyan", "Sword13_Green", "Sword13_Orange", "Sword13_Red", "Sword14_Blue", "Sword14_Red", "Sword14_Yellow", "Sword15_Earth", "Sword15_Frost", "Sword15_Iron", "Sword15_Lava", "Sword1_Bronze", "Sword1_Gold", "Sword1_Silver", "Sword2_Green", "Sword2_Red", "Sword2_Yellow", "Sword3_Blue", "Sword3_Green", "Sword3_Red", "Sword4_Blue", "Sword4_Red", "Sword4_Yellow", "Sword5_Blue", "Sword5_Gold", "Sword5_Red", "Sword5_Yellow", "Sword6_Blue", "Sword6_Red", "Sword6_Yellow", "Sword7_Blue", "Sword7_Green", "Sword7_Red", "Sword8_Corrupted", "Sword8_Gold", "Sword8_White", "Sword9_Blue", "Sword9_Green", "Sword9_Purple", "Sword9_Red", "Sword9_White", "Wand_Basic", "Wand_Epic", "Wand_Medium" };
+        public static readonly string[] ModelTall = { "StaffOfPain", "Cartoon_Staff_01", "Cartoon_Staff_02", "Cartoon_Staff_03", "Cartoon_Staff_04", "Cartoon_Staff_05", "Cartoon_Staff_06", "Spear1H_Basic", "Spear1H_Epic", "Spear1H_Epic2", "Spear1H_Medium", "Spear2H_Basic", "Spear2H_Epic", "Spear2H_Medium", "Staff_Basic", "Staff_Epic", "Staff_Medium" };
+        public static readonly string[] ModelShields = { "Ashen_gth_equi_kite_shield", "Cartoon_Shield_01", "Cartoon_Shield_02", "Cartoon_Shield_03", "Shield_Basic", "Shield_Epic", "Shield_Medium", "Sics_Shield" };
         /// <summary>Every family and variant (DESIGN.md section 2.3). Variants after the first <c>gen</c> are named-item only.</summary>
         public static readonly GearFamily[] Families = {
             // Main hand.
@@ -95,6 +99,9 @@ namespace Crulanda.Encounter
             new GearFamily("shield.kite", "offhand", 1, "plain", "slab"),
             new GearFamily("shield.leaf", "offhand", 1, "bronze", "bark"),
             new GearFamily("offhand.hung", "offhand", 1, "lantern", "shuttered", "moss", "censer", "scale"),
+            // Models from the Asset Store packs (ActorVisual.GearModels.cs, 2026-10-05): the variant is the prefab's name.
+            new GearFamily("model.weapon", "mainhand", 0, ModelWeapons), new GearFamily("model.tall", "mainhand", 0, ModelTall),
+            new GearFamily("model.shield", "offhand", 0, ModelShields),
             // Head.
             new GearFamily("head.cap", "head", 2, "plain", "flaps", "leaf"),
             new GearFamily("head.hood", "head", 1, "cloth", "oilskin"),
@@ -130,6 +137,29 @@ namespace Crulanda.Encounter
             new GearFamily("neck.torc", "neck", 1, "metal", "band", "wood", "charm")
         };
         static Dictionary<string, GearFamily> byName;
+        /// <summary>
+        /// The models a generated piece may wear, by quality (Chris: "some of the glowing weapons should be epic or legendary only"):
+        /// uncommon the plain blades, axes, maces and shields; rare the better-made ones, a faint gleam at most; epic the glowing
+        /// ones. The brightest (Blink's Sword13 and Sword15 and the RPG pack's epics) are kept for named legendary pieces.
+        /// </summary>
+        static readonly Dictionary<string, string[][]> GeneratedModels = new Dictionary<string, string[][]> {
+            { "Blade", new[] {
+                new[] { "Sword2_Green", "Sword2_Red", "Sword2_Yellow", "Sword3_Blue", "Sword3_Green", "Sword3_Red", "Sword4_Blue", "Sword4_Red", "Sword4_Yellow",
+                        "Sword5_Blue", "Sword5_Gold", "Sword5_Red", "Sword5_Yellow", "Sword10_Bone", "Sword10_Brown", "Sword11_Bone", "Sword11_Dark", "Cartoon_Sword_01", "Cartoon_Sword_02", "Cartoon_Sword_03", "Cartoon_Sword_04", "Ashen_gth_equi_arming_sword", "Ashen_dun_equi_crescent_sabre" },
+                new[] { "Sword1_Bronze", "Sword1_Silver", "Sword1_Gold", "Sword6_Blue", "Sword6_Yellow", "Sword8_White", "Sword8_Corrupted", "Sword10_Dark", "Sword11_Blood" },
+                new[] { "Sword6_Red", "Sword7_Blue", "Sword7_Green", "Sword7_Red", "Sword8_Gold", "Sword9_Blue", "Sword9_Green", "Sword9_Purple", "Sword9_Red", "Sword9_White",
+                        "Sword12_Green", "Sword12_Purple", "Sword12_Red", "Sword14_Blue", "Sword14_Red", "Sword14_Yellow" } } },
+            { "Hatchet", new[] { new[] { "Axe1H_Basic", "Ashen_nth_equi_bearded_axe" }, new[] { "Axe1H_Medium" }, new[] { "Axe1H_Epic" } } },
+            { "Cudgel", new[] { new[] { "Mace1H_Basic", "Ashen_nth_equi_flanged_mace" }, new[] { "Mace1H_Medium" }, new[] { "Mace1H_Epic" } } },
+            { "Buckler", new[] { new[] { "Cartoon_Shield_01", "Shield_Basic" }, new[] { "Cartoon_Shield_02", "Shield_Medium" }, new[] { "Cartoon_Shield_03", "Shield_Epic" } } },
+            { "Shield", new[] { new[] { "Shield_Basic", "Cartoon_Shield_01" }, new[] { "Shield_Medium", "Cartoon_Shield_02", "Ashen_gth_equi_kite_shield" }, new[] { "Shield_Epic", "Cartoon_Shield_03" } } },
+        };
+        /// <summary>The model a generated piece wears (uncommon and better, in the hand or on the arm), or null for the drawn families.</summary>
+        public static string GeneratedModel(string piece, int quality, int seed)
+        {
+            if (quality < 2 || piece == null || !GeneratedModels.TryGetValue(piece, out var tiers)) return null;
+            var pool = tiers[Mathf.Clamp(quality - 2, 0, 2)]; return pool[Mathf.Abs(seed / 3) % pool.Length];
+        }
         public static GearFamily Family(string name)
         {
             if (byName == null) { byName = new Dictionary<string, GearFamily>(StringComparer.Ordinal); foreach (var f in Families) byName[f.name] = f; }
@@ -314,7 +344,7 @@ namespace Crulanda.Encounter
         public GearLook Resolve(ItemDef d)
         {
             string slot = d != null && ItemDatabase.SlotIndex(d.slot) >= 0 ? d.slot : "mainhand";
-            int q = d == null ? 1 : Mathf.Clamp(d.quality, 0, 4);
+            int q = d == null ? 1 : Mathf.Clamp(d.quality, 0, ItemDatabase.MaxQuality);
             string id = d != null ? d.id ?? "" : "";
             int tier = BandOf(Mathf.Clamp(d == null ? 1 : d.level + 1, 1, EncounterProgress.LevelCap));   // the curve level: required level + 1 (DESIGN.md 3.2)
             // Its own look, if it names a family of the item's slot.
@@ -324,6 +354,9 @@ namespace Crulanda.Encounter
             if (TrySplitGenerated(d, out var material, out var piece, out int level, out int seed)
                 && materials.TryGetValue(material, out var m) && words.TryGetValue(slot + "|" + piece, out var w) && w.families.Length > 0)
             {
+                var modelled = GeneratedModel(piece, q, seed);
+                if (modelled != null)
+                    return Make(slot == "offhand" ? "model.shield" : "model.weapon", modelled, m.palette, m.shade, m.detail, q, false, false, BandOf(Mathf.Clamp(level, 1, EncounterProgress.LevelCap)));
                 var family = Family(w.families.Length == 1 ? w.families[0] : w.families[Mathf.Clamp(BandOf(level), 0, w.families.Length - 1)]);
                 if (family != null && family.gen > 0)
                     return Tint(Make(family.name, family.variants[Mathf.Abs(seed / 7) % family.gen], m.palette, m.shade, m.detail, q, false, false, BandOf(Mathf.Clamp(level, 1, EncounterProgress.LevelCap))), id);
@@ -349,7 +382,7 @@ namespace Crulanda.Encounter
         static Color Faded(Color c) { float g = c.r * .3f + c.g * .59f + c.b * .11f; return Color.Lerp(c, new Color(g, g, g), .55f) * .78f; }
         /// <summary>How rich a dye is by quality: common a little plainer, uncommon the palette's own, rare and epic more saturated
         /// and deeper (a jewel tone is dark and saturated, not light).</summary>
-        static readonly float[] DyeSat = { 1, .9f, 1, 1.08f, 1.14f }, DyeVal = { 1, 1, 1, .94f, .88f };
+        static readonly float[] DyeSat = { 1, .9f, 1, 1.08f, 1.14f, 1.18f }, DyeVal = { 1, 1, 1, .94f, .88f, .86f };
         static Color Rich(Color c, int q)
         {
             Color.RGBToHSV(c, out float h, out float s, out float v);
@@ -365,7 +398,7 @@ namespace Crulanda.Encounter
             {
                 string alt = shade == 1 ? b : shade == 2 ? c3 : null;
                 var c = string.IsNullOrEmpty(alt) ? Shade(Hex(hex), shade) : Hex(alt);
-                return q == 0 ? Faded(c) : Rich(c, Mathf.Clamp(q, 0, 4));
+                return q == 0 ? Faded(c) : Rich(c, Mathf.Clamp(q, 0, ItemDatabase.MaxQuality));
             }
             var l = new GearLook {
                 family = family, variant = variant, palette = paletteId, detail = string.IsNullOrEmpty(detail) ? "none" : detail, quality = q, forceGlow = glow, fallback = fallback, tier = tier,

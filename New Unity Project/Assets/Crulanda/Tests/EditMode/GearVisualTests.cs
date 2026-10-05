@@ -237,7 +237,8 @@ namespace Crulanda.Tests
                             accents += own; if (own > 0) palettes.Add(looks.Resolve(db.Get(ids[(int)s])).palette);
                             var root = v.GearRoot(s); var pulse = root != null ? root.GetComponent<GearGlow>() : null;
                             bool hand = s == EquipSlot.MainHand || s == EquipSlot.OffHand;
-                            if (q >= 3 && hand) Assert.GreaterOrEqual(own, q - 2, what + ": the " + s + " piece has " + (q - 2) + " glowing accents.");
+                            bool modelled = hand && ids.Length > (int)s && db.Get(ids[(int)s]) != null && looks.Resolve(db.Get(ids[(int)s])).family.StartsWith("model.");   // a model's glow is its own (ActorVisual.GearModels.cs)
+                            if (q >= 3 && hand && !modelled) Assert.GreaterOrEqual(own, q - 2, what + ": the " + s + " piece has " + (q - 2) + " glowing accents.");
                             if (q == 4 && own > 0) { Assert.NotNull(pulse, what + ": the epic " + s + " piece pulses."); Assert.AreEqual(own, pulse.Accents, what + ": every accent of the " + s + " piece pulses."); }
                             else Assert.IsNull(pulse, what + ": only epic accents pulse (" + s + ").");
                         }
@@ -340,6 +341,7 @@ namespace Crulanda.Tests
             var combos = new[] { (0, 1), (1, 3), (2, 6), (3, 9), (4, 12), (4, 1), (1, 12) };
             foreach (var family in GearLooks.Families)
             {
+                if (family.name.StartsWith("model.")) continue;   // the drawn families; the models are the packs' own (ModelWeaponTests)
                 var slot = (EquipSlot)ItemDatabase.SlotIndex(family.slot); bool hand = slot == EquipSlot.MainHand || slot == EquipSlot.OffHand;
                 foreach (var variant in family.variants)
                     foreach (var (q, level) in combos)

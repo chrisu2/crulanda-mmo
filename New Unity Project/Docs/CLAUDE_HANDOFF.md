@@ -9,11 +9,21 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-10-05 morning)
-**NEXT:** Round 20 (treants, 8-way motion, classic MMO controls, bears, drowned dead, model spiders and crows) is PUBLISHED and
-committed: all green (EditMode 399/399, PlayMode 175/175 with the two camps moved: peaks "High pines bears" now (-44,104) r8,
-khaven "The drowned dead" (38,-176) r5). Waiting on Chris's playtest. Open: efficient PlayMode, captures overwrite the screen
-mode, note 10 cave lighting, more fps.
+## RESUME HERE (updated 2026-10-05, late morning)
+**NEXT:** Round 21 (see its CHANGELOG entry; PLAYTEST_NOTES 33-46) is PUBLISHED (midday 2026-10-05), committed and backed up; waiting on Chris's playtest. Then, in this order:
+1. **Make PlayMode efficient** (Chris asked 2026-10-04; still NOT built): (a) run_tests picks fixtures from the files changed since
+   the last green run (art/shader/zone data: EditMode + build + tour only; gameplay code: the fixtures covering those files;
+   core: all); (b) fixtures share one scene load ([OneTimeSetUp]); (c) fixed waits become wait-until with a timeout; (d) PlayMode
+   split across two validation copies side by side. A full run is ~1 h 50 today (PlayMode ~55 min, build + 5 tours ~45).
+2. **The Ash-Walker enclave's interior** (note 40, Chris chose a real interior: a firelit hall behind the middle arch).
+3. **Art rounds from Chris's assets:** Stylized Nature MegaKit (outdoors), Medieval Village MegaKit (housing; not in Downloads yet
+   at 09:40), Fantasy Props MegaKit, Stylized Megapack 2in1 (Downloads), Medieval props and HQ Rock Pack (Asset Store cache),
+   the Ashen sentinel helm (needs a model-helm path in the armour code).
+4. **Sound phase** (Chris): ambience, weapon hits (slash, pierce, blunt each different), spells, mobs; music later.
+Asset notes: weapon prefabs in Resources/Weapons (packs in ThirdParty/, tools/wip/weapons/weapons_import.py; ThirdPartyImport
+caps their textures at 512 and writes WeaponReport.txt); model icons via run_method ModelIcons.Render -Graphics, then COPY the
+PNGs from the validation copy to the repo at once (any later sync mirrors them away) and give them metas (clone an icon meta
+with a new guid). make_icons.py re-encodes every PNG: keep only new files. Chris's save is not precious.
 
 ## Earlier resume notes (2026-10-03/04)
 **NEXT (2026-10-04 15:50):**

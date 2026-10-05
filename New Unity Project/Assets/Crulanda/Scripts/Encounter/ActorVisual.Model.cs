@@ -354,7 +354,7 @@ namespace Crulanda.Encounter
         /// height they reach (<see cref="HatClear"/>). Walls are the faces that look sideways; a brim's flat faces and a crown's
         /// top do not count, so a brim may pass through the head (hidden inside it). Gives the drop and the crown's scale.
         /// </summary>
-        bool HatFit(IEnumerable<Transform> parts, out float dy, out float k)
+        bool HatFit(IEnumerable<Transform> parts, out float dy, out float k, float atDy = float.NaN)
         {
             dy = 0; k = 1; if (headOutline == null) return false;
             var side = new List<Vector3>(); float rim = float.MaxValue; var toFrame = headFrame.worldToLocalMatrix;
@@ -370,7 +370,7 @@ namespace Crulanda.Encounter
                     }
                 }
             if (side.Count == 0) return false;
-            dy = headOutline.eyes + HatAboveEyes - rim;
+            dy = float.IsNaN(atDy) ? headOutline.eyes + HatAboveEyes - rim : atDy;   // (or at a height given: a crown set higher)
             float need = 0; bool any = false;
             foreach (var p in side)
             {
@@ -378,7 +378,7 @@ namespace Crulanda.Encounter
                 float head = HeadRadius(p.y + dy, Mathf.Atan2(d.x, d.y)); if (head <= 0) continue;
                 need = Mathf.Max(need, (head + HatClear) / r); any = true;
             }
-            k = any ? Mathf.Clamp(need, .75f, 1.9f) : 1;
+            k = any ? Mathf.Clamp(need, .6f, 1.9f) : 1;
             return true;
         }
         /// <summary>

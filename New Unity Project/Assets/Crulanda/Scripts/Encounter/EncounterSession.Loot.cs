@@ -136,7 +136,7 @@ namespace Crulanda.Encounter
         public int BestQuality(IReadOnlyList<LootDrop> drops)
         {
             int best = 0; if (drops == null || Items == null) return best;
-            foreach (var d in drops) { var i = Items.Get(d.item); if (i != null) best = Mathf.Max(best, Mathf.Clamp(i.quality, 0, 4)); }
+            foreach (var d in drops) { var i = Items.Get(d.item); if (i != null) best = Mathf.Max(best, Mathf.Clamp(i.quality, 0, ItemDatabase.MaxQuality)); }
             return best;
         }
         void ShowBeacon(EncounterEnemy body)
@@ -209,12 +209,46 @@ namespace Crulanda.Encounter
             if (body.Coins <= 0 && (body.Drops == null || body.Drops.Count == 0)) { body.Looted = true; LootBeacon.Clear(body); if (lootBody == body) CloseLoot(); }
             else ShowBeacon(body);
         }
+        // ---------- treasure chests (2026-10-05) ----------
+        /// <summary>How long an emptied chest takes to fill again, in seconds (not saved: a restart fills them all).</summary>
+        public const float ChestRefill = 1200;
+        static readonly Dictionary<string, float> chestReadyAt = new Dictionary<string, float>();
+        /// <summary>Tests only: every chest is full again.</summary>
+        public static void RefillChests() { chestReadyAt.Clear(); }
+        public const string ChestEmptyLine = "The chest is empty. Someone has been here before you.";
+        public const string BagsFullForChestLine = "Your bags are full: what was in the chest stays in it.";
+        /// <summary>
+        /// E on a treasure chest: it opens (ChestLid) and what is in it goes into the bags, with the loot call-outs: crowns by the
+        /// zone's level, a piece of gear of the zone's top level (uncommon 55%, rare 34%, epic 11%; never legendary: those are the
+        /// bosses' alone) and sometimes a potion. Empty, it says so until it fills again (<see cref="ChestRefill"/>). Not in a fight.
+        /// </summary>
+        public void OpenChest(Crulanda.World.ZoneInteractable i)
+        {
+            if (InCombat) { Message(FightingLine); return; }
+            string key = i.Key(Zone.Zone.id);
+            if (chestReadyAt.TryGetValue(key, out float at) && Time.time < at) { Message(ChestEmptyLine); return; }
+            chestReadyAt[key] = Time.time + ChestRefill;
+            var lid = i.root != null ? i.root.GetComponentInChildren<Crulanda.World.ChestLid>() : null;
+            if (lid != null) { lid.Open(); StartCoroutine(ShutLater(lid, ChestRefill)); }
+            int level = Mathf.Max(1, Zone.Zone.levelMax);
+            int coins = level * 4 + gatherRng.Next(level * 4 + 1); Progress.gold += coins; Message("Looted " + coins + " crowns.");
+            if (Items != null)
+            {
+                double roll = gatherRng.NextDouble(); int q = roll < .11 ? 4 : roll < .45 ? 3 : 2;
+                var gear = ItemDatabase.GearId(ItemDatabase.SlotIds[gatherRng.Next(ItemDatabase.SlotIds.Length)], level, q, gatherRng.Next(10000));
+                if (Inventory.Add(Progress, Items, gear, 1) == 0) Received(gear, 1); else Message(BagsFullForChestLine);
+                if (gatherRng.NextDouble() < .4 && Items.Get("potion.healing") != null && Inventory.Add(Progress, Items, "potion.healing", 1) == 0) Received("potion.healing", 1);
+            }
+            Save(false);
+        }
+        System.Collections.IEnumerator ShutLater(Crulanda.World.ChestLid lid, float seconds) { yield return new WaitForSeconds(seconds); if (lid != null) lid.Close(); }
+
         /// <summary>The rarity call-out: a chat line in the item's quality colour, and a "RARE" or "EPIC" toast over its name.</summary>
         void Received(string item, int count)
         {
-            var d = Items.Get(item); int q = Mathf.Clamp(d.quality, 0, 4);
+            var d = Items.Get(item); int q = Mathf.Clamp(d.quality, 0, ItemDatabase.MaxQuality);
             LootLine("Looted: " + d.name + (count > 1 ? " x" + count : "") + ".", q == 0 ? ItemDatabase.QualityColors[0] : LootBeacon.Colour(q));
-            if (q >= 3) ShowToast(q >= 4 ? "EPIC" : "RARE", d.name);
+            if (q >= 3) ShowToast(q >= 5 ? "LEGENDARY" : q >= 4 ? "EPIC" : "RARE", d.name);
         }
         /// <summary>Chat lines shown in a colour of their own (the loot call-outs), by their text.</summary>
         readonly Dictionary<string, Color> lineColours = new Dictionary<string, Color>();

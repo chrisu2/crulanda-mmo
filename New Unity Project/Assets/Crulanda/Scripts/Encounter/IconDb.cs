@@ -46,7 +46,7 @@ namespace Crulanda.Encounter
             if (t == null && d.kind == "gear")
             {
                 looks = looks ?? GearLooks.Load();
-                if (looks != null) { var l = looks.Resolve(d); t = Load("Icons/gear/" + l.family.Replace('.', '-') + "__" + l.palette); }
+                if (looks != null) { var l = looks.Resolve(d); t = l.family.StartsWith("model.") ? Load("Icons/model/" + l.variant) : Load("Icons/gear/" + l.family.Replace('.', '-') + "__" + l.palette); }   // a model's own (Editor/ModelIcons)
                 if (t == null) t = Slot(d.slot);
             }
             if (t == null) t = Load("Icons/kind/" + KindKey(d));

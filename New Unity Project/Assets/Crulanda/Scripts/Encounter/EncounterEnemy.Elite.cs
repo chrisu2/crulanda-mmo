@@ -18,9 +18,11 @@ namespace Crulanda.Encounter
         public float NextBlowIn { get { return Move == null ? float.MaxValue : Mathf.Max(0, nextBlowAt - Time.time); } }
         /// <summary>Seconds between its swings: the content's interval, shorter once it is enraged.</summary>
         public float SwingInterval { get { return session.content.enemySwingInterval * (Enraged && Move != null ? Move.enrageHaste : 1); } }
-        /// <summary>What its swing is multiplied by and what the party's blows on it are multiplied by, when it outlevels the player.</summary>
-        float OverHitNow { get { return Move != null && session.Player != null ? OvermatchHit(actor.Level, session.Player.Level) : 1; } }
-        float OverTakenNow { get { return Move != null && session.Player != null ? OvermatchTaken(actor.Level, session.Player.Level) : 1; } }
+        /// <summary>What its swing is multiplied by and what the party's blows on it are multiplied by, when it outlevels the player.
+        /// Every mob counts it now, a normal one more steeply (Chris, 2026-10-05: a level 10 at level 7 "was way too easy...should
+        /// kill me"); an elite as before (EliteBalance's paper fights).</summary>
+        float OverHitNow { get { return session.Player == null ? 1 : Move != null ? OvermatchHit(actor.Level, session.Player.Level) : OvermatchHitNormal(actor.Level, session.Player.Level); } }
+        float OverTakenNow { get { return session.Player == null ? 1 : Move != null ? OvermatchTaken(actor.Level, session.Player.Level) : OvermatchTakenNormal(actor.Level, session.Player.Level); } }
         float blowAt = -1, blowStart, nextBlowAt;
         bool rallied, leaning; Quaternion bodyRest; Vector3 calmScale;
         BlowMark mark;

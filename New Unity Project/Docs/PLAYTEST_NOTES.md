@@ -414,3 +414,35 @@ arms are fixed).
 Status 2026-10-04 15:50: 24 (tree joins), 25 (combat animations), 26 (see-through buildings), 28 (the horse) and 30 (sitting)
 FIXED and published; 23 (fps) IMPROVED (94 to 104 fps in Oakhaven at 1440x900; HUD and scripts still the largest costs, see
 CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have a up and down"), full screen by default.
+
+## 33-39 (2026-10-05, Chris playing round 20)
+- **33. Everyone walks backwards; the paper doll shows the back.** The Human Basic Motions clips were imported with Body
+  Orientation (CharacterImport keepOriginalOrientation = !ki), which turned them 180 degrees. FIXED: Original orientation.
+- **34. Animations too fast.** ModelFigure's directional rates: walk paced for 1.6 m/s, run 4.6, sprint 7, capped near 1.2. FIXED.
+- **35. Crown still not fitting** (a loose ring round the hair). Crowns and circlets sit 2.5 cm higher and are never widened
+  past their own size. FIXED.
+- **36. Paper doll too small.** Framed on the skeleton (feet to head) instead of the loose skinned bounds. FIXED.
+- **37. Horizon looks blank.** DistantRanges: two rings of far hills or mountains in the haze's colours. FIXED.
+- **38. Too many cattails** ("should be clumped together in random spots"). PlantField: reeds only where a slow noise is high. FIXED.
+- **39. Boulders (crags) still unnatural.** Upper masses upright, deep and wider, no crest knobs. FIXED (to look at again).
+- **40. The Ash-Walker enclave looks like a building but can't be entered.** Chris chose a real interior: a firelit hall cut
+  into the rock behind the middle arch (salt hearth, sleeping alcoves, Grohl and Vane inside). NEXT ROUND.
+- **41. Gathering above the skill should refuse, for every trade.** CanGather refuses: "Requires Mining 60." FIXED.
+- **42. A better shield off level 1-2 wolves than off the level 10 Brood Weave-Eater.** The tables look right on paper
+  (generated level-10 elite shields ~35 armour, the brood's signature Brood-glass Ward 44; a level-2 wolf shield ~7): asked
+  Chris for the two shields' names to trace it.
+- **43. A level 10 Brood Weave-Eater was too easy at level 7; "should be red and kill me".** Con: three levels up is red now
+  (LevelCon). Every mob above the player hits 25% harder and takes 10% less per level (five at most;
+  EncounterEnemy.OvermatchHitNormal); elites keep their own rates.
+- **Next big phase (Chris, 2026-10-05): sound.** Environmental sound, combat sound effects (slash, pierce and blunt all
+  different), spell casting, mob sounds, etc.; music later.
+- **44. Legendaries under 0.5%; the legendary staff is the "Staff of Pain" asset.** 0.4% each; The Toll Unpaid wears Sergi
+  Nicols' Staff Of Pain (imported with the weapon packs). DONE (round 21).
+- **45. Mocap idles for anyone standing; walking by default, run toggled.** Morro Motion's Idle MoCap (stances, looking about,
+  a cough; the cold idles on the Peaks) when figures stand; walking by default (1.9 m/s), "/" toggles running; villagers and
+  children walk; Mira keeps your pace. DONE (round 21).
+- **46. Menu button** in place of the row of HUD buttons. DONE (round 21).
+- **Asset queue (Chris, 2026-10-05), for the next art rounds:** Stylized Nature MegaKit (outdoor areas), Medieval Village
+  MegaKit (housing), Fantasy Props MegaKit, Stylized Megapack 2in1 (all in Downloads), the Asset Store's Medieval props and HQ
+  Rock Pack (boulders and crags), the Ashen Marches sentinel helm (a model helm needs the armour path), and the Ash-Walker
+  enclave's interior (note 40). Then the sound phase.

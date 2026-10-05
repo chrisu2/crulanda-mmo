@@ -2139,6 +2139,28 @@
       "variant": 1
     },
     {
+      "kind": "chest",
+      "name": "Chest at Greyheart",
+      "at": {
+        "x": 104.31,
+        "y": 177.67
+      },
+      "rotation": 225,
+      "interact": "Open the chest",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "kind": "chest",
+      "name": "Chest at Old Ninebranch",
+      "at": {
+        "x": -151.15,
+        "y": 103.85
+      },
+      "rotation": 225,
+      "interact": "Open the chest",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
       "kind": "board",
       "name": "Notice board",
       "at": {

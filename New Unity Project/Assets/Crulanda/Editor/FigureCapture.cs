@@ -56,6 +56,10 @@ namespace Crulanda.EditorTools
             Spec K(string clip, float t, bool woman = false) { var x = woman ? V("baker", "Ama Rusk", 13) : P(ActorLook.Warrior, 0, null, clip + " " + t); x.act = "ki:" + (woman ? "F:" : "M:") + clip; x.time = t; return x; }
             Row("motions-ki", new[] { K("Walk01_Forward", .3f), K("Walk01_Backward", .3f), K("Walk01_Left", .3f), K("Walk01_Right", .3f), K("Run01_Forward", .2f), K("Sprint01_Forward", .2f),
                 K("Idle02", 1.5f), K("Walk01_Forward", .3f, true), K("Run01_Forward", .2f, true) }, 90);
+            // Model weapons (2026-10-05): uncommon, rare and epic blades, hatchets, cudgels and shields from the Asset Store packs.
+            Row("weapons-models", new[] { P(ActorLook.Warrior, 0, null, "Uncommon", Hands(db, 3, 2, "Blade", "Shield"), db, looks), P(ActorLook.Warrior, 1, null, "Rare", Hands(db, 6, 3, "Blade", "Buckler"), db, looks),
+                P(ActorLook.Warrior, 2, null, "Epic", Hands(db, 9, 4, "Blade", "Shield"), db, looks), P(ActorLook.Warrior, 0, null, "Rare hatchet", Hands(db, 5, 3, "Hatchet", "Shield"), db, looks),
+                P(ActorLook.Warrior, 1, null, "Epic cudgel", Hands(db, 10, 4, "Cudgel", "Buckler"), db, looks), P(ActorLook.Druid, 0, null, "Epic blade", Hands(db, 12, 4, "Blade", null), db, looks) }, 0);
             Row("fight", new[] { A("swing", .15f), A("swing", .35f), A("swing", .55f), A("jab", .2f, new string[0]), A("hit", .2f), A("castloop", .5f, new string[0]), A("castshot", .25f, new string[0]) }, 90);
             // Named head pieces on the players, close (playtest note 31: "tin crown is also way too big", "orbits my head").
             var named = ItemDatabase.Parse(new System.Collections.Generic.List<string> { System.IO.File.ReadAllText("Assets/Crulanda/EncounterContent/Items/items.json") });
@@ -110,6 +114,21 @@ namespace Crulanda.EditorTools
             RenderTexture.active = null; cam.targetTexture = null; Object.DestroyImmediate(rt); Object.DestroyImmediate(tex);
         }
         /// <summary>A generated kit: for each slot in order (head ... off hand), the first item whose piece word is the one given.</summary>
+        /// <summary>A generated main-hand piece (and off-hand, or null) of these piece words, level and quality.</summary>
+        static string[] Hands(ItemDatabase db, int level, int quality, string main, string off)
+        {
+            var ids = new List<string>();
+            foreach (var (slot, piece) in new[] { ("mainhand", main), ("offhand", off) })
+            {
+                if (piece == null) continue;
+                for (int seed = 0; seed < 5000; seed++)
+                {
+                    string id = ItemDatabase.GearId(slot, level, quality, seed);
+                    if (GearLooks.TrySplitGenerated(db.Get(id), out _, out var p, out _, out _) && p == piece) { ids.Add(id); break; }
+                }
+            }
+            return ids.ToArray();
+        }
         static string[] Kit(ItemDatabase db, int level, int quality, params string[] pieces)
         {
             var ids = new List<string>();

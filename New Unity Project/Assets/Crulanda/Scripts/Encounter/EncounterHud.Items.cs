@@ -60,14 +60,14 @@ namespace Crulanda.Encounter
         void ItemSquare(Rect r, ItemStack s, string emptyLabel = null)
         {
             var d = s == null || s.Empty ? null : session.Items?.Get(s.item);
-            Fill(new Rect(r.x - 2, r.y - 2, r.width + 4, r.height + 4), d == null ? new Color(.25f, .22f, .18f) : ItemDatabase.QualityColors[Mathf.Clamp(d.quality, 0, 4)] * .9f);
+            Fill(new Rect(r.x - 2, r.y - 2, r.width + 4, r.height + 4), d == null ? new Color(.25f, .22f, .18f) : ItemDatabase.QualityColors[Mathf.Clamp(d.quality, 0, ItemDatabase.MaxQuality)] * .9f);
             Fill(r, new Color(.09f, .1f, .11f)); Fill(new Rect(r.x, r.y, r.width, r.height / 2), new Color(1, 1, 1, .04f));
             if (d != null)
             {
                 // Its painted icon (playtest note 11, Resources/Icons via IconDb); the letters only for anything without one.
                 var icon = IconDb.Item(d);
                 if (icon != null) GUI.DrawTexture(new Rect(r.x + 1, r.y + 1, r.width - 2, r.height - 2), icon, ScaleMode.ScaleToFit);
-                else Shadow(r, Glyph(d), glyph, ItemDatabase.QualityColors[Mathf.Clamp(d.quality, 0, 4)]);
+                else Shadow(r, Glyph(d), glyph, ItemDatabase.QualityColors[Mathf.Clamp(d.quality, 0, ItemDatabase.MaxQuality)]);
                 SquareMarks(r, d);
                 if (s.count > 1) Shadow(new Rect(r.x, r.y, r.width - 3, r.height - 1), s.count.ToString(), countStyle, Color.white);
             }
@@ -78,7 +78,7 @@ namespace Crulanda.Encounter
         {
             if (d == null) return;
             var lines = new List<string>();
-            if (d.kind == "gear") lines.Add(ItemDatabase.SlotNames[ItemDatabase.SlotIndex(d.slot)] + "  ·  " + ItemDatabase.QualityNames[Mathf.Clamp(d.quality, 0, 4)]);
+            if (d.kind == "gear") lines.Add(ItemDatabase.SlotNames[ItemDatabase.SlotIndex(d.slot)] + "  ·  " + ItemDatabase.QualityNames[Mathf.Clamp(d.quality, 0, ItemDatabase.MaxQuality)]);
             else lines.Add(d.kind == "junk" ? "Junk" : Inventory.IsHide(d) ? "Hide" : d.kind == "material" ? "Crafting material" : d.kind == "tool" ? "Tool" : d.kind == "bag" ? "Trade bag" : d.food ? "Food" : "Potion");
             var stats = ItemDatabase.StatLines(d); if (stats.Length > 0) lines.Add(stats);
             if (d.kind == "bag")
@@ -97,7 +97,7 @@ namespace Crulanda.Encounter
                 var w = worn.Empty ? null : session.Items.Get(worn.item);
                 lines.Add(CompareLines(d, w));
             }
-            tooltip = "<b><color=#" + ColorUtility.ToHtmlStringRGB(ItemDatabase.QualityColors[Mathf.Clamp(d.quality, 0, 4)]) + ">" + d.name + "</color></b>\n" + string.Join("\n", lines);
+            tooltip = "<b><color=#" + ColorUtility.ToHtmlStringRGB(ItemDatabase.QualityColors[Mathf.Clamp(d.quality, 0, ItemDatabase.MaxQuality)]) + ">" + d.name + "</color></b>\n" + string.Join("\n", lines);
             tooltipAt = Event.current.mousePosition;
         }
         /// <summary>"a" or "an" before a word (by its first letter).</summary>
@@ -274,7 +274,7 @@ namespace Crulanda.Encounter
                 int price = Inventory.Price(d); bool afford = p.gold >= price;
                 // Names in ink on the parchment: common in the window's own brown, junk in a faded one, better pieces in their colour
                 // darkened (the colour times .6 took the alpha down too, so common names were faint grey).
-                var qc = ItemDatabase.QualityColors[Mathf.Clamp(d.quality, 0, 4)];
+                var qc = ItemDatabase.QualityColors[Mathf.Clamp(d.quality, 0, ItemDatabase.MaxQuality)];
                 GUI.contentColor = d.quality <= 0 ? new Color(.42f, .39f, .34f) : d.quality == 1 ? new Color(.2f, .13f, .07f) : new Color(qc.r * .6f, qc.g * .6f, qc.b * .6f, 1); GUI.Label(new Rect(r.xMax + 10, r.y + 2, 200, 22), d.name, frameName);
                 GUI.contentColor = afford ? new Color(.35f, .25f, .08f) : new Color(.7f, .15f, .1f); GUI.Label(new Rect(r.xMax + 10, r.y + 26, 160, 22), price + " crowns" + (d.level > p.Level ? "  ·  level " + d.level : ""), tiny);
                 GUI.contentColor = Color.white;

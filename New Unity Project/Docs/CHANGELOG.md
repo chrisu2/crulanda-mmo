@@ -1168,3 +1168,12 @@ A read-only review by five reviewers, each finding checked by a second who tried
   Out of the Wall (Grohl), The Reach-Stones (Mother Vane, at night), Cinder-Jaw (Oska), The Silent Statue (Grohl, then Vane:
   the statue and the Wasting's edge).
 - Tests: EditMode 399/399, PlayMode 175/175; the Ash Rim toured (235 fps); no errors in any game log; release build.
+
+## 2026-10-04 — The Verdant Shore filled out: four camps and five quests; the zone-by-zone pass done (published 22:40)
+- **Camps:** Fern Hollow briars, Ridge crawlers (basalt spiders on the Ridge of Long Shadows' shoulder above Mossveil Falls),
+  Void-Touchers below the ridge (CANON: the violet fog brings them, book3 ch.2-4; shown early, PROVISIONAL), Old Brine-Tusk.
+- **Quests:** Brine-Tusk (Reed-Song), Lanterns on the Ridge (Moss-Lantern: clear the shoulder, look west over the Verdant
+  Ocean), The Violet Fog (Ondine Varro, at night), Briars in the Fern Hollow (Oak-Bane), What the Glade Keeps (Sister Iselle
+  writes it; the Whispering Glade at night, then Willow-Whisper).
+- The zone-by-zone camps and quests (Khaven, the Peaks, the Ash Rim, the Verdant Shore) are done: 16 camps and 20 quests added.
+- Tests: EditMode 399/399, PlayMode 175/175; the Verdant Shore toured (204 fps); no errors in any game log; release build.

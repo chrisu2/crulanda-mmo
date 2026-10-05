@@ -792,6 +792,265 @@
           "doc.verdant.root_mother"
         ]
       }
+    },
+    {
+      "id": "npc.reedsong.tusker",
+      "title": "Brine-Tusk",
+      "kind": "npc",
+      "giver": "Reed-Song",
+      "turnIn": "Reed-Song",
+      "zone": "zone.verdant",
+      "level": 11,
+      "requires": [
+        "npc.reedsong.boars"
+      ],
+      "canonStatus": "GAME-ONLY",
+      "summary": "An old boar that came up off the salt shore is tearing the south-west wood apart. Reed-Song wants it dead.",
+      "offer": "Reed-Song sits so still on the bank that the reeds have stopped minding her. \"The reed-boars were young and stupid. This one is old and isn't.\" She points south-west with her chin. \"It came up off the salt shore with brine dried white on its tusks. It roots the giants' roots. A tree feels that, you know. Go and stop it.\"",
+      "complete": "\"Gone?\" Reed-Song listens to something you can't hear. \"Yes. The wood's stopped flinching.\" She goes back to watching the water. \"Thank you. Mind the salt on your boots; the mere doesn't like it.\"",
+      "steps": [
+        {
+          "text": "Kill Old Brine-Tusk in the south-west wood.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.verdant",
+              "target": "mob.mossboar.verdant.18.*",
+              "text": "Old Brine-Tusk",
+              "say": "The old boar goes down among the roots, and the salt on its tusks crumbles away like frost."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 560,
+        "gold": 130,
+        "reputation": [
+          {
+            "faction": "keepers",
+            "amount": 250
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.mosslantern.ridge",
+      "title": "Lanterns on the Ridge",
+      "kind": "npc",
+      "giver": "Moss-Lantern",
+      "turnIn": "Moss-Lantern",
+      "zone": "zone.verdant",
+      "level": 12,
+      "requires": [
+        "npc.mosslantern.silk"
+      ],
+      "canonStatus": "CANON place (the Ridge of Long Shadows); GAME-ONLY quest",
+      "summary": "Moss-Lantern's lantern-post on the ridge road has gone dark. Spiders have come up on the basalt shoulder above Mossveil Falls.",
+      "offer": "Moss-Lantern turns a lantern in her bark fingers; the moss inside it glows and dims, glows and dims. \"I keep a lantern on the ridge road, for the ones who come over the mountains in the dark. It's out. Spiders, on the black stone above the falls: they don't like the light, so they put it out.\" She sets the lantern down. \"Clear the shoulder. Then stand on the ridge and look west, so you know why the light matters.\"",
+      "complete": "\"You saw it.\" Moss-Lantern doesn't ask; she can see it on you. \"All of it, green to the edge of the world, and one small light at the top of the road so they know where to come down.\" She hands you a lantern of your own. \"Keep it lit.\"",
+      "steps": [
+        {
+          "text": "Clear the spiders from the ridge's shoulder above Mossveil Falls.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.verdant",
+              "target": "mob.spider.verdant.16.*",
+              "count": 5,
+              "text": "Ridge crawlers"
+            }
+          ]
+        },
+        {
+          "text": "Stand on the Ridge of Long Shadows and look west.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.verdant",
+              "at": {
+                "x": 156,
+                "y": 22
+              },
+              "radius": 10,
+              "text": "Look west from the ridge",
+              "say": "Below you the Verdant Ocean goes on to the edge of seeing: a thousand greens moving like a tide. Somewhere in it, a lantern's worth of light is all a traveller has to steer by."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 600,
+        "gold": 140,
+        "reputation": [
+          {
+            "faction": "keepers",
+            "amount": 250
+          }
+        ]
+      }
+    },
+    {
+      "id": "side.ondine.fog",
+      "title": "The Violet Fog",
+      "kind": "side",
+      "giver": "Ondine Varro",
+      "turnIn": "Ondine Varro",
+      "zone": "zone.verdant",
+      "level": 13,
+      "canonStatus": "CANON (the violet fog and the Void-Touchers, book3 ch.2-4), shown early: PROVISIONAL",
+      "summary": "Ondine Varro saw a violet fog below the ridge's south shoulder, and things walking in it. She wants to know what they are, and wants them gone.",
+      "offer": "Ondine Varro has a glass-ship scout's way of looking past you at the horizon. \"Below the ridge, on the south shoulder, there's a fog that isn't fog. Violet. It tastes of the air before lightning.\" She touches her tongue as if remembering. \"Things walk in it. Thin things, that reach. Go at night, when it's thickest, and see them. Then I'd be glad if they stopped walking.\"",
+      "complete": "\"Void-Touchers.\" Ondine writes it down in a small hand, then looks at what she has written for a long time. \"My grandmother's stories had that word in them. I thought it was a word for children.\" She closes the book. \"Thank you. I'm going to tell the ship to wait a season.\"",
+      "steps": [
+        {
+          "text": "Go below the ridge's south shoulder after dark.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.verdant",
+              "at": {
+                "x": 166,
+                "y": -36
+              },
+              "radius": 14,
+              "night": true,
+              "text": "Stand in the violet fog at night",
+              "say": "The fog is violet and lit from inside. The air tastes of ozone. Shapes walk in it, too thin and too tall, and where one reaches out the moss on the stone goes grey."
+            }
+          ]
+        },
+        {
+          "text": "Put down the Void-Touchers.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.verdant",
+              "target": "mob.mistwalker.verdant.17.*",
+              "count": 4,
+              "text": "Void-Touchers"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 680,
+        "gold": 160,
+        "reputation": [
+          {
+            "faction": "keepers",
+            "amount": 250
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.oakbane.ferns",
+      "title": "Briars in the Fern Hollow",
+      "kind": "npc",
+      "giver": "Oak-Bane",
+      "turnIn": "Oak-Bane",
+      "zone": "zone.verdant",
+      "level": 11,
+      "canonStatus": "CANON Keeper (Oak-Bane); GAME-ONLY quest",
+      "summary": "Creeping briars have got into the Fern Hollow south of Rootfast. Oak-Bane wants them torn out before they reach the giants.",
+      "offer": "Oak-Bane's voice is like a branch settling under snow. \"The briars that came up the Briar Way have sent runners south. Into the Fern Hollow, where the new ferns glow.\" He opens a hand like a root unclenching. \"They choke what they climb. Go and look at the hollow, and pull them out. Five.\"",
+      "complete": "\"Five.\" Oak-Bane is quiet the way a tree is quiet. \"The ferns will glow again by the turn of the moon. They always do, if you give them the chance.\"",
+      "steps": [
+        {
+          "text": "Look at the Fern Hollow, south of Rootfast.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.verdant",
+              "at": {
+                "x": 34,
+                "y": -74
+              },
+              "radius": 12,
+              "text": "Look at the Fern Hollow",
+              "say": "Ferns the green of new emerald, glowing faintly at their curled tips, and running through them, grey and patient, the briars."
+            }
+          ]
+        },
+        {
+          "text": "Tear out the briars in the Fern Hollow.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.verdant",
+              "target": "mob.bramble.verdant.15.*",
+              "count": 5,
+              "text": "Fern Hollow briars"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 540,
+        "gold": 125,
+        "reputation": [
+          {
+            "faction": "keepers",
+            "amount": 250
+          }
+        ]
+      }
+    },
+    {
+      "id": "side.iselle.glade",
+      "title": "What the Glade Keeps",
+      "kind": "side",
+      "giver": "Sister Iselle",
+      "turnIn": "Willow-Whisper",
+      "zone": "zone.verdant",
+      "level": 12,
+      "requires": [
+        "side.iselle.notes"
+      ],
+      "canonStatus": "CANON places (the Whispering Glade and its mossy outcrop, book3 ch.5) and order (the Silent Pilgrims); GAME-ONLY quest",
+      "summary": "Sister Iselle asks you to keep the night in the Whispering Glade and carry what you hear to Willow-Whisper.",
+      "offer": "Sister Iselle does not speak; her order doesn't. She writes on a leaf with a charcoal stick and hands it to you. The Glade speaks after dark. I may not answer it. You may. Listen, and tell the Keeper what it says.",
+      "complete": "Willow-Whisper hears you out with her eyes closed and her branches very still. \"It said that? Then it remembers the Root-Mother before she was sad.\" She opens her eyes. \"Tell the Sister nothing. She will already know. Thank you for carrying it.\"",
+      "steps": [
+        {
+          "text": "Keep the night in the Whispering Glade.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.verdant",
+              "at": {
+                "x": 40,
+                "y": 108
+              },
+              "radius": 14,
+              "night": true,
+              "text": "Listen in the Whispering Glade at night",
+              "say": "The leaves overhead move without wind, and the sound they make is very nearly words: a woman's voice, patient and fond, telling the wood to grow."
+            }
+          ]
+        },
+        {
+          "text": "Tell Willow-Whisper what the Glade said.",
+          "objectives": [
+            {
+              "type": "talk",
+              "zone": "zone.verdant",
+              "target": "Willow-Whisper",
+              "text": "Tell Willow-Whisper"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 560,
+        "gold": 120,
+        "reputation": [
+          {
+            "faction": "keepers",
+            "amount": 250
+          }
+        ]
+      }
     }
   ]
 }

@@ -1007,4 +1007,13 @@ resumed with `Workflow({scriptPath, resumeFromRunId})` (finished agents replay f
   Old Cinder-Jaw (-186,-40) hound x1 L10, look wolf), the "Overturned salt cart" prop, the canonNote; Quests/ashrim.json +5
   (npc.brine.raiders, npc.grohl.mouth, side.ashrim.stones (night visit), npc.oska.jaw, side.ashrim.statue). Learned: a hound
   camp's look is "wolf" (SocialAggro packs by look); a beast camp's levels must sit in its loot table's band (ItemTests).
+- **Round 19, the Verdant Shore's camps and quests (PUBLISHED 2026-10-04 22:40)**: verdant.json camps 15-18 (Fern Hollow briars
+  (44,-108) bramble x5 L11-12; Ridge crawlers (160,48) spider x5 L12; Void-Touchers below the ridge (172,-42) mistwalker x4 L13,
+  look hollow; Old Brine-Tusk (-160,-150) mossboar x1 L11, look boar), canonNote; Quests/verdant.json +5 (npc.reedsong.tusker,
+  npc.mosslantern.ridge, side.ondine.fog (night), npc.oakbane.ferns, side.iselle.glade (night, -> Willow-Whisper, "she")).
+- **Next asked by Chris (2026-10-04 22:30):** better models for the tree people (the Keepers are capsules with glowing stripes,
+  all alike). Chris is choosing a treant asset himself and will say; he asked whether Kevin Iglesias's "Human Basic Motions
+  FREE" (Unity Asset Store) can improve the figures' motion: yes, the figures are Humanoid (CharacterImport: animationType
+  Human), so its clips retarget; he is downloading it through the Package Manager (My Assets); unpack the .unitypackage from
+  %APPDATA%/Unity/Asset Store-5.x/ into the repo (a .unitypackage is a tar.gz of GUID folders: asset, asset.meta, pathname).
 

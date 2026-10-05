@@ -3,7 +3,7 @@
   "displayName": "The Verdant Shore",
   "subtitle": "The Verdant Ocean of the western coast, where the Veridian Keepers keep the Shore of the First Cycle",
   "canonStatus": "CANON-EXPANDED",
-  "canonNote": "Canon (book3 ch.1-7, world_bible.md): the Verdant Shore, the 'Verdant Ocean' of the Western Coast, a forest 'that didn't know when to stop': giant trees with trunks as wide as houses, broad flat leaves that sway like a green tide, a thousand greens from obsidian moss to emerald-glowing new ferns (ch.1); the Ridge of Long Shadows, the basalt divide the survivors crest to see it, with a harbour at its foot (ch.1, 3); the Veridian Keepers, beings of living wood and moss, and Oak-Bane and Willow-Whisper (ch.2, world_bible.md); the Veridian Temple, a stair of calcified roots down to the Root-Mother (ch.7); Ghost-Oaks tapped for Veridian sap 'the color of liquid emerald' (ch.4); the Whispering Glade and the mossy outcrop over it (ch.5); glass-frogs (ch.2); the Salt-Flats (ch.3); and the mists below the ridge, where an unnatural violet fog that tastes of ozone brings the Void-Touchers and the Pale Shadows (ch.2-4, 8). The game is set before the books' exodus: the survivors, Elara's First Seed (the Veridian Pine), the Salt-Wall and Salt-Mender's Landing are not here yet, and the Pale's touch is shown early, as foreshadowing (PROVISIONAL). The mountains between the Rim and the Shore are Book 3's ash-mountains (book2 ch.26: the Ashlands of the lower North were once the forested Verdant Spine); the road over them is GAME-ONLY. GAME-ONLY: Rootfast and every Keeper but Oak-Bane and Willow-Whisper, Mossveil Falls, the Wending, the Mistmere, the Fern Hollow, the Fallen Ghost-Oak, the Antler Meadow, the Greying, Palemist Hollow (canon's 'mists below the ridge'), the creatures and camps, and all placement. The Root-Mother's Deep under the Temple (its root-stair, Sap Well, the cold in the root and the Hollow Root-Warden) is GAME-ONLY.",
+  "canonNote": "Canon (book3 ch.1-7, world_bible.md): the Verdant Shore, the 'Verdant Ocean' of the Western Coast, a forest 'that didn't know when to stop': giant trees with trunks as wide as houses, broad flat leaves that sway like a green tide, a thousand greens from obsidian moss to emerald-glowing new ferns (ch.1); the Ridge of Long Shadows, the basalt divide the survivors crest to see it, with a harbour at its foot (ch.1, 3); the Veridian Keepers, beings of living wood and moss, and Oak-Bane and Willow-Whisper (ch.2, world_bible.md); the Veridian Temple, a stair of calcified roots down to the Root-Mother (ch.7); Ghost-Oaks tapped for Veridian sap 'the color of liquid emerald' (ch.4); the Whispering Glade and the mossy outcrop over it (ch.5); glass-frogs (ch.2); the Salt-Flats (ch.3); and the mists below the ridge, where an unnatural violet fog that tastes of ozone brings the Void-Touchers and the Pale Shadows (ch.2-4, 8). The game is set before the books' exodus: the survivors, Elara's First Seed (the Veridian Pine), the Salt-Wall and Salt-Mender's Landing are not here yet, and the Pale's touch is shown early, as foreshadowing (PROVISIONAL). The mountains between the Rim and the Shore are Book 3's ash-mountains (book2 ch.26: the Ashlands of the lower North were once the forested Verdant Spine); the road over them is GAME-ONLY. GAME-ONLY: Rootfast and every Keeper but Oak-Bane and Willow-Whisper, Mossveil Falls, the Wending, the Mistmere, the Fern Hollow, the Fallen Ghost-Oak, the Antler Meadow, the Greying, Palemist Hollow (canon's 'mists below the ridge'), the creatures and camps, and all placement. The Root-Mother's Deep under the Temple (its root-stair, Sap Well, the cold in the root and the Hollow Root-Warden) is GAME-ONLY. The filled-out shore (2026-10-04): creeping briars in the Fern Hollow, spiders on the basalt shoulder of the Ridge of Long Shadows (CANON place), the Void-Touchers the violet fog brings below the ridge (CANON, shown early: PROVISIONAL), Old Brine-Tusk in the south-west wood, and their quests; all placement GAME-ONLY.",
   "size": 430,
   "levelMin": 11,
   "levelMax": 13,
@@ -2809,6 +2809,70 @@
       "elite": true,
       "respawn": 900,
       "harder": true
+    },
+    {
+      "name": "Fern Hollow briars",
+      "mob": "Creeping briar",
+      "tag": "bramble",
+      "look": "bramble",
+      "canonStatus": "GAME-ONLY (creeping briars in the Fern Hollow)",
+      "center": {
+        "x": 44,
+        "y": -108
+      },
+      "radius": 9,
+      "count": 5,
+      "levelMin": 11,
+      "levelMax": 12,
+      "respawn": 75
+    },
+    {
+      "name": "Ridge crawlers",
+      "mob": "Basalt spider",
+      "tag": "spider",
+      "look": "spider",
+      "canonStatus": "CANON place (the Ridge of Long Shadows, book3 ch.1); GAME-ONLY creatures",
+      "center": {
+        "x": 160,
+        "y": 48
+      },
+      "radius": 9,
+      "count": 5,
+      "levelMin": 12,
+      "levelMax": 12,
+      "respawn": 75
+    },
+    {
+      "name": "Void-Touchers below the ridge",
+      "mob": "Void-Toucher",
+      "tag": "mistwalker",
+      "look": "hollow",
+      "canonStatus": "CANON (the violet fog below the ridge brings the Void-Touchers, book3 ch.2-4), shown early: PROVISIONAL",
+      "center": {
+        "x": 172,
+        "y": -42
+      },
+      "radius": 8,
+      "count": 4,
+      "levelMin": 13,
+      "levelMax": 13,
+      "respawn": 120
+    },
+    {
+      "name": "Old Brine-Tusk",
+      "mob": "Old Brine-Tusk",
+      "tag": "mossboar",
+      "look": "boar",
+      "canonStatus": "GAME-ONLY (an old boar of the south shore)",
+      "center": {
+        "x": -160,
+        "y": -150
+      },
+      "radius": 5,
+      "count": 1,
+      "levelMin": 11,
+      "levelMax": 11,
+      "respawn": 180
     }
   ],
   "life": {

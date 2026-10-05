@@ -29,7 +29,7 @@ namespace Crulanda.Tests
             { "deserter", SocialKind.Call }, { "banditking", SocialKind.Call }, { "quartermaster", SocialKind.Call }, { "outrider", SocialKind.Call }, { "tollguard", SocialKind.Call },
             { "captain", SocialKind.Call }, { "cultist", SocialKind.Call }, { "deacon", SocialKind.Call }, { "hollow", SocialKind.Call }, { "sexton", SocialKind.Call }, { "pale", SocialKind.Call },
             { "paleshadow", SocialKind.Call }, { "mistwalker", SocialKind.Call }, { "deepwalker", SocialKind.Call }, { "withered", SocialKind.Call }, { "deepwithered", SocialKind.Call },
-            { "greyheart", SocialKind.Call }, { "rootwarden", SocialKind.Call }
+            { "greyheart", SocialKind.Call }, { "rootwarden", SocialKind.Call }, { "bear", SocialKind.Solitary }, { "drowned", SocialKind.Call }
         };
 
         [Test] public void Every_camp_in_the_five_zones_has_a_sensible_kind()

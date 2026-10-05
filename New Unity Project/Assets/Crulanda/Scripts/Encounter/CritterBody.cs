@@ -170,6 +170,7 @@ namespace Crulanda.Encounter
                     break;
                 case "crow":
                     Speed = .5f; FleeSpeed = 7; FleeRadius = 7; torso = .18f; flank = .08f;
+                    if (MakeModel("Raven", .36f, .5f, 7)) { model.TipsOver = true; break; }   // the carrion raven (Ashen Marches): it hops, and flies on its own wingbeat
                     var black = new Color(.07f, .07f, .09f);
                     Part(PrimitiveType.Sphere, body, new Vector3(0, .18f, 0), new Vector3(.16f, .15f, .3f), black);
                     Head = Part(PrimitiveType.Sphere, body, new Vector3(0, .29f, .13f), Vector3.one * .11f, black);
@@ -363,6 +364,7 @@ namespace Crulanda.Encounter
         /// <summary>Wings out and beating at <paramref name="flap"/> degrees (a crow in flight; others have no wings).</summary>
         public void Flap(float flap)
         {
+            if (model != null) { WingsSpread = true; model.Drive(model.RunPace, "idle"); return; }   // the raven's wingbeat
             if (wingL == null) return;
             WingsSpread = true; wingL.localEulerAngles = new Vector3(0, 0, flap); wingR.localEulerAngles = new Vector3(0, 0, -flap);
         }
@@ -373,6 +375,7 @@ namespace Crulanda.Encounter
         /// </summary>
         public void FoldWings()
         {
+            if (model != null) { WingsSpread = false; return; }
             if (wingL == null) return; WingsSpread = false;
             foreach (int s in new[] { -1, 1 })
                 (s < 0 ? wingL : wingR).localRotation = Quaternion.AngleAxis(s * 80, Vector3.up) * Quaternion.AngleAxis(s * 8, Vector3.forward) * Quaternion.AngleAxis(-100, Vector3.right);

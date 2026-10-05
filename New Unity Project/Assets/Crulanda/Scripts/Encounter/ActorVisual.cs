@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Crulanda.Encounter
 {
-    public enum ActorLook { Warrior, Druid, Healer, Collector, Warden, Sentry, Outrider, Pale, Villager, Hollow, Cultist, Wolf, Boar, WeaveEater, Deserter, BanditKing, Keeper, Stag, Spider, Bramble }
+    public enum ActorLook { Warrior, Druid, Healer, Collector, Warden, Sentry, Outrider, Pale, Villager, Hollow, Cultist, Wolf, Boar, WeaveEater, Deserter, BanditKing, Keeper, Stag, Spider, Bramble, Bear, Skeleton }
     /// <summary>Body language layered over walking: working a hoe or bucket, talking, sitting, cowering.</summary>
     public enum ActorPose { None, Work, Talk, Sit, Cower, Hammer, Chop, Gather, Knead, Swim, Sneak, Drink, Slump }
 
@@ -110,7 +110,7 @@ namespace Crulanda.Encounter
             }
         }
         /// <summary>Not humanoid: no clothes or kit, and a little lighter in health (EncounterEnemy.MobHealth). Weave-Eaters count, though they are no animal.</summary>
-        public static bool IsBeast(ActorLook look) { return look == ActorLook.Wolf || look == ActorLook.Boar || look == ActorLook.WeaveEater || look == ActorLook.Stag || look == ActorLook.Spider || look == ActorLook.Bramble; }
+        public static bool IsBeast(ActorLook look) { return look == ActorLook.Wolf || look == ActorLook.Boar || look == ActorLook.WeaveEater || look == ActorLook.Stag || look == ActorLook.Spider || look == ActorLook.Bramble || look == ActorLook.Bear; }
 
         /// <summary>
         /// Four-legged creatures. The front legs use the arm pivots and the hind legs the leg pivots, so the walk cycle
@@ -406,12 +406,13 @@ namespace Crulanda.Encounter
             var capsule = body.GetComponent<MeshRenderer>(); if (capsule != null) capsule.enabled = false;
             if (look == ActorLook.WeaveEater) { BuildEater(); lastPosition = transform.position; return; }
             if (look == ActorLook.Pale) { BuildPale(); lastPosition = transform.position; return; }
-            if ((look == ActorLook.Wolf || look == ActorLook.Stag || look == ActorLook.Boar) && BuildModelBeast(look)) { lastPosition = transform.position; return; }   // ActorVisual.Beasts.cs
+            if ((look == ActorLook.Wolf || look == ActorLook.Stag || look == ActorLook.Boar || look == ActorLook.Bear || look == ActorLook.Spider) && BuildModelBeast(look)) { lastPosition = transform.position; return; }   // ActorVisual.Beasts.cs
             if (look == ActorLook.Stag) { BuildStag(); lastPosition = transform.position; return; }
             if (look == ActorLook.Spider) { BuildSpider(); lastPosition = transform.position; return; }
             if (look == ActorLook.Bramble) { BuildBramble(); lastPosition = transform.position; return; }
-            if (look == ActorLook.Keeper) { BuildKeeper(); lastPosition = transform.position; return; }
+            if (look == ActorLook.Keeper) { if (!BuildModelBeast(look) && capsule != null) capsule.enabled = true; lastPosition = transform.position; return; }   // a treant (ActorVisual.Beasts.cs)
             if (IsBeast(look)) { BuildBeast(look); lastPosition = transform.position; return; }
+            if (look == ActorLook.Skeleton) { if (BuildModelBeast(look)) { lastPosition = transform.position; return; } look = ActorLook.Hollow; }   // the risen dead (ActorVisual.Beasts.cs); a Hollow Man without the model
             Material skin = Mat(new Color(.76f, .6f, .48f));
             Color clothC, accentC, legC;
             switch (look)

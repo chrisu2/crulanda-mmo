@@ -1177,3 +1177,29 @@ A read-only review by five reviewers, each finding checked by a second who tried
   writes it; the Whispering Glade at night, then Willow-Whisper).
 - The zone-by-zone camps and quests (Khaven, the Peaks, the Ash Rim, the Verdant Shore) are done: 16 camps and 20 quests added.
 - Tests: EditMode 399/399, PlayMode 175/175; the Verdant Shore toured (204 fps); no errors in any game log; release build.
+
+## 2026-10-04 — Treant Keepers, better motion, classic MMO controls, bears, the drowned dead, model spiders and crows (committed 23:30, NOT yet published)
+- **Motion (Chris: "could we use this for better motion?"):** Kevin Iglesias's Human Basic Motions FREE (Asset Store EULA;
+  Resources/Characters/Animations/KI, 64 in-place clips, tools/wip/characters/ki_import.py). The figures stand in two idles,
+  talk with their own talk clip, and walk, run and sprint in eight directions: the walk cycle blends the two directions nearest
+  the way a figure moves against the way it faces, so strafing and backing up no longer slide. UI capture shots 39-40.
+- **Classic MMO controls (Chris's pick):** on foot you face where the camera looks and move any way from there (strafe, back
+  up at a little over half speed); swimming still turns you into the stroke.
+- **Treant Keepers (Chris: "we need some better models for the tree people"; he picked Tennessippi Studios' Treant Pack, CC0):**
+  every Veridian Keeper is a treant (two builds, 2.7-3 m, Greyheart and the Root-Warden 3.75 m), with its idle, a heavy walk,
+  three attacks taken in turn and three deaths. Coloured by kind (Chris: "color them differently based on their type";
+  tools/wip/treants/skins.py): living Keepers warm dark bark with a faint green sap-light in the moss; the Greying's withered
+  ash grey; Greyheart bleached to bone with a cold pale light; the withered down in the Root-Mother's Deep blackened with
+  violet in the moss; the Hollow Root-Warden rotted black, burning violet. The old block Keeper is gone (Chris: "we dont need
+  this guy any longer").
+- **Bears (Blink's FREE Stylized Bear, Asset Store; Chris: Oakhaven woods + Peaks):** brown bears in the hill hazels under
+  Crowsfoot Ridge (L2) with Old Hazelmaw (L3, bigger and grizzled), and grey mountain bears in the Peaks' high pines (L7-8).
+  Solitary, skinnable; they drop a bear pelt, claws and a haunch. Quests: Bears in the Hazels (Garet Moss) and Bears in the
+  High Pines (Yara Quell). All GAME-ONLY.
+- **The drowned dead (ChillLands' Ashen Marches Free, its ossuary knight; Chris: Khaven graveyard dead):** the old bones the
+  creek gave back, by the drowned chapel wall (L5, four). They crumble into a heap of bones when they die (Chris: "maybe
+  crumble into a pile of bones?"). Quest: The Old Bones (Ansel Morrow, after The Ones Who Came Back). GAME-ONLY.
+- **Spiders and crows (Ashen Marches):** every spider is the crypt spider, coloured by where it lives (Khaven's charnel spiders
+  bone and ash, the ridge's basalt spiders black, the canopy spiders moss green); the village crows are carrion ravens that hop
+  and fly on their own wingbeat; a dead crow keels over onto its side.
+- Tests: first pass EditMode 396/399 (missing icons, the skeletons' call, the bears near homes): all three fixed, not yet re-run. PlayMode, build and tours of Oakhaven, Khaven, the Peaks and the Verdant Shore were still running at commit.

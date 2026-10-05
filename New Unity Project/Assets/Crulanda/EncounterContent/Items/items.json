@@ -648,6 +648,59 @@
       "canonStatus": "GAME-ONLY"
     },
     {
+      "id": "hide.bear",
+      "name": "Bear pelt",
+      "kind": "material",
+      "quality": 1,
+      "value": 5,
+      "stack": 10,
+      "trade": "tannery.hides",
+      "description": "Heavy as a wet blanket and twice as warm. A tanner will be glad of it.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "junk.bear_claw",
+      "name": "Bear claw",
+      "kind": "junk",
+      "quality": 0,
+      "value": 3,
+      "stack": 10,
+      "description": "Long as a finger and curved like a hook.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "mat.bear_haunch",
+      "name": "Bear haunch",
+      "kind": "material",
+      "quality": 1,
+      "value": 3,
+      "stack": 20,
+      "trade": "inn.meat",
+      "pouch": "larder",
+      "description": "Dark, rich and fatty. A cook's whole winter, if the cook is clever.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "junk.creek_bone",
+      "name": "Creek-stained bone",
+      "kind": "junk",
+      "quality": 0,
+      "value": 2,
+      "stack": 10,
+      "description": "Brown with the creek's mud. Somebody's, once.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "junk.grave_goods",
+      "name": "Grave goods",
+      "kind": "junk",
+      "quality": 0,
+      "value": 7,
+      "stack": 10,
+      "description": "A pewter ring, a horn button, a coin worn smooth: what the old dead were buried with. Ansel would want them back in the ground.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
       "id": "junk.spider_chitin",
       "name": "Canopy-spider chitin",
       "kind": "junk",
@@ -1644,6 +1697,27 @@
       ]
     },
     {
+      "tag": "bear",
+      "levelMin": 1,
+      "levelMax": 10,
+      "gearChance": 0.12,
+      "entries": [
+        {
+          "item": "hide.bear",
+          "chance": 0.75
+        },
+        {
+          "item": "junk.bear_claw",
+          "chance": 0.4,
+          "max": 2
+        },
+        {
+          "item": "mat.bear_haunch",
+          "chance": 0.45
+        }
+      ]
+    },
+    {
       "tag": "collector",
       "levelMin": 1,
       "levelMax": 10,
@@ -1879,6 +1953,22 @@
         {
           "item": "junk.petrified_shard",
           "chance": 0.5
+        }
+      ]
+    },
+    {
+      "tag": "drowned",
+      "levelMin": 1,
+      "levelMax": 10,
+      "gearChance": 0.1,
+      "entries": [
+        {
+          "item": "junk.creek_bone",
+          "chance": 0.7
+        },
+        {
+          "item": "junk.grave_goods",
+          "chance": 0.25
         }
       ]
     },

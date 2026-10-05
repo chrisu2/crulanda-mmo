@@ -714,6 +714,37 @@
         "xp": 230,
         "gold": 45
       }
+    },
+    {
+      "id": "npc.yara.bears",
+      "title": "Bears in the High Pines",
+      "kind": "npc",
+      "giver": "Yara Quell",
+      "turnIn": "Yara Quell",
+      "zone": "zone.peaks",
+      "level": 7,
+      "canonStatus": "GAME-ONLY",
+      "summary": "Mountain bears have come down into the high pines below the Cold Tarn, and they have taken two of the pilgrims' mules. Yara wants three of them dead.",
+      "offer": "Yara Quell is mending a mule's harness that something has bitten clean through. \"Bears. Grey ones, mountain bears, down in the high pines under the tarn.\" She holds up the harness. \"Two mules this week. They don't come below the snow in a good year, and this isn't one.\"\n\n\"Three of them. Keep your back to a tree, and don't run: they're quicker than you downhill.\"",
+      "complete": "\"Three.\" Yara turns a grey pelt over in her hands, thick as a blanket. \"That's a winter's warmth for somebody up here.\" She folds it. \"The mules will thank you. In their way.\"",
+      "steps": [
+        {
+          "text": "Kill the mountain bears in the high pines.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.peaks",
+              "target": "mob.bear.peaks.13.*",
+              "count": 3,
+              "text": "Mountain bears"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 250,
+        "gold": 52
+      }
     }
   ]
 }

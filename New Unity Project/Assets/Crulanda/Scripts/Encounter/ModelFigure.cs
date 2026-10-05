@@ -309,6 +309,20 @@ namespace Crulanda.Encounter
             ("sit", "Sitting_Idle_Loop"), ("sittalk", "Sitting_Talking_Loop"), ("swim", "Swim_Fwd_Loop"), ("swimidle", "Swim_Idle_Loop"),
             ("sneak", "Crouch_Fwd_Loop"), ("crouch", "Crouch_Idle_Loop"), ("talk", "Idle_Talking_Loop"), ("gather", "Fixing_Kneeling"),
             ("death", "Death01") };
+        /// <summary>
+        /// Kevin Iglesias's Human Basic Motions (Resources/Characters/Animations/KI, male and female): two idles, talk, fall, and walk
+        /// and run in eight directions, sprint in five. When a figure has them, its walk cycle blends the two directions nearest the
+        /// way it is moving against the way it faces (strafing, backing, the diagonals), so nothing slides or moonwalks.
+        /// </summary>
+        static readonly string[] Dirs = { "F", "FR", "R", "BR", "B", "BL", "L", "FL" };
+        static readonly string[] DirFiles = { "Forward", "ForwardRight", "Right", "BackwardRight", "Backward", "BackwardLeft", "Left", "ForwardLeft" };
+        static AnimationClip KiClip(bool female, string file)
+        {
+            foreach (var c in Resources.LoadAll<AnimationClip>("Characters/Animations/KI/" + (female ? "Female/HumanF@" : "Male/HumanM@") + file))
+                if (c != null && !c.name.StartsWith("__preview__")) return c;
+            return null;
+        }
+        bool ki;
         /// <summary>Starts the figure's graph (play mode only; in edit mode the figure keeps its bind pose).</summary>
         public void StartMotion(string label)
         {
@@ -317,12 +331,24 @@ namespace Crulanda.Encounter
             var output = AnimationPlayableOutput.Create(graph, "Figure", Animator);
             var found = new List<(string, AnimationClip)>();
             foreach (var (slot, clip) in Motions) { var c = Clip(clip); if (c != null) found.Add((slot, c)); }
+            // The Human Basic Motions for this figure's body, when they are in the game.
+            var kiClips = new List<(string, AnimationClip)>();
+            foreach (var (slot, file) in new[] { ("k.idle", "Idle01"), ("k.idle2", "Idle02"), ("k.talk", "Talk01"), ("k.fall", "Fall01") }) { var c = KiClip(spec.female, file); if (c != null) kiClips.Add((slot, c)); }
+            for (int d = 0; d < Dirs.Length; d++)
+            {
+                var w = KiClip(spec.female, "Walk01_" + DirFiles[d]); if (w != null) kiClips.Add(("w." + Dirs[d], w));
+                var r = KiClip(spec.female, "Run01_" + DirFiles[d]); if (r != null) kiClips.Add(("r." + Dirs[d], r));
+                var s = KiClip(spec.female, "Sprint01_" + DirFiles[d]); if (s != null) kiClips.Add(("s." + Dirs[d], s));
+            }
+            ki = kiClips.Exists(k => k.Item1 == "w.F") && kiClips.Exists(k => k.Item1 == "r.F") && kiClips.Exists(k => k.Item1 == "k.idle");
+            if (ki) found.AddRange(kiClips);
             mixer = AnimationMixerPlayable.Create(graph, found.Count); weights = new float[found.Count];
             for (int i = 0; i < found.Count; i++)
             {
                 var p = AnimationClipPlayable.Create(graph, found[i].Item2); p.SetApplyFootIK(true);
                 graph.Connect(p, 0, mixer, i); slots.Add((p, found[i].Item2, found[i].Item1 != "death" && found[i].Item1 != "gather")); slotOf[found[i].Item1] = i;
                 p.SetTime(Stagger(label, i) * found[i].Item2.length);   // no two figures step in time
+                idleBeat = Stagger(label, 99);
             }
             if (slotOf.TryGetValue("idle", out int idle)) { weights[idle] = 1; mixer.SetInputWeight(idle, 1); }
             // The upper body's layer over the mixer (playtest note 25): its clips, a mask from the spine up, weight 0 until a blow.
@@ -353,7 +379,11 @@ namespace Crulanda.Encounter
         }
         public void StopMotion() { if (graph.IsValid()) graph.Destroy(); }
         /// <summary>The clip a slot plays (null if the library lacks it).</summary>
-        public static AnimationClip SlotClip(string slot) { foreach (var (s, clip) in Motions) if (s == slot) return Clip(clip); foreach (var (s, clip) in Actions) if (s == slot) return Clip(clip); return null; }
+        public static AnimationClip SlotClip(string slot)
+        {
+            if (slot != null && slot.StartsWith("ki:")) return KiClip(slot.StartsWith("ki:F:"), slot.Substring(5));   // "ki:M:Walk01_Backward" (captures)
+            foreach (var (s, clip) in Motions) if (s == slot) return Clip(clip); foreach (var (s, clip) in Actions) if (s == slot) return Clip(clip); return null;
+        }
         /// <summary>Edit mode (captures, tests): poses the figure at <paramref name="time"/> seconds into a slot's clip, once
         /// (AnimationClip.SampleAnimation: a PlayableGraph does not pose an Animator outside play mode).</summary>
         public void Sample(string slot, float time)
@@ -379,15 +409,36 @@ namespace Crulanda.Encounter
         /// pose's slot (sit, swim, sneak, talk...) takes over when given. Weights ease over a quarter second, so nothing pops.
         /// A one-shot clip (a death, kneeling to work) starts from its beginning when its slot comes in and holds its last frame.
         /// </summary>
-        public void Drive(float speed, string pose, float dt)
+        public void Drive(float speed, string pose, float dt) { Drive(speed, pose, dt, new Vector2(0, 1)); }
+        /// <summary>As above, with the way the figure is moving against the way it faces (x right, y forward; length ignored).</summary>
+        public void Drive(float speed, string pose, float dt, Vector2 heading)
         {
             if (!graph.IsValid()) return;
             var want = new float[weights.Length];
+            if (ki && pose == "talk" && slotOf.ContainsKey("k.talk")) pose = "k.talk";
             if (pose != null && slotOf.TryGetValue(pose, out int ps))
             {
                 want[ps] = 1;
                 if (pose != current && !slots[ps].loop) slots[ps].p.SetTime(0);
                 if (pose == "swim" || pose == "sneak") slots[ps].p.SetSpeed(Mathf.Clamp(speed / (pose == "swim" ? 1.6f : 1.2f), pose == "swim" ? .35f : .5f, 1.6f));
+            }
+            else if (ki)
+            {
+                float walk = Mathf.InverseLerp(.15f, 1.2f, speed), run = Mathf.InverseLerp(2.2f, 3.6f, speed), sprint = Mathf.InverseLerp(5.2f, 6.8f, speed);
+                // Standing: the first idle, and now and then the second for a while (each figure on its own beat).
+                bool second = slotOf.ContainsKey("k.idle2") && Mathf.Repeat(Time.time * .04f + idleBeat, 1) > .82f;
+                Set(want, second ? "k.idle2" : "k.idle", 1 - walk);
+                // Moving: the two directions nearest the heading, by how near each is.
+                float a = Mathf.Repeat(Mathf.Atan2(heading.x, heading.y) * Mathf.Rad2Deg, 360) / 45f; int i0 = Mathf.FloorToInt(a) % 8, i1 = (i0 + 1) % 8; float t = a - Mathf.Floor(a);
+                void Way(string kind, float w)
+                {
+                    if (w <= 0) return;
+                    string s0 = kind + "." + Dirs[i0], s1 = kind + "." + Dirs[i1];
+                    if (kind == "s" && (!slotOf.ContainsKey(s0) || !slotOf.ContainsKey(s1))) { s0 = "r." + Dirs[i0]; s1 = "r." + Dirs[i1]; }   // no sprinting backwards
+                    Add(want, s0, w * (1 - t)); Add(want, s1, w * t);
+                }
+                Way("w", walk * (1 - run)); Way("r", walk * run * (1 - sprint)); Way("s", walk * run * sprint);
+                foreach (var d in Dirs) { Rate("w." + d, Mathf.Clamp(speed / 1.4f, .7f, 1.6f)); Rate("r." + d, Mathf.Clamp(speed / 3.6f, .75f, 1.5f)); Rate("s." + d, Mathf.Clamp(speed / 6.5f, .8f, 1.4f)); }
             }
             else
             {
@@ -409,6 +460,8 @@ namespace Crulanda.Encounter
             }
         }
         void Set(float[] want, string slot, float w) { if (slotOf.TryGetValue(slot, out int i)) want[i] = w; }
+        void Add(float[] want, string slot, float w) { if (slotOf.TryGetValue(slot, out int i)) want[i] += w; }
+        float idleBeat;
         void Rate(string slot, float r) { if (slotOf.TryGetValue(slot, out int i)) slots[i].p.SetSpeed(r); }
     }
 }

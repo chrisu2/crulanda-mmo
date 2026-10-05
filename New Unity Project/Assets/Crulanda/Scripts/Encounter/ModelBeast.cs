@@ -14,7 +14,8 @@ namespace Crulanda.Encounter
     /// are the file's flat ones on matte Standard materials, or a <see cref="Coat"/>'s (an ash hound's charcoal hide and burning
     /// eyes). It is turned to face +Z and scaled so the top of its head (its ears; never the antlers) stands at the height asked
     /// for, its feet on the ground. Worn by beasts (ActorVisual.Beasts.cs: wolves and ash hounds, stags and does) and by game deer
-    /// (CritterBody).
+    /// (CritterBody). The Veridian Keepers wear Tennessippi Studios' treants (CC0) the same way, in a painted skin of their own
+    /// (<see cref="Coat.Skin"/>).
     /// </summary>
     public sealed partial class ModelBeast
     {
@@ -29,6 +30,13 @@ namespace Crulanda.Encounter
             public Color Glow;
             public Coat Set(string material, Color c) { Colours[material] = c; return this; }
             public Coat Shine(string material, Color c, Color glow) { Colours[material] = c; Glowing.Add(material); Glow = glow; return this; }
+            /// <summary>A painted skin over the whole model (the treants: an albedo and a normal map, Resources/CreatureSkins), tinted.
+            /// A skinned model keeps its own mesh (not rounded: the normal map carries the detail).</summary>
+            public Texture Albedo, Normal; public Color Tint = Color.white;
+            public Coat Skin(Texture albedo, Texture normal, Color tint) { Albedo = albedo; Normal = normal; Tint = tint; return this; }
+            /// <summary>Under a painted skin: light of this colour where the mask is white (a treant's moss, its sap-light).</summary>
+            public Texture GlowMap; public Color GlowColour;
+            public Coat Lit(Texture mask, Color colour) { GlowMap = mask; GlowColour = colour; return this; }
             public string Key
             {
                 get
@@ -36,6 +44,8 @@ namespace Crulanda.Encounter
                     var keys = new List<string>(Colours.Keys); keys.Sort(System.StringComparer.Ordinal);
                     var s = new System.Text.StringBuilder();
                     foreach (var k in keys) s.Append(k).Append('=').Append(Hex(Colours[k])).Append(Glowing.Contains(k) ? "*" : "").Append(';');
+                    if (Albedo != null) s.Append("skin=").Append(Albedo.name).Append('/').Append(Normal != null ? Normal.name : "-").Append('/').Append(Hex(Tint)).Append(';');
+                    if (GlowMap != null) s.Append("lit=").Append(GlowMap.name).Append('/').Append(GlowColour.ToString("0.00")).Append(';');
                     return s.ToString();
                 }
             }
@@ -80,12 +90,15 @@ namespace Crulanda.Encounter
         static bool Shiny(string name) { var n = name.ToLowerInvariant(); return n.Contains("eye") || n.Contains("nose") || n == "material.011"; }
         /// <summary>A matte Standard material in this colour (eyes and noses a little glossy), or glowing, on a palette texture if
         /// the file paints with one (CraftPix's animals: an atlas of colour swatches); one per colour, shared.</summary>
-        static Material Mat(string name, Color c, bool glowing, Color glow, Texture atlas = null)
+        static Material Mat(string name, Color c, bool glowing, Color glow, Texture atlas = null, Texture normal = null, Texture glowMap = null)
         {
-            string key = name + "/" + Hex(c) + (glowing ? "/" + Hex(glow) : "") + (atlas != null ? "/" + atlas.name : "");
+            string key = name + "/" + Hex(c) + (glowing || glowMap != null ? "/" + glow.ToString("0.00") : "") + (atlas != null ? "/" + atlas.name : "") + (normal != null ? "/" + normal.name : "") + (glowMap != null ? "/" + glowMap.name : "");
             if (mats.TryGetValue(key, out var m) && m != null) return m;
             m = new Material(Shader.Find("Standard")) { color = c, name = "Creature " + key };
             if (atlas != null) m.mainTexture = atlas;
+            if (normal != null) { m.SetTexture("_BumpMap", normal); m.SetFloat("_BumpScale", 1); m.EnableKeyword("_NORMALMAP"); }
+            if (glowMap != null && glow.maxColorComponent > 0)
+            { m.EnableKeyword("_EMISSION"); m.SetTexture("_EmissionMap", glowMap); m.SetColor("_EmissionColor", glow); m.globalIlluminationFlags = MaterialGlobalIlluminationFlags.RealtimeEmissive; }
             m.SetFloat("_Glossiness", Shiny(name) ? .55f : .1f); m.SetFloat("_Metallic", 0);
             if (glowing) { m.EnableKeyword("_EMISSION"); m.SetColor("_EmissionColor", glow); m.globalIlluminationFlags = MaterialGlobalIlluminationFlags.RealtimeEmissive; }
             mats[key] = m; return m;
@@ -98,7 +111,9 @@ namespace Crulanda.Encounter
             {
                 case "Stag": return new Coat().Set("Material", new Color(.5f, .33f, .2f)).Set("Material.003", new Color(.82f, .76f, .64f)).Set("Material.010", new Color(.3f, .21f, .13f));
                 case "Deer": return new Coat().Set("Main", new Color(.53f, .37f, .25f)).Set("Main_Light", new Color(.82f, .75f, .63f)).Set("Main_Dark", new Color(.36f, .25f, .17f));
-                default: return null;
+                // Blink's bear: its painted skin (Resources/CreatureSkins/Bear). ChillLands' creatures: their palette beside them.
+                case "Bear": { var t = Resources.Load<Texture2D>("CreatureSkins/Bear/Bear_Albedo"); return t != null ? new Coat().Skin(t, Resources.Load<Texture2D>("CreatureSkins/Bear/Bear_Normal"), Color.white) : null; }
+                default: { var pal = Resources.Load<Texture2D>("Creatures/" + kind + "_palette"); return pal != null ? new Coat().Skin(pal, null, Color.white) : null; }
             }
         }
         /// <summary>The palette texture a material paints with: its own, or the one of its name beside the models (CraftPix's
@@ -111,6 +126,12 @@ namespace Crulanda.Encounter
         void Colour(Coat coat, float shade)
         {
             if (coat == null) coat = Native(Kind);
+            if (coat != null && coat.Albedo != null)
+            {
+                var t = coat.Tint; var skin = Mat("Skin", new Color(t.r * shade, t.g * shade, t.b * shade, 1), false, coat.GlowColour, coat.Albedo, coat.Normal, coat.GlowMap);
+                foreach (var r in Renderers) { var own = r.sharedMaterials; for (int i = 0; i < own.Length; i++) own[i] = skin; r.sharedMaterials = own; }
+                return;
+            }
             foreach (var r in Renderers)
             {
                 var own = r.sharedMaterials;
@@ -205,6 +226,15 @@ namespace Crulanda.Encounter
             r.SetNormals(normals); r.RecalculateBounds();
             rounded[src] = r; return r;
         }
+        static readonly Dictionary<Mesh, Mesh> tangented = new Dictionary<Mesh, Mesh>();
+        /// <summary>The mesh with tangents for a normal map (the importer leaves them out); made once per mesh.</summary>
+        static Mesh Tangents(Mesh src)
+        {
+            if (src == null || !src.isReadable) return src;
+            if (tangented.TryGetValue(src, out var done) && done != null) return done;
+            var m = Object.Instantiate(src); m.name = src.name + " (tangents)"; m.RecalculateTangents();
+            tangented[src] = m; return m;
+        }
         /// <summary>A direction of length one. (Vector3.normalized gives zero under 1e-5, and the pack's meshes are a hundredth of
         /// their size in the file: every face's cross product is under it, and the first rounding drew black.)</summary>
         static Vector3 Unit(Vector3 v) { float m = v.magnitude; return m > 1e-30f ? v / m : Vector3.up; }
@@ -272,7 +302,7 @@ namespace Crulanda.Encounter
         public static ModelBeast Build(Transform parent, string kind, float ground, float height, Coat coat = null, float shade = 1)
         {
             var src = Available(kind) ? Source(kind) : null; if (src == null) return null;
-            var b = new ModelBeast { Kind = kind };
+            var b = new ModelBeast { Kind = kind }; if (coat == null) coat = Native(kind);
             var go = Object.Instantiate(src, parent, false); go.name = "Model"; b.Model = go.transform;
             b.Model.localPosition = Vector3.zero; b.Model.localRotation = Quaternion.identity; b.Model.localScale = Vector3.one;
             b.Animator = go.GetComponent<Animator>(); if (b.Animator == null) b.Animator = go.AddComponent<Animator>();
@@ -283,8 +313,14 @@ namespace Crulanda.Encounter
             foreach (var r in go.GetComponentsInChildren<Renderer>(true))
             {
                 r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On; r.receiveShadows = true;
-                if (r is SkinnedMeshRenderer sk) { sk.updateWhenOffscreen = false; sk.skinnedMotionVectors = false; if (Round) sk.sharedMesh = Rounded(sk.sharedMesh); }
-                else if (Round) { var mf = r.GetComponent<MeshFilter>(); if (mf != null) mf.sharedMesh = Rounded(mf.sharedMesh); }
+                bool painted = coat != null && coat.Albedo != null;
+                if (r is SkinnedMeshRenderer sk)
+                {
+                    sk.updateWhenOffscreen = false; sk.skinnedMotionVectors = false;
+                    if (painted) { if (coat.Normal != null) sk.sharedMesh = Tangents(sk.sharedMesh); }
+                    else if (Round) sk.sharedMesh = Rounded(sk.sharedMesh);
+                }
+                else if (Round && !painted) { var mf = r.GetComponent<MeshFilter>(); if (mf != null) mf.sharedMesh = Rounded(mf.sharedMesh); }
                 b.Renderers.Add(r);
             }
             var shape = b.Measure();
@@ -293,7 +329,7 @@ namespace Crulanda.Encounter
             b.Model.localRotation = Quaternion.Euler(0, -shape.yaw, 0);
             b.Model.localScale = Vector3.one * b.Scale;
             b.Model.localPosition = new Vector3(0, ground - shape.feet * b.Scale, 0);
-            b.basePos = b.Model.localPosition; b.baseRot = b.Model.localRotation; b.halfWidth = shape.half * b.Scale;
+            b.basePos = b.Model.localPosition; b.baseRot = b.Model.localRotation; b.halfWidth = shape.half * b.Scale; b.groundLocal = ground;
             b.Colour(coat, shade);
             if (SlotClip(kind, "walk") == null) b.MakeRig();   // no clips in the file: the code moves it (ModelBeast.Proc.cs)
             return b;
@@ -303,16 +339,27 @@ namespace Crulanda.Encounter
         /// <summary>Its motions, a mixer slot each, and the clips that can fill them (the first the file has): standing, grazing
         /// and the head-low idle loop; walk and gallop loop with the ground; the rest are one-shots.</summary>
         static readonly (string slot, string[] clips, bool loop)[] Motions = {
-            ("idle", new[] { "Idle" }, true), ("idle2", new[] { "Idle_2" }, true), ("headlow", new[] { "Idle_2_HeadLow", "Idle_Headlow" }, true),
-            ("eat", new[] { "Eating" }, true), ("walk", new[] { "Walk" }, true), ("run", new[] { "Gallop" }, true),
-            ("attack", new[] { "Attack", "Attack_Headbutt" }, false), ("kick", new[] { "Attack_Kick", "Attack" }, false),
-            ("hitL", new[] { "Idle_HitReact_Left" }, false), ("hitR", new[] { "Idle_HitReact_Right", "Idle_HitReact_Left" }, false),
-            ("death", new[] { "Death" }, false), ("jump", new[] { "Gallop_Jump", "Jump_toIdle", "Jump_ToIdle" }, false) };
+            ("idle", new[] { "Idle", "idle" }, true), ("idle2", new[] { "Idle_2" }, true), ("headlow", new[] { "Idle_2_HeadLow", "Idle_Headlow" }, true),
+            ("eat", new[] { "Eating", "Eat" }, true), ("walk", new[] { "Walk", "WalkForward", "Run", "move_slow" }, true), ("run", new[] { "Gallop", "RunForward", "move_fast" }, true),
+            ("attack", new[] { "Attack", "Attack_Headbutt", "Attack_1", "Attack1", "attack_01" }, false), ("kick", new[] { "Attack_Kick", "Attack" }, false),
+            ("attack2", new[] { "Attack2" }, false), ("attack3", new[] { "Attack3" }, false),
+            ("hitL", new[] { "Idle_HitReact_Left", "GetHitFromFront", "hit_01" }, false), ("hitR", new[] { "Idle_HitReact_Right", "Idle_HitReact_Left", "GetHitFromFront", "hit_01" }, false),
+            ("death", new[] { "Death", "Death1", "death_01" }, false), ("death2", new[] { "Death2" }, false), ("death3", new[] { "Death3" }, false),
+            ("jump", new[] { "Gallop_Jump", "Jump_toIdle", "Jump_ToIdle" }, false), ("roar", new[] { "Buff" }, false),
+            ("takeoff", new[] { "takeoff" }, false), ("land", new[] { "land" }, false) };
+        // (The treants have one cycle, "Run", a heavy stride: it is their walk, its rate following the ground all the way up. Blink's
+        // bear has a file per clip, Creatures/BearClips; ChillLands' Ashen Marches creatures name theirs in lower case.)
         static readonly Dictionary<string, AnimationClip[]> clipsOf = new Dictionary<string, AnimationClip[]>();
         /// <summary>The kind's clip of this name (as imported: CreatureImport names them plainly), or null.</summary>
         public static AnimationClip Clip(string kind, string name)
         {
-            if (!clipsOf.TryGetValue(kind, out var all)) { all = Resources.LoadAll<AnimationClip>("Creatures/" + kind); clipsOf[kind] = all; }
+            if (!clipsOf.TryGetValue(kind, out var all))
+            {
+                all = Resources.LoadAll<AnimationClip>("Creatures/" + kind);
+                var more = Resources.LoadAll<AnimationClip>("Creatures/" + kind + "Clips");   // a file per clip (the bear)
+                if (more.Length > 0) { var both = new AnimationClip[all.Length + more.Length]; all.CopyTo(both, 0); more.CopyTo(both, all.Length); all = both; }
+                clipsOf[kind] = all;
+            }
             foreach (var c in all)
             {
                 if (c == null || c.name.StartsWith("__preview__")) continue;   // the editor's raw takes
@@ -381,16 +428,21 @@ namespace Crulanda.Encounter
             if (!slotOf.TryGetValue(slot, out int i)) return;
             shot = slot; shotTime = 0; slots[i].p.SetTime(0); slots[i].p.SetSpeed(1);
         }
+        /// <summary>Which of its deaths it dies (death, death2, death3: the treants have three); the first if it lacks that one.</summary>
+        public string DeathSlot = "death";
         /// <summary>It falls: its death, played once, its last frame held.</summary>
         public void Die()
         {
             if (dead) return;
             dead = true;
+            if (Crumbles) { StartCrumble(); return; }   // ModelBeast.Crumble.cs
+            if (TipsOver) { StartTip(); return; }
             if (proc) { shot = "death"; shotTime = 0; return; }
-            if (slotOf.TryGetValue("death", out int i)) { shot = "death"; shotTime = 0; slots[i].p.SetTime(0); slots[i].p.SetSpeed(1); }
+            string slot = slotOf.ContainsKey(DeathSlot) ? DeathSlot : "death";
+            if (slotOf.TryGetValue(slot, out int i)) { shot = slot; shotTime = 0; slots[i].p.SetTime(0); slots[i].p.SetSpeed(1); }
         }
         /// <summary>On its feet again (respawned).</summary>
-        public void Revive() { dead = false; shot = null; shotWeight = 0; }
+        public void Revive() { if (crumbling) EndCrumble(); if (tipping) EndTip(); dead = false; shot = null; shotWeight = 0; }
         /// <summary>What it is doing now: going at <paramref name="speed"/> m/s, and when it stands, <paramref name="standing"/>
         /// (idle, idle2, headlow, eat). Kept until the next call; the model eases toward it every frame.</summary>
         public void Drive(float speed, string standing) { pace = speed; rest = standing != null && (proc ? procLengths.ContainsKey(standing) : slotOf.ContainsKey(standing)) ? standing : "idle"; }
@@ -400,13 +452,16 @@ namespace Crulanda.Encounter
         /// </summary>
         void Tick(float dt)
         {
+            if (crumbling) { CrumbleTick(dt); return; }
+            if (tipping) { TipTick(dt); if (!graph.IsValid() || !graph.IsPlaying()) return; }
             if (proc) { ProcTick(dt); return; }
             if (!graph.IsValid()) return;
             float speed = pace;
             System.Array.Clear(want, 0, want.Length);
-            float walk = Mathf.InverseLerp(.12f, WalkPace * .6f, speed), run = Mathf.InverseLerp(WalkPace * 1.5f, RunPace * .6f, speed);
+            bool gallops = slotOf.ContainsKey("run");
+            float walk = Mathf.InverseLerp(.12f, WalkPace * .6f, speed), run = gallops ? Mathf.InverseLerp(WalkPace * 1.5f, RunPace * .6f, speed) : 0;
             Set(want, rest, 1 - walk); Set(want, "walk", walk * (1 - run)); Set(want, "run", walk * run);
-            Rate("walk", Mathf.Clamp(speed / WalkPace, .6f, 1.7f)); Rate("run", Mathf.Clamp(speed / RunPace, .7f, 1.5f));
+            Rate("walk", Mathf.Clamp(speed / WalkPace, .6f, gallops ? 1.7f : 2.6f)); Rate("run", Mathf.Clamp(speed / RunPace, .7f, 1.5f));
             // The one-shot: in over a tenth of a second, out over the last fifth (a death never goes out).
             if (shot != null && slotOf.TryGetValue(shot, out int si))
             {
@@ -437,6 +492,8 @@ namespace Crulanda.Encounter
         /// its last frame). A PlayableGraph does not pose an Animator outside play mode.</summary>
         public void Sample(string slot, float time)
         {
+            if (Crumbles && slot == "death") { Sample("idle", 0); StartCrumble(); CrumblePose(time); return; }
+            if (TipsOver && slot == "death") { Sample("idle", 0); TipPose(time); return; }
             if (proc) { ProcSample(slot, time); return; }
             var c = SlotClip(Kind, slot); if (c == null || Model == null || c.length <= 0) return;
             bool loop = false; foreach (var (s, _, l) in Motions) if (s == slot) loop = l;

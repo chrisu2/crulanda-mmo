@@ -88,7 +88,7 @@ namespace Crulanda.Tests
             var mobs = new List<EliteBalance.Mob> { EliteBalance.CampMob(camp.levelMax, beast, move) }; mobs.AddRange(Answerers(camp, move)); return mobs;
         }
         // ActorVisual.IsBeast by look name: beasts and Weave-Eaters are a little lighter in health.
-        static bool Beast(string look) { return look == "wolf" || look == "boar" || look == "weaveeater" || look == "stag" || look == "spider" || look == "bramble"; }
+        static bool Beast(string look) { return look == "wolf" || look == "boar" || look == "weaveeater" || look == "stag" || look == "spider" || look == "bramble" || look == "bear"; }
         static DerivedStatRules Rules(EliteBalance.Kit kit)
         {
             var c = content.FindClass(kit == EliteBalance.Kit.Warrior ? "class.warrior" : "class.druid");

@@ -3,71 +3,12 @@ using UnityEngine;
 namespace Crulanda.Encounter
 {
     /// <summary>
-    /// The Verdant Shore's creatures and people (ActorVisual): a Veridian Keeper (CANON-EXPANDED: Book 3's native wood-beings),
+    /// The Verdant Shore's creatures (ActorVisual; the Veridian Keepers are treants, ActorVisual.Beasts.cs):
     /// a great forest stag, a forest spider and a bramble-thing (GAME-ONLY). Primitives, like the rest; the walk cycle moves the
     /// same pivots.
     /// </summary>
     public sealed partial class ActorVisual
     {
-        /// <summary>
-        /// A Veridian Keeper (CANON-EXPANDED: "native wood-beings" with "wooden limbs" that glow "with a desperate, emerald fire" in
-        /// the siege, Book 3 ch.11; Oak-Bane and Willow-Whisper are named): about 2.6 m, a figure of bark over a heartwood core,
-        /// long-limbed, a crown of leafy twigs for hair, moss on the shoulders, two deep knots for eyes with a faint emerald light in
-        /// them, and sap-light in the seams of the bark. Withered (variant odd, a corrupted Keeper): grey bark, dead twigs, the
-        /// light gone violet. Builds on the humanoid frame, so it walks and fights as the others do.
-        /// </summary>
-        void BuildKeeper()
-        {
-            bool withered = variant % 2 == 1;
-            var bark = Mat(withered ? new Color(.36f, .34f, .3f) : new Color(.33f, .24f, .16f), .1f);
-            var heart = Mat(withered ? new Color(.26f, .22f, .22f) : new Color(.48f, .34f, .2f), .2f);
-            var moss = Mat(withered ? new Color(.3f, .3f, .26f) : new Color(.26f, .4f, .17f), .05f);
-            var leaf = Mat(withered ? new Color(.4f, .36f, .28f) : new Color(.3f, .55f, .2f), .05f);
-            var sap = Mat(withered ? new Color(.5f, .2f, .7f) : new Color(.25f, .95f, .55f), .8f);
-            sap.EnableKeyword("_EMISSION"); sap.SetColor("_EmissionColor", (withered ? new Color(.5f, .15f, .8f) : new Color(.2f, .9f, .45f)) * 1.8f);
-            cloth = bark; accent = leaf; stoop = 4;
-            // Everything at its true height (feet at -1): a tall figure, so nothing is scaled.
-            float scale = 1.3f;
-            Transform P(PrimitiveType type, Transform parent, Vector3 pos, Vector3 size, Material m, Vector3? euler = null)
-            { return Part(type, parent, pos * scale, size * scale, m, euler); }
-            legL = Pivot("Leg L", new Vector3(-.16f, -.08f, 0) * scale); legR = Pivot("Leg R", new Vector3(.16f, -.08f, 0) * scale);
-            foreach (var (leg, s) in new[] { (legL, -1), (legR, 1) })
-            {
-                P(PrimitiveType.Capsule, leg, new Vector3(0, -.36f, 0), new Vector3(.17f, .4f, .17f), bark);                      // a limb of bark
-                P(PrimitiveType.Cube, leg, new Vector3(0, -.38f, .07f), new Vector3(.05f, .5f, .04f), sap);                       // sap in the seam
-                P(PrimitiveType.Capsule, leg, new Vector3(s * .02f, -.72f, .04f), new Vector3(.15f, .22f, .22f), heart);           // a rooty foot
-                for (int k = 0; k < 3; k++) P(PrimitiveType.Capsule, leg, new Vector3((k - 1) * .07f, -.9f, .12f + (k == 1 ? .08f : 0)), new Vector3(.04f, .12f, .04f), bark, new Vector3(70, (k - 1) * 20, 0));   // root toes
-            }
-            torso = Pivot("Torso", new Vector3(0, .3f, 0) * scale);
-            P(PrimitiveType.Capsule, torso, new Vector3(0, .05f, 0), new Vector3(.4f, .4f, .32f), bark);                          // the trunk of the body
-            P(PrimitiveType.Cube, torso, new Vector3(0, .08f, .14f), new Vector3(.07f, .6f, .05f), sap);                           // the sap seam down the chest
-            foreach (int s in new[] { -1, 1 }) P(PrimitiveType.Cube, torso, new Vector3(s * .1f, .14f, .13f), new Vector3(.05f, .3f, .04f), sap, new Vector3(0, 0, s * 18));
-            P(PrimitiveType.Sphere, torso, new Vector3(0, .32f, 0), new Vector3(.52f, .2f, .36f), moss);                           // moss over the shoulders
-            foreach (int s in new[] { -1, 1 }) P(PrimitiveType.Sphere, torso, new Vector3(s * .26f, .3f, 0), new Vector3(.2f, .18f, .22f), bark);
-            P(PrimitiveType.Cylinder, torso, new Vector3(0, .42f, 0), new Vector3(.14f, .08f, .14f), heart);                      // neck
-            head = P(PrimitiveType.Capsule, torso, new Vector3(0, .62f, .02f), new Vector3(.3f, .2f, .3f), bark);                  // a long, narrow head
-            foreach (int s in new[] { -1, 1 })
-            {
-                P(PrimitiveType.Sphere, torso, new Vector3(s * .07f, .66f, .12f), new Vector3(.07f, .05f, .04f), heart);         // the knots
-                P(PrimitiveType.Sphere, torso, new Vector3(s * .07f, .66f, .14f), new Vector3(.035f, .025f, .02f), sap);           // lit deep in them
-            }
-            // A crown of twigs, leafed (or bare and grey when withered), out of the top of the head every which way.
-            for (int i = 0; i < 9; i++)
-            {
-                float a = i * 40 + 11, tilt = 20 + (i * 37 % 40);
-                var twig = P(PrimitiveType.Cylinder, torso, new Vector3(Mathf.Cos(a * Mathf.Deg2Rad) * .08f, .8f, Mathf.Sin(a * Mathf.Deg2Rad) * .08f - .02f), new Vector3(.025f, .14f, .025f), heart, new Vector3(Mathf.Sin(a * Mathf.Deg2Rad) * tilt, 0, -Mathf.Cos(a * Mathf.Deg2Rad) * tilt));
-                if (!withered) P(PrimitiveType.Sphere, twig, new Vector3(0, 1, 0), new Vector3(3.2f, .5f, 2.2f), leaf, new Vector3(0, a, 0));
-            }
-            armL = Pivot("Arm L", new Vector3(-.3f, .62f, 0) * scale); armR = Pivot("Arm R", new Vector3(.3f, .62f, 0) * scale);
-            foreach (var (arm, s) in new[] { (armL, -1), (armR, 1) })
-            {
-                P(PrimitiveType.Capsule, arm, new Vector3(s * .02f, -.38f, 0), new Vector3(.13f, .42f, .13f), bark, new Vector3(0, 0, s * 3));   // long arms, to the knee
-                P(PrimitiveType.Cube, arm, new Vector3(s * .06f, -.4f, 0), new Vector3(.03f, .55f, .035f), sap, new Vector3(0, 0, s * 3));
-                var hand = P(PrimitiveType.Sphere, arm, new Vector3(s * .04f, -.84f, 0), new Vector3(.13f, .1f, .13f), heart);
-                for (int k = 0; k < 4; k++) P(PrimitiveType.Capsule, arm, new Vector3(s * .04f + (k - 1.5f) * .035f, -.95f, .02f), new Vector3(.025f, .09f, .025f), bark, new Vector3(10, 0, (k - 1.5f) * 12));   // twig fingers
-            }
-        }
-
         /// <summary>
         /// A great forest stag (GAME-ONLY): taller than a wolf at the shoulder, a deep russet coat with a pale belly and throat, a
         /// long neck, a narrow head with a dark muzzle and ears, and a wide crown of branching antlers. A doe (variant odd) has

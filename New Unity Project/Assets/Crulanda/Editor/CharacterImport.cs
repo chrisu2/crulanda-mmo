@@ -16,6 +16,8 @@ namespace Crulanda.EditorTools
     public sealed class CharacterImport : AssetPostprocessor
     {
         const string Root = "Assets/Crulanda/Resources/Characters/";
+        /// <summary>Bumped when the import settings change, so Unity imports the models and clips again.</summary>
+        public override uint GetVersion() { return 2; }
         void OnPreprocessModel()
         {
             if (!assetPath.StartsWith(Root)) return;
@@ -32,10 +34,17 @@ namespace Crulanda.EditorTools
         {
             if (!assetPath.StartsWith(Root) || !assetPath.Contains("/Animations/")) return;
             var m = (ModelImporter)assetImporter; var clips = m.defaultClipAnimations;
+            // Kevin Iglesias's motions (Animations/KI, "HumanM@Walk01_Forward"): the cycles loop (idles, walk, run, sprint, talk, the
+            // jump's middle and the fall); the turns, the jump's start and landing and the idles' crossings play once.
+            string file = Path.GetFileNameWithoutExtension(assetPath); bool ki = assetPath.Contains("/Animations/KI/");
+            bool kiLoop = ki && (file.Contains("@Walk01") || file.Contains("@Run01") || file.Contains("@Sprint01") || file.Contains("@Talk01") || file.Contains("@Fall01")
+                || file.EndsWith("@Idle01") || file.EndsWith("@Idle02") || file.EndsWith("@Jump01"));
             foreach (var c in clips)
             {
-                c.loopTime = c.name.EndsWith("_Loop");
-                c.lockRootRotation = true; c.keepOriginalOrientation = true;
+                c.loopTime = c.name.EndsWith("_Loop") || kiLoop;
+                // Kevin's strafes and diagonals face forward by the body's own heading, not the root's as authored (as authored, a
+                // strafe to the left turned the whole figure a quarter round).
+                c.lockRootRotation = true; c.keepOriginalOrientation = !ki;
                 c.lockRootHeightY = true; c.keepOriginalPositionY = true;
                 c.lockRootPositionXZ = true; c.keepOriginalPositionXZ = true;
             }

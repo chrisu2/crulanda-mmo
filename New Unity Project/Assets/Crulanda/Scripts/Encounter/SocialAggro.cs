@@ -44,7 +44,7 @@ namespace Crulanda.Encounter
             switch ((look ?? "").ToLowerInvariant())
             {
                 case "wolf": case "weaveeater": case "spider": case "bramble": return SocialKind.Pack;
-                case "boar": case "stag": return SocialKind.Solitary;
+                case "boar": case "stag": case "bear": return SocialKind.Solitary;
                 default: return SocialKind.Call;   // people, and what was people: they have voices
             }
         }
@@ -85,6 +85,7 @@ namespace Crulanda.Encounter
             { "hollow", new[] { (" lets out a dry, rattling moan.", "A rattling moan"), (" moans, long and empty, and the others lift their heads.", "A long moan") } },
             { "pale", new[] { (" turns, and the other pale things turn with it.", "It turns") } },
             { "keepers", new[] { (" creaks a long warning through the trees.", "A long creak") } },
+            { "skeleton", new[] { (" clatters, and the old bones around it turn their skulls.", "A dry clatter"), (" rattles its jaw, and the drowned dead come.", "Rattling") } },
         };
         static readonly (string chat, string over)[] PlainShout = { (" cries out for help.", "Help!") };
         /// <summary>One of the kin's shouts (pick chooses among them; any number will do).</summary>

@@ -52,6 +52,10 @@ namespace Crulanda.EditorTools
                 Row(shot, new[] { P(ActorLook.Warrior, 0, null, null, martial, db, looks, walk), P(ActorLook.Warrior, 1, null, null, late, db, looks, walk), P(ActorLook.Druid, 0, null, null, cloth, db, looks, walk), P(ActorLook.Warrior, 2, null, null, new string[0], db, looks, walk) }, yaw);
             // Fighting (playtest note 25): the warrior armed, a sword's swing through, a jab, a flinch, a spell drawn and let fly.
             Spec A(string act, float t, string[] gear = null) { var x = P(ActorLook.Warrior, 0, null, act + " " + t, gear ?? martial, db, looks); x.act = act; x.time = t; return x; }
+            // Human Basic Motions (Kevin Iglesias): a man and a woman walking forward, back, left and right, running and sprinting, side on.
+            Spec K(string clip, float t, bool woman = false) { var x = woman ? V("baker", "Ama Rusk", 13) : P(ActorLook.Warrior, 0, null, clip + " " + t); x.act = "ki:" + (woman ? "F:" : "M:") + clip; x.time = t; return x; }
+            Row("motions-ki", new[] { K("Walk01_Forward", .3f), K("Walk01_Backward", .3f), K("Walk01_Left", .3f), K("Walk01_Right", .3f), K("Run01_Forward", .2f), K("Sprint01_Forward", .2f),
+                K("Idle02", 1.5f), K("Walk01_Forward", .3f, true), K("Run01_Forward", .2f, true) }, 90);
             Row("fight", new[] { A("swing", .15f), A("swing", .35f), A("swing", .55f), A("jab", .2f, new string[0]), A("hit", .2f), A("castloop", .5f, new string[0]), A("castshot", .25f, new string[0]) }, 90);
             // Named head pieces on the players, close (playtest note 31: "tin crown is also way too big", "orbits my head").
             var named = ItemDatabase.Parse(new System.Collections.Generic.List<string> { System.IO.File.ReadAllText("Assets/Crulanda/EncounterContent/Items/items.json") });

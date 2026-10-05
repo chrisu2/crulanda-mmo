@@ -327,6 +327,24 @@ namespace Crulanda.Encounter
             EncounterHud.BookTab = "achievements"; yield return new WaitForSeconds(.6f);
             ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "37-achievements.png")); yield return new WaitForSeconds(.4f);
             session.QuestBookOpen = false;
+            // Strafing and backing (Human Basic Motions, classic MMO movement): the player moved sideways, then backwards, facing one
+            // way, the camera off the shoulder: the figure's walk follows the way it moves, it doesn't turn.
+            {
+                var me = session.Player.transform; motor.enabled = false; var cc = session.Player.GetComponent<CharacterController>();
+                var face = Quaternion.Euler(0, 30, 0); me.rotation = face; var view = session.View.transform;
+                foreach (var (name, way, pace) in new[] { ("39-strafe-left", Vector3.left, 1.6f), ("40-backpedal", Vector3.back, 1.2f) })
+                {
+                    for (float t = 0; t < 1.2f; t += Time.deltaTime)
+                    {
+                        var step = face * way * pace * Time.deltaTime; if (cc != null && cc.enabled) cc.Move(step + Vector3.down * .05f); else me.position += step;
+                        me.rotation = face;
+                        var eye = me.position + face * new Vector3(2.6f, 1.6f, 3.2f); view.SetPositionAndRotation(eye, Quaternion.LookRotation(me.position + Vector3.up * .9f - eye));
+                        yield return null;
+                    }
+                    ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + name + ".png")); yield return new WaitForSeconds(.3f);
+                }
+                motor.enabled = true;
+            }
             // The character sheet with your own figure as its paper doll (EncounterHud.PaperDoll.cs).
             session.CharacterOpen = true; yield return new WaitForSeconds(.8f);
             ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "38-character-sheet.png")); yield return new WaitForSeconds(.4f);

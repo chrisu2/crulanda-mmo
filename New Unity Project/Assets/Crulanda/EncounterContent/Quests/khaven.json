@@ -670,6 +670,40 @@
         "xp": 170,
         "gold": 30
       }
+    },
+    {
+      "id": "npc.ansel.drowned",
+      "title": "The Old Bones",
+      "kind": "npc",
+      "giver": "Ansel Morrow",
+      "turnIn": "Ansel Morrow",
+      "zone": "zone.khaven",
+      "level": 5,
+      "requires": [
+        "npc.ansel.hollows"
+      ],
+      "canonStatus": "GAME-ONLY",
+      "summary": "The flood gave back the oldest graves too: bare bones, walking by the drowned chapel wall. Ansel wants them laid down again.",
+      "offer": "Ansel turns the pages of his book back, and back, to names in a hand that isn't his. \"The grey ones were the new dead. These are older. The low graves the creek took before my grandfather's time.\" He closes the book. \"Bones, walking. Nothing on them but mud and what they were buried in. By the drowned chapel wall.\"\n\n\"Four of them. I don't know their names. Somebody did, once.\"",
+      "complete": "Ansel listens, then writes four lines in the book that say only: \"one of the old ones, laid down again.\" \"It's the best I can do for them,\" he says. \"It's more than the creek did.\"",
+      "steps": [
+        {
+          "text": "Lay the drowned dead to rest by the drowned chapel wall.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.khaven",
+              "target": "mob.drowned.khaven.14.*",
+              "count": 4,
+              "text": "Drowned dead laid to rest"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 165,
+        "gold": 32
+      }
     }
   ]
 }

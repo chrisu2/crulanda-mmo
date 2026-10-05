@@ -1840,6 +1840,10 @@ ITEMS = {
     'junk.pale_filament': ('junk', filament), 'junk.company_badge': ('junk', badge), 'junk.sexton_bell': ('junk', bell), 'junk.mossback_tusk': ('junk', tusk, ('#9ab86a', '#5a6a3a')),
     'junk.velvet_tine': ('junk', tine), 'junk.spider_chitin': ('junk', chitin), 'junk.venom_gland': ('junk', gland), 'junk.briar_thorns': ('junk', thorns), 'junk.briar_heart': ('junk', knot),
     'junk.grey_bark': ('junk', bark), 'junk.cold_trinket': ('junk', trinket), 'junk.cold_sliver': ('junk', shard, ('#d8f0ff', 'gem'), dict(glowc='#9fe8ff', thin=True)),
+    # the bears and the drowned dead (2026-10-04)
+    'hide.bear': ('hide', pelt, ('#6a4a30',), dict(belly='#8a6a4a')), 'junk.bear_claw': ('junk', fang, (), dict(bone='#4a3e34', root='#7a5a44', curve=1.5)),
+    'mat.bear_haunch': ('meat', meat_ham, ('#7a2a26', '#e0c8a8')), 'junk.creek_bone': ('junk', bone, ('#9a8a66',)),
+    'junk.grave_goods': ('junk', coin, ('#8a8a80', 'crown'), dict(worn=True)),
 }
 QUEST = {
     'item.brood_heart': (crystal,), 'item.calcified_shard': (crystal, (), dict(n=1)), 'item.salt_cask': (cask,), 'item.petrified_bone': (bone,), 'item.first_sea_salt': (sack, ('#e6e2d8', '#ffffff'), dict(knots=3)),

@@ -34,17 +34,34 @@ namespace Crulanda.EditorTools
         /// <summary>A palette texture (CraftPix's swatches): no mipmaps or compression to bleed one swatch into the next.</summary>
         void OnPreprocessTexture()
         {
+            // Painted skins (Resources/CreatureSkins: the treants): ordinary mipmapped, compressed textures; the "_Normal" ones normal maps.
+            if (assetPath.StartsWith("Assets/Crulanda/Resources/CreatureSkins/"))
+            {
+                var s = (TextureImporter)assetImporter; s.mipmapEnabled = true; s.maxTextureSize = 1024;
+                s.textureType = assetPath.EndsWith("_Normal.png") ? TextureImporterType.NormalMap : TextureImporterType.Default;
+                return;
+            }
             if (!assetPath.StartsWith(Root)) return;
             var t = (TextureImporter)assetImporter;
             t.textureType = TextureImporterType.Default; t.sRGBTexture = true; t.mipmapEnabled = false; t.filterMode = FilterMode.Bilinear;
             t.wrapMode = TextureWrapMode.Clamp; t.textureCompression = TextureImporterCompression.Uncompressed; t.alphaSource = TextureImporterAlphaSource.None;
         }
-        static readonly string[] Loops = { "Idle", "Idle_2", "Idle_2_HeadLow", "Idle_Headlow", "Walk", "Gallop", "Eating" };
+        static readonly string[] Loops = { "Idle", "Idle_2", "Idle_2_HeadLow", "Idle_Headlow", "Walk", "Gallop", "Eating", "WalkForward", "RunForward", "WalkBackward", "RunBackward", "IdleCombat", "Eat", "Sleep", "StunnedLoop" };
         void OnPreprocessAnimation()
         {
             if (!assetPath.StartsWith(Root)) return;
             var m = (ModelImporter)assetImporter; var clips = m.defaultClipAnimations;
             const string arm = "AnimalArmature|";
+            // An animal with a file per clip (Blink's bear: Creatures/BearClips/Bear_Attack1.fbx...): the clip is named for its file,
+            // after the animal's name ("Attack1").
+            if (assetPath.Contains("Clips/") && clips.Length > 0)
+            {
+                string file = Path.GetFileNameWithoutExtension(assetPath); int u = file.IndexOf('_');
+                var only = clips.OrderByDescending(c => c.lastFrame - c.firstFrame).First();   // the file's real take (each has a one-frame one too)
+                only.name = u >= 0 ? file.Substring(u + 1) : file;
+                only.loopTime = System.Array.IndexOf(Loops, only.name) >= 0;
+                m.clipAnimations = new[] { only }; return;
+            }
             var keep = clips.Where(c => c.takeName.StartsWith(arm)).ToList();
             if (keep.Count == 0) keep = clips.ToList();
             foreach (var c in keep)
@@ -59,6 +76,9 @@ namespace Crulanda.EditorTools
         public static void Report()
         {
             AssetDatabase.Refresh();
+            // The files of a clip each come in again (cheap), so a change to how they are named takes without a full reimport.
+            foreach (var clipFile in AssetDatabase.FindAssets("t:Model", new[] { Root.TrimEnd('/') }).Select(AssetDatabase.GUIDToAssetPath).Where(p => p.Contains("Clips/")))
+                AssetDatabase.ImportAsset(clipFile, ImportAssetOptions.ForceUpdate);
             var sb = new StringBuilder();
             foreach (var path in AssetDatabase.FindAssets("t:Model", new[] { Root.TrimEnd('/') }).Select(AssetDatabase.GUIDToAssetPath).OrderBy(p => p))
             {
@@ -85,8 +105,17 @@ namespace Crulanda.EditorTools
                 foreach (var t in go.GetComponentsInChildren<Transform>(true))
                     if (t.name == "Body" || t.name == "Head" || t.name == "Torso3" || t.name.StartsWith("Front") || t.name.StartsWith("Back") || t.name.StartsWith("Tail1") || t.name == "Neck1")
                         sb.AppendLine("   bone " + PathOf(go.transform, t) + " @" + t.position.ToString("0.000") + " rot " + t.eulerAngles.ToString("0.0"));
+                if (!go.GetComponentsInChildren<Transform>(true).Any(t => t.name == "AnimalArmature"))   // another maker's rig: every bone, by name
+                    sb.AppendLine("   bones " + string.Join(" ", go.GetComponentsInChildren<Transform>(true).Select(t => t.name + "@" + t.position.ToString("0.00"))));
+                // Each clip, and how far it carries the rig's root from its first frame to its last (a clip that walks off on its own).
+                var inst = Object.Instantiate(go); var root = inst.GetComponentInChildren<SkinnedMeshRenderer>(true)?.rootBone;
                 foreach (var clip in AssetDatabase.LoadAllAssetsAtPath(path).OfType<AnimationClip>().Where(c => !c.name.StartsWith("__preview")))
-                    sb.AppendLine("   clip " + clip.name + " " + clip.length.ToString("0.00") + "s" + (clip.isLooping ? " loop" : "") + " curves " + AnimationUtility.GetCurveBindings(clip).Length);
+                {
+                    string moves = "";
+                    if (root != null) { clip.SampleAnimation(inst, 0); var a = root.position; clip.SampleAnimation(inst, clip.length); moves = " root moves " + (root.position - a).ToString("0.000"); }
+                    sb.AppendLine("   clip " + clip.name + " " + clip.length.ToString("0.00") + "s" + (clip.isLooping ? " loop" : "") + " curves " + AnimationUtility.GetCurveBindings(clip).Length + moves);
+                }
+                Object.DestroyImmediate(inst);
             }
             File.WriteAllText(Path.Combine(Application.dataPath, "../CreatureReport.txt"), sb.ToString());   // beside the project, not in the build
             Debug.Log("CREATURE_REPORT_DONE");

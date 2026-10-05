@@ -45,16 +45,32 @@ namespace Crulanda.EditorTools
                 Named(B(ActorLook.Boar, 0, "idle", .5f), "Mire boar"), Named(B(ActorLook.Boar, 0, "idle", .5f), "Rockhide boar"), Named(B(ActorLook.Boar, 0, "idle", .5f), "Old Scree-Tusk (elite)"), P(ActorLook.Warrior, 0, null, 0) }, 1.6f);
             Row("beasts-boar-moves", new[] { B(ActorLook.Boar, 0, "walk", .1f), B(ActorLook.Boar, 0, "walk", .3f), B(ActorLook.Boar, 0, "run", .1f), B(ActorLook.Boar, 0, "eat", 1),
                 B(ActorLook.Boar, 0, "attack", .1f), B(ActorLook.Boar, 0, "attack", .26f), B(ActorLook.Boar, 0, "headlow", 1), B(ActorLook.Boar, 0, "death", 2) }, 1.5f);
+            // The Keepers as treants (2026-10-04): the old bark figure beside them, living and withered, the great ones, and their motions.
+            Row("beasts-treants", new[] { P(ActorLook.Warrior, 0, null, 0), Named(B(ActorLook.Keeper, 0, "idle", .5f), "Oak-Bane"), Named(B(ActorLook.Keeper, 2, "idle", .9f), "Willow-Whisper"),
+                Named(B(ActorLook.Keeper, 1, "idle", .3f), "Withered Keeper"), Named(B(ActorLook.Keeper, 1, "idle", .7f), "Withered Keeper (elite)"), Named(B(ActorLook.Keeper, 1, "idle", .5f), "Greyheart"),
+                Named(B(ActorLook.Keeper, 1, "idle", .4f), "The Hollow Root-Warden") }, 2.6f);
+            Row("beasts-treant-moves", new[] { B(ActorLook.Keeper, 0, "walk", .3f), B(ActorLook.Keeper, 0, "walk", .9f), B(ActorLook.Keeper, 0, "attack", .7f), B(ActorLook.Keeper, 0, "attack2", .5f),
+                B(ActorLook.Keeper, 0, "attack3", .6f), B(ActorLook.Keeper, 1, "death", 10), B(ActorLook.Keeper, 1, "death2", 10), B(ActorLook.Keeper, 1, "death3", 10) }, 2.8f);
+            // The new creatures in the game (2026-10-04): bears (Blink), spiders, the drowned dead and the crows (ChillLands' Ashen Marches).
+            Row("beasts-bears", new[] { P(ActorLook.Warrior, 0, null, 0), Named(B(ActorLook.Bear, 0, "idle", .5f), "Brown bear"), Named(B(ActorLook.Bear, 0, "eat", 1), "Brown bear"),
+                Named(B(ActorLook.Bear, 0, "idle", .8f), "Old Hazelmaw"), Named(B(ActorLook.Bear, 0, "walk", .3f), "Brown bear"), Named(B(ActorLook.Bear, 0, "run", .2f), "Brown bear"),
+                Named(B(ActorLook.Bear, 0, "attack", .4f), "Brown bear"), Named(B(ActorLook.Bear, 0, "attack2", .5f), "Brown bear"), Named(B(ActorLook.Bear, 0, "death", 10), "Brown bear") }, 2.6f);
+            Row("beasts-dead", new[] { P(ActorLook.Warrior, 0, null, 0), Named(B(ActorLook.Spider, 0, "idle", .5f), "Charnel spider"), Named(B(ActorLook.Spider, 0, "walk", .3f), "Basalt spider"),
+                Named(B(ActorLook.Spider, 0, "attack", .4f), "Canopy spider"), Named(B(ActorLook.Spider, 0, "death", 10), "Canopy spider"),
+                Named(B(ActorLook.Skeleton, 0, "idle", .5f), "Drowned dead"), Named(B(ActorLook.Skeleton, 0, "walk", .4f), "Drowned dead"), Named(B(ActorLook.Skeleton, 0, "attack", .4f), "Drowned dead"),
+                Named(B(ActorLook.Skeleton, 0, "death", .35f), "Drowned dead"), Named(B(ActorLook.Skeleton, 0, "death", 10), "Drowned dead"), K("crow", .3f, "idle", .5f), K("crow", .6f, "run", .3f), K("crow", .8f, "death", 10) }, 1.9f);
             Debug.Log("CREATURE_CAPTURE_DONE");
         }
 
-        sealed class Spec { public ActorLook look; public int variant; public string slot; public float time; public bool person, old, deer, flat; public float r; public string name, kind = "deer"; }
+        sealed class Spec { public ActorLook look; public int variant; public string slot; public float time; public bool person, old, deer, flat; public float r; public string name, kind = "deer", raw; }
         /// <summary>The same, its mesh left as the file has it (ModelBeast.Round off).</summary>
         static Spec F(Spec s) { s.flat = true; s.name += " (file)"; return s; }
         static Spec Named(Spec s, string name) { s.name = name; return s; }
         static Spec P(ActorLook look, int variant, string slot, float time) { return new Spec { look = look, variant = variant, person = true, time = time, name = look.ToString() }; }
         static Spec B(ActorLook look, int variant, string slot, float time) { return new Spec { look = look, variant = variant, slot = slot, time = time, name = look + " " + variant }; }
         static Spec Old(ActorLook look, int variant) { return new Spec { look = look, variant = variant, old = true, name = "Old " + look + " " + variant }; }
+        /// <summary>A model as it comes (ModelBeast.Build, no look), <paramref name="height"/> m tall.</summary>
+        static Spec R(string kind, string slot, float time, float height) { return new Spec { raw = kind, slot = slot, time = time, r = height, name = kind + " " + slot }; }
         static Spec D(float r, string slot, float time) { return new Spec { deer = true, r = r, slot = slot, time = time, name = "Hill deer " + r }; }
         /// <summary>A village or game animal of this kind (CritterBody), coloured by <paramref name="r"/>.</summary>
         static Spec K(string kind, float r, string slot, float time) { return new Spec { deer = true, kind = kind, r = r, slot = slot, time = time, name = kind + " " + r }; }
@@ -69,6 +85,14 @@ namespace Crulanda.EditorTools
             {
                 var s = specs[i];
                 var go = new GameObject(s.name); go.transform.SetParent(stage, false);
+                if (s.raw != null)
+                {
+                    go.transform.SetPositionAndRotation(new Vector3(x0 + i * gap, 0, 0), Quaternion.Euler(0, 90, 0));
+                    var m = ModelBeast.Build(go.transform, s.raw, 0, s.r);
+                    if (m != null) { m.Sample(s.slot, s.time); top = Mathf.Max(top, s.r + .3f); }
+                    else Debug.Log("CREATURE_CAPTURE no model " + s.raw);
+                    continue;
+                }
                 if (s.deer)
                 {
                     go.transform.SetPositionAndRotation(new Vector3(x0 + i * gap, 0, 0), Quaternion.Euler(0, 90, 0));

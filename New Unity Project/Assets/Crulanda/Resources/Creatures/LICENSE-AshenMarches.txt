@@ -1,0 +1,26 @@
+Spider.fbx, Raven.fbx, Skeleton.fbx and their palettes: from "Ashen Marches - Free 100" by ChillLands
+(https://chilllands.itch.io/ashen-marches-free), downloaded by Chris Underwood 2026-10-04. Free for use in finished games;
+the source files are not to be redistributed on their own. Its license:
+
+ASHEN MARCHES — FREE STARTER ASSET LICENSE
+Publisher: ChillLands | Version 1.0
+
+Downloading this free pack grants you a non-exclusive, perpetual license to use and modify the
+included assets in unlimited personal and commercial games, applications,
+films, renders and other finished creative projects. No ongoing royalties
+or attribution are required. Credit to ChillLands is appreciated.
+
+You may share source assets with collaborators working on your projects,
+provided they do not redistribute or use those source files independently.
+You may distribute the assets as incorporated into your finished projects.
+
+You may not redistribute, sell, give away, sublicense or repackage the assets
+as standalone source files, stock assets, asset packs, templates whose main
+value is these assets, or competing asset libraries, including modified versions.
+You may not claim that you created the original unmodified assets.
+
+This license does not transfer ownership or grant exclusive rights. The assets
+were produced through an AI-assisted procedural Blender workflow and reviewed
+and revised as described on the product page. No warranty of fitness for a
+particular purpose is provided. Mandatory consumer rights remain unaffected.
+For support, use the comments on https://chilllands.itch.io/ashen-marches-free

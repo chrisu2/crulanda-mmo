@@ -48,6 +48,9 @@ namespace Crulanda.Encounter
             Sneaking = EncounterInput.Sneak && !Swimming;
             float wade = inWater ? Mathf.Lerp(1, .6f, Mathf.Clamp01(depth / 1.3f)) : 1;
             float speed = 5.2f * session.Kit.MoveSpeedMultiplier * (Swimming ? .55f : wade) * (Sneaking ? .5f : 1);
+            // Classic MMO movement (Chris, 2026-10-04): on foot you face where the camera looks and walk any way from there; backing
+            // up is slower. Swimming still turns you into the stroke.
+            if (!Swimming && move.y < 0) speed *= Mathf.Lerp(1, .55f, Mathf.Clamp01(-move.y / Mathf.Max(.01f, move.magnitude)));
             // Creek current: a gentle push downstream, strongest mid-channel and in deeper water (you can always wade across).
             var flow = inWater ? zone.FlowAt(new Vector2(here.x, here.z)) : Vector2.zero;
             var current = new Vector3(flow.x, 0, flow.y) * (Swimming ? 1.2f : .9f * Mathf.Clamp01(depth / .8f));
@@ -83,7 +86,8 @@ namespace Crulanda.Encounter
             }
             if (wasInWater && !inWater) leftWater = Time.time;
             wasInWater = inWater;
-            if (direction.sqrMagnitude > .01f) transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime * 12);
+            if (direction.sqrMagnitude > .01f)
+                transform.rotation = Quaternion.Slerp(transform.rotation, Swimming ? Quaternion.LookRotation(direction) : Quaternion.Euler(0, yaw, 0), Time.deltaTime * 12);
             var p = transform.position;
             if (p.y < Crulanda.World.Hollow.Lowest && !(wet && p.y > surface - 12)) Teleport(session.RecoveryPoint);   // fell out of the world (a cave's deep floor is not that)
         }

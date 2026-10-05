@@ -9,7 +9,18 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-10-03, evening)
+## RESUME HERE (updated 2026-10-04 23:30)
+**NEXT (2026-10-05):** Round 20 (treants, motion, classic MMO controls, bears, drowned dead, model spiders and crows; see the
+round's entry at the end) is committed but NOT published. A full run started 23:02 (marker hel/work/c41-start.marker;
+results in hel/work/full-run.done and full-run.log). First EditMode pass failed 3 (icons, skeleton call words, NearHomes):
+fixed after it started, so: (1) read full-run.done, fix any PlayMode/tour problems; (2) rerun EditMode (run_focus.ps1
+-Platform EditMode); (3) CreatureCapture.Run (-Graphics) and check the crow's new tip-over death (beasts-dead.png, last
+crow; written after the run started); (4) copy new .meta files back from the validation copy (KI folders, Treant/Bear/
+Spider/Raven/Skeleton pngs+fbx, BearClips, CreatureSkins/Bear); (5) release build, publish, commit, Backup.ps1.
+Chris liked: treant colours by type, the skeleton crumble, bears/spiders. Still open: efficient PlayMode, captures overwrite
+the screen mode, note 10 cave lighting.
+
+## Earlier resume notes (2026-10-03/04)
 **NEXT (2026-10-04 15:50):**
 1. Nothing in flight: committed, published 15:50, backed up. Done today: notes 24, 25, 26, 28, 30, camera below level, full screen.
 1b. **FPS (note 23):** 94 (start of day) -> 104 -> 145 fps in Oakhaven at 1440x900 (published 19:20). The cause of most of it was
@@ -1016,4 +1027,20 @@ resumed with `Workflow({scriptPath, resumeFromRunId})` (finished agents replay f
   FREE" (Unity Asset Store) can improve the figures' motion: yes, the figures are Humanoid (CharacterImport: animationType
   Human), so its clips retarget; he is downloading it through the Package Manager (My Assets); unpack the .unitypackage from
   %APPDATA%/Unity/Asset Store-5.x/ into the repo (a .unitypackage is a tar.gz of GUID folders: asset, asset.meta, pathname).
-
+- **Round 20, treants, motion, controls and new creatures (COMMITTED 2026-10-04 23:30, NOT PUBLISHED)**: assets Chris picked, each in the repo
+  with its license note: Kevin Iglesias's Human Basic Motions FREE (Resources/Characters/Animations/KI, tools/wip/characters/
+  ki_import.py; ModelFigure blends 8-way walk/run/sprint by heading, AdventurerMotor classic MMO facing); Tennessippi's Treant Pack
+  (CC0; Resources/Creatures/Treant1-2.fbx, Resources/CreatureSkins/Treant incl. _Grey/_Rot/_Glow from tools/wip/treants/skins.py;
+  ActorVisual.Beasts KeeperKind/KeeperBark: living, Greying withered, Greyheart, deep withered (Hollow.DepthAt), Root-Warden);
+  the old BuildKeeper is deleted. Blink's FREE Stylized Bear (Asset Store; Creatures/Bear.fbx + Creatures/BearClips, a file per
+  clip: CreatureImport names each clip for its file and takes the longest take; ModelBeast.Clip also loads "<Kind>Clips").
+  ChillLands' Ashen Marches Free (itch; zip kept in tools/wip/animals/source; tools/wip/animals/creatures_import.py): Spider,
+  Raven, Skeleton .fbx + <Kind>_palette.png (spider variants from palettes.py). New ActorLook.Bear and .Skeleton (appended),
+  "bear" solitary + skinnable, "skeleton" calls (kin "skeleton"). ModelBeast: Coat.Skin/Lit (albedo, normal map, emission mask;
+  painted models are not rounded and get tangents), Motions names for treant/bear/Ashen clips, attack2/3 and death2/3 slots,
+  DeathSlot, a model without a gallop walks all the way up; ModelBeast.Crumble.cs: Crumbles (skeletons fall into a heap of
+  bones) and TipsOver (crows keel onto their side). Camps: oakhaven "Hill hazel bears" (-70,178) x2 L2 and "Old Hazelmaw"
+  (-58,194) L3; peaks "High pines bears" (-44,96) x3 L7-8; khaven "The drowned dead" (32,-178) skeleton x4 L5, tag drowned.
+  Quests: npc.garet.bears, npc.yara.bears, npc.ansel.drowned. Loot tables bear and drowned, 5 items with icons (make_icons.py
+  re-encodes every PNG: keep only the new files). CreatureCapture rows beasts-treants, beasts-treant-moves, beasts-bears,
+  beasts-dead; CreatureImport.Report lists foreign rigs' bones and how far each clip carries the root.

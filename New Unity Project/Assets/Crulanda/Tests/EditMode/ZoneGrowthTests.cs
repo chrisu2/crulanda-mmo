@@ -68,11 +68,14 @@ namespace Crulanda.Tests
                 { "Deserters' camp", "down the cave, under the ridge" }, { "Drop sentries", "down the cave, under the ridge" },
                 { "Store Caves", "down the cave, under the ridge" }, { "The Quartermaster's desk", "down the cave, under the ridge" },
                 { "Deep Stair watch", "down the cave, under the ridge" }, { "King's guard", "down the cave, under the ridge" },
-                { "Caddock's hall", "down the cave, under the ridge" } } },
+                { "Caddock's hall", "down the cave, under the ridge" },
+                { "Hill hazel bears", "the hunter's quarry: 46 m up the hill from Moss's lodge, the hazels between (Bears in the Hazels)" },
+                { "Old Hazelmaw", "the hunter's quarry, 65 m up the hill from Moss's lodge (Bears in the Hazels)" } } },
             { "khaven", new Dictionary<string, string>() },   // grown to 410 m: every camp 125 m and more from its houses (2026-10-02)
             { "peaks", new Dictionary<string, string> {
                 { "Toll-gate guards", "the Sandthrone's toll-gate on the road, 70 m from Pilgrims' Rest: the guards stand at their gate" },
-                { "Captain's eyrie", "the Sandthrone's own keep, 117 m from Pilgrims' Rest" } } },   // grown to 430 m; the beasts moved out (2026-10-02)
+                { "Captain's eyrie", "the Sandthrone's own keep, 117 m from Pilgrims' Rest" },
+                { "High pines bears", "in the high pines under the tarn, 94 m from Pilgrims' Rest across the gate pines and the road" } } },   // grown to 430 m; the beasts moved out (2026-10-02)
             { "ashrim", new Dictionary<string, string> {
                 { "Cinderfold hollows", "91 m from the hunters' hide, where nobody lives (the Ash-Walkers are all at the enclave)" } } },   // grown to 430 m (2026-10-02)
             { "verdant", new Dictionary<string, string> {   // grown to 430 m (2026-10-02)

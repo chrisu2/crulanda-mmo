@@ -192,7 +192,7 @@ namespace Crulanda.Tests
             var zones = LootTestData.Zones(); int beasts = 0;
             foreach (var z in zones) foreach (var c in z.camps)
             {
-                if (c == null || (c.look != "wolf" && c.look != "boar" && c.look != "stag")) continue;
+                if (c == null || (c.look != "wolf" && c.look != "boar" && c.look != "stag" && c.look != "bear")) continue;
                 beasts++; var t = db.Loot.Find(x => x.tag == c.tag);
                 Assert.NotNull(t, z.id + " " + c.mob + ": a loot table for " + c.tag);
                 Assert.IsTrue(t.entries.Any(x => Inventory.IsHide(db.Get(x.item)) && x.chance > 0), z.id + " " + c.mob + " (" + c.tag + ") drops a hide.");

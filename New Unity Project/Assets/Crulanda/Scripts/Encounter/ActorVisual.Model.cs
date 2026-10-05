@@ -39,7 +39,7 @@ namespace Crulanda.Encounter
         /// pivot, but it rides the forearm, so it stays in the hand as the elbow bends.</summary>
         public Transform RightHandle { get { return handleR != null ? handleR : armR; } }
 
-        static bool Person(ActorLook look) { return !IsBeast(look) && look != ActorLook.Pale && look != ActorLook.Keeper && look != ActorLook.WeaveEater; }
+        static bool Person(ActorLook look) { return !IsBeast(look) && look != ActorLook.Pale && look != ActorLook.Keeper && look != ActorLook.WeaveEater && (look != ActorLook.Skeleton || !ModelBeast.Available("Skeleton")); }
 
         static readonly string[] FemaleNames = { "Ama", "Hedda", "Sel", "Lisbet", "Ilse", "Maud", "Edda", "Nettie", "Tamsin", "Grete", "Wenna", "Goody", "Hettie", "Nan", "Mother", "Old Sorrel", "Sorrel", "Mistress", "Dame", "Sister", "Widow" };
         static readonly string[] MaleNames = { "Brannoc", "Wil", "Garet", "Old Tobin", "Tobin", "Osk", "Corwin", "Aldo", "Hob", "Fen", "Jory", "Pim", "Chieftain", "Brother", "Master", "Father" };
@@ -509,6 +509,7 @@ namespace Crulanda.Encounter
         }
         /// <summary>A model's frame: the clip for the pose (walking wins over a standing pose), the arms for the poses without a
         /// clip, the back, the lean, then the frames.</summary>
+        Vector2 heading = new Vector2(0, 1);
         void ModelLate()
         {
             // Running out of a fight with a staff or a polearm: slung on the back, not whipping about in the fist (playtest note 19,
@@ -524,12 +525,15 @@ namespace Crulanda.Encounter
             var delta = transform.position - lastPosition; delta.y = 0; lastPosition = transform.position;
             float dt = Time.deltaTime, target = dt > 0 ? delta.magnitude / dt : 0;
             speed = Mathf.Lerp(speed, target, dt * 8); phase += dt * (2.2f + speed * 1.6f);
+            // Which way it is moving against the way it faces (strafing, backing): the figure's walk cycle follows it.
+            if (target > .2f) { var local = transform.InverseTransformDirection(delta); var h = new Vector2(local.x, local.z).normalized; heading = Vector2.Lerp(heading, h, Mathf.Min(1, dt * 10)); }
+            else heading = Vector2.Lerp(heading, new Vector2(0, 1), Mathf.Min(1, dt * 4));
             bool dead = actorRef != null && !actorRef.IsAlive, moving = speed > 1.1f, travel = Pose == ActorPose.Swim || Pose == ActorPose.Sneak;
             var p = PoseOf(moving && !travel ? ActorPose.None : Pose, speed, Time.time + variant * .7f);
             if (!p.arms && p.slot == null && Carry != Carrying.None) CarryArms(ref p);
             if (LyingLow) p = new PoseState { slot = "crouch" };   // an ambusher in wait (EncounterEnemy.Hide), crouched in the grass
             if (dead) { p = new PoseState { slot = "death" }; body.localRotation = Quaternion.identity; body.localPosition = Vector3.zero; }
-            model.Drive(speed, p.slot, dt);
+            model.Drive(speed, p.slot, dt, heading);
             if (p.arms) { poseArmL = p.armL; poseArmR = p.armR; poseElbowL = p.elbowL; poseElbowR = p.elbowR; }
             armWeight = Mathf.MoveTowards(armWeight, p.arms ? 1 : 0, dt * 4);
             // Off screen the Animator leaves the bones as they were (CullUpdateTransforms): bending them again would bend them twice.

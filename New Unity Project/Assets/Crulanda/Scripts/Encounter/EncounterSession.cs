@@ -1310,6 +1310,8 @@ namespace Crulanda.Encounter
                 case "stag": return ActorLook.Stag;
                 case "spider": return ActorLook.Spider;
                 case "bramble": return ActorLook.Bramble;
+                case "bear": return ActorLook.Bear;
+                case "skeleton": return ActorLook.Skeleton;
                 default: return veteran ? ActorLook.Warden : ActorLook.Collector;
             }
         }
@@ -1339,10 +1341,10 @@ namespace Crulanda.Encounter
                     bool elite = camp.elite && n == 0;
                     string id = "mob." + tag + "." + zoneShort + "." + c + "." + n;
                     var a = SpawnActor(elite ? camp.mob + " (elite)" : camp.mob, content.enemy, point, Color.grey, id, look, level);
-                    AddAgent(a.gameObject, look == ActorLook.Wolf ? 4.2f : look == ActorLook.Boar ? 3.8f : look == ActorLook.WeaveEater ? 3.4f : 2.8f, beast ? .6f : .45f);
+                    AddAgent(a.gameObject, look == ActorLook.Wolf ? 4.2f : look == ActorLook.Boar ? 3.8f : look == ActorLook.Bear ? 4f : look == ActorLook.WeaveEater ? 3.4f : 2.8f, beast ? .6f : .45f);
                     var enemy = a.gameObject.AddComponent<EncounterEnemy>(); enemy.actor = a; enemy.persistentId = id; enemy.session = this;
                     enemy.Camp = true; enemy.Elite = elite; enemy.RespawnSeconds = Mathf.Max(20, camp.respawn); enemy.CampCenter = camp.center; enemy.CampRadius = camp.radius;
-                    enemy.Ambusher = camp.ambush; enemy.Skinnable = look == ActorLook.Wolf || look == ActorLook.Boar || look == ActorLook.Stag;
+                    enemy.Ambusher = camp.ambush; enemy.Skinnable = look == ActorLook.Wolf || look == ActorLook.Boar || look == ActorLook.Stag || look == ActorLook.Bear;
                     a.gameObject.SetActive(true); enemy.Initialize(); Enemies.Add(enemy);
                     if (camp.ambush) enemy.Hide();
                     a.Stats.SetBase(StatType.MaxHealth, EncounterEnemy.MobHealth(level, false, elite, beast));

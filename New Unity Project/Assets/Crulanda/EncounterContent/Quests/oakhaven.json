@@ -846,6 +846,53 @@
           }
         ]
       }
+    },
+    {
+      "id": "npc.garet.bears",
+      "title": "Bears in the Hazels",
+      "kind": "npc",
+      "giver": "Garet Moss",
+      "turnIn": "Garet Moss",
+      "zone": "zone.oakhaven",
+      "level": 2,
+      "requires": [
+        "npc.garet.tracks"
+      ],
+      "canonStatus": "GAME-ONLY",
+      "summary": "Bears have come down off Crowsfoot Ridge into the hill hazels, an old one with them. Garet wants them gone before they find the Harrows' pigs.",
+      "offer": "Garet Moss is scraping a hide on the rail and doesn't look up. \"Bears. Down off the ridge into the hill hazels, east of the Mastwood. They never come this low.\" He sets the scraper down. \"Something up there has them moving. Two young ones, and an old boar the size of a cart. Hazelmaw, my father called him, and my father's been dead twenty years.\"\n\n\"Before they find the Harrows' pigs. Mind the old one: he doesn't bluff.\"",
+      "complete": "Garet looks at the claw you bring him a long while. \"Hazelmaw. I'll be.\" He hangs it on the rail with the hides. \"Twenty years he kept to the ridge. Whatever moved him, I'd rather it hadn't.\"",
+      "steps": [
+        {
+          "text": "Drive the bears out of the hill hazels.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.oakhaven",
+              "target": "mob.bear.oakhaven.21.*",
+              "count": 2,
+              "text": "Brown bears"
+            },
+            {
+              "type": "kill",
+              "zone": "zone.oakhaven",
+              "target": "mob.bear.oakhaven.22.*",
+              "text": "Old Hazelmaw",
+              "say": "The old bear goes down like a felled tree, and the hazels go quiet around it."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 90,
+        "gold": 14,
+        "reputation": [
+          {
+            "faction": "oakhaven",
+            "amount": 150
+          }
+        ]
+      }
     }
   ]
 }

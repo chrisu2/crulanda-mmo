@@ -1544,7 +1544,7 @@ namespace Crulanda.World
             var door = PlankDoor(hinge, new Vector3(doorW / 2, doorH / 2, 0), doorW, doorH, dark, .1f);
             var doorCollider = door.AddComponent<BoxCollider>();
             DoorSteps(t, 0, -d / 2 - wall / 2, .05f, 2, wall, footing);
-            var innDoor = new ZoneDoor { name = t.name, openable = true, hinge = hinge, blocker = doorCollider, position = t.TransformPoint(new Vector3(0, 1, -d / 2)) };
+            var innDoor = new ZoneDoor { name = t.name, kind = "inn", openable = true, hinge = hinge, blocker = doorCollider, position = t.TransformPoint(new Vector3(0, 1, -d / 2)) };
             Doors.Add(innDoor); innDoor.SetOpen(true);   // the inn keeps its door open; villagers come and go
             if (art.particle != null && variant != 1) Smoke(t, new Vector3(w / 2 - 1.1f, H + roofH * 1.4f, d * .15f));
             // Inside: bar counter with barrels behind it, three tables with stools, and the hearth.

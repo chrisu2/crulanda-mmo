@@ -91,7 +91,7 @@ namespace Crulanda.Encounter
             Activity = actor.Resource.Pool.Current < heal.cost ? "Recovering mana" : distance > 3 ? "Following you" : "Watching your flank";
             var target = session.Target;
             var bolt = Hasted(session.content.boltAbility);
-            if (target != null && target.Engaged && target.actor.IsAlive && recipient.Health.Pool.Ratio > .8f &&
+            if (target != null && target.FightingParty && target.actor.IsAlive && recipient.Health.Pool.Ratio > .8f &&
                 Vector3.Distance(target.transform.position, transform.position) < bolt.range)
             {
                 if (abilities.TryStart(bolt, Time.time, Spend, () => {

@@ -21,9 +21,15 @@ namespace Crulanda.Encounter
         public readonly List<SimFigure> Figures = new List<SimFigure>();
         float nextCheck;
 
+        /// <summary>Whether sims live their day (hunt, gather, the inn: Phase 5.3a) or only stand about. Off in editor test runs and
+        /// the HUD captures, so no sim tags a mob a test or a capture is fighting; a test of their life sets <see cref="LifeOverride"/>.</summary>
+        public bool Lively { get; private set; }
+        public static bool? LifeOverride;
         public void Init(EncounterSession session, string root)
         {
             Session = session; Root = root; Active = this;
+            bool testRun = Application.isEditor && (Application.isBatchMode || System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-runTests") >= 0);
+            Lively = LifeOverride ?? !(testRun || EncounterCapture.Requested);
             World = SimRoster.LoadOrCreate(root);
             Refresh();
         }
@@ -31,6 +37,8 @@ namespace Crulanda.Encounter
         public string ZoneId { get { return Session != null && Session.Zone != null ? Session.Zone.Zone.id : null; } }
         public SimFigure Find(string simId) { return Figures.Find(f => f != null && f.sim.id == simId); }
         public SimFigure FindByName(string name) { return Figures.Find(f => f != null && f.sim.name == name); }
+        /// <summary>A sim standing in the world, as a fighter (its Actor) for the mobs' threat (EncounterSession.CombatActor).</summary>
+        public Crulanda.Gameplay.Actor FighterActor(string simId) { var f = Find(simId); return f != null && !f.Hidden ? f.actor : null; }
 
         void Update()
         {
@@ -75,49 +83,6 @@ namespace Crulanda.Encounter
             p.y = zb != null ? zb.HeightAt(p.x, p.z) : 0;
             if (NavMesh.SamplePosition(p, out var hit, 8, NavMesh.AllAreas)) return hit.position;
             return p;
-        }
-    }
-
-    /// <summary>A sim's figure in the zone: the class's look, standing about and wandering between the zone's places.</summary>
-    public sealed class SimFigure : MonoBehaviour
-    {
-        public SimAdventurer sim; public SimPopulation population; public ActorVisual visual; NavMeshAgent agent;
-        float nextMove, stuckSince; int pick;
-        public bool Walking { get { return agent != null && agent.isOnNavMesh && !agent.isStopped && agent.remainingDistance > agent.stoppingDistance + .1f; } }
-
-        public static SimFigure Spawn(SimPopulation pop, SimAdventurer s)
-        {
-            var go = new GameObject("Sim " + s.name); go.SetActive(false); go.transform.SetParent(pop.transform, false);
-            var start = s.x != 0 || s.z != 0 ? new Vector3(s.x, 0, s.z) : pop.Spot(s, 0);
-            if (s.x != 0 || s.z != 0) { start.y = pop.Session.Zone != null ? pop.Session.Zone.HeightAt(start.x, start.z) : 0; if (NavMesh.SamplePosition(start, out var hit, 6, NavMesh.AllAreas)) start = hit.position; }
-            go.transform.position = start + Vector3.up;
-            var body = GameObject.CreatePrimitive(PrimitiveType.Capsule); body.name = "Body"; Destroy(body.GetComponent<Collider>()); body.transform.SetParent(go.transform, false);
-            var f = go.AddComponent<SimFigure>(); f.sim = s; f.population = pop;
-            f.agent = go.AddComponent<NavMeshAgent>(); f.agent.speed = 1.7f; f.agent.angularSpeed = 360; f.agent.acceleration = 8; f.agent.stoppingDistance = .5f; f.agent.radius = .3f; f.agent.height = 2; f.agent.baseOffset = 1; f.agent.avoidancePriority = 80;   // villagers (60) go first: a sim steps aside
-            f.visual = ActorVisual.Attach(go, EncounterSession.LookForClass(s.classId), s.variant);
-            go.SetActive(true);   // ActorVisual hides the placeholder capsule itself; the figure is built under "Body", so nothing else is touched here
-            SimGear.Dress(f.visual, s, pop.Session.Items);   // its own gear by its level and class (Phase 5.2 round 2)
-            f.nextMove = Time.time + 4 + (s.variant % 7) * 2;
-            return f;
-        }
-        void Update()
-        {
-            if (population == null || population.Session == null || population.Session.Paused || agent == null || !agent.isOnNavMesh) return;
-            if (Time.time >= nextMove)
-            {
-                pick++; var to = population.Spot(sim, pick);
-                agent.isStopped = false; agent.SetDestination(to);
-                nextMove = Time.time + 14 + (sim.variant % 5) * 4 + (sim.chatty > .6f ? 6 : 0);
-                stuckSince = Time.time;
-            }
-            if (Walking && Time.time - stuckSince > 25) { agent.ResetPath(); nextMove = Time.time + 2; }   // a path that never ends: give it up
-            // Facing the player when they stand close (friendly ones): a nod of attention, nothing more yet.
-            if (sim.friendly > .5f && !Walking)
-            {
-                var player = population.Session.Player; if (player == null) return;
-                var to = player.transform.position - transform.position; to.y = 0;
-                if (to.sqrMagnitude < 9 && to.sqrMagnitude > .01f) transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(to), Time.deltaTime * 3);
-            }
         }
     }
 }

@@ -35,6 +35,14 @@ Cap/Cord/Mantle/Jerkin/Gloves/Breeches/Boots; cloth: Hood/Pendant/Mantle/Tunic/W
 Paladin only. Not stored: derived on sight. The who list (EncounterHud.Who, O) lists the online. EncounterEnemy.GroupScale: each
 party sim adds clamp(simLevel/mobLevel, .25, 1.25) shares; health x(1+.6 shares), damage x(1+.15 shares).
 
+## Phase 5.3a (2026-10-06): their day
+SimFigure (Scripts/Encounter/SimFigure.cs) carries an Actor (sim id as EntityId) and Combatant. Choose scores: hunt .35+.6 bold
+(a camp mob of level -2..+1 within 160 m, health over 60%), gather .3+.5(1-bold) (a ready node within 140 m), inn 1.2 when under
+60% health else .12+.2 chatty, loiter .25+.45 chatty, each plus up to .3 chance. Hunt: 2-4 mobs; melee 2.4 m every 2 s, ranged 18 m
+every 2.4 s, damage as a party sim; breaks off under 30% (non-healers); healers heal every 8 s under 50%. Fallen: up after 12 s at
+35%, then the inn. Gather: 1-3 nodes, 4-6 s kneeling each (EncounterSession.SimGathered rests the node). Inn: hidden 60-120 s,
+healing. EncounterEnemy.TappedBy (first hitter) decides credit; FightingParty separates your fights from theirs.
+
 ## Next extraction
 Introduce a plain persistent SimAdventurer profile keyed by EntityId, distinct from its Actor.
 Move companion state out of the scenario DTO behind a versioned save migration. Preserve existing IDs.

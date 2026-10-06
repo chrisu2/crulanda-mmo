@@ -632,10 +632,10 @@ namespace Crulanda.Encounter
             if (pop != null)
                 foreach (var f in pop.Figures)
                 {
-                    if (f == null) continue;
+                    if (f == null || f.Hidden) continue;   // inside the inn
                     var root = f.transform.position; float fd = Vector3.Distance(player, root + Vector3.up * 1.3f);
                     if (fd > 24 || !ToCanvas(root + Vector3.up * 1.3f, out var fp) || fp.x < 0 || fp.x > 1440 || Occluded(f, root + Vector3.up * .85f)) continue;
-                    string title = Bracketed(SimRoster.ClassName(f.sim.classId) + " " + f.sim.level);
+                    string title = Bracketed(SimRoster.ClassName(f.sim.classId) + " " + f.sim.level + (f.Activity == SimFigure.Doing.Loiter ? "" : " · " + f.Doings));
                     float w = Mathf.Max(TextWidth(plateText, f.sim.name), TextWidth(plateText, title)) + 8;
                     AddPlate(new Plate { dist = fd, fade = Mathf.Clamp01((24 - fd) / 4), top = -41, at = fp, sim = f, named = true, name = f.sim.name, title = title, mark = ' ' }, w);
                 }

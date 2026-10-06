@@ -102,6 +102,10 @@ namespace Crulanda.Encounter
         public readonly EncounterThreat threat = new EncounterThreat();
         public Actor Victim { get; private set; }
         public bool Engaged { get { return Victim != null && actor.IsAlive; } }
+        /// <summary>Fighting you or one of your party (not a sim out on its own: Phase 5.3a).</summary>
+        public bool FightingParty { get { return Engaged && session.PartyActor(Victim.EntityId.Value) != null; } }
+        /// <summary>Whose kill it is: the first to hit it (your party, or a sim on its own). Cleared when the fight resets.</summary>
+        public string TappedBy { get; private set; }
         NavMeshAgent agent;
         Vector3 home;
         float swing, baseSpeed, slowFactor = 1, slowUntil, rootUntil;
@@ -152,8 +156,8 @@ namespace Crulanda.Encounter
             // behind a wall doesn't come for you through it. On its way home from a broken leash it notices nobody.
             if (!Evading && Vector3.Distance(transform.position, session.Player.transform.position) < 5 && (Victim != null || Sees(session.Player.transform.position)))
                 threat.AddProximity(session.Player.EntityId.Value, Time.deltaTime);
-            var id = threat.Choose(Time.time, session.IsLivingPartyMember);
-            Victim = session.PartyActor(id);
+            var id = threat.Choose(Time.time, session.IsLivingCombatant);
+            Victim = session.CombatActor(id);   // your party, or a sim that came for it (Phase 5.3a)
             if (Victim == null) { if (inFight) ClearFight(); if (agent.isOnNavMesh) agent.SetDestination(home); return; }
             if (Vector3.Distance(Victim.transform.position, Group != null ? Group.anchor : home) > session.Leash + 6) { Disengage(); return; }
             if (!inFight) Engage();   // the camp hears of it (EncounterSession.RaiseAlarm)
@@ -198,7 +202,7 @@ namespace Crulanda.Encounter
         public void ResetFight()
         {
             ClearFight();
-            threat.Clear(); Victim = null; slowUntil = rootUntil = 0; unreachableSince = -1;
+            threat.Clear(); Victim = null; slowUntil = rootUntil = 0; unreachableSince = -1; TappedBy = null;
             UnscaleFromGroup();
             if (!actor.IsAlive) return;
             actor.Health.ApplyHealing(actor.Health.Pool.Max);
@@ -211,6 +215,7 @@ namespace Crulanda.Encounter
         {
             if (!actor.IsAlive) return;
             if (Hidden) Pounce();
+            if (TappedBy == null && source != null && !Game) TappedBy = source.EntityId.Value;
             int actual = actor.GetComponent<Combatant>().Damage(Mathf.RoundToInt(damage * session.Kit.PartyDamageMultiplier(this) * OverTakenNow));
             if (actor.IsAlive && Figure != null) Figure.Flinch();
             if (Game) { if (actor.IsAlive) GetComponent<GameAnimal>()?.Bolt(source != null ? source.transform.position : transform.position); }
@@ -238,7 +243,7 @@ namespace Crulanda.Encounter
             home = transform.position;
             var visual = transform.Find("Body");
             if (visual != null) { visual.localRotation = Quaternion.identity; visual.localPosition = Vector3.zero; }
-            UnscaleFromGroup(); actor.Health.Revive(actor.Health.Pool.Max); actor.Health.ApplyHealing(actor.Health.Pool.Max);
+            UnscaleFromGroup(); TappedBy = null; actor.Health.Revive(actor.Health.Pool.Max); actor.Health.ApplyHealing(actor.Health.Pool.Max);
             ClearFight(); evadeUntil = 0;
             threat.Clear(); Victim = null; Looted = false; slowUntil = rootUntil = 0;
             Drops = null; Coins = 0; LootBeacon.Clear(this);

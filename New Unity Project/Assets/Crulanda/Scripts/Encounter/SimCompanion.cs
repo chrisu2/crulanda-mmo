@@ -39,11 +39,11 @@ namespace Crulanda.Encounter
             get
             {
                 var t = session.Target;
-                if (t != null && t.actor.IsAlive && !t.Game && (t.Engaged || session.AutoAttack)) return t;
+                if (t != null && t.actor.IsAlive && !t.Game && (t.FightingParty || session.AutoAttack)) return t;
                 EncounterEnemy best = null; float bestD = 30;
                 foreach (var e in session.Enemies)
                 {
-                    if (e == null || !e.actor.IsAlive || !e.Engaged) continue;
+                    if (e == null || !e.actor.IsAlive || !e.FightingParty) continue;
                     float d = Vector3.Distance(e.transform.position, transform.position); if (d < bestD) { best = e; bestD = d; }
                 }
                 return best;

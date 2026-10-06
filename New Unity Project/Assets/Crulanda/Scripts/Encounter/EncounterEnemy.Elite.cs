@@ -21,8 +21,10 @@ namespace Crulanda.Encounter
         /// <summary>What its swing is multiplied by and what the party's blows on it are multiplied by, when it outlevels the player.
         /// Every mob counts it now, a normal one more steeply (Chris, 2026-10-05: a level 10 at level 7 "was way too easy...should
         /// kill me"); an elite as before (EliteBalance's paper fights).</summary>
-        float OverHitNow { get { return session.Player == null ? 1 : Move != null ? OvermatchHit(actor.Level, session.Player.Level) : OvermatchHitNormal(actor.Level, session.Player.Level); } }
-        float OverTakenNow { get { return session.Player == null ? 1 : Move != null ? OvermatchTaken(actor.Level, session.Player.Level) : OvermatchTakenNormal(actor.Level, session.Player.Level); } }
+        /// <summary>The level of whom it fights (a sim on its own fights at its own level), else yours.</summary>
+        int FoeLevel { get { return Victim != null ? Victim.Level : session.Player.Level; } }
+        float OverHitNow { get { return session.Player == null ? 1 : Move != null ? OvermatchHit(actor.Level, FoeLevel) : OvermatchHitNormal(actor.Level, FoeLevel); } }
+        float OverTakenNow { get { return session.Player == null ? 1 : Move != null ? OvermatchTaken(actor.Level, FoeLevel) : OvermatchTakenNormal(actor.Level, FoeLevel); } }
         float blowAt = -1, blowStart, nextBlowAt;
         bool rallied, leaning; Quaternion bodyRest; Vector3 calmScale;
         BlowMark mark;

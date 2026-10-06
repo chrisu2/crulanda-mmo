@@ -27,9 +27,9 @@ namespace Crulanda.Encounter
         public void HealThreat(Actor healer, int healed)
         {
             if (healer == null || healed <= 0) return;
-            int n = 0; foreach (var enemy in Enemies) if (enemy != null && enemy.Engaged) n++;
+            int n = 0; foreach (var enemy in Enemies) if (enemy != null && enemy.FightingParty) n++;
             if (n == 0) return;
-            foreach (var enemy in Enemies) if (enemy != null && enemy.Engaged) enemy.threat.Add(healer.EntityId.Value, healed * .5f / n);
+            foreach (var enemy in Enemies) if (enemy != null && enemy.FightingParty) enemy.threat.Add(healer.EntityId.Value, healed * .5f / n);
         }
         /// <summary>
         /// Mira's health as the save holds it. A save from before she grew with your level holds her old full health (her level-1

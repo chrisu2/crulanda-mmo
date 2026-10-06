@@ -28,7 +28,7 @@ namespace Crulanda.Encounter
         /// <summary>Scales to the party now; only ever up during a fight (a sim falling does not heal the mob).</summary>
         void ScaleToGroup()
         {
-            if (Game || !actor.IsAlive) return;
+            if (Game || !actor.IsAlive || !FightingParty) return;   // a sim on its own fights it as it is
             float shares = SharesFor(session, actor.Level);
             if (shares <= GroupShares + .001f) return;
             GroupShares = shares;

@@ -43,6 +43,9 @@ namespace Crulanda.Encounter
             if (PartySims.Count >= MaxPartySims) return "Your party is full.";
             if (Mathf.Abs(s.level - Progress.Level) > InviteLevelGap) return s.name + " declines: \"We're too far apart, friend. Find someone nearer your level.\"";
             if (s.friendly < BusyBelow) return s.name + " declines: \"Not right now. I'm in the middle of something.\"";
+            var fig = SimPopulation.Active?.Find(s.id);
+            if (fig != null && fig.InFight) return s.name + " is busy fighting.";
+            if (fig != null && fig.Hidden) return s.name + " is inside the inn.";
             return null;
         }
         public bool Invite(string simId)

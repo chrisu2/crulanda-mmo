@@ -1347,3 +1347,20 @@ A read-only review by five reviewers, each finding checked by a second who tried
   (the flaps cap and the half kettle resting on the hair's top); hoods, coifs, barbutes, masks and the scarf by their crown
   just over the hair, sized from the skull only; circlets and crowns by their band, not their spikes. Any class hood (Druid,
   Ranger, Mage) comes off under a head piece. FigureCapture helms-fit rows: all 18 on a man and a woman, front and side.
+
+## 2026-10-06 — Phase 5.3a: the sims live their day
+- **They choose what to do** (SimFigure.Choose) when the last thing is done, by personality, health and what is near: hunt the
+  camp mobs of their level (bold ones more), work a herb or ore node (cautious ones more), rest at the inn (when hurt, or now
+  and then), or stand about the named places (chatty ones more), with a little chance in it. Their plate says what they are at
+  ("Warrior 5 · fighting Grey wolf", "· gathering", "· at the inn").
+- **They fight real mobs, and the mobs fight back** (EncounterSession.CombatActor: your party, or a sim that came for it). They
+  fight in their class's way; healers mend themselves; a hurt sim breaks off; one beaten falls and gets up after a while (the
+  run back from a graveyard is 5.3b). A mob fights a sim at the sim's level, and is not scaled to your group.
+- **Tagging:** a mob first hit by a sim on its own is its kill: no experience, coin, loot or quest credit for you. A sim's fight
+  elsewhere does not put you in combat (you can still save, invite, rest).
+- **Nodes are shared:** a node a sim works rests on its own timer, as when you work it. The inn: they go in (out of sight and
+  reach) and come out mended. The Golden Cask's door is now known as the inn's (ZoneDoor.kind "inn").
+- In editor test runs and the HUD captures the sims only stand about (SimPopulation.Lively), so none tags a mob a test is
+  fighting; SimLifeTests turn their life on.
+- Tests: PlayMode SimLifeTests (a hunt the mob answers, the sim's kill gives you nothing, a node worked and resting, the inn,
+  the bold choose to hunt).

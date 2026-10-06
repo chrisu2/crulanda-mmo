@@ -1073,7 +1073,7 @@ namespace Crulanda.Encounter
         }
         public void AddHealingThreat(int healed)
         {
-            foreach (var enemy in Enemies) if (enemy.Engaged) enemy.threat.Add(Player.EntityId.Value, healed * .5f);
+            foreach (var enemy in Enemies) if (enemy.FightingParty) enemy.threat.Add(Player.EntityId.Value, healed * .5f);
         }
         public bool AutoAttack { get; private set; }
         public float SwingRemaining { get { return Mathf.Max(0, nextSwing - Time.time); } }
@@ -1160,7 +1160,7 @@ namespace Crulanda.Encounter
         public void StopAutoAttack() { AutoAttack = false; }
         public readonly List<string> Messages = new List<string>();
         public readonly List<CombatText> Floating = new List<CombatText>();
-        public bool InCombat { get { return FightingTarget || Enemies.Exists(e => e != null && e.Engaged); } }
+        public bool InCombat { get { return FightingTarget || Enemies.Exists(e => e != null && e.FightingParty); } }   // a sim's fight elsewhere is not yours
         public int WeaponDamage { get { return Player == null ? 0 : Player.Stats.GetRounded(StatType.AttackPower); } }
         float nextSwing, nextRegen, nextSave;
         EncounterSave saves;
@@ -1428,6 +1428,15 @@ namespace Crulanda.Encounter
             return null;
         }
         public bool IsLivingPartyMember(string id) { var a = PartyActor(id); return a != null && a.IsAlive; }
+        /// <summary>Whom a mob may fight: your party, or a sim in the world that came for it (Phase 5.3a).</summary>
+        public Actor CombatActor(string id) { return PartyActor(id) ?? SimPopulation.Active?.FighterActor(id); }
+        public bool IsLivingCombatant(string id) { var a = CombatActor(id); return a != null && a.IsAlive; }
+        /// <summary>A sim worked a node: it rests until its respawn as if you had (nothing comes to you).</summary>
+        public void SimGathered(Crulanda.World.ZoneInteractable i)
+        {
+            if (i == null || i.node == null || Professions == null || Zone == null) return;
+            var def = Professions.Db.Node(i.node); if (def != null) RestNode(i, def.respawn);
+        }
         // Timed for the performance probe (playtest note 23).
         static readonly Unity.Profiling.ProfilerMarker perfMark = new Unity.Profiling.ProfilerMarker("PERF.Session");
         void Update() { using (perfMark.Auto()) UpdateTimed(); }
@@ -1547,7 +1556,7 @@ namespace Crulanda.Encounter
             if (Companion != null && Hit(Companion.transform.position, .95f, out float md) && md < best) { best = md; pick = null; mira = true; }
             // The sims, in the world and in your party (Phase 5.2b): the nearest under the pointer wins over a villager behind them.
             string simPick = null;
-            if (SimPopulation.Active != null) foreach (var f in SimPopulation.Active.Figures) if (f != null && Hit(f.transform.position, .95f, out float sd) && sd < best) { best = sd; simPick = f.sim.id; }
+            if (SimPopulation.Active != null) foreach (var f in SimPopulation.Active.Figures) if (f != null && !f.Hidden && Hit(f.transform.position, .95f, out float sd) && sd < best) { best = sd; simPick = f.sim.id; }
             foreach (var c in PartySims) if (c != null && Hit(c.transform.position, .95f, out float cd) && cd < best) { best = cd; simPick = c.sim.id; }
             if (simPick != null) { SelectSim(simPick); return; }
             SelectFriendly(pick, mira);
@@ -1607,7 +1616,7 @@ namespace Crulanda.Encounter
             if (exit == null || Zone == null || !Zone.HasZone(exit.to)) return false;
             // Only a fight you are actually in stops you: something after you nearby. A mob stuck chasing you from the far side
             // of the zone must not bar every road out.
-            var chaser = Enemies.Find(e => e != null && e.Engaged && Distance(e) < 40);
+            var chaser = Enemies.Find(e => e != null && e.FightingParty && Distance(e) < 40);
             if (!Player.IsAlive || chaser != null || (FightingTarget && Distance(Target) < 40))
             { Message(chaser != null ? "You can't travel while fighting: " + chaser.actor.DisplayName + " is still after you." : "You can't travel while fighting."); return false; }
             if (saves == null || saveBlocked) { Message("Travel disabled to protect an unreadable save."); return false; }
@@ -1770,6 +1779,8 @@ namespace Crulanda.Encounter
         {
             if (restoring) return;
             if (enemy.Game) { GameDied(enemy); return; }   // no experience, no coin, no "zone clear" (EncounterSession.Hunt)
+            // A sim's kill (it hit first, out of your party): nothing for you, no loot on the body (Phase 5.3a; classic tagging).
+            if (enemy.TappedBy != null && enemy.TappedBy != Player.EntityId.Value && PartyActor(enemy.TappedBy) == null) { if (Target == enemy) AutoAttack = false; return; }
             if (enemy.Camp) RollCorpse(enemy);   // the loot is decided as it dies, so the body can show it
             if (enemy.Camp && enemy.Elite) { if (Feats != null) Feats.Slain(enemy.persistentId); else { var k = Achievements.EliteKey(enemy.persistentId); if (k != null && !Progress.elitesSlain.Contains(k)) Progress.elitesSlain.Add(k); } }
             OnKillEffects();

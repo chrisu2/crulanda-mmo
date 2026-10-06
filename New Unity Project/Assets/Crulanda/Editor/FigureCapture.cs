@@ -60,7 +60,7 @@ namespace Crulanda.EditorTools
             Row("weapons-models", new[] { P(ActorLook.Warrior, 0, null, "Uncommon", Hands(db, 3, 2, "Blade", "Shield"), db, looks), P(ActorLook.Warrior, 1, null, "Rare", Hands(db, 6, 3, "Blade", "Buckler"), db, looks),
                 P(ActorLook.Warrior, 2, null, "Epic", Hands(db, 9, 4, "Blade", "Shield"), db, looks), P(ActorLook.Warrior, 0, null, "Rare hatchet", Hands(db, 5, 3, "Hatchet", "Shield"), db, looks),
                 P(ActorLook.Warrior, 1, null, "Epic cudgel", Hands(db, 10, 4, "Cudgel", "Buckler"), db, looks), P(ActorLook.Druid, 0, null, "Epic blade", Hands(db, 12, 4, "Blade", null), db, looks) }, 0);
-            Row("fight", new[] { A("swing", .15f), A("swing", .35f), A("swing", .55f), A("jab", .2f, new string[0]), A("hit", .2f), A("castloop", .5f, new string[0]), A("castshot", .25f, new string[0]) }, 90);
+            Row("fight", new[] { A("swing", .15f), A("swing", .35f), A("swing", .55f), A("jab", .2f, new string[0]), A("hit", .2f), A("castloop", .5f, new string[0]), A("castenter", 9f, new string[0]), A("castshot", .25f, new string[0]) }, 90);
             // Named head pieces on the players, close (playtest note 31: "tin crown is also way too big", "orbits my head").
             var named = ItemDatabase.Parse(new System.Collections.Generic.List<string> { System.IO.File.ReadAllText("Assets/Crulanda/EncounterContent/Items/items.json") });
             Row("helms-named", new[] { P(ActorLook.Warrior, 0, null, "Tin crown", new[] { "item.tin_crown" }, named, looks), P(ActorLook.Druid, 0, null, "Tin crown (druid)", new[] { "item.tin_crown" }, named, looks),

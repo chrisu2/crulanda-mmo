@@ -144,7 +144,7 @@ namespace Crulanda.Encounter
                 float per = a.power + 6 * R("ju-weighted-judgement");
                 float d = per * pips + s.WeaponDamage * .5f;
                 if (t.actor.Health.Pool.Ratio < .35f) d *= 1 + .1f * R("ju-executioner");
-                Hit(t, Dmg(d));
+                s.Bolt(t, new Color(1, .9f, .5f), .22f); Hit(t, Dmg(d));
                 int burn = R("ju-burning-light");
                 if (burn > 0) periodic.Add("burn", t, Now, 2, 3, Dmg((2 + Level / 2f) * burn), (e, i) => { var enemy = (EncounterEnemy)e.target; if (!enemy.actor.IsAlive) return false; Hit(enemy, e.value); return true; });
                 if (pips >= MaxConviction && R("ju-swift-verdict") > 0) s.Player.Resource.Pool.Change(10);

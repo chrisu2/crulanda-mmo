@@ -95,6 +95,8 @@
     { "item": "temper.veridian",      "look": "sword.great:steel/concord" },
     { "item": "craft.heartwood_greatblade",  "look": "sword.great:wood/veridian+glow" },
     { "item": "item.training_blade",         "look": "sword.arming:straight/oakhaven" },
+    { "item": "item.apprentice_wand",        "look": "model.weapon:Wand_Basic/oakhaven" },
+    { "item": "item.hunting_bow",            "look": "model.weapon:Bow_Basic/oakhaven" },
     { "item": "item.poachers_hood",          "look": "head.hood:oilskin/oakhaven" },
     { "item": "item.hesks_lantern",          "look": "offhand.hung:shuttered/sandthrone+glow" },
     { "item": "item.tin_crown",              "look": "head.crown:tin/sandthrone" },

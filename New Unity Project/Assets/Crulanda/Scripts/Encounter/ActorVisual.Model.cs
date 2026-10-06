@@ -513,6 +513,7 @@ namespace Crulanda.Encounter
         /// <summary>A model's frame: the clip for the pose (walking wins over a standing pose), the arms for the poses without a
         /// clip, the back, the lean, then the frames.</summary>
         Vector2 heading = new Vector2(0, 1);
+        AdventurerMotor motor; bool motorChecked;
         void ModelLate()
         {
             // Running out of a fight with a staff or a polearm: slung on the back, not whipping about in the fist (playtest note 19,
@@ -535,6 +536,13 @@ namespace Crulanda.Encounter
             var p = PoseOf(moving && !travel ? ActorPose.None : Pose, speed, Time.time + variant * .7f);
             if (!p.arms && p.slot == null && Carry != Carrying.None) CarryArms(ref p);
             if (LyingLow) p = new PoseState { slot = "crouch" };   // an ambusher in wait (EncounterEnemy.Hide), crouched in the grass
+            // The player's jump (Round 22, note 50): the take-off, the air, and the landing on the spot.
+            if (!motorChecked) { motor = GetComponent<AdventurerMotor>(); motorChecked = true; }
+            if (motor != null && !dead && Pose != ActorPose.Swim)
+            {
+                if (motor.Airborne && model.Has("k.jump")) p = new PoseState { slot = motor.AirAge < .22f && model.Has("k.jumpstart") ? "k.jumpstart" : "k.jump" };
+                else if (!motor.Airborne && motor.LandedAge < .3f && !moving && model.Has("k.land")) p = new PoseState { slot = "k.land" };
+            }
             if (dead) { p = new PoseState { slot = "death" }; body.localRotation = Quaternion.identity; body.localPosition = Vector3.zero; }
             model.Drive(speed, p.slot, dt, heading);
             if (p.arms) { poseArmL = p.armL; poseArmR = p.armR; poseElbowL = p.elbowL; poseElbowR = p.elbowR; }

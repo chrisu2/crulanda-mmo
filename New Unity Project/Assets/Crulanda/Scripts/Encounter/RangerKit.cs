@@ -112,7 +112,7 @@ namespace Crulanda.Encounter
             return Start(With(a, cost, 0), () => {
                 freeQuick = false;
                 if (!s.LandsOn(t, a.range)) return;
-                s.BeginAutoAttack(); Hit(t, Shot(a.power + s.WeaponDamage * .6f)); AfterShot(t);
+s.Bolt(t, new Color(.9f, .88f, .8f), .1f, true); s.BeginAutoAttack(); Hit(t, Shot(a.power + s.WeaponDamage * .6f)); AfterShot(t);
             });
         }
         bool AimedShot(AbilityDefinition a)
@@ -120,7 +120,7 @@ namespace Crulanda.Encounter
             if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
             return Start(a, () => {
                 if (!s.LandsOn(t, a.range)) return;
-                s.BeginAutoAttack();
+                s.BeginAutoAttack(); s.Bolt(t, new Color(.9f, .88f, .8f), .1f, true); 
                 float d = a.power + s.WeaponDamage;
                 float ratio = t.actor.Health.Pool.Ratio;
                 if (ratio > .7f) d *= 1 + .08f * R("mk-piercing");
@@ -136,7 +136,7 @@ namespace Crulanda.Encounter
             if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
             return Start(a, () => {
                 if (!s.LandsOn(t, a.range)) return;
-                s.BeginAutoAttack(); Hit(t, Shot(a.power + s.WeaponDamage * .3f));
+s.Bolt(t, new Color(.9f, .88f, .8f), .1f, true); s.BeginAutoAttack(); Hit(t, Shot(a.power + s.WeaponDamage * .3f));
                 int ticks = 4 + R("mk-bleeding-wounds");
                 periodic.Add("bleed", t, Now, 2, ticks, Shot(3 + Level / 2f), (e, i) => { var enemy = (EncounterEnemy)e.target; if (!enemy.actor.IsAlive) return false; Hit(enemy, e.value); return true; });
                 AfterShot(t);
@@ -158,14 +158,14 @@ namespace Crulanda.Encounter
         {
             if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
             int tangle = R("pf-tangling-snare");
-            return Start(a, () => { if (s.LandsOn(t, a.range)) t.Slow(.5f + .05f * tangle, a.duration + tangle); });
+            return Start(a, () => { if (s.LandsOn(t, a.range)) { s.Bolt(t, new Color(.9f, .88f, .8f), .1f, true); t.Slow(.5f + .05f * tangle, a.duration + tangle); } });
         }
         bool Pin(AbilityDefinition a)
         {
             if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
             return Start(a, () => {
                 if (!s.LandsOn(t, a.range)) return;
-                Hit(t, Shot(a.power + s.WeaponDamage * .3f)); t.Root(a.duration + R("pf-trapper"));
+s.Bolt(t, new Color(.9f, .88f, .8f), .1f, true); Hit(t, Shot(a.power + s.WeaponDamage * .3f)); t.Root(a.duration + R("pf-trapper"));
                 s.Message("Pin: the target is held where it stands.");
             });
         }

@@ -155,7 +155,7 @@ namespace Crulanda.Encounter
             var id = threat.Choose(Time.time, session.IsLivingPartyMember);
             Victim = session.PartyActor(id);
             if (Victim == null) { if (inFight) ClearFight(); if (agent.isOnNavMesh) agent.SetDestination(home); return; }
-            if (Vector3.Distance(Victim.transform.position, Group != null ? Group.anchor : home) > session.Leash + 2) { Disengage(); return; }
+            if (Vector3.Distance(Victim.transform.position, Group != null ? Group.anchor : home) > session.Leash + 6) { Disengage(); return; }
             if (!inFight) Engage();   // the camp hears of it (EncounterSession.RaiseAlarm)
             if (Move != null && TickElite()) return;   // an elite drawing back for its heavy blow stands still and does not swing
             if (agent.isOnNavMesh) { agent.isStopped = false; agent.SetDestination(Victim.transform.position); }

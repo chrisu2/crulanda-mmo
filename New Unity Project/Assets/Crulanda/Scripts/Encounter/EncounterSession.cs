@@ -42,7 +42,7 @@ namespace Crulanda.Encounter
         // ---------- zone (generated world) or the legacy Quiet Trail defaults ----------
         public Crulanda.World.ZoneBuilder Zone { get { return Crulanda.World.ZoneBuilder.Active; } }
         public string ZoneTitle { get { return Zone != null ? Zone.Zone.displayName : "The Quiet Trail"; } }
-        public float Leash { get { return Zone != null && Zone.Zone.spawns.leash > 0 ? Zone.Zone.spawns.leash : 17; } }
+        public float Leash { get { return Zone != null && Zone.Zone.spawns.leash > 0 ? Zone.Zone.spawns.leash : 30; } }   // 17 until Round 22 (note 53: a wolf went home when Chris backed a few steps)
         public Vector3 RecoveryPoint { get { return Zone != null ? Zone.Ground(Zone.Zone.spawns.recovery, 1.1f) : new Vector3(0, 1.1f, -13); } }
         Vector3 StartPoint { get { return Zone != null ? Zone.Ground(Zone.Zone.spawns.player, 1.1f) : new Vector3(0, 1.1f, -13); } }
         Vector3 CompanionPoint { get { return Zone != null ? Zone.Ground(Zone.Zone.spawns.companion, 1.05f) : new Vector3(3, 1.05f, -12); } }
@@ -1142,6 +1142,13 @@ namespace Crulanda.Encounter
             if (EnemyInRange(Target, range)) return true;
             Message("Select a living enemy and move within " + range + " metres."); return false;
         }
+        /// <summary>A spell or an arrow seen flying from the player's hand to <paramref name="target"/> (Bolt; Round 22, note 52). Cosmetic: the blow lands as the ability resolves.</summary>
+        public void Bolt(EncounterEnemy target, Color colour, float size = .18f, bool arrow = false)
+        {
+            if (target == null || Player == null) return;
+            var hand = PlayerFigure != null ? PlayerFigure.RightHandle : null;
+            Crulanda.Encounter.Bolt.Fire(hand != null ? hand.position : Player.transform.position + Vector3.up * 1.3f, target.transform, colour, size, arrow ? .22f : .28f, arrow);
+        }
         public void BeginAutoAttack()
         {
             if (Kit != null && !Kit.MeleeAutoAttacks && !Kit.RangedAutoAttacks) return;
@@ -1487,7 +1494,7 @@ namespace Crulanda.Encounter
             if (AutoAttack && Target != null && Target.actor.IsAlive && Time.time >= nextSwing && Distance(Target) < Kit.AutoAttackRange)
             {
                 nextSwing = Time.time + Kit.SwingInterval(content.playerSwingInterval);
-                if (Kit.MeleeAutoAttacks) PlayerFigure?.Strike(); else PlayerFigure?.CastRelease();
+                if (Kit.MeleeAutoAttacks) PlayerFigure?.Strike(); else { PlayerFigure?.CastRelease(); Bolt(Target, new Color(.9f, .88f, .8f), .1f, true); }
                 Target.Receive(WeaponDamage, Player); Kit.OnAutoHit();
             }
             if (Time.time >= nextRegen)

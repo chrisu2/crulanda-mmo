@@ -71,7 +71,7 @@
       "x": -7,
       "y": 33
     },
-    "leash": 17,
+    "leash": 30,
     "enemies": []
   },
   "objectives": [
@@ -1104,6 +1104,7 @@
         "x": 4,
         "y": -9
       },
+      "name": "Rootfast",
       "rotation": 270
     },
     {
@@ -1112,6 +1113,7 @@
         "x": 155,
         "y": 18.5
       },
+      "name": "Ashland Rim",
       "rotation": 180
     },
     {

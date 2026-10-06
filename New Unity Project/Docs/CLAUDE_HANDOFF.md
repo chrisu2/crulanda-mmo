@@ -9,7 +9,9 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-10-05, late night)
+## RESUME HERE (updated 2026-10-06, small hours)
+**Round 22 (playtest notes 47-53 from Chris's first go at the Mage and Ranger): PUBLISHED, committed, backed up (CHANGELOG).
+Next: 5.2 sim profiles, or whatever Chris's next notes say.**
 **5.1c the Mage: PUBLISHED 2026-10-05 late night, committed, backed up (see CHANGELOG). Phase 5.1 is complete: five classes
 (Warrior, Druid, Paladin, Ranger, Mage). Next: 5.2 sim profiles (Docs/ROADMAP.md): ~20 persistent SimAdventurers with stable
 ids, name, race, class (any of the five kits), level, gear, personality and home zone, saved, materialised as figures in the

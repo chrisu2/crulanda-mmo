@@ -249,7 +249,7 @@ namespace Crulanda.Encounter
         /// <summary>One-shot and held motions of the arms and back, played over whatever the legs are doing.</summary>
         static readonly (string slot, string clip)[] Actions = {
             ("swing", "Sword_Attack"), ("jab", "Punch_Jab"), ("cross", "Punch_Cross"), ("hit", "Hit_Chest"), ("hithead", "Hit_Head"),
-            ("castloop", "Spell_Simple_Idle_Loop"), ("castshot", "Spell_Simple_Shoot") };
+            ("castloop", "Spell_Simple_Idle_Loop"), ("castshot", "Spell_Simple_Shoot"), ("castenter", "Spell_Simple_Enter") };
         AnimationLayerMixerPlayable layers; AnimationMixerPlayable upper;
         readonly List<(AnimationClipPlayable p, AnimationClip c)> acts = new List<(AnimationClipPlayable, AnimationClip)>();
         readonly Dictionary<string, int> actOf = new Dictionary<string, int>();
@@ -266,7 +266,7 @@ namespace Crulanda.Encounter
             acting = slot; actUntil = Time.time + c.length / (flinch ? 1.4f : 1.25f);
         }
         /// <summary>Holds the spell pose while a cast is drawn (the release is <see cref="Act"/>("castshot")).</summary>
-        public bool Casting { get { return casting; } set { casting = value; } }
+        public bool Casting { get { return casting; } set { if (value && !casting && actOf.TryGetValue("castenter", out int ce)) acts[ce].p.SetTime(0); casting = value; } }
         /// <summary>The spine and all above it (arms, neck, head), as transform paths under the figure's Animator.</summary>
         AvatarMask UpperMask()
         {
@@ -286,12 +286,15 @@ namespace Crulanda.Encounter
         {
             if (!layers.IsValid()) return;
             bool on = Acting || casting;
-            string slot = Acting ? acting : casting ? "castloop" : null;
+            // A cast drawn: the gathering of the hands (Spell_Simple_Enter) held at its end, not the loop's arms held out (Round 22, note 51).
+            string slot = Acting ? acting : casting ? (actOf.ContainsKey("castenter") ? "castenter" : "castloop") : null;
             for (int i = 0; i < acts.Count; i++) upper.SetInputWeight(i, slot != null && actOf.TryGetValue(slot, out int s) && s == i ? 1 : 0);
             if (!Acting) acting = null;
-            layerWeight = Mathf.MoveTowards(layerWeight, on ? 1 : 0, dt * (on ? 12 : 5));
+            float aim = !on ? 0 : Acting ? 1 : .45f;   // a cast drawn: the arm half-raised over the walk, not held out full for the whole draw (Round 22, note 51)
+            layerWeight = Mathf.MoveTowards(layerWeight, aim, dt * (on ? 12 : 5));
             layers.SetInputWeight(1, layerWeight);
             if (slot == "castloop" && actOf.TryGetValue("castloop", out int cl)) { var (p, c) = acts[cl]; if (c.length > 0 && p.GetTime() > c.length) p.SetTime(p.GetTime() % c.length); }
+            if (slot == "castenter" && actOf.TryGetValue("castenter", out int en)) { var (p, c) = acts[en]; if (c.length > 0 && p.GetTime() > c.length - .02f) p.SetTime(c.length - .02f); }
         }
         readonly List<(AnimationClipPlayable p, AnimationClip c, bool loop)> slots = new List<(AnimationClipPlayable, AnimationClip, bool)>();
         readonly Dictionary<string, int> slotOf = new Dictionary<string, int>(); float[] weights; string current;
@@ -333,7 +336,7 @@ namespace Crulanda.Encounter
             foreach (var (slot, clip) in Motions) { var c = Clip(clip); if (c != null) found.Add((slot, c)); }
             // The Human Basic Motions for this figure's body, when they are in the game.
             var kiClips = new List<(string, AnimationClip)>();
-            foreach (var (slot, file) in new[] { ("k.idle", "Idle01"), ("k.idle2", "Idle02"), ("k.talk", "Talk01"), ("k.fall", "Fall01") }) { var c = KiClip(spec.female, file); if (c != null) kiClips.Add((slot, c)); }
+            foreach (var (slot, file) in new[] { ("k.idle", "Idle01"), ("k.idle2", "Idle02"), ("k.talk", "Talk01"), ("k.fall", "Fall01"), ("k.jump", "Jump01"), ("k.jumpstart", "Jump01 - Begin"), ("k.land", "Jump01 - Land") }) { var c = KiClip(spec.female, file); if (c != null) kiClips.Add((slot, c)); }   // the jump's three (Round 22, note 50)
             for (int d = 0; d < Dirs.Length; d++)
             {
                 var w = KiClip(spec.female, "Walk01_" + DirFiles[d]); if (w != null) kiClips.Add(("w." + Dirs[d], w));
@@ -360,7 +363,7 @@ namespace Crulanda.Encounter
             for (int i = 0; i < found.Count; i++)
             {
                 var p = AnimationClipPlayable.Create(graph, found[i].Item2); p.SetApplyFootIK(true);
-                graph.Connect(p, 0, mixer, i); slots.Add((p, found[i].Item2, found[i].Item1 != "death" && found[i].Item1 != "gather")); slotOf[found[i].Item1] = i;
+                graph.Connect(p, 0, mixer, i); slots.Add((p, found[i].Item2, found[i].Item1 != "death" && found[i].Item1 != "gather" && found[i].Item1 != "k.jumpstart" && found[i].Item1 != "k.land")); slotOf[found[i].Item1] = i;
                 p.SetTime(Stagger(label, i) * found[i].Item2.length);   // no two figures step in time
                 idleBeat = Stagger(label, 99);
             }

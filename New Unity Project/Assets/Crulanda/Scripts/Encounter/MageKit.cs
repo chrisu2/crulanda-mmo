@@ -139,6 +139,7 @@ namespace Crulanda.Encounter
             return Start(With(a, a.cost, cast), () => {
                 if (instant) backdraft = false;
                 if (!s.LandsOn(t, a.range)) return;
+                s.Bolt(t, new Color(1, .55f, .15f), .2f);
                 float d = (a.power + 2 * Level) * (1 + .03f * R("cb-kindling"));
                 if (bound) { d *= 1 - Mathf.Max(.1f, BoundLoss - .1f * R("sb-steady-mind")); Binding = false; Charges = 1; s.Message("Bound: a Charge is banked for Unbind."); }
                 Hit(t, Dmg(d)); GainHeat(EmberHeat);
@@ -149,6 +150,7 @@ namespace Crulanda.Encounter
             if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
             return Start(a, () => {
                 if (!s.LandsOn(t, a.range)) return;
+                s.Bolt(t, new Color(1, .32f, .1f), .16f);
                 Hit(t, Dmg(a.power + Level)); GainHeat(ScorchHeat);
                 int ticks = 4 + R("cb-stoked");
                 periodic.Add("scorch", t, Now, 2, ticks, Dmg(3 + Level / 2f), (e, i) => { var enemy = (EncounterEnemy)e.target; if (!enemy.actor.IsAlive) return false; Hit(enemy, e.value); return true; });
@@ -160,6 +162,7 @@ namespace Crulanda.Encounter
             var t = s.Target;
             return Start(a, () => {
                 if (!s.LandsOn(t, a.range) || Heat < FlareMinHeat) return;
+                s.Bolt(t, new Color(1, .72f, .25f), .34f);
                 int spent = Heat; Heat = 0;
                 int d = Dmg((a.power + Level + spent * .6f) * (1 + .08f * R("cb-flashpoint")));
                 Hit(t, d);
@@ -192,6 +195,7 @@ namespace Crulanda.Encounter
             if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
             return Start(a, () => {
                 if (!s.LandsOn(t, a.range)) return;
+                s.Bolt(t, new Color(.55f, .5f, .48f), .14f);
                 t.Slow(.5f, a.duration + R("hw-slow-burn")); GainHeat(SmoulderHeat);
                 if (R("hw-firestorm") > 0 && InField(t)) { t.Root(2); s.Message("Firestorm: the target is held in the burning ground."); }
             });
@@ -201,6 +205,7 @@ namespace Crulanda.Encounter
             if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
             return Start(a, () => {
                 if (!s.LandsOn(t, a.range)) return;
+                s.Bolt(t, new Color(.6f, .85f, 1), .16f);
                 Hit(t, Dmg(a.power + Level)); t.Stagger(a.duration);
                 overloadedUntil = 0;
                 s.Message("Quench: the target's swing is held back for " + a.duration + " seconds; your own heat is steadied.");

@@ -1,6 +1,32 @@
 {
   "items": [
     {
+      "id": "item.apprentice_wand",
+      "name": "Apprentice's Wand",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 2,
+      "level": 1,
+      "value": 5,
+      "weaponDamage": 6,
+      "intellect": 1,
+      "description": "Hazel, cut on a new moon and warm to the hand. It remembers the first spark you drew through it.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "item.hunting_bow",
+      "name": "Hunter's Bow",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 2,
+      "level": 1,
+      "value": 5,
+      "weaponDamage": 7,
+      "stamina": 1,
+      "description": "Yew, strung with gut. It has brought down more hares than anything with a name.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
       "id": "item.training_blade",
       "name": "Tempered Trailblade",
       "kind": "gear",

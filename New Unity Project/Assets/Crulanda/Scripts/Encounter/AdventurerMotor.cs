@@ -13,6 +13,11 @@ namespace Crulanda.Encounter
         bool orbiting;
         /// <summary>True while the player is walking or airborne this frame; used to interrupt cast-time abilities.</summary>
         public bool Moving { get; private set; }
+        /// <summary>In a jump or a fall (not swimming).</summary>
+        public bool Airborne { get; private set; }
+        float groundedAt, airSince = -9, landedAt = -9;
+        public float AirAge { get { return Time.time - airSince; } }
+        public float LandedAge { get { return Time.time - landedAt; } }
         /// <summary>In water deeper than about chest height: floating at the surface, slower, no jumping.</summary>
         public bool Swimming { get; private set; }
         /// <summary>Holding Ctrl: half speed, and hidden hunters only notice you from much closer.</summary>
@@ -73,8 +78,13 @@ namespace Crulanda.Encounter
                 if (pushingBank) vertical = Mathf.Max(vertical, 3.2f);
                 if (EncounterInput.Press(KeyCode.Space) && depth < 2.2f) vertical = 5.5f;
             }
-            else if (controller.isGrounded) { vertical = -2; if (EncounterInput.Press(KeyCode.Space)) vertical = 6; }
+            else if (controller.isGrounded) { vertical = -2; groundedAt = Time.time; if (EncounterInput.Press(KeyCode.Space)) { vertical = 6; airSince = Time.time; } }
             else vertical -= 20 * Time.deltaTime;
+            // In the air (Round 22, note 50): a jump, or a fall longer than a step off a kerb. The figure plays the jump clips on it.
+            bool air = !Swimming && !controller.isGrounded && (vertical > .5f || Time.time - groundedAt > .15f);
+            if (air && !Airborne && vertical <= .5f) airSince = Time.time;
+            if (!air && Airborne) landedAt = Time.time;
+            Airborne = air;
             Moving = direction.sqrMagnitude > .01f || vertical > .5f;
             float fallSpeed = -vertical;
             controller.Move((direction * speed + current + Vector3.up * vertical) * Time.deltaTime);

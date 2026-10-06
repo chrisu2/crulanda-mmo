@@ -442,6 +442,18 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
   a cough; the cold idles on the Peaks) when figures stand; walking by default (1.9 m/s), "/" toggles running; villagers and
   children walk; Mira keeps your pace. DONE (round 21).
 - **46. Menu button** in place of the row of HUD buttons. DONE (round 21).
+- **47. Sword too big** (the Mage with the starter blade). DONE (round 22): the held mount scaled 1.05, not 1.35.
+- **48. "Mage should start with wand or staff?"** DONE (round 22): an Apprentice's Wand for the Mage and a Hunter's Bow for the
+  Ranger (the packs' Wand_Basic and Bow_Basic as model weapons; bows now a gear look, gripped at the middle).
+- **49. "Why is this sign in the middle of the road? Should say something on it."** DONE (round 22): the boards carry where the
+  road goes (the prop's name, both faces); the three posts that stood in a road moved a metre past the verge.
+- **50. Jumping animation needs work.** DONE (round 22): Kevin's jump (take-off, the air, the landing) on the player's figure.
+- **51. Casting: "stands too long with arms up. seems unnatural."** DONE (round 22): a cast now holds the end of the hands-gathering
+  clip, not the arms-out loop.
+- **52. "No animations on firebolt/scorch. shoot out fire?"** DONE (round 22): bolts (Bolt.cs): a glowing ball with a trail and a
+  burst of embers for the Mage's spells, Thornbolt and Seedshot, Judgement; arrows for the Ranger's shots and auto-shot.
+- **53. "Killed one wolf, backed up a few steps, the other ran back home. Should have been more aggressive."** DONE (round 22):
+  the leash 30 m from where the pull began (was 17) with 6 m of give (was 2).
 - **Asset queue (Chris, 2026-10-05), for the next art rounds:** Stylized Nature MegaKit (outdoor areas), Medieval Village
   MegaKit (housing), Fantasy Props MegaKit, Stylized Megapack 2in1 (all in Downloads), the Asset Store's Medieval props and HQ
   Rock Pack (boulders and crags), the Ashen Marches sentinel helm (a model helm needs the armour path), and the Ash-Walker

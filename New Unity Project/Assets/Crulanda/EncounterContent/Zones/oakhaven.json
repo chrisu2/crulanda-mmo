@@ -73,7 +73,7 @@
       "x": -8,
       "y": -8
     },
-    "leash": 17,
+    "leash": 30,
     "enemies": [
       {
         "id": "oakhaven.collector.0",
@@ -1873,17 +1873,19 @@
     {
       "kind": "signpost",
       "at": {
-        "x": -11,
-        "y": -41
+        "x": -13.9,
+        "y": -39.8
       },
+      "name": "Ashland Rim",
       "rotation": 22
     },
     {
       "kind": "signpost",
       "at": {
-        "x": -37,
-        "y": 7
+        "x": -36.9,
+        "y": 7.9
       },
+      "name": "Khaven Village",
       "rotation": 90
     },
     {
@@ -2260,14 +2262,16 @@
         "x": -78,
         "y": 14
       },
+      "name": "Harrow farm",
       "rotation": 0
     },
     {
       "kind": "signpost",
       "at": {
-        "x": -26,
-        "y": -92
+        "x": -24.2,
+        "y": -92.5
       },
+      "name": "Ashland Rim",
       "rotation": 15
     },
     {
@@ -2932,6 +2936,7 @@
         "x": -243,
         "y": 19
       },
+      "name": "Khaven Village",
       "rotation": 80
     },
     {
@@ -3128,6 +3133,7 @@
         "x": 236,
         "y": -136.5
       },
+      "name": "Hallow's Creek",
       "rotation": 70
     },
     {
@@ -3308,6 +3314,7 @@
         "x": -28.5,
         "y": 187.5
       },
+      "name": "Crowsfoot Hollow",
       "rotation": 300
     },
     {

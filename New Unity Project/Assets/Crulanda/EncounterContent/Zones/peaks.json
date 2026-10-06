@@ -67,7 +67,7 @@
       "x": -18,
       "y": -2
     },
-    "leash": 17,
+    "leash": 30,
     "enemies": []
   },
   "objectives": [
@@ -838,6 +838,7 @@
         "x": -3,
         "y": -5
       },
+      "name": "Pilgrims' Rest",
       "rotation": 315
     },
     {
@@ -1002,6 +1003,7 @@
         "x": 12,
         "y": 36
       },
+      "name": "The Toll Gate",
       "rotation": 290
     },
     {
@@ -1604,6 +1606,7 @@
         "x": -137,
         "y": -44.5
       },
+      "name": "The Sealed Adit",
       "rotation": 270
     },
     {

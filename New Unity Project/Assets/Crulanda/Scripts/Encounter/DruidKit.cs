@@ -376,7 +376,7 @@ namespace Crulanda.Encounter
             if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
             return Start(a, () => {
                 if (!s.LandsOn(t, a.range)) return;
-                t.Receive(Dmg(a.power + Level), s.Player); Alternate("seedshot");
+                s.Bolt(t, new Color(.55f, .9f, .3f), .15f); t.Receive(Dmg(a.power + Level), s.Player); Alternate("seedshot");
                 if (R("ts-pollen-veil") > 0) veiledUntil[t] = Now + 6;
                 if (R("ts-germinate") > 0) seeded.Add(t);
                 else periodic.Add("thornrot", t, Now, 2, 2, Dmg(3 + Level / 3f), (e, i) => {
@@ -392,7 +392,7 @@ namespace Crulanda.Encounter
                 if (instant) CadenceCharges = Mathf.Max(0, CadenceCharges - 1);
                 if (!s.LandsOn(t, a.range)) return;
                 float bonus = seeded.Remove(t) ? 1 + .15f * R("ts-germinate") : 1;
-                t.Receive(Dmg((a.power + 2 * Level) * bonus), s.Player); Alternate("thornbolt");
+                s.Bolt(t, new Color(.4f, .8f, .25f), .2f); t.Receive(Dmg((a.power + 2 * Level) * bonus), s.Player); Alternate("thornbolt");
             });
         }
         bool BriarSnare(AbilityDefinition a)

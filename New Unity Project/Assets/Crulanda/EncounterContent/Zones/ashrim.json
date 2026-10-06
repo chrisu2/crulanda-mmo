@@ -61,7 +61,7 @@
       "x": 56,
       "y": 2
     },
-    "leash": 17,
+    "leash": 30,
     "enemies": []
   },
   "objectives": [
@@ -767,6 +767,7 @@
         "x": 40,
         "y": 5
       },
+      "name": "Shattered Peaks",
       "rotation": 90
     },
     {
@@ -1273,6 +1274,7 @@
         "x": -151,
         "y": 83.9
       },
+      "name": "Wain's Rest",
       "rotation": 270
     },
     {
@@ -1964,7 +1966,7 @@
     },
     {
       "kind": "signpost",
-      "name": "Old west road sign",
+      "name": "Verdant Shore",
       "at": {
         "x": -156.5,
         "y": 82

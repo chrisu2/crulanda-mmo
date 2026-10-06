@@ -70,7 +70,7 @@
       "x": -19,
       "y": -6
     },
-    "leash": 16,
+    "leash": 30,
     "enemies": [
       {
         "id": "khaven.outrider.0",
@@ -1710,9 +1710,10 @@
     {
       "kind": "signpost",
       "at": {
-        "x": -40,
-        "y": -26
+        "x": -38.1,
+        "y": -27.9
       },
+      "name": "Oakhaven",
       "rotation": 45
     },
     {
@@ -1768,6 +1769,7 @@
         "x": -43,
         "y": -14
       },
+      "name": "Shattered Peaks",
       "rotation": 90
     },
     {
@@ -1776,6 +1778,7 @@
         "x": -6,
         "y": 102
       },
+      "name": "Shattered Peaks",
       "rotation": 0
     },
     {
@@ -2192,6 +2195,7 @@
         "x": -86.8,
         "y": -138.8
       },
+      "name": "Oakhaven",
       "rotation": 45
     },
     {

@@ -1177,7 +1177,7 @@ namespace Crulanda.World
                         Lump(Boulder(), t, new Vector3(0, .3f * s, 0), new Vector3(2f * s, 1.3f * s, 1.7f * s), stone, R01 * 360); if (s > 1.3f) Lump(Boulder(), t, new Vector3(.7f * s, .15f * s, .5f * s), new Vector3(.9f * s, .6f * s, .8f * s), stone, R01 * 360); Solid(t, new Vector3(0, .5f * s, 0), new Vector3(1.6f * s, 1f * s, 1.4f * s)); if (Zone.biome == "mountain" && string.IsNullOrEmpty(p.interact)) RockSkirt(t, s * .8f, stone); break;
                     }
                     case "bridge": SeatBridge(t, p.size.x > 0 ? p.size.x : 12); if (p.variant == 1) RopeBridge(t, p.size.x > 0 ? p.size.x : 12); else Bridge(t, p.size.x > 0 ? p.size.x : 12); break;
-                    case "signpost": Signpost(t); break;
+                    case "signpost": Signpost(t, p.name); break;
                     case "board": NoticeBoard(t); break;
                     case "ruin": Ruin(t, p.size.x > 0 ? p.size.x : 6); break;
                     case "gate": Gate(t, p.size.x > 0 ? p.size.x : 6.4f); break;
@@ -2444,12 +2444,23 @@ namespace Crulanda.World
                 Part(PrimitiveType.Sphere, t, new Vector3(x, y + h / 2 - .03f, -.05f), Vector3.one * .03f, Tint(art.timber, new Color(.2f, .14f, .09f)));   // the nail
             }
         }
-        void Signpost(Transform t)
+        void Signpost(Transform t, string text = null)
         {
             Stake(t, new Vector3(0, -.1f, 0), .2f, 2.44f, art.timber, Quaternion.Euler(0, 0, 2));
             var board = PropMesh("Sign board", () => Cutout(new[] { new Vector2(-.24f, -.17f), new Vector2(-.24f, .17f), new Vector2(.86f, .17f), new Vector2(1.08f, 0), new Vector2(.86f, -.17f) }, .07f));
             MeshPart(board, t, new Vector3(0, 1.82f, -.12f), Tint(art.timber, new Color(.5f, .37f, .22f)), Quaternion.Euler(0, 0, -5));
             foreach (float x in new[] { -.13f, .02f }) Part(PrimitiveType.Cube, t, new Vector3(x, 1.82f - x * .087f, -.16f), new Vector3(.05f, .05f, .06f), Tint(art.timber, new Color(.2f, .14f, .09f)));   // the pegs, on the board's own slant
+            // The board's writing (Round 22, playtest note 49: "should say something on it"): the prop's name, burnt into both faces.
+            if (string.IsNullOrEmpty(text)) return;
+            var font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            foreach (float side in new[] { -1f, 1f })
+            {
+                var tm = new GameObject("Sign text").AddComponent<TextMesh>(); tm.transform.SetParent(t, false);
+                tm.transform.localPosition = new Vector3(.4f, 1.82f - .4f * .087f, -.12f + side * .045f); tm.transform.localRotation = Quaternion.Euler(0, side < 0 ? 0 : 180, side < 0 ? -5 : 5);
+                tm.text = text; tm.font = font; tm.fontSize = 64; tm.characterSize = Mathf.Min(.03f, 1.1f / Mathf.Max(6, text.Length) * .26f); tm.fontStyle = FontStyle.Bold;
+                tm.anchor = TextAnchor.MiddleCenter; tm.alignment = TextAlignment.Center; tm.color = new Color(.17f, .11f, .05f);
+                var r = tm.GetComponent<MeshRenderer>(); r.sharedMaterial = font.material; r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off; r.receiveShadows = false;
+            }
         }
         /// <summary>
         /// A post-and-rail fence along x: hewn posts with chamfered caps, each leaning and standing a little taller or shorter

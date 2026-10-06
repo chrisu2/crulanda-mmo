@@ -81,8 +81,10 @@ namespace Crulanda.Encounter
             bool fromLow = at <= .67f;
             float gripAt = at < .35f ? at : at > .67f ? at : tall ? .4f : .12f;
             if (!fromLow) gripAt = at;
+            bool bow = name.Contains("Bow"); if (bow) gripAt = .5f;   // a bow is held at its middle, its limbs up and down and its string toward the body (Round 22)
             var up = Axis(lng) * (fromLow ? 1 : -1);   // from the grip toward the far end
             var rot = Quaternion.Inverse(Quaternion.LookRotation(Axis(mid), up));
+            if (bow) rot = Quaternion.Euler(0, 90, 0) * rot;
             float scale = ModelLength(name) / len;
             var grip = b.center; grip[lng] = lo + gripAt * len;
             return (rot, -(rot * grip) * scale, scale);

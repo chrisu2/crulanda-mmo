@@ -65,8 +65,10 @@ namespace Crulanda.Tests
             Assert.IsTrue(session.UseAbility(EmberBolt), "Ember Bolt begins its cast");
             yield return new WaitForSeconds(.5f);
             Assert.AreEqual(before, e.actor.Health.Pool.Current, "Nothing lands while it is cast."); Assert.AreEqual(0, Mage.Heat);
-            yield return new WaitForSeconds(1.4f);
+            bool ember = false;
+            for (float w = 0; w < 1.6f; w += Time.deltaTime) { if (UnityEngine.Object.FindFirstObjectByType<Bolt>() != null) ember = true; yield return null; }
             Assert.Less(e.actor.Health.Pool.Current, before, "It lands."); Assert.AreEqual(MageKit.EmberHeat, Mage.Heat, "15 Heat built.");
+            Assert.IsTrue(ember, "An ember is seen flying (Round 22).");
             Assert.IsFalse(session.Kit.Use(Flare), "Flare refuses under 30 Heat.");
             Mage.GainHeat(35); Assert.AreEqual(50, Mage.Heat);
             int mid = e.actor.Health.Pool.Current;

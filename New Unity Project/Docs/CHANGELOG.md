@@ -1282,3 +1282,18 @@ A read-only review by five reviewers, each finding checked by a second who tried
   capture_extra.ps1 takes the Mage's HUD shots (prefix mage-).
 - Tests: EditMode MageRulesTests (tree, gates, content; five classes now), PlayMode MageLoopTests (own character, the cast and
   the Heat it builds, Flare's release, the Overload and its stall, Cinder Field and Smoulder, Bind, Unbind and Ember Ward).
+
+## 2026-10-05 — Round 22: the first playtest of the three classes (notes 47-53)
+- **Weapons in hand:** the held mount scaled 1.05 (was 1.35: "sword too big"). The Mage starts with an Apprentice's Wand and the
+  Ranger with a Hunter's Bow (the packs' Wand_Basic and Bow_Basic; bows join the model-weapon looks, gripped at the middle with
+  the limbs up and down); the others keep the Trailblade.
+- **Spells and arrows seen flying (Bolt.cs):** a glowing ball with a trail and a point light flies from the hand to the target in
+  a quarter second and bursts into embers (Ember Bolt, Scorch, Flare, Smoulder, Quench; Seedshot and Thornbolt; Judgement); an
+  arrow for the Ranger's shots and the bow's auto-shot. Cosmetic: the blow lands as before.
+- **The cast pose:** a cast being drawn holds the end of Spell_Simple_Enter (hands gathering) instead of the loop with the arms
+  held out; the release is unchanged.
+- **The jump:** Kevin Iglesias's Jump01 (take-off, the air, the landing) on the player's figure (AdventurerMotor.Airborne).
+- **Signposts** say where the road goes (ZoneProp.name on each of the 19 posts, burnt into both faces of the board) and none
+  stands in the road (three moved a metre past the verge: two in Oakhaven, one in Khaven).
+- **The leash:** 30 m from where the pull began (was 17) and 6 m of give (was 2), so backing a few steps no longer sends a
+  wolf home.

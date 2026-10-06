@@ -22,7 +22,7 @@ namespace Crulanda.Encounter
             foreach (var r in go.GetComponentsInChildren<MeshRenderer>(true)) { r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On; r.receiveShadows = true; }
             var fit = ModelFit(go.transform, false, prefab);
             go.transform.localRotation = fit.Item1; go.transform.localScale = Vector3.one * fit.Item3;
-            float fitGrip = prefab.Contains("Staff") || prefab.Contains("Spear") ? .4f : .12f;
+            float fitGrip = prefab.Contains("Bow") ? .5f : prefab.Contains("Staff") || prefab.Contains("Spear") ? .4f : .12f;   // where the fit itself put the grip (ActorVisual.GearModels.cs)
             go.transform.localPosition = fit.Item2 + Vector3.down * ((gripAt - fitGrip) * ModelLength(prefab));   // slide the grip point to the hand
             return holder;
         }

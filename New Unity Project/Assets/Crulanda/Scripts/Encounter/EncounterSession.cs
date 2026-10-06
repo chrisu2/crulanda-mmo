@@ -49,6 +49,23 @@ namespace Crulanda.Encounter
         public string Objective(int index, string fallback)
         { var o = Zone?.Zone.objectives; return o != null && index < o.Length && !string.IsNullOrEmpty(o[index]) ? o[index] : fallback; }
         public DruidKit Druid { get { return Kit as DruidKit; } }
+        public PaladinKit Paladin { get { return Kit as PaladinKit; } }
+        /// <summary>The figure a class wears and the tint of its capsule stand-in (the classes added 2026-10-05 included).</summary>
+        public static ActorLook LookForClass(string classId)
+        {
+            switch (classId) { case "class.druid": return ActorLook.Druid; case "class.paladin": return ActorLook.Paladin; case "class.ranger": return ActorLook.Ranger; case "class.mage": return ActorLook.Mage; default: return ActorLook.Warrior; }
+        }
+        public static Color TintForClass(string classId)
+        {
+            switch (classId)
+            {
+                case "class.druid": return new Color(.52f, .44f, .27f);
+                case "class.paladin": return new Color(.9f, .84f, .6f);
+                case "class.ranger": return new Color(.3f, .5f, .25f);
+                case "class.mage": return new Color(.4f, .3f, .7f);
+                default: return new Color(.2f, .58f, .72f);
+            }
+        }
         // ---------- quests ----------
         /// <summary>The player's quest log (null when quest content is missing or invalid).</summary>
         public QuestLog Quests { get; private set; }
@@ -1227,9 +1244,7 @@ namespace Crulanda.Encounter
             }
             if (Zone != null) Progress.y = Zone.StandAt(new Vector2(Progress.x, Progress.z), Progress.y - 1.1f, 1.1f).y;   // on the generated ground, or the cave floor you saved on
             actorsRoot = new GameObject("Encounter Actors");
-            var tint = ClassDef.id == "class.druid" ? new Color(.52f, .44f, .27f) : new Color(.2f, .58f, .72f);
-            Player = SpawnActor("You", content.player, new Vector3(Progress.x, Progress.y, Progress.z), tint, Progress.playerId,
-                ClassDef.id == "class.druid" ? ActorLook.Druid : ActorLook.Warrior);
+            Player = SpawnActor("You", content.player, new Vector3(Progress.x, Progress.y, Progress.z), TintForClass(ClassDef.id), Progress.playerId, LookForClass(ClassDef.id));
             var controller = Player.gameObject.AddComponent<CharacterController>(); controller.height = 2; controller.radius = .4f; controller.stepOffset = .35f;
             controller.minMoveDistance = 0;
             var motor = Player.gameObject.AddComponent<AdventurerMotor>(); motor.session = this; motor.view = View;

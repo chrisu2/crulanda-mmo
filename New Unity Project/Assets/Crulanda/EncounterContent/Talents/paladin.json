@@ -1,0 +1,57 @@
+{
+ "id": "paladin",
+ "name": "Paladin",
+ "resource": "Mana and Conviction",
+ "resourceDesc": "Mana pays for every action; Conviction (three pips) is built by Smite in melee and by blows taken under the Ward, and spent by Judgement or Lay On.",
+ "identity": "A mailed hybrid who earns Conviction up close and chooses, pip by pip, between a thrown Judgement and a saving Lay On.",
+ "branches": [
+  {
+   "id": "oathguard",
+   "name": "Oathguard",
+   "role": "tank",
+   "loop": "Hold attention with Oath of Ward, bank Conviction from blows taken under the Ward, and burn the ground you stand on.",
+   "tradeoff": "Conviction earned from blows is slow and only comes while the Ward is up; the branch gives nothing to Judgement's bite.",
+   "nodes": [
+    {"id": "og-steadfast", "name": "Steadfast", "tier": 0, "col": 1, "max": 5, "req": null, "kind": "passive", "icon": "shield", "desc": "+2% armor per rank, and Oath of Ward raises 10% more threat per rank on everything near you.", "emphasis": {"mitigation": 1, "threat": 0.5}, "impl": true},
+    {"id": "og-bulwark-of-faith", "name": "Bulwark of Faith", "tier": 0, "col": 2, "max": 3, "req": null, "kind": "modifier", "icon": "heart", "desc": "Ward also raises a barrier worth 3% of your maximum health per rank for 8s.", "emphasis": {"mitigation": 1}, "impl": true},
+    {"id": "og-answering-light", "name": "Answering Light", "tier": 1, "col": 0, "max": 3, "req": null, "kind": "passive", "icon": "star", "desc": "Blows taken under the Ward heal you for 2% of your maximum health per rank, at most once every 2s.", "emphasis": {"sustain": 1}, "impl": true},
+    {"id": "og-censure", "name": "Censure", "tier": 1, "col": 1, "max": 1, "req": null, "kind": "active", "icon": "hand", "desc": "New action: a blow that holds the target's next swing back for 2s.", "emphasis": {"control": 3}, "impl": true},
+    {"id": "og-unbroken-oath", "name": "Unbroken Oath", "tier": 1, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "clock", "desc": "Ward lasts 1s longer per rank.", "emphasis": {"mitigation": 0.8}, "impl": true},
+    {"id": "og-vigil", "name": "Vigil", "tier": 2, "col": 1, "max": 3, "req": "og-censure", "kind": "passive", "icon": "eye", "desc": "Oath of Ward also holds the attention of 1/2/3 other enemies within 6m.", "emphasis": {"threat": 2}, "impl": true},
+    {"id": "og-hallowed-ground", "name": "Hallowed Ground", "tier": 2, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "chain", "desc": "Enemies standing on your consecrated ground hit 10% softer.", "emphasis": {"mitigation": 2}, "impl": true}
+   ]
+  },
+  {
+   "id": "judicator",
+   "name": "Judicator",
+   "role": "dps",
+   "loop": "Smite to three pips, throw Judgement, and keep the rhythm so a pip comes early.",
+   "tradeoff": "Everything feeds Judgement; a Judicator who spends pips on Lay On loses the branch's whole rhythm.",
+   "nodes": [
+    {"id": "ju-zeal", "name": "Zeal", "tier": 0, "col": 1, "max": 5, "req": null, "kind": "passive", "icon": "sword", "desc": "Smite hits 3% harder per rank.", "emphasis": {"damage": 1}, "impl": true},
+    {"id": "ju-righteous-rhythm", "name": "Righteous Rhythm", "tier": 0, "col": 2, "max": 3, "req": null, "kind": "modifier", "icon": "clock", "desc": "Every fourth/third/second Smite grants a second pip of Conviction.", "emphasis": {"damage": 0.8, "tempo": 1}, "impl": true},
+    {"id": "ju-weighted-judgement", "name": "Weighted Judgement", "tier": 1, "col": 0, "max": 3, "req": null, "kind": "passive", "icon": "target", "desc": "Judgement deals 6 more per pip per rank.", "emphasis": {"damage": 1.2}, "impl": true},
+    {"id": "ju-burning-light", "name": "Burning Light", "tier": 1, "col": 1, "max": 3, "req": null, "kind": "passive", "icon": "flame", "desc": "Judgement leaves the target burning: three ticks over 6s, scaling with rank and level.", "emphasis": {"damage": 1}, "impl": true},
+    {"id": "ju-swift-verdict", "name": "Swift Verdict", "tier": 1, "col": 2, "max": 1, "req": null, "kind": "modifier", "icon": "bolt", "desc": "A Judgement thrown at three pips gives back 10 Mana.", "emphasis": {"sustain": 1}, "impl": true},
+    {"id": "ju-executioner", "name": "Executioner", "tier": 2, "col": 1, "max": 3, "req": "ju-weighted-judgement", "kind": "passive", "icon": "dagger", "desc": "Judgement hits 10% harder per rank against targets under 35% health.", "emphasis": {"damage": 1.5}, "impl": true},
+    {"id": "ju-crusade", "name": "Crusade", "tier": 2, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "star", "desc": "Smite also strikes one other enemy within 4m of its target for half.", "emphasis": {"damage": 2}, "impl": true}
+   ]
+  },
+  {
+   "id": "sanctuary",
+   "name": "Sanctuary",
+   "role": "healer",
+   "loop": "Keep the party up with Mend and Aegis, and hold three pips back for a Lay On when it matters.",
+   "tradeoff": "Pips held for Lay On never become Judgement, and a Paladin casting Mend is not swinging.",
+   "nodes": [
+    {"id": "sa-devotion", "name": "Devotion", "tier": 0, "col": 1, "max": 5, "req": null, "kind": "passive", "icon": "heart", "desc": "Mend heals 4% more per rank.", "emphasis": {"healing": 1}, "impl": true},
+    {"id": "sa-light-of-dawn", "name": "Light of Dawn", "tier": 0, "col": 2, "max": 3, "req": null, "kind": "modifier", "icon": "drop", "desc": "Mend leaves a glow that heals a tenth of the Mend per rank, twice over 4s.", "emphasis": {"healing": 0.8}, "impl": true},
+    {"id": "sa-grace", "name": "Grace", "tier": 1, "col": 0, "max": 3, "req": null, "kind": "passive", "icon": "plus", "desc": "Mend costs 2 less Mana per rank.", "emphasis": {"sustain": 1}, "impl": true},
+    {"id": "sa-aegis-of-faith", "name": "Aegis of Faith", "tier": 1, "col": 1, "max": 3, "req": null, "kind": "passive", "icon": "shield", "desc": "Aegis's barrier is 15% larger and lasts 2s longer per rank.", "emphasis": {"mitigation": 1}, "impl": true},
+    {"id": "sa-beacon", "name": "Beacon", "tier": 1, "col": 2, "max": 1, "req": null, "kind": "modifier", "icon": "star", "desc": "Lay On also grants its target an Aegis.", "emphasis": {"healing": 1, "mitigation": 0.5}, "impl": true},
+    {"id": "sa-mercy", "name": "Mercy", "tier": 2, "col": 1, "max": 3, "req": "sa-grace", "kind": "passive", "icon": "hand", "desc": "Lay On heals 8% more of the target's maximum health per rank.", "emphasis": {"healing": 1.5}, "impl": true},
+    {"id": "sa-sanctuary", "name": "Sanctuary", "tier": 2, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "moon", "desc": "Each second of Consecrate also heals you and Mira on the ground for 3% of maximum health.", "emphasis": {"healing": 2}, "impl": true}
+   ]
+  }
+ ]
+}

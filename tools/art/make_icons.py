@@ -1389,6 +1389,58 @@ def a_stillroot(c):
         c.part(c.taper(pts, 12, 3), '#a07448', 'wood', grain=.3)
     c.back(c.ell(50, 50, 30), VIOLET, .3, 10)
 
+# ---- paladin (Phase 5.1, 2026-10-05): ivory, gold and a warm light ----
+GOLD = '#e0b040'; IVORY = '#efe6cf'; HOLY = '#ffe9a0'
+def a_smite(c):
+    c.back(c.taper([(8, 70), (26, 32), (60, 10), (92, 12)], 1, 1, wmid=26), HOLY, .5, 5)
+    c.push(rot=-10)
+    c.part(c.rect(46, 30, 54, 100, 2), '#8a5a30', 'wood', grain=.3)
+    c.part(c.ell(50, 24, 17, 15), '#b9c2cc', 'metal'); c.part(c.ell(50, 24, 10, 8), GOLD, 'metal')
+    for a in range(0, 360, 60): c.part(c.ell(50 + 16 * math.cos(math.radians(a)), 24 + 14 * math.sin(math.radians(a)), 5), '#b9c2cc', 'metal')
+    c.pop()
+    slash(c, [(8, 56), (26, 26), (54, 10), (84, 10)], 7, HOLY)
+def a_oath(c):
+    rings(c, 50, 50, (30, 40), GOLD, .6, w=4)
+    d = c.poly([(22, 16), (50, 20), (78, 16), (80, 46), (68, 72), (50, 92), (32, 72), (20, 46)], smooth=True, n=6)
+    c.part(d, IVORY, 'soft'); c.part(c.grow(d, -7), '#b8402a', 'matte')
+    c.part(c.poly([(50, 30), (56, 46), (72, 48), (60, 58), (64, 74), (50, 66), (36, 74), (40, 58), (28, 48), (44, 46)]), GOLD, 'metal', clip=c.grow(d, -7))
+def a_mend(c):
+    rays(c, 50, 46, 10, 56, 10, HOLY, .4, 8)
+    for sx in (-1, 1): c.part(c.ell(50 + sx * 12, 40, 14, 13), '#d9b48a', 'soft')
+    c.part(c.poly([(28, 48), (72, 48), (76, 70), (50, 96), (24, 70)], smooth=True), '#d9b48a', 'soft')
+    c.glow(c.ell(50, 48, 12, 12), HOLY, core='#ffffff', halo=12, power=.9)
+def a_pward(c):
+    d = c.poly([(16, 12), (50, 18), (84, 12), (86, 46), (74, 74), (50, 96), (26, 74), (14, 46)], smooth=True, n=6)
+    c.back(c.grow(d, 5), HOLY, .7, 9)
+    c.part(d, IVORY, 'soft'); inner = c.grow(d, -9); c.part(inner, '#3a4a80', 'matte')
+    c.part(c.rect(46, 30, 54, 78, 2), GOLD, 'metal', clip=inner); c.part(c.rect(32, 42, 68, 50, 2), GOLD, 'metal', clip=inner)
+def a_judgement(c):
+    c.back(c.taper([(6, 92), (56, 44)], 2, 20, smooth=False), HOLY, .5, 5)
+    c.glow(c.taper([(12, 86), (62, 40)], 2, 12, smooth=False), GOLD, core='#ffffff', halo=10, power=.8)
+    c.glow(c.star(66, 34, 24, 8, 4, rot=-45), HOLY, core='#ffffff', halo=10, power=.9)
+    for i in range(3): c.glow(c.ell(30 - i * 8, 74 + i * 7, 3.5), HOLY, halo=5, power=.7)
+def a_consecrate(c):
+    c.part(c.ell(50, 70, 42, 18), '#5a4028', 'matte'); c.part(c.ell(50, 70, 32, 12), '#8a5a30', 'matte')
+    rings(c, 50, 70, (36,), GOLD, .7, w=3)
+    for x, h in ((22, 26), (34, 40), (50, 48), (66, 40), (78, 26)):
+        c.glow(c.taper([(x, 72), (x + 3, 72 - h * .6), (x - 2, 72 - h)], 9, 1), '#ffb030', core='#fff0b0', halo=8, power=.8)
+def a_lay_on(c):
+    rays(c, 50, 44, 14, 64, 12, HOLY, .45, 9)
+    c.part(c.poly([(30, 44), (70, 44), (76, 66), (50, 94), (24, 66)], smooth=True), '#d9b48a', 'soft')
+    for sx in (-1, 1): c.part(c.ell(50 + sx * 14, 40, 10, 12), '#d9b48a', 'soft')
+    c.glow(c.star(50, 40, 16, 6, 8), HOLY, core='#ffffff', halo=12, power=1.0)
+def a_aegis(c):
+    c.back(c.ell(50, 50, 38), HOLY, .4, 12)
+    d = c.poly([(50, 8), (84, 26), (84, 56), (50, 94), (16, 56), (16, 26)], smooth=True, n=4)
+    c.part(d, '#d8e8ff', 'gem'); c.part(c.grow(d, -8), '#9fc8ff', 'gem'); c.shine(c.ell(36, 34, 7, 14, rot=20), .5, clip=d)
+    rings(c, 50, 50, (44,), GOLD, .6, w=3)
+def a_censure(c):
+    c.back(c.ell(50, 50, 36), '#ffb030', .3, 10)
+    c.part(c.poly([(30, 46), (70, 46), (74, 68), (50, 96), (26, 68)], smooth=True), '#d9b48a', 'soft')
+    for x in (34, 44, 54, 64): c.part(c.rect(x - 4, 20, x + 4, 48, 3), '#d9b48a', 'soft')
+    rays(c, 50, 30, 20, 46, 10, GOLD, .5, 7)
+    c.flat(c.line([(18, 18), (82, 18)], 3), GOLD, .9)
+
 ABILITIES = {
     'ability.strike': ('#6a2a20', a_strike), 'ability.challenge': ('#6a2420', a_challenge), 'ability.guard': ('#24406a', a_guard),
     'ability.intercept': ('#1f4a54', a_intercept), 'ability.breaching_blow': ('#6a3c14', a_breach), 'ability.muster': ('#4f5a1e', a_muster),
@@ -1399,6 +1451,9 @@ ABILITIES = {
     'druid.seedling': ('#214a2c', a_seedling), 'druid.quickbloom': ('#2c4a3a', a_quickbloom), 'druid.verdant_ward': ('#1c4434', a_ward), 'druid.burst_bloom': ('#4a2a44', a_burst_bloom),
     'druid.seedshot': ('#38285a', a_seedshot), 'druid.thornbolt': ('#30245a', a_thornbolt), 'druid.briar_snare': ('#2c2a4a', a_briar_snare), 'druid.bramblestorm': ('#3a2460', a_bramblestorm),
     'druid.swiftroot': ('#1c3c54', a_swiftroot), 'druid.stillroot': ('#3a3048', a_stillroot),
+    'paladin.smite': ('#4a3a1a', a_smite), 'paladin.oath': ('#4a2a24', a_oath), 'paladin.mend': ('#4a3c20', a_mend), 'paladin.ward': ('#2a3454', a_pward),
+    'paladin.judgement': ('#4a4020', a_judgement), 'paladin.consecrate': ('#4a2c14', a_consecrate), 'paladin.lay_on': ('#4a4228', a_lay_on), 'paladin.aegis': ('#24364e', a_aegis),
+    'paladin.censure': ('#4a3018', a_censure),
 }
 
 # ---- talents: an emblem per icon word, in the branch's colours ----
@@ -1475,6 +1530,8 @@ BRANCH = {
     'support': ('#4a4018', ['#e8b830', '#f0e080', '#e08a30', '#b8d050', '#f0c890']), 'barkhide': ('#44321e', ['#c08a4a', '#e0b070', '#a0a050', '#d07040', '#b89a7a']),
     'thornclaw': ('#4a2024', ['#e0504a', '#9be05a', '#f08a50', '#d04a80', '#c8d070']), 'rootmend': ('#1e4428', ['#62c84a', '#b0e86a', '#40c0a0', '#e8e070', '#8ad0f0']),
     'thornsong': ('#33265a', ['#a070f0', '#70c0f0', '#e070d0', '#9be05a', '#f0d070']),
+    'oathguard': ('#3a3a2a', ['#e0b040', '#efe6cf', '#9fc8ff', '#d0a060', '#c8c0a0']), 'judicator': ('#4a3018', ['#ffb030', '#e0503a', '#f0e080', '#e08a30', '#f0c890']),
+    'sanctuary': ('#3a3c22', ['#ffe9a0', '#9be05a', '#e0b040', '#f0f0d0', '#8ad0f0']),
 }
 KIND_TRIM = dict(passive='#c9ccd2', modifier='#e0b040', active='#fff0b0', signature='#fff0b0', capstone='#ffd040')
 def draw_talent(c, icon, branch, kind, k):
@@ -2081,6 +2138,7 @@ def build_all(C):
         id_ = it['id']; kind = it.get('kind', 'gear'); q = it.get('quality', 1)
         if kind == 'gear':
             lk = C['gearlooks'].get(id_)
+            if lk and lk.startswith('model.'): continue   # a model weapon's icon is rendered from the model (Editor/ModelIcons.cs)
             look = parse_look(lk) if lk else (fallbacks.get(it.get('slot'), 'sword.arming'), FAMILIES[fallbacks.get(it.get('slot'), 'sword.arming')][0], 'oakhaven', False)
             out.append(('item/' + safe(id_), gear_icon(id_, looks, look, id_), it['name'], q, False))
         elif id_ in ITEMS: out.append(('item/' + safe(id_), plain_icon(id_, ITEMS[id_]), it['name'], q, False))

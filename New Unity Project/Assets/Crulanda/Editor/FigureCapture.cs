@@ -33,7 +33,7 @@ namespace Crulanda.EditorTools
 
             var db = new ItemDatabase(); var looks = GearLooks.Parse(Resources.Load<TextAsset>("Gear/looks").text);
             Row("people-1", new[] { P(ActorLook.Warrior), P(ActorLook.Druid), P(ActorLook.Healer), P(ActorLook.Collector), P(ActorLook.Warden), P(ActorLook.Outrider) });
-            Row("people-2", new[] { P(ActorLook.Cultist), P(ActorLook.Deserter, 1, null, "Deserter a"), P(ActorLook.Deserter, 2, null, "Deserter bb"), P(ActorLook.BanditKing), P(ActorLook.Hollow), P(ActorLook.Sentry) });
+            Row("people-2", new[] { P(ActorLook.Cultist), P(ActorLook.Deserter, 1, null, "Deserter a"), P(ActorLook.Deserter, 2, null, "Deserter bb"), P(ActorLook.BanditKing), P(ActorLook.Hollow), P(ActorLook.Sentry), P(ActorLook.Paladin), P(ActorLook.Ranger), P(ActorLook.Mage) });
             Row("trades-1", new[] { V("blacksmith", "Brannoc Vell", 3), V("merchant", "Wil Carder", 8), V("baker", "Ama Rusk", 13), V("henwife", "Hedda Thorne", 40), V("farmer", "Garet Moss", 23), V("hunter", "Corwin Ashby", 28) });
             Row("trades-2", new[] { V("herbalist", "Lisbet Crane", 33), V("miller", "Aldo Crisp", 38), V("elder", "Old Tobin", 43), V("stranger", "A Stranger", 48), V("pilgrim", "Pilgrim", 53), V("innkeeper", "Maud Tanner", 58) });
             Row("trades-3", new[] { V("leatherworker", "Edda Pell", 63), V("lumberjack", "Hob Linden", 68), V("skinner", "Osk Farrow", 73), V("warden", "Fen Walker", 78), V("drinker", "Jory", 83), V("gossip", "Grete Lowe", 88), V("child", "Pim", 93) });

@@ -352,6 +352,114 @@ MonoBehaviour:
     globalCooldown: 1.5
     duration: 4
     statusId: 
+  - id: paladin.smite
+    name: Smite
+    description: A mailed blow that builds a pip of Conviction. Starts automatic weapon attacks while in melee range.
+    effect: 0
+    power: 11
+    cost: 12
+    cooldown: 0
+    range: 3.2
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 0
+    statusId: 
+  - id: paladin.oath
+    name: Oath of Ward
+    description: Forces your target to attack you for 3 seconds and draws every enemy near you. Use it to protect Mira.
+    effect: 1
+    power: 0
+    cost: 10
+    cooldown: 8
+    range: 10
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 3
+    statusId: 
+  - id: paladin.mend
+    name: Mend
+    description: A prayer of 1.5 seconds that heals the party member who needs it most.
+    effect: 3
+    power: 30
+    cost: 22
+    cooldown: 0
+    range: 25
+    castTime: 1.5
+    globalCooldown: 1.5
+    duration: 0
+    statusId: 
+  - id: paladin.ward
+    name: Ward
+    description: Reduce damage taken by 40% for 5 seconds. Blows taken under it build Conviction.
+    effect: 4
+    power: 0
+    cost: 20
+    cooldown: 14
+    range: 0
+    castTime: 0
+    globalCooldown: 0
+    duration: 5
+    statusId: 
+  - id: paladin.judgement
+    name: Judgement
+    description: Throw your Conviction as light: 14 damage per pip, plus half your weapon damage, at up to 8 metres. Spends every pip.
+    effect: 0
+    power: 14
+    cost: 10
+    cooldown: 6
+    range: 8
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 0
+    statusId: 
+  - id: paladin.consecrate
+    name: Consecrate
+    description: Burn the ground round you for 6 seconds: enemies on it take damage every second.
+    effect: 0
+    power: 5
+    cost: 30
+    cooldown: 20
+    range: 0
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 6
+    statusId: 
+  - id: paladin.lay_on
+    name: Lay On
+    description: Spend three pips of Conviction to heal the party member who needs it most for a quarter of their health, at once.
+    effect: 3
+    power: 0
+    cost: 0
+    cooldown: 30
+    range: 25
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 0
+    statusId: 
+  - id: paladin.aegis
+    name: Aegis
+    description: A barrier on the party member who needs it most for 8 seconds.
+    effect: 7
+    power: 25
+    cost: 18
+    cooldown: 12
+    range: 25
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 8
+    statusId: 
+  - id: paladin.censure
+    name: Censure
+    description: A blow that holds the target's next swing back for 2 seconds. Talent.
+    effect: 0
+    power: 8
+    cost: 15
+    cooldown: 15
+    range: 3.2
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 2
+    statusId: 
   playerClass:
     id: class.warrior
     displayName: Warrior
@@ -475,6 +583,52 @@ MonoBehaviour:
         level: 6
         talentId: 
     talentTree: {fileID: 4900000, guid: 457f191fd7564f54a95742e419040cb1, type: 3}
+  - definition:
+      id: class.paladin
+      displayName: Paladin
+      role: 4
+      resource: 1
+      maxResource: 100
+      combatRegen: 4
+      restingRegen: 14
+      stats:
+        baseHealth: 175
+        healthPerLevel: 24
+        healthPerStamina: 5
+        baseAttackPower: 11
+        attackPowerPerLevel: 2
+        attackPowerPerStrength: 1
+        spellPowerPerIntellect: 1
+        armorPerAgility: 1
+      unlocks:
+      - abilityId: paladin.smite
+        level: 1
+        talentId: 
+      - abilityId: paladin.oath
+        level: 1
+        talentId: 
+      - abilityId: paladin.mend
+        level: 1
+        talentId: 
+      - abilityId: paladin.ward
+        level: 2
+        talentId: 
+      - abilityId: paladin.judgement
+        level: 3
+        talentId: 
+      - abilityId: paladin.consecrate
+        level: 4
+        talentId: 
+      - abilityId: paladin.lay_on
+        level: 5
+        talentId: 
+      - abilityId: paladin.aegis
+        level: 6
+        talentId: 
+      - abilityId: paladin.censure
+        level: 1
+        talentId: og-censure
+    talentTree: {fileID: 4900000, guid: ae359ffc02cb42b486625e88fc47b2f5, type: 3}
   questFiles:
   - {fileID: 4900000, guid: 2f37ccf5ed8d46928976a7b5854444ed, type: 3}
   - {fileID: 4900000, guid: 74079723a64512c49ae39123ea0f57e0, type: 3}

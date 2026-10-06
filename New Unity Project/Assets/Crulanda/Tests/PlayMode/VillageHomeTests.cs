@@ -84,7 +84,7 @@ namespace Crulanda.Tests
             var sleepers = folk.Where(v => v.Role != "drinker").ToList();
             yield return WaitUntil(() => sleepers.All(InBed) || WorldClock.Hour >= 23.5f || WorldClock.Hour < 21, 150);
             float hour = WorldClock.Hour; Time.timeScale = 1;
-            var missing = sleepers.Where(v => !InBed(v)).Select(v => v.Name + " (" + v.Activity + (v.Visible ? ", up" : ", hidden") + ", " + Flat(v.transform.position, v.Home.position).ToString("0") + " m from " + v.Home.name + ")").ToList();
+            var missing = sleepers.Where(v => !InBed(v)).Select(v => v.Name + " (" + v.Activity + (v.Visible ? ", up" : ", hidden") + ", " + Flat(v.transform.position, v.Home.position).ToString("0") + " m from " + v.Home.name + "; " + v.Trace + ")").ToList();
             Assert.IsEmpty(missing, "By 23:30 (now " + hour.ToString("0.00") + ") everyone is behind their own door:\n" + string.Join("\n", missing));
             foreach (var name in new[] { "Old Tobin", "Jory" }) Assert.AreEqual(name == "Jory" ? "Jory's house" : "Pell house", life.Find(name).Home.name, "The drinkers have homes to go to as well.");
         }

@@ -40,6 +40,12 @@ namespace Crulanda.Encounter
             if (playerClass != null && playerClass.id == id) return new PlayableClass { definition = playerClass, talentTree = talentTree };
             return additionalClasses == null ? null : System.Array.Find(additionalClasses, c => c != null && c.definition != null && c.definition.id == id);
         }
+        /// <summary>Every selectable class, the default first.</summary>
+        public System.Collections.Generic.IEnumerable<PlayableClass> AllClasses()
+        {
+            if (playerClass != null) yield return new PlayableClass { definition = playerClass, talentTree = talentTree };
+            if (additionalClasses != null) foreach (var c in additionalClasses) if (c != null && c.definition != null) yield return c;
+        }
         public DerivedStatRules playerStats = new DerivedStatRules();
         public StatusEffectDefinition[] statuses = {
             new StatusEffectDefinition { id = "status.guard", name = "Guard", duration = 5, incomingDamageMultiplier = .4f }

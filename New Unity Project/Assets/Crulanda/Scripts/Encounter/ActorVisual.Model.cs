@@ -48,7 +48,7 @@ namespace Crulanda.Encounter
         {
             switch (look)
             {
-                case ActorLook.Druid: case ActorLook.Healer: return true;
+                case ActorLook.Druid: case ActorLook.Healer: case ActorLook.Mage: return true;
                 case ActorLook.Villager: break;
                 case ActorLook.Deserter: return (FigureSeed() & 7) == 3;
                 default: return false;
@@ -83,6 +83,9 @@ namespace Crulanda.Encounter
             {
                 case ActorLook.Warrior: s.kit = ModelFigure.Kit.Ranger; s.bleach = true; s.hair = 0; s.beard = false; break;   // his blue
                 case ActorLook.Druid: s.kit = ModelFigure.Kit.Ranger; s.hood = true; s.hoodColour = ClothTint(clothC, .8f); s.hair = 1; break;
+                case ActorLook.Paladin: s.kit = ModelFigure.Kit.Ranger; s.bleach = true; s.hair = 3; s.beard = true; break;
+                case ActorLook.Ranger: s.kit = ModelFigure.Kit.Ranger; s.hood = true; s.hoodColour = ClothTint(clothC, .8f); s.hair = 2; break;
+                case ActorLook.Mage: s.kit = ModelFigure.Kit.Peasant; s.hood = true; s.hoodColour = ClothTint(accentC, .75f); s.hair = 1; break;
                 case ActorLook.Healer: s.hood = true; s.hoodColour = ClothTint(clothC, .8f); s.hair = 2; break;
                 case ActorLook.Collector: case ActorLook.Warden: s.kit = ModelFigure.Kit.Ranger; s.bleach = true; s.shirt = ClothTint(new Color(.93f, .93f, .95f), .15f); break;   // Concord white, for the tabard
                 case ActorLook.Sentry: s.kit = ModelFigure.Kit.Ranger; break;

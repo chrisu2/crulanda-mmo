@@ -70,10 +70,13 @@ namespace Crulanda.Encounter
             Directory.CreateDirectory(directory);
             yield return new WaitForSeconds(1.5f);
             session.Progress.experience = EncounterProgress.XpForLevel(10); session.Player.SetLevel(10); session.Interact();
-            bool druid = session.Druid != null; string prefix = druid ? "druid-" : "warrior-";
-            var build = druid
+            string prefix = session.ClassDef.id.Replace("class.", "") + "-"; bool druid = session.Druid != null;
+            var build = session.Druid != null
                 ? new[] { "bh-ringed-hide", "bh-ringed-hide", "bh-ringed-hide", "bh-ringed-hide", "bh-ringed-hide", "bh-heartwood-brace",
                     "ts-green-voice", "ts-green-voice", "ts-green-voice", "ts-green-voice", "ts-green-voice" }
+                : session.Paladin != null
+                ? new[] { "og-steadfast", "og-steadfast", "og-steadfast", "og-steadfast", "og-steadfast", "og-censure",
+                    "sa-devotion", "sa-devotion", "sa-devotion", "sa-devotion", "sa-devotion" }
                 : new[] { "tk-hardened-grip", "tk-hardened-grip", "tk-hardened-grip", "tk-tempered-armor", "tk-tempered-armor",
                     "tk-intercept", "dp-weapon-pressure", "dp-weapon-pressure", "dp-read-the-opening", "dp-read-the-opening", "dp-read-the-opening" };
             foreach (var id in build) if (!session.ChangeTalent(id, 1)) Debug.LogError("UI capture could not buy " + id);

@@ -1286,6 +1286,8 @@ namespace Crulanda.Encounter
             if (home != null && agent.isOnNavMesh) { agent.speed = 4; agent.isStopped = false; agent.SetDestination(home.position); }
             else { state = State.Activity; visual.Pose = ActorPose.Cower; until = Time.time + 8; }
         }
+        /// <summary>Tests: where the villager is in its day (state, path, destination), for a failure's message.</summary>
+        public string Trace { get { return state + "/" + activity + " until " + (until - Time.time).ToString("0") + "s, " + (agent == null ? "no agent" : !agent.enabled ? "agent off" : !agent.isOnNavMesh ? "off mesh" : agent.pathStatus + " dest " + agent.destination.ToString("0") + " left " + agent.remainingDistance.ToString("0.0") + (agent.isStopped ? " stopped" : "")) + " at " + transform.position.ToString("0"); } }
         bool Arrived { get { return agent.enabled && agent.isOnNavMesh && !agent.pathPending && agent.pathStatus == NavMeshPathStatus.PathComplete && agent.remainingDistance <= agent.stoppingDistance + .25f; } }
         /// <summary>Came to the end of a path that could not reach the place (e.g. across deep water).</summary>
         bool Stranded { get { return agent.enabled && agent.isOnNavMesh && !agent.pathPending && agent.pathStatus != NavMeshPathStatus.PathComplete && agent.remainingDistance <= agent.stoppingDistance + .25f; } }

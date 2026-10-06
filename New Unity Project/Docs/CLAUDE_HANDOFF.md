@@ -10,6 +10,16 @@ Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
 ## RESUME HERE (updated 2026-10-05, late morning)
+**5.1a the Paladin: PUBLISHED 2026-10-05 evening, committed, backed up. Flaky: VillageHomeTests.Every_villager_sleeps_behind_their_own_named_door (real-time wait, fails under lane B's load; passes alone).** Pattern for the Ranger and the Mage (one round each): a <Class>Kit : ClassKit after PaladinKit
+(own ability and unlock dictionaries, a BarIds order, ImplementedIds = every impl node of Talents/<class>.json), ClassKit.Create
+case, EncounterSession.<Class> property + LookForClass/TintForClass, ActorLook colours and ModelFigure spec, a class block and
+its abilities appended to Encounter.asset (YAML; the talent file's guid from a .meta you write: see scratchpad paladin_patch.py
+pattern in git history), make_icons.py painters for the actions and BRANCH colours for the branches (icons are required by
+IconCoverageTests; keep only the new PNGs, make_icons re-encodes all), EncounterCapture's build list, FigureCapture people-2,
+EditMode <Class>RulesTests + PlayMode <Class>LoopTests (StartClassOverride, scene PlayableEncounter), capture_extra.ps1 UI run.
+Ranger: Marksman ranged (bow: the packs' Bow_Basic/Medium/Epic models exist), Beastbond pet, Pathfinder control; needs a ranged
+auto-attack (MeleeAutoAttacks false, a shot on a timer) and a pet. Mage: Combustion ranged, Heatweaver control, Spellbinder
+support; casts like the Druid's Thornsong.
 **PHASE 5 NOW (Chris, 2026-10-05):** see Docs/ROADMAP.md (rewritten): 5.0 faster tests first, then 5.1 class kits Paladin,
 Ranger, Mage, then sim profiles, in-world life, offscreen world, chat and memory, groups.
 **Before that:** Round 21 (see its CHANGELOG entry; PLAYTEST_NOTES 33-46) is PUBLISHED (midday 2026-10-05), committed and backed up; waiting on Chris's playtest. Then, in this order:

@@ -1224,3 +1224,17 @@ A read-only review by five reviewers, each finding checked by a second who tried
 - **The twin moons, The Eye and The Tear** (CANON, book1 ch.1; their looks GAME-ONLY): The Eye large and pale with a grey iris
   ring, its light the night's; The Tear smaller and silver-blue, an hour and a half behind on a lower arc. Tour shot 97-moons.
 - Tests: EditMode 401/401 and PlayMode 175/175 (the last few count and walking-speed expectations fixed and rerun: EditMode in full, EncounterLoop and NamedLoot); all five zones toured, no shader errors; release build.
+
+## 2026-10-05 — Phase 5.1a: the Paladin (published, evening)
+- **A third playable class (Chris chose Paladin, Ranger, Mage for Phase 5; provisional GAME-ONLY name and mechanics, after
+  CLASS_BUILD_MATRIX's Oathguard tank, Judicator melee, Sanctuary healer):** a mailed hybrid on Mana with Conviction (three
+  pips) built by Smite in melee and by blows taken under the Ward, spent by Judgement (a thrown light, 8 m) or Lay On (a
+  quarter of the target's health at once). Nine actions: Smite, Oath of Ward (taunt), Mend (1.5 s heal), Ward (-40% damage
+  5 s), Judgement, Consecrate (burning ground 5 m for 6 s), Lay On, Aegis (barrier) and the talent action Censure (holds the
+  target's swing 2 s). 21 talents in three rows of Oathguard, Judicator and Sanctuary (EncounterContent/Talents/paladin.json),
+  all with effects (PaladinKit). Its own character and save, chosen from the pause menu, which now lists every other class.
+- **Looks:** the Paladin in ivory and gold with a beard and the Warrior's sword and shield until gear takes over; the Ranger
+  (green, hooded) and the Mage (violet, hooded, a woman) are drawn ready for their rounds. Icons painted for the nine
+  actions and the 21 talents; the figure line-up (people-2) shows the three.
+- Tests: EditMode PaladinRulesTests (tree, gates, content), PlayMode PaladinLoopTests (own save, Conviction, Mend and Lay On,
+  Ward, Consecrate). Full run: EditMode 405/405, PlayMode 179/180 (VillageHomeTests' bedtime walk timed out once under lane B's load and passed twice after: flaky under load, noted), build, five tours, the Paladin's own HUD captures (paladin-01-talents, 03-combat). Phase 5.0's two-lane run: 60 min.

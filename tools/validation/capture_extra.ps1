@@ -10,6 +10,11 @@ $log = Join-Path $ui 'hud.log'
 $g = Start-Process $exe -PassThru -ArgumentList @('--crulanda-ui-capture', ('"' + $ui + '"'), '--crulanda-class', 'class.warrior', '-screen-width', '1440', '-screen-height', '900', '-screen-fullscreen', '0', '-logFile', ('"' + $log + '"'))
 $g | Wait-Process -Timeout 240
 Select-String -LiteralPath $log -Pattern 'CAPTURE_DONE|Exception|could not' | Select-Object -First 5 | ForEach-Object Line
+# The Paladin's HUD shots too (Phase 5.1, 2026-10-05): its talents, its bar, Smite and Mend in a fight (prefix paladin-).
+$plog = Join-Path $ui 'hud-paladin.log'
+$g = Start-Process $exe -PassThru -ArgumentList @('--crulanda-ui-capture', ('"' + $ui + '"'), '--crulanda-class', 'class.paladin', '-screen-width', '1440', '-screen-height', '900', '-screen-fullscreen', '0', '-logFile', ('"' + $plog + '"'))
+$g | Wait-Process -Timeout 240
+Select-String -LiteralPath $plog -Pattern 'CAPTURE_DONE|Exception|could not' | Select-Object -First 5 | ForEach-Object Line
 $wd = Join-Path $ui 'wardrobe'
 New-Item -ItemType Directory -Force $wd | Out-Null
 $wlog = Join-Path $wd 'wardrobe.log'

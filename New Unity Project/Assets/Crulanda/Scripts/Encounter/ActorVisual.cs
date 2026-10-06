@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Crulanda.Encounter
 {
-    public enum ActorLook { Warrior, Druid, Healer, Collector, Warden, Sentry, Outrider, Pale, Villager, Hollow, Cultist, Wolf, Boar, WeaveEater, Deserter, BanditKing, Keeper, Stag, Spider, Bramble, Bear, Skeleton }
+    public enum ActorLook { Warrior, Druid, Healer, Collector, Warden, Sentry, Outrider, Pale, Villager, Hollow, Cultist, Wolf, Boar, WeaveEater, Deserter, BanditKing, Keeper, Stag, Spider, Bramble, Bear, Skeleton, Paladin, Ranger, Mage }
     /// <summary>Body language layered over walking: working a hoe or bucket, talking, sitting, cowering.</summary>
     public enum ActorPose { None, Work, Talk, Sit, Cower, Hammer, Chop, Gather, Knead, Swim, Sneak, Drink, Slump }
 
@@ -419,6 +419,10 @@ namespace Crulanda.Encounter
             {
                 case ActorLook.Warrior: clothC = new Color(.08f, .2f, .56f); accentC = new Color(.76f, .78f, .82f); legC = new Color(.32f, .2f, .12f); break;
                 case ActorLook.Druid: clothC = new Color(.1f, .38f, .16f); accentC = new Color(.56f, .24f, .09f); legC = new Color(.34f, .23f, .13f); break;
+                // The classes of Phase 5.1 (2026-10-05; GAME-ONLY looks): the Paladin in ivory and gold, the Ranger in forest green, the Mage in violet.
+                case ActorLook.Paladin: clothC = new Color(.88f, .84f, .72f); accentC = new Color(.86f, .68f, .22f); legC = new Color(.3f, .26f, .2f); break;
+                case ActorLook.Ranger: clothC = new Color(.24f, .42f, .2f); accentC = new Color(.46f, .3f, .15f); legC = new Color(.3f, .24f, .15f); break;
+                case ActorLook.Mage: clothC = new Color(.28f, .2f, .52f); accentC = new Color(.82f, .7f, .3f); legC = new Color(.18f, .15f, .3f); break;
                 case ActorLook.Healer: clothC = new Color(.1f, .44f, .36f); accentC = new Color(.95f, .86f, .6f); legC = new Color(.1f, .3f, .27f); break;
                 case ActorLook.Collector: clothC = new Color(.14f, .22f, .54f); accentC = new Color(.76f, .78f, .82f); legC = new Color(.12f, .14f, .24f); break;
                 case ActorLook.Warden: clothC = new Color(.08f, .15f, .46f); accentC = new Color(.8f, .82f, .86f); legC = new Color(.09f, .1f, .2f); break;
@@ -436,8 +440,8 @@ namespace Crulanda.Encounter
                     legC = new Color(.3f, .25f, .2f) * (.8f + (variant % 3) * .15f); skin = Mat(Skins[Mathf.Abs(variant * 7) % Skins.Length]); break;
                 default: clothC = new Color(.6f, .27f, .18f); accentC = new Color(.4f, .35f, .3f); legC = new Color(.28f, .2f, .16f); break;
             }
-            cloth = Mat(clothC); accent = Mat(accentC, look == ActorLook.Warrior || look == ActorLook.Warden || look == ActorLook.Collector ? .55f : .15f,
-                look == ActorLook.Warrior || look == ActorLook.Warden || look == ActorLook.Collector ? .5f : 0);
+            bool metalAccent = look == ActorLook.Warrior || look == ActorLook.Paladin || look == ActorLook.Warden || look == ActorLook.Collector;
+            cloth = Mat(clothC); accent = Mat(accentC, metalAccent ? .55f : .15f, metalAccent ? .5f : 0);
             var legs = Mat(legC); var boots = Mat(new Color(.18f, .13f, .1f));
             if (look == ActorLook.Warden) body.localScale = new Vector3(1.08f, 1.12f, 1.08f);
 
@@ -447,6 +451,7 @@ namespace Crulanda.Encounter
             bool modelled = model != null;   // a model shows its own clothes, hood, hair and beard: the old figure's stand-ins for them are left off
             switch (look)
             {
+                case ActorLook.Paladin:   // a mace and shield would be its own; the Warrior's sword and shield stand in until gear drives it
                 case ActorLook.Warrior:
                 {
                     if (modelled) classKit = model.Extras.FindAll(r => r.name.Contains("Pauldron")).ConvertAll(r => r.transform).ToArray();   // the outfit's own pauldron

@@ -160,7 +160,7 @@ namespace Crulanda.Encounter
         {
             var p = session.Player; var cls = session.ClassDef;
             Fill(new Rect(58, 22, 290, 64), new Color(0, 0, 0, .55f));
-            Portrait(new Vector2(52, 54), 74, cls.id == "class.druid" ? new Color(.95f, .5f, .15f) : new Color(.78f, .61f, .43f), cls.displayName.Substring(0, 1), session.Progress.Level.ToString());
+            Portrait(new Vector2(52, 54), 74, ClassColour(cls.id), cls.displayName.Substring(0, 1), session.Progress.Level.ToString());
             Shadow(new Rect(96, 24, 240, 20), "You · " + cls.displayName, frameName, Color.white);
             if (!string.IsNullOrEmpty(session.Progress.title)) Shadow(new Rect(96, 4, 300, 18), "\u201C" + session.Progress.title + "\u201D", tiny, gold);   // the title worn (Achievements)
             UnitBar(new Rect(96, 45, 244, 18), p.Health.Pool.Ratio, HealthGreen, p.Health.Pool.Current + " / " + p.Health.Pool.Max);
@@ -364,18 +364,30 @@ namespace Crulanda.Encounter
             for (int i = 1; i < 20; i++) Fill(new Rect(i * 72, r.y, 1, r.height), new Color(0, 0, 0, .6f));
             Shadow(new Rect(0, r.y - 3, 1440, 18), capped ? "Level 10 · prototype cap" : "Level " + pr.Level + "  ·  XP " + pr.XpIntoLevel + " / " + pr.XpLevelSize, new GUIStyle(barText) { fontSize = 10 }, Color.white);
         }
+        /// <summary>A class's colour on its portrait and in the class list.</summary>
+        public static Color ClassColour(string classId)
+        {
+            switch (classId)
+            {
+                case "class.druid": return new Color(.95f, .5f, .15f);
+                case "class.paladin": return new Color(.95f, .82f, .4f);
+                case "class.ranger": return new Color(.45f, .75f, .3f);
+                case "class.mage": return new Color(.6f, .45f, .95f);
+                default: return new Color(.78f, .61f, .43f);
+            }
+        }
         void DrawPause()
         {
-            Frame(new Rect(475, 325, 490, 250));
+            // Each class is a separate character with its own save; switching saves this one first. One button per other class.
+            var others = new List<PlayableClass>();
+            foreach (var c in session.content.AllClasses()) if (c.definition.id != session.ClassDef.id) others.Add(c);
+            Frame(new Rect(475, 325, 490, 250 + 48 * Mathf.Max(0, others.Count - 1)));
             GUI.Label(new Rect(525, 351, 400, 35), "EXPEDITION PAUSED", heading);
             GUI.Label(new Rect(525, 398, 400, 35), "Progress autosaves out of combat.", text);
             if (GUI.Button(new Rect(525, 448, 390, 44), "Resume [Esc]", button)) session.Resume();
-            // Each class is a separate character with its own save; switching saves this one first.
-            string other = session.ClassDef.id == "class.druid" ? "class.warrior" : "class.druid";
-            var otherClass = session.content.FindClass(other);
-            GUI.enabled = otherClass != null && !session.InCombat;
-            if (otherClass != null && GUI.Button(new Rect(525, 504, 390, 44), "Play your " + otherClass.definition.displayName + " (separate character)", button))
-                session.SwitchCharacter(other);
+            GUI.enabled = !session.InCombat;
+            for (int i = 0; i < others.Count; i++)
+                if (GUI.Button(new Rect(525, 504 + 48 * i, 390, 44), "Play your " + others[i].definition.displayName + " (separate character)", button)) { session.SwitchCharacter(others[i].definition.id); break; }
             GUI.enabled = true;
         }
         public static string ResourceName(Crulanda.Core.ResourceKind kind) { return kind == Crulanda.Core.ResourceKind.Breath ? "Shift Breath" : kind.ToString(); }

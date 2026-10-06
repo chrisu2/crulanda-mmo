@@ -50,6 +50,7 @@ namespace Crulanda.Encounter
             {
                 case "class.warrior": return new WarriorKit(session, new ClassLoadout(definition, catalog), new Crulanda.Core.SeededRandom(Environment.TickCount));
                 case "class.druid": return new DruidKit(session, definition, catalog);
+                case "class.paladin": return new PaladinKit(session, definition, catalog);
                 default: throw new ArgumentException("No class kit for '" + classId + "'.");
             }
         }

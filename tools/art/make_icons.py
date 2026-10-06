@@ -1441,6 +1441,56 @@ def a_censure(c):
     rays(c, 50, 30, 20, 46, 10, GOLD, .5, 7)
     c.flat(c.line([(18, 18), (82, 18)], 3), GOLD, .9)
 
+# ---- ranger (Phase 5.1b, 2026-10-05): forest green, ash wood and fletching ----
+FOREST = '#4f8a3a'; ASH = '#b08a58'; FLETCH = '#d8d0b0'
+def arrow(c, x0, y0, x1, y1, w=3.2, head='#c3ccd6'):
+    c.part(c.line([(x0, y0), (x1, y1)], w), ASH, 'wood')
+    dx, dy = x1 - x0, y1 - y0; L = max(1e-6, (dx * dx + dy * dy) ** .5); ux, uy = dx / L, dy / L; px, py = -uy, ux
+    c.part(c.poly([(x1 + ux * 9, y1 + uy * 9), (x1 - ux * 4 + px * 5, y1 - uy * 4 + py * 5), (x1 - ux * 4 - px * 5, y1 - uy * 4 - py * 5)]), head, 'metal')
+    for k in (10, 16): c.part(c.poly([(x0 + ux * k, y0 + uy * k), (x0 + ux * (k - 7) + px * 6, y0 + uy * (k - 7) + py * 6), (x0 + ux * (k + 2) + px * 6, y0 + uy * (k + 2) + py * 6)]), FLETCH, 'soft')
+def a_quick_shot(c):
+    c.back(c.taper([(10, 90), (86, 14)], 1, 1, wmid=18), '#c8e070', .4, 5)
+    arrow(c, 14, 86, 80, 20)
+    slash(c, [(8, 92), (40, 60), (72, 28)], 5, '#e8f0a0')
+def a_aimed_shot(c):
+    rings(c, 50, 50, (34, 20), '#e0503a', .6, w=3)
+    c.part(c.ell(50, 50, 7), '#e0503a', 'matte')
+    arrow(c, 10, 90, 50, 50)
+def a_barbed_arrow(c):
+    arrow(c, 12, 88, 78, 22, head='#8a3a30')
+    for t in (.55, .7): c.part(c.poly([(12 + 66 * t, 88 - 66 * t), (12 + 66 * t + 7, 88 - 66 * t + 1), (12 + 66 * t + 2, 88 - 66 * t + 8)]), '#8a3a30', 'metal')
+    for x, y in ((70, 34), (76, 40), (64, 44)): c.glow(c.ell(x, y, 3), '#e0302a', halo=4, power=.6)
+def a_hunters_mark(c):
+    c.back(c.ell(50, 50, 36), '#e0503a', .35, 12)
+    c.part(c.poly([(50, 10), (62, 42), (90, 50), (62, 58), (50, 90), (38, 58), (10, 50), (38, 42)]), '#ffb040', 'metal')
+    c.part(c.ell(50, 50, 9), '#8a2a20', 'matte'); c.part(c.ell(50, 50, 4), '#ffe9a0', 'matte', ink=False)
+def a_snare(c):
+    c.part(c.ell(50, 62, 34, 20), '#3a4a2a', 'matte')
+    for i in range(6):
+        a = i * 30 - 75
+        c.part(c.line([(50, 62), (50 + 36 * math.cos(math.radians(a)), 62 + 18 * math.sin(math.radians(a)))], 2.2), FOREST, 'matte')
+    for r in (10, 20, 30): rings(c, 50, 62, (r,), FOREST, .5, w=2)
+    arrow(c, 70, 18, 50, 60, w=2.6)
+def a_call_companion(c):
+    pawprint(c, 50, 58, 30, '#4a4a48', claws='#d8d0c0', clawlen=12)
+    for r in (34, 42): rings(c, 50, 50, (r,), '#c8e070', .35, a0=200, a1=340, w=3)
+def a_sic(c):
+    c.back(c.taper([(8, 60), (90, 40)], 1, 1, wmid=20), '#e0503a', .4, 5)
+    pawprint(c, 40, 56, 24, '#4a4a48', claws='#e0503a', clawlen=12)
+    pawprint(c, 68, 40, 24, '#4a4a48', claws='#e0503a', clawlen=12)
+    slash(c, [(12, 80), (50, 56), (90, 30)], 5, '#ffb040')
+def a_disengage(c):
+    c.back(c.taper([(84, 70), (20, 30)], 1, 14, smooth=False), '#c8e070', .5, 5)
+    c.push(rot=-20, sc=.9, dx=-6)
+    g_feet(c, _P(), 'feet.boots', 'plain', False)
+    c.pop()
+    for y in (28, 44, 60): c.glow(c.taper([(92, y), (70, y + 4)], .5, 4, smooth=False), '#e8f0a0', halo=5, power=.5)
+def a_pin(c):
+    c.part(c.ell(50, 78, 30, 10), '#5a4a30', 'matte')
+    c.part(c.poly([(34, 60), (66, 60), (72, 78), (28, 78)], smooth=True), '#8a6a40', 'soft')
+    arrow(c, 38, 10, 52, 76, w=3)
+    c.glow(c.ell(52, 76, 6), '#ffb040', halo=6, power=.6)
+
 ABILITIES = {
     'ability.strike': ('#6a2a20', a_strike), 'ability.challenge': ('#6a2420', a_challenge), 'ability.guard': ('#24406a', a_guard),
     'ability.intercept': ('#1f4a54', a_intercept), 'ability.breaching_blow': ('#6a3c14', a_breach), 'ability.muster': ('#4f5a1e', a_muster),
@@ -1454,6 +1504,8 @@ ABILITIES = {
     'paladin.smite': ('#4a3a1a', a_smite), 'paladin.oath': ('#4a2a24', a_oath), 'paladin.mend': ('#4a3c20', a_mend), 'paladin.ward': ('#2a3454', a_pward),
     'paladin.judgement': ('#4a4020', a_judgement), 'paladin.consecrate': ('#4a2c14', a_consecrate), 'paladin.lay_on': ('#4a4228', a_lay_on), 'paladin.aegis': ('#24364e', a_aegis),
     'paladin.censure': ('#4a3018', a_censure),
+    'ranger.quick_shot': ('#2c3e22', a_quick_shot), 'ranger.aimed_shot': ('#3a2a22', a_aimed_shot), 'ranger.barbed_arrow': ('#3a2420', a_barbed_arrow), 'ranger.hunters_mark': ('#3a2c18', a_hunters_mark),
+    'ranger.snare': ('#2a3420', a_snare), 'ranger.call_companion': ('#2c3a2a', a_call_companion), 'ranger.sic': ('#3a2a20', a_sic), 'ranger.disengage': ('#2a3a22', a_disengage), 'ranger.pin': ('#3a3020', a_pin),
 }
 
 # ---- talents: an emblem per icon word, in the branch's colours ----
@@ -1532,6 +1584,8 @@ BRANCH = {
     'thornsong': ('#33265a', ['#a070f0', '#70c0f0', '#e070d0', '#9be05a', '#f0d070']),
     'oathguard': ('#3a3a2a', ['#e0b040', '#efe6cf', '#9fc8ff', '#d0a060', '#c8c0a0']), 'judicator': ('#4a3018', ['#ffb030', '#e0503a', '#f0e080', '#e08a30', '#f0c890']),
     'sanctuary': ('#3a3c22', ['#ffe9a0', '#9be05a', '#e0b040', '#f0f0d0', '#8ad0f0']),
+    'marksman': ('#3a2e20', ['#e0503a', '#ffb040', '#d8d0b0', '#c8e070', '#f0c890']), 'beastbond': ('#2e3a2a', ['#c8c0b0', '#e0503a', '#9be05a', '#d0a060', '#8ad0f0']),
+    'pathfinder': ('#2a3a22', ['#9be05a', '#c8e070', '#e0b040', '#70c0f0', '#d8d0b0']),
 }
 KIND_TRIM = dict(passive='#c9ccd2', modifier='#e0b040', active='#fff0b0', signature='#fff0b0', capstone='#ffd040')
 def draw_talent(c, icon, branch, kind, k):

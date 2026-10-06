@@ -77,6 +77,9 @@ namespace Crulanda.Encounter
                 : session.Paladin != null
                 ? new[] { "og-steadfast", "og-steadfast", "og-steadfast", "og-steadfast", "og-steadfast", "og-censure",
                     "sa-devotion", "sa-devotion", "sa-devotion", "sa-devotion", "sa-devotion" }
+                : session.Ranger != null
+                ? new[] { "mk-steady-hand", "mk-steady-hand", "mk-steady-hand", "mk-steady-hand", "mk-steady-hand", "mk-snap-shot",
+                    "bb-thick-coat", "bb-thick-coat", "bb-thick-coat", "bb-thick-coat", "bb-thick-coat" }
                 : new[] { "tk-hardened-grip", "tk-hardened-grip", "tk-hardened-grip", "tk-tempered-armor", "tk-tempered-armor",
                     "tk-intercept", "dp-weapon-pressure", "dp-weapon-pressure", "dp-read-the-opening", "dp-read-the-opening", "dp-read-the-opening" };
             foreach (var id in build) if (!session.ChangeTalent(id, 1)) Debug.LogError("UI capture could not buy " + id);
@@ -86,7 +89,7 @@ namespace Crulanda.Encounter
             yield return new WaitForSeconds(1);
             session.BuildOpen = false;
             var target = session.Enemies[0];
-            session.Player.GetComponent<AdventurerMotor>().Teleport(target.transform.position + Vector3.back * (druid ? 8 : 2.5f));
+            session.Player.GetComponent<AdventurerMotor>().Teleport(target.transform.position + Vector3.back * (druid || session.Ranger != null ? 8 : 2.5f));
             session.Select(target);
             if (druid)
             {

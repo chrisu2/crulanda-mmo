@@ -470,6 +470,14 @@ namespace Crulanda.Encounter
                         Part(PrimitiveType.Cylinder, body, new Vector3(0, .3f, -.27f), new Vector3(.18f, .02f, .18f), accent, new Vector3(90, 0, 0)) };
                     break;
                 }
+                case ActorLook.Ranger:   // the bow in the left hand, limbs up and down in front of the fist; slung across the back for swimming
+                {
+                    if (modelled) classKit = model.Hood != null ? new[] { model.Hood.transform } : new Transform[0];
+                    var bow = HeldModel("Bow_Basic", armL, new Vector3(0, -.62f, .1f), new Vector3(0, 0, 0), 1, .5f);
+                    var slung = HeldModel("Bow_Basic", body, new Vector3(-.1f, .25f, -.27f), new Vector3(0, 0, 30), 1, .5f);
+                    held = bow != null ? new[] { bow } : new Transform[0]; stowed = slung != null ? new[] { slung } : new Transform[0];
+                    break;
+                }
                 case ActorLook.Druid:
                     if (modelled) classKit = model.Hood != null ? new[] { model.Hood.transform } : new Transform[0];   // the outfit's hood
                     else

@@ -460,6 +460,114 @@ MonoBehaviour:
     globalCooldown: 1.5
     duration: 2
     statusId: 
+  - id: ranger.quick_shot
+    name: Quick Shot
+    description: An arrow on the instant, at up to 25 metres. Starts the bow's own auto-shot while the target is in range.
+    effect: 0
+    power: 9
+    cost: 10
+    cooldown: 0
+    range: 25
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 0
+    statusId: 
+  - id: ranger.aimed_shot
+    name: Aimed Shot
+    description: A drawn arrow of 1.5 seconds that hits hard, at up to 25 metres.
+    effect: 0
+    power: 22
+    cost: 25
+    cooldown: 6
+    range: 25
+    castTime: 1.5
+    globalCooldown: 1.5
+    duration: 0
+    statusId: 
+  - id: ranger.barbed_arrow
+    name: Barbed Arrow
+    description: An arrow that bleeds the target for four ticks over 8 seconds.
+    effect: 0
+    power: 6
+    cost: 15
+    cooldown: 8
+    range: 25
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 8
+    statusId: 
+  - id: ranger.hunters_mark
+    name: Hunter's Mark
+    description: Mark the target for 15 seconds: it takes 10% more from everyone in the party.
+    effect: 4
+    power: 0
+    cost: 10
+    cooldown: 10
+    range: 30
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 15
+    statusId: 
+  - id: ranger.snare
+    name: Snare
+    description: A tangling arrow that slows the target by half for 6 seconds.
+    effect: 4
+    power: 0
+    cost: 15
+    cooldown: 12
+    range: 25
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 6
+    statusId: 
+  - id: ranger.call_companion
+    name: Call Companion
+    description: Whistle up your wolf to heel (or send it away). It hunts what you Sic it on.
+    effect: 7
+    power: 0
+    cost: 0
+    cooldown: 20
+    range: 0
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 0
+    statusId: 
+  - id: ranger.sic
+    name: Sic
+    description: Send your wolf at the target: it runs in and bites, the first bite half again as hard.
+    effect: 1
+    power: 0
+    cost: 10
+    cooldown: 8
+    range: 30
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 0
+    statusId: 
+  - id: ranger.disengage
+    name: Disengage
+    description: Leap 6 metres away from your target.
+    effect: 5
+    power: 0
+    cost: 15
+    cooldown: 15
+    range: 0
+    castTime: 0
+    globalCooldown: 0
+    duration: 0
+    statusId: 
+  - id: ranger.pin
+    name: Pin
+    description: An arrow through the foot: the target is rooted for 3 seconds. Talent.
+    effect: 4
+    power: 8
+    cost: 20
+    cooldown: 20
+    range: 25
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 3
+    statusId: 
   playerClass:
     id: class.warrior
     displayName: Warrior
@@ -629,6 +737,52 @@ MonoBehaviour:
         level: 1
         talentId: og-censure
     talentTree: {fileID: 4900000, guid: ae359ffc02cb42b486625e88fc47b2f5, type: 3}
+  - definition:
+      id: class.ranger
+      displayName: Ranger
+      role: 2
+      resource: 3
+      maxResource: 100
+      combatRegen: 8
+      restingRegen: 15
+      stats:
+        baseHealth: 160
+        healthPerLevel: 22
+        healthPerStamina: 5
+        baseAttackPower: 12
+        attackPowerPerLevel: 2
+        attackPowerPerStrength: 1
+        spellPowerPerIntellect: 1
+        armorPerAgility: 1
+      unlocks:
+      - abilityId: ranger.quick_shot
+        level: 1
+        talentId: 
+      - abilityId: ranger.aimed_shot
+        level: 1
+        talentId: 
+      - abilityId: ranger.barbed_arrow
+        level: 2
+        talentId: 
+      - abilityId: ranger.hunters_mark
+        level: 3
+        talentId: 
+      - abilityId: ranger.snare
+        level: 4
+        talentId: 
+      - abilityId: ranger.call_companion
+        level: 1
+        talentId: 
+      - abilityId: ranger.sic
+        level: 2
+        talentId: 
+      - abilityId: ranger.disengage
+        level: 5
+        talentId: 
+      - abilityId: ranger.pin
+        level: 1
+        talentId: pf-pin
+    talentTree: {fileID: 4900000, guid: 1505a72df549418f89ae19b5f1d96eda, type: 3}
   questFiles:
   - {fileID: 4900000, guid: 2f37ccf5ed8d46928976a7b5854444ed, type: 3}
   - {fileID: 4900000, guid: 74079723a64512c49ae39123ea0f57e0, type: 3}

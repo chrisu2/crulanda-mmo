@@ -9,7 +9,7 @@ records where each of its phases stands and the order of the work. Update it eve
 |---|---|---|
 | 0 | Foundation | Done |
 | 1 | Combat sandbox | Done: shared abilities, threat, elites, level scaling (mobs above you hit harder, red at +3) |
-| 2 | Class loops | Warrior, Druid and Paladin with talent trees; Mira's healer kit. Ranger and Mage next (Phase 5.1) |
+| 2 | Class loops | Warrior, Druid, Paladin and Ranger with talent trees; Mira's healer kit. Mage next (Phase 5.1c) |
 | 3 | Inventory, items, vendors | Done: bags, gear and looks, named loot and legendaries, vendors, professions and crafting, chests |
 | 4 | Questing | Done: five zones of quests, the chronicle, notice boards and bounties, discoveries, achievements |
 | 5 | **SimAdventurers** (the brief's "most important feature") | **Now** (see below) |
@@ -22,7 +22,7 @@ records where each of its phases stands and the order of the work. Update it eve
 | Step | What gets done | Size |
 |---|---|---|
 | 5.0 Groundwork (DONE 2026-10-05) | Faster test runs: run only the tests a change touches; one scene load per test fixture; wait-until instead of fixed waits; PlayMode split across two validation copies. Landed as: select_tests.ps1 (only the fixtures a change names; NONE for art and docs) and two lanes (tests in encounter-validation, build, tours and captures in encounter-validation-b at the same time); a docs-only round took 12 min. Shared scene loads and wait-until left for later (most fixture time is simulated village days, not loading). | 1 round |
-| 5.1 Class kits (Paladin DONE 2026-10-05; Ranger and Mage next) | Paladin, Ranger, Mage: 8-10 abilities each, an AI rotation, gear rules and looks, playable by the player too (full talent trees later). Names provisional until checked against the books. | 3 rounds |
+| 5.1 Class kits (Paladin and Ranger DONE 2026-10-05; Mage next) | Paladin, Ranger, Mage: 8-10 abilities each, an AI rotation, gear rules and looks, playable by the player too (full talent trees later). Names provisional until checked against the books. | 3 rounds |
 | 5.2 Sim profiles | ~20 persistent SimAdventurers (stable ids; name, race, class, level, gear, personality, home zone), saved; materialised as figures in the player's zone, dematerialised when away. | 2 rounds |
 | 5.3 In-world life | Utility-AI activities: questing (camp mobs), gathering, travelling the roads, shopping, resting at inns, dying and the corpse run, levelling and gearing up; personality weights the choices. | 3 rounds |
 | 5.4 Offscreen world | Coarse simulation of the unloaded: levels, zone moves, online and offline hours by the world clock. | 1-2 rounds |

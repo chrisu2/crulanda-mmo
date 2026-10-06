@@ -50,6 +50,26 @@ namespace Crulanda.Encounter
         { var o = Zone?.Zone.objectives; return o != null && index < o.Length && !string.IsNullOrEmpty(o[index]) ? o[index] : fallback; }
         public DruidKit Druid { get { return Kit as DruidKit; } }
         public PaladinKit Paladin { get { return Kit as PaladinKit; } }
+        public RangerKit Ranger { get { return Kit as RangerKit; } }
+        /// <summary>The Ranger's wolf (RangerPet), while one is called.</summary>
+        public RangerPet Pet { get; private set; }
+        /// <summary>Whistles up the Ranger's wolf beside the player (the old one, if any, let go first).</summary>
+        public RangerPet SummonWolf(RangerKit kit)
+        {
+            DismissPet();
+            var point = Player.transform.position - Player.transform.forward * 1.5f + Player.transform.right * 1.2f;
+            if (NavMesh.SamplePosition(point, out var hit, 8, NavMesh.AllAreas)) point = hit.position + Vector3.up;
+            var wolf = SpawnActor("Your wolf", content.player, point, new Color(.45f, .44f, .42f), "pet." + Progress.playerId, ActorLook.Wolf, Progress.Level);
+            AddAgent(wolf.gameObject, 5.5f, .5f);
+            var pet = wolf.gameObject.AddComponent<RangerPet>(); wolf.gameObject.SetActive(true); pet.Init(wolf, this, kit);
+            Pet = pet; return pet;
+        }
+        public void DismissPet()
+        {
+            if (Pet == null) return;
+            foreach (var e in Enemies) if (e != null && e.Victim == Pet.actor) e.ResetFight();
+            Destroy(Pet.gameObject); Pet = null;
+        }
         /// <summary>The figure a class wears and the tint of its capsule stand-in (the classes added 2026-10-05 included).</summary>
         public static ActorLook LookForClass(string classId)
         {
@@ -1058,9 +1078,11 @@ namespace Crulanda.Encounter
         {
             get
             {
-                if (Kit != null && !Kit.MeleeAutoAttacks) return abilities.IsCasting ? "Casting " + abilities.Casting.name : "No weapon swings in this form";
-                return !AutoAttack ? "Auto attack: use a melee ability" : Target == null || !Target.actor.IsAlive ? "Auto attack: no target" :
-                    Distance(Target) >= 3.2f ? "Auto attack: move closer" : "Next swing: " + SwingRemaining.ToString("0.0") + "s";
+                if (abilities.IsCasting && Kit != null && !Kit.MeleeAutoAttacks) return "Casting " + abilities.Casting.name;
+                if (Kit != null && !Kit.MeleeAutoAttacks && !Kit.RangedAutoAttacks) return "No weapon swings in this form";
+                bool bow = Kit != null && Kit.RangedAutoAttacks; string what = bow ? "Auto shot" : "Auto attack", next = bow ? "Next shot: " : "Next swing: ";
+                return !AutoAttack ? what + (bow ? ": shoot to begin" : ": use a melee ability") : Target == null || !Target.actor.IsAlive ? what + ": no target" :
+                    Distance(Target) >= Kit.AutoAttackRange ? what + ": move closer" : next + SwingRemaining.ToString("0.0") + "s";
             }
         }
         public int ActionCount { get { return Kit == null ? 0 : Kit.ActionCount; } }
@@ -1121,7 +1143,7 @@ namespace Crulanda.Encounter
         }
         public void BeginAutoAttack()
         {
-            if (Kit != null && !Kit.MeleeAutoAttacks) return;
+            if (Kit != null && !Kit.MeleeAutoAttacks && !Kit.RangedAutoAttacks) return;
             if (!AutoAttack) nextSwing = Time.time + Kit.SwingInterval(content.playerSwingInterval);
             AutoAttack = true;
         }
@@ -1389,6 +1411,7 @@ namespace Crulanda.Encounter
             if (id == null) return null;
             if (Player != null && Player.EntityId.Value == id) return Player;
             if (Companion != null && Progress.recruited && Companion.actor.EntityId.Value == id) return Companion.actor;
+            if (Pet != null && Pet.actor != null && Pet.actor.EntityId.Value == id) return Pet.actor;   // the Ranger's wolf (RangerPet)
             return null;
         }
         public bool IsLivingPartyMember(string id) { var a = PartyActor(id); return a != null && a.IsAlive; }
@@ -1458,9 +1481,14 @@ namespace Crulanda.Encounter
             for (int slot = 0; slot < ActionCount; slot++)
                 if (!BuildOpen && slot < 10 && EncounterInput.Press(EncounterInput.SlotKey(slot))) UseAbility(slot);
             Kit.Tick(InCombat);
-            if (AutoAttack && !Kit.MeleeAutoAttacks) AutoAttack = false;
-            if (AutoAttack && Target != null && Target.actor.IsAlive && Time.time >= nextSwing && Distance(Target) < 3.2f)
-            { nextSwing = Time.time + Kit.SwingInterval(content.playerSwingInterval); PlayerFigure?.Strike(); Target.Receive(WeaponDamage, Player); Kit.OnAutoHit(); }
+            if (AutoAttack && !Kit.MeleeAutoAttacks && !Kit.RangedAutoAttacks) AutoAttack = false;
+            // The swing in melee, or the bow's auto-shot at its range (the Ranger: ClassKit.RangedAutoAttacks).
+            if (AutoAttack && Target != null && Target.actor.IsAlive && Time.time >= nextSwing && Distance(Target) < Kit.AutoAttackRange)
+            {
+                nextSwing = Time.time + Kit.SwingInterval(content.playerSwingInterval);
+                if (Kit.MeleeAutoAttacks) PlayerFigure?.Strike(); else PlayerFigure?.CastRelease();
+                Target.Receive(WeaponDamage, Player); Kit.OnAutoHit();
+            }
             if (Time.time >= nextRegen)
             {
                 nextRegen = Time.time + 1; Player.Resource.Pool.Change(InCombat ? ClassDef.combatRegen : ClassDef.restingRegen);

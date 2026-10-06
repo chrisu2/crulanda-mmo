@@ -1,0 +1,57 @@
+{
+ "id": "ranger",
+ "name": "Ranger",
+ "resource": "Focus",
+ "resourceDesc": "Focus pays for every shot and comes back quickly, in a fight and out of it; the wolf asks nothing but a whistle.",
+ "identity": "A bow at 25 metres and a wolf at heel: the Ranger keeps the distance, marks the quarry and lets the pack close.",
+ "branches": [
+  {
+   "id": "marksman",
+   "name": "Marksman",
+   "role": "dps",
+   "loop": "Open with Aimed Shot, keep the auto-shot going with Quick Shot, bleed with Barbed Arrow, and finish low targets with a headshot.",
+   "tradeoff": "Everything is at range and on the player's own arrows; the wolf is a distraction, not a weapon.",
+   "nodes": [
+    {"id": "mk-steady-hand", "name": "Steady Hand", "tier": 0, "col": 1, "max": 5, "req": null, "kind": "passive", "icon": "target", "desc": "Every shot hits 3% harder per rank.", "emphasis": {"damage": 1}, "impl": true},
+    {"id": "mk-quick-draw", "name": "Quick Draw", "tier": 0, "col": 2, "max": 3, "req": null, "kind": "modifier", "icon": "bolt", "desc": "Quick Shot costs 2 less Focus per rank and the auto-shot comes 5% faster per rank.", "emphasis": {"tempo": 1}, "impl": true},
+    {"id": "mk-piercing", "name": "Piercing", "tier": 1, "col": 0, "max": 3, "req": null, "kind": "passive", "icon": "dagger", "desc": "Aimed Shot hits 8% harder per rank against targets above 70% health.", "emphasis": {"damage": 1}, "impl": true},
+    {"id": "mk-bleeding-wounds", "name": "Bleeding Wounds", "tier": 1, "col": 1, "max": 3, "req": null, "kind": "passive", "icon": "drop", "desc": "Barbed Arrow bleeds for one more tick per rank.", "emphasis": {"damage": 0.8}, "impl": true},
+    {"id": "mk-snap-shot", "name": "Snap Shot", "tier": 1, "col": 2, "max": 1, "req": null, "kind": "modifier", "icon": "clock", "desc": "After an Aimed Shot the next Quick Shot is free.", "emphasis": {"tempo": 1.5}, "impl": true},
+    {"id": "mk-headshot", "name": "Headshot", "tier": 2, "col": 1, "max": 3, "req": "mk-steady-hand", "kind": "passive", "icon": "eye", "desc": "Aimed Shot hits 12% harder per rank against targets under 35% health.", "emphasis": {"damage": 1.5}, "impl": true},
+    {"id": "mk-double-nock", "name": "Double Nock", "tier": 2, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "star", "desc": "Aimed Shot looses two arrows, the second at half.", "emphasis": {"damage": 2}, "impl": true}
+   ]
+  },
+  {
+   "id": "beastbond",
+   "name": "Beastbond",
+   "role": "pet",
+   "loop": "Keep the wolf fed and fierce: it takes the blows while you shoot, and Sic sends it in with a fury bite.",
+   "tradeoff": "The wolf is only as good as the points in it, and a Ranger who is all wolf shoots like a beginner.",
+   "nodes": [
+    {"id": "bb-thick-coat", "name": "Thick Coat", "tier": 0, "col": 1, "max": 5, "req": null, "kind": "passive", "icon": "shield", "desc": "Your wolf has 8% more health per rank.", "emphasis": {"mitigation": 1}, "impl": true},
+    {"id": "bb-sharp-teeth", "name": "Sharp Teeth", "tier": 0, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "paw", "desc": "Your wolf's bite is 10% harder per rank.", "emphasis": {"damage": 1}, "impl": true},
+    {"id": "bb-mending-bond", "name": "Mending Bond", "tier": 1, "col": 0, "max": 3, "req": null, "kind": "passive", "icon": "heart", "desc": "Each of your shots heals your wolf for 2% of its health per rank.", "emphasis": {"sustain": 1}, "impl": true},
+    {"id": "bb-sic-fury", "name": "Sic Fury", "tier": 1, "col": 1, "max": 3, "req": null, "kind": "modifier", "icon": "flame", "desc": "Sic's first bite lands 25% harder per rank.", "emphasis": {"damage": 1}, "impl": true},
+    {"id": "bb-pack-sense", "name": "Pack Sense", "tier": 1, "col": 2, "max": 1, "req": null, "kind": "modifier", "icon": "eye", "desc": "Your wolf goes for whatever you shoot, without being sent.", "emphasis": {"tempo": 1}, "impl": true},
+    {"id": "bb-howl", "name": "Howl", "tier": 2, "col": 1, "max": 1, "req": "bb-thick-coat", "kind": "passive", "icon": "wind", "desc": "Your wolf's bites hold attention like a tank's blows.", "emphasis": {"threat": 2}, "impl": true},
+    {"id": "bb-alpha", "name": "Alpha", "tier": 2, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "skull", "desc": "Your wolf is an alpha: a quarter more health and bite.", "emphasis": {"damage": 1, "mitigation": 1}, "impl": true}
+   ]
+  },
+  {
+   "id": "pathfinder",
+   "name": "Pathfinder",
+   "role": "control",
+   "loop": "Mark the quarry for the whole party, slow and pin what comes for you, and leap clear when it gets close.",
+   "tradeoff": "Control costs Focus that is not going into arrows, and a pinned target is not a dead one.",
+   "nodes": [
+    {"id": "pf-fleet", "name": "Fleet", "tier": 0, "col": 1, "max": 5, "req": null, "kind": "passive", "icon": "wind", "desc": "You move 2% faster per rank.", "emphasis": {"tempo": 1}, "impl": true},
+    {"id": "pf-tangling-snare", "name": "Tangling Snare", "tier": 0, "col": 2, "max": 3, "req": null, "kind": "modifier", "icon": "chain", "desc": "Snare slows 5% more and lasts 1s longer per rank.", "emphasis": {"control": 1}, "impl": true},
+    {"id": "pf-keen-eye", "name": "Keen Eye", "tier": 1, "col": 0, "max": 3, "req": null, "kind": "passive", "icon": "eye", "desc": "Hunter's Mark raises the party's damage by 2% more per rank.", "emphasis": {"damage": 0.8}, "impl": true},
+    {"id": "pf-pin", "name": "Pin", "tier": 1, "col": 1, "max": 1, "req": null, "kind": "active", "icon": "target", "desc": "New action: an arrow through the foot that roots the target for 3s.", "emphasis": {"control": 3}, "impl": true},
+    {"id": "pf-cover-of-leaves", "name": "Cover of Leaves", "tier": 1, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "leaf", "desc": "Disengage grants a barrier worth 3% of your maximum health per rank for 6s.", "emphasis": {"mitigation": 1}, "impl": true},
+    {"id": "pf-trapper", "name": "Trapper", "tier": 2, "col": 1, "max": 3, "req": "pf-pin", "kind": "passive", "icon": "gear", "desc": "Pin holds 1s longer per rank.", "emphasis": {"control": 1.5}, "impl": true},
+    {"id": "pf-pathfinder", "name": "Pathfinder", "tier": 2, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "banner", "desc": "Hunter's Mark also slows its target by 15%.", "emphasis": {"control": 2}, "impl": true}
+   ]
+  }
+ ]
+}

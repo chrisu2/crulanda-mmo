@@ -15,6 +15,11 @@ $plog = Join-Path $ui 'hud-paladin.log'
 $g = Start-Process $exe -PassThru -ArgumentList @('--crulanda-ui-capture', ('"' + $ui + '"'), '--crulanda-class', 'class.paladin', '-screen-width', '1440', '-screen-height', '900', '-screen-fullscreen', '0', '-logFile', ('"' + $plog + '"'))
 $g | Wait-Process -Timeout 240
 Select-String -LiteralPath $plog -Pattern 'CAPTURE_DONE|Exception|could not' | Select-Object -First 5 | ForEach-Object Line
+# The Ranger's too (Phase 5.1b, 2026-10-05): the bow, the wolf, the shots (prefix ranger-).
+$rlog = Join-Path $ui 'hud-ranger.log'
+$g = Start-Process $exe -PassThru -ArgumentList @('--crulanda-ui-capture', ('"' + $ui + '"'), '--crulanda-class', 'class.ranger', '-screen-width', '1440', '-screen-height', '900', '-screen-fullscreen', '0', '-logFile', ('"' + $rlog + '"'))
+$g | Wait-Process -Timeout 240
+Select-String -LiteralPath $rlog -Pattern 'CAPTURE_DONE|Exception|could not' | Select-Object -First 5 | ForEach-Object Line
 $wd = Join-Path $ui 'wardrobe'
 New-Item -ItemType Directory -Force $wd | Out-Null
 $wlog = Join-Path $wd 'wardrobe.log'

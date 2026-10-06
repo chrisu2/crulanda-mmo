@@ -28,6 +28,7 @@ namespace Crulanda.Encounter
             if (n.Contains("Spear2H")) return 1.95f;
             if (n.Contains("Spear")) return 1.65f;
             if (n.Contains("Staff")) return 1.65f;
+            if (n.Contains("Bow")) return 1.2f;   // the Ranger's bow (ActorVisual.ClassModels.cs), gripped at its centre
             return .95f;   // a sword
         }
 

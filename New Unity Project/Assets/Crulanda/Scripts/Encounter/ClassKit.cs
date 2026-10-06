@@ -32,6 +32,9 @@ namespace Crulanda.Encounter
         public virtual void Tick(bool inCombat) { }
 
         public virtual bool MeleeAutoAttacks { get { return true; } }
+        /// <summary>A bow's auto-shot (the Ranger): automatic attacks at <see cref="AutoAttackRange"/> instead of in melee.</summary>
+        public virtual bool RangedAutoAttacks { get { return false; } }
+        public virtual float AutoAttackRange { get { return 3.2f; } }
         public virtual float MoveSpeedMultiplier { get { return 1; } }
         public virtual float SwingInterval(float baseInterval) { return baseInterval; }
         public virtual void OnAutoHit() { }
@@ -51,6 +54,7 @@ namespace Crulanda.Encounter
                 case "class.warrior": return new WarriorKit(session, new ClassLoadout(definition, catalog), new Crulanda.Core.SeededRandom(Environment.TickCount));
                 case "class.druid": return new DruidKit(session, definition, catalog);
                 case "class.paladin": return new PaladinKit(session, definition, catalog);
+                case "class.ranger": return new RangerKit(session, definition, catalog);
                 default: throw new ArgumentException("No class kit for '" + classId + "'.");
             }
         }

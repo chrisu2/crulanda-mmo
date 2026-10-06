@@ -9,7 +9,13 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-10-05, late morning)
+## RESUME HERE (updated 2026-10-05, night)
+**5.1b the Ranger: PUBLISHED 2026-10-05 night, committed, backed up (see CHANGELOG). Next: 5.1c the Mage, then 5.2 sim profiles.**
+Ranger notes for the Mage round: the ranged auto-attack is ClassKit.RangedAutoAttacks + AutoAttackRange (EncounterSession's
+BeginAutoAttack and the swing loop honour them; a release pose instead of a swing); the wolf is RangerPet (EncounterSession.Pet,
+SummonWolf/DismissPet, a party member through PartyActor so enemies turn on it; not saved); the bow is a model class kit
+(ActorVisual.ClassModels.cs HeldModel, gripped at its centre) that yields to a main-hand item like the Druid's staff.
+The Mage casts like the Druid's Thornsong (castTime abilities; TickCastPose): Combustion ranged, Heatweaver control, Spellbinder support.
 **5.1a the Paladin: PUBLISHED 2026-10-05 evening, committed, backed up. Flaky: VillageHomeTests.Every_villager_sleeps_behind_their_own_named_door (real-time wait, fails under lane B's load; passes alone).** Pattern for the Ranger and the Mage (one round each): a <Class>Kit : ClassKit after PaladinKit
 (own ability and unlock dictionaries, a BarIds order, ImplementedIds = every impl node of Talents/<class>.json), ClassKit.Create
 case, EncounterSession.<Class> property + LookForClass/TintForClass, ActorLook colours and ModelFigure spec, a class block and

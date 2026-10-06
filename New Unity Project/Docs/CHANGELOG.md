@@ -1238,3 +1238,27 @@ A read-only review by five reviewers, each finding checked by a second who tried
   actions and the 21 talents; the figure line-up (people-2) shows the three.
 - Tests: EditMode PaladinRulesTests (tree, gates, content), PlayMode PaladinLoopTests (own save, Conviction, Mend and Lay On,
   Ward, Consecrate). Full run: EditMode 405/405, PlayMode 179/180 (VillageHomeTests' bedtime walk timed out once under lane B's load and passed twice after: flaky under load, noted), build, five tours, the Paladin's own HUD captures (paladin-01-talents, 03-combat). Phase 5.0's two-lane run: 60 min.
+
+## 2026-10-05 — Phase 5.1b: the Ranger (published, night)
+- **A fourth playable class (provisional GAME-ONLY name and mechanics, after CLASS_BUILD_MATRIX's Marksman ranged, Beastbond
+  pet, Pathfinder control):** a bow at 25 m on Focus (100, back fast in and out of a fight) with a wolf at heel. Nine actions:
+  Quick Shot (instant; starts the bow's own auto-shot, the game's first ranged auto-attack: ClassKit.RangedAutoAttacks and
+  AutoAttackRange, a release pose instead of a swing), Aimed Shot (1.5 s draw, hits hard), Barbed Arrow (bleeds four ticks),
+  Hunter's Mark (the target takes 10% more from the whole party for 15 s), Snare (half speed 6 s), Call Companion (the wolf
+  comes or goes), Sic (the wolf runs in, first bite half again as hard), Disengage (a 6 m leap away, no global cooldown) and
+  the talent action Pin (roots 3 s). 21 talents in three rows of Marksman, Beastbond and Pathfinder
+  (EncounterContent/Talents/ranger.json), all with effects (RangerKit): Steady Hand, Quick Draw, Piercing, Bleeding Wounds,
+  Snap Shot (a free Quick Shot after an Aimed Shot), Headshot, Double Nock; Thick Coat, Sharp Teeth, Mending Bond (shots heal
+  the wolf), Sic Fury, Pack Sense (the wolf goes for whatever you shoot), Howl (its bites hold attention), Alpha; Fleet,
+  Tangling Snare, Keen Eye, Pin, Cover of Leaves (a barrier on Disengage), Trapper, Pathfinder (the Mark also slows).
+- **The wolf (RangerPet):** a grey wolf on the pack's model, 90 + 18/level health (talents scale it), bites every 2 s with
+  threat of its own, keeps to heel a pace behind the Ranger's shoulder at the Ranger's pace, hunts what it is sent at until
+  the quarry dies or breaks off, and is a party member the enemies can turn on (EncounterSession.PartyActor). Not saved: a
+  whistle each session.
+- **Looks:** the Ranger in forest green and a hood with the packs' Bow_Basic in the left hand, gripped at its centre
+  (ActorVisual.ClassModels.cs: a class kit piece that is a model; ModelLength knows bows), slung across the back when swimming,
+  yielding to a main-hand item like the Druid's staff. Icons painted for the nine actions and the 21 talents (make_icons.py:
+  ash arrows, fletching, paw prints). HUD class colour green; the pause menu offers the Ranger like the other classes.
+- Tests: EditMode RangerRulesTests (tree, gates, content; four classes now), PlayMode RangerLoopTests (own character, Quick
+  Shot at 15 m and the auto-shot's second arrow, the drawn Aimed Shot, Mark and Snare, the wolf called and sent, Disengage).
+  capture_extra.ps1 takes the Ranger's HUD shots (prefix ranger-).

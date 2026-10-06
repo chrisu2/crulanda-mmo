@@ -61,7 +61,7 @@ namespace Crulanda.Encounter
             EncounterEnemy best = null; float bestD = within;
             foreach (var e in Session.Enemies)
             {
-                if (e == null || !e.Camp || e.Game || !e.actor.IsAlive || e.Hidden || e.Engaged) continue;
+                if (e == null || !e.Camp || e.Game || e.Elite || !e.actor.IsAlive || e.Hidden || e.Engaged) continue;   // no elite alone (Old Hazelmaw drew a level-5 Ranger)
                 int lv = e.actor.Level; if (lv < sim.level - 2 || lv > sim.level + 1) continue;
                 float d = Vector3.Distance(e.transform.position, transform.position); if (d < bestD) { best = e; bestD = d; }
             }

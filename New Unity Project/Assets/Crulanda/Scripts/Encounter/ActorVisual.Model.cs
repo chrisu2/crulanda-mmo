@@ -357,9 +357,9 @@ namespace Crulanda.Encounter
         /// height they reach (<see cref="HatClear"/>). Walls are the faces that look sideways; a brim's flat faces and a crown's
         /// top do not count, so a brim may pass through the head (hidden inside it). Gives the drop and the crown's scale.
         /// </summary>
-        bool HatFit(IEnumerable<Transform> parts, out float dy, out float k, float atDy = float.NaN)
+        bool HatFit(IEnumerable<Transform> parts, out float dy, out float k, float atDy = float.NaN, HeadOutline against = null, float wallsBelow = float.MaxValue, float wallsAbove = float.MinValue, float minK = .6f, float maxK = 1.9f)
         {
-            dy = 0; k = 1; if (headOutline == null) return false;
+            dy = 0; k = 1; if (headOutline == null) return false; var o = against ?? headOutline;
             var side = new List<Vector3>(); float rim = float.MaxValue; var toFrame = headFrame.worldToLocalMatrix;
             foreach (var part in parts)
                 foreach (var mf in part.GetComponentsInChildren<MeshFilter>(true))
@@ -369,7 +369,8 @@ namespace Crulanda.Encounter
                     for (int i = 0; i < v.Length; i++)
                     {
                         if (n.Length == v.Length && Mathf.Abs(M.MultiplyVector(n[i]).normalized.y) > .55f) continue;
-                        var p = M.MultiplyPoint3x4(v[i]); side.Add(p); rim = Mathf.Min(rim, p.y);
+                        var p = M.MultiplyPoint3x4(v[i]); rim = Mathf.Min(rim, p.y);
+                        if (p.y <= wallsBelow && p.y >= wallsAbove) side.Add(p);   // which faces count as walls (a crown's band, not its spikes)
                     }
                 }
             if (side.Count == 0) return false;
@@ -378,10 +379,10 @@ namespace Crulanda.Encounter
             foreach (var p in side)
             {
                 var d = new Vector2(p.x, p.z - headOutline.z0); float r = d.magnitude; if (r < .02f) continue;
-                float head = HeadRadius(p.y + dy, Mathf.Atan2(d.x, d.y)); if (head <= 0) continue;
+                float head = OutlineRadius(o, p.y + dy, Mathf.Atan2(d.x, d.y)); if (head <= 0) continue;
                 need = Mathf.Max(need, (head + HatClear) / r); any = true;
             }
-            k = any ? Mathf.Clamp(need, .6f, 1.9f) : 1;
+            k = any ? Mathf.Clamp(need, minK, maxK) : 1;
             return true;
         }
         /// <summary>

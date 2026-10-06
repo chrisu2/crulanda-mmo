@@ -173,7 +173,7 @@ namespace Crulanda.Encounter
                 if (Move != null && Time.time >= nextBlowAt) { BeginBlow(); return; }
                 swing = Time.time + SwingInterval;
                 if (Figure != null) Figure.Strike();
-                int damage = session.Kit.ResolveEnemyHit(this, Victim, Mathf.RoundToInt(HitBase * OverHitNow));
+                int damage = session.Kit.ResolveEnemyHit(this, Victim, Mathf.RoundToInt(HitBase * OverHitNow * GroupDamageScale));
                 session.FloatText(Victim.transform.position, "−" + damage, new Color(1, .45f, .35f));
             }
         }
@@ -199,6 +199,7 @@ namespace Crulanda.Encounter
         {
             ClearFight();
             threat.Clear(); Victim = null; slowUntil = rootUntil = 0; unreachableSince = -1;
+            UnscaleFromGroup();
             if (!actor.IsAlive) return;
             actor.Health.ApplyHealing(actor.Health.Pool.Max);
             if (agent.isOnNavMesh) { agent.isStopped = false; agent.SetDestination(home); }
@@ -213,7 +214,7 @@ namespace Crulanda.Encounter
             int actual = actor.GetComponent<Combatant>().Damage(Mathf.RoundToInt(damage * session.Kit.PartyDamageMultiplier(this) * OverTakenNow));
             if (actor.IsAlive && Figure != null) Figure.Flinch();
             if (Game) { if (actor.IsAlive) GetComponent<GameAnimal>()?.Bolt(source != null ? source.transform.position : transform.position); }
-            else { if (!inFight) struck = true; threat.Add(source.EntityId.Value, actual); }   // struck: it was hit before it noticed anyone, so sneaking does not quieten its alarm
+            else { if (!inFight) struck = true; threat.Add(source.EntityId.Value, actual); if (inFight) ScaleToGroup(); }   // a sim joining mid-fight raises it   // struck: it was hit before it noticed anyone, so sneaking does not quieten its alarm
             session.FloatText(transform.position, actual.ToString(), new Color(1, .86f, .4f));
         }
         void OnDeath(Health health)
@@ -237,7 +238,7 @@ namespace Crulanda.Encounter
             home = transform.position;
             var visual = transform.Find("Body");
             if (visual != null) { visual.localRotation = Quaternion.identity; visual.localPosition = Vector3.zero; }
-            actor.Health.Revive(actor.Health.Pool.Max); actor.Health.ApplyHealing(actor.Health.Pool.Max);
+            UnscaleFromGroup(); actor.Health.Revive(actor.Health.Pool.Max); actor.Health.ApplyHealing(actor.Health.Pool.Max);
             ClearFight(); evadeUntil = 0;
             threat.Clear(); Victim = null; Looted = false; slowUntil = rootUntil = 0;
             Drops = null; Coins = 0; LootBeacon.Clear(this);

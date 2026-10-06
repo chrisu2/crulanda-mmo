@@ -22,7 +22,7 @@ namespace Crulanda.Encounter
         public static bool BlocksPointer(Vector2 point)
         {
             var p = new Vector2(point.x * 1440 / Screen.width, (Screen.height - point.y) * 900 / Screen.height);
-            return paused || buildVisible || mapVisible || QuestUiBlocks(p) || ItemUiBlocks(p) || TradesUiBlocks(p) || LootUiBlocks(p) || p.y > 795 || new Rect(10, 10, 350, 190).Contains(p) ||
+            return paused || buildVisible || mapVisible || QuestUiBlocks(p) || WhoUiBlocks(p) || ItemUiBlocks(p) || TradesUiBlocks(p) || LootUiBlocks(p) || p.y > 795 || new Rect(10, 10, 350, 190).Contains(p) ||
                 (targetVisible && new Rect(365, 10, 350, 130).Contains(p)) || new Rect(1215, 0, 225, 240).Contains(p) ||
                 (partySims > 0 && new Rect(10, 196, 350, 46 * partySims).Contains(p)) ||
                 new Rect(1110, 236, 330, 200).Contains(p) || false;
@@ -71,7 +71,7 @@ namespace Crulanda.Encounter
             if (Hidden || session == null || session.Player == null) return;
             Styles();
             inventoryVisible = session.InventoryOpen; paused = session.Paused; buildVisible = session.BuildOpen;
-            mapVisible = session.MapOpen; targetVisible = session.Target != null || session.HasFriendlyFocus; partySims = session.PartySims.Count; bookVisible = session.QuestBookOpen; talkVisible = session.Conversation != null;
+            mapVisible = session.MapOpen; targetVisible = session.Target != null || session.HasFriendlyFocus; partySims = session.PartySims.Count; whoVisible = session.WhoOpen; bookVisible = session.QuestBookOpen; talkVisible = session.Conversation != null;
             bagsVisible = session.InventoryOpen; charVisible = session.CharacterOpen; vendorVisible = session.VendorNpc != null; tradesVisible = session.TradesOpen;
             GUI.matrix = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(Screen.width / 1440f, Screen.height / 900f, 1));
             GUI.color = Color.white;
@@ -87,6 +87,7 @@ namespace Crulanda.Encounter
             if (session.BuildOpen) DrawBuild();
             if (session.MapOpen) maps.DrawWindow(session, gold, ink);
             if (session.QuestBookOpen) DrawQuestBook();
+            if (session.WhoOpen) DrawWho();
             if (session.Conversation != null) DrawConversation();
             DrawLoot();
             DrawDiscoveryToast();   // over the windows: it lasts a few seconds
@@ -260,7 +261,7 @@ namespace Crulanda.Encounter
                 Outlined(new Rect(18, y, 455, h), msgs[i], tiny, session.LineColour(msgs[i], new Color(1, .96f, .86f)));   // loot lines in their quality's colour
             }
             chatTop = y;
-            Shadow(new Rect(12, 774, 880, 20), "WASD move · / run · Space jump · Right-drag look · Wheel zoom · Tab target · E interact · L quests · M map · B talents · I bags · C character · K trades", tiny, new Color(.8f, .8f, .78f));
+            Shadow(new Rect(12, 774, 880, 20), "WASD move · / run · Space jump · Right-drag look · Wheel zoom · Tab target · E interact · L quests · M map · B talents · I bags · C character · K trades · O who", tiny, new Color(.8f, .8f, .78f));
         }
         void DrawCenter()
         {

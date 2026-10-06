@@ -1447,6 +1447,7 @@ namespace Crulanda.Encounter
                 else if (Conversation != null && !Paused) Conversation = null;
                 else if (VendorNpc != null && !Paused) CloseVendor();
                 else if (TradesOpen && !Paused) TradesOpen = false;
+                else if (WhoOpen && !Paused) WhoOpen = false;
                 else if ((CharacterOpen || InventoryOpen) && !Paused) { CharacterOpen = false; InventoryOpen = false; }
                 else if (QuestBookOpen && !Paused) { QuestBookOpen = false; ReadingDocument = null; }
                 else if (MapOpen && !Paused) MapOpen = false;
@@ -1454,6 +1455,7 @@ namespace Crulanda.Encounter
             }
             if (!Paused && EncounterInput.Press(KeyCode.M)) MapOpen = !MapOpen;
             if (!Paused && Quests != null && EncounterInput.Press(KeyCode.L)) { QuestBookOpen = !QuestBookOpen; if (!QuestBookOpen) ReadingDocument = null; }
+            if (!Paused && SimPopulation.Active != null && EncounterInput.Press(KeyCode.O)) WhoOpen = !WhoOpen;
             if (Paused) return;
             if (EncounterInput.Press(KeyCode.B)) BuildOpen = !BuildOpen;
             // Moving interrupts the player's own cast-time abilities (instant abilities are unaffected).

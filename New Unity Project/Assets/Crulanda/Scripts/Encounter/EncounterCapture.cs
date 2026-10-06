@@ -178,6 +178,9 @@ namespace Crulanda.Encounter
             foreach (var f in pop.Figures.ToArray()) if (session.PartySims.Count < 2 && f != null) session.Invite(f.sim.id);
             session.SelectSim(null); yield return new WaitForSeconds(2.5f);
             ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "41-sim-party.png")); yield return new WaitForSeconds(.4f);
+            session.WhoOpen = true; yield return new WaitForSeconds(.5f);
+            ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "42-who.png")); yield return new WaitForSeconds(.4f);
+            session.WhoOpen = false;
             foreach (var c in session.PartySims.ToArray()) session.LeaveParty(c.sim.id);
         }
         IEnumerator CaptureBags(string directory, string prefix)

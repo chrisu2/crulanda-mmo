@@ -75,7 +75,7 @@ namespace Crulanda.Encounter
                 session.Message(v == session.Player ? "You step clear of " + Move.name + "." : Move.name + " falls on empty ground.");
                 return;
             }
-            int damage = session.Kit.ResolveEnemyHit(this, v, Mathf.RoundToInt(HitBase * Move.blow * OverHitNow));
+            int damage = session.Kit.ResolveEnemyHit(this, v, Mathf.RoundToInt(HitBase * Move.blow * OverHitNow * GroupDamageScale));
             session.FloatText(v.transform.position + Vector3.up * .3f, Move.name + " −" + damage, RageColor);
             session.Message(Name + "'s " + Move.name + " hits " + (v == session.Player ? "you" : v.DisplayName) + " for " + damage + ".");
         }

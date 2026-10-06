@@ -25,6 +25,7 @@ namespace Crulanda.Encounter
                 case KeyCode.I: return k.iKey.wasPressedThisFrame;
                 case KeyCode.K: return k.kKey.wasPressedThisFrame;
                 case KeyCode.L: return k.lKey.wasPressedThisFrame;
+                case KeyCode.O: return k.oKey.wasPressedThisFrame;   // the who list
                 case KeyCode.C: return k.cKey.wasPressedThisFrame;
                 case KeyCode.Escape: return k.escapeKey.wasPressedThisFrame;
                 case KeyCode.F5: return k.f5Key.wasPressedThisFrame;

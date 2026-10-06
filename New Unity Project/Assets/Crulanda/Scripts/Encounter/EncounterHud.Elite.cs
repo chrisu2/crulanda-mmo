@@ -20,6 +20,7 @@ namespace Crulanda.Encounter
         /// <summary>The target frame's status words with an elite's enrage in front.</summary>
         static string WithEnrage(EncounterEnemy t, string extra)
         {
+            if (t != null && t.GroupNote != null) extra = string.IsNullOrEmpty(extra) ? t.GroupNote : extra + "  ·  " + t.GroupNote;   // scaled for your group
             return t == null || !t.Enraged ? extra : "ENRAGED" + (string.IsNullOrEmpty(extra) ? "" : "  ·  " + extra);
         }
     }

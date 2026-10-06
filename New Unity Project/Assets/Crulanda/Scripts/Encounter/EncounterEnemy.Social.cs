@@ -74,7 +74,7 @@ namespace Crulanda.Encounter
         /// <summary>The first frame of a fight: an elite's heavy blow starts its count, and the camp hears of it once.</summary>
         void Engage()
         {
-            inFight = true;
+            inFight = true; ScaleToGroup();   // stronger for a group (EncounterEnemy.GroupScale)
             if (Move != null) nextBlowAt = Time.time + Move.first;
             if (!alarmed) { alarmed = true; session.RaiseAlarm(this, Victim, !struck); }
         }

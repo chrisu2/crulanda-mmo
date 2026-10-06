@@ -103,7 +103,55 @@ namespace Crulanda.Encounter
             }
             finally { roundShells = false; }
             Fitted(slot, f);
+            if (slot == EquipSlot.Head) SeatHead(gearRoots[(int)EquipSlot.Head], f.l.family, f.v);
         }
+        /// <summary>
+        /// A head piece seated on this head (2026-10-06, Chris: "still many helms that dont fit on the head"): measured like the
+        /// villagers' hats (HatFit) instead of placed by numbers. Caps, kettle hats, wraps, circlets and crowns come down until the
+        /// rim sits just above the brows; hoods, coifs, barbutes and masks (which cover the face and neck) come down until the top
+        /// sits just over the hair; then each grows or narrows round the head's axis until its walls stand clear of head and hair.
+        /// </summary>
+        void SeatHead(Transform root, string family, string variant)
+        {
+            if (model == null || headOutline == null || root == null || root.childCount == 0) return;
+            var seat = new GameObject("Seat").transform; seat.SetParent(root, false);
+            var parts = new List<Transform>(); foreach (Transform c in root) if (c != seat) parts.Add(c);
+            foreach (var c in parts) c.SetParent(seat, true);
+            // Seated by its top over the hair: what covers the face or the neck, and the scarf wrap (whose hanging tail is no rim).
+            bool enclosing = family == "head.hood" || family == "head.coif" || family == "head.barbute" || family == "head.mask" || family == "head.wrap";
+            bool ring = family == "head.circlet" || family == "head.crown";
+            var hair = hairOutline ?? headOutline;
+            float top = float.MinValue, low = float.MaxValue; var toFrame = headFrame.worldToLocalMatrix;
+            foreach (var mf in seat.GetComponentsInChildren<MeshFilter>(true))
+            {
+                var mesh = mf.sharedMesh; if (mesh == null || !mesh.isReadable) continue;
+                var M = toFrame * mf.transform.localToWorldMatrix; foreach (var v in mesh.vertices) { float y = M.MultiplyPoint3x4(v).y; top = Mathf.Max(top, y); low = Mathf.Min(low, y); }
+            }
+            if (top == float.MinValue) return;
+            float dy, k; bool fitted;
+            if (enclosing)
+            {
+                // Walls only from the crown of the head up (a cape, a mask's face or a coif's neck are not walls round the skull).
+                float atDy = hair.top + HelmOverHair - top;
+                fitted = HatFit(new[] { seat }, out dy, out k, atDy, hair, float.MaxValue, headOutline.eyes + .04f - atDy, .85f, 1.25f);
+            }
+            else if (ring) fitted = HatFit(new[] { seat }, out dy, out k, float.NaN, hair, low + (top - low) * .35f, float.MinValue, .7f, 1.35f);   // the band, not its spikes or tines
+            else
+            {
+                // A cap tucks the hair (Tuck), so it clears the head; no wider than 1.3. Its rim just above the brows; but a piece
+                // with parts hanging lower than its band (the flaps cap's ear flaps, the half kettle's rim) would ride up on them,
+                // so its crown rests on the hair's top instead when that sits lower.
+                var against = Tucks(family) ? headOutline : hair;
+                fitted = HatFit(new[] { seat }, out dy, out k, float.NaN, against, float.MaxValue, float.MinValue, .7f, 1.3f);
+                float onSkull = hair.top + HelmOverHair * .5f - top;   // resting on the hair's top (the bare skull is lower: a cap there sat over the brows)
+                bool hangs = family == "head.cap" && variant == "flaps" || family == "head.kettle" && variant == "half";   // ear flaps, a low rim
+                if (fitted && hangs && onSkull < dy) fitted = HatFit(new[] { seat }, out dy, out k, onSkull, against, float.MaxValue, float.MinValue, .7f, 1.3f);
+            }
+            if (fitted) WearHat(seat, dy, k);
+        }
+        static bool Tucks(string family) { return family == "head.cap" || family == "head.kettle"; }
+        /// <summary>How far a helmet's crown stands over the hair (old head units: about 1 cm on a model).</summary>
+        const float HelmOverHair = .045f;
         /// <summary>True while a model's armour is built: its shells come out rounder (<see cref="Shell"/>).</summary>
         static bool roundShells;
         /// <summary>How square a shell may be on a model (GearMeshes.Shell's superellipse power): the old figure's cube torso needed
@@ -377,7 +425,8 @@ namespace Crulanda.Encounter
             neckOver = shows[sh] && lks[sh].family == "shoulder.mantle" ? "mantle" : !shows[sh] && hood ? "cape" : "";
             neckStill = OnShell(wornChest) || neckOver != "";
         }
-        void DruidHood(bool on) { if (built == ActorLook.Druid && classKit != null) foreach (var t in classKit) if (t != null) t.gameObject.SetActive(on); }
+        /// <summary>A class's own hood (the Druid's, the Ranger's, the Mage's) comes off under any head piece (2026-10-06: helmets sat on the Mage's hood).</summary>
+        void DruidHood(bool on) { if ((built == ActorLook.Druid || built == ActorLook.Ranger || built == ActorLook.Mage) && classKit != null) foreach (var t in classKit) if (t != null) t.gameObject.SetActive(on); }
         /// <summary>Gives back what a slot's piece covered (called whenever the slot is cleared).</summary>
         void Uncover(EquipSlot slot)
         {

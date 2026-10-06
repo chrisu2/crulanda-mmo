@@ -87,9 +87,34 @@ namespace Crulanda.Tests
             session.Player.GetComponent<AdventurerMotor>().Teleport(e.transform.position + Vector3.back * 12);
             c.GetComponent<UnityEngine.AI.NavMeshAgent>().Warp(e.transform.position + Vector3.back * 11 + Vector3.left * 2);
             session.Select(e); e.Receive(1, session.Player);   // the fight is on
+            for (float w = 0; w < 2 && e.GroupShares <= 0; w += Time.deltaTime) yield return null;   // scaled to the group as it starts (EncounterEnemy.GroupScale)
             int hp = e.actor.Health.Pool.Current;
             float t = 0; while (t < 6 && e.actor.Health.Pool.Current > hp - c.Hit) { t += Time.deltaTime; yield return null; }
             Assert.LessOrEqual(e.actor.Health.Pool.Current, hp - c.Hit, s.name + " (" + c.Activity + ") shot at it");
+        }
+
+        [UnityTest] public IEnumerator Mobs_grow_with_the_group_by_its_levels()
+        {
+            var e = session.Enemies.Find(x => x != null && x.actor.IsAlive && !x.Game); Assert.NotNull(e);
+            int mobLevel = e.actor.Level, alone = e.actor.Health.Pool.Max;
+            Assert.AreEqual(0, EncounterEnemy.SharesFor(session, mobLevel), 1e-4f, "alone (with Mira): as tuned");
+            var pop = SimPopulation.Active; var two = pop.World.sims.Take(2).ToList();
+            foreach (var x in two) { x.zone = "zone.oakhaven"; x.onlineFrom = 0; x.onlineHours = 24; x.friendly = .9f; x.level = session.Progress.Level; }
+            pop.Refresh(); yield return null;
+            foreach (var x in two) Assert.IsTrue(session.Invite(x.id), x.name);
+            // Each sim's share is its level over the mob's, a quarter to one and a quarter.
+            float shares = two.Sum(x => Mathf.Clamp((float)x.level / mobLevel, EncounterEnemy.MinShare, EncounterEnemy.MaxShare));
+            Assert.AreEqual(shares, EncounterEnemy.SharesFor(session, mobLevel), 1e-4f);
+            two[1].level = 1; Assert.Less(EncounterEnemy.SharesFor(session, Mathf.Max(8, mobLevel)), shares + .001f, "a low sim adds little");
+            two[1].level = session.Progress.Level;
+            session.Player.GetComponent<AdventurerMotor>().Teleport(e.transform.position + Vector3.back * 3); session.Select(e);
+            e.Receive(1, session.Player);
+            float t = 0; while (t < 3 && e.GroupShares <= 0) { t += Time.deltaTime; yield return null; }
+            Assert.AreEqual(shares, e.GroupShares, 1e-3f, "scaled when the fight starts");
+            Assert.AreEqual(Mathf.Round(alone * (1 + EncounterEnemy.HealthPerShare * shares)), e.actor.Health.Pool.Max, 1, "health grows by the shares");
+            StringAssert.Contains("group of 3", e.GroupNote);
+            e.ResetFight();
+            Assert.AreEqual(alone, e.actor.Health.Pool.Max, "and is itself again when the fight resets");
         }
     }
 }

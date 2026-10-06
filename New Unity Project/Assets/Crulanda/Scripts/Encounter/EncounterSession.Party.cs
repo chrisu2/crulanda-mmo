@@ -14,6 +14,8 @@ namespace Crulanda.Encounter
         public const int MaxPartySims = 3, InviteLevelGap = 5;
         public const float BusyBelow = .15f;
         public readonly List<SimCompanion> PartySims = new List<SimCompanion>();
+        /// <summary>The who list (O): every adventurer online (EncounterHud.Who).</summary>
+        public bool WhoOpen { get; set; }
 
         // ---------- the sim you clicked ----------
         public string FocusSimId { get; private set; }
@@ -53,6 +55,7 @@ namespace Crulanda.Encounter
             var a = SpawnActor(s.name, content.player, at, EncounterHud.ClassColour(s.classId), s.id, LookForClass(s.classId), s.level, s.variant);
             AddAgent(a.gameObject, 4.6f);
             var c = a.gameObject.AddComponent<SimCompanion>(); a.gameObject.SetActive(true); c.Init(a, this, s, FreeSlot());
+            SimGear.Dress(a.GetComponent<ActorVisual>(), s, Items);
             PartySims.Add(c);
             Message(s.name + " has joined your party.");
             return true;

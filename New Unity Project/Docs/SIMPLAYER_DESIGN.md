@@ -28,6 +28,13 @@ threat), Rangers arrows, Mages fire and Druids thorns from 20 m every 2.4 s (Bol
 under 60% every 6 s. It falls when beaten and gets up at 40% once the fight is over; Recover heals the party. Party rows under
 Mira's frame with a Leave button; plates say "· party". The party is not saved: on load the sims are back in the world.
 
+## Phase 5.2 round 2 (2026-10-06): gear, who, group scaling
+SimGear.For(sim, items): generated ids (ItemDatabase.GearId) at the sim's level, each slot's seed (gearSeed + slot*101 + k*7)
+tried until the piece name is the class's weight (heavy: Coif/Torc/Spaulders/Hauberk/Gauntlets/Greaves/Sabatons; leather:
+Cap/Cord/Mantle/Jerkin/Gloves/Breeches/Boots; cloth: Hood/Pendant/Mantle/Tunic/Wraps/Leggings/Shoes). Weapons for Warrior and
+Paladin only. Not stored: derived on sight. The who list (EncounterHud.Who, O) lists the online. EncounterEnemy.GroupScale: each
+party sim adds clamp(simLevel/mobLevel, .25, 1.25) shares; health x(1+.6 shares), damage x(1+.15 shares).
+
 ## Next extraction
 Introduce a plain persistent SimAdventurer profile keyed by EntityId, distinct from its Actor.
 Move companion state out of the scenario DTO behind a versioned save migration. Preserve existing IDs.

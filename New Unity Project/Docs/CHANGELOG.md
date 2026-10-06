@@ -1329,3 +1329,21 @@ A read-only review by five reviewers, each finding checked by a second who tried
 - **Sims visible:** their figures were hidden along with the placeholder capsule.
 - Tests: PlayMode FigureAnimationTests (you as Warrior and as Mage, Mira, party sims, world sims, enemies and villagers: no hands
   more than 1.1 m apart in ten seconds of watching), SimPopulationTests checks a figure is drawn.
+
+## 2026-10-06 — Phase 5.2 round 2: the sims dressed, the who list, mobs scaled to your group
+- **Gear on the sims** (SimGear): generated gear at their level from their gear seed, the same every time; mail for Warriors and
+  Paladins, leather for Rangers, cloth for Mages and Druids; a blade and shield for Warriors and Paladins, the class staff, bow
+  or wand for the rest; uncommon from level 4, some rare from level 8. Shown on their figures and in your party.
+- **The who list (O):** everyone online by the world clock, your zone first: name, class in its colour, level, zone, "(party)",
+  and Invite for those standing in your zone.
+- **Mobs scale to your group** (Chris chose strength over level): a mob keeps its zone level; each sim in your party adds a share
+  (its level over the mob's, 0.25 to 1.25), each share +60% health and +15% damage. You with Mira are the baseline. Applied when
+  the fight starts (raised if a sim joins mid-fight), undone when it resets; the target frame says "Scaled for your group of N".
+- Tests: EditMode SimGearTests; PlayMode SimPartyTests.Mobs_grow_with_the_group_by_its_levels. HUD capture 42-who.
+
+## 2026-10-06 — Helms seated by measurement (playtest note 56)
+- Every head piece is fitted to the head it is on (ActorVisual.GearArmor SeatHead, using the villagers' hat fit, HatFit, now
+  with a choice of outline, walls and limits): caps and kettle hats with the rim just above the brows and no wider than 1.3
+  (the flaps cap and the half kettle resting on the hair's top); hoods, coifs, barbutes, masks and the scarf by their crown
+  just over the hair, sized from the skull only; circlets and crowns by their band, not their spikes. Any class hood (Druid,
+  Ranger, Mage) comes off under a head piece. FigureCapture helms-fit rows: all 18 on a man and a woman, front and side.

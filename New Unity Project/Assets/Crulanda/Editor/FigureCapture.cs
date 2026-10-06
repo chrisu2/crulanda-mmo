@@ -65,6 +65,17 @@ namespace Crulanda.EditorTools
             var named = ItemDatabase.Parse(new System.Collections.Generic.List<string> { System.IO.File.ReadAllText("Assets/Crulanda/EncounterContent/Items/items.json") });
             Row("helms-named", new[] { P(ActorLook.Warrior, 0, null, "Tin crown", new[] { "item.tin_crown" }, named, looks), P(ActorLook.Druid, 0, null, "Tin crown (druid)", new[] { "item.tin_crown" }, named, looks),
                 P(ActorLook.Warrior, 1, null, "Bare", new string[0], named, looks) }, 0, close: true);
+            // Every head piece, close, on a man (the Ranger kit) and a woman (the Peasant kit), front and side (2026-10-06: "still many
+            // helms that dont fit on the head").
+            var helmLooks = Crulanda.Encounter.WardrobeCapture.HeadLooks; var helmDb = new ItemDatabase(); var helmIds = new List<string>();
+            foreach (var hl in helmLooks) { string id = "helmfit." + helmIds.Count; looks.Register(id, hl); helmDb.Items[id] = new ItemDef { id = id, name = hl, kind = "gear", slot = "head", quality = 2, level = 6, canonStatus = "GAME-ONLY" }; helmIds.Add(id); }
+            for (int i = 0; i < helmIds.Count; i += 6)
+            {
+                var chunk = helmIds.GetRange(i, Mathf.Min(6, helmIds.Count - i));
+                foreach (var (who, look) in new[] { ("m", ActorLook.Warrior), ("f", ActorLook.Mage) })
+                    foreach (var (view, yaw) in new[] { ("front", 0f), ("side", 90f) })
+                        Row("helms-fit-" + (i / 6 + 1) + "-" + who + "-" + view, chunk.ConvertAll(id => P(look, 0, null, helmLooks[helmIds.IndexOf(id)].Split('/')[0], new[] { id }, helmDb, looks)).ToArray(), yaw, close: true);
+            }
             // Hats, close (Chris: "the hats definitely do not fit properly on the heads").
             Row("hats-1", new[] { V("blacksmith", "Brannoc Vell", 3), V("merchant", "Wil Carder", 8), V("baker", "Ama Rusk", 13), V("farmer", "Garet Moss", 23), V("lumberjack", "Hob Linden", 68) }, 0, close: true);
             Row("hats-2", new[] { V("skinner", "Osk Farrow", 73), V("leatherworker", "Edda Pell", 63), V("miller", "Aldo Crisp", 38), V("gossip", "Grete Lowe", 5), P(ActorLook.Collector), P(ActorLook.BanditKing) }, 0, close: true);

@@ -460,6 +460,13 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
   frame 0, so each loop began with the capture's calibration T-pose for a few seconds: anyone standing still went into a T now
   and then. The vendor's trimmed range is kept now. Also every figure now uses the body's avatar (the Ranger outfit's own is
   not mapped). FigureAnimationTests watches everyone in Oakhaven for ten seconds.
+- **56. "Still many helms that don't fit on the head ... that's why I sent over some other armour assets."** DONE (2026-10-06):
+  the armour helms were placed by fixed numbers, never measured against the head; and the Mage's and the Ranger's own hood
+  stayed on under them. Every head piece is now seated by the head's measured outline (SeatHead: caps and kettles at the
+  brow, hoods, coifs, barbutes, masks and the scarf by their crown over the hair, circlets and crowns by their band), and
+  any class hood comes off under a head piece. Checked on a man and a woman, front and side: Docs/helm-fit-2026-10-06.png.
+  The Ashen Marches pack holds one helm (gth_equi_sentinel_helm); its other 99 models are buildings, furniture, nature,
+  animals and whole figures, so it cannot replace the helm set; the sentinel helm is still to be wired in as a model helm.
 - **Asset queue (Chris, 2026-10-05), for the next art rounds:** Stylized Nature MegaKit (outdoor areas), Medieval Village
   MegaKit (housing), Fantasy Props MegaKit, Stylized Megapack 2in1 (all in Downloads), the Asset Store's Medieval props and HQ
   Rock Pack (boulders and crags), the Ashen Marches sentinel helm (a model helm needs the armour path), and the Ash-Walker

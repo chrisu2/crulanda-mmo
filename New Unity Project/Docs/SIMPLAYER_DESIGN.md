@@ -18,6 +18,16 @@ yet), a NavMesh agent, standing about the zone's named places and wandering betw
 you stand close. Their nameplates show the name in the class's colour with the class and level beneath. Round 2 brings gear
 on them and a who list; 5.3 their activities; 5.4 the unloaded zones; 5.5 chat and memory.
 
+## Phase 5.2b (2026-10-06): inviting sims
+Click a sim (its figure, or a party member) to focus it: its frame shows name, class, level and folk with Invite (or Leave
+party). EncounterSession.Invite accepts unless the party is full (MaxPartySims 3), you are fighting, the level gap is over 5
+("too far apart") or the sim is busy (friendly under .15). On joining, its figure is replaced by a party actor (SimCompanion,
+its sim id as its EntityId) with health 150/115 + 22 a level (melee/ranged): it follows a pace behind in its own place, fights
+your target when a fight is on (or whatever is on the party): Warriors and Paladins in melee every 2 s (a Warrior's blows add
+threat), Rangers arrows, Mages fire and Druids thorns from 20 m every 2.4 s (Bolt.cs), and Druids and Paladins heal the most hurt
+under 60% every 6 s. It falls when beaten and gets up at 40% once the fight is over; Recover heals the party. Party rows under
+Mira's frame with a Leave button; plates say "· party". The party is not saved: on load the sims are back in the world.
+
 ## Next extraction
 Introduce a plain persistent SimAdventurer profile keyed by EntityId, distinct from its Actor.
 Move companion state out of the scenario DTO behind a versioned save migration. Preserve existing IDs.

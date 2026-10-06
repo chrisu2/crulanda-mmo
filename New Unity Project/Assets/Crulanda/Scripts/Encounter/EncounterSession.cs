@@ -1252,7 +1252,7 @@ namespace Crulanda.Encounter
             UnityEngine.SceneManagement.SceneManager.LoadScene(gameObject.scene.name);
             return true;
         }
-        Actor SpawnActor(string label, Crulanda.Data.ActorArchetypeDefinition definition, Vector3 point, Color color, string id, ActorLook look, int level = 1)
+        Actor SpawnActor(string label, Crulanda.Data.ActorArchetypeDefinition definition, Vector3 point, Color color, string id, ActorLook look, int level = 1, int variant = -1)
         {
             var go = new GameObject(label);
             go.SetActive(false); go.transform.SetParent(actorsRoot.transform); go.transform.position = point;
@@ -1264,7 +1264,7 @@ namespace Crulanda.Encounter
             var actor = go.AddComponent<Actor>();
             actor.Initialize(definition, label, label == "You" ? Progress.Level : level, new EntityId(id));
             go.AddComponent<Combatant>();
-            ActorVisual.Attach(go, look, LookVariant(label));
+            ActorVisual.Attach(go, look, variant >= 0 ? variant : LookVariant(label));
             return actor;
         }
         void SpawnParty()
@@ -1424,6 +1424,7 @@ namespace Crulanda.Encounter
             if (Player != null && Player.EntityId.Value == id) return Player;
             if (Companion != null && Progress.recruited && Companion.actor.EntityId.Value == id) return Companion.actor;
             if (Pet != null && Pet.actor != null && Pet.actor.EntityId.Value == id) return Pet.actor;   // the Ranger's wolf (RangerPet)
+            foreach (var c in PartySims) if (c != null && c.actor != null && c.actor.EntityId.Value == id) return c.actor;   // invited sims (Phase 5.2b)
             return null;
         }
         public bool IsLivingPartyMember(string id) { var a = PartyActor(id); return a != null && a.IsAlive; }
@@ -1510,17 +1511,17 @@ namespace Crulanda.Encounter
             Floating.RemoveAll(f => f.expires < Time.time);
         }
         public float Distance(EncounterEnemy enemy) { return Vector3.Distance(Player.transform.position, enemy.transform.position); }
-        public void Select(EncounterEnemy enemy) { Target = enemy; AutoAttack = false; if (enemy != null) { FocusVillager = null; FocusMira = false; } }
+        public void Select(EncounterEnemy enemy) { Target = enemy; AutoAttack = false; if (enemy != null) { FocusVillager = null; FocusMira = false; FocusSimId = null; } }
         // ---------- friendly target (left-click a villager or Mira) ----------
         /// <summary>The villager you clicked (null = none). E talks to the selected friend first when they are in reach.</summary>
         public Villager FocusVillager { get; private set; }
         public bool FocusMira { get; private set; }
-        public bool HasFriendlyFocus { get { return FocusMira || (FocusVillager != null && FocusVillager.Visible); } }
-        public string FocusName { get { return FocusMira ? "Mira" : FocusVillager != null ? FocusVillager.Name : null; } }
-        public Vector3 FocusPosition { get { return FocusMira && Companion != null ? Companion.transform.position : FocusVillager != null ? FocusVillager.transform.position : Vector3.zero; } }
+        public bool HasFriendlyFocus { get { return FocusMira || (FocusVillager != null && FocusVillager.Visible) || FocusSimBody != null; } }
+        public string FocusName { get { return FocusMira ? "Mira" : FocusVillager != null ? FocusVillager.Name : FocusSim?.name; } }
+        public Vector3 FocusPosition { get { var sb = FocusSimBody; return FocusMira && Companion != null ? Companion.transform.position : FocusVillager != null ? FocusVillager.transform.position : sb != null ? sb.position : Vector3.zero; } }
         public void SelectFriendly(Villager v, bool mira)
         {
-            FocusVillager = mira ? null : v; FocusMira = mira;
+            FocusVillager = mira ? null : v; FocusMira = mira; FocusSimId = null;
             if (mira || v != null) { Target = null; AutoAttack = false; }
         }
         /// <summary>
@@ -1542,6 +1543,11 @@ namespace Crulanda.Encounter
                 foreach (var v in life.Villagers)
                     if (v.Visible && Hit(v.transform.position, v.Role == "child" ? .45f : .95f, out float d) && d < best) { best = d; pick = v; mira = false; }
             if (Companion != null && Hit(Companion.transform.position, .95f, out float md) && md < best) { best = md; pick = null; mira = true; }
+            // The sims, in the world and in your party (Phase 5.2b): the nearest under the pointer wins over a villager behind them.
+            string simPick = null;
+            if (SimPopulation.Active != null) foreach (var f in SimPopulation.Active.Figures) if (f != null && Hit(f.transform.position, .95f, out float sd) && sd < best) { best = sd; simPick = f.sim.id; }
+            foreach (var c in PartySims) if (c != null && Hit(c.transform.position, .95f, out float cd) && cd < best) { best = cd; simPick = c.sim.id; }
+            if (simPick != null) { SelectSim(simPick); return; }
             SelectFriendly(pick, mira);
         }
         /// <summary>Who E would talk to: the selected friend when in reach, otherwise the nearest of Mira and the villagers. In reach
@@ -1802,6 +1808,7 @@ namespace Crulanda.Encounter
             Companion.actor.Health.Revive(Companion.actor.Health.Pool.Max);
             Companion.actor.Health.ApplyHealing(1000); Companion.actor.Resource.Pool.Fill();
             Companion.GetComponent<NavMeshAgent>().Warp(RecoveryPoint + Vector3.right * 2.5f - Vector3.up * .1f);
+            HealPartySimsAfterRecover();
             foreach (var e in Enemies) e.ResetFight();
             Message("Recovered at camp. Defeated enemies and collected rewards remain recorded.");
         }

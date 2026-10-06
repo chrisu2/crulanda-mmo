@@ -44,7 +44,7 @@ namespace Crulanda.Encounter
             float hour = WorldClock.Hour;
             foreach (var s in World.sims)
             {
-                bool here = s.zone == zone && s.IsOnlineAt(hour);
+                bool here = s.zone == zone && s.IsOnlineAt(hour) && !Session.InParty(s.id);   // one in your party is with you, not standing about
                 var f = Find(s.id);
                 if (here && f == null) Figures.Add(SimFigure.Spawn(this, s));
                 else if (!here && f != null) { Figures.Remove(f); Destroy(f.gameObject); }
@@ -55,6 +55,7 @@ namespace Crulanda.Encounter
         public void Persist()
         {
             foreach (var f in Figures) if (f != null) { f.sim.x = f.transform.position.x; f.sim.z = f.transform.position.z; }
+            foreach (var c in Session.PartySims) if (c != null) { c.sim.x = c.transform.position.x; c.sim.z = c.transform.position.z; }
             try { SimRoster.Save(Root, World); } catch (System.Exception e) { Debug.LogWarning("World save failed: " + e.Message); }
         }
         /// <summary>A place to stand in this zone: near one of its named places (a landmark), on the NavMesh.</summary>
@@ -64,6 +65,13 @@ namespace Crulanda.Encounter
             Vector2 at = marks != null && marks.Length > 0 ? marks[Mathf.Abs(s.variant * 7 + pick) % marks.Length].at : Vector2.zero;
             var r = new Crulanda.Core.SeededRandom(s.variant * 31 + pick);
             var p = new Vector3(at.x + (r.NextFloat() - .5f) * 10, 0, at.y + (r.NextFloat() - .5f) * 10);
+            // Never in a doorway (a villager going home to bed must not find a sim stood on the step): 4 m clear of every door.
+            if (zb != null)
+                foreach (var d in zb.Doors)
+                {
+                    var off = new Vector3(p.x - d.position.x, 0, p.z - d.position.z);
+                    if (off.sqrMagnitude < 16) p = new Vector3(d.position.x, 0, d.position.z) + (off.sqrMagnitude > .01f ? off.normalized : Vector3.right) * 4.5f;
+                }
             p.y = zb != null ? zb.HeightAt(p.x, p.z) : 0;
             if (NavMesh.SamplePosition(p, out var hit, 8, NavMesh.AllAreas)) return hit.position;
             return p;
@@ -85,7 +93,7 @@ namespace Crulanda.Encounter
             go.transform.position = start + Vector3.up;
             var body = GameObject.CreatePrimitive(PrimitiveType.Capsule); body.name = "Body"; Destroy(body.GetComponent<Collider>()); body.transform.SetParent(go.transform, false);
             var f = go.AddComponent<SimFigure>(); f.sim = s; f.population = pop;
-            f.agent = go.AddComponent<NavMeshAgent>(); f.agent.speed = 1.7f; f.agent.angularSpeed = 360; f.agent.acceleration = 8; f.agent.stoppingDistance = .5f; f.agent.radius = .3f; f.agent.height = 2; f.agent.baseOffset = 1; f.agent.avoidancePriority = 55;
+            f.agent = go.AddComponent<NavMeshAgent>(); f.agent.speed = 1.7f; f.agent.angularSpeed = 360; f.agent.acceleration = 8; f.agent.stoppingDistance = .5f; f.agent.radius = .3f; f.agent.height = 2; f.agent.baseOffset = 1; f.agent.avoidancePriority = 80;   // villagers (60) go first: a sim steps aside
             f.visual = ActorVisual.Attach(go, EncounterSession.LookForClass(s.classId), s.variant);
             go.SetActive(true);
             foreach (var r in body.GetComponentsInChildren<Renderer>()) r.enabled = false;

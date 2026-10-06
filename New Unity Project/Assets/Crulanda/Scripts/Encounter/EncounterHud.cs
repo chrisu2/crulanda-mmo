@@ -13,7 +13,7 @@ namespace Crulanda.Encounter
     {
         public EncounterSession session;
         static bool inventoryVisible, paused, buildVisible, mapVisible, targetVisible;
-        GUIStyle heading, text, small, tiny, button, number, compact, tile, tileIcon, denseAction, abbrev, keybind, frameName, barText, micro;
+        GUIStyle heading, text, small, tiny, button, slim, number, compact, tile, tileIcon, denseAction, abbrev, keybind, frameName, barText, micro;
         readonly Color ink = new Color(.045f, .065f, .075f, .94f);
         readonly Color gold = new Color(.91f, .76f, .43f);
         static readonly Color HealthGreen = new Color(.12f, .72f, .16f);
@@ -24,6 +24,7 @@ namespace Crulanda.Encounter
             var p = new Vector2(point.x * 1440 / Screen.width, (Screen.height - point.y) * 900 / Screen.height);
             return paused || buildVisible || mapVisible || QuestUiBlocks(p) || ItemUiBlocks(p) || TradesUiBlocks(p) || LootUiBlocks(p) || p.y > 795 || new Rect(10, 10, 350, 190).Contains(p) ||
                 (targetVisible && new Rect(365, 10, 350, 130).Contains(p)) || new Rect(1215, 0, 225, 240).Contains(p) ||
+                (partySims > 0 && new Rect(10, 196, 350, 46 * partySims).Contains(p)) ||
                 new Rect(1110, 236, 330, 200).Contains(p) || false;
         }
         /// <summary>Capture tools hide the HUD to photograph the world.</summary>
@@ -37,6 +38,7 @@ namespace Crulanda.Encounter
             small = new GUIStyle(GUI.skin.label) { fontSize = 14, wordWrap = true };
             number = new GUIStyle(heading) { alignment = TextAnchor.MiddleCenter };
             button = new GUIStyle(GUI.skin.button) { fontSize = 17, wordWrap = true, padding = new RectOffset(10, 10, 8, 8) };
+            slim = new GUIStyle(GUI.skin.button) { fontSize = 14, padding = new RectOffset(6, 6, 2, 2), alignment = TextAnchor.MiddleCenter };   // small buttons in frames (Invite, Leave)
             tiny = new GUIStyle(small) { fontSize = 13 };
             compact = new GUIStyle(button) { fontSize = 13, padding = new RectOffset(4, 4, 3, 3) };
             denseAction = new GUIStyle(button) { fontSize = 11, padding = new RectOffset(2, 2, 2, 2), wordWrap = true };
@@ -69,7 +71,7 @@ namespace Crulanda.Encounter
             if (Hidden || session == null || session.Player == null) return;
             Styles();
             inventoryVisible = session.InventoryOpen; paused = session.Paused; buildVisible = session.BuildOpen;
-            mapVisible = session.MapOpen; targetVisible = session.Target != null || session.HasFriendlyFocus; bookVisible = session.QuestBookOpen; talkVisible = session.Conversation != null;
+            mapVisible = session.MapOpen; targetVisible = session.Target != null || session.HasFriendlyFocus; partySims = session.PartySims.Count; bookVisible = session.QuestBookOpen; talkVisible = session.Conversation != null;
             bagsVisible = session.InventoryOpen; charVisible = session.CharacterOpen; vendorVisible = session.VendorNpc != null; tradesVisible = session.TradesOpen;
             GUI.matrix = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(Screen.width / 1440f, Screen.height / 900f, 1));
             GUI.color = Color.white;
@@ -179,6 +181,18 @@ namespace Crulanda.Encounter
             UnitBar(new Rect(70, 149, 184, 8), a.Resource.Pool.Ratio, ResourceColor(Crulanda.Core.ResourceKind.Mana), "");
             Shadow(new Rect(20, 166, 320, 20), m.Activity, tiny, new Color(.85f, .9f, .85f));
             if (m.CastProgress > 0) UnitBar(new Rect(70, 186, 184, 7), m.CastProgress, new Color(.3f, .85f, .65f), "");
+            // The sims in your party (Phase 5.2b): one row each under Mira, health and what they are doing, and a button to part ways.
+            for (int i = 0; i < session.PartySims.Count; i++)
+            {
+                var c = session.PartySims[i]; if (c == null) continue;
+                float y = 200 + 46 * i; var col = ClassColour(c.sim.classId);
+                Fill(new Rect(48, y, 214, 40), new Color(0, 0, 0, .5f));
+                Portrait(new Vector2(40, y + 20), 40, c.actor.IsAlive ? col : new Color(.4f, .4f, .4f), c.sim.name.Substring(0, 1), c.sim.level.ToString());
+                Shadow(new Rect(70, y - 3, 150, 20), c.sim.name, tiny, Color.white);
+                UnitBar(new Rect(70, y + 16, 184, 10), c.actor.Health.Pool.Ratio, HealthGreen, "");
+                Shadow(new Rect(70, y + 26, 200, 18), c.Activity, tiny, new Color(.85f, .9f, .85f));
+                if (GUI.Button(new Rect(268, y + 4, 70, 26), "Leave", slim)) session.LeaveParty(c.sim.id);
+            }
         }
         /// <summary>The target frame's line under a game animal's health (GAME-ONLY).</summary>
         public const string GameLine = "Game: it won't fight, but it will run. Skin it for its hide.";
@@ -469,7 +483,8 @@ namespace Crulanda.Encounter
         // Nameplates, ! and ? markers, speech bubbles and place names float over the world. They keep off the HUD panels and
         // inside the screen, hide behind solid scenery (one ray each), and stack instead of overprinting: the nearest keeps its
         // place and farther ones move up out of its way. Drawn on Repaint only (labels take no input), so the rays run once a frame.
-        struct Plate { public float dist, fade, top; public Vector2 at; public Rect box; public Villager v; public EncounterEnemy e; public SimFigure sim; public bool mira, named, shown, grey; public char mark; public string name, title; }
+        struct Plate { public float dist, fade, top; public Vector2 at; public Rect box; public Villager v; public EncounterEnemy e; public SimFigure sim; public SimCompanion simParty; public bool mira, named, shown, grey; public char mark; public string name, title; }
+        static int partySims;
         readonly System.Collections.Generic.List<Plate> plates = new System.Collections.Generic.List<Plate>(48);
         readonly System.Collections.Generic.List<Rect> taken = new System.Collections.Generic.List<Rect>(64);
         readonly System.Collections.Generic.Dictionary<EncounterEnemy, (float height, int level, string label)> enemyPlates = new System.Collections.Generic.Dictionary<EncounterEnemy, (float height, int level, string label)>();
@@ -623,6 +638,14 @@ namespace Crulanda.Encounter
                     float w = Mathf.Max(TextWidth(plateText, f.sim.name), TextWidth(plateText, title)) + 8;
                     AddPlate(new Plate { dist = fd, fade = Mathf.Clamp01((24 - fd) / 4), top = -41, at = fp, sim = f, named = true, name = f.sim.name, title = title, mark = ' ' }, w);
                 }
+            foreach (var c in session.PartySims)
+            {
+                if (c == null) continue;
+                var root = c.transform.position; float cd = Vector3.Distance(player, root + Vector3.up * 1.3f);
+                if (cd > 30 || !ToCanvas(root + Vector3.up * 1.3f, out var cp) || cp.x < 0 || cp.x > 1440 || Occluded(c, root + Vector3.up * .85f)) continue;
+                string ctitle = Bracketed(SimRoster.ClassName(c.sim.classId) + " " + c.sim.level + " · party");
+                AddPlate(new Plate { dist = cd, fade = 1, top = -41, at = cp, simParty = c, named = true, name = c.sim.name, title = ctitle, mark = ' ' }, Mathf.Max(TextWidth(plateText, c.sim.name), TextWidth(plateText, ctitle)) + 8);
+            }
             foreach (var e in session.Enemies) EnemyPlateAt(e, 25);
             // Game animals (deer, rabbits): a plate when close or targeted, so the fields are not a sea of names.
             foreach (var e in session.Game) EnemyPlateAt(e, session.Target == e ? 25 : 12);
@@ -666,9 +689,9 @@ namespace Crulanda.Encounter
             if (p.named)
             {
                 var style = p.mira ? centered : plateText;
-                var simColour = p.sim != null ? ClassColour(p.sim.sim.classId) : Color.white;
+                var simColour = p.sim != null ? ClassColour(p.sim.sim.classId) : p.simParty != null ? ClassColour(p.simParty.sim.classId) : Color.white;
                 Outlined(new Rect(a.x - 150, rows, 300, p.mira ? 24 : 22), p.name, style, p.mira ? new Color(.55f, 1, .7f) :
-                    p.sim != null ? new Color(simColour.r, simColour.g, simColour.b, p.fade) :
+                    p.sim != null || p.simParty != null ? new Color(simColour.r, simColour.g, simColour.b, p.fade) :
                     session.FocusVillager == p.v ? new Color(.55f, 1, .55f, p.fade) : new Color(.85f, .9f, 1, p.fade));
                 if (p.title != null) Outlined(new Rect(a.x - 150, rows + 15, 300, 22), p.title, style, new Color(1, .84f, .45f, p.fade));
             }

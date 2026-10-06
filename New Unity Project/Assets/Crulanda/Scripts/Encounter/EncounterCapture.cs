@@ -1,3 +1,4 @@
+using System.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -140,6 +141,7 @@ namespace Crulanda.Encounter
             if (session.Professions != null && zone != null) { var st = CaptureStation(directory, prefix, zone); while (st.MoveNext()) yield return st.Current; }
             if (session.Professions != null && zone != null) { var ck = CaptureCooking(directory, prefix, zone); while (ck.MoveNext()) yield return ck.Current; }
             if (session.Professions != null && zone != null) { var cr = CaptureCrafts(directory, prefix, zone); while (cr.MoveNext()) yield return cr.Current; }
+            if (SimPopulation.Active != null && zone != null) { var pt = CaptureParty(directory, prefix); while (pt.MoveNext()) yield return pt.Current; }
             yield return new WaitForSeconds(1);
             Debug.Log("UI_CAPTURE_DONE"); Application.Quit(0);
         }
@@ -160,6 +162,24 @@ namespace Crulanda.Encounter
         /// quest offer, her wares beside the bags, the bags window with all four worn and things in their rows, and the Trades
         /// window's bag line. Maud is dealt with where the player stands, so her window stays open wherever she is.
         /// </summary>
+        /// <summary>The sims (Phase 5.2b): one clicked, its frame with Invite; then two in your party, their rows under Mira and their plates.</summary>
+        IEnumerator CaptureParty(string directory, string prefix)
+        {
+            var pop = SimPopulation.Active; session.Conversation = null; session.InventoryOpen = false; session.QuestBookOpen = false; session.ShowTrades(false); session.CloseVendor();
+            foreach (var e in session.Enemies) e.ResetFight();
+            int n = 0;
+            foreach (var x in pop.World.sims) { if (n >= 3) break; x.zone = session.ZoneId; x.onlineFrom = 0; x.onlineHours = 24; x.friendly = .9f; x.level = session.Progress.Level; x.x = x.z = 0; n++; }
+            pop.Refresh(); yield return new WaitForSeconds(.5f);
+            var first = pop.Figures.Count > 0 ? pop.Figures[0] : null; if (first == null) yield break;
+            var motor = session.Player.GetComponent<AdventurerMotor>();
+            motor.Teleport(first.transform.position + first.transform.forward * 3 + Vector3.up * .2f);
+            motor.SetView(Quaternion.LookRotation(-first.transform.forward).eulerAngles.y, 14, 6); session.SelectSim(first.sim.id); yield return new WaitForSeconds(1);
+            ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "40-sim-invite.png")); yield return new WaitForSeconds(.4f);
+            foreach (var f in pop.Figures.ToArray()) if (session.PartySims.Count < 2 && f != null) session.Invite(f.sim.id);
+            session.SelectSim(null); yield return new WaitForSeconds(2.5f);
+            ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "41-sim-party.png")); yield return new WaitForSeconds(.4f);
+            foreach (var c in session.PartySims.ToArray()) session.LeaveParty(c.sim.id);
+        }
         IEnumerator CaptureBags(string directory, string prefix)
         {
             var p = session.Progress; var maud = VillageLife.Active?.Find("Maud Tanner"); var here = session.Player.transform.position;

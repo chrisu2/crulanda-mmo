@@ -57,6 +57,8 @@ namespace Crulanda.Encounter
         /// <summary>Target frame for a clicked villager or Mira: green ring, name, trade, and what E will do.</summary>
         void DrawFriendFrame()
         {
+            var sim = session.FocusSim;
+            if (sim != null && session.FocusVillager == null && !session.FocusMira) { DrawSimFrame(sim); return; }
             var v = session.FocusVillager; string name = session.FocusName; if (name == null) return;
             string title = session.FocusMira ? "Healer" : v.Title;
             float dist = Vector3.Distance(session.Player.transform.position, session.FocusPosition);
@@ -69,6 +71,22 @@ namespace Crulanda.Encounter
                 "Friendly  ·  [E] " + (m == '!' ? "has work for you" : m == '?' ? "wants to hear from you" : "talk");
             Shadow(new Rect(380, 66, 280, 20), hint, tiny, Color.white);
             if (m != ' ') { QuestStyles(); Ink(new Rect(700, 18, 30, 44), m.ToString(), qMark, QuestGold); }
+        }
+
+        /// <summary>A sim you clicked (Phase 5.2b): name in the class's colour, class, level and folk, and Invite (or Leave party).</summary>
+        void DrawSimFrame(SimAdventurer s)
+        {
+            var col = ClassColour(s.classId); bool member = session.InParty(s.id);
+            Fill(new Rect(372, 22, 290, 70), new Color(0, 0, 0, .55f));
+            Portrait(new Vector2(668, 54), 74, col, s.name.Substring(0, 1), s.level.ToString());
+            Shadow(new Rect(380, 24, 240, 20), s.name, frameName, col);
+            Shadow(new Rect(380, 46, 260, 20), "<" + SimRoster.ClassName(s.classId) + " " + s.level + " · " + s.folk + ">", tiny, new Color(1, .84f, .45f));
+            if (member) { if (GUI.Button(new Rect(380, 63, 120, 26), "Leave party", slim)) session.LeaveParty(s.id); }
+            else
+            {
+                if (GUI.Button(new Rect(380, 63, 90, 26), "Invite", slim)) session.Invite(s.id);
+                Shadow(new Rect(478, 66, 180, 20), "Adventurer", tiny, Color.white);
+            }
         }
 
         // ---------- tracker ----------

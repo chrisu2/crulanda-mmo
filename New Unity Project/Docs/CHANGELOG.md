@@ -1309,3 +1309,14 @@ A read-only review by five reviewers, each finding checked by a second who tried
 - Tests: EditMode SimRosterTests (twenty for a seed, names unique, every class, levels to homes, hours wrapping midnight, the
   world slot round-trips, falls back to its .bak and rejects rubbish), PlayMode SimPopulationTests (Oakhaven's online sims stand
   there as figures on the NavMesh, none from other zones, gone when they log off; their places saved with the character).
+
+## 2026-10-06 — Phase 5.2b: inviting sims (Chris moved a basic invite ahead of the rest of Phase 5)
+- **Click a sim and Invite** (its frame where the target frame goes). It joins unless your party is full (three sims, a party
+  of five with Mira), you are fighting, it is more than five levels from you, or it is busy. Leave party (its frame, or the
+  button on its party row) sends it back to the world where it stands.
+- **In your party** (SimCompanion): follows a pace behind in its own place, fights your target in its class's way (Warriors and
+  Paladins in melee, the Warrior holding attention; Rangers shoot arrows, Mages fire, Druids thorns; Druids and Paladins heal
+  the most hurt of you), can be turned on by the enemies, falls and gets up after the fight. Its row under Mira's frame shows
+  health and what it is doing. The party is not saved yet.
+- Tests: PlayMode SimPartyTests (joins, follows and leaves; the busy and the far-off decline and the party holds three; fights
+  your target). HUD captures 40-sim-invite and 41-sim-party.

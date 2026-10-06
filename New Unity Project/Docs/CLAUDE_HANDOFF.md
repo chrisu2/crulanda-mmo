@@ -10,6 +10,8 @@ Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
 ## RESUME HERE (updated 2026-10-06, morning)
+**5.2b (invite sims, Chris moved it up): built and tested; see CHANGELOG. After it: 5.2 round 2 (gear on the sims, who
+list), then 5.3. Sim party tests load the "Oakhaven" scene.**
 **5.2 round 1 (the sims' roster, the world slot, figures in the zone by the clock): PUBLISHED, committed, backed up (CHANGELOG,
 SIMPLAYER_DESIGN.md). Next: 5.2 round 2 (gear on the sims from their gearSeed and level through GearLooks, a who list on the
 HUD, their levels rising a little by the clock), then 5.3 in-world life (utility AI: questing at camps, gathering, roads, the

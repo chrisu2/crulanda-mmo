@@ -10,8 +10,13 @@ Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
 ## RESUME HERE (updated 2026-10-06, small hours)
-**Round 22 (playtest notes 47-53 from Chris's first go at the Mage and Ranger): PUBLISHED, committed, backed up (CHANGELOG).
-Next: 5.2 sim profiles, or whatever Chris's next notes say.**
+**Round 22 (playtest notes 47-53 from Chris's first go at the Mage and Ranger): PUBLISHED (build 00:55), commit 0f05e2b,
+backed up (CHANGELOG). Session commits, in order: 42b1644 Paladin, 892446c + 0e850e9 Ranger, 1347441 Mage, 0f05e2b Round 22.
+Unverified by eye in Round 22 (check first if Chris reports them): the signpost lettering (ZoneBuilder.Signpost, a TextMesh
+on each face: size, slant, which way it reads) and the half-raised cast pose (ModelFigure.DriveUpper blends the upper layer
+at .45 while a cast is drawn; the UAL1 Spell_Simple set is the only cast pose in the library and ends arms-out).
+Next: 5.2 sim profiles (Docs/ROADMAP.md), or whatever Chris's next playtest notes say. Chris runs on Fable: one agent at a
+time, no workflows.**
 **5.1c the Mage: PUBLISHED 2026-10-05 late night, committed, backed up (see CHANGELOG). Phase 5.1 is complete: five classes
 (Warrior, Druid, Paladin, Ranger, Mage). Next: 5.2 sim profiles (Docs/ROADMAP.md): ~20 persistent SimAdventurers with stable
 ids, name, race, class (any of the five kits), level, gear, personality and home zone, saved, materialised as figures in the

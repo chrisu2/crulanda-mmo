@@ -9,7 +9,12 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-10-06, small hours)
+## RESUME HERE (updated 2026-10-06, morning)
+**5.2 round 1 (the sims' roster, the world slot, figures in the zone by the clock): PUBLISHED, committed, backed up (CHANGELOG,
+SIMPLAYER_DESIGN.md). Next: 5.2 round 2 (gear on the sims from their gearSeed and level through GearLooks, a who list on the
+HUD, their levels rising a little by the clock), then 5.3 in-world life (utility AI: questing at camps, gathering, roads, the
+inn, dying and the corpse run). Note: a sim-population PlayMode test must load the "Oakhaven" scene (PlayableEncounter is the
+old test map with no zone, so no sims).**
 **Round 22 (playtest notes 47-53 from Chris's first go at the Mage and Ranger): PUBLISHED (build 00:55), commit 0f05e2b,
 backed up (CHANGELOG). Session commits, in order: 42b1644 Paladin, 892446c + 0e850e9 Ranger, 1347441 Mage, 0f05e2b Round 22.
 Unverified by eye in Round 22 (check first if Chris reports them): the signpost lettering (ZoneBuilder.Signpost, a TextMesh

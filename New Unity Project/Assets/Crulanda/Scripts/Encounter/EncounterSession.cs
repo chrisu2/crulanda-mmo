@@ -14,6 +14,8 @@ namespace Crulanda.Encounter
     {
         public EncounterContent content;
         [NonSerialized] public string SaveDirectoryOverride;
+        /// <summary>Where this run's saves live (the characters' slots and the world slot, SimRoster).</summary>
+        public string SaveRoot { get; private set; }
         /// <summary>The throwaway save folder of a --crulanda-temp-save run (static: it must outlive the scene reload that travel does).</summary>
         static string tempSaveRoot;
         /// <summary>Same as the --crulanda-temp-save flag (tests set it). <see cref="ResetTempSave"/> forgets the folder.</summary>
@@ -1189,7 +1191,7 @@ namespace Crulanda.Encounter
                 SaveDirectoryOverride = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "CrulandaCapture-" + Guid.NewGuid().ToString("N"));
                 gameObject.AddComponent<EncounterCapture>().session = this;
             }
-            string root = SaveDirectoryOverride ?? System.IO.Path.Combine(Application.persistentDataPath, "CrulandaEncounter");
+            string root = SaveDirectoryOverride ?? System.IO.Path.Combine(Application.persistentDataPath, "CrulandaEncounter"); SaveRoot = root;
             var args = Environment.GetCommandLineArgs(); int classArg = Array.IndexOf(args, "--crulanda-class");
             if (StartClassOverride == null && classArg >= 0 && classArg + 1 < args.Length) StartClassOverride = args[classArg + 1];
             string classId = StartClassOverride ?? CharacterProfile.LastClass(root) ?? content.playerClass.id;
@@ -1221,6 +1223,8 @@ namespace Crulanda.Encounter
             SpawnParty();
             // Villagers and critters live alongside the encounter (they survive load/respawn of the party).
             if (Zone != null && Zone.Zone.life != null) new GameObject("Village life").AddComponent<VillageLife>().Init(this);
+            // The other adventurers (Phase 5.2): the roster from the world slot, figures for those here and online.
+            if (Zone != null) new GameObject("Sims").AddComponent<SimPopulation>().Init(this, SaveRoot);
             StartQuests(); StartDiscoveries(); StartArmoury();
             Message(Zone != null ? Zone.Zone.displayName + ". " + Objective(0, "") + "." : "Recruit the healer at camp [E], then follow the path to the sentries.");
             ReconcileQuests();
@@ -1811,7 +1815,7 @@ namespace Crulanda.Encounter
             var point = Player.transform.position;
             if (Zone != null && Zone.WaterAt(new Vector2(point.x, point.z), out _, out float wetDepth) && wetDepth > .3f) point = lastDry;
             Progress.x = point.x; Progress.y = point.y; Progress.z = point.z;
-            try { saves.Write(Progress); if (announce) Message("Expedition saved."); }
+            try { saves.Write(Progress); SimPopulation.Active?.Persist(); if (announce) Message("Expedition saved."); }
             catch (Exception e) { Message("Save failed: " + e.Message); }
         }
         public void Load()

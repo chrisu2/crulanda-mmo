@@ -469,7 +469,7 @@ namespace Crulanda.Encounter
         // Nameplates, ! and ? markers, speech bubbles and place names float over the world. They keep off the HUD panels and
         // inside the screen, hide behind solid scenery (one ray each), and stack instead of overprinting: the nearest keeps its
         // place and farther ones move up out of its way. Drawn on Repaint only (labels take no input), so the rays run once a frame.
-        struct Plate { public float dist, fade, top; public Vector2 at; public Rect box; public Villager v; public EncounterEnemy e; public bool mira, named, shown, grey; public char mark; public string name, title; }
+        struct Plate { public float dist, fade, top; public Vector2 at; public Rect box; public Villager v; public EncounterEnemy e; public SimFigure sim; public bool mira, named, shown, grey; public char mark; public string name, title; }
         readonly System.Collections.Generic.List<Plate> plates = new System.Collections.Generic.List<Plate>(48);
         readonly System.Collections.Generic.List<Rect> taken = new System.Collections.Generic.List<Rect>(64);
         readonly System.Collections.Generic.Dictionary<EncounterEnemy, (float height, int level, string label)> enemyPlates = new System.Collections.Generic.Dictionary<EncounterEnemy, (float height, int level, string label)>();
@@ -611,6 +611,18 @@ namespace Crulanda.Encounter
                     float w = Mathf.Max(Mathf.Max(named ? TextWidth(plateText, v.Name) : 0, title != null ? TextWidth(plateText, title) : 0), m != ' ' ? 28 : 0) + 8;
                     AddPlate(new Plate { dist = vd, fade = named ? Mathf.Clamp01((18 - vd) / 4) : 0, top = named ? (title != null ? -41 : -25) : -20, at = vp, v = v, named = named, name = v.Name, title = title, mark = m, grey = grey }, w);
                 }
+            // The other adventurers (Phase 5.2): name in their class's colour, the class and level beneath, like a player's plate.
+            var pop = SimPopulation.Active;
+            if (pop != null)
+                foreach (var f in pop.Figures)
+                {
+                    if (f == null) continue;
+                    var root = f.transform.position; float fd = Vector3.Distance(player, root + Vector3.up * 1.3f);
+                    if (fd > 24 || !ToCanvas(root + Vector3.up * 1.3f, out var fp) || fp.x < 0 || fp.x > 1440 || Occluded(f, root + Vector3.up * .85f)) continue;
+                    string title = Bracketed(SimRoster.ClassName(f.sim.classId) + " " + f.sim.level);
+                    float w = Mathf.Max(TextWidth(plateText, f.sim.name), TextWidth(plateText, title)) + 8;
+                    AddPlate(new Plate { dist = fd, fade = Mathf.Clamp01((24 - fd) / 4), top = -41, at = fp, sim = f, named = true, name = f.sim.name, title = title, mark = ' ' }, w);
+                }
             foreach (var e in session.Enemies) EnemyPlateAt(e, 25);
             // Game animals (deer, rabbits): a plate when close or targeted, so the fields are not a sea of names.
             foreach (var e in session.Game) EnemyPlateAt(e, session.Target == e ? 25 : 12);
@@ -654,7 +666,9 @@ namespace Crulanda.Encounter
             if (p.named)
             {
                 var style = p.mira ? centered : plateText;
+                var simColour = p.sim != null ? ClassColour(p.sim.sim.classId) : Color.white;
                 Outlined(new Rect(a.x - 150, rows, 300, p.mira ? 24 : 22), p.name, style, p.mira ? new Color(.55f, 1, .7f) :
+                    p.sim != null ? new Color(simColour.r, simColour.g, simColour.b, p.fade) :
                     session.FocusVillager == p.v ? new Color(.55f, 1, .55f, p.fade) : new Color(.85f, .9f, 1, p.fade));
                 if (p.title != null) Outlined(new Rect(a.x - 150, rows + 15, 300, 22), p.title, style, new Color(1, .84f, .45f, p.fade));
             }

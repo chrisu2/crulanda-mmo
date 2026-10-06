@@ -41,8 +41,15 @@ EncounterSave uses it from format 6 on: it registers one step per format (6 → 
 `EncounterSave.Read`. Versions above the current one are rejected.
 To change saved fields, add the next step (9 → 10) and bump `FormatVersion`. No migration is needed for combat tuning.
 
+## The world slot (2026-10-06, Phase 5.2)
+File: the same root, slot "world" (world.save.json, .bak kept), payloadType CrulandaWorld, formatVersion 1, DTO WorldSave:
+seed and the list of SimAdventurer (id, name, folk, classId, homeZone, zone, level, variant, gearSeed, bold, friendly, chatty,
+onlineFrom, onlineHours, x, z). Shared by every character; created when first missing (SimRoster.LoadOrCreate) and written with
+each character autosave (SimPopulation.Persist). An unreadable world slot falls back to its .bak, and failing that is made anew.
+Not migrated yet: bump WorldSave.FormatVersion and add a step when its fields change.
+
 ## Future world persistence
-WorldSaveData/CharacterSaveData/SimAdventurerSaveData/QuestSaveData/InventorySaveData/FactionSaveData
+CharacterSaveData/QuestSaveData/InventorySaveData/FactionSaveData
 are planned; do not describe them as already implemented. Use stable content/instance IDs, not scene
 object pointers, asset paths or Unity GUIDs. JSON records use lists rather than dictionaries.
 

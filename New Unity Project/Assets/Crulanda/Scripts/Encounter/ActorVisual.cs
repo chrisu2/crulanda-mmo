@@ -27,6 +27,7 @@ namespace Crulanda.Encounter
         Transform[] held, stowed; bool gearStowed;
         /// <summary>Class kit that worn gear replaces: the Warrior's shoulder pads, the Druid's hood. See ActorVisual.Gear.cs.</summary>
         Transform[] classKit; ActorLook built;
+        public ActorLook Look { get { return built; } }
         /// <summary>The bare figure's parts that worn armour recolours, hides or tucks away (see ActorVisual.GearArmor.cs): torso, chest and shoulders; sleeves; hands; legs and hips; boots; the belt; the hair (the long fall and the bun tuck under a cap); the Druid's cloak.</summary>
         Renderer[] baseChest, baseSleeves, baseHands, baseLegs, baseBoots; Renderer baseBelt; Transform[] hairParts; Transform hairLong, hairBun, druidCloak;
         /// <summary>Villagers pass their trade (<paramref name="role"/>) to get its outfit and tool; see <see cref="Dress"/>.</summary>

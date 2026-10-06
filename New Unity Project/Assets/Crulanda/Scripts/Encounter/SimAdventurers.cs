@@ -1,0 +1,113 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+using Crulanda.Core;
+using Crulanda.Persistence;
+
+namespace Crulanda.Encounter
+{
+    /// <summary>
+    /// A SimAdventurer's profile (Phase 5.2 round 1, 2026-10-06; GAME-BRIEF section 13, Docs/SIMPLAYER_DESIGN.md): one of the
+    /// twenty other adventurers who play alongside you. Stable id, a name and where they are from (GAME-ONLY names; the folk
+    /// labels are origins, not canon races, until the canon is checked), one of the five class kits, a level with a home zone to
+    /// match, a personality (three weights the later phases' choices and chat read), the hours they are online (world-clock
+    /// hours), and where they were last seen. Saved in the world slot (WorldSave), shared by every character.
+    /// </summary>
+    [Serializable]
+    public sealed class SimAdventurer
+    {
+        public string id, name, folk, classId, homeZone, zone;
+        public int level = 1, variant, gearSeed;
+        /// <summary>0-1 each: bold (fights above their level), friendly (helps, greets), chatty (talks in the channels).</summary>
+        public float bold, friendly, chatty;
+        /// <summary>Online from this world-clock hour for <see cref="onlineHours"/> hours (wrapping past midnight).</summary>
+        public float onlineFrom = 8, onlineHours = 8;
+        public float x, z;
+        public bool IsOnline(float hour) { return Crulanda.World.WorldClock.Between(onlineFrom, Mathf.Repeat(onlineFrom + onlineHours, 24)) || onlineHours >= 24; }
+        public bool IsOnlineAt(float hour) { float to = Mathf.Repeat(onlineFrom + onlineHours, 24); return onlineHours >= 24 || (onlineFrom <= to ? hour >= onlineFrom && hour < to : hour >= onlineFrom || hour < to); }
+    }
+
+    /// <summary>The world's own save (slot "world", beside the characters' slots): the sims. Format 1.</summary>
+    [Serializable]
+    public sealed class WorldSave
+    {
+        public const int FormatVersion = 1;
+        public const string PayloadType = "CrulandaWorld";
+        public int seed;
+        public List<SimAdventurer> sims = new List<SimAdventurer>();
+    }
+
+    /// <summary>Makes, reads and writes the roster.</summary>
+    public static class SimRoster
+    {
+        public const int Count = 20;
+        public const string Slot = "world";
+        public static readonly string[] ClassIds = { "class.warrior", "class.druid", "class.paladin", "class.ranger", "class.mage" };
+        /// <summary>Home zones by level band (WORLD_ZONES.md): the village for the low levels, the Shore for the cap.</summary>
+        public static readonly (string zone, string folk, int lo, int hi)[] Homes = {
+            ("zone.oakhaven", "Oakhaven folk", 1, 5), ("zone.khaven", "Khaven folk", 4, 8), ("zone.peaks", "Peaks folk", 7, 10), ("zone.ashrim", "Rim folk", 9, 12), ("zone.verdant", "Shore folk", 11, 13) };
+        // GAME-ONLY names, plain and of the Trail: none from the books.
+        static readonly string[] First = { "Ansel", "Bryn", "Cato", "Della", "Edric", "Fenna", "Garrick", "Hollis", "Isolde", "Jory", "Kestrel", "Lowen", "Maren", "Nolan", "Orla", "Piran", "Quill", "Rhosyn", "Sedge", "Tamsin", "Ulric", "Vesna", "Wren", "Yorath" };
+        static readonly string[] Bynames = { "Ashby", "Brook", "Coombe", "Dray", "Fallow", "Greave", "Hale", "Kettle", "Larkin", "Marl", "Nettle", "Oxley", "Pike", "Rooke", "Sallow", "Thatch", "Underhill", "Wick" };
+
+        /// <summary>The twenty, the same for the same seed: names unique, every class at least three times, levels spread 1-13 with homes to match.</summary>
+        public static List<SimAdventurer> Generate(int seed)
+        {
+            var r = new SeededRandom(seed); var sims = new List<SimAdventurer>(Count); var used = new HashSet<string>();
+            for (int i = 0; i < Count; i++)
+            {
+                var s = new SimAdventurer { id = "sim." + (i + 1).ToString("00"), classId = ClassIds[i % ClassIds.Length] };
+                // Levels: a spread over the bands, more at the bottom where the player starts (1-5: 8, 4-8: 5, 7-10: 3, 9-12: 2, 11-13: 2).
+                int band = i < 8 ? 0 : i < 13 ? 1 : i < 16 ? 2 : i < 18 ? 3 : 4;
+                var home = Homes[band];
+                s.level = home.lo + r.NextInt(0, home.hi - home.lo + 1);
+                s.homeZone = s.zone = home.zone; s.folk = home.folk;
+                string name;
+                do { name = First[r.NextInt(0, First.Length)] + " " + Bynames[r.NextInt(0, Bynames.Length)]; } while (!used.Add(name));
+                s.name = name; s.variant = r.NextInt(0, 1000); s.gearSeed = r.NextInt(0, 100000);
+                s.bold = r.NextFloat(); s.friendly = r.NextFloat(); s.chatty = r.NextFloat();
+                // Hours: most play evenings, some mornings, a few all hours (the ones you always see).
+                float kind = r.NextFloat();
+                if (kind < .15f) { s.onlineFrom = 0; s.onlineHours = 24; }
+                else if (kind < .4f) { s.onlineFrom = 6 + r.NextInt(0, 4); s.onlineHours = 5 + r.NextInt(0, 5); }
+                else { s.onlineFrom = 15 + r.NextInt(0, 5); s.onlineHours = 4 + r.NextInt(0, 7); }
+                sims.Add(s);
+            }
+            return sims;
+        }
+
+        public static WorldSave Load(string root, out string message)
+        {
+            message = null;
+            var store = new SaveFileStore(root);
+            if (!store.Exists(Slot)) return null;
+            if (!store.TryRead(Slot, out var env, out message)) return null;
+            if (env.payloadType != WorldSave.PayloadType || env.formatVersion < 1 || env.formatVersion > WorldSave.FormatVersion) { message = "Unsupported world save."; return null; }
+            try
+            {
+                var w = JsonUtility.FromJson<WorldSave>(env.payloadJson);
+                if (w == null || w.sims == null || w.sims.Count == 0) { message = "Empty world save."; return null; }
+                foreach (var s in w.sims) if (s == null || string.IsNullOrEmpty(s.id) || string.IsNullOrEmpty(s.name) || Array.IndexOf(ClassIds, s.classId) < 0 || s.level < 1 || s.level > EncounterProgress.LevelCap) { message = "Invalid sim in the world save."; return null; }
+                return w;
+            }
+            catch (Exception e) { message = e.Message; return null; }
+        }
+        public static void Save(string root, WorldSave world)
+        {
+            new SaveFileStore(root).Write(Slot, new SaveEnvelope {
+                formatVersion = WorldSave.FormatVersion, payloadType = WorldSave.PayloadType, gameVersion = "0.3.0",
+                savedAtUtc = DateTime.UtcNow.ToString("O"), payloadJson = JsonUtility.ToJson(world) });
+        }
+        /// <summary>The saved world, or a new one (seeded from the clock) saved at once.</summary>
+        public static WorldSave LoadOrCreate(string root)
+        {
+            var w = Load(root, out _);
+            if (w != null) return w;
+            w = new WorldSave { seed = Environment.TickCount & 0x7fffffff }; w.sims = Generate(w.seed); Save(root, w); return w;
+        }
+        public static string ClassName(string classId)
+        {
+            switch (classId) { case "class.druid": return "Druid"; case "class.paladin": return "Paladin"; case "class.ranger": return "Ranger"; case "class.mage": return "Mage"; default: return "Warrior"; }
+        }
+    }
+}

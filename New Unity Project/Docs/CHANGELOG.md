@@ -1297,3 +1297,15 @@ A read-only review by five reviewers, each finding checked by a second who tried
   stands in the road (three moved a metre past the verge: two in Oakhaven, one in Khaven).
 - **The leash:** 30 m from where the pull began (was 17) and 6 m of give (was 2), so backing a few steps no longer sends a
   wolf home.
+
+## 2026-10-06 — Phase 5.2 round 1: the sims' roster (published)
+- **Twenty SimAdventurers** (Scripts/Encounter/SimAdventurers.cs; GAME-ONLY names, folk labels PROVISIONAL): stable ids, a class
+  from the five kits, a level with a home zone to match, a personality (bold, friendly, chatty), hours they are online by the
+  world clock, and where they were last seen. Made once from a seed and kept in a new world save slot beside the characters'
+  (world.save.json; SAVE_FORMAT.md), shared by every character and written with each autosave.
+- **In the zone:** those of this zone who are online stand about its named places as figures in their class's look
+  (SimPopulation, SimFigure), wander between them, and the friendly turn to face you when you come close; they go when they
+  log off and come back when they log on. Nameplates in the class's colour with the class and level beneath.
+- Tests: EditMode SimRosterTests (twenty for a seed, names unique, every class, levels to homes, hours wrapping midnight, the
+  world slot round-trips, falls back to its .bak and rejects rubbish), PlayMode SimPopulationTests (Oakhaven's online sims stand
+  there as figures on the NavMesh, none from other zones, gone when they log off; their places saved with the character).

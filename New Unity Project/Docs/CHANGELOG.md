@@ -1364,3 +1364,9 @@ A read-only review by five reviewers, each finding checked by a second who tried
   fighting; SimLifeTests turn their life on.
 - Tests: PlayMode SimLifeTests (a hunt the mob answers, the sim's kill gives you nothing, a node worked and resting, the inn,
   the bold choose to hunt).
+
+## 2026-10-06 — Round 23 (UNTESTED, NOT PUBLISHED: Chris stopped the test run; playtest notes 57-61)
+- Brimmed (straw) hats removed from modelled figures; cows, horses, donkeys and sheep solid (box colliders); class attributes by
+  level shown on the character sheet, balance-neutral (EncounterSession.Innate + cancelling modifiers); the empty-slot tooltip
+  beside its slot; sign letters in a depth-tested shader; farmhands for the fields no farmer works (VillageLife.SpawnFarmhands).
+- Zone chat researched: Docs/CHAT_RESEARCH.md.

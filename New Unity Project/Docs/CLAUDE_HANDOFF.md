@@ -9,7 +9,20 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-10-06, morning)
+## RESUME HERE (updated 2026-10-06, about 16:30)
+**Playable build = 5.3a (published 14:58, commit c1f4c6c): sims hunt camp mobs (which fight back), gather, rest at the inn,
+loiter; tagging; mobs scale to your group; who list (O); invite up to 3 sims; helms seated by measurement; T-pose fixed.**
+**Round 23 is COMMITTED (b7bce96 + the wrap-up commit) but UNTESTED and NOT PUBLISHED: Chris said "don't start a test run" and
+the run was stopped. First thing next session: run the full check (start_detached.ps1), fix what it finds (watch the village
+bedtime test: farmhands are new villagers; character-sheet and stat tests: class attributes are new base stats), then a
+release build and publish. Round 23 = playtest notes 57-61 (Docs/PLAYTEST_NOTES.md).**
+**Then, in Chris's order: zone chat (note 62; research and design in Docs/CHAT_RESEARCH.md: channels Zone, Trade, LFG, Party,
+Say; sims talk from what they are really doing, by their chatty weight; replies, grats, LF1M), then 5.3b (travel, death and
+corpse run, levelling), then 5.3c with note 63 (sims sell their goods, or craft their own gear with trade skills, to upgrade).**
+Tools: --crulanda-life-capture <dir> on a build shows the sims living (LifeCapture.cs); SimPopulation.Lively is off in editor
+test runs and other captures. Model on this machine: Opus 5.5 now (was Fable); still one agent at a time.
+
+## Earlier resume note (updated 2026-10-06, morning)
 **5.2b (invite sims, Chris moved it up): built and tested; see CHANGELOG. After it: 5.2 round 2 (gear on the sims, who
 list), then 5.3. Sim party tests load the "Oakhaven" scene.**
 **5.2 round 1 (the sims' roster, the world slot, figures in the zone by the clock): PUBLISHED, committed, backed up (CHANGELOG,

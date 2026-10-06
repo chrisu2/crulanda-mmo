@@ -471,3 +471,15 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
   MegaKit (housing), Fantasy Props MegaKit, Stylized Megapack 2in1 (all in Downloads), the Asset Store's Medieval props and HQ
   Rock Pack (boulders and crags), the Ashen Marches sentinel helm (a model helm needs the armour path), and the Ash-Walker
   enclave's interior (note 40). Then the sound phase.
+- **57. "This hat on any NPC is terrible looking"** (the straw hat). FIXED, UNTESTED (round 23): brimmed hats come off modelled figures.
+- **58. "Can run through cows. They need physics."** FIXED, UNTESTED (round 23): cows, horses, donkeys and sheep have box colliders.
+- **59. Character sheet: "overlaps and no stats"** (the empty-slot tooltip over the doll; every attribute 0). FIXED, UNTESTED (round
+  23): each class has its own attributes by level (balance-neutral), the empty-slot name sits beside its slot.
+- **60. "Text on signs not correct"** (the back face's mirrored words showed through). FIXED, UNTESTED (round 23): a depth-tested
+  sign-text shader (Resources/Shaders/SignText).
+- **61. "Farmer should be working their fields."** FIXED, UNTESTED (round 23): 16 fields and few farmers, and fields over 125 m
+  out had no work spots; every field no farmer works now gets a farmhand from the nearest house within 80 m.
+- **62. Zone chat for all sims and players in the zone; sims chatting away; research real MMO chat.** RESEARCHED (Docs/CHAT_RESEARCH.md);
+  to build next (Phase 5.5 brought forward).
+- **63. Sims sell what they gather or make and upgrade themselves, or make their own gear with trade skills and recipes.** For 5.3c.
+

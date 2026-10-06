@@ -95,8 +95,7 @@ namespace Crulanda.Encounter
             var f = go.AddComponent<SimFigure>(); f.sim = s; f.population = pop;
             f.agent = go.AddComponent<NavMeshAgent>(); f.agent.speed = 1.7f; f.agent.angularSpeed = 360; f.agent.acceleration = 8; f.agent.stoppingDistance = .5f; f.agent.radius = .3f; f.agent.height = 2; f.agent.baseOffset = 1; f.agent.avoidancePriority = 80;   // villagers (60) go first: a sim steps aside
             f.visual = ActorVisual.Attach(go, EncounterSession.LookForClass(s.classId), s.variant);
-            go.SetActive(true);
-            foreach (var r in body.GetComponentsInChildren<Renderer>()) r.enabled = false;
+            go.SetActive(true);   // ActorVisual hides the placeholder capsule itself; the figure is built under "Body", so nothing else is touched here
             f.nextMove = Time.time + 4 + (s.variant % 7) * 2;
             return f;
         }

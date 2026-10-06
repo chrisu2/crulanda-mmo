@@ -50,6 +50,8 @@ namespace Crulanda.Tests
             var on = local[0]; WorldClock.Hour = Mathf.Repeat(on.onlineFrom + 1, 24); pop.Refresh(); yield return null;
             var f = pop.Find(on.id); Assert.NotNull(f, on.name + " is here at " + WorldClock.Hour);
             Assert.NotNull(f.visual); Assert.AreEqual(EncounterSession.LookForClass(on.classId), f.visual.Look);
+            // Seen: the figure draws (2026-10-06: every sim was invisible, its model hidden with the placeholder capsule).
+            Assert.Greater(f.GetComponentsInChildren<Renderer>().Count(r => r.enabled && r.gameObject.activeInHierarchy && r.name != "Body"), 3, on.name + " is drawn");
             Assert.NotNull(f.GetComponent<UnityEngine.AI.NavMeshAgent>()); Assert.IsTrue(f.GetComponent<UnityEngine.AI.NavMeshAgent>().isOnNavMesh, "on the NavMesh");
             foreach (var s in local) if (s.IsOnlineAt(WorldClock.Hour)) Assert.NotNull(pop.Find(s.id), s.name + " online but not here"); else Assert.IsNull(pop.Find(s.id), s.name + " offline but here");
             foreach (var s in world.sims.Where(s => s.zone != "zone.oakhaven")) Assert.IsNull(pop.Find(s.id), s.name + " is in another zone");

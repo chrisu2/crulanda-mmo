@@ -137,12 +137,9 @@ namespace Crulanda.Tests
             foreach (var r in hands[0].GetComponentsInChildren<SkinnedMeshRenderer>(true))
                 foreach (var bw in r.sharedMesh.boneWeights) { var b = r.bones[bw.boneIndex0]; if (b == m.HandL || b == m.HandR || b.IsChildOf(m.HandL) || b.IsChildOf(m.HandR)) { onHand = true; break; } }
             Assert.IsTrue(onHand, "A gauntlet's weights are on the hand's bones.");
-            // Hats: the farmer's brim sits between the brows and the crown of the head, not perched on top.
-            var farmer = Figure(ActorLook.Villager, 23, "farmer", "Garet Moss"); var fm = farmer.Model;
-            var hat = farmer.transform.Find("Body/Head frame/Hat"); Assert.NotNull(hat, "The farmer's hat is fitted (Body/Head frame/Hat).");
-            float brim = float.MaxValue; foreach (var r in hat.GetComponentsInChildren<Renderer>()) brim = Mathf.Min(brim, r.bounds.min.y);
-            float eyes = fm.HeadBone.position.y + .1f;
-            Assert.That(brim - eyes, Is.InRange(.0f, .1f), "The brim sits just above the brows.");
+            // Hats: no brimmed hat on a model (2026-10-06, playtest note 57: "this hat on any npc is terrible looking"): the farmer goes bareheaded.
+            var farmer = Figure(ActorLook.Villager, 23, "farmer", "Garet Moss");
+            Assert.IsNull(farmer.transform.Find("Body/Head frame/Hat"), "No straw hat on the farmer.");
             // A cap hugs the head: the smith's skullcap is a shell of his head, no wider than a head and a half.
             var smith = Figure(ActorLook.Villager, 3, "blacksmith", "Brannoc Vell");
             Renderer cap = null; foreach (var r in smith.transform.Find("Body/Head frame").GetComponentsInChildren<MeshRenderer>()) if (r.GetComponent<MeshFilter>().sharedMesh.name == "Cap (fitted)") cap = r;

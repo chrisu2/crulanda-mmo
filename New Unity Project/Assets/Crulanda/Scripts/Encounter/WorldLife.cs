@@ -226,13 +226,13 @@ namespace Crulanda.Encounter
                 if (spots.Count == 0) continue;
                 string name = FarmhandNames[n % FarmhandNames.Length]; n++;
                 fieldOf[name] = spots;
-                var household = Households.Find(h => h.house == home);
-                Settle(Villager.Spawn(this, name, "farmer", 80 + n, home, spots[0], null, null, "Farmhand"), household);
+                // A day hand, not of the family: housed at the nearest door, in no household (a knock there names the family only).
+                Settle(Villager.Spawn(this, name, "farmer", 80 + n, home, spots[0], null, null, "Farmhand"), null);
             }
         }
         void Settle(Villager v, Household household) { Villagers.Add(v); v.Household = household; if (household != null) household.members.Add(v); }
         /// <summary>Who is indoors behind this door now (hidden at home: abed, at dinner, or fled in).</summary>
-        public List<Villager> AtHome(ZoneDoor door) { return Villagers.FindAll(v => v.Home == door && v.Indoors); }
+        public List<Villager> AtHome(ZoneDoor door) { return Villagers.FindAll(v => v.Home == door && v.Indoors && !v.Farmhand); }   // a farmhand sleeps in the loft and never answers the door
         /// <summary>
         /// The player paid this villager this much coin (a purchase, or a bag made for a quest's hides): it goes into their household's
         /// purse. Before the shops shut the household plans again and sets out for what it can now afford ("That's the fire lit
@@ -835,6 +835,8 @@ namespace Crulanda.Encounter
         public bool Keeper { get; private set; }
         /// <summary>Trade shown under the name (&lt;Blacksmith&gt;), or null.</summary>
         public string Title { get; private set; }
+        /// <summary>A day hand in the fields (VillageLife.SpawnFarmhands): housed, but of no household.</summary>
+        public bool Farmhand { get { return Title == "Farmhand"; } }
         public string Bubble { get; private set; }
         public float BubbleUntil { get; private set; }
         public bool Visible { get { return state != State.Hidden; } }
@@ -1452,7 +1454,7 @@ namespace Crulanda.Encounter
             c.seed = life.R01 * 100; c.body = CritterBody.Build(go.transform, kind, life.R01, c.seed); c.until = Time.time + life.R01 * 4;
             // Solid (2026-10-06, Chris: "can run through cows. they need physics"): a box the size of the beast, turning with it.
             var size = kind == "horse" ? new Vector3(.7f, 1.6f, 2.2f) : kind == "cow" ? new Vector3(.8f, 1.35f, 2f) : kind == "donkey" ? new Vector3(.55f, 1.15f, 1.6f) : kind == "sheep" ? new Vector3(.6f, .8f, 1.1f) : Vector3.zero;
-            if (size != Vector3.zero) { var box = go.AddComponent<BoxCollider>(); box.size = size; box.center = new Vector3(0, size.y / 2, 0); }
+            if (size != Vector3.zero) { var box = go.AddComponent<BoxCollider>(); box.size = size; box.center = new Vector3(0, size.y / 2, 0); go.layer = 2; }   // Ignore Raycast: solid to walk into, never a click target
             c.rends = go.GetComponentsInChildren<Renderer>();
             if (kind == "chicken")
             {

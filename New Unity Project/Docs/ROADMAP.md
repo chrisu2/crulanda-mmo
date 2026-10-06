@@ -27,7 +27,7 @@ records where each of its phases stands and the order of the work. Update it eve
 | 5.2b Invite (Chris moved it up, 2026-10-06) | Click a sim, Invite: it joins like Mira (up to three), follows, fights your target in its class's way (melee closes, Ranger and Mage shoot, Druid and Paladin also heal), is in the party frames and can be turned on; Leave party sends it back. Not saved. The full party system stays in 5.6. | 1 round |
 | 5.3 In-world life (5.3a DONE 2026-10-06: choosing by personality, hunting camps, gathering, the inn, tagging) | Utility-AI activities: questing (camp mobs), gathering, travelling the roads, shopping, resting at inns, dying and the corpse run, levelling and gearing up; personality weights the choices. | 3 rounds |
 | 5.4 Offscreen world | Coarse simulation of the unloaded: levels, zone moves, online and offline hours by the world clock. | 1-2 rounds |
-| 5.5 Chat and memory | Say, Zone, Whisper and System channels from personality and event templates; a who list and friends; compact social memory and relationships (Stranger to Friend or Rival). | 2 rounds |
+| 5.5 Chat and memory (zone chat built 2026-10-06, brought forward for playtest note 62; whispers, friends and memory to come) | Say, Zone, Whisper and System channels from personality and event templates; a who list and friends; compact social memory and relationships (Stranger to Friend or Rival). | 2 rounds |
 | 5.6 Groups (Phase 6) | Invite, accept, leave, party frames, roles, assist, shared kill credit, need and greed, sims inviting the player, dungeon runs with sims. | 3 rounds |
 
 About 15-17 rounds. No external language model: local state machines and utility AI only (brief section 13).

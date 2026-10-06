@@ -1890,7 +1890,7 @@ namespace Crulanda.Encounter
             Target = null; AutoAttack = false; abilities.Reset();
             SpawnParty(); Message("A new patrol has arrived. Your equipment, level and companion history are kept.");
         }
-        public void Message(string text) { Messages.Add(text); if (Messages.Count > 6) Messages.RemoveAt(0); }
+        public void Message(string text) { Messages.Add(text); if (Messages.Count > 6) Messages.RemoveAt(0); ChatSay(ChatChannel.System, null, text); }
         public void FloatText(Vector3 point, string text, Color color) { Floating.Add(new CombatText { position = point + Vector3.up * 1.5f, text = text, color = color, expires = Time.time + 1.3f }); }
         public void Resume() { Paused = false; Time.timeScale = 1; }
         void OnDestroy() { Time.timeScale = 1; Crulanda.World.WorldWeather.Turned -= OnWeatherTurned; }

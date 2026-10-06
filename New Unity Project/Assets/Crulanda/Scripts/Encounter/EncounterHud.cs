@@ -24,7 +24,7 @@ namespace Crulanda.Encounter
             var p = new Vector2(point.x * 1440 / Screen.width, (Screen.height - point.y) * 900 / Screen.height);
             return paused || buildVisible || mapVisible || QuestUiBlocks(p) || WhoUiBlocks(p) || ItemUiBlocks(p) || TradesUiBlocks(p) || LootUiBlocks(p) || p.y > 795 || new Rect(10, 10, 350, 190).Contains(p) ||
                 (targetVisible && new Rect(365, 10, 350, 130).Contains(p)) || new Rect(1215, 0, 225, 240).Contains(p) ||
-                (partySims > 0 && new Rect(10, 196, 350, 46 * partySims).Contains(p)) ||
+                (partySims > 0 && new Rect(10, 196, 350, 46 * partySims).Contains(p)) || new Rect(10, 590, 474, 186).Contains(p) ||   // the chat
                 new Rect(1110, 236, 330, 200).Contains(p) || false;
         }
         /// <summary>Capture tools hide the HUD to photograph the world.</summary>
@@ -246,22 +246,48 @@ namespace Crulanda.Encounter
         const float ChatPlateSeconds = 8;
         /// <summary>The message log. Its plate hugs the lines (last pass's extent, since IMGUI paints in call order) and fades out
         /// a few seconds after the last message; hovering the log brings it back. The text itself stays, outlined.</summary>
+        /// <summary>The chat (2026-10-06, playtest note 62; ZoneChat): tabs for All, Zone, Trade, LFG, Party and the game's own
+        /// messages; Enter to type (/s say, /z zone, /t trade, /lfg, /p party), Enter to send, Esc to stop.</summary>
+        static readonly string[] ChatTabs = { "All", "Zone", "Trade", "LFG", "Party", "System" };
+        static int chatTab; static bool chatTyping, chatFocus; static string chatTyped = "";
+        static bool ShowsIn(ChatLine l, int tab)
+        {
+            switch (tab) { case 1: return l.channel == ChatChannel.Zone || l.channel == ChatChannel.Say; case 2: return l.channel == ChatChannel.Trade; case 3: return l.channel == ChatChannel.LFG; case 4: return l.channel == ChatChannel.Party; case 5: return l.channel == ChatChannel.System; default: return true; }
+        }
         void DrawChat()
         {
-            var msgs = session.Messages; int n = msgs.Count;
-            if (n != chatCount || (n > 0 && (!object.ReferenceEquals(msgs[0], chatFirst) || !object.ReferenceEquals(msgs[n - 1], chatLast))))
-            { chatCount = n; chatFirst = n > 0 ? msgs[0] : null; chatLast = n > 0 ? msgs[n - 1] : null; chatAt = Time.unscaledTime; }
-            float fade = ChatArea.Contains(Event.current.mousePosition) ? 1 : Mathf.Clamp01(1 - (Time.unscaledTime - chatAt - ChatPlateSeconds) / 3);
-            if (chatW > 0) HudBacking(new Rect(10, chatTop - 6, chatW + 16, 776 - chatTop), fade);
-            float y = 770 - 6; chatW = 0;
-            for (int i = n - 1; i >= 0 && y > 626; i--)
+            var e = Event.current;
+            if (e.type == EventType.KeyDown && (e.keyCode == KeyCode.Return || e.keyCode == KeyCode.KeypadEnter))
             {
-                measureContent.text = msgs[i]; var h = tiny.CalcHeight(measureContent, 455); y -= h;
-                chatW = Mathf.Max(chatW, Mathf.Min(455, tiny.CalcSize(measureContent).x));
-                Outlined(new Rect(18, y, 455, h), msgs[i], tiny, session.LineColour(msgs[i], new Color(1, .96f, .86f)));   // loot lines in their quality's colour
+                if (chatTyping) { session.PlayerChat(chatTyped); chatTyped = ""; chatTyping = false; GUI.FocusControl(null); e.Use(); }
+                else if (!session.Paused) { chatTyping = true; chatTyped = ""; chatFocus = true; e.Use(); }
             }
-            chatTop = y;
-            Shadow(new Rect(12, 774, 880, 20), "WASD move · / run · Space jump · Right-drag look · Wheel zoom · Tab target · E interact · L quests · M map · B talents · I bags · C character · K trades · O who", tiny, new Color(.8f, .8f, .78f));
+            else if (chatTyping && e.type == EventType.KeyDown && e.keyCode == KeyCode.Escape) { chatTyping = false; chatTyped = ""; GUI.FocusControl(null); e.Use(); }
+            EncounterInput.Typing = chatTyping;
+            var box = new Rect(10, 592, 472, 182);
+            Fill(box, new Color(0, 0, 0, chatTyping || box.Contains(e.mousePosition) ? .5f : .3f));
+            for (int i = 0; i < ChatTabs.Length; i++)
+            {
+                var r = new Rect(box.x + 4 + i * 66, box.y + 3, 64, 20);
+                if (i == chatTab) Fill(r, new Color(1, .84f, .45f, .25f));
+                if (GUI.Button(r, ChatTabs[i], slim)) chatTab = i;
+            }
+            float bottom = chatTyping ? box.yMax - 28 : box.yMax - 4, top = box.y + 26, y = bottom;
+            var lines = session.Chat;
+            for (int i = lines.Count - 1; i >= 0 && y > top; i--)
+            {
+                var l = lines[i]; if (!ShowsIn(l, chatTab)) continue;
+                string shown = l.Shown; measureContent.text = shown; var h = tiny.CalcHeight(measureContent, 455); if (y - h < top) break; y -= h;
+                var colour = l.channel == ChatChannel.System ? session.LineColour(l.text, ZoneChat.Colour(ChatChannel.System)) : ZoneChat.Colour(l.channel);
+                Outlined(new Rect(box.x + 8, y, 455, h), shown, tiny, colour);   // loot lines in their quality's colour
+            }
+            if (chatTyping)
+            {
+                GUI.SetNextControlName("chat");
+                chatTyped = GUI.TextField(new Rect(box.x + 4, box.yMax - 26, box.width - 8, 22), chatTyped, 200);
+                if (chatFocus) { GUI.FocusControl("chat"); chatFocus = false; }
+            }
+            Shadow(new Rect(12, 776, 900, 20), "WASD move · / run · Space jump · Right-drag look · Wheel zoom · Tab target · E interact · L quests · M map · B talents · I bags · C character · K trades · O who · Enter chat", tiny, new Color(.8f, .8f, .78f));
         }
         void DrawCenter()
         {

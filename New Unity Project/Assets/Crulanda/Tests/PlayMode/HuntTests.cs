@@ -223,7 +223,8 @@ namespace Crulanda.Tests
             foreach (var c in life.Critters)
             {
                 Assert.IsFalse(GameAnimals.IsGame(c.Kind), c.Kind + " is not game."); CollectionAssert.Contains(GameAnimals.NeverHunted, c.Kind);
-                Assert.IsEmpty(c.GetComponentsInChildren<Collider>(true), c.Kind + ": nothing to click on.");
+                // Solid to walk into (2026-10-06: "can run through cows"), but on Ignore Raycast: nothing to click on.
+                Assert.IsTrue(c.GetComponentsInChildren<Collider>(true).All(k => k.gameObject.layer == 2), c.Kind + ": nothing to click on.");
                 Assert.IsNull(c.GetComponentInParent<EncounterEnemy>(), c.Kind + " can never be a target."); Assert.IsNull(c.GetComponentInParent<Crulanda.Gameplay.Actor>(), c.Kind + " has no health.");
             }
             Assert.IsFalse(life.Critters.Any(c => c.Kind == "deer" || c.Kind == "rabbit"), "Deer and rabbits are game now, not critters.");

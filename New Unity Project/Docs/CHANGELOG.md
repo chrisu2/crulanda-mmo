@@ -1370,3 +1370,16 @@ A read-only review by five reviewers, each finding checked by a second who tried
   level shown on the character sheet, balance-neutral (EncounterSession.Innate + cancelling modifiers); the empty-slot tooltip
   beside its slot; sign letters in a depth-tested shader; farmhands for the fields no farmer works (VillageLife.SpawnFarmhands).
 - Zone chat researched: Docs/CHAT_RESEARCH.md.
+
+## 2026-10-06 — Zone chat (playtest note 62; Phase 5.5 brought forward)
+- **The chat window** (EncounterHud.DrawChat, ZoneChat): tabs All, Zone, Trade, LFG, Party and System (the game's own
+  messages); each channel in its colour. **Enter** to type, Enter to send, Esc to stop; /s say, /z zone (the default), /t trade,
+  /lfg, /p party. No key moves you while you type (EncounterInput.Typing). Clicks on the chat stay in it.
+- **The sims talk** (SimChatter), every few seconds (sooner the more are here), the chatty ones far more, the quiet ones never,
+  and what they say is true: LF1M for a real camp at their level, LF2M for an elite that is up, an elite up near a named place,
+  WTS and WTB the ore and herbs of the zone, where-is questions that another sim answers with the real direction ("The Old
+  Barrow's south of the village, past Brook pond"), the road to another zone, grumbles about the mobs they are fighting, the
+  inn, the dark and the rain, goodnights as they log off. In your party they call out in Party ("inc", "need a heal").
+- **They answer you:** where a place is, a group wanted (a sim of your level offers to join), something for sale, thanks,
+  hello. Built from Docs/CHAT_RESEARCH.md; all lines GAME-ONLY.
+- Tests: EditMode ZoneChatTests; PlayMode SimChatTests (they talk; directions answered; a group call answered; messages in System).

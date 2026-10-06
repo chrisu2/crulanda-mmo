@@ -31,6 +31,7 @@ namespace Crulanda.Encounter
             bool testRun = Application.isEditor && (Application.isBatchMode || System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-runTests") >= 0);
             Lively = LifeOverride ?? !(testRun || EncounterCapture.Requested && !LifeCapture.Requested);   // the life capture watches them live
             World = SimRoster.LoadOrCreate(root);
+            gameObject.AddComponent<SimChatter>().Init(this);   // the sims talking (zone chat, playtest note 62)
             Refresh();
         }
         void OnDestroy() { if (Active == this) Active = null; }
@@ -55,7 +56,7 @@ namespace Crulanda.Encounter
                 bool here = s.zone == zone && s.IsOnlineAt(hour) && !Session.InParty(s.id);   // one in your party is with you, not standing about
                 var f = Find(s.id);
                 if (here && f == null) Figures.Add(SimFigure.Spawn(this, s));
-                else if (!here && f != null) { Figures.Remove(f); Destroy(f.gameObject); }
+                else if (!here && f != null) { if (!s.IsOnlineAt(hour)) SimChatter.Active?.LoggedOff(s); Figures.Remove(f); Destroy(f.gameObject); }
             }
             Figures.RemoveAll(f => f == null);
         }

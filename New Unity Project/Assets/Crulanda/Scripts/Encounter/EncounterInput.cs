@@ -11,8 +11,11 @@ namespace Crulanda.Encounter
         /// <summary>Action-bar key for a slot: 1-9 then 0 (slot index 9), matching the HUD labels.</summary>
         public static KeyCode SlotKey(int slot) { return slot == 9 ? KeyCode.Alpha0 : (KeyCode)((int)KeyCode.Alpha1 + slot); }
         public static string SlotLabel(int slot) { return slot == 9 ? "0" : (slot + 1).ToString(); }
+        /// <summary>True while you type in the chat (EncounterHud.DrawChat): no key moves you or works the bar.</summary>
+        public static bool Typing;
         public static bool Press(KeyCode key)
         {
+            if (Typing) return false;
 #if ENABLE_INPUT_SYSTEM
             var k = Keyboard.current;
             if (k == null) return false;
@@ -55,6 +58,7 @@ namespace Crulanda.Encounter
         public static bool Sneak
         {
             get {
+                if (Typing) return false;
 #if ENABLE_INPUT_SYSTEM
                 var k = Keyboard.current; return k != null && (k.leftCtrlKey.isPressed || k.rightCtrlKey.isPressed);
 #else
@@ -65,6 +69,7 @@ namespace Crulanda.Encounter
         public static Vector2 Move
         {
             get {
+                if (Typing) return Vector2.zero;
 #if ENABLE_INPUT_SYSTEM
                 var k = Keyboard.current;
                 if (k == null) return Vector2.zero;

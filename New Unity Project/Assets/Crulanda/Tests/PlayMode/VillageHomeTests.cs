@@ -65,8 +65,12 @@ namespace Crulanda.Tests
         {
             yield return Load(19);
             var life = VillageLife.Active; Assert.IsNotNull(life, "Oakhaven has village life.");
-            var folk = life.Villagers.Where(v => !v.Resident).ToList();
+            var folk = life.Villagers.Where(v => !v.Resident && !v.Farmhand).ToList();
             Assert.AreEqual(24, folk.Count, "Twenty villagers, three hen-wives and the innkeeper.");
+            // The farmhands (2026-10-06, playtest note 61): of no household, but each with a house to go home to.
+            var hands = life.Villagers.Where(v => v.Farmhand).ToList();
+            Assert.Greater(hands.Count, 0, "Some fields have farmhands.");
+            foreach (var v in hands) { Assert.IsNull(v.Household, v.Name); Assert.IsNotNull(v.Home, v.Name + " has a home."); }
             foreach (var v in folk)
             {
                 Assert.IsNotNull(v.Household, v.Name + " has a household."); Assert.IsNotNull(v.Home, v.Name + " has a home.");
@@ -119,7 +123,7 @@ namespace Crulanda.Tests
                 Assert.IsNotNull(keeper.Coop);
                 Assert.Less(Flat(keeper.Coop.door, h.house.position), 30, keeper.Name + " keeps the hens by her own farmhouse.");
             }
-            Assert.IsTrue(life.Villagers.Where(v => v.Role == "farmer").All(v => v.Home.name.EndsWith("farmhouse")), "Every farmer lives at a farm.");
+            Assert.IsTrue(life.Villagers.Where(v => v.Role == "farmer" && !v.Farmhand).All(v => v.Home.name.EndsWith("farmhouse")), "Every farmer lives at a farm.");
             Assert.AreEqual("Crisp cottage", life.Find("Aldo Crisp").Home.name, "The miller lives in his cottage, not at the mill.");
             Assert.IsFalse(life.Villagers.Any(v => v.Home != null && v.Home.name == "Oak creek mill"), "Nobody sleeps at the mill.");
         }

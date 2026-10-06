@@ -1798,7 +1798,38 @@ namespace Crulanda.Encounter
             }
             if (!enemy.Camp && StoryEnemies.TrueForAll(e => !e.actor.IsAlive)) Message(ZoneTitle + " is clear for now. " + (Inventory.IsEquipped(Progress, content.itemId) ? "Save [F5]." : "Equip your reward [I], then save [F5]."));
         }
-        void ApplyLevel() { Player.SetLevel(Progress.Level); if (Companion != null) Companion.MatchLevel(Progress.Level); }
+        void ApplyLevel() { Player.SetLevel(Progress.Level); if (Companion != null) Companion.MatchLevel(Progress.Level); ApplyInnate(); }
+        /// <summary>
+        /// The class's own attributes at this level (2026-10-06, playtest note 59: every attribute read 0 without gear): a Warrior
+        /// strong and hardy, a Paladin strong and steady, a Ranger quick, a Druid and a Mage keen of mind and spirit. Balance-neutral:
+        /// the class's base health and power already count them (DerivedStatsController.SetInnate); gear adds on top as before.
+        /// </summary>
+        public static (int sta, int str, int agi, int intel, int spi) Innate(string classId, int level)
+        {
+            int L = Mathf.Max(1, level);
+            switch (classId)
+            {
+                case "class.paladin": return (19 + 2 * L, 18 + 2 * L, 12 + L, 12 + L, 12 + L);
+                case "class.ranger": return (17 + (3 * L) / 2, 12 + L, 20 + 2 * L, 10 + L / 2, 12 + L / 2);
+                case "class.druid": return (15 + (3 * L) / 2, 12 + L, 14 + L, 18 + 2 * L, 18 + 2 * L);
+                case "class.mage": return (13 + L, 8 + L / 2, 10 + L / 2, 22 + 2 * L, 20 + 2 * L);
+                default: return (20 + 2 * L, 20 + 2 * L, 15 + L, 8 + L / 2, 10 + L / 2);   // the Warrior
+            }
+        }
+        readonly object innateSource = new object();
+        void ApplyInnate()
+        {
+            if (Player == null || playerStats == null || ClassDef == null) return;
+            var a = Innate(ClassDef.id, Progress.Level);
+            Player.Stats.SetBase(StatType.Stamina, a.sta); Player.Stats.SetBase(StatType.Strength, a.str); Player.Stats.SetBase(StatType.Agility, a.agi);
+            Player.Stats.SetBase(StatType.Intellect, a.intel); Player.Stats.SetBase(StatType.Spirit, a.spi);
+            // Balance-neutral: what the attributes add to health, attack power, spell power and armour is taken off again, so only
+            // gear moves those numbers (the class's base health and power were tuned without them).
+            var r = ClassDef.stats; Player.Stats.RemoveModifiersFromSource(innateSource);
+            Player.Stats.AddModifiers(new List<StatModifier> {
+                new StatModifier(StatType.MaxHealth, ModifierOp.Flat, -a.sta * r.healthPerStamina, innateSource), new StatModifier(StatType.AttackPower, ModifierOp.Flat, -a.str * r.attackPowerPerStrength, innateSource),
+                new StatModifier(StatType.SpellPower, ModifierOp.Flat, -a.intel * r.spellPowerPerIntellect, innateSource), new StatModifier(StatType.Armor, ModifierOp.Flat, -a.agi * r.armorPerAgility, innateSource) });
+        }
         /// <summary>Development builds only: jump to the prototype level cap so the whole talent tree can be reviewed.</summary>
         public bool PrototypeLevelCap()
         {

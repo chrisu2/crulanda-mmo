@@ -2444,6 +2444,15 @@ namespace Crulanda.World
                 Part(PrimitiveType.Sphere, t, new Vector3(x, y + h / 2 - .03f, -.05f), Vector3.one * .03f, Tint(art.timber, new Color(.2f, .14f, .09f)));   // the nail
             }
         }
+        static Material signText;
+        /// <summary>The font in the sign-text shader (Resources/Shaders/SignText): hidden behind the board like anything solid.</summary>
+        static Material SignTextMaterial(Font font)
+        {
+            if (signText != null) return signText;
+            var sh = Resources.Load<Shader>("Shaders/SignText");
+            signText = sh != null ? new Material(sh) { name = "Sign text", mainTexture = font.material.mainTexture } : font.material;
+            return signText;
+        }
         void Signpost(Transform t, string text = null)
         {
             Stake(t, new Vector3(0, -.1f, 0), .2f, 2.44f, art.timber, Quaternion.Euler(0, 0, 2));
@@ -2459,7 +2468,7 @@ namespace Crulanda.World
                 tm.transform.localPosition = new Vector3(.4f, 1.82f - .4f * .087f, -.12f + side * .045f); tm.transform.localRotation = Quaternion.Euler(0, side < 0 ? 0 : 180, side < 0 ? -5 : 5);
                 tm.text = text; tm.font = font; tm.fontSize = 64; tm.characterSize = Mathf.Min(.03f, 1.1f / Mathf.Max(6, text.Length) * .26f); tm.fontStyle = FontStyle.Bold;
                 tm.anchor = TextAnchor.MiddleCenter; tm.alignment = TextAlignment.Center; tm.color = new Color(.17f, .11f, .05f);
-                var r = tm.GetComponent<MeshRenderer>(); r.sharedMaterial = font.material; r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off; r.receiveShadows = false;
+                var r = tm.GetComponent<MeshRenderer>(); r.sharedMaterial = SignTextMaterial(font); r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off; r.receiveShadows = false;
             }
         }
         /// <summary>

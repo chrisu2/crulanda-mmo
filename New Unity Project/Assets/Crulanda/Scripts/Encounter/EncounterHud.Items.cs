@@ -220,7 +220,7 @@ namespace Crulanda.Encounter
                 ItemSquare(r, dragEquip == slot ? null : s, ItemDatabase.SlotNames[slot].Split(' ')[0]);
                 if (!r.Contains(mouse)) continue;
                 if (!s.Empty && dragBag < 0 && dragEquip < 0) ItemTooltip(session.Items?.Get(s.item), false);
-                else if (s.Empty && dragBag < 0) { tooltip = ItemDatabase.SlotNames[slot] + " (empty)"; tooltipAt = mouse; }
+                else if (s.Empty && dragBag < 0) { tooltip = ItemDatabase.SlotNames[slot] + " (empty)"; tooltipAt = r.center.x < cx ? new Vector2(r.xMin - 190, r.yMax + 4) : new Vector2(r.xMax - 10, r.yMax + 4); }   // beside the slot, clear of the figure
                 if (e.type == EventType.MouseDown && e.button == 0 && !s.Empty) { dragEquip = slot; e.Use(); }
                 else if (e.type == EventType.MouseDown && e.button == 1 && !s.Empty) { session.UnequipSlot(slot); e.Use(); }
                 else if (e.type == EventType.MouseUp && e.button == 0)

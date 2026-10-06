@@ -84,6 +84,7 @@ namespace Crulanda.Encounter
                 var mine = all.FindAll(p => placeName.TryGetValue(p, out var n) && props.Contains(n));
                 if (mine.Count > 0) return mine;
             }
+            if (kind == "field" && fieldOf.TryGetValue(v.Name, out var own)) return own;   // a farmhand's own field
             if (kind == "field" && v.Role == "farmer" && v.Home != null)
             {
                 var near = all.FindAll(p => Vector2.Distance(new Vector2(p.x, p.z), new Vector2(v.Home.position.x, v.Home.position.z)) < 60);
@@ -158,6 +159,7 @@ namespace Crulanda.Encounter
                 for (int i = 0; i < group.count; i++)
                     if (GameAnimals.IsGame(group.kind)) Critter.SkipSpawn(this, group.center, group.radius);
                     else Critters.Add(Critter.Spawn(this, group.kind, group.center, group.radius));
+            SpawnFarmhands(z);
             StartEconomy();
         }
         static readonly string[] KeeperNames = { "Goody Marl", "Hettie Brook", "Nan Pennock", "Old Sorrel" };
@@ -193,6 +195,41 @@ namespace Crulanda.Encounter
         }
         /// <summary>A household made for a house when the zone names none (called after the house).</summary>
         Household Derived(ZoneDoor house) { var h = new Household { name = house.name, house = house }; Households.Add(h); return h; }
+        /// <summary>GAME-ONLY names for the farmhands (2026-10-06).</summary>
+        static readonly string[] FarmhandNames = { "Tam Furrow", "Ned Barley", "Wat Stook", "Hob Tiller", "Joss Reaper", "Col Sheaf", "Abe Gleaner", "Dun Hayward", "Mabb Rake", "Tilda Sickle", "Oswy Plough", "Bran Haulm", "Kit Thresher", "Lew Fallow", "Ima Winnow", "Rook Scythe" };
+        /// <summary>Who works each field (by the farmhand's name): its own four spots, near or far from the village.</summary>
+        readonly Dictionary<string, List<Vector3>> fieldOf = new Dictionary<string, List<Vector3>>();
+        /// <summary>
+        /// Farmhands (2026-10-06, Chris: "farmer should be working their fields"): a field with no farmer living within 60 m of it
+        /// gets a farmhand, at home in the nearest house within 80 m (a field with no house so near stays fallow), working that field
+        /// by the farmer's day. Their own stream of chance, so nothing spawned before them moves.
+        /// </summary>
+        void SpawnFarmhands(ZoneDefinition z)
+        {
+            if (z.fields == null || z.fields.Length == 0) return;
+            var r = new System.Random(z.seed + 211); int n = 0;
+            foreach (var f in z.fields)
+            {
+                var c = new Vector3(f.center.x, 0, f.center.y);
+                bool worked = Villagers.Exists(v => v.Role == "farmer" && v.Home != null && Vector2.Distance(new Vector2(v.Home.position.x, v.Home.position.z), f.center) < 60);
+                if (worked) continue;
+                ZoneDoor home = null; float best = 80 * 80;
+                foreach (var h in Homes) { float d = (new Vector2(h.position.x, h.position.z) - f.center).sqrMagnitude; if (d < best) { best = d; home = h; } }
+                if (home == null) continue;
+                var spots = new List<Vector3>(); float a = f.rotation * Mathf.Deg2Rad;
+                for (int i = 0; i < 4; i++)
+                {
+                    var local = new Vector2(((float)r.NextDouble() - .5f) * f.size.x * .8f, ((float)r.NextDouble() - .5f) * f.size.y * .8f);
+                    var p = f.center + new Vector2(local.x * Mathf.Cos(a) - local.y * Mathf.Sin(a), local.x * Mathf.Sin(a) + local.y * Mathf.Cos(a));
+                    var at = Zone.Ground(p); if (NavMesh.SamplePosition(at, out var hit, 3, NavMesh.AllAreas)) spots.Add(hit.position);
+                }
+                if (spots.Count == 0) continue;
+                string name = FarmhandNames[n % FarmhandNames.Length]; n++;
+                fieldOf[name] = spots;
+                var household = Households.Find(h => h.house == home);
+                Settle(Villager.Spawn(this, name, "farmer", 80 + n, home, spots[0], null, null, "Farmhand"), household);
+            }
+        }
         void Settle(Villager v, Household household) { Villagers.Add(v); v.Household = household; if (household != null) household.members.Add(v); }
         /// <summary>Who is indoors behind this door now (hidden at home: abed, at dinner, or fled in).</summary>
         public List<Villager> AtHome(ZoneDoor door) { return Villagers.FindAll(v => v.Home == door && v.Indoors); }
@@ -1413,6 +1450,9 @@ namespace Crulanda.Encounter
             if (NavMesh.SamplePosition(spawnAt, out var spawnHit, 3, NavMesh.AllAreas) && !life.Zone.WaterAt(new Vector2(spawnHit.position.x, spawnHit.position.z), out _, out _)) spawnAt = spawnHit.position;
             go.transform.position = spawnAt; go.transform.rotation = Quaternion.Euler(0, life.R01 * 360, 0);
             c.seed = life.R01 * 100; c.body = CritterBody.Build(go.transform, kind, life.R01, c.seed); c.until = Time.time + life.R01 * 4;
+            // Solid (2026-10-06, Chris: "can run through cows. they need physics"): a box the size of the beast, turning with it.
+            var size = kind == "horse" ? new Vector3(.7f, 1.6f, 2.2f) : kind == "cow" ? new Vector3(.8f, 1.35f, 2f) : kind == "donkey" ? new Vector3(.55f, 1.15f, 1.6f) : kind == "sheep" ? new Vector3(.6f, .8f, 1.1f) : Vector3.zero;
+            if (size != Vector3.zero) { var box = go.AddComponent<BoxCollider>(); box.size = size; box.center = new Vector3(0, size.y / 2, 0); }
             c.rends = go.GetComponentsInChildren<Renderer>();
             if (kind == "chicken")
             {

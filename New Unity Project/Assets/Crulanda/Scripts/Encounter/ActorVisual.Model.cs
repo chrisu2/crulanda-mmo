@@ -264,6 +264,9 @@ namespace Crulanda.Encounter
             }
             string Kind(Transform c) { var f = c.GetComponent<MeshFilter>(); return f != null && f.sharedMesh != null ? f.sharedMesh.name : ""; }
             bool brimmed = hats.Exists(c => Kind(c).StartsWith("Cylinder") && c.localScale.x >= .4f && c.localScale.y <= .03f);   // a brim disc: a hat with a crown
+            // No brimmed hat on a model (2026-10-06, Chris: "this hat on any npc is terrible looking"): the straw hat and its kind are
+            // a flat disc on a drum, never right on a modelled head. The wearer goes bareheaded.
+            if (brimmed) { foreach (var c in hats) Kill(c); hats.Clear(); brimmed = false; }
             bool puffed = hats.Exists(c => Kind(c).StartsWith("Sphere") && c.localPosition.y >= .98f);                               // a baker's puff on its band
             var caps = hats.FindAll(c => Kind(c).StartsWith("Sphere") && c.localPosition.y < .98f && c.localScale.x >= .25f
                 || !brimmed && !puffed && Kind(c).StartsWith("Cylinder") && c.localScale.x < .4f && c.localScale.y <= .1f);

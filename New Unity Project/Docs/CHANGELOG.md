@@ -1262,3 +1262,23 @@ A read-only review by five reviewers, each finding checked by a second who tried
 - Tests: EditMode RangerRulesTests (tree, gates, content; four classes now), PlayMode RangerLoopTests (own character, Quick
   Shot at 15 m and the auto-shot's second arrow, the drawn Aimed Shot, Mark and Snare, the wolf called and sent, Disengage).
   capture_extra.ps1 takes the Ranger's HUD shots (prefix ranger-).
+
+## 2026-10-05 — Phase 5.1c: the Mage (published, late night)
+- **A fifth playable class (provisional GAME-ONLY name and mechanics, after CLASS_BUILD_MATRIX's Combustion ranged, Heatweaver
+  control, Spellbinder support):** a caster on Mana with a second, visible gauge, Heat (0-100). Ember Bolt (a 1.5 s cast, 15
+  Heat), Scorch (an instant burn that keeps burning, 10) and Smoulder (a slow, 5) build it; Flare releases all of it at once (the
+  more Heat, the harder; needs 30); reaching 100 is an Overload: a burn of 8% of your own health, the gauge emptied and four
+  seconds in which nothing builds. Cinder Field burns the ground under the target (4 m, 8 s), Ember Ward is a barrier, Bind makes
+  the next Ember Bolt 40% weaker and banks a Charge, Unbind spends it so the whole party hits 15% harder for 10 s, and the
+  talent action Quench holds the target's swing 2 s and ends an Overload's stall. 21 talents in three rows of Combustion,
+  Heatweaver and Spellbinder (EncounterContent/Talents/mage.json), all with effects (MageKit): Kindling, Hot Hands, Stoked,
+  Flashpoint, Backdraft (an instant bolt after Flare), Inferno, White Heat (Overload no longer burns); Cinders, Slow Burn, Wide
+  Field, Embers Underfoot (the field slows), Heat Haze (enemies in it hit softer), Long Burn, Firestorm (Smoulder in the field
+  roots); Reservoir, Ward Weave, Quench, Shared Flame (Unbind heals), Steady Mind, Quickening (Unbind hastes Mira), Binding
+  Oath (25%).
+- **Looks:** the Mage in violet and a hood, a woman, with the packs' Cartoon_Staff_01 in the right hand gripped 40% up like the
+  Druid's staff (ActorVisual.ClassModels.cs now knows a staff's own grip), slung across the back when swimming, yielding to a
+  main-hand item. Icons painted for the nine actions and the 21 talents (embers, a cold snap for Quench, violet bindings).
+  capture_extra.ps1 takes the Mage's HUD shots (prefix mage-).
+- Tests: EditMode MageRulesTests (tree, gates, content; five classes now), PlayMode MageLoopTests (own character, the cast and
+  the Heat it builds, Flare's release, the Overload and its stall, Cinder Field and Smoulder, Bind, Unbind and Ember Ward).

@@ -51,6 +51,7 @@ namespace Crulanda.Encounter
         public DruidKit Druid { get { return Kit as DruidKit; } }
         public PaladinKit Paladin { get { return Kit as PaladinKit; } }
         public RangerKit Ranger { get { return Kit as RangerKit; } }
+        public MageKit Mage { get { return Kit as MageKit; } }
         /// <summary>The Ranger's wolf (RangerPet), while one is called.</summary>
         public RangerPet Pet { get; private set; }
         /// <summary>Whistles up the Ranger's wolf beside the player (the old one, if any, let go first).</summary>

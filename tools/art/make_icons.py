@@ -1491,6 +1491,59 @@ def a_pin(c):
     arrow(c, 38, 10, 52, 76, w=3)
     c.glow(c.ell(52, 76, 6), '#ffb040', halo=6, power=.6)
 
+# ---- mage (Phase 5.1c, 2026-10-05): ember orange, violet robes, white heat ----
+EMBER = '#ff7a2a'; VIOLETM = '#8a5ae0'; WHITEHEAT = '#fff2c0'
+def flame_tongue(c, x, y, h, w, color, core='#ffe070', power=.8):
+    f = c.poly([(x, y), (x + w * .5, y - h * .35), (x + w * .3, y - h * .55), (x + w * .15, y - h), (x - w * .1, y - h * .6), (x - w * .5, y - h * .4)], smooth=True)
+    c.glow(f, color, core=core, halo=8, power=power)
+def a_ember_bolt(c):
+    c.back(c.taper([(6, 94), (70, 30)], 2, 24, smooth=False), EMBER, .5, 6)
+    c.glow(c.taper([(10, 90), (64, 36)], 2, 10, smooth=False), '#ffb040', core=WHITEHEAT, halo=10, power=.8)
+    c.glow(c.ell(70, 30, 13), EMBER, core=WHITEHEAT, halo=14, power=.9)
+    flame_tongue(c, 72, 24, 26, 18, EMBER)
+def a_scorch(c):
+    c.part(c.ell(50, 72, 36, 14), '#3a2418', 'matte')
+    for x, h in ((26, 22), (38, 34), (50, 44), (62, 36), (74, 24)): flame_tongue(c, x, 74, h, 16, EMBER, power=.7)
+    for x, y in ((30, 80), (52, 84), (70, 80)): c.glow(c.ell(x, y, 2.5), '#ff4a20', halo=4, power=.7)
+def a_flare(c):
+    c.back(c.ell(50, 50, 40), EMBER, .5, 14)
+    rays(c, 50, 50, 14, 46, 10, '#ffb040', .6, 8)
+    c.glow(c.ell(50, 50, 16), '#ff9a30', core=WHITEHEAT, halo=16, power=1)
+def a_cinder_field(c):
+    c.part(c.ell(50, 70, 42, 18), '#4a2818', 'matte'); c.part(c.ell(50, 70, 32, 12), '#8a3a20', 'matte')
+    rings(c, 50, 70, (36,), EMBER, .6, w=3)
+    for x, y in ((28, 70), (40, 64), (54, 74), (66, 66), (74, 74), (48, 60)): c.glow(c.ell(x, y, 3.5), '#ff6a20', core=WHITEHEAT, halo=7, power=.9)
+    flame_tongue(c, 50, 62, 30, 14, EMBER, power=.6)
+def a_smoulder(c):
+    c.part(c.ell(50, 74, 30, 12), '#3a2a24', 'matte')
+    for x, y in ((38, 72), (52, 76), (62, 70)): c.glow(c.ell(x, y, 4), '#e04a20', halo=6, power=.8)
+    for i, (x0, y0) in enumerate(((36, 66), (50, 66), (62, 64))):
+        c.part(c.taper([(x0, y0), (x0 + 6, y0 - 16), (x0 - 4, y0 - 32), (x0 + 4, y0 - 48)], 7, 2), '#8a8a90', 'soft', alpha=.75)
+def a_ember_ward(c):
+    c.back(c.ell(50, 50, 38), VIOLETM, .4, 12)
+    d = c.poly([(50, 8), (84, 26), (84, 56), (50, 94), (16, 56), (16, 26)], smooth=True, n=4)
+    c.part(d, '#5a3aa0', 'gem'); c.part(c.grow(d, -8), '#8a5ae0', 'gem'); c.shine(c.ell(36, 34, 7, 14, rot=20), .5, clip=d)
+    rings(c, 50, 50, (44,), EMBER, .6, w=3)
+    flame_tongue(c, 50, 68, 30, 18, EMBER, power=.7)
+def a_bind(c):
+    c.back(c.ell(50, 50, 36), VIOLETM, .4, 10)
+    for r, w in ((30, 5), (21, 4)): rings(c, 50, 50, (r,), '#c8a0ff', .7, w=w)
+    c.part(c.line([(50, 14), (50, 86)], 4), '#e0c8ff', 'gem'); c.part(c.line([(14, 50), (86, 50)], 4), '#e0c8ff', 'gem')
+    c.glow(c.ell(50, 50, 9), EMBER, core=WHITEHEAT, halo=10, power=.9)
+def a_unbind(c):
+    c.back(c.ell(50, 50, 40), EMBER, .5, 14)
+    rays(c, 50, 50, 18, 48, 8, '#c8a0ff', .5, 7, rot=22)
+    for r in (30, 22): rings(c, 50, 50, (r,), '#c8a0ff', .5, w=3, a0=10, a1=170)
+    c.glow(c.ell(50, 50, 12), VIOLETM, core=WHITEHEAT, halo=14, power=1)
+def a_quench(c):
+    c.part(c.ell(50, 74, 30, 12), '#3a2a24', 'matte')
+    for x, y in ((40, 72), (56, 74)): c.glow(c.ell(x, y, 4), '#8a3a20', halo=4, power=.4)
+    c.back(c.ell(50, 40, 30), '#70c0f0', .5, 10)
+    for i in range(6):
+        a = i * 60
+        c.part(c.line([(50, 40), (50 + 26 * math.cos(math.radians(a)), 40 + 26 * math.sin(math.radians(a)))], 3), '#d8f0ff', 'gem')
+    c.glow(c.ell(50, 40, 7), '#a0e0ff', core='#ffffff', halo=8, power=.8)
+
 ABILITIES = {
     'ability.strike': ('#6a2a20', a_strike), 'ability.challenge': ('#6a2420', a_challenge), 'ability.guard': ('#24406a', a_guard),
     'ability.intercept': ('#1f4a54', a_intercept), 'ability.breaching_blow': ('#6a3c14', a_breach), 'ability.muster': ('#4f5a1e', a_muster),
@@ -1506,6 +1559,8 @@ ABILITIES = {
     'paladin.censure': ('#4a3018', a_censure),
     'ranger.quick_shot': ('#2c3e22', a_quick_shot), 'ranger.aimed_shot': ('#3a2a22', a_aimed_shot), 'ranger.barbed_arrow': ('#3a2420', a_barbed_arrow), 'ranger.hunters_mark': ('#3a2c18', a_hunters_mark),
     'ranger.snare': ('#2a3420', a_snare), 'ranger.call_companion': ('#2c3a2a', a_call_companion), 'ranger.sic': ('#3a2a20', a_sic), 'ranger.disengage': ('#2a3a22', a_disengage), 'ranger.pin': ('#3a3020', a_pin),
+    'mage.ember_bolt': ('#3a2018', a_ember_bolt), 'mage.scorch': ('#3a2018', a_scorch), 'mage.flare': ('#40200e', a_flare), 'mage.cinder_field': ('#302018', a_cinder_field),
+    'mage.smoulder': ('#2a2224', a_smoulder), 'mage.ember_ward': ('#2a1e40', a_ember_ward), 'mage.bind': ('#281e3c', a_bind), 'mage.unbind': ('#3a2230', a_unbind), 'mage.quench': ('#1e2a3a', a_quench),
 }
 
 # ---- talents: an emblem per icon word, in the branch's colours ----
@@ -1586,6 +1641,8 @@ BRANCH = {
     'sanctuary': ('#3a3c22', ['#ffe9a0', '#9be05a', '#e0b040', '#f0f0d0', '#8ad0f0']),
     'marksman': ('#3a2e20', ['#e0503a', '#ffb040', '#d8d0b0', '#c8e070', '#f0c890']), 'beastbond': ('#2e3a2a', ['#c8c0b0', '#e0503a', '#9be05a', '#d0a060', '#8ad0f0']),
     'pathfinder': ('#2a3a22', ['#9be05a', '#c8e070', '#e0b040', '#70c0f0', '#d8d0b0']),
+    'combustion': ('#40200e', ['#ff7a2a', '#ffb040', '#fff2c0', '#e0503a', '#ffd070']), 'heatweaver': ('#3a2418', ['#ff6a20', '#d07040', '#ffb040', '#8a8a90', '#e0c040']),
+    'spellbinder': ('#281e3c', ['#c8a0ff', '#8a5ae0', '#ff7a2a', '#70c0f0', '#e0c8ff']),
 }
 KIND_TRIM = dict(passive='#c9ccd2', modifier='#e0b040', active='#fff0b0', signature='#fff0b0', capstone='#ffd040')
 def draw_talent(c, icon, branch, kind, k):

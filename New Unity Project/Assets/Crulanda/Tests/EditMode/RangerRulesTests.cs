@@ -55,7 +55,7 @@ namespace Crulanda.Tests
             CollectionAssert.AreEqual(RangerKit.BarIds, ranger.definition.unlocks.Select(u => u.abilityId).ToArray(), "The unlocks are the bar, in order.");
             Assert.AreEqual("pf-pin", ranger.definition.unlocks.Last().talentId, "Pin is the talent action.");
             Assert.AreEqual(content.abilities.Length, ids.Count, "No duplicate ability ids.");
-            Assert.AreEqual(4, content.AllClasses().Count(), "Warrior, Druid, Paladin, Ranger.");
+            Assert.AreEqual(5, content.AllClasses().Count(), "Warrior, Druid, Paladin, Ranger, Mage.");
         }
     }
 }

@@ -55,6 +55,7 @@ namespace Crulanda.Encounter
                 case "class.druid": return new DruidKit(session, definition, catalog);
                 case "class.paladin": return new PaladinKit(session, definition, catalog);
                 case "class.ranger": return new RangerKit(session, definition, catalog);
+                case "class.mage": return new MageKit(session, definition, catalog);
                 default: throw new ArgumentException("No class kit for '" + classId + "'.");
             }
         }

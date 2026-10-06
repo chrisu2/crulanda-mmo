@@ -470,6 +470,14 @@ namespace Crulanda.Encounter
                         Part(PrimitiveType.Cylinder, body, new Vector3(0, .3f, -.27f), new Vector3(.18f, .02f, .18f), accent, new Vector3(90, 0, 0)) };
                     break;
                 }
+                case ActorLook.Mage:   // a staff from the packs in the right hand, gripped 40% up like the Druid's; across the back for swimming
+                {
+                    if (modelled) classKit = model.Hood != null ? new[] { model.Hood.transform } : new Transform[0];
+                    var staffM = HeldModel("Cartoon_Staff_01", armR, new Vector3(0, -.62f, .1f), new Vector3(0, 90, 0), 1, .4f);
+                    var slungM = HeldModel("Cartoon_Staff_01", body, new Vector3(.1f, .25f, -.27f), new Vector3(0, 0, -30), 1, .4f);
+                    held = staffM != null ? new[] { staffM } : new Transform[0]; stowed = slungM != null ? new[] { slungM } : new Transform[0];
+                    break;
+                }
                 case ActorLook.Ranger:   // the bow in the left hand, limbs up and down in front of the fist; slung across the back for swimming
                 {
                     if (modelled) classKit = model.Hood != null ? new[] { model.Hood.transform } : new Transform[0];

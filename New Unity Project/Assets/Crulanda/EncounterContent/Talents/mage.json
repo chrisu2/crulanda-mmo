@@ -1,0 +1,57 @@
+{
+ "id": "mage",
+ "name": "Mage",
+ "resource": "Mana and Heat",
+ "resourceDesc": "Mana pays for every spell; Heat (0-100) builds with Ember Bolt, Scorch and Smoulder, is released by Flare, and at 100 Overloads: it burns you, empties, and builds nothing for four seconds.",
+ "identity": "A caster who builds Heat and chooses the moment to release it, or banks part of a cast to make the whole party hit harder.",
+ "branches": [
+  {
+   "id": "combustion",
+   "name": "Combustion",
+   "role": "dps",
+   "loop": "Build Heat with Ember Bolt and Scorch, release it with Flare before it reaches 100, and let Backdraft make the next bolt instant.",
+   "tradeoff": "Overcommitting to Heat means an Overload: a burn of your own health and seconds of nothing.",
+   "nodes": [
+    {"id": "cb-kindling", "name": "Kindling", "tier": 0, "col": 1, "max": 5, "req": null, "kind": "passive", "icon": "flame", "desc": "Ember Bolt hits 3% harder per rank.", "emphasis": {"damage": 1}, "impl": true},
+    {"id": "cb-hot-hands", "name": "Hot Hands", "tier": 0, "col": 2, "max": 3, "req": null, "kind": "modifier", "icon": "clock", "desc": "Ember Bolt casts 0.1s faster per rank.", "emphasis": {"tempo": 1}, "impl": true},
+    {"id": "cb-stoked", "name": "Stoked", "tier": 1, "col": 0, "max": 3, "req": null, "kind": "passive", "icon": "spiral", "desc": "Scorch burns for one more tick per rank.", "emphasis": {"damage": 0.8}, "impl": true},
+    {"id": "cb-flashpoint", "name": "Flashpoint", "tier": 1, "col": 1, "max": 3, "req": null, "kind": "passive", "icon": "star", "desc": "Flare hits 8% harder per rank.", "emphasis": {"damage": 1.5}, "impl": true},
+    {"id": "cb-backdraft", "name": "Backdraft", "tier": 1, "col": 2, "max": 1, "req": null, "kind": "modifier", "icon": "bolt", "desc": "After a Flare the next Ember Bolt is instant.", "emphasis": {"tempo": 1.5}, "impl": true},
+    {"id": "cb-inferno", "name": "Inferno", "tier": 2, "col": 1, "max": 1, "req": "cb-kindling", "kind": "passive", "icon": "flame", "desc": "A Flare of 70 Heat or more also burns a second enemy within 4 m for half.", "emphasis": {"damage": 1.5}, "impl": true},
+    {"id": "cb-white-heat", "name": "White Heat", "tier": 2, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "crystal", "desc": "An Overload no longer burns you; it still empties the Heat and stalls it.", "emphasis": {"sustain": 2}, "impl": true}
+   ]
+  },
+  {
+   "id": "heatweaver",
+   "name": "Heatweaver",
+   "role": "control",
+   "loop": "Lay a Cinder Field under the fight, slow with Smoulder what tries to leave it, and keep the field burning longer and wider.",
+   "tradeoff": "The field is where it was cast; enemies that move or scatter take little of it.",
+   "nodes": [
+    {"id": "hw-cinders", "name": "Cinders", "tier": 0, "col": 1, "max": 5, "req": null, "kind": "passive", "icon": "flame", "desc": "Cinder Field burns 10% harder per rank.", "emphasis": {"damage": 1}, "impl": true},
+    {"id": "hw-slow-burn", "name": "Slow Burn", "tier": 0, "col": 2, "max": 3, "req": null, "kind": "modifier", "icon": "clock", "desc": "Smoulder lasts 1s longer per rank.", "emphasis": {"control": 1}, "impl": true},
+    {"id": "hw-wide-field", "name": "Wide Field", "tier": 1, "col": 0, "max": 3, "req": null, "kind": "passive", "icon": "spiral", "desc": "Cinder Field reaches 0.5 m further per rank.", "emphasis": {"control": 0.8}, "impl": true},
+    {"id": "hw-embers-underfoot", "name": "Embers Underfoot", "tier": 1, "col": 1, "max": 1, "req": null, "kind": "modifier", "icon": "chain", "desc": "Enemies in your Cinder Field are slowed by 20%.", "emphasis": {"control": 1.5}, "impl": true},
+    {"id": "hw-heat-haze", "name": "Heat Haze", "tier": 1, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "eye", "desc": "Enemies in your Cinder Field hit 4% softer per rank.", "emphasis": {"mitigation": 1}, "impl": true},
+    {"id": "hw-long-burn", "name": "Long Burn", "tier": 2, "col": 1, "max": 3, "req": "hw-cinders", "kind": "passive", "icon": "gear", "desc": "Cinder Field burns 2s longer per rank.", "emphasis": {"damage": 1}, "impl": true},
+    {"id": "hw-firestorm", "name": "Firestorm", "tier": 2, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "skull", "desc": "Smoulder on a target standing in your Cinder Field holds it there for 2s.", "emphasis": {"control": 2}, "impl": true}
+   ]
+  },
+  {
+   "id": "spellbinder",
+   "name": "Spellbinder",
+   "role": "support",
+   "loop": "Bind, cast a weaker Ember Bolt to bank a Charge, then Unbind when the party is on the target; Ember Ward and Quench cover the rest.",
+   "tradeoff": "Every bound bolt is damage not dealt now, and a Charge wasted on an empty field is a bolt lost.",
+   "nodes": [
+    {"id": "sb-reservoir", "name": "Reservoir", "tier": 0, "col": 1, "max": 5, "req": null, "kind": "passive", "icon": "crystal", "desc": "Unbind lasts 1s longer per rank.", "emphasis": {"support": 1}, "impl": true},
+    {"id": "sb-ward-weave", "name": "Ward Weave", "tier": 0, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "shield", "desc": "Ember Ward holds 6% more per rank.", "emphasis": {"mitigation": 1}, "impl": true},
+    {"id": "sb-quench", "name": "Quench", "tier": 1, "col": 0, "max": 1, "req": null, "kind": "active", "icon": "hand", "desc": "New action: a cold snap that holds the target's swing back 2s and steadies your own Heat after an Overload.", "emphasis": {"control": 2}, "impl": true},
+    {"id": "sb-shared-flame", "name": "Shared Flame", "tier": 1, "col": 1, "max": 3, "req": null, "kind": "passive", "icon": "heart", "desc": "Unbind also heals you and Mira for 3% of your health per rank.", "emphasis": {"sustain": 1}, "impl": true},
+    {"id": "sb-steady-mind", "name": "Steady Mind", "tier": 1, "col": 2, "max": 3, "req": null, "kind": "modifier", "icon": "eye", "desc": "A bound Ember Bolt loses 10% less per rank.", "emphasis": {"damage": 0.8}, "impl": true},
+    {"id": "sb-quickening", "name": "Quickening", "tier": 2, "col": 1, "max": 3, "req": "sb-reservoir", "kind": "passive", "icon": "clock", "desc": "While Unbound, Mira casts 10% faster per rank.", "emphasis": {"support": 1.5}, "impl": true},
+    {"id": "sb-binding-oath", "name": "Binding Oath", "tier": 2, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "banner", "desc": "Unbind makes the party hit 25% harder instead of 15%.", "emphasis": {"support": 2}, "impl": true}
+   ]
+  }
+ ]
+}

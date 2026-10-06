@@ -97,7 +97,7 @@ namespace Crulanda.Encounter
             if (gearDriven) return;
             gearDriven = true; classHeld = held; classStowed = stowed; held = stowed = null;
             for (int s = 0; s < GearSlots; s++) gearMore[s] = new List<Transform>();
-            if (built == ActorLook.Druid || built == ActorLook.Ranger) return;   // the staff and the bow yield to a main-hand item (RefreshHeld); the hood waits for the head slot
+            if (built == ActorLook.Druid || built == ActorLook.Ranger || built == ActorLook.Mage) return;   // the staff and the bow yield to a main-hand item (RefreshHeld); the hood waits for the head slot
             Kill(classKit); Kill(classHeld); Kill(classStowed); classKit = classHeld = classStowed = null;
         }
         /// <summary>Points the held/stowed switch at the gear roots (and the Druid's staff while the main hand is empty) and shows the right set.</summary>

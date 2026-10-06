@@ -9,8 +9,14 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-10-05, night)
-**5.1b the Ranger: PUBLISHED 2026-10-05 night, committed, backed up (see CHANGELOG). Next: 5.1c the Mage, then 5.2 sim profiles.**
+## RESUME HERE (updated 2026-10-05, late night)
+**5.1c the Mage: PUBLISHED 2026-10-05 late night, committed, backed up (see CHANGELOG). Phase 5.1 is complete: five classes
+(Warrior, Druid, Paladin, Ranger, Mage). Next: 5.2 sim profiles (Docs/ROADMAP.md): ~20 persistent SimAdventurers with stable
+ids, name, race, class (any of the five kits), level, gear, personality and home zone, saved, materialised as figures in the
+player's zone. Mage notes: Heat gauge (MageKit.GainHeat/Overload), Cinder Field is a periodic effect on the player keyed
+"cinder" with fieldCentre/FieldRadius, Bind/Unbind drive PartyDamageMultiplier and CompanionHaste; the staff is a model class
+kit (Cartoon_Staff_01) like the Ranger's bow.**
+**5.1b the Ranger: PUBLISHED 2026-10-05 night, committed, backed up (see CHANGELOG).**
 Ranger notes for the Mage round: the ranged auto-attack is ClassKit.RangedAutoAttacks + AutoAttackRange (EncounterSession's
 BeginAutoAttack and the swing loop honour them; a release pose instead of a swing); the wolf is RangerPet (EncounterSession.Pet,
 SummonWolf/DismissPet, a party member through PartyActor so enemies turn on it; not saved); the bow is a model class kit

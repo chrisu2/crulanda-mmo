@@ -454,6 +454,12 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
   burst of embers for the Mage's spells, Thornbolt and Seedshot, Judgement; arrows for the Ranger's shots and auto-shot.
 - **53. "Killed one wolf, backed up a few steps, the other ran back home. Should have been more aggressive."** DONE (round 22):
   the leash 30 m from where the pull began (was 17) with 6 m of give (was 2).
+- **54. "All the sim players are invisible."** DONE (2026-10-06): their figure's model was hidden with its placeholder capsule.
+- **55. "People T-pose too much"; "it's all characters"; "they were doing it before the jump fix"** (and note 51's "stands too
+  long with arms up", which I misread as the cast pose). DONE (2026-10-06): the importer imported Morro Motion's mocap idles from
+  frame 0, so each loop began with the capture's calibration T-pose for a few seconds: anyone standing still went into a T now
+  and then. The vendor's trimmed range is kept now. Also every figure now uses the body's avatar (the Ranger outfit's own is
+  not mapped). FigureAnimationTests watches everyone in Oakhaven for ten seconds.
 - **Asset queue (Chris, 2026-10-05), for the next art rounds:** Stylized Nature MegaKit (outdoor areas), Medieval Village
   MegaKit (housing), Fantasy Props MegaKit, Stylized Megapack 2in1 (all in Downloads), the Asset Store's Medieval props and HQ
   Rock Pack (boulders and crags), the Ashen Marches sentinel helm (a model helm needs the armour path), and the Ash-Walker

@@ -1320,3 +1320,12 @@ A read-only review by five reviewers, each finding checked by a second who tried
   health and what it is doing. The party is not saved yet.
 - Tests: PlayMode SimPartyTests (joins, follows and leaves; the busy and the far-off decline and the party holds three; fights
   your target). HUD captures 40-sim-invite and 41-sim-party.
+
+## 2026-10-06 — T-pose fix and visible sims (playtest notes 54-55)
+- **No more T-poses:** CharacterImport imported the Morro Motion idles (Round 21) from the first frame of each take, which is the
+  capture's calibration T-pose; every figure standing still went into a T for a few seconds of each loop. It keeps the vendor's
+  trimmed range now (importer version 7). ModelFigure always gives a figure the body's avatar (the Ranger outfit's own avatar
+  calls itself humanoid but is not mapped).
+- **Sims visible:** their figures were hidden along with the placeholder capsule.
+- Tests: PlayMode FigureAnimationTests (you as Warrior and as Mage, Mira, party sims, world sims, enemies and villagers: no hands
+  more than 1.1 m apart in ten seconds of watching), SimPopulationTests checks a figure is drawn.

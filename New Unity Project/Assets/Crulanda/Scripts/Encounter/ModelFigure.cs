@@ -144,7 +144,10 @@ namespace Crulanda.Encounter
             var go = Object.Instantiate(outfitSrc, body, false); go.name = "Model"; f.Model = go.transform;
             f.Model.localPosition = new Vector3(0, -1, 0); f.Model.localRotation = Quaternion.Euler(0, 180, 0); f.Model.localScale = Vector3.one * (s.scale > 0 ? s.scale : 1);
             f.Animator = go.GetComponent<Animator>(); if (f.Animator == null) f.Animator = go.AddComponent<Animator>();
-            if (f.Animator.avatar == null || !f.Animator.avatar.isHuman) { var a = bodySrc.GetComponent<Animator>(); if (a != null) f.Animator.avatar = a.avatar; }
+            // Always the body's avatar, the one the clips are made for (2026-10-06, "people t pose too much"): the Ranger outfit's own
+            // avatar calls itself humanoid but its bones are not mapped, so everyone in the Ranger kit (the sims, the warden, the
+            // stranger) stood in the bind pose. The outfits share the body's skeleton.
+            { var a = bodySrc.GetComponent<Animator>(); if (a != null && a.avatar != null && a.avatar.isHuman) f.Animator.avatar = a.avatar; }
             f.Animator.applyRootMotion = false; f.Animator.cullingMode = AnimatorCullingMode.CullUpdateTransforms; f.Animator.runtimeAnimatorController = null;
             f.bones = new Dictionary<string, Transform>();
             foreach (var t in go.GetComponentsInChildren<Transform>(true)) if (!f.bones.ContainsKey(t.name)) f.bones[t.name] = t;

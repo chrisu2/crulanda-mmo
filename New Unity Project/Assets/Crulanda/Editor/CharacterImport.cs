@@ -17,7 +17,7 @@ namespace Crulanda.EditorTools
     {
         const string Root = "Assets/Crulanda/Resources/Characters/";
         /// <summary>Bumped when the import settings change, so Unity imports the models and clips again.</summary>
-        public override uint GetVersion() { return 6; }
+        public override uint GetVersion() { return 7; }
         void OnPreprocessModel()
         {
             if (!assetPath.StartsWith(Root)) return;
@@ -34,6 +34,10 @@ namespace Crulanda.EditorTools
         {
             if (!assetPath.StartsWith(Root) || !assetPath.Contains("/Animations/")) return;
             var m = (ModelImporter)assetImporter; var clips = m.defaultClipAnimations;
+            // Morro Motion's idles come trimmed (their clip starts after the capture's calibration T-pose, frame 85-166): keep the
+            // vendor's range. From the take's start every idling figure stood in a T for seconds each loop (2026-10-06, "people t
+            // pose too much").
+            if (assetPath.Contains("/Animations/Morro/") && m.clipAnimations != null && m.clipAnimations.Length > 0) clips = m.clipAnimations;
             // Kevin Iglesias's motions (Animations/KI, "HumanM@Walk01_Forward"): the cycles loop (idles, walk, run, sprint, talk, the
             // jump's middle and the fall); the turns, the jump's start and landing and the idles' crossings play once.
             string file = Path.GetFileNameWithoutExtension(assetPath); bool ki = assetPath.Contains("/Animations/KI/");

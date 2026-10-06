@@ -84,7 +84,7 @@ namespace Crulanda.Encounter
         public void Choose()
         {
             Quarry = null; Node = null; float health = actor.Health.Pool.Ratio;
-            if (!population.Lively) { Start(Doing.Loiter); return; }
+            if (!population.Lively) { Begin(Doing.Loiter); return; }
             float Noise() { return Random.value * .3f; }
             var prey = health > .6f ? FindPrey() : null; var node = FindNode(); var inn = Inn;
             float hunt = prey != null ? .35f + .6f * sim.bold + Noise() : -1;
@@ -92,13 +92,13 @@ namespace Crulanda.Encounter
             float rest = inn != null ? (health < .6f ? 1.2f : .12f + .2f * sim.chatty) + Noise() : -1;
             float loiter = .25f + .45f * sim.chatty + Noise();
             float top = Mathf.Max(Mathf.Max(hunt, gather), Mathf.Max(rest, loiter));
-            if (top == hunt) Start(Doing.Hunt, prey: prey);
-            else if (top == gather) Start(Doing.Gather, node: node);
-            else if (top == rest) Start(Doing.Inn);
-            else Start(Doing.Loiter);
+            if (top == hunt) Begin(Doing.Hunt, prey: prey);
+            else if (top == gather) Begin(Doing.Gather, node: node);
+            else if (top == rest) Begin(Doing.Inn);
+            else Begin(Doing.Loiter);
         }
         /// <summary>Starts an activity (tests and the choice).</summary>
-        public void Start(Doing what, EncounterEnemy prey = null, ZoneInteractable node = null)
+        public void Begin(Doing what, EncounterEnemy prey = null, ZoneInteractable node = null)
         {
             Activity = what; Quarry = prey; Node = node; stuckSince = Time.time; goal = 0;
             switch (what)
@@ -156,7 +156,7 @@ namespace Crulanda.Encounter
                 Quarry = null;
                 // Another, while it has the health and the will; then a rest.
                 if (goal > 0 && actor.Health.Pool.Ratio > .45f && Time.time < until) Quarry = FindPrey(60);
-                if (Quarry == null) { if (actor.Health.Pool.Ratio < .6f) Start(Doing.Inn); else Choose(); }
+                if (Quarry == null) { if (actor.Health.Pool.Ratio < .6f) Begin(Doing.Inn); else Choose(); }
                 return;
             }
             // Someone else has it (you, or another sim): leave it to them.
@@ -232,7 +232,7 @@ namespace Crulanda.Encounter
         {
             if (Activity != Doing.Down) { Activity = Doing.Down; downSince = Time.time; Quarry = null; if (agent.isOnNavMesh) agent.isStopped = true; visual.Pose = ActorPose.None; }
             // Up again a little later (the run back from a graveyard is Phase 5.3b), and off to rest.
-            if (Time.time - downSince > 12) { actor.Health.Revive(Mathf.RoundToInt(actor.Health.Pool.Max * .35f)); Start(Doing.Inn); }
+            if (Time.time - downSince > 12) { actor.Health.Revive(Mathf.RoundToInt(actor.Health.Pool.Max * .35f)); Begin(Doing.Inn); }
         }
         void OnDisable() { if (visual != null && Activity == Doing.Gather) visual.Pose = ActorPose.None; }
     }

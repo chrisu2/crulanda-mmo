@@ -29,7 +29,7 @@ namespace Crulanda.Encounter
         {
             Session = session; Root = root; Active = this;
             bool testRun = Application.isEditor && (Application.isBatchMode || System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-runTests") >= 0);
-            Lively = LifeOverride ?? !(testRun || EncounterCapture.Requested);
+            Lively = LifeOverride ?? !(testRun || EncounterCapture.Requested && !LifeCapture.Requested);   // the life capture watches them live
             World = SimRoster.LoadOrCreate(root);
             Refresh();
         }

@@ -54,7 +54,7 @@ namespace Crulanda.Tests
             yield return null;
             var f = SimAt(e.transform.position + Vector3.back * 5, e.actor.Level);
             yield return null;
-            f.Start(SimFigure.Doing.Hunt, prey: e);
+            f.Begin(SimFigure.Doing.Hunt, prey: e);
             int hp = e.actor.Health.Pool.Current; float t = 0;
             while (t < 15 && e.Victim != f.actor) { t += Time.deltaTime; yield return null; }
             Assert.AreSame(f.actor, e.Victim, "the mob fights the sim back");
@@ -73,7 +73,7 @@ namespace Crulanda.Tests
         {
             var node = session.Zone.Interactables.FirstOrDefault(i => i != null && i.node != null && Time.time >= i.hiddenUntil); Assert.NotNull(node, "a node");
             var f = SimAt(node.position + Vector3.right * 1.2f, 3); yield return null;
-            f.Start(SimFigure.Doing.Gather, node: node);
+            f.Begin(SimFigure.Doing.Gather, node: node);
             float t = 0; while (t < 20 && Time.time >= node.hiddenUntil) { t += Time.deltaTime; yield return null; }
             Assert.Greater(node.hiddenUntil, Time.time, "the node rests after the sim works it (" + f.Doings + ")");
         }
@@ -82,7 +82,7 @@ namespace Crulanda.Tests
         {
             var inn = session.Zone.Doors.Find(d => d.kind == "inn"); Assert.NotNull(inn, "Oakhaven's inn");
             var f = SimAt(inn.position + Vector3.right * 2.5f, 4); yield return null;
-            f.Start(SimFigure.Doing.Inn);
+            f.Begin(SimFigure.Doing.Inn);
             float t = 0; while (t < 20 && !f.Hidden) { t += Time.deltaTime; yield return null; }
             Assert.IsTrue(f.Hidden, "inside");
             Assert.IsNull(SimPopulation.Active.FighterActor(f.sim.id), "no mob can fight one inside");

@@ -43,6 +43,14 @@ every 2.4 s, damage as a party sim; breaks off under 30% (non-healers); healers 
 35%, then the inn. Gather: 1-3 nodes, 4-6 s kneeling each (EncounterSession.SimGathered rests the node). Inn: hidden 60-120 s,
 healing. EncounterEnemy.TappedBy (first hitter) decides credit; FightingParty separates your fights from theirs.
 
+## Phase 5.3b-c (2026-10-06): levels, death, roads, trades
+SimFigure.GainXp (KillXp on the player's curve; SimCompanion.GainXp for the party, half shares); Fallen -> MarkCorpse, warp to
+RecoveryPoint, Doing.CorpseRun. FindExit/Doing.Travel -> SimPopulation.Depart (zone = exit.to, x/z = exit.arrive); unseen sims:
+SimPopulation.TickAway by nextTravelHour. SimEconomy: GatherTrade/CraftTrade by class, Skill = 8*level, goods (goodIds/
+goodCounts), SellAll at Places["stall"], UpgradeCost/Upgrade (gearBonus 0-2 -> SimGear.QualityFor), Craftable/Craft at
+Places["forge"] (charcoal and vials bought), Worn/Wear overrides in SimGear.For. Choose scores: trade .5+.04/goods (6+ goods or
+an affordable upgrade), craft .75, travel .9 when Suits(zone) < 0 else .05+.1 bold (not within 60 s of trading).
+
 ## Next extraction
 Introduce a plain persistent SimAdventurer profile keyed by EntityId, distinct from its Actor.
 Move companion state out of the scenario DTO behind a versioned save migration. Preserve existing IDs.

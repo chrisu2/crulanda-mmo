@@ -23,6 +23,13 @@ namespace Crulanda.Encounter
         /// <summary>Online from this world-clock hour for <see cref="onlineHours"/> hours (wrapping past midnight).</summary>
         public float onlineFrom = 8, onlineHours = 8;
         public float x, z;
+        // 5.3b-c (2026-10-06): experience (level stays the saved truth; XpForLevel(level) is its floor), the purse, what it carries
+        // (parallel lists: JsonUtility keeps no dictionaries), the gear it forged (slot and item id), the upgrades bought, and the
+        // world-clock hour it next thinks of moving zone while unseen. A world slot from before reads them as empty (format 1 still).
+        public int experience, coin, gearBonus;
+        public List<string> goodIds = new List<string>(); public List<int> goodCounts = new List<int>();
+        public List<string> wornSlots = new List<string>(); public List<string> wornIds = new List<string>();
+        public float nextTravelHour = -1;
         public bool IsOnline(float hour) { return Crulanda.World.WorldClock.Between(onlineFrom, Mathf.Repeat(onlineFrom + onlineHours, 24)) || onlineHours >= 24; }
         public bool IsOnlineAt(float hour) { float to = Mathf.Repeat(onlineFrom + onlineHours, 24); return onlineHours >= 24 || (onlineFrom <= to ? hour >= onlineFrom && hour < to : hour >= onlineFrom || hour < to); }
     }

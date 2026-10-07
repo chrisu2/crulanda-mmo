@@ -25,6 +25,17 @@ namespace Crulanda.Encounter
         public float Interval { get { return Melee ? 2.0f : 2.4f; } }
         public int Hit { get { return Mathf.RoundToInt((Melee ? 6 : 5) + (Melee ? 2.4f : 2.2f) * sim.level); } }
         public int HealAmount { get { return Mathf.RoundToInt(12 + 5 * sim.level); } }
+        /// <summary>Experience from the party's kills (EncounterSession.EnemyDied): a level when it has enough, said in Party.</summary>
+        public void GainXp(int xp)
+        {
+            if (xp <= 0 || sim.level >= EncounterProgress.LevelCap) return;
+            sim.experience = Mathf.Max(sim.experience, EncounterProgress.XpForLevel(sim.level)) + xp;
+            if (sim.experience >= EncounterProgress.XpForLevel(sim.level + 1))
+            {
+                sim.level++; actor.Stats.SetBase(Crulanda.Core.StatType.MaxHealth, MaxHealthFor(sim)); actor.Health.ApplyHealing(actor.Health.Pool.Max);
+                SimGear.Dress(GetComponent<ActorVisual>(), sim, session.Items); SimChatter.Active?.Ding(sim, true);
+            }
+        }
         public static int MaxHealthFor(SimAdventurer s) { return (s.classId == "class.warrior" || s.classId == "class.paladin" ? 150 : 115) + 22 * Mathf.Max(1, s.level); }
 
         public void Init(Actor a, EncounterSession s, SimAdventurer data, int partySlot)

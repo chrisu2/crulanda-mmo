@@ -1432,10 +1432,11 @@ namespace Crulanda.Encounter
         public Actor CombatActor(string id) { return PartyActor(id) ?? SimPopulation.Active?.FighterActor(id); }
         public bool IsLivingCombatant(string id) { var a = CombatActor(id); return a != null && a.IsAlive; }
         /// <summary>A sim worked a node: it rests until its respawn as if you had (nothing comes to you).</summary>
-        public void SimGathered(Crulanda.World.ZoneInteractable i)
+        public NodeDef SimGathered(Crulanda.World.ZoneInteractable i)
         {
-            if (i == null || i.node == null || Professions == null || Zone == null) return;
+            if (i == null || i.node == null || Professions == null || Zone == null) return null;
             var def = Professions.Db.Node(i.node); if (def != null) RestNode(i, def.respawn);
+            return def;
         }
         // Timed for the performance probe (playtest note 23).
         static readonly Unity.Profiling.ProfilerMarker perfMark = new Unity.Profiling.ProfilerMarker("PERF.Session");
@@ -1789,6 +1790,7 @@ namespace Crulanda.Encounter
             if (enemy.Camp) Progress.experience += xp;
             else { if (!Progress.AwardKill(enemy.persistentId, xp)) return; if (Progress.recruited) Progress.relationship++; }
             Message(enemy.actor.DisplayName + " defeated · " + (xp > 0 ? "+" + xp + " XP" : "no experience (too weak)") + " · press E at the body to loot.");
+            foreach (var c in PartySims) if (c != null && c.actor.IsAlive) c.GainXp(EncounterProgress.KillXp(enemy.actor.Level, c.sim.level, enemy.Elite) / 2);   // the party's kill: half shares for the sims (5.3b)
             if (Progress.Level > before) { ApplyLevel(); Player.Health.ApplyHealing(40); Message("Level " + Progress.Level + "! Health and weapon damage increased."); }
             if (Target == enemy) AutoAttack = false;
             if (Quests != null)

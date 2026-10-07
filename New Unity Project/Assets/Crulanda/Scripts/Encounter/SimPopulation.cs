@@ -46,11 +46,41 @@ namespace Crulanda.Encounter
             if (Session == null || Session.Paused || Time.time < nextCheck) return;
             nextCheck = Time.time + 1; Refresh();
         }
+        /// <summary>How well a zone's levels suit a sim: 0 inside its band, negative by how far out (SimRoster.Homes).</summary>
+        public static int Suits(string zoneId, int level)
+        {
+            foreach (var h in SimRoster.Homes) if (h.zone == zoneId) return level < h.lo ? level - h.lo : level > h.hi ? h.hi - level : 0;
+            return -3;
+        }
+        /// <summary>A sim steps over the zone line (SimFigure.Travel): in the other zone at its arrival point; its figure here goes.</summary>
+        public void Depart(SimFigure f, ZoneExit exit)
+        {
+            if (f == null || exit == null) return;
+            f.sim.zone = exit.to; f.sim.x = exit.arrive.x; f.sim.z = exit.arrive.y; f.sim.nextTravelHour = Mathf.Repeat(WorldClock.Hour + 1.5f, 24);
+            Figures.Remove(f); Destroy(f.gameObject);
+        }
+        /// <summary>
+        /// The unseen (5.3b, a first step of 5.4): a sim in another zone, online, now and then takes a road to a zone that suits its
+        /// level (home weighted), arriving at that road's end; one arriving here is spawned there by <see cref="Refresh"/>.
+        /// </summary>
+        void TickAway(SimAdventurer s, float hour)
+        {
+            if (s.nextTravelHour < 0) { s.nextTravelHour = Mathf.Repeat(hour + 1 + Mathf.Abs(s.variant % 5) * .5f, 24); return; }
+            if (!WorldClock.Between(s.nextTravelHour, Mathf.Repeat(s.nextTravelHour + .5f, 24))) return;
+            s.nextTravelHour = Mathf.Repeat(hour + 1.5f + Mathf.Abs(s.variant % 4), 24);
+            var zone = Session.Zone != null ? Session.Zone.FindZone(s.zone) : null; if (zone == null || zone.exits == null || zone.exits.Length == 0) return;
+            if (Suits(s.zone, s.level) == 0 && (s.variant + Mathf.FloorToInt(hour)) % 3 != 0) return;   // content where it is, mostly
+            ZoneExit best = null; int bestScore = int.MinValue;
+            foreach (var e in zone.exits) { if (e == null) continue; int sc = Suits(e.to, s.level) + (e.to == s.homeZone ? 2 : 0); if (sc > bestScore) { best = e; bestScore = sc; } }
+            if (best == null || bestScore < Suits(s.zone, s.level)) return;
+            s.zone = best.to; s.x = best.arrive.x; s.z = best.arrive.y;
+        }
         /// <summary>Figures for those here and online; none for those gone.</summary>
         public void Refresh()
         {
             string zone = ZoneId; if (zone == null || World == null) return;
             float hour = WorldClock.Hour;
+            if (Lively) foreach (var s in World.sims) if (s.zone != zone && s.IsOnlineAt(hour)) TickAway(s, hour);
             foreach (var s in World.sims)
             {
                 bool here = s.zone == zone && s.IsOnlineAt(hour) && !Session.InParty(s.id);   // one in your party is with you, not standing about

@@ -27,6 +27,7 @@ namespace Crulanda.Encounter
         public static int QualityFor(SimAdventurer s, int slot)
         {
             int roll = Mathf.Abs(s.gearSeed * 31 + slot * 977) % 100;
+            roll -= 18 * s.gearBonus;   // bought upgrades (SimEconomy): better odds of the better piece
             if (s.level >= 8 && roll < 25) return 3;
             if (s.level >= 4 || roll < 20) return roll < 70 ? 2 : 1;
             return 1;
@@ -38,6 +39,7 @@ namespace Crulanda.Encounter
             var want = Wanted[Weight(s.classId)];
             for (int i = 0; i < ArmourSlots.Length; i++)
             {
+                var forged = SimEconomy.Worn(s, ArmourSlots[i]); if (forged != null && items.Get(forged) != null) { ids.Add(forged); continue; }   // its own make (5.3c)
                 // A few sims go bareheaded or without a neck piece or a mantle: not everyone owns all seven.
                 if (i <= 2 && Mathf.Abs(s.gearSeed + i * 13) % 5 == 0) continue;
                 var id = Pick(items, ArmourSlots[i], s, i, d => d.name.Contains(want[i]));
@@ -45,8 +47,8 @@ namespace Crulanda.Encounter
             }
             if (CarriesWeapon(s.classId))
             {
-                var main = Pick(items, "mainhand", s, 7, d => true); if (main != null) ids.Add(main);
-                var off = Pick(items, "offhand", s, 8, d => d.name.Contains("Shield") || d.name.Contains("Buckler")); if (off != null) ids.Add(off);
+                var fm = SimEconomy.Worn(s, "mainhand"); var main = fm != null && items.Get(fm) != null ? fm : Pick(items, "mainhand", s, 7, d => true); if (main != null) ids.Add(main);
+                var fo = SimEconomy.Worn(s, "offhand"); var off = fo != null && items.Get(fo) != null ? fo : Pick(items, "offhand", s, 8, d => d.name.Contains("Shield") || d.name.Contains("Buckler")); if (off != null) ids.Add(off);
             }
             return ids;
         }

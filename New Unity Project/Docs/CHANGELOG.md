@@ -1383,3 +1383,26 @@ A read-only review by five reviewers, each finding checked by a second who tried
 - **They answer you:** where a place is, a group wanted (a sim of your level offers to join), something for sale, thanks,
   hello. Built from Docs/CHAT_RESEARCH.md; all lines GAME-ONLY.
 - Tests: EditMode ZoneChatTests; PlayMode SimChatTests (they talk; directions answered; a group call answered; messages in System).
+
+## 2026-10-06 — Phase 5.3b and 5.3c: the sims travel, die and get up, level, trade and craft
+- **Levelling (5.3b):** a sim's own kills (and half shares of your party's) are experience on the player's curve; at a level it
+  says "ding N!" in Zone (Party for a party sim, and Mira says grats) and others say grats; its health grows and its gear is
+  made again for the level.
+- **Death and the corpse run (5.3b):** a beaten sim lies ten seconds where it fell, its corpse marked there ("Corpse of ..."),
+  comes to at the zone's recovery point at a third of its health, runs back, and is whole again on reaching it (or gives up
+  after three minutes and rests at the inn). Chatty ones say where they died.
+- **Travel (5.3b):** a sim that has outgrown the zone's levels (SimRoster.Homes bands), or now and then a bold one, takes the
+  road to a zone that suits it (its home weighted) and arrives at that road's far end (ZoneExit.arrive). The unseen move too
+  (a first step of 5.4): every hour or three a sim in another zone may take a road toward its level; one arriving where you
+  are appears at the road's end.
+- **Trades and the purse (5.3c, playtest note 63):** Warriors and Paladins mine, Rangers cut wood, Druids and Mages pick herbs
+  (nodes of their trade at their skill, 8 a level); what they gather is theirs (goods) and is sold at the merchant's stall for
+  the items' values; coin buys up to two gear upgrades (25 x step x level), which raise the quality of what SimGear makes.
+  Warriors and Paladins smith at the forge from what they mined (bars first, the merchant's charcoal bought as needed, then
+  the cudgel, buckler, gauntlets, jerkin, helm, greaves, hauberk and so on of the recipes at their skill), and wear what they
+  forge (wornSlots/wornIds). Druids and Mages would brew, but no village has an alchemy bench as a place yet: they sell herbs.
+  Chat tells of it: WTS of what they really carry, "just forged a copper cudgel", "finally afforded better gear".
+- World slot: experience, coin, gearBonus, goods, worn pieces and nextTravelHour added to SimAdventurer (format 1 still: an
+  older slot reads them empty).
+- Tests: EditMode SimEconomyTests; PlayMode SimWorldTests (ding and grats; the corpse run; the road out and the unseen move;
+  the stall, an upgrade, the forge).

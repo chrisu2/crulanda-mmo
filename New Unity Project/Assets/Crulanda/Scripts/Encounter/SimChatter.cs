@@ -67,7 +67,8 @@ namespace Crulanda.Encounter
             if (camp != null && s.bold > .35f) options.Add(() => (ChatChannel.LFG, lingo ? "LF1M " + camp + ", " + Short(s) + " here" : "Looking for one more for the " + camp + ". I'm a " + Long(s) + "."));
             if (elite != null && s.bold > .5f && s.level >= elite.actor.Level - 2) options.Add(() => (ChatChannel.LFG, lingo ? "LF2M " + elite.Name + ", have " + SimRoster.ClassName(s.classId).ToLower() : "Anyone up for " + elite.Name + "? Need two more."));
             if (elite != null) options.Add(() => (ChatChannel.Zone, elite.Name + (lingo ? " is up by " : " is up near ") + Near(elite.transform.position) + (lingo ? ", careful" : ". Careful out there.")));
-            if (item != null && (f == null || f.Activity == SimFigure.Doing.Gather || s.bold < .5f)) options.Add(() => (ChatChannel.Trade, lingo ? "WTS " + item + " x" + (5 + rng.Next(15)) + ", pst" : "Selling " + item + ", " + (5 + rng.Next(15)) + " of them. Send me a tell."));
+            if (s.goodIds.Count > 0) { int gi = rng.Next(s.goodIds.Count); string gname = S.ItemName(s.goodIds[gi]); int gn = s.goodCounts[gi]; options.Add(() => (ChatChannel.Trade, lingo ? "WTS " + gname + " x" + gn + ", pst" : "Selling " + gname + ", " + gn + " of them. Send me a tell.")); }
+            else if (item != null && (f == null || f.Activity == SimFigure.Doing.Gather || s.bold < .5f)) options.Add(() => (ChatChannel.Trade, lingo ? "WTB " + item + ", any amount" : "Buying " + item + " if anyone has some."));
             if (item != null) options.Add(() => (ChatChannel.Trade, lingo ? "WTB " + item + " x10" : "Buying " + item + " if anyone has some."));
             if (place != null && s.level <= 4) options.Add(() => { Answer(place, s); return (ChatChannel.Zone, lingo ? "where's " + place.name + "?" : "Can anyone tell me where " + place.name + " is?"); });
             var exit = SomeExit();
@@ -96,6 +97,22 @@ namespace Crulanda.Encounter
             else if (R < .35f) line = Pick(new[] { "where to next?", "ty for the invite", "good group", "brb 1 min", "lead on" });
             if (line != null) S.ChatSay(ChatChannel.Party, c.sim.name, line);
         }
+        /// <summary>A level gained (5.3b): "ding N!" and a grats or two from the others.</summary>
+        public void Ding(SimAdventurer s, bool inParty = false)
+        {
+            if (!Population.Lively && !inParty) return;
+            var ch = inParty ? ChatChannel.Party : ChatChannel.Zone;
+            S.ChatSay(ch, s.name, Pick(new[] { "ding " + s.level + "!", "ding!", "ding " + s.level + " :)", "ding " + s.level }));
+            var others = Here().FindAll(o => o.id != s.id && o.chatty > .3f); int n = Mathf.Min(others.Count, 1 + (R < .5f ? 1 : 0));
+            if (inParty) { S.ChatSay(ChatChannel.Party, "Mira", "Grats!"); return; }
+            for (int i = 0; i < n; i++) { var o = others[rng.Next(others.Count)]; others.Remove(o); Later(ch, o.name, Pick(new[] { "grats", "gz", "grats!", "nice, grats", "gratz" }), i * 2.5f); }
+        }
+        public void Died(SimAdventurer s, Vector3 at) { if (Population.Lively && s.chatty > .35f && R < .7f) Later(ChatChannel.Zone, s.name, Pick(new[] { "died at " + Near(at) + ", running back", "corpse run time...", "ugh, dead. cr", "anyone near " + Near(at) + "? died there" }), 4); }
+        public void Recovered(SimAdventurer s) { if (Population.Lively && s.chatty > .5f && R < .5f) Later(ChatChannel.Zone, s.name, Pick(new[] { "got my corpse back", "back in it", "ok, alive again" }), 1); }
+        public void Leaving(SimAdventurer s, ZoneExit exit) { if (Population.Lively && s.chatty > .4f && R < .7f) Later(ChatChannel.Zone, s.name, Pick(new[] { "heading to " + S.ZoneName(exit.to) + ", cya", "off to " + S.ZoneName(exit.to), "outgrown this place, " + S.ZoneName(exit.to) + " next" }), 1); }
+        public void Sold(SimAdventurer s, int coin) { if (Population.Lively && s.chatty > .5f && R < .4f) Later(ChatChannel.Trade, s.name, Pick(new[] { "sold my ore, " + coin + " coin, not bad", "stall took the lot for " + coin, coin + " coin for a morning's gathering" }), 1); }
+        public void Upgraded(SimAdventurer s) { if (Population.Lively && s.chatty > .3f) Later(ChatChannel.Zone, s.name, Pick(new[] { "finally afforded better gear", "new " + (SimGear.Weight(s.classId) == "heavy" ? "mail" : SimGear.Weight(s.classId) == "leather" ? "leathers" : "robes") + ", look at me", "upgraded, feeling strong" }), 1); }
+        public void Crafted(SimAdventurer s, string name, bool worn) { if (Population.Lively && s.chatty > .3f && R < .8f) Later(worn ? ChatChannel.Zone : ChatChannel.Trade, s.name, worn ? Pick(new[] { "just forged a " + name.ToLower() + ", wearing it", "made my own " + name.ToLower(), name + " done, my own make" }) : Pick(new[] { "WTS " + name + ", fresh made", "brewed a " + name.ToLower() + ", selling", "selling " + name.ToLower() + "s, pst" }), 1); }
         /// <summary>A sim logs off: a chatty one says so.</summary>
         public void LoggedOff(SimAdventurer s) { if (s.chatty > .45f && R < .6f && Population.Lively) S.ChatSay(ChatChannel.Zone, s.name, Pick(new[] { "gn all", "night all", "off to bed, gn", "logging, cya" })); }
 

@@ -95,6 +95,13 @@ namespace Crulanda.World
             ("Medieval/Prefabs/BeerBarrelV1", .9f), ("Medieval/Prefabs/LanternV1", .4f),
             ("Nature/CommonTree_1", 7), ("Nature/CommonTree_3", 7), ("Nature/CommonTree_5", 7), ("Nature/Pine_1", 10), ("Nature/Pine_4", 10), ("Nature/Bush_Common", 1.3f), ("Nature/Bush_Common_Flowers", 1.3f),
             ("Nature/DeadTree_1", 6), ("Nature/Rock_Medium_1", 1.5f), ("Nature/Grass_Common_Tall", .5f), ("Nature/Flower_3_Group", .35f), ("Nature/TwistedTree_1", 8),
+            ("Nature/Rock_Medium_2", 1.5f), ("Nature/Rock_Medium_3", 1.5f),
+            ("Megapack/Models/Plants/Rock_1", 1.5f), ("Megapack/Models/Plants/Rock_2", 1.5f), ("Megapack/Models/Plants/Rock_3", 1.5f), ("Megapack/Models/Plants/Rock_4", 1.5f),
+            ("Megapack/Models/Rock_Formation_1", 3), ("Megapack/Models/Plants/Rodck_Formation_2", 3), ("Megapack/Models/Plants/Rock_Formation_3", 3), ("Megapack/Models/Plants/Stone_1", .6f),
+            ("Megapack/Models/Hay_1", 1.2f), ("Megapack/Models/Hay_2", 1.2f), ("Megapack/Models/Cart_1", 1.4f), ("Megapack/Models/Cart_2", 1.4f), ("Megapack/Models/Wheelbarrow", .8f),
+            ("Megapack/Models/Trough_Hay", .7f), ("Megapack/Models/Market/Market_Table_1", 1), ("Megapack/Models/Stall_1", 2.6f), ("Megapack/Models/Market/Crate_1_Apples", .5f),
+            ("Megapack/Models/Arrow Target", 1.5f), ("Megapack/Models/Plants/TreeTrunk_1", .8f), ("Megapack/Models/Tree_Broken_1", 2), ("Megapack/Models/WodenLog_Cuted", .6f),
+            ("Megapack/Models/Fireplace", .6f), ("Megapack/Models/Barrel_1", .95f),
         };
     }
 }

@@ -1496,3 +1496,16 @@ A read-only review by five reviewers, each finding checked by a second who tried
 - Full run c39: EditMode 427/427, PlayMode 212/214, five tours, 0 shader errors. The two failures were races in the sim tests,
   fixed: a recovered corpse is hidden at once (it was destroyed only at the frame's end, so the test still found it), and the
   ding test now counts "gratz" (one of the five grats lines did not contain "grats").
+
+## 2026-10-07 — Art round 3: the Stylized Megapack's medieval half, kit rocks, haystacks and carts
+- **The Stylized Megapack 2in1** (Asset Store EULA; tools/wip/art/megapack_import.py): its "Medieval Kingdom" half only (207
+  models, materials, textures under Resources/Props/Megapack; the Asia half is off the world's look). Its materials are URP Lit and
+  the project is the built-in pipeline, so the import rewrites each .mat to Standard, keeping its maps, colour and smoothness;
+  the FBX metas keep their GUIDs, so every model still finds its material.
+- **Rocks:** in the green zones every forest-edge rock and every loose rock (one you do not interact with) is one of the nature
+  kit's three mossy rocks, with the same collider; the mountains, the ash and gloom keep the painted rock and its skirts. The zone's
+  draws are taken in the same order as before, so nothing else moves.
+- **Haystacks** are the Megapack's corded rick (2.1-2.4 m), often with a rolled bale lying by it; **carts** are its hay cart, shafts
+  where the painted one's were. A new zone prop kind, "target", is its archery butt.
+- **Left out:** the HQ Rock Pack. Its three rocks are photoreal scans and clash with the painted world (props row); the import is
+  kept in the script, its files deleted. The Megapack's white rock formations and buildings are not placed yet.

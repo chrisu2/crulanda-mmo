@@ -1174,13 +1174,16 @@ namespace Crulanda.World
                             foreach (float k in new[] { -.9f, 0, .9f }) foreach (float j in new[] { -.8f, 0, .8f }) low = Mathf.Min(low, HeightAt(t.position.x + k * s, t.position.z + j * s));
                             t.position += Vector3.up * (low - t.position.y) * .85f;
                         }
-                        Lump(Boulder(), t, new Vector3(0, .3f * s, 0), new Vector3(2f * s, 1.3f * s, 1.7f * s), stone, R01 * 360); if (s > 1.3f) Lump(Boulder(), t, new Vector3(.7f * s, .15f * s, .5f * s), new Vector3(.9f * s, .6f * s, .8f * s), stone, R01 * 360); Solid(t, new Vector3(0, .5f * s, 0), new Vector3(1.6f * s, 1f * s, 1.4f * s)); if (Zone.biome == "mountain" && string.IsNullOrEmpty(p.interact)) RockSkirt(t, s * .8f, stone); break;
+                        var rb0 = Boulder(); float ry0 = R01 * 360; Mesh rb1 = null; float ry1 = 0; if (s > 1.3f) { rb1 = Boulder(); ry1 = R01 * 360; }   // the zone's draws, in the order they always were
+                        if (KitRocks && string.IsNullOrEmpty(p.interact) && KitRock(t, (int)(ry0 / 120), .95f * s, 2.2f * s, ry0) != null) { }   // the kit's rock (art round 3, 2026-10-07); a rock you interact with keeps its painted look
+                        else { Lump(rb0, t, new Vector3(0, .3f * s, 0), new Vector3(2f * s, 1.3f * s, 1.7f * s), stone, ry0); if (rb1 != null) Lump(rb1, t, new Vector3(.7f * s, .15f * s, .5f * s), new Vector3(.9f * s, .6f * s, .8f * s), stone, ry1); } Solid(t, new Vector3(0, .5f * s, 0), new Vector3(1.6f * s, 1f * s, 1.4f * s)); if (Zone.biome == "mountain" && string.IsNullOrEmpty(p.interact)) RockSkirt(t, s * .8f, stone); break;
                     }
                     case "bridge": SeatBridge(t, p.size.x > 0 ? p.size.x : 12); if (p.variant == 1) RopeBridge(t, p.size.x > 0 ? p.size.x : 12); else Bridge(t, p.size.x > 0 ? p.size.x : 12); break;
                     case "signpost": Signpost(t, p.name); break;
                     case "hitch": Hitch(t); break;
                     case "dummy": GroundProp(t, "Fantasy/Dummy", Vector3.zero, 0, 1.9f, true); break;      // a training dummy (kit, 2026-10-07)
                     case "banner": GroundProp(t, "Fantasy/Banner_1", Vector3.zero, 0, 2.6f); break;        // a standing banner (kit, 2026-10-07)
+                    case "target": GroundProp(t, "Megapack/Models/Arrow Target", Vector3.zero, 0, 1.5f, true); break;   // an archery butt (Megapack, art round 3)
                     case "board": NoticeBoard(t); break;
                     case "ruin": Ruin(t, p.size.x > 0 ? p.size.x : 6); break;
                     case "gate": Gate(t, p.size.x > 0 ? p.size.x : 6.4f); break;
@@ -1968,6 +1971,13 @@ namespace Crulanda.World
         void Haystack(Transform t)
         {
             var hr = TreeRandom(t.position); float H() { return (float)hr.NextDouble(); }
+            if (HasProp("Megapack/Models/Hay_2"))
+            {
+                // The Megapack's corded rick (art round 3, 2026-10-07), 2.1-2.4 m, and a rolled bale or two lying by it.
+                ModelProp(t, "Megapack/Models/Hay_2", Vector3.down * .05f, H() * 360, 2.1f + H() * .3f);
+                if (H() < .6f) { float a = H() * 6.28f; GroundProp(t, "Megapack/Models/Hay_1", new Vector3(Mathf.Cos(a) * 2.1f, 0, Mathf.Sin(a) * 2.1f), H() * 360, 1.1f); }
+                Solid(t, new Vector3(0, 1, 0), new Vector3(2.4f, 2, 2.4f)); return;
+            }
             var rick = PropMesh("Hayrick", () => Turned(new[] { new Vector2(1.2f, -.35f), new Vector2(1.27f, .12f), new Vector2(1.16f, .62f), new Vector2(1.24f, .58f), new Vector2(1.04f, 1.12f), new Vector2(1.11f, 1.08f), new Vector2(.74f, 1.6f), new Vector2(.8f, 1.56f), new Vector2(.36f, 1.98f), new Vector2(0, 2.2f) }, 14, 2.5f));
             float girth = .95f + H() * .07f, high = .92f + H() * .16f;
             MeshPart(rick, t, Vector3.zero, Tint(art.thatch, new Color(.84f, .72f, .42f)), Quaternion.Euler(0, H() * 360, 0)).transform.localScale = new Vector3(girth, high, girth);
@@ -2535,6 +2545,7 @@ namespace Crulanda.World
         /// <summary>A farm cart, shafts to -z: a plank bed between flared side boards, two spoked wheels with iron tyres on an axle, and a heaped load of hay.</summary>
         void Cart(Transform t)
         {
+            if (ModelProp(t, "Megapack/Models/Cart_1", new Vector3(0, 0, -.6f), -90, 1.45f) != null) { Solid(t, new Vector3(0, .8f, -.4f), new Vector3(2.1f, 1.6f, 3.8f)); return; }   // the Megapack's cart (art round 3, 2026-10-07)
             var board = Tint(art.timber, new Color(.42f, .3f, .19f)); var dark = Tint(art.timber, new Color(.25f, .17f, .11f));
             BoxPart(t, new Vector3(0, .8f, 0), new Vector3(1.5f, .12f, 2.6f), art.timber, null, 1);   // the bed
             foreach (int s in new[] { -1, 1 })
@@ -5366,6 +5377,7 @@ namespace Crulanda.World
             var t = Root(new ZoneProp { kind = "rock", at = at, rotation = yaw }, statics);
             var mat = RockTint(Zone.biome == "ash" ? new Color(.33f, .32f, .31f) : Zone.biome == "mountain" ? MountainStone : new Color(.42f, .41f, .39f));
             if (Zone.biome == "mountain") SinkBySlope(t, at, s);
+            if (KitRocks && KitRock(t, (int)(y0 / 120), 1.25f * s, 2.4f * s, y1) != null) { Solid(t, new Vector3(0, .6f * s, 0), new Vector3(1.8f * s, 1.2f * s, 1.5f * s)); return; }   // the kit's rock (art round 3, 2026-10-07)
             float deep = Zone.biome == "mountain" ? .14f * s : 0;   // mountains: the lumps a seventh deeper in the ground (the collider is where it was)
             Lump(b0, t, new Vector3(0, .45f * s - deep, 0), new Vector3(2.1f * s, 1.5f * s, 1.8f * s), mat, y0);
             Lump(b1, t, new Vector3(.8f * s, .25f * s - deep, .45f * s), new Vector3(1.2f * s, .9f * s, 1.1f * s), mat, y1);

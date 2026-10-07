@@ -9,7 +9,14 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-10-07, about 15:30)
+## RESUME HERE (updated 2026-10-07, about 17:00)
+**Playable build = art round 4 (dead and twisted trees), built 16:18 from commit ea91c2f, published, backed up to E:.**
+Art round 5 (Megapack outbuildings: barns nobody lives in, the Golden Cask's stable over the hitch, the wooden Watchtower; Chris
+chose "outbuildings only" after Docs/art/megapack-houses.png) is in the working tree; full run c46 started 16:58: if green, release
+build in lane B, publish, commit, backup. Next after that: the enclave interior (note 40) and the sound phase; the Medieval
+Village MegaKit when it is in Downloads; the Megapack windmill has no lore spot yet.
+
+## Earlier resume note (2026-10-07, about 15:30)
 **Playable build = art round 3, built 15:06 from commit 5ca6d2d, published. Full run c41: 427/427, 214/214, five tours, 0 shader
 errors. Backed up to E:.** Art round 4 (the nature kit's dead trees for the dead woods, its twisted trees for the autumn
 broadleaf; TreeLimbTests counts only painted trees now) is in the working tree; its tours look right (Khaven, the Rim, Oakhaven,

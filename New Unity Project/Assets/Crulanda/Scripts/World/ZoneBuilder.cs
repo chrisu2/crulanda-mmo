@@ -1140,7 +1140,11 @@ namespace Crulanda.World
                     case "herb": Herb(t, p.variant); break;
                     case "ruined_house": RuinedHouse(t, p.size.x > 0 ? p.size : new Vector2(8, 6)); break;
                     case "wall": Wall(p.points, statics); DestroyImmediate(t.gameObject); break;
-                    case "tower": Tower(t, p.size.x > 0 ? p.size.x : 4.4f); break;
+                    case "tower":
+                        // variant 2: the Megapack's wooden lookout on its trestle legs (art round 5: The Watchtower, where Oakhaven takes turns watching).
+                        if (p.variant == 2 && GroundProp(t, "Megapack/Models/Buildings/Tower_1", Vector3.down * .2f, 0, 9.5f) != null)
+                        { var legs = t.gameObject.AddComponent<CapsuleCollider>(); legs.center = new Vector3(0, 4.5f, 0); legs.height = 9; legs.radius = 2.2f; t.gameObject.AddComponent<NavBlocker>(); break; }
+                        Tower(t, p.size.x > 0 ? p.size.x : 4.4f); break;
                     case "giant_tree": GiantTree(t, p.variant); trunks.Add(p.at); break;
                     case "fallen_giant": FallenGiant(t, p.size.x > 0 ? p.size.x : 36); break;
                     case "treehouse": Treehouse(t, p.variant); trunks.Add(p.at); break;
@@ -1640,6 +1644,22 @@ namespace Crulanda.World
         void Barn(Transform t, Vector2 size)
         {
             float w = size.x, d = size.y, h = 4.2f;
+            // The Megapack's timber barn (art round 5, 2026-10-07) for a barn nobody sleeps in: fitted inside the footprint, a little
+            // into the ground so a slope never shows under it; the same collider. A home (Moss's lodge) keeps the painted barn and its door.
+            bool home = Zone.life != null && Zone.life.households != null && Array.Exists(Zone.life.households, x => x != null && x.house == t.name);
+            if (!home && HasProp("Megapack/Models/Buildings/Buiilding_6_1"))
+            {
+                string model = (Mathf.Abs(t.name.GetHashCode()) % 2 == 0) ? "Megapack/Models/Buildings/Buiilding_6_1" : "Megapack/Models/Buildings/Buiilding_6_2";
+                // Stretched to the footprint and the painted barn's height, on the same stone sill and threshold (BuildingGroundTests:
+                // every building stands on stone down to the ground, every barn's door on a step at the ground).
+                if (ModelProp(t, model, Vector3.zero, 0, h + d * .5f, false, null, new Vector3(w, h + d * .5f, d)) != null)
+                {
+                    Footing(t, w + .3f, d + .3f, .45f, .4f, 1, 1.75f);
+                    float kitSill = Mathf.Clamp(DoorGround(t, 0, -d / 2 - .3f, 3.2f) + .03f, -1, .6f);
+                    DoorSteps(t, 0, -d / 2 - .15f, kitSill, 3.44f);
+                    Solid(t, new Vector3(0, (h + d * .5f) / 2, 0), new Vector3(w + .3f, h + d * .5f, d + .3f)); return;
+                }
+            }
             var boards = Tint(art.timber, new Color(.4f, .25f, .16f));
             BoxPart(t, new Vector3(0, h / 2, 0), new Vector3(w, h, d), boards);
             Footing(t, w + .3f, d + .3f, .45f, .4f, 1, 1.75f);   // a stone sill round the boards' foot, stepping up and down the slope, open at the doors
@@ -2512,6 +2532,9 @@ namespace Crulanda.World
         /// water trough beneath and a heap of hay beside, in the Golden Cask's yard, where its horse is kept.</summary>
         void Hitch(Transform t)
         {
+            // The Megapack's open stable over the rail (art round 5, 2026-10-07; playtest note 64: "this horse needs to find a home or
+            // stall"): the horse that stands here is under a roof now. Posts only, no walls: you can walk in to it.
+            ModelProp(t, "Megapack/Models/Buildings/Stable_1", new Vector3(0, -.1f, .4f), 180, 4.1f);
             foreach (float x in new[] { -1.3f, 1.3f }) Stake(t, new Vector3(x, -.1f, 0), .16f, 1.3f, art.timber, Quaternion.Euler(0, 0, x < 0 ? 2 : -2));
             Bar(t, new Vector3(-1.5f, 1.05f, 0), new Vector3(1.5f, 1.05f, 0), .1f, .08f, Tint(art.timber, new Color(.42f, .31f, .19f)));
             var trough = Tint(art.timber, new Color(.34f, .25f, .15f));

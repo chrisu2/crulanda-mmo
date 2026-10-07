@@ -35,7 +35,7 @@ namespace Crulanda.World
         /// <paramref name="yaw"/> about the vertical. Only its meshes come along (no kit scripts, colliders or lights); solid adds a box
         /// collider the navmesh keeps clear. Null when the model is missing, so the caller can draw its painted stand-in.
         /// </summary>
-        public static GameObject ModelProp(Transform parent, string path, Vector3 foot, float yaw, float height, bool solid = false, float? width = null)
+        public static GameObject ModelProp(Transform parent, string path, Vector3 foot, float yaw, float height, bool solid = false, float? width = null, Vector3? box = null)
         {
             var src = PropSource(path); if (src == null) return null;
             // A holder of our own round the kit's object, so a root mesh or a root scale in the kit never matters.
@@ -48,11 +48,13 @@ namespace Crulanda.World
             var b = PropBounds(t); if (b.size.y < .001f) return go;
             float s = height / b.size.y;
             if (width.HasValue) s = Mathf.Min(s, width.Value / Mathf.Max(.001f, Mathf.Max(b.size.x, b.size.z)));
-            t.localScale = Vector3.one * s; t.localRotation = Quaternion.Euler(0, yaw, 0);
-            t.localPosition = foot + t.localRotation * new Vector3(-b.center.x * s, -b.min.y * s, -b.center.z * s);
+            // A box (a building fitted to its footprint, art round 5): each axis stretched to it, a little either way.
+            var k = box.HasValue ? new Vector3(box.Value.x / Mathf.Max(.001f, b.size.x), box.Value.y / Mathf.Max(.001f, b.size.y), box.Value.z / Mathf.Max(.001f, b.size.z)) : Vector3.one * s;
+            t.localScale = k; t.localRotation = Quaternion.Euler(0, yaw, 0);
+            t.localPosition = foot + t.localRotation * new Vector3(-b.center.x * k.x, -b.min.y * k.y, -b.center.z * k.z);
             foreach (var r in go.GetComponentsInChildren<Renderer>(true)) { r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On; r.receiveShadows = true; }
             if (path.StartsWith("Nature/")) DressNature(go);
-            if (solid) { var box = go.AddComponent<BoxCollider>(); box.center = b.center; box.size = b.size; go.AddComponent<NavBlocker>(); }
+            if (solid) { var col = go.AddComponent<BoxCollider>(); col.center = b.center; col.size = b.size; go.AddComponent<NavBlocker>(); }
             return go;
         }
         /// <summary>The model's meshes' bounds in its root's own space (before any scale), from each mesh's corners.</summary>
@@ -102,6 +104,7 @@ namespace Crulanda.World
             ("Megapack/Models/Trough_Hay", .7f), ("Megapack/Models/Market/Market_Table_1", 1), ("Megapack/Models/Stall_1", 2.6f), ("Megapack/Models/Market/Crate_1_Apples", .5f),
             ("Megapack/Models/Arrow Target", 1.5f), ("Megapack/Models/Plants/TreeTrunk_1", .8f), ("Megapack/Models/Tree_Broken_1", 2), ("Megapack/Models/WodenLog_Cuted", .6f),
             ("Megapack/Models/Fireplace", .6f), ("Megapack/Models/Barrel_1", .95f),
+            ("Megapack/Models/Buildings/Buiilding_6_1", 7.6f), ("Megapack/Models/Buildings/Stable_1", 4.1f), ("Megapack/Models/Buildings/Tower_1", 9.5f),
         };
     }
 }

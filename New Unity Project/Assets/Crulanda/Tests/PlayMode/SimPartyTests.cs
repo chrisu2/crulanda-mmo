@@ -60,7 +60,8 @@ namespace Crulanda.Tests
             var motor = session.Player.GetComponent<AdventurerMotor>();
             motor.Teleport(c.transform.position + Vector3.forward * 12);
             float before = Vector3.Distance(c.transform.position, session.Player.transform.position);
-            yield return new WaitForSeconds(4);
+            // Up to eight seconds of game time (four was tight under a full run's load, c46): it closes three metres of the twelve.
+            for (float w = 0; w < 8 && Vector3.Distance(c.transform.position, session.Player.transform.position) >= before - 3; w += Time.deltaTime) yield return null;
             Assert.Less(Vector3.Distance(c.transform.position, session.Player.transform.position), before - 3, "it follows");
             session.LeaveParty(s.id);
             Assert.IsNull(session.PartySim(s.id)); Assert.NotNull(SimPopulation.Active.Find(s.id), "back in the world as a figure");

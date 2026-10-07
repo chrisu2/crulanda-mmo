@@ -3165,6 +3165,7 @@
     {
       "kind": "tower",
       "name": "The Watchtower",
+      "variant": 2,
       "at": {
         "x": 128,
         "y": 98

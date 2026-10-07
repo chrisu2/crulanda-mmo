@@ -1520,3 +1520,18 @@ A read-only review by five reviewers, each finding checked by a second who tried
 - Full run c43: EditMode 427/427, PlayMode 213/214, five tours, 0 shader errors. The failure: SimChatTests waited forty seconds
   for three zone lines when six sims talk every 8-23 s; it waits seventy-five now (rerun green). Editor/HouseCapture.cs renders the
   Megapack's buildings for comparison (Docs/art).
+
+## 2026-10-07 — Art round 5: Megapack outbuildings (Chris chose "outbuildings only")
+- Chris compared the Megapack's buildings with Oakhaven's houses (Docs/art/megapack-houses.png, oakhaven-houses-now.png;
+  Editor/HouseCapture.cs renders them) and chose to keep the village houses (doors, interiors, lit windows) and use the pack for
+  the outbuildings.
+- **Barns:** every barn nobody sleeps in (the Tithe barn, Harrow, Brook and Hollin barns, the Cider Barn, Carder's field barn) is
+  the pack's double-gabled timber barn, one of its two finishes by name, fitted inside the old footprint with the same collider.
+  Moss's lodge and any barn a household lives in stay painted, with their doors.
+  Each kit barn is stretched to its footprint and the painted barn's height and stands on the same stone sill with a step at
+  its door (BuildingGroundTests: every building on stone down to the ground). ZoneBuilder.ModelProp takes a box for that.
+- **The Golden Cask's stable:** the pack's open stable stands over the hitching rail, so the inn's horse has a roof (playtest
+  note 64 asked for a home or a stall).
+- **The Watchtower** is the pack's wooden lookout on its trestle legs (prop variant 2); the gate and toll towers stay stone.
+- Full run c46: EditMode 427/427, PlayMode 213/214, five tours, 0 shader errors. The failure: SimPartyTests gave a party sim a
+  fixed four seconds to close three metres under the run's load; it polls up to eight now (rerun 5/5).

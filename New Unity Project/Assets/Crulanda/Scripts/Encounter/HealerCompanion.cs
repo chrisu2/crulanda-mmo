@@ -77,7 +77,7 @@ namespace Crulanda.Encounter
             {
                 var result = abilities.TryStart(heal, Time.time, Spend, () => {
                     if (!recipient.IsAlive) return;
-                    int healed = recipient.GetComponent<Combatant>().Heal(HealFor(heal.power, session.Player.Level));
+                    int healed = recipient.GetComponent<Combatant>().Heal(HealFor(heal.power, session.Player.Level)); if (healed > 0) HealFx.Show(recipient.transform);
                     session.FloatText(recipient.transform.position, "+" + healed, new Color(.3f,1,.7f));
                     session.HealThreat(actor, healed);   // shared out among the mobs in the fight (EncounterSession.Social)
                 });

@@ -16,6 +16,9 @@ namespace Crulanda.Tests
             Assert.AreEqual((ChatChannel.Say, "hi there"), ZoneChat.Parse("/s hi there"));
             Assert.AreEqual((ChatChannel.Zone, ""), ZoneChat.Parse("   "));
             Assert.AreEqual((ChatChannel.Zone, "/dance"), ZoneChat.Parse("/dance"), "an unknown command is said in Zone as typed");
+            Assert.AreEqual((ChatChannel.LFG, "lf1m"), ZoneChat.Parse("lf1m", ChatChannel.LFG), "plain words go to the sticky channel");
+            Assert.AreEqual((ChatChannel.Party, ""), ZoneChat.Parse("/p", ChatChannel.Zone), "a prefix alone is a switch");
+            Assert.AreEqual("/lfg", ZoneChat.Prefix(ChatChannel.LFG));
         }
         [Test] public void A_line_shows_its_channel_and_speaker()
         {

@@ -24,7 +24,7 @@ namespace Crulanda.Encounter
             var p = new Vector2(point.x * 1440 / Screen.width, (Screen.height - point.y) * 900 / Screen.height);
             return paused || buildVisible || mapVisible || QuestUiBlocks(p) || WhoUiBlocks(p) || ItemUiBlocks(p) || TradesUiBlocks(p) || LootUiBlocks(p) || p.y > 795 || new Rect(10, 10, 350, 190).Contains(p) ||
                 (targetVisible && new Rect(365, 10, 350, 130).Contains(p)) || new Rect(1215, 0, 225, 240).Contains(p) ||
-                (partySims > 0 && new Rect(10, 196, 350, 46 * partySims).Contains(p)) || new Rect(10, 590, 474, 186).Contains(p) ||   // the chat
+                (partySims > 0 && new Rect(10, 196, 350, 46 * partySims).Contains(p)) || chatRect.Contains(p) ||   // the chat
                 new Rect(1110, 236, 330, 200).Contains(p) || false;
         }
         /// <summary>Capture tools hide the HUD to photograph the world.</summary>
@@ -248,15 +248,21 @@ namespace Crulanda.Encounter
         /// a few seconds after the last message; hovering the log brings it back. The text itself stays, outlined.</summary>
         /// <summary>The chat (2026-10-06, playtest note 62; ZoneChat): tabs for All, Zone, Trade, LFG, Party and the game's own
         /// messages; Enter to type (/s say, /z zone, /t trade, /lfg, /p party), Enter to send, Esc to stop.</summary>
-        static readonly string[] ChatTabs = { "All", "Zone", "Trade", "LFG", "Party", "System" };
-        static int chatTab; static bool chatTyping, chatFocus; static string chatTyped = "";
-        static bool ShowsIn(ChatLine l, int tab)
-        {
-            switch (tab) { case 1: return l.channel == ChatChannel.Zone || l.channel == ChatChannel.Say; case 2: return l.channel == ChatChannel.Trade; case 3: return l.channel == ChatChannel.LFG; case 4: return l.channel == ChatChannel.Party; case 5: return l.channel == ChatChannel.System; default: return true; }
-        }
+        /// <summary>One window (Round 24, playtest note 66: "one window, but colorized"): every channel together, each in its colour,
+        /// with filter chips to hide one; dragged by its top edge and resized by its top-right corner (kept in PlayerPrefs).</summary>
+        static readonly (string chip, ChatChannel ch)[] ChatChips = { ("Zone", ChatChannel.Zone), ("Trade", ChatChannel.Trade), ("LFG", ChatChannel.LFG), ("Party", ChatChannel.Party), ("Sys", ChatChannel.System) };
+        static bool chatTyping, chatFocus, chatDrag, chatSize; static string chatTyped = ""; static Vector2 chatGrab;
+        static Rect chatRect = new Rect(10, 592, 472, 182); static int chatHidden; static bool chatLoaded;
+        static bool Shown(ChatLine l) { int bit = l.channel == ChatChannel.Say ? 1 << (int)ChatChannel.Zone : 1 << (int)l.channel; return (chatHidden & bit) == 0; }
+        static bool ChipAt(Vector2 p) { for (int i = 0; i < ChatChips.Length; i++) if (new Rect(chatRect.x + 4 + i * 58, chatRect.y + 2, 56, 18).Contains(p)) return true; return false; }
         void DrawChat()
         {
             var e = Event.current;
+            if (!chatLoaded)
+            {
+                chatLoaded = true;
+                try { chatRect = new Rect(PlayerPrefs.GetFloat("chat.x", 10), PlayerPrefs.GetFloat("chat.y", 592), PlayerPrefs.GetFloat("chat.w", 472), PlayerPrefs.GetFloat("chat.h", 182)); chatHidden = PlayerPrefs.GetInt("chat.hidden", 0); } catch { }
+            }
             if (e.type == EventType.KeyDown && (e.keyCode == KeyCode.Return || e.keyCode == KeyCode.KeypadEnter))
             {
                 if (chatTyping) { session.PlayerChat(chatTyped); chatTyped = ""; chatTyping = false; GUI.FocusControl(null); e.Use(); }
@@ -264,27 +270,36 @@ namespace Crulanda.Encounter
             }
             else if (chatTyping && e.type == EventType.KeyDown && e.keyCode == KeyCode.Escape) { chatTyping = false; chatTyped = ""; GUI.FocusControl(null); e.Use(); }
             EncounterInput.Typing = chatTyping;
-            var box = new Rect(10, 592, 472, 182);
+            // The top edge drags the window; the top-right corner resizes it.
+            var bar = new Rect(chatRect.x, chatRect.y, chatRect.width - 22, 22); var corner = new Rect(chatRect.xMax - 22, chatRect.y, 22, 22);
+            if (e.type == EventType.MouseDown && e.button == 0) { if (corner.Contains(e.mousePosition)) { chatSize = true; e.Use(); } else if (bar.Contains(e.mousePosition) && !ChipAt(e.mousePosition)) { chatDrag = true; chatGrab = e.mousePosition - chatRect.position; e.Use(); } }
+            if (e.type == EventType.MouseDrag && chatDrag) { chatRect.position = new Vector2(Mathf.Clamp(e.mousePosition.x - chatGrab.x, 0, 1440 - chatRect.width), Mathf.Clamp(e.mousePosition.y - chatGrab.y, 0, 790 - chatRect.height)); e.Use(); }
+            if (e.type == EventType.MouseDrag && chatSize) { float w = Mathf.Clamp(e.mousePosition.x - chatRect.x, 300, 900), h = Mathf.Clamp(chatRect.yMax - e.mousePosition.y, 90, 500); chatRect = new Rect(chatRect.x, chatRect.yMax - h, w, h); e.Use(); }
+            if (e.type == EventType.MouseUp && (chatDrag || chatSize)) { chatDrag = chatSize = false; try { PlayerPrefs.SetFloat("chat.x", chatRect.x); PlayerPrefs.SetFloat("chat.y", chatRect.y); PlayerPrefs.SetFloat("chat.w", chatRect.width); PlayerPrefs.SetFloat("chat.h", chatRect.height); } catch { } e.Use(); }
+            var box = chatRect;
             Fill(box, new Color(0, 0, 0, chatTyping || box.Contains(e.mousePosition) ? .5f : .3f));
-            for (int i = 0; i < ChatTabs.Length; i++)
+            Fill(bar, new Color(1, 1, 1, .05f)); Shadow(new Rect(corner.x + 4, corner.y + 1, 18, 20), "⤢", tiny, new Color(.8f, .8f, .78f));
+            for (int i = 0; i < ChatChips.Length; i++)
             {
-                var r = new Rect(box.x + 4 + i * 66, box.y + 3, 64, 20);
-                if (i == chatTab) Fill(r, new Color(1, .84f, .45f, .25f));
-                if (GUI.Button(r, ChatTabs[i], slim)) chatTab = i;
+                var r = new Rect(box.x + 4 + i * 58, box.y + 2, 56, 18); bool on = (chatHidden & (1 << (int)ChatChips[i].ch)) == 0;
+                var c = ZoneChat.Colour(ChatChips[i].ch); Fill(r, on ? new Color(c.r, c.g, c.b, .22f) : new Color(0, 0, 0, .25f));
+                if (GUI.Button(r, ChatChips[i].chip, slim)) { chatHidden ^= 1 << (int)ChatChips[i].ch; try { PlayerPrefs.SetInt("chat.hidden", chatHidden); } catch { } }
             }
-            float bottom = chatTyping ? box.yMax - 28 : box.yMax - 4, top = box.y + 26, y = bottom;
+            float bottom = chatTyping ? box.yMax - 28 : box.yMax - 4, top = box.y + 24, y = bottom; float textW = box.width - 18;
             var lines = session.Chat;
             for (int i = lines.Count - 1; i >= 0 && y > top; i--)
             {
-                var l = lines[i]; if (!ShowsIn(l, chatTab)) continue;
-                string shown = l.Shown; measureContent.text = shown; var h = tiny.CalcHeight(measureContent, 455); if (y - h < top) break; y -= h;
+                var l = lines[i]; if (!Shown(l)) continue;
+                string shown = l.Shown; measureContent.text = shown; var h = tiny.CalcHeight(measureContent, textW); if (y - h < top) break; y -= h;
                 var colour = l.channel == ChatChannel.System ? session.LineColour(l.text, ZoneChat.Colour(ChatChannel.System)) : ZoneChat.Colour(l.channel);
-                Outlined(new Rect(box.x + 8, y, 455, h), shown, tiny, colour);   // loot lines in their quality's colour
+                Outlined(new Rect(box.x + 8, y, textW, h), shown, tiny, colour);   // loot lines in their quality's colour
             }
             if (chatTyping)
             {
+                var cc = ZoneChat.Colour(session.ChatDefault); string tag = "[" + ZoneChat.Label(session.ChatDefault) + "]"; float tw = TextWidth(tiny, tag) + 10;
+                Fill(new Rect(box.x + 4, box.yMax - 26, tw, 22), new Color(cc.r, cc.g, cc.b, .25f)); Shadow(new Rect(box.x + 8, box.yMax - 25, tw, 20), tag, tiny, cc);
                 GUI.SetNextControlName("chat");
-                chatTyped = GUI.TextField(new Rect(box.x + 4, box.yMax - 26, box.width - 8, 22), chatTyped, 200);
+                chatTyped = GUI.TextField(new Rect(box.x + 4 + tw, box.yMax - 26, box.width - 8 - tw, 22), chatTyped, 200);
                 if (chatFocus) { GUI.FocusControl("chat"); chatFocus = false; }
             }
             Shadow(new Rect(12, 776, 900, 20), "WASD move · / run · Space jump · Right-drag look · Wheel zoom · Tab target · E interact · L quests · M map · B talents · I bags · C character · K trades · O who · Enter chat", tiny, new Color(.8f, .8f, .78f));

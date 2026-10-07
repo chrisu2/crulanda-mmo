@@ -30,7 +30,7 @@ namespace Crulanda.Encounter
         public RecipeDef Recipe { get; private set; }
         public Vector3 CorpseAt { get; private set; }
         public int Kills { get; private set; }
-        float until, nextAct, nextHeal, stuckSince, workUntil, downSince, lastTrade; int pick, goal; Renderer[] renderers; Transform corpse;
+        float until, nextAct, nextHeal, stuckSince, workUntil, downSince, lastTrade, healAt; int pick, goal; Renderer[] renderers; Transform corpse;
         EncounterSession Session { get { return population.Session; } }
         public bool Walking { get { return agent != null && agent.isOnNavMesh && !agent.isStopped && agent.remainingDistance > agent.stoppingDistance + .1f; } }
         public bool Melee { get { return sim.classId == "class.warrior" || sim.classId == "class.paladin"; } }
@@ -214,12 +214,19 @@ namespace Crulanda.Encounter
             if (q.Engaged && q.Victim != actor && !(q.TappedBy == sim.id)) { Quarry = null; return; }
             if (actor.Health.Pool.Ratio < .3f && !Healer) { Quarry = null; goal = 0; return; }   // breaks off: the mob may follow (its leash)
             float reach = Melee ? 2.4f : 18, d = Vector3.Distance(transform.position, q.transform.position);
+            // A healer mending itself: the spell pose held a second (playtest note 68), then the release, the heal and its glow.
+            if (healAt > 0)
+            {
+                if (Time.time < healAt) return;
+                healAt = 0; if (visual != null) visual.Casting = false;
+                int healed = actor.GetComponent<Combatant>().Heal(Mathf.RoundToInt(12 + 5 * sim.level)); visual?.CastRelease();
+                if (healed > 0) { Session.FloatText(transform.position, "+" + healed, new Color(.3f, 1, .7f)); HealFx.Show(transform); }
+                return;
+            }
             if (Healer && actor.Health.Pool.Ratio < .5f && Time.time >= nextHeal)
             {
-                nextHeal = Time.time + 8; nextAct = Mathf.Max(nextAct, Time.time + 1.2f);
-                int healed = actor.GetComponent<Combatant>().Heal(Mathf.RoundToInt(12 + 5 * sim.level)); visual?.CastRelease();
-                if (healed > 0) Session.FloatText(transform.position, "+" + healed, new Color(.3f, 1, .7f));
-                return;
+                nextHeal = Time.time + 8; nextAct = Mathf.Max(nextAct, Time.time + 2.2f); healAt = Time.time + 1; if (visual != null) visual.Casting = true;
+                agent.isStopped = true; return;
             }
             if (d > reach) { if (Time.time - stuckSince > .5f || !Walking) { Go(q.transform.position); agent.speed = Melee ? 4.6f : 3.2f; stuckSince = Time.time; } return; }
             agent.isStopped = true;

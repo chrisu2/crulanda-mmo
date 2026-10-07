@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -62,6 +63,43 @@ namespace Crulanda.Encounter
             PartySims.Add(c);
             Message(s.name + " has joined your party.");
             return true;
+        }
+        /// <summary>How long a sim takes to come from another zone when invited (seconds; tests shorten it).</summary>
+        public static float InviteTravelSeconds = 30;
+        readonly List<string> coming = new List<string>();
+        /// <summary>/invite by name (Round 24, playtest note 67): a sim standing here joins at once; one online elsewhere accepts by
+        /// the same rules, sets out, and arrives at the road's end nearest you after <see cref="InviteTravelSeconds"/>.</summary>
+        public bool InviteByName(string name)
+        {
+            var pop = SimPopulation.Active; if (pop == null || string.IsNullOrEmpty(name)) { Message("Invite whom? /invite <name>."); return false; }
+            // The name as typed, else by its start (a first name): among those online, one standing here before one away (first names repeat).
+            var s = pop.World.sims.Find(x => string.Equals(x.name, name, StringComparison.OrdinalIgnoreCase));
+            if (s == null)
+            {
+                var hour = Crulanda.World.WorldClock.Hour;
+                var like = pop.World.sims.FindAll(x => x.name.StartsWith(name, StringComparison.OrdinalIgnoreCase) && (x.IsOnlineAt(hour) || InParty(x.id)));
+                s = like.Find(x => x.zone == ZoneId && pop.Find(x.id) != null) ?? (like.Count > 0 ? like[0] : pop.World.sims.Find(x => x.name.StartsWith(name, StringComparison.OrdinalIgnoreCase)));
+            }
+            if (s == null) { Message("Nobody called " + name + "."); return false; }
+            if (!s.IsOnlineAt(Crulanda.World.WorldClock.Hour) && !InParty(s.id)) { Message(s.name + " is not online."); return false; }
+            if (s.zone == ZoneId && pop.Find(s.id) != null) return Invite(s.id);
+            var why = InviteRefusal(s); if (why != null) { Message(why); return false; }
+            if (coming.Contains(s.id)) { Message(s.name + " is already on the way."); return false; }
+            coming.Add(s.id); ChatSay(ChatChannel.Party, s.name, "on my way from " + ZoneName(s.zone) + ", " + Mathf.RoundToInt(InviteTravelSeconds) + "s");
+            StartCoroutine(Arrive(s));
+            return true;
+        }
+        System.Collections.IEnumerator Arrive(SimAdventurer s)
+        {
+            yield return new WaitForSeconds(InviteTravelSeconds);
+            coming.Remove(s.id);
+            var pop = SimPopulation.Active; if (pop == null || Player == null) yield break;
+            // At the road's end nearest you (or by you, where the zone has no roads).
+            var at = Player.transform.position; float best = float.MaxValue;
+            if (Zone != null && Zone.Zone.exits != null) foreach (var e in Zone.Zone.exits) { var p = Zone.Ground(e.at); float d = Vector3.Distance(p, Player.transform.position); if (d < best) { best = d; at = p; } }
+            s.zone = ZoneId; s.x = at.x; s.z = at.z; s.onlineFrom = s.onlineFrom; pop.Refresh();
+            if (pop.Find(s.id) == null) { Message(s.name + " could not get here."); yield break; }
+            if (Invite(s.id)) ChatSay(ChatChannel.Party, s.name, "here, where to?");
         }
         int FreeSlot() { for (int i = 0; ; i++) if (!PartySims.Exists(x => x != null && x.slot == i)) return i; }
         /// <summary>Sends a party sim back to the world where it stands.</summary>

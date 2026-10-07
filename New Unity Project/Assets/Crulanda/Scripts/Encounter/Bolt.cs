@@ -77,22 +77,46 @@ namespace Crulanda.Encounter
         }
     }
 
+    /// <summary>A heal landing (Round 24, playtest note 68: "need to show druid casting healing spells"): a soft green glow and a few
+    /// motes rising off the healed. The caster's part is the spell pose held a moment, then the release (SimCompanion, SimFigure,
+    /// HealerCompanion; the player's own casts already pose).</summary>
+    public static class HealFx
+    {
+        public static readonly Color Green = new Color(.45f, 1, .6f);
+        public static void Show(Transform target)
+        {
+            if (target == null) return;
+            var root = new GameObject("Heal"); root.transform.position = target.position + Vector3.up * .9f;
+            var burst = root.AddComponent<BoltBurst>(); burst.colour = Green; burst.rising = true;
+            for (int i = 0; i < 9; i++)
+            {
+                var e = GameObject.CreatePrimitive(PrimitiveType.Sphere); Object.Destroy(e.GetComponent<Collider>());
+                e.transform.SetParent(root.transform, false); e.transform.localPosition = Random.insideUnitSphere * .45f; e.transform.localScale = Vector3.one * .09f;
+                var r = e.GetComponent<MeshRenderer>(); r.sharedMaterial = new Material(Shader.Find("Sprites/Default")) { color = Color.Lerp(Green, Color.white, .3f), renderQueue = 3150 }; r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off; r.receiveShadows = false;
+                burst.embers.Add((e.transform, Vector3.up * (.8f + Random.value * .8f) + Random.insideUnitSphere * .3f));
+            }
+            var l = root.AddComponent<Light>(); l.type = LightType.Point; l.color = Green; l.range = 3.5f; l.intensity = 2.2f; l.shadows = LightShadows.None;
+            burst.light = l;
+        }
+    }
     /// <summary>The embers of a <see cref="Bolt"/>'s impact: flung out, slowed, shrinking away.</summary>
     public sealed class BoltBurst : MonoBehaviour
     {
         public readonly System.Collections.Generic.List<(Transform t, Vector3 v)> embers = new System.Collections.Generic.List<(Transform, Vector3)>();
         public Light light; public Color colour; float age;
-        const float Life = .38f;
+        /// <summary>A heal's motes: they drift up and are not pulled down, over a longer moment.</summary>
+        public bool rising;
+        float Life { get { return rising ? .9f : .38f; } }
         void Update()
         {
             age += Time.deltaTime; float k = 1 - Mathf.Clamp01(age / Life);
             for (int i = 0; i < embers.Count; i++)
             {
                 var (t, v) = embers[i]; if (t == null) continue;
-                t.position += v * Time.deltaTime * k; t.localScale = Vector3.one * Mathf.Max(.001f, t.localScale.x * (1 - Time.deltaTime * 2.5f));
-                embers[i] = (t, v + Vector3.down * 4 * Time.deltaTime);
+                t.position += v * Time.deltaTime * k; t.localScale = Vector3.one * Mathf.Max(.001f, t.localScale.x * (1 - Time.deltaTime * (rising ? 1.1f : 2.5f)));
+                embers[i] = (t, rising ? v : v + Vector3.down * 4 * Time.deltaTime);
             }
-            if (light != null) light.intensity = 2.5f * k;
+            if (light != null) light.intensity = (rising ? 2.2f : 2.5f) * k;
             if (age >= Life) Destroy(gameObject);
         }
     }

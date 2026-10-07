@@ -1406,3 +1406,11 @@ A read-only review by five reviewers, each finding checked by a second who tried
   older slot reads them empty).
 - Tests: EditMode SimEconomyTests; PlayMode SimWorldTests (ding and grats; the corpse run; the road out and the unseen move;
   the stall, an upgrade, the forge).
+
+## 2026-10-07 — Round 24 (playtest notes 64-71)
+- The Golden Cask's horse stabled at a hitching rail in the back yard (new prop "hitch"); the camera held inside the building
+  you are in; one chat window coloured by channel with filter chips, drag and resize (PlayerPrefs); a sticky chat channel
+  (/lfg alone switches it; the input shows the channel); /invite <name> across zones (arrives at the nearest road's end after
+  InviteTravelSeconds, 30), /leave, /who, /help; healing seen (a second's cast pose, then HealFx: green glow and motes);
+  the coop's trough, sack and pan seated on the ground (ZoneBuilder.Seat); the orchard's apples in the leaves.
+- Tests: ZoneChatTests (sticky channel, prefixes), SimChatTests (/lfg switch, /invite from another zone, unknown command).

@@ -74,6 +74,18 @@ namespace Crulanda.Tests
             session.Message("A test message.");
             Assert.AreEqual(ChatChannel.System, session.Chat.Last().channel); Assert.AreEqual("A test message.", session.Chat.Last().text);
             session.PlayerChat("/p hello"); StringAssert.Contains("not in a party", session.Messages.Last());
+            // The sticky channel (note 71): "/lfg" alone switches, plain words then go there, "/z" brings Zone back.
+            session.PlayerChat("/lfg"); Assert.AreEqual(ChatChannel.LFG, session.ChatDefault);
+            session.PlayerChat("lf1m wolves"); Assert.AreEqual(ChatChannel.LFG, session.Chat.Last(l => l.speaker == "You").channel);
+            session.PlayerChat("/z"); Assert.AreEqual(ChatChannel.Zone, session.ChatDefault);
+            // /invite across zones (note 67): a sim online elsewhere sets out and joins.
+            EncounterSession.InviteTravelSeconds = 1;
+            var far = SimPopulation.Active.World.sims.First(s => s.zone != "zone.oakhaven"); far.onlineFrom = 0; far.onlineHours = 24; far.friendly = .9f; far.level = session.Progress.Level;
+            Assert.IsTrue(session.InviteByName(far.name), "invited by name from " + far.zone + ": " + string.Join(" | ", session.Messages));
+            float tt = 0; while (tt < 8 && !session.InParty(far.id)) { tt += Time.deltaTime; yield return null; }
+            Assert.IsTrue(session.InParty(far.id), far.name + " came from " + far.zone + " and joined");
+            EncounterSession.InviteTravelSeconds = 30;
+            session.PlayerChat("/dance"); StringAssert.Contains("Unknown command", session.Messages.Last());
         }
     }
 }

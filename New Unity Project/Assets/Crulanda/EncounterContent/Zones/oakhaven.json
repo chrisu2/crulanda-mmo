@@ -1472,6 +1472,15 @@
       "scale": 1.9
     },
     {
+      "kind": "hitch",
+      "name": "The Cask's hitching rail",
+      "at": {
+        "x": -21.2,
+        "y": -24.3
+      },
+      "rotation": 41
+    },
+    {
       "kind": "inn",
       "name": "The Golden Cask",
       "at": {
@@ -4283,10 +4292,10 @@
       {
         "kind": "horse",
         "center": {
-          "x": -8.5,
-          "y": -9
+          "x": -21.2,
+          "y": -24.3
         },
-        "radius": 1.5,
+        "radius": 2,
         "count": 1
       },
       {

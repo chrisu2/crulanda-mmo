@@ -38,6 +38,20 @@ namespace Crulanda.World
             }
         }
 
+        /// <summary>The player is inside this building (its bounds hold them): the camera must stay inside too (AdventurerMotor).</summary>
+        public static bool ClampInside(Vector3 player, ref Vector3 camera)
+        {
+            foreach (var r in All)
+            {
+                if (!r.ready) r.Prepare();
+                var b = r.bounds; if (!b.Contains(player)) continue;
+                if (b.Contains(camera)) return true;
+                var d = player - camera; float length = d.magnitude; if (length < .01f) return true;
+                if (b.IntersectRay(new Ray(camera, d / length), out float hit)) camera = camera + d / length * (hit + .35f);   // just inside the wall
+                return true;
+            }
+            return false;
+        }
         /// <summary>Fades every building that blocks the camera's view of the player and brings back the rest. Once a frame,
         /// after the camera has moved (AdventurerMotor, with TreeFade.UpdateAll).</summary>
         public static void UpdateAll(Vector3 camera, Vector3 head, Vector3 body)

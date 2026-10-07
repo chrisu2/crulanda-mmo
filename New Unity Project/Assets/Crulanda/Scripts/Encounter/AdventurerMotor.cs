@@ -126,6 +126,9 @@ namespace Crulanda.Encounter
                 if (hit.collider != groundCollider && hit.collider.GetComponentInParent<Crulanda.Gameplay.Actor>() == null && hit.collider.GetComponentInParent<Crulanda.World.TreeFade>() == null && hit.distance > .05f)
                     allowed = Mathf.Min(allowed, hit.distance);
             var camAt = pivot - rotation * Vector3.forward * Mathf.Max(1.2f, allowed);
+            // Inside a building (the Golden Cask) the camera stays within its walls (Round 24, playtest note 65: turning the camera
+            // took it out through the wall, and the building faded away round you); the walls are not solid to the cast above.
+            Crulanda.World.RoofFade.ClampInside(transform.position + Vector3.up * .9f, ref camAt);
             // Out of doors the ground does not pull the camera in: it rides along the grass (looking up past you), never under it.
             if (groundCollider != null) { float g = zoneHere.HeightAt(camAt.x, camAt.z) + .35f; if (camAt.y < g) camAt.y = g; }
             // Keep the camera above any water surface (no looking up at the water from underneath).

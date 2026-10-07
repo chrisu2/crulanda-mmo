@@ -17,7 +17,7 @@ namespace Crulanda.Encounter
     {
         public Actor actor; public EncounterSession session; public SimAdventurer sim; public int slot;
         NavMeshAgent agent; ActorVisual visual;
-        float nextAct, nextHeal, nextCatchUp, downSince = -1;
+        float nextAct, nextHeal, nextCatchUp, downSince = -1, healAt; Actor healing;
         public string Activity { get; private set; } = "Following you";
         public bool Melee { get { return sim.classId == "class.warrior" || sim.classId == "class.paladin"; } }
         public bool Healer { get { return sim.classId == "class.druid" || sim.classId == "class.paladin"; } }
@@ -81,16 +81,28 @@ namespace Crulanda.Encounter
             }
             if (!agent.isOnNavMesh) return;
             if (!session.InCombat && Time.time >= nextHeal) { nextHeal = Time.time + 1; actor.Health.ApplyHealing(Mathf.Max(3, actor.Health.Pool.Max / 40)); }
-            // Mending first, for the healers: the most hurt of the party under 60%.
-            if (Healer && session.InCombat && Time.time >= nextHeal)
+            // Mending first, for the healers: the most hurt of the party under 60%. A cast of a second (the spell pose held, playtest
+            // note 68), then the release, the heal and its glow.
+            if (healing != null)
+            {
+                if (Time.time < healAt) { Activity = "Mending " + (healing == player ? "you" : healing.DisplayName); return; }
+                var who = healing; healing = null; if (visual != null) visual.Casting = false;
+                if (who.IsAlive && Vector3.Distance(who.transform.position, transform.position) <= 28)
+                {
+                    int healed = who.GetComponent<Combatant>().Heal(HealAmount);
+                    session.FloatText(who.transform.position, "+" + healed, new Color(.3f, 1, .7f)); session.HealThreat(actor, healed);
+                    visual?.CastRelease(); if (healed > 0) HealFx.Show(who.transform);
+                }
+            }
+            else if (Healer && session.InCombat && Time.time >= nextHeal)
             {
                 var hurt = MostHurt();
                 if (hurt != null && hurt.Health.Pool.Ratio < .6f && Vector3.Distance(hurt.transform.position, transform.position) <= 25)
                 {
-                    nextHeal = Time.time + 6; nextAct = Mathf.Max(nextAct, Time.time + 1.2f);
-                    int healed = hurt.GetComponent<Combatant>().Heal(HealAmount);
-                    session.FloatText(hurt.transform.position, "+" + healed, new Color(.3f, 1, .7f)); session.HealThreat(actor, healed);
-                    visual?.CastRelease(); Activity = "Mending " + (hurt == player ? "you" : hurt.DisplayName);
+                    nextHeal = Time.time + 6; nextAct = Mathf.Max(nextAct, Time.time + 2.2f);
+                    healing = hurt; healAt = Time.time + 1; if (visual != null) visual.Casting = true;
+                    if (agent.isOnNavMesh) agent.isStopped = true;
+                    Activity = "Mending " + (hurt == player ? "you" : hurt.DisplayName);
                     return;
                 }
             }

@@ -482,4 +482,21 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
 - **62. Zone chat for all sims and players in the zone; sims chatting away; research real MMO chat.** RESEARCHED (Docs/CHAT_RESEARCH.md);
   to build next (Phase 5.5 brought forward).
 - **63. Sims sell what they gather or make and upgrade themselves, or make their own gear with trade skills and recipes.** For 5.3c.
-
+- **64. "This horse needs to find a home or stall; still hangs out in front of the inn."** DONE (round 24): a hitching rail with a
+  trough and hay in the Golden Cask's back yard (prop kind "hitch"), the horse kept there.
+- **65. "When in the inn, rotating the camera makes it all disappear."** DONE (round 24): the camera stays inside the building the
+  player is in (RoofFade.ClampInside): it had gone out through the wall, and the whole inn faded.
+- **66. "Chat should be in one window, colorized by channel; should be able to adjust chat windows."** DONE (round 24): one
+  window, lines in their channel's colour, filter chips to hide a channel, dragged by its top edge, resized by its corner; kept
+  between runs. (Chris later: "nm on chat, I see the All channel.")
+- **67. "/invite command for people across zones."** DONE (round 24): /invite <name> (or /inv; a first name will do) for anyone
+  online anywhere; from another zone they accept, say so in Party, and arrive at the road's end nearest you after 30 s. Also
+  /leave [name], /who, /help; an unknown command says so instead of going to Zone.
+- **68. "Need to show druid casting healing spells, animations."** DONE (round 24): healers (sims, party sims, Mira) hold the spell
+  pose a second, then release; every heal (theirs, the Druid's, the Paladin's) puts a green glow and rising motes on the healed.
+- **69. "Chicken items floating."** DONE (round 24): the coop's trough, grain sack and water pan sit on the ground where they stand.
+- **70. "Apples floating."** DONE (round 24): the orchard's apples sit in the leaf mass, not in the air round it.
+- **71. "I can't talk in party or lfg channels."** DONE (round 24): a sticky channel: /lfg or /p on its own switches where plain
+  words go (the input shows [LFG]); Party with no party says to /invite someone first.
+- **72. "Allow all party members to get loot, and maybe need/greed uncommon, rare, epic, legendary items."** NEXT (round 25):
+  loot shared round the party; need/greed rolls on uncommon and better, the sims rolling by what they can use.

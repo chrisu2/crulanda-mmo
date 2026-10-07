@@ -1178,6 +1178,7 @@ namespace Crulanda.World
                     }
                     case "bridge": SeatBridge(t, p.size.x > 0 ? p.size.x : 12); if (p.variant == 1) RopeBridge(t, p.size.x > 0 ? p.size.x : 12); else Bridge(t, p.size.x > 0 ? p.size.x : 12); break;
                     case "signpost": Signpost(t, p.name); break;
+                    case "hitch": Hitch(t); break;
                     case "board": NoticeBoard(t); break;
                     case "ruin": Ruin(t, p.size.x > 0 ? p.size.x : 6); break;
                     case "gate": Gate(t, p.size.x > 0 ? p.size.x : 6.4f); break;
@@ -2453,6 +2454,18 @@ namespace Crulanda.World
             signText = sh != null ? new Material(sh) { name = "Sign text", mainTexture = font.material.mainTexture } : font.material;
             return signText;
         }
+        /// <summary>A hitching rail (Round 24, playtest note 64: "this horse needs to find a home or stall"): two posts, a rail, a
+        /// water trough beneath and a heap of hay beside, in the Golden Cask's yard, where its horse is kept.</summary>
+        void Hitch(Transform t)
+        {
+            foreach (float x in new[] { -1.3f, 1.3f }) Stake(t, new Vector3(x, -.1f, 0), .16f, 1.3f, art.timber, Quaternion.Euler(0, 0, x < 0 ? 2 : -2));
+            Bar(t, new Vector3(-1.5f, 1.05f, 0), new Vector3(1.5f, 1.05f, 0), .1f, .08f, Tint(art.timber, new Color(.42f, .31f, .19f)));
+            var trough = Tint(art.timber, new Color(.34f, .25f, .15f));
+            Part(PrimitiveType.Cube, t, new Vector3(0, .22f, .55f), new Vector3(1.6f, .34f, .5f), trough);
+            Part(PrimitiveType.Cube, t, new Vector3(0, .36f, .55f), new Vector3(1.45f, .04f, .38f), Tint(art.stone, new Color(.3f, .42f, .5f)));   // the water
+            Part(PrimitiveType.Sphere, t, new Vector3(2.2f, .3f, -.3f), new Vector3(1.3f, .6f, 1.1f), art.hay);   // a heap of hay
+            Solid(t, new Vector3(0, .6f, .2f), new Vector3(3.2f, 1.2f, 1.2f));
+        }
         void Signpost(Transform t, string text = null)
         {
             Stake(t, new Vector3(0, -.1f, 0), .2f, 2.44f, art.timber, Quaternion.Euler(0, 0, 2));
@@ -2540,6 +2553,9 @@ namespace Crulanda.World
         /// A hen coop: a small raised hut on legs with a ramp down to a pop-hole door on a hinge (front faces -Z),
         /// nest boxes on the side and a feed trough in the yard. Registered in <see cref="Coops"/>.
         /// </summary>
+        /// <summary>Puts a small thing on the ground where it stands (Round 24, playtest note 69: "chicken items floating"): its own
+        /// height becomes the ground's there, whatever its parent sits on.</summary>
+        void Seat(Transform thing, float lift = 0) { var p = thing.position; thing.position = new Vector3(p.x, HeightAt(p.x, p.z) + lift, p.z); }
         void Coop(Transform t, string name)
         {
             float w = 2.6f, d = 2f, floor = .7f, h = 1.5f;
@@ -2562,18 +2578,20 @@ namespace Crulanda.World
             Part(PrimitiveType.Cube, t, new Vector3(0, floor / 2, -d / 2 - .75f), new Vector3(.5f, .05f, 1.6f), boards, Quaternion.Euler(-26, 0, 0));
             // Feed trough and a grain sack out front, and a water pan the other side of the ramp (the hen-wife fills it from the well;
             // the water sinks as the day dries it).
-            Part(PrimitiveType.Cube, t, new Vector3(-1.4f, .18f, -d / 2 - 1.6f), new Vector3(1.2f, .25f, .35f), dark);
-            Part(PrimitiveType.Cube, t, new Vector3(-1.4f, .3f, -d / 2 - 1.6f), new Vector3(1.1f, .04f, .25f), art.hay);
+            var troughT = new GameObject("Feed trough").transform; troughT.SetParent(t, false); troughT.localPosition = new Vector3(-1.4f, 0, -d / 2 - 1.6f);
+            Part(PrimitiveType.Cube, troughT, new Vector3(0, .18f, 0), new Vector3(1.2f, .25f, .35f), dark);
+            Part(PrimitiveType.Cube, troughT, new Vector3(0, .3f, 0), new Vector3(1.1f, .04f, .25f), art.hay);
+            Seat(troughT);
             // The grain sack (playtest note 21: one tall sphere read as a giant egg): a slumped burlap body wider than it is tall,
             // a gathered neck and its cord, leaning back against the coop.
             var burlap = Tint(art.cloth, new Color(.62f, .52f, .36f)); var sack = new GameObject("Grain sack").transform;
-            sack.SetParent(t, false); sack.localPosition = new Vector3(1.5f, 0, -d / 2 - .45f); sack.localRotation = Quaternion.Euler(-8, 15, 0);
+            sack.SetParent(t, false); sack.localPosition = new Vector3(1.5f, 0, -d / 2 - .45f); sack.localRotation = Quaternion.Euler(-8, 15, 0); Seat(sack);
             Part(PrimitiveType.Sphere, sack, new Vector3(0, .2f, 0), new Vector3(.52f, .42f, .44f), burlap);
             Part(PrimitiveType.Sphere, sack, new Vector3(0, .38f, 0), new Vector3(.4f, .3f, .36f), burlap);
             Part(PrimitiveType.Cylinder, sack, new Vector3(0, .56f, 0), new Vector3(.13f, .07f, .13f), burlap);
             Part(PrimitiveType.Cylinder, sack, new Vector3(0, .54f, 0), new Vector3(.15f, .015f, .15f), Tint(art.timber, new Color(.35f, .27f, .17f)));   // the cord
             Part(PrimitiveType.Sphere, sack, new Vector3(0, .65f, 0), new Vector3(.17f, .1f, .17f), burlap);   // the gathered top
-            var pan = new GameObject("Water pan").transform; pan.SetParent(t, false); pan.localPosition = new Vector3(1.3f, 0, -d / 2 - 1.7f);
+            var pan = new GameObject("Water pan").transform; pan.SetParent(t, false); pan.localPosition = new Vector3(1.3f, 0, -d / 2 - 1.7f); Seat(pan);
             Part(PrimitiveType.Cylinder, pan, new Vector3(0, .05f, 0), new Vector3(.8f, .05f, .8f), Tint(art.metal, new Color(.3f, .3f, .32f)));
             var water = Part(PrimitiveType.Cylinder, pan, new Vector3(0, .06f, 0), new Vector3(.68f, .012f, .68f), Tint(art.stone, new Color(.3f, .42f, .5f)));
             water.SetActive(false);
@@ -3208,7 +3226,8 @@ namespace Crulanda.World
                         // Its leaf mass: small fresh-green lumps (the fruit still shows round them) under the cards.
                         LeafCrown(t, tr, lean + new Vector3(0, h + .85f, 0), spots, ends, orchardLeaf, bark, Tint(art.foliage, new Color(.19f, .29f, .12f)), 1, new Vector3(1.5f, .9f, 1.5f), mass: LeafMassOf(0), cardSize: .9f, massSize: .54f);
                         var fruit = Tint(art.hay, new Color(.72f, .18f, .12f));
-                        for (int k = 0; k < 6; k++) Part(PrimitiveType.Sphere, t, new Vector3(R01 * 2.4f - 1.2f, h + .2f + R01 * 1.4f, R01 * 2.4f - 1.2f) + lean, Vector3.one * .22f, fruit);
+                        // On the leaf mass's skin (Round 24, playtest note 70: "apples floating"): round the crown's middle, a little in from its edge.
+                        for (int k = 0; k < 6; k++) { float fa = R01 * Mathf.PI * 2, fr = .5f + R01 * .25f; Part(PrimitiveType.Sphere, t, new Vector3(Mathf.Cos(fa) * fr, h + .85f + (R01 - .5f) * .5f, Mathf.Sin(fa) * fr) + lean, Vector3.one * .2f, fruit); }
                         var cap = t.gameObject.AddComponent<CapsuleCollider>(); cap.center = new Vector3(0, h / 2, 0); cap.height = h; cap.radius = .3f; trunks.Add(at);
                         t.gameObject.AddComponent<NavBlocker>(); t.gameObject.AddComponent<TreeFade>();
                     }

@@ -368,7 +368,7 @@ namespace Crulanda.Encounter
             var r = go.GetComponent<MeshRenderer>(); r.sharedMaterial = new Material(Shader.Find("Standard")) { color = new Color(.24f, .2f, .17f) }; r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             corpse = go.transform;
         }
-        void ClearCorpse() { if (corpse != null) { Destroy(corpse.gameObject); corpse = null; } }
+        void ClearCorpse() { if (corpse != null) { corpse.gameObject.SetActive(false); Destroy(corpse.gameObject); corpse = null; } }   // gone at once, not at the frame's end
         void OnDisable() { if (visual != null && (Activity == Doing.Gather || Activity == Doing.Craft)) visual.Pose = ActorPose.None; }
         void OnDestroy() { ClearCorpse(); }
     }

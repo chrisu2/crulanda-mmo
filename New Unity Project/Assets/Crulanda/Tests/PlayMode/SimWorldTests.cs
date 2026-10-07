@@ -56,8 +56,8 @@ namespace Crulanda.Tests
             f.GainXp(EncounterProgress.XpToNext(2));
             Assert.AreEqual(3, f.sim.level, "level 3"); Assert.Greater(f.actor.Health.Pool.Max, hp, "more health at the new level");
             Assert.IsTrue(session.Chat.Any(l => l.speaker == f.sim.name && l.text.Contains("ding")), "ding in the chat");
-            float t = 0; while (t < 10 && !session.Chat.Any(l => l.text.Contains("grats") || l.text.Contains("gz"))) { t += Time.deltaTime; yield return null; }
-            Assert.IsTrue(session.Chat.Any(l => l.text.Contains("grats") || l.text.Contains("gz")), "a grats from another sim");
+            float t = 0; while (t < 10 && !session.Chat.Any(l => l.text.Contains("grat") || l.text.Contains("gz"))) { t += Time.deltaTime; yield return null; }
+            Assert.IsTrue(session.Chat.Any(l => l.text.Contains("grat") || l.text.Contains("gz")), "a grats from another sim (\"gratz\" counts)");
         }
 
         [UnityTest] public IEnumerator A_beaten_sim_comes_to_at_the_recovery_point_and_runs_back_for_its_corpse()

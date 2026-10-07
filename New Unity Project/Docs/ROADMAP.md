@@ -34,7 +34,7 @@ About 15-17 rounds. No external language model: local state machines and utility
 
 ## Queued around Phase 5
 - The Ash-Walker enclave's interior (playtest note 40).
-- Art rounds from Chris's assets (Fantasy Props MegaKit and Medieval props in, 2026-10-07): Stylized Nature MegaKit, Medieval Village MegaKit, Stylized Megapack
+- Art rounds from Chris's assets (Fantasy Props MegaKit, Medieval props and the Stylized Nature MegaKit's trees in, 2026-10-07): Medieval Village MegaKit, Stylized Megapack
   2in1, Medieval props, HQ Rock Pack, the Ashen Marches sentinel helm.
 - Sound: ambience, weapon hits (slash, pierce, blunt each different), spells, mobs; music later.
 - Standing: playtest notes as they come (Docs/PLAYTEST_NOTES.md), frame rate, cave lighting (note 10).

@@ -51,6 +51,7 @@ namespace Crulanda.World
             t.localScale = Vector3.one * s; t.localRotation = Quaternion.Euler(0, yaw, 0);
             t.localPosition = foot + t.localRotation * new Vector3(-b.center.x * s, -b.min.y * s, -b.center.z * s);
             foreach (var r in go.GetComponentsInChildren<Renderer>(true)) { r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On; r.receiveShadows = true; }
+            if (path.StartsWith("Nature/")) DressNature(go);
             if (solid) { var box = go.AddComponent<BoxCollider>(); box.center = b.center; box.size = b.size; go.AddComponent<NavBlocker>(); }
             return go;
         }
@@ -92,6 +93,8 @@ namespace Crulanda.World
             ("Fantasy/FarmCrate_Apple", .34f), ("Fantasy/FarmCrate_Carrot", .34f), ("Fantasy/Dummy", 1.9f), ("Fantasy/Banner_1", 2.6f), ("Fantasy/Cauldron", .9f),
             ("Medieval/Prefabs/PileOfWoodV1", .5f), ("Medieval/Prefabs/CandleV1", .2f), ("Medieval/Prefabs/BottleV1", .28f), ("Medieval/Prefabs/MugV2", .13f), ("Medieval/Prefabs/PotV1", .3f),
             ("Medieval/Prefabs/BeerBarrelV1", .9f), ("Medieval/Prefabs/LanternV1", .4f),
+            ("Nature/CommonTree_1", 7), ("Nature/CommonTree_3", 7), ("Nature/CommonTree_5", 7), ("Nature/Pine_1", 10), ("Nature/Pine_4", 10), ("Nature/Bush_Common", 1.3f), ("Nature/Bush_Common_Flowers", 1.3f),
+            ("Nature/DeadTree_1", 6), ("Nature/Rock_Medium_1", 1.5f), ("Nature/Grass_Common_Tall", .5f), ("Nature/Flower_3_Group", .35f), ("Nature/TwistedTree_1", 8),
         };
     }
 }

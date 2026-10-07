@@ -1475,3 +1475,24 @@ A read-only review by five reviewers, each finding checked by a second who tried
   and front, to hel/work/ui-captures/props-row*.png: the check on size and facing before a model goes into a village.
 - Left for the next art rounds: the Stylized Nature MegaKit (trees, bushes, rocks for the outdoors), the Stylized Megapack, the
   HQ Rock Pack, and the Medieval Village MegaKit when it is in Downloads.
+
+## 2026-10-07 — Art round 2, the nature round: the Stylized Nature MegaKit
+- **The kit in the project** (Quaternius, CC0; 68 FBX under Resources/Props/Nature with their bark, leaf, rock and grass textures;
+  ThirdPartyImport names each material's texture after it, bark with its normal map, grass and flowers cut out).
+- **Kit trees** (ZoneBuilder.NatureKit, KitTree): every broadleaf "tree" prop and forest-edge tree is one of the kit's five
+  common trees (6-8 m), every pine one of its five pines (8-13 m), every meadow bush its bush (flowering now and then), each on
+  the prop root with its turn and scale, a trunk collider, a NavBlocker and TreeFade as before. The builders take the same draws
+  from the zone's stream as the painted trees did, so nothing else in a zone moved. The painted trees remain the fallback
+  (tests' bare scenes) and still build the great oak, the giant trees, dead trees and twisted woods.
+- **Leaf cards:** the kit's leaf, grass and flower sheets are alpha cards whose colour is in the "_C" sheets; they go on the
+  game's own painted-leaf shader (cut out, both faces, swaying, faded by TreeFade), set by the importer and again at run time
+  (ZoneBuilder.DressNature). Crowns take the painted trees' leaf-family tints (and grey in gloom); meadow bushes get the green
+  sheet (the model ships with the twisted tree's autumn red). Pitfall found on the way: the importer's normal-map test matched
+  "NormalTree" in the colour sheets' names, which imported the bark and leaf colour as normal maps (pink bark, no crowns); it
+  now matches only files ending in _Normal.
+- The props row (PropCapture) now includes the kit's trees, bush, dead tree, rock, grass, flowers and twisted tree, and logs
+  each model's materials (shader, texture) beside its size.
+- Left: dead trees and twisted trees from the kit, its rocks and pebbles (the HQ Rock Pack is next for crags), ground plants.
+- Full run c39: EditMode 427/427, PlayMode 212/214, five tours, 0 shader errors. The two failures were races in the sim tests,
+  fixed: a recovered corpse is hidden at once (it was destroyed only at the frame's end, so the test still found it), and the
+  ding test now counts "gratz" (one of the five grats lines did not contain "grats").

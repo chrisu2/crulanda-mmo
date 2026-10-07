@@ -1783,6 +1783,8 @@ namespace Crulanda.World
             float h = 3.5f + R01 * 1.5f;
             float yawA = R01 * 120, yawB = R01 * 120 + 180;   // the two main limbs' bearings, on roughly opposite sides (the zone's draws, as before)
             int family = (Mathf.Abs(variant) + (int)(R01 * 2)) % Leaf.Length;   // its leaf: fresh green, yellow-green, autumn or dull gold (the same draw as before)
+            // The kit's broadleaf (art round 2, 2026-10-07): one of five by the variant and the first draw, 6-8 m, its trunk about .3 m.
+            if (KitTrees) { var kit = KitTree(t, "Nature/CommonTree_" + (1 + (Mathf.Abs(variant) + (int)(yawA / 30)) % 5), (h - 3.5f) / 1.5f * 2 + 6, .3f, yawB); if (kit != null) { DressNature(kit, Wither(LeafTints[family])); return; } }
             // A tapered, slightly bent and leaning trunk on a root flare, in its own shade of bark, running up into the crown's
             // heart; limbs grow out of it toward the crown's side clusters. Its look comes from its own stream (TreeRandom).
             var tr = TreeRandom(t.position); float T() { return (float)tr.NextDouble(); }
@@ -2072,6 +2074,8 @@ namespace Crulanda.World
         /// and nothing is kept.
         /// </summary>
         public static bool RecordWood;
+        /// <summary>Takes draws from the zone's stream and drops them (a kit builder keeping the draws a painted one took, so the zone's later draws are unchanged).</summary>
+        void R01Draws(int n) { for (int i = 0; i < n; i++) { var _ = R01; } }
         public sealed class WoodAxis { public Vector3[] pts; public float[] r; public bool trunk; public Vector3? from; }
         public readonly Dictionary<Transform, List<WoodAxis>> Wood = new Dictionary<Transform, List<WoodAxis>>();
         void Record(Transform tree, Func<float, Vector3> centre, Func<float, float, float> radius, IList<float> rings, bool trunk)
@@ -2246,6 +2250,8 @@ namespace Crulanda.World
         {
             float h = 6 + R01 * 4;
             var tr = TreeRandom(t.position); float T() { return (float)tr.NextDouble(); }
+            // The kit's pine (art round 2, 2026-10-07): one of five from the tree's own stream, 8-13 m, its trunk about .35 m.
+            if (KitTrees && KitTree(t, "Nature/Pine_" + (1 + (int)(T() * 5) % 5), h * 1.3f, .35f, T() * 360) != null) return;
             // The trunk runs the whole height now, a pole tapering to the leader's tip on a small root swell (the boughs no longer
             // hide a stub). A tube, so the bark grain runs up it: the shared cone mesh has no UVs and would read as one flat texel.
             float top = 1.1f + h * .94f;
@@ -3289,6 +3295,12 @@ namespace Crulanda.World
         {
             var t = new GameObject("Bush").transform; t.SetParent(statics, false); t.position = Ground(at, -.1f); t.rotation = Quaternion.Euler(0, R01 * 360, 0);
             var c = conifer ? Color.Lerp(new Color(.17f, .25f, .15f), new Color(.24f, .3f, .17f), R01) : Leaf[(int)(R01 * Leaf.Length) % Leaf.Length] * (.85f + R01 * .2f);
+            // The kit's bush (art round 2, 2026-10-07), flowering now and then in the meadows; the same draws as the painted one takes.
+            if (HasProp("Nature/Bush_Common"))
+            {
+                var kit = ModelProp(t, conifer || c.r > .5f ? "Nature/Bush_Common" : "Nature/Bush_Common_Flowers", Vector3.up * .1f, 0, 1.1f + (float)TreeRandom(t.position).NextDouble() * .6f);
+                if (kit != null) { DressNature(kit, Wither(conifer ? new Color(.62f, .74f, .66f) : new Color(.72f, .8f, .64f)), "Leaves_TwistedTree", GreenSheet); R01Draws(1); return; }
+            }
             bool cardArt = art.leafCards != null && art.leafCards.Length > 0;
             var mat = cardArt ? LeafMaterial(art.leafCards[0], conifer ? new Color(.62f, .74f, .66f) : new Color(.72f, .8f, .64f)) : Tint(art.foliage, Wither(c));
             int n = 2 + (int)(R01 * 2);

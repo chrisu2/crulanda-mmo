@@ -32,6 +32,9 @@ namespace Crulanda.EditorTools
                     n++; var raw = ZoneBuilder.PropBounds(go.transform); var world = new Bounds(); bool any = false;
                     foreach (var r in go.GetComponentsInChildren<Renderer>()) { if (!any) { world = r.bounds; any = true; } else world.Encapsulate(r.bounds); }
                     Debug.Log("PROP " + path + " raw " + raw.size.ToString("0.000") + " scale " + go.transform.localScale.x.ToString("0.0000") + " stands " + world.size.ToString("0.00") + " foot " + (world.min.y - foot.y).ToString("0.00") + " wanted " + height);
+                    var mats = new System.Text.StringBuilder();
+                    foreach (var r in go.GetComponentsInChildren<Renderer>()) foreach (var m in r.sharedMaterials) if (m != null) mats.Append(m.name + "[" + (m.shader != null ? m.shader.name : "?") + ", tex " + (m.mainTexture != null ? m.mainTexture.name : "none") + ", q " + m.renderQueue + "] ");
+                    Debug.Log("PROPMAT " + path + " " + mats);
                 }
                 // A metre rule (a thin white post) and an arrow on the ground pointing the model's -Z, where a front would be.
                 var rule = GameObject.CreatePrimitive(PrimitiveType.Cube); rule.transform.position = foot + new Vector3(.9f, .5f, 0); rule.transform.localScale = new Vector3(.04f, 1, .04f);

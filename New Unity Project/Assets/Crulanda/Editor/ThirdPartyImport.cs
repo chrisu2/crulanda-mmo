@@ -22,8 +22,8 @@ namespace Crulanda.EditorTools
         void OnPreprocessTexture()
         {
             if (!Ours) return;
-            var t = (TextureImporter)assetImporter; t.maxTextureSize = assetPath.Contains("/Chest/") || assetPath.Contains("/Fantasy/") ? 1024 : 512; t.mipmapEnabled = true;
-            if (assetPath.Contains("/Fantasy/") && assetPath.Contains("_Normal")) t.textureType = TextureImporterType.NormalMap;
+            var t = (TextureImporter)assetImporter; t.maxTextureSize = assetPath.Contains("/Chest/") || assetPath.Contains("/Fantasy/") || assetPath.Contains("/Nature/") ? 1024 : 512; t.mipmapEnabled = true;
+            if ((assetPath.Contains("/Fantasy/") || assetPath.Contains("/Nature/")) && assetPath.EndsWith("_Normal.png")) t.textureType = TextureImporterType.NormalMap;   // (ends with: Bark_NormalTree.png and Leaves_NormalTree_C.png are colour)
         }
         void OnPreprocessModel()
         {
@@ -35,6 +35,7 @@ namespace Crulanda.EditorTools
         /// gets that sheet's base colour and normal map on the Standard shader, wood and cloth matte, metal a little glossier.</summary>
         void OnPostprocessMaterial(Material m)
         {
+            if (assetPath.StartsWith(Props + "Nature/")) { NatureMaterial(m); return; }
             if (!assetPath.StartsWith(Props + "Fantasy/")) return;
             string sheet = m.name.Contains("Metal") ? "Metal" : m.name.Contains("Furniture") ? "Furniture" : m.name.Contains("Cloth") || m.name.Contains("Banner") ? "Cloth" : "Props";
             var baseMap = AssetDatabase.LoadAssetAtPath<Texture2D>(Props + "Fantasy/Textures/T_Trim_" + sheet + "_BaseColor.png");
@@ -44,7 +45,39 @@ namespace Crulanda.EditorTools
             if (normal != null) { m.SetTexture("_BumpMap", normal); m.EnableKeyword("_NORMALMAP"); }
             m.SetFloat("_Glossiness", sheet == "Metal" ? .45f : .2f); m.SetFloat("_Metallic", sheet == "Metal" ? .35f : 0);
         }
-        public override uint GetVersion() { return 2; }   // 2: the prop kits (2026-10-07)
+        /// <summary>The nature kit (Stylized Nature MegaKit, 2026-10-07) names a material after its texture: Bark_NormalTree,
+        /// Leaves_NormalTree, Leaves_Pine (Leaf_Pine.png), Rocks (Rocks_Diffuse.png), Grass, Flowers, Mushrooms. Bark gets its normal
+        /// map; grass, flowers, petals and plants are cut out; leaves are solid clumps and stay opaque; all matte.</summary>
+        static void NatureMaterial(Material m)
+        {
+            string dir = Props + "Nature/Textures/", n = m.name;
+            // The leaf sheets are alpha cards: the "_C" sheet carries the colour (the plain one is a grey mask for vertex-coloured use).
+            bool leaf = n.StartsWith("Leaves") || n.StartsWith("Leaf");
+            bool cutout = leaf || n.StartsWith("Grass") || n.StartsWith("Flower") || n.StartsWith("Petal") || n.StartsWith("Plant") || n.StartsWith("Fern") || n.StartsWith("Clover") || n.StartsWith("Mushroom");
+            string tex = n == "Leaves_Pine" ? "Leaf_Pine_C" : n == "Leaves_NormalTree" ? "Leaves_NormalTree_C" : n == "Leaves_TwistedTree" ? "Leaves_TwistedTree_C" : n == "Leaves_GiantPine" ? "Leaves_GiantPine_C"
+                : n == "Rocks" ? "Rocks_Diffuse" : n == "PathRocks" ? "PathRocks_Diffuse" : n == "Material" ? "Bark_TwistedTree" : n;
+            var baseMap = AssetDatabase.LoadAssetAtPath<Texture2D>(dir + tex + ".png");
+            var normal = AssetDatabase.LoadAssetAtPath<Texture2D>(dir + tex + "_Normal.png");
+            if (cutout)
+            {
+                // The game's own painted-leaf shader: cut out, both faces, swaying in the wind, faded by TreeFade like the painted crowns.
+                var leafShader = AssetDatabase.LoadAssetAtPath<Shader>("Assets/Crulanda/World/Shaders/Leaf.shader") ?? Shader.Find("Crulanda/Leaf");
+                m.shader = leafShader != null ? leafShader : Shader.Find("Standard"); m.color = Color.white;
+                if (leafShader == null) Debug.LogWarning("NATURE_KIT the painted-leaf shader was not found at import; ZoneBuilder.DressNature sets it at run time.");
+                if (baseMap != null) m.mainTexture = baseMap; else Debug.LogWarning("NATURE_KIT no texture for material " + n);
+                if (m.HasProperty("_Cutoff")) m.SetFloat("_Cutoff", .4f);
+                if (m.HasProperty("_VertexTint")) m.SetFloat("_VertexTint", 0);
+                if (m.HasProperty("_Cull")) m.SetFloat("_Cull", 0);
+                if (m.HasProperty("_Wind")) m.SetFloat("_Wind", leaf ? .05f : .03f);
+                if (m.HasProperty("_Glossiness")) m.SetFloat("_Glossiness", .05f);
+                return;
+            }
+            m.shader = Shader.Find("Standard"); m.color = Color.white;
+            if (baseMap != null) m.mainTexture = baseMap; else Debug.LogWarning("NATURE_KIT no texture for material " + n);
+            if (normal != null) { m.SetTexture("_BumpMap", normal); m.EnableKeyword("_NORMALMAP"); }
+            m.SetFloat("_Glossiness", .08f); m.SetFloat("_Metallic", 0);
+        }
+        public override uint GetVersion() { return 5; }   // 2: the prop kits, 3-5: the nature kit (2026-10-07)
 
         public static void Report()
         {

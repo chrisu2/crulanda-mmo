@@ -9,7 +9,20 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-10-07, about 02:00)
+## RESUME HERE (updated 2026-10-07, about 12:00)
+**Art round 2, the nature round, is in the working tree: full run c39 result: PENDING_RESULT**
+The Stylized Nature MegaKit (CC0) is under Resources/Props/Nature; ZoneBuilder.NatureKit (KitTree) makes every broadleaf "tree"
+prop, every forest-edge tree and every pine a kit model (the painted builders remain as fallback and still build the great oak,
+giant trees, dead trees and twisted woods), meadow bushes are the kit's bush (flowering now and then). Leaf cards go on the
+painted-leaf shader (ZoneBuilder.DressNature; the importer does it too), crowns take the leaf-family tints. The Mastwood and the
+Oakhaven tours look right (hel/work/world-captures, 11:48); Khaven keeps its dead woods. Zone/tree tests 7/7 before the run.
+Pitfall recorded in CHANGELOG: never match "_Normal" by Contains on this kit's file names.
+**After c39 (if green):** release build in lane B (--crulanda-release; retry once if ILPP pipe error), publish, commit, Backup.ps1,
+this file's result line, copy to hel/outputs. Then the next art rounds: the Stylized Megapack 2in1 (.unitypackage in Downloads),
+the HQ Rock Pack (Asset Store cache) for crags and boulders, the kit's dead and twisted trees for Khaven and the Verdant giants,
+the Medieval Village MegaKit when it is in Downloads; then the enclave interior (note 40) and the sound phase.
+
+## Earlier resume note (2026-10-07, about 02:00)
 **Playable build = everything below, built 2026-10-07 03:28 (release) from commit af59508, published to Crulanda-Playable. Full run c37: EditMode 427/427, PlayMode 213/214 (NamedLootTests count fixed, rerun 7/7), five tours, 0 shader errors. c36 before it caught a build-breaking barrel bug (an empty Oakhaven in the tour): fixed. Committed and backed up to E:.**
 **What was done tonight (all in the working tree; commit and publish follow the c36 run):** Round 24 (notes 64-71: the horse
 stabled, the camera held indoors, one colourised chat window with chips, /invite across zones, healing seen, floating props seated;

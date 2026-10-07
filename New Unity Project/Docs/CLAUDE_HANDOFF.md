@@ -9,7 +9,24 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-10-06, about 16:30)
+## RESUME HERE (updated 2026-10-06, about 22:15)
+**Playable build = Phase 5.3 complete (5.3a-c) + Round 23 + zone chat, built 2026-10-06 22:06 from commit a2d6301 (+ the
+wrap-up commit). Last full run: EditMode 424/424, PlayMode 210/210, five tours, 0 shader errors. Committed and backed up to J:.**
+What is in it (see CHANGELOG 2026-10-06): sims live their day (hunt camp mobs that fight back, gather the nodes of their
+trade, sell at the stall, smiths forge and wear their own pieces, buy gear upgrades, rest at the inn, run back for their corpse,
+level and ding, take the roads between zones; the unseen move too); tagging (a sim's kill gives you nothing); invite up to
+three sims (mobs scale to the group); who list on O; zone chat (Enter; tabs All/Zone/Trade/LFG/Party/System; /s /z /t /lfg /p)
+with sims talking from what is true and answering you; Round 23 (notes 57-61: straw hat gone, solid farm animals, class
+attributes on the sheet, readable signs, farmhands in the fields).
+**Chris's playtest notes 47-63 are all done.** Open: the Ashen Marches sentinel helm as a model helm; an alchemy bench place so
+Druids and Mages brew (they only sell herbs now); whispers, friends and memory (rest of 5.5); 5.4 proper (offscreen levelling,
+online hours); 5.6 the full party system (loot rolls, roles, dungeon runs). Next on the roadmap: 5.4, then 5.5's rest, then 5.6.
+Tools: --crulanda-life-capture <dir> on a build shows the sims living (LifeCapture.cs); SimPopulation.Lively is off in editor
+test runs and other captures (SimLifeTests set LifeOverride). The run script sometimes reads the PlayMode xml a moment early
+("NO RESULTS"): read q-PlayMode.xml yourself. Model: Fable 5.1 (one agent at a time, no workflows). Chris asked that long test
+runs not be started when he is about to stop the machine; he had me shut the PC down at the end of this session.
+
+## Earlier resume note (2026-10-06, about 16:30)
 **Playable build = 5.3a (published 14:58, commit c1f4c6c): sims hunt camp mobs (which fight back), gather, rest at the inn,
 loiter; tagging; mobs scale to your group; who list (O); invite up to 3 sims; helms seated by measurement; T-pose fixed.**
 **Round 23 is COMMITTED (b7bce96 + the wrap-up commit) but UNTESTED and NOT PUBLISHED: Chris said "don't start a test run" and

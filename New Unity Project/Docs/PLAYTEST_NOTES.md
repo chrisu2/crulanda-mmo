@@ -467,7 +467,7 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
   any class hood comes off under a head piece. Checked on a man and a woman, front and side: Docs/helm-fit-2026-10-06.png.
   The Ashen Marches pack holds one helm (gth_equi_sentinel_helm); its other 99 models are buildings, furniture, nature,
   animals and whole figures, so it cannot replace the helm set; the sentinel helm is still to be wired in as a model helm.
-- **Asset queue (Chris, 2026-10-05), for the next art rounds:** Stylized Nature MegaKit (outdoor areas), Medieval Village
+- **Asset queue (Chris, 2026-10-05), for the next art rounds** (Fantasy Props MegaKit and Medieval props DONE 2026-10-07, the sentinel helm DONE 2026-10-07): Stylized Nature MegaKit (outdoor areas), Medieval Village
   MegaKit (housing), Fantasy Props MegaKit, Stylized Megapack 2in1 (all in Downloads), the Asset Store's Medieval props and HQ
   Rock Pack (boulders and crags), the Ashen Marches sentinel helm (a model helm needs the armour path), and the Ash-Walker
   enclave's interior (note 40). Then the sound phase.
@@ -498,5 +498,5 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
 - **70. "Apples floating."** DONE (round 24): the orchard's apples sit in the leaf mass, not in the air round it.
 - **71. "I can't talk in party or lfg channels."** DONE (round 24): a sticky channel: /lfg or /p on its own switches where plain
   words go (the input shows [LFG]); Party with no party says to /invite someone first.
-- **72. "Allow all party members to get loot, and maybe need/greed uncommon, rare, epic, legendary items."** NEXT (round 25):
+- **72. "Allow all party members to get loot, and maybe need/greed uncommon, rare, epic, legendary items."** DONE (round 25):
   loot shared round the party; need/greed rolls on uncommon and better, the sims rolling by what they can use.

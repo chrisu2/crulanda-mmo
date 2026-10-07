@@ -19,6 +19,7 @@
     {"id": "loot.ash.oskas_bone_kilt", "name": "Oska's Bone-Plate Kilt", "kind": "gear", "slot": "legs", "quality": 3, "level": 8, "value": 36, "armor": 34, "stamina": 10, "strength": 9, "description": "Every plate carved from the same rib.", "canonStatus": "GAME-ONLY"},
     {"id": "loot.ash.old_salt_road_pauldrons", "name": "Pauldrons of the Old Salt Road", "kind": "gear", "slot": "shoulders", "quality": 3, "level": 9, "value": 40, "armor": 24, "stamina": 12, "strength": 9, "description": "The Ash-Walkers give these to people who are leaving.", "canonStatus": "GAME-ONLY"},
     {"id": "loot.ash.cask_head_shield", "name": "Sefa's Cask-Head Shield", "kind": "gear", "slot": "offhand", "quality": 2, "level": 9, "value": 30, "armor": 35, "stamina": 9, "strength": 5, "description": "The end of a salt cask, still stamped.", "canonStatus": "GAME-ONLY"},
+    {"id": "loot.ash.sentinel_helm", "name": "Sentinel's Helm", "kind": "gear", "slot": "head", "quality": 3, "level": 9, "value": 40, "armor": 24, "stamina": 10, "strength": 7, "spirit": 3, "description": "A watchman's helm from the Rim's old gatehouses, the slit worn bright by a hundred years of looking out.", "canonStatus": "GAME-ONLY"},
     {"id": "loot.ash.cinderheart", "name": "Cinderheart", "kind": "gear", "slot": "mainhand", "quality": 5, "level": 9, "value": 84, "weaponDamage": 43, "stamina": 18, "strength": 26, "description": "The Deacon's last sermon, hammered into an edge. It has not stopped burning.", "canonStatus": "GAME-ONLY"}
   ],
   "vendors": [
@@ -27,6 +28,7 @@
   "gear": [
     {"id": "loot.ash.tear_marked_mask", "look": "head.mask:tear/cult", "source": "mob:cultist@ashrim"},
     {"id": "loot.ash.skull_knob_staff", "look": "staff:skull/cult", "source": "mob:cultist@ashrim"},
+    {"id": "loot.ash.sentinel_helm", "look": "model.helm:Ashen_gth_equi_sentinel_helm/ashwalker", "source": "mob:cultist@ashrim"},
     {"id": "loot.ash.cinder_sewn_vestment", "look": "chest.robe:vestment/cult", "source": "mob:cultist@ashrim"},
     {"id": "loot.ash.ash_hound_wraps", "look": "hands.wraps:fur/ashwalker", "source": "mob:hound@ashrim"},
     {"id": "loot.ash.harpoon_line_boots", "look": "feet.boots:plain/ashwalker", "source": "mob:hound@ashrim"},
@@ -49,7 +51,7 @@
   "drops": [
     {"id": "drop.ash.brood", "zone": "ashrim", "mob": "Brood Weave-Eater", "rank": "elite", "groups": [{"chance": 0.5, "signature": true, "pick": [{"item": "loot.ash.brood_glass_ward"}, {"item": "loot.ash.threadcutter"}]}, {"chance": 0.15, "lucky": true, "pick": [{"item": "loot.ash.weave_eaten_mantle"}]}]},
     {"id": "drop.ash.deacon", "zone": "ashrim", "mob": "The Ash-Deacon", "rank": "elite", "groups": [{"chance": 0.5, "signature": true, "pick": [{"item": "loot.ash.the_deacons_censer"}, {"item": "loot.ash.cassock_of_the_last_sermon"}]}, {"chance": 0.15, "lucky": true, "pick": [{"item": "loot.ash.deacons_ash_treads"}]}, {"chance": 0.04, "lucky": true, "pity": 25, "pick": [{"item": "loot.ash.ember_that_remembers"}]}, {"chance": 0.005, "lucky": true, "pick": [{"item": "loot.ash.cinderheart"}]}]},
-    {"id": "drop.ash.cultists", "zone": "ashrim", "tag": "cultist", "rank": "normal", "groups": [{"chance": 0.03, "lucky": true, "pick": [{"item": "loot.ash.tear_marked_mask"}, {"item": "loot.ash.skull_knob_staff"}, {"item": "loot.ash.cinder_sewn_vestment"}]}]},
+    {"id": "drop.ash.cultists", "zone": "ashrim", "tag": "cultist", "rank": "normal", "groups": [{"chance": 0.03, "lucky": true, "pick": [{"item": "loot.ash.tear_marked_mask"}, {"item": "loot.ash.skull_knob_staff"}, {"item": "loot.ash.cinder_sewn_vestment"}, {"item": "loot.ash.sentinel_helm"}]}]},
     {"id": "drop.ash.hounds", "zone": "ashrim", "tag": "hound", "rank": "normal", "groups": [{"chance": 0.03, "lucky": true, "pick": [{"item": "loot.ash.ash_hound_wraps"}, {"item": "loot.ash.harpoon_line_boots"}]}]},
     {"id": "drop.ash.eaters", "zone": "ashrim", "tag": "weaveeater", "rank": "normal", "groups": [{"chance": 0.03, "lucky": true, "pick": [{"item": "loot.ash.static_glass_shiv"}, {"item": "loot.ash.unwoven_cord"}]}]},
     {"id": "drop.ash.cinderfold", "zone": "ashrim", "tag": "hollow", "rank": "normal", "groups": [{"chance": 0.04, "lucky": true, "pick": [{"item": "loot.ash.cinderfold_greaves"}]}]}

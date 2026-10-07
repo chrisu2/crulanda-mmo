@@ -30,6 +30,14 @@ namespace Crulanda.Encounter
         public List<string> goodIds = new List<string>(); public List<int> goodCounts = new List<int>();
         public List<string> wornSlots = new List<string>(); public List<string> wornIds = new List<string>();
         public float nextTravelHour = -1;
+        /// <summary>5.4: the world-clock hour its unseen life was last reckoned (SimPopulation.LiveAway); -1 never.</summary>
+        public float lastAwayHour = -1;
+        /// <summary>5.5 (2026-10-07): what it makes of you, from what you have done together (SimMemory); 0 a stranger.</summary>
+        public int regard;
+        /// <summary>On your friends list (/friend).</summary>
+        public bool friend;
+        /// <summary>The last world-clock hour it greeted you, so a friend says hello once a session, not every refresh.</summary>
+        public float greetedHour = -1;
         public bool IsOnline(float hour) { return Crulanda.World.WorldClock.Between(onlineFrom, Mathf.Repeat(onlineFrom + onlineHours, 24)) || onlineHours >= 24; }
         public bool IsOnlineAt(float hour) { float to = Mathf.Repeat(onlineFrom + onlineHours, 24); return onlineHours >= 24 || (onlineFrom <= to ? hour >= onlineFrom && hour < to : hour >= onlineFrom || hour < to); }
     }

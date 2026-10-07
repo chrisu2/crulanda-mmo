@@ -188,7 +188,8 @@ namespace Crulanda.Encounter
         void TakeCoins(EncounterEnemy body)
         {
             if (body.Coins <= 0) return;
-            Progress.gold += body.Coins; Message("Looted " + body.Coins + " crowns."); body.Coins = 0;
+            int all = body.Coins, mine = SplitCoins(all); Progress.gold += mine; body.Coins = 0;   // split round the party (Round 25, note 72)
+            Message(mine == all ? "Looted " + all + " crowns." : "Looted " + mine + " crowns, your share of " + all + ".");
         }
         /// <summary>
         /// One thing off the body into the bags (Inventory.Add: onto its stacks, then a worn trade bag of its class, then the bags).
@@ -200,6 +201,8 @@ namespace Crulanda.Encounter
             refused = false;
             var drop = body.Drops[i]; if (drop.count <= 0) return 0;
             if (HoldsUnique(drop.item)) { refused = true; Message(UniqueLine(ItemName(drop.item))); return 0; }
+            // In a party, uncommon and better is rolled for (Round 25, note 72): off the body and into the roll.
+            if (Rolled(drop.item)) { body.Drops[i] = new LootDrop(drop.item, 0); QueueRoll(drop.item, drop.count, body.actor.DisplayName); return 0; }
             int left = Items != null ? Inventory.Add(Progress, Items, drop.item, drop.count) : drop.count;
             if (drop.count - left > 0) Received(drop.item, drop.count - left);
             body.Drops[i] = new LootDrop(drop.item, left);
@@ -264,6 +267,7 @@ namespace Crulanda.Encounter
         /// <summary>The window shuts when you walk off (beyond LootReach), die, or the body is gone or back on its feet. The Armoury sweeps here too, twice a second.</summary>
         void TickLoot()
         {
+            TickRoll();
             SweepArmoury();
             if (lootBody == null) { lootBody = null; return; }   // a body destroyed by a load reads as null: forget it
             if (!Player.IsAlive || lootBody.actor == null || lootBody.actor.IsAlive || lootBody.Drops == null || Vector3.Distance(Player.transform.position, lootBody.transform.position) > LootReach

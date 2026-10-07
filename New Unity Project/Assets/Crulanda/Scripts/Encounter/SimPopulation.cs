@@ -75,17 +75,55 @@ namespace Crulanda.Encounter
             if (best == null || bestScore < Suits(s.zone, s.level)) return;
             s.zone = best.to; s.x = best.arrive.x; s.z = best.arrive.y;
         }
+        /// <summary>
+        /// The unseen living on (5.4, 2026-10-07): each world-clock hour a sim in another zone and online hunts, gathers and trades
+        /// in the rough, by its personality: the bold take experience as from a few kills of their level (a level when it adds
+        /// up: no ding is heard from another zone), the careful gather their trade's first material and sell it now and then,
+        /// coin buys the gear upgrades (SimEconomy), and the smiths forge what they can. Nothing happens while offline, and a
+        /// sim here, seen, lives for real instead. Called from <see cref="Refresh"/>.
+        /// </summary>
+        public static void LiveAway(SimAdventurer s, float hour, ItemDatabase items, ProfessionDatabase db)
+        {
+            if (s.lastAwayHour < 0) { s.lastAwayHour = hour; return; }
+            float hours = Mathf.Repeat(hour - s.lastAwayHour, 24); if (hours < 1) return;
+            if (hours > 6) hours = 6;   // a long gap (a night away from the game) counts as a working evening, no more
+            s.lastAwayHour = hour;
+            var r = new Crulanda.Core.SeededRandom(s.variant * 131 + Mathf.FloorToInt(hour * 7));
+            for (int h = 0; h < Mathf.FloorToInt(hours); h++)
+            {
+                if (r.NextFloat() < .35f + .5f * s.bold)
+                {
+                    int kills = 2 + r.NextInt(0, 4);
+                    if (s.level < EncounterProgress.LevelCap)
+                    {
+                        s.experience = Mathf.Max(s.experience, EncounterProgress.XpForLevel(s.level)) + kills * EncounterProgress.KillXp(s.level, s.level, false) / 2;
+                        while (s.level < EncounterProgress.LevelCap && s.experience >= EncounterProgress.XpForLevel(s.level + 1)) s.level++;
+                    }
+                }
+                else
+                {
+                    string trade = SimEconomy.GatherTrade(s.classId); string mat = trade == "mining" ? "mat.copper_ore" : trade == "woodcutting" ? "mat.oak_log" : "mat.yarrow";
+                    SimEconomy.Add(s, mat, 2 + r.NextInt(0, 4));
+                }
+                if (SimEconomy.GoodsCount(s) >= 8 && r.NextFloat() < .5f)
+                {
+                    var recipe = SimEconomy.Craftable(s, db, items);
+                    if (recipe != null) SimEconomy.Craft(s, recipe, items); else SimEconomy.SellAll(s, items);
+                    SimEconomy.Upgrade(s);
+                }
+            }
+        }
         /// <summary>Figures for those here and online; none for those gone.</summary>
         public void Refresh()
         {
             string zone = ZoneId; if (zone == null || World == null) return;
             float hour = WorldClock.Hour;
-            if (Lively) foreach (var s in World.sims) if (s.zone != zone && s.IsOnlineAt(hour)) TickAway(s, hour);
+            if (Lively) foreach (var s in World.sims) if (s.zone != zone && s.IsOnlineAt(hour)) { LiveAway(s, hour, Session.Items, Session.Professions?.Db); TickAway(s, hour); }
             foreach (var s in World.sims)
             {
                 bool here = s.zone == zone && s.IsOnlineAt(hour) && !Session.InParty(s.id);   // one in your party is with you, not standing about
                 var f = Find(s.id);
-                if (here && f == null) Figures.Add(SimFigure.Spawn(this, s));
+                if (here && f == null) { Figures.Add(SimFigure.Spawn(this, s)); SimChatter.Active?.Arrived(s); }
                 else if (!here && f != null) { if (!s.IsOnlineAt(hour)) SimChatter.Active?.LoggedOff(s); Figures.Remove(f); Destroy(f.gameObject); }
             }
             Figures.RemoveAll(f => f == null);

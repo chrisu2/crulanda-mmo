@@ -15,16 +15,36 @@ namespace Crulanda.EditorTools
     public sealed class ThirdPartyImport : AssetPostprocessor
     {
         const string Root = "Assets/Crulanda/ThirdParty/";
+        /// <summary>The prop kits (2026-10-07): Quaternius's Fantasy Props MegaKit (CC0; FBX with four trim sheets) and Lukas Bobor's
+        /// Medieval props (Asset Store EULA; prefabs with their own materials), under Resources so ZoneBuilder.ModelProp can load them by name.</summary>
+        const string Props = "Assets/Crulanda/Resources/Props/";
+        bool Ours { get { return assetPath.StartsWith(Root) || assetPath.StartsWith(Props); } }
         void OnPreprocessTexture()
         {
-            if (!assetPath.StartsWith(Root)) return;
-            var t = (TextureImporter)assetImporter; t.maxTextureSize = assetPath.Contains("/Chest/") ? 1024 : 512; t.mipmapEnabled = true;
+            if (!Ours) return;
+            var t = (TextureImporter)assetImporter; t.maxTextureSize = assetPath.Contains("/Chest/") || assetPath.Contains("/Fantasy/") ? 1024 : 512; t.mipmapEnabled = true;
+            if (assetPath.Contains("/Fantasy/") && assetPath.Contains("_Normal")) t.textureType = TextureImporterType.NormalMap;
         }
         void OnPreprocessModel()
         {
-            if (!assetPath.StartsWith(Root)) return;
+            if (!Ours) return;
             var m = (ModelImporter)assetImporter; m.isReadable = true; m.importCameras = false; m.importLights = false;
         }
+        /// <summary>The Fantasy kit's FBX name their materials after the trim sheet they use (MI_Trim_Metal, MI_Trim_Furniture,
+        /// MI_Trim_Props, MI_Trim_Cloth, MI_Banner, MI_Page_Empty; "_Vertex" variants are vertex-painted over the same sheet): each
+        /// gets that sheet's base colour and normal map on the Standard shader, wood and cloth matte, metal a little glossier.</summary>
+        void OnPostprocessMaterial(Material m)
+        {
+            if (!assetPath.StartsWith(Props + "Fantasy/")) return;
+            string sheet = m.name.Contains("Metal") ? "Metal" : m.name.Contains("Furniture") ? "Furniture" : m.name.Contains("Cloth") || m.name.Contains("Banner") ? "Cloth" : "Props";
+            var baseMap = AssetDatabase.LoadAssetAtPath<Texture2D>(Props + "Fantasy/Textures/T_Trim_" + sheet + "_BaseColor.png");
+            var normal = AssetDatabase.LoadAssetAtPath<Texture2D>(Props + "Fantasy/Textures/T_Trim_" + sheet + "_Normal.png");
+            m.shader = Shader.Find("Standard"); m.color = Color.white;
+            if (baseMap != null) m.mainTexture = baseMap;
+            if (normal != null) { m.SetTexture("_BumpMap", normal); m.EnableKeyword("_NORMALMAP"); }
+            m.SetFloat("_Glossiness", sheet == "Metal" ? .45f : .2f); m.SetFloat("_Metallic", sheet == "Metal" ? .35f : 0);
+        }
+        public override uint GetVersion() { return 2; }   // 2: the prop kits (2026-10-07)
 
         public static void Report()
         {

@@ -64,6 +64,25 @@ namespace Crulanda.Tests
             StringAssert.Contains("of the village", answer.text, "with a direction");
         }
 
+        /// <summary>5.5: a whisper is answered by whisper, /r answers back, /friend lists, a rival stays silent and refuses.</summary>
+        [UnityTest] public IEnumerator A_whisper_is_answered_and_a_friend_is_listed()
+        {
+            var s = SimPopulation.Active.World.sims.First(x => x.zone == "zone.oakhaven" && x.IsOnlineAt(WorldClock.Hour));
+            int before = session.Chat.Count;
+            Assert.IsTrue(session.Whisper(s.name + " hello there"), "whispered by full name");
+            Assert.AreEqual(ChatChannel.Whisper, session.Chat.Last().channel); Assert.AreEqual(s.name, session.Chat.Last().to);
+            float t = 0; ChatLine answer = null;
+            while (t < 12 && answer == null) { answer = session.Chat.Skip(before).FirstOrDefault(l => l.channel == ChatChannel.Whisper && l.speaker == s.name); t += Time.deltaTime; yield return null; }
+            Assert.NotNull(answer, s.name + " answered by whisper"); Assert.IsNull(answer.to); Assert.AreEqual(s.name, session.LastWhisperer);
+            Assert.GreaterOrEqual(s.regard, 1, "an answered whisper counts a little");
+            before = session.Chat.Count; session.PlayerChat("/r ty"); Assert.AreEqual(s.name, session.Chat.Last(l => l.speaker == "You").to, "/r answers the last whisperer");
+            t = 0; while (t < 12 && !session.Chat.Skip(before).Any(l => l.speaker == s.name)) { t += Time.deltaTime; yield return null; }   // its "np" lands before the rival part
+            session.PlayerChat("/friend " + s.name); Assert.IsTrue(s.friend, "listed"); session.PlayerChat("/friends"); StringAssert.Contains(s.name, session.Messages.Last());
+            s.regard = SimMemory.RivalAt; before = session.Chat.Count;
+            session.Whisper(s.name + " hey"); yield return new WaitForSeconds(8);
+            Assert.IsFalse(session.Chat.Skip(before).Any(l => l.channel == ChatChannel.Whisper && l.speaker == s.name), "a rival does not answer (its zone chatter goes on)");
+            StringAssert.Contains("Not with you", session.InviteRefusal(s), "nor group with you");
+        }
         [UnityTest] public IEnumerator A_group_call_is_answered_and_messages_land_in_system()
         {
             int before = session.Chat.Count;

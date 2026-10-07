@@ -309,7 +309,7 @@ namespace Crulanda.World
             MeshPart(PropMesh("Inn sign frame", () => Cutout(Octagon(.86f, .61f, .12f), .05f)), t, new Vector3(sx, by, zb + .045f), cask ? gold : iron);
             if (cask)
             {
-                var device = Barrel(t, new Vector3(sx - .36f, by, zb - .255f), .72f);   // a cask on its side, gilded
+                var device = Barrel(t, new Vector3(sx - .36f, by, zb - .255f), .72f, 0, true);   // a cask on its side, gilded (the painted one: it is recoloured and turned)
                 device.transform.localRotation = Quaternion.Euler(0, 0, -90);
                 device.GetComponent<MeshRenderer>().sharedMaterials = new[] { gold, Tint(art.metal, new Color(.5f, .38f, .16f)) };
             }
@@ -390,6 +390,9 @@ namespace Crulanda.World
             Part(PrimitiveType.Cube, t, new Vector3(0, top - .35f, front), new Vector3(2 * end + .3f, .2f, .2f), dark);
             Part(PrimitiveType.Cube, t, new Vector3(0, top - .35f, 1.91f), new Vector3(2 * end + .3f, .2f, .12f), dark);
             BoxPart(t, new Vector3(0, .025f, .75f), new Vector3(2 * end - .2f, .05f, 2.6f), Tint(Masonry, new Color(.56f, .54f, .5f)), null, 1.2f);   // the flagged floor
+            // The kit's smithy furniture (2026-10-07): a workbench against the back wall, a weapon stand at the stone end, a whetstone and a bucket by the anvil's side.
+            ModelProp(t, "Fantasy/Workbench", new Vector3(-1.3f, .05f, 1.45f), 180, .9f, true, 1.9f); ModelProp(t, "Fantasy/WeaponStand", new Vector3(end - .55f, .05f, 1.2f), -90, 1.6f, true, .9f);
+            ModelProp(t, "Fantasy/Whetstone", new Vector3(1.3f, .05f, -.15f), 20, .6f); ModelProp(t, "Fantasy/Bucket_Metal", new Vector3(-1.9f, .05f, -.3f), 0, .38f);
             var roof = new GameObject("Smithy roof").transform; roof.SetParent(t, false); roof.localPosition = new Vector3(0, 0, (front + rear) / 2);
             float d = rear - front, w = 2 * end + .3f;   // the hearth house's walls, outer faces
             MeshPart(ZoneMeshes.GableRoof(w + .9f, d + 1.4f, roofH, .25f, .45f), roof, new Vector3(0, top, 0), art.slate);

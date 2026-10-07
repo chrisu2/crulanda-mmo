@@ -14,7 +14,7 @@ foreach ($m in $Modes) {
     if ($m -eq 'PlayMode' -and $PlayFilter -ne 'ALL') { $args2 += @('-testFilter', ('"' + $PlayFilter + '"')) }
     $args2 += @('-testResults', ('"' + $r + '"'), '-logFile', ('"' + (Join-Path $v "q-$m.log") + '"'))
     $p = Start-Process $unity -WindowStyle Hidden -PassThru -ArgumentList $args2
-    $p | Wait-Process -Timeout 3600   # PlayMode loads every zone many times: give it an hour
+    $p | Wait-Process -Timeout 5400   # PlayMode loads every zone many times: ninety minutes (an hour ran out on 2026-10-07)
     if (Test-Path -LiteralPath $r) {
         $x = [xml](Get-Content -LiteralPath $r); $t = $x.'test-run'
         "$m total=$($t.total) passed=$($t.passed) failed=$($t.failed)"

@@ -51,6 +51,19 @@ goodCounts), SellAll at Places["stall"], UpgradeCost/Upgrade (gearBonus 0-2 -> S
 Places["forge"] (charcoal and vials bought), Worn/Wear overrides in SimGear.For. Choose scores: trade .5+.04/goods (6+ goods or
 an affordable upgrade), craft .75, travel .9 when Suits(zone) < 0 else .05+.1 bold (not within 60 s of trading).
 
+## Phase 5.4 and 5.5 (2026-10-07): the unseen live on; whispers, friends and memory
+5.4: `SimPopulation.LiveAway` gives each sim online in another zone an hour of rough living per world-clock hour (the bold hunt for
+experience and levels, the careful gather and sell, goods enough are forged or sold and gear bought); nothing offline; gaps cap at six.
+5.5: `ChatChannel.Whisper` with /w, /r and a Whisper button; `SimMemory` keeps `regard` on each sim (deeds: minutes and kills
+grouped, loot passed or needed over, whispers answered, /friend, /kick) and the standing it adds to (rival -10, acquaintance 6,
+friend 25); `SimChatter.Whispered/Arrived/FriendsAsk/StandingChanged` give friends a voice (greetings, "inv me", a word when a
+standing is crossed) and rivals a refusal. `/friend` and `/friends` keep your list; the who list shows standing.
+
+## Phase 5.6 (2026-10-07): the party system
+`SimCompanion.Role` (Tank / Healer / Damage by class and company), tanks peel and taunt (`EncounterThreat.Taunt`), `/assist`,
+and runs: `SimCompanion.Lead` picks a camp near its level (an elite for a party of three or more), leads at a trot, waits for you,
+fights the camp's mobs from its `Quarry`, and ends when `CampCleared`. `EncounterSession.Assist/Lead`, Lead and Stop buttons.
+
 ## Next extraction
 Introduce a plain persistent SimAdventurer profile keyed by EntityId, distinct from its Actor.
 Move companion state out of the scenario DTO behind a versioned save migration. Preserve existing IDs.

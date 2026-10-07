@@ -1414,3 +1414,64 @@ A read-only review by five reviewers, each finding checked by a second who tried
   InviteTravelSeconds, 30), /leave, /who, /help; healing seen (a second's cast pose, then HealFx: green glow and motes);
   the coop's trough, sack and pan seated on the ground (ZoneBuilder.Seat); the orchard's apples in the leaves.
 - Tests: ZoneChatTests (sticky channel, prefixes), SimChatTests (/lfg switch, /invite from another zone, unknown command).
+
+## 2026-10-07 — Round 25: party loot (playtest note 72; a piece of 5.6)
+- **Coins split** round the party (the sims' shares into their purses). **Uncommon and better is rolled for** when you are in a
+  party (LootRoll): a panel under the target frame with Need / Greed / Pass for you; each sim chooses by what it can use (Need
+  for gear of its weight and slot that beats what it wears, Greed for what it could sell); Need beats Greed, the highest roll
+  of that tier wins, everyone passing leaves it to you; twenty seconds, then it resolves. The winner takes it (a sim wearing
+  what it needed, or keeping it to sell); rolls and the win are said in Party. Common and junk are taken as before.
+- Tests: PlayMode PartyLootTests.
+
+## 2026-10-07 — To-do items 2 and 3, and Phase 5.4: the unseen live on
+- **An alchemy bench:** the herbalist's drying hut stands in for it (VillageLife Places["bench"]), so Druid and Mage sims brew
+  potions there from the herbs they pick, and sell them.
+- **The sentinel helm** (the one helm in the Ashen Marches pack) is the first model head piece (GearLooks model.helm,
+  ActorVisual.GearArmor ModelHelm, seated by SeatHead like the drawn ones), worn by a new rare drop of the Rim's cultists, the
+  Sentinel's Helm (loot.ashrim.json). Thirteen named items now (LootDataTests).
+- **5.4, the unseen living on** (SimPopulation.LiveAway): each world-clock hour a sim online in another zone hunts (experience
+  and levels, the bold more), gathers its trade's first material (the careful more), and when it has goods enough forges what
+  it can or sells them and buys gear upgrades; nothing while offline; a gap longer than six hours counts as six. With the roads
+  taken between zones (5.3b) the world keeps moving while you look elsewhere. Tests: SimEconomyTests.The_unseen_live_on_by_the_clock.
+
+## 2026-10-07 — Phase 5.5: whispers, friends and the sims' memory of you
+- **Whispers:** a Whisper channel (pink, its own chip), `/w <name> <words>` to anyone online anywhere (first names work; two-word
+  names too), `/r` answers the last whisperer, and the sim frame has a Whisper button. The sims answer by what you said and what
+  they make of you (SimChatter.Whispered): directions, "sure, inv", a hello back; a stranger who is not the friendly sort may
+  ignore you; a rival never answers.
+- **Memory (SimMemory):** every sim keeps a regard score for you, saved with it. A point a minute grouped and one for every
+  three kills together, three for passing on loot it needed, minus four for needing over its need, one for an answered whisper,
+  minus three for /kick. Standings: stranger, acquaintance (6), friend (25), rival (-10). The who list and the sim frame show
+  them; crossing one is said.
+- **Friends:** `/friend <name>` lists one (`/friends` shows them and who is online). A friend greets you by whisper when you
+  meet (once an hour of the clock), now and then asks you to group ("inv me"), stretches the level gap by two, is never too busy
+  to join, and hands you loot it won on Greed when you wanted it. A rival refuses your invites ("Not with you").
+- Tests: SimMemoryTests, SimChatTests.A_whisper_is_answered_and_a_friend_is_listed.
+
+## 2026-10-07 — Phase 5.6: the party system
+- **Roles** (SimCompanion.Role, shown in the party frames): Warriors tank, Druids heal, Paladins tank unless a Warrior is along
+  and no Druid is, Rangers and Mages deal damage. A tank takes first whatever mob is on someone who is not a tank, taunts it
+  (EncounterThreat.Taunt, every eight seconds, "Taunt" floated) and its blows hold attention; the rest fight your target.
+- **/assist [name]** targets what a party member is fighting.
+- **Runs:** `/lead [name]` (or the Lead button on a party frame) has a sim lead the party to a camp near its level (an elite when
+  the party is three or more): "Follow me", it walks there at a trot, waits when you fall more than eighteen metres behind,
+  fights what it finds at the camp, and calls the run done when no mob of the camp stands; Stop ends it. A friend who asked
+  you to group (5.5) names the camp it has in mind.
+- Tests: SimPartyTests.A_warrior_tanks_and_leads_a_run_to_a_camp.
+
+## 2026-10-07 — Art round 1, the props round: the Fantasy Props MegaKit and the Medieval props
+- **Two kits in the project** (Chris's asset queue): Quaternius's Fantasy Props MegaKit (CC0; 94 FBX on four trim sheets, under
+  Resources/Props/Fantasy with their base colour and normal maps; ThirdPartyImport gives each material its sheet on the Standard
+  shader) and Lukas Bobor's Medieval props (Asset Store EULA; 40 prefabs with their own materials, under Resources/Props/Medieval).
+- **ZoneBuilder.ModelProp** stands any kit model at a height, its bottom on the spot, turned, only its meshes kept, a box collider
+  the navmesh respects when solid; GroundProp sets an outdoor one on the land. A builder keeps its painted stand-in for when the
+  kit is missing (the tests' bare scenes), so nothing depends on the kits being there.
+- **Where they stand:** every barrel and crate in the game is the kit's now (Barrel, Crate); the inn's taproom has the kit's
+  tables with stools, a candlestick and a mug on each, barrels behind the bar, mugs, a bottle and a candle along it, a chandelier
+  over the room, a bench and a woodpile by the hearth; the smithy has a workbench against its back wall, a weapon stand at the
+  stone end, a whetstone and a bucket by the anvil; a produce stall has crates of apples and carrots out front, the other stalls a
+  barrel. Two new prop kinds for the zone files: "dummy" (a training dummy, solid) and "banner".
+- **PropCapture.Render** (run_method, -Graphics) draws every kit model the builders use in a row with a metre rule, three-quarter
+  and front, to hel/work/ui-captures/props-row*.png: the check on size and facing before a model goes into a village.
+- Left for the next art rounds: the Stylized Nature MegaKit (trees, bushes, rocks for the outdoors), the Stylized Megapack, the
+  HQ Rock Pack, and the Medieval Village MegaKit when it is in Downloads.

@@ -108,3 +108,4 @@ loot.kha.the_reckoners_frost
 loot.pea.the_toll_unpaid
 loot.ash.cinderheart
 loot.ver.the_green_wrath
+loot.ash.sentinel_helm

@@ -47,6 +47,20 @@ namespace Crulanda.Tests
             CollectionAssert.Contains(SimGear.For(s, items), "craft.copper_cudgel", "worn in its slot");
             Assert.AreNotEqual("craft.copper_cudgel", SimEconomy.Craftable(s, db, items)?.output, "not forged again while worn");
         }
+        [Test] public void The_unseen_live_on_by_the_clock()
+        {
+            var items = Items(); var db = Professions();
+            var bold = new SimAdventurer { id = "sim.b", name = "Bold", classId = "class.warrior", level = 3, bold = 1, variant = 5 };
+            var careful = new SimAdventurer { id = "sim.c", name = "Careful", classId = "class.mage", level = 3, bold = 0, variant = 9 };
+            SimPopulation.LiveAway(bold, 8, items, db); SimPopulation.LiveAway(careful, 8, items, db);   // the first look only marks the hour
+            Assert.AreEqual(3, bold.level); Assert.AreEqual(0, SimEconomy.GoodsCount(careful));
+            for (int hour = 9; hour <= 20; hour++) { SimPopulation.LiveAway(bold, hour, items, db); SimPopulation.LiveAway(careful, hour, items, db); }
+            Assert.Greater(bold.experience, EncounterProgress.XpForLevel(3), "the bold hunted"); Assert.GreaterOrEqual(bold.level, 4, "and levelled over a day");
+            Assert.Greater(careful.coin + SimEconomy.GoodsCount(careful), 0, "the careful gathered and sold");
+            var idle = new SimAdventurer { id = "sim.i", name = "Idle", classId = "class.ranger", level = 2, variant = 1 };
+            SimPopulation.LiveAway(idle, 3, items, db); SimPopulation.LiveAway(idle, 3.5f, items, db);
+            Assert.AreEqual(0, idle.experience, "less than an hour: nothing yet");
+        }
         [Test] public void Gathering_follows_the_trade_and_the_skill()
         {
             var db = Professions(); var low = Sim("class.paladin", 1); var high = Sim("class.paladin", 5);

@@ -55,7 +55,8 @@ namespace Crulanda.Encounter
         public static readonly string[] HeadLooks = {
             "head.cap:plain/oakhaven", "head.cap:flaps/khaven", "head.cap:leaf/veridian", "head.hood:cloth/pilgrim", "head.hood:oilskin/oakhaven", "head.coif:mail/tollroad",
             "head.wrap:scarf/sandthrone", "head.kettle:plain/tollroad", "head.kettle:half/sandthrone", "head.barbute:plain/tollroad", "head.barbute:rimed/pale+glow",
-            "head.mask:bone/ashwalker", "head.mask:tear/cult+glow", "head.circlet:band/concord", "head.circlet:briar/veridian", "head.crown:tin/sandthrone", "head.crown:root/veridian+glow", "head.crown:antler/veridian"
+            "head.mask:bone/ashwalker", "head.mask:tear/cult+glow", "head.circlet:band/concord", "head.circlet:briar/veridian", "head.crown:tin/sandthrone", "head.crown:root/veridian+glow", "head.crown:antler/veridian",
+            "model.helm:Ashen_gth_equi_sentinel_helm/ashwalker"
         };
         public static readonly string[] ShoulderChestLooks = {
             "shoulder.mantle:cloth/oakhaven", "shoulder.mantle:fur/pilgrim", "shoulder.mantle:hide/ashwalker", "shoulder.mantle:frayed/khaven", "shoulder.mantle:shawl/pale",

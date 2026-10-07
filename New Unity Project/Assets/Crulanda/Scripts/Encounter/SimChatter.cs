@@ -23,7 +23,7 @@ namespace Crulanda.Encounter
         readonly Dictionary<string, float> said = new Dictionary<string, float>();
         System.Random rng;
 
-        public void Init(SimPopulation pop) { Population = pop; Active = this; rng = new System.Random(pop.World.seed + 77); next = Time.time + 6; nextParty = Time.time + 10; }
+        public void Init(SimPopulation pop) { Population = pop; Active = this; rng = new System.Random(pop.World.seed + 77); next = Time.time + 6; nextParty = Time.time + 10; nextAsk = Time.time + 60; }
         void OnDestroy() { if (Active == this) Active = null; }
         float R { get { return (float)rng.NextDouble(); } }
         T Pick<T>(IList<T> list) { return list[rng.Next(list.Count)]; }
@@ -41,6 +41,7 @@ namespace Crulanda.Encounter
                 var who = PickTalker(here); if (who != null) Talk(who);
             }
             if (Time.time >= nextParty && S.PartySims.Count > 0) { nextParty = Time.time + Mathf.Lerp(6, 14, R); PartyTalk(); }
+            FriendsAsk();
         }
         /// <summary>Sims online in this zone (standing about or in your party).</summary>
         List<SimAdventurer> Here()
@@ -147,6 +148,57 @@ namespace Crulanda.Encounter
             if (t.Contains("?") && R < .5f) { var s = Someone(x => x.friendly > .5f); if (s != null) Later(ChatChannel.Zone, s.name, Pick(new[] { "not sure, sorry", "ask at the inn?", "no idea", "try the notice board" })); }
         }
         void Later(ChatChannel ch, string who, string text, float extra = 0) { pending.Add((Time.time + 2.5f + R * 4 + extra, ch, who, text)); }
+
+        // ---------- whispers, friends and memory (5.5, 2026-10-07) ----------
+        readonly Dictionary<string, float> answered = new Dictionary<string, float>();
+        float nextAsk;
+        /// <summary>You whispered a sim: a friend or an acquaintance answers, a stranger when it is friendly, a rival never. An
+        /// answer counts for you a little (once a minute each).</summary>
+        public void Whispered(SimAdventurer s, string text)
+        {
+            if (s == null) return;
+            var st = SimMemory.Of(s); string t = text.ToLowerInvariant(); bool lingo = s.chatty > .65f;
+            if (st == SimMemory.Standing.Rival) return;
+            if (st == SimMemory.Standing.Stranger && s.friendly < .3f && R < .6f) return;
+            string line;
+            var place = PlaceIn(t);
+            if (place != null) line = Directions(place, s);
+            else if (t.Contains("inv") || t.Contains("group") || t.Contains("lfg") || t.Contains("party"))
+                line = S.InviteRefusal(s) == null ? (lingo ? "sure, inv" : "Gladly. Send the invite.") : (lingo ? "can't rn, sry" : "I can't just now, sorry.");
+            else if (t.Contains("ty") || t.Contains("thank")) line = Pick(new[] { "np", "anytime", "np :)" });
+            else if (t.Contains("?")) line = Pick(st == SimMemory.Standing.Stranger ? new[] { "not sure", "no idea, sorry", "dunno" } : new[] { "hmm, not sure", "let me think... no idea", "ask at the inn maybe?" });
+            else if (t == "o/" || t.StartsWith("hi") || t.StartsWith("hey") || t.StartsWith("hello") || t.Contains("evening") || t.Contains("morning"))
+                line = st == SimMemory.Standing.Friend ? Pick(new[] { "hey you :)", "o/ good to see you", "hey! how's it going" }) : st == SimMemory.Standing.Acquaintance ? Pick(new[] { "hey", "o/", "hi again" }) : Pick(new[] { "hi", "hello", "o/" });
+            else if (t.Contains("wts") || t.Contains("wtb") || t.Contains("sell") || t.Contains("buy")) line = Pick(new[] { "how much?", "what's your price", "maybe, what for?" });
+            else line = st == SimMemory.Standing.Friend ? Pick(new[] { "ha, yeah", ":)", "true", "same" }) : st == SimMemory.Standing.Acquaintance ? Pick(new[] { "yeah", "ok", "heh" }) : Pick(new[] { "ok", "sure", "k" });
+            Later(ChatChannel.Whisper, s.name, line, -1);
+            if (!answered.TryGetValue(s.id, out var at) || Time.time - at > 60) { answered[s.id] = Time.time; SimMemory.Note(s, SimMemory.Deed.WhisperAnswered); }
+        }
+        /// <summary>A sim came into your zone or online (SimPopulation.Refresh): a friend says hello, once an hour of the clock.</summary>
+        public void Arrived(SimAdventurer s)
+        {
+            if (!Population.Lively || SimMemory.Of(s) != SimMemory.Standing.Friend) return;
+            float hour = WorldClock.Hour; if (s.greetedHour >= 0 && Mathf.Abs(Mathf.DeltaAngle(s.greetedHour * 15, hour * 15)) < 15) return;
+            s.greetedHour = hour; bool lingo = s.chatty > .65f;
+            Later(ChatChannel.Whisper, s.name, Pick(lingo ? new[] { "hey, you on? o/", "yo, you about?", "o/ what are you up to" } : new[] { "Hello again. Good to see you about.", "Evening, friend. How goes it?", "Hello! Are you out hunting today?" }), 2 + R * 4);
+        }
+        /// <summary>A standing crossed: a friend made or lost says so.</summary>
+        public void StandingChanged(SimAdventurer s, SimMemory.Standing was, SimMemory.Standing now)
+        {
+            if (now == SimMemory.Standing.Friend) { S.Message(s.name + " counts you a friend now."); Later(ChatChannel.Whisper, s.name, s.chatty > .65f ? "you're alright, you know. add me" : "You're good company. Let's group again some time.", 1); }
+            else if (now == SimMemory.Standing.Rival) { S.Message(s.name + " has had enough of you."); if (s.chatty > .4f) Later(ChatChannel.Zone, s.name, Pick(new[] { "some people...", "ninja looters everywhere", "won't group with that one again" }), 1); }
+            else if (was == SimMemory.Standing.Friend) S.Message("Things have cooled between you and " + s.name + ".");
+        }
+        /// <summary>Now and then a friend not in your party asks you to group (5.5), by whisper; "/invite" accepts.</summary>
+        void FriendsAsk()
+        {
+            if (Time.time < nextAsk) return; nextAsk = Time.time + Mathf.Lerp(150, 300, R);
+            if (S.PartySims.Count >= EncounterSession.MaxPartySims || S.InCombat) return;
+            var friends = Here().FindAll(s => !S.InParty(s.id) && SimMemory.Of(s) == SimMemory.Standing.Friend && s.bold > .3f && Mathf.Abs(s.level - S.Progress.Level) <= EncounterSession.InviteLevelGap);
+            if (friends.Count == 0 || R > .6f) return;
+            var s = friends[rng.Next(friends.Count)]; var camp = CampFor(s); bool lingo = s.chatty > .65f;
+            Later(ChatChannel.Whisper, s.name, camp != null ? (lingo ? "want to do " + camp + "? inv me" : "Fancy the " + camp + "? Invite me if so.") : (lingo ? "grouping? inv me" : "Want to group for a bit? Invite me if so."));
+        }
         void Answer(ZoneLabel place, SimAdventurer asker)
         {
             var here = Here().FindAll(s => s.id != asker.id && s.friendly > .3f && s.level >= asker.level);
@@ -224,7 +276,7 @@ namespace Crulanda.Encounter
             foreach (var l in m) { float d = Vector2.Distance(l.at, new Vector2(p.x, p.z)); if (d < bd) { bd = d; best = l.name; } }
             return best;
         }
-        static string Plural(string name)
+        public static string Plural(string name)
         {
             if (string.IsNullOrEmpty(name)) return name; var n = name.ToLowerInvariant();
             if (n.EndsWith("wolf")) return n.Substring(0, n.Length - 1) + "ves";

@@ -26,15 +26,15 @@ records where each of its phases stands and the order of the work. Update it eve
 | 5.2 Sim profiles (DONE 2026-10-06: the roster, the world slot, figures in the zone by the clock; gear on them and a who list; mobs scale to your group) | ~20 persistent SimAdventurers (stable ids; name, race, class, level, gear, personality, home zone), saved; materialised as figures in the player's zone, dematerialised when away. | 2 rounds |
 | 5.2b Invite (Chris moved it up, 2026-10-06) | Click a sim, Invite: it joins like Mira (up to three), follows, fights your target in its class's way (melee closes, Ranger and Mage shoot, Druid and Paladin also heal), is in the party frames and can be turned on; Leave party sends it back. Not saved. The full party system stays in 5.6. | 1 round |
 | 5.3 In-world life (DONE 2026-10-06: 5.3a choosing, hunting, gathering, the inn, tagging; 5.3b levelling, death and the corpse run, roads between zones; 5.3c trades, the stall, upgrades, the forge) | Utility-AI activities: questing (camp mobs), gathering, travelling the roads, shopping, resting at inns, dying and the corpse run, levelling and gearing up; personality weights the choices. | 3 rounds |
-| 5.4 Offscreen world (a first step in 5.3b: the unseen take roads between zones by the clock) | Coarse simulation of the unloaded: levels, zone moves, online and offline hours by the world clock. | 1-2 rounds |
-| 5.5 Chat and memory (zone chat built 2026-10-06, brought forward for playtest note 62; whispers, friends and memory to come) | Say, Zone, Whisper and System channels from personality and event templates; a who list and friends; compact social memory and relationships (Stranger to Friend or Rival). | 2 rounds |
-| 5.6 Groups (Phase 6) | Invite, accept, leave, party frames, roles, assist, shared kill credit, need and greed, sims inviting the player, dungeon runs with sims. | 3 rounds |
+| 5.4 Offscreen world (DONE 2026-10-07: the unseen hunt, gather, trade and level by the clock, and take the roads between zones) | Coarse simulation of the unloaded: levels, zone moves, online and offline hours by the world clock. | 1-2 rounds |
+| 5.5 Chat and memory (DONE: zone chat 2026-10-06; whispers, friends and memory 2026-10-07) | Say, Zone, Whisper and System channels from personality and event templates; a who list and friends; compact social memory and relationships (Stranger to Friend or Rival). | 2 rounds |
+| 5.6 Groups (DONE 2026-10-07: invite, frames, need/greed, roles, assist, sims asking you, runs to camps) | Invite, accept, leave, party frames, roles, assist, shared kill credit, need and greed, sims inviting the player, dungeon runs with sims. | 3 rounds |
 
 About 15-17 rounds. No external language model: local state machines and utility AI only (brief section 13).
 
 ## Queued around Phase 5
 - The Ash-Walker enclave's interior (playtest note 40).
-- Art rounds from Chris's assets: Stylized Nature MegaKit, Medieval Village MegaKit, Fantasy Props MegaKit, Stylized Megapack
+- Art rounds from Chris's assets (Fantasy Props MegaKit and Medieval props in, 2026-10-07): Stylized Nature MegaKit, Medieval Village MegaKit, Stylized Megapack
   2in1, Medieval props, HQ Rock Pack, the Ashen Marches sentinel helm.
 - Sound: ambience, weapon hits (slash, pierce, blunt each different), spells, mobs; music later.
 - Standing: playtest notes as they come (Docs/PLAYTEST_NOTES.md), frame rate, cave lighting (note 10).

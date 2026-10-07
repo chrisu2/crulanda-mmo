@@ -24,6 +24,13 @@ namespace Crulanda.Encounter
             return classId == "class.warrior" || classId == "class.paladin" ? "heavy" : classId == "class.ranger" ? "leather" : "cloth";
         }
         public static bool CarriesWeapon(string classId) { return classId == "class.warrior" || classId == "class.paladin"; }
+        /// <summary>Whether a piece by its name is of the class's weight (a Hauberk for the mail classes, a Jerkin for leather, a Tunic for cloth).</summary>
+        public static bool Suits(string classId, string name)
+        {
+            if (string.IsNullOrEmpty(name)) return false;
+            foreach (var w in Wanted[Weight(classId)]) if (name.Contains(w)) return true;
+            return false;
+        }
         public static int QualityFor(SimAdventurer s, int slot)
         {
             int roll = Mathf.Abs(s.gearSeed * 31 + slot * 977) % 100;

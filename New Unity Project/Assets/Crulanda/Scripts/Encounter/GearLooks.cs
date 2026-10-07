@@ -71,6 +71,8 @@ namespace Crulanda.Encounter
         // The model families' variants: declared before Families, which reads them (static fields start in the order written).
         public static readonly string[] ModelWeapons = { "Ashen_gth_equi_arming_sword", "Ashen_dun_equi_crescent_sabre", "Ashen_nth_equi_bearded_axe", "Ashen_nth_equi_flanged_mace", "Ashen_dun_equi_parrying_dagger", "Ashen_nth_equi_rondel_dagger", "Axe1H_Basic", "Axe1H_Epic", "Axe1H_Medium", "Axe2H_Basic", "Axe2H_Epic", "Axe2H_Medium", "Cartoon_Dagger", "Cartoon_Espadon", "Cartoon_Sword_01", "Cartoon_Sword_02", "Cartoon_Sword_03", "Cartoon_Sword_04", "Mace1H_Basic", "Mace1H_Epic", "Mace1H_Medium", "Mace2H_Basic", "Mace2H_Epic", "Mace2H_Medium", "Sics_Dagger", "Sics_Sword", "Sword10_Bone", "Sword10_Brown", "Sword10_Dark", "Sword11_Blood", "Sword11_Bone", "Sword11_Dark", "Sword12_Green", "Sword12_Purple", "Sword12_Red", "Sword13_Blue", "Sword13_Cyan", "Sword13_Green", "Sword13_Orange", "Sword13_Red", "Sword14_Blue", "Sword14_Red", "Sword14_Yellow", "Sword15_Earth", "Sword15_Frost", "Sword15_Iron", "Sword15_Lava", "Sword1_Bronze", "Sword1_Gold", "Sword1_Silver", "Sword2_Green", "Sword2_Red", "Sword2_Yellow", "Sword3_Blue", "Sword3_Green", "Sword3_Red", "Sword4_Blue", "Sword4_Red", "Sword4_Yellow", "Sword5_Blue", "Sword5_Gold", "Sword5_Red", "Sword5_Yellow", "Sword6_Blue", "Sword6_Red", "Sword6_Yellow", "Sword7_Blue", "Sword7_Green", "Sword7_Red", "Sword8_Corrupted", "Sword8_Gold", "Sword8_White", "Sword9_Blue", "Sword9_Green", "Sword9_Purple", "Sword9_Red", "Sword9_White", "Wand_Basic", "Wand_Epic", "Wand_Medium", "Bow_Basic", "Bow_Epic", "Bow_Medium" };
         public static readonly string[] ModelTall = { "StaffOfPain", "Cartoon_Staff_01", "Cartoon_Staff_02", "Cartoon_Staff_03", "Cartoon_Staff_04", "Cartoon_Staff_05", "Cartoon_Staff_06", "Spear1H_Basic", "Spear1H_Epic", "Spear1H_Epic2", "Spear1H_Medium", "Spear2H_Basic", "Spear2H_Epic", "Spear2H_Medium", "Staff_Basic", "Staff_Epic", "Staff_Medium" };
+        /// <summary>Model helms (2026-10-07): the Ashen Marches sentinel helm, seated on the head like the drawn ones (ActorVisual.GearArmor ModelHelm).</summary>
+        public static readonly string[] ModelHelms = { "Ashen_gth_equi_sentinel_helm" };
         public static readonly string[] ModelShields = { "Ashen_gth_equi_kite_shield", "Cartoon_Shield_01", "Cartoon_Shield_02", "Cartoon_Shield_03", "Shield_Basic", "Shield_Epic", "Shield_Medium", "Sics_Shield" };
         /// <summary>Every family and variant (DESIGN.md section 2.3). Variants after the first <c>gen</c> are named-item only.</summary>
         public static readonly GearFamily[] Families = {
@@ -101,7 +103,7 @@ namespace Crulanda.Encounter
             new GearFamily("offhand.hung", "offhand", 1, "lantern", "shuttered", "moss", "censer", "scale"),
             // Models from the Asset Store packs (ActorVisual.GearModels.cs, 2026-10-05): the variant is the prefab's name.
             new GearFamily("model.weapon", "mainhand", 0, ModelWeapons), new GearFamily("model.tall", "mainhand", 0, ModelTall),
-            new GearFamily("model.shield", "offhand", 0, ModelShields),
+            new GearFamily("model.shield", "offhand", 0, ModelShields), new GearFamily("model.helm", "head", 0, ModelHelms),
             // Head.
             new GearFamily("head.cap", "head", 2, "plain", "flaps", "leaf"),
             new GearFamily("head.hood", "head", 1, "cloth", "oilskin"),

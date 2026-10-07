@@ -93,6 +93,25 @@ namespace Crulanda.Tests
             Assert.LessOrEqual(e.actor.Health.Pool.Current, hp - c.Hit, s.name + " (" + c.Activity + ") shot at it");
         }
 
+        /// <summary>5.6: roles by class; a sim leads a run to a camp and calls it when the camp is cleared; /assist takes the party's fight; /lead when nothing fits says so.</summary>
+        [UnityTest] public IEnumerator A_warrior_tanks_and_leads_a_run_to_a_camp()
+        {
+            var s = Willing("class.warrior"); yield return null;
+            Assert.IsTrue(session.Invite(s.id)); var c = session.PartySim(s.id);
+            Assert.AreEqual(SimCompanion.PartyRole.Tank, c.Role);
+            session.PlayerChat("/assist"); StringAssert.Contains("Nobody in the party is fighting", session.Messages.Last());
+            Assert.IsTrue(session.Lead(s.name), session.Messages.Last()); Assert.IsTrue(c.Leading.HasValue, "a camp picked");
+            Assert.IsTrue(session.Chat.Any(l => l.channel == ChatChannel.Party && l.speaker == s.name && l.text.ToLower().Contains("follow me")), "said in Party");
+            float t = 0; while (t < 4 && !c.Activity.StartsWith("Leading")) { t += Time.deltaTime; yield return null; }
+            StringAssert.StartsWith("Leading you to the", c.Activity);
+            // The camp falls (to the test): the run is called done.
+            var camp = c.Leading.Value;
+            foreach (var e in session.Enemies) if (e != null && e.actor.IsAlive && e.Camp && !e.Game && Vector3.Distance(e.transform.position, camp) < 16) e.actor.Health.ApplyDamage(100000);
+            session.Player.GetComponent<AdventurerMotor>().Teleport(c.transform.position + Vector3.back * 3);
+            t = 0; while (t < 6 && c.Leading.HasValue) { t += Time.deltaTime; yield return null; }
+            Assert.IsFalse(c.Leading.HasValue, "the run is done"); StringAssert.Contains("cleared", session.Messages.Last());
+        }
+
         [UnityTest] public IEnumerator Mobs_grow_with_the_group_by_its_levels()
         {
             var e = session.Enemies.Find(x => x != null && x.actor.IsAlive && !x.Game); Assert.NotNull(e);

@@ -28,12 +28,12 @@ namespace Crulanda.EditorTools
             string root = Path.Combine(Application.dataPath, "Crulanda/Resources/Icons");
             Directory.CreateDirectory(Path.Combine(root, "model"));
             int n = 0;
-            foreach (var name in Models()) { if (Draw(cam, name, IsShield(name), Path.Combine(root, "model", name + ".png"))) n++; }
+            foreach (var name in Models()) { if (Draw(cam, name, IsShield(name), Path.Combine(root, "model", name + ".png"), IsHelm(name))) n++; }
             // Named items that wear a model: their own icon (IconCoverageTests asks every item for one).
             var named = new System.Text.RegularExpressions.Regex(@"\{""id"": ""([^""]+)"", ""look"": ""(model\.[a-z]+):([^/]+)/");
             foreach (var file in Directory.GetFiles(Path.Combine(Application.dataPath, "Crulanda/EncounterContent/Items"), "loot.*.json"))
                 foreach (System.Text.RegularExpressions.Match m in named.Matches(File.ReadAllText(file)))
-                    if (Draw(cam, m.Groups[3].Value, m.Groups[2].Value == "model.shield", Path.Combine(root, "item", m.Groups[1].Value.Replace('.', '-') + ".png"))) n++;
+                    if (Draw(cam, m.Groups[3].Value, m.Groups[2].Value == "model.shield", Path.Combine(root, "item", m.Groups[1].Value.Replace('.', '-') + ".png"), m.Groups[2].Value == "model.helm")) n++;
             Debug.Log("MODEL_ICONS_DONE " + n);
         }
         static IEnumerable<string> Models()
@@ -41,10 +41,12 @@ namespace Crulanda.EditorTools
             foreach (var s in GearLooks.ModelWeapons) yield return s;
             foreach (var s in GearLooks.ModelTall) yield return s;
             foreach (var s in GearLooks.ModelShields) yield return s;
+            foreach (var s in GearLooks.ModelHelms) yield return s;
         }
         static bool IsShield(string name) { return System.Array.IndexOf(GearLooks.ModelShields, name) >= 0; }
+        static bool IsHelm(string name) { return System.Array.IndexOf(GearLooks.ModelHelms, name) >= 0; }
 
-        static bool Draw(Camera cam, string name, bool shield, string path)
+        static bool Draw(Camera cam, string name, bool shield, string path, bool helm = false)
         {
             var src = Resources.Load<GameObject>("Weapons/" + name); if (src == null) { Debug.LogWarning("MODEL_ICONS no prefab " + name); return false; }
             var holder = new GameObject("Holder").transform; var go = Object.Instantiate(src, holder, false);
@@ -52,8 +54,8 @@ namespace Crulanda.EditorTools
             var b = Bounds(go.transform); var size = b.size; int lng = size.x >= size.y && size.x >= size.z ? 0 : size.y >= size.z ? 1 : 2;
             int thin = size.x <= size.y && size.x <= size.z ? 0 : size.y <= size.z ? 1 : 2;
             Vector3 Axis(int i) { var v = Vector3.zero; v[i] = 1; return v; }
-            Quaternion toView = shield ? Quaternion.FromToRotation(Axis(thin), Vector3.back) : Quaternion.Euler(0, 0, -45) * Quaternion.FromToRotation(Axis(lng), Vector3.up) * Quaternion.Euler(0, 0, 0);
-            if (!shield) toView = Quaternion.AngleAxis(25, toView * Axis(lng)) * toView;   // a quarter turn about its length so the flat catches the light
+            Quaternion toView = helm ? Quaternion.Euler(15, 180, 0) : shield ? Quaternion.FromToRotation(Axis(thin), Vector3.back) : Quaternion.Euler(0, 0, -45) * Quaternion.FromToRotation(Axis(lng), Vector3.up) * Quaternion.Euler(0, 0, 0);
+            if (!shield && !helm) toView = Quaternion.AngleAxis(25, toView * Axis(lng)) * toView;   // a helm faces the camera (2026-10-07), a little from above   // a quarter turn about its length so the flat catches the light
             go.transform.localRotation = toView * go.transform.localRotation; go.transform.localPosition = -(toView * b.center);   // (the prefab's own turn kept: the bounds were measured with it)
             var view = Bounds(holder); float half = Mathf.Max(view.extents.x, view.extents.y) * 1.12f; cam.orthographicSize = half; cam.transform.position = new Vector3(view.center.x, view.center.y, -5);
             int px = Size * Super; var rt = new RenderTexture(px, px, 24, RenderTextureFormat.ARGB32) { antiAliasing = 8 };

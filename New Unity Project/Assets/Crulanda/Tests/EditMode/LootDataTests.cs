@@ -72,12 +72,12 @@ namespace Crulanda.Tests
             Assert.AreEqual(6, paths.Count, "Six loot files: " + string.Join(", ", paths.Select(Path.GetFileName)));
             var items = LootTestData.Items(); var loot = LootTestData.Loot(items, LootTestData.Looks());
             var named = items.Items.Keys.Where(k => k.StartsWith("loot.", StringComparison.Ordinal)).ToList();
-            Assert.AreEqual(109, named.Count, "104 named items (ITEMS_V1.md) and the five legendaries (2026-10-05).");
-            Assert.AreEqual(109 + 12, loot.Gear.Count, "A gear entry for each, and for the twelve named items already in the game.");
+            Assert.AreEqual(110, named.Count, "104 named items (ITEMS_V1.md), the five legendaries (2026-10-05) and the Sentinel's Helm (2026-10-07).");
+            Assert.AreEqual(109 + 13, loot.Gear.Count, "A gear entry for each, and for the thirteen named items already in the game (the Sentinel's Helm the thirteenth, 2026-10-07).");
             Assert.AreEqual(12, loot.GearOrder.Count(g => g.legacy));
             Assert.AreEqual(2, loot.Sets.Count, "Two sets.");
             Assert.AreEqual(49, named.Count(id => items.Get(id).quality == 2), "49 uncommon.");
-            Assert.AreEqual(48, named.Count(id => items.Get(id).quality == 3), "48 rare.");
+            Assert.AreEqual(49, named.Count(id => items.Get(id).quality == 3), "49 rare (the Sentinel's Helm the 49th, 2026-10-07).");
             Assert.AreEqual(7, named.Count(id => items.Get(id).quality == 4), "7 epic.");
         }
 
@@ -167,7 +167,7 @@ namespace Crulanda.Tests
                 Assert.AreEqual(gen.value, d.value, d.id + ": value is generated gear's.");
                 Assert.AreEqual(gen.level, d.level, d.id + ": required level is the curve level less one.");
             }
-            Assert.AreEqual(109, n);
+            Assert.AreEqual(110, n);
         }
 
         [Test] public void Named_gear_stat_budgets_hold()
@@ -232,7 +232,7 @@ namespace Crulanda.Tests
             Assert.AreEqual(5, counts["vendor"], "Five vendor pieces.");
             Assert.AreEqual(6, counts["world"], "Six world drops.");
             Assert.AreEqual(40, counts["boss"], "24 signature pieces, 5 from rare tables, 6 epics, 5 legendaries.");
-            Assert.AreEqual(43, counts["mob"], "43 from ordinary mobs.");
+            Assert.AreEqual(44, counts["mob"], "44 from ordinary mobs.");
         }
 
         [Test] public void A_mob_source_names_its_zone_by_its_display_name()

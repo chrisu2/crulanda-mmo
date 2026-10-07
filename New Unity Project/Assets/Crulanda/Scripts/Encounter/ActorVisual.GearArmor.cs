@@ -454,8 +454,30 @@ namespace Crulanda.Encounter
                 case "head.mask": Hood(f, true); ShowHair(false); break;
                 case "head.circlet": Circlet(f); break;
                 case "head.crown": Crown(f); break;
+                case "model.helm": ModelHelm(f); ShowHair(false); break;
             }
             DruidHood(false);   // the Druid's own hood yields to any head piece
+        }
+        /// <summary>
+        /// A helm from the Asset Store packs (2026-10-07, the Ashen Marches sentinel helm): the prefab under the head's gear root in
+        /// its own materials, its mesh brought to about a head's width in the frame, its eye slit forward; then seated and sized to
+        /// this head like every other head piece (SeatHead, HatFit). The packs keep their meshes readable (ThirdPartyImport).
+        /// </summary>
+        void ModelHelm(Fit f)
+        {
+            var src = Resources.Load<GameObject>("Weapons/" + f.v); if (src == null) return;
+            var root = gearRoots[(int)EquipSlot.Head]; var go = Instantiate(src, root, false); go.name = "Model " + f.v;
+            foreach (var c in go.GetComponentsInChildren<Component>(true))
+                if (!(c is Transform) && !(c is MeshFilter) && !(c is MeshRenderer)) { if (Application.isPlaying) Destroy(c); else DestroyImmediate(c); }
+            foreach (var r in go.GetComponentsInChildren<MeshRenderer>(true)) { r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On; r.receiveShadows = true; }
+            // Its size in its own space: the widest of x and z is the head's width; the bottom goes to the frame's eye line region.
+            var b = new Bounds(); bool any = false;
+            foreach (var mf in go.GetComponentsInChildren<MeshFilter>(true)) { if (mf.sharedMesh == null) continue; var mb = mf.sharedMesh.bounds; var m = go.transform.worldToLocalMatrix * mf.transform.localToWorldMatrix; for (int i = 0; i < 8; i++) { var p = m.MultiplyPoint3x4(mb.center + Vector3.Scale(mb.extents, new Vector3((i & 1) == 0 ? -1 : 1, (i & 2) == 0 ? -1 : 1, (i & 4) == 0 ? -1 : 1))); if (!any) { b = new Bounds(p, Vector3.zero); any = true; } else b.Encapsulate(p); } }
+            if (!any) return;
+            float width = Mathf.Max(b.size.x, b.size.z), scale = .36f / Mathf.Max(.01f, width);   // a helm a little wider than the old head's .3
+            go.transform.localScale = Vector3.one * scale;
+            go.transform.localPosition = new Vector3(-b.center.x * scale, .78f - b.min.y * scale, -b.center.z * scale);   // its bottom edge at the brow line; SeatHead sets it right
+            go.transform.localRotation = Quaternion.identity;
         }
         /// <summary>
         /// A skull-cap over the hair, a band round its brim. The brim sits on the brow line, clear of the eyes and brows, and the

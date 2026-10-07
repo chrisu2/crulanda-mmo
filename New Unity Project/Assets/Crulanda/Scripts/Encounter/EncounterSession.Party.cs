@@ -42,11 +42,13 @@ namespace Crulanda.Encounter
             if (InParty(s.id)) return s.name + " is already in your party.";
             if (InCombat) return "Not while you are fighting.";
             if (PartySims.Count >= MaxPartySims) return "Your party is full.";
-            if (Mathf.Abs(s.level - Progress.Level) > InviteLevelGap) return s.name + " declines: \"We're too far apart, friend. Find someone nearer your level.\"";
-            if (s.friendly < BusyBelow) return s.name + " declines: \"Not right now. I'm in the middle of something.\"";
             var fig = SimPopulation.Active?.Find(s.id);
+            if (fig != null && fig.Hidden) return s.name + " is inside the inn.";   // where it is comes before its mood (a full run of 2026-10-07 caught the order)
             if (fig != null && fig.InFight) return s.name + " is busy fighting.";
-            if (fig != null && fig.Hidden) return s.name + " is inside the inn.";
+            if (SimMemory.Refuses(s)) return s.name + " declines: \"Not with you.\"";   // a rival (5.5)
+            bool friend = SimMemory.Of(s) == SimMemory.Standing.Friend;   // a friend stretches a little further, and is never too busy for you
+            if (Mathf.Abs(s.level - Progress.Level) > InviteLevelGap + (friend ? 2 : 0)) return s.name + " declines: \"We're too far apart, friend. Find someone nearer your level.\"";
+            if (s.friendly < BusyBelow && !friend) return s.name + " declines: \"Not right now. I'm in the middle of something.\"";
             return null;
         }
         public bool Invite(string simId)
@@ -102,10 +104,36 @@ namespace Crulanda.Encounter
             if (Invite(s.id)) ChatSay(ChatChannel.Party, s.name, "here, where to?");
         }
         int FreeSlot() { for (int i = 0; ; i++) if (!PartySims.Exists(x => x != null && x.slot == i)) return i; }
+        /// <summary>/assist [name] (5.6): your target becomes what that party member (or any of them) is fighting.</summary>
+        public bool Assist(string name = null)
+        {
+            SimCompanion c = string.IsNullOrEmpty(name) ? null : PartySims.Find(x => x != null && x.sim.name.StartsWith(name, StringComparison.OrdinalIgnoreCase));
+            if (!string.IsNullOrEmpty(name) && c == null) { Message("Nobody called " + name + " is in your party."); return false; }
+            EncounterEnemy q = c != null ? c.Quarry : null;
+            if (q == null) foreach (var p in PartySims) { if (p == null) continue; q = p.Quarry; if (q != null) break; }
+            if (q == null || !q.actor.IsAlive) { Message("Nobody in the party is fighting anything."); return false; }
+            Select(q); Message("Assisting: " + q.actor.DisplayName + "."); return true;
+        }
+        /// <summary>/lead [name] (5.6): a party sim leads a run to a camp near its level (its bold ones gladly; the rest do too, less sure).</summary>
+        public bool Lead(string name = null)
+        {
+            if (PartySims.Count == 0) { Message("You are not in a party: /invite someone first."); return false; }
+            SimCompanion c = string.IsNullOrEmpty(name) ? null : PartySims.Find(x => x != null && x.sim.name.StartsWith(name, StringComparison.OrdinalIgnoreCase));
+            if (!string.IsNullOrEmpty(name) && c == null) { Message("Nobody called " + name + " is in your party."); return false; }
+            if (c == null) { c = PartySims.Find(x => x != null && x.sim.bold > .5f) ?? PartySims.Find(x => x != null); }
+            if (c == null) return false;
+            foreach (var p in PartySims) if (p != null && p != c) p.StopLeading();
+            if (InCombat) { Message("Not while you are fighting."); return false; }
+            var camp = c.Lead();
+            if (camp == null) { Message(c.sim.name + " knows no camp fit for the party near here."); return false; }
+            Message(c.sim.name + " leads the way to the " + camp.ToLower() + ".");
+            return true;
+        }
         /// <summary>Sends a party sim back to the world where it stands.</summary>
-        public void LeaveParty(string simId)
+        public void LeaveParty(string simId, bool kicked = false)
         {
             var c = PartySim(simId); if (c == null) return;
+            c.Remember(kicked);
             foreach (var e in Enemies) if (e != null && e.Victim == c.actor) e.ResetFight();
             c.sim.x = c.transform.position.x; c.sim.z = c.transform.position.z;
             PartySims.Remove(c); Destroy(c.gameObject);

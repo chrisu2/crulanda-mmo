@@ -1,9 +1,9 @@
-# Back up D:\code\mmo (project, docs, tools and the .git history) to J:\claude\unity projects\mmo.
+# Back up D:\code\mmo (project, docs, tools and the .git history) to E:\claude\unity projects\mmo.
 # Additive by default: copies new and changed files and never deletes anything from the backup.
 #   .\Backup.ps1            skip Unity's regenerable caches (Library, Temp, Logs); fast
 #   .\Backup.ps1 -Full      include Library and Logs too
 #   .\Backup.ps1 -Mirror    make the backup an exact copy (deletes backup files that no longer exist here)
-param([switch]$Full, [switch]$Mirror, [string]$Destination = "J:\claude\unity projects\mmo")
+param([switch]$Full, [switch]$Mirror, [string]$Destination = "E:\claude\unity projects\mmo")
 
 $source = Split-Path -Parent $PSScriptRoot
 if (-not (Test-Path (Split-Path -Qualifier $Destination))) { Write-Error "Backup drive $(Split-Path -Qualifier $Destination) is not available; nothing was copied."; exit 2 }

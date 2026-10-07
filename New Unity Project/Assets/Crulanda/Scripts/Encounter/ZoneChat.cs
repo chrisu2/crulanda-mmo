@@ -5,13 +5,23 @@ using UnityEngine;
 namespace Crulanda.Encounter
 {
     /// <summary>The chat's channels (playtest note 62; Docs/CHAT_RESEARCH.md): the game's own messages, and what people say.</summary>
-    public enum ChatChannel { System, Say, Zone, Trade, LFG, Party }
+    public enum ChatChannel { System, Say, Zone, Trade, LFG, Party, Whisper }
 
     /// <summary>One line in the chat: who said it, where, and when.</summary>
     public sealed class ChatLine
     {
         public ChatChannel channel; public string speaker, text; public float time;
-        public string Shown { get { return channel == ChatChannel.System ? text : "[" + ZoneChat.Label(channel) + "] " + speaker + ": " + text; } }
+        /// <summary>A whisper's other end: whom you told, or null for one sent to you.</summary>
+        public string to;
+        public string Shown
+        {
+            get
+            {
+                if (channel == ChatChannel.System) return text;
+                if (channel == ChatChannel.Whisper) return to != null ? "To " + to + ": " + text : speaker + " whispers: " + text;
+                return "[" + ZoneChat.Label(channel) + "] " + speaker + ": " + text;
+            }
+        }
     }
 
     /// <summary>
@@ -32,6 +42,7 @@ namespace Crulanda.Encounter
                 case ChatChannel.Trade: return new Color(1, .62f, .78f);
                 case ChatChannel.LFG: return new Color(.55f, .85f, 1);
                 case ChatChannel.Party: return new Color(.6f, .7f, 1);
+                case ChatChannel.Whisper: return new Color(1, .55f, 1);
                 default: return new Color(1, .96f, .86f);
             }
         }
@@ -69,11 +80,60 @@ namespace Crulanda.Encounter
         /// <summary>Where plain words go (Round 24, playtest note 71: "I can't talk in party or lfg"): the last channel you used by its
         /// prefix, Zone at first. "/lfg" alone switches it.</summary>
         public ChatChannel ChatDefault { get; private set; } = ChatChannel.Zone;
-        public void ChatSay(ChatChannel channel, string speaker, string text)
+        public void ChatSay(ChatChannel channel, string speaker, string text, string to = null)
         {
             if (string.IsNullOrEmpty(text)) return;
-            Chat.Add(new ChatLine { channel = channel, speaker = speaker, text = text, time = Time.time });
+            Chat.Add(new ChatLine { channel = channel, speaker = speaker, text = text, time = Time.time, to = to });
             if (Chat.Count > ZoneChat.Kept) Chat.RemoveAt(0);
+            if (channel == ChatChannel.Whisper && to == null) LastWhisperer = speaker;
+        }
+        /// <summary>Who last whispered you (/r answers them).</summary>
+        public string LastWhisperer { get; private set; }
+        /// <summary>A sim by its name as typed, else by the start of its name, those online and here first (first names repeat).</summary>
+        public SimAdventurer SimByName(string name)
+        {
+            var pop = SimPopulation.Active; if (pop == null || string.IsNullOrEmpty(name)) return null;
+            var s = pop.World.sims.Find(x => string.Equals(x.name, name, StringComparison.OrdinalIgnoreCase));
+            if (s != null) return s;
+            var hour = Crulanda.World.WorldClock.Hour;
+            var like = pop.World.sims.FindAll(x => x.name.StartsWith(name, StringComparison.OrdinalIgnoreCase) && (x.IsOnlineAt(hour) || InParty(x.id)));
+            return like.Find(x => x.zone == ZoneId && pop.Find(x.id) != null) ?? (like.Count > 0 ? like[0] : pop.World.sims.Find(x => x.name.StartsWith(name, StringComparison.OrdinalIgnoreCase)));
+        }
+        /// <summary>/w name words (5.5): a tell to one adventurer online anywhere; a friend or an acquaintance answers, a stranger
+        /// mostly, a rival never (SimChatter.Whispered).</summary>
+        public bool Whisper(string nameAndText)
+        {
+            nameAndText = (nameAndText ?? "").Trim(); int sp = nameAndText.IndexOf(' ');
+            if (sp < 0) { Message("Whisper whom, and what? /w <name> <words>."); return false; }
+            // The name may be two words ("Wren Wick hello"): try the longest match first.
+            string text = null; SimAdventurer s = null;
+            var words = nameAndText.Split(' ');
+            for (int n = Math.Min(2, words.Length - 1); n >= 1 && s == null; n--) { s = SimByName(string.Join(" ", words, 0, n)); if (s != null) text = string.Join(" ", words, n, words.Length - n).Trim(); }
+            if (s == null) { Message("Nobody called " + words[0] + "."); return false; }
+            if (text.Length == 0) { Message("Say what to " + s.name + "?"); return false; }
+            if (!s.IsOnlineAt(Crulanda.World.WorldClock.Hour) && !InParty(s.id)) { Message(s.name + " is not online."); return false; }
+            ChatSay(ChatChannel.Whisper, "You", text, s.name);
+            SimChatter.Active?.Whispered(s, text);
+            return true;
+        }
+        /// <summary>/friend name (5.5): on or off your friends list; "/friends" lists them with who is online.</summary>
+        public void ToggleFriend(string name)
+        {
+            var s = SimByName(name); if (s == null) { Message(string.IsNullOrEmpty(name) ? "Befriend whom? /friend <name>." : "Nobody called " + name + "."); return; }
+            s.friend = !s.friend;
+            Message(s.friend ? s.name + " is on your friends list." : s.name + " is off your friends list.");
+            if (s.friend) SimMemory.Note(s, SimMemory.Deed.Befriended);
+            SimPopulation.Active?.Persist();
+        }
+        public void ListFriends()
+        {
+            var pop = SimPopulation.Active; if (pop == null) return;
+            var hour = Crulanda.World.WorldClock.Hour; var friends = pop.World.sims.FindAll(x => x.friend);
+            if (friends.Count == 0) { Message("No friends yet: /friend <name> adds one (the who list, O, shows who is about)."); return; }
+            friends.Sort((a, b) => (a.IsOnlineAt(hour) ? 0 : 1).CompareTo(b.IsOnlineAt(hour) ? 0 : 1));
+            var sb = new System.Text.StringBuilder("Friends: ");
+            for (int i = 0; i < friends.Count; i++) { var f = friends[i]; sb.Append(i > 0 ? ", " : "").Append(f.name).Append(f.IsOnlineAt(hour) || InParty(f.id) ? " (" + SimRoster.ClassName(f.classId) + " " + f.level + ", " + ZoneName(f.zone) + ")" : " (offline)"); }
+            Message(sb.ToString());
         }
         /// <summary>You typed a line (Enter): a command (/invite, /inv, /leave, /who, /help), or words into their channel, which the
         /// sims who hear may answer (SimChatter.Heard).</summary>
@@ -86,9 +146,15 @@ namespace Crulanda.Encounter
                 switch (cmd)
                 {
                     case "/invite": case "/inv": InviteByName(arg); return;
-                    case "/leave": case "/kick": if (arg.Length == 0) { foreach (var c in PartySims.ToArray()) if (c != null) LeaveParty(c.sim.id); } else { var c = PartySims.Find(x => x != null && x.sim.name.StartsWith(arg, StringComparison.OrdinalIgnoreCase)); if (c != null) LeaveParty(c.sim.id); else Message("Nobody called " + arg + " is in your party."); } return;
+                    case "/leave": case "/kick": if (arg.Length == 0) { foreach (var c in PartySims.ToArray()) if (c != null) LeaveParty(c.sim.id); } else { var c = PartySims.Find(x => x != null && x.sim.name.StartsWith(arg, StringComparison.OrdinalIgnoreCase)); if (c != null) LeaveParty(c.sim.id, cmd == "/kick"); else Message("Nobody called " + arg + " is in your party."); } return;
                     case "/who": WhoOpen = !WhoOpen; return;
-                    case "/help": Message("Chat: /s say, /z zone, /t trade, /lfg, /p party; /invite <name> (anyone online, anywhere), /leave [name], /who."); return;
+                    case "/w": case "/tell": case "/whisper": Whisper(arg); return;
+                    case "/r": case "/reply": if (LastWhisperer == null) Message("Nobody has whispered you yet."); else Whisper(LastWhisperer + " " + arg); return;
+                    case "/friend": ToggleFriend(arg); return;
+                    case "/friends": ListFriends(); return;
+                    case "/assist": case "/a": Assist(arg); return;
+                    case "/lead": case "/run": Lead(arg); return;
+                    case "/help": Message("Chat: /s say, /z zone, /t trade, /lfg, /p party, /w <name> <words> whisper, /r reply; /invite <name> (anyone online, anywhere), /leave [name], /who, /friend <name>, /friends, /assist [name], /lead [name] (a sim leads a run to a camp)."); return;
                     case "/s": case "/say": case "/z": case "/zone": case "/ooc": case "/t": case "/trade": case "/lfg": case "/l": case "/p": case "/party": case "/g": break;
                     default: Message("Unknown command " + cmd + ". /help lists them."); return;
                 }

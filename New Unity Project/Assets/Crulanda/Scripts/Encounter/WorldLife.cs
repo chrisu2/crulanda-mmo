@@ -103,6 +103,7 @@ namespace Crulanda.Encounter
             Session = session; Zone = session.Zone; Active = this;
             var z = Zone.Zone; rng = new System.Random(z.seed + 7);
             FindPlaces(); MorningCask(); NameHouseholds();
+            if (Places["bench"].Count == 0) Places["bench"].AddRange(Places["dryhut"]);   // the alchemy bench: the herbalist's drying hut (2026-10-07; the Druid and Mage sims brew there)
             // Without households in the zone's data, villager i takes house i while houses last and the rest lodge at the inn.
             bool named = Households.Count > 0; var lodging = Zone.Doors.Find(d => d.kind == "rooms");
             int count = z.life.villagers;
@@ -517,7 +518,7 @@ namespace Crulanda.Encounter
         void FindPlaces()
         {
             var z = Zone.Zone;
-            foreach (var key in new[] { "field", "well", "green", "inn", "mill", "wander", "forge", "stall", "oven", "tannery", "woodpile", "woods", "meadow", "leathershop", "dryhut", "kitchen", "kitchendoor", "bar", "lodge" }) Places[key] = new List<Vector3>();
+            foreach (var key in new[] { "field", "well", "green", "inn", "mill", "wander", "forge", "stall", "oven", "tannery", "woodpile", "woods", "meadow", "leathershop", "dryhut", "kitchen", "kitchendoor", "bar", "lodge", "bench" }) Places[key] = new List<Vector3>();
             // Trade workplaces (exact stand points, with where to look while working, and whose place it is).
             foreach (var w in Zone.Workplaces)
                 if (NavMesh.SamplePosition(w.stand, out var wh, 1.5f, NavMesh.AllAreas)) { Places[w.kind].Add(wh.position); faceAt[wh.position] = w.look; placeName[wh.position] = w.name; }

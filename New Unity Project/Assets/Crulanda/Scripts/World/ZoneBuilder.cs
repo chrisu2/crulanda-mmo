@@ -1179,6 +1179,8 @@ namespace Crulanda.World
                     case "bridge": SeatBridge(t, p.size.x > 0 ? p.size.x : 12); if (p.variant == 1) RopeBridge(t, p.size.x > 0 ? p.size.x : 12); else Bridge(t, p.size.x > 0 ? p.size.x : 12); break;
                     case "signpost": Signpost(t, p.name); break;
                     case "hitch": Hitch(t); break;
+                    case "dummy": GroundProp(t, "Fantasy/Dummy", Vector3.zero, 0, 1.9f, true); break;      // a training dummy (kit, 2026-10-07)
+                    case "banner": GroundProp(t, "Fantasy/Banner_1", Vector3.zero, 0, 2.6f); break;        // a standing banner (kit, 2026-10-07)
                     case "board": NoticeBoard(t); break;
                     case "ruin": Ruin(t, p.size.x > 0 ? p.size.x : 6); break;
                     case "gate": Gate(t, p.size.x > 0 ? p.size.x : 6.4f); break;
@@ -1552,7 +1554,10 @@ namespace Crulanda.World
             var bar = Part(PrimitiveType.Cube, t, new Vector3(-w / 2 + 2.6f, .55f, d / 2 - 1.5f), new Vector3(4, 1.1f, .7f), boards);
             bar.AddComponent<BoxCollider>(); bar.AddComponent<NavBlocker>();
             Part(PrimitiveType.Cube, t, new Vector3(-w / 2 + 2.6f, 1.12f, d / 2 - 1.5f), new Vector3(4.2f, .08f, .9f), dark);
-            for (int i = 0; i < 3; i++) Part(PrimitiveType.Cylinder, t, new Vector3(-w / 2 + 1.2f + i * 1.1f, .5f, d / 2 - .55f), new Vector3(.8f, .5f, .8f), art.timber);
+            for (int i = 0; i < 3; i++) Barrel(t, new Vector3(-w / 2 + 1.2f + i * 1.1f, .045f, d / 2 - .55f), 1, i * 40);   // the kit's barrels behind the bar (2026-10-07)
+            // The bar's top dressed from the Medieval props (2026-10-07): two mugs, a bottle and a candle along it.
+            ModelProp(t, "Medieval/Prefabs/MugV2", new Vector3(-w / 2 + 1.3f, 1.16f, d / 2 - 1.5f), 20, .13f); ModelProp(t, "Medieval/Prefabs/MugV2", new Vector3(-w / 2 + 2.1f, 1.16f, d / 2 - 1.55f), -60, .13f);
+            ModelProp(t, "Medieval/Prefabs/BottleV1", new Vector3(-w / 2 + 3.4f, 1.16f, d / 2 - 1.45f), 0, .28f); ModelProp(t, "Medieval/Prefabs/CandleV1", new Vector3(-w / 2 + 4.2f, 1.16f, d / 2 - 1.6f), 0, .2f);
             // The innkeeper's place at the open end of the bar, and behind it the door to the rooms upstairs (barred to the player:
             // whoever lodges at the inn goes to bed through it), set between two of the back wall's windows. With a kitchen on the
             // back wall, the kitchen's own door shows in the taproom too.
@@ -1561,8 +1566,20 @@ namespace Crulanda.World
             InnerDoor(t, roomsX, d / 2 - wall / 2, dark);
             Doors.Add(new ZoneDoor { name = t.name + ", upstairs", kind = "rooms", openable = false, position = t.TransformPoint(new Vector3(roomsX, 1, d / 2 - .7f)) });
             if (kitchen.HasValue) InnerDoor(t, kitchen.Value - KitchenDoorX, d / 2 - wall / 2, dark);
+            // The kit's chandelier over the room and a bench by the hearth (2026-10-07); the tables below are the kit's where it is there.
+            ModelProp(t, "Fantasy/Chandelier", new Vector3(0, 2.55f, -.2f), 0, .8f); ModelProp(t, "Fantasy/Bench", new Vector3(w / 2 - 2.3f, .045f, .8f), 90, .5f);
+            ModelProp(t, "Medieval/Prefabs/PileOfWoodV1", new Vector3(w / 2 - 1.3f, .045f, -1.2f), 0, .5f);
+            bool kitTables = HasProp("Fantasy/Table_Large"); int tableNo = 0;
             foreach (var at in new[] { new Vector2(2.2f, -1.6f), new Vector2(2.8f, 1.3f), new Vector2(-2.8f, -1.9f) })
             {
+                if (kitTables)
+                {
+                    float turn = tableNo * 50; tableNo++;
+                    ModelProp(t, "Fantasy/Table_Large", new Vector3(at.x, .045f, at.y), turn, .8f, false, 1.5f);
+                    for (int k = 0; k < 3; k++) { float a = (k * 120 + turn + 30) * Mathf.Deg2Rad; ModelProp(t, "Fantasy/Stool", new Vector3(at.x + Mathf.Cos(a) * 1.0f, .045f, at.y + Mathf.Sin(a) * 1.0f), -k * 120 - turn + 60, .45f); }
+                    ModelProp(t, "Fantasy/CandleStick", new Vector3(at.x + .15f, .845f, at.y - .1f), 0, .22f); ModelProp(t, "Fantasy/Mug", new Vector3(at.x - .3f, .845f, at.y + .25f), turn + 70, .12f);
+                    continue;
+                }
                 Part(PrimitiveType.Cylinder, t, new Vector3(at.x, .78f, at.y), new Vector3(1.2f, .04f, 1.2f), boards);
                 Part(PrimitiveType.Cylinder, t, new Vector3(at.x, .4f, at.y), new Vector3(.18f, .38f, .18f), dark);
                 for (int k = 0; k < 3; k++)
@@ -2383,8 +2400,9 @@ namespace Crulanda.World
             return MeshPart(mesh, t, foot, m, rot);
         }
         /// <summary>A coopered barrel standing on <paramref name="foot"/>, a metre tall and .72 across the bilge at size 1: bulged staves, a recessed head and three iron hoops.</summary>
-        GameObject Barrel(Transform t, Vector3 foot, float size = 1, float yaw = 0)
+        GameObject Barrel(Transform t, Vector3 foot, float size = 1, float yaw = 0, bool painted = false)
         {
+            if (!painted) { var model = ModelProp(t, "Fantasy/Barrel", foot, yaw, .95f * size); if (model != null) return model; }   // the kit's barrel (2026-10-07), the painted one when the kit is not there
             var mesh = PropMesh("Barrel", () => TwoTone(
                 Turned(new[] { new Vector2(0, 0), new Vector2(.3f, 0), new Vector2(.345f, .28f), new Vector2(.36f, .5f), new Vector2(.345f, .72f), new Vector2(.3f, 1), new Vector2(.27f, 1), new Vector2(.27f, .95f), new Vector2(0, .95f) }, 12),
                 Joined(Piece(Turned(new[] { new Vector2(.315f, .12f), new Vector2(.335f, .12f), new Vector2(.348f, .2f), new Vector2(.328f, .2f) }, 12)),
@@ -2396,6 +2414,7 @@ namespace Crulanda.World
         /// <summary>A packing crate <paramref name="size"/> a side, centred on <paramref name="at"/>: plank panels and a lid set in a frame of darker battens, a brace across each side.</summary>
         GameObject Crate(Transform t, Vector3 at, float size, float yaw = 0)
         {
+            var model = ModelProp(t, "Fantasy/Crate_Wooden", new Vector3(at.x, at.y - size / 2, at.z), yaw, size); if (model != null) return model;   // the kit's crate (2026-10-07)
             var mesh = PropMesh("Crate", () =>
             {
                 var frame = new List<CombineInstance>();
@@ -3455,6 +3474,9 @@ namespace Crulanda.World
         void Stall(Transform t, int variant)
         {
             bool hide = variant == 3;
+            // The kit's crates of apples and carrots in front of a produce stall, a barrel by the others (2026-10-07).
+            if (!hide && Mathf.Abs(variant) % 3 == 0) { GroundProp(t, "Fantasy/FarmCrate_Apple", new Vector3(-1.05f, 0, -1.35f), 14, .34f); GroundProp(t, "Fantasy/FarmCrate_Carrot", new Vector3(-.4f, 0, -1.4f), -9, .34f); }
+            else if (!hide) GroundProp(t, "Fantasy/Barrel", new Vector3(1.75f, 0, -.3f), 30, .95f);
             var colors = hide ? new[] { new Color(.56f, .43f, .29f), new Color(.64f, .52f, .36f) } : Awnings[Mathf.Abs(variant) % Awnings.Length];
             foreach (int sx in new[] { -1, 1 }) foreach (int sz in new[] { -1, 1 })
                 if (hide) Part(PrimitiveType.Cylinder, t, new Vector3(sx * 1.4f, sz > 0 ? 1.25f : 1.1f, sz * .9f), new Vector3(.13f, sz > 0 ? 1.25f : 1.1f, .13f), Bone);

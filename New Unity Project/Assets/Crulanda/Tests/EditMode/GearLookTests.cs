@@ -47,7 +47,7 @@ namespace Crulanda.Tests
         {
             var looks = Looks();   // Parse refuses unknown families, palettes and variants anywhere in the file
             CollectionAssert.IsSubsetOf(new[] { "oakhaven", "concord", "sandthrone", "khaven", "tollroad", "pilgrim", "ashwalker", "cult", "veridian", "pale" }, new List<string>(looks.PaletteIds));
-            Assert.AreEqual(57, GearLooks.Families.Length, "54 shape families (DESIGN.md 2.3) and the three model families (2026-10-05).");
+            Assert.AreEqual(58, GearLooks.Families.Length, "54 shape families (DESIGN.md 2.3), the three model families (2026-10-05) and model.helm (2026-10-07).");
             int variants = 0; var names = new HashSet<string>();
             foreach (var f in GearLooks.Families)
             {

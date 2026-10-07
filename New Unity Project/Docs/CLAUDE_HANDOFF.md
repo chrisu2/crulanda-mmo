@@ -9,7 +9,31 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-10-06, about 22:15)
+## RESUME HERE (updated 2026-10-07, about 02:00)
+**Full run c36 result: PENDING_RESULT**
+**What was done tonight (all in the working tree; commit and publish follow the c36 run):** Round 24 (notes 64-71: the horse
+stabled, the camera held indoors, one colourised chat window with chips, /invite across zones, healing seen, floating props seated;
+commit 952fc67; its full run c35 was 424/424 and 208/210 with two flaky or ordering failures, fixed, so it was not published on its
+own); Round 25 (note 72: party loot, coins split, need/greed rolls for uncommon and better, PartyLoot.cs); the alchemy bench place
+(Druid and Mage sims brew at the drying hut); the sentinel helm as the first model helm (GearLooks model.helm, ModelHelm, the
+Sentinel's Helm rare off the Rim's cultists, icon rendered by ModelIcons); 5.4 (SimPopulation.LiveAway: the unseen hunt, gather,
+sell, forge and level by the clock); 5.5 (whispers /w /r, SimMemory regard and standings, /friend /friends, friends greet you,
+ask you to group, hand you greed loot; rivals refuse); 5.6 (roles Tank/Healer/Damage, tanks peel and taunt, /assist, /lead runs
+to a camp with Lead/Stop buttons); art round 1, the props round (Fantasy Props MegaKit and Medieval props under
+Resources/Props, ZoneBuilder.ModelProp, barrels and crates everywhere, the inn's taproom, the smithy and the stalls dressed;
+PropCapture.Render draws the kit row to hel/work/ui-captures/props-row*.png). CHANGELOG 2026-10-07 has each.
+**Focused runs before c36:** EditMode LootData/GearLook/Icon/SimGear/SimEconomy/SimMemory/ZoneChat/SimRoster/CraftData green
+(44+33), PlayMode PartyLoot/SimParty/SimChat/SimLife/VillageHome 22/23 then the whisper test fixed and 4/4.
+**Backups go to E:\claude\unity projects\mmo now** (Chris moved them from J: on 2026-10-07; Backup.ps1 and CLAUDE.md updated).
+**Next (Chris's order):** the remaining art rounds: Stylized Nature MegaKit (trees, bushes, rocks for the outdoors), the Stylized
+Megapack 2in1 (a .unitypackage), the HQ Rock Pack (Asset Store cache), the Medieval Village MegaKit when it is in Downloads; then
+the Ash-Walker enclave interior (note 40) and the sound phase. ModelProp + PropCapture are the pattern: put a kit under
+Resources/Props, list the models in ZoneBuilder.KitProps, render the row, set any lying-down model upright in PropTurns, then
+place them from the builders with a painted fallback. Tests never need the kits (the builders fall back).
+Notes: run_tests.ps1 now waits ninety minutes for PlayMode (an hour ran out). VillageHomeTests.Every_villager_sleeps is flaky
+under lane B's load. Model: Fable 5.1, one agent at a time, no workflows. Chris asked for a shutdown at the end of this session.
+
+## Earlier resume note (2026-10-06, about 22:15)
 **Playable build = Phase 5.3 complete (5.3a-c) + Round 23 + zone chat, built 2026-10-06 22:06 from commit a2d6301 (+ the
 wrap-up commit). Last full run: EditMode 424/424, PlayMode 210/210, five tours, 0 shader errors. Committed and backed up to J:.**
 What is in it (see CHANGELOG 2026-10-06): sims live their day (hunt camp mobs that fight back, gather the nodes of their

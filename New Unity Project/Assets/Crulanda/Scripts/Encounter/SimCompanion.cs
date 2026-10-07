@@ -16,9 +16,27 @@ namespace Crulanda.Encounter
     public sealed class SimCompanion : MonoBehaviour
     {
         public Actor actor; public EncounterSession session; public SimAdventurer sim; public int slot;
+        /// <summary>Time and kills with you this grouping (5.5: SimMemory on leaving).</summary>
+        public float joinedAt; public int killsTogether;
         NavMeshAgent agent; ActorVisual visual;
         float nextAct, nextHeal, nextCatchUp, downSince = -1, healAt; Actor healing;
         public string Activity { get; private set; } = "Following you";
+        public enum PartyRole { Tank, Healer, Damage }
+        /// <summary>Its part in the party (5.6): Warriors and Paladins tank (a Paladin heals when no Druid is along), Druids heal, Rangers and Mages deal damage.</summary>
+        public PartyRole Role
+        {
+            get
+            {
+                if (sim.classId == "class.warrior") return PartyRole.Tank;
+                if (sim.classId == "class.druid") return PartyRole.Healer;
+                if (sim.classId == "class.paladin") return session.PartySims.Exists(c => c != null && c != this && c.sim.classId == "class.druid") || session.PartySims.Exists(c => c != null && c != this && c.sim.classId == "class.warrior") == false ? PartyRole.Tank : PartyRole.Healer;
+                return PartyRole.Damage;
+            }
+        }
+        /// <summary>Where it is leading the party (5.6, a run to a camp), or null.</summary>
+        public Vector3? Leading { get; private set; }
+        public string LeadingName { get; private set; }
+        float nextTaunt;
         public bool Melee { get { return sim.classId == "class.warrior" || sim.classId == "class.paladin"; } }
         public bool Healer { get { return sim.classId == "class.druid" || sim.classId == "class.paladin"; } }
         public float Reach { get { return Melee ? 2.4f : 20; } }
@@ -28,6 +46,7 @@ namespace Crulanda.Encounter
         /// <summary>Experience from the party's kills (EncounterSession.EnemyDied): a level when it has enough, said in Party.</summary>
         public void GainXp(int xp)
         {
+            killsTogether++;
             if (xp <= 0 || sim.level >= EncounterProgress.LevelCap) return;
             sim.experience = Mathf.Max(sim.experience, EncounterProgress.XpForLevel(sim.level)) + xp;
             if (sim.experience >= EncounterProgress.XpForLevel(sim.level + 1))
@@ -36,19 +55,56 @@ namespace Crulanda.Encounter
                 SimGear.Dress(GetComponent<ActorVisual>(), sim, session.Items); SimChatter.Active?.Ding(sim, true);
             }
         }
+        /// <summary>Its choice in a roll (Round 25, note 72): Need for gear of its weight and slot that beats what it wears, Greed for
+        /// anything it could sell, Pass for what is no use to it (a potion it cannot use goes to Greed too: coin is coin).</summary>
+        public RollChoice RollFor(ItemDef d)
+        {
+            if (d == null) return RollChoice.Pass;
+            if (d.kind == "gear")
+            {
+                bool mine = d.slot == "mainhand" || d.slot == "offhand" ? SimGear.CarriesWeapon(sim.classId) : SimGear.Suits(sim.classId, d.name);
+                if (mine && d.level <= sim.level)
+                {
+                    var worn = session.Items?.Get(SimEconomy.Worn(sim, d.slot));
+                    if (worn == null || d.quality > worn.quality || d.quality == worn.quality && d.level > worn.level) return RollChoice.Need;
+                }
+                return RollChoice.Greed;
+            }
+            return d.value > 0 ? RollChoice.Greed : RollChoice.Pass;
+        }
         public static int MaxHealthFor(SimAdventurer s) { return (s.classId == "class.warrior" || s.classId == "class.paladin" ? 150 : 115) + 22 * Mathf.Max(1, s.level); }
 
         public void Init(Actor a, EncounterSession s, SimAdventurer data, int partySlot)
         {
             actor = a; session = s; sim = data; slot = partySlot; agent = GetComponent<NavMeshAgent>(); visual = GetComponent<ActorVisual>();
             actor.Stats.SetBase(Crulanda.Core.StatType.MaxHealth, MaxHealthFor(sim)); actor.Health.ApplyHealing(actor.Health.Pool.Max);
-            nextAct = Time.time + .5f + slot * .3f;
+            nextAct = Time.time + .5f + slot * .3f; joinedAt = Time.time;
+        }
+        /// <summary>What this grouping was worth to it (5.5): a point a minute, one for every three kills.</summary>
+        public void Remember(bool kicked)
+        {
+            int minutes = Mathf.FloorToInt((Time.time - joinedAt) / 60);
+            if (minutes > 0) SimMemory.Note(sim, SimMemory.Deed.MinuteTogether, Mathf.Min(minutes, 30));
+            if (killsTogether >= 3) SimMemory.Note(sim, SimMemory.Deed.KillsTogether, killsTogether / 3);
+            if (kicked) SimMemory.Note(sim, SimMemory.Deed.Kicked);
         }
         /// <summary>The enemy it should be fighting: your target when it is in a fight, otherwise whatever is on one of the party.</summary>
         public EncounterEnemy Quarry
         {
             get
             {
+                // A tank's first care (5.6): whatever is on someone who is not a tank.
+                if (Role == PartyRole.Tank)
+                {
+                    EncounterEnemy peel = null; float peelD = 30;
+                    foreach (var e in session.Enemies)
+                    {
+                        if (e == null || !e.actor.IsAlive || !e.FightingParty || e.Victim == null || e.Victim == actor) continue;
+                        var vc = e.Victim.GetComponent<SimCompanion>(); if (vc != null && vc.Role == PartyRole.Tank) continue;
+                        float d = Vector3.Distance(e.transform.position, transform.position); if (d < peelD) { peel = e; peelD = d; }
+                    }
+                    if (peel != null) return peel;
+                }
                 var t = session.Target;
                 if (t != null && t.actor.IsAlive && !t.Game && (t.FightingParty || session.AutoAttack)) return t;
                 EncounterEnemy best = null; float bestD = 30;
@@ -57,8 +113,41 @@ namespace Crulanda.Encounter
                     if (e == null || !e.actor.IsAlive || !e.FightingParty) continue;
                     float d = Vector3.Distance(e.transform.position, transform.position); if (d < bestD) { best = e; bestD = d; }
                 }
+                if (best == null && Leading.HasValue && Vector3.Distance(transform.position, Leading.Value) < 18)
+                {
+                    // At the camp it leads to: the nearest of its mobs still standing.
+                    foreach (var e in session.Enemies)
+                    {
+                        if (e == null || !e.actor.IsAlive || !e.Camp || e.Game) continue;
+                        float d = Vector3.Distance(e.transform.position, Leading.Value); if (d < 16 && d < bestD) { best = e; bestD = d; }
+                    }
+                }
                 return best;
             }
+        }
+        /// <summary>Leads the party to a camp of about its level (5.6, "dungeon runs"): the nearest, or an elite when the party is three
+        /// or more. Returns what it heads for, or null when there is nothing fit.</summary>
+        public string Lead()
+        {
+            EncounterEnemy pick = null; float best = float.MaxValue; bool big = session.PartySims.Count >= 3;
+            foreach (var e in session.Enemies)
+            {
+                if (e == null || !e.actor.IsAlive || !e.Camp || e.Game || Mathf.Abs(e.actor.Level - sim.level) > (big ? 3 : 2) || (e.Elite && !big)) continue;
+                float d = Vector3.Distance(e.transform.position, transform.position) - (big && e.Elite ? 60 : 0); if (d < 12 || d >= best) continue;
+                best = d; pick = e;
+            }
+            if (pick == null) { Leading = null; return null; }
+            Leading = pick.transform.position; LeadingName = pick.Elite ? pick.Name : SimChatter.Plural(pick.Name);
+            session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? "follow me, " + LeadingName.ToLower() + " this way" : "Follow me. The " + LeadingName.ToLower() + " are this way.");
+            return LeadingName;
+        }
+        public void StopLeading() { Leading = null; LeadingName = null; }
+        /// <summary>No mob of the camp left near where it led to: the run is done.</summary>
+        bool CampCleared()
+        {
+            if (!Leading.HasValue) return false;
+            foreach (var e in session.Enemies) if (e != null && e.actor.IsAlive && e.Camp && !e.Game && Vector3.Distance(e.transform.position, Leading.Value) < 16) return false;
+            return true;
         }
         void Update()
         {
@@ -107,8 +196,17 @@ namespace Crulanda.Encounter
                 }
             }
             var quarry = Quarry;
+            if (Leading.HasValue && quarry == null && CampCleared())
+            {
+                session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? "camp cleared, gg. where next?" : "That's the camp cleared. Well fought. Where next?");
+                session.Message(sim.name + " calls the run done: " + LeadingName.ToLower() + " cleared.");
+                StopLeading();
+            }
             if (quarry != null)
             {
+                // A tank taunts what is on someone else (5.6): the mob turns to it for a few seconds.
+                if (Role == PartyRole.Tank && quarry.Victim != null && quarry.Victim != actor && Time.time >= nextTaunt && Vector3.Distance(transform.position, quarry.transform.position) < 12)
+                { nextTaunt = Time.time + 8; quarry.threat.Taunt(actor.EntityId.Value, Time.time, 4); session.FloatText(transform.position + Vector3.up * 2, "Taunt", new Color(1, .7f, .3f)); }
                 float d = Vector3.Distance(transform.position, quarry.transform.position);
                 if (d > Reach) { agent.isStopped = false; agent.speed = 5.2f; agent.SetDestination(quarry.transform.position); Activity = "Closing on " + quarry.actor.DisplayName; return; }
                 agent.isStopped = true;
@@ -129,9 +227,17 @@ namespace Crulanda.Encounter
                         Bolt.Fire(from, quarry.transform, colour, arrow ? .1f : .18f, arrow ? .22f : .28f, arrow);
                     }
                     quarry.Receive(dmg, actor);
-                    if (sim.classId == "class.warrior") quarry.threat.Add(actor.EntityId.Value, dmg * 1.5f);   // a warrior's blows hold attention
+                    if (Role == PartyRole.Tank) quarry.threat.Add(actor.EntityId.Value, dmg * 1.5f);   // a tank's blows hold attention
                 }
                 return;
+            }
+            // Leading a run (5.6): on to the camp while you keep up; waits when you fall behind.
+            if (Leading.HasValue)
+            {
+                float toCamp = Vector3.Distance(transform.position, Leading.Value);
+                if (toPlayer > 18) { Activity = "Waiting for you"; agent.isStopped = true; return; }
+                if (toCamp > 6) { Activity = "Leading you to the " + LeadingName.ToLower(); agent.isStopped = false; agent.speed = 4.2f; agent.SetDestination(Leading.Value); return; }
+                Activity = "At the " + LeadingName.ToLower(); agent.isStopped = true; return;
             }
             // At your side: a pace behind, each in its own place so they do not stack.
             Activity = toPlayer > 4 ? "Following you" : "At your side";

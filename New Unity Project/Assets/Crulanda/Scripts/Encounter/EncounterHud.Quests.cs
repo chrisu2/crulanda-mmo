@@ -85,7 +85,9 @@ namespace Crulanda.Encounter
             else
             {
                 if (GUI.Button(new Rect(380, 63, 90, 26), "Invite", slim)) session.Invite(s.id);
-                Shadow(new Rect(478, 66, 180, 20), "Adventurer", tiny, Color.white);
+                if (GUI.Button(new Rect(476, 63, 80, 26), "Whisper", slim)) BeginWhisper(s.name);   // 5.5
+                var st = SimMemory.Of(s);
+                Shadow(new Rect(562, 66, 100, 20), s.friend ? "Friend" : st == SimMemory.Standing.Stranger ? "Adventurer" : char.ToUpper(SimMemory.Label(st)[0]) + SimMemory.Label(st).Substring(1), tiny, st == SimMemory.Standing.Rival ? new Color(1, .5f, .45f) : s.friend || st == SimMemory.Standing.Friend ? new Color(.55f, 1, .7f) : Color.white);
             }
         }
 

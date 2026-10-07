@@ -24,7 +24,7 @@ namespace Crulanda.Encounter
             var p = new Vector2(point.x * 1440 / Screen.width, (Screen.height - point.y) * 900 / Screen.height);
             return paused || buildVisible || mapVisible || QuestUiBlocks(p) || WhoUiBlocks(p) || ItemUiBlocks(p) || TradesUiBlocks(p) || LootUiBlocks(p) || p.y > 795 || new Rect(10, 10, 350, 190).Contains(p) ||
                 (targetVisible && new Rect(365, 10, 350, 130).Contains(p)) || new Rect(1215, 0, 225, 240).Contains(p) ||
-                (partySims > 0 && new Rect(10, 196, 350, 46 * partySims).Contains(p)) || chatRect.Contains(p) ||   // the chat
+                (partySims > 0 && new Rect(10, 196, 400, 46 * partySims).Contains(p)) || chatRect.Contains(p) ||   // the chat
                 new Rect(1110, 236, 330, 200).Contains(p) || false;
         }
         /// <summary>Capture tools hide the HUD to photograph the world.</summary>
@@ -190,9 +190,12 @@ namespace Crulanda.Encounter
                 Fill(new Rect(48, y, 214, 40), new Color(0, 0, 0, .5f));
                 Portrait(new Vector2(40, y + 20), 40, c.actor.IsAlive ? col : new Color(.4f, .4f, .4f), c.sim.name.Substring(0, 1), c.sim.level.ToString());
                 Shadow(new Rect(70, y - 3, 150, 20), c.sim.name, tiny, Color.white);
+                var role = c.Role; Shadow(new Rect(196, y - 3, 70, 20), role.ToString(), tiny, role == SimCompanion.PartyRole.Tank ? new Color(.8f, .85f, 1) : role == SimCompanion.PartyRole.Healer ? new Color(.6f, 1, .7f) : new Color(1, .8f, .6f));   // 5.6
                 UnitBar(new Rect(70, y + 16, 184, 10), c.actor.Health.Pool.Ratio, HealthGreen, "");
                 Shadow(new Rect(70, y + 26, 200, 18), c.Activity, tiny, new Color(.85f, .9f, .85f));
-                if (GUI.Button(new Rect(268, y + 4, 70, 26), "Leave", slim)) session.LeaveParty(c.sim.id);
+                if (c.Leading.HasValue) { if (GUI.Button(new Rect(268, y + 4, 50, 26), "Stop", slim)) c.StopLeading(); }
+                else if (GUI.Button(new Rect(268, y + 4, 50, 26), "Lead", slim)) session.Lead(c.sim.name);
+                if (GUI.Button(new Rect(322, y + 4, 60, 26), "Leave", slim)) session.LeaveParty(c.sim.id);
             }
         }
         /// <summary>The target frame's line under a game animal's health (GAME-ONLY).</summary>
@@ -250,8 +253,10 @@ namespace Crulanda.Encounter
         /// messages; Enter to type (/s say, /z zone, /t trade, /lfg, /p party), Enter to send, Esc to stop.</summary>
         /// <summary>One window (Round 24, playtest note 66: "one window, but colorized"): every channel together, each in its colour,
         /// with filter chips to hide one; dragged by its top edge and resized by its top-right corner (kept in PlayerPrefs).</summary>
-        static readonly (string chip, ChatChannel ch)[] ChatChips = { ("Zone", ChatChannel.Zone), ("Trade", ChatChannel.Trade), ("LFG", ChatChannel.LFG), ("Party", ChatChannel.Party), ("Sys", ChatChannel.System) };
+        static readonly (string chip, ChatChannel ch)[] ChatChips = { ("Zone", ChatChannel.Zone), ("Trade", ChatChannel.Trade), ("LFG", ChatChannel.LFG), ("Party", ChatChannel.Party), ("Whisper", ChatChannel.Whisper), ("Sys", ChatChannel.System) };
         static bool chatTyping, chatFocus, chatDrag, chatSize; static string chatTyped = ""; static Vector2 chatGrab;
+        /// <summary>Opens the chat line with "/w name " ready (the sim frame's Whisper button, 5.5).</summary>
+        void BeginWhisper(string name) { chatTyped = "/w " + name + " "; chatTyping = true; chatFocus = true; EncounterInput.Typing = true; }
         static Rect chatRect = new Rect(10, 592, 472, 182); static int chatHidden; static bool chatLoaded;
         static bool Shown(ChatLine l) { int bit = l.channel == ChatChannel.Say ? 1 << (int)ChatChannel.Zone : 1 << (int)l.channel; return (chatHidden & bit) == 0; }
         static bool ChipAt(Vector2 p) { for (int i = 0; i < ChatChips.Length; i++) if (new Rect(chatRect.x + 4 + i * 58, chatRect.y + 2, 56, 18).Contains(p)) return true; return false; }

@@ -17,7 +17,29 @@ namespace Crulanda.Encounter
     {
         static bool lootVisible; static Rect lootRect;
         const float LootRowH = Slot + 8, LootTop = 58, LootFoot = 56;
-        static bool LootUiBlocks(Vector2 p) { return lootVisible && lootRect.Contains(p); }
+        static bool LootUiBlocks(Vector2 p) { return lootVisible && lootRect.Contains(p) || rollVisible && RollRect.Contains(p); }
+        static bool rollVisible; static readonly Rect RollRect = new Rect(372, 96, 300, 118);
+        /// <summary>The roll for a piece of loot (Round 25, playtest note 72): the piece, Need / Greed / Pass for you, and each member's choice as it comes.</summary>
+        void DrawRoll()
+        {
+            var r = session.Roll; rollVisible = r != null; if (r == null) return;
+            var d = session.Items?.Get(r.item); int q = d != null ? Mathf.Clamp(d.quality, 0, ItemDatabase.MaxQuality) : 1;
+            var edge = LootBeacon.Colour(q); var w = RollRect;
+            Fill(new Rect(w.x - 2, w.y - 2, w.width + 4, w.height + 4), new Color(edge.r, edge.g, edge.b, .9f)); Fill(w, new Color(.08f, .075f, .07f, .97f));
+            Shadow(new Rect(w.x + 10, w.y + 6, 280, 22), r.Done ? (r.Winner == "you" ? "Yours" : (session.PartySim(r.Winner)?.sim.name ?? "") + " wins") : "Roll  ·  " + Mathf.CeilToInt(r.deadline - Time.time) + "s", frameName, gold);
+            Shadow(new Rect(w.x + 10, w.y + 28, 280, 20), (d != null ? d.name : r.item) + (r.count > 1 ? " x" + r.count : ""), lootName ?? frameName, edge);
+            if (d != null && new Rect(w.x + 10, w.y + 28, 200, 20).Contains(Event.current.mousePosition)) ItemTooltip(d, true);
+            var mine = r.Of("you");
+            if (!r.Done && mine == RollChoice.Undecided)
+            {
+                if (GUI.Button(new Rect(w.x + 10, w.y + 52, 86, 26), "Need", slim)) session.ChooseRoll("you", RollChoice.Need);
+                if (GUI.Button(new Rect(w.x + 104, w.y + 52, 86, 26), "Greed", slim)) session.ChooseRoll("you", RollChoice.Greed);
+                if (GUI.Button(new Rect(w.x + 198, w.y + 52, 86, 26), "Pass", slim)) session.ChooseRoll("you", RollChoice.Pass);
+            }
+            float y = w.y + (mine == RollChoice.Undecided && !r.Done ? 82 : 52); string line = "";
+            foreach (var m in r.members) line += (line.Length > 0 ? "   " : "") + m.name + ": " + (m.choice == RollChoice.Undecided ? "..." : m.choice == RollChoice.Pass ? "pass" : m.choice.ToString().ToLower() + " " + m.roll);
+            Shadow(new Rect(w.x + 10, y, w.width - 20, 36), line, tiny, new Color(.85f, .9f, .85f));
+        }
         /// <summary>Capture tools: the tooltip of this item, shown as if hovered at <see cref="PinnedTooltipAt"/> (null = none).</summary>
         public static string PinnedTooltip; public static Vector2 PinnedTooltipAt;
         static readonly Color Gain = new Color(.3f, 1, .3f);
@@ -32,6 +54,7 @@ namespace Crulanda.Encounter
         {
             lootVisible = session.LootOpen;
             if (lootVisible) LootWindow();
+            DrawRoll();
             if (PinnedTooltip != null && session.Items != null) { ItemTooltip(session.Items.Get(PinnedTooltip), true); tooltipAt = PinnedTooltipAt; }
             if (tooltip != null && !(session.InventoryOpen || session.CharacterOpen || session.VendorNpc != null)) DrawTooltip();
         }

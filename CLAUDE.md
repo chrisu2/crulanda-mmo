@@ -7,7 +7,7 @@ Single-player simulated MMORPG. Read `New Unity Project/Docs/GAME_BRIEF.md` firs
 | What | Location |
 |---|---|
 | Project and git repo (branch `main`) | `D:\code\mmo`; the Unity project is `D:\code\mmo\New Unity Project` |
-| Backup (full copy including `.git`) | `J:\claude\unity projects\mmo`; run `tools\Backup.ps1` |
+| Backup (full copy including `.git`) | `E:\claude\unity projects\mmo`; run `tools\Backup.ps1` |
 | Lore (novels, world bible, maps) | `D:\code\crulanda` |
 | Unity 6000.6.3f1 | `D:\unity\Hub\Editor\6000.6.3f1\Editor\Unity.exe` |
 | Validation copy (tests and builds run here) | `C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation` |
@@ -21,7 +21,7 @@ Single-player simulated MMORPG. Read `New Unity Project/Docs/GAME_BRIEF.md` firs
 - Every file made for this game goes inside `D:\code\mmo`.
 - After a meaningful piece of work: commit, then run `tools\Backup.ps1`.
   - The backup is additive. `-Full` includes Library, and `-Mirror` makes an exact copy.
-  - J: is slow (about 2 MB/s), so a full copy takes about 10 minutes. If J: is missing, say so.
+  - E: is the backup drive (J: was the old one). If E: is missing, say so.
 - Git:
   - It's at `C:\Program Files\Git\cmd\git.exe` and not on the agent shell's PATH.
   - The author is set in this repo's local config (`Chris Underwood <chrisu2@gmail.com>`), so a plain `git commit` works. There is no global identity.

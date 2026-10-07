@@ -1535,3 +1535,24 @@ A read-only review by five reviewers, each finding checked by a second who tried
 - **The Watchtower** is the pack's wooden lookout on its trestle legs (prop variant 2); the gate and toll towers stay stone.
 - Full run c46: EditMode 427/427, PlayMode 213/214, five tours, 0 shader errors. The failure: SimPartyTests gave a party sim a
   fixed four seconds to close three metres under the run's load; it polls up to eight now (rerun 5/5).
+
+## 2026-10-07 — Art round 6: loose ends (mountain crags, Carder's windmill) and the Village kit imported
+- **Mountain rocks:** in the Peaks the forest-edge rocks and the loose rocks you do not interact with are the Megapack's rock
+  formations (big ones) and standing stones (small ones), their pale stone shaded to the mountain's, sunk a little and still on
+  the painted rubble skirts; same colliders, the zone's draws untouched.
+- **Carder's windmill** (GAME-ONLY): the Megapack's post mill on its stone podest west of Carder's field barn (-20, 126), clear of
+  the road, the north acre and the pines; a collider round the podest; its sails turn slowly (ZoneBuilder.Sails). New prop kind
+  "windmill".
+- **The Medieval Village MegaKit** (Quaternius, CC0; 176 modular pieces: plaster, brick and timber walls with doors and windows,
+  floors, stairs, tiled roofs, chimneys, balconies) is under Resources/Props/Village with its textures (the Unity-style normals);
+  ThirdPartyImport gives each material its sheet. Its pieces go into use next round.
+- **The Great Oak** (playtest note 73: "mightier, taller", then "not that huge, just mightier and noticeable from a distance"):
+  the prop scale 1.9 to 2.2 makes the bole stouter; in its own metres its limbs reach 1.4 times further and its crown
+  spreads 1.4 times wider and rises 1.2 times higher, with a ring of great masses between the first and the skirt and more skirt
+  and rim clumps: about 30 m tall (was 20), the crown about 20 m from the bole (was about 11), standing over the roofs from any
+  approach. Its own stream draws it: nothing else in the zone moves.
+- **Nothing stands in a road** (playtest note 74: "still lanterns/stonehenges/markers in the middle of the road"): the exit
+  waystones (BuildExits) stood exactly where each road leaves the zone; they now stand on the verge. Small props (lamps, signposts,
+  carts, loose rocks, stones, shrines, boards, barrels, crates and the like, unless you interact with them where they are) are moved
+  out sideways from any road to its edge plus their own reach (ZoneBuilder.Verge, OffRoad): the lamp on the green, Khaven's cart
+  in the gate road, the lamps and the Harrow farm sign whose arms reached over the edge, a rock by the west road.

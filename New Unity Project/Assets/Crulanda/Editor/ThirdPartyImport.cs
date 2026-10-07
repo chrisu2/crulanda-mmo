@@ -22,8 +22,8 @@ namespace Crulanda.EditorTools
         void OnPreprocessTexture()
         {
             if (!Ours) return;
-            var t = (TextureImporter)assetImporter; t.maxTextureSize = assetPath.Contains("/Chest/") || assetPath.Contains("/Fantasy/") || assetPath.Contains("/Nature/") || assetPath.Contains("/Megapack/") || assetPath.Contains("/HQRocks/") ? 1024 : 512; t.mipmapEnabled = true;
-            if ((assetPath.Contains("/Fantasy/") || assetPath.Contains("/Nature/")) && assetPath.EndsWith("_Normal.png")) t.textureType = TextureImporterType.NormalMap;   // (ends with: Bark_NormalTree.png and Leaves_NormalTree_C.png are colour)
+            var t = (TextureImporter)assetImporter; t.maxTextureSize = assetPath.Contains("/Chest/") || assetPath.Contains("/Fantasy/") || assetPath.Contains("/Nature/") || assetPath.Contains("/Megapack/") || assetPath.Contains("/HQRocks/") || assetPath.Contains("/Village/") ? 1024 : 512; t.mipmapEnabled = true;
+            if ((assetPath.Contains("/Fantasy/") || assetPath.Contains("/Nature/") || assetPath.Contains("/Village/")) && assetPath.EndsWith("_Normal.png")) t.textureType = TextureImporterType.NormalMap;   // (ends with: Bark_NormalTree.png and Leaves_NormalTree_C.png are colour)
         }
         void OnPreprocessModel()
         {
@@ -36,6 +36,7 @@ namespace Crulanda.EditorTools
         void OnPostprocessMaterial(Material m)
         {
             if (assetPath.StartsWith(Props + "Nature/")) { NatureMaterial(m); return; }
+            if (assetPath.StartsWith(Props + "Village/")) { VillageMaterial(m); return; }
             if (!assetPath.StartsWith(Props + "Fantasy/")) return;
             string sheet = m.name.Contains("Metal") ? "Metal" : m.name.Contains("Furniture") ? "Furniture" : m.name.Contains("Cloth") || m.name.Contains("Banner") ? "Cloth" : "Props";
             var baseMap = AssetDatabase.LoadAssetAtPath<Texture2D>(Props + "Fantasy/Textures/T_Trim_" + sheet + "_BaseColor.png");
@@ -77,7 +78,28 @@ namespace Crulanda.EditorTools
             if (normal != null) { m.SetTexture("_BumpMap", normal); m.EnableKeyword("_NORMALMAP"); }
             m.SetFloat("_Glossiness", .08f); m.SetFloat("_Metallic", 0);
         }
-        public override uint GetVersion() { return 5; }   // 2: the prop kits, 3-5: the nature kit (2026-10-07)
+        /// <summary>The Medieval Village MegaKit (Quaternius, CC0, 2026-10-07): MI_Plaster, MI_WoodTrim(_Wear), MI_Brick, MI_RedBrick,
+        /// MI_UnevenBrick, MI_RockTrim, MI_RoundTiles, MI_MetalOrnaments take their T_..._BaseColor and T_..._Normal (the Unity-style
+        /// normals); window glass is a pale, glossy blue; the vine leaves are cut-out cards on the painted-leaf shader.</summary>
+        static void VillageMaterial(Material m)
+        {
+            string dir = Props + "Village/Textures/", n = m.name.Replace("MI_", "").Replace("_Wear", "");
+            if (n == "Vine")
+            {
+                var leaf = AssetDatabase.LoadAssetAtPath<Shader>("Assets/Crulanda/World/Shaders/Leaf.shader") ?? Shader.Find("Crulanda/Leaf");
+                m.shader = leaf != null ? leaf : Shader.Find("Standard"); m.mainTexture = AssetDatabase.LoadAssetAtPath<Texture2D>(dir + "T_VineLeaf.png"); m.color = Color.white;
+                if (m.HasProperty("_Cutoff")) m.SetFloat("_Cutoff", .4f); if (m.HasProperty("_VertexTint")) m.SetFloat("_VertexTint", 0); if (m.HasProperty("_Cull")) m.SetFloat("_Cull", 0);
+                return;
+            }
+            m.shader = Shader.Find("Standard");
+            if (n == "WindowGlass") { m.color = new Color(.55f, .68f, .78f); m.SetFloat("_Glossiness", .8f); m.SetFloat("_Metallic", .1f); return; }
+            m.color = Color.white;
+            var baseMap = AssetDatabase.LoadAssetAtPath<Texture2D>(dir + "T_" + n + "_BaseColor.png"); var normal = AssetDatabase.LoadAssetAtPath<Texture2D>(dir + "T_" + n + "_Normal.png");
+            if (baseMap != null) m.mainTexture = baseMap; else Debug.LogWarning("VILLAGE_KIT no texture for material " + m.name);
+            if (normal != null) { m.SetTexture("_BumpMap", normal); m.EnableKeyword("_NORMALMAP"); }
+            m.SetFloat("_Glossiness", n == "MetalOrnaments" ? .4f : .12f); m.SetFloat("_Metallic", n == "MetalOrnaments" ? .5f : 0);
+        }
+        public override uint GetVersion() { return 6; }   // 2: the prop kits, 3-5: the nature kit, 6: the village kit (2026-10-07)
 
         public static void Report()
         {

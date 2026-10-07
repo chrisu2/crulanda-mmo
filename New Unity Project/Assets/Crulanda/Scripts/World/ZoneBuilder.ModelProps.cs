@@ -88,6 +88,29 @@ namespace Crulanda.World
             var p = go.transform.position; float ground = HeightAt(p.x, p.z); var dy = ground - parent.TransformPoint(foot).y;
             go.transform.position = p + Vector3.up * dy; return go;
         }
+        /// <summary>
+        /// A post mill (art round 6, 2026-10-07): the Megapack's windmill on its stone podest, 13 m to the top sail, a little into the
+        /// ground, a collider round the podest, and its sails turning slowly about their hub (the thinnest axis of the turbine's mesh,
+        /// round the mesh's middle, so it turns true whatever the pivot).
+        /// </summary>
+        void Windmill(Transform t)
+        {
+            var go = GroundProp(t, "Megapack/Models/Buildings/Windmill", Vector3.down * .3f, 0, 13); if (go == null) return;
+            var col = t.gameObject.AddComponent<CapsuleCollider>(); col.center = new Vector3(0, 3.5f, 0); col.height = 7; col.radius = 2.4f; t.gameObject.AddComponent<NavBlocker>();
+            foreach (var mf in go.GetComponentsInChildren<MeshFilter>())
+                if (mf.name.Contains("Turbine")) mf.gameObject.AddComponent<Sails>();
+        }
+        /// <summary>A windmill's sails turning about their hub.</summary>
+        public sealed class Sails : MonoBehaviour
+        {
+            Vector3 axisLocal, hubLocal; public float degreesPerSecond = 22;
+            void Start()
+            {
+                var m = GetComponent<MeshFilter>().sharedMesh; if (m == null) { enabled = false; return; }
+                var e = m.bounds.extents; axisLocal = e.x <= e.y && e.x <= e.z ? Vector3.right : e.y <= e.z ? Vector3.up : Vector3.forward; hubLocal = m.bounds.center;
+            }
+            void Update() { transform.RotateAround(transform.TransformPoint(hubLocal), transform.TransformDirection(axisLocal), degreesPerSecond * Time.deltaTime); }
+        }
         /// <summary>The kit props the builders use, with the heights they stand at (PropCapture renders this row to look at).</summary>
         public static readonly (string path, float height)[] KitProps = {
             ("Fantasy/Barrel", .95f), ("Fantasy/Crate_Wooden", .82f), ("Fantasy/Table_Large", .8f), ("Fantasy/Stool", .45f), ("Fantasy/CandleStick", .22f), ("Fantasy/Mug", .12f),
@@ -104,7 +127,9 @@ namespace Crulanda.World
             ("Megapack/Models/Trough_Hay", .7f), ("Megapack/Models/Market/Market_Table_1", 1), ("Megapack/Models/Stall_1", 2.6f), ("Megapack/Models/Market/Crate_1_Apples", .5f),
             ("Megapack/Models/Arrow Target", 1.5f), ("Megapack/Models/Plants/TreeTrunk_1", .8f), ("Megapack/Models/Tree_Broken_1", 2), ("Megapack/Models/WodenLog_Cuted", .6f),
             ("Megapack/Models/Fireplace", .6f), ("Megapack/Models/Barrel_1", .95f),
-            ("Megapack/Models/Buildings/Buiilding_6_1", 7.6f), ("Megapack/Models/Buildings/Stable_1", 4.1f), ("Megapack/Models/Buildings/Tower_1", 9.5f),
+            ("Megapack/Models/Buildings/Buiilding_6_1", 7.6f), ("Megapack/Models/Buildings/Stable_1", 4.1f), ("Megapack/Models/Buildings/Tower_1", 9.5f), ("Megapack/Models/Buildings/Windmill", 13),
+            ("Village/Wall_Plaster_Straight", 3), ("Village/Wall_Plaster_Door_Round", 3), ("Village/Wall_Plaster_Window_Wide_Round", 3), ("Village/Wall_UnevenBrick_Straight", 3),
+            ("Village/Roof_RoundTiles_6x8", 3), ("Village/Floor_WoodDark", .3f), ("Village/Door_1_Round", 2.4f), ("Village/Prop_Chimney", 2.5f), ("Village/Corner_Exterior_Wood", 3), ("Village/Stairs_Exterior_Straight", 1.5f),
         };
     }
 }

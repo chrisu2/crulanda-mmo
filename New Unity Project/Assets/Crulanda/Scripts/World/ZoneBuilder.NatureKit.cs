@@ -63,6 +63,19 @@ namespace Crulanda.World
             if (!kitShades.TryGetValue(key, out var k) || k == null) { k = new Material(m) { name = m.name + " (shade)" }; k.color = m.color * shade; kitShades[key] = k; }
             return k;
         }
+        /// <summary>The mountains' rocks (art round 6): the Megapack's rock formations and standing stones, their pale stone tinted to the
+        /// mountain's; a big rock is a formation, a small one a single stone.</summary>
+        bool KitCrags { get { return Zone.biome == "mountain" && HasProp("Megapack/Models/Rock_Formation_1"); } }
+        static readonly string[] CragModels = { "Megapack/Models/Rock_Formation_1", "Megapack/Models/Plants/Rodck_Formation_2", "Megapack/Models/Plants/Rock_Formation_3" };
+        static readonly string[] StoneModels = { "Megapack/Models/Plants/Rock_2", "Megapack/Models/Plants/Rock_3", "Megapack/Models/Plants/Rock_4", "Megapack/Models/Plants/Stone_1" };
+        GameObject KitCrag(Transform t, int pick, float s, float yaw, float deep)
+        {
+            bool big = s > 2.2f; var models = big ? CragModels : StoneModels; pick = ((pick % models.Length) + models.Length) % models.Length;
+            var go = ModelProp(t, models[pick], Vector3.down * deep, yaw, (big ? 1.5f : 1.1f) * s, false, 2.4f * s); if (go == null) return null;
+            var shade = MountainStone * 1.55f; shade.a = 1;
+            foreach (var r in go.GetComponentsInChildren<Renderer>()) { var mats = r.sharedMaterials; for (int i = 0; i < mats.Length; i++) mats[i] = KitShade(mats[i], shade); r.sharedMaterials = mats; }
+            return go;
+        }
         /// <summary>Whether the nature kit is in the project (one look, cached by PropSource).</summary>
         public static bool KitTrees { get { return HasProp("Nature/CommonTree_1") && HasProp("Nature/Pine_1"); } }
         /// <summary>A kit tree under a prop root: the model to <paramref name="height"/> (before the root's own scale), a trunk collider

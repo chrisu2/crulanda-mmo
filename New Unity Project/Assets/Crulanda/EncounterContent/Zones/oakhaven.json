@@ -1469,7 +1469,16 @@
         "x": 0,
         "y": 0
       },
-      "scale": 1.9
+      "scale": 2.2
+    },
+    {
+      "kind": "windmill",
+      "name": "Carder's windmill",
+      "at": {
+        "x": -20,
+        "y": 126
+      },
+      "rotation": 70
     },
     {
       "kind": "hitch",

@@ -1111,6 +1111,8 @@ namespace Crulanda.World
                 if (p == null || string.IsNullOrEmpty(p.kind)) continue;
                 // Moving parts (doors, wheels) and things that can be picked or emptied can't be static-batched.
                 var parent = p.kind == "bridge" || p.kind == "cavern" || p.kind == "inn" || p.kind == "mill" || p.kind == "coop" || p.kind == "herb" || !string.IsNullOrEmpty(p.interact) ? props : statics;
+                // Small things never stand in a road (playtest note 74): out to the verge, clear of the edge by their own reach.
+                float verge = Verge(p); if (verge > 0) p.at = OffRoad(p.at, verge);
                 var t = Root(p, parent);
                 // A ruin never stands in a building: moved clear here, or (a plain one) built for its draws and then left out.
                 bool drop = (p.kind == "ruin" || p.kind == "ruined_house") && !ClearOfBuildings(p, t);
@@ -1180,6 +1182,7 @@ namespace Crulanda.World
                         }
                         var rb0 = Boulder(); float ry0 = R01 * 360; Mesh rb1 = null; float ry1 = 0; if (s > 1.3f) { rb1 = Boulder(); ry1 = R01 * 360; }   // the zone's draws, in the order they always were
                         if (KitRocks && string.IsNullOrEmpty(p.interact) && KitRock(t, (int)(ry0 / 120), .95f * s, 2.2f * s, ry0) != null) { }   // the kit's rock (art round 3, 2026-10-07); a rock you interact with keeps its painted look
+                        else if (KitCrags && string.IsNullOrEmpty(p.interact) && KitCrag(t, (int)(ry0 / 90), s, ry0, .12f * s) != null) { }   // a mountain's: the Megapack's stone (art round 6)
                         else { Lump(rb0, t, new Vector3(0, .3f * s, 0), new Vector3(2f * s, 1.3f * s, 1.7f * s), stone, ry0); if (rb1 != null) Lump(rb1, t, new Vector3(.7f * s, .15f * s, .5f * s), new Vector3(.9f * s, .6f * s, .8f * s), stone, ry1); } Solid(t, new Vector3(0, .5f * s, 0), new Vector3(1.6f * s, 1f * s, 1.4f * s)); if (Zone.biome == "mountain" && string.IsNullOrEmpty(p.interact)) RockSkirt(t, s * .8f, stone); break;
                     }
                     case "bridge": SeatBridge(t, p.size.x > 0 ? p.size.x : 12); if (p.variant == 1) RopeBridge(t, p.size.x > 0 ? p.size.x : 12); else Bridge(t, p.size.x > 0 ? p.size.x : 12); break;
@@ -1188,6 +1191,7 @@ namespace Crulanda.World
                     case "dummy": GroundProp(t, "Fantasy/Dummy", Vector3.zero, 0, 1.9f, true); break;      // a training dummy (kit, 2026-10-07)
                     case "banner": GroundProp(t, "Fantasy/Banner_1", Vector3.zero, 0, 2.6f); break;        // a standing banner (kit, 2026-10-07)
                     case "target": GroundProp(t, "Megapack/Models/Arrow Target", Vector3.zero, 0, 1.5f, true); break;   // an archery butt (Megapack, art round 3)
+                    case "windmill": Windmill(t); break;   // the Megapack's post mill (art round 6)
                     case "board": NoticeBoard(t); break;
                     case "ruin": Ruin(t, p.size.x > 0 ? p.size.x : 6); break;
                     case "gate": Gate(t, p.size.x > 0 ? p.size.x : 6.4f); break;
@@ -2151,6 +2155,9 @@ namespace Crulanda.World
         void GreatOak(Transform t)
         {
             SkipDeadOakDraws();
+            // Playtest note 73 (2026-10-07): mightier, taller, its crown over nearly the whole village at noon. The bole keeps its shape
+            // (the prop's scale makes it stouter); the limbs reach and the crown spread wider and higher by these.
+            const float Spread = 1.4f, Lift = 1.2f;
             LeafTrees.Add(t.position);
             var tr = new System.Random(Zone.seed + 4127); float T() { return (float)tr.NextDouble(); }
             var bark = Tint(art.bark, new Color(.41f, .36f, .31f)); var rootBark = Tint(art.bark, new Color(.35f, .33f, .27f));
@@ -2196,22 +2203,22 @@ namespace Crulanda.World
             {
                 float yaw = turn + i * 72 + (T() - .5f) * 26, y0 = 3.3f + i * 2 % 5 * .25f + T() * .1f, low = Mathf.Clamp01(1 - (y0 - 3.3f));
                 var outward = Quaternion.Euler(0, yaw, 0) * Vector3.right;
-                float reach = Mathf.Lerp(3.2f, 4.6f, low) + T() * .5f, rise = Mathf.Lerp(3.3f, 1.8f, low) + T() * .5f, rb = Mathf.Lerp(.44f, .54f, low);
+                float reach = (Mathf.Lerp(3.2f, 4.6f, low) + T() * .5f) * Spread, rise = (Mathf.Lerp(3.3f, 1.8f, low) + T() * .5f) * Lift, rb = Mathf.Lerp(.44f, .54f, low) * 1.15f;
                 Vector3 p0 = Axis(y0), p2 = p0 + outward * reach + Vector3.up * rise, p1 = p0 + outward * reach * .55f + Vector3.up * rise * .12f;
                 Vector3 C(float s) { return (1 - s) * (1 - s) * p0 + 2 * s * (1 - s) * p1 + s * s * p2; }
                 float R(float s, float a) { return Mathf.Lerp(rb, .12f, s) * (1 + .3f * Mathf.Exp(-s * 7)) * (1 + .05f * Mathf.Sin(a * 3 + s * 9)) * Mathf.Clamp01((1.06f - s) / .1f); }
                 var limbRings = new[] { 0, .08f, .17f, .27f, .38f, .5f, .62f, .74f, .86f, .96f, 1.06f };
                 MeshPart(ZoneMeshes.Tube(C, R, limbRings, 14, Vector3.Cross(Vector3.up, outward), 2, 2.5f), t, Vector3.zero, bark).name = "Oak limb";
                 Record(t, C, R, limbRings, false);
-                tips.Add((p2 + Vector3.up * .25f, 3.1f + T() * .5f));
+                tips.Add((p2 + Vector3.up * .25f, (3.1f + T() * .5f) * 1.25f));
                 for (int k = 0; k < 3; k++)
                 {
-                    float s = .4f + k * .2f + T() * .06f, turnBy = (k % 2 == 0 ? 1 : -1) * (26 + T() * 20), len = (2.6f - k * .35f) * (.85f + T() * .3f);
+                    float s = .4f + k * .2f + T() * .06f, turnBy = (k % 2 == 0 ? 1 : -1) * (26 + T() * 20), len = (2.6f - k * .35f) * (.85f + T() * .3f) * Spread * .8f;
                     var along = C(s + .01f) - C(s - .01f); var flat = new Vector3(along.x, 0, along.z).normalized;
                     var dir = (Quaternion.AngleAxis(turnBy, Vector3.up) * flat + Vector3.up * (.18f + T() * .3f)).normalized;   // out to the side, not straight up like a peg
                     var from = C(s); var to = from + dir * len + Vector3.up * len * .25f;
                     Limb(t, from, to, R(s, 0) * .68f, .06f, bark, .16f, 9);   // bowed: it sets out level and turns up into the leaf
-                    tips.Add((to + Vector3.up * .2f, 2.6f + T() * .6f));
+                    tips.Add((to + Vector3.up * .2f, (2.6f + T() * .6f) * 1.25f));
                 }
             }
             // The crown: leaf on every limb and branch end (small: they are its edges), then the bulk as five big squashed masses
@@ -2228,18 +2235,20 @@ namespace Crulanda.World
                 o.transform.localScale = new Vector3(size, size * flat, size); o.name = "Oak leaves";
             }
             foreach (var tip in tips) Clump(tip.at, tip.size * .7f, T() < .5f ? mid : light);
-            for (int i = 0; i < 5; i++) { float a = (i + (T() - .5f) * .3f) * Mathf.PI * 2 / 5 + .4f, r = 1.9f + T() * .9f; Clump(new Vector3(Mathf.Cos(a) * r, 7.1f + T() * .9f, Mathf.Sin(a) * r), 5.6f + T() * 1.6f, i % 2 == 0 ? mid : light, .5f + T() * .1f); }
-            Clump(new Vector3(.2f, 8.7f, -.2f), 6.4f, sunlit, .55f);
-            for (int i = 0; i < 12; i++) { float a = (i + T() * .5f) * Mathf.PI / 6, r = 4.7f + T(); Clump(new Vector3(Mathf.Cos(a) * r, 4.8f + T() * .6f, Mathf.Sin(a) * r), 2 + T() * .8f, i % 6 == 1 ? gold : i % 2 == 0 ? deep : mid, .62f); }
-            for (int i = 0; i < 8; i++) { float a = (i + T() * .6f) * Mathf.PI / 4 + .3f, r = 3.6f + T() * .9f; Clump(new Vector3(Mathf.Cos(a) * r, 6.2f + T() * .7f, Mathf.Sin(a) * r), 3 + T() * .8f, i % 3 == 0 ? light : mid, .65f); }
-            for (int i = 0; i < 5; i++) { float a = (i + T() * .6f) * Mathf.PI * 2 / 5 + .9f, r = .7f + T() * 1.6f; Clump(new Vector3(Mathf.Cos(a) * r, 9.9f + T() * .8f, Mathf.Sin(a) * r), 1.7f + T() * .8f, i % 2 == 0 ? sunlit : light); }
-            for (int i = 0; i < 3; i++) { float a = i * 2.1f + T(); Clump(new Vector3(Mathf.Cos(a) * 1.5f, 6.3f + T() * .6f, Mathf.Sin(a) * 1.5f), 4 + T() * .4f, deep); }
+            for (int i = 0; i < 5; i++) { float a = (i + (T() - .5f) * .3f) * Mathf.PI * 2 / 5 + .4f, r = (1.9f + T() * .9f) * Spread; Clump(new Vector3(Mathf.Cos(a) * r, (7.1f + T() * .9f) * Lift, Mathf.Sin(a) * r), (5.6f + T() * 1.6f) * 1.35f, i % 2 == 0 ? mid : light, .5f + T() * .1f); }
+            Clump(new Vector3(.2f, 8.7f * Lift, -.2f), 6.4f * 1.35f, sunlit, .55f);
+            // A second ring of great masses between the first and the skirt (the crown is wider now: no sky through its middle).
+            for (int i = 0; i < 6; i++) { float a = (i + T() * .5f) * Mathf.PI * 2 / 6, r = (3.4f + T() * .8f) * Spread; Clump(new Vector3(Mathf.Cos(a) * r, (6.4f + T() * .8f) * Lift, Mathf.Sin(a) * r), 5.5f + T() * 1.5f, i % 3 == 0 ? light : i % 3 == 1 ? mid : deep, .6f); }
+            for (int i = 0; i < 18; i++) { float a = (i + T() * .5f) * Mathf.PI * 2 / 18, r = (4.7f + T()) * Spread; Clump(new Vector3(Mathf.Cos(a) * r, (4.8f + T() * .6f) * Lift, Mathf.Sin(a) * r), (2 + T() * .8f) * 1.45f, i % 6 == 1 ? gold : i % 2 == 0 ? deep : mid, .62f); }
+            for (int i = 0; i < 12; i++) { float a = (i + T() * .6f) * Mathf.PI / 6 + .3f, r = (3.6f + T() * .9f) * Spread; Clump(new Vector3(Mathf.Cos(a) * r, (6.2f + T() * .7f) * Lift, Mathf.Sin(a) * r), (3 + T() * .8f) * 1.4f, i % 3 == 0 ? light : mid, .65f); }
+            for (int i = 0; i < 6; i++) { float a = (i + T() * .6f) * Mathf.PI * 2 / 6 + .9f, r = (.7f + T() * 1.6f) * Spread; Clump(new Vector3(Mathf.Cos(a) * r, (9.9f + T() * .8f) * Lift, Mathf.Sin(a) * r), (1.7f + T() * .8f) * 1.4f, i % 2 == 0 ? sunlit : light); }
+            for (int i = 0; i < 3; i++) { float a = i * 2.1f + T(); Clump(new Vector3(Mathf.Cos(a) * 1.5f * Spread, (6.3f + T() * .6f) * Lift, Mathf.Sin(a) * 1.5f * Spread), (4 + T() * .4f) * 1.3f, deep); }
             // A fringe of painted leaf cards (Crulanda/Leaf) round the skirt, the middle ring and the top, fanning out past the clumps,
             // so the crown's edge against the sky and the ground is ragged leaf, not the clumps' smooth curves. Three meshes (skirt,
             // rim, top), so the fade still tells the crown's levels apart. From the oak's stream, after every clump: nothing else moves.
             if (art.leafCards != null && art.leafCards.Length > 0)
             {
-                var crownHeart = new Vector3(0, 7.2f, 0); var fringeLeaf = LeafMaterial(0);
+                var crownHeart = new Vector3(0, 7.2f * Lift, 0); var fringeLeaf = LeafMaterial(0);
                 void Fringe(string name, int count, float step, float phase, float r0, float r1, float y0, float y1, float s0, float s1, float lift0, float lift1)
                 {
                     var fringe = new ZoneMeshes.Cards();
@@ -2253,9 +2262,9 @@ namespace Crulanda.World
                     }
                     MeshPart(fringe.Build(name), t, Vector3.zero, fringeLeaf);
                 }
-                Fringe("Oak leaf skirt", 14, Mathf.PI / 7, 0, 4.4f, 5.2f, 4.5f, 5.3f, 2.6f, 3.2f, -.2f, .2f);
-                Fringe("Oak leaf rim", 10, Mathf.PI / 5, .3f, 3.5f, 4.3f, 6.5f, 7.3f, 2.8f, 3.4f, .3f, .7f);
-                Fringe("Oak leaf top", 5, Mathf.PI * 2 / 5, .9f, 1, 2.4f, 9.4f, 10.2f, 2.3f, 2.8f, 1, 1.8f);
+                Fringe("Oak leaf skirt", 20, Mathf.PI / 10, 0, 4.4f * Spread, 5.2f * Spread, 4.5f * Lift, 5.3f * Lift, 3.6f, 4.4f, -.2f, .2f);
+                Fringe("Oak leaf rim", 14, Mathf.PI / 7, .3f, 3.5f * Spread, 4.3f * Spread, 6.5f * Lift, 7.3f * Lift, 3.8f, 4.6f, .3f, .7f);
+                Fringe("Oak leaf top", 7, Mathf.PI * 2 / 7, .9f, Spread, 2.4f * Spread, 9.4f * Lift, 10.2f * Lift, 3.2f, 3.8f, 1, 1.8f);
             }
             var cap = t.gameObject.AddComponent<CapsuleCollider>(); cap.center = new Vector3(0, 3.2f, 0); cap.height = 6.4f; cap.radius = 1.1f;
             t.gameObject.AddComponent<NavBlocker>(); t.gameObject.AddComponent<TreeFade>();
@@ -3393,7 +3402,8 @@ namespace Crulanda.World
         {
             foreach (var e in Zone.exits)
             {
-                var t = new GameObject("Exit: " + e.name).transform; t.SetParent(statics, false); t.position = Ground(e.at);
+                // Beside the road where it leaves the zone, on its verge (playtest note 74: it stood in the road).
+                var t = new GameObject("Exit: " + e.name).transform; t.SetParent(statics, false); t.position = Ground(OffRoad(e.at, 1.1f));
                 // An eight-sided standing stone, tapered, leaning a little with the years (its lean and turn from where it stands: no
                 // zone draw), set deep enough for a slope; a carved band round its waist; a lantern house cut through its head (four
                 // posts under a pointed cap) with the light set back inside it; two loose stones at its foot. One mesh of painted rock.
@@ -5421,6 +5431,8 @@ namespace Crulanda.World
             if (Zone.biome == "mountain") SinkBySlope(t, at, s);
             if (KitRocks && KitRock(t, (int)(y0 / 120), 1.25f * s, 2.4f * s, y1) != null) { Solid(t, new Vector3(0, .6f * s, 0), new Vector3(1.8f * s, 1.2f * s, 1.5f * s)); return; }   // the kit's rock (art round 3, 2026-10-07)
             float deep = Zone.biome == "mountain" ? .14f * s : 0;   // mountains: the lumps a seventh deeper in the ground (the collider is where it was)
+            if (KitCrags && KitCrag(t, (int)(y0 / 90), s, y1, deep + .1f * s) != null)   // the Megapack's crag (art round 6, 2026-10-07)
+            { Solid(t, new Vector3(0, .6f * s, 0), new Vector3(1.8f * s, 1.2f * s, 1.5f * s)); RockSkirt(t, s, mat); return; }
             Lump(b0, t, new Vector3(0, .45f * s - deep, 0), new Vector3(2.1f * s, 1.5f * s, 1.8f * s), mat, y0);
             Lump(b1, t, new Vector3(.8f * s, .25f * s - deep, .45f * s), new Vector3(1.2f * s, .9f * s, 1.1f * s), mat, y1);
             Solid(t, new Vector3(0, .6f * s, 0), new Vector3(1.8f * s, 1.2f * s, 1.5f * s));
@@ -5499,6 +5511,40 @@ namespace Crulanda.World
                     float s = Steep(q, size); if (s < best - .1f) { best = s; spot = q; }
                 }
             return spot;
+        }
+        /// <summary>How far past a road's edge a small prop must stand (its own reach: a lamp's arm, a sign's board, a rock's width);
+        /// 0 for anything that may stand on or across a road (bridges, gates, buildings, fences) or that you interact with where it is.</summary>
+        static float Verge(ZoneProp p)
+        {
+            if (p == null || !string.IsNullOrEmpty(p.interact)) return 0;
+            switch (p.kind)
+            {
+                case "lamp": return 1.4f;
+                case "signpost": return 1.3f;
+                case "cart": return 2.4f;
+                case "rock": return 1.2f * (1 + Mathf.Max(0, p.variant) * .6f);
+                case "monolith": case "grave": case "wayshrine": case "idol": case "shrine": case "board": case "brazier": case "barrels": case "crates": case "haystack": case "woodpile": case "target": case "dummy": case "banner": return 1.2f;
+            }
+            return 0;
+        }
+        /// <summary>A point moved out sideways from any road it stands within <paramref name="clear"/> of that road's edge, to the edge plus
+        /// <paramref name="clear"/>, on the side it already leant to (twice over, for a junction). Unchanged when it is clear already.</summary>
+        Vector2 OffRoad(Vector2 at, float clear)
+        {
+            for (int pass = 0; pass < 2; pass++)
+                foreach (var r in Zone.roads)
+                {
+                    if (r == null || r.points == null) continue;
+                    for (int i = 0; i + 1 < r.points.Length; i++)
+                    {
+                        Vector2 a = r.points[i], b = r.points[i + 1], ab = b - a; float len2 = Mathf.Max(1e-6f, ab.sqrMagnitude);
+                        var q = a + ab * Mathf.Clamp01(Vector2.Dot(at - a, ab) / len2); var off = at - q; float need = r.width / 2 + clear;
+                        if (off.magnitude >= need) continue;
+                        var side = off.sqrMagnitude > 1e-6f ? off.normalized : new Vector2(-ab.y, ab.x).normalized;
+                        at = q + side * need;
+                    }
+                }
+            return at;
         }
         bool NearRoad(Vector2 p, float margin)
         {

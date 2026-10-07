@@ -500,3 +500,26 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
   words go (the input shows [LFG]); Party with no party says to /invite someone first.
 - **72. "Allow all party members to get loot, and maybe need/greed uncommon, rare, epic, legendary items."** DONE (round 25):
   loot shared round the party; need/greed rolls on uncommon and better, the sims rolling by what they can use.
+
+- **73. "The great oak needs to be a bit mightier. Taller, and shades just about the whole village at noon."** DONE (art round 6,
+  2026-10-07): a stouter bole, about 30 m tall (was 20), its crown reaching about 20 m out (was about 11); Chris then
+  added "not that huge, just mightier and noticeable from a distance".
+- **74. "Still lanterns / stonehenges / markers in the middle of the road."** DONE (art round 6, 2026-10-07): the exit
+  waystones (standing stones with a lantern in the head) stood where each road leaves the zone, in the road; they and every small
+  prop on or over a road (lamps, a signpost, a cart, a rock) now stand on the verge (ZoneBuilder.OffRoad).
+- **75. "I need a way to edit or change the default keyboard setting. I hate WASD for movement, I prefer ESDF and G for interact."**
+  OPEN (next round): key bindings in the options, an ESDF preset, every key rebindable.
+- **76. "I see farmers in the field but they aren't actually doing anything or growing anything."** OPEN (next round): field work
+  that shows (sowing, hoeing, reaping with the tools in hand) and crops that grow through the days.
+- **77. "Has hoe backwards and two blue lines hovering above chest."** (a farmhand, screenshot: the tool over his shoulder blade-first
+  toward his head; two blue straps floating in front of his chest) OPEN (next round).
+- **78. "The red is too pink. I like some red/pink but it should be more brown in it."** (the autumn twisted trees, art round 4)
+  OPEN (next round): russet and red-brown autumn leaves.
+- **79. "Characters shouldn't run with sword/weapons in hand unless fighting."** OPEN (next round): weapons sheathed on the back or
+  hip out of a fight, drawn when it starts (you, Mira, sims, guards).
+- **80. (screenshot, Harrow barn)** The kit barn's stone sill stands a metre out from its walls, like a separate low wall with grass
+  between. OPEN (next round): the barn model was fitted by its bounds, which include the roof's overhang; its walls go to the
+  footprint now and the roof overhangs past the sill.
+- **83. "'H' to hail other people, NPCs and sims."** OPEN (round 26): H greets whoever you face or have selected; they answer.
+- **84. "Still lots of empty space."** (screenshot: the open meadow between the village and the woods, Oakhaven) OPEN (round 26):
+  the nature kit scattered over open ground (thickets, lone trees, stumps, logs, rocks, flower patches), clear of roads and fields.

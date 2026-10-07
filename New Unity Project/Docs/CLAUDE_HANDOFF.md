@@ -10,7 +10,7 @@ Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
 ## RESUME HERE (updated 2026-10-07, about 02:00)
-**Full run c36 result: PENDING_RESULT**
+**Playable build = everything below, built 2026-10-07 03:28 (release) from commit af59508, published to Crulanda-Playable. Full run c37: EditMode 427/427, PlayMode 213/214 (NamedLootTests count fixed, rerun 7/7), five tours, 0 shader errors. c36 before it caught a build-breaking barrel bug (an empty Oakhaven in the tour): fixed. Committed and backed up to E:.**
 **What was done tonight (all in the working tree; commit and publish follow the c36 run):** Round 24 (notes 64-71: the horse
 stabled, the camera held indoors, one colourised chat window with chips, /invite across zones, healing seen, floating props seated;
 commit 952fc67; its full run c35 was 424/424 and 208/210 with two flaky or ordering failures, fixed, so it was not published on its

@@ -10,15 +10,14 @@ Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
 ## RESUME HERE (updated 2026-10-07, about 12:00)
-**Art round 2, the nature round, is in the working tree: full run c39 result: PENDING_RESULT**
+**Playable build = art round 2, the nature round, built 2026-10-07 13:01 (release) from commit 396ec3b, published. Full run c39: EditMode 427/427, PlayMode 212/214 (two sim-test races fixed, rerun 4/4), five tours, 0 shader errors. Committed and backed up to E:.**
 The Stylized Nature MegaKit (CC0) is under Resources/Props/Nature; ZoneBuilder.NatureKit (KitTree) makes every broadleaf "tree"
 prop, every forest-edge tree and every pine a kit model (the painted builders remain as fallback and still build the great oak,
 giant trees, dead trees and twisted woods), meadow bushes are the kit's bush (flowering now and then). Leaf cards go on the
 painted-leaf shader (ZoneBuilder.DressNature; the importer does it too), crowns take the leaf-family tints. The Mastwood and the
 Oakhaven tours look right (hel/work/world-captures, 11:48); Khaven keeps its dead woods. Zone/tree tests 7/7 before the run.
 Pitfall recorded in CHANGELOG: never match "_Normal" by Contains on this kit's file names.
-**After c39 (if green):** release build in lane B (--crulanda-release; retry once if ILPP pipe error), publish, commit, Backup.ps1,
-this file's result line, copy to hel/outputs. Then the next art rounds: the Stylized Megapack 2in1 (.unitypackage in Downloads),
+**Next:** the next art rounds: the Stylized Megapack 2in1 (.unitypackage in Downloads),
 the HQ Rock Pack (Asset Store cache) for crags and boulders, the kit's dead and twisted trees for Khaven and the Verdant giants,
 the Medieval Village MegaKit when it is in Downloads; then the enclave interior (note 40) and the sound phase.
 

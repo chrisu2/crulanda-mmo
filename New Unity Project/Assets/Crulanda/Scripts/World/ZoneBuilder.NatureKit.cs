@@ -55,6 +55,14 @@ namespace Crulanda.World
         {
             return ModelProp(t, "Nature/Rock_Medium_" + (1 + ((pick % 3) + 3) % 3), Vector3.down * height * .12f, yaw, height, false, width);
         }
+        static readonly System.Collections.Generic.Dictionary<string, Material> kitShades = new System.Collections.Generic.Dictionary<string, Material>();
+        /// <summary>A kit material in a shade (multiplied), one copy per material and shade.</summary>
+        static Material KitShade(Material m, Color shade)
+        {
+            if (m == null) return null; string key = m.name + "|" + shade;
+            if (!kitShades.TryGetValue(key, out var k) || k == null) { k = new Material(m) { name = m.name + " (shade)" }; k.color = m.color * shade; kitShades[key] = k; }
+            return k;
+        }
         /// <summary>Whether the nature kit is in the project (one look, cached by PropSource).</summary>
         public static bool KitTrees { get { return HasProp("Nature/CommonTree_1") && HasProp("Nature/Pine_1"); } }
         /// <summary>A kit tree under a prop root: the model to <paramref name="height"/> (before the root's own scale), a trunk collider

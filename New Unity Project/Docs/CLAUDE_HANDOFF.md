@@ -9,7 +9,19 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-10-07, about 12:00)
+## RESUME HERE (updated 2026-10-07, about 15:30)
+**Playable build = art round 3, built 15:06 from commit 5ca6d2d, published. Full run c41: 427/427, 214/214, five tours, 0 shader
+errors. Backed up to E:.** Art round 4 (the nature kit's dead trees for the dead woods, its twisted trees for the autumn
+broadleaf; TreeLimbTests counts only painted trees now) is in the working tree; its tours look right (Khaven, the Rim, Oakhaven,
+15:20) and full run c43 is running: if green, release build in lane B, publish, commit, backup.
+Rounds done today: 1 props (Fantasy Props MegaKit, Medieval props), 2 nature trees, 3 Megapack (haystacks, carts, target, kit
+rocks in green zones; HQ Rock Pack left out as photoreal), 4 dead and twisted trees. Tools: tools/wip/art/megapack_import.py,
+PropCapture.Render (props row + PROP/PROPMAT log), ZoneBuilder.ModelProp/GroundProp/KitTree/KitRock/DressNature/KitShade.
+**Next:** the Megapack's buildings are not placed (the houses have working doors, interiors and roof fade: a bigger job, ask Chris
+first); its white rock formations could become the Peaks' crags with the mountain tint; the Medieval Village MegaKit when it is
+in Downloads; then the enclave interior (note 40) and the sound phase.
+
+## Earlier resume note (2026-10-07, about 12:00)
 **Playable build = art round 2, the nature round, built 2026-10-07 13:01 (release) from commit 396ec3b, published. Full run c39: EditMode 427/427, PlayMode 212/214 (two sim-test races fixed, rerun 4/4), five tours, 0 shader errors. Committed and backed up to E:.**
 The Stylized Nature MegaKit (CC0) is under Resources/Props/Nature; ZoneBuilder.NatureKit (KitTree) makes every broadleaf "tree"
 prop, every forest-edge tree and every pine a kit model (the painted builders remain as fallback and still build the great oak,

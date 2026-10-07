@@ -82,8 +82,10 @@ namespace Crulanda.Tests
                 }
                 if (bad > 12) problems.Add(id + ": and " + (bad - 12) + " more");
             }
-            Assert.Greater(trees, 200, "Standing trees recorded in the five zones.");
-            Assert.Greater(limbs, 600, "Their limbs.");
+            // The kit's trees (art rounds 2 and 4, 2026-10-07) are models with no recorded wood: what is recorded now is the painted
+            // trees left (the great oak, the giants, the massive dead oaks, the treehouse trees), and with the kit gone, all of them.
+            Assert.Greater(trees, 10, "Standing painted trees recorded in the five zones.");
+            Assert.Greater(limbs, 30, "Their limbs.");
             Assert.Greater(giants, 0, "The Verdant Shore's giants among them.");
             Assert.IsEmpty(problems, string.Join("\n", problems));
         }

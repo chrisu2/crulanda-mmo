@@ -1702,6 +1702,18 @@ namespace Crulanda.World
             SkipBranchDraws(depth, trunkR * (girth > .6f ? .75f : .7f));                     // and the old limbs'
             var tr = TreeRandom(root.position); float T() { return (float)tr.NextDouble(); }
             bool massive = girth > .6f;
+            // The kit's dead tree (art round 4, 2026-10-07), one of five from the tree's own stream, as tall as the painted one would
+            // stand; charred darker in the ash. The massive dead oaks (landmarks) stay painted.
+            if (!massive && HasProp("Nature/DeadTree_1"))
+            {
+                float kitTop = trunkH * 1.35f * (.9f + T() * .2f);
+                var kit = KitTree(root, "Nature/DeadTree_" + (1 + (int)(T() * 5) % 5), kitTop, Mathf.Max(.14f, trunkR * .8f), T() * 360);
+                if (kit != null)
+                {
+                    if (Zone.biome == "ash" || Gloom) foreach (var r in kit.GetComponentsInChildren<Renderer>()) r.sharedMaterial = KitShade(r.sharedMaterial, Zone.biome == "ash" ? new Color(.55f, .52f, .5f) : new Color(.8f, .78f, .76f));
+                    return root;
+                }
+            }
             // A massive one (a dead_oak prop) is a great old tree: tall, a broad but not squat bole, long heavy limbs.
             float top = (massive ? trunkH * 2.1f : trunkH * 1.35f) * (.9f + T() * .2f), r0 = massive ? trunkR * .66f : Mathf.Max(.14f, trunkR * .8f);
             var axis = Bole(root, tr, top, r0, mat, .45f);   // a snapped-off top
@@ -1787,7 +1799,14 @@ namespace Crulanda.World
             float yawA = R01 * 120, yawB = R01 * 120 + 180;   // the two main limbs' bearings, on roughly opposite sides (the zone's draws, as before)
             int family = (Mathf.Abs(variant) + (int)(R01 * 2)) % Leaf.Length;   // its leaf: fresh green, yellow-green, autumn or dull gold (the same draw as before)
             // The kit's broadleaf (art round 2, 2026-10-07): one of five by the variant and the first draw, 6-8 m, its trunk about .3 m.
-            if (KitTrees) { var kit = KitTree(t, "Nature/CommonTree_" + (1 + (Mathf.Abs(variant) + (int)(yawA / 30)) % 5), (h - 3.5f) / 1.5f * 2 + 6, .3f, yawB); if (kit != null) { DressNature(kit, Wither(LeafTints[family])); return; } }
+            if (KitTrees)
+            {
+                // The autumn family (red-brown leaves) is the kit's twisted tree in its own autumn red (art round 4); the rest its common tree, tinted.
+                bool autumn = family == 2 && !Gloom && HasProp("Nature/TwistedTree_1");
+                var kit = autumn ? KitTree(t, "Nature/TwistedTree_" + (1 + (Mathf.Abs(variant) + (int)(yawA / 30)) % 5), (h - 3.5f) / 1.5f * 2 + 6.5f, .3f, yawB)
+                                 : KitTree(t, "Nature/CommonTree_" + (1 + (Mathf.Abs(variant) + (int)(yawA / 30)) % 5), (h - 3.5f) / 1.5f * 2 + 6, .3f, yawB);
+                if (kit != null) { if (!autumn) DressNature(kit, Wither(LeafTints[family])); return; }
+            }
             // A tapered, slightly bent and leaning trunk on a root flare, in its own shade of bark, running up into the crown's
             // heart; limbs grow out of it toward the crown's side clusters. Its look comes from its own stream (TreeRandom).
             var tr = TreeRandom(t.position); float T() { return (float)tr.NextDouble(); }

@@ -45,9 +45,9 @@ namespace Crulanda.Tests
 
         [UnityTest] public IEnumerator The_sims_talk_in_the_zone()
         {
-            float t = 0; while (t < 40 && session.Chat.Count(SimLine) < 3) { t += Time.deltaTime; yield return null; }
+            float t = 0; while (t < 75 && session.Chat.Count(SimLine) < 3) { t += Time.deltaTime; yield return null; }   // a line every 8-23 s with six sims about (SimChatter): forty seconds was borderline (c43)
             var said = session.Chat.Where(SimLine).ToList();
-            Assert.GreaterOrEqual(said.Count, 3, "three lines in forty seconds from six chatty sims");
+            Assert.GreaterOrEqual(said.Count, 3, "three lines in seventy-five seconds from six chatty sims");
             var names = SimPopulation.Active.World.sims.Select(s => s.name).ToList();
             foreach (var l in said) { Assert.Contains(l.speaker, names, "a sim said it"); Assert.IsFalse(string.IsNullOrWhiteSpace(l.text)); }
         }

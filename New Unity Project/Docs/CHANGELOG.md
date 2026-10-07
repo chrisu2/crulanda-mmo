@@ -1509,3 +1509,14 @@ A read-only review by five reviewers, each finding checked by a second who tried
   where the painted one's were. A new zone prop kind, "target", is its archery butt.
 - **Left out:** the HQ Rock Pack. Its three rocks are photoreal scans and clash with the painted world (props row); the import is
   kept in the script, its files deleted. The Megapack's white rock formations and buildings are not placed yet.
+
+## 2026-10-07 — Art round 4: the kit's dead and twisted trees
+- **Dead woods:** every dead tree in the forest edges of gloom and ash, the dead groves (Khaven's Whispering Wood) and the
+  Wasting's ash trees is one of the nature kit's five dead trees, as tall as the painted one would stand, darker in the ash and
+  in gloom; trunk collider, NavBlocker and TreeFade as before; the zone's draws untouched. The massive dead oaks (landmarks) stay
+  painted.
+- **Autumn trees:** the broadleaf's autumn family (the red-brown one) is the kit's twisted tree in its own autumn red.
+- TreeLimbTests counts only the painted trees left (the kit's are models without recorded wood).
+- Full run c43: EditMode 427/427, PlayMode 213/214, five tours, 0 shader errors. The failure: SimChatTests waited forty seconds
+  for three zone lines when six sims talk every 8-23 s; it waits seventy-five now (rerun green). Editor/HouseCapture.cs renders the
+  Megapack's buildings for comparison (Docs/art).

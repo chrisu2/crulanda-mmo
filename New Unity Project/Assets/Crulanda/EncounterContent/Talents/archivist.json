@@ -1,0 +1,351 @@
+{
+ "id": "archivist",
+ "name": "Archivist",
+ "resource": "Mana",
+ "resourceDesc": "Mana pays for every song and spell; one song (Cadence or Dirge) can be sung at a time.",
+ "identity": "A song-caster of the Silent Pilgrims: little damage, the purest crowd control. Lull a pull to sleep, bind the worst of it, hush the casters. (GAME-ONLY kit on CANON roots: the Original Song, the echo-jars.)",
+ "branches": [
+  {
+   "id": "silent-vow",
+   "name": "The Silent Vow",
+   "role": "control",
+   "loop": "Hush the blow or the cast that matters; keep the casters quiet.",
+   "tradeoff": "Answers, not damage.",
+   "nodes": [
+    {
+     "id": "sv-quick-hush",
+     "name": "Quick Hush",
+     "tier": 0,
+     "col": 1,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "clock",
+     "desc": "Hush's cooldown is 2 seconds shorter per rank.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "sv-long-hush",
+     "name": "Long Hush",
+     "tier": 0,
+     "col": 2,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "note",
+     "desc": "Hush silences 1 second longer per rank.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "sv-still-air",
+     "name": "Still Air",
+     "tier": 1,
+     "col": 0,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "wind",
+     "desc": "Mobs within 6 m of you cast 5% slower per rank.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "sv-vow",
+     "name": "The Vow",
+     "tier": 1,
+     "col": 2,
+     "max": 1,
+     "req": null,
+     "kind": "passive",
+     "icon": "chain",
+     "desc": "Hush also stops the mob calling for help.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "sv-quiet-step",
+     "name": "Quiet Step",
+     "tier": 2,
+     "col": 1,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "wind",
+     "desc": "Mobs notice you 1 m closer per rank.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "sv-no-word",
+     "name": "No Word",
+     "tier": 2,
+     "col": 2,
+     "max": 1,
+     "req": null,
+     "kind": "passive",
+     "icon": "skull",
+     "desc": "A hushed mob takes 10% more damage.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "sv-silence",
+     "name": "The Great Silence",
+     "tier": 3,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "capstone",
+     "icon": "moon",
+     "desc": "Hush silences every mob within 6 m of the target.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": false
+    }
+   ]
+  },
+  {
+   "id": "the-lull",
+   "name": "The Lull",
+   "role": "control",
+   "loop": "Lull the pull before it starts; keep the sleepers asleep; Unsong the one that wakes.",
+   "tradeoff": "The longest holds, and nothing else.",
+   "nodes": [
+    {
+     "id": "lu-deep-sleep",
+     "name": "Deep Sleep",
+     "tier": 0,
+     "col": 1,
+     "max": 5,
+     "req": null,
+     "kind": "passive",
+     "icon": "moon",
+     "desc": "Lull lasts 2 seconds longer per rank.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "lu-unsong",
+     "name": "Unsong",
+     "tier": 1,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "passive",
+     "icon": "spiral",
+     "desc": "A mob woken from Lull or Echo Bind by damage is slowed by half for 6 seconds.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "lu-soft",
+     "name": "Soft Voice",
+     "tier": 1,
+     "col": 2,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "clock",
+     "desc": "Lull's cooldown is 5 seconds shorter per rank.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "lu-wide",
+     "name": "Wide Lull",
+     "tier": 2,
+     "col": 0,
+     "max": 1,
+     "req": null,
+     "kind": "passive",
+     "icon": "wind",
+     "desc": "Lull reaches 8 m around the target.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "lu-fourth",
+     "name": "A Fourth Sleeper",
+     "tier": 2,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "passive",
+     "icon": "star",
+     "desc": "Lull takes up to four mobs.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "lu-dreams",
+     "name": "Dreams",
+     "tier": 2,
+     "col": 2,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "heart",
+     "desc": "Sleepers heal 2% a second per rank (keeps a pull fresh for later).",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "lu-mesmer",
+     "name": "Mesmer",
+     "tier": 3,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "capstone",
+     "icon": "eye",
+     "desc": "Echo Bind takes a boss for 6 seconds.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": false
+    }
+   ]
+  },
+  {
+   "id": "the-archive",
+   "name": "The Archive",
+   "role": "dps",
+   "loop": "Shard Note between holds; Echo-jar when the pull goes wrong; sing the right song.",
+   "tradeoff": "Some damage, shorter holds.",
+   "nodes": [
+    {
+     "id": "ar-resonance",
+     "name": "Resonance",
+     "tier": 0,
+     "col": 1,
+     "max": 5,
+     "req": null,
+     "kind": "passive",
+     "icon": "crystal",
+     "desc": "Shard Note hits 4% harder per rank.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "ar-full-jar",
+     "name": "A Fuller Jar",
+     "tier": 1,
+     "col": 1,
+     "max": 2,
+     "req": "ar-resonance",
+     "kind": "passive",
+     "icon": "flask",
+     "desc": "Echo-jar's fear lasts 2 seconds longer per rank.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "ar-chorus",
+     "name": "Chorus",
+     "tier": 1,
+     "col": 2,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "note",
+     "desc": "Cadence also makes the party hit 2% harder per rank.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "ar-low-dirge",
+     "name": "Low Dirge",
+     "tier": 2,
+     "col": 0,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "drop",
+     "desc": "Dirge slows 10% more per rank.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "ar-second-jar",
+     "name": "A Second Jar",
+     "tier": 2,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "passive",
+     "icon": "flask",
+     "desc": "Echo-jar holds two cries (two uses).",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "ar-catalogue",
+     "name": "The Catalogue",
+     "tier": 2,
+     "col": 2,
+     "max": 1,
+     "req": null,
+     "kind": "passive",
+     "icon": "gear",
+     "desc": "Shard Note on a held mob doesn't break the hold.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "ar-original",
+     "name": "The Original Song",
+     "tier": 3,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "capstone",
+     "icon": "star",
+     "desc": "Once a fight, sing every mob within 10 m to sleep for 8 seconds.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": false
+    }
+   ]
+  }
+ ]
+}

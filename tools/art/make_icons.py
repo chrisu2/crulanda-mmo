@@ -1668,6 +1668,29 @@ def a_vanish(c):
     c.back(c.ell(50, 50, 40), '#4a4a70', .5, 14); m_moon(c, '#b0a8c8', '#ffffff'); m_wind(c, '#8a90b0', '#ffffff')
 ABILITIES.update({'rogue.sinister_strike': ('#3a2a1a', a_sinister), 'rogue.eviscerate': ('#4a1a1e', a_eviscerate), 'rogue.sap': ('#26242e', a_sap),
                   'rogue.gouge': ('#3a1e1e', a_gouge), 'rogue.kick': ('#1e2a3a', a_kick), 'rogue.blind': ('#2e2c28', a_blind), 'rogue.vanish': ('#1a1a2a', a_vanish)})
+# The Archivist (2026-10-08, Docs/CC_DESIGN.md section 0): a song-caster.
+BRANCH.update({'silent-vow': ('#22283a', ['#9fc8ff', '#e0e8f0', '#8a90b0', '#c8a0ff', '#70c0f0']),
+               'the-lull': ('#1e2440', ['#a0b0ff', '#c8a0ff', '#70c0f0', '#e0e8f0', '#9be05a']),
+               'the-archive': ('#2a2a22', ['#e0c070', '#9fc8ff', '#c8c0a0', '#e0b040', '#f0e080'])})
+def a_shard_note(c):
+    c.back(c.ell(50, 50, 38), '#70c0f0', .45, 10); m_note(c, '#9fc8ff', '#ffffff'); c.spark(76, 24, 10, '#e0f0ff', .9)
+def a_lull(c):
+    c.back(c.ell(50, 50, 40), '#4a5ab0', .5, 14); m_moon(c, '#c8d0ff', '#ffffff')
+    for x, y in ((24, 26), (34, 14), (70, 76)): c.spark(x, y, 7, '#e0e8ff', .85)
+def a_hush(c):
+    c.back(c.ell(50, 50, 38), '#8a90b0', .4, 10); m_hand(c, '#d8d0c8', '#8090b0')
+def a_echo_bind(c):
+    c.back(c.ell(50, 50, 38), '#c8a0ff', .45, 12); rings(c, 50, 50, (34, 24, 14), '#e0c8ff', .7, w=4)
+def a_cadence(c):
+    c.back(c.ell(50, 50, 38), '#e0b040', .4, 10); m_note(c, '#f0e080', '#ffffff'); m_wind(c, '#e0c070', '#ffffff')
+def a_dirge(c):
+    c.back(c.ell(50, 50, 40), '#3a3a5a', .55, 14); m_note(c, '#8a90b0', '#c0c0d0'); m_drop(c, '#6a70a0', '#c0c0d0')
+def a_echo_jar(c):
+    c.back(c.ell(50, 50, 38), '#c83a6a', .4, 12); m_flask(c, '#c8c0a0', '#e0b040')
+    for r in (40, 46): rings(c, 50, 50, (r,), '#ffd0e0', .5, w=2.5, a0=-60, a1=60)
+ABILITIES.update({'archivist.shard_note': ('#1e2a3a', a_shard_note), 'archivist.lull': ('#1e2040', a_lull), 'archivist.hush': ('#26283a', a_hush),
+                  'archivist.echo_bind': ('#281e3c', a_echo_bind), 'archivist.cadence': ('#3a3418', a_cadence), 'archivist.dirge': ('#1e1e2e', a_dirge),
+                  'archivist.echo_jar': ('#3a1e2a', a_echo_jar)})
 KIND_TRIM = dict(passive='#c9ccd2', modifier='#e0b040', active='#fff0b0', signature='#fff0b0', capstone='#ffd040')
 def draw_talent(c, icon, branch, kind, k):
     """k: how many earlier talents in the branch used the same icon word (0 = first)."""

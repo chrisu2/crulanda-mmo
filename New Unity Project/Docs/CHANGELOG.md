@@ -1672,3 +1672,12 @@ A read-only review by five reviewers, each finding checked by a second who tried
   Ruthless, Quick Kick, Fine Dust). Leather, the Ranger's figure for now, gold class colour, its own icons. Play it from the pause
   menu as a separate character. Tests: RogueRulesTests, RogueLoopTests.
 - Not yet: sims as Rogues, pick-lock, a Rogue look of its own; then the Archivist.
+
+## 2026-10-08 — The Archivist, the seventh class (CC step C2b)
+- A song-caster of the Silent Pilgrims on Mana (GAME-ONLY kit on CANON roots: the Original Song, the echo-jars), robed like the Mage,
+  with a wand. Shard Note (its one damage cast); Lull (the target and up to two more within 6 m sleep 20 s; damage wakes one); Hush
+  (silence 5 s); Echo Bind (one mob held 30 s, one at a time); Cadence (you move and Mira casts 10% faster) or Dirge (fighting mobs
+  within 10 m slowed), one song at a time; Echo-jar (the target and up to two more within 8 m flee 6 s). Unlocks at 1, 2, 3, 4, 5, 6, 8.
+- Talents: the Silent Vow, the Lull and the Archive, 7 each, 6 implemented (Quick Hush, Long Hush, Deep Sleep, Unsong, Resonance,
+  A Fuller Jar). Unsong: a sleeper woken by damage is slowed by half for 6 s. Its own icons; play it from the pause menu.
+- Tests: ArchivistRulesTests, ArchivistLoopTests.

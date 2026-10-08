@@ -145,7 +145,7 @@ namespace Crulanda.Encounter
         }
         public static string ClassName(string classId)
         {
-            switch (classId) { case "class.druid": return "Druid"; case "class.paladin": return "Paladin"; case "class.ranger": return "Ranger"; case "class.mage": return "Mage"; case "class.rogue": return "Rogue"; default: return "Warrior"; }
+            switch (classId) { case "class.druid": return "Druid"; case "class.paladin": return "Paladin"; case "class.ranger": return "Ranger"; case "class.mage": return "Mage"; case "class.rogue": return "Rogue"; case "class.archivist": return "Archivist"; default: return "Warrior"; }
         }
     }
 }

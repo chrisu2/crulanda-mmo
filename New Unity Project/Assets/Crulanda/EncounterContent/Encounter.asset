@@ -760,6 +760,90 @@ MonoBehaviour:
     globalCooldown: 1
     duration: 0
     statusId: 
+  - id: archivist.shard_note
+    name: Shard Note
+    description: "A 1.5-second cast at up to 25 metres: one sung note, sharp as a shard."
+    effect: 0
+    power: 14
+    cost: 10
+    cooldown: 0
+    range: 25
+    castTime: 1.5
+    globalCooldown: 1.5
+    duration: 0
+    statusId: 
+  - id: archivist.lull
+    name: Lull
+    description: "A hummed line: the target and up to two more within 6 metres of it sleep 20 seconds. Any damage wakes one."
+    effect: 4
+    power: 0
+    cost: 25
+    cooldown: 30
+    range: 25
+    castTime: 1.5
+    globalCooldown: 1.5
+    duration: 20
+    statusId: 
+  - id: archivist.hush
+    name: Hush
+    description: "The Pilgrims' vow made a weapon: stops the target's blow and silences it 5 seconds."
+    effect: 4
+    power: 0
+    cost: 12
+    cooldown: 15
+    range: 25
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 5
+    statusId: 
+  - id: archivist.echo_bind
+    name: Echo Bind
+    description: "Holds one mob in its own echo for 30 seconds; damage breaks it. Binding another lets the first go."
+    effect: 4
+    power: 0
+    cost: 20
+    cooldown: 0
+    range: 25
+    castTime: 1.5
+    globalCooldown: 1.5
+    duration: 30
+    statusId: 
+  - id: archivist.cadence
+    name: Cadence
+    description: "A walking song: you move 10% faster and Mira casts 10% faster. One song at a time; use again to stop."
+    effect: 4
+    power: 0
+    cost: 15
+    cooldown: 0
+    range: 0
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 0
+    statusId: 
+  - id: archivist.dirge
+    name: Dirge
+    description: "A slow song: mobs fighting within 10 metres of you are slowed. One song at a time; use again to stop."
+    effect: 4
+    power: 0
+    cost: 15
+    cooldown: 0
+    range: 0
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 0
+    statusId: 
+  - id: archivist.echo_jar
+    name: Echo-jar
+    description: "A stored death-cry let out over the target: it and up to two more within 8 metres flee 6 seconds."
+    effect: 4
+    power: 0
+    cost: 30
+    cooldown: 90
+    range: 25
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 6
+    statusId: 
   playerClass:
     id: class.warrior
     displayName: Warrior
@@ -1061,6 +1145,46 @@ MonoBehaviour:
         level: 8
         talentId: 
     talentTree: {fileID: 4900000, guid: d42a25e91b3b4f919864d43a597a8380, type: 3}
+  - definition:
+      id: class.archivist
+      displayName: Archivist
+      role: 3
+      resource: 1
+      maxResource: 100
+      combatRegen: 5
+      restingRegen: 14
+      stats:
+        baseHealth: 150
+        healthPerLevel: 18
+        healthPerStamina: 5
+        baseAttackPower: 6
+        attackPowerPerLevel: 1
+        attackPowerPerStrength: 1
+        spellPowerPerIntellect: 2
+        armorPerAgility: 1
+      unlocks:
+      - abilityId: archivist.shard_note
+        level: 1
+        talentId: 
+      - abilityId: archivist.lull
+        level: 2
+        talentId: 
+      - abilityId: archivist.hush
+        level: 3
+        talentId: 
+      - abilityId: archivist.echo_bind
+        level: 4
+        talentId: 
+      - abilityId: archivist.cadence
+        level: 5
+        talentId: 
+      - abilityId: archivist.dirge
+        level: 6
+        talentId: 
+      - abilityId: archivist.echo_jar
+        level: 8
+        talentId: 
+    talentTree: {fileID: 4900000, guid: 4a212c4a60b94032aed04b1295fd0325, type: 3}
   questFiles:
   - {fileID: 4900000, guid: 2f37ccf5ed8d46928976a7b5854444ed, type: 3}
   - {fileID: 4900000, guid: 74079723a64512c49ae39123ea0f57e0, type: 3}

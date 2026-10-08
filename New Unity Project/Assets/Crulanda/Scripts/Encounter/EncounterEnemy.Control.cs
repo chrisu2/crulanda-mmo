@@ -64,6 +64,8 @@ namespace Crulanda.Encounter
             return null;
         }
         float lostUntil;
+        /// <summary>Lets a hold or a fear go early (an Archivist binding another mob).</summary>
+        public void Release() { incapUntil = 0; fearUntil = 0; }
         /// <summary>A Rogue's Vanish: this mob forgets <paramref name="who"/> (its threat on them is gone) and doesn't notice them again
         /// for <paramref name="seconds"/>. With nobody else on its list it gives up the fight and goes home.</summary>
         public void LoseSight(Actor who, float seconds)

@@ -77,7 +77,7 @@ namespace Crulanda.Encounter
             if (Zone == null || Progress == null || string.IsNullOrEmpty(content.itemId)) return;
             Inventory.Ensure(Progress);
             // The class's own first weapon (Round 22, note 48: "mage should start with wand or staff"): a wand for the Mage, a bow for the Ranger, the blade for the rest.
-            string starter = ClassDef != null && ClassDef.id == "class.mage" ? "item.apprentice_wand" : ClassDef != null && ClassDef.id == "class.ranger" ? "item.hunting_bow" : content.itemId;
+            string starter = ClassDef != null && (ClassDef.id == "class.mage" || ClassDef.id == "class.archivist") ? "item.apprentice_wand" : ClassDef != null && ClassDef.id == "class.ranger" ? "item.hunting_bow" : content.itemId;
             if (Progress.equipment[(int)EquipSlot.MainHand].Empty) Progress.equipment[(int)EquipSlot.MainHand] = new ItemStack { item = starter, count = 1 };
         }
         /// <summary>What taking says when the bags could not hold everything.</summary>

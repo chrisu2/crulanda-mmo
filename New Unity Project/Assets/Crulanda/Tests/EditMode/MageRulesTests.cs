@@ -55,7 +55,7 @@ namespace Crulanda.Tests
             CollectionAssert.AreEqual(MageKit.BarIds, mage.definition.unlocks.Select(u => u.abilityId).ToArray(), "The unlocks are the bar, in order.");
             Assert.AreEqual("sb-quench", mage.definition.unlocks.Last().talentId, "Quench is the talent action.");
             Assert.AreEqual(content.abilities.Length, ids.Count, "No duplicate ability ids.");
-            Assert.AreEqual(6, content.AllClasses().Count(), "Warrior, Druid, Paladin, Ranger, Mage, Rogue.");
+            Assert.AreEqual(7, content.AllClasses().Count(), "Warrior, Druid, Paladin, Ranger, Mage, Rogue, Archivist.");
         }
     }
 }

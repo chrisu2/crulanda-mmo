@@ -476,6 +476,7 @@ namespace Crulanda.Encounter
                 case "class.ranger": return new Color(.45f, .75f, .3f);
                 case "class.mage": return new Color(.6f, .45f, .95f);
                 case "class.rogue": return new Color(.95f, .85f, .35f);
+                case "class.archivist": return new Color(.55f, .8f, 1f);
                 default: return new Color(.78f, .61f, .43f);
             }
         }

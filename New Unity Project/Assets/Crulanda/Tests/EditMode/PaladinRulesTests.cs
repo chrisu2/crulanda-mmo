@@ -62,7 +62,7 @@ namespace Crulanda.Tests
             foreach (var id in PaladinKit.BarIds) Assert.IsTrue(ids.Contains(id), id + " is in the ability catalog.");
             Assert.AreEqual(PaladinKit.BarIds.Length, paladin.definition.unlocks.Length, "One unlock per bar slot.");
             CollectionAssert.AreEqual(PaladinKit.BarIds, paladin.definition.unlocks.Select(u => u.abilityId).ToArray(), "The unlocks are the bar, in order.");
-            Assert.AreEqual("og-censure", paladin.definition.unlocks.Last().talentId, "Censure is the talent action.");
+            Assert.AreEqual("og-censure", paladin.definition.unlocks.First(u => u.abilityId == "paladin.censure").talentId, "Censure is the talent action.");
             Assert.AreEqual(content.abilities.Length, ids.Count, "No duplicate ability ids.");
             Assert.AreEqual(7, content.AllClasses().Count(), "Warrior, Druid, Paladin, Ranger, Mage, Rogue, Archivist.");
         }

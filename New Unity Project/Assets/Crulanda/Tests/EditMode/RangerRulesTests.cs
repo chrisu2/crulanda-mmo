@@ -53,7 +53,7 @@ namespace Crulanda.Tests
             var ids = new HashSet<string>(content.abilities.Select(a => a.id));
             foreach (var id in RangerKit.BarIds) Assert.IsTrue(ids.Contains(id), id + " is in the ability catalog.");
             CollectionAssert.AreEqual(RangerKit.BarIds, ranger.definition.unlocks.Select(u => u.abilityId).ToArray(), "The unlocks are the bar, in order.");
-            Assert.AreEqual("pf-pin", ranger.definition.unlocks.Last().talentId, "Pin is the talent action.");
+            Assert.AreEqual("pf-pin", ranger.definition.unlocks.First(u => u.abilityId == "ranger.pin").talentId, "Pin is the talent action.");
             Assert.AreEqual(content.abilities.Length, ids.Count, "No duplicate ability ids.");
             Assert.AreEqual(7, content.AllClasses().Count(), "Warrior, Druid, Paladin, Ranger, Mage, Rogue, Archivist.");
         }

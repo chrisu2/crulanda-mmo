@@ -32,7 +32,7 @@ namespace Crulanda.Encounter
             new[] { "druid.seedling", "druid.quickbloom", "druid.verdant_ward", "druid.burst_bloom" },
             new[] { "druid.seedshot", "druid.thornbolt", "druid.briar_snare", "druid.bramblestorm" }
         };
-        static readonly string[] UtilityIds = { "druid.swiftroot", "druid.stillroot" };
+        static readonly string[] UtilityIds = { "druid.swiftroot", "druid.stillroot", "druid.sleep_of_the_wood" };
         public const int PoolCap = 100, MaxFang = 5, ShiftCost = 25, HealRange = 25;
         static readonly Color[] FormTint = { new Color(.45f, .33f, .2f), new Color(.78f, .55f, .2f), new Color(.35f, .68f, .38f), new Color(.3f, .55f, .6f) };
         /// <summary>How a form changes the figure (the wardrobe line-up shows the same): its build, as the Body's scale.</summary>
@@ -85,10 +85,10 @@ namespace Crulanda.Encounter
         public void GainGlimmer(int n) { Glimmer = Clamp(Glimmer + n, PoolCap); }
 
         // ---------- action bar ----------
-        public override int ActionCount { get { return 10; } }
+        public override int ActionCount { get { return 11; } }   // the eleventh, on the minus key: Sleep of the Wood (CC_DESIGN section 2)
         public override AbilityDefinition ActionAt(int slot)
         {
-            string id = slot < 4 ? ShiftIds[slot] : slot < 8 ? FormIds[(int)Form][slot - 4] : slot < 10 ? UtilityIds[slot - 8] : null;
+            string id = slot < 4 ? ShiftIds[slot] : slot < 8 ? FormIds[(int)Form][slot - 4] : slot < 11 ? UtilityIds[slot - 8] : null;
             return id != null && abilities.TryGetValue(id, out var a) ? a : null;
         }
         public override string ActionLockLabel(int slot)
@@ -126,6 +126,7 @@ namespace Crulanda.Encounter
                 case "druid.bramblestorm": return Bramblestorm(a);
                 case "druid.swiftroot": return Swiftroot(a);
                 case "druid.stillroot": return Stillroot(a);
+                case "druid.sleep_of_the_wood": return SleepOfTheWood(a);
             }
             return false;
         }
@@ -399,6 +400,16 @@ namespace Crulanda.Encounter
         {
             if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
             return Start(a, () => { if (s.LandsOn(t, a.range)) t.Slow(.4f, a.duration); });
+        }
+        /// <summary>Sleep of the Wood (CC_DESIGN section 2): a 1.5 s cast, the target sleeps 25 s in any form; damage wakes it.</summary>
+        bool SleepOfTheWood(AbilityDefinition a)
+        {
+            if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
+            return Start(a, () => {
+                if (!s.LandsOn(t, a.range)) return;
+                string why = t.Apply("incap", s.Player, a.duration);
+                s.Message(why == null ? "Sleep of the Wood: " + t.actor.DisplayName + " sleeps." : t.actor.DisplayName + ": " + why + ".");
+            });
         }
         bool Stillroot(AbilityDefinition a)
         {

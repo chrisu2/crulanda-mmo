@@ -48,7 +48,7 @@ namespace Crulanda.Tests
         [UnityTest] public IEnumerator Druid_is_a_separate_character_with_its_own_save()
         {
             Assert.AreEqual("class.druid", session.ClassDef.id); Assert.AreEqual("class.druid", session.Progress.classId);
-            Assert.AreEqual(DruidForm.Thornsong, Druid.Form); Assert.AreEqual(10, session.ActionCount);
+            Assert.AreEqual(DruidForm.Thornsong, Druid.Form); Assert.AreEqual(11, session.ActionCount); Assert.AreEqual("druid.sleep_of_the_wood", session.ActionAt(10).id);
             Assert.AreEqual("Active", session.ActionLockLabel(3)); Assert.IsNull(session.ActionLockLabel(0));
             Assert.AreEqual("Level 6", session.ActionLockLabel(9), "Stillroot unlocks at level 6.");
             session.Save();

@@ -41,6 +41,28 @@ namespace Crulanda.Encounter
         public override string[] ImplementedTalents { get { return ImplementedIds; } }
         int R(string id) { return s.TalentRank(id); }
 
+        // ---------- crowd control (CC_DESIGN section 2, 2026-10-08) ----------
+        /// <summary>Shield Bash: stops the target's blow and silences it 3 s (an interrupt).</summary>
+        bool ShieldBash(AbilityDefinition a)
+        {
+            if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
+            return s.StartAbility(a, () => {
+                if (!s.Player.IsAlive || !s.LandsOn(t, a.range)) return;
+                s.BeginAutoAttack(); t.Receive(Mathf.Max(1, Mathf.RoundToInt(a.power + s.WeaponDamage * .3f)), s.Player);
+                string why = t.Apply("silence", s.Player, a.duration); if (why != null) s.Message(t.actor.DisplayName + ": " + why + ".");
+            }) == AbilityStartResult.Started;
+        }
+        /// <summary>Shout: every mob within 8 m flees for 6 s (three hits end a fear).</summary>
+        bool Shout(AbilityDefinition a)
+        {
+            return s.StartAbility(a, () => {
+                if (!s.Player.IsAlive) return; int n = 0;
+                foreach (var e in s.Enemies.ToArray())
+                    if (e != null && e.actor.IsAlive && !e.Game && !e.Hidden && Vector3.Distance(e.transform.position, s.Player.transform.position) <= 8 && e.Apply("fear", s.Player, a.duration) == null) n++;
+                s.Message(n == 0 ? "Your shout frightens no one." : "Your shout sends " + n + (n == 1 ? " running." : " of them running."));
+            }) == AbilityStartResult.Started;
+        }
+
         // ---------- action bar ----------
         public override int ActionCount { get { return loadout.Count; } }
         public override AbilityDefinition ActionAt(int slot) { return loadout.At(slot); }
@@ -54,6 +76,8 @@ namespace Crulanda.Encounter
         public override bool Use(int slot)
         {
             var a = loadout.At(slot);
+            if (a != null && a.id == "ability.shield_bash") return ShieldBash(a);   // crowd control (CC_DESIGN section 2)
+            if (a != null && a.id == "ability.shout") return Shout(a);
             bool needsEnemy = a.effect == AbilityEffect.Damage || a.effect == AbilityEffect.Taunt || a.effect == AbilityEffect.Breach;
             if (needsEnemy && !s.RequireEnemyInRange(a.range)) return false;
             if (a.effect == AbilityEffect.Breach && Pressure < 1) { s.Message("Build weapon pressure with Strike first."); return false; }

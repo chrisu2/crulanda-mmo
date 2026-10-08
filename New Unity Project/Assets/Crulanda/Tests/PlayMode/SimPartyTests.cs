@@ -48,6 +48,22 @@ namespace Crulanda.Tests
             pop.Refresh(); Assert.NotNull(pop.Find(s.id), s.name + " stands in Oakhaven"); return s;
         }
 
+        /// <summary>CC_DESIGN section 3: a sim Rogue in a fight of two puts the moon on the one that isn't your target and holds it.</summary>
+        [UnityTest] public IEnumerator A_sim_Rogue_marks_and_holds_the_moon()
+        {
+            var a = session.Enemies.First(e => e != null && e.actor.IsAlive && e.Camp && !e.Elite && !e.Game && !e.Hidden &&
+                session.Enemies.Any(o => o != null && o != e && o.actor.IsAlive && o.Camp && !o.Elite && !o.Game && !o.Hidden && Vector3.Distance(o.transform.position, e.transform.position) < 12));
+            var b = session.Enemies.Where(o => o != null && o != a && o.actor.IsAlive && o.Camp && !o.Elite && !o.Game && !o.Hidden).OrderBy(o => Vector3.Distance(o.transform.position, a.transform.position)).First();
+            var s = Willing("class.rogue"); Assert.AreEqual("class.rogue", s.classId); yield return null;
+            Assert.IsNull(session.InviteRefusal(s)); Assert.IsTrue(session.Invite(s.id), "joins"); var c = session.PartySim(s.id);
+            session.Player.GetComponent<AdventurerMotor>().Teleport(a.transform.position + Vector3.back * 6); yield return null;
+            c.GetComponent<UnityEngine.AI.NavMeshAgent>().Warp(session.Player.transform.position + Vector3.right * 2);
+            session.Select(a); string me = session.Player.EntityId.Value; a.threat.Add(me, 50); b.threat.Add(me, 50);
+            EncounterEnemy moon = null; float t = 0;
+            while (t < 5 && (moon == null || !moon.Incapacitated)) { a.threat.Add(me, 1); b.threat.Add(me, 1); moon = session.Enemies.FirstOrDefault(e => e != null && e.RaidMarked == RaidMark.Moon); t += Time.deltaTime; yield return null; }
+            Assert.NotNull(moon, "a moon is marked"); Assert.AreNotEqual(a, moon, "not on your target"); Assert.IsTrue(moon.Incapacitated, "and held");
+            Assert.IsFalse(a.Incapacitated, "your target is left to fight");
+        }
         [UnityTest] public IEnumerator A_sim_joins_follows_and_leaves_again()
         {
             var s = Willing(); yield return null;

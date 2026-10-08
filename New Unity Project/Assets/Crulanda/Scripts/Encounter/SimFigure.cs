@@ -33,7 +33,7 @@ namespace Crulanda.Encounter
         float until, nextAct, nextHeal, stuckSince, workUntil, downSince, lastTrade, healAt; int pick, goal; Renderer[] renderers; Transform corpse;
         EncounterSession Session { get { return population.Session; } }
         public bool Walking { get { return agent != null && agent.isOnNavMesh && !agent.isStopped && agent.remainingDistance > agent.stoppingDistance + .1f; } }
-        public bool Melee { get { return sim.classId == "class.warrior" || sim.classId == "class.paladin"; } }
+        public bool Melee { get { return sim.classId == "class.warrior" || sim.classId == "class.paladin" || sim.classId == "class.rogue"; } }
         public bool Healer { get { return sim.classId == "class.druid" || sim.classId == "class.paladin"; } }
         public string Doings
         {
@@ -241,7 +241,7 @@ namespace Crulanda.Encounter
                 visual?.CastRelease();
                 var hand = visual != null ? visual.RightHandle : null; var from = hand != null ? hand.position : transform.position + Vector3.up * 1.3f;
                 bool arrow = sim.classId == "class.ranger";
-                var colour = sim.classId == "class.mage" ? new Color(1, .55f, .15f) : sim.classId == "class.druid" ? new Color(.45f, .85f, .3f) : new Color(.9f, .88f, .8f);
+                var colour = sim.classId == "class.mage" ? new Color(1, .55f, .15f) : sim.classId == "class.druid" ? new Color(.45f, .85f, .3f) : sim.classId == "class.archivist" ? new Color(.6f, .8f, 1) : new Color(.9f, .88f, .8f);
                 Bolt.Fire(from, q.transform, colour, arrow ? .1f : .18f, arrow ? .22f : .28f, arrow);
             }
             q.Receive(dmg, actor);

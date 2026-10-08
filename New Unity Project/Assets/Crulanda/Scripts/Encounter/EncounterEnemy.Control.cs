@@ -4,6 +4,8 @@ using Crulanda.Gameplay;
 
 namespace Crulanda.Encounter
 {
+    /// <summary>Raid marks (Docs/CC_DESIGN.md section 3): skull, kill first; moon and cross, held by crowd control, left alone.</summary>
+    public enum RaidMark { None, Skull, Moon, Cross }
     /// <summary>
     /// Crowd control on a mob (Docs/CC_DESIGN.md section 1, step C1; Chris 2026-10-08: "we don't have any CC classes yet"):
     /// - "incap" (a hex, a sleep, a trap, a sap): out of the fight, no swings, no calls; any damage breaks it;
@@ -64,6 +66,10 @@ namespace Crulanda.Encounter
             return null;
         }
         float lostUntil;
+        /// <summary>Its raid mark (Ctrl+1 skull, Ctrl+2 moon, Ctrl+3 cross, Ctrl+4 clears; one mob a mark).</summary>
+        public RaidMark RaidMarked { get; set; }
+        /// <summary>What the party's helpers (sims, Mira, the Ranger's companion) don't hit: a held mob, or one marked moon or cross.</summary>
+        public bool LeaveAlone { get { return Incapacitated || RaidMarked == RaidMark.Moon || RaidMarked == RaidMark.Cross; } }
         /// <summary>Lets a hold or a fear go early (an Archivist binding another mob).</summary>
         public void Release() { incapUntil = 0; fearUntil = 0; }
         /// <summary>A Rogue's Vanish: this mob forgets <paramref name="who"/> (its threat on them is gone) and doesn't notice them again

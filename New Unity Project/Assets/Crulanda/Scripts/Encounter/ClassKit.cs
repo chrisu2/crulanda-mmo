@@ -42,6 +42,8 @@ namespace Crulanda.Encounter
         { return victim == null || !victim.IsAlive ? 0 : victim.GetComponent<Combatant>().Damage(raw); }
         public virtual float PartyDamageMultiplier(EncounterEnemy enemy) { return 1; }
         public virtual float CompanionHaste { get { return 0; } }
+        /// <summary>Metres off the range at which mobs notice you (the Archivist's Quiet Step).</summary>
+        public virtual float NoticeShrink { get { return 0; } }
         /// <summary>Extra HUD line under the resource bar (e.g. weapon pressure, current form pool).</summary>
         public virtual string StatusLine { get { return null; } }
         /// <summary>Extra target-frame text (e.g. EXPOSED 2.1s, Rooted).</summary>

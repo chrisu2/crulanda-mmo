@@ -1691,6 +1691,25 @@ def a_echo_jar(c):
 ABILITIES.update({'archivist.shard_note': ('#1e2a3a', a_shard_note), 'archivist.lull': ('#1e2040', a_lull), 'archivist.hush': ('#26283a', a_hush),
                   'archivist.echo_bind': ('#281e3c', a_echo_bind), 'archivist.cadence': ('#3a3418', a_cadence), 'archivist.dirge': ('#1e1e2e', a_dirge),
                   'archivist.echo_jar': ('#3a1e2a', a_echo_jar)})
+# Per-class crowd control (2026-10-08, CC_DESIGN section 2).
+def a_ash_hex(c):
+    c.back(c.ell(50, 50, 38), '#ff7a2a', .4, 12); c.part(c.ell(50, 58, 22, 30), '#5a5050', 'matte')
+    for x, y in ((40, 40), (60, 46), (48, 70)): c.glow(c.ell(x, y, 4), '#ff6a20', halo=5, power=.6)
+def a_rebuke(c):
+    c.back(c.ell(50, 50, 38), '#e0b040', .4, 10); m_shield(c, '#e0b040', '#efe6cf')
+    for x, y in ((22, 22), (78, 22), (50, 10)): c.spark(x, y, 8, '#fff0b0', .9)
+def a_snare_trap(c):
+    c.part(c.ell(50, 64, 34, 14), '#5a4630', 'matte')
+    for i in range(7): x = 22 + i * 9.3; c.part(c.poly([(x - 4, 64), (x, 40), (x + 4, 64)]), '#c8ccd2', 'metal')
+ABILITIES.update({'mage.ash_hex': ('#3a2418', a_ash_hex), 'paladin.rebuke': ('#3a3a2a', a_rebuke), 'ranger.snare_trap': ('#2a3a22', a_snare_trap)})
+def a_shield_bash(c):
+    c.back(c.ell(50, 50, 38), '#70c0f0', .4, 10); m_shield(c, '#8fb8e8', '#efe6cf'); c.spark(80, 20, 10, '#ffffff', .9)
+def a_shout(c):
+    rings(c, 40, 50, (20, 30, 40), '#ff7a4a', .8, a0=-60, a1=60, w=4.5); c.part(c.ell(28, 50, 12, 16), '#e0b080', 'soft')
+ABILITIES.update({'ability.shield_bash': ('#24406a', a_shield_bash), 'ability.shout': ('#6a2420', a_shout)})
+def a_sleep_wood(c):
+    c.back(c.ell(50, 50, 40), '#2c4424', .5, 14); m_leaf(c, '#62c84a', '#b0e86a'); m_moon(c, '#e0e8ff', '#ffffff')
+ABILITIES.update({'druid.sleep_of_the_wood': ('#1e3420', a_sleep_wood)})
 KIND_TRIM = dict(passive='#c9ccd2', modifier='#e0b040', active='#fff0b0', signature='#fff0b0', capstone='#ffd040')
 def draw_talent(c, icon, branch, kind, k):
     """k: how many earlier talents in the branch used the same icon word (0 = first)."""

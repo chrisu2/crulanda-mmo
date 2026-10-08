@@ -17,7 +17,7 @@
      "name": "Quick Hush",
      "tier": 0,
      "col": 1,
-     "max": 2,
+     "max": 3,
      "req": null,
      "kind": "passive",
      "icon": "clock",
@@ -32,7 +32,7 @@
      "name": "Long Hush",
      "tier": 0,
      "col": 2,
-     "max": 2,
+     "max": 3,
      "req": null,
      "kind": "passive",
      "icon": "note",
@@ -47,15 +47,15 @@
      "name": "Still Air",
      "tier": 1,
      "col": 0,
-     "max": 2,
+     "max": 3,
      "req": null,
      "kind": "passive",
      "icon": "wind",
-     "desc": "Mobs within 6 m of you cast 5% slower per rank.",
+     "desc": "A hushed mob is also slowed 20% per rank for 5 seconds.",
      "emphasis": {
       "control": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "sv-vow",
@@ -66,41 +66,41 @@
      "req": null,
      "kind": "passive",
      "icon": "chain",
-     "desc": "Hush also stops the mob calling for help.",
+     "desc": "Hush also stuns for 1 second.",
      "emphasis": {
       "control": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "sv-quiet-step",
      "name": "Quiet Step",
      "tier": 2,
      "col": 1,
-     "max": 2,
+     "max": 3,
      "req": null,
      "kind": "passive",
      "icon": "wind",
-     "desc": "Mobs notice you 1 m closer per rank.",
+     "desc": "Mobs notice you 1 metre closer per rank.",
      "emphasis": {
       "control": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "sv-no-word",
      "name": "No Word",
      "tier": 2,
      "col": 2,
-     "max": 1,
+     "max": 2,
      "req": null,
      "kind": "passive",
      "icon": "skull",
-     "desc": "A hushed mob takes 10% more damage.",
+     "desc": "A silenced mob takes 5% more damage from your party per rank.",
      "emphasis": {
       "control": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "sv-silence",
@@ -111,11 +111,11 @@
      "req": null,
      "kind": "capstone",
      "icon": "moon",
-     "desc": "Hush silences every mob within 6 m of the target.",
+     "desc": "Hush silences every mob within 6 metres of the target.",
      "emphasis": {
       "control": 1
      },
-     "impl": false
+     "impl": true
     }
    ]
   },
@@ -161,7 +161,7 @@
      "name": "Soft Voice",
      "tier": 1,
      "col": 2,
-     "max": 2,
+     "max": 3,
      "req": null,
      "kind": "passive",
      "icon": "clock",
@@ -169,22 +169,22 @@
      "emphasis": {
       "control": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "lu-wide",
      "name": "Wide Lull",
-     "tier": 2,
+     "tier": 1,
      "col": 0,
-     "max": 1,
+     "max": 2,
      "req": null,
      "kind": "passive",
      "icon": "wind",
-     "desc": "Lull reaches 8 m around the target.",
+     "desc": "Lull reaches 1 metre further around the target per rank.",
      "emphasis": {
       "control": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "lu-fourth",
@@ -199,22 +199,22 @@
      "emphasis": {
       "control": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "lu-dreams",
      "name": "Dreams",
      "tier": 2,
      "col": 2,
-     "max": 2,
+     "max": 3,
      "req": null,
      "kind": "passive",
      "icon": "heart",
-     "desc": "Sleepers heal 2% a second per rank (keeps a pull fresh for later).",
+     "desc": "Lull costs 5 less Mana per rank.",
      "emphasis": {
       "control": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "lu-mesmer",
@@ -225,11 +225,11 @@
      "req": null,
      "kind": "capstone",
      "icon": "eye",
-     "desc": "Echo Bind takes a boss for 6 seconds.",
+     "desc": "Echo Bind on a boss stuns it for 4 seconds instead of failing.",
      "emphasis": {
       "control": 1
      },
-     "impl": false
+     "impl": true
     }
    ]
   },
@@ -275,22 +275,22 @@
      "name": "Chorus",
      "tier": 1,
      "col": 2,
-     "max": 2,
+     "max": 3,
      "req": null,
      "kind": "passive",
      "icon": "note",
-     "desc": "Cadence also makes the party hit 2% harder per rank.",
+     "desc": "While you sing Cadence, your party hits 2% harder per rank.",
      "emphasis": {
       "control": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "ar-low-dirge",
      "name": "Low Dirge",
      "tier": 2,
      "col": 0,
-     "max": 2,
+     "max": 3,
      "req": null,
      "kind": "passive",
      "icon": "drop",
@@ -298,7 +298,7 @@
      "emphasis": {
       "control": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "ar-second-jar",
@@ -309,11 +309,11 @@
      "req": null,
      "kind": "passive",
      "icon": "flask",
-     "desc": "Echo-jar holds two cries (two uses).",
+     "desc": "Echo-jar's cooldown is 30 seconds shorter.",
      "emphasis": {
       "control": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "ar-catalogue",
@@ -324,11 +324,11 @@
      "req": null,
      "kind": "passive",
      "icon": "gear",
-     "desc": "Shard Note on a held mob doesn't break the hold.",
+     "desc": "Shard Note hits a silenced or fleeing mob 25% harder.",
      "emphasis": {
       "control": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "ar-original",
@@ -339,11 +339,11 @@
      "req": null,
      "kind": "capstone",
      "icon": "star",
-     "desc": "Once a fight, sing every mob within 10 m to sleep for 8 seconds.",
+     "desc": "The Original Song: the first Lull of each fight takes every mob within 10 metres of the target.",
      "emphasis": {
       "control": 1
      },
-     "impl": false
+     "impl": true
     }
    ]
   }

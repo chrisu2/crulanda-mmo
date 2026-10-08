@@ -18,6 +18,8 @@ namespace Crulanda.Tests
             CollectionAssert.AreEqual(a.Select(s => s.name).ToArray(), b.Select(s => s.name).ToArray(), "the same seed gives the same twenty");
             Assert.AreNotEqual(string.Join(",", a.Select(s => s.name)), string.Join(",", c.Select(s => s.name)), "another seed gives others");
             foreach (var id in SimRoster.ClassIds) Assert.GreaterOrEqual(a.Count(s => s.classId == id), 3, id);
+            CollectionAssert.AreEqual(SimRoster.Generate(7).Take(40).Select(s => s.classId).ToArray(), a.Take(40).Select(s => s.classId).ToArray());
+            Assert.AreEqual(5, a.Count(s => s.classId == "class.rogue")); Assert.AreEqual(5, a.Count(s => s.classId == "class.archivist"));
             foreach (var s in a)
             {
                 var home = SimRoster.Homes.First(h => h.zone == s.homeZone);
@@ -40,7 +42,7 @@ namespace Crulanda.Tests
             Assert.IsFalse(SimRoster.Grow(old), "grown once");
             Assert.IsTrue(SimGuilds.Assign(old)); var first = old.sims.Select(s => s.guild).ToArray();
             Assert.IsFalse(SimGuilds.Assign(old), "assigned once"); CollectionAssert.AreEqual(first, old.sims.Select(s => s.guild).ToArray());
-            Assert.That(old.sims.Count(s => s.guild != ""), Is.InRange(16, 36), "about two in three in a guild");
+            Assert.That(old.sims.Count(s => s.guild != ""), Is.InRange(SimRoster.Count * 2 / 5, SimRoster.Count * 9 / 10), "about two in three in a guild");
             foreach (var s in old.sims) Assert.IsTrue(s.guild == "" || SimGuilds.Exists(s.guild), s.guild);
             var seen = new System.Collections.Generic.HashSet<string>();
             for (int seed = 1; seed <= 10; seed++) { var w = new WorldSave { seed = seed, sims = SimRoster.Generate(seed) }; SimGuilds.Assign(w); foreach (var s in w.sims) seen.Add(s.guild); }

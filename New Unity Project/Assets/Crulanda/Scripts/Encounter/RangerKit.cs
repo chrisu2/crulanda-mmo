@@ -22,7 +22,7 @@ namespace Crulanda.Encounter
             "bb-thick-coat", "bb-sharp-teeth", "bb-mending-bond", "bb-sic-fury", "bb-pack-sense", "bb-howl", "bb-alpha",
             "pf-fleet", "pf-tangling-snare", "pf-pin", "pf-keen-eye", "pf-cover-of-leaves", "pf-trapper", "pf-pathfinder"
         };
-        public static readonly string[] BarIds = { "ranger.quick_shot", "ranger.aimed_shot", "ranger.barbed_arrow", "ranger.hunters_mark", "ranger.snare", "ranger.call_companion", "ranger.sic", "ranger.disengage", "ranger.pin" };
+        public static readonly string[] BarIds = { "ranger.quick_shot", "ranger.aimed_shot", "ranger.barbed_arrow", "ranger.hunters_mark", "ranger.snare", "ranger.call_companion", "ranger.sic", "ranger.disengage", "ranger.pin", "ranger.snare_trap" };
         public const float BowRange = 25, MarkBonus = .1f, DisengageLeap = 6;
 
         readonly Dictionary<string, AbilityDefinition> abilities = new Dictionary<string, AbilityDefinition>(StringComparer.Ordinal);
@@ -91,6 +91,7 @@ namespace Crulanda.Encounter
                 case "ranger.sic": return Sic(a);
                 case "ranger.disengage": return Disengage(a);
                 case "ranger.pin": return Pin(a);
+                case "ranger.snare_trap": return SnareTrap(a);
             }
             return false;
         }
@@ -165,7 +166,7 @@ s.Bolt(t, new Color(.9f, .88f, .8f), .1f, true); s.BeginAutoAttack(); Hit(t, Sho
             if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
             return Start(a, () => {
                 if (!s.LandsOn(t, a.range)) return;
-s.Bolt(t, new Color(.9f, .88f, .8f), .1f, true); Hit(t, Shot(a.power + s.WeaponDamage * .3f)); t.Root(a.duration + R("pf-trapper"));
+s.Bolt(t, new Color(.9f, .88f, .8f), .1f, true); Hit(t, Shot(a.power + s.WeaponDamage * .3f)); t.Root(a.duration + R("pf-trapper")); t.Apply("silence", s.Player, 2);
                 s.Message("Pin: the target is held where it stands.");
             });
         }
@@ -201,7 +202,36 @@ s.Bolt(t, new Color(.9f, .88f, .8f), .1f, true); Hit(t, Shot(a.power + s.WeaponD
         }
 
         // ---------- per frame / lifecycle ----------
-        public override void Tick(bool inCombat) { periodic.Tick(Now); }
+        public override void Tick(bool inCombat) { periodic.Tick(Now); TickTrap(); }
+        GameObject trap; float trapUntil, trapHold;
+        /// <summary>Snare Trap (CC_DESIGN section 2): set at your feet for a minute; the first mob to step in is held 20 s (damage breaks it).</summary>
+        bool SnareTrap(AbilityDefinition a)
+        {
+            return Start(a, () => {
+                if (trap != null) UnityEngine.Object.Destroy(trap);
+                trap = GameObject.CreatePrimitive(PrimitiveType.Cylinder); trap.name = "Snare trap";
+                UnityEngine.Object.Destroy(trap.GetComponent<Collider>());
+                trap.transform.position = s.Player.transform.position + Vector3.up * .03f; trap.transform.localScale = new Vector3(1.1f, .03f, 1.1f);
+                var mr = trap.GetComponent<Renderer>(); mr.material.color = new Color(.35f, .27f, .18f);
+                trapUntil = Time.time + 60; trapHold = a.duration;
+                s.Message("Snare Trap set: the first to step in is held " + a.duration + " seconds.");
+            });
+        }
+        /// <summary>The trap's teeth: the first living mob within 1.4 m of it.</summary>
+        public bool TrapSet { get { return trap != null; } }
+        void TickTrap()
+        {
+            if (trap == null) return;
+            if (Time.time > trapUntil) { UnityEngine.Object.Destroy(trap); trap = null; return; }
+            foreach (var e in s.Enemies)
+            {
+                if (e == null || !e.actor.IsAlive || e.Game || e.Hidden) continue;
+                var d = e.transform.position - trap.transform.position; d.y = 0; if (d.magnitude > 1.4f) continue;
+                string why = e.Apply("incap", s.Player, trapHold);
+                s.Message(why == null ? "Snare Trap: " + e.actor.DisplayName + " is caught." : e.actor.DisplayName + " springs the trap: " + why + ".");
+                UnityEngine.Object.Destroy(trap); trap = null; return;
+            }
+        }
         public override void ResetState()
         {
             resetting = true; periodic.Clear(); resetting = false;

@@ -54,6 +54,27 @@ namespace Crulanda.Tests
             e.Receive(1, session.Player);
             Assert.AreEqual("Immune (too soon)", e.Apply("incap", session.Player, 20), "a third time: no");
         }
+        [UnityTest] public IEnumerator Marks_are_one_a_mob_and_the_party_leaves_moon_and_held_alone()
+        {
+            var a = Mob(); var b = session.Enemies.First(e => e != null && e != a && e.actor.IsAlive && e.Camp && !e.Elite && !e.Game && !e.Hidden); yield return null;
+            session.Select(a); session.MarkTarget(RaidMark.Skull); Assert.AreEqual(RaidMark.Skull, a.RaidMarked); Assert.IsFalse(a.LeaveAlone);
+            session.Select(b); session.MarkTarget(RaidMark.Skull); Assert.AreEqual(RaidMark.None, a.RaidMarked, "one skull"); Assert.AreEqual(RaidMark.Skull, b.RaidMarked);
+            session.Select(a); session.MarkTarget(RaidMark.Moon); Assert.IsTrue(a.LeaveAlone, "moon: leave it be");
+            session.MarkTarget(RaidMark.None); Assert.IsFalse(a.LeaveAlone);
+            Assert.IsNull(a.Apply("incap", session.Player, 10)); Assert.IsTrue(a.LeaveAlone, "held: leave it be");
+        }
+        [UnityTest] public IEnumerator The_Warrior_bashes_and_shouts()
+        {
+            Assert.AreEqual("class.warrior", session.ClassDef.id, "a fresh character is a Warrior");
+            session.Progress.experience = EncounterProgress.XpForLevel(10); session.Player.SetLevel(10); session.Player.Resource.Pool.SetCurrent(100);
+            var e = Mob(); session.Player.GetComponent<AdventurerMotor>().Teleport(e.transform.position + Vector3.back * 2); session.Select(e);
+            int bash = -1, shout = -1;
+            for (int i = 0; i < session.Kit.ActionCount; i++) { var x = session.Kit.ActionAt(i); if (x.id == "ability.shield_bash") bash = i; if (x.id == "ability.shout") shout = i; }
+            Assert.IsTrue(bash >= 0 && shout >= 0, "both on the bar");
+            Assert.IsTrue(session.UseAbility(bash), "Shield Bash"); yield return null; Assert.IsTrue(e.Silenced);
+            yield return new WaitForSeconds(1.6f);
+            Assert.IsTrue(session.UseAbility(shout), "Shout"); yield return null; Assert.IsTrue(e.Feared);
+        }
         [UnityTest] public IEnumerator A_boss_takes_no_hold()
         {
             yield return null;

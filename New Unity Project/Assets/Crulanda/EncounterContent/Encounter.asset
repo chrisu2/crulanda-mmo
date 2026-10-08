@@ -844,6 +844,78 @@ MonoBehaviour:
     globalCooldown: 1.5
     duration: 6
     statusId: 
+  - id: mage.ash_hex
+    name: Ash Hex
+    description: "A 1.5-second cast: a person or beast turned to smouldering ash for 25 seconds. Damage breaks it; one at a time."
+    effect: 4
+    power: 0
+    cost: 20
+    cooldown: 0
+    range: 25
+    castTime: 1.5
+    globalCooldown: 1.5
+    duration: 25
+    statusId: 
+  - id: paladin.rebuke
+    name: Rebuke
+    description: "The shield's edge: the target is stunned 4 seconds. Damage doesn't break it."
+    effect: 4
+    power: 6
+    cost: 15
+    cooldown: 30
+    range: 5
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 4
+    statusId: 
+  - id: ranger.snare_trap
+    name: Snare Trap
+    description: "Set a trap at your feet for a minute: the first mob to step in is held 20 seconds. Damage breaks it."
+    effect: 4
+    power: 0
+    cost: 15
+    cooldown: 30
+    range: 0
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 20
+    statusId: 
+  - id: ability.shield_bash
+    name: Shield Bash
+    description: "A blow with the shield's face: stops the target's blow and silences it 3 seconds."
+    effect: 4
+    power: 4
+    cost: 10
+    cooldown: 12
+    range: 3.2
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 3
+    statusId:
+  - id: ability.shout
+    name: Shout
+    description: "A war-shout: every mob within 8 metres flees for 6 seconds. Three hits end a fear."
+    effect: 4
+    power: 0
+    cost: 15
+    cooldown: 45
+    range: 0
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 6
+    statusId:
+  - id: druid.sleep_of_the_wood
+    name: Sleep of the Wood
+    description: "A 1.5-second cast: the target sleeps 25 seconds, in any form. Damage wakes it."
+    effect: 4
+    power: 0
+    cost: 20
+    cooldown: 0
+    range: 25
+    castTime: 1.5
+    globalCooldown: 1.5
+    duration: 25
+    statusId:
   playerClass:
     id: class.warrior
     displayName: Warrior
@@ -880,6 +952,12 @@ MonoBehaviour:
     - abilityId: ability.muster
       level: 1
       talentId: sp-muster
+    - abilityId: ability.shield_bash
+      level: 4
+      talentId:
+    - abilityId: ability.shout
+      level: 7
+      talentId:
   talentTree: {fileID: 4900000, guid: 91ec937a34a741efaaf03d29334b12f6, type: 3}
   additionalClasses:
   - definition:
@@ -966,6 +1044,9 @@ MonoBehaviour:
       - abilityId: druid.stillroot
         level: 6
         talentId: 
+      - abilityId: druid.sleep_of_the_wood
+        level: 6
+        talentId: 
     talentTree: {fileID: 4900000, guid: 457f191fd7564f54a95742e419040cb1, type: 3}
   - definition:
       id: class.paladin
@@ -1012,6 +1093,9 @@ MonoBehaviour:
       - abilityId: paladin.censure
         level: 1
         talentId: og-censure
+      - abilityId: paladin.rebuke
+        level: 6
+        talentId: 
     talentTree: {fileID: 4900000, guid: ae359ffc02cb42b486625e88fc47b2f5, type: 3}
   - definition:
       id: class.ranger
@@ -1058,6 +1142,9 @@ MonoBehaviour:
       - abilityId: ranger.pin
         level: 1
         talentId: pf-pin
+      - abilityId: ranger.snare_trap
+        level: 6
+        talentId: 
     talentTree: {fileID: 4900000, guid: 1505a72df549418f89ae19b5f1d96eda, type: 3}
   - definition:
       id: class.mage
@@ -1104,6 +1191,9 @@ MonoBehaviour:
       - abilityId: mage.quench
         level: 1
         talentId: sb-quench
+      - abilityId: mage.ash_hex
+        level: 6
+        talentId: 
     talentTree: {fileID: 4900000, guid: 317285d9fd0e47d3845a82d3780fa675, type: 3}
   - definition:
       id: class.rogue

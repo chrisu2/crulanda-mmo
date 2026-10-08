@@ -9,8 +9,8 @@ namespace Crulanda.Encounter
     public static class EncounterInput
     {
         /// <summary>Action-bar key for a slot: 1-9 then 0 (slot index 9), matching the HUD labels.</summary>
-        public static KeyCode SlotKey(int slot) { return slot == 9 ? KeyCode.Alpha0 : (KeyCode)((int)KeyCode.Alpha1 + slot); }
-        public static string SlotLabel(int slot) { return slot == 9 ? "0" : (slot + 1).ToString(); }
+        public static KeyCode SlotKey(int slot) { return slot == 10 ? KeyCode.Minus : slot == 9 ? KeyCode.Alpha0 : (KeyCode)((int)KeyCode.Alpha1 + slot); }
+        public static string SlotLabel(int slot) { return slot == 10 ? "-" : slot == 9 ? "0" : (slot + 1).ToString(); }
         /// <summary>True while you type in the chat (EncounterHud.DrawChat): no key moves you or works the bar.</summary>
         public static bool Typing;
         public static bool Press(KeyCode key)
@@ -47,6 +47,7 @@ namespace Crulanda.Encounter
                 case KeyCode.Alpha8: return k.digit8Key.wasPressedThisFrame;
                 case KeyCode.Alpha9: return k.digit9Key.wasPressedThisFrame;
                 case KeyCode.Alpha0: return k.digit0Key.wasPressedThisFrame;
+                case KeyCode.Minus: return k.minusKey.wasPressedThisFrame;   // the eleventh slot (2026-10-08)
                 case KeyCode.Space: return k.spaceKey.wasPressedThisFrame;
                 case KeyCode.Slash: return k.slashKey.wasPressedThisFrame || k.numpadDivideKey.wasPressedThisFrame;   // the run toggle
             }

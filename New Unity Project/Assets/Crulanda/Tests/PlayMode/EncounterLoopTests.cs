@@ -224,12 +224,16 @@ namespace Crulanda.Tests
             var motor = session.Player.GetComponent<AdventurerMotor>();
             foreach (var enemy in session.Enemies)
             {
+                // Since round 30 Mira counts as a member of your group (Chris: "she should be same as me"), so these mobs have twice
+                // the health and hit 45% harder: each fight is about 40 s and a fresh Warrior starts each one rested, as a player would.
+                session.Player.Health.ApplyHealing(session.Player.Health.Pool.Max);
                 motor.Teleport(enemy.transform.position + Vector3.back * 2.5f);
                 session.Select(enemy);
                 float fightStarted = Time.time;
-                float deadline = Time.time + 45;
+                float deadline = Time.time + 120; int potions = 3;   // the veteran (an elite at twice its health) wants them: this old test bed isn't loaded by the game
                 while (enemy.actor.IsAlive && session.Player.IsAlive && Time.time < deadline)
                 {
+                    if (session.Player.Health.Pool.Ratio < .3f && potions-- > 0) session.Player.Health.ApplyHealing(session.Player.Health.Pool.Max / 2);
                     // Tank like a player would: without Challenge, Mira's healing threat can legitimately pull the
                     // sentry out of melee reach (seen when fight timings shift), which is aggro behavior, not a bug.
                     session.UseAbility(0); session.UseAbility(1); session.UseAbility(2);

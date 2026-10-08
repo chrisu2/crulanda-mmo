@@ -74,7 +74,7 @@ menders; the Rail Hall's waves want stuns and a trap. With CC in, the dungeon ge
 tuned so a group without CC struggles and a group that uses it doesn't.
 
 ## 6. Build order
-0. **The engine and the two classes come first** (Chris: a CC class); the per-class CC follows. Status 2026-10-08: C1 done; the Rogue and the Archivist playable (sims, pick-lock and their own looks still to do); C3 (marks, sims using CC) next.
+0. **The engine and the two classes come first** (Chris: a CC class); the per-class CC follows. Status 2026-10-08: C1 done; the Rogue and the Archivist playable (sims, pick-lock and their own looks still to do); C3 marks done (Ctrl+1-4; helpers leave held and moon/cross mobs alone); sims as Rogues and Archivists, sims using CC, and the per-class CC next.
 1. **C1 the engine:** the states, the breaks, the diminishing returns, the immunities, threat on release; tests.
 2. **C2 the abilities:** one CC and one interrupt per class, on the action bars, with their looks; Mira's Hush.
 3. **C3 marks and sims:** the keys and markers; sims using CC and interrupts and marking on a sim-led run.

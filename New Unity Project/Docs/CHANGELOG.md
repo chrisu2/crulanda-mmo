@@ -1681,3 +1681,35 @@ A read-only review by five reviewers, each finding checked by a second who tried
 - Talents: the Silent Vow, the Lull and the Archive, 7 each, 6 implemented (Quick Hush, Long Hush, Deep Sleep, Unsong, Resonance,
   A Fuller Jar). Unsong: a sleeper woken by damage is slowed by half for 6 s. Its own icons; play it from the pause menu.
 - Tests: ArchivistRulesTests, ArchivistLoopTests.
+
+## 2026-10-08 — Raid marks and a party that leaves your crowd control alone (CC step C3, first part)
+- Ctrl+1 skull, Ctrl+2 moon, Ctrl+3 cross on your target, Ctrl+4 clears (one mob a mark); the mark shows above its name.
+- Party sims go for the skull first; sims, Mira's bolt and the Ranger's companion leave a held mob, a moon and a cross alone, so a
+  Sap, a Lull or an Echo Bind isn't broken by your own party. Tests: CrowdControlTests (marks).
+- Still to come in C3: sims marking a pull and putting their own CC on the moon.
+
+## 2026-10-08 — Crowd control for the first five classes (CC step C2)
+- Mage: Ash Hex (slot 0, level 6): a 1.5 s cast, a person or beast held as smouldering ash 25 s, one at a time; Quench now also
+  silences 4 s (an interrupt).
+- Paladin: Rebuke (slot 0, level 6): a 4 s stun, which works on bosses; Censure now also silences 3 s.
+- Ranger: Snare Trap (slot 0, level 6): set at your feet for a minute, the first mob to step in is held 20 s; Pin now also silences 2 s.
+- Warrior: Shield Bash (level 4): silences 3 s; Shout (level 7): every mob within 8 m flees 6 s.
+- Not yet: the Druid's Sleep of the Wood (its ten slots are full; it needs a place on the bar), Mira's Hush, Turn the Unmade.
+
+## 2026-10-08 — Sims as Rogues and Archivists, holding the moon (CC step C3)
+- The world has fifty sims: the forty as before, and ten more, five Rogues and five Archivists, spread over the bands (an old world
+  gains them, as it gained the second twenty). Rogues fight in melee in leather; Archivists at range in cloth with a pale note.
+- In your party, a sim Rogue or Archivist in a fight of two or more holds the moon 20 s: the one you marked, or else it marks one that
+  isn't the skull or your target, and says so in Party ("lulling moon", "Moon is held. Leave it be."). Every 25 s at most; never a boss.
+- Tests: SimRosterTests (fifty, the first forty unchanged), SimPartyTests (a sim Rogue marks and holds the moon).
+- The Druid: Sleep of the Wood (level 6) on a new eleventh slot, the minus key: a 1.5 s cast, the target sleeps 25 s in any form.
+- EncounterLoopTests: since round 30 Mira counts as a member of your group, so the tutorial sentries have twice the health and hit 45%
+  harder (fights about 40 s, up from 21); the test now rests the Warrior before each fight and allows 120 s.
+
+## 2026-10-08 — The Rogue's and the Archivist's talent trees complete (21 of 21 each)
+- Every talent now works, ranks set so each row's gate (5 points a row) can be reached and both capstones bought. Talents that named
+  things the game doesn't have yet (locks, wards, mob spell casts) now say what they do today. Highlights: Thief's Grace (once a fight
+  a blow that would drop you misses), Cut Deep (a five-point Eviscerate bleeds), Shard Poison, Light Fingers (a Sap lifts coins), The
+  Hum (Kick stuns 1 s); the Great Silence (Hush silences everything within 6 m), Mesmer (Echo Bind stuns a boss), Chorus (Cadence makes
+  the party hit harder), Quiet Step (mobs notice you closer), the Original Song (the first Lull of a fight takes everything within 10 m).
+- Chris (2026-10-08): fights of about 40 s with Mira counted as a member are "not too long"; the balance stays.

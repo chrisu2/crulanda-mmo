@@ -775,6 +775,9 @@ namespace Crulanda.Encounter
                 }
                 // Level-coloured names (grey, green, yellow, orange, red by how the enemy compares to you).
                 Outlined(new Rect(a.x - 150, a.y - 25, 300, 22), p.name, plateText, target ? gold : ConColor(p.e.actor.Level));
+                if (p.e.RaidMarked != RaidMark.None)   // the raid mark above the name (CC step C3)
+                    Outlined(new Rect(a.x - 150, a.y - 45, 300, 22), p.e.RaidMarked == RaidMark.Skull ? "[ SKULL ]" : p.e.RaidMarked == RaidMark.Moon ? "( MOON )" : "< CROSS >", plateText,
+                        p.e.RaidMarked == RaidMark.Skull ? Color.white : p.e.RaidMarked == RaidMark.Moon ? new Color(.6f, .8f, 1) : new Color(1, .4f, .35f));
                 Fill(new Rect(a.x - 66, a.y - 1, 132, 8), new Color(0, 0, 0, .75f));
                 Bar(new Rect(a.x - 65, a.y, 130, 6), p.e.actor.Health.Pool.Ratio, new Color(.8f, .3f, .25f), "");
                 return;

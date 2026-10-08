@@ -17,7 +17,7 @@
      "name": "Long Sap",
      "tier": 0,
      "col": 1,
-     "max": 2,
+     "max": 3,
      "req": null,
      "kind": "passive",
      "icon": "hand",
@@ -32,11 +32,11 @@
      "name": "Quiet Hands",
      "tier": 0,
      "col": 2,
-     "max": 1,
+     "max": 2,
      "req": null,
      "kind": "passive",
      "icon": "moon",
-     "desc": "After Vanish mobs lose sight of you for 10 seconds instead of 6.",
+     "desc": "After Vanish, mobs lose sight of you 4 seconds longer per rank.",
      "emphasis": {
       "control": 1
      },
@@ -55,22 +55,22 @@
      "emphasis": {
       "control": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "tg-second-sap",
      "name": "Second Sap",
      "tier": 1,
      "col": 2,
-     "max": 1,
+     "max": 3,
      "req": null,
      "kind": "passive",
      "icon": "chain",
-     "desc": "Sap can hold a second mob at once.",
+     "desc": "Sap costs 5 less Focus per rank.",
      "emphasis": {
       "control": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "tg-shadow-shift",
@@ -85,22 +85,22 @@
      "emphasis": {
       "control": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "tg-pickpocket",
      "name": "Light Fingers",
      "tier": 2,
      "col": 2,
-     "max": 1,
+     "max": 2,
      "req": null,
      "kind": "passive",
      "icon": "hand",
-     "desc": "Pick a sapped mob's pocket for a few coins.",
+     "desc": "A Sap lifts a few coins from the mob's pocket; more per rank.",
      "emphasis": {
       "control": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "tg-graces-end",
@@ -115,7 +115,7 @@
      "emphasis": {
       "control": 1
      },
-     "impl": false
+     "impl": true
     }
    ]
   },
@@ -165,11 +165,11 @@
      "req": null,
      "kind": "passive",
      "icon": "drop",
-     "desc": "Your swings sometimes leave a burning shard in the wound.",
+     "desc": "Each swing has a 10% chance per rank to leave a burning shard in the wound.",
      "emphasis": {
       "control": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "sw-quick-blades",
@@ -184,7 +184,7 @@
      "emphasis": {
       "control": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "sw-relentless",
@@ -195,11 +195,11 @@
      "req": null,
      "kind": "passive",
      "icon": "spiral",
-     "desc": "A finisher returns Focus per combo point spent.",
+     "desc": "Eviscerate gives back 4 Focus per combo point spent, per rank.",
      "emphasis": {
       "control": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "sw-spent-shards",
@@ -210,11 +210,11 @@
      "req": null,
      "kind": "passive",
      "icon": "crystal",
-     "desc": "Eviscerate on a held mob doesn't break the hold.",
+     "desc": "Eviscerate hits a stunned, silenced or fleeing mob 30% harder.",
      "emphasis": {
       "control": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "sw-cut-deep",
@@ -225,11 +225,11 @@
      "req": null,
      "kind": "capstone",
      "icon": "drop",
-     "desc": "Your critical strikes bleed.",
+     "desc": "A five-point Eviscerate leaves the wound bleeding for 8 seconds.",
      "emphasis": {
       "control": 1
      },
-     "impl": false
+     "impl": true
     }
    ]
   },
@@ -245,7 +245,7 @@
      "name": "Quick Kick",
      "tier": 0,
      "col": 1,
-     "max": 2,
+     "max": 3,
      "req": null,
      "kind": "passive",
      "icon": "clock",
@@ -275,37 +275,37 @@
      "name": "Feel the Pins",
      "tier": 1,
      "col": 0,
-     "max": 1,
+     "max": 3,
      "req": null,
      "kind": "passive",
      "icon": "gear",
-     "desc": "Pick locks: open the Adit's locked gates and chests.",
+     "desc": "Gouge costs 5 less Focus per rank.",
      "emphasis": {
       "control": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "lk-ward-break",
      "name": "Ward-break",
      "tier": 1,
      "col": 2,
-     "max": 2,
+     "max": 3,
      "req": null,
      "kind": "passive",
      "icon": "shield",
-     "desc": "Kick also breaks a caster's ward.",
+     "desc": "Kick hits 50% harder per rank.",
      "emphasis": {
       "control": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "lk-tumblers",
      "name": "Tumblers",
      "tier": 2,
      "col": 1,
-     "max": 2,
+     "max": 3,
      "req": null,
      "kind": "passive",
      "icon": "gear",
@@ -313,7 +313,7 @@
      "emphasis": {
       "control": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "lk-hum",
@@ -324,11 +324,11 @@
      "req": null,
      "kind": "passive",
      "icon": "note",
-     "desc": "You hear a mob's blow coming: Kick also stuns 1 second.",
+     "desc": "Kick also stuns for 1 second.",
      "emphasis": {
       "control": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "lk-vibration",
@@ -339,11 +339,11 @@
      "req": null,
      "kind": "capstone",
      "icon": "bolt",
-     "desc": "A Kick on a casting mob silences it twice as long.",
+     "desc": "Kick silences twice as long.",
      "emphasis": {
       "control": 1
      },
-     "impl": false
+     "impl": true
     }
    ]
   }

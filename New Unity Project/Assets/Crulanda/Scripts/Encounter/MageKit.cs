@@ -23,7 +23,7 @@ namespace Crulanda.Encounter
             "hw-cinders", "hw-slow-burn", "hw-wide-field", "hw-embers-underfoot", "hw-heat-haze", "hw-long-burn", "hw-firestorm",
             "sb-reservoir", "sb-ward-weave", "sb-quench", "sb-shared-flame", "sb-steady-mind", "sb-quickening", "sb-binding-oath"
         };
-        public static readonly string[] BarIds = { "mage.ember_bolt", "mage.scorch", "mage.flare", "mage.cinder_field", "mage.smoulder", "mage.ember_ward", "mage.bind", "mage.unbind", "mage.quench" };
+        public static readonly string[] BarIds = { "mage.ember_bolt", "mage.scorch", "mage.flare", "mage.cinder_field", "mage.smoulder", "mage.ember_ward", "mage.bind", "mage.unbind", "mage.quench", "mage.ash_hex" };
         public const int MaxHeat = 100, FlareMinHeat = 30, EmberHeat = 15, ScorchHeat = 10, SmoulderHeat = 5;
         public const float OverloadBurn = .08f, OverloadSeconds = 4, HeatKept = 10, BoundLoss = .4f, UnbindBonus = .15f;
 
@@ -110,6 +110,7 @@ namespace Crulanda.Encounter
                 case "mage.bind": return Bind(a);
                 case "mage.unbind": return Unbind(a);
                 case "mage.quench": return Quench(a);
+                case "mage.ash_hex": return AshHex(a);
             }
             return false;
         }
@@ -200,13 +201,25 @@ namespace Crulanda.Encounter
                 if (R("hw-firestorm") > 0 && InField(t)) { t.Root(2); s.Message("Firestorm: the target is held in the burning ground."); }
             });
         }
+        EncounterEnemy hexed;
+        /// <summary>Ash Hex (CC_DESIGN section 2): a person or beast turned to smouldering ash for 25 s; damage breaks it; one at a time.</summary>
+        bool AshHex(AbilityDefinition a)
+        {
+            if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
+            return Start(a, () => {
+                if (!s.LandsOn(t, a.range)) return;
+                if (hexed != null && hexed != t && hexed.Incapacitated) hexed.Release();
+                string why = t.Apply("incap", s.Player, a.duration);
+                if (why == null) { hexed = t; s.Message("Ash Hex: " + t.actor.DisplayName + " stands as smouldering ash."); } else s.Message(t.actor.DisplayName + ": " + why + ".");
+            });
+        }
         bool Quench(AbilityDefinition a)
         {
             if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
             return Start(a, () => {
                 if (!s.LandsOn(t, a.range)) return;
                 s.Bolt(t, new Color(.6f, .85f, 1), .16f);
-                Hit(t, Dmg(a.power + Level)); t.Stagger(a.duration);
+                Hit(t, Dmg(a.power + Level)); t.Stagger(a.duration); t.Apply("silence", s.Player, 4);   // an interrupt (CC_DESIGN section 2)
                 overloadedUntil = 0;
                 s.Message("Quench: the target's swing is held back for " + a.duration + " seconds; your own heat is steadied.");
             });

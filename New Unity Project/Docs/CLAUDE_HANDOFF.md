@@ -9,7 +9,17 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-10-08) — round 29 PUBLISHED (commit c8f57a4)
+## RESUME HERE (updated 2026-10-08, evening) — crowd control: engine, Rogue, Archivist, marks, per-class CC
+**Chris (2026-10-08): "we need CC classes"; "archivist and rogue both sound good"; "keep working".** Docs/CC_DESIGN.md is the plan.
+**Done:** C1 engine (EncounterEnemy.Control: incap/stun/fear/silence, DR, boss immunity, LoseSight, Release, RaidMarked/LeaveAlone);
+the Rogue (RogueKit, published 0ea8958) and the Archivist (ArchivistKit, 1ee87c5), each a separate character from the pause menu;
+raid marks Ctrl+1-4 with sims/Mira/the wolf leaving held and moon/cross mobs alone; per-class CC (Mage Ash Hex, Paladin Rebuke,
+Ranger Snare Trap on slot 0; Warrior Shield Bash and Shout; Quench/Censure/Pin silence).
+**Next:** sims as Rogues and Archivists (SimRoster.ClassIds: keep the first forty as they are, add the new classes after), sims putting
+CC on the moon and marking sim-led pulls, the Druid's Sleep of the Wood (its bar is full), Mira's Hush, C4 visuals, C5 the Adit
+re-tuned around CC and deepened; then the Medieval Village Kit, dungeon D2-D8. Chris is low on tokens: focused test runs only.
+
+## Earlier resume note (2026-10-08) — round 29 PUBLISHED (commit c8f57a4)
 **Playable build = round 29: cap 15, bands 1-5/5-9/9-12/12-15/13-15, slower XP (save format 10), the Shore a group zone, the Sealed Adit open (D1).** All tests green.
 **Next:** the wardrobe capture of the 25 helmets for Chris (note 88); the Medieval Village Kit import (ROADMAP); dungeon D2-D8. Chris is low on tokens: one careful pass, focused test runs.
 

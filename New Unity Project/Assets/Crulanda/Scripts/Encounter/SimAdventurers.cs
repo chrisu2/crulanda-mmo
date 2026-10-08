@@ -61,9 +61,10 @@ namespace Crulanda.Encounter
     /// <summary>Makes, reads and writes the roster.</summary>
     public static class SimRoster
     {
-        public const int Count = 40;   // round 27 (sims item 6): forty, the second twenty mostly at the higher levels
+        public const int Count = 50;   // round 27: forty; 2026-10-08: ten more, the Rogues and Archivists (the first forty unchanged)
         public const string Slot = "world";
-        public static readonly string[] ClassIds = { "class.warrior", "class.druid", "class.paladin", "class.ranger", "class.mage" };
+        public static readonly string[] ClassIds = { "class.warrior", "class.druid", "class.paladin", "class.ranger", "class.mage", "class.rogue", "class.archivist" };
+        static readonly string[] FirstFive = { "class.warrior", "class.druid", "class.paladin", "class.ranger", "class.mage" };
         /// <summary>Home zones by level band (WORLD_ZONES.md): the village for the low levels, the Shore for the cap.</summary>
         public static readonly (string zone, string folk, int lo, int hi)[] Homes = {
             ("zone.oakhaven", "Oakhaven folk", 1, 5), ("zone.khaven", "Khaven folk", 5, 9), ("zone.peaks", "Peaks folk", 9, 12), ("zone.ashrim", "Rim folk", 12, 15), ("zone.verdant", "Shore folk", 13, 15) };   // round 29 bands
@@ -78,7 +79,7 @@ namespace Crulanda.Encounter
             var r = new SeededRandom(seed); var sims = new List<SimAdventurer>(Count); var used = new HashSet<string>();
             for (int i = 0; i < Count; i++)
             {
-                var s = new SimAdventurer { id = "sim." + (i + 1).ToString("00"), classId = ClassIds[i % ClassIds.Length] };
+                var s = new SimAdventurer { id = "sim." + (i + 1).ToString("00"), classId = i < 40 ? FirstFive[i % FirstFive.Length] : ClassIds[5 + i % 2] };
                 // Levels: a spread over the bands, more at the bottom where the player starts (1-5: 8, 4-8: 5, 7-10: 3, 9-12: 2, 11-13: 2).
                 int band = i < 8 ? 0 : i < 13 ? 1 : i < 16 ? 2 : i < 18 ? 3 : i < 20 ? 4 : (i - 20) % 5;   // the second twenty: four a band (12/9/7/6/6 in all)
                 var home = Homes[band];

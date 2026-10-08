@@ -49,7 +49,7 @@ namespace Crulanda.Tests
         {
             Assert.AreEqual("class.mage", session.ClassDef.id); Assert.AreEqual("class.mage", session.Progress.classId);
             Assert.AreEqual(Crulanda.Core.ResourceKind.Mana, session.ClassDef.resource);
-            Assert.AreEqual(9, session.Kit.ActionCount); Assert.AreEqual("mage.quench", session.Kit.ActionAt(Quench).id);
+            Assert.AreEqual(10, session.Kit.ActionCount); Assert.AreEqual("mage.quench", session.Kit.ActionAt(Quench).id);
             Assert.AreEqual("Talent", session.Kit.ActionLockLabel(Quench)); Assert.AreEqual("Level 2", session.Kit.ActionLockLabel(Flare));
             Level10();
             Assert.AreEqual("Heat 30", session.Kit.ActionLockLabel(Flare), "Flare waits on Heat."); Assert.AreEqual("No Charge", session.Kit.ActionLockLabel(Unbind));
@@ -58,6 +58,14 @@ namespace Crulanda.Tests
             yield return null;
         }
 
+        [UnityTest] public IEnumerator Ash_Hex_holds_one_at_a_time()
+        {
+            Level10(); var a = session.Enemies.Find(x => x != null && x.actor.IsAlive && !x.Elite && !x.Game); var b = session.Enemies.Find(x => x != null && x != a && x.actor.IsAlive && !x.Elite && !x.Game); Assert.NotNull(b);
+            Near(a, 12); Assert.IsTrue(session.UseAbility(9), "Ash Hex"); yield return new WaitForSeconds(1.8f);
+            Assert.IsTrue(a.Incapacitated, "hexed");
+            Near(b, 12); Assert.IsTrue(session.UseAbility(9), "again"); yield return new WaitForSeconds(1.8f);
+            Assert.IsTrue(b.Incapacitated); Assert.IsFalse(a.Incapacitated, "one at a time");
+        }
         [UnityTest] public IEnumerator Ember_Bolt_is_cast_builds_Heat_and_Flare_releases_it()
         {
             Level10(); var e = Foe(); Near(e, 12);

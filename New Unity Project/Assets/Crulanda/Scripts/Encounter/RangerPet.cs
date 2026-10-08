@@ -60,7 +60,7 @@ namespace Crulanda.Encounter
             EncounterEnemy best = null; float bestD = 25;
             foreach (var e in session.Enemies)
             {
-                if (e == null || !e.FightingParty) continue;
+                if (e == null || !e.FightingParty || e.LeaveAlone) continue;
                 float d = Vector3.Distance(transform.position, e.transform.position); if (d < bestD) { bestD = d; best = e; }
             }
             if (best != null) Hunt(best, 1);

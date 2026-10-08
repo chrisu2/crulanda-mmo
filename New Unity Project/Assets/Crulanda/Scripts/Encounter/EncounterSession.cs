@@ -1122,6 +1122,14 @@ namespace Crulanda.Encounter
         /// <summary>Where the player last stood on dry ground (saves use it if you are in the water).</summary>
         Vector3 lastDry;
         public int TalentRank(string id) { return TalentTree.Rank(Progress, id); }
+        /// <summary>Puts a raid mark on your target (a mark is on one mob at a time; None clears the target's).</summary>
+        public void MarkTarget(RaidMark mark)
+        {
+            var t = Target; if (t == null || !t.actor.IsAlive) { Message("Mark what? Target a mob first."); return; }
+            if (mark != RaidMark.None) foreach (var e in Enemies) if (e != null && e != t && e.RaidMarked == mark) e.RaidMarked = RaidMark.None;
+            t.RaidMarked = mark;
+            Message(mark == RaidMark.None ? t.actor.DisplayName + ": mark cleared." : mark + " on " + t.actor.DisplayName + (mark == RaidMark.Skull ? ": kill it first." : ": leave it be."));
+        }
         public bool CanEditBuild { get { return Player != null && Player.IsAlive && !Paused && !InCombat; } }
         public bool ChangeTalent(string id, int delta)
         {
@@ -1633,8 +1641,9 @@ namespace Crulanda.Encounter
             if (EncounterInput.Press(KeyCode.H)) Hail();   // playtest note 83
             TickInvite();   // a sim's invitation lapses after thirty seconds (round 27)
 
-            for (int slot = 0; slot < ActionCount; slot++)
-                if (!BuildOpen && slot < 10 && EncounterInput.Press(EncounterInput.SlotKey(slot))) UseAbility(slot);
+            bool marking = EncounterInput.Sneak;   // Ctrl+1-4: raid marks on your target (CC step C3); Ctrl alone still sneaks
+            for (int slot = 0; slot < (marking ? 4 : ActionCount); slot++)
+                if (!BuildOpen && slot < 11 && EncounterInput.Press(EncounterInput.SlotKey(slot))) { if (marking) MarkTarget((RaidMark)((slot + 1) % 4)); else UseAbility(slot); }
             Kit.Tick(InCombat);
             if (AutoAttack && !Kit.MeleeAutoAttacks && !Kit.RangedAutoAttacks) AutoAttack = false;
             // The swing in melee, or the bow's auto-shot at its range (the Ranger: ClassKit.RangedAutoAttacks).

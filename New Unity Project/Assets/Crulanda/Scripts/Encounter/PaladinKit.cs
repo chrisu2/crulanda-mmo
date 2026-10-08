@@ -22,7 +22,7 @@ namespace Crulanda.Encounter
             "ju-zeal", "ju-righteous-rhythm", "ju-weighted-judgement", "ju-burning-light", "ju-swift-verdict", "ju-executioner", "ju-crusade",
             "sa-devotion", "sa-light-of-dawn", "sa-grace", "sa-aegis-of-faith", "sa-beacon", "sa-mercy", "sa-sanctuary"
         };
-        public static readonly string[] BarIds = { "paladin.smite", "paladin.oath", "paladin.mend", "paladin.ward", "paladin.judgement", "paladin.consecrate", "paladin.lay_on", "paladin.aegis", "paladin.censure" };
+        public static readonly string[] BarIds = { "paladin.smite", "paladin.oath", "paladin.mend", "paladin.ward", "paladin.judgement", "paladin.consecrate", "paladin.lay_on", "paladin.aegis", "paladin.censure", "paladin.rebuke" };
         public const int MaxConviction = 3, HealRange = 25;
         public const float WardMultiplier = .6f, ConsecrateRadius = 5;
         const float ConvictionKept = 10;
@@ -84,6 +84,7 @@ namespace Crulanda.Encounter
                 case "paladin.lay_on": return LayOn(a);
                 case "paladin.aegis": return Aegis(a);
                 case "paladin.censure": return Censure(a);
+                case "paladin.rebuke": return Rebuke(a);
             }
             return false;
         }
@@ -150,12 +151,22 @@ namespace Crulanda.Encounter
                 if (pips >= MaxConviction && R("ju-swift-verdict") > 0) s.Player.Resource.Pool.Change(10);
             });
         }
+        /// <summary>Rebuke (CC_DESIGN section 2): the shield's edge, a 4 s stun; damage doesn't break it; bosses take it too.</summary>
+        bool Rebuke(AbilityDefinition a)
+        {
+            if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
+            return Start(a, () => {
+                if (!s.LandsOn(t, a.range)) return;
+                s.BeginAutoAttack(); Hit(t, Dmg(a.power));
+                string why = t.Apply("stun", s.Player, a.duration); if (why != null) s.Message(t.actor.DisplayName + ": " + why + ".");
+            });
+        }
         bool Censure(AbilityDefinition a)
         {
             if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
             return Start(a, () => {
                 if (!s.LandsOn(t, a.range)) return;
-                s.BeginAutoAttack(); Hit(t, Dmg(a.power + s.WeaponDamage * .4f)); t.Stagger(a.duration);
+                s.BeginAutoAttack(); Hit(t, Dmg(a.power + s.WeaponDamage * .4f)); t.Stagger(a.duration); t.Apply("silence", s.Player, 3);   // an interrupt
                 s.Message("Censure: the target's swing is held back for " + a.duration + " seconds.");
             });
         }

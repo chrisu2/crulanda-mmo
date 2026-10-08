@@ -37,7 +37,10 @@ namespace Crulanda.Encounter
         public Vector3? Leading { get; private set; }
         public string LeadingName { get; private set; }
         float nextTaunt;
-        public bool Melee { get { return sim.classId == "class.warrior" || sim.classId == "class.paladin"; } }
+        public bool Melee { get { return sim.classId == "class.warrior" || sim.classId == "class.paladin" || sim.classId == "class.rogue"; } }
+        /// <summary>A Rogue or an Archivist (CC_DESIGN section 3): holds the moon in a fight of two or more.</summary>
+        public bool Controller { get { return sim.classId == "class.rogue" || sim.classId == "class.archivist"; } }
+        float nextHold;
         public bool Healer { get { return sim.classId == "class.druid" || sim.classId == "class.paladin"; } }
         public float Reach { get { return Melee ? 2.4f : 20; } }
         public float Interval { get { return Melee ? 2.0f : 2.4f; } }
@@ -99,18 +102,20 @@ namespace Crulanda.Encounter
                     EncounterEnemy peel = null; float peelD = 30;
                     foreach (var e in session.Enemies)
                     {
-                        if (e == null || !e.actor.IsAlive || !e.FightingParty || e.Victim == null || e.Victim == actor) continue;
+                        if (e == null || !e.actor.IsAlive || !e.FightingParty || e.LeaveAlone || e.Victim == null || e.Victim == actor) continue;
                         var vc = e.Victim.GetComponent<SimCompanion>(); if (vc != null && vc.Role == PartyRole.Tank) continue;
                         float d = Vector3.Distance(e.transform.position, transform.position); if (d < peelD) { peel = e; peelD = d; }
                     }
                     if (peel != null) return peel;
                 }
+                foreach (var e in session.Enemies)   // the skull first (CC step C3)
+                    if (e != null && e.RaidMarked == RaidMark.Skull && e.actor.IsAlive && e.FightingParty && !e.Incapacitated && Vector3.Distance(e.transform.position, transform.position) < 30) return e;
                 var t = session.Target;
-                if (t != null && t.actor.IsAlive && !t.Game && (t.FightingParty || session.AutoAttack)) return t;
+                if (t != null && t.actor.IsAlive && !t.Game && !t.LeaveAlone && (t.FightingParty || session.AutoAttack)) return t;
                 EncounterEnemy best = null; float bestD = 30;
                 foreach (var e in session.Enemies)
                 {
-                    if (e == null || !e.actor.IsAlive || !e.FightingParty) continue;
+                    if (e == null || !e.actor.IsAlive || !e.FightingParty || e.LeaveAlone) continue;
                     float d = Vector3.Distance(e.transform.position, transform.position); if (d < bestD) { best = e; bestD = d; }
                 }
                 if (best == null && Leading.HasValue && Vector3.Distance(transform.position, Leading.Value) < 18)
@@ -124,6 +129,32 @@ namespace Crulanda.Encounter
                 }
                 return best;
             }
+        }
+        /// <summary>
+        /// A sim Rogue or Archivist in a fight with two or more mobs on the party: the moon (marked by you, or else by it on a mob that
+        /// isn't the skull or your target) is held 20 s, and it says so in Party. Every 25 s at most; never a boss.
+        /// </summary>
+        void HoldTheMoon()
+        {
+            nextHold = Time.time + 2;
+            int fighting = 0; EncounterEnemy moon = null, pick = null; float far = 0;
+            foreach (var e in session.Enemies)
+            {
+                if (e == null || !e.actor.IsAlive || !e.FightingParty) continue;
+                fighting++;
+                if (e.RaidMarked == RaidMark.Moon) moon = e;
+                else if (e.RaidMarked == RaidMark.None && e != session.Target && !e.Controlled && !(e.Elite && e.Move != null && e.Move.boss))
+                { float d = Vector3.Distance(e.transform.position, transform.position); if (d > far) { far = d; pick = e; } }
+            }
+            if (fighting < 2) return;
+            bool marked = false;
+            if (moon == null && pick != null) { moon = pick; moon.RaidMarked = RaidMark.Moon; marked = true; }
+            if (moon == null || moon.Incapacitated || Vector3.Distance(moon.transform.position, transform.position) > 25) return;
+            if (moon.Apply("incap", actor, 20) != null) { nextHold = Time.time + 6; return; }
+            nextHold = Time.time + 25;
+            bool rogue = sim.classId == "class.rogue";
+            string what = rogue ? (sim.chatty > .65f ? "gouged moon, dont touch it" : "Moon is held. Leave it be.") : (sim.chatty > .65f ? "lulling moon" : "Moon's asleep. Don't wake it.");
+            session.ChatSay(ChatChannel.Party, sim.name, marked ? (sim.chatty > .65f ? "moon on " + moon.actor.DisplayName.ToLower() + ", " + what : "Moon on the " + moon.actor.DisplayName + ". " + what) : what);
         }
         /// <summary>Leads the party to a camp of about its level (5.6, "dungeon runs"): the nearest, or an elite when the party is three
         /// or more. Returns what it heads for, or null when there is nothing fit.</summary>
@@ -275,6 +306,7 @@ namespace Crulanda.Encounter
                     StopLeading();
                 }
             }
+            if (Controller && Time.time >= nextHold) HoldTheMoon();
             if (quarry != null)
             {
                 // A tank taunts what is on someone else (5.6): the mob turns to it for a few seconds.
@@ -296,7 +328,7 @@ namespace Crulanda.Encounter
                         visual?.CastRelease();
                         var hand = visual != null ? visual.RightHandle : null; var from = hand != null ? hand.position : transform.position + Vector3.up * 1.3f;
                         bool arrow = sim.classId == "class.ranger";
-                        var colour = sim.classId == "class.mage" ? new Color(1, .55f, .15f) : sim.classId == "class.druid" ? new Color(.45f, .85f, .3f) : new Color(.9f, .88f, .8f);
+                        var colour = sim.classId == "class.mage" ? new Color(1, .55f, .15f) : sim.classId == "class.druid" ? new Color(.45f, .85f, .3f) : sim.classId == "class.archivist" ? new Color(.6f, .8f, 1) : new Color(.9f, .88f, .8f);
                         Bolt.Fire(from, quarry.transform, colour, arrow ? .1f : .18f, arrow ? .22f : .28f, arrow);
                     }
                     quarry.Receive(dmg, actor);

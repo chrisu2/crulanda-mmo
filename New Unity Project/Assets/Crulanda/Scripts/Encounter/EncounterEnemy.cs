@@ -146,7 +146,7 @@ namespace Crulanda.Encounter
             {
                 // Noticing the player: about 8 m normally, 3 m if they sneak (Ctrl), never while they are dead.
                 var motor = session.Player.GetComponent<AdventurerMotor>();
-                float notice = motor != null && motor.Sneaking ? 3 : 8;
+                float notice = Mathf.Max(1.5f, (motor != null && motor.Sneaking ? 3 : 8) - session.Kit.NoticeShrink);
                 if (session.Player.IsAlive && !EncounterSession.Unseen && Time.time >= lostUntil && Vector3.Distance(transform.position, session.Player.transform.position) < notice) Pounce();
                 return;
             }

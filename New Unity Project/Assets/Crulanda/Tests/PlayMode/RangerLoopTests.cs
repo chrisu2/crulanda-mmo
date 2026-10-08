@@ -49,7 +49,7 @@ namespace Crulanda.Tests
         {
             Assert.AreEqual("class.ranger", session.ClassDef.id); Assert.AreEqual("class.ranger", session.Progress.classId);
             Assert.AreEqual(Crulanda.Core.ResourceKind.Focus, session.ClassDef.resource);
-            Assert.AreEqual(9, session.Kit.ActionCount); Assert.AreEqual("ranger.pin", session.Kit.ActionAt(Pin).id);
+            Assert.AreEqual(10, session.Kit.ActionCount); Assert.AreEqual("ranger.pin", session.Kit.ActionAt(Pin).id);
             Assert.AreEqual("Level 2", session.Kit.ActionLockLabel(Sic)); Level10();
             Assert.AreEqual("Talent", session.Kit.ActionLockLabel(Pin)); Assert.AreEqual("No wolf", session.Kit.ActionLockLabel(Sic), "Sic waits on the wolf.");
             Assert.IsFalse(session.Kit.MeleeAutoAttacks); Assert.IsTrue(session.Kit.RangedAutoAttacks); Assert.AreEqual(RangerKit.BowRange, session.Kit.AutoAttackRange);

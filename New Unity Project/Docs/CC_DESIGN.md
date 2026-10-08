@@ -9,7 +9,25 @@ Stillroot and Briar Snare) but nothing that takes a mob out of a fight, no inter
 1. **Classic strength (pick):** long CC (20-30 s) that breaks on damage, short stuns (3-4 s) that don't. (Or modern: everything short.)
 2. **Marking with keys (pick):** Ctrl+1 skull (kill first), Ctrl+2 moon (CC), Ctrl+3 cross (second CC), Ctrl+4 clear. Sims read the marks.
    (Or a right-click menu on the target frame.)
-3. **One CC and one interrupt per class now;** a Rogue with Sap comes with Phase 9.
+3. **One CC and one interrupt per class now,** and two CC classes (section 0): the Rogue, then the Archivist.
+
+## 0. Two CC classes (Chris, 2026-10-08: "Archivist and Rogue both sound good. I love them in Crulanda")
+Both drawn from the novels (CANON roots; the kits GAME-ONLY until checked against the books), both playable and both sims.
+
+**The Rogue** (Valen's line, book 1: Thief's Grace, spent shards, vibration-locking). Melee, stealth, the classic pull-setter.
+- **Sap**: from stealth, out of combat, a person or beast held 40 s; breaks on damage. The long CC that starts a pull.
+- **Gouge**: a 4 s incapacitate in the fight (breaks on damage); **Blind**: a shard of dust in the eyes, the mob wanders 10 s.
+- **Kick**: interrupt, silences 3 s. **Vanish**: drop out of the fight into stealth. **Pick lock** (the Adit's quiet gate).
+- Damage between: combo points to a finisher. Leather, daggers. Talents: Thief's Grace (stealth, Sap), Shardwork (poisons, blind), Locksmith (vibration-locking: open locks and break a caster's ward).
+
+**The Archivist** (the Silent Pilgrims, the Original Song, echo-jars; world_bible). A song-caster: the purest CC, little damage.
+- **Lull**: a hummed line; up to three mobs within 6 m sleep 20 s; breaks on damage. **Echo Bind**: one mob held in its own echo 30 s.
+- **Hush**: interrupt and silence 5 s (the Pilgrims' vow made a weapon). **Unsong**: a mob that breaks its CC is slowed 50%.
+- Songs (one at a time, around the Archivist): **Cadence** (the party moves and swings faster), **Dirge** (enemies slowed).
+- **Echo-jar**: stores a mob's death-cry to replay as a fear on the next pull. Cloth, a staff or a bell. Talents: the Silent Vow (silences, interrupts), the Lull (sleeps, mesmerise), the Archive (echo-jars, songs).
+
+Order: the Rogue first (closer to what the game has: melee, stealth already exists as sneaking), then the Archivist. Both take a
+class slot each, a talent tree, an AI rotation for sims, looks and gear rules, as the five classes did in Phase 5.1.
 
 ## 1. The engine (on every mob)
 | State | What it does | Breaks | Length |
@@ -56,6 +74,7 @@ menders; the Rail Hall's waves want stuns and a trap. With CC in, the dungeon ge
 tuned so a group without CC struggles and a group that uses it doesn't.
 
 ## 6. Build order
+0. **The engine and the two classes come first** (Chris: a CC class); the per-class CC follows.
 1. **C1 the engine:** the states, the breaks, the diminishing returns, the immunities, threat on release; tests.
 2. **C2 the abilities:** one CC and one interrupt per class, on the action bars, with their looks; Mira's Hush.
 3. **C3 marks and sims:** the keys and markers; sims using CC and interrupts and marking on a sim-led run.

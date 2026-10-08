@@ -9,7 +9,11 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-10-08, about 00:50) — WORK IN PROGRESS, NOT PUBLISHED
+## RESUME HERE (updated 2026-10-08) — round 29 PUBLISHED (commit c8f57a4)
+**Playable build = round 29: cap 15, bands 1-5/5-9/9-12/12-15/13-15, slower XP (save format 10), the Shore a group zone, the Sealed Adit open (D1).** All tests green.
+**Next:** the wardrobe capture of the 25 helmets for Chris (note 88); the Medieval Village Kit import (ROADMAP); dungeon D2-D8. Chris is low on tokens: one careful pass, focused test runs.
+
+## Earlier resume note (2026-10-08, about 00:50) — WORK IN PROGRESS, NOT PUBLISHED
 **Playable build = round 28 (published 2026-10-07 23:35, commit 21a6b50).** The working tree holds round 29 (the cap-15 rescale) and the
 Sealed Adit's D1, committed as WIP (not green yet). Chris stopped the session ("about out of tokens").
 **State:** rescale applied (tools/wip/levels/rescale.py --write, regen_named.py --write), save format 10, the Adit zone live

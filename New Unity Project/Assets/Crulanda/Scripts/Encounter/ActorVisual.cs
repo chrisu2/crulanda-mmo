@@ -742,6 +742,15 @@ namespace Crulanda.Encounter
             // A tool held in the right hand, pointing forward like a carried hammer or axe (it swings with the arm).
             void HandTool(Material handle, float length, Material head, Vector3 headScale, float headAt = 1)
             {
+                // A long tool (the farmer's hoe) is carried upright like a staff, the hand a third of the way up the shaft, the head
+                // at the top (playtest note 95, 2026-10-08: "should not be walking like this with hoe in hand, should be like a staff").
+                if (length >= .7f)
+                {
+                    float shaft = length * 1.9f;
+                    Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.64f + shaft * .17f, .06f), new Vector3(.045f, shaft / 2, .045f), handle);
+                    if (head != null) Part(PrimitiveType.Cube, armR, new Vector3(0, -.64f + shaft * .67f, .06f + headScale.z * .4f), new Vector3(headScale.x, headScale.z, headScale.y), head);
+                    return;
+                }
                 Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.64f, length / 2 - .08f), new Vector3(.045f, length / 2, .045f), handle, new Vector3(90, 0, 0));
                 if (head != null) Part(PrimitiveType.Cube, armR, new Vector3(0, -.64f + headScale.y * .25f, (length - .08f) * headAt), headScale, head);
             }

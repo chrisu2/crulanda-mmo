@@ -1659,7 +1659,7 @@ namespace Crulanda.World
                 string model = "Megapack/Models/Buildings/Building 3Base";
                 // Stretched to the footprint and the painted barn's height, on the same stone sill and threshold (BuildingGroundTests:
                 // every building stands on stone down to the ground, every barn's door on a step at the ground).
-                if (WallProp(t, model, 90, w, h + d * .5f, d) != null)
+                if (WallProp(t, model, 270, w, h + d * .5f, d) != null)   // 270: its door to the front, over the steps (playtest note 96, "barn still looks backwards, no entrance")
                 {
                     Footing(t, w + .3f, d + .3f, .45f, .4f, 1, 1.75f);
                     float kitSill = Mathf.Clamp(DoorGround(t, 0, -d / 2 - .3f, 3.2f) + .03f, -1, .6f);

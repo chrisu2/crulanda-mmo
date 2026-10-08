@@ -21,7 +21,7 @@ namespace Crulanda.Encounter
         readonly HudMaps maps = new HudMaps();
         public static bool BlocksPointer(Vector2 point)
         {
-            var p = new Vector2(point.x * 1440 / Screen.width, (Screen.height - point.y) * 900 / Screen.height);
+            var p = ScreenToCanvas(point.x, point.y);
             return paused || buildVisible || mapVisible || QuestUiBlocks(p) || WhoUiBlocks(p) || ItemUiBlocks(p) || TradesUiBlocks(p) || LootUiBlocks(p) || p.y > 795 || new Rect(10, 10, 350, 190).Contains(p) ||
                 (targetVisible && new Rect(365, 10, 350, 130).Contains(p)) || new Rect(1215, 0, 225, 240).Contains(p) ||
                 (partySims > 0 && new Rect(10, 196, 400, 46 * partySims).Contains(p)) || chatRect.Contains(p) ||   // the chat
@@ -73,7 +73,7 @@ namespace Crulanda.Encounter
             inventoryVisible = session.InventoryOpen; paused = session.Paused; buildVisible = session.BuildOpen;
             mapVisible = session.MapOpen; targetVisible = session.Target != null || session.HasFriendlyFocus; partySims = session.PartySims.Count; whoVisible = session.WhoOpen; bookVisible = session.QuestBookOpen; talkVisible = session.Conversation != null;
             bagsVisible = session.InventoryOpen; charVisible = session.CharacterOpen; vendorVisible = session.VendorNpc != null; tradesVisible = session.TradesOpen;
-            GUI.matrix = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(Screen.width / 1440f, Screen.height / 900f, 1));
+            GUI.matrix = CanvasMatrix;   // even and centred (playtest note 94; EncounterHud.Display)
             GUI.color = Color.white;
             using (mWorld.Auto()) DrawWorldLabels();
             using (mFrames.Auto()) { DrawPlayerFrame(); DrawPartyFrame(); if (session.Target != null) DrawTargetFrame(); else if (session.HasFriendlyFocus) DrawFriendFrame(); }
@@ -484,8 +484,10 @@ namespace Crulanda.Encounter
             GUI.Label(new Rect(525, 351, 400, 35), "EXPEDITION PAUSED", heading);
             GUI.Label(new Rect(525, 398, 400, 35), "Progress autosaves out of combat.", text);
             if (controlsOpen) { DrawControls(); return; }
-            if (GUI.Button(new Rect(525, 448, 190, 44), "Resume [Esc]", button)) session.Resume();
-            if (GUI.Button(new Rect(725, 448, 190, 44), "Controls", button)) controlsOpen = true;   // key bindings (playtest note 75)
+            if (displayOpen) { DrawDisplay(); return; }
+            if (GUI.Button(new Rect(525, 448, 126, 44), "Resume [Esc]", button)) session.Resume();
+            if (GUI.Button(new Rect(657, 448, 126, 44), "Controls", button)) controlsOpen = true;
+            if (GUI.Button(new Rect(789, 448, 126, 44), "Display", button)) displayOpen = true;   // resolution, mode, UI scale (playtest note 94)   // key bindings (playtest note 75)
             GUI.enabled = !session.InCombat;
             for (int i = 0; i < others.Count; i++)
                 if (GUI.Button(new Rect(525, 504 + 48 * i, 390, 44), "Play your " + others[i].definition.displayName + " (separate character)", button)) { session.SwitchCharacter(others[i].definition.id); break; }
@@ -584,7 +586,7 @@ namespace Crulanda.Encounter
         GUIStyle centered, plateText;
         bool ToCanvas(Vector3 world, out Vector2 p)
         {
-            var s = session.View.WorldToScreenPoint(world); p = new Vector2(s.x * 1440 / Screen.width, (Screen.height - s.y) * 900 / Screen.height);
+            var s = session.View.WorldToScreenPoint(world); p = ScreenToCanvas(s.x, s.y);
             return s.z > 0 && p.x > -100 && p.x < 1540 && p.y > 0 && p.y < 900;
         }
         // Text widths and sight lines are kept (playtest note 23, fps: the nameplates and place names cost 2.2 ms a frame, measuring
@@ -703,7 +705,7 @@ namespace Crulanda.Encounter
                 {
                     if (!v.Visible) continue;
                     var root = v.transform.position; float vd = Vector3.Distance(player, root + Vector3.up * 1.3f);
-                    if (vd > 28 || !ToCanvas(root + Vector3.up * 1.3f, out var vp) || vp.x < 0 || vp.x > 1440) continue;
+                    if (vd > 28 || !ToCanvas(root + Vector3.up * 1.3f, out var vp) || !OnCanvasX(vp.x)) continue;
                     // Soft nameplates when close (name, and the trade in angle brackets beneath it), the quest marker, and speech.
                     bool named = vd < 18; char m = HeadMarker(v.Name, vd, out bool grey);
                     if (!named && m == ' ' && (v.Bubble == null || Time.time >= v.BubbleUntil)) continue;
@@ -720,7 +722,7 @@ namespace Crulanda.Encounter
                 {
                     if (f == null || f.Hidden) continue;   // inside the inn
                     var root = f.transform.position; float fd = Vector3.Distance(player, root + Vector3.up * 1.3f);
-                    if (fd > 24 || !ToCanvas(root + Vector3.up * 1.3f, out var fp) || fp.x < 0 || fp.x > 1440 || Occluded(f, root + Vector3.up * .85f)) continue;
+                    if (fd > 24 || !ToCanvas(root + Vector3.up * 1.3f, out var fp) || !OnCanvasX(fp.x) || Occluded(f, root + Vector3.up * .85f)) continue;
                     string title = Bracketed(SimRoster.ClassName(f.sim.classId) + " " + f.sim.level + (f.Activity == SimFigure.Doing.Loiter ? "" : " · " + f.Doings));
                     if (!string.IsNullOrEmpty(f.sim.guild)) title = Bracketed(f.sim.guild) + " " + SimRoster.ClassName(f.sim.classId) + " " + f.sim.level;   // round 27: the guild tag
                     float w = Mathf.Max(TextWidth(plateText, f.sim.name), TextWidth(plateText, title)) + 8;
@@ -730,7 +732,7 @@ namespace Crulanda.Encounter
             {
                 if (c == null) continue;
                 var root = c.transform.position; float cd = Vector3.Distance(player, root + Vector3.up * 1.3f);
-                if (cd > 30 || !ToCanvas(root + Vector3.up * 1.3f, out var cp) || cp.x < 0 || cp.x > 1440 || Occluded(c, root + Vector3.up * .85f)) continue;
+                if (cd > 30 || !ToCanvas(root + Vector3.up * 1.3f, out var cp) || !OnCanvasX(cp.x) || Occluded(c, root + Vector3.up * .85f)) continue;
                 string ctitle = string.IsNullOrEmpty(c.sim.guild) ? Bracketed(SimRoster.ClassName(c.sim.classId) + " " + c.sim.level + " · party") : Bracketed(c.sim.guild) + " " + SimRoster.ClassName(c.sim.classId) + " " + c.sim.level;
                 AddPlate(new Plate { dist = cd, fade = 1, top = -41, at = cp, simParty = c, named = true, name = c.sim.name, title = ctitle, mark = ' ' }, Mathf.Max(TextWidth(plateText, c.sim.name), TextWidth(plateText, ctitle)) + 8);
             }
@@ -740,7 +742,7 @@ namespace Crulanda.Encounter
             // Mira: nameplate, plus a gold ! until she has joined you (after that, whatever the quests say).
             var mira = session.Companion; if (mira == null) return;
             var head = mira.transform.position + Vector3.up * 1.4f; float md = Vector3.Distance(player, head);
-            if (md >= 45 || !ToCanvas(head, out var mp) || mp.x < 0 || mp.x > 1440 || Occluded(mira, mira.transform.position + Vector3.up * .9f)) return;
+            if (md >= 45 || !ToCanvas(head, out var mp) || !OnCanvasX(mp.x) || Occluded(mira, mira.transform.position + Vector3.up * .9f)) return;
             bool mgrey = false; char mm = session.Progress.recruited ? HeadMarker("Mira", md, out mgrey) : '!';
             AddPlate(new Plate { dist = md, fade = 1, top = -29, at = mp, mira = true, named = true, name = "Mira", mark = mm, grey = mgrey }, Mathf.Max(TextWidth(centered, "Mira"), 28) + 8);
         }
@@ -749,7 +751,7 @@ namespace Crulanda.Encounter
             if (e == null || e.Hidden) return;   // lying in wait: no nameplate
             float d = session.Distance(e); if (d > range) return;
             var (h, label) = EnemyPlate(e); var root = e.transform.position;
-            if (!ToCanvas(root + Vector3.up * h, out var ep) || ep.x < 0 || ep.x > 1440 || Occluded(e, root + Vector3.up * (h - .45f))) return;
+            if (!ToCanvas(root + Vector3.up * h, out var ep) || !OnCanvasX(ep.x) || Occluded(e, root + Vector3.up * (h - .45f))) return;
             float w = session.Target == e ? Mathf.Max(146, TextWidth(plateText, label) + 16) : Mathf.Max(130, TextWidth(plateText, label)) + 8;
             plates.Add(new Plate { dist = d, fade = 1, at = ep, e = e, name = label, shown = true, box = new Rect(ep.x - w / 2, ep.y - 25, w, 38) });
         }
@@ -817,7 +819,7 @@ namespace Crulanda.Encounter
         void PlaceName(Vector3 player, Vector3 at, string name, float reach, Color colour)
         {
             float d = Vector3.Distance(player, at);
-            if (d > reach || !ToCanvas(at, out var p) || p.x < 0 || p.x > 1440 || Occluded(name, at, 8)) return;
+            if (d > reach || !ToCanvas(at, out var p) || !OnCanvasX(p.x) || Occluded(name, at, 8)) return;
             float w = TextWidth(centered, name) + 10; var r = new Rect(p.x - w / 2, Mathf.Max(4, p.y - 14), w, 28);
             if (!Place(ref r, 40)) return;
             GUI.color = new Color(1, 1, 1, Mathf.Clamp01((reach - d) / 10));
@@ -855,7 +857,7 @@ namespace Crulanda.Encounter
                 var p = session.View.WorldToScreenPoint(f.position + Vector3.up * (1.3f - (f.expires - Time.time)));
                 if (p.z <= 0) continue;
                 GUI.contentColor = f.color;
-                GUI.Label(new Rect(p.x * 1440 / Screen.width - 45, (Screen.height - p.y) * 900 / Screen.height, 90, 38), f.text, number);
+                { var cp = ScreenToCanvas(p.x, p.y); GUI.Label(new Rect(cp.x - 45, cp.y, 90, 38), f.text, number); }
             }
             GUI.contentColor = Color.white;
         }

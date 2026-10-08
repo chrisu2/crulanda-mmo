@@ -161,6 +161,14 @@ namespace Crulanda.Encounter
                     case "/guild": if (arg.Length == 0) { GuildRoster(); return; } break;
                     case "/groster": case "/ginfo": GuildRoster(); return;
                     case "/gquit": LeaveGuild(); return;
+                    case "/adit":   // a tester's way in (Chris, 2026-10-08): level 11 and straight to the Sealed Adit's yard
+                        {
+                            var adit = Zone != null ? Zone.FindZone("zone.adit") : null; if (adit == null) { Message("The Sealed Adit is not in this build."); return; }
+                            if (Progress.Level < 11) { Progress.experience = EncounterProgress.XpForLevel(11); ApplyLevel(); Player.Health.ApplyHealing(Player.Health.Pool.Max); }
+                            Message("Level " + Progress.Level + ". Into the Sealed Adit...");
+                            TravelTo(new Crulanda.World.ZoneExit { to = "zone.adit", name = "/adit", arrive = adit.spawns.player });
+                            return;
+                        }
                     case "/help": Message("Chat: /s say, /z zone, /t trade, /lfg, /p party, /w <name> <words> whisper, /r reply; /invite <name> (anyone online, anywhere), /leave [name], /who, /friend <name>, /friends, /assist [name], /lead [name] (a sim leads a run to a camp), /dungeon (a sim leads you through the dungeon); /g guild chat, /guild (who is in it), /gquit."); return;
                     case "/s": case "/say": case "/z": case "/zone": case "/ooc": case "/t": case "/trade": case "/lfg": case "/l": case "/p": case "/party": case "/g": case "/gu": break;
                     default: Message("Unknown command " + cmd + ". /help lists them."); return;

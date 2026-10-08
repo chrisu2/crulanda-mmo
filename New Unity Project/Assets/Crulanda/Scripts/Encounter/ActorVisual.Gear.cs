@@ -15,6 +15,15 @@ namespace Crulanda.Encounter
     /// </summary>
     public sealed partial class ActorVisual
     {
+        /// <summary>Whether head pieces are drawn (Esc > Display, "Show helms"; off by default until the helms are remade, playtest note 88).
+        /// The worn helm still counts: only its look is hidden.</summary>
+        public static bool ShowHelms { get { if (AlwaysHelms) return true; try { return PlayerPrefs.GetInt("gear.showHelms", 0) == 1; } catch { return false; } } set { try { PlayerPrefs.SetInt("gear.showHelms", value ? 1 : 0); } catch { } } }
+        bool helmsShown;
+        /// <summary>The tests (in the editor) and the gear captures always draw head pieces: they are what is being checked.</summary>
+        static bool? alwaysHelms;
+        static bool AlwaysHelms { get { if (alwaysHelms == null) { var args = System.Environment.GetCommandLineArgs(); alwaysHelms = Application.isEditor || System.Array.Exists(args, x => x.Contains("wardrobe-capture") || x.Contains("loot-capture") || x.Contains("figure-capture")); } return alwaysHelms.Value; } }
+        /// <summary>The switch changed since this figure was dressed: dress it again.</summary>
+        public bool HelmsStale { get { return helmsShown != ShowHelms; } }
         static readonly int GearSlots = ItemDatabase.SlotIds.Length;
         bool gearDriven; Transform[] classHeld, classStowed;
         readonly Transform[] gearRoots = new Transform[ItemDatabase.SlotIds.Length], gearStows = new Transform[ItemDatabase.SlotIds.Length];
@@ -31,12 +40,13 @@ namespace Crulanda.Encounter
         {
             if (body == null || armR == null || armL == null || beast || core != null || looks == null) return;
             GearInit();
-            var shows = new bool[GearSlots]; var lks = new GearLook[GearSlots]; var sigs = new string[GearSlots];
+            var shows = new bool[GearSlots]; helmsShown = ShowHelms; var lks = new GearLook[GearSlots]; var sigs = new string[GearSlots];
             for (int s = 0; s < GearSlots; s++)
             {
                 var stack = equipment != null && s < equipment.Count ? equipment[s] : null;
                 var d = stack == null || stack.Empty || items == null ? null : items.Get(stack.item);
                 shows[s] = d != null && d.kind == "gear" && ItemDatabase.SlotIndex(d.slot) == s && BuildsSlot((EquipSlot)s);
+                if (s == (int)EquipSlot.Head && !ShowHelms) shows[s] = false;   // Esc > Display: helms hidden (playtest note 88, "helms still garbage")
                 lks[s] = shows[s] ? looks.Resolve(d) : default;
                 sigs[s] = shows[s] ? d.id + "|" + GearLooks.LookKey(lks[s]) : stack == null || stack.Empty ? "" : stack.item;
             }

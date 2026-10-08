@@ -13,6 +13,8 @@ namespace Crulanda.Encounter
     public sealed class GearBinder : MonoBehaviour
     {
         static GearBinder instance; static bool hooked;
+        /// <summary>Dress the player again on the next check (the Show helms switch).</summary>
+        public static void Refresh() { if (instance != null) instance.worn = new string[0]; }
         EncounterSession session; Crulanda.Gameplay.Actor dressed; string[] worn = new string[0]; float nextSearch;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]

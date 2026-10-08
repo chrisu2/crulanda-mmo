@@ -34,6 +34,13 @@ namespace Crulanda.Encounter
         static readonly string[] ModeNames = { "Fullscreen", "Borderless", "Windowed" };
         static readonly FullScreenMode[] Modes = { FullScreenMode.ExclusiveFullScreen, FullScreenMode.FullScreenWindow, FullScreenMode.Windowed };
         static List<Resolution> resolutions;
+        /// <summary>Everyone dressed again (the Show helms switch): you, your party and the sims about.</summary>
+        void RedressAll()
+        {
+            GearBinder.Refresh();
+            foreach (var c in session.PartySims) if (c != null) SimGear.Dress(c.GetComponent<ActorVisual>(), c.sim, session.Items);
+            var pop = SimPopulation.Active; if (pop != null) foreach (var f in pop.Figures) if (f != null) SimGear.Dress(f.visual, f.sim, session.Items);
+        }
         void DrawDisplay()
         {
             if (resolutions == null)
@@ -59,6 +66,8 @@ namespace Crulanda.Encounter
             float v = GUI.HorizontalSlider(new Rect(box.x + 170, box.y + 180, 200, 20), UiScale, .6f, 1.4f);
             if (Mathf.Abs(v - UiScale) > .005f) UiScale = Mathf.Round(v * 20) / 20;
             Shadow(new Rect(box.x + 382, box.y + 174, 60, 24), Mathf.RoundToInt(UiScale * 100) + "%", tiny, new Color(1, .84f, .45f));
+            bool helms = GUI.Toggle(new Rect(box.x + 260, box.y + 236, 220, 26), ActorVisual.ShowHelms, "  Show helms");
+            if (helms != ActorVisual.ShowHelms) { ActorVisual.ShowHelms = helms; RedressAll(); }
             if (GUI.Button(new Rect(box.x + 28, box.y + 230, 200, 36), "Apply resolution", button)) Screen.SetResolution(res.width, res.height, Modes[mode]);
             if (GUI.Button(new Rect(box.xMax - 128, box.y + 16, 100, 30), "Done", slim)) displayOpen = false;
             Shadow(new Rect(box.x + 28, box.y + 280, 450, 20), "The UI scale applies at once; the resolution when you apply it.", tiny, new Color(.85f, .85f, .8f));

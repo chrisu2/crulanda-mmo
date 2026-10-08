@@ -4407,7 +4407,7 @@ namespace Crulanda.World
                 {
                     int o = i * 2;
                     // A quad wholly in another cave's air is that cave's floor already (a branch's mouth in the Gallery).
-                    if (linked && Hollow.OpenInOther(h, t.TransformPoint((fv[o] + fv[o + 1] + fv[o + 2] + fv[o + 3]) / 4) + Vector3.up * .3f, 1f)) continue;   // the Gallery's floor there already (a band showed)
+                    if (linked && Hollow.OpenInOther(h, t.TransformPoint((fv[o] + fv[o + 1] + fv[o + 2] + fv[o + 3]) / 4) + Vector3.up * .3f, .8f)) continue;   // the Gallery's floor there already (a band showed)
                     ft.AddRange(new[] { o, o + 2, o + 1, o + 1, o + 2, o + 3 });
                 }
                 if (ft.Count > 2 && Vector3.Cross(fv[ft[1]] - fv[ft[0]], fv[ft[2]] - fv[ft[0]]).y < 0) for (int q = 0; q < ft.Count; q += 3) { int sw = ft[q + 1]; ft[q + 1] = ft[q + 2]; ft[q + 2] = sw; }   // facing up

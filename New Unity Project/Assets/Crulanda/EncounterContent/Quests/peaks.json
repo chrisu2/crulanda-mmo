@@ -78,7 +78,7 @@
       "giver": "Maddoc Vire",
       "turnIn": "Maddoc Vire",
       "zone": "zone.peaks",
-      "level": 6,
+      "level": 9,
       "requires": [
         "main.khaven.3"
       ],
@@ -149,7 +149,7 @@
       "giver": "Maddoc Vire",
       "turnIn": "Tarsk",
       "zone": "zone.peaks",
-      "level": 7,
+      "level": 10,
       "requires": [
         "main.peaks.1"
       ],
@@ -212,7 +212,7 @@
       "giver": "Tarsk",
       "turnIn": "Mother Vane",
       "zone": "zone.peaks",
-      "level": 8,
+      "level": 11,
       "requires": [
         "main.peaks.2"
       ],
@@ -268,7 +268,7 @@
       "giver": "Maddoc Vire",
       "turnIn": "Maddoc Vire",
       "zone": "zone.peaks",
-      "level": 6,
+      "level": 9,
       "canonStatus": "GAME-ONLY (a burial custom of the pass)",
       "summary": "Lay a stone on each of the three pilgrims' cairns along the toll road.",
       "offer": "\"Every pilgrim who dies on this road gets a cairn, and every pilgrim who passes lays a stone on it. That's the custom.\" He looks at the empty benches. \"Not many pass now. The cairns go bare, and the old folk say a bare cairn lets the dead wander.\"\n\n\"There are three along the road: one below, on the way up from Khaven, and two past the gate. A stone on each. Say their names if you know them. I don't, anymore.\"",
@@ -299,7 +299,7 @@
       "giver": "Yara Quell",
       "turnIn": "Yara Quell",
       "zone": "zone.peaks",
-      "level": 6,
+      "level": 9,
       "canonStatus": "GAME-ONLY",
       "summary": "Cull six mountain wolves in the pines on the western slope.",
       "offer": "\"I've three mules left, and the wolves in the west pines have learned the sound of their bells.\" Yara slaps dust from her trader's coat. \"Six of them. Enough that the rest learn a new sound.\"",
@@ -330,7 +330,7 @@
       "giver": "Yara Quell",
       "turnIn": "Yara Quell",
       "zone": "zone.peaks",
-      "level": 7,
+      "level": 10,
       "canonStatus": "GAME-ONLY",
       "summary": "Bring Yara five rockhides from the boars in the wallow on the southern slopes.",
       "offer": "\"Rockhide boars. Skin like a scree slope, and it wears like one. Pilgrims' boots, mule harness, a Sandthrone jerkin if one comes asking.\" She grins. \"Five hides. The boars wallow on the south slope, past the pines.\"",
@@ -362,7 +362,7 @@
       "giver": "Maddoc Vire",
       "turnIn": "Maddoc Vire",
       "zone": "zone.peaks",
-      "level": 7,
+      "level": 10,
       "canonStatus": "GAME-ONLY",
       "summary": "Search the ruined waystation on the lower road for its last keeper's journal.",
       "offer": "\"Before the Sandthrone came there was a waystation on the lower road. Grenna Holt kept it. The toll-guards burned it the week they took the gate, and nobody ever found her.\"\n\n\"She kept a journal, like I keep my book. It'll be in the hearth if it's anywhere; she hid everything in the hearth. Bring it back. Someone should know how it ended.\"",
@@ -407,7 +407,7 @@
       "giver": "Hadrik Sull",
       "turnIn": "Hadrik Sull",
       "zone": "zone.peaks",
-      "level": 7,
+      "level": 10,
       "canonStatus": "CANON factions (Sandthrone, Salt-Menders), GAME-ONLY quest",
       "summary": "Hadrik Sull will pay well for the Salt-Menders' letters hidden in a waymarker on the eastern descent. Taking this contract costs you standing with the Salt-Menders.",
       "offer": "The broker doesn't get up. \"Everyone who comes up this road ends up killing a few of my Company's people. I don't hold it against them. It's trade. Everything is.\"\n\n\"Here's another. The Salt-Menders run people over this pass under our noses, and they leave letters for each other in a hollow waymarker on the east road down. I want those letters. Bring them, and the Company forgets a few of its dead, and you walk away with more coin than the pilgrims will ever pay you.\"\n\n\"The Menders won't thank you. But then, they never pay.\"",
@@ -461,7 +461,7 @@
       "giver": "Tarsk",
       "turnIn": "Tarsk",
       "zone": "zone.peaks",
-      "level": 8,
+      "level": 11,
       "canonStatus": "CANON-EXPANDED: the Pale Things as cosmic watchers are canon (world_bible.md); the watchers on the high ledge are GAME-ONLY.",
       "summary": "Drive the Pale watchers off the high ledge above the east road, so Tarsk can see what they were watching.",
       "offer": "\"Pale ones on the high ledge, above the east road. Three. They came when the escort went through, and they haven't moved since.\" Tarsk's voice is flat. \"My people don't fight the Pale. We don't know that they can be fought. But you have a way of making things stop being where they stand.\"\n\n\"Make them stop. Then I'll go up and look at what they were looking at.\"",
@@ -498,7 +498,7 @@
       "giver": "Maddoc Vire",
       "turnIn": "Maddoc Vire",
       "zone": "zone.peaks",
-      "level": 7,
+      "level": 10,
       "requires": [
         "npc.maddoc.cairns"
       ],
@@ -548,7 +548,7 @@
       "giver": "Tarsk",
       "turnIn": "Tarsk",
       "zone": "zone.peaks",
-      "level": 8,
+      "level": 11,
       "requires": [
         "npc.tarsk.pale"
       ],
@@ -583,7 +583,7 @@
       "giver": "Hadrik Sull",
       "turnIn": "Hadrik Sull",
       "zone": "zone.peaks",
-      "level": 7,
+      "level": 10,
       "requires": [
         "faction.sandthrone.1"
       ],
@@ -640,7 +640,7 @@
       "giver": "Maddoc Vire",
       "turnIn": "Tarsk",
       "zone": "zone.peaks",
-      "level": 6,
+      "level": 9,
       "canonStatus": "GAME-ONLY (the Silent Pilgrims are CANON; this shrine is not theirs by any book)",
       "summary": "Maddoc wants someone to stand at the Listening Shrine after dark and tell Tarsk what it says.",
       "offer": "\"There's a shrine up on the north spur. No idol in it. Just an ear, cut in the stone.\" Maddoc rubs his own ear without noticing. \"The pilgrims used to stand there at night and listen. They'd come down quiet. Go up after dark and listen. Then tell Tarsk, not me. He'll know what it means. I'm too old to want to.\"",
@@ -687,8 +687,8 @@
       "giver": "Yara Quell",
       "turnIn": "Yara Quell",
       "zone": "zone.peaks",
-      "level": 8,
-      "minLevel": 7,
+      "level": 11,
+      "minLevel": 10,
       "requires": [
         "npc.yara.rockhide"
       ],
@@ -722,7 +722,7 @@
       "giver": "Yara Quell",
       "turnIn": "Yara Quell",
       "zone": "zone.peaks",
-      "level": 7,
+      "level": 10,
       "canonStatus": "GAME-ONLY",
       "summary": "Mountain bears have come down into the high pines below the Cold Tarn, and they have taken two of the pilgrims' mules. Yara wants three of them dead.",
       "offer": "Yara Quell is mending a mule's harness that something has bitten clean through. \"Bears. Grey ones, mountain bears, down in the high pines under the tarn.\" She holds up the harness. \"Two mules this week. They don't come below the snow in a good year, and this isn't one.\"\n\n\"Three of them. Keep your back to a tree, and don't run: they're quicker than you downhill.\"",

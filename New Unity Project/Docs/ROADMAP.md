@@ -47,6 +47,20 @@ CANON where the books name it, CANON-EXPANDED where the game fills in round a ca
 
 Each step is its own set of rounds; Chris picks the first zone, class and race when Phase 8 closes.
 
+**The 16-30 road (Chris, side chat 2026-10-07; PROVISIONAL, mostly Book 1):** levels 16-30 use places already on the world map:
+the Lowtowns and the Rust Market (16-19), the Forge District (19-22), the Warrens with the Deep Veins dungeon (22-25), the Crown and
+the Transit Hub (25-28), the Spire (28-30). The Shore's breadcrumb at 15 leads back east to Argentis's gate.
+**Three more dungeons on that road:** the Sludge-Tunnels (18-20, Forge District: the city's waste tunnels of Book 1, a sewer-and-foundry
+run under the smelters, a syndicate boss), the Deep Veins (23-25, the Warrens: the penal-legion mine of book1 ch.9, geode seams, the
+Blind Crow's goblins as allies, a Council overseer and his unmade labour as bosses), the Transit Hub (27-29, the Crown: the junction
+of every soul-prism and geode, cargo lifts, redaction squads, a Councillor's lieutenant; its last boss drops the letter that opens the Spire).
+**Endgame at the cap** (30 later; a cap-15 version in the Shore first): raids (the Spire of Agony first, ten players: you and sims, a
+guild run, several bosses with the Adit's mechanics at scale; the Ashlands Sanctum later); world bosses (one roaming elite per high
+zone on a long timer, the Weave-Eater brood's mother on the Rim, a Pale King's shadow on the Shore, announced in Zone chat, a full
+group needed, guilds forming up); challenges (timed dungeon runs with a rating the sims' guilds compete on, a weekly notice-board bounty,
+rotating harder camps); rewards (set gear above the dungeons', titles, the Chronicle marking each kill). The pieces exist in small
+(elite camps and guards, group scaling, loot rolls, guilds, sim-led runs): raids and world bosses scale them up.
+
 **Level cap (Chris, 2026-10-07): 30 in the end, 15 now; "difficult and slow leveling, grind it out".** Round 29 (after round 28):
 the cap goes from 13 to 15 and the zones' bands stretch to Oakhaven 1-5, Khaven 5-9, Peaks 9-12, Ash Rim 12-15, Verdant Shore 13-15
 (two zones at the cap, "so endgame has more to do"; the Shore "all epic mobs, group required": every mob there elite-strength, a zone flag; the Rim "more solo friendly"); every camp, quest and loot list moves with its zone, Crowsfoot Hollow to about

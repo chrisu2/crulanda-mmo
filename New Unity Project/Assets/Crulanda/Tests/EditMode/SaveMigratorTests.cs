@@ -157,7 +157,7 @@ namespace Crulanda.Tests
                 Assert.AreEqual("class.warrior", p.classId); Assert.AreEqual("zone.oakhaven", p.zoneId);
                 Assert.AreEqual(1, p.talents.Count); Assert.AreEqual("tk-tempered-armor", p.talents[0].id); Assert.AreEqual(1, p.talents[0].rank);
                 Assert.AreEqual("5d0c1f3e8b2a4c6d9e7f0a1b2c3d4e5f", p.playerId); Assert.AreEqual("a1b2c3d4e5f60718293a4b5c6d7e8f90", p.companionId);
-                Assert.AreEqual(1329, p.experience); Assert.AreEqual(4, p.Level);
+                Assert.AreEqual(2599, p.experience, "1329 of the old curve: level 4, 459/470 in, is 2599 of the cap-15 curve (round 29)"); Assert.AreEqual(4, p.Level);
                 Assert.AreEqual(255, p.health); Assert.AreEqual(118, p.mana); Assert.AreEqual(130, p.companionHealth);
                 Assert.AreEqual(14.25f, p.x); Assert.AreEqual(2.5f, p.y); Assert.AreEqual(-31.75f, p.z);
                 Assert.IsTrue(p.recruited); Assert.AreEqual(8, p.relationship); Assert.AreEqual(57, p.gold);
@@ -385,7 +385,7 @@ namespace Crulanda.Tests
         static void AsTheOwnersV8Held(EncounterProgress p)
         {
             AsTheOwnerIs(p);
-            Assert.AreEqual(2137, p.experience); Assert.AreEqual(6, p.Level); Assert.AreEqual(355, p.health); Assert.AreEqual(306, p.gold);
+            Assert.AreEqual(4156, p.experience, "2137 of the old curve (level 6, 237/650 in) is 4156 of the cap-15 curve"); Assert.AreEqual(6, p.Level); Assert.AreEqual(355, p.health); Assert.AreEqual(306, p.gold);
             Assert.AreEqual(-6.805179119110107f, p.x); Assert.AreEqual(1.0799998044967651f, p.y); Assert.AreEqual(18.035306930541992f, p.z);
             CollectionAssert.AreEqual(new[] { "0:junk.wolf_pelt x1", "1:junk.company_badge x10", "2:potion.minor x3", "3:gen.shoulders.5.1.9496 x1", "4:junk.company_badge x2", "6:item.training_blade x1",
                 "eq0:item.tin_crown x1", "eq6:gen.feet.4.3.2421 x1", "eq7:gen.mainhand.5.3.5107 x1" }, Held(p));
@@ -395,7 +395,7 @@ namespace Crulanda.Tests
         static void AsTheOwnersV6Held(EncounterProgress p)
         {
             AsTheOwnerIs(p);
-            Assert.AreEqual(1329, p.experience); Assert.AreEqual(4, p.Level); Assert.AreEqual(255, p.health); Assert.AreEqual(49, p.gold);
+            Assert.AreEqual(2599, p.experience, "1329 of the old curve: level 4, 459/470 in, is 2599 of the cap-15 curve (round 29)"); Assert.AreEqual(4, p.Level); Assert.AreEqual(255, p.health); Assert.AreEqual(49, p.gold);
             Assert.AreEqual(-20.41796875f, p.x); Assert.AreEqual(3.575676679611206f, p.y); Assert.AreEqual(120.16324615478516f, p.z);
             CollectionAssert.AreEqual(new[] { "0:junk.wolf_pelt x1", "eq7:item.training_blade x1" }, Held(p));
             Assert.IsEmpty(p.professions);
@@ -404,7 +404,7 @@ namespace Crulanda.Tests
         [Test] public void V8Payload_MigratesTo9_AddsArmouryLooksAndLuck_KeepsEveryOtherCharacter()
         {
             var step = new AddArmouryMigration();
-            Assert.AreEqual(8, step.FromVersion); Assert.AreEqual(9, step.ToVersion); Assert.AreEqual(9, EncounterSave.FormatVersion);
+            Assert.AreEqual(8, step.FromVersion); Assert.AreEqual(9, step.ToVersion); Assert.AreEqual(10, EncounterSave.FormatVersion);
             string v8 = OwnerSaveFixtures.V8Payload, v9 = step.Migrate(v8);
             Assert.AreEqual(v8.Substring(0, v8.Length - 1) + Tail9, v9, "Every character of the v8 payload is kept; the three lists go in before the closing brace.");
             Assert.AreEqual(v9, step.Migrate(v9), "A payload that has all three is left alone.");
@@ -416,13 +416,13 @@ namespace Crulanda.Tests
             Assert.Throws<SaveMigrationException>(() => step.Migrate(null));
 
             // The whole chain: the owner's format 6 gains format 7's list, format 8's two and format 9's three, and nothing else moves.
-            var m = new SaveMigrator(); m.Register(new AddDiscoveriesMigration()); m.Register(new AddProfessionsMigration()); m.Register(step);
+            var m = new SaveMigrator(); m.Register(new AddDiscoveriesMigration()); m.Register(new AddProfessionsMigration()); m.Register(step); m.Register(new SteeperCurveMigration());
             string v6 = OwnerSaveFixtures.V6Payload;
             var from6 = m.MigrateToVersion(new SaveEnvelope { formatVersion = 6, payloadType = "CrulandaEncounter", payloadJson = v6 }, EncounterSave.FormatVersion);
-            Assert.AreEqual(9, from6.formatVersion); Assert.AreEqual(v6.Substring(0, v6.Length - 1) + ",\"discoveries\":[]" + Then9(Tail8), from6.payloadJson);
+            Assert.AreEqual(10, from6.formatVersion); Assert.AreEqual(new SteeperCurveMigration().Migrate(v6.Substring(0, v6.Length - 1) + ",\"discoveries\":[]" + Then9(Tail8)), from6.payloadJson);
             var input = new SaveEnvelope { formatVersion = 8, payloadType = "CrulandaEncounter", payloadJson = v8 };
             var from8 = m.MigrateToVersion(input, EncounterSave.FormatVersion);
-            Assert.AreEqual(9, from8.formatVersion); Assert.AreEqual(v9, from8.payloadJson);
+            Assert.AreEqual(10, from8.formatVersion); Assert.AreEqual(new SteeperCurveMigration().Migrate(v9), from8.payloadJson);
             Assert.AreEqual(8, input.formatVersion); Assert.AreEqual(v8, input.payloadJson, "The envelope that was read is not touched.");
 
             // Through the save itself, then the Armoury's first bind: what he holds is found, and nothing else changes.
@@ -467,7 +467,7 @@ namespace Crulanda.Tests
                     // The next save is format 9 with the three lists at the end, and reads back the same.
                     save.Write(p);
                     Assert.IsTrue(store.TryRead("encounter", out var envelope, out _));
-                    Assert.AreEqual(9, envelope.formatVersion);
+                    Assert.AreEqual(10, envelope.formatVersion);
                     StringAssert.Contains(",\"pouches\":[],\"armoury\":[\"item.training_blade\"", envelope.payloadJson);
                     StringAssert.EndsWith("\"],\"lootLuck\":[]}", envelope.payloadJson);
                     Assert.IsTrue(save.Read(out var again, out message), message);
@@ -514,7 +514,7 @@ namespace Crulanda.Tests
                 p.lootLuck.Add(new LootLuck { source = "drop.oak.caddock", kills = 9 });   // a second entry for a source already listed
                 var save = new EncounterSave(root, TestTalents.Warrior()); save.Write(p);
                 Assert.IsTrue(new SaveFileStore(root).TryRead("encounter", out var envelope, out _));
-                Assert.AreEqual(9, envelope.formatVersion);
+                Assert.AreEqual(10, envelope.formatVersion);
                 StringAssert.Contains("\"lootLuck\":[{\"source\":\"drop.oak.caddock\",\"kills\":3,\"dry\":0},", envelope.payloadJson);
                 Assert.AreEqual(envelope.payloadJson, new AddArmouryMigration().Migrate(envelope.payloadJson), "A format-9 payload needs nothing from the step.");
                 Assert.IsTrue(save.Read(out var loaded, out var message), message);
@@ -536,6 +536,20 @@ namespace Crulanda.Tests
                 Assert.IsTrue(new SaveFileStore(root).TryRead("encounter", out envelope, out _)); StringAssert.EndsWith(Tail9, envelope.payloadJson);
             }
             finally { if (Directory.Exists(root)) Directory.Delete(root, true); }
+        }
+        /// <summary>Round 29: format 9 -> 10 keeps a character's level and the way into it under the steeper curve; the old cap's character is 13 of 15.</summary>
+        [Test] public void The_steeper_curve_keeps_the_level_and_the_way_into_it()
+        {
+            int oldFor5 = 200 + 290 + 380 + 470, oldNext5 = 560;   // the old curve: 200 + 90 a level
+            int xp = SteeperCurveMigration.Convert(oldFor5 + oldNext5 / 2);
+            var p = new EncounterProgress { experience = xp }; Assert.AreEqual(5, p.Level, "level 5 still");
+            Assert.AreEqual(EncounterProgress.XpToNext(5) / 2, p.XpIntoLevel, 2, "half way into it");
+            Assert.AreEqual(13, new EncounterProgress { experience = SteeperCurveMigration.Convert(999999) }.Level, "the old cap's character is level 13 of 15 now");
+            string json = "{\"classId\":\"class.warrior\",\"experience\":" + (oldFor5 + oldNext5 / 2) + ",\"gold\":7}";
+            string outJson = new SteeperCurveMigration().Migrate(json);
+            StringAssert.Contains("\"experience\":" + xp + ",", outJson); StringAssert.StartsWith("{\"classId\":\"class.warrior\",", outJson); StringAssert.EndsWith(",\"gold\":7}", outJson);
+            Assert.AreEqual("{\"gold\":7}", new SteeperCurveMigration().Migrate("{\"gold\":7}"), "no experience field: untouched");
+            Assert.Throws<SaveMigrationException>(() => new SteeperCurveMigration().Migrate("[1,2]"));
         }
     }
 }

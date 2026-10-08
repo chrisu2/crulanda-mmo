@@ -71,7 +71,7 @@ namespace Crulanda.Tests
                 Assert.IsFalse(l.fallback, d.id + " (" + d.name + ") found no look: its words are missing from looks.json.");
                 Assert.AreEqual(d.slot, GearLooks.Family(l.family).slot, d.id + " wears a " + d.slot + " family.");
             }
-            Assert.AreEqual(9 * 13 * 5 * 40, n);
+            Assert.AreEqual(9 * EncounterProgress.LevelCap * 5 * 40, n);   // nine words, every level, five qualities, forty draws
         }
 
         [Test] public void Every_crafted_piece_has_a_look()
@@ -171,7 +171,7 @@ namespace Crulanda.Tests
             var looks = Looks(); var db = new ItemDatabase();
             for (int level = 1; level <= EncounterProgress.LevelCap; level++)
                 Assert.AreEqual(GearLooks.BandOf(level), looks.Resolve(db.Get(ItemDatabase.GearId("chest", level, 2, 3))).tier, "Generated gear's tier is its level band (level " + level + ").");
-            var named = new ItemDef { id = "craft.veridian_breastplate", name = "Breastplate", kind = "gear", slot = "chest", quality = 2, level = 11 };
+            var named = new ItemDef { id = "craft.veridian_breastplate", name = "Breastplate", kind = "gear", slot = "chest", quality = 2, level = 14 };   // curve 15: the top band (round 29)
             Assert.AreEqual(4, looks.Resolve(named).tier, "A named piece's tier comes from its curve level, the required level + 1.");
             named.level = 1; Assert.AreEqual(0, looks.Resolve(named).tier);
             Assert.AreNotEqual(GearLooks.LookKey(looks.Resolve(db.Get(ItemDatabase.GearId("chest", 2, 2, 3)))), GearLooks.LookKey(looks.Resolve(db.Get(ItemDatabase.GearId("chest", 13, 2, 3)))), "The tier is part of the key.");

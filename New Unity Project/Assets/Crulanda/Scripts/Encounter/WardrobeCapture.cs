@@ -13,11 +13,11 @@ namespace Crulanda.Encounter
     /// wide so each piece is big enough to judge, which takes several shots per set:
     /// 01-weapon-rack-a..g, 02-shield-wall-a..c (every main-hand and off-hand family and variant, held);
     /// 03-quality-ladder-a (blades), -b (shields), -c (lanterns): poor to epic at dusk so the glow reads;
-    /// 04-sets-front-a..d and 05-sets-back-a..d: full generated kits at levels 2, 5, 8, 10 and 13 (a common, b uncommon, c rare
+    /// 04-sets-front-a..d and 05-sets-back-a..d: full generated kits at levels 3, 7, 10, 13 and 15 (a common, b uncommon, c rare
     /// in mail and plate; d rare in cloth and leather), front and back;
     /// 06-helms-*, 07-shoulders-chests-*, 08-hands-legs-feet-neck-*: every armour family and variant up close;
     /// 09-palettes-a, -b: the same kit in all ten palettes; 10-crafted: the Blacksmith's 21 pieces by metal tier;
-    /// 11-in-motion-front, -back: a rare level-13 kit standing, walking, sneaking, sitting and swimming (weapons slung);
+    /// 11-in-motion-front, -back: a rare level-15 kit standing, walking, sneaking, sitting and swimming (weapons slung);
     /// 12-druid-forms: the Druid in that kit in each of her four forms, and bare-headed in her hood;
     /// 13-named-oakhaven-*, 14-named-khaven-*, 15-named-peaks-*, 16-named-ashrim-*, 17-named-verdant-*, 18-named-world-*: every
     /// named item of the loot database (step A3) on its own mannequin at its own level and quality, labelled with its name, quality
@@ -93,7 +93,7 @@ namespace Crulanda.Encounter
         /// <summary>Generated kits by piece word, head to off hand: mail and plate, and cloth and leather.</summary>
         static readonly string[] Martial = { "Cap", "Torc", "Pauldrons", "Hauberk", "Gauntlets", "Greaves", "Sabatons", "Blade", "Shield" };
         static readonly string[] Cloth = { "Hood", "Pendant", "Mantle", "Jerkin", "Gloves", "Leggings", "Boots", "Cudgel", "Lantern" };
-        static readonly int[] SetLevels = { 2, 5, 8, 10, 13 };
+        static readonly int[] SetLevels = { 3, 7, 10, 13, 15 };
         const int PerRow = 5; const float Spacing = 1.7f;   // five to a shot, framed close enough to judge a guard or a rim
 
         /// <summary>How a shot frames its row: figures per row and apart, the height looked at, the camera's pitch and margin, where the labels hang (above the figure's root, negative is below), and which way the figures face.</summary>

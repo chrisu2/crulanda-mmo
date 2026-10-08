@@ -5,8 +5,8 @@
   "canonStatus": "CANON-EXPANDED",
   "canonNote": "Canon (Khaven Village map): walled village with the Cracked Hearth, two Fallen Smithies, the Blood-Stone Well, the Gallows Tree and the Crypt-Keeper's Hovel; the Whispering Wood to the west, Gloom Creek, and the Carrion Cliffs. GAME-ONLY / PROVISIONAL: the Sandthrone outriders holding it, the Pale watcher at the crypt, the crypt itself, road links to Oakhaven and all exact placement. Also GAME-ONLY: the wilderness beyond the walls (the deep Whispering Wood, the north road to the Peaks, the drowned graveyard and creek barrow), the levelling camps, and the residents Wenna Coyle, Ansel Morrow and Cato Brisk. Hollow Men are a CANON creature (book1 ch.4); their presence here is GAME-ONLY. The 340 m growth (2026-09-30) adds, all GAME-ONLY in placement and story: the Hush and the Listener's Hut deeper in the Whispering Wood (the Listener is a Silent Pilgrim; the Silent Pilgrims are CANON), the corpse road with its coffin stones and bridge, the gibbet crossroads on the Gloom road, the plague pit, the drowned fields, the Carrion Heights and the Charnel Barrow above the Carrion Cliffs (the cliffs are CANON), the Old Bound Wall and the Fallen Watch on the north road, and the Pale Reckoner (the Pale Things are CANON). The Scarp hollows, the Thicket deserters, the Heights scree spiders, the Hush-Mother and the Thicket (2026-10-03) are GAME-ONLY. The drowned dead (2026-10-04): the old bones the creek gave back, risen at the drowned graveyard; GAME-ONLY.",
   "size": 410,
-  "levelMin": 3,
-  "levelMax": 5,
+  "levelMin": 5,
+  "levelMax": 9,
   "biome": "gloom",
   "weather": [
     {
@@ -3162,8 +3162,8 @@
       },
       "radius": 10,
       "count": 5,
-      "levelMin": 3,
-      "levelMax": 4,
+      "levelMin": 6,
+      "levelMax": 7,
       "respawn": 75
     },
     {
@@ -3178,8 +3178,8 @@
       },
       "radius": 10,
       "count": 4,
-      "levelMin": 3,
-      "levelMax": 4,
+      "levelMin": 6,
+      "levelMax": 7,
       "respawn": 75,
       "ambush": true
     },
@@ -3195,8 +3195,8 @@
       },
       "radius": 10,
       "count": 4,
-      "levelMin": 4,
-      "levelMax": 5,
+      "levelMin": 8,
+      "levelMax": 8,
       "respawn": 90
     },
     {
@@ -3211,8 +3211,8 @@
       },
       "radius": 10,
       "count": 4,
-      "levelMin": 5,
-      "levelMax": 5,
+      "levelMin": 6,
+      "levelMax": 6,
       "respawn": 90
     },
     {
@@ -3227,8 +3227,8 @@
       },
       "radius": 5,
       "count": 1,
-      "levelMin": 5,
-      "levelMax": 5,
+      "levelMin": 7,
+      "levelMax": 7,
       "respawn": 240,
       "elite": true
     },
@@ -3244,8 +3244,8 @@
       },
       "radius": 10,
       "count": 5,
-      "levelMin": 4,
-      "levelMax": 5,
+      "levelMin": 7,
+      "levelMax": 8,
       "respawn": 75
     },
     {
@@ -3260,8 +3260,8 @@
       },
       "radius": 9,
       "count": 4,
-      "levelMin": 4,
-      "levelMax": 5,
+      "levelMin": 5,
+      "levelMax": 6,
       "respawn": 90
     },
     {
@@ -3276,8 +3276,8 @@
       },
       "radius": 9,
       "count": 4,
-      "levelMin": 5,
-      "levelMax": 5,
+      "levelMin": 8,
+      "levelMax": 8,
       "respawn": 90
     },
     {
@@ -3292,8 +3292,8 @@
       },
       "radius": 10,
       "count": 4,
-      "levelMin": 4,
-      "levelMax": 5,
+      "levelMin": 7,
+      "levelMax": 8,
       "respawn": 75
     },
     {
@@ -3308,8 +3308,8 @@
       },
       "radius": 5,
       "count": 1,
-      "levelMin": 7,
-      "levelMax": 7,
+      "levelMin": 10,
+      "levelMax": 10,
       "respawn": 300,
       "elite": true,
       "harder": true
@@ -3326,8 +3326,8 @@
       },
       "radius": 9,
       "count": 5,
-      "levelMin": 4,
-      "levelMax": 5,
+      "levelMin": 6,
+      "levelMax": 7,
       "respawn": 75
     },
     {
@@ -3342,8 +3342,8 @@
       },
       "radius": 9,
       "count": 5,
-      "levelMin": 4,
-      "levelMax": 5,
+      "levelMin": 5,
+      "levelMax": 6,
       "respawn": 75,
       "ambush": true
     },
@@ -3359,8 +3359,8 @@
       },
       "radius": 9,
       "count": 5,
-      "levelMin": 5,
-      "levelMax": 5,
+      "levelMin": 8,
+      "levelMax": 8,
       "respawn": 75
     },
     {
@@ -3375,8 +3375,8 @@
       },
       "radius": 5,
       "count": 1,
-      "levelMin": 6,
-      "levelMax": 6,
+      "levelMin": 7,
+      "levelMax": 7,
       "respawn": 240
     },
     {
@@ -3391,8 +3391,8 @@
       },
       "radius": 5,
       "count": 4,
-      "levelMin": 5,
-      "levelMax": 5,
+      "levelMin": 6,
+      "levelMax": 6,
       "respawn": 90
     }
   ],

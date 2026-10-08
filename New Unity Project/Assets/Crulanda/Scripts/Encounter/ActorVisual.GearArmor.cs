@@ -467,7 +467,7 @@ namespace Crulanda.Encounter
         {
             // A piece of a modular kit (Chosan's Modular Hero, note 88): one node of the pack's armour FBX, by name.
             GameObject src; Transform node = null;
-            if (f.v.StartsWith("Headgear.")) { var kit = Resources.Load<GameObject>("Props/ModularHero/Armor Parts"); node = kit != null ? FindDeep(kit.transform, f.v) : null; src = node != null ? node.gameObject : null; }
+            if (f.v.StartsWith("Headgear.")) { var kit = Resources.Load<GameObject>("Props/ModularHero/Models/Armor Parts/Armor Parts"); node = kit != null ? FindDeep(kit.transform, f.v) : null; src = node != null ? node.gameObject : null; }
             else src = Resources.Load<GameObject>("Weapons/" + f.v);
             if (src == null) return;
             var root = gearRoots[(int)EquipSlot.Head]; var go = Instantiate(src, root, false); go.name = "Model " + f.v;

@@ -6,7 +6,7 @@
   "canonNote": "Canon: Oakhaven is an eastern agricultural hub erased by an accelerated, localized Wasting event that hid the Council's abduction of resonance candidates (interactive map; Oakhaven village map). This zone shows it on the eve of that erasure. Layout follows the canon village map. The Concord collectors, Mira and exact building placement are GAME-ONLY / PROVISIONAL. The wolf and boar camps and the south road to the Ashland Rim are GAME-ONLY. Crowsfoot Hollow (the cave past the end of the North road, in the west heel of Crowsfoot Ridge, running deep under the northern hills), its Sandthrone deserters, Quartermaster Hesk and Caddock, the Bandit King are GAME-ONLY; the Sandthrone company is CANON. The second growth (2026-10-01, 380 to 560 m, playtest note 1): the hollow and Crowsfoot Ridge moved out to the north hills, and Carder's field barn, Thornshaw, the Carter's Rest, Lark Hill, Sallow Bottom and the Bound wood are GAME-ONLY places. The outer farmland (2026-09-30 growth): Crowsfoot Ridge over the hollow, the Overlook, the Mastwood and Moss's lodge, the Old Fold and Old Whitefoot, the Bound Stone, the Cider Barn, Withy pool, the Old Barrow, Hollin farm, the Hallow's Creek milestone and the Watchtower are GAME-ONLY places; the farm animals (the horses at the Golden Cask and Carder's field barn, the miller's donkey, the Brook and Harrow cows, 2026-10-03) are GAME-ONLY; the hill overlooking the valley, Oakhaven's cider and its deep springs (book1 ch.4), the First Kin (sworn by in book1 ch.4) and Hallow's Creek, the first settlement the Wasting took (world_bible.md), are CANON. Bears in the hill hazels under Crowsfoot Ridge, and Old Hazelmaw (2026-10-04): GAME-ONLY.",
   "size": 560,
   "levelMin": 1,
-  "levelMax": 2,
+  "levelMax": 5,
   "biome": "meadow",
   "weather": [
     {
@@ -4660,8 +4660,8 @@
       },
       "radius": 9,
       "count": 4,
-      "levelMin": 1,
-      "levelMax": 2,
+      "levelMin": 3,
+      "levelMax": 4,
       "respawn": 75
     },
     {
@@ -4692,8 +4692,8 @@
       },
       "radius": 9,
       "count": 4,
-      "levelMin": 2,
-      "levelMax": 2,
+      "levelMin": 4,
+      "levelMax": 4,
       "respawn": 75
     },
     {
@@ -4741,8 +4741,8 @@
       },
       "radius": 3,
       "count": 2,
-      "levelMin": 3,
-      "levelMax": 3,
+      "levelMin": 6,
+      "levelMax": 6,
       "respawn": 300,
       "harder": true
     },
@@ -4758,8 +4758,8 @@
       },
       "radius": 3.5,
       "count": 4,
-      "levelMin": 3,
-      "levelMax": 4,
+      "levelMin": 6,
+      "levelMax": 6,
       "respawn": 480,
       "harder": true
     },
@@ -4775,8 +4775,8 @@
       },
       "radius": 3,
       "count": 3,
-      "levelMin": 4,
-      "levelMax": 5,
+      "levelMin": 6,
+      "levelMax": 7,
       "respawn": 600,
       "harder": true
     },
@@ -4792,8 +4792,8 @@
       },
       "radius": 1.2,
       "count": 1,
-      "levelMin": 5,
-      "levelMax": 5,
+      "levelMin": 7,
+      "levelMax": 7,
       "elite": true,
       "respawn": 900,
       "harder": true
@@ -4810,8 +4810,8 @@
       },
       "radius": 1.2,
       "count": 2,
-      "levelMin": 3,
-      "levelMax": 4,
+      "levelMin": 6,
+      "levelMax": 6,
       "respawn": 480,
       "harder": true
     },
@@ -4827,8 +4827,8 @@
       },
       "radius": 2.5,
       "count": 2,
-      "levelMin": 4,
-      "levelMax": 4,
+      "levelMin": 6,
+      "levelMax": 6,
       "respawn": 600,
       "harder": true
     },
@@ -4844,8 +4844,8 @@
       },
       "radius": 1,
       "count": 1,
-      "levelMin": 4,
-      "levelMax": 4,
+      "levelMin": 6,
+      "levelMax": 6,
       "elite": true,
       "respawn": 900,
       "harder": true
@@ -4862,8 +4862,8 @@
       },
       "radius": 1.2,
       "count": 2,
-      "levelMin": 4,
-      "levelMax": 5,
+      "levelMin": 6,
+      "levelMax": 7,
       "respawn": 600,
       "harder": true
     },
@@ -4879,8 +4879,8 @@
       },
       "radius": 9,
       "count": 4,
-      "levelMin": 1,
-      "levelMax": 2,
+      "levelMin": 3,
+      "levelMax": 4,
       "respawn": 75
     },
     {
@@ -4895,8 +4895,8 @@
       },
       "radius": 2.5,
       "count": 1,
-      "levelMin": 3,
-      "levelMax": 3,
+      "levelMin": 6,
+      "levelMax": 6,
       "elite": true,
       "respawn": 240,
       "harder": true
@@ -4913,8 +4913,8 @@
       },
       "radius": 6,
       "count": 3,
-      "levelMin": 2,
-      "levelMax": 2,
+      "levelMin": 3,
+      "levelMax": 3,
       "respawn": 75
     },
     {
@@ -4929,8 +4929,8 @@
       },
       "radius": 8,
       "count": 4,
-      "levelMin": 2,
-      "levelMax": 2,
+      "levelMin": 1,
+      "levelMax": 1,
       "respawn": 75
     },
     {
@@ -4961,8 +4961,8 @@
       },
       "radius": 7,
       "count": 3,
-      "levelMin": 2,
-      "levelMax": 2,
+      "levelMin": 4,
+      "levelMax": 4,
       "respawn": 75
     },
     {
@@ -4993,8 +4993,8 @@
       },
       "radius": 8,
       "count": 4,
-      "levelMin": 1,
-      "levelMax": 2,
+      "levelMin": 2,
+      "levelMax": 3,
       "respawn": 75
     },
     {
@@ -5009,8 +5009,8 @@
       },
       "radius": 8,
       "count": 2,
-      "levelMin": 2,
-      "levelMax": 2,
+      "levelMin": 3,
+      "levelMax": 3,
       "respawn": 90
     },
     {
@@ -5025,8 +5025,8 @@
       },
       "radius": 3,
       "count": 1,
-      "levelMin": 3,
-      "levelMax": 3,
+      "levelMin": 4,
+      "levelMax": 4,
       "respawn": 180
     }
   ],

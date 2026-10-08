@@ -111,7 +111,7 @@ namespace Crulanda.Tests
         {
             var zones = new Dictionary<string, Crulanda.World.ZoneDefinition>();
             foreach (var f in Directory.GetFiles(Path.Combine(Application.dataPath, "Crulanda", "EncounterContent", "Zones"), "*.json"))
-                zones[Path.GetFileNameWithoutExtension(f)] = JsonUtility.FromJson<Crulanda.World.ZoneDefinition>(File.ReadAllText(f));
+                { var z = JsonUtility.FromJson<Crulanda.World.ZoneDefinition>(File.ReadAllText(f)); if (z.dungeon) continue; zones[Path.GetFileNameWithoutExtension(f)] = z; }   // a dungeon (the Sealed Adit) has no trade nodes yet
             return zones;
         }
         /// <summary>A zone's nodes, from its nodes array and its props: the node id, where it is put, and whether it is a herb prop.</summary>
@@ -268,13 +268,13 @@ namespace Crulanda.Tests
                 ("recipe.boar_stew", 1, "junk.boar_meat 2", "food.boar_stew", 1, 220, 1, 3),
                 ("recipe.griddle_bread", 1, "mat.flour 1", "food.griddle_bread", 1, 190, 1, 1),
                 ("recipe.hearth_cake", 5, "mat.flour 1, food.fresh_eggs 1", "food.hearth_cake", 2, 200, 1, 2),
-                ("recipe.wolf_skewer", 20, "mat.wolf_haunch 2, mat.mourners_cap 1", "food.wolf_skewer", 1, 340, 3, 5),
-                ("recipe.harrow_pasty", 30, "mat.flour 1, food.harrow_cheese 1, junk.boar_meat 1", "food.harrow_pasty", 1, 380, 4, 5),
-                ("recipe.smoked_loin", 40, "junk.boar_meat 2, mat.tarnwort 1, mat.salt 1", "food.smoked_loin", 1, 520, 6, 8),
-                ("recipe.salt_flank", 60, "mat.hound_flank 2, mat.salt 1", "food.salt_flank", 1, 700, 9, 12),
-                ("recipe.cinder_loaf", 70, "mat.flour 2, mat.cinder_thistle 1, mat.charcoal 1", "food.cinder_loaf", 1, 660, 9, 8),
-                ("recipe.mossback_chop", 80, "mat.mossback_chop 2, mat.dewfern 1", "food.mossback_chop", 1, 820, 11, 18),
-                ("recipe.venison_pie", 90, "mat.venison 2, mat.flour 1", "food.venison_pie", 1, 900, 12, 16) };
+                ("recipe.wolf_skewer", 20, "mat.wolf_haunch 2, mat.mourners_cap 1", "food.wolf_skewer", 1, 340, 5, 5),
+                ("recipe.harrow_pasty", 30, "mat.flour 1, food.harrow_cheese 1, junk.boar_meat 1", "food.harrow_pasty", 1, 380, 6, 5),
+                ("recipe.smoked_loin", 40, "junk.boar_meat 2, mat.tarnwort 1, mat.salt 1", "food.smoked_loin", 1, 520, 9, 8),
+                ("recipe.salt_flank", 60, "mat.hound_flank 2, mat.salt 1", "food.salt_flank", 1, 700, 12, 12),
+                ("recipe.cinder_loaf", 70, "mat.flour 2, mat.cinder_thistle 1, mat.charcoal 1", "food.cinder_loaf", 1, 660, 12, 8),
+                ("recipe.mossback_chop", 80, "mat.mossback_chop 2, mat.dewfern 1", "food.mossback_chop", 1, 820, 14, 18),
+                ("recipe.venison_pie", 90, "mat.venison 2, mat.flour 1", "food.venison_pie", 1, 900, 14, 16) };
             CollectionAssert.AreEqual(expect.Select(e => e.Item1), db.RecipesFor("cooking").Select(r => r.id), "Cooking's recipes, easiest first.");
             var vendorFood = items.Vendors.SelectMany(v => v.items ?? new string[0]).Append(EncounterSession.FreshEggs).Distinct().Select(items.Get).Where(d => d != null && d.food).ToList();
             Assert.IsNotEmpty(vendorFood);
@@ -397,8 +397,8 @@ namespace Crulanda.Tests
         [Test] public void Blacksmithing_HasTheFiveSmeltsAndTwentyOnePieces()
         {
             var items = Items(); var db = Db(items);
-            var smelts = new[] { ("recipe.copper_bar", "mat.copper_ore", "mat.copper_bar", 1, 4), ("recipe.bogiron_bar", "mat.bogiron_ore", "mat.bogiron_bar", 20, 7),
-                ("recipe.ridgesteel_bar", "mat.adit_ore", "mat.ridgesteel_bar", 40, 10), ("recipe.ashsteel_bar", "mat.cinder_ore", "mat.ashsteel_bar", 60, 13), ("recipe.veridian_bar", "mat.veridian_ore", "mat.veridian_bar", 80, 19) };
+            var smelts = new[] { ("recipe.copper_bar", "mat.copper_ore", "mat.copper_bar", 1, 4), ("recipe.bogiron_bar", "mat.bogiron_ore", "mat.bogiron_bar", 20, 9),
+                ("recipe.ridgesteel_bar", "mat.adit_ore", "mat.ridgesteel_bar", 40, 11), ("recipe.ashsteel_bar", "mat.cinder_ore", "mat.ashsteel_bar", 60, 13), ("recipe.veridian_bar", "mat.veridian_ore", "mat.veridian_bar", 80, 19) };
             var all = db.RecipesFor("blacksmithing");
             Assert.AreEqual(31, all.Count, "Five smelts, 21 pieces and the five resonance-tempered weapons (the notice boards' shard).");
             Assert.IsTrue(all.All(r => r.station == "forge"), "Everything a smith makes is made at a forge.");
@@ -443,14 +443,14 @@ namespace Crulanda.Tests
             foreach (var d in crafted)
             {
                 Assert.AreEqual("gear", d.kind, d.id); Assert.GreaterOrEqual(ItemDatabase.SlotIndex(d.slot), 0, d.id);
-                Assert.IsTrue(new[] { 1, 4, 7, 9, 12 }.Contains(d.level), d.id + " is required at a zone's top level less one (" + d.level + ").");
+                Assert.IsTrue(new[] { 1, 4, 8, 11, 14 }.Contains(d.level), d.id + " is required at a zone's top level less one (" + d.level + "; round 29: Khaven 8, the Peaks 11, the Rim and the Shore 14).");
                 var l = looks.Resolve(d); Assert.IsFalse(l.fallback, d.id + " has its own look."); Assert.AreEqual(d.slot, GearLooks.Family(l.family).slot, d.id);
                 Assert.IsFalse(string.IsNullOrEmpty(d.description), d.id); Assert.IsTrue(d.canonStatus != null && d.canonStatus.StartsWith("GAME-ONLY"), d.id);
                 int stats = d.stamina + d.strength + d.agility + d.intellect + d.spirit;
                 if (d.id == "craft.heartwood_greatblade")
                 {
-                    Assert.AreEqual(3, d.quality, "The capstone is rare."); Assert.AreEqual(12, d.level); Assert.AreEqual("mainhand", d.slot);
-                    Assert.LessOrEqual(d.weaponDamage, 36); Assert.Less(d.weaponDamage, items.Get(ItemDatabase.GearId("mainhand", 13, 3, 0)).weaponDamage, "Under a generated level-13 rare.");
+                    Assert.AreEqual(3, d.quality, "The capstone is rare."); Assert.AreEqual(14, d.level); Assert.AreEqual("mainhand", d.slot);
+                    Assert.LessOrEqual(d.weaponDamage, 42); Assert.Less(d.weaponDamage, items.Get(ItemDatabase.GearId("mainhand", 15, 3, 0)).weaponDamage, "Under a generated level-15 rare.");
                     Assert.AreEqual(5, d.strength); Assert.AreEqual(5, d.stamina); Assert.AreEqual(10, stats);
                     continue;
                 }
@@ -490,7 +490,7 @@ namespace Crulanda.Tests
                 Assert.AreEqual(r.name, d.name, id + " is named for what it makes.");
             }
             var tarn = items.Get("potion.tarn");
-            Assert.AreEqual(6, tarn.level); Assert.AreEqual(11, tarn.value); Assert.AreEqual(10, tarn.stack); Assert.AreEqual("GAME-ONLY", tarn.canonStatus); Assert.IsFalse(string.IsNullOrEmpty(tarn.description));
+            Assert.AreEqual(9, tarn.level); Assert.AreEqual(11, tarn.value); Assert.AreEqual(10, tarn.stack); Assert.AreEqual("GAME-ONLY", tarn.canonStatus); Assert.IsFalse(string.IsNullOrEmpty(tarn.description));
             Assert.IsFalse(items.Vendors.Any(v => (v.items ?? new string[0]).Contains("potion.tarn")), "The Tarnwater draught is made, not sold.");
         }
 

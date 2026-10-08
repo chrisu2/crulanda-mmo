@@ -90,7 +90,7 @@
       "giver": "Willow-Whisper",
       "turnIn": "Willow-Whisper",
       "zone": "zone.verdant",
-      "level": 11,
+      "level": 13,
       "requires": [
         "main.ashrim.5"
       ],
@@ -160,7 +160,7 @@
       "giver": "Willow-Whisper",
       "turnIn": "Oak-Bane",
       "zone": "zone.verdant",
-      "level": 12,
+      "level": 14,
       "requires": [
         "main.verdant.1"
       ],
@@ -229,7 +229,7 @@
       "giver": "Oak-Bane",
       "turnIn": "Willow-Whisper",
       "zone": "zone.verdant",
-      "level": 12,
+      "level": 14,
       "requires": [
         "main.verdant.2"
       ],
@@ -291,7 +291,7 @@
       "giver": "Willow-Whisper",
       "turnIn": "Willow-Whisper",
       "zone": "zone.verdant",
-      "level": 13,
+      "level": 15,
       "requires": [
         "main.verdant.3"
       ],
@@ -379,8 +379,8 @@
       "giver": "Reed-Song",
       "turnIn": "Reed-Song",
       "zone": "zone.verdant",
-      "level": 11,
-      "minLevel": 10,
+      "level": 13,
+      "minLevel": 12,
       "canonStatus": "CANON-EXPANDED: glass-frogs in the undergrowth are CANON (book3 ch.2); Reed-Song, the Mistmere and the moss-backed boars are GAME-ONLY.",
       "summary": "Drive off six moss-backed boars rooting up the reed-beds on the far shore of the Mistmere. They lie up in the reeds.",
       "offer": "\"Listen.\" Reed-Song is a thin, stooped Keeper the colour of wet reeds, and when she stops moving you lose her against the shore. \"The near shore sings. The glass-frogs click and answer. Now listen to the far shore.\" Nothing. \"Boars. Moss-backed, fat and bold, rooting up the reed-beds where the frogs lay. They lie up in the reeds, and they do not like to be found.\"\n\n\"Six. Then the far shore will sing again, and so will I.\"",
@@ -418,8 +418,8 @@
       "giver": "Alder-Knot",
       "turnIn": "Alder-Knot",
       "zone": "zone.verdant",
-      "level": 11,
-      "minLevel": 10,
+      "level": 13,
+      "minLevel": 12,
       "canonStatus": "CANON-EXPANDED: on the Shore iron rusts to nothing and the wood is worked instead (book3 ch.1, 3); Alder-Knot, the moss-antler stags and the carving are GAME-ONLY.",
       "summary": "Bring Alder-Knot five moss-crowned antlers from the stags of the Antler Meadow, north-west of Rootfast.",
       "offer": "Alder-Knot is all elbows and burls, with wood-shavings caught in the moss of his shoulders. \"Iron rusts on the Shore. Everything you flesh-folk carry here goes to rust-lace in a season. So I carve.\" He holds up a knife-handle of pale antler grown round with a ring of living wood. \"Antler, bound in heartwood. It lasts.\"\n\n\"The stags in the meadow are too many this year. They strip the saplings to the white. Bring me five antlers, good ones, with moss on the tines. The meadow will thank you, even if the stags don't.\"",
@@ -458,8 +458,8 @@
       "giver": "Moss-Lantern",
       "turnIn": "Moss-Lantern",
       "zone": "zone.verdant",
-      "level": 12,
-      "minLevel": 10,
+      "level": 14,
+      "minLevel": 12,
       "canonStatus": "CANON-EXPANDED: Veridian sap that glows (the bioluminescent sap mortar of book3 ch.4) is CANON; sap-lanterns with spider-silk wicks, Moss-Lantern, the canopy spiders and the Fallen Ghost-Oak are GAME-ONLY.",
       "summary": "Gather six skeins of web-silk from the canopy spiders nesting in the Fallen Ghost-Oak, west of Rootfast, for the grove's lantern-wicks.",
       "offer": "Moss-Lantern is round and slow and smells of warm honey. All round her, little lanterns of rind and resin hang from the roots, waiting for dusk. \"Sap burns green-gold and gentle, if the wick is right. Spider-silk is the right wick. Nothing else draws it so slow.\"\n\n\"The spiders in the Fallen Ghost-Oak spin the best silk on the Shore, and lately they have grown too many and too bold to ask. Bring me six skeins. Then Rootfast will be lit tonight, and you may sit under the lanterns and eat a sap-cake. Everyone should, once.\"",
@@ -498,8 +498,8 @@
       "giver": "Sister Iselle",
       "turnIn": "Sister Iselle",
       "zone": "zone.verdant",
-      "level": 12,
-      "minLevel": 10,
+      "level": 14,
+      "minLevel": 12,
       "canonStatus": "CANON-EXPANDED: the Silent Pilgrims, their dyed linen, silver masks and brass listening-tubes, and their search for the Original Song and its three notes (Earth, Spirit, Silence) are CANON (book3 ch.5, world_bible.md); Sister Iselle, the glade-light and her page are GAME-ONLY.",
       "summary": "Gather three caps of glade-light in the Whispering Glade for Sister Iselle, a Silent Pilgrim who has been listening there for eleven days.",
       "offer": "The pilgrim wears layered linen the colours of ochre and sand, and a mask of polished silver over her mouth and nose. She lowers a long brass tube from her ear. \"Forgive me. I have been listening to this glade for eleven days, and it has sung the same two notes on every one of them.\"\n\n\"The Archive teaches that the Song had three notes before the cycles began: Earth, and Spirit, and a third we have lost. This glade holds the first two. I need to hear them in my hand, not only in my ear. Bring me three caps of glade-light, the ones that glow. Take them gently. They grow back.\"",
@@ -549,8 +549,8 @@
       "giver": "Ondine Varro",
       "turnIn": "Ondine Varro",
       "zone": "zone.verdant",
-      "level": 12,
-      "minLevel": 10,
+      "level": 14,
+      "minLevel": 12,
       "canonStatus": "CANON-EXPANDED: Port Caelum's glass ships (world_bible.md), Veridian sap 'the color of liquid emerald and thicker than honey' and the Ghost-Oaks it is tapped from (book3 ch.4), and the quarrel between harvesting the Shore and singing to it (book3 ch.3) are CANON; Ondine Varro and this errand are GAME-ONLY. Taking the sap costs standing with the Keepers.",
       "summary": "Draw three flasks of Veridian sap from the spouts in the old Ghost-Oaks east of the Salt-Flats for Ondine Varro of Port Caelum. The Keepers will not like it.",
       "offer": "\"House Glass pays for three things: charts, salt, and anything that glows.\" Ondine Varro taps a chart weighted down with sea-shells. \"This sap glows. In Port Caelum they say a drop of it mends a cracked hull of glass so you'd never find the seam. Nobody in Port Caelum has ever seen any.\"\n\n\"There's a stand of old Ghost-Oaks east of the flats, with spouts already cut in them. Somebody taps them. Three flasks, and I'll pay more than a season of honest work.\" She doesn't smile. \"The wood-folk won't thank you. I'm not asking them. I'm asking you.\"",
@@ -603,8 +603,8 @@
       "giver": "Oak-Bane",
       "turnIn": "Oak-Bane",
       "zone": "zone.verdant",
-      "level": 13,
-      "minLevel": 10,
+      "level": 15,
+      "minLevel": 12,
       "canonStatus": "GAME-ONLY (Old Ninebranch). Oak-Bane, guardian of the deep woods, is CANON (book3 ch.2, world_bible.md).",
       "summary": "Put down Old Ninebranch, the great stag of the deep wood west of the Antler Meadow, before the grey in his antlers spreads to the herd. He is very dangerous.",
       "offer": "\"Old Ninebranch was a fawn when I was a sapling.\" Oak-Bane's voice is the creak of a whole tree in a wind. \"He has been king of the deep wood longer than your kind has had kings. This spring the grey got into his antlers. Now he gores anything that moves. A Keeper, yesterday. Not badly. He was always very good at it.\"\n\n\"I cannot do it. I have known him too long, and he knows how I move. You, he does not know. Make it clean.\"",
@@ -642,8 +642,8 @@
       "giver": "Willow-Whisper",
       "turnIn": "Mother Vane",
       "zone": "zone.verdant",
-      "level": 12,
-      "minLevel": 10,
+      "level": 14,
+      "minLevel": 12,
       "requires": [
         "main.verdant.1"
       ],
@@ -703,7 +703,7 @@
       "giver": "Willow-Whisper",
       "turnIn": "Willow-Whisper",
       "zone": "zone.verdant",
-      "level": 13,
+      "level": 15,
       "requires": [
         "main.verdant.4"
       ],
@@ -800,7 +800,7 @@
       "giver": "Reed-Song",
       "turnIn": "Reed-Song",
       "zone": "zone.verdant",
-      "level": 11,
+      "level": 13,
       "requires": [
         "npc.reedsong.boars"
       ],
@@ -840,7 +840,7 @@
       "giver": "Moss-Lantern",
       "turnIn": "Moss-Lantern",
       "zone": "zone.verdant",
-      "level": 12,
+      "level": 14,
       "requires": [
         "npc.mosslantern.silk"
       ],
@@ -896,7 +896,7 @@
       "giver": "Ondine Varro",
       "turnIn": "Ondine Varro",
       "zone": "zone.verdant",
-      "level": 13,
+      "level": 15,
       "canonStatus": "CANON (the violet fog and the Void-Touchers, book3 ch.2-4), shown early: PROVISIONAL",
       "summary": "Ondine Varro saw a violet fog below the ridge's south shoulder, and things walking in it. She wants to know what they are, and wants them gone.",
       "offer": "Ondine Varro has a glass-ship scout's way of looking past you at the horizon. \"Below the ridge, on the south shoulder, there's a fog that isn't fog. Violet. It tastes of the air before lightning.\" She touches her tongue as if remembering. \"Things walk in it. Thin things, that reach. Go at night, when it's thickest, and see them. Then I'd be glad if they stopped walking.\"",
@@ -950,7 +950,7 @@
       "giver": "Oak-Bane",
       "turnIn": "Oak-Bane",
       "zone": "zone.verdant",
-      "level": 11,
+      "level": 13,
       "canonStatus": "CANON Keeper (Oak-Bane); GAME-ONLY quest",
       "summary": "Creeping briars have got into the Fern Hollow south of Rootfast. Oak-Bane wants them torn out before they reach the giants.",
       "offer": "Oak-Bane's voice is like a branch settling under snow. \"The briars that came up the Briar Way have sent runners south. Into the Fern Hollow, where the new ferns glow.\" He opens a hand like a root unclenching. \"They choke what they climb. Go and look at the hollow, and pull them out. Five.\"",
@@ -1003,7 +1003,7 @@
       "giver": "Sister Iselle",
       "turnIn": "Willow-Whisper",
       "zone": "zone.verdant",
-      "level": 12,
+      "level": 14,
       "requires": [
         "side.iselle.notes"
       ],

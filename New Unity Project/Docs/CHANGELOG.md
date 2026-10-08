@@ -1633,3 +1633,30 @@ A read-only review by five reviewers, each finding checked by a second who tried
   out: the script used UnityEditor at runtime and would have broken the player build). Twenty-five helmets (Headgear.B/DS/G/I/M.011-016)
   are model-helm variants (GearLooks.ModelHelms; ActorVisual ModelHelm loads a node of the armour FBX by name) and in the wardrobe
   line-up (06-helms) for Chris to judge before any item wears one. The pack's README names no licence.
+
+## 2026-10-08 — Round 29: the level cap 15 and the bands stretched (Chris: "difficult and slow leveling, grind it out")
+- **Cap 13 to 15; the zones Oakhaven 1-5, Khaven 5-9, Peaks 9-12, Ash Rim 12-15, Verdant Shore 13-15** (tools/wip/levels/rescale.py): the
+  ordinary camps spread over each band by distance from the village, the nearest lowest; elites a level over their neighbours; cave
+  camps past the band's top (Crowsfoot Hollow 6-7, the Root-Mother's Deep 15); quests, bounties, loot lists and items move with their
+  zones, the old cap's things to the new cap. The Sealed Adit is 10-12 (adit_layout.py).
+- **The Shore is a group zone** ("all epic mobs, group required"): `groupZone` in the zone data; every camp mob there has an elite's
+  health and blows and kill XP (EncounterEnemy.Tough) without being an elite. The Rim stays solo-friendly.
+- **Slower levelling:** XpToNext is 400 + 170 a level (was 200 + 90): about twice the XP a level, growing faster at the top.
+- **Breadcrumbs (Chris):** each zone's last main quest already turns in at the next zone; they now sit at the top of their bands
+  (Oakhaven 4, Khaven 8, Peaks 11, the Rim 15 with a level-14 floor), and each next zone's first main quest follows at the band's start.
+- **Named and crafted gear re-made for its new level** (tools/wip/levels/regen_named.py): every named piece's weapon damage, armour
+  and value are the generated curve's at its new level, its stat points scaled to the budget there (102 pieces); crafted gear is
+  required at its tier zone's top level less one (bog-iron 8, ridge-steel 11, ash-steel and veridian 14; the heartwood capstone 14)
+  and on the uncommon curve; the skinning and junk tables' level bands and the world drop lists' bands moved with the global map.
+  The smiths' chain keeps its rule (no recipe worth more than half again its inputs): bog-iron ore 3 and bars 9, Adit ore 4 and
+  ridge-steel bars 11. Crowsfoot Hollow's quest sits at level 6 (offered at 5). The dungeon stays out of the Achievements' zones until
+  it has quests and deeds (D6); the Armoury lists its pieces under the Sealed Adit.
+- **Save format 10** (SteeperCurveMigration, 9 → 10): a character keeps its level and the way into it under the steeper curve (Chris's
+  save backed up first: hel/work/save-backups/2026-10-07-r29-before-curve).
+- **The Sealed Adit, first loot and moves** (dungeon D6/D2 first pass, pulled forward by the data tests): loot.adit.json, seventeen
+  boss pieces in seven signature lists (DUNGEON_DESIGN.md section 7), the Vent-Hound's and the greyed bears' skinning tables, and a
+  provisional EliteMoves entry for each of the seven elites until D2 gives them their mechanics. The Peaks' way in stands on the Ore
+  road's end and the Adit has a cart track from the cut to the mouth (the exits-on-roads rule). The Gallery is 21 m down, so no
+  knoll heaps over it (a buttress had stood in the Ember Vent's mouth).
+- Sim homes, gear bands (GearLooks.BandOf), the wardrobe's set levels (3, 7, 10, 13, 15) and the docs (WORLD_ZONES camp table,
+  QUEST_DESIGN section 8, DUNGEON_DESIGN) follow.

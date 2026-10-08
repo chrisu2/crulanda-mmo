@@ -1,184 +1,860 @@
 {
   "quests": [
     {
-      "id": "bounty.oakhaven.wolves", "title": "Wolves at the Old Fold", "kind": "bounty", "giver": "board", "turnIn": "board", "zone": "zone.oakhaven", "level": 1, "poster": "oakhaven", "canonStatus": "GAME-ONLY",
+      "id": "bounty.oakhaven.wolves",
+      "title": "Wolves at the Old Fold",
+      "kind": "bounty",
+      "giver": "board",
+      "turnIn": "board",
+      "zone": "zone.oakhaven",
+      "level": 1,
+      "poster": "oakhaven",
+      "canonStatus": "GAME-ONLY",
       "summary": "The shepherd of the Old Fold will pay for six grey wolves out of the Mastwood.",
       "offer": "Scrawled in charcoal on a scrap of sacking: WOLVES in the Mastwood, bold as you like, had two ewes off the Old Fold this week. Six of them dead and I'll pay thirty crowns, silver, no questions. Ask at the Cask for the shepherd.",
       "complete": "The shepherd counts out thirty silver crowns on the Cask's bench without looking up. \"Six. The ewes'll not come back, but the rest might sleep.\"",
-      "steps": [{ "text": "Kill six grey wolves in the Mastwood.", "objectives": [{ "type": "kill", "zone": "zone.oakhaven", "target": "mob.wolf.oakhaven.*", "count": 6, "text": "Grey wolves" }] }],
-      "rewards": { "xp": 50, "gold": 30, "reputation": [{ "faction": "oakhaven", "amount": 40 }] }
+      "steps": [
+        {
+          "text": "Kill six grey wolves in the Mastwood.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.oakhaven",
+              "target": "mob.wolf.oakhaven.*",
+              "count": 6,
+              "text": "Grey wolves"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 50,
+        "gold": 30,
+        "reputation": [
+          {
+            "faction": "oakhaven",
+            "amount": 40
+          }
+        ]
+      }
     },
     {
-      "id": "bounty.oakhaven.coney", "title": "Coney for the Cask's Pot", "kind": "bounty", "giver": "board", "turnIn": "board", "zone": "zone.oakhaven", "level": 1, "poster": "oakhaven", "canonStatus": "GAME-ONLY",
+      "id": "bounty.oakhaven.coney",
+      "title": "Coney for the Cask's Pot",
+      "kind": "bounty",
+      "giver": "board",
+      "turnIn": "board",
+      "zone": "zone.oakhaven",
+      "level": 1,
+      "poster": "oakhaven",
+      "canonStatus": "GAME-ONLY",
       "summary": "Hob Linden wants three coney skins for the Cask's kitchen: the pot and the hat-maker both.",
       "offer": "In the innkeeper's square hand: THREE CONEY SKINS wanted for the kitchen, twenty crowns the lot, bring them whole. H. Linden.",
       "complete": "Hob turns the skins over, nods, and the crowns are on the bar before you ask. \"Rabbit in the pot tonight. Tell nobody it was you; they'll all want one.\"",
-      "steps": [{ "text": "Bring three coney skins to the board (the rabbits of the downs and the Brook).", "objectives": [{ "type": "bring", "zone": "zone.oakhaven", "target": "board", "item": "hide.coney", "count": 3, "text": "Coney skins pinned to the board" }] }],
-      "rewards": { "xp": 40, "gold": 20, "reputation": [{ "faction": "oakhaven", "amount": 30 }] }
+      "steps": [
+        {
+          "text": "Bring three coney skins to the board (the rabbits of the downs and the Brook).",
+          "objectives": [
+            {
+              "type": "bring",
+              "zone": "zone.oakhaven",
+              "target": "board",
+              "item": "hide.coney",
+              "count": 3,
+              "text": "Coney skins pinned to the board"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 40,
+        "gold": 20,
+        "reputation": [
+          {
+            "faction": "oakhaven",
+            "amount": 30
+          }
+        ]
+      }
     },
     {
-      "id": "bounty.oakhaven.contract", "title": "Tusks for the Company", "kind": "bounty", "giver": "board", "turnIn": "board", "zone": "zone.oakhaven", "level": 2, "poster": "sandthrone", "canonStatus": "GAME-ONLY contract; CANON company (Sandthrone)",
+      "id": "bounty.oakhaven.contract",
+      "title": "Tusks for the Company",
+      "kind": "bounty",
+      "giver": "board",
+      "turnIn": "board",
+      "zone": "zone.oakhaven",
+      "level": 4,
+      "poster": "sandthrone",
+      "canonStatus": "GAME-ONLY contract; CANON company (Sandthrone)",
       "summary": "A Sandthrone contract: three boar hides for the company's saddler. Mercenary coin, and the Salt-Menders will hear you took it.",
       "offer": "A printed bill under a company seal, a sun on a bar of sand: BOAR HIDES, THREE, for the Company saddler at the toll road. FORTY-FIVE CROWNS on delivery. Sandthrone pays its debts. Below, in another hand, very small: and the Salt-Menders remember who takes their coin.",
       "complete": "A Sandthrone outrider in company sand takes the hides without a word, counts forty-five crowns into your palm, and rides. Somebody at the Cask watched the whole thing.",
-      "steps": [{ "text": "Bring three boar hides to the board.", "objectives": [{ "type": "bring", "zone": "zone.oakhaven", "target": "board", "item": "hide.boar", "count": 3, "text": "Boar hides for the company" }] }],
-      "rewards": { "xp": 60, "gold": 45, "reputation": [{ "faction": "sandthrone", "amount": 40 }, { "faction": "saltmenders", "amount": -30 }] }
+      "steps": [
+        {
+          "text": "Bring three boar hides to the board.",
+          "objectives": [
+            {
+              "type": "bring",
+              "zone": "zone.oakhaven",
+              "target": "board",
+              "item": "hide.boar",
+              "count": 3,
+              "text": "Boar hides for the company"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 60,
+        "gold": 45,
+        "reputation": [
+          {
+            "faction": "sandthrone",
+            "amount": 40
+          },
+          {
+            "faction": "saltmenders",
+            "amount": -30
+          }
+        ]
+      }
     },
     {
-      "id": "bounty.oakhaven.milestone", "title": "The Milestone After Dark", "kind": "bounty", "giver": "board", "turnIn": "board", "zone": "zone.oakhaven", "level": 2, "poster": "oakhaven", "canonStatus": "CANON-EXPANDED (Hallow's Creek, the first settlement the Wasting took)",
+      "id": "bounty.oakhaven.milestone",
+      "title": "The Milestone After Dark",
+      "kind": "bounty",
+      "giver": "board",
+      "turnIn": "board",
+      "zone": "zone.oakhaven",
+      "level": 4,
+      "poster": "oakhaven",
+      "canonStatus": "CANON-EXPANDED (Hallow's Creek, the first settlement the Wasting took)",
       "summary": "Corwin Ashby will pay to know whether the Hallow's Creek milestone still stands by the grey after dark.",
       "offer": "In the elder's careful hand: Will someone with a steady head walk out to the HALLOW'S CREEK MILESTONE by the grey after dark and tell me whether it still stands. Twenty-five crowns. I would go myself. Corwin Ashby.",
       "complete": "\"It stands.\" Corwin lets out a breath. \"Hallow's Creek went first, and that stone is the last thing with its name on. While it stands, we have time.\" He pays you from a purse that is lighter than it was.",
-      "steps": [{ "text": "Stand at the Hallow's Creek milestone by the grey, after dark.", "objectives": [{ "type": "visit", "zone": "zone.oakhaven", "at": { "x": 242, "y": -139.5 }, "radius": 10, "night": true, "text": "The milestone, at night", "say": "The stone stands. Beyond it the grey hisses very softly, like static, and gives no light of its own." }] }],
-      "rewards": { "xp": 45, "gold": 25, "reputation": [{ "faction": "oakhaven", "amount": 30 }] }
+      "steps": [
+        {
+          "text": "Stand at the Hallow's Creek milestone by the grey, after dark.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.oakhaven",
+              "at": {
+                "x": 242,
+                "y": -139.5
+              },
+              "radius": 10,
+              "night": true,
+              "text": "The milestone, at night",
+              "say": "The stone stands. Beyond it the grey hisses very softly, like static, and gives no light of its own."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 45,
+        "gold": 25,
+        "reputation": [
+          {
+            "faction": "oakhaven",
+            "amount": 30
+          }
+        ]
+      }
     },
     {
-      "id": "bounty.oakhaven.courier", "title": "A Bureau Courier on the Road", "kind": "bounty", "giver": "board", "turnIn": "board", "zone": "zone.oakhaven", "level": 3, "rare": true, "poster": "saltmenders", "canonStatus": "CANON-EXPANDED (the Investigation Bureau; Aether-Geodes, the Council's resonance fuel)",
+      "id": "bounty.oakhaven.courier",
+      "title": "A Bureau Courier on the Road",
+      "kind": "bounty",
+      "giver": "board",
+      "turnIn": "board",
+      "zone": "zone.oakhaven",
+      "level": 5,
+      "rare": true,
+      "poster": "saltmenders",
+      "canonStatus": "CANON-EXPANDED (the Investigation Bureau; Aether-Geodes, the Council's resonance fuel)",
       "summary": "A rare posting. A courier of the Concord's Investigation Bureau is crossing the zone on the North road carrying an Aether-Geode shard. The Salt-Menders want the shard out of the Bureau's hands, and will pay in bars as well as crowns.",
       "offer": "No name, no seal, pinned with a fish-bone: A BUREAU COURIER crosses by the North road tonight, white-cloaked, alone, with a STONE THAT HUMS in a lead box. The Council burns such stones for light, and what burns is somebody's memory. Take it from him. Keep it, or sell it; just not to them. The forge-bars are yours either way.",
       "complete": "The lead box is heavier than it looks. Inside, a shard of something like grey glass hums against your palm, and for a moment you hear a child counting. Two bars of good iron are waiting under the board, as promised, and nobody saw who left them.",
-      "steps": [{ "text": "Kill the Bureau courier on the North road and take the Aether-Geode shard.", "objectives": [{ "type": "kill", "zone": "zone.oakhaven", "target": "mob.courier.oakhaven.*", "text": "The Bureau courier", "say": "The courier goes down clutching a lead box to his chest. It hums." }] }],
-      "rewards": { "xp": 120, "gold": 60, "bagItems": ["mat.geode_shard", "mat.bogiron_bar", "mat.bogiron_bar"], "reputation": [{ "faction": "saltmenders", "amount": 80 }] }
+      "steps": [
+        {
+          "text": "Kill the Bureau courier on the North road and take the Aether-Geode shard.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.oakhaven",
+              "target": "mob.courier.oakhaven.*",
+              "text": "The Bureau courier",
+              "say": "The courier goes down clutching a lead box to his chest. It hums."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 120,
+        "gold": 60,
+        "bagItems": [
+          "mat.geode_shard",
+          "mat.bogiron_bar",
+          "mat.bogiron_bar"
+        ],
+        "reputation": [
+          {
+            "faction": "saltmenders",
+            "amount": 80
+          }
+        ]
+      }
     },
-
     {
-      "id": "bounty.khaven.hollows", "title": "Six Off the Creek", "kind": "bounty", "giver": "board", "turnIn": "board", "zone": "zone.khaven", "level": 4, "poster": "khaven", "canonStatus": "CANON creature (Hollow Men), GAME-ONLY bounty",
+      "id": "bounty.khaven.hollows",
+      "title": "Six Off the Creek",
+      "kind": "bounty",
+      "giver": "board",
+      "turnIn": "board",
+      "zone": "zone.khaven",
+      "level": 6,
+      "poster": "khaven",
+      "canonStatus": "CANON creature (Hollow Men), GAME-ONLY bounty",
       "summary": "The crypt-keeper pays for Hollow Men put down along Gloom Creek and the plague pit.",
       "offer": "In a cramped hand: HOLLOW MEN walking by the creek and the pit again. Six put down, thirty-five crowns, and I'll see to the ground. A. Morrow.",
       "complete": "Ansel pays in coins that have been in the ground a long time. \"Six. I'll put the stones back over them tonight.\"",
-      "steps": [{ "text": "Put down six Hollow Men by Gloom Creek or the plague pit.", "objectives": [{ "type": "kill", "zone": "zone.khaven", "target": "mob.hollow.khaven.*", "count": 6, "text": "Hollow Men put down" }] }],
-      "rewards": { "xp": 90, "gold": 35 }
+      "steps": [
+        {
+          "text": "Put down six Hollow Men by Gloom Creek or the plague pit.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.khaven",
+              "target": "mob.hollow.khaven.*",
+              "count": 6,
+              "text": "Hollow Men put down"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 90,
+        "gold": 35
+      }
     },
     {
-      "id": "bounty.khaven.caps", "title": "Mourner's Cap for the Lamps", "kind": "bounty", "giver": "board", "turnIn": "board", "zone": "zone.khaven", "level": 3, "poster": "khaven", "canonStatus": "GAME-ONLY",
+      "id": "bounty.khaven.caps",
+      "title": "Mourner's Cap for the Lamps",
+      "kind": "bounty",
+      "giver": "board",
+      "turnIn": "board",
+      "zone": "zone.khaven",
+      "level": 5,
+      "poster": "khaven",
+      "canonStatus": "GAME-ONLY",
       "summary": "Wenna Coyle wants four mourner's cap for the lamp-oil she burns against the dark.",
       "offer": "A sprig of the cap itself is pinned with the note: FOUR MOURNER'S CAP, whole, for the lamps. Thirty crowns. Don't pick by the gallows. W. Coyle.",
       "complete": "Wenna crushes a cap between finger and thumb and smells it. \"Good. Not from under the gallows.\" Thirty crowns, counted twice.",
-      "steps": [{ "text": "Bring four mourner's cap to the board (they grow by the creek; herbalism).", "objectives": [{ "type": "bring", "zone": "zone.khaven", "target": "board", "item": "mat.mourners_cap", "count": 4, "text": "Mourner's cap" }] }],
-      "rewards": { "xp": 70, "gold": 30 }
+      "steps": [
+        {
+          "text": "Bring four mourner's cap to the board (they grow by the creek; herbalism).",
+          "objectives": [
+            {
+              "type": "bring",
+              "zone": "zone.khaven",
+              "target": "board",
+              "item": "mat.mourners_cap",
+              "count": 4,
+              "text": "Mourner's cap"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 70,
+        "gold": 30
+      }
     },
     {
-      "id": "bounty.khaven.contract", "title": "Wolves Off the Toll Road", "kind": "bounty", "giver": "board", "turnIn": "board", "zone": "zone.khaven", "level": 4, "poster": "sandthrone", "canonStatus": "GAME-ONLY contract; CANON company (Sandthrone)",
+      "id": "bounty.khaven.contract",
+      "title": "Wolves Off the Toll Road",
+      "kind": "bounty",
+      "giver": "board",
+      "turnIn": "board",
+      "zone": "zone.khaven",
+      "level": 6,
+      "poster": "sandthrone",
+      "canonStatus": "GAME-ONLY contract; CANON company (Sandthrone)",
       "summary": "A Sandthrone contract: five grey wolves off the road north, so the company's carts get through. Mercenary coin; the Salt-Menders will hear of it.",
       "offer": "A printed bill, the sun on a bar of sand: WOLVES on the north road, FIVE dead, FIFTY CROWNS. The Company's carts must pass. Below, scratched with a nail: their carts carried children once.",
       "complete": "An outrider pays fifty crowns from a company purse and says nothing at all. Somebody in Khaven saw.",
-      "steps": [{ "text": "Kill five grey wolves in the Whispering Wood.", "objectives": [{ "type": "kill", "zone": "zone.khaven", "target": "mob.wolf.khaven.*", "count": 5, "text": "Wolves off the road" }] }],
-      "rewards": { "xp": 90, "gold": 50, "reputation": [{ "faction": "sandthrone", "amount": 40 }, { "faction": "saltmenders", "amount": -30 }] }
+      "steps": [
+        {
+          "text": "Kill five grey wolves in the Whispering Wood.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.khaven",
+              "target": "mob.wolf.khaven.*",
+              "count": 5,
+              "text": "Wolves off the road"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 90,
+        "gold": 50,
+        "reputation": [
+          {
+            "faction": "sandthrone",
+            "amount": 40
+          },
+          {
+            "faction": "saltmenders",
+            "amount": -30
+          }
+        ]
+      }
     },
     {
-      "id": "bounty.khaven.gibbet", "title": "The Gibbet at Midnight", "kind": "bounty", "giver": "board", "turnIn": "board", "zone": "zone.khaven", "level": 3, "poster": "khaven", "canonStatus": "GAME-ONLY",
+      "id": "bounty.khaven.gibbet",
+      "title": "The Gibbet at Midnight",
+      "kind": "bounty",
+      "giver": "board",
+      "turnIn": "board",
+      "zone": "zone.khaven",
+      "level": 5,
+      "poster": "khaven",
+      "canonStatus": "GAME-ONLY",
       "summary": "Cato Brisk will pay to know whether the Gibbet Crossroads is as empty at night as it is by day.",
       "offer": "In the merchant's neat figures: Twenty-five crowns to any soul who stands under the GIBBET at the crossroads after dark and comes back to say what hangs there. I am a man of accounts, not of nerve. C. Brisk.",
       "complete": "\"Nothing hangs there.\" Cato writes it down. \"Then the chain is what I heard. Chains don't swing by themselves, but twenty-five crowns says I'll pretend they do.\"",
-      "steps": [{ "text": "Stand under the Gibbet Crossroads at night.", "objectives": [{ "type": "visit", "zone": "zone.khaven", "at": { "x": -95.8, "y": -131 }, "radius": 10, "night": true, "text": "The gibbet, at night", "say": "The gibbet is empty. Its chain swings a little, though there is no wind, and stops when you look at it." }] }],
-      "rewards": { "xp": 60, "gold": 25 }
+      "steps": [
+        {
+          "text": "Stand under the Gibbet Crossroads at night.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.khaven",
+              "at": {
+                "x": -95.8,
+                "y": -131
+              },
+              "radius": 10,
+              "night": true,
+              "text": "The gibbet, at night",
+              "say": "The gibbet is empty. Its chain swings a little, though there is no wind, and stops when you look at it."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 60,
+        "gold": 25
+      }
     },
     {
-      "id": "bounty.khaven.courier", "title": "A Bureau Courier on the Gate Road", "kind": "bounty", "giver": "board", "turnIn": "board", "zone": "zone.khaven", "level": 6, "rare": true, "poster": "saltmenders", "canonStatus": "CANON-EXPANDED (the Investigation Bureau; Aether-Geodes)",
+      "id": "bounty.khaven.courier",
+      "title": "A Bureau Courier on the Gate Road",
+      "kind": "bounty",
+      "giver": "board",
+      "turnIn": "board",
+      "zone": "zone.khaven",
+      "level": 9,
+      "rare": true,
+      "poster": "saltmenders",
+      "canonStatus": "CANON-EXPANDED (the Investigation Bureau; Aether-Geodes)",
       "summary": "A rare posting. A Bureau courier crosses Khaven by the Gate road with an Aether-Geode shard in a lead box. Take it, for the Salt-Menders, and the forge-bars are yours.",
       "offer": "Pinned with a fish-bone, no name: A BUREAU COURIER on the Gate road tonight, white cloak, lead box, a STONE THAT HUMS. They burn the dead's memories for lamplight in Argentis. Take it from him. Ridge-steel under the board for whoever does.",
       "complete": "The shard hums in its lead box like a struck glass, and under the board, as promised, two bars of ridge-steel wrapped in sacking. Nobody saw who left them.",
-      "steps": [{ "text": "Kill the Bureau courier on the Gate road and take the Aether-Geode shard.", "objectives": [{ "type": "kill", "zone": "zone.khaven", "target": "mob.courier.khaven.*", "text": "The Bureau courier", "say": "The courier falls across the road with the lead box under him. It hums." }] }],
-      "rewards": { "xp": 200, "gold": 80, "bagItems": ["mat.geode_shard", "mat.ridgesteel_bar", "mat.ridgesteel_bar"], "reputation": [{ "faction": "saltmenders", "amount": 80 }] }
+      "steps": [
+        {
+          "text": "Kill the Bureau courier on the Gate road and take the Aether-Geode shard.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.khaven",
+              "target": "mob.courier.khaven.*",
+              "text": "The Bureau courier",
+              "say": "The courier falls across the road with the lead box under him. It hums."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 200,
+        "gold": 80,
+        "bagItems": [
+          "mat.geode_shard",
+          "mat.ridgesteel_bar",
+          "mat.ridgesteel_bar"
+        ],
+        "reputation": [
+          {
+            "faction": "saltmenders",
+            "amount": 80
+          }
+        ]
+      }
     },
-
     {
-      "id": "bounty.peaks.wolves", "title": "Mountain Wolves on the Mule Track", "kind": "bounty", "giver": "board", "turnIn": "board", "zone": "zone.peaks", "level": 7, "poster": "peaks", "canonStatus": "GAME-ONLY",
+      "id": "bounty.peaks.wolves",
+      "title": "Mountain Wolves on the Mule Track",
+      "kind": "bounty",
+      "giver": "board",
+      "turnIn": "board",
+      "zone": "zone.peaks",
+      "level": 10,
+      "poster": "peaks",
+      "canonStatus": "GAME-ONLY",
       "summary": "The waystation pays for six mountain wolves off the mule track.",
       "offer": "WOLVES on the mule track, six dead, forty crowns from the waystation purse. Y. Quell.",
       "complete": "Yara Quell pays forty crowns and marks six strokes on the door-post. \"That's this month.\"",
-      "steps": [{ "text": "Kill six mountain wolves.", "objectives": [{ "type": "kill", "zone": "zone.peaks", "target": "mob.wolf.peaks.*", "count": 6, "text": "Mountain wolves" }] }],
-      "rewards": { "xp": 120, "gold": 40 }
+      "steps": [
+        {
+          "text": "Kill six mountain wolves.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.peaks",
+              "target": "mob.wolf.peaks.*",
+              "count": 6,
+              "text": "Mountain wolves"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 120,
+        "gold": 40
+      }
     },
     {
-      "id": "bounty.peaks.ore", "title": "Adit Ore for the Forge", "kind": "bounty", "giver": "board", "turnIn": "board", "zone": "zone.peaks", "level": 6, "poster": "peaks", "canonStatus": "GAME-ONLY",
+      "id": "bounty.peaks.ore",
+      "title": "Adit Ore for the Forge",
+      "kind": "bounty",
+      "giver": "board",
+      "turnIn": "board",
+      "zone": "zone.peaks",
+      "level": 9,
+      "poster": "peaks",
+      "canonStatus": "GAME-ONLY",
       "summary": "The waystation smith wants four lumps of adit ore from the old workings.",
       "offer": "ADIT ORE, four good lumps, for the forge. Forty crowns. The adit's no place after dark. M. Vire.",
       "complete": "Maddoc Vire weighs the ore in his hand. \"Good iron in that, under the grey.\" Forty crowns.",
-      "steps": [{ "text": "Bring four adit iron ore to the board (mining).", "objectives": [{ "type": "bring", "zone": "zone.peaks", "target": "board", "item": "mat.adit_ore", "count": 4, "text": "Adit iron ore" }] }],
-      "rewards": { "xp": 100, "gold": 40 }
+      "steps": [
+        {
+          "text": "Bring four adit iron ore to the board (mining).",
+          "objectives": [
+            {
+              "type": "bring",
+              "zone": "zone.peaks",
+              "target": "board",
+              "item": "mat.adit_ore",
+              "count": 4,
+              "text": "Adit iron ore"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 100,
+        "gold": 40
+      }
     },
     {
-      "id": "bounty.peaks.contract", "title": "Rockhides for the Toll-House", "kind": "bounty", "giver": "board", "turnIn": "board", "zone": "zone.peaks", "level": 7, "poster": "sandthrone", "canonStatus": "GAME-ONLY contract; CANON company (Sandthrone)",
+      "id": "bounty.peaks.contract",
+      "title": "Rockhides for the Toll-House",
+      "kind": "bounty",
+      "giver": "board",
+      "turnIn": "board",
+      "zone": "zone.peaks",
+      "level": 10,
+      "poster": "sandthrone",
+      "canonStatus": "GAME-ONLY contract; CANON company (Sandthrone)",
       "summary": "A Sandthrone contract: three boar hides for the toll-house. Mercenary coin; the Salt-Menders will hear of it.",
       "offer": "The company bill, the sun on a bar of sand: BOAR HIDES, THREE, to the toll-house. SIXTY CROWNS. Below, in charcoal: the toll-house keeps a ledger of children too.",
       "complete": "A toll-guard pays sixty crowns through the hatch and shuts it.",
-      "steps": [{ "text": "Bring three boar hides to the board.", "objectives": [{ "type": "bring", "zone": "zone.peaks", "target": "board", "item": "hide.boar", "count": 3, "text": "Rockhide boar hides" }] }],
-      "rewards": { "xp": 120, "gold": 60, "reputation": [{ "faction": "sandthrone", "amount": 40 }, { "faction": "saltmenders", "amount": -30 }] }
+      "steps": [
+        {
+          "text": "Bring three boar hides to the board.",
+          "objectives": [
+            {
+              "type": "bring",
+              "zone": "zone.peaks",
+              "target": "board",
+              "item": "hide.boar",
+              "count": 3,
+              "text": "Rockhide boar hides"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 120,
+        "gold": 60,
+        "reputation": [
+          {
+            "faction": "sandthrone",
+            "amount": 40
+          },
+          {
+            "faction": "saltmenders",
+            "amount": -30
+          }
+        ]
+      }
     },
     {
-      "id": "bounty.peaks.courier", "title": "A Bureau Courier on the Toll Road", "kind": "bounty", "giver": "board", "turnIn": "board", "zone": "zone.peaks", "level": 9, "rare": true, "poster": "saltmenders", "canonStatus": "CANON-EXPANDED (the Investigation Bureau; Aether-Geodes)",
+      "id": "bounty.peaks.courier",
+      "title": "A Bureau Courier on the Toll Road",
+      "kind": "bounty",
+      "giver": "board",
+      "turnIn": "board",
+      "zone": "zone.peaks",
+      "level": 12,
+      "rare": true,
+      "poster": "saltmenders",
+      "canonStatus": "CANON-EXPANDED (the Investigation Bureau; Aether-Geodes)",
       "summary": "A rare posting. A Bureau courier crosses the Peaks by the Toll road with an Aether-Geode shard. Take it for the Salt-Menders; ash-steel under the board for whoever does.",
       "offer": "No seal, a fish-bone pin: A BUREAU COURIER takes the Toll road tonight with a STONE THAT HUMS in lead. Every lamp in the High City is somebody's stolen memory. Take it from him. Ash-steel waits under the board.",
       "complete": "The shard hums in its box; under the board, two bars of ash-steel in sacking.",
-      "steps": [{ "text": "Kill the Bureau courier on the Toll road and take the Aether-Geode shard.", "objectives": [{ "type": "kill", "zone": "zone.peaks", "target": "mob.courier.peaks.*", "text": "The Bureau courier", "say": "The courier goes down on the toll road, the lead box still humming in his arms." }] }],
-      "rewards": { "xp": 260, "gold": 100, "bagItems": ["mat.geode_shard", "mat.ashsteel_bar", "mat.ashsteel_bar"], "reputation": [{ "faction": "saltmenders", "amount": 80 }] }
+      "steps": [
+        {
+          "text": "Kill the Bureau courier on the Toll road and take the Aether-Geode shard.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.peaks",
+              "target": "mob.courier.peaks.*",
+              "text": "The Bureau courier",
+              "say": "The courier goes down on the toll road, the lead box still humming in his arms."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 260,
+        "gold": 100,
+        "bagItems": [
+          "mat.geode_shard",
+          "mat.ashsteel_bar",
+          "mat.ashsteel_bar"
+        ],
+        "reputation": [
+          {
+            "faction": "saltmenders",
+            "amount": 80
+          }
+        ]
+      }
     },
-
     {
-      "id": "bounty.ashrim.cultists", "title": "Bone-Masks at the Ash-Pit", "kind": "bounty", "giver": "board", "turnIn": "board", "zone": "zone.ashrim", "level": 9, "poster": "ashwalkers", "canonStatus": "CANON faction (Ash-Walkers, the Cult of Ash), GAME-ONLY bounty",
+      "id": "bounty.ashrim.cultists",
+      "title": "Bone-Masks at the Ash-Pit",
+      "kind": "bounty",
+      "giver": "board",
+      "turnIn": "board",
+      "zone": "zone.ashrim",
+      "level": 12,
+      "poster": "ashwalkers",
+      "canonStatus": "CANON faction (Ash-Walkers, the Cult of Ash), GAME-ONLY bounty",
       "summary": "The Ash-Walkers pay in crowns for six bone-masked cultists off the ash-pit.",
       "offer": "Burned into a plank: SIX BONE-MASKS off the ash-pit. Fifty crowns of salt-money. Grohl.",
       "complete": "Grohl pays fifty crowns that are white with salt. \"Six fewer to feed the fire.\"",
-      "steps": [{ "text": "Kill six bone-masked cultists.", "objectives": [{ "type": "kill", "zone": "zone.ashrim", "target": "mob.cultist.ashrim.*", "count": 6, "text": "Bone-masked cultists" }] }],
-      "rewards": { "xp": 160, "gold": 50, "reputation": [{ "faction": "ashwalkers", "amount": 40 }] }
+      "steps": [
+        {
+          "text": "Kill six bone-masked cultists.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.ashrim",
+              "target": "mob.cultist.ashrim.*",
+              "count": 6,
+              "text": "Bone-masked cultists"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 160,
+        "gold": 50,
+        "reputation": [
+          {
+            "faction": "ashwalkers",
+            "amount": 40
+          }
+        ]
+      }
     },
     {
-      "id": "bounty.ashrim.thistle", "title": "Cinder-Thistle for the Salt-Pans", "kind": "bounty", "giver": "board", "turnIn": "board", "zone": "zone.ashrim", "level": 9, "poster": "ashwalkers", "canonStatus": "GAME-ONLY",
+      "id": "bounty.ashrim.thistle",
+      "title": "Cinder-Thistle for the Salt-Pans",
+      "kind": "bounty",
+      "giver": "board",
+      "turnIn": "board",
+      "zone": "zone.ashrim",
+      "level": 12,
+      "poster": "ashwalkers",
+      "canonStatus": "GAME-ONLY",
       "summary": "Mother Vane wants four cinder-thistle for the salt-pans' fire.",
       "offer": "CINDER-THISTLE, four heads, for the pans. Fifty crowns. Mind the burrs. Vane.",
       "complete": "Mother Vane counts the heads into a salt-crusted basket. \"These burn clean. Fifty crowns, and a blessing you don't believe in.\"",
-      "steps": [{ "text": "Bring four cinder-thistle to the board (herbalism).", "objectives": [{ "type": "bring", "zone": "zone.ashrim", "target": "board", "item": "mat.cinder_thistle", "count": 4, "text": "Cinder-thistle" }] }],
-      "rewards": { "xp": 140, "gold": 50 }
+      "steps": [
+        {
+          "text": "Bring four cinder-thistle to the board (herbalism).",
+          "objectives": [
+            {
+              "type": "bring",
+              "zone": "zone.ashrim",
+              "target": "board",
+              "item": "mat.cinder_thistle",
+              "count": 4,
+              "text": "Cinder-thistle"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 140,
+        "gold": 50
+      }
     },
     {
-      "id": "bounty.ashrim.contract", "title": "Hounds Off the Harpoon-Line", "kind": "bounty", "giver": "board", "turnIn": "board", "zone": "zone.ashrim", "level": 10, "poster": "sandthrone", "canonStatus": "GAME-ONLY contract; CANON company (Sandthrone)",
+      "id": "bounty.ashrim.contract",
+      "title": "Hounds Off the Harpoon-Line",
+      "kind": "bounty",
+      "giver": "board",
+      "turnIn": "board",
+      "zone": "zone.ashrim",
+      "level": 14,
+      "poster": "sandthrone",
+      "canonStatus": "GAME-ONLY contract; CANON company (Sandthrone)",
       "summary": "A Sandthrone contract: five ash hounds dead along the harpoon-line. Mercenary coin; the Salt-Menders will hear of it.",
       "offer": "The company bill, singed: ASH HOUNDS, FIVE, off the harpoon-line. SEVENTY CROWNS. Scratched beneath: and whose lines were the harpoons for, company man?",
       "complete": "A Sandthrone rider in a salt-stiff cloak pays seventy crowns and goes. Oska saw.",
-      "steps": [{ "text": "Kill five ash hounds.", "objectives": [{ "type": "kill", "zone": "zone.ashrim", "target": "mob.hound.ashrim.*", "count": 5, "text": "Ash hounds" }] }],
-      "rewards": { "xp": 170, "gold": 70, "reputation": [{ "faction": "sandthrone", "amount": 40 }, { "faction": "saltmenders", "amount": -30 }] }
+      "steps": [
+        {
+          "text": "Kill five ash hounds.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.ashrim",
+              "target": "mob.hound.ashrim.*",
+              "count": 5,
+              "text": "Ash hounds"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 170,
+        "gold": 70,
+        "reputation": [
+          {
+            "faction": "sandthrone",
+            "amount": 40
+          },
+          {
+            "faction": "saltmenders",
+            "amount": -30
+          }
+        ]
+      }
     },
     {
-      "id": "bounty.ashrim.courier", "title": "A Bureau Courier on the Ridge Road", "kind": "bounty", "giver": "board", "turnIn": "board", "zone": "zone.ashrim", "level": 11, "rare": true, "poster": "saltmenders", "canonStatus": "CANON-EXPANDED (the Investigation Bureau; Aether-Geodes)",
+      "id": "bounty.ashrim.courier",
+      "title": "A Bureau Courier on the Ridge Road",
+      "kind": "bounty",
+      "giver": "board",
+      "turnIn": "board",
+      "zone": "zone.ashrim",
+      "level": 14,
+      "rare": true,
+      "poster": "saltmenders",
+      "canonStatus": "CANON-EXPANDED (the Investigation Bureau; Aether-Geodes)",
       "summary": "A rare posting. A Bureau courier crosses the Rim by the Ridge road with an Aether-Geode shard. Take it for the Salt-Menders; Veridian bars under the board.",
       "offer": "A fish-bone pin: A BUREAU COURIER on the Ridge road tonight, lead box, a STONE THAT HUMS. They harvest the dead for lamplight. Take it from him. Veridian waits under the board.",
       "complete": "The shard hums; under the board, two Veridian bars wrapped in salt-cloth.",
-      "steps": [{ "text": "Kill the Bureau courier on the Ridge road and take the Aether-Geode shard.", "objectives": [{ "type": "kill", "zone": "zone.ashrim", "target": "mob.courier.ashrim.*", "text": "The Bureau courier", "say": "The courier falls on the ridge road, the lead box humming under him." }] }],
-      "rewards": { "xp": 320, "gold": 120, "bagItems": ["mat.geode_shard", "mat.veridian_bar", "mat.veridian_bar"], "reputation": [{ "faction": "saltmenders", "amount": 80 }] }
+      "steps": [
+        {
+          "text": "Kill the Bureau courier on the Ridge road and take the Aether-Geode shard.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.ashrim",
+              "target": "mob.courier.ashrim.*",
+              "text": "The Bureau courier",
+              "say": "The courier falls on the ridge road, the lead box humming under him."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 320,
+        "gold": 120,
+        "bagItems": [
+          "mat.geode_shard",
+          "mat.veridian_bar",
+          "mat.veridian_bar"
+        ],
+        "reputation": [
+          {
+            "faction": "saltmenders",
+            "amount": 80
+          }
+        ]
+      }
     },
-
     {
-      "id": "bounty.verdant.spiders", "title": "Silk-Spinners of the Deep Wood", "kind": "bounty", "giver": "board", "turnIn": "board", "zone": "zone.verdant", "level": 11, "poster": "verdant", "canonStatus": "CANON faction (the Veridian Keepers), GAME-ONLY bounty",
+      "id": "bounty.verdant.spiders",
+      "title": "Silk-Spinners of the Deep Wood",
+      "kind": "bounty",
+      "giver": "board",
+      "turnIn": "board",
+      "zone": "zone.verdant",
+      "level": 14,
+      "poster": "verdant",
+      "canonStatus": "CANON faction (the Veridian Keepers), GAME-ONLY bounty",
       "summary": "Moss-Lantern asks for six forest spiders fewer in the deep wood.",
       "offer": "Woven in pale root-fibre on the board: SIX SPINNERS fewer in the deep wood, and the Keepers will give sixty of the strangers' crowns.",
       "complete": "Moss-Lantern lays sixty crowns on a leaf, one by one, as if they were seeds. \"The wood breathes easier.\"",
-      "steps": [{ "text": "Kill six forest spiders.", "objectives": [{ "type": "kill", "zone": "zone.verdant", "target": "mob.spider.verdant.*", "count": 6, "text": "Forest spiders" }] }],
-      "rewards": { "xp": 200, "gold": 60 }
+      "steps": [
+        {
+          "text": "Kill six forest spiders.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.verdant",
+              "target": "mob.spider.verdant.*",
+              "count": 6,
+              "text": "Forest spiders"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 200,
+        "gold": 60
+      }
     },
     {
-      "id": "bounty.verdant.dewfern", "title": "Dewfern for the Root-Mother", "kind": "bounty", "giver": "board", "turnIn": "board", "zone": "zone.verdant", "level": 11, "poster": "verdant", "canonStatus": "CANON (the Root-Mother), GAME-ONLY bounty",
+      "id": "bounty.verdant.dewfern",
+      "title": "Dewfern for the Root-Mother",
+      "kind": "bounty",
+      "giver": "board",
+      "turnIn": "board",
+      "zone": "zone.verdant",
+      "level": 14,
+      "poster": "verdant",
+      "canonStatus": "CANON (the Root-Mother), GAME-ONLY bounty",
       "summary": "Willow-Whisper asks for three dewfern fronds for the Root-Mother's amber.",
       "offer": "Three DEWFERN fronds, unbroken, for the Root-Mother. The Keepers give sixty crowns, though they do not know what crowns are for.",
       "complete": "Willow-Whisper takes the fronds without touching them. \"She will remember you. That is worth more than the metal, but have the metal too.\"",
-      "steps": [{ "text": "Bring three dewfern fronds to the board (herbalism).", "objectives": [{ "type": "bring", "zone": "zone.verdant", "target": "board", "item": "mat.dewfern", "count": 3, "text": "Dewfern fronds" }] }],
-      "rewards": { "xp": 180, "gold": 60 }
+      "steps": [
+        {
+          "text": "Bring three dewfern fronds to the board (herbalism).",
+          "objectives": [
+            {
+              "type": "bring",
+              "zone": "zone.verdant",
+              "target": "board",
+              "item": "mat.dewfern",
+              "count": 3,
+              "text": "Dewfern fronds"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 180,
+        "gold": 60
+      }
     },
     {
-      "id": "bounty.verdant.contract", "title": "Mossbacks for the Company Pot", "kind": "bounty", "giver": "board", "turnIn": "board", "zone": "zone.verdant", "level": 12, "poster": "sandthrone", "canonStatus": "GAME-ONLY contract; CANON company (Sandthrone)",
+      "id": "bounty.verdant.contract",
+      "title": "Mossbacks for the Company Pot",
+      "kind": "bounty",
+      "giver": "board",
+      "turnIn": "board",
+      "zone": "zone.verdant",
+      "level": 14,
+      "poster": "sandthrone",
+      "canonStatus": "GAME-ONLY contract; CANON company (Sandthrone)",
       "summary": "A Sandthrone contract: four mossback boars for the company's pot. Mercenary coin; the Salt-Menders will hear of it.",
       "offer": "The company bill, mould on its corners: MOSSBACKS, FOUR, for the pot. EIGHTY CROWNS. Scratched beneath: the Keepers watch who feeds the company.",
       "complete": "A Sandthrone forager pays eighty crowns and hurries out of the wood as if it were listening. It is.",
-      "steps": [{ "text": "Kill four mossback boars.", "objectives": [{ "type": "kill", "zone": "zone.verdant", "target": "mob.mossboar.verdant.*", "count": 4, "text": "Mossback boars" }] }],
-      "rewards": { "xp": 220, "gold": 80, "reputation": [{ "faction": "sandthrone", "amount": 40 }, { "faction": "saltmenders", "amount": -30 }] }
+      "steps": [
+        {
+          "text": "Kill four mossback boars.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.verdant",
+              "target": "mob.mossboar.verdant.*",
+              "count": 4,
+              "text": "Mossback boars"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 220,
+        "gold": 80,
+        "reputation": [
+          {
+            "faction": "sandthrone",
+            "amount": 40
+          },
+          {
+            "faction": "saltmenders",
+            "amount": -30
+          }
+        ]
+      }
     },
     {
-      "id": "bounty.verdant.courier", "title": "A Bureau Courier on the Ash-Road", "kind": "bounty", "giver": "board", "turnIn": "board", "zone": "zone.verdant", "level": 13, "rare": true, "poster": "saltmenders", "canonStatus": "CANON-EXPANDED (the Investigation Bureau; Aether-Geodes)",
+      "id": "bounty.verdant.courier",
+      "title": "A Bureau Courier on the Ash-Road",
+      "kind": "bounty",
+      "giver": "board",
+      "turnIn": "board",
+      "zone": "zone.verdant",
+      "level": 15,
+      "rare": true,
+      "poster": "saltmenders",
+      "canonStatus": "CANON-EXPANDED (the Investigation Bureau; Aether-Geodes)",
       "summary": "A rare posting. A Bureau courier crosses the Verdant by the Ash-road with an Aether-Geode shard. Take it for the Salt-Menders; three Veridian bars under the board.",
       "offer": "A fish-bone pin: A BUREAU COURIER on the Ash-road tonight, lead box, a STONE THAT HUMS. Somebody's memory, cut for a lamp. Take it from him. Three Veridian bars under the board.",
       "complete": "The shard hums like a struck glass; under the board, three Veridian bars in a root-fibre wrap.",
-      "steps": [{ "text": "Kill the Bureau courier on the Ash-road and take the Aether-Geode shard.", "objectives": [{ "type": "kill", "zone": "zone.verdant", "target": "mob.courier.verdant.*", "text": "The Bureau courier", "say": "The courier falls among the roots, the lead box humming in his arms." }] }],
-      "rewards": { "xp": 380, "gold": 140, "bagItems": ["mat.geode_shard", "mat.veridian_bar", "mat.veridian_bar", "mat.veridian_bar"], "reputation": [{ "faction": "saltmenders", "amount": 80 }] }
+      "steps": [
+        {
+          "text": "Kill the Bureau courier on the Ash-road and take the Aether-Geode shard.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.verdant",
+              "target": "mob.courier.verdant.*",
+              "text": "The Bureau courier",
+              "say": "The courier falls among the roots, the lead box humming in his arms."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 380,
+        "gold": 140,
+        "bagItems": [
+          "mat.geode_shard",
+          "mat.veridian_bar",
+          "mat.veridian_bar",
+          "mat.veridian_bar"
+        ],
+        "reputation": [
+          {
+            "faction": "saltmenders",
+            "amount": 80
+          }
+        ]
+      }
     }
   ]
 }

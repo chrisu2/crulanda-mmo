@@ -2,7 +2,7 @@
 
 Chris: "7-9 dungeon creation that rivals wow dungeons like these. research these completely before dungeon design. leveling
 takes longer in land of crulanda", then "not 3..one big dungeon" and "we will design others later". So this is **one** big
-dungeon for **levels 7-9**. It takes the best of three classic dungeons (research below). It uses **no** names, assets or
+dungeon for **levels 10-12**. It takes the best of three classic dungeons (research below). It uses **no** names, assets or
 layouts from them, only design lessons.
 
 ## 1. Where it is and what it is (lore)
@@ -63,12 +63,12 @@ the next dungeon.
 
 ## 3. Level and length
 
-- Crulanda levels slower (cap 15 now, 30 in the end; the Peaks are 9-12). The classic band of about 15-24 out of 60 maps to **10-12** here (the numbers below are the pre-rescale 7-9 and move up by three with round 29):
-  - trash 7-8;
-  - branch bosses 8;
-  - the hall's bosses 9;
-  - the last boss 9 elite, `harder`;
-  - the hidden boss 10.
+- Crulanda levels slower (cap 15 now, 30 in the end; the Peaks are 9-12). The classic band of about 15-24 out of 60 maps to **10-12** here :
+  - trash 10-11;
+  - branch bosses 11;
+  - the hall's bosses 12;
+  - the last boss 12 elite, `harder`;
+  - the hidden boss 13.
 - **Length:** a full clear is 55-75 minutes with a party of sims (Chris, 2026-10-07). It is built so it **does not have to be done in one go**:
   - **Wing 1 plus one branch is a 25-minute run** (the short-dungeon lesson);
   - a **spirit stone at the Gallery** (the respawn point once reached);
@@ -107,7 +107,7 @@ the next dungeon.
 
 ### [0] The Adit yard (outside, on the Peaks)
 - What exists now: the Sealed Adit's face, the yard, the spoil heap, ore nodes, the Signal-tower pickets.
-- What changes: the seal is broken open. Sandthrone pickets (level 7) stand on the yard, with a cart track running inside.
+- What changes: the seal is broken open. Sandthrone pickets (level 10) stand on the yard, with a cart track running inside.
 - The quest givers are near by (section 6).
 - The door is a dark cut with lum-tube green light inside.
 
@@ -115,7 +115,7 @@ the next dungeon.
 - Timbered drifts, rusted ladders, ore carts on bent rails, dripping water, green lum-tubes.
 - Trash: Sandthrone diggers (non-elite, in 2s), overseers (elite, with whips), sappers (throw a charge you must step out of).
 - **Pressed goblins** sit in cages. They are not hostile. The quest "The Pressed" frees them, and freed goblins help later.
-- **Boss: Gang-Boss Haddo Lusk** (8, elite). He hits hard and slow and has a lot of armour, with two guards.
+- **Boss: Gang-Boss Haddo Lusk** (11, elite). He hits hard and slow and has a lot of armour, with two guards.
   - If you wait for the guards to walk off, you can pull him alone (the first boss's lesson).
   - When he dies, **a patrol of three walks in from the door behind** (patrols after bosses).
 
@@ -137,7 +137,7 @@ the next dungeon.
   - cutters (elite);
   - goblin turncoats who throw spanners (knockdown);
   - a **rock-borer** engine that the goblins repair if you kill it before them.
-- **Boss: Nix and the Rock-Eater** (8, elite). Two-part fight:
+- **Boss: Nix and the Rock-Eater** (11, elite). Two-part fight:
   - first the Rock-Eater, a goblin boring-engine;
   - when it breaks, Nix, the goblin who sold out his own Warren (a Razzle-like traitor; GAME-ONLY), jumps out and fights on
     foot, vibration-locking your weapon (disarm for 4 s).
@@ -149,11 +149,11 @@ the next dungeon.
 - Trash:
   - Ash initiates in groups of 2-3 (one heals, one **casts fear**: plan the pull);
   - ember elementals (non-elite, pulled 1-2).
-- **Boss: Cinder-Warden Ysolt** (8, elite).
+- **Boss: Cinder-Warden Ysolt** (11, elite).
   - **Ember Blow:** an uppercut that **knocks the tank back** (into the lava if you stand at the edge, so fight her in the
     middle).
   - **Flame Ring:** a burst round her, the same knockback idea.
-- Optional: the **Vent-Hound** (8, elite), which wanders the far ledge.
+- Optional: the **Vent-Hound** (11, elite), which wanders the far ledge.
 - Drops the **Ember Sigil**.
 
 ### [3c] The Grey Breach (the Wasting: the corrupted cave)
@@ -164,7 +164,7 @@ the next dungeon.
 - Trash: **greyed** cave beasts (bats, crawlers, a bear), unmade at the edges:
   - they **flee at low health** and bring more;
   - a grey caster puts one of you **to sleep** (interrupt it).
-- **Boss: The Foreman Who Forgot** (8, elite). A Sandthrone foreman half unmade.
+- **Boss: The Foreman Who Forgot** (11, elite). A Sandthrone foreman half unmade.
   - He **blinks** in and out.
   - At half health he **forgets** his target (aggro reset).
   - He **terrifies** at 25%.
@@ -182,7 +182,7 @@ the next dungeon.
 - **The gate onto the platform:**
   - **quiet:** a freed goblin (from "The Pressed") vibration-locks it open, and the hall does not know you are there;
   - **loud:** blasting powder from a crate in the side gallery blows it open, and the Quartermaster sends a wave at you.
-- **Boss: Quartermaster Brannigan Sorrel** (9, elite).
+- **Boss: Quartermaster Brannigan Sorrel** (12, elite).
   - **Two guards jump you** from the platform's sides as he comes down.
   - **At 2/3 and 1/3 health he stamps:** the whole party is stunned for 2 s while he goes to his weapon rack, and comes back
     with a heavier weapon (more damage each time).
@@ -191,11 +191,11 @@ the next dungeon.
     the geodes go dark (their memories let go) and the carriage cannot run.
   - You escort her down the platform. **Two waves** come: Sandthrone from the carriage, then dockers from the far tunnel.
   - **The surprise:** with the lock half matched, the carriage roof opens and the last boss stands up.
-- **Last boss: Rail-Captain Orsk Danner** (9, elite, `harder`), fought on the carriage roof.
+- **Last boss: Rail-Captain Orsk Danner** (12, elite, `harder`), fought on the carriage roof.
   - **When he is attacked, two guards step out of the shadows. At half health, two more.**
   - **Kill the guards and he calls new ones** (so burn him down).
   - He carries **a sealed letter** addressed to the Sandthrone's commander (CANON; named only), which starts the next chain.
-- **Hidden boss: Old Kettle** (10, elite), the hall's cook, below the platform's far side. Drop down to find him. He throws
+- **Hidden boss: Old Kettle** (13, elite), the hall's cook, below the platform's far side. Drop down to find him. He throws
   the pot.
 - **The way out:** with the lock matched, the goblins set the carriage to run **back up the line** to a siding under the Adit
   yard. One ride takes you out.

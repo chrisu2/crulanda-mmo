@@ -15,7 +15,7 @@ namespace Crulanda.Tests
             Assert.IsTrue(p.AwardKill("a", 150)); Assert.IsFalse(p.AwardKill("a", 150));
             Assert.IsTrue(p.Loot("a")); Assert.IsFalse(p.Loot("a"));
             Assert.AreEqual(150, p.experience); Assert.AreEqual(8, p.gold);
-           Assert.AreEqual(1, p.Level); p.AwardKill("b", 150); Assert.AreEqual(2, p.Level);
+           Assert.AreEqual(1, p.Level); p.AwardKill("b", 450); Assert.AreEqual(2, p.Level);   // 400 to level 2 (round 29)
         }
         [Test]
         public void Taunt_expires_and_dead_targets_are_ignored()
@@ -47,8 +47,8 @@ namespace Crulanda.Tests
         [Test]
         public void Level_curve_kill_experience_and_old_save_migration()
         {
-            Assert.AreEqual(0, EncounterProgress.XpForLevel(1)); Assert.AreEqual(200, EncounterProgress.XpForLevel(2)); Assert.AreEqual(5040, EncounterProgress.XpForLevel(10));
-            var p = EncounterSession.FreshProgress(); p.experience = 489; Assert.AreEqual(2, p.Level); p.experience = 490; Assert.AreEqual(3, p.Level);
+            Assert.AreEqual(0, EncounterProgress.XpForLevel(1)); Assert.AreEqual(400, EncounterProgress.XpForLevel(2)); Assert.AreEqual(9720, EncounterProgress.XpForLevel(10));   // round 29: 400 + 170 a level
+            var p = EncounterSession.FreshProgress(); p.experience = 969; Assert.AreEqual(2, p.Level); p.experience = 970; Assert.AreEqual(3, p.Level);
             p.experience = 999999; Assert.AreEqual(EncounterProgress.LevelCap, p.Level);
             Assert.AreEqual(28, EncounterProgress.KillXp(1, 1, false));
             Assert.Greater(EncounterProgress.KillXp(5, 3, false), EncounterProgress.KillXp(5, 5, false), "Higher mobs give more.");

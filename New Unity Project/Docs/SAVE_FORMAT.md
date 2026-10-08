@@ -182,3 +182,8 @@ Three new lists at the end of the payload, after `pouches`, in this order (one f
   `lootLuck`, `armoury`, `quests` and `questsDone`).
 - An older build refuses a format-9 save (its version is above theirs) and leaves the file alone.
 - As before, migration happens in memory on read. The file is written as format 9 on the next save.
+
+## Format 10 (2026-10-08, round 29): the cap-15 curve
+`SteeperCurveMigration` (9 → 10) rewrites `experience` so the character keeps its level and the fraction of it it had under the old
+curve (200 + 90 a level, cap 13) on the new one (400 + 170 a level, cap 15); nothing else in the payload changes. The world slot
+(the sims) is not migrated: a sim's level is the saved truth and its experience only delays its next level.

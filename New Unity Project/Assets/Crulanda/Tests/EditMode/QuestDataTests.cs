@@ -28,8 +28,8 @@ namespace Crulanda.Tests
             var bagQuests = new[] {
                 ("npc.leatherworker.wallet", "A Wallet for Simples", 1, "junk.wolf_pelt", 3, "bag.simples_wallet", 20),
                 ("npc.leatherworker.sling", "A Strap for the Woodyard", 1, "hide.hill_deer", 3, "bag.log_sling", 25),
-                ("npc.leatherworker.scrip", "The Cook's Scrip", 2, "hide.coney", 5, "bag.larder_scrip", 25),
-                ("npc.leatherworker.poke", "Ore Wants a Stout Bag", 2, "hide.boar", 3, "bag.ore_poke", 30) };
+                ("npc.leatherworker.scrip", "The Cook's Scrip", 4, "hide.coney", 5, "bag.larder_scrip", 25),
+                ("npc.leatherworker.poke", "Ore Wants a Stout Bag", 4, "hide.boar", 3, "bag.ore_poke", 30) };   // levels 4 since round 29 (Oakhaven 1-5)
             var dropped = new HashSet<string>(items.Loot.SelectMany(t => t.entries).Where(e => e.chance > 0).Select(e => e.item));
             foreach (var (id, title, level, hide, count, bag, xp) in bagQuests)
             {

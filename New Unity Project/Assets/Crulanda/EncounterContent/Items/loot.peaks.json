@@ -1,57 +1,563 @@
 {
   "items": [
-    {"id": "loot.pea.tollkeepers_billhook", "name": "Toll-Keeper's Billhook", "kind": "gear", "slot": "mainhand", "quality": 2, "level": 6, "value": 29, "weaponDamage": 18, "stamina": 4, "strength": 5, "description": "Lowered across the road ten thousand times.", "canonStatus": "GAME-ONLY"},
-    {"id": "loot.pea.toll_gate_kettle", "name": "Toll-Gate Kettle Helm", "kind": "gear", "slot": "head", "quality": 2, "level": 6, "value": 21, "armor": 13, "stamina": 6, "strength": 3, "description": "The brim keeps the sleet out of your eyes.", "canonStatus": "GAME-ONLY"},
-    {"id": "loot.pea.signal_tower_mitts", "name": "Signal-Tower Mitts", "kind": "gear", "slot": "hands", "quality": 2, "level": 6, "value": 21, "armor": 13, "stamina": 4, "agility": 5, "description": "Singed from the beacon.", "canonStatus": "GAME-ONLY"},
-    {"id": "loot.pea.mule_track_hobnails", "name": "Mule-Track Hobnails", "kind": "gear", "slot": "feet", "quality": 2, "level": 6, "value": 21, "armor": 13, "stamina": 5, "agility": 4, "description": "They grip where a mule would think twice.", "canonStatus": "GAME-ONLY"},
-    {"id": "loot.pea.shieling_crook", "name": "Shieling Crook", "kind": "gear", "slot": "mainhand", "quality": 2, "level": 6, "value": 29, "weaponDamage": 18, "stamina": 5, "intellect": 2, "spirit": 2, "description": "The flock is gone. The crook stayed.", "canonStatus": "GAME-ONLY"},
-    {"id": "loot.pea.rockhide_jerkin", "name": "Rockhide Jerkin", "kind": "gear", "slot": "chest", "quality": 2, "level": 7, "value": 24, "armor": 24, "stamina": 7, "strength": 4, "description": "Tanning it broke two knives.", "canonStatus": "GAME-ONLY"},
-    {"id": "loot.pea.watchers_cold_lens", "name": "Watcher's Cold Lens", "kind": "gear", "slot": "neck", "quality": 3, "level": 7, "value": 32, "stamina": 7, "strength": 4, "agility": 6, "description": "Look through it and the ledge looks back.", "canonStatus": "GAME-ONLY"},
-    {"id": "loot.pea.cold_glass_spaulders", "name": "Spaulders of Cold Glass", "kind": "gear", "slot": "shoulders", "quality": 3, "level": 7, "value": 32, "armor": 19, "stamina": 9, "strength": 8, "description": "They never warm, whatever the weather.", "canonStatus": "GAME-ONLY"},
-    {"id": "loot.pea.the_captains_toll", "name": "The Captain's Toll", "kind": "gear", "slot": "mainhand", "quality": 3, "level": 7, "value": 45, "weaponDamage": 25, "stamina": 8, "strength": 12, "description": "What the road pays when it cannot pay in coin.", "canonStatus": "GAME-ONLY"},
-    {"id": "loot.pea.eyrie_cuirass", "name": "Eyrie Cuirass", "kind": "gear", "slot": "chest", "quality": 3, "level": 7, "value": 32, "armor": 30, "stamina": 12, "strength": 8, "description": "Dented on the left, where the wind throws stones.", "canonStatus": "GAME-ONLY"},
-    {"id": "loot.pea.signet_of_the_toll_road", "name": "Signet of the Toll Road", "kind": "gear", "slot": "neck", "quality": 3, "level": 7, "value": 32, "stamina": 8, "strength": 9, "description": "Press it in wax and people hand over their purses.", "canonStatus": "GAME-ONLY"},
-    {"id": "loot.pea.scree_tusk", "name": "Scree-Tusk's Broken Tusk", "kind": "gear", "slot": "mainhand", "quality": 3, "level": 7, "value": 45, "weaponDamage": 25, "stamina": 12, "strength": 8, "description": "It broke on the mountain. The mountain lost a piece too.", "canonStatus": "GAME-ONLY"},
-    {"id": "loot.pea.scree_hide_legguards", "name": "Scree-Hide Legguards", "kind": "gear", "slot": "legs", "quality": 3, "level": 7, "value": 32, "armor": 30, "stamina": 11, "agility": 9, "description": "Grey as the slope he slept on.", "canonStatus": "GAME-ONLY"},
-    {"id": "loot.pea.rockfall", "name": "Rockfall", "kind": "gear", "slot": "offhand", "quality": 4, "level": 7, "value": 40, "armor": 44, "stamina": 15, "strength": 10, "description": "A slab of slate with a strap. It has already fallen on someone.", "canonStatus": "GAME-ONLY"},
-    {"id": "loot.pea.seekers_sealed_pendant", "name": "Seeker's Sealed Pendant", "kind": "gear", "slot": "neck", "quality": 2, "level": 6, "value": 21, "stamina": 5, "strength": 4, "description": "The wax is unbroken. Leave it that way.", "canonStatus": "GAME-ONLY"},
-    {"id": "loot.pea.salt_rimed_helm", "name": "Tarsk's Salt-Rimed Helm", "kind": "gear", "slot": "head", "quality": 3, "level": 7, "value": 32, "armor": 19, "stamina": 10, "strength": 7, "description": "White at the edges, like a tide-line.", "canonStatus": "GAME-ONLY"},
-    {"id": "loot.pea.quells_climbing_gloves", "name": "Yara's Climbing Gloves", "kind": "gear", "slot": "hands", "quality": 2, "level": 7, "value": 24, "armor": 15, "stamina": 5, "agility": 6, "description": "Palms of goat-hide. She does not sell the bad pairs.", "canonStatus": "GAME-ONLY"},
-    {"id": "loot.pea.the_toll_unpaid", "name": "The Toll Unpaid", "kind": "gear", "slot": "mainhand", "quality": 5, "level": 7, "value": 67, "weaponDamage": 35, "stamina": 12, "intellect": 16, "spirit": 7, "description": "Every coin the gate ever took is still owed to someone. The staff remembers who.", "canonStatus": "GAME-ONLY"}
+    {
+      "id": "loot.pea.tollkeepers_billhook",
+      "name": "Toll-Keeper's Billhook",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 2,
+      "level": 9,
+      "value": 42,
+      "weaponDamage": 25,
+      "stamina": 6,
+      "strength": 8,
+      "description": "Lowered across the road ten thousand times.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.pea.toll_gate_kettle",
+      "name": "Toll-Gate Kettle Helm",
+      "kind": "gear",
+      "slot": "head",
+      "quality": 2,
+      "level": 9,
+      "value": 30,
+      "armor": 19,
+      "stamina": 9,
+      "strength": 5,
+      "description": "The brim keeps the sleet out of your eyes.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.pea.signal_tower_mitts",
+      "name": "Signal-Tower Mitts",
+      "kind": "gear",
+      "slot": "hands",
+      "quality": 2,
+      "level": 9,
+      "value": 30,
+      "armor": 19,
+      "stamina": 6,
+      "agility": 8,
+      "description": "Singed from the beacon.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.pea.mule_track_hobnails",
+      "name": "Mule-Track Hobnails",
+      "kind": "gear",
+      "slot": "feet",
+      "quality": 2,
+      "level": 9,
+      "value": 30,
+      "armor": 19,
+      "stamina": 8,
+      "agility": 6,
+      "description": "They grip where a mule would think twice.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.pea.shieling_crook",
+      "name": "Shieling Crook",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 2,
+      "level": 9,
+      "value": 42,
+      "weaponDamage": 25,
+      "stamina": 8,
+      "intellect": 3,
+      "spirit": 3,
+      "description": "The flock is gone. The crook stayed.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.pea.rockhide_jerkin",
+      "name": "Rockhide Jerkin",
+      "kind": "gear",
+      "slot": "chest",
+      "quality": 2,
+      "level": 10,
+      "value": 33,
+      "armor": 33,
+      "stamina": 10,
+      "strength": 5,
+      "description": "Tanning it broke two knives.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.pea.watchers_cold_lens",
+      "name": "Watcher's Cold Lens",
+      "kind": "gear",
+      "slot": "neck",
+      "quality": 3,
+      "level": 10,
+      "value": 44,
+      "stamina": 10,
+      "strength": 5,
+      "agility": 8,
+      "description": "Look through it and the ledge looks back.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.pea.cold_glass_spaulders",
+      "name": "Spaulders of Cold Glass",
+      "kind": "gear",
+      "slot": "shoulders",
+      "quality": 3,
+      "level": 10,
+      "value": 44,
+      "armor": 26,
+      "stamina": 12,
+      "strength": 11,
+      "description": "They never warm, whatever the weather.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.pea.the_captains_toll",
+      "name": "The Captain's Toll",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 3,
+      "level": 10,
+      "value": 62,
+      "weaponDamage": 33,
+      "stamina": 11,
+      "strength": 17,
+      "description": "What the road pays when it cannot pay in coin.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.pea.eyrie_cuirass",
+      "name": "Eyrie Cuirass",
+      "kind": "gear",
+      "slot": "chest",
+      "quality": 3,
+      "level": 10,
+      "value": 44,
+      "armor": 41,
+      "stamina": 17,
+      "strength": 11,
+      "description": "Dented on the left, where the wind throws stones.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.pea.signet_of_the_toll_road",
+      "name": "Signet of the Toll Road",
+      "kind": "gear",
+      "slot": "neck",
+      "quality": 3,
+      "level": 10,
+      "value": 44,
+      "stamina": 11,
+      "strength": 12,
+      "description": "Press it in wax and people hand over their purses.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.pea.scree_tusk",
+      "name": "Scree-Tusk's Broken Tusk",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 3,
+      "level": 10,
+      "value": 62,
+      "weaponDamage": 33,
+      "stamina": 17,
+      "strength": 11,
+      "description": "It broke on the mountain. The mountain lost a piece too.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.pea.scree_hide_legguards",
+      "name": "Scree-Hide Legguards",
+      "kind": "gear",
+      "slot": "legs",
+      "quality": 3,
+      "level": 10,
+      "value": 44,
+      "armor": 41,
+      "stamina": 15,
+      "agility": 13,
+      "description": "Grey as the slope he slept on.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.pea.rockfall",
+      "name": "Rockfall",
+      "kind": "gear",
+      "slot": "offhand",
+      "quality": 4,
+      "level": 10,
+      "value": 55,
+      "armor": 60,
+      "stamina": 21,
+      "strength": 14,
+      "description": "A slab of slate with a strap. It has already fallen on someone.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.pea.seekers_sealed_pendant",
+      "name": "Seeker's Sealed Pendant",
+      "kind": "gear",
+      "slot": "neck",
+      "quality": 2,
+      "level": 9,
+      "value": 30,
+      "stamina": 8,
+      "strength": 6,
+      "description": "The wax is unbroken. Leave it that way.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.pea.salt_rimed_helm",
+      "name": "Tarsk's Salt-Rimed Helm",
+      "kind": "gear",
+      "slot": "head",
+      "quality": 3,
+      "level": 10,
+      "value": 44,
+      "armor": 26,
+      "stamina": 14,
+      "strength": 9,
+      "description": "White at the edges, like a tide-line.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.pea.quells_climbing_gloves",
+      "name": "Yara's Climbing Gloves",
+      "kind": "gear",
+      "slot": "hands",
+      "quality": 2,
+      "level": 10,
+      "value": 33,
+      "armor": 21,
+      "stamina": 7,
+      "agility": 8,
+      "description": "Palms of goat-hide. She does not sell the bad pairs.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.pea.the_toll_unpaid",
+      "name": "The Toll Unpaid",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 5,
+      "level": 10,
+      "value": 92,
+      "weaponDamage": 47,
+      "stamina": 16,
+      "intellect": 22,
+      "spirit": 10,
+      "description": "Every coin the gate ever took is still owed to someone. The staff remembers who.",
+      "canonStatus": "GAME-ONLY"
+    }
   ],
   "vendors": [
-    {"npc": "Yara Quell", "items": ["loot.pea.quells_climbing_gloves"]}
+    {
+      "npc": "Yara Quell",
+      "items": [
+        "loot.pea.quells_climbing_gloves"
+      ]
+    }
   ],
   "gear": [
-    {"id": "loot.pea.tollkeepers_billhook", "look": "polearm:billhook/sandthrone", "source": "mob:tollguard@peaks"},
-    {"id": "loot.pea.toll_gate_kettle", "look": "head.kettle:plain/tollroad", "source": "mob:tollguard@peaks"},
-    {"id": "loot.pea.signal_tower_mitts", "look": "hands.gloves:mitts/tollroad", "source": "mob:outrider@peaks"},
-    {"id": "loot.pea.mule_track_hobnails", "look": "feet.boots:hobnail/tollroad", "source": "mob:wolf@peaks"},
-    {"id": "loot.pea.shieling_crook", "look": "staff:crook/pilgrim", "source": "mob:wolf@peaks"},
-    {"id": "loot.pea.rockhide_jerkin", "look": "chest.jerkin:hide/tollroad", "source": "mob:boar@peaks"},
-    {"id": "loot.pea.watchers_cold_lens", "look": "neck.pendant:glass/pale+glow", "source": "mob:pale@peaks"},
-    {"id": "loot.pea.cold_glass_spaulders", "look": "shoulder.spaulder:glass/pale", "source": "mob:pale@peaks"},
-    {"id": "loot.pea.the_captains_toll", "look": "sword.sabre:officer/sandthrone", "source": "boss:Sandthrone captain", "boss": true, "unique": true},
-    {"id": "loot.pea.eyrie_cuirass", "look": "chest.cuirass:plate/sandthrone", "source": "boss:Sandthrone captain", "boss": true, "unique": true},
-    {"id": "loot.pea.signet_of_the_toll_road", "look": "neck.pendant:signet/sandthrone", "source": "boss:Sandthrone captain", "boss": true, "unique": true, "effects": [{"kind": "coins", "amount": 15, "text": "+15% coins from bodies."}]},
-    {"id": "loot.pea.scree_tusk", "look": "club:tusk/tollroad", "source": "boss:Old Scree-Tusk", "boss": true, "unique": true},
-    {"id": "loot.pea.scree_hide_legguards", "look": "legs.leggings:hide/tollroad", "source": "boss:Old Scree-Tusk", "boss": true, "unique": true},
-    {"id": "loot.pea.rockfall", "look": "shield.kite:slab/tollroad+glow", "source": "boss:Old Scree-Tusk", "boss": true, "unique": true, "effects": [{"kind": "stat", "stat": "Armor", "amount": 10, "percent": true, "text": "+10% armour."}]},
-    {"id": "loot.pea.seekers_sealed_pendant", "look": "neck.pendant:seal/pilgrim", "source": "quest:main.peaks.2"},
-    {"id": "loot.pea.salt_rimed_helm", "look": "head.barbute:rimed/tollroad", "source": "quest:main.peaks.3"},
-    {"id": "loot.pea.quells_climbing_gloves", "look": "hands.gloves:plain/tollroad", "source": "vendor:Yara Quell"},
-    {"id": "loot.pea.the_toll_unpaid", "look": "model.tall:StaffOfPain/tollroad", "source": "boss:Sandthrone captain"}
+    {
+      "id": "loot.pea.tollkeepers_billhook",
+      "look": "polearm:billhook/sandthrone",
+      "source": "mob:tollguard@peaks"
+    },
+    {
+      "id": "loot.pea.toll_gate_kettle",
+      "look": "head.kettle:plain/tollroad",
+      "source": "mob:tollguard@peaks"
+    },
+    {
+      "id": "loot.pea.signal_tower_mitts",
+      "look": "hands.gloves:mitts/tollroad",
+      "source": "mob:outrider@peaks"
+    },
+    {
+      "id": "loot.pea.mule_track_hobnails",
+      "look": "feet.boots:hobnail/tollroad",
+      "source": "mob:wolf@peaks"
+    },
+    {
+      "id": "loot.pea.shieling_crook",
+      "look": "staff:crook/pilgrim",
+      "source": "mob:wolf@peaks"
+    },
+    {
+      "id": "loot.pea.rockhide_jerkin",
+      "look": "chest.jerkin:hide/tollroad",
+      "source": "mob:boar@peaks"
+    },
+    {
+      "id": "loot.pea.watchers_cold_lens",
+      "look": "neck.pendant:glass/pale+glow",
+      "source": "mob:pale@peaks"
+    },
+    {
+      "id": "loot.pea.cold_glass_spaulders",
+      "look": "shoulder.spaulder:glass/pale",
+      "source": "mob:pale@peaks"
+    },
+    {
+      "id": "loot.pea.the_captains_toll",
+      "look": "sword.sabre:officer/sandthrone",
+      "source": "boss:Sandthrone captain",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.pea.eyrie_cuirass",
+      "look": "chest.cuirass:plate/sandthrone",
+      "source": "boss:Sandthrone captain",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.pea.signet_of_the_toll_road",
+      "look": "neck.pendant:signet/sandthrone",
+      "source": "boss:Sandthrone captain",
+      "boss": true,
+      "unique": true,
+      "effects": [
+        {
+          "kind": "coins",
+          "amount": 15,
+          "text": "+15% coins from bodies."
+        }
+      ]
+    },
+    {
+      "id": "loot.pea.scree_tusk",
+      "look": "club:tusk/tollroad",
+      "source": "boss:Old Scree-Tusk",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.pea.scree_hide_legguards",
+      "look": "legs.leggings:hide/tollroad",
+      "source": "boss:Old Scree-Tusk",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.pea.rockfall",
+      "look": "shield.kite:slab/tollroad+glow",
+      "source": "boss:Old Scree-Tusk",
+      "boss": true,
+      "unique": true,
+      "effects": [
+        {
+          "kind": "stat",
+          "stat": "Armor",
+          "amount": 10,
+          "percent": true,
+          "text": "+10% armour."
+        }
+      ]
+    },
+    {
+      "id": "loot.pea.seekers_sealed_pendant",
+      "look": "neck.pendant:seal/pilgrim",
+      "source": "quest:main.peaks.2"
+    },
+    {
+      "id": "loot.pea.salt_rimed_helm",
+      "look": "head.barbute:rimed/tollroad",
+      "source": "quest:main.peaks.3"
+    },
+    {
+      "id": "loot.pea.quells_climbing_gloves",
+      "look": "hands.gloves:plain/tollroad",
+      "source": "vendor:Yara Quell"
+    },
+    {
+      "id": "loot.pea.the_toll_unpaid",
+      "look": "model.tall:StaffOfPain/tollroad",
+      "source": "boss:Sandthrone captain"
+    }
   ],
   "drops": [
-    {"id": "drop.pea.captain", "zone": "peaks", "mob": "Sandthrone captain", "rank": "elite", "groups": [{"chance": 0.5, "signature": true, "pick": [{"item": "loot.pea.the_captains_toll"}, {"item": "loot.pea.eyrie_cuirass"}]}, {"chance": 0.15, "lucky": true, "pick": [{"item": "loot.pea.signet_of_the_toll_road"}]}, {"chance": 0.005, "lucky": true, "pick": [{"item": "loot.pea.the_toll_unpaid"}]}]},
-    {"id": "drop.pea.screetusk", "zone": "peaks", "mob": "Old Scree-Tusk", "rank": "elite", "groups": [{"chance": 0.5, "signature": true, "pick": [{"item": "loot.pea.scree_tusk"}, {"item": "loot.pea.scree_hide_legguards"}]}, {"chance": 0.04, "lucky": true, "pity": 25, "pick": [{"item": "loot.pea.rockfall"}]}]},
-    {"id": "drop.pea.tollguards", "zone": "peaks", "tag": "tollguard", "rank": "normal", "groups": [{"chance": 0.03, "lucky": true, "pick": [{"item": "loot.pea.tollkeepers_billhook"}, {"item": "loot.pea.toll_gate_kettle"}]}]},
-    {"id": "drop.pea.pickets", "zone": "peaks", "tag": "outrider", "rank": "normal", "groups": [{"chance": 0.03, "lucky": true, "pick": [{"item": "loot.pea.signal_tower_mitts"}]}]},
-    {"id": "drop.pea.wolves", "zone": "peaks", "tag": "wolf", "rank": "normal", "groups": [{"chance": 0.03, "lucky": true, "pick": [{"item": "loot.pea.mule_track_hobnails"}, {"item": "loot.pea.shieling_crook"}]}]},
-    {"id": "drop.pea.boars", "zone": "peaks", "tag": "boar", "rank": "normal", "groups": [{"chance": 0.03, "lucky": true, "pick": [{"item": "loot.pea.rockhide_jerkin"}]}]},
-    {"id": "drop.pea.ledge_lens", "zone": "peaks", "tag": "pale", "rank": "normal", "groups": [{"chance": 0.02, "lucky": true, "pick": [{"item": "loot.pea.watchers_cold_lens"}]}]},
-    {"id": "drop.pea.ledge_spaulders", "zone": "peaks", "tag": "pale", "rank": "normal", "groups": [{"chance": 0.02, "lucky": true, "pick": [{"item": "loot.pea.cold_glass_spaulders"}]}]}
+    {
+      "id": "drop.pea.captain",
+      "zone": "peaks",
+      "mob": "Sandthrone captain",
+      "rank": "elite",
+      "groups": [
+        {
+          "chance": 0.5,
+          "signature": true,
+          "pick": [
+            {
+              "item": "loot.pea.the_captains_toll"
+            },
+            {
+              "item": "loot.pea.eyrie_cuirass"
+            }
+          ]
+        },
+        {
+          "chance": 0.15,
+          "lucky": true,
+          "pick": [
+            {
+              "item": "loot.pea.signet_of_the_toll_road"
+            }
+          ]
+        },
+        {
+          "chance": 0.005,
+          "lucky": true,
+          "pick": [
+            {
+              "item": "loot.pea.the_toll_unpaid"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drop.pea.screetusk",
+      "zone": "peaks",
+      "mob": "Old Scree-Tusk",
+      "rank": "elite",
+      "groups": [
+        {
+          "chance": 0.5,
+          "signature": true,
+          "pick": [
+            {
+              "item": "loot.pea.scree_tusk"
+            },
+            {
+              "item": "loot.pea.scree_hide_legguards"
+            }
+          ]
+        },
+        {
+          "chance": 0.04,
+          "lucky": true,
+          "pity": 25,
+          "pick": [
+            {
+              "item": "loot.pea.rockfall"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drop.pea.tollguards",
+      "zone": "peaks",
+      "tag": "tollguard",
+      "rank": "normal",
+      "groups": [
+        {
+          "chance": 0.03,
+          "lucky": true,
+          "pick": [
+            {
+              "item": "loot.pea.tollkeepers_billhook"
+            },
+            {
+              "item": "loot.pea.toll_gate_kettle"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drop.pea.pickets",
+      "zone": "peaks",
+      "tag": "outrider",
+      "rank": "normal",
+      "groups": [
+        {
+          "chance": 0.03,
+          "lucky": true,
+          "pick": [
+            {
+              "item": "loot.pea.signal_tower_mitts"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drop.pea.wolves",
+      "zone": "peaks",
+      "tag": "wolf",
+      "rank": "normal",
+      "groups": [
+        {
+          "chance": 0.03,
+          "lucky": true,
+          "pick": [
+            {
+              "item": "loot.pea.mule_track_hobnails"
+            },
+            {
+              "item": "loot.pea.shieling_crook"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drop.pea.boars",
+      "zone": "peaks",
+      "tag": "boar",
+      "rank": "normal",
+      "groups": [
+        {
+          "chance": 0.03,
+          "lucky": true,
+          "pick": [
+            {
+              "item": "loot.pea.rockhide_jerkin"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drop.pea.ledge_lens",
+      "zone": "peaks",
+      "tag": "pale",
+      "rank": "normal",
+      "groups": [
+        {
+          "chance": 0.02,
+          "lucky": true,
+          "pick": [
+            {
+              "item": "loot.pea.watchers_cold_lens"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drop.pea.ledge_spaulders",
+      "zone": "peaks",
+      "tag": "pale",
+      "rank": "normal",
+      "groups": [
+        {
+          "chance": 0.02,
+          "lucky": true,
+          "pick": [
+            {
+              "item": "loot.pea.cold_glass_spaulders"
+            }
+          ]
+        }
+      ]
+    }
   ],
-  "sets": [
-  ]
+  "sets": []
 }

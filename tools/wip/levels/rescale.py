@@ -108,7 +108,12 @@ def quests():
 def items():
     for name, zid in FILE_ZONE.items():
         p = os.path.join(C, 'Items', 'loot.' + name + '.json'); d = rj(p); say('== loot', name); walk_levels(d, lambda o, z=zid: zone_map(z, o)); wj(p, d)
-    p = os.path.join(C, 'Items', 'loot.world.json'); d = rj(p); say('== loot world'); walk_levels(d, global_map); wj(p, d)
+    p = os.path.join(C, 'Items', 'loot.world.json'); d = rj(p); say('== loot world'); walk_levels(d, global_map)
+    for g in d.get('gear', []):   # the world lists' sources name their level band: "world:1-5"
+        src = g.get('source', '')
+        if src.startswith('world:'):
+            a, b = src[6:].split('-'); g['source'] = 'world:%d-%d' % (global_map(int(a)), global_map(int(b))); say('   ', g['id'], src, '->', g['source'])
+    wj(p, d)
     p = os.path.join(C, 'Items', 'items.json'); d = rj(p); say('== items')
     for it in d.get('items', d if isinstance(d, list) else []):
         if 'level' not in it: continue

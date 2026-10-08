@@ -44,7 +44,7 @@ namespace Crulanda.Tests
         }
         public static QuestDatabase Quests() { return QuestDatabase.Parse(Texts(Directory.GetFiles(Path.Combine(Content, "Quests"), "*.json"))); }
         /// <summary>The five zones' short names in loot ids, and their zone ids without "zone.".</summary>
-        public static readonly (string shortId, string zone)[] ZoneShorts = { ("oak", "oakhaven"), ("kha", "khaven"), ("pea", "peaks"), ("ash", "ashrim"), ("ver", "verdant") };
+        public static readonly (string shortId, string zone)[] ZoneShorts = { ("oak", "oakhaven"), ("kha", "khaven"), ("pea", "peaks"), ("ash", "ashrim"), ("ver", "verdant"), ("adit", "adit") };
         /// <summary>Items on any signature list.</summary>
         public static HashSet<string> Signature(LootDatabase loot)
         {
@@ -63,16 +63,16 @@ namespace Crulanda.Tests
     /// </summary>
     public class LootDataTests
     {
-        static readonly Regex IdScheme = new Regex(@"^loot\.(oak|kha|pea|ash|ver|world)\.[a-z0-9_]+$");
-        static readonly Dictionary<string, string> FileShort = new Dictionary<string, string> { { "oakhaven", "oak" }, { "khaven", "kha" }, { "peaks", "pea" }, { "ashrim", "ash" }, { "verdant", "ver" }, { "world", "world" } };
+        static readonly Regex IdScheme = new Regex(@"^loot\.(oak|kha|pea|ash|ver|adit|world)\.[a-z0-9_]+$");
+        static readonly Dictionary<string, string> FileShort = new Dictionary<string, string> { { "oakhaven", "oak" }, { "khaven", "kha" }, { "peaks", "pea" }, { "ashrim", "ash" }, { "verdant", "ver" }, { "world", "world" }, { "adit", "adit" } };
 
         [Test] public void Every_item_file_parses_together()
         {
             var paths = LootTestData.LootPaths();
-            Assert.AreEqual(6, paths.Count, "Six loot files: " + string.Join(", ", paths.Select(Path.GetFileName)));
+            Assert.AreEqual(7, paths.Count, "Seven loot files: " + string.Join(", ", paths.Select(Path.GetFileName)));
             var items = LootTestData.Items(); var loot = LootTestData.Loot(items, LootTestData.Looks());
             var named = items.Items.Keys.Where(k => k.StartsWith("loot.", StringComparison.Ordinal)).ToList();
-            Assert.AreEqual(110, named.Count, "104 named items (ITEMS_V1.md), the five legendaries (2026-10-05) and the Sentinel's Helm (2026-10-07).");
+            Assert.AreEqual(127, named.Count, "104 named items (ITEMS_V1.md), the five legendaries (2026-10-05) and the Sentinel's Helm (2026-10-07), and the Sealed Adit's seventeen (2026-10-08).");
             Assert.AreEqual(109 + 13, loot.Gear.Count, "A gear entry for each, and for the thirteen named items already in the game (the Sentinel's Helm the thirteenth, 2026-10-07).");
             Assert.AreEqual(12, loot.GearOrder.Count(g => g.legacy));
             Assert.AreEqual(2, loot.Sets.Count, "Two sets.");
@@ -127,7 +127,7 @@ namespace Crulanda.Tests
             foreach (var path in LootTestData.LootPaths())
             {
                 string name = Path.GetFileName(path), zone = name.Substring(5, name.Length - 10);
-                Assert.IsTrue(FileShort.TryGetValue(zone, out var shortId), name + " is one of the six loot files.");
+                Assert.IsTrue(FileShort.TryGetValue(zone, out var shortId), name + " is one of the seven loot files.");
                 var text = File.ReadAllText(path); var file = JsonUtility.FromJson<ItemFile>(text); var lootFile = JsonUtility.FromJson<LootFile>(text);
                 foreach (var i in file.items)
                 {
@@ -167,7 +167,7 @@ namespace Crulanda.Tests
                 Assert.AreEqual(gen.value, d.value, d.id + ": value is generated gear's.");
                 Assert.AreEqual(gen.level, d.level, d.id + ": required level is the curve level less one.");
             }
-            Assert.AreEqual(110, n);
+            Assert.AreEqual(127, n, "110 of the five zones and the world, 17 of the Sealed Adit");
         }
 
         [Test] public void Named_gear_stat_budgets_hold()
@@ -231,7 +231,7 @@ namespace Crulanda.Tests
             Assert.AreEqual(15, counts["quest"], "Fifteen quest rewards.");
             Assert.AreEqual(5, counts["vendor"], "Five vendor pieces.");
             Assert.AreEqual(6, counts["world"], "Six world drops.");
-            Assert.AreEqual(40, counts["boss"], "24 signature pieces, 5 from rare tables, 6 epics, 5 legendaries.");
+            Assert.AreEqual(57, counts["boss"], "41 signature pieces (17 the Sealed Adit's), 5 from rare tables, 6 epics, 5 legendaries.");
             Assert.AreEqual(44, counts["mob"], "44 from ordinary mobs.");
         }
 
@@ -267,7 +267,7 @@ namespace Crulanda.Tests
                     var normal = ctx; normal.elite = false;
                     Assert.IsFalse(loot.Matching(normal).Any(d => d.groups.Any(g => g.signature)), c.mob + "'s pack mates do not roll the list.");
                 }
-            Assert.AreEqual(12, elites, "Twelve elites.");
+            Assert.AreEqual(19, elites, "Twelve elites, and the Sealed Adit's seven.");
         }
 
         [Test] public void Every_zone_has_named_gear_for_every_slot()

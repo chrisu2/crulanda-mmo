@@ -1,0 +1,517 @@
+{
+  "items": [
+    {
+      "id": "loot.adit.lusks_tally_stick",
+      "name": "Lusk's Tally-Stick",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 3,
+      "level": 11,
+      "value": 67,
+      "weaponDamage": 36,
+      "stamina": 12,
+      "strength": 19,
+      "description": "An iron-shod stick notched for every cart that went down and every man who did not come up.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.overseers_long_coat",
+      "name": "Overseer's Long Coat",
+      "kind": "gear",
+      "slot": "chest",
+      "quality": 3,
+      "level": 11,
+      "value": 48,
+      "armor": 45,
+      "stamina": 19,
+      "strength": 12,
+      "description": "Sandthrone grey, the skirts stiff with rock dust. A tally book's shape is worn into the breast.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.the_borer_bit",
+      "name": "The Borer Bit",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 3,
+      "level": 11,
+      "value": 67,
+      "weaponDamage": 36,
+      "strength": 19,
+      "agility": 12,
+      "description": "The Rock-Eater's drill head, cut down to a pick. It still hums if you hold it to the stone.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.turncoats_greasy_gloves",
+      "name": "Turncoat's Greasy Gloves",
+      "kind": "gear",
+      "slot": "hands",
+      "quality": 3,
+      "level": 11,
+      "value": 48,
+      "armor": 29,
+      "stamina": 12,
+      "agility": 19,
+      "description": "Nix's own. Small, quick, and black to the wrist with engine oil.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.ember_wardens_brand",
+      "name": "Ember-Warden's Brand",
+      "kind": "gear",
+      "slot": "offhand",
+      "quality": 3,
+      "level": 11,
+      "value": 48,
+      "armor": 53,
+      "stamina": 5,
+      "intellect": 16,
+      "spirit": 10,
+      "description": "A censer on a chain that never quite goes out. The Cult of Ash carries fire the way others carry a lamp.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.cinder_wardens_sabatons",
+      "name": "Cinder-Warden's Sabatons",
+      "kind": "gear",
+      "slot": "feet",
+      "quality": 3,
+      "level": 11,
+      "value": 48,
+      "armor": 29,
+      "stamina": 19,
+      "strength": 12,
+      "description": "Plate boots scorched to blue. She walked the lake's rim in them.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.ash_red_pendant",
+      "name": "Ash-Red Pendant",
+      "kind": "gear",
+      "slot": "neck",
+      "quality": 3,
+      "level": 11,
+      "value": 48,
+      "stamina": 6,
+      "intellect": 13,
+      "spirit": 12,
+      "description": "A drop of red glass on a cord, warm to the touch, as if it remembered the vent.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.the_grey_lantern",
+      "name": "The Grey Lantern",
+      "kind": "gear",
+      "slot": "offhand",
+      "quality": 3,
+      "level": 11,
+      "value": 48,
+      "armor": 53,
+      "stamina": 12,
+      "spirit": 19,
+      "description": "A miner's lantern that gives a light with no colour in it. Things look washed out by it, and some look less there.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.foremans_unmade_breeches",
+      "name": "Foreman's Unmade Breeches",
+      "kind": "gear",
+      "slot": "legs",
+      "quality": 3,
+      "level": 11,
+      "value": 48,
+      "armor": 45,
+      "stamina": 19,
+      "agility": 12,
+      "description": "One leg is cloth. The other is cloth most of the time.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.vent_hounds_ember_pelt",
+      "name": "Vent-Hound's Ember Pelt",
+      "kind": "gear",
+      "slot": "shoulders",
+      "quality": 3,
+      "level": 11,
+      "value": 48,
+      "armor": 29,
+      "stamina": 19,
+      "strength": 12,
+      "description": "A mantle of hound hide with a line of embers still along the spine. It smells of the vent.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.vent_hound_tooth",
+      "name": "Vent-Hound Tooth",
+      "kind": "gear",
+      "slot": "neck",
+      "quality": 3,
+      "level": 11,
+      "value": 48,
+      "strength": 12,
+      "agility": 19,
+      "description": "A tooth the length of a finger, black as a coal.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.sorrels_heavier_hammer",
+      "name": "Sorrel's Heavier Hammer",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 3,
+      "level": 12,
+      "value": 73,
+      "weaponDamage": 38,
+      "stamina": 13,
+      "strength": 20,
+      "description": "The last thing he took off the rack. He never got to the one after it.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.quartermasters_gauntlets",
+      "name": "Quartermaster's Gauntlets",
+      "kind": "gear",
+      "slot": "hands",
+      "quality": 3,
+      "level": 12,
+      "value": 52,
+      "armor": 31,
+      "stamina": 13,
+      "strength": 20,
+      "description": "Plate gauntlets stamped with the Sandthrone mark, the knuckles bright from the rack's iron.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.platform_masters_greaves",
+      "name": "Platform-Master's Greaves",
+      "kind": "gear",
+      "slot": "legs",
+      "quality": 3,
+      "level": 12,
+      "value": 52,
+      "armor": 49,
+      "stamina": 20,
+      "strength": 13,
+      "description": "Greaves with a boot-heel's dent in the left shin. He stamped a great deal.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.rail_captains_coat",
+      "name": "Rail-Captain's Coat",
+      "kind": "gear",
+      "slot": "chest",
+      "quality": 3,
+      "level": 12,
+      "value": 52,
+      "armor": 49,
+      "stamina": 17,
+      "strength": 11,
+      "spirit": 5,
+      "description": "An armoured coat with the carriage's rivets down its front. The letter's pocket is empty now.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.danners_kettle_helm",
+      "name": "Danner's Kettle Helm",
+      "kind": "gear",
+      "slot": "head",
+      "quality": 3,
+      "level": 12,
+      "value": 52,
+      "armor": 31,
+      "stamina": 20,
+      "intellect": 13,
+      "description": "A rail-captain's kettle hat, the brim lamp-blacked from a hundred nights on the dead line.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.the_dead_line_shield",
+      "name": "The Dead Line Shield",
+      "kind": "gear",
+      "slot": "offhand",
+      "quality": 3,
+      "level": 12,
+      "value": 52,
+      "armor": 57,
+      "stamina": 20,
+      "strength": 13,
+      "description": "A heater shield cut from a carriage plate. The rail's mark runs across it like a scar.",
+      "canonStatus": "GAME-ONLY"
+    }
+  ],
+  "vendors": [],
+  "gear": [
+    {
+      "id": "loot.adit.lusks_tally_stick",
+      "look": "mace.flanged:six/tollroad",
+      "source": "boss:Gang-Boss Haddo Lusk",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.adit.overseers_long_coat",
+      "look": "chest.coat:skirted/sandthrone",
+      "source": "boss:Gang-Boss Haddo Lusk",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.adit.the_borer_bit",
+      "look": "hammer.war:pick/khaven",
+      "source": "boss:Nix, the turncoat",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.adit.turncoats_greasy_gloves",
+      "look": "hands.gloves:fingerless/sandthrone",
+      "source": "boss:Nix, the turncoat",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.adit.ember_wardens_brand",
+      "look": "offhand.hung:censer/cult+glow",
+      "source": "boss:Cinder-Warden Ysolt",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.adit.cinder_wardens_sabatons",
+      "look": "feet.sabatons:plate/ashwalker",
+      "source": "boss:Cinder-Warden Ysolt",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.adit.ash_red_pendant",
+      "look": "neck.pendant:ember/ashwalker",
+      "source": "boss:Cinder-Warden Ysolt",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.adit.the_grey_lantern",
+      "look": "offhand.hung:shuttered/sandthrone+glow",
+      "source": "boss:The Foreman Who Forgot",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.adit.foremans_unmade_breeches",
+      "look": "legs.breeches:patched/sandthrone",
+      "source": "boss:The Foreman Who Forgot",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.adit.vent_hounds_ember_pelt",
+      "look": "shoulder.mantle:fur/pilgrim",
+      "source": "boss:The Vent-Hound",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.adit.vent_hound_tooth",
+      "look": "neck.cord:tooth/ashwalker",
+      "source": "boss:The Vent-Hound",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.adit.sorrels_heavier_hammer",
+      "look": "hammer.war:maul/khaven",
+      "source": "boss:Quartermaster Brannigan Sorrel",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.adit.quartermasters_gauntlets",
+      "look": "hands.gauntlets:plate/tollroad",
+      "source": "boss:Quartermaster Brannigan Sorrel",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.adit.platform_masters_greaves",
+      "look": "legs.greaves:plate/tollroad",
+      "source": "boss:Quartermaster Brannigan Sorrel",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.adit.rail_captains_coat",
+      "look": "chest.cuirass:plate/tollroad",
+      "source": "boss:Rail-Captain Orsk Danner",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.adit.danners_kettle_helm",
+      "look": "head.kettle:plain/tollroad",
+      "source": "boss:Rail-Captain Orsk Danner",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.adit.the_dead_line_shield",
+      "look": "shield.heater:plain/tollroad",
+      "source": "boss:Rail-Captain Orsk Danner",
+      "boss": true,
+      "unique": true
+    }
+  ],
+  "drops": [
+    {
+      "id": "drop.adit.gang_boss_haddo_lusk",
+      "zone": "adit",
+      "mob": "Gang-Boss Haddo Lusk",
+      "rank": "elite",
+      "groups": [
+        {
+          "chance": 0.5,
+          "signature": true,
+          "pick": [
+            {
+              "item": "loot.adit.lusks_tally_stick"
+            },
+            {
+              "item": "loot.adit.overseers_long_coat"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drop.adit.nix",
+      "zone": "adit",
+      "mob": "Nix, the turncoat",
+      "rank": "elite",
+      "groups": [
+        {
+          "chance": 0.5,
+          "signature": true,
+          "pick": [
+            {
+              "item": "loot.adit.the_borer_bit"
+            },
+            {
+              "item": "loot.adit.turncoats_greasy_gloves"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drop.adit.cinder_warden_ysolt",
+      "zone": "adit",
+      "mob": "Cinder-Warden Ysolt",
+      "rank": "elite",
+      "groups": [
+        {
+          "chance": 0.5,
+          "signature": true,
+          "pick": [
+            {
+              "item": "loot.adit.ember_wardens_brand"
+            },
+            {
+              "item": "loot.adit.cinder_wardens_sabatons"
+            },
+            {
+              "item": "loot.adit.ash_red_pendant"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drop.adit.the_foreman_who_forgot",
+      "zone": "adit",
+      "mob": "The Foreman Who Forgot",
+      "rank": "elite",
+      "groups": [
+        {
+          "chance": 0.5,
+          "signature": true,
+          "pick": [
+            {
+              "item": "loot.adit.the_grey_lantern"
+            },
+            {
+              "item": "loot.adit.foremans_unmade_breeches"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drop.adit.the_vent_hound",
+      "zone": "adit",
+      "mob": "The Vent-Hound",
+      "rank": "elite",
+      "groups": [
+        {
+          "chance": 0.5,
+          "signature": true,
+          "pick": [
+            {
+              "item": "loot.adit.vent_hounds_ember_pelt"
+            },
+            {
+              "item": "loot.adit.vent_hound_tooth"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drop.adit.quartermaster_brannigan_sorrel",
+      "zone": "adit",
+      "mob": "Quartermaster Brannigan Sorrel",
+      "rank": "elite",
+      "groups": [
+        {
+          "chance": 0.5,
+          "signature": true,
+          "pick": [
+            {
+              "item": "loot.adit.sorrels_heavier_hammer"
+            },
+            {
+              "item": "loot.adit.quartermasters_gauntlets"
+            },
+            {
+              "item": "loot.adit.platform_masters_greaves"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drop.adit.rail_captain_orsk_danner",
+      "zone": "adit",
+      "mob": "Rail-Captain Orsk Danner",
+      "rank": "elite",
+      "groups": [
+        {
+          "chance": 0.5,
+          "signature": true,
+          "pick": [
+            {
+              "item": "loot.adit.rail_captains_coat"
+            },
+            {
+              "item": "loot.adit.danners_kettle_helm"
+            },
+            {
+              "item": "loot.adit.the_dead_line_shield"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sets": []
+}

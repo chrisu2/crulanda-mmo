@@ -295,14 +295,14 @@ namespace Crulanda.Tests
         {
             var db = new ItemDatabase(); var looks = Looks(); var v = Figure();   // variant 0: short hair
             v.ApplyGearIds(new string[0], db, looks); Assert.IsTrue(v.HairShowing);
-            var barbute = GeneratedPiece(db, "head", 12, 2, "Cap"); Assert.AreEqual("head.barbute", looks.Resolve(db.Get(barbute)).family, "A level-12 cap is a barbute.");
+            var barbute = GeneratedPiece(db, "head", 15, 2, "Cap"); Assert.AreEqual("head.barbute", looks.Resolve(db.Get(barbute)).family, "A level-15 cap is a barbute.");   // the top band (round 29: 15)
             v.ApplyGearIds(new[] { barbute }, db, looks); Assert.IsFalse(v.HairShowing, "A barbute hides the hair.");
             foreach (var (piece, level, family) in new[] { ("Hood", 4, "head.hood"), ("Coif", 4, "head.coif") })
             {
                 var id = GeneratedPiece(db, "head", level, 2, piece); Assert.AreEqual(family, looks.Resolve(db.Get(id)).family);
                 v.ApplyGearIds(new[] { id }, db, looks); Assert.IsFalse(v.HairShowing, family + " covers the hair.");
             }
-            foreach (var (level, family) in new[] { (2, "head.cap"), (7, "head.kettle") })
+            foreach (var (level, family) in new[] { (2, "head.cap"), (10, "head.kettle") })   // the Peaks' band (round 29)
             {
                 var id = GeneratedPiece(db, "head", level, 2, "Cap"); Assert.AreEqual(family, looks.Resolve(db.Get(id)).family);
                 v.ApplyGearIds(new[] { id }, db, looks); Assert.IsTrue(v.HairShowing, family + " leaves the hair showing below it.");
@@ -377,7 +377,7 @@ namespace Crulanda.Tests
                 {
                     var slot = (EquipSlot)ItemDatabase.SlotIndex(family.slot); if (slot == EquipSlot.MainHand || slot == EquipSlot.OffHand) continue;
                     foreach (var variant in family.variants)
-                        foreach (var (q, level) in new[] { (1, 1), (3, 9), (4, 13) })
+                        foreach (var (q, level) in new[] { (1, 1), (3, 10), (4, 15) })
                         {
                             string id = "fit." + family.name + "." + variant + "." + q + "." + level, look = family.name + ":" + variant + "/" + palettes[n++ % palettes.Count];
                             looks.Register(id, look); db.Items[id] = new ItemDef { id = id, name = look, kind = "gear", slot = family.slot, quality = q, level = level - 1 };

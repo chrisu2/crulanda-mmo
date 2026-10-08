@@ -66,12 +66,12 @@ CAVES = [
         (-1, 21, 5.5, 4.6, -2.4), (-2, 26, 6.5, 5, -2.6), (-1, 31, 5.5, 4.6, -2.8),                             # 5-7 the cages
         (1.5, 35, 2.5, 3.3, -3.4), (4, 39, 2.4, 3.3, -4.6), (5, 44, 2.5, 3.4, -6),                              # 8-10 the sappers' drift
         (4, 49, 6, 5, -6.6), (2.5, 55, 7.5, 5.6, -7), (2, 61, 6.5, 5.4, -7.2),                                  # 11-13 the gang-boss's hall
-        (3, 65, 2.6, 3.4, -8), (4.5, 69, 2.6, 3.4, -10), (5, 73, 2.7, 3.5, -12), (4.5, 77, 3.2, 3.8, -13.5),    # 14-17 the lower drift
-        (4, 82, 8, 8, -14.5), (3, 88, 13, 11, -15), (2, 96, 15, 12.5, -15), (2, 104, 14, 12, -15), (2.5, 111, 10, 9.5, -15),   # 18-22 the Gallery
-        (3, 116, 3, 3.8, -15.2), (3.5, 120, 2.8, 3.6, -15.4),                                                   # 23-24 the cage gate
-        (4, 125, 2.8, 3.8, -18.2), (5, 130, 2.8, 3.8, -21), (7, 135, 2.8, 3.8, -23.8), (10, 139, 2.9, 3.9, -26.5),
-        (14, 142, 3, 4, -28.8), (18.5, 144.5, 3, 4, -31.4), (23, 147, 3, 4, -34), (27, 150, 3.2, 4.2, -36.4),
-        (30, 154, 3.6, 4.6, -38.6), (32, 158, 4.4, 5, -40),                                                     # 25-34 the shaft stair
+        (3, 65, 2.6, 3.4, -8), (4.5, 69, 2.6, 3.4, -10.5), (5, 73, 2.7, 3.5, -13), (4.5, 77, 3.2, 3.8, -15.5),    # 14-17 the lower drift (down 2.5 a row: stairs)
+        (4, 82, 8, 8, -18), (3, 88, 13, 11, -20.5), (2, 96, 15, 12.5, -21), (2, 104, 14, 12, -21), (2.5, 111, 10, 9.5, -21),   # 18-22 the Gallery, 21 m down: its roof well under the land (no knoll heaps over it)
+        (3, 116, 3, 3.8, -21.2), (3.5, 120, 2.8, 3.6, -21.4),                                                   # 23-24 the cage gate
+        (4, 125, 2.8, 3.8, -23.2), (5, 130, 2.8, 3.8, -25.4), (7, 135, 2.8, 3.8, -27.6), (10, 139, 2.9, 3.9, -29.8),
+        (14, 142, 3, 4, -31.8), (18.5, 144.5, 3, 4, -33.8), (23, 147, 3, 4, -35.8), (27, 150, 3.2, 4.2, -37.6),
+        (30, 154, 3.6, 4.6, -39.2), (32, 158, 4.4, 5, -40),                                                     # 25-34 the shaft stair
         (34, 163, 9, 9, -40.5), (36, 170, 15, 13, -40.5), (38, 180, 17, 14, -40.5), (39, 191, 17, 14, -40.5),
         (39, 202, 16, 13.5, -40.5), (38, 211, 12, 11, -40.5), (37, 216, 6, 7, -40.5), (36.5, 218, .3, .4, -40.5)]),   # 35-42 the Rail Hall
     # The three ways on from the Gallery, each lit its own colour.
@@ -97,41 +97,41 @@ def mob(name, mob_, look, count, lo, hi, tag=None, **kw):
     d = dict(name=name, mob=mob_, tag=tag or look, look=look, canonStatus=kw.pop('canon', S), radius=kw.pop('radius', 2.5), count=count, levelMin=lo, levelMax=hi, respawn=kw.pop('respawn', 900))
     d.update(kw); return d
 CAMPS = [
-    (MAIN, 1, 4, 0, mob('Adit pickets', 'Sandthrone picket', 'deserter', 2, 7, 7, tag='picket', radius=1.6)),
-    (MAIN, 4, 0, 0, mob("Diggers' drift", 'Sandthrone digger', 'deserter', 3, 7, 7, tag='digger', radius=1.8)),
-    (MAIN, 6, 0, -2, mob('The cages', 'Sandthrone overseer', 'deserter', 3, 7, 8, tag='overseer')),
-    (MAIN, 9, 0, 0, mob("Sappers' drift", 'Sandthrone sapper', 'deserter', 2, 8, 8, tag='sapper', radius=1.6)),
-    (MAIN, 12, -3, 3, mob("Gang-boss's guards", 'Sandthrone overseer', 'deserter', 2, 8, 8, tag='overseer', radius=1.5)),
-    (MAIN, 12, 2, 0, mob('Gang-Boss Haddo Lusk', 'Gang-Boss Haddo Lusk', 'deserter', 1, 8, 8, tag='gangboss', canon='GAME-ONLY', radius=1, elite=True, guards="Gang-boss's guards")),
-    (MAIN, 15, 0, 0, mob('Lower drift', 'Sandthrone digger', 'deserter', 2, 8, 8, tag='digger', radius=1.6)),
-    (MAIN, 19, 0, -6, mob('Gallery carriers', 'Sandthrone geode-carrier', 'outrider', 3, 8, 8, tag='carrier', radius=3)),
-    (MAIN, 21, 0, 6, mob('Gallery watch', 'Sandthrone watchman', 'outrider', 2, 8, 8, tag='watchman', radius=2)),
-    (MAIN, 26, 0, 0, mob('Stair watch', 'Sandthrone watchman', 'outrider', 2, 8, 9, tag='watchman', radius=1.5)),
-    (MAIN, 36, 0, -5, mob('Platform guards', 'Sandthrone platform guard', 'outrider', 3, 9, 9, tag='platformguard', radius=2.5)),
-    (MAIN, 37, 0, 8, mob('Dockers', 'Sandthrone docker', 'deserter', 3, 9, 9, tag='docker', radius=2.5)),
-    (MAIN, 38, -3, -3, mob("Quartermaster's guards", 'Sandthrone platform guard', 'outrider', 2, 9, 9, tag='platformguard', radius=1.5)),
-    (MAIN, 38, 2, 0, mob('Quartermaster Brannigan Sorrel', 'Quartermaster Brannigan Sorrel', 'outrider', 1, 9, 9, tag='railquartermaster', canon='GAME-ONLY', radius=1, elite=True, guards="Quartermaster's guards")),
-    (MAIN, 39, 2, 9, mob('Carriage gunners', 'Sandthrone carriage gunner', 'outrider', 2, 9, 9, tag='gunner', radius=2)),
-    (MAIN, 40, -2, -5, mob("Rail-Captain's guard", 'Sandthrone platform guard', 'outrider', 2, 9, 9, tag='platformguard', radius=1.5)),
-    (MAIN, 40, 2, 0, mob('Rail-Captain Orsk Danner', 'Rail-Captain Orsk Danner', 'outrider', 1, 9, 9, tag='railcaptain', canon='GAME-ONLY', radius=1, elite=True, harder=True, guards="Rail-Captain's guard")),
+    (MAIN, 1, 4, 0, mob('Adit pickets', 'Sandthrone picket', 'deserter', 2, 10, 10, tag='picket', radius=1.6)),
+    (MAIN, 4, 0, 0, mob("Diggers' drift", 'Sandthrone digger', 'deserter', 3, 10, 10, tag='digger', radius=1.8)),
+    (MAIN, 6, 0, -2, mob('The cages', 'Sandthrone overseer', 'deserter', 3, 10, 11, tag='overseer')),
+    (MAIN, 9, 0, 0, mob("Sappers' drift", 'Sandthrone sapper', 'deserter', 2, 11, 11, tag='sapper', radius=1.6)),
+    (MAIN, 12, -3, 3, mob("Gang-boss's guards", 'Sandthrone overseer', 'deserter', 2, 11, 11, tag='overseer', radius=1.5)),
+    (MAIN, 12, 2, 0, mob('Gang-Boss Haddo Lusk', 'Gang-Boss Haddo Lusk', 'deserter', 1, 11, 11, tag='gangboss', canon='GAME-ONLY', radius=1, elite=True, guards="Gang-boss's guards")),
+    (MAIN, 15, 0, 0, mob('Lower drift', 'Sandthrone digger', 'deserter', 2, 11, 11, tag='digger', radius=1.6)),
+    (MAIN, 19, 0, -6, mob('Gallery carriers', 'Sandthrone geode-carrier', 'outrider', 3, 11, 11, tag='carrier', radius=3)),
+    (MAIN, 21, 0, 6, mob('Gallery watch', 'Sandthrone watchman', 'outrider', 2, 11, 11, tag='watchman', radius=2)),
+    (MAIN, 26, 0, 0, mob('Stair watch', 'Sandthrone watchman', 'outrider', 2, 11, 12, tag='watchman', radius=1.5)),
+    (MAIN, 36, 0, -5, mob('Platform guards', 'Sandthrone platform guard', 'outrider', 3, 12, 12, tag='platformguard', radius=2.5)),
+    (MAIN, 37, 0, 8, mob('Dockers', 'Sandthrone docker', 'deserter', 3, 12, 12, tag='docker', radius=2.5)),
+    (MAIN, 38, -3, -3, mob("Quartermaster's guards", 'Sandthrone platform guard', 'outrider', 2, 12, 12, tag='platformguard', radius=1.5)),
+    (MAIN, 38, 2, 0, mob('Quartermaster Brannigan Sorrel', 'Quartermaster Brannigan Sorrel', 'outrider', 1, 12, 12, tag='railquartermaster', canon='GAME-ONLY', radius=1, elite=True, guards="Quartermaster's guards")),
+    (MAIN, 39, 2, 9, mob('Carriage gunners', 'Sandthrone carriage gunner', 'outrider', 2, 12, 12, tag='gunner', radius=2)),
+    (MAIN, 40, -2, -5, mob("Rail-Captain's guard", 'Sandthrone platform guard', 'outrider', 2, 12, 12, tag='platformguard', radius=1.5)),
+    (MAIN, 40, 2, 0, mob('Rail-Captain Orsk Danner', 'Rail-Captain Orsk Danner', 'outrider', 1, 12, 12, tag='railcaptain', canon='GAME-ONLY', radius=1, elite=True, harder=True, guards="Rail-Captain's guard")),
 
-    ('The Geode Floor', 3, 0, 0, mob("Cutters' drift", 'Sandthrone geode-cutter', 'outrider', 2, 8, 8, tag='cutter', radius=1.6)),
-    ('The Geode Floor', 5, 2, -3, mob('The cutting floor', 'Sandthrone geode-cutter', 'outrider', 3, 8, 8, tag='cutter', radius=2.5)),
-    ('The Geode Floor', 7, -1, 4, mob('Sorting troughs', 'Sandthrone sorter', 'deserter', 3, 8, 8, tag='sorter', radius=2.5)),
-    ('The Geode Floor', 10, -1, -3, mob('Workshop guards', 'Sandthrone overseer', 'deserter', 2, 8, 8, tag='overseer', radius=1.6)),
-    ('The Geode Floor', 11, 3, 0, mob('Nix and the Rock-Eater', 'Nix, the turncoat', 'outrider', 1, 8, 8, tag='nix', canon='GAME-ONLY (the goblins, the Weavers of the Warrens, are CANON)', radius=1, elite=True, guards='Workshop guards')),
+    ('The Geode Floor', 3, 0, 0, mob("Cutters' drift", 'Sandthrone geode-cutter', 'outrider', 2, 11, 11, tag='cutter', radius=1.6)),
+    ('The Geode Floor', 5, 2, -3, mob('The cutting floor', 'Sandthrone geode-cutter', 'outrider', 3, 11, 11, tag='cutter', radius=2.5)),
+    ('The Geode Floor', 7, -1, 4, mob('Sorting troughs', 'Sandthrone sorter', 'deserter', 3, 11, 11, tag='sorter', radius=2.5)),
+    ('The Geode Floor', 10, -1, -3, mob('Workshop guards', 'Sandthrone overseer', 'deserter', 2, 11, 11, tag='overseer', radius=1.6)),
+    ('The Geode Floor', 11, 3, 0, mob('Nix and the Rock-Eater', 'Nix, the turncoat', 'outrider', 1, 11, 11, tag='nix', canon='GAME-ONLY (the goblins, the Weavers of the Warrens, are CANON)', radius=1, elite=True, guards='Workshop guards')),
 
-    ('The Ember Vent', 3, 0, 0, mob('Vent mouth', 'Ash initiate', 'cultist', 2, 8, 8, tag='ashinitiate', canon='GAME-ONLY cell; CANON cult (the Cult of Ash)', radius=1.6)),
-    ('The Ember Vent', 7, 0, -9, mob('Ash initiates', 'Ash initiate', 'cultist', 3, 8, 8, tag='ashinitiate', canon='GAME-ONLY cell; CANON cult (the Cult of Ash)', radius=2.2)),
-    ('The Ember Vent', 8, 0, 11, mob('Lava ledge', 'Ash mender', 'cultist', 3, 8, 8, tag='ashmender', canon='GAME-ONLY cell; CANON cult (the Cult of Ash)', radius=2.2)),
-    ('The Ember Vent', 8, 0, -12, mob('The Vent-Hound', 'The Vent-Hound', 'wolf', 1, 8, 8, tag='venthound', canon='GAME-ONLY', radius=1.5, elite=True, guards='none', respawn=1200)),
-    ('The Ember Vent', 9, 0, -9, mob('Ember circle', 'Ash initiate', 'cultist', 3, 8, 8, tag='ashinitiate', canon='GAME-ONLY cell; CANON cult (the Cult of Ash)', radius=2.2)),
-    ('The Ember Vent', 10, 1, 0, mob('Cinder-Warden Ysolt', 'Cinder-Warden Ysolt', 'cultist', 1, 8, 8, tag='ysolt', canon='GAME-ONLY (the Cult of Ash is CANON)', radius=1, elite=True, guards='none')),
+    ('The Ember Vent', 3, 0, 0, mob('Vent mouth', 'Ash initiate', 'cultist', 2, 11, 11, tag='ashinitiate', canon='GAME-ONLY cell; CANON cult (the Cult of Ash)', radius=1.6)),
+    ('The Ember Vent', 7, 0, -9, mob('Ash initiates', 'Ash initiate', 'cultist', 3, 11, 11, tag='ashinitiate', canon='GAME-ONLY cell; CANON cult (the Cult of Ash)', radius=2.2)),
+    ('The Ember Vent', 8, 0, 11, mob('Lava ledge', 'Ash mender', 'cultist', 3, 11, 11, tag='ashmender', canon='GAME-ONLY cell; CANON cult (the Cult of Ash)', radius=2.2)),
+    ('The Ember Vent', 8, 0, -12, mob('The Vent-Hound', 'The Vent-Hound', 'wolf', 1, 11, 11, tag='venthound', canon='GAME-ONLY', radius=1.5, elite=True, guards='none', respawn=1200)),
+    ('The Ember Vent', 9, 0, -9, mob('Ember circle', 'Ash initiate', 'cultist', 3, 11, 11, tag='ashinitiate', canon='GAME-ONLY cell; CANON cult (the Cult of Ash)', radius=2.2)),
+    ('The Ember Vent', 10, 1, 0, mob('Cinder-Warden Ysolt', 'Cinder-Warden Ysolt', 'cultist', 1, 11, 11, tag='ysolt', canon='GAME-ONLY (the Cult of Ash is CANON)', radius=1, elite=True, guards='none')),
 
-    ('The Grey Breach', 3, 0, 0, mob('Greyed crawlers', 'Greyed crawler', 'spider', 3, 8, 8, tag='crawler', canon='GAME-ONLY (the Wasting is CANON)', radius=1.8)),
-    ('The Grey Breach', 6, 0, 0, mob('The Hollow drift', 'Hollow Man', 'hollow', 3, 8, 8, tag='hollow', canon='CANON creature (Hollow Men) and CANON tunnels under the Peaks (book2 ch.19); GAME-ONLY camp', radius=2.5)),
-    ('The Grey Breach', 9, 0, 0, mob('Grey drift', 'Greyed bear', 'bear', 2, 8, 8, tag='greybear', canon='GAME-ONLY (the Wasting is CANON)', radius=1.8)),
-    ('The Grey Breach', 11, 3, 0, mob('The Foreman Who Forgot', 'The Foreman Who Forgot', 'hollow', 1, 8, 8, tag='foreman', canon='GAME-ONLY (the unmade are CANON)', radius=1, elite=True, guards='none')),
+    ('The Grey Breach', 3, 0, 0, mob('Greyed crawlers', 'Greyed crawler', 'spider', 3, 11, 11, tag='crawler', canon='GAME-ONLY (the Wasting is CANON)', radius=1.8)),
+    ('The Grey Breach', 6, 0, 0, mob('The Hollow drift', 'Hollow Man', 'hollow', 3, 11, 11, tag='hollow', canon='CANON creature (Hollow Men) and CANON tunnels under the Peaks (book2 ch.19); GAME-ONLY camp', radius=2.5)),
+    ('The Grey Breach', 9, 0, 0, mob('Grey drift', 'Greyed bear', 'bear', 2, 11, 11, tag='greybear', canon='GAME-ONLY (the Wasting is CANON)', radius=1.8)),
+    ('The Grey Breach', 11, 3, 0, mob('The Foreman Who Forgot', 'The Foreman Who Forgot', 'hollow', 1, 11, 11, tag='foreman', canon='GAME-ONLY (the unmade are CANON)', radius=1, elite=True, guards='none')),
 ]
 
 def build():
@@ -184,7 +184,7 @@ def zone(traced, camps):
                      'from deep seams (CANON, book1 ch.3); the Wasting eating the Peaks\' stone (CANON, world_bible); the Sandthrone, the Cult '
                      'of Ash, the goblins and the Hollow Men (CANON). GAME-ONLY: the Sandthrone cutting geodes here and running them south on '
                      'the old line, the Ash cell in the vent, the breach, every person, camp and place name. Docs/DUNGEON_DESIGN.md.',
-        'size': 260, 'levelMin': 7, 'levelMax': 9, 'biome': 'mountain',
+        'size': 260, 'levelMin': 10, 'levelMax': 12, 'roadsNote': 'the cart track from the cut to the mouth', 'biome': 'mountain',
         'weather': [{'kind': 'overcast', 'weight': 3}, {'kind': 'fair', 'weight': 1}, {'kind': 'flurries', 'weight': 1}],
         'worldMapPosition': {'x': 0.5, 'y': 0.56}, 'worldMapNote': 'Under the Shattered Peaks, through the Sealed Adit.',
         'flatRadius': 14, 'hillHeight': 3, 'seed': 7717,
@@ -197,6 +197,7 @@ def zone(traced, camps):
                    'recovery': {'x': yard[0] - 2, 'y': yard[1] - 2}, 'leash': 24, 'enemies': []},
         'objectives': ['Find out what the Sandthrone are cutting under the pass', 'Stop the carriage on the dead line'],
         'exits': [{'to': 'zone.peaks', 'name': 'The cut back up to the Peaks', 'at': {'x': yard[0], 'y': yard[1] - 9}, 'arrive': {'x': -140.5, 'y': -42}, 'radius': 3.5}],
+        'roads': [{'name': 'Adit track', 'width': 3, 'points': [{'x': yard[0], 'y': yard[1] - 11}, {'x': yard[0], 'y': yard[1]}, {'x': main_at[0], 'y': main_at[1] + 1}]}],
         'clearings': [{'name': 'The Adit cut', 'center': {'x': yard[0], 'y': yard[1] + 2}, 'radius': 9}],
         'landmarks': [{'name': 'The Sealed Adit', 'at': {'x': main_at[0], 'y': main_at[1] + 2}, 'radius': 6}],
         'props': props,
@@ -205,7 +206,9 @@ def zone(traced, camps):
 
 def peaks_exit(z):
     exits = [e for e in z['exits'] if e.get('to') != 'zone.adit']
-    exits.append({'to': 'zone.adit', 'name': 'Into the Sealed Adit', 'at': {'x': -147.2, 'y': -42}, 'arrive': {'x': CAVES[0]['at'][0], 'y': CAVES[0]['at'][1] - 12}, 'radius': 2.4})
+    road = next(r for r in z['roads'] if r.get('name') == 'Ore road')
+    if road['points'][-1]['x'] > -146: road['points'].append({'x': -146.5, 'y': -41.5})   # on to the adit's face
+    exits.append({'to': 'zone.adit', 'name': 'Into the Sealed Adit', 'at': {'x': -144.5, 'y': -41.5}, 'arrive': {'x': CAVES[0]['at'][0], 'y': CAVES[0]['at'][1] - 12}, 'radius': 2.4})
     z['exits'] = exits
 
 def picture(traced, camps, path):

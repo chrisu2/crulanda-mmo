@@ -236,16 +236,16 @@ The Chronicle runs `main.ashrim.5` -> `main.verdant.1` -> 2 -> 3 -> 4 -> 5 (XP a
   - a full play-through;
   - that a mob doesn't notice you through solid scenery.
 
-## 8. The road to level 10 (2026-09-29)
+## 8. The road to the cap (2026-09-29; levels as of the round 29 rescale, cap 15)
 Each zone's last main quest is turned in to someone in the next zone. This makes the Chronicle a breadcrumb trail:
-- **Oakhaven:** `main.oakhaven.3` "The Ruts Go West", level 2. Corwin sends you to Wenna Coyle in Khaven.
-- **Khaven:** `main.khaven.1-3`, levels 3-5.
+- **Oakhaven:** `main.oakhaven.3` "The Ruts Go West", level 4. Corwin sends you to Wenna Coyle in Khaven.
+- **Khaven:** `main.khaven.1-3`, levels 5-8.
   - Break the Sandthrone Hold → What the Pale Thing Counts → The Toll Road North.
   - The last one is turned in to Maddoc Vire in the Peaks.
-- **Peaks:** `main.peaks.1-3`, levels 6-8.
+- **Peaks:** `main.peaks.1-3`, levels 9-11.
   - The Toll-Book → Under a Seeker's Seal → Salt of the First Sea.
   - The last one is turned in to Mother Vane on the Ash Rim.
-- **Ash Rim:** `main.ashrim.1-4`, levels 9-10.
+- **Ash Rim:** `main.ashrim.1-5`, levels 12-15 (`main.ashrim.5` is turned in to Willow-Whisper on the Verdant Shore, 13-15).
   - Salt Is Not Given → The Tear-Marked Shrine → Heart of the Brood → Salt for the Well.
 
 Each zone also has NPC quests that send you into its camps, plus one faction quest in the Peaks (Sandthrone, "The Dead-Drop").

@@ -69,6 +69,26 @@ namespace Crulanda.Encounter
             new EliteMove { mob = "The Hollow Root-Warden", name = "The Root's Weight", boss = true, health = BossHealth, hit = BossHit, windup = 2.2f, blow = 4.6f, reach = 4.2f, every = 11,
                 call = "The Hollow Root-Warden strikes the floor, and the Heart answers.", callShort = "The Heart answers", enrageAt = .35f, enrageHaste = .6f,
                 enrage = "The Hollow Root-Warden creaks, and every root in the Heart pulls tight." },
+            // ---------- The Sealed Adit (dungeon D1; PROVISIONAL moves until D2 gives each boss its mechanics, DUNGEON_DESIGN.md) ----------
+            new EliteMove { mob = "Gang-Boss Haddo Lusk", name = "Tally-Stick", windup = 2.2f, blow = 3.6f, reach = 3.8f, every = 12, callMost = 2,   // the first boss: a lesson, not a wall (the paper fight: his two guards answer, nobody else)
+                call = "Lusk roars: \"Overseers! Earn your cut!\"", callShort = "Earn your cut!",
+                enrage = "Lusk throws the tally book down and comes round the table." },
+            new EliteMove { mob = "Nix, the turncoat", name = "Spanner-Lock", windup = 1.6f, blow = 3.6f, reach = 3.4f, every = 9,
+                call = "Nix shrieks: \"Get them off me!\"", callShort = "Get them off me!",
+                enrage = "Nix's hands blur over the engine's controls." },
+            new EliteMove { mob = "Cinder-Warden Ysolt", name = "Ember Blow", windup = 2, blow = 4.2f, reach = 3.8f, every = 10,
+                call = "Ysolt lifts the brand: \"The fire sees you.\"", callShort = "The fire sees you",
+                enrage = "Ysolt steps into the heat and comes out burning." },
+            new EliteMove { mob = "The Foreman Who Forgot", name = "What the Grey Takes", windup = 2.4f, blow = 4.4f, reach = 3.6f, every = 12,
+                enrage = "The Foreman flickers, and for a moment there is less of him." },
+            new EliteMove { mob = "The Vent-Hound", name = "Ember Lunge", windup = 1.5f, blow = 3.6f, reach = 4.4f, every = 9,
+                enrage = "The Vent-Hound's coat glows along the spine." },
+            new EliteMove { mob = "Quartermaster Brannigan Sorrel", name = "Boot-Heel Stamp", windup = 2, blow = 4.2f, reach = 3.6f, every = 10, callReach = 14, callMost = 2,   // his guards, not the captain down the hall
+                call = "Sorrel bellows: \"Platform! Hold the ramp!\"", callShort = "Hold the ramp!",
+                enrage = "Sorrel goes to the rack and comes back with something heavier." },
+            new EliteMove { mob = "Rail-Captain Orsk Danner", name = "The Dead Line", boss = true, health = BossHealth, hit = 1, windup = 2.2f, blow = 3.6f, reach = 4, every = 12,   // sturdy, not savage: his guards and the shadows are the fight (the paper fight at level 12)
+                call = "Danner says, quietly: \"Guards.\" They step out of the dark.", callShort = "Guards.", enrageAt = .35f, enrageHaste = .6f,
+                enrage = "Danner draws a second blade. The letter stays buttoned in his coat." },
         };
         static readonly EliteMove Blow = new EliteMove { name = "Heavy Blow" }, Lunge = new EliteMove { name = "Savage Lunge", windup = 1.7f, blow = 3.8f, reach = 4.2f, every = 10 };
         /// <summary>The move of the elite a camp names; a plain heavy blow (a lunge, for a beast) when it is not one of the twelve.</summary>

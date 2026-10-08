@@ -53,6 +53,20 @@ namespace Crulanda.Tests
             Assert.Less(main.Centre[main.Centre.Count - 1].y, main.Centre[0].y - 35, "the Rail Hall lies deep under the Peaks");
             Assert.IsTrue(NavMesh.SamplePosition(zone.Ground(zone.Zone.spawns.player, .2f), out var start, 2.5f, NavMesh.AllAreas), "the yard is on the navmesh");
             var path = new NavMeshPath();
+            // Down each cave in six-metre steps first, so a break in the floor names its stretch.
+            foreach (var h in Hollow.All)
+            {
+                var from = h.Parent == null ? start.position : (NavMesh.SamplePosition(h.At(1) + Vector3.up * .2f, out var m, 2, NavMesh.AllAreas) ? m.position : start.position);
+                for (float s = 3; s < h.Length - 4; s += 6)
+                {
+                    // The middle of the way, or beside it where the middle is not floor (the Ember Vent's lake of molten rock).
+                    float aside = h.Half[h.Nearest(new Vector2(h.At(s).x, h.At(s).z), out _)] * .62f; NavMeshHit next = default; bool on = false;
+                    foreach (var off in new[] { 0f, aside, -aside }) if (NavMesh.SamplePosition(h.At(s, off) + Vector3.up * .2f, out next, 2, NavMesh.AllAreas)) { on = true; break; }
+                    Assert.IsTrue(on, h.Name + ": the floor " + s + " m in is on the navmesh (" + h.At(s) + ")");
+                    Assert.IsTrue(NavMesh.CalculatePath(from, next.position, NavMesh.AllAreas, path) && path.status == NavMeshPathStatus.PathComplete, h.Name + ": walkable from " + from + " to " + next.position + " (" + s + " m in)");
+                    from = next.position;
+                }
+            }
             foreach (var cp in zone.Zone.camps)
             {
                 var h = Cave(cp.cave); Assert.NotNull(h, cp.name + " names its cave");
@@ -85,7 +99,7 @@ namespace Crulanda.Tests
         {
             yield return null; var session = UnityEngine.Object.FindFirstObjectByType<EncounterSession>();
             var pop = SimPopulation.Active; var s = pop.World.sims.First();
-            s.zone = "zone.adit"; s.onlineFrom = 0; s.onlineHours = 24; s.friendly = .9f; s.level = 9; session.Progress.experience = EncounterProgress.XpForLevel(8);
+            s.zone = "zone.adit"; s.onlineFrom = 0; s.onlineHours = 24; s.friendly = .9f; s.level = 11; session.Progress.experience = EncounterProgress.XpForLevel(9);   // the Adit is 10-12 (round 29)
             var p = session.Player.transform.position; s.x = p.x + 2; s.z = p.z; pop.Refresh(); yield return null;
             Assert.IsTrue(session.Invite(s.id, true)); var c = session.PartySim(s.id);
             Assert.IsNotNull(c.LeadDungeon(out var why), why); Assert.AreEqual("The Sealed Adit", c.Dungeon);

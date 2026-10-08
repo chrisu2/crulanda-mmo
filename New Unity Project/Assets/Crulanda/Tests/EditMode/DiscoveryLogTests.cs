@@ -76,7 +76,7 @@ namespace Crulanda.Tests
                 Assert.AreEqual("class.warrior", p.classId); Assert.AreEqual("zone.oakhaven", p.zoneId);
                 Assert.AreEqual(1, p.talents.Count); Assert.AreEqual("tk-tempered-armor", p.talents[0].id); Assert.AreEqual(1, p.talents[0].rank);
                 Assert.AreEqual("5d0c1f3e8b2a4c6d9e7f0a1b2c3d4e5f", p.playerId); Assert.AreEqual("a1b2c3d4e5f60718293a4b5c6d7e8f90", p.companionId);
-                Assert.AreEqual(1329, p.experience, "No experience migration from format 6."); Assert.AreEqual(4, p.Level);
+                Assert.AreEqual(2599, p.experience, "Format 6 keeps its level under the cap-15 curve (round 29: 1329 -> 2599, level 4)."); Assert.AreEqual(4, p.Level);
                 Assert.AreEqual(255, p.health); Assert.AreEqual(118, p.mana); Assert.AreEqual(130, p.companionHealth);
                 Assert.AreEqual(14.25f, p.x); Assert.AreEqual(2.5f, p.y); Assert.AreEqual(-31.75f, p.z);
                 Assert.IsTrue(p.recruited); Assert.AreEqual(8, p.relationship); Assert.AreEqual(57, p.gold);

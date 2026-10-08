@@ -5,8 +5,8 @@
   "canonStatus": "CANON-EXPANDED",
   "canonNote": "Canon (book1 ch.20): the Ash-Walkers live along the Wasting and fight the Weave-Eaters with Salt of the First Sea; Chieftain Grohl and Mother Vane, the Salt-Speaker, lead them from an enclave in the deep caves of the Eastern Ridge, across a plain of petrified ash. The Cult of Ash (Torvyn Embercloak, Vorn) and its iron-wired bone masks are canon (book1 ch.10, series_bible.md); the purple tear is the later House of Ash's symbol (series_bible.md), used here early (GAME-ONLY). The books also call Torvyn's cultists 'Ashwalkers'; the game keeps the Ash-Walkers of ch.20 and the Cult of Ash apart. The canon Ashlands take their full form after the Spoke fires (series_bible.md), so this pre-erasure rim is PROVISIONAL. GAME-ONLY: the zone's name and its roads to the Peaks and Oakhaven, the cult shrine's location, Cinderfold, the old ribcage, the ash hounds, the brood, and all placement. Grown to 360 m (2026-09-30): the Silent Statue is a canon kind (faceless monoliths in the Wasting, world_bible.md), placed here GAME-ONLY. GAME-ONLY: Wain's Rest and the old salt road, the Last Orchard, the Drowned Leviathan (harpoons of petrified leviathan bone are canon), the Walled Mouth, the Ash Pit and its Ash-Deacon, the Fraying, the Reach-Stones and the Hunters' Knoll. The filled-out rim (2026-10-04): Sandthrone salt-raiders on the old salt road by Wain's Rest (CANON company, GAME-ONLY camp), Hollow Men out of the Walled Mouth (CANON creature), pale shadows among the Reach-Stones (CANON-EXPANDED: the Pale Things as watchers), Old Cinder-Jaw in the far west, and their quests; all placement GAME-ONLY.",
   "size": 430,
-  "levelMin": 9,
-  "levelMax": 10,
+  "levelMin": 12,
+  "levelMax": 15,
   "biome": "ash",
   "weather": [
     {
@@ -2240,8 +2240,8 @@
       },
       "radius": 12,
       "count": 5,
-      "levelMin": 9,
-      "levelMax": 10,
+      "levelMin": 13,
+      "levelMax": 14,
       "respawn": 90
     },
     {
@@ -2256,8 +2256,8 @@
       },
       "radius": 10,
       "count": 5,
-      "levelMin": 9,
-      "levelMax": 9,
+      "levelMin": 12,
+      "levelMax": 12,
       "respawn": 75
     },
     {
@@ -2272,8 +2272,8 @@
       },
       "radius": 12,
       "count": 5,
-      "levelMin": 9,
-      "levelMax": 10,
+      "levelMin": 13,
+      "levelMax": 14,
       "respawn": 90
     },
     {
@@ -2288,8 +2288,8 @@
       },
       "radius": 7,
       "count": 2,
-      "levelMin": 10,
-      "levelMax": 10,
+      "levelMin": 15,
+      "levelMax": 15,
       "respawn": 180,
       "elite": true
     },
@@ -2305,8 +2305,8 @@
       },
       "radius": 10,
       "count": 5,
-      "levelMin": 10,
-      "levelMax": 10,
+      "levelMin": 13,
+      "levelMax": 13,
       "respawn": 90
     },
     {
@@ -2321,8 +2321,8 @@
       },
       "radius": 12,
       "count": 5,
-      "levelMin": 9,
-      "levelMax": 10,
+      "levelMin": 13,
+      "levelMax": 14,
       "respawn": 90
     },
     {
@@ -2337,8 +2337,8 @@
       },
       "radius": 2,
       "count": 1,
-      "levelMin": 10,
-      "levelMax": 10,
+      "levelMin": 15,
+      "levelMax": 15,
       "respawn": 240,
       "elite": true
     },
@@ -2354,8 +2354,8 @@
       },
       "radius": 11,
       "count": 5,
-      "levelMin": 9,
-      "levelMax": 10,
+      "levelMin": 14,
+      "levelMax": 14,
       "respawn": 90
     },
     {
@@ -2370,8 +2370,8 @@
       },
       "radius": 10,
       "count": 5,
-      "levelMin": 9,
-      "levelMax": 10,
+      "levelMin": 13,
+      "levelMax": 14,
       "respawn": 75
     },
     {
@@ -2386,8 +2386,8 @@
       },
       "radius": 9,
       "count": 5,
-      "levelMin": 9,
-      "levelMax": 10,
+      "levelMin": 12,
+      "levelMax": 13,
       "respawn": 90
     },
     {
@@ -2402,8 +2402,8 @@
       },
       "radius": 9,
       "count": 5,
-      "levelMin": 10,
-      "levelMax": 10,
+      "levelMin": 14,
+      "levelMax": 14,
       "respawn": 90
     },
     {
@@ -2418,8 +2418,8 @@
       },
       "radius": 7,
       "count": 3,
-      "levelMin": 10,
-      "levelMax": 10,
+      "levelMin": 14,
+      "levelMax": 14,
       "respawn": 120
     },
     {
@@ -2434,8 +2434,8 @@
       },
       "radius": 5,
       "count": 1,
-      "levelMin": 10,
-      "levelMax": 10,
+      "levelMin": 12,
+      "levelMax": 12,
       "respawn": 180
     }
   ],

@@ -15,7 +15,7 @@ namespace Crulanda.Tests
 {
     /// <summary>
     /// Crowsfoot Hollow, the Sandthrone deserters' cave in Oakhaven's north hills, and its quest "The Tin Crown" (GAME-ONLY):
-    /// - the quest waits for level 3 (minLevel): no offer, no ! and no accepting at 2; its giver offers it at 3;
+    /// - the quest waits for level 5 (minLevel; round 29): no offer, no ! and no accepting at 4; its giver offers it at 5;
     /// - its kill targets are the hollow's camps (tags deserter and banditking), which wear their own looks, and its plunder is a usable prop;
     /// - played through: six deserters and Caddock, the plunder, and the hand-in;
     /// - a mob doesn't notice you through solid scenery (the rock between the chambers and the hillside).
@@ -49,13 +49,13 @@ namespace Crulanda.Tests
             Assert.AreEqual(level, s.Progress.Level);
         }
 
-        [UnityTest] public IEnumerator The_tin_crown_waits_for_level_3_and_its_giver_lives_in_Oakhaven()
+        [UnityTest] public IEnumerator The_tin_crown_waits_for_level_5_and_its_giver_lives_in_Oakhaven()
         {
             var s = Session(); Assert.NotNull(s.Quests, "Quest content loaded.");
             var q = s.Quests.Def(QuestId);
             Assert.NotNull(q, "The Crowsfoot Hollow quest is defined.");
-            Assert.AreEqual(3, q.minLevel, "It waits for level 3.");
-            Assert.AreEqual(4, q.level, "The quest sits in the middle of the dungeon's levels (3-5).");
+            Assert.AreEqual(5, q.minLevel, "It waits for level 5 (round 29: Oakhaven is 1-5).");
+            Assert.AreEqual(6, q.level, "The quest sits in the middle of the dungeon's levels (6-7 since round 29).");
             Assert.AreEqual("zone.oakhaven", q.zone);
             StringAssert.Contains("GAME-ONLY", q.canonStatus);
             Assert.NotNull(VillageLife.Active.Find(q.giver), "Nobody called '" + q.giver + "' in Oakhaven.");
@@ -64,12 +64,12 @@ namespace Crulanda.Tests
             yield return null;
         }
 
-        [UnityTest] public IEnumerator Not_offered_or_marked_at_level_2_and_offered_by_its_giver_at_level_3()
+        [UnityTest] public IEnumerator Not_offered_or_marked_at_level_4_and_offered_by_its_giver_at_level_5()
         {
             var s = Session(); var log = s.Quests; var q = log.Def(QuestId);
             var giver = VillageLife.Active.Find(q.giver);
 
-            AtLevel(s, 2);
+            AtLevel(s, 4);
             Assert.IsFalse(log.For(q.giver, s.ZoneId, 2).Exists(o => o.quest == q), "Not offered at level 2.");
             Assert.AreNotEqual('!', log.Marker(q.giver, s.ZoneId, 2, out _), "No ! over the giver at level 2, not even a grey one.");
             Assert.IsFalse(log.Accept(q, s.ZoneId), "Can't be taken at level 2.");
@@ -77,9 +77,9 @@ namespace Crulanda.Tests
             Assert.IsTrue(s.Conversation == null || !s.Conversation.entries.Exists(o => o.quest == q), "Talking to the giver at level 2 doesn't bring it up.");
             s.Conversation = null;
 
-            AtLevel(s, 3);
-            Assert.IsTrue(log.For(q.giver, s.ZoneId, 3).Exists(o => o.quest == q && o.status == QuestStatus.Available), "Offered at level 3.");
-            Assert.AreEqual('!', log.Marker(q.giver, s.ZoneId, 3, out bool grey)); Assert.IsFalse(grey, "A gold !, not a grey one.");
+            AtLevel(s, 5);
+            Assert.IsTrue(log.For(q.giver, s.ZoneId, 5).Exists(o => o.quest == q && o.status == QuestStatus.Available), "Offered at level 5.");
+            Assert.AreEqual('!', log.Marker(q.giver, s.ZoneId, 5, out bool grey)); Assert.IsFalse(grey, "A gold !, not a grey one.");
             Assert.IsTrue(s.QuestTalk(giver.Name, giver.transform.position), q.giver + " has the quest to give.");
             Assert.NotNull(s.Conversation); Assert.IsTrue(s.Conversation.entries.Exists(o => o.quest == q));
             s.AcceptQuest(q);
@@ -119,7 +119,7 @@ namespace Crulanda.Tests
         [UnityTest] public IEnumerator Clear_the_hollow_search_the_plunder_and_hand_it_in()
         {
             var s = Session(); var log = s.Quests; var q = log.Def(QuestId);
-            AtLevel(s, 3);
+            AtLevel(s, 5);
             Assert.IsTrue(log.Accept(q, s.ZoneId));
             var band = q.steps[0].objectives.First(o => o.target.StartsWith("mob.deserter."));
             var crown = q.steps[0].objectives.First(o => o.target.StartsWith("mob.banditking."));

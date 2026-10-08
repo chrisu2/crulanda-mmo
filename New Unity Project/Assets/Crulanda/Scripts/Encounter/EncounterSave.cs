@@ -16,12 +16,12 @@ namespace Crulanda.Encounter
     /// </summary>
     public sealed class EncounterSave
     {
-        public const int FormatVersion = 9;   // 5: level curve (experience migrated). 6: bag + equipment slots (old item list moved in). 7: discoveries. 8: trades (professions, pouches). 9: the Armoury (armoury, looks, lootLuck)
+        public const int FormatVersion = 10;   // 5: level curve (experience migrated). 6: bag + equipment slots (old item list moved in). 7: discoveries. 8: trades (professions, pouches). 9: the Armoury (armoury, looks, lootLuck). 10: the cap-15 curve (experience migrated again, round 29)
         /// <summary>The most trade bags a save may list as worn.</summary>
         public const int MaxPouches = 8;
         /// <summary>The payload steps from format 6 on. Formats 1-5 are older than this chain and are upgraded in memory in Read.</summary>
         static readonly SaveMigrator Steps = CreateSteps();
-        static SaveMigrator CreateSteps() { var m = new SaveMigrator(); m.Register(new AddDiscoveriesMigration()); m.Register(new AddProfessionsMigration()); m.Register(new AddArmouryMigration()); return m; }
+        static SaveMigrator CreateSteps() { var m = new SaveMigrator(); m.Register(new AddDiscoveriesMigration()); m.Register(new AddProfessionsMigration()); m.Register(new AddArmouryMigration()); m.Register(new SteeperCurveMigration()); return m; }
         /// <summary>9-node prototype ids (format 2) -> the nodes they became in the data-driven Warrior tree.</summary>
         public static readonly Dictionary<string, string> LegacyTalentIds = new Dictionary<string, string>(StringComparer.Ordinal) {
             { "tank.armor", "tk-tempered-armor" }, { "tank.challenge", "tk-steady-challenge" }, { "tank.bulwark", "tk-bulwark" },
@@ -202,6 +202,35 @@ namespace Crulanda.Encounter
     /// is then not loaded, not changed). What the character already holds is marked found when the Armoury first binds to it
     /// (ArmouryLog.Bind), not here.
     /// </summary>
+    /// <summary>
+    /// Save format 9 -> 10 (round 29, the cap 15 and the steeper curve): the character keeps its level and the fraction of it it had
+    /// under the old curve (200 + 90 a level, cap 13) by rewriting its <c>experience</c> for the new one; every other character of the
+    /// payload stays as it was. A payload with no experience field is left alone.
+    /// </summary>
+    public sealed class SteeperCurveMigration : ISaveMigration
+    {
+        public int FromVersion { get { return 9; } }
+        public int ToVersion { get { return 10; } }
+        static readonly Regex Xp = new Regex(@"""experience""\s*:\s*(-?\d+)");
+        const int OldCap = 13;
+        static int OldToNext(int level) { return 200 + 90 * (Math.Max(1, level) - 1); }
+        static int OldFor(int level) { int t = 0; for (int l = 1; l < Math.Min(level, OldCap); l++) t += OldToNext(l); return t; }
+        /// <summary>The new experience for an old total: the same level, the same way into it.</summary>
+        public static int Convert(int oldXp)
+        {
+            int level = 1; while (level < OldCap && oldXp >= OldFor(level + 1)) level++;
+            float frac = level >= OldCap ? 0 : Mathf.Clamp01((oldXp - OldFor(level)) / (float)OldToNext(level));
+            return EncounterProgress.XpForLevel(level) + (int)Math.Round(frac * EncounterProgress.XpToNext(level));
+        }
+        public string Migrate(string payloadJson)
+        {
+            string json = (payloadJson ?? "").Trim();
+            if (json.Length < 2 || json[0] != '{' || json[json.Length - 1] != '}') throw new SaveMigrationException("The save's payload is not a JSON object.");
+            var m = Xp.Match(payloadJson); if (!m.Success) return payloadJson;
+            int old = int.Parse(m.Groups[1].Value);
+            return payloadJson.Substring(0, m.Groups[1].Index) + Convert(Math.Max(0, old)) + payloadJson.Substring(m.Groups[1].Index + m.Groups[1].Length);
+        }
+    }
     public sealed class AddArmouryMigration : ISaveMigration
     {
         public int FromVersion { get { return 8; } }

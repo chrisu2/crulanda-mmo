@@ -29,12 +29,16 @@ namespace Crulanda.Tests
             { "deserter", SocialKind.Call }, { "banditking", SocialKind.Call }, { "quartermaster", SocialKind.Call }, { "outrider", SocialKind.Call }, { "tollguard", SocialKind.Call },
             { "captain", SocialKind.Call }, { "cultist", SocialKind.Call }, { "deacon", SocialKind.Call }, { "hollow", SocialKind.Call }, { "sexton", SocialKind.Call }, { "pale", SocialKind.Call },
             { "paleshadow", SocialKind.Call }, { "mistwalker", SocialKind.Call }, { "deepwalker", SocialKind.Call }, { "withered", SocialKind.Call }, { "deepwithered", SocialKind.Call },
-            { "greyheart", SocialKind.Call }, { "rootwarden", SocialKind.Call }, { "bear", SocialKind.Solitary }, { "drowned", SocialKind.Call }
+            { "greyheart", SocialKind.Call }, { "rootwarden", SocialKind.Call }, { "bear", SocialKind.Solitary }, { "drowned", SocialKind.Call },
+            // The Sealed Adit (dungeon D1): the Sandthrone and the cult call, the hound and the crawlers pack, the greyed bears keep to themselves.
+            { "picket", SocialKind.Call }, { "digger", SocialKind.Call }, { "overseer", SocialKind.Call }, { "sapper", SocialKind.Call }, { "gangboss", SocialKind.Call }, { "carrier", SocialKind.Call }, { "watchman", SocialKind.Call },
+            { "platformguard", SocialKind.Call }, { "docker", SocialKind.Call }, { "railquartermaster", SocialKind.Call }, { "gunner", SocialKind.Call }, { "railcaptain", SocialKind.Call }, { "cutter", SocialKind.Call }, { "sorter", SocialKind.Call },
+            { "nix", SocialKind.Call }, { "ashinitiate", SocialKind.Call }, { "ashmender", SocialKind.Call }, { "ysolt", SocialKind.Call }, { "foreman", SocialKind.Call }, { "venthound", SocialKind.Pack }, { "crawler", SocialKind.Pack }, { "greybear", SocialKind.Solitary }
         };
 
         [Test] public void Every_camp_in_the_five_zones_has_a_sensible_kind()
         {
-            Assert.AreEqual(5, zones.Count, "Five zones.");
+            Assert.AreEqual(6, zones.Count, "Five zones and the Sealed Adit.");
             int camps = 0;
             foreach (var (zone, camp, _) in Camps())
             {
@@ -110,7 +114,9 @@ namespace Crulanda.Tests
             // and the Greying, the Root-Warden and the Heart's withered. The other seven elites stand alone or with their own camp.
             CollectionAssert.AreEquivalent(new[] {
                 "Caddock's hall <- King's guard", "The Quartermaster's desk <- Store Caves", "The Ash-Deacon <- Ash-pit cultists",
-                "Greyheart <- The Greying", "The Root-Warden <- The Heart's withered" }, pairs,
+                "Greyheart <- The Greying", "The Root-Warden <- The Heart's withered",
+                // The Sealed Adit (dungeon D1): the gang-boss, the quartermaster, the rail-captain and Nix each name their guards.
+                "Gang-Boss Haddo Lusk <- Gang-boss's guards", "Quartermaster Brannigan Sorrel <- Quartermaster's guards", "Rail-Captain Orsk Danner <- Rail-Captain's guard", "Nix and the Rock-Eater <- Workshop guards" }, pairs,
                 "If a camp moved, pair it in the data: \"guards\" on the elite's camp names its guard camps.");
         }
 
@@ -131,8 +137,8 @@ namespace Crulanda.Tests
         [Test] public void Each_of_the_twelve_elites_has_its_own_move()
         {
             var elites = Camps().Where(x => x.camp.elite).ToList();
-            Assert.AreEqual(12, elites.Count, "Twelve camp elites in the five zones.");
-            Assert.AreEqual(12, EliteMoves.All.Length);
+            Assert.AreEqual(19, elites.Count, "Twelve camp elites in the five zones and seven in the Sealed Adit.");
+            Assert.AreEqual(19, EliteMoves.All.Length);
             var plain = EliteMoves.For("nobody at all", false);
             foreach (var (zone, camp, _) in elites)
             {
@@ -147,7 +153,7 @@ namespace Crulanda.Tests
                 Assert.That(m.enrageAt, Is.InRange(.2f, .4f)); Assert.Less(m.enrageHaste, .8f, "Enraged, it swings faster.");
                 Assert.Greater(m.callAt, m.enrageAt, "It calls before it enrages.");
             }
-            Assert.AreEqual(12, EliteMoves.All.Select(m => m.name).Distinct().Count(), "Twelve different moves.");
+            Assert.AreEqual(12, EliteMoves.All.Select(m => m.name).Distinct().Count(), "Nineteen different moves.");
             // Dungeon end bosses are a step harder than outdoor named elites: Caddock and the Hollow Root-Warden, and only they.
             CollectionAssert.AreEquivalent(new[] { "Caddock, the Bandit King", "The Hollow Root-Warden" }, EliteMoves.All.Where(m => m.boss).Select(m => m.mob).ToList());
             foreach (var m in EliteMoves.All) { Assert.AreEqual(m.boss ? EliteMoves.BossHealth : 1, m.health, m.mob); Assert.AreEqual(m.boss ? EliteMoves.BossHit : 1, m.hit, m.mob); }

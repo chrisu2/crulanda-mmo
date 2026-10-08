@@ -66,7 +66,7 @@ namespace Crulanda.Encounter
         public static readonly string[] ClassIds = { "class.warrior", "class.druid", "class.paladin", "class.ranger", "class.mage" };
         /// <summary>Home zones by level band (WORLD_ZONES.md): the village for the low levels, the Shore for the cap.</summary>
         public static readonly (string zone, string folk, int lo, int hi)[] Homes = {
-            ("zone.oakhaven", "Oakhaven folk", 1, 5), ("zone.khaven", "Khaven folk", 4, 8), ("zone.peaks", "Peaks folk", 7, 10), ("zone.ashrim", "Rim folk", 9, 12), ("zone.verdant", "Shore folk", 11, 13) };
+            ("zone.oakhaven", "Oakhaven folk", 1, 5), ("zone.khaven", "Khaven folk", 5, 9), ("zone.peaks", "Peaks folk", 9, 12), ("zone.ashrim", "Rim folk", 12, 15), ("zone.verdant", "Shore folk", 13, 15) };   // round 29 bands
         // GAME-ONLY names, plain and of the Trail: none from the books.
         static readonly string[] First = { "Ansel", "Bryn", "Cato", "Della", "Edric", "Fenna", "Garrick", "Hollis", "Isolde", "Jory", "Kestrel", "Lowen", "Maren", "Nolan", "Orla", "Piran", "Quill", "Rhosyn", "Sedge", "Tamsin", "Ulric", "Vesna", "Wren", "Yorath" };
         static readonly string[] Bynames = { "Ashby", "Brook", "Coombe", "Dray", "Fallow", "Greave", "Hale", "Kettle", "Larkin", "Marl", "Nettle", "Oxley", "Pike", "Rooke", "Sallow", "Thatch", "Underhill", "Wick" };

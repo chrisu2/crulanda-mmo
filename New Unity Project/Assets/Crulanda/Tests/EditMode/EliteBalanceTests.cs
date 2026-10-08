@@ -43,7 +43,7 @@ namespace Crulanda.Tests
                     var c = z.camps[i]; if (c == null || !c.elite) continue;
                     bool beast = Beast(c.look); elites.Add((c, EliteMoves.For(c.mob, beast), beast)); where[c] = (z, i);
                 }
-            Assert.AreEqual(12, elites.Count);
+            Assert.AreEqual(19, elites.Count, "twelve across the five zones and seven in the Sealed Adit");
         }
         // A camp mob's pace by its look (EncounterSession.SpawnCamps).
         static float Pace(string look) { return look == "wolf" ? 4.2f : look == "boar" ? 3.8f : look == "weaveeater" ? 3.4f : 2.8f; }

@@ -1,4 +1,4 @@
-# Crulanda Unity 6 — Claude continuation handoff
+# Crulanda Unity 6 â€” Claude continuation handoff
 
 Updated 2026-09-28, America/New_York (latest logs cross into 2026-09-29 UTC).
 This is the authoritative current progress snapshot. Some older project documents retain historical status statements.
@@ -9,7 +9,32 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-10-07, about 22:30)
+## RESUME HERE (updated 2026-10-08, about 00:50) — WORK IN PROGRESS, NOT PUBLISHED
+**Playable build = round 28 (published 2026-10-07 23:35, commit 21a6b50).** The working tree holds round 29 (the cap-15 rescale) and the
+Sealed Adit's D1, committed as WIP (not green yet). Chris stopped the session ("about out of tokens").
+**State:** rescale applied (tools/wip/levels/rescale.py --write, regen_named.py --write), save format 10, the Adit zone live
+(adit.json, the Peaks' way in), its first loot and provisional elite moves, icons made. EditMode last ran 411/429 before the final
+batch of fixes; a rerun (c61e, lane B) and the dungeon/cave/quest/party PlayMode set (c61a, lane A) were in progress. Check their
+outputs (hel/work/encounter-validation*/c61*.log) before anything else; fix what is left in ONE pass (read every affected test first;
+memory: crulanda-data-change-cascades), then a full run, release build, publish (check Crulanda.exe closed), commit, backup.
+**Helms (note 88):** the kit's Resources path is fixed (Props/ModularHero/Models/Armor Parts/Armor Parts); the next lane B build's
+wardrobe capture (--crulanda-wardrobe-capture) renders the 25 helmets for Chris.
+**Then:** dungeon D2-D8 (DUNGEON_DESIGN.md section 9), the enclave, Khaven kit, sound; Phase 9 (ROADMAP.md) after Phase 8.
+## Earlier resume note (2026-10-07, about 23:40)
+**Playable build = round 28 (notes 87, 89-93: key hints to Esc > Controls, chat focus, the wolf joins fights + companion bar, harder
+groups, outlying mobs), published 23:35, commit 21a6b50, backed up to E:. Full run c54: 428/428, 220/220, 0 shader errors.**
+**In the working tree, uncommitted:** the Sealed Adit zone switched on (tools/wip/dungeon/adit_layout.py --live wrote
+EncounterContent/Zones/adit.json and the Peaks' exit) with its first test run c55a in lane A (AditTests, CaveTests, RootDeepTests,
+HollowQuestTests). If green: D2 boss mechanics next (DUNGEON_DESIGN.md section 9). If not: fix, or `git checkout` peaks.json and
+delete adit.json to put it back to staged.
+**Round 29 (next, before D2 if Chris agrees the order): the cap-15 rescale**, tools/wip/levels/rescale.py --write (report checked;
+bands 1-5/5-9/9-12/12-15/13-15, the Shore a group zone: needs a `groupZone` flag read in EncounterSession.SpawnCamps making every
+mob elite-strength; slower XP; breadcrumbs checked), then WORLD_ZONES.md's camp table and DUNGEON_DESIGN.md's numbers (+3).
+**Helms (note 88):** Chosan's Modular Hero pack is in (Resources/Props/ModularHero); the wardrobe line-up with its 25 helmets is
+rendering to hel/work/ui-captures/wardrobe-r28 (06-helms-*.png) for Chris to judge. Then: the enclave interior (note 40), Khaven
+with the Village kit, sound; Phase 9 (zones, classes, races from the novels) after Phase 8.
+
+## Earlier resume note (updated 2026-10-07, about 22:30)
 **Round 27 = sims complete (ROADMAP 5.7, all six items).** Party kept across zones and sessions (WorldSave.party), sims invite you
 (Accept / Decline panel), /dungeon (a sim leads the run camp by camp, the mouth's outside camp first), trading with sims (Trade
 button on the sim frame), guilds (SimGuilds in EncounterSession.Guild.cs: four GAME-ONLY guilds, /g Guild chat, invitations, tags
@@ -502,9 +527,9 @@ Weather polish for later (not blocking):
 - `build_and_tour.ps1`: now skips the tour if the build fails, and waits 420 s per zone because the machine is slow under load.
 - Archive `work\world-captures` before each tour.
 
-## UPDATE 2026-09-29 (Claude session) — zones 1-10, camps, items, water, graphics
+## UPDATE 2026-09-29 (Claude session) â€” zones 1-10, camps, items, water, graphics
 - **Decision by Chris:** the level cap stays at 10 for now.
-  - Ladder: Oakhaven 1-2 → Khaven 3-5 → Shattered Peaks 6-8 → Ashland Rim 9-10.
+  - Ladder: Oakhaven 1-2 â†’ Khaven 3-5 â†’ Shattered Peaks 6-8 â†’ Ashland Rim 9-10.
   - Build order: Peaks then Ashlands.
   - Graphics priorities: lighting and atmosphere, terrain and nature, characters and creatures. Buildings come later.
 - **Chris's standing requests:**
@@ -514,7 +539,7 @@ Weather polish for later (not blocking):
 - **Where to read:**
   - CHANGELOG, the "Zones 1-10" entry.
   - WORLD_ZONES.md: the new zones, the level ladder and camps table, Water, and Nature and post-processing.
-  - QUEST_DESIGN.md §8: the chain across zones.
+  - QUEST_DESIGN.md Â§8: the chain across zones.
   - SAVE_FORMAT.md: formats 5 (XP curve) and 6 (bag and equipment).
 - **Key new code:**
   - `World/ZoneWater.cs`: the single water model.
@@ -547,7 +572,7 @@ Weather polish for later (not blocking):
   - Buildings pass (graphics) still to do.
   - Hollow Men / the well at night (Chronicle II).
 
-## UPDATE 2026-09-29 (Claude session) — quests, village trades, direction decisions
+## UPDATE 2026-09-29 (Claude session) â€” quests, village trades, direction decisions
 - **Decisions by Chris (2026-09-29):**
   - The game is set BEFORE Oakhaven is erased, so the village stays standing and the erasure is not shown.
   - The inn is the **Golden Cask**, the book's name (it was Whispering Barrel).
@@ -561,7 +586,7 @@ Weather polish for later (not blocking):
 - **Validation:** helper scripts are in the session scratchpad (they can be recreated from "Practical validation workflow" below).
   They sync with robocopy /MIR, run EditMode and PlayMode, build, and capture with `--crulanda-ui-capture` and `--crulanda-world-capture`.
 
-## UPDATE 2026-09-28 (Claude session) — day/night cycle, hen-wives and chicken coops
+## UPDATE 2026-09-28 (Claude session) â€” day/night cycle, hen-wives and chicken coops
 Chris asked for a chicken farmer who gathers eggs, feeds the chickens, and puts them in the coops at night.
 - `Scripts/World/WorldClock.cs`: the day/night cycle (40 min/day, static hour, lamps as `NightLights`) and `ZoneCoop`.
 - `ZoneBuilder.Coop` builds the `coop` prop. Oakhaven has three coops.
@@ -575,7 +600,7 @@ Chris asked for a chicken farmer who gathers eggs, feeds the chickens, and puts 
   - Oakhaven enlarged to 260 m with farms, mill, orchard, groves and instanced grass.
   - Walk-in inn with a door; villagers and critters (`WorldLife.cs`).
 
-## UPDATE 2026-09-28 (Claude session, latest) — direction: evolve the world; Druid playable; Oakhaven zone
+## UPDATE 2026-09-28 (Claude session, latest) â€” direction: evolve the world; Druid playable; Oakhaven zone
 Chris's direction (latest): stop per-skill testing/balancing; "the game needs to evolve first" - build graphics, zones
 and maps from the lore in `D:\code\crulanda` (world_bible.md, maps\*.png, interactive_map.html, chars\*.html, books).
 - Multi-class: `ClassKit` base (Warrior/Druid kits), per-class character saves (`encounter`, `encounter-druid`),
@@ -589,7 +614,7 @@ and maps from the lore in `D:\code\crulanda` (world_bible.md, maps\*.png, intera
 - Next world steps: zone-to-zone travel, a second zone (Khaven Village has a strong canon map), interiors for the inn,
   ambient life (villagers), audio, then better character art.
 
-## UPDATE 2026-09-28 (Claude session, later) — Warrior tree is data-driven and 27 talents are playable
+## UPDATE 2026-09-28 (Claude session, later) â€” Warrior tree is data-driven and 27 talents are playable
 Read PHASE2_CLASS_LOOPS.md "Update 2026-09-28 (later)" and SAVE_FORMAT.md for details. Key facts:
 - Source of truth for talents: workspace `work\calculator\trees\warrior.json` -> copied to
   `Assets\Crulanda\EncounterContent\Talents\warrior.json` with `build.py --sync` (build.py refuses to run on drift).
@@ -604,7 +629,7 @@ Read PHASE2_CLASS_LOOPS.md "Update 2026-09-28 (later)" and SAVE_FORMAT.md for de
   from before this slice: work\checkpoints\pre-warrior-slice-*.zip (no Git on this machine).
 - Chris's Unity editor was open on Phase0_TestMap during this work; it will reimport the changed scripts when focused.
 
-## UPDATE 2026-09-28 (Claude session) — calculator delivered
+## UPDATE 2026-09-28 (Claude session) â€” calculator delivered
 The all-class calculator from "IMMEDIATE UNFINISHED WORK" below now exists and was browser-tested:
 - Page: workspace `outputs\Crulanda-Talent-Calculator.html` (self-contained, ~290 KB; opens from disk).
 - Source: workspace `work\calculator\`: `trees\<class>.json` (20 files, hand-authored per path, PROVISIONAL / GAME-ONLY),
@@ -670,7 +695,7 @@ Do not overwrite or recreate the project or scene to update it. Preserve .meta G
 - User later saw dead mobs from saved progress. We backed up their save and restarted fresh.
 - User noted walking through scenery. Solid scenery collision/navigation were added and tested.
 - User asked to see auto-attack timing. Do NOT add a separate toggle: keep auto-attacks starting from Strike/Challenge. Show countdown/progress between swings.
-- User wants 3–4 base builds per class, combining classic class trees, branching upgrades and hybrid investment.
+- User wants 3â€“4 base builds per class, combining classic class trees, branching upgrades and hybrid investment.
 - Explicit examples: Warrior Tank/DPS/Support; Druid Tank/Melee/Healer/Ranged.
 - User then explicitly asked for the matrix for ALL classes. It has been expanded.
 - Latest feature request: a calculator visually like the supplied classic talent-tree screenshot, for every build, to explore choices and judge viability.
@@ -716,7 +741,7 @@ Files under `Assets/Crulanda/Scripts/Encounter`:
 - `BuildTree.cs`: validates complete proposed rank allocations with rank/level gates, prerequisites, branch investment, budget, exclusive choices and reachable purchase order. Rejects cyclic or missing graph prerequisites.
 - EncounterContent now has `playerClass`; current serialized content is `class.warrior` with all original three actions available at level 1.
 - Session gates abilities before spending costs/effects and derives action ordering from the class profile.
-- HUD reads class/resource names and action slots from data. Number keys 1–8 are supported.
+- HUD reads class/resource names and action slots from data. Number keys 1â€“8 are supported.
 - Actor.ConfigureResource configures class resource at spawn. Derived stats use playerClass.stats.
 - Legacy EncounterContent.playerStats remains for asset compatibility but is no longer authoritative; existing values were copied to playerClass.stats.
 
@@ -771,7 +796,7 @@ Latest EncounterSave writes envelope formatVersion 2, gameVersion 0.2.0.
 Previous user save backup is under workspace `work\save-backups\<timestamp>`.
 Do not reset or delete the user's progress just to test. Use isolated test save directories.
 
-## Latest validation — VERIFIED
+## Latest validation â€” VERIFIED
 
 Unity 6000.6.3f1 ran these on the synchronized validation project copy, leaving the user's open project/editor untouched:
 - **142/142 EditMode tests passed.**
@@ -794,7 +819,7 @@ Earlier reports remain for history.
 Latest build was copied into `outputs\Crulanda-Playable` during handoff (no player process was running).
 No user replay requested. No visual screenshot of the new tree was captured.
 
-## Full roster/build matrix — complete as a design document
+## Full roster/build matrix â€” complete as a design document
 
 Project: `Docs\CLASS_BUILD_MATRIX.md`.
 User-facing copy: `outputs\Crulanda-Class-Build-Matrix.md`.
@@ -825,7 +850,7 @@ The original brief had 12 generic classes and later additional Crulanda seeds. C
 not a decision to ship 20 classes. The up-to-15 final roster target and overlaps remain unresolved.
 Tinker/Engineer, Knight/Paladin/Warrior, Cleric/Healer, Rogue/Assassin, etc. have explicit differentiation notes.
 The user asked for ALL-class matrix coverage; do not limit the calculator to Warrior/Druid.
-The newer 3–4-build instruction takes precedence over the brief's earlier up-to-3 specializations.
+The newer 3â€“4-build instruction takes precedence over the brief's earlier up-to-3 specializations.
 
 Novels were not supplied/cross-checked. Canon names/claims from the brief remain unverified.
 Avoid treating proposed spell names and mechanics as established Crulanda lore.
@@ -838,7 +863,7 @@ for every class/build and use the calculator to explore viability.
 
 What EXISTS:
 1. `outputs\Crulanda-Build-Workshop.html` (~20 KB): an earlier, self-contained preview.
-   - Actual 9-node Warrior prototype calculator with levels 1–10, ranked investment/refund and exclusive signatures.
+   - Actual 9-node Warrior prototype calculator with levels 1â€“10, ranked investment/refund and exclusive signatures.
    - Other classes have build-path cards copied from the matrix and hybrid comparison selections.
    - Does NOT yet match the full reference or provide detailed trees for all classes.
    - No saved-build system, robust viability model or visual/browser QA completed.
@@ -886,7 +911,7 @@ Start-Process $unity -WindowStyle Hidden -PassThru -ArgumentList @(
 ```
 
 Do NOT add `-quit` to test runs. Wait for completion and inspect XML test-run totals/failures.
-PlayMode full encounter runs take roughly 90–120 seconds.
+PlayMode full encounter runs take roughly 90â€“120 seconds.
 
 Build pattern:
 

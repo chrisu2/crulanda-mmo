@@ -13,6 +13,9 @@ namespace Crulanda.World
         public string id, displayName, subtitle, canonStatus, canonNote;
         /// <summary>A dungeon (the Sealed Adit): a zone of caves you go into from another zone; the sims never wander into it on their own.</summary>
         public bool dungeon;
+        /// <summary>A group zone (the Verdant Shore, round 29; Chris: "all epic mobs, group required"): every camp mob has an elite's
+        /// health and blows (EncounterEnemy.Tough), though only the named ones are elites.</summary>
+        public bool groupZone;
         public float size = 140;            // square side length
         public float flatRadius = 50;       // village ground stays flat inside this radius
         public float hillHeight = 3;        // rolling ground outside it

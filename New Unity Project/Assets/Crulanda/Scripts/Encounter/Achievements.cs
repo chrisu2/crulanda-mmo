@@ -36,7 +36,7 @@ namespace Crulanda.Encounter
 
         public Achievements(EncounterProgress progress, IEnumerable<ZoneDefinition> zones, QuestDatabase questDb)
         {
-            Zones = (zones ?? new ZoneDefinition[0]).Where(z => z != null).OrderBy(z => z.levelMin).ThenBy(z => z.id, StringComparer.Ordinal).ToList();
+            /* a dungeon gets its deeds with its quests (the Sealed Adit, D6) */ Zones = (zones ?? new ZoneDefinition[0]).Where(z => z != null && !z.dungeon).OrderBy(z => z.levelMin).ThenBy(z => z.id, StringComparer.Ordinal).ToList();
             quests = questDb; Bind(progress); Build();
         }
         public void Bind(EncounterProgress progress)

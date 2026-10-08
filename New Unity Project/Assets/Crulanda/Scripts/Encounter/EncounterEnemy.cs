@@ -21,6 +21,8 @@ namespace Crulanda.Encounter
         /// <summary>A beast with a hide or pelt (a wolf, hound, boar or stag camp mob, and all game): E at its body reads "Skin the body".</summary>
         public bool Skinnable;
         public bool Elite;
+        /// <summary>Elite-strength without being an elite (a group zone's mobs, round 29): an elite's health, blows and kill XP.</summary>
+        public bool Tough;
         /// <summary>Base damage per swing before the class kit resolves it (scales with level).</summary>
         public float HitBase = 13;
         public float RespawnSeconds = 75;

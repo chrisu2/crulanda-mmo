@@ -207,7 +207,7 @@ namespace Crulanda.Tests
             Near(.10f, Rate(counts, "loot.oak.broken_oath_sabre", n), .05f, "Caddock's epic (10%)");
             Near(1f, Rate(counts, new[] { "item.tin_crown", "loot.oak.due_cleaver", "loot.oak.due_coat" }, n), .001f, "Caddock's list (every kill)");
             // A zone rare on a slow camp (5%) and a world drop off an elite (2%).
-            counts = Rates(Mob("verdant", "Withered Keeper", false, 13), n / 4);
+            counts = Rates(Mob("verdant", "Withered Keeper", false, 15), n / 4);
             Assert.AreEqual(0, Rate(counts, "loot.ver.vigil_root_grips", n / 4), "The Greying's keepers are not the Deep's.");
             var deep = zones.First(z => z.id == "zone.verdant"); int gallery = Array.FindIndex(deep.camps, x => x.tag == "deepwithered");
             counts = Rates(LootContext.From("mob.deepwithered.verdant." + gallery + ".0", deep.camps, 13, false), n / 4);
@@ -235,7 +235,7 @@ namespace Crulanda.Tests
                 {
                     if (!d.item.StartsWith("gen.", StringComparison.Ordinal) || items.Get(d.item).quality != 4) continue;
                     epics++; var g = items.Get(d.item); var parts = d.item.Split('.');
-                    Assert.AreEqual("5", parts[2], "At the elite's level."); Assert.AreEqual("epic", ItemDatabase.QualityNames[g.quality].ToLowerInvariant());
+                    Assert.AreEqual(caddock.level.ToString(), parts[2], "At the elite's level."); Assert.AreEqual("epic", ItemDatabase.QualityNames[g.quality].ToLowerInvariant());
                     Assert.NotNull(items.Get(string.Join(".", parts[0], parts[1], parts[2], "3", parts[4])), "The rare it was, same slot, level and seed.");
                 }
             // 70% gear, 35% of it rare, 6% of those epic: about 1.5% of kills.

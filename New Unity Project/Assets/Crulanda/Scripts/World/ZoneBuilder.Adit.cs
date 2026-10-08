@@ -136,7 +136,7 @@ namespace Crulanda.World
                 }
                 // The Workings' rails, the carts on them, and the lum-tubes: green light every eight metres.
                 Rails(2, galleryFrom - 1, 0);
-                Cart(Mathf.Min(galleryFrom - 6, 27), -1.6f, false); Cart(Mathf.Min(galleryFrom - 4, 70), 0, true);
+                Cart(Mathf.Min(galleryFrom - 6, 27), -1.6f, false); Cart(Mathf.Min(galleryFrom - 30, 57), 1.6f, true);   // in the hall, off the way (a cart in the narrow drift cut the navmesh)
                 int lumNo = 0;
                 for (float s = 4; s < galleryFrom; s += 8, lumNo++) WallLamp(RingAt(s), lumNo % 2 == 0 ? 1 : -1, LumGreen, 8, .75f);
                 // The cages: three along the left wall of the first chamber, straw inside, doors hanging.

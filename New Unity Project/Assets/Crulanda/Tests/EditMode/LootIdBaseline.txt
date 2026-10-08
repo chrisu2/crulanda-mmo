@@ -109,3 +109,21 @@ loot.pea.the_toll_unpaid
 loot.ash.cinderheart
 loot.ver.the_green_wrath
 loot.ash.sentinel_helm
+# The Sealed Adit (dungeon D6 first pass, 2026-10-08)
+loot.adit.lusks_tally_stick
+loot.adit.overseers_long_coat
+loot.adit.the_borer_bit
+loot.adit.turncoats_greasy_gloves
+loot.adit.ember_wardens_brand
+loot.adit.cinder_wardens_sabatons
+loot.adit.ash_red_pendant
+loot.adit.the_grey_lantern
+loot.adit.foremans_unmade_breeches
+loot.adit.vent_hounds_ember_pelt
+loot.adit.vent_hound_tooth
+loot.adit.sorrels_heavier_hammer
+loot.adit.quartermasters_gauntlets
+loot.adit.platform_masters_greaves
+loot.adit.rail_captains_coat
+loot.adit.danners_kettle_helm
+loot.adit.the_dead_line_shield

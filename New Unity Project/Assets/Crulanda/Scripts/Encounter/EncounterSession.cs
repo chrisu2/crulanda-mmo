@@ -1462,10 +1462,11 @@ namespace Crulanda.Encounter
                     enemy.Ambusher = camp.ambush; enemy.Skinnable = look == ActorLook.Wolf || look == ActorLook.Boar || look == ActorLook.Stag || look == ActorLook.Bear;
                     a.gameObject.SetActive(true); enemy.Initialize(); Enemies.Add(enemy);
                     if (camp.ambush) enemy.Hide();
-                    a.Stats.SetBase(StatType.MaxHealth, EncounterEnemy.MobHealth(level, false, elite, beast));
+                    bool tough = Zone.Zone.groupZone && !elite; enemy.Tough = tough;   // a group zone: every mob at an elite's strength (round 29)
+                    a.Stats.SetBase(StatType.MaxHealth, EncounterEnemy.MobHealth(level, false, elite || tough, beast));
                     a.Health.ApplyHealing(a.Health.Pool.Max);
-                    enemy.HitBase = EncounterEnemy.MobHit(level, false, elite);
-                    if (elite) a.transform.localScale = Vector3.one * 1.18f;
+                    enemy.HitBase = EncounterEnemy.MobHit(level, false, elite || tough);
+                    if (elite) a.transform.localScale = Vector3.one * 1.18f; else if (tough) a.transform.localScale = Vector3.one * 1.08f;
                     ConfigureSocial(enemy, camp, c, level, beast);   // its kind, its kin and, for the elite, its move (EncounterSession.Social)
                 }
             }
@@ -1513,9 +1514,10 @@ namespace Crulanda.Encounter
                         enemy.Camp = true; enemy.RespawnSeconds = Mathf.Max(20, camp.respawn); enemy.CampCenter = at; enemy.CampRadius = 4;
                         enemy.Skinnable = look == ActorLook.Wolf || look == ActorLook.Boar || look == ActorLook.Stag || look == ActorLook.Bear;
                         a.gameObject.SetActive(true); enemy.Initialize(); Enemies.Add(enemy);
-                        a.Stats.SetBase(StatType.MaxHealth, EncounterEnemy.MobHealth(level, false, false, beast));
+                        enemy.Tough = Zone.Zone.groupZone;
+                        a.Stats.SetBase(StatType.MaxHealth, EncounterEnemy.MobHealth(level, false, enemy.Tough, beast));
                         a.Health.ApplyHealing(a.Health.Pool.Max);
-                        enemy.HitBase = EncounterEnemy.MobHit(level, false, false);
+                        enemy.HitBase = EncounterEnemy.MobHit(level, false, enemy.Tough); if (enemy.Tough) a.transform.localScale = Vector3.one * 1.08f;
                         ConfigureSocial(enemy, camp, c, level, beast); enemy.CampIndex = 1000 + c * 10 + g;   // a group of its own: it calls its kin, but is not the camp's pull
                     }
                 }
@@ -1905,11 +1907,11 @@ namespace Crulanda.Encounter
             if (enemy.Camp && enemy.Elite) { if (Feats != null) Feats.Slain(enemy.persistentId); else { var k = Achievements.EliteKey(enemy.persistentId); if (k != null && !Progress.elitesSlain.Contains(k)) Progress.elitesSlain.Add(k); } }
             OnKillEffects();
             int before = Progress.Level;
-            int xp = EncounterProgress.KillXp(enemy.actor.Level, Progress.Level, enemy.Elite);
+            int xp = EncounterProgress.KillXp(enemy.actor.Level, Progress.Level, enemy.Elite || enemy.Tough);
             if (enemy.Camp) Progress.experience += xp;
             else { if (!Progress.AwardKill(enemy.persistentId, xp)) return; if (Progress.recruited) Progress.relationship++; }
             Message(enemy.actor.DisplayName + " defeated · " + (xp > 0 ? "+" + xp + " XP" : "no experience (too weak)") + " · press " + KeyBindings.InteractLabel + " at the body to loot.");
-            foreach (var c in PartySims) if (c != null && c.actor.IsAlive) c.GainXp(EncounterProgress.KillXp(enemy.actor.Level, c.sim.level, enemy.Elite) / 2);   // the party's kill: half shares for the sims (5.3b)
+            foreach (var c in PartySims) if (c != null && c.actor.IsAlive) c.GainXp(EncounterProgress.KillXp(enemy.actor.Level, c.sim.level, enemy.Elite || enemy.Tough) / 2);   // the party's kill: half shares for the sims (5.3b)
             if (Progress.Level > before) { ApplyLevel(); Player.Health.ApplyHealing(40); Message("Level " + Progress.Level + "! Health and weapon damage increased."); }
             if (Target == enemy) AutoAttack = false;
             if (Quests != null)

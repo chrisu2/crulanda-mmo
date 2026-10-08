@@ -85,10 +85,10 @@ namespace Crulanda.Encounter
         // ---------- levels (save format 5) ----------
         /// <summary>The highest level (13 since the Verdant Shore, 2026-09-30; it was 10 for the first four zones). Talent points stop
         /// at <see cref="TalentCap"/>: the trees were designed for ten levels' worth, so the last levels bring health and hit, not points.</summary>
-        public const int LevelCap = 13;
+        public const int LevelCap = 15;   // 15 now, 30 in the end (Chris, 2026-10-07; ROADMAP: Phase 9)
         public const int TalentCap = 10;
         /// <summary>Experience from level to level+1: 200 at level 1, +90 per level (1,000+ by the late levels).</summary>
-        public static int XpToNext(int level) { return 200 + 90 * (Math.Max(1, level) - 1); }
+        public static int XpToNext(int level) { return 400 + 170 * (Math.Max(1, level) - 1); }   // round 29: "difficult and slow leveling, grind it out" (was 200 + 90 a level)
         /// <summary>Total experience at which a level begins (level 1 = 0).</summary>
         public static int XpForLevel(int level)
         {

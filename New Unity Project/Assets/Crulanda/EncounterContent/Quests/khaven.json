@@ -60,7 +60,7 @@
       "giver": "Wenna Coyle",
       "turnIn": "Wenna Coyle",
       "zone": "zone.khaven",
-      "level": 3,
+      "level": 5,
       "requires": [
         "main.oakhaven.3"
       ],
@@ -131,7 +131,7 @@
       "giver": "Ansel Morrow",
       "turnIn": "Ansel Morrow",
       "zone": "zone.khaven",
-      "level": 4,
+      "level": 6,
       "requires": [
         "main.khaven.1"
       ],
@@ -187,7 +187,7 @@
       "giver": "Ansel Morrow",
       "turnIn": "Maddoc Vire",
       "zone": "zone.khaven",
-      "level": 5,
+      "level": 8,
       "requires": [
         "main.khaven.2"
       ],
@@ -243,7 +243,7 @@
       "giver": "Wenna Coyle",
       "turnIn": "Wenna Coyle",
       "zone": "zone.khaven",
-      "level": 3,
+      "level": 5,
       "canonStatus": "GAME-ONLY",
       "summary": "Thin the grey wolves hunting the Whispering Wood beyond the walls.",
       "offer": "\"Wolves in the Whispering Wood. Grey ones, greyer every season, as if the wood's got into them.\" She touches a charm of knotted bone over the gate. \"They've had Col Emmet's goats, and they'll have Col next. Six of them, and I'll sleep.\"",
@@ -274,7 +274,7 @@
       "giver": "Wenna Coyle",
       "turnIn": "Wenna Coyle",
       "zone": "zone.khaven",
-      "level": 3,
+      "level": 5,
       "canonStatus": "GAME-ONLY",
       "summary": "Gather five mourner's caps from the banks of Gloom Creek for Wenna's salves.",
       "offer": "\"You'll be bleeding before you're done in Khaven, and so will everyone else. I need mourner's cap for the salve: black-gilled, grows on the creek banks where the water's darkest. The old folk call it that because it likes the drowned graves. Five. And don't lick your fingers after.\"",
@@ -306,7 +306,7 @@
       "giver": "Cato Brisk",
       "turnIn": "Cato Brisk",
       "zone": "zone.khaven",
-      "level": 4,
+      "level": 6,
       "canonStatus": "GAME-ONLY",
       "summary": "Bring Cato five lumps of tallow from the carrion boars rooting under the Carrion Cliffs.",
       "offer": "\"Candles. Khaven runs on candles, and I've none to sell.\" He spreads empty hands over his stall. \"The boars under the Carrion Cliffs are fat as abbots on what falls from up there. Don't ask what falls. Five good lumps of their tallow, and there'll be light in Khaven's windows again.\"",
@@ -338,7 +338,7 @@
       "giver": "Cato Brisk",
       "turnIn": "Cato Brisk",
       "zone": "zone.khaven",
-      "level": 5,
+      "level": 8,
       "canonStatus": "CANON faction (Sandthrone), GAME-ONLY quest",
       "summary": "Raid the Sandthrone outrider camp beyond the north pines and take back the goods they carried off as 'toll'.",
       "offer": "\"The two in the square were the polite ones.\" Cato keeps his voice low. \"There's a camp of them out past the north pines. Everything they 'tolled' off us is sitting in their crates: my stock, the Tabors' pewter, Old Kestrel's good wool.\"\n\n\"Bring back what you can carry. And if a few of them don't get up again, I won't weep.\"",
@@ -383,7 +383,7 @@
       "giver": "Ansel Morrow",
       "turnIn": "Ansel Morrow",
       "zone": "zone.khaven",
-      "level": 5,
+      "level": 8,
       "canonStatus": "CANON creature (Hollow Men: stone-grey, whispering 'Hungry', book1 ch.4); the drowned graveyard is GAME-ONLY.",
       "summary": "Lay to rest the grey dead walking out of the drowned graveyard south of Gloom Creek.",
       "offer": "\"When the creek floods, it takes the low graves. Always has. We'd find a boot, a jaw, and bury it again.\" His hands are shaking on his stick. \"This year they walked out on their own. Grey. Skin like stone. Whispering that they're hungry.\"\n\n\"Those are Khaven's dead, and I'm their keeper. Five of them. Put them down so they stay down.\"",
@@ -414,7 +414,7 @@
       "giver": "Ansel Morrow",
       "turnIn": "Ansel Morrow",
       "zone": "zone.khaven",
-      "level": 5,
+      "level": 8,
       "requires": [
         "npc.ansel.hollows"
       ],
@@ -448,7 +448,7 @@
       "giver": "Ansel Morrow",
       "turnIn": "Ansel Morrow",
       "zone": "zone.khaven",
-      "level": 4,
+      "level": 6,
       "requires": [
         "npc.ansel.hollows"
       ],
@@ -498,7 +498,7 @@
       "giver": "Cato Brisk",
       "turnIn": "Cato Brisk",
       "zone": "zone.khaven",
-      "level": 4,
+      "level": 6,
       "requires": [
         "npc.cato.spoils"
       ],
@@ -545,8 +545,8 @@
       "giver": "Dorra Vey",
       "turnIn": "Dorra Vey",
       "zone": "zone.khaven",
-      "level": 5,
-      "minLevel": 4,
+      "level": 8,
+      "minLevel": 6,
       "canonStatus": "GAME-ONLY",
       "summary": "Dorra Vey wants spider-silk from the scree below the Carrion Heights, for a dye she will not name.",
       "offer": "Dorra Vey keeps her voice down, though there is nobody near. \"The scree under the Carrion Heights, on the east side. There are spiders in it now, big as dogs, and their silk is grey and strong and takes a colour like nothing I've worked.\" She shows you a thread wound on her finger, the red of a hanged man's face. \"Five skeins. Don't tell Wenna. She'd call it unlucky.\"",
@@ -579,7 +579,7 @@
       "giver": "Old Kestrel",
       "turnIn": "Old Kestrel",
       "zone": "zone.khaven",
-      "level": 3,
+      "level": 5,
       "canonStatus": "GAME-ONLY",
       "summary": "Old Kestrel wants to know what the Listener heard before the Hush took him. Go to the Listener's Hut, then to the Hush at night, and tell Wenna Coyle what you find.",
       "offer": "Old Kestrel sits with a blanket over his knees though the day is warm. \"There was a man lived west of the wood, in a hut, and he listened. To the ground, to the trees, to the dead. The Listener, they called him; he had another name once. One night he walked up to the Hush and he didn't come back.\" The old man's hands shake. \"Go to his hut. Then go up to the Hush when it's dark, and stand still, and listen the way he did. Then tell Wenna what you heard. She'll know. I'm too old to hear it myself.\"",
@@ -643,8 +643,8 @@
       "giver": "Wenna Coyle",
       "turnIn": "Wenna Coyle",
       "zone": "zone.khaven",
-      "level": 6,
-      "minLevel": 5,
+      "level": 9,
+      "minLevel": 8,
       "requires": [
         "npc.wenna.wolves"
       ],
@@ -678,7 +678,7 @@
       "giver": "Ansel Morrow",
       "turnIn": "Ansel Morrow",
       "zone": "zone.khaven",
-      "level": 5,
+      "level": 8,
       "requires": [
         "npc.ansel.hollows"
       ],

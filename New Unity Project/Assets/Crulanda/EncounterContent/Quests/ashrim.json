@@ -60,7 +60,7 @@
       "giver": "Mother Vane",
       "turnIn": "Chieftain Grohl",
       "zone": "zone.ashrim",
-      "level": 9,
+      "level": 12,
       "requires": [
         "main.peaks.3"
       ],
@@ -100,7 +100,7 @@
       "giver": "Chieftain Grohl",
       "turnIn": "Chieftain Grohl",
       "zone": "zone.ashrim",
-      "level": 9,
+      "level": 12,
       "requires": [
         "main.ashrim.1"
       ],
@@ -153,7 +153,7 @@
       "giver": "Mother Vane",
       "turnIn": "Mother Vane",
       "zone": "zone.ashrim",
-      "level": 10,
+      "level": 14,
       "requires": [
         "main.ashrim.2"
       ],
@@ -209,7 +209,7 @@
       "giver": "Mother Vane",
       "turnIn": "Corwin Ashby",
       "zone": "zone.ashrim",
-      "level": 10,
+      "level": 14,
       "requires": [
         "main.ashrim.3"
       ],
@@ -273,7 +273,7 @@
       "giver": "Chieftain Grohl",
       "turnIn": "Chieftain Grohl",
       "zone": "zone.ashrim",
-      "level": 9,
+      "level": 12,
       "canonStatus": "GAME-ONLY (ash hounds)",
       "summary": "Kill six ash hounds hunting in the dead snags west of the enclave.",
       "offer": "\"Ash hounds. Wolves, once, before the grey got into them. Now they're wolves that don't need to eat, and eat anyway.\" He spits into the ash. \"They've been at our harpoon-line in the western snags. Six. Bring me nothing back; I'll believe you.\"",
@@ -310,7 +310,7 @@
       "giver": "Mother Vane",
       "turnIn": "Mother Vane",
       "zone": "zone.ashrim",
-      "level": 9,
+      "level": 12,
       "canonStatus": "CANON-EXPANDED: salted Weave-Eaters turning to white crystal is canon (book1 ch.20); using the shards is GAME-ONLY.",
       "summary": "Gather six calcified shards from the Weave-Eaters you salt and shatter.",
       "offer": "\"When the salt takes an Eater it leaves white crystal. Most of my people kick it into the ash.\" She holds a shard up to the firelight. \"Wasteful. Ground fine, it sweetens the salt. Bring me six shards. Whole ones.\"",
@@ -348,7 +348,7 @@
       "giver": "Oska",
       "turnIn": "Oska",
       "zone": "zone.ashrim",
-      "level": 9,
+      "level": 12,
       "canonStatus": "CANON-EXPANDED: Ash-Walker harpoons of petrified leviathan bone and a petrified ribcage on the ash plain are canon images (book1 ch.20); this ribcage and the quest are GAME-ONLY.",
       "summary": "Chip five pieces of petrified bone from the old ribcage in the south for Oska's harpoons.",
       "offer": "Oska doesn't look up from the harpoon she is carving. \"The Eaters won't eat old bone. Nobody knows why. So we make our harpoons of it.\"\n\n\"There's a ribcage in the south, big as a hall, from something that swam when the ash was sea, or so the old ones say. Chip me five good pieces. Hard ones. The soft ones splinter.\"",
@@ -386,7 +386,7 @@
       "giver": "Sefa Brine",
       "turnIn": "Sefa Brine",
       "zone": "zone.ashrim",
-      "level": 10,
+      "level": 14,
       "canonStatus": "GAME-ONLY",
       "summary": "Take back three salt-casks the Cult of Ash carried off to their shrine in the south-west.",
       "offer": "\"Three casks.\" The salt-trader counts on her fingers as if she might have got it wrong. \"Three casks of good salt gone in one night, and the tracks go south-west to the bone-masks' shrine. They don't eat it. They don't sell it. They just keep it from us.\"\n\n\"Bring them back and I'll trade you anything on my table at cost. Well. Near cost.\"",
@@ -424,7 +424,7 @@
       "giver": "Sefa Brine",
       "turnIn": "Sefa Brine",
       "zone": "zone.ashrim",
-      "level": 10,
+      "level": 14,
       "canonStatus": "CANON creature (Hollow Men, book1 ch.4); Cinderfold is GAME-ONLY.",
       "summary": "Put down the Hollow Men in the ruins of Cinderfold, north-west of the enclave, and find the house with the carved fish.",
       "offer": "\"I was born in Cinderfold, north of here, before the grey went through it. It didn't take the houses. It took everything that lived in them.\" She doesn't stop polishing her scales. \"They walk the lanes now. Grey. Saying they're hungry.\"\n\n\"Put six of them down. And find the house with the fish carved over the door. I'd like to know it's still standing.\"",
@@ -472,8 +472,8 @@
       "giver": "Chieftain Grohl",
       "turnIn": "Willow-Whisper",
       "zone": "zone.ashrim",
-      "level": 11,
-      "minLevel": 10,
+      "level": 15,
+      "minLevel": 14,
       "requires": [
         "main.ashrim.3"
       ],
@@ -538,7 +538,7 @@
       "giver": "Sefa Brine",
       "turnIn": "Sefa Brine",
       "zone": "zone.ashrim",
-      "level": 9,
+      "level": 12,
       "requires": [
         "npc.brine.casks"
       ],
@@ -590,7 +590,7 @@
       "giver": "Chieftain Grohl",
       "turnIn": "Chieftain Grohl",
       "zone": "zone.ashrim",
-      "level": 10,
+      "level": 14,
       "requires": [
         "npc.grohl.hounds"
       ],
@@ -646,7 +646,7 @@
       "giver": "Mother Vane",
       "turnIn": "Mother Vane",
       "zone": "zone.ashrim",
-      "level": 10,
+      "level": 14,
       "canonStatus": "CANON-EXPANDED (the Pale Things); GAME-ONLY quest",
       "summary": "Mother Vane wants to know what stands among the Reach-Stones at night, and wants it gone.",
       "offer": "Mother Vane pours salt from one hand to the other. \"The Reach-Stones, north-east, by the grey. We set them to mark how far the Wasting had come. Every year a little nearer.\" The salt runs out. \"Now there are pale things standing among them at night, as if they were counting the stones too. Go at night. See them. Then send them back to wherever they count from.\"",
@@ -700,8 +700,8 @@
       "giver": "Oska",
       "turnIn": "Oska",
       "zone": "zone.ashrim",
-      "level": 10,
-      "minLevel": 9,
+      "level": 14,
+      "minLevel": 12,
       "requires": [
         "npc.oska.bone"
       ],
@@ -741,7 +741,7 @@
       "giver": "Chieftain Grohl",
       "turnIn": "Mother Vane",
       "zone": "zone.ashrim",
-      "level": 9,
+      "level": 12,
       "canonStatus": "CANON kind (the faceless statues in the Wasting, world_bible.md); GAME-ONLY quest",
       "summary": "Grohl wants someone to look at the Silent Statue by the grey and tell Mother Vane what they see.",
       "offer": "\"There's a statue east of here, at the edge of the grey. No face. It was further away when I was a boy.\" Grohl says it plainly, as a man says the river is high. \"Go and look at it. Then go to the edge of the Wasting and look at that. Then tell Vane. She keeps the count of such things.\"",

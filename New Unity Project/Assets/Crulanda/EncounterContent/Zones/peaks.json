@@ -5,8 +5,8 @@
   "canonStatus": "CANON-EXPANDED",
   "canonNote": "Canon: the Shattered Peaks are a jagged range on the eastern border that holds back the Wasting while the void slowly eats through the stone (world_bible.md), and Sandthrone mercenaries hold them and charge a toll (book1 ch.5). GAME-ONLY / PROVISIONAL: this pass and its toll gate, the toll-house, the pilgrims' rest and its people, the ruined waystation, the pilgrims' cairns, the levelling camps and all placement. Mount Umbra is named on the game's world map image but not in the lore folder. The grown ring (2026-09-30): old mining tunnels under the Peaks are CANON (book2 ch.19), and so is the void eating the stone (world_bible.md); the signal tower, the goatherd's shieling, the sealed adit, the Cold Tarn, the Listening Shrine (the Silent Pilgrims are CANON), the Broken Post, the avalanche scar with its grey head, and their camps are GAME-ONLY. The filled-out ring (2026-10-03): Hollow Men out of the Sealed Adit (CANON creature, CANON tunnels), pale shadows at the Cold Tarn and one Pale Thing watching from under the Umbra scarp (CANON-EXPANDED: the Pale Things as watchers), grey-robed false pilgrims at the Broken Post (GAME-ONLY; the Silent Pilgrims are CANON and are not these), and their quests. Mountain bears in the high pines (2026-10-04): GAME-ONLY.",
   "size": 430,
-  "levelMin": 6,
-  "levelMax": 8,
+  "levelMin": 9,
+  "levelMax": 12,
   "biome": "mountain",
   "weather": [
     {
@@ -100,6 +100,19 @@
         "y": 90.8
       },
       "radius": 5
+    },
+    {
+      "to": "zone.adit",
+      "name": "Into the Sealed Adit",
+      "at": {
+        "x": -144.5,
+        "y": -41.5
+      },
+      "arrive": {
+        "x": 0,
+        "y": -112
+      },
+      "radius": 2.4
     }
   ],
   "clearings": [
@@ -500,6 +513,10 @@
         {
           "x": -140.5,
           "y": -41
+        },
+        {
+          "x": -146.5,
+          "y": -41.5
         }
       ]
     },
@@ -2020,8 +2037,8 @@
       },
       "radius": 9,
       "count": 5,
-      "levelMin": 6,
-      "levelMax": 7,
+      "levelMin": 10,
+      "levelMax": 11,
       "respawn": 90
     },
     {
@@ -2036,8 +2053,8 @@
       },
       "radius": 10,
       "count": 5,
-      "levelMin": 6,
-      "levelMax": 7,
+      "levelMin": 10,
+      "levelMax": 11,
       "respawn": 75,
       "ambush": true
     },
@@ -2053,8 +2070,8 @@
       },
       "radius": 10,
       "count": 5,
-      "levelMin": 7,
-      "levelMax": 7,
+      "levelMin": 10,
+      "levelMax": 10,
       "respawn": 75
     },
     {
@@ -2069,8 +2086,8 @@
       },
       "radius": 6,
       "count": 1,
-      "levelMin": 8,
-      "levelMax": 8,
+      "levelMin": 12,
+      "levelMax": 12,
       "respawn": 180,
       "elite": true
     },
@@ -2086,8 +2103,8 @@
       },
       "radius": 7,
       "count": 3,
-      "levelMin": 8,
-      "levelMax": 8,
+      "levelMin": 11,
+      "levelMax": 11,
       "respawn": 120
     },
     {
@@ -2102,8 +2119,8 @@
       },
       "radius": 8,
       "count": 4,
-      "levelMin": 6,
-      "levelMax": 7,
+      "levelMin": 9,
+      "levelMax": 10,
       "respawn": 90
     },
     {
@@ -2118,8 +2135,8 @@
       },
       "radius": 9,
       "count": 5,
-      "levelMin": 6,
-      "levelMax": 7,
+      "levelMin": 9,
+      "levelMax": 10,
       "respawn": 75
     },
     {
@@ -2134,8 +2151,8 @@
       },
       "radius": 9,
       "count": 5,
-      "levelMin": 7,
-      "levelMax": 8,
+      "levelMin": 11,
+      "levelMax": 11,
       "respawn": 75
     },
     {
@@ -2150,8 +2167,8 @@
       },
       "radius": 5,
       "count": 1,
-      "levelMin": 8,
-      "levelMax": 8,
+      "levelMin": 12,
+      "levelMax": 12,
       "respawn": 180,
       "elite": true
     },
@@ -2167,8 +2184,8 @@
       },
       "radius": 8,
       "count": 5,
-      "levelMin": 7,
-      "levelMax": 8,
+      "levelMin": 9,
+      "levelMax": 10,
       "respawn": 90
     },
     {
@@ -2183,8 +2200,8 @@
       },
       "radius": 7,
       "count": 3,
-      "levelMin": 8,
-      "levelMax": 8,
+      "levelMin": 11,
+      "levelMax": 11,
       "respawn": 120
     },
     {
@@ -2199,8 +2216,8 @@
       },
       "radius": 8,
       "count": 5,
-      "levelMin": 7,
-      "levelMax": 8,
+      "levelMin": 10,
+      "levelMax": 11,
       "respawn": 90,
       "ambush": true
     },
@@ -2216,8 +2233,8 @@
       },
       "radius": 5,
       "count": 1,
-      "levelMin": 8,
-      "levelMax": 8,
+      "levelMin": 10,
+      "levelMax": 10,
       "respawn": 180
     },
     {
@@ -2232,8 +2249,8 @@
       },
       "radius": 7,
       "count": 3,
-      "levelMin": 7,
-      "levelMax": 8,
+      "levelMin": 10,
+      "levelMax": 11,
       "respawn": 90
     }
   ],

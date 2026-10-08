@@ -4271,10 +4271,12 @@ namespace Crulanda.World
             if (lining != null) { body.GetComponent<MeshRenderer>().enabled = false; CaveLining(t, h, c, ring, n, P, seed, lining, linked); }
             int dressedFrom = t.childCount;
             CaveDressing(t, h, c, right, ring, n, P, roots, lining ?? (roots ? knoll : rock));
-            if (linked) for (int k = t.childCount - 1; k >= dressedFrom; k--)   // no fallen stone or dripstone in another cave's way
+            if (linked) for (int k = t.childCount - 1; k >= dressedFrom; k--)   // no fallen stone, ledge or dripstone in another cave's way
                 {
-                    var r = t.GetChild(k).GetComponentInChildren<Renderer>();
-                    if (r != null && Hollow.OpenInOther(h, r.bounds.center, .95f)) DestroyImmediate(t.GetChild(k).gameObject);
+                    var r = t.GetChild(k).GetComponentInChildren<Renderer>(); if (r == null) continue;
+                    var b = r.bounds; bool inWay = Hollow.OpenInOther(h, b.center, 1f);
+                    for (int q = 0; q < 6 && !inWay; q++) { var e = Vector3.zero; e[q / 2] = (q % 2 == 0 ? 1 : -1) * b.extents[q / 2]; inWay = Hollow.OpenInOther(h, b.center + e, 1f); }
+                    if (inWay) DestroyImmediate(t.GetChild(k).gameObject);
                 }
 
             // The knoll: an outer shell round the passage, 2-4 m of rock thick and thickest over the top (so it heaps into a mound),

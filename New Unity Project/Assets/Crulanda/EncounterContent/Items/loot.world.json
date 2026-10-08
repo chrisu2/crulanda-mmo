@@ -1,48 +1,447 @@
 {
   "items": [
-    {"id": "loot.world.golden_cask_tankard", "name": "The Golden Cask's Lost Tankard", "kind": "gear", "slot": "mainhand", "quality": 3, "level": 2, "value": 17, "weaponDamage": 11, "stamina": 4, "strength": 2, "description": "Pewter, dented, and owed back at the bar.", "canonStatus": "GAME-ONLY"},
-    {"id": "loot.world.assessors_honest_scale", "name": "Assessor's Honest Scale", "kind": "gear", "slot": "offhand", "quality": 3, "level": 4, "value": 20, "armor": 22, "stamina": 6, "strength": 5, "description": "The only honest thing a grey-coat ever carried.", "canonStatus": "GAME-ONLY"},
-    {"id": "loot.world.pilgrims_last_mile", "name": "Pilgrim's Last Mile", "kind": "gear", "slot": "feet", "quality": 3, "level": 7, "value": 32, "armor": 19, "stamina": 9, "agility": 8, "description": "Whoever wore them got where they were going.", "canonStatus": "GAME-ONLY"},
-    {"id": "loot.world.hares_foot_torc", "name": "Hare's-Foot Torc", "kind": "gear", "slot": "neck", "quality": 3, "level": 9, "value": 40, "stamina": 8, "agility": 8, "description": "Lucky for you. Less so for the hare.", "canonStatus": "GAME-ONLY"},
-    {"id": "loot.world.helm_with_no_makers_mark", "name": "Helm With No Maker's Mark", "kind": "gear", "slot": "head", "quality": 3, "level": 11, "value": 48, "armor": 29, "stamina": 14, "strength": 12, "description": "Every smith who sees it says it is not theirs.", "canonStatus": "GAME-ONLY"},
-    {"id": "loot.world.vial_of_the_first_sea", "name": "Vial of the First Sea", "kind": "gear", "slot": "neck", "quality": 4, "level": 12, "value": 65, "stamina": 16, "strength": 13, "agility": 12, "description": "Water from before there was a shore to name it.", "canonStatus": "GAME-ONLY"}
+    {
+      "id": "loot.world.golden_cask_tankard",
+      "name": "The Golden Cask's Lost Tankard",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 3,
+      "level": 4,
+      "value": 28,
+      "weaponDamage": 17,
+      "stamina": 7,
+      "strength": 4,
+      "description": "Pewter, dented, and owed back at the bar.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.world.assessors_honest_scale",
+      "name": "Assessor's Honest Scale",
+      "kind": "gear",
+      "slot": "offhand",
+      "quality": 3,
+      "level": 6,
+      "value": 28,
+      "armor": 31,
+      "stamina": 8,
+      "strength": 7,
+      "description": "The only honest thing a grey-coat ever carried.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.world.pilgrims_last_mile",
+      "name": "Pilgrim's Last Mile",
+      "kind": "gear",
+      "slot": "feet",
+      "quality": 3,
+      "level": 10,
+      "value": 44,
+      "armor": 26,
+      "stamina": 12,
+      "agility": 11,
+      "description": "Whoever wore them got where they were going.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.world.hares_foot_torc",
+      "name": "Hare's-Foot Torc",
+      "kind": "gear",
+      "slot": "neck",
+      "quality": 3,
+      "level": 12,
+      "value": 52,
+      "stamina": 8,
+      "agility": 8,
+      "description": "Lucky for you. Less so for the hare.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.world.helm_with_no_makers_mark",
+      "name": "Helm With No Maker's Mark",
+      "kind": "gear",
+      "slot": "head",
+      "quality": 3,
+      "level": 14,
+      "value": 60,
+      "armor": 36,
+      "stamina": 17,
+      "strength": 15,
+      "description": "Every smith who sees it says it is not theirs.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.world.vial_of_the_first_sea",
+      "name": "Vial of the First Sea",
+      "kind": "gear",
+      "slot": "neck",
+      "quality": 4,
+      "level": 14,
+      "value": 75,
+      "stamina": 18,
+      "strength": 15,
+      "agility": 14,
+      "description": "Water from before there was a shore to name it.",
+      "canonStatus": "GAME-ONLY"
+    }
   ],
-  "vendors": [
-  ],
+  "vendors": [],
   "gear": [
-    {"id": "loot.world.golden_cask_tankard", "look": "club:tankard/oakhaven", "source": "world:1-5", "effects": [{"kind": "onKillPower", "amount": 5, "text": "Each kill restores 5 resource."}]},
-    {"id": "loot.world.assessors_honest_scale", "look": "offhand.hung:scale/concord", "source": "world:3-7", "effects": [{"kind": "coins", "amount": 20, "text": "+20% coins from bodies."}]},
-    {"id": "loot.world.pilgrims_last_mile", "look": "feet.boots:plain/pilgrim", "source": "world:6-10", "effects": [{"kind": "restRegen", "amount": 6, "text": "+6 health per rest tick out of combat."}]},
-    {"id": "loot.world.hares_foot_torc", "look": "neck.torc:charm/oakhaven", "source": "world:8-13", "effects": [{"kind": "luck", "amount": 15, "text": "+15% luck on lucky drops."}]},
-    {"id": "loot.world.helm_with_no_makers_mark", "look": "head.barbute:plain/tollroad", "source": "world:11-13"},
-    {"id": "loot.world.vial_of_the_first_sea", "look": "neck.pendant:vial/pale+glow", "source": "world:11-13", "unique": true, "effects": [{"kind": "stat", "stat": "MaxHealth", "amount": 8, "percent": true, "text": "+8% maximum health."}]},
-    {"id": "item.training_blade", "look": "sword.arming:straight/oakhaven", "source": "quest:main.oakhaven.1", "legacy": true},
-    {"id": "item.poachers_hood", "look": "head.hood:oilskin/oakhaven", "source": "secret:secret.oakhaven.poachers-camp", "legacy": true},
-    {"id": "item.hesks_lantern", "look": "offhand.hung:shuttered/sandthrone+glow", "source": "secret:secret.oakhaven.quartermasters-strongbox", "legacy": true},
-    {"id": "item.tin_crown", "look": "head.crown:tin/sandthrone", "source": "boss:Caddock, the Bandit King", "legacy": true, "boss": true, "unique": true, "set": "set.crowsfoot"},
-    {"id": "item.outriders_knife", "look": "knife:hooked/sandthrone", "source": "secret:secret.khaven.outriders-hoard", "legacy": true},
-    {"id": "item.echo_jar", "look": "neck.pendant:jar/pilgrim+glow", "source": "secret:secret.peaks.echo-jar", "legacy": true},
-    {"id": "item.bone_harpoon", "look": "polearm:harpoon/ashwalker", "source": "secret:secret.ashrim.hunters-cache", "legacy": true},
-    {"id": "item.leviathan_charm", "look": "neck.cord:tooth/ashwalker", "source": "secret:secret.ashrim.carvers-bundle", "legacy": true},
-    {"id": "item.tappers_gloves", "look": "hands.gloves:plain/veridian", "source": "secret:secret.verdant.tappers-stump", "legacy": true},
-    {"id": "item.ninebranch_tine", "look": "neck.cord:tine/veridian", "source": "boss:Old Ninebranch", "legacy": true, "boss": true, "unique": true},
-    {"id": "item.greyheart_stave", "look": "staff:forked/pale+glow", "source": "boss:Greyheart", "legacy": true, "boss": true, "unique": true},
-    {"id": "item.wardens_crown", "look": "head.crown:root/veridian+glow", "source": "boss:The Hollow Root-Warden", "legacy": true, "boss": true, "unique": true, "set": "set.vigil"}
+    {
+      "id": "loot.world.golden_cask_tankard",
+      "look": "club:tankard/oakhaven",
+      "source": "world:1-8",
+      "effects": [
+        {
+          "kind": "onKillPower",
+          "amount": 5,
+          "text": "Each kill restores 5 resource."
+        }
+      ]
+    },
+    {
+      "id": "loot.world.assessors_honest_scale",
+      "look": "offhand.hung:scale/concord",
+      "source": "world:5-10",
+      "effects": [
+        {
+          "kind": "coins",
+          "amount": 20,
+          "text": "+20% coins from bodies."
+        }
+      ]
+    },
+    {
+      "id": "loot.world.pilgrims_last_mile",
+      "look": "feet.boots:plain/pilgrim",
+      "source": "world:9-14",
+      "effects": [
+        {
+          "kind": "restRegen",
+          "amount": 6,
+          "text": "+6 health per rest tick out of combat."
+        }
+      ]
+    },
+    {
+      "id": "loot.world.hares_foot_torc",
+      "look": "neck.torc:charm/oakhaven",
+      "source": "world:11-15",
+      "effects": [
+        {
+          "kind": "luck",
+          "amount": 15,
+          "text": "+15% luck on lucky drops."
+        }
+      ]
+    },
+    {
+      "id": "loot.world.helm_with_no_makers_mark",
+      "look": "head.barbute:plain/tollroad",
+      "source": "world:14-15"
+    },
+    {
+      "id": "loot.world.vial_of_the_first_sea",
+      "look": "neck.pendant:vial/pale+glow",
+      "source": "world:14-15",
+      "unique": true,
+      "effects": [
+        {
+          "kind": "stat",
+          "stat": "MaxHealth",
+          "amount": 8,
+          "percent": true,
+          "text": "+8% maximum health."
+        }
+      ]
+    },
+    {
+      "id": "item.training_blade",
+      "look": "sword.arming:straight/oakhaven",
+      "source": "quest:main.oakhaven.1",
+      "legacy": true
+    },
+    {
+      "id": "item.poachers_hood",
+      "look": "head.hood:oilskin/oakhaven",
+      "source": "secret:secret.oakhaven.poachers-camp",
+      "legacy": true
+    },
+    {
+      "id": "item.hesks_lantern",
+      "look": "offhand.hung:shuttered/sandthrone+glow",
+      "source": "secret:secret.oakhaven.quartermasters-strongbox",
+      "legacy": true
+    },
+    {
+      "id": "item.tin_crown",
+      "look": "head.crown:tin/sandthrone",
+      "source": "boss:Caddock, the Bandit King",
+      "legacy": true,
+      "boss": true,
+      "unique": true,
+      "set": "set.crowsfoot"
+    },
+    {
+      "id": "item.outriders_knife",
+      "look": "knife:hooked/sandthrone",
+      "source": "secret:secret.khaven.outriders-hoard",
+      "legacy": true
+    },
+    {
+      "id": "item.echo_jar",
+      "look": "neck.pendant:jar/pilgrim+glow",
+      "source": "secret:secret.peaks.echo-jar",
+      "legacy": true
+    },
+    {
+      "id": "item.bone_harpoon",
+      "look": "polearm:harpoon/ashwalker",
+      "source": "secret:secret.ashrim.hunters-cache",
+      "legacy": true
+    },
+    {
+      "id": "item.leviathan_charm",
+      "look": "neck.cord:tooth/ashwalker",
+      "source": "secret:secret.ashrim.carvers-bundle",
+      "legacy": true
+    },
+    {
+      "id": "item.tappers_gloves",
+      "look": "hands.gloves:plain/veridian",
+      "source": "secret:secret.verdant.tappers-stump",
+      "legacy": true
+    },
+    {
+      "id": "item.ninebranch_tine",
+      "look": "neck.cord:tine/veridian",
+      "source": "boss:Old Ninebranch",
+      "legacy": true,
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "item.greyheart_stave",
+      "look": "staff:forked/pale+glow",
+      "source": "boss:Greyheart",
+      "legacy": true,
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "item.wardens_crown",
+      "look": "head.crown:root/veridian+glow",
+      "source": "boss:The Hollow Root-Warden",
+      "legacy": true,
+      "boss": true,
+      "unique": true,
+      "set": "set.vigil"
+    }
   ],
   "drops": [
-    {"id": "drop.world.golden_cask_tankard.normal", "rank": "normal", "levelMin": 1, "levelMax": 5, "groups": [{"chance": 0.0025, "lucky": true, "pick": [{"item": "loot.world.golden_cask_tankard"}]}]},
-    {"id": "drop.world.golden_cask_tankard.elite", "rank": "elite", "levelMin": 1, "levelMax": 5, "groups": [{"chance": 0.02, "lucky": true, "pick": [{"item": "loot.world.golden_cask_tankard"}]}]},
-    {"id": "drop.world.assessors_honest_scale.normal", "rank": "normal", "levelMin": 3, "levelMax": 7, "groups": [{"chance": 0.0025, "lucky": true, "pick": [{"item": "loot.world.assessors_honest_scale"}]}]},
-    {"id": "drop.world.assessors_honest_scale.elite", "rank": "elite", "levelMin": 3, "levelMax": 7, "groups": [{"chance": 0.02, "lucky": true, "pick": [{"item": "loot.world.assessors_honest_scale"}]}]},
-    {"id": "drop.world.pilgrims_last_mile.normal", "rank": "normal", "levelMin": 6, "levelMax": 10, "groups": [{"chance": 0.0025, "lucky": true, "pick": [{"item": "loot.world.pilgrims_last_mile"}]}]},
-    {"id": "drop.world.pilgrims_last_mile.elite", "rank": "elite", "levelMin": 6, "levelMax": 10, "groups": [{"chance": 0.02, "lucky": true, "pick": [{"item": "loot.world.pilgrims_last_mile"}]}]},
-    {"id": "drop.world.hares_foot_torc.normal", "rank": "normal", "levelMin": 8, "levelMax": 13, "groups": [{"chance": 0.0025, "lucky": true, "pick": [{"item": "loot.world.hares_foot_torc"}]}]},
-    {"id": "drop.world.hares_foot_torc.elite", "rank": "elite", "levelMin": 8, "levelMax": 13, "groups": [{"chance": 0.02, "lucky": true, "pick": [{"item": "loot.world.hares_foot_torc"}]}]},
-    {"id": "drop.world.helm_with_no_makers_mark.normal", "rank": "normal", "levelMin": 11, "levelMax": 13, "groups": [{"chance": 0.0025, "lucky": true, "pick": [{"item": "loot.world.helm_with_no_makers_mark"}]}]},
-    {"id": "drop.world.helm_with_no_makers_mark.elite", "rank": "elite", "levelMin": 11, "levelMax": 13, "groups": [{"chance": 0.02, "lucky": true, "pick": [{"item": "loot.world.helm_with_no_makers_mark"}]}]},
-    {"id": "drop.world.vial_of_the_first_sea.normal", "rank": "normal", "levelMin": 11, "levelMax": 13, "groups": [{"chance": 0.001, "lucky": true, "pick": [{"item": "loot.world.vial_of_the_first_sea"}]}]},
-    {"id": "drop.world.vial_of_the_first_sea.elite", "rank": "elite", "levelMin": 11, "levelMax": 13, "groups": [{"chance": 0.01, "lucky": true, "pick": [{"item": "loot.world.vial_of_the_first_sea"}]}]}
+    {
+      "id": "drop.world.golden_cask_tankard.normal",
+      "rank": "normal",
+      "levelMin": 1,
+      "levelMax": 8,
+      "groups": [
+        {
+          "chance": 0.0025,
+          "lucky": true,
+          "pick": [
+            {
+              "item": "loot.world.golden_cask_tankard"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drop.world.golden_cask_tankard.elite",
+      "rank": "elite",
+      "levelMin": 1,
+      "levelMax": 8,
+      "groups": [
+        {
+          "chance": 0.02,
+          "lucky": true,
+          "pick": [
+            {
+              "item": "loot.world.golden_cask_tankard"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drop.world.assessors_honest_scale.normal",
+      "rank": "normal",
+      "levelMin": 5,
+      "levelMax": 10,
+      "groups": [
+        {
+          "chance": 0.0025,
+          "lucky": true,
+          "pick": [
+            {
+              "item": "loot.world.assessors_honest_scale"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drop.world.assessors_honest_scale.elite",
+      "rank": "elite",
+      "levelMin": 5,
+      "levelMax": 10,
+      "groups": [
+        {
+          "chance": 0.02,
+          "lucky": true,
+          "pick": [
+            {
+              "item": "loot.world.assessors_honest_scale"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drop.world.pilgrims_last_mile.normal",
+      "rank": "normal",
+      "levelMin": 9,
+      "levelMax": 14,
+      "groups": [
+        {
+          "chance": 0.0025,
+          "lucky": true,
+          "pick": [
+            {
+              "item": "loot.world.pilgrims_last_mile"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drop.world.pilgrims_last_mile.elite",
+      "rank": "elite",
+      "levelMin": 9,
+      "levelMax": 14,
+      "groups": [
+        {
+          "chance": 0.02,
+          "lucky": true,
+          "pick": [
+            {
+              "item": "loot.world.pilgrims_last_mile"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drop.world.hares_foot_torc.normal",
+      "rank": "normal",
+      "levelMin": 11,
+      "levelMax": 15,
+      "groups": [
+        {
+          "chance": 0.0025,
+          "lucky": true,
+          "pick": [
+            {
+              "item": "loot.world.hares_foot_torc"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drop.world.hares_foot_torc.elite",
+      "rank": "elite",
+      "levelMin": 11,
+      "levelMax": 15,
+      "groups": [
+        {
+          "chance": 0.02,
+          "lucky": true,
+          "pick": [
+            {
+              "item": "loot.world.hares_foot_torc"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drop.world.helm_with_no_makers_mark.normal",
+      "rank": "normal",
+      "levelMin": 14,
+      "levelMax": 15,
+      "groups": [
+        {
+          "chance": 0.0025,
+          "lucky": true,
+          "pick": [
+            {
+              "item": "loot.world.helm_with_no_makers_mark"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drop.world.helm_with_no_makers_mark.elite",
+      "rank": "elite",
+      "levelMin": 14,
+      "levelMax": 15,
+      "groups": [
+        {
+          "chance": 0.02,
+          "lucky": true,
+          "pick": [
+            {
+              "item": "loot.world.helm_with_no_makers_mark"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drop.world.vial_of_the_first_sea.normal",
+      "rank": "normal",
+      "levelMin": 14,
+      "levelMax": 15,
+      "groups": [
+        {
+          "chance": 0.001,
+          "lucky": true,
+          "pick": [
+            {
+              "item": "loot.world.vial_of_the_first_sea"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drop.world.vial_of_the_first_sea.elite",
+      "rank": "elite",
+      "levelMin": 14,
+      "levelMax": 15,
+      "groups": [
+        {
+          "chance": 0.01,
+          "lucky": true,
+          "pick": [
+            {
+              "item": "loot.world.vial_of_the_first_sea"
+            }
+          ]
+        }
+      ]
+    }
   ],
-  "sets": [
-  ]
+  "sets": []
 }

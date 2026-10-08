@@ -55,6 +55,8 @@ namespace Crulanda.Encounter
         public RangerKit Ranger { get { return Kit as RangerKit; } }
         public MageKit Mage { get { return Kit as MageKit; } }
         /// <summary>The Ranger's wolf (RangerPet), while one is called.</summary>
+        /// <summary>/invis (a tester's switch, Chris 2026-10-08): mobs do not notice you; hit one and it fights as ever.</summary>
+        public static bool Unseen;
         public RangerPet Pet { get; private set; }
         /// <summary>The companion bar's orders (playtest note 93): attack your target, assist (follow and join your fights), stay.</summary>
         public bool PetAttack()
@@ -1343,6 +1345,11 @@ namespace Crulanda.Encounter
                 Progress.zoneId = Zone.Zone.id; var start = StartPoint; Progress.x = start.x; Progress.y = start.y; Progress.z = start.z;
             }
             if (Zone != null) Progress.y = Zone.StandAt(new Vector2(Progress.x, Progress.z), Progress.y - 1.1f, 1.1f).y;   // on the generated ground, or the cave floor you saved on
+            if (Zone != null && Zone.Zone.id == "zone.adit" && PlayerPrefs.GetInt("test.adit", 0) == 1)
+            {
+                PlayerPrefs.DeleteKey("test.adit");   // /adit: level 11 on arrival
+                if (Progress.Level < 11) Progress.experience = EncounterProgress.XpForLevel(11);
+            }
             actorsRoot = new GameObject("Encounter Actors");
             Player = SpawnActor("You", content.player, new Vector3(Progress.x, Progress.y, Progress.z), TintForClass(ClassDef.id), Progress.playerId, LookForClass(ClassDef.id));
             var controller = Player.gameObject.AddComponent<CharacterController>(); controller.height = 2; controller.radius = .4f; controller.stepOffset = .35f;

@@ -67,6 +67,8 @@ namespace Crulanda.Encounter
 #endif
             }
         }
+        /// <summary>Running on by itself (the Auto-run key) until forward, back or the key again.</summary>
+        public static bool AutoRunning; static int autoFrame = -1;
         public static Vector2 Move
         {
             get {
@@ -74,8 +76,12 @@ namespace Crulanda.Encounter
 #if ENABLE_INPUT_SYSTEM
                 var k = Keyboard.current;
                 if (k == null) return Vector2.zero;
+                // Auto-run (Chris, 2026-10-08): its key toggles it; forward or back takes the walking back into your hands.
+                if (KeyBindings.Pressed(GameKey.AutoRun) && Time.frameCount != autoFrame) { autoFrame = Time.frameCount; AutoRunning = !AutoRunning; }   // once a frame, however often Move is read
+                bool fwd = KeyBindings.Held(GameKey.Forward), back = KeyBindings.Held(GameKey.Back);
+                if (fwd || back) AutoRunning = false;
                 return new Vector2((KeyBindings.Held(GameKey.Right) ? 1 : 0) - (KeyBindings.Held(GameKey.Left) ? 1 : 0),
-                    (KeyBindings.Held(GameKey.Forward) ? 1 : 0) - (KeyBindings.Held(GameKey.Back) ? 1 : 0));   // the bound keys (note 75)
+                    (fwd || AutoRunning ? 1 : 0) - (back ? 1 : 0));   // the bound keys (note 75)
 #else
                 return new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 #endif

@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 namespace Crulanda.Encounter
 {
     /// <summary>The game's rebindable keys (playtest note 75, 2026-10-07).</summary>
-    public enum GameKey { Forward, Back, Left, Right, Interact, Jump, Run, Target, Map, Quests, Talents, Bags, Character, Trades, Who, Recover, Hail }
+    public enum GameKey { Forward, Back, Left, Right, Interact, Jump, Run, Target, Map, Quests, Talents, Bags, Character, Trades, Who, Recover, Hail, AutoRun }
 
     /// <summary>
     /// Key bindings (playtest note 75: "I hate WASD for movement, I prefer ESDF and G for interact"): every game key bound to a keyboard
@@ -22,13 +22,13 @@ namespace Crulanda.Encounter
             (GameKey.Interact, KeyCode.E, "Interact, talk, loot, travel"), (GameKey.Jump, KeyCode.Space, "Jump"), (GameKey.Run, KeyCode.Slash, "Walk / run"),
             (GameKey.Target, KeyCode.Tab, "Next target"), (GameKey.Map, KeyCode.M, "Map"), (GameKey.Quests, KeyCode.L, "Quest book"), (GameKey.Talents, KeyCode.B, "Talents"),
             (GameKey.Bags, KeyCode.I, "Bags"), (GameKey.Character, KeyCode.C, "Character"), (GameKey.Trades, KeyCode.K, "Trades"), (GameKey.Who, KeyCode.O, "Who list"),
-            (GameKey.Recover, KeyCode.R, "Recover (when beaten)"), (GameKey.Hail, KeyCode.H, "Hail (greet who you face)"),
+            (GameKey.Recover, KeyCode.R, "Recover (when beaten)"), (GameKey.Hail, KeyCode.H, "Hail (greet who you face)"), (GameKey.AutoRun, KeyCode.Numlock, "Auto-run (forward or back stops it)"),
         };
 #if ENABLE_INPUT_SYSTEM
         static readonly Dictionary<GameKey, Key> Defaults = new Dictionary<GameKey, Key> {
             { GameKey.Forward, Key.W }, { GameKey.Back, Key.S }, { GameKey.Left, Key.A }, { GameKey.Right, Key.D }, { GameKey.Interact, Key.E }, { GameKey.Jump, Key.Space },
             { GameKey.Run, Key.Slash }, { GameKey.Target, Key.Tab }, { GameKey.Map, Key.M }, { GameKey.Quests, Key.L }, { GameKey.Talents, Key.B }, { GameKey.Bags, Key.I },
-            { GameKey.Character, Key.C }, { GameKey.Trades, Key.K }, { GameKey.Who, Key.O }, { GameKey.Recover, Key.R }, { GameKey.Hail, Key.H },
+            { GameKey.Character, Key.C }, { GameKey.Trades, Key.K }, { GameKey.Who, Key.O }, { GameKey.Recover, Key.R }, { GameKey.Hail, Key.H }, { GameKey.AutoRun, Key.NumLock },
         };
         static Dictionary<GameKey, Key> bound;
         static Dictionary<KeyCode, GameKey> byCode;

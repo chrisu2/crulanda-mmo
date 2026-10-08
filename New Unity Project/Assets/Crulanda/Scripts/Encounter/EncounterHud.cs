@@ -22,10 +22,11 @@ namespace Crulanda.Encounter
         public static bool BlocksPointer(Vector2 point)
         {
             var p = ScreenToCanvas(point.x, point.y);
-            return paused || buildVisible || mapVisible || QuestUiBlocks(p) || WhoUiBlocks(p) || ItemUiBlocks(p) || TradesUiBlocks(p) || LootUiBlocks(p) || p.y > 795 || new Rect(10, 10, 350, 190).Contains(p) ||
-                (targetVisible && new Rect(365, 10, 350, 130).Contains(p)) || new Rect(1215, 0, 225, 240).Contains(p) ||
-                (partySims > 0 && new Rect(10, 196, 400, 46 * partySims).Contains(p)) || chatRect.Contains(p) ||   // the chat
-                new Rect(1110, 236, 330, 200).Contains(p) || false;
+            Vector2 fr = p - PanelOffset("frames"), mm = p - PanelOffset("minimap"), tr = p - PanelOffset("tracker"), br = p - PanelOffset("bar");   // each panel where it was put
+            return paused || buildVisible || mapVisible || uiUnlocked || QuestUiBlocks(p) || WhoUiBlocks(p) || ItemUiBlocks(p) || TradesUiBlocks(p) || LootUiBlocks(p) || br.y > 795 || new Rect(10, 10, 350, 190).Contains(fr) ||
+                (targetVisible && new Rect(365, 10, 350, 130).Contains(fr)) || new Rect(1215, 0, 225, 240).Contains(mm) ||
+                (partySims > 0 && new Rect(10, 196, 400, 46 * partySims).Contains(fr)) || chatRect.Contains(p) ||   // the chat
+                new Rect(1110, 236, 330, 200).Contains(tr) || false;
         }
         /// <summary>Capture tools hide the HUD to photograph the world.</summary>
         public static bool Hidden;
@@ -76,9 +77,10 @@ namespace Crulanda.Encounter
             GUI.matrix = CanvasMatrix;   // even and centred (playtest note 94; EncounterHud.Display)
             GUI.color = Color.white;
             using (mWorld.Auto()) DrawWorldLabels();
-            using (mFrames.Auto()) { DrawPlayerFrame(); DrawPartyFrame(); if (session.Target != null) DrawTargetFrame(); else if (session.HasFriendlyFocus) DrawFriendFrame(); }
-            using (mMap.Auto()) maps.DrawMinimap(session, gold);
-            using (mPanels.Auto()) { DrawQuestTracker(); DrawChat(); DrawCenter(); DrawActionBar(); DrawPetBar(); DrawMicroMenu(); DrawXpBar(); }
+            // The movable panels (playtest note 97): each drawn where the player put it (EncounterHud.Display, PanelOffset).
+            using (mFrames.Auto()) { At("frames"); DrawPlayerFrame(); DrawPartyFrame(); if (session.Target != null) DrawTargetFrame(); else if (session.HasFriendlyFocus) DrawFriendFrame(); }
+            using (mMap.Auto()) { At("minimap"); maps.DrawMinimap(session, gold); }
+            using (mPanels.Auto()) { At("tracker"); DrawQuestTracker(); At(null); DrawChat(); DrawCenter(); At("bar"); DrawActionBar(); DrawPetBar(); DrawMicroMenu(); DrawXpBar(); At(null); }
             var windows = mWindows.Auto();
             if (session.CharacterOpen) DrawCharacter();
             if (session.VendorNpc != null) DrawVendor();
@@ -90,6 +92,7 @@ namespace Crulanda.Encounter
             if (session.WhoOpen) DrawWho();
             if (session.Conversation != null) DrawConversation();
             DrawLoot();
+            if (uiUnlocked) DrawPanelHandles();
             DrawDiscoveryToast();   // over the windows: it lasts a few seconds
             if (!session.Player.IsAlive)
             {

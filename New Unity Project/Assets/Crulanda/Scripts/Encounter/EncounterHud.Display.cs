@@ -30,6 +30,41 @@ namespace Crulanda.Encounter
         /// <summary>Whether a canvas x is on the screen (past the canvas's own 0-1440 on a wide screen).</summary>
         static bool OnCanvasX(float x) { float m = CanvasOffset.x / CanvasScale; return x >= -m && x <= 1440 + m; }
 
+        // ---------- movable panels (playtest note 97, 2026-10-08: "I can't move the UI, should be able to drag where I want") ----------
+        static readonly (string id, string label, Rect rect, int anchor)[] Panels = {
+            ("frames", "Your frames", new Rect(10, 10, 705, 240), -1), ("minimap", "Minimap", new Rect(1215, 0, 225, 240), 1),
+            ("tracker", "Quest tracker", new Rect(1110, 236, 330, 200), 1), ("bar", "Action bar", new Rect(150, 772, 1140, 128), 0) };
+        static readonly Dictionary<string, Vector2> panelOffsets = new Dictionary<string, Vector2>();
+        static bool uiUnlocked; static string dragging; static Vector2 dragFrom;
+        /// <summary>How far a panel is moved from its place on the 1440x900 canvas: where the player put it, else (on a wide screen) out to
+        /// the screen's edge on its side.</summary>
+        static Vector2 PanelOffset(string id)
+        {
+            if (panelOffsets.TryGetValue(id, out var o)) return o;
+            float x = 0, y = 0; bool saved = false;
+            try { saved = PlayerPrefs.HasKey("ui.pos." + id + ".x"); if (saved) { x = PlayerPrefs.GetFloat("ui.pos." + id + ".x"); y = PlayerPrefs.GetFloat("ui.pos." + id + ".y"); } } catch { }
+            if (!saved) foreach (var pn in Panels) if (pn.id == id) x = pn.anchor * CanvasOffset.x / CanvasScale;
+            return panelOffsets[id] = new Vector2(x, y);
+        }
+        static void SetPanelOffset(string id, Vector2 o) { panelOffsets[id] = o; try { PlayerPrefs.SetFloat("ui.pos." + id + ".x", o.x); PlayerPrefs.SetFloat("ui.pos." + id + ".y", o.y); } catch { } }
+        /// <summary>Draw what follows where this panel was put (null: back to the canvas).</summary>
+        static void At(string id) { GUI.matrix = id == null ? CanvasMatrix : CanvasMatrix * Matrix4x4.Translate(PanelOffset(id)); }
+        /// <summary>Unlocked: a box over each panel to drag it, a button to lock them again and one to put them back.</summary>
+        void DrawPanelHandles()
+        {
+            GUI.matrix = CanvasMatrix; var e = Event.current; var mouse = e.mousePosition;
+            foreach (var pn in Panels)
+            {
+                var r = pn.rect; r.position += PanelOffset(pn.id);
+                Fill(r, new Color(.95f, .78f, .35f, dragging == pn.id ? .35f : .18f)); Fill(new Rect(r.x, r.y, r.width, 2), new Color(.95f, .78f, .35f, .9f));
+                Shadow(new Rect(r.x + 8, r.y + 6, 240, 22), pn.label + " (drag)", tiny, Color.white);
+                if (e.type == EventType.MouseDown && e.button == 0 && r.Contains(mouse)) { dragging = pn.id; dragFrom = mouse - PanelOffset(pn.id); e.Use(); }
+            }
+            if (e.type == EventType.MouseDrag && dragging != null) { SetPanelOffset(dragging, mouse - dragFrom); e.Use(); }
+            if (e.type == EventType.MouseUp && dragging != null) { dragging = null; e.Use(); }
+            if (GUI.Button(new Rect(620, 380, 200, 40), "Lock UI", button)) { uiUnlocked = false; dragging = null; }
+            if (GUI.Button(new Rect(620, 426, 200, 32), "Put them back", slim)) foreach (var pn in Panels) { try { PlayerPrefs.DeleteKey("ui.pos." + pn.id + ".x"); PlayerPrefs.DeleteKey("ui.pos." + pn.id + ".y"); } catch { } panelOffsets.Remove(pn.id); }
+        }
         static bool displayOpen; static int resPick = -1;
         static readonly string[] ModeNames = { "Fullscreen", "Borderless", "Windowed" };
         static readonly FullScreenMode[] Modes = { FullScreenMode.ExclusiveFullScreen, FullScreenMode.FullScreenWindow, FullScreenMode.Windowed };
@@ -51,7 +86,7 @@ namespace Crulanda.Encounter
             }
             if (resPick < 0) { resPick = resolutions.FindIndex(r => r.width == Screen.width && r.height == Screen.height); if (resPick < 0) resPick = resolutions.Count - 1; }
             int mode = System.Array.IndexOf(Modes, Screen.fullScreenMode); if (mode < 0) mode = 1;
-            var box = new Rect(470, 200, 500, 330); Frame(box);
+            var box = new Rect(470, 200, 500, 360); Frame(box);
             GUI.Label(new Rect(box.x + 28, box.y + 16, 400, 34), "DISPLAY", heading);
             var res = resolutions[resPick];
             Shadow(new Rect(box.x + 28, box.y + 74, 140, 24), "Resolution", tiny, Color.white);
@@ -68,9 +103,10 @@ namespace Crulanda.Encounter
             Shadow(new Rect(box.x + 382, box.y + 174, 60, 24), Mathf.RoundToInt(UiScale * 100) + "%", tiny, new Color(1, .84f, .45f));
             bool helms = GUI.Toggle(new Rect(box.x + 260, box.y + 236, 220, 26), ActorVisual.ShowHelms, "  Show helms");
             if (helms != ActorVisual.ShowHelms) { ActorVisual.ShowHelms = helms; RedressAll(); }
+            if (GUI.Button(new Rect(box.x + 260, box.y + 272, 200, 30), "Unlock UI (drag panels)", slim)) { uiUnlocked = true; displayOpen = false; session.Resume(); }
             if (GUI.Button(new Rect(box.x + 28, box.y + 230, 200, 36), "Apply resolution", button)) Screen.SetResolution(res.width, res.height, Modes[mode]);
             if (GUI.Button(new Rect(box.xMax - 128, box.y + 16, 100, 30), "Done", slim)) displayOpen = false;
-            Shadow(new Rect(box.x + 28, box.y + 280, 450, 20), "The UI scale applies at once; the resolution when you apply it.", tiny, new Color(.85f, .85f, .8f));
+            Shadow(new Rect(box.x + 28, box.y + 316, 450, 20), "The UI scale applies at once; the resolution when you apply it.", tiny, new Color(.85f, .85f, .8f));
         }
     }
 }

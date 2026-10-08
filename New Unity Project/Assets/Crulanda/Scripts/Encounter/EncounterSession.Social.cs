@@ -112,6 +112,7 @@ namespace Crulanda.Encounter
             float reach = SocialAggro.Reach(caller.Social, noticed && sneaking);
             // A party draws more of a camp (playtest note 91, "mobs still way too easy in group"): the call carries half as far again.
             if (PartySims.Count > 0 && !(noticed && sneaking)) reach *= SocialAggro.PartyReach;
+            if (Zone != null && Zone.Zone.dungeon) reach = Mathf.Min(reach, SocialAggro.PackReach);   // a dungeon's pulls are where its camps stand
             if (reach <= 0 && !lord) return;
             List<EncounterEnemy> heard = null;
             foreach (var e in Enemies)

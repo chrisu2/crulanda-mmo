@@ -161,11 +161,13 @@ namespace Crulanda.Encounter
                     case "/guild": if (arg.Length == 0) { GuildRoster(); return; } break;
                     case "/groster": case "/ginfo": GuildRoster(); return;
                     case "/gquit": LeaveGuild(); return;
+                    case "/invis": Unseen = !Unseen; Message(Unseen ? "Unseen: mobs will not notice you (until you hit one). /invis again to be seen." : "Seen again."); return;
                     case "/adit":   // a tester's way in (Chris, 2026-10-08): level 11 and straight to the Sealed Adit's yard
                         {
                             var adit = Zone != null ? Zone.FindZone("zone.adit") : null; if (adit == null) { Message("The Sealed Adit is not in this build."); return; }
                             if (Progress.Level < 11) { Progress.experience = EncounterProgress.XpForLevel(11); ApplyLevel(); Player.Health.ApplyHealing(Player.Health.Pool.Max); }
-                            Message("Level " + Progress.Level + ". Into the Sealed Adit...");
+                            PlayerPrefs.SetInt("test.adit", 1);   // and again on arrival (EncounterSession's load)
+                            Message("Into the Sealed Adit at level 11...");
                             TravelTo(new Crulanda.World.ZoneExit { to = "zone.adit", name = "/adit", arrive = adit.spawns.player });
                             return;
                         }

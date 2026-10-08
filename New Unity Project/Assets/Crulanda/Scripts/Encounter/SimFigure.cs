@@ -327,7 +327,10 @@ namespace Crulanda.Encounter
                 if (Time.time >= until) { Show(true); Choose(); }
                 return;
             }
-            if (Near(inn.position, 2.6f)) { Show(false); until = Time.time + 60 + (sim.variant % 5) * 15; return; }
+            // In at the door; or close by and no longer getting anywhere (playtest note 98, "people get stuck in inn door": a crowd at the
+            // doorway, or the door's own frame, held them on the step).
+            bool jammed = Near(inn.position, 5f) && agent.velocity.sqrMagnitude < .04f && Time.time - stuckSince > 2;
+            if (Near(inn.position, 2.6f) || jammed) { Show(false); until = Time.time + 60 + (sim.variant % 5) * 15; return; }
             if (!Walking && Time.time - stuckSince > 1) Go(inn.position);
             if (Time.time - stuckSince > 60) Choose();
         }

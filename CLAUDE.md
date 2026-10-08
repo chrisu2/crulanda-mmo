@@ -7,6 +7,7 @@ Single-player simulated MMORPG. Read `New Unity Project/Docs/GAME_BRIEF.md` firs
 | What | Location |
 |---|---|
 | Project and git repo (branch `main`) | `D:\code\mmo`; the Unity project is `D:\code\mmo\New Unity Project` |
+| GitHub (private, for Claude Code on the web; pushed 2026-10-08) | `https://github.com/chrisu2/crulanda-mmo` (remote `origin`, LFS on) |
 | Backup (full copy including `.git`) | `E:\claude\unity projects\mmo`; run `tools\Backup.ps1` |
 | Lore (novels, world bible, maps) | `D:\code\crulanda` |
 | Unity 6000.6.3f1 | `D:\unity\Hub\Editor\6000.6.3f1\Editor\Unity.exe` |
@@ -33,3 +34,9 @@ Single-player simulated MMORPG. Read `New Unity Project/Docs/GAME_BRIEF.md` firs
 - Preserve `.meta` GUIDs.
 - Label lore honestly: CANON, CANON-EXPANDED, GAME-ONLY or PROVISIONAL. Don't copy WoW names or assets.
 - Chris skims. When you need a decision, ask it first and short, or use the question prompt.
+
+## In a cloud session (Claude Code on the web)
+If there is no `D:` drive (a Linux sandbox from claude.ai/code), Chris's PC is off and the rules above that need it don't
+apply: no Unity, no `tools\Backup.ps1`, no validation copies, no builds. Follow `New Unity Project/Docs/WEB_HANDOFF.md`
+instead: a `web/<topic>` branch and a draft PR (never push to `main`), compile-safe code with tests, new `.meta` files
+with fresh guids, and an entry in `Docs/WEB_LOG.md` saying what the local session must run and look at.

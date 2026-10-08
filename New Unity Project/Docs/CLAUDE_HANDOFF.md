@@ -9,7 +9,17 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-10-08, evening) — crowd control: engine, Rogue, Archivist, marks, per-class CC
+## RESUME HERE (updated 2026-10-08, night) — on GitHub; cloud sessions may have worked while the PC was off
+**First, when the PC is back:** `git fetch`; look for `web/*` branches and draft PRs from Claude Code on the web, read
+`Docs/WEB_LOG.md`, test each in the validation copy, merge, build, publish, back up, push (`WEB_HANDOFF.md` section 5).
+**Repo:** private `https://github.com/chrisu2/crulanda-mmo` (origin, LFS), pushed 2026-10-08; push `main` after each commit.
+Remote Control is on for the local session.
+**Published:** crowd control C1-C5 (83b5e18): Rogue, Archivist, marks, per-class CC, rings, Adit mob casts and interrupts.
+**Committed after that:** D2 boss mechanics (EncounterEnemy.Boss, player stun/disarm, the Adit bosses' phases); see CHANGELOG.
+**Next:** D3 gates and keys, D4 the Weaver's escort, Nix's two-part fight, the Adit's quests and loot, Mira's Hush on request,
+talent rows 4-6 for the cap-30 levels; then the Medieval Village Kit and the Adit's look (local only).
+
+## Earlier resume note (2026-10-08, evening) — crowd control: engine, Rogue, Archivist, marks, per-class CC
 **Chris (2026-10-08): "we need CC classes"; "archivist and rogue both sound good"; "keep working".** Docs/CC_DESIGN.md is the plan.
 **Done:** C1 engine (EncounterEnemy.Control: incap/stun/fear/silence, DR, boss immunity, LoseSight, Release, RaidMarked/LeaveAlone);
 the Rogue (RogueKit, published 0ea8958) and the Archivist (ArchivistKit, 1ee87c5), each a separate character from the pause menu;

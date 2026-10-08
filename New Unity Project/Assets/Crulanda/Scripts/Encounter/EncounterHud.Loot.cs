@@ -98,7 +98,7 @@ namespace Crulanda.Encounter
                 if (e.type == EventType.MouseDown && (e.button == 0 || e.button == 1) && row.Contains(mouse)) { session.TakeLoot(i); e.Use(); return; }
                 y += LootRowH;
             }
-            if (GUI.Button(new Rect(w.x + 14, w.yMax - 44, 150, 32), "Take all [E]", micro)) { session.TakeAllLoot(); return; }
+            if (GUI.Button(new Rect(w.x + 14, w.yMax - 44, 150, 32), "Take all [" + KeyBindings.InteractLabel + "]", micro)) { session.TakeAllLoot(); return; }
             if (GUI.Button(new Rect(w.xMax - 124, w.yMax - 44, 110, 32), "Close [Esc]", micro)) session.CloseLoot();
         }
         /// <summary>A row's second line: "Rare  ·  Main hand", or what kind of thing it is, with the count when there are several.</summary>

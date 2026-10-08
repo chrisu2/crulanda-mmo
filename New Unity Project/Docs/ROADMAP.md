@@ -43,3 +43,9 @@ About 15-17 rounds. No external language model: local state machines and utility
 Every round: compile offline, the tests the change touches (all of them once 5.0 lands for core changes), a player build and
 the tours the change can be seen in, then publish, commit and back up (CLAUDE.md). Chris plays the published build; his notes
 open the next round.
+
+## Ideas for later (Chris)
+- **Seasons (Chris, 2026-10-07, playtest note 85):** a year turning through the days. Summer: stamina and water
+  drain faster (a water supply to keep up). Winter: snow on the ground in the high and northern places; the cold takes health and
+  stops it coming back until you are warm (a fire, an inn, warm clothes). Builds on the crops' round (CropField), WorldWeather and
+  WorldClock.

@@ -9,7 +9,17 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-10-07, about 17:00)
+## RESUME HERE (updated 2026-10-07, about 20:25)
+**Playable build = round 26, built 20:20, published. Notes 75-84 and 86 done: Esc > Controls (key bindings, WASD/ESDF presets, G
+interact), H hails, crops grow (CropField, Resources/Shaders/Crop.shader) and farmers work them, the meadows dressed
+(ZoneBuilder.Meadow), weapons sheathed out of a fight, walled kit barns fitted by their walls (WallProp), cows keep apart, signs point
+at their place, darker greens and crimson/russet autumn, no grass in the hens' pan. Round 6 (crags, windmill, 30 m oak, nothing
+in the roads) published 18:36. Full runs c48 214/214, c49 212/214 with both fixed (reruns 5/5).**
+**Open:** the Medieval Village MegaKit is imported (Resources/Props/Village) and VillageKit assembles houses from it (Editor/
+VillageCapture; hel/work/ui-captures/village). Ask Chris whether to rebuild Oakhaven's houses with it (keeping doors, interiors,
+lit windows) or use it elsewhere. Note 85 (seasons) is on the roadmap. Then the enclave interior (note 40) and the sound phase.
+
+## Earlier resume note (2026-10-07, about 17:00)
 **Playable build = art round 4 (dead and twisted trees), built 16:18 from commit ea91c2f, published, backed up to E:.**
 Art round 5 (Megapack outbuildings: barns nobody lives in, the Golden Cask's stable over the hitch, the wooden Watchtower; Chris
 chose "outbuildings only" after Docs/art/megapack-houses.png) is in the working tree; full run c46 started 16:58: if green, release

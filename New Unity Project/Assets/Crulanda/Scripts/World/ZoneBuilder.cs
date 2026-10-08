@@ -78,7 +78,7 @@ namespace Crulanda.World
             statics = new GameObject("Zone static scenery").transform; statics.SetParent(transform, false);
             PrepareRelief(); PrepareShapes(); Water = new ZoneWater(); Water.Prepare(Zone, (x, z) => HeightAt(x, z, false)); PrepareHollows(); Lap("prepare");
             BuildLighting(); BuildGround(); Lap("ground"); BuildWater(); BuildWasting(); Lap("water"); BuildProps(); BuildHomeDoors(); Lap("props"); BuildGroves(); BuildExits(); Lap("groves");
-            BuildForestEdge(); BuildBoundaries(); Lap("edge"); BuildBackdrop(); DistantRanges.Build(transform, Zone, Half + BackdropWidth); Lap("backdrop");
+            BuildForestEdge(); BuildMeadow(); BuildCrops(); BuildBoundaries(); Lap("edge"); BuildBackdrop(); DistantRanges.Build(transform, Zone, Half + BackdropWidth); Lap("backdrop");
             if (art.grass != null && art.grass.Length > 0)
             {
                 // Gloom: the tufts are dry, greyed straw and no wildflowers bloom.
@@ -1186,7 +1186,7 @@ namespace Crulanda.World
                         else { Lump(rb0, t, new Vector3(0, .3f * s, 0), new Vector3(2f * s, 1.3f * s, 1.7f * s), stone, ry0); if (rb1 != null) Lump(rb1, t, new Vector3(.7f * s, .15f * s, .5f * s), new Vector3(.9f * s, .6f * s, .8f * s), stone, ry1); } Solid(t, new Vector3(0, .5f * s, 0), new Vector3(1.6f * s, 1f * s, 1.4f * s)); if (Zone.biome == "mountain" && string.IsNullOrEmpty(p.interact)) RockSkirt(t, s * .8f, stone); break;
                     }
                     case "bridge": SeatBridge(t, p.size.x > 0 ? p.size.x : 12); if (p.variant == 1) RopeBridge(t, p.size.x > 0 ? p.size.x : 12); else Bridge(t, p.size.x > 0 ? p.size.x : 12); break;
-                    case "signpost": Signpost(t, p.name); break;
+                    case "signpost": PointSign(t, p.name); Signpost(t, p.name); break;
                     case "hitch": Hitch(t); break;
                     case "dummy": GroundProp(t, "Fantasy/Dummy", Vector3.zero, 0, 1.9f, true); break;      // a training dummy (kit, 2026-10-07)
                     case "banner": GroundProp(t, "Fantasy/Banner_1", Vector3.zero, 0, 2.6f); break;        // a standing banner (kit, 2026-10-07)
@@ -1651,12 +1651,15 @@ namespace Crulanda.World
             // The Megapack's timber barn (art round 5, 2026-10-07) for a barn nobody sleeps in: fitted inside the footprint, a little
             // into the ground so a slope never shows under it; the same collider. A home (Moss's lodge) keeps the painted barn and its door.
             bool home = Zone.life != null && Zone.life.households != null && Array.Exists(Zone.life.households, x => x != null && x.house == t.name);
-            if (!home && HasProp("Megapack/Models/Buildings/Buiilding_6_1"))
+            // Playtest note 80 (2026-10-07): the double-gabled barn stood inside its sill (fitted by bounds that took in the roof's overhang),
+            // and squeezed onto the Shepherd's hut it showed its open bay. Now: the pack's walled barn (Building 3Base, its long side along
+            // the footprint), fitted by its walls; a barn under 8 m keeps the painted one.
+            if (!home && w >= 8 && HasProp("Megapack/Models/Buildings/Building 3Base"))
             {
-                string model = (Mathf.Abs(t.name.GetHashCode()) % 2 == 0) ? "Megapack/Models/Buildings/Buiilding_6_1" : "Megapack/Models/Buildings/Buiilding_6_2";
+                string model = "Megapack/Models/Buildings/Building 3Base";
                 // Stretched to the footprint and the painted barn's height, on the same stone sill and threshold (BuildingGroundTests:
                 // every building stands on stone down to the ground, every barn's door on a step at the ground).
-                if (ModelProp(t, model, Vector3.zero, 0, h + d * .5f, false, null, new Vector3(w, h + d * .5f, d)) != null)
+                if (WallProp(t, model, 90, w, h + d * .5f, d) != null)
                 {
                     Footing(t, w + .3f, d + .3f, .45f, .4f, 1, 1.75f);
                     float kitSill = Mathf.Clamp(DoorGround(t, 0, -d / 2 - .3f, 3.2f) + .03f, -1, .6f);
@@ -1829,7 +1832,7 @@ namespace Crulanda.World
                 bool autumn = family == 2 && !Gloom && HasProp("Nature/TwistedTree_1");
                 var kit = autumn ? KitTree(t, "Nature/TwistedTree_" + (1 + (Mathf.Abs(variant) + (int)(yawA / 30)) % 5), (h - 3.5f) / 1.5f * 2 + 6.5f, .3f, yawB)
                                  : KitTree(t, "Nature/CommonTree_" + (1 + (Mathf.Abs(variant) + (int)(yawA / 30)) % 5), (h - 3.5f) / 1.5f * 2 + 6, .3f, yawB);
-                if (kit != null) { if (!autumn) DressNature(kit, Wither(LeafTints[family])); return; }
+                if (kit != null) { if (!autumn) DressNature(kit, Wither(KitLeaf[family]), "*", LeafMask); else DressNature(kit, Autumn[(Mathf.Abs(variant) + (int)(yawB / 45)) % Autumn.Length], "Leaves_TwistedTree", AutumnMask); return; }
             }
             // A tapered, slightly bent and leaning trunk on a root flare, in its own shade of bark, running up into the crown's
             // heart; limbs grow out of it toward the crown's side clusters. Its look comes from its own stream (TreeRandom).
@@ -2551,6 +2554,33 @@ namespace Crulanda.World
             Part(PrimitiveType.Cube, t, new Vector3(0, .36f, .55f), new Vector3(1.45f, .04f, .38f), Tint(art.stone, new Color(.3f, .42f, .5f)));   // the water
             Part(PrimitiveType.Sphere, t, new Vector3(2.2f, .3f, -.3f), new Vector3(1.3f, .6f, 1.1f), art.hay);   // a heap of hay
             Solid(t, new Vector3(0, .6f, .2f), new Vector3(3.2f, 1.2f, 1.2f));
+        }
+        /// <summary>
+        /// Turns a signpost so its board points at the place it names (playtest note 82, 2026-10-07: "sign pointing the wrong way"): a
+        /// zone's road end (an exit whose name holds the text), else a landmark or a prop of that name. Where a road runs within 10 m,
+        /// the board points along it, the way that leads nearer the place; otherwise straight at it. Unknown names keep the zone's turn.
+        /// </summary>
+        void PointSign(Transform t, string text)
+        {
+            if (string.IsNullOrEmpty(text)) return;
+            Vector2? goal = null;
+            foreach (var e in Zone.exits) if (e != null && !string.IsNullOrEmpty(e.name) && e.name.IndexOf(text, StringComparison.OrdinalIgnoreCase) >= 0) { goal = e.at; break; }
+            if (!goal.HasValue) foreach (var l in Zone.landmarks) if (l != null && string.Equals(l.name, text, StringComparison.OrdinalIgnoreCase)) { goal = l.at; break; }
+            if (!goal.HasValue) foreach (var q in Zone.props) if (q != null && q.kind != "signpost" && string.Equals(q.name, text, StringComparison.OrdinalIgnoreCase)) { goal = q.at; break; }
+            if (!goal.HasValue) return;
+            var at = new Vector2(t.position.x, t.position.z); var toGoal = goal.Value - at; if (toGoal.sqrMagnitude < 1) return;
+            var dir = toGoal.normalized; float best = 10;
+            foreach (var r in Zone.roads)
+            {
+                if (r == null || r.points == null) continue;
+                for (int i = 0; i + 1 < r.points.Length; i++)
+                {
+                    Vector2 a = r.points[i], b = r.points[i + 1], ab = b - a; if (ab.sqrMagnitude < 1e-4f) continue;
+                    var q = a + ab * Mathf.Clamp01(Vector2.Dot(at - a, ab) / ab.sqrMagnitude); float dist = Vector2.Distance(at, q);
+                    if (dist >= best) continue; best = dist; var along = ab.normalized; dir = Vector2.Dot(along, toGoal) >= 0 ? along : -along;
+                }
+            }
+            t.rotation = Quaternion.Euler(0, Mathf.Atan2(-dir.y, dir.x) * Mathf.Rad2Deg, 0);   // the board points down its local +X
         }
         void Signpost(Transform t, string text = null)
         {
@@ -3361,7 +3391,7 @@ namespace Crulanda.World
             if (HasProp("Nature/Bush_Common"))
             {
                 var kit = ModelProp(t, conifer || c.r > .5f ? "Nature/Bush_Common" : "Nature/Bush_Common_Flowers", Vector3.up * .1f, 0, 1.1f + (float)TreeRandom(t.position).NextDouble() * .6f);
-                if (kit != null) { DressNature(kit, Wither(conifer ? new Color(.62f, .74f, .66f) : new Color(.72f, .8f, .64f)), "Leaves_TwistedTree", GreenSheet); R01Draws(1); return; }
+                if (kit != null) { DressNature(kit, Wither(conifer ? KitBushDark : KitBush), "*", LeafMask); R01Draws(1); return; }
             }
             bool cardArt = art.leafCards != null && art.leafCards.Length > 0;
             var mat = cardArt ? LeafMaterial(art.leafCards[0], conifer ? new Color(.62f, .74f, .66f) : new Color(.72f, .8f, .64f)) : Tint(art.foliage, Wither(c));
@@ -3442,7 +3472,8 @@ namespace Crulanda.World
                 grassRoadBox = Zone.roads.Select(r => Box(r.points, r.width / 2 + 3.5f)).ToArray();
                 grassBuildings = Zone.props.Where(o => o != null && (o.kind == "house" || o.kind == "inn" || o.kind == "barn" || o.kind == "mill" || o.kind == "ruined_house"))
                     .Select(o => (o.at, Mathf.Max(2, Mathf.Max(o.size.x, o.size.y) * .75f) + 1.5f))
-                    .Concat(Zone.props.Where(o => o != null && (o.kind == "leathershop" || o.kind == "dryhut" || o.kind == "kitchen" || o.kind == "forge")).Select(o => (o.at, 4.5f))).ToArray();   // a workshop's floor (these props carry no size)
+                    .Concat(Zone.props.Where(o => o != null && (o.kind == "leathershop" || o.kind == "dryhut" || o.kind == "kitchen" || o.kind == "forge")).Select(o => (o.at, 4.5f)))
+                    .Concat(Zone.props.Where(o => o != null && (o.kind == "coop" || o.kind == "hitch" || o.kind == "well")).Select(o => (o.at, o.kind == "coop" ? 4.2f : 2.6f))).ToArray();   // a coop's yard (its trough, sack and water pan), a hitching rail's trough, a well's step: bare (playtest note 86: flowers grew in the hens' water)   // a workshop's floor (these props carry no size)
             }
             float living = 1 - Unmade(p.x, p.y) / .55f; if (living <= 0) return 0;   // grass thins out along the grey's ragged front
             if (Hollow.CoverAt(p, 1.2f) > 0) return 0;   // a cave's bare floor

@@ -1173,7 +1173,14 @@ namespace Crulanda.Encounter
         {
             if (content == null) { Debug.LogError("Encounter content missing."); enabled = false; return; }
             // Who keeps a staff in hand on the run (playtest note 19): an enemy while engaged; anyone else while the player fights.
-            ActorVisual.Fighting = go => { var e = go.GetComponent<EncounterEnemy>(); return e != null ? e.Engaged : InCombat; };
+            // Who has a weapon out (ActorVisual: sheathed otherwise, playtest note 79): a mob while engaged; you, Mira and a party sim while
+            // the party fights or you auto-attack; a sim out in the world while it hunts; anyone else (villagers, guards) never.
+            ActorVisual.Fighting = go =>
+            {
+                var e = go.GetComponent<EncounterEnemy>(); if (e != null) return e.Engaged;
+                var f = go.GetComponent<SimFigure>(); if (f != null) return f.InFight;
+                return InCombat || AutoAttack;
+            };
             Crulanda.World.WorldWeather.Turned += OnWeatherTurned;
             // An editor running tests from the command line (the validation copy) never reads or writes the real save folder, even
             // in a test that forgets to point the session elsewhere: the real folder is the player's, shared by every build.
@@ -1226,7 +1233,7 @@ namespace Crulanda.Encounter
             // The other adventurers (Phase 5.2): the roster from the world slot, figures for those here and online.
             if (Zone != null) new GameObject("Sims").AddComponent<SimPopulation>().Init(this, SaveRoot);
             StartQuests(); StartDiscoveries(); StartArmoury();
-            Message(Zone != null ? Zone.Zone.displayName + ". " + Objective(0, "") + "." : "Recruit the healer at camp [E], then follow the path to the sentries.");
+            Message(Zone != null ? Zone.Zone.displayName + ". " + Objective(0, "") + "." : "Recruit the healer at camp [" + KeyBindings.InteractLabel + "], then follow the path to the sentries.");
             ReconcileQuests();
             nextSave = Time.time + 30;
         }
@@ -1447,7 +1454,7 @@ namespace Crulanda.Encounter
             AdvanceToast();
             // The day turns at six in the morning: the boards draw again (Bounties). A rare posting taken on keeps its courier abroad.
             if (lastHour >= 0 && Bounties.DayTurned(lastHour, Crulanda.World.WorldClock.Hour)) Progress.days++;
-            lastHour = Crulanda.World.WorldClock.Hour;
+            lastHour = Crulanda.World.WorldClock.Hour; Crulanda.World.CropField.Day = Progress.days;   // the crops grow by the game's days (note 76)
             if (courier == null && Boards != null && Zone != null && Boards.ActiveRare(ZoneId) != null && !courierDone) SpawnCourier();
             if (courier != null && !courier.actor.IsAlive) courierDone = true;
             if (EncounterInput.Press(KeyCode.Escape))
@@ -1502,6 +1509,7 @@ namespace Crulanda.Encounter
                 else PickFriendly(EncounterInput.Pointer);
             }
             if (!BuildOpen && EncounterInput.Press(KeyCode.E)) Interact();
+            if (EncounterInput.Press(KeyCode.H)) Hail();   // playtest note 83
 
             for (int slot = 0; slot < ActionCount; slot++)
                 if (!BuildOpen && slot < 10 && EncounterInput.Press(EncounterInput.SlotKey(slot))) UseAbility(slot);
@@ -1789,7 +1797,7 @@ namespace Crulanda.Encounter
             int xp = EncounterProgress.KillXp(enemy.actor.Level, Progress.Level, enemy.Elite);
             if (enemy.Camp) Progress.experience += xp;
             else { if (!Progress.AwardKill(enemy.persistentId, xp)) return; if (Progress.recruited) Progress.relationship++; }
-            Message(enemy.actor.DisplayName + " defeated · " + (xp > 0 ? "+" + xp + " XP" : "no experience (too weak)") + " · press E at the body to loot.");
+            Message(enemy.actor.DisplayName + " defeated · " + (xp > 0 ? "+" + xp + " XP" : "no experience (too weak)") + " · press " + KeyBindings.InteractLabel + " at the body to loot.");
             foreach (var c in PartySims) if (c != null && c.actor.IsAlive) c.GainXp(EncounterProgress.KillXp(enemy.actor.Level, c.sim.level, enemy.Elite) / 2);   // the party's kill: half shares for the sims (5.3b)
             if (Progress.Level > before) { ApplyLevel(); Player.Health.ApplyHealing(40); Message("Level " + Progress.Level + "! Health and weapon damage increased."); }
             if (Target == enemy) AutoAttack = false;

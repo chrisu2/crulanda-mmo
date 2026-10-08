@@ -57,6 +57,31 @@ namespace Crulanda.World
             if (solid) { var col = go.AddComponent<BoxCollider>(); col.center = b.center; col.size = b.size; go.AddComponent<NavBlocker>(); }
             return go;
         }
+        /// <summary>
+        /// A building fitted by its walls (playtest note 80): the model turned <paramref name="yaw"/>, then stretched so the extent of
+        /// its vertices in the lowest metre (the walls and posts where they meet the ground, not the roof's eaves) is
+        /// <paramref name="w"/> x <paramref name="d"/>, and its whole height <paramref name="h"/>; its walls' middle on the root.
+        /// </summary>
+        public static GameObject WallProp(Transform parent, string path, float yaw, float w, float h, float d)
+        {
+            var src = PropSource(path); if (src == null) return null;
+            var holder = new GameObject("Model " + path.Substring(path.LastIndexOf('/') + 1)).transform; holder.SetParent(parent, false);
+            var turn = new GameObject("Turn").transform; turn.SetParent(holder, false); turn.localRotation = Quaternion.Euler(0, yaw, 0);
+            var inst = Instantiate(src, turn, false); inst.transform.localPosition = Vector3.zero;
+            foreach (var c in inst.GetComponentsInChildren<Component>(true))
+                if (!(c is Transform) && !(c is MeshFilter) && !(c is MeshRenderer)) { if (Application.isPlaying) Destroy(c); else DestroyImmediate(c); }
+            var all = PropBounds(holder); var low = new Bounds(); bool any = false; var toHolder = holder.worldToLocalMatrix;
+            foreach (var mf in holder.GetComponentsInChildren<MeshFilter>(true))
+            {
+                var mesh = mf.sharedMesh; if (mesh == null || !mesh.isReadable) continue; var m = toHolder * mf.transform.localToWorldMatrix;
+                foreach (var v in mesh.vertices) { var p = m.MultiplyPoint3x4(v); if (p.y > all.min.y + 1) continue; if (!any) { low = new Bounds(p, Vector3.zero); any = true; } else low.Encapsulate(p); }
+            }
+            if (!any) low = all;
+            var k = new Vector3(w / Mathf.Max(.01f, low.size.x), h / Mathf.Max(.01f, all.size.y), d / Mathf.Max(.01f, low.size.z));
+            holder.localScale = k; holder.localPosition = new Vector3(-low.center.x * k.x, -all.min.y * k.y, -low.center.z * k.z);
+            foreach (var r in holder.GetComponentsInChildren<Renderer>(true)) { r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On; r.receiveShadows = true; }
+            return holder.gameObject;
+        }
         /// <summary>The model's meshes' bounds in its root's own space (before any scale), from each mesh's corners.</summary>
         public static Bounds PropBounds(Transform root)
         {

@@ -68,7 +68,7 @@ namespace Crulanda.Encounter
             Shadow(new Rect(380, 46, 260, 20), title != null ? "<" + title + ">" : session.ZoneTitle + " villager", tiny, new Color(1, .84f, .45f));
             char m = session.Quests != null && session.Zone != null ? session.Quests.Marker(name, session.ZoneId, session.Progress.Level, out _) : ' ';
             string hint = !session.FocusInTalkReach ? "Friendly  ·  " + (dist >= EncounterSession.TalkRange ? Mathf.RoundToInt(dist) + " m away" : "out of earshot") :
-                "Friendly  ·  [E] " + (m == '!' ? "has work for you" : m == '?' ? "wants to hear from you" : "talk");
+                "Friendly  ·  [" + KeyBindings.InteractLabel + "] " + (m == '!' ? "has work for you" : m == '?' ? "wants to hear from you" : "talk");
             Shadow(new Rect(380, 66, 280, 20), hint, tiny, Color.white);
             if (m != ' ') { QuestStyles(); Ink(new Rect(700, 18, 30, 44), m.ToString(), qMark, QuestGold); }
         }

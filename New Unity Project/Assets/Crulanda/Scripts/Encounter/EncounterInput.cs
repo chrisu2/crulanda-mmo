@@ -19,6 +19,7 @@ namespace Crulanda.Encounter
 #if ENABLE_INPUT_SYSTEM
             var k = Keyboard.current;
             if (k == null) return false;
+            if (KeyBindings.Stands(key, out var game)) return KeyBindings.Pressed(game);   // a rebindable key (playtest note 75)
             switch (key) {
                 case KeyCode.Tab: return k.tabKey.wasPressedThisFrame;
                 case KeyCode.E: return k.eKey.wasPressedThisFrame;
@@ -73,8 +74,8 @@ namespace Crulanda.Encounter
 #if ENABLE_INPUT_SYSTEM
                 var k = Keyboard.current;
                 if (k == null) return Vector2.zero;
-                return new Vector2((k.dKey.isPressed ? 1 : 0) - (k.aKey.isPressed ? 1 : 0),
-                    (k.wKey.isPressed ? 1 : 0) - (k.sKey.isPressed ? 1 : 0));
+                return new Vector2((KeyBindings.Held(GameKey.Right) ? 1 : 0) - (KeyBindings.Held(GameKey.Left) ? 1 : 0),
+                    (KeyBindings.Held(GameKey.Forward) ? 1 : 0) - (KeyBindings.Held(GameKey.Back) ? 1 : 0));   // the bound keys (note 75)
 #else
                 return new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 #endif

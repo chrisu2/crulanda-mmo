@@ -790,12 +790,17 @@ namespace Crulanda.Encounter
                 case "farmer":
                     // Wide straw hat, a denim bib over a work shirt, and a pitchfork.
                     cloth.color = variant % 2 == 0 ? new Color(.74f, .52f, .2f) : new Color(.3f, .52f, .26f); legs.color = new Color(.17f, .28f, .52f);
-                    Part(PrimitiveType.Cube, body, new Vector3(0, .2f, .15f), new Vector3(.36f, .44f, .02f), M(.17f, .28f, .52f));      // bib
-                    foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, body, new Vector3(s * .12f, .5f, .15f), new Vector3(.04f, .2f, .02f), M(.17f, .28f, .52f));
+                    // (Playtest note 77, 2026-10-07: on a modelled figure the bib and its straps floated off the chest, and the fork's tines
+                    // stood by the head. The model's shirt carries the colours; the fork is carried tines down, by the ground.)
+                    if (!modelled)
+                    {
+                        Part(PrimitiveType.Cube, body, new Vector3(0, .2f, .15f), new Vector3(.36f, .44f, .02f), M(.17f, .28f, .52f));      // bib
+                        foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, body, new Vector3(s * .12f, .5f, .15f), new Vector3(.04f, .2f, .02f), M(.17f, .28f, .52f));
+                    }
                     Brim(M(.9f, .74f, .32f), .62f, .26f, .07f);
                     Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.45f, .08f), new Vector3(.035f, .85f, .035f), wood);
-                    for (int i = -1; i <= 1; i++) Part(PrimitiveType.Cube, armR, new Vector3(i * .05f, .47f, .08f), new Vector3(.02f, .2f, .02f), iron);
-                    Part(PrimitiveType.Cube, armR, new Vector3(0, .38f, .08f), new Vector3(.14f, .02f, .02f), iron);
+                    for (int i = -1; i <= 1; i++) Part(PrimitiveType.Cube, armR, new Vector3(i * .05f, -1.37f, .08f), new Vector3(.02f, .2f, .02f), iron);
+                    Part(PrimitiveType.Cube, armR, new Vector3(0, -1.28f, .08f), new Vector3(.14f, .02f, .02f), iron);
                     break;
                 case "hunter":
                     // Green hood and cape, leather jerkin, bow and quiver on the back.
@@ -928,8 +933,8 @@ namespace Crulanda.Encounter
             if (beastModel != null) { BeastLate(); return; }
             if (model != null) { ModelLate(); return; }
             if (body == null || legL == null) return;
-            // Swimming: the kit goes on the back, so no sword stands out of the water like a mast.
-            bool stow = Pose == ActorPose.Swim;
+            // Swimming: the kit goes on the back, so no sword stands out of the water like a mast; out of a fight too (playtest note 79).
+            bool stow = Pose == ActorPose.Swim || (Fighting != null && !Fighting(gameObject) && !Casting);
             if (held != null && stow != gearStowed)
             {
                 gearStowed = stow;

@@ -466,10 +466,11 @@ namespace Crulanda.Encounter
                 case ActorPose.Knead:    // both hands pushing forward in turn
                     p.arms = true; p.armL = new Vector3(-60 - Mathf.Max(0, Mathf.Sin(t * 3)) * 25, 0, 6); p.armR = new Vector3(-60 - Mathf.Max(0, Mathf.Sin(t * 3 + Mathf.PI)) * 25, 0, -6);
                     p.elbowL = p.elbowR = -35; p.lean = 10; break;
-                case ActorPose.Work:     // both arms down together, like hoeing or hauling a bucket
+                case ActorPose.Work:     // hoeing (or hauling a bucket): a lift and a stroke down, leaning into it (playtest note 76: it read as standing still)
                 {
-                    float chop = Mathf.Abs(Mathf.Sin(t * 2.4f)) * 70;
-                    p.arms = true; p.armL = new Vector3(-chop, 0, 10); p.armR = new Vector3(-chop, 0, -10); p.elbowL = p.elbowR = -25; break;
+                    float k = Mathf.Repeat(t * .9f, 1), lift = k < .55f ? Mathf.SmoothStep(0, 1, k / .55f) : 1 - Mathf.SmoothStep(0, 1, (k - .55f) / .2f);
+                    float chop = 25 + lift * 85;
+                    p.arms = true; p.armL = new Vector3(-chop, 0, 12); p.armR = new Vector3(-chop + 8, 0, -12); p.elbowL = p.elbowR = -20 - lift * 20; p.lean = 16 - lift * 8; break;
                 }
                 case ActorPose.Drink:    // seated, the right arm lifting the tankard to the mouth every few seconds
                 {
@@ -523,7 +524,10 @@ namespace Crulanda.Encounter
             // Running out of a fight with a staff or a polearm: slung on the back, not whipping about in the fist (playtest note 19,
             // "she runs awkwardly with the stave"); in hand again to stop or to fight. A little give either side so it does not flicker.
             if (speed > 3.2f) runSlung = true; else if (speed < 2.2f) runSlung = false;
-            bool stow = Pose == ActorPose.Swim || runSlung && HeldTall() && (Fighting == null || !Fighting(gameObject));
+            // Playtest note 79 (2026-10-07): "characters shouldn't run with sword/weapons in hand unless fighting": out of a fight every
+            // weapon is on the back or at the hip; it comes out when a fight starts, or to cast.
+            bool fighting = Fighting != null && Fighting(gameObject);
+            bool stow = Pose == ActorPose.Swim || (!fighting && !Casting && Fighting != null) || runSlung && HeldTall() && !fighting;
             if (held != null && stow != gearStowed)
             {
                 gearStowed = stow;

@@ -231,7 +231,7 @@ namespace Crulanda.Encounter
             string miraDistance = session.Progress.recruited || session.Companion == null ? "" :
                 "  (" + Mathf.RoundToInt(Vector3.Distance(session.Player.transform.position, session.Companion.transform.position)) + "m)";
             var lines = new[] {
-                (session.Progress.recruited, session.Objective(0, "Recruit the healer [E]") + miraDistance),
+                (session.Progress.recruited, session.Objective(0, "Recruit the healer [" + KeyBindings.InteractLabel + "]") + miraDistance),
                 (dead == total, session.Objective(1, "Secure the trail") + "  " + dead + "/" + total),
                 (session.Progress.equippedItem == session.content.itemId, session.Objective(2, "Equip a recovered blade [I]"))
             };
@@ -307,7 +307,7 @@ namespace Crulanda.Encounter
                 chatTyped = GUI.TextField(new Rect(box.x + 4 + tw, box.yMax - 26, box.width - 8 - tw, 22), chatTyped, 200);
                 if (chatFocus) { GUI.FocusControl("chat"); chatFocus = false; }
             }
-            Shadow(new Rect(12, 776, 900, 20), "WASD move · / run · Space jump · Right-drag look · Wheel zoom · Tab target · E interact · L quests · M map · B talents · I bags · C character · K trades · O who · Enter chat", tiny, new Color(.8f, .8f, .78f));
+            Shadow(new Rect(12, 776, 900, 20), KeyBindings.MoveLabel + " move · " + KeyBindings.Label(GameKey.Run) + " run · " + KeyBindings.Label(GameKey.Jump) + " jump · Right-drag look · Wheel zoom · " + KeyBindings.Label(GameKey.Target) + " target · " + KeyBindings.InteractLabel + " interact · " + KeyBindings.Label(GameKey.Quests) + " quests · " + KeyBindings.Label(GameKey.Map) + " map · " + KeyBindings.Label(GameKey.Talents) + " talents · " + KeyBindings.Label(GameKey.Bags) + " bags · " + KeyBindings.Label(GameKey.Character) + " character · " + KeyBindings.Label(GameKey.Trades) + " trades · " + KeyBindings.Label(GameKey.Who) + " who · Enter chat · Esc controls", tiny, new Color(.8f, .8f, .78f));
         }
         void DrawCenter()
         {
@@ -315,7 +315,7 @@ namespace Crulanda.Encounter
             if (prompt != null)
             {
                 Fill(new Rect(520, 692, 400, 34), new Color(0, 0, 0, .55f));
-                Shadow(new Rect(530, 697, 390, 26), "[E]  " + prompt, text, gold);
+                Shadow(new Rect(530, 697, 390, 26), "[" + KeyBindings.InteractLabel + "]  " + prompt, text, gold);
             }
             var bar = new Rect(560, 744, 320, 12);
             if (session.PlayerCasting)
@@ -445,7 +445,9 @@ namespace Crulanda.Encounter
             Frame(new Rect(475, 325, 490, 250 + 48 * Mathf.Max(0, others.Count - 1)));
             GUI.Label(new Rect(525, 351, 400, 35), "EXPEDITION PAUSED", heading);
             GUI.Label(new Rect(525, 398, 400, 35), "Progress autosaves out of combat.", text);
-            if (GUI.Button(new Rect(525, 448, 390, 44), "Resume [Esc]", button)) session.Resume();
+            if (controlsOpen) { DrawControls(); return; }
+            if (GUI.Button(new Rect(525, 448, 190, 44), "Resume [Esc]", button)) session.Resume();
+            if (GUI.Button(new Rect(725, 448, 190, 44), "Controls", button)) controlsOpen = true;   // key bindings (playtest note 75)
             GUI.enabled = !session.InCombat;
             for (int i = 0; i < others.Count; i++)
                 if (GUI.Button(new Rect(525, 504 + 48 * i, 390, 44), "Play your " + others[i].definition.displayName + " (separate character)", button)) { session.SwitchCharacter(others[i].definition.id); break; }

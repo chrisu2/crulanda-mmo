@@ -508,18 +508,25 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
   waystones (standing stones with a lantern in the head) stood where each road leaves the zone, in the road; they and every small
   prop on or over a road (lamps, a signpost, a cart, a rock) now stand on the verge (ZoneBuilder.OffRoad).
 - **75. "I need a way to edit or change the default keyboard setting. I hate WASD for movement, I prefer ESDF and G for interact."**
-  OPEN (next round): key bindings in the options, an ESDF preset, every key rebindable.
-- **76. "I see farmers in the field but they aren't actually doing anything or growing anything."** OPEN (next round): field work
+  DONE (round 26): key bindings in the options, an ESDF preset, every key rebindable.
+- **76. "I see farmers in the field but they aren't actually doing anything or growing anything."** DONE (round 26): field work
   that shows (sowing, hoeing, reaping with the tools in hand) and crops that grow through the days.
 - **77. "Has hoe backwards and two blue lines hovering above chest."** (a farmhand, screenshot: the tool over his shoulder blade-first
-  toward his head; two blue straps floating in front of his chest) OPEN (next round).
+  toward his head; two blue straps floating in front of his chest) DONE (round 26).
 - **78. "The red is too pink. I like some red/pink but it should be more brown in it."** (the autumn twisted trees, art round 4)
-  OPEN (next round): russet and red-brown autumn leaves.
-- **79. "Characters shouldn't run with sword/weapons in hand unless fighting."** OPEN (next round): weapons sheathed on the back or
+  DONE (round 26): russet and red-brown autumn leaves.
+- **79. "Characters shouldn't run with sword/weapons in hand unless fighting."** DONE (round 26): weapons sheathed on the back or
   hip out of a fight, drawn when it starts (you, Mira, sims, guards).
 - **80. (screenshot, Harrow barn)** The kit barn's stone sill stands a metre out from its walls, like a separate low wall with grass
-  between. OPEN (next round): the barn model was fitted by its bounds, which include the roof's overhang; its walls go to the
+  between. DONE (round 26): the barn model was fitted by its bounds, which include the roof's overhang; its walls go to the
   footprint now and the roof overhangs past the sill.
-- **83. "'H' to hail other people, NPCs and sims."** OPEN (round 26): H greets whoever you face or have selected; they answer.
-- **84. "Still lots of empty space."** (screenshot: the open meadow between the village and the woods, Oakhaven) OPEN (round 26):
+- **81. "Cows walk through each other."** (screenshot) DONE (round 26): the big beasts keep a body length apart.
+- **82. "Sign pointing the wrong way."** (the Khaven Village sign by the west road) DONE (round 26): signposts point at what they
+  name, along the road.
+- **83. "'H' to hail other people, NPCs and sims."** DONE (round 26): H greets whoever you face or have selected; they answer.
+- **84. "Still lots of empty space."** (screenshot: the open meadow between the village and the woods, Oakhaven) DONE (round 26):
   the nature kit scattered over open ground (thickets, lone trees, stumps, logs, rocks, flower patches), clear of roads and fields.
+- **85. (idea for a future update) "Seasons. Summer: stamina drains fast, water supply drains fast. Winter: snow on the ground in
+  certain areas; too cold, lose HP / can't regain HP if cold. Just some thoughts."** LOGGED on the roadmap (Seasons).
+- **86. "Flowers growing in chicken feed bowl."** (screenshot: grass and flowers up through the coop's water pan) DONE (round 26): the
+  grass and flowers keep off a coop's yard, a hitching rail's trough and a well's step.

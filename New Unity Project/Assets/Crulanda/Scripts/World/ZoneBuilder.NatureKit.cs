@@ -29,7 +29,7 @@ namespace Crulanda.World
                     string n = m.name; int cut = n.IndexOf(" (", System.StringComparison.Ordinal); if (cut > 0) n = n.Substring(0, cut);   // a dressed copy's source name
                     bool card = n.StartsWith("Leaves") || n.StartsWith("Leaf") || n.StartsWith("Grass") || n.StartsWith("Flower") || n.StartsWith("Petal") || n.StartsWith("Plant") || n.StartsWith("Fern") || n.StartsWith("Clover") || n.StartsWith("Mushroom");
                     if (!card) continue;
-                    var tex = sheetFor != null && n.StartsWith(sheetFor) && sheet != null ? sheet : m.mainTexture;
+                    var tex = sheetFor != null && sheet != null && (sheetFor == "*" ? n.StartsWith("Leaves") : n.StartsWith(sheetFor)) ? sheet : m.mainTexture;
                     var colour = tint ?? Color.white; if (m.shader == leaf && !tint.HasValue && tex == m.mainTexture) continue;   // dressed already, nothing to change
                     string key = n + "|" + (tex != null ? tex.name : "") + "|" + colour;
                     if (!kitLeafMaterials.TryGetValue(key, out var k) || k == null)
@@ -43,7 +43,18 @@ namespace Crulanda.World
                 if (changed) r.sharedMaterials = mats;
             }
         }
-        static Texture greenSheet;
+        static Texture greenSheet, autumnMask, leafMask;
+        /// <summary>The kit's grey leaf mask (white where a leaf is): every kit crown and bush is this, tinted (Chris, 2026-10-07: "gold is too
+        /// light and too yellow" - the kit's own green sheet is a lime that reads yellow in the sun).</summary>
+        static Texture LeafMask { get { if (leafMask == null) leafMask = Resources.Load<Texture2D>("Props/Nature/Textures/Leaves_NormalTree"); return leafMask; } }
+        /// <summary>The kit crowns' greens by leaf family: deep green, a fresher green, (autumn is the twisted tree), and old gold brown.</summary>
+        static readonly Color[] KitLeaf = { new Color(.3f, .47f, .2f), new Color(.38f, .53f, .21f), new Color(.5f, .4f, .2f), new Color(.5f, .43f, .22f) };
+        static readonly Color KitBush = new Color(.32f, .48f, .23f), KitBushDark = new Color(.24f, .38f, .2f);
+        /// <summary>The twisted tree's leaf mask (grey: it takes a tint whole), for the autumn trees in russet and red-brown (note 78).</summary>
+        static Texture AutumnMask { get { if (autumnMask == null) autumnMask = Resources.Load<Texture2D>("Props/Nature/Textures/Leaves_TwistedTree"); return autumnMask; } }
+        /// <summary>Autumn browns with some red in them (playtest note 78: "the red is too pink... should be more brown in it"); over a
+        /// mask that is near white where a leaf is, so each shows about as it reads.</summary>
+        static readonly Color[] Autumn = { new Color(.6f, .22f, .1f), new Color(.6f, .13f, .09f), new Color(.6f, .38f, .14f), new Color(.5f, .19f, .11f), new Color(.66f, .11f, .08f) };   // russet-red, crimson, old gold, rust, deep red (Chris: "add some red to the trees")   // russet, red-brown, dark old gold, rust: the mask is near white where a leaf is, so these show at full strength
         /// <summary>The kit's green leaf sheet (the bush model comes with the twisted tree's autumn-red one).</summary>
         static Texture GreenSheet { get { if (greenSheet == null) greenSheet = Resources.Load<Texture2D>("Props/Nature/Textures/Leaves_NormalTree_C"); return greenSheet; } }
         /// <summary>Whether rocks here are the kit's mossy ones (art round 3): the green zones; the mountains, the ash and gloom keep the

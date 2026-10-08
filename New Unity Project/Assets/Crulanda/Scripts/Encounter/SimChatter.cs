@@ -174,6 +174,19 @@ namespace Crulanda.Encounter
             Later(ChatChannel.Whisper, s.name, line, -1);
             if (!answered.TryGetValue(s.id, out var at) || Time.time - at > 60) { answered[s.id] = Time.time; SimMemory.Note(s, SimMemory.Deed.WhisperAnswered); }
         }
+        /// <summary>You hailed a sim (H, playtest note 83): it answers in Say by what it makes of you; a rival only glares. It counts
+        /// a little, like an answered whisper (once a minute).</summary>
+        public void Hailed(SimAdventurer s)
+        {
+            if (s == null) return; var st = SimMemory.Of(s); bool lingo = s.chatty > .65f;
+            if (st == SimMemory.Standing.Rival) { S.Message(s.name + " looks straight through you."); return; }
+            string line = st == SimMemory.Standing.Friend ? Pick(lingo ? new[] { "o/ hey you!", "heyyy", "yo! what's up" } : new[] { "Hail, friend! Good to see you.", "Well met again!", "There you are." })
+                : st == SimMemory.Standing.Acquaintance ? Pick(lingo ? new[] { "o/", "hey again", "sup" } : new[] { "Hail again.", "Well met.", "Hello there." })
+                : Pick(lingo ? new[] { "o/", "hi", "hey" } : new[] { "Hail, stranger.", "Well met.", "Good day." });
+            if (s.friendly < .2f && st == SimMemory.Standing.Stranger && R < .5f) line = Pick(new[] { "...", "hm.", "busy." });
+            Later(ChatChannel.Say, s.name, line, -2);
+            if (!answered.TryGetValue(s.id, out var at) || Time.time - at > 60) { answered[s.id] = Time.time; SimMemory.Note(s, SimMemory.Deed.WhisperAnswered); }
+        }
         /// <summary>A sim came into your zone or online (SimPopulation.Refresh): a friend says hello, once an hour of the clock.</summary>
         public void Arrived(SimAdventurer s)
         {

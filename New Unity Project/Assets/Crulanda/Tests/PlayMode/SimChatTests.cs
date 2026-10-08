@@ -76,7 +76,7 @@ namespace Crulanda.Tests
             Assert.NotNull(answer, s.name + " answered by whisper"); Assert.IsNull(answer.to); Assert.AreEqual(s.name, session.LastWhisperer);
             Assert.GreaterOrEqual(s.regard, 1, "an answered whisper counts a little");
             before = session.Chat.Count; session.PlayerChat("/r ty"); Assert.AreEqual(s.name, session.Chat.Last(l => l.speaker == "You").to, "/r answers the last whisperer");
-            t = 0; while (t < 12 && !session.Chat.Skip(before).Any(l => l.speaker == s.name)) { t += Time.deltaTime; yield return null; }   // its "np" lands before the rival part
+            t = 0; while (t < 12 && !session.Chat.Skip(before).Any(l => l.speaker == s.name && l.channel == ChatChannel.Whisper)) { t += Time.deltaTime; yield return null; }   // its whispered "np" lands before the rival part (its zone chatter does not count: c49)
             session.PlayerChat("/friend " + s.name); Assert.IsTrue(s.friend, "listed"); session.PlayerChat("/friends"); StringAssert.Contains(s.name, session.Messages.Last());
             s.regard = SimMemory.RivalAt; before = session.Chat.Count;
             session.Whisper(s.name + " hey"); yield return new WaitForSeconds(8);

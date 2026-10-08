@@ -76,7 +76,7 @@ namespace Crulanda.Encounter
         {
             var kind = animal.GetComponent<GameAnimal>()?.Kind;
             PutLoot(animal, 0, GameAnimals.RollHide(Items, kind, animal.actor.Level, new System.Random(Random.Range(0, int.MaxValue))));
-            Message(animal.actor.DisplayName + " killed · no experience from game · press E at the body to skin it.");
+            Message(animal.actor.DisplayName + " killed · no experience from game · press " + KeyBindings.InteractLabel + " at the body to skin it.");
             if (Target == animal) AutoAttack = false;
             if (Quests != null) { Quests.Notify("kill", animal.persistentId); ReconcileQuests(); }
         }

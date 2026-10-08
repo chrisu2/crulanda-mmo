@@ -1556,3 +1556,34 @@ A read-only review by five reviewers, each finding checked by a second who tried
   carts, loose rocks, stones, shrines, boards, barrels, crates and the like, unless you interact with them where they are) are moved
   out sideways from any road to its edge plus their own reach (ZoneBuilder.Verge, OffRoad): the lamp on the green, Khaven's cart
   in the gate road, the lamps and the Harrow farm sign whose arms reached over the edge, a rock by the west road.
+
+## 2026-10-07 — Round 26: playtest notes 75-82
+- **75. Key bindings:** pause (Esc) > Controls lists every game key; click one and press the new key (a key in use swaps over); WASD
+  and ESDF (G interacts) presets; saved at once (KeyBindings, PlayerPrefs keys.*). The help line and the [key] prompts name the
+  keys as bound.
+- **76. Crops that grow, farmers that work:** every tilled field has a crop on the ridges between its furrows (CropField, the nature
+  kit's tall grass in one mesh, Crulanda/Crop grows it), running a six-day round from its own day: bare, sown, sprouting, growing
+  green, ripening gold, reaped; fields a day or two apart. A farmer's work follows his field: kneeling to sow, hoeing while it grows
+  (a real lift and stroke now, leaning in), cutting when it is ripe, gathering when it is reaped.
+- **77.** The farmer's fork is carried tines down; on a modelled figure the bib and its straps no longer float off the chest.
+- **78.** Autumn trees are russet, red-brown, amber and rust (the twisted tree's grey leaf mask tinted), not the pink-red sheet.
+- **79.** Weapons are sheathed (on the back or at the hip) out of a fight and drawn when it starts or to cast; mobs while engaged, sims
+  out hunting while they fight, villagers and guards never draw.
+- **80.** Barns 8 m and wider are the Megapack's walled barn (Building 3Base) fitted by its walls to the stone sill and door step
+  (ZoneBuilder.WallProp measures the vertices in its lowest metre); smaller barns are the painted barn again.
+- **81.** Horses, cows, donkeys and sheep keep a body length apart: they stop short of one another and choose spots clear of the herd.
+- **82.** Signposts point at what they name: a zone's road end, a landmark or a named place, along the road where one runs by.
+- **83. Hail** (H, rebindable): greets whoever you have selected, or the nearest person within 15 m in front; you say it, they
+  turn and answer: a villager by their trade, a sim by what it makes of you (a rival only glares; an answer counts a little toward
+  its regard), Mira as Mira.
+- **86.** No grass or flowers in the hens' water pan: a coop's yard, a hitching rail's trough and a well's step stay bare.
+- **84. The open ground dressed** (ZoneBuilder.Meadow): the green zones' open grass gets the nature kit in clusters on an 18 m grid,
+  thickets (bushes, often round a young tree), lone trees (now and then a russet one), mossy rocks with pebbles, flower patches and
+  ferns, stumps and fallen logs; the mountains a stone or a lone pine now and then. Only where the grass grows open, out of the
+  village's heart, clear of camps, nodes, secrets, exits, landmarks, props and trunks, on gentle ground; its own stream.
+- Colours after Chris's notes during the round ("gold is too light and too yellow", "add some red to the trees"): every kit crown
+  and bush is the kit's grey leaf mask tinted deep green, fresh green or old gold (the kit's own sheet is a lime that reads yellow);
+  the autumn set is russet-red, crimson, old gold, rust and deep red; ripe crops are amber.
+- Full run c49: EditMode 427/427, PlayMode 212/214, five tours, 0 shader errors. Fixed: the meadow kept clear of gathering nodes,
+  so adding the nodes moved scenery (NodeStreamTests); it ignores them now. A whisper test waited for any line instead of the
+  whispered reply. Reruns 5/5.

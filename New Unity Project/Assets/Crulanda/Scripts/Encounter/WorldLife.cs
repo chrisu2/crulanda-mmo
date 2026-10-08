@@ -1168,7 +1168,14 @@ namespace Crulanda.Encounter
         {
             switch (place)
             {
-                case "field": return Role == "farmer" ? ActorPose.Work : ActorPose.Gather;
+                case "field":
+                {
+                    // The work follows the crop (playtest note 76): kneel to sow it, hoe it while it grows and when it stands bare, cut and
+                    // gather when it is ripe or just reaped.
+                    if (Role != "farmer") return ActorPose.Gather;
+                    var crop = Crulanda.World.CropField.At(transform.position);
+                    return crop == null ? ActorPose.Work : crop.Stage == "sown" || crop.Stage == "reaped" ? ActorPose.Gather : crop.Stage == "ripe" ? ActorPose.Chop : ActorPose.Work;
+                }
                 case "mill": return ActorPose.Work;
                 case "well": return life.R01 < .5f ? ActorPose.Work : ActorPose.Talk;
                 case "inn": case "sleep": return ActorPose.Sit;
@@ -1552,7 +1559,8 @@ namespace Crulanda.Encounter
                 var p = life.Zone.Ground(around + new Vector2(life.R01 - .5f, life.R01 - .5f) * range * 2);
                 if (NavMesh.SamplePosition(p, out var hit, 2, NavMesh.AllAreas) && !NavMesh.Raycast(transform.position, hit.position, out _, NavMesh.AllAreas)
                     && !life.Zone.WaterAt(new Vector2(hit.position.x, hit.position.z), out _, out _) && !CrossesWater(transform.position, hit.position)
-                    && (Kind == "cat" || !life.Zone.InBuilding(new Vector2(hit.position.x, hit.position.z)))) return hit.position;   // no horse in the taproom (playtest note 28); a cat may go in
+                    && (Kind == "cat" || !life.Zone.InBuilding(new Vector2(hit.position.x, hit.position.z)))   // no horse in the taproom (playtest note 28); a cat may go in
+                    && (Bulk <= 0 || !Crowded(hit.position, Bulk * 1.3f))) return hit.position;   // and no beast stands where another does (note 81)
             }
             return null;
         }
@@ -1613,11 +1621,22 @@ namespace Crulanda.Encounter
         }
         /// <summary>Moves along the ground toward the target; returns true on arrival.</summary>
         Vector2 groundAt = new Vector2(float.MaxValue, 0); float groundY, groundSlope;
+        /// <summary>The big beasts (playtest note 81, 2026-10-07: "cows walk through each other"): each keeps its body's reach from the others.</summary>
+        static readonly List<Critter> Herd = new List<Critter>();
+        float Bulk { get { return Kind == "horse" ? 1.25f : Kind == "cow" ? 1.15f : Kind == "donkey" ? .95f : Kind == "sheep" ? .65f : 0; } }
+        void OnEnable() { if (Bulk > 0 && !Herd.Contains(this)) Herd.Add(this); }
+        void OnDisable() { Herd.Remove(this); }
+        bool Crowded(Vector3 at, float reach)
+        {
+            foreach (var o in Herd) { if (o == null || o == this) continue; float r = reach + o.Bulk; var d = o.transform.position - at; d.y = 0; if (d.sqrMagnitude < r * r) return true; }
+            return false;
+        }
         bool Step(float v)
         {
             var me = transform.position; var to = target - me; to.y = 0;
             if (to.magnitude < .3f) return true;
             var dir = to.normalized; var next = me + dir * v * Time.deltaTime;
+            if (Bulk > 0 && Crowded(me + dir * Bulk * .9f, Bulk * .8f) && !Crowded(me, Bulk * .8f)) return true;   // another beast ahead: stop here (and choose again)
             // The ground (and the water's edge) is looked at again every 20 cm, not every frame (playtest note 23, fps).
             if ((new Vector2(next.x, next.z) - groundAt).sqrMagnitude > .04f)
             {

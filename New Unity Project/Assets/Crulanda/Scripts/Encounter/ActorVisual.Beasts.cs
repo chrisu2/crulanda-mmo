@@ -178,7 +178,8 @@ namespace Crulanda.Encounter
         /// <summary>A spell let fly (an instant one, or a cast as it completes): the release over the walk.</summary>
         public void CastRelease() { if (model != null) model.Act("castshot"); }
         /// <summary>A cast being drawn: the spell pose held over the walk.</summary>
-        public bool Casting { set { if (model != null) model.Casting = value; } }
+        bool castingNow;
+        public bool Casting { get { return castingNow; } set { castingNow = value; if (model != null) model.Casting = value; } }
         /// <summary>Struck (EncounterEnemy.Receive): a modelled beast flinches, one way then the other, unless it is mid-attack.</summary>
         public void Flinch()
         {

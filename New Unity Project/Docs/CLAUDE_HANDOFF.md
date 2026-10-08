@@ -1219,3 +1219,5 @@ resumed with `Workflow({scriptPath, resumeFromRunId})` (finished agents replay f
   Quests: npc.garet.bears, npc.yara.bears, npc.ansel.drowned. Loot tables bear and drowned, 5 items with icons (make_icons.py
   re-encodes every PNG: keep only the new files). CreatureCapture rows beasts-treants, beasts-treant-moves, beasts-bears,
   beasts-dead; CreatureImport.Report lists foreign rigs' bones and how far each clip carries the root.
+
+**EditMode c61e result (read after the stop): 421/429.** Left: Danner (boss step, paper fight, call reaches Sorrel: shorten callReach, boss=true needs BossHit/BossHealth step), Caddock paper fight at level 7 (retune his move for the new level), "Raw value by tier" (vendor test: the ore values 3/4 moved), the gear-entry count line in Every_item_file_parses_together, the distinct-move count (19), and ZoneGrowthTests home-camps table needs an "adit" key. PlayMode c61a output: hel/work tasks (not read).

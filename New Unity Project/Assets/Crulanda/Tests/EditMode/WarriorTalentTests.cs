@@ -26,7 +26,7 @@ namespace Crulanda.Tests
             int count = 0; foreach (var b in t.Branches) count += b.nodes.Length;
             Assert.AreEqual(3, t.Branches.Count); Assert.AreEqual(WarriorKit.ImplementedIds.Length, count);
             foreach (var id in WarriorKit.ImplementedIds) Assert.NotNull(t.Find(id), id);
-            Assert.IsNull(t.Find("tk-held-line"), "Tier 3+ talents are design-only until implemented.");
+            Assert.NotNull(t.Find("tk-held-line"), "Row 3 is implemented (2026-10-08)."); Assert.IsNull(t.Find("tk-unbroken-line"), "Rows 4-6 wait for the cap-30 levels.");
         }
         [Test] public void Implemented_flag_without_code_is_rejected()
         {
@@ -96,7 +96,7 @@ namespace Crulanda.Tests
                 save.Write(refunded);
                 Assert.IsTrue(store.TryRead("encounter", out var envelope, out _)); Assert.AreEqual(EncounterSave.FormatVersion, envelope.formatVersion);
                 Assert.IsTrue(save.Read(out var loaded, out message), message); Assert.AreEqual(1, TalentTree.Rank(loaded, "sp-rally-reserve"));
-                loaded.talents.Add(new TalentRank { id = "tk-held-line", rank = 1 }); loaded.experience = 240;
+                loaded.talents.Add(new TalentRank { id = "tk-unbroken-line", rank = 1 }); loaded.experience = 240;
                 store.Write("encounter", new SaveEnvelope { formatVersion = 3, payloadType = "CrulandaEncounter", payloadJson = JsonUtility.ToJson(loaded) });
                 Assert.IsFalse(save.Read(out _, out _));
             }

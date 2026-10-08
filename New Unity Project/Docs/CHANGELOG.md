@@ -1713,3 +1713,12 @@ A read-only review by five reviewers, each finding checked by a second who tried
   Hum (Kick stuns 1 s); the Great Silence (Hush silences everything within 6 m), Mesmer (Echo Bind stuns a boss), Chorus (Cadence makes
   the party hit harder), Quiet Step (mobs notice you closer), the Original Song (the first Lull of a fight takes everything within 10 m).
 - Chris (2026-10-08): fights of about 40 s with Mira counted as a member are "not too long"; the balance stays.
+
+## 2026-10-08 — The Warrior's and the Druid's row 3 (the deepest a level-15 character reaches)
+- Talent points are your level plus one, so at cap 15 a branch reaches row 3 (15 points in it). Rows 4-6 of the Warrior's and
+  Druid's trees wait for the cap-30 levels (ROADMAP Phase 9); every row a level-15 character can reach now works.
+- Warrior: Held Line (Guard blows give Vigor and threat), Iron Reserve (Vigor below half health), Press the Breach (free 2-pressure
+  Strikes after a Breach), Battle Rhythm, Answering Step (an Intercepted attacker is Exposed), Second Wind (Muster gives Vigor).
+- Druid: Deep Grain, Bristle Roar (roared enemies hit you softer), Tracker's Shift, Open Veins, Rain Root, Heartwood Reading,
+  Deep-root Snare, Quartzine Seed. Each says what it does now (some were written for systems not built yet).
+- The four talent files keep one talent a line.

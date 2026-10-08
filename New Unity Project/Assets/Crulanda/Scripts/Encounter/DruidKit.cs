@@ -23,6 +23,7 @@ namespace Crulanda.Encounter
             "bh-ringed-hide", "bh-rooted-stance", "bh-mosscoat", "bh-heartwood-brace", "bh-thorned-bark", "bh-sapwood-core", "bh-lodged-roots",
             "tc-chain-pounce", "tc-keen-claws", "tc-scent-of-blood", "tc-rending-flurry", "tc-quickpad", "tc-bramble-feint", "tc-feral-cadence",
             "rm-slow-sap", "rm-pre-bloom", "rm-dew-cleanse", "rm-burst-bloom", "rm-canopy", "rm-grafting", "rm-sap-thrift",
+            "bh-deep-grain", "bh-bristle-roar", "tc-trackers-shift", "tc-open-veins", "rm-rain-root", "rm-heartwood-reading", "ts-deep-root-snare", "ts-quartzine-seed",   // row 3 (2026-10-08)
             "ts-germinate", "ts-green-voice", "ts-pollen-veil", "ts-bramblestorm", "ts-stillroot-cast", "ts-cadence-thread", "ts-thornbound-channel"
         };
         static readonly string[] ShiftIds = { "druid.barkhide", "druid.thornclaw", "druid.rootmend", "druid.thornsong" };
@@ -46,6 +47,7 @@ namespace Crulanda.Encounter
         readonly object formSource = new object();
         readonly Dictionary<EncounterEnemy, float> veiledUntil = new Dictionary<EncounterEnemy, float>();
         readonly Dictionary<EncounterEnemy, float> roaredUntil = new Dictionary<EncounterEnemy, float>();
+        readonly Dictionary<EncounterEnemy, float> bristledUntil = new Dictionary<EncounterEnemy, float>();   // Bristle Roar
         readonly HashSet<EncounterEnemy> seeded = new HashSet<EncounterEnemy>();
         bool resetting;
         float lastMovedAt, fangKeptUntil, lungeAt = -99, feintReady, braceUntil, bracePrevented, nextDecay;
@@ -149,6 +151,7 @@ namespace Crulanda.Encounter
                 if (!MeleeAutoAttacks) s.StopAutoAttack();
                 if (to == DruidForm.Barkhide && R("bh-mosscoat") > 0)
                     PlayerCombat.AddBarrier(Mathf.RoundToInt(s.Player.Health.Pool.Max * .03f * R("bh-mosscoat")), 8);
+                if (to == DruidForm.Thornclaw && R("tc-trackers-shift") > 0) GainFang(R("tc-trackers-shift"));   // Tracker's Shift
                 s.Message("Shifted into " + to + ".");
             });
         }
@@ -209,7 +212,7 @@ namespace Crulanda.Encounter
                 if (!s.LandsOn(t, a.range)) return;
                 t.threat.Taunt(s.Player.EntityId.Value, Now, a.duration);
                 foreach (var o in s.Enemies)
-                    if (o.actor.IsAlive && s.Distance(o) <= 8) o.threat.Add(s.Player.EntityId.Value, 20);
+                    if (o.actor.IsAlive && s.Distance(o) <= 8) { o.threat.Add(s.Player.EntityId.Value, 20); if (R("bh-bristle-roar") > 0) bristledUntil[o] = Now + 8; }
                 if (R("bh-lodged-roots") > 0) { t.Slow(.2f * R("bh-lodged-roots"), 4); roaredUntil[t] = Now + 4; }
                 s.Message("Bellowing Roar: attention forced for " + a.duration + " seconds.");
             });
@@ -251,7 +254,8 @@ namespace Crulanda.Encounter
                 bool low = t.actor.Health.Pool.Ratio < .35f;
                 int scent = R("tc-scent-of-blood");
                 int bleed = Dmg((3 + Level / 2f) * (low ? 1 + .1f * scent : 1));
-                periodic.Add("bleed", t, Now, 2, 3, bleed, (e, i) => { var enemy = (EncounterEnemy)e.target; if (!enemy.actor.IsAlive) return false; enemy.Receive(e.value, s.Player); return true; });
+                periodic.Add("bleed", t, Now, 2, 3 + R("tc-open-veins"), bleed, (e, i) => { var enemy = (EncounterEnemy)e.target; if (!enemy.actor.IsAlive) return false; enemy.Receive(e.value, s.Player);
+                    if (R("tc-open-veins") > 0 && UnityEngine.Random.value < .05f) GainFang(1); return true; });   // Open Veins
                 rakes++;
                 GainFang(1 + (low && scent >= 2 ? 1 : 0) + (R("tc-keen-claws") >= 5 && rakes % 3 == 0 ? 1 : 0));
             });
@@ -356,7 +360,17 @@ namespace Crulanda.Encounter
         bool Swiftroot(AbilityDefinition a)
         {
             int cost = Form == DruidForm.Rootmend ? 0 : 20 - 5 * R("rm-dew-cleanse");
-            return Start(With(a, cost, 0), () => HealActor(HealTarget, a.power + Level));
+            return Start(With(a, cost, 0), () => {
+                var who = HealTarget;
+                HealActor(who, Mathf.RoundToInt((a.power + Level) * (1 + .1f * R("rm-heartwood-reading"))));   // Heartwood Reading
+                int rain = R("rm-rain-root");   // Rain Root: a short Seedling on the healed and on the other within 3 m + 2 m a rank
+                if (rain > 0 && who != null)
+                {
+                    PlantSeedling(who, 2);
+                    var other = who == s.Player ? (s.Progress.recruited && s.Companion != null ? s.Companion.actor : null) : s.Player;
+                    if (other != null && other.IsAlive && Vector3.Distance(other.transform.position, who.transform.position) <= 3 + 2 * rain) PlantSeedling(other, 2);
+                }
+            });
         }
 
         // ---------- Thornsong ----------
@@ -392,8 +406,12 @@ namespace Crulanda.Encounter
             return Start(def, () => {
                 if (instant) CadenceCharges = Mathf.Max(0, CadenceCharges - 1);
                 if (!s.LandsOn(t, a.range)) return;
-                float bonus = seeded.Remove(t) ? 1 + .15f * R("ts-germinate") : 1;
-                s.Bolt(t, new Color(.4f, .8f, .25f), .2f); t.Receive(Dmg((a.power + 2 * Level) * bonus), s.Player); Alternate("thornbolt");
+                bool seed = seeded.Remove(t);
+                float bonus = (seed ? 1 + .15f * R("ts-germinate") : 1) * (t.Rooted ? 1 + .05f * R("ts-deep-root-snare") : 1);   // Deep-root Snare
+                int dmg = Dmg((a.power + 2 * Level) * bonus);
+                s.Bolt(t, new Color(.4f, .8f, .25f), .2f); t.Receive(dmg, s.Player); Alternate("thornbolt");
+                int quartz = R("ts-quartzine-seed");   // Quartzine Seed: a burst seed throws shards at what stands near
+                if (seed && quartz > 0) foreach (var o in s.Enemies.ToArray()) if (o != null && o != t && o.actor.IsAlive && !o.Game && Vector3.Distance(o.transform.position, t.transform.position) <= 2 + quartz) o.Receive(Mathf.Max(1, dmg / 2), s.Player);
             });
         }
         bool BriarSnare(AbilityDefinition a)
@@ -444,12 +462,13 @@ namespace Crulanda.Encounter
             int canopy = R("rm-canopy"); if (canopy > 0 && periodic.Has("seedling", victim)) mult -= .03f * canopy;
             if (victim != s.Player && roaredUntil.TryGetValue(enemy, out var roared) && Now < roared) mult -= .05f;
             if (victim == s.Player && veiledUntil.TryGetValue(enemy, out var veiled) && Now < veiled) mult -= .03f * R("ts-pollen-veil");
+            if (victim == s.Player && bristledUntil.TryGetValue(enemy, out var bristled) && Now < bristled) mult -= .03f * R("bh-bristle-roar");
             int dealt = victim.GetComponent<Combatant>().Damage(Mathf.RoundToInt(raw * mult));
             if (victim != s.Player) return dealt;
             if (Now < braceUntil) bracePrevented += dealt * .35f / .65f;
             if (Form == DruidForm.Barkhide)
             {
-                GainBark(5 + R("bh-ringed-hide"));
+                GainBark(5 + R("bh-ringed-hide") + R("bh-deep-grain"));   // Deep Grain
                 int thorns = R("bh-thorned-bark");
                 if (thorns > 0)
                 {

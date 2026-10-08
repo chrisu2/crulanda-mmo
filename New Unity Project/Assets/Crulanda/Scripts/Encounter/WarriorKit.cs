@@ -20,8 +20,10 @@ namespace Crulanda.Encounter
             "dp-read-the-opening", "dp-weapon-pressure", "dp-edge-discipline", "dp-breaching-blow", "dp-finishing-strike", "dp-honed-edge",
             "dp-momentum", "dp-deep-breach", "dp-sweeping-strike",
             "sp-called-cadence", "sp-rally-reserve", "sp-mark-the-gap", "sp-steady-voice", "sp-rallying-challenge", "sp-muster",
-            "sp-shared-shelter", "sp-planted-standard", "sp-scatter-their-guard"
+            "sp-shared-shelter", "sp-planted-standard", "sp-scatter-their-guard",
+            "tk-held-line", "tk-iron-reserve", "dp-press-the-breach", "dp-battle-rhythm", "sp-answering-step", "sp-second-wind"   // row 3 (2026-10-08)
         };
+        float pressUntil, nextReserve;
         public const int MaxPressure = 5;
         public const float GuardExposeSeconds = 3, BreachExposeSeconds = 4, ExposedBonus = .05f;
         const float PressureDecayDelay = 8, TimedGuardWindow = .5f, GrudgeMemory = 10, InterceptWindow = 3;
@@ -78,6 +80,9 @@ namespace Crulanda.Encounter
             var a = loadout.At(slot);
             if (a != null && a.id == "ability.shield_bash") return ShieldBash(a);   // crowd control (CC_DESIGN section 2)
             if (a != null && a.id == "ability.shout") return Shout(a);
+            if (a != null && a.id == "ability.strike" && Now < pressUntil)   // Press the Breach: Strike costs nothing for a while
+                a = new AbilityDefinition { id = a.id, name = a.name, description = a.description, effect = a.effect, power = a.power, cost = 0, cooldown = a.cooldown,
+                    range = a.range, castTime = a.castTime, globalCooldown = a.globalCooldown, duration = a.duration, statusId = a.statusId };
             bool needsEnemy = a.effect == AbilityEffect.Damage || a.effect == AbilityEffect.Taunt || a.effect == AbilityEffect.Breach;
             if (needsEnemy && !s.RequireEnemyInRange(a.range)) return false;
             if (a.effect == AbilityEffect.Breach && Pressure < 1) { s.Message("Build weapon pressure with Strike first."); return false; }
@@ -198,7 +203,7 @@ namespace Crulanda.Encounter
         }
         public void AfterStrike(EncounterEnemy target, int damage)
         {
-            GainPressure(1);
+            GainPressure(Now < pressUntil ? 2 : 1);
             if (R("sp-mark-the-gap") > 0) Expose(target, R("sp-mark-the-gap"));
             if (R("dp-sweeping-strike") > 0)
                 foreach (var other in s.Enemies)
@@ -256,12 +261,16 @@ namespace Crulanda.Encounter
             target.Receive(12 * spent, s.Player);
             Expose(target, BreachExposeSeconds);
             if (spent == MaxPressure && R("dp-deep-breach") > 0) target.Stagger(.5f * R("dp-deep-breach"));
+            if (spent == MaxPressure && R("dp-battle-rhythm") > 0) s.Player.Resource.Pool.Change(4 * R("dp-battle-rhythm"));   // Battle Rhythm
+            if (R("dp-press-the-breach") > 0) pressUntil = Now + 6;   // Press the Breach
             s.Message("Breaching Blow spends " + spent + " pressure. Target Exposed.");
         }
         public void Muster()
         {
             PlayerCombat.AddBarrier(20, 6);
-            if (CompanionWithin(RallyRange(12))) s.Companion.actor.GetComponent<Combatant>().AddBarrier(20, 6);
+            bool reaches = CompanionWithin(RallyRange(12));
+            if (reaches) s.Companion.actor.GetComponent<Combatant>().AddBarrier(20, 6);
+            if (R("sp-second-wind") > 0) s.Player.Resource.Pool.Change(3 * R("sp-second-wind") * (reaches ? 2 : 1));   // Second Wind: you and each ally reached
             if (R("sp-planted-standard") > 0)
             {
                 StandardPoint = s.Player.transform.position; StandardUntil = Now + 4 * R("sp-planted-standard"); nextStandardTick = Now + 1;
@@ -281,6 +290,7 @@ namespace Crulanda.Encounter
                 bool guarding = PlayerCombat.Statuses.Remaining("status.guard", Now) > 0;
                 int redirected = guarding ? raw : Mathf.CeilToInt(raw * GuardMultiplier(.4f));
                 s.FloatText(s.Player.transform.position, "Intercepted", new Color(.55f, .8f, 1));
+                if (R("sp-answering-step") > 0) Expose(enemy, 5);   // Answering Step
                 return HitPlayer(enemy, redirected);
             }
             if (victim == s.Player) return HitPlayer(enemy, raw);
@@ -299,6 +309,7 @@ namespace Crulanda.Encounter
                     vigor += 3 * R("tk-timed-guard"); guardRaisedAt = -99;
                     s.FloatText(s.Player.transform.position, "Timed guard", new Color(.95f, .8f, .45f));
                 }
+                if (R("tk-held-line") > 0) { vigor += 3; enemy.threat.Add(s.Player.EntityId.Value, 50); }   // Held Line
                 if (vigor > 0) s.Player.Resource.Pool.Change(vigor);
             }
             return PlayerCombat.Damage(Mathf.RoundToInt(raw * mult));
@@ -308,6 +319,8 @@ namespace Crulanda.Encounter
         public override void Tick(bool inCombat)
         {
             if (Pressure > 0 && !inCombat && Now > pressureKeptUntil) Pressure = 0;
+            if (R("tk-iron-reserve") > 0 && inCombat && Now >= nextReserve && s.Player.Health.Pool.Ratio < .5f)   // Iron Reserve
+            { nextReserve = Now + 1; s.Player.Resource.Pool.Change(2 * R("tk-iron-reserve")); }
             if (Now < StandardUntil && Now >= nextStandardTick)
             {
                 nextStandardTick = Now + 1; float reach = RallyRange(8);

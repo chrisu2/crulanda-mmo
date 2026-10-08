@@ -180,13 +180,14 @@ namespace Crulanda.Tests
         {
             var e = session.Enemies.Find(x => x != null && x.actor.IsAlive && !x.Game); Assert.NotNull(e);
             int mobLevel = e.actor.Level, alone = e.actor.Health.Pool.Max;
-            Assert.AreEqual(0, EncounterEnemy.SharesFor(session, mobLevel), 1e-4f, "alone (with Mira): as tuned");
+            float mira = session.Companion != null && session.Companion.actor.IsAlive && session.Progress.recruited ? Mathf.Clamp((float)session.Progress.Level / Mathf.Max(1, mobLevel), EncounterEnemy.MinShare, EncounterEnemy.MaxShare) : 0;   // Mira is a member like any other
+            Assert.AreEqual(mira, EncounterEnemy.SharesFor(session, mobLevel), 1e-4f, "alone: only Mira's share, if she is with you");
             var pop = SimPopulation.Active; var two = pop.World.sims.Take(2).ToList();
             foreach (var x in two) { x.zone = "zone.oakhaven"; x.onlineFrom = 0; x.onlineHours = 24; x.friendly = .9f; x.level = session.Progress.Level; }
             pop.Refresh(); yield return null;
             foreach (var x in two) Assert.IsTrue(session.Invite(x.id), x.name);
             // Each sim's share is its level over the mob's, a quarter to one and a quarter.
-            float shares = two.Sum(x => Mathf.Clamp((float)x.level / mobLevel, EncounterEnemy.MinShare, EncounterEnemy.MaxShare));
+            float shares = mira + two.Sum(x => Mathf.Clamp((float)x.level / mobLevel, EncounterEnemy.MinShare, EncounterEnemy.MaxShare));
             Assert.AreEqual(shares, EncounterEnemy.SharesFor(session, mobLevel), 1e-4f);
             two[1].level = 1; Assert.Less(EncounterEnemy.SharesFor(session, Mathf.Max(8, mobLevel)), shares + .001f, "a low sim adds little");
             two[1].level = session.Progress.Level;
@@ -195,7 +196,7 @@ namespace Crulanda.Tests
             float t = 0; while (t < 3 && e.GroupShares <= 0) { t += Time.deltaTime; yield return null; }
             Assert.AreEqual(shares, e.GroupShares, 1e-3f, "scaled when the fight starts");
             Assert.AreEqual(Mathf.Round(alone * (1 + EncounterEnemy.HealthPerShare * shares)), e.actor.Health.Pool.Max, 1, "health grows by the shares");
-            StringAssert.Contains("group of 3", e.GroupNote);
+            StringAssert.Contains("group of " + (3 + (mira > 0 ? 1 : 0)), e.GroupNote);
             e.ResetFight();
             Assert.AreEqual(alone, e.actor.Health.Pool.Max, "and is itself again when the fight resets");
         }

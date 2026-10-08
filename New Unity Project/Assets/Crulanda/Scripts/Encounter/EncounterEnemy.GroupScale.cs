@@ -25,12 +25,15 @@ namespace Crulanda.Encounter
         {
             float shares = 0; int lv = Mathf.Max(1, mobLevel);
             foreach (var c in session.PartySims) if (c != null && c.actor != null && c.actor.IsAlive) shares += Mathf.Clamp((float)c.sim.level / lv, MinShare, MaxShare);
+            // Mira counts as a member like any other (Chris, 2026-10-08: "she should be same as me"): at your level she is a share.
+            if (session.Companion != null && session.Companion.actor != null && session.Companion.actor.IsAlive && session.Progress != null && session.Progress.recruited)
+                shares += Mathf.Clamp((float)session.Progress.Level / lv, MinShare, MaxShare);
             return shares;
         }
         /// <summary>Scales to the party now; only ever up during a fight (a sim falling does not heal the mob).</summary>
         void ScaleToGroup()
         {
-            if (Game || !actor.IsAlive || !FightingParty) return;   // a sim on its own fights it as it is
+            if (Game || !actor.IsAlive || !FightingParty) return;   // a sim on its own fights it as it is (you and Mira are a party of two)
             float shares = SharesFor(session, actor.Level);
             if (shares <= GroupShares + .001f) return;
             GroupShares = shares;
@@ -45,6 +48,6 @@ namespace Crulanda.Encounter
             if (unscaledHealth > 0) { actor.Stats.SetBase(StatType.MaxHealth, unscaledHealth); unscaledHealth = -1; }
         }
         /// <summary>The target frame's line: "Scaled for your group (3)".</summary>
-        public string GroupNote { get { return GroupShares > 0 ? "Scaled for your group of " + (1 + session.PartySims.Count) : null; } }
+        public string GroupNote { get { return GroupShares > 0 ? "Scaled for your group of " + (1 + session.PartySims.Count + (session.Companion != null && session.Progress.recruited ? 1 : 0)) : null; } }
     }
 }

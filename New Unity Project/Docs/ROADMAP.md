@@ -68,6 +68,12 @@ the cap goes from 13 to 15 and the zones' bands stretch to Oakhaven 1-5, Khaven 
 the sim roster's home bands, gear tiers, the wardrobe captures and the tests follow. **Breadcrumbs (Chris, 2026-10-07): each zone's last main quest already turns in to someone in the next zone (QUEST_DESIGN.md: Oakhaven to Khaven to the Peaks to the Rim to the Shore); round 29 sets each of those at the top of its new band, checks the chain reaches it, and makes sure the next zone's first quest offers itself on arrival, so the trail leads through the bands in order.** Levels 16-30 come with the Phase 9 zones, each
 new zone carrying its own band, so the cap rises as the world does.
 
+**After round 29 (Chris, 2026-10-08): Daniel Gruginski's Medieval Village Kit (CC0, hand-painted, ~/Downloads/MedievalVillageKit_FBX.zip).**
+Use the FBX zip, not the Unity package (it needs URP). One vertex-colour shader (its painted shading is in the vertex colours),
+materials from its Data/materials.json, then a capture of a dozen pieces for Chris before use. Its underground set (mine posts and carts,
+crystal veins, lava tiles, dwarf halls, dungeon walls, sewers, cages, altars, cave rock) dresses the Sealed Adit and the later dungeons.
+The NatureManufacture castle pack was looked at and passed over (near-realistic, clashes with the stylised look).
+
 ## Queued around Phase 5
 - The Ash-Walker enclave's interior (playtest note 40).
 - Art rounds from Chris's assets (Fantasy Props MegaKit, Medieval props and the Stylized Nature MegaKit's trees in, 2026-10-07): Medieval Village MegaKit, Stylized Megapack

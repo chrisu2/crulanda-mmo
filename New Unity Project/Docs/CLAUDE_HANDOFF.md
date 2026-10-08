@@ -19,7 +19,7 @@ outputs (hel/work/encounter-validation*/c61*.log) before anything else; fix what
 memory: crulanda-data-change-cascades), then a full run, release build, publish (check Crulanda.exe closed), commit, backup.
 **Helms (note 88):** the kit's Resources path is fixed (Props/ModularHero/Models/Armor Parts/Armor Parts); the next lane B build's
 wardrobe capture (--crulanda-wardrobe-capture) renders the 25 helmets for Chris.
-**Then:** dungeon D2-D8 (DUNGEON_DESIGN.md section 9), the enclave, Khaven kit, sound; Phase 9 (ROADMAP.md) after Phase 8.
+**Then (Chris, 2026-10-08):** import the Medieval Village Kit (ROADMAP: FBX zip, vertex-colour shader, a capture for Chris); then dungeon D2-D8 (DUNGEON_DESIGN.md section 9), the enclave, Khaven kit, sound; Phase 9 (ROADMAP.md) after Phase 8.
 ## Earlier resume note (2026-10-07, about 23:40)
 **Playable build = round 28 (notes 87, 89-93: key hints to Esc > Controls, chat focus, the wolf joins fights + companion bar, harder
 groups, outlying mobs), published 23:35, commit 21a6b50, backed up to E:. Full run c54: 428/428, 220/220, 0 shader errors.**

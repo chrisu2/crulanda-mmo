@@ -281,7 +281,9 @@ the next dungeon.
    - a spirit stone.
 4. **The escort event:** an NPC who walks, waves on a timer, a boss who rises at a step.
 5. **Mob behaviours:** call for help, flee at low health, sleep, fear, knockback, a charge to step out of.
-6. **Quests and loot:** the seven quests, the set and boss tables.
+6. **Quests and loot:** the seven quests, the set and boss tables. *Written 2026-10-08 on web/adit-quests-loot (Quests/adit.json, the
+   Adit-Runner's Kit in loot.adit.json); quest gear is not yet handed out at turn-in, and the Geode Shards and the hidden and rare
+   bosses' pieces wait (WEB_LOG.md).*
 7. **Sim support:** the dungeon run leads through the wings and branches in order, waits at gates, and joins the escort.
 8. **The rail ride out.**
 

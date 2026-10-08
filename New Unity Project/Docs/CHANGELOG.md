@@ -1731,3 +1731,25 @@ A read-only review by five reviewers, each finding checked by a second who tried
   bar on the nameplate and the target frame ("interrupt it"); any silence, stun, hold or fear interrupts it, and a silenced mob can't
   begin one. Mira hushes a cast past its first third every 15 s; party sims with an interrupt (Rogue, Archivist, Warrior, Paladin,
   Mage) stop casts in their reach every 12 s and say so. Tests: CrowdControlTests (a ring, an interrupt, a mender's heal).
+
+## 2026-10-08 — The Sealed Adit's quests and loot (dungeon step D6; cloud branch web/adit-quests-loot, not yet run in Unity)
+- Quests/adit.json: the seven quests of DUNGEON_DESIGN.md section 6, all side quests from level 10:
+  - Under the Toll (Yara Quell, 11): Gang-Boss Lusk and his tally book (a Chronicle page) to Yara.
+  - The Pressed (Pib, 11): open the five goblin cages in the Workings.
+  - Echoes in the Stone (Brother Cael, 11): six echo-jars from the Singing Gallery; his page of what they held.
+  - Embers Below (Tamsin Rook in Khaven, 11): Cinder-Warden Ysolt's brand.
+  - What the Grey Takes (Lisle Tamber, 11): a shard of unmade stone from the Foreman Who Forgot.
+  - The Dead Line (Yara, 12, after Under the Toll): the Quartermaster and the Rail-Captain; Danner drops his sealed letter.
+  - A Letter Under Seal (Yara to Lisle, 12): the letter's page, the hook for the next dungeon.
+- New people (GAME-ONLY, residents keeping a post): Pib, Brother Cael and Lisle Tamber at the Pilgrims' Rest and the Listening Shrine
+  (peaks.json); Tamsin Rook by Khaven's gallows tree (khaven.json). Five quest items with icons; three Chronicle pages.
+- ZoneBuilder.Adit.cs: the Workings' three cages are now five (two on the right wall) and usable ("Open the cage", once each); seven
+  echo-jars stand round the Gallery's floor ("Take the echo-jar", back after 90 s). No draws from the cave's random stream, so nothing
+  else in the cave moves.
+- loot.adit.json: the Adit-Runner's Kit, a five-piece rare set (hood from Nix, mantle from Ysolt, boots from the Foreman, gloves from
+  the Quartermaster, jerkin from Danner), each a 20% lucky roll beside the boss's signature list; +50 health at three pieces, +10
+  attack power and 20 health a kill at five. The Dead Line's three rewards (Sleeper-Splitter, Coupler's Hook, Weaver's
+  Tuning-Drop), quest-sourced like the other zones' quest pieces. Icons for all eight and the five quest items are in
+  tools/art/make_icons.py, to be painted locally (the cloud can't push Git LFS).
+- Tests: QuestDataTests (the seven quests' data, and a play-through on the quest log); LootDataTests and NamedLootTests counts
+  (135 named, 147 gear entries, 74 rares, three sets, 18 quest and 62 boss pieces); the sets test allows a five-piece set from three.

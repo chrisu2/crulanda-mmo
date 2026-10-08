@@ -19,6 +19,9 @@ namespace Crulanda.World
     /// </summary>
     public sealed partial class ZoneBuilder
     {
+        /// <summary>The usable things the Adit's quests name (Quests/adit.json): the pressed goblins' cages in the Workings ("The Pressed",
+        /// five, each opened once) and the pilgrims' echo-jars round the Gallery ("Echoes in the Stone", seven, each back after a while).</summary>
+        public const string AditCage = "A goblin cage", AditEchoJar = "A pilgrim's echo-jar";
         static readonly Color LumGreen = new Color(.45f, 1, .55f), GeodeViolet = new Color(.7f, .42f, 1), EmberRed = new Color(1, .45f, .15f),
             GreyLight = new Color(.74f, .77f, .82f), RailBlue = new Color(.55f, .75f, 1), GalleryLight = new Color(.62f, .72f, .88f);
         /// <summary>A cave's lining colour by its part (variant 2): the workings' grey-brown, a violet cast, the vent's scorched rock, the grey.</summary>
@@ -139,14 +142,18 @@ namespace Crulanda.World
                 Cart(Mathf.Min(galleryFrom - 6, 27), -1.6f, false); Cart(Mathf.Min(galleryFrom - 30, 57), 1.6f, true);   // in the hall, off the way (a cart in the narrow drift cut the navmesh)
                 int lumNo = 0;
                 for (float s = 4; s < galleryFrom; s += 8, lumNo++) WallLamp(RingAt(s), lumNo % 2 == 0 ? 1 : -1, LumGreen, 8, .75f);
-                // The cages: three along the left wall of the first chamber, straw inside, doors hanging.
+                // The cages: three along the left wall of the first chamber and two on the right, straw inside, doors hanging. Each is
+                // usable (E, "Open the cage"): the quest "The Pressed" (Quests/adit.json) has you open all five; once opened it stays open.
                 int cages = Widest(18, 36);
                 if (cages >= 0)
                 {
                     float s0 = h.Along[cages];
-                    for (int k = 0; k < 3; k++)
+                    for (int k = 0; k < 5; k++)
                     {
-                        float s = s0 - 3.5f + k * 3.2f; var q = Along(s); var at = On(s, -h.Half[RingAt(s)] * .62f); if (!Free(at)) continue;
+                        float s = k < 3 ? s0 - 3.5f + k * 3.2f : s0 - 1.9f + (k - 3) * 3.2f; int side = k < 3 ? -1 : 1;
+                        var q = Along(s); var at = On(s, side * h.Half[RingAt(s)] * .62f); if (!Free(at)) continue;
+                        var cage = new GameObject(AditCage).transform; cage.SetParent(t, false); cage.localPosition = at; cage.localRotation = q;
+                        Interactables.Add(new ZoneInteractable { name = AditCage, prompt = "Open the cage", kind = "cage", once = true, position = cage.position, root = cage });
                         foreach (int sx in new[] { -1, 1 }) foreach (int sz in new[] { -1, 1 })
                                 Part(PrimitiveType.Cube, t, at + q * new Vector3(sx * .8f, .95f, sz * .8f), new Vector3(.12f, 1.9f, .12f), iron, q);
                         Part(PrimitiveType.Cube, t, at + Vector3.up * 1.92f, new Vector3(1.75f, .08f, 1.75f), iron, q);
@@ -191,6 +198,20 @@ namespace Crulanda.World
                         }
                     }
                     for (int k = 0; k < 4; k++) { int i = RingAt(galleryFrom + 6 + k * 6); Part(PrimitiveType.Sphere, t, c[i] + Vector3.up * h.Height[i] * .97f + right[i] * (k - 1.5f) * 3, new Vector3(1.6f, .3f, 1.3f), Tint(art.stone, new Color(.03f, .03f, .04f))); }
+                    // The pilgrims' echo-jars: seven clay jars set down round the Gallery's floor where the singing is loudest, a faint
+                    // light in each. Taken (E) while "Echoes in the Stone" wants one, a jar is gone for a while and comes back (kind crates).
+                    // Fixed places, no draws from the stream, so nothing else in the cave moves.
+                    var clay = Tint(art.stone, new Color(.62f, .5f, .38f)); var echo = Glowing(new Color(1, .82f, .9f), .9f);
+                    for (int k = 0; k < 7; k++)
+                    {
+                        float s = galleryFrom + 3 + k * (galleryTo - galleryFrom - 6) / 6f; int i = RingAt(s);
+                        var at = On(s, (k % 2 == 0 ? -1 : 1) * h.Half[i] * (.42f + (k % 3) * .06f)); at.y = FloorY(at.x, at.z); if (!Free(at)) continue;
+                        var jar = new GameObject(AditEchoJar).transform; jar.SetParent(t, false); jar.localPosition = at; jar.localRotation = Along(s) * Quaternion.Euler(0, k * 47, 0);
+                        Part(PrimitiveType.Sphere, jar, new Vector3(0, .22f, 0), new Vector3(.34f, .42f, .34f), clay);
+                        Part(PrimitiveType.Cylinder, jar, new Vector3(0, .47f, 0), new Vector3(.15f, .06f, .15f), clay);
+                        Part(PrimitiveType.Sphere, jar, new Vector3(0, .53f, 0), new Vector3(.1f, .05f, .1f), echo);   // what it holds, showing at the neck
+                        Interactables.Add(new ZoneInteractable { name = AditEchoJar, prompt = "Take the echo-jar", item = "item.adit_echo_jar", kind = "crates", position = jar.position, root = jar });
+                    }
                     foreach (var o in Hollow.All)
                     {
                         if (o.Parent != h) continue;

@@ -167,6 +167,12 @@ The Chronicle runs `main.ashrim.5` -> `main.verdant.1` -> 2 -> 3 -> 4 -> 5 (XP a
 - **A new faction**, the Veridian Keepers (`keepers`, CANON), with standing from the quests. Five Chronicle pages.
 - Two named vendors: Moss-Lantern (sap-cakes, dewfern) and Ondine Varro.
 
+### The Sealed Adit (levels 10-12; `Quests/adit.json`, 2026-10-08, cloud branch web/adit-quests-loot)
+Seven side quests from level 10, given outside (DUNGEON_DESIGN.md section 6): Under the Toll and then The Dead Line (Yara Quell),
+The Pressed (Pib, five cages in the Workings), Echoes in the Stone (Brother Cael, six echo-jars in the Gallery), Embers Below (Tamsin
+Rook in Khaven), What the Grey Takes (Lisle Tamber, Salt-Menders), and A Letter Under Seal (Danner's letter, Yara to Lisle; the hook
+for the next dungeon). Kills name the Adit's camps (`mob.<tag>.adit.*`); the bosses' items come as "collect from a kill".
+
 ### Faction introductions (CANON factions, GAME-ONLY quests)
 - **Oakhaven Folk** (village standing): earned from the NPC quests. Raises prices at the stalls, opens a room at the inn, and gets villagers to share rumours.
 - **Salt-Menders (the Alliance):** a quiet stranger at the inn asks you to spoil the collectors' supplies. Their chain works against the Concord.

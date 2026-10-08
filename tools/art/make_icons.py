@@ -2088,6 +2088,10 @@ QUEST = {
     'item.glade_light': (herb_cap, ('#3fae6a', '#bfffd0', '#d9e8d0'), dict(glowc='#5fe08a', spots='#d8ffe0')), 'item.moss_antler': (tine, ('#b89a7a',), dict(moss=True)), 'item.web_silk': (skein,), 'item.charnel_silk': (skein,),
     'item.veridian_sap': (flask, ('#2fd070',), dict(shape='round', glowc='#40e080', cork='#8a5a3a')), 'item.cold_glass': (shard, ('#d8f0ff', 'gem'), dict(glowc='#9fe8ff', thin=True, spark=True)),
     'item.void_husk': (husk,), 'item.shore_salt': (salt, (), dict(crust=True)),
+    # the Sealed Adit's quests (2026-10-08, web/adit-quests-loot)
+    'item.adit_tally_book': (book, ('#5a3a22', '#9a9aa0'), dict(wrap='#3a2a1a')), 'item.adit_echo_jar': (flask, ('#c8a888',), dict(shape='round', glowc='#ffd0e0', cork='#8a5a3a')),
+    'item.ysolt_ash_brand': (shard, ('#3a2a26', 'metal'), dict(glowc='#ff7a30', spark=True)), 'item.unmade_shard': (shard, ('#a8a8ac',), dict(glowc='#d8d8e0', thin=True)),
+    'item.adit_sealed_letter': (letter, ('#2a2a30',), dict(broken=False)),
 }
 # what a kind looks like when an item has no picture of its own (new content): the resolver's second step
 KINDS = {

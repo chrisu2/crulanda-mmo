@@ -181,6 +181,8 @@ namespace Crulanda.Encounter
             return best;
         }
         public void Clear() { values.Clear(); forced = null; until = 0; }
+        public void Remove(string id) { if (id != null) values.Remove(id); if (forced == id) { forced = null; until = 0; } }
+        public bool IsEmpty { get { return values.Count == 0; } }
     }
 }
 

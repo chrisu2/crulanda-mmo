@@ -676,6 +676,90 @@ MonoBehaviour:
     globalCooldown: 1.5
     duration: 2
     statusId: 
+  - id: rogue.sinister_strike
+    name: Sinister Strike
+    description: "A quick blade. Builds a combo point on the target. Starts automatic weapon attacks."
+    effect: 0
+    power: 8
+    cost: 35
+    cooldown: 0
+    range: 3.2
+    castTime: 0
+    globalCooldown: 1
+    duration: 0
+    statusId: 
+  - id: rogue.eviscerate
+    name: Eviscerate
+    description: "A finisher: spends the combo points on the target for heavy damage per point."
+    effect: 0
+    power: 9
+    cost: 30
+    cooldown: 0
+    range: 3.2
+    castTime: 0
+    globalCooldown: 1
+    duration: 0
+    statusId: 
+  - id: rogue.sap
+    name: Sap
+    description: "Out of a fight, before the pull: a mob not yet fighting is held 40 seconds. Any damage breaks it."
+    effect: 4
+    power: 0
+    cost: 25
+    cooldown: 0
+    range: 3.2
+    castTime: 0
+    globalCooldown: 1
+    duration: 40
+    statusId: 
+  - id: rogue.gouge
+    name: Gouge
+    description: "A thumb in the eye: the target is held 4 seconds (damage breaks it) and gives a combo point."
+    effect: 4
+    power: 4
+    cost: 40
+    cooldown: 10
+    range: 3.2
+    castTime: 0
+    globalCooldown: 1
+    duration: 4
+    statusId: 
+  - id: rogue.kick
+    name: Kick
+    description: "Stops the target's blow and silences it 3 seconds."
+    effect: 4
+    power: 3
+    cost: 20
+    cooldown: 12
+    range: 3.2
+    castTime: 0
+    globalCooldown: 1
+    duration: 3
+    statusId: 
+  - id: rogue.blind
+    name: Blind
+    description: "A pinch of shard-dust in the eyes: the target wanders off for 10 seconds (three hits end it)."
+    effect: 4
+    power: 0
+    cost: 30
+    cooldown: 60
+    range: 10
+    castTime: 0
+    globalCooldown: 1
+    duration: 10
+    statusId: 
+  - id: rogue.vanish
+    name: Vanish
+    description: "Every mob after you loses sight of you for 6 seconds; with nobody else to fight it goes home."
+    effect: 4
+    power: 0
+    cost: 0
+    cooldown: 120
+    range: 0
+    castTime: 0
+    globalCooldown: 1
+    duration: 0
+    statusId: 
   playerClass:
     id: class.warrior
     displayName: Warrior
@@ -937,6 +1021,46 @@ MonoBehaviour:
         level: 1
         talentId: sb-quench
     talentTree: {fileID: 4900000, guid: 317285d9fd0e47d3845a82d3780fa675, type: 3}
+  - definition:
+      id: class.rogue
+      displayName: Rogue
+      role: 2
+      resource: 3
+      maxResource: 100
+      combatRegen: 10
+      restingRegen: 20
+      stats:
+        baseHealth: 165
+        healthPerLevel: 21
+        healthPerStamina: 5
+        baseAttackPower: 12
+        attackPowerPerLevel: 2
+        attackPowerPerStrength: 1
+        spellPowerPerIntellect: 1
+        armorPerAgility: 1
+      unlocks:
+      - abilityId: rogue.sinister_strike
+        level: 1
+        talentId: 
+      - abilityId: rogue.eviscerate
+        level: 1
+        talentId: 
+      - abilityId: rogue.sap
+        level: 2
+        talentId: 
+      - abilityId: rogue.gouge
+        level: 3
+        talentId: 
+      - abilityId: rogue.kick
+        level: 4
+        talentId: 
+      - abilityId: rogue.blind
+        level: 6
+        talentId: 
+      - abilityId: rogue.vanish
+        level: 8
+        talentId: 
+    talentTree: {fileID: 4900000, guid: d42a25e91b3b4f919864d43a597a8380, type: 3}
   questFiles:
   - {fileID: 4900000, guid: 2f37ccf5ed8d46928976a7b5854444ed, type: 3}
   - {fileID: 4900000, guid: 74079723a64512c49ae39123ea0f57e0, type: 3}

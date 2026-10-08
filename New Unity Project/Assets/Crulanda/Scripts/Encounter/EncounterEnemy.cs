@@ -147,7 +147,7 @@ namespace Crulanda.Encounter
                 // Noticing the player: about 8 m normally, 3 m if they sneak (Ctrl), never while they are dead.
                 var motor = session.Player.GetComponent<AdventurerMotor>();
                 float notice = motor != null && motor.Sneaking ? 3 : 8;
-                if (session.Player.IsAlive && !EncounterSession.Unseen && Vector3.Distance(transform.position, session.Player.transform.position) < notice) Pounce();
+                if (session.Player.IsAlive && !EncounterSession.Unseen && Time.time >= lostUntil && Vector3.Distance(transform.position, session.Player.transform.position) < notice) Pounce();
                 return;
             }
             if (agent != null) agent.speed = Rooted ? 0 : baseSpeed * (Slowed ? slowFactor : 1) * (Time.time < lungeUntil ? 2.2f : 1);
@@ -157,7 +157,7 @@ namespace Crulanda.Encounter
             if (Group == null && Vector3.Distance(transform.position, home) > session.Leash) { if (inFight) GoHome(); else ResetFight(); return; }
             // Noticing you: within 5 m and, until a fight is on, only with a clear line to you, so a mob inside a rock cave or
             // behind a wall doesn't come for you through it. On its way home from a broken leash it notices nobody.
-            if (!Evading && !EncounterSession.Unseen && Vector3.Distance(transform.position, session.Player.transform.position) < 5 && (Victim != null || Sees(session.Player.transform.position)))
+            if (!Evading && !EncounterSession.Unseen && Time.time >= lostUntil && Vector3.Distance(transform.position, session.Player.transform.position) < 5 && (Victim != null || Sees(session.Player.transform.position)))
                 threat.AddProximity(session.Player.EntityId.Value, Time.deltaTime);
             var id = threat.Choose(Time.time, session.IsLivingCombatant);
             Victim = session.CombatActor(id);   // your party, or a sim that came for it (Phase 5.3a)

@@ -21,7 +21,7 @@ namespace Crulanda.Encounter
 
         public static string Weight(string classId)
         {
-            return classId == "class.warrior" || classId == "class.paladin" ? "heavy" : classId == "class.ranger" ? "leather" : "cloth";
+            return classId == "class.warrior" || classId == "class.paladin" ? "heavy" : classId == "class.ranger" || classId == "class.rogue" ? "leather" : "cloth";
         }
         public static bool CarriesWeapon(string classId) { return classId == "class.warrior" || classId == "class.paladin"; }
         /// <summary>Whether a piece by its name is of the class's weight (a Hauberk for the mail classes, a Jerkin for leather, a Tunic for cloth).</summary>

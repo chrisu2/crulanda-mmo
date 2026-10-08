@@ -1644,6 +1644,30 @@ BRANCH = {
     'combustion': ('#40200e', ['#ff7a2a', '#ffb040', '#fff2c0', '#e0503a', '#ffd070']), 'heatweaver': ('#3a2418', ['#ff6a20', '#d07040', '#ffb040', '#8a8a90', '#e0c040']),
     'spellbinder': ('#281e3c', ['#c8a0ff', '#8a5ae0', '#ff7a2a', '#70c0f0', '#e0c8ff']),
 }
+# The Rogue (2026-10-08, Docs/CC_DESIGN.md section 0): its branches and its seven moves.
+BRANCH.update({'thiefs-grace': ('#26242e', ['#b0a8c8', '#e0b040', '#8a90b0', '#d8d0e8', '#70c0f0']),
+               'shardwork': ('#3a1e22', ['#e0503a', '#d8d0c0', '#c83a6a', '#e8c040', '#9be05a']),
+               'locksmith': ('#2e2a1e', ['#e0b040', '#c8c0a0', '#70c0f0', '#d07050', '#f0e080'])})
+def a_sinister(c):
+    c.back(c.ell(50, 50, 38), '#e0b040', .35, 10); m_dagger(c, '#d8d0c0', '#e0b040'); slash(c, [(10, 84), (38, 56), (66, 30), (92, 10)], 6, '#ffe070')
+def a_eviscerate(c):
+    c.back(c.ell(50, 50, 40), '#e0503a', .45, 12); m_dagger(c, '#e0d8c8', '#c0a040')
+    c.push(rot=90); m_dagger(c, '#e0d8c8', '#c0a040'); c.pop()
+    for x, y in ((30, 76), (70, 78), (50, 86)): c.glow(c.ell(x, y, 4), '#c0201a', halo=5, power=.6)
+def a_sap(c):
+    c.back(c.ell(50, 50, 38), '#8a90b0', .4, 10); m_hand(c, '#c8b090', '#806040')
+    for x, y in ((26, 22), (50, 12), (74, 22)): c.spark(x, y, 8, '#f0e8ff', .9)
+def a_gouge(c):
+    m_eye(c, '#e0503a', '#ffffff'); slash(c, [(14, 86), (40, 60), (64, 36), (88, 14)], 6, '#ff9070')
+def a_kick(c):
+    c.back(c.ell(50, 50, 38), '#70c0f0', .4, 10); m_bolt(c, '#ffd040', '#ffffff')
+def a_blind(c):
+    m_eye(c, '#9a9aa8', '#ffffff')
+    for x, y in ((22, 30), (36, 18), (64, 16), (80, 30), (30, 80), (72, 82)): c.spark(x, y, 6, '#e8e0c8', .85)
+def a_vanish(c):
+    c.back(c.ell(50, 50, 40), '#4a4a70', .5, 14); m_moon(c, '#b0a8c8', '#ffffff'); m_wind(c, '#8a90b0', '#ffffff')
+ABILITIES.update({'rogue.sinister_strike': ('#3a2a1a', a_sinister), 'rogue.eviscerate': ('#4a1a1e', a_eviscerate), 'rogue.sap': ('#26242e', a_sap),
+                  'rogue.gouge': ('#3a1e1e', a_gouge), 'rogue.kick': ('#1e2a3a', a_kick), 'rogue.blind': ('#2e2c28', a_blind), 'rogue.vanish': ('#1a1a2a', a_vanish)})
 KIND_TRIM = dict(passive='#c9ccd2', modifier='#e0b040', active='#fff0b0', signature='#fff0b0', capstone='#ffd040')
 def draw_talent(c, icon, branch, kind, k):
     """k: how many earlier talents in the branch used the same icon word (0 = first)."""

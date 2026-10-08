@@ -63,6 +63,15 @@ namespace Crulanda.Encounter
             session.FloatText(transform.position, kind == "incap" ? "Held" : kind == "stun" ? "Stunned" : kind == "fear" ? "Fleeing" : "Silenced", new Color(.75f, .85f, 1));
             return null;
         }
+        float lostUntil;
+        /// <summary>A Rogue's Vanish: this mob forgets <paramref name="who"/> (its threat on them is gone) and doesn't notice them again
+        /// for <paramref name="seconds"/>. With nobody else on its list it gives up the fight and goes home.</summary>
+        public void LoseSight(Actor who, float seconds)
+        {
+            if (who == null || !actor.IsAlive) return;
+            threat.Remove(who.EntityId.Value); lostUntil = Time.time + seconds;
+            if (threat.IsEmpty) ResetFight();
+        }
         /// <summary>Damage on a held mob: an incap breaks at once, a fear after three hits.</summary>
         void ControlStruck()
         {

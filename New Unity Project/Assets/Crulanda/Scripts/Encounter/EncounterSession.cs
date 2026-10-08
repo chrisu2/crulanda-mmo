@@ -90,7 +90,7 @@ namespace Crulanda.Encounter
         /// <summary>The figure a class wears and the tint of its capsule stand-in (the classes added 2026-10-05 included).</summary>
         public static ActorLook LookForClass(string classId)
         {
-            switch (classId) { case "class.druid": return ActorLook.Druid; case "class.paladin": return ActorLook.Paladin; case "class.ranger": return ActorLook.Ranger; case "class.mage": return ActorLook.Mage; default: return ActorLook.Warrior; }
+            switch (classId) { case "class.druid": return ActorLook.Druid; case "class.paladin": return ActorLook.Paladin; case "class.ranger": case "class.rogue": return ActorLook.Ranger; case "class.mage": return ActorLook.Mage; default: return ActorLook.Warrior; }
         }
         public static Color TintForClass(string classId)
         {
@@ -100,6 +100,7 @@ namespace Crulanda.Encounter
                 case "class.paladin": return new Color(.9f, .84f, .6f);
                 case "class.ranger": return new Color(.3f, .5f, .25f);
                 case "class.mage": return new Color(.4f, .3f, .7f);
+                case "class.rogue": return new Color(.22f, .2f, .24f);
                 default: return new Color(.2f, .58f, .72f);
             }
         }
@@ -1949,6 +1950,7 @@ namespace Crulanda.Encounter
                 case "class.ranger": return (17 + (3 * L) / 2, 12 + L, 20 + 2 * L, 10 + L / 2, 12 + L / 2);
                 case "class.druid": return (15 + (3 * L) / 2, 12 + L, 14 + L, 18 + 2 * L, 18 + 2 * L);
                 case "class.mage": return (13 + L, 8 + L / 2, 10 + L / 2, 22 + 2 * L, 20 + 2 * L);
+                case "class.rogue": return (16 + (3 * L) / 2, 14 + L, 22 + 2 * L, 8 + L / 2, 10 + L / 2);
                 default: return (20 + 2 * L, 20 + 2 * L, 15 + L, 8 + L / 2, 10 + L / 2);   // the Warrior
             }
         }

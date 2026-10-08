@@ -1660,3 +1660,15 @@ A read-only review by five reviewers, each finding checked by a second who tried
   knoll heaps over it (a buttress had stood in the Ember Vent's mouth).
 - Sim homes, gear bands (GearLooks.BandOf), the wardrobe's set levels (3, 7, 10, 13, 15) and the docs (WORLD_ZONES camp table,
   QUEST_DESIGN section 8, DUNGEON_DESIGN) follow.
+
+## 2026-10-08 — Crowd control: the engine (C1) and the Rogue (Chris: "Archivist and Rogue both sound good")
+- The engine (EncounterEnemy.Control): hold, stun, fear and silence on any mob; the same hold again within 18 s is half as long and a
+  third time doesn't take; non-boss elites hold 70% as long; bosses take no hold or fear; a held mob answers no call; when a hold
+  ends the mob comes back for whoever put it on. Tests: CrowdControlTests.
+- The Rogue, the sixth class (GAME-ONLY kit on Valen's CANON line): Focus and combo points. Sinister Strike builds, Eviscerate spends;
+  Sap holds a mob 40 s before the pull (out of combat, the mob not yet fighting); Gouge holds 4 s; Kick silences 3 s; Blind sends one
+  off 10 s; Vanish makes every mob after you lose sight of you for 6 s (with nobody else to fight it goes home). Unlocks at levels
+  1, 1, 2, 3, 4, 6 and 8. Talents: Thief's Grace, Shardwork and Locksmith, 7 each, 6 implemented (Long Sap, Quiet Hands, Keen Edge,
+  Ruthless, Quick Kick, Fine Dust). Leather, the Ranger's figure for now, gold class colour, its own icons. Play it from the pause
+  menu as a separate character. Tests: RogueRulesTests, RogueLoopTests.
+- Not yet: sims as Rogues, pick-lock, a Rogue look of its own; then the Archivist.

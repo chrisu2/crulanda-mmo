@@ -1,0 +1,351 @@
+{
+ "id": "rogue",
+ "name": "Rogue",
+ "resource": "Focus and combo points",
+ "resourceDesc": "Focus (0-100) pays for every move and comes back fast; combo points (0-5) build on one target with Sinister Strike and Gouge and are spent by Eviscerate.",
+ "identity": "A quiet blade who decides which fights happen: Sap one before the pull, Gouge or Blind one in it, Kick the blow that matters, Vanish when it goes wrong. (GAME-ONLY kit on Valen's CANON line.)",
+ "branches": [
+  {
+   "id": "thiefs-grace",
+   "name": "Thief's Grace",
+   "role": "control",
+   "loop": "Sneak up, Sap the one you don't want, open on the rest; Vanish to reset a bad pull.",
+   "tradeoff": "Long holds, little damage.",
+   "nodes": [
+    {
+     "id": "tg-long-sap",
+     "name": "Long Sap",
+     "tier": 0,
+     "col": 1,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "hand",
+     "desc": "Sap holds 10 seconds longer per rank.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "tg-quiet-hands",
+     "name": "Quiet Hands",
+     "tier": 0,
+     "col": 2,
+     "max": 1,
+     "req": null,
+     "kind": "passive",
+     "icon": "moon",
+     "desc": "After Vanish mobs lose sight of you for 10 seconds instead of 6.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "tg-light-step",
+     "name": "Light Step",
+     "tier": 1,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "wind",
+     "desc": "You move 4% faster while sneaking per rank.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "tg-second-sap",
+     "name": "Second Sap",
+     "tier": 1,
+     "col": 2,
+     "max": 1,
+     "req": null,
+     "kind": "passive",
+     "icon": "chain",
+     "desc": "Sap can hold a second mob at once.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "tg-shadow-shift",
+     "name": "Shadow Shift",
+     "tier": 2,
+     "col": 1,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "moon",
+     "desc": "Vanish's cooldown is 30 seconds shorter per rank.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "tg-pickpocket",
+     "name": "Light Fingers",
+     "tier": 2,
+     "col": 2,
+     "max": 1,
+     "req": null,
+     "kind": "passive",
+     "icon": "hand",
+     "desc": "Pick a sapped mob's pocket for a few coins.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "tg-graces-end",
+     "name": "Thief's Grace",
+     "tier": 3,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "capstone",
+     "icon": "star",
+     "desc": "Once a fight, a blow that would drop you misses instead.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": false
+    }
+   ]
+  },
+  {
+   "id": "shardwork",
+   "name": "Shardwork",
+   "role": "dps",
+   "loop": "Build five points with Sinister Strike, spend them on Eviscerate, keep Focus from running dry.",
+   "tradeoff": "Hits hard, holds little.",
+   "nodes": [
+    {
+     "id": "sw-keen-edge",
+     "name": "Keen Edge",
+     "tier": 0,
+     "col": 1,
+     "max": 5,
+     "req": null,
+     "kind": "passive",
+     "icon": "dagger",
+     "desc": "Sinister Strike hits 4% harder per rank.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "sw-ruthless",
+     "name": "Ruthless",
+     "tier": 1,
+     "col": 1,
+     "max": 3,
+     "req": "sw-keen-edge",
+     "kind": "passive",
+     "icon": "skull",
+     "desc": "Eviscerate hits 6% harder per point per rank.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "sw-shard-poison",
+     "name": "Shard Poison",
+     "tier": 1,
+     "col": 2,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "drop",
+     "desc": "Your swings sometimes leave a burning shard in the wound.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "sw-quick-blades",
+     "name": "Quick Blades",
+     "tier": 2,
+     "col": 0,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "clock",
+     "desc": "You swing 5% faster per rank.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "sw-relentless",
+     "name": "Relentless",
+     "tier": 2,
+     "col": 1,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "spiral",
+     "desc": "A finisher returns Focus per combo point spent.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "sw-spent-shards",
+     "name": "Spent Shards",
+     "tier": 3,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "passive",
+     "icon": "crystal",
+     "desc": "Eviscerate on a held mob doesn't break the hold.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "sw-cut-deep",
+     "name": "Cut Deep",
+     "tier": 3,
+     "col": 2,
+     "max": 1,
+     "req": null,
+     "kind": "capstone",
+     "icon": "drop",
+     "desc": "Your critical strikes bleed.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": false
+    }
+   ]
+  },
+  {
+   "id": "locksmith",
+   "name": "Locksmith",
+   "role": "utility",
+   "loop": "Kick the blows and casts that matter, Blind the runner, open the Adit's quiet gates.",
+   "tradeoff": "Answers, not damage.",
+   "nodes": [
+    {
+     "id": "lk-quick-kick",
+     "name": "Quick Kick",
+     "tier": 0,
+     "col": 1,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "clock",
+     "desc": "Kick's cooldown is 2 seconds shorter per rank.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "lk-dust",
+     "name": "Fine Dust",
+     "tier": 0,
+     "col": 2,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "eye",
+     "desc": "Blind lasts 2 seconds longer per rank.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "lk-feel-the-pins",
+     "name": "Feel the Pins",
+     "tier": 1,
+     "col": 0,
+     "max": 1,
+     "req": null,
+     "kind": "passive",
+     "icon": "gear",
+     "desc": "Pick locks: open the Adit's locked gates and chests.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "lk-ward-break",
+     "name": "Ward-break",
+     "tier": 1,
+     "col": 2,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "shield",
+     "desc": "Kick also breaks a caster's ward.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "lk-tumblers",
+     "name": "Tumblers",
+     "tier": 2,
+     "col": 1,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "gear",
+     "desc": "Gouge holds 1 second longer per rank.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "lk-hum",
+     "name": "The Hum",
+     "tier": 2,
+     "col": 2,
+     "max": 1,
+     "req": null,
+     "kind": "passive",
+     "icon": "note",
+     "desc": "You hear a mob's blow coming: Kick also stuns 1 second.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "lk-vibration",
+     "name": "Vibration-locking",
+     "tier": 3,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "capstone",
+     "icon": "bolt",
+     "desc": "A Kick on a casting mob silences it twice as long.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": false
+    }
+   ]
+  }
+ ]
+}

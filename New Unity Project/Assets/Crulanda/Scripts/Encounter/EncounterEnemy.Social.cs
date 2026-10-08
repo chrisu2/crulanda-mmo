@@ -44,7 +44,7 @@ namespace Crulanda.Encounter
         Actor joinFor; FightGroup joinGroup;
 
         /// <summary>Free to answer a packmate or a call: alive, standing, in no fight, not already answering and not on its way home.</summary>
-        public bool CanAnswer { get { return actor != null && actor.IsAlive && !Game && isActiveAndEnabled && Victim == null && !inFight && joinAt < 0 && !Evading; } }
+        public bool CanAnswer { get { return actor != null && actor.IsAlive && !Controlled && !Game && isActiveAndEnabled && Victim == null && !inFight && joinAt < 0 && !Evading; } }
         /// <summary>
         /// Heard <paramref name="caller"/>: after <paramref name="delay"/> seconds (0 = at once) it joins the caller's group and
         /// comes for <paramref name="puller"/>. It raises no alarm of its own, so a pull does not run through a whole camp.

@@ -140,6 +140,7 @@ namespace Crulanda.Encounter
             if (session == null || session.Paused) return;
             if (!actor.IsAlive) { if (Camp && Time.time >= respawnAt) Respawn(); return; }
             if (Game) return;   // no threat, no aggro, no swing: GameAnimal grazes, wanders and bolts
+            if (ControlTick()) return;   // held, stunned or fleeing: nothing else this frame (EncounterEnemy.Control)
             if (joinAt >= 0 && Time.time >= joinAt) Join();   // it heard a call a beat ago: now it comes
             if (Hidden)
             {
@@ -220,6 +221,7 @@ namespace Crulanda.Encounter
             if (TappedBy == null && source != null && !Game) TappedBy = source.EntityId.Value;
             int actual = actor.GetComponent<Combatant>().Damage(Mathf.RoundToInt(damage * session.Kit.PartyDamageMultiplier(this) * OverTakenNow));
             if (actor.IsAlive && Figure != null) Figure.Flinch();
+            if (actor.IsAlive) ControlStruck();   // a hold breaks on damage (EncounterEnemy.Control)
             if (Game) { if (actor.IsAlive) GetComponent<GameAnimal>()?.Bolt(source != null ? source.transform.position : transform.position); }
             else { if (!inFight) struck = true; threat.Add(source.EntityId.Value, actual); if (inFight) ScaleToGroup(); }   // a sim joining mid-fight raises it   // struck: it was hit before it noticed anyone, so sneaking does not quieten its alarm
             session.FloatText(transform.position, actual.ToString(), new Color(1, .86f, .4f));

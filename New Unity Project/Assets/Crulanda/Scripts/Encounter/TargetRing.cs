@@ -65,7 +65,7 @@ namespace Crulanda.Encounter
         }
 
         /// <summary>A soft ring band (transparent at both edges) plus four inward arrowheads, radius 1, lying flat.</summary>
-        static Mesh RingMesh()
+        internal static Mesh RingMesh()
         {
             const int n = 64; float[] radii = { .76f, .88f, 1 }; float[] alphas = { 0, 1, .15f };
             var v = new System.Collections.Generic.List<Vector3>(); var col = new System.Collections.Generic.List<Color>(); var tri = new System.Collections.Generic.List<int>();

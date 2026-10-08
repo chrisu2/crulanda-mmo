@@ -40,7 +40,9 @@ namespace Crulanda.Encounter
         public bool Melee { get { return sim.classId == "class.warrior" || sim.classId == "class.paladin" || sim.classId == "class.rogue"; } }
         /// <summary>A Rogue or an Archivist (CC_DESIGN section 3): holds the moon in a fight of two or more.</summary>
         public bool Controller { get { return sim.classId == "class.rogue" || sim.classId == "class.archivist"; } }
-        float nextHold;
+        float nextHold, nextKick;
+        /// <summary>Has an interrupt (Kick, Hush, Shield Bash, Censure, Quench): stops a cast in its reach every 12 s.</summary>
+        public bool Interrupter { get { return sim.classId == "class.rogue" || sim.classId == "class.archivist" || sim.classId == "class.warrior" || sim.classId == "class.paladin" || sim.classId == "class.mage"; } }
         public bool Healer { get { return sim.classId == "class.druid" || sim.classId == "class.paladin"; } }
         public float Reach { get { return Melee ? 2.4f : 20; } }
         public float Interval { get { return Melee ? 2.0f : 2.4f; } }
@@ -307,6 +309,17 @@ namespace Crulanda.Encounter
                 }
             }
             if (Controller && Time.time >= nextHold) HoldTheMoon();
+            if (Interrupter && Time.time >= nextKick)
+                foreach (var e in session.Enemies)
+                    if (e != null && e.actor.IsAlive && e.Casting && e.FightingParty && e.CastProgress > .25f && Vector3.Distance(e.transform.position, transform.position) <= Reach + 1.5f)
+                    {
+                        if (e.Apply("silence", actor, 3) == null)
+                        {
+                            nextKick = Time.time + 12;
+                            if (sim.chatty > .5f) session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .75f ? "kicked" : "Interrupted the " + e.actor.DisplayName + ".");
+                        }
+                        break;
+                    }
             if (quarry != null)
             {
                 // A tank taunts what is on someone else (5.6): the mob turns to it for a few seconds.

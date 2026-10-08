@@ -57,6 +57,7 @@ namespace Crulanda.Encounter
         void ConfigureSocial(EncounterEnemy enemy, Crulanda.World.ZoneCamp camp, int campIndex, int level, bool beast)
         {
             enemy.CampIndex = campIndex; enemy.Social = SocialAggro.KindFor(camp); enemy.Kin = SocialAggro.Kin(camp.look); enemy.MobName = camp.mob;
+            enemy.Cast = MobCasts.For(camp.mob);   // a caster (CC step C5)
             if (!enemy.Elite) return;
             var move = EliteMoves.For(camp.mob, beast); enemy.ArmElite(move);
             enemy.actor.Stats.SetBase(StatType.MaxHealth, Mathf.RoundToInt(EncounterEnemy.MobHealth(level, false, true, beast) * move.health));

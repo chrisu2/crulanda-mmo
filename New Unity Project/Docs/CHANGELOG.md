@@ -1722,3 +1722,12 @@ A read-only review by five reviewers, each finding checked by a second who tried
 - Druid: Deep Grain, Bristle Roar (roared enemies hit you softer), Tracker's Shift, Open Veins, Rain Root, Heartwood Reading,
   Deep-root Snare, Quartzine Seed. Each says what it does now (some were written for systems not built yet).
 - The four talent files keep one talent a line.
+
+## 2026-10-08 — Crowd control you can see (C4) and casts worth interrupting (C5, first part)
+- A ring on the ground under every held (pale blue), stunned (gold), fleeing (violet) or silenced (white) mob, fading in its last
+  three seconds; the state and its seconds under the mob's nameplate (not just your target's).
+- Mob spells: the Sealed Adit's Ash menders cast Ember Mend (heals a hurt ally 35%), Ash initiates Cinder Bolt (2.5 blows), the
+  Sandthrone sapper Short Fuse (a blast on everyone within 4.5 m) and the Hollow Man Grey Drain (heals itself by what it takes). A cast
+  bar on the nameplate and the target frame ("interrupt it"); any silence, stun, hold or fear interrupts it, and a silenced mob can't
+  begin one. Mira hushes a cast past its first third every 15 s; party sims with an interrupt (Rogue, Archivist, Warrior, Paladin,
+  Mage) stop casts in their reach every 12 s and say so. Tests: CrowdControlTests (a ring, an interrupt, a mender's heal).

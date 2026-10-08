@@ -165,6 +165,7 @@ namespace Crulanda.Encounter
             if (Vector3.Distance(Victim.transform.position, Group != null ? Group.anchor : home) > session.Leash + 6) { Disengage(); return; }
             if (!inFight) Engage();   // the camp hears of it (EncounterSession.RaiseAlarm)
             if (Move != null && TickElite()) return;   // an elite drawing back for its heavy blow stands still and does not swing
+            if (Cast != null && TickCast()) return;   // a caster casting stands still and does not swing (EncounterEnemy.Casts)
             if (agent.isOnNavMesh) { agent.isStopped = false; agent.SetDestination(Victim.transform.position); }
             // Reach: 2.6 m across the ground and 1.6 m of height (a wading target sits lower than one on the bank).
             var gap = Victim.transform.position - transform.position; float across = new Vector2(gap.x, gap.z).magnitude;
@@ -206,7 +207,7 @@ namespace Crulanda.Encounter
         {
             ClearFight();
             threat.Clear(); Victim = null; slowUntil = rootUntil = 0; unreachableSince = -1; TappedBy = null;
-            UnscaleFromGroup();
+            UnscaleFromGroup(); ResetCasting();
             if (!actor.IsAlive) return;
             actor.Health.ApplyHealing(actor.Health.Pool.Max);
             if (agent.isOnNavMesh) { agent.isStopped = false; agent.SetDestination(home); }

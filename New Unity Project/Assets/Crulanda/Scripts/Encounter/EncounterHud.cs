@@ -780,6 +780,14 @@ namespace Crulanda.Encounter
                         p.e.RaidMarked == RaidMark.Skull ? Color.white : p.e.RaidMarked == RaidMark.Moon ? new Color(.6f, .8f, 1) : new Color(1, .4f, .35f));
                 Fill(new Rect(a.x - 66, a.y - 1, 132, 8), new Color(0, 0, 0, .75f));
                 Bar(new Rect(a.x - 65, a.y, 130, 6), p.e.actor.Health.Pool.Ratio, new Color(.8f, .3f, .25f), "");
+                var held = p.e.ControlLabel;   // crowd control on any mob, not just your target (CC step C4)
+                if (held != null) Outlined(new Rect(a.x - 150, a.y + 6, 300, 20), held, plateText, ControlRings.ColourFor(p.e));
+                else if (p.e.Casting && p.e.Cast != null)
+                {
+                    Fill(new Rect(a.x - 66, a.y + 9, 132, 6), new Color(0, 0, 0, .75f));
+                    Fill(new Rect(a.x - 65, a.y + 10, 130 * p.e.CastProgress, 4), new Color(.85f, .45f, 1));
+                    Outlined(new Rect(a.x - 150, a.y + 14, 300, 20), p.e.Cast.name, plateText, new Color(.9f, .7f, 1));
+                }
                 return;
             }
             // Rows are 22 px (24 for Mira's larger font): the label style clips at its padded rect, so tighter rows cut off g, p and y.

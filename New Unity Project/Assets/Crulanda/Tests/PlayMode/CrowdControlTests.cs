@@ -39,6 +39,7 @@ namespace Crulanda.Tests
             var e = Mob(); yield return null;
             Assert.IsNull(e.Apply("incap", session.Player, 20), "it takes");
             Assert.IsTrue(e.Incapacitated); Assert.IsTrue(e.Controlled); Assert.IsFalse(e.CanAnswer, "a held mob answers no call");
+            yield return null; var rings = session.GetComponent<ControlRings>(); Assert.NotNull(rings); Assert.GreaterOrEqual(rings.Showing, 1, "a ring under it");
             StringAssert.StartsWith("Held", e.ControlLabel);
             yield return null; e.Receive(1, session.Player);
             Assert.IsFalse(e.Incapacitated, "damage breaks it");
@@ -74,6 +75,25 @@ namespace Crulanda.Tests
             Assert.IsTrue(session.UseAbility(bash), "Shield Bash"); yield return null; Assert.IsTrue(e.Silenced);
             yield return new WaitForSeconds(1.6f);
             Assert.IsTrue(session.UseAbility(shout), "Shout"); yield return null; Assert.IsTrue(e.Feared);
+        }
+        [UnityTest] public IEnumerator A_caster_casts_and_a_silence_interrupts_it()
+        {
+            var e = Mob(); e.Cast = MobCasts.For("Ash initiate"); Assert.NotNull(e.Cast);
+            session.Player.GetComponent<AdventurerMotor>().Teleport(e.transform.position + Vector3.back * 6); session.Select(e);
+            string me = session.Player.EntityId.Value; float t = 0;
+            while (t < 8 && !e.Casting) { e.threat.Add(me, 1); t += Time.deltaTime; yield return null; }
+            Assert.IsTrue(e.Casting, "it begins Cinder Bolt"); Assert.AreEqual(0, e.Interrupts);
+            Assert.IsNull(e.Apply("silence", session.Player, 3)); Assert.IsFalse(e.Casting, "interrupted"); Assert.AreEqual(1, e.Interrupts);
+        }
+        [UnityTest] public IEnumerator A_mender_heals_a_hurt_ally()
+        {
+            var m = Mob(); m.Cast = MobCasts.For("Ash mender");
+            var o = session.Enemies.Where(x => x != null && x != m && x.actor.IsAlive && x.Camp && !x.Elite && !x.Game && !x.Hidden).OrderBy(x => Vector3.Distance(x.transform.position, m.transform.position)).First();
+            session.Player.GetComponent<AdventurerMotor>().Teleport(m.transform.position + Vector3.back * 6); session.Select(m);
+            string me = session.Player.EntityId.Value; m.threat.Add(me, 50); o.threat.Add(me, 50); yield return null; yield return null;
+            o.actor.Health.ApplyDamage(o.actor.Health.Pool.Max / 2); int hurt = o.actor.Health.Pool.Current; float t = 0;
+            while (t < 9 && o.actor.Health.Pool.Current <= hurt) { m.threat.Add(me, 1); o.threat.Add(me, 1); session.Player.Health.ApplyHealing(999); t += Time.deltaTime; yield return null; }
+            Assert.Greater(o.actor.Health.Pool.Current, hurt, "Ember Mend lands on the hurt one");
         }
         [UnityTest] public IEnumerator A_boss_takes_no_hold()
         {

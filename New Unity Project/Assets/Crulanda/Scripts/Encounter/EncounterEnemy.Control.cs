@@ -39,6 +39,16 @@ namespace Crulanda.Encounter
             }
         }
         bool IsBoss { get { return Elite && Move != null && Move.boss; } }
+        /// <summary>Seconds left on whatever control shows (0 when free).</summary>
+        public float ControlSecondsLeft
+        {
+            get
+            {
+                float now = Time.time;
+                if (Incapacitated) return incapUntil - now; if (Stunned) return stunUntil - now; if (Feared) return fearUntil - now; if (Silenced) return silenceUntil - now;
+                return 0;
+            }
+        }
         /// <summary>
         /// Puts a CC on it: kind "incap", "stun", "fear" or "silence", from <paramref name="by"/>, for about <paramref name="seconds"/>.
         /// Null when it took (the seconds it got are in the float text), else why not ("Immune", "Immune (too soon)").
@@ -61,7 +71,7 @@ namespace Crulanda.Encounter
                 case "silence": silenceUntil = Mathf.Max(silenceUntil, until); break;
                 default: return "No such hold";
             }
-            CancelBlow(); wasHeld = Controlled;
+            CancelBlow(); CancelCast(true); wasHeld = Controlled;
             session.FloatText(transform.position, kind == "incap" ? "Held" : kind == "stun" ? "Stunned" : kind == "fear" ? "Fleeing" : "Silenced", new Color(.75f, .85f, 1));
             return null;
         }

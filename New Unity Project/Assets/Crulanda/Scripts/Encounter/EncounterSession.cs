@@ -1366,6 +1366,7 @@ namespace Crulanda.Encounter
             controller.minMoveDistance = 0;
             var motor = Player.gameObject.AddComponent<AdventurerMotor>(); motor.session = this; motor.view = View;
             if (GetComponent<TargetRing>() == null) gameObject.AddComponent<TargetRing>().session = this;
+            if (GetComponent<ControlRings>() == null) gameObject.AddComponent<ControlRings>().session = this;   // CC step C4
             Player.gameObject.SetActive(true);
             playerStats = Player.gameObject.AddComponent<DerivedStatsController>();
             Inventory.Ensure(Progress); if (Items != null) Inventory.EnsurePouches(Progress, Items);

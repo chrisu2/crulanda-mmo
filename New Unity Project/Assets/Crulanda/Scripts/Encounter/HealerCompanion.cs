@@ -32,6 +32,19 @@ namespace Crulanda.Encounter
             actor.Stats.SetBase(Crulanda.Core.StatType.MaxHealth, baseHealth + HealthPerLevel * (Mathf.Max(1, playerLevel) - 1));
         }
         void Awake() { agent = GetComponent<NavMeshAgent>(); }
+        float nextHush;
+        public const float HushCooldown = 15, HushSeconds = 4;
+        /// <summary>Hush (CC_DESIGN section 2, step C5): a mob casting at your party, past the first third of its cast, within 25 m, is silenced 4 s; every 15 s.</summary>
+        void Hush()
+        {
+            foreach (var e in session.Enemies)
+            {
+                if (e == null || !e.actor.IsAlive || !e.Casting || !e.FightingParty || e.CastProgress < .35f || Vector3.Distance(e.transform.position, transform.position) > 25) continue;
+                string what = e.Cast != null ? e.Cast.name : "cast";
+                if (e.Apply("silence", actor, HushSeconds) == null) { nextHush = Time.time + HushCooldown; session.Message("Mira: Hush! " + e.actor.DisplayName + "'s " + what + " is stopped."); }
+                return;
+            }
+        }
         bool Spend(int cost)
         {
             if (actor.Resource.Pool.Current < cost) return false;
@@ -48,6 +61,7 @@ namespace Crulanda.Encounter
             }
             if (!session.Progress.recruited) return;
             if (Time.time >= nextRegen) { nextRegen = Time.time + 1; actor.Resource.Pool.Change(session.InCombat ? 1 : 8); }
+            if (Time.time >= nextHush) Hush();
             var heal = Hasted(session.content.healingAbility);
             if (abilities.IsCasting)
             {

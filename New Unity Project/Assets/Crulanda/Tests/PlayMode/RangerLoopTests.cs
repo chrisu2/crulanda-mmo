@@ -106,6 +106,30 @@ namespace Crulanda.Tests
             StringAssert.Contains("Wolf", session.Kit.StatusLine);
         }
 
+        /// <summary>Playtest note 90: called, the wolf joins the Ranger's fight unasked (no Sic, no Pack Sense).</summary>
+        [UnityTest] public IEnumerator The_wolf_joins_the_fight_unasked()
+        {
+            Level10(); var e = Foe(); Near(e, 8);
+            Assert.IsTrue(session.UseAbility(CallCompanion), "Call Companion"); yield return new WaitForSeconds(1.6f);
+            Assert.IsNull(session.Pet.Quarry, "at heel before the fight");
+            int before = e.actor.Health.Pool.Current;
+            session.Select(e); session.BeginAutoAttack(); yield return null; yield return null;
+            Assert.AreSame(e, session.Pet.Quarry, "goes for what the Ranger fights");
+            yield return new WaitForSeconds(4f);
+            Assert.Less(e.actor.Health.Pool.Current, before, "and bites it");
+        }
+        /// <summary>Playtest note 93: the companion bar's orders. Stay holds it out of your fight; Attack sends it; Assist brings it back to heel.</summary>
+        [UnityTest] public IEnumerator The_wolf_stays_attacks_and_assists_on_order()
+        {
+            Level10(); var e = Foe(); Near(e, 8);
+            Assert.IsTrue(session.UseAbility(CallCompanion)); yield return new WaitForSeconds(1.6f);
+            session.PetOrder(RangerPet.Order.Stay); Assert.AreEqual(RangerPet.Order.Stay, session.Pet.Mode);
+            session.Select(e); session.BeginAutoAttack(); yield return null; yield return null;
+            Assert.IsNull(session.Pet.Quarry, "staying, it keeps out of it");
+            Assert.IsTrue(session.PetAttack(), "Attack"); Assert.AreSame(e, session.Pet.Quarry);
+            session.PetOrder(RangerPet.Order.Assist); Assert.AreEqual(RangerPet.Order.Assist, session.Pet.Mode);
+            session.Select(null); Assert.IsFalse(session.PetAttack(), "no target, no attack");
+        }
         [UnityTest] public IEnumerator Disengage_leaps_away_from_the_target()
         {
             Level10(); var e = Foe(); Near(e, 3);

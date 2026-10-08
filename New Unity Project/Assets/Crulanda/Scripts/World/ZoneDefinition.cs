@@ -11,6 +11,8 @@ namespace Crulanda.World
     [Serializable] public sealed class ZoneDefinition
     {
         public string id, displayName, subtitle, canonStatus, canonNote;
+        /// <summary>A dungeon (the Sealed Adit): a zone of caves you go into from another zone; the sims never wander into it on their own.</summary>
+        public bool dungeon;
         public float size = 140;            // square side length
         public float flatRadius = 50;       // village ground stays flat inside this radius
         public float hillHeight = 3;        // rolling ground outside it
@@ -132,6 +134,9 @@ namespace Crulanda.World
         /// <summary>On an elite's camp: the camps whose mobs are its guards and always fight beside it, by name, comma-separated
         /// ("none" for no guards). Empty = every non-elite camp whose edge is within 8 m of this camp's centre.</summary>
         public string guards;
+        /// <summary>In a cave (the Sealed Adit): which cave, how far in and how far to the right of its middle the camp stands. The
+        /// centre is written from these by tools/wip/dungeon/adit_layout.py; the run a sim leads goes cave by cave in this order.</summary>
+        public string cave; public float along, aside;
     }
     /// <summary>Walk into the radius and press E to travel; you arrive at <see cref="arrive"/> in the other zone.</summary>
     [Serializable] public sealed class ZoneExit { public string to, name; public Vector2 at, arrive; public float radius = 5; }
@@ -232,6 +237,11 @@ namespace Crulanda.World
         /// <summary>Optional: the kind of node it is to gather (a herb prop: "node.yarrow"), from the trades' content. It is then
         /// worked with the trade's skill, and still gives item while a quest wants it.</summary>
         public string node;
+        /// <summary>A cavern's own passage (rows of five: x, z, half-width, height, floor drop below the mouth), instead of its variant's.</summary>
+        public float[] plan;
+        /// <summary>A cavern opening out of another (by name, listed before it): its mouth stands on that cave's floor, and each cave's
+        /// walls are open where the other runs through them (the Sealed Adit's branches off the Gallery).</summary>
+        public string within;
     }
     /// <summary>
     /// A thing to gather that is not a prop: an ore seam, a windfall, a herb. node: its kind ("node.copper") in the trades'

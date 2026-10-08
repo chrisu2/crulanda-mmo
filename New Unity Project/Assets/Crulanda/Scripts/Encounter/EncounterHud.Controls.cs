@@ -12,7 +12,7 @@ namespace Crulanda.Encounter
         void DrawControls()
         {
             var rows = KeyBindings.All; float rowH = 30;
-            var r = new Rect(430, 120, 580, 150 + rowH * rows.Length);
+            var r = new Rect(430, 120, 580, 176 + rowH * rows.Length);
             Frame(r);
             GUI.Label(new Rect(r.x + 28, r.y + 16, 400, 34), "CONTROLS", heading);
             if (GUI.Button(new Rect(r.x + 28, r.y + 58, 160, 30), "WASD (E interacts)", slim)) { KeyBindings.Preset(false); rebinding = -1; }
@@ -26,6 +26,7 @@ namespace Crulanda.Encounter
                 y += rowH;
             }
             Shadow(new Rect(r.x + 28, y + 6, 520, 20), rebinding >= 0 ? "Press the new key (Esc cancels). A key already in use swaps over." : "Click a key to change it. Saved at once.", tiny, new Color(.85f, .85f, .8f));
+            Shadow(new Rect(r.x + 28, y + 30, 520, 20), "Always: right-drag to look, wheel to zoom, Enter to chat, Esc for this menu.", tiny, new Color(.85f, .85f, .8f));   // what the foot of the screen used to list
             if (GUI.Button(new Rect(r.xMax - 128, r.y + 16, 100, 30), "Done", slim)) { controlsOpen = false; rebinding = -1; }
 #if ENABLE_INPUT_SYSTEM
             if (rebinding >= 0 && Event.current.type == EventType.Repaint)

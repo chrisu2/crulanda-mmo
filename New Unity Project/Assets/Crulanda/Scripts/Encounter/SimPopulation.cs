@@ -66,6 +66,8 @@ namespace Crulanda.Encounter
             if (Session == null || Session.Paused || Time.time < nextCheck) return;
             nextCheck = Time.time + 1; Refresh();
         }
+        /// <summary>A dungeon zone (the Sealed Adit): sims go in only with you, in your party.</summary>
+        public static bool Dungeon(Crulanda.World.ZoneBuilder zb, string zoneId) { return zb != null && zb.FindZone(zoneId)?.dungeon == true; }
         /// <summary>How well a zone's levels suit a sim: 0 inside its band, negative by how far out (SimRoster.Homes).</summary>
         public static int Suits(string zoneId, int level)
         {
@@ -91,7 +93,7 @@ namespace Crulanda.Encounter
             var zone = Session.Zone != null ? Session.Zone.FindZone(s.zone) : null; if (zone == null || zone.exits == null || zone.exits.Length == 0) return;
             if (Suits(s.zone, s.level) == 0 && (s.variant + Mathf.FloorToInt(hour)) % 3 != 0) return;   // content where it is, mostly
             ZoneExit best = null; int bestScore = int.MinValue;
-            foreach (var e in zone.exits) { if (e == null) continue; int sc = Suits(e.to, s.level) + (e.to == s.homeZone ? 2 : 0); if (sc > bestScore) { best = e; bestScore = sc; } }
+            foreach (var e in zone.exits) { if (e == null || Dungeon(Session.Zone, e.to)) continue; int sc = Suits(e.to, s.level) + (e.to == s.homeZone ? 2 : 0); if (sc > bestScore) { best = e; bestScore = sc; } }
             if (best == null || bestScore < Suits(s.zone, s.level)) return;
             s.zone = best.to; s.x = best.arrive.x; s.z = best.arrive.y;
         }

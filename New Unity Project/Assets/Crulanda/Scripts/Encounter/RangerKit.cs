@@ -102,7 +102,7 @@ namespace Crulanda.Encounter
         bool Start(AbilityDefinition a, Action effect) { return s.StartAbility(a, () => { if (s.Player.IsAlive) effect(); }) == AbilityStartResult.Started; }
         bool Need(bool ok, string message) { if (!ok) s.Message(message); return ok; }
         void Hit(EncounterEnemy t, int damage) { t.Receive(damage, s.Player); }
-        void AfterShot(EncounterEnemy t) { MendWolf(); if (R("bb-pack-sense") > 0 && Wolf != null && Wolf.actor.IsAlive) Wolf.Hunt(t, 1); }
+        void AfterShot(EncounterEnemy t) { MendWolf(); if (R("bb-pack-sense") > 0 && Wolf != null && Wolf.actor.IsAlive && Wolf.Quarry != t) Wolf.Hunt(t, 1.5f); }   // it turns at once to what you shoot, and bites the harder for it
 
         // ---------- Marksman ----------
         bool QuickShot(AbilityDefinition a)

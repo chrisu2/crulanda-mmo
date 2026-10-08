@@ -107,7 +107,7 @@ namespace Crulanda.Encounter
             ZoneExit best = null; int bestScore = int.MinValue;
             foreach (var e in zb.Zone.exits)
             {
-                if (e == null || string.IsNullOrEmpty(e.to)) continue;
+                if (e == null || string.IsNullOrEmpty(e.to) || SimPopulation.Dungeon(zb, e.to)) continue;   // never into a dungeon on its own
                 int score = SimPopulation.Suits(e.to, sim.level) + (e.to == sim.homeZone ? 2 : 0) + Mathf.Abs((sim.variant + e.to.Length) % 3);
                 if (score > bestScore) { best = e; bestScore = score; }
             }

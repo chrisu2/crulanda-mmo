@@ -16,6 +16,7 @@ records where each of its phases stands and the order of the work. Update it eve
 | 6 | Group gameplay | You and Mira only; full parties come with 5.6 |
 | 7 | First dungeon | Done: Crowsfoot Hollow (Oakhaven) and the Root-Mother's Deep (Verdant Shore) |
 | 8 | Vertical slice | In progress alongside: world art, polish and the playtest-note rounds |
+| 9 | **The wider world** (Chris, 2026-10-07: "more zones, more classes, more races based on the canon of the novels, after phase 8") | Planned (see below) |
 
 ## Phase 5 plan (Chris chose 2026-10-05: Phase 5 now; classes Paladin, Ranger, Mage; faster tests first)
 
@@ -32,6 +33,26 @@ records where each of its phases stands and the order of the work. Update it eve
 | 5.7 Sims complete (Chris, 2026-10-07: "I want the sims complete first", before the enclave and Khaven) | 1. the party travels with you and is kept (DONE round 27); 2. sims invite you (DONE round 27); 3. dungeon runs led by a sim (DONE round 27); 4. trading with sims (DONE round 27); 5. guilds (chat, tags, joining) (DONE round 27); 6. a bigger population (about 40, more at the high zones) (DONE round 27). | 4-6 rounds |
 
 About 15-17 rounds. No external language model: local state machines and utility AI only (brief section 13).
+
+## Phase 9 plan: the wider world (after Phase 8; PROVISIONAL until each item is checked against the books)
+Everything here is drawn from the lore folder (D:\code\crulanda: world_bible.md, the three books) and labelled as the game labels lore:
+CANON where the books name it, CANON-EXPANDED where the game fills in round a canon place, GAME-ONLY for the rest.
+
+| Step | What gets done | Canon source |
+|---|---|---|
+| 9.1 Zones | New zones on the world map, each with its band, quests, camps, trades and a dungeon or landmark: the Lowtowns of Argentis (industry and poverty under the Crown), the Crown itself (white stone and gold), Port Caelum and the Glittering Coast (glass ships, the Gilded Bay), the Iron Citadel (the Iron Pact's fortress-monastery in a dormant volcano), the Archive of Silence (the Silent Pilgrims' library-temple), Hallow's Creek (the first town the Wasting took), the Warrens (the goblins' tunnels under the High City), the Tide-Watched Shores (blue water, no ash). Order and bands to be chosen with Chris. | world_bible.md Geography; book1 (the Lowtowns, the Deep Veins, the Warrens); book2 (the Wasting) |
+| 9.2 Classes | New class kits with talents, AI rotations, looks and sim support, modelled on the books' people: the Tinker (Klyther Forgeheart: drones and scorpions, an engineer), the Rogue (Valen: Thief's Grace, shards, vibration-locking), the Knight (Talira Frostveil, Kaelith Dawnstrike: swordmaster, Stormlight), the Archivist (the Silent Pilgrims: the Original Song, echo-jars), the Salt-Mender (salt-magic of the West). Names provisional. | world_bible.md Characters and Factions |
+| 9.3 Races | Playable and sim folk beyond the human regions: the goblins (the Weavers of the Warrens: vibration-locking, static-charting), the Forgeborn (Tynara Embercoil), the Veridian Keepers (beings of wood and moss; a Keeper playable only if the books allow), and the human peoples by region (Lowtowners, Coast folk, the North's survivors). Each with models, looks, voices in chat and a home zone. | world_bible.md Factions; the character sheets in chars/ |
+| 9.4 The sims in the wider world | The roster grows with the zones (more bands, more homes); guilds and trades reach the new places. | ROADMAP 5.7 |
+
+Each step is its own set of rounds; Chris picks the first zone, class and race when Phase 8 closes.
+
+**Level cap (Chris, 2026-10-07): 30 in the end, 15 now; "difficult and slow leveling, grind it out".** Round 29 (after round 28):
+the cap goes from 13 to 15 and the zones' bands stretch to Oakhaven 1-5, Khaven 5-9, Peaks 9-12, Ash Rim 12-15, Verdant Shore 13-15
+(two zones at the cap, "so endgame has more to do"; the Shore "all epic mobs, group required": every mob there elite-strength, a zone flag; the Rim "more solo friendly"); every camp, quest and loot list moves with its zone, Crowsfoot Hollow to about
+4-6 and the Sealed Adit to 10-12 (DUNGEON_DESIGN.md); the XP curve steepens (about twice the XP a level, growing faster at the top);
+the sim roster's home bands, gear tiers, the wardrobe captures and the tests follow. **Breadcrumbs (Chris, 2026-10-07): each zone's last main quest already turns in to someone in the next zone (QUEST_DESIGN.md: Oakhaven to Khaven to the Peaks to the Rim to the Shore); round 29 sets each of those at the top of its new band, checks the chain reaches it, and makes sure the next zone's first quest offers itself on arrival, so the trail leads through the bands in order.** Levels 16-30 come with the Phase 9 zones, each
+new zone carrying its own band, so the cap rises as the world does.
 
 ## Queued around Phase 5
 - The Ash-Walker enclave's interior (playtest note 40).

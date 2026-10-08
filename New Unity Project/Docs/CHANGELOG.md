@@ -1613,3 +1613,23 @@ A read-only review by five reviewers, each finding checked by a second who tried
   (SimRoster.Grow), and its sims get their guilds once (WorldSave.guildedUpTo).
 - Tests: SimPartyTests.The_party_is_kept_and_a_sim_can_invite_you, A_sim_leads_a_dungeon_run_camp_by_camp, Trading_with_a_sim_moves_goods_and_coin, Joining_a_guild_and_talking_in_it;
   SimRosterTests.Forty_sims_the_same_for_a_seed_with_unique_names_and_every_class, An_old_world_grows_to_forty_and_each_sim_gets_its_guild_once.
+
+## 2026-10-07 — Round 28: playtest notes 87 and 89-93 (key hints, chat focus, the wolf and its bar, harder groups, fuller land)
+- **87, the key hints:** the line of keys along the foot of the screen is gone. Esc > Controls lists them all, with a line for the
+  fixed ones (right-drag to look, wheel to zoom, Enter to chat, Esc for the menu).
+- **89, chat focus:** Enter opens the chat box with the keys in it; it keeps taking focus until it has them, the cursor at the end.
+- **90, the wolf does nothing:** called, the Ranger's wolf now joins whatever the Ranger fights, and whatever is after the party,
+  unasked. Pack Sense turns it at once to what you shoot, its first bite half again as hard.
+- **93, the companion bar:** while the wolf is out, a bar left of the action bar shows its health and three orders: Attack (your
+  target), Assist (at heel, joining your fights; the default) and Stay (holds its ground, biting only what it is sent at or what bites it).
+- **91, groups too easy:** each sim in your party adds a full share of a mob's health (was 60%) and 45% to its blows (was 15%),
+  and a call carries half as far again against a party, so a group's pulls are bigger. Alone with Mira, nothing changes.
+- **92, deserted land:** every outdoor camp of two or more has one or two outlying groups of its own kind 22-40 m out on open
+  ground (never near a village, a road, water, an exit or another camp): the land between camps has mobs on it. Their own stream,
+  so the camps stand where they did.
+- Tests: RangerLoopTests.The_wolf_joins_the_fight_unasked, The_wolf_stays_attacks_and_assists_on_order.
+- **Note 88 (the helms), in hand:** Chris brought Chosan's Modular Hero pack (Asset Store; Modular Hero.unitypackage). Its models
+  and palette material are in Resources/Props/ModularHero (the demo scene, prefabs, poses and the editor-only Customiser script left
+  out: the script used UnityEditor at runtime and would have broken the player build). Twenty-five helmets (Headgear.B/DS/G/I/M.011-016)
+  are model-helm variants (GearLooks.ModelHelms; ActorVisual ModelHelm loads a node of the armour FBX by name) and in the wardrobe
+  line-up (06-helms) for Chris to judge before any item wears one. The pack's README names no licence.

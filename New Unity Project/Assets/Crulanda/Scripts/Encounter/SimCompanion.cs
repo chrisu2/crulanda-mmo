@@ -155,26 +155,50 @@ namespace Crulanda.Encounter
         {
             why = null; route.Clear(); Dungeon = null;
             if (session.Zone == null) { why = "There is nowhere to go."; return null; }
+            // The caves with their own mouths; a branch's camps come where the passage meets the branch (the Sealed Adit: the
+            // Workings, then each way off the Gallery in the order you pass it, then the stair and the Rail Hall).
             foreach (var h in Crulanda.World.Hollow.All)
             {
+                if (h.Parent != null) continue;
                 var camps = new System.Collections.Generic.List<(float along, Vector3 at, string name, bool boss, int lo)>();
-                foreach (var cp in session.Zone.Zone.camps)
-                {
-                    if (cp == null) continue;
-                    if (h.FloorAt(cp.center, out float y)) { int i = h.Nearest(cp.center, out _); camps.Add((h.Along[i], new Vector3(cp.center.x, y, cp.center.y), cp.name, cp.elite, cp.levelMin)); continue; }
-                    // A camp guarding the mouth from outside (the Hollow lookouts) is the run's first: before the passage, by its distance.
-                    if (h.Centre.Count == 0) continue; var mouth = new Vector2(h.Centre[0].x, h.Centre[0].z); float out_ = Vector2.Distance(cp.center, mouth);
-                    if (out_ < 14) camps.Add((-out_, session.Zone.Ground(cp.center), cp.name, cp.elite, cp.levelMin));
-                }
+                Gather(h, camps, true);
                 if (camps.Count == 0) continue;
-                camps.Sort((a, b) => a.along.CompareTo(b.along));
                 int first = camps[0].lo; if (session.Progress.Level < first - 1) { why = h.Name + " is too much for us yet (level " + first + " at the door)."; return null; }
                 foreach (var cp in camps) route.Add((cp.at, cp.name, cp.boss));
-                Dungeon = h.Name; Leading = route[0].at; LeadingName = route[0].name;
+                Dungeon = session.Zone.Zone.dungeon ? session.Zone.Zone.displayName : h.Name; Leading = route[0].at; LeadingName = route[0].name;
                 session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? "ok, " + Dungeon + " run. " + route.Count + " camps to the bottom, stay close" : "Follow me into " + Dungeon + ". " + route.Count + " camps between us and the end. Stay close.");
                 return Dungeon;
             }
             why = "There is no dungeon in these parts."; return null;
+        }
+        /// <summary>A cave's camps in the order the way through meets them, each branch's run spliced in where it opens.</summary>
+        void Gather(Crulanda.World.Hollow h, System.Collections.Generic.List<(float along, Vector3 at, string name, bool boss, int lo)> into, bool root)
+        {
+            var mine = new System.Collections.Generic.List<(float along, Vector3 at, string name, bool boss, int lo)>();
+            foreach (var cp in session.Zone.Zone.camps)
+            {
+                if (cp == null) continue;
+                if (!string.IsNullOrEmpty(cp.cave))
+                {
+                    if (cp.cave != h.Name) continue;
+                    float y = 0; if (!h.FloorSmooth(cp.center, out y)) h.FloorAt(cp.center, out y);
+                    mine.Add((cp.along, new Vector3(cp.center.x, y, cp.center.y), cp.name, cp.elite, cp.levelMin)); continue;
+                }
+                bool inOther = false; foreach (var o in Crulanda.World.Hollow.All) if (o != h && o.FloorAt(cp.center, out _)) { inOther = true; break; }
+                if (!inOther && h.FloorAt(cp.center, out float fy)) { int i = h.Nearest(cp.center, out _); mine.Add((h.Along[i], new Vector3(cp.center.x, fy, cp.center.y), cp.name, cp.elite, cp.levelMin)); continue; }
+                // A camp guarding the mouth from outside (the Hollow lookouts) is the run's first: before the passage, by its distance.
+                if (!root || h.Centre.Count == 0) continue; var mouth = new Vector2(h.Centre[0].x, h.Centre[0].z); float out_ = Vector2.Distance(cp.center, mouth);
+                if (out_ < 14) mine.Add((-out_, session.Zone.Ground(cp.center), cp.name, cp.elite, cp.levelMin));
+            }
+            mine.Sort((a, b) => a.along.CompareTo(b.along));
+            var kids = Crulanda.World.Hollow.All.FindAll(o => o.Parent == h); kids.Sort((a, b) => a.ParentAlong.CompareTo(b.ParentAlong));
+            int k = 0;
+            foreach (var cp in mine)
+            {
+                while (k < kids.Count && kids[k].ParentAlong < cp.along) Gather(kids[k++], into, false);
+                into.Add(cp);
+            }
+            while (k < kids.Count) Gather(kids[k++], into, false);
         }
         /// <summary>No mob of the camp left near where it led to: the run is done.</summary>
         bool CampCleared()

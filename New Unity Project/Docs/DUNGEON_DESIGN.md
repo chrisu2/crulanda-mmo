@@ -1,4 +1,4 @@
-# The Sealed Adit: dungeon design (draft 1, 2026-10-07)
+# The Sealed Adit: dungeon design (draft 1, 2026-10-07; levels 10-12 since the cap-15 rescale, see ROADMAP)
 
 Chris: "7-9 dungeon creation that rivals wow dungeons like these. research these completely before dungeon design. leveling
 takes longer in land of crulanda", then "not 3..one big dungeon" and "we will design others later". So this is **one** big
@@ -63,13 +63,13 @@ the next dungeon.
 
 ## 3. Level and length
 
-- Crulanda levels slower (cap 13). The classic band of about 15-24 out of 60 maps to **7-9** here:
+- Crulanda levels slower (cap 15 now, 30 in the end; the Peaks are 9-12). The classic band of about 15-24 out of 60 maps to **10-12** here (the numbers below are the pre-rescale 7-9 and move up by three with round 29):
   - trash 7-8;
   - branch bosses 8;
   - the hall's bosses 9;
   - the last boss 9 elite, `harder`;
   - the hidden boss 10.
-- **Length:** a full clear is 60-90 minutes with a party of sims. It is built so it **does not have to be done in one go**:
+- **Length:** a full clear is 55-75 minutes with a party of sims (Chris, 2026-10-07). It is built so it **does not have to be done in one go**:
   - **Wing 1 plus one branch is a 25-minute run** (the short-dungeon lesson);
   - a **spirit stone at the Gallery** (the respawn point once reached);
   - **the rail as the way out** at the end (fixes the long walk back).

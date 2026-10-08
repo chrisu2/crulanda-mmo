@@ -35,10 +35,10 @@ namespace Crulanda.World
         /// the origin, facing -z, turned by <paramref name="yaw"/>): x, z, half-width and height smoothed (Catmull-Rom), the floor's
         /// drop below the mouth's ground straight between rows (the steepest row sets the steepest floor), rings about every 0.7 m. The land's height comes from <paramref name="ground"/>.
         /// </summary>
-        public Hollow(string name, Vector2 at, float yaw, IList<float[]> plan, Func<float, float, float> ground)
+        public Hollow(string name, Vector2 at, float yaw, IList<float[]> plan, Func<float, float, float> ground, float? mouthY = null)
         {
             Name = name;
-            var turn = Quaternion.Euler(0, yaw, 0); float along = 0, mouth = ground(at.x, at.y); Vector3 last = Vector3.zero; bool first = true;
+            var turn = Quaternion.Euler(0, yaw, 0); float along = 0, mouth = mouthY ?? ground(at.x, at.y); Vector3 last = Vector3.zero; bool first = true;
             Vector4 P(int i) { var r = plan[Mathf.Clamp(i, 0, plan.Count - 1)]; return new Vector4(r[0], r[1], r[2], r[3]); }
             float D(int i) { var r = plan[Mathf.Clamp(i, 0, plan.Count - 1)]; return r.Length > 4 ? r[4] : 0; }
             for (int seg = 0; seg + 1 < plan.Count; seg++)
@@ -177,6 +177,27 @@ namespace Crulanda.World
             fwd.Normalize(); return c + new Vector3(fwd.z, 0, -fwd.x) * aside;
         }
         public float Length { get { return Along.Count > 0 ? Along[Along.Count - 1] : 0; } }
+        /// <summary>The cave this one opens out of (null for one with its own mouth on the land), and how far into it.</summary>
+        public Hollow Parent; public float ParentAlong;
+        /// <summary>
+        /// Whether a point is in the open air of the passage, well inside its walls and under its roof (<paramref name="shrink"/> of the
+        /// way to them): another cave's wall standing there is cut away (ZoneBuilder.Cavern), so one passage opens into the next. Not
+        /// in front of the mouth or past the end.
+        /// </summary>
+        public bool Open(Vector3 p, float shrink = .86f)
+        {
+            var q = new Vector2(p.x, p.z); if (Centre.Count < 2 || !box.Contains(q)) return false;
+            int i = Nearest(q, out _); int j = i + 1 < Centre.Count ? i + 1 : i - 1;
+            var fwd = new Vector2(Centre[j].x - Centre[i].x, Centre[j].z - Centre[i].z); if (j < i) fwd = -fwd;
+            if (fwd.sqrMagnitude < 1e-8f) return false; fwd.Normalize();
+            var d = q - new Vector2(Centre[i].x, Centre[i].z);
+            if (Mathf.Abs(Vector2.Dot(d, fwd)) > .75f) return false;
+            float u = Mathf.Abs(d.x * fwd.y - d.y * fwd.x) / Half[i]; if (u >= shrink) return false;
+            float up = p.y - Centre[i].y; if (up < -.6f) return false;
+            return up < Height[i] * Mathf.Pow(Mathf.Max(0, 1 - Mathf.Pow(u, 8f / 3)), .425f) * shrink;
+        }
+        /// <summary>Whether a point is open air in any cave but <paramref name="not"/>.</summary>
+        public static bool OpenInOther(Hollow not, Vector3 p, float shrink = .86f) { foreach (var h in All) if (h != not && h.Open(p, shrink)) return true; return false; }
         /// <summary>The passage's deepest floor.</summary>
         public float Bottom { get { return low + 2; } }
         /// <summary>How low anything may stand in the zone: 5 m under the land's floor (y 0), or under the deepest cave floor.</summary>

@@ -530,3 +530,18 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
   certain areas; too cold, lose HP / can't regain HP if cold. Just some thoughts."** LOGGED on the roadmap (Seasons).
 - **86. "Flowers growing in chicken feed bowl."** (screenshot: grass and flowers up through the coop's water pan) DONE (round 26): the
   grass and flowers keep off a coop's yard, a hitching rail's trough and a well's step.
+- **87. "Should be removed and put in an esc menu or something."** (screenshot: the key hints along the foot of the screen) DONE
+  (round 28): the strip is gone; every key is in Esc > Controls, with a line for the fixed ones (right-drag look, wheel zoom, Enter
+  chat, Esc menu).
+- **88. "Helms are terrible."** (screenshots: a puffy white cap floating over a sim's head, a pale stiff hood; a yellow square on a
+  chest) OPEN: the head pieces are code-built shapes, untextured, the metal chalk-white. Asked Chris: a helmet art kit, or rework.
+- **89. "When I hit enter and it opens the chat I should be able to type without having to click on chat box."** DONE (round 28):
+  the box keeps taking focus until it has the keys, the cursor at the end.
+- **90. "I call a companion but he does nothing."** (screenshot: the Ranger's grey wolf standing idle beside her in the grass) DONE (round 28): it joins
+  whatever the Ranger fights unasked.
+- **91. "Mobs still way too easy in group. Can level without healer or CC."** DONE (round 28): a sim adds a full share of
+  a mob's health and 45% to its blows (were 60% and 15%), and calls carry half as far again against a party.
+- **92. "Still need more camps, pretty deserted to level up."** DONE (round 28): one or two outlying groups round
+  every outdoor camp, on open ground away from villages, roads and water.
+- **93. "Should create a companion UI element that I can have him attack, assist, stay."** DONE (round 28): the companion bar left of the
+  action bar (Attack, Assist, Stay).

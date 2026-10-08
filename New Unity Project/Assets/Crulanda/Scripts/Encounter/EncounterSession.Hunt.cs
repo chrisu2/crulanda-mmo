@@ -85,6 +85,6 @@ namespace Crulanda.Encounter
         /// <summary>A game animal's body in reach that E would skin (as for a camp body: something on it that fits).</summary>
         EncounterEnemy SkinnableBody { get { return Game.Find(e => e != null && CanLoot(e) && Distance(e) < 3.6f && CanTakeAny(e)); } }
         /// <summary>Whether the target you are swinging at is an enemy (a game animal you are hunting is not a fight).</summary>
-        bool FightingTarget { get { return AutoAttack && Target != null && Target.actor.IsAlive && !Target.Game; } }
+        public bool FightingTarget { get { return AutoAttack && Target != null && Target.actor.IsAlive && !Target.Game; } }
     }
 }

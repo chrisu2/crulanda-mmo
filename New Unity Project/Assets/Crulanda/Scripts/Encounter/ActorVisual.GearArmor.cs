@@ -465,8 +465,13 @@ namespace Crulanda.Encounter
         /// </summary>
         void ModelHelm(Fit f)
         {
-            var src = Resources.Load<GameObject>("Weapons/" + f.v); if (src == null) return;
+            // A piece of a modular kit (Chosan's Modular Hero, note 88): one node of the pack's armour FBX, by name.
+            GameObject src; Transform node = null;
+            if (f.v.StartsWith("Headgear.")) { var kit = Resources.Load<GameObject>("Props/ModularHero/Armor Parts"); node = kit != null ? FindDeep(kit.transform, f.v) : null; src = node != null ? node.gameObject : null; }
+            else src = Resources.Load<GameObject>("Weapons/" + f.v);
+            if (src == null) return;
             var root = gearRoots[(int)EquipSlot.Head]; var go = Instantiate(src, root, false); go.name = "Model " + f.v;
+            if (node != null) { go.transform.localPosition = Vector3.zero; go.transform.localRotation = Quaternion.identity; go.transform.localScale = Vector3.one; }
             foreach (var c in go.GetComponentsInChildren<Component>(true))
                 if (!(c is Transform) && !(c is MeshFilter) && !(c is MeshRenderer)) { if (Application.isPlaying) Destroy(c); else DestroyImmediate(c); }
             foreach (var r in go.GetComponentsInChildren<MeshRenderer>(true)) { r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On; r.receiveShadows = true; }
@@ -478,6 +483,12 @@ namespace Crulanda.Encounter
             go.transform.localScale = Vector3.one * scale;
             go.transform.localPosition = new Vector3(-b.center.x * scale, .78f - b.min.y * scale, -b.center.z * scale);   // its bottom edge at the brow line; SeatHead sets it right
             go.transform.localRotation = Quaternion.identity;
+        }
+        static Transform FindDeep(Transform t, string name)
+        {
+            if (t.name == name) return t;
+            for (int i = 0; i < t.childCount; i++) { var f = FindDeep(t.GetChild(i), name); if (f != null) return f; }
+            return null;
         }
         /// <summary>
         /// A skull-cap over the hair, a band round its brim. The brim sits on the brow line, clear of the eyes and brows, and the

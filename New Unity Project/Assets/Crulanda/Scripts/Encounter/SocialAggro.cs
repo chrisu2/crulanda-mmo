@@ -22,6 +22,8 @@ namespace Crulanda.Encounter
     {
         /// <summary>Metres from the mob that joined the fight: a pack's reach, a call's earshot, and both when a sneaking player was merely noticed.</summary>
         public const float PackReach = 9, CallReach = 12, SneakReach = 3.5f;
+        /// <summary>How much further a call carries against a party (playtest note 91).</summary>
+        public const float PartyReach = 1.5f;
         /// <summary>An elite's guards come from this far, however it was pulled; a non-elite camp guards an elite when its edge is within GuardPairing of the elite's centre.</summary>
         public const float GuardReach = 16, GuardPairing = 8;
         /// <summary>A guard's or a kinsman's alarm brings a camp's elite only from this near: beside it. Further off the elite stays where it is, so its guards can be cleared first.</summary>

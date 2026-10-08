@@ -56,6 +56,18 @@ namespace Crulanda.Encounter
         public MageKit Mage { get { return Kit as MageKit; } }
         /// <summary>The Ranger's wolf (RangerPet), while one is called.</summary>
         public RangerPet Pet { get; private set; }
+        /// <summary>The companion bar's orders (playtest note 93): attack your target, assist (follow and join your fights), stay.</summary>
+        public bool PetAttack()
+        {
+            if (Pet == null || !Pet.actor.IsAlive) return false;
+            if (Target == null || !Target.actor.IsAlive || Target.Game) { Message("Your wolf needs a target: select one first."); return false; }
+            Pet.Hunt(Target, 1); return true;
+        }
+        public void PetOrder(RangerPet.Order o)
+        {
+            if (Pet == null) return; Pet.Command(o);
+            Message(o == RangerPet.Order.Stay ? "Your wolf stays where it is." : "Your wolf follows you and joins your fights.");
+        }
         /// <summary>Whistles up the Ranger's wolf beside the player (the old one, if any, let go first).</summary>
         public RangerPet SummonWolf(RangerKit kit)
         {
@@ -1455,6 +1467,57 @@ namespace Crulanda.Encounter
                     enemy.HitBase = EncounterEnemy.MobHit(level, false, elite);
                     if (elite) a.transform.localScale = Vector3.one * 1.18f;
                     ConfigureSocial(enemy, camp, c, level, beast);   // its kind, its kin and, for the elite, its move (EncounterSession.Social)
+                }
+            }
+            SpawnOutliers();
+        }
+        /// <summary>
+        /// Outlying mobs (playtest note 92, 2026-10-07: "still need more camps, pretty deserted to level up"): round each outdoor camp of
+        /// two or more (not an elite's, not an ambush, not in a cave), one or two smaller groups of its own kind and levels, 22-40 m out
+        /// on open ground (ZoneBuilder.MobGround), each its own little camp with its own leash. From a stream of their own, after the
+        /// camps, so every camp's mobs stand where they did.
+        /// </summary>
+        void SpawnOutliers()
+        {
+            var rng = new System.Random(Zone.Zone.seed * 31 + 977); string zoneShort = Zone.Zone.id.Replace("zone.", "");
+            var taken = new List<Vector2>(); foreach (var cp in Zone.Zone.camps) if (cp != null) taken.Add(cp.center);
+            for (int c = 0; c < Zone.Zone.camps.Length; c++)
+            {
+                var camp = Zone.Zone.camps[c]; if (camp == null || camp.elite || camp.ambush || camp.count < 2) continue;
+                float floor = 0; if (Crulanda.World.Hollow.FloorUnder(camp.center, ref floor)) continue;
+                var look = LookFor(camp.look, false); bool beast = ActorVisual.IsBeast(look);
+                string tag = string.IsNullOrEmpty(camp.tag) ? (camp.look ?? "mob") : camp.tag;
+                int groups = 1 + (camp.count >= 4 ? 1 : 0);
+                for (int g = 0; g < groups; g++)
+                {
+                    Vector2 at = Vector2.zero; bool found = false;
+                    for (int tries = 0; tries < 14 && !found; tries++)
+                    {
+                        float a = (float)rng.NextDouble() * Mathf.PI * 2, d = 22 + (float)rng.NextDouble() * 18;
+                        at = camp.center + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * d;
+                        found = Zone.MobGround(at) && taken.TrueForAll(o => Vector2.Distance(o, at) > 18);
+                    }
+                    if (!found) continue;
+                    taken.Add(at);
+                    int n = 1 + (camp.count >= 3 && rng.NextDouble() < .6 ? 1 : 0);
+                    for (int k = 0; k < n; k++)
+                    {
+                        var spot = at + new Vector2((float)rng.NextDouble() - .5f, (float)rng.NextDouble() - .5f) * 5;
+                        var point = Zone.StandAt(spot, 0, 1);
+                        if (NavMesh.SamplePosition(point, out var hit, 3, NavMesh.AllAreas)) point = hit.position + Vector3.up; else continue;
+                        int level = camp.levelMin + rng.Next(Mathf.Max(1, camp.levelMax - camp.levelMin + 1));
+                        string id = "mob." + tag + "." + zoneShort + "." + c + ".w" + g + k;
+                        var a = SpawnActor(camp.mob, content.enemy, point, Color.grey, id, look, level);
+                        AddAgent(a.gameObject, look == ActorLook.Wolf ? 4.2f : look == ActorLook.Boar ? 3.8f : look == ActorLook.Bear ? 4f : look == ActorLook.WeaveEater ? 3.4f : 2.8f, beast ? .6f : .45f);
+                        var enemy = a.gameObject.AddComponent<EncounterEnemy>(); enemy.actor = a; enemy.persistentId = id; enemy.session = this;
+                        enemy.Camp = true; enemy.RespawnSeconds = Mathf.Max(20, camp.respawn); enemy.CampCenter = at; enemy.CampRadius = 4;
+                        enemy.Skinnable = look == ActorLook.Wolf || look == ActorLook.Boar || look == ActorLook.Stag || look == ActorLook.Bear;
+                        a.gameObject.SetActive(true); enemy.Initialize(); Enemies.Add(enemy);
+                        a.Stats.SetBase(StatType.MaxHealth, EncounterEnemy.MobHealth(level, false, false, beast));
+                        a.Health.ApplyHealing(a.Health.Pool.Max);
+                        enemy.HitBase = EncounterEnemy.MobHit(level, false, false);
+                        ConfigureSocial(enemy, camp, c, level, beast); enemy.CampIndex = 1000 + c * 10 + g;   // a group of its own: it calls its kin, but is not the camp's pull
+                    }
                 }
             }
         }

@@ -4156,8 +4156,23 @@ namespace Crulanda.World
         {
             Hollow.All.Clear();
             foreach (var p in Zone.props)
-                if (p != null && p.kind == "cavern")
-                    Hollow.All.Add(new Hollow(string.IsNullOrEmpty(p.name) ? "cavern" : p.name, p.at, p.rotation, CavernPlan(p.variant), (x, z) => HeightAt(x, z)));
+            {
+                if (p == null || p.kind != "cavern") continue;
+                var plan = p.plan != null && p.plan.Length >= 10 ? PlanRows(p.plan) : CavernPlan(p.variant);
+                // A branch opens out of a cave already made: its mouth on that cave's floor (the Sealed Adit's ways out of the Gallery).
+                var parent = string.IsNullOrEmpty(p.within) ? null : Hollow.All.Find(o => o.Name == p.within);
+                float? mouthY = null; float parentAlong = 0;
+                if (parent != null && parent.FloorSmooth(p.at, out float fy)) { mouthY = fy; parentAlong = parent.Along[parent.Nearest(p.at, out _)]; }
+                var h = new Hollow(string.IsNullOrEmpty(p.name) ? "cavern" : p.name, p.at, p.rotation, plan, (x, z) => HeightAt(x, z), mouthY);
+                if (parent != null) { h.Parent = parent; h.ParentAlong = parentAlong; }
+                Hollow.All.Add(h);
+            }
+        }
+        static float[][] PlanRows(float[] flat)
+        {
+            var rows = new float[flat.Length / 5][];
+            for (int i = 0; i < rows.Length; i++) rows[i] = new[] { flat[i * 5], flat[i * 5 + 1], flat[i * 5 + 2], flat[i * 5 + 3], flat[i * 5 + 4] };
+            return rows;
         }
         /// <summary>
         /// A cavern's passage in its frame (mouth at the origin, facing -z): rows (x, z, half-width, height, floor drop below the
@@ -4227,11 +4242,20 @@ namespace Crulanda.World
                 uv.Add(new Vector2(arc[i0, k0] / 2.4f, h.Along[i0] / 2.4f)); uv.Add(new Vector2(arc[i1, k1] / 2.4f, h.Along[i1] / 2.4f)); uv.Add(new Vector2(arc[i2, k2] / 2.4f, h.Along[i2] / 2.4f));
                 tri.Add(b); tri.Add(b + 1); tri.Add(b + 2);
             }
+            // A cave in a network (the Sealed Adit): its walls are open where another's passage runs through them, and none of it
+            // stands in the other's air (Hollow.Open), so a branch's mouth is a hole in the Gallery's wall.
+            bool linked = Hollow.All.Count > 1 && Hollow.All.Exists(o => o != h && (o.Parent == h || h.Parent == o));
+            bool Cut(Vector3 a, Vector3 b2, Vector3 d) { return linked && Hollow.OpenInOther(h, t.TransformPoint((a + b2 + d) / 3)); }
             for (int i = 0; i + 1 < n; i++)
-                for (int k = 0; k + 1 < P; k++) { Face(i, k, i + 1, k, i, k + 1); Face(i, k + 1, i + 1, k, i + 1, k + 1); }
-            {   // inward, whichever way that winding came out: a triangle at the crown of a middle ring must face down
-                int mid = ((n / 2) * (P - 1) + P / 2) * 6;
-                var a = v[tri[mid]]; var b2 = v[tri[mid + 1]]; var d = v[tri[mid + 2]];
+                for (int k = 0; k + 1 < P; k++)
+                {
+                    if (!Cut(ring[i, k], ring[i + 1, k], ring[i, k + 1])) Face(i, k, i + 1, k, i, k + 1);
+                    if (!Cut(ring[i, k + 1], ring[i + 1, k], ring[i + 1, k + 1])) Face(i, k + 1, i + 1, k, i + 1, k + 1);
+                }
+            {   // inward, whichever way that winding came out: a triangle at the crown of a middle ring must face down (its winding is
+                // taken from the ring's own corners, as a cut face may be missing from the list)
+                int ci = n / 2, ck = P / 2;
+                var a = ring[ci, ck]; var b2 = ring[ci + 1, ck]; var d = ring[ci, ck + 1];
                 if (Vector3.Cross(b2 - a, d - a).y > 0) for (int q = 0; q < tri.Count; q += 3) { int sw = tri[q + 1]; tri[q + 1] = tri[q + 2]; tri[q + 2] = sw; }
             }
             var shell = new Mesh { name = h.Name + " shell" };
@@ -4243,9 +4267,15 @@ namespace Crulanda.World
             // What shows inside is the painted lining over that shell (the shell stays the collider and the navmesh's obstacle, not
             // drawn), and against it the rock, dripstone, root and earth that break the walls up. With no cave art the shell shows.
             var paint = roots ? art.caveEarth : art.cave;
-            var lining = paint != null ? Tint(paint, roots ? new Color(.5f, .4f, .27f) : new Color(.56f, .51f, .45f)) : null;
-            if (lining != null) { body.GetComponent<MeshRenderer>().enabled = false; CaveLining(t, h, c, ring, n, P, seed, lining); }
+            var lining = paint != null ? Tint(paint, roots ? new Color(.5f, .4f, .27f) : variant == 2 ? AditLining(h.Name) : new Color(.56f, .51f, .45f)) : null;
+            if (lining != null) { body.GetComponent<MeshRenderer>().enabled = false; CaveLining(t, h, c, ring, n, P, seed, lining, linked); }
+            int dressedFrom = t.childCount;
             CaveDressing(t, h, c, right, ring, n, P, roots, lining ?? (roots ? knoll : rock));
+            if (linked) for (int k = t.childCount - 1; k >= dressedFrom; k--)   // no fallen stone or dripstone in another cave's way
+                {
+                    var r = t.GetChild(k).GetComponentInChildren<Renderer>();
+                    if (r != null && Hollow.OpenInOther(h, r.bounds.center, .95f)) DestroyImmediate(t.GetChild(k).gameObject);
+                }
 
             // The knoll: an outer shell round the passage, 2-4 m of rock thick and thickest over the top (so it heaps into a mound),
             // broken by big slow swells; closed past the passage's end; at the mouth, a cut face of rock joining it to the passage.
@@ -4288,19 +4318,20 @@ namespace Crulanda.World
             for (int i = 0; i + 1 < m; i++)
                 for (int k = 0; k + 1 < P; k++)
                 {
-                    OFace(outer[i, k], outer[i + 1, k], outer[i, k + 1], OU(i, k), OU(i + 1, k), OU(i, k + 1));
-                    OFace(outer[i, k + 1], outer[i + 1, k], outer[i + 1, k + 1], OU(i, k + 1), OU(i + 1, k), OU(i + 1, k + 1));
+                    if (!Cut(outer[i, k], outer[i + 1, k], outer[i, k + 1])) OFace(outer[i, k], outer[i + 1, k], outer[i, k + 1], OU(i, k), OU(i + 1, k), OU(i, k + 1));
+                    if (!Cut(outer[i, k + 1], outer[i + 1, k], outer[i + 1, k + 1])) OFace(outer[i, k + 1], outer[i + 1, k], outer[i + 1, k + 1], OU(i, k + 1), OU(i + 1, k), OU(i + 1, k + 1));
                 }
             {   // outward, whichever way that winding came out: a triangle at the crown of a middle ring must face up
-                int mid = ((n / 2) * (P - 1) + P / 2) * 6;
-                if (Vector3.Cross(ov[ot[mid + 1]] - ov[ot[mid]], ov[ot[mid + 2]] - ov[ot[mid]]).y < 0) for (int q = 0; q < ot.Count; q += 3) { int sw = ot[q + 1]; ot[q + 1] = ot[q + 2]; ot[q + 2] = sw; }
+                int ci = n / 2, ck = P / 2;
+                if (Vector3.Cross(outer[ci + 1, ck] - outer[ci, ck], outer[ci, ck + 1] - outer[ci, ck]).y < 0) for (int q = 0; q < ot.Count; q += 3) { int sw = ot[q + 1]; ot[q + 1] = ot[q + 2]; ot[q + 2] = sw; }
             }
             int lipStart = ot.Count; var mouthOut = c[0] - c[1]; mouthOut.y = 0; mouthOut.Normalize();
-            for (int k = 0; k + 1 < P; k++)   // the mouth's cut face, from the passage's edge out to the knoll's
+            for (int k = 0; k + 1 < P && h.Parent == null; k++)   // the mouth's cut face, from the passage's edge out to the knoll's (a branch's mouth is in a cave: none)
             {
                 OFace(ring[0, k], ring[0, k + 1], outer[0, k], new Vector2(0, arc[0, k] / 2.6f), new Vector2(0, arc[0, k + 1] / 2.6f), new Vector2(Thick(0, k) / 2.6f, arc[0, k] / 2.6f));
                 OFace(ring[0, k + 1], outer[0, k + 1], outer[0, k], new Vector2(0, arc[0, k + 1] / 2.6f), new Vector2(Thick(0, k + 1) / 2.6f, arc[0, k + 1] / 2.6f), new Vector2(Thick(0, k) / 2.6f, arc[0, k] / 2.6f));
             }
+            if (ot.Count > lipStart)
             {   // facing out of the mouth
                 int q0 = lipStart + (P / 2) * 6;
                 if (Vector3.Dot(Vector3.Cross(ov[ot[q0 + 1]] - ov[ot[q0]], ov[ot[q0 + 2]] - ov[ot[q0]]), mouthOut) < 0)
@@ -4361,16 +4392,24 @@ namespace Crulanda.World
             {
                 var fv = new List<Vector3>(); var fuv = new List<Vector2>(); var ft = new List<int>();
                 var outward = c[0] - c[1]; outward.y = 0; outward.Normalize();
-                for (int i = -1; i < n; i++)
+                for (int i = h.Parent != null ? 0 : -1; i < n; i++)
                 {
                     int r = Mathf.Max(0, i); Vector3 a = ring[r, 1], b = ring[r, P - 2];
                     if (i < 0) { a += outward * 2.4f; b += outward * 2.4f; a.y = LocalGround(t, a.x, a.z) + .02f; b.y = LocalGround(t, b.x, b.z) + .02f; }   // over the land's cut edge
-                    else a.y = b.y = c[r].y;
+                    else a.y = b.y = c[r].y + (h.Parent != null ? .012f : 0);   // a branch's floor a hair over its parent's where they meet
                     float fvv = (i < 0 ? -2.4f : h.Along[r]) / 2.4f;
                     fv.Add(a); fv.Add(b); fuv.Add(new Vector2(0, fvv)); fuv.Add(new Vector2(Vector3.Distance(a, b) / 2.4f, fvv));
                 }
-                for (int i = 0; i < n; i++) { int o = i * 2; ft.AddRange(new[] { o, o + 2, o + 1, o + 1, o + 2, o + 3 }); }
-                if (Vector3.Cross(fv[ft[1]] - fv[ft[0]], fv[ft[2]] - fv[ft[0]]).y < 0) for (int q = 0; q < ft.Count; q += 3) { int sw = ft[q + 1]; ft[q + 1] = ft[q + 2]; ft[q + 2] = sw; }   // facing up
+                int rowsF = fv.Count / 2;
+                for (int i = 0; i + 1 < rowsF; i++)
+                {
+                    int o = i * 2;
+                    // A quad wholly in another cave's air is that cave's floor already (a branch's mouth in the Gallery).
+                    if (linked && Hollow.OpenInOther(h, t.TransformPoint(fv[o]) + Vector3.up * .3f) && Hollow.OpenInOther(h, t.TransformPoint(fv[o + 1]) + Vector3.up * .3f)
+                        && Hollow.OpenInOther(h, t.TransformPoint(fv[o + 2]) + Vector3.up * .3f) && Hollow.OpenInOther(h, t.TransformPoint(fv[o + 3]) + Vector3.up * .3f)) continue;
+                    ft.AddRange(new[] { o, o + 2, o + 1, o + 1, o + 2, o + 3 });
+                }
+                if (ft.Count > 2 && Vector3.Cross(fv[ft[1]] - fv[ft[0]], fv[ft[2]] - fv[ft[0]]).y < 0) for (int q = 0; q < ft.Count; q += 3) { int sw = ft[q + 1]; ft[q + 1] = ft[q + 2]; ft[q + 2] = sw; }   // facing up
                 var floorMesh = new Mesh { name = h.Name + " floor" }; floorMesh.SetVertices(fv); floorMesh.SetUVs(0, fuv); floorMesh.SetTriangles(ft, 0); floorMesh.RecalculateNormals(); floorMesh.RecalculateBounds();
                 var ground = MeshPart(floorMesh, t, Vector3.zero, Tint(art.soil, roots ? new Color(.2f, .16f, .1f) : new Color(.34f, .3f, .25f)));
                 ground.AddComponent<MeshCollider>().sharedMesh = floorMesh; ground.AddComponent<NavWalkable>();
@@ -4399,6 +4438,11 @@ namespace Crulanda.World
             if (roots)
             {
                 RootDeepInterior(t, h, c, right, ring, n, P, FloorY, RingAt, On, Along, Block);
+                return;
+            }
+            if (variant == 2)
+            {
+                AditInterior(t, h, c, right, ring, n, P, FloorY, RingAt, On, Along, Block);   // the Sealed Adit (ZoneBuilder.Adit.cs)
                 return;
             }
             // Inside: torches down the walls, alternating sides, set on the rock at about head height; every twelfth one in the deep
@@ -4667,7 +4711,7 @@ namespace Crulanda.World
         /// where it meets the knoll's cut face. In stretches of ten rings, so each takes the lights near it; it casts shadow both
         /// ways, as the shell did (no sun reaches the floor). No colliders; draws from no stream.
         /// </summary>
-        void CaveLining(Transform t, Hollow h, Vector3[] c, Vector3[,] ring, int n, int P, float seed, Material m)
+        void CaveLining(Transform t, Hollow h, Vector3[] c, Vector3[,] ring, int n, int P, float seed, Material m, bool linked = false)
         {
             int W = 2 * P - 1; var g = new Vector3[n, W]; var nrm = new Vector3[n, W]; var col = new Color[n, W];
             for (int i = 0; i < n; i++)
@@ -4708,6 +4752,7 @@ namespace Crulanda.World
                     for (int k = 0; k + 1 < W; k++)
                     {
                         int a = i * W + k, b = a + W, d = a + 1, e = b + 1;
+                        if (linked && Hollow.OpenInOther(h, t.TransformPoint((v[a] + v[b] + v[d] + v[e]) / 4))) continue;   // open into the next cave
                         tri.AddRange(turned ? new[] { a, d, b, d, e, b } : new[] { a, b, d, d, b, e });
                     }
                 var mesh = new Mesh { name = h.Name + " lining" }; mesh.SetVertices(v); mesh.SetNormals(vn); mesh.SetColors(vc); mesh.SetTriangles(tri, 0); mesh.RecalculateBounds();
@@ -5576,6 +5621,24 @@ namespace Crulanda.World
                     }
                 }
             return at;
+        }
+        /// <summary>
+        /// Open ground a camp's outlying mobs may stand on (playtest note 92, "still need more camps, pretty deserted to level up"):
+        /// inside the zone, out of caves, off roads, water, buildings and props, not steep, nowhere near a village (no house, inn,
+        /// mill, barn, forge or stall within 115 m: camps stand 125 m off), clear of clearings, exits, arrivals, secrets and landmarks.
+        /// </summary>
+        public bool MobGround(Vector2 p)
+        {
+            if (Mathf.Abs(p.x) > Half - 14 || Mathf.Abs(p.y) > Half - 14) return false;
+            float y = 0; if (Hollow.CoverAt(p, 2) > 0 || Hollow.FloorUnder(p, ref y)) return false;
+            if (NearRoad(p, 6) || Water.NearWater(p, 4) || InBuilding(p) || NearProp(p, 3) || Steep(p, 2) > .5f) return false;
+            foreach (var o in Zone.props) if (o != null && (o.kind == "house" || o.kind == "inn" || o.kind == "mill" || o.kind == "barn" || o.kind == "forge" || o.kind == "stall") && Vector2.Distance(o.at, p) < 115) return false;
+            foreach (var c in Zone.clearings) if (c != null && Vector2.Distance(p, c.center) < c.radius + 4) return false;
+            foreach (var e in Zone.exits) if (e != null && (Vector2.Distance(p, e.at) < 16 || Vector2.Distance(p, e.arrive) < 16)) return false;
+            foreach (var z in AllZones()) foreach (var e in z.exits) if (e != null && e.to == Zone.id && Vector2.Distance(p, e.arrive) < 16) return false;
+            foreach (var s in Zone.secrets) if (s != null && Vector2.Distance(p, s.at) < s.radius + 5) return false;
+            foreach (var l in Zone.landmarks) if (l != null && Vector2.Distance(p, l.at) < 8) return false;
+            return true;
         }
         bool NearRoad(Vector2 p, float margin)
         {

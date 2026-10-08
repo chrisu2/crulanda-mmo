@@ -110,6 +110,8 @@ namespace Crulanda.Encounter
             bool lord = caller.Elite && caller.Camp;
             bool sneaking = GameAnimal.SneakingOverride ?? (motor != null && motor.Sneaking);   // the override is the tests' Ctrl
             float reach = SocialAggro.Reach(caller.Social, noticed && sneaking);
+            // A party draws more of a camp (playtest note 91, "mobs still way too easy in group"): the call carries half as far again.
+            if (PartySims.Count > 0 && !(noticed && sneaking)) reach *= SocialAggro.PartyReach;
             if (reach <= 0 && !lord) return;
             List<EncounterEnemy> heard = null;
             foreach (var e in Enemies)

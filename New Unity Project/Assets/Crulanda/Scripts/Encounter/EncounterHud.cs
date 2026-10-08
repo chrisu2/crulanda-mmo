@@ -78,7 +78,7 @@ namespace Crulanda.Encounter
             using (mWorld.Auto()) DrawWorldLabels();
             using (mFrames.Auto()) { DrawPlayerFrame(); DrawPartyFrame(); if (session.Target != null) DrawTargetFrame(); else if (session.HasFriendlyFocus) DrawFriendFrame(); }
             using (mMap.Auto()) maps.DrawMinimap(session, gold);
-            using (mPanels.Auto()) { DrawQuestTracker(); DrawChat(); DrawCenter(); DrawActionBar(); DrawMicroMenu(); DrawXpBar(); }
+            using (mPanels.Auto()) { DrawQuestTracker(); DrawChat(); DrawCenter(); DrawActionBar(); DrawPetBar(); DrawMicroMenu(); DrawXpBar(); }
             var windows = mWindows.Auto();
             if (session.CharacterOpen) DrawCharacter();
             if (session.VendorNpc != null) DrawVendor();
@@ -305,9 +305,21 @@ namespace Crulanda.Encounter
                 Fill(new Rect(box.x + 4, box.yMax - 26, tw, 22), new Color(cc.r, cc.g, cc.b, .25f)); Shadow(new Rect(box.x + 8, box.yMax - 25, tw, 20), tag, tiny, cc);
                 GUI.SetNextControlName("chat");
                 chatTyped = GUI.TextField(new Rect(box.x + 4 + tw, box.yMax - 26, box.width - 8 - tw, 22), chatTyped, 200);
-                if (chatFocus) { GUI.FocusControl("chat"); chatFocus = false; }
+                // Focus the box until it really has the keys (playtest note 89, "when I hit enter ... I should be able to type without
+                // having to click on chat box"): the control only exists from this pass, so focusing it once could miss. Then the cursor
+                // goes to the end (a whisper's "/w name " stays, not selected to be typed over).
+                if (chatFocus)
+                {
+                    GUI.FocusControl("chat");
+                    if (GUI.GetNameOfFocusedControl() == "chat" && GUIUtility.keyboardControl != 0)
+                    {
+                        var te = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), GUIUtility.keyboardControl);
+                        if (te != null) { te.text = chatTyped; te.MoveTextEnd(); }
+                        if (e.type == EventType.Repaint) chatFocus = false;
+                    }
+                }
             }
-            Shadow(new Rect(12, 776, 900, 20), KeyBindings.MoveLabel + " move · " + KeyBindings.Label(GameKey.Run) + " run · " + KeyBindings.Label(GameKey.Jump) + " jump · Right-drag look · Wheel zoom · " + KeyBindings.Label(GameKey.Target) + " target · " + KeyBindings.InteractLabel + " interact · " + KeyBindings.Label(GameKey.Quests) + " quests · " + KeyBindings.Label(GameKey.Map) + " map · " + KeyBindings.Label(GameKey.Talents) + " talents · " + KeyBindings.Label(GameKey.Bags) + " bags · " + KeyBindings.Label(GameKey.Character) + " character · " + KeyBindings.Label(GameKey.Trades) + " trades · " + KeyBindings.Label(GameKey.Who) + " who · Enter chat · Esc controls", tiny, new Color(.8f, .8f, .78f));
+            // (The key hints that ran along the foot of the screen live in Esc > Controls now: Chris, 2026-10-07, "should be removed and put in an esc menu".)
         }
         void DrawCenter()
         {
@@ -334,6 +346,32 @@ namespace Crulanda.Encounter
             var words = name.Split(' ');
             if (words.Length >= 2) return (words[0].Substring(0, 1) + words[1].Substring(0, 1)).ToUpperInvariant();
             return name.Length <= 3 ? name.ToUpperInvariant() : name.Substring(0, 3).ToUpperInvariant();
+        }
+        /// <summary>
+        /// The companion bar (playtest note 93, 2026-10-07: "a companion UI element that I can have him attack, assist, stay"): while the
+        /// Ranger's wolf is out, left of the action bar, its health and three orders, the standing one lit.
+        /// </summary>
+        void DrawPetBar()
+        {
+            var pet = session.Pet; if (pet == null || pet.actor == null || !pet.actor.IsAlive) return;
+            float total = session.ActionCount * 56 - 6, x0 = 720 - total / 2 - 12 - 262, y = 800;
+            var box = new Rect(x0, y, 250, 76);
+            Fill(box, new Color(.07f, .06f, .05f, .9f)); Fill(new Rect(box.x, box.y, box.width, 2), new Color(.62f, .52f, .33f));
+            var hp = pet.actor.Health.Pool;
+            Shadow(new Rect(box.x + 8, box.y + 4, 120, 20), "Wolf", tiny, Color.white);
+            var bar = new Rect(box.x + 60, box.y + 9, 182, 10); Fill(bar, new Color(0, 0, 0, .6f));
+            Fill(new Rect(bar.x, bar.y, bar.width * Mathf.Clamp01(hp.Ratio), bar.height), new Color(.3f, .75f, .3f));
+            string[] labels = { "Attack", "Assist", "Stay" };
+            for (int i = 0; i < 3; i++)
+            {
+                var r = new Rect(box.x + 8 + i * 80, box.y + 30, 74, 36);
+                bool lit = i == 1 && pet.Mode == RangerPet.Order.Assist || i == 2 && pet.Mode == RangerPet.Order.Stay || i == 0 && pet.Quarry != null;
+                if (lit) Fill(new Rect(r.x - 2, r.y - 2, r.width + 4, r.height + 4), new Color(.95f, .78f, .35f, .9f));
+                if (GUI.Button(r, labels[i], slim))
+                {
+                    if (i == 0) session.PetAttack(); else session.PetOrder(i == 1 ? RangerPet.Order.Assist : RangerPet.Order.Stay);
+                }
+            }
         }
         void DrawActionBar()
         {

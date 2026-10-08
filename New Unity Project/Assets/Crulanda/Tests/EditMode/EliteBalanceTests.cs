@@ -203,7 +203,7 @@ namespace Crulanda.Tests
                 }
             // Six elites stand with guards (Caddock, Hesk, the Brood Weave-Eater's broodmate, the Ash-Deacon, Greyheart, the
             // Root-Warden) and four have kin in earshot of their call (Hesk, Old Whitefoot, the Grey Sexton, the Sandthrone captain).
-            Assert.AreEqual(6 * Kits.Length, guarded, "Six elites have guards."); Assert.AreEqual(4 * Kits.Length, answered, "Four elites' calls are answered by kin.");
+            Assert.AreEqual(10 * Kits.Length, guarded, "Ten elites have guards (four of them the Sealed Adit's)."); Assert.AreEqual(8 * Kits.Length, answered, "Eight elites' calls are answered by kin (four of them the Sealed Adit's).");
         }
         /// <summary>The least health a careful player with Mira ends with when an elite's call is answered.</summary>
         const float CallMargin = .1f;

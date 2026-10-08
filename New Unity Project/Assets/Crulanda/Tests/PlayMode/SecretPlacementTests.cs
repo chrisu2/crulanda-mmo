@@ -65,7 +65,7 @@ namespace Crulanda.Tests
         {
             var first = UnityEngine.Object.FindFirstObjectByType<EncounterSession>();
             var all = first.Zone.AllZones();
-            var zones = all.Select(z => z.id).ToList();
+            var zones = all.Where(z => !z.dungeon).Select(z => z.id).ToList();   // a dungeon's secrets come with its quests (D6)
             Assert.GreaterOrEqual(zones.Count, 4, "Oakhaven, Khaven, the Peaks and the Ashland Rim are registered.");
             var arrivals = new Dictionary<string, List<Vector2>>();
             foreach (var z in all) foreach (var e in z.exits) { if (!arrivals.ContainsKey(e.to)) arrivals[e.to] = new List<Vector2>(); arrivals[e.to].Add(e.arrive); }

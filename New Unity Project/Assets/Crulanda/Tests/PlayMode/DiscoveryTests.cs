@@ -209,9 +209,9 @@ namespace Crulanda.Tests
             Assert.AreEqual(potions + 1, Inventory.Count(s.Progress, "potion.minor"), "The item is in the bags.");
             Assert.Contains(page, s.Progress.documents, "The page is in the Chronicle.");
             Assert.IsTrue(s.Messages.Exists(m => m.StartsWith("New page in your Chronicle")), "And said so.");
-            Assert.AreEqual(2, s.Progress.Level, "250 XP from level 1 is a level, taken the way quest rewards are.");
-            Assert.AreEqual(2, s.Player.Level, "The character levels up at once.");
-            Assert.IsTrue(s.Messages.Exists(m => m.StartsWith("Level 2!")));
+            Assert.AreEqual(250, s.Progress.experience, "250 XP, taken the way quest rewards are (a level is 400 since round 29).");
+            Assert.AreEqual(1, s.Player.Level, "Not a level yet: 400 since round 29.");
+            Assert.IsFalse(s.Messages.Exists(m => m.StartsWith("Level 2!")), "No level message under 400.");
             Assert.AreEqual("Test Cache", s.ToastName);
             Assert.IsNull(s.NearbySecret, "Found, it isn't offered again.");
             Assert.AreNotEqual("Search under the loose stones", s.InteractPrompt);

@@ -241,7 +241,8 @@ namespace Crulanda.Tests
                 Assert.IsFalse(string.IsNullOrEmpty(db.Get(id).trade), id + " feeds a village stock when sold."); Assert.IsFalse(string.IsNullOrEmpty(db.Get(id).pouch), id + " has a trade bag.");
                 foreach (var v in db.Vendors) Assert.IsFalse(System.Array.IndexOf(v.items, id) >= 0, id + " is sold by a vendor.");
             }
-            CollectionAssert.AreEqual(new[] { 1, 2, 3, 4, 6 }, new[] { db.Get(raw[0]).value, db.Get(raw[1]).value, db.Get(raw[2]).value, db.Get(raw[3]).value, db.Get(raw[4]).value }, "Raw value by tier.");
+            CollectionAssert.AreEqual(new[] { 1, 3, 4, 4, 6 },   // bog-iron and Adit ore up a crown (round 29: the smiths' chain)
+ new[] { db.Get(raw[0]).value, db.Get(raw[1]).value, db.Get(raw[2]).value, db.Get(raw[3]).value, db.Get(raw[4]).value }, "Raw value by tier.");
         }
 
         [Test] public void Loot_rolls_use_the_kind_and_elites_drop_gear()

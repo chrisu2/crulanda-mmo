@@ -75,7 +75,7 @@ namespace Crulanda.Tests
         [UnityTest, Timeout(600000)] public IEnumerator EveryNodeAndStation_IsReachable()
         {
             var first = UnityEngine.Object.FindFirstObjectByType<EncounterSession>();
-            var zones = first.Zone.AllZones().Select(z => z.id).ToList();
+            var zones = first.Zone.AllZones().Where(z => !z.dungeon).Select(z => z.id).ToList();   // a dungeon has no nodes, herbs or trees of its own
             Assert.AreEqual(5, zones.Count, "Oakhaven, Khaven, the Peaks, the Ashland Rim and the Verdant Shore are registered.");
             var problems = new List<string>();
             foreach (var id in zones)
@@ -99,7 +99,7 @@ namespace Crulanda.Tests
         [UnityTest, Timeout(600000)] public IEnumerator EveryHerb_LiesOnTheGround()
         {
             var first = UnityEngine.Object.FindFirstObjectByType<EncounterSession>();
-            var zones = first.Zone.AllZones().Select(z => z.id).ToList();
+            var zones = first.Zone.AllZones().Where(z => !z.dungeon).Select(z => z.id).ToList();   // a dungeon has no nodes, herbs or trees of its own
             var problems = new List<string>(); int herbs = 0; float steepest = 0; string steepestAt = "";
             foreach (var id in zones)
             {

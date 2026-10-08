@@ -124,7 +124,7 @@ CAMPS = [
     ('The Ember Vent', 3, 0, 0, mob('Vent mouth', 'Ash initiate', 'cultist', 2, 11, 11, tag='ashinitiate', canon='GAME-ONLY cell; CANON cult (the Cult of Ash)', radius=1.6)),
     ('The Ember Vent', 7, 0, -9, mob('Ash initiates', 'Ash initiate', 'cultist', 3, 11, 11, tag='ashinitiate', canon='GAME-ONLY cell; CANON cult (the Cult of Ash)', radius=2.2)),
     ('The Ember Vent', 8, 0, 11, mob('Lava ledge', 'Ash mender', 'cultist', 3, 11, 11, tag='ashmender', canon='GAME-ONLY cell; CANON cult (the Cult of Ash)', radius=2.2)),
-    ('The Ember Vent', 8, 0, -12, mob('The Vent-Hound', 'The Vent-Hound', 'wolf', 1, 11, 11, tag='venthound', canon='GAME-ONLY', radius=1.5, elite=True, guards='none', respawn=1200)),
+    ('The Ember Vent', 8, 0, -12, mob('The Vent-Hound', 'The Vent-Hound', 'wolf', 1, 11, 11, tag='venthound', canon='GAME-ONLY', radius=1.5, elite=True, guards='none', respawn=1200, social='solitary')),
     ('The Ember Vent', 9, 0, -9, mob('Ember circle', 'Ash initiate', 'cultist', 3, 11, 11, tag='ashinitiate', canon='GAME-ONLY cell; CANON cult (the Cult of Ash)', radius=2.2)),
     ('The Ember Vent', 10, 1, 0, mob('Cinder-Warden Ysolt', 'Cinder-Warden Ysolt', 'cultist', 1, 11, 11, tag='ysolt', canon='GAME-ONLY (the Cult of Ash is CANON)', radius=1, elite=True, guards='none')),
 
@@ -207,8 +207,8 @@ def zone(traced, camps):
 def peaks_exit(z):
     exits = [e for e in z['exits'] if e.get('to') != 'zone.adit']
     road = next(r for r in z['roads'] if r.get('name') == 'Ore road')
-    if road['points'][-1]['x'] > -146: road['points'].append({'x': -146.5, 'y': -41.5})   # on to the adit's face
-    exits.append({'to': 'zone.adit', 'name': 'Into the Sealed Adit', 'at': {'x': -144.5, 'y': -41.5}, 'arrive': {'x': CAVES[0]['at'][0], 'y': CAVES[0]['at'][1] - 12}, 'radius': 2.4})
+    road['points'] = [q for q in road['points'] if q['x'] >= -140.6] + [{'x': -145, 'y': -41.4}]   # on toward the adit's face, short of the seal's secret   # on to the adit's face
+    exits.append({'to': 'zone.adit', 'name': 'Into the Sealed Adit', 'at': {'x': -143.3, 'y': -41.4}, 'arrive': {'x': CAVES[0]['at'][0], 'y': CAVES[0]['at'][1] - 12}, 'radius': 1.6})
     z['exits'] = exits
 
 def picture(traced, camps, path):

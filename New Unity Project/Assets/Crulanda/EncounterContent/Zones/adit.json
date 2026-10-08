@@ -1116,6 +1116,7 @@
       "respawn": 1200,
       "elite": true,
       "guards": "none",
+      "social": "solitary",
       "center": {
         "x": -55.45,
         "y": -20.16

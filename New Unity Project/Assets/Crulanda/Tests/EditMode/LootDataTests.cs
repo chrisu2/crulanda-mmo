@@ -73,11 +73,12 @@ namespace Crulanda.Tests
             var items = LootTestData.Items(); var loot = LootTestData.Loot(items, LootTestData.Looks());
             var named = items.Items.Keys.Where(k => k.StartsWith("loot.", StringComparison.Ordinal)).ToList();
             Assert.AreEqual(127, named.Count, "104 named items (ITEMS_V1.md), the five legendaries (2026-10-05) and the Sentinel's Helm (2026-10-07), and the Sealed Adit's seventeen (2026-10-08).");
-            Assert.AreEqual(109 + 13, loot.Gear.Count, "A gear entry for each, and for the thirteen named items already in the game (the Sentinel's Helm the thirteenth, 2026-10-07).");
+            Assert.AreEqual(109 + 17 + 13, loot.Gear.Count,   // and the Sealed Adit's seventeen
+ "A gear entry for each, and for the thirteen named items already in the game (the Sentinel's Helm the thirteenth, 2026-10-07).");
             Assert.AreEqual(12, loot.GearOrder.Count(g => g.legacy));
             Assert.AreEqual(2, loot.Sets.Count, "Two sets.");
             Assert.AreEqual(49, named.Count(id => items.Get(id).quality == 2), "49 uncommon.");
-            Assert.AreEqual(49, named.Count(id => items.Get(id).quality == 3), "49 rare (the Sentinel's Helm the 49th, 2026-10-07).");
+            Assert.AreEqual(66, named.Count(id => items.Get(id).quality == 3), "66 rare (17 the Sealed Adit\'s) (the Sentinel's Helm the 49th, 2026-10-07).");
             Assert.AreEqual(7, named.Count(id => items.Get(id).quality == 4), "7 epic.");
         }
 

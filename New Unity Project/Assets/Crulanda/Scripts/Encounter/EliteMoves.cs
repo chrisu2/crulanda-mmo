@@ -30,7 +30,7 @@ namespace Crulanda.Encounter
         public const float BossHealth = 1.25f, BossHit = 1.1f;
         public static readonly EliteMove[] All = {
             // ---------- Oakhaven ----------
-            new EliteMove { mob = "Caddock, the Bandit King", name = "The King's Due", boss = true, health = BossHealth, hit = BossHit, windup = 2, blow = 4.3f, reach = 3.8f, every = 11,
+            new EliteMove { mob = "Caddock, the Bandit King", name = "The King's Due", boss = true, health = BossHealth, hit = BossHit, windup = 2, blow = 3.1f, reach = 3.8f, every = 12,
                 call = "Caddock bellows: \"To me, you dogs! Earn your keep!\"", callShort = "To me!", enrageAt = .35f, enrageHaste = .6f,
                 enrage = "Caddock shoves the tin crown straight and comes on like a cornered man." },
             new EliteMove { mob = "Quartermaster Hesk", name = "Short Weight", windup = 1.8f, blow = 3.8f, reach = 3.4f, every = 10,
@@ -66,7 +66,7 @@ namespace Crulanda.Encounter
                 enrage = "Greyheart's bark splits. What is under it is angrier." },
             new EliteMove { mob = "Old Ninebranch", name = "Nine-Tine Toss", windup = 1.6f, blow = 3.8f, reach = 4.4f, every = 9,
                 enrage = "Old Ninebranch lowers all nine tines and paws the moss." },
-            new EliteMove { mob = "The Hollow Root-Warden", name = "The Root's Weight", boss = true, health = BossHealth, hit = BossHit, windup = 2.2f, blow = 4.6f, reach = 4.2f, every = 11,
+            new EliteMove { mob = "The Hollow Root-Warden", name = "The Root's Weight", boss = true, health = BossHealth, hit = BossHit, windup = 2.2f, blow = 3.6f, reach = 4.2f, every = 11,
                 call = "The Hollow Root-Warden strikes the floor, and the Heart answers.", callShort = "The Heart answers", enrageAt = .35f, enrageHaste = .6f,
                 enrage = "The Hollow Root-Warden creaks, and every root in the Heart pulls tight." },
             // ---------- The Sealed Adit (dungeon D1; PROVISIONAL moves until D2 gives each boss its mechanics, DUNGEON_DESIGN.md) ----------
@@ -76,17 +76,18 @@ namespace Crulanda.Encounter
             new EliteMove { mob = "Nix, the turncoat", name = "Spanner-Lock", windup = 1.6f, blow = 3.6f, reach = 3.4f, every = 9,
                 call = "Nix shrieks: \"Get them off me!\"", callShort = "Get them off me!",
                 enrage = "Nix's hands blur over the engine's controls." },
-            new EliteMove { mob = "Cinder-Warden Ysolt", name = "Ember Blow", windup = 2, blow = 4.2f, reach = 3.8f, every = 10,
+            new EliteMove { mob = "Cinder-Warden Ysolt", name = "Ember Blow", windup = 2, blow = 4.2f, reach = 3.8f, every = 10, callReach = 14, callMost = 2,
                 call = "Ysolt lifts the brand: \"The fire sees you.\"", callShort = "The fire sees you",
                 enrage = "Ysolt steps into the heat and comes out burning." },
-            new EliteMove { mob = "The Foreman Who Forgot", name = "What the Grey Takes", windup = 2.4f, blow = 4.4f, reach = 3.6f, every = 12,
+            new EliteMove { mob = "The Foreman Who Forgot", name = "What the Grey Takes", windup = 2.4f, blow = 4.4f, reach = 3.6f, every = 12, callReach = 40, callMost = 2,   // the Hollow drift, back up the breach
+                call = "The Foreman calls a shift-name nobody has answered to in years. Something in the grey answers.", callShort = "Shift!",
                 enrage = "The Foreman flickers, and for a moment there is less of him." },
             new EliteMove { mob = "The Vent-Hound", name = "Ember Lunge", windup = 1.5f, blow = 3.6f, reach = 4.4f, every = 9,
                 enrage = "The Vent-Hound's coat glows along the spine." },
             new EliteMove { mob = "Quartermaster Brannigan Sorrel", name = "Boot-Heel Stamp", windup = 2, blow = 4.2f, reach = 3.6f, every = 10, callReach = 14, callMost = 2,   // his guards, not the captain down the hall
                 call = "Sorrel bellows: \"Platform! Hold the ramp!\"", callShort = "Hold the ramp!",
                 enrage = "Sorrel goes to the rack and comes back with something heavier." },
-            new EliteMove { mob = "Rail-Captain Orsk Danner", name = "The Dead Line", boss = true, health = BossHealth, hit = 1, windup = 2.2f, blow = 3.6f, reach = 4, every = 12,   // sturdy, not savage: his guards and the shadows are the fight (the paper fight at level 12)
+            new EliteMove { mob = "Rail-Captain Orsk Danner", name = "The Dead Line", boss = true, health = BossHealth, hit = BossHit, windup = 2.2f, blow = 3.2f, reach = 4, every = 12, callReach = 10,   // sturdy, not savage: his guards and the shadows are the fight (the paper fight at level 12)
                 call = "Danner says, quietly: \"Guards.\" They step out of the dark.", callShort = "Guards.", enrageAt = .35f, enrageHaste = .6f,
                 enrage = "Danner draws a second blade. The letter stays buttoned in his coat." },
         };

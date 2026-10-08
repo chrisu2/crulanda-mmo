@@ -187,6 +187,7 @@ namespace Crulanda.Tests
             var problems = new List<string>();
             foreach (var file in Files)
             {
+                if (!NearHomes.ContainsKey(file)) continue;   // a dungeon has no homes
                 var z = Zone(file); var homes = Homes(z); var known = NearHomes[file]; var near = new HashSet<string>();
                 Assert.IsNotEmpty(homes, file + " has homes to measure from.");
                 if (file == "oakhaven") Assert.AreEqual(17, homes.Count, "The village's sixteen and Moss's lodge.");

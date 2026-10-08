@@ -1484,7 +1484,7 @@ namespace Crulanda.Encounter
             var taken = new List<Vector2>(); foreach (var cp in Zone.Zone.camps) if (cp != null) taken.Add(cp.center);
             for (int c = 0; c < Zone.Zone.camps.Length; c++)
             {
-                var camp = Zone.Zone.camps[c]; if (camp == null || camp.elite || camp.ambush || camp.count < 2) continue;
+                var camp = Zone.Zone.camps[c]; if (camp == null || camp.elite || camp.ambush || camp.harder || camp.count < 2) continue;
                 float floor = 0; if (Crulanda.World.Hollow.FloorUnder(camp.center, ref floor)) continue;
                 var look = LookFor(camp.look, false); bool beast = ActorVisual.IsBeast(look);
                 string tag = string.IsNullOrEmpty(camp.tag) ? (camp.look ?? "mob") : camp.tag;

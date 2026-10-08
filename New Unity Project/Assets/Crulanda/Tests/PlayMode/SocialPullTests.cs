@@ -184,7 +184,8 @@ namespace Crulanda.Tests
 
         [UnityTest] public IEnumerator A_deserters_shout_is_read_in_the_chat_and_brings_the_camp_after_a_beat()
         {
-            var s = Session(); Sturdy(s); var stage = Stage(s);
+            var s = Session(); Sturdy(s); AtLevel(s, 6);   // the deserters are 6-7 since round 29
+            var stage = Stage(s);
             var camp = CampMobs(s, c => c.tag == "deserter", 2);
             var next = CampMobs(s, c => c.tag == "deserter", 2, camp[0].CampIndex);   // another camp of the same people
             EncounterEnemy a = camp[0], b = camp[1], kin = next[0], far = next[1];
@@ -250,7 +251,8 @@ namespace Crulanda.Tests
 
         [UnityTest] public IEnumerator An_elites_guards_come_from_further_than_a_call_carries()
         {
-            var s = Session(); Sturdy(s); var stage = Stage(s);
+            var s = Session(); Sturdy(s); AtLevel(s, 6);   // the deserters are 6-7 since round 29
+            var stage = Stage(s);
             var king = Named(s, "Caddock, the Bandit King");
             var guards = s.Enemies.FindAll(e => e != king && e.actor.IsAlive && s.GuardOf(e, king));
             Assert.GreaterOrEqual(guards.Count, 2, "The king's guard stands with him.");
@@ -295,7 +297,7 @@ namespace Crulanda.Tests
 
         [UnityTest] public IEnumerator A_guards_shout_brings_his_fellows_and_not_the_king_across_the_hall()
         {
-            var s = Session(); Sturdy(s);
+            var s = Session(); Sturdy(s); AtLevel(s, 6);   // the deserters are 6-7 since round 29
             KingAndGuards(s, 8, out var king, out var first, out var second);
             float apart = Vector3.Distance(king.transform.position, first.transform.position);
             Assert.Greater(apart, SocialAggro.LordReach + 1, "The guard does not stand beside the king."); Assert.Less(apart, SocialAggro.CallReach - 1, "But well within earshot of him.");
@@ -313,7 +315,7 @@ namespace Crulanda.Tests
 
         [UnityTest] public IEnumerator A_guard_beside_the_king_brings_him_and_he_brings_the_rest()
         {
-            var s = Session(); Sturdy(s);
+            var s = Session(); Sturdy(s); AtLevel(s, 6);   // the deserters are 6-7 since round 29
             KingAndGuards(s, 2.5f, out var king, out var first, out var second);
             Assert.Less(Vector3.Distance(king.transform.position, first.transform.position), SocialAggro.LordReach - .3f, "The guard stands beside the king.");
             // A third of the guard far across the hall: out of the first guard's earshot, within the king's reach for his guards.

@@ -33,7 +33,7 @@ namespace Crulanda.Tests
             // The Sealed Adit (dungeon D1): the Sandthrone and the cult call, the hound and the crawlers pack, the greyed bears keep to themselves.
             { "picket", SocialKind.Call }, { "digger", SocialKind.Call }, { "overseer", SocialKind.Call }, { "sapper", SocialKind.Call }, { "gangboss", SocialKind.Call }, { "carrier", SocialKind.Call }, { "watchman", SocialKind.Call },
             { "platformguard", SocialKind.Call }, { "docker", SocialKind.Call }, { "railquartermaster", SocialKind.Call }, { "gunner", SocialKind.Call }, { "railcaptain", SocialKind.Call }, { "cutter", SocialKind.Call }, { "sorter", SocialKind.Call },
-            { "nix", SocialKind.Call }, { "ashinitiate", SocialKind.Call }, { "ashmender", SocialKind.Call }, { "ysolt", SocialKind.Call }, { "foreman", SocialKind.Call }, { "venthound", SocialKind.Pack }, { "crawler", SocialKind.Pack }, { "greybear", SocialKind.Solitary }
+            { "nix", SocialKind.Call }, { "ashinitiate", SocialKind.Call }, { "ashmender", SocialKind.Call }, { "ysolt", SocialKind.Call }, { "foreman", SocialKind.Call }, { "venthound", SocialKind.Solitary }, { "crawler", SocialKind.Pack }, { "greybear", SocialKind.Solitary }
         };
 
         [Test] public void Every_camp_in_the_five_zones_has_a_sensible_kind()
@@ -153,9 +153,9 @@ namespace Crulanda.Tests
                 Assert.That(m.enrageAt, Is.InRange(.2f, .4f)); Assert.Less(m.enrageHaste, .8f, "Enraged, it swings faster.");
                 Assert.Greater(m.callAt, m.enrageAt, "It calls before it enrages.");
             }
-            Assert.AreEqual(12, EliteMoves.All.Select(m => m.name).Distinct().Count(), "Nineteen different moves.");
+            Assert.AreEqual(19, EliteMoves.All.Select(m => m.name).Distinct().Count(), "Nineteen different moves.");
             // Dungeon end bosses are a step harder than outdoor named elites: Caddock and the Hollow Root-Warden, and only they.
-            CollectionAssert.AreEquivalent(new[] { "Caddock, the Bandit King", "The Hollow Root-Warden" }, EliteMoves.All.Where(m => m.boss).Select(m => m.mob).ToList());
+            CollectionAssert.AreEquivalent(new[] { "Caddock, the Bandit King", "The Hollow Root-Warden", "Rail-Captain Orsk Danner" }, EliteMoves.All.Where(m => m.boss).Select(m => m.mob).ToList());
             foreach (var m in EliteMoves.All) { Assert.AreEqual(m.boss ? EliteMoves.BossHealth : 1, m.health, m.mob); Assert.AreEqual(m.boss ? EliteMoves.BossHit : 1, m.hit, m.mob); }
             Assert.Greater(EliteMoves.BossHealth, 1.1f); Assert.Greater(EliteMoves.BossHit, 1.05f);
             // Solitary beasts call nobody; the rest have a call to make.

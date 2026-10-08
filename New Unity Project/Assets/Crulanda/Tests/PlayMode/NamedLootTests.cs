@@ -73,7 +73,8 @@ namespace Crulanda.Tests
         [UnityTest] public IEnumerator Named_loot_is_live_and_a_new_character_holds_the_Trailblade()
         {
             var s = Session(); yield return null;
-            Assert.AreEqual(122, s.Loot.Gear.Count, "104 named items, the five legendaries, the twelve older ones and the Sentinel's Helm (2026-10-07).");
+            Assert.AreEqual(139, s.Loot.Gear.Count,   // and the Sealed Adit's seventeen
+ "104 named items, the five legendaries, the twelve older ones and the Sentinel's Helm (2026-10-07).");
             Assert.NotNull(s.Items.Get("loot.oak.whitefoot_mantle"), "The loot files are item files.");
             Assert.AreEqual(s.content.itemId, s.Progress.equipment[(int)EquipSlot.MainHand].item, "A new character starts with the Tempered Trailblade in hand.");
             Assert.AreEqual(0, Inventory.Count(s.Progress, s.content.itemId), "Worn, not in the bags.");

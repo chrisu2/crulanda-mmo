@@ -168,7 +168,7 @@ namespace Crulanda.Tests
             // A normal mob never does this.
             var wolf = CampMobs(s, c => c.look == "wolf" && !c.ambush, 1)[0];
             before = wolf.actor.Health.Pool.Current; AtLevel(s, 1); wolf.Receive(10, s.Player);
-            Assert.AreEqual(10, before - wolf.actor.Health.Pool.Current, "Normal mobs are as they were.");
+            Assert.AreEqual(8, before - wolf.actor.Health.Pool.Current, "Normal mobs are as they were (8 at the wolf's round-29 level).");
         }
 
         [UnityTest] public IEnumerator Miras_health_follows_your_level()

@@ -253,7 +253,7 @@ namespace Crulanda.Encounter
         /// messages; Enter to type (/s say, /z zone, /t trade, /lfg, /p party), Enter to send, Esc to stop.</summary>
         /// <summary>One window (Round 24, playtest note 66: "one window, but colorized"): every channel together, each in its colour,
         /// with filter chips to hide one; dragged by its top edge and resized by its top-right corner (kept in PlayerPrefs).</summary>
-        static readonly (string chip, ChatChannel ch)[] ChatChips = { ("Zone", ChatChannel.Zone), ("Trade", ChatChannel.Trade), ("LFG", ChatChannel.LFG), ("Party", ChatChannel.Party), ("Whisper", ChatChannel.Whisper), ("Sys", ChatChannel.System) };
+        static readonly (string chip, ChatChannel ch)[] ChatChips = { ("Zone", ChatChannel.Zone), ("Trade", ChatChannel.Trade), ("LFG", ChatChannel.LFG), ("Party", ChatChannel.Party), ("Whisper", ChatChannel.Whisper), ("Guild", ChatChannel.Guild), ("Sys", ChatChannel.System) };
         static bool chatTyping, chatFocus, chatDrag, chatSize; static string chatTyped = ""; static Vector2 chatGrab;
         /// <summary>Opens the chat line with "/w name " ready (the sim frame's Whisper button, 5.5).</summary>
         void BeginWhisper(string name) { chatTyped = "/w " + name + " "; chatTyping = true; chatFocus = true; EncounterInput.Typing = true; }
@@ -266,7 +266,7 @@ namespace Crulanda.Encounter
             if (!chatLoaded)
             {
                 chatLoaded = true;
-                try { chatRect = new Rect(PlayerPrefs.GetFloat("chat.x", 10), PlayerPrefs.GetFloat("chat.y", 592), PlayerPrefs.GetFloat("chat.w", 472), PlayerPrefs.GetFloat("chat.h", 182)); chatHidden = PlayerPrefs.GetInt("chat.hidden", 0); } catch { }
+                try { chatRect = new Rect(PlayerPrefs.GetFloat("chat.x", 10), PlayerPrefs.GetFloat("chat.y", 592), Mathf.Max(470, PlayerPrefs.GetFloat("chat.w", 472)), PlayerPrefs.GetFloat("chat.h", 182)); chatHidden = PlayerPrefs.GetInt("chat.hidden", 0); } catch { }
             }
             if (e.type == EventType.KeyDown && (e.keyCode == KeyCode.Return || e.keyCode == KeyCode.KeypadEnter))
             {
@@ -279,7 +279,7 @@ namespace Crulanda.Encounter
             var bar = new Rect(chatRect.x, chatRect.y, chatRect.width - 22, 22); var corner = new Rect(chatRect.xMax - 22, chatRect.y, 22, 22);
             if (e.type == EventType.MouseDown && e.button == 0) { if (corner.Contains(e.mousePosition)) { chatSize = true; e.Use(); } else if (bar.Contains(e.mousePosition) && !ChipAt(e.mousePosition)) { chatDrag = true; chatGrab = e.mousePosition - chatRect.position; e.Use(); } }
             if (e.type == EventType.MouseDrag && chatDrag) { chatRect.position = new Vector2(Mathf.Clamp(e.mousePosition.x - chatGrab.x, 0, 1440 - chatRect.width), Mathf.Clamp(e.mousePosition.y - chatGrab.y, 0, 790 - chatRect.height)); e.Use(); }
-            if (e.type == EventType.MouseDrag && chatSize) { float w = Mathf.Clamp(e.mousePosition.x - chatRect.x, 300, 900), h = Mathf.Clamp(chatRect.yMax - e.mousePosition.y, 90, 500); chatRect = new Rect(chatRect.x, chatRect.yMax - h, w, h); e.Use(); }
+            if (e.type == EventType.MouseDrag && chatSize) { float w = Mathf.Clamp(e.mousePosition.x - chatRect.x, 470, 900), h = Mathf.Clamp(chatRect.yMax - e.mousePosition.y, 90, 500); chatRect = new Rect(chatRect.x, chatRect.yMax - h, w, h); e.Use(); }
             if (e.type == EventType.MouseUp && (chatDrag || chatSize)) { chatDrag = chatSize = false; try { PlayerPrefs.SetFloat("chat.x", chatRect.x); PlayerPrefs.SetFloat("chat.y", chatRect.y); PlayerPrefs.SetFloat("chat.w", chatRect.width); PlayerPrefs.SetFloat("chat.h", chatRect.height); } catch { } e.Use(); }
             var box = chatRect;
             Fill(box, new Color(0, 0, 0, chatTyping || box.Contains(e.mousePosition) ? .5f : .3f));
@@ -684,6 +684,7 @@ namespace Crulanda.Encounter
                     var root = f.transform.position; float fd = Vector3.Distance(player, root + Vector3.up * 1.3f);
                     if (fd > 24 || !ToCanvas(root + Vector3.up * 1.3f, out var fp) || fp.x < 0 || fp.x > 1440 || Occluded(f, root + Vector3.up * .85f)) continue;
                     string title = Bracketed(SimRoster.ClassName(f.sim.classId) + " " + f.sim.level + (f.Activity == SimFigure.Doing.Loiter ? "" : " · " + f.Doings));
+                    if (!string.IsNullOrEmpty(f.sim.guild)) title = Bracketed(f.sim.guild) + " " + SimRoster.ClassName(f.sim.classId) + " " + f.sim.level;   // round 27: the guild tag
                     float w = Mathf.Max(TextWidth(plateText, f.sim.name), TextWidth(plateText, title)) + 8;
                     AddPlate(new Plate { dist = fd, fade = Mathf.Clamp01((24 - fd) / 4), top = -41, at = fp, sim = f, named = true, name = f.sim.name, title = title, mark = ' ' }, w);
                 }
@@ -692,7 +693,7 @@ namespace Crulanda.Encounter
                 if (c == null) continue;
                 var root = c.transform.position; float cd = Vector3.Distance(player, root + Vector3.up * 1.3f);
                 if (cd > 30 || !ToCanvas(root + Vector3.up * 1.3f, out var cp) || cp.x < 0 || cp.x > 1440 || Occluded(c, root + Vector3.up * .85f)) continue;
-                string ctitle = Bracketed(SimRoster.ClassName(c.sim.classId) + " " + c.sim.level + " · party");
+                string ctitle = string.IsNullOrEmpty(c.sim.guild) ? Bracketed(SimRoster.ClassName(c.sim.classId) + " " + c.sim.level + " · party") : Bracketed(c.sim.guild) + " " + SimRoster.ClassName(c.sim.classId) + " " + c.sim.level;
                 AddPlate(new Plate { dist = cd, fade = 1, top = -41, at = cp, simParty = c, named = true, name = c.sim.name, title = ctitle, mark = ' ' }, Mathf.Max(TextWidth(plateText, c.sim.name), TextWidth(plateText, ctitle)) + 8);
             }
             foreach (var e in session.Enemies) EnemyPlateAt(e, 25);

@@ -17,9 +17,22 @@ namespace Crulanda.Encounter
     {
         static bool lootVisible; static Rect lootRect;
         const float LootRowH = Slot + 8, LootTop = 58, LootFoot = 56;
-        static bool LootUiBlocks(Vector2 p) { return lootVisible && lootRect.Contains(p) || rollVisible && RollRect.Contains(p); }
+        static bool LootUiBlocks(Vector2 p) { return lootVisible && lootRect.Contains(p) || rollVisible && RollRect.Contains(p) || inviteVisible && InviteRect.Contains(p); }
         static bool rollVisible; static readonly Rect RollRect = new Rect(372, 96, 300, 118);
         /// <summary>The roll for a piece of loot (Round 25, playtest note 72): the piece, Need / Greed / Pass for you, and each member's choice as it comes.</summary>
+        /// <summary>A sim's invitation (round 27): who, Accept and Decline, over the roll's place.</summary>
+        void DrawInvite()
+        {
+            var s = session.PendingInvite; inviteVisible = s != null; if (s == null) return;
+            var w = InviteRect; var col = ClassColour(s.classId);
+            Fill(new Rect(w.x - 2, w.y - 2, w.width + 4, w.height + 4), new Color(col.r, col.g, col.b, .9f)); Fill(w, new Color(.08f, .075f, .07f, .97f));
+            Shadow(new Rect(w.x + 10, w.y + 6, 280, 22), s.name + " invites you", frameName, col);
+            if (session.PendingGuild != null) Shadow(new Rect(w.x + 10, w.y + 28, 280, 20), "to join <" + session.PendingGuild + ">", tiny, ZoneChat.Colour(ChatChannel.Guild));   // round 27
+            else Shadow(new Rect(w.x + 10, w.y + 28, 280, 20), SimRoster.ClassName(s.classId) + " " + s.level + (s.zone != session.ZoneId ? " · in " + session.ZoneName(s.zone) : ""), tiny, new Color(1, .84f, .45f));
+            if (GUI.Button(new Rect(w.x + 10, w.y + 52, 130, 26), "Accept", slim)) session.AnswerInvite(true);
+            if (GUI.Button(new Rect(w.x + 150, w.y + 52, 130, 26), "Decline", slim)) session.AnswerInvite(false);
+        }
+        static bool inviteVisible; static readonly Rect InviteRect = new Rect(372, 222, 300, 86);
         void DrawRoll()
         {
             var r = session.Roll; rollVisible = r != null; if (r == null) return;
@@ -54,7 +67,7 @@ namespace Crulanda.Encounter
         {
             lootVisible = session.LootOpen;
             if (lootVisible) LootWindow();
-            DrawRoll();
+            DrawRoll(); DrawInvite();
             if (PinnedTooltip != null && session.Items != null) { ItemTooltip(session.Items.Get(PinnedTooltip), true); tooltipAt = PinnedTooltipAt; }
             if (tooltip != null && !(session.InventoryOpen || session.CharacterOpen || session.VendorNpc != null)) DrawTooltip();
         }

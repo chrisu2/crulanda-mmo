@@ -9,7 +9,7 @@ namespace Crulanda.Tests
     /// <summary>The sims' roster (Phase 5.2 round 1): twenty, the same for a seed, named and levelled to their homes, saved in the world slot and read back whole.</summary>
     public class SimRosterTests
     {
-        [Test] public void Twenty_sims_the_same_for_a_seed_with_unique_names_and_every_class()
+        [Test] public void Forty_sims_the_same_for_a_seed_with_unique_names_and_every_class()
         {
             var a = SimRoster.Generate(7); var b = SimRoster.Generate(7); var c = SimRoster.Generate(8);
             Assert.AreEqual(SimRoster.Count, a.Count);
@@ -26,6 +26,26 @@ namespace Crulanda.Tests
                 Assert.That(s.onlineHours, Is.InRange(4, 24)); Assert.That(s.bold, Is.InRange(0, 1));
             }
             Assert.GreaterOrEqual(a.Count(s => s.homeZone == "zone.oakhaven"), 6, "most of them where the player starts");
+        }
+        /// <summary>Round 27: a world of twenty (made before) grows to forty, the old ones kept as they are, the new mostly higher; every sim gets its guild once.</summary>
+        [Test] public void An_old_world_grows_to_forty_and_each_sim_gets_its_guild_once()
+        {
+            var old = new WorldSave { seed = 11, sims = SimRoster.Generate(11).Take(20).ToList() };
+            old.sims[0].level = 9; old.sims[0].name = old.sims[0].name + "x";
+            Assert.IsTrue(SimRoster.Grow(old)); Assert.AreEqual(SimRoster.Count, old.sims.Count);
+            Assert.AreEqual(9, old.sims[0].level, "the old twenty are kept as they are");
+            Assert.AreEqual(old.sims.Count, old.sims.Select(s => s.id).Distinct().Count(), "ids unique");
+            Assert.AreEqual(old.sims.Count, old.sims.Select(s => s.name).Distinct().Count(), "names unique");
+            Assert.GreaterOrEqual(old.sims.Skip(20).Count(s => s.level >= 7), 12, "the new twenty mostly at the higher levels");
+            Assert.IsFalse(SimRoster.Grow(old), "grown once");
+            Assert.IsTrue(SimGuilds.Assign(old)); var first = old.sims.Select(s => s.guild).ToArray();
+            Assert.IsFalse(SimGuilds.Assign(old), "assigned once"); CollectionAssert.AreEqual(first, old.sims.Select(s => s.guild).ToArray());
+            Assert.That(old.sims.Count(s => s.guild != ""), Is.InRange(16, 36), "about two in three in a guild");
+            foreach (var s in old.sims) Assert.IsTrue(s.guild == "" || SimGuilds.Exists(s.guild), s.guild);
+            var seen = new System.Collections.Generic.HashSet<string>();
+            for (int seed = 1; seed <= 10; seed++) { var w = new WorldSave { seed = seed, sims = SimRoster.Generate(seed) }; SimGuilds.Assign(w); foreach (var s in w.sims) seen.Add(s.guild); }
+            foreach (var g in SimGuilds.All) Assert.IsTrue(seen.Contains(g.name), g.name + " has members");
+            Assert.NotNull(SimGuilds.Leader(old, old.sims.First(s => s.guild != "").guild));
         }
         [Test] public void Online_hours_wrap_past_midnight()
         {

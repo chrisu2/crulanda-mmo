@@ -113,6 +113,69 @@ namespace Crulanda.Tests
             Assert.IsFalse(c.Leading.HasValue, "the run is done"); StringAssert.Contains("cleared", session.Messages.Last());
         }
 
+        /// <summary>Round 27: the party is saved with the world and comes back with you; a sim's invitation is accepted from the screen.</summary>
+        [UnityTest] public IEnumerator The_party_is_kept_and_a_sim_can_invite_you()
+        {
+            var s = Willing("class.ranger"); yield return null;
+            Assert.IsTrue(session.Invite(s.id)); SimPopulation.Active.Persist();
+            CollectionAssert.Contains(SimPopulation.Active.World.party, s.id, "saved with the world");
+            // As after a zone change: the party gone from the scene, the saved list brings it back without asking.
+            var kept = new System.Collections.Generic.List<string>(SimPopulation.Active.World.party);
+            session.LeaveParty(s.id); Assert.IsFalse(session.InParty(s.id));
+            SimPopulation.Active.RestoreParty(kept); yield return null;
+            Assert.IsTrue(session.InParty(s.id), "with you again"); StringAssert.Contains(s.name, session.Messages.Last());
+            session.LeaveParty(s.id); yield return null;
+            // An invitation from a sim: Accept brings it into the party.
+            session.InvitedBy(s); Assert.AreSame(s, session.PendingInvite);
+            session.AnswerInvite(true); yield return null;
+            Assert.IsTrue(session.InParty(s.id), "joined by accepting"); Assert.IsNull(session.PendingInvite);
+        }
+        /// <summary>Round 27: a guild sim asks you in; accepting puts you in its guild (not its group), the guild welcomes you and answers
+        /// you in Guild chat; /guild lists it; /gquit leaves. /g says so when you are in none.</summary>
+        [UnityTest] public IEnumerator Joining_a_guild_and_talking_in_it()
+        {
+            var s = Willing("class.paladin"); s.guild = "The Lantern Watch"; s.chatty = .9f; yield return null;
+            Assert.IsFalse(session.InGuild);
+            session.PlayerChat("/g hello"); StringAssert.Contains("not in a guild", session.Messages.Last());
+            session.GuildInvitedBy(s); Assert.AreSame(s, session.PendingInvite); Assert.AreEqual("The Lantern Watch", session.PendingGuild);
+            session.AnswerInvite(true); yield return null;
+            Assert.AreEqual("The Lantern Watch", session.Guild); Assert.IsTrue(session.SameGuild(s)); Assert.IsNull(session.PendingInvite);
+            Assert.IsFalse(session.InParty(s.id), "a guild, not a group");
+            float until = Time.time + 12; while (Time.time < until && !session.Chat.Any(l => l.channel == ChatChannel.Guild && l.speaker == s.name)) yield return null;
+            Assert.IsTrue(session.Chat.Any(l => l.channel == ChatChannel.Guild && l.speaker == s.name), "welcomed in Guild");
+            session.PlayerChat("/g hello all"); var said = session.Chat.Last(); Assert.AreEqual(ChatChannel.Guild, said.channel); Assert.AreEqual("You", said.speaker);
+            until = Time.time + 12; while (Time.time < until && session.Chat.Last().speaker == "You") yield return null;
+            var answer = session.Chat.Last(); Assert.AreEqual(ChatChannel.Guild, answer.channel, "a guild-mate answers"); Assert.AreNotEqual("You", answer.speaker);
+            session.PlayerChat("/guild"); StringAssert.Contains("<The Lantern Watch>", session.Messages.Last()); StringAssert.Contains(s.name, session.Messages.Last());
+            session.PlayerChat("/gquit"); Assert.IsFalse(session.InGuild);
+        }
+        /// <summary>Round 27: /dungeon routes the run through Crowsfoot Hollow's camps in the passage's order, the boss (Caddock's hall) last.</summary>
+        [UnityTest] public IEnumerator A_sim_leads_a_dungeon_run_camp_by_camp()
+        {
+            var s = Willing("class.warrior"); yield return null; Assert.IsTrue(session.Invite(s.id)); var c = session.PartySim(s.id);
+            session.Progress.experience = EncounterProgress.XpForLevel(5);
+            Assert.IsNotNull(c.LeadDungeon(out var why), why); Assert.AreEqual("Crowsfoot Hollow", c.Dungeon);
+            Assert.GreaterOrEqual(c.CampsLeft, 5, "the hollow's camps");
+            Assert.AreEqual("Hollow lookouts", c.LeadingName, "the first camp in from the mouth");
+            Assert.IsTrue(session.Chat.Any(l => l.channel == ChatChannel.Party && l.speaker == s.name && l.text.Contains("Crowsfoot Hollow")), "said in Party");
+            c.StopLeading(); session.Progress.experience = 0; Assert.IsNull(c.LeadDungeon(out why), "too low"); StringAssert.Contains("too much", why);
+        }
+        /// <summary>Round 27: buying from a sim moves its goods and your coin to each other; selling it ore pays half as much again.</summary>
+        [UnityTest] public IEnumerator Trading_with_a_sim_moves_goods_and_coin()
+        {
+            var s = Willing("class.warrior"); yield return null; var fig = SimPopulation.Active.Find(s.id);
+            session.Player.GetComponent<AdventurerMotor>().Teleport(fig.transform.position + Vector3.back * 2); yield return null;
+            s.goodIds.Clear(); s.goodCounts.Clear(); SimEconomy.Add(s, "mat.copper_ore", 3); s.coin = 100; session.Progress.gold = 50;
+            Assert.IsTrue(session.OpenSimTrade(s, fig.transform.position)); CollectionAssert.Contains(session.VendorStock, "mat.copper_ore");
+            var ore = session.Items.Get("mat.copper_ore"); int price = session.VendorPrice(ore);
+            Assert.AreEqual(Mathf.Max(1, ore.value * 2), price, "twice its value");
+            session.Buy("mat.copper_ore");
+            Assert.AreEqual(50 - price, session.Progress.gold); Assert.AreEqual(100 + price, s.coin); Assert.AreEqual(2, SimEconomy.Count(s, "mat.copper_ore"));
+            int slot = session.Progress.bag.FindIndex(b => !b.Empty && b.item == "mat.copper_ore"); Assert.GreaterOrEqual(slot, 0, "in your bags");
+            int offer = session.SimOffer(s, ore, 1); Assert.AreEqual(Mathf.Max(1, Mathf.RoundToInt(ore.value * 1.5f)), offer, "a smith pays more for ore");
+            session.SellBag(slot); Assert.AreEqual(3, SimEconomy.Count(s, "mat.copper_ore"), "back to it");
+            session.CloseVendor(); Assert.IsNull(session.VendorSim);
+        }
         [UnityTest] public IEnumerator Mobs_grow_with_the_group_by_its_levels()
         {
             var e = session.Enemies.Find(x => x != null && x.actor.IsAlive && !x.Game); Assert.NotNull(e);

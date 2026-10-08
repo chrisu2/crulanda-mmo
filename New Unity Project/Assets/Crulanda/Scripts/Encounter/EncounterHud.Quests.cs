@@ -81,13 +81,19 @@ namespace Crulanda.Encounter
             Portrait(new Vector2(668, 54), 74, col, s.name.Substring(0, 1), s.level.ToString());
             Shadow(new Rect(380, 24, 240, 20), s.name, frameName, col);
             Shadow(new Rect(380, 46, 260, 20), "<" + SimRoster.ClassName(s.classId) + " " + s.level + " · " + s.folk + ">", tiny, new Color(1, .84f, .45f));
-            if (member) { if (GUI.Button(new Rect(380, 63, 120, 26), "Leave party", slim)) session.LeaveParty(s.id); }
+            var body = session.FocusSimBody;
+            if (member)
+            {
+                if (GUI.Button(new Rect(380, 63, 120, 26), "Leave party", slim)) session.LeaveParty(s.id);
+                if (body != null && GUI.Button(new Rect(506, 63, 70, 26), "Trade", slim)) session.OpenSimTrade(s, body.position);   // round 27
+            }
             else
             {
                 if (GUI.Button(new Rect(380, 63, 90, 26), "Invite", slim)) session.Invite(s.id);
                 if (GUI.Button(new Rect(476, 63, 80, 26), "Whisper", slim)) BeginWhisper(s.name);   // 5.5
+                if (body != null && GUI.Button(new Rect(562, 63, 70, 26), "Trade", slim)) session.OpenSimTrade(s, body.position);   // round 27
                 var st = SimMemory.Of(s);
-                Shadow(new Rect(562, 66, 100, 20), s.friend ? "Friend" : st == SimMemory.Standing.Stranger ? "Adventurer" : char.ToUpper(SimMemory.Label(st)[0]) + SimMemory.Label(st).Substring(1), tiny, st == SimMemory.Standing.Rival ? new Color(1, .5f, .45f) : s.friend || st == SimMemory.Standing.Friend ? new Color(.55f, 1, .7f) : Color.white);
+                Shadow(new Rect(500, 46, 160, 20), s.friend ? "Friend" : st == SimMemory.Standing.Stranger ? "Adventurer" : char.ToUpper(SimMemory.Label(st)[0]) + SimMemory.Label(st).Substring(1), tiny, st == SimMemory.Standing.Rival ? new Color(1, .5f, .45f) : s.friend || st == SimMemory.Standing.Friend ? new Color(.55f, 1, .7f) : Color.white);
             }
         }
 

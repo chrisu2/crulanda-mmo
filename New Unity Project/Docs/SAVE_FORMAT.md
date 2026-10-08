@@ -44,9 +44,12 @@ To change saved fields, add the next step (9 → 10) and bump `FormatVersion`. N
 ## The world slot (2026-10-06, Phase 5.2)
 File: the same root, slot "world" (world.save.json, .bak kept), payloadType CrulandaWorld, formatVersion 1, DTO WorldSave:
 seed and the list of SimAdventurer (id, name, folk, classId, homeZone, zone, level, variant, gearSeed, bold, friendly, chatty,
-onlineFrom, onlineHours, x, z). Shared by every character; created when first missing (SimRoster.LoadOrCreate) and written with
+onlineFrom, onlineHours, x, z; later regard, friend, greetedHour, guild), the party (sim ids, round 27) and guildedUpTo
+(how many sims have had their guild chosen; round 27). Shared by every character; created when first missing (SimRoster.LoadOrCreate) and written with
 each character autosave (SimPopulation.Persist). An unreadable world slot falls back to its .bak, and failing that is made anew.
-Not migrated yet: bump WorldSave.FormatVersion and add a step when its fields change.
+Not migrated yet: bump WorldSave.FormatVersion and add a step when its fields change. Fields added since read as empty in an older
+world slot (format 1 still); an older world of twenty sims grows to forty on load (SimRoster.Grow, round 27). The character
+keeps its guild in EncounterProgress.guild ("" none; round 27), which an older save reads as none.
 
 ## Future world persistence
 CharacterSaveData/QuestSaveData/InventorySaveData/FactionSaveData

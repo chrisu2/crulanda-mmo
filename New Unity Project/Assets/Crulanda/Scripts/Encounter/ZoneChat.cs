@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Crulanda.Encounter
 {
     /// <summary>The chat's channels (playtest note 62; Docs/CHAT_RESEARCH.md): the game's own messages, and what people say.</summary>
-    public enum ChatChannel { System, Say, Zone, Trade, LFG, Party, Whisper }
+    public enum ChatChannel { System, Say, Zone, Trade, LFG, Party, Whisper, Guild }
 
     /// <summary>One line in the chat: who said it, where, and when.</summary>
     public sealed class ChatLine
@@ -18,6 +18,7 @@ namespace Crulanda.Encounter
             get
             {
                 if (channel == ChatChannel.System) return text;
+                if (channel == ChatChannel.Guild && string.IsNullOrEmpty(speaker)) return "[Guild] " + text;
                 if (channel == ChatChannel.Whisper) return to != null ? "To " + to + ": " + text : speaker + " whispers: " + text;
                 return "[" + ZoneChat.Label(channel) + "] " + speaker + ": " + text;
             }
@@ -43,6 +44,7 @@ namespace Crulanda.Encounter
                 case ChatChannel.LFG: return new Color(.55f, .85f, 1);
                 case ChatChannel.Party: return new Color(.6f, .7f, 1);
                 case ChatChannel.Whisper: return new Color(1, .55f, 1);
+                case ChatChannel.Guild: return new Color(.4f, 1, .45f);
                 default: return new Color(1, .96f, .86f);
             }
         }
@@ -58,7 +60,8 @@ namespace Crulanda.Encounter
                 case "/s": case "/say": return (ChatChannel.Say, rest);
                 case "/t": case "/trade": return (ChatChannel.Trade, rest);
                 case "/lfg": case "/l": return (ChatChannel.LFG, rest);
-                case "/p": case "/party": case "/g": return (ChatChannel.Party, rest);
+                case "/p": case "/party": return (ChatChannel.Party, rest);
+                case "/g": case "/gu": case "/guild": return (ChatChannel.Guild, rest);   // round 27: /g is the guild's, as everywhere
                 default: return (ChatChannel.Zone, cmd == "/z" || cmd == "/zone" || cmd == "/ooc" ? rest : raw);
             }
         }
@@ -67,7 +70,7 @@ namespace Crulanda.Encounter
         {
             switch (c)
             {
-                case ChatChannel.Say: return "/s"; case ChatChannel.Trade: return "/t"; case ChatChannel.LFG: return "/lfg"; case ChatChannel.Party: return "/p";
+                case ChatChannel.Say: return "/s"; case ChatChannel.Trade: return "/t"; case ChatChannel.LFG: return "/lfg"; case ChatChannel.Party: return "/p"; case ChatChannel.Guild: return "/g";
                 default: return "/z";
             }
         }
@@ -154,12 +157,17 @@ namespace Crulanda.Encounter
                     case "/friends": ListFriends(); return;
                     case "/assist": case "/a": Assist(arg); return;
                     case "/lead": case "/run": Lead(arg); return;
-                    case "/help": Message("Chat: /s say, /z zone, /t trade, /lfg, /p party, /w <name> <words> whisper, /r reply; /invite <name> (anyone online, anywhere), /leave [name], /who, /friend <name>, /friends, /assist [name], /lead [name] (a sim leads a run to a camp)."); return;
-                    case "/s": case "/say": case "/z": case "/zone": case "/ooc": case "/t": case "/trade": case "/lfg": case "/l": case "/p": case "/party": case "/g": break;
+                    case "/dungeon": LeadDungeon(); return;
+                    case "/guild": if (arg.Length == 0) { GuildRoster(); return; } break;
+                    case "/groster": case "/ginfo": GuildRoster(); return;
+                    case "/gquit": LeaveGuild(); return;
+                    case "/help": Message("Chat: /s say, /z zone, /t trade, /lfg, /p party, /w <name> <words> whisper, /r reply; /invite <name> (anyone online, anywhere), /leave [name], /who, /friend <name>, /friends, /assist [name], /lead [name] (a sim leads a run to a camp), /dungeon (a sim leads you through the dungeon); /g guild chat, /guild (who is in it), /gquit."); return;
+                    case "/s": case "/say": case "/z": case "/zone": case "/ooc": case "/t": case "/trade": case "/lfg": case "/l": case "/p": case "/party": case "/g": case "/gu": break;
                     default: Message("Unknown command " + cmd + ". /help lists them."); return;
                 }
             }
             var (channel, text) = ZoneChat.Parse(raw, ChatDefault);
+            if (channel == ChatChannel.Guild && !InGuild) { Message("You are not in a guild. Say \"lf guild\" in /z or /lfg and someone may ask you in."); return; }
             if (channel == ChatChannel.Party && PartySims.Count == 0) { Message("You are not in a party: /invite someone first (the who list, O, shows who is online)."); return; }
             if (raw.StartsWith("/") && channel != ChatDefault) { ChatDefault = channel; if (text.Length == 0) { Message("Talking in " + ZoneChat.Label(channel) + " now (" + ZoneChat.Prefix(ChatChannel.Zone) + " for Zone)."); return; } }
             if (text.Length == 0) return;

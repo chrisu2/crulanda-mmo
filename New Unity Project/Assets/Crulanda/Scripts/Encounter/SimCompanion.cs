@@ -141,7 +141,41 @@ namespace Crulanda.Encounter
             session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? "follow me, " + LeadingName.ToLower() + " this way" : "Follow me. The " + LeadingName.ToLower() + " are this way.");
             return LeadingName;
         }
-        public void StopLeading() { Leading = null; LeadingName = null; }
+        public void StopLeading() { Leading = null; LeadingName = null; route.Clear(); Dungeon = null; }
+        /// <summary>A dungeon run (round 27): the camps still to clear, in the order the passage meets them, and the dungeon's name.</summary>
+        readonly System.Collections.Generic.List<(Vector3 at, string name, bool boss)> route = new System.Collections.Generic.List<(Vector3, string, bool)>();
+        public string Dungeon { get; private set; }
+        public int CampsLeft { get { return route.Count; } }
+        /// <summary>
+        /// Leads the party through the zone's dungeon (a walk-in cave with camps in it): every camp whose ground is the cave's floor, in
+        /// the order the passage reaches them from the mouth, the boss (an elite at the far end) last. Refuses (null, and why) when there
+        /// is none, or when you are more than a level under its first camp (its camps are harder).
+        /// </summary>
+        public string LeadDungeon(out string why)
+        {
+            why = null; route.Clear(); Dungeon = null;
+            if (session.Zone == null) { why = "There is nowhere to go."; return null; }
+            foreach (var h in Crulanda.World.Hollow.All)
+            {
+                var camps = new System.Collections.Generic.List<(float along, Vector3 at, string name, bool boss, int lo)>();
+                foreach (var cp in session.Zone.Zone.camps)
+                {
+                    if (cp == null) continue;
+                    if (h.FloorAt(cp.center, out float y)) { int i = h.Nearest(cp.center, out _); camps.Add((h.Along[i], new Vector3(cp.center.x, y, cp.center.y), cp.name, cp.elite, cp.levelMin)); continue; }
+                    // A camp guarding the mouth from outside (the Hollow lookouts) is the run's first: before the passage, by its distance.
+                    if (h.Centre.Count == 0) continue; var mouth = new Vector2(h.Centre[0].x, h.Centre[0].z); float out_ = Vector2.Distance(cp.center, mouth);
+                    if (out_ < 14) camps.Add((-out_, session.Zone.Ground(cp.center), cp.name, cp.elite, cp.levelMin));
+                }
+                if (camps.Count == 0) continue;
+                camps.Sort((a, b) => a.along.CompareTo(b.along));
+                int first = camps[0].lo; if (session.Progress.Level < first - 1) { why = h.Name + " is too much for us yet (level " + first + " at the door)."; return null; }
+                foreach (var cp in camps) route.Add((cp.at, cp.name, cp.boss));
+                Dungeon = h.Name; Leading = route[0].at; LeadingName = route[0].name;
+                session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? "ok, " + Dungeon + " run. " + route.Count + " camps to the bottom, stay close" : "Follow me into " + Dungeon + ". " + route.Count + " camps between us and the end. Stay close.");
+                return Dungeon;
+            }
+            why = "There is no dungeon in these parts."; return null;
+        }
         /// <summary>No mob of the camp left near where it led to: the run is done.</summary>
         bool CampCleared()
         {
@@ -198,9 +232,24 @@ namespace Crulanda.Encounter
             var quarry = Quarry;
             if (Leading.HasValue && quarry == null && CampCleared())
             {
-                session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? "camp cleared, gg. where next?" : "That's the camp cleared. Well fought. Where next?");
-                session.Message(sim.name + " calls the run done: " + LeadingName.ToLower() + " cleared.");
-                StopLeading();
+                if (route.Count > 1)
+                {
+                    // A dungeon run (round 27): on to the next camp down the passage.
+                    route.RemoveAt(0); Leading = route[0].at; LeadingName = route[0].name;
+                    session.ChatSay(ChatChannel.Party, sim.name, route[0].boss ? (sim.chatty > .65f ? "boss next. " + LeadingName + ". buff up" : "That's the last before " + LeadingName + ". Ready yourselves.") : (sim.chatty > .65f ? "clear. next: " + LeadingName.ToLower() : "Clear. On to " + LeadingName + "."));
+                }
+                else if (Dungeon != null)
+                {
+                    session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? Dungeon + " done!! gg all" : Dungeon + " is cleared. That was well done, all of you.");
+                    session.Message(sim.name + ": " + Dungeon + " cleared."); foreach (var p in session.PartySims) if (p != null) SimMemory.Note(p.sim, SimMemory.Deed.KillsTogether, 3);
+                    StopLeading();
+                }
+                else
+                {
+                    session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? "camp cleared, gg. where next?" : "That's the camp cleared. Well fought. Where next?");
+                    session.Message(sim.name + " calls the run done: " + LeadingName.ToLower() + " cleared.");
+                    StopLeading();
+                }
             }
             if (quarry != null)
             {

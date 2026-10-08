@@ -271,7 +271,7 @@ namespace Crulanda.Encounter
                 var d = session.Items.Get(stock[i]); if (d == null) continue;
                 var r = new Rect(4, i * rowH + 4, Slot, Slot);
                 ItemSquare(r, new ItemStack { item = d.id, count = 1 });
-                int price = Inventory.Price(d); bool afford = p.gold >= price;
+                int price = session.VendorPrice(d); bool afford = p.gold >= price;   // a sim asks less than a merchant (round 27)
                 // Names in ink on the parchment: common in the window's own brown, junk in a faded one, better pieces in their colour
                 // darkened (the colour times .6 took the alpha down too, so common names were faint grey).
                 var qc = ItemDatabase.QualityColors[Mathf.Clamp(d.quality, 0, ItemDatabase.MaxQuality)];

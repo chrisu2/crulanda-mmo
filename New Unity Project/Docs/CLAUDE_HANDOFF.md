@@ -9,7 +9,19 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-10-07, about 20:25)
+## RESUME HERE (updated 2026-10-07, about 22:30)
+**Round 27 = sims complete (ROADMAP 5.7, all six items).** Party kept across zones and sessions (WorldSave.party), sims invite you
+(Accept / Decline panel), /dungeon (a sim leads the run camp by camp, the mouth's outside camp first), trading with sims (Trade
+button on the sim frame), guilds (SimGuilds in EncounterSession.Guild.cs: four GAME-ONLY guilds, /g Guild chat, invitations, tags
+on plates and the who list, /guild, /gquit, EncounterProgress.guild), forty sims (SimRoster.Count 40, Grow for old worlds).
+Full run c52: EditMode 428/428, PlayMode 217/218 (the dungeon test's level rule tightened to one level under the first camp; rerun
+c53). Release build in lane B, then publish (check Crulanda.exe is closed), commit, backup.
+**Next: the dungeon.** Docs/DUNGEON_DESIGN.md (draft 1): the Sealed Adit under the Shattered Peaks, levels 7-9, one big dungeon
+from research of three classic dungeons (design lessons only). Chris was asked: setting OK? size (60-90 min, 25-min first part)
+OK? He said "ok finish sims" (the order). Confirm the setting and size, then build in the order of section 9 (cavern variant 3
+first). After it: the enclave interior (note 40), Khaven with the Village kit, sound; seasons (note 85) later.
+
+## Earlier resume note (updated 2026-10-07, about 20:25)
 **Playable build = round 26, built 20:20, published. Notes 75-84 and 86 done: Esc > Controls (key bindings, WASD/ESDF presets, G
 interact), H hails, crops grow (CropField, Resources/Shaders/Crop.shader) and farmers work them, the meadows dressed
 (ZoneBuilder.Meadow), weapons sheathed out of a fight, walled kit barns fitted by their walls (WallProp), cows keep apart, signs point

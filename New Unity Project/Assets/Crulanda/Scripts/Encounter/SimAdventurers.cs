@@ -38,6 +38,8 @@ namespace Crulanda.Encounter
         public bool friend;
         /// <summary>The last world-clock hour it greeted you, so a friend says hello once a session, not every refresh.</summary>
         public float greetedHour = -1;
+        /// <summary>Its guild (round 27; SimGuilds), "" none.</summary>
+        public string guild = "";
         public bool IsOnline(float hour) { return Crulanda.World.WorldClock.Between(onlineFrom, Mathf.Repeat(onlineFrom + onlineHours, 24)) || onlineHours >= 24; }
         public bool IsOnlineAt(float hour) { float to = Mathf.Repeat(onlineFrom + onlineHours, 24); return onlineHours >= 24 || (onlineFrom <= to ? hour >= onlineFrom && hour < to : hour >= onlineFrom || hour < to); }
     }
@@ -50,12 +52,16 @@ namespace Crulanda.Encounter
         public const string PayloadType = "CrulandaWorld";
         public int seed;
         public List<SimAdventurer> sims = new List<SimAdventurer>();
+        /// <summary>The sims in your party when last saved (round 27): they are with you again in the next zone or the next session.</summary>
+        public List<string> party = new List<string>();
+        /// <summary>How many sims (in roster order) have had their guild chosen (round 27): an older world assigns them on load.</summary>
+        public int guildedUpTo;
     }
 
     /// <summary>Makes, reads and writes the roster.</summary>
     public static class SimRoster
     {
-        public const int Count = 20;
+        public const int Count = 40;   // round 27 (sims item 6): forty, the second twenty mostly at the higher levels
         public const string Slot = "world";
         public static readonly string[] ClassIds = { "class.warrior", "class.druid", "class.paladin", "class.ranger", "class.mage" };
         /// <summary>Home zones by level band (WORLD_ZONES.md): the village for the low levels, the Shore for the cap.</summary>
@@ -65,7 +71,8 @@ namespace Crulanda.Encounter
         static readonly string[] First = { "Ansel", "Bryn", "Cato", "Della", "Edric", "Fenna", "Garrick", "Hollis", "Isolde", "Jory", "Kestrel", "Lowen", "Maren", "Nolan", "Orla", "Piran", "Quill", "Rhosyn", "Sedge", "Tamsin", "Ulric", "Vesna", "Wren", "Yorath" };
         static readonly string[] Bynames = { "Ashby", "Brook", "Coombe", "Dray", "Fallow", "Greave", "Hale", "Kettle", "Larkin", "Marl", "Nettle", "Oxley", "Pike", "Rooke", "Sallow", "Thatch", "Underhill", "Wick" };
 
-        /// <summary>The twenty, the same for the same seed: names unique, every class at least three times, levels spread 1-13 with homes to match.</summary>
+        /// <summary>The forty, the same for a seed: names unique, every class at least three times, levels spread 1-13 with homes to match.
+        /// The first twenty are those of a world made before round 27 (the same draws), so an old world grows by the second twenty.</summary>
         public static List<SimAdventurer> Generate(int seed)
         {
             var r = new SeededRandom(seed); var sims = new List<SimAdventurer>(Count); var used = new HashSet<string>();
@@ -73,7 +80,7 @@ namespace Crulanda.Encounter
             {
                 var s = new SimAdventurer { id = "sim." + (i + 1).ToString("00"), classId = ClassIds[i % ClassIds.Length] };
                 // Levels: a spread over the bands, more at the bottom where the player starts (1-5: 8, 4-8: 5, 7-10: 3, 9-12: 2, 11-13: 2).
-                int band = i < 8 ? 0 : i < 13 ? 1 : i < 16 ? 2 : i < 18 ? 3 : 4;
+                int band = i < 8 ? 0 : i < 13 ? 1 : i < 16 ? 2 : i < 18 ? 3 : i < 20 ? 4 : (i - 20) % 5;   // the second twenty: four a band (12/9/7/6/6 in all)
                 var home = Homes[band];
                 s.level = home.lo + r.NextInt(0, home.hi - home.lo + 1);
                 s.homeZone = s.zone = home.zone; s.folk = home.folk;
@@ -117,8 +124,24 @@ namespace Crulanda.Encounter
         public static WorldSave LoadOrCreate(string root)
         {
             var w = Load(root, out _);
-            if (w != null) return w;
-            w = new WorldSave { seed = Environment.TickCount & 0x7fffffff }; w.sims = Generate(w.seed); Save(root, w); return w;
+            if (w != null) { if (Grow(w) | SimGuilds.Assign(w)) Save(root, w); return w; }
+            w = new WorldSave { seed = Environment.TickCount & 0x7fffffff }; w.sims = Generate(w.seed); SimGuilds.Assign(w); Save(root, w); return w;
+        }
+        /// <summary>A world with fewer sims than <see cref="Count"/> (made before round 27) gains the rest, as its seed makes them; a
+        /// name already taken is drawn again. True when it grew.</summary>
+        public static bool Grow(WorldSave w)
+        {
+            if (w == null || w.sims.Count >= Count) return false;
+            var all = Generate(w.seed); var used = new HashSet<string>(); var ids = new HashSet<string>();
+            foreach (var s in w.sims) { used.Add(s.name); ids.Add(s.id); }
+            var r = new SeededRandom(w.seed + 4111);
+            for (int i = w.sims.Count; i < Count; i++)
+            {
+                var s = all[i]; if (ids.Contains(s.id)) continue;
+                while (!used.Add(s.name)) s.name = First[r.NextInt(0, First.Length)] + " " + Bynames[r.NextInt(0, Bynames.Length)];
+                w.sims.Add(s);
+            }
+            return true;
         }
         public static string ClassName(string classId)
         {

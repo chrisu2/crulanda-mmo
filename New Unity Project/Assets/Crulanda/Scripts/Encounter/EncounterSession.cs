@@ -326,10 +326,55 @@ namespace Crulanda.Encounter
             VendorNpc = v.Name; vendorAt = at ?? v.transform.position; InventoryOpen = true; Conversation = null; TradesOpen = false; v.Hold(30);
         }
         public const string FreshEggs = "food.fresh_eggs";
-        public void CloseVendor() { VendorNpc = null; VendorStock = new List<string>(); }
+        public void CloseVendor() { VendorNpc = null; VendorSim = null; VendorStock = new List<string>(); }
+        // ---------- trading with a sim (round 27) ----------
+        /// <summary>The sim whose goods the merchant window shows, if it is a sim you trade with (null for a village merchant).</summary>
+        public SimAdventurer VendorSim { get; private set; }
+        /// <summary>What an item costs from this window: a sim asks twice its value (a merchant four times).</summary>
+        public int VendorPrice(ItemDef d) { return d == null ? 0 : VendorSim != null ? Math.Max(1, d.value * 2) : Inventory.Price(d); }
+        /// <summary>What a sim pays for a stack: its value, half as much again for what its own trade uses (ore to a smith, herbs to a brewer).</summary>
+        public int SimOffer(SimAdventurer s, ItemDef d, int count)
+        {
+            if (s == null || d == null || d.value <= 0) return 0;
+            // What its trades use, by the item's pouch: ore to a miner-smith, herbs to a herbalist-alchemist, timber to a woodcutter.
+            string gather = SimEconomy.GatherTrade(s.classId);
+            bool ours = d.pouch == (gather == "mining" ? "ore" : gather == "herbalism" ? "herb" : "timber");
+            return Mathf.Max(1, Mathf.RoundToInt(d.value * count * (ours ? 1.5f : 1)));
+        }
+        public bool OpenSimTrade(SimAdventurer s, Vector3 at)
+        {
+            if (s == null || Items == null) return false;
+            if (Player != null && Vector3.Distance(Player.transform.position, at) > 6) { Message(s.name + " is too far away to trade with."); return false; }
+            if (SimMemory.Refuses(s)) { Message(s.name + " won't trade with you."); return false; }
+            CloseVendor(); VendorSim = s; VendorNpc = s.name; vendorAt = at; InventoryOpen = true; Conversation = null; TradesOpen = false;
+            VendorStock = new List<string>(); foreach (var id in s.goodIds) if (Items.Get(id) != null) VendorStock.Add(id);
+            if (VendorStock.Count == 0) Message(s.name + " has nothing to sell just now, but will buy (" + s.coin + " crowns on them).");
+            return true;
+        }
+        void BuyFromSim(string item)
+        {
+            var s = VendorSim; var d = Items?.Get(item); if (s == null || d == null || SimEconomy.Count(s, item) <= 0) { VendorStock.Remove(item); return; }
+            int price = VendorPrice(d);
+            if (Progress.gold < price) { Message("You need " + price + " crowns."); return; }
+            if (Inventory.Add(Progress, Items, item, 1) > 0) { Message("Your bags are full."); return; }
+            Progress.gold -= price; s.coin += price; SimEconomy.Add(s, item, -1); if (SimEconomy.Count(s, item) <= 0) VendorStock.Remove(item);
+            Message("Bought " + ItemName(item) + " from " + s.name + " for " + price + " crowns."); ChatSay(ChatChannel.Whisper, s.name, s.chatty > .65f ? "ty!" : "Thank you. Pleasure.");
+            Save(false);
+        }
+        void SellToSim(int i)
+        {
+            var s = VendorSim; var stack = Progress.bag[i]; var d = Items?.Get(stack.item); if (s == null || d == null) return;
+            int offer = SimOffer(s, d, stack.count);
+            if (offer <= 0) { Message(s.name + " has no use for " + ItemName(stack.item) + "."); return; }
+            if (s.coin < offer) { Message(s.name + " can't afford that (" + offer + " crowns; " + s.coin + " on them)."); return; }
+            string n = ItemName(stack.item); int count = stack.count;
+            Progress.bag[i] = new ItemStack(); Progress.gold += offer; s.coin -= offer; SimEconomy.Add(s, d.id, count);
+            Message("Sold " + n + (count > 1 ? " x" + count : "") + " to " + s.name + " for " + offer + " crowns."); Save(false);
+        }
         public void SellBag(int i)
         {
             if (VendorNpc == null || i < 0 || i >= Progress.bag.Count || Progress.bag[i].Empty) return;
+            if (VendorSim != null) { SellToSim(i); return; }
             string n = ItemName(Progress.bag[i].item); int count = Progress.bag[i].count; var d = Items?.Get(Progress.bag[i].item);
             int gold = Inventory.Sell(Progress, Items, i);
             // A material sold in a village is that day's delivery to its trade (ore to the forge, herbs to the stall), and the trades
@@ -340,12 +385,14 @@ namespace Crulanda.Encounter
         public void SellJunk()
         {
             if (VendorNpc == null) return;
+            if (VendorSim != null) { Message(VendorSim.name + " doesn't buy junk. A merchant will."); return; }
             int total = Inventory.SellJunk(Progress, Items);
             Message(total > 0 ? "Sold your junk for " + total + " crowns." : "Nothing worth selling as junk."); Save(false);
         }
         public void Buy(string item)
         {
             if (VendorNpc == null) return;
+            if (VendorSim != null) { BuyFromSim(item); return; }
             if (item == FreshEggs && (VillageLife.Active == null || VillageLife.Active.Count("stall.eggs") <= 0)) { VendorStock.Remove(item); Message("The eggs have all gone."); return; }
             var d = Items?.Get(item);
             if (d != null && d.kind == "bag" && Inventory.Owns(Progress, item)) { VendorStock.Remove(item); Message(Inventory.AlreadyWornLine); return; }
@@ -1510,6 +1557,7 @@ namespace Crulanda.Encounter
             }
             if (!BuildOpen && EncounterInput.Press(KeyCode.E)) Interact();
             if (EncounterInput.Press(KeyCode.H)) Hail();   // playtest note 83
+            TickInvite();   // a sim's invitation lapses after thirty seconds (round 27)
 
             for (int slot = 0; slot < ActionCount; slot++)
                 if (!BuildOpen && slot < 10 && EncounterInput.Press(EncounterInput.SlotKey(slot))) UseAbility(slot);
@@ -1808,7 +1856,13 @@ namespace Crulanda.Encounter
             }
             if (!enemy.Camp && StoryEnemies.TrueForAll(e => !e.actor.IsAlive)) Message(ZoneTitle + " is clear for now. " + (Inventory.IsEquipped(Progress, content.itemId) ? "Save [F5]." : "Equip your reward [I], then save [F5]."));
         }
-        void ApplyLevel() { Player.SetLevel(Progress.Level); if (Companion != null) Companion.MatchLevel(Progress.Level); ApplyInnate(); }
+        void ApplyLevel()
+        {
+            Player.SetLevel(Progress.Level); if (Companion != null) Companion.MatchLevel(Progress.Level); ApplyInnate();
+            if (levelSeen > 0 && Progress.Level > levelSeen && InGuild) SimChatter.Active?.PlayerDinged(Progress.Level);   // your guild says grats (round 27)
+            levelSeen = Progress.Level;
+        }
+        int levelSeen;
         /// <summary>
         /// The class's own attributes at this level (2026-10-06, playtest note 59: every attribute read 0 without gear): a Warrior
         /// strong and hardy, a Paladin strong and steady, a Ranger quick, a Druid and a Mage keen of mind and spirit. Balance-neutral:

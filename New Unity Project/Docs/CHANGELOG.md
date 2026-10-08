@@ -1587,3 +1587,29 @@ A read-only review by five reviewers, each finding checked by a second who tried
 - Full run c49: EditMode 427/427, PlayMode 212/214, five tours, 0 shader errors. Fixed: the meadow kept clear of gathering nodes,
   so adding the nodes moved scenery (NodeStreamTests); it ignores them now. A whisper test waited for any line instead of the
   whispered reply. Reruns 5/5.
+
+## 2026-10-07 — Round 27: sims complete (Chris chose the sims before the enclave and Khaven; the Village kit is for Khaven)
+- **Your party travels with you and is kept:** its sims are saved with the world (WorldSave.party) on every save and at travel; in
+  the next zone or the next session they are at your side again without being asked (SimPopulation.RestoreParty). One who has
+  logged off in the meantime has, and the chat says so.
+- **Sims invite you:** a friend who wants to group, and a bold sim answering your LFG call, sends a real invitation: "X invites you"
+  with Accept and Decline over the action bars for thirty seconds. Accepting brings the sim to you, from another zone by the road.
+- **Dungeon runs:** `/dungeon` (or the Lead button with two or more sims along) has the boldest sim lead you into the zone's
+  dungeon, Crowsfoot Hollow or the Root-Mother's Deep, camp by camp in the order the passage meets them, the boss last: "Clear. On
+  to ...", "That's the last before ...", "... is cleared"; it waits when you fall behind. Too far under the first camp's level, it says so.
+- **Trading with sims:** a Trade button on a sim's frame (within 6 m) opens the merchant window on its goods. A sim sells at
+  twice an item's value (a merchant asks four times) and buys whatever you bring at its value, half as much again for what its own
+  trade uses (ore to a smith), with the coin it has; the goods and the coin really move (SimEconomy). A rival will not trade.
+- **Guilds:** four GAME-ONLY guilds (the Lantern Watch, Oak and Ember, the Long Road, the Scree Hounds), each with its own
+  character; about two sims in three belong to one, chosen by what they are like (SimGuilds). A guild chat channel (`/g`, green,
+  its own filter chip; `/p` stays Party): your guild-mates online anywhere talk in it, welcome you, answer you, say grats on your
+  levels and come when you ask for a group there. Joining: a guild sim who knows you (acquaintance or better) whispers an offer
+  and sends an invitation (the Accept / Decline panel), and asking "lf guild" in Zone or LFG brings one; recruiting calls in
+  Zone. Tags: `<Guild>` on the sims' plates and a Guild column in the who list (O). A guild-mate counts as a friend for joining
+  your group. `/guild` lists the members (online first, the guild master marked), `/gquit` leaves. Kept on the character
+  (EncounterProgress.guild).
+- **Forty sims:** the roster is forty (SimRoster.Count), the new twenty four to each band, so the higher zones are far busier
+  (12/9/7/6/6 from Oakhaven to the Shore). An older world keeps its twenty as they are and gains the rest from its seed
+  (SimRoster.Grow), and its sims get their guilds once (WorldSave.guildedUpTo).
+- Tests: SimPartyTests.The_party_is_kept_and_a_sim_can_invite_you, A_sim_leads_a_dungeon_run_camp_by_camp, Trading_with_a_sim_moves_goods_and_coin, Joining_a_guild_and_talking_in_it;
+  SimRosterTests.Forty_sims_the_same_for_a_seed_with_unique_names_and_every_class, An_old_world_grows_to_forty_and_each_sim_gets_its_guild_once.

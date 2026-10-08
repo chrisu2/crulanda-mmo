@@ -46,15 +46,16 @@ namespace Crulanda.Encounter
             if (fig != null && fig.Hidden) return s.name + " is inside the inn.";   // where it is comes before its mood (a full run of 2026-10-07 caught the order)
             if (fig != null && fig.InFight) return s.name + " is busy fighting.";
             if (SimMemory.Refuses(s)) return s.name + " declines: \"Not with you.\"";   // a rival (5.5)
-            bool friend = SimMemory.Of(s) == SimMemory.Standing.Friend;   // a friend stretches a little further, and is never too busy for you
+            bool friend = SimMemory.Of(s) == SimMemory.Standing.Friend || SameGuild(s);   // a friend (or a guild-mate, round 27) stretches a little further, and is never too busy for you
             if (Mathf.Abs(s.level - Progress.Level) > InviteLevelGap + (friend ? 2 : 0)) return s.name + " declines: \"We're too far apart, friend. Find someone nearer your level.\"";
             if (s.friendly < BusyBelow && !friend) return s.name + " declines: \"Not right now. I'm in the middle of something.\"";
             return null;
         }
-        public bool Invite(string simId)
+        public bool Invite(string simId, bool returning = false)
         {
             var pop = SimPopulation.Active; var s = pop?.World.sims.Find(x => x.id == simId);
-            var why = InviteRefusal(s); if (why != null) { Message(why); return false; }
+            var why = returning ? (s == null ? "Nobody to invite." : InParty(s.id) ? s.name + " is already in your party." : PartySims.Count >= MaxPartySims ? "Your party is full." : null) : InviteRefusal(s);   // a sim coming back to the party it was in (round 27) is not asked again
+            if (why != null) { Message(why); return false; }
             var fig = pop.Find(s.id); if (fig == null) { Message(s.name + " is not here."); return false; }
             var at = fig.transform.position; pop.Figures.Remove(fig); Destroy(fig.gameObject);
             if (NavMesh.SamplePosition(at, out var hit, 6, NavMesh.AllAreas)) at = hit.position + Vector3.up;
@@ -63,7 +64,7 @@ namespace Crulanda.Encounter
             var c = a.gameObject.AddComponent<SimCompanion>(); a.gameObject.SetActive(true); c.Init(a, this, s, FreeSlot());
             SimGear.Dress(a.GetComponent<ActorVisual>(), s, Items);
             PartySims.Add(c);
-            Message(s.name + " has joined your party.");
+            if (!returning) Message(s.name + " has joined your party.");
             return true;
         }
         /// <summary>How long a sim takes to come from another zone when invited (seconds; tests shorten it).</summary>
@@ -103,6 +104,25 @@ namespace Crulanda.Encounter
             if (pop.Find(s.id) == null) { Message(s.name + " could not get here."); yield break; }
             if (Invite(s.id)) ChatSay(ChatChannel.Party, s.name, "here, where to?");
         }
+        /// <summary>A sim's invitation to you (round 27): who, and until when it stands (thirty seconds). The HUD shows Accept / Decline.</summary>
+        public SimAdventurer PendingInvite { get; private set; }
+        float pendingUntil;
+        public void InvitedBy(SimAdventurer s)
+        {
+            if (s == null || InParty(s.id) || PartySims.Count >= MaxPartySims || PendingInvite != null) return;
+            PendingInvite = s; PendingGuild = null; pendingUntil = Time.time + 30;
+            Message(s.name + " invites you to a group. (Accept or decline above the bars.)");
+        }
+        /// <summary>Accepting a sim's invitation: it joins you, here at once or from another zone by the road (as /invite).</summary>
+        public void AnswerInvite(bool accept)
+        {
+            var s = PendingInvite; var guild = PendingGuild; PendingInvite = null; PendingGuild = null; if (s == null) return;
+            if (guild != null) { if (accept) JoinGuild(guild, s); else ChatSay(ChatChannel.Whisper, s.name, s.chatty > .65f ? "np, offer stands" : "No matter. The offer stands."); return; }   // round 27
+            if (!accept) { ChatSay(ChatChannel.Whisper, s.name, s.chatty > .65f ? "np, another time" : "Another time, then."); return; }
+            if (s.zone == ZoneId && SimPopulation.Active?.Find(s.id) != null) { if (Invite(s.id, true)) Message("You join " + s.name + "'s group."); }
+            else InviteByName(s.name);
+        }
+        void TickInvite() { if (PendingInvite != null && Time.time > pendingUntil) { Message(PendingInvite.name + "'s invitation lapses."); PendingInvite = null; PendingGuild = null; } }
         int FreeSlot() { for (int i = 0; ; i++) if (!PartySims.Exists(x => x != null && x.slot == i)) return i; }
         /// <summary>/assist [name] (5.6): your target becomes what that party member (or any of them) is fighting.</summary>
         public bool Assist(string name = null)
@@ -124,10 +144,22 @@ namespace Crulanda.Encounter
             if (c == null) return false;
             foreach (var p in PartySims) if (p != null && p != c) p.StopLeading();
             if (InCombat) { Message("Not while you are fighting."); return false; }
+            // Two or more sims with you and a dungeon near your level: the run goes into it (round 27); otherwise a camp.
+            if (PartySims.Count >= 2 && c.LeadDungeon(out _) != null) { Message(c.sim.name + " leads the way into " + c.Dungeon + "."); return true; }
             var camp = c.Lead();
             if (camp == null) { Message(c.sim.name + " knows no camp fit for the party near here."); return false; }
             Message(c.sim.name + " leads the way to the " + camp.ToLower() + ".");
             return true;
+        }
+        /// <summary>/dungeon (round 27): a party sim (the boldest) leads you through the zone's dungeon, camp by camp.</summary>
+        public bool LeadDungeon()
+        {
+            if (PartySims.Count == 0) { Message("You are not in a party: /invite someone first."); return false; }
+            if (InCombat) { Message("Not while you are fighting."); return false; }
+            var c = PartySims.Find(x => x != null && x.sim.bold > .5f) ?? PartySims.Find(x => x != null); if (c == null) return false;
+            foreach (var p in PartySims) if (p != null && p != c) p.StopLeading();
+            if (c.LeadDungeon(out var why) == null) { Message(c.sim.name + ": " + why); return false; }
+            Message(c.sim.name + " leads the way into " + c.Dungeon + " (" + c.CampsLeft + " camps)."); return true;
         }
         /// <summary>Sends a party sim back to the world where it stands.</summary>
         public void LeaveParty(string simId, bool kicked = false)

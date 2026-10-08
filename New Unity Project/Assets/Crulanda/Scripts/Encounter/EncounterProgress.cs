@@ -38,6 +38,8 @@ namespace Crulanda.Encounter
         // ---------- notice boards (2026-10-03; older saves load with zero days and no boards, and draw on first use) ----------
         /// <summary>Game days passed (the clock crossing six in the morning while playing): what the boards draw by.</summary>
         public int days;
+        /// <summary>Round 27: the guild you are in ("" none; SimGuilds). Older saves load with none.</summary>
+        public string guild = "";
         /// <summary>Each zone's notice board: the day it was drawn, its postings, the ones handed in today. See Bounties.</summary>
         public List<BoardState> boards = new List<BoardState>();
         // ---------- points of interest and achievements (2026-10-03; older saves load with these empty and record past deeds) ----------

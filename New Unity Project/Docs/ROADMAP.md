@@ -29,6 +29,7 @@ records where each of its phases stands and the order of the work. Update it eve
 | 5.4 Offscreen world (DONE 2026-10-07: the unseen hunt, gather, trade and level by the clock, and take the roads between zones) | Coarse simulation of the unloaded: levels, zone moves, online and offline hours by the world clock. | 1-2 rounds |
 | 5.5 Chat and memory (DONE: zone chat 2026-10-06; whispers, friends and memory 2026-10-07) | Say, Zone, Whisper and System channels from personality and event templates; a who list and friends; compact social memory and relationships (Stranger to Friend or Rival). | 2 rounds |
 | 5.6 Groups (DONE 2026-10-07: invite, frames, need/greed, roles, assist, sims asking you, runs to camps) | Invite, accept, leave, party frames, roles, assist, shared kill credit, need and greed, sims inviting the player, dungeon runs with sims. | 3 rounds |
+| 5.7 Sims complete (Chris, 2026-10-07: "I want the sims complete first", before the enclave and Khaven) | 1. the party travels with you and is kept (DONE round 27); 2. sims invite you (DONE round 27); 3. dungeon runs led by a sim (DONE round 27); 4. trading with sims (DONE round 27); 5. guilds (chat, tags, joining) (DONE round 27); 6. a bigger population (about 40, more at the high zones) (DONE round 27). | 4-6 rounds |
 
 About 15-17 rounds. No external language model: local state machines and utility AI only (brief section 13).
 

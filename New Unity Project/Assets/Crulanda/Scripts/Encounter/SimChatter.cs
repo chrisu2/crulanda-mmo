@@ -13,7 +13,7 @@ namespace Crulanda.Encounter
     /// goodnight as they log off. In your party they call out in Party ("inc", "need a heal"). They answer you: a greeting, "where
     /// is ...", a group wanted, something for sale, thanks. Names of places, mobs and items come from the zone (no other game's).
     /// </summary>
-    public sealed class SimChatter : MonoBehaviour
+    public sealed partial class SimChatter : MonoBehaviour
     {
         public static SimChatter Active { get; private set; }
         public SimPopulation Population;
@@ -23,7 +23,7 @@ namespace Crulanda.Encounter
         readonly Dictionary<string, float> said = new Dictionary<string, float>();
         System.Random rng;
 
-        public void Init(SimPopulation pop) { Population = pop; Active = this; rng = new System.Random(pop.World.seed + 77); next = Time.time + 6; nextParty = Time.time + 10; nextAsk = Time.time + 60; }
+        public void Init(SimPopulation pop) { Population = pop; Active = this; rng = new System.Random(pop.World.seed + 77); next = Time.time + 6; nextParty = Time.time + 10; nextAsk = Time.time + 60; nextGuild = Time.time + 20; nextRecruit = Time.time + 180; }
         void OnDestroy() { if (Active == this) Active = null; }
         float R { get { return (float)rng.NextDouble(); } }
         T Pick<T>(IList<T> list) { return list[rng.Next(list.Count)]; }
@@ -42,6 +42,7 @@ namespace Crulanda.Encounter
             }
             if (Time.time >= nextParty && S.PartySims.Count > 0) { nextParty = Time.time + Mathf.Lerp(6, 14, R); PartyTalk(); }
             FriendsAsk();
+            GuildTick();   // round 27
         }
         /// <summary>Sims online in this zone (standing about or in your party).</summary>
         List<SimAdventurer> Here()
@@ -77,6 +78,7 @@ namespace Crulanda.Encounter
             if (f != null && f.Activity == SimFigure.Doing.Hunt && f.Quarry != null) options.Add(() => (ChatChannel.Zone, Pick(new[] { "these " + Plural(f.Quarry.Name) + " hit hard", "anyone else on " + Plural(f.Quarry.Name) + "?", f.Quarry.Name + " number " + (2 + rng.Next(6)) + ", still nothing", "so many " + Plural(f.Quarry.Name) + " by " + Near(f.Quarry.transform.position) })));
             if (f != null && f.Activity == SimFigure.Doing.Inn) options.Add(() => (ChatChannel.Zone, Pick(new[] { "anyone at the inn?", "inn stew is decent tonight", "brb, food", "resting up, then back out" })));
             if (f != null && f.Activity == SimFigure.Doing.Gather && item != null) options.Add(() => (ChatChannel.Zone, Pick(new[] { item + " everywhere today", "who keeps taking all the " + item + "?", "skilling up, slow going" })));
+            var recruit = Recruiting(s); if (recruit != null && R < .35f) options.Add(() => (ChatChannel.Zone, recruit));   // round 27
             if (WorldClock.IsNight) options.Add(() => (ChatChannel.Zone, Pick(new[] { "dark already?", "can't see a thing out here", "night mobs are no joke", "need a torch lol" })));
             var w = WorldWeather.Active;
             if (w != null && (w.Kind == WeatherKind.Rain || w.Kind == WeatherKind.Storm)) options.Add(() => (ChatChannel.Zone, Pick(new[] { "rain again", "soaked", "this weather..." })));
@@ -121,9 +123,11 @@ namespace Crulanda.Encounter
         /// <summary>You said something: the sims who heard it may answer.</summary>
         public void Heard(ChatChannel ch, string text)
         {
-            var here = Here(); if (here.Count == 0) return;
             string t = text.ToLowerInvariant();
+            if (ch == ChatChannel.Guild) { GuildHeard(t); return; }   // your guild hears you anywhere (round 27)
+            var here = Here(); if (here.Count == 0) return;
             SimAdventurer Someone(Func<SimAdventurer, bool> ok = null) { var l = here.FindAll(s => !S.InParty(s.id) && (ok == null || ok(s))); return l.Count == 0 ? null : l[rng.Next(l.Count)]; }
+            if ((ch == ChatChannel.Zone || ch == ChatChannel.LFG) && AskedForGuild(t)) return;
             if (ch == ChatChannel.Party)
             {
                 if (S.PartySims.Count > 0 && R < .7f) { var c = S.PartySims[rng.Next(S.PartySims.Count)]; Later(ChatChannel.Party, c.sim.name, t.Contains("?") ? Pick(new[] { "sure", "np", "your call", "ok" }) : Pick(new[] { "ok", "k", "sounds good", "on it" })); }
@@ -134,7 +138,12 @@ namespace Crulanda.Encounter
             if (t.Contains("lfg") || t.Contains("lfm") || t.Contains("group") || ch == ChatChannel.LFG)
             {
                 int lv = S.Progress.Level; var s = Someone(x => Mathf.Abs(x.level - lv) <= 3 && x.friendly > .3f);
-                if (s != null) Later(ChatChannel.Zone, s.name, s.chatty > .65f ? Short(s) + ", inv me" : "I'm a " + Long(s) + ", happy to join you.");
+                if (s != null)
+                {
+                    // Half of them ask to be invited; the bold send you the invitation themselves (round 27).
+                    if (s.bold > .55f && R < .6f) { Later(ChatChannel.Zone, s.name, s.chatty > .65f ? Short(s) + ", sending inv" : "I'm a " + Long(s) + ". I'll send you an invite."); StartCoroutine(InviteLater(s, 5)); }
+                    else Later(ChatChannel.Zone, s.name, s.chatty > .65f ? Short(s) + ", inv me" : "I'm a " + Long(s) + ", happy to join you.");
+                }
                 return;
             }
             if (t.Contains("wts") || t.Contains("selling") || ch == ChatChannel.Trade) { var s = Someone(); if (s != null && R < .6f) Later(ChatChannel.Trade, s.name, Pick(new[] { "how much?", "pst", "price?", "what's it worth to you" })); return; }
@@ -148,6 +157,7 @@ namespace Crulanda.Encounter
             if (t.Contains("?") && R < .5f) { var s = Someone(x => x.friendly > .5f); if (s != null) Later(ChatChannel.Zone, s.name, Pick(new[] { "not sure, sorry", "ask at the inn?", "no idea", "try the notice board" })); }
         }
         void Later(ChatChannel ch, string who, string text, float extra = 0) { pending.Add((Time.time + 2.5f + R * 4 + extra, ch, who, text)); }
+        System.Collections.IEnumerator InviteLater(SimAdventurer s, float after) { yield return new WaitForSeconds(after + R * 3); if (s != null && s.IsOnlineAt(WorldClock.Hour)) S.InvitedBy(s); }
 
         // ---------- whispers, friends and memory (5.5, 2026-10-07) ----------
         readonly Dictionary<string, float> answered = new Dictionary<string, float>();
@@ -210,7 +220,8 @@ namespace Crulanda.Encounter
             var friends = Here().FindAll(s => !S.InParty(s.id) && SimMemory.Of(s) == SimMemory.Standing.Friend && s.bold > .3f && Mathf.Abs(s.level - S.Progress.Level) <= EncounterSession.InviteLevelGap);
             if (friends.Count == 0 || R > .6f) return;
             var s = friends[rng.Next(friends.Count)]; var camp = CampFor(s); bool lingo = s.chatty > .65f;
-            Later(ChatChannel.Whisper, s.name, camp != null ? (lingo ? "want to do " + camp + "? inv me" : "Fancy the " + camp + "? Invite me if so.") : (lingo ? "grouping? inv me" : "Want to group for a bit? Invite me if so."));
+            Later(ChatChannel.Whisper, s.name, camp != null ? (lingo ? "want to do " + camp + "? sending inv" : "Fancy the " + camp + "? I'll send you an invite.") : (lingo ? "grouping? sending inv" : "Want to group for a bit? I'll send you an invite."));
+            StartCoroutine(InviteLater(s, 5));   // and a real invitation (round 27)
         }
         void Answer(ZoneLabel place, SimAdventurer asker)
         {

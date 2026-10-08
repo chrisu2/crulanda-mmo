@@ -33,6 +33,26 @@ namespace Crulanda.Encounter
             World = SimRoster.LoadOrCreate(root);
             gameObject.AddComponent<SimChatter>().Init(this);   // the sims talking (zone chat, playtest note 62)
             Refresh();
+            RestoreParty(World.party);
+        }
+        /// <summary>
+        /// The party you had (round 27: it travels with you and survives a save): each sim comes to this zone at your side and joins
+        /// again without asking; one who is offline now has logged off since, and that is said. Then the list is the party as it stands.
+        /// </summary>
+        public void RestoreParty(IList<string> ids)
+        {
+            if (ids == null || ids.Count == 0 || Session == null || Session.Player == null) return;
+            float hour = WorldClock.Hour; var back = new List<string>(); int k = 0;
+            foreach (var id in new List<string>(ids))
+            {
+                var s = World.sims.Find(x => x.id == id); if (s == null || Session.InParty(id)) continue;
+                if (!s.IsOnlineAt(hour)) { Session.Message(s.name + " has logged off since."); continue; }
+                var at = Session.Player.transform.position - Session.Player.transform.forward * (2 + k) + Session.Player.transform.right * (k % 2 == 0 ? 1.5f : -1.5f); k++;
+                s.zone = ZoneId; s.x = at.x; s.z = at.z; Refresh();
+                if (Session.Invite(id, true)) back.Add(s.name);
+            }
+            if (back.Count > 0) Session.Message("Your party is with you: " + string.Join(", ", back) + ".");
+            World.party.Clear(); foreach (var c in Session.PartySims) if (c != null) World.party.Add(c.sim.id);
         }
         void OnDestroy() { if (Active == this) Active = null; }
         public string ZoneId { get { return Session != null && Session.Zone != null ? Session.Zone.Zone.id : null; } }
@@ -133,6 +153,7 @@ namespace Crulanda.Encounter
         {
             foreach (var f in Figures) if (f != null) { f.sim.x = f.transform.position.x; f.sim.z = f.transform.position.z; }
             foreach (var c in Session.PartySims) if (c != null) { c.sim.x = c.transform.position.x; c.sim.z = c.transform.position.z; }
+            World.party.Clear(); foreach (var c in Session.PartySims) if (c != null) World.party.Add(c.sim.id);   // the party, kept (round 27)
             try { SimRoster.Save(Root, World); } catch (System.Exception e) { Debug.LogWarning("World save failed: " + e.Message); }
         }
         /// <summary>A place to stand in this zone: near one of its named places (a landmark), on the NavMesh.</summary>

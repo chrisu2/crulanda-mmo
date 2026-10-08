@@ -45,7 +45,7 @@ namespace Crulanda.World
             void Lamp(Vector3 at, Color col, float range, float power, float size = .12f)
             {
                 Part(PrimitiveType.Sphere, t, at, Vector3.one * size, Glowing(col, 2.2f));
-                Glow(t, at + Vector3.up * .1f, range, power, col, power);
+                Glow(t, at + Vector3.up * .1f, range * 1.4f, power * 1.9f, col, power * 1.9f);   // brighter and further: the caves read too dark (2026-10-08)
             }
             // A lamp on the wall at about head height, on the given side of ring i.
             void WallLamp(int i, int side, Color col, float range, float power)
@@ -287,8 +287,7 @@ namespace Crulanda.World
                     float s = from + 8 + k * 5.5f; if (s > sc - 9) break;
                     Crate(On(s, -line * (.5f + A() * .4f)), Along(s), 1 + (int)(A() * 2), A() < .4f);
                 }
-                var steam = Glowing(new Color(.55f, .58f, .62f), .25f);
-                for (int k = 0; k < 5; k++) Part(PrimitiveType.Sphere, t, On(sc - 4 + k * 2, line) + Vector3.up * (3.6f + A()), new Vector3(1.4f + A(), .8f, 1.4f + A()), steam);
+                for (int k = 0; k < 5; k++) { A(); A(); A(); }   // (the steam is gone: it read as white blobs; its draws are kept)
             }
 
             void GeodeFloor()
@@ -387,7 +386,7 @@ namespace Crulanda.World
             void GreyBreach()
             {
                 int foreman = Widest(46, h.Length - 3);
-                var unmade = Glowing(new Color(.72f, .74f, .78f), .45f); var hole = Tint(art.stone, new Color(.015f, .015f, .02f));
+                var unmade = Tint(art.stone, new Color(.34f, .35f, .37f)); var hole = Tint(art.stone, new Color(.015f, .015f, .02f));   // the grey: dull rock gone colourless, not white cards (2026-10-08)
                 // Little light: a pale glow every twelve metres, and the old miners' things left where they dropped them.
                 int no = 0;
                 for (float s = 6; s < h.Length - 3; s += 12, no++) WallLamp(RingAt(s), no % 2 == 0 ? 1 : -1, GreyLight, 8, .45f);
@@ -403,7 +402,7 @@ namespace Crulanda.World
                     float deep = Mathf.InverseLerp(10, h.Length, s); if (A() > .25f + deep * .6f) continue;
                     int i = RingAt(s), k = 1 + (int)(A() * (P - 2)); var at = ring[i, k]; var inward = c[i] + Vector3.up * h.Height[i] * .4f - at; inward.Normalize();
                     if (!Free(at + inward * .3f)) continue;
-                    Part(PrimitiveType.Cube, t, at + inward * .05f, new Vector3(.9f + A() * 1.6f, .7f + A() * 1.2f, .03f), unmade, Quaternion.LookRotation(inward) * Quaternion.Euler(0, 0, A() * 40));
+                    Lump(CragRock((int)(A() * 6)), t, at - inward * .1f, new Vector3(.6f + A() * .9f, .5f + A() * .8f, .4f), unmade, A() * 360);   // a patch of the rock gone grey
                 }
                 if (foreman >= 0)
                 {
@@ -412,7 +411,7 @@ namespace Crulanda.World
                     if (Free(at))
                     {
                         Part(PrimitiveType.Cylinder, t, at + Vector3.up * .02f, new Vector3(3.2f, .01f, 2.4f), hole, q);
-                        Part(PrimitiveType.Cylinder, t, at + Vector3.up * .015f, new Vector3(3.8f, .01f, 3), unmade, q);
+                        for (int k = 0; k < 12; k++) { float a = k / 12f * Mathf.PI * 2; Lump(BoulderAt(k), t, at + q * new Vector3(Mathf.Cos(a) * 1.75f, .05f, Mathf.Sin(a) * 1.35f), new Vector3(.5f, .25f, .4f), unmade, k * 30); }   // a broken rim
                         Block(at, new Vector3(2.6f, 1.2f, 2), q);
                     }
                     Glow(t, On(s0, 0) + Vector3.up * 3, 14, .5f, GreyLight, .5f);

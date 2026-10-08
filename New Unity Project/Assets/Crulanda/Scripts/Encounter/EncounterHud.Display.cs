@@ -60,6 +60,10 @@ namespace Crulanda.Encounter
                 Shadow(new Rect(r.x + 8, r.y + 6, 240, 22), pn.label + " (drag)", tiny, Color.white);
                 if (e.type == EventType.MouseDown && e.button == 0 && r.Contains(mouse)) { dragging = pn.id; dragFrom = mouse - PanelOffset(pn.id); e.Use(); }
             }
+            // The chat moves here too, whole (its own bar is mostly tabs; playtest note 100, "can't move chat panel").
+            Fill(chatRect, new Color(.95f, .78f, .35f, dragging == "chat" ? .35f : .18f)); Shadow(new Rect(chatRect.x + 8, chatRect.y + 26, 240, 22), "Chat (drag)", tiny, Color.white);
+            if (e.type == EventType.MouseDown && e.button == 0 && dragging == null && chatRect.Contains(mouse)) { dragging = "chat"; dragFrom = mouse - chatRect.position; e.Use(); }
+            if (e.type == EventType.MouseDrag && dragging == "chat") { chatRect.position = mouse - dragFrom; try { PlayerPrefs.SetFloat("chat.x", chatRect.x); PlayerPrefs.SetFloat("chat.y", chatRect.y); } catch { } e.Use(); return; }
             if (e.type == EventType.MouseDrag && dragging != null) { SetPanelOffset(dragging, mouse - dragFrom); e.Use(); }
             if (e.type == EventType.MouseUp && dragging != null) { dragging = null; e.Use(); }
             if (GUI.Button(new Rect(620, 380, 200, 40), "Lock UI", button)) { uiUnlocked = false; dragging = null; }

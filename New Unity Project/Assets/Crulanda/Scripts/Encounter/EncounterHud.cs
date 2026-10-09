@@ -200,7 +200,20 @@ namespace Crulanda.Encounter
                 else if (GUI.Button(new Rect(268, y + 4, 50, 26), "Lead", slim)) session.Lead(c.sim.name);
                 if (GUI.Button(new Rect(322, y + 4, 60, 26), "Leave", slim)) session.LeaveParty(c.sim.id);
             }
+            // Mother Quillet while she is on her way to the lock (D4): her health, how the walk or the lock goes, and the lock as a bar.
+            var w = session.Weaver;
+            if (w != null && w.actor != null && (w.Now == AditWeaver.Stage.Walking || w.Now == AditWeaver.Stage.Matching || w.Now == AditWeaver.Stage.Fallen))
+            {
+                float y = 200 + 46 * session.PartySims.Count;
+                Fill(new Rect(48, y, 214, 48), new Color(0, 0, 0, .5f));
+                Portrait(new Vector2(40, y + 20), 40, w.actor.IsAlive ? WeaverViolet : new Color(.4f, .4f, .4f), "Q", w.actor.Level.ToString());
+                Shadow(new Rect(70, y - 3, 190, 20), AditWeaver.Name, tiny, Color.white);
+                UnitBar(new Rect(70, y + 16, 184, 10), w.actor.Health.Pool.Ratio, HealthGreen, "");
+                Shadow(new Rect(70, y + 26, 280, 18), w.Status, tiny, new Color(.88f, .82f, 1));
+                UnitBar(new Rect(70, y + 42, 184, 4), w.Now == AditWeaver.Stage.Matching ? w.Matched : w.Walked, WeaverViolet, "");
+            }
         }
+        static readonly Color WeaverViolet = new Color(.68f, .5f, 1);
         /// <summary>The target frame's line under a game animal's health (GAME-ONLY).</summary>
         public const string GameLine = "Game: it won't fight, but it will run. Skin it for its hide.";
         void DrawTargetFrame()
@@ -740,6 +753,16 @@ namespace Crulanda.Encounter
                 if (cd > 30 || !ToCanvas(root + Vector3.up * 1.3f, out var cp) || !OnCanvasX(cp.x) || Occluded(c, root + Vector3.up * .85f)) continue;
                 string ctitle = string.IsNullOrEmpty(c.sim.guild) ? Bracketed(SimRoster.ClassName(c.sim.classId) + " " + c.sim.level + " · party") : Bracketed(c.sim.guild) + " " + SimRoster.ClassName(c.sim.classId) + " " + c.sim.level;
                 AddPlate(new Plate { dist = cd, fade = 1, top = -41, at = cp, simParty = c, named = true, name = c.sim.name, title = ctitle, mark = ' ' }, Mathf.Max(TextWidth(plateText, c.sim.name), TextWidth(plateText, ctitle)) + 8);
+            }
+            var weaver = session.Weaver;   // Mother Quillet (D4): her name and what she is
+            if (weaver != null && weaver.actor != null)
+            {
+                var root = weaver.transform.position; float wd = Vector3.Distance(player, root + Vector3.up * 1.1f);
+                if (wd <= 30 && ToCanvas(root + Vector3.up * 1.1f, out var wp) && OnCanvasX(wp.x) && !Occluded(weaver, root + Vector3.up * .7f))
+                {
+                    string wtitle = Bracketed("Weaver of the Warrens");
+                    AddPlate(new Plate { dist = wd, fade = 1, top = -41, at = wp, named = true, name = AditWeaver.Name, title = wtitle, mark = ' ' }, Mathf.Max(TextWidth(plateText, AditWeaver.Name), TextWidth(plateText, wtitle)) + 8);
+                }
             }
             foreach (var e in session.Enemies) EnemyPlateAt(e, 25);
             // Game animals (deer, rabbits): a plate when close or targeted, so the fields are not a sea of names.

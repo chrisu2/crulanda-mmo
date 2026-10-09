@@ -157,6 +157,54 @@
       }
     },
     {
+      "id": "side.adit.weaver",
+      "title": "The Weaver's Lock",
+      "kind": "side",
+      "giver": "Pib",
+      "turnIn": "Pib",
+      "zone": "zone.peaks",
+      "level": 12,
+      "minLevel": 10,
+      "requires": [
+        "side.adit.pressed"
+      ],
+      "canonStatus": "CANON-EXPANDED: the goblins and the locks they hum open are CANON (the Weavers of the Warrens); Mother Quillet, the carriage's resonance lock and the walk down the platform are GAME-ONLY.",
+      "summary": "Mother Quillet, the eldest of the pressed goblins, went down to the Rail Hall instead of running. Have the freed goblins open the platform gate quietly, then walk her down to the carriage and keep the Company off her while she matches its lock.",
+      "offer": "Pib is where you left him, behind the barrels, but he is not hiding now. He is packing a very small bag. \"She went down. Old Quillet. I knew she would.\" He pulls the strap tight with his teeth.\n\n\"There's a lock on that carriage, a singing lock, and she's the only one of us old enough to know its note. Every stone they load is somebody's memory, cut out of the mountain and sold south. She'll match the lock and let them go, if the Company lets her live long enough.\" He looks up at you. \"Our people will open the gate at the bottom for you, quiet, and she'll be waiting by it. Walk her down. Don't let her stop to think. She hates that.\"",
+      "progress": "\"Is she still down there? Then go back down. I'll not sleep till you do.\"",
+      "complete": "Pib hears it all with his whole face again. When you tell him the stones went dark he sits down on the bag he packed. \"Let go. All of them.\" He wipes his nose on his wrist. \"She'll be insufferable now. She was insufferable before.\"\n\nHe presses a fistful of small coins into your hand, warm from his pocket. \"From the Warrens. Everyone that's left put something in.\"",
+      "steps": [
+        {
+          "text": "Go down to the Rail Hall at the bottom of the Sealed Adit. Have the freed goblins open the platform gate quietly, then walk Mother Quillet to the carriage and keep the Company off her while she matches its lock.",
+          "objectives": [
+            {
+              "type": "flag",
+              "zone": "zone.adit",
+              "target": "key:adit.lock",
+              "count": 1,
+              "text": "The carriage's lock matched",
+              "say": "The geodes in the carriage gutter and go dark, one crate at a time. Mother Quillet takes her hand off the lock and sits down on the platform."
+            }
+          ]
+        },
+        {
+          "text": "Tell Pib his old auntie did it.",
+          "objectives": [
+            {
+              "type": "talk",
+              "zone": "zone.peaks",
+              "target": "Pib",
+              "text": "Return to Pib"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 760,
+        "gold": 60
+      }
+    },
+    {
       "id": "side.adit.echoes",
       "title": "Echoes in the Stone",
       "kind": "side",

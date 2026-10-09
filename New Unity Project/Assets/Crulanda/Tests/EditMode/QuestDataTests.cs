@@ -61,7 +61,7 @@ namespace Crulanda.Tests
             ("side.adit.toll", "Under the Toll", "Yara Quell", "zone.peaks", 11), ("side.adit.pressed", "The Pressed", "Pib", "zone.peaks", 11),
             ("side.adit.echoes", "Echoes in the Stone", "Brother Cael", "zone.peaks", 11), ("side.adit.embers", "Embers Below", "Tamsin Rook", "zone.khaven", 11),
             ("side.adit.grey", "What the Grey Takes", "Lisle Tamber", "zone.peaks", 11), ("side.adit.dead_line", "The Dead Line", "Yara Quell", "zone.peaks", 12),
-            ("side.adit.letter", "A Letter Under Seal", "Yara Quell", "zone.peaks", 12) };
+            ("side.adit.letter", "A Letter Under Seal", "Yara Quell", "zone.peaks", 12), ("side.adit.weaver", "The Weaver's Lock", "Pib", "zone.peaks", 12) };
 
         /// <summary>
         /// The Sealed Adit's seven quests are given outside, in the Peaks and Khaven, by people who live there, from level 10; every kill
@@ -74,7 +74,7 @@ namespace Crulanda.Tests
             var db = QuestDatabase.Parse(Texts("Quests"));
             var zones = new Dictionary<string, ZoneDefinition> { { "zone.peaks", Zone("peaks") }, { "zone.khaven", Zone("khaven") } };
             var adit = Zone("adit");
-            CollectionAssert.AreEquivalent(AditQuests.Select(a => a.id), db.Ordered.Where(q => q.id.StartsWith("side.adit.")).Select(q => q.id), "Seven quests for the Adit.");
+            CollectionAssert.AreEquivalent(AditQuests.Select(a => a.id), db.Ordered.Where(q => q.id.StartsWith("side.adit.")).Select(q => q.id), "Eight quests for the Adit.");
             foreach (var (id, title, giver, zone, level) in AditQuests)
             {
                 var q = db.Quests[id];
@@ -99,12 +99,14 @@ namespace Crulanda.Tests
                     }
                     else if (o.type == "interact") { Assert.AreEqual(ZoneBuilder.AditCage, o.target, id); Assert.AreEqual(5, o.count, id + ": the five cages."); }
                     else if (o.type == "collect") { Assert.AreEqual(ZoneBuilder.AditEchoJar, o.target, id); Assert.AreEqual(6, o.count, id + ": six jars of the seven."); }
+                    else if (o.type == "flag") Assert.AreEqual("key:" + EncounterSession.WeaverLock, o.target, id + ": the Weaver's lock, matched for good.");
                     else if (o.type == "talk" || o.type == "deliver") Assert.IsTrue(zones[o.zone].life.residents.Any(r => r.name == o.target), id + ": " + o.target + " lives in " + o.zone + ".");
                     else Assert.Fail(id + ": an objective of type " + o.type + " was not expected.");
                 }
             }
             CollectionAssert.AreEqual(new[] { "side.adit.toll" }, db.Quests["side.adit.dead_line"].requires, "The Dead Line follows Under the Toll.");
             CollectionAssert.AreEqual(new[] { "side.adit.dead_line" }, db.Quests["side.adit.letter"].requires, "The letter follows The Dead Line.");
+            CollectionAssert.AreEqual(new[] { EncounterSession.PressedQuest }, db.Quests[EncounterSession.WeaverQuest].requires, "The Weaver's Lock follows The Pressed.");
             Assert.AreEqual("Lisle Tamber", db.Quests["side.adit.letter"].turnIn, "The Salt-Mender reads the letter.");
             var items = LootTestData.Items(); var loot = LootTestData.Loot(items);
             var rewards = loot.GearOrder.Where(g => g.source == "quest:side.adit.dead_line").Select(g => items.Get(g.id)).ToList();
@@ -126,8 +128,9 @@ namespace Crulanda.Tests
             Assert.IsFalse(log.Accept(log.Def("side.adit.toll"), "zone.peaks"), "And it can't be taken.");
             log.Progress.experience = EncounterProgress.XpForLevel(11);
             Assert.IsFalse(log.Accept(log.Def("side.adit.embers"), "zone.peaks"), "Embers Below is Khaven's.");
-            foreach (var (id, _, _, zone, _) in AditQuests.Where(a => a.id != "side.adit.dead_line" && a.id != "side.adit.letter")) Assert.IsTrue(log.Accept(log.Def(id), zone), id + " is taken.");
+            foreach (var (id, _, _, zone, _) in AditQuests.Where(a => a.id != "side.adit.dead_line" && a.id != "side.adit.letter" && a.id != "side.adit.weaver")) Assert.IsTrue(log.Accept(log.Def(id), zone), id + " is taken.");
             Assert.IsFalse(log.Accept(log.Def("side.adit.dead_line"), "zone.peaks"), "The Dead Line waits for Under the Toll.");
+            Assert.IsFalse(log.Accept(log.Def("side.adit.weaver"), "zone.peaks"), "The Weaver's Lock waits for The Pressed.");
 
             // Under the Toll: Lusk, his book, Yara.
             log.Notify("kill", "mob.gangboss.adit.5.0"); Assert.AreEqual("item.adit_tally_book", log.LootFrom("mob.gangboss.adit.5.0"));
@@ -137,6 +140,11 @@ namespace Crulanda.Tests
             for (int k = 0; k < 4; k++) log.Notify("interact", ZoneBuilder.AditCage);
             Assert.AreEqual(QuestStatus.Active, log.Status(log.Def("side.adit.pressed"), "zone.peaks"), "Four cages are not five.");
             log.Notify("interact", ZoneBuilder.AditCage); Assert.IsTrue(log.TalkTo("Pib")); Assert.IsTrue(log.TurnIn(log.Def("side.adit.pressed"), out _));
+            // The Weaver's Lock: Mother Quillet walked to the carriage and its lock matched (kept for good, "key:adit.lock"), then Pib.
+            Assert.IsTrue(log.Accept(log.Def("side.adit.weaver"), "zone.peaks"));
+            log.Reconcile(f => false, null); Assert.AreEqual(QuestStatus.Active, log.Status(log.Def("side.adit.weaver"), "zone.peaks"), "The lock is not matched yet.");
+            log.Reconcile(f => f == "key:" + EncounterSession.WeaverLock, null);
+            Assert.IsTrue(log.TalkTo("Pib")); Assert.IsTrue(log.TurnIn(log.Def("side.adit.weaver"), out int weaverXp)); Assert.AreEqual(760, weaverXp);
             // Echoes in the Stone: six jars, given to Brother Cael.
             for (int k = 0; k < 7; k++) if (log.Wants("item.adit_echo_jar", ZoneBuilder.AditEchoJar)) log.GiveItem("item.adit_echo_jar");
             Assert.AreEqual(6, log.ItemCount("item.adit_echo_jar"), "Six jars, and the seventh is left.");
@@ -160,7 +168,7 @@ namespace Crulanda.Tests
             Assert.IsTrue(log.TalkTo("Lisle Tamber")); Assert.Contains("doc.adit.sealed_letter", pages);
             Assert.AreEqual(0, log.ItemCount("item.adit_sealed_letter"));
             Assert.IsTrue(log.TurnIn(log.Def("side.adit.letter"), out _));
-            Assert.IsTrue(AditQuests.All(a => log.IsDone(a.id)), "All seven done.");
+            Assert.IsTrue(AditQuests.All(a => log.IsDone(a.id)), "All eight done.");
             Assert.AreEqual(-500 - 150 - 300, log.Standing("sandthrone"), "The Company likes you less for it.");
         }
     }

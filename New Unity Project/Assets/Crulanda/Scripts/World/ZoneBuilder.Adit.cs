@@ -26,6 +26,24 @@ namespace Crulanda.World
         /// Gallery's spirit stone, and the elite whose people answer the loud way (EncounterSession.Adit).</summary>
         public const string AditLiftGate = "The cage-lift gate", AditPlatformGate = "The platform gate", AditPowder = "A keg of blasting powder",
             AditSpiritStone = "The Gallery's spirit stone", AditQuartermaster = "Quartermaster Brannigan Sorrel";
+        /// <summary>The Rail Hall's part in the Weaver's unlocking (dungeon step D4, EncounterSession.Weaver): where Mother Quillet stands to match
+        /// the carriage's resonance lock, where the two waves come from (behind the carriage, then the far end where the line runs on into the
+        /// dark), and the carriage's geodes with their light and the lock's eye, which go dark when it is matched. Unset outside the Adit.</summary>
+        public Vector3 RailLock; public Vector3[] RailWaves; public GameObject[] RailGeodes;
+        /// <summary>The lock matched (D4): the carriage's geodes go dull and their light goes out.</summary>
+        public void QuietCarriage()
+        {
+            if (RailGeodes == null) return;
+            var dull = Tint(art.stone, new Color(.22f, .2f, .25f));
+            foreach (var g in RailGeodes)
+            {
+                if (g == null) continue;
+                var r = g.GetComponent<Renderer>(); if (r != null) r.sharedMaterial = dull;
+                var l = g.GetComponent<Light>(); if (l == null) continue;
+                foreach (var night in NightLights) if (night.light == l) night.dayIntensity = night.nightIntensity = 0;   // the clock lights it by these
+                l.intensity = 0; l.enabled = false;
+            }
+        }
         static readonly Color LumGreen = new Color(.45f, 1, .55f), GeodeViolet = new Color(.7f, .42f, 1), EmberRed = new Color(1, .45f, .15f),
             GreyLight = new Color(.74f, .77f, .82f), RailBlue = new Color(.55f, .75f, 1), GalleryLight = new Color(.62f, .72f, .88f);
         /// <summary>A cave's lining colour by its part (variant 2): the workings' grey-brown, a violet cast, the vent's scorched rock, the grey.</summary>
@@ -92,11 +110,11 @@ namespace Crulanda.World
                 Block(at, new Vector3(1.1f, 1, 1.5f), q);
             }
             // A crate (or a stack), its top open on glowing geodes when `geodes`.
-            void Crate(Vector3 at, Quaternion q, int high, bool geodes)
+            void Crate(Vector3 at, Quaternion q, int high, bool geodes, System.Collections.Generic.List<GameObject> into = null)
             {
                 if (!Free(at)) return;
                 for (int k = 0; k < high; k++) Part(PrimitiveType.Cube, t, at + Vector3.up * (.4f + k * .8f), Vector3.one * .8f, timber, q * Quaternion.Euler(0, k * 11, 0));
-                if (geodes) for (int k = 0; k < 4; k++) Part(PrimitiveType.Sphere, t, at + Vector3.up * (high * .8f + .02f) + q * new Vector3((A() - .5f) * .5f, 0, (A() - .5f) * .5f), new Vector3(.22f, .16f, .2f), geode);
+                if (geodes) for (int k = 0; k < 4; k++) { var g = Part(PrimitiveType.Sphere, t, at + Vector3.up * (high * .8f + .02f) + q * new Vector3((A() - .5f) * .5f, 0, (A() - .5f) * .5f), new Vector3(.22f, .16f, .2f), geode); into?.Add(g); }
                 Block(at, new Vector3(.9f, .8f * high, .9f), q);
             }
             // Crystal in the wall: a cluster of thin violet prisms leaning out of the rock.
@@ -355,8 +373,17 @@ namespace Crulanda.World
                         Part(PrimitiveType.Cylinder, t, car + qc * new Vector3(side * 1.05f, .45f, -5.6f + k * 3.7f), new Vector3(.8f, .06f, .8f), rust, qc * Quaternion.Euler(0, 0, 90));
                 for (int k = 0; k < 6; k++) foreach (int side in new[] { -1, 1 })
                         Part(PrimitiveType.Sphere, t, car + qc * new Vector3(side * 1.42f, 1.2f + (k % 2) * .8f, -.4f + k * .9f), Vector3.one * .1f, rust, qc);   // rivets
-                for (int k = 0; k < 6; k++) Crate(car + qc * new Vector3((k % 2 - .5f) * 1.1f, .85f, -2.4f - (k / 2) * 1.1f), qc, 1 + (k + 1) % 2, true);
-                Glow(t, car + qc * new Vector3(0, 2.2f, -3.4f), 8, .9f, GeodeViolet, .9f);
+                var lit = new System.Collections.Generic.List<GameObject>();
+                for (int k = 0; k < 6; k++) Crate(car + qc * new Vector3((k % 2 - .5f) * 1.1f, .85f, -2.4f - (k / 2) * 1.1f), qc, 1 + (k + 1) % 2, true, lit);
+                lit.Add(Glow(t, car + qc * new Vector3(0, 2.2f, -3.4f), 8, .9f, GeodeViolet, .9f).gameObject);
+                // The resonance lock (D4): an iron plate on the cab's platform side with a violet eye, and where the Weaver stands to match it.
+                // The waves come from behind the carriage and from the far end, where the line runs on into the dark. Fixed places, no draws.
+                Part(PrimitiveType.Cylinder, t, car + qc * new Vector3(1.47f, 1.5f, 1.2f), new Vector3(.75f, .03f, .75f), iron, qc * Quaternion.Euler(0, 0, 90));
+                foreach (float r in new[] { .5f, .3f }) Part(PrimitiveType.Cylinder, t, car + qc * new Vector3(1.5f, 1.5f, 1.2f), new Vector3(r, .02f, r), rust, qc * Quaternion.Euler(0, 0, 90));
+                lit.Add(Part(PrimitiveType.Sphere, t, car + qc * new Vector3(1.53f, 1.5f, 1.2f), new Vector3(.06f, .16f, .16f), geode, qc));
+                lit.Add(Glow(t, car + qc * new Vector3(2.1f, 1.6f, 1.2f), 4, .7f, GeodeViolet, .7f).gameObject);
+                RailGeodes = lit.ToArray(); RailLock = t.TransformPoint(On(sc + 1.2f, line + 2.6f));
+                RailWaves = new[] { t.TransformPoint(On(sc - 9.5f, line + 1)), t.TransformPoint(On(to - 4.5f, line + 2)) };
                 Block(car + qc * new Vector3(0, 0, 2.2f), new Vector3(2.9f, 3.2f, 6.2f), qc);
                 Block(car + qc * new Vector3(0, 0, -3.8f), new Vector3(2.9f, 1, 4.6f), qc);
                 // The loading crane by the carriage, crates and barrels on the platform, steam hanging over the line.

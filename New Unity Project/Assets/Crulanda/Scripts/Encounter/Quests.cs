@@ -48,7 +48,7 @@ namespace Crulanda.Encounter
     [Serializable] public sealed class QuestStepDef { public string text, say, sayBy; public QuestObjectiveDef[] objectives = new QuestObjectiveDef[0]; }
     /// <summary>
     /// type:
-    /// - flag: a game state (recruited, equipped:&lt;item&gt;).
+    /// - flag: a game state (recruited, equipped:&lt;item&gt;, key:&lt;something done for good, Progress.keys&gt;).
     /// - kill: an enemy id; a trailing * matches as a prefix.
     /// - talk: speak to an NPC.
     /// - deliver: bring item to target; it is consumed.

@@ -28,6 +28,7 @@ namespace Crulanda.Encounter
             if (Zone == null) return;
             foreach (var g in Zone.Gates) if (g != null) g.Recarve();   // the navmesh is built after the gates: cut them into it now
             foreach (var i in Zone.Interactables) if (i.kind == "liftgate" && i.gate != null && Progress.keys.Contains(LiftWoken)) i.gate.SetOpen(true, true);
+            StartWeaver();   // the Weaver's unlocking (EncounterSession.Weaver.cs)
         }
         /// <summary>What E says at a usable prop (the HUD's prompt; the Adit's things say how things stand).</summary>
         public string InteractPromptFor(ZoneInteractable i) { return i == null ? null : AditPrompt(i) ?? i.prompt; }
@@ -56,6 +57,7 @@ namespace Crulanda.Encounter
                 case "platformgate": return Quests != null && Quests.IsDone(PressedQuest) ? "Call the goblins to the gate (quiet)" : CarryingPowder ? "Blow the gate (loud)" : "Try the gate";
                 case "powder": return CarryingPowder ? "Powder on your shoulder" : null;
                 case "stone": return Progress.spiritStones.Contains(i.Key(Zone.Zone.id)) ? "The spirit stone hums" : i.prompt;
+                case "weaver": return Weaver != null && Weaver.Now == AditWeaver.Stage.Waiting ? "Talk to " + AditWeaver.Name + " (walk her to the carriage)" : i.prompt;
                 default: return null;
             }
         }
@@ -71,6 +73,7 @@ namespace Crulanda.Encounter
                     else { CarryingPowder = true; Message("You heave a keg of blasting powder onto your shoulder. Mind the lamps."); }
                     return true;
                 case "stone": TouchStone(i); return true;
+                case "weaver": TalkToWeaver(); return true;
                 default: return false;
             }
         }
@@ -96,7 +99,9 @@ namespace Crulanda.Encounter
             if (Quests != null && Quests.IsDone(PressedQuest))
             {
                 g.SetOpen(true);
-                Message("A goblin you freed from the cages slips out of the dark, lays a hand on the lock and hums. The bolts let go without a sound. Nobody in the hall has heard.");
+                Message("A goblin you freed from the cages slips out of the dark, lays a hand on the lock and hums. The bolts let go without a sound. Nobody in the hall has heard." +
+                    (EscortPossible ? " She stays by the gate: the old one from the fifth cage, Mother Quillet, and she has business with that carriage." : ""));
+                SpawnWeaver(g);   // the escort (EncounterSession.Weaver.cs)
                 return;
             }
             if (!CarryingPowder)

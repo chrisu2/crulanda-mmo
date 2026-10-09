@@ -381,6 +381,7 @@ namespace Crulanda.Encounter
             Consider(session.Player);
             if (session.Progress.recruited && session.Companion != null) Consider(session.Companion.actor);
             foreach (var p in session.PartySims) if (p != null) Consider(p.actor);
+            if (session.Weaver != null) Consider(session.Weaver.actor);   // Mother Quillet (D4)
             return best;
         }
     }

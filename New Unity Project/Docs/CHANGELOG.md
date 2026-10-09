@@ -1795,3 +1795,25 @@ A read-only review by five reviewers, each finding checked by a second who tried
   tools/art/make_icons.py, to be painted locally (the cloud can't push Git LFS).
 - Tests: QuestDataTests (the seven quests' data, and a play-through on the quest log); LootDataTests and NamedLootTests counts
   (135 named, 147 gear entries, 74 rares, three sets, 18 quest and 62 boss pieces); the sets test allows a five-piece set from three.
+
+## 2026-10-09 — The Weaver's unlocking: Mother Quillet's escort in the Rail Hall (dungeon step D4)
+- **Mother Quillet** (GAME-ONLY; the goblins are CANON people): with "The Pressed" handed in, the goblin who hums the platform gate open
+  on the quiet way is the old one from the fifth cage, and she stays by the gate. Spoken to, she walks down the platform to the
+  carriage's resonance lock (an iron plate with a violet eye on the cab's platform side) and matches it, about half a minute's work.
+  - She is one of your party for every mob, for Mira and for the sims (`PartyActor`): mobs on her count as your fight, sims attack
+    them, Mira and a sim healer heal her. A row under the party frame shows her health and the walk or the lock in per cent; she has a
+    name over her head.
+  - She waits while you are more than 16 m behind or something is on her within 5 m, and stops matching while you are down.
+- **Two waves** (`EncounterSession.Weaver.cs`): three platform guards drop off the back of the carriage a third of the way down,
+  three dockers come out of the far end at two thirds. They come for her; they belong to no camp, so they call nobody and answer
+  nobody, and they carry their camp's loot.
+- **Rail-Captain Danner** lies in the dark while the escort can still happen (a mob lying in wait, not in grass, is now deaf to calls,
+  so neither his guards' fight nor the Quartermaster's dying call draws him out); he stands up when the lock is half matched and comes
+  for her (`EncounterEnemy.Rise`). Walk up to him and he still springs out.
+- **Matched:** the carriage's geodes and its light go dark (`ZoneBuilder.QuietCarriage`), and "adit.lock" is kept for good: dark on
+  every later visit, Danner on his feet, nobody at the gate. If she falls, whatever was on her lets go, the waves still standing go back
+  into the dark, and 30 s later she is by the gate, whole, to start again.
+- **A new quest, The Weaver's Lock** (Pib, 12, after The Pressed; 760 XP, 60 crowns): its step is a flag objective, `key:adit.lock`
+  (the session's quest flags now read any `key:<id>` in `Progress.keys`). Eight Adit quests now.
+- Tests: AditWeaverTests (new, PlayMode: the quiet gate brings her and Danner lies in wait; the walk with both waves on her, Danner at
+  half the lock, the geodes dark and kept over a reload; her fall and return); QuestDataTests for the eighth quest and its flag.

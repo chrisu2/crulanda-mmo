@@ -57,6 +57,14 @@ namespace Crulanda.Encounter
             lungeUntil = Time.time + 1.1f;
             session.FloatText(transform.position + Vector3.up * .6f, "!", new Color(1, .35f, .2f));
         }
+        /// <summary>Up out of hiding when the session says so (Rail-Captain Danner at the Weaver's half-matched lock), and after
+        /// <paramref name="at"/> if it is not in a fight already.</summary>
+        public void Rise(Actor at)
+        {
+            if (!actor.IsAlive) return;
+            if (Hidden) Unhide();
+            if (at != null && !Engaged) threat.Add(at.EntityId.Value, JoinThreat);
+        }
         /// <summary>Springs out at the player: a fast lunge, a snarl, and straight into the fight.</summary>
         void Pounce()
         {

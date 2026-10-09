@@ -233,6 +233,8 @@ the next dungeon.
    - Choice of three rare pieces.
 7. **A Letter Under Seal** (dropped by Danner).
    - Leads to the next dungeon (later).
+8. **The Weaver's Lock** (Pib, after "The Pressed"; added with D4).
+   - Walk Mother Quillet down the platform to the carriage's lock and keep the Company off her while she matches it.
 
 ## 7. Loot
 
@@ -281,7 +283,11 @@ the next dungeon.
    - patrols released when a boss dies;
    - a rare spawn chance;
    - a spirit stone.
-4. **The escort event:** an NPC who walks, waves on a timer, a boss who rises at a step.
+4. **The escort event:** an NPC who walks, waves on a timer, a boss who rises at a step. *Built 2026-10-09 (D4): Mother Quillet waits by
+   the platform gate after the quiet way in; spoken to, she walks to the carriage's resonance lock (one of your party for every mob,
+   Mira and the sims), platform guards come at a third of the way and dockers at two thirds, Danner stands up out of the dark with the
+   lock half matched; matched, the geodes go dark and "adit.lock" is kept; Pib's "The Weaver's Lock" (EncounterSession.Weaver.cs,
+   AditWeaver). The carriage roof, a goblin figure and the sims joining the escort on their own wait.*
 5. **Mob behaviours:** call for help, flee at low health, sleep, fear, knockback, a charge to step out of.
 6. **Quests and loot:** the seven quests, the set and boss tables. *Written 2026-10-08 on web/adit-quests-loot (Quests/adit.json, the
    Adit-Runner's Kit in loot.adit.json); quest gear is not yet handed out at turn-in, and the Geode Shards and the hidden and rare

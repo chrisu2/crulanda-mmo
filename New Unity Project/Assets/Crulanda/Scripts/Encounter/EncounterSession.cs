@@ -183,6 +183,7 @@ namespace Crulanda.Encounter
         {
             if (flag == "recruited") return Progress.recruited;
             if (flag != null && flag.StartsWith("equipped:")) return Inventory.IsEquipped(Progress, flag.Substring(9));
+            if (flag != null && flag.StartsWith("key:")) return Progress.keys.Contains(flag.Substring(4));   // something done for good ("key:adit.lock")
             return false;
         }
         /// <summary>Talk to someone about quests. Returns true if they had quest business (so no small talk).</summary>
@@ -1566,6 +1567,7 @@ namespace Crulanda.Encounter
             if (Companion != null && Progress.recruited && Companion.actor.EntityId.Value == id) return Companion.actor;
             if (Pet != null && Pet.actor != null && Pet.actor.EntityId.Value == id) return Pet.actor;   // the Ranger's wolf (RangerPet)
             foreach (var c in PartySims) if (c != null && c.actor != null && c.actor.EntityId.Value == id) return c.actor;   // invited sims (Phase 5.2b)
+            if (Weaver != null && Weaver.actor != null && Weaver.actor.EntityId.Value == id) return Weaver.actor;   // Mother Quillet on her way to the lock (D4)
             return null;
         }
         public bool IsLivingPartyMember(string id) { var a = PartyActor(id); return a != null && a.IsAlive; }

@@ -172,6 +172,8 @@ Seven side quests from level 10, given outside (DUNGEON_DESIGN.md section 6): Un
 The Pressed (Pib, five cages in the Workings), Echoes in the Stone (Brother Cael, six echo-jars in the Gallery), Embers Below (Tamsin
 Rook in Khaven), What the Grey Takes (Lisle Tamber, Salt-Menders), and A Letter Under Seal (Danner's letter, Yara to Lisle; the hook
 for the next dungeon). Kills name the Adit's camps (`mob.<tag>.adit.*`); the bosses' items come as "collect from a kill".
+An eighth (D4, 2026-10-09): The Weaver's Lock (Pib, after The Pressed), walking Mother Quillet to the carriage's lock; its step is a
+flag objective, `key:adit.lock`, met by something kept for good in `Progress.keys` (the session's QuestFlag reads any `key:<id>`).
 
 ### Faction introductions (CANON factions, GAME-ONLY quests)
 - **Oakhaven Folk** (village standing): earned from the NPC quests. Raises prices at the stalls, opens a room at the inn, and gets villagers to share rumours.

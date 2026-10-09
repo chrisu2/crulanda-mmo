@@ -87,6 +87,8 @@ namespace Crulanda.Encounter
                 agent.speed = AdventurerMotor.Running ? 5.6f : distance > 9 ? 4.2f : 2.3f;
             }
             var recipient = actor.Health.Pool.Ratio < session.Player.Health.Pool.Ratio ? actor : session.Player;
+            var weaver = session.Weaver != null ? session.Weaver.actor : null;   // Mother Quillet on her way to the lock (D4)
+            if (weaver != null && weaver.IsAlive && weaver.Health.Pool.Ratio < recipient.Health.Pool.Ratio && Vector3.Distance(weaver.transform.position, transform.position) <= heal.range) recipient = weaver;
             if (recipient.Health.Pool.Ratio < .78f && Vector3.Distance(recipient.transform.position, transform.position) <= heal.range)
             {
                 var result = abilities.TryStart(heal, Time.time, Spend, () => {

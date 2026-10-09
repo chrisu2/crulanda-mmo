@@ -38,7 +38,7 @@ namespace Crulanda.Tests
         }
         [UnityTearDown] public IEnumerator Cleanup()
         {
-            EncounterSession.RareDice = () => UnityEngine.Random.value;
+            EncounterSession.RareDice = () => UnityEngine.Random.value; EncounterSession.RideSeconds = 5;
             if (WorldWeather.Active != null) WorldWeather.Active.Release(true);
             WorldClock.Hour = 8.5f; ZoneBuilder.RequestedZoneId = null;
             SceneManager.sceneLoaded -= OnLoaded;
@@ -70,9 +70,33 @@ namespace Crulanda.Tests
             var p = session.Player.transform.position; s.x = p.x + 2; s.z = p.z; pop.Refresh(); yield return null;
             Assert.IsTrue(session.Invite(s.id, true)); var c = session.PartySim(s.id);
             Assert.IsNotNull(c.LeadDungeon(out var why), why);
-            Assert.AreEqual(ZoneBuilder.AditLiftGate, c.StoppedBy, "the run stops at the lift");
-            int before = session.Zone.Zone.camps.Count(cp => cp.cave != "The Sealed Adit" || cp.along < lift.Along);
-            Assert.AreEqual(before, c.CampsLeft, "every camp this side of the lift, the branches too");
+            Assert.AreEqual(ZoneBuilder.AditLiftGate, c.StoppedBy, "the run will wait at the lift");
+            Assert.AreEqual(session.Zone.Zone.camps.Count(cp => cp != null), c.CampsLeft, "every camp, the ones past the gates too: the run waits at them (D7)");
+        }
+        [UnityTest] public IEnumerator The_run_waits_at_the_lift_and_goes_on_when_it_opens()
+        {
+            var lift = Thing("liftgate");
+            var pop = SimPopulation.Active; var s = pop.World.sims.First();
+            s.zone = "zone.adit"; s.onlineFrom = 0; s.onlineHours = 24; s.friendly = .9f; s.level = 11; session.Progress.experience = EncounterProgress.XpForLevel(9);
+            var p = session.Player.transform.position; s.x = p.x + 2; s.z = p.z; pop.Refresh(); yield return null;
+            Assert.IsTrue(session.Invite(s.id, true)); var c = session.PartySim(s.id);
+            Assert.IsNotNull(c.LeadDungeon(out var why), why);
+            // Everything this side of the lift falls (the branches too): the run walks its route down to the gate and waits there.
+            var camps = session.Zone.Zone.camps;
+            foreach (var e in session.Enemies.ToArray())
+                if (e != null && e.Camp && e.actor.IsAlive && e.CampIndex >= 0 && e.CampIndex < camps.Length && !(camps[e.CampIndex].cave == "The Sealed Adit" && camps[e.CampIndex].along > lift.gate.Along))
+                    e.actor.Health.ApplyDamage(e.actor.Health.Pool.Max * 3);
+            var near = lift.gate.transform.position - lift.gate.transform.forward * 3f;
+            session.Player.GetComponent<AdventurerMotor>().Teleport(near + Vector3.up); if (NavMesh.SamplePosition(near, out var hit, 3, NavMesh.AllAreas)) c.GetComponent<NavMeshAgent>().Warp(hit.position);
+            float t = 0; while (t < 8 && !c.WaitingAtGate) { t += Time.deltaTime; yield return null; }
+            Assert.IsTrue(c.WaitingAtGate, "the run waits at the lift"); StringAssert.EndsWith("cage-lift gate", c.LeadingName); Assert.AreEqual(ZoneBuilder.AditLiftGate, c.StoppedBy);
+            t = 0; while (t < 4 && !c.Activity.StartsWith("Waiting at")) { t += Time.deltaTime; yield return null; }
+            StringAssert.StartsWith("Waiting at the", c.Activity);
+            Assert.IsTrue(session.Chat.Any(l => l.channel == ChatChannel.Party && l.text.Contains("rail sigils")), "it says what the gate wants");
+            foreach (var k in new[] { "sigil.amber", "sigil.ember", "sigil.grey" }) session.Progress.keys.Add(k);
+            session.UseInteractable(lift); yield return Frames(3);
+            Assert.IsTrue(lift.gate.Open); Assert.IsFalse(c.WaitingAtGate, "open: on we go"); Assert.IsNull(c.StoppedBy);
+            Assert.AreEqual("Stair watch", c.LeadingName, "the first camp past the lift");
         }
         [UnityTest] public IEnumerator The_sigils_are_won_from_the_branch_bosses_and_wake_the_lift_for_good()
         {
@@ -119,6 +143,23 @@ namespace Crulanda.Tests
             session.UseInteractable(gate); yield return Frames(3);
             Assert.IsTrue(gate.gate.Open);
             Assert.AreEqual(ready, session.Enemies.Count(e => e != null && e.Camp && !e.Elite && e.CanAnswer), "nobody in the hall heard");
+        }
+        [UnityTest] public IEnumerator The_carriage_rides_you_out_once_the_lock_is_matched()
+        {
+            EncounterSession.RideSeconds = .5f;
+            var ride = Thing("carriage"); var yard = session.Zone.Ground(session.Zone.Zone.spawns.player, 1.1f);
+            Assert.Greater(Vector3.Distance(ride.position, yard), 60, "the gangway is down in the hall");
+            var motor = session.Player.GetComponent<AdventurerMotor>(); motor.Teleport(ride.position + Vector3.up);
+            StringAssert.Contains("loading", session.InteractPromptFor(ride));
+            session.UseInteractable(ride); yield return Frames(2);
+            Assert.IsFalse(session.Working, "the Company's carriage takes nobody up");
+            session.Progress.keys.Add(EncounterSession.WeaverLock);
+            StringAssert.Contains("one ride out", session.InteractPromptFor(ride));
+            session.UseInteractable(ride); Assert.IsTrue(session.Working, "on the bar");
+            yield return new WaitForSeconds(.8f);
+            Assert.IsFalse(session.Working);
+            Assert.Less(Vector3.Distance(session.Player.transform.position, yard), 4, "at the siding under the yard");
+            Assert.Less(Vector3.Distance(session.Companion.transform.position, yard), 6, "Mira too");
         }
         [UnityTest] public IEnumerator The_spirit_stone_is_where_you_wake()
         {

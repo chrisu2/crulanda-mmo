@@ -109,6 +109,10 @@ namespace Crulanda.Tests
             var gate = Thing("platformgate"); ClearHall(gate.gate);
             session.UseInteractable(gate); yield return Frames(3);
             var w = session.Weaver; var danner = Danner(); Assert.NotNull(danner);
+            // A sim in the party joins the escort (D7): it guards her while she walks.
+            var pop = SimPopulation.Active; var s = pop.World.sims.First(); s.zone = "zone.adit"; s.onlineFrom = 0; s.onlineHours = 24; s.friendly = .9f; s.level = 11;
+            var pp = session.Player.transform.position; s.x = pp.x + 2; s.z = pp.z; pop.Refresh(); yield return null;
+            Assert.IsTrue(session.Invite(s.id, true)); var guard = session.PartySim(s.id); bool guarded = false;
             w.GetComponent<NavMeshAgent>().speed = 7;   // a quick walk for the test
             session.UseInteractable(w.talk); yield return null;
             Assert.AreEqual(AditWeaver.Stage.Walking, w.Now, "spoken to, she sets off");
@@ -123,6 +127,7 @@ namespace Crulanda.Tests
                     cameFor[e] = e.Victim; e.actor.Health.ApplyDamage(e.actor.Health.Pool.Max * 3);
                 }
                 if (matchedWhenRose < 0 && !danner.Hidden) matchedWhenRose = w.Matched;
+                if (guard != null && guard.Activity == "Guarding " + AditWeaver.Name) guarded = true;
                 if (dannerFor == null && danner.actor.IsAlive && danner.Victim != null) { dannerFor = danner.Victim; danner.actor.Health.ApplyDamage(danner.actor.Health.Pool.Max * 3); }
             });
             Assert.AreEqual(AditWeaver.Stage.Done, w.Now, "the lock is matched");
@@ -132,6 +137,7 @@ namespace Crulanda.Tests
             Assert.That(walkedAtSecond, Is.InRange(.63f, .85f), "the second at two thirds");
             Assert.That(matchedWhenRose, Is.InRange(.5f, .7f), "Danner stood up with the lock half matched");
             Assert.AreSame(w.actor, dannerFor, "and came for her");
+            Assert.IsTrue(guarded, "the sim guarded her on the way (D7)");
             Assert.Contains(EncounterSession.WeaverLock, session.Progress.keys, "kept for good");
             Assert.IsTrue(CarriageDark, "the geodes have gone dark");
             Assert.AreEqual(1, quests.State(EncounterSession.WeaverQuest).step, "Pib's quest: back to Pib");

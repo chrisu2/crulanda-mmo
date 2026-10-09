@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using Crulanda.World;
 
 namespace Crulanda.Encounter
@@ -58,6 +59,7 @@ namespace Crulanda.Encounter
                 case "powder": return CarryingPowder ? "Powder on your shoulder" : null;
                 case "stone": return Progress.spiritStones.Contains(i.Key(Zone.Zone.id)) ? "The spirit stone hums" : i.prompt;
                 case "weaver": return Weaver != null && Weaver.Now == AditWeaver.Stage.Waiting ? "Talk to " + AditWeaver.Name + " (walk her to the carriage)" : i.prompt;
+                case "carriage": return Progress.keys.Contains(WeaverLock) ? i.prompt + " (one ride out)" : "The carriage is loading: its lock still sings";
                 default: return null;
             }
         }
@@ -74,6 +76,7 @@ namespace Crulanda.Encounter
                     return true;
                 case "stone": TouchStone(i); return true;
                 case "weaver": TalkToWeaver(); return true;
+                case "carriage": RideCarriage(); return true;
                 default: return false;
             }
         }
@@ -152,12 +155,44 @@ namespace Crulanda.Encounter
             foreach (var i in Zone.Interactables) if (i.kind == "stone" && Progress.spiritStones.Contains(i.Key(Zone.Zone.id))) return i;
             return null;
         }
-        /// <summary>Whether a camp stands past a shut gate in its cave (the run a sim leads stops there).</summary>
+        /// <summary>How long the ride up the line takes on the bar (D8; tests shorten it).</summary>
+        public static float RideSeconds = 5;
+        /// <summary>
+        /// The rail ride out (dungeon step D8): with the lock matched, the goblins at the levers run the carriage back up the line to a
+        /// siding under the Adit yard. E at the gangway: a few seconds on the bar (moving or a blow stops it, as with any work), then you,
+        /// Mira and the sims stand at the yard. Before the lock is matched the carriage is still the Company's.
+        /// </summary>
+        void RideCarriage()
+        {
+            if (!Progress.keys.Contains(WeaverLock)) { Message("The carriage is loading, its geodes glowing in their crates, and the lock on its side still sings the Company's note. Stop it first: the Weaver knows the way."); return; }
+            if (InCombat) { Message(FightingLine); return; }
+            Message("You climb the gangway. Two goblins at the levers grin and throw them, and the carriage takes up the line with a jolt.");
+            StartWork("Riding the line", RideSeconds, RideOut);
+        }
+        void RideOut()
+        {
+            var siding = StartPoint;
+            Player.GetComponent<AdventurerMotor>().Teleport(siding);
+            if (Companion != null) { var ma = Companion.GetComponent<NavMeshAgent>(); if (ma != null) ma.Warp(siding + Vector3.right * 2.5f - Vector3.up * .1f); }
+            foreach (var c in PartySims) { if (c == null) continue; var agent = c.GetComponent<NavMeshAgent>(); if (agent != null) agent.Warp(siding + Vector3.left * (2 + c.slot) - Vector3.up * .1f); }
+            foreach (var e in Enemies) if (e != null && e.Victim != null) e.ResetFight();
+            Message("A long climb in the dark, the Gallery's song far off through the rock, then grey daylight: the carriage stops at a siding under the Adit yard, and the goblins wave you off. The line is theirs now.");
+            Save(false);
+        }
+        /// <summary>Whether a camp stands past a shut gate in its cave (the run a sim leads waits there).</summary>
         public ZoneGate GateBefore(ZoneCamp camp)
         {
             if (Zone == null || camp == null || string.IsNullOrEmpty(camp.cave)) return null;
             foreach (var g in Zone.Gates) if (g != null && !g.Open && g.Cave == camp.cave && camp.along > g.Along) return g;
             return null;
+        }
+        /// <summary>The last gate across the cave before a camp, open or shut (D7: the run a sim leads waits at it while it is shut), or null.</summary>
+        public ZoneGate GateAhead(ZoneCamp camp)
+        {
+            if (Zone == null || camp == null || string.IsNullOrEmpty(camp.cave)) return null;
+            ZoneGate last = null;
+            foreach (var g in Zone.Gates) if (g != null && g.Cave == camp.cave && camp.along > g.Along && (last == null || g.Along > last.Along)) last = g;
+            return last;
         }
     }
 }

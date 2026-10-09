@@ -25,7 +25,7 @@ namespace Crulanda.World
         /// <summary>Dungeon step D3: the gates across the main way (ZoneGate), the powder for the loud way through the second, the
         /// Gallery's spirit stone, and the elite whose people answer the loud way (EncounterSession.Adit).</summary>
         public const string AditLiftGate = "The cage-lift gate", AditPlatformGate = "The platform gate", AditPowder = "A keg of blasting powder",
-            AditSpiritStone = "The Gallery's spirit stone", AditQuartermaster = "Quartermaster Brannigan Sorrel";
+            AditSpiritStone = "The Gallery's spirit stone", AditQuartermaster = "Quartermaster Brannigan Sorrel", AditCarriage = "The rail-carriage";
         /// <summary>The Rail Hall's part in the Weaver's unlocking (dungeon step D4, EncounterSession.Weaver): where Mother Quillet stands to match
         /// the carriage's resonance lock, where the two waves come from (behind the carriage, then the far end where the line runs on into the
         /// dark), and the carriage's geodes with their light and the lock's eye, which go dark when it is matched. Unset outside the Adit.</summary>
@@ -384,6 +384,9 @@ namespace Crulanda.World
                 lit.Add(Glow(t, car + qc * new Vector3(2.1f, 1.6f, 1.2f), 4, .7f, GeodeViolet, .7f).gameObject);
                 RailGeodes = lit.ToArray(); RailLock = t.TransformPoint(On(sc + 1.2f, line + 2.6f));
                 RailWaves = new[] { t.TransformPoint(On(sc - 9.5f, line + 1)), t.TransformPoint(On(to - 4.5f, line + 2)) };
+                // The way out (D8): the gangway at the carriage's bed, on the platform side. With the lock matched the goblins set the
+                // carriage to run back up the line to a siding under the yard (EncounterSession.Adit, kind "carriage").
+                Interactables.Add(new ZoneInteractable { name = AditCarriage, prompt = "Ride the carriage up the line", kind = "carriage", position = t.TransformPoint(On(sc - 3f, line + 2.4f)) });
                 Block(car + qc * new Vector3(0, 0, 2.2f), new Vector3(2.9f, 3.2f, 6.2f), qc);
                 Block(car + qc * new Vector3(0, 0, -3.8f), new Vector3(2.9f, 1, 4.6f), qc);
                 // The loading crane by the carriage, crates and barrels on the platform, steam hanging over the line.

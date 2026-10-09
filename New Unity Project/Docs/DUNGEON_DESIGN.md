@@ -289,11 +289,16 @@ the next dungeon.
    Mira and the sims), platform guards come at a third of the way and dockers at two thirds, Danner stands up out of the dark with the
    lock half matched; matched, the geodes go dark and "adit.lock" is kept; Pib's "The Weaver's Lock" (EncounterSession.Weaver.cs,
    AditWeaver). The carriage roof, a goblin figure and the sims joining the escort on their own wait.*
-5. **Mob behaviours:** call for help, flee at low health, sleep, fear, knockback, a charge to step out of.
+5. **Mob behaviours:** call for help, flee at low health, sleep, fear, knockback, a charge to step out of. *Calls, the sapper's blast,
+   heals, bolts, drains and knockbacks came with C5 and D2; flee at low health (`ZoneCamp.flee`, the Breach's crawlers) and the gunners'
+   and pickets' ranged shots 2026-10-09 (D5). The Foreman's terrify stands for a mob's fear; a sleep on you waits for a mob that sings it.*
 6. **Quests and loot:** the seven quests, the set and boss tables. *Written 2026-10-08 on web/adit-quests-loot (Quests/adit.json, the
    Adit-Runner's Kit in loot.adit.json); quest gear is not yet handed out at turn-in, and the Geode Shards and the hidden and rare
    bosses' pieces wait (WEB_LOG.md).*
-7. **Sim support:** the dungeon run leads through the wings and branches in order, waits at gates, and joins the escort.
-8. **The rail ride out.**
+7. **Sim support:** the dungeon run leads through the wings and branches in order, waits at gates, and joins the escort. *Built
+   2026-10-09 (D7): the order came with round 27; the run now keeps the camps past a gate, walks to a shut one and waits, saying what it
+   wants (SimCompanion.TickGate), and goes on when it opens; every party sim guards Mother Quillet while she walks.*
+8. **The rail ride out.** *Built 2026-10-09 (D8): E at the carriage's gangway once the lock is matched, five seconds on the bar, and you,
+   Mira and the sims stand at the siding under the yard (EncounterSession.Adit.RideCarriage). The carriage does not move on screen yet.*
 
 Biggest risk: step 1 (the largest cavern by far) and the knockback into lava (it must never put anyone under the world).

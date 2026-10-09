@@ -120,9 +120,9 @@ namespace Crulanda.Encounter
                     if (e == null || !e.actor.IsAlive || !e.FightingParty || e.LeaveAlone) continue;
                     float d = Vector3.Distance(e.transform.position, transform.position); if (d < bestD) { best = e; bestD = d; }
                 }
-                if (best == null && Leading.HasValue && Vector3.Distance(transform.position, Leading.Value) < 18)
+                if (best == null && Leading.HasValue && waitingAt == null && Vector3.Distance(transform.position, Leading.Value) < 18)
                 {
-                    // At the camp it leads to: the nearest of its mobs still standing.
+                    // At the camp it leads to: the nearest of its mobs still standing (not while it waits at a shut gate: the camp past it is not its to pull, D7).
                     foreach (var e in session.Enemies)
                     {
                         if (e == null || !e.actor.IsAlive || !e.Camp || e.Game) continue;
@@ -174,13 +174,35 @@ namespace Crulanda.Encounter
             session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? "follow me, " + LeadingName.ToLower() + " this way" : "Follow me. The " + LeadingName.ToLower() + " are this way.");
             return LeadingName;
         }
-        public void StopLeading() { Leading = null; LeadingName = null; route.Clear(); Dungeon = null; StoppedBy = null; }
-        /// <summary>A dungeon run (round 27): the camps still to clear, in the order the passage meets them, and the dungeon's name.</summary>
-        readonly System.Collections.Generic.List<(Vector3 at, string name, bool boss)> route = new System.Collections.Generic.List<(Vector3, string, bool)>();
+        public void StopLeading() { Leading = null; LeadingName = null; route.Clear(); Dungeon = null; StoppedBy = null; waitingAt = null; }
+        /// <summary>A dungeon run (round 27): the camps still to clear, in the order the passage meets them, each with the gate across the
+        /// way before it (D7: shut, the run waits at it), and the dungeon's name.</summary>
+        readonly System.Collections.Generic.List<(Vector3 at, string name, bool boss, Crulanda.World.ZoneGate gate)> route = new System.Collections.Generic.List<(Vector3, string, bool, Crulanda.World.ZoneGate)>();
         public string Dungeon { get; private set; }
-        /// <summary>The shut gate the run stops at (the Sealed Adit's cage-lift or platform gate), or null: its camps past it are left out.</summary>
+        /// <summary>The shut gate ahead that the run will wait at (the Sealed Adit's cage-lift or platform gate), or null once it is open or there is none.</summary>
         public string StoppedBy { get; private set; }
         public int CampsLeft { get { return route.Count; } }
+        Crulanda.World.ZoneGate waitingAt;
+        /// <summary>Waiting at a shut gate for you to open it (D7).</summary>
+        public bool WaitingAtGate { get { return waitingAt != null; } }
+        /// <summary>A shut gate before the next camp: the run goes to it and waits, saying what it wants; open, the run goes on (D7).</summary>
+        void TickGate()
+        {
+            if (Dungeon == null || route.Count == 0) return;
+            var g = route[0].gate;
+            if (g != null && !g.Open)
+            {
+                if (waitingAt == g) return;
+                waitingAt = g; StoppedBy = g.Title; Leading = g.transform.position - g.transform.forward * 2.5f; LeadingName = g.Title.StartsWith("The ") ? g.Title.Substring(4) : g.Title;   // "Waiting at the cage-lift gate"
+                var thing = session.Zone.Interactables.Find(i => i.gate == g); var prompt = thing != null ? session.InteractPromptFor(thing) : null;
+                session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? g.Title.ToLower() + " is shut. " + (prompt ?? "open it").ToLower() + "?" : g.Title + " is shut against us. " + (prompt ?? "It wants opening") + ".");
+            }
+            else if (waitingAt != null)
+            {
+                waitingAt = null; StoppedBy = null; Leading = route[0].at; LeadingName = route[0].name;
+                session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? "open! on we go" : "It's open. On we go.");
+            }
+        }
         /// <summary>
         /// Leads the party through the zone's dungeon (a walk-in cave with camps in it): every camp whose ground is the cave's floor, in
         /// the order the passage reaches them from the mouth, the boss (an elite at the far end) last. Refuses (null, and why) when there
@@ -195,11 +217,11 @@ namespace Crulanda.Encounter
             foreach (var h in Crulanda.World.Hollow.All)
             {
                 if (h.Parent != null) continue;
-                var camps = new System.Collections.Generic.List<(float along, Vector3 at, string name, bool boss, int lo)>();
+                var camps = new System.Collections.Generic.List<(float along, Vector3 at, string name, bool boss, int lo, Crulanda.World.ZoneGate gate)>();
                 Gather(h, camps, true);
                 if (camps.Count == 0) continue;
                 int first = camps[0].lo; if (session.Progress.Level < first - 1) { why = h.Name + " is too much for us yet (level " + first + " at the door)."; return null; }
-                foreach (var cp in camps) route.Add((cp.at, cp.name, cp.boss));
+                foreach (var cp in camps) { route.Add((cp.at, cp.name, cp.boss, cp.gate)); if (StoppedBy == null && cp.gate != null && !cp.gate.Open) StoppedBy = cp.gate.Title; }   // the first shut gate: the run waits there (D7)
                 Dungeon = session.Zone.Zone.dungeon ? session.Zone.Zone.displayName : h.Name; Leading = route[0].at; LeadingName = route[0].name;
                 session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? "ok, " + Dungeon + " run. " + route.Count + " camps to the bottom, stay close" : "Follow me into " + Dungeon + ". " + route.Count + " camps between us and the end. Stay close.");
                 return Dungeon;
@@ -207,24 +229,23 @@ namespace Crulanda.Encounter
             why = "There is no dungeon in these parts."; return null;
         }
         /// <summary>A cave's camps in the order the way through meets them, each branch's run spliced in where it opens.</summary>
-        void Gather(Crulanda.World.Hollow h, System.Collections.Generic.List<(float along, Vector3 at, string name, bool boss, int lo)> into, bool root)
+        void Gather(Crulanda.World.Hollow h, System.Collections.Generic.List<(float along, Vector3 at, string name, bool boss, int lo, Crulanda.World.ZoneGate gate)> into, bool root)
         {
-            var mine = new System.Collections.Generic.List<(float along, Vector3 at, string name, bool boss, int lo)>();
+            var mine = new System.Collections.Generic.List<(float along, Vector3 at, string name, bool boss, int lo, Crulanda.World.ZoneGate gate)>();
             foreach (var cp in session.Zone.Zone.camps)
             {
                 if (cp == null) continue;
                 if (!string.IsNullOrEmpty(cp.cave))
                 {
                     if (cp.cave != h.Name) continue;
-                    var shut = session.GateBefore(cp); if (shut != null) { if (StoppedBy == null) StoppedBy = shut.Title; continue; }   // past a shut gate: the run stops there
                     float y = 0; if (!h.FloorSmooth(cp.center, out y)) h.FloorAt(cp.center, out y);
-                    mine.Add((cp.along, new Vector3(cp.center.x, y, cp.center.y), cp.name, cp.elite, cp.levelMin)); continue;
+                    mine.Add((cp.along, new Vector3(cp.center.x, y, cp.center.y), cp.name, cp.elite, cp.levelMin, session.GateAhead(cp))); continue;   // past a gate: the run waits at it while it is shut (D7)
                 }
                 bool inOther = false; foreach (var o in Crulanda.World.Hollow.All) if (o != h && o.FloorAt(cp.center, out _)) { inOther = true; break; }
-                if (!inOther && h.FloorAt(cp.center, out float fy)) { int i = h.Nearest(cp.center, out _); mine.Add((h.Along[i], new Vector3(cp.center.x, fy, cp.center.y), cp.name, cp.elite, cp.levelMin)); continue; }
+                if (!inOther && h.FloorAt(cp.center, out float fy)) { int i = h.Nearest(cp.center, out _); mine.Add((h.Along[i], new Vector3(cp.center.x, fy, cp.center.y), cp.name, cp.elite, cp.levelMin, null)); continue; }
                 // A camp guarding the mouth from outside (the Hollow lookouts) is the run's first: before the passage, by its distance.
                 if (!root || h.Centre.Count == 0) continue; var mouth = new Vector2(h.Centre[0].x, h.Centre[0].z); float out_ = Vector2.Distance(cp.center, mouth);
-                if (out_ < 14) mine.Add((-out_, session.Zone.Ground(cp.center), cp.name, cp.elite, cp.levelMin));
+                if (out_ < 14) mine.Add((-out_, session.Zone.Ground(cp.center), cp.name, cp.elite, cp.levelMin, null));
             }
             mine.Sort((a, b) => a.along.CompareTo(b.along));
             var kids = Crulanda.World.Hollow.All.FindAll(o => o.Parent == h); kids.Sort((a, b) => a.ParentAlong.CompareTo(b.ParentAlong));
@@ -289,21 +310,15 @@ namespace Crulanda.Encounter
                     return;
                 }
             }
+            TickGate();   // a shut gate ahead: the run waits at it and goes on when it opens (D7)
             var quarry = Quarry;
-            if (Leading.HasValue && quarry == null && CampCleared())
+            if (Leading.HasValue && quarry == null && waitingAt == null && CampCleared())
             {
                 if (route.Count > 1)
                 {
                     // A dungeon run (round 27): on to the next camp down the passage.
                     route.RemoveAt(0); Leading = route[0].at; LeadingName = route[0].name;
                     session.ChatSay(ChatChannel.Party, sim.name, route[0].boss ? (sim.chatty > .65f ? "boss next. " + LeadingName + ". buff up" : "That's the last before " + LeadingName + ". Ready yourselves.") : (sim.chatty > .65f ? "clear. next: " + LeadingName.ToLower() : "Clear. On to " + LeadingName + "."));
-                }
-                else if (Dungeon != null && StoppedBy != null)
-                {
-                    // The run ends at a shut gate (the Sealed Adit's, dungeon step D3): as far as the party can go.
-                    session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? "thats as far as we get. " + StoppedBy.ToLower() + " is shut" : "That's as far as we can go. " + StoppedBy + " is shut against us.");
-                    session.Message(sim.name + ": " + StoppedBy + " is shut; the run ends here."); foreach (var p in session.PartySims) if (p != null) SimMemory.Note(p.sim, SimMemory.Deed.KillsTogether, 2);
-                    StopLeading();
                 }
                 else if (Dungeon != null)
                 {
@@ -359,13 +374,24 @@ namespace Crulanda.Encounter
                 }
                 return;
             }
-            // Leading a run (5.6): on to the camp while you keep up; waits when you fall behind.
+            // The Weaver's escort (D7): while Mother Quillet walks to the lock, the party keeps to her, not to you.
+            var weaver = session.Weaver;
+            if (weaver != null && weaver.actor.IsAlive && (weaver.Now == AditWeaver.Stage.Walking || weaver.Now == AditWeaver.Stage.Matching) && Vector3.Distance(transform.position, weaver.transform.position) < 45)
+            {
+                Activity = "Guarding " + AditWeaver.Name;
+                var post = weaver.transform.position + Quaternion.Euler(0, 90 + slot * 120, 0) * Vector3.forward * 2.2f;
+                float toHer = Vector3.Distance(transform.position, weaver.transform.position);
+                agent.isStopped = toHer < 3.2f;
+                if (!agent.isStopped) { agent.speed = toHer > 8 ? 5.6f : 3.4f; agent.SetDestination(post); }
+                return;
+            }
+            // Leading a run (5.6): on to the camp while you keep up; waits when you fall behind. At a shut gate it waits for you to open it (D7).
             if (Leading.HasValue)
             {
                 float toCamp = Vector3.Distance(transform.position, Leading.Value);
                 if (toPlayer > 18) { Activity = "Waiting for you"; agent.isStopped = true; return; }
-                if (toCamp > 6) { Activity = "Leading you to the " + LeadingName.ToLower(); agent.isStopped = false; agent.speed = 4.2f; agent.SetDestination(Leading.Value); return; }
-                Activity = "At the " + LeadingName.ToLower(); agent.isStopped = true; return;
+                if (toCamp > 6) { Activity = (waitingAt != null ? "Going to the " : "Leading you to the ") + LeadingName.ToLower(); agent.isStopped = false; agent.speed = 4.2f; agent.SetDestination(Leading.Value); return; }
+                Activity = (waitingAt != null ? "Waiting at the " : "At the ") + LeadingName.ToLower(); agent.isStopped = true; return;
             }
             // At your side: a pace behind, each in its own place so they do not stack.
             Activity = toPlayer > 4 ? "Following you" : "At your side";

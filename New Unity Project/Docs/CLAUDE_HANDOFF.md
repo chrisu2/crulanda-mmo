@@ -9,17 +9,26 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-10-09, 20:00) — D4 published; D5 part 1 (Nix and the Rock-Eater) committed; the rest of D5 next
-**Since the publish (committed, not yet in a build):** Nix's two-part fight (CHANGELOG 2026-10-09 "Nix and the Rock-Eater"): the engine is
-a second elite of his camp with its own figure (ActorLook.RockEater) and move (Bore), Nix rides inside it unseen until it breaks
-(EncounterSession.RockEater.cs, EncounterEnemy.HideInside/Inside); RockEaterTests 2/2, BossPhase/AditGate/Adit/EliteBalance green.
-Docs/CLASS_STATUS.md (new) has every class's state: all seven complete for cap 15; deeper talents wait on Phase 9.
-**Mira's Hush is already built** (HealerCompanion.Hush, with C5): the earlier "not yet" was stale. Only the "when you ask" half (a key or
-button) is missing, and it is not needed.
-**Next:** the rest of D5: mobs that flee at low health (the Breach's crawlers, the bats when they exist) and the carriage gunner firing
-from the roof (a ranged MobCast); then D7 (sims through the wings in order, waiting at gates, joining the escort), D8 (the rail ride
-out); then a full run, release_build.ps1, publish, back up, push.
+## RESUME HERE (updated 2026-10-09, 21:30) — the Sealed Adit's engine work is COMPLETE (D1-D8); full run, release build and publish next
+**Committed since the last publish (18:45):** D5 (Nix and the Rock-Eater; mobs that bolt at low health; the pickets' and gunners' shots),
+D7 (a sim-led run waits at a shut gate and goes on when it opens; party sims guard Mother Quillet on her walk) and D8 (the rail ride out:
+E at the carriage's gangway once the lock is matched, five seconds on the bar, the party at the siding under the yard). CHANGELOG
+2026-10-09 has each. Focused runs green (RockEater 2/2; MobBehaviour, CrowdControl, SocialPull, AditGate, AditWeaver, SimParty, Adit).
+Docs/CLASS_STATUS.md (the seven classes' state) and Docs/TALENT_DEPTH.md (decided: one point a level; a fourth path for every class;
+the Adit first, then the Paladin) are new.
+**Next, in order:** a full run (tools\validation\start_detached.ps1 -Arguments "-AllTests -Zones zone.adit"), fix anything red, then
+tools\validation\release_build.ps1 (the release player, published), back up, push, handoff. Then **the talents, the Paladin first**
+(TALENT_DEPTH.md: the Herald path, 3-4 new abilities, tiers 3-6 for all four paths; then Warrior and Druid, whose deep rows are designed;
+then Archivist, Ranger, Rogue, Mage). Left in the Adit for a later look: the carriage moving on the ride out, a goblin figure for Quillet
+and Nix, the carriage gunner on the roof (he fires from the platform), a mob that sings a sleep on you.
+**Mira's Hush is built** (HealerCompanion.Hush, with C5); only the "when you ask" half is missing and it is not needed.
+**Publishing:** full_run.ps1's lane B builds a DEVELOPMENT player (the tours need it). After a green run, run release_build.ps1.
+Focused test runs: focus_detached.ps1 -Runs "EditMode|<filter>|<tag>#PlayMode|<filter>|<tag>" -Log <file> ("DONE" ends the log).
+**Why the Claude app froze (2026-10-09; NOT Unity):** Windows toasts with Windows notifications off hung the app's main process at
+turn ends (event log Microsoft-Windows-PushNotification-Platform/Operational, 2416 with no 2418/3150 after it). Fixed: notifications on,
+question notifications set to badge, the sideloaded second Claude app removed (its settings in D:\crulanda-work\claude-app-old-backup).
 
+## Earlier resume note (2026-10-09, 20:00) — D4 published; D5 part 1 (Nix and the Rock-Eater) committed; the rest of D5 next
 ## Earlier resume note (2026-10-09, 18:50) — D4 (the Weaver's escort) done, full run green, release build PUBLISHED
 **Playable build = D4 (commit 5f90443 + the docs commit after it), a release build published 18:45 to D:\crulanda-work\outputs; backed
 up to E:, pushed.** Full run: EditMode 440/440, PlayMode 254/254 (every fixture), build and the Adit tour clean, 0 shader errors.

@@ -1833,3 +1833,34 @@ A read-only review by five reviewers, each finding checked by a second who tried
 - Tests: RockEaterTests (new, PlayMode: inside, out at the wreck and on you, the sigil and deed from Nix, both back with Nix inside);
   BossPhaseTests checks the Bore's knockback.
 - Docs: CLASS_STATUS.md (new): the seven classes' state, complete for cap 15, what the cap of 30 needs.
+
+## 2026-10-09 — Mobs that bolt, shooters that shoot (dungeon step D5, the rest of it)
+- **Flee at low health** (`ZoneCamp.flee`; `EncounterEnemy.Flee.cs`): a camp's mobs bolt once their health is under that fraction, running
+  from whoever they fight for 6 s, then come back for them (their threat is kept). Once a fight only. Not a hold: the nameplate says
+  "Fleeing", they answer no call while they run, and the party's helpers may chase them. The Grey Breach's crawlers bolt at a quarter
+  (tools/wip/dungeon/adit_layout.py writes it); elites never do.
+- **Shots:** the yard's Sandthrone pickets open with a Crossbow Bolt at 20 m (every 9 s), and the carriage gunners fire a Rail-shot at
+  25 m (every 7 s): MobCasts, interruptible like any cast. They still close to melee between shots: a mob that keeps its distance is
+  not built.
+- Of DUNGEON_DESIGN.md's section 5 that leaves: a sleep put on you (no mob sings it yet), a mob's fear on you (the Foreman's terrify
+  stands for it), the picket hound, cave-bats and the ember elemental (not in the camps).
+- Mira's Hush was already built with C5 (HealerCompanion.Hush); the handoff's "not yet" was stale.
+- Tests: MobBehaviourTests (new: the crawlers' bolt and return, the shots); the camp field in the zone data tests.
+
+## 2026-10-09 — Sims in the dungeon: waiting at gates, guarding the Weaver (dungeon step D7)
+- A sim-led run (/dungeon, Lead) no longer ends at a shut gate: its route keeps every camp, each with the gate across the way before
+  it (`EncounterSession.GateAhead`); at a shut one the sim walks to the near side, waits ("Waiting at the cage-lift gate") and says what
+  the gate wants (the E prompt: "Set the rail sigils (2/3)"); when it opens the run goes on to the first camp past it. `StoppedBy` now
+  names the shut gate ahead (null once open); `CampsLeft` counts every camp. A sim waiting at a gate pulls nothing: the camp past it is
+  not its to start (it used to close on any camp mob within 16 m of where it stood, through the rock).
+- While Mother Quillet walks to the lock, every party sim guards her (a post round her, "Guarding Mother Quillet") instead of
+  following you; mobs on her were already theirs to fight (D4). The run's camps resume after.
+- Tests: AditGateTests (the run waits at the lift and goes on when it opens; every camp on the route); AditWeaverTests (a sim guards
+  her on the way).
+
+## 2026-10-09 — The rail ride out (dungeon step D8)
+- With the lock matched, E at the carriage's gangway ("Ride the carriage up the line (one ride out)") puts "Riding the line" on the bar
+  for five seconds (moving or a blow stops it, as with any work), then you, Mira and the party's sims stand at the siding under the
+  Adit yard, the fights behind you reset, and the game saves. Before the lock is matched the carriage is the Company's and says so.
+  The carriage itself does not move on screen yet (a later look).
+- Tests: AditGateTests (the ride refused while the lock sings, taken once it is matched; the party arrives at the yard).

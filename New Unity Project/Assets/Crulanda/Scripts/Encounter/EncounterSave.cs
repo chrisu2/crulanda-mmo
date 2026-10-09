@@ -108,7 +108,9 @@ namespace Crulanda.Encounter
                 if (p.armoury == null) p.armoury = new List<string>();
                 if (p.looks == null) p.looks = new List<string>();
                 if (p.lootLuck == null) p.lootLuck = new List<LootLuck>();
-                foreach (var list in new[] { p.armoury, p.looks }) { list.RemoveAll(string.IsNullOrEmpty); var once = new HashSet<string>(StringComparer.Ordinal); list.RemoveAll(id => !once.Add(id)); }
+                if (p.keys == null) p.keys = new List<string>();   // dungeon step D3 (no format change: older saves have none)
+                if (p.spiritStones == null) p.spiritStones = new List<string>();
+                foreach (var list in new[] { p.armoury, p.looks, p.keys, p.spiritStones }) { list.RemoveAll(string.IsNullOrEmpty); var once = new HashSet<string>(StringComparer.Ordinal); list.RemoveAll(id => !once.Add(id)); }
                 p.lootLuck.RemoveAll(l => l == null || string.IsNullOrEmpty(l.source));
                 foreach (var l in p.lootLuck) if (l.kills < 0 || l.dry < 0) throw new InvalidOperationException("Invalid loot data.");
                 var sources = new HashSet<string>(StringComparer.Ordinal);

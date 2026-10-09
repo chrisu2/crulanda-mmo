@@ -93,6 +93,9 @@ namespace Crulanda.Encounter
                     new BossPhase { at = .25f, kind = "terrify", seconds = 3, text = "The Foreman opens his mouth and the grey comes out of it. You cannot move." } },   // the Hollow drift, back up the breach
                 call = "The Foreman calls a shift-name nobody has answered to in years. Something in the grey answers.", callShort = "Shift!",
                 enrage = "The Foreman flickers, and for a moment there is less of him." },
+            // The rare (D3, one visit in five): a slow, heavy swing of a pick that has worked this drift since before the seal; alone, he calls nobody.
+            new EliteMove { mob = "The Quiet Miner", name = "The Last Swing of the Shift", windup = 2.3f, blow = 4.6f, reach = 3.8f, every = 11,
+                enrage = "The Quiet Miner stops working. For the first time, he looks at you." },
             new EliteMove { mob = "The Vent-Hound", name = "Ember Lunge", windup = 1.5f, blow = 3.6f, reach = 4.4f, every = 9,
                 enrage = "The Vent-Hound's coat glows along the spine." },
             new EliteMove { mob = "Quartermaster Brannigan Sorrel", name = "Boot-Heel Stamp", windup = 2, blow = 4.2f, reach = 3.6f, every = 10, callReach = 14, callMost = 2,

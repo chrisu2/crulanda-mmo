@@ -128,6 +128,20 @@
       "canonStatus": "GAME-ONLY"
     },
     {
+      "id": "loot.adit.quiet_miners_lamp_cap",
+      "name": "The Quiet Miner's Lamp-Cap",
+      "kind": "gear",
+      "slot": "head",
+      "quality": 3,
+      "level": 12,
+      "value": 52,
+      "armor": 31,
+      "stamina": 19,
+      "strength": 14,
+      "description": "A miner's flapped leather cap with a lamp on the brow. It has not been lit since the seal went up. It lights for you.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
       "id": "loot.adit.vent_hounds_ember_pelt",
       "name": "Vent-Hound's Ember Pelt",
       "kind": "gear",
@@ -500,6 +514,21 @@
       "set": "set.adit_runner"
     },
     {
+      "id": "loot.adit.quiet_miners_lamp_cap",
+      "look": "head.cap:flaps/tollroad+glow",
+      "source": "boss:The Quiet Miner",
+      "boss": true,
+      "unique": true,
+      "effects": [
+        {
+          "kind": "stat",
+          "stat": "MaxHealth",
+          "amount": 40,
+          "text": "+40 health."
+        }
+      ]
+    },
+    {
       "id": "loot.adit.runners_rail_gloves",
       "look": "hands.gloves:plain/sandthrone",
       "source": "boss:Quartermaster Brannigan Sorrel",
@@ -637,6 +666,23 @@
           "pick": [
             {
               "item": "loot.adit.runners_hobnail_boots"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drop.adit.the_quiet_miner",
+      "zone": "adit",
+      "mob": "The Quiet Miner",
+      "rank": "elite",
+      "groups": [
+        {
+          "chance": 1,
+          "signature": true,
+          "pick": [
+            {
+              "item": "loot.adit.quiet_miners_lamp_cap"
             }
           ]
         }

@@ -174,10 +174,12 @@ namespace Crulanda.Encounter
             session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? "follow me, " + LeadingName.ToLower() + " this way" : "Follow me. The " + LeadingName.ToLower() + " are this way.");
             return LeadingName;
         }
-        public void StopLeading() { Leading = null; LeadingName = null; route.Clear(); Dungeon = null; }
+        public void StopLeading() { Leading = null; LeadingName = null; route.Clear(); Dungeon = null; StoppedBy = null; }
         /// <summary>A dungeon run (round 27): the camps still to clear, in the order the passage meets them, and the dungeon's name.</summary>
         readonly System.Collections.Generic.List<(Vector3 at, string name, bool boss)> route = new System.Collections.Generic.List<(Vector3, string, bool)>();
         public string Dungeon { get; private set; }
+        /// <summary>The shut gate the run stops at (the Sealed Adit's cage-lift or platform gate), or null: its camps past it are left out.</summary>
+        public string StoppedBy { get; private set; }
         public int CampsLeft { get { return route.Count; } }
         /// <summary>
         /// Leads the party through the zone's dungeon (a walk-in cave with camps in it): every camp whose ground is the cave's floor, in
@@ -186,7 +188,7 @@ namespace Crulanda.Encounter
         /// </summary>
         public string LeadDungeon(out string why)
         {
-            why = null; route.Clear(); Dungeon = null;
+            why = null; route.Clear(); Dungeon = null; StoppedBy = null;
             if (session.Zone == null) { why = "There is nowhere to go."; return null; }
             // The caves with their own mouths; a branch's camps come where the passage meets the branch (the Sealed Adit: the
             // Workings, then each way off the Gallery in the order you pass it, then the stair and the Rail Hall).
@@ -214,6 +216,7 @@ namespace Crulanda.Encounter
                 if (!string.IsNullOrEmpty(cp.cave))
                 {
                     if (cp.cave != h.Name) continue;
+                    var shut = session.GateBefore(cp); if (shut != null) { if (StoppedBy == null) StoppedBy = shut.Title; continue; }   // past a shut gate: the run stops there
                     float y = 0; if (!h.FloorSmooth(cp.center, out y)) h.FloorAt(cp.center, out y);
                     mine.Add((cp.along, new Vector3(cp.center.x, y, cp.center.y), cp.name, cp.elite, cp.levelMin)); continue;
                 }
@@ -294,6 +297,13 @@ namespace Crulanda.Encounter
                     // A dungeon run (round 27): on to the next camp down the passage.
                     route.RemoveAt(0); Leading = route[0].at; LeadingName = route[0].name;
                     session.ChatSay(ChatChannel.Party, sim.name, route[0].boss ? (sim.chatty > .65f ? "boss next. " + LeadingName + ". buff up" : "That's the last before " + LeadingName + ". Ready yourselves.") : (sim.chatty > .65f ? "clear. next: " + LeadingName.ToLower() : "Clear. On to " + LeadingName + "."));
+                }
+                else if (Dungeon != null && StoppedBy != null)
+                {
+                    // The run ends at a shut gate (the Sealed Adit's, dungeon step D3): as far as the party can go.
+                    session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? "thats as far as we get. " + StoppedBy.ToLower() + " is shut" : "That's as far as we can go. " + StoppedBy + " is shut against us.");
+                    session.Message(sim.name + ": " + StoppedBy + " is shut; the run ends here."); foreach (var p in session.PartySims) if (p != null) SimMemory.Note(p.sim, SimMemory.Deed.KillsTogether, 2);
+                    StopLeading();
                 }
                 else if (Dungeon != null)
                 {

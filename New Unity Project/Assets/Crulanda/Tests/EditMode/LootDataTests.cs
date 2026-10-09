@@ -72,13 +72,13 @@ namespace Crulanda.Tests
             Assert.AreEqual(7, paths.Count, "Seven loot files: " + string.Join(", ", paths.Select(Path.GetFileName)));
             var items = LootTestData.Items(); var loot = LootTestData.Loot(items, LootTestData.Looks());
             var named = items.Items.Keys.Where(k => k.StartsWith("loot.", StringComparison.Ordinal)).ToList();
-            Assert.AreEqual(135, named.Count, "104 named items (ITEMS_V1.md), the five legendaries (2026-10-05) and the Sentinel's Helm (2026-10-07), the Sealed Adit's seventeen (2026-10-08), and its set of five and The Dead Line's three (web/adit-quests-loot).");
-            Assert.AreEqual(109 + 17 + 8 + 13, loot.Gear.Count,   // and the Sealed Adit's seventeen, its set of five and The Dead Line's three
+            Assert.AreEqual(136, named.Count, "104 named items (ITEMS_V1.md), the five legendaries (2026-10-05) and the Sentinel's Helm (2026-10-07), the Sealed Adit's seventeen (2026-10-08), its set of five and The Dead Line's three (web/adit-quests-loot), and the Quiet Miner's cap (D3).");
+            Assert.AreEqual(109 + 17 + 8 + 1 + 13, loot.Gear.Count,   // and the Sealed Adit's seventeen, its set of five and The Dead Line's three, and the Quiet Miner's cap
  "A gear entry for each, and for the thirteen named items already in the game (the Sentinel's Helm the thirteenth, 2026-10-07).");
             Assert.AreEqual(12, loot.GearOrder.Count(g => g.legacy));
             Assert.AreEqual(3, loot.Sets.Count, "Three sets: the Deserter King's Due, the Vigil and the Adit-Runner's Kit.");
             Assert.AreEqual(49, named.Count(id => items.Get(id).quality == 2), "49 uncommon.");
-            Assert.AreEqual(74, named.Count(id => items.Get(id).quality == 3), "74 rare (25 the Sealed Adit\'s) (the Sentinel's Helm the 49th, 2026-10-07).");
+            Assert.AreEqual(75, named.Count(id => items.Get(id).quality == 3), "75 rare (26 the Sealed Adit\'s, the Quiet Miner's cap the 26th) (the Sentinel's Helm the 49th, 2026-10-07).");
             Assert.AreEqual(7, named.Count(id => items.Get(id).quality == 4), "7 epic.");
         }
 
@@ -168,7 +168,7 @@ namespace Crulanda.Tests
                 Assert.AreEqual(gen.value, d.value, d.id + ": value is generated gear's.");
                 Assert.AreEqual(gen.level, d.level, d.id + ": required level is the curve level less one.");
             }
-            Assert.AreEqual(135, n, "110 of the five zones and the world, 25 of the Sealed Adit");
+            Assert.AreEqual(136, n, "110 of the five zones and the world, 26 of the Sealed Adit");
         }
 
         [Test] public void Named_gear_stat_budgets_hold()
@@ -232,7 +232,7 @@ namespace Crulanda.Tests
             Assert.AreEqual(18, counts["quest"], "Eighteen quest rewards (three of them The Dead Line's, side.adit.dead_line).");
             Assert.AreEqual(5, counts["vendor"], "Five vendor pieces.");
             Assert.AreEqual(6, counts["world"], "Six world drops.");
-            Assert.AreEqual(62, counts["boss"], "41 signature pieces (17 the Sealed Adit's), 5 from rare tables, 6 epics, 5 legendaries, and the Adit-Runner's Kit's five.");
+            Assert.AreEqual(63, counts["boss"], "42 signature pieces (18 the Sealed Adit's, the Quiet Miner's cap among them), 5 from rare tables, 6 epics, 5 legendaries, and the Adit-Runner's Kit's five.");
             Assert.AreEqual(44, counts["mob"], "44 from ordinary mobs.");
         }
 
@@ -263,12 +263,12 @@ namespace Crulanda.Tests
                     var lists = loot.Matching(ctx).Where(d => d.groups.Any(g => g.signature)).ToList();
                     Assert.AreEqual(1, lists.Count, c.mob + " (" + z.id + ") has one signature list.");
                     var pieces = lists[0].groups.Where(g => g.signature).SelectMany(g => g.pick).Select(k => k.item).ToList();
-                    Assert.That(pieces.Count, Is.InRange(2, 3), c.mob + " has two or three signature pieces.");
+                    if (c.rare > 0) Assert.AreEqual(1, pieces.Count, c.mob + ", a rare, has one better piece (DUNGEON_DESIGN 7).");
                     Assert.IsTrue(pieces.All(p => loot.Meta(p).boss && loot.Meta(p).unique), c.mob + "'s pieces are boss pieces and unique.");
                     var normal = ctx; normal.elite = false;
                     Assert.IsFalse(loot.Matching(normal).Any(d => d.groups.Any(g => g.signature)), c.mob + "'s pack mates do not roll the list.");
                 }
-            Assert.AreEqual(19, elites, "Twelve elites, and the Sealed Adit's seven.");
+            Assert.AreEqual(20, elites, "Twelve elites, and the Sealed Adit's eight (its rare among them).");
         }
 
         [Test] public void Every_zone_has_named_gear_for_every_slot()
@@ -354,7 +354,7 @@ namespace Crulanda.Tests
                 else Assert.IsFalse(e.percent, e.text + ": only stats take percentages.");
             }
             var carriers = loot.GearOrder.Where(g => g.effects != null && g.effects.Length > 0).ToList();
-            Assert.AreEqual(13, carriers.Count, "Thirteen items carry an effect: the seven epics and six rares.");
+            Assert.AreEqual(14, carriers.Count, "Fourteen items carry an effect: the seven epics and seven rares (the Quiet Miner's cap the seventh, D3).");
             Assert.IsTrue(items.Items.Values.Where(d => d.quality == 4 && d.id.StartsWith("loot.", StringComparison.Ordinal)).All(d => carriers.Any(c => c.id == d.id)), "Every epic has an effect.");
             Assert.IsTrue(carriers.All(c => items.Get(c.id).quality >= 3), "Only rares and epics carry effects.");
         }

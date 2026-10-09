@@ -45,7 +45,8 @@ namespace Crulanda.Encounter
         public Crulanda.World.ZoneBuilder Zone { get { return Crulanda.World.ZoneBuilder.Active; } }
         public string ZoneTitle { get { return Zone != null ? Zone.Zone.displayName : "The Quiet Trail"; } }
         public float Leash { get { return Zone != null && Zone.Zone.spawns.leash > 0 ? Zone.Zone.spawns.leash : 30; } }   // 17 until Round 22 (note 53: a wolf went home when Chris backed a few steps)
-        public Vector3 RecoveryPoint { get { return Zone != null ? Zone.Ground(Zone.Zone.spawns.recovery, 1.1f) : new Vector3(0, 1.1f, -13); } }
+        /// <summary>Where you wake after a fall: beside the spirit stone you touched in this zone (the Sealed Adit's Gallery), else the zone's recovery point.</summary>
+        public Vector3 RecoveryPoint { get { var stone = BoundStone(); return stone != null ? stone.position + Vector3.up * 1.1f : Zone != null ? Zone.Ground(Zone.Zone.spawns.recovery, 1.1f) : new Vector3(0, 1.1f, -13); } }
         Vector3 StartPoint { get { return Zone != null ? Zone.Ground(Zone.Zone.spawns.player, 1.1f) : new Vector3(0, 1.1f, -13); } }
         Vector3 CompanionPoint { get { return Zone != null ? Zone.Ground(Zone.Zone.spawns.companion, 1.05f) : new Vector3(3, 1.05f, -12); } }
         public string Objective(int index, string fallback)
@@ -845,7 +846,7 @@ namespace Crulanda.Encounter
                 foreach (var i in Zone.Interactables)
                 {
                     // A hidden find registered as a prop too is searched through SecretSpots (DiscoveryLog), never as a quest prop.
-                    if (i.kind == "secret" || Time.time < i.hiddenUntil || (i.once && Progress.usedInteractables.Contains(i.Key(Zone.Zone.id)))) continue;
+                    if (i.kind == "secret" || Time.time < i.hiddenUntil || (i.once && Progress.usedInteractables.Contains(i.Key(Zone.Zone.id))) || (i.gate != null && i.gate.Open)) continue;   // an open gate has nothing left to use
                     var d = GroundDistance(i.position); if (d < bestD) { best = i; bestD = d; }   // the prop's origin is at its foot, the player's at the waist
                 }
                 return best;
@@ -855,6 +856,7 @@ namespace Crulanda.Encounter
         {
             if (i.kind == "board") { OpenBoard(i); return; }
             if (i.kind == "chest") { OpenChest(i); return; }   // EncounterSession.Loot.cs
+            if (UseAditThing(i)) return;   // the Sealed Adit's gates, powder and spirit stone (EncounterSession.Adit.cs)
             if (i.node != null && Professions != null) { TryGather(i); return; }   // a node (a seam, a windfall, a herb) is worked with its trade
             if (Quests == null) { Message("Nothing here you need."); return; }
             if (!QuestUse(i)) { Message(string.IsNullOrEmpty(i.item) ? "You look it over, but find nothing you need right now." : "You don't need any of this right now."); return; }
@@ -1304,7 +1306,7 @@ namespace Crulanda.Encounter
             if (Zone != null && Zone.Zone.life != null) new GameObject("Village life").AddComponent<VillageLife>().Init(this);
             // The other adventurers (Phase 5.2): the roster from the world slot, figures for those here and online.
             if (Zone != null) new GameObject("Sims").AddComponent<SimPopulation>().Init(this, SaveRoot);
-            StartQuests(); StartDiscoveries(); StartArmoury();
+            StartQuests(); StartDiscoveries(); StartArmoury(); StartAdit();
             Message(Zone != null ? Zone.Zone.displayName + ". " + Objective(0, "") + "." : "Recruit the healer at camp [" + KeyBindings.InteractLabel + "], then follow the path to the sentries.");
             ReconcileQuests();
             nextSave = Time.time + 30;
@@ -1461,6 +1463,7 @@ namespace Crulanda.Encounter
             for (int c = 0; c < Zone.Zone.camps.Length; c++)
             {
                 var camp = Zone.Zone.camps[c]; if (camp == null) continue;
+                if (camp.rare > 0 && RareDice() >= camp.rare) continue;   // a rare camp, not here this visit (last in the list: no other camp's draws move)
                 var look = LookFor(camp.look, camp.elite); bool beast = ActorVisual.IsBeast(look);
                 string tag = string.IsNullOrEmpty(camp.tag) ? (camp.look ?? "mob") : camp.tag;
                 for (int n = 0; n < camp.count; n++)
@@ -1836,7 +1839,7 @@ namespace Crulanda.Encounter
                 if (villager != null) return "Talk to " + villager.Name;
                 var (usable, secret) = NearestUse();
                 if (secret != null) return SearchPrompt(secret.def);
-                if (usable != null) return usable.prompt;
+                if (usable != null) return InteractPromptFor(usable);
                 var door = NearbyDoor;
                 if (door != null) return door.openable ? (door.Open ? "Close the door" : "Open the door") + " · " + door.name : (door.kind == "rooms" ? "Try the door · " : "Knock · ") + door.name;
                 return StationPrompt(StationNear(null));   // last: a station reaches farther than a door, so a door at hand is knocked at first
@@ -1927,6 +1930,7 @@ namespace Crulanda.Encounter
             if (enemy.TappedBy != null && enemy.TappedBy != Player.EntityId.Value && PartyActor(enemy.TappedBy) == null) { if (Target == enemy) AutoAttack = false; return; }
             if (enemy.Camp) RollCorpse(enemy);   // the loot is decided as it dies, so the body can show it
             if (enemy.Camp && enemy.Elite) { if (Feats != null) Feats.Slain(enemy.persistentId); else { var k = Achievements.EliteKey(enemy.persistentId); if (k != null && !Progress.elitesSlain.Contains(k)) Progress.elitesSlain.Add(k); } }
+            if (enemy.Camp) TakeKey(enemy);   // a sigil boss's key (EncounterSession.Adit.cs)
             OnKillEffects();
             int before = Progress.Level;
             int xp = EncounterProgress.KillXp(enemy.actor.Level, Progress.Level, enemy.Elite || enemy.Tough);
@@ -2007,7 +2011,7 @@ namespace Crulanda.Encounter
             Companion.GetComponent<NavMeshAgent>().Warp(RecoveryPoint + Vector3.right * 2.5f - Vector3.up * .1f);
             HealPartySimsAfterRecover();
             foreach (var e in Enemies) e.ResetFight();
-            Message("Recovered at camp. Defeated enemies and collected rewards remain recorded.");
+            Message((BoundStone() != null ? "You wake beside the spirit stone." : "Recovered at camp.") + " Defeated enemies and collected rewards remain recorded.");
         }
         public void Save(bool announce = true)
         {

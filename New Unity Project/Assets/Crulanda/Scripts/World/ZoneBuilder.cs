@@ -59,6 +59,10 @@ namespace Crulanda.World
         /// <summary>The zone's own ground material (WorldWeather darkens and glosses it when the ground is wet).</summary>
         public Material GroundMaterial { get; private set; }
         public readonly List<ZoneDoor> Doors = new List<ZoneDoor>();
+        /// <summary>The gates across caves' ways (the Sealed Adit's, ZoneBuilder.Adit), shut when built.</summary>
+        public readonly List<ZoneGate> Gates = new List<ZoneGate>();
+        /// <summary>Opens every gate at once (tests that walk the whole zone, and its tours).</summary>
+        public void OpenGates() { foreach (var g in Gates) if (g != null) g.SetOpen(true, true); }
         public float Half { get { return Zone.size / 2; } }
         Transform props, statics;
         System.Random rng;

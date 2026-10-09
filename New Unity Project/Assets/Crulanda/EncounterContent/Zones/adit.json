@@ -1038,6 +1038,8 @@
       "respawn": 900,
       "elite": true,
       "guards": "Workshop guards",
+      "key": "sigil.amber",
+      "keyName": "the Amber Sigil",
       "center": {
         "x": 76.03,
         "y": 3.43
@@ -1157,6 +1159,8 @@
       "respawn": 900,
       "elite": true,
       "guards": "none",
+      "key": "sigil.ember",
+      "keyName": "the Ember Sigil",
       "center": {
         "x": -75.21,
         "y": -10.7
@@ -1235,12 +1239,37 @@
       "respawn": 900,
       "elite": true,
       "guards": "none",
+      "key": "sigil.grey",
+      "keyName": "the Grey Sigil",
       "center": {
         "x": -47.12,
         "y": 50.65
       },
       "cave": "The Grey Breach",
       "along": 61.03,
+      "aside": 0
+    },
+    {
+      "name": "The Quiet Miner",
+      "mob": "The Quiet Miner",
+      "tag": "quietminer",
+      "look": "pale",
+      "canonStatus": "GAME-ONLY (the unmade are CANON)",
+      "radius": 1,
+      "count": 1,
+      "levelMin": 12,
+      "levelMax": 12,
+      "respawn": 1200,
+      "elite": true,
+      "guards": "none",
+      "rare": 0.2,
+      "social": "solitary",
+      "center": {
+        "x": -31.27,
+        "y": 34.37
+      },
+      "cave": "The Grey Breach",
+      "along": 37.94,
       "aside": 0
     }
   ]

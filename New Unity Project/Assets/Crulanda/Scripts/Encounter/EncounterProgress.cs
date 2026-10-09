@@ -53,6 +53,11 @@ namespace Crulanda.Encounter
         public int bounties, rares;
         /// <summary>Camp elites killed, by camp ("mob.captain.peaks.3").</summary>
         public List<string> elitesSlain = new List<string>();
+        /// <summary>Keys kept for good (dungeon step D3; older saves load with none; here, not at the end, so older payloads still end as they did): the Sealed Adit's rail sigils ("sigil.amber",
+        /// "sigil.ember", "sigil.grey", taken from its branch bosses) and "adit.lift" once they are set in the cage-lift's frame.</summary>
+        public List<string> keys = new List<string>();
+        /// <summary>The spirit stones touched (ZoneInteractable.Key): where you wake in that zone after a fall (D3).</summary>
+        public List<string> spiritStones = new List<string>();
         // ---------- quests (save format 4; older saves load with these empty) ----------
         public List<QuestState> quests = new List<QuestState>();
         public List<string> questsDone = new List<string>();

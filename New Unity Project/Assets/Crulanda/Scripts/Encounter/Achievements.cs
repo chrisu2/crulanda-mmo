@@ -79,7 +79,7 @@ namespace Crulanda.Encounter
         public static List<string> EliteKeys(ZoneDefinition z)
         {
             var list = new List<string>(); if (z.camps == null) return list;
-            for (int i = 0; i < z.camps.Length; i++) if (z.camps[i] != null && z.camps[i].elite) list.Add("mob." + z.camps[i].tag + "." + Short(z) + "." + i);
+            for (int i = 0; i < z.camps.Length; i++) if (z.camps[i] != null && z.camps[i].elite && z.camps[i].rare <= 0) list.Add("mob." + z.camps[i].tag + "." + Short(z) + "." + i);   // no deed waits on a rare one
             return list;
         }
         public void Slain(string persistentId) { var k = EliteKey(persistentId); if (k != null && !Progress.elitesSlain.Contains(k)) Progress.elitesSlain.Add(k); }

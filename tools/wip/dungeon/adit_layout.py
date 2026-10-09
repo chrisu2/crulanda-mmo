@@ -119,19 +119,22 @@ CAMPS = [
     ('The Geode Floor', 5, 2, -3, mob('The cutting floor', 'Sandthrone geode-cutter', 'outrider', 3, 11, 11, tag='cutter', radius=2.5)),
     ('The Geode Floor', 7, -1, 4, mob('Sorting troughs', 'Sandthrone sorter', 'deserter', 3, 11, 11, tag='sorter', radius=2.5)),
     ('The Geode Floor', 10, -1, -3, mob('Workshop guards', 'Sandthrone overseer', 'deserter', 2, 11, 11, tag='overseer', radius=1.6)),
-    ('The Geode Floor', 11, 3, 0, mob('Nix and the Rock-Eater', 'Nix, the turncoat', 'outrider', 1, 11, 11, tag='nix', canon='GAME-ONLY (the goblins, the Weavers of the Warrens, are CANON)', radius=1, elite=True, guards='Workshop guards')),
+    ('The Geode Floor', 11, 3, 0, mob('Nix and the Rock-Eater', 'Nix, the turncoat', 'outrider', 1, 11, 11, tag='nix', canon='GAME-ONLY (the goblins, the Weavers of the Warrens, are CANON)', radius=1, elite=True, guards='Workshop guards', key='sigil.amber', keyName='the Amber Sigil')),
 
     ('The Ember Vent', 3, 0, 0, mob('Vent mouth', 'Ash initiate', 'cultist', 2, 11, 11, tag='ashinitiate', canon='GAME-ONLY cell; CANON cult (the Cult of Ash)', radius=1.6)),
     ('The Ember Vent', 7, 0, -9, mob('Ash initiates', 'Ash initiate', 'cultist', 3, 11, 11, tag='ashinitiate', canon='GAME-ONLY cell; CANON cult (the Cult of Ash)', radius=2.2)),
     ('The Ember Vent', 8, 0, 11, mob('Lava ledge', 'Ash mender', 'cultist', 3, 11, 11, tag='ashmender', canon='GAME-ONLY cell; CANON cult (the Cult of Ash)', radius=2.2)),
     ('The Ember Vent', 8, 0, -12, mob('The Vent-Hound', 'The Vent-Hound', 'wolf', 1, 11, 11, tag='venthound', canon='GAME-ONLY', radius=1.5, elite=True, guards='none', respawn=1200, social='solitary')),
     ('The Ember Vent', 9, 0, -9, mob('Ember circle', 'Ash initiate', 'cultist', 3, 11, 11, tag='ashinitiate', canon='GAME-ONLY cell; CANON cult (the Cult of Ash)', radius=2.2)),
-    ('The Ember Vent', 10, 1, 0, mob('Cinder-Warden Ysolt', 'Cinder-Warden Ysolt', 'cultist', 1, 11, 11, tag='ysolt', canon='GAME-ONLY (the Cult of Ash is CANON)', radius=1, elite=True, guards='none')),
+    ('The Ember Vent', 10, 1, 0, mob('Cinder-Warden Ysolt', 'Cinder-Warden Ysolt', 'cultist', 1, 11, 11, tag='ysolt', canon='GAME-ONLY (the Cult of Ash is CANON)', radius=1, elite=True, guards='none', key='sigil.ember', keyName='the Ember Sigil')),
 
     ('The Grey Breach', 3, 0, 0, mob('Greyed crawlers', 'Greyed crawler', 'spider', 3, 11, 11, tag='crawler', canon='GAME-ONLY (the Wasting is CANON)', radius=1.8)),
     ('The Grey Breach', 6, 0, 0, mob('The Hollow drift', 'Hollow Man', 'hollow', 3, 11, 11, tag='hollow', canon='CANON creature (Hollow Men) and CANON tunnels under the Peaks (book2 ch.19); GAME-ONLY camp', radius=2.5)),
     ('The Grey Breach', 9, 0, 0, mob('Grey drift', 'Greyed bear', 'bear', 2, 11, 11, tag='greybear', canon='GAME-ONLY (the Wasting is CANON)', radius=1.8)),
-    ('The Grey Breach', 11, 3, 0, mob('The Foreman Who Forgot', 'The Foreman Who Forgot', 'hollow', 1, 11, 11, tag='foreman', canon='GAME-ONLY (the unmade are CANON)', radius=1, elite=True, guards='none')),
+    ('The Grey Breach', 11, 3, 0, mob('The Foreman Who Forgot', 'The Foreman Who Forgot', 'hollow', 1, 11, 11, tag='foreman', canon='GAME-ONLY (the unmade are CANON)', radius=1, elite=True, guards='none', key='sigil.grey', keyName='the Grey Sigil')),
+    # D3: the rare (one run in five), last so no camp's index moves; an older, wholly grey shape in the drift past the Hollow Men,
+    # pale (not kin to the Hollow Men or the Foreman, so no call brings him) and alone.
+    ('The Grey Breach', 7, 2.5, 0, mob('The Quiet Miner', 'The Quiet Miner', 'pale', 1, 12, 12, tag='quietminer', canon='GAME-ONLY (the unmade are CANON)', radius=1, elite=True, guards='none', respawn=1200, rare=0.2, social='solitary')),
 ]
 
 def build():

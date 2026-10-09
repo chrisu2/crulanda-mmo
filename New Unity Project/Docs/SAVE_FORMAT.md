@@ -24,7 +24,7 @@ clears threat, casts, personal cooldowns, global cooldowns and temporary Guard s
 The shared ability runtime does not change the persistent schema, so no version bump is required.
 Unsupported format/type or invalid payloads are rejected. An unreadable startup save blocks overwrite.
 
-## Format history (current EncounterSave.FormatVersion = 9; formats 4-9 are described at the end)
+## Format history (current EncounterSave.FormatVersion = 10; formats 4-10 are described at the end)
 - 1: no class/talents. Read migrates to classId class.warrior with an empty talent list.
 - 2: classId + talents using the 9-node prototype ids (tank.armor, dps.power, ...). Read maps them through
   EncounterSave.LegacyTalentIds to the data-driven ids; if the mapped allocation is illegal under the new tier
@@ -187,3 +187,13 @@ Three new lists at the end of the payload, after `pouches`, in this order (one f
 `SteeperCurveMigration` (9 → 10) rewrites `experience` so the character keeps its level and the fraction of it it had under the old
 curve (200 + 90 a level, cap 13) on the new one (400 + 170 a level, cap 15); nothing else in the payload changes. The world slot
 (the sims) is not migrated: a sim's level is the saved truth and its experience only delays its next level.
+
+### Within format 10 (2026-10-09, dungeon step D3): keys and spirit stones
+Two lists added without a format change (a save without them loads with both empty; `EncounterSave` also fills in a missing one,
+drops blanks and repeats):
+- `keys`: `List<string>`, kept for good: the Sealed Adit's rail sigils (`sigil.amber`, `sigil.ember`, `sigil.grey`, taken from the
+  branch bosses, `ZoneCamp.key`) and `adit.lift` once they are set in the cage-lift's frame (the lift gate then stands open on every
+  visit).
+- `spiritStones`: `List<string>`, the spirit stones touched, by `ZoneInteractable.Key` (`zone.adit|The Gallery's spirit stone|x|z`):
+  `RecoveryPoint` in that zone is beside the stone.
+- Not saved: the platform gate (shut again on every visit) and a keg of powder in hand.

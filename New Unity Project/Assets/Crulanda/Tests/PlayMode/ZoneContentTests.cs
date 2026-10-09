@@ -67,7 +67,9 @@ namespace Crulanda.Tests
                 if (arrivals.TryGetValue(id, out var ins))
                     foreach (var (from, at) in ins) if (!NavMesh.SamplePosition(s.Zone.Ground(at), out _, 2.5f, NavMesh.AllAreas)) problems.Add(p + "arrival from " + from + " at " + at + " is not walkable");
                 foreach (var e in z.exits) if (!s.Zone.HasZone(e.to)) problems.Add(p + "exit to unknown zone " + e.to);
-                // Every exit and camp can be walked to from the player's start: no wall, crag or relief cuts the zone in two.
+                // Every exit and camp can be walked to from the player's start: no wall, crag or relief cuts the zone in two (its gates
+                // open: the Sealed Adit's are shut until their keys are found, AditGateTests).
+                s.Zone.OpenGates(); for (int i = 0; i < 3; i++) yield return null;
                 if (NavMesh.SamplePosition(s.Zone.Ground(z.spawns.player), out var start, 2.5f, NavMesh.AllAreas))
                 {
                     var path = new NavMeshPath();
@@ -84,7 +86,7 @@ namespace Crulanda.Tests
                 {
                     var camp = z.camps[c];
                     int spawned = s.Enemies.Count(e => e.Camp && e.persistentId.Contains("." + shortId + "." + c + "."));
-                    if (spawned < Mathf.CeilToInt(camp.count * .75f)) problems.Add(p + "camp '" + camp.name + "' spawned " + spawned + "/" + camp.count);
+                    if (camp.rare <= 0 && spawned < Mathf.CeilToInt(camp.count * .75f)) problems.Add(p + "camp '" + camp.name + "' spawned " + spawned + "/" + camp.count);
                     if (camp.levelMin < z.levelMin - 1 || camp.levelMax > z.levelMax + (camp.harder ? 3 : 1)) problems.Add(p + "camp '" + camp.name + "' levels " + camp.levelMin + "-" + camp.levelMax + " outside " + z.levelMin + "-" + z.levelMax);
                 }
                 // Quest people and props that the zone is responsible for.

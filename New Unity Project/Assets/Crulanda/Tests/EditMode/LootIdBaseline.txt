@@ -136,3 +136,4 @@ loot.adit.runners_scale_jerkin
 loot.adit.sleeper_splitter
 loot.adit.couplers_hook
 loot.adit.weavers_tuning_drop
+loot.adit.quiet_miners_lamp_cap

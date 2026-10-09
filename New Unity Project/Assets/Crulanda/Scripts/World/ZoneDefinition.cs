@@ -140,6 +140,12 @@ namespace Crulanda.World
         /// <summary>In a cave (the Sealed Adit): which cave, how far in and how far to the right of its middle the camp stands. The
         /// centre is written from these by tools/wip/dungeon/adit_layout.py; the run a sim leads goes cave by cave in this order.</summary>
         public string cave; public float along, aside;
+        /// <summary>A key its elite carries (dungeon step D3: the Sealed Adit's rail sigils), taken from the body at the first kill and
+        /// kept for good (EncounterProgress.keys), and its name in words ("the Amber Sigil"). Empty = none.</summary>
+        public string key, keyName;
+        /// <summary>A rare camp's chance to be there on a visit (0..1; the Quiet Miner, one run in five). 0 = always. A rare camp comes
+        /// last in the list, so a visit without it moves no other camp's mobs, and no deed waits on it.</summary>
+        public float rare;
     }
     /// <summary>Walk into the radius and press E to travel; you arrive at <see cref="arrive"/> in the other zone.</summary>
     [Serializable] public sealed class ZoneExit { public string to, name; public Vector2 at, arrive; public float radius = 5; }
@@ -290,6 +296,8 @@ namespace Crulanda.World
         public Transform part;
         public Vector3 position; public Transform root;
         public float hiddenUntil;
+        /// <summary>The gate it works (kinds "liftgate" and "platformgate"); once the gate is open there is nothing left to use.</summary>
+        public ZoneGate gate;
         public string Key(string zoneId) { return zoneId + "|" + name + "|" + Mathf.RoundToInt(position.x) + "|" + Mathf.RoundToInt(position.z); }
     }
     [Serializable] public sealed class ZoneWasting

@@ -48,6 +48,7 @@ namespace Crulanda.Tests
         [UnityTest] public IEnumerator The_network_is_built_and_every_camp_is_walkable_from_the_yard()
         {
             var zone = ZoneBuilder.Active; Assert.AreEqual("zone.adit", zone.Zone.id); Assert.IsTrue(zone.Zone.dungeon, "a dungeon");
+            zone.OpenGates(); for (int i = 0; i < 3; i++) yield return null;   // the way through, with its gates open (D3; AditGateTests has them shut)
             var main = Cave(Main); Assert.NotNull(main, "the main way"); Assert.IsNull(main.Parent);
             foreach (var b in Branches) { var h = Cave(b); Assert.NotNull(h, b); Assert.AreSame(main, h.Parent, b + " opens out of the Gallery"); }
             Assert.Less(main.Centre[main.Centre.Count - 1].y, main.Centre[0].y - 35, "the Rail Hall lies deep under the Peaks");
@@ -92,12 +93,14 @@ namespace Crulanda.Tests
         {
             yield return null; var session = UnityEngine.Object.FindFirstObjectByType<EncounterSession>();
             foreach (var cp in ZoneBuilder.Active.Zone.camps)
-                Assert.IsTrue(session.Enemies.Exists(e => e != null && e.Camp && Vector2.Distance(new Vector2(e.transform.position.x, e.transform.position.z), cp.center) < cp.radius + 2.5f), cp.name + " has its mobs");
+                if (cp.rare <= 0)   // a rare camp is there one visit in a few (AditGateTests)
+                    Assert.IsTrue(session.Enemies.Exists(e => e != null && e.Camp && Vector2.Distance(new Vector2(e.transform.position.x, e.transform.position.z), cp.center) < cp.radius + 2.5f), cp.name + " has its mobs");
             Assert.IsTrue(session.Enemies.Exists(e => e != null && e.Elite && e.actor.DisplayName.Contains("Orsk Danner")), "the Rail-Captain waits at the end");
         }
         [UnityTest] public IEnumerator A_sim_leads_the_whole_adit_in_order()
         {
             yield return null; var session = UnityEngine.Object.FindFirstObjectByType<EncounterSession>();
+            ZoneBuilder.Active.OpenGates();   // the whole of it: the gates open (with them shut the run stops at the lift: AditGateTests)
             var pop = SimPopulation.Active; var s = pop.World.sims.First();
             s.zone = "zone.adit"; s.onlineFrom = 0; s.onlineHours = 24; s.friendly = .9f; s.level = 11; session.Progress.experience = EncounterProgress.XpForLevel(9);   // the Adit is 10-12 (round 29)
             var p = session.Player.transform.position; s.x = p.x + 2; s.z = p.z; pop.Refresh(); yield return null;

@@ -272,7 +272,9 @@ the next dungeon.
 2. **Boss mechanics:**
    - phase triggers at health thresholds (stun the party, a weapon change, summon guards, aggro reset, terrify, knockback);
    - a two-part fight (machine, then pilot).
-3. **Dungeon objects:**
+3. **Dungeon objects:** *Done 2026-10-09 (D3): the cage-lift is a gate at the stair's head (Chris), the sigils are kept once
+   won, the platform gate opens quietly (The Pressed) or loudly (powder), the spirit stone, the Quiet Miner (one visit in five);
+   the Foreman's short way back to the Gallery is not built yet.*
    - gates (opened by a key, a freed NPC, or powder, the loud way alerting a boss);
    - sigils in a frame;
    - the cage-lift;

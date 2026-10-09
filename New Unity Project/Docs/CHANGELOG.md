@@ -1747,6 +1747,24 @@ A read-only review by five reviewers, each finding checked by a second who tried
 - (The local branch also had six Adit quests and its own Adit-Runner's Kit; Chris chose the cloud branch's seven quests and kit
   instead on 2026-10-09, so those were dropped in the merge.)
 
+## 2026-10-09 — The Sealed Adit's gates, sigils, spirit stone and rare (dungeon step D3)
+- Chris's calls: the cage-lift is a gate on the stair (not a new shaft), and the sigils are kept once won.
+- **Rail sigils:** Nix carries the Amber Sigil, Cinder-Warden Ysolt the Ember and the Foreman Who Forgot the Grey (`ZoneCamp.key`).
+  The first kill by you or your party takes it from the body, kept for good (`Progress.keys`).
+- **The cage-lift gate** at the head of the stair under the Gallery: an iron grille that stops you, Mira, the sims and the mobs
+  (`ZoneGate`: a collider and a carved navmesh obstacle). The frame on its left post has three sockets; with all three sigils, E sets
+  them, they light, and the grille climbs into the frame. It stays open on every later visit ("adit.lift").
+- **The platform gate** at the stair's foot, shut again on every visit:
+  - quiet: with "The Pressed" handed in, a goblin you freed hums its lock open and the hall never hears;
+  - loud: a keg of blasting powder from up the stair blows it, and the Quartermaster sends his guards and the platform guards at you.
+- **The Gallery's spirit stone** (right wall, just inside): touched once, you wake beside it after a fall in the Adit, not out in
+  the yard (`Progress.spiritStones`, `RecoveryPoint`).
+- **The Quiet Miner** (12, elite, GAME-ONLY): a rare camp in the Grey Breach's drift past the Hollow Men, there one visit in five
+  (`ZoneCamp.rare`; last in the list, so no other camp moves; no achievement waits on it). No loot of his own yet.
+- A sim leading a run stops at a shut gate and says so; with the gates open it leads the whole way as before.
+- Tests: AditGateTests (new: shut gates and the sim's stop, the sigils and the lift kept over a reload, loud and quiet ways, the
+  stone, the rare); AditTests and ZoneContentTests open the gates before walking the whole zone and allow for a rare camp.
+
 ## 2026-10-09 — Quest gear handed out at turn-in (Chris: "do quest gear rewards first")
 - The eighteen named quest pieces were never given (each named its quest as its source; nothing granted it). Now a quest's piece goes
   into the bags when you hand it in, and The Dead Line offers a choice of three (Sleeper-Splitter, Coupler's Hook, Weaver's

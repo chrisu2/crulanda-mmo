@@ -22,6 +22,10 @@ namespace Crulanda.World
         /// <summary>The usable things the Adit's quests name (Quests/adit.json): the pressed goblins' cages in the Workings ("The Pressed",
         /// five, each opened once) and the pilgrims' echo-jars round the Gallery ("Echoes in the Stone", seven, each back after a while).</summary>
         public const string AditCage = "A goblin cage", AditEchoJar = "A pilgrim's echo-jar";
+        /// <summary>Dungeon step D3: the gates across the main way (ZoneGate), the powder for the loud way through the second, the
+        /// Gallery's spirit stone, and the elite whose people answer the loud way (EncounterSession.Adit).</summary>
+        public const string AditLiftGate = "The cage-lift gate", AditPlatformGate = "The platform gate", AditPowder = "A keg of blasting powder",
+            AditSpiritStone = "The Gallery's spirit stone", AditQuartermaster = "Quartermaster Brannigan Sorrel";
         static readonly Color LumGreen = new Color(.45f, 1, .55f), GeodeViolet = new Color(.7f, .42f, 1), EmberRed = new Color(1, .45f, .15f),
             GreyLight = new Color(.74f, .77f, .82f), RailBlue = new Color(.55f, .75f, 1), GalleryLight = new Color(.62f, .72f, .88f);
         /// <summary>A cave's lining colour by its part (variant 2): the workings' grey-brown, a violet cast, the vent's scorched rock, the grey.</summary>
@@ -225,13 +229,37 @@ namespace Crulanda.World
                         }
                     }
                 }
-                // The cage gate at the head of the stair: a heavy frame, the grille drawn up into it, cold lamps.
+                // The cage-lift gate at the head of the stair (dungeon step D3): shut until the three rail sigils are set in the frame on
+                // its left post, three sockets that light amber, red and grey when they are (EncounterSession.Adit).
                 {
-                    float s = galleryTo + 4; var q = Along(s); int i = RingAt(s); float w = h.Half[i] * .9f, top = h.Height[i] * .82f;
-                    foreach (int side in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, On(s, side * w) + Vector3.up * top / 2, new Vector3(.4f, top, .4f), dark, q);
-                    Part(PrimitiveType.Cube, t, On(s, 0) + Vector3.up * top, new Vector3(w * 2 + .8f, .45f, .45f), dark, q);
-                    for (int b = -3; b <= 3; b++) Part(PrimitiveType.Cylinder, t, On(s, b * w / 3.5f) + Vector3.up * (top - .3f), new Vector3(.06f, .3f, .06f), iron, q);   // the grille's teeth, drawn up
-                    foreach (int side in new[] { -1, 1 }) Lamp(On(s - .6f, side * (w - .3f)) + Vector3.up * 2.1f, RailBlue, 8, .9f);
+                    float s = galleryTo + 4; var gate = Gate(s, AditLiftGate, "liftgate", "Set the rail sigils", null);
+                    var q = Along(s); float w = h.Half[RingAt(s)] * .9f; var plate = On(s - .3f, -w + .55f) + Vector3.up * 1.45f;
+                    Part(PrimitiveType.Cube, t, plate, new Vector3(.8f, .5f, .08f), iron, q);
+                    var lit = new System.Collections.Generic.List<GameObject>();
+                    var socket = Tint(art.stone, new Color(.08f, .08f, .09f));
+                    for (int k = 0; k < 3; k++)
+                    {
+                        var at = plate + q * new Vector3(-.24f + k * .24f, 0, -.06f);
+                        Part(PrimitiveType.Sphere, t, at, Vector3.one * .13f, socket);
+                        var sigil = Part(PrimitiveType.Sphere, t, at + q * new Vector3(0, 0, -.02f), Vector3.one * .14f, Glowing(k == 0 ? new Color(1, .72f, .25f) : k == 1 ? EmberRed : GreyLight, 2.4f));
+                        sigil.SetActive(false); lit.Add(sigil);
+                    }
+                    gate.Lights = lit.ToArray();
+                }
+                // The Gallery's spirit stone (D3): a standing stone against the right wall just inside the Gallery, pale with its song,
+                // clear of the camps and of the three ways on (the Geode Floor opens further along this wall). Touched once, it is where
+                // you wake in the Adit. Fixed place, no draws from the stream.
+                if (gallery >= 0)
+                {
+                    float s = galleryFrom + 4; int i = RingAt(s); var q = Along(s); var foot = On(s, h.Half[i] * .74f); foot.y = FloorY(foot.x, foot.z);
+                    var marker = new GameObject(AditSpiritStone).transform; marker.SetParent(t, false); marker.localPosition = foot; marker.localRotation = q * Quaternion.Euler(0, 15, 0);
+                    Part(PrimitiveType.Cube, marker, new Vector3(0, 1.1f, 0), new Vector3(.9f, 2.2f, .55f), Tint(art.stone, new Color(.58f, .6f, .66f)), Quaternion.Euler(0, 0, 4));
+                    Part(PrimitiveType.Cube, marker, new Vector3(0, .12f, 0), new Vector3(1.4f, .24f, 1), Tint(art.stone, new Color(.4f, .41f, .44f)));
+                    Part(PrimitiveType.Sphere, marker, new Vector3(0, 1.45f, .29f), new Vector3(.22f, .3f, .04f), Glowing(new Color(.7f, .85f, 1), 2));   // the rune
+                    Glow(marker, new Vector3(0, 1.6f, .8f), 9, .9f, new Color(.7f, .85f, 1), .9f);
+                    Block(foot, new Vector3(1, 2.2f, .7f), q);
+                    var stand = On(s, h.Half[i] * .74f - 1.3f);
+                    Interactables.Add(new ZoneInteractable { name = AditSpiritStone, prompt = "Touch the spirit stone", kind = "stone", position = t.TransformPoint(stand), root = marker });
                 }
                 // The stair: plank treads where it runs steep, a rope rail on posts, a cold lamp every nine metres.
                 float lastPost = -9; int stairLamp = 0;
@@ -249,7 +277,44 @@ namespace Crulanda.World
                     lastPost = s;
                     if (stairLamp++ % 4 == 0) WallLamp(i, 1, RailBlue, 9, .8f);
                 }
-                if (hall >= 0) RailHall(hallFrom);
+                // The gate onto the platform at the stair's foot (D3), where the way is narrowest before the hall opens, barred from the
+                // hall's side: a goblin freed in "The Pressed" hums its lock open, or powder from the keg up the stair blows it (and the
+                // Quartermaster's people come for you).
+                if (hall >= 0)
+                {
+                    float foot = galleryTo + 5, narrow = 9;
+                    for (int i = 0; i < n; i++) if (h.Along[i] > hallFrom - 22 && h.Along[i] < hallFrom - 6 && h.Half[i] < narrow) { narrow = h.Half[i]; foot = h.Along[i]; }
+                    Gate(foot, AditPlatformGate, "platformgate", "Open the gate", AditQuartermaster);
+                    float sk = foot - 7; int ik = RingAt(sk); var q = Along(sk); var keg = On(sk, h.Half[ik] * .5f); keg.y = FloorY(keg.x, keg.z);
+                    var kegs = new GameObject(AditPowder).transform; kegs.SetParent(t, false); kegs.localPosition = keg; kegs.localRotation = q;
+                    for (int k = 0; k < 2; k++)
+                    {
+                        var at = new Vector3(0, .33f, k * .6f - .3f);
+                        Part(PrimitiveType.Cylinder, kegs, at, new Vector3(.5f, .33f, .5f), dark);
+                        foreach (float y in new[] { -.2f, .2f }) Part(PrimitiveType.Cylinder, kegs, at + Vector3.up * y, new Vector3(.53f, .03f, .53f), iron);
+                    }
+                    Part(PrimitiveType.Cube, kegs, new Vector3(0, .7f, 0), new Vector3(.35f, .04f, .25f), Tint(art.cloth, new Color(.6f, .15f, .1f)));   // a red-marked lid: powder
+                    Interactables.Add(new ZoneInteractable { name = AditPowder, prompt = "Take blasting powder", kind = "powder", position = t.TransformPoint(keg), root = kegs });
+                    RailHall(hallFrom);
+                }
+            }
+            // A gate across the way at s: a heavy frame, an iron grille shut across it (ZoneGate: it stops you and every agent until it
+            // opens, then climbs into the frame), cold lamps on the near side, and the thing to use at its foot on the near side.
+            ZoneGate Gate(float s, string title, string kind, string prompt, string lord)
+            {
+                var q = Along(s); int i = RingAt(s); float w = h.Half[i] * .9f, top = h.Height[i] * .82f, high = top - .25f;
+                foreach (int side in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, On(s, side * w) + Vector3.up * top / 2, new Vector3(.4f, top, .4f), dark, q);
+                Part(PrimitiveType.Cube, t, On(s, 0) + Vector3.up * top, new Vector3(w * 2 + .8f, .45f, .45f), dark, q);
+                foreach (int side in new[] { -1, 1 }) Lamp(On(s - .6f, side * (w - .3f)) + Vector3.up * 2.1f, RailBlue, 8, .9f);
+                var root = new GameObject(title).transform; root.SetParent(t, false); root.localPosition = On(s, 0); root.localRotation = q;
+                var grille = new GameObject("Grille").transform; grille.SetParent(root, false);
+                for (int b = -7; b <= 7; b++) Part(PrimitiveType.Cylinder, grille, new Vector3(b * w / 7.5f, high / 2, 0), new Vector3(.07f, high / 2, .07f), iron);
+                foreach (float y in new[] { .35f, high * .5f, high - .3f }) Part(PrimitiveType.Cube, grille, new Vector3(0, y, 0), new Vector3(w * 2, .1f, .08f), iron);
+                var gate = root.gameObject.AddComponent<ZoneGate>(); gate.Title = title; gate.Cave = h.Name; gate.Along = s; gate.Lord = lord; gate.Grille = grille; gate.Rise = high - .4f;
+                gate.Init(new Vector3(h.Half[i] * 2 + 1, top, .5f));
+                Gates.Add(gate);
+                Interactables.Add(new ZoneInteractable { name = title, prompt = prompt, kind = kind, position = t.TransformPoint(On(s - 1.3f, 0)), gate = gate });
+                return gate;
             }
 
             void RailHall(float from)

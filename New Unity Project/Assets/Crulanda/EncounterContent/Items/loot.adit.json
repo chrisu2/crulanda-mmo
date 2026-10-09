@@ -261,7 +261,8 @@
       "look": "hammer.war:pick/khaven",
       "source": "boss:Nix, the turncoat",
       "boss": true,
-      "unique": true
+      "unique": true,
+      "set": "set.adit"
     },
     {
       "id": "loot.adit.turncoats_greasy_gloves",
@@ -282,7 +283,8 @@
       "look": "feet.sabatons:plate/ashwalker",
       "source": "boss:Cinder-Warden Ysolt",
       "boss": true,
-      "unique": true
+      "unique": true,
+      "set": "set.adit"
     },
     {
       "id": "loot.adit.ash_red_pendant",
@@ -303,7 +305,8 @@
       "look": "legs.breeches:patched/sandthrone",
       "source": "boss:The Foreman Who Forgot",
       "boss": true,
-      "unique": true
+      "unique": true,
+      "set": "set.adit"
     },
     {
       "id": "loot.adit.vent_hounds_ember_pelt",
@@ -331,7 +334,8 @@
       "look": "hands.gauntlets:plate/tollroad",
       "source": "boss:Quartermaster Brannigan Sorrel",
       "boss": true,
-      "unique": true
+      "unique": true,
+      "set": "set.adit"
     },
     {
       "id": "loot.adit.platform_masters_greaves",
@@ -345,7 +349,8 @@
       "look": "chest.cuirass:plate/tollroad",
       "source": "boss:Rail-Captain Orsk Danner",
       "boss": true,
-      "unique": true
+      "unique": true,
+      "set": "set.adit"
     },
     {
       "id": "loot.adit.danners_kettle_helm",
@@ -513,5 +518,42 @@
       ]
     }
   ],
-  "sets": []
+  "sets": [
+    {
+      "id": "set.adit",
+      "name": "The Adit-Runner's Kit",
+      "canonStatus": "GAME-ONLY",
+      "pieces": [
+        "loot.adit.the_borer_bit",
+        "loot.adit.cinder_wardens_sabatons",
+        "loot.adit.foremans_unmade_breeches",
+        "loot.adit.quartermasters_gauntlets",
+        "loot.adit.rail_captains_coat"
+      ],
+      "bonuses": [
+        {
+          "count": 3,
+          "effects": [
+            {
+              "kind": "stat",
+              "stat": "MaxHealth",
+              "amount": 40,
+              "text": "+40 health."
+            }
+          ]
+        },
+        {
+          "count": 5,
+          "effects": [
+            {
+              "kind": "stat",
+              "stat": "AttackPower",
+              "amount": 10,
+              "text": "+10 attack power."
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }

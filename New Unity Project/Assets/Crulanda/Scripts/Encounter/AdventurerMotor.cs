@@ -59,7 +59,7 @@ namespace Crulanda.Encounter
             Swimming = inWater && depth > (Swimming ? 1.25f : 1.45f);
             Sneaking = EncounterInput.Sneak && !Swimming;
             float wade = inWater ? Mathf.Lerp(1, .6f, Mathf.Clamp01(depth / 1.3f)) : 1;
-            float speed = (Running ? RunSpeed : WalkSpeed) * session.Kit.MoveSpeedMultiplier * (Swimming ? .55f : wade) * (Sneaking ? .5f : 1);
+            float speed = (Running ? RunSpeed : WalkSpeed) * session.Kit.MoveSpeedMultiplier * (Swimming ? .55f : wade) * (Sneaking ? .5f : 1) * (session.PlayerStunned ? 0 : 1);
             // Classic MMO movement (Chris, 2026-10-04): on foot you face where the camera looks and walk any way from there; backing
             // up is slower. Swimming still turns you into the stroke.
             if (!Swimming && move.y < 0) speed *= Mathf.Lerp(1, .55f, Mathf.Clamp01(-move.y / Mathf.Max(.01f, move.magnitude)));

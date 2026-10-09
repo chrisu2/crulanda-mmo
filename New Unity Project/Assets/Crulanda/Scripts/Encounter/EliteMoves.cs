@@ -21,6 +21,12 @@ namespace Crulanda.Encounter
         public float enrageAt = .3f, enrageHaste = .65f, callAt = .6f, callReach = 22;
         public float health = 1, hit = 1;
         public int callMost;
+        // Boss mechanics (D2, 2026-10-08; EncounterEnemy.Boss):
+        public BossPhase[] phases;
+        public bool callOnPull;
+        public int deathCall; public float deathReach = 45; public string deathText;
+        public float knock, disarm, blinkEvery;
+        public float ringEvery, ringReach = 4.5f, ringBlow = 1.6f; public string ringName;
     }
 
     /// <summary>The twelve camp elites' moves, by the camp's mob name, and a plain one for any elite not listed.</summary>
@@ -70,24 +76,32 @@ namespace Crulanda.Encounter
                 call = "The Hollow Root-Warden strikes the floor, and the Heart answers.", callShort = "The Heart answers", enrageAt = .35f, enrageHaste = .6f,
                 enrage = "The Hollow Root-Warden creaks, and every root in the Heart pulls tight." },
             // ---------- The Sealed Adit (dungeon D1; PROVISIONAL moves until D2 gives each boss its mechanics, DUNGEON_DESIGN.md) ----------
-            new EliteMove { mob = "Gang-Boss Haddo Lusk", name = "Tally-Stick", windup = 2.2f, blow = 3.6f, reach = 3.8f, every = 12, callMost = 2,   // the first boss: a lesson, not a wall (the paper fight: his two guards answer, nobody else)
+            new EliteMove { mob = "Gang-Boss Haddo Lusk", name = "Tally-Stick", windup = 2.2f, blow = 3.6f, reach = 3.8f, every = 12, callMost = 2,
+                deathCall = 3, deathText = "Boots in the drift behind: Lusk's relief shift walks in, three of them.",   // the first boss: a lesson, not a wall (the paper fight: his two guards answer, nobody else)
                 call = "Lusk roars: \"Overseers! Earn your cut!\"", callShort = "Earn your cut!",
                 enrage = "Lusk throws the tally book down and comes round the table." },
-            new EliteMove { mob = "Nix, the turncoat", name = "Spanner-Lock", windup = 1.6f, blow = 3.6f, reach = 3.4f, every = 9,
+            new EliteMove { mob = "Nix, the turncoat", name = "Spanner-Lock", windup = 1.6f, blow = 3.6f, reach = 3.4f, every = 9, disarm = 4,
                 call = "Nix shrieks: \"Get them off me!\"", callShort = "Get them off me!",
                 enrage = "Nix's hands blur over the engine's controls." },
             new EliteMove { mob = "Cinder-Warden Ysolt", name = "Ember Blow", windup = 2, blow = 4.2f, reach = 3.8f, every = 10, callReach = 14, callMost = 2,
+                knock = 5, ringEvery = 15, ringReach = 4.5f, ringBlow = 1.6f, ringName = "Flame Ring",
                 call = "Ysolt lifts the brand: \"The fire sees you.\"", callShort = "The fire sees you",
                 enrage = "Ysolt steps into the heat and comes out burning." },
-            new EliteMove { mob = "The Foreman Who Forgot", name = "What the Grey Takes", windup = 2.4f, blow = 4.4f, reach = 3.6f, every = 12, callReach = 40, callMost = 2,   // the Hollow drift, back up the breach
+            new EliteMove { mob = "The Foreman Who Forgot", name = "What the Grey Takes", windup = 2.4f, blow = 4.4f, reach = 3.6f, every = 12, callReach = 40, callMost = 2,
+                blinkEvery = 14, phases = new[] {
+                    new BossPhase { at = .5f, kind = "reset", text = "The Foreman stops. He looks at his hands, then at you, as if for the first time." },
+                    new BossPhase { at = .25f, kind = "terrify", seconds = 3, text = "The Foreman opens his mouth and the grey comes out of it. You cannot move." } },   // the Hollow drift, back up the breach
                 call = "The Foreman calls a shift-name nobody has answered to in years. Something in the grey answers.", callShort = "Shift!",
                 enrage = "The Foreman flickers, and for a moment there is less of him." },
             new EliteMove { mob = "The Vent-Hound", name = "Ember Lunge", windup = 1.5f, blow = 3.6f, reach = 4.4f, every = 9,
                 enrage = "The Vent-Hound's coat glows along the spine." },
-            new EliteMove { mob = "Quartermaster Brannigan Sorrel", name = "Boot-Heel Stamp", windup = 2, blow = 4.2f, reach = 3.6f, every = 10, callReach = 14, callMost = 2,   // his guards, not the captain down the hall
+            new EliteMove { mob = "Quartermaster Brannigan Sorrel", name = "Boot-Heel Stamp", windup = 2, blow = 4.2f, reach = 3.6f, every = 10, callReach = 14, callMost = 2,
+                phases = new[] {
+                    new BossPhase { at = .667f, kind = "stamp", seconds = 2, text = "Sorrel stamps: the platform jumps under you. He goes to the rack and comes back with a maul." },
+                    new BossPhase { at = .333f, kind = "stamp", seconds = 2, text = "Sorrel stamps again, and this time comes back with the poleaxe." } },   // his guards, not the captain down the hall
                 call = "Sorrel bellows: \"Platform! Hold the ramp!\"", callShort = "Hold the ramp!",
                 enrage = "Sorrel goes to the rack and comes back with something heavier." },
-            new EliteMove { mob = "Rail-Captain Orsk Danner", name = "The Dead Line", boss = true, health = BossHealth, hit = BossHit, windup = 2.2f, blow = 3.2f, reach = 4, every = 12, callReach = 10,   // sturdy, not savage: his guards and the shadows are the fight (the paper fight at level 12)
+            new EliteMove { mob = "Rail-Captain Orsk Danner", name = "The Dead Line", boss = true, callOnPull = true, phases = new[] { new BossPhase { at = .5f, kind = "rally", text = "Danner, without turning: \"More.\"" } }, health = BossHealth, hit = BossHit, windup = 2.2f, blow = 3.2f, reach = 4, every = 12, callReach = 10,   // sturdy, not savage: his guards and the shadows are the fight (the paper fight at level 12)
                 call = "Danner says, quietly: \"Guards.\" They step out of the dark.", callShort = "Guards.", enrageAt = .35f, enrageHaste = .6f,
                 enrage = "Danner draws a second blade. The letter stays buttoned in his coat." },
         };

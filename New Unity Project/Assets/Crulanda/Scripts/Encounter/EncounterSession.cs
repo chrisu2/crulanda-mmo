@@ -1648,7 +1648,7 @@ namespace Crulanda.Encounter
             Kit.Tick(InCombat);
             if (AutoAttack && !Kit.MeleeAutoAttacks && !Kit.RangedAutoAttacks) AutoAttack = false;
             // The swing in melee, or the bow's auto-shot at its range (the Ranger: ClassKit.RangedAutoAttacks).
-            if (AutoAttack && Target != null && Target.actor.IsAlive && Time.time >= nextSwing && Distance(Target) < Kit.AutoAttackRange)
+            if (AutoAttack && Target != null && Target.actor.IsAlive && Time.time >= nextSwing && Distance(Target) < Kit.AutoAttackRange && !PlayerStunned && !PlayerDisarmed)
             {
                 nextSwing = Time.time + Kit.SwingInterval(content.playerSwingInterval);
                 if (Kit.MeleeAutoAttacks) PlayerFigure?.Strike(); else { PlayerFigure?.CastRelease(); Bolt(Target, new Color(.9f, .88f, .8f), .1f, true); }
@@ -1736,6 +1736,8 @@ namespace Crulanda.Encounter
         public bool UseAbility(int index)
         {
             if (Paused || Player == null || !Player.IsAlive || !ActionUnlocked(index)) return false;
+            if (PlayerStunned) { Message("You are stunned."); return false; }
+            if (PlayerDisarmed && WeaponMove(index)) { Message("Your weapon is locked."); return false; }
             if (CooldownRemaining(index) > 0) return false;
             bool used = Kit.Use(index);
             if (used) CancelWork(true);   // an ability that goes off takes the hands off the work (the work only ends in TickWork, so it gathers nothing)

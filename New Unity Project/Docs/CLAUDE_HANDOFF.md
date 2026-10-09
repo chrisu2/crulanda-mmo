@@ -9,15 +9,21 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-10-09) — C: was lost; the project is safe; set-up before work
+## RESUME HERE (updated 2026-10-09, afternoon) — set up again after losing C:; the Adit work merged on `integrate/adit`
 **Chris lost his C: drive on 2026-10-09.** D: (the repo, Unity's editor, the lore) and the E: backup survived. Lost with C:: Git
-(reinstalled), the `hel` workspace (validation copy, playable build, save backups, screenshots, handoff copy) and Chris's save.
-New home for all of that: `D:\crulanda-work` (see CLAUDE.md).
-**D2 and the Adit quests were never committed.** Saved 2026-10-09 to the branch `wip/d2-adit-quests` (a58ea14, pushed, backed
-up); `main` is still 40a538f. Untested since the loss: test that branch in the new validation copy, fix, then merge to `main`.
-**Set-up still to do (Chris):** Unity Hub > Installs > Locate the D: editor and sign in; Python 3 on PATH; the validation copy
-(`robocopy "D:\code\mmo\New Unity Project" "D:\crulanda-work\encounter-validation" /E /XD Temp`); a fresh build to
-`D:\crulanda-work\outputs`. Then carry on with "Next" below.
+(reinstalled), the `hel` workspace (validation copy, playable build, save backups, screenshots, handoff copy) and Chris's save
+(no copy anywhere: he starts a new character). New home for the workspace: `D:\crulanda-work` (see CLAUDE.md).
+**Set up again (done):** the Windows account is now `ChrisWin11`; Unity Hub signed in and licensed; Python 3.12
+(`%LOCALAPPDATA%\Programs\Python\Python312`, with numpy, Pillow, reportlab); every `tools\validation` script, Build-TestPlayer and
+make_history_pdf now use `D:\crulanda-work`; the 26 dead git worktrees (C: scratchpads) pruned (their branches kept).
+**417 `.meta` files had never been committed** (the Village, Nature and Fantasy kits, ArchivistKit, RogueKit, KeyBindings and
+others): their only copies were in the lost validation copies. Unity made new ones (ThirdPartyImport.cs sets the import settings,
+and no scene, prefab or material referred to them); they are committed now. Commit every new asset's `.meta` with it.
+**Branch `integrate/adit`** = main + `wip/d2-adit-quests` (D2 boss mechanics) + `web/adit-quests-loot` (the cloud's seven quests,
+four givers, cages, echo-jars, the Adit-Runner's Kit and The Dead Line's rewards). The local branch's own six quests and kit were
+dropped (Chris chose the cloud's). Fixed: the knockback stops at an edge (it gave up when the full distance was not walkable).
+First runs: EditMode 435/435, the Adit PlayMode set 36/36. A full run (-AllTests, build, tours) was started; if green: merge to
+`main`, publish the build to `D:\crulanda-work\outputs`, tick WEB_LOG, push, back up. Then carry on with "Next" below.
 
 ## Earlier resume note (2026-10-08, night) — on GitHub; cloud sessions may have worked while the PC was off
 **First, when the PC is back:** `git fetch`; look for `web/*` branches and draft PRs from Claude Code on the web, read

@@ -198,7 +198,10 @@ namespace Crulanda.Encounter
             string body = status == QuestStatus.ReadyToTurnIn ? quest.complete : quest.offer;
             var view = new Rect(w.x + 24, y, w.width - 48, w.yMax - 70 - y);
             float bodyH = qBody.CalcHeight(new GUIContent(body), view.width - 20);
-            float extraH = 220;
+            var gear = log.GearRewards(quest);
+            if (rewardFor != quest) { rewardFor = quest; rewardPick = null; }
+            bool mustPick = gear.Count > 1 && !gear.Exists(d => d.id == rewardPick);
+            float extraH = 220 + (gear.Count > 0 ? 30 + gear.Count * GearRow : 0);
             textScroll = GUI.BeginScrollView(view, textScroll, new Rect(0, 0, view.width - 20, bodyH + extraH));
             Ink(new Rect(0, 0, view.width - 20, bodyH), body, qBody, InkBrown);
             float yy = bodyH + 14;
@@ -210,7 +213,10 @@ namespace Crulanda.Encounter
                 Ink(new Rect(0, yy, view.width - 20, sh), summary, qSmall, InkBrown); yy += sh + 12;
             }
             Ink(new Rect(0, yy, 300, 22), "REWARDS", qHead, new Color(.42f, .22f, .05f)); yy += 24;
-            Ink(new Rect(0, yy, view.width - 20, 80), RewardText(quest), qSmall, InkBrown);
+            string rewards = RewardText(quest, false);
+            float rh = rewards.Length == 0 ? 0 : qSmall.CalcHeight(new GUIContent(rewards), view.width - 20);
+            Ink(new Rect(0, yy, view.width - 20, rh), rewards, qSmall, InkBrown); yy += rh + 8;
+            QuestGear(gear, status, view, yy);
             GUI.EndScrollView();
             if (status == QuestStatus.Available)
             {
@@ -219,21 +225,60 @@ namespace Crulanda.Encounter
             }
             else if (status == QuestStatus.ReadyToTurnIn)
             {
-                if (GUI.Button(new Rect(w.x + 24, w.yMax - 52, 190, 36), "Complete quest", button)) session.CompleteQuest(quest);
+                GUI.enabled = !mustPick;
+                if (GUI.Button(new Rect(w.x + 24, w.yMax - 52, 190, 36), mustPick ? "Choose a reward" : "Complete quest", button)) session.CompleteQuest(quest, rewardPick);
+                GUI.enabled = true;
                 if (GUI.Button(new Rect(w.xMax - 174, w.yMax - 52, 150, 36), c.entries.Count > 1 ? "Back" : "Later", button)) { if (c.entries.Count > 1) c.selected = null; else session.Conversation = null; }
             }
             else if (GUI.Button(new Rect(w.xMax - 174, w.yMax - 52, 150, 36), "Close", button)) session.Conversation = null;
         }
-        string RewardText(QuestDef q)
+        const float GearRow = 52;
+        /// <summary>The quest the conversation's reward pick belongs to, and the pick (a gear piece's id; null = none yet).</summary>
+        QuestDef rewardFor; string rewardPick;
+        /// <summary>
+        /// A quest's gear in the conversation, inside its scroll view from <paramref name="yy"/>: each piece's square and name, and its
+        /// tooltip on hover. A choice of several is picked with a click once the quest is ready to hand in (the pick is lit).
+        /// </summary>
+        void QuestGear(List<ItemDef> gear, QuestStatus status, Rect view, float yy)
+        {
+            if (gear.Count == 0) return;
+            ItemStyles();
+            bool choose = gear.Count > 1, ready = status == QuestStatus.ReadyToTurnIn;
+            Ink(new Rect(0, yy, view.width - 20, 22), !choose ? "You will receive:" : ready ? "Choose one:" : "You will choose one of:", qSmall, InkBrown); yy += 26;
+            var e = Event.current; var mouse = e.mousePosition;
+            // The mouse on the page (a row scrolled out of the view must not answer it).
+            bool inView = view.Contains(mouse - textScroll + view.position);
+            foreach (var d in gear)
+            {
+                var row = new Rect(0, yy, view.width - 20, GearRow - 4);
+                bool lit = choose && rewardPick == d.id, over = inView && row.Contains(mouse);
+                if (lit || (over && choose && ready)) Fill(row, lit ? new Color(.85f, .6f, .1f, .35f) : new Color(.85f, .6f, .1f, .15f));
+                ItemSquare(new Rect(row.x + 4, row.y + 2, GearRow - 8, GearRow - 8), new ItemStack { item = d.id, count = 1 });
+                var q = ItemDatabase.QualityColors[Mathf.Clamp(d.quality, 0, ItemDatabase.MaxQuality)];
+                Ink(new Rect(row.x + GearRow + 6, row.y + 4, row.width - GearRow - 6, 22), d.name, qBody, Color.Lerp(q, InkBrown, .5f));
+                Ink(new Rect(row.x + GearRow + 6, row.y + 24, row.width - GearRow - 6, 20), ItemDatabase.SlotNames[ItemDatabase.SlotIndex(d.slot)] + (d.level > 1 ? "  ·  level " + d.level : ""), qSmall, new Color(.4f, .32f, .22f));
+                if (over)
+                {
+                    ItemTooltip(d, true); tooltipAt = mouse - textScroll + view.position;
+                    if (choose && ready && e.type == EventType.MouseDown && e.button == 0) { rewardPick = d.id; e.Use(); }
+                }
+                yy += GearRow;
+            }
+        }
+        /// <summary>The rewards in words; the gear too when <paramref name="gearText"/> (the quest book: the conversation shows it as squares).</summary>
+        string RewardText(QuestDef q, bool gearText = true)
         {
             var r = q.rewards ?? new QuestRewardDef(); var parts = new List<string>();
+            var gear = session.Quests.GearRewards(q);
             if (r.xp > 0) parts.Add(r.xp + " experience");
             if (r.gold > 0) parts.Add(r.gold + " silver crowns");
             foreach (var i in r.items) parts.Add(session.Quests.Db.ItemName(i));
             foreach (var i in r.bagItems ?? new string[0]) parts.Add(session.ItemName(i) + (Inventory.Owns(session.Progress, i) ? " (you have one: its worth in crowns instead)" : ""));
             foreach (var d in r.documents) parts.Add("Chronicle page: " + (session.Quests.Db.Documents.TryGetValue(d, out var doc) ? doc.title : d));
             foreach (var s in r.reputation) parts.Add((s.amount > 0 ? "+" : "") + s.amount + " standing with " + (session.Quests.Db.Factions.TryGetValue(s.faction, out var f) ? f.name : s.faction));
-            return parts.Count == 0 ? "None but thanks." : string.Join("\n", parts);
+            if (gearText && gear.Count == 1) parts.Add(gear[0].name);
+            if (gearText && gear.Count > 1) parts.Add("Your choice of: " + string.Join(", ", gear.ConvertAll(d => d.name)));
+            return parts.Count == 0 ? (gear.Count > 0 ? "" : "None but thanks.") : string.Join("\n", parts);
         }
 
         // ---------- quest book ----------

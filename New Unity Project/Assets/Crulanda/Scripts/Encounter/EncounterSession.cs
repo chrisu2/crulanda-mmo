@@ -157,7 +157,7 @@ namespace Crulanda.Encounter
                     var texts = new List<string>(); foreach (var f in content.questFiles) if (f != null) texts.Add(f.text);
                     questCache = QuestDatabase.Parse(texts); questCacheFor = content;
                 }
-                Quests = new QuestLog(questCache, Progress) { Items = Items }; Boards = new Bounties(Quests);
+                Quests = new QuestLog(questCache, Progress) { Items = Items, Loot = Loot }; Boards = new Bounties(Quests);
                 if (Items != null) { var unknown = questCache.CheckItems(Items); if (unknown.Count > 0) Debug.LogError("Quest content names items that are not right:\n" + string.Join("\n", unknown)); }
                 Quests.Say = (text, speaker) => {
                     if (speaker == null) { Message(text); return; }
@@ -202,7 +202,8 @@ namespace Crulanda.Encounter
             if (q.kind == "bounty" && q.rare) SpawnCourier();
             ReconcileQuests(); Save(false); ReopenConversation();
         }
-        public void CompleteQuest(QuestDef q)
+        /// <summary>Hands in a finished quest; <paramref name="choice"/> is the gear piece picked when it offers a choice (QuestLog.GearRewards).</summary>
+        public void CompleteQuest(QuestDef q, string choice = null)
         {
             if (Quests == null) return;
             int before = Progress.Level;
@@ -210,7 +211,7 @@ namespace Crulanda.Encounter
             // counted before the hand-in (afterwards the bag is owned), and a bag you already had is paid to you as coin, not made, so earns her nothing.
             var bagItems = q.rewards?.bagItems; int worth = 0;
             if (bagItems != null && Items != null) foreach (var id in bagItems) { var d = Items.Get(id); if (d != null && !(d.kind == "bag" && Inventory.Owns(Progress, id))) worth += Inventory.Price(d); }
-            if (!Quests.TurnIn(q, out _)) return;
+            if (!Quests.TurnIn(q, out _, choice)) return;
             if (q.kind == "bounty" && Boards != null) { Boards.Finished(ZoneId, q.id); if (q.rare) DespawnCourier(); }
             if (q.kind == "bounty") { Progress.bounties++; if (q.rare) Progress.rares++; }   // Achievements count them
             if (worth > 0) VillageLife.Active?.Paid(q.turnIn, worth);

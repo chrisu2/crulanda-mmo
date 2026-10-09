@@ -1747,6 +1747,15 @@ A read-only review by five reviewers, each finding checked by a second who tried
 - (The local branch also had six Adit quests and its own Adit-Runner's Kit; Chris chose the cloud branch's seven quests and kit
   instead on 2026-10-09, so those were dropped in the merge.)
 
+## 2026-10-09 — Quest gear handed out at turn-in (Chris: "do quest gear rewards first")
+- The eighteen named quest pieces were never given (each named its quest as its source; nothing granted it). Now a quest's piece goes
+  into the bags when you hand it in, and The Dead Line offers a choice of three (Sleeper-Splitter, Coupler's Hook, Weaver's
+  Tuning-Drop): the conversation's Rewards show each piece's square, name, slot and level with its tooltip (and the compare lines),
+  a click picks one, and Complete waits for the pick. The quest book lists them in words ("Your choice of: ...").
+- A piece already held is paid in crowns ("You've one already. Take the coin."); full bags make the quest wait. The Tempered
+  Trailblade (legacy; every new character has it) is not given again by the first Chronicle chapter.
+- Tests: QuestGearTests (EditMode: the eighteen and their quests, a single piece, the choice, held, full bags).
+
 ## 2026-10-08 — The Sealed Adit's quests and loot (dungeon step D6; cloud branch web/adit-quests-loot, not yet run in Unity)
 - Quests/adit.json: the seven quests of DUNGEON_DESIGN.md section 6, all side quests from level 10:
   - Under the Toll (Yara Quell, 11): Gang-Boss Lusk and his tally book (a Chronicle page) to Yara.

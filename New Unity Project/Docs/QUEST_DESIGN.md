@@ -270,6 +270,11 @@ the coin goes to her family. Design: `tools/wip/professions/ADDENDUM.md` D. All 
   bags and completes the objective. The target shows a gold ? while you carry enough, a grey one before.
 - `rewards.bagItems`: items given into the bags at turn-in (a trade bag). With no free ordinary slot the turn-in is refused with
   "Make room in your bags first." and nothing changes (the hides stay handed over; the quest waits, ready to turn in).
+- **Quest gear (2026-10-09):** a quest's gear is every named piece in the loot files whose `source` is `quest:<its id>` (a legacy
+  piece is left out: the Tempered Trailblade comes with a new character). One piece goes into the bags at turn-in; two or more are a
+  choice of one, picked by a click in the conversation's Rewards ("Choose one:"; the Complete button waits for the pick). A piece
+  already held is paid as its value in crowns; with no free slot the turn-in waits as for a bag. `QuestLog.GearRewards`, tests in
+  `QuestGearTests`. Eighteen pieces: one each from fifteen quests, and The Dead Line's choice of three.
 - `unlessWorn` (on the quest): a trade bag's id. The quest is not offered while that bag is worn or carried. One already taken on
   pays the bag's value in gold at turn-in instead of a second bag ("You've one already. Take the coin.").
 - `QuestDatabase.CheckItems(ItemDatabase)` cross-checks bring items, bag rewards and `unlessWorn` against the items (the quest files
@@ -309,6 +314,6 @@ Step 11 adds EditMode `QuestDataTests.Bring_and_bag_rewards_name_real_items` (al
 she sells earned by exactly one quest) and PlayMode `HuntTests` (the hides got by hunting).
 
 **Next**
-- Quest rewards that give real equipment: `reward.items` exists in the data but nothing grants it yet. Gear comes only from camp loot and merchants.
+- ~~Quest rewards that give real equipment~~: done 2026-10-09 (quest gear, above).
 - The well at night and the Hollow Men (new enemy look), finishing Chronicle II.
 - Khaven: Chronicle III and the Sandthrone contracts, which cost Salt-Mender standing.

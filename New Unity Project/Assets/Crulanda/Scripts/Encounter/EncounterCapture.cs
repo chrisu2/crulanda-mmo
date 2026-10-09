@@ -140,6 +140,7 @@ namespace Crulanda.Encounter
             if (session.Boards != null && zone != null) { var bd = CaptureBoard(directory, prefix, zone); while (bd.MoveNext()) yield return bd.Current; }
             if (session.Professions != null) { var t = CaptureTrades(directory, prefix); while (t.MoveNext()) yield return t.Current; }
             if (session.Items != null) { var b = CaptureBags(directory, prefix); while (b.MoveNext()) yield return b.Current; }
+            if (session.Items != null && session.Loot != null && session.Quests != null) { var qg = CaptureQuestGear(directory, prefix); while (qg.MoveNext()) yield return qg.Current; }
             if (session.Professions != null && zone != null) { var st = CaptureStation(directory, prefix, zone); while (st.MoveNext()) yield return st.Current; }
             if (session.Professions != null && zone != null) { var ck = CaptureCooking(directory, prefix, zone); while (ck.MoveNext()) yield return ck.Current; }
             if (session.Professions != null && zone != null) { var cr = CaptureCrafts(directory, prefix, zone); while (cr.MoveNext()) yield return cr.Current; }
@@ -184,6 +185,24 @@ namespace Crulanda.Encounter
             ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "42-who.png")); yield return new WaitForSeconds(.4f);
             session.WhoOpen = false;
             foreach (var c in session.PartySims.ToArray()) session.LeaveParty(c.sim.id);
+        }
+        /// <summary>Quest gear (2026-10-09): The Dead Line ready to hand in, its choice of three in the Rewards with one piece's tooltip
+        /// pinned; then the Coupler's Hook picked and handed in, in the bags.</summary>
+        IEnumerator CaptureQuestGear(string directory, string prefix)
+        {
+            var log = session.Quests; var q = log.Def("side.adit.dead_line"); if (q == null) yield break;
+            session.Conversation = null; session.QuestBookOpen = false; session.ShowTrades(false); session.CloseVendor(); session.InventoryOpen = false;
+            if (log.State(q.id) == null) log.Progress.quests.Add(new QuestState { id = q.id, step = q.steps.Length });
+            session.Conversation = new EncounterSession.QuestConversation { npc = q.turnIn, selected = q, entries = new List<(QuestDef, QuestStatus)> { (q, QuestStatus.ReadyToTurnIn) }, where = session.Player.transform.position };
+            var gear = log.GearRewards(q);
+            if (gear.Count > 1) { EncounterHud.PinnedTooltip = gear[1].id; EncounterHud.PinnedTooltipAt = new Vector2(980, 560); }
+            yield return new WaitForSeconds(.5f);
+            ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "43-quest-gear-choice.png")); yield return new WaitForSeconds(.4f);
+            EncounterHud.PinnedTooltip = null;
+            if (gear.Count > 1) session.CompleteQuest(q, gear[1].id);
+            session.Conversation = null; session.InventoryOpen = true; yield return new WaitForSeconds(.5f);
+            ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "44-quest-gear-received.png")); yield return new WaitForSeconds(.4f);
+            session.InventoryOpen = false;
         }
         IEnumerator CaptureBags(string directory, string prefix)
         {

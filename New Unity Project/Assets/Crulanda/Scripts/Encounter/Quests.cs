@@ -185,7 +185,9 @@ namespace Crulanda.Encounter
         /// <summary>The item database, for bring objectives' names and bag rewards (the session sets it; without it a quest that gives
         /// a bag cannot be turned in).</summary>
         public ItemDatabase Items;
-        public const string MakeRoomLine = "Make room in your bags first.", HaveOneLine = "You've one already. Take the coin.";
+        /// <summary>The named loot, for the gear a quest gives (<see cref="GearRewards"/>); the session sets it. Without it a quest gives no gear.</summary>
+        public LootDatabase Loot;
+        public const string MakeRoomLine = "Make room in your bags first.", HaveOneLine = "You've one already. Take the coin.", ChooseLine = "Choose your reward first.";
         public QuestLog(QuestDatabase db, EncounterProgress progress) { Db = db; Bind(progress); }
         public void Bind(EncounterProgress progress)
         {
@@ -301,11 +303,25 @@ namespace Crulanda.Encounter
             return true;
         }
         /// <summary>
+        /// The gear a quest gives at turn-in, in the loot files' order: every named piece whose source is "quest:&lt;its id&gt;" (a legacy
+        /// piece comes its own way, as the Tempered Trailblade with a new character, so is left out). One piece is given; two or more
+        /// are a choice of one.
+        /// </summary>
+        public List<ItemDef> GearRewards(QuestDef q)
+        {
+            var list = new List<ItemDef>(); if (q == null || Loot == null || Items == null) return list;
+            string source = "quest:" + q.id;
+            foreach (var g in Loot.GearOrder) if (g.source == source && !g.legacy && Items.Get(g.id) != null) list.Add(Items.Get(g.id));
+            return list;
+        }
+        /// <summary>
         /// Hands in a finished quest and pays out. Returns false if it isn't ready, or (saying "Make room in your bags first.") when it
         /// gives something for the bags and they have no room for it: then nothing changes. A trade bag already worn or carried is paid
-        /// as its value in gold instead ("You've one already. Take the coin.").
+        /// as its value in gold instead ("You've one already. Take the coin."), and so is a quest's gear piece already held. A quest
+        /// with a choice of gear (<see cref="GearRewards"/>) needs <paramref name="choice"/>, one of its pieces' ids ("Choose your
+        /// reward first." without it).
         /// </summary>
-        public bool TurnIn(QuestDef q, out int xp)
+        public bool TurnIn(QuestDef q, out int xp, string choice = null)
         {
             xp = 0; var s = q == null ? null : State(q.id);
             if (s == null || s.step < q.steps.Length) return false;
@@ -316,6 +332,10 @@ namespace Crulanda.Encounter
                 var d = Items?.Get(id); if (d == null) return false;   // no item content: it waits until there is
                 if (d.kind == "bag" && Owns(id)) coin += d.value; else bags.Add(d);
             }
+            var gear = GearRewards(q);
+            var pick = gear.Count == 1 ? gear[0] : gear.Find(d => d.id == choice);
+            if (gear.Count > 1 && pick == null) { Say(ChooseLine, null); return false; }
+            if (pick != null) { if (Inventory.Has(Progress, pick.id)) coin += pick.value; else bags.Add(pick); }
             if (bags.Count > 0 && Inventory.FreeSlots(Progress) < bags.Count) { Say(MakeRoomLine, null); return false; }
             Progress.quests.Remove(s); if (q.kind != "bounty") Progress.questsDone.Add(q.id);
             xp = r.xp; Progress.experience += r.xp; Progress.gold += r.gold + coin;
@@ -323,7 +343,7 @@ namespace Crulanda.Encounter
             foreach (var d in bags) Inventory.Add(Progress, Items, d.id, 1);
             foreach (var d in r.documents) Reveal(d);
             Say((q.IsMain ? "Chronicle complete: " : q.kind == "bounty" ? "Bounty paid: " : "Quest complete: ") + q.title + (r.xp > 0 ? "  +" + r.xp + " XP" : "") + (r.gold > 0 ? "  +" + r.gold + " crowns" : ""), null);
-            foreach (var d in bags) Say("Received: " + d.name + "." + (d.kind == "bag" ? " Use it from your bags [I] to wear it." : ""), null);
+            foreach (var d in bags) Say("Received: " + d.name + "." + (d.kind == "bag" ? " Use it from your bags [I] to wear it." : d.kind == "gear" ? " Right-click it in your bags [I] to wear it." : ""), null);
             if (coin > 0) { Say(HaveOneLine, q.turnIn == "auto" ? null : q.turnIn); Say("Received " + coin + " crowns.", null); }
             foreach (var c in r.reputation) ChangeStanding(c.faction, c.amount);
             return true;

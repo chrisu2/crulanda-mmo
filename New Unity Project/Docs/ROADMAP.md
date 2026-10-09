@@ -15,7 +15,7 @@ records where each of its phases stands and the order of the work. Update it eve
 | 5 | **SimAdventurers** (the brief's "most important feature") | Done (5.0-5.7, 2026-10-07) |
 | 6 | Group gameplay | Done with 5.6-5.7: parties, roles, need/greed, sim-led runs, guilds |
 | 7 | First dungeon | Done: Crowsfoot Hollow (Oakhaven) and the Root-Mother's Deep (Verdant Shore) |
-| 8 | Vertical slice | **Now**: the Sealed Adit (DUNGEON_DESIGN.md section 9: D1 the caves, D2 boss mechanics, D3 gates and keys, D4 the Weaver's escort and D6 quests and loot done by 2026-10-09; left: Nix's two-part fight, the rest of D5 mob behaviours, D7 sims in the dungeon, D8 the rail ride out), crowd control C1-C5 (CC_DESIGN.md), then the Medieval Village Kit, world art, polish and the playtest-note rounds |
+| 8 | Vertical slice | **Now**: the Sealed Adit (DUNGEON_DESIGN.md section 9: D1 the caves, D2 boss mechanics, D3 gates and keys, D4 the Weaver's escort and D6 quests and loot done by 2026-10-09; left: Nix's two-part fight, the rest of D5 mob behaviours, D7 sims in the dungeon, D8 the rail ride out), crowd control C1-C5 (CC_DESIGN.md); then **the talents: a fourth path for every class and tiers 4-6 (TALENT_DEPTH.md, decided 2026-10-09: one point a level, Paladin first)**, the Medieval Village Kit, world art, polish and the playtest-note rounds |
 | 9 | **The wider world** (Chris, 2026-10-07: "more zones, more classes, more races based on the canon of the novels, after phase 8") | Planned (see below) |
 
 ## Phase 5 plan (Chris chose 2026-10-05: Phase 5 now; classes Paladin, Ranger, Mage; faster tests first)

@@ -146,6 +146,9 @@ namespace Crulanda.World
         /// <summary>A rare camp's chance to be there on a visit (0..1; the Quiet Miner, one run in five). 0 = always. A rare camp comes
         /// last in the list, so a visit without it moves no other camp's mobs, and no deed waits on it.</summary>
         public float rare;
+        /// <summary>Its mobs bolt at this fraction of their health (dungeon step D5: the Grey Breach's crawlers at a quarter): a run from
+        /// whoever they fight for a few seconds, then back. 0 = they fight to the end. Not for elites.</summary>
+        public float flee;
     }
     /// <summary>Walk into the radius and press E to travel; you arrive at <see cref="arrive"/> in the other zone.</summary>
     [Serializable] public sealed class ZoneExit { public string to, name; public Vector2 at, arrive; public float radius = 5; }

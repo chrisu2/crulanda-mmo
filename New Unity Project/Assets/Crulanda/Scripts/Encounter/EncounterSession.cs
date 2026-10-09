@@ -1483,6 +1483,7 @@ namespace Crulanda.Encounter
                     var enemy = a.gameObject.AddComponent<EncounterEnemy>(); enemy.actor = a; enemy.persistentId = id; enemy.session = this;
                     enemy.Camp = true; enemy.Elite = elite; enemy.RespawnSeconds = Mathf.Max(20, camp.respawn); enemy.CampCenter = camp.center; enemy.CampRadius = camp.radius;
                     enemy.Ambusher = camp.ambush; enemy.Skinnable = look == ActorLook.Wolf || look == ActorLook.Boar || look == ActorLook.Stag || look == ActorLook.Bear;
+                    enemy.FleeAt = elite ? 0 : camp.flee;   // bolts at low health (D5; EncounterEnemy.Flee)
                     a.gameObject.SetActive(true); enemy.Initialize(); Enemies.Add(enemy);
                     if (camp.ambush) enemy.Hide();
                     bool tough = Zone.Zone.groupZone && !elite; enemy.Tough = tough;   // a group zone: every mob at an elite's strength (round 29)
@@ -1536,7 +1537,7 @@ namespace Crulanda.Encounter
                         AddAgent(a.gameObject, look == ActorLook.Wolf ? 4.2f : look == ActorLook.Boar ? 3.8f : look == ActorLook.Bear ? 4f : look == ActorLook.WeaveEater ? 3.4f : 2.8f, beast ? .6f : .45f);
                         var enemy = a.gameObject.AddComponent<EncounterEnemy>(); enemy.actor = a; enemy.persistentId = id; enemy.session = this;
                         enemy.Camp = true; enemy.RespawnSeconds = Mathf.Max(20, camp.respawn); enemy.CampCenter = at; enemy.CampRadius = 4;
-                        enemy.Skinnable = look == ActorLook.Wolf || look == ActorLook.Boar || look == ActorLook.Stag || look == ActorLook.Bear;
+                        enemy.Skinnable = look == ActorLook.Wolf || look == ActorLook.Boar || look == ActorLook.Stag || look == ActorLook.Bear; enemy.FleeAt = camp.flee;
                         a.gameObject.SetActive(true); enemy.Initialize(); Enemies.Add(enemy);
                         enemy.Tough = Zone.Zone.groupZone;
                         a.Stats.SetBase(StatType.MaxHealth, EncounterEnemy.MobHealth(level, false, enemy.Tough, beast));

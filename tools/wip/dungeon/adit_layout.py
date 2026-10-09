@@ -128,7 +128,7 @@ CAMPS = [
     ('The Ember Vent', 9, 0, -9, mob('Ember circle', 'Ash initiate', 'cultist', 3, 11, 11, tag='ashinitiate', canon='GAME-ONLY cell; CANON cult (the Cult of Ash)', radius=2.2)),
     ('The Ember Vent', 10, 1, 0, mob('Cinder-Warden Ysolt', 'Cinder-Warden Ysolt', 'cultist', 1, 11, 11, tag='ysolt', canon='GAME-ONLY (the Cult of Ash is CANON)', radius=1, elite=True, guards='none', key='sigil.ember', keyName='the Ember Sigil')),
 
-    ('The Grey Breach', 3, 0, 0, mob('Greyed crawlers', 'Greyed crawler', 'spider', 3, 11, 11, tag='crawler', canon='GAME-ONLY (the Wasting is CANON)', radius=1.8)),
+    ('The Grey Breach', 3, 0, 0, mob('Greyed crawlers', 'Greyed crawler', 'spider', 3, 11, 11, tag='crawler', canon='GAME-ONLY (the Wasting is CANON)', radius=1.8, flee=.25)),
     ('The Grey Breach', 6, 0, 0, mob('The Hollow drift', 'Hollow Man', 'hollow', 3, 11, 11, tag='hollow', canon='CANON creature (Hollow Men) and CANON tunnels under the Peaks (book2 ch.19); GAME-ONLY camp', radius=2.5)),
     ('The Grey Breach', 9, 0, 0, mob('Grey drift', 'Greyed bear', 'bear', 2, 11, 11, tag='greybear', canon='GAME-ONLY (the Wasting is CANON)', radius=1.8)),
     ('The Grey Breach', 11, 3, 0, mob('The Foreman Who Forgot', 'The Foreman Who Forgot', 'hollow', 1, 11, 11, tag='foreman', canon='GAME-ONLY (the unmade are CANON)', radius=1, elite=True, guards='none', key='sigil.grey', keyName='the Grey Sigil')),

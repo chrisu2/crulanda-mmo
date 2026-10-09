@@ -184,6 +184,7 @@ namespace Crulanda.Encounter
             if (Vector3.Distance(Victim.transform.position, Group != null ? Group.anchor : home) > session.Leash + 6) { Disengage(); return; }
             if (!inFight) Engage();   // the camp hears of it (EncounterSession.RaiseAlarm)
             if (Move != null && TickElite()) return;   // an elite drawing back for its heavy blow stands still and does not swing
+            if (TickFlee()) return;   // bolting at low health (EncounterEnemy.Flee)
             if (Cast != null && TickCast()) return;   // a caster casting stands still and does not swing (EncounterEnemy.Casts)
             if (agent.isOnNavMesh) { agent.isStopped = false; agent.SetDestination(Victim.transform.position); }
             // Reach: 2.6 m across the ground and 1.6 m of height (a wading target sits lower than one on the bank).
@@ -226,7 +227,7 @@ namespace Crulanda.Encounter
         {
             ClearFight();
             threat.Clear(); Victim = null; slowUntil = rootUntil = 0; unreachableSince = -1; TappedBy = null;
-            UnscaleFromGroup(); ResetCasting();
+            UnscaleFromGroup(); ResetCasting(); ResetFlee();
             if (!actor.IsAlive) return;
             actor.Health.ApplyHealing(actor.Health.Pool.Max);
             if (agent.isOnNavMesh) { agent.isStopped = false; agent.SetDestination(home); }
@@ -271,7 +272,7 @@ namespace Crulanda.Encounter
             if (visual != null) { visual.localRotation = Quaternion.identity; visual.localPosition = Vector3.zero; }
             UnscaleFromGroup(); TappedBy = null; actor.Health.Revive(actor.Health.Pool.Max); actor.Health.ApplyHealing(actor.Health.Pool.Max);
             ClearFight(); evadeUntil = 0;
-            threat.Clear(); Victim = null; Looted = false; slowUntil = rootUntil = 0;
+            threat.Clear(); Victim = null; Looted = false; slowUntil = rootUntil = 0; ResetFlee();
             Drops = null; Coins = 0; LootBeacon.Clear(this);
             if (agent.isOnNavMesh) agent.isStopped = false;
             if (Game) GetComponent<GameAnimal>()?.Stand();

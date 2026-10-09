@@ -35,6 +35,7 @@ namespace Crulanda.Encounter
                 if (Stunned) return "Stunned " + Mathf.CeilToInt(stunUntil - Time.time) + " s";
                 if (Feared) return "Fleeing " + Mathf.CeilToInt(fearUntil - Time.time) + " s";
                 if (Silenced) return "Silenced " + Mathf.CeilToInt(silenceUntil - Time.time) + " s";
+                if (Bolting) return "Fleeing " + Mathf.CeilToInt(boltUntil - Time.time) + " s";   // bolting at low health (EncounterEnemy.Flee): not a hold
                 return null;
             }
         }

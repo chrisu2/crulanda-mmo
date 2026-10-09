@@ -1180,6 +1180,7 @@
       "levelMin": 11,
       "levelMax": 11,
       "respawn": 900,
+      "flee": 0.25,
       "center": {
         "x": -15.77,
         "y": 16.97

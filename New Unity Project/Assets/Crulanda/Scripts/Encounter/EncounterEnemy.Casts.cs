@@ -19,6 +19,9 @@ namespace Crulanda.Encounter
             new MobCast { mob = "Ash initiate", name = "Cinder Bolt", kind = "bolt", cast = 2f, every = 8, first = 4, power = 2.5f },
             new MobCast { mob = "Sandthrone sapper", name = "Short Fuse", kind = "blast", cast = 3f, every = 14, first = 5, power = 3f, reach = 4.5f },
             new MobCast { mob = "Hollow Man", name = "Grey Drain", kind = "drain", cast = 2.5f, every = 10, first = 4, power = 2f },
+            // The Adit's shooters (D5, DUNGEON_DESIGN.md section 5): the yard's pickets open at range, the carriage gunners fire from the platform.
+            new MobCast { mob = "Sandthrone picket", name = "Crossbow Bolt", kind = "bolt", cast = 1.5f, every = 9, first = 1, power = 2f, reach = 20 },
+            new MobCast { mob = "Sandthrone carriage gunner", name = "Rail-shot", kind = "bolt", cast = 1.6f, every = 7, first = 2, power = 2.4f, reach = 25 },
         };
         public static MobCast For(string mob) { return string.IsNullOrEmpty(mob) ? null : All.FirstOrDefault(c => c.mob == mob); }
     }

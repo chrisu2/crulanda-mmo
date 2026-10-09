@@ -1,4 +1,4 @@
-$v = if ($env:CRULANDA_VCOPY) { $env:CRULANDA_VCOPY } else { 'C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation' }   # lane B sets CRULANDA_VCOPY (full_run.ps1)
+$v = if ($env:CRULANDA_VCOPY) { $env:CRULANDA_VCOPY } else { 'D:\crulanda-work\encounter-validation' }   # lane B sets CRULANDA_VCOPY (full_run.ps1)
 $unity = 'D:\unity\Hub\Editor\6000.6.3f1\Editor\Unity.exe'
 foreach ($m in 'EditMode', 'PlayMode') {
     $r = Join-Path $v "world-$m.xml"

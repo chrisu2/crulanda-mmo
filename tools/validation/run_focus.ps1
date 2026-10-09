@@ -1,6 +1,6 @@
 param([string]$Filter = 'Crulanda.Tests.VillageErrandTests', [string]$Platform = 'PlayMode', [string]$Tag = 'focus')
 # Runs only the tests matching $Filter (NUnit full names, ';' separated) in the validation copy: a fast check before the full run.
-$v = if ($env:CRULANDA_VCOPY) { $env:CRULANDA_VCOPY } else { 'C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation' }   # lane B sets CRULANDA_VCOPY (full_run.ps1)
+$v = if ($env:CRULANDA_VCOPY) { $env:CRULANDA_VCOPY } else { 'D:\crulanda-work\encounter-validation' }   # lane B sets CRULANDA_VCOPY (full_run.ps1)
 $unity = 'D:\unity\Hub\Editor\6000.6.3f1\Editor\Unity.exe'
 robocopy 'D:\code\mmo\New Unity Project\Assets' (Join-Path $v 'Assets') /MIR /NFL /NDL /NJH /NJS /NP | Out-Null
 # Register zone, quest and item JSON on the scene and content first, as run_tests.ps1 does: the mirror just put the repo's

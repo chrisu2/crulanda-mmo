@@ -4,7 +4,7 @@
 
 .DESCRIPTION
   Copies the project's Assets into the validation copy, builds a Development player there with Unity in batch mode,
-  and (unless the game is running) refreshes outputs\Crulanda-Playable. Logs go to work\test-builds.
+  and (unless the game is running) refreshes outputs\Crulanda-Playable. Logs go to D:\crulanda-work\test-builds.
 
 .EXAMPLE
   .\Build-TestPlayer.ps1                 # build only
@@ -23,10 +23,10 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 $project = 'D:\code\mmo\New Unity Project'
-$workspace = 'C:\Users\chris\Documents\Codex\2026-09-28\hel'
-$validation = Join-Path $workspace 'work\encounter-validation'
+$workspace = 'D:\crulanda-work'
+$validation = Join-Path $workspace 'encounter-validation'
 $unity = 'D:\unity\Hub\Editor\6000.6.3f1\Editor\Unity.exe'
-$logs = Join-Path $workspace ('work\test-builds\' + (Get-Date -Format 'yyyyMMdd-HHmmss'))
+$logs = Join-Path $workspace ('test-builds\' + (Get-Date -Format 'yyyyMMdd-HHmmss'))
 $playable = Join-Path $workspace 'outputs\Crulanda-Playable'
 New-Item -ItemType Directory -Force $logs | Out-Null
 

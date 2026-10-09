@@ -1,16 +1,16 @@
 param([string[]]$Zones = @('zone.oakhaven', 'zone.khaven', 'zone.peaks', 'zone.ashrim', 'zone.verdant'), [switch]$NoTests, [switch]$NoExtra, [switch]$NoTour, [switch]$NoBuild, [switch]$AllTests)
 # The whole check before a publish, meant to be started DETACHED (start_detached.ps1) so a tool's time limit cannot kill Unity
-# part-way. Everything it prints goes to hel\work\full-run.log; it writes full-run.done (with the summary lines) when finished.
+# part-way. Everything it prints goes to D:\crulanda-work\full-run.log; it writes full-run.done (with the summary lines) when finished.
 # Two lanes at once (Phase 5.0, 2026-10-05: about 110 minutes became about 60):
 #   lane A (encounter-validation): EditMode, then the PlayMode fixtures the change needs (select_tests.ps1: those that name a
 #     changed class, the world set for zone data, none for art and docs; -AllTests runs every one);
 #   lane B (encounter-validation-b, a second copy of the project): the player build, the zone tours and the HUD, wardrobe and
 #     loot captures, in a process of its own.
-# A green run (no failures) records the commit it ran on in hel\work\last-green.txt, which the next selection starts from.
+# A green run (no failures) records the commit it ran on in D:\crulanda-work\last-green.txt, which the next selection starts from.
 # -NoTour: build and capture but tour no zone (the look is unchanged). -NoBuild: tests only. -Zones: one zone or a comma list.
 $Zones = @($Zones | ForEach-Object { $_ -split ',' } | Where-Object { $_ })
 if ($NoTour) { $Zones = @() }
-$work = 'C:\Users\chris\Documents\Codex\2026-09-28\hel\work'
+$work = 'D:\crulanda-work'
 $laneA = Join-Path $work 'encounter-validation'; $laneB = Join-Path $work 'encounter-validation-b'
 $log = Join-Path $work 'full-run.log'; $done = Join-Path $work 'full-run.done'; $logB = Join-Path $work 'full-run-b.log'
 if (Test-Path $done) { Remove-Item $done }

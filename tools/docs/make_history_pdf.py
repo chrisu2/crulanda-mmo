@@ -45,7 +45,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(os.path.dirname(HERE))
 DEFAULT_CONTENT = os.path.join(HERE, "history_content.md")
 DEFAULT_OUT = os.path.join(REPO, "New Unity Project", "Docs", "Crulanda-Everything-Built-So-Far.pdf")
-DEFAULT_CAPTURES = r"C:\Users\chris\Documents\Codex\2026-09-28\hel\work"
+DEFAULT_CAPTURES = r"D:\crulanda-work"
 
 PAGE_W, PAGE_H = letter
 MARGIN_X = 0.85 * inch

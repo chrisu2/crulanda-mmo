@@ -2,7 +2,7 @@ param([string]$Since = '')
 # Which PlayMode fixtures a change needs (Phase 5.0, 2026-10-05; Chris: "the most efficient playmode, whatever that takes").
 # Prints one line: ALL, NONE, or the fixtures' full names joined by ';' (a -testFilter for run_tests.ps1).
 # The change is everything that differs from $Since (default: the commit of the last green full run, kept in
-# hel\work\last-green.txt; with none on record, ALL), committed or not, plus untracked files.
+# D:\crulanda-work\last-green.txt; with none on record, ALL), committed or not, plus untracked files.
 #   - a script under Scripts/: every fixture whose test file names one of the script's classes (its file name before the
 #     first '.', so ActorVisual.Gear.cs counts as ActorVisual); a core class (EncounterSession, ZoneBuilder, ActorVisual,
 #     EncounterProgress, ...) is named by nearly every fixture, so it runs nearly all of them;
@@ -13,7 +13,7 @@ param([string]$Since = '')
 #   - art, shaders, prefabs, models, textures, docs and tools only: NONE (the build and the tours cover them).
 $repo = 'D:\code\mmo'; $git = 'C:\Program Files\Git\cmd\git.exe'
 $tests = Join-Path $repo 'New Unity Project\Assets\Crulanda\Tests\PlayMode'
-if (-not $Since) { $f = 'C:\Users\chris\Documents\Codex\2026-09-28\hel\work\last-green.txt'; if (Test-Path $f) { $Since = (Get-Content $f -TotalCount 1).Trim() } }
+if (-not $Since) { $f = 'D:\crulanda-work\last-green.txt'; if (Test-Path $f) { $Since = (Get-Content $f -TotalCount 1).Trim() } }
 if (-not $Since) { 'ALL'; exit 0 }
 $changed = @(& $git -C $repo diff --name-only $Since) + @(& $git -C $repo ls-files --others --exclude-standard)
 $changed = $changed | Where-Object { $_ } | Sort-Object -Unique

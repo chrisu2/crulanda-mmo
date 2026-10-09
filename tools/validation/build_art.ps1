@@ -1,7 +1,7 @@
 # Generates new art assets (textures, materials: ZoneSceneBuilder.EnsureArt) in the validation copy and brings them back into the
 # repo, so the next mirror does not delete them. Run after adding or changing generated art. Runs the art build twice: a new
 # shader is only found by Shader.Find once Unity has imported it.
-$v = if ($env:CRULANDA_VCOPY) { $env:CRULANDA_VCOPY } else { 'C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation' }   # lane B sets CRULANDA_VCOPY (full_run.ps1)
+$v = if ($env:CRULANDA_VCOPY) { $env:CRULANDA_VCOPY } else { 'D:\crulanda-work\encounter-validation' }   # lane B sets CRULANDA_VCOPY (full_run.ps1)
 $unity = 'D:\unity\Hub\Editor\6000.6.3f1\Editor\Unity.exe'
 $repo = 'D:\code\mmo\New Unity Project\Assets'
 robocopy $repo (Join-Path $v 'Assets') /MIR /NFL /NDL /NJH /NJS /NP | Out-Null

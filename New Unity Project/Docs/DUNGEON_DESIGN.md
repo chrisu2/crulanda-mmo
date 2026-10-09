@@ -273,7 +273,8 @@ the next dungeon.
    the Rail Hall as one cavern system under the Peaks' Sealed Adit. Lights by part.
 2. **Boss mechanics:**
    - phase triggers at health thresholds (stun the party, a weapon change, summon guards, aggro reset, terrify, knockback);
-   - a two-part fight (machine, then pilot).
+   - a two-part fight (machine, then pilot). *Built 2026-10-09 (D5): the Rock-Eater is a second elite of Nix's camp, Nix rides inside it,
+     unseen and out of reach, and jumps out at the wreck when it breaks (EncounterSession.RockEater.cs, ActorLook.RockEater).*
 3. **Dungeon objects:** *Done 2026-10-09 (D3): the cage-lift is a gate at the stair's head (Chris), the sigils are kept once
    won, the platform gate opens quietly (The Pressed) or loudly (powder), the spirit stone, the Quiet Miner (one visit in five);
    the Foreman's short way back to the Gallery is not built yet.*

@@ -1819,3 +1819,17 @@ A read-only review by five reviewers, each finding checked by a second who tried
   half the lock, the geodes dark and kept over a reload; her fall and return); QuestDataTests for the eighth quest and its flag.
 - Full run: EditMode 440/440, PlayMode 254/254 (every fixture), build and the Adit's tour clean, 0 shader errors. The full run's lane B
   builds a Development player (the tours need it); tools/validation/release_build.ps1 now makes the release build that gets published.
+
+## 2026-10-09 — Nix and the Rock-Eater: the two-part fight (dungeon step D5, first part)
+- **The Rock-Eater** (GAME-ONLY): the goblin boring-engine is no longer a prop in the Geode Floor's workshop but a second elite of
+  Nix's camp, with a figure of its own (`ActorLook.RockEater`: a rust hull on tracks, the pilot's seat, a stack, a turning drill) and
+  its own move, Bore (a drill blow that throws you back 4 m; its horn calls the workshop guards). Nix's camp spawns it beside him.
+- **Nix rides inside it** (`EncounterEnemy.HideInside`): unseen, untargetable, beyond harm and deaf to calls; walking up to the engine
+  brings nothing out. When the engine breaks he jumps out at the wreck with his spanner and comes for whoever broke it (Spanner-Lock,
+  the 4 s disarm, as before). Together the two are about one and three-quarter elites of health (the engine .95, Nix .8).
+- The Amber Sigil and the camp's deed come from Nix alone: a camp's key and deed now go to its *named* elite (`NamedElite`), and the
+  machine's id names no camp, so its corpse rolls plain loot, not Nix's pieces. Both come back with the camp, Nix inside again
+  (`EncounterSession.EnemyRespawned`). A dead machine stays where it stopped, tipped a little.
+- Tests: RockEaterTests (new, PlayMode: inside, out at the wreck and on you, the sigil and deed from Nix, both back with Nix inside);
+  BossPhaseTests checks the Bore's knockback.
+- Docs: CLASS_STATUS.md (new): the seven classes' state, complete for cap 15, what the cap of 30 needs.

@@ -57,14 +57,24 @@ namespace Crulanda.Encounter
             lungeUntil = Time.time + 1.1f;
             session.FloatText(transform.position + Vector3.up * .6f, "!", new Color(1, .35f, .2f));
         }
-        /// <summary>Up out of hiding when the session says so (Rail-Captain Danner at the Weaver's half-matched lock), and after
-        /// <paramref name="at"/> if it is not in a fight already.</summary>
+        /// <summary>The machine it rides (Nix in the Rock-Eater, D5): hidden inside it, unseen and out of reach, until it breaks.</summary>
+        public EncounterEnemy Inside { get; private set; }
+        /// <summary>Climbs into <paramref name="machine"/>: hidden, invisible, deaf to calls and beyond harm until the session brings it out (Rise).</summary>
+        public void HideInside(EncounterEnemy machine)
+        {
+            if (machine == null || !actor.IsAlive) return;
+            Inside = machine; Hide(); Shown(false);
+        }
+        /// <summary>Up out of hiding when the session says so (Rail-Captain Danner at the Weaver's half-matched lock; Nix out of the broken
+        /// Rock-Eater), and after <paramref name="at"/> if it is not in a fight already.</summary>
         public void Rise(Actor at)
         {
             if (!actor.IsAlive) return;
+            if (Inside != null) { Inside = null; Shown(true); }
             if (Hidden) Unhide();
             if (at != null && !Engaged) threat.Add(at.EntityId.Value, JoinThreat);
         }
+        void Shown(bool on) { var body = transform.Find("Body"); if (body != null) foreach (var r in body.GetComponentsInChildren<Renderer>(true)) r.enabled = on; }
         /// <summary>Springs out at the player: a fast lunge, a snarl, and straight into the fight.</summary>
         void Pounce()
         {
@@ -152,6 +162,7 @@ namespace Crulanda.Encounter
             if (joinAt >= 0 && Time.time >= joinAt) Join();   // it heard a call a beat ago: now it comes
             if (Hidden)
             {
+                if (Inside != null) return;   // riding its machine: it comes out when the session says (the machine broke), not before
                 // Noticing the player: about 8 m normally, 3 m if they sneak (Ctrl), never while they are dead.
                 var motor = session.Player.GetComponent<AdventurerMotor>();
                 float notice = Mathf.Max(1.5f, (motor != null && motor.Sneaking ? 3 : 8) - session.Kit.NoticeShrink);
@@ -225,7 +236,7 @@ namespace Crulanda.Encounter
         public void Stagger(float seconds) { if (seconds > 0 && actor.IsAlive) swing = Mathf.Max(swing, Time.time) + seconds; }
         public void Receive(int damage, Actor source)
         {
-            if (!actor.IsAlive) return;
+            if (!actor.IsAlive || Inside != null) return;   // inside its machine, nothing reaches it
             if (Hidden) Pounce();
             if (TappedBy == null && source != null && !Game) TappedBy = source.EntityId.Value;
             int actual = actor.GetComponent<Combatant>().Damage(Mathf.RoundToInt(damage * session.Kit.PartyDamageMultiplier(this) * OverTakenNow));
@@ -242,6 +253,7 @@ namespace Crulanda.Encounter
             if (agent.isOnNavMesh) agent.isStopped = true;
             var visual = transform.Find("Body");
             if (Game) GetComponent<GameAnimal>()?.Fall();   // on its side on the ground, not tipped from an actor's height
+            else if (Figure != null && Figure.Look == ActorLook.RockEater) { if (visual != null) { visual.localRotation = Quaternion.Euler(0, 0, 14); visual.localPosition = new Vector3(0, -.25f, 0); } }   // a machine breaks down where it stands
             else if (visual != null) { visual.localRotation = Quaternion.Euler(0, 0, 90); visual.localPosition = new Vector3(0, -.6f, 0); }
             respawnAt = Time.time + RespawnSeconds;
             DeathCall();   // a boss's relief patrol (EncounterEnemy.Boss)
@@ -264,6 +276,8 @@ namespace Crulanda.Encounter
             if (agent.isOnNavMesh) agent.isStopped = false;
             if (Game) GetComponent<GameAnimal>()?.Stand();
             if (Ambusher) Hide();
+            Inside = null; Shown(true);
+            session.EnemyRespawned(this);   // a rider and its machine pair up again (EncounterSession.RockEater)
         }
         public void RestoreDead()
         {

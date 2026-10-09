@@ -9,7 +9,7 @@ records where each of its phases stands and the order of the work. Update it eve
 |---|---|---|
 | 0 | Foundation | Done |
 | 1 | Combat sandbox | Done: shared abilities, threat, elites, level scaling (mobs above you hit harder, red at +3), crowd control (CC_DESIGN.md) |
-| 2 | Class loops | Seven classes (Warrior, Druid, Paladin, Ranger, Mage, Rogue, Archivist), talent rows 1-3 (rows 4-6 come with levels 16-30); Mira's healer kit |
+| 2 | Class loops | Seven classes (Warrior, Druid, Paladin, Ranger, Mage, Rogue, Archivist), complete for the cap of 15; deeper talents for 16-30 wait on Phase 9 (CLASS_STATUS.md has each class's state); Mira's healer kit |
 | 3 | Inventory, items, vendors | Done: bags, gear and looks, named loot and legendaries, vendors, professions and crafting, chests, quest gear (2026-10-09) |
 | 4 | Questing | Done: five zones of quests, the chronicle, notice boards and bounties, discoveries, achievements |
 | 5 | **SimAdventurers** (the brief's "most important feature") | Done (5.0-5.7, 2026-10-07) |

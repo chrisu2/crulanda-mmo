@@ -431,18 +431,9 @@ namespace Crulanda.World
                 }
                 if (shop >= 0)
                 {
-                    // The Rock-Eater: a goblin boring-engine (GAME-ONLY) at rest against the far wall, its drill toward the rock.
-                    float s0 = h.Along[shop] + 3; var q = Along(s0); var at = On(s0, h.Half[shop] * .35f);
-                    if (Free(at))
-                    {
-                        Part(PrimitiveType.Cube, t, at + q * new Vector3(0, 1.1f, 0), new Vector3(2.2f, 1.6f, 2.8f), rust, q);
-                        Part(PrimitiveType.Cube, t, at + q * new Vector3(0, 2.1f, -.4f), new Vector3(1.2f, .6f, 1.2f), iron, q);   // the pilot's seat
-                        if (cone == null) cone = ZoneMeshes.Cone(1, 1);
-                        MeshPart(cone, t, at + q * new Vector3(0, 1.1f, 1.4f), iron, q * Quaternion.Euler(90, 0, 0)).transform.localScale = new Vector3(.9f, 1.6f, .9f);   // the drill
-                        foreach (int side in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, at + q * new Vector3(side * 1.2f, .4f, 0), new Vector3(.4f, .8f, 3), dark, q);   // tracks
-                        Part(PrimitiveType.Cylinder, t, at + q * new Vector3(.6f, 2.4f, -1), new Vector3(.25f, .6f, .25f), iron, q);   // its stack
-                        Block(at, new Vector3(2.8f, 2.4f, 4.4f), q);
-                    }
+                    // The Rock-Eater, the goblin boring-engine (GAME-ONLY), is no longer a prop here: it is the camp's machine, which Nix
+                    // rides (EncounterSession.RockEater, ActorLook.RockEater; D5). The workshop keeps its crates, scrap and light.
+                    float s0 = h.Along[shop] + 3; var q = Along(s0);
                     for (int k = 0; k < 4; k++) Crate(On(s0 - 7 + k * 1.3f, -h.Half[shop] * .6f), q, 1 + k % 2, k % 2 == 0);
                     for (int k = 0; k < 6; k++) Lump(BoulderAt(k), t, On(s0 - 3 + A() * 6, -h.Half[shop] * (.2f + A() * .3f)) + Vector3.up * .1f, Vector3.one * (.25f + A() * .2f), rust, A() * 360);   // scrap
                     Glow(t, On(s0, 0) + Vector3.up * 4, 18, .9f, new Color(.9f, .6f, 1), .9f);

@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Crulanda.Encounter
 {
-    public enum ActorLook { Warrior, Druid, Healer, Collector, Warden, Sentry, Outrider, Pale, Villager, Hollow, Cultist, Wolf, Boar, WeaveEater, Deserter, BanditKing, Keeper, Stag, Spider, Bramble, Bear, Skeleton, Paladin, Ranger, Mage }
+    public enum ActorLook { Warrior, Druid, Healer, Collector, Warden, Sentry, Outrider, Pale, Villager, Hollow, Cultist, Wolf, Boar, WeaveEater, Deserter, BanditKing, Keeper, Stag, Spider, Bramble, Bear, Skeleton, Paladin, Ranger, Mage, RockEater }
     /// <summary>Body language layered over walking: working a hoe or bucket, talking, sitting, cowering.</summary>
     public enum ActorPose { None, Work, Talk, Sit, Cower, Hammer, Chop, Gather, Knead, Swim, Sneak, Drink, Slump }
 
@@ -407,6 +407,7 @@ namespace Crulanda.Encounter
             var capsule = body.GetComponent<MeshRenderer>(); if (capsule != null) capsule.enabled = false;
             if (look == ActorLook.WeaveEater) { BuildEater(); lastPosition = transform.position; return; }
             if (look == ActorLook.Pale) { BuildPale(); lastPosition = transform.position; return; }
+            if (look == ActorLook.RockEater) { BuildRockEater(); lastPosition = transform.position; return; }   // the goblin boring-engine (ActorVisual.Machine.cs)
             if ((look == ActorLook.Wolf || look == ActorLook.Stag || look == ActorLook.Boar || look == ActorLook.Bear || look == ActorLook.Spider) && BuildModelBeast(look)) { lastPosition = transform.position; return; }   // ActorVisual.Beasts.cs
             if (look == ActorLook.Stag) { BuildStag(); lastPosition = transform.position; return; }
             if (look == ActorLook.Spider) { BuildSpider(); lastPosition = transform.position; return; }
@@ -941,6 +942,7 @@ namespace Crulanda.Encounter
             if (core != null) { Drift(); return; }
             if (beastModel != null) { BeastLate(); return; }
             if (model != null) { ModelLate(); return; }
+            if (drill != null) { MachineLate(); return; }
             if (body == null || legL == null) return;
             // Swimming: the kit goes on the back, so no sword stands out of the water like a mast; out of a fight too (playtest note 79).
             bool stow = Pose == ActorPose.Swim || (Fighting != null && !Fighting(gameObject) && !Casting);

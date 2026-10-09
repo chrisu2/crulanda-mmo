@@ -80,9 +80,13 @@ namespace Crulanda.Encounter
                 deathCall = 3, deathText = "Boots in the drift behind: Lusk's relief shift walks in, three of them.",   // the first boss: a lesson, not a wall (the paper fight: his two guards answer, nobody else)
                 call = "Lusk roars: \"Overseers! Earn your cut!\"", callShort = "Earn your cut!",
                 enrage = "Lusk throws the tally book down and comes round the table." },
-            new EliteMove { mob = "Nix, the turncoat", name = "Spanner-Lock", windup = 1.6f, blow = 3.6f, reach = 3.4f, every = 9, disarm = 4,
+            // Nix's two-part fight (D5): first his engine, then him on foot. Together about one and three-quarter elites of health.
+            new EliteMove { mob = "The Rock-Eater", name = "Bore", windup = 2, blow = 3.8f, reach = 3.6f, every = 10, knock = 4, health = .95f, callReach = 14, callMost = 2,
+                call = "The Rock-Eater's horn blares across the workshop. The guards come running.", callShort = "Horn",
+                enrage = "Black smoke pours from the Rock-Eater's stack and the drill screams." },
+            new EliteMove { mob = "Nix, the turncoat", name = "Spanner-Lock", windup = 1.6f, blow = 3.6f, reach = 3.4f, every = 9, disarm = 4, health = .8f,
                 call = "Nix shrieks: \"Get them off me!\"", callShort = "Get them off me!",
-                enrage = "Nix's hands blur over the engine's controls." },
+                enrage = "Nix stops dodging and comes at you with the spanner in both hands." },
             new EliteMove { mob = "Cinder-Warden Ysolt", name = "Ember Blow", windup = 2, blow = 4.2f, reach = 3.8f, every = 10, callReach = 14, callMost = 2,
                 knock = 5, ringEvery = 15, ringReach = 4.5f, ringBlow = 1.6f, ringName = "Flame Ring",
                 call = "Ysolt lifts the brand: \"The fire sees you.\"", callShort = "The fire sees you",

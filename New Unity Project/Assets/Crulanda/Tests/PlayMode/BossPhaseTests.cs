@@ -54,6 +54,7 @@ namespace Crulanda.Tests
             Assert.IsTrue(foreman.phases.Any(p => p.kind == "reset") && foreman.phases.Any(p => p.kind == "terrify")); Assert.Greater(foreman.blinkEvery, 0);
             var ysolt = EliteMoves.For("Cinder-Warden Ysolt", false); Assert.Greater(ysolt.knock, 0); Assert.Greater(ysolt.ringEvery, 0);
             Assert.Greater(EliteMoves.For("Nix, the turncoat", false).disarm, 0);
+            Assert.Greater(EliteMoves.For(EncounterSession.RockEaterName, false).knock, 0, "the Rock-Eater's drill throws you back");
             Assert.IsTrue(EliteMoves.For("Rail-Captain Orsk Danner", false).callOnPull);
             Assert.AreEqual(3, EliteMoves.For("Gang-Boss Haddo Lusk", false).deathCall);
         }

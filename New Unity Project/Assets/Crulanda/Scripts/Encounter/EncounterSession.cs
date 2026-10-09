@@ -1491,6 +1491,7 @@ namespace Crulanda.Encounter
                     enemy.HitBase = EncounterEnemy.MobHit(level, false, elite || tough);
                     if (elite) a.transform.localScale = Vector3.one * 1.18f; else if (tough) a.transform.localScale = Vector3.one * 1.08f;
                     ConfigureSocial(enemy, camp, c, level, beast);   // its kind, its kin and, for the elite, its move (EncounterSession.Social)
+                    if (elite && camp.mob == NixName) SpawnRockEater(enemy, camp, c, level);   // his engine, and him inside it (EncounterSession.RockEater)
                 }
             }
             SpawnOutliers();
@@ -1931,8 +1932,9 @@ namespace Crulanda.Encounter
             // A sim's kill (it hit first, out of your party): nothing for you, no loot on the body (Phase 5.3a; classic tagging).
             if (enemy.TappedBy != null && enemy.TappedBy != Player.EntityId.Value && PartyActor(enemy.TappedBy) == null) { if (Target == enemy) AutoAttack = false; return; }
             if (enemy.Camp) RollCorpse(enemy);   // the loot is decided as it dies, so the body can show it
-            if (enemy.Camp && enemy.Elite) { if (Feats != null) Feats.Slain(enemy.persistentId); else { var k = Achievements.EliteKey(enemy.persistentId); if (k != null && !Progress.elitesSlain.Contains(k)) Progress.elitesSlain.Add(k); } }
+            if (NamedElite(enemy)) { if (Feats != null) Feats.Slain(enemy.persistentId); else { var k = Achievements.EliteKey(enemy.persistentId); if (k != null && !Progress.elitesSlain.Contains(k)) Progress.elitesSlain.Add(k); } }   // the camp's own elite, not a machine it rides
             if (enemy.Camp) TakeKey(enemy);   // a sigil boss's key (EncounterSession.Adit.cs)
+            BreakOut(enemy);   // the Rock-Eater's rider jumps out (EncounterSession.RockEater.cs)
             OnKillEffects();
             int before = Progress.Level;
             int xp = EncounterProgress.KillXp(enemy.actor.Level, Progress.Level, enemy.Elite || enemy.Tough);

@@ -40,7 +40,7 @@ namespace Crulanda.Encounter
         /// <summary>An elite carrying a key, dead by your hand or your party's: the key is yours, once.</summary>
         void TakeKey(EncounterEnemy e)
         {
-            var camp = CampOf(e); if (camp == null || string.IsNullOrEmpty(camp.key) || !e.Elite || Progress.keys.Contains(camp.key)) return;
+            var camp = CampOf(e); if (camp == null || string.IsNullOrEmpty(camp.key) || !NamedElite(e) || Progress.keys.Contains(camp.key)) return;   // Nix carries it, not his engine
             Progress.keys.Add(camp.key);
             var keyed = KeyCamps(); int have = KeysHeld(keyed);
             FloatText(e.transform.position + Vector3.up * 1.2f, char.ToUpperInvariant(camp.keyName[0]) + camp.keyName.Substring(1), new Color(1, .82f, .35f));

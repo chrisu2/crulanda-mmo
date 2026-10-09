@@ -9,7 +9,18 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-10-09, 18:50) — D4 (the Weaver's escort) done, full run green, release build PUBLISHED
+## RESUME HERE (updated 2026-10-09, 20:00) — D4 published; D5 part 1 (Nix and the Rock-Eater) committed; the rest of D5 next
+**Since the publish (committed, not yet in a build):** Nix's two-part fight (CHANGELOG 2026-10-09 "Nix and the Rock-Eater"): the engine is
+a second elite of his camp with its own figure (ActorLook.RockEater) and move (Bore), Nix rides inside it unseen until it breaks
+(EncounterSession.RockEater.cs, EncounterEnemy.HideInside/Inside); RockEaterTests 2/2, BossPhase/AditGate/Adit/EliteBalance green.
+Docs/CLASS_STATUS.md (new) has every class's state: all seven complete for cap 15; deeper talents wait on Phase 9.
+**Mira's Hush is already built** (HealerCompanion.Hush, with C5): the earlier "not yet" was stale. Only the "when you ask" half (a key or
+button) is missing, and it is not needed.
+**Next:** the rest of D5: mobs that flee at low health (the Breach's crawlers, the bats when they exist) and the carriage gunner firing
+from the roof (a ranged MobCast); then D7 (sims through the wings in order, waiting at gates, joining the escort), D8 (the rail ride
+out); then a full run, release_build.ps1, publish, back up, push.
+
+## Earlier resume note (2026-10-09, 18:50) — D4 (the Weaver's escort) done, full run green, release build PUBLISHED
 **Playable build = D4 (commit 5f90443 + the docs commit after it), a release build published 18:45 to D:\crulanda-work\outputs; backed
 up to E:, pushed.** Full run: EditMode 440/440, PlayMode 254/254 (every fixture), build and the Adit tour clean, 0 shader errors.
 **D4** (CHANGELOG 2026-10-09 "The Weaver's unlocking"): Mother Quillet (AditWeaver.cs, EncounterSession.Weaver.cs) waits by the platform

@@ -1731,3 +1731,23 @@ A read-only review by five reviewers, each finding checked by a second who tried
   bar on the nameplate and the target frame ("interrupt it"); any silence, stun, hold or fear interrupts it, and a silenced mob can't
   begin one. Mira hushes a cast past its first third every 15 s; party sims with an interrupt (Rogue, Archivist, Warrior, Paladin,
   Mage) stop casts in their reach every 12 s and say so. Tests: CrowdControlTests (a ring, an interrupt, a mender's heal).
+
+## 2026-10-08 — The Sealed Adit's bosses get their mechanics (dungeon step D2)
+- A boss-phase system (EncounterEnemy.Boss): moments at health marks (stamp, terrify, reset, rally), a call when first attacked, a
+  relief patrol when it dies, a knockback on its heavy blow (only ever onto walkable ground), a disarm, a burst round it, a blink.
+- You can now be stunned (no moving, no abilities, no swings) and disarmed (no swings or weapon moves; spells still work).
+- Gang-Boss Lusk: when he dies, three of his kind walk in. Nix: Spanner-Lock disarms you 4 s. Cinder-Warden Ysolt: Ember Blow
+  knocks you back 5 m; Flame Ring bursts round her every 15 s. The Foreman Who Forgot: blinks behind you every 14 s, forgets whom he
+  fought at half health, terrifies (a 3 s stun) at a quarter. Quartermaster Sorrel: stamps at two thirds and one third (a 2 s stun)
+  and comes back each time with a heavier weapon (+25%). Rail-Captain Danner: his guards step out when he is attacked, and more at half.
+- Not yet: Nix's Rock-Eater (the two-part fight), the Weaver's escort, gates and the cage-lift (D3-D4). Tests: BossPhaseTests.
+
+## 2026-10-08 — The Sealed Adit's quests and the Adit-Runner's Kit (DUNGEON_DESIGN sections 6-7)
+- Six of the seven quests: Under the Toll (Yara Quell: Lusk's tally book), Echoes in the Stone (Maddoc Vire: three echo-jars from
+  the Hollow Men), What the Grey Takes (Tarsk: a shard of unmade stone from the Foreman), Embers Below (Ansel Morrow in Khaven:
+  Ysolt's brand), The Dead Line (Yara, after the first: Danner, and his sealed letter), A Letter Under Seal (to Maddoc; leads to
+  the next dungeon, later). Existing NPCs stand in for the design's Pass-trader, Silent Pilgrim, Salt-Mender and Gallows-keeper.
+  The Pressed (open five cages) waits for the cages (D3); The Dead Line's escort waits for D4 (for now: kill Danner).
+- The Adit-Runner's Kit (set.adit, rare, five pieces): the Borer Bit (Nix), the Cinder-Warden's Sabatons (Ysolt), the Foreman's
+  Unmade Breeches, the Quartermaster's Gauntlets, the Rail-Captain's Coat; +40 health at three, +10 attack power at five.
+- Knockback fix: it traced from the body a metre above the ground and never moved anyone; it now traces along the ground.

@@ -41,6 +41,7 @@ namespace Crulanda.Encounter
         bool TickElite()
         {
             float ratio = actor.Health.Pool.Ratio;
+            TickBoss();   // phases, rings, blinks, calls (EncounterEnemy.Boss)
             if (!Enraged && ratio <= Move.enrageAt) Enrage();
             if (!rallied && ratio <= Move.callAt) { rallied = true; if (!string.IsNullOrEmpty(Move.call)) session.Rally(this, Victim); }
             if (!WindingUp) return false;
@@ -77,7 +78,8 @@ namespace Crulanda.Encounter
                 session.Message(v == session.Player ? "You step clear of " + Move.name + "." : Move.name + " falls on empty ground.");
                 return;
             }
-            int damage = session.Kit.ResolveEnemyHit(this, v, Mathf.RoundToInt(HitBase * Move.blow * OverHitNow * GroupDamageScale));
+            int damage = session.Kit.ResolveEnemyHit(this, v, Mathf.RoundToInt(HitBase * Move.blow * weaponUp * OverHitNow * GroupDamageScale));
+            AfterBlow(v);   // knockback, disarm (EncounterEnemy.Boss)
             session.FloatText(v.transform.position + Vector3.up * .3f, Move.name + " −" + damage, RageColor);
             session.Message(Name + "'s " + Move.name + " hits " + (v == session.Player ? "you" : v.DisplayName) + " for " + damage + ".");
         }
@@ -99,7 +101,7 @@ namespace Crulanda.Encounter
         /// <summary>The fight is over for it: no enrage, and it may call again next time.</summary>
         void Soothe()
         {
-            rallied = false;
+            rallied = false; ResetBoss();
             if (!Enraged) return;
             Enraged = false; transform.localScale = calmScale;
         }

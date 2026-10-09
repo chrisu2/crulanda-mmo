@@ -236,6 +236,7 @@ namespace Crulanda.Encounter
             if (Game) GetComponent<GameAnimal>()?.Fall();   // on its side on the ground, not tipped from an actor's height
             else if (visual != null) { visual.localRotation = Quaternion.Euler(0, 0, 90); visual.localPosition = new Vector3(0, -.6f, 0); }
             respawnAt = Time.time + RespawnSeconds;
+            DeathCall();   // a boss's relief patrol (EncounterEnemy.Boss)
             session.EnemyDied(this);
         }
         /// <summary>Camp mobs come back somewhere in their camp, whole, forgetting the fight.</summary>

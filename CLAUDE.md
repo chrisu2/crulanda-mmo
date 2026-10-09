@@ -14,7 +14,7 @@ Single-player simulated MMORPG. Read `New Unity Project/Docs/GAME_BRIEF.md` firs
 | Work folder (not in git; replaces the old `C:\...\Codex\2026-09-28\hel`, lost with C: on 2026-10-09) | `D:\crulanda-work` |
 | Validation copy (tests and builds run here) | `D:\crulanda-work\encounter-validation` |
 | Playable build | `D:\crulanda-work\outputs\Crulanda-Playable\Crulanda.exe` |
-| Chris's save (Unity's default place, so it stays on C:) | `C:\Users\chris\AppData\LocalLow\Crulanda\Crulanda - The Quiet Trail\CrulandaEncounter` |
+| Chris's save (Unity's default place, so it stays on C:; the Windows account is `ChrisWin11` since 2026-10-09, and the old save was lost with C:) | `C:\Users\ChrisWin11\AppData\LocalLow\Crulanda\Crulanda - The Quiet Trail\CrulandaEncounter` |
 | Save backups | `D:\crulanda-work\save-backups` |
 | Screenshots | `D:\crulanda-work\world-captures`, `D:\crulanda-work\ui-captures` |
 | Handoff copy | `D:\crulanda-work\outputs\Crulanda-Claude-Handoff.md` |

@@ -9,6 +9,7 @@ Single-player simulated MMORPG. Read `New Unity Project/Docs/GAME_BRIEF.md` firs
 | Project and git repo (branch `main`) | `D:\code\mmo`; the Unity project is `D:\code\mmo\New Unity Project` |
 | GitHub (private, for Claude Code on the web; pushed 2026-10-08) | `https://github.com/chrisu2/crulanda-mmo` (remote `origin`, LFS on) |
 | Backup (full copy including `.git`) | `E:\claude\unity projects\mmo`; run `tools\Backup.ps1` |
+| Spare clone of GitHub (Chris's extra backup, 2026-10-09) | `D:\mmo clone\crulanda-mmo`: leave it alone; all work happens in `D:\code\mmo` |
 | Lore (novels, world bible, maps) | `D:\code\crulanda` |
 | Unity 6000.6.3f1 (editor) | `D:\unity\Hub\Editor\6000.6.3f1\Editor\Unity.exe`; Unity Hub is `C:\Program Files\Unity Hub\Unity Hub.exe` |
 | Work folder (not in git; replaces the old `C:\...\Codex\2026-09-28\hel`, lost with C: on 2026-10-09) | `D:\crulanda-work` |

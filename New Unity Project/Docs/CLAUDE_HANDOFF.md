@@ -9,17 +9,22 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-10-09, evening) — D4 (the Weaver's escort) written and focus-tested; full run, build and publish next
-**Done this session:** dungeon step D4 (CHANGELOG 2026-10-09 "The Weaver's unlocking"): Mother Quillet (AditWeaver.cs) waits by the
-platform gate after the quiet way in, walks to the carriage's lock as one of your party, two waves come for her, Danner lies in wait and
-stands up at half the lock, the geodes go dark and "adit.lock" is kept; Pib's eighth Adit quest "The Weaver's Lock" (flag `key:adit.lock`).
-Tests: AditWeaverTests (new), QuestDataTests updated; focused runs green (EditMode 35/35 QuestData/QuestLog/LootData, PlayMode 9/9
-AditWeaver/AditGate). `wip/d4-escort` is taken in by hand (its AditWeaver.cs, revised); the branch can go.
-**Next:** a full run (tools\validation\start_detached.ps1), then a release build, publish (the published build is from before D3), commit,
-back up, push. Then, in Chris's order: Nix's two-part fight, Mira's Hush, the rest of D5, D7 (sims join the escort and wait at gates), D8
-(the rail ride out); talent rows 4-6; the Medieval Village Kit (its zip was lost with C:: Chris must download it again).
-**Focused test runs:** tools\validation\focus_detached.ps1 -Runs "EditMode|<filter>|<tag>#PlayMode|<filter>|<tag>" -Log <file> runs
-run_focus.ps1 outside the agent shell's process tree and writes "DONE" at the end of the log.
+## RESUME HERE (updated 2026-10-09, 18:50) — D4 (the Weaver's escort) done, full run green, release build PUBLISHED
+**Playable build = D4 (commit 5f90443 + the docs commit after it), a release build published 18:45 to D:\crulanda-work\outputs; backed
+up to E:, pushed.** Full run: EditMode 440/440, PlayMode 254/254 (every fixture), build and the Adit tour clean, 0 shader errors.
+**D4** (CHANGELOG 2026-10-09 "The Weaver's unlocking"): Mother Quillet (AditWeaver.cs, EncounterSession.Weaver.cs) waits by the platform
+gate after the quiet way in, walks to the carriage's lock as one of your party, two waves come for her, Danner lies in wait and stands up
+at half the lock, the geodes go dark and "adit.lock" is kept; Pib's eighth Adit quest "The Weaver's Lock" (flag `key:adit.lock`); a HUD
+row and a nameplate for her. Tests: AditWeaverTests (new), QuestDataTests. `wip/d4-escort` is taken in by hand; the branch can go.
+**Not yet looked at by eye:** the lock plate on the carriage's platform side and Quillet herself (a villager figure scaled to .78 until
+there is a goblin figure). The Adit tour's "hollow hall" shot (world-captures/adit-86-hollow-hall.png) stands among the platform guards
+and the tour's player dies there: the tour's own doing, since before D4. Chris: play the quiet way (hand in The Pressed first).
+**Publishing:** full_run.ps1's lane B builds a DEVELOPMENT player (the tours need it; it carries the watermark). After a green run, run
+tools\validation\release_build.ps1: it builds the release player in lane B (--crulanda-release) and mirrors it into outputs\Crulanda-Playable
+(not while the game runs). Focused test runs: tools\validation\focus_detached.ps1 -Runs "EditMode|<filter>|<tag>#PlayMode|<filter>|<tag>"
+-Log <file> (runs run_focus.ps1 outside the agent shell's process tree; "DONE" ends the log).
+**Next (Chris's order):** Nix's two-part fight, Mira's Hush, the rest of D5, D7 (sims join the escort and wait at gates), D8 (the rail
+ride out); talent rows 4-6; the Medieval Village Kit (its zip was lost with C:: Chris must download it again).
 **Why the Claude app froze (found 2026-10-09 17:15; it was NOT Unity or long sessions):** at each turn's end the app shows a Windows
 toast; Windows notifications were off, and the notification service sometimes never answered, so the app's main process hung until
 Windows shut down (event log Microsoft-Windows-PushNotification-Platform/Operational: event 2416 with no 2418/3150 after it; WER:

@@ -1817,3 +1817,5 @@ A read-only review by five reviewers, each finding checked by a second who tried
   (the session's quest flags now read any `key:<id>` in `Progress.keys`). Eight Adit quests now.
 - Tests: AditWeaverTests (new, PlayMode: the quiet gate brings her and Danner lies in wait; the walk with both waves on her, Danner at
   half the lock, the geodes dark and kept over a reload; her fall and return); QuestDataTests for the eighth quest and its flag.
+- Full run: EditMode 440/440, PlayMode 254/254 (every fixture), build and the Adit's tour clean, 0 shader errors. The full run's lane B
+  builds a Development player (the tours need it); tools/validation/release_build.ps1 now makes the release build that gets published.

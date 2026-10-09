@@ -9,7 +9,17 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-10-08, night) — on GitHub; cloud sessions may have worked while the PC was off
+## RESUME HERE (updated 2026-10-09) — C: was lost; the project is safe; set-up before work
+**Chris lost his C: drive on 2026-10-09.** D: (the repo, Unity's editor, the lore) and the E: backup survived. Lost with C:: Git
+(reinstalled), the `hel` workspace (validation copy, playable build, save backups, screenshots, handoff copy) and Chris's save.
+New home for all of that: `D:\crulanda-work` (see CLAUDE.md).
+**D2 and the Adit quests were never committed.** Saved 2026-10-09 to the branch `wip/d2-adit-quests` (a58ea14, pushed, backed
+up); `main` is still 40a538f. Untested since the loss: test that branch in the new validation copy, fix, then merge to `main`.
+**Set-up still to do (Chris):** Unity Hub > Installs > Locate the D: editor and sign in; Python 3 on PATH; the validation copy
+(`robocopy "D:\code\mmo\New Unity Project" "D:\crulanda-work\encounter-validation" /E /XD Temp`); a fresh build to
+`D:\crulanda-work\outputs`. Then carry on with "Next" below.
+
+## Earlier resume note (2026-10-08, night) — on GitHub; cloud sessions may have worked while the PC was off
 **First, when the PC is back:** `git fetch`; look for `web/*` branches and draft PRs from Claude Code on the web, read
 `Docs/WEB_LOG.md`, test each in the validation copy, merge, build, publish, back up, push (`WEB_HANDOFF.md` section 5).
 **Repo:** private `https://github.com/chrisu2/crulanda-mmo` (origin, LFS), pushed 2026-10-08; push `main` after each commit.

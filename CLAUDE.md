@@ -10,21 +10,24 @@ Single-player simulated MMORPG. Read `New Unity Project/Docs/GAME_BRIEF.md` firs
 | GitHub (private, for Claude Code on the web; pushed 2026-10-08) | `https://github.com/chrisu2/crulanda-mmo` (remote `origin`, LFS on) |
 | Backup (full copy including `.git`) | `E:\claude\unity projects\mmo`; run `tools\Backup.ps1` |
 | Lore (novels, world bible, maps) | `D:\code\crulanda` |
-| Unity 6000.6.3f1 | `D:\unity\Hub\Editor\6000.6.3f1\Editor\Unity.exe` |
-| Validation copy (tests and builds run here) | `C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation` |
-| Playable build | `C:\Users\chris\Documents\Codex\2026-09-28\hel\outputs\Crulanda-Playable\Crulanda.exe` |
-| Chris's save | `C:\Users\chris\AppData\LocalLow\Crulanda\Crulanda - The Quiet Trail\CrulandaEncounter` |
-| Save backups | `C:\Users\chris\Documents\Codex\2026-09-28\hel\work\save-backups` |
-| Screenshots | `...\hel\work\world-captures`, `...\hel\work\ui-captures` |
-| Handoff copy | `...\hel\outputs\Crulanda-Claude-Handoff.md` |
+| Unity 6000.6.3f1 (editor) | `D:\unity\Hub\Editor\6000.6.3f1\Editor\Unity.exe`; Unity Hub is `C:\Program Files\Unity Hub\Unity Hub.exe` |
+| Work folder (not in git; replaces the old `C:\...\Codex\2026-09-28\hel`, lost with C: on 2026-10-09) | `D:\crulanda-work` |
+| Validation copy (tests and builds run here) | `D:\crulanda-work\encounter-validation` |
+| Playable build | `D:\crulanda-work\outputs\Crulanda-Playable\Crulanda.exe` |
+| Chris's save (Unity's default place, so it stays on C:) | `C:\Users\chris\AppData\LocalLow\Crulanda\Crulanda - The Quiet Trail\CrulandaEncounter` |
+| Save backups | `D:\crulanda-work\save-backups` |
+| Screenshots | `D:\crulanda-work\world-captures`, `D:\crulanda-work\ui-captures` |
+| Handoff copy | `D:\crulanda-work\outputs\Crulanda-Claude-Handoff.md` |
 
 ## Rules
-- Every file made for this game goes inside `D:\code\mmo`.
+- Every file made for this game goes inside `D:\code\mmo` (working copies, builds and captures go in `D:\crulanda-work`).
+- Keep nothing for this game on C: except Chris's save: C: was lost on 2026-10-09.
 - After a meaningful piece of work: commit, then run `tools\Backup.ps1`.
   - The backup is additive. `-Full` includes Library, and `-Mirror` makes an exact copy.
   - E: is the backup drive (J: was the old one). If E: is missing, say so.
 - Git:
-  - It's at `C:\Program Files\Git\cmd\git.exe` and not on the agent shell's PATH.
+  - It's at `C:\Program Files\Git\cmd\git.exe` (reinstalled 2026-10-09; may not be on the agent shell's PATH).
+  - `D:/code/mmo` is in the global `safe.directory` list (the folder belongs to the old Windows account).
   - The author is set in this repo's local config (`Chris Underwood <chrisu2@gmail.com>`), so a plain `git commit` works. There is no global identity.
   - Git LFS is enabled for this repo only (`.gitattributes` sends images, models and audio through it).
 - `D:\code` is a separate, unrelated repo (other projects, VM images and model weights, owned by an old Windows account).

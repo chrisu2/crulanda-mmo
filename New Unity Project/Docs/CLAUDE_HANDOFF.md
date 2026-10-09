@@ -22,8 +22,13 @@ and no scene, prefab or material referred to them); they are committed now. Comm
 **Branch `integrate/adit`** = main + `wip/d2-adit-quests` (D2 boss mechanics) + `web/adit-quests-loot` (the cloud's seven quests,
 four givers, cages, echo-jars, the Adit-Runner's Kit and The Dead Line's rewards). The local branch's own six quests and kit were
 dropped (Chris chose the cloud's). Fixed: the knockback stops at an edge (it gave up when the full distance was not walkable).
-First runs: EditMode 435/435, the Adit PlayMode set 36/36. A full run (-AllTests, build, tours) was started; if green: merge to
-`main`, publish the build to `D:\crulanda-work\outputs`, tick WEB_LOG, push, back up. Then carry on with "Next" below.
+**Quest gear (Chris: "do quest gear rewards first")** done on the same branch: QuestLog.GearRewards, The Dead Line's choice of
+three in the conversation, QuestGearTests; UI capture shots 43-44. Encounter.asset now registers Quests/adit.json and
+Items/loot.adit.json (only the validation copies had them). Full run: EditMode 440/440, PlayMode 245/245, build and tours clean
+(0 shader errors). Merged to `main` and published 2026-10-09 (Claude crashed once mid-run at 13:38; the rerun was green).
+**Next (Chris's order, 2026-10-09):** D3 gates and keys (the Pressed opens the quiet gate: `questsDone` has `side.adit.pressed`),
+D4 the Weaver's escort (and its step in The Dead Line), Nix's two-part fight, Mira's Hush, the rest of D5, D7, D8; talent rows 4-6;
+the Medieval Village Kit (its zip was in Downloads on C: and is lost: Chris must download it again).
 
 ## Earlier resume note (2026-10-08, night) — on GitHub; cloud sessions may have worked while the PC was off
 **First, when the PC is back:** `git fetch`; look for `web/*` branches and draft PRs from Claude Code on the web, read

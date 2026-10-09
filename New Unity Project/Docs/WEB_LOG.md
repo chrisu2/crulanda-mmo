@@ -43,5 +43,5 @@ WEB_HANDOFF task 1: the Sealed Adit's seven quests (DUNGEON_DESIGN.md 6) and its
     Khaven's wants Embers Below. Achievements.cs expected the dungeon to get deeds of its own; decide which.
   - `Items/loot.adit.json` and `Zones/adit.json` have no `.meta` in git (from the local WIP commit a14c39b). They were not added
     here so they don't clash with the local ones: commit the local `.meta` files.
-- **For Chris:** build quest gear rewards (a choice of one, at turn-in) as the next cloud task? It would hand out all 18 quest pieces.
-- [ ] tested and merged locally
+- **For Chris:** build quest gear rewards (a choice of one, at turn-in) as the next cloud task? It would hand out all 18 quest pieces. **Done locally 2026-10-09** (QuestLog.GearRewards; CHANGELOG).
+- [x] tested and merged locally (2026-10-09, on `integrate/adit` with the D2 branch: icons painted, adit.json and loot.adit.json registered and their .meta files made, EditMode 440/440, PlayMode 245/245, build and tours clean; merged to `main`)

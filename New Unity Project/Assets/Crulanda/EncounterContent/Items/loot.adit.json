@@ -238,6 +238,120 @@
       "strength": 13,
       "description": "A heater shield cut from a carriage plate. The rail's mark runs across it like a scar.",
       "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.runners_oilskin_hood",
+      "name": "Adit-Runner's Oilskin Hood",
+      "kind": "gear",
+      "slot": "head",
+      "quality": 3,
+      "level": 11,
+      "value": 48,
+      "armor": 29,
+      "stamina": 10,
+      "agility": 15,
+      "description": "The old line's cart-runners wore these against the drip. This one smells of engine oil and goblin.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.runners_hide_mantle",
+      "name": "Adit-Runner's Hide Mantle",
+      "kind": "gear",
+      "slot": "shoulders",
+      "quality": 3,
+      "level": 11,
+      "value": 48,
+      "armor": 29,
+      "stamina": 13,
+      "strength": 12,
+      "description": "A runner's shoulder-hide for carrying ore sacks. Someone in the vent has singed a ring into it.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.runners_hobnail_boots",
+      "name": "Adit-Runner's Hobnail Boots",
+      "kind": "gear",
+      "slot": "feet",
+      "quality": 3,
+      "level": 11,
+      "value": 48,
+      "armor": 29,
+      "stamina": 12,
+      "agility": 13,
+      "description": "Hobnailed for the rail-ties. They were standing in the grey drift, laced, with nobody in them.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.runners_rail_gloves",
+      "name": "Adit-Runner's Rail Gloves",
+      "kind": "gear",
+      "slot": "hands",
+      "quality": 3,
+      "level": 12,
+      "value": 52,
+      "armor": 31,
+      "stamina": 11,
+      "strength": 9,
+      "agility": 8,
+      "description": "The palms are worn smooth on brake-levers and the cage-lift's rope.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.runners_scale_jerkin",
+      "name": "Adit-Runner's Scale Jerkin",
+      "kind": "gear",
+      "slot": "chest",
+      "quality": 3,
+      "level": 12,
+      "value": 52,
+      "armor": 49,
+      "stamina": 14,
+      "strength": 7,
+      "agility": 7,
+      "description": "Iron scales sewn on leather, the old line's mark stamped on every one. The captain had it off a runner who no longer needed it.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.sleeper_splitter",
+      "name": "Sleeper-Splitter",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 3,
+      "level": 12,
+      "value": 73,
+      "weaponDamage": 38,
+      "stamina": 11,
+      "strength": 17,
+      "description": "A track-layer's axe, for cutting the line's ties to length. Yara never says where she got it.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.couplers_hook",
+      "name": "Coupler's Hook",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 3,
+      "level": 12,
+      "value": 73,
+      "weaponDamage": 38,
+      "stamina": 11,
+      "agility": 17,
+      "description": "The hooked knife that cuts a carriage loose from its train. Quick, and very sharp.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.weavers_tuning_drop",
+      "name": "Weaver's Tuning-Drop",
+      "kind": "gear",
+      "slot": "neck",
+      "quality": 3,
+      "level": 12,
+      "value": 52,
+      "stamina": 6,
+      "intellect": 12,
+      "spirit": 10,
+      "description": "A bead of goblin glass on a cord, traded up the pass years ago. Hold it to a lock and it hums the note the lock wants.",
+      "canonStatus": "GAME-ONLY"
     }
   ],
   "vendors": [],
@@ -360,6 +474,61 @@
       "source": "boss:Rail-Captain Orsk Danner",
       "boss": true,
       "unique": true
+    },
+    {
+      "id": "loot.adit.runners_oilskin_hood",
+      "look": "head.hood:oilskin/sandthrone",
+      "source": "boss:Nix, the turncoat",
+      "boss": true,
+      "unique": true,
+      "set": "set.adit_runner"
+    },
+    {
+      "id": "loot.adit.runners_hide_mantle",
+      "look": "shoulder.mantle:hide/sandthrone",
+      "source": "boss:Cinder-Warden Ysolt",
+      "boss": true,
+      "unique": true,
+      "set": "set.adit_runner"
+    },
+    {
+      "id": "loot.adit.runners_hobnail_boots",
+      "look": "feet.boots:hobnail/sandthrone",
+      "source": "boss:The Foreman Who Forgot",
+      "boss": true,
+      "unique": true,
+      "set": "set.adit_runner"
+    },
+    {
+      "id": "loot.adit.runners_rail_gloves",
+      "look": "hands.gloves:plain/sandthrone",
+      "source": "boss:Quartermaster Brannigan Sorrel",
+      "boss": true,
+      "unique": true,
+      "set": "set.adit_runner"
+    },
+    {
+      "id": "loot.adit.runners_scale_jerkin",
+      "look": "chest.jerkin:scale/sandthrone",
+      "source": "boss:Rail-Captain Orsk Danner",
+      "boss": true,
+      "unique": true,
+      "set": "set.adit_runner"
+    },
+    {
+      "id": "loot.adit.sleeper_splitter",
+      "look": "axe.bearded:plain/tollroad",
+      "source": "quest:side.adit.dead_line"
+    },
+    {
+      "id": "loot.adit.couplers_hook",
+      "look": "knife:hooked/tollroad",
+      "source": "quest:side.adit.dead_line"
+    },
+    {
+      "id": "loot.adit.weavers_tuning_drop",
+      "look": "neck.pendant:glass/pilgrim",
+      "source": "quest:side.adit.dead_line"
     }
   ],
   "drops": [
@@ -400,6 +569,15 @@
               "item": "loot.adit.turncoats_greasy_gloves"
             }
           ]
+        },
+        {
+          "chance": 0.2,
+          "lucky": true,
+          "pick": [
+            {
+              "item": "loot.adit.runners_oilskin_hood"
+            }
+          ]
         }
       ]
     },
@@ -423,6 +601,15 @@
               "item": "loot.adit.ash_red_pendant"
             }
           ]
+        },
+        {
+          "chance": 0.2,
+          "lucky": true,
+          "pick": [
+            {
+              "item": "loot.adit.runners_hide_mantle"
+            }
+          ]
         }
       ]
     },
@@ -441,6 +628,15 @@
             },
             {
               "item": "loot.adit.foremans_unmade_breeches"
+            }
+          ]
+        },
+        {
+          "chance": 0.2,
+          "lucky": true,
+          "pick": [
+            {
+              "item": "loot.adit.runners_hobnail_boots"
             }
           ]
         }
@@ -486,6 +682,15 @@
               "item": "loot.adit.platform_masters_greaves"
             }
           ]
+        },
+        {
+          "chance": 0.2,
+          "lucky": true,
+          "pick": [
+            {
+              "item": "loot.adit.runners_rail_gloves"
+            }
+          ]
         }
       ]
     },
@@ -509,9 +714,59 @@
               "item": "loot.adit.the_dead_line_shield"
             }
           ]
+        },
+        {
+          "chance": 0.2,
+          "lucky": true,
+          "pick": [
+            {
+              "item": "loot.adit.runners_scale_jerkin"
+            }
+          ]
         }
       ]
     }
   ],
-  "sets": []
+  "sets": [
+    {
+      "id": "set.adit_runner",
+      "name": "The Adit-Runner's Kit",
+      "pieces": [
+        "loot.adit.runners_oilskin_hood",
+        "loot.adit.runners_hide_mantle",
+        "loot.adit.runners_hobnail_boots",
+        "loot.adit.runners_rail_gloves",
+        "loot.adit.runners_scale_jerkin"
+      ],
+      "bonuses": [
+        {
+          "count": 3,
+          "effects": [
+            {
+              "kind": "stat",
+              "stat": "MaxHealth",
+              "amount": 50,
+              "text": "+50 health."
+            }
+          ]
+        },
+        {
+          "count": 5,
+          "effects": [
+            {
+              "kind": "stat",
+              "stat": "AttackPower",
+              "amount": 10,
+              "text": "+10 attack power."
+            },
+            {
+              "kind": "onKillHeal",
+              "amount": 20,
+              "text": "Each kill restores 20 health."
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }

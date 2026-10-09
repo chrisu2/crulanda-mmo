@@ -72,13 +72,13 @@ namespace Crulanda.Tests
             Assert.AreEqual(7, paths.Count, "Seven loot files: " + string.Join(", ", paths.Select(Path.GetFileName)));
             var items = LootTestData.Items(); var loot = LootTestData.Loot(items, LootTestData.Looks());
             var named = items.Items.Keys.Where(k => k.StartsWith("loot.", StringComparison.Ordinal)).ToList();
-            Assert.AreEqual(127, named.Count, "104 named items (ITEMS_V1.md), the five legendaries (2026-10-05) and the Sentinel's Helm (2026-10-07), and the Sealed Adit's seventeen (2026-10-08).");
-            Assert.AreEqual(109 + 17 + 13, loot.Gear.Count,   // and the Sealed Adit's seventeen
+            Assert.AreEqual(135, named.Count, "104 named items (ITEMS_V1.md), the five legendaries (2026-10-05) and the Sentinel's Helm (2026-10-07), the Sealed Adit's seventeen (2026-10-08), and its set of five and The Dead Line's three (web/adit-quests-loot).");
+            Assert.AreEqual(109 + 17 + 8 + 13, loot.Gear.Count,   // and the Sealed Adit's seventeen, its set of five and The Dead Line's three
  "A gear entry for each, and for the thirteen named items already in the game (the Sentinel's Helm the thirteenth, 2026-10-07).");
             Assert.AreEqual(12, loot.GearOrder.Count(g => g.legacy));
-            Assert.AreEqual(2, loot.Sets.Count, "Two sets.");
+            Assert.AreEqual(3, loot.Sets.Count, "Three sets: the Deserter King's Due, the Vigil and the Adit-Runner's Kit.");
             Assert.AreEqual(49, named.Count(id => items.Get(id).quality == 2), "49 uncommon.");
-            Assert.AreEqual(66, named.Count(id => items.Get(id).quality == 3), "66 rare (17 the Sealed Adit\'s) (the Sentinel's Helm the 49th, 2026-10-07).");
+            Assert.AreEqual(74, named.Count(id => items.Get(id).quality == 3), "74 rare (25 the Sealed Adit\'s) (the Sentinel's Helm the 49th, 2026-10-07).");
             Assert.AreEqual(7, named.Count(id => items.Get(id).quality == 4), "7 epic.");
         }
 
@@ -168,7 +168,7 @@ namespace Crulanda.Tests
                 Assert.AreEqual(gen.value, d.value, d.id + ": value is generated gear's.");
                 Assert.AreEqual(gen.level, d.level, d.id + ": required level is the curve level less one.");
             }
-            Assert.AreEqual(127, n, "110 of the five zones and the world, 17 of the Sealed Adit");
+            Assert.AreEqual(135, n, "110 of the five zones and the world, 25 of the Sealed Adit");
         }
 
         [Test] public void Named_gear_stat_budgets_hold()
@@ -229,10 +229,10 @@ namespace Crulanda.Tests
             var problems = LootDatabase.Validate(loot, LootTestData.Zones(), LootTestData.Quests());
             Assert.IsEmpty(problems, string.Join("\n", problems));
             var counts = loot.GearOrder.Where(g => !g.legacy).GroupBy(g => LootDatabase.SourceKind(g.source)).ToDictionary(x => x.Key, x => x.Count());
-            Assert.AreEqual(15, counts["quest"], "Fifteen quest rewards.");
+            Assert.AreEqual(18, counts["quest"], "Eighteen quest rewards (three of them The Dead Line's, side.adit.dead_line).");
             Assert.AreEqual(5, counts["vendor"], "Five vendor pieces.");
             Assert.AreEqual(6, counts["world"], "Six world drops.");
-            Assert.AreEqual(57, counts["boss"], "41 signature pieces (17 the Sealed Adit's), 5 from rare tables, 6 epics, 5 legendaries.");
+            Assert.AreEqual(62, counts["boss"], "41 signature pieces (17 the Sealed Adit's), 5 from rare tables, 6 epics, 5 legendaries, and the Adit-Runner's Kit's five.");
             Assert.AreEqual(44, counts["mob"], "44 from ordinary mobs.");
         }
 
@@ -306,20 +306,38 @@ namespace Crulanda.Tests
                 }
         }
 
+        /// <summary>
+        /// The two four-piece sets each include their boss's crown and switch on at two pieces. The Sealed Adit's (DUNGEON_DESIGN.md 7)
+        /// has five pieces, one from each of five bosses (the three sigil bosses, the Quartermaster and the Rail-Captain) on a lucky group
+        /// beside its signature list, and switches on at three and five.
+        /// </summary>
         [Test] public void Sets_have_real_pieces_in_distinct_slots_and_rising_bonuses()
         {
             var items = LootTestData.Items(); var loot = LootTestData.Loot(items);
-            CollectionAssert.AreEquivalent(new[] { "set.crowsfoot", "set.vigil" }, loot.Sets.Keys);
+            CollectionAssert.AreEquivalent(new[] { "set.crowsfoot", "set.vigil", "set.adit_runner" }, loot.Sets.Keys);
             foreach (var s in loot.SetOrder)
             {
-                Assert.AreEqual(4, s.pieces.Length, s.id + " has four pieces.");
+                bool adit = s.id == "set.adit_runner";
+                Assert.AreEqual(adit ? 5 : 4, s.pieces.Length, s.id + " has " + (adit ? "five" : "four") + " pieces.");
                 var slots = s.pieces.Select(p => items.Get(p).slot).ToList();
                 Assert.AreEqual(slots.Count, slots.Distinct().Count(), s.id + ": one piece per slot.");
-                Assert.IsTrue(s.pieces.Any(p => p.StartsWith("item.", StringComparison.Ordinal)), s.id + " includes its boss's existing crown.");
+                if (!adit) Assert.IsTrue(s.pieces.Any(p => p.StartsWith("item.", StringComparison.Ordinal)), s.id + " includes its boss's existing crown.");
                 int last = 1;
                 foreach (var b in s.bonuses) { Assert.Greater(b.count, last, s.id + ": bonuses rise."); Assert.LessOrEqual(b.count, s.pieces.Length); Assert.Greater(b.effects.Length, 0); last = b.count; }
-                Assert.AreEqual(2, s.bonuses[0].count, s.id + " starts at two pieces.");
+                Assert.AreEqual(adit ? 3 : 2, s.bonuses[0].count, s.id + " starts at " + (adit ? "three" : "two") + " pieces.");
                 foreach (var p in s.pieces) { Assert.AreEqual(s.id, loot.Meta(p).set, p + " names its set."); Assert.AreSame(s, loot.SetOf(p)); Assert.IsTrue(loot.Meta(p).unique, p + " is unique."); }
+                if (!adit) continue;
+                Assert.AreEqual(5, s.bonuses[s.bonuses.Length - 1].count, s.id + ": the last bonus wants all five.");
+                var bosses = s.pieces.Select(p => loot.Meta(p).source).ToList();
+                Assert.AreEqual(5, bosses.Distinct().Count(), s.id + ": each piece from a different boss.");
+                foreach (var p in s.pieces)
+                {
+                    Assert.AreEqual("boss", LootDatabase.SourceKind(loot.Meta(p).source), p + " drops from a boss.");
+                    var groups = loot.Drops.SelectMany(d => d.groups).Where(g => g.pick.Any(k => k.item == p)).ToList();
+                    Assert.AreEqual(1, groups.Count, p + " is on one drop group.");
+                    Assert.IsFalse(groups[0].signature, p + " is not on the boss's signature list (it rolls beside it).");
+                    Assert.IsTrue(groups[0].lucky, p + "'s group is lucky."); Assert.AreEqual(.2f, groups[0].chance, 1e-5f, p + " drops one kill in five.");
+                }
             }
         }
 

@@ -127,3 +127,12 @@ loot.adit.platform_masters_greaves
 loot.adit.rail_captains_coat
 loot.adit.danners_kettle_helm
 loot.adit.the_dead_line_shield
+# the Sealed Adit's set and The Dead Line's rewards (2026-10-08, web/adit-quests-loot)
+loot.adit.runners_oilskin_hood
+loot.adit.runners_hide_mantle
+loot.adit.runners_hobnail_boots
+loot.adit.runners_rail_gloves
+loot.adit.runners_scale_jerkin
+loot.adit.sleeper_splitter
+loot.adit.couplers_hook
+loot.adit.weavers_tuning_drop

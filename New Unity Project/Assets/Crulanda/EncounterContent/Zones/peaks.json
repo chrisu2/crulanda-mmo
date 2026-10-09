@@ -3,7 +3,7 @@
   "displayName": "The Shattered Peaks",
   "subtitle": "The Sandthrone toll road over the eastern border mountains",
   "canonStatus": "CANON-EXPANDED",
-  "canonNote": "Canon: the Shattered Peaks are a jagged range on the eastern border that holds back the Wasting while the void slowly eats through the stone (world_bible.md), and Sandthrone mercenaries hold them and charge a toll (book1 ch.5). GAME-ONLY / PROVISIONAL: this pass and its toll gate, the toll-house, the pilgrims' rest and its people, the ruined waystation, the pilgrims' cairns, the levelling camps and all placement. Mount Umbra is named on the game's world map image but not in the lore folder. The grown ring (2026-09-30): old mining tunnels under the Peaks are CANON (book2 ch.19), and so is the void eating the stone (world_bible.md); the signal tower, the goatherd's shieling, the sealed adit, the Cold Tarn, the Listening Shrine (the Silent Pilgrims are CANON), the Broken Post, the avalanche scar with its grey head, and their camps are GAME-ONLY. The filled-out ring (2026-10-03): Hollow Men out of the Sealed Adit (CANON creature, CANON tunnels), pale shadows at the Cold Tarn and one Pale Thing watching from under the Umbra scarp (CANON-EXPANDED: the Pale Things as watchers), grey-robed false pilgrims at the Broken Post (GAME-ONLY; the Silent Pilgrims are CANON and are not these), and their quests. Mountain bears in the high pines (2026-10-04): GAME-ONLY.",
+  "canonNote": "Canon: the Shattered Peaks are a jagged range on the eastern border that holds back the Wasting while the void slowly eats through the stone (world_bible.md), and Sandthrone mercenaries hold them and charge a toll (book1 ch.5). GAME-ONLY / PROVISIONAL: this pass and its toll gate, the toll-house, the pilgrims' rest and its people, the ruined waystation, the pilgrims' cairns, the levelling camps and all placement. Mount Umbra is named on the game's world map image but not in the lore folder. The grown ring (2026-09-30): old mining tunnels under the Peaks are CANON (book2 ch.19), and so is the void eating the stone (world_bible.md); the signal tower, the goatherd's shieling, the sealed adit, the Cold Tarn, the Listening Shrine (the Silent Pilgrims are CANON), the Broken Post, the avalanche scar with its grey head, and their camps are GAME-ONLY. The filled-out ring (2026-10-03): Hollow Men out of the Sealed Adit (CANON creature, CANON tunnels), pale shadows at the Cold Tarn and one Pale Thing watching from under the Umbra scarp (CANON-EXPANDED: the Pale Things as watchers), grey-robed false pilgrims at the Broken Post (GAME-ONLY; the Silent Pilgrims are CANON and are not these), and their quests. Mountain bears in the high pines (2026-10-04): GAME-ONLY. The Sealed Adit's quest-givers (2026-10-08): Pib, a goblin out of the Sandthrone's cages (goblins are CANON), Brother Cael, a Silent Pilgrim at the Listening Shrine (the order is CANON), and Lisle Tamber, a Salt-Mender scholar (the faction is CANON); all three people GAME-ONLY.",
   "size": 430,
   "levelMin": 9,
   "levelMax": 12,
@@ -2411,6 +2411,33 @@
         "at": {
           "x": -36,
           "y": 10
+        }
+      },
+      {
+        "name": "Pib",
+        "role": "stranger",
+        "title": "Escaped Goblin",
+        "at": {
+          "x": -23,
+          "y": 1
+        }
+      },
+      {
+        "name": "Brother Cael",
+        "role": "pilgrim",
+        "title": "Silent Pilgrim",
+        "at": {
+          "x": 6,
+          "y": 140
+        }
+      },
+      {
+        "name": "Lisle Tamber",
+        "role": "stranger",
+        "title": "Salt-Mender Scholar",
+        "at": {
+          "x": -6,
+          "y": -4
         }
       }
     ]

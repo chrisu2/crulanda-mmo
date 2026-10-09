@@ -107,11 +107,12 @@ namespace Crulanda.Encounter
         {
             if (who == null || !who.IsAlive || metres <= 0) return;
             var dir = Flat(who.transform.position - transform.position).normalized;
-            var to = who.transform.position + dir * metres;
-            // Bodies stand about a metre above the walkable mesh: trace along the mesh from under their feet, never through a wall or off an edge.
+            // Bodies stand about a metre above the walkable mesh: trace along the mesh from under their feet, never through a wall or off an
+            // edge. Short of walkable ground the full distance (a cliff, deep water, a cave wall), the throw stops at the edge.
             if (!NavMesh.SamplePosition(who.transform.position, out var from, 2.5f, NavMesh.AllAreas)) return;
-            if (!NavMesh.SamplePosition(to, out var hit, 2.5f, NavMesh.AllAreas)) return;
-            if (NavMesh.Raycast(from.position, hit.position, out var edge, NavMesh.AllAreas)) { if ((edge.position - from.position).magnitude < .5f) return; hit = edge; }
+            NavMeshHit hit;
+            if (NavMesh.Raycast(from.position, from.position + dir * metres, out var edge, NavMesh.AllAreas)) { if ((edge.position - from.position).magnitude < .5f) return; hit = edge; }
+            else if (!NavMesh.SamplePosition(from.position + dir * metres, out hit, 2.5f, NavMesh.AllAreas)) return;
             var motor = who.GetComponent<AdventurerMotor>();
             if (motor != null) motor.Teleport(hit.position + Vector3.up * (who.transform.position.y - from.position.y));
             else { var a = who.GetComponent<NavMeshAgent>(); if (a != null && a.isOnNavMesh) a.Warp(hit.position); }

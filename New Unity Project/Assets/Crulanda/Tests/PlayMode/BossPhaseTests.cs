@@ -75,6 +75,18 @@ namespace Crulanda.Tests
             e.actor.Health.ApplyDamage(Mathf.CeilToInt(e.actor.Health.Pool.Max * .15f));
             yield return Until(e, () => e.Victim == session.Player);
             Assert.AreEqual(session.Player, e.Victim, "with only you to fight, " + e.Name + " comes back to you");
+            // Stand beside it on open ground, room behind you to be thrown into (against a wall or an edge a knockback does nothing).
+            var motor = session.Player.GetComponent<AdventurerMotor>(); bool open = false;
+            UnityEngine.AI.NavMesh.SamplePosition(session.Player.transform.position, out var feet, 2.5f, UnityEngine.AI.NavMesh.AllAreas);
+            float lift = session.Player.transform.position.y - feet.position.y;
+            for (int i = 0; i < 8 && !open; i++)
+            {
+                var d = Quaternion.Euler(0, i * 45, 0) * Vector3.forward;
+                if (!UnityEngine.AI.NavMesh.SamplePosition(e.transform.position + d * 2.5f, out var f, 1.5f, UnityEngine.AI.NavMesh.AllAreas)) continue;
+                if (UnityEngine.AI.NavMesh.Raycast(f.position, f.position + d * 5, out _, UnityEngine.AI.NavMesh.AllAreas)) continue;
+                motor.Teleport(f.position + Vector3.up * lift); open = true;
+            }
+            Assert.IsTrue(open, "open ground beside " + e.Name);
             var before = session.Player.transform.position;
             e.Knock(session.Player, 4); yield return null;
             var moved = session.Player.transform.position - before; moved.y = 0;

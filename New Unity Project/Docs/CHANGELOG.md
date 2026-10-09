@@ -1741,7 +1741,9 @@ A read-only review by five reviewers, each finding checked by a second who tried
   fought at half health, terrifies (a 3 s stun) at a quarter. Quartermaster Sorrel: stamps at two thirds and one third (a 2 s stun)
   and comes back each time with a heavier weapon (+25%). Rail-Captain Danner: his guards step out when he is attacked, and more at half.
 - Not yet: Nix's Rock-Eater (the two-part fight), the Weaver's escort, gates and the cage-lift (D3-D4). Tests: BossPhaseTests.
-- Knockback fix: it traced from the body a metre above the ground and never moved anyone; it now traces along the ground.
+- Knockback fix: it traced from the body a metre above the ground and never moved anyone; it now traces along the ground, and
+  short of walkable ground the full distance (a cliff, deep water, a cave wall) it throws you to the edge instead of not at all
+  (2026-10-09, first run after losing C:; the test now stands you on open ground beside the elite).
 - (The local branch also had six Adit quests and its own Adit-Runner's Kit; Chris chose the cloud branch's seven quests and kit
   instead on 2026-10-09, so those were dropped in the merge.)
 

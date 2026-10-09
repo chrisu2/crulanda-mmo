@@ -76,7 +76,7 @@ namespace Crulanda.Tests
             Assert.AreEqual(109 + 17 + 13, loot.Gear.Count,   // and the Sealed Adit's seventeen
  "A gear entry for each, and for the thirteen named items already in the game (the Sentinel's Helm the thirteenth, 2026-10-07).");
             Assert.AreEqual(12, loot.GearOrder.Count(g => g.legacy));
-            Assert.AreEqual(3, loot.Sets.Count, "Three sets (the Adit-Runner's Kit, 2026-10-08).");
+            Assert.AreEqual(2, loot.Sets.Count, "Two sets.");
             Assert.AreEqual(49, named.Count(id => items.Get(id).quality == 2), "49 uncommon.");
             Assert.AreEqual(66, named.Count(id => items.Get(id).quality == 3), "66 rare (17 the Sealed Adit\'s) (the Sentinel's Helm the 49th, 2026-10-07).");
             Assert.AreEqual(7, named.Count(id => items.Get(id).quality == 4), "7 epic.");
@@ -309,17 +309,16 @@ namespace Crulanda.Tests
         [Test] public void Sets_have_real_pieces_in_distinct_slots_and_rising_bonuses()
         {
             var items = LootTestData.Items(); var loot = LootTestData.Loot(items);
-            CollectionAssert.AreEquivalent(new[] { "set.crowsfoot", "set.vigil", "set.adit" }, loot.Sets.Keys);
+            CollectionAssert.AreEquivalent(new[] { "set.crowsfoot", "set.vigil" }, loot.Sets.Keys);
             foreach (var s in loot.SetOrder)
             {
-                bool dungeon = s.id == "set.adit";   // a dungeon set (DUNGEON_DESIGN section 7): five pieces from five bosses, bonuses at three and five
-                Assert.AreEqual(dungeon ? 5 : 4, s.pieces.Length, s.id + " has its pieces.");
+                Assert.AreEqual(4, s.pieces.Length, s.id + " has four pieces.");
                 var slots = s.pieces.Select(p => items.Get(p).slot).ToList();
                 Assert.AreEqual(slots.Count, slots.Distinct().Count(), s.id + ": one piece per slot.");
-                if (!dungeon) Assert.IsTrue(s.pieces.Any(p => p.StartsWith("item.", StringComparison.Ordinal)), s.id + " includes its boss's existing crown.");
+                Assert.IsTrue(s.pieces.Any(p => p.StartsWith("item.", StringComparison.Ordinal)), s.id + " includes its boss's existing crown.");
                 int last = 1;
                 foreach (var b in s.bonuses) { Assert.Greater(b.count, last, s.id + ": bonuses rise."); Assert.LessOrEqual(b.count, s.pieces.Length); Assert.Greater(b.effects.Length, 0); last = b.count; }
-                Assert.AreEqual(dungeon ? 3 : 2, s.bonuses[0].count, s.id + " starts at its first bonus.");
+                Assert.AreEqual(2, s.bonuses[0].count, s.id + " starts at two pieces.");
                 foreach (var p in s.pieces) { Assert.AreEqual(s.id, loot.Meta(p).set, p + " names its set."); Assert.AreSame(s, loot.SetOf(p)); Assert.IsTrue(loot.Meta(p).unique, p + " is unique."); }
             }
         }

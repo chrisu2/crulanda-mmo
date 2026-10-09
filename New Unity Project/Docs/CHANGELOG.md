@@ -1741,13 +1741,6 @@ A read-only review by five reviewers, each finding checked by a second who tried
   fought at half health, terrifies (a 3 s stun) at a quarter. Quartermaster Sorrel: stamps at two thirds and one third (a 2 s stun)
   and comes back each time with a heavier weapon (+25%). Rail-Captain Danner: his guards step out when he is attacked, and more at half.
 - Not yet: Nix's Rock-Eater (the two-part fight), the Weaver's escort, gates and the cage-lift (D3-D4). Tests: BossPhaseTests.
-
-## 2026-10-08 — The Sealed Adit's quests and the Adit-Runner's Kit (DUNGEON_DESIGN sections 6-7)
-- Six of the seven quests: Under the Toll (Yara Quell: Lusk's tally book), Echoes in the Stone (Maddoc Vire: three echo-jars from
-  the Hollow Men), What the Grey Takes (Tarsk: a shard of unmade stone from the Foreman), Embers Below (Ansel Morrow in Khaven:
-  Ysolt's brand), The Dead Line (Yara, after the first: Danner, and his sealed letter), A Letter Under Seal (to Maddoc; leads to
-  the next dungeon, later). Existing NPCs stand in for the design's Pass-trader, Silent Pilgrim, Salt-Mender and Gallows-keeper.
-  The Pressed (open five cages) waits for the cages (D3); The Dead Line's escort waits for D4 (for now: kill Danner).
-- The Adit-Runner's Kit (set.adit, rare, five pieces): the Borer Bit (Nix), the Cinder-Warden's Sabatons (Ysolt), the Foreman's
-  Unmade Breeches, the Quartermaster's Gauntlets, the Rail-Captain's Coat; +40 health at three, +10 attack power at five.
 - Knockback fix: it traced from the body a metre above the ground and never moved anyone; it now traces along the ground.
+- (The local branch also had six Adit quests and its own Adit-Runner's Kit; Chris chose the cloud branch's seven quests and kit
+  instead on 2026-10-09, so those were dropped in the merge.)

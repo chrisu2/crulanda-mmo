@@ -24,11 +24,6 @@
       "id": "item.charnel_silk",
       "name": "Charnel silk",
       "description": "A skein of grey spider-silk from the Carrion Heights, strong as cord and cold to hold. Dorra Vey says it takes a dye like nothing else."
-    },
-    {
-      "id": "item.ysolts_brand",
-      "name": "Ysolt's brand",
-      "description": "The Cinder-Warden's iron, still warm. The mark on its face is the one burned into the Khaven road's mile-posts."
     }
   ],
   "documents": [
@@ -708,39 +703,6 @@
       "rewards": {
         "xp": 165,
         "gold": 32
-      }
-    },
-    {
-      "id": "dungeon.adit.embers",
-      "title": "Embers Below",
-      "kind": "npc",
-      "giver": "Ansel Morrow",
-      "turnIn": "Ansel Morrow",
-      "zone": "zone.khaven",
-      "level": 11,
-      "minLevel": 10,
-      "canonStatus": "CANON-EXPANDED: the Cult of Ash is canon; Ysolt, her brand and this quest are GAME-ONLY. A tie to the Ash Rim.",
-      "summary": "Ansel Morrow has seen Ash marks burned into the Khaven road's mile-posts. The one who burns them is in the Sealed Adit: kill Cinder-Warden Ysolt and bring her brand.",
-      "offer": "Ansel holds his lantern to a mile-post: a mark burned in, a ring with a line through it. \"New this month. One on every post from here to the Peaks road.\" He lowers the lantern. \"The ash-folk mark their way. The way runs into the old adit in the Peaks. Whoever's at the end of it has the iron that does this. Bring me the iron.\"",
-      "complete": "Ansel fits the brand to the mark on the post. It is the same. He puts the brand in the crypt, behind a gate he locks, and tests the lock twice. \"The way's still marked,\" he says. \"But nobody's burning new ones.\"",
-      "steps": [
-        {
-          "text": "Kill Cinder-Warden Ysolt in the Ember Vent and take her brand.",
-          "objectives": [
-            {
-              "type": "collect",
-              "zone": "zone.adit",
-              "target": "kill:mob.ysolt.adit*",
-              "item": "item.ysolts_brand",
-              "count": 1,
-              "text": "Ysolt's brand"
-            }
-          ]
-        }
-      ],
-      "rewards": {
-        "xp": 300,
-        "gold": 40
       }
     }
   ]

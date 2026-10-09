@@ -199,8 +199,9 @@ namespace Crulanda.Encounter
             var view = new Rect(w.x + 24, y, w.width - 48, w.yMax - 70 - y);
             float bodyH = qBody.CalcHeight(new GUIContent(body), view.width - 20);
             var gear = log.GearRewards(quest);
-            if (rewardFor != quest) { rewardFor = quest; rewardPick = null; }
-            bool mustPick = gear.Count > 1 && !gear.Exists(d => d.id == rewardPick);
+            bool mustPick = gear.Count > 1 && !gear.Exists(d => d.id == rewardPick && rewardFor == quest);
+            // A choice to make at hand-in: open at the rewards (the three pieces sit below the text), once; the reader can scroll back up.
+            if (rewardFor != quest) { rewardFor = quest; rewardPick = null; if (mustPick && status == QuestStatus.ReadyToTurnIn) textScroll = new Vector2(0, 100000); }
             float extraH = 220 + (gear.Count > 0 ? 30 + gear.Count * GearRow : 0);
             textScroll = GUI.BeginScrollView(view, textScroll, new Rect(0, 0, view.width - 20, bodyH + extraH));
             Ink(new Rect(0, 0, view.width - 20, bodyH), body, qBody, InkBrown);

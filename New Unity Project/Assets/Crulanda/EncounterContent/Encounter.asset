@@ -1276,6 +1276,7 @@ MonoBehaviour:
         talentId: 
     talentTree: {fileID: 4900000, guid: 4a212c4a60b94032aed04b1295fd0325, type: 3}
   questFiles:
+  - {fileID: 4900000, guid: dadeaa3314444542a04b4e17d9dbc0c4, type: 3}
   - {fileID: 4900000, guid: 2f37ccf5ed8d46928976a7b5854444ed, type: 3}
   - {fileID: 4900000, guid: 74079723a64512c49ae39123ea0f57e0, type: 3}
   - {fileID: 4900000, guid: 459d5e0303c34e389076eb618e2fb240, type: 3}
@@ -1285,6 +1286,7 @@ MonoBehaviour:
   - {fileID: 4900000, guid: 18fb20f367634b13b043a5ef942ce07d, type: 3}
   itemFiles:
   - {fileID: 4900000, guid: 7cab9a409af043aea37f75e1a8cad32b, type: 3}
+  - {fileID: 4900000, guid: 9e17c1814ba469b4f98e9dfdd42e93d9, type: 3}
   - {fileID: 4900000, guid: 9f701a55d07c4f4299fbb7c48497aeb4, type: 3}
   - {fileID: 4900000, guid: 103ac81766944eeb9928acfa11d938c2, type: 3}
   - {fileID: 4900000, guid: 256143be1814496f9a1bddd5c4fc0913, type: 3}

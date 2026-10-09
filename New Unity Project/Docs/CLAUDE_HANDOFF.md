@@ -9,7 +9,34 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-10-09, afternoon) — set up again after losing C:; the Adit work merged on `integrate/adit`
+## RESUME HERE (updated 2026-10-09, 17:00) — D3 done; D4 (the Weaver's escort) next, its walker parked on `wip/d4-escort`
+**Done today, on `main` and pushed:** quest gear (all 18 pieces, The Dead Line's choice of three) and dungeon step D3 (commit fa714d2:
+rail sigils kept, the cage-lift gate, the platform gate quiet or loud, the Gallery's spirit stone, the rare Quiet Miner and his
+lamp-cap; AditGateTests). EditMode 440/440, the Adit PlayMode set 32/32. The published build (D:\crulanda-work\outputs) is from
+before D3: build and publish again after D4.
+**The Claude app hung three times on 2026-10-09** (main process frozen right after a turn ended; Unity runs started from the agent
+shell sat in its process tree, up to 7.8 GB). So: start every Unity run DETACHED (tools\validation\start_detached.ps1, or Start-Process
+through WMI like it), never as a background shell child; commit often (the app's git panel re-diffs the working tree); keep sessions
+short. Claude 2.31226.1 was downloaded to install.
+**D4 plan (Chris left the details to me; DUNGEON_DESIGN section 4, the Rail Hall):**
+- `wip/d4-escort` holds `AditWeaver.cs` (Mother Quillet walks from the platform gate to the carriage's lock, waves at 1/3 and 2/3 of
+  the way, matches the lock in 36 s, Danner rises at half; it calls session methods not written yet: WeaverWave, WeaverHalfway,
+  WeaverDone, WeaverFell, WeaverBack). Merge it with the session side, not before: alone it does not compile.
+- Session side (EncounterSession.Adit.cs): Quillet is the goblin who hums the platform gate open on the quiet way and then waits
+  there (SpawnActor with content.healer, ActorLook.Villager until a goblin figure exists, level 12, elite-strength health; AddAgent;
+  a ZoneInteractable kind "weaver" that follows her for "Talk to Mother Quillet"). Put her in PartyActor so mobs fight her and Mira
+  and the sims defend her (the code map: CombatActor = PartyActor ?? sims; sims' Quarry and Mira key on FightingParty).
+- Waves: spawn camp-like mobs as SpawnCamps does (camp 10's platform guards from the carriage, camp 11's dockers from the far
+  tunnel), ids `mob.<tag>.adit.<camp>.w<n>`, Camp=true with a huge RespawnSeconds, threat on Quillet, Rehome near her (leash 24).
+- Danner (camp 16): Hide() him on arrival while the escort is possible (The Pressed done, "adit.lock" not kept); he still pounces
+  at 8 m; add a public EncounterEnemy.Rise(Actor) (Unhide is private) for the half-way mark.
+- Done: keep "adit.lock" in Progress.keys, the carriage's geode light goes dark (record it in ZoneBuilder.RailHall with the lock
+  point and the two wave spots), QuestFlag gains "key:<id>", and a new quest side.adit.weaver "The Weaver's Lock" from Pib
+  (requires side.adit.pressed; a flag objective "key:adit.lock", then back to Pib). QuestDataTests then expects eight side.adit.*.
+- HUD: a row for Quillet under the party frame (health, and "matching the lock 45%"). Tests: AditWeaverTests (PlayMode).
+- If she falls: mobs on her reset, she is back at the gate 30 s later.
+
+## Earlier resume note (2026-10-09, afternoon) — set up again after losing C:; the Adit work merged on `integrate/adit`
 **Chris lost his C: drive on 2026-10-09.** D: (the repo, Unity's editor, the lore) and the E: backup survived. Lost with C:: Git
 (reinstalled), the `hel` workspace (validation copy, playable build, save backups, screenshots, handoff copy) and Chris's save
 (no copy anywhere: he starts a new character). New home for the workspace: `D:\crulanda-work` (see CLAUDE.md).

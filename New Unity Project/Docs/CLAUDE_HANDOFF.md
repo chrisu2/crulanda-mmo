@@ -44,8 +44,18 @@ first a mix of the Deadmines, Wailing Caverns and Scarlet Monastery; bands low 1
 instead of Scarlet Monastery and built only caves; section 0.2 plans the rework (a built Cult of Ash chapter-house, a built foundry,
 a room builder, step D9). Not started.
 
-**Next, in Chris's order:** (1) ask Chris exactly what is wrong with the feet and the bow in the build he plays, fix only that, show him
-side, front and back frames before publishing; (2) only then the room builder and the Adit rework, and the Ranger's Skirmisher.
+**New animation packs (Chris, 2026-10-10, 20:30: "human melee animations, human basic motion, and human archer animations added to
+myassets"):** Kevin Iglesias's Human Archer Animations FREE, Human Basic Motions FREE and Human Melee Animations FREE are downloaded in
+Unity's Asset Store cache, C:\Users\ChrisWin11\AppData\Roaming\Unity\Asset Store-5.x\Kevin Iglesias\Animation\ (17.5, 15.3 and 12.7 MB).
+First copy the three .unitypackage files to D:\crulanda-work\downloads (C: was lost once). Import them into the validation copy in batch
+mode (never Chris's open project), bring the clips into Resources/Characters/Animations/KI with their .meta files (the same Humanoid
+avatar setup as the KI clips already there), and use them: the **archer set replaces the hand-posed bow arms** (ActorVisual.BowArms:
+draw, aim and release clips for the Ranger and ranger sims; keep the live string), the **melee set** gives real attack swings for every
+class, and check the **basic motions** against the run and walk clips in use. Then show Chris frames from the side, front and back.
+
+**Next, in Chris's order:** (1) ask Chris exactly what is wrong with the feet and the bow in the build he plays, fix only that (with the
+archer clips above for the bow), show him side, front and back frames before publishing; (2) only then the room builder and the Adit
+rework, and the Ranger's Skirmisher.
 
 ## Earlier resume note (2026-10-10, 18:05) — barns, horizon, windmill, Mira's Invite, the jump, the bow, the Jailer and the Cantor
 **Playable build = release, published 18:04 to D:\crulanda-work\outputs (built 17:52; not yet committed when built, the commit follows).** Since 15:12, from Chris's playtest this afternoon:

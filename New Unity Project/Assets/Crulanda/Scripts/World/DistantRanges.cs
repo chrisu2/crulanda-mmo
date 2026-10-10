@@ -12,7 +12,7 @@ namespace Crulanda.World
     /// </summary>
     public sealed class DistantRanges : MonoBehaviour
     {
-        Material near, far; Color tint; float strength = 1;
+        Material wood, near, far; Color tint, woodTint; float strength = 1;
 
         public static void Build(Transform parent, ZoneDefinition zone, float reach)
         {
@@ -27,14 +27,21 @@ namespace Crulanda.World
             int seed = zone.seed % 997;
             // The Wasting's side (Oakhaven's east): no land there.
             float wastingYaw = zone.wasting != null ? 90 : float.NaN;
-            d.near = d.Ring(go.transform, shader, reach * 2.45f, 110 * scale, 50 * scale, seed, wastingYaw, .05f);
+            // Wooded hills rising behind the backdrop's ridge, their crests a run of tree crowns (2026-10-10, Chris: "horizon still looks
+            // empty", against Elwynn's), and the hills and mountains past them nearer and taller than they were: a forest ring at 1.5
+            // reaches, tall enough to stand over the ridge and its trees (some 45 m at 350 m, seen from the zone), none on the Ash Rim.
+            d.woodTint = mountain ? new Color(.17f, .27f, .27f) : biome == "gloom" ? new Color(.22f, .24f, .25f) : biome == "verdant" ? new Color(.13f, .3f, .2f) : new Color(.17f, .3f, .19f);
+            if (!ash) d.wood = d.Ring(go.transform, shader, reach * 1.5f, mountain ? 95 : 82, 26, seed + 77, wastingYaw, .07f, 4320, 9);
+            d.near = d.Ring(go.transform, shader, reach * (mountain ? 2.45f : 2.0f), mountain ? 110 * scale : ash ? 110 * scale : 150, mountain || ash ? 50 * scale : 60, seed, wastingYaw, .05f);
             d.far = d.Ring(go.transform, shader, reach * 2.75f, 175 * scale, 80 * scale, seed + 41, wastingYaw, .028f);
             d.LateUpdate();
         }
 
-        Material Ring(Transform parent, Shader shader, float radius, float tall, float vary, int seed, float skipYaw, float freq)
+        /// <summary>A ring of <paramref name="N"/> columns; <paramref name="crowns"/> above 0 runs a row of rounded tree crowns that tall
+        /// (about two every three degrees, each its own size, smaller ones between) along the crest: a wood's skyline, not a saw's.</summary>
+        Material Ring(Transform parent, Shader shader, float radius, float tall, float vary, int seed, float skipYaw, float freq, int N = 360, float crowns = 0)
         {
-            const int N = 360; var v = new Vector3[(N + 1) * 2]; var t = new int[N * 6];
+            var v = new Vector3[(N + 1) * 2]; var t = new int[N * 6];
             for (int i = 0; i <= N; i++)
             {
                 float a = i * 360f / N, r = a * Mathf.Deg2Rad;
@@ -44,6 +51,12 @@ namespace Crulanda.World
                         + Mathf.PerlinNoise(seed + 50 + x * radius * freq, z * radius * freq + 9) * .28f
                         + Mathf.PerlinNoise(seed + 90 + x * radius * freq * 4, z * radius * freq * 4) * .07f;
                 float top = tall + (h - .45f) * vary * 2;
+                if (crowns > 0)
+                {
+                    float f = a * .7f + Mathf.PerlinNoise(seed + 130 + x * 3, z * 3) * 3, size = .55f + Mathf.PerlinNoise(seed + 170 + x * 9, z * 9);
+                    float g = a * 1.9f + Mathf.PerlinNoise(seed + 150 + x * 5, z * 5) * 4, small = .4f + Mathf.PerlinNoise(seed + 190 + x * 11, z * 11);
+                    top += crowns * (size * (Mathf.Pow(Mathf.Abs(Mathf.Sin(f * Mathf.PI)), .3f) - .65f) + .35f * small * (Mathf.Pow(Mathf.Abs(Mathf.Sin(g * Mathf.PI)), .4f) - .6f));
+                }
                 if (!float.IsNaN(skipYaw)) { float off = Mathf.Abs(Mathf.DeltaAngle(a, skipYaw)); top *= Mathf.SmoothStep(0, 1, (off - 25) / 30f); }
                 var dir = new Vector3(Mathf.Sin(r), 0, Mathf.Cos(r));
                 v[i * 2] = dir * radius + Vector3.up * -60; v[i * 2 + 1] = dir * radius + Vector3.up * Mathf.Max(-10, top);
@@ -64,8 +77,11 @@ namespace Crulanda.World
             // Light on the land: the skylight's brightness against a clear noon, so the crests darken with the evening.
             float light = Mathf.Clamp(RenderSettings.ambientSkyColor.grayscale / .55f, .15f, 1.1f);
             var crest = new Color(tint.r * light, tint.g * light, tint.b * light);
-            Set(near, fog, Color.Lerp(fog, crest, .55f * strength));
-            Set(far, fog, Color.Lerp(fog, crest, .32f * strength));
+            // Paler the farther: the wood past the ridge is fainter than the ridge's own trees (some 40% their colour at 350 m), the
+            // ranges fainter again (2026-10-10: a darker far band read as a forest floating over the mist).
+            Set(wood, fog, Color.Lerp(fog, new Color(woodTint.r * light, woodTint.g * light, woodTint.b * light), .45f * strength));
+            Set(near, fog, Color.Lerp(fog, crest, .36f * strength));
+            Set(far, fog, Color.Lerp(fog, crest, .22f * strength));
         }
         static void Set(Material m, Color haze, Color crest) { if (m == null) return; m.SetColor("_Haze", haze); m.SetColor("_Color", crest); }
     }

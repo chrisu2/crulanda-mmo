@@ -12,13 +12,13 @@ and icons for everything on the bar (IconCoverageTests).
 
 | Class | Resource | Builds (talent branches) | Talent ranks built per branch | Crowd control / interrupt | Figure |
 |---|---|---|---|---|---|
-| Warrior | Vigor | Tank, DPS, Support | 23 of 34 designed (rows 0-3 work; rows 4-6 written, not built) | Shout (fear 6 s) / Shield Bash (silence) | own |
+| Warrior | Vigor | Tank, DPS, Support, **Jailer control** (2026-10-10) | 33 of the first three (rows 0-3 work; rows 4-6 written, not built); the Jailer 10 of 15 (rows 0-3 built, 4-6 written) | Shout (fear 6 s) / Shield Bash (silence) / Hock Cut (slow) / Weighted Net (root) / Shackle Cast (stun) | own |
 | Druid | Wildstores | Barkhide tank, Thornclaw melee, Rootmend healer, Thornsong ranged | 25 of 35 designed (rows 0-3 work; rows 4-6 written, not built) | Sleep of the Wood (an eleventh slot) / Thornsong's interrupt | own; four forms |
 | Paladin | Mana + Conviction | Oathguard tank, Judicator melee, Sanctuary healer, **Vanguard support** (2026-10-09) | 19 of 19 in the first three (rows 0-2); the Vanguard 23 of 32 (rows 0-3 built, 4-6 written) | Rebuke (stun, works on bosses) / Censure (silence) | own |
 | Ranger | Focus | Marksman ranged, Beastbond pet, Pathfinder control | 17-19 of 17-19 (rows 0-2; nothing deeper written) | Snare Trap (hold 20 s) / Pin (silence) | own; the wolf |
 | Mage | Mana + Heat | Combustion ranged, Heatweaver control, Spellbinder support | 17-19 of 17-19 (rows 0-2; nothing deeper written) | Ash Hex (held 25 s) / Quench (silence) | own; the staff |
 | Rogue | Focus + combo points | Thief's Grace stealth, Shardwork poisons, Locksmith | 16-17 of 16-17 (rows 0-3; nothing deeper written) | Sap, Gouge, Blind / Kick; Vanish; pick-lock | borrows the Ranger's |
-| Archivist | Mana | the Silent Vow, the Lull, the Archive | 16 of 16 (rows 0-3; nothing deeper written) | Lull (three sleep), Echo Bind / Hush; songs; echo-jar | borrows the Mage's |
+| Archivist | Mana | the Silent Vow, the Lull, the Archive, **the Cantor healer** (2026-10-10) | 21 of the first three (rows 0-3; nothing deeper written); the Cantor 10 of 15 (rows 0-3 built, 4-6 written) | Lull (three sleep), Echo Bind / Hush; songs; echo-jar; Mending Phrase, the Song of Mending, Chorus of the Weave | borrows the Mage's |
 
 **At the cap of 15 every class is complete:** talent points are your level plus one (16 at 15), and every branch has at least 16 ranks
 built, so nothing a level-15 character can reach is missing.

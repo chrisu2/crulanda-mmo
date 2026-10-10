@@ -243,8 +243,13 @@ namespace Crulanda.World
     public sealed class ZoneBarn
     {
         public string name;
-        /// <summary>The barn's right (along its front), for the two places in a stall that two sheep share.</summary>
+        /// <summary>The way the two places in a stall that two sheep share lie apart (across the stall, along the barn's length).</summary>
         public Vector3 door, inside, right = Vector3.right; public Vector3[] stalls = new Vector3[0];
+        /// <summary>For each stall: the point in the aisle in front of it (walked to before turning in, so no beast cuts through a
+        /// partition), and the way a beast lying in it faces (its head to the wall and the hay rack).</summary>
+        public Vector3[] aisle = new Vector3[0], faces = new Vector3[0];
+        public Vector3 AisleFor(int slot) { int i = slot / 2; return i >= 0 && i < aisle.Length ? aisle[i] : inside; }
+        public Vector3 FaceFor(int slot) { int i = slot / 2; if (i >= 0 && i < faces.Length) return faces[i]; var f = SpotFor(slot, false) - door; f.y = 0; return f; }
         readonly System.Collections.Generic.Dictionary<int, MonoBehaviour> taken = new System.Collections.Generic.Dictionary<int, MonoBehaviour>();
         readonly System.Collections.Generic.HashSet<MonoBehaviour> small = new System.Collections.Generic.HashSet<MonoBehaviour>();
         bool Free(int slot) { return !taken.TryGetValue(slot, out var o) || o == null; }

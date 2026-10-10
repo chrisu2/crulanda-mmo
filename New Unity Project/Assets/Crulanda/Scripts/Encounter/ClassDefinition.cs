@@ -36,6 +36,8 @@ namespace Crulanda.Encounter
     /// <summary>Validated class ownership and ordered abilities. Reject invalid data before spawning actors.</summary>
     public sealed class ClassLoadout
     {
+        /// <summary>The action bar's slots (keys 1-0, -, = and [; EncounterInput.SlotKey). Was 8 until the Jailer gave the Warrior eleven (2026-10-10).</summary>
+        public const int MaxActions = 13;
         readonly ClassDefinition definition;
         readonly AbilityDefinition[] actions;
         public int Count { get { return actions.Length; } }
@@ -45,7 +47,7 @@ namespace Crulanda.Encounter
                 definition.stats == null || !Enum.IsDefined(typeof(ClassRole), definition.role) ||
                 !Enum.IsDefined(typeof(ResourceKind), definition.resource) || definition.maxResource < 0 ||
                 definition.combatRegen < 0 || definition.restingRegen < 0 || definition.unlocks == null ||
-                definition.unlocks.Length == 0 || definition.unlocks.Length > 8 || catalog == null)
+                definition.unlocks.Length == 0 || definition.unlocks.Length > MaxActions || catalog == null)
                 throw new ArgumentException("Invalid class profile.");
             this.definition = definition;
             var byId = new Dictionary<string, AbilityDefinition>(StringComparer.Ordinal);

@@ -77,7 +77,9 @@ namespace Crulanda.Tests
                     var footing = t.Find("Footing"); if (footing == null) { problems.Add(q + "has no footing"); continue; }
                     seen++;
                     // The footing's foot against the lowest ground just outside its walls, round all four sides.
-                    var size = Size(p); float out2 = p.kind == "inn" ? .35f : .25f, bottom = footing.GetComponent<Renderer>().bounds.min.y, low = float.MaxValue;
+                    var size = Size(p);
+                    if (p.kind == "barn" && zone.Barns.Exists(b => b.name == p.name)) size = new Vector2(size.y, size.x);   // a walk-in barn runs back from its front (ZoneBuilder.WalkInBarn, 2026-10-10)
+                    float out2 = p.kind == "inn" ? .35f : .25f, bottom = footing.GetComponent<Renderer>().bounds.min.y, low = float.MaxValue;
                     for (int sx = -1; sx <= 1; sx++) for (int sz = -1; sz <= 1; sz++)
                     {
                         if (sx == 0 && sz == 0) continue;

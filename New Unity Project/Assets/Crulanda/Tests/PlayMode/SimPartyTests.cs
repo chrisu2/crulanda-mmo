@@ -48,6 +48,29 @@ namespace Crulanda.Tests
             pop.Refresh(); Assert.NotNull(pop.Find(s.id), s.name + " stands in Oakhaven"); return s;
         }
 
+        /// <summary>Mira's Invite (2026-10-10, Chris: "there should be an invite button for mira"): from across the zone she joins and
+        /// walks over; /invite mira then finds her already with you.</summary>
+        [UnityTest] public IEnumerator Mira_is_invited_from_afar_and_walks_over()
+        {
+            session.Progress.recruited = false; yield return null;
+            var motor = session.Player.GetComponent<AdventurerMotor>(); var mira = session.Companion.transform.position; var path = new UnityEngine.AI.NavMeshPath();
+            Vector3? far = null;
+            for (int k = 0; k < 16 && far == null; k++)
+            {
+                var at = mira + Quaternion.Euler(0, k * 22.5f, 0) * Vector3.forward * 24;
+                if (UnityEngine.AI.NavMesh.SamplePosition(at, out var hit, 3, UnityEngine.AI.NavMesh.AllAreas) && UnityEngine.AI.NavMesh.CalculatePath(mira, hit.position, UnityEngine.AI.NavMesh.AllAreas, path) && path.status == UnityEngine.AI.NavMeshPathStatus.PathComplete) far = hit.position;
+            }
+            Assert.NotNull(far, "somewhere 24 m from Mira to stand");
+            motor.Teleport(far.Value + Vector3.up * 1.1f); yield return null;
+            Assert.IsTrue(session.InviteMira(), "she joins from afar");
+            Assert.IsTrue(session.Progress.recruited);
+            float end = Time.realtimeSinceStartup + 25;
+            while (Vector3.Distance(session.Companion.transform.position, session.Player.transform.position) > 6 && Time.realtimeSinceStartup < end) yield return null;
+            Assert.Less(Vector3.Distance(session.Companion.transform.position, session.Player.transform.position), 6, "and walks over");
+            Assert.IsFalse(session.InviteByName("mira"), "/invite mira: she is already with you");
+            Assert.IsTrue(session.Messages.Any(m => m.Contains("already in your party")));
+        }
+
         /// <summary>CC_DESIGN section 3: a sim Rogue in a fight of two puts the moon on the one that isn't your target and holds it.</summary>
         [UnityTest] public IEnumerator A_sim_Rogue_marks_and_holds_the_moon()
         {

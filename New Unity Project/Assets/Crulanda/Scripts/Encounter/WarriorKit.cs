@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using Crulanda.Core;
 using Crulanda.Gameplay;
 using Crulanda.Combat;
@@ -8,7 +9,7 @@ using Crulanda.Abilities;
 namespace Crulanda.Encounter
 {
     /// <summary>
-    /// Warrior talent effects for tiers 0-2 of the data-driven tree (EncounterContent/Talents/warrior.json).
+    /// Warrior talent effects for tiers 0-3 of the data-driven tree (EncounterContent/Talents/warrior.json), the Jailer's among them.
     /// Owns transient combat state only (weapon pressure, Exposed windows, intercept, standard); nothing here is saved.
     /// Shared rule: an Exposed enemy takes +5% damage from the party (Scatter Their Guard adds more).
     /// </summary>
@@ -21,7 +22,9 @@ namespace Crulanda.Encounter
             "dp-momentum", "dp-deep-breach", "dp-sweeping-strike",
             "sp-called-cadence", "sp-rally-reserve", "sp-mark-the-gap", "sp-steady-voice", "sp-rallying-challenge", "sp-muster",
             "sp-shared-shelter", "sp-planted-standard", "sp-scatter-their-guard",
-            "tk-held-line", "tk-iron-reserve", "dp-press-the-breach", "dp-battle-rhythm", "sp-answering-step", "sp-second-wind"   // row 3 (2026-10-08)
+            "tk-held-line", "tk-iron-reserve", "dp-press-the-breach", "dp-battle-rhythm", "sp-answering-step", "sp-second-wind",   // row 3 (2026-10-08)
+            "jl-cord-and-hook", "jl-turnkey", "jl-heavy-iron", "jl-weighted-net", "jl-tight-weave", "jl-keepers-due", "jl-drag-chain", "jl-wide-mesh",
+            "jl-low-and-cruel", "jl-warden"   // the Jailer, tiers 0-3 (2026-10-10, TALENT_DEPTH.md)
         };
         float pressUntil, nextReserve;
         public const int MaxPressure = 5;
@@ -65,6 +68,80 @@ namespace Crulanda.Encounter
             }) == AbilityStartResult.Started;
         }
 
+        // ---------- the Jailer (control; 2026-10-10, TALENT_DEPTH.md: "nets, chains, hamstrings, a throw that stuns") ----------
+        // Three holds: Hock Cut's slow, the Net's root and the Shackle's stun. A foe you hold takes harder blows from the whole party
+        // (Turnkey); one in your Net or on your Shackle deals less (Warden). GAME-ONLY names.
+        readonly Dictionary<EncounterEnemy, float> heldUntil = new Dictionary<EncounterEnemy, float>(), boundUntil = new Dictionary<EncounterEnemy, float>();
+        public const float HockSlow = .5f, WardenCut = .2f, WideMeshPerRank = 1.5f;
+        /// <summary>Held by you: slowed by your Hock Cut, in your Net or on your Shackle.</summary>
+        public bool Holds(EncounterEnemy e) { return e != null && heldUntil.TryGetValue(e, out var t) && Now < t; }
+        /// <summary>In your Net or on your Shackle.</summary>
+        public bool Binds(EncounterEnemy e) { return e != null && boundUntil.TryGetValue(e, out var t) && Now < t; }
+        void Hold(EncounterEnemy e, float seconds, bool bound)
+        {
+            float until = Now + seconds;
+            if (!heldUntil.TryGetValue(e, out var h) || h < until) heldUntil[e] = until;
+            if (bound && (!boundUntil.TryGetValue(e, out var b) || b < until)) boundUntil[e] = until;
+        }
+        void KeepersDue() { if (R("jl-keepers-due") > 0) s.Player.Resource.Pool.Change(4 * R("jl-keepers-due")); }
+        /// <summary>Hock Cut: a light blow, and the target moves at half speed for 8 s (Cord and Hook: longer; Low and Cruel: Exposed too).</summary>
+        bool HockCut(AbilityDefinition a)
+        {
+            if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
+            return s.StartAbility(a, () => {
+                if (!s.Player.IsAlive || !s.LandsOn(t, a.range)) return;
+                s.BeginAutoAttack();
+                t.Receive(StrikeDamage(t, Mathf.RoundToInt(a.power + s.WeaponDamage * .5f)), s.Player);
+                float seconds = a.duration + R("jl-cord-and-hook");
+                t.Slow(HockSlow, seconds); Hold(t, seconds, false);
+                if (R("jl-low-and-cruel") > 0) Expose(t, R("jl-low-and-cruel"));
+            }) == AbilityStartResult.Started;
+        }
+        /// <summary>Weighted Net: the target (and, with Wide Mesh, every foe close by it) is held where it stands for 5 s.</summary>
+        bool Net(AbilityDefinition a)
+        {
+            if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
+            return s.StartAbility(a, () => {
+                if (!s.Player.IsAlive || !s.LandsOn(t, a.range)) return;
+                s.Bolt(t, new Color(.85f, .75f, .55f), .16f, false);
+                float seconds = a.duration + R("jl-tight-weave"), wide = WideMeshPerRank * R("jl-wide-mesh"); int n = 0;
+                foreach (var e in s.Enemies.ToArray())
+                {
+                    if (e == null || !e.actor.IsAlive || e.Game || e.Hidden) continue;
+                    if (e != t && (wide <= 0 || Vector3.Distance(e.transform.position, t.transform.position) > wide)) continue;
+                    e.Receive(1, s.Player); e.Root(seconds); Hold(e, seconds, true); n++;
+                }
+                KeepersDue();
+                s.Message(n > 1 ? "Weighted Net: " + n + " of them held for " + seconds + " seconds." : "Weighted Net: " + t.actor.DisplayName + " is held for " + seconds + " seconds.");
+            }) == AbilityStartResult.Started;
+        }
+        /// <summary>Shackle Cast: a chain hurled at up to 20 m stuns the target 2 s (Heavy Iron: longer) and, with Drag Chain, drags it to
+        /// your feet. A boss takes no stun and is not dragged.</summary>
+        bool Shackle(AbilityDefinition a)
+        {
+            if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
+            return s.StartAbility(a, () => {
+                if (!s.Player.IsAlive || !s.LandsOn(t, a.range)) return;
+                s.Bolt(t, new Color(.55f, .58f, .62f), .14f, false);
+                t.Receive(Mathf.Max(1, Mathf.RoundToInt(a.power + s.WeaponDamage * .3f)), s.Player);
+                float seconds = a.duration + .25f * R("jl-heavy-iron");
+                string why = t.Apply("stun", s.Player, seconds);
+                if (why != null) { s.Message(t.actor.DisplayName + ": " + why + "."); return; }
+                Hold(t, seconds, true); KeepersDue();
+                if (R("jl-drag-chain") > 0) Drag(t);
+            }) == AbilityStartResult.Started;
+        }
+        /// <summary>Drag Chain: the shackled foe is hauled to a stride in front of you.</summary>
+        public void Drag(EncounterEnemy t)
+        {
+            var me = s.Player.transform; var to = me.position + me.forward * 1.8f;
+            if (!NavMesh.SamplePosition(to, out var hit, 2.5f, NavMesh.AllAreas)) return;
+            var agent = t.GetComponent<NavMeshAgent>();
+            if (agent != null && agent.isOnNavMesh) agent.Warp(hit.position); else t.transform.position = hit.position;
+            t.threat.Add(s.Player.EntityId.Value, 30);
+            s.FloatText(t.transform.position, "Dragged", new Color(.75f, .8f, .9f));
+        }
+
         // ---------- action bar ----------
         public override int ActionCount { get { return loadout.Count; } }
         public override AbilityDefinition ActionAt(int slot) { return loadout.At(slot); }
@@ -80,6 +157,9 @@ namespace Crulanda.Encounter
             var a = loadout.At(slot);
             if (a != null && a.id == "ability.shield_bash") return ShieldBash(a);   // crowd control (CC_DESIGN section 2)
             if (a != null && a.id == "ability.shout") return Shout(a);
+            if (a != null && a.id == "warrior.hock_cut") return HockCut(a);   // the Jailer
+            if (a != null && a.id == "warrior.net") return Net(a);
+            if (a != null && a.id == "warrior.shackle") return Shackle(a);
             if (a != null && a.id == "ability.strike" && Now < pressUntil)   // Press the Breach: Strike costs nothing for a while
                 a = new AbilityDefinition { id = a.id, name = a.name, description = a.description, effect = a.effect, power = a.power, cost = 0, cooldown = a.cooldown,
                     range = a.range, castTime = a.castTime, globalCooldown = a.globalCooldown, duration = a.duration, statusId = a.statusId };
@@ -123,7 +203,8 @@ namespace Crulanda.Encounter
         public override string TargetStatus(EncounterEnemy enemy)
         {
             float exposed = ExposedRemaining(enemy);
-            return exposed > 0 ? "EXPOSED " + exposed.ToString("0.0") + "s" : null;
+            if (exposed > 0) return "EXPOSED " + exposed.ToString("0.0") + "s";
+            return Binds(enemy) ? "HELD " + Mathf.Max(0, boundUntil[enemy] - Now).ToString("0.0") + "s" : null;
         }
         float Now { get { return Time.time; } }
         Combatant PlayerCombat { get { return s.Player.GetComponent<Combatant>(); } }
@@ -160,7 +241,7 @@ namespace Crulanda.Encounter
         /// <summary>Data-only reset for respawn/load, when the previous actors are being destroyed.</summary>
         public override void ResetState()
         {
-            Pressure = 0; exposedUntil.Clear(); challengedAt.Clear();
+            Pressure = 0; exposedUntil.Clear(); challengedAt.Clear(); heldUntil.Clear(); boundUntil.Clear();
             guardRaisedAt = -99; interceptUntil = cadenceUntil = companionCadenceUntil = StandardUntil = 0;
         }
 
@@ -174,7 +255,7 @@ namespace Crulanda.Encounter
             if (!exposedUntil.TryGetValue(e, out var current) || current < until) exposedUntil[e] = until;
         }
         public override float PartyDamageMultiplier(EncounterEnemy e)
-        { return IsExposed(e) ? 1 + ExposedBonus + .03f * R("sp-scatter-their-guard") : 1; }
+        { return (IsExposed(e) ? 1 + ExposedBonus + .03f * R("sp-scatter-their-guard") : 1) * (Holds(e) ? 1 + .03f * R("jl-turnkey") : 1); }   // Turnkey: a held foe
 
         // ---------- weapon pressure / tempo ----------
         public void GainPressure(int amount)
@@ -283,6 +364,7 @@ namespace Crulanda.Encounter
         public override int ResolveEnemyHit(EncounterEnemy enemy, Actor victim, int raw)
         {
             if (victim == null || !victim.IsAlive) return 0;
+            if (R("jl-warden") > 0 && Binds(enemy)) raw = Mathf.CeilToInt(raw * (1 - WardenCut));   // Warden: a foe in your Net or on your Shackle
             if (s.Companion != null && victim == s.Companion.actor && Now < interceptUntil && s.Player.IsAlive)
             {
                 interceptUntil = 0;

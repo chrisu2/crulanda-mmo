@@ -16,10 +16,24 @@ namespace Crulanda.Tests
         {
             var t = TalentTree.Parse("class.archivist", Json, 15, ArchivistKit.ImplementedIds);
             int count = 0; foreach (var b in t.Branches) count += b.nodes.Length;
-            Assert.AreEqual(3, t.Branches.Count); Assert.AreEqual(ArchivistKit.ImplementedIds.Length, count);
+            Assert.AreEqual(4, t.Branches.Count, "the Silent Vow, the Lull, the Archive, the Cantor"); Assert.AreEqual(ArchivistKit.ImplementedIds.Length, count);
+            Assert.AreEqual("healer", t.Branches[3].role); Assert.IsNull(t.Find("ca-second-voice"), "the Cantor's tiers 4-6 are written, not built");
             foreach (var id in ArchivistKit.ImplementedIds) Assert.NotNull(t.Find(id), id);
             var only = new List<string>(ArchivistKit.ImplementedIds); only.Remove("ar-full-jar");
             Assert.Throws<ArgumentException>(() => TalentTree.Parse("class.archivist", Json, 15, only));
+        }
+        /// <summary>The Cantor (TALENT_DEPTH.md, 2026-10-10): at the cap of 15 (16 points) an Archivist reaches its tier 3; the Chorus is its talent action.</summary>
+        [Test] public void The_Cantor_reaches_tier_three_at_the_cap()
+        {
+            var t = TalentTree.Parse("class.archivist", Json, 15, ArchivistKit.ImplementedIds); var p = EncounterSession.FreshProgress(); p.classId = "class.archivist"; p.experience = EncounterProgress.XpForLevel(15);
+            Assert.AreEqual(16, t.Budget(p.Level));
+            void Buy(params string[] ids) { foreach (var id in ids) { Assert.IsTrue(t.Propose(p, id, 1, out var next, out var why), id + ": " + why); p.talents = next; } }
+            Assert.IsFalse(t.Propose(p, "ca-chorus", 1, out _, out _), "tier 1 needs 5 points in the Cantor");
+            Buy("ca-clear-voice", "ca-clear-voice", "ca-clear-voice", "ca-clear-voice", "ca-clear-voice");          // 5
+            Buy("ca-chorus", "ca-long-song", "ca-long-song", "ca-long-song", "ca-held-note");                        // 10
+            Buy("ca-resonant-ward", "ca-resonant-ward", "ca-resonant-ward", "ca-quiet-mind", "ca-echoing-mend");     // 15
+            Buy("ca-symphony");                                                                                      // 16
+            Assert.AreEqual(0, t.Available(p)); Assert.IsTrue(t.Validate(p, out var reason), reason);
         }
         [Test] public void The_class_and_its_seven_songs_are_in_the_content()
         {

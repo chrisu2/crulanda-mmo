@@ -9,7 +9,26 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-10-10, 15:15) — walk-in barns and sleeping beasts PUBLISHED; full run green
+## RESUME HERE (updated 2026-10-10, 18:05) — barns, horizon, windmill, Mira's Invite, the jump, the bow, the Jailer and the Cantor
+**Playable build = release, published 18:04 to D:\crulanda-work\outputs (built 17:52; not yet committed when built, the commit follows).** Since 15:12, from Chris's playtest this afternoon:
+- barns with their doors in the gable end, an aisle between stalls, straw bedding, racks and bales (ZoneBuilder.WalkInBarn, swapped
+  footprint); the Old Fold's hut is the walk-in Fold barn and its flock sleeps there; Mira's Invite (party row, her frame, /invite mira);
+  the windmill's sails turn with the wind (they had been static-batched); a fuller horizon (woods over the ridge, a wooded hill ring with
+  a crown skyline, nearer mountains, Oakhaven's fog 150-480 m); the jump quicker and gentler (tuck held through a hop, a half-weight
+  landing dip, quick blends); the bow drawn, held and loosed by posed arms (no archery clips exist), an equipped bow in the left fist,
+  upright while drawn; the who list on the Menu, its headings aligned; the capture runs no longer leave the game windowed.
+- the Warrior's fourth path, the **Jailer** (Hock Cut, Weighted Net, Shackle Cast; tiers 0-3 built), and the Archivist's, the **Cantor**
+  (Mending Phrase, the Song of Mending, Chorus of the Weave; tiers 0-3 built). A class may have 13 actions (was 8).
+- **a talent point every level to 15** (EncounterProgress.TalentCap = LevelCap): it had stopped at 10, so no tier 3 was reachable.
+**Runs:** the full run (started 15:57) on the first half: EditMode 442/442, PlayMode 269/271, build and all five zones' tours and every capture clean, 0 shader errors; its two failures were tests (BuildingGroundTests measured a walk-in barn by its old outline; SimChatTests met a sim mid-fight) and are fixed. The rest checked in focused runs: EditMode 444/444; PlayMode 76/76 (every class loop, CrowdControl with the Jailer, the Archivist with the Cantor, sims) and 70/71 before it (barns, jump, footing, gear, whispers; its one failure the talent cap, fixed). MotionCapture frames checked by eye.
+**To check with Chris:** the horizon (first pass; he compared Elwynn), the jump and the bow in play (MotionCapture frames in
+D:\crulanda-work\ui-captures\motion look right), the barns. The who list still "opens nothing" for him and is not reproduced (his
+Player.log clean, his keys leave O on it): ask him to try Menu > Who.
+**Next (Chris's order):** the fourth paths go on: Ranger Skirmisher (melee: it needs a short blade or spear in hand for its blows, or the
+bow is swung), Rogue Swashbuckler, Mage Cinderwright. Then Phase 8.5 (gear fit; a Kevin Iglesias archery set would give real bow clips).
+Run the full run first next session (tools\validation\start_detached.ps1 -Arguments "-AllTests").
+
+## Earlier resume note (2026-10-10, 15:15) — walk-in barns and sleeping beasts PUBLISHED; full run green
 **Playable build = release, published 15:12 to D:\crulanda-work\outputs (commit 0a395a2):** everything below the 21:45 note, plus today:
 - walk-in barns (ZoneBuilder.WalkInBarn: the kit's materials, a 3.4 m doorway, two sliding doors slid aside on a rail as in Chris's picture,
   straw, hay, a manger, a lantern), farm beasts that walk in at dusk, sleep in a stall (two sheep share one) and walk out after six

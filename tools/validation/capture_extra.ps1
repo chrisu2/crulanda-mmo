@@ -49,4 +49,12 @@ $e = Start-Process $exe -PassThru -ArgumentList @('--crulanda-elite-capture', ('
 $e | Wait-Process -Timeout 300
 Select-String -LiteralPath $elog -Pattern 'ELITE_CAPTURE_DONE|Exception|Elite capture' | Select-Object -First 5 | ForEach-Object Line
 Get-ChildItem $ed -Filter '*.png' | Select-Object -ExpandProperty Name
+# The player's own motions (2026-10-10): a standing and a running jump and the Ranger's bow, frame by frame (motion\jump-*, bow-*).
+$md = Join-Path $ui 'motion'
+New-Item -ItemType Directory -Force $md | Out-Null
+Get-ChildItem $md -Filter '*.png' -ErrorAction SilentlyContinue | Remove-Item
+$mlog2 = Join-Path $md 'motion.log'
+$m = Start-Process $exe -PassThru -ArgumentList @('--crulanda-motion-capture', ('"' + $md + '"'), '--crulanda-class', 'class.ranger', '-screen-width', '1440', '-screen-height', '900', '-screen-fullscreen', '0', '-logFile', ('"' + $mlog2 + '"'))
+$m | Wait-Process -Timeout 240
+Select-String -LiteralPath $mlog2 -Pattern 'MOTION_CAPTURE_DONE|Exception' | Select-Object -First 5 | ForEach-Object Line
 & (Join-Path $PSScriptRoot 'screen_prefs.ps1') -Restore

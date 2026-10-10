@@ -79,6 +79,30 @@
     {"id": "sp-weathered-voice", "name": "Weathered Voice", "tier": 5, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "note", "desc": "Muster's barriers absorb 10% more per rank and also remove one slowing effect.", "emphasis": {"support": 1}},
     {"id": "sp-stormlight-standard", "name": "Stormlight Standard", "tier": 6, "col": 1, "max": 1, "req": "sp-shoulder-to-shoulder", "kind": "capstone", "icon": "star", "desc": "Answering Step also plants your standard: for 8s allies within 10m share 20% of incoming damage with you and receive your Vigor refunds as their resource. Your damage is halved meanwhile.", "emphasis": {"support": 8, "mitigation": 1, "damage": -2}}
    ]
+  },
+  {
+   "id": "jailer",
+   "name": "Jailer",
+   "role": "control",
+   "loop": "Cut a foe's legs, net or shackle it where it stands, and keep the fight on your terms: what you hold cannot reach the party.",
+   "tradeoff": "The Jailer's holds cost the Vigor a tank spends on blocks and a duellist on finishers: it holds a foe; it does not outlast or outhit one.",
+   "nodes": [
+    {"id": "jl-cord-and-hook", "name": "Cord and Hook", "tier": 0, "col": 1, "max": 5, "req": null, "kind": "passive", "icon": "clock", "desc": "Hock Cut's slow lasts 1s longer per rank.", "emphasis": {"control": 1}, "impl": true},
+    {"id": "jl-turnkey", "name": "Turnkey", "tier": 0, "col": 2, "max": 3, "req": null, "kind": "modifier", "icon": "sword", "desc": "Blows on a foe you hold (slowed by Hock Cut, netted or shackled) land 3% harder per rank, whoever strikes them.", "emphasis": {"damage": 1}, "impl": true},
+    {"id": "jl-heavy-iron", "name": "Heavy Iron", "tier": 1, "col": 0, "max": 3, "req": null, "kind": "passive", "icon": "chain", "desc": "Shackle Cast's stun lasts a quarter second longer per rank.", "emphasis": {"control": 1.2}, "impl": true},
+    {"id": "jl-weighted-net", "name": "Weighted Net", "tier": 1, "col": 1, "max": 1, "req": null, "kind": "active", "icon": "chain", "desc": "New action: Weighted Net: the target is held where it stands for 5s (it can still strike what is in reach).", "emphasis": {"control": 2}, "impl": true},
+    {"id": "jl-tight-weave", "name": "Tight Weave", "tier": 1, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "clock", "desc": "Weighted Net holds 1s longer per rank.", "emphasis": {"control": 1}, "impl": true},
+    {"id": "jl-keepers-due", "name": "Keeper's Due", "tier": 2, "col": 0, "max": 3, "req": null, "kind": "passive", "icon": "crystal", "desc": "Each hold that takes (a Net or a Shackle) gives you 4 Vigor per rank.", "emphasis": {"sustain": 1}, "impl": true},
+    {"id": "jl-drag-chain", "name": "Drag Chain", "tier": 2, "col": 1, "max": 1, "req": null, "kind": "signature", "icon": "hand", "desc": "Shackle Cast drags the foe to your feet.", "emphasis": {"control": 2, "threat": 1}, "impl": true},
+    {"id": "jl-wide-mesh", "name": "Wide Mesh", "tier": 2, "col": 2, "max": 3, "req": "jl-weighted-net", "kind": "modifier", "icon": "target", "desc": "Weighted Net also catches every foe within 1.5m of the target per rank.", "emphasis": {"control": 1.5}, "impl": true},
+    {"id": "jl-low-and-cruel", "name": "Low and Cruel", "tier": 3, "col": 1, "max": 3, "req": null, "kind": "modifier", "icon": "eye", "desc": "Hock Cut also Exposes the target for 1s per rank.", "emphasis": {"damage": 1, "support": 1}, "impl": true},
+    {"id": "jl-warden", "name": "Warden", "tier": 3, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "shield", "desc": "A foe held by your Net or your Shackle deals 20% less to anyone.", "emphasis": {"mitigation": 1.5, "control": 1}, "impl": true},
+    {"id": "jl-manacles", "name": "Manacles", "tier": 4, "col": 1, "max": 3, "req": null, "kind": "modifier", "icon": "clock", "desc": "Shackle Cast's cooldown is 3s shorter per rank.", "emphasis": {"control": 1.2}, "impl": false},
+    {"id": "jl-gaolers-reach", "name": "Gaoler's Reach", "tier": 4, "col": 2, "max": 1, "req": null, "kind": "modifier", "icon": "target", "desc": "Weighted Net and Shackle Cast reach 30m.", "emphasis": {"control": 1}, "impl": false},
+    {"id": "jl-chain-gang", "name": "Chain Gang", "tier": 5, "col": 1, "max": 3, "req": "jl-drag-chain", "kind": "passive", "icon": "chain", "desc": "Drag Chain also drags one more foe within 5m of the first per rank.", "emphasis": {"control": 1.5, "threat": 1}, "impl": false},
+    {"id": "jl-lockdown", "name": "Lockdown", "tier": 5, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "bolt", "desc": "A foe you hold three times within 20s is stunned for 3s.", "emphasis": {"control": 2}, "impl": false},
+    {"id": "jl-the-gaol", "name": "The Gaol", "tier": 6, "col": 1, "max": 1, "req": "jl-chain-gang", "kind": "capstone", "icon": "star", "desc": "Shackle Cast stuns every foe within 6m of the target.", "emphasis": {"control": 3}, "impl": false}
+   ]
   }
  ]
 }

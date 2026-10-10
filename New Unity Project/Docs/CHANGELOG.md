@@ -1926,3 +1926,88 @@ A read-only review by five reviewers, each finding checked by a second who tried
 
 - Full run 2026-10-10 on f8e43bd: EditMode 441/441, PlayMode 265/265, build and the Oakhaven and Adit tours clean, 0 shader errors.
   Published 15:12 (release, commit 0a395a2: the walk-in barns, the sleeping beasts, the wand at the hip).
+
+## 2026-10-10 — Barns with their doors in the gable, straw, the Fold barn, Mira's Invite, a windmill in the wind, a fuller horizon, the jump and the bow
+- **The doors are in the gable end** (Chris: "this barn is backwards"; asked, "doors on wrong side": under the roof's peak, not the long
+  side under the eaves). A walk-in barn now runs back from its front: the footprint's long side is its length, the ridge runs in from the
+  doorway, the doorway and its sliding leaves stand under the gable (`ZoneBuilder.WalkInBarn`, the roof built along x and turned). Its
+  footprint is swapped to match (`Footprint`, `WalksIn`), so grass, trees and rain keep out of it; the Cider Barn's barrels, Carder's
+  haystack and the Harrow grain bin moved clear of the longer barns.
+- **Straw** ("missing straw", twice): the floor is the kit's straw (the thatch's Wheat texture, tiled), each stall has loose heaps of
+  bedding, a hay rack on its wall and a plank partition; bales with twine are stacked against the back wall (one dragged into a wide
+  aisle), loose straw in the back corners when there is room. The floating hay "bun" is gone.
+- **Stalls down both sides of an aisle**: two rows facing the side walls; a beast walks up the aisle to its stall's front before turning
+  in (`ZoneBarn.aisle`), and lies with its head to the wall (`ZoneBarn.faces`); two sheep share a stall side by side along the barn.
+- **The Old Fold's flock has a barn** ("the old fort barn not open and sheep dont have a place to sleep"): the Shepherd's hut (5.5 by 4,
+  too small to walk into) is now the Fold barn, 9 by 6, a little further from the fold's corner, its doorway facing the fold.
+- **Mira's Invite** ("there should be an invite button for mira"): Invite on her row in the party frame and on her frame when you click
+  her, and /invite mira, from anywhere in the zone; she walks over (`EncounterSession.InviteMira`, the same as recruiting her in person).
+- **The windmill turns with the wind** ("windmill should be animated when wind blowing"): its sails had been merged into the static
+  scenery's batches, which froze them where they stood; the mill now stands with the moving props, and its sails turn from about 4
+  degrees a second on a still day to 70 in a storm (20 on a fair one), easing up and down as the weather changes, with a slow gust
+  (`ZoneBuilder.Sails`).
+- **The horizon** ("horizon still looks empty. compare the horizon in world of warcraft forever in elwynn forest"): the backdrop's
+  woods stopped 43 m past the edge with trees up to 19 m apart, the ridge behind them was bare, and Oakhaven's fog ended at 330 m, so
+  from the green the far trees were 3 to 24 per cent of their colour. Now meadows and woods are wooded right over the ridge (rows to 86
+  m out, 6 to 14 m apart, the ridge's taller); a ring of wooded hills with a skyline of tree crowns rises behind the ridge at 1.5 reaches
+  (`DistantRanges`, none on the Ash Rim), the hills and mountains past it are nearer and taller (2 reaches, 150 m), and Oakhaven's fog
+  runs from 150 to 480 m (was 105 to 330).
+- **The jump** ("still feel floaty and when you land feet twist together"): up at 6.4 m/s under 22 m/s2, down under 34, so it tops out a
+  little under a metre and is over in 0.53 s, coming down quicker than it went up (it was 0.6 s, hanging at the top). In the air the
+  take-off clip plays from its push-off while rising and the fall's loop coming down (the whole standing jump, crouch and landing, had
+  played in the air); the landing's knee-dip plays on touching down, a moment of it running; blends into and out of the jump's clips
+  take a sixteenth of a second, not a quarter, so the legs never sit half in two poses (`AdventurerMotor`, `ActorVisual`, `ModelFigure`).
+  Then, from the motion capture's frames: the fall's loop flung both arms up and the landing clip squatted to the ground (that was the
+  legs folding and twisting). A hop now keeps the take-off's tuck at four-fifths over the walk or run until it touches down (only a long
+  fall plays the fall), and the landing's dip plays at half weight standing and a third running (`ModelFigure.Drive` lays a pose over
+  the locomotion at part weight).
+- **The bow** ("still no bow animations on ranger"): the game has no archery clips (locomotion, idles, a sword's swing and spell casts),
+  so every shot played the mage's throw. A shot is now posed over whatever the legs are doing: the chest turned side-on, the bow arm out
+  at the mark, the string hand drawn to the jaw and held, loosed with a follow-through past the ear, back to the string and drawn again;
+  Aimed Shot holds the full draw while it is drawn. Any figure with a bow in hand does it (your Ranger, Ranger sims, party sims), and a
+  Ranger's ranged ability no longer swings the bow like a sword when the mark is close (`ActorVisual.BowArms`). A Kevin Iglesias archery
+  set would replace the posed arms with real clips (ROADMAP 8.5). The capture then showed why Chris never saw it: a Ranger's Hunting Bow
+  is an equipped item, mounted in the right hand like a sword, and the bow check knew only the class's own bow. An equipped bow now sits
+  in the left fist as the Ranger's own does (`ActorVisual.IsBow`, `Mount`), any bow in hand draws and looses, the bow stays out while
+  you shoot, and while drawn it stands upright instead of lying along the raised arm like a spear (`BowUpright`).
+- **A talent point every level to 15** (16 points at 15, as TALENT_DEPTH.md has it and Chris decided: "1 a level (as now)"): points had
+  stopped at level 10 (11 points) when the levels went to 15, so no path's tier 3 (the Vanguard's, the Jailer's, the Cantor's) could be
+  reached in play; `EncounterProgress.TalentCap` is the level cap now. Caught by the Jailer's test.
+- **A class may have up to thirteen actions** (the bar's slots): `ClassLoadout` refused more than eight, which the Jailer's three took
+  the Warrior past (every Warrior session failed to start in the focused run; caught before publishing).
+- **The who list** (still "opens nothing" for Chris; not reproduced: his Player.log has no error, his saved keys leave O on the who
+  list, and the capture draws it): it is now also on the Menu (Who [O]), and its headings stand over their columns (one spaced-out line
+  had drifted a column left of what it named).
+- `MotionCapture` (new, in capture_extra.ps1): a standing and a running jump and the bow, frame by frame from the side, slowed.
+- **The game no longer opens windowed after a capture run**: screen_prefs.ps1 read the game's screen settings with Get-ItemProperty, which
+  threw on that key ("Unable to cast Int64 to Int32"), so it saved nothing and restored nothing and the captures' windowed 1440x900 stayed
+  for Chris. It reads and writes them through .NET's registry API now.
+
+## 2026-10-10 — The Warrior's fourth path: the Jailer (TALENT_DEPTH.md, Chris's order: the Warrior after the Paladin)
+- **Three actions** (GAME-ONLY names, keys 9, 0 and -): **Hock Cut** (level 3; a light blow, the target at half speed 8 s), **Weighted
+  Net** (its talent; thrown up to 20 m, the target held where it stands 5 s, still striking what is in reach), **Shackle Cast** (level 9;
+  a chain hurled up to 20 m, the target stunned 2 s; a boss takes no stun).
+- **The jailer branch** (warrior.json, role control): tiers 0-3 built (Cord and Hook, Turnkey, Heavy Iron, Weighted Net, Tight Weave,
+  Keeper's Due, Drag Chain, Wide Mesh, Low and Cruel, Warden), tiers 4-6 written (Manacles, Gaoler's Reach, Chain Gang, Lockdown, The
+  Gaol). A held foe (slowed, netted or shackled by you) takes 3% a rank more from the whole party (Turnkey); one netted or shackled deals
+  20% less to anyone (Warden); Drag Chain hauls the shackled foe to a stride in front of you; the target frame says HELD and how long.
+- Icons for the three actions and fifteen talents (tools/art/make_icons.py).
+- Tests: WarriorTalentTests (four paths; the Jailer to tier 3 at the cap of 15), CrowdControlTests (the Jailer cuts, nets and shackles:
+  the slow, the root, the stun and the drag; Turnkey's 3%, Keeper's Due's Vigor, Warden's cut).
+- Tests: BarnTests (the ridge runs in from the doorway, stalls on both sides of the aisle facing the walls, inside the footprint; the
+  Old Fold's sheep have the Fold barn; the windmill's sails are not static-batched, turn, and turn over three times faster in a wind),
+  JumpTests (new: tops out at 0.75 to 1.05 m, lands in 0.42 to 0.65 s, falls quicker than it rose), SimPartyTests (Mira invited from 24 m
+  walks over; /invite mira then finds her with you).
+
+## 2026-10-10 — The Archivist's fourth path: the Cantor (TALENT_DEPTH.md, Chris's order: the Archivist after the Warrior)
+- **CANON-EXPANDED roots:** the books' Silent Pilgrims keep the memory of the Original Song and hope for a "Song of Mending" (a
+  "Symphony of Mending"); the Cantor sings it. Its kit is GAME-ONLY.
+- **Three actions** (keys 8, 9 and 0): **Mending Phrase** (level 3; sung 1.5 s, it heals whoever of the party within 30 m is most hurt
+  when it lands), **the Song of Mending** (level 5; a third song beside Cadence and Dirge, one at a time: every party member within 10 m
+  of you mends 1% of maximum health a second), **Chorus of the Weave** (its talent; a barrier on every party member within 15 m for 8 s).
+- **The Cantor's branch** (archivist.json, role healer): tiers 0-3 built (Clear Voice, Breath, Held Note, Chorus of the Weave, Long Song,
+  Echoing Mend, Resonant Ward, Quiet Mind, The Weave, Symphony of Mending), tiers 4-6 written (Second Voice, Desert of Echoes, Last
+  Verse, Choir, The Mending Song).
+- Icons for the three actions and fifteen talents (tools/art/make_icons.py).
+- Tests: ArchivistRulesTests (four paths; the Cantor to tier 3 at the cap of 15), ArchivistLoopTests (the phrase heals, the song mends
+  each second and is one of the songs, the Chorus shields; ten actions).

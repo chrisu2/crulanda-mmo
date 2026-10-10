@@ -20,7 +20,10 @@ namespace Crulanda.Encounter
             whoRect = new Rect(320, 120, 860, Mathf.Min(h, 680));   // round 27: wider, for the guild
             Frame(whoRect);
             GUI.Label(new Rect(whoRect.x + 24, whoRect.y + 14, 400, 34), "WHO · " + list.Count + " online", heading);
-            Shadow(new Rect(whoRect.x + 24, whoRect.y + 50, 760, 20), "Name                                  Guild                              Class         Level   Where                          Standing", tiny, new Color(.8f, .8f, .78f));
+            // The headings over their columns (2026-10-10: one spaced-out line had drifted a column to the left of what it named).
+            var head = new Color(.8f, .8f, .78f);
+            foreach (var (x, label) in new[] { (24f, "Name"), (236f, "Guild"), (396f, "Class"), (494f, "Level"), (538f, "Where"), (702f, "Standing") })
+                Shadow(new Rect(whoRect.x + x, whoRect.y + 50, 160, 20), label, tiny, head);
             float y = whoRect.y + 72;
             foreach (var s in list)
             {

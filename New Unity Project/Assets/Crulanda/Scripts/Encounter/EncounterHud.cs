@@ -181,6 +181,7 @@ namespace Crulanda.Encounter
             Fill(new Rect(48, 118, 214, 44), new Color(0, 0, 0, .5f));
             Portrait(new Vector2(40, 140), 46, new Color(.45f, .8f, .55f), "M", null);
             Shadow(new Rect(70, 114, 190, 22), "Mira · " + session.Progress.Level + (session.Progress.recruited ? "" : "  (not in party)"), tiny, session.Progress.recruited ? Color.white : new Color(.8f, .8f, .8f));   // 22 px: an 18 px rect clipped the p and y
+            if (!session.Progress.recruited && GUI.Button(new Rect(268, 122, 60, 26), "Invite", slim)) session.InviteMira();   // 2026-10-10
             UnitBar(new Rect(70, 135, 184, 12), a.Health.Pool.Ratio, HealthGreen, "");
             UnitBar(new Rect(70, 149, 184, 8), a.Resource.Pool.Ratio, ResourceColor(Crulanda.Core.ResourceKind.Mana), "");
             Shadow(new Rect(20, 166, 320, 20), m.Activity, tiny, new Color(.85f, .9f, .85f));
@@ -456,6 +457,7 @@ namespace Crulanda.Encounter
             };
             if (session.Professions != null) items.Add(("Trades   [K]", () => session.ShowTrades(!session.TradesOpen)));
             items.Add(("Map   [M]", () => session.MapOpen = !session.MapOpen));
+            if (SimPopulation.Active != null) items.Add(("Who   [" + KeyBindings.Label(GameKey.Who) + "]", () => session.WhoOpen = !session.WhoOpen));   // 2026-10-10: Chris found no way to it
             items.Add(("Save", () => session.Save()));
             items.Add(("Load", () => session.Load()));
             float w = 170, h = 32, top = button.y - 6 - items.Count * (h + 2);

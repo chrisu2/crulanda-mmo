@@ -50,6 +50,8 @@ out of that rig as loose nodes and pinned to our heads, which is why they cannot
 construction (needs the full package re-downloaded from the Asset Store, our animations retargeted through a Humanoid avatar, and a
 mapping from our items' looks to its parts, keeping the drawn pieces for what it lacks: cloth, leather, the zones' palettes); or
 (b) keep our figures and rewrite the fitting rules piece by piece. (a) is the lasting fix; (b) is the one that keeps failing.
+**Animations to buy with it (2026-10-10):** the game has no archery clips, so the bow is posed by hand (ActorVisual.BowArms, note 108);
+a Kevin Iglesias archery set (the same maker as the locomotion) would give a real draw, aim and release on the same Humanoid avatar.
 **Done when:** the wardrobe line-up (EncounterCapture --crulanda-wardrobe-capture) shows every slot's every family fitting on every
 class's figure, and Chris has looked at it.
 

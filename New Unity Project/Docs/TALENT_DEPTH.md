@@ -35,12 +35,12 @@ control Ranger, Mage, Rogue, Archivist, Warrior (new).
 | Class | Today | Fourth path (proposed) | Can tank? |
 |---|---|---|---|
 | Paladin | Oathguard tank, Judicator damage, Sanctuary healer | **Vanguard** (support; built 2026-10-09): Plant the Colours (the party under the standard takes less), Close Ranks (barriers, Conviction for each ally rallied), Press On (the party's blows harder, Mira faster). Chris chose it over Herald (no church in the books) and Marshal (a Warrior's word). | yes |
-| Warrior | Tank, DPS, Support | **Jailer** (control): nets, chains, hamstrings, a throw that stuns | yes |
+| Warrior | Tank, DPS, Support | **Jailer** (control; built 2026-10-10): Hock Cut (a slow), Weighted Net (a root, a talent), Shackle Cast (a stun; Drag Chain hauls the foe to you); a held foe takes harder blows (Turnkey), a netted or shackled one deals less (Warden). Tiers 0-3 built, 4-6 written. | yes |
 | Druid | Barkhide tank, Thornclaw melee, Rootmend healer, Thornsong ranged | has four: depth only | yes |
 | Ranger | Marksman ranged, Beastbond pet, Pathfinder control | **Skirmisher** (melee): spear and short blade, hit-and-run | no (the wolf holds a little) |
 | Mage | Combustion ranged, Heatweaver control, Spellbinder support | **Cinderwright** (pets): ember familiars and a forge-golem | no |
 | Rogue | Thief's Grace stealth, Shardwork poisons, Locksmith control | **Swashbuckler** (support): flanking, exposing, party haste | no |
-| Archivist | the Silent Vow control, the Lull control, the Archive support | **the Cantor** (healer): songs that mend, a chorus that shields | no |
+| Archivist | the Silent Vow control, the Lull control, the Archive support | **the Cantor** (healer; built 2026-10-10, CANON-EXPANDED from the books' Song of Mending): Mending Phrase (a sung heal on the most hurt), the Song of Mending (a third song: the party near you mends 1% a second), Chorus of the Weave (a talent: barriers on everyone near). Tiers 0-3 built, 4-6 written. | no |
 
 A new path means 3-4 new abilities and 16-21 talents; a deepened old one about 8 new talents.
 

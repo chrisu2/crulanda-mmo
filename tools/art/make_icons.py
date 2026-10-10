@@ -1729,6 +1729,48 @@ def a_press_on(c):
     rays(c, 86, 24, 10, 30, 8, HOLY, .5, 6)
 ABILITIES.update({'paladin.colours': ('#4a2a24', a_colours), 'paladin.close_ranks': ('#2a3454', a_close_ranks), 'paladin.press_on': ('#4a4020', a_press_on)})
 BRANCH.update({'vanguard': ('#4a3020', ['#e0b040', '#b02a2a', '#efe6cf', '#9fc8ff', '#d0a060'])})
+
+# ---- warrior, the Jailer (2026-10-10, TALENT_DEPTH.md): the cut, the net, the shackle ----
+IRONC = '#8a9098'
+def a_hock_cut(c):
+    c.back(c.ell(50, 50, 38), '#c84a3a', .4, 10)
+    c.push(rot=-30, sc=1.0); P = dict(_P(), metal=col(lite(IRONC, .35)), trim=col(GOLD)); _blade(c, [(44, 70), (44, 26), (50, 10), (56, 26), (56, 70)], P['metal'], y0=12)
+    c.part(c.rect(34, 68, 66, 74, 2), GOLD, 'metal'); c.part(c.rect(46, 74, 54, 92, 2), '#6a4a30', 'matte'); c.pop()
+    c.part(c.taper([(12, 84), (44, 70), (90, 76)], 2, 1, wmid=5), '#d83a2a', 'gem', ink=False)
+def a_net(c):
+    c.back(c.ell(50, 50, 40), '#c8b080', .35, 10)
+    net = c.ell(50, 52, 36, 32)
+    c.part(net, '#5a4a30', 'matte', alpha=.35)
+    for k in range(-3, 4):
+        c.part(c.line([(50 + k * 10 - 30, 22), (50 + k * 10 + 30, 84)], 2.2), '#d8c090', 'soft', clip=net, ink=False)
+        c.part(c.line([(50 + k * 10 + 30, 22), (50 + k * 10 - 30, 84)], 2.2), '#d8c090', 'soft', clip=net, ink=False)
+    for x, y in ((20, 46), (80, 46), (34, 80), (66, 80), (50, 22)): c.part(c.ell(x, y, 5.5), '#6a6e76', 'metal')
+def a_shackle(c):
+    c.back(c.ell(50, 50, 38), '#9fc8ff', .35, 10)
+    for i, (x, y) in enumerate(((20, 22), (32, 34), (44, 46))):
+        r = 45 if i % 2 == 0 else -45
+        c.part(c.sub(c.ell(x, y, 10, 6.5, rot=r), c.ell(x, y, 5.5, 2.5, rot=r)), IRONC, 'metal')
+    ring = c.sub(c.ell(64, 66, 24), c.ell(64, 66, 15))
+    c.part(ring, lite(IRONC, .15), 'metal'); c.part(c.rect(54, 38, 74, 46, 2), dark(IRONC, .2), 'metal')
+    c.spark(84, 84, 9, '#ffffff', .8)
+ABILITIES.update({'warrior.hock_cut': ('#4a2220', a_hock_cut), 'warrior.net': ('#3a3222', a_net), 'warrior.shackle': ('#26303e', a_shackle)})
+BRANCH.update({'jailer': ('#2a2e36', ['#8a9098', '#c8b080', '#d83a2a', '#9fc8ff', '#e0b040'])})
+
+# ---- archivist, the Cantor (2026-10-10, TALENT_DEPTH.md): the phrase, the song, the chorus ----
+def a_mending_phrase(c):
+    c.back(c.ell(50, 50, 38), '#9fe8c0', .45, 10)
+    m_note(c, '#bfe8ff', '#ffffff'); c.spark(76, 26, 9, '#d0ffe0', .9); c.spark(26, 70, 6, '#d0ffe0', .7)
+def a_song_of_mending(c):
+    c.back(c.ell(50, 50, 40), '#70d0a0', .4, 12)
+    rings(c, 50, 54, (16, 26, 36), '#a0f0c0', .7, w=3.5); m_drop(c, '#9fe8c0', '#ffffff')
+def a_chorus(c):
+    c.back(c.ell(50, 50, 38), '#9fc8ff', .4, 10)
+    for x, y in ((30, 58), (50, 46), (70, 58)):
+        m = c.poly([(x - 11, y - 14), (x + 11, y - 14), (x + 11, y + 5), (x, y + 20), (x - 11, y + 5)], smooth=True, n=4)
+        c.part(m, '#dfeeff', 'soft'); c.part(c.grow(m, -5), '#3a6a9a', 'matte')
+    rings(c, 50, 50, (44,), '#bfe8ff', .5, w=3)
+ABILITIES.update({'archivist.mending_phrase': ('#1e3a34', a_mending_phrase), 'archivist.song_of_mending': ('#1e3a2c', a_song_of_mending), 'archivist.chorus': ('#22304a', a_chorus)})
+BRANCH.update({'the-cantor': ('#1e3434', ['#9fe8c0', '#bfe8ff', '#70d0a0', '#e0e8f0', '#d0ffe0'])})
 KIND_TRIM = dict(passive='#c9ccd2', modifier='#e0b040', active='#fff0b0', signature='#fff0b0', capstone='#ffd040')
 def draw_talent(c, icon, branch, kind, k):
     """k: how many earlier talents in the branch used the same icon word (0 = first)."""

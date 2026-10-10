@@ -24,9 +24,25 @@ namespace Crulanda.Tests
         {
             var t = TestTalents.Warrior();
             int count = 0; foreach (var b in t.Branches) count += b.nodes.Length;
-            Assert.AreEqual(3, t.Branches.Count); Assert.AreEqual(WarriorKit.ImplementedIds.Length, count);
+            Assert.AreEqual(4, t.Branches.Count, "Tank, DPS, Support, Jailer."); Assert.AreEqual(WarriorKit.ImplementedIds.Length, count);
+            Assert.AreEqual("jailer", t.Branches[3].id); Assert.AreEqual("control", t.Branches[3].role);
+            Assert.NotNull(t.Find("jl-warden"), "The Jailer's tier 3 is built."); Assert.IsNull(t.Find("jl-manacles"), "Its tiers 4-6 are written, not built.");
             foreach (var id in WarriorKit.ImplementedIds) Assert.NotNull(t.Find(id), id);
             Assert.NotNull(t.Find("tk-held-line"), "Row 3 is implemented (2026-10-08)."); Assert.IsNull(t.Find("tk-unbroken-line"), "Rows 4-6 wait for the cap-30 levels.");
+        }
+        /// <summary>The Jailer (TALENT_DEPTH.md, 2026-10-10): at the cap of 15 (16 points) a Warrior reaches its tier 3; Weighted Net is its talent action.</summary>
+        [Test] public void The_Jailer_reaches_tier_three_at_the_cap()
+        {
+            var t = TalentTree.Parse("class.warrior", TestTalents.Json, 15, WarriorKit.ImplementedIds); var p = AtLevel(15);
+            Assert.AreEqual(16, t.Budget(p.Level));
+            Assert.IsFalse(t.Propose(p, "jl-weighted-net", 1, out _, out _), "Tier 1 needs 5 points in the Jailer.");
+            Buy(t, p, "jl-cord-and-hook", "jl-cord-and-hook", "jl-cord-and-hook", "jl-cord-and-hook", "jl-cord-and-hook");   // 5: tier 1 opens
+            Assert.IsFalse(t.Propose(p, "jl-wide-mesh", 1, out _, out _), "Wide Mesh needs tier 2 and the Net.");
+            Buy(t, p, "jl-weighted-net", "jl-tight-weave", "jl-tight-weave", "jl-heavy-iron", "jl-heavy-iron");                  // 10: tier 2 opens
+            Buy(t, p, "jl-drag-chain", "jl-wide-mesh", "jl-keepers-due", "jl-keepers-due", "jl-turnkey");                       // 15: tier 3 opens
+            Buy(t, p, "jl-warden");                                                                                             // 16
+            Assert.AreEqual(0, t.Available(p), "Sixteen points: the Jailer to its third tier.");
+            Assert.IsTrue(t.Validate(p, out var why), why);
         }
         [Test] public void Implemented_flag_without_code_is_rejected()
         {

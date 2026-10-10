@@ -17,7 +17,9 @@ namespace Crulanda.Tests
     /// <summary>
     /// The walk-in barns (2026-10-10, Chris: "barn door should be open enough to walk into, for farm animals to sleep"): the doorway stands
     /// open with its sliding doors slid aside and every stall can be walked to from in front of it; at night the farm beasts are in their
-    /// stalls and by day back on their pastures; one walks in through the doorway at dusk and back out in the morning.
+    /// stalls and by day back on their pastures; one walks in through the doorway at dusk and back out in the morning. Then ("this barn is
+    /// backwards", "missing straw", "sheep dont have a place to sleep"): the doors are in the gable end, the stalls down both sides of an
+    /// aisle, and the Old Fold's flock has the Fold barn. And the windmill turns with the wind ("should be animated when wind blowing").
     /// </summary>
     public class BarnTests
     {
@@ -65,8 +67,36 @@ namespace Crulanda.Tests
                 var from = zone.Ground(Flat(b.door), 1.2f); var to = zone.Ground(Flat(b.inside), 1.2f);
                 if (Physics.Linecast(from, to, out var hit, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore)) problems.Add(b.name + ": the doorway is blocked by " + hit.collider.name);
                 if (!zone.InBuilding(Flat(b.inside))) problems.Add(b.name + ": the point inside is not inside it");
+                // The doorway is in the gable end: the ridge runs in from it, and the stalls face out to either side of the aisle.
+                var axis = b.inside - b.door; axis.y = 0; axis.Normalize();
+                var roof = UnityEngine.Object.FindObjectsByType<Transform>(FindObjectsSortMode.None).FirstOrDefault(t => t.name == "Barn roof" && t.parent != null && t.parent.name == b.name);
+                if (roof == null || Mathf.Abs(Vector3.Dot(roof.right, axis)) < .99f) problems.Add(b.name + ": its ridge does not run in from the doorway");
+                if (b.faces.Length != b.stalls.Length || b.faces.Any(f => Mathf.Abs(Vector3.Dot(f.normalized, axis)) > .05f)) problems.Add(b.name + ": its stalls do not face the side walls");
+                if (!b.faces.Any(f => Vector3.Cross(axis, f).y > 0) || !b.faces.Any(f => Vector3.Cross(axis, f).y < 0)) problems.Add(b.name + ": stalls only on one side of the aisle");
+                if (b.aisle.Length != b.stalls.Length || b.aisle.Any(a => !zone.InBuilding(Flat(a)))) problems.Add(b.name + ": an aisle point outside it");
+                foreach (var s in b.stalls) if (!zone.InBuilding(Flat(s))) problems.Add(b.name + ": the stall at " + s + " is outside its footprint (the grass grows there)");
             }
             Assert.IsEmpty(problems, string.Join("\n", problems));
+            var fold = UnityEngine.Object.FindObjectsByType<Critter>(FindObjectsSortMode.None).Where(c => c.Kind == "sheep" && Vector2.Distance(Flat(c.transform.position), new Vector2(-156, 64)) < 25).ToList();
+            Assert.Greater(fold.Count, 0, "the Old Fold's flock");
+            foreach (var c in fold) { Assert.NotNull(c.Barn, c.name + " at the Old Fold has a barn"); Assert.AreEqual("Fold barn", c.Barn.name); }
+        }
+
+        [UnityTest] public IEnumerator A_windmill_turns_with_the_wind()
+        {
+            yield return Load(10);
+            var sails = UnityEngine.Object.FindObjectsByType<ZoneBuilder.Sails>(FindObjectsSortMode.None);
+            Assert.Greater(sails.Length, 0, "Oakhaven has a windmill");
+            foreach (var s in sails) Assert.IsFalse(s.GetComponent<MeshRenderer>().isPartOfStaticBatch, "its sails are not frozen in a static batch");
+            var weather = WorldWeather.Active; Assert.NotNull(weather);
+            weather.Force(WeatherKind.Clear, true); Time.timeScale = 4;
+            yield return WaitUntil(() => Mathf.Abs(sails[0].degreesPerSecond - ZoneBuilder.Sails.SpeedFor(WorldWeather.Now.wind)) < 3, 10);
+            float calm = sails[0].degreesPerSecond; var was = sails[0].transform.rotation;
+            yield return new WaitForSeconds(1);
+            Assert.Greater(Quaternion.Angle(was, sails[0].transform.rotation), 1, "the sails turn");
+            weather.Force(WeatherKind.Windy, true);
+            yield return WaitUntil(() => sails[0].degreesPerSecond > calm * 3, 12);
+            Assert.Greater(sails[0].degreesPerSecond, calm * 3, "faster in a wind (" + calm + " calm)");
         }
 
         [UnityTest] public IEnumerator At_night_the_farm_beasts_sleep_in_their_barns_and_by_day_they_are_out()

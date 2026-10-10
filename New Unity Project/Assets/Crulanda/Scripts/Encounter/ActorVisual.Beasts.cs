@@ -176,10 +176,10 @@ namespace Crulanda.Encounter
         }
         bool punchLeft; int blow;
         /// <summary>A spell let fly (an instant one, or a cast as it completes): the release over the walk.</summary>
-        public void CastRelease() { if (model != null) model.Act("castshot"); }
+        public void CastRelease() { if (BowReady) { Shoot(); return; } if (model != null) model.Act("castshot"); }   // a bow looses an arrow (and comes out to)
         /// <summary>A cast being drawn: the spell pose held over the walk.</summary>
         bool castingNow;
-        public bool Casting { get { return castingNow; } set { castingNow = value; if (model != null) model.Casting = value; } }
+        public bool Casting { get { return castingNow; } set { castingNow = value; bool bow = value && BowReady; drawing = bow; if (model != null) model.Casting = value && !bow; } }   // a bow is drawn, not a spell
         /// <summary>Struck (EncounterEnemy.Receive): a modelled beast flinches, one way then the other, unless it is mid-attack.</summary>
         public void Flinch()
         {

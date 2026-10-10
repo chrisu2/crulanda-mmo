@@ -81,7 +81,9 @@ namespace Crulanda.Tests
             s.regard = SimMemory.RivalAt; before = session.Chat.Count;
             session.Whisper(s.name + " hey"); yield return new WaitForSeconds(8);
             Assert.IsFalse(session.Chat.Skip(before).Any(l => l.channel == ChatChannel.Whisper && l.speaker == s.name), "a rival does not answer (its zone chatter goes on)");
-            StringAssert.Contains("Not with you", session.InviteRefusal(s), "nor group with you");
+            Assert.IsTrue(SimMemory.Refuses(s), "nor group with you");
+            var refusal = session.InviteRefusal(s);   // where it is (in the inn, in a fight) is said before its mood (a full run of 2026-10-10 caught one fighting)
+            if (!refusal.Contains("busy fighting") && !refusal.Contains("inside the inn")) StringAssert.Contains("Not with you", refusal, "nor group with you");
         }
         [UnityTest] public IEnumerator A_group_call_is_answered_and_messages_land_in_system()
         {

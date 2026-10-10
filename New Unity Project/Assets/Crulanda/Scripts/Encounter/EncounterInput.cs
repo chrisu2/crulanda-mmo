@@ -72,9 +72,12 @@ namespace Crulanda.Encounter
         }
         /// <summary>Running on by itself (the Auto-run key) until forward, back or the key again.</summary>
         public static bool AutoRunning; static int autoFrame = -1;
+        /// <summary>Movement set by a capture (MotionCapture's running jump) in place of the keys; null otherwise.</summary>
+        public static Vector2? Scripted;
         public static Vector2 Move
         {
             get {
+                if (Scripted.HasValue) return Scripted.Value;
                 if (Typing) return Vector2.zero;
 #if ENABLE_INPUT_SYSTEM
                 var k = Keyboard.current;

@@ -76,6 +76,45 @@ namespace Crulanda.Tests
             yield return new WaitForSeconds(1.6f);
             Assert.IsTrue(session.UseAbility(shout), "Shout"); yield return null; Assert.IsTrue(e.Feared);
         }
+        /// <summary>The Jailer (TALENT_DEPTH.md, 2026-10-10): Hock Cut slows, the Net holds where it stands, the Shackle stuns and (Drag Chain)
+        /// drags the foe to your feet; a held foe takes harder blows (Turnkey) and one netted or shackled deals less (Warden).</summary>
+        [UnityTest] public IEnumerator The_Jailer_cuts_nets_and_shackles()
+        {
+            Assert.AreEqual("class.warrior", session.ClassDef.id);
+            session.Progress.experience = EncounterProgress.XpForLevel(15); session.Player.SetLevel(15); session.Player.Resource.Pool.SetCurrent(100);
+            int cut = -1, net = -1, shackle = -1;
+            for (int i = 0; i < session.Kit.ActionCount; i++) { var x = session.Kit.ActionAt(i); if (x.id == "warrior.hock_cut") cut = i; if (x.id == "warrior.net") net = i; if (x.id == "warrior.shackle") shackle = i; }
+            Assert.AreEqual(11, session.Kit.ActionCount, "eight, and the Jailer's three");
+            Assert.IsTrue(cut >= 0 && net >= 0 && shackle >= 0, "all three on the bar");
+            Assert.AreEqual("Talent", session.Kit.ActionLockLabel(net), "the Net waits on its talent");
+            foreach (var id in new[] { "jl-cord-and-hook", "jl-cord-and-hook", "jl-cord-and-hook", "jl-cord-and-hook", "jl-cord-and-hook", "jl-weighted-net",
+                "jl-tight-weave", "jl-tight-weave", "jl-heavy-iron", "jl-heavy-iron", "jl-drag-chain", "jl-wide-mesh", "jl-keepers-due", "jl-keepers-due", "jl-turnkey", "jl-warden" })
+            { Assert.IsTrue(session.Talents.Propose(session.Progress, id, 1, out var next, out var why), id + ": " + why); session.Progress.talents = next; }
+            session.Kit.ApplyStats();
+            Assert.IsNull(session.Kit.ActionLockLabel(net), "the Net learnt");
+            var jailer = (WarriorKit)session.Kit; var motor = session.Player.GetComponent<AdventurerMotor>();
+            var e = Mob(); motor.Teleport(e.transform.position + Vector3.back * 2); session.Select(e); yield return null;
+            Assert.AreEqual(1f, session.Kit.PartyDamageMultiplier(e), 1e-4f, "nothing held yet");
+            Assert.IsTrue(session.UseAbility(cut), "Hock Cut"); yield return null;
+            Assert.IsTrue(e.Slowed, "slowed"); Assert.IsTrue(jailer.Holds(e)); Assert.IsFalse(jailer.Binds(e), "a slow is a hold, not a binding");
+            Assert.AreEqual(1.03f, session.Kit.PartyDamageMultiplier(e), 1e-3f, "Turnkey: a held foe takes 3% more");
+            yield return new WaitForSeconds(1.6f);
+            session.Player.Resource.Pool.SetCurrent(50);
+            Assert.IsTrue(session.UseAbility(net), "Weighted Net"); yield return null;
+            Assert.IsTrue(e.Rooted, "held where it stands"); Assert.IsTrue(jailer.Binds(e));
+            Assert.That(e.RootRemaining, Is.InRange(6.5f, 7.01f), "5 s and Tight Weave's two");
+            Assert.AreEqual(50 - 15 + 8, session.Player.Resource.Pool.Current, "the Net's cost, and Keeper's Due's 8 Vigor back");
+            int plain = 100; var combat = session.Player.GetComponent<Crulanda.Combat.Combatant>();
+            int taken = session.Kit.ResolveEnemyHit(e, session.Player, plain);
+            Assert.LessOrEqual(taken, Mathf.CeilToInt(plain * (1 - WarriorKit.WardenCut)), "Warden: a netted foe deals less");
+            session.Player.Health.ApplyHealing(9999);
+            // The Shackle at range: the foe stunned and dragged to your feet.
+            var f = session.Enemies.First(x => x != null && x != e && x.actor.IsAlive && x.Camp && !x.Elite && !x.Game && !x.Hidden);
+            motor.Teleport(f.transform.position + Vector3.back * 12); session.Select(f); yield return null; yield return new WaitForSeconds(1.6f);
+            Assert.IsTrue(session.UseAbility(shackle), "Shackle Cast"); yield return null;
+            Assert.IsTrue(f.Stunned, "stunned"); Assert.IsTrue(jailer.Binds(f));
+            Assert.Less(Vector3.Distance(f.transform.position, session.Player.transform.position), 4f, "Drag Chain: dragged to your feet");
+        }
         [UnityTest] public IEnumerator A_caster_casts_and_a_silence_interrupts_it()
         {
             var e = Mob(); e.Cast = MobCasts.For("Ash initiate"); Assert.NotNull(e.Cast);

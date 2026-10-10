@@ -16,22 +16,29 @@ namespace Crulanda.Encounter
     /// at a time: Cadence (you move faster and Mira casts faster) or Dirge (fighting mobs within 10 m are slowed). Echo-jar replays a
     /// stored death-cry: up to three mobs within 8 m of the target flee. Bar: 1 Shard Note, 2 Lull, 3 Hush, 4 Echo Bind, 5 Cadence,
     /// 6 Dirge, 7 Echo-jar. Talents: Talents/archivist.json, all 21 implemented (2026-10-08).
+    /// The Cantor (its fourth path, a healer; 2026-10-10, TALENT_DEPTH.md; CANON-EXPANDED: the books' Song of Mending and Symphony of
+    /// Mending, the Silent Pilgrims' hope): 8 Mending Phrase (a sung heal on the most hurt), 9 the Song of Mending (a third song: the party
+    /// near you mends each second), 0 Chorus of the Weave (a talent: a barrier on every party member near you).
     /// </summary>
     public sealed class ArchivistKit : ClassKit
     {
         public static readonly string[] ImplementedIds = {
             "sv-quick-hush", "sv-long-hush", "sv-still-air", "sv-vow", "sv-quiet-step", "sv-no-word", "sv-silence",
             "lu-deep-sleep", "lu-unsong", "lu-soft", "lu-wide", "lu-fourth", "lu-dreams", "lu-mesmer",
-            "ar-resonance", "ar-full-jar", "ar-chorus", "ar-low-dirge", "ar-second-jar", "ar-catalogue", "ar-original" };
-        public static readonly string[] BarIds = { "archivist.shard_note", "archivist.lull", "archivist.hush", "archivist.echo_bind", "archivist.cadence", "archivist.dirge", "archivist.echo_jar" };
+            "ar-resonance", "ar-full-jar", "ar-chorus", "ar-low-dirge", "ar-second-jar", "ar-catalogue", "ar-original",
+            "ca-clear-voice", "ca-breath", "ca-held-note", "ca-chorus", "ca-long-song", "ca-echoing-mend", "ca-resonant-ward", "ca-quiet-mind", "ca-weave", "ca-symphony" };   // the Cantor, tiers 0-3
+        public static readonly string[] BarIds = { "archivist.shard_note", "archivist.lull", "archivist.hush", "archivist.echo_bind", "archivist.cadence", "archivist.dirge", "archivist.echo_jar",
+            "archivist.mending_phrase", "archivist.song_of_mending", "archivist.chorus" };
+        public const float MendingReach = 10, MendingShare = .01f, HeldNoteShare = .01f, HeldNoteSeconds = 5, LowMend = .35f;
         public const float LullSeconds = 20, LullReach = 6, BindSeconds = 30, HushSilence = 5, DirgeReach = 10, JarReach = 8, JarSeconds = 6, CadenceSpeed = .1f;
         public const int LullMost = 3, JarMost = 3;
-        public enum Song { None, Cadence, Dirge }
+        public enum Song { None, Cadence, Dirge, Mending }
 
         readonly Dictionary<string, AbilityDefinition> abilities = new Dictionary<string, AbilityDefinition>(StringComparer.Ordinal);
         readonly Dictionary<string, ClassAbilityUnlock> unlocks = new Dictionary<string, ClassAbilityUnlock>(StringComparer.Ordinal);
         readonly List<(EncounterEnemy e, float until)> sleepers = new List<(EncounterEnemy, float)>();
-        float dirgeNext; bool originalSung;
+        float dirgeNext, mendNext; bool originalSung;
+        readonly List<(Actor who, float until, int each)> heldNotes = new List<(Actor, float, int)>(); float heldNext;
         /// <summary>The song being sung (one at a time).</summary>
         public Song Singing { get; private set; }
         /// <summary>The mob held in Echo Bind (one at a time).</summary>
@@ -62,9 +69,10 @@ namespace Crulanda.Encounter
         }
         /// <summary>Quiet Step: mobs notice you a metre closer per rank.</summary>
         public override float NoticeShrink { get { return R("sv-quiet-step"); } }
-        public override void ResetState() { Singing = Song.None; Bound = null; sleepers.Clear(); dirgeNext = 0; originalSung = false; }
+        public override void ResetState() { Singing = Song.None; Bound = null; sleepers.Clear(); dirgeNext = mendNext = 0; originalSung = false; heldNotes.Clear(); }
         public override void ClearTransient() { Bound = null; sleepers.Clear(); }
-        public override string StatusLine { get { return Singing == Song.None ? null : "Singing " + Singing; } }
+        public override string StatusLine { get { return Singing == Song.None ? null : "Singing " + SongName(Singing); } }
+        static string SongName(Song song) { return song == Song.Mending ? "the Song of Mending" : song.ToString(); }
         public override string TargetStatus(EncounterEnemy enemy) { return enemy != null ? enemy.ControlLabel : null; }
 
         public override int ActionCount { get { return BarIds.Length; } }
@@ -89,6 +97,9 @@ namespace Crulanda.Encounter
                 case "archivist.cadence": return Sing(a, Song.Cadence);
                 case "archivist.dirge": return Sing(a, Song.Dirge);
                 case "archivist.echo_jar": return EchoJar(a);
+                case "archivist.mending_phrase": return MendingPhrase(a);
+                case "archivist.song_of_mending": return Sing(a, Song.Mending);
+                case "archivist.chorus": return Chorus(a);
             }
             return false;
         }
@@ -153,8 +164,8 @@ namespace Crulanda.Encounter
         }
         bool Sing(AbilityDefinition a, Song song)
         {
-            if (Singing == song) { Singing = Song.None; s.Message("You let the " + song + " fall silent."); return true; }
-            return Start(a, () => { Singing = song; s.FloatText(s.Player.transform.position, song.ToString(), SongBlue); });
+            if (Singing == song) { Singing = Song.None; s.Message("You let " + (song == Song.Mending ? "" : "the ") + SongName(song) + " fall silent."); return true; }
+            return Start(a, () => { Singing = song; s.FloatText(s.Player.transform.position, song == Song.Mending ? "Song of Mending" : song.ToString(), SongBlue); });
         }
         /// <summary>Echo-jar: a stored death-cry let out over the target: it and up to two more within 8 m flee.</summary>
         bool EchoJar(AbilityDefinition a)
@@ -168,8 +179,84 @@ namespace Crulanda.Encounter
                 s.Message(n == 0 ? "The jar's cry frightens no one." : "The death-cry rings out: " + n + (n == 1 ? " flees." : " flee."));
             });
         }
+        // ---------- the Cantor ----------
+        /// <summary>You, Mira when she is with you, and the sims in your party.</summary>
+        IEnumerable<Actor> Party()
+        {
+            yield return s.Player;
+            if (s.Progress.recruited && s.Companion != null) yield return s.Companion.actor;
+            foreach (var c in s.PartySims) if (c != null && c.actor != null) yield return c.actor;
+        }
+        /// <summary>The most hurt living party member within <paramref name="reach"/> of you (you, if nobody is hurt).</summary>
+        public Actor MostHurt(float reach)
+        {
+            Actor best = s.Player; float low = s.Player.Health.Pool.Ratio;
+            foreach (var who in Party())
+                if (who != null && who.IsAlive && who.Health.Pool.Ratio < low && Vector3.Distance(who.transform.position, s.Player.transform.position) <= reach) { best = who; low = who.Health.Pool.Ratio; }
+            return best;
+        }
+        int HealActor(Actor target, int amount)
+        {
+            if (target == null || !target.IsAlive || amount <= 0) return 0;
+            int healed = target.GetComponent<Combatant>().Heal(amount); if (healed > 0) HealFx.Show(target.transform);
+            if (healed > 0) { s.AddHealingThreat(healed); s.FloatText(target.transform.position, "+" + healed, new Color(.75f, .9f, 1)); }
+            return healed;
+        }
+        public int PhraseAmount(AbilityDefinition a, Actor target)
+        {
+            float heal = (a.power + 3 * Level) * (1 + .04f * R("ca-clear-voice"));
+            if (R("ca-echoing-mend") > 0 && target != null && target.Health.Pool.Ratio < LowMend) heal *= 1.3f;   // Echoing Mend
+            return Mathf.RoundToInt(heal);
+        }
+        /// <summary>Mending Phrase: sung 1.5 s (Breath: quicker), then heals whoever is most hurt by then; Held Note leaves a mend behind.</summary>
+        bool MendingPhrase(AbilityDefinition a)
+        {
+            var sung = new AbilityDefinition { id = a.id, name = a.name, description = a.description, effect = a.effect, power = a.power, cost = Mathf.Max(0, a.cost - 3 * R("ca-quiet-mind")),
+                cooldown = a.cooldown, range = a.range, castTime = Mathf.Max(.5f, a.castTime - .15f * R("ca-breath")), globalCooldown = a.globalCooldown, duration = a.duration, statusId = a.statusId };
+            return Start(sung, () => {
+                var target = MostHurt(a.range);
+                HealActor(target, PhraseAmount(a, target));
+                int held = R("ca-held-note");
+                if (held > 0 && target != null && target.IsAlive) heldNotes.Add((target, Time.time + HeldNoteSeconds, Mathf.Max(1, Mathf.RoundToInt(target.Health.Pool.Max * HeldNoteShare * held))));
+            });
+        }
+        /// <summary>Chorus of the Weave: a barrier on every party member within 15 m (Resonant Ward: larger; Symphony of Mending: a heal too).</summary>
+        bool Chorus(AbilityDefinition a)
+        {
+            return Start(a, () => {
+                int n = 0, size = Mathf.Max(1, Mathf.RoundToInt((a.power + 2 * Level) * (1 + .25f * R("ca-resonant-ward"))));
+                foreach (var who in Party())
+                {
+                    if (who == null || !who.IsAlive || Vector3.Distance(who.transform.position, s.Player.transform.position) > a.range) continue;
+                    who.GetComponent<Combatant>().AddBarrier(size, a.duration); n++;
+                    if (R("ca-symphony") > 0) HealActor(who, Mathf.Max(1, Mathf.RoundToInt(who.Health.Pool.Max * .08f)));
+                }
+                s.FloatText(s.Player.transform.position + Vector3.up * 1.5f, "Chorus", SongBlue);
+                s.Message("Chorus of the Weave: " + n + (n == 1 ? " shielded." : " shielded."));
+            });
+        }
+        /// <summary>The Song of Mending's reach (The Weave: further).</summary>
+        public float MendingSongReach { get { return MendingReach + 2 * R("ca-weave"); } }
+
         public override void Tick(bool inCombat)
         {
+            if (Singing == Song.Mending && Time.time >= mendNext)
+            {
+                mendNext = Time.time + 1; float share = MendingShare + .005f * R("ca-long-song"), reach = MendingSongReach;
+                foreach (var who in Party())
+                    if (who != null && who.IsAlive && who.Health.Pool.Ratio < 1 && Vector3.Distance(who.transform.position, s.Player.transform.position) <= reach)
+                        HealActor(who, Mathf.Max(1, Mathf.RoundToInt(who.Health.Pool.Max * share)));
+            }
+            if (heldNotes.Count > 0 && Time.time >= heldNext)
+            {
+                heldNext = Time.time + 1;
+                for (int i = heldNotes.Count - 1; i >= 0; i--)
+                {
+                    var (who, until, each) = heldNotes[i];
+                    if (who == null || !who.IsAlive || Time.time > until) { heldNotes.RemoveAt(i); continue; }
+                    HealActor(who, each);
+                }
+            }
             if (!inCombat) originalSung = false;
             // Unsong: a sleeper woken early (by damage) is slowed by half for 6 s.
             for (int i = sleepers.Count - 1; i >= 0; i--)

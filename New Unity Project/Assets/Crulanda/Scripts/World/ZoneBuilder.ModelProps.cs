@@ -125,16 +125,26 @@ namespace Crulanda.World
             foreach (var mf in go.GetComponentsInChildren<MeshFilter>())
                 if (mf.name.Contains("Turbine")) mf.gameObject.AddComponent<Sails>();
         }
-        /// <summary>A windmill's sails turning about their hub.</summary>
+        /// <summary>A windmill's sails turning about their hub, with the wind (2026-10-10, Chris: "windmill should be animated when wind
+        /// blowing"): barely turning on a still day, about 20 degrees a second on a fair one, racing in a gale; easing up and down as the
+        /// weather changes, with a slow gust. The mill now stands with the moving props, not the static scenery: static batching had
+        /// frozen its sails in place.</summary>
         public sealed class Sails : MonoBehaviour
         {
-            Vector3 axisLocal, hubLocal; public float degreesPerSecond = 22;
+            Vector3 axisLocal, hubLocal; public float degreesPerSecond = 22; float phase;
+            /// <summary>Degrees a second for a wind of 0 to 1 (WorldWeather's).</summary>
+            public static float SpeedFor(float wind) { return Mathf.Lerp(4, 70, Mathf.Clamp01(wind)); }
             void Start()
             {
                 var m = GetComponent<MeshFilter>().sharedMesh; if (m == null) { enabled = false; return; }
                 var e = m.bounds.extents; axisLocal = e.x <= e.y && e.x <= e.z ? Vector3.right : e.y <= e.z ? Vector3.up : Vector3.forward; hubLocal = m.bounds.center;
+                phase = transform.position.x * .37f; if (WorldWeather.Active != null) degreesPerSecond = SpeedFor(WorldWeather.Now.wind);
             }
-            void Update() { transform.RotateAround(transform.TransformPoint(hubLocal), transform.TransformDirection(axisLocal), degreesPerSecond * Time.deltaTime); }
+            void Update()
+            {
+                if (WorldWeather.Active != null) degreesPerSecond = Mathf.MoveTowards(degreesPerSecond, SpeedFor(WorldWeather.Now.wind) * (1 + .15f * Mathf.Sin(Time.time * .6f + phase)), 8 * Time.deltaTime);
+                transform.RotateAround(transform.TransformPoint(hubLocal), transform.TransformDirection(axisLocal), degreesPerSecond * Time.deltaTime);
+            }
         }
         /// <summary>The kit props the builders use, with the heights they stand at (PropCapture renders this row to look at).</summary>
         public static readonly (string path, float height)[] KitProps = {

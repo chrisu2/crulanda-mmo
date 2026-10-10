@@ -1653,7 +1653,7 @@ namespace Crulanda.Encounter
             if (!Night || state == State.Fly || Time.time < nextRoute) return false;
             stall = Barn.Take(this, Small);
             if (stall < 0) { Barn = null; return false; }   // a full barn: this one stays out
-            if (!Route(transform.position, Barn.door, Barn.inside, Barn.SpotFor(stall, Small))) { Barn.Free(this); stall = -1; nextRoute = Time.time + 20; return false; }
+            if (!Route(transform.position, Barn.door, Barn.inside, Barn.AisleFor(stall), Barn.SpotFor(stall, Small))) { Barn.Free(this); stall = -1; nextRoute = Time.time + 20; return false; }
             state = State.ToBarn; return true;
         }
         /// <summary>The navmesh's way through each leg in turn (round the barn to its doorway, in, and on to the stall), as corners to walk.</summary>
@@ -1683,14 +1683,14 @@ namespace Crulanda.Encounter
             if (stall < 0) { stall = Barn.Take(this, Small); if (stall < 0) { Barn = null; return; } }
             var at = Barn.SpotFor(stall, Small);
             if (place) { at.y = life.Zone.HeightAt(at.x, at.z); transform.position = at; groundAt = new Vector2(float.MaxValue, 0); }
-            var face = at - Barn.door; face.y = 0; if (face.sqrMagnitude > .01f) transform.rotation = Quaternion.LookRotation(face);
+            var face = Barn.FaceFor(stall); face.y = 0; if (face.sqrMagnitude > .01f) transform.rotation = Quaternion.LookRotation(face);
             state = State.Sleep; body.Sleep();
         }
         /// <summary>Up at first light and out to its pasture (<paramref name="place"/>: put there, unseen).</summary>
         void WakeOut(bool place)
         {
             var pasture = life.Zone.Ground(home + new Vector2(life.R01 - .5f, life.R01 - .5f) * radius);
-            if (!place && Barn != null && stall >= 0 && Route(transform.position, Barn.inside, Barn.door, pasture)) { state = State.FromBarn; body.Rest(); return; }
+            if (!place && Barn != null && stall >= 0 && Route(transform.position, Barn.AisleFor(stall), Barn.inside, Barn.door, pasture)) { state = State.FromBarn; body.Rest(); return; }
             if (Barn != null) Barn.Free(this); stall = -1;
             transform.position = pasture; groundAt = new Vector2(float.MaxValue, 0); state = State.Idle; until = Time.time + 1 + life.R01 * 4; body.Rest();
         }

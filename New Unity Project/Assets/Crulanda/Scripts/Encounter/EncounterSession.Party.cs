@@ -70,10 +70,21 @@ namespace Crulanda.Encounter
         /// <summary>How long a sim takes to come from another zone when invited (seconds; tests shorten it).</summary>
         public static float InviteTravelSeconds = 30;
         readonly List<string> coming = new List<string>();
+        /// <summary>Mira into your party (Chris, 2026-10-10: "there should be an invite button for mira"): Invite on her row in the party
+        /// frame or on her frame when you click her, or /invite mira, from anywhere in the zone; she walks over. The same as recruiting her
+        /// face to face.</summary>
+        public bool InviteMira()
+        {
+            if (Companion == null) { Message("Mira isn't here."); return false; }
+            if (Progress.recruited) { Message("Mira is already in your party."); return false; }
+            Progress.recruited = true; Progress.relationship++; Message("Mira: I'll keep you standing. Lead the way."); ReconcileQuests();
+            return true;
+        }
         /// <summary>/invite by name (Round 24, playtest note 67): a sim standing here joins at once; one online elsewhere accepts by
         /// the same rules, sets out, and arrives at the road's end nearest you after <see cref="InviteTravelSeconds"/>.</summary>
         public bool InviteByName(string name)
         {
+            if (string.Equals(name, "Mira", StringComparison.OrdinalIgnoreCase)) return InviteMira();
             var pop = SimPopulation.Active; if (pop == null || string.IsNullOrEmpty(name)) { Message("Invite whom? /invite <name>."); return false; }
             // The name as typed, else by its start (a first name): among those online, one standing here before one away (first names repeat).
             var s = pop.World.sims.Find(x => string.Equals(x.name, name, StringComparison.OrdinalIgnoreCase));

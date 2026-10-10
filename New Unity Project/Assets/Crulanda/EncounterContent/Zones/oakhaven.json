@@ -53,8 +53,8 @@
     "ambientEquator": "#86886E",
     "ambientGround": "#3E4030",
     "fogColor": "#96B8DA",
-    "fogStart": 105,
-    "fogEnd": 330,
+    "fogStart": 150,
+    "fogEnd": 480,
     "skyTint": "#6189C8",
     "skyExposure": 1.05,
     "skyHaze": 1.0
@@ -2546,8 +2546,8 @@
       "kind": "crates",
       "name": "Harrow grain bin",
       "at": {
-        "x": -74,
-        "y": 49
+        "x": -73.5,
+        "y": 47.6
       },
       "rotation": 0,
       "variant": 2,
@@ -2892,15 +2892,15 @@
     },
     {
       "kind": "barn",
-      "name": "Shepherd's hut",
+      "name": "Fold barn",
       "at": {
-        "x": -168,
-        "y": 53
+        "x": -172,
+        "y": 56
       },
       "rotation": 225,
       "size": {
-        "x": 5.5,
-        "y": 4
+        "x": 9,
+        "y": 6
       }
     },
     {
@@ -2981,8 +2981,8 @@
     {
       "kind": "barrels",
       "at": {
-        "x": -133.5,
-        "y": -18
+        "x": -134.6,
+        "y": -15.6
       },
       "variant": 1
     },
@@ -3299,7 +3299,7 @@
     {
       "kind": "haystack",
       "at": {
-        "x": 14,
+        "x": 15.8,
         "y": 124.5
       }
     },

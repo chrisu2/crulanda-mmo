@@ -15,8 +15,18 @@ namespace Crulanda.Encounter
         public bool Moving { get; private set; }
         /// <summary>In a jump or a fall (not swimming).</summary>
         public bool Airborne { get; private set; }
-        float groundedAt, airSince = -9, landedAt = -9;
+        float groundedAt, airSince = -9, landedAt = -9; bool jumpQueued;
         public float AirAge { get { return Time.time - airSince; } }
+        /// <summary>The jump (2026-10-10, Chris: "jumping animation still borked. still feel floaty"): off the ground at 6.4 m/s, up under
+        /// 22 m/s2 and down under 34, so it tops out a little under a metre and comes down quicker than it went up (0.53 s in all, where
+        /// it was 0.6 s up and down alike, hanging at the top).</summary>
+        public const float JumpSpeed = 6.4f, RiseGravity = 22, FallGravity = 34;
+        /// <summary>Going up in a jump (the take-off's clip); coming down (or falling off something) plays the fall.</summary>
+        public bool Rising { get { return Airborne && vertical > 0; } }
+        /// <summary>This time in the air began with a jump (not a step off a ledge).</summary>
+        public bool Jumped { get; private set; }
+        /// <summary>Jumps at the next grounded frame, as Space does (captures, tests).</summary>
+        public void Jump() { jumpQueued = true; }
         public float LandedAge { get { return Time.time - landedAt; } }
         /// <summary>In water deeper than about chest height: floating at the surface, slower, no jumping.</summary>
         public bool Swimming { get; private set; }
@@ -78,11 +88,11 @@ namespace Crulanda.Encounter
                 if (pushingBank) vertical = Mathf.Max(vertical, 3.2f);
                 if (EncounterInput.Press(KeyCode.Space) && depth < 2.2f) vertical = 5.5f;
             }
-            else if (controller.isGrounded) { vertical = -2; groundedAt = Time.time; if (EncounterInput.Press(KeyCode.Space)) { vertical = 6; airSince = Time.time; } }
-            else vertical -= 20 * Time.deltaTime;
+            else if (controller.isGrounded) { vertical = -2; groundedAt = Time.time; if (EncounterInput.Press(KeyCode.Space) || jumpQueued) { vertical = JumpSpeed; airSince = Time.time; Jumped = true; } jumpQueued = false; }
+            else vertical -= (vertical > 0 ? RiseGravity : FallGravity) * Time.deltaTime;
             // In the air (Round 22, note 50): a jump, or a fall longer than a step off a kerb. The figure plays the jump clips on it.
             bool air = !Swimming && !controller.isGrounded && (vertical > .5f || Time.time - groundedAt > .15f);
-            if (air && !Airborne && vertical <= .5f) airSince = Time.time;
+            if (air && !Airborne && vertical <= .5f) { airSince = Time.time; Jumped = false; }   // a step off a ledge
             if (!air && Airborne) landedAt = Time.time;
             Airborne = air;
             Moving = direction.sqrMagnitude > .01f || vertical > .5f;

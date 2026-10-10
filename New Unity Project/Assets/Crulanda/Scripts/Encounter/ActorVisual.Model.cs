@@ -441,7 +441,7 @@ namespace Crulanda.Encounter
         /// <summary>The sitting clip puts the hips this far behind where the figure stands: a seated body is moved forward by it, so a
         /// villager placed on a stool sits on it and not beside it (playtest note 30).</summary>
         const float SitShift = .42f;
-        struct PoseState { public string slot; public bool arms; public Vector3 armL, armR; public float elbowL, elbowR, lean, drop, bend, shift; }
+        struct PoseState { public string slot; public bool arms; public Vector3 armL, armR; public float elbowL, elbowR, lean, drop, bend, shift, twist, weight; }
         PoseState PoseOf(ActorPose pose, float speed, float t)
         {
             var p = new PoseState();
@@ -486,6 +486,32 @@ namespace Crulanda.Encounter
         }
         /// <summary>The arms for what is carried (over the walk or the idle): the right arm out to the load at the hip, both arms
         /// forward under a load in front, the right hand up at the shoulder to steady a sack.</summary>
+        // ---------- the bow (2026-10-10, Chris: "still no bow animations on ranger") ----------
+        // The game has no archery clips (the animation sets are locomotion, idles, a sword's swing and spell casts), so a shot is posed
+        // here over whatever the legs are doing: the bow arm out at the mark, the string hand drawn back to the jaw and held there, loosed
+        // with a follow-through past the ear, then back to the string to draw again. An aimed shot holds the full draw while it is drawn.
+        float shotAt = -9; bool drawing;
+        /// <summary>What is held is a bow: an equipped one (IsBow), or with the main hand empty the Ranger's own.</summary>
+        public bool BowReady { get { return model != null && (gearDriven && gearRoots[(int)EquipSlot.MainHand] != null ? mainBow : built == ActorLook.Ranger); } }
+        /// <summary>The bow is in the left hand now (not slung on the back).</summary>
+        public bool HoldsBow { get { return BowReady && held != null && held.Length > 0 && !gearStowed && held[0] != null && held[0].gameObject.activeInHierarchy; } }
+        /// <summary>Shooting, or a shot drawn: the bow stays out (not slung) till three seconds after the last arrow.</summary>
+        bool BowBusy { get { return BowReady && (drawing || Time.time - shotAt < 3.2f); } }
+        /// <summary>An arrow loosed now (CastRelease does this for a figure with a bow in hand).</summary>
+        public void Shoot() { shotAt = Time.time; }
+        /// <summary>Shooting, or a shot drawn: the arms stay on the bow until three seconds after the last arrow.</summary>
+        bool Bowing { get { return BowBusy && HoldsBow; } }
+        public const float BowRelease = .12f, BowRenock = .45f, BowDrawn = 1.05f;
+        static readonly Quaternion Nocked = Quaternion.Euler(-82, -12, 0), FullDraw = Quaternion.Euler(-4, 12, -84), Loosed = Quaternion.Euler(-14, 42, -78);
+        void BowArms(ref PoseState p)
+        {
+            float since = drawing ? BowDrawn : Time.time - shotAt;
+            Quaternion q; float elbow;
+            if (since < BowRelease) { float u = since / BowRelease; q = Quaternion.Slerp(FullDraw, Loosed, u); elbow = Mathf.Lerp(-125, -70, u); }                      // loosed: the hand flies back past the ear
+            else if (since < BowRenock) { float u = Mathf.SmoothStep(0, 1, (since - BowRelease) / (BowRenock - BowRelease)); q = Quaternion.Slerp(Loosed, Nocked, u); elbow = Mathf.Lerp(-70, -25, u); }   // back to the string
+            else { float u = Mathf.SmoothStep(0, 1, (since - BowRenock) / (BowDrawn - BowRenock)); q = Quaternion.Slerp(Nocked, FullDraw, u); elbow = Mathf.Lerp(-25, -125, u); }   // drawn to the jaw, and held
+            p.arms = true; p.armL = new Vector3(-86, 0, 6); p.elbowL = -6; p.armR = q.eulerAngles; p.elbowR = elbow; p.twist = 35;
+        }
         void CarryArms(ref PoseState p)
         {
             p.arms = true;
@@ -527,7 +553,7 @@ namespace Crulanda.Encounter
             // Playtest note 79 (2026-10-07): "characters shouldn't run with sword/weapons in hand unless fighting": out of a fight every
             // weapon is on the back or at the hip; it comes out when a fight starts, or to cast.
             bool fighting = Fighting != null && Fighting(gameObject);
-            bool stow = Pose == ActorPose.Swim || (!fighting && !Casting && Fighting != null) || runSlung && HeldTall() && !fighting;
+            bool stow = Pose == ActorPose.Swim || (!fighting && !Casting && !BowBusy && Fighting != null) || runSlung && HeldTall() && !fighting;
             if (held != null && stow != gearStowed)
             {
                 gearStowed = stow;
@@ -544,15 +570,24 @@ namespace Crulanda.Encounter
             var p = PoseOf(moving && !travel ? ActorPose.None : Pose, speed, Time.time + variant * .7f);
             if (!p.arms && p.slot == null && Carry != Carrying.None) CarryArms(ref p);
             if (LyingLow) p = new PoseState { slot = "crouch" };   // an ambusher in wait (EncounterEnemy.Hide), crouched in the grass
-            // The player's jump (Round 22, note 50): the take-off, the air, and the landing on the spot.
+            if (Bowing && !dead) BowArms(ref p);
+            // The player's jump (Round 22, note 50; 2026-10-10, Chris: "still feel floaty and when you land feet twist together"): the
+            // take-off clip from its push-off while going up, the fall's loop coming down (the whole standing jump, crouch, air and
+            // landing, had played in the air), and the landing's knee-dip on touching down, a moment of it running and longer standing.
+            // ModelFigure blends into and out of them four times quicker than other motions, so the legs never sit half in one pose.
             if (!motorChecked) { motor = GetComponent<AdventurerMotor>(); motorChecked = true; }
             if (motor != null && !dead && Pose != ActorPose.Swim)
             {
-                if (motor.Airborne && model.Has("k.jump")) p = new PoseState { slot = motor.AirAge < .22f && model.Has("k.jumpstart") ? "k.jumpstart" : "k.jump" };
-                else if (!motor.Airborne && motor.LandedAge < .3f && !moving && model.Has("k.land")) p = new PoseState { slot = "k.land" };
+                // A hop (up from a jump, under 0.8 s in the air) keeps the take-off's tuck, four-fifths over the walk or run, from leaving
+                // the ground to touching down; only a long fall (off a ledge, or a jump that goes on) plays the fall's flung-up arms. The
+                // landing's dip is the clip at half weight standing and a third running: whole, it squats to the ground (the frames of
+                // 2026-10-10), which read as the legs folding and the feet twisting together.
+                bool hop = motor.Jumped && motor.AirAge < .8f && model.Has("k.jumpstart");
+                if (motor.Airborne && model.Has("k.fall")) p = new PoseState { slot = hop ? "k.jumpstart" : "k.fall", weight = hop ? .8f : 1, arms = p.arms, armL = p.armL, armR = p.armR, elbowL = p.elbowL, elbowR = p.elbowR, twist = p.twist };
+                else if (!motor.Airborne && motor.LandedAge < (moving ? .16f : .4f) && model.Has("k.land")) p = new PoseState { slot = "k.land", weight = moving ? .3f : .5f, arms = p.arms, armL = p.armL, armR = p.armR, elbowL = p.elbowL, elbowR = p.elbowR, twist = p.twist };
             }
             if (dead) { p = new PoseState { slot = "death" }; body.localRotation = Quaternion.identity; body.localPosition = Vector3.zero; }
-            model.Drive(speed, p.slot, dt, heading);
+            model.Drive(speed, p.slot, dt, heading, p.weight > 0 ? p.weight : 1);
             if (p.arms) { poseArmL = p.armL; poseArmR = p.armR; poseElbowL = p.elbowL; poseElbowR = p.elbowR; }
             armWeight = Mathf.MoveTowards(armWeight, p.arms ? 1 : 0, dt * 4);
             // Off screen the Animator leaves the bones as they were (CullUpdateTransforms): bending them again would bend them twice.
@@ -571,6 +606,15 @@ namespace Crulanda.Encounter
                 p.drop = swimLift;
             }
             else swimLift = 0;
+            // A bow drawn: the chest turned side-on to the mark, the left shoulder leading, and the head kept on the mark; before the
+            // arms, which are set in the body's frame.
+            float twist = fresh ? p.twist * arms : 0;
+            if (twist != 0 && model.Spine != null && model.Chest != null)
+            {
+                model.Spine.rotation = Quaternion.AngleAxis(twist * .4f, body.up) * model.Spine.rotation;
+                model.Chest.rotation = Quaternion.AngleAxis(twist * .6f, body.up) * model.Chest.rotation;
+                var neck = model.Neck != null ? model.Neck : model.HeadBone; if (neck != null) neck.rotation = Quaternion.AngleAxis(-twist * .85f, body.up) * neck.rotation;
+            }
             if (arms > 0 && fresh)
             {
                 PoseArm(armL, foreL, model.UpperArmL, model.LowerArmL, poseArmL, poseElbowL, arms);
@@ -591,6 +635,18 @@ namespace Crulanda.Encounter
                 else if (staggering || leaned) { staggering = leaned = false; body.localEulerAngles = Vector3.zero; }
             }
             SyncFrames();
+            BowUpright(fresh && (p.twist != 0 || bowHeld != null) ? arms : 0);   // and while the arms come down after
+        }
+        Transform bowHeld; Quaternion bowRest;
+        /// <summary>While a bow is drawn its limbs stand up and down, as they hang at rest: the fist carries the grip, but the arm raised to
+        /// the mark would otherwise lay the bow along it like a spear (the motion capture of 2026-10-10).</summary>
+        void BowUpright(float w)
+        {
+            var b = w > 0 && held != null && held.Length > 0 ? held[0] : null;
+            if (bowHeld != null && bowHeld != b) { bowHeld.localRotation = bowRest; bowHeld = null; }
+            if (b == null) return;
+            if (bowHeld != b) { bowHeld = b; bowRest = b.localRotation; }
+            b.rotation = Quaternion.Slerp(b.parent.rotation * bowRest, body.rotation * Quaternion.Euler(0, 0, -10), w);   // canted a little, the top limb out
         }
         /// <summary>
         /// Edit mode (captures, tests): the model as it stands <paramref name="time"/> seconds into <paramref name="pose"/>, walking at

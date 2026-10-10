@@ -69,7 +69,14 @@ namespace Crulanda.Encounter
             char m = session.Quests != null && session.Zone != null ? session.Quests.Marker(name, session.ZoneId, session.Progress.Level, out _) : ' ';
             string hint = !session.FocusInTalkReach ? "Friendly  ·  " + (dist >= EncounterSession.TalkRange ? Mathf.RoundToInt(dist) + " m away" : "out of earshot") :
                 "Friendly  ·  [" + KeyBindings.InteractLabel + "] " + (m == '!' ? "has work for you" : m == '?' ? "wants to hear from you" : "talk");
-            Shadow(new Rect(380, 66, 280, 20), hint, tiny, Color.white);
+            // Mira not yet with you: Invite, as on a sim's frame (2026-10-10, Chris: "there should be an invite button for mira").
+            if (session.FocusMira && !session.Progress.recruited)
+            {
+                Fill(new Rect(372, 86, 290, 6), new Color(0, 0, 0, .55f));
+                if (GUI.Button(new Rect(380, 63, 90, 26), "Invite", slim)) session.InviteMira();
+                Shadow(new Rect(478, 66, 190, 20), "Friendly  ·  not in your party", tiny, Color.white);
+            }
+            else Shadow(new Rect(380, 66, 280, 20), hint, tiny, Color.white);
             if (m != ' ') { QuestStyles(); Ink(new Rect(700, 18, 30, 44), m.ToString(), qMark, QuestGold); }
         }
 

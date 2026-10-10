@@ -37,15 +37,36 @@ namespace Crulanda.Tests
         void Level10() { session.Progress.experience = EncounterProgress.XpForLevel(10); session.Player.SetLevel(10); }
         EncounterEnemy Foe(EncounterEnemy not = null) { var e = session.Enemies.Find(x => x != null && x != not && x.actor.IsAlive && !x.Elite && !x.Game && !x.Engaged); Assert.NotNull(e, "A living mob."); return e; }
         void Near(EncounterEnemy e, float d) { session.Player.GetComponent<AdventurerMotor>().Teleport(e.transform.position + Vector3.back * d); session.Select(e); }
-        const int Note = 0, Lull = 1, Hush = 2, Bind = 3, Cadence = 4, Dirge = 5, Jar = 6;
+        const int Note = 0, Lull = 1, Hush = 2, Bind = 3, Cadence = 4, Dirge = 5, Jar = 6, Phrase = 7, Mending = 8, Chorus = 9;
         IEnumerator Cast() { yield return new WaitForSeconds(1.7f); }
 
         [UnityTest] public IEnumerator The_Archivist_is_its_own_character()
         {
             Assert.AreEqual("class.archivist", session.ClassDef.id); Assert.AreEqual(Crulanda.Core.ResourceKind.Mana, session.ClassDef.resource);
-            Assert.AreEqual(7, session.Kit.ActionCount); Assert.AreEqual("Level 2", session.Kit.ActionLockLabel(Lull));
+            Assert.AreEqual(10, session.Kit.ActionCount, "seven, and the Cantor's three"); Assert.AreEqual("Level 2", session.Kit.ActionLockLabel(Lull));
+            Assert.AreEqual("Talent", session.Kit.ActionLockLabel(Chorus), "the Chorus waits on its talent");
             Assert.IsFalse(session.Kit.MeleeAutoAttacks); Assert.AreEqual(ActorLook.Mage, EncounterSession.LookForClass("class.archivist"));
             yield return null;
+        }
+        /// <summary>The Cantor (TALENT_DEPTH.md, 2026-10-10): a Mending Phrase heals the most hurt, the Song of Mending mends the party
+        /// each second (and is one of the songs), the Chorus puts a barrier on everyone near.</summary>
+        [UnityTest] public IEnumerator The_Cantor_mends_sings_and_shields()
+        {
+            Level10(); session.Player.Resource.Pool.SetCurrent(session.Player.Resource.Pool.Max);
+            foreach (var id in new[] { "ca-clear-voice", "ca-clear-voice", "ca-clear-voice", "ca-clear-voice", "ca-clear-voice", "ca-chorus" })
+            { Assert.IsTrue(session.Talents.Propose(session.Progress, id, 1, out var next, out var why), id + ": " + why); session.Progress.talents = next; }
+            Assert.IsNull(session.Kit.ActionLockLabel(Chorus), "the Chorus learnt");
+            var hp = session.Player.Health; hp.ApplyDamage(hp.Pool.Max / 2); int hurt = hp.Pool.Current;
+            Assert.IsTrue(session.UseAbility(Phrase), "Mending Phrase"); yield return Cast();
+            Assert.Greater(hp.Pool.Current, hurt, "the phrase heals you"); hurt = hp.Pool.Current;
+            Assert.IsTrue(session.UseAbility(Mending), "the Song of Mending"); yield return null;
+            Assert.AreEqual(ArchivistKit.Song.Mending, Arch.Singing);
+            yield return new WaitForSeconds(2.2f);
+            Assert.Greater(hp.Pool.Current, hurt, "the song mends you each second");
+            Assert.IsTrue(session.UseAbility(Cadence), "Cadence"); yield return null; Assert.AreEqual(ArchivistKit.Song.Cadence, Arch.Singing, "one song at a time");
+            yield return new WaitForSeconds(1.6f);
+            Assert.IsTrue(session.UseAbility(Chorus), "the Chorus"); yield return null;
+            Assert.Greater(session.Player.GetComponent<Crulanda.Combat.Combatant>().Barrier, 0, "a barrier on you");
         }
         [UnityTest] public IEnumerator Lull_sleeps_and_damage_wakes()
         {

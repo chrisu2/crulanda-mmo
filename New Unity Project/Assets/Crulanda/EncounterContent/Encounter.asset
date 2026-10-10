@@ -880,6 +880,42 @@ MonoBehaviour:
     globalCooldown: 1.5
     duration: 6
     statusId: 
+  - id: archivist.mending_phrase
+    name: Mending Phrase
+    description: "A phrase of the Song of Mending, sung over 1.5 seconds: heals the most hurt of your party within 30 metres."
+    effect: 3
+    power: 30
+    cost: 20
+    cooldown: 0
+    range: 30
+    castTime: 1.5
+    globalCooldown: 1.5
+    duration: 0
+    statusId: 
+  - id: archivist.song_of_mending
+    name: Song of Mending
+    description: "A song: every party member within 10 metres of you mends 1% of maximum health a second. One song at a time; use again to stop."
+    effect: 4
+    power: 0
+    cost: 15
+    cooldown: 0
+    range: 0
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 0
+    statusId: 
+  - id: archivist.chorus
+    name: Chorus of the Weave
+    description: "Every party member within 15 metres takes a barrier for 8 seconds. Talent."
+    effect: 4
+    power: 30
+    cost: 30
+    cooldown: 30
+    range: 15
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 8
+    statusId: 
   - id: mage.ash_hex
     name: Ash Hex
     description: "A 1.5-second cast: a person or beast turned to smouldering ash for 25 seconds. Damage breaks it; one at a time."
@@ -940,6 +976,42 @@ MonoBehaviour:
     globalCooldown: 1.5
     duration: 6
     statusId:
+  - id: warrior.hock_cut
+    name: Hock Cut
+    description: "A low cut behind the knee: light damage, and the target moves at half speed for 8 seconds."
+    effect: 4
+    power: 6
+    cost: 10
+    cooldown: 6
+    range: 3.2
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 8
+    statusId:
+  - id: warrior.net
+    name: Weighted Net
+    description: "Throw a weighted net up to 20 metres: the target is held where it stands for 5 seconds (it can still strike what is in reach). Talent."
+    effect: 4
+    power: 0
+    cost: 15
+    cooldown: 20
+    range: 20
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 5
+    statusId:
+  - id: warrior.shackle
+    name: Shackle Cast
+    description: "Hurl a chain with a shackle on its end up to 20 metres: the target is stunned for 2 seconds."
+    effect: 4
+    power: 5
+    cost: 15
+    cooldown: 25
+    range: 20
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 2
+    statusId:
   - id: druid.sleep_of_the_wood
     name: Sleep of the Wood
     description: "A 1.5-second cast: the target sleeps 25 seconds, in any form. Damage wakes it."
@@ -993,6 +1065,15 @@ MonoBehaviour:
       talentId:
     - abilityId: ability.shout
       level: 7
+      talentId:
+    - abilityId: warrior.hock_cut
+      level: 3
+      talentId:
+    - abilityId: warrior.net
+      level: 1
+      talentId: jl-weighted-net
+    - abilityId: warrior.shackle
+      level: 9
       talentId:
   talentTree: {fileID: 4900000, guid: 91ec937a34a741efaaf03d29334b12f6, type: 3}
   additionalClasses:
@@ -1319,6 +1400,15 @@ MonoBehaviour:
       - abilityId: archivist.echo_jar
         level: 8
         talentId: 
+      - abilityId: archivist.mending_phrase
+        level: 3
+        talentId: 
+      - abilityId: archivist.song_of_mending
+        level: 5
+        talentId: 
+      - abilityId: archivist.chorus
+        level: 1
+        talentId: ca-chorus
     talentTree: {fileID: 4900000, guid: 4a212c4a60b94032aed04b1295fd0325, type: 3}
   questFiles:
   - {fileID: 4900000, guid: dadeaa3314444542a04b4e17d9dbc0c4, type: 3}

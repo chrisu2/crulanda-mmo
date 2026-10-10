@@ -88,10 +88,13 @@ namespace Crulanda.Encounter
         public List<LootLuck> lootLuck = new List<LootLuck>();
 
         // ---------- levels (save format 5) ----------
-        /// <summary>The highest level (13 since the Verdant Shore, 2026-09-30; it was 10 for the first four zones). Talent points stop
-        /// at <see cref="TalentCap"/>: the trees were designed for ten levels' worth, so the last levels bring health and hit, not points.</summary>
+        /// <summary>The highest level (13 since the Verdant Shore, 2026-09-30; it was 10 for the first four zones). A talent point a level
+        /// to <see cref="TalentCap"/>, which is this.</summary>
         public const int LevelCap = 15;   // 15 now, 30 in the end (Chris, 2026-10-07; ROADMAP: Phase 9)
-        public const int TalentCap = 10;
+        /// <summary>A point a level to the level cap (TALENT_DEPTH.md, Chris's decision of 2026-10-09: "1 a level (as now)", 16 points at 15,
+        /// enough for a path's tier 3). It had stayed at 10 when the levels went to 15, so the Vanguard's, the Jailer's and the Cantor's
+        /// third tiers could not be reached in play (caught 2026-10-10 by the Jailer's test).</summary>
+        public const int TalentCap = LevelCap;
         /// <summary>Experience from level to level+1: 200 at level 1, +90 per level (1,000+ by the late levels).</summary>
         public static int XpToNext(int level) { return 400 + 170 * (Math.Max(1, level) - 1); }   // round 29: "difficult and slow leveling, grind it out" (was 200 + 90 a level)
         /// <summary>Total experience at which a level begins (level 1 = 0).</summary>

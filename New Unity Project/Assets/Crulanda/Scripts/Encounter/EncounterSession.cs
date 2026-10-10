@@ -1199,7 +1199,7 @@ namespace Crulanda.Encounter
             if (result == AbilityStartResult.InsufficientResource) Message("Not enough " + ClassDef.resource + ".");
             // An instant blow or spell on a target shows (playtest note 25): a swing in melee, a release at range. Casts are TickCastPose's.
             if (result == AbilityStartResult.Started && a.castTime <= 0 && Target != null && Target.actor.IsAlive)
-            { if (Kit.MeleeAutoAttacks || Distance(Target) < 3.5f) PlayerFigure?.Strike(); else PlayerFigure?.CastRelease(); }
+            { if (Kit.MeleeAutoAttacks || a.range <= 5 || (Distance(Target) < 3.5f && !Kit.RangedAutoAttacks)) PlayerFigure?.Strike(); else PlayerFigure?.CastRelease(); }   // a bow's shot is loosed at any range
             return result;
         }
         public bool EnemyInRange(EncounterEnemy enemy, float range) { return enemy != null && enemy.actor.IsAlive && Distance(enemy) <= range; }
@@ -1877,7 +1877,7 @@ namespace Crulanda.Encounter
             var (talkTo, toMira) = TalkTarget();
             if (toMira)
             {
-                if (!Progress.recruited) { Progress.recruited = true; Progress.relationship++; Message("Mira: I'll keep you standing. Lead the way."); ReconcileQuests(); }
+                if (!Progress.recruited) InviteMira();
                 else if (!Companion.actor.IsAlive && !InCombat) { Companion.actor.Health.Revive(100); Message("Mira: Thank you. Let's be more careful."); }
                 else if (!QuestTalk("Mira", Companion.transform.position)) Message("Mira: Stay close; my healing has a limited reach.");
                 return;

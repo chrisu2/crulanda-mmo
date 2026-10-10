@@ -52,6 +52,30 @@
     {"id": "ar-catalogue", "name": "The Catalogue", "tier": 2, "col": 2, "max": 1, "req": null, "kind": "passive", "icon": "gear", "desc": "Shard Note hits a silenced or fleeing mob 25% harder.", "emphasis": {"control": 1}, "impl": true},
     {"id": "ar-original", "name": "The Original Song", "tier": 3, "col": 1, "max": 1, "req": null, "kind": "capstone", "icon": "star", "desc": "The Original Song: the first Lull of each fight takes every mob within 10 metres of the target.", "emphasis": {"control": 1}, "impl": true}
    ]
+  },
+  {
+   "id": "the-cantor",
+   "name": "The Cantor",
+   "role": "healer",
+   "loop": "Sing the Song of Mending under the fight, a Mending Phrase on whoever falls behind, and the Chorus when the blow everyone sees coming lands.",
+   "tradeoff": "A Cantor's songs are its healing: singing the Song of Mending means no Cadence and no Dirge, and its holds wait while it mends.",
+   "nodes": [
+    {"id": "ca-clear-voice", "name": "Clear Voice", "tier": 0, "col": 1, "max": 5, "req": null, "kind": "passive", "icon": "note", "desc": "Mending Phrase heals 4% more per rank.", "emphasis": {"healing": 1}, "impl": true},
+    {"id": "ca-breath", "name": "Breath", "tier": 0, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "clock", "desc": "Mending Phrase is sung 0.15s quicker per rank.", "emphasis": {"healing": 0.8}, "impl": true},
+    {"id": "ca-held-note", "name": "Held Note", "tier": 1, "col": 0, "max": 3, "req": null, "kind": "passive", "icon": "drop", "desc": "Mending Phrase leaves a held note: 1% of maximum health a second for 5s per rank.", "emphasis": {"healing": 1.2}, "impl": true},
+    {"id": "ca-chorus", "name": "Chorus of the Weave", "tier": 1, "col": 1, "max": 1, "req": null, "kind": "active", "icon": "shield", "desc": "New action: Chorus of the Weave: every party member within 15m takes a barrier for 8s.", "emphasis": {"mitigation": 2}, "impl": true},
+    {"id": "ca-long-song", "name": "Long Song", "tier": 1, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "note", "desc": "The Song of Mending mends 0.5% more of maximum health a second per rank.", "emphasis": {"healing": 1.2}, "impl": true},
+    {"id": "ca-echoing-mend", "name": "Echoing Mend", "tier": 2, "col": 0, "max": 1, "req": null, "kind": "signature", "icon": "heart", "desc": "Mending Phrase on someone below 35% health heals 30% more.", "emphasis": {"healing": 2}, "impl": true},
+    {"id": "ca-resonant-ward", "name": "Resonant Ward", "tier": 2, "col": 1, "max": 3, "req": "ca-chorus", "kind": "modifier", "icon": "shield", "desc": "Chorus of the Weave's barriers are 25% larger per rank.", "emphasis": {"mitigation": 1.5}, "impl": true},
+    {"id": "ca-quiet-mind", "name": "Quiet Mind", "tier": 2, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "crystal", "desc": "Mending Phrase costs 3 less Mana per rank.", "emphasis": {"sustain": 1}, "impl": true},
+    {"id": "ca-weave", "name": "The Weave", "tier": 3, "col": 1, "max": 3, "req": null, "kind": "passive", "icon": "wind", "desc": "The Song of Mending reaches 2m further per rank.", "emphasis": {"healing": 1, "support": 1}, "impl": true},
+    {"id": "ca-symphony", "name": "Symphony of Mending", "tier": 3, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "star", "desc": "Chorus of the Weave also heals each ally it shields for 8% of maximum health.", "emphasis": {"healing": 2}, "impl": true},
+    {"id": "ca-second-voice", "name": "Second Voice", "tier": 4, "col": 1, "max": 3, "req": null, "kind": "passive", "icon": "note", "desc": "Mending Phrase also heals the next most hurt for 30% of it per rank.", "emphasis": {"healing": 1.5}, "impl": false},
+    {"id": "ca-desert-of-echoes", "name": "Desert of Echoes", "tier": 4, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "wind", "desc": "The Song of Mending can be sung beside Cadence or Dirge: two songs at once.", "emphasis": {"healing": 1, "support": 1.5}, "impl": false},
+    {"id": "ca-last-verse", "name": "Last Verse", "tier": 5, "col": 1, "max": 3, "req": "ca-second-voice", "kind": "passive", "icon": "heart", "desc": "An ally who would fall within your Song is left at 1 health instead, once every 60/45/30s.", "emphasis": {"healing": 2}, "impl": false},
+    {"id": "ca-choir", "name": "Choir", "tier": 5, "col": 2, "max": 1, "req": null, "kind": "modifier", "icon": "clock", "desc": "Chorus of the Weave's cooldown is halved.", "emphasis": {"mitigation": 1.5}, "impl": false},
+    {"id": "ca-the-mending-song", "name": "The Mending Song", "tier": 6, "col": 1, "max": 1, "req": "ca-last-verse", "kind": "capstone", "icon": "star", "desc": "Once a fight, sing the whole party back to full health.", "emphasis": {"healing": 3}, "impl": false}
+   ]
   }
  ]
 }

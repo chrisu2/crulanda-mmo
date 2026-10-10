@@ -129,7 +129,7 @@ namespace Crulanda.Encounter
         }
         void ClearSlot(int s)
         {
-            Kill(gearRoots[s]); Kill(gearStows[s]); gearRoots[s] = gearStows[s] = null;
+            Kill(gearRoots[s]); Kill(gearStows[s]); gearRoots[s] = gearStows[s] = null; if (s == (int)EquipSlot.MainHand) mainBow = false;
             if (gearMore[s] != null) { foreach (var t in gearMore[s]) Kill(t); gearMore[s].Clear(); }
             Uncover((EquipSlot)s);
         }
@@ -148,6 +148,13 @@ namespace Crulanda.Encounter
         static bool Hung(string family) { return family == "offhand.hung"; }
         /// <summary>A short one-hander that hangs at the belt when put away, not across the back (Chris, 2026-10-09, note 101: "her wand should not be
         /// on her back, either in hand or on her belt"): wands, daggers, knives.</summary>
+        /// <summary>A bow (the Hunting Bow's model, any "Bow" model weapon): held in the left hand, its string drawn with the right
+        /// (2026-10-10: in the right hand like a sword, the hand that draws held it, and the shot's pose never knew it was a bow).</summary>
+        public static bool IsBow(GearLook look)
+        {
+            return look.family == "model.weapon" && !string.IsNullOrEmpty(look.variant) && look.variant.IndexOf("Bow", System.StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+        bool mainBow;
         public static bool Short(GearLook look)
         {
             if (look.family == "knife") return true;
@@ -162,7 +169,8 @@ namespace Crulanda.Encounter
                 gearRoots[s] = new GameObject("Gear " + ItemDatabase.SlotNames[s]).transform; gearRoots[s].SetParent(SlotParent(slot), false);   // on a model, the head's or the chest's frame
                 BuildArmor(slot, look); return;
             }
-            gearRoots[s] = Mount(slot, look.family, false); BuildGear(look, gearRoots[s]);
+            if (slot == EquipSlot.MainHand) mainBow = IsBow(look);
+            gearRoots[s] = Mount(slot, look.family, false, false, slot == EquipSlot.MainHand && mainBow); BuildGear(look, gearRoots[s]);
             if (slot == EquipSlot.MainHand || slot == EquipSlot.OffHand) { gearStows[s] = Mount(slot, look.family, true, Short(look)); BuildGear(look, gearStows[s]); }
             if (Hung(look.family)) gearRoots[s].gameObject.AddComponent<GearHang>().wearer = transform;
         }
@@ -174,13 +182,14 @@ namespace Crulanda.Encounter
         /// right shoulder, flat to the back), a wand, dagger or knife at the right hip point down, the shield flat on the back point
         /// down, a lantern hanging beside the left hip.
         /// </summary>
-        Transform Mount(EquipSlot slot, string family, bool stow, bool shortOne = false)
+        Transform Mount(EquipSlot slot, string family, bool stow, bool shortOne = false, bool bow = false)
         {
             bool main = slot == EquipSlot.MainHand, tall = Tall(family), hung = Hung(family);
             Transform parent; Vector3 pos; Quaternion rot;
             if (!stow)
             {
-                if (main) { parent = armR; pos = tall ? new Vector3(0, -.62f, .085f) : new Vector3(0, -.62f, 0); rot = tall ? Quaternion.Euler(8, 0, 0) : Quaternion.Euler(110, 0, 0) * Quaternion.Euler(0, 20, 0); }
+                if (main && bow) { parent = armL; pos = new Vector3(0, -.62f, .1f); rot = Quaternion.identity; }   // a bow: in the left fist, limbs up and down, as the Ranger's own
+                else if (main) { parent = armR; pos = tall ? new Vector3(0, -.62f, .085f) : new Vector3(0, -.62f, 0); rot = tall ? Quaternion.Euler(8, 0, 0) : Quaternion.Euler(110, 0, 0) * Quaternion.Euler(0, 20, 0); }
                 else if (hung) { parent = armL; pos = new Vector3(0, -.65f, 0); rot = Quaternion.identity; }
                 else { parent = armL; pos = new Vector3(-.1f, -.38f, .05f); rot = Quaternion.Euler(0, 0, 90); }
             }

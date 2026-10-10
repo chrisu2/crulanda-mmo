@@ -1114,7 +1114,7 @@ namespace Crulanda.World
             {
                 if (p == null || string.IsNullOrEmpty(p.kind)) continue;
                 // Moving parts (doors, wheels) and things that can be picked or emptied can't be static-batched.
-                var parent = p.kind == "bridge" || p.kind == "cavern" || p.kind == "inn" || p.kind == "mill" || p.kind == "coop" || p.kind == "herb" || !string.IsNullOrEmpty(p.interact) ? props : statics;
+                var parent = p.kind == "bridge" || p.kind == "cavern" || p.kind == "inn" || p.kind == "mill" || p.kind == "windmill" || p.kind == "coop" || p.kind == "herb" || !string.IsNullOrEmpty(p.interact) ? props : statics;
                 // Small things never stand in a road (playtest note 74): out to the verge, clear of the edge by their own reach.
                 float verge = Verge(p); if (verge > 0) p.at = OffRoad(p.at, verge);
                 var t = Root(p, parent);
@@ -1255,10 +1255,11 @@ namespace Crulanda.World
             }
         }
         /// <summary>Half-extents of a building's footprint (a little over its walls, for roof and plinth); zero for anything else.</summary>
-        static Vector2 Footprint(ZoneProp p)
+        Vector2 Footprint(ZoneProp p)
         {
             switch (p.kind)
             {
+                case "barn" when p.size.x > 0 && WalksIn(p.name, p.size): return new Vector2(p.size.y, p.size.x) / 2 + Vector2.one * .8f;   // a walk-in barn runs back from its front
                 case "house": return (p.size.x > 0 ? p.size : new Vector2(7, 5)) / 2 + Vector2.one * .8f;
                 case "inn": case "barn": return (p.size.x > 0 ? p.size : new Vector2(12, 8)) / 2 + Vector2.one * .8f;
                 case "mill": case "keep": return (p.size.x > 0 ? p.size : new Vector2(7, 6)) / 2 + Vector2.one * .8f;
@@ -1666,20 +1667,27 @@ namespace Crulanda.World
         static Material KitMat(string name) { return Resources.Load<Material>("Props/Megapack/Materials/" + name); }
         /// <summary>
         /// A walk-in barn (2026-10-10, Chris: "barn door should be open enough to walk into, for farm animals to sleep"; "they can slide
-        /// open", with a picture of a sliding barn door). Built in the Megapack barn's own materials, as Chris chose it in art round 5:
-        /// boards below a rail, stone panels above it, in a timber frame, under thatch. The front has a 3.4 m doorway; its two leaves stand
-        /// slid aside on a black rail, each hung on two round wheels (framed planks, a mid rail, a brace each way, a bar for a handle).
-        /// Inside: straw on the floor, hay in the back corners, a manger along the back wall, a lantern by the door. Each wall piece is its
-        /// own collider and nav blocker, so the inside is walkable; its stalls are registered (ZoneBarn) for the farm beasts.
+        /// open", with a picture of a sliding barn door; then "this barn is backwards": the doors belong on the gable end, under the peak).
+        /// Built in the Megapack barn's own materials, as Chris chose it in art round 5: boards below a rail, stone panels above it, in a
+        /// timber frame, under thatch. It runs back from its front (the footprint's long side <paramref name="w"/> becomes its length), so the
+        /// ridge runs front to back and the front is a gable end: a doorway under the gable, its two leaves slid aside on a black rail, each
+        /// hung on two round wheels (framed planks, a mid rail, a brace each way, a bar for a handle). Inside ("missing straw"): an aisle up
+        /// the middle between two rows of stalls, each with a plank partition, a hay rack on the wall and straw bedding; straw over the whole
+        /// floor, bales stacked at the back, a lantern by the door. Each wall piece is its own collider and nav blocker, so the inside is
+        /// walkable; its stalls (and the aisle in front of each) are registered (ZoneBarn) for the farm beasts.
         /// </summary>
         void WalkInBarn(Transform t, float w, float d)
         {
-            const float H = 4.2f, wall = .3f, doorW = 3.4f, doorH = 3.2f, low = 1.5f;
+            float W = d, L = w;   // across, and front to back
+            const float H = 4.2f, wall = .3f, doorH = 3.2f, low = 1.5f, pitch = 2.4f;
+            float doorW = Mathf.Min(3.4f, W - 3);
             var stone = KitMat("Bricks Mat") ?? Dressed(new Color(.55f, .55f, .55f));
             var boards = KitMat("Wood_Planks_1") ?? Tint(art.timber, new Color(.4f, .25f, .16f));
             var frame = KitMat("Wood_2") ?? art.timber;
             var thatch = KitMat("Wheat") ?? art.thatch;
-            var straw = Tint(art.hay, new Color(.72f, .62f, .4f)); var iron = Tint(art.metal, new Color(.07f, .07f, .08f));
+            var strawMat = KitMat("Wheat") != null ? Tint(KitMat("Wheat"), new Color(1, .93f, .72f)) : Tint(art.hay, new Color(.85f, .74f, .45f));
+            var balesMat = KitMat("Wheat") != null ? Tint(KitMat("Wheat"), new Color(1, .9f, .62f)) : Tint(art.hay, new Color(.8f, .68f, .4f));
+            var iron = Tint(art.metal, new Color(.07f, .07f, .08f)); var twine = Tint(art.timber, new Color(.3f, .24f, .16f));
             var leafWood = Tint(art.timber, new Color(.3f, .22f, .15f)); var leafFrame = Tint(art.timber, new Color(.22f, .16f, .11f));
             void Piece(Vector3 at, Vector3 size, Material m, bool solid)
             {
@@ -1692,26 +1700,33 @@ namespace Crulanda.World
                 Piece(new Vector3(cx, low / 2, cz), new Vector3(sx, low, sz), boards, true);
                 Piece(new Vector3(cx, low + (H - low) / 2, cz), new Vector3(sx, H - low, sz), stone, true);
             }
-            float side = (w - doorW) / 2;
-            Wall(0, d / 2, w, wall);                                                                     // the back
-            foreach (int s in new[] { -1, 1 }) Wall(s * w / 2, 0, wall, d);                              // the ends
-            foreach (int s in new[] { -1, 1 }) Wall(s * (doorW / 2 + side / 2), -d / 2, side, wall);     // the front, either side of the doorway
-            Piece(new Vector3(0, doorH + (H - doorH) / 2, -d / 2), new Vector3(doorW, H - doorH, wall), stone, false);   // over the doorway
-            // The frame: corner posts, a top plate and the rail between boards and stone round the outside, studs down the back.
-            foreach (int sx in new[] { -1, 1 }) foreach (int sz in new[] { -1, 1 }) Piece(new Vector3(sx * w / 2, H / 2, sz * d / 2), new Vector3(.36f, H, .36f), frame, false);
-            foreach (int sz in new[] { -1, 1 }) Piece(new Vector3(0, H - .1f, sz * (d / 2 + .04f)), new Vector3(w, .22f, wall + .1f), frame, false);
-            foreach (int sx in new[] { -1, 1 }) Piece(new Vector3(sx * (w / 2 + .04f), H - .1f, 0), new Vector3(wall + .1f, .22f, d), frame, false);
-            Piece(new Vector3(0, low, d / 2 + .04f), new Vector3(w, .2f, wall + .1f), frame, false);
-            foreach (int sx in new[] { -1, 1 }) Piece(new Vector3(sx * (w / 2 + .04f), low, 0), new Vector3(wall + .1f, .2f, d), frame, false);
-            foreach (int s in new[] { -1, 1 }) Piece(new Vector3(s * (doorW / 2 + side / 2), low, -d / 2 - .04f), new Vector3(side, .2f, wall + .1f), frame, false);
-            for (float x = -w / 2 + 3; x < w / 2 - 1.5f; x += 3) Piece(new Vector3(x, H / 2, d / 2 + .05f), new Vector3(.22f, H, .12f), frame, false);
+            float side = (W - doorW) / 2;
+            Wall(0, L / 2, W, wall);                                                                     // the back gable
+            foreach (int s in new[] { -1, 1 }) Wall(s * W / 2, 0, wall, L);                              // the long sides
+            foreach (int s in new[] { -1, 1 }) Wall(s * (doorW / 2 + side / 2), -L / 2, side, wall);     // the front gable, either side of the doorway
+            Piece(new Vector3(0, doorH + (H - doorH) / 2, -L / 2), new Vector3(doorW, H - doorH, wall), stone, false);   // over the doorway
+            // The frame: corner posts, a top plate and the rail between boards and stone round the outside, a post at each stall down the sides.
+            foreach (int sx in new[] { -1, 1 }) foreach (int sz in new[] { -1, 1 }) Piece(new Vector3(sx * W / 2, H / 2, sz * L / 2), new Vector3(.36f, H, .36f), frame, false);
+            foreach (int sz in new[] { -1, 1 }) Piece(new Vector3(0, H - .1f, sz * (L / 2 + .04f)), new Vector3(W, .22f, wall + .1f), frame, false);
+            foreach (int sx in new[] { -1, 1 }) Piece(new Vector3(sx * (W / 2 + .04f), H - .1f, 0), new Vector3(wall + .1f, .22f, L), frame, false);
+            Piece(new Vector3(0, low, L / 2 + .04f), new Vector3(W, .2f, wall + .1f), frame, false);
+            foreach (int sx in new[] { -1, 1 }) Piece(new Vector3(sx * (W / 2 + .04f), low, 0), new Vector3(wall + .1f, .2f, L), frame, false);
+            foreach (int s in new[] { -1, 1 }) Piece(new Vector3(s * (doorW / 2 + side / 2), low, -L / 2 - .04f), new Vector3(side, .2f, wall + .1f), frame, false);
+            // The stalls: a row down each side, opening onto the aisle; what is left at the back holds the bales.
+            int n = Mathf.Max(1, Mathf.FloorToInt((L - .6f - 1.0f) / pitch));
+            float stallD = Mathf.Min(2.4f, (W - wall - 1.4f) / 2), z0 = -L / 2 + .45f + pitch / 2, inner = W / 2 - wall / 2;
+            for (int k = 0; k <= n; k++)
+            {
+                float z = z0 - pitch / 2 + k * pitch;
+                foreach (int sx in new[] { -1, 1 }) Piece(new Vector3(sx * (W / 2 + .05f), H / 2, z), new Vector3(.12f, H, .22f), frame, false);   // the post outside
+            }
             // The doorway: posts and a lintel, on a stone threshold at the ground with steps where it falls away (DoorSteps).
-            float sill = Mathf.Clamp(DoorGround(t, 0, -d / 2 - .3f, doorW) + .03f, -1, .6f);
-            foreach (int s in new[] { -1, 1 }) Piece(new Vector3(s * (doorW / 2 + .15f), (sill + doorH + .25f) / 2, -d / 2 - .02f), new Vector3(.3f, doorH + .25f - sill, wall + .14f), frame, false);
-            Piece(new Vector3(0, doorH + .12f, -d / 2 - .02f), new Vector3(doorW + .6f, .26f, wall + .14f), frame, false);
-            // The sliding doors, slid open, hung in front of the wall either side of the doorway.
-            float floor = Mathf.Max(0, sill), leafW = doorW / 2 + .1f, leafH = doorH - floor - .05f, leafY = floor + .03f + leafH / 2, front = -d / 2 - wall / 2 - .12f, railY = doorH + .45f;
-            Piece(new Vector3(0, railY, front - .03f), new Vector3(doorW * 2 + .8f, .08f, .05f), iron, false);   // the rail, long enough for both leaves
+            float sill = Mathf.Clamp(DoorGround(t, 0, -L / 2 - .3f, doorW) + .03f, -1, .6f);
+            foreach (int s in new[] { -1, 1 }) Piece(new Vector3(s * (doorW / 2 + .15f), (sill + doorH + .25f) / 2, -L / 2 - .02f), new Vector3(.3f, doorH + .25f - sill, wall + .14f), frame, false);
+            Piece(new Vector3(0, doorH + .12f, -L / 2 - .02f), new Vector3(doorW + .6f, .26f, wall + .14f), frame, false);
+            // The sliding doors, slid open, hung in front of the gable either side of the doorway.
+            float floor = Mathf.Max(0, sill), leafW = doorW / 2 + .1f, leafH = doorH - floor - .05f, leafY = floor + .03f + leafH / 2, front = -L / 2 - wall / 2 - .12f, railY = doorH + .45f;
+            Piece(new Vector3(0, railY, front - .03f), new Vector3(2 * (doorW / 2 + leafW + .15f), .08f, .05f), iron, false);   // the rail, long enough for both leaves
             foreach (int s in new[] { -1, 1 })
             {
                 var leaf = new GameObject(s < 0 ? "Barn door L" : "Barn door R").transform; leaf.SetParent(t, false);
@@ -1730,28 +1745,78 @@ namespace Crulanda.World
                 }
                 Part(PrimitiveType.Cube, leaf, new Vector3(-s * (leafW / 2 - .22f), 0, -.1f), new Vector3(.04f, .55f, .04f), iron);   // the handle, on the edge toward the doorway
             }
-            // Inside: straw down, hay in the back corners, a manger along the back wall, a lantern by the door.
-            Part(PrimitiveType.Cube, t, new Vector3(0, .03f, 0), new Vector3(w - wall - .1f, .06f, d - wall - .1f), straw);
-            foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Sphere, t, new Vector3(s * (w / 2 - .9f), .3f, d / 2 - .8f), new Vector3(1.2f, .7f, 1), thatch);
-            Part(PrimitiveType.Cube, t, new Vector3(0, .45f, d / 2 - .5f), new Vector3(w * .45f, .5f, .55f), frame);
-            Part(PrimitiveType.Cube, t, new Vector3(0, .73f, d / 2 - .5f), new Vector3(w * .42f, .1f, .45f), thatch);
-            var lampAt = new Vector3(doorW / 2 + .6f, 2.6f, -d / 2 + .4f);
+            // Inside: straw over the floor (the kit's straw, tiled), bedding heaped in each stall, partitions, hay racks, bales at the back.
+            BoxPart(t, new Vector3(0, .04f, 0), new Vector3(W - wall - .1f, .08f, L - wall - .1f), strawMat, null, 1.2f);
+            var stalls = new List<Vector3>(); var aisle = new List<Vector3>(); var faces = new List<Vector3>();
+            uint h = 2166136261; foreach (char c in t.name) h = (h ^ c) * 16777619; h |= 1;   // the barn's own steady stream (its name), for the straw's lie
+            float H01() { h ^= h << 13; h ^= h >> 17; h ^= h << 5; return (h % 10000) / 10000f; }
+            for (int k = 0; k <= n; k++)
+            {
+                float z = z0 - pitch / 2 + k * pitch;
+                foreach (int sx in new[] { -1, 1 })
+                {
+                    // A plank partition from the wall out to the aisle, with a post at its end.
+                    Piece(new Vector3(sx * (inner - stallD / 2), .6f, z), new Vector3(stallD, 1.2f, .08f), boards, false);
+                    Piece(new Vector3(sx * (inner - stallD + .06f), .7f, z), new Vector3(.12f, 1.4f, .12f), frame, false);
+                    Piece(new Vector3(sx * (inner - stallD / 2), 1.22f, z), new Vector3(stallD, .08f, .12f), frame, false);
+                }
+                if (k == n) break;
+                float zc = z + pitch / 2;
+                foreach (int sx in new[] { -1, 1 })
+                {
+                    float xc = sx * (inner - stallD / 2);
+                    stalls.Add(t.TransformPoint(new Vector3(xc, 0, zc))); aisle.Add(t.TransformPoint(new Vector3(0, 0, zc))); faces.Add(t.TransformDirection(new Vector3(sx, 0, 0)));
+                    // Bedding: a few loose heaps of straw, each a little turned.
+                    for (int b = 0; b < 3; b++)
+                        BoxPart(t, new Vector3(xc + (H01() - .5f) * stallD * .35f, .1f + b * .015f, zc + (b - 1) * .62f + (H01() - .5f) * .2f), new Vector3(stallD * (.62f + H01() * .25f), .12f + H01() * .06f, .9f + H01() * .3f), strawMat, Quaternion.Euler(0, (H01() - .5f) * 40, 0), 1.2f);
+                    // The hay rack on the wall: a slatted box, hay showing over its top.
+                    float rx = sx * (inner - .3f);
+                    Piece(new Vector3(rx, 1.0f, zc), new Vector3(.5f, .08f, 1.3f), frame, false);
+                    for (float sz = -.6f; sz <= .61f; sz += .2f) Piece(new Vector3(rx - sx * .22f, 1.3f, zc + sz), new Vector3(.05f, .6f, .05f), frame, false);
+                    BoxPart(t, new Vector3(rx, 1.35f, zc), new Vector3(.42f, .55f, 1.2f), balesMat, null, 1.2f);
+                }
+            }
+            // Bales: stacked against the back wall, two rows of the aisle's width with one on top, twine round each.
+            float backZ = L / 2 - wall / 2 - .32f, endZ = z0 - pitch / 2 + n * pitch;
+            void Bale(Vector3 at, float yaw)
+            {
+                var r = Quaternion.Euler(0, yaw, 0);
+                BoxPart(t, at, new Vector3(1.0f, .42f, .52f), balesMat, r, 1.2f);
+                foreach (float tx in new[] { -.25f, .25f }) Part(PrimitiveType.Cube, t, at + r * new Vector3(tx, 0, 0), new Vector3(.03f, .43f, .53f), twine, r);
+            }
+            if (backZ - endZ > .45f)
+            {
+                float aisleW = W - wall - 2 * stallD;
+                int across = Mathf.Max(1, Mathf.FloorToInt((W - wall - .2f) / 1.05f));
+                for (int i = 0; i < across; i++) Bale(new Vector3((i - (across - 1) / 2f) * 1.05f, .21f, backZ), (H01() - .5f) * 6);
+                for (int i = 0; i < Mathf.Max(1, across - 2); i++) Bale(new Vector3((i - (Mathf.Max(1, across - 2) - 1) / 2f) * 1.05f, .63f, backZ + .02f), (H01() - .5f) * 8);
+                if (aisleW > 1.6f) Bale(new Vector3(aisleW / 2 - .7f, .21f, backZ - .75f), 80 + H01() * 20);   // one dragged out into the aisle
+            }
+            else
+                for (int i = 0; i < 2; i++) Bale(new Vector3(0, .21f + i * .42f, endZ - .1f), 90 + (H01() - .5f) * 8);   // no room at the back: two at the aisle's head
+            if (backZ - endZ > 1.3f) foreach (int sx in new[] { -1, 1 }) for (int b = 0; b < 2; b++)   // loose straw heaped in the back corners
+                BoxPart(t, new Vector3(sx * (inner - .6f) + (H01() - .5f) * .3f, .14f + b * .1f, backZ - .75f + (H01() - .5f) * .2f), new Vector3(.9f - b * .25f, .2f, .7f - b * .2f), strawMat, Quaternion.Euler(0, (H01() - .5f) * 50, 0), 1.2f);
+            var lampAt = new Vector3(doorW / 2 + .35f, 2.6f, -L / 2 + .4f);
             Part(PrimitiveType.Sphere, t, lampAt, Vector3.one * .18f, Glowing(new Color(1, .72f, .4f), 2));
             Glow(t, lampAt - Vector3.up * .1f, 8, .15f, new Color(1, .72f, .4f), 1.4f);
-            // The roof, as the painted barn's but in the kit's thatch, stone to the ridge in the gables.
-            float roofH = d * .5f;
-            MeshPart(ZoneMeshes.GableRoof(w + 1, d + 1.4f, roofH, .25f, .5f), t, new Vector3(0, H, 0), thatch);
-            Eaves(t, w - .2f, d, H, roofH, thatch);
-            Gables(t, w / 2, d, H, roofH, d / 2 + .7f, w / 2 + .5f, stone, d, .2f);
+            // The roof, as the painted barn's but in the kit's thatch, stone to the ridge in the gables: built along x and turned, so the
+            // ridge runs front to back and the gables stand over the doorway and the back wall.
+            float roofH = W * .5f;
+            var roof = new GameObject("Barn roof").transform; roof.SetParent(t, false); roof.localRotation = Quaternion.Euler(0, 90, 0);
+            MeshPart(ZoneMeshes.GableRoof(L + 1, W + 1.4f, roofH, .25f, .5f), roof, new Vector3(0, H, 0), thatch);
+            Eaves(roof, L - .2f, W, H, roofH, thatch);
+            Gables(roof, L / 2, W, H, roofH, W / 2 + .7f, L / 2 + .5f, stone, W, .2f);
             // The stone sill round the outside, open at the doorway, and the threshold and steps.
-            Footing(t, w + .3f, d + .3f, .45f, .4f, 1, doorW / 2 + .1f);
-            DoorSteps(t, 0, -d / 2 - .15f, sill, doorW + .24f);
-            // The stalls: two rows, one beast a stall, clear of the hay and the doorway.
-            var stalls = new List<Vector3>();
-            for (float z = d / 2 - 2.2f; z > -d / 2 + 1.3f; z -= 2.4f)
-                for (float x = -w / 2 + 1.6f; x <= w / 2 - 1.6f + .01f; x += 2.6f)
-                    if (!(Mathf.Abs(x) < doorW / 2 + .5f && z < -d / 2 + 2.4f)) stalls.Add(t.TransformPoint(new Vector3(x, 0, z)));
-            Barns.Add(new ZoneBarn { name = t.name, door = t.TransformPoint(new Vector3(0, 0, -d / 2 - 2.4f)), inside = t.TransformPoint(new Vector3(0, 0, -d / 2 + 1.3f)), right = t.TransformDirection(Vector3.right), stalls = stalls.ToArray() });
+            Footing(t, W + .3f, L + .3f, .45f, .4f, 1, doorW / 2 + .1f);
+            DoorSteps(t, 0, -L / 2 - .15f, sill, doorW + .24f);
+            Barns.Add(new ZoneBarn { name = t.name, door = t.TransformPoint(new Vector3(0, 0, -L / 2 - 2.4f)), inside = t.TransformPoint(new Vector3(0, 0, -L / 2 + 1.3f)),
+                right = t.TransformDirection(Vector3.forward), stalls = stalls.ToArray(), aisle = aisle.ToArray(), faces = faces.ToArray() });
+        }
+        /// <summary>Whether the barn of this name and size is a walk-in barn (WalkInBarn): 8 m or more and nobody's home. It stands turned
+        /// (its gable end to the front), so its footprint's sides are swapped (Footprint).</summary>
+        bool WalksIn(string name, Vector2 size)
+        {
+            return size.x >= 8 && !(Zone.life != null && Zone.life.households != null && Array.Exists(Zone.life.households, x => x != null && x.house == name));
         }
         void Barn(Transform t, Vector2 size)
         {
@@ -1762,7 +1827,7 @@ namespace Crulanda.World
             // A barn nobody sleeps in is walked into (2026-10-10, Chris: "barn door should be open enough to walk into, for farm animals to
             // sleep"). The Megapack's walled barn (art round 5; notes 80, 96) is one closed mesh with no door on any face, so it is built
             // here in that kit's own materials (WalkInBarn); a barn under 8 m keeps the painted one.
-            if (!home && w >= 8) { WalkInBarn(t, w, d); return; }
+            if (WalksIn(t.name, size)) { WalkInBarn(t, w, d); return; }
             var boards = Tint(art.timber, new Color(.4f, .25f, .16f));
             BoxPart(t, new Vector3(0, h / 2, 0), new Vector3(w, h, d), boards);
             Footing(t, w + .3f, d + .3f, .45f, .4f, 1, 1.75f);   // a stone sill round the boards' foot, stepping up and down the slope, open at the doors
@@ -5896,12 +5961,16 @@ namespace Crulanda.World
                 if (!parts.TryGetValue((mat, side), out var list)) parts[(mat, side)] = list = new List<CombineInstance>();
                 list.Add(new CombineInstance { mesh = mesh, transform = Matrix4x4.TRS(at, rot, scale) });
             }
-            float treeline = mountain ? 32 : ash ? 22 : 43;
-            foreach (float row in new[] { 8f, 14, 22, 32, 43, 53, 64 })
+            // Meadows and woods are wooded right over the ridge, the rows closing up into a canopy (2026-10-10, Chris: "horizon still
+            // looks empty. compare the horizon in world of warcraft forever in elwynn forest": the trees stopped 43 m out, up to 19 m
+            // apart, and the ridge behind them was bare).
+            bool wooded = !mountain && !ash;
+            float treeline = mountain ? 32 : ash ? 22 : 90;
+            foreach (float row in wooded ? new[] { 8f, 14, 22, 32, 43, 53, 64, 76, 86 } : new[] { 8f, 14, 22, 32, 43, 53, 64 })
             {
                 bool rock = row > treeline; if (rock && !mountain && !ash) break;
                 // keep: near rows leave the roads' way out open; further out the woods close across it (the road goes into cover).
-                float edge = Half + row, step = rock ? 20 + row * .2f : (6 + row * .3f) * (ash ? 1.8f : 1), keep = rock ? 14 : row < 30 ? 9 : 0;
+                float edge = Half + row, step = rock ? 20 + row * .2f : wooded ? 5.5f + row * .1f : (6 + row * .3f) * (ash ? 1.8f : 1), keep = rock ? 14 : row < 30 ? 9 : 0;
                 for (int side = 0; side < 4; side++)
                     for (float a = -edge + R() * step; a < edge; a += step * (.7f + R() * .6f))
                     {
@@ -5909,6 +5978,7 @@ namespace Crulanda.World
                         var q = side == 0 ? new Vector2(a, -o) : side == 1 ? new Vector2(o, a) : side == 2 ? new Vector2(-a, o) : new Vector2(-o, -a);
                         if ((Zone.wasting != null && q.x > Zone.wasting.x - 6) || (keep > 0 && valleys.Exists(v => DistanceToPath(q, v) < keep))) continue;
                         var at = new Vector3(q.x, H(q.x, q.y) - 1, q.y); float yaw = R() * 360, th = 7 + R() * 5, pick = R() * (dead + pines + leafy);
+                        if (wooded && row > 40) th *= 1.3f;   // the old wood on the ridge stands taller
                         // Set on the lowest drawn ground round it (1.2 m out, and at the trunk's own radius); no tree where that
                         // ground is near-vertical (a rise of over 2.2 m across it, or a 2 m step within 2.5 m: a crest or ledge). The
                         // trunk sinks half a metre, and further the steeper the ground, so the cone's base never shows.

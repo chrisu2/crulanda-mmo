@@ -430,53 +430,61 @@ namespace Crulanda.Encounter
         /// A one-shot clip (a death, kneeling to work) starts from its beginning when its slot comes in and holds its last frame.
         /// </summary>
         public void Drive(float speed, string pose, float dt) { Drive(speed, pose, dt, new Vector2(0, 1)); }
+        /// <summary>As below; <paramref name="poseWeight"/> under 1 lays the pose over the walk, run or stand by that much (the jump's tuck
+        /// and landing dip, 2026-10-10).</summary>
         /// <summary>As above, with the way the figure is moving against the way it faces (x right, y forward; length ignored).</summary>
-        public void Drive(float speed, string pose, float dt, Vector2 heading)
+        public void Drive(float speed, string pose, float dt, Vector2 heading, float poseWeight = 1)
         {
             if (!graph.IsValid()) return;
             var want = new float[weights.Length];
             if (ki && pose == "talk" && slotOf.ContainsKey("k.talk")) pose = "k.talk";
-            if (pose != null && slotOf.TryGetValue(pose, out int ps))
+            int ps = -1; bool posed = pose != null && slotOf.TryGetValue(pose, out ps);
+            if (!posed || poseWeight < 1)
             {
-                want[ps] = 1;
-                if (pose != current && !slots[ps].loop) slots[ps].p.SetTime(0);
-                if (pose == "swim" || pose == "sneak") slots[ps].p.SetSpeed(Mathf.Clamp(speed / (pose == "swim" ? 1.6f : 1.2f), pose == "swim" ? .35f : .5f, 1.6f));
-            }
-            else if (ki)
-            {
-                float walk = Mathf.InverseLerp(.15f, 1.2f, speed), run = Mathf.InverseLerp(2.2f, 3.6f, speed), sprint = Mathf.InverseLerp(5.2f, 6.8f, speed);
-                // Standing: the first idle, and now and then the second for a while (each figure on its own beat).
-                // Standing: the mocap idles in turn, about 18 s each (each figure on its own beat), or Kevin's two.
-                if (morroIdles.Count > 0) Set(want, morroIdles[Mathf.Abs(Mathf.FloorToInt(Time.time / 18f + idleBeat * 7)) % morroIdles.Count], 1 - walk);
+                if (ki)
+                {
+                    float walk = Mathf.InverseLerp(.15f, 1.2f, speed), run = Mathf.InverseLerp(2.2f, 3.6f, speed), sprint = Mathf.InverseLerp(5.2f, 6.8f, speed);
+                    // Standing: the first idle, and now and then the second for a while (each figure on its own beat).
+                    // Standing: the mocap idles in turn, about 18 s each (each figure on its own beat), or Kevin's two.
+                    if (morroIdles.Count > 0) Set(want, morroIdles[Mathf.Abs(Mathf.FloorToInt(Time.time / 18f + idleBeat * 7)) % morroIdles.Count], 1 - walk);
+                    else
+                    {
+                        bool second = slotOf.ContainsKey("k.idle2") && Mathf.Repeat(Time.time * .04f + idleBeat, 1) > .82f;
+                        Set(want, second ? "k.idle2" : "k.idle", 1 - walk);
+                    }
+                    // Moving: the two directions nearest the heading, by how near each is.
+                    float a = Mathf.Repeat(Mathf.Atan2(heading.x, heading.y) * Mathf.Rad2Deg, 360) / 45f; int i0 = Mathf.FloorToInt(a) % 8, i1 = (i0 + 1) % 8; float t = a - Mathf.Floor(a);
+                    void Way(string kind, float w)
+                    {
+                        if (w <= 0) return;
+                        string s0 = kind + "." + Dirs[i0], s1 = kind + "." + Dirs[i1];
+                        if (kind == "s" && (!slotOf.ContainsKey(s0) || !slotOf.ContainsKey(s1))) { s0 = "r." + Dirs[i0]; s1 = "r." + Dirs[i1]; }   // no sprinting backwards
+                        Add(want, s0, w * (1 - t)); Add(want, s1, w * t);
+                    }
+                    Way("w", walk * (1 - run)); Way("r", walk * run * (1 - sprint)); Way("s", walk * run * sprint);
+                    // Rates kept near the clips' own (Chris, 2026-10-05: "animations are too fast"): a walk paced for 1.6 m/s, a run for 4.6, a sprint for 7.
+                    foreach (var d in Dirs) { Rate("w." + d, Mathf.Clamp(speed / 1.6f, .6f, 1.2f)); Rate("r." + d, Mathf.Clamp(speed / 4.6f, .7f, 1.15f)); Rate("s." + d, Mathf.Clamp(speed / 7f, .8f, 1.1f)); }
+                }
                 else
                 {
-                    bool second = slotOf.ContainsKey("k.idle2") && Mathf.Repeat(Time.time * .04f + idleBeat, 1) > .82f;
-                    Set(want, second ? "k.idle2" : "k.idle", 1 - walk);
+                    float walk = Mathf.InverseLerp(.15f, 1.2f, speed), run = Mathf.InverseLerp(2.2f, 3.6f, speed), sprint = Mathf.InverseLerp(5.2f, 6.8f, speed);
+                    Set(want, "idle", 1 - walk); Set(want, "walk", walk * (1 - run)); Set(want, "run", walk * run * (1 - sprint)); Set(want, "sprint", walk * run * sprint);
+                    // The walk cycle is made for about 1.4 m/s, the jog for about 3.6, the sprint for about 6.5: the feet keep to the ground.
+                    Rate("walk", Mathf.Clamp(speed / 1.4f, .7f, 1.6f)); Rate("run", Mathf.Clamp(speed / 3.6f, .75f, 1.5f)); Rate("sprint", Mathf.Clamp(speed / 6.5f, .8f, 1.4f));
                 }
-                // Moving: the two directions nearest the heading, by how near each is.
-                float a = Mathf.Repeat(Mathf.Atan2(heading.x, heading.y) * Mathf.Rad2Deg, 360) / 45f; int i0 = Mathf.FloorToInt(a) % 8, i1 = (i0 + 1) % 8; float t = a - Mathf.Floor(a);
-                void Way(string kind, float w)
-                {
-                    if (w <= 0) return;
-                    string s0 = kind + "." + Dirs[i0], s1 = kind + "." + Dirs[i1];
-                    if (kind == "s" && (!slotOf.ContainsKey(s0) || !slotOf.ContainsKey(s1))) { s0 = "r." + Dirs[i0]; s1 = "r." + Dirs[i1]; }   // no sprinting backwards
-                    Add(want, s0, w * (1 - t)); Add(want, s1, w * t);
-                }
-                Way("w", walk * (1 - run)); Way("r", walk * run * (1 - sprint)); Way("s", walk * run * sprint);
-                // Rates kept near the clips' own (Chris, 2026-10-05: "animations are too fast"): a walk paced for 1.6 m/s, a run for 4.6, a sprint for 7.
-                foreach (var d in Dirs) { Rate("w." + d, Mathf.Clamp(speed / 1.6f, .6f, 1.2f)); Rate("r." + d, Mathf.Clamp(speed / 4.6f, .7f, 1.15f)); Rate("s." + d, Mathf.Clamp(speed / 7f, .8f, 1.1f)); }
+                if (posed) for (int i = 0; i < want.Length; i++) want[i] *= 1 - poseWeight;   // the pose over it
             }
-            else
+            if (posed)
             {
-                float walk = Mathf.InverseLerp(.15f, 1.2f, speed), run = Mathf.InverseLerp(2.2f, 3.6f, speed), sprint = Mathf.InverseLerp(5.2f, 6.8f, speed);
-                Set(want, "idle", 1 - walk); Set(want, "walk", walk * (1 - run)); Set(want, "run", walk * run * (1 - sprint)); Set(want, "sprint", walk * run * sprint);
-                // The walk cycle is made for about 1.4 m/s, the jog for about 3.6, the sprint for about 6.5: the feet keep to the ground.
-                Rate("walk", Mathf.Clamp(speed / 1.4f, .7f, 1.6f)); Rate("run", Mathf.Clamp(speed / 3.6f, .75f, 1.5f)); Rate("sprint", Mathf.Clamp(speed / 6.5f, .8f, 1.4f));
+                want[ps] += Mathf.Clamp01(poseWeight);
+                if (pose != current && !slots[ps].loop) { slots[ps].p.SetTime(StartOf(pose) * slots[ps].c.length); if (pose == "k.jumpstart" || pose == "k.land") slots[ps].p.SetSpeed(1.3f); }
+                if (pose == "swim" || pose == "sneak") slots[ps].p.SetSpeed(Mathf.Clamp(speed / (pose == "swim" ? 1.6f : 1.2f), pose == "swim" ? .35f : .5f, 1.6f));
             }
+            if (Airy(pose) || Airy(current)) quickUntil = Time.time + .2f;
             current = pose;
             DriveUpper(dt);
-            float sum = 0;
-            for (int i = 0; i < weights.Length; i++) { weights[i] = Mathf.MoveTowards(weights[i], want[i], dt * 4); sum += weights[i]; }
+            float sum = 0, rate = Time.time < quickUntil ? 16 : 4;   // into and out of the jump's clips in a sixteenth of a second, not a quarter
+            for (int i = 0; i < weights.Length; i++) { weights[i] = Mathf.MoveTowards(weights[i], want[i], dt * rate); sum += weights[i]; }
             for (int i = 0; i < weights.Length; i++)
             {
                 mixer.SetInputWeight(i, sum > 0 ? weights[i] / sum : 0);
@@ -485,6 +493,11 @@ namespace Crulanda.Encounter
                 if (c.length > 0 && t > c.length) p.SetTime(loop ? t % c.length : c.length);
             }
         }
+        float quickUntil = -9;
+        static bool Airy(string slot) { return slot == "k.jumpstart" || slot == "k.fall" || slot == "k.land" || slot == "k.jump"; }
+        /// <summary>Where a one-off clip starts, as a share of its length: the take-off at its push-off (the jump has already left the
+        /// ground when it starts, so its crouch would be played in the air), the rest from the top.</summary>
+        static float StartOf(string slot) { return slot == "k.jumpstart" ? .5f : 0; }
         void Set(float[] want, string slot, float w) { if (slotOf.TryGetValue(slot, out int i)) want[i] = w; }
         void Add(float[] want, string slot, float w) { if (slotOf.TryGetValue(slot, out int i)) want[i] += w; }
         float idleBeat;

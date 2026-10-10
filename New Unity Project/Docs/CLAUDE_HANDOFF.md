@@ -15,7 +15,7 @@ The user requested this handoff because they ran out of tokens. Do not assume an
 - Mira mended only you and herself: FIXED, she mends the most hurt of the party incl. party sims (HealerCompanion);
 - the kit barns had no door (note 96 again; the kit's model has none on any face): FIXED, the painted barn's door on its front (ZoneBuilder.BarnDoor);
 - /adit did not level the party: FIXED (SimCompanion.MatchLevel).
-Tests for each, green; the full run has NOT been run since the Vanguard: run it first next session (toolsalidation\start_detached.ps1 -Arguments "-AllTests"), then release_build.ps1 -Sync.
+Tests for each, green; the full run has NOT been run since the Vanguard: run it first next session (tools\validation\start_detached.ps1 -Arguments "-AllTests"), then release_build.ps1 -Sync.
 **Open from Chris's reports (PLAYTEST_NOTES 101 and CHANGELOG):**
 - **The who list (O, /who) opens nothing for Chris.** A test shows WhoOpen toggling in the Adit; the draw is not checked. Ask him what he
   sees in the 21:40 build; look at Player.log for an OnGUI exception from DrawWho (EncounterHud.Who.cs); note the O key is hard-coded

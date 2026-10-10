@@ -1652,7 +1652,7 @@ namespace Crulanda.Encounter
 
             bool marking = EncounterInput.Sneak;   // Ctrl+1-4: raid marks on your target (CC step C3); Ctrl alone still sneaks
             for (int slot = 0; slot < (marking ? 4 : ActionCount); slot++)
-                if (!BuildOpen && slot < 11 && EncounterInput.Press(EncounterInput.SlotKey(slot))) { if (marking) MarkTarget((RaidMark)((slot + 1) % 4)); else UseAbility(slot); }
+                if (!BuildOpen && slot < 13 && EncounterInput.Press(EncounterInput.SlotKey(slot))) { if (marking) MarkTarget((RaidMark)((slot + 1) % 4)); else UseAbility(slot); }
             Kit.Tick(InCombat);
             if (AutoAttack && !Kit.MeleeAutoAttacks && !Kit.RangedAutoAttacks) AutoAttack = false;
             // The swing in melee, or the bow's auto-shot at its range (the Ranger: ClassKit.RangedAutoAttacks).

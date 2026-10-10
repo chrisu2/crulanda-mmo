@@ -52,6 +52,29 @@
     {"id": "sa-mercy", "name": "Mercy", "tier": 2, "col": 1, "max": 3, "req": "sa-grace", "kind": "passive", "icon": "hand", "desc": "Lay On heals 8% more of the target's maximum health per rank.", "emphasis": {"healing": 1.5}, "impl": true},
     {"id": "sa-sanctuary", "name": "Sanctuary", "tier": 2, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "moon", "desc": "Each second of Consecrate also heals you and Mira on the ground for 3% of maximum health.", "emphasis": {"healing": 2}, "impl": true}
    ]
+  },
+  {
+    "id": "vanguard",
+    "name": "Vanguard",
+    "role": "support",
+    "loop": "Plant the Colours where the party stands, close ranks for barriers and Conviction, and press on so every blow lands harder.",
+    "tradeoff": "The Vanguard's Conviction comes from allies rallied, not from Smite: alone, the branch is thin, and its Paladin neither holds a foe nor heals as the others do.",
+    "nodes": [
+    {"id": "va-colours-held", "name": "Colours Held", "tier": 0, "col": 1, "max": 5, "req": null, "kind": "passive", "icon": "shield", "desc": "The Colours stand 1s longer and reach half a metre further per rank.", "emphasis": {"mitigation": 1}, "impl": true},
+    {"id": "va-press-harder", "name": "Press Harder", "tier": 0, "col": 2, "max": 3, "req": null, "kind": "modifier", "icon": "sword", "desc": "Press On's bonus to the party's blows is 2% more per rank.", "emphasis": {"damage": 1}, "impl": true},
+    {"id": "va-rampart", "name": "Rampart", "tier": 1, "col": 0, "max": 3, "req": null, "kind": "passive", "icon": "shield", "desc": "Planting the Colours raises a barrier worth 2% of maximum health per rank on each party member under them, for 8s.", "emphasis": {"mitigation": 1.2}, "impl": true},
+    {"id": "va-close-ranks", "name": "Close Ranks", "tier": 1, "col": 1, "max": 1, "req": null, "kind": "active", "icon": "hand", "desc": "New action: every party member within 15m takes a barrier for 6s, and you gain Conviction for each ally rallied.", "emphasis": {"mitigation": 1, "sustain": 1}, "impl": true},
+    {"id": "va-press-longer", "name": "Press Longer", "tier": 1, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "clock", "desc": "Press On lasts 2s longer per rank.", "emphasis": {"damage": 0.8}, "impl": true},
+    {"id": "va-steady-ranks", "name": "Steady Ranks", "tier": 2, "col": 1, "max": 3, "req": "va-close-ranks", "kind": "passive", "icon": "heart", "desc": "Close Ranks' barriers are 25% larger per rank.", "emphasis": {"mitigation": 1.5}, "impl": true},
+    {"id": "va-comrades", "name": "Comrades", "tier": 2, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "star", "desc": "While Press On lasts, each Smite heals the most hurt party member for 3% of their maximum health.", "emphasis": {"healing": 1, "damage": 0.5}, "impl": true},
+    {"id": "va-under-the-colours", "name": "Under the Colours", "tier": 3, "col": 1, "max": 3, "req": null, "kind": "passive", "icon": "sword", "desc": "While you stand under your Colours the party's blows hit 2% harder per rank.", "emphasis": {"damage": 1.2}, "impl": true},
+    {"id": "va-last-stand", "name": "Last Stand", "tier": 3, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "moon", "desc": "When the Colours fall, every party member still under them is healed for 10% of maximum health.", "emphasis": {"healing": 1.5}, "impl": true},
+    {"id": "va-oriflamme", "name": "Oriflamme", "tier": 4, "col": 1, "max": 3, "req": null, "kind": "passive", "icon": "star", "desc": "The Colours reach 1m further per rank and mend everyone under them for 1% of maximum health a second per rank.", "emphasis": {"healing": 1, "mitigation": 0.5}, "impl": false},
+    {"id": "va-cadence-of-arms", "name": "Cadence of Arms", "tier": 4, "col": 2, "max": 1, "req": null, "kind": "modifier", "icon": "bolt", "desc": "Press On also quickens the party's swings by a tenth.", "emphasis": {"damage": 1.5}, "impl": false},
+    {"id": "va-no-retreat", "name": "No Retreat", "tier": 5, "col": 1, "max": 3, "req": "va-oriflamme", "kind": "passive", "icon": "heart", "desc": "A party member under the Colours who would fall is left at 1 health instead, once every 60/45/30s.", "emphasis": {"mitigation": 2}, "impl": false},
+    {"id": "va-rally-point", "name": "Rally Point", "tier": 5, "col": 2, "max": 1, "req": null, "kind": "modifier", "icon": "eye", "desc": "Close Ranks also draws every mob within 8m onto you for 3s.", "emphasis": {"threat": 2}, "impl": false},
+    {"id": "va-the-line-holds", "name": "The Line Holds", "tier": 6, "col": 1, "max": 1, "req": "va-no-retreat", "kind": "signature", "icon": "chain", "desc": "Planting the Colours makes the party under them unbreakable for 2s: no blow lands.", "emphasis": {"mitigation": 3}, "impl": false}
+   ]
   }
  ]
 }

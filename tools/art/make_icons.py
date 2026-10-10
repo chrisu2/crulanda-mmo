@@ -1710,6 +1710,25 @@ ABILITIES.update({'ability.shield_bash': ('#24406a', a_shield_bash), 'ability.sh
 def a_sleep_wood(c):
     c.back(c.ell(50, 50, 40), '#2c4424', .5, 14); m_leaf(c, '#62c84a', '#b0e86a'); m_moon(c, '#e0e8ff', '#ffffff')
 ABILITIES.update({'druid.sleep_of_the_wood': ('#1e3420', a_sleep_wood)})
+
+# ---- paladin, the Vanguard (2026-10-09, TALENT_DEPTH.md): the Colours, the ranks, the press ----
+def a_colours(c):
+    c.back(c.ell(50, 50, 38), HOLY, .4, 10)
+    c.part(c.rect(22, 6, 28, 96, 2), '#8a5a30', 'wood', grain=.3)
+    c.part(c.poly([(28, 14), (86, 24), (70, 42), (86, 60), (28, 70)], smooth=True, n=4), '#b02a2a', 'soft')
+    c.part(c.ell(52, 42, 9), GOLD, 'metal'); c.part(c.ell(25, 6, 6), GOLD, 'metal')
+def a_close_ranks(c):
+    c.back(c.ell(50, 50, 36), HOLY, .35, 10)
+    for x, y in ((28, 58), (50, 46), (72, 58)):
+        m = c.poly([(x - 12, y - 16), (x + 12, y - 16), (x + 12, y + 6), (x, y + 22), (x - 12, y + 6)], smooth=True, n=4)
+        c.part(m, IVORY, 'soft'); c.part(c.grow(m, -5), '#3a4a80', 'matte')
+    rings(c, 50, 50, (44,), GOLD, .5, w=3)
+def a_press_on(c):
+    c.back(c.taper([(10, 72), (50, 42), (92, 20)], 2, 2, wmid=20), HOLY, .5, 5)
+    c.part(c.poly([(14, 62), (56, 36), (54, 48), (90, 22), (62, 24), (66, 36), (20, 68)], smooth=False), GOLD, 'metal')
+    rays(c, 86, 24, 10, 30, 8, HOLY, .5, 6)
+ABILITIES.update({'paladin.colours': ('#4a2a24', a_colours), 'paladin.close_ranks': ('#2a3454', a_close_ranks), 'paladin.press_on': ('#4a4020', a_press_on)})
+BRANCH.update({'vanguard': ('#4a3020', ['#e0b040', '#b02a2a', '#efe6cf', '#9fc8ff', '#d0a060'])})
 KIND_TRIM = dict(passive='#c9ccd2', modifier='#e0b040', active='#fff0b0', signature='#fff0b0', capstone='#ffd040')
 def draw_talent(c, icon, branch, kind, k):
     """k: how many earlier talents in the branch used the same icon word (0 = first)."""

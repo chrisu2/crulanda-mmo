@@ -1864,3 +1864,20 @@ A read-only review by five reviewers, each finding checked by a second who tried
   Adit yard, the fights behind you reset, and the game saves. Before the lock is matched the carriage is the Company's and says so.
   The carriage itself does not move on screen yet (a later look).
 - Tests: AditGateTests (the ride refused while the lock sings, taken once it is matched; the party arrives at the yard).
+
+## 2026-10-09 — The Paladin's fourth path: the Vanguard (TALENT_DEPTH.md, the first of the fourth paths)
+- Chris: "deeper talents and more customization: a Paladin can be a tank, healer, dps or support class". Decided (TALENT_DEPTH.md): one
+  point a level as now; a fourth path for every class; the Adit first, then the classes, the Paladin first. He named this one
+  **Vanguard** over Herald (the books have no church; their rallying figure is General Veyra Crimsonlash) and Marshal (a Warrior's word).
+  CANON-EXPANDED: a field commander's path; the names and numbers are GAME-ONLY.
+- **Three new actions** on the bar's slots 11-13 (keys -, = and [; EncounterInput): **Plant the Colours** (level 5: the standard at your
+  feet for 12 s, the party within 8 m takes 10% less, a short status refreshed each second so stepping out loses it), **Close Ranks**
+  (a talent action: every party member within 15 m takes a barrier for 6 s, and you gain Conviction for each ally rallied: the Vanguard's
+  pips come from the party, not from Smite) and **Press On** (level 7: for 10 s the party's blows hit 8% harder, `PartyDamageMultiplier`,
+  and Mira casts 15% faster, `CompanionHaste`).
+- **The branch** (Talents/paladin.json, ids va-*): tiers 0-3 built (23 ranks: Colours Held, Press Harder, Rampart, Close Ranks, Press
+  Longer, Steady Ranks, Comrades, Under the Colours, Last Stand), tiers 4-6 written for the cap of 30 and left unbuilt (Oriflamme, Cadence
+  of Arms, No Retreat, Rally Point, The Line Holds). Icons for all (make_icons.py: three painters and a Vanguard palette).
+- Sims do not take the Vanguard as a role yet (their Paladins stay tanks or healers).
+- Tests: PaladinRulesTests (four branches, 30 built talents, the Vanguard's tier gates at the cap); PaladinLoopTests (the Colours soften a
+  blow, Close Ranks' barrier and its Conviction only for allies, Press On's multipliers); IconCoverageTests covers the new icons.

@@ -1,7 +1,8 @@
 # Deeper talents and a fourth path for every class (decided 2026-10-09)
 
 **Chris decided (2026-10-09, evening):** one point a level as now (the deep rows open with Phase 9's levels 16-30); the fourth paths as
-proposed below; the Adit first (D5-D8), then the talents class by class, the Paladin first.
+proposed below (the Paladin's named Vanguard, not Herald: the books have no church, and their rallying figure is a general); the Adit
+first (D5-D8, done), then the talents class by class, the Paladin first (its Vanguard built 2026-10-09).
 
 Chris, 2026-10-09: "need deeper talents and more customization (more rows, i.e. paladin can be a tank, healer, dps, or support class
 with 4 rows). We need to explore something similar for all classes, albeit some classes can't tank." This is the plan to decide on.
@@ -28,12 +29,12 @@ A gives the customisation Chris asked for in the game he plays now; the deep row
 ## Decision 2: the fourth path, class by class
 
 Every class gets four paths; a class that cannot tank gets something else as its fourth. Roles after: tanks Warrior, Paladin, Druid;
-healers Paladin, Druid, Archivist (new), Mira; damage all seven; support Warrior, Paladin (new), Mage, Rogue (new), Archivist;
+healers Paladin, Druid, Archivist (new), Mira; damage all seven; support Warrior, Paladin (the Vanguard, built), Mage, Rogue (new), Archivist;
 control Ranger, Mage, Rogue, Archivist, Warrior (new).
 
 | Class | Today | Fourth path (proposed) | Can tank? |
 |---|---|---|---|
-| Paladin | Oathguard tank, Judicator damage, Sanctuary healer | **Herald** (support): auras and rallies, blessings on the party, a banner that holds | yes |
+| Paladin | Oathguard tank, Judicator damage, Sanctuary healer | **Vanguard** (support; built 2026-10-09): Plant the Colours (the party under the standard takes less), Close Ranks (barriers, Conviction for each ally rallied), Press On (the party's blows harder, Mira faster). Chris chose it over Herald (no church in the books) and Marshal (a Warrior's word). | yes |
 | Warrior | Tank, DPS, Support | **Jailer** (control): nets, chains, hamstrings, a throw that stuns | yes |
 | Druid | Barkhide tank, Thornclaw melee, Rootmend healer, Thornsong ranged | has four: depth only | yes |
 | Ranger | Marksman ranged, Beastbond pet, Pathfinder control | **Skirmisher** (melee): spear and short blade, hit-and-run | no (the wolf holds a little) |

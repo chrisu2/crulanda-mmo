@@ -7,14 +7,14 @@ class moves.
 ## The seven built classes
 
 All seven are playable from the pause menu (a separate character each), all are played by the sims (`SimAdventurers.ClassIds`; sims 41
-and up are Rogues and Archivists), all have a talent tree, an AI rotation, gear rules, one crowd control and one interrupt (CC_DESIGN.md),
+and up are Rogues and Archivists), all have a talent tree (the Paladin four paths since 2026-10-09, TALENT_DEPTH.md), an AI rotation, gear rules, one crowd control and one interrupt (CC_DESIGN.md),
 and icons for everything on the bar (IconCoverageTests).
 
 | Class | Resource | Builds (talent branches) | Talent ranks built per branch | Crowd control / interrupt | Figure |
 |---|---|---|---|---|---|
 | Warrior | Vigor | Tank, DPS, Support | 23 of 34 designed (rows 0-3 work; rows 4-6 written, not built) | Shout (fear 6 s) / Shield Bash (silence) | own |
 | Druid | Wildstores | Barkhide tank, Thornclaw melee, Rootmend healer, Thornsong ranged | 25 of 35 designed (rows 0-3 work; rows 4-6 written, not built) | Sleep of the Wood (an eleventh slot) / Thornsong's interrupt | own; four forms |
-| Paladin | Mana + Conviction | Oathguard tank, Judicator melee, Sanctuary healer | 19 of 19 (rows 0-2; nothing deeper written) | Rebuke (stun, works on bosses) / Censure (silence) | own |
+| Paladin | Mana + Conviction | Oathguard tank, Judicator melee, Sanctuary healer, **Vanguard support** (2026-10-09) | 19 of 19 in the first three (rows 0-2); the Vanguard 23 of 32 (rows 0-3 built, 4-6 written) | Rebuke (stun, works on bosses) / Censure (silence) | own |
 | Ranger | Focus | Marksman ranged, Beastbond pet, Pathfinder control | 17-19 of 17-19 (rows 0-2; nothing deeper written) | Snare Trap (hold 20 s) / Pin (silence) | own; the wolf |
 | Mage | Mana + Heat | Combustion ranged, Heatweaver control, Spellbinder support | 17-19 of 17-19 (rows 0-2; nothing deeper written) | Ash Hex (held 25 s) / Quench (silence) | own; the staff |
 | Rogue | Focus + combo points | Thief's Grace stealth, Shardwork poisons, Locksmith | 16-17 of 16-17 (rows 0-3; nothing deeper written) | Sap, Gouge, Blind / Kick; Vanish; pick-lock | borrows the Ranger's |

@@ -460,6 +460,42 @@ MonoBehaviour:
     globalCooldown: 1.5
     duration: 2
     statusId: 
+  - id: paladin.colours
+    name: Plant the Colours
+    description: Plant the standard at your feet for 12 seconds. The party within 8 metres of it takes 10% less damage.
+    effect: 4
+    power: 10
+    cost: 25
+    cooldown: 30
+    range: 0
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 12
+    statusId: 
+  - id: paladin.close_ranks
+    name: Close Ranks
+    description: Every party member within 15 metres takes a barrier for 6 seconds, and you gain Conviction for each ally rallied. Talent.
+    effect: 2
+    power: 20
+    cost: 15
+    cooldown: 20
+    range: 15
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 6
+    statusId: 
+  - id: paladin.press_on
+    name: Press On
+    description: For 10 seconds the party's blows hit 8% harder and Mira casts faster.
+    effect: 7
+    power: 8
+    cost: 20
+    cooldown: 25
+    range: 0
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 10
+    statusId: 
   - id: ranger.quick_shot
     name: Quick Shot
     description: An arrow on the instant, at up to 25 metres. Starts the bow's own auto-shot while the target is in range.
@@ -1095,6 +1131,15 @@ MonoBehaviour:
         talentId: og-censure
       - abilityId: paladin.rebuke
         level: 6
+        talentId: 
+      - abilityId: paladin.colours
+        level: 5
+        talentId: 
+      - abilityId: paladin.close_ranks
+        level: 1
+        talentId: va-close-ranks
+      - abilityId: paladin.press_on
+        level: 7
         talentId: 
     talentTree: {fileID: 4900000, guid: ae359ffc02cb42b486625e88fc47b2f5, type: 3}
   - definition:

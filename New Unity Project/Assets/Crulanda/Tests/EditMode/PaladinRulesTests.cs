@@ -24,10 +24,28 @@ namespace Crulanda.Tests
         {
             var t = Tree();
             int count = 0; foreach (var b in t.Branches) count += b.nodes.Length;
-            Assert.AreEqual(3, t.Branches.Count, "Oathguard, Judicator, Sanctuary.");
-            Assert.AreEqual(PaladinKit.ImplementedIds.Length, count); Assert.AreEqual(21, count);
+            Assert.AreEqual(4, t.Branches.Count, "Oathguard, Judicator, Sanctuary, Vanguard.");
+            Assert.AreEqual(PaladinKit.ImplementedIds.Length, count); Assert.AreEqual(30, count, "21 of the first three paths, 9 of the Vanguard's tiers 0-3; its tiers 4-6 are written, not built.");
             foreach (var id in PaladinKit.ImplementedIds) Assert.NotNull(t.Find(id), id);
-            CollectionAssert.AreEqual(new[] { "oathguard", "judicator", "sanctuary" }, t.Branches.Select(b => b.id).ToArray());
+            CollectionAssert.AreEqual(new[] { "oathguard", "judicator", "sanctuary", "vanguard" }, t.Branches.Select(b => b.id).ToArray());
+            Assert.AreEqual("support", t.Branches[3].role);
+        }
+        /// <summary>The Vanguard (TALENT_DEPTH.md, 2026-10-09): at the cap of 15 (16 points) a Paladin reaches its tier 3; Close Ranks is its talent action.</summary>
+        [Test] public void The_Vanguard_reaches_tier_three_at_the_cap()
+        {
+            var t = TalentTree.Parse("class.paladin", Json, 15, PaladinKit.ImplementedIds); var p = AtLevel(15);   // the tree at the cap of 15 (round 29), not the Phase 5.1 cap of 10 the other tests keep
+            Assert.AreEqual(16, t.Budget(p.Level));
+            Assert.IsFalse(t.Propose(p, "va-close-ranks", 1, out _, out _), "Tier 1 needs 5 points in the Vanguard.");
+            Buy(t, p, "va-colours-held", "va-colours-held", "va-colours-held", "va-colours-held", "va-colours-held");   // 5: tier 1 opens
+            Buy(t, p, "va-close-ranks", "va-press-longer", "va-press-longer", "va-press-longer");                          // 9
+            Assert.IsFalse(t.Propose(p, "va-comrades", 1, out _, out _), "Tier 2 needs 10 points.");
+            Buy(t, p, "va-rampart");                                                                                     // 10: tier 2 opens
+            Buy(t, p, "va-steady-ranks", "va-steady-ranks", "va-steady-ranks", "va-comrades");                           // 14
+            Assert.IsFalse(t.Propose(p, "va-under-the-colours", 1, out _, out _), "Tier 3 needs 15 points.");
+            Buy(t, p, "va-rampart");                                                                                     // 15: tier 3 opens
+            Buy(t, p, "va-under-the-colours");                                                                            // 16
+            Assert.AreEqual(0, t.Available(p), "Sixteen points: the Vanguard to its third tier, as far as the cap of 15 reaches.");
+            Assert.IsNull(t.Find("va-oriflamme"), "Tier 4 is written, not built: not in the loaded tree.");
         }
         [Test] public void Implemented_flag_without_code_is_rejected()
         {

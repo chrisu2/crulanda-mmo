@@ -9,27 +9,30 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-10-09, 21:05) — the Sealed Adit's engine work is COMPLETE (D1-D8) and PUBLISHED
-**Playable build = D1-D8 (commit 37eb32d), a release build published 21:00 to D:\crulanda-work\outputs; backed up to E:, pushed.** Full run on
-3c23b64: EditMode 440 and PlayMode 260 with one stale count (fixed, 10/10) and one load flake (SimParty follows; 10/10 alone), build and
-the Adit tour clean, 0 shader errors.
-**In the build since 18:45:** D5 (Nix and the Rock-Eater; mobs that bolt at low health; the pickets' and gunners' shots),
-D7 (a sim-led run waits at a shut gate and goes on when it opens; party sims guard Mother Quillet on her walk) and D8 (the rail ride out:
-E at the carriage's gangway once the lock is matched, five seconds on the bar, the party at the siding under the yard). CHANGELOG
-2026-10-09 has each. Focused runs green (RockEater 2/2; MobBehaviour, CrowdControl, SocialPull, AditGate, AditWeaver, SimParty, Adit).
-Docs/CLASS_STATUS.md (the seven classes' state) and Docs/TALENT_DEPTH.md (decided: one point a level; a fourth path for every class;
-the Adit first, then the Paladin) are new.
-**Next: the talents, the Paladin first**
-(TALENT_DEPTH.md: the Herald path, 3-4 new abilities, tiers 3-6 for all four paths; then Warrior and Druid, whose deep rows are designed;
-then Archivist, Ranger, Rogue, Mage). Left in the Adit for a later look: the carriage moving on the ride out, a goblin figure for Quillet
-and Nix, the carriage gunner on the roof (he fires from the platform), a mob that sings a sleep on you.
-**Mira's Hush is built** (HealerCompanion.Hush, with C5); only the "when you ask" half is missing and it is not needed.
+## RESUME HERE (updated 2026-10-09, 21:30) — the Paladin's Vanguard built and committed (NOT yet in a build); D1-D8 published
+**Playable build = D1-D8 (commit 37eb32d), a release build published 21:00 to D:\crulanda-work\outputs.** The Vanguard (below) came after
+it: it has had focused runs only. **First next session:** a full run (tools\validation\start_detached.ps1 -Arguments "-AllTests"), then
+tools\validation\release_build.ps1, back up, push.
+**The Paladin's fourth path, the Vanguard** (CHANGELOG 2026-10-09 The Paladin's fourth path; TALENT_DEPTH.md): Chris chose the name
+over Herald (no church in the books) and Marshal (a Warrior's word). Three actions on bar slots 11-13 (keys -, =, [): Plant the Colours,
+Close Ranks (a talent action; Conviction from allies rallied) and Press On (PartyDamageMultiplier, CompanionHaste). Branch vanguard in
+Talents/paladin.json: tiers 0-3 built (va-*, 9 talents, 23 ranks), tiers 4-6 written and unbuilt. Icons made. Sims' Paladins do not take
+it as a role yet. Tests: PaladinRulesTests (4 branches, 30 built, the cap-15 gates), PaladinLoopTests (the Vanguard in play), IconCoverage.
+Runs: EditMode all 441 green (one gate test fixed on the way), PlayMode Paladin/Druid/CrowdControl loops green. Also fixed: the hold
+labels on mob plates ceil'd a float (Held 11 s for 10): EncounterEnemy.Control.Left.
+**Next (TALENT_DEPTH.md, Chris's order: one class a round, published each time):** the other fourth paths: Warrior Jailer (control),
+Archivist Cantor (healer), Ranger Skirmisher (melee), Rogue Swashbuckler (support), Mage Cinderwright (pets); each is 3-4 actions, a
+branch to tier 3 with tiers 4-6 written, icons, tests. Rows 4-6 everywhere wait for Phase 9's levels (one point a level stays).
+Pattern to copy: this session's Vanguard commit (paladin.json branch, Encounter.asset abilities and unlocks, the kit's Use cases and
+overrides, EncounterInput keys if the bar grows, make_icons.py painters and a BRANCH palette, the two Paladin tests).
+**Left in the Adit for a later look:** the carriage moving on the ride out, a goblin figure for Quillet and Nix, the gunner on the roof.
 **Publishing:** full_run.ps1's lane B builds a DEVELOPMENT player (the tours need it). After a green run, run release_build.ps1.
-Focused test runs: focus_detached.ps1 -Runs "EditMode|<filter>|<tag>#PlayMode|<filter>|<tag>" -Log <file> ("DONE" ends the log).
+Focused test runs: focus_detached.ps1 -Runs EditMode|<filter>|<tag>#PlayMode|<filter>|<tag> -Log <file> (DONE ends the log).
 **Why the Claude app froze (2026-10-09; NOT Unity):** Windows toasts with Windows notifications off hung the app's main process at
 turn ends (event log Microsoft-Windows-PushNotification-Platform/Operational, 2416 with no 2418/3150 after it). Fixed: notifications on,
 question notifications set to badge, the sideloaded second Claude app removed (its settings in D:\crulanda-work\claude-app-old-backup).
 
+## Earlier resume note (2026-10-09, 21:05) — the Sealed Adit's engine work is COMPLETE (D1-D8) and PUBLISHED
 ## Earlier resume note (2026-10-09, 20:00) — D4 published; D5 part 1 (Nix and the Rock-Eater) committed; the rest of D5 next
 ## Earlier resume note (2026-10-09, 18:50) — D4 (the Weaver's escort) done, full run green, release build PUBLISHED
 **Playable build = D4 (commit 5f90443 + the docs commit after it), a release build published 18:45 to D:\crulanda-work\outputs; backed

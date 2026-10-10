@@ -31,14 +31,16 @@ namespace Crulanda.Encounter
         {
             get
             {
-                if (Incapacitated) return "Held " + Mathf.CeilToInt(incapUntil - Time.time) + " s";
-                if (Stunned) return "Stunned " + Mathf.CeilToInt(stunUntil - Time.time) + " s";
-                if (Feared) return "Fleeing " + Mathf.CeilToInt(fearUntil - Time.time) + " s";
-                if (Silenced) return "Silenced " + Mathf.CeilToInt(silenceUntil - Time.time) + " s";
-                if (Bolting) return "Fleeing " + Mathf.CeilToInt(boltUntil - Time.time) + " s";   // bolting at low health (EncounterEnemy.Flee): not a hold
+                if (Incapacitated) return "Held " + Left(incapUntil) + " s";
+                if (Stunned) return "Stunned " + Left(stunUntil) + " s";
+                if (Feared) return "Fleeing " + Left(fearUntil) + " s";
+                if (Silenced) return "Silenced " + Left(silenceUntil) + " s";
+                if (Bolting) return "Fleeing " + Left(boltUntil) + " s";   // bolting at low health (EncounterEnemy.Flee): not a hold
                 return null;
             }
         }
+        /// <summary>Whole seconds left until <paramref name="until"/>, rounded up, with a hair of slack: now + 10 read back in float can be 10.000008, and that must say 10, not 11.</summary>
+        static int Left(float until) { return Mathf.CeilToInt(until - Time.time - .005f); }
         bool IsBoss { get { return Elite && Move != null && Move.boss; } }
         /// <summary>Seconds left on whatever control shows (0 when free).</summary>
         public float ControlSecondsLeft

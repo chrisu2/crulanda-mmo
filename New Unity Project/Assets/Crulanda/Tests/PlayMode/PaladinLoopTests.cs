@@ -44,18 +44,41 @@ namespace Crulanda.Tests
         EncounterEnemy Foe() { var e = session.Enemies.Find(x => x != null && x.actor.IsAlive); Assert.NotNull(e, "A living enemy."); return e; }
         void Near(EncounterEnemy e, float distance) { session.Player.GetComponent<AdventurerMotor>().Teleport(e.transform.position + Vector3.back * distance); session.Select(e); }
         static Combatant Combat(Crulanda.Gameplay.Actor a) { return a.GetComponent<Combatant>(); }
-        const int Smite = 0, Oath = 1, Mend = 2, Ward = 3, Judgement = 4, Consecrate = 5, LayOn = 6, Aegis = 7, Censure = 8;
+        const int Smite = 0, Oath = 1, Mend = 2, Ward = 3, Judgement = 4, Consecrate = 5, LayOn = 6, Aegis = 7, Censure = 8, Colours = 10, CloseRanks = 11, PressOn = 12;
+        void Learn(params string[] ids) { foreach (var id in ids) { Assert.IsTrue(session.Talents.Propose(session.Progress, id, 1, out var next, out var why), id + ": " + why); session.Progress.talents = next; } }
+
+        /// <summary>The Vanguard in play (TALENT_DEPTH.md, 2026-10-09): the Colours soften blows on the party under them, Close Ranks puts barriers up
+        /// (and gives Conviction only for allies), Press On hardens the party's blows and quickens Mira.</summary>
+        [UnityTest] public IEnumerator The_Vanguard_plants_the_Colours_closes_ranks_and_presses_on()
+        {
+            Level10(); var e = Foe(); Near(e, 6);
+            Learn("va-colours-held", "va-colours-held", "va-colours-held", "va-colours-held", "va-colours-held", "va-close-ranks");
+            Assert.IsNull(session.Kit.ActionLockLabel(CloseRanks), "Close Ranks learnt");
+            int plain = Combat(session.Player).Damage(40);
+            Assert.IsTrue(session.UseAbility(Colours), "the Colours planted"); yield return null;
+            Assert.IsTrue(Paladin.ColoursUp); StringAssert.Contains("Colours", session.Kit.StatusLine);
+            int under = Combat(session.Player).Damage(40);
+            Assert.Less(under, plain, "a blow under the Colours lands softer");
+            yield return new WaitForSeconds(1.6f);
+            Assert.IsTrue(session.UseAbility(CloseRanks), "Close Ranks"); yield return null;
+            Assert.Greater(Combat(session.Player).Barrier, 0, "a barrier on you"); Assert.AreEqual(0, Paladin.Conviction, "no ally at your side: no Conviction");
+            yield return new WaitForSeconds(1.6f);
+            Assert.AreEqual(1f, session.Kit.PartyDamageMultiplier(e), 1e-4f); Assert.AreEqual(0f, session.Kit.CompanionHaste, 1e-4f);
+            Assert.IsTrue(session.UseAbility(PressOn), "Press On"); yield return null;
+            Assert.IsTrue(Paladin.Pressing); Assert.AreEqual(1.08f, session.Kit.PartyDamageMultiplier(e), 1e-3f, "the party hits 8% harder"); Assert.AreEqual(PaladinKit.PressHaste, session.Kit.CompanionHaste, 1e-4f, "Mira casts faster");
+        }
 
         [UnityTest] public IEnumerator Paladin_is_a_separate_character_with_its_own_save()
         {
             Assert.AreEqual("class.paladin", session.ClassDef.id); Assert.AreEqual("class.paladin", session.Progress.classId);
             Assert.AreEqual(Crulanda.Core.ResourceKind.Mana, session.ClassDef.resource);
-            Assert.AreEqual(10, session.Kit.ActionCount);
+            Assert.AreEqual(13, session.Kit.ActionCount, "ten, and the Vanguard's three");
             Assert.AreEqual("paladin.smite", session.Kit.ActionAt(Smite).id); Assert.AreEqual("paladin.censure", session.Kit.ActionAt(Censure).id);
             Assert.AreEqual("Talent", session.Kit.ActionLockLabel(Censure), "Censure waits on its talent.");
             Assert.AreEqual("Level 5", session.Kit.ActionLockLabel(LayOn), "Lay On comes at level 5.");
             Assert.AreEqual(ActorLook.Paladin, EncounterSession.LookForClass("class.paladin"));
-            Assert.AreEqual(3, session.Talents.Branches.Count);
+            Assert.AreEqual(4, session.Talents.Branches.Count);
+            Assert.AreEqual("Talent", session.Kit.ActionLockLabel(CloseRanks), "Close Ranks waits on its talent."); Assert.AreEqual("Level 5", session.Kit.ActionLockLabel(Colours));
             yield return null;
         }
 

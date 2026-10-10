@@ -71,6 +71,8 @@ Each step is its own set of rounds; Chris picks the first zone, class and race w
 **The 16-30 road (Chris, side chat 2026-10-07; PROVISIONAL, mostly Book 1):** levels 16-30 use places already on the world map:
 the Lowtowns and the Rust Market (16-19), the Forge District (19-22), the Warrens with the Deep Veins dungeon (22-25), the Crown and
 the Transit Hub (25-28), the Spire (28-30). The Shore's breadcrumb at 15 leads back east to Argentis's gate.
+**The dungeon brief (Chris; DUNGEON_DESIGN.md section 0 governs):** four 5-player dungeons (1 tank, 1 healer, 3 damage/support), the
+first a mix of the Deadmines, Wailing Caverns and Scarlet Monastery; bands low 10-15, mid 15-25, high 25-35.
 **Three more dungeons on that road:** the Sludge-Tunnels (18-20, Forge District: the city's waste tunnels of Book 1, a sewer-and-foundry
 run under the smelters, a syndicate boss), the Deep Veins (23-25, the Warrens: the penal-legion mine of book1 ch.9, geode seams, the
 Blind Crow's goblins as allies, a Council overseer and his unmade labour as bosses), the Transit Hub (27-29, the Crown: the junction

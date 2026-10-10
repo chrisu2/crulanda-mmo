@@ -1,4 +1,57 @@
-# The Sealed Adit: dungeon design (draft 1, 2026-10-07; levels 10-12 since the cap-15 rescale, see ROADMAP)
+# Dungeons: the brief and the plan (read this first)
+
+## 0. Chris's brief (restated 2026-10-10; it holds over everything below)
+- **The first dungeon is a good mix of three classic dungeons: the Deadmines, Wailing Caverns and Scarlet Monastery.**
+  Draft 1 (below, 2026-10-07) took its third model from Ragefire Chasm instead of Scarlet Monastery, and the cave builder made every
+  space of the Sealed Adit a rock tunnel, so the dungeon reads as one long cave. Both were wrong; this section corrects them.
+- **Four dungeons in all, up to level 30 eventually:** the Sealed Adit (10-12) and three on the 16-30 road (ROADMAP Phase 9: the
+  Sludge-Tunnels 18-20, the Deep Veins 23-25, the Transit Hub 27-29). Each is held to the same bar as the first.
+- **Dungeons are 5-player group instances: 1 tank, 1 healer, 3 damage dealers or support** (Chris, 2026-10-10). In this game the five
+  are you, Mira (the healer) and three sims (MaxPartySims is 3); when you play a healer, a sim takes the tank's place and Mira supports.
+- **Three bands** (Chris, 2026-10-10): **low** dungeons from about level 10 to 15, **mid** 15 to 25, **high** 25 to 35. The Sealed Adit
+  (10-12) is the low one; the Sludge-Tunnels (18-20) and the Deep Veins (23-25) are mid; the Transit Hub (27-29) is high. The high band
+  reaches 35, past ROADMAP's cap of 30: to settle when Phase 9's levels are set.
+- **"A mix" means the places as well as the mechanics:** mine tunnels AND built halls AND a stronghold of stone, each wing looking
+  unlike the last, as well as the bosses, gates, escorts and patrols. Lessons only: no names, layouts or assets from those games.
+
+## 0.1 What Scarlet Monastery brings (lessons only)
+- **A fortified house of zealots, built in stone:** halls, stairs and doors, not caves. The order feels like an army in its own house.
+- **Wings, each a short run to its own end boss and each with its own look:** a graveyard of the order's dead, a library, an armoury
+  with a training yard, and a cathedral. A group picks a wing to suit its time.
+- **Packs of fanatics** that heal each other, call out for help and fight to the end; a hall full of them is the challenge.
+- **A finale pair:** the commander, and the priestess who raises him once when he falls: kill her first or fight him twice.
+- **Rooms you know from one look:** rows of pews, shelves of books, racks of weapons and dummies, banners, a great window.
+- **A secret:** a hidden door to a side chamber.
+
+## 0.2 How the Sealed Adit takes all three (the rework)
+| Wing | Its model | Built as | Status |
+|---|---|---|---|
+| [1] The Old Workings, [2] the Singing Gallery | the Deadmines (the mine) | cave tunnels, timber sets, rails | built (D1-D8) |
+| [3a] The Geode Floor | the Deadmines (the goblins' foundry) | **a built foundry hall:** stone walls, catwalks on columns, the boring-engine bay | to rebuild (D9) |
+| [3b] The Ember Vent, becoming **the Cult of Ash's chapter-house** | **Scarlet Monastery** | **a built stronghold in the vent:** the ash-garden of urns (graveyard), the scriptorium (library), the drill yard (armoury), the chapel over the lava lake (cathedral), each with its boss; the finale pair is the Cinder-Warden and a priestess who raises him once | to build (D9-D10) |
+| [3c] The Grey Breach | Wailing Caverns (corrupted caves) | cave | built |
+| [4] The Rail Hall | the Deadmines (the reveal) | **a built station hall** | walls, columns, tiles 2026-10-10 |
+
+Wailing Caverns' lessons stay where they are: the three branches in any order, the escort with waves (the Weaver), mobs that flee
+for help, casters that put you to sleep, and the shortcut back (the rail ride).
+
+## 0.3 The room builder (engine step D9)
+- **Rooms from a plan in data:** each room a rectangle or an L, with a floor height, a wall height, doors to its neighbours and a
+  style (temple, foundry, crypt, library, armoury, station).
+- **Built from the modular kit** (Resources/Props/Dungeon, Chris's 41 pieces): walls, floors, columns, stairs and arches. Colliders
+  and nav blockers follow the walls, and doors are openings.
+- **Dressed by style:** pews, bookshelves, weapon racks and dummies, urns, banners, candelabra, carpets.
+- **Caves and rooms join:** a tunnel ends at a room's door. The same builder makes the three later dungeons' halls.
+
+## 0.4 The three later dungeons (a sketch; each gets its own design section before it is built)
+- **The Sludge-Tunnels (18-20, the Forge District):** sewer tunnels (cave builder) into a built smelting works and a syndicate's
+  counting-house. A mix of the Stockade's short city run and Gnomeregan's machine halls.
+- **The Deep Veins (23-25, the Warrens):** the penal-legion mine (tunnels) with a built prison block and an overseer's keep: the mine
+  and the gaol.
+- **The Transit Hub (27-29, the Crown):** a built junction of lifts, platforms and cargo halls, with service tunnels between. The
+  last boss drops the letter that opens the Spire.
+
+# Draft 1: The Sealed Adit (2026-10-07; levels 10-12 since the cap-15 rescale, see ROADMAP)
 
 Chris: "7-9 dungeon creation that rivals wow dungeons like these. research these completely before dungeon design. leveling
 takes longer in land of crulanda", then "not 3..one big dungeon" and "we will design others later". So this is **one** big

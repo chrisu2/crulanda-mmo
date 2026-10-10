@@ -139,7 +139,7 @@ namespace Crulanda.Tests
         {
             var elites = Camps().Where(x => x.camp.elite).ToList();
             Assert.AreEqual(20, elites.Count, "Twelve camp elites in the five zones and eight in the Sealed Adit (the rare Quiet Miner among them).");
-            Assert.AreEqual(20, EliteMoves.All.Length);
+            Assert.AreEqual(21, EliteMoves.All.Length, "Twenty camp elites, and the Rock-Eater, which rides beside Nix in his camp (D5).");
             var plain = EliteMoves.For("nobody at all", false);
             foreach (var (zone, camp, _) in elites)
             {
@@ -154,10 +154,13 @@ namespace Crulanda.Tests
                 Assert.That(m.enrageAt, Is.InRange(.2f, .4f)); Assert.Less(m.enrageHaste, .8f, "Enraged, it swings faster.");
                 Assert.Greater(m.callAt, m.enrageAt, "It calls before it enrages.");
             }
-            Assert.AreEqual(20, EliteMoves.All.Select(m => m.name).Distinct().Count(), "Twenty different moves.");
+            Assert.AreEqual(21, EliteMoves.All.Select(m => m.name).Distinct().Count(), "Twenty-one different moves.");
             // Dungeon end bosses are a step harder than outdoor named elites: Caddock and the Hollow Root-Warden, and only they.
             CollectionAssert.AreEquivalent(new[] { "Caddock, the Bandit King", "The Hollow Root-Warden", "Rail-Captain Orsk Danner" }, EliteMoves.All.Where(m => m.boss).Select(m => m.mob).ToList());
-            foreach (var m in EliteMoves.All) { Assert.AreEqual(m.boss ? EliteMoves.BossHealth : 1, m.health, m.mob); Assert.AreEqual(m.boss ? EliteMoves.BossHit : 1, m.hit, m.mob); }
+            // Nix's two-part fight (D5): the engine and the goblin are each lighter than one elite and together a step above one.
+            var rock = EliteMoves.For(EncounterSession.RockEaterName, false); var nix = EliteMoves.For(EncounterSession.NixName, false);
+            Assert.That(rock.health, Is.InRange(.7f, 1f)); Assert.That(nix.health, Is.InRange(.7f, 1f)); Assert.That(rock.health + nix.health, Is.InRange(1.5f, 2f), "two parts, a step above one elite together");
+            foreach (var m in EliteMoves.All) { if (m == rock || m == nix) continue; Assert.AreEqual(m.boss ? EliteMoves.BossHealth : 1, m.health, m.mob); Assert.AreEqual(m.boss ? EliteMoves.BossHit : 1, m.hit, m.mob); }
             Assert.Greater(EliteMoves.BossHealth, 1.1f); Assert.Greater(EliteMoves.BossHit, 1.05f);
             // Solitary beasts call nobody; the rest have a call to make.
             foreach (var (_, camp, _) in elites)

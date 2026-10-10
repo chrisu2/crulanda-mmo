@@ -9,15 +9,17 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-10-09, 21:30) — the Sealed Adit's engine work is COMPLETE (D1-D8); full run, release build and publish next
-**Committed since the last publish (18:45):** D5 (Nix and the Rock-Eater; mobs that bolt at low health; the pickets' and gunners' shots),
+## RESUME HERE (updated 2026-10-09, 21:05) — the Sealed Adit's engine work is COMPLETE (D1-D8) and PUBLISHED
+**Playable build = D1-D8 (commit 37eb32d), a release build published 21:00 to D:\crulanda-work\outputs; backed up to E:, pushed.** Full run on
+3c23b64: EditMode 440 and PlayMode 260 with one stale count (fixed, 10/10) and one load flake (SimParty follows; 10/10 alone), build and
+the Adit tour clean, 0 shader errors.
+**In the build since 18:45:** D5 (Nix and the Rock-Eater; mobs that bolt at low health; the pickets' and gunners' shots),
 D7 (a sim-led run waits at a shut gate and goes on when it opens; party sims guard Mother Quillet on her walk) and D8 (the rail ride out:
 E at the carriage's gangway once the lock is matched, five seconds on the bar, the party at the siding under the yard). CHANGELOG
 2026-10-09 has each. Focused runs green (RockEater 2/2; MobBehaviour, CrowdControl, SocialPull, AditGate, AditWeaver, SimParty, Adit).
 Docs/CLASS_STATUS.md (the seven classes' state) and Docs/TALENT_DEPTH.md (decided: one point a level; a fourth path for every class;
 the Adit first, then the Paladin) are new.
-**Next, in order:** a full run (tools\validation\start_detached.ps1 -Arguments "-AllTests -Zones zone.adit"), fix anything red, then
-tools\validation\release_build.ps1 (the release player, published), back up, push, handoff. Then **the talents, the Paladin first**
+**Next: the talents, the Paladin first**
 (TALENT_DEPTH.md: the Herald path, 3-4 new abilities, tiers 3-6 for all four paths; then Warrior and Druid, whose deep rows are designed;
 then Archivist, Ranger, Rogue, Mage). Left in the Adit for a later look: the carriage moving on the ride out, a goblin figure for Quillet
 and Nix, the carriage gunner on the roof (he fires from the platform), a mob that sings a sleep on you.

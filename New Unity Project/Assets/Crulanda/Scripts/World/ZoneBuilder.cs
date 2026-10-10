@@ -1649,6 +1649,17 @@ namespace Crulanda.World
             BoxPart(t, new Vector3(face + .5f, .1f, z + .9f), new Vector3(.4f, .25f, .3f), stone, Quaternion.Euler(0, 30, 0));
             BoxPart(t, new Vector3(face + .35f, .08f, z - .7f), new Vector3(.3f, .2f, .35f), stone, Quaternion.Euler(0, -20, 0));
         }
+        /// <summary>A barn's double door on its front (local -Z), from <paramref name="sill"/> up to the lintel: the dark leaves, two braces
+        /// corner to corner, two posts and the lintel. The painted barn's own, and the kit barn's over the kit's doorless wall.</summary>
+        void BarnDoor(Transform t, float d, float sill)
+        {
+            float tall = 3.2f - sill, mid = (3.2f + sill) / 2;
+            float brace = Mathf.Atan2(tall, 3.2f) * Mathf.Rad2Deg, across = Mathf.Sqrt(3.2f * 3.2f + tall * tall) - .3f;
+            Part(PrimitiveType.Cube, t, new Vector3(0, mid, -d / 2 - .07f), new Vector3(3.2f, tall, .1f), Tint(art.timber, new Color(.18f, .12f, .09f)));
+            foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(0, mid, -d / 2 - .12f), new Vector3(across, .2f, .06f), art.timber, Quaternion.Euler(0, 0, s * brace));
+            foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(s * 1.72f, (sill + 3.4f) / 2, -d / 2 - .1f), new Vector3(.22f, 3.4f - sill, .2f), art.timber);
+            Part(PrimitiveType.Cube, t, new Vector3(0, 3.32f, -d / 2 - .1f), new Vector3(3.66f, .2f, .2f), art.timber);
+        }
         void Barn(Transform t, Vector2 size)
         {
             float w = size.x, d = size.y, h = 4.2f;
@@ -1663,10 +1674,13 @@ namespace Crulanda.World
                 string model = "Megapack/Models/Buildings/Building 3Base";
                 // Stretched to the footprint and the painted barn's height, on the same stone sill and threshold (BuildingGroundTests:
                 // every building stands on stone down to the ground, every barn's door on a step at the ground).
-                if (WallProp(t, model, 270, w, h + d * .5f, d) != null)   // 270: its door to the front, over the steps (playtest note 96, "barn still looks backwards, no entrance")
+                if (WallProp(t, model, 270, w, h + d * .5f, d) != null)   // its long side along the footprint
                 {
                     Footing(t, w + .3f, d + .3f, .45f, .4f, 1, 1.75f);
                     float kitSill = Mathf.Clamp(DoorGround(t, 0, -d / 2 - .3f, 3.2f) + .03f, -1, .6f);
+                    // The kit's "3Base" has no door on any face (Chris, 2026-10-09, twice: "barns still backwards, no entrance"): the painted
+                    // barn's double door, posts, lintel and braces stand proud of the kit's front wall, over the steps.
+                    BarnDoor(t, d, kitSill);
                     DoorSteps(t, 0, -d / 2 - .15f, kitSill, 3.44f);
                     Solid(t, new Vector3(0, (h + d * .5f) / 2, 0), new Vector3(w + .3f, h + d * .5f, d + .3f)); return;
                 }
@@ -1678,12 +1692,8 @@ namespace Crulanda.World
                 foreach (int sz in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(x, h / 2, sz * (d / 2 + .04f)), new Vector3(.12f, h, .08f), art.timber);
             // The doors in a frame of two posts and a lintel, braced corner to corner, down to the highest ground across the
             // doorway (the grass never cuts them), on a stone threshold down to the lowest, with steps if the ground falls away.
-            float sill = Mathf.Clamp(DoorGround(t, 0, -d / 2 - .3f, 3.2f) + .03f, -1, .6f), tall = 3.2f - sill, mid = (3.2f + sill) / 2;
-            float brace = Mathf.Atan2(tall, 3.2f) * Mathf.Rad2Deg, across = Mathf.Sqrt(3.2f * 3.2f + tall * tall) - .3f;
-            Part(PrimitiveType.Cube, t, new Vector3(0, mid, -d / 2 - .07f), new Vector3(3.2f, tall, .1f), Tint(art.timber, new Color(.18f, .12f, .09f)));
-            foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(0, mid, -d / 2 - .12f), new Vector3(across, .2f, .06f), art.timber, Quaternion.Euler(0, 0, s * brace));
-            foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(s * 1.72f, (sill + 3.4f) / 2, -d / 2 - .1f), new Vector3(.22f, 3.4f - sill, .2f), art.timber);
-            Part(PrimitiveType.Cube, t, new Vector3(0, 3.32f, -d / 2 - .1f), new Vector3(3.66f, .2f, .2f), art.timber);
+            float sill = Mathf.Clamp(DoorGround(t, 0, -d / 2 - .3f, 3.2f) + .03f, -1, .6f);
+            BarnDoor(t, d, sill);
             DoorSteps(t, 0, -d / 2 - .15f, sill, 3.44f);
             float roofH = d * .5f;
             MeshPart(ZoneMeshes.GableRoof(w + 1, d + 1.4f, roofH, .25f, .5f), t, new Vector3(0, h, 0), art.thatch);

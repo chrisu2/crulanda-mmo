@@ -74,7 +74,9 @@ namespace Crulanda.Encounter
             if (Hidden) Unhide();
             if (at != null && !Engaged) threat.Add(at.EntityId.Value, JoinThreat);
         }
-        void Shown(bool on) { var body = transform.Find("Body"); if (body != null) foreach (var r in body.GetComponentsInChildren<Renderer>(true)) r.enabled = on; }
+        /// <summary>The figure's parts shown or hidden: never the Body's own placeholder capsule, which ActorVisual.Build switched off for good
+        /// (the boars came back as grey capsules, 2026-10-09).</summary>
+        void Shown(bool on) { var body = transform.Find("Body"); if (body != null) foreach (var r in body.GetComponentsInChildren<Renderer>(true)) if (r.gameObject != body.gameObject) r.enabled = on; }
         /// <summary>Springs out at the player: a fast lunge, a snarl, and straight into the fight.</summary>
         void Pounce()
         {
@@ -277,7 +279,7 @@ namespace Crulanda.Encounter
             if (agent.isOnNavMesh) agent.isStopped = false;
             if (Game) GetComponent<GameAnimal>()?.Stand();
             if (Ambusher) Hide();
-            Inside = null; Shown(true);
+            if (Inside != null) { Inside = null; Shown(true); }   // it died riding its machine: back in sight
             session.EnemyRespawned(this);   // a rider and its machine pair up again (EncounterSession.RockEater)
         }
         public void RestoreDead()

@@ -52,6 +52,26 @@ namespace Crulanda.Tests
             Assert.AreEqual(.25f, camps.First(c => c.mob == "Greyed crawler").flee, 1e-5f, "the crawlers bolt at a quarter");
             Assert.IsTrue(camps.Where(c => c.elite).All(c => c.flee == 0), "no elite bolts");
         }
+        /// <summary>A respawned mob is its figure again, not the grey placeholder capsule the figure is built over (seen on the boars, 2026-10-09).</summary>
+        [UnityTest] public IEnumerator A_camp_mob_comes_back_as_its_figure_not_a_capsule()
+        {
+            var e = session.Enemies.Find(x => x != null && x.Camp && !x.Elite && x.actor.IsAlive && x.MobName == "Sandthrone digger"); Assert.NotNull(e, "a digger");
+            var body = e.transform.Find("Body"); var capsule = body.GetComponent<MeshRenderer>();
+            Assert.IsFalse(capsule.enabled, "the placeholder capsule is off while it lives");
+            int parts = body.GetComponentsInChildren<Renderer>(true).Count(r => r.gameObject != body.gameObject && r.enabled); Assert.Greater(parts, 0, "its figure shows");
+            e.RespawnSeconds = 1; e.actor.Health.ApplyDamage(e.actor.Health.Pool.Max * 3); yield return new WaitForSeconds(2.5f);
+            Assert.IsTrue(e.actor.IsAlive, "back");
+            Assert.IsFalse(capsule.enabled, "and still no capsule");
+            Assert.AreEqual(parts, body.GetComponentsInChildren<Renderer>(true).Count(r => r.gameObject != body.gameObject && r.enabled), "its figure, whole");
+        }
+        /// <summary>The who list opens in the Adit too (Chris, 2026-10-09: "O or /who opens nothing").</summary>
+        [UnityTest] public IEnumerator The_who_list_opens_in_the_Adit()
+        {
+            Assert.NotNull(SimPopulation.Active, "the sims' population is up in the Adit");
+            session.PlayerChat("/who"); yield return null;
+            Assert.IsTrue(session.WhoOpen, "/who opens the list");
+            session.PlayerChat("/who"); Assert.IsFalse(session.WhoOpen, "and closes it again");
+        }
         [UnityTest] public IEnumerator A_crawler_bolts_at_a_quarter_of_its_health_and_comes_back()
         {
             EncounterEnemy.BoltSeconds = 1.5f;

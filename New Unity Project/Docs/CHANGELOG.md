@@ -1881,3 +1881,27 @@ A read-only review by five reviewers, each finding checked by a second who tried
 - Sims do not take the Vanguard as a role yet (their Paladins stay tanks or healers).
 - Tests: PaladinRulesTests (four branches, 30 built talents, the Vanguard's tier gates at the cap); PaladinLoopTests (the Colours soften a
   blow, Close Ranks' barrier and its Conviction only for allies, Press On's multipliers); IconCoverageTests covers the new icons.
+
+## 2026-10-09 — Respawned mobs came back as grey capsules (fixed; Chris's screenshots of the boars)
+- The Rock-Eater change made a respawning mob switch every renderer under its body back on, which included the placeholder capsule
+  the figure is built over (ActorVisual.Build turns it off for good): every camp mob came back as a grey pill. Now only a mob that died
+  riding its machine is shown again, and never the capsule. In the 21:00 build; republished with the fix.
+- Tests: MobBehaviourTests (a digger comes back as its figure, no capsule); RockEaterTests checks the engine's and Nix's.
+
+## 2026-10-09 — Mira mends the sims in your party (Chris: "Mira not healing a sim in our party")
+- Her mend only ever weighed herself against you (and Mother Quillet since D4). Now she mends the most hurt of the party within her
+  reach: you, herself, the sims in your party and Quillet; you when it is even. The 78% threshold and her mana are as before.
+- Tests: SimPartyTests (she casts her mend when only a party sim is hurt).
+
+## 2026-10-09 — The kit barns get a door (playtest note 96 again: "barns still backwards, no entrance")
+- The Megapack's "Building 3Base" has no door on any of its faces, so turning it (round 30) could never show one. The painted barn's
+  double door, posts, lintel and braces now stand proud of the kit barn's front wall, over the stone steps (`ZoneBuilder.BarnDoor`,
+  shared with the painted barn). Verified in the Oakhaven tour's Carder's-barn shot.
+
+## 2026-10-09 — /adit brings the party up to 11 (Chris: "the /adit command did not level all the party members"; noted the day before)
+- /adit raised only you. Now every sim in your party below 11 is brought up with you (`SimCompanion.MatchLevel`: level, experience,
+  health and gear at once; never down), and the line says so.
+- The who list (O, /who): a test shows it opens in the Adit (`MobBehaviourTests`); Chris reports it opening nothing in play. Not found
+  yet: to look at next session with what he sees in the new build.
+- Tests: SimPartyTests (a party sim brought up to 11 at once), MobBehaviourTests (/who toggles in the Adit).
+- Published 21:40 (release, with the capsule, Mira, barn door and /adit fixes).

@@ -82,6 +82,8 @@ namespace Crulanda.Tests
             Assert.IsTrue(machine.actor.IsAlive, "the engine is back"); Assert.IsTrue(nix.actor.IsAlive, "and so is Nix");
             Assert.AreSame(machine, nix.Inside, "inside it again"); Assert.IsTrue(nix.Hidden); Assert.IsFalse(Visible(nix));
             Assert.IsTrue(Visible(machine));
+            Assert.IsFalse(machine.transform.Find("Body").GetComponent<MeshRenderer>().enabled, "the engine's placeholder capsule stays off");
+            Assert.IsFalse(nix.transform.Find("Body").GetComponent<MeshRenderer>().enabled, "and Nix's");
         }
     }
 }

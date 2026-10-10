@@ -96,6 +96,32 @@ namespace Crulanda.Tests
             Assert.AreEqual(EncounterSession.MaxPartySims, joined); Assert.AreEqual("Your party is full.", session.InviteRefusal(pop.World.sims[4]));
         }
 
+        /// <summary>Mira mends a hurt sim in your party, not only you and herself (Chris, 2026-10-09: "Mira not healing a sim in our party").</summary>
+        [UnityTest] public IEnumerator Mira_mends_a_hurt_sim_in_the_party()
+        {
+            session.Progress.recruited = true;
+            var s = Willing("class.warrior"); yield return null;
+            Assert.IsTrue(session.Invite(s.id)); var c = session.PartySim(s.id);
+            var p = session.Player.transform.position;
+            c.GetComponent<UnityEngine.AI.NavMeshAgent>().Warp(p + Vector3.left * 2); session.Companion.GetComponent<UnityEngine.AI.NavMeshAgent>().Warp(p + Vector3.right * 2);
+            Assert.Greater(session.Player.Health.Pool.Ratio, .9f); Assert.Greater(session.Companion.actor.Health.Pool.Ratio, .9f);
+            c.actor.Health.ApplyDamage(Mathf.RoundToInt(c.actor.Health.Pool.Max * .5f));   // only the sim is hurt: her next mend can be for nobody else
+            string casting = "Casting " + session.content.healingAbility.name.ToLowerInvariant(); bool cast = false;
+            float t = 0; while (t < 8 && !cast) { if (session.Companion.Activity == casting) cast = true; t += Time.deltaTime; yield return null; }
+            Assert.IsTrue(cast, "Mira casts her mend for " + s.name + " (she was: " + session.Companion.Activity + ")");
+        }
+        /// <summary>/adit brings the party up to 11 with you (Chris, 2026-10-09: "the /adit command did not level all the party members"): a sim's
+        /// MatchLevel sets its level, health and gear at once, and leaves one already there alone.</summary>
+        [UnityTest] public IEnumerator A_party_sim_is_brought_up_to_a_level_at_once()
+        {
+            var s = Willing("class.warrior"); yield return null;
+            Assert.IsTrue(session.Invite(s.id)); var c = session.PartySim(s.id);
+            int was = c.sim.level; Assert.Less(was, 11);
+            c.MatchLevel(11);
+            Assert.AreEqual(11, c.sim.level); Assert.AreEqual(EncounterProgress.XpForLevel(11), c.sim.experience);
+            Assert.AreEqual(c.actor.Health.Pool.Max, c.actor.Health.Pool.Current, "whole at the new level"); Assert.Greater(c.Hit, 6 + 2.4f * was, "hits like an eleven");
+            c.MatchLevel(5); Assert.AreEqual(11, c.sim.level, "never down");
+        }
         [UnityTest] public IEnumerator A_party_sim_fights_your_target()
         {
             var s = Willing("class.ranger"); yield return null;

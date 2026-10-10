@@ -9,7 +9,24 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-10-09, 21:30) — the Paladin's Vanguard built and committed (NOT yet in a build); D1-D8 published
+## RESUME HERE (updated 2026-10-09, 21:45) — playtest fixes published 21:40; the Vanguard in the build
+**Playable build = release, published 21:40 to D:\crulanda-work\outputs:** D1-D8, the Paladin's Vanguard, and Chris's evening reports:
+- respawned camp mobs came back as grey capsules (a D5 regression: Respawn re-lit the Body's placeholder capsule): FIXED (EncounterEnemy.Shown);
+- Mira mended only you and herself: FIXED, she mends the most hurt of the party incl. party sims (HealerCompanion);
+- the kit barns had no door (note 96 again; the kit's model has none on any face): FIXED, the painted barn's door on its front (ZoneBuilder.BarnDoor);
+- /adit did not level the party: FIXED (SimCompanion.MatchLevel).
+Tests for each, green; the full run has NOT been run since the Vanguard: run it first next session (start_detached.ps1 -Arguments -AllTests).
+**Open from Chris's reports (PLAYTEST_NOTES 101 and CHANGELOG):**
+- **The who list (O, /who) opens nothing for Chris.** A test shows WhoOpen toggling in the Adit; the draw is not checked. Ask him what he
+  sees in the 21:40 build; look at Player.log for an OnGUI exception from DrawWho (EncounterHud.Who.cs); note the O key is hard-coded
+  (EncounterSession: KeyCode.O), not read from KeyBindings' GameKey.Who.
+- **The wand on her back** (note 101): the Apprentice's Wand has no look family (Wand is no piece word in Resources/Gear/looks.json), so
+  it draws as a blade slung across the back. Add a wand family (a short rod, a gem at the tip), its word, its icon, and stow short
+  one-handers at the right hip (ActorVisual.Gear.Mount).
+- **A level-1 sim Warrior's armour looks like crap** (note 101): SimGear.Dress at level 1, the starter pieces' tints and the bleached shirt.
+**Then (TALENT_DEPTH.md, one class a round):** Warrior Jailer, Archivist Cantor, Ranger Skirmisher, Rogue Swashbuckler, Mage Cinderwright.
+
+## Earlier resume note (2026-10-09, 21:30) — the Paladin's Vanguard built and committed (NOT yet in a build); D1-D8 published
 **Playable build = D1-D8 (commit 37eb32d), a release build published 21:00 to D:\crulanda-work\outputs.** The Vanguard (below) came after
 it: it has had focused runs only. **First next session:** a full run (tools\validation\start_detached.ps1 -Arguments "-AllTests"), then
 tools\validation\release_build.ps1, back up, push.

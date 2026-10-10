@@ -60,6 +60,15 @@ namespace Crulanda.Encounter
                 SimGear.Dress(GetComponent<ActorVisual>(), sim, session.Items); SimChatter.Active?.Ding(sim, true);
             }
         }
+        /// <summary>A tester's shortcut (/adit; Chris, 2026-10-09: "the /adit command did not level all the party members"): brought up to
+        /// <paramref name="level"/> at once, whole, dressed for it. Nothing for a sim already there or above.</summary>
+        public void MatchLevel(int level)
+        {
+            level = Mathf.Min(level, EncounterProgress.LevelCap); if (sim.level >= level) return;
+            sim.level = level; sim.experience = EncounterProgress.XpForLevel(level);
+            actor.Stats.SetBase(Crulanda.Core.StatType.MaxHealth, MaxHealthFor(sim)); actor.Health.ApplyHealing(actor.Health.Pool.Max);
+            SimGear.Dress(GetComponent<ActorVisual>(), sim, session.Items);
+        }
         /// <summary>Its choice in a roll (Round 25, note 72): Need for gear of its weight and slot that beats what it wears, Greed for
         /// anything it could sell, Pass for what is no use to it (a potion it cannot use goes to Greed too: coin is coin).</summary>
         public RollChoice RollFor(ItemDef d)

@@ -166,8 +166,9 @@ namespace Crulanda.Encounter
                         {
                             var adit = Zone != null ? Zone.FindZone("zone.adit") : null; if (adit == null) { Message("The Sealed Adit is not in this build."); return; }
                             if (Progress.Level < 11) { Progress.experience = EncounterProgress.XpForLevel(11); ApplyLevel(); Player.Health.ApplyHealing(Player.Health.Pool.Max); }
+                            int brought = 0; foreach (var c in PartySims) if (c != null && c.sim.level < 11) { c.MatchLevel(11); brought++; }   // and the party with you (Chris, 2026-10-09)
                             PlayerPrefs.SetInt("test.adit", 1);   // and again on arrival (EncounterSession's load)
-                            Message("Into the Sealed Adit at level 11...");
+                            Message("Into the Sealed Adit at level 11" + (brought > 0 ? ", the party brought up to 11 with you" : "") + "...");
                             TravelTo(new Crulanda.World.ZoneExit { to = "zone.adit", name = "/adit", arrive = adit.spawns.player });
                             return;
                         }

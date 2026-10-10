@@ -86,9 +86,13 @@ namespace Crulanda.Encounter
                 // She keeps your pace: a walk while you walk (hurrying when she has fallen behind), a run while you run.
                 agent.speed = AdventurerMotor.Running ? 5.6f : distance > 9 ? 4.2f : 2.3f;
             }
-            var recipient = actor.Health.Pool.Ratio < session.Player.Health.Pool.Ratio ? actor : session.Player;
-            var weaver = session.Weaver != null ? session.Weaver.actor : null;   // Mother Quillet on her way to the lock (D4)
-            if (weaver != null && weaver.IsAlive && weaver.Health.Pool.Ratio < recipient.Health.Pool.Ratio && Vector3.Distance(weaver.transform.position, transform.position) <= heal.range) recipient = weaver;
+            // Whom to mend: the most hurt of the party within reach: you, herself, the sims in your party (Chris, 2026-10-09: "Mira not
+            // healing a sim in our party"), and Mother Quillet on her way to the lock (D4). You, when it is even.
+            var recipient = session.Player;
+            void Consider(Actor who) { if (who != null && who.IsAlive && who.Health.Pool.Ratio < recipient.Health.Pool.Ratio && Vector3.Distance(who.transform.position, transform.position) <= heal.range) recipient = who; }
+            Consider(actor);
+            foreach (var c in session.PartySims) if (c != null) Consider(c.actor);
+            if (session.Weaver != null) Consider(session.Weaver.actor);
             if (recipient.Health.Pool.Ratio < .78f && Vector3.Distance(recipient.transform.position, transform.position) <= heal.range)
             {
                 var result = abilities.TryStart(heal, Time.time, Spend, () => {

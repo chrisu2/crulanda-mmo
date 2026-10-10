@@ -95,6 +95,22 @@ namespace Crulanda.Tests
             Assert.IsTrue(v.HairShowing, "The hair shows.");
         }
 
+        /// <summary>Put away, a wand (or a dagger or knife) hangs at the right hip, not across the back like a sword (Chris, 2026-10-09, note 101:
+        /// "her wand should not be on her back, either in hand or on her belt").</summary>
+        [Test] public void A_wand_is_put_away_at_the_hip_and_a_blade_across_the_back()
+        {
+            var db = LootTestData.Items(); var looks = Looks(); var v = Figure(ActorLook.Mage);
+            var wand = looks.Resolve(db.Get("item.apprentice_wand"));
+            Assert.AreEqual("model.weapon", wand.family); StringAssert.Contains("Wand", wand.variant); Assert.IsTrue(ActorVisual.Short(wand), "a wand is a short one");
+            v.ApplyGearIds(new[] { "item.apprentice_wand" }, db, looks);
+            var hip = v.GearRoot(EquipSlot.MainHand, true); Assert.NotNull(hip, "the wand's put-away copy");
+            Assert.Greater(hip.localPosition.x, .2f, "at the right side"); Assert.Less(hip.localPosition.y, .3f, "at the hip, not the shoulder");
+            Assert.Less(Vector3.Dot(hip.localRotation * Vector3.up, Vector3.up), -.9f, "point down");
+            var bdb = new ItemDatabase(); var blade = GeneratedPiece(bdb, "mainhand", 5, 2, "Blade");
+            v.ApplyGearIds(new[] { blade }, bdb, looks);
+            Assert.IsFalse(ActorVisual.Short(looks.Resolve(bdb.Get(blade))), "a sword is not");
+            Assert.Greater(v.GearRoot(EquipSlot.MainHand, true).localPosition.y, .5f, "a blade goes across the back, hilt at the shoulder");
+        }
         [Test] public void Equipping_each_slot_adds_parts_under_its_gear_root()
         {
             var db = new ItemDatabase(); var looks = Looks(); var v = Figure();

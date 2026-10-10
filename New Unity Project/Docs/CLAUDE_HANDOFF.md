@@ -23,6 +23,9 @@ Tests for each, green; the full run has NOT been run since the Vanguard: run it 
 - **The wand on her back** (note 101): the Apprentice's Wand has no look family (Wand is no piece word in Resources/Gear/looks.json), so
   it draws as a blade slung across the back. Add a wand family (a short rod, a gem at the tip), its word, its icon, and stow short
   one-handers at the right hip (ActorVisual.Gear.Mount).
+- **Gear fit (helms, armour, weapons): Chris made it its own phase, 8.5, "down the line" (ROADMAP: the Modular Hero pack is a skinned
+  modular rig; only two of its FBX are imported). Leave the helms as they are until then.**
+- **The Medieval Village Kit's zip is back:** D:\crulanda-work\downloads\MedievalVillageKit_FBX.zip (it was lost with C:).
 - **A level-1 sim Warrior's armour looks like crap** (note 101): SimGear.Dress at level 1, the starter pieces' tints and the bleached shirt.
 **Then (TALENT_DEPTH.md, one class a round):** Warrior Jailer, Archivist Cantor, Ranger Skirmisher, Rogue Swashbuckler, Mage Cinderwright.
 

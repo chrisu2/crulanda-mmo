@@ -1440,7 +1440,7 @@ namespace Crulanda.Encounter
     /// </summary>
     public sealed class Critter : MonoBehaviour
     {
-        enum State { Idle, Walk, Flee, Fly, Feed, Return, Roost, Climb, Descend }
+        enum State { Idle, Walk, Flee, Fly, Feed, Return, Roost, Climb, Descend, ToBarn, Sleep, FromBarn }
         float rampT;
         public string Kind { get; private set; }
         /// <summary>A hen's coop: she roosts inside at night, rushes the feed, and heads in at dusk.</summary>
@@ -1473,6 +1473,14 @@ namespace Crulanda.Encounter
                     if (d < best) { best = d; c.Coop = coop; }
                 }
                 if (c.Coop != null) { c.fedSeen = c.Coop.FedAt; if (!c.Coop.Open || WorldClock.Between(c.RoostHour, 6)) c.Roost(); }
+            }
+            if (c.Bulk > 0)
+            {
+                // A farm beast (a cow, a horse, a donkey, a sheep) sleeps in the nearest walk-in barn to its pasture, within 45 m of its edge
+                // (2026-10-10, Chris: "barn door should be open enough to walk into, for farm animals to sleep"). Spawned at night: already in.
+                float best = (radius + 45) * (radius + 45);
+                foreach (var b in life.Zone.Barns) { float d = (new Vector2(b.door.x, b.door.z) - center).sqrMagnitude; if (d < best) { best = d; c.Barn = b; } }
+                if (c.Barn != null && c.Night) c.SleepIn(true);
             }
             return c;
         }
@@ -1575,8 +1583,9 @@ namespace Crulanda.Encounter
             if (life == null || life.Session.Player == null) return;
             var me = transform.position; var player = life.Session.Player.transform.position;
             float playerDist = Vector3.Distance(new Vector3(me.x, 0, me.z), new Vector3(player.x, 0, player.z));
-            if (playerDist > AwakeWithin && Coop == null && state != State.Fly) return;
+            if (playerDist > AwakeWithin && Coop == null && state != State.Fly) { if (Barn != null) BarnRoutine(false); return; }
             if (Coop != null && HenRoutine()) return;
+            if (Barn != null && BarnRoutine(true)) return;
             if (state != State.Flee && state != State.Fly && playerDist < body.FleeRadius)
             {
                 var away = me - player; away.y = 0; away = away.sqrMagnitude > .01f ? away.normalized : transform.forward;
@@ -1612,6 +1621,79 @@ namespace Crulanda.Encounter
             }
             if (state != State.Fly && body.WingsSpread) body.FoldWings();   // any way down that skips Fly's landing still folds them
         }
+        // ---------- the barn (2026-10-10) ----------
+        /// <summary>A farm beast's walk-in barn: in at dusk to its stall, out to its pasture at first light. Null with no barn near its pasture.</summary>
+        public ZoneBarn Barn { get; private set; }
+        /// <summary>In its stall for the night.</summary>
+        public bool Asleep { get { return state == State.Sleep; } }
+        public bool InBarnRoutine { get { return state == State.ToBarn || state == State.Sleep || state == State.FromBarn; } }
+        int stall = -1, routeAt; float nextRoute; readonly List<Vector3> route = new List<Vector3>(); static NavMeshPath routePath;
+        /// <summary>In after the hens (staggered over half an hour or so) and out a little after six.</summary>
+        float StableHour { get { return 19.4f + (seed % 10) * .08f; } }
+        float WakeHour { get { return 6.2f + (seed % 10) * .05f; } }
+        bool Night { get { return WorldClock.Between(StableHour, WakeHour); } }
+        /// <summary>A sheep: two share a stall.</summary>
+        bool Small { get { return Kind == "sheep"; } }
+        /// <summary>The barn's part of a frame; true when it has handled it. Out of sight a beast is simply where it should be: in its stall by
+        /// night, back on its pasture by day. In sight it walks: in through the doorway at dusk, out to the pasture at first light.</summary>
+        bool BarnRoutine(bool near)
+        {
+            if (!near)
+            {
+                if (Night && state != State.Sleep) SleepIn(true);
+                else if (!Night && InBarnRoutine) WakeOut(true);
+                return true;
+            }
+            switch (state)
+            {
+                case State.Sleep: body.Sleep(); if (!Night) WakeOut(false); return true;
+                case State.ToBarn: if (FollowRoute()) SleepIn(false); return true;
+                case State.FromBarn: if (FollowRoute()) { Barn.Free(this); stall = -1; state = State.Idle; until = Time.time + 2 + life.R01 * 4; } return true;
+            }
+            if (!Night || state == State.Fly || Time.time < nextRoute) return false;
+            stall = Barn.Take(this, Small);
+            if (stall < 0) { Barn = null; return false; }   // a full barn: this one stays out
+            if (!Route(transform.position, Barn.door, Barn.inside, Barn.SpotFor(stall, Small))) { Barn.Free(this); stall = -1; nextRoute = Time.time + 20; return false; }
+            state = State.ToBarn; return true;
+        }
+        /// <summary>The navmesh's way through each leg in turn (round the barn to its doorway, in, and on to the stall), as corners to walk.</summary>
+        bool Route(params Vector3[] points)
+        {
+            route.Clear(); routeAt = 0; if (routePath == null) routePath = new NavMeshPath();
+            for (int i = 0; i + 1 < points.Length; i++)
+            {
+                if (!NavMesh.SamplePosition(points[i], out var a, 2.5f, NavMesh.AllAreas) || !NavMesh.SamplePosition(points[i + 1], out var b, 2.5f, NavMesh.AllAreas)) return false;
+                if (!NavMesh.CalculatePath(a.position, b.position, NavMesh.AllAreas, routePath) || routePath.status != NavMeshPathStatus.PathComplete) return false;
+                route.AddRange(routePath.corners);
+            }
+            return route.Count > 0;
+        }
+        /// <summary>Walks the route corner by corner (squeezing past the herd); true at its end.</summary>
+        bool FollowRoute()
+        {
+            if (routeAt >= route.Count) return true;
+            target = route[routeAt]; var to = target - transform.position; to.y = 0;
+            if (to.magnitude < .45f) { routeAt++; return routeAt >= route.Count; }
+            Step(body.Speed, true); return false;
+        }
+        /// <summary>Down for the night in its stall (<paramref name="place"/>: put there, unseen), facing the back wall.</summary>
+        void SleepIn(bool place)
+        {
+            if (Barn == null) return;
+            if (stall < 0) { stall = Barn.Take(this, Small); if (stall < 0) { Barn = null; return; } }
+            var at = Barn.SpotFor(stall, Small);
+            if (place) { at.y = life.Zone.HeightAt(at.x, at.z); transform.position = at; groundAt = new Vector2(float.MaxValue, 0); }
+            var face = at - Barn.door; face.y = 0; if (face.sqrMagnitude > .01f) transform.rotation = Quaternion.LookRotation(face);
+            state = State.Sleep; body.Sleep();
+        }
+        /// <summary>Up at first light and out to its pasture (<paramref name="place"/>: put there, unseen).</summary>
+        void WakeOut(bool place)
+        {
+            var pasture = life.Zone.Ground(home + new Vector2(life.R01 - .5f, life.R01 - .5f) * radius);
+            if (!place && Barn != null && stall >= 0 && Route(transform.position, Barn.inside, Barn.door, pasture)) { state = State.FromBarn; body.Rest(); return; }
+            if (Barn != null) Barn.Free(this); stall = -1;
+            transform.position = pasture; groundAt = new Vector2(float.MaxValue, 0); state = State.Idle; until = Time.time + 1 + life.R01 * 4; body.Rest();
+        }
         /// <summary>Does the straight walk from a to b dip into water anywhere (checked every metre)?</summary>
         bool CrossesWater(Vector3 a, Vector3 b)
         {
@@ -1631,12 +1713,12 @@ namespace Crulanda.Encounter
             foreach (var o in Herd) { if (o == null || o == this) continue; float r = reach + o.Bulk; var d = o.transform.position - at; d.y = 0; if (d.sqrMagnitude < r * r) return true; }
             return false;
         }
-        bool Step(float v)
+        bool Step(float v, bool squeeze = false)
         {
             var me = transform.position; var to = target - me; to.y = 0;
             if (to.magnitude < .3f) return true;
             var dir = to.normalized; var next = me + dir * v * Time.deltaTime;
-            if (Bulk > 0 && Crowded(me + dir * Bulk * .9f, Bulk * .8f) && !Crowded(me, Bulk * .8f)) return true;   // another beast ahead: stop here (and choose again)
+            if (!squeeze && Bulk > 0 && Crowded(me + dir * Bulk * .9f, Bulk * .8f) && !Crowded(me, Bulk * .8f)) return true;   // another beast ahead: stop here (and choose again)
             // The ground (and the water's edge) is looked at again every 20 cm, not every frame (playtest note 23, fps).
             if ((new Vector2(next.x, next.z) - groundAt).sqrMagnitude > .04f)
             {

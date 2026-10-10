@@ -380,6 +380,17 @@ namespace Crulanda.Encounter
             foreach (int s in new[] { -1, 1 })
                 (s < 0 ? wingL : wingR).localRotation = Quaternion.AngleAxis(s * 80, Vector3.up) * Quaternion.AngleAxis(s * 8, Vector3.forward) * Quaternion.AngleAxis(-100, Vector3.right);
         }
+        /// <summary>Asleep in its barn stall (2026-10-10): a modelled beast stands with its head low; a body of primitives lies down, its legs
+        /// folded under it (the front ones back, the hind ones forward) and its head down.</summary>
+        public void Sleep()
+        {
+            if (model != null) { model.Drive(0, "headlow"); return; }
+            stride = tuck = 0; atRest = false;
+            foreach (var l in legs) l.hip.localEulerAngles = new Vector3(l.hip.localPosition.z > 0 ? 85 : -85, 0, 0);
+            Root.localRotation = Quaternion.identity; Root.localPosition = new Vector3(0, Lift - legLen * .8f, 0);
+            if (Kind == "sheep") Nod(1, 1.6f); else if (Head != null) Head.localEulerAngles = new Vector3(25, 0, 0);
+            if (tail != null) Tail(0, 0, 0);
+        }
         /// <summary>Dead: rolled onto its side where it fell, the torso resting on the ground and the legs out straight.</summary>
         public void LieDown()
         {

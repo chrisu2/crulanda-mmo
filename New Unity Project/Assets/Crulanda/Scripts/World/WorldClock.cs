@@ -236,4 +236,35 @@ namespace Crulanda.World
         }
         public void SetOpen(bool open) { Open = open; if (hinge != null) hinge.localRotation = Quaternion.Euler(open ? -100 : 0, 0, 0); }
     }
+    /// <summary>
+    /// A walk-in barn (2026-10-10, Chris: "barn door should be open enough to walk into, for farm animals to sleep"): the ground in front
+    /// of its doorway, a point just inside it, and the stalls its farm beasts sleep in at night (one beast a stall). World positions.
+    /// </summary>
+    public sealed class ZoneBarn
+    {
+        public string name;
+        /// <summary>The barn's right (along its front), for the two places in a stall that two sheep share.</summary>
+        public Vector3 door, inside, right = Vector3.right; public Vector3[] stalls = new Vector3[0];
+        readonly System.Collections.Generic.Dictionary<int, MonoBehaviour> taken = new System.Collections.Generic.Dictionary<int, MonoBehaviour>();
+        readonly System.Collections.Generic.HashSet<MonoBehaviour> small = new System.Collections.Generic.HashSet<MonoBehaviour>();
+        bool Free(int slot) { return !taken.TryGetValue(slot, out var o) || o == null; }
+        /// <summary>
+        /// The place <paramref name="who"/> has, or a new one; -1 when the barn is full. A place is a stall's half (slot = stall * 2 + 0 or 1):
+        /// a big beast takes a whole stall, a small one (a sheep) shares a stall with another small one (2026-10-10: a flock and the cows
+        /// would not fit one barn's stalls otherwise).
+        /// </summary>
+        public int Take(MonoBehaviour who, bool isSmall = false)
+        {
+            foreach (var kv in taken) if (kv.Value == who) return kv.Key;
+            if (isSmall) for (int i = 0; i < stalls.Length; i++) if (!Free(i * 2) && small.Contains(taken[i * 2]) && Free(i * 2 + 1)) { taken[i * 2 + 1] = who; small.Add(who); return i * 2 + 1; }
+            for (int i = 0; i < stalls.Length; i++) if (Free(i * 2) && Free(i * 2 + 1)) { taken[i * 2] = who; if (isSmall) small.Add(who); return i * 2; }
+            return -1;
+        }
+        /// <summary>Where the beast in <paramref name="slot"/> lies: the stall's middle, or a side of it for a small one.</summary>
+        public Vector3 SpotFor(int slot, bool isSmall) { var s = stalls[Mathf.Clamp(slot / 2, 0, stalls.Length - 1)]; return isSmall ? s + right * (slot % 2 == 0 ? -.55f : .55f) : s; }
+        public void Free(MonoBehaviour who) { foreach (var k in new System.Collections.Generic.List<int>(taken.Keys)) if (taken[k] == who) taken.Remove(k); small.Remove(who); }
+        public int Sleepers { get { int n = 0; foreach (var kv in taken) if (kv.Value != null) n++; return n; } }
+        /// <summary>Whether <paramref name="who"/> has a stall here now.</summary>
+        public bool Holds(MonoBehaviour who) { foreach (var kv in taken) if (kv.Value == who) return true; return false; }
+    }
 }

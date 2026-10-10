@@ -16,6 +16,7 @@ records where each of its phases stands and the order of the work. Update it eve
 | 6 | Group gameplay | Done with 5.6-5.7: parties, roles, need/greed, sim-led runs, guilds |
 | 7 | First dungeon | Done: Crowsfoot Hollow (Oakhaven) and the Root-Mother's Deep (Verdant Shore) |
 | 8 | Vertical slice | **Now**: the Sealed Adit (DUNGEON_DESIGN.md section 9: D1 the caves, D2 boss mechanics, D3 gates and keys, D4 the Weaver's escort and D6 quests and loot done by 2026-10-09; left: Nix's two-part fight, the rest of D5 mob behaviours, D7 sims in the dungeon, D8 the rail ride out), crowd control C1-C5 (CC_DESIGN.md); then **the talents: a fourth path for every class and tiers 4-6 (TALENT_DEPTH.md, decided 2026-10-09: one point a level, Paladin first)**, the Medieval Village Kit, world art, polish and the playtest-note rounds |
+| 8.5 | **Gear and figures overhaul** (Chris, 2026-10-10: "we really need a complete overhaul on armor/weapons/helms, all seem to not fit properly"; "its own phase down the line") | Queued (see below) |
 | 9 | **The wider world** (Chris, 2026-10-07: "more zones, more classes, more races based on the canon of the novels, after phase 8") | Planned (see below) |
 
 ## Phase 5 plan (Chris chose 2026-10-05: Phase 5 now; classes Paladin, Ranger, Mage; faster tests first)
@@ -33,6 +34,24 @@ records where each of its phases stands and the order of the work. Update it eve
 | 5.7 Sims complete (Chris, 2026-10-07: "I want the sims complete first", before the enclave and Khaven) | 1. the party travels with you and is kept (DONE round 27); 2. sims invite you (DONE round 27); 3. dungeon runs led by a sim (DONE round 27); 4. trading with sims (DONE round 27); 5. guilds (chat, tags, joining) (DONE round 27); 6. a bigger population (about 40, more at the high zones) (DONE round 27). | 4-6 rounds |
 
 About 15-17 rounds. No external language model: local state machines and utility AI only (brief section 13).
+
+## Phase 8.5 plan: gear and figures overhaul (queued 2026-10-10; after the talents' fourth paths)
+**Why:** armour, weapons and helms are drawn onto our own figures and fitted by measurement (ActorVisual.Gear, GearArmor, GearWeapons;
+SeatHead and HatFit for the head). It works for the drawn caps and hoods, not for the models: every Modular Hero helm sits on top of the
+skull and some are tilted (wardrobe captures 06-helms-f..j, 2026-10-10; Chris's screenshot of four crowned helms); a level-1 sim's
+armour reads as mismatched pieces (note 101); a stowed wand went across the back like a sword (note 101; fixed for wands, daggers and
+knives 2026-10-10, ActorVisual.Short).
+**What was found (2026-10-10):** CHOSAN's Modular Hero pack (bought; its README in Resources/Props/ModularHero/Documentation) is a
+modular character: one base character on one shared skeleton, with headgear, shoulder pads, chest plates, gauntlets, belts, leg guards,
+boots and outfits as skinned meshes made to fit it, and light/medium/heavy weapon sets. Only its Armor Parts.fbx and Face Parts.fbx were
+imported (as Generic rigs); the base character prefab, the weapons, the poses and the demo are not in the project. The helms are pulled
+out of that rig as loose nodes and pinned to our heads, which is why they cannot fit.
+**The choice to make when the phase starts:** (a) build the player, sims and villagers on that pack's rig so its pieces fit by
+construction (needs the full package re-downloaded from the Asset Store, our animations retargeted through a Humanoid avatar, and a
+mapping from our items' looks to its parts, keeping the drawn pieces for what it lacks: cloth, leather, the zones' palettes); or
+(b) keep our figures and rewrite the fitting rules piece by piece. (a) is the lasting fix; (b) is the one that keeps failing.
+**Done when:** the wardrobe line-up (EncounterCapture --crulanda-wardrobe-capture) shows every slot's every family fitting on every
+class's figure, and Chris has looked at it.
 
 ## Phase 9 plan: the wider world (after Phase 8; PROVISIONAL until each item is checked against the books)
 Everything here is drawn from the lore folder (D:\code\crulanda: world_bible.md, the three books) and labelled as the game labels lore:

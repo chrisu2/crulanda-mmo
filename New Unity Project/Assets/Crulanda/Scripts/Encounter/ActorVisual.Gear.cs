@@ -146,6 +146,14 @@ namespace Crulanda.Encounter
         public const float HeldScale = 1.05f, ShieldScale = 1.15f;   // 1.35 until Round 22 (playtest note 47: "sword too big")
         static bool Tall(string family) { return family == "polearm" || family == "staff" || family == "model.tall"; }
         static bool Hung(string family) { return family == "offhand.hung"; }
+        /// <summary>A short one-hander that hangs at the belt when put away, not across the back (Chris, 2026-10-09, note 101: "her wand should not be
+        /// on her back, either in hand or on her belt"): wands, daggers, knives.</summary>
+        public static bool Short(GearLook look)
+        {
+            if (look.family == "knife") return true;
+            if (look.family != "model.weapon" || string.IsNullOrEmpty(look.variant)) return false;
+            return look.variant.IndexOf("Wand", System.StringComparison.OrdinalIgnoreCase) >= 0 || look.variant.IndexOf("dagger", System.StringComparison.OrdinalIgnoreCase) >= 0;
+        }
         void BuildSlot(EquipSlot slot, GearLook look)
         {
             int s = (int)slot;
@@ -155,7 +163,7 @@ namespace Crulanda.Encounter
                 BuildArmor(slot, look); return;
             }
             gearRoots[s] = Mount(slot, look.family, false); BuildGear(look, gearRoots[s]);
-            if (slot == EquipSlot.MainHand || slot == EquipSlot.OffHand) { gearStows[s] = Mount(slot, look.family, true); BuildGear(look, gearStows[s]); }
+            if (slot == EquipSlot.MainHand || slot == EquipSlot.OffHand) { gearStows[s] = Mount(slot, look.family, true, Short(look)); BuildGear(look, gearStows[s]); }
             if (Hung(look.family)) gearRoots[s].gameObject.AddComponent<GearHang>().wearer = transform;
         }
         /// <summary>
@@ -163,9 +171,10 @@ namespace Crulanda.Encounter
         /// 20 degrees down (turned 20 degrees about its length so a flat shows to a camera behind and above); staves and polearms
         /// stand nearly upright just in front of the fist, clear of the sleeve. Off hand: on the left forearm, face outward; hung
         /// pieces from the left hand, the bail or chain inside the fist. Slung copies: the weapon across the back (hilt over the
-        /// right shoulder, flat to the back), the shield flat on the back point down, a lantern hanging beside the left hip.
+        /// right shoulder, flat to the back), a wand, dagger or knife at the right hip point down, the shield flat on the back point
+        /// down, a lantern hanging beside the left hip.
         /// </summary>
-        Transform Mount(EquipSlot slot, string family, bool stow)
+        Transform Mount(EquipSlot slot, string family, bool stow, bool shortOne = false)
         {
             bool main = slot == EquipSlot.MainHand, tall = Tall(family), hung = Hung(family);
             Transform parent; Vector3 pos; Quaternion rot;
@@ -179,6 +188,7 @@ namespace Crulanda.Encounter
             {
                 parent = model != null ? chestFrame : body;
                 if (main && tall) { pos = new Vector3(0, .25f, -.27f); rot = Quaternion.Euler(0, 0, -40) * Quaternion.Euler(0, 90, 0); }
+                else if (main && shortOne) { pos = new Vector3(.29f, .1f, .05f); rot = Quaternion.Euler(0, 0, 12) * Quaternion.Euler(180, 0, 0); }   // at the right hip, point down, a little out from the thigh
                 else if (main) { pos = new Vector3(.26f, .66f, -.2f); rot = Quaternion.Euler(0, 0, 145) * Quaternion.Euler(0, 90, 0); }
                 else if (hung) { pos = new Vector3(-.31f, .08f, -.12f); rot = Quaternion.Euler(0, 90, 0); }   // clear of the hip and thigh; a balance's beam runs fore and aft
                 else { pos = new Vector3(0, .3f, -.24f); rot = Quaternion.Euler(0, -90, 90); }

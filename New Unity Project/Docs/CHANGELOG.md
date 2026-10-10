@@ -1905,3 +1905,21 @@ A read-only review by five reviewers, each finding checked by a second who tried
   yet: to look at next session with what he sees in the new build.
 - Tests: SimPartyTests (a party sim brought up to 11 at once), MobBehaviourTests (/who toggles in the Adit).
 - Published 21:40 (release, with the capsule, Mira, barn door and /adit fixes).
+
+## 2026-10-10 — Walk-in barns, farm beasts that sleep in them, and wands at the hip
+- **Walk-in barns** (Chris: "barn door should be open enough to walk into, for farm animals to sleep"; "they can slide open", with a
+  picture of a sliding barn door). The Megapack's walled barn is one closed mesh with no door on any face, so every barn nobody lives in
+  is now built from parts in that kit's own materials (`ZoneBuilder.WalkInBarn`): boards below a rail, stone panels above, a timber frame,
+  thatch. A 3.4 m doorway with its two sliding doors slid aside on a black rail, each hung on two round wheels (framed planks, a mid rail,
+  two braces, a bar handle); straw on the floor, hay in the back corners, a manger, a lantern by the door. Each wall piece is its own
+  collider and nav blocker, so the inside is walkable. A lived-in barn (Moss's lodge) keeps the painted barn and its door.
+- **Farm beasts sleep in them** (`ZoneBarn`, `Critter`): a cow, horse, donkey or sheep whose pasture is within 45 m of a barn walks in
+  through the doorway at dusk (from about 19:24, staggered), lies down in a stall (legs folded; a modelled beast stands head low) and
+  walks out to its pasture a little after six. Out of sight it is simply in its stall by night and on its pasture by day. One big beast
+  a stall, two sheep to a stall; a full barn leaves the rest out.
+- **Stowed short weapons hang at the right hip** (note 101: "her wand should not be on her back"): wands, daggers and knives, point down,
+  instead of across the back like a sword (`ActorVisual.Short`, `Mount`).
+- **Gear fit becomes its own phase** (ROADMAP 8.5, Chris: "we really need a complete overhaul on armor/weapons/helms"; "its own phase down
+  the line"): what was found about the Modular Hero pack is written there.
+- Tests: BarnTests (new: the doorway open and every stall reachable; asleep at night, out by day; one walks in at dusk and out in the
+  morning); GearVisualTests (a wand at the hip, a blade across the back); BuildingGroundTests and VillageDayTests unchanged and green.

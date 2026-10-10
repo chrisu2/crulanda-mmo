@@ -99,6 +99,7 @@ namespace Crulanda.Tests
                         var f = pick(x); if (f.toe > stand.toe + .04f) continue;   // only a foot that is down
                         if (f.yaw > 30) { problems.Add(what + " " + name + " foot at " + F(x.t - t0) + "s: down but turned " + f.yaw.ToString("0") + " degrees from the way it goes"); break; }
                         if (name == "left" ? f.side > .02f : f.side < -.02f) { problems.Add(what + " " + name + " foot at " + F(x.t - t0) + "s: down on the wrong side of the body (crossed)"); break; }
+                        if (Mathf.Abs(f.side) < .06f) { problems.Add(what + " " + name + " foot at " + F(x.t - t0) + "s: down on the middle line (" + F(f.side) + " m out): the feet land one in front of the other"); break; }
                     }
                 }
             }

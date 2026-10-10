@@ -2027,3 +2027,14 @@ A read-only review by five reviewers, each finding checked by a second who tried
   Every modelled figure now learns its standing ankle height and, while it moves on the ground, sinks by how far its lowest ankle of
   the last half second rides above that (at most 14 cm), so the planted foot meets the ground (`ActorVisual.Plant`). A landing on the
   run plays no landing clip any more (blended under the run it turned the feet in); standing, its dip stays at half weight.
+- **The figure stood 8-9 cm off the ground** (FootTests, new). The player's CharacterController rests on its skin (skinWidth .08)
+  and the model hung from the capsule's bottom: the capsule bottom was .087 m above the ground and the toes .09-.12 m standing, which
+  is why the feet hung on their toes and landed wrong whatever the clips did. On the ground the model is lowered by the gap a ray
+  finds under the capsule (`ActorVisual.GroundGap`); in the air the last gap is kept. Standing ankles now .09 m (were .17).
+- **The feet landed one in front of the other** (the run from the front, MotionCapture): the body avatars' Feet Spacing was 0;
+  it is .2 on both (Superhero_Male_FullBody, Superhero_Female_FullBody), and the feet land on their own sides.
+- **FootTests** measures the feet standing, walking, running and after a running jump against the ground under each foot (by ray):
+  standing toes within 7 cm of it; each half second the toes and heel come down to where they stand, never 5 cm into it; a foot
+  that is down points within 30 degrees of the heading, is on its own side and at least 6 cm off the middle line. Green with the
+  two fixes above; Chris's foot reports (107, 111) stay open until he checks them in play.
+- The Adit's rubble is painted in the cave's own stone (the kit's pale grey read as crystal in the dark).

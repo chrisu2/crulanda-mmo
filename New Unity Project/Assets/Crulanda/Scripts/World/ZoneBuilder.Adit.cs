@@ -182,7 +182,8 @@ namespace Crulanda.World
                     if (h.Name == "The Grey Breach" && K() < .2f) what = "Column_Broken";
                     var at = On(s, side * h.Half[i] * (.74f + K() * .08f)); at.y = FloorY(at.x, at.z) - .04f; if (!Free(at)) continue;
                     bool bones = what.StartsWith("Bones"), column = what.StartsWith("Column");
-                    Piece(what, at, K() * 360, bones ? .32f + K() * .12f : column ? .9f : .22f + K() * .2f);
+                    var rubbleGo = Piece(what, at, K() * 360, bones ? .32f + K() * .12f : column ? .9f : .22f + K() * .2f);
+                    if (rubbleGo != null && !bones) foreach (var r in rubbleGo.GetComponentsInChildren<Renderer>()) r.sharedMaterial = stone;   // the cave's own rock, not the kit's pale grey (it read as crystal in the dark)
                 }
                 switch (h.Name)
                 {

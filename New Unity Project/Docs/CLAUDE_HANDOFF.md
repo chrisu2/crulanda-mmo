@@ -9,7 +9,45 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-10-10, 18:05) — barns, horizon, windmill, Mira's Invite, the jump, the bow, the Jailer and the Cantor
+## RESUME HERE (updated 2026-10-10, 20:20) — Chris stopped the session: "bow still not right. feet still not right"
+**Read first:** the open reports in PLAYTEST_NOTES.md (107, 108, 109, 111) and the memory notes in
+C:\Users\ChrisWin11\.claude\projects\D--code-mmo\memory (reports stay OPEN until Chris confirms them in his own build; record
+his briefs verbatim; the dungeon brief). Chris is frustrated that his feet reports were marked done and came back again and again.
+Do not call the feet or the bow fixed until he has played them and said so.
+
+**Playable build = release published 18:04** (main at e9e0292): the barns, horizon, windmill, Mira's Invite, the Jailer, the Cantor,
+the talent cap at 15, and the first jump and bow changes. Chris played it this evening and reports **the feet and the bow still wrong**.
+Nothing newer has been published: the 20:15 release build was stopped on Chris's word before its publish step.
+
+**Unpublished work, on branch `feet-bow-adit-kit` (PR #2, https://github.com/chrisu2/crulanda-mmo/pull/2, open; do NOT merge until
+Chris has checked a build of it):**
+- Feet: the figure stood 8-9 cm off the ground (the CharacterController's skin; the model hung from the capsule's bottom), now lowered
+  by the measured gap (ActorVisual.GroundGap); while moving, a sink by how high the lowest ankle rides over standing (ActorVisual.Plant);
+  the body avatars' Feet Spacing 0 -> .2 (feet landed one in front of the other); no landing clip on a running landing.
+  FootTests (new) is green on it (toes and heel against the ground under each foot, turn, side, middle line), and MotionCapture's
+  side, front and back frames look planted. BUT Chris has not seen this build, and his last word was "feet still not right": he may
+  be seeing things the test does not measure (the foot's pitch and roll, the knees, the walk, other figures: GroundGap is only the
+  player's; sims and villagers run on NavMeshAgents and were not checked). Ask him, with his screenshot, what exactly is wrong.
+- Bow: the bow strings are baked into the meshes; a held bow gets a copy with its string cut out, a live LineRenderer string that the
+  drawing hand pulls back and an arrow nocked while drawn (ActorVisual.BowString; Bow.fbx made readable). The pose is hand-made arm
+  angles (no archery clips exist): Chris says it is still not right. The real fix is an archery animation set (Kevin Iglesias, the
+  same maker as the locomotion) bought and imported; ask him before spending more rounds on posed arms.
+- Tools carried: a hoe or axe upright like a staff while walking, a hammer or sickle hanging from the hand (ActorVisual.CarryTool).
+- The Adit dressed from Chris's 41 dungeon pieces (Resources/Props/Dungeon): a stone arch at the mouth, stone arches on the gates,
+  the Rail Hall walled, columned, torch-lit and tiled, the Ember altar's carpet and candelabra, rubble and bones down the walls.
+  Tested (Adit, gates, Weaver, Rock-Eater, zone content, caves: 47/47) and toured by eye.
+- Tests on the branch: EditMode 444/444; PlayMode focused runs green (47/47, then FootTests, JumpTests, FigureAnimationTests 4/4).
+  The full run of all fixtures was not completed on the branch.
+
+**The dungeon brief (Chris; DUNGEON_DESIGN.md section 0 governs):** four 5-player dungeons (1 tank, 1 healer, 3 damage/support), the
+first a mix of the Deadmines, Wailing Caverns and Scarlet Monastery; bands low 10-15, mid 15-25, high 25-35. Draft 1 used Ragefire
+instead of Scarlet Monastery and built only caves; section 0.2 plans the rework (a built Cult of Ash chapter-house, a built foundry,
+a room builder, step D9). Not started.
+
+**Next, in Chris's order:** (1) ask Chris exactly what is wrong with the feet and the bow in the build he plays, fix only that, show him
+side, front and back frames before publishing; (2) only then the room builder and the Adit rework, and the Ranger's Skirmisher.
+
+## Earlier resume note (2026-10-10, 18:05) — barns, horizon, windmill, Mira's Invite, the jump, the bow, the Jailer and the Cantor
 **Playable build = release, published 18:04 to D:\crulanda-work\outputs (built 17:52; not yet committed when built, the commit follows).** Since 15:12, from Chris's playtest this afternoon:
 - barns with their doors in the gable end, an aisle between stalls, straw bedding, racks and bales (ZoneBuilder.WalkInBarn, swapped
   footprint); the Old Fold's hut is the walk-in Fold barn and its flock sleeps there; Mira's Invite (party row, her frame, /invite mira);

@@ -9,7 +9,21 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-10-09, 21:45) — playtest fixes published 21:40; the Vanguard in the build
+## RESUME HERE (updated 2026-10-10, 15:15) — walk-in barns and sleeping beasts PUBLISHED; full run green
+**Playable build = release, published 15:12 to D:\crulanda-work\outputs (commit 0a395a2):** everything below the 21:45 note, plus today:
+- walk-in barns (ZoneBuilder.WalkInBarn: the kit's materials, a 3.4 m doorway, two sliding doors slid aside on a rail as in Chris's picture,
+  straw, hay, a manger, a lantern), farm beasts that walk in at dusk, sleep in a stall (two sheep share one) and walk out after six
+  (Critter, ZoneBarn, CritterBody.Sleep); stowed wands, daggers and knives at the right hip (ActorVisual.Short).
+**Full run on f8e43bd (2026-10-10 13:50): EditMode 441/441, PlayMode 265/265, build and the Oakhaven and Adit tours clean, 0 shader errors.**
+The barn and wand commit came after it: BarnTests, BuildingGroundTests, VillageDayTests, GearVisualTests and MageLoopTests are green on it.
+**Gear fit (helms, armour, weapons) is Phase 8.5 (ROADMAP), Chris: "its own phase down the line".** Leave the helms as they are.
+**The who list (O, /who):** its window draws in the capture (ui-captures/mage-42-who.png) and /who toggles it in a test; Chris saw nothing.
+Ask him to try the 15:12 build and, if it still fails, send D:\..LocalLow\Crulanda\Crulanda - The Quiet Trail\Player.log.
+**Next (Chris's order):** the fourth talent paths, one class a round (TALENT_DEPTH.md): Warrior Jailer, Archivist Cantor, Ranger Skirmisher,
+Rogue Swashbuckler, Mage Cinderwright. Also open: the Medieval Village Kit (its zip is back in D:\crulanda-work\downloads), a level-1
+sim's armour (note 101, goes with Phase 8.5).
+
+## Earlier resume note (2026-10-09, 21:45) — playtest fixes published 21:40; the Vanguard in the build
 **Playable build = release, published 21:40 to D:\crulanda-work\outputs:** D1-D8, the Paladin's Vanguard, and Chris's evening reports:
 - respawned camp mobs came back as grey capsules (a D5 regression: Respawn re-lit the Body's placeholder capsule): FIXED (EncounterEnemy.Shown);
 - Mira mended only you and herself: FIXED, she mends the most hurt of the party incl. party sims (HealerCompanion);

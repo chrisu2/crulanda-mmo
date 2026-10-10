@@ -1923,3 +1923,6 @@ A read-only review by five reviewers, each finding checked by a second who tried
   the line"): what was found about the Modular Hero pack is written there.
 - Tests: BarnTests (new: the doorway open and every stall reachable; asleep at night, out by day; one walks in at dusk and out in the
   morning); GearVisualTests (a wand at the hip, a blade across the back); BuildingGroundTests and VillageDayTests unchanged and green.
+
+- Full run 2026-10-10 on f8e43bd: EditMode 441/441, PlayMode 265/265, build and the Oakhaven and Adit tours clean, 0 shader errors.
+  Published 15:12 (release, commit 0a395a2: the walk-in barns, the sleeping beasts, the wand at the hip).

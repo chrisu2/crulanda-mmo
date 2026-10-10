@@ -2011,3 +2011,19 @@ A read-only review by five reviewers, each finding checked by a second who tried
 - Icons for the three actions and fifteen talents (tools/art/make_icons.py).
 - Tests: ArchivistRulesTests (four paths; the Cantor to tier 3 at the cap of 15), ArchivistLoopTests (the phrase heals, the song mends
   each second and is one of the songs, the Chorus shields; ten actions).
+
+## 2026-10-10 (evening) — Tools carried as tools; the Adit's dungeon pieces imported
+- **Trade tools** (note 109, Chris: "npc still walking around with hoes/tools stuck to their arm. if a hoe it should be carried like a
+  staff"): a trade's tool was built onto the arm's frame, so a hoe swung with every stride and a hammer stuck straight out of the fist.
+  It hangs from a holder at the fist now (`ActorVisual.HandTool`, `CarryTool`): a long tool (the hoe, the axe) stands upright beside the
+  walker like a staff, a short one (the hammer, the sickle) hangs head-down from the hand, and at work both lie along the arm as before.
+- **The Adit's dungeon pieces** (note 110): Chris's 41 FBX models in Resources/Props/Dungeon (meta files from the kit's template, fresh
+  guids); `PropCapture.RenderDungeon` shows them at their own size with their bounds in the log.
+- Tests: VillageDayTests (a long tool stays within 20 degrees of upright while its villager walks or stands).
+- **Feet on the ground** (note 111, Chris: "during the jump the feet land awkwardly bending inward and then run on tip toes
+  afterwards"). The motion capture now logs each frame's clip mix and ankle heights: after a jump the run plays alone with the hips at
+  their usual height, so nothing of the jump lingered. The tiptoe was in the run itself: its clips keep their own body height, which rides
+  a few centimetres high on our figures, so the planted foot hung toes-down short of the ground (ankles .18-.25 m running, .17 standing).
+  Every modelled figure now learns its standing ankle height and, while it moves on the ground, sinks by how far its lowest ankle of
+  the last half second rides above that (at most 14 cm), so the planted foot meets the ground (`ActorVisual.Plant`). A landing on the
+  run plays no landing clip any more (blended under the run it turned the feet in); standing, its dip stays at half weight.

@@ -23,6 +23,8 @@ namespace Crulanda.Encounter
         /// <summary>People are built as models when the kit is in the build; off, the smooth figure (read when a figure is built).</summary>
         public static bool Models = true;
         ModelFigure model;
+        /// <summary>The modelled figure, for captures and tests (null on a primitive figure).</summary>
+        public ModelFigure Figure { get { return model; } }
         /// <summary>The figure's model (null on a smooth, block or beast figure).</summary>
         public ModelFigure Model { get { return model; } }
         Transform headFrame, faceFrame, chestFrame, hipsFrame, handleR;
@@ -507,9 +509,9 @@ namespace Crulanda.Encounter
         {
             float since = drawing ? BowDrawn : Time.time - shotAt;
             Quaternion q; float elbow;
-            if (since < BowRelease) { float u = since / BowRelease; q = Quaternion.Slerp(FullDraw, Loosed, u); elbow = Mathf.Lerp(-125, -70, u); }                      // loosed: the hand flies back past the ear
-            else if (since < BowRenock) { float u = Mathf.SmoothStep(0, 1, (since - BowRelease) / (BowRenock - BowRelease)); q = Quaternion.Slerp(Loosed, Nocked, u); elbow = Mathf.Lerp(-70, -25, u); }   // back to the string
-            else { float u = Mathf.SmoothStep(0, 1, (since - BowRenock) / (BowDrawn - BowRenock)); q = Quaternion.Slerp(Nocked, FullDraw, u); elbow = Mathf.Lerp(-25, -125, u); }   // drawn to the jaw, and held
+            if (since < BowRelease) { float u = since / BowRelease; q = Quaternion.Slerp(FullDraw, Loosed, u); elbow = Mathf.Lerp(-125, -70, u); bowDraw = 0; }                      // loosed: the hand flies back past the ear, the string snaps straight
+            else if (since < BowRenock) { float u = Mathf.SmoothStep(0, 1, (since - BowRelease) / (BowRenock - BowRelease)); q = Quaternion.Slerp(Loosed, Nocked, u); elbow = Mathf.Lerp(-70, -25, u); bowDraw = 0; }   // back to the string
+            else { float u = Mathf.SmoothStep(0, 1, (since - BowRenock) / (BowDrawn - BowRenock)); q = Quaternion.Slerp(Nocked, FullDraw, u); elbow = Mathf.Lerp(-25, -125, u); bowDraw = Mathf.Max(.15f, u); }   // nocked and drawn to the jaw, and held
             p.arms = true; p.armL = new Vector3(-86, 0, 6); p.elbowL = -6; p.armR = q.eulerAngles; p.elbowR = elbow; p.twist = 35;
         }
         void CarryArms(ref PoseState p)
@@ -584,9 +586,10 @@ namespace Crulanda.Encounter
                 // 2026-10-10), which read as the legs folding and the feet twisting together.
                 bool hop = motor.Jumped && motor.AirAge < .8f && model.Has("k.jumpstart");
                 if (motor.Airborne && model.Has("k.fall")) p = new PoseState { slot = hop ? "k.jumpstart" : "k.fall", weight = hop ? .8f : 1, arms = p.arms, armL = p.armL, armR = p.armR, elbowL = p.elbowL, elbowR = p.elbowR, twist = p.twist };
-                else if (!motor.Airborne && motor.LandedAge < (moving ? .16f : .4f) && model.Has("k.land")) p = new PoseState { slot = "k.land", weight = moving ? .3f : .5f, arms = p.arms, armL = p.armL, armR = p.armR, elbowL = p.elbowL, elbowR = p.elbowR, twist = p.twist };
+                else if (!motor.Airborne && !moving && motor.LandedAge < .4f && model.Has("k.land")) p = new PoseState { slot = "k.land", weight = .5f, arms = p.arms, armL = p.armL, armR = p.armR, elbowL = p.elbowL, elbowR = p.elbowR, twist = p.twist };   // running, none: the landing clip under the run turned the feet in (Chris, 2026-10-10)
             }
             if (dead) { p = new PoseState { slot = "death" }; body.localRotation = Quaternion.identity; body.localPosition = Vector3.zero; }
+            else if (p.slot == null || p.slot == "sneak") p.drop -= Plant(dt, moving && (motor == null || !motor.Airborne));
             model.Drive(speed, p.slot, dt, heading, p.weight > 0 ? p.weight : 1);
             if (p.arms) { poseArmL = p.armL; poseArmR = p.armR; poseElbowL = p.elbowL; poseElbowR = p.elbowR; }
             armWeight = Mathf.MoveTowards(armWeight, p.arms ? 1 : 0, dt * 4);
@@ -636,6 +639,102 @@ namespace Crulanda.Encounter
             }
             SyncFrames();
             BowUpright(fresh && (p.twist != 0 || bowHeld != null) ? arms : 0);   // and while the arms come down after
+            BowString(fresh && p.twist != 0 && arms > .6f);
+        }
+        // ---------- the feet on the ground (2026-10-10, Chris: "run on tip toes") ----------
+        // The run and walk clips keep their own body height (keepOriginalPositionY), which on our figures rides a few centimetres high:
+        // the planted foot hung toes-down short of the ground (the motion capture's ankle heights: .18-.25 m running, .17 standing).
+        // Each figure learns how low its ankles sit standing, follows how low they come in the last half second of moving, and while it
+        // moves on the ground sinks by the difference (at most 14 cm), so each stride's planted foot meets the ground as it does standing.
+        float standAnkle = float.NaN, lowAnkle = 9, plantSink;
+        float Plant(float dt, bool moving)
+        {
+            if (model.FootL == null || model.FootR == null) return 0;
+            float ankle = Mathf.Min(body.InverseTransformPoint(model.FootL.position).y, body.InverseTransformPoint(model.FootR.position).y);
+            if (!moving && speed < .3f) { standAnkle = float.IsNaN(standAnkle) ? ankle : Mathf.Lerp(standAnkle, ankle, Mathf.Min(1, dt * 2)); lowAnkle = 9; }
+            lowAnkle = Mathf.Min(lowAnkle + dt * .25f, ankle);   // the lowest of the last half second or so
+            float want = moving && !float.IsNaN(standAnkle) ? Mathf.Clamp(lowAnkle - standAnkle, 0, .14f) : 0;
+            plantSink = Mathf.MoveTowards(plantSink, want, dt * .6f);
+            return plantSink;
+        }
+        // ---------- the bowstring (2026-10-10, Chris: "doesn't even pull the string on bow shots") ----------
+        // The bows' strings are part of their meshes (one mesh, one material). When a bow comes into a hand, a copy of its mesh without
+        // the string is put on it (the string is the thin geometry on the tips' side running the bow's length), and a string of our own
+        // runs from nock to nock: straight at rest, pulled back by the drawing hand, with an arrow on it while it is drawn.
+        static readonly Dictionary<Mesh, (Mesh bare, Vector3 top, Vector3 bottom)> stringless = new Dictionary<Mesh, (Mesh, Vector3, Vector3)>();
+        static Material stringMat, shaftMat, headMat, fletchMat;
+        MeshFilter bowMesh; LineRenderer bowString; Transform bowArrow; Vector3 stringTop, stringBottom; float bowDraw;
+        /// <summary>The string's two nocks on the bow (mesh space) and the mesh without it; null bare when it cannot be found (or the mesh
+        /// is not readable), and the bow keeps its own.</summary>
+        static (Mesh, Vector3, Vector3) CutString(Mesh m)
+        {
+            if (m == null || !m.isReadable) return (null, default, default);
+            var v = m.vertices; if (v.Length < 8) return (null, default, default);
+            var e = m.bounds.extents; int ax = e.y >= e.x && e.y >= e.z ? 1 : e.x >= e.z ? 0 : 2;   // the bow's length
+            int dp = ax == 1 ? (e.x >= e.z ? 0 : 2) : ax == 0 ? (e.y >= e.z ? 1 : 2) : (e.x >= e.y ? 0 : 1);   // its depth: grip to string
+            int hi = 0, lo = 0; for (int i = 1; i < v.Length; i++) { if (v[i][ax] > v[hi][ax]) hi = i; if (v[i][ax] < v[lo][ax]) lo = i; }
+            float side = (v[hi][dp] + v[lo][dp]) / 2, half = (v[hi][ax] - v[lo][ax]) / 2, mid = (v[hi][ax] + v[lo][ax]) / 2, band = half * .06f;
+            bool On(Vector3 q) { return Mathf.Abs(q[dp] - side) < band; }
+            var bare = Object.Instantiate(m); bare.name = m.name + " (stringless)";
+            float top = float.MinValue, bottom = float.MaxValue; int cut = 0;
+            for (int sub = 0; sub < m.subMeshCount; sub++)
+            {
+                var tri = m.GetTriangles(sub); var keep = new List<int>(tri.Length);
+                for (int k = 0; k + 2 < tri.Length; k += 3)
+                {
+                    Vector3 a = v[tri[k]], b = v[tri[k + 1]], c = v[tri[k + 2]];
+                    bool inner = Mathf.Abs(a[ax] - mid) < half * .85f || Mathf.Abs(b[ax] - mid) < half * .85f || Mathf.Abs(c[ax] - mid) < half * .85f;
+                    if (On(a) && On(b) && On(c) && inner)
+                    { cut++; foreach (var q in new[] { a, b, c }) { top = Mathf.Max(top, q[ax]); bottom = Mathf.Min(bottom, q[ax]); } continue; }
+                    keep.Add(tri[k]); keep.Add(tri[k + 1]); keep.Add(tri[k + 2]);
+                }
+                bare.SetTriangles(keep, sub);
+            }
+            if (cut == 0) { Object.Destroy(bare); return (null, default, default); }
+            var t = Vector3.zero; t[dp] = side; t[ax] = top; var u = Vector3.zero; u[dp] = side; u[ax] = bottom;
+            return (bare, t, u);
+        }
+        void BowString(bool drawn)
+        {
+            var b = held != null && held.Length > 0 && HoldsBow ? held[0] : null;
+            var mf = b != null ? b.GetComponentInChildren<MeshFilter>() : null;
+            if (mf != bowMesh)
+            {
+                bowMesh = mf; if (bowString != null) { Destroy(bowString.gameObject); bowString = null; }
+                if (mf != null)
+                {
+                    var src = mf.sharedMesh;
+                    if (src != null && !stringless.TryGetValue(src, out var found)) { found = CutString(src); stringless[src] = found; if (found.bare != null) stringless[found.bare] = found; }
+                    if (src != null && stringless.TryGetValue(src, out var cut) && cut.bare != null)
+                    {
+                        mf.sharedMesh = cut.bare; stringTop = cut.top; stringBottom = cut.bottom;
+                        if (stringMat == null) stringMat = Mat(new Color(.82f, .78f, .66f), .3f);
+                        var go = new GameObject("Bowstring"); go.transform.SetParent(transform, false);
+                        bowString = go.AddComponent<LineRenderer>(); bowString.positionCount = 3; bowString.useWorldSpace = true; bowString.widthMultiplier = .012f;
+                        bowString.sharedMaterial = stringMat; bowString.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off; bowString.numCapVertices = 2;
+                    }
+                }
+            }
+            if (bowString == null || bowMesh == null) { if (bowArrow != null) bowArrow.gameObject.SetActive(false); return; }
+            var top = bowMesh.transform.TransformPoint(stringTop); var bottom = bowMesh.transform.TransformPoint(stringBottom); var rest = (top + bottom) / 2;
+            float pull = drawn && model.HandR != null ? bowDraw : 0;
+            var nock = pull > 0 ? Vector3.Lerp(rest, model.HandR.position, pull) : rest;
+            bowString.SetPosition(0, top); bowString.SetPosition(1, nock); bowString.SetPosition(2, bottom);
+            // The arrow on the string while it is drawn: nocked at the hand, its head out past the bow.
+            bool arrow = pull > .1f;
+            if (arrow && bowArrow == null)
+            {
+                if (shaftMat == null) { shaftMat = Mat(new Color(.55f, .38f, .22f)); headMat = Mat(new Color(.3f, .3f, .32f), .5f, .6f); fletchMat = Mat(new Color(.7f, .16f, .12f)); }
+                bowArrow = new GameObject("Nocked arrow").transform; bowArrow.SetParent(transform, false);
+                Part(PrimitiveType.Cylinder, bowArrow, new Vector3(0, .36f, 0), new Vector3(.014f, .36f, .014f), shaftMat);
+                Part(PrimitiveType.Cube, bowArrow, new Vector3(0, .74f, 0), new Vector3(.03f, .07f, .012f), headMat, new Vector3(0, 0, 45));
+                foreach (float a in new[] { 0f, 120f, 240f }) Part(PrimitiveType.Cube, bowArrow, new Vector3(0, .07f, 0), new Vector3(.003f, .09f, .045f), fletchMat, new Vector3(0, a, 0));
+            }
+            if (bowArrow == null) return;
+            bowArrow.gameObject.SetActive(arrow);
+            if (!arrow) return;
+            var grip = bowMesh.transform.position; var dir = grip - nock; if (dir.sqrMagnitude < .0001f) dir = body.forward;
+            bowArrow.position = nock; bowArrow.rotation = Quaternion.FromToRotation(Vector3.up, dir.normalized);
         }
         Transform bowHeld; Quaternion bowRest;
         /// <summary>While a bow is drawn its limbs stand up and down, as they hang at rest: the fist carries the grip, but the arm raised to

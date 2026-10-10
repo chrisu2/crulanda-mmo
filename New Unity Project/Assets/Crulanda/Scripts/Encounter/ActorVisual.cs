@@ -740,20 +740,26 @@ namespace Crulanda.Encounter
             void Skirt(Material m) { if (!modelled) Part(PrimitiveType.Cylinder, body, new Vector3(0, -.45f, 0), new Vector3(.5f, .42f, .42f), m); }
             void Bare(Transform arm) { if (!modelled) Part(PrimitiveType.Capsule, arm, new Vector3(0, -.47f, 0), new Vector3(.15f, .15f, .15f), skin); }
             Transform Hood(Material m, Vector3 pos, Vector3 scale) { return modelled ? null : Part(PrimitiveType.Sphere, body, pos, scale, m); }
-            // A tool held in the right hand, pointing forward like a carried hammer or axe (it swings with the arm).
+            // A tool in the right hand, on a holder at the fist (CarryTool turns it). A long tool (the farmer's hoe, the woodcutter's axe)
+            // stands upright like a staff while walking, the hand a third of the way up the shaft, the head at the top (playtest note 95;
+            // 2026-10-10, Chris: "npc still walking around with hoes/tools stuck to their arm. if a hoe it should be carried like a
+            // staff"): it had been fixed to the arm, so it swung with every stride. A short one (a hammer, a sickle) hangs head-down
+            // from the hand. At work both go back to the arm's line.
             void HandTool(Material handle, float length, Material head, Vector3 headScale, float headAt = 1)
             {
-                // A long tool (the farmer's hoe) is carried upright like a staff, the hand a third of the way up the shaft, the head
-                // at the top (playtest note 95, 2026-10-08: "should not be walking like this with hoe in hand, should be like a staff").
-                if (length >= .7f)
+                tradeTool = new GameObject("Trade tool").transform; tradeTool.SetParent(armR, false);
+                tradeToolLong = length >= .7f;
+                if (tradeToolLong)
                 {
                     float shaft = length * 1.9f;
-                    Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.64f + shaft * .17f, .06f), new Vector3(.045f, shaft / 2, .045f), handle);
-                    if (head != null) Part(PrimitiveType.Cube, armR, new Vector3(0, -.64f + shaft * .67f, .06f + headScale.z * .4f), new Vector3(headScale.x, headScale.z, headScale.y), head);
+                    tradeTool.localPosition = new Vector3(0, -.64f, .06f);
+                    Part(PrimitiveType.Cylinder, tradeTool, new Vector3(0, shaft * .17f, 0), new Vector3(.045f, shaft / 2, .045f), handle);
+                    if (head != null) Part(PrimitiveType.Cube, tradeTool, new Vector3(0, shaft * .67f, headScale.z * .4f), new Vector3(headScale.x, headScale.z, headScale.y), head);
                     return;
                 }
-                Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.64f, length / 2 - .08f), new Vector3(.045f, length / 2, .045f), handle, new Vector3(90, 0, 0));
-                if (head != null) Part(PrimitiveType.Cube, armR, new Vector3(0, -.64f + headScale.y * .25f, (length - .08f) * headAt), headScale, head);
+                tradeTool.localPosition = new Vector3(0, -.64f, 0);
+                Part(PrimitiveType.Cylinder, tradeTool, new Vector3(0, 0, length / 2 - .08f), new Vector3(.045f, length / 2, .045f), handle, new Vector3(90, 0, 0));
+                if (head != null) Part(PrimitiveType.Cube, tradeTool, new Vector3(0, headScale.y * .25f, (length - .08f) * headAt), headScale, head);
             }
             switch (trade)
             {
@@ -936,7 +942,17 @@ namespace Crulanda.Encounter
 
         // Timed for the performance probe (playtest note 23).
         static readonly Unity.Profiling.ProfilerMarker perfMark = new Unity.Profiling.ProfilerMarker("PERF.ActorVisual");
-        void LateUpdate() { using (perfMark.Auto()) LateUpdateTimed(); }
+        void LateUpdate() { using (perfMark.Auto()) { try { LateUpdateTimed(); } finally { CarryTool(); } } }
+        Transform tradeTool; bool tradeToolLong;
+        /// <summary>After the arms have moved: a long trade tool stands upright beside the walker as a staff does (leaning a little
+        /// forward), a short one hangs from the fist head-down; at work (hoeing, hammering) each lies along the arm as it was built.</summary>
+        void CarryTool()
+        {
+            if (tradeTool == null || body == null) return;
+            bool working = Pose == ActorPose.Work || Pose == ActorPose.Hammer || Pose == ActorPose.Chop;
+            if (tradeToolLong) { if (working) tradeTool.localRotation = Quaternion.identity; else tradeTool.rotation = body.rotation * Quaternion.Euler(-8, 0, -5); }
+            else tradeTool.localRotation = working ? Quaternion.identity : Quaternion.Euler(80, 0, 0);
+        }
         void LateUpdateTimed()
         {
             if (core != null) { Drift(); return; }

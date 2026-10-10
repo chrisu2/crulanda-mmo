@@ -45,6 +45,7 @@ namespace Crulanda.World
             foreach (var c in go.GetComponentsInChildren<Component>(true))
                 if (!(c is Transform) && !(c is MeshFilter) && !(c is MeshRenderer) && !(c is SkinnedMeshRenderer)) { if (Application.isPlaying) Destroy(c); else DestroyImmediate(c); }
             if (PropTurns.TryGetValue(path, out var turn)) inst.transform.localRotation = Quaternion.Euler(turn);
+            else if (path.StartsWith("Dungeon/")) inst.transform.localRotation = Quaternion.Euler(-90, 0, 0);   // the Adit's pieces (Blender, Z up), all of them
             var b = PropBounds(t); if (b.size.y < .001f) return go;
             float s = height / b.size.y;
             if (width.HasValue) s = Mathf.Min(s, width.Value / Mathf.Max(.001f, Mathf.Max(b.size.x, b.size.z)));

@@ -44,6 +44,30 @@ namespace Crulanda.Tests
             while (!done() && Time.realtimeSinceStartup < end) yield return null;
         }
 
+        /// <summary>A trade's long tool (the farmer's hoe, the woodcutter's axe) stands upright like a staff while its villager walks or
+        /// stands, whatever the arm is doing (2026-10-10, Chris: "npc still walking around with hoes/tools stuck to their arm"); a short
+        /// one hangs from the fist. At work they follow the arm.</summary>
+        [UnityTest] public IEnumerator A_long_tool_is_carried_upright_like_a_staff()
+        {
+            yield return Load(10);
+            var tools = UnityEngine.Object.FindObjectsByType<Transform>(FindObjectsSortMode.None).Where(t => t.name == "Trade tool").ToList();
+            Assert.Greater(tools.Count, 0, "villagers carry their trades' tools");
+            int upright = 0; float worst = 0;
+            for (int f = 0; f < 60; f++)
+            {
+                yield return null;
+                foreach (var t in tools)
+                {
+                    var v = t.GetComponentInParent<ActorVisual>(); if (v == null || v.Pose != ActorPose.None) continue;
+                    var shaft = t.GetComponentsInChildren<Transform>().FirstOrDefault(x => x != t && x.name.Contains("Cylinder"));
+                    if (shaft == null) continue;
+                    float tilt = Vector3.Angle(shaft.up, Vector3.up);
+                    if (t.childCount > 0 && shaft.localScale.y > .5f) { worst = Mathf.Max(worst, tilt); upright++; }   // a long shaft: near upright
+                }
+            }
+            Assert.Greater(upright, 0, "a long tool seen while its villager walks or stands");
+            Assert.Less(worst, 20, "a long tool stays upright like a staff (worst lean " + worst.ToString("0") + " degrees)");
+        }
         [UnityTest] public IEnumerator At_night_hens_roost_behind_shut_doors_and_the_village_sleeps()
         {
             yield return Load(23.5f);

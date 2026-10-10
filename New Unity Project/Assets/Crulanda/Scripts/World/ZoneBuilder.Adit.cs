@@ -66,6 +66,38 @@ namespace Crulanda.World
             var iron = Tint(art.metal, new Color(.22f, .21f, .2f)); var rust = Tint(art.metal, new Color(.36f, .23f, .15f));
             var stone = Tint(art.stone, new Color(.4f, .38f, .35f)); var straw = Tint(art.hay, new Color(.62f, .54f, .37f));
             var geode = Glowing(GeodeViolet, 1.5f);
+            // ---------- the dungeon pieces (Chris's download of 2026-10-10, Resources/Props/Dungeon) ----------
+            // He chose to dress the whole Adit with them and to build its halls from them (the Adit had no masonry: every space is a
+            // lofted rock tube, so the halls are walled where a mine would have built: the Rail Hall, the gates, the mouth). All of it under
+            // one root, static-batched at the end; the pieces are for the eye, with a Block where one would be walked into. Its own stream
+            // (kr), so nothing placed before moves.
+            Transform kit = null; var kr = TreeRandom(t.position + new Vector3(7.1f, 0, 2.9f)); float K() { return (float)kr.NextDouble(); }
+            GameObject Piece(string name, Vector3 foot, float yaw, float height, float? width = null, Vector3? box = null)
+            {
+                if (kit == null) { kit = new GameObject("Adit kit").transform; kit.SetParent(t, false); }
+                return ModelProp(kit, "Dungeon/" + name, foot, yaw, height, false, width, box);
+            }
+            float YawAt(float s) { return Along(s).eulerAngles.y; }
+            var torchFire = new Color(1, .62f, .3f);
+            // A torch in its iron bracket on a wall face (foot: the wall's face at the floor; out: the way into the room), 1.5 m up, its
+            // fire lit (with a light when `lit`).
+            void Torch(Vector3 wall, Vector3 out_, bool lit)
+            {
+                out_.y = 0; if (out_.sqrMagnitude < .01f) return; out_.Normalize();
+                var foot = wall + out_ * .3f + Vector3.up * 1.5f; if (!Free(foot)) return;
+                float yaw = Quaternion.LookRotation(out_).eulerAngles.y - 90;   // the bracket's +X out from the wall
+                if (Piece("Torch_wall", foot, yaw, 1.0f) == null) return;
+                if (lit) Glow(t, foot + out_ * .25f + Vector3.up * 1.05f, 9, .95f, torchFire, .95f).gameObject.AddComponent<Flicker>();
+            }
+            // A torch on the cave's wall at s on one side (the rock at about 2 m up, as WallLamp finds it).
+            void WallTorch(float s, int side, bool lit)
+            {
+                int i = RingAt(s), best = side > 0 ? 1 : P - 2;
+                for (int k = 1; k < P - 1; k++)
+                    if ((side > 0 ? k <= P / 2 : k >= P / 2) && Mathf.Abs(ring[i, k].y - c[i].y - 2f) < Mathf.Abs(ring[i, best].y - c[i].y - 2f)) best = k;
+                var wall = ring[i, best]; var out_ = c[i] - wall; wall.y = c[i].y;
+                Torch(wall, out_, lit);
+            }
             // A lamp: a small glowing source and its light.
             void Lamp(Vector3 at, Color col, float range, float power, float size = .12f)
             {
@@ -135,6 +167,64 @@ namespace Crulanda.World
                 case "The Grey Breach": GreyBreach(); break;
                 default: MainAdit(); break;
             }
+            KitDressing();
+            if (kit != null && Application.isPlaying) StaticBatchingUtility.Combine(kit.gameObject);
+
+            // Bones and fallen rock at the walls' feet the length of the cave, a column fallen in the Breach and the Gallery, and the
+            // chests, barrels, candelabra, books and carpet of the rooms people kept.
+            void KitDressing()
+            {
+                string[] rubble = { "Rock1", "Rock2", "Rock3", "Rock4", "Rock5", "Rock1", "Rock3", "Bones", "Bones2" };
+                for (float s = 4; s < h.Length - 3; s += 3.5f)
+                {
+                    if (K() < .45f) { K(); K(); continue; }
+                    int i = RingAt(s); int side = K() < .5f ? 1 : -1; string what = rubble[(int)(K() * rubble.Length) % rubble.Length];
+                    if (h.Name == "The Grey Breach" && K() < .2f) what = "Column_Broken";
+                    var at = On(s, side * h.Half[i] * (.74f + K() * .08f)); at.y = FloorY(at.x, at.z) - .04f; if (!Free(at)) continue;
+                    bool bones = what.StartsWith("Bones"), column = what.StartsWith("Column");
+                    Piece(what, at, K() * 360, bones ? .32f + K() * .12f : column ? .9f : .22f + K() * .2f);
+                }
+                switch (h.Name)
+                {
+                    case "The Ember Vent":
+                    {
+                        // The Ash cell's altar: a red carpet up to it (short of the lake's rim), a tall candelabrum either side.
+                        float sa = h.Length - 8; var qa = Along(sa); var altar = On(sa, 0);
+                        if (!Free(altar)) break;
+                        Piece("Carpet", On(sa - 3f, 0) + Vector3.up * .01f, YawAt(sa), .06f, null, new Vector3(1.8f, .06f, 3.6f));
+                        foreach (int side in new[] { -1, 1 }) { var cd = On(sa, side * 2.1f); if (Free(cd)) { Piece("Candelabrum_tall", cd, YawAt(sa), 1.9f); Block(cd, new Vector3(.6f, 1.9f, .6f), qa); } }
+                        break;
+                    }
+                    case "The Grey Breach":
+                    {
+                        // The Foreman's room: his strongbox against the wall, gilt gone dull, and a barrel.
+                        int foreman = Widest(46, h.Length - 3); if (foreman < 0) break;
+                        float s0 = h.Along[foreman] + 3; var q = Along(s0); var box = On(s0, h.Half[foreman] * .62f); box.y = FloorY(box.x, box.z);
+                        if (Free(box)) { Piece("Chest_gold", box, YawAt(s0) - 90, .85f); Block(box, new Vector3(1, .9f, 1), q); }
+                        var barrel = On(s0 + 1.6f, h.Half[foreman] * .66f); barrel.y = FloorY(barrel.x, barrel.z);
+                        if (Free(barrel)) { Piece("Barrel", barrel, K() * 360, 1f); Block(barrel, new Vector3(.9f, 1, .9f), q); }
+                        break;
+                    }
+                    case "The Geode Floor": break;
+                    default:
+                    {
+                        // The gang-boss's hall: a candelabrum and his open book on the table (the lantern stays), a chest by the crates.
+                        int boss = Widest(44, 64); if (boss < 0) break;
+                        float s0 = h.Along[boss]; var q = Along(s0); var table = On(s0 + 1.5f, h.Half[boss] * .45f);
+                        if (Free(table))
+                        {
+                            Piece("Candelabrum", table + Vector3.up * .84f + q * new Vector3(.15f, 0, .9f), YawAt(s0), .5f);
+                            Piece("Book_Open", table + Vector3.up * .84f + q * new Vector3(-.1f, 0, -.1f), YawAt(s0) + 90, .06f);
+                        }
+                        var chest = On(s0 - 1.2f, -h.Half[boss] * .7f); chest.y = FloorY(chest.x, chest.z);
+                        if (Free(chest)) { Piece("Chest", chest, YawAt(s0) + 90, .8f); Block(chest, new Vector3(.9f, .8f, .9f), q); }
+                        // Torches in the hall and by the cages, warm against the lum-tubes' green.
+                        foreach (int side in new[] { -1, 1 }) WallTorch(s0 + side * 5, side, side > 0);
+                        int cages = Widest(18, 36); if (cages >= 0) WallTorch(h.Along[cages] + 6, 1, true);
+                        break;
+                    }
+                }
+            }
 
             void MainAdit()
             {
@@ -143,10 +233,15 @@ namespace Crulanda.World
                 // The mouth: a heavy timber portal, the old seal's boards broken and thrown down, a lantern either side.
                 {
                     var q = Along(1); float w = h.Half[RingAt(1)] * .9f;
-                    foreach (int side in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, On(1, side * w) + Vector3.up * 1.4f, new Vector3(.34f, 2.8f, .34f), dark, q);
-                    Part(PrimitiveType.Cube, t, On(1, 0) + Vector3.up * 2.85f, new Vector3(w * 2 + .7f, .38f, .4f), dark, q);
+                    // A cut-stone arch (the kit's Entrance, fitted to the drift), or the old timber portal without the kit.
+                    if (Piece("Entrance", On(1, 0), YawAt(1) + 90, 3.1f, null, new Vector3(.5f, 3.1f, w * 2 + .7f)) == null)
+                    {
+                        foreach (int side in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, On(1, side * w) + Vector3.up * 1.4f, new Vector3(.34f, 2.8f, .34f), dark, q);
+                        Part(PrimitiveType.Cube, t, On(1, 0) + Vector3.up * 2.85f, new Vector3(w * 2 + .7f, .38f, .4f), dark, q);
+                    }
                     for (int k = 0; k < 4; k++) Part(PrimitiveType.Cube, t, On(-1.5f - k * .4f, (k - 1.5f) * .7f) + Vector3.up * .06f, new Vector3(.32f, .06f, 2 + A()), timber, q * Quaternion.Euler(0, (A() - .5f) * 70, 0));
-                    foreach (int side in new[] { -1, 1 }) Lamp(On(1.2f, side * (w + .3f)) + Vector3.up * 2.2f, new Color(1, .7f, .4f), 7, .9f);
+                    // Torches on the arch's face either side, looking out to the yard (their light where the lanterns' was).
+                    foreach (int side in new[] { -1, 1 }) Torch(On(.7f, side * (w + .15f)), q * Vector3.back, true);
                 }
                 // Timber sets down the drifts and the stair (not in the chambers): two posts and a cap every 2.4 m.
                 for (float s = 3; s < h.Length - 2; s += 2.4f)
@@ -321,8 +416,12 @@ namespace Crulanda.World
             ZoneGate Gate(float s, string title, string kind, string prompt, string lord)
             {
                 var q = Along(s); int i = RingAt(s); float w = h.Half[i] * .9f, top = h.Height[i] * .82f, high = top - .25f;
-                foreach (int side in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, On(s, side * w) + Vector3.up * top / 2, new Vector3(.4f, top, .4f), dark, q);
-                Part(PrimitiveType.Cube, t, On(s, 0) + Vector3.up * top, new Vector3(w * 2 + .8f, .45f, .45f), dark, q);
+                // A cut-stone arch round the grille (the kit's Entrance2 fitted to the way), or the old timber frame without the kit.
+                if (Piece("Entrance2", On(s, 0), YawAt(s) + 90, top + .45f, null, new Vector3(.6f, top + .45f, w * 2 + .8f)) == null)
+                {
+                    foreach (int side in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, On(s, side * w) + Vector3.up * top / 2, new Vector3(.4f, top, .4f), dark, q);
+                    Part(PrimitiveType.Cube, t, On(s, 0) + Vector3.up * top, new Vector3(w * 2 + .8f, .45f, .45f), dark, q);
+                }
                 foreach (int side in new[] { -1, 1 }) Lamp(On(s - .6f, side * (w - .3f)) + Vector3.up * 2.1f, RailBlue, 8, .9f);
                 var root = new GameObject(title).transform; root.SetParent(t, false); root.localPosition = On(s, 0); root.localRotation = q;
                 var grille = new GameObject("Grille").transform; grille.SetParent(root, false);
@@ -344,23 +443,56 @@ namespace Crulanda.World
                 Part(PrimitiveType.Cube, t, buffer + Vector3.up * .5f, new Vector3(2.2f, 1, .5f), dark, qEnd); Block(buffer, new Vector3(2.2f, 1, .5f), qEnd);
                 foreach (int side in new[] { -1, 1 }) Part(PrimitiveType.Cylinder, t, buffer + qEnd * new Vector3(side * .7f, .6f, -.35f), new Vector3(.3f, .2f, .3f), iron, qEnd * Quaternion.Euler(90, 0, 0));
                 Part(PrimitiveType.Sphere, t, On(h.Length - .6f, line) + Vector3.up * 2.4f, new Vector3(5.5f, 5, .6f), Tint(art.stone, new Color(.02f, .02f, .025f)), qEnd);
-                // The platform: flags along the middle of the hall, a kerb on the line's side.
-                for (float s = from + 4; s < to - 4; s += 3)
+                // The platform: cut-stone tiles from the kerb to the right-hand wall (flags without the kit), the kerb on the line's side.
+                float wallAt = .82f;   // the hall's walls stand this far out of its half-width (clear of the rock's bulges)
+                bool tiled = false;
+                for (float s = from + 4; s < to - 4; s += 2)
                 {
-                    var q = Along(s); var mid = On(s, line * -.35f);
-                    Part(PrimitiveType.Cube, t, mid + Vector3.up * .025f, new Vector3(-line * 1.4f, .05f, 3), Tint(art.stone, new Color(.36f, .35f, .34f)), q);
-                    Part(PrimitiveType.Cube, t, On(s, line * .6f) + Vector3.up * .1f, new Vector3(.3f, .2f, 3), Tint(art.stone, new Color(.3f, .29f, .28f)), q);
+                    int i = RingAt(s); var q = Along(s);
+                    for (float a = line * .6f + 1.2f; a < h.Half[i] * wallAt - 1.2f; a += 2)
+                    {
+                        var at = On(s, a); if (!Free(at)) continue;
+                        if (Piece("ModularFloor", at + Vector3.down * .33f, YawAt(s), .36f) != null) tiled = true;
+                    }
+                    if (Mathf.Repeat(s - from - 4, 3) < 2) Part(PrimitiveType.Cube, t, On(s, line * .6f) + Vector3.up * .1f, new Vector3(.3f, .2f, 3), Tint(art.stone, new Color(.3f, .29f, .28f)), q);
                 }
-                // Lamps on iron posts down both sides, cold light, and high lights over the whole hall.
-                int k2 = 0;
-                for (float s = from + 4; s < to - 2; s += 10, k2++)
+                if (!tiled)
+                    for (float s = from + 4; s < to - 4; s += 3)
+                        Part(PrimitiveType.Cube, t, On(s, line * -.35f) + Vector3.up * .025f, new Vector3(-line * 1.4f, .05f, 3), Tint(art.stone, new Color(.36f, .35f, .34f)), Along(s));
+                // The hall's walls: two courses of cut stone down both sides (2 m modules, 4 m high), a column every 6 m before them, and
+                // a torch between each pair of columns, every other one lit; the rock above. Without the kit, the old lamps on iron posts.
+                bool walled = false;
+                for (float s = from + 3; s < to - 3; s += 2)
                     foreach (int side in new[] { -1, 1 })
                     {
-                        int i = RingAt(s); var foot = On(s, side * (h.Half[i] - 2)); if (!Free(foot)) continue;
-                        Part(PrimitiveType.Cylinder, t, foot + Vector3.up * 1.6f, new Vector3(.12f, 1.6f, .12f), iron);
-                        Lamp(foot + Vector3.up * 3.3f, RailBlue, 12, 1.1f, .2f);
-                        Block(foot, new Vector3(.35f, 3.2f, .35f), Quaternion.identity);
+                        int i = RingAt(s); var foot = On(s, side * h.Half[i] * wallAt); if (!Free(foot) || !Free(foot + Vector3.up * 3.5f)) continue;
+                        float yaw = YawAt(s) + (side > 0 ? 180 : 0);
+                        if (Piece("ModularStoneWall", foot, yaw, 2.02f) == null) continue;
+                        Piece("ModularStoneWall", foot + Vector3.up * 2, yaw, 2.02f); walled = true;
+                        Block(foot, new Vector3(.7f, 4, 2.05f), Along(s));
                     }
+                int k2 = 0;
+                if (walled)
+                    for (float s = from + 4; s < to - 3; s += 6, k2++)
+                        foreach (int side in new[] { -1, 1 })
+                        {
+                            int i = RingAt(s); var foot = On(s, side * (h.Half[i] * wallAt - 1.05f)); if (!Free(foot)) continue;
+                            Piece("Column", foot, YawAt(s), 4.3f); Block(foot, new Vector3(1.6f, 4.3f, 1.6f), Along(s));
+                            float st = s + 3; if (st > to - 3) continue; int it = RingAt(st);
+                            var face = On(st, side * (h.Half[it] * wallAt - .36f));
+                            Torch(face, On(st, 0) - face, (k2 + (side > 0 ? 1 : 0)) % 2 == 0);
+                        }
+                else
+                    for (float s = from + 4; s < to - 2; s += 10, k2++)
+                        foreach (int side in new[] { -1, 1 })
+                        {
+                            int i = RingAt(s); var foot = On(s, side * (h.Half[i] - 2)); if (!Free(foot)) continue;
+                            Part(PrimitiveType.Cylinder, t, foot + Vector3.up * 1.6f, new Vector3(.12f, 1.6f, .12f), iron);
+                            Lamp(foot + Vector3.up * 3.3f, RailBlue, 12, 1.1f, .2f);
+                            Block(foot, new Vector3(.35f, 3.2f, .35f), Quaternion.identity);
+                        }
+                // Barrels stood on the platform against the right-hand wall.
+                if (walled) for (int k = 0; k < 3; k++) { float s = from + 6 + k * 1.2f; var b = On(s, h.Half[RingAt(s)] * wallAt - 1.2f); if (Free(b)) { Piece("Barrel", b, K() * 360, .95f); Block(b, new Vector3(.9f, .95f, .9f), Along(s)); } }
                 for (float s = from + 8; s < to; s += 16) { int i = RingAt(s); Glow(t, c[i] + Vector3.up * h.Height[i] * .7f, 30, .55f, RailBlue, .55f); }
                 // The carriage: an armoured body on eight wheels, plates riveted down its side, the rear open on stacked crates of
                 // glowing geodes, a gangway up from the platform.

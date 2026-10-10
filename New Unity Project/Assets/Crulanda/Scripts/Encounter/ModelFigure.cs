@@ -301,6 +301,17 @@ namespace Crulanda.Encounter
         }
         readonly List<(AnimationClipPlayable p, AnimationClip c, bool loop)> slots = new List<(AnimationClipPlayable, AnimationClip, bool)>();
         readonly Dictionary<string, int> slotOf = new Dictionary<string, int>(); float[] weights; string current;
+        /// <summary>The clips in the blend now and their weights ("r.f .72 k.land .28"), for captures and tests.</summary>
+        public string Mix
+        {
+            get
+            {
+                if (weights == null) return "";
+                var sb = new System.Text.StringBuilder(); float sum = 0; foreach (var w in weights) sum += w;
+                foreach (var kv in slotOf) if (kv.Value < weights.Length && weights[kv.Value] > .01f) sb.Append(kv.Key).Append(' ').Append((weights[kv.Value] / Mathf.Max(.001f, sum)).ToString("0.00")).Append("  ");
+                return sb.ToString();
+            }
+        }
         static AnimationClip[] library;
         static AnimationClip[] Library { get { if (library == null) library = Resources.LoadAll<AnimationClip>("Characters/Animations/UAL1_Standard"); return library; } }
         /// <summary>The library's clip of this name (as in the file, after "Armature|"), or null.</summary>

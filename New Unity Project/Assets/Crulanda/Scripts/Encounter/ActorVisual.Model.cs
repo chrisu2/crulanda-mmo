@@ -590,6 +590,7 @@ namespace Crulanda.Encounter
             }
             if (dead) { p = new PoseState { slot = "death" }; body.localRotation = Quaternion.identity; body.localPosition = Vector3.zero; }
             else if (p.slot == null || p.slot == "sneak") p.drop -= Plant(dt, moving && (motor == null || !motor.Airborne));
+            if (!dead) p.drop -= GroundGap(dt);
             model.Drive(speed, p.slot, dt, heading, p.weight > 0 ? p.weight : 1);
             if (p.arms) { poseArmL = p.armL; poseArmR = p.armR; poseElbowL = p.elbowL; poseElbowR = p.elbowR; }
             armWeight = Mathf.MoveTowards(armWeight, p.arms ? 1 : 0, dt * 4);
@@ -647,6 +648,23 @@ namespace Crulanda.Encounter
         // Each figure learns how low its ankles sit standing, follows how low they come in the last half second of moving, and while it
         // moves on the ground sinks by the difference (at most 14 cm), so each stride's planted foot meets the ground as it does standing.
         float standAnkle = float.NaN, lowAnkle = 9, plantSink;
+        // The player's capsule rests on its skin (CharacterController.skinWidth, 8 cm), and the model hung from the capsule's bottom, so
+        // the whole figure stood 8-9 cm above the ground (FootTests, 2026-10-10: capsule bottom .087 above it, the toes .09-.12 standing).
+        // On the ground the model is lowered by the gap a ray finds between the capsule's bottom and the ground under it; in the air the
+        // last gap is kept, so it never pops.
+        CharacterController capsule; bool capsuleChecked; float groundGap;
+        float GroundGap(float dt)
+        {
+            if (!capsuleChecked) { capsule = GetComponent<CharacterController>(); capsuleChecked = true; }
+            if (capsule == null || motor == null || motor.Airborne || motor.Swimming) return groundGap;
+            var bottom = transform.position + Vector3.up * (capsule.center.y - capsule.height / 2);
+            float best = float.MinValue;
+            foreach (var h in Physics.RaycastAll(bottom + Vector3.up * .5f, Vector3.down, 1.1f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+                if (!h.collider.transform.IsChildOf(transform) && h.point.y > best) best = h.point.y;
+            float want = best > float.MinValue ? Mathf.Clamp(bottom.y - best, 0, .25f) : 0;
+            groundGap = Mathf.MoveTowards(groundGap, want, dt * .8f);
+            return groundGap;
+        }
         float Plant(float dt, bool moving)
         {
             if (model.FootL == null || model.FootR == null) return 0;

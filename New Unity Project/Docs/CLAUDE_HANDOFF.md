@@ -19,8 +19,8 @@ Assets third-person clips are in Resources/Characters/Animations/Unity (Chris do
 remove them or use their jumps later). Bow: the archer turns side-on, faces her target while fighting standing (AdventurerMotor),
 and the held bow is set by its mesh axes.
 
-**Published:** a playable build from branch feet-bow-adit-kit (commit 3416d47) at 20:45 if the game was closed (check
-D:\crulanda-work\release-publish-2045.log). PR #2 updated; do not merge until Chris has played it.
+**Published:** the playable build at 20:41 (D:\crulanda-work\outputs\Crulanda-Playable) from branch feet-bow-adit-kit, commit
+3416d47. PR #2 updated; do not merge until Chris has played it.
 
 **Open (PLAYTEST_NOTES 112):** the bowstring is not drawn back at full draw and no arrow shows; Morro's idles (a foot turned out)
 and the walk's toes dipping, flagged by FootTests (which now animate in batch runs: before, they measured a frozen pose and passed

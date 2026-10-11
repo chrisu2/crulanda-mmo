@@ -1,4 +1,14 @@
-# Crulanda Canon (STUB)
+# Crulanda Canon
+
+## Standing rules (Chris, 2026-10-10)
+- **When sources disagree, the novels' text wins, then the world bible, then the ledger** (`ledger_of_souls.md` and the series bible's
+  status tables). A label says which source it rests on. Open conflicts: `LORE_AUDIT.md`.
+- **The classes are GAME-ONLY archetypes** (Warrior, Druid, Paladin, Ranger, Rogue, Mage, Archivist), each noting a CANON root where one
+  exists: the Archivist's Silent Pilgrims, the Original Song and the echo-jars; the Cantor's Song of Mending.
+- **No machine words in player-facing text** (engine, machine, machinery, motor...).
+
+## The Phase 0 stub (below, unchanged; still to be filled from the books)
+
 
 Status of every entry must be one of: CANON, CANON-EXPANDED, GAME-ONLY, PROVISIONAL (brief s.64).
 

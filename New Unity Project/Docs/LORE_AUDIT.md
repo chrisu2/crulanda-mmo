@@ -8,6 +8,20 @@ machine words, which Chris approved: "engine oil" became "drill-grease".)
 - **No machine words in player-facing text** (engine, machine, machinery, motor...): use in-world words ("drill-grease", "the
   Rock-Eater's berth"). Code comments and design notes may still name things plainly.
 
+## Which source wins: DECIDED (Chris, 2026-10-10: "Novels, bible, ledger")
+The canon sources disagree with each other (see Klyther below), so every check needs an order. Proposed: **the novels' text first**
+(book chapters), **then the world bible** (`world_bible.md`, `book1/world_bible.md`), **then the ledger** (`ledger_of_souls.md`, and the
+series bible's status tables). A label says which source it rests on.
+
+## 0. The classes have no canon label
+- The class data carries no canonStatus; the only labels are code comments (the Archivist's "CANON roots", the Paladin's Vanguard
+  "CANON-EXPANDED").
+- Druid, Paladin and Ranger appear nowhere in the bibles; Rogue, Mage, Warrior and Archivist appear as words (not yet checked in
+  context).
+- **DECIDED (Chris, 2026-10-10: "Yes, GAME-ONLY"):** every class is GAME-ONLY as an archetype, noting a CANON root where one exists
+  (the Archivist's Silent Pilgrims and echo-jars; the Cantor's Song of Mending). Recorded in CRULANDA_CANON.md (the class data has no
+  label field).
+
 ## 1. The Salt-Menders: labelled CANON, but they are not what the books say
 - Game (`EncounterContent/Quests/factions.json`, faction `saltmenders`, CANON): "Rebels of the Alliance who meet in old tunnels and mean
   to 'break the machine'. They move people the Concord wants."

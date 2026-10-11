@@ -70,8 +70,10 @@ because they had grown to 146 KB of notes that contradicted each other). Replace
 - **Out of date, not yet refreshed:** `marketing/steam-blurb.md` (2026-09-30: four zones, levels 1-10, Warrior or Druid; it also
   names the Salt-Menders, see the lore audit). `CLAUDE.md` now names lane B.
 - **Lore audit, waiting for Chris: `LORE_AUDIT.md`** (nothing changed yet): the Salt-Menders and the Whispering Wood contradict book 3;
-  the Sandthrone toll is sourced (chapter 5); Klyther has four versions across the books' notes. CRULANDA_CANON.md is still a stub.
-  Rule from Chris: no machine words in player-facing text.
+  the Sandthrone toll is sourced (chapter 5); Klyther has four versions across the books' notes; the classes carry no canon label
+  (Chris decided: **GAME-ONLY archetypes**, canon roots noted). Chris decided the order when sources disagree: **novels, then the
+  world bible, then the ledger**. Both, and the no-machine-words rule, are now at the head of CRULANDA_CANON.md (the rest of it is still
+  the Phase 0 stub). The four conflicts still wait for his call.
 
 ## Next, in order
 1. Fix the escort test (see "Tests and builds"); run the Adit suites green; publish the drawn-out Adit for Chris to walk.

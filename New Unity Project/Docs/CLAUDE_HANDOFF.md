@@ -1,6 +1,6 @@
 # Crulanda — handoff (current state)
 
-Updated 2026-10-11, 00:30 (America/New_York; the work it describes ends at commit cdc1222, 00:28). One page on purpose: what is true now, where things are, what is open, what is
+Updated 2026-10-11, 00:35 (America/New_York; the work it describes ends with the build published at 00:33). One page on purpose: what is true now, where things are, what is open, what is
 next. History lives in CHANGELOG.md and HANDOFF_ARCHIVE.md (the old resume notes of 2026-09-28 to 2026-10-10, archived tonight
 because they had grown to 146 KB of notes that contradicted each other). Replace this page when the state changes; do not stack.
 
@@ -51,8 +51,9 @@ because they had grown to 146 KB of notes that contradicted each other). Replace
 - Adit suites on the drawn-out layout, all green (00:10-00:28): AditWeaverTests 3/3, AditTests 5/5, AditGateTests 8/8,
   RockEaterTests 2/2, CaveTests 9/9, EliteFightTests 6/6. The escort test waits for all six of the waves, checks where each comes
   out and that the second can reach her inside half the game's lock time, and saves and reloads with the fight over.
-- Published playable build: 20:41 on 2026-10-10 (feet and bow; the Adit before the scale-up). The drawn-out Adit is being built for
-  Chris to walk (this page says when it is published).
+- **Published playable build: 00:33 on 2026-10-11** (release, 0 shader errors, from commit 9fc71fc): the drawn-out Adit with the escort
+  and save fixes, for Chris to walk. Checked in the published files: the new code and the new layout are in it. The one before was
+  20:41 on 2026-10-10 (feet and bow).
 
 ## Open (see PLAYTEST_NOTES.md for each)
 - 113: the Adit bigger **and "more to do"**: the scale is done and tested; the content is next (DUNGEON_DESIGN 0.25, wing by wing).
@@ -75,7 +76,7 @@ because they had grown to 146 KB of notes that contradicted each other). Replace
   no-machine-words rule head CRULANDA_CANON.md (the rest of it is still the Phase 0 stub: fill it from the books).
 
 ## Next, in order
-1. Publish the drawn-out Adit for Chris to walk (`release_build.ps1 -Sync`), and tell him.
+1. Chris walks the drawn-out Adit (published 00:33, 2026-10-11); his word on it before PR #2 is merged.
 2. Notes 114-118 (the tester's report), the two that spoil every session first: **115, keys ignored after alt-tab or chat until a
    click in the window** (the character stands still), and **117, the camera going inside walls in buildings**; then 114 (the HUD
    clipped at the left and top: chat, party frame; no player frame or minimap seen), 116 (the shop not closing on "Goodbye"), and

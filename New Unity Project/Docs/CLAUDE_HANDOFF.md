@@ -1,6 +1,6 @@
 # Crulanda — handoff (current state)
 
-Updated 2026-10-10, about 22:00 (America/New_York; the work it describes ends at commit e9ee605, 21:52). One page on purpose: what is true now, where things are, what is open, what is
+Updated 2026-10-11, 00:30 (America/New_York; the work it describes ends at commit cdc1222, 00:28). One page on purpose: what is true now, where things are, what is open, what is
 next. History lives in CHANGELOG.md and HANDOFF_ARCHIVE.md (the old resume notes of 2026-09-28 to 2026-10-10, archived tonight
 because they had grown to 146 KB of notes that contradicted each other). Replace this page when the state changes; do not stack.
 
@@ -42,22 +42,20 @@ because they had grown to 146 KB of notes that contradicted each other). Replace
   (`tools/wip/dungeon/adit_layout.py`; the Adit code's places are in the first Adit's metres times X=3, CW=2.5, DW=1.5, CH=2).
 - **Machine words replaced** in the Adit's item texts ("engine oil" became "drill-grease"; Chris: replace them).
 - Docs: this handoff rewritten, the old one archived; GAME_BRIEF brought up to the code.
+- **After midnight (2026-10-11): the escort works on the drawn-out Adit, and saves deep in it load.** The Weaver's waves come by her
+  distance to the lock (27 m, then 13 m); the carriage stands by Danner; the Quartermaster's call is 30 m (Danner is 32 m from her).
+  A save in the Rail Hall (80-90 m down) used to come back a new character (the limit was 60 m down; now 250, `EncounterSave.Placeable`).
 
 ## Tests and builds
-- EditMode 444/444 (about 23:05, after the lore decisions; the Adit elites' call ranges set for the drawn-out layout: Lusk and Nix 66 m,
-  the Quartermaster 48 m, so each call still reaches its kin).
-- Adit suites on the drawn-out layout: 17 of 18 pass. **Failing: AditWeaverTests "two waves of three" (3 of 6).** What the test
-  reported (run at about 21:50): both waves spawn (6 of 6); the second comes out 13.5 m past the lock; the test sets the lock to 4 s
-  (`MatchSeconds = 4`; the game's is about 36) and stops as soon as the lock is done, so the second wave can arrive too late to be
-  counted. **Plausible, not proven.** The fix to make (agreed with a review Chris pasted): do **not** just lengthen the test's lock
-  (it breaks again when the layout moves); keep every check and let the test wait, with a time limit, until all six have come for
-  her. And a design check to add: **the second wave must reach her while she is still working the lock** (if it only arrives after,
-  it never threatens the lock, in play too): if it fails, bring its spawn nearer or time the wave earlier.
-- Published playable build: 20:41 (feet and bow; the Adit before the scale-up). The drawn-out Adit is **not published** (Chris, at
-  about 21:50: "complete handoff and save"). Publish it once the escort test is green.
+- EditMode 445/445 (00:28, 2026-10-11); the escort test again after the call change, 3/3 (00:32).
+- Adit suites on the drawn-out layout, all green (00:10-00:28): AditWeaverTests 3/3, AditTests 5/5, AditGateTests 8/8,
+  RockEaterTests 2/2, CaveTests 9/9, EliteFightTests 6/6. The escort test waits for all six of the waves, checks where each comes
+  out and that the second can reach her inside half the game's lock time, and saves and reloads with the fight over.
+- Published playable build: 20:41 on 2026-10-10 (feet and bow; the Adit before the scale-up). The drawn-out Adit is being built for
+  Chris to walk (this page says when it is published).
 
 ## Open (see PLAYTEST_NOTES.md for each)
-- 113: the Adit bigger **and "more to do"**: the scale is done; the content is next (DUNGEON_DESIGN 0.25, wing by wing).
+- 113: the Adit bigger **and "more to do"**: the scale is done and tested; the content is next (DUNGEON_DESIGN 0.25, wing by wing).
 - **114-118, a tester's report Chris pasted at about 22:20 (on the 20:41 build), all open:** the HUD clipped at the left and top (chat
   and party frame cut, no player frame or minimap seen); after alt-tab or chat, keys ignored until a click in the window; the shop not
   closing on "Goodbye"; the camera going inside walls in buildings; "/invite Thatch" not working (the Who list's Invite does).
@@ -71,22 +69,21 @@ because they had grown to 146 KB of notes that contradicted each other). Replace
   Chris's open project, into Resources/Characters/Animations/KI with its metas, the clips copying his avatars like the rest).
 - **Out of date, not yet refreshed:** `marketing/steam-blurb.md` (2026-09-30: four zones, levels 1-10, Warrior or Druid; it also
   names the Salt-Menders, see the lore audit). `CLAUDE.md` now names lane B.
-- **Lore audit, waiting for Chris: `LORE_AUDIT.md`** (nothing changed yet): the Salt-Menders and the Whispering Wood contradict book 3;
-  the Sandthrone toll is sourced (chapter 5); Klyther has four versions across the books' notes; the classes carry no canon label
-  (Chris decided: **GAME-ONLY archetypes**, canon roots noted). Chris decided the order when sources disagree: **novels, then the
-  world bible, then the ledger**. Both, and the no-machine-words rule, are now at the head of CRULANDA_CANON.md (the rest of it is still
-  the Phase 0 stub). The four conflicts are decided and done in the data (Salt-Menders as forerunners, Khaven's wood renamed the
-  Stillwood, the toll CANON-EXPANDED, Klyther as in the novels): LORE_AUDIT.md.
+- **Lore (`LORE_AUDIT.md`), all decided by Chris on 2026-10-10 and done in the data:** the Salt-Menders as book 3's forerunners,
+  Khaven's wood renamed the Stillwood, the Peaks toll CANON-EXPANDED (the draft chapter_5.md), Klyther as the novels have him; the
+  classes are GAME-ONLY archetypes; when sources disagree, **novels, then the world bible, then the ledger**. These rules and the
+  no-machine-words rule head CRULANDA_CANON.md (the rest of it is still the Phase 0 stub: fill it from the books).
 
 ## Next, in order
-1. Fix the escort test (see "Tests and builds"); run the Adit suites green; publish the drawn-out Adit for Chris to walk.
+1. Publish the drawn-out Adit for Chris to walk (`release_build.ps1 -Sync`), and tell him.
 2. Notes 114-118 (the tester's report), the two that spoil every session first: **115, keys ignored after alt-tab or chat until a
    click in the window** (the character stands still), and **117, the camera going inside walls in buildings**; then 114 (the HUD
    clipped at the left and top: chat, party frame; no player frame or minimap seen), 116 (the shop not closing on "Goodbye"), and
    118 ("/invite Thatch" fails, the Who list's Invite works). Each with a test that measures it, frames, and Chris's word before DONE.
-3. The lore audit: a list for Chris (each label with its book reference or none), then fix only what he approves.
-4. "More to do" in the Adit, a wing at a time, frames shown to Chris before the next (DUNGEON_DESIGN 0.25).
-5. Note 112's three items.
+3. "More to do" in the Adit, a wing at a time, frames shown to Chris before the next (DUNGEON_DESIGN 0.25).
+4. Note 112's three items.
+- Leads for 115 (not yet tested): the chat's "typing" flag is only cleared while the chat box is drawn; and the input system's default
+  focus behaviour turns the keyboard off when the window loses focus (no InputSettings asset; runInBackground off).
 
 ## How to work here (short)
 - Never run Unity against Chris's open project: sync into a validation lane (the tools do it).

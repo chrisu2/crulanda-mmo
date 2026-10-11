@@ -5,7 +5,7 @@ records where each of its phases stands and the order of the work. Update it eve
 
 ## Phases (PROJECT_MASTER.md)
 
-| Phase | Goal | Status (2026-10-09) |
+| Phase | Goal | Status (2026-10-09; what is verified, tested or only built: CLAUDE_HANDOFF.md, 2026-10-11) |
 |---|---|---|
 | 0 | Foundation | Done |
 | 1 | Combat sandbox | Done: shared abilities, threat, elites, level scaling (mobs above you hit harder, red at +3), crowd control (CC_DESIGN.md) |
@@ -50,7 +50,7 @@ out of that rig as loose nodes and pinned to our heads, which is why they cannot
 construction (needs the full package re-downloaded from the Asset Store, our animations retargeted through a Humanoid avatar, and a
 mapping from our items' looks to its parts, keeping the drawn pieces for what it lacks: cloth, leather, the zones' palettes); or
 (b) keep our figures and rewrite the fitting rules piece by piece. (a) is the lasting fix; (b) is the one that keeps failing.
-**Animations to buy with it (2026-10-10):** the game has no archery clips, so the bow is posed by hand (ActorVisual.BowArms, note 108);
+**Animations (2026-10-10, brought up to date 2026-10-11):** Kevin Iglesias's Archer pack is in, in part (BowShot01 load, hold and release, BowIdle01; the rest when the bow is right, note 112); his Melee pack waits to be imported. The rest of this paragraph is from before they came:
 a Kevin Iglesias archery set (the same maker as the locomotion) would give a real draw, aim and release on the same Humanoid avatar.
 **Done when:** the wardrobe line-up (EncounterCapture --crulanda-wardrobe-capture) shows every slot's every family fitting on every
 class's figure, and Chris has looked at it.

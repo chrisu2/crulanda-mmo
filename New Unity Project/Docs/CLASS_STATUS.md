@@ -33,7 +33,7 @@ have theirs designed (rows 4-6 in their files, marked `impl: false`); the Paladi
    build. Several rounds; only when Phase 9's zones bring the levels.
 2. **Own figures for the Rogue and the Archivist** (they borrow the Ranger's and the Mage's): a figure spec each in ActorVisual.Model.cs,
    a wardrobe capture for Chris. Small.
-3. **Mira's Hush** (the companion's interrupt, CC_DESIGN C2): small.
+3. ~~Mira's Hush~~: BUILT with C5 (HealerCompanion.Hush; its test ArchivistLoopTests, PlayMode); listed here as left by mistake until 2026-10-11.
 4. **Turn the Unmade** (a Paladin fear against the Wasting's things, noted with C2): small.
 
 ## Planned, not started (ROADMAP Phase 9.2, from the novels; PROVISIONAL)

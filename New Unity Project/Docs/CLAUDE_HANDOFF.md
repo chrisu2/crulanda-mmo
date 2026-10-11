@@ -60,7 +60,8 @@ them is not verified is under "Verify first". Phase 8 is now; 8.5 and 9 follow.
 
 ### Verify first
 1. Chris walks the drawn-out Adit (published 00:33). His word before PR #2 (`feet-bow-adit-kit`) is merged.
-2. The full PlayMode run on the branch, then the zone tours (`build_and_tour.ps1`); fix what fails before the merge.
+2. The full PlayMode run on the branch, then the zone tours (`build_and_tour.ps1`); fix what fails before the merge. (Chris, 00:46:
+   not tonight; first thing next session.)
 3. In Chris's build: the feet, the jump and the bow (verified only in captures); note 108 (the bow in play); 109 (tools carried).
 4. Reports worked on that Chris never confirmed: 23 (frame rate: 145 fps measured in Oakhaven at 1440x900; the target is 144+ and he
    plays at 3440x1440), 24 (dead-tree joins), 25 (swings: an upper-body layer only; real swings need the Melee pack), 26 (roofs fade),
@@ -69,11 +70,9 @@ them is not verified is under "Verify first". Phase 8 is now; 8.5 and 9 follow.
    99's done parts (the Adit's first look), 106 (the horizon, a first pass). **In all, 79 notes in PLAYTEST_NOTES.md are marked DONE or
    FIXED by the agent and only 2 are confirmed by Chris (107 and 111, in a capture):** the real list to verify is those 79, the ones
    above first. Go through them in play with Chris.
-5. Docs that disagree with the code: DUNGEON_DESIGN section 9 step 6 says quest gear is not handed out (it is: QuestLog.GearRewards,
-   TESTED); CLASS_STATUS.md lists Mira's Hush as left (it is in: HealerCompanion.Hush, C5); ROADMAP 8.5 says the game has no archery
-   clips (Kevin's Archer clips are in, in part); the ROADMAP's status column is dated 2026-10-09; KNOWN_ISSUES.md's top half is from
-   Phase 0; GAME_BRIEF.md's header still says "Updated 2026-09-30" (it was changed 2026-10-10), its Verdant Shore paragraph still says
-   levels 11-13 and the cap rising to 13 (corrected only in a parenthesis), and "the painted style pass is next" is dated 2026-09-30.
+5. Docs that disagreed with the code: fixed 2026-10-11, 00:47 (Chris said yes): CLASS_STATUS (Mira's Hush), DUNGEON_DESIGN (quest
+   gear), ROADMAP (the archery clips; the status column points here), GAME_BRIEF (its date, the Shore's band, the style pass), KNOWN_ISSUES
+   (its Phase 0 sections marked as such).
 
 ### Phase 8: the vertical slice (now)
 **8A. The Sealed Adit (DUNGEON_DESIGN.md)**
@@ -106,14 +105,17 @@ frames, and Chris's word:
 - **116** the shop not closing on "Goodbye".
 - **118** "/invite Thatch" fails (the Who list's Invite works).
 
-**8C. Animation**
+**8C. Sound: there is none** (no audio code in the game; Chris, 2026-10-11: right after the tester's bugs). Ambience per zone, weather (rain, thunder), weapon hits (slash, pierce and
+blunt each different), spells, mobs; music later. OPEN.
+
+**8D. Animation**
 - Note 112, OPEN: (a) at full draw the bowstring is not drawn to the hand and no arrow shows; (b) Morro Motion's idles turn a foot out
   about 50 degrees (import them from a source avatar, as Kevin's are); (c) the walk's toes dip 3-6 cm in places.
 - Kevin Iglesias's Melee pack: not imported (copies in `D:\crulanda-work\downloads\kevin-iglesias`). Real swings for every class (the
   rest of note 25): into a validation lane first, the clips copying his avatars, never into Chris's open project.
 - Kevin's Archer pack: only BowShot01 (load, hold, release) and BowIdle01 are in.
 
-**8D. Classes and crowd control (CLASS_STATUS.md, CC_DESIGN.md, TALENT_DEPTH.md)**
+**8E. Classes and crowd control (CLASS_STATUS.md, CC_DESIGN.md, TALENT_DEPTH.md)**
 - Fourth paths to design and build: the Ranger's Skirmisher (melee), the Mage's Cinderwright (pets), the Rogue's Swashbuckler
   (support). The Paladin's Vanguard, the Warrior's Jailer and the Archivist's Cantor: TESTED in EditMode 00:25 tonight
   (PaladinRulesTests, WarriorTalentTests, ArchivistRulesTests); their PlayMode tests (PaladinLoopTests, CrowdControlTests,
@@ -125,15 +127,12 @@ frames, and Chris's word:
   C5's "the dungeon deepened" is the scale-up (TESTED).
 - Note 42 (a better shield off wolves than off the Brood Weave-Eater): waits for Chris to name the two shields.
 
-**8E. World and art**
+**8F. World and art**
 - The painted style pass (GAME_BRIEF's art direction), zone by zone. OPEN.
 - Note 40: the Ash-Walker enclave's interior (a firelit hall behind the middle arch; only its cave mouths exist). OPEN.
 - Khaven with the Village kit (imported 2026-10-07 into Resources/Props/Village; check what Khaven uses before calling it done).
 - Daniel Gruginski's Medieval Village Kit (CC0; ROADMAP): no record of its import.
 - Note 14: the PDF of the work (last brought up to date 2026-10-02, `tools/docs/make_history_pdf.py`). OPEN.
-
-**8F. Sound: there is none** (no audio code in the game). Ambience per zone, weather (rain, thunder), weapon hits (slash, pierce and
-blunt each different), spells, mobs; music later. OPEN.
 
 **8G. Performance and tech**
 - Note 23's target (144+ fps), measured at Chris's 3440x1440.

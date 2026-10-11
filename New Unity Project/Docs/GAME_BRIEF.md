@@ -1,6 +1,6 @@
 # Crulanda — game brief (what this is, and the bar it is held to)
 
-Updated 2026-09-30. This is the standing direction for the project, gathered from Chris's instructions across sessions.
+Updated 2026-10-10 (first written 2026-09-30). This is the standing direction for the project, gathered from Chris's instructions across sessions.
 The handoff (`CLAUDE_HANDOFF.md`) says where the work stands; this file says what the game is meant to be. When they
 disagree, this file wins on direction and the handoff wins on current state.
 
@@ -67,7 +67,7 @@ reference only:
   a map-marked quest pickup. Decided: exploration is rewarded with **discoveries + loot** (a "Discovered" toast, XP, a
   cache, a Discoveries tab in the quest book). The overall order: **tree crowns, weather, the cave, secrets in every
   zone, the cave made a deep dungeon, then grow the zones** to about 340-380 m once there is content to fill them, then
-  the painted style pass. (All up to the zone growth are built, 2026-09-30; the painted style pass is next.)
+  the painted style pass. (All up to the zone growth were built by 2026-09-30; the painted style pass is still open on 2026-10-11, CLAUDE_HANDOFF 8F.)
 - **Seamless caves:** a rock-shell cave built into a hillside with no loading screen, darkening as you walk in. The
   first, **Crowsfoot Hollow**, is built (2026-09-30), the **Sandthrone deserters' cave** in Oakhaven's north hills: a quest
   from level 3 to clear the bandits and their game-only Bandit King so they stop harassing the villagers. Chris: "the cave
@@ -77,8 +77,8 @@ reference only:
 - **The next zone is a truly lush one** (Chris, 2026-09-30, with style references: a giant-tree forest of a thousand greens,
   cozy wooden houses built into the trees, waterfalls, flowers and glowing plants). Decided: **the Verdant Shore** (CANON,
   Book 3: "a forest that didn't know when to stop", trunks as wide as houses, the Veridian Keepers and their temple), set in
-  the game's time, before the books' exodus. It is the fifth zone, **levels 11-13, after the Ash Rim**, so the level cap rises
-  to 13 (as decided on 2026-09-30; since 2026-10-07 the cap is 15 and the Shore is 13-15); the way there crosses the ash-mountains west, as the survivors do in Book 3. The references are style only: nothing
+  the game's time, before the books' exodus. It is the fifth zone, **levels 13-15, after the Ash Rim** (planned
+  on 2026-09-30 as 11-13 with a cap of 13; the cap is 15 since 2026-10-07); the way there crosses the ash-mountains west, as the survivors do in Book 3. The references are style only: nothing
   is copied from any other game.
 
 ## Standing rules

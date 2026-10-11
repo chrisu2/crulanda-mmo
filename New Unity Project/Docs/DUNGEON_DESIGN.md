@@ -367,7 +367,7 @@ the next dungeon.
    heals, bolts, drains and knockbacks came with C5 and D2; flee at low health (`ZoneCamp.flee`, the Breach's crawlers) and the gunners'
    and pickets' ranged shots 2026-10-09 (D5). The Foreman's terrify stands for a mob's fear; a sleep on you waits for a mob that sings it.*
 6. **Quests and loot:** the seven quests, the set and boss tables. *Written 2026-10-08 on web/adit-quests-loot (Quests/adit.json, the
-   Adit-Runner's Kit in loot.adit.json); quest gear is not yet handed out at turn-in, and the Geode Shards and the hidden and rare
+   Adit-Runner's Kit in loot.adit.json); quest gear is handed out at turn-in since 2026-10-09 (QuestLog.GearRewards; QuestGearTests passed 2026-10-11), and the Geode Shards and the hidden and rare
    bosses' pieces wait (WEB_LOG.md).*
 7. **Sim support:** the dungeon run leads through the wings and branches in order, waits at gates, and joins the escort. *Built
    2026-10-09 (D7): the order came with round 27; the run now keeps the camps past a gate, walks to a shut one and waits, saying what it

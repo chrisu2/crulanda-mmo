@@ -60,7 +60,7 @@ def half_at(rings, along):
 MAIN = 'The Sealed Adit'
 CAVES = [
     # The Old Workings, the Singing Gallery, the shaft stair and the Rail Hall.
-    dict(name=MAIN, at=(0, -100), yaw=0, plan=[
+    dict(name=MAIN, at=(0, -370), yaw=0, plan=[
         (0, -1.2, 2.0, 3.0, 0), (0, 2, 2.1, 3.1, 0), (.5, 7, 2.2, 3.2, -.5),                                   # 0-2 the adit: timbered, square-ish
         (2, 12, 2.4, 3.2, -1.2), (1, 17, 2.4, 3.3, -2),                                                         # 3-4 the drift
         (-1, 21, 5.5, 4.6, -2.4), (-2, 26, 6.5, 5, -2.6), (-1, 31, 5.5, 4.6, -2.8),                             # 5-7 the cages
@@ -91,6 +91,31 @@ CAVES = [
         (1, 49, 7, 6, -3.6), (0, 56, 9, 7, -3.6), (0, 62, 7, 6, -3.6), (0, 65, .3, .4, -3.6)]),                # 10-12 the Foreman's drift
 ]
 
+# ---------------------------------------------------------------- the full-length Adit (Chris, 2026-10-10: "the whole place needs to
+# be bigger", "3x, full-length run", "not just bigger but more too do!"; DUNGEON_DESIGN.md 0.25)
+# The plans above are the first Adit's (451 m of cave). Every one is drawn out: along it LEN times as long, a chamber (a row 4.5 m or
+# more in half-width) CHAMBER_W times as wide and CHAMBER_H as tall, a drift DRIFT_W as wide and DRIFT_H as tall (still a mine's
+# drift), and the floor DROP times as deep (the taller roofs stay under the land; the stairs keep their steepness). Branch mouths and
+# camps scale with them: along offsets LEN times, asides by the width of the row they stand in.
+LEN, CHAMBER_W, CHAMBER_H, DRIFT_W, DRIFT_H, DROP = 3.0, 2.5, 2.0, 1.5, 1.4, 2.0
+CHAMBER = 4.5
+def widen(half): return CHAMBER_W if half >= CHAMBER else DRIFT_W
+def drawn(plan):
+    out = []
+    for x, z, half, height, drop in plan:
+        if half < .5: out.append((x * LEN, z * LEN, half, height, drop * DROP)); continue   # a cave's closing tip
+        ch = half >= CHAMBER
+        out.append((x * LEN, z * LEN, half * (CHAMBER_W if ch else DRIFT_W), height * (CHAMBER_H if ch else DRIFT_H), drop * DROP))
+    return out
+FIRST = {c['name']: list(c['plan']) for c in CAVES}   # the first Adit's plans (for the widths the camps' asides scale by)
+for c in CAVES:
+    c['plan'] = drawn(c['plan'])
+    if 'within' in c:
+        prow = FIRST[c['within']][c['along_row']]
+        c['along_off'] *= LEN; c['aside'] *= widen(prow[2])
+
+SIZE = 800   # the zone's square (260 for the first Adit): the main way runs ~650 m north from the mouth, the branches ~250 m east and west
+
 # ---------------------------------------------------------------- the camps: (cave, row, along offset, aside, entry)
 S = 'GAME-ONLY band; CANON company (Sandthrone)'
 def mob(name, mob_, look, count, lo, hi, tag=None, **kw):
@@ -118,7 +143,7 @@ CAMPS = [
     ('The Geode Floor', 3, 0, 0, mob("Cutters' drift", 'Sandthrone geode-cutter', 'outrider', 2, 11, 11, tag='cutter', radius=1.6)),
     ('The Geode Floor', 5, 2, -3, mob('The cutting floor', 'Sandthrone geode-cutter', 'outrider', 3, 11, 11, tag='cutter', radius=2.5)),
     ('The Geode Floor', 7, -1, 4, mob('Sorting troughs', 'Sandthrone sorter', 'deserter', 3, 11, 11, tag='sorter', radius=2.5)),
-    ('The Geode Floor', 10, -1, -3, mob('Workshop guards', 'Sandthrone overseer', 'deserter', 2, 11, 11, tag='overseer', radius=1.6)),
+    ('The Geode Floor', 11, -3, -3, mob('Workshop guards', 'Sandthrone overseer', 'deserter', 2, 11, 11, tag='overseer', radius=1.6)),
     ('The Geode Floor', 11, 3, 0, mob('Nix and the Rock-Eater', 'Nix, the turncoat', 'outrider', 1, 11, 11, tag='nix', canon='GAME-ONLY (the goblins, the Weavers of the Warrens, are CANON)', radius=1, elite=True, guards='Workshop guards', key='sigil.amber', keyName='the Amber Sigil')),
 
     ('The Ember Vent', 3, 0, 0, mob('Vent mouth', 'Ash initiate', 'cultist', 2, 11, 11, tag='ashinitiate', canon='GAME-ONLY cell; CANON cult (the Cult of Ash)', radius=1.6)),
@@ -153,8 +178,14 @@ def build():
         rings, rows = trace(c['at'], c['yaw'], c['plan'])
         traced[c['name']] = ([r[:4] + (r[4] + base,) + r[5:] for r in rings], rows)
     camps = []
+    guards = {d['guards'] for *_, d in CAMPS if d.get('guards') not in (None, 'none')}
     for cave, row, off, aside, d in CAMPS:
-        rings, rows = traced[cave]; along = rows[row] + off
+        rings, rows = traced[cave]
+        # A lord and his guards stand a few metres apart (SocialAggro's GuardReach): their offsets are not drawn out.
+        near = d['name'] in guards or d.get('guards') not in (None, 'none')
+        w = widen(FIRST[cave][row][2])
+        off = off * (1 if near else LEN); aside = round(aside * (min(w, 2) if near else w), 2)
+        along = rows[row] + off
         (x, z), _ = point(rings, along, aside)
         assert abs(aside) + d['radius'] < half_at(rings, along) + .01, (d['name'], aside, half_at(rings, along))
         e = dict(d); e['center'] = {'x': round(x, 2), 'y': round(z, 2)}; e['cave'] = cave; e['along'] = round(along, 2); e['aside'] = aside
@@ -164,8 +195,12 @@ def build():
     for a in range(len(names)):
         for b in range(a + 1, len(names)):
             ra, rb = traced[names[a]][0], traced[names[b]][0]
+            # A branch's first metres stand in its parent's air (the mouth opens out of the chamber's wall, and the drawn-out chamber
+            # is wide): those may lie over the parent's sloping floor.
+            parent = next((c for c in CAVES if c['name'] == names[b] and c.get('within') == names[a]), None)
             for p in ra[::3]:
                 for q in rb[::3]:
+                    if parent is not None and q[5] < 18: continue
                     d = math.hypot(p[0] - q[0], p[1] - q[1])
                     if d < p[2] + q[2] + 1 and abs(p[4] - q[4]) > 1.5:
                         sys.exit('caves overlap: %s at %.1f and %s at %.1f' % (names[a], p[5], names[b], q[5]))
@@ -187,7 +222,7 @@ def zone(traced, camps):
                      'from deep seams (CANON, book1 ch.3); the Wasting eating the Peaks\' stone (CANON, world_bible); the Sandthrone, the Cult '
                      'of Ash, the goblins and the Hollow Men (CANON). GAME-ONLY: the Sandthrone cutting geodes here and running them south on '
                      'the old line, the Ash cell in the vent, the breach, every person, camp and place name. Docs/DUNGEON_DESIGN.md.',
-        'size': 260, 'levelMin': 10, 'levelMax': 12, 'roadsNote': 'the cart track from the cut to the mouth', 'biome': 'mountain',
+        'size': SIZE, 'levelMin': 10, 'levelMax': 12, 'roadsNote': 'the cart track from the cut to the mouth', 'biome': 'mountain',
         'weather': [{'kind': 'overcast', 'weight': 3}, {'kind': 'fair', 'weight': 1}, {'kind': 'flurries', 'weight': 1}],
         'worldMapPosition': {'x': 0.5, 'y': 0.56}, 'worldMapNote': 'Under the Shattered Peaks, through the Sealed Adit.',
         'flatRadius': 14, 'hillHeight': 3, 'seed': 7717,
@@ -220,7 +255,7 @@ def picture(traced, camps, path):
     except ImportError:
         return
     xs = [r[0] for rs, _ in traced.values() for r in rs]; zs = [r[1] for rs, _ in traced.values() for r in rs]
-    x0, x1, z0, z1 = min(xs) - 20, max(xs) + 20, min(zs) - 25, max(zs) + 20; s = 4
+    x0, x1, z0, z1 = min(xs) - 20, max(xs) + 20, min(zs) - 25, max(zs) + 20; s = 1.6
     W, H = int((x1 - x0) * s), int((z1 - z0) * s)
     img = Image.new('RGB', (W, H), (24, 22, 20)); g = ImageDraw.Draw(img)
     colours = {MAIN: (150, 170, 120), 'The Geode Floor': (170, 120, 210), 'The Ember Vent': (230, 110, 60), 'The Grey Breach': (150, 150, 150)}

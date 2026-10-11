@@ -16,10 +16,11 @@ games are style references only: no copied names, assets, zones or creatures fro
 
 ## What exists (Unity 6000.6.3f1, built-in pipeline)
 
-- **Five zones on a level ladder, cap 13:** Oakhaven (1-2, farmland village, the Great Oak, the Golden Cask inn),
-  Khaven Village (3-5, a walled village in permanent grim dusk beside the dead Whispering Wood), the Shattered Peaks
-  (6-8, a mountain toll pass held by Sandthrone mercenaries), the Ashland Rim (9-10, grey petrified ash beside the
-  Wasting, with the Ash-Walker caves and Weave-Eaters). All built from JSON by `ZoneBuilder` at load, 340-380 m across
+- **Five zones on a level ladder, cap 15 (30 in the end):** Oakhaven (1-5, farmland village, the Great Oak, the Golden Cask
+  inn), Khaven Village (5-9, a walled village in permanent grim dusk beside the dead Whispering Wood), the Shattered Peaks
+  (9-12, a mountain toll pass held by Sandthrone mercenaries), the Ashland Rim (12-15, grey petrified ash beside the
+  Wasting, with the Ash-Walker caves and Weave-Eaters), and the Verdant Shore (13-15). (Levels as of 2026-10-10, from the
+  zone files; the cap-15 rescale is in ROADMAP.) All built from JSON by `ZoneBuilder` at load, 340-380 m across
   (grown 2026-09-30 with 37 new places, 18 camps and 14 secrets in the new ground); Oakhaven is 560 m since playtest note 1
   (2026-10-01: farms, then wolf and boar country, then the hills, with the bandits' cave 270 m from the green).
 - **Living world:** villagers with trades and daily routines, hen-wives and coops, critters with legs, a day/night
@@ -36,9 +37,12 @@ games are style references only: no copied names, assets, zones or creatures fro
 - **Water:** stylized turquoise (Chris's chosen look): a sandy bed showing through pale shallows, foam at shores and
   around legs, a creek current, ripple rings, wading and swimming. Khaven's Gloom Creek stays murky.
 - **Camera and targeting:** trees fade when they block the view; a coloured ring under the selected target.
-- **A fifth zone, the Verdant Shore (11-13):** Book 3's giant-tree forest, with the Veridian Keepers' treehouses, the Temple, a
-  waterfall, glowing glades and the coast's salt-flats (WORLD_ZONES.md "The Verdant Shore"). The level cap is 13.
-- **Classes:** Warrior and Druid playable, with data-driven talent trees; saves per character (format 7).
+- **The Verdant Shore (13-15):** Book 3's giant-tree forest, with the Veridian Keepers' treehouses, the Temple, a
+  waterfall, glowing glades and the coast's salt-flats (WORLD_ZONES.md "The Verdant Shore").
+- **The Sealed Adit (10-12):** the first group dungeon, its own zone entered from the Peaks: five players (you, Mira and three
+  sims), seven bosses, gates, an escort, built halls; drawn out to about 1.35 km of cave on 2026-10-10 (DUNGEON_DESIGN.md).
+- **Classes:** seven playable (Warrior, Druid, Paladin, Ranger, Rogue, Mage, Archivist), with data-driven talent trees; saves
+  per character (format 10).
 - **Docs to read next:** `WORLD_ZONES.md` (how zones are built), `QUEST_DESIGN.md`, `SAVE_FORMAT.md`,
   `CHANGELOG.md`, `CRULANDA_CANON.md` and `CRULANDA_LOCATIONS.md` (what is canon).
 
@@ -84,11 +88,11 @@ reference only:
 - Evolve the world first; per-skill balancing comes later.
 - Chris skims: ask him decisions first and short. Keep going without waiting between ordered steps, and tell him at
   each publish. Finish each step (fix, test, re-shoot, verify, commit, publish, back up) before starting the next.
-- Validation runs against the copy in `work\encounter-validation`, never against the open project. Check every build
+- Validation runs against the copies in `D:\crulanda-work\encounter-validation` (and `-b`), never against the open project. Check every build
   log for `Shader error` (a broken shader silently falls back). Back up the save before a format change.
 
 ## Where things live
 
-`D:\code\mmo` is the git repo (backed up to `J:\claude\unity projects\mmo` by `tools\Backup.ps1`). The playable build
-is `outputs\Crulanda-Playable\Crulanda.exe`; run it with `--crulanda-temp-save` for a throwaway character. Every path
+`D:\code\mmo` is the git repo (backed up to `E:\claude\unity projects\mmo` by `tools\Backup.ps1`). The playable build
+is `D:\crulanda-work\outputs\Crulanda-Playable\Crulanda.exe`; run it with `--crulanda-temp-save` for a throwaway character. Every path
 is in `D:\code\mmo\CLAUDE.md`.

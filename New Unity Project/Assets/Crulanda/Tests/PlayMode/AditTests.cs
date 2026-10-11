@@ -54,6 +54,7 @@ namespace Crulanda.Tests
             Assert.Less(main.Centre[main.Centre.Count - 1].y, main.Centre[0].y - 35, "the Rail Hall lies deep under the Peaks");
             Assert.IsTrue(NavMesh.SamplePosition(zone.Ground(zone.Zone.spawns.player, .2f), out var start, 2.5f, NavMesh.AllAreas), "the yard is on the navmesh");
             var path = new NavMeshPath();
+            var walked = new System.Collections.Generic.List<(Hollow cave, float s, Vector3 at)>();   // each step's floor point, for the camps below
             // Down each cave in six-metre steps first, so a break in the floor names its stretch.
             foreach (var h in Hollow.All)
             {
@@ -65,7 +66,7 @@ namespace Crulanda.Tests
                     foreach (var off in new[] { 0f, aside, -aside }) if (NavMesh.SamplePosition(h.At(s, off) + Vector3.up * .2f, out next, 2, NavMesh.AllAreas)) { on = true; break; }
                     Assert.IsTrue(on, h.Name + ": the floor " + s + " m in is on the navmesh (" + h.At(s) + ")");
                     Assert.IsTrue(NavMesh.CalculatePath(from, next.position, NavMesh.AllAreas, path) && path.status == NavMeshPathStatus.PathComplete, h.Name + ": walkable from " + from + " to " + next.position + " (" + s + " m in)");
-                    from = next.position;
+                    from = next.position; walked.Add((h, s, next.position));
                 }
             }
             foreach (var cp in zone.Zone.camps)
@@ -73,7 +74,10 @@ namespace Crulanda.Tests
                 var h = Cave(cp.cave); Assert.NotNull(h, cp.name + " names its cave");
                 Assert.IsTrue(h.FloorAt(cp.center, out float y), cp.name + " stands on " + cp.cave + "'s floor");
                 Assert.IsTrue(NavMesh.SamplePosition(new Vector3(cp.center.x, y + .2f, cp.center.y), out var at, 2, NavMesh.AllAreas), cp.name + " is on the navmesh");
-                Assert.IsTrue(NavMesh.CalculatePath(start.position, at.position, NavMesh.AllAreas, path) && path.status == NavMeshPathStatus.PathComplete, cp.name + " can be walked to from the yard");
+                // From the nearest step of its cave's walk (each step was walked from the one before, back to the yard): a search the length
+                // of the whole drawn-out dungeon gives up part way (2026-10-10).
+                var near = walked.Where(w => w.cave == h).OrderBy(w => Mathf.Abs(w.s - cp.along)).First();
+                Assert.IsTrue(NavMesh.CalculatePath(near.at, at.position, NavMesh.AllAreas, path) && path.status == NavMeshPathStatus.PathComplete, cp.name + " can be walked to from the yard (from " + near.s + " m in, " + near.at + ", to " + at.position + ")");
             }
             yield return null;
         }
@@ -84,7 +88,7 @@ namespace Crulanda.Tests
             {
                 var h = Cave(b);
                 // From in the Gallery, just inside the branch's mouth, straight down the branch: nothing of the Gallery's wall in the way.
-                var from = h.At(1) + Vector3.up * 1.4f; var to = h.At(10) + Vector3.up * 1.4f;
+                var from = h.At(1) + Vector3.up * 1.4f; var to = h.At(24) + Vector3.up * 1.4f;   // (10 m in the first Adit; its mouths drawn out three times)
                 Assert.IsFalse(Physics.Linecast(from, to, out var hit, ~0, QueryTriggerInteraction.Ignore), b + ": the way in is open (hit " + (hit.collider != null ? hit.collider.name : "") + " at " + hit.point + ")");
                 Assert.IsTrue(Cave(Main).Open(h.At(1) + Vector3.up * 1.4f), b + "'s mouth is in the Gallery's air");
             }

@@ -130,7 +130,7 @@ namespace Crulanda.Encounter
             foreach (var e in Enemies)
             {
                 if (e == null || !e.Camp || e.Elite || !e.actor.IsAlive || !e.CanAnswer) continue;
-                if (!(lord != null && GuardOf(e, lord)) && Vector2.Distance(e.CampCenter, at) > 26) continue;
+                if (!(lord != null && GuardOf(e, lord)) && Vector2.Distance(e.CampCenter, at) > 78) continue;   // (26 m in the first Adit; drawn out three times, 2026-10-10)
                 coming.Add(e);
             }
             if (coming.Count == 0) return 0;

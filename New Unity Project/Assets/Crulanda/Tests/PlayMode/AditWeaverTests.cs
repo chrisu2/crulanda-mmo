@@ -118,7 +118,7 @@ namespace Crulanda.Tests
             Assert.AreEqual(AditWeaver.Stage.Walking, w.Now, "spoken to, she sets off");
             // Each of the waves' people is cut down as soon as it picks someone to fight; Danner too, once he is up.
             var cameFor = new Dictionary<EncounterEnemy, Actor>(); float walkedAtFirst = -1, walkedAtSecond = -1, matchedWhenRose = -1; Actor dannerFor = null;
-            yield return Walk(w, 90, () => w.Now == AditWeaver.Stage.Done, () => {
+            yield return Walk(w, 270, () => w.Now == AditWeaver.Stage.Done, () => {   // (90 s for the first Adit's walk; three times as long now)
                 foreach (var e in session.WeaverWaves)
                 {
                     if (e == null || cameFor.ContainsKey(e)) continue;
@@ -131,7 +131,7 @@ namespace Crulanda.Tests
                 if (dannerFor == null && danner.actor.IsAlive && danner.Victim != null) { dannerFor = danner.Victim; danner.actor.Health.ApplyDamage(danner.actor.Health.Pool.Max * 3); }
             });
             Assert.AreEqual(AditWeaver.Stage.Done, w.Now, "the lock is matched");
-            Assert.AreEqual(2 * EncounterSession.WaveSize, cameFor.Count, "two waves of three");
+            Assert.AreEqual(2 * EncounterSession.WaveSize, cameFor.Count, "two waves of three (spawned " + session.WeaverWaves.Count + ", walked at the first " + walkedAtFirst + ", at the second " + walkedAtSecond + ", the waves' places " + string.Join(" ", session.Zone.RailWaves.Select(p => p.ToString())) + ", the lock " + session.Zone.RailLock + ")");
             Assert.IsTrue(cameFor.Values.All(a => a == w.actor), "every one of them came for her");
             Assert.That(walkedAtFirst, Is.InRange(.3f, .5f), "the first wave a third of the way down");
             Assert.That(walkedAtSecond, Is.InRange(.63f, .85f), "the second at two thirds");

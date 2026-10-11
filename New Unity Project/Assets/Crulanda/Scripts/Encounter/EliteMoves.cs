@@ -81,17 +81,17 @@ namespace Crulanda.Encounter
                 call = "Lusk roars: \"Overseers! Earn your cut!\"", callShort = "Earn your cut!",
                 enrage = "Lusk throws the tally book down and comes round the table." },
             // Nix's two-part fight (D5): first his engine, then him on foot. Together about one and three-quarter elites of health.
-            new EliteMove { mob = "The Rock-Eater", name = "Bore", windup = 2, blow = 3.8f, reach = 3.6f, every = 10, knock = 4, health = .95f, callReach = 14, callMost = 2,
+            new EliteMove { mob = "The Rock-Eater", name = "Bore", windup = 2, blow = 3.8f, reach = 3.6f, every = 10, knock = 4, health = .95f, callReach = 42, callMost = 2,
                 call = "The Rock-Eater's horn blares across the workshop. The guards come running.", callShort = "Horn",
                 enrage = "Black smoke pours from the Rock-Eater's stack and the drill screams." },
             new EliteMove { mob = "Nix, the turncoat", name = "Spanner-Lock", windup = 1.6f, blow = 3.6f, reach = 3.4f, every = 9, disarm = 4, health = .8f,
                 call = "Nix shrieks: \"Get them off me!\"", callShort = "Get them off me!",
                 enrage = "Nix stops dodging and comes at you with the spanner in both hands." },
-            new EliteMove { mob = "Cinder-Warden Ysolt", name = "Ember Blow", windup = 2, blow = 4.2f, reach = 3.8f, every = 10, callReach = 14, callMost = 2,
+            new EliteMove { mob = "Cinder-Warden Ysolt", name = "Ember Blow", windup = 2, blow = 4.2f, reach = 3.8f, every = 10, callReach = 42, callMost = 2,
                 knock = 5, ringEvery = 15, ringReach = 4.5f, ringBlow = 1.6f, ringName = "Flame Ring",
                 call = "Ysolt lifts the brand: \"The fire sees you.\"", callShort = "The fire sees you",
                 enrage = "Ysolt steps into the heat and comes out burning." },
-            new EliteMove { mob = "The Foreman Who Forgot", name = "What the Grey Takes", windup = 2.4f, blow = 4.4f, reach = 3.6f, every = 12, callReach = 40, callMost = 2,
+            new EliteMove { mob = "The Foreman Who Forgot", name = "What the Grey Takes", windup = 2.4f, blow = 4.4f, reach = 3.6f, every = 12, callReach = 120, callMost = 2,
                 blinkEvery = 14, phases = new[] {
                     new BossPhase { at = .5f, kind = "reset", text = "The Foreman stops. He looks at his hands, then at you, as if for the first time." },
                     new BossPhase { at = .25f, kind = "terrify", seconds = 3, text = "The Foreman opens his mouth and the grey comes out of it. You cannot move." } },   // the Hollow drift, back up the breach
@@ -102,7 +102,7 @@ namespace Crulanda.Encounter
                 enrage = "The Quiet Miner stops working. For the first time, he looks at you." },
             new EliteMove { mob = "The Vent-Hound", name = "Ember Lunge", windup = 1.5f, blow = 3.6f, reach = 4.4f, every = 9,
                 enrage = "The Vent-Hound's coat glows along the spine." },
-            new EliteMove { mob = "Quartermaster Brannigan Sorrel", name = "Boot-Heel Stamp", windup = 2, blow = 4.2f, reach = 3.6f, every = 10, callReach = 14, callMost = 2,
+            new EliteMove { mob = "Quartermaster Brannigan Sorrel", name = "Boot-Heel Stamp", windup = 2, blow = 4.2f, reach = 3.6f, every = 10, callReach = 42, callMost = 2,
                 phases = new[] {
                     new BossPhase { at = .667f, kind = "stamp", seconds = 2, text = "Sorrel stamps: the platform jumps under you. He goes to the rack and comes back with a maul." },
                     new BossPhase { at = .333f, kind = "stamp", seconds = 2, text = "Sorrel stamps again, and this time comes back with the poleaxe." } },   // his guards, not the captain down the hall

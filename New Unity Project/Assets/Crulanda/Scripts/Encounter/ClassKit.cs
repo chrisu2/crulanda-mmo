@@ -41,6 +41,9 @@ namespace Crulanda.Encounter
         public virtual int ResolveEnemyHit(EncounterEnemy enemy, Actor victim, int raw)
         { return victim == null || !victim.IsAlive ? 0 : victim.GetComponent<Combatant>().Damage(raw); }
         public virtual float PartyDamageMultiplier(EncounterEnemy enemy) { return 1; }
+        /// <summary>An ability whose blow the kit shows itself (the Ranger's spear work: a thrust, not the bow's release), so starting it
+        /// shows nothing of its own.</summary>
+        public virtual bool OwnBlow(AbilityDefinition a) { return false; }
         public virtual float CompanionHaste { get { return 0; } }
         /// <summary>Metres off the range at which mobs notice you (the Archivist's Quiet Step).</summary>
         public virtual float NoticeShrink { get { return 0; } }

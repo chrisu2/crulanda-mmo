@@ -52,6 +52,27 @@
     {"id": "sb-quickening", "name": "Quickening", "tier": 2, "col": 1, "max": 3, "req": "sb-reservoir", "kind": "passive", "icon": "clock", "desc": "While Unbound, Mira casts 10% faster per rank.", "emphasis": {"support": 1.5}, "impl": true},
     {"id": "sb-binding-oath", "name": "Binding Oath", "tier": 2, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "banner", "desc": "Unbind makes the party hit 25% harder instead of 15%.", "emphasis": {"support": 2}, "impl": true}
    ]
+  },
+  {
+   "id": "cinderwright",
+   "name": "Cinderwright",
+   "role": "pet",
+   "loop": "Kindle the ember hound and let it take the fight in, build Heat with Ember Bolt and pour it into the hound with Stoke instead of a Flare, and flare the hound itself with Cinder Burst when the pack closes.",
+   "tradeoff": "Heat given to the hound is Heat not loosed with Flare, and a burst burns the hound as well as the foe: the Cinderwright's damage lives and dies with its hound.",
+   "nodes": [
+    {"id": "cw-banked-coals", "name": "Banked Coals", "tier": 0, "col": 1, "max": 3, "req": null, "kind": "passive", "icon": "shield", "desc": "Your ember hound has 8% more health per rank.", "emphasis": {"mitigation": 1}, "impl": true},
+    {"id": "cw-hot-jaws", "name": "Hot Jaws", "tier": 0, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "flame", "desc": "Your ember hound's bites burn 10% harder per rank.", "emphasis": {"damage": 1}, "impl": true},
+    {"id": "cw-kinship", "name": "Kinship", "tier": 1, "col": 0, "max": 3, "req": null, "kind": "passive", "icon": "heart", "desc": "Each Ember Bolt that lands mends your hound for 2% of its health per rank.", "emphasis": {"sustain": 1}, "impl": true},
+    {"id": "cw-long-stoke", "name": "Long Stoke", "tier": 1, "col": 2, "max": 2, "req": null, "kind": "modifier", "icon": "clock", "desc": "Stoke lasts 3s longer per rank.", "emphasis": {"damage": 1}, "impl": true},
+    {"id": "cw-cinder-burst", "name": "Cinder Burst", "tier": 2, "col": 1, "max": 1, "req": null, "kind": "active", "icon": "flame", "desc": "New action: Cinder Burst: the hound flares and every foe within 4m of it burns; it costs the hound 15% of its health.", "emphasis": {"damage": 2}, "impl": true},
+    {"id": "cw-shared-heat", "name": "Shared Heat", "tier": 2, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "bolt", "desc": "Each of your hound's bites builds 1 Heat per rank.", "emphasis": {"tempo": 1}, "impl": true},
+    {"id": "cw-white-coals", "name": "White Coals", "tier": 3, "col": 1, "max": 1, "req": null, "kind": "signature", "icon": "star", "desc": "Stoked from 60 Heat or more, your hound takes 30% less while it lasts.", "emphasis": {"mitigation": 2}, "impl": true},
+    {"id": "cw-wide-burst", "name": "Wide Burst", "tier": 3, "col": 2, "max": 3, "req": "cw-cinder-burst", "kind": "modifier", "icon": "target", "desc": "Cinder Burst reaches 1m further per rank.", "emphasis": {"damage": 1}, "impl": true},
+    {"id": "cw-twin-embers", "name": "Twin Embers", "tier": 4, "col": 1, "max": 1, "req": null, "kind": "modifier", "icon": "star", "desc": "Kindle Hound calls a second, smaller hound at half strength.", "emphasis": {"damage": 1.5}, "impl": false},
+    {"id": "cw-ash-coat", "name": "Ash Coat", "tier": 4, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "shield", "desc": "Your hound takes 5% less per rank.", "emphasis": {"mitigation": 1}, "impl": false},
+    {"id": "cw-rekindle", "name": "Rekindle", "tier": 5, "col": 1, "max": 1, "req": "cw-white-coals", "kind": "passive", "icon": "heart", "desc": "Once a fight, a hound that falls kindles again at a third of its health.", "emphasis": {"sustain": 2}, "impl": false},
+    {"id": "cw-the-great-hound", "name": "The Great Hound", "tier": 6, "col": 1, "max": 1, "req": "cw-rekindle", "kind": "capstone", "icon": "star", "desc": "Stoke from 100 Heat makes the hound twice its size for 12s: its bites and its bursts half again as hard.", "emphasis": {"damage": 3}, "impl": false}
+   ]
   }
  ]
 }

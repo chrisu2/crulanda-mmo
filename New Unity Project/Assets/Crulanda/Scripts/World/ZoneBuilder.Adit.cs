@@ -96,7 +96,7 @@ namespace Crulanda.World
                     r.sharedMaterials = mats;
                 }
             }
-            const float FloorShade = .52f;   // the kit's floor flags at about half their pale grey
+            const float FloorShade = .4f;   // the kit's floor flags at two fifths of their pale grey (half still read pale in the 14:59 captures)
             GameObject Piece(string name, Vector3 foot, float yaw, float height, float? width = null, Vector3? box = null)
             {
                 if (kit == null) { kit = new GameObject("Adit kit").transform; kit.SetParent(t, false); }
@@ -410,6 +410,7 @@ namespace Crulanda.World
             }
             KitDressing();
             FloorClutter();
+            CampDressing();
             if (kit != null && Application.isPlaying) StaticBatchingUtility.Combine(kit.gameObject);
 
             // The floors filled (Chris, 2026-10-11: "room full of nothing", "more nothingness"): drawn out two and a half times as wide,
@@ -417,25 +418,61 @@ namespace Crulanda.World
             // fallen timber over the open floor of every wide stretch (geode crystal on the Geode Floor, basalt in the Vent, grey rock in
             // the Breach), each in a place of its own (Room: off the way down the middle, off the camps and off what stands), never in a
             // built hall, at a gate or on the lava; the big ones solid. Its own stream, so nothing placed before it moves.
+            // The camps lived in (2026-10-11, the captures: the drawn-out halls read as bare floor with people standing on it): at the edge of
+            // each camp of people a brazier burning (its warm light against the cave's cold), barrels and crates of their stores and bedrolls;
+            // by each camp of beasts, bones. Each in a place of its own (Room), so none stands on a camp, the way or anything else. Its own
+            // stream, after the floors, so nothing placed before moves.
+            void CampDressing()
+            {
+                if (Zone.camps == null) return;
+                var cr = TreeRandom(t.position + new Vector3(9.1f, 0, 4.3f)); float C() { return (float)cr.NextDouble(); }
+                var cloth = Tint(art.hay, new Color(.45f, .36f, .26f)); var blanketRed = Tint(art.hay, new Color(.45f, .16f, .12f));
+                foreach (var cp in Zone.camps)
+                {
+                    if (cp == null || cp.cave != h.Name || cp.elite || (cp.route != null && cp.route.Length > 1)) continue;   // lords keep their halls; patrols walk
+                    bool people = cp.look == "deserter" || cp.look == "outrider" || cp.look == "cultist";
+                    float turn = C() * Mathf.PI * 2;
+                    for (int k = 0; k < (people ? 5 : 3); k++)
+                    {
+                        float ang = turn + k * 1.37f, r = k == 0 ? .7f : .55f, edge = cp.radius + r + 1.1f + C() * .8f;
+                        float s = cp.along + Mathf.Cos(ang) * edge, a = cp.aside + Mathf.Sin(ang) * edge;
+                        if (s < 2 || s > h.Length - 2 || !Room(s, a, r)) continue;
+                        var at = On(s, a); at.y = FloorY(at.x, at.z);
+                        if (!people) { Piece(C() < .5f ? "Bones" : "Bones2", at, C() * 360, .34f + C() * .12f); continue; }
+                        if (k == 0) { Brazier(t, at, null); Block(at, new Vector3(.9f, 1.1f, .9f), Along(s)); continue; }
+                        if (k <= 2)
+                        {
+                            if (C() < .5f) { var b = Piece("Barrel", at, C() * 360, .95f); if (b != null) Block(at, new Vector3(.9f, .95f, .9f), Along(s)); }
+                            else { Crate(at, Along(s) * Quaternion.Euler(0, C() * 40 - 20, 0), 1 + (int)(C() * 2), false); Block(at, new Vector3(1.1f, 1.2f, 1.1f), Along(s)); }
+                            continue;
+                        }
+                        // A bedroll: a blanket laid out and a rolled cloak for a pillow.
+                        var bq = Along(s) * Quaternion.Euler(0, C() * 360, 0);
+                        Part(PrimitiveType.Cube, t, at + Vector3.up * .03f, new Vector3(.8f, .05f, 1.9f), C() < .5f ? cloth : blanketRed, bq);
+                        Part(PrimitiveType.Cylinder, t, at + bq * new Vector3(0, .1f, .78f), new Vector3(.2f, .38f, .2f), cloth, bq * Quaternion.Euler(0, 0, 90));
+                    }
+                }
+            }
             void FloorClutter()
             {
                 var fr = TreeRandom(t.position + new Vector3(3.7f, 0, 11.3f)); float F() { return (float)fr.NextDouble(); }
                 int lake = h.Name == "The Ember Vent" ? Widest(26 * X, h.Length - 8 * X) : -1;
                 float lakeS = lake >= 0 ? h.Along[lake] : -999, lakeR = lake >= 0 ? LakeRz(lake) + 4 : 0;
-                var rock = Tint(art.stone, AditLining(h.Name) * .8f); var rubbleRock = Tint(art.stone, AditLining(h.Name) * .65f);
+                var rock = Tint(art.stone, AditLining(h.Name) * .55f); var rubbleRock = Tint(art.stone, AditLining(h.Name) * .45f);   // (at .8 they read near white in the cave's light)
                 bool geodes = h.Name == "The Geode Floor", drips = h.Name == "The Sealed Adit" || h.Name == "The Grey Breach";
-                for (float s = 6; s < h.Length - 4; s += 2.6f)
+                for (float s = 6; s < h.Length - 4; s += 2.2f)
                 {
                     int i = RingAt(s); float half = h.Half[i];
                     bool skip = half < 6 || Mathf.Abs(s - lakeS) < lakeR;   // a drift keeps its rubble at the walls only
                     foreach (var span in hallSpans) if (s > span.x && s < span.y) skip = true;
                     foreach (var g in Gates) if (g != null && g.Cave == h.Name && Mathf.Abs(s - g.Along) < 8) skip = true;
-                    int tries = 1 + (int)(half / 9);   // more across the wider chambers
+                    int tries = 2 + (int)(half / 3.5f);   // more across the wider chambers (fewer left them bare: 2026-10-11 captures, 12:00 and 14:59)
                     for (int k = 0; k < tries; k++)
                     {
                         float a = (F() * 2 - 1) * half * .8f, roll = F(), size = F(), turn = F() * 360;
                         if (skip) continue;
-                        bool big = roll < .3f; float r = big ? 1.1f + size * 1.3f : .55f + size * .45f;
+                        bool wall = Mathf.Abs(a) > half * .5f;   // toward the walls, more and bigger outcrops
+                        bool big = roll < (wall ? .45f : .25f); float r = big ? (wall ? 1.4f + size * 1.8f : 1.1f + size * 1.2f) : .55f + size * .45f;
                         if (!Room(s, a, r)) continue;
                         var at = On(s, a); at.y = FloorY(at.x, at.z) - .06f;
                         if (big)

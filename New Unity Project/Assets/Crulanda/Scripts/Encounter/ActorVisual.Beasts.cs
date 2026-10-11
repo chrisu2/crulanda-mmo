@@ -75,7 +75,12 @@ namespace Crulanda.Encounter
             {
                 // Khaven's dusk (gloom): darker hides, or the wolves vanish into its pale earth and dry grass (as the old body did).
                 var zone = Crulanda.World.ZoneBuilder.Active; bool gloom = zone != null && zone.Zone != null && zone.Zone.biome == "gloom";
-                if (variant % 2 == 1)
+                // The Mage's ember hound (the Cinderwright, GAME-ONLY): a fire spirit in a hound's shape, charred black with its light parts
+                // glowing like coals and its eyes alight.
+                if (name != null && name.StartsWith("Ember hound"))
+                    coat = new ModelBeast.Coat().Set("Main", new Color(.13f, .06f, .04f)).Shine("Main_Light", new Color(1, .42f, .1f), new Color(1, .32f, .06f) * 1.6f)
+                        .Shine("Eyes_Black", new Color(1, .85f, .3f), new Color(1, .7f, .2f) * 2.5f);
+                else if (variant % 2 == 1)
                     coat = new ModelBeast.Coat().Set("Main", new Color(.17f, .16f, .16f)).Set("Main_Light", new Color(.31f, .29f, .28f)).Set("Nose", new Color(.05f, .05f, .05f))
                         .Shine("Eyes_Black", new Color(1, .45f, .15f), new Color(1, .4f, .1f) * 2);
                 // Old Whitefoot of the Old Fold (GAME-ONLY): grizzled with age, his muzzle, chest and feet gone white.
@@ -155,32 +160,81 @@ namespace Crulanda.Encounter
         public const float RockEaterHeight = 3.6f;
         /// <summary>Where its rider sits (Nix, EncounterEnemy.Ride): on the saddle, facing the way it faces; null for any other figure.</summary>
         public Transform RiderSeat { get; private set; }
-        /// <summary>The Rock-Eater's back, set in the bear's bind pose and carried by its back bone: a ridge of violet geode crystal out
-        /// through the stone of its hide (the geodes it eats), glowing faintly, and a saddle on a blanket with a girth, and the seat.</summary>
+        /// <summary>The Rock-Eater's back, fitted to its hide as its idle stands it and carried by its spine: a ridge of violet geode crystal out
+        /// through the stone of its hide (the geodes it eats), glowing faintly; a saddle on a blanket, its girth down both flanks; and the seat.</summary>
         void RockEaterGear()
         {
-            var back = beastModel.Hips != null ? beastModel.Hips : body;
-            var hide = beastModel.Renderers != null && beastModel.Renderers.Count > 0 ? beastModel.Renderers[0].bounds : new Bounds(transform.position + Vector3.up, Vector3.one * 2);
-            float top = hide.max.y, length = Vector3.Dot(hide.size, new Vector3(Mathf.Abs(body.forward.x), 0, Mathf.Abs(body.forward.z)));
-            Vector3 up = body.up, ahead = body.forward, side = body.right, mid = new Vector3(back.position.x, back.position.y + (top - back.position.y) * .8f, back.position.z);   // the hide's top is its shoulders' hump: the back behind them is lower
-            var crystal = Mat(new Color(.62f, .4f, .95f), .9f, .2f); crystal.EnableKeyword("_EMISSION"); crystal.SetColor("_EmissionColor", new Color(.55f, .25f, 1) * 1.2f);
-            var leather = Mat(new Color(.3f, .19f, .11f), .1f, .3f); var blanket = Mat(new Color(.42f, .12f, .1f), .05f, .1f);
-            Transform OnBack(Transform t) { t.SetParent(back, true); return t; }
-            // The crystals: along the spine behind the saddle and over the shoulders in front of it, leaning out.
-            for (int k = 0; k < 9; k++)
+            // Posed first and measured off the hide itself (2026-10-11 captures: set by the bear's rest pose and its back bone's place, the
+            // saddle came out at its mouth, a girth strap stood up off its back like a pole and the crystals were at its tail).
+            beastModel.Settle();
+            var hide = new HideSurface(beastModel.Renderers);
+            if (hide.Empty) return;
+            Vector3 up = body.up, ahead = body.forward, side = body.right, o = body.position;
+            float back = float.MaxValue, front = float.MinValue, left = float.MaxValue, right = float.MinValue;
+            foreach (var v in hide.Points) { var d = v - o; float f = Vector3.Dot(d, ahead), x = Vector3.Dot(d, side); back = Mathf.Min(back, f); front = Mathf.Max(front, f); left = Mathf.Min(left, x); right = Mathf.Max(right, x); }
+            float length = front - back, mid = (left + right) / 2;
+            Vector3 On(float along, float across) { return o + ahead * along + side * (mid + across); }
+            float TopAt(Vector3 at) { return hide.TopAt(at) ?? o.y + RockEaterHeight * .7f; }
+            // Carried by the nearest bone of its spine (not the head's or the neck's, which turn as it looks about), so all of it moves with
+            // the back as it walks and breathes.
+            var spine = new System.Collections.Generic.List<Transform>();
+            for (var bone = beastModel.Head != null ? beastModel.Head.parent : null; bone != null && bone != beastModel.Model; bone = bone.parent)
+                if (bone.name.IndexOf("Neck", System.StringComparison.OrdinalIgnoreCase) < 0) spine.Add(bone);
+            if (spine.Count == 0 && beastModel.Hips != null) spine.Add(beastModel.Hips);
+            Transform OnBack(Transform t, string what)
             {
-                float along = (k < 4 ? -.12f - k * .09f : .2f + (k - 4) * .07f) * length, lean = (k % 2 == 0 ? 1 : -1) * (14 + (k * 7) % 12);
-                var at = mid + ahead * along + side * ((k % 3) - 1) * .18f - up * .1f;
-                var c = Part(PrimitiveType.Cube, body, Vector3.zero, new Vector3(.14f, .5f + (k * 37 % 5) * .1f, .14f), crystal);
-                c.position = at; c.rotation = Quaternion.AngleAxis(lean, ahead) * Quaternion.AngleAxis(45, up) * body.rotation; OnBack(c);
+                t.name = what; Transform best = body; float near = float.MaxValue;
+                foreach (var bone in spine) { float d = (bone.position - t.position).sqrMagnitude; if (d < near) { near = d; best = bone; } }
+                t.SetParent(best, true); return t;
             }
-            // The saddle: a blanket over the back, the seat and its cantle, the girth round the belly.
-            var seatAt = mid + ahead * .04f * length;
-            var pad = Part(PrimitiveType.Cube, body, Vector3.zero, new Vector3(1.3f, .06f, 1.1f), blanket); pad.position = seatAt - up * .02f; pad.rotation = body.rotation; OnBack(pad);
-            var seat = Part(PrimitiveType.Cube, body, Vector3.zero, new Vector3(.7f, .16f, .8f), leather); seat.position = seatAt + up * .08f; seat.rotation = body.rotation; OnBack(seat);
-            var cantle = Part(PrimitiveType.Cube, body, Vector3.zero, new Vector3(.7f, .3f, .1f), leather); cantle.position = seatAt + up * .2f - ahead * .38f; cantle.rotation = body.rotation; OnBack(cantle);
-            foreach (int s in new[] { -1, 1 }) { var girth = Part(PrimitiveType.Cube, body, Vector3.zero, new Vector3(.08f, top - hide.min.y > 0 ? (top - hide.min.y) * .55f : 1, .14f), leather); girth.position = seatAt + side * s * .62f - up * (top - hide.min.y) * .25f; girth.rotation = body.rotation; OnBack(girth); }
-            RiderSeat = new GameObject("Rider seat").transform; RiderSeat.position = seatAt + up * .16f; RiderSeat.rotation = body.rotation; OnBack(RiderSeat);
+            var crystal = Mat(new Color(.62f, .4f, .95f), .9f, .2f); crystal.EnableKeyword("_EMISSION"); crystal.SetColor("_EmissionColor", new Color(.55f, .25f, 1) * 1.1f);
+            var leather = Mat(new Color(.3f, .19f, .11f), .1f, .3f); var blanket = Mat(new Color(.42f, .12f, .1f), .05f, .1f);
+            // The saddle a little behind the middle of the hide's length (the head and neck make the front quarter): behind the shoulders' hump.
+            float seatAlong = back + length * .46f; var seatAt = On(seatAlong, 0); seatAt.y = TopAt(seatAt);
+            // The ridge of crystal down the spine behind the saddle, biggest first and smaller toward the rump, leaning out a little either
+            // way, each sunk into the hide where it stands; and a few small shards out of the shoulders to the sides (none in front of the rider).
+            for (int k = 0; k < 7; k++)
+            {
+                float along = seatAlong - .8f - k * length * .045f, size = 1 - k * .1f; if (along < back + length * .1f) break;
+                var foot = On(along, k % 2 == 0 ? .08f : -.08f); foot.y = TopAt(foot) - .12f * size;
+                var c = Part(PrimitiveType.Cube, body, Vector3.zero, new Vector3(.16f * size, .75f * size, .16f * size), crystal);
+                var lean = Quaternion.AngleAxis((k % 2 == 0 ? -1 : 1) * (10 + k * 3), ahead) * Quaternion.AngleAxis(-12, side);
+                c.rotation = lean * Quaternion.AngleAxis(45, up) * body.rotation; c.position = foot + c.up * .375f * size; OnBack(c, "Geode crystal");
+            }
+            foreach (int s in new[] { -1, 1 })
+                for (int k = 0; k < 2; k++)
+                {
+                    var foot = On(seatAlong + .75f + k * .3f, s * (.32f + k * .1f)); foot.y = TopAt(foot) - .08f;
+                    var c = Part(PrimitiveType.Cube, body, Vector3.zero, new Vector3(.1f, .4f - k * .1f, .1f), crystal);
+                    c.rotation = Quaternion.AngleAxis(s * -35, ahead) * Quaternion.AngleAxis(30, up) * body.rotation; c.position = foot + c.up * (.2f - k * .05f); OnBack(c, "Geode crystal");
+                }
+            // The saddle: a blanket, the seat and its cantle.
+            var pad = Part(PrimitiveType.Cube, body, Vector3.zero, new Vector3(1.1f, .06f, 1.1f), blanket); pad.position = seatAt + up * .01f; pad.rotation = body.rotation; OnBack(pad, "Saddle blanket");
+            var seat = Part(PrimitiveType.Cube, body, Vector3.zero, new Vector3(.7f, .16f, .8f), leather); seat.position = seatAt + up * .1f; seat.rotation = body.rotation; OnBack(seat, "Saddle");
+            var cantle = Part(PrimitiveType.Cube, body, Vector3.zero, new Vector3(.7f, .3f, .1f), leather); cantle.position = seatAt + up * .22f - ahead * .38f; cantle.rotation = body.rotation; OnBack(cantle, "Cantle");
+            // The girth down each flank, strap by strap over the hide's own curve (each strap from one point on the hide to the next, found
+            // by a ray in from the side): from just under the blanket down to where the belly turns under.
+            float halfWidth = (right - left) / 2;
+            foreach (int s in new[] { -1, 1 })
+            {
+                Vector3? from = null;
+                for (float drop = .1f; drop < RockEaterHeight * .45f; drop += .22f)
+                {
+                    float level = seatAt.y - drop;
+                    var outside = On(seatAlong, s * (halfWidth + 2)); outside.y = level;
+                    var met = hide.Cast(outside, -side * s);
+                    if (!met.HasValue || (Vector3.Dot(met.Value - o, side) - mid) * s < .2f) break;   // under the belly, or between the legs
+                    var to = met.Value + side * s * .03f;
+                    if (from.HasValue)
+                    {
+                        var span = to - from.Value; if (span.sqrMagnitude < .0004f) continue;
+                        var strap = Part(PrimitiveType.Cube, body, Vector3.zero, new Vector3(.06f, span.magnitude + .04f, .14f), leather);
+                        strap.position = (from.Value + to) / 2; strap.rotation = Quaternion.LookRotation(ahead, span.normalized); OnBack(strap, "Girth");
+                    }
+                    from = to;
+                }
+            }
+            RiderSeat = new GameObject("Rider seat").transform; RiderSeat.position = seatAt + up * .18f; RiderSeat.rotation = body.rotation; RiderSeat.SetParent(seat.parent, true);
         }
         /// <summary>A modelled beast's frame: its pace from how far it went; dead, its death (the body EncounterEnemy tipped over
         /// set upright again); lying in wait, head down; standing, it grazes (deer) or looks about (wolves), or watches what it
@@ -217,6 +271,8 @@ namespace Crulanda.Encounter
             if (model != null) model.Act(held != null && held.Length > 0 && !gearStowed ? "swing" : (punchLeft = !punchLeft) ? "jab" : "cross");
         }
         bool punchLeft; int blow;
+        /// <summary>A thrust whatever the hands hold (the Ranger's spear work, the bow slung: the jab and the cross in turn).</summary>
+        public void Thrust() { if (model != null) model.Act((punchLeft = !punchLeft) ? "jab" : "cross"); else Strike(); }
         /// <summary>A spell let fly (an instant one, or a cast as it completes): the release over the walk.</summary>
         public void CastRelease() { if (BowReady) { Shoot(); return; } if (model != null) model.Act("castshot"); }   // a bow looses an arrow (and comes out to)
         /// <summary>A cast being drawn: the spell pose held over the walk.</summary>
@@ -230,5 +286,42 @@ namespace Crulanda.Encounter
         }
         /// <summary>Edit mode (captures, tests): a modelled beast posed <paramref name="time"/> seconds into one of its motions.</summary>
         public void BeastPreview(string slot, float time) { if (beastModel != null) beastModel.Sample(slot, time); }
+    }
+
+    /// <summary>A baked hide's surface to measure against (the Rock-Eater's saddle, RockEaterGear, and its test): rays on its own
+    /// triangles, as it stands now. (The vertices of a low-poly hide grown two and a half times lie too far apart to measure by: 2026-10-11.)</summary>
+    public sealed class HideSurface
+    {
+        public readonly Vector3[] Points; readonly int[] tris;
+        public HideSurface(System.Collections.Generic.IEnumerable<Renderer> renderers)
+        {
+            var pts = new System.Collections.Generic.List<Vector3>(); var tri = new System.Collections.Generic.List<int>();
+            foreach (var r in renderers)
+            {
+                if (!(r is SkinnedMeshRenderer sk) || sk.sharedMesh == null) continue;
+                var baked = new Mesh(); sk.BakeMesh(baked); var toWorld = sk.transform.localToWorldMatrix; int first = pts.Count;   // baked unscaled, then its whole transform
+                foreach (var v in baked.vertices) pts.Add(toWorld.MultiplyPoint3x4(v));
+                foreach (var i in baked.triangles) tri.Add(first + i);
+                if (Application.isPlaying) UnityEngine.Object.Destroy(baked); else UnityEngine.Object.DestroyImmediate(baked);
+            }
+            Points = pts.ToArray(); tris = tri.ToArray();
+        }
+        public bool Empty { get { return Points.Length == 0; } }
+        /// <summary>Where a ray first meets the hide (<paramref name="dir"/> of unit length), or null.</summary>
+        public Vector3? Cast(Vector3 from, Vector3 dir)
+        {
+            float best = float.MaxValue;
+            for (int i = 0; i + 2 < tris.Length; i += 3)
+            {
+                Vector3 a = Points[tris[i]], e1 = Points[tris[i + 1]] - a, e2 = Points[tris[i + 2]] - a, p = Vector3.Cross(dir, e2);
+                float det = Vector3.Dot(e1, p); if (det > -1e-8f && det < 1e-8f) continue;
+                float inv = 1 / det; Vector3 t = from - a; float u = Vector3.Dot(t, p) * inv; if (u < 0 || u > 1) continue;
+                Vector3 q = Vector3.Cross(t, e1); float v = Vector3.Dot(dir, q) * inv; if (v < 0 || u + v > 1) continue;
+                float d = Vector3.Dot(e2, q) * inv; if (d > 0 && d < best) best = d;
+            }
+            return best < float.MaxValue ? from + dir * best : (Vector3?)null;
+        }
+        /// <summary>The top of the hide over a point (straight down from well above it), or null off it.</summary>
+        public float? TopAt(Vector3 at) { var hit = Cast(new Vector3(at.x, at.y + 20, at.z), Vector3.down); return hit.HasValue ? hit.Value.y : (float?)null; }
     }
 }

@@ -75,6 +75,49 @@ namespace Crulanda.Tests
             Assert.Contains("sigil.amber", session.Progress.keys, "the Amber Sigil from Nix");
             Assert.IsTrue(session.Progress.elitesSlain.Any(k => k.EndsWith("." + nix.CampIndex) && k.Contains("nix")), "and the camp's deed");
         }
+        /// <summary>The saddle and the crystals measured on its hide (Chris's captures, 2026-10-11: the saddle at its mouth, a strap standing up
+        /// off its back like a pole, the crystals at its tail). After it has stood a while, its idle moving its back: the saddle in the middle
+        /// of its length on top of its back with Nix in it, every crystal's foot in its hide and the ridge behind the saddle, and the girth
+        /// lying down its flanks, none of it above the saddle.</summary>
+        [UnityTest] public IEnumerator Its_saddle_and_crystals_sit_on_its_back()
+        {
+            var beast = Find(EncounterSession.RockEaterName); var nix = Find(EncounterSession.NixName); var look = beast.GetComponent<ActorVisual>();
+            yield return new WaitForSeconds(2f);
+            var surface = new HideSurface(look.BeastModel.Renderers); var hide = surface.Points;
+            Assert.Greater(hide.Length, 100, "its hide measured");
+            var body = beast.transform.Find("Body"); Vector3 ahead = body.forward, o = body.position;
+            float back = hide.Min(v => Vector3.Dot(v - o, ahead)), front = hide.Max(v => Vector3.Dot(v - o, ahead));
+            float Frac(Vector3 p) { return (Vector3.Dot(p - o, ahead) - back) / (front - back); }
+            // Measured on the hide's surface (rays on its triangles; its vertices lie too far apart on a low-poly hide grown two and a half times).
+            float Top(Vector3 p) { return surface.TopAt(p) ?? float.NaN; }
+            float Gap(Vector3 p) { float top = Top(p); return float.IsNaN(top) ? 99 : Mathf.Abs(p.y - top); }   // how far over or into its back
+            Vector3 aside = body.right;
+            float Flank(Vector3 p)   // how far off its side, at its own height and place along it
+            {
+                float x = Vector3.Dot(p - o, aside), sign = Mathf.Sign(x);
+                var met = surface.Cast(p + aside * sign * 3, -aside * sign);
+                return met.HasValue ? Mathf.Abs(Vector3.Dot(met.Value - p, aside)) : 99;
+            }
+            var gear = body.GetComponentsInChildren<Transform>(true);
+            var saddle = gear.FirstOrDefault(t => t.name == "Saddle"); Assert.NotNull(saddle, "a saddle");
+            string at = " (saddle at " + Frac(saddle.position).ToString("0.00") + " of its length, " + saddle.position.y.ToString("0.00") + " m up, its back there " + Top(saddle.position).ToString("0.00") + ", on " + saddle.parent.name + ")";
+            Assert.That(Frac(saddle.position), Is.InRange(.3f, .65f), "the saddle in the middle of its length, not at its head" + at);
+            Assert.Less(Mathf.Abs(saddle.position.y - .1f - Top(saddle.position)), .3f, "on top of its back" + at);
+            Assert.Less(Vector3.Distance(nix.transform.position, look.RiderSeat.position + Vector3.up * EncounterEnemy.RiderLift), .3f, "Nix in it");
+            var crystals = gear.Where(t => t.name == "Geode crystal").ToList(); Assert.GreaterOrEqual(crystals.Count, 7, "a ridge of crystal");
+            foreach (var c in crystals)
+            {
+                var foot = c.position - c.up * c.lossyScale.y / 2;
+                Assert.Less(Gap(foot), .3f, "a crystal's foot on its back, not in the air: " + Gap(foot).ToString("0.00") + " m off at " + Frac(foot).ToString("0.00") + at);
+            }
+            Assert.GreaterOrEqual(crystals.Count(c => Frac(c.position) < Frac(saddle.position)), 5, "the ridge behind the saddle" + at);
+            var girth = gear.Where(t => t.name == "Girth").ToList(); Assert.GreaterOrEqual(girth.Count, 2, "a girth");
+            foreach (var g in girth)
+            {
+                Assert.Less(Flank(g.position), .25f, "the girth lies on its flank: " + Flank(g.position).ToString("0.00") + " m off" + at);
+                Assert.Less(g.position.y + g.lossyScale.y / 2 * Mathf.Abs(g.up.y), saddle.position.y + .15f, "and stands up above nothing" + at);
+            }
+        }
         [UnityTest] public IEnumerator Both_come_back_with_the_camp_and_Nix_is_inside_again()
         {
             var machine = Find(EncounterSession.RockEaterName); var nix = Find(EncounterSession.NixName);

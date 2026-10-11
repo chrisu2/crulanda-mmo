@@ -796,6 +796,42 @@ MonoBehaviour:
     globalCooldown: 1
     duration: 0
     statusId: 
+  - id: rogue.opening_cut
+    name: Opening Cut
+    description: "A quick cut that opens the target up: for 8 seconds the party's blows on it land 8% harder. A combo point."
+    effect: 4
+    power: 4
+    cost: 25
+    cooldown: 6
+    range: 3.2
+    castTime: 0
+    globalCooldown: 1
+    duration: 8
+    statusId:
+  - id: rogue.rallying_flourish
+    name: Rallying Flourish
+    description: "Spend the combo points on the target: for 10 seconds you swing and Mira casts 4% faster per point."
+    effect: 7
+    power: 4
+    cost: 20
+    cooldown: 30
+    range: 0
+    castTime: 0
+    globalCooldown: 1
+    duration: 10
+    statusId:
+  - id: rogue.tumble
+    name: Tumble
+    description: "Roll past the target to its back: your next blow within 4 seconds lands 30% harder, as from behind. Talent."
+    effect: 4
+    power: 30
+    cost: 15
+    cooldown: 15
+    range: 8
+    castTime: 0
+    globalCooldown: 1
+    duration: 4
+    statusId:
   - id: archivist.shard_note
     name: Shard Note
     description: "A 1.5-second cast at up to 25 metres: one sung note, sharp as a shard."
@@ -940,6 +976,42 @@ MonoBehaviour:
     globalCooldown: 1.5
     duration: 4
     statusId: 
+  - id: mage.kindle_hound
+    name: Kindle Hound
+    description: "Call an ember hound to your side, a fire spirit in a hound's shape that fights what you fight. Again: it sinks back into the embers."
+    effect: 4
+    power: 0
+    cost: 25
+    cooldown: 2
+    range: 0
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 0
+    statusId:
+  - id: mage.stoke
+    name: Stoke
+    description: "Pour all your Heat (20 at least) into the hound: its bites land 1% harder per point for 10 seconds."
+    effect: 4
+    power: 0
+    cost: 5
+    cooldown: 12
+    range: 0
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 10
+    statusId:
+  - id: mage.cinder_burst
+    name: Cinder Burst
+    description: "The hound flares: every enemy within 4 metres of it burns. It costs the hound 15% of its health. Talent."
+    effect: 0
+    power: 14
+    cost: 20
+    cooldown: 15
+    range: 0
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 0
+    statusId:
   - id: ranger.snare_trap
     name: Snare Trap
     description: "Set a trap at your feet for a minute: the first mob to step in is held 20 seconds. Damage breaks it."
@@ -952,6 +1024,42 @@ MonoBehaviour:
     globalCooldown: 1.5
     duration: 20
     statusId: 
+  - id: ranger.spear_lunge
+    name: Spear Lunge
+    description: "Bound up to 8 metres to the target and drive the short spear into it: 1.6 times your weapon's hit."
+    effect: 0
+    power: 6
+    cost: 20
+    cooldown: 10
+    range: 8
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 0
+    statusId:
+  - id: ranger.whirling_spear
+    name: Whirling Spear
+    description: "Swing the haft round: every enemy within 3.5 metres takes 0.9 times your weapon's hit."
+    effect: 0
+    power: 4
+    cost: 25
+    cooldown: 14
+    range: 3.5
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 0
+    statusId:
+  - id: ranger.feint
+    name: Feint
+    description: "A false thrust: the target's next blow at you within 3 seconds misses. Talent."
+    effect: 4
+    power: 0
+    cost: 10
+    cooldown: 12
+    range: 5
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 3
+    statusId:
   - id: ability.shield_bash
     name: Shield Bash
     description: "A blow with the shield's face: stops the target's blow and silences it 3 seconds."
@@ -1270,7 +1378,16 @@ MonoBehaviour:
         talentId: pf-pin
       - abilityId: ranger.snare_trap
         level: 6
-        talentId: 
+        talentId:
+      - abilityId: ranger.spear_lunge
+        level: 4
+        talentId:
+      - abilityId: ranger.whirling_spear
+        level: 8
+        talentId:
+      - abilityId: ranger.feint
+        level: 1
+        talentId: sk-feint
     talentTree: {fileID: 4900000, guid: 1505a72df549418f89ae19b5f1d96eda, type: 3}
   - definition:
       id: class.mage
@@ -1320,6 +1437,15 @@ MonoBehaviour:
       - abilityId: mage.ash_hex
         level: 6
         talentId: 
+      - abilityId: mage.kindle_hound
+        level: 2
+        talentId:
+      - abilityId: mage.stoke
+        level: 6
+        talentId:
+      - abilityId: mage.cinder_burst
+        level: 1
+        talentId: cw-cinder-burst
     talentTree: {fileID: 4900000, guid: 317285d9fd0e47d3845a82d3780fa675, type: 3}
   - definition:
       id: class.rogue
@@ -1359,7 +1485,16 @@ MonoBehaviour:
         talentId: 
       - abilityId: rogue.vanish
         level: 8
-        talentId: 
+        talentId:
+      - abilityId: rogue.opening_cut
+        level: 3
+        talentId:
+      - abilityId: rogue.rallying_flourish
+        level: 6
+        talentId:
+      - abilityId: rogue.tumble
+        level: 1
+        talentId: bk-tumble
     talentTree: {fileID: 4900000, guid: d42a25e91b3b4f919864d43a597a8380, type: 3}
   - definition:
       id: class.archivist

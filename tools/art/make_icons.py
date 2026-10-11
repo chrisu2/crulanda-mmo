@@ -2431,6 +2431,66 @@ SAMPLE = ['ability/ability-strike', 'ability/ability-challenge', 'ability/abilit
           'item/craft-bogiron_helm', 'item/craft-bogiron_hauberk', 'item/loot-oak-due_boots', 'item/loot-oak-whitefoot_fang', 'item/loot-kha-mourners_iron_band', 'quest/item-bureau_ledger',
           'quest/item-brood_heart', 'talent/tk-timed-guard', 'talent/rm-slow-sap', 'trade/mining', 'gear/sword-short__oakhaven', 'gear/sword-short__veridian', 'slot/head']
 
+# ---- ranger, the Skirmisher (2026-10-11, TALENT_DEPTH.md): the short spear's lunge, its whirl and the feint ----
+def m_spear(c, rot, dx=0, dy=0, alpha=1.0):
+    c.push(rot=rot, sc=1.0, dx=dx, dy=dy)
+    c.part(c.rect(47.5, 28, 52.5, 96, 2), '#7a5434', 'matte', alpha=alpha)   # the ash haft
+    c.part(c.rect(46, 30, 54, 36, 1.5), '#3a2a1e', 'matte', alpha=alpha)   # its binding
+    head = [(43, 32), (50, 6), (57, 32), (50, 28)]
+    if alpha >= 1: _blade(c, head, col(lite(IRONC, .3)), y0=10, y1=28)
+    else: c.part(c.poly(head), lite(IRONC, .3), 'metal', alpha=alpha)
+    c.pop()
+def a_spear_lunge(c):
+    c.back(c.ell(56, 44, 36), '#e0c080', .4, 10)
+    for y in (40, 56, 72): c.glow(c.taper([(8, y + 14), (34, y)], .5, 4, smooth=False), '#f0e0b0', halo=5, power=.5)
+    m_spear(c, 45, dx=6, dy=-4); c.spark(80, 20, 9, '#ffffff', .9)
+def a_whirling_spear(c):
+    rings(c, 50, 50, (42, 34), '#f0c890', .6, a0=30, a1=320, w=3.5)
+    m_spear(c, 90); slash(c, [(14, 70), (50, 86), (86, 66)], 4, '#e8b060')
+def a_feint(c):
+    c.back(c.ell(50, 50, 38), '#9fc8ff', .35, 10)
+    m_spear(c, 20, dx=-12, alpha=.35); m_spear(c, 60, dx=8, dy=4); c.spark(26, 26, 8, '#d0e8ff', .8)
+ABILITIES.update({'ranger.spear_lunge': ('#3a2e1e', a_spear_lunge), 'ranger.whirling_spear': ('#3a2a1a', a_whirling_spear), 'ranger.feint': ('#22283a', a_feint)})
+BRANCH.update({'skirmisher': ('#33281c', ['#e0c080', '#f0e0b0', '#9fc8ff', '#d83a2a', '#8a9098'])})
+
+# ---- rogue, the Swashbuckler (2026-10-11, TALENT_DEPTH.md): the opening cut, the flourish, the tumble ----
+def a_opening_cut(c):
+    c.back(c.ell(50, 50, 38), '#ffb050', .4, 10)
+    c.push(rot=40, sc=.95); _blade(c, [(45, 70), (45, 22), (50, 8), (55, 22), (55, 70)], col(lite(IRONC, .35)), y0=12)
+    c.part(c.rect(36, 68, 64, 73, 2), GOLD, 'metal'); c.part(c.rect(46, 73, 54, 90, 2), '#5a3a26', 'matte'); c.pop()
+    slash(c, [(14, 30), (52, 54), (86, 82)], 5, '#ff9040')
+def a_rallying_flourish(c):
+    rings(c, 50, 50, (40,), '#ffd070', .6, a0=200, a1=340, w=3)
+    c.push(rot=-20, sc=.9); _blade(c, [(46, 74), (46, 18), (50, 6), (54, 18), (54, 74)], col(lite(IRONC, .4)), y0=10)
+    c.part(c.rect(34, 72, 66, 77, 2), GOLD, 'metal'); c.part(c.rect(46, 77, 54, 94, 2), '#5a3a26', 'matte'); c.pop()
+    for x, y, r in ((22, 30, 8), (78, 26, 7), (82, 70, 6), (20, 72, 6)): c.spark(x, y, r, '#fff2b0', .8)
+def a_tumble(c):
+    c.back(c.ell(50, 50, 38), '#9fc8ff', .35, 10)
+    rings(c, 50, 54, (30,), '#d8e8ff', .7, a0=40, a1=330, w=5)
+    c.part(c.ell(50, 54, 10), '#3a3040', 'matte'); c.part(c.poly([(70, 20), (84, 30), (72, 38)]), '#d8e8ff', 'soft', ink=False)
+ABILITIES.update({'rogue.opening_cut': ('#3a2418', a_opening_cut), 'rogue.rallying_flourish': ('#3a3018', a_rallying_flourish), 'rogue.tumble': ('#22283a', a_tumble)})
+BRANCH.update({'swashbuckler': ('#3a2a1e', ['#ffb050', '#ffd070', '#9fc8ff', '#e0b040', '#d83a2a'])})
+
+# ---- mage, the Cinderwright (2026-10-11, TALENT_DEPTH.md): the ember hound, stoking it, its burst ----
+def m_hound_head(c, x, y, s, fur, glow):
+    head = c.poly([(x - 14 * s, y - 2 * s), (x - 8 * s, y - 16 * s), (x - 2 * s, y - 8 * s), (x + 6 * s, y - 16 * s), (x + 10 * s, y - 4 * s),
+                   (x + 20 * s, y + 4 * s), (x + 8 * s, y + 12 * s), (x - 10 * s, y + 10 * s)], smooth=True, n=3)
+    c.part(head, fur, 'matte'); c.glow(c.ell(x + 3 * s, y - 2 * s, 2.6 * s), glow, halo=5, power=.9)
+def a_kindle_hound(c):
+    c.back(c.ell(50, 56, 38), '#ff7a2a', .5, 12)
+    m_hound_head(c, 46, 50, 1.6, '#2a120a', '#ffd070')
+    for x, y, r in ((26, 78, 7), (70, 80, 6), (52, 84, 5)): c.spark(x, y, r, '#ffb040', .8)
+def a_stoke(c):
+    c.back(c.ell(50, 50, 36), '#ff9a3a', .5, 10)
+    c.glow(c.poly([(50, 14), (64, 44), (58, 42), (66, 70), (50, 86), (34, 70), (42, 42), (36, 44)], smooth=True, n=3), '#ff7a2a', core='#fff2c0', halo=10, power=.9)
+    c.part(c.rect(30, 84, 70, 90, 2), '#3a2418', 'matte')
+def a_cinder_burst(c):
+    rings(c, 50, 54, (40, 30), '#ff7a2a', .7, w=4)
+    m_hound_head(c, 46, 54, 1.1, '#2a120a', '#ffd070')
+    for x, y in ((18, 22), (82, 24), (16, 80), (84, 82), (50, 12)): c.spark(x, y, 7, '#ffd070', .8)
+ABILITIES.update({'mage.kindle_hound': ('#3a1e10', a_kindle_hound), 'mage.stoke': ('#40200e', a_stoke), 'mage.cinder_burst': ('#3a1a0e', a_cinder_burst)})
+BRANCH.update({'cinderwright': ('#3a1e10', ['#ff7a2a', '#ffd070', '#ffb040', '#e0503a', '#fff2c0'])})
+
 def main():
     here = os.path.dirname(os.path.abspath(__file__))
     ap = argparse.ArgumentParser(description='Paints the Crulanda HUD icons (items, quest items, abilities, talents, trades).')

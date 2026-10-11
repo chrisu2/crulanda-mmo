@@ -55,31 +55,34 @@ namespace Crulanda.Encounter
         public PaladinKit Paladin { get { return Kit as PaladinKit; } }
         public RangerKit Ranger { get { return Kit as RangerKit; } }
         public MageKit Mage { get { return Kit as MageKit; } }
-        /// <summary>The Ranger's wolf (RangerPet), while one is called.</summary>
         /// <summary>/invis (a tester's switch, Chris 2026-10-08): mobs do not notice you; hit one and it fights as ever.</summary>
         public static bool Unseen;
+        /// <summary>The pet at heel (RangerPet): the Ranger's wolf or the Mage's ember hound, while one is called.</summary>
         public RangerPet Pet { get; private set; }
         /// <summary>The companion bar's orders (playtest note 93): attack your target, assist (follow and join your fights), stay.</summary>
         public bool PetAttack()
         {
             if (Pet == null || !Pet.actor.IsAlive) return false;
-            if (Target == null || !Target.actor.IsAlive || Target.Game) { Message("Your wolf needs a target: select one first."); return false; }
+            if (Target == null || !Target.actor.IsAlive || Target.Game) { Message("Your " + Pet.Kind + " needs a target: select one first."); return false; }
             Pet.Hunt(Target, 1); return true;
         }
         public void PetOrder(RangerPet.Order o)
         {
             if (Pet == null) return; Pet.Command(o);
-            Message(o == RangerPet.Order.Stay ? "Your wolf stays where it is." : "Your wolf follows you and joins your fights.");
+            Message(o == RangerPet.Order.Stay ? "Your " + Pet.Kind + " stays where it is." : "Your " + Pet.Kind + " follows you and joins your fights.");
         }
         /// <summary>Whistles up the Ranger's wolf beside the player (the old one, if any, let go first).</summary>
-        public RangerPet SummonWolf(RangerKit kit)
+        public RangerPet SummonWolf(IPetMaster kit) { return SummonPet(kit, "Your wolf", "wolf"); }
+        /// <summary>Calls a pet on the wolf's body beside the player (the old one, if any, let go first): the Ranger's wolf, or the Mage's
+        /// ember hound (named "Ember hound", which ActorVisual dresses in embers).</summary>
+        public RangerPet SummonPet(IPetMaster kit, string name, string kind)
         {
             DismissPet();
             var point = Player.transform.position - Player.transform.forward * 1.5f + Player.transform.right * 1.2f;
             if (NavMesh.SamplePosition(point, out var hit, 8, NavMesh.AllAreas)) point = hit.position + Vector3.up;
-            var wolf = SpawnActor("Your wolf", content.player, point, new Color(.45f, .44f, .42f), "pet." + Progress.playerId, ActorLook.Wolf, Progress.Level);
+            var wolf = SpawnActor(name, content.player, point, new Color(.45f, .44f, .42f), "pet." + Progress.playerId, ActorLook.Wolf, Progress.Level);
             AddAgent(wolf.gameObject, 5.5f, .5f);
-            var pet = wolf.gameObject.AddComponent<RangerPet>(); wolf.gameObject.SetActive(true); pet.Init(wolf, this, kit);
+            var pet = wolf.gameObject.AddComponent<RangerPet>(); pet.Kind = kind; wolf.gameObject.SetActive(true); pet.Init(wolf, this, kit);
             Pet = pet; return pet;
         }
         public void DismissPet()
@@ -1181,7 +1184,7 @@ namespace Crulanda.Encounter
         /// <summary>A cast in progress, or work (gathering) on the same bar.</summary>
         public bool PlayerCasting { get { return abilities.IsCasting || Working; } }
         /// <summary>The player's figure (blows, flinches and casts on it: playtest note 25).</summary>
-        ActorVisual PlayerFigure { get { if (playerFigure == null && Player != null) playerFigure = Player.GetComponent<ActorVisual>(); return playerFigure; } }
+        public ActorVisual PlayerFigure { get { if (playerFigure == null && Player != null) playerFigure = Player.GetComponent<ActorVisual>(); return playerFigure; } }
         ActorVisual playerFigure; bool castPosed;
         /// <summary>A cast being drawn holds the spell pose; when it ends standing (not moved off it), the spell is let fly.</summary>
         void TickCastPose()
@@ -1204,7 +1207,7 @@ namespace Crulanda.Encounter
             }, effect);
             if (result == AbilityStartResult.InsufficientResource) Message("Not enough " + ClassDef.resource + ".");
             // An instant blow or spell on a target shows (playtest note 25): a swing in melee, a release at range. Casts are TickCastPose's.
-            if (result == AbilityStartResult.Started && a.castTime <= 0 && Target != null && Target.actor.IsAlive)
+            if (result == AbilityStartResult.Started && a.castTime <= 0 && Target != null && Target.actor.IsAlive && !Kit.OwnBlow(a))
             { if (Kit.MeleeAutoAttacks || a.range <= 5 || (Distance(Target) < 3.5f && !Kit.RangedAutoAttacks)) PlayerFigure?.Strike(); else PlayerFigure?.CastRelease(); }   // a bow's shot is loosed at any range
             return result;
         }

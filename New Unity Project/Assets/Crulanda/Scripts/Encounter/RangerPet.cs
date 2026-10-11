@@ -5,6 +5,17 @@ using Crulanda.Combat;
 
 namespace Crulanda.Encounter
 {
+    /// <summary>Whoever keeps a pet (the Ranger's wolf; the Mage's ember hound, the Cinderwright's, 2026-10-11): how hardy and how fierce
+    /// their talents make it, and what its bites do for them.</summary>
+    public interface IPetMaster
+    {
+        float PetHealthScale { get; }
+        float PetBiteScale { get; }
+        /// <summary>Its bites hold attention like a tank's blows (the wolf's Howl).</summary>
+        bool PetHolds { get; }
+        void OnPetBite(EncounterEnemy target, int bite);
+    }
+
     /// <summary>
     /// The Ranger's wolf (Phase 5.1b): a grey wolf on the pack's model (ActorLook.Wolf) that keeps to heel like Mira does, hunts
     /// joins whatever the Ranger fights (note 90), goes where the Ranger sets it (Sic; with Pack Sense whatever the Ranger shoots, the first bite harder), bites every two seconds with threat of its
@@ -16,7 +27,9 @@ namespace Crulanda.Encounter
     {
         public Actor actor;
         public EncounterSession session;
-        public RangerKit kit;
+        public IPetMaster kit;
+        /// <summary>What it is called in what you are told ("wolf", "hound").</summary>
+        public string Kind = "wolf";
         NavMeshAgent agent; ActorVisual visual;
         float nextBite, nextCatchUp, fury = 1; int baseHealth;
         /// <summary>What it is hunting (null at heel).</summary>
@@ -29,7 +42,7 @@ namespace Crulanda.Encounter
         public void Command(Order o) { Mode = o; if (o == Order.Stay) { stayAt = transform.position; Quarry = null; fury = 1; } }
         public const float BiteInterval = 2, BiteReach = 2.2f;
 
-        public void Init(Actor a, EncounterSession s, RangerKit k)
+        public void Init(Actor a, EncounterSession s, IPetMaster k)
         {
             actor = a; session = s; kit = k; agent = GetComponent<NavMeshAgent>(); visual = GetComponent<ActorVisual>();
             baseHealth = 90 + 18 * Mathf.Max(1, session.Progress.Level);
@@ -39,10 +52,10 @@ namespace Crulanda.Encounter
         public void Refit()
         {
             if (actor == null || kit == null) return;
-            int max = Mathf.RoundToInt(baseHealth * kit.WolfHealthScale);
+            int max = Mathf.RoundToInt(baseHealth * kit.PetHealthScale);
             actor.Stats.SetBase(Crulanda.Core.StatType.MaxHealth, max);
         }
-        public int Bite { get { return Mathf.Max(1, Mathf.RoundToInt((6 + 2 * Mathf.Max(1, session.Progress.Level)) * kit.WolfBiteScale)); } }
+        public int Bite { get { return Mathf.Max(1, Mathf.RoundToInt((6 + 2 * Mathf.Max(1, session.Progress.Level)) * kit.PetBiteScale)); } }
         /// <summary>Sent at a target; its first bite lands <paramref name="firstBite"/> times as hard (Sic).</summary>
         public void Hunt(EncounterEnemy target, float firstBite)
         {
@@ -98,7 +111,8 @@ namespace Crulanda.Encounter
                         nextBite = Time.time + BiteInterval;
                         int bite = Mathf.RoundToInt(Bite * fury); fury = 1;
                         Quarry.Receive(bite, actor);
-                        if (kit.WolfHowls) Quarry.threat.Add(actor.EntityId.Value, bite);   // Howl: its bites hold attention like a tank's
+                        if (kit.PetHolds) Quarry.threat.Add(actor.EntityId.Value, bite);   // Howl: its bites hold attention like a tank's
+                        kit.OnPetBite(Quarry, bite);
                         visual?.Strike();
                     }
                 }

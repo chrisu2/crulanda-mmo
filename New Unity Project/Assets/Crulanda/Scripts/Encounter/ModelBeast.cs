@@ -414,6 +414,14 @@ namespace Crulanda.Encounter
             return (h & 0xffff) / 65536f;
         }
         public void StopMotion() { if (graph.IsValid()) graph.Destroy(); }
+        /// <summary>Sets its bones as its motion first stands them (one evaluation, seen or not), so what is fixed to them is placed on the
+        /// pose it will have and not on the file's rest pose (the Rock-Eater's saddle: RockEaterGear).</summary>
+        public void Settle()
+        {
+            if (!graph.IsValid() || Animator == null) return;
+            var cull = Animator.cullingMode; Animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+            graph.Evaluate(0); Animator.cullingMode = cull;
+        }
         public bool Moving { get { return graph.IsValid(); } }
         public bool Has(string slot) { return proc ? procLengths.ContainsKey(slot) : slotOf.ContainsKey(slot); }
         /// <summary>Dead: its death played and its last frame held (<see cref="Die"/>) until <see cref="Revive"/>.</summary>

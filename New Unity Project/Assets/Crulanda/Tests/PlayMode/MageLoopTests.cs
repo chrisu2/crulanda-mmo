@@ -43,13 +43,51 @@ namespace Crulanda.Tests
         void Level10() { session.Progress.experience = EncounterProgress.XpForLevel(10); session.Player.SetLevel(10); }
         EncounterEnemy Foe() { var e = session.Enemies.Find(x => x != null && x.actor.IsAlive); Assert.NotNull(e, "A living enemy."); return e; }
         void Near(EncounterEnemy e, float distance) { session.Player.GetComponent<AdventurerMotor>().Teleport(e.transform.position + Vector3.back * distance); session.Select(e); }
-        const int EmberBolt = 0, Scorch = 1, Flare = 2, CinderField = 3, Smoulder = 4, EmberWard = 5, Bind = 6, Unbind = 7, Quench = 8;
+        const int EmberBolt = 0, Scorch = 1, Flare = 2, CinderField = 3, Smoulder = 4, EmberWard = 5, Bind = 6, Unbind = 7, Quench = 8, KindleHound = 10, Stoke = 11, CinderBurst = 12;
+
+        /// <summary>The Cinderwright (TALENT_DEPTH.md, 2026-10-11): Kindle Hound calls an ember hound (the wolf's body dressed in embers, a
+        /// party member like the Ranger's wolf) that joins the Mage's fight; Stoke pours the Heat into its bites (refused under 20 Heat);
+        /// Cinder Burst flares it, burning every foe close by and costing the hound 15% of its health; Kindle again sends it back.</summary>
+        [UnityTest] public IEnumerator The_ember_hound_is_kindled_stoked_and_bursts()
+        {
+            session.Progress.experience = EncounterProgress.XpForLevel(15); session.Player.SetLevel(15); session.Player.Resource.Pool.SetCurrent(session.Player.Resource.Pool.Max);
+            Assert.AreEqual("mage.kindle_hound", session.Kit.ActionAt(KindleHound).id); Assert.AreEqual("Talent", session.Kit.ActionLockLabel(CinderBurst));
+            foreach (var id in new[] { "cw-banked-coals", "cw-banked-coals", "cw-banked-coals", "cw-hot-jaws", "cw-hot-jaws", "cw-hot-jaws", "cw-kinship", "cw-kinship", "cw-kinship",
+                "cw-long-stoke", "cw-long-stoke", "cw-cinder-burst", "cw-shared-heat", "cw-shared-heat", "cw-shared-heat", "cw-white-coals" })
+            { Assert.IsTrue(session.Talents.Propose(session.Progress, id, 1, out var next, out var why), id + ": " + why); session.Progress.talents = next; }
+            session.Kit.ApplyStats(); Assert.IsNull(session.Kit.ActionLockLabel(CinderBurst), "Cinder Burst learnt");
+            Assert.IsNull(session.Pet);
+            Assert.IsTrue(session.UseAbility(KindleHound), "Kindle Hound"); var hound = session.Pet;
+            Assert.NotNull(hound, "an ember hound"); Assert.AreEqual("hound", hound.Kind); Assert.AreEqual("Ember hound", hound.actor.DisplayName);
+            Assert.AreSame(hound.actor, session.PartyActor(hound.actor.EntityId.Value), "a party member the enemies can turn on");
+            Assert.AreEqual(1.24f, Mage.PetHealthScale, 1e-3f, "Banked Coals: 8% more health a rank");
+            StringAssert.Contains("Hound", session.Kit.StatusLine);
+            // Stoke: refused without Heat; with 50 it is spent on the hound's bites.
+            yield return new WaitForSeconds(1.6f);
+            Assert.IsFalse(session.UseAbility(Stoke), "no Heat, no Stoke");
+            Mage.GainHeat(50); Assert.AreEqual(50, Mage.Heat);
+            Assert.IsTrue(session.UseAbility(Stoke), "Stoke"); Assert.AreEqual(0, Mage.Heat, "all the Heat spent"); Assert.IsTrue(Mage.Stoked);
+            Assert.AreEqual(1.3f * 1.5f, Mage.PetBiteScale, 1e-3f, "Hot Jaws 30%, and 50 Heat stoked: half again");
+            // It joins the fight; Cinder Burst burns what is near it.
+            var e = Foe(); Near(e, 10);
+            hound.GetComponent<UnityEngine.AI.NavMeshAgent>().Warp(e.transform.position + Vector3.right * 1.5f); yield return null;
+            int before = e.actor.Health.Pool.Current, houndBefore = hound.actor.Health.Pool.Current;
+            yield return new WaitForSeconds(1.6f);
+            before = e.actor.Health.Pool.Current; houndBefore = hound.actor.Health.Pool.Current;
+            hound.GetComponent<UnityEngine.AI.NavMeshAgent>().Warp(e.transform.position + Vector3.right * 1.5f);
+            Assert.IsTrue(session.UseAbility(CinderBurst), "Cinder Burst");
+            Assert.Less(e.actor.Health.Pool.Current, before, "the foe beside the hound burns");
+            Assert.Less(hound.actor.Health.Pool.Current, houndBefore, "and the burst costs the hound");
+            // Kindle again: it sinks back into the embers.
+            yield return new WaitForSeconds(1.6f);
+            Assert.IsTrue(session.UseAbility(KindleHound), "Kindle again"); Assert.IsNull(session.Pet, "gone back into the embers");
+        }
 
         [UnityTest] public IEnumerator Mage_is_a_separate_character_with_a_staff()
         {
             Assert.AreEqual("class.mage", session.ClassDef.id); Assert.AreEqual("class.mage", session.Progress.classId);
             Assert.AreEqual(Crulanda.Core.ResourceKind.Mana, session.ClassDef.resource);
-            Assert.AreEqual(10, session.Kit.ActionCount); Assert.AreEqual("mage.quench", session.Kit.ActionAt(Quench).id);
+            Assert.AreEqual(13, session.Kit.ActionCount, "ten, and the Cinderwright's three"); Assert.AreEqual("mage.quench", session.Kit.ActionAt(Quench).id);
             Assert.AreEqual("Talent", session.Kit.ActionLockLabel(Quench)); Assert.AreEqual("Level 2", session.Kit.ActionLockLabel(Flare));
             Level10();
             Assert.AreEqual("Heat 30", session.Kit.ActionLockLabel(Flare), "Flare waits on Heat."); Assert.AreEqual("No Charge", session.Kit.ActionLockLabel(Unbind));

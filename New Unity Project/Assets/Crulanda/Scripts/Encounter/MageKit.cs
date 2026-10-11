@@ -14,16 +14,19 @@ namespace Crulanda.Encounter
     /// emptied and four seconds in which no Heat builds. Cinder Field burns the ground under the target, Smoulder slows, Ember
     /// Ward is a barrier. Bind makes the next Ember Bolt weaker and banks a Charge; Unbind spends it so the whole party hits
     /// harder for a while. Bar: 1 Ember Bolt, 2 Scorch, 3 Flare, 4 Cinder Field, 5 Smoulder, 6 Ember Ward, 7 Bind, 8 Unbind,
-    /// 9 Quench (talent). Base abilities and rows 0-2 of Talents/mage.json. Nothing here is saved.
+    /// 9 Quench (talent), 0 Ash Hex; the Cinderwright's - Kindle Hound, = Stoke, [ Cinder Burst (talent). Base abilities, rows 0-2 of
+    /// Talents/mage.json and the Cinderwright's rows 0-3. Nothing here is saved.
     /// </summary>
-    public sealed class MageKit : ClassKit
+    public sealed class MageKit : ClassKit, IPetMaster
     {
         public static readonly string[] ImplementedIds = {
             "cb-kindling", "cb-hot-hands", "cb-stoked", "cb-flashpoint", "cb-backdraft", "cb-inferno", "cb-white-heat",
             "hw-cinders", "hw-slow-burn", "hw-wide-field", "hw-embers-underfoot", "hw-heat-haze", "hw-long-burn", "hw-firestorm",
-            "sb-reservoir", "sb-ward-weave", "sb-quench", "sb-shared-flame", "sb-steady-mind", "sb-quickening", "sb-binding-oath"
+            "sb-reservoir", "sb-ward-weave", "sb-quench", "sb-shared-flame", "sb-steady-mind", "sb-quickening", "sb-binding-oath",
+            "cw-banked-coals", "cw-hot-jaws", "cw-kinship", "cw-long-stoke", "cw-cinder-burst", "cw-shared-heat", "cw-white-coals", "cw-wide-burst"   // the Cinderwright, rows 0-3
         };
-        public static readonly string[] BarIds = { "mage.ember_bolt", "mage.scorch", "mage.flare", "mage.cinder_field", "mage.smoulder", "mage.ember_ward", "mage.bind", "mage.unbind", "mage.quench", "mage.ash_hex" };
+        public static readonly string[] BarIds = { "mage.ember_bolt", "mage.scorch", "mage.flare", "mage.cinder_field", "mage.smoulder", "mage.ember_ward", "mage.bind", "mage.unbind", "mage.quench", "mage.ash_hex",
+            "mage.kindle_hound", "mage.stoke", "mage.cinder_burst" };
         public const int MaxHeat = 100, FlareMinHeat = 30, EmberHeat = 15, ScorchHeat = 10, SmoulderHeat = 5;
         public const float OverloadBurn = .08f, OverloadSeconds = 4, HeatKept = 10, BoundLoss = .4f, UnbindBonus = .15f;
 
@@ -111,6 +114,9 @@ namespace Crulanda.Encounter
                 case "mage.unbind": return Unbind(a);
                 case "mage.quench": return Quench(a);
                 case "mage.ash_hex": return AshHex(a);
+                case "mage.kindle_hound": return KindleHound(a);   // the Cinderwright
+                case "mage.stoke": return Stoke(a);
+                case "mage.cinder_burst": return CinderBurst(a);
             }
             return false;
         }
@@ -143,7 +149,7 @@ namespace Crulanda.Encounter
                 s.Bolt(t, new Color(1, .55f, .15f), .2f);
                 float d = (a.power + 2 * Level) * (1 + .03f * R("cb-kindling"));
                 if (bound) { d *= 1 - Mathf.Max(.1f, BoundLoss - .1f * R("sb-steady-mind")); Binding = false; Charges = 1; s.Message("Bound: a Charge is banked for Unbind."); }
-                Hit(t, Dmg(d)); GainHeat(EmberHeat);
+                Hit(t, Dmg(d)); GainHeat(EmberHeat); MendHound();
             });
         }
         bool Scorch(AbilityDefinition a)
@@ -256,12 +262,65 @@ namespace Crulanda.Encounter
         public override float PartyDamageMultiplier(EncounterEnemy enemy) { return Unbound ? 1 + Bonus : 1; }
         public override float CompanionHaste { get { return Unbound ? .1f * R("sb-quickening") : 0; } }
 
+        // ---------- the Cinderwright (pets; 2026-10-11, TALENT_DEPTH.md; GAME-ONLY; no machines: the "forge-golem" of the first plan
+        // is gone, Chris, 2026-10-11) ----------
+        // An ember hound at heel, a fire spirit in a hound's shape (the wolf's body, RangerPet, dressed in embers): Kindle Hound calls it,
+        // Stoke pours the Mage's Heat into its bites (Heat spent on the hound is Heat that cannot Overload you), Cinder Burst flares it.
+        public const int StokeMinHeat = 20;
+        public const float StokePerHeat = .01f, BurstReach = 4, BurstCost = .15f, WhiteCoalsHeat = 60, WhiteCoalsCut = .3f;
+        float stokeUntil, stoke, whiteCoalsUntil;
+        /// <summary>The ember hound at heel (null until kindled, or once it has gone out).</summary>
+        public RangerPet Hound { get { return s.Pet; } }
+        bool HoundUp { get { return Hound != null && Hound.actor != null && Hound.actor.IsAlive; } }
+        public bool Stoked { get { return Now < stokeUntil; } }
+        public float StokeBonus { get { return Stoked ? stoke : 0; } }
+        public float PetHealthScale { get { return 1 + .08f * R("cw-banked-coals"); } }
+        public float PetBiteScale { get { return (1 + .1f * R("cw-hot-jaws")) * (1 + StokeBonus); } }
+        public bool PetHolds { get { return false; } }
+        /// <summary>Shared Heat: each of its bites builds your Heat.</summary>
+        public void OnPetBite(EncounterEnemy target, int bite) { if (R("cw-shared-heat") > 0) GainHeat(R("cw-shared-heat")); }
+        /// <summary>Kinship: an Ember Bolt that lands mends the hound.</summary>
+        void MendHound() { int k = R("cw-kinship"); if (k > 0 && HoundUp) Hound.actor.GetComponent<Combatant>().Heal(Mathf.RoundToInt(Hound.actor.Health.Pool.Max * .02f * k)); }
+        /// <summary>Kindle Hound: the ember hound at your side; again, it sinks back into the embers.</summary>
+        bool KindleHound(AbilityDefinition a)
+        {
+            if (HoundUp) return Start(With(a, 0, 0), () => { s.DismissPet(); s.Message("Your hound sinks back into the embers."); });
+            return Start(a, () => { s.SummonPet(this, "Ember hound", "hound"); s.Message("An ember hound kindles at your side."); });
+        }
+        /// <summary>Stoke: all your Heat (20 at least) poured into the hound: its bites 1% harder per point for 10 s (Long Stoke: longer);
+        /// White Coals: stoked from 60, it takes 30% less for that while.</summary>
+        bool Stoke(AbilityDefinition a)
+        {
+            if (!Need(HoundUp, "No hound: Kindle Hound first.") || !Need(Heat >= StokeMinHeat, "Stoke needs " + StokeMinHeat + " Heat.")) return false;
+            return Start(a, () => {
+                int spent = Heat; Heat = 0; stoke = spent * StokePerHeat; stokeUntil = Now + a.duration + 3 * R("cw-long-stoke");
+                whiteCoalsUntil = R("cw-white-coals") > 0 && spent >= WhiteCoalsHeat ? stokeUntil : 0;
+                s.FloatText(Hound.transform.position, "Stoked", new Color(1, .55f, .15f));
+                s.Message("Stoke: " + spent + " Heat into your hound; its bites " + Mathf.RoundToInt(stoke * 100) + "% harder for " + (stokeUntil - Now).ToString("0") + " seconds.");
+            });
+        }
+        /// <summary>Cinder Burst (a talent): the hound flares, every foe within 4 m of it (Wide Burst: further) burning; it costs the hound
+        /// 15% of its health.</summary>
+        bool CinderBurst(AbilityDefinition a)
+        {
+            if (!Need(HoundUp, "No hound: Kindle Hound first.")) return false;
+            return Start(a, () => {
+                if (!HoundUp) return;
+                var at = Hound.transform.position; float reach = BurstReach + R("cw-wide-burst"); int dealt = Dmg(a.power + 3 * Level), n = 0;
+                foreach (var e in s.Enemies.ToArray())
+                    if (e != null && e.actor.IsAlive && !e.Game && !e.Hidden && (e.transform.position - at).sqrMagnitude <= reach * reach) { Hit(e, dealt); n++; }
+                Hound.actor.GetComponent<Combatant>().Damage(Mathf.Max(1, Mathf.RoundToInt(Hound.actor.Health.Pool.Max * BurstCost)));
+                s.FloatText(at, "Cinder Burst", new Color(1, .5f, .12f));
+            });
+        }
+
         // ---------- incoming blows ----------
         public override int ResolveEnemyHit(EncounterEnemy enemy, Actor victim, int raw)
         {
             if (victim == null || !victim.IsAlive) return 0;
             int haze = R("hw-heat-haze");
             float mult = haze > 0 && InField(enemy) ? 1 - .04f * haze : 1;
+            if (HoundUp && victim == Hound.actor && Now < whiteCoalsUntil) mult *= 1 - WhiteCoalsCut;   // White Coals
             return victim.GetComponent<Combatant>().Damage(Mathf.RoundToInt(raw * mult));
         }
 
@@ -274,13 +333,14 @@ namespace Crulanda.Encounter
         public override void ResetState()
         {
             resetting = true; periodic.Clear(); resetting = false;
-            Heat = Charges = 0; Binding = backdraft = false; heatKeptUntil = overloadedUntil = fieldUntil = unboundUntil = 0;
+            Heat = Charges = 0; Binding = backdraft = false; heatKeptUntil = overloadedUntil = fieldUntil = unboundUntil = 0; stokeUntil = whiteCoalsUntil = 0;
         }
         public override void ClearTransient()
         {
             resetting = true; periodic.Clear(); resetting = false;
-            fieldUntil = unboundUntil = 0; backdraft = false;
+            fieldUntil = unboundUntil = 0; backdraft = false; stokeUntil = whiteCoalsUntil = 0;
             if (s.Player != null) PlayerCombat.ClearBarrier();
+            if (Hound != null) Hound.Refit();
         }
 
         // ---------- HUD ----------
@@ -292,6 +352,7 @@ namespace Crulanda.Encounter
                 if (Binding) parts.Add("Binding"); if (Charges > 0) parts.Add("Charge banked");
                 if (Unbound) parts.Add("Unbound " + (unboundUntil - Now).ToString("0.0") + "s");
                 if (FieldBurning) parts.Add("Cinder Field");
+                if (HoundUp) parts.Add("Hound " + Hound.actor.Health.Pool.Current + "/" + Hound.actor.Health.Pool.Max + (Stoked ? " stoked " + (stokeUntil - Now).ToString("0") + "s" : ""));
                 int barrier = PlayerCombat.Barrier; if (barrier > 0) parts.Add("Barrier " + barrier);
                 return string.Join("  ·  ", parts);
             }

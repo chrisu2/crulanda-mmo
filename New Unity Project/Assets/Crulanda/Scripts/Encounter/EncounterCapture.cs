@@ -1014,6 +1014,29 @@ namespace Crulanda.Encounter
                     }
                     motor.enabled = true; foreach (var r in body) if (r != null) r.enabled = true;
                 }
+                // The Adit's things made by hand (Chris, 2026-10-11, no machines): the ore wagons and their mules, a cage with its goblin, the
+                // winch gate; each madeFrom a few metres off, the player out of frame.
+                var madeShots = new System.Collections.Generic.List<(Vector3 madeFocus, Vector3 madeFrom, string name)>();
+                foreach (var madeThing in zone.Interactables)
+                {
+                    if (madeThing.kind == "carriage") { var f = madeThing.position + Vector3.up * .8f; madeShots.Add((f, f + (zone.RailTeam != null && zone.RailTeam.Length > 0 ? (madeThing.position - zone.RailTeam[0]).normalized * -3 : Vector3.zero) + Quaternion.Euler(0, 90, 0) * (madeThing.position - (zone.RailTeam != null && zone.RailTeam.Length > 0 ? zone.RailTeam[0] : madeThing.position)).normalized * 7 + Vector3.up * 2.5f, "95-ore-wagons")); }
+                    if (madeThing.kind == "cage" && madeThing.root != null && !madeShots.Exists(x => x.name == "96-cage")) { var f = madeThing.root.position + Vector3.up * .8f; var door = madeThing.root.Find("Door"); var outward = door != null ? madeThing.root.TransformDirection(new Vector3(door.localPosition.x > 0 ? 1 : -1, 0, 0)) : madeThing.root.forward; madeShots.Add((f, f + outward * 3.2f + madeThing.root.forward * 1.2f + Vector3.up * .9f, "96-cage")); }
+                    if (madeThing.kind == "liftgate" && madeThing.gate != null) { var f = madeThing.gate.transform.position + Vector3.up * 2; madeShots.Add((f, f - madeThing.gate.transform.forward * 8 + madeThing.gate.transform.right * 2 + Vector3.up * 1.5f, "97-winch-gate")); }
+                }
+                if (madeShots.Count > 0)
+                {
+                    EncounterHud.Hidden = true; Crulanda.World.WorldClock.Hour = 15;
+                    var body = Array.FindAll(session.Player.GetComponentsInChildren<Renderer>(), r => r.enabled);
+                    foreach (var r in body) r.enabled = false;
+                    motor.enabled = false; var view = session.View.transform;
+                    foreach (var (madeFocus, madeFrom, madeShot) in madeShots)
+                    {
+                        motor.Teleport(madeFocus + Vector3.up * 20); var look = Quaternion.LookRotation(madeFocus - madeFrom);
+                        for (float w = 0; w < .8f; w += Time.deltaTime) { view.SetPositionAndRotation(madeFrom, look); yield return null; }
+                        ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + madeShot + ".png")); yield return new WaitForSeconds(.4f);
+                    }
+                    motor.enabled = true; foreach (var r in body) if (r != null) r.enabled = true;
+                }
                 // A hidden find up close, one a zone (its first chest, cache, herb, note or key): from the side you come to it (its
                 // frame's -Z), a little above, the player out of frame and the HUD hidden. Secrets are on no map: this is their picture.
                 Crulanda.World.ZoneSecretSpot find = null;

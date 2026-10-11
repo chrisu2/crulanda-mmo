@@ -83,7 +83,9 @@ namespace Crulanda.Tests
         {
             var beast = Find(EncounterSession.RockEaterName); var nix = Find(EncounterSession.NixName); var look = beast.GetComponent<ActorVisual>();
             yield return new WaitForSeconds(2f);
-            var surface = new HideSurface(look.BeastModel.Renderers); var hide = surface.Points;
+            Assert.IsTrue(look.GearFitted, "its gear fitted on its idle, two frames after it was built");
+            Assert.AreEqual(AnimatorCullingMode.AlwaysAnimate, look.BeastModel.Animator.cullingMode, "its bones posed even out of sight (in the game it stands unseen when built)");
+            var surface = new HideSurface(look.BeastModel.Renderers, look.BeastModel.Height); var hide = surface.Points;
             Assert.Greater(hide.Length, 100, "its hide measured");
             var body = beast.transform.Find("Body"); Vector3 ahead = body.forward, o = body.position;
             float back = hide.Min(v => Vector3.Dot(v - o, ahead)), front = hide.Max(v => Vector3.Dot(v - o, ahead));

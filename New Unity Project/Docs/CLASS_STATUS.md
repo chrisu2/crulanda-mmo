@@ -38,9 +38,11 @@ have theirs designed (rows 4-6 in their files, marked `impl: false`); the Paladi
 
 ## Planned, not started (ROADMAP Phase 9.2, from the novels; PROVISIONAL)
 
-- **The Tinker** (Klyther Forgeheart: drones and scorpions, an engineer).
+- ~~The Tinker~~ (Klyther Forgeheart: drones and scorpions): **set aside 2026-10-11, machinery** (no machines). Klyther's book-3 craft
+  (salt-stone, sap-mortar) is the Salt-Mender's Mason path (CLASS_BUILD_MATRIX.md, "Phase 9.2 and 9.3 from the canon").
 - **The Knight** (Talira Frostveil, Kaelith Dawnstrike: swordmaster, Stormlight); overlaps the Paladin's Oathguard, to resolve.
-- **The Salt-Mender** (the salt-magic of the West).
+- **The Salt-Mender** (the salt-magic of the West): designed 2026-10-11 from Book 1's Salt-Speaker and book 3's Mender-Craft
+  (CLASS_BUILD_MATRIX.md): Salt-Speaker control, Mason tank, Sifter ranged; not a healer (no salt-magic heals in the books).
 - The Rogue and the Archivist were on that list and are done.
 
 CLASS_BUILD_MATRIX.md holds 20 candidates in all (Cleric, Shaman, Necromancer, Warlock, Bard, Monk, Seer, Engineer and more); the

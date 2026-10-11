@@ -1005,6 +1005,8 @@ namespace Crulanda.Encounter
                     var at = rockEater.transform.position; motor.Teleport(at + rockEater.transform.forward * 9 + Vector3.up * .2f);
                     foreach (var r in body) r.enabled = false;
                     motor.enabled = false; var view = session.View.transform;
+                    var rockLook = rockEater.GetComponent<ActorVisual>(); var saddleNow = rockEater.GetComponentsInChildren<Transform>(true).FirstOrDefault(x => x.name == "Saddle");
+                    Debug.Log("ROCKEATER_CAPTURE fitted " + (rockLook != null && rockLook.GearFitted) + ", saddle " + (saddleNow != null ? (saddleNow.position - rockEater.transform.position).ToString("F2") + " on " + saddleNow.parent.name : "none") + ", seat " + (rockLook != null && rockLook.RiderSeat != null ? (rockLook.RiderSeat.position - rockEater.transform.position).ToString("F2") : "none") + ", forward " + rockEater.transform.forward.ToString("F2"));
                     foreach (var (turn, shot) in new[] { (0f, "94-rock-eater-front"), (90f, "94-rock-eater-side"), (180f, "94-rock-eater-back") })
                     {
                         var dir = Quaternion.Euler(0, turn, 0) * rockEater.transform.forward; dir.y = 0; dir.Normalize();

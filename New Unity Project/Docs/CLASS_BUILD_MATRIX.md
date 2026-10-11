@@ -14,6 +14,48 @@ The user's newer 3–4-build direction supersedes the brief's older up-to-3-spec
 Novels have not been cross-checked. All proposed disciplines, forms, resources and signature mechanics
 are PROVISIONAL/GAME-ONLY. Names appearing in the brief are not independently verified canon.
 
+## Phase 9.2 and 9.3 from the canon (2026-10-11; Chris: "add new classes/races based on lore canon"; no machines over all of it)
+Read from `D:\code\crulanda` on 2026-10-11 (novels first, then the world bible, then notes). Labels per CRULANDA_CANON.md.
+
+**Decided: the Tinker and the Engineer are set aside** (rows below kept as history). Both are machinery (constructs, drones, gadgets,
+artillery), which Chris has ruled out ("NO Machines", 2026-10-11). Klyther Forgeheart stays an ally as the novels have him, and his
+book-3 craft, which is not machinery, goes to the Salt-Mender's Mason path: he forges tools from scrap and sea-salt and says the magic
+must be carved "into the bark" (book3/chapter_1.md:70-72), lays salt-stone, "a mason of the weave" (book3/chapter_3.md:12-18), and taps
+the Ghost-Oaks for sap that, with salt and sand, makes a glowing mortar (book3/chapter_4.md:12-14). CANON.
+
+**The Salt-Mender** (the first new class; CANON roots, GAME-ONLY kit; PROVISIONAL names):
+- Roots: the Salt-Speaker who throws salt and chants "I bind the Chaos! I seal the Wound!", calcifying Weave-Eaters into white crystal
+  (Book 1, B1F:5486-5498; "Mother Vane, our Salt-Speaker", B1F:5540); book 3's Salt-Menders and their Mender-Craft: a wall sung into place
+  (chapter_3.md:20-22), a Salt-Wall that grows spikes and absorbs the enemy's force and grounds it (chapter_8.md:32-34), salt-crystal
+  arrowheads that dissolve Void things and the Song of Sifting (chapter_4.md:46-50), salt-resonance coating a blade in white, caustic
+  frost (chapter_9.md:96). The game's Salt-Menders are their forerunners (decided 2026-10-10, CANON-EXPANDED).
+- **Not a healer**: no salt-magic heals in the books (searched 2026-10-11). Its support is wards.
+- Resource: **Salt** (a pouch of 100), spent by every working and refilled from the earth out of a fight (GAME-ONLY).
+- Paths (rows 0-2 first, as the first seven classes began):
+  - **Salt-Speaker** (control): Binding Salt (a handful thrown with the chant: the target held in white crystal), Seal the Wound (a silence).
+  - **Mason** (tank; Klyther's craft): Salt-Ward (a barrier that grounds what strikes it into Salt), Sung Wall (a ward the party stands behind), a taunt.
+  - **Sifter** (ranged): salt-crystal shards (the Song of Sifting), harder on the Wasting's things (the Weave-Eaters, the Unmade).
+  - Written for later: **Frost-Edge** (melee: the blade in white, caustic frost).
+- Look: the Mage's robe figure with a salt-white mantle until an own figure is made (Phase 8.5's figures).
+
+**The Knight** (a later candidate, PROVISIONAL): Kaelith Dawnstrike fights "like a dancer composed entirely of... light" with a blade of
+golden sunlight that unmakes corruption rather than cutting flesh (book2/chapter_29.md:81, chapter_30.md:13; CANON); the High Concord
+duelist's upright stance and the drilled "Ascendant Strike" (B1F:7317, 7341); the Iron Pact "relies on the shield" (B1F:7339). Talira
+Frostveil is only a name and a command of knights in the draft (chapter_9.md:46). **"Stormlight" is not used**: it is never defined in the
+books (world bible only) and it is another author's well-known term. The Knight overlaps the Paladin (light) and the Warrior (shield);
+held until those overlaps are settled.
+
+**Races (Phase 9.3; there is no race layer in the game yet: every figure is human):**
+| People | Canon | Traits a game could use | Playable? |
+|---|---|---|---|
+| Goblins of the Warrens | green skin, a large warty head, oversized tufted ears (B1F:4385, 4395); the Warrens' tunnels (B1F:1736); vibration-locking, treating metal "exactly like complex music" (B1F:914); a silent hand-cant (B1F:2360); the oath "First Kin" (B1F:1116). CANON | small; locks opened by ear; hand-cant (sims talk in signs); at home underground | yes: the first race (the pressed goblins of the Adit are already its figure, PROVISIONAL) |
+| The Forgeborn | flesh people, not constructs: Tynara Embercoil, "minor telekinesis" over metal and aether-burn in glowing veins (chapter_7.md:24, 88; CANON-DRAFT); "Forgeborn tinkers" (historical_evidence.md:10) | a pull on metal at short range; veins that glow when they work it | later (only a draft chapter describes them) |
+| Humans by region | Lowtowners: slum folk with shivs and black-jacks (B1F:6915); the Coast's City of Glass and its Trade Princes (book2/chapter_4.md:5-13); the North's Iron Wardens in heavy plate (book2/chapter_20.md, 23) | a home zone, dress and speech each | yes: as backgrounds, not races |
+| Orcs, dwarves, ogres | orcs seven feet tall, green and tusked (B1F:28); Horgus the dwarf (B1F:1904); Tiny the ogre (B1F:3999) | | later |
+| Veridian Keepers | "tall, spindly figures made of living willow and woven moss" (book3/chapter_2.md:34); they fight beside humans but none lives among them | | no: NPCs and sims' allies only |
+Conflicts left in the books (machines): the goblin engine-room engineer Ricket (B1F:4195), salt-cannons (book3/chapter_9.md:24), the
+Coast's clockwork arm and aether-driven ships, Ironhold's arc-throwers. None comes into the game.
+
 ## At a glance
 
 | Class/candidate | Path 1 | Path 2 | Path 3 | Path 4 | Source/status |
@@ -32,8 +74,8 @@ are PROVISIONAL/GAME-ONLY. Names appearing in the brief are not independently ve
 | Monk | Sentinel tank | Striker melee | Harmonist support | — | Initial roster |
 | Knight | Bastion tank | Challenger melee | Oathkeeper support | — | Later candidate; separate from Warrior through commitments |
 | Seer | Oracle prevention/support | Fateweaver caster | Watcher control | — | Later candidate; foresight rather than reactive healing |
-| Tinker | Construct keeper pet/ranged | Gadgeteer control | Field technician support | — | Later candidate; may merge with Engineer |
-| Engineer | Artillerist ranged | Demolitionist burst | Fortifier support/control | — | Later candidate; may merge with Tinker |
+| Tinker | Construct keeper pet/ranged | Gadgeteer control | Field technician support | — | **Set aside 2026-10-11: machinery (no machines)** |
+| Engineer | Artillerist ranged | Demolitionist burst | Fortifier support/control | — | **Set aside 2026-10-11: machinery (no machines)** |
 | Healer / medicinal practitioner | Herbalist healer | Woundkeeper healer | Apothecary support | — | Later candidate; cultural class name unresolved |
 | Mystic | Resonant caster | Prism guardian support | Crystal binder control | — | Later candidate; crystal network mechanics |
 | Windcaller | Storm conductor ranged | Gale keeper support | Tempest controller | — | Later candidate; distinguish from Shaman/Mage |

@@ -1,5 +1,37 @@
 # Changelog
 
+## 2026-10-11, 15:00 on — The Rock-Eater's saddle on its back; the three missing fourth paths (branch feet-bow-adit-kit)
+Chris, 14:26: "keep developing. once completed continue working on classes/perks/talent builds and add new classes/races based on lore
+canon. and all phases after." Nothing here is seen by Chris yet.
+- **The Rock-Eater's gear (the 14:59 capture: the saddle at its mouth, a strap standing up off its back like a pole, one crystal at its
+  tail):** it was set by the bear's rest pose and parented to a back bone that turns when the idle takes over. Now the bear is posed first
+  (ModelBeast.Settle), the gear is measured on the hide itself (HideSurface: rays on the baked hide's triangles; its vertices are too far
+  apart to measure by) and each piece is carried by the nearest bone of its spine. RockEaterTests measures it after the beast has stood
+  two seconds: the saddle at 0.46 of its length on top of its back, Nix in it, every crystal's foot on its back and the ridge behind the
+  saddle, the girth lying on its flanks and nothing standing up above the saddle.
+- **The Ranger's Skirmisher** (melee; GAME-ONLY): Spear Lunge (a bound of up to 8 m and a drive of the spear, 1.6 times the weapon's hit),
+  Whirling Spear (every foe within 3.5 m), Feint (a talent: the next blow at you misses); eight talents built (Long Haft, Light Step,
+  Bleeding Point, Quick Recovery, Feint, Pack Tactics, Whirl Edge, Hit and Run), four written. The thrusts are the figure's own jab and
+  cross (ActorVisual.Thrust; ClassKit.OwnBlow keeps the bow from loosing an arrow on a spear blow).
+- **The Rogue's Swashbuckler** (support; GAME-ONLY): Opening Cut (Exposes the target: the party's blows on it 8% harder), Rallying Flourish
+  (the combo spent on haste for you and Mira), Tumble (a talent: to its back, the next blow 30% harder); eight talents built, four written.
+- **The Mage's Cinderwright** (pets; GAME-ONLY; no machines: the first plan's forge-golem is dropped): an ember hound, a fire spirit in a
+  hound's shape on the wolf's body (Kindle Hound), Stoke (the Heat poured into its bites), Cinder Burst (a talent: it flares); eight
+  talents built, four written. The pet code is kept by any IPetMaster (the Ranger's wolf, the Mage's hound).
+- **The Rock-Eater in the built game (16:00-16:26):** the tests passed but the game's capture still had the saddle at its mouth. Two causes
+  the editor never showed: the bear's animator stops posing what no camera sees, so the gear was fitted to the file's rest pose (now its
+  bones always animate and the gear is fitted two frames after it is built, on its idle); and in the game a bake comes out with the
+  model's scale, so the hide measured 13.5 m long (now HideSurface scales the bake to the beast's own height). The 16:26 captures, front,
+  side and back: Nix in the saddle on its back, the crystal ridge behind him, shards at the shoulders, the girth down the flank.
+- **The game starts on Direct3D 11 now (ProjectSettings: Windows graphics APIs D3D11, then D3D12).** From 15:45 every D3D12 run of the
+  Adit (this branch's build and the published 00:33 build alike) raised an NVIDIA graphics exception and a driver reset (System log,
+  nvlddmkm 14 and 153; driver 32.0.16.1742, RTX 5060 Ti), while other zones ran; a fresh copy ran once and crashed the second time, so it
+  is the driver's cached build of something in the Adit, not the game's files. Direct3D 11 ran the Adit cleanly twice. D3D12 stays as
+  the fallback.
+- Icons for every new ability and talent (tools/art/make_icons.py). TALENT_DEPTH.md and CLASS_STATUS.md record all three.
+- **The Adit's floors** two fifths of the kit's grey (half still read pale), their dressing denser.
+- Runs: EditMode 17/17 (the three classes' rules, the icons), PlayMode 28/28 (the Mage, Rogue and Ranger loops; RockEaterTests 3/3).
+
 ## 2026-10-11, 12:23 on — The Adit pass: filled, no machines, walls the right way round, mobs that move (branch feet-bow-adit-kit)
 Chris, before he left at about 12:33: "get busy and do better than yesterday", "keep working until i say stop . dont stop to ask questions".
 Status of each line: see CLAUDE_HANDOFF.md (nothing here is verified by Chris yet).

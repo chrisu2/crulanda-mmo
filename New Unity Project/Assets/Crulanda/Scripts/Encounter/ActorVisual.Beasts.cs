@@ -153,9 +153,21 @@ namespace Crulanda.Encounter
             beastModel.Crumbles = look == ActorLook.Skeleton;   // the drowned dead fall apart into a heap of bones (ModelBeast.Crumble.cs)
             beast = true;
             beastModel.StartMotion(name + "#" + variant);
-            if (look == ActorLook.RockEater) RockEaterGear();
+            if (look == ActorLook.RockEater)
+            {
+                // Its bones always posed, seen or not: it carries a rider and its gear on its back, and a bear's animator stops posing what
+                // no camera sees, so in the game (where it stands out of sight when the Adit is built) its gear was fitted to the file's rest
+                // pose and swung to its mouth when the idle took over (2026-10-11 captures; the editor's tests, with no camera, never saw it).
+                if (beastModel.Animator != null) beastModel.Animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+                // A seat to ride on at once (Nix climbs in as the camp spawns), then the gear fitted two frames on, on its idle as it stands.
+                RiderSeat = new GameObject("Rider seat").transform; RiderSeat.SetParent(body, false); RiderSeat.localPosition = Vector3.up * RockEaterHeight * .8f;
+                if (Application.isPlaying) rockGearAt = Time.frameCount + 2; else RockEaterGear();
+            }
             return true;
         }
+        int rockGearAt = -1;
+        /// <summary>Whether the Rock-Eater's gear is on its back yet (fitted two frames after it is built).</summary>
+        public bool GearFitted { get; private set; }
         /// <summary>How tall the Rock-Eater stands (a bear is 1.45, an old one 1.75).</summary>
         public const float RockEaterHeight = 3.6f;
         /// <summary>Where its rider sits (Nix, EncounterEnemy.Ride): on the saddle, facing the way it faces; null for any other figure.</summary>
@@ -167,7 +179,8 @@ namespace Crulanda.Encounter
             // Posed first and measured off the hide itself (2026-10-11 captures: set by the bear's rest pose and its back bone's place, the
             // saddle came out at its mouth, a girth strap stood up off its back like a pole and the crystals were at its tail).
             beastModel.Settle();
-            var hide = new HideSurface(beastModel.Renderers);
+            GearFitted = true;
+            var hide = new HideSurface(beastModel.Renderers, beastModel.Height);
             if (hide.Empty) return;
             Vector3 up = body.up, ahead = body.forward, side = body.right, o = body.position;
             float back = float.MaxValue, front = float.MinValue, left = float.MaxValue, right = float.MinValue;
@@ -234,13 +247,16 @@ namespace Crulanda.Encounter
                     from = to;
                 }
             }
-            RiderSeat = new GameObject("Rider seat").transform; RiderSeat.position = seatAt + up * .18f; RiderSeat.rotation = body.rotation; RiderSeat.SetParent(seat.parent, true);
+            Debug.Log("ROCKEATER_GEAR hide " + hide.Points.Length + " points (bake scaled " + hide.Corrected.ToString("0.00") + "), length " + length.ToString("0.00") + " (back " + back.ToString("0.00") + ", front " + front.ToString("0.00") + "), seat " + (seatAt - o).ToString("F2") + " from its body, on " + seat.parent.name + ", frame " + Time.frameCount + ", cull " + (beastModel.Animator != null ? beastModel.Animator.cullingMode.ToString() : "-"));
+            if (RiderSeat == null) RiderSeat = new GameObject("Rider seat").transform;
+            RiderSeat.SetParent(seat.parent, true); RiderSeat.position = seatAt + up * .18f; RiderSeat.rotation = body.rotation;
         }
         /// <summary>A modelled beast's frame: its pace from how far it went; dead, its death (the body EncounterEnemy tipped over
         /// set upright again); lying in wait, head down; standing, it grazes (deer) or looks about (wolves), or watches what it
         /// fights.</summary>
         void BeastLate()
         {
+            if (rockGearAt >= 0 && Time.frameCount >= rockGearAt) { rockGearAt = -1; RockEaterGear(); }   // posed by its idle now (LateUpdate)
             float dt = Time.deltaTime;
             var delta = transform.position - lastPosition; delta.y = 0; lastPosition = transform.position;
             float target = dt > 0 ? delta.magnitude / dt : 0;
@@ -293,16 +309,34 @@ namespace Crulanda.Encounter
     public sealed class HideSurface
     {
         public readonly Vector3[] Points; readonly int[] tris;
-        public HideSurface(System.Collections.Generic.IEnumerable<Renderer> renderers)
+        /// <summary>How much the bake had to be scaled to stand at the beast's own height (1 when it came out right).</summary>
+        public readonly float Corrected = 1;
+        /// <param name="height">The beast's height (ModelBeast.Height), feet to the top: the bake is scaled to it. In the editor a bake
+        /// comes out without the model's scale and in the game with it (2026-10-11: the game's Rock-Eater measured two and a half times
+        /// its size, 13.5 m long, so its saddle went where its mouth is), so neither is trusted: the hide is made the height it is built to.</param>
+        public HideSurface(System.Collections.Generic.IEnumerable<Renderer> renderers, float height = 0)
         {
             var pts = new System.Collections.Generic.List<Vector3>(); var tri = new System.Collections.Generic.List<int>();
+            var spans = new System.Collections.Generic.List<(Vector3 pivot, int from, int to)>(); var scales = new System.Collections.Generic.List<float>();
             foreach (var r in renderers)
             {
                 if (!(r is SkinnedMeshRenderer sk) || sk.sharedMesh == null) continue;
-                var baked = new Mesh(); sk.BakeMesh(baked); var toWorld = sk.transform.localToWorldMatrix; int first = pts.Count;   // baked unscaled, then its whole transform
+                var baked = new Mesh(); sk.BakeMesh(baked); var toWorld = sk.transform.localToWorldMatrix; int first = pts.Count;   // baked unscaled (in the editor), then its whole transform
                 foreach (var v in baked.vertices) pts.Add(toWorld.MultiplyPoint3x4(v));
                 foreach (var i in baked.triangles) tri.Add(first + i);
+                spans.Add((sk.transform.position, first, pts.Count)); scales.Add(sk.transform.lossyScale.x);
                 if (Application.isPlaying) UnityEngine.Object.Destroy(baked); else UnityEngine.Object.DestroyImmediate(baked);
+            }
+            if (height > 0 && pts.Count > 0)
+            {
+                float low = float.MaxValue, high = float.MinValue; foreach (var q in pts) { low = Mathf.Min(low, q.y); high = Mathf.Max(high, q.y); }
+                float k = high > low ? height / (high - low) : 1;
+                if (k < .75f || k > 1.33f)   // a pose stands a little lower or higher than its build; a bake scaled twice is far out
+                {
+                    float own = scales.Count > 0 ? scales[0] : 1; if (own > 0 && Mathf.Abs(k * own - 1) < .15f) k = 1 / own;   // its scale taken twice
+                    Corrected = k;
+                    foreach (var (pivot, from, to) in spans) for (int i = from; i < to; i++) pts[i] = pivot + (pts[i] - pivot) * k;
+                }
             }
             Points = pts.ToArray(); tris = tri.ToArray();
         }

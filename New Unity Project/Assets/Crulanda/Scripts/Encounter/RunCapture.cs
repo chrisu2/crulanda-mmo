@@ -58,7 +58,7 @@ namespace Crulanda.Encounter
             var leader = s.PartySims.Find(c => c != null && c.Dungeon != null);
             int camps = leader.CampsLeft, left = camps; Log("Leader: " + leader.sim.name + ", " + camps + " camps.");
             var motor = s.Player.GetComponent<AdventurerMotor>(); AdventurerMotor.Running = true;
-            int deaths = 0, warps = 0, shots = 0, elitesSeen = 0, mends = 0, looted = 0; var lootTally = new SortedDictionary<string, int>(); float lootUntil = 0; var seen = new HashSet<string>(); var mending = new Dictionary<SimCompanion, string>(); var engagedAt = new Dictionary<EncounterEnemy, float>(); var searched = new HashSet<EncounterEnemy>();
+            int deaths = 0, warps = 0, shots = 0, elitesSeen = 0, mends = 0, looted = 0; var lootTally = new SortedDictionary<string, int>(); float lootUntil = 0; var seen = new HashSet<string>(); var mending = new Dictionary<SimCompanion, string>(); var engagedAt = new Dictionary<EncounterEnemy, float>(); var searched = new HashSet<EncounterEnemy>(); float idleLogAt = 0;
             float start = Time.time, realStart = Time.realtimeSinceStartup, nextShot = Time.time + 20, nextSwing = 0, stuckAt = Time.time, deadAt = -1; var stuckFrom = s.Player.transform.position;
             string leadingName = leader.LeadingName;
             Time.timeScale = Speed;
@@ -66,6 +66,8 @@ namespace Crulanda.Encounter
             while (leader != null && leader.Dungeon != null && Time.realtimeSinceStartup - realStart < RealLimitSeconds)
             {
                 float t = Time.time - start; var me = s.Player.transform.position;
+                // The leader's state when nothing moves (every 20 s of nobody fighting), to see what holds the run.
+                if (Time.time >= idleLogAt) { idleLogAt = Time.time + 20; if (!s.InCombat) Log(Clock(t) + "  quiet: the leader " + (leader.Activity ?? "").ToLower() + ", " + Vector3.Distance(leader.transform.position, me).ToString("0") + " m from you; " + s.PartySims.Count(c => c != null && c.actor.IsAlive) + " sims up; bags " + s.Progress.bag.Take(Inventory.BagSize).Count(b => !b.Empty) + "/" + Inventory.BagSize); }
                 // A camp cleared: the leader moves its mark on.
                 if (leader.CampsLeft < left) { Log(Clock(t) + "  camp " + (camps - leader.CampsLeft) + "/" + camps + " cleared: " + leadingName + "; next " + leader.LeadingName); left = leader.CampsLeft; }
                 if (leader.LeadingName != leadingName)
@@ -115,6 +117,13 @@ namespace Crulanda.Encounter
                     var body = s.LootableCorpse;
                     if (body != null && Time.time >= lootUntil && !searched.Contains(body))
                     {
+                        // Bags full: the cheapest thing not worn goes (the run would stand at a body it could not take from).
+                        if (s.Progress.bag.Take(Inventory.BagSize).All(b => !b.Empty))
+                        {
+                            int cheapest = -1, worth = int.MaxValue;
+                            for (int bi = 0; bi < s.Progress.bag.Count && bi < Inventory.BagSize; bi++) { var st = s.Progress.bag[bi]; if (st.Empty) continue; var d = s.Items.Get(st.item); int v = d != null ? d.value : 0; if (v < worth) { worth = v; cheapest = bi; } }
+                            if (cheapest >= 0) { var d = s.Items.Get(s.Progress.bag[cheapest].item); Log(Clock(t) + "  bags full: " + (d != null ? d.name : s.Progress.bag[cheapest].item) + " thrown away"); s.Progress.bag[cheapest] = new ItemStack(); }
+                        }
                         // A body with only common things is emptied in the one press (OpenLoot); one with gear opens the window: either way,
                         // what landed in the bags is the record.
                         string Named(string id) { var d = s.Items.Get(id); return d != null ? d.name : id; }

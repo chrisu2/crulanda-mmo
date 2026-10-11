@@ -180,6 +180,9 @@ namespace Crulanda.Encounter
         {
             if (!agent.isOnNavMesh) return;
             if (!Camp || Evading || Inside != null) { agent.SetDestination(home); strolling = false; return; }
+            // Far from everyone (no party member within 70 m): it stands; the strolling's path-finding for a hundred and fifty mobs at once pegged
+            // the CPU (Chris, 2026-10-11, watching the group run: "pegging cpu 100% alot of times").
+            if (Patrol == null && session.Player != null && (transform.position - session.Player.transform.position).sqrMagnitude > 70 * 70) { if (strolling) { strolling = false; agent.ResetPath(); } return; }
             if (Patrol != null) home = transform.position;
             agent.speed = baseSpeed * StrollPace * (Slowed ? slowFactor : 1);
             bool there = !agent.pathPending && agent.remainingDistance <= Mathf.Max(.5f, agent.stoppingDistance);

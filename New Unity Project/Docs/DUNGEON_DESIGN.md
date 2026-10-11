@@ -14,6 +14,13 @@
 - **"A mix" means the places as well as the mechanics:** mine tunnels AND built halls AND a stronghold of stone, each wing looking
   unlike the last, as well as the bosses, gates, escorts and patrols. Lessons only: no names, layouts or assets from those games.
 
+- **Scale and content (Chris, 2026-10-10 evening, verbatim, after seeing the first built halls):** "the whole place needs to be
+  bigger. doesnt seem like deadmines or wailing caves like wow dungeons"; asked how much bigger, he chose **"3x, full-length run"**
+  (about a kilometre of cave or more, a 45-60 minute run like the full Deadmines); "if need to make it its on zone you zone into so
+  there are no limitations"; and **"not just bigger but more too do!"** So: the Adit (already its own zone, zone.adit) grows to three
+  times its length with chambers far wider and taller, and the new length is filled: more packs and patrols, more bosses and
+  mini-bosses, events, side areas, secrets and things to use, not empty tunnel.
+
 ## 0.1 What Scarlet Monastery brings (lessons only)
 - **A fortified house of zealots, built in stone:** halls, stairs and doors, not caves. The order feels like an army in its own house.
 - **Wings, each a short run to its own end boss and each with its own look:** a graveyard of the order's dead, a library, an armoury
@@ -34,6 +41,20 @@
 
 Wailing Caverns' lessons stay where they are: the three branches in any order, the escort with waves (the Weaver), mobs that flee
 for help, casters that put you to sleep, and the shortcut back (the rail ride).
+
+## 0.25 The full-length Adit (Chris, 2026-10-10 evening: "3x, full-length run", "not just bigger but more too do!")
+The layout grows (tools/wip/dungeon/adit_layout.py): passages about three times as long, chambers about 2.5 times as wide and twice
+as tall, drifts half as wide again (still a mine's drifts); a kilometre and more of cave. The new length is filled, wing by wing
+(lessons only, all GAME-ONLY):
+| Wing | Model | What is added |
+|---|---|---|
+| [1] The Old Workings | the Deadmines (the mine) | patrols on the long drifts, ambushes from side galleries, a flooded lower working with a mini-boss, a collapsed-shaft shortcut back |
+| [2] The Singing Gallery | Wailing Caverns | a great multi-level water cavern (ledges, pools, a fall), sleep-casters and corrupted beasts, an optional boss off the path, a jump-down shortcut to the hub |
+| [3a] The Geode Floor | the Deadmines (the foundry) | the foundry hall and the engine bay (built, D9); a refinery of crushers and stampers to time your way past; an overseer before Nix and the Rock-Eater |
+| [3b] The Ember Vent | Scarlet Monastery | four wings with an end boss each: the ash-garden (an urn-keeper who raises the dead), the scriptorium (a loremaster), the drill yard (a drillmaster), the chapel (Ysolt and a priestess who raises her once); packs of fanatics that heal each other |
+| [3c] The Grey Breach | Wailing Caverns (corruption) | the grey spreading deeper in, the Foreman, the Quiet Miner (rare) |
+| [4] The Rail Hall into the Great Cove | the Deadmines (the cove) | the line runs on into a vast underground harbour: a moored ore barge, its cannon fired the loud way, the last boss on deck, the hidden boss below |
+Order: the scale-up first (layout, every hard-coded distance, tests), then the wings one at a time, each shown to Chris in frames.
 
 ## 0.3 The room builder (engine step D9)
 - **Rooms from a plan in data:** each room a rectangle or an L, with a floor height, a wall height, doors to its neighbours and a

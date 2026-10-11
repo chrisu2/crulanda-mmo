@@ -536,9 +536,11 @@ namespace Crulanda.Encounter
                     if (child) body.localScale = new Vector3(.68f, .66f, .68f);
                     break;
                 case ActorLook.Hollow:
-                    // A Hollow Man (CANON, book1 ch.4): a villager turned to grey stone, cracked, with a violet shard where the heart was.
-                    for (int i = 0; i < 5; i++) Part(PrimitiveType.Cube, body, new Vector3((i - 2) * .08f, .25f + (i % 2) * .15f, .15f), new Vector3(.02f, .25f, .01f), Mat(new Color(.22f, .22f, .23f)), new Vector3(0, 0, i * 30 - 60));
-                    var shard = Mat(new Color(.7f, .4f, 1f), .9f); shard.EnableKeyword("_EMISSION"); shard.SetColor("_EmissionColor", new Color(.65f, .3f, 1f) * 2.5f);
+                    // A Hollow Man (CANON creature, book1 ch.4): an apparition of a villager (GAME-ONLY look, Chris: "should be ghostly"), see-
+                    // through grey (ModelFigure.Ghost), and inside it the violet shard where the heart was, glowing through. (The stone cracks
+                    // of the statue it was are gone with the stone.) Without the model, the old grey figure keeps them.
+                    if (!modelled) for (int i = 0; i < 5; i++) Part(PrimitiveType.Cube, body, new Vector3((i - 2) * .08f, .25f + (i % 2) * .15f, .15f), new Vector3(.02f, .25f, .01f), Mat(new Color(.22f, .22f, .23f)), new Vector3(0, 0, i * 30 - 60));
+                    var shard = Mat(new Color(.7f, .4f, 1f), .9f); shard.EnableKeyword("_EMISSION"); shard.SetColor("_EmissionColor", new Color(.65f, .3f, 1f) * (modelled ? 4f : 2.5f));
                     Part(PrimitiveType.Cube, body, new Vector3(-.06f, .42f, .15f), new Vector3(.07f, .12f, .04f), shard, new Vector3(0, 0, 20));
                     body.localEulerAngles = new Vector3(10, 0, 0); stoop = 10;
                     break;

@@ -94,8 +94,36 @@ namespace Crulanda.Encounter
         void Retexture(Renderer r)
         {
             var mats = r.sharedMaterials;
-            for (int i = 0; i < mats.Length; i++) { var (set, tint) = SetFor(mats[i] != null ? mats[i].name : "", r); mats[i] = KitMat(set, tint); }
+            for (int i = 0; i < mats.Length; i++)
+            {
+                string name = mats[i] != null ? mats[i].name : "";
+                if (spec.stone) { mats[i] = Ghost(name.ToLowerInvariant().Contains("eye")); continue; }
+                var (set, tint) = SetFor(name, r); mats[i] = KitMat(set, tint);
+            }
             r.sharedMaterials = mats;
+            if (spec.stone) { r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off; r.receiveShadows = false; }
+        }
+        // A Hollow Man is an apparition (Chris, playtest note 99 of 2026-10-08, "hollow men should be ghostly, not with no textures",
+        // and 2026-10-10, "hallow man should be ghostly/apparitions"): every piece of it a see-through ashen grey lit a little from
+        // within, the eyes violet, casting no shadow. Made from the zone art's veil (Standard, Fade, emissive: that variant is in the
+        // build). GAME-ONLY look: book1 ch.4 has them as solid grey stone in the shape of a starving man.
+        static Material ghostBody, ghostEyes;
+        static Material Ghost(bool eyes)
+        {
+            var m = eyes ? ghostEyes : ghostBody; if (m != null) return m;
+            var zone = Crulanda.World.ZoneBuilder.Active; var veil = zone != null && zone.art != null ? zone.art.veil : null;
+            if (veil != null) m = new Material(veil);
+            else
+            {
+                m = new Material(Shader.Find("Standard")); m.SetFloat("_Mode", 2); m.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+                m.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha); m.SetInt("_ZWrite", 0); m.EnableKeyword("_ALPHABLEND_ON"); m.renderQueue = 3000;
+            }
+            m.mainTexture = null; m.SetFloat("_Glossiness", .2f); m.EnableKeyword("_EMISSION");
+            m.color = eyes ? new Color(.8f, .6f, 1, .95f) : new Color(.66f, .68f, .76f, .36f);
+            m.SetColor("_EmissionColor", eyes ? new Color(.7f, .35f, 1) * 2.4f : new Color(.2f, .19f, .27f));
+            m.name = eyes ? "Hollow Man eyes" : "Hollow Man apparition";
+            if (eyes) ghostEyes = m; else ghostBody = m;
+            return m;
         }
         readonly Dictionary<Renderer, Material[]> undyed = new Dictionary<Renderer, Material[]>();
         /// <summary>

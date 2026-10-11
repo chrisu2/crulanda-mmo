@@ -960,6 +960,14 @@ namespace Crulanda.Encounter
                     if (drop > 0) views.Add((drop - 2.5f, drop + 7, dropPitch, "88-hollow-drop" + hs));
                     if (stores > 0) views.Add((stores - 8, stores + 1, 10, "89-hollow-stores" + hs));
                     views.Add((hollow.Length - 13, hollow.Length - 5, 10, "86-hollow-hall" + hs));
+                    // The built halls from the other way too (D9, 2026-10-10: Chris looks at a room from the side, the front and the back),
+                    // and the first chamber off the drift from its door (the Ember Vent's ash-garden).
+                    if (stores > 0) views.Add((stores + 8, stores - 1, 10, "90-hollow-stores-back" + hs));
+                    views.Add((hollow.Length - 9, hollow.Length - 18, 10, "91-hollow-hall-back" + hs));
+                    float entry = -1; for (int i = 0; i < hollow.Centre.Count && entry < 0; i++) if (hollow.Along[i] > 8 && hollow.Half[i] > 6) entry = hollow.Along[i];
+                    if (entry > 0) views.Add((entry - 1.5f, entry + 7, 10, "92-hollow-entry" + hs));
+                    var shown = Array.FindAll(session.Player.GetComponentsInChildren<Renderer>(), r => r.enabled);
+                    foreach (var r in shown) r.enabled = false;   // the rooms, not the tourist (a level-1 visitor lay dead in every one)
                     foreach (var (from, toward, pitch, shot) in views)
                     {
                         var stand = hollow.At(from); var ahead = hollow.At(toward) - stand;
@@ -967,6 +975,25 @@ namespace Crulanda.Encounter
                         yield return new WaitForSeconds(1.2f);
                         ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + shot + ".png")); yield return new WaitForSeconds(.4f);
                     }
+                    foreach (var r in shown) if (r != null) r.enabled = true;
+                }
+                // A Hollow Man close to, from in front and from its side (2026-10-10, Chris: "hallow man should be ghostly/apparitions").
+                var hollowMan = session.Enemies.Find(e => e != null && e.Name == "Hollow Man");
+                if (hollowMan != null)
+                {
+                    EncounterHud.Hidden = true; Crulanda.World.WorldClock.Hour = 15;
+                    var body = Array.FindAll(session.Player.GetComponentsInChildren<Renderer>(), r => r.enabled);
+                    var at = hollowMan.transform.position; motor.Teleport(at + hollowMan.transform.forward * 6 + Vector3.up * .2f);
+                    foreach (var r in body) r.enabled = false;
+                    motor.enabled = false; var view = session.View.transform;
+                    foreach (var (turn, shot) in new[] { (0f, "93-hollow-man-front"), (90f, "93-hollow-man-side") })
+                    {
+                        var dir = Quaternion.Euler(0, turn, 0) * hollowMan.transform.forward; dir.y = 0; dir.Normalize();
+                        var eye = at + dir * 2.6f + Vector3.up * 1.5f; var look = Quaternion.LookRotation(at + Vector3.up * .95f - eye);
+                        for (float w = 0; w < .6f; w += Time.deltaTime) { view.SetPositionAndRotation(eye, look); yield return null; }
+                        ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + shot + ".png")); yield return new WaitForSeconds(.4f);
+                    }
+                    motor.enabled = true; foreach (var r in body) if (r != null) r.enabled = true;
                 }
                 // A hidden find up close, one a zone (its first chest, cache, herb, note or key): from the side you come to it (its
                 // frame's -Z), a little above, the player out of frame and the HUD hidden. Secrets are on no map: this is their picture.

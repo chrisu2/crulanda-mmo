@@ -60,6 +60,7 @@ namespace Crulanda.Encounter
             actor = a; session = s; kit = k; agent = GetComponent<NavMeshAgent>(); visual = GetComponent<ActorVisual>();
             baseHealth = 90 + 18 * Mathf.Max(1, session.Progress.Level);
             Refit(); actor.Health.ApplyHealing(actor.Health.Pool.Max);
+            actor.Health.Died += h => session.Meter.Death(actor);   // the scorecard's deaths
         }
         /// <summary>Its health for the Ranger's level and talents (kept whole when it grows).</summary>
         public void Refit()
@@ -82,11 +83,11 @@ namespace Crulanda.Encounter
         void Assist()
         {
             var t = Master != null ? Master.Quarry : session.Target;
-            if (t != null && t.actor.IsAlive && (Master != null || session.FightingTarget) && Vector3.Distance(Heel.position, t.transform.position) < 30) { Hunt(t, 1); return; }
+            if (t != null && t.actor.IsAlive && !SimCompanion.Held(t) && (Master != null || session.FightingTarget) && Vector3.Distance(Heel.position, t.transform.position) < 30) { Hunt(t, 1); return; }
             EncounterEnemy best = null; float bestD = 25;
             foreach (var e in session.Enemies)
             {
-                if (e == null || !e.FightingParty || e.LeaveAlone) continue;
+                if (e == null || !e.FightingParty || e.LeaveAlone || SimCompanion.Held(e)) continue;   // a held mob is left held
                 float d = Vector3.Distance(transform.position, e.transform.position); if (d < bestD) { bestD = d; best = e; }
             }
             if (best != null) Hunt(best, 1);

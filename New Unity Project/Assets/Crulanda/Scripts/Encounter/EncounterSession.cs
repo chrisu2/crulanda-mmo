@@ -42,6 +42,10 @@ namespace Crulanda.Encounter
         /// <summary>The party's damage and healing meter (/meter; CombatMeter).</summary>
         public CombatMeter Meter { get { if (meter == null) { meter = new CombatMeter(this); Combatant.Healed += OnHealed; } return meter; } }
         CombatMeter meter; public bool MeterOpen;
+        /// <summary>The run's scorecard (CombatMeter.Scorecard): shown when a sim-led run is called cleared or the dungeon's last boss falls, and
+        /// by /scorecard (Chris, 2026-10-11).</summary>
+        public bool ScorecardOpen; public string ScorecardTitle;
+        public void ShowScorecard(string title) { ScorecardTitle = title; ScorecardOpen = true; Message("The scorecard: " + title + " (/scorecard shows it again)."); }
         void OnHealed(Actor by, Actor who, int amount) { meter?.Heal(by, amount); }
         public ClassKit Kit { get; private set; }
         public WarriorKit Warrior { get { return Kit as WarriorKit; } }
@@ -1257,6 +1261,7 @@ namespace Crulanda.Encounter
             else if (VendorNpc != null && !Paused) CloseVendor();
             else if (TradesOpen && !Paused) TradesOpen = false;
             else if (WhoOpen && !Paused) WhoOpen = false;
+            else if (ScorecardOpen && !Paused) ScorecardOpen = false;
             else if ((CharacterOpen || InventoryOpen) && !Paused) { CharacterOpen = false; InventoryOpen = false; }
             else if (QuestBookOpen && !Paused) { QuestBookOpen = false; ReadingDocument = null; }
             else if (MapOpen && !Paused) MapOpen = false;
@@ -1413,6 +1418,7 @@ namespace Crulanda.Encounter
             ApplyEquipment();
             SetHealth(Player, Progress.health);
             Player.Health.Died += h => {
+                Meter.Death(Player);
                 AutoAttack = false; abilities.Interrupt(); CancelWork(); Message("You fell. Press R to recover at camp. Your equipment is kept.");
                 var look = Player.GetComponent<ActorVisual>(); if (look != null) look.Pose = ActorPose.None;   // no swimming or sneaking corpse
             };
@@ -1991,6 +1997,9 @@ namespace Crulanda.Encounter
             if (enemy.Camp) RollCorpse(enemy);   // the loot is decided as it dies, so the body can show it
             if (NamedElite(enemy)) { if (Feats != null) Feats.Slain(enemy.persistentId); else { var k = Achievements.EliteKey(enemy.persistentId); if (k != null && !Progress.elitesSlain.Contains(k)) Progress.elitesSlain.Add(k); } }   // the camp's own elite, not a machine it rides
             if (enemy.Camp) TakeKey(enemy);   // a sigil boss's key (EncounterSession.Adit.cs)
+            // The dungeon's last boss down: the run's scorecard (Chris, 2026-10-11: "final boss kill can also call the scorecard").
+            if (Zone != null && Zone.Zone.dungeon && enemy.Elite && enemy.Move != null && enemy.Move.boss && !Enemies.Exists(o => o != null && o != enemy && o.Camp && o.Elite && o.Move != null && o.Move.boss && o.actor.IsAlive))
+                ShowScorecard(Zone.Zone.displayName + ": " + enemy.Name + " has fallen");
             BreakOut(enemy);   // the Rock-Eater's rider jumps out (EncounterSession.RockEater.cs)
             OnKillEffects();
             int before = Progress.Level;

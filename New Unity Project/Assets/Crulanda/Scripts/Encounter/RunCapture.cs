@@ -100,7 +100,7 @@ namespace Crulanda.Encounter
                 EncounterEnemy foe = null; float best = 14;
                 foreach (var e in s.Enemies)
                 {
-                    if (e == null || !e.actor.IsAlive || e.Game || e.Hidden || !e.FightingParty) continue;
+                    if (e == null || !e.actor.IsAlive || e.Game || e.Hidden || !e.FightingParty || SimCompanion.Held(e)) continue;   // a held mob is left held
                     if (!engagedAt.TryGetValue(e, out var since)) { engagedAt[e] = since = Time.time; }
                     if (e.Victim != s.Player && Time.time - since < 2.5f) continue;
                     float d = Vector3.Distance(e.transform.position, me); if (d < best) { best = d; foe = e; }
@@ -111,29 +111,31 @@ namespace Crulanda.Encounter
                 if (foe == null)
                 {
                     float nearest = 12;
-                    foreach (var e in s.Enemies) if (e != null && !e.actor.IsAlive && e.Camp && !e.Game && !searched.Contains(e) && (e.Drops == null || e.Drops.Count > 0 || e.Coins > 0)) { float d = Vector3.Distance(e.transform.position, me); if (d < nearest) { nearest = d; corpse = e; } }
+                    foreach (var e in s.Enemies) if (e != null && e.Camp && !e.Game && s.CanLoot(e) && !searched.Contains(e)) { float d = Vector3.Distance(e.transform.position, me); if (d < nearest) { nearest = d; corpse = e; } }
                     var body = s.LootableCorpse;
-                    if (body != null && Time.time >= lootUntil)
+                    if (body != null && Time.time >= lootUntil && !searched.Contains(body))
                     {
-                        if (!s.LootOpen) s.Interact();
-                        if (s.LootOpen && s.LootBody == body)
+                        // A body with only common things is emptied in the one press (OpenLoot); one with gear opens the window: either way,
+                        // what landed in the bags is the record.
+                        string Named(string id) { var d = s.Items.Get(id); return d != null ? d.name : id; }
+                        var before = new Dictionary<string, int>(); foreach (var st in s.Progress.bag) if (!st.Empty) { before.TryGetValue(st.item, out var n); before[st.item] = n + st.count; }
+                        int coinBefore = s.Progress.gold;
+                        s.Interact(); if (s.LootOpen && s.LootBody == body) s.TakeAllLoot();
+                        var gained = new List<string>();
+                        var after = new Dictionary<string, int>(); foreach (var st in s.Progress.bag) if (!st.Empty) { after.TryGetValue(st.item, out var n); after[st.item] = n + st.count; }
+                        foreach (var kv in after) { before.TryGetValue(kv.Key, out var had); if (kv.Value > had) { gained.Add(Named(kv.Key) + (kv.Value - had > 1 ? " x" + (kv.Value - had) : "")); var key = Named(kv.Key); lootTally.TryGetValue(key, out var n); lootTally[key] = n + kv.Value - had; } }
+                        int coin = s.Progress.gold - coinBefore; looted++; searched.Add(body);
+                        Log(Clock(t) + "  searched " + body.Name + ": " + (gained.Count > 0 ? string.Join(", ", gained) : "nothing") + (coin > 0 ? (gained.Count > 0 ? ", " : "") + coin + " coin" : "") + (body.Drops != null && body.Drops.Count > 0 ? " (left on it: " + string.Join(", ", body.Drops.Select(d => Named(d.item))) + ")" : ""));
+                        // Anything better than what you wear goes on (the loot's worth, seen in play).
+                        for (int bi = 0; bi < s.Progress.bag.Count; bi++)
                         {
-                            string Named(string id) { var d = s.Items.Get(id); return d != null ? d.name : id; }
-                            var had = body.Drops != null ? body.Drops.Select(d => Named(d.item) + (d.count > 1 ? " x" + d.count : "")).ToList() : new List<string>();
-                            foreach (var d in (body.Drops ?? new List<LootDrop>())) { var key = Named(d.item); lootTally.TryGetValue(key, out var n); lootTally[key] = n + d.count; }
-                            int coinBefore = s.Progress.gold; s.TakeAllLoot(); looted++; searched.Add(body);
-                            Log(Clock(t) + "  searched " + body.Name + ": " + (had.Count > 0 ? string.Join(", ", had) : "nothing") + (s.Progress.gold > coinBefore ? ", " + (s.Progress.gold - coinBefore) + " coin" : "") + (body.Drops != null && body.Drops.Count > 0 ? " (left on it: " + string.Join(", ", body.Drops.Select(d => Named(d.item))) + ")" : ""));
-                            // Anything better than what you wear goes on (the loot's worth, seen in play).
-                            for (int bi = 0; bi < s.Progress.bag.Count; bi++)
-                            {
-                                var stack = s.Progress.bag[bi]; if (stack.Empty) continue; var d = s.Items.Get(stack.item); if (d == null || d.kind != "gear" || !Inventory.CanEquip(d, s.Progress.Level, out _)) continue;
-                                int slot = ItemDatabase.SlotIndex(d.slot); if (slot < 0 || slot >= s.Progress.equipment.Count) continue;
-                                var worn = s.Progress.equipment[slot].Empty ? null : s.Items.Get(s.Progress.equipment[slot].item);
-                                if (worn != null && Worth(worn) >= Worth(d)) continue;
-                                if (s.EquipFromBag(bi)) Log(Clock(t) + "  equipped " + d.name + " (" + d.slot + ", armour " + d.armor + (worn != null ? ", was " + worn.name : "") + ")");
-                            }
+                            var stack = s.Progress.bag[bi]; if (stack.Empty) continue; var d = s.Items.Get(stack.item); if (d == null || d.kind != "gear" || !Inventory.CanEquip(d, s.Progress.Level, out _)) continue;
+                            int slot = ItemDatabase.SlotIndex(d.slot); if (slot < 0 || slot >= s.Progress.equipment.Count) continue;
+                            var worn = s.Progress.equipment[slot].Empty ? null : s.Items.Get(s.Progress.equipment[slot].item);
+                            if (worn != null && Worth(worn) >= Worth(d)) continue;
+                            if (s.EquipFromBag(bi)) Log(Clock(t) + "  equipped " + d.name + " (" + d.slot + ", armour " + d.armor + (worn != null ? ", was " + worn.name : "") + ")");
                         }
-                        lootUntil = Time.time + 1.5f; if (!s.LootOpen && s.LootBody == null) searched.Add(body);   // nothing on it (CanTakeAny): not again
+                        lootUntil = Time.time + 1.5f;
                         if (corpse == body) corpse = null;
                     }
                 }
@@ -161,10 +163,13 @@ namespace Crulanda.Encounter
             }
             EncounterInput.Scripted = null; Time.timeScale = 1;
             float total = Time.time - start; bool done = leader != null && leader.Dungeon == null;
-            Shot(s, directory, "99-" + Clock(total).Replace(':', 'm') + "-" + (done ? "cleared" : "stopped"), ref shots, leader);
+            Shot(s, directory, "98-" + Clock(total).Replace(':', 'm') + "-" + (done ? "cleared" : "stopped"), ref shots, leader);
+            if (!s.ScorecardOpen) s.ShowScorecard((s.Zone.Zone.displayName ?? s.ZoneId) + (done ? " cleared" : " so far"));
+            yield return null; yield return null;
+            ScreenCapture.CaptureScreenshot(Path.Combine(directory, "99-scorecard.png")); yield return new WaitForSeconds(.6f);
             Log(Clock(total) + "  " + (done ? "the run is done: every camp cleared." : "stopped (the real-time limit): " + (camps - left) + " of " + camps + " camps cleared.") + " Mends seen: " + mends + "; bodies searched: " + looted + ".");
             Log("Loot taken: " + (lootTally.Count == 0 ? "nothing" : string.Join(", ", lootTally.Select(kv => kv.Key + (kv.Value > 1 ? " x" + kv.Value : "")))) + "; coin " + s.Progress.gold + ".");
-            Log("Meter (" + Mathf.RoundToInt(s.Meter.CombatSeconds) + " s of fighting):"); foreach (var line in s.Meter.Lines()) Log("  " + line);
+            foreach (var line in s.Meter.Scorecard()) Log(line);
             Finish(s, directory, log, total, camps, camps - left, deaths, warps, done);
         }
         static int Worth(ItemDef d) { return d == null ? 0 : d.armor + 2 * (d.stamina + d.strength + d.agility + d.intellect + d.spirit) + 3 * d.weaponDamage + d.heal; }
@@ -187,8 +192,8 @@ namespace Crulanda.Encounter
                 "Mobs down at the end: " + slain + "; elites slain: " + elites,
                 "Your deaths: " + deaths + "; warps to the leader when stuck: " + warps,
                 "The gates were opened for the run (their quests are not done here).",
-                "Meter over " + Mathf.RoundToInt(s.Meter.CombatSeconds) + " s of fighting:" };
-            summary.AddRange(s.Meter.Lines().Select(l => "  " + l));
+                "Scorecard:" };
+            summary.AddRange(s.Meter.Scorecard().Select(l => "  " + l));
             File.WriteAllLines(Path.Combine(directory, "run-summary.txt"), summary);
             File.WriteAllLines(Path.Combine(directory, "run-log.txt"), log);
             Debug.Log("RUN_CAPTURE_DONE " + string.Join(" | ", summary));

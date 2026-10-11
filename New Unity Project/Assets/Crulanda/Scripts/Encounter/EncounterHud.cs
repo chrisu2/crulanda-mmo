@@ -102,6 +102,7 @@ namespace Crulanda.Encounter
             if (session.QuestBookOpen) DrawQuestBook();
             if (session.WhoOpen) DrawWho();
             if (session.MeterOpen) DrawMeter();
+            if (session.ScorecardOpen) DrawScorecard();
             if (session.Conversation != null) DrawConversation();
             DrawLoot();
             if (uiUnlocked) DrawPanelHandles();
@@ -813,7 +814,7 @@ namespace Crulanda.Encounter
                 }
                 // Level-coloured names (grey, green, yellow, orange, red by how the enemy compares to you).
                 Outlined(new Rect(a.x - 150, a.y - 25, 300, 22), p.name, plateText, target ? gold : ConColor(p.e.actor.Level));
-                if (p.e.RaidMarked != RaidMark.None)   // the raid mark above the name (CC step C3): an icon (Chris, 2026-10-11: "you say Moon it really need to show an ICon")
+                if (p.e.RaidMarked != RaidMark.None && p.e.actor.IsAlive)   // the raid mark above the name (CC step C3): an icon (Chris, 2026-10-11: "you say Moon it really need to show an ICon"); gone with the mob ("once the mob that was cc dies. take off the icon")
                 {
                     var icon = Mark(p.e.RaidMarked == RaidMark.Skull ? "skull" : p.e.RaidMarked == RaidMark.Moon ? "moon" : "cross");
                     if (icon != null) { Fill(new Rect(a.x - 18, a.y - 63, 36, 36), new Color(0, 0, 0, .55f)); GUI.DrawTexture(new Rect(a.x - 16, a.y - 61, 32, 32), icon); }
@@ -960,6 +961,38 @@ namespace Crulanda.Encounter
                 GUI.contentColor = Color.white; y += 22;
             }
             if (rows.Count == 0) GUI.Label(new Rect(r.x + 10, y, 300, 20), "Nothing yet.", small);
+        }
+        /// <summary>The run's scorecard (Chris, 2026-10-11): every member with its class, damage and healing a second, deaths; the MVP and the
+        /// healer of the run; what dropped, off whom, to whom.</summary>
+        void DrawScorecard()
+        {
+            var m = session.Meter; var rows = new List<CombatMeter.Row>(m.Rows); float t = m.CombatSeconds;
+            int lootLines = Mathf.Min(10, m.Drops.Count);
+            var r = new Rect(290, 110, 860, 190 + 26 * Mathf.Max(1, rows.Count) + 22 * Mathf.Max(1, lootLines));
+            Frame(r);
+            GUI.Label(new Rect(r.x + 30, r.y + 18, 800, 36), (session.ScorecardTitle ?? "THE RUN").ToUpperInvariant(), heading);
+            GUI.Label(new Rect(r.x + 30, r.y + 56, 800, 22), Mathf.FloorToInt(m.RunSeconds / 60) + " min " + (Mathf.FloorToInt(m.RunSeconds) % 60).ToString("00") + " s  ·  " + Mathf.RoundToInt(t) + " s of it fighting", small);
+            float y = r.y + 88;
+            GUI.contentColor = gold;
+            GUI.Label(new Rect(r.x + 30, y, 260, 22), "MEMBER", small); GUI.Label(new Rect(r.x + 300, y, 160, 22), "DAMAGE", small); GUI.Label(new Rect(r.x + 470, y, 160, 22), "HEALING", small); GUI.Label(new Rect(r.x + 640, y, 90, 22), "DEATHS", small);
+            GUI.contentColor = Color.white; y += 26;
+            var mvp = m.Mvp(); var healer = m.TopHealer();
+            foreach (var row in rows)
+            {
+                GUI.Label(new Rect(r.x + 30, y, 260, 22), row.name + (row == mvp ? "  ★" : ""), small);
+                GUI.contentColor = new Color(1, .75f, .5f); GUI.Label(new Rect(r.x + 300, y, 160, 22), row.damage.ToString("N0") + "  " + row.Dps(t).ToString("0") + "/s", small);
+                GUI.contentColor = new Color(.5f, 1, .7f); GUI.Label(new Rect(r.x + 470, y, 160, 22), row.healing.ToString("N0") + "  " + row.Hps(t).ToString("0") + "/s", small);
+                GUI.contentColor = row.deaths > 0 ? new Color(1, .5f, .45f) : Color.white; GUI.Label(new Rect(r.x + 640, y, 90, 22), row.deaths.ToString(), small);
+                GUI.contentColor = Color.white; y += 26;
+            }
+            if (rows.Count == 0) { GUI.Label(new Rect(r.x + 30, y, 400, 22), "Nothing fought yet.", small); y += 26; }
+            y += 6; GUI.contentColor = gold;
+            GUI.Label(new Rect(r.x + 30, y, 800, 22), (mvp != null ? "MVP: " + mvp.name : "") + (healer != null ? "     Healer of the run: " + healer.name : ""), small);
+            GUI.contentColor = Color.white; y += 30;
+            GUI.Label(new Rect(r.x + 30, y, 400, 22), "LOOT" + (m.Coin > 0 ? "  ·  " + m.Coin + " coin to you" : ""), small); y += 24;
+            if (m.Drops.Count == 0) GUI.Label(new Rect(r.x + 30, y, 800, 22), "Nothing dropped.", tiny);
+            for (int i = Mathf.Max(0, m.Drops.Count - lootLines); i < m.Drops.Count; i++) { var d = m.Drops[i]; GUI.Label(new Rect(r.x + 30, y, 800, 22), d.item + "  off " + d.from + "  to " + d.to, tiny); y += 22; }
+            if (GUI.Button(new Rect(r.xMax - 150, r.yMax - 46, 120, 32), "Close [Esc]", button)) session.ScorecardOpen = false;
         }
         static Texture2D Mark(string id) { return IconDb.Load(IconDb.PathFor("mark", id)); }
         /// <summary>Which hold icon a mob's control label calls for (Icons/mark): held, stunned, feared, silenced; null for none.</summary>

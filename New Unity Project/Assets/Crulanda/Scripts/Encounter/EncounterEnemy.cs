@@ -289,7 +289,7 @@ namespace Crulanda.Encounter
                 if (Move != null && Time.time >= nextBlowAt) { BeginBlow(); return; }
                 swing = Time.time + SwingInterval;
                 if (Figure != null) Figure.Strike();
-                int damage = session.Kit.ResolveEnemyHit(this, Victim, Capped(Victim, Mathf.RoundToInt(HitBase * OverHitNow * GroupDamageScale)));
+                int damage = session.Kit.ResolveEnemyHit(this, Victim, CappedBlow(Victim, Mathf.RoundToInt(HitBase * OverHitNow * GroupDamageScale)));
                 session.FloatText(Victim.transform.position, "−" + damage, new Color(1, .45f, .35f));
             }
         }
@@ -326,7 +326,7 @@ namespace Crulanda.Encounter
         /// <summary>No single blow takes more than three fifths of a party member's health (2026-10-11, the group run: Gang-Boss Haddo Lusk's
         /// Tally-Stick came to about 1,050 against people of 439, a one-shot every cycle; a fight should be lost over blows, not in one).</summary>
         public const float MaxBlowShare = .6f;
-        int Capped(Actor victim, int raw)
+        public int CappedBlow(Actor victim, int raw)
         {
             if (victim == null || victim.Health == null || session.PartyActor(victim.EntityId.Value) == null) return raw;
             return Mathf.Min(raw, Mathf.Max(1, Mathf.RoundToInt(victim.Health.Pool.Max * MaxBlowShare)));
@@ -346,6 +346,7 @@ namespace Crulanda.Encounter
         }
         void OnDeath(Health health)
         {
+            RaidMarked = RaidMark.None;   // the mark dies with it (Chris, 2026-10-11: "once the mob that was cc dies. take off the icon")
             ClearFight();   // before the death pose: a blow half drawn leaves the body leaning
             Victim = null;
             if (agent.isOnNavMesh) agent.isStopped = true;

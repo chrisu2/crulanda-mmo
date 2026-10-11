@@ -188,7 +188,7 @@ namespace Crulanda.Encounter
         void TakeCoins(EncounterEnemy body)
         {
             if (body.Coins <= 0) return;
-            int all = body.Coins, mine = SplitCoins(all); Progress.gold += mine; body.Coins = 0;   // split round the party (Round 25, note 72)
+            int all = body.Coins, mine = SplitCoins(all); Progress.gold += mine; body.Coins = 0; Meter.Coin += mine;   // split round the party (Round 25, note 72)
             Message(mine == all ? "Looted " + all + " crowns." : "Looted " + mine + " crowns, your share of " + all + ".");
         }
         /// <summary>
@@ -204,7 +204,7 @@ namespace Crulanda.Encounter
             // In a party, uncommon and better is rolled for (Round 25, note 72): off the body and into the roll.
             if (Rolled(drop.item)) { body.Drops[i] = new LootDrop(drop.item, 0); QueueRoll(drop.item, drop.count, body.actor.DisplayName); return 0; }
             int left = Items != null ? Inventory.Add(Progress, Items, drop.item, drop.count) : drop.count;
-            if (drop.count - left > 0) Received(drop.item, drop.count - left);
+            if (drop.count - left > 0) { Received(drop.item, drop.count - left); Meter.Loot(ItemName(drop.item) + (drop.count - left > 1 ? " x" + (drop.count - left) : ""), body.Name, "You"); }
             body.Drops[i] = new LootDrop(drop.item, left);
             return left;
         }

@@ -102,6 +102,7 @@ namespace Crulanda.Encounter
             actor = a; session = s; sim = data; slot = partySlot; agent = GetComponent<NavMeshAgent>(); visual = GetComponent<ActorVisual>();
             actor.Stats.SetBase(Crulanda.Core.StatType.MaxHealth, MaxHealthFor(sim)); actor.Health.ApplyHealing(actor.Health.Pool.Max);
             actor.Stats.SetBase(Crulanda.Core.StatType.Armor, ArmourFor(sim, session.Items));   // what it wears turns blows as yours does (2026-10-11; it had no armour at all)
+            actor.Health.Died += h => session.Meter.Death(actor);   // the scorecard's deaths
             nextAct = Time.time + .5f + slot * .3f; joinedAt = Time.time;
         }
         /// <summary>What this grouping was worth to it (5.5): a point a minute, one for every three kills.</summary>
@@ -112,6 +113,17 @@ namespace Crulanda.Encounter
             if (killsTogether >= 3) SimMemory.Note(sim, SimMemory.Deed.KillsTogether, killsTogether / 3);
             if (kicked) SimMemory.Note(sim, SimMemory.Deed.Kicked);
         }
+        /// <summary>How far behind the leader its farthest living party member is (you, the sims, the wolves), in metres.</summary>
+        public float PartyBehind()
+        {
+            float worst = 0; var me = transform.position;
+            if (player != null && player.IsAlive) worst = Mathf.Max(worst, Vector3.Distance(me, player.transform.position));
+            foreach (var c in session.PartySims) if (c != null && c != this && c.actor != null && c.actor.IsAlive) worst = Mathf.Max(worst, Vector3.Distance(me, c.transform.position));
+            return worst;
+        }
+        /// <summary>A mob the party's holds have put out of the fight (sapped, gouged, bound, blinded): nobody strikes it while anything else
+        /// stands (Chris, 2026-10-11: "party doesnt ignore the CC mobs"). A stunned one is fair game: the stun does not break.</summary>
+        public static bool Held(EncounterEnemy e) { return e != null && (e.Incapacitated || e.Feared); }
         /// <summary>The enemy it should be fighting: your target when it is in a fight, otherwise whatever is on one of the party.</summary>
         public EncounterEnemy Quarry
         {
@@ -123,7 +135,7 @@ namespace Crulanda.Encounter
                     EncounterEnemy peel = null; float peelD = 30;
                     foreach (var e in session.Enemies)
                     {
-                        if (e == null || !e.actor.IsAlive || !e.FightingParty || e.LeaveAlone || e.Victim == null || e.Victim == actor) continue;
+                        if (e == null || !e.actor.IsAlive || !e.FightingParty || e.LeaveAlone || e.Victim == null || e.Victim == actor || Held(e)) continue;
                         var vc = e.Victim.GetComponent<SimCompanion>(); if (vc != null && vc.Role == PartyRole.Tank) continue;
                         float d = Vector3.Distance(e.transform.position, transform.position); if (d < peelD) { peel = e; peelD = d; }
                     }
@@ -132,14 +144,14 @@ namespace Crulanda.Encounter
                 foreach (var e in session.Enemies)   // the skull first (CC step C3)
                     if (e != null && e.RaidMarked == RaidMark.Skull && e.actor.IsAlive && e.FightingParty && !e.Incapacitated && Vector3.Distance(e.transform.position, transform.position) < 30) return e;
                 var t = session.Target;
-                if (t != null && t.actor.IsAlive && !t.Game && !t.LeaveAlone && (t.FightingParty || session.AutoAttack)) return t;
+                if (t != null && t.actor.IsAlive && !t.Game && !t.LeaveAlone && !Held(t) && (t.FightingParty || session.AutoAttack)) return t;
                 EncounterEnemy best = null; float bestD = 30;
                 foreach (var e in session.Enemies)
                 {
-                    if (e == null || !e.actor.IsAlive || !e.FightingParty || e.LeaveAlone) continue;
+                    if (e == null || !e.actor.IsAlive || !e.FightingParty || e.LeaveAlone || Held(e)) continue;
                     float d = Vector3.Distance(e.transform.position, transform.position); if (d < bestD) { best = e; bestD = d; }
                 }
-                if (best == null && Leading.HasValue && waitingAt == null && Vector3.Distance(transform.position, Leading.Value) < 18)
+                if (best == null && Leading.HasValue && waitingAt == null && Vector3.Distance(transform.position, Leading.Value) < 18 && PartyBehind() <= 12)   // no pull till the party is up
                 {
                     // At the camp it leads to: the nearest of its mobs still standing (not while it waits at a shut gate: the camp past it is not its to pull, D7).
                     foreach (var e in session.Enemies)
@@ -242,6 +254,7 @@ namespace Crulanda.Encounter
                 int first = camps[0].lo; if (session.Progress.Level < first - 1) { why = h.Name + " is too much for us yet (level " + first + " at the door)."; return null; }
                 foreach (var cp in camps) { route.Add((cp.at, cp.name, cp.boss, cp.gate)); if (StoppedBy == null && cp.gate != null && !cp.gate.Open) StoppedBy = cp.gate.Title; }   // the first shut gate: the run waits there (D7)
                 Dungeon = session.Zone.Zone.dungeon ? session.Zone.Zone.displayName : h.Name; Leading = route[0].at; LeadingName = route[0].name;
+                session.Meter.BeginRun(Dungeon);   // the scorecard counts from here
                 session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? "ok, " + Dungeon + " run. " + route.Count + " camps to the bottom, stay close" : "Follow me into " + Dungeon + ". " + route.Count + " camps between us and the end. Stay close.");
                 return Dungeon;
             }
@@ -349,6 +362,7 @@ namespace Crulanda.Encounter
                 {
                     session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? Dungeon + " done!! gg all" : Dungeon + " is cleared. That was well done, all of you.");
                     session.Message(sim.name + ": " + Dungeon + " cleared."); foreach (var p in session.PartySims) if (p != null) SimMemory.Note(p.sim, SimMemory.Deed.KillsTogether, 3);
+                    session.ShowScorecard(Dungeon + " cleared");
                     StopLeading();
                 }
                 else
@@ -415,6 +429,10 @@ namespace Crulanda.Encounter
             {
                 float toCamp = Vector3.Distance(transform.position, Leading.Value);
                 if (toPlayer > 18) { Activity = "Waiting for you"; agent.isStopped = true; return; }
+                // The whole party, not only you (Chris, 2026-10-11, watching the run: "warrior needs to wait on party"): it stops while
+                // anyone alive is more than 12 m behind, and pulls nothing until they are all within reach.
+                float behind = PartyBehind();
+                if (behind > 12) { Activity = "Waiting for the party"; agent.isStopped = true; return; }
                 if (toCamp > 6) { Activity = (waitingAt != null ? "Going to the " : "Leading you to the ") + LeadingName.ToLower(); agent.isStopped = false; agent.speed = 4.2f; agent.SetDestination(Leading.Value); return; }
                 Activity = (waitingAt != null ? "Waiting at the " : "At the ") + LeadingName.ToLower(); agent.isStopped = true; return;
             }

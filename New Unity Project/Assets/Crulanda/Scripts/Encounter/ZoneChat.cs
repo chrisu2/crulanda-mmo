@@ -158,6 +158,7 @@ namespace Crulanda.Encounter
                     case "/assist": case "/a": Assist(arg); return;
                     case "/lead": case "/run": Lead(arg); return;
                     case "/dungeon": LeadDungeon(); return;
+                    case "/scorecard": ScorecardOpen = !ScorecardOpen; if (ScorecardOpen && ScorecardTitle == null) ScorecardTitle = (Meter.RunName ?? "The run") + " so far"; return;
                     case "/meter": if (arg == "reset") { Meter.Reset(); Message("Meter reset."); } else { MeterOpen = !MeterOpen; Message(MeterOpen ? "Damage and healing meter shown (/meter reset clears it)." : "Meter hidden."); } return;
                     case "/guild": if (arg.Length == 0) { GuildRoster(); return; } break;
                     case "/groster": case "/ginfo": GuildRoster(); return;

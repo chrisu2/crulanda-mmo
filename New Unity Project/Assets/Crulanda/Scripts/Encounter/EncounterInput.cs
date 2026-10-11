@@ -11,8 +11,11 @@ namespace Crulanda.Encounter
         /// <summary>Action-bar key for a slot: 1-9 then 0 (slot index 9), matching the HUD labels.</summary>
         public static KeyCode SlotKey(int slot) { return slot == 12 ? KeyCode.LeftBracket : slot == 11 ? KeyCode.Equals : slot == 10 ? KeyCode.Minus : slot == 9 ? KeyCode.Alpha0 : (KeyCode)((int)KeyCode.Alpha1 + slot); }   // slots 12 and 13 (the Vanguard's): = and [
         public static string SlotLabel(int slot) { return slot == 12 ? "[" : slot == 11 ? "=" : slot == 10 ? "-" : slot == 9 ? "0" : (slot + 1).ToString(); }
-        /// <summary>True while you type in the chat (EncounterHud.DrawChat): no key moves you or works the bar.</summary>
-        public static bool Typing;
+        /// <summary>True while you type in the chat (EncounterHud.DrawChat sets it each time it draws the chat): no key moves you or works
+        /// the bar. It lapses two frames after the chat was last drawn, so a chat line put away by anything else never holds the keys (the
+        /// tester's note 115: "the game ignored keys until I clicked inside the window").</summary>
+        public static bool Typing { get { return typing && Time.frameCount - typingFrame <= 2; } set { typing = value; typingFrame = Time.frameCount; } }
+        static bool typing; static int typingFrame;
         public static bool Press(KeyCode key)
         {
             if (Typing) return false;

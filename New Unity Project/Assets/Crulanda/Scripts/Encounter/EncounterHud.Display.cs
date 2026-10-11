@@ -70,8 +70,30 @@ namespace Crulanda.Encounter
             if (GUI.Button(new Rect(620, 426, 200, 32), "Put them back", slim)) foreach (var pn in Panels) { try { PlayerPrefs.DeleteKey("ui.pos." + pn.id + ".x"); PlayerPrefs.DeleteKey("ui.pos." + pn.id + ".y"); } catch { } panelOffsets.Remove(pn.id); }
         }
         static bool displayOpen; static int resPick = -1;
-        static readonly string[] ModeNames = { "Fullscreen", "Borderless", "Windowed" };
-        static readonly FullScreenMode[] Modes = { FullScreenMode.ExclusiveFullScreen, FullScreenMode.FullScreenWindow, FullScreenMode.Windowed };
+        // Full screen is always borderless at the monitor's own size (playtest note 121, Chris, 2026-10-11: "going full screen at
+        // 3440x1440 everything is blurry and screw up my text on computer screen ... after i tab out"). "Fullscreen" had been the
+        // exclusive mode at whatever size the window was (1920x1080 at first): the monitor itself switched to that size and stretched
+        // it, and every alt-tab switched the monitor back and forth. The window size is for windowed play only.
+        static readonly string[] ModeNames = { "Full screen", "Windowed" };
+        public static readonly FullScreenMode[] DisplayModes = { FullScreenMode.FullScreenWindow, FullScreenMode.Windowed };
+        /// <summary>The monitor's own size.</summary>
+        static Vector2Int Native { get { var d = Display.main; return d != null && d.systemWidth > 0 ? new Vector2Int(d.systemWidth, d.systemHeight) : new Vector2Int(Screen.currentResolution.width, Screen.currentResolution.height); } }
+        /// <summary>What to set at start-up, or null to leave it: anything full screen that is not borderless at the monitor's own size
+        /// becomes that (an exclusive mode or a smaller size kept from before); a window is left as it is.</summary>
+        public static (int width, int height, FullScreenMode mode)? StartupDisplay(FullScreenMode mode, int width, int height, int nativeWidth, int nativeHeight)
+        {
+            if (mode == FullScreenMode.Windowed || mode == FullScreenMode.MaximizedWindow) return null;
+            if (mode == FullScreenMode.FullScreenWindow && width == nativeWidth && height == nativeHeight) return null;
+            return (nativeWidth, nativeHeight, FullScreenMode.FullScreenWindow);
+        }
+        static bool displayChecked;
+        /// <summary>Once a run: full screen put right (StartupDisplay).</summary>
+        static void CheckDisplay()
+        {
+            if (displayChecked || Application.isEditor) return; displayChecked = true;
+            var n = Native; var fix = StartupDisplay(Screen.fullScreenMode, Screen.width, Screen.height, n.x, n.y);
+            if (fix.HasValue) Screen.SetResolution(fix.Value.width, fix.Value.height, fix.Value.mode);
+        }
         static List<Resolution> resolutions;
         /// <summary>Everyone dressed again (the Show helms switch): you, your party and the sims about.</summary>
         void RedressAll()
@@ -89,17 +111,22 @@ namespace Crulanda.Encounter
                 if (resolutions.Count == 0) resolutions.Add(Screen.currentResolution);
             }
             if (resPick < 0) { resPick = resolutions.FindIndex(r => r.width == Screen.width && r.height == Screen.height); if (resPick < 0) resPick = resolutions.Count - 1; }
-            int mode = System.Array.IndexOf(Modes, Screen.fullScreenMode); if (mode < 0) mode = 1;
+            int mode = Screen.fullScreenMode == FullScreenMode.Windowed || Screen.fullScreenMode == FullScreenMode.MaximizedWindow ? 1 : 0;
             var box = new Rect(470, 200, 500, 360); Frame(box);
             GUI.Label(new Rect(box.x + 28, box.y + 16, 400, 34), "DISPLAY", heading);
             var res = resolutions[resPick];
-            Shadow(new Rect(box.x + 28, box.y + 74, 140, 24), "Resolution", tiny, Color.white);
+            Shadow(new Rect(box.x + 28, box.y + 74, 140, 24), "Window size", tiny, Color.white);
             if (GUI.Button(new Rect(box.x + 170, box.y + 70, 36, 30), "<", slim)) resPick = (resPick + resolutions.Count - 1) % resolutions.Count;
             Shadow(new Rect(box.x + 214, box.y + 74, 170, 24), res.width + " x " + res.height, tiny, new Color(1, .84f, .45f));
             if (GUI.Button(new Rect(box.x + 392, box.y + 70, 36, 30), ">", slim)) resPick = (resPick + 1) % resolutions.Count;
             Shadow(new Rect(box.x + 28, box.y + 124, 140, 24), "Mode", tiny, Color.white);
-            for (int i = 0; i < 3; i++)
-                if (GUI.Button(new Rect(box.x + 170 + i * 104, box.y + 120, 98, 30), ModeNames[i], slim)) { mode = i; Screen.fullScreenMode = Modes[i]; }
+            for (int i = 0; i < DisplayModes.Length; i++)
+                if (GUI.Button(new Rect(box.x + 170 + i * 104, box.y + 120, 98, 30), ModeNames[i], slim))
+                {
+                    mode = i; var n = Native;
+                    if (DisplayModes[i] == FullScreenMode.Windowed) Screen.SetResolution(Mathf.Min(res.width, n.x), Mathf.Min(res.height, n.y), FullScreenMode.Windowed);
+                    else Screen.SetResolution(n.x, n.y, FullScreenMode.FullScreenWindow);
+                }
             Fill(new Rect(box.x + 170 + mode * 104, box.y + 151, 98, 3), new Color(1, .84f, .45f));
             Shadow(new Rect(box.x + 28, box.y + 174, 140, 24), "UI scale", tiny, Color.white);
             float v = GUI.HorizontalSlider(new Rect(box.x + 170, box.y + 180, 200, 20), UiScale, .6f, 1.4f);
@@ -108,9 +135,9 @@ namespace Crulanda.Encounter
             bool helms = GUI.Toggle(new Rect(box.x + 260, box.y + 236, 220, 26), ActorVisual.ShowHelms, "  Show helms");
             if (helms != ActorVisual.ShowHelms) { ActorVisual.ShowHelms = helms; RedressAll(); }
             if (GUI.Button(new Rect(box.x + 260, box.y + 272, 200, 30), "Unlock UI (drag panels)", slim)) { uiUnlocked = true; displayOpen = false; session.Resume(); }
-            if (GUI.Button(new Rect(box.x + 28, box.y + 230, 200, 36), "Apply resolution", button)) Screen.SetResolution(res.width, res.height, Modes[mode]);
+            if (GUI.Button(new Rect(box.x + 28, box.y + 230, 200, 36), "Window at this size", button)) { var n = Native; Screen.SetResolution(Mathf.Min(res.width, n.x), Mathf.Min(res.height, n.y), FullScreenMode.Windowed); }
             if (GUI.Button(new Rect(box.xMax - 128, box.y + 16, 100, 30), "Done", slim)) displayOpen = false;
-            Shadow(new Rect(box.x + 28, box.y + 316, 450, 20), "The UI scale applies at once; the resolution when you apply it.", tiny, new Color(.85f, .85f, .8f));
+            Shadow(new Rect(box.x + 28, box.y + 316, 450, 20), "Full screen is always your monitor's own size; the window size is for a window.", tiny, new Color(.85f, .85f, .8f));
         }
     }
 }

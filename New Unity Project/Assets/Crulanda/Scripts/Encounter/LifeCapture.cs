@@ -43,6 +43,29 @@ namespace Crulanda.Encounter
                 ScreenCapture.CaptureScreenshot(Path.Combine(directory, file)); yield return new WaitForSeconds(.5f);
                 Debug.Log("Life capture: " + file + " " + f.sim.name + " " + f.Doings);
             }
+            // A farmer with the fork (playtest notes 95, 109 and 119: "farmers hoes still going thru the arm and not held like a staff"):
+            // about the fields (07), then standing and talking from the front, the side and the back (08-10), and at work hoeing (11).
+            Villager farmer = null;
+            foreach (var v in UnityEngine.Object.FindObjectsByType<Villager>(FindObjectsSortMode.None)) if (v.Role == "farmer" && v.gameObject.activeInHierarchy) { farmer = v; break; }
+            if (farmer == null) Debug.Log("Life capture: no farmer");
+            else
+            {
+                var fv = farmer.GetComponent<ActorVisual>(); var cam = Camera.main; var ft = farmer.transform;
+                motor.Teleport(ft.position + ft.forward * 30 + Vector3.up); yield return null; motor.enabled = false;   // the player out of the shot
+                cam.transform.position = ft.position + ft.right * 4 + Vector3.up * 1.4f; cam.transform.LookAt(ft.position + Vector3.up);
+                yield return null; ScreenCapture.CaptureScreenshot(Path.Combine(directory, "07-farmer-about.png")); yield return new WaitForSeconds(.5f);
+                farmer.enabled = false; var agent = farmer.GetComponent<UnityEngine.AI.NavMeshAgent>(); if (agent != null && agent.isOnNavMesh) agent.isStopped = true;
+                foreach (var (angle, name, pose) in new[] { (0f, "08-farmer-front", ActorPose.Talk), (90f, "09-farmer-side", ActorPose.Talk), (180f, "10-farmer-back", ActorPose.Talk), (60f, "11-farmer-at-work", ActorPose.Work) })
+                {
+                    if (fv != null) fv.Pose = pose;
+                    var dir = Quaternion.Euler(0, angle, 0) * ft.forward;
+                    cam.transform.position = ft.position + dir * 2.6f + Vector3.up * 1.4f; cam.transform.LookAt(ft.position + Vector3.up);
+                    yield return new WaitForSeconds(1.5f);
+                    ScreenCapture.CaptureScreenshot(Path.Combine(directory, name + ".png")); yield return new WaitForSeconds(.5f);
+                    Debug.Log("Life capture: " + name + " " + farmer.Name);
+                }
+                farmer.enabled = true; motor.enabled = true;
+            }
             motor.Teleport(s.Zone.Ground(Vector2.zero) + new Vector3(18, 1, -18)); motor.SetView(-45, 22, 30);
             yield return new WaitForSeconds(2.5f);
             ScreenCapture.CaptureScreenshot(Path.Combine(directory, "06-wide.png")); yield return new WaitForSeconds(.5f);

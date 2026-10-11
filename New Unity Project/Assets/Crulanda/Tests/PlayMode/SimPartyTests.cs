@@ -120,6 +120,39 @@ namespace Crulanda.Tests
         }
 
         /// <summary>Mira mends a hurt sim in your party, not only you and herself (Chris, 2026-10-09: "Mira not healing a sim in our party").</summary>
+        /// <summary>A Druid in the party mends whoever is hurt near it, you and the other sims, out of a fight too, and is not held up by
+        /// someone hurt worse out of its reach (playtest note 122, Chris, 2026-10-11: "the druids are still not healing party members!").</summary>
+        [UnityTest] public IEnumerator A_Druid_in_the_party_mends_you_and_the_sims_near_it()
+        {
+            session.Progress.recruited = false;   // Mira stays out of it: the mending measured is the Druid's
+            var pop = SimPopulation.Active;
+            var two = pop.World.sims.Where(x => x.zone == "zone.oakhaven").Take(2).ToList(); if (two.Count < 2) two = pop.World.sims.Take(2).ToList();
+            foreach (var x in two) { x.zone = "zone.oakhaven"; x.onlineFrom = 0; x.onlineHours = 24; x.friendly = .9f; x.level = session.Progress.Level; }
+            two[0].classId = "class.druid"; two[1].classId = "class.warrior";
+            pop.Refresh(); yield return null;
+            Assert.IsTrue(session.Invite(two[0].id), "the Druid joins"); Assert.IsTrue(session.Invite(two[1].id), "the Warrior joins");
+            var druid = session.PartySim(two[0].id); var warrior = session.PartySim(two[1].id);
+            Assert.AreEqual(SimCompanion.PartyRole.Healer, druid.Role);
+            var p = session.Player.transform.position;
+            druid.GetComponent<UnityEngine.AI.NavMeshAgent>().Warp(p + Vector3.left * 2); warrior.GetComponent<UnityEngine.AI.NavMeshAgent>().Warp(p + Vector3.right * 2);
+            yield return null;
+            IEnumerator Mended(Crulanda.Gameplay.Actor who, string name, float ratio)
+            {
+                who.Health.ApplyDamage(Mathf.RoundToInt(who.Health.Pool.Max * (who.Health.Pool.Ratio - ratio)));
+                int before = who.Health.Pool.Current; bool saw = false; float t = 0;
+                while (t < 6 && !(saw && who.Health.Pool.Current >= before + druid.MendFor(who) * .9f)) { if (druid.Activity.StartsWith("Mending")) saw = true; t += Time.deltaTime; yield return null; }
+                Assert.IsTrue(saw, "the Druid mends " + name + " (at " + ratio.ToString("0%") + "; it was: " + druid.Activity + ")");
+                Assert.GreaterOrEqual(who.Health.Pool.Current, before + druid.MendFor(who) * .9f, name + "'s health rises by the mend (" + before + " to " + who.Health.Pool.Current + ")");
+            }
+            yield return Mended(session.Player, "you", .7f);
+            yield return Mended(warrior.actor, warrior.sim.name, .7f);
+            // Someone hurt worse but out of reach does not stop it mending the one beside it.
+            warrior.enabled = false; warrior.GetComponent<UnityEngine.AI.NavMeshAgent>().enabled = false;   // held there, 40 m off
+            warrior.transform.position = p + Vector3.right * 40; warrior.actor.Health.ApplyDamage(Mathf.RoundToInt(warrior.actor.Health.Pool.Max * .5f));
+            yield return new WaitForSeconds(SimCompanion.MendEvery);
+            yield return Mended(session.Player, "you, with the Warrior hurt worse 40 m off", .7f);
+        }
+
         [UnityTest] public IEnumerator Mira_mends_a_hurt_sim_in_the_party()
         {
             session.Progress.recruited = true;

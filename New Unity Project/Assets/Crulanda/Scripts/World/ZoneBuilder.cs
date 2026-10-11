@@ -1217,7 +1217,12 @@ namespace Crulanda.World
                 }
                 rng = zoneRng;
                 if (drop) { DestroyImmediate(t.gameObject); continue; }
-                if (t != null && Footprint(p).x > 0) t.gameObject.AddComponent<RoofFade>();   // see-through when it hides the player (playtest note 26)
+                if (t != null && Footprint(p).x > 0)   // see-through where it hides the player (playtest notes 26 and 120)
+                {
+                    var fade = t.gameObject.AddComponent<RoofFade>(); bool open = p.kind == "forge" || p.kind == "tannery" || p.kind == "shelter";
+                    fade.Half = Footprint(p) - Vector2.one * (open || p.kind == "tower" || p.kind == "crypt" || p.kind == "kitchen" ? .3f : .8f);   // the walls, not the eaves
+                    fade.Walled = !open;
+                }
                 if (!string.IsNullOrEmpty(p.interact) && t != null)
                     Interactables.Add(new ZoneInteractable { name = string.IsNullOrEmpty(p.name) ? p.kind : p.name, prompt = p.interact, item = p.item, kind = p.kind, once = p.once, node = string.IsNullOrEmpty(p.node) ? null : p.node, position = t.position, root = t });
             }

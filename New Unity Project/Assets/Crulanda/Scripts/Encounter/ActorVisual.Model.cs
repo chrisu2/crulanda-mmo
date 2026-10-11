@@ -591,6 +591,11 @@ namespace Crulanda.Encounter
                 else if (!motor.Airborne && !moving && motor.LandedAge < .4f && model.Has("k.land")) p = new PoseState { slot = "k.land", weight = .5f, arms = p.arms, armL = p.armL, armR = p.armR, elbowL = p.elbowL, elbowR = p.elbowR, twist = p.twist };   // running, none: the landing clip under the run turned the feet in (Chris, 2026-10-10)
             }
             if (dead) { p = new PoseState { slot = "death" }; body.localRotation = Quaternion.identity; body.localPosition = Vector3.zero; }
+            // A trade's tool (CarryTool): put away while seated, carrying a load, swimming or dead; at work only standing at it; a long
+            // one otherwise held like a staff in the right fist (StaffArm), whatever the clip's arm is doing (walking, talking).
+            toolAway = dead || p.slot == "sit" || p.slot == "swim" || p.slot == "swimidle" || Carry != Carrying.None;
+            ToolAtWork = !toolAway && !moving && WorkPose;
+            staffHold = Mathf.MoveTowards(staffHold, tradeTool != null && tradeToolLong && !toolAway && !ToolAtWork && !p.arms ? 1 : 0, dt * 5);
             if (!dead) p.drop -= GroundGap(dt);
             model.Drive(speed, p.slot, dt, heading, p.weight > 0 ? p.weight : 1);
             if (p.arms) { poseArmL = p.armL; poseArmR = p.armR; poseElbowL = p.elbowL; poseElbowR = p.elbowR; }
@@ -641,6 +646,7 @@ namespace Crulanda.Encounter
                 PoseArm(armL, foreL, model.UpperArmL, model.LowerArmL, poseArmL, poseElbowL, arms);
                 PoseArm(armR, foreR, model.UpperArmR, model.LowerArmR, poseArmR, poseElbowR, arms);
             }
+            if (staffHold > 0 && fresh && !dead) StaffArm(staffHold);
             // An elder's stoop and a sleeper's slump bend the back, not the legs.
             float bend = fresh ? stoop + p.bend : 0;
             if (bend != 0 && model.Spine != null) model.Spine.rotation = Quaternion.AngleAxis(bend * .5f, body.right) * model.Spine.rotation;
@@ -814,6 +820,24 @@ namespace Crulanda.Encounter
         public void PreviewDead() { if (model == null) return; model.Sample("death", 99); body.localRotation = Quaternion.identity; body.localPosition = Vector3.zero; SyncFrames(); }
         /// <summary>Turns a model arm so its frames stand as the old pivots would at these angles (the shoulder's Euler in the body,
         /// the elbow about the forearm's X), blended over the clip by <paramref name="w"/>.</summary>
+        float staffHold;
+        /// <summary>The right arm holding a staff (a trade's long tool, CarryTool): the upper arm down, a little forward and out, the
+        /// elbow bent so the forearm points ahead, the fist at the belt a hand's breadth out from the body, the shaft upright through it
+        /// and clear of the arm, the body and the legs (playtest notes 95, 109 and 119).</summary>
+        void StaffArm(float w)
+        {
+            if (model.UpperArmR == null || model.LowerArmR == null || model.HandR == null) return;
+            Vector3 up = body.up, ahead = body.forward, outward = body.right;
+            if (model.Chest != null && Vector3.Dot(model.UpperArmR.position - model.Chest.position, outward) < 0) outward = -outward;   // the right arm's own side
+            PointBone(model.UpperArmR, model.LowerArmR.position - model.UpperArmR.position, (-up + outward * .22f + ahead * .12f).normalized, w);
+            PointBone(model.LowerArmR, model.HandR.position - model.LowerArmR.position, (ahead + outward * .1f - up * .2f).normalized, w);
+        }
+        /// <summary>Turns <paramref name="bone"/> so its limb (now pointing <paramref name="now"/>) points <paramref name="want"/>, by <paramref name="w"/>.</summary>
+        static void PointBone(Transform bone, Vector3 now, Vector3 want, float w)
+        {
+            if (now.sqrMagnitude < 1e-6f) return;
+            bone.rotation = Quaternion.Slerp(Quaternion.identity, Quaternion.FromToRotation(now, want), w) * bone.rotation;
+        }
         void PoseArm(Transform arm, Transform fore, Transform upperBone, Transform lowerBone, Vector3 shoulder, float elbow, float w)
         {
             var fa = FollowOf(arm); var ff = FollowOf(fore); if (fa.frame == null || ff.frame == null) return;

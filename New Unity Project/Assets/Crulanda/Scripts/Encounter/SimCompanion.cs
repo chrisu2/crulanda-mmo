@@ -19,7 +19,7 @@ namespace Crulanda.Encounter
         /// <summary>Time and kills with you this grouping (5.5: SimMemory on leaving).</summary>
         public float joinedAt; public int killsTogether;
         NavMeshAgent agent; ActorVisual visual;
-        float nextAct, nextHeal, nextCatchUp, downSince = -1, healAt; Actor healing;
+        float nextAct, nextHeal, nextRegen, nextCatchUp, downSince = -1, healAt; Actor healing;
         public string Activity { get; private set; } = "Following you";
         public enum PartyRole { Tank, Healer, Damage }
         /// <summary>Its part in the party (5.6): Warriors and Paladins tank (a Paladin heals when no Druid is along), Druids heal, Rangers and Mages deal damage.</summary>
@@ -293,7 +293,7 @@ namespace Crulanda.Encounter
                 if (stuck && NavMesh.SamplePosition(player.transform.position - player.transform.forward * 2.5f, out var near, 12, NavMesh.AllAreas)) agent.Warp(near.position);
             }
             if (!agent.isOnNavMesh) return;
-            if (!session.InCombat && Time.time >= nextHeal) { nextHeal = Time.time + 1; actor.Health.ApplyHealing(Mathf.Max(3, actor.Health.Pool.Max / 40)); }
+            if (!session.InCombat && Time.time >= nextRegen) { nextRegen = Time.time + 1; actor.Health.ApplyHealing(Mathf.Max(3, actor.Health.Pool.Max / 40)); }
             // Mending first, for the healers: the most hurt of the party under 60%. A cast of a second (the spell pose held, playtest
             // note 68), then the release, the heal and its glow.
             if (healing != null)
@@ -302,17 +302,23 @@ namespace Crulanda.Encounter
                 var who = healing; healing = null; if (visual != null) visual.Casting = false;
                 if (who.IsAlive && Vector3.Distance(who.transform.position, transform.position) <= 28)
                 {
-                    int healed = who.GetComponent<Combatant>().Heal(HealAmount);
+                    int healed = who.GetComponent<Combatant>().Heal(MendFor(who));
                     session.FloatText(who.transform.position, "+" + healed, new Color(.3f, 1, .7f)); session.HealThreat(actor, healed);
                     visual?.CastRelease(); if (healed > 0) HealFx.Show(who.transform);
                 }
             }
-            else if (Healer && session.InCombat && Time.time >= nextHeal)
+            // The party's healer (a Druid, or a Paladin with no Druid along) mends as Mira does: whoever is most hurt within reach, under
+            // 80%, in a fight or out of it, every 2.5 s, for a sixth or so of their health. A Paladin tanking only steadies someone under
+            // 60% in a fight, every 6 s. (Playtest note 122, Chris, 2026-10-11: "the druids are still not healing party members!". They
+            // had mended only under 60%, only in a fight, every 6 s and for a small flat sum; nobody at all while the most hurt was out of
+            // reach; and never out of a fight, the sim's own mending each second holding the same timer back.)
+            else if (Healer && Time.time >= nextHeal && (session.InCombat || Role == PartyRole.Healer))
             {
-                var hurt = MostHurt();
-                if (hurt != null && hurt.Health.Pool.Ratio < .6f && Vector3.Distance(hurt.transform.position, transform.position) <= 25)
+                bool mender = Role == PartyRole.Healer;
+                var hurt = MostHurt(HealReach);
+                if (hurt != null && hurt.Health.Pool.Ratio < (mender ? .8f : .6f))
                 {
-                    nextHeal = Time.time + 6; nextAct = Mathf.Max(nextAct, Time.time + 2.2f);
+                    nextHeal = Time.time + (mender ? MendEvery : 6); nextAct = Mathf.Max(nextAct, Time.time + (mender ? 1.2f : 2.2f));
                     healing = hurt; healAt = Time.time + 1; if (visual != null) visual.Casting = true;
                     if (agent.isOnNavMesh) agent.isStopped = true;
                     Activity = "Mending " + (hurt == player ? "you" : hurt.DisplayName);
@@ -409,10 +415,15 @@ namespace Crulanda.Encounter
             agent.isStopped = toPlayer < 2.8f;
             if (!agent.isStopped) { agent.SetDestination(spot); agent.speed = AdventurerMotor.Running ? 5.6f : toPlayer > 9 ? 4.2f : 2.3f; }
         }
-        Actor MostHurt()
+        /// <summary>How far a party healer reaches, and how often the party's healer mends (a Paladin tanking: every 6 s).</summary>
+        public const float HealReach = 25, MendEvery = 2.5f;
+        /// <summary>A mend: the party's healer gives a sixth of the healed one's health (or its old flat sum, if more); a tank's is the flat sum.</summary>
+        public int MendFor(Actor who) { return Role == PartyRole.Healer ? Mathf.Max(HealAmount, Mathf.RoundToInt(who.Health.Pool.Max * .16f)) : HealAmount; }
+        /// <summary>The most hurt of the party within <paramref name="reach"/>: you, Mira (when recruited), the sims, Mother Quillet.</summary>
+        Actor MostHurt(float reach)
         {
             Actor best = null; float low = 1;
-            void Consider(Actor a) { if (a != null && a.IsAlive && a.Health.Pool.Ratio < low) { best = a; low = a.Health.Pool.Ratio; } }
+            void Consider(Actor a) { if (a != null && a.IsAlive && a.Health.Pool.Ratio < low && Vector3.Distance(a.transform.position, transform.position) <= reach) { best = a; low = a.Health.Pool.Ratio; } }
             Consider(session.Player);
             if (session.Progress.recruited && session.Companion != null) Consider(session.Companion.actor);
             foreach (var p in session.PartySims) if (p != null) Consider(p.actor);

@@ -1,6 +1,6 @@
 # Crulanda — handoff (current state)
 
-Updated 2026-10-11, 00:40 (America/New_York). One page on purpose: what is true now, where things are, and everything left to
+Updated 2026-10-11, 01:21 (America/New_York). One page on purpose: what is true now, where things are, and everything left to
 do, phase by phase. History lives in CHANGELOG.md and HANDOFF_ARCHIVE.md. Replace this page when the state changes; do not stack.
 
 ## Read first
@@ -37,9 +37,24 @@ do, phase by phase. History lives in CHANGELOG.md and HANDOFF_ARCHIVE.md. Replac
 - **OPEN**: not done.
 Nothing counts as done until it is VERIFIED. Read the clock (`Get-Date`) before writing any time.
 
+## Chris, 2026-10-11, 01:20
+"record it all and . create a handoff ill probably not let you touch my project again after today". Before that: "after all this work i
+feel less optimistic after all the crap i experienced today", "ive also had to repeat the same issues over and over and over with no
+resolutions", and on the dungeon: "all you did in the dungeon was make it bigger which in turn has less mobs and would not take 60-75mins
+to complete". Whoever works on this next: verify everything yourself, show Chris pictures before anything is published, and never call a
+report fixed until he has seen it in his own build.
+
+## After midnight: Chris's play of the 00:33 build (notes 119-132)
+- **Fixed, TESTED and committed, NOT published, not seen by Chris** (see "Repeated reports" below for the causes and tests): 119 the fork,
+  120 the building fading and 117 the camera in walls, 121 full screen and 115 alt-tab keys, 122 druids healing, 123 the trap, 124 auto
+  shot (Esc), 116 the shop's bags. To publish: run the repeat set, `release_build.ps1 -Sync -NoPublish`, run the build's life capture
+  (`Crulanda.exe --crulanda-life-capture <folder> --crulanda-temp-save`, windowed) and look at the farmer shots 07-11 front, side and back,
+  then publish (`release_build.ps1` copies to outputs unless the game is running) and tell Chris.
+- **Recorded, OPEN, the Adit pass** (8A below): 125, 126, 127, 128, 129, 130, 131, 132.
+
 ## Where the work stands (2026-10-11, 00:33)
 - **Published 00:33** (release build, 0 shader errors, from commit 9fc71fc; the new code and the new layout were checked in the
-  published files): the drawn-out Sealed Adit. **Chris has not walked it yet.**
+  published files): the drawn-out Sealed Adit. **Chris walked it after midnight and reported notes 119-132** (above).
 - VERIFIED in captures only (Chris, 2026-10-10): the feet (the clip import; "finally looks fixed"), the jump's landing (notes 107 and
   111), the bow facing its target ("bow looks better"). Still to see in his own build.
 - TESTED (2026-10-11, 00:10-00:32): the Adit drawn out three times (1,353 m of cave, the zone 800 m square; its built halls walked by
@@ -54,12 +69,28 @@ Nothing counts as done until it is VERIFIED. Read the clock (`Get-Date`) before 
   is on disk (the oldest is 2026-10-10 21:52), so even that is unproven. Tonight only the Adit suites ran; the feet import, the bow,
   the room builder, the scale-up and the lore renames reach further than those.
 
+## Repeated reports (Chris, 2026-10-11: "ive also had to repeat the same issues over and over and over with no resolutions")
+Each was reported before and came back. The cause found on 2026-10-11 and the test that now measures what Chris saw. **Run the
+"repeat set" before every publish**:
+`focus_detached.ps1 -Runs 'PlayMode|Crulanda.Tests.VillageDayTests.A_long_tool_is_held_in_the_fist_like_a_staff_clear_of_the_arm;Crulanda.Tests.CameraAndTargetTests;Crulanda.Tests.SimPartyTests;Crulanda.Tests.RangerLoopTests;Crulanda.Tests.TradeBagTests|repeat#EditMode|Crulanda.Tests.EncounterRulesTests|repeatE'`.
+
+| Note (his words) | Before | Cause found | Measured by |
+|---|---|---|---|
+| 119 "farmers hoes still going thru the arm and not held like a staff" | 95, 109 | the farmer's fork was never on the tool holder note 109 added; the old test measured only the woodcutter's axe | VillageDayTests: fork in the fist, upright, clear of arm, body and legs, walking, standing, talking, at work |
+| 120 "GOING IN A BUILDING MAKES IT DISAPPEAR" | 26, 65; tester 117 | the fade boxed walls square to the world: the angled inn's walls boxed the room, so the whole inn faded; the camera's 1.2 m minimum put it in walls | CameraAndTargetTests: inside, the walls stay; from outside the wall hit fades and the far ones stay; the camera stays within the walls |
+| 122 "the druids are still not healing party members!" | Mira's, 2026-10-09 | sims healed only under 60%, in a fight, every 6 s, none while the most hurt was out of reach, never out of a fight (a timer clash) | SimPartyTests: a Druid mends you and a sim, and the near one with a worse one 40 m off |
+| 121 blurry full screen, desktop text after alt-tab | 94; tester 115 | "Fullscreen" was the exclusive mode at the window's size (1920x1080 first); the chat's typing flag could stay on | EncounterRulesTests: full screen is borderless at the monitor's size; the typing flag lapses |
+| 116 the shop not closing on Goodbye (tester) | | the bags the shop opened stayed open | TradeBagTests |
+| 123 "trap set up in the air" | | set at the middle of the player's 2 m capsule | RangerLoopTests: the trap on the ground at your feet |
+| 124 "no way to turn off auto shot" | | Esc went past it to the menu | RangerLoopTests: Esc stops it, then the target, then the menu |
+
 ## To do, every phase
 Phases 0-7 are built (ROADMAP.md: foundation, combat, seven classes, items, quests, sims, groups, the first two dungeons); what of
 them is not verified is under "Verify first". Phase 8 is now; 8.5 and 9 follow.
 
 ### Verify first
-1. Chris walks the drawn-out Adit (published 00:33). His word before PR #2 (`feet-bow-adit-kit`) is merged.
+1. Chris walked the drawn-out Adit (00:33 build) and reported 119-132. PR #2 (`feet-bow-adit-kit`) is not to be merged until the
+   fixes above are published and verified by him and the Adit pass is done.
 2. The full PlayMode run on the branch, then the zone tours (`build_and_tour.ps1`); fix what fails before the merge. (Chris, 00:46:
    not tonight; first thing next session.)
 3. In Chris's build: the feet, the jump and the bow (verified only in captures); note 108 (the bow in play); 109 (tools carried).
@@ -76,6 +107,13 @@ them is not verified is under "Verify first". Phase 8 is now; 8.5 and 9 follow.
 
 ### Phase 8: the vertical slice (now)
 **8A. The Sealed Adit (DUNGEON_DESIGN.md)**
+0. **First, what Chris saw in the 00:33 build (notes 125-132), all OPEN:** a run must take **60-75 minutes** (0.06) and the drawn-out
+   caves are empty: more camps along every drift and chamber, mobs that **wander their ground and walk patrols**, spawned a body's width
+   apart (131); the halls dressed to their new size (rocks, dripstone, crystals, timber, rubble: 126, 127, 130), or the chambers made
+   narrower than 2.5 times; the built halls' **flat black walls** made from the modular stone kit (128, note 110); **no machines** (129;
+   0.05): the Rock-Eater a great burrowing beast Nix rides, the carriage an ore wagon hauled by a beast or by hand, the cage-lift a
+   rope-and-winch cage worked by people; the **cages** whole, with doors and someone in them (125: needs a goblin figure). Frames to
+   Chris before each publish.
 1. **"More to do"** (note 113, section 0.25), a wing at a time, frames shown to Chris before the next:
    - [1] the Old Workings: patrols on the long drifts (no mob walks a patrol yet: build that first), ambushes from side galleries, a
      flooded lower working with a mini-boss, a collapsed-shaft shortcut back. OPEN.

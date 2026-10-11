@@ -211,11 +211,23 @@ s.Bolt(t, new Color(.9f, .88f, .8f), .1f, true); Hit(t, Shot(a.power + s.WeaponD
                 if (trap != null) UnityEngine.Object.Destroy(trap);
                 trap = GameObject.CreatePrimitive(PrimitiveType.Cylinder); trap.name = "Snare trap";
                 UnityEngine.Object.Destroy(trap.GetComponent<Collider>());
-                trap.transform.position = s.Player.transform.position + Vector3.up * .03f; trap.transform.localScale = new Vector3(1.1f, .03f, 1.1f);
+                trap.transform.position = GroundAtFeet(s.Player.transform) + Vector3.up * .03f; trap.transform.localScale = new Vector3(1.1f, .03f, 1.1f);
                 var mr = trap.GetComponent<Renderer>(); mr.material.color = new Color(.35f, .27f, .18f);
                 trapUntil = Time.time + 60; trapHold = a.duration;
                 s.Message("Snare Trap set: the first to step in is held " + a.duration + " seconds.");
             });
+        }
+        /// <summary>The ground under someone's feet: down from the bottom of their capsule to the first thing that is not a person.
+        /// (Playtest note 123, Chris, 2026-10-11: "trap set up in the air". It was set at the player's middle, a metre up: the
+        /// player's capsule is two metres tall and centred on its position.)</summary>
+        public static Vector3 GroundAtFeet(Transform who)
+        {
+            var cc = who.GetComponent<CharacterController>();
+            var feet = cc != null ? new Vector3(who.position.x, cc.bounds.min.y, who.position.z) : who.position;
+            RaycastHit best = default; bool found = false;
+            foreach (var hit in Physics.RaycastAll(feet + Vector3.up * .5f, Vector3.down, 3f, ~0, QueryTriggerInteraction.Ignore))
+                if (hit.collider.GetComponentInParent<Actor>() == null && (!found || hit.distance < best.distance)) { best = hit; found = true; }
+            return found ? best.point : feet;
         }
         /// <summary>The trap's teeth: the first living mob within 1.4 m of it.</summary>
         public bool TrapSet { get { return trap != null; } }

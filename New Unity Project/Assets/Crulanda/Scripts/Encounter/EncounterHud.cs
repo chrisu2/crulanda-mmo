@@ -65,7 +65,18 @@ namespace Crulanda.Encounter
             mMap = new Unity.Profiling.ProfilerMarker("HUD.Minimap"), mPanels = new Unity.Profiling.ProfilerMarker("HUD.Panels"), mWindows = new Unity.Profiling.ProfilerMarker("HUD.Windows");
         static readonly Unity.Profiling.ProfilerMarker mGather = new Unity.Profiling.ProfilerMarker("HUD.Gather"), mLayout = new Unity.Profiling.ProfilerMarker("HUD.Layout"),
             mDraw = new Unity.Profiling.ProfilerMarker("HUD.DrawPlates"), mPlaces = new Unity.Profiling.ProfilerMarker("HUD.PlaceNames");
-        void Awake() { useGUILayout = false; }
+        void Awake() { useGUILayout = false; CheckDisplay(); }
+        /// <summary>Back from another window (alt-tab): an open chat line takes the keys again, and the keyboard is switched back on if
+        /// the input system left it off (the tester's note 115, 2026-10-10: "After alt-tabbing or using chat, the game ignored keys until
+        /// I clicked inside the window").</summary>
+        void OnApplicationFocus(bool focused)
+        {
+            if (!focused) return;
+            if (chatTyping) chatFocus = true;
+#if ENABLE_INPUT_SYSTEM
+            var k = UnityEngine.InputSystem.Keyboard.current; if (k != null && !k.enabled) UnityEngine.InputSystem.InputSystem.EnableDevice(k);
+#endif
+        }
         void LateUpdate() { TickPaperDoll(); }
         void OnGUI()
         {

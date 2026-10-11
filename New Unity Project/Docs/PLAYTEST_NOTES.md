@@ -570,5 +570,49 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
   - **116.** "The shop didn't close on "Goodbye", and I didn't close the bags."
   - **117.** "The camera goes inside walls when you walk into a building."
   - **118.** "/invite Thatch didn't work, though the who list's Invite button did."
+- **119. "farmers hoes still going thru the arm and not held like a staff."** (Chris, 2026-10-11, about 00:48, on the 00:33 build;
+  screenshot: a farmer in an orange shirt standing, talking to Jory, her pitchfork running from the ground, tines down by her feet,
+  diagonally up through her left forearm.) Notes 95 and 109 again: the third time. OPEN. Found: the farmer's fork was never put on
+  the tool holder that note 109's fix added (it is built straight onto the arm, ActorVisual.cs farmer case), and VillageDayTests'
+  upright check only measured the holder's tools (the woodcutter's axe), so it passed without looking at a farmer.
+  Status: OPEN until Chris confirms. TESTED 2026-10-11 01:04 (VillageDayTests), committed, not yet published or seen by Chris.
+- **120. "GOING IN A BUILDING MAKES IT DISAPPEAR."** (Chris, 2026-10-11, about 00:49; screenshot: the player inside Quill's shop in
+  Oakhaven, the camera behind and above, the whole building, far walls too, drawn see-through so the village shows through every
+  wall.) Notes 26 and 65 again, and the tester's 117. OPEN.
+  Status: OPEN until Chris confirms. TESTED 2026-10-11 01:20 (CameraAndTargetTests), committed, not yet published or seen by Chris.
+- **121. "going full screen at 3440x1440 everything is blurry and screw up my text on computer screen so not sure what it is doing after
+  i tab out"** (Chris, 2026-10-11, about 00:53, on the 00:33 build.) The game blurry in full screen at his monitor's own size, and his
+  desktop's text wrong after alt-tab: the full-screen mode or the display's scaling is being changed. Note 94 (resolution choices) again,
+  and goes with the tester's 115 (keys after alt-tab). OPEN.
+  Status: OPEN until Chris confirms. TESTED 2026-10-11 01:17 (EncounterRulesTests; the screen itself only Chris can see), committed, not yet published.
+- **122. "damn u. the druids are still not healing party members!"** (Chris, 2026-10-11, about 00:53.) A repeat ("still"). OPEN.
+  Status: OPEN until Chris confirms. TESTED 2026-10-11 01:10 (SimPartyTests), committed, not yet published or seen by Chris.
+- **123. "trap set up in the air . i am tired of repeating issues and not fixed."** (Chris, 2026-10-11, about 00:55; screenshot: the
+  Ranger's Snare Trap, a flat disc, hanging in the air at about knee height beside the archer, its shadow on the ground.) OPEN.
+  Status: OPEN until Chris confirms. TESTED 2026-10-11 01:04 (RangerLoopTests), committed, not yet published or seen by Chris.
+- **124. "no way to turn off auto shot"** (Chris, 2026-10-11, about 00:56; the Ranger, "Auto shot: move closer" on the bar.) OPEN.
+  Status: OPEN until Chris confirms. TESTED 2026-10-11 01:17 (RangerLoopTests: Esc stops it, then the target, then the menu), committed, not yet published.
+- **125. "says open the cage but it is obviously broken and nothing in it."** (Chris, 2026-10-11, about 00:59; screenshot: a cage in
+  the Sealed Adit, bars on two sides only, its floor slab raised and loose, nobody inside, the prompt "[G] Open the cage".) OPEN.
+- **126. "very sparse mob density."** (Chris, 2026-10-11, about 01:00; screenshot: the drawn-out Sealed Adit, a wide dark hall along
+  the rail with two mobs in sight.) The camps were spread over three times the length without more of them (note 113's "more to do",
+  DUNGEON_DESIGN 0.25). OPEN.
+- **127. "more nothingness"** (Chris, 2026-10-11, about 01:01; screenshot: in the drawn-out Adit, a vast flat grey floor to the
+  horizon, no wall, rock or dressing in sight, two mobs far off and an echo-jar.) With 126: the halls were drawn out (2.5 times as wide,
+  twice as tall) without their rocks, dressing and camps multiplied to fill them, and published before the fill. OPEN.
+- **128. "looks terrible"** (Chris, 2026-10-11, about 01:02; screenshot: a built hall in the Adit, its end wall two flat black slabs
+  with a plain arch between, untextured, in the dark.) The room builder's halls (D9, 2026-10-10), never shown to Chris before. OPEN.
+- **129. "more machines!!!!!  i told you NO Machines!"** (Chris, 2026-10-11, about 01:02; screenshot: the Rock-Eater, a drill engine
+  on rails with a cone drill, wheels and a funnel, on the berth's tiled floor.) The rule is no machines at all, not only no machine
+  words (CRULANDA_CANON, memory no-machines). OPEN: the Rock-Eater, and the carriage and cage-lift to ask about.
+- **130. "room full of nothing."** (Chris, 2026-10-11, about 01:04; screenshot: the Singing Gallery, a bare dark floor to the edges,
+  a row of spikes far off, an echo-jar; the HUD cut off at the left and the window short of the screen's right edge, notes 114 and 121.)
+  With 126 and 127. OPEN.
+- **131. "shouldnt spawn almost on top of each other. should all patrol. all mobs just stand in one place"** (Chris, 2026-10-11, about
+  01:05; screenshot: two cave bears in the Adit overlapping, nose to flank.) No mob anywhere walks a patrol or wanders its ground, and a
+  camp's mobs are set closer than their bodies are wide. OPEN.
+- **132. "all you did in the dungeon was make it bigger which in turn has less mobs and would not take 60-75mins to complete"** (Chris,
+  2026-10-11, about 01:21.) The brief for the Adit: a 60-75 minute run (DUNGEON_DESIGN 0.06). The scale-up spread the same camps over
+  three times the length; the content that makes the time (mobs, patrols, side rooms, events) was not built. OPEN.
 - **110. New dungeon pieces for the Adit** (Chris's download, 41 FBX: modular stone walls, floor, columns, stairs, an entrance arch, torches, candelabra, chests, barrels, bones, rocks, bars, books, potions). Chris chose: dress the whole Adit and rebuild its built rooms from the modular pieces; raw cave stays rock. In progress.
 - **108. "Still no bow animations on ranger."** Kevin Iglesias's archer clips (load, hold, release) since 2026-10-10; then "bow still twisted", "bow is backwards", "not facing target": the archer turns side-on as the clips are made, turns to her target while fighting standing (AdventurerMotor turned her only while moving), and the bow is set by its own mesh axes (rounded back to the mark, string to the archer). Chris, 20:45: "bow looks better" ... "move forward". To check in play.

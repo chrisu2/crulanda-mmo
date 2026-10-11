@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.IO;
+using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -88,6 +89,40 @@ namespace Crulanda.Tests
             yield return new WaitForSeconds(1.6f);
             Assert.IsTrue(session.UseAbility(Snare)); Assert.IsTrue(e.Slowed, "Snared.");
             StringAssert.Contains("MARKED", session.Kit.TargetStatus(e)); StringAssert.Contains("SNARED", session.Kit.TargetStatus(e));
+        }
+
+        /// <summary>The Snare Trap lies on the ground at your feet (playtest note 123, Chris, 2026-10-11: "trap set up in the air"; it
+        /// hung a metre up, at the middle of the player's capsule).</summary>
+        [UnityTest] public IEnumerator Snare_Trap_lies_on_the_ground_at_your_feet()
+        {
+            Level10(); yield return new WaitForSeconds(.3f);
+            int slot = -1; for (int i = 0; i < session.Kit.ActionCount; i++) if (session.Kit.ActionAt(i).id == "ranger.snare_trap") slot = i;
+            Assert.GreaterOrEqual(slot, 0, "the Snare Trap is on the bar");
+            Assert.IsTrue(session.UseAbility(slot), "Snare Trap set");
+            yield return null;
+            var trap = GameObject.Find("Snare trap"); Assert.NotNull(trap, "the trap is there");
+            var at = trap.transform.position;
+            float ground = float.NaN;
+            foreach (var hit in Physics.RaycastAll(at + Vector3.up * 5, Vector3.down, 12, ~0, QueryTriggerInteraction.Ignore).OrderBy(h => h.distance))
+                if (hit.collider.GetComponentInParent<Crulanda.Gameplay.Actor>() == null && hit.collider.gameObject != trap) { ground = hit.point.y; break; }
+            Assert.IsFalse(float.IsNaN(ground), "ground under the trap");
+            Assert.AreEqual(ground, at.y, .08f, "the trap lies on the ground (it was " + (at.y - ground).ToString("0.00") + " m up)");
+            var feet = session.Player.GetComponent<CharacterController>().bounds.min.y;
+            Assert.Less(Mathf.Abs(feet - at.y), .25f, "at the player's feet");
+            var flat = at - session.Player.transform.position; flat.y = 0; Assert.Less(flat.magnitude, .3f, "where the player stands");
+        }
+
+        /// <summary>Esc stops the auto shot, then lets go of the target, then pauses (playtest note 124, Chris, 2026-10-11: "no way to
+        /// turn off auto shot").</summary>
+        [UnityTest] public IEnumerator Esc_stops_the_auto_shot_then_lets_go_of_the_target()
+        {
+            Level10(); var e = Foe(); Near(e, 15);
+            Assert.IsTrue(session.UseAbility(QuickShot)); Assert.IsTrue(session.AutoAttack, "the auto shot begins");
+            StringAssert.Contains("Esc stops", session.AutoAttackStatus, "the bar says how to stop it");
+            session.Escape(); Assert.IsFalse(session.AutoAttack, "Esc stops the auto shot"); Assert.AreSame(e, session.Target, "the target is kept"); Assert.IsFalse(session.Paused);
+            session.Escape(); Assert.IsNull(session.Target, "Esc again lets go of the target"); Assert.IsFalse(session.Paused);
+            session.Escape(); Assert.IsTrue(session.Paused, "then the menu"); session.Resume();
+            yield return null;
         }
 
         [UnityTest] public IEnumerator The_wolf_comes_to_heel_and_hunts_what_it_is_sent_at()

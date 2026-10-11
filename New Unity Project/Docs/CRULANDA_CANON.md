@@ -5,7 +5,9 @@
   status tables). A label says which source it rests on. Open conflicts: `LORE_AUDIT.md`.
 - **The classes are GAME-ONLY archetypes** (Warrior, Druid, Paladin, Ranger, Rogue, Mage, Archivist), each noting a CANON root where one
   exists: the Archivist's Silent Pilgrims, the Original Song and the echo-jars; the Cantor's Song of Mending.
-- **No machine words in player-facing text** (engine, machine, machinery, motor...).
+- **NO machines** (Chris, 2026-10-11: "more machines!!!!! i told you NO Machines!"): no engines, drills, locomotives or contraptions as
+  props, bosses or set pieces, and no machine words in player-facing text (engine, machine, machinery, motor...). The rule had been
+  narrowed to words; the Adit's Rock-Eater drill engine broke it.
 - Decided 2026-10-10 (LORE_AUDIT.md): the game's **Salt-Menders** are the forerunners of book 3's (CANON-EXPANDED); Khaven's dead wood is
   **the Stillwood** (GAME-ONLY; book 3's Whispering Woods are the Western Coast's forest, though the Khaven map labels Khaven's wood so);
   the **Sandthrone toll** on the Peaks is CANON-EXPANDED (the draft chapter_5.md); **Klyther** is as the novels have him (Klyther

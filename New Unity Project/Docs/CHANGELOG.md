@@ -1,5 +1,28 @@
 # Changelog
 
+## 2026-10-11, 00:45-01:20 — Chris's play of the 00:33 build: fourteen reports, eight fixed and tested, none published (branch feet-bow-adit-kit)
+Chris played the drawn-out Adit build and reported notes 119-132 (PLAYTEST_NOTES.md, verbatim). Fixed, each with a test that measures what
+he saw, all TESTED and committed, **not published and not seen by Chris**:
+- **119, the farmer's fork** (third time, after 95 and 109): it had never been put on the tool holder; it is now held in the fist, upright
+  like a staff with the tines up, the arm bent to hold it (ActorVisual.StaffArm), and at work it runs on from the fist. VillageDayTests
+  measures the fist on the shaft and the shaft clear of the arm, body and legs, walking, standing, talking and at work.
+- **120, a building disappearing when you go in** (after 26 and 65), and the tester's **117** (the camera in walls): RoofFade boxes each part
+  in the building's own frame and fades only what blocks the view (with the small pieces on it); the camera stays within the walls and may
+  come close indoors. CameraAndTargetTests.
+- **121, blurry full screen and the desktop's text after alt-tab**, and the tester's **115**: full screen is borderless at the monitor's own
+  size, never the exclusive mode; a start-up puts a leftover mode right; the chat's typing flag lapses when the chat is not drawn; focus
+  regained re-enables the keyboard. EncounterRulesTests (the screen itself only Chris can see).
+- **122, druids not healing the party**: party healers mend under 80%, in or out of a fight, every 2.5 s, a sixth of the target's health,
+  whoever is most hurt within reach (an out-of-combat timer clash had stopped them). SimPartyTests.
+- **123, the snare trap in the air**: on the ground at your feet. **124, no way to turn off auto shot**: Esc stops it, then lets go of the
+  target, then pauses. RangerLoopTests. **116** (tester), the shop's bags staying open after Goodbye: TradeBagTests.
+- Life capture (--crulanda-life-capture) shoots a farmer about, from the front, side and back, and at work (07-11), to look at the fork.
+- Recorded, not done: 125 (a broken, empty cage), 126/127/130/132 (the drawn-out Adit sparse and empty; a run must take 60-75 minutes,
+  DUNGEON_DESIGN 0.06), 128 (the built halls' black walls), 129 (**no machines**: the Rock-Eater becomes a great burrowing beast, the
+  carriage and lift hand-worked, DUNGEON_DESIGN 0.05), 131 (mobs overlapping, none patrolling or wandering).
+- Tests: EditMode 447/447; PlayMode VillageDayTests (the fork), RangerLoopTests, SimPartyTests 14/14, CameraAndTargetTests 3/3,
+  TradeBagTests, SimChatTests.
+
 ## 2026-10-11, small hours — The escort on the drawn-out Adit; saves deep in it (branch feet-bow-adit-kit)
 - **A save deep in the Adit came back a new character.** The save check refused any place more than 60 m down, and the drawn-out
   Adit's Rail Hall is 80-90 m down: the game would have said "Save could not be loaded" and started a fresh character there. Found by

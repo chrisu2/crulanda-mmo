@@ -742,26 +742,28 @@ namespace Crulanda.Encounter
             void Skirt(Material m) { if (!modelled) Part(PrimitiveType.Cylinder, body, new Vector3(0, -.45f, 0), new Vector3(.5f, .42f, .42f), m); }
             void Bare(Transform arm) { if (!modelled) Part(PrimitiveType.Capsule, arm, new Vector3(0, -.47f, 0), new Vector3(.15f, .15f, .15f), skin); }
             Transform Hood(Material m, Vector3 pos, Vector3 scale) { return modelled ? null : Part(PrimitiveType.Sphere, body, pos, scale, m); }
-            // A tool in the right hand, on a holder at the fist (CarryTool turns it). A long tool (the farmer's hoe, the woodcutter's axe)
-            // stands upright like a staff while walking, the hand a third of the way up the shaft, the head at the top (playtest note 95;
-            // 2026-10-10, Chris: "npc still walking around with hoes/tools stuck to their arm. if a hoe it should be carried like a
-            // staff"): it had been fixed to the arm, so it swung with every stride. A short one (a hammer, a sickle) hangs head-down
-            // from the hand. At work both go back to the arm's line.
-            void HandTool(Material handle, float length, Material head, Vector3 headScale, float headAt = 1)
+            // A tool in the right hand; CarryTool puts it in the fist every frame. A long tool (the farmer's fork, the woodcutter's axe)
+            // is held upright like a staff, head at the top, gripped a little over half way up, the arm bent to hold it out beside the
+            // body (StaffArm); at work it runs on from the fist along the forearm. A short one (a hammer, a sickle) hangs head-down from
+            // the fist and at work turns with the hand. (Playtest notes 95, 109 and 119; Chris, 2026-10-11: "farmers hoes still going
+            // thru the arm and not held like a staff". The farmer's fork had never been put on this holder, and on a modelled figure the
+            // holder rode the upper arm, so a bent elbow put the shaft through the forearm.)
+            Transform HandTool(Material handle, float length, Material head, Vector3 headScale, float headAt = 1)
             {
                 tradeTool = new GameObject("Trade tool").transform; tradeTool.SetParent(armR, false);
                 tradeToolLong = length >= .7f;
                 if (tradeToolLong)
                 {
-                    float shaft = length * 1.9f;
+                    float shaft = length * 1.9f; tradeToolShaft = shaft;
                     tradeTool.localPosition = new Vector3(0, -.64f, .06f);
-                    Part(PrimitiveType.Cylinder, tradeTool, new Vector3(0, shaft * .17f, 0), new Vector3(.045f, shaft / 2, .045f), handle);
-                    if (head != null) Part(PrimitiveType.Cube, tradeTool, new Vector3(0, shaft * .67f, headScale.z * .4f), new Vector3(headScale.x, headScale.z, headScale.y), head);
-                    return;
+                    Part(PrimitiveType.Cylinder, tradeTool, new Vector3(0, shaft * (.5f - ToolGrip), 0), new Vector3(.045f, shaft / 2, .045f), handle);
+                    if (head != null) Part(PrimitiveType.Cube, tradeTool, new Vector3(0, shaft * (1 - ToolGrip), headScale.z * .4f), new Vector3(headScale.x, headScale.z, headScale.y), head);
+                    return tradeTool;
                 }
                 tradeTool.localPosition = new Vector3(0, -.64f, 0);
                 Part(PrimitiveType.Cylinder, tradeTool, new Vector3(0, 0, length / 2 - .08f), new Vector3(.045f, length / 2, .045f), handle, new Vector3(90, 0, 0));
                 if (head != null) Part(PrimitiveType.Cube, tradeTool, new Vector3(0, headScale.y * .25f, (length - .08f) * headAt), headScale, head);
+                return tradeTool;
             }
             switch (trade)
             {
@@ -816,9 +818,12 @@ namespace Crulanda.Encounter
                         foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, body, new Vector3(s * .12f, .5f, .15f), new Vector3(.04f, .2f, .02f), M(.17f, .28f, .52f));
                     }
                     Brim(M(.9f, .74f, .32f), .62f, .26f, .07f);
-                    Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.45f, .08f), new Vector3(.035f, .85f, .035f), wood);
-                    for (int i = -1; i <= 1; i++) Part(PrimitiveType.Cube, armR, new Vector3(i * .05f, -1.37f, .08f), new Vector3(.02f, .2f, .02f), iron);
-                    Part(PrimitiveType.Cube, armR, new Vector3(0, -1.28f, .08f), new Vector3(.14f, .02f, .02f), iron);
+                    {
+                        // The pitchfork on the tool holder, tines up (note 119: it had been built onto the arm itself).
+                        var fork = HandTool(wood, .79f, null, Vector3.zero); float top = tradeToolShaft * (1 - ToolGrip);
+                        Part(PrimitiveType.Cube, fork, new Vector3(0, top, 0), new Vector3(.14f, .02f, .02f), iron).name = "Tine bar";
+                        for (int i = -1; i <= 1; i++) Part(PrimitiveType.Cube, fork, new Vector3(i * .05f, top + .1f, 0), new Vector3(.02f, .2f, .02f), iron).name = "Tine";
+                    }
                     break;
                 case "hunter":
                     // Green hood and cape, leather jerkin, bow and quiver on the back.
@@ -945,15 +950,51 @@ namespace Crulanda.Encounter
         // Timed for the performance probe (playtest note 23).
         static readonly Unity.Profiling.ProfilerMarker perfMark = new Unity.Profiling.ProfilerMarker("PERF.ActorVisual");
         void LateUpdate() { using (perfMark.Auto()) { try { LateUpdateTimed(); } finally { CarryTool(); } } }
-        Transform tradeTool; bool tradeToolLong;
-        /// <summary>After the arms have moved: a long trade tool stands upright beside the walker as a staff does (leaning a little
-        /// forward), a short one hangs from the fist head-down; at work (hoeing, hammering) each lies along the arm as it was built.</summary>
+        Transform tradeTool; bool tradeToolLong; float tradeToolShaft;
+        /// <summary>How far up a long tool's shaft the fist holds it, from the butt: a staff's hold.</summary>
+        const float ToolGrip = .55f;
+        /// <summary>The trade's tool is put away (seated, carrying a load, swimming, dead): set each frame by a modelled figure.</summary>
+        bool toolAway;
+        /// <summary>The trade's tool is at work this frame (the hoe's stroke, the hammer's blow, the axe's swing; walking wins over a
+        /// work pose, so not while moving). Set by a modelled figure.</summary>
+        public bool ToolAtWork { get; private set; }
+        bool WorkPose { get { return Pose == ActorPose.Work || Pose == ActorPose.Hammer || Pose == ActorPose.Chop; } }
+        /// <summary>The middle of the right fist: past the wrist by a third of the forearm (a modelled figure), or the old arm's end.</summary>
+        Vector3 Fist(out Vector3 along)
+        {
+            if (model != null && handR != null && foreR != null)
+            {
+                var wrist = handR.position; along = wrist - foreR.position; float len = along.magnitude;
+                along = len > 1e-4f ? along / len : -body.up;
+                return wrist + along * len * .3f;
+            }
+            along = -armR.up; return armR.TransformPoint(new Vector3(0, -.64f, .06f));
+        }
+        /// <summary>After the arms have moved, the trade's tool in the right fist: a long one upright like a staff, a short one hanging
+        /// head-down; at work a long one runs on from the fist along the forearm (the hands near its butt), a short one turns with the
+        /// hand. Put away while seated, carrying a load or swimming.</summary>
         void CarryTool()
         {
             if (tradeTool == null || body == null) return;
-            bool working = Pose == ActorPose.Work || Pose == ActorPose.Hammer || Pose == ActorPose.Chop;
-            if (tradeToolLong) { if (working) tradeTool.localRotation = Quaternion.identity; else tradeTool.rotation = body.rotation * Quaternion.Euler(-8, 0, -5); }
-            else tradeTool.localRotation = working ? Quaternion.identity : Quaternion.Euler(80, 0, 0);
+            if (tradeTool.gameObject.activeSelf == toolAway) tradeTool.gameObject.SetActive(!toolAway);
+            if (toolAway) return;
+            bool working = model != null ? ToolAtWork : WorkPose;
+            var fist = Fist(out var along);
+            if (tradeToolLong)
+            {
+                if (working)
+                {
+                    var side = Vector3.Cross(along, body.right); if (side.sqrMagnitude < 1e-4f) side = body.forward;
+                    tradeTool.rotation = Quaternion.LookRotation(side, along);
+                    tradeTool.position = fist + along * (tradeToolShaft * ToolGrip - .1f) * tradeTool.lossyScale.y;
+                }
+                else { tradeTool.rotation = body.rotation * Quaternion.Euler(-4, 0, 0); tradeTool.position = fist; }
+            }
+            else
+            {
+                tradeTool.position = fist;
+                tradeTool.rotation = working ? (model != null && handR != null ? handR.rotation : armR.rotation) : Quaternion.LookRotation(Vector3.down, body.forward);
+            }
         }
         void LateUpdateTimed()
         {

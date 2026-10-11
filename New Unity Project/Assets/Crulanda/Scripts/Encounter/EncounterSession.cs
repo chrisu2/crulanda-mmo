@@ -342,10 +342,15 @@ namespace Crulanda.Encounter
             VendorStock = stock;
             // What the village brought the stall today (the hen-wife's eggs): sold on while they last.
             if (v.Role == "merchant" && VillageLife.Active != null && VillageLife.Active.Count("stall.eggs") > 0 && Items.Get(FreshEggs) != null) VendorStock.Insert(0, FreshEggs);
+            if (VendorNpc == null) bagsForShop = !InventoryOpen;
             VendorNpc = v.Name; vendorAt = at ?? v.transform.position; InventoryOpen = true; Conversation = null; TradesOpen = false; v.Hold(30);
         }
         public const string FreshEggs = "food.fresh_eggs";
-        public void CloseVendor() { VendorNpc = null; VendorSim = null; VendorStock = new List<string>(); }
+        /// <summary>The bags were opened by the shop (they were shut when it opened).</summary>
+        bool bagsForShop;
+        /// <summary>Shuts the shop, and the bags with it if the shop opened them (the tester's note 116, 2026-10-10: "The shop didn't close
+        /// on 'Goodbye', and I didn't close the bags": the shop's window went, the bags it had opened stayed).</summary>
+        public void CloseVendor() { if (VendorNpc != null && bagsForShop) InventoryOpen = false; bagsForShop = false; VendorNpc = null; VendorSim = null; VendorStock = new List<string>(); }
         // ---------- trading with a sim (round 27) ----------
         /// <summary>The sim whose goods the merchant window shows, if it is a sim you trade with (null for a village merchant).</summary>
         public SimAdventurer VendorSim { get; private set; }
@@ -365,7 +370,7 @@ namespace Crulanda.Encounter
             if (s == null || Items == null) return false;
             if (Player != null && Vector3.Distance(Player.transform.position, at) > 6) { Message(s.name + " is too far away to trade with."); return false; }
             if (SimMemory.Refuses(s)) { Message(s.name + " won't trade with you."); return false; }
-            CloseVendor(); VendorSim = s; VendorNpc = s.name; vendorAt = at; InventoryOpen = true; Conversation = null; TradesOpen = false;
+            CloseVendor(); bagsForShop = !InventoryOpen; VendorSim = s; VendorNpc = s.name; vendorAt = at; InventoryOpen = true; Conversation = null; TradesOpen = false;
             VendorStock = new List<string>(); foreach (var id in s.goodIds) if (Items.Get(id) != null) VendorStock.Add(id);
             if (VendorStock.Count == 0) Message(s.name + " has nothing to sell just now, but will buy (" + s.coin + " crowns on them).");
             return true;
@@ -1160,7 +1165,7 @@ namespace Crulanda.Encounter
                 if (Kit != null && !Kit.MeleeAutoAttacks && !Kit.RangedAutoAttacks) return "No weapon swings in this form";
                 bool bow = Kit != null && Kit.RangedAutoAttacks; string what = bow ? "Auto shot" : "Auto attack", next = bow ? "Next shot: " : "Next swing: ";
                 return !AutoAttack ? what + (bow ? ": shoot to begin" : ": use a melee ability") : Target == null || !Target.actor.IsAlive ? what + ": no target" :
-                    Distance(Target) >= Kit.AutoAttackRange ? what + ": move closer" : next + SwingRemaining.ToString("0.0") + "s";
+                    Distance(Target) >= Kit.AutoAttackRange ? what + ": move closer (Esc stops)" : next + SwingRemaining.ToString("0.0") + "s (Esc stops)";
             }
         }
         public int ActionCount { get { return Kit == null ? 0 : Kit.ActionCount; } }
@@ -1233,6 +1238,23 @@ namespace Crulanda.Encounter
             AutoAttack = true;
         }
         public void StopAutoAttack() { AutoAttack = false; }
+        /// <summary>Esc, a step at a time: an open window first (loot, a conversation, a shop, the trades, the who list, your bags, the quest
+        /// book, the map), then your auto shot or auto attack, then your target, and only then the pause menu (playtest note 124, Chris,
+        /// 2026-10-11: "no way to turn off auto shot"; Esc went past it to the menu).</summary>
+        public void Escape()
+        {
+            if (LootOpen && !Paused) CloseLoot();
+            else if (Conversation != null && !Paused) Conversation = null;
+            else if (VendorNpc != null && !Paused) CloseVendor();
+            else if (TradesOpen && !Paused) TradesOpen = false;
+            else if (WhoOpen && !Paused) WhoOpen = false;
+            else if ((CharacterOpen || InventoryOpen) && !Paused) { CharacterOpen = false; InventoryOpen = false; }
+            else if (QuestBookOpen && !Paused) { QuestBookOpen = false; ReadingDocument = null; }
+            else if (MapOpen && !Paused) MapOpen = false;
+            else if (AutoAttack && !Paused) { StopAutoAttack(); Message(Kit != null && Kit.RangedAutoAttacks ? "Auto shot stopped." : "Auto attack stopped."); }
+            else if (Target != null && !Paused) Target = null;
+            else { Paused = !Paused; Time.timeScale = Paused ? 0 : 1; }
+        }
         public readonly List<string> Messages = new List<string>();
         public readonly List<CombatText> Floating = new List<CombatText>();
         public bool InCombat { get { return FightingTarget || Enemies.Exists(e => e != null && e.FightingParty); } }   // a sim's fight elsewhere is not yours
@@ -1595,19 +1617,7 @@ namespace Crulanda.Encounter
             lastHour = Crulanda.World.WorldClock.Hour; Crulanda.World.CropField.Day = Progress.days;   // the crops grow by the game's days (note 76)
             if (courier == null && Boards != null && Zone != null && Boards.ActiveRare(ZoneId) != null && !courierDone) SpawnCourier();
             if (courier != null && !courier.actor.IsAlive) courierDone = true;
-            if (EncounterInput.Press(KeyCode.Escape))
-            {
-                // Esc closes open windows (conversation, quest book, map) before it pauses.
-                if (LootOpen && !Paused) CloseLoot();
-                else if (Conversation != null && !Paused) Conversation = null;
-                else if (VendorNpc != null && !Paused) CloseVendor();
-                else if (TradesOpen && !Paused) TradesOpen = false;
-                else if (WhoOpen && !Paused) WhoOpen = false;
-                else if ((CharacterOpen || InventoryOpen) && !Paused) { CharacterOpen = false; InventoryOpen = false; }
-                else if (QuestBookOpen && !Paused) { QuestBookOpen = false; ReadingDocument = null; }
-                else if (MapOpen && !Paused) MapOpen = false;
-                else { Paused = !Paused; Time.timeScale = Paused ? 0 : 1; }
-            }
+            if (EncounterInput.Press(KeyCode.Escape)) Escape();
             if (!Paused && EncounterInput.Press(KeyCode.M)) MapOpen = !MapOpen;
             if (!Paused && Quests != null && EncounterInput.Press(KeyCode.L)) { QuestBookOpen = !QuestBookOpen; if (!QuestBookOpen) ReadingDocument = null; }
             if (!Paused && SimPopulation.Active != null && EncounterInput.Press(KeyCode.O)) WhoOpen = !WhoOpen;

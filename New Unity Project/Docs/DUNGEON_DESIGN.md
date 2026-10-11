@@ -21,6 +21,18 @@
   times its length with chambers far wider and taller, and the new length is filled: more packs and patrols, more bosses and
   mini-bosses, events, side areas, secrets and things to use, not empty tunnel.
 
+## 0.05 No machines (Chris, 2026-10-11, about 01:03, on the Rock-Eater: "more machines!!!!!  i told you NO Machines!")
+Nothing in the dungeon is a machine. Chris's choices (01:04, the question prompt):
+- **The Rock-Eater becomes "a great burrowing beast"**: a huge rock-eating cave beast that Nix rides and drives. The fight stays: the
+  beast, then Nix.
+- **The carriage, the rails and the cage-lift become "hand-worked"**: an ore wagon on the old rails pulled by a beast or by hand, a
+  rope-and-winch cage worked by people; no engine anywhere.
+
+## 0.06 How long a run takes (Chris, 2026-10-11, about 01:21)
+"all you did in the dungeon was make it bigger which in turn has less mobs and would not take 60-75mins to complete". **A full run of the
+Sealed Adit takes 60-75 minutes.** The scale-up (0.25) made the caves three times longer with the same camps; the time has to come from
+what is in them: more camps and mobs, patrols, side rooms and events, the wings' bosses (0.25's table), not from walking.
+
 ## 0.1 What Scarlet Monastery brings (lessons only)
 - **A fortified house of zealots, built in stone:** halls, stairs and doors, not caves. The order feels like an army in its own house.
 - **Wings, each a short run to its own end boss and each with its own look:** a graveyard of the order's dead, a library, an armoury

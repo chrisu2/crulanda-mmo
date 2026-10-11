@@ -75,9 +75,13 @@ because they had grown to 146 KB of notes that contradicted each other). Replace
 
 ## Next, in order
 1. Fix the escort test (see "Tests and builds"); run the Adit suites green; publish the drawn-out Adit for Chris to walk.
-2. The lore audit: a list for Chris (each label with its book reference or none), then fix only what he approves.
-3. "More to do" in the Adit, a wing at a time, frames shown to Chris before the next (DUNGEON_DESIGN 0.25).
-4. Note 112's three items.
+2. Notes 114-118 (the tester's report), the two that spoil every session first: **115, keys ignored after alt-tab or chat until a
+   click in the window** (the character stands still), and **117, the camera going inside walls in buildings**; then 114 (the HUD
+   clipped at the left and top: chat, party frame; no player frame or minimap seen), 116 (the shop not closing on "Goodbye"), and
+   118 ("/invite Thatch" fails, the Who list's Invite works). Each with a test that measures it, frames, and Chris's word before DONE.
+3. The lore audit: a list for Chris (each label with its book reference or none), then fix only what he approves.
+4. "More to do" in the Adit, a wing at a time, frames shown to Chris before the next (DUNGEON_DESIGN 0.25).
+5. Note 112's three items.
 
 ## How to work here (short)
 - Never run Unity against Chris's open project: sync into a validation lane (the tools do it).

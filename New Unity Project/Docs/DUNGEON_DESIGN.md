@@ -45,12 +45,13 @@ What the runs settled:
   run cleared 37 of 67 camps in 30 game-minutes (two deaths, both at the Gang-Boss), on course for about 55-60 minutes: the 60-75 minute
   brief (0.06) is within reach of the bosses' fights and the wings' events.
 - **The duo** (Chris: "the duo boss needs to be tougher. maybe perm CC one while killing one?"): Nix leaps down as the Rock-Eater is
-  engaged, marked for the party to hold; free, he goads the beast (its blows half again, mending 2% a second); held (he can be, for the
-  full time, as long as the party keeps him held), it is calm; Nix killed first, it rampages. The Rock-Eater's health 1.6 (was .95).
-  The play: hold Nix, kill the beast, then Nix. (EncounterSession.TickDuo; EliteMove.holdable.)
+  engaged, marked for the party to hold; free, he goads the beast (its blows half again, mending half a percent a second); held (he can
+  be, for the full time, as long as the party keeps him held), it is calm; Nix killed first, it rampages. The Rock-Eater's health 1.3
+  (was .95). The play: hold Nix, kill the beast, then Nix. (EncounterSession.TickDuo; EliteMove.holdable.) First cut at 18:23 (health 1.6,
+  a 2% mend, its shake every 12 s, Nix's shriek every 15 s) was a stalemate: 23 game-minutes on the beast with no kill; eased at 18:43.
 - **Bosses that hold the party** (Chris: "needs some of the bosses to stun or cc members of the party? maybe freeze? stun? fear?
   disorient?"): Haddo Lusk floors whoever he fights (stun 2 s, every 14); the Rock-Eater shakes everyone within 5 m (disoriented 3 s,
-  every 12: your steps go the wrong way); Nix's shriek (fear 3 s within 4 m, every 15); Ysolt's "the fire sees you" (fear 4 s within
+  every 20: your steps go the wrong way); Nix's shriek (fear 3 s within 4 m, every 25); Ysolt's "the fire sees you" (fear 4 s within
   6 m, every 16); Danner's coupling chain (root 4 s, every 14). EliteMove.cc; EncounterSession.HoldPlayer; SimCompanion.HoldUntil.
 - **A camp nobody can reach** held the 17:37 run (an Ash mender up where no one got at it): a leader gives a camp up after 45 s with
   nothing to fight, and strollers keep to their own floor.

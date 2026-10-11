@@ -31,7 +31,7 @@
       "id": "doc.adit.tally_book",
       "title": "Lusk's Tally Book",
       "text": "SEALED ADIT. LOWER WORKINGS.\nthe gang-boss's tally, H. Lusk\n\nWeek 3. Carts down: 41. Carts up: 38. Three lost on the stair; their men's pay docked.\nGeodes cut: 212 good, 30 split. Pressed hands: 23. Lost: 2 (one to the grey drift, one ran. Ran into the grey drift).\nSent down to the Quartermaster for the carriage: 190.\n\nWeek 4. The cult's lot took 12 for their fire again. Captain says let them. Captain says the fire keeps the hollow ones off the vent road.\nToll at the gate this week: 31 sovereigns.\nBy the carriage this week: not to be written down.\n\nNB. The toll is for the look of it. Keep it honest.",
-      "canonStatus": "GAME-ONLY (the Sandthrone toll on the Peaks is CANON, book1 ch.5; aether-geodes are CANON, book1 ch.3)"
+      "canonStatus": "GAME-ONLY (the Sandthrone toll on the Peaks is CANON-EXPANDED, the draft chapter_5.md; aether-geodes are CANON, book1 ch.3)"
     },
     {
       "id": "doc.adit.echoes",
@@ -322,7 +322,7 @@
       "zone": "zone.peaks",
       "level": 11,
       "minLevel": 10,
-      "canonStatus": "CANON-EXPANDED: the Salt-Menders, the Wasting and the unmade are CANON (world_bible, book2 ch.18); Lisle Tamber, the Grey Breach and its Foreman are GAME-ONLY.",
+      "canonStatus": "CANON-EXPANDED: the Wasting and the unmade are CANON (world_bible, book2 ch.18), the Salt-Menders here their forerunners (CANON-EXPANDED, book 3); Lisle Tamber, the Grey Breach and its Foreman are GAME-ONLY.",
       "summary": "Lisle Tamber, a Salt-Mender scholar, wants to know how far the Wasting has eaten into the Peaks. Go down to the Grey Breach under the Sealed Adit and bring a shard of unmade stone from the Foreman Who Forgot.",
       "offer": "The scholar has a satchel of papers, all written in a cipher of salt-marks, and ink on every finger. \"Quill sends her regards from Oakhaven, if you know Quill. If you don't, then a traveller sends hers.\"\n\n\"The Peaks hold back the grey. Everyone says so, and everyone's right, for now. But the miners down the old adit broke into a drift on the east side, and my people hear that the rock there isn't rock any more.\" She lowers her voice. \"There's a foreman down there, a Company man who went into the grey and didn't come out, and didn't die either. Wherever he walks, the stone forgets itself. Bring me a piece of what it forgets into. I need to know how fast.\"",
       "progress": "\"Don't hold it long. Carry it in something you don't need.\"",
@@ -388,7 +388,7 @@
       "requires": [
         "side.adit.toll"
       ],
-      "canonStatus": "CANON-EXPANDED: the mag-rail south under the range (book2 ch.19) and the Sandthrone (book1 ch.5) are CANON; the Rail Hall, the carriage, Sorrel and Danner are GAME-ONLY.",
+      "canonStatus": "CANON-EXPANDED: the mag-rail south under the range (book2 ch.19) and the Sandthrone (world_bible) are CANON; the Rail Hall, the carriage, Sorrel and Danner are GAME-ONLY.",
       "summary": "The geodes go south on the old mag-rail, from a hall at the bottom of the Sealed Adit. Go down to the Rail Hall and stop the carriage: bring down Quartermaster Brannigan Sorrel and Rail-Captain Orsk Danner.",
       "offer": "Yara has a map of the pass spread on her counter, the old kind, with the mine-workings inked under it in red. She has her finger on a line that runs south off the bottom of the page. \"The old line. Everyone knows it's dead. The Company said so, the year they bricked the adit.\"\n\n\"It isn't dead. It's how two hundred geodes a week go south without passing my counter or anyone's.\" She rolls the map up. \"Somewhere at the bottom of that mine there's a carriage, and a quartermaster loading it, and a captain riding it. Stop it. I'll find you something worth the walk. I've a few pieces put by that I can't sell on this pass without questions.\"",
       "progress": "\"Still running, is it? I can hear it, some nights. Or I think I can.\"",

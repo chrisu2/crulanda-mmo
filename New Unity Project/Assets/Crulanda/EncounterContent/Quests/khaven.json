@@ -137,7 +137,7 @@
       ],
       "canonStatus": "CANON-EXPANDED: the Pale Things / Pale Kings as cosmic watchers and auditors are canon (world_bible.md, series_bible.md); the watcher at Khaven's crypt is GAME-ONLY.",
       "summary": "Drive off the Pale watcher that has stood at the crypt since the wagon came, then walk the north road where Ansel saw the riders go.",
-      "offer": "The old man doesn't look at you. He looks past you, at the crypt. \"It came the night the wagon did. Stands at my crypt door, pale as a peeled egg, and it counts. The riders. The children. Me. I've buried Khaven for forty years and never minded the dead watching. I mind that.\"\n\n\"Make it stop counting. Then walk the north road past the Whispering Wood. The riders went that way with the children across their saddles. I watched them from my step, and I did nothing.\"",
+      "offer": "The old man doesn't look at you. He looks past you, at the crypt. \"It came the night the wagon did. Stands at my crypt door, pale as a peeled egg, and it counts. The riders. The children. Me. I've buried Khaven for forty years and never minded the dead watching. I mind that.\"\n\n\"Make it stop counting. Then walk the north road past the Stillwood. The riders went that way with the children across their saddles. I watched them from my step, and I did nothing.\"",
       "complete": "\"North, then. To the toll road.\" Ansel lowers himself onto his step. \"The Sandthrone hold the pass. They'll take coin from anyone for anything. A good trade, a child, if you've no soul to speak of.\"",
       "steps": [
         {
@@ -163,7 +163,7 @@
                 "y": 26
               },
               "radius": 8,
-              "text": "Walk the north road past the Whispering Wood",
+              "text": "Walk the north road past the Stillwood",
               "say": "Hoofprints a fortnight old, baked hard, going north at a trot. Where the horses stopped, the scuff of small feet. Ahead, the road climbs toward the grey shoulders of the Peaks."
             }
           ]
@@ -191,7 +191,7 @@
       "requires": [
         "main.khaven.2"
       ],
-      "canonStatus": "CANON-EXPANDED: the Sandthrone charge a toll in the Shattered Peaks (book1 ch.5); the pilgrims' rest and Maddoc Vire are GAME-ONLY.",
+      "canonStatus": "CANON-EXPANDED: the Sandthrone charge a toll in the Shattered Peaks (the draft chapter_5.md; the Sandthrone are in the world bible); the pilgrims' rest and Maddoc Vire are GAME-ONLY.",
       "summary": "Take the north road up into the Shattered Peaks and find the pilgrims' rest below the Sandthrone toll gate.",
       "offer": "\"There's a rest-house on the pass, below the toll gate. Pilgrims wait there for the Sandthrone to name a price. Maddoc Vire keeps it. He's kept it through three sets of masters on that gate, and he writes down everyone who goes up.\"\n\n\"Ask him about two children in chains. And go careful. The Peaks aren't Khaven. Things up there are hungrier.\"",
       "complete": "Maddoc turns his book toward you. Two lines, in a careful hand: 'Two children, small, chained at the wrist. Brought up by Sandthrone riders. Taken through the gate without toll.'\n\n\"Without toll,\" he says. \"The Sandthrone never let so much as a goat through without toll. Somebody paid before they got here.\"",
@@ -245,12 +245,12 @@
       "zone": "zone.khaven",
       "level": 5,
       "canonStatus": "GAME-ONLY",
-      "summary": "Thin the grey wolves hunting the Whispering Wood beyond the walls.",
-      "offer": "\"Wolves in the Whispering Wood. Grey ones, greyer every season, as if the wood's got into them.\" She touches a charm of knotted bone over the gate. \"They've had Col Emmet's goats, and they'll have Col next. Six of them, and I'll sleep.\"",
+      "summary": "Thin the grey wolves hunting the Stillwood beyond the walls.",
+      "offer": "\"Wolves in the Stillwood. Grey ones, greyer every season, as if the wood's got into them.\" She touches a charm of knotted bone over the gate. \"They've had Col Emmet's goats, and they'll have Col next. Six of them, and I'll sleep.\"",
       "complete": "\"Six. Good.\" She ties another knot in the cord at her wrist. \"The wood will be quieter tonight. Not quiet. Quieter.\"",
       "steps": [
         {
-          "text": "Cull the grey wolves in the deep Whispering Wood.",
+          "text": "Cull the grey wolves in the deep Stillwood.",
           "objectives": [
             {
               "type": "kill",
@@ -586,7 +586,7 @@
       "complete": "Old Kestrel listens with his eyes shut. When you finish he opens them. \"A name. He heard a name, and he went up to answer it.\" He pulls the blanket higher. \"Mine's not one he'd have heard. I made sure of that, years ago. Thank you. Don't go up there again.\"",
       "steps": [
         {
-          "text": "Go to the Listener's Hut, west of the Whispering Wood.",
+          "text": "Go to the Listener's Hut, west of the Stillwood.",
           "objectives": [
             {
               "type": "visit",

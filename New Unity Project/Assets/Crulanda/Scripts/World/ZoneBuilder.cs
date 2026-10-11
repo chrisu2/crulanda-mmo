@@ -1870,7 +1870,7 @@ namespace Crulanda.World
             Solid(t, new Vector3(0, 1.2f, 0), new Vector3(2.4f, 2.4f, 2.4f));
         }
         /// <summary>
-        /// A dead tree (Khaven's Whispering Wood, the Rim's husks, the unmade): a tapered, slightly bent bole on a root flare of
+        /// A dead tree (Khaven's Stillwood, the Rim's husks, the unmade): a tapered, slightly bent bole on a root flare of
         /// buttress ridges (Bole), ending in a broken leader; three to five limbs leaving it at different heights, each crooked (a
         /// kink part way) and tapering to a point, with branches off its length, not its tip, and twigs off those. Grey weathered
         /// wood, no bark grain in the shade. Its look is its own (TreeRandom); from the zone's stream it takes exactly the draws the
@@ -1948,7 +1948,7 @@ namespace Crulanda.World
             root.gameObject.AddComponent<NavBlocker>(); root.gameObject.AddComponent<TreeFade>();
             return root;
         }
-        /// <summary>Bark for dead woods: charred dark in the ash, weathered grey elsewhere (Khaven's Whispering Wood). One draw.</summary>
+        /// <summary>Bark for dead woods: charred dark in the ash, weathered grey elsewhere (Khaven's Stillwood). One draw.</summary>
         Material DeadBark() { float t = R01; return Tint(art.bark, Zone.biome == "ash" ? Color.Lerp(new Color(.2f, .18f, .16f), new Color(.3f, .27f, .24f), t) : Color.Lerp(new Color(.58f, .57f, .56f), new Color(.72f, .71f, .69f), t)); }
         static readonly Color[] Leaf = { new Color(.33f, .38f, .17f), new Color(.55f, .42f, .16f), new Color(.52f, .27f, .13f), new Color(.40f, .36f, .15f) };
         bool Gloom { get { return Zone.biome == "gloom"; } }

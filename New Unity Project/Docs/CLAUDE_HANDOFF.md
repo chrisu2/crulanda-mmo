@@ -44,6 +44,8 @@ because they had grown to 146 KB of notes that contradicted each other). Replace
 - Docs: this handoff rewritten, the old one archived; GAME_BRIEF brought up to the code.
 
 ## Tests and builds
+- EditMode 444/444 (about 22:40, after the lore decisions; the Adit elites' call ranges set for the drawn-out layout: Lusk and Nix 66 m,
+  the Quartermaster 48 m, so each call still reaches its kin).
 - Adit suites on the drawn-out layout: 17 of 18 pass. **Failing: AditWeaverTests "two waves of three" (3 of 6).** What the test
   reported (run at about 21:50): both waves spawn (6 of 6); the second comes out 13.5 m past the lock; the test sets the lock to 4 s
   (`MatchSeconds = 4`; the game's is about 36) and stops as soon as the lock is done, so the second wave can arrive too late to be
@@ -73,7 +75,8 @@ because they had grown to 146 KB of notes that contradicted each other). Replace
   the Sandthrone toll is sourced (chapter 5); Klyther has four versions across the books' notes; the classes carry no canon label
   (Chris decided: **GAME-ONLY archetypes**, canon roots noted). Chris decided the order when sources disagree: **novels, then the
   world bible, then the ledger**. Both, and the no-machine-words rule, are now at the head of CRULANDA_CANON.md (the rest of it is still
-  the Phase 0 stub). The four conflicts still wait for his call.
+  the Phase 0 stub). The four conflicts are decided and done in the data (Salt-Menders as forerunners, Khaven's wood renamed the
+  Stillwood, the toll CANON-EXPANDED, Klyther as in the novels): LORE_AUDIT.md.
 
 ## Next, in order
 1. Fix the escort test (see "Tests and builds"); run the Adit suites green; publish the drawn-out Adit for Chris to walk.

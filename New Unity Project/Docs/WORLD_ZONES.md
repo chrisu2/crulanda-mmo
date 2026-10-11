@@ -177,7 +177,7 @@ Trades in Oakhaven (GAME-ONLY, 2026-10-01; BUILD_PLAN step 4; tier 1, every node
 
 ## Khaven Village (CANON-EXPANDED)
 Canon names from `maps\khaven_village_map.png`: the Cracked Hearth, two Fallen Smithies, the Blood-Stone Well, the Gallows
-Tree, the Crypt-Keeper's Hovel, the Whispering Wood, Gloom Creek and the Carrion Cliffs. Built as a walled village at dusk
+Tree, the Crypt-Keeper's Hovel, the Stillwood, Gloom Creek and the Carrion Cliffs. Built as a walled village at dusk
 with gate towers, a dead grey wood, dark creek water and an old crypt under the cliffs.
 Biome `gloom`: hard grey-brown earth, thin dry grass and no flowers, grey dead woods, withered pines and brush, and a drained
 rose-violet grade. The dusk holds all day: `lighting.sunHigh` keeps the sun low, and `skyTint`/`skyExposure`/`skyHaze` give a
@@ -187,7 +187,7 @@ GAME-ONLY / PROVISIONAL: the Sandthrone outriders holding it (Sandthrone is a ca
 `Beacon mound` shape, 3.6 m, its old beacon a lookout secret). GAME-ONLY looks: the Cracked Hearth's split chimney with the fire showing through (a reading of the canon name; the map draws it as the inn), the drowned graveyard's flood pool and heaved graves, and the creek barrow's turf mound.
 Grown to 340 m (2026-09-30): the Gibbet Crossroads and the Corpse Road (a new bridge over Gloom Creek), the Plague Pit, the
 Drowned Fields, the Carrion Heights above the canon Carrion Cliffs and the Charnel Barrow on them, the Old Bound Wall and the
-Fallen Watch on it, the Listener's Hut (CANON-EXPANDED: a Silent Pilgrim's) and the Hush, the densest of the Whispering Wood.
+Fallen Watch on it, the Listener's Hut (CANON-EXPANDED: a Silent Pilgrim's) and the Hush, the densest of the Stillwood.
 Trades in Khaven (GAME-ONLY, 2026-10-01; BUILD_PLAN step 8; tier 2, every node at skill 20):
 - **Ore** (Carrion bog-iron): at the feet of the Carrion Cliffs (two on the long cliff's creek side, one off the east cliff,
   one under the low cliff, one behind the far cliff, clear of the Carrion boars), two under the Carrion Heights' face, two at
@@ -410,7 +410,7 @@ mood. How it was made: a first draft was pre-checked by agents who ported the ge
   neighbours' arrival points for them), the roads' ends and the creeks' ends went out 35 m; the creeks keep their line (their
   swing is counted from their old first point). Every camp nearer than 125 m to a home moved out whole with its place (its
   landmark, props, clearing, wood, hill, tall grass and secrets; guards and elites with it): Khaven's drowned graveyard and the
-  Grey Sexton together, the Sandthrone outriders, the picket at the Fallen Watch, the Deep Whispering Wood wolves, the Carrion
+  Grey Sexton together, the Sandthrone outriders, the picket at the Fallen Watch, the Deep Stillwood wolves, the Carrion
   boars (the cliffs stay); the Peaks' Wolf pines pack and rockhide wallow; the Ash Rim's Fraying, the Weave-Eater brood and the
   Unwoven Flats eaters; the Verdant Shore's Greying with Greyheart, the Mistmere reed-boars, Old Ninebranch on his knoll, the
   Fallen Ghost-Oak with its spiders and the Antler Meadow with its stags. The village cores did not move. Left where they stand,
@@ -421,7 +421,7 @@ mood. How it was made: a first draft was pre-checked by agents who ported the ge
 | Zone | Camps (level) |
 |---|---|
 | Oakhaven 1-5 | Upper pines wolves (3-4), Southwood boars (1-2), Thornshaw wolves (4), Tall-grass stalkers (1-2, ambush), Brookside boars (2), Mastwood boars (3-4), Whitefoot's pack (3), Withy pool boars (1), Hollin farm wolves (2), Hanger wolves (4), Sallow Bottom boars (2), Bound wood wolves (2-3), Hill hazel bears (3), Old Hazelmaw (4); `harder` (caves): Hollow lookouts (6), Deserters' camp (6), King's guard (6-7), Caddock's hall (7, elite), Drop sentries (6), Store Caves (6), The Quartermaster's desk (6, elite), Deep Stair watch (6-7), Whitefoot's den (6, elite) |
-| Khaven 5-9 | Whispering Wood wolves (6-7), Carrion boars (6-7, ambush), Sandthrone outrider camp (8), Gloom Creek hollows (6), The Grey Sexton (7, elite), Hush wolves (7-8), Plague pit hollows (5-6), Sandthrone picket (8), Mire boars (7-8), Scarp hollows (6-7), Thicket deserters (5-6, ambush), Heights scree spiders (8), The Hush-Mother (7), The drowned dead (6); `harder` (caves): The Pale Reckoner (10, elite) |
+| Khaven 5-9 | Stillwood wolves (6-7), Carrion boars (6-7, ambush), Sandthrone outrider camp (8), Gloom Creek hollows (6), The Grey Sexton (7, elite), Hush wolves (7-8), Plague pit hollows (5-6), Sandthrone picket (8), Mire boars (7-8), Scarp hollows (6-7), Thicket deserters (5-6, ambush), Heights scree spiders (8), The Hush-Mother (7), The drowned dead (6); `harder` (caves): The Pale Reckoner (10, elite) |
 | Peaks 9-12 | Toll-gate guards (10-11), Wolf pines pack (10-11, ambush), Rockhide wallow (10), Captain's eyrie (12, elite), The High Ledge (11), Signal-tower pickets (9-10), Shieling wolves (9-10), Scar rockhides (11), Old Scree-Tusk (12, elite), Adit hollows (9-10), Tarn shadows (11), False pilgrims (10-11, ambush), The Umbra Watcher (10), High pines bears (10-11) |
 | Ash Rim 12-15 | Unwoven Flats eaters (13-14), Ash hound pack (12), Tear-marked shrine (13-14), The Weave-Eater brood (15, elite), Cinderfold hollows (13), Ash-pit cultists (13-14), The Ash-Deacon (15, elite), Fraying eaters (14), Orchard hounds (13-14), Salt-road raiders (12-13), Walled Mouth hollows (14), Reach-Stone shadows (14), Old Cinder-Jaw (12) |
 | Verdant Shore 13-15 (group zone: every mob elite-strength) | Mistmere reed-boars (14, ambush), Antler Meadow stags (14), Fallen Ghost-Oak spiders (14), The Briar Way (14), The Greying (13-14), Greyheart (15, elite), Palemist mist-walkers (13-14), Palemist shadows (13), Old Ninebranch (15, elite), Fern Hollow briars (14), Ridge crawlers (13), Void-Touchers below the ridge (13), Old Brine-Tusk (14); `harder` (caves): Root-stair briars (15), Gallery withered (15), Sap Well walkers (15), Cold Stair briars (15), The Heart's withered (15), The Root-Warden (15, elite) |
@@ -1023,6 +1023,6 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
   - It doesn't receive shadows (a transparent surface shader in the built-in pipeline).
   - The camera stays above the surface, so there is no underwater view.
   - Swimmable water: Oakhaven's Brook pond and Withy pool, and the Peaks' Cold Tarn.
-- The crypt has no interior/dungeon yet; the Whispering Wood does not whisper (no audio).
+- The crypt has no interior/dungeon yet; the Stillwood is silent (no audio).
 - Primitive-built art, no authored models/animation/audio; windows are flat emissive panes; no interiors.
 - The camera pulls in on scenery collisions but can still clip very thin geometry.

@@ -1,7 +1,7 @@
 # Lore audit (2026-10-10, for Chris's decisions)
 
-A review found game labels and lore that do not match the books. Each item below is checked against `D:\code\crulanda`. **Nothing in
-the game has been changed for these yet:** each waits for Chris's word. (The one change made: the Adit's item texts lose their
+A review found game labels and lore that do not match the books. Each item below is checked against `D:\code\crulanda`. **All four were decided by
+Chris on 2026-10-10** and are done in the game data (below). (The one change made: the Adit's item texts lose their
 machine words, which Chris approved: "engine oil" became "drill-grease".)
 
 ## Rule, from Chris (2026-10-10)
@@ -28,20 +28,26 @@ series bible's status tables). A label says which source it rests on.
 - Books: book 3 ch.2-3 (and `world_bible.md` line 63): the refugee community on the Western Coast after the exodus, building the
   Salt-Wall, "mending" the world with the salt-magic of the West; Klyther, Tynara and Elara's followers among them.
 - Also a machine word in player-facing text ("break the machine").
-- **Decide:** rewrite the faction to the books (they cannot exist yet in the game's time, before the exodus: a forerunner group?), or
-  keep it and label it GAME-ONLY under another name.
+- **DECIDED (Chris, 2026-10-10): forerunners.** The game's Salt-Menders are the forerunners of book 3's (CANON-EXPANDED): folk of the
+  Alliance who meet in old tunnels and mend what the Concord breaks; their name goes west with the refugees in years to come. Done in
+  factions.json and the Adit quest's label; "break the machine" gone.
 
 ## 2. The Whispering Wood: placed and described against book 3
 - Game: a dead wood beside Khaven, with grey wolves (`Quests/khaven.json`, `Quests/bounties.json`; GAME_BRIEF, WORLD_ZONES).
 - Books: book 3 ch.2 "The Whispering Woods": the living, singing forest on the Western Coast of the Veridian Keepers, the forest
   the game builds as the Verdant Shore.
-- **Decide:** rename Khaven's wood (it is GAME-ONLY then) and give the name to the Verdant Shore's forest, or keep both and label
-  Khaven's GAME-ONLY.
+- Chris's own Khaven Village map (`khaven_village_map.png`) labels the wood "Whispering Wood": the clash is between the map and book 3.
+- **DECIDED (Chris, 2026-10-10): rename anyway; book 3 wins.** Khaven's dead wood is **the Stillwood** (GAME-ONLY), in the zone, quests,
+  bounties and docs; the map's label is noted as superseded (CRULANDA_LOCATIONS). The Verdant Shore's subtitle names "the Whispering
+  Woods" beside "the Verdant Ocean", as book 3 does.
 
 ## 3. The Sandthrone toll on the Peaks: sourced (the review was wrong here)
 - `chapter_5.md` ("The Geography of Division", a ~1,800-word draft): "The Peaks are crawling with Sandthrone mercenaries," Korath
   warned. "And they're charging a toll." Plus `world_bible.md` "Sandthrone (Antagonists / Mercenaries)".
-- **Decide:** CANON (if chapter 5 is canon) or CANON-EXPANDED (if it is a draft).
+- The finished Book 1 never names the Sandthrone (its only "toll" is a rat's in the sewers); the Peaks toll is only in the draft
+  `chapter_5.md`.
+- **DECIDED (Chris, 2026-10-10): CANON-EXPANDED.** Every label that cited "book1 ch.5" now cites the draft chapter_5.md (quests: Adit,
+  Khaven, Peaks; the Peaks zone note and its letters).
 
 ## 4. Klyther: the books' own notes disagree
 - `book1/world_bible.md` 30: Klyther Forgeheart, Lead Engineer, gruff, pragmatic, loyal to Kaelen.
@@ -49,7 +55,8 @@ series bible's status tables). A label says which source it rests on.
 - `book1/series_bible.md` 137: status UNKNOWN, fled via chute, likely surviving in the Ashlands.
 - `ledger_of_souls.md` 25: Klyther Void-Singer, Independent, alive, "Bad": a techno-cultist, villain of the Verdant Shore.
 - Book 3 ch.6: he treks to the Temple with Elara, Kai and Aris (an ally).
-- **Decide:** which is true for the game (the game does not use him yet, so nothing breaks either way).
+- **DECIDED (Chris, 2026-10-10): follow the novels.** Klyther Forgeheart, an engineer and an ally (book 3); the ledger's "Klyther
+  Void-Singer" villain is set aside. Nothing in the game uses him yet.
 
 ## Still to do
 - `CRULANDA_CANON.md` is a stub from Phase 0: fill it from the books once the decisions above are made.

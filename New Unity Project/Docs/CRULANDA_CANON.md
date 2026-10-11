@@ -6,6 +6,10 @@
 - **The classes are GAME-ONLY archetypes** (Warrior, Druid, Paladin, Ranger, Rogue, Mage, Archivist), each noting a CANON root where one
   exists: the Archivist's Silent Pilgrims, the Original Song and the echo-jars; the Cantor's Song of Mending.
 - **No machine words in player-facing text** (engine, machine, machinery, motor...).
+- Decided 2026-10-10 (LORE_AUDIT.md): the game's **Salt-Menders** are the forerunners of book 3's (CANON-EXPANDED); Khaven's dead wood is
+  **the Stillwood** (GAME-ONLY; book 3's Whispering Woods are the Western Coast's forest, though the Khaven map labels Khaven's wood so);
+  the **Sandthrone toll** on the Peaks is CANON-EXPANDED (the draft chapter_5.md); **Klyther** is as the novels have him (Klyther
+  Forgeheart, an engineer and ally).
 
 ## The Phase 0 stub (below, unchanged; still to be filled from the books)
 

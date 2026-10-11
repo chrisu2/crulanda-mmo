@@ -31,7 +31,7 @@
       "id": "doc.peaks.toll_book",
       "title": "The Toll-Book",
       "text": "SANDTHRONE TOLL - HIGH GATE\nkept by the toll-master's hand\n\n14th day. Salt-carter, two mules. 3 sovereigns. Paid.\n15th day. Pilgrims, six, for the south. 1 sovereign each. Four paid; two held till paid.\n17th day. Oakhaven run, by Khaven. Two, small. Received from our riders.\n    Handed on at the gate to the Concord escort: four horse, one closed cart. Road to Argentis.\n    TOLL: none. By Seeker's warrant. Captain has the paper.\n18th day. Iron, four carts, north road. 12 sovereigns. Paid.\n19th day. Goatherd. Took two goats.",
-      "canonStatus": "GAME-ONLY: the toll-book and its entries. Sandthrone tolls in the Peaks are canon (book1 ch.5)."
+      "canonStatus": "GAME-ONLY: the toll-book and its entries. Sandthrone tolls in the Peaks are CANON-EXPANDED (the draft chapter_5.md)."
     },
     {
       "id": "doc.peaks.warrant",
@@ -55,7 +55,7 @@
       "id": "doc.peaks.letter_home",
       "title": "To Ysolde, by Any Caravan",
       "text": "To Ysolde at the Dry Wells, in the south, by any caravan:\n\nSister, the pay is good, as they promised, and the cold is worse than they said. Snow in the middle of summer. They have us stopping carts on a mountain road and taking what we like and calling it toll, and most of the lads like it well enough.\nI don't. Last week we passed two little ones through the gate in a closed cart, under a paper with a seal I'm not to speak of. No toll. They didn't cry. That was the worst of it.\nWhen I've enough I'm coming home. Keep the goats.\nYour brother, Tomas",
-      "canonStatus": "GAME-ONLY: the letter, Tomas and Ysolde. The Sandthrone is a CANON mercenary company; its toll in the Peaks is CANON (book1 ch.5)."
+      "canonStatus": "GAME-ONLY: the letter, Tomas and Ysolde. The Sandthrone is a CANON mercenary company; its toll in the Peaks is CANON-EXPANDED (the draft chapter_5.md)."
     },
     {
       "id": "doc.peaks.echo",
@@ -82,7 +82,7 @@
       "requires": [
         "main.khaven.3"
       ],
-      "canonStatus": "CANON-EXPANDED: Sandthrone tolls in the Shattered Peaks are canon (book1 ch.5); the toll-book and the handover to a Concord escort are GAME-ONLY.",
+      "canonStatus": "CANON-EXPANDED: Sandthrone tolls in the Shattered Peaks are CANON-EXPANDED (the draft chapter_5.md); the toll-book and the handover to a Concord escort are GAME-ONLY.",
       "summary": "Fight through the Sandthrone toll-guards at the gate and take the toll-book from the strongbox by the toll-house.",
       "offer": "\"Paid before they got here. Paid by whom?\" Maddoc taps the page. \"The Sandthrone write everything in their toll-book: who passed, what they paid, who paid it for them. They're proud of that book. They keep it in a strongbox by the toll-house, behind the gate.\"\n\n\"I can't ask pilgrims to fight for it. You aren't a pilgrim.\"",
       "complete": "\"Here.\" Maddoc's finger stops on the page. \"'Two, small. Oakhaven run. Handed on at the gate to the Concord escort. Road to Argentis. No toll: by Seeker's warrant.'\" He closes the book gently, as if it might wake. \"A Seeker's warrant. That's the Council's own hand.\"",

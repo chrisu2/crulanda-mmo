@@ -76,7 +76,7 @@ namespace Crulanda.Encounter
                 call = "The Hollow Root-Warden strikes the floor, and the Heart answers.", callShort = "The Heart answers", enrageAt = .35f, enrageHaste = .6f,
                 enrage = "The Hollow Root-Warden creaks, and every root in the Heart pulls tight." },
             // ---------- The Sealed Adit (dungeon D1; PROVISIONAL moves until D2 gives each boss its mechanics, DUNGEON_DESIGN.md) ----------
-            new EliteMove { mob = "Gang-Boss Haddo Lusk", name = "Tally-Stick", windup = 2.2f, blow = 3.6f, reach = 3.8f, every = 12, callMost = 2,
+            new EliteMove { mob = "Gang-Boss Haddo Lusk", name = "Tally-Stick", windup = 2.2f, blow = 3.6f, reach = 3.8f, every = 12, callMost = 2, callReach = 66,   // (the default 22 in the first Adit; drawn out three times)
                 deathCall = 3, deathText = "Boots in the drift behind: Lusk's relief shift walks in, three of them.",   // the first boss: a lesson, not a wall (the paper fight: his two guards answer, nobody else)
                 call = "Lusk roars: \"Overseers! Earn your cut!\"", callShort = "Earn your cut!",
                 enrage = "Lusk throws the tally book down and comes round the table." },
@@ -84,7 +84,7 @@ namespace Crulanda.Encounter
             new EliteMove { mob = "The Rock-Eater", name = "Bore", windup = 2, blow = 3.8f, reach = 3.6f, every = 10, knock = 4, health = .95f, callReach = 42, callMost = 2,
                 call = "The Rock-Eater's horn blares across the workshop. The guards come running.", callShort = "Horn",
                 enrage = "Black smoke pours from the Rock-Eater's stack and the drill screams." },
-            new EliteMove { mob = "Nix, the turncoat", name = "Spanner-Lock", windup = 1.6f, blow = 3.6f, reach = 3.4f, every = 9, disarm = 4, health = .8f,
+            new EliteMove { mob = "Nix, the turncoat", name = "Spanner-Lock", windup = 1.6f, blow = 3.6f, reach = 3.4f, every = 9, disarm = 4, health = .8f, callReach = 66,   // (22 before the Adit was drawn out)
                 call = "Nix shrieks: \"Get them off me!\"", callShort = "Get them off me!",
                 enrage = "Nix stops dodging and comes at you with the spanner in both hands." },
             new EliteMove { mob = "Cinder-Warden Ysolt", name = "Ember Blow", windup = 2, blow = 4.2f, reach = 3.8f, every = 10, callReach = 42, callMost = 2,
@@ -102,7 +102,7 @@ namespace Crulanda.Encounter
                 enrage = "The Quiet Miner stops working. For the first time, he looks at you." },
             new EliteMove { mob = "The Vent-Hound", name = "Ember Lunge", windup = 1.5f, blow = 3.6f, reach = 4.4f, every = 9,
                 enrage = "The Vent-Hound's coat glows along the spine." },
-            new EliteMove { mob = "Quartermaster Brannigan Sorrel", name = "Boot-Heel Stamp", windup = 2, blow = 4.2f, reach = 3.6f, every = 10, callReach = 42, callMost = 2,
+            new EliteMove { mob = "Quartermaster Brannigan Sorrel", name = "Boot-Heel Stamp", windup = 2, blow = 4.2f, reach = 3.6f, every = 10, callReach = 48, callMost = 2,   // (14 in the first Adit; the gunners stand 44.6 m off now)
                 phases = new[] {
                     new BossPhase { at = .667f, kind = "stamp", seconds = 2, text = "Sorrel stamps: the platform jumps under you. He goes to the rack and comes back with a maul." },
                     new BossPhase { at = .333f, kind = "stamp", seconds = 2, text = "Sorrel stamps again, and this time comes back with the poleaxe." } },   // his guards, not the captain down the hall

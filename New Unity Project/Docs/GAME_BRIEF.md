@@ -17,7 +17,7 @@ games are style references only: no copied names, assets, zones or creatures fro
 ## What exists (Unity 6000.6.3f1, built-in pipeline)
 
 - **Five zones on a level ladder, cap 15 (30 in the end):** Oakhaven (1-5, farmland village, the Great Oak, the Golden Cask
-  inn), Khaven Village (5-9, a walled village in permanent grim dusk beside the dead Whispering Wood), the Shattered Peaks
+  inn), Khaven Village (5-9, a walled village in permanent grim dusk beside the dead Stillwood), the Shattered Peaks
   (9-12, a mountain toll pass held by Sandthrone mercenaries), the Ashland Rim (12-15, grey petrified ash beside the
   Wasting, with the Ash-Walker caves and Weave-Eaters), and the Verdant Shore (13-15). (Levels as of 2026-10-10, from the
   zone files; the cap-15 rescale is in ROADMAP.) All built from JSON by `ZoneBuilder` at load, 340-380 m across

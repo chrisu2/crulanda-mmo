@@ -44,6 +44,22 @@ resolutions", and on the dungeon: "all you did in the dungeon was make it bigger
 to complete". Whoever works on this next: verify everything yourself, show Chris pictures before anything is published, and never call a
 report fixed until he has seen it in his own build.
 
+## 2026-10-11, 19:03: STOPPED by Chris ("stop the presses on everything once all current tasks are complete"; "you have used 18% of my
+## fable tokens today and not accomplished much at all")
+What he has: **nothing new published.** The playable build is still the 00:33 one. What the day left, honestly:
+- VERIFIED by Chris on his screen: the group runs as they went (he watched); nothing he has played himself.
+- TESTED (suites green today): the Rock-Eater's saddle (editor), the three fourth paths, the Salt-Mender's rules and loop, the group
+  tests (party of five, the wolf, sims' armour and blows, the blow cap, the meter, the scorecard, the mark), the duo, the dirks.
+- **UNPROVEN: the full PlayMode set** on today's code (the 16:26 run timed out with the machine shared; it never ran again).
+- **OPEN, seen in the runs and not fixed:** the kit's column and plinth tops are walkable in the NavMesh bake, so a mob (an Ash mender,
+  17:37) or the leader (the Warrior, 18:44) ends up standing on a pedestal and the run stalls there. The leader's 45-second give-up only
+  covers a mob up there, not the leader itself. Fix: exclude the kit's column/plinth tops from the bake (ZoneBuilder.Adit, the kit
+  pieces' NavMesh area or a NavMeshModifier), then rerun `group_run.ps1`. No run reached the end; the best got 37 of 67 camps at 48
+  game-minutes with four deaths (18:44 run), and the pace points to about 60-65 minutes for a full clear.
+- OPEN: whether the Vent's and the Rail Hall's bosses (Ysolt, Sorrel, Danner, the Foreman) hold up against the party; never reached.
+- The run captures of the evening are in `D:\crulanda-workun-capturesdit-group-*` (each with its run-log.txt).
+- To publish anything: fix the bake, run the full set on a quiet machine, then `release_build.ps1 -Sync`.
+
 ## 2026-10-11, 16:50 on: Chris watching group runs of the Adit (PLAYTEST_NOTES 133-141; CHANGELOG 16:50)
 - **The group run tool:** `toolsalidation\group_run.ps1` runs lane B's build with `--crulanda-run-capture` (RunCapture.cs): a party of
   five led by a sim through the Adit at 3x, on the screen, everything logged to `D:\crulanda-workun-captures\<name>un-log.txt` and

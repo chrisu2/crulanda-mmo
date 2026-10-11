@@ -84,7 +84,7 @@ namespace Crulanda.Encounter
         public void Rehome(Vector3 point)
         {
             if (NavMesh.SamplePosition(point, out var hit, 3, NavMesh.AllAreas)) point = hit.position;
-            if (agent != null && agent.isOnNavMesh) agent.Warp(point); else transform.position = point + Vector3.up;
+            if (agent != null && agent.enabled && agent.isOnNavMesh) agent.Warp(point); else transform.position = point + Vector3.up;
             home = transform.position;
         }
         /// <summary>Everything a fight leaves on a mob, dropped: its group, a call it was answering, a blow half drawn, an enrage.</summary>

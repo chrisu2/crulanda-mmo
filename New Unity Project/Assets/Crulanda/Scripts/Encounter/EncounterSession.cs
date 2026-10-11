@@ -868,6 +868,7 @@ namespace Crulanda.Encounter
             if (!QuestUse(i)) { Message(string.IsNullOrEmpty(i.item) ? "You look it over, but find nothing you need right now." : "You don't need any of this right now."); return; }
             // Used up: once-only things stay done (saved); herbs regrow after a while.
             if (i.once) { Progress.usedInteractables.Add(i.Key(Zone.Zone.id)); if (i.Vanishes && i.root != null) HideProp(i.root); }
+            if (i.kind == "cage") FreeGoblin(i);   // its door swings open and its goblin is gone (EncounterSession.Adit, note 125)
             else if (i.Vanishes) { i.hiddenUntil = Time.time + 90; if (i.root != null) StartCoroutine(HideFor(i.root, 90)); }
             Save(false);
         }
@@ -1478,6 +1479,30 @@ namespace Crulanda.Encounter
         /// Levelling camps from the zone data: packs of mobs at levels inside the camp's band. They respawn somewhere in
         /// the camp after RespawnSeconds and are never saved. Ids: mob.&lt;tag&gt;.&lt;zone&gt;.&lt;camp&gt;.&lt;n&gt;.
         /// </summary>
+        /// <summary>How far apart two of a camp stand (playtest note 131, Chris, 2026-10-11: "shouldnt spawn almost on top of each other"):
+        /// a bear's or a Weave-Eater's length, a wolf's or a boar's, a man's shoulders and a step; an elite's a little more.</summary>
+        public static float GapFor(ActorLook look, bool elite)
+        {
+            float g = look == ActorLook.Bear || look == ActorLook.WeaveEater ? 3f : ActorVisual.IsBeast(look) ? 2.2f : 1.4f;
+            return elite ? g * 1.2f : g;
+        }
+        /// <summary>A spot clear of those already placed by <paramref name="gap"/>: turned round the camp's centre by the golden angle and a
+        /// little further out each try, with no more draws from the camp's dice (so no other camp's mobs move).</summary>
+        public static Vector2 Spaced(Vector2 spot, Vector2 centre, float gap, List<Vector2> placed)
+        {
+            bool ClearOfPlaced(Vector2 s) { foreach (var q in placed) if (Vector2.Distance(q, s) < gap) return false; return true; }
+            if (ClearOfPlaced(spot)) return spot;
+            var off = spot - centre; float r = Mathf.Max(off.magnitude, gap * .75f); float a = Mathf.Atan2(off.y, off.x);
+            for (int k = 1; k <= 40; k++)
+            {
+                float rr = r + gap * .25f * k, aa = a + k * 2.39996f;
+                var s = centre + new Vector2(Mathf.Cos(aa), Mathf.Sin(aa)) * rr;
+                if (ClearOfPlaced(s)) return s;
+            }
+            return spot;
+        }
+        /// <summary>The side of a patrol's road (square to its first leg), for walking side by side.</summary>
+        static Vector2 Side(Vector2[] road) { var d = road[1] - road[0]; return d.sqrMagnitude > 1e-4f ? new Vector2(-d.y, d.x).normalized : Vector2.right; }
         void SpawnCamps()
         {
             if (Zone == null || Zone.Zone.camps == null) return;
@@ -1489,11 +1514,16 @@ namespace Crulanda.Encounter
                 if (camp.rare > 0 && RareDice() >= camp.rare) continue;   // a rare camp, not here this visit (last in the list: no other camp's draws move)
                 var look = LookFor(camp.look, camp.elite); bool beast = ActorVisual.IsBeast(look);
                 string tag = string.IsNullOrEmpty(camp.tag) ? (camp.look ?? "mob") : camp.tag;
+                float gap = GapFor(look, camp.elite); var placed = new List<Vector2>();
                 for (int n = 0; n < camp.count; n++)
                 {
                     var spot = camp.center + new Vector2((float)rng.NextDouble() - .5f, (float)rng.NextDouble() - .5f) * camp.radius * 2;
                     // Hunters in hiding lie where the tall grass is sure to be, not out at the corners of the camp.
                     if (camp.ambush) spot = camp.center + Vector2.ClampMagnitude(spot - camp.center, camp.radius) * EncounterEnemy.AmbushSpread(camp.radius);
+                    // A patrol sets out from the head of its road, side by side; the rest a body's width from the others of the camp.
+                    if (camp.route != null && camp.route.Length > 1) spot = camp.route[0] + Side(camp.route) * gap * 1.15f * (n - (camp.count - 1) / 2f);
+                    else spot = Spaced(spot, camp.center, gap, placed);
+                    placed.Add(spot);
                     var point = Zone.StandAt(spot, float.NegativeInfinity, 1);   // a camp in a cave stands on its floor
                     if (NavMesh.SamplePosition(point, out var hit, 3, NavMesh.AllAreas)) point = hit.position + Vector3.up; else continue;
                     int level = camp.levelMin + rng.Next(Mathf.Max(1, camp.levelMax - camp.levelMin + 1));
@@ -1506,6 +1536,13 @@ namespace Crulanda.Encounter
                     enemy.Camp = true; enemy.Elite = elite; enemy.RespawnSeconds = Mathf.Max(20, camp.respawn); enemy.CampCenter = camp.center; enemy.CampRadius = camp.radius;
                     enemy.Ambusher = camp.ambush; enemy.Skinnable = look == ActorLook.Wolf || look == ActorLook.Boar || look == ActorLook.Stag || look == ActorLook.Bear;
                     enemy.FleeAt = elite ? 0 : camp.flee;   // bolts at low health (D5; EncounterEnemy.Flee)
+                    enemy.Gap = gap;
+                    if (camp.route != null && camp.route.Length > 1)   // a patrol: its road, each a little to the side of the next
+                    {
+                        var road = new Vector3[camp.route.Length]; var side = Side(camp.route) * gap * 1.15f * (n - (camp.count - 1) / 2f);
+                        for (int r = 0; r < road.Length; r++) road[r] = Zone.StandAt(camp.route[r] + side, float.NegativeInfinity, 1);   // on its cave's floor, as the camps
+                        enemy.Patrol = road;
+                    }
                     a.gameObject.SetActive(true); enemy.Initialize(); Enemies.Add(enemy);
                     if (camp.ambush) enemy.Hide();
                     bool tough = Zone.Zone.groupZone && !elite; enemy.Tough = tough;   // a group zone: every mob at an elite's strength (round 29)
@@ -1514,7 +1551,7 @@ namespace Crulanda.Encounter
                     enemy.HitBase = EncounterEnemy.MobHit(level, false, elite || tough);
                     if (elite) a.transform.localScale = Vector3.one * 1.18f; else if (tough) a.transform.localScale = Vector3.one * 1.08f;
                     ConfigureSocial(enemy, camp, c, level, beast);   // its kind, its kin and, for the elite, its move (EncounterSession.Social)
-                    if (elite && camp.mob == NixName) SpawnRockEater(enemy, camp, c, level);   // his engine, and him inside it (EncounterSession.RockEater)
+                    if (elite && camp.mob == NixName) SpawnRockEater(enemy, camp, c, level);   // his beast, and him in its saddle (EncounterSession.RockEater)
                 }
             }
             SpawnOutliers();

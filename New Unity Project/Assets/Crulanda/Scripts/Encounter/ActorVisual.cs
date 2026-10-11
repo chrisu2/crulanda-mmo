@@ -22,6 +22,8 @@ namespace Crulanda.Encounter
         Vector3 lastPosition; float phase, speed;
 
         public ActorPose Pose;
+        /// <summary>Riding in a saddle (Nix on the Rock-Eater, EncounterEnemy.HideInside): seated, its legs still, however fast its mount goes.</summary>
+        public bool Riding;
         int variant; bool child, posed; string role; float stoop, swimLean, swimPhase;
         /// <summary>Held weapon/shield/staff parts, and the same kit slung on the back (shown instead while swimming).</summary>
         Transform[] held, stowed; bool gearStowed;
@@ -41,7 +43,7 @@ namespace Crulanda.Encounter
             switch (role)
             {
                 case "blacksmith": case "merchant": case "baker": case "henwife": case "farmer": case "hunter": case "leatherworker":
-                case "skinner": case "lumberjack": case "herbalist": case "miller": case "elder": case "drinker": case "stranger": case "warden": case "pilgrim": case "innkeeper": return true;
+                case "skinner": case "lumberjack": case "herbalist": case "miller": case "elder": case "drinker": case "stranger": case "warden": case "pilgrim": case "innkeeper": case "goblin": return true;
                 default: return false;
             }
         }
@@ -407,8 +409,7 @@ namespace Crulanda.Encounter
             var capsule = body.GetComponent<MeshRenderer>(); if (capsule != null) capsule.enabled = false;
             if (look == ActorLook.WeaveEater) { BuildEater(); lastPosition = transform.position; return; }
             if (look == ActorLook.Pale) { BuildPale(); lastPosition = transform.position; return; }
-            if (look == ActorLook.RockEater) { BuildRockEater(); lastPosition = transform.position; return; }   // the goblin boring-engine (ActorVisual.Machine.cs)
-            if ((look == ActorLook.Wolf || look == ActorLook.Stag || look == ActorLook.Boar || look == ActorLook.Bear || look == ActorLook.Spider) && BuildModelBeast(look)) { lastPosition = transform.position; return; }   // ActorVisual.Beasts.cs
+            if ((look == ActorLook.Wolf || look == ActorLook.Stag || look == ActorLook.Boar || look == ActorLook.Bear || look == ActorLook.Spider || look == ActorLook.RockEater) && BuildModelBeast(look)) { lastPosition = transform.position; return; }   // ActorVisual.Beasts.cs
             if (look == ActorLook.Stag) { BuildStag(); lastPosition = transform.position; return; }
             if (look == ActorLook.Spider) { BuildSpider(); lastPosition = transform.position; return; }
             if (look == ActorLook.Bramble) { BuildBramble(); lastPosition = transform.position; return; }
@@ -439,7 +440,11 @@ namespace Crulanda.Encounter
                 case ActorLook.BanditKing: clothC = new Color(.13f, .09f, .09f); accentC = new Color(.84f, .6f, .2f); legC = new Color(.36f, .1f, .08f); skin = Mat(new Color(.7f, .53f, .4f)); break;
                 case ActorLook.Villager:
                     clothC = VillagerCloth[Mathf.Abs(variant) % VillagerCloth.Length]; accentC = VillagerCloth[Mathf.Abs(variant * 3 + 2) % VillagerCloth.Length] * .8f;
-                    legC = new Color(.3f, .25f, .2f) * (.8f + (variant % 3) * .15f); skin = Mat(Skins[Mathf.Abs(variant * 7) % Skins.Length]); break;
+                    legC = new Color(.3f, .25f, .2f) * (.8f + (variant % 3) * .15f); skin = Mat(Skins[Mathf.Abs(variant * 7) % Skins.Length]);
+                    // A goblin (PROVISIONAL look until the goblins have a figure: the pressed goblins in the Adit's cages, note 125): grey-green
+                    // skin, rags the colour of rock dust.
+                    if (role == "goblin") { clothC = new Color(.36f, .32f, .26f); accentC = new Color(.27f, .24f, .2f); legC = new Color(.25f, .22f, .18f); skin = Mat(new Color(.5f, .6f, .42f)); }
+                    break;
                 default: clothC = new Color(.6f, .27f, .18f); accentC = new Color(.4f, .35f, .3f); legC = new Color(.28f, .2f, .16f); break;
             }
             bool metalAccent = look == ActorLook.Warrior || look == ActorLook.Paladin || look == ActorLook.Warden || look == ActorLook.Collector;
@@ -767,6 +772,15 @@ namespace Crulanda.Encounter
             }
             switch (trade)
             {
+                case "goblin":
+                    // Long pointed ears out from the head, swept back (on a model they ride its head frame, as a hat does).
+                    foreach (int side in new[] { -1, 1 })
+                    {
+                        var ear = new GameObject("Ear", typeof(MeshFilter), typeof(MeshRenderer)).transform; ear.SetParent(body, false);
+                        ear.GetComponent<MeshFilter>().sharedMesh = Crulanda.World.ZoneMeshes.Cone(1, 1); ear.GetComponent<MeshRenderer>().sharedMaterial = skin;
+                        ear.localPosition = new Vector3(side * .15f, .83f, -.02f); ear.localRotation = Quaternion.Euler(-20, 0, -side * 72); ear.localScale = new Vector3(.07f, .22f, .035f);
+                    }
+                    break;
                 case "blacksmith":
                     // Broad, soot-dark shirt with bare forearms, a long leather apron, a skullcap, and a hammer.
                     cloth.color = new Color(.24f, .22f, .22f); legs.color = new Color(.2f, .17f, .15f);
@@ -1001,7 +1015,6 @@ namespace Crulanda.Encounter
             if (core != null) { Drift(); return; }
             if (beastModel != null) { BeastLate(); return; }
             if (model != null) { ModelLate(); return; }
-            if (drill != null) { MachineLate(); return; }
             if (body == null || legL == null) return;
             // Swimming: the kit goes on the back, so no sword stands out of the water like a mast; out of a fight too (playtest note 79).
             bool stow = Pose == ActorPose.Swim || (Fighting != null && !Fighting(gameObject) && !Casting);

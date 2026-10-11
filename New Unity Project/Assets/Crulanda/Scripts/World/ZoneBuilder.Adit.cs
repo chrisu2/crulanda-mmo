@@ -24,12 +24,15 @@ namespace Crulanda.World
         public const string AditCage = "A goblin cage", AditEchoJar = "A pilgrim's echo-jar";
         /// <summary>Dungeon step D3: the gates across the main way (ZoneGate), the powder for the loud way through the second, the
         /// Gallery's spirit stone, and the elite whose people answer the loud way (EncounterSession.Adit).</summary>
-        public const string AditLiftGate = "The cage-lift gate", AditPlatformGate = "The platform gate", AditPowder = "A keg of blasting powder",
-            AditSpiritStone = "The Gallery's spirit stone", AditQuartermaster = "Quartermaster Brannigan Sorrel", AditCarriage = "The rail-carriage";
+        public const string AditLiftGate = "The winch gate", AditPlatformGate = "The platform gate", AditPowder = "A keg of blasting powder",
+            AditSpiritStone = "The Gallery's spirit stone", AditQuartermaster = "Quartermaster Brannigan Sorrel", AditCarriage = "The ore carriage";
         /// <summary>The Rail Hall's part in the Weaver's unlocking (dungeon step D4, EncounterSession.Weaver): where Mother Quillet stands to match
         /// the carriage's resonance lock, where the two waves come from (behind the carriage, then the far end where the line runs on into the
         /// dark), and the carriage's geodes with their light and the lock's eye, which go dark when it is matched. Unset outside the Adit.</summary>
         public Vector3 RailLock; public Vector3[] RailWaves; public GameObject[] RailGeodes;
+        /// <summary>Where the carriage's two pit mules stand in their traces, up the line from it, and the way they face (the session puts
+        /// them there: EncounterSession.Adit). Unset outside the Adit.</summary>
+        public Vector3[] RailTeam; public Quaternion RailTeamFacing;
         /// <summary>The lock matched (D4): the carriage's geodes go dull and their light goes out.</summary>
         public void QuietCarriage()
         {
@@ -77,10 +80,29 @@ namespace Crulanda.World
             // one root, static-batched at the end; the pieces are for the eye, with a Block where one would be walked into. Its own stream
             // (kr), so nothing placed before moves.
             Transform kit = null; var kr = TreeRandom(t.position + new Vector3(7.1f, 0, 2.9f)); float K() { return (float)kr.NextDouble(); }
+            // The kit's pale flags in the cave's own tone (2026-10-11, Chris's screenshots: a near-white tiled floor in the dark cave).
+            var shaded = new System.Collections.Generic.Dictionary<Material, Material>();
+            void Shade(GameObject piece, float k)
+            {
+                foreach (var r in piece.GetComponentsInChildren<Renderer>())
+                {
+                    var mats = r.sharedMaterials;
+                    for (int m = 0; m < mats.Length; m++)
+                    {
+                        if (mats[m] == null) continue;
+                        if (!shaded.TryGetValue(mats[m], out var dim)) { dim = new Material(mats[m]) { name = mats[m].name + " (cave)" }; if (dim.HasProperty("_Color")) dim.color = mats[m].color * new Color(k, k * .97f, k * .93f, 1); shaded[mats[m]] = dim; }
+                        mats[m] = dim;
+                    }
+                    r.sharedMaterials = mats;
+                }
+            }
+            const float FloorShade = .52f;   // the kit's floor flags at about half their pale grey
             GameObject Piece(string name, Vector3 foot, float yaw, float height, float? width = null, Vector3? box = null)
             {
                 if (kit == null) { kit = new GameObject("Adit kit").transform; kit.SetParent(t, false); }
-                return ModelProp(kit, "Dungeon/" + name, foot, yaw, height, false, width, box);
+                var piece = ModelProp(kit, "Dungeon/" + name, foot, yaw, height, false, width, box);
+                if (piece != null && name == "ModularFloor") Shade(piece, FloorShade);
+                return piece;
             }
             float YawAt(float s) { return Along(s).eulerAngles.y; }
             var torchFire = new Color(1, .62f, .3f);
@@ -178,6 +200,7 @@ namespace Crulanda.World
             const float NaveW = 12 * CW;   // the chapter-house's nave: its walls this far either side of the way
             float LakeRz(int lake) { return Mathf.Min(13 * X, h.Half[lake] * .9f); }   // the lava lake's half-length down the hall
             var taken = new System.Collections.Generic.List<Vector3>();   // (along, aside, radius) of what stands on the floor
+            var hallSpans = new System.Collections.Generic.List<Vector2>();   // the built halls' stretches (from, to), kept clear by FloorClutter
             bool Room(float s, float a, float r, bool middle = false)
             {
                 if (!middle && Mathf.Abs(a) - r < 1.6f) return false;
@@ -204,8 +227,11 @@ namespace Crulanda.World
                     for (float a = from + 1; a < w + .6f; a += 2)
                     {
                         var foot = On(s, side * a); if (!Free(foot) || !Free(foot + Vector3.up * 3.5f)) continue;
+                        // The kit's wall is dressed on one face (its back is flat): an end wall is seen from both sides, so two, back to back
+                        // (Chris, 2026-10-11, "looks terrible": two flat black slabs round an arch, the walls' backs).
                         if (Piece("ModularStoneWall", foot, YawAt(s) + 90, 2.02f) == null) continue;
-                        for (int k = 1; k < courses; k++) Piece("ModularStoneWall", foot + Vector3.up * 2 * k, YawAt(s) + 90, 2.02f);
+                        Piece("ModularStoneWall", foot, YawAt(s) - 90, 2.02f);
+                        for (int k = 1; k < courses; k++) { Piece("ModularStoneWall", foot + Vector3.up * 2 * k, YawAt(s) + 90, 2.02f); Piece("ModularStoneWall", foot + Vector3.up * 2 * k, YawAt(s) - 90, 2.02f); }
                         Block(foot, new Vector3(2.05f, 2 * courses, .7f), q);
                     }
                 if (!door) return;
@@ -216,6 +242,7 @@ namespace Crulanda.World
             void Hall(float s0, float s1, float w, bool wallIn, bool doorIn, bool wallOut, bool doorOut, float columnsEvery = 6, Func<float, float, bool> bare = null, int courses = 2)
             {
                 if (s0 < 0 || s1 - s0 < 6) return;
+                hallSpans.Add(new Vector2(s0 - 3, s1 + 3));
                 for (float s = s0 + 1; s < s1 - .5f; s += 2)
                     for (float a = -w + 1; a < w - .5f; a += 2)
                     {
@@ -227,7 +254,7 @@ namespace Crulanda.World
                     {
                         if (h.Half[RingAt(s)] * .82f < w - .2f) continue;   // the rock bulges in here: it shows
                         var foot = On(s, side * w); if (!Free(foot) || !Free(foot + Vector3.up * 3.5f)) continue;
-                        float yaw = YawAt(s) + (side > 0 ? 180 : 0);
+                        float yaw = YawAt(s) + (side > 0 ? 0 : 180);   // the dressed face into the hall (it faced the rock: the hall showed flat backs)
                         if (Piece("ModularStoneWall", foot, yaw, 2.02f) == null) continue;
                         for (int k = 1; k < courses; k++) Piece("ModularStoneWall", foot + Vector3.up * 2 * k, yaw, 2.02f);
                         Block(foot, new Vector3(.7f, 2 * courses, 2.05f), Along(s));
@@ -382,7 +409,75 @@ namespace Crulanda.World
                 default: MainAdit(); break;
             }
             KitDressing();
+            FloorClutter();
             if (kit != null && Application.isPlaying) StaticBatchingUtility.Combine(kit.gameObject);
+
+            // The floors filled (Chris, 2026-10-11: "room full of nothing", "more nothingness"): drawn out two and a half times as wide,
+            // the chambers kept their rubble at the walls' feet only and the floor between lay bare. Rock outcrops, rubble, dripstone and
+            // fallen timber over the open floor of every wide stretch (geode crystal on the Geode Floor, basalt in the Vent, grey rock in
+            // the Breach), each in a place of its own (Room: off the way down the middle, off the camps and off what stands), never in a
+            // built hall, at a gate or on the lava; the big ones solid. Its own stream, so nothing placed before it moves.
+            void FloorClutter()
+            {
+                var fr = TreeRandom(t.position + new Vector3(3.7f, 0, 11.3f)); float F() { return (float)fr.NextDouble(); }
+                int lake = h.Name == "The Ember Vent" ? Widest(26 * X, h.Length - 8 * X) : -1;
+                float lakeS = lake >= 0 ? h.Along[lake] : -999, lakeR = lake >= 0 ? LakeRz(lake) + 4 : 0;
+                var rock = Tint(art.stone, AditLining(h.Name) * .8f); var rubbleRock = Tint(art.stone, AditLining(h.Name) * .65f);
+                bool geodes = h.Name == "The Geode Floor", drips = h.Name == "The Sealed Adit" || h.Name == "The Grey Breach";
+                for (float s = 6; s < h.Length - 4; s += 2.6f)
+                {
+                    int i = RingAt(s); float half = h.Half[i];
+                    bool skip = half < 6 || Mathf.Abs(s - lakeS) < lakeR;   // a drift keeps its rubble at the walls only
+                    foreach (var span in hallSpans) if (s > span.x && s < span.y) skip = true;
+                    foreach (var g in Gates) if (g != null && g.Cave == h.Name && Mathf.Abs(s - g.Along) < 8) skip = true;
+                    int tries = 1 + (int)(half / 9);   // more across the wider chambers
+                    for (int k = 0; k < tries; k++)
+                    {
+                        float a = (F() * 2 - 1) * half * .8f, roll = F(), size = F(), turn = F() * 360;
+                        if (skip) continue;
+                        bool big = roll < .3f; float r = big ? 1.1f + size * 1.3f : .55f + size * .45f;
+                        if (!Room(s, a, r)) continue;
+                        var at = On(s, a); at.y = FloorY(at.x, at.z) - .06f;
+                        if (big)
+                        {
+                            // An outcrop: a boulder sunk into the floor with a smaller one leaning on it.
+                            Lump(BoulderAt((int)(size * 97)), t, at, new Vector3(r * 1.4f, r * (.75f + roll), r * 1.2f), rock, turn);
+                            Lump(BoulderAt((int)(size * 97) + 3), t, at + Along(s) * new Vector3(r * .7f, 0, r * .4f), Vector3.one * r * .55f, rubbleRock, turn + 70);
+                            Block(at, new Vector3(r * 1.7f, r * 1.1f, r * 1.5f), Along(s));
+                        }
+                        else if (geodes && roll < .55f)
+                        {
+                            // A clutch of geode crystal out of the floor, lit faintly.
+                            for (int q = 0; q < 4; q++)
+                            {
+                                var dir = (Vector3.up + new Vector3(Mathf.Sin(turn + q * 1.7f), 0, Mathf.Cos(turn + q * 1.7f)) * .45f).normalized; float len = .4f + ((q * 37 + (int)(size * 50)) % 7) * .1f;
+                                Part(PrimitiveType.Cube, t, at + dir * len / 2, new Vector3(.14f, len, .14f), geode, Quaternion.FromToRotation(Vector3.up, dir) * Quaternion.Euler(0, turn + q * 40, 0));
+                            }
+                        }
+                        else if (drips && roll < .55f)
+                        {
+                            // Dripstone: two or three stalagmites, a tall one and its shorter neighbours.
+                            for (int q = 0; q < 3; q++)
+                            {
+                                var foot = at + Along(s) * new Vector3((q - 1) * r * .7f, 0, (q % 2) * r * .5f); float tall = (q == 1 ? 1.4f : .7f) + size * 1.6f;
+                                MeshPart(Drip(i + q), t, foot, rock).transform.localScale = new Vector3(.35f + size * .3f, tall, .35f + size * .3f);
+                            }
+                            Block(at, new Vector3(r * 1.6f, 2, r * 1.6f), Along(s));
+                        }
+                        else if (roll < .75f)
+                        {
+                            // A rubble heap: three stones.
+                            for (int q = 0; q < 3; q++) Lump(BoulderAt(q + (int)(size * 13)), t, at + Along(s) * new Vector3((q - 1) * r * .6f, 0, ((q * 2) % 3 - 1) * r * .4f), Vector3.one * r * (.35f + q * .1f), rubbleRock, turn + q * 50);
+                        }
+                        else
+                        {
+                            // Fallen timber: a pit prop and a cap-piece, broken and grey with dust.
+                            Part(PrimitiveType.Cube, t, at + Vector3.up * .14f, new Vector3(.24f, .24f, 2.4f + size * 1.5f), dark, Quaternion.Euler(0, turn, 3));
+                            Part(PrimitiveType.Cube, t, at + Vector3.up * .32f + Quaternion.Euler(0, turn, 0) * new Vector3(.4f, 0, .3f), new Vector3(.22f, .22f, 1.6f), timber, Quaternion.Euler(0, turn + 35, 8));
+                        }
+                    }
+                }
+            }
 
             // Bones and fallen rock at the walls' feet the length of the cave, a column fallen in the Breach and the Gallery, and the
             // chests, barrels, candelabra, books and carpet of the rooms people kept.
@@ -474,8 +569,11 @@ namespace Crulanda.World
                 Cart(Mathf.Min(galleryFrom - 6 * X, 27 * X), -1.6f * CW, false); Cart(Mathf.Min(galleryFrom - 30 * X, 57 * X), 1.6f * CW, true);   // in the hall, off the way (a cart in the narrow drift cut the navmesh)
                 int lumNo = 0;
                 for (float s = 4; s < galleryFrom; s += 14, lumNo++) WallLamp(RingAt(s), lumNo % 2 == 0 ? 1 : -1, LumGreen, 10, .8f);
-                // The cages: three along the left wall of the first chamber and two on the right, straw inside, doors hanging. Each is
-                // usable (E, "Open the cage"): the quest "The Pressed" (Quests/adit.json) has you open all five; once opened it stays open.
+                // The cages: three along the left wall of the first chamber and two on the right, a pressed goblin huddled in each
+                // (EncounterSession.Adit puts them there). Each is usable (E, "Open the cage"): the quest "The Pressed" (Quests/adit.json) has
+                // you open all five; once opened its door stands open. (Playtest note 125, Chris, 2026-10-11: "says open the cage but it is
+                // obviously broken and nothing in it": bars on two sides only, the straw a slab off the floor, nobody inside.) Barred all
+                // round on the cave's floor, its door on the side toward the way, hinged at a corner ("Door").
                 int cages = Widest(18 * X, 36 * X);
                 if (cages >= 0)
                 {
@@ -484,13 +582,28 @@ namespace Crulanda.World
                     {
                         float s = k < 3 ? s0 - 3.5f * X + k * 3.2f * X : s0 - 1.9f * X + (k - 3) * 3.2f * X; int side = k < 3 ? -1 : 1;
                         var q = Along(s); var at = On(s, side * h.Half[RingAt(s)] * .62f); if (!Free(at)) continue;
+                        at.y = FloorY(at.x, at.z);   // on the floor where it stands (the ring's height left the straw a slab in the air)
                         var cage = new GameObject(AditCage).transform; cage.SetParent(t, false); cage.localPosition = at; cage.localRotation = q;
                         Interactables.Add(new ZoneInteractable { name = AditCage, prompt = "Open the cage", kind = "cage", once = true, position = cage.position, root = cage });
                         foreach (int sx in new[] { -1, 1 }) foreach (int sz in new[] { -1, 1 })
-                                Part(PrimitiveType.Cube, t, at + q * new Vector3(sx * .8f, .95f, sz * .8f), new Vector3(.12f, 1.9f, .12f), iron, q);
-                        Part(PrimitiveType.Cube, t, at + Vector3.up * 1.92f, new Vector3(1.75f, .08f, 1.75f), iron, q);
-                        for (int b = -2; b <= 2; b++) { Part(PrimitiveType.Cylinder, t, at + q * new Vector3(b * .32f, .95f, .8f), new Vector3(.04f, .95f, .04f), iron, q); Part(PrimitiveType.Cylinder, t, at + q * new Vector3(b * .32f, .95f, -.8f), new Vector3(.04f, .95f, .04f), iron, q); }
-                        Part(PrimitiveType.Cube, t, at + Vector3.up * .05f, new Vector3(1.4f, .1f, 1.4f), straw, q * Quaternion.Euler(0, 20, 0));
+                                Part(PrimitiveType.Cube, cage, new Vector3(sx * .8f, .95f, sz * .8f), new Vector3(.12f, 1.9f, .12f), iron);
+                        Part(PrimitiveType.Cube, cage, new Vector3(0, 1.92f, 0), new Vector3(1.75f, .08f, 1.75f), iron);   // the lid
+                        Part(PrimitiveType.Cube, cage, new Vector3(0, .04f, 0), new Vector3(1.75f, .08f, 1.75f), iron);    // the floor frame
+                        float doorX = -side * .8f;   // the door on the side toward the way
+                        for (int b = -2; b <= 2; b++)
+                        {
+                            foreach (float z in new[] { .8f, -.8f }) Part(PrimitiveType.Cylinder, cage, new Vector3(b * .32f, .95f, z), new Vector3(.04f, .95f, .04f), iron);   // the ends
+                            Part(PrimitiveType.Cylinder, cage, new Vector3(-doorX, .95f, b * .32f), new Vector3(.04f, .95f, .04f), iron);   // the back, against the wall
+                        }
+                        // The door: hinged at its corner, four bars between two rails, a padlock on its catch.
+                        var hinge = new GameObject("Door").transform; hinge.SetParent(cage, false); hinge.localPosition = new Vector3(doorX, 0, -.74f);
+                        for (int b = 0; b < 4; b++) Part(PrimitiveType.Cylinder, hinge, new Vector3(0, .95f, .24f + b * .32f), new Vector3(.04f, .9f, .04f), iron);
+                        foreach (float y in new[] { .18f, 1.75f }) Part(PrimitiveType.Cube, hinge, new Vector3(0, y, .74f), new Vector3(.05f, .06f, 1.48f), iron);
+                        Part(PrimitiveType.Cube, hinge, new Vector3(0, 1, 1.42f), new Vector3(.08f, .14f, .1f), rust);   // the padlock
+                        // Inside: straw on the floor, a tin bowl, a chain from the back bars.
+                        Part(PrimitiveType.Cube, cage, new Vector3(0, .09f, 0), new Vector3(1.4f, .03f, 1.4f), straw, Quaternion.Euler(0, 20, 0));
+                        Part(PrimitiveType.Cylinder, cage, new Vector3(-doorX * .4f, .13f, .45f), new Vector3(.22f, .03f, .22f), rust);
+                        for (int l = 0; l < 5; l++) Part(PrimitiveType.Cube, cage, new Vector3(-doorX * (.75f - l * .06f), .55f - l * .1f, -.3f), new Vector3(.03f, .08f, .05f), iron, Quaternion.Euler(0, 0, l * 30));
                         Block(at, new Vector3(1.75f, 2, 1.75f), q);
                     }
                 }
@@ -557,11 +670,21 @@ namespace Crulanda.World
                         }
                     }
                 }
-                // The cage-lift gate at the head of the stair (dungeon step D3): shut until the three rail sigils are set in the frame on
-                // its left post, three sockets that light amber, red and grey when they are (EncounterSession.Adit).
+                // The winch gate at the head of the stair (dungeon step D3): shut until the three rail sigils are set in the frame on
+                // its left post, three sockets that light amber, red and grey when they are (EncounterSession.Adit). Its grille is wound up
+                // by hand on a timber windlass on the right (Chris, 2026-10-11, no machines: it had been "the cage-lift").
                 {
                     float s = galleryTo + 4 * X; var gate = Gate(s, AditLiftGate, "liftgate", "Set the rail sigils", null);
                     var q = Along(s); float w = h.Half[RingAt(s)] * .9f; var plate = On(s - .3f, -w + .55f) + Vector3.up * 1.45f;
+                    var winch = On(s - 1.1f, w - .7f);
+                    foreach (float pz in new[] { -.45f, .45f }) Part(PrimitiveType.Cube, t, winch + q * new Vector3(0, .6f, pz), new Vector3(.18f, 1.2f, .18f), timber, q);   // its two posts
+                    Part(PrimitiveType.Cylinder, t, winch + q * new Vector3(0, 1.05f, 0), new Vector3(.32f, .5f, .32f), timber, q * Quaternion.Euler(90, 0, 0));   // the drum
+                    Part(PrimitiveType.Cylinder, t, winch + q * new Vector3(0, 1.05f, 0), new Vector3(.36f, .2f, .36f), straw, q * Quaternion.Euler(90, 0, 0));   // the rope wound on it
+                    foreach (float pz in new[] { -.6f, .6f }) for (int spoke = 0; spoke < 4; spoke++) Part(PrimitiveType.Cube, t, winch + q * new Vector3(0, 1.05f, pz) + q * Quaternion.Euler(spoke * 45, 0, 0) * new Vector3(0, .42f, 0), new Vector3(.06f, .84f, .06f), timber, q * Quaternion.Euler(spoke * 45, 0, 0));   // the spokes
+                    var ropeTop = On(s, w - .9f) + Vector3.up * (h.Height[RingAt(s)] * .82f - .3f); var ropeFoot = winch + Vector3.up * 1.2f;
+                    var rope = Part(PrimitiveType.Cylinder, t, (ropeTop + ropeFoot) / 2, new Vector3(.03f, Vector3.Distance(ropeTop, ropeFoot) / 2, .03f), straw);
+                    rope.transform.localRotation = Quaternion.FromToRotation(Vector3.up, ropeTop - ropeFoot);
+                    Block(winch, new Vector3(.6f, 1.3f, 1.4f), q);
                     Part(PrimitiveType.Cube, t, plate, new Vector3(.8f, .5f, .08f), iron, q);
                     var lit = new System.Collections.Generic.List<GameObject>();
                     var socket = Tint(art.stone, new Color(.08f, .08f, .09f));
@@ -652,6 +775,7 @@ namespace Crulanda.World
 
             void RailHall(float from)
             {
+                hallSpans.Add(new Vector2(from - 6, h.Length + 1));   // the platform and the line: the escort's ground
                 float to = h.Length - 3 * X, line = -h.Half[Widest(from, to)] * .55f;
                 // The line: down the hall's left side, buffers at the far end, and a dark mouth in the end wall where it runs on south.
                 Rails(from + 1, to - 1, line, .7f);
@@ -682,7 +806,7 @@ namespace Crulanda.World
                     foreach (int side in new[] { -1, 1 })
                     {
                         int i = RingAt(s); var foot = On(s, side * h.Half[i] * wallAt); if (!Free(foot) || !Free(foot + Vector3.up * 3.5f)) continue;
-                        float yaw = YawAt(s) + (side > 0 ? 180 : 0);
+                        float yaw = YawAt(s) + (side > 0 ? 0 : 180);   // the dressed face into the hall (as the halls')
                         if (Piece("ModularStoneWall", foot, yaw, 2.02f) == null) continue;
                         Piece("ModularStoneWall", foot + Vector3.up * 2, yaw, 2.02f); Piece("ModularStoneWall", foot + Vector3.up * 4, yaw, 2.02f); walled = true;   // three courses: the hall is twice as tall
                         Block(foot, new Vector3(.7f, 6, 2.05f), Along(s));
@@ -710,48 +834,61 @@ namespace Crulanda.World
                 // Barrels stood on the platform against the right-hand wall.
                 if (walled) for (int k = 0; k < 3; k++) { float s = from + 6 * X + k * 1.2f; var b = On(s, h.Half[RingAt(s)] * wallAt - 1.2f); if (Free(b)) { Piece("Barrel", b, K() * 360, .95f); Block(b, new Vector3(.9f, .95f, .9f), Along(s)); } }
                 for (float s = from + 8 * X; s < to; s += 30) { int i = RingAt(s); Glow(t, c[i] + Vector3.up * h.Height[i] * .7f, 30 * CW, .7f, RailBlue, .7f); }
-                // The carriage: an armoured body on eight wheels, plates riveted down its side, the rear open on stacked crates of
-                // glowing geodes, a gangway up from the platform.
+                // The carriage (Chris, 2026-10-11: "NO Machines"; it had been an armoured rail-car with a cab, rivets and levers): two timber
+                // ore wagons coupled on the old rails, plank-sided and iron-banded on wooden wheels, the geodes in their crates in the rear one,
+                // a driver's bench up front, and the traces out to a pair of pit mules standing up the line (RailTeam).
                 // The carriage stands where Rail-Captain Danner keeps, 14 m short of his camp as in the first Adit (to - 16 there): drawn
                 // out, "to - 16 * X" put it 38 m from him, past the reach of a mob's leash, and he never came for the Weaver at the lock.
                 var danner = Zone.camps == null ? null : System.Array.Find(Zone.camps, cp => cp != null && cp.cave == h.Name && cp.tag == "railcaptain");
                 float sc = danner != null ? Mathf.Min(danner.along - 14, to - 12) : to - 16 * X; var qc = Along(sc); var car = On(sc, line);
-                var plate = Tint(art.metal, new Color(.26f, .27f, .29f));
-                Part(PrimitiveType.Cube, t, car + qc * new Vector3(0, 1.75f, 2.2f), new Vector3(2.8f, 2.4f, 6), plate, qc);   // the armoured cab
-                Part(PrimitiveType.Cube, t, car + qc * new Vector3(0, 3.05f, 2.2f), new Vector3(3, .2f, 6.2f), dark, qc);
-                Part(PrimitiveType.Cube, t, car + qc * new Vector3(0, .7f, -1), new Vector3(2.8f, .3f, 12.4f), iron, qc);   // the bed
-                for (int k = 0; k < 4; k++) foreach (int side in new[] { -1, 1 })
-                        Part(PrimitiveType.Cylinder, t, car + qc * new Vector3(side * 1.05f, .45f, -5.6f + k * 3.7f), new Vector3(.8f, .06f, .8f), rust, qc * Quaternion.Euler(0, 0, 90));
-                for (int k = 0; k < 6; k++) foreach (int side in new[] { -1, 1 })
-                        Part(PrimitiveType.Sphere, t, car + qc * new Vector3(side * 1.42f, 1.2f + (k % 2) * .8f, -.4f + k * .9f), Vector3.one * .1f, rust, qc);   // rivets
+                var boards = Tint(art.timber, new Color(.46f, .33f, .21f));
+                void Wagon(float wz0, float wz1)
+                {
+                    float wzc = (wz0 + wz1) / 2, wlen = wz1 - wz0;
+                    Part(PrimitiveType.Cube, t, car + qc * new Vector3(0, .75f, wzc), new Vector3(2.6f, .12f, wlen), boards, qc);   // the floor
+                    foreach (int wside in new[] { -1, 1 })
+                    {
+                        Part(PrimitiveType.Cube, t, car + qc * new Vector3(wside * 1.25f, 1.2f, wzc), new Vector3(.1f, .8f, wlen), boards, qc);   // the sides
+                        for (float wz = wz0 + .3f; wz < wz1; wz += 1.5f) Part(PrimitiveType.Cube, t, car + qc * new Vector3(wside * 1.31f, 1.2f, wz), new Vector3(.04f, .84f, .1f), dark, qc);   // iron bands
+                        foreach (float wz in new[] { wz0 + .8f, wz1 - .8f })
+                        {
+                            Part(PrimitiveType.Cylinder, t, car + qc * new Vector3(wside * 1.05f, .45f, wz), new Vector3(.8f, .06f, .8f), boards, qc * Quaternion.Euler(0, 0, 90));   // a wooden wheel
+                            Part(PrimitiveType.Cylinder, t, car + qc * new Vector3(wside * 1.09f, .45f, wz), new Vector3(.84f, .02f, .84f), dark, qc * Quaternion.Euler(0, 0, 90));   // its iron tyre
+                        }
+                    }
+                    foreach (float wz in new[] { wz0, wz1 }) Part(PrimitiveType.Cube, t, car + qc * new Vector3(0, 1.2f, wz), new Vector3(2.6f, .8f, .1f), boards, qc);   // the ends
+                }
+                Wagon(-.6f, 5.2f); Wagon(-7.2f, -1.2f);
+                Part(PrimitiveType.Cube, t, car + qc * new Vector3(0, .6f, -.9f), new Vector3(.12f, .08f, .8f), dark, qc);   // the coupling
+                Part(PrimitiveType.Cube, t, car + qc * new Vector3(0, 1.75f, -6.8f), new Vector3(2, .1f, .5f), boards, qc);   // the driver's bench
+                foreach (int tside in new[] { -1, 1 })   // the traces, out to the mules
+                {
+                    Part(PrimitiveType.Cube, t, car + qc * new Vector3(tside * .55f, .95f, -9.4f), new Vector3(.08f, .08f, 4.4f), boards, qc);
+                    Part(PrimitiveType.Cylinder, t, car + qc * new Vector3(tside * .65f, 1.05f, -11.5f), new Vector3(.02f, .9f, .02f), straw, qc * Quaternion.Euler(90, 0, 0));
+                }
+                RailTeam = new[] { t.TransformPoint(car + qc * new Vector3(-.65f, 0, -12.6f)), t.TransformPoint(car + qc * new Vector3(.65f, 0, -12.6f)) };
+                RailTeamFacing = t.rotation * qc * Quaternion.Euler(0, 180, 0);
                 var lit = new System.Collections.Generic.List<GameObject>();
                 for (int k = 0; k < 6; k++) Crate(car + qc * new Vector3((k % 2 - .5f) * 1.1f, .85f, -2.4f - (k / 2) * 1.1f), qc, 1 + (k + 1) % 2, true, lit);
                 lit.Add(Glow(t, car + qc * new Vector3(0, 2.2f, -3.4f), 8, .9f, GeodeViolet, .9f).gameObject);
-                // The resonance lock (D4): an iron plate on the cab's platform side with a violet eye, and where the Weaver stands to match it.
+                // The resonance lock (D4): an iron plate on the front wagon's platform side with a violet eye, and where the Weaver stands to match it.
                 // The waves come from behind the carriage and from the far end, where the line runs on into the dark. Fixed places, no draws.
-                Part(PrimitiveType.Cylinder, t, car + qc * new Vector3(1.47f, 1.5f, 1.2f), new Vector3(.75f, .03f, .75f), iron, qc * Quaternion.Euler(0, 0, 90));
-                foreach (float r in new[] { .5f, .3f }) Part(PrimitiveType.Cylinder, t, car + qc * new Vector3(1.5f, 1.5f, 1.2f), new Vector3(r, .02f, r), rust, qc * Quaternion.Euler(0, 0, 90));
-                lit.Add(Part(PrimitiveType.Sphere, t, car + qc * new Vector3(1.53f, 1.5f, 1.2f), new Vector3(.06f, .16f, .16f), geode, qc));
+                Part(PrimitiveType.Cylinder, t, car + qc * new Vector3(1.33f, 1.3f, 1.2f), new Vector3(.75f, .03f, .75f), iron, qc * Quaternion.Euler(0, 0, 90));
+                foreach (float r in new[] { .5f, .3f }) Part(PrimitiveType.Cylinder, t, car + qc * new Vector3(1.36f, 1.3f, 1.2f), new Vector3(r, .02f, r), rust, qc * Quaternion.Euler(0, 0, 90));
+                lit.Add(Part(PrimitiveType.Sphere, t, car + qc * new Vector3(1.39f, 1.3f, 1.2f), new Vector3(.06f, .16f, .16f), geode, qc));
                 lit.Add(Glow(t, car + qc * new Vector3(2.1f, 1.6f, 1.2f), 4, .7f, GeodeViolet, .7f).gameObject);
                 RailGeodes = lit.ToArray(); RailLock = t.TransformPoint(On(sc + 1.2f, line + 2.6f));
                 // The second wave out of the dark toward the far end, 14 m past the carriage (the far end itself is 33 m past it now: they came
                 // too late to matter), by the line where the hall has narrowed (drawn out, the line runs 23 m off the way: there it is in the rock).
                 float s2 = Mathf.Min(to - 4.5f * X, sc + 14);   // 13 m from the lock when it comes (AditWeaver.Wave2At), she is then some 26 m from them: inside the leash's 30
                 RailWaves = new[] { t.TransformPoint(On(sc - 9.5f, line + 1)), t.TransformPoint(On(s2, Mathf.Max(line + 2, -h.Half[RingAt(s2)] * .5f))) };
-                // The way out (D8): the gangway at the carriage's bed, on the platform side. With the lock matched the goblins set the
-                // carriage to run back up the line to a siding under the yard (EncounterSession.Adit, kind "carriage").
+                // The way out (D8): the step up at the carriage's side, on the platform side. With the lock matched the goblins take the mules'
+                // heads and walk the carriage back up the line to a siding under the yard (EncounterSession.Adit, kind "carriage").
                 Interactables.Add(new ZoneInteractable { name = AditCarriage, prompt = "Ride the carriage up the line", kind = "carriage", position = t.TransformPoint(On(sc - 3f, line + 2.4f)) });
-                Block(car + qc * new Vector3(0, 0, 2.2f), new Vector3(2.9f, 3.2f, 6.2f), qc);
+                Block(car + qc * new Vector3(0, 0, 2.2f), new Vector3(2.9f, 2.2f, 6.2f), qc);
                 Block(car + qc * new Vector3(0, 0, -3.8f), new Vector3(2.9f, 1, 4.6f), qc);
-                // The loading crane by the carriage, crates and barrels on the platform, steam hanging over the line.
-                var crane = On(sc - 7, line * .15f);
-                if (Free(crane))
-                {
-                    Part(PrimitiveType.Cube, t, crane + Vector3.up * 2.4f, new Vector3(.4f, 4.8f, .4f), dark, qc);
-                    Part(PrimitiveType.Cube, t, crane + qc * new Vector3(line * .4f, 4.6f, 0), new Vector3(Mathf.Abs(line) * .9f, .3f, .3f), dark, qc);
-                    Part(PrimitiveType.Cylinder, t, crane + qc * new Vector3(line * .8f, 3.4f, 0), new Vector3(.03f, 1.2f, .03f), straw, qc);
-                    Block(crane, new Vector3(.6f, 4.8f, .6f), qc);
-                }
+                // Crates and barrels on the platform (the loading crane is gone: no machines). Its spot's check is kept, so nothing else moves.
+                var crane = On(sc - 7, line * .15f); Free(crane);
                 for (int k = 0; k < 8; k++)
                 {
                     float s = from + 8 * X + k * 5.5f * X; if (s > sc - 9 * X) break;

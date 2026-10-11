@@ -149,6 +149,9 @@ namespace Crulanda.World
         /// <summary>Its mobs bolt at this fraction of their health (dungeon step D5: the Grey Breach's crawlers at a quarter): a run from
         /// whoever they fight for a few seconds, then back. 0 = they fight to the end. Not for elites.</summary>
         public float flee;
+        /// <summary>A patrol (playtest note 131, Chris, 2026-10-11: "should all patrol"): the points of its road, walked back and forth side
+        /// by side while it has nobody to fight. Empty = its mobs stroll about the camp. The Sealed Adit's are written by adit_layout.py.</summary>
+        public Vector2[] route;
     }
     /// <summary>Walk into the radius and press E to travel; you arrive at <see cref="arrive"/> in the other zone.</summary>
     [Serializable] public sealed class ZoneExit { public string to, name; public Vector2 at, arrive; public float radius = 5; }

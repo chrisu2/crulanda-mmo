@@ -1,5 +1,30 @@
 # Changelog
 
+## 2026-10-11, 12:23 on — The Adit pass: filled, no machines, walls the right way round, mobs that move (branch feet-bow-adit-kit)
+Chris, before he left at about 12:33: "get busy and do better than yesterday", "keep working until i say stop . dont stop to ask questions".
+Status of each line: see CLAUDE_HANDOFF.md (nothing here is verified by Chris yet).
+- **Mobs move (note 131, "should all patrol. all mobs just stand in one place"; every zone):** with nobody to fight, a camp's mobs stroll
+  their camp at a walk, a few seconds at each spot, a body's width from each other (EncounterEnemy.Idle); a patrol walks its road back
+  and forth side by side (ZoneCamp.route), its leash held from where it is met; mobs of no camp keep their place. Spawned a body's width
+  apart (a bear's length, a man's shoulders; EncounterSession.Spaced, no extra dice, so no other camp moves).
+- **The Adit filled (notes 126, 130, 132, "would not take 60-75mins"):** 67 camps (33 before), 148 mobs (70), eight patrols of two down
+  the drifts and the deep stair, every camp spread over its widened ground (tools/wip/dungeon/adit_layout.py: FILL, PATROLS); rock
+  outcrops, rubble heaps, dripstone, fallen timber and geode clutches over the wide chambers' floors (ZoneBuilder.Adit FloorClutter), kept
+  off the way, the camps, the built halls, the gates and the lava.
+- **No machines (note 129):** the Rock-Eater is a great burrowing beast on the bear's body (3.6 m, stone-grey hide, violet geode crystal
+  through its back, a saddle) with Nix riding it in sight and out of reach till it falls (ActorVisual.RockEaterGear, EncounterEnemy.Ride);
+  its move Rock-Crush, its call a bellow; Nix's Goad-Hook; the Borer Bit is the Rock-Eater's Tooth. The carriage is two plank-sided,
+  iron-banded ore wagons on wooden wheels with two pit mules in the traces (PitMule); no cab, rivets, levers or crane. The cage-lift is the
+  winch gate, wound by hand on a timber windlass. ActorVisual.Machine.cs is gone. DUNGEON_DESIGN 0.05, 0.055.
+- **The built halls (note 128, "looks terrible"):** the kit's stone wall is dressed on one face; the halls' and the Rail Hall's side walls
+  had it to the rock and the end walls one way only, so the halls showed flat black backs. Side walls face in, end walls are back to back,
+  the floor flags darkened to the cave's tone.
+- **The cages (note 125):** barred all round with a hinged door and a padlock, on the floor, straw, a bowl, a chain, and a pressed goblin
+  huddled in each (PROVISIONAL look: the small villager figure, grey-green, long-eared, in rags); without "The Pressed" the lock holds and
+  the prompt says Pib wants them out; with it the door swings open and the goblin slips away.
+- Tests added: AditTests (mobs apart, strolling, patrols walking, 140+ mobs; no machines), AditGateTests (the cages), RockEaterTests (Nix
+  seen in the saddle). Captures added: the Rock-Eater front, side and back (94), a farmer's fork (life capture 07-11).
+
 ## 2026-10-11, 00:45-01:20 — Chris's play of the 00:33 build: fourteen reports, eight fixed and tested, none published (branch feet-bow-adit-kit)
 Chris played the drawn-out Adit build and reported notes 119-132 (PLAYTEST_NOTES.md, verbatim). Fixed, each with a test that measures what
 he saw, all TESTED and committed, **not published and not seen by Chris**:

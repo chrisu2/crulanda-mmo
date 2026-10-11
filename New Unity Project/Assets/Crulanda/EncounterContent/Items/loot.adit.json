@@ -30,7 +30,7 @@
     },
     {
       "id": "loot.adit.the_borer_bit",
-      "name": "The Borer Bit",
+      "name": "The Rock-Eater's Tooth",
       "kind": "gear",
       "slot": "mainhand",
       "quality": 3,
@@ -39,7 +39,7 @@
       "weaponDamage": 36,
       "strength": 19,
       "agility": 12,
-      "description": "The Rock-Eater's drill head, cut down to a pick. It still hums if you hold it to the stone.",
+      "description": "A grinding tooth out of the Rock-Eater's jaw, set on an ironwood haft. It still hums if you hold it to the stone.",
       "canonStatus": "GAME-ONLY"
     },
     {
@@ -222,7 +222,7 @@
       "stamina": 17,
       "strength": 11,
       "spirit": 5,
-      "description": "An armoured coat with the carriage's rivets down its front. The letter's pocket is empty now.",
+      "description": "An armoured coat, iron-studded down its front like the carriage's tailboard. The letter's pocket is empty now.",
       "canonStatus": "GAME-ONLY"
     },
     {
@@ -250,7 +250,7 @@
       "armor": 57,
       "stamina": 20,
       "strength": 13,
-      "description": "A heater shield cut from a carriage plate. The rail's mark runs across it like a scar.",
+      "description": "A heater shield cut from the carriage's iron-bound tailboard. The rail's mark runs across it like a scar.",
       "canonStatus": "GAME-ONLY"
     },
     {
@@ -350,7 +350,7 @@
       "weaponDamage": 38,
       "stamina": 11,
       "agility": 17,
-      "description": "The hooked knife that cuts a carriage loose from its train. Quick, and very sharp.",
+      "description": "The hooked knife that cuts a carriage's mules loose from their traces. Quick, and very sharp.",
       "canonStatus": "GAME-ONLY"
     },
     {

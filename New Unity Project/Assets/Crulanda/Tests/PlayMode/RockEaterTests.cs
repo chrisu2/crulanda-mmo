@@ -13,8 +13,8 @@ using Crulanda.World;
 namespace Crulanda.Tests
 {
     /// <summary>
-    /// Nix's two-part fight (DUNGEON_DESIGN.md 3a; dungeon step D5): the Geode Floor's workshop has the Rock-Eater, an engine Nix rides,
-    /// hidden inside it (unseen, out of reach, not drawn out by walking up to it); when the engine breaks he jumps out at the wreck and
+    /// Nix's two-part fight (DUNGEON_DESIGN.md 3a; dungeon step D5): the Geode Floor's workshop has the Rock-Eater, a great burrowing beast
+    /// Nix rides (Chris, 2026-10-11, no machines), in its saddle (seen, out of reach, not drawn out by walking up to it); when it falls he leaps down and
     /// comes for whoever broke it; the Amber Sigil and the camp's deed come from him, not the machine; both come back with the camp,
     /// Nix inside again.
     /// </summary>
@@ -50,7 +50,10 @@ namespace Crulanda.Tests
         {
             var machine = Find(EncounterSession.RockEaterName); var nix = Find(EncounterSession.NixName);
             Assert.AreEqual(nix.CampIndex, machine.CampIndex, "the machine is his camp's");
-            Assert.AreSame(machine, nix.Inside); Assert.IsTrue(nix.Hidden, "inside it"); Assert.IsFalse(Visible(nix), "and unseen");
+            Assert.AreSame(machine, nix.Inside); Assert.IsTrue(nix.Hidden, "in the saddle, out of reach"); Assert.IsTrue(Visible(nix), "and seen riding it");
+            var seat = machine.GetComponent<ActorVisual>().RiderSeat; Assert.NotNull(seat, "the beast has a saddle");
+            Assert.Less(Vector3.Distance(nix.transform.position, seat.position + Vector3.up * EncounterEnemy.RiderLift), .3f, "Nix sits in it");
+            Assert.Greater(seat.position.y, machine.transform.position.y, "up on its back");
             Assert.IsTrue(Visible(machine)); Assert.IsFalse(nix.CanAnswer, "no call brings him out");
             Assert.AreEqual(ActorLook.RockEater, machine.GetComponent<ActorVisual>().Look);
             Assert.IsNull(LootContext.From(machine.persistentId, session.Zone.Zone.camps, 11, true).mob, "the machine's corpse rolls no named piece of Nix's");
@@ -80,9 +83,9 @@ namespace Crulanda.Tests
             Assert.IsFalse(machine.actor.IsAlive); Assert.IsFalse(nix.actor.IsAlive);
             yield return new WaitForSeconds(2.5f);
             Assert.IsTrue(machine.actor.IsAlive, "the engine is back"); Assert.IsTrue(nix.actor.IsAlive, "and so is Nix");
-            Assert.AreSame(machine, nix.Inside, "inside it again"); Assert.IsTrue(nix.Hidden); Assert.IsFalse(Visible(nix));
+            Assert.AreSame(machine, nix.Inside, "in the saddle again"); Assert.IsTrue(nix.Hidden); Assert.IsTrue(Visible(nix));
             Assert.IsTrue(Visible(machine));
-            Assert.IsFalse(machine.transform.Find("Body").GetComponent<MeshRenderer>().enabled, "the engine's placeholder capsule stays off");
+            Assert.IsFalse(machine.transform.Find("Body").GetComponent<MeshRenderer>().enabled, "the beast's placeholder capsule stays off");
             Assert.IsFalse(nix.transform.Find("Body").GetComponent<MeshRenderer>().enabled, "and Nix's");
         }
     }

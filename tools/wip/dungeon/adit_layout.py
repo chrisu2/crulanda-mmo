@@ -164,6 +164,56 @@ CAMPS = [
     ('The Grey Breach', 7, 2.5, 0, mob('The Quiet Miner', 'The Quiet Miner', 'pale', 1, 12, 12, tag='quietminer', canon='GAME-ONLY (the unmade are CANON)', radius=1, elite=True, guards='none', respawn=1200, rare=0.2, social='solitary')),
 ]
 
+# ---------------------------------------------------------------- the drawn-out Adit filled (Chris, 2026-10-11)
+# "all you did in the dungeon was make it bigger which in turn has less mobs and would not take 60-75mins to complete" (DUNGEON_DESIGN
+# 0.06), "should all patrol", "room full of nothing", "very sparse mob density". The scale-up left long stretches with no camp: camps of
+# the kinds each wing already has go in them, every camp spreads over its widened ground (build), and patrols walk the drifts
+# (ZoneCamp.route). All GAME-ONLY.
+CA = 'GAME-ONLY cell; CANON cult (the Cult of Ash)'
+GB = 'GAME-ONLY (the Wasting is CANON)'
+HM = 'CANON creature (Hollow Men) and CANON tunnels under the Peaks (book2 ch.19); GAME-ONLY camp'
+FILL = [
+    (MAIN, 3, 0, 0, mob('Lamp drift', 'Sandthrone digger', 'deserter', 2, 10, 10, tag='digger', radius=1.6)),
+    (MAIN, 5, 0, -3, mob('Ore-cart loaders', 'Sandthrone digger', 'deserter', 3, 10, 10, tag='digger', radius=2.2)),
+    (MAIN, 7, 0, 3, mob("Overseers' mess", 'Sandthrone overseer', 'deserter', 3, 10, 11, tag='overseer', radius=2.2)),
+    (MAIN, 10, 0, 0, mob('Powder store', 'Sandthrone sapper', 'deserter', 2, 11, 11, tag='sapper', radius=1.6)),
+    (MAIN, 13, 0, -3, mob('Spoil heaps', 'Sandthrone digger', 'deserter', 3, 11, 11, tag='digger', radius=2.2)),
+    (MAIN, 16, 0, 0, mob('Timber crew', 'Sandthrone digger', 'deserter', 2, 11, 11, tag='digger', radius=1.6)),
+    (MAIN, 18, 0, 3, mob('Gallery mouth watch', 'Sandthrone watchman', 'outrider', 2, 11, 11, tag='watchman', radius=2)),
+    (MAIN, 20, 0, 7, mob('Gallery porters', 'Sandthrone geode-carrier', 'outrider', 3, 11, 11, tag='carrier', radius=2.5)),
+    (MAIN, 20, 0, -7, mob('Gallery lamp-men', 'Sandthrone watchman', 'outrider', 2, 11, 11, tag='watchman', radius=2)),
+    (MAIN, 22, 0, -3, mob('Stairhead watch', 'Sandthrone watchman', 'outrider', 3, 11, 12, tag='watchman', radius=2.2)),
+    (MAIN, 24, 0, 0, mob('Upper stair guard', 'Sandthrone platform guard', 'outrider', 2, 11, 12, tag='platformguard', radius=1.6)),
+    (MAIN, 29, 0, 0, mob('Middle stair guard', 'Sandthrone platform guard', 'outrider', 2, 12, 12, tag='platformguard', radius=1.6)),
+    (MAIN, 32, 0, 0, mob('Lower stair guard', 'Sandthrone platform guard', 'outrider', 2, 12, 12, tag='platformguard', radius=1.6)),
+    (MAIN, 35, 0, 4, mob('Siding dockers', 'Sandthrone docker', 'deserter', 3, 12, 12, tag='docker', radius=2.5)),
+    ('The Geode Floor', 1, 0, 0, mob('Floor mouth cutters', 'Sandthrone geode-cutter', 'outrider', 2, 11, 11, tag='cutter', radius=1.6)),
+    ('The Geode Floor', 4, 0, 0, mob('Trough runners', 'Sandthrone sorter', 'deserter', 2, 11, 11, tag='sorter', radius=1.6)),
+    ('The Geode Floor', 6, 0, 3, mob('Sorting floor', 'Sandthrone sorter', 'deserter', 3, 11, 11, tag='sorter', radius=2.5)),
+    ('The Geode Floor', 6, 0, -4, mob('Seam cutters', 'Sandthrone geode-cutter', 'outrider', 2, 11, 11, tag='cutter', radius=2)),
+    ('The Geode Floor', 9, 0, 0, mob('Back drift cutters', 'Sandthrone geode-cutter', 'outrider', 2, 11, 11, tag='cutter', radius=1.6)),
+    ('The Ember Vent', 1, 0, 0, mob('Vent pickets', 'Ash initiate', 'cultist', 2, 11, 11, tag='ashinitiate', canon=CA, radius=1.6)),
+    ('The Ember Vent', 5, 0, 0, mob('Vent menders', 'Ash mender', 'cultist', 2, 11, 11, tag='ashmender', canon=CA, radius=1.6)),
+    ('The Ember Vent', 6, 0, 4, mob('Ash garden', 'Ash initiate', 'cultist', 3, 11, 11, tag='ashinitiate', canon=CA, radius=2.5)),
+    ('The Grey Breach', 1, 0, 0, mob('Breach mouth crawlers', 'Greyed crawler', 'spider', 3, 11, 11, tag='crawler', canon=GB, radius=1.8, flee=.25)),
+    ('The Grey Breach', 4, 0, 0, mob('Grey seep', 'Greyed crawler', 'spider', 3, 11, 11, tag='crawler', canon=GB, radius=1.8, flee=.25)),
+    ('The Grey Breach', 5, 0, 3, mob('The Hollow sump', 'Hollow Man', 'hollow', 2, 11, 11, tag='hollow', canon=HM, radius=2.2)),
+    ('The Grey Breach', 10, 0, -3, mob('Grey den', 'Greyed bear', 'bear', 2, 11, 11, tag='greybear', canon=GB, radius=2.5)),
+]
+# Patrols: two side by side, walking a drift back and forth between two rows of its cave, down its middle. Each sets out clear of the
+# other camps' centres (a camp's mobs are its own), more than 16 m past a gate (a sim's run counts a camp cleared with nobody living
+# within 16 m of it), and off the branches' mouths.
+PATROLS = [
+    (MAIN, 2, 4, mob('Drift patrol', 'Sandthrone picket', 'deserter', 2, 10, 10, tag='picket', radius=1.2)),
+    (MAIN, 8, 11, mob('Overseers on their rounds', 'Sandthrone overseer', 'deserter', 2, 11, 11, tag='overseer', radius=1.2)),
+    (MAIN, 14, 17, mob("Sergeants' round", 'Sandthrone overseer', 'deserter', 2, 11, 11, tag='overseer', radius=1.2)),
+    (MAIN, 25, 28, mob('Upper stair patrol', 'Sandthrone watchman', 'outrider', 2, 11, 12, tag='watchman', radius=1.2)),
+    (MAIN, 30, 34, mob('Lower stair patrol', 'Sandthrone watchman', 'outrider', 2, 12, 12, tag='watchman', radius=1.2)),
+    ('The Geode Floor', 2, 4, mob('Floor runners', 'Sandthrone geode-cutter', 'outrider', 2, 11, 11, tag='cutter', radius=1.2)),
+    ('The Ember Vent', 2, 5, mob('Ash procession', 'Ash initiate', 'cultist', 2, 11, 11, tag='ashinitiate', canon=CA, radius=1.2)),
+    ('The Grey Breach', 7, 9, mob('Wandering Hollow', 'Hollow Man', 'hollow', 2, 11, 11, tag='hollow', canon=HM, radius=1.2)),
+]
+
 def build():
     traced = {}
     for c in CAVES:
@@ -181,7 +231,9 @@ def build():
         traced[c['name']] = ([r[:4] + (r[4] + base,) + r[5:] for r in rings], rows)
     camps = []
     guards = {d['guards'] for *_, d in CAMPS if d.get('guards') not in (None, 'none')}
-    for cave, row, off, aside, d in CAMPS:
+    rare = [c for c in CAMPS if c[4].get('rare')]
+    for cave, row, off, aside, d in [c for c in CAMPS if not c[4].get('rare')] + FILL + rare:
+        if d.get('rare'): add_patrols(traced, camps)   # the patrols before the rare camp: a visit without it moves nobody's dice
         rings, rows = traced[cave]
         # A lord and his guards stand a few metres apart (SocialAggro's GuardReach): their offsets are not drawn out.
         near = d['name'] in guards or d.get('guards') not in (None, 'none')
@@ -189,9 +241,12 @@ def build():
         off = off * (1 if near else LEN); aside = round(aside * (min(w, 2) if near else w), 2)
         along = rows[row] + off
         (x, z), _ = point(rings, along, aside)
-        assert abs(aside) + d['radius'] < half_at(rings, along) + .01, (d['name'], aside, half_at(rings, along))
-        e = dict(d); e['center'] = {'x': round(x, 2), 'y': round(z, 2)}; e['cave'] = cave; e['along'] = round(along, 2); e['aside'] = aside
+        # Spread over its ground, drawn out with the cave (a chamber's camp much more than a drift's); a lord and his guards stay close.
+        r = d['radius'] if near else round(max(1.2, min(d['radius'] * (1.8 if w == CHAMBER_W else 1.2), half_at(rings, along) - abs(aside) - .6)), 2)
+        assert abs(aside) + r < half_at(rings, along) + .01, (d['name'], aside, r, half_at(rings, along))
+        e = dict(d); e['radius'] = r; e['center'] = {'x': round(x, 2), 'y': round(z, 2)}; e['cave'] = cave; e['along'] = round(along, 2); e['aside'] = aside
         camps.append(e)
+    if not rare: add_patrols(traced, camps)
     # No two caves may lie over each other (a floor under a floor): only the branches' mouths, inside the Gallery, may.
     names = [c['name'] for c in CAVES]
     for a in range(len(names)):
@@ -207,6 +262,18 @@ def build():
                     if d < p[2] + q[2] + 1 and abs(p[4] - q[4]) > 1.5:
                         sys.exit('caves overlap: %s at %.1f and %s at %.1f' % (names[a], p[5], names[b], q[5]))
     return traced, camps
+
+def add_patrols(traced, camps):
+    """Each patrol's road: points down the middle of its drift every 12 m or so, from its first row to its last; it starts at the first."""
+    for cave, r0, r1, d in PATROLS:
+        rings, rows = traced[cave]
+        a0, a1 = rows[r0], rows[r1]; n = max(2, int(abs(a1 - a0) / 12) + 1)
+        road = []
+        for k in range(n):
+            (x, z), _ = point(rings, a0 + (a1 - a0) * k / (n - 1), 0)
+            road.append({'x': round(x, 2), 'y': round(z, 2)})
+        e = dict(d); e['center'] = road[0]; e['cave'] = cave; e['along'] = round(a0, 2); e['aside'] = 0; e['route'] = road
+        camps.append(e)
 
 def zone(traced, camps):
     main_at = CAVES[0]['at']

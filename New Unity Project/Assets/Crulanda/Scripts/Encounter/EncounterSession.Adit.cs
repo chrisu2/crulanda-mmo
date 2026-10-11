@@ -30,6 +30,64 @@ namespace Crulanda.Encounter
             foreach (var g in Zone.Gates) if (g != null) g.Recarve();   // the navmesh is built after the gates: cut them into it now
             foreach (var i in Zone.Interactables) if (i.kind == "liftgate" && i.gate != null && Progress.keys.Contains(LiftWoken)) i.gate.SetOpen(true, true);
             StartWeaver();   // the Weaver's unlocking (EncounterSession.Weaver.cs)
+            // The pressed goblins in their cages, and the doors of those opened before standing open (playtest note 125).
+            foreach (var i in Zone.Interactables)
+            {
+                if (i.kind != "cage" || i.root == null) continue;
+                if (Progress.usedInteractables.Contains(i.Key(Zone.Zone.id))) { OpenCageDoor(i, false); continue; }
+                caged[i] = PressedGoblin(i.root, caged.Count);
+            }
+            // The carriage's team: two pit mules standing in their traces up the line from it (Chris, 2026-10-11, no machines).
+            if (Zone.RailTeam != null)
+                for (int k = 0; k < Zone.RailTeam.Length; k++)
+                {
+                    var mule = new GameObject("Pit mule").transform; mule.SetPositionAndRotation(Zone.RailTeam[k], Zone.RailTeamFacing);
+                    mule.gameObject.AddComponent<PitMule>().body = CritterBody.Build(mule, "donkey", .2f + k * .45f, 11 + k * 7);
+                    var box = mule.gameObject.AddComponent<BoxCollider>(); box.size = new Vector3(.55f, 1.15f, 1.6f); box.center = new Vector3(0, .575f, 0); mule.gameObject.layer = 2;   // solid, never a click target (as the farm's)
+                }
+        }
+        readonly Dictionary<ZoneInteractable, GameObject> caged = new Dictionary<ZoneInteractable, GameObject>();
+        /// <summary>A pressed goblin huddled in a cage (PROVISIONAL look: the small villager figure, grey-green, long-eared, in rags, until
+        /// the goblins have a figure of their own; the goblins are CANON, the Weavers of the Warrens).</summary>
+        GameObject PressedGoblin(Transform cage, int k)
+        {
+            var go = new GameObject("Pressed goblin"); go.transform.SetPositionAndRotation(cage.position + Vector3.up * .66f, cage.rotation * Quaternion.Euler(0, k % 2 == 0 ? 70 : -110, 0));
+            var body = GameObject.CreatePrimitive(PrimitiveType.Capsule); body.name = "Body"; Destroy(body.GetComponent<Collider>()); body.transform.SetParent(go.transform, false);
+            var v = ActorVisual.Attach(go, ActorLook.Villager, 41 + k * 6, true, "goblin"); v.Pose = ActorPose.Cower;
+            return go;
+        }
+        /// <summary>The cage's door swung open (slowly, as you open it; at once for one opened before).</summary>
+        void OpenCageDoor(ZoneInteractable cage, bool slowly)
+        {
+            var door = cage.root != null ? cage.root.Find("Door") : null; if (door == null) return;
+            float side = door.localPosition.x > 0 ? 1 : -1; var open = Quaternion.Euler(0, side * 105, 0);
+            if (slowly) StartCoroutine(SwingDoor(door, open)); else door.localRotation = open;
+        }
+        System.Collections.IEnumerator SwingDoor(Transform door, Quaternion to)
+        {
+            var from = door.localRotation;
+            for (float u = 0; u < 1; u += Time.deltaTime / .7f) { if (door == null) yield break; door.localRotation = Quaternion.Slerp(from, to, Mathf.SmoothStep(0, 1, u)); yield return null; }
+            if (door != null) door.localRotation = to;
+        }
+        /// <summary>A cage opened (EncounterSession.Interact, after the quest has counted it): the door swings open, and its goblin gets up,
+        /// slips out past you and is gone into the dark.</summary>
+        void FreeGoblin(ZoneInteractable cage)
+        {
+            OpenCageDoor(cage, true);
+            if (!caged.TryGetValue(cage, out var goblin) || goblin == null) return;
+            caged.Remove(cage); StartCoroutine(GoblinOut(goblin, cage.root));
+        }
+        System.Collections.IEnumerator GoblinOut(GameObject goblin, Transform cage)
+        {
+            var v = goblin.GetComponent<ActorVisual>(); if (v != null) v.Pose = ActorPose.None;
+            yield return new WaitForSeconds(.6f);
+            var door = cage.Find("Door"); var outward = door != null ? cage.TransformDirection(new Vector3(door.localPosition.x > 0 ? 1 : -1, 0, 0)) : cage.forward;
+            var from = goblin.transform.position; var to = from + outward * 2.2f + cage.forward * 1.5f;
+            goblin.transform.rotation = Quaternion.LookRotation(new Vector3(outward.x, 0, outward.z));
+            for (float u = 0; u < 1; u += Time.deltaTime / 1.4f) { if (goblin == null) yield break; goblin.transform.position = Vector3.Lerp(from, to, u); yield return null; }
+            Message("The goblin squeezes out past you, says something quick and grateful in the Warrens' tongue, and is gone into the dark.");
+            yield return new WaitForSeconds(1.5f);
+            if (goblin != null) Destroy(goblin);
         }
         /// <summary>What E says at a usable prop (the HUD's prompt; the Adit's things say how things stand).</summary>
         public string InteractPromptFor(ZoneInteractable i) { return i == null ? null : AditPrompt(i) ?? i.prompt; }
@@ -46,7 +104,7 @@ namespace Crulanda.Encounter
             var keyed = KeyCamps(); int have = KeysHeld(keyed);
             FloatText(e.transform.position + Vector3.up * 1.2f, char.ToUpperInvariant(camp.keyName[0]) + camp.keyName.Substring(1), new Color(1, .82f, .35f));
             Message("You take " + camp.keyName + " from " + camp.mob + ". Rail sigils " + have + "/" + keyed.Count +
-                (have < keyed.Count ? ": the others are down the other ways off the Gallery." : ": set them in the frame by the cage-lift, at the head of the stair."));
+                (have < keyed.Count ? ": the others are down the other ways off the Gallery." : ": set them in the frame by the winch gate, at the head of the stair."));
         }
 
         /// <summary>What E says at one of the Adit's things, or null for the prop's own prompt.</summary>
@@ -55,6 +113,7 @@ namespace Crulanda.Encounter
             switch (i.kind)
             {
                 case "liftgate": { var keyed = KeyCamps(); return "Set the rail sigils (" + KeysHeld(keyed) + "/" + keyed.Count + ")"; }
+                case "cage": return Quests != null && Quests.State(PressedQuest) != null ? i.prompt : "A goblin huddles in the cage (Pib, in the Peaks, wants them out)";
                 case "platformgate": return Quests != null && Quests.IsDone(PressedQuest) ? "Call the goblins to the gate (quiet)" : CarryingPowder ? "Blow the gate (loud)" : "Try the gate";
                 case "powder": return CarryingPowder ? "Powder on your shoulder" : null;
                 case "stone": return Progress.spiritStones.Contains(i.Key(Zone.Zone.id)) ? "The spirit stone hums" : i.prompt;
@@ -77,6 +136,9 @@ namespace Crulanda.Encounter
                 case "stone": TouchStone(i); return true;
                 case "weaver": TalkToWeaver(); return true;
                 case "carriage": RideCarriage(); return true;
+                case "cage":   // the lock is the Company's: without Pib's quest, the goblin only shrinks back (with it, the quest counts it and it opens)
+                    if (Quests != null && Quests.State(PressedQuest) != null) return false;
+                    Message("The goblin inside flinches back from the bars. The padlock is the Company's: Pib, in the Peaks, knows how these open."); return true;
                 default: return false;
             }
         }
@@ -158,15 +220,15 @@ namespace Crulanda.Encounter
         /// <summary>How long the ride up the line takes on the bar (D8; tests shorten it).</summary>
         public static float RideSeconds = 5;
         /// <summary>
-        /// The rail ride out (dungeon step D8): with the lock matched, the goblins at the levers run the carriage back up the line to a
-        /// siding under the Adit yard. E at the gangway: a few seconds on the bar (moving or a blow stops it, as with any work), then you,
-        /// Mira and the sims stand at the yard. Before the lock is matched the carriage is still the Company's.
+        /// The ride out (dungeon step D8): with the lock matched, the goblins take the mules' heads and walk the carriage back up the line
+        /// to a siding under the Adit yard. E at its step: a few seconds on the bar (moving or a blow stops it, as with any work), then you,
+        /// Mira and the sims stand at the yard. Before the lock is matched the carriage is still the Company's. No machines (Chris, 2026-10-11).
         /// </summary>
         void RideCarriage()
         {
             if (!Progress.keys.Contains(WeaverLock)) { Message("The carriage is loading, its geodes glowing in their crates, and the lock on its side still sings the Company's note. Stop it first: the Weaver knows the way."); return; }
             if (InCombat) { Message(FightingLine); return; }
-            Message("You climb the gangway. Two goblins at the levers grin and throw them, and the carriage takes up the line with a jolt.");
+            Message("You climb up onto the carriage. Two goblins take the mules' heads, cluck at them, and the wagons creak off up the line.");
             StartWork("Riding the line", RideSeconds, RideOut);
         }
         void RideOut()
@@ -176,7 +238,7 @@ namespace Crulanda.Encounter
             if (Companion != null) { var ma = Companion.GetComponent<NavMeshAgent>(); if (ma != null) ma.Warp(siding + Vector3.right * 2.5f - Vector3.up * .1f); }
             foreach (var c in PartySims) { if (c == null) continue; var agent = c.GetComponent<NavMeshAgent>(); if (agent != null) agent.Warp(siding + Vector3.left * (2 + c.slot) - Vector3.up * .1f); }
             foreach (var e in Enemies) if (e != null && e.Victim != null) e.ResetFight();
-            Message("A long climb in the dark, the Gallery's song far off through the rock, then grey daylight: the carriage stops at a siding under the Adit yard, and the goblins wave you off. The line is theirs now.");
+            Message("A long, slow climb in the dark behind the mules, the Gallery's song far off through the rock, then grey daylight: the carriage stops at a siding under the Adit yard, and the goblins wave you off. The line is theirs now.");
             Save(false);
         }
         /// <summary>Whether a camp stands past a shut gate in its cave (the run a sim leads waits there).</summary>
@@ -195,4 +257,7 @@ namespace Crulanda.Encounter
             return last;
         }
     }
+    /// <summary>A mule in the Sealed Adit's carriage traces (EncounterSession.StartAdit): it stands, shifts and lowers its head as a farm
+    /// animal does at rest.</summary>
+    public sealed class PitMule : MonoBehaviour { public CritterBody body; void Update() { body?.Rest(); } }
 }

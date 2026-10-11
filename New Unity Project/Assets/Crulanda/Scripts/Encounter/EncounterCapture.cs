@@ -995,6 +995,25 @@ namespace Crulanda.Encounter
                     }
                     motor.enabled = true; foreach (var r in body) if (r != null) r.enabled = true;
                 }
+                // The Rock-Eater with Nix in the saddle, from in front, the side and behind (Chris, 2026-10-11: "more machines!!!!!  i told you
+                // NO Machines!"; it is a great burrowing beast now).
+                var rockEater = session.Enemies.Find(e => e != null && e.MobName == EncounterSession.RockEaterName && e.actor.IsAlive);
+                if (rockEater != null)
+                {
+                    EncounterHud.Hidden = true; Crulanda.World.WorldClock.Hour = 15;
+                    var body = Array.FindAll(session.Player.GetComponentsInChildren<Renderer>(), r => r.enabled);
+                    var at = rockEater.transform.position; motor.Teleport(at + rockEater.transform.forward * 9 + Vector3.up * .2f);
+                    foreach (var r in body) r.enabled = false;
+                    motor.enabled = false; var view = session.View.transform;
+                    foreach (var (turn, shot) in new[] { (0f, "94-rock-eater-front"), (90f, "94-rock-eater-side"), (180f, "94-rock-eater-back") })
+                    {
+                        var dir = Quaternion.Euler(0, turn, 0) * rockEater.transform.forward; dir.y = 0; dir.Normalize();
+                        var eye = at + dir * 6.5f + Vector3.up * 2.6f; var look = Quaternion.LookRotation(at + Vector3.up * 1.4f - eye);
+                        for (float w = 0; w < .6f; w += Time.deltaTime) { view.SetPositionAndRotation(eye, look); yield return null; }
+                        ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + shot + ".png")); yield return new WaitForSeconds(.4f);
+                    }
+                    motor.enabled = true; foreach (var r in body) if (r != null) r.enabled = true;
+                }
                 // A hidden find up close, one a zone (its first chest, cache, herb, note or key): from the side you come to it (its
                 // frame's -Z), a little above, the player out of frame and the HUD hidden. Secrets are on no map: this is their picture.
                 Crulanda.World.ZoneSecretSpot find = null;

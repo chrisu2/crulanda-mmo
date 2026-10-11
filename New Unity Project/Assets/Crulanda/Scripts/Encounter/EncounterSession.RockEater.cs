@@ -8,11 +8,12 @@ namespace Crulanda.Encounter
 {
     /// <summary>
     /// Nix's two-part fight (dungeon step D5; DUNGEON_DESIGN.md 3a, "first the Rock-Eater, then Nix"): the Geode Floor's workshop camp
-    /// spawns the Rock-Eater, a goblin boring-engine (ActorLook.RockEater), as a second elite of Nix's camp, and Nix rides inside it: hidden,
-    /// unseen, out of reach and deaf to calls (EncounterEnemy.HideInside). The machine fights with its drill (EliteMoves "Bore", a
-    /// knockback); its guards defend it as they would Nix. When it breaks, Nix jumps out at the wreck and comes for whoever broke it, with
-    /// his Spanner-Lock. The Amber Sigil and the camp's deed come from Nix alone (the machine's corpse rolls plain loot: its id names no
-    /// camp). Both come back with the camp, Nix inside again. All GAME-ONLY (the goblins are CANON).
+    /// spawns the Rock-Eater, a great burrowing beast that eats rock and geodes (ActorLook.RockEater; Chris, 2026-10-11: "NO Machines", it had
+    /// been a boring-engine), as a second elite of Nix's camp, and Nix rides it in the saddle: seen, but out of reach and deaf to calls
+    /// (EncounterEnemy.HideInside). The beast fights with its charge (EliteMoves "Rock-Crush", a knockback); its guards defend it as they
+    /// would Nix. When it falls, Nix leaps down beside it and comes for whoever brought it down, with his Goad-Hook. The Amber Sigil and the
+    /// camp's deed come from Nix alone (the beast's body rolls plain loot: its id names no camp). Both come back with the camp, Nix in the
+    /// saddle again. All GAME-ONLY (the goblins are CANON).
     /// </summary>
     public sealed partial class EncounterSession
     {
@@ -23,7 +24,7 @@ namespace Crulanda.Encounter
         EncounterEnemy Machine(EncounterEnemy rider) { return Enemies.Find(e => e != null && e.Camp && e.MobName == RockEaterName && e.CampIndex == rider.CampIndex); }
         EncounterEnemy Rider(EncounterEnemy machine) { return Enemies.Find(e => e != null && e.Camp && e.MobName == NixName && e.CampIndex == machine.CampIndex); }
 
-        /// <summary>Beside the camp's Nix as he spawns: his engine, and him into its seat.</summary>
+        /// <summary>Beside the camp's Nix as he spawns: his beast, and him into its saddle.</summary>
         void SpawnRockEater(EncounterEnemy nix, ZoneCamp camp, int campIndex, int level)
         {
             var at = nix.transform.position + nix.transform.right * 2.2f;
@@ -42,7 +43,7 @@ namespace Crulanda.Encounter
             e.HitBase = EncounterEnemy.MobHit(level, false, true) * move.hit;
             nix.HideInside(e);
         }
-        /// <summary>The Rock-Eater broke: its rider jumps out at the wreck and comes for whoever broke it.</summary>
+        /// <summary>The Rock-Eater fell: its rider leaps down beside it and comes for whoever brought it down.</summary>
         void BreakOut(EncounterEnemy machine)
         {
             if (machine == null || machine.MobName != RockEaterName) return;
@@ -51,9 +52,9 @@ namespace Crulanda.Encounter
             var towards = killer != null ? killer.transform.position - machine.transform.position : machine.transform.forward; towards.y = 0;
             rider.Rehome(machine.transform.position + (towards.sqrMagnitude > .01f ? towards.normalized : Vector3.forward) * 1.8f);
             rider.Rise(killer);
-            Message("The Rock-Eater shudders, screams and stops. The canopy bangs open and " + NixName + " drops out of the seat with a spanner in both hands: \"Do you know what that COST?\"");
+            Message("The Rock-Eater bellows, staggers and comes down like a rockfall. " + NixName + " vaults out of the saddle with his goad in both hands: \"Do you know how long she took to RAISE?\"");
         }
-        /// <summary>A camp mob came back: a rider finds its machine standing, or a machine its rider, and they pair up again.</summary>
+        /// <summary>A camp mob came back: a rider finds its beast standing, or a beast its rider, and they pair up again.</summary>
         public void EnemyRespawned(EncounterEnemy e)
         {
             if (e == null || restoring) return;

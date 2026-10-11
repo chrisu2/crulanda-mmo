@@ -63,7 +63,7 @@ namespace Crulanda.Tests
             Assert.IsFalse(lift.Open); Assert.IsFalse(platform.Open);
             Assert.Less(lift.Along, platform.Along, "the lift at the stair's head, the platform gate at its foot");
             Assert.IsTrue(Walkable(CampAt("Gallery watch")), "the Gallery is open");
-            Assert.IsFalse(Walkable(CampAt("Stair watch")), "nobody walks through the cage-lift gate");
+            Assert.IsFalse(Walkable(CampAt("Stair watch")), "nobody walks through the winch gate");
             Assert.AreEqual("Set the rail sigils (0/3)", session.InteractPromptFor(Thing("liftgate")));
             var pop = SimPopulation.Active; var s = pop.World.sims.First();
             s.zone = "zone.adit"; s.onlineFrom = 0; s.onlineHours = 24; s.friendly = .9f; s.level = 11; session.Progress.experience = EncounterProgress.XpForLevel(9);
@@ -89,14 +89,14 @@ namespace Crulanda.Tests
             var near = lift.gate.transform.position - lift.gate.transform.forward * 3f;
             session.Player.GetComponent<AdventurerMotor>().Teleport(near + Vector3.up); if (NavMesh.SamplePosition(near, out var hit, 3, NavMesh.AllAreas)) c.GetComponent<NavMeshAgent>().Warp(hit.position);
             float t = 0; while (t < 8 && !c.WaitingAtGate) { t += Time.deltaTime; yield return null; }
-            Assert.IsTrue(c.WaitingAtGate, "the run waits at the lift"); StringAssert.EndsWith("cage-lift gate", c.LeadingName); Assert.AreEqual(ZoneBuilder.AditLiftGate, c.StoppedBy);
+            Assert.IsTrue(c.WaitingAtGate, "the run waits at the lift"); StringAssert.EndsWith("winch gate", c.LeadingName); Assert.AreEqual(ZoneBuilder.AditLiftGate, c.StoppedBy);
             t = 0; while (t < 4 && !c.Activity.StartsWith("Waiting at")) { t += Time.deltaTime; yield return null; }
             StringAssert.StartsWith("Waiting at the", c.Activity);
             Assert.IsTrue(session.Chat.Any(l => l.channel == ChatChannel.Party && l.text.Contains("rail sigils")), "it says what the gate wants");
             foreach (var k in new[] { "sigil.amber", "sigil.ember", "sigil.grey" }) session.Progress.keys.Add(k);
             session.UseInteractable(lift); yield return Frames(3);
             Assert.IsTrue(lift.gate.Open); Assert.IsFalse(c.WaitingAtGate, "open: on we go"); Assert.IsNull(c.StoppedBy);
-            Assert.AreEqual("Stair watch", c.LeadingName, "the first camp past the lift");
+            Assert.AreEqual("Upper stair guard", c.LeadingName, "the first camp past the lift (since the Adit was filled, 2026-10-11)");
         }
         [UnityTest] public IEnumerator The_sigils_are_won_from_the_branch_bosses_and_wake_the_lift_for_good()
         {
@@ -160,6 +160,41 @@ namespace Crulanda.Tests
             Assert.IsFalse(session.Working);
             Assert.Less(Vector3.Distance(session.Player.transform.position, yard), 4, "at the siding under the yard");
             Assert.Less(Vector3.Distance(session.Companion.transform.position, yard), 6, "Mira too");
+        }
+        /// <summary>The cages (playtest note 125, Chris, 2026-10-11: "says open the cage but it is obviously broken and nothing in it"): barred
+        /// on all four sides with a door, a goblin huddled in each; without Pib's quest the lock holds and says so; with it the door swings
+        /// open and the goblin is gone.</summary>
+        [UnityTest] public IEnumerator Each_cage_holds_a_goblin_and_opens_with_the_quest()
+        {
+            var cages = session.Zone.Interactables.Where(i => i.kind == "cage").ToList();
+            Assert.AreEqual(5, cages.Count, "five cages");
+            var goblins = UnityEngine.Object.FindObjectsByType<ActorVisual>(FindObjectsSortMode.None).Where(v => v.name == "Pressed goblin").ToList();
+            float Across(Vector3 a, Vector3 b) { a.y = b.y = 0; return Vector3.Distance(a, b); }
+            foreach (var c in cages)
+            {
+                Assert.NotNull(c.root.Find("Door"), "a door on each cage");
+                Assert.IsTrue(goblins.Any(g => Across(g.transform.position, c.root.position) < .7f), "a goblin in the cage at " + c.root.position);
+                foreach (var side in new[] { Vector3.right, Vector3.left, Vector3.forward, Vector3.back })
+                {
+                    var mid = c.root.TransformPoint(side * .8f + Vector3.up * .95f);
+                    Assert.IsTrue(c.root.GetComponentsInChildren<Renderer>(true).Any(r => r.name.Contains("Cylinder") && Vector3.Distance(r.bounds.center, mid) < .45f), "bars on its " + side + " side");
+                }
+            }
+            var first = cages[0]; var door = first.root.Find("Door"); var shut = door.localRotation;
+            session.Player.GetComponent<AdventurerMotor>().Teleport(first.position + Vector3.up); yield return Frames(2);
+            // Without Pib's quest the lock holds, and the prompt says whose it is to open.
+            StringAssert.Contains("Pib", session.InteractPromptFor(first));
+            session.UseInteractable(first); yield return Frames(3);
+            Assert.AreEqual(shut, door.localRotation, "still shut without the quest");
+            Assert.IsFalse(session.Progress.usedInteractables.Contains(first.Key(session.Zone.Zone.id)), "not counted as opened");
+            // With it: the door swings open and the goblin slips away.
+            session.Progress.experience = EncounterProgress.XpForLevel(11);
+            Assert.IsTrue(session.Quests.Accept(session.Quests.Def(EncounterSession.PressedQuest), "zone.peaks"), "Pib's quest taken");
+            Assert.AreEqual("Open the cage", session.InteractPromptFor(first));
+            session.UseInteractable(first); yield return new WaitForSeconds(1.2f);
+            Assert.Greater(Quaternion.Angle(shut, door.localRotation), 80, "the door swings open");
+            yield return new WaitForSeconds(3.5f);
+            Assert.IsFalse(UnityEngine.Object.FindObjectsByType<ActorVisual>(FindObjectsSortMode.None).Any(v => v.name == "Pressed goblin" && Across(v.transform.position, first.root.position) < 1.2f), "its goblin is gone");
         }
         [UnityTest] public IEnumerator The_spirit_stone_is_where_you_wake()
         {

@@ -625,7 +625,7 @@
       "tag": "picket",
       "look": "deserter",
       "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
-      "radius": 1.6,
+      "radius": 1.92,
       "count": 2,
       "levelMin": 10,
       "levelMax": 10,
@@ -644,7 +644,7 @@
       "tag": "digger",
       "look": "deserter",
       "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
-      "radius": 1.8,
+      "radius": 2.16,
       "count": 3,
       "levelMin": 10,
       "levelMax": 10,
@@ -663,7 +663,7 @@
       "tag": "overseer",
       "look": "deserter",
       "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
-      "radius": 2.5,
+      "radius": 4.5,
       "count": 3,
       "levelMin": 10,
       "levelMax": 11,
@@ -682,7 +682,7 @@
       "tag": "sapper",
       "look": "deserter",
       "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
-      "radius": 1.6,
+      "radius": 1.92,
       "count": 2,
       "levelMin": 11,
       "levelMax": 11,
@@ -741,7 +741,7 @@
       "tag": "digger",
       "look": "deserter",
       "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
-      "radius": 1.6,
+      "radius": 1.92,
       "count": 2,
       "levelMin": 11,
       "levelMax": 11,
@@ -760,7 +760,7 @@
       "tag": "carrier",
       "look": "outrider",
       "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
-      "radius": 3,
+      "radius": 5.4,
       "count": 3,
       "levelMin": 11,
       "levelMax": 11,
@@ -779,7 +779,7 @@
       "tag": "watchman",
       "look": "outrider",
       "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
-      "radius": 2,
+      "radius": 3.6,
       "count": 2,
       "levelMin": 11,
       "levelMax": 11,
@@ -798,7 +798,7 @@
       "tag": "watchman",
       "look": "outrider",
       "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
-      "radius": 1.5,
+      "radius": 1.8,
       "count": 2,
       "levelMin": 11,
       "levelMax": 12,
@@ -817,7 +817,7 @@
       "tag": "platformguard",
       "look": "outrider",
       "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
-      "radius": 2.5,
+      "radius": 4.5,
       "count": 3,
       "levelMin": 12,
       "levelMax": 12,
@@ -836,7 +836,7 @@
       "tag": "docker",
       "look": "deserter",
       "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
-      "radius": 2.5,
+      "radius": 4.5,
       "count": 3,
       "levelMin": 12,
       "levelMax": 12,
@@ -895,7 +895,7 @@
       "tag": "gunner",
       "look": "outrider",
       "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
-      "radius": 2,
+      "radius": 3.6,
       "count": 2,
       "levelMin": 12,
       "levelMax": 12,
@@ -955,7 +955,7 @@
       "tag": "cutter",
       "look": "outrider",
       "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
-      "radius": 1.6,
+      "radius": 1.92,
       "count": 2,
       "levelMin": 11,
       "levelMax": 11,
@@ -974,7 +974,7 @@
       "tag": "cutter",
       "look": "outrider",
       "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
-      "radius": 2.5,
+      "radius": 4.5,
       "count": 3,
       "levelMin": 11,
       "levelMax": 11,
@@ -993,7 +993,7 @@
       "tag": "sorter",
       "look": "deserter",
       "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
-      "radius": 2.5,
+      "radius": 4.5,
       "count": 3,
       "levelMin": 11,
       "levelMax": 11,
@@ -1054,7 +1054,7 @@
       "tag": "ashinitiate",
       "look": "cultist",
       "canonStatus": "GAME-ONLY cell; CANON cult (the Cult of Ash)",
-      "radius": 1.6,
+      "radius": 1.92,
       "count": 2,
       "levelMin": 11,
       "levelMax": 11,
@@ -1073,7 +1073,7 @@
       "tag": "ashinitiate",
       "look": "cultist",
       "canonStatus": "GAME-ONLY cell; CANON cult (the Cult of Ash)",
-      "radius": 2.2,
+      "radius": 3.96,
       "count": 3,
       "levelMin": 11,
       "levelMax": 11,
@@ -1092,7 +1092,7 @@
       "tag": "ashmender",
       "look": "cultist",
       "canonStatus": "GAME-ONLY cell; CANON cult (the Cult of Ash)",
-      "radius": 2.2,
+      "radius": 3.96,
       "count": 3,
       "levelMin": 11,
       "levelMax": 11,
@@ -1111,7 +1111,7 @@
       "tag": "venthound",
       "look": "wolf",
       "canonStatus": "GAME-ONLY",
-      "radius": 1.5,
+      "radius": 2.7,
       "count": 1,
       "levelMin": 11,
       "levelMax": 11,
@@ -1133,7 +1133,7 @@
       "tag": "ashinitiate",
       "look": "cultist",
       "canonStatus": "GAME-ONLY cell; CANON cult (the Cult of Ash)",
-      "radius": 2.2,
+      "radius": 3.96,
       "count": 3,
       "levelMin": 11,
       "levelMax": 11,
@@ -1152,7 +1152,7 @@
       "tag": "ysolt",
       "look": "cultist",
       "canonStatus": "GAME-ONLY (the Cult of Ash is CANON)",
-      "radius": 1,
+      "radius": 1.8,
       "count": 1,
       "levelMin": 11,
       "levelMax": 11,
@@ -1175,7 +1175,7 @@
       "tag": "crawler",
       "look": "spider",
       "canonStatus": "GAME-ONLY (the Wasting is CANON)",
-      "radius": 1.8,
+      "radius": 2.16,
       "count": 3,
       "levelMin": 11,
       "levelMax": 11,
@@ -1195,7 +1195,7 @@
       "tag": "hollow",
       "look": "hollow",
       "canonStatus": "CANON creature (Hollow Men) and CANON tunnels under the Peaks (book2 ch.19); GAME-ONLY camp",
-      "radius": 2.5,
+      "radius": 4.5,
       "count": 3,
       "levelMin": 11,
       "levelMax": 11,
@@ -1214,7 +1214,7 @@
       "tag": "greybear",
       "look": "bear",
       "canonStatus": "GAME-ONLY (the Wasting is CANON)",
-      "radius": 1.8,
+      "radius": 2.16,
       "count": 2,
       "levelMin": 11,
       "levelMax": 11,
@@ -1233,7 +1233,7 @@
       "tag": "foreman",
       "look": "hollow",
       "canonStatus": "GAME-ONLY (the unmade are CANON)",
-      "radius": 1,
+      "radius": 1.8,
       "count": 1,
       "levelMin": 11,
       "levelMax": 11,
@@ -1251,12 +1251,796 @@
       "aside": 0.0
     },
     {
+      "name": "Lamp drift",
+      "mob": "Sandthrone digger",
+      "tag": "digger",
+      "look": "deserter",
+      "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
+      "radius": 1.92,
+      "count": 2,
+      "levelMin": 10,
+      "levelMax": 10,
+      "respawn": 900,
+      "center": {
+        "x": 6.0,
+        "y": -334.0
+      },
+      "cave": "The Sealed Adit",
+      "along": 40.4,
+      "aside": 0.0
+    },
+    {
+      "name": "Ore-cart loaders",
+      "mob": "Sandthrone digger",
+      "tag": "digger",
+      "look": "deserter",
+      "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
+      "radius": 3.96,
+      "count": 3,
+      "levelMin": 10,
+      "levelMax": 10,
+      "respawn": 900,
+      "center": {
+        "x": -10.07,
+        "y": -309.51
+      },
+      "cave": "The Sealed Adit",
+      "along": 69.24,
+      "aside": -7.5
+    },
+    {
+      "name": "Overseers' mess",
+      "mob": "Sandthrone overseer",
+      "tag": "overseer",
+      "look": "deserter",
+      "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
+      "radius": 3.96,
+      "count": 3,
+      "levelMin": 10,
+      "levelMax": 11,
+      "respawn": 900,
+      "center": {
+        "x": 4.01,
+        "y": -279.66
+      },
+      "cave": "The Sealed Adit",
+      "along": 99.97,
+      "aside": 7.5
+    },
+    {
+      "name": "Powder store",
+      "mob": "Sandthrone sapper",
+      "tag": "sapper",
+      "look": "deserter",
+      "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
+      "radius": 1.92,
+      "count": 2,
+      "levelMin": 11,
+      "levelMax": 11,
+      "respawn": 900,
+      "center": {
+        "x": 15.0,
+        "y": -238.0
+      },
+      "cave": "The Sealed Adit",
+      "along": 143.72,
+      "aside": 0.0
+    },
+    {
+      "name": "Spoil heaps",
+      "mob": "Sandthrone digger",
+      "tag": "digger",
+      "look": "deserter",
+      "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
+      "radius": 3.96,
+      "count": 3,
+      "levelMin": 11,
+      "levelMax": 11,
+      "respawn": 900,
+      "center": {
+        "x": -1.49,
+        "y": -186.69
+      },
+      "cave": "The Sealed Adit",
+      "along": 195.72,
+      "aside": -7.5
+    },
+    {
+      "name": "Timber crew",
+      "mob": "Sandthrone digger",
+      "tag": "digger",
+      "look": "deserter",
+      "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
+      "radius": 1.92,
+      "count": 2,
+      "levelMin": 11,
+      "levelMax": 11,
+      "respawn": 900,
+      "center": {
+        "x": 15.0,
+        "y": -151.0
+      },
+      "cave": "The Sealed Adit",
+      "along": 233.09,
+      "aside": 0.0
+    },
+    {
+      "name": "Gallery mouth watch",
+      "mob": "Sandthrone watchman",
+      "tag": "watchman",
+      "look": "outrider",
+      "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
+      "radius": 3.6,
+      "count": 2,
+      "levelMin": 11,
+      "levelMax": 11,
+      "respawn": 900,
+      "center": {
+        "x": 19.43,
+        "y": -123.01
+      },
+      "cave": "The Sealed Adit",
+      "along": 260.27,
+      "aside": 7.5
+    },
+    {
+      "name": "Gallery porters",
+      "mob": "Sandthrone geode-carrier",
+      "tag": "carrier",
+      "look": "outrider",
+      "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
+      "radius": 4.5,
+      "count": 3,
+      "levelMin": 11,
+      "levelMax": 11,
+      "respawn": 900,
+      "center": {
+        "x": 23.46,
+        "y": -80.85
+      },
+      "cave": "The Sealed Adit",
+      "along": 302.71,
+      "aside": 17.5
+    },
+    {
+      "name": "Gallery lamp-men",
+      "mob": "Sandthrone watchman",
+      "tag": "watchman",
+      "look": "outrider",
+      "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
+      "radius": 3.6,
+      "count": 2,
+      "levelMin": 11,
+      "levelMax": 11,
+      "respawn": 900,
+      "center": {
+        "x": -11.46,
+        "y": -83.15
+      },
+      "cave": "The Sealed Adit",
+      "along": 302.71,
+      "aside": -17.5
+    },
+    {
+      "name": "Stairhead watch",
+      "mob": "Sandthrone watchman",
+      "tag": "watchman",
+      "look": "outrider",
+      "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
+      "radius": 3.96,
+      "count": 3,
+      "levelMin": 11,
+      "levelMax": 12,
+      "respawn": 900,
+      "center": {
+        "x": 0.03,
+        "y": -36.37
+      },
+      "cave": "The Sealed Adit",
+      "along": 347.78,
+      "aside": -7.5
+    },
+    {
+      "name": "Upper stair guard",
+      "mob": "Sandthrone platform guard",
+      "tag": "platformguard",
+      "look": "outrider",
+      "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
+      "radius": 1.92,
+      "count": 2,
+      "levelMin": 11,
+      "levelMax": 12,
+      "respawn": 900,
+      "center": {
+        "x": 10.5,
+        "y": -10.0
+      },
+      "cave": "The Sealed Adit",
+      "along": 374.95,
+      "aside": 0.0
+    },
+    {
+      "name": "Middle stair guard",
+      "mob": "Sandthrone platform guard",
+      "tag": "platformguard",
+      "look": "outrider",
+      "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
+      "radius": 1.92,
+      "count": 2,
+      "levelMin": 12,
+      "levelMax": 12,
+      "respawn": 900,
+      "center": {
+        "x": 42.0,
+        "y": 56.0
+      },
+      "cave": "The Sealed Adit",
+      "along": 451.6,
+      "aside": 0.0
+    },
+    {
+      "name": "Lower stair guard",
+      "mob": "Sandthrone platform guard",
+      "tag": "platformguard",
+      "look": "outrider",
+      "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
+      "radius": 1.92,
+      "count": 2,
+      "levelMin": 12,
+      "levelMax": 12,
+      "respawn": 900,
+      "center": {
+        "x": 81.0,
+        "y": 80.0
+      },
+      "cave": "The Sealed Adit",
+      "along": 497.52,
+      "aside": 0.0
+    },
+    {
+      "name": "Siding dockers",
+      "mob": "Sandthrone docker",
+      "tag": "docker",
+      "look": "deserter",
+      "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
+      "radius": 4.5,
+      "count": 3,
+      "levelMin": 12,
+      "levelMax": 12,
+      "respawn": 900,
+      "center": {
+        "x": 111.48,
+        "y": 115.81
+      },
+      "cave": "The Sealed Adit",
+      "along": 542.15,
+      "aside": 10.0
+    },
+    {
+      "name": "Floor mouth cutters",
+      "mob": "Sandthrone geode-cutter",
+      "tag": "cutter",
+      "look": "outrider",
+      "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
+      "radius": 1.92,
+      "count": 2,
+      "levelMin": 11,
+      "levelMax": 11,
+      "respawn": 900,
+      "center": {
+        "x": 47.64,
+        "y": -88.52
+      },
+      "cave": "The Geode Floor",
+      "along": 15.0,
+      "aside": 0.0
+    },
+    {
+      "name": "Trough runners",
+      "mob": "Sandthrone sorter",
+      "tag": "sorter",
+      "look": "deserter",
+      "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
+      "radius": 1.92,
+      "count": 2,
+      "levelMin": 11,
+      "levelMax": 11,
+      "respawn": 900,
+      "center": {
+        "x": 90.07,
+        "y": -88.89
+      },
+      "cave": "The Geode Floor",
+      "along": 57.62,
+      "aside": 0.0
+    },
+    {
+      "name": "Sorting floor",
+      "mob": "Sandthrone sorter",
+      "tag": "sorter",
+      "look": "deserter",
+      "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
+      "radius": 4.5,
+      "count": 3,
+      "levelMin": 11,
+      "levelMax": 11,
+      "respawn": 900,
+      "center": {
+        "x": 127.4,
+        "y": -88.35
+      },
+      "cave": "The Geode Floor",
+      "along": 93.86,
+      "aside": 7.5
+    },
+    {
+      "name": "Seam cutters",
+      "mob": "Sandthrone geode-cutter",
+      "tag": "cutter",
+      "look": "outrider",
+      "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
+      "radius": 3.6,
+      "count": 2,
+      "levelMin": 11,
+      "levelMax": 11,
+      "respawn": 900,
+      "center": {
+        "x": 122.62,
+        "y": -71.51
+      },
+      "cave": "The Geode Floor",
+      "along": 93.86,
+      "aside": -10.0
+    },
+    {
+      "name": "Back drift cutters",
+      "mob": "Sandthrone geode-cutter",
+      "tag": "cutter",
+      "look": "outrider",
+      "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
+      "radius": 1.92,
+      "count": 2,
+      "levelMin": 11,
+      "levelMax": 11,
+      "respawn": 900,
+      "center": {
+        "x": 174.31,
+        "y": -62.47
+      },
+      "cave": "The Geode Floor",
+      "along": 146.43,
+      "aside": 0.0
+    },
+    {
+      "name": "Vent pickets",
+      "mob": "Ash initiate",
+      "tag": "ashinitiate",
+      "look": "cultist",
+      "canonStatus": "GAME-ONLY cell; CANON cult (the Cult of Ash)",
+      "radius": 1.92,
+      "count": 2,
+      "levelMin": 11,
+      "levelMax": 11,
+      "respawn": 900,
+      "center": {
+        "x": -37.15,
+        "y": -84.84
+      },
+      "cave": "The Ember Vent",
+      "along": 15.0,
+      "aside": 0.0
+    },
+    {
+      "name": "Vent menders",
+      "mob": "Ash mender",
+      "tag": "ashmender",
+      "look": "cultist",
+      "canonStatus": "GAME-ONLY cell; CANON cult (the Cult of Ash)",
+      "radius": 1.92,
+      "count": 2,
+      "levelMin": 11,
+      "levelMax": 11,
+      "respawn": 900,
+      "center": {
+        "x": -93.64,
+        "y": -94.56
+      },
+      "cave": "The Ember Vent",
+      "along": 72.65,
+      "aside": 0.0
+    },
+    {
+      "name": "Ash garden",
+      "mob": "Ash initiate",
+      "tag": "ashinitiate",
+      "look": "cultist",
+      "canonStatus": "GAME-ONLY cell; CANON cult (the Cult of Ash)",
+      "radius": 4.5,
+      "count": 3,
+      "levelMin": 11,
+      "levelMax": 11,
+      "respawn": 900,
+      "center": {
+        "x": -107.87,
+        "y": -82.6
+      },
+      "cave": "The Ember Vent",
+      "along": 87.95,
+      "aside": 10.0
+    },
+    {
+      "name": "Breach mouth crawlers",
+      "mob": "Greyed crawler",
+      "tag": "crawler",
+      "look": "spider",
+      "canonStatus": "GAME-ONLY (the Wasting is CANON)",
+      "radius": 2.16,
+      "count": 3,
+      "levelMin": 11,
+      "levelMax": 11,
+      "respawn": 900,
+      "flee": 0.25,
+      "center": {
+        "x": -26.59,
+        "y": -41.43
+      },
+      "cave": "The Grey Breach",
+      "along": 15.0,
+      "aside": 0.0
+    },
+    {
+      "name": "Grey seep",
+      "mob": "Greyed crawler",
+      "tag": "crawler",
+      "look": "spider",
+      "canonStatus": "GAME-ONLY (the Wasting is CANON)",
+      "radius": 2.16,
+      "count": 3,
+      "levelMin": 11,
+      "levelMax": 11,
+      "respawn": 900,
+      "flee": 0.25,
+      "center": {
+        "x": -54.36,
+        "y": -9.91
+      },
+      "cave": "The Grey Breach",
+      "along": 57.68,
+      "aside": 0.0
+    },
+    {
+      "name": "The Hollow sump",
+      "mob": "Hollow Man",
+      "tag": "hollow",
+      "look": "hollow",
+      "canonStatus": "CANON creature (Hollow Men) and CANON tunnels under the Peaks (book2 ch.19); GAME-ONLY camp",
+      "radius": 3.96,
+      "count": 2,
+      "levelMin": 11,
+      "levelMax": 11,
+      "respawn": 900,
+      "center": {
+        "x": -61.42,
+        "y": 4.85
+      },
+      "cave": "The Grey Breach",
+      "along": 72.99,
+      "aside": 7.5
+    },
+    {
+      "name": "Grey den",
+      "mob": "Greyed bear",
+      "tag": "greybear",
+      "look": "bear",
+      "canonStatus": "GAME-ONLY (the Wasting is CANON)",
+      "radius": 4.5,
+      "count": 2,
+      "levelMin": 11,
+      "levelMax": 11,
+      "respawn": 900,
+      "center": {
+        "x": -118.28,
+        "y": 56.01
+      },
+      "cave": "The Grey Breach",
+      "along": 152.89,
+      "aside": -7.5
+    },
+    {
+      "name": "Drift patrol",
+      "mob": "Sandthrone picket",
+      "tag": "picket",
+      "look": "deserter",
+      "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
+      "radius": 1.2,
+      "count": 2,
+      "levelMin": 10,
+      "levelMax": 10,
+      "respawn": 900,
+      "center": {
+        "x": 1.5,
+        "y": -349.0
+      },
+      "cave": "The Sealed Adit",
+      "along": 24.69,
+      "aside": 0,
+      "route": [
+        {
+          "x": 1.5,
+          "y": -349.0
+        },
+        {
+          "x": 5.99,
+          "y": -334.16
+        },
+        {
+          "x": 3.0,
+          "y": -319.0
+        }
+      ]
+    },
+    {
+      "name": "Overseers on their rounds",
+      "mob": "Sandthrone overseer",
+      "tag": "overseer",
+      "look": "deserter",
+      "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
+      "radius": 1.2,
+      "count": 2,
+      "levelMin": 11,
+      "levelMax": 11,
+      "respawn": 900,
+      "center": {
+        "x": 4.5,
+        "y": -265.0
+      },
+      "cave": "The Sealed Adit",
+      "along": 114.16,
+      "aside": 0,
+      "route": [
+        {
+          "x": 4.5,
+          "y": -265.0
+        },
+        {
+          "x": 12.28,
+          "y": -252.27
+        },
+        {
+          "x": 14.99,
+          "y": -237.63
+        },
+        {
+          "x": 12.0,
+          "y": -223.0
+        }
+      ]
+    },
+    {
+      "name": "Sergeants' round",
+      "mob": "Sandthrone overseer",
+      "tag": "overseer",
+      "look": "deserter",
+      "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
+      "radius": 1.2,
+      "count": 2,
+      "levelMin": 11,
+      "levelMax": 11,
+      "respawn": 900,
+      "center": {
+        "x": 9.0,
+        "y": -175.0
+      },
+      "cave": "The Sealed Adit",
+      "along": 208.14,
+      "aside": 0,
+      "route": [
+        {
+          "x": 9.0,
+          "y": -175.0
+        },
+        {
+          "x": 13.38,
+          "y": -163.46
+        },
+        {
+          "x": 15.0,
+          "y": -151.25
+        },
+        {
+          "x": 13.5,
+          "y": -139.0
+        }
+      ]
+    },
+    {
+      "name": "Upper stair patrol",
+      "mob": "Sandthrone watchman",
+      "tag": "watchman",
+      "look": "outrider",
+      "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
+      "radius": 1.2,
+      "count": 2,
+      "levelMin": 11,
+      "levelMax": 12,
+      "respawn": 900,
+      "center": {
+        "x": 12.0,
+        "y": 5.0
+      },
+      "cave": "The Sealed Adit",
+      "along": 390.02,
+      "aside": 0,
+      "route": [
+        {
+          "x": 12.0,
+          "y": 5.0
+        },
+        {
+          "x": 15.06,
+          "y": 20.2
+        },
+        {
+          "x": 20.78,
+          "y": 34.59
+        },
+        {
+          "x": 30.0,
+          "y": 47.0
+        }
+      ]
+    },
+    {
+      "name": "Lower stair patrol",
+      "mob": "Sandthrone watchman",
+      "tag": "watchman",
+      "look": "outrider",
+      "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
+      "radius": 1.2,
+      "count": 2,
+      "levelMin": 12,
+      "levelMax": 12,
+      "respawn": 900,
+      "center": {
+        "x": 55.5,
+        "y": 63.5
+      },
+      "cave": "The Sealed Adit",
+      "along": 467.05,
+      "aside": 0,
+      "route": [
+        {
+          "x": 55.5,
+          "y": 63.5
+        },
+        {
+          "x": 68.4,
+          "y": 70.62
+        },
+        {
+          "x": 80.28,
+          "y": 79.3
+        },
+        {
+          "x": 89.3,
+          "y": 90.9
+        },
+        {
+          "x": 96.0,
+          "y": 104.0
+        }
+      ]
+    },
+    {
+      "name": "Floor runners",
+      "mob": "Sandthrone geode-cutter",
+      "tag": "cutter",
+      "look": "outrider",
+      "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
+      "radius": 1.2,
+      "count": 2,
+      "levelMin": 11,
+      "levelMax": 11,
+      "respawn": 900,
+      "center": {
+        "x": 59.54,
+        "y": -86.92
+      },
+      "cave": "The Geode Floor",
+      "along": 27.01,
+      "aside": 0,
+      "route": [
+        {
+          "x": 59.54,
+          "y": -86.92
+        },
+        {
+          "x": 74.8,
+          "y": -87.91
+        },
+        {
+          "x": 90.07,
+          "y": -88.89
+        }
+      ]
+    },
+    {
+      "name": "Ash procession",
+      "mob": "Ash initiate",
+      "tag": "ashinitiate",
+      "look": "cultist",
+      "canonStatus": "GAME-ONLY cell; CANON cult (the Cult of Ash)",
+      "radius": 1.2,
+      "count": 2,
+      "levelMin": 11,
+      "levelMax": 11,
+      "respawn": 900,
+      "center": {
+        "x": -49.13,
+        "y": -85.62
+      },
+      "cave": "The Ember Vent",
+      "along": 27.01,
+      "aside": 0,
+      "route": [
+        {
+          "x": -49.13,
+          "y": -85.62
+        },
+        {
+          "x": -63.81,
+          "y": -89.58
+        },
+        {
+          "x": -78.49,
+          "y": -93.55
+        },
+        {
+          "x": -93.64,
+          "y": -94.56
+        }
+      ]
+    },
+    {
+      "name": "Wandering Hollow",
+      "mob": "Hollow Man",
+      "tag": "hollow",
+      "look": "hollow",
+      "canonStatus": "CANON creature (Hollow Men) and CANON tunnels under the Peaks (book2 ch.19); GAME-ONLY camp",
+      "radius": 1.2,
+      "count": 2,
+      "levelMin": 11,
+      "levelMax": 11,
+      "respawn": 900,
+      "center": {
+        "x": -86.09,
+        "y": 26.1
+      },
+      "cave": "The Grey Breach",
+      "along": 106.34,
+      "aside": 0,
+      "route": [
+        {
+          "x": -86.09,
+          "y": 26.1
+        },
+        {
+          "x": -91.23,
+          "y": 40.83
+        },
+        {
+          "x": -101.42,
+          "y": 52.58
+        }
+      ]
+    },
+    {
       "name": "The Quiet Miner",
       "mob": "The Quiet Miner",
       "tag": "quietminer",
       "look": "pale",
       "canonStatus": "GAME-ONLY (the unmade are CANON)",
-      "radius": 1,
+      "radius": 1.2,
       "count": 1,
       "levelMin": 12,
       "levelMax": 12,

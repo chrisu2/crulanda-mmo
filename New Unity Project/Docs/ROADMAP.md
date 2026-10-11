@@ -3,6 +3,13 @@
 Updated 2026-10-05 (rewritten: the 2026-09-28 version had fallen behind). PROJECT_MASTER.md remains the design brief; this file
 records where each of its phases stands and the order of the work. Update it every round that moves a phase.
 
+## Chris's order, 2026-10-11 (about 14:26, verbatim)
+"keep developing. once completed continue working on classes/perks/talent builds and add new classes/races based on lore canon. and all
+phases after." So: finish the Adit pass (CLAUDE_HANDOFF 8A); then the classes (the three missing fourth paths: the Ranger's Skirmisher, the
+Mage's Cinderwright, the Rogue's Swashbuckler; talent rows 4-6; perks), then new classes and races from the canon (Phase 9.2 and 9.3), then
+every phase after. **No machines** holds over all of it (CRULANDA_CANON): Phase 9.2's Tinker as written (Klyther Forgeheart's drones and
+scorpions) is machinery and is to be designed without it, or set aside, and the choice written down.
+
 ## Phases (PROJECT_MASTER.md)
 
 | Phase | Goal | Status (2026-10-09; what is verified, tested or only built: CLAUDE_HANDOFF.md, 2026-10-11) |

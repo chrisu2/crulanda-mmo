@@ -83,6 +83,69 @@ namespace Crulanda.Tests
             }
             yield return null;
         }
+        /// <summary>The drawn-out Adit is filled (note 132, Chris, 2026-10-11: "all you did in the dungeon was make it bigger which in turn has
+        /// less mobs"), its mobs stand a body's width apart, stroll about their camps without leaving them, and the patrols walk their roads
+        /// (note 131: "shouldnt spawn almost on top of each other. should all patrol. all mobs just stand in one place").</summary>
+        [UnityTest, Timeout(300000)] public IEnumerator Mobs_stand_apart_stroll_their_camps_and_patrols_walk_their_roads()
+        {
+            var s = UnityEngine.Object.FindFirstObjectByType<EncounterSession>();
+            float Across(Vector3 v) { v.y = 0; return v.magnitude; }
+            var mobs = s.Enemies.Where(e => e != null && e.actor.IsAlive && e.Camp).ToList();
+            Assert.GreaterOrEqual(mobs.Count, 140, "the Adit holds a 60-75 minute run's mobs (70 before the fill)");
+            Assert.GreaterOrEqual(mobs.Count(e => e.Patrol != null), 16, "eight patrols of two walk the drifts");
+            // Apart from the first: no two of a camp closer than their width.
+            var close = new System.Collections.Generic.List<string>();
+            for (int x = 0; x < mobs.Count; x++)
+                for (int y = x + 1; y < mobs.Count; y++)
+                {
+                    var a = mobs[x]; var b = mobs[y];
+                    if (a.CampCenter == b.CampCenter && !a.Hidden && !b.Hidden && Across(a.transform.position - b.transform.position) < Mathf.Min(a.Gap, b.Gap) * .9f)
+                        close.Add(a.actor.DisplayName + " and " + b.actor.DisplayName + " " + Across(a.transform.position - b.transform.position).ToString("0.0") + " m apart");
+                }
+            Assert.IsEmpty(close, "mobs spawned on top of each other: " + string.Join("; ", close.Take(8)));
+            // Ninety seconds of their time: who has moved, who has left its camp, how far each patrol has walked.
+            var start = mobs.ToDictionary(e => e, e => e.transform.position);
+            var moved = new System.Collections.Generic.HashSet<EncounterEnemy>(); var strayed = new System.Collections.Generic.List<string>();
+            var walked = mobs.Where(e => e.Patrol != null).ToDictionary(e => e, e => 0f);
+            Time.timeScale = 3;
+            try
+            {
+                for (float t = 0; t < 30; t += Time.unscaledDeltaTime)
+                {
+                    yield return null;
+                    foreach (var e in mobs)
+                    {
+                        if (e == null || !e.actor.IsAlive || e.Engaged) continue;
+                        if (Across(e.transform.position - start[e]) > 1.5f) moved.Add(e);
+                        if (e.Patrol != null) walked[e] = Mathf.Max(walked[e], Across(e.transform.position - start[e]));
+                        else if (!e.Evading && Across(e.transform.position - new Vector3(e.CampCenter.x, 0, e.CampCenter.y)) > e.CampRadius + e.Gap + 1.5f)
+                            strayed.Add(e.actor.DisplayName + " " + Across(e.transform.position - new Vector3(e.CampCenter.x, 0, e.CampCenter.y)).ToString("0.0") + " m from its camp (radius " + e.CampRadius + ")");
+                    }
+                }
+            }
+            finally { Time.timeScale = 1; }
+            var still = mobs.Where(e => e != null && e.actor.IsAlive && !e.Hidden && e.Inside == null && !moved.Contains(e)).ToList();
+            Assert.Less(still.Count, mobs.Count * .25f, still.Count + " of " + mobs.Count + " stood still: " + string.Join(", ", still.Take(12).Select(e => e.actor.DisplayName)));
+            Assert.IsEmpty(strayed.Distinct().Take(8).ToList(), "a mob left its camp: " + string.Join("; ", strayed.Distinct().Take(8)));
+            var lazy = walked.Where(w => w.Value < 20).Select(w => w.Key.actor.DisplayName + " " + w.Value.ToString("0") + " m (its road " + w.Key.Patrol.Length + " points, "
+                + Across(w.Key.Patrol[w.Key.Patrol.Length - 1] - w.Key.Patrol[0]).ToString("0") + " m end to end; now " + Across(w.Key.transform.position - start[w.Key]).ToString("0") + " m out)").ToList();
+            Assert.IsEmpty(lazy, "every patrol walks its road (20 m and more in ninety seconds): " + string.Join(", ", lazy));
+        }
+        /// <summary>No machines in the Adit (Chris, 2026-10-11: "more machines!!!!!  i told you NO Machines!"): the Rock-Eater is a beast on
+        /// the bear's body with Nix in its saddle, two mules stand in the carriage's traces, and nothing of the old engine is built.</summary>
+        [UnityTest] public IEnumerator No_machines_the_Rock_Eater_is_a_beast_and_mules_haul_the_carriage()
+        {
+            var s = UnityEngine.Object.FindFirstObjectByType<EncounterSession>();
+            var rock = s.Enemies.Find(e => e != null && e.MobName == EncounterSession.RockEaterName); Assert.NotNull(rock, "the Rock-Eater");
+            var look = rock.GetComponent<ActorVisual>();
+            Assert.NotNull(look.BeastModel, "a beast's body (the bear's), not a hull and a drill"); Assert.NotNull(look.RiderSeat, "a saddle on it");
+            Assert.IsNull(GameObject.Find("Drill"), "no drill"); Assert.IsNull(GameObject.Find("Bit"), "no drill bit");
+            var mules = UnityEngine.Object.FindObjectsByType<PitMule>(FindObjectsSortMode.None);
+            Assert.AreEqual(2, mules.Length, "two mules in the carriage's traces");
+            foreach (var m in mules) Assert.Less(s.Zone.RailTeam.Min(p => Vector3.Distance(p, m.transform.position)), .5f, "standing in the traces");
+            Assert.AreEqual("The ore carriage", ZoneBuilder.AditCarriage);
+            yield return null;
+        }
         [UnityTest] public IEnumerator Each_branch_opens_through_the_gallery_wall()
         {
             yield return null;
@@ -91,7 +154,9 @@ namespace Crulanda.Tests
                 var h = Cave(b);
                 // From in the Gallery, just inside the branch's mouth, straight down the branch: nothing of the Gallery's wall in the way.
                 var from = h.At(1) + Vector3.up * 1.4f; var to = h.At(24) + Vector3.up * 1.4f;   // (10 m in the first Adit; its mouths drawn out three times)
-                Assert.IsFalse(Physics.Linecast(from, to, out var hit, ~0, QueryTriggerInteraction.Ignore), b + ": the way in is open (hit " + (hit.collider != null ? hit.collider.name : "") + " at " + hit.point + ")");
+                // (The rock, not who stands in it: a mob strolling in the mouth is no wall.)
+                var rock = Physics.RaycastAll(from, (to - from).normalized, Vector3.Distance(from, to), ~0, QueryTriggerInteraction.Ignore).Where(x => x.collider.GetComponentInParent<Crulanda.Gameplay.Actor>() == null).ToList();
+                Assert.IsEmpty(rock.Select(x => x.collider.name + " at " + x.point).ToList(), b + ": the way in is open");
                 Assert.IsTrue(Cave(Main).Open(h.At(1) + Vector3.up * 1.4f), b + "'s mouth is in the Gallery's air");
             }
         }

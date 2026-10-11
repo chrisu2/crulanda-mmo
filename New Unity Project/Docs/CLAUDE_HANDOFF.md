@@ -44,6 +44,20 @@ resolutions", and on the dungeon: "all you did in the dungeon was make it bigger
 to complete". Whoever works on this next: verify everything yourself, show Chris pictures before anything is published, and never call a
 report fixed until he has seen it in his own build.
 
+## 2026-10-11 afternoon: the Adit pass (Chris, 12:23: "get busy and do better than yesterday"; "keep working until i say stop . dont stop
+to ask questions"; he was away from about 12:33)
+- The full run on the night's code (80045ff, 12:24-13:46): EditMode 447/447, PlayMode 279/280; the one failure is note 112(b), Morro
+  Motion's standing idles turning a foot out (48 degrees here), known and open (below).
+- Built today (CHANGELOG, DUNGEON_DESIGN 0.05-0.06; status by line in "Where the work stands"): mobs stroll their camps and patrols walk
+  their roads in every zone, spawned a body's width apart; the Adit filled (67 camps, 148 mobs, eight patrols) and its wide floors
+  dressed; no machines (the Rock-Eater a great beast with Nix in its saddle, the carriage mule-hauled ore wagons, the winch gate); the built
+  halls' walls turned to face in and the floors darkened; the cages whole with a pressed goblin in each.
+- **Note 112(b), Morro's feet:** the Morro idles have no source character in the project (only the clips were imported), so each builds its
+  avatar from its own file, as the feet did before 2026-10-10. Two ways, Chris to choose: get the pack's own character model and copy its
+  avatar to every Morro clip (CharacterImport.SourceModel), or stand figures on Kevin's idles (straight feet, less variety). FootTests
+  measures it.
+- Daniel Gruginski's Medieval Village Kit is downloaded (`D:\crulanda-work\downloads\MedievalVillageKit_FBX.zip`); no import is recorded.
+
 ## After midnight: Chris's play of the 00:33 build (notes 119-132)
 - **Fixed, TESTED and committed, NOT published, not seen by Chris** (see "Repeated reports" below for the causes and tests): 119 the fork,
   120 the building fading and 117 the camera in walls, 121 full screen and 115 alt-tab keys, 122 druids healing, 123 the trap, 124 auto

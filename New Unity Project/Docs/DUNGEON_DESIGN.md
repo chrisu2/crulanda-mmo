@@ -28,6 +28,16 @@ Nothing in the dungeon is a machine. Chris's choices (01:04, the question prompt
 - **The carriage, the rails and the cage-lift become "hand-worked"**: an ore wagon on the old rails pulled by a beast or by hand, a
   rope-and-winch cage worked by people; no engine anywhere.
 
+## 0.055 What was done for 0.05 and 0.06 (2026-10-11, after noon; TESTED or BUILT as CLAUDE_HANDOFF.md says)
+- The Rock-Eater: the bear's body at 3.6 m, a stone-grey hide, violet geode crystal through its back, a saddle with Nix in it.
+- The carriage: two plank-sided, iron-banded ore wagons on wooden wheels, the geodes in crates, a driver's bench, traces out to two pit
+  mules standing up the line; the loading crane gone; the "levers" and "train" words gone from the text and the loot.
+- The winch gate (was the cage-lift): a timber windlass with its rope up to the grille.
+- The fill: 67 camps (33 before, 148 mobs from 70), eight patrols of two walking the drifts, every camp spread over its widened ground;
+  mobs stroll their camps and stand a body's width apart (all zones); rock outcrops, rubble, dripstone, fallen timber and geode clutches
+  over the wide chambers' floors.
+- The built halls: the kit's walls turned to face into the halls (they faced the rock), end walls back to back, the floor flags darkened.
+
 ## 0.06 How long a run takes (Chris, 2026-10-11, about 01:21)
 "all you did in the dungeon was make it bigger which in turn has less mobs and would not take 60-75mins to complete". **A full run of the
 Sealed Adit takes 60-75 minutes.** The scale-up (0.25) made the caves three times longer with the same camps; the time has to come from
@@ -46,7 +56,7 @@ what is in them: more camps and mobs, patrols, side rooms and events, the wings'
 | Wing | Its model | Built as | Status |
 |---|---|---|---|
 | [1] The Old Workings, [2] the Singing Gallery | the Deadmines (the mine) | cave tunnels, timber sets, rails | built (D1-D8) |
-| [3a] The Geode Floor | the Deadmines (the goblins' foundry) | **a built foundry hall:** stone walls, catwalks on columns, the boring-engine bay | to rebuild (D9) |
+| [3a] The Geode Floor | the Deadmines (the goblins' foundry) | **a built foundry hall:** stone walls, catwalks on columns, the Rock-Eater's berth (a beast's since 2026-10-11, 0.05) | to rebuild (D9) |
 | [3b] The Ember Vent, becoming **the Cult of Ash's chapter-house** | **Scarlet Monastery** | **a built stronghold in the vent:** the ash-garden of urns (graveyard), the scriptorium (library), the drill yard (armoury), the chapel over the lava lake (cathedral), each with its boss; the finale pair is the Cinder-Warden and a priestess who raises him once | to build (D9-D10) |
 | [3c] The Grey Breach | Wailing Caverns (corrupted caves) | cave | built |
 | [4] The Rail Hall | the Deadmines (the reveal) | **a built station hall** | walls, columns, tiles 2026-10-10 |
@@ -62,13 +72,13 @@ as tall, drifts half as wide again (still a mine's drifts); a kilometre and more
 |---|---|---|
 | [1] The Old Workings | the Deadmines (the mine) | patrols on the long drifts, ambushes from side galleries, a flooded lower working with a mini-boss, a collapsed-shaft shortcut back |
 | [2] The Singing Gallery | Wailing Caverns | a great multi-level water cavern (ledges, pools, a fall), sleep-casters and corrupted beasts, an optional boss off the path, a jump-down shortcut to the hub |
-| [3a] The Geode Floor | the Deadmines (the foundry) | the foundry hall and the engine bay (built, D9); a refinery of crushers and stampers to time your way past; an overseer before Nix and the Rock-Eater |
+| [3a] The Geode Floor | the Deadmines (the foundry) | the foundry hall and the Rock-Eater's berth (built, D9); a sorting hall of sluices and swinging ore-buckets on ropes, worked by hand, to time your way past (no machines, 0.05); an overseer before Nix and the Rock-Eater |
 | [3b] The Ember Vent | Scarlet Monastery | four wings with an end boss each: the ash-garden (an urn-keeper who raises the dead), the scriptorium (a loremaster), the drill yard (a drillmaster), the chapel (Ysolt and a priestess who raises her once); packs of fanatics that heal each other |
 | [3c] The Grey Breach | Wailing Caverns (corruption) | the grey spreading deeper in, the Foreman, the Quiet Miner (rare) |
 | [4] The Rail Hall into the Great Cove | the Deadmines (the cove) | the line runs on into a vast underground harbour: a moored ore barge, its cannon fired the loud way, the last boss on deck, the hidden boss below |
 Order: the scale-up first (layout, every hard-coded distance, tests), then the wings one at a time, each shown to Chris in frames.
 
-## 0.3 The room builder (engine step D9)
+## 0.3 The room builder (build step D9)
 - **Rooms from a plan in data:** each room a rectangle or an L, with a floor height, a wall height, doors to its neighbours and a
   style (temple, foundry, crypt, library, armoury, station).
 - **Built from the modular kit** (Resources/Props/Dungeon, Chris's 41 pieces): walls, floors, columns, stairs and arches. Colliders
@@ -78,7 +88,7 @@ Order: the scale-up first (layout, every hard-coded distance, tests), then the w
 
 ## 0.4 The three later dungeons (a sketch; each gets its own design section before it is built)
 - **The Sludge-Tunnels (18-20, the Forge District):** sewer tunnels (cave builder) into a built smelting works and a syndicate's
-  counting-house. A mix of the Stockade's short city run and Gnomeregan's machine halls.
+  counting-house. A mix of the Stockade's short city run and Gnomeregan's long built halls (no machines, 0.05).
 - **The Deep Veins (23-25, the Warrens):** the penal-legion mine (tunnels) with a built prison block and an overseer's keep: the mine
   and the gaol.
 - **The Transit Hub (27-29, the Crown):** a built junction of lifts, platforms and cargo halls, with service tunnels between. The
@@ -121,7 +131,7 @@ the next dungeon.
   of the dungeon.
 - A gate you open by **doing something in the world** (loot the powder, fire the cannon). The loud way alerts the next boss.
   The quiet way (picking the lock) does not.
-- Bosses that each teach one thing. The pilot whose machine you kill first and then him (two-part fight). The first mate who
+- Bosses that each teach one thing. The rider whose beast you bring down first and then him (two-part fight; it was a pilot and his machine until 0.05). The first mate who
   **stuns the whole group at 2/3 and 1/3 health** and runs to his chest for a heavier weapon. The captain on deck with two
   guards. The leader who **calls guards out of the shadows at half health**.
 - **Patrols walk in behind you after each boss** (the doors open), so the group never fully relaxes.
@@ -179,9 +189,9 @@ the next dungeon.
   boss: Nix and      boss: Cinder-     boss: The Foreman
   the Rock-Eater     Warden Ysolt      Who Forgot
    └── each drops a RAIL SIGIL ──┴───────────────┘
-        │  three sigils wake the cage-lift
+        │  three sigils open the winch gate
         ▼
-   [4] THE RAIL HALL  ── the reveal: a vast cavern, the old mag-rail, an armoured rail-carriage being loaded with geodes
+   [4] THE RAIL HALL  ── the reveal: a vast cavern, the old mag-rail, an ore carriage on the old line, mule-hauled (0.05), being loaded with geodes
         gate: quiet (a freed goblin unlocks it) or loud (blasting powder: the hall comes for you)
         boss: Quartermaster Brannigan Sorrel (stuns, weapon rack)
         event: the Weaver's unlocking (escort and waves)
@@ -222,9 +232,9 @@ the next dungeon.
 - Trash:
   - cutters (elite);
   - goblin turncoats who throw spanners (knockdown);
-  - a **rock-borer** engine that the goblins repair if you kill it before them.
+  - ~~a **rock-borer** engine that the goblins repair if you kill it before them~~ (no machines, 0.05).
 - **Boss: Nix and the Rock-Eater** (11, elite). Two-part fight:
-  - first the Rock-Eater, a goblin boring-engine;
+  - first the Rock-Eater, a great burrowing beast Nix rides (it was a goblin boring-engine until 2026-10-11, 0.05);
   - when it breaks, Nix, the goblin who sold out his own Warren (a Razzle-like traitor; GAME-ONLY), jumps out and fights on
     foot, vibration-locking your weapon (disarm for 4 s).
 - Drops the **Amber Sigil**.
@@ -259,7 +269,7 @@ the next dungeon.
 - Killing the Foreman opens a **short way back** to the Gallery (the waterfall-shortcut lesson).
 
 ### [4] The Rail Hall (the finale)
-- **The cage-lift** wakes when the three sigils are set in its frame, and goes down a long way.
+- **The winch gate** (the cage-lift until 2026-10-11, 0.05) is wound open by hand when the three sigils are set in its frame.
 - **The reveal:** you step out into the biggest space in the game:
   - an old station cut into the mountain's root, high and dark;
   - the mag-rail line running off into the black both ways;
@@ -353,20 +363,21 @@ the next dungeon.
   - Hall: cold blue lamps.
 - **Readable layout:** every branch has one landmark you can see from the hub, and the hub's light behind you.
 
-## 9. What has to be built (engine work, in order)
+## 9. What has to be built (build work, in order)
 
-1. **Cavern variant 3** (the Hollow cavern builder): the Workings, the Gallery hub with three branches, the cage-lift shaft and
+1. **Cavern variant 3** (the Hollow cavern builder): the Workings, the Gallery hub with three branches, the winch gate's stair and
    the Rail Hall as one cavern system under the Peaks' Sealed Adit. Lights by part.
 2. **Boss mechanics:**
    - phase triggers at health thresholds (stun the party, a weapon change, summon guards, aggro reset, terrify, knockback);
-   - a two-part fight (machine, then pilot). *Built 2026-10-09 (D5): the Rock-Eater is a second elite of Nix's camp, Nix rides inside it,
-     unseen and out of reach, and jumps out at the wreck when it breaks (EncounterSession.RockEater.cs, ActorLook.RockEater).*
-3. **Dungeon objects:** *Done 2026-10-09 (D3): the cage-lift is a gate at the stair's head (Chris), the sigils are kept once
+   - a two-part fight (beast, then rider). *Built 2026-10-09 (D5); since 2026-10-11 (0.05) the Rock-Eater is a great burrowing beast on
+     the bear's body (stone hide, geode crystal through its back, a saddle), a second elite of Nix's camp; Nix rides in the saddle, seen but
+     out of reach, and leaps down when it falls (EncounterSession.RockEater.cs, ActorLook.RockEater, ActorVisual.RockEaterGear).*
+3. **Dungeon objects:** *Done 2026-10-09 (D3): the cage-lift is a gate at the stair's head (Chris; the winch gate, wound by hand, since 2026-10-11), the sigils are kept once
    won, the platform gate opens quietly (The Pressed) or loudly (powder), the spirit stone, the Quiet Miner (one visit in five);
    the Foreman's short way back to the Gallery is not built yet.*
    - gates (opened by a key, a freed NPC, or powder, the loud way alerting a boss);
    - sigils in a frame;
-   - the cage-lift;
+   - the winch gate (was the cage-lift);
    - patrols released when a boss dies;
    - a rare spawn chance;
    - a spirit stone.

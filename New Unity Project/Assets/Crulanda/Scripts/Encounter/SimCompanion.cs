@@ -202,7 +202,7 @@ namespace Crulanda.Encounter
             if (g != null && !g.Open)
             {
                 if (waitingAt == g) return;
-                waitingAt = g; StoppedBy = g.Title; Leading = g.transform.position - g.transform.forward * 2.5f; LeadingName = g.Title.StartsWith("The ") ? g.Title.Substring(4) : g.Title;   // "Waiting at the cage-lift gate"
+                waitingAt = g; StoppedBy = g.Title; Leading = g.transform.position - g.transform.forward * 2.5f; LeadingName = g.Title.StartsWith("The ") ? g.Title.Substring(4) : g.Title;   // "Waiting at the winch gate"
                 var thing = session.Zone.Interactables.Find(i => i.gate == g); var prompt = thing != null ? session.InteractPromptFor(thing) : null;
                 session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? g.Title.ToLower() + " is shut. " + (prompt ?? "open it").ToLower() + "?" : g.Title + " is shut against us. " + (prompt ?? "It wants opening") + ".");
             }

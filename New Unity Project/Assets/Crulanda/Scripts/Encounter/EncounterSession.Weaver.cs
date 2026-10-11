@@ -113,7 +113,7 @@ namespace Crulanda.Encounter
             if (!Progress.keys.Contains(WeaverLock)) Progress.keys.Add(WeaverLock);
             if (Zone != null) Zone.QuietCarriage();
             FloatText(w.LockAt + Vector3.up * 2, "The lock is matched", new Color(.8f, .65f, 1));
-            Message("The lock's note slides into the right one. One by one the geodes in the carriage gutter and go dark, and the whole hall is quieter for it. The carriage will not run again.");
+            Message("The lock's note slides into the right one. One by one the geodes in the carriage gutter and go dark, and the whole hall is quieter for it. The carriage will not carry the Company's stones again.");
             w.Say("There. Let go, all of them. Whatever they held is back in the stone where it belongs.");
             ReconcileQuests(); Save(false);
         }

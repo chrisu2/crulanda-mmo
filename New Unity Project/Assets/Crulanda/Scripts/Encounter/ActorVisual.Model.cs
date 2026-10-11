@@ -564,7 +564,8 @@ namespace Crulanda.Encounter
             }
             var delta = transform.position - lastPosition; delta.y = 0; lastPosition = transform.position;
             float dt = Time.deltaTime, target = dt > 0 ? delta.magnitude / dt : 0;
-            speed = Mathf.Lerp(speed, target, dt * 8); phase += dt * (2.2f + speed * 1.6f);
+            speed = Mathf.Lerp(speed, target, dt * 8); if (Riding) speed = 0;   // carried in a saddle: seated however fast its mount goes
+            phase += dt * (2.2f + speed * 1.6f);
             // Which way it is moving against the way it faces (strafing, backing): the figure's walk cycle follows it.
             if (target > .2f) { var local = transform.InverseTransformDirection(delta); var h = new Vector2(local.x, local.z).normalized; heading = Vector2.Lerp(heading, h, Mathf.Min(1, dt * 10)); }
             else heading = Vector2.Lerp(heading, new Vector2(0, 1), Mathf.Min(1, dt * 4));

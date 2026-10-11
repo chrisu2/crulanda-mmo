@@ -25,6 +25,7 @@ namespace Crulanda.Encounter
                 case ActorLook.Stag: return variant % 2 == 1 ? "Deer" : "Stag";
                 case ActorLook.Boar: return "Boar";
                 case ActorLook.Bear: return "Bear";         // Blink's stylized bear (Asset Store)
+                case ActorLook.RockEater: return "Bear";    // the Rock-Eater: the bear's body, grown and turned to stone (BuildModelBeast)
                 case ActorLook.Spider: return "Spider";     // ChillLands' crypt spider (Ashen Marches)
                 case ActorLook.Skeleton: return "Skeleton"; // ChillLands' ossuary knight: the risen dead
                 default: return null;
@@ -113,6 +114,15 @@ namespace Crulanda.Encounter
                 coat = new ModelBeast.Coat().Skin(skin, Resources.Load<Texture2D>("CreatureSkins/Bear/Bear_Normal"), old ? new Color(.86f, .84f, .8f) : mountain ? new Color(.72f, .7f, .7f) : Color.white);
                 height = elite || old ? 1.75f : 1.45f; walk = 1.3f; run = 5; LieDepth = .4f;
             }
+            else if (look == ActorLook.RockEater)
+            {
+                // The Rock-Eater (GAME-ONLY; Chris, 2026-10-11: no machines, "a great burrowing beast" Nix rides and drives): a cave beast
+                // on the bear's body, two and a half times its size, its hide gone the grey of the rock it eats, the violet of the geodes
+                // it swallows growing out through its back (RockEaterGear), a saddle on it.
+                var skin = Resources.Load<Texture2D>("CreatureSkins/Bear/Bear_Albedo"); if (skin == null) return false;
+                coat = new ModelBeast.Coat().Skin(skin, Resources.Load<Texture2D>("CreatureSkins/Bear/Bear_Normal"), new Color(.52f, .5f, .56f));
+                height = RockEaterHeight; walk = 1.1f; run = 4; LieDepth = 0;
+            }
             else if (look == ActorLook.Spider)
             {
                 // The crypt spider in the colours of where it lives: Khaven's charnel spiders bone and ash, the ridge's basalt
@@ -138,7 +148,39 @@ namespace Crulanda.Encounter
             beastModel.Crumbles = look == ActorLook.Skeleton;   // the drowned dead fall apart into a heap of bones (ModelBeast.Crumble.cs)
             beast = true;
             beastModel.StartMotion(name + "#" + variant);
+            if (look == ActorLook.RockEater) RockEaterGear();
             return true;
+        }
+        /// <summary>How tall the Rock-Eater stands (a bear is 1.45, an old one 1.75).</summary>
+        public const float RockEaterHeight = 3.6f;
+        /// <summary>Where its rider sits (Nix, EncounterEnemy.Ride): on the saddle, facing the way it faces; null for any other figure.</summary>
+        public Transform RiderSeat { get; private set; }
+        /// <summary>The Rock-Eater's back, set in the bear's bind pose and carried by its back bone: a ridge of violet geode crystal out
+        /// through the stone of its hide (the geodes it eats), glowing faintly, and a saddle on a blanket with a girth, and the seat.</summary>
+        void RockEaterGear()
+        {
+            var back = beastModel.Hips != null ? beastModel.Hips : body;
+            var hide = beastModel.Renderers != null && beastModel.Renderers.Count > 0 ? beastModel.Renderers[0].bounds : new Bounds(transform.position + Vector3.up, Vector3.one * 2);
+            float top = hide.max.y, length = Vector3.Dot(hide.size, new Vector3(Mathf.Abs(body.forward.x), 0, Mathf.Abs(body.forward.z)));
+            Vector3 up = body.up, ahead = body.forward, side = body.right, mid = new Vector3(back.position.x, back.position.y + (top - back.position.y) * .8f, back.position.z);   // the hide's top is its shoulders' hump: the back behind them is lower
+            var crystal = Mat(new Color(.62f, .4f, .95f), .9f, .2f); crystal.EnableKeyword("_EMISSION"); crystal.SetColor("_EmissionColor", new Color(.55f, .25f, 1) * 1.2f);
+            var leather = Mat(new Color(.3f, .19f, .11f), .1f, .3f); var blanket = Mat(new Color(.42f, .12f, .1f), .05f, .1f);
+            Transform OnBack(Transform t) { t.SetParent(back, true); return t; }
+            // The crystals: along the spine behind the saddle and over the shoulders in front of it, leaning out.
+            for (int k = 0; k < 9; k++)
+            {
+                float along = (k < 4 ? -.12f - k * .09f : .2f + (k - 4) * .07f) * length, lean = (k % 2 == 0 ? 1 : -1) * (14 + (k * 7) % 12);
+                var at = mid + ahead * along + side * ((k % 3) - 1) * .18f - up * .1f;
+                var c = Part(PrimitiveType.Cube, body, Vector3.zero, new Vector3(.14f, .5f + (k * 37 % 5) * .1f, .14f), crystal);
+                c.position = at; c.rotation = Quaternion.AngleAxis(lean, ahead) * Quaternion.AngleAxis(45, up) * body.rotation; OnBack(c);
+            }
+            // The saddle: a blanket over the back, the seat and its cantle, the girth round the belly.
+            var seatAt = mid + ahead * .04f * length;
+            var pad = Part(PrimitiveType.Cube, body, Vector3.zero, new Vector3(1.3f, .06f, 1.1f), blanket); pad.position = seatAt - up * .02f; pad.rotation = body.rotation; OnBack(pad);
+            var seat = Part(PrimitiveType.Cube, body, Vector3.zero, new Vector3(.7f, .16f, .8f), leather); seat.position = seatAt + up * .08f; seat.rotation = body.rotation; OnBack(seat);
+            var cantle = Part(PrimitiveType.Cube, body, Vector3.zero, new Vector3(.7f, .3f, .1f), leather); cantle.position = seatAt + up * .2f - ahead * .38f; cantle.rotation = body.rotation; OnBack(cantle);
+            foreach (int s in new[] { -1, 1 }) { var girth = Part(PrimitiveType.Cube, body, Vector3.zero, new Vector3(.08f, top - hide.min.y > 0 ? (top - hide.min.y) * .55f : 1, .14f), leather); girth.position = seatAt + side * s * .62f - up * (top - hide.min.y) * .25f; girth.rotation = body.rotation; OnBack(girth); }
+            RiderSeat = new GameObject("Rider seat").transform; RiderSeat.position = seatAt + up * .16f; RiderSeat.rotation = body.rotation; OnBack(RiderSeat);
         }
         /// <summary>A modelled beast's frame: its pace from how far it went; dead, its death (the body EncounterEnemy tipped over
         /// set upright again); lying in wait, head down; standing, it grazes (deer) or looks about (wolves), or watches what it

@@ -57,20 +57,38 @@ namespace Crulanda.Encounter
             lungeUntil = Time.time + 1.1f;
             session.FloatText(transform.position + Vector3.up * .6f, "!", new Color(1, .35f, .2f));
         }
-        /// <summary>The machine it rides (Nix in the Rock-Eater, D5): hidden inside it, unseen and out of reach, until it breaks.</summary>
+        /// <summary>The beast it rides (Nix on the Rock-Eater, D5): in the saddle, seen but out of reach and deaf to calls, until it falls.</summary>
         public EncounterEnemy Inside { get; private set; }
-        /// <summary>Climbs into <paramref name="machine"/>: hidden, invisible, deaf to calls and beyond harm until the session brings it out (Rise).</summary>
-        public void HideInside(EncounterEnemy machine)
+        /// <summary>Climbs into <paramref name="mount"/>'s saddle (ActorVisual.RiderSeat): seen, seated, deaf to calls and beyond harm until
+        /// the session brings it down (Rise). (Chris, 2026-10-11, no machines: Nix had sat hidden inside a boring-engine.)</summary>
+        public void HideInside(EncounterEnemy mount)
         {
-            if (machine == null || !actor.IsAlive) return;
-            Inside = machine; Hide(); Shown(false);
+            if (mount == null || !actor.IsAlive) return;
+            Inside = mount; Hide(); Shown(true);
+            var seated = transform.Find("Body"); if (seated != null) seated.localPosition = Vector3.zero;   // sitting up in the saddle, not crouched as in grass
+            if (agent != null) agent.enabled = false;
+            var look = GetComponent<ActorVisual>(); if (look != null) { look.LyingLow = false; look.Pose = ActorPose.Sit; look.Riding = true; }
+            Ride();
         }
+        /// <summary>In the saddle: where the mount's seat is, facing its way (each frame while riding).</summary>
+        void Ride()
+        {
+            var seat = Inside != null ? Inside.GetComponent<ActorVisual>()?.RiderSeat : null; if (seat == null) return;
+            transform.SetPositionAndRotation(seat.position + Vector3.up * RiderLift, Quaternion.Euler(0, seat.eulerAngles.y, 0));
+        }
+        /// <summary>How far above the seat a rider's centre sits (an actor's centre is a metre over its feet; seated, its hips are half that).</summary>
+        public const float RiderLift = .45f;
         /// <summary>Up out of hiding when the session says so (Rail-Captain Danner at the Weaver's half-matched lock; Nix out of the broken
         /// Rock-Eater), and after <paramref name="at"/> if it is not in a fight already.</summary>
         public void Rise(Actor at)
         {
             if (!actor.IsAlive) return;
-            if (Inside != null) { Inside = null; Shown(true); }
+            if (Inside != null)
+            {
+                Inside = null; Shown(true);
+                var look = GetComponent<ActorVisual>(); if (look != null) { look.Riding = false; if (look.Pose == ActorPose.Sit) look.Pose = ActorPose.None; }
+                if (agent != null && !agent.enabled) { agent.enabled = true; if (NavMesh.SamplePosition(transform.position, out var hit, 4, NavMesh.AllAreas)) agent.Warp(hit.position); }
+            }
             if (Hidden) Unhide();
             if (at != null && !Engaged) threat.Add(at.EntityId.Value, JoinThreat);
         }
@@ -140,7 +158,74 @@ namespace Crulanda.Encounter
         {
             agent = GetComponent<NavMeshAgent>();
             home = transform.position; baseSpeed = agent.speed;
+            idleUntil = Time.time + Random.Range(2f, 8f);   // they do not all set off at once
             actor.Health.Died += OnDeath;
+        }
+        // ---------- with nobody to fight (playtest note 131, Chris, 2026-10-11: "shouldnt spawn almost on top of each other. should all
+        // patrol. all mobs just stand in one place"): every mob had walked back to the spot it was spawned on, every frame ----------
+        /// <summary>A patrol's road, walked back and forth while it has nobody to fight (ZoneCamp.route); null: it strolls about its camp.</summary>
+        public Vector3[] Patrol;
+        /// <summary>How far apart two of a camp keep (a bear's length, a man's shoulders; EncounterSession.GapFor).</summary>
+        public float Gap = 1.4f;
+        /// <summary>A stroll's pace against its run: about 1.2 m/s for most.</summary>
+        public const float StrollPace = .42f;
+        float idleUntil; int patrolAt, patrolStep = 1; bool strolling; static NavMeshPath strollPath;
+        /// <summary>Walking somewhere of its own (a stroll or a patrol's leg), not fighting.</summary>
+        public bool Strolling { get { return strolling && Victim == null; } }
+        static float Across(Vector3 v) { v.y = 0; return v.magnitude; }
+        /// <summary>A camp's mobs stroll about their camp, a few seconds at each spot, a body's width from each other; a patrol walks its
+        /// road back and forth (its leash held from where it is met, not where it set out); on the way home from a broken leash it only goes
+        /// home. A mob of no camp (a story mob, a wave of the escort) and one riding inside another keep their place.</summary>
+        void Idle()
+        {
+            if (!agent.isOnNavMesh) return;
+            if (!Camp || Evading || Inside != null) { agent.SetDestination(home); strolling = false; return; }
+            if (Patrol != null) home = transform.position;
+            agent.speed = baseSpeed * StrollPace * (Slowed ? slowFactor : 1);
+            bool there = !agent.pathPending && agent.remainingDistance <= Mathf.Max(.5f, agent.stoppingDistance);
+            if (strolling && !there) return;
+            if (strolling) { strolling = false; idleUntil = Time.time + (Patrol != null ? Random.Range(1.5f, 4f) : Random.Range(3f, 9f)); }
+            if (Time.time < idleUntil) return;
+            Vector3 to;
+            if (Patrol != null && Patrol.Length > 1)
+            {
+                if (patrolAt + patrolStep < 0 || patrolAt + patrolStep >= Patrol.Length) patrolStep = -patrolStep;
+                patrolAt += patrolStep; to = Patrol[patrolAt];
+            }
+            else if (!StrollSpot(out to)) { idleUntil = Time.time + 2; return; }
+            if (NavMesh.SamplePosition(to, out var hit, Patrol != null ? 4 : 2, NavMesh.AllAreas)) { agent.isStopped = false; agent.SetDestination(hit.position); strolling = true; }
+            else idleUntil = Time.time + 2;
+        }
+        /// <summary>A spot to stroll to in its camp (within the camp's radius, two and a half metres at the least; an elite paces a round of
+        /// its own about where it stands), a step or more from where it is, clear of the others of its camp, where they stand and where they
+        /// are going, by their width. (A lord's guards and the lord, their camps a metre or so across, had barely shifted: still standing.)</summary>
+        bool StrollSpot(out Vector3 to)
+        {
+            var centre = Elite ? new Vector2(home.x, home.z) : CampCenter;
+            float reach = Elite ? 2.5f : Mathf.Max(2.5f, CampRadius);
+            for (int k = 0; k < 8; k++)
+            {
+                var p = centre + Random.insideUnitCircle * reach;
+                var point = session.Zone != null ? session.Zone.StandAt(p, home.y) : new Vector3(p.x, home.y, p.y);
+                if (Across(point - transform.position) < 1.2f || !ClearOfCamp(point)) continue;
+                // On the floor itself, and straight there: not over lava or in a wall, and not the long way round a lake (the Ember Vent's
+                // camps by its lava had walked round it and out of their camps).
+                if (!NavMesh.SamplePosition(point, out var at, 1, NavMesh.AllAreas)) continue;
+                if (strollPath == null) strollPath = new NavMeshPath();
+                if (!NavMesh.CalculatePath(transform.position, at.position, NavMesh.AllAreas, strollPath) || strollPath.status != NavMeshPathStatus.PathComplete) continue;
+                float length = 0; var corners = strollPath.corners; for (int c = 1; c < corners.Length; c++) length += Vector3.Distance(corners[c - 1], corners[c]);
+                if (length > Across(at.position - transform.position) * 1.5f + 1.5f) continue;
+                to = at.position; return true;
+            }
+            to = home; return false;
+        }
+        /// <summary>No other living mob of its camp stands within its width of <paramref name="point"/>, or is walking there.</summary>
+        bool ClearOfCamp(Vector3 point)
+        {
+            foreach (var e in session.Enemies)
+                if (e != null && e != this && e.actor.IsAlive && e.Camp && e.CampCenter == CampCenter &&
+                    (Across(e.transform.position - point) < Gap || (e.strolling && e.agent != null && e.agent.isOnNavMesh && Across(e.agent.destination - point) < Gap))) return false;
+            return true;
         }
         /// <summary>Movement slow: the strongest active slow wins; it never stacks.</summary>
         public void Slow(float fraction, float seconds)
@@ -164,7 +249,7 @@ namespace Crulanda.Encounter
             if (joinAt >= 0 && Time.time >= joinAt) Join();   // it heard a call a beat ago: now it comes
             if (Hidden)
             {
-                if (Inside != null) return;   // riding its machine: it comes out when the session says (the machine broke), not before
+                if (Inside != null) { if (Inside.actor.IsAlive) Ride(); return; }   // in the saddle: down when the session says (its mount fell), not before
                 // Noticing the player: about 8 m normally, 3 m if they sneak (Ctrl), never while they are dead.
                 var motor = session.Player.GetComponent<AdventurerMotor>();
                 float notice = Mathf.Max(1.5f, (motor != null && motor.Sneaking ? 3 : 8) - session.Kit.NoticeShrink);
@@ -182,7 +267,8 @@ namespace Crulanda.Encounter
                 threat.AddProximity(session.Player.EntityId.Value, Time.deltaTime);
             var id = threat.Choose(Time.time, session.IsLivingCombatant);
             Victim = session.CombatActor(id);   // your party, or a sim that came for it (Phase 5.3a)
-            if (Victim == null) { if (inFight) ClearFight(); if (agent.isOnNavMesh) agent.SetDestination(home); return; }
+            if (Victim == null) { if (inFight) ClearFight(); Idle(); return; }
+            strolling = false;
             if (Vector3.Distance(Victim.transform.position, Group != null ? Group.anchor : home) > session.Leash + 6) { Disengage(); return; }
             if (!inFight) Engage();   // the camp hears of it (EncounterSession.RaiseAlarm)
             if (Move != null && TickElite()) return;   // an elite drawing back for its heavy blow stands still and does not swing
@@ -256,7 +342,7 @@ namespace Crulanda.Encounter
             if (agent.isOnNavMesh) agent.isStopped = true;
             var visual = transform.Find("Body");
             if (Game) GetComponent<GameAnimal>()?.Fall();   // on its side on the ground, not tipped from an actor's height
-            else if (Figure != null && Figure.Look == ActorLook.RockEater) { if (visual != null) { visual.localRotation = Quaternion.Euler(0, 0, 14); visual.localPosition = new Vector3(0, -.25f, 0); } }   // a machine breaks down where it stands
+            else if (Figure != null && Figure.Look == ActorLook.RockEater) { }   // a modelled beast: it falls in its own death where it stood
             else if (visual != null) { visual.localRotation = Quaternion.Euler(0, 0, 90); visual.localPosition = new Vector3(0, -.6f, 0); }
             respawnAt = Time.time + RespawnSeconds;
             DeathCall();   // a boss's relief patrol (EncounterEnemy.Boss)
@@ -267,6 +353,8 @@ namespace Crulanda.Encounter
         {
             respawnAt = float.MaxValue;
             var at = session.Zone != null ? session.Zone.StandAt(CampCenter + Random.insideUnitCircle * CampRadius * (Ambusher ? AmbushSpread(CampRadius) : 1), home.y) : home;   // a cave camp respawns on its floor
+            for (int k = 0; k < 5 && session.Zone != null && !ClearOfCamp(at); k++) at = session.Zone.StandAt(CampCenter + Random.insideUnitCircle * Mathf.Max(CampRadius, Gap), home.y);   // not on top of another (note 131)
+            if (Patrol != null && Patrol.Length > 0) { at = Patrol[0]; patrolAt = 0; patrolStep = 1; }   // a patrol comes back at the head of its road
             if (NavMesh.SamplePosition(at, out var hit, 3, NavMesh.AllAreas)) at = hit.position;
             if (agent.isOnNavMesh) agent.Warp(at); else transform.position = at + Vector3.up;
             home = transform.position;
@@ -279,7 +367,7 @@ namespace Crulanda.Encounter
             if (agent.isOnNavMesh) agent.isStopped = false;
             if (Game) GetComponent<GameAnimal>()?.Stand();
             if (Ambusher) Hide();
-            if (Inside != null) { Inside = null; Shown(true); }   // it died riding its machine: back in sight
+            if (Inside != null) { Inside = null; Shown(true); if (agent != null) agent.enabled = true; var look = GetComponent<ActorVisual>(); if (look != null) look.Riding = false; }   // it died in the saddle: down off its mount
             session.EnemyRespawned(this);   // a rider and its machine pair up again (EncounterSession.RockEater)
         }
         public void RestoreDead()

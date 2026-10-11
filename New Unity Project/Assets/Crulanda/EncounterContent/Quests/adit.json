@@ -395,7 +395,7 @@
       "complete": "Yara hears you out, then goes to the back of the shop and comes out with three things wrapped in sacking. \"I've been keeping these for someone. Take your pick, and don't tell me where you'll carry it.\"\n\nShe sits. \"No carriage. So no geodes south, and no Company pay this winter, and fifty hungry mercenaries on my pass.\" She laughs, short. \"That'll be interesting. Find out who that letter's for. Someone up the chain is going to want their money.\"",
       "steps": [
         {
-          "text": "Go down the cage-lift to the Rail Hall at the bottom of the Sealed Adit. Bring down Quartermaster Brannigan Sorrel and Rail-Captain Orsk Danner on his carriage.",
+          "text": "Go down past the winch gate to the Rail Hall at the bottom of the Sealed Adit. Bring down Quartermaster Brannigan Sorrel and Rail-Captain Orsk Danner on his carriage.",
           "objectives": [
             {
               "type": "kill",

@@ -113,11 +113,20 @@ namespace Crulanda.Encounter
             if (killsTogether >= 3) SimMemory.Note(sim, SimMemory.Deed.KillsTogether, killsTogether / 3);
             if (kicked) SimMemory.Note(sim, SimMemory.Deed.Kicked);
         }
+        float heldUntil, campIdleSince = -1; string heldKind; Vector3 fearFrom;
+        /// <summary>A boss's hold on this sim (EliteMove.cc): "stun", "root", "fear" or "disorient", for seconds, from where (fear runs from it).</summary>
+        public void HoldUntil(string kind, float seconds, Vector3 from)
+        {
+            if (!actor.IsAlive || seconds <= 0) return;
+            heldKind = kind; heldUntil = Mathf.Max(heldUntil, Time.time + seconds); fearFrom = from;
+            session.FloatText(transform.position + Vector3.up * .4f, kind == "fear" ? "Fleeing" : kind == "root" ? "Rooted" : kind == "disorient" ? "Disoriented" : "Stunned", new Color(1, .85f, .3f));
+        }
+        public bool HeldNow { get { return Time.time < heldUntil; } }
         /// <summary>How far behind the leader its farthest living party member is (you, the sims, the wolves), in metres.</summary>
         public float PartyBehind()
         {
             float worst = 0; var me = transform.position;
-            if (player != null && player.IsAlive) worst = Mathf.Max(worst, Vector3.Distance(me, player.transform.position));
+            var you = session.Player; if (you != null && you.IsAlive) worst = Mathf.Max(worst, Vector3.Distance(me, you.transform.position));
             foreach (var c in session.PartySims) if (c != null && c != this && c.actor != null && c.actor.IsAlive) worst = Mathf.Max(worst, Vector3.Distance(me, c.transform.position));
             return worst;
         }
@@ -308,6 +317,18 @@ namespace Crulanda.Encounter
                 if (!session.InCombat && Time.time - downSince > 6) { actor.Health.Revive(Mathf.RoundToInt(actor.Health.Pool.Max * .4f)); downSince = -1; session.Message(sim.name + " gets back up."); }
                 return;
             }
+            // Held by a boss (HoldUntil): stunned, rooted or disoriented it stands and does nothing; feared it runs from what frightened it.
+            if (Time.time < heldUntil)
+            {
+                Activity = heldKind == "fear" ? "Fleeing" : heldKind == "root" ? "Rooted" : heldKind == "disorient" ? "Disoriented" : "Stunned";
+                if (visual != null) visual.Casting = false; healing = null;
+                if (agent.isOnNavMesh)
+                {
+                    if (heldKind == "fear") { var away = transform.position - fearFrom; away.y = 0; agent.isStopped = false; agent.speed = 4.5f; agent.SetDestination(transform.position + (away.sqrMagnitude > .01f ? away.normalized : transform.forward) * 6); }
+                    else agent.isStopped = true;
+                }
+                return;
+            }
             float toPlayer = Vector3.Distance(transform.position, player.transform.position);
             if (Time.time >= nextCatchUp)
             {
@@ -350,6 +371,19 @@ namespace Crulanda.Encounter
             }
             TickGate();   // a shut gate ahead: the run waits at it and goes on when it opens (D7)
             var quarry = Quarry;
+            // A camp nobody can get at (2026-10-11, the group run: an Ash mender up where no one reached it held the run): forty-five seconds
+            // at the camp with nothing to fight and it is left behind.
+            if (Leading.HasValue && quarry == null && waitingAt == null && !CampCleared() && Vector3.Distance(transform.position, Leading.Value) < 18 && !session.InCombat)
+            {
+                if (campIdleSince < 0) campIdleSince = Time.time;
+                else if (Time.time - campIdleSince > 45)
+                {
+                    campIdleSince = -1;
+                    session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? "cant reach that one. leave it, on we go" : "Leave that one, it is out of our reach. On we go.");
+                    if (route.Count > 1) { route.RemoveAt(0); Leading = route[0].at; LeadingName = route[0].name; } else StopLeading();
+                }
+            }
+            else campIdleSince = -1;
             if (Leading.HasValue && quarry == null && waitingAt == null && CampCleared())
             {
                 if (route.Count > 1)

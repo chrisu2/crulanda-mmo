@@ -1715,7 +1715,7 @@ namespace Crulanda.Encounter
             bool marking = EncounterInput.Sneak;   // Ctrl+1-4: raid marks on your target (CC step C3); Ctrl alone still sneaks
             for (int slot = 0; slot < (marking ? 4 : ActionCount); slot++)
                 if (!BuildOpen && slot < 13 && EncounterInput.Press(EncounterInput.SlotKey(slot))) { if (marking) MarkTarget((RaidMark)((slot + 1) % 4)); else UseAbility(slot); }
-            Kit.Tick(InCombat); Meter.Tick(InCombat, Time.deltaTime);
+            Kit.Tick(InCombat); Meter.Tick(InCombat, Time.deltaTime); TickDuo();
             if (AutoAttack && !Kit.MeleeAutoAttacks && !Kit.RangedAutoAttacks) AutoAttack = false;
             // The swing in melee, or the bow's auto-shot at its range (the Ranger: ClassKit.RangedAutoAttacks).
             if (AutoAttack && Target != null && Target.actor.IsAlive && Time.time >= nextSwing && Distance(Target) < Kit.AutoAttackRange && !PlayerStunned && !PlayerDisarmed)
@@ -1807,6 +1807,8 @@ namespace Crulanda.Encounter
         {
             if (Paused || Player == null || !Player.IsAlive || !ActionUnlocked(index)) return false;
             if (PlayerStunned) { Message("You are stunned."); return false; }
+            if (PlayerFeared) { Message("You are running: nothing comes to hand."); return false; }
+            if (PlayerDisoriented) { Message("The cave swims: you can't make the move."); return false; }
             if (PlayerDisarmed && WeaponMove(index)) { Message("Your weapon is locked."); return false; }
             if (CooldownRemaining(index) > 0) return false;
             bool used = Kit.Use(index);

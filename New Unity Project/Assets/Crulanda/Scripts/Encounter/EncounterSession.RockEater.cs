@@ -43,7 +43,36 @@ namespace Crulanda.Encounter
             e.HitBase = EncounterEnemy.MobHit(level, false, true) * move.hit;
             nix.HideInside(e);
         }
-        /// <summary>The Rock-Eater fell: its rider leaps down beside it and comes for whoever brought it down.</summary>
+        /// <summary>The duo (Chris, 2026-10-11: "the duo boss needs to be tougher. maybe perm CC one while killing one?"): the Rock-Eater
+        /// engaged, Nix leaps down at once, marked for the party to hold. Free, he goads the beast: its blows half again and it mends 2% a
+        /// second. Held (he can be, for the full time, as long as the party keeps him held), it is calm. Nix killed first, the beast rampages
+        /// for the rest of the fight. So: hold Nix, kill the beast, then Nix.</summary>
+        public const float GoadedBlows = 1.5f, GoadedMend = .02f;
+        float duoMendAt; bool duoRampaging;
+        void TickDuo()
+        {
+            if (Zone == null || Zone.Zone.id != "zone.adit") return;
+            var machine = Enemies.Find(e => e != null && e.Camp && e.MobName == RockEaterName && e.actor.IsAlive);
+            if (machine == null) { duoRampaging = false; return; }
+            var rider = Rider(machine);
+            if (!machine.Engaged) { machine.BlowScale = 1; duoRampaging = false; return; }
+            if (rider != null && rider.actor.IsAlive && rider.Inside == machine)
+            {
+                // The fight is on: Nix leaps down beside it, goad in hand, and the party is told whom to hold.
+                var foe = machine.Victim != null ? machine.Victim.transform.position : Player.transform.position; var towards = foe - machine.transform.position; towards.y = 0;
+                rider.Rehome(machine.transform.position + (towards.sqrMagnitude > .01f ? towards.normalized : Vector3.forward) * 2.2f);
+                rider.Rise(machine.Victim ?? Player); rider.RaidMarked = RaidMark.Moon;
+                Message(NixName + " vaults out of the saddle, goad in hand, and drives the Rock-Eater at you: \"Dig, girl! DIG!\" Hold him and the beast goes quiet.");
+            }
+            bool nixFree = rider != null && rider.actor.IsAlive && rider.Inside == null && !SimCompanion.Held(rider);
+            bool nixDead = rider == null || !rider.actor.IsAlive;
+            if (nixDead && !duoRampaging) { duoRampaging = true; Message("With Nix down nothing holds the Rock-Eater back: it rampages."); FloatText(machine.transform.position + Vector3.up, "Rampage!", new Color(1, .4f, .3f)); }
+            machine.BlowScale = nixFree || nixDead ? GoadedBlows : 1;
+            if (nixFree && Time.time >= duoMendAt) { duoMendAt = Time.time + 1; machine.actor.Health.ApplyHealing(Mathf.Max(1, Mathf.RoundToInt(machine.actor.Health.Pool.Max * GoadedMend))); }
+        }
+        /// <summary>Whether the duo's beast is goaded or rampaging now (its blows half again).</summary>
+        public bool RockEaterDriven { get { var m = Enemies.Find(e => e != null && e.Camp && e.MobName == RockEaterName && e.actor.IsAlive); return m != null && m.BlowScale > 1; } }
+        /// <summary>The Rock-Eater fell with its rider still up: the rider leaps down beside it and comes for whoever brought it down.</summary>
         void BreakOut(EncounterEnemy machine)
         {
             if (machine == null || machine.MobName != RockEaterName) return;

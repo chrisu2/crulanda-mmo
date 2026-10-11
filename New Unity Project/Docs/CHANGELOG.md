@@ -20,6 +20,16 @@ on his screen the same hour, each run in `D:\crulanda-workun-captures`:
 - **Raid marks and holds as icons** on the nameplate (Icons/mark: skull, moon, cross; held, stunned, feared, silenced), the held mob's plate
   tinted (Chris: "you say Moon it really need to show an ICon", "show who is CCd").
 - Captures draw the HUD's panels at their defaults (the party frame was off a 1440x900 window under Chris's saved positions).
+- **The scorecard** (Chris, 17:44: "a run down of dps deaths loot drops etc. kinda like a scorecard when a dungeon is complete. maybe an
+  mvp"; "final boss kill can also call the scorecard"): every member with its class, damage and healing a second, deaths, the MVP and
+  the healer of the run, what dropped off whom and to whom (rolled loot to its winner), coin; opens when a sim-led run is called
+  cleared or the dungeon's last boss falls; /scorecard; Esc closes it. CombatMeter.Scorecard; the run capture ends on it.
+- **The party leaves held mobs alone** (Chris, 17:45: "party doesnt ignore the CC mobs"): no sim, wolf or the run's player strikes a
+  sapped, gouged, bound or blinded mob while anything else stands (SimCompanion.Held); a stunned one is fair game.
+- **The leader waits for the whole party** (Chris, 17:46: "warrior needs to wait on party"): it stops while anyone alive is more than
+  12 m behind and pulls nothing until they are all within reach (SimCompanion.PartyBehind).
+- **A raid mark dies with its mob** (Chris, 17:41: "once the mob that was cc dies. take off the icon").
+- GroupRunTests measures the party of five, the sim's wolf, the sims' armour and blows, the blow cap, the meter, the scorecard, the mark.
 - **The Rock-Eater:** "thats just a bear"; the stone rework shown at 16:46 ("this model is horrific, i like the original better"); the
   16:26 bear kept.
 - **The Salt-Mender** built (see 15:00 below); its tests written, not yet run (lane A on the full run).

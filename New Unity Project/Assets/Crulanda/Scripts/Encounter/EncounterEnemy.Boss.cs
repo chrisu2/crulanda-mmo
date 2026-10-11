@@ -25,7 +25,23 @@ namespace Crulanda.Encounter
     public sealed partial class EncounterEnemy
     {
         readonly HashSet<int> phasesDone = new HashSet<int>();
-        float nextRingAt, nextBlinkAt, weaponUp = 1; bool calledOnPull; Actor lastFoe;
+        float nextRingAt, nextBlinkAt, nextHoldAt, weaponUp = 1; bool calledOnPull, saidHold; Actor lastFoe;
+        /// <summary>Its hold on the party (EliteMove.cc): on everyone within ccReach, or on whoever it fights.</summary>
+        void HoldParty()
+        {
+            var who = Move.ccReach > 0 ? PartyNear(Move.ccReach).ToList() : new List<Actor> { Victim };
+            int held = 0;
+            foreach (var a in who)
+            {
+                if (a == null || !a.IsAlive) continue;
+                if (a == session.Player) session.HoldPlayer(Move.cc, Move.ccSeconds, transform.position, Name + "'s " + (Move.ccName ?? Move.cc));
+                else { var c = a.GetComponent<SimCompanion>(); if (c != null) c.HoldUntil(Move.cc, Move.ccSeconds, transform.position); else continue; }
+                held++;
+            }
+            if (held == 0) return;
+            session.FloatText(transform.position + Vector3.up * .5f, (Move.ccName ?? Move.cc) + "!", BlowColor);
+            if (!saidHold && !string.IsNullOrEmpty(Move.ccText)) { saidHold = true; session.Message(Move.ccText); }
+        }
         /// <summary>How much heavier its weapon is now (a stamp's weapon change).</summary>
         public float WeaponUp { get { return weaponUp; } }
 
@@ -42,6 +58,11 @@ namespace Crulanda.Encounter
             {
                 if (nextRingAt <= 0) nextRingAt = now + Move.ringEvery * .6f;
                 else if (now >= nextRingAt) { nextRingAt = now + Move.ringEvery; Ring(); }
+            }
+            if (!string.IsNullOrEmpty(Move.cc) && Move.ccEvery > 0 && !WindingUp && Victim != null)
+            {
+                if (nextHoldAt <= 0) nextHoldAt = now + Move.ccEvery * .7f;
+                else if (now >= nextHoldAt) { nextHoldAt = now + Move.ccEvery; HoldParty(); }
             }
             if (Move.blinkEvery > 0 && !WindingUp && Victim != null)
             {
@@ -86,7 +107,7 @@ namespace Crulanda.Encounter
         {
             foreach (var who in PartyNear(Move.ringReach).ToList())
             {
-                int dealt = session.Kit.ResolveEnemyHit(this, who, CappedBlow(who, Mathf.RoundToInt(HitBase * Move.ringBlow * OverHitNow * GroupDamageScale)));
+                int dealt = session.Kit.ResolveEnemyHit(this, who, CappedBlow(who, Mathf.RoundToInt(HitBase * Move.ringBlow * OverHitNow * GroupDamageScale * BlowScale)));
                 if (Move.knock > 0) Knock(who, Move.knock * .6f);
                 session.FloatText(who.transform.position, (Move.ringName ?? "Burst") + " " + dealt, RageColor);
             }

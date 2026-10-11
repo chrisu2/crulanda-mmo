@@ -27,6 +27,12 @@ namespace Crulanda.Encounter
         public int deathCall; public float deathReach = 45; public string deathText;
         public float knock, disarm, blinkEvery;
         public float ringEvery, ringReach = 4.5f, ringBlow = 1.6f; public string ringName;
+        // A hold on the party (Chris, 2026-10-11: "needs some of the bosses to stun or cc members of the party? maybe freeze? stun? fear?
+        // disorient?"): cc "stun", "root", "fear" or "disorient", every ccEvery seconds for ccSeconds, on everyone within ccReach of it
+        // (0: on whoever it fights). EncounterEnemy.Boss.HoldParty; EncounterSession.HoldPlayer and SimCompanion.HoldUntil take it.
+        public string cc, ccName, ccText; public float ccEvery, ccSeconds = 3, ccReach;
+        /// <summary>Held by the party's crowd control for the full time, no immunity and no diminishing (the duo's Nix).</summary>
+        public bool holdable;
     }
 
     /// <summary>The twelve camp elites' moves, by the camp's mob name, and a plain one for any elite not listed.</summary>
@@ -76,18 +82,22 @@ namespace Crulanda.Encounter
                 call = "The Hollow Root-Warden strikes the floor, and the Heart answers.", callShort = "The Heart answers", enrageAt = .35f, enrageHaste = .6f,
                 enrage = "The Hollow Root-Warden creaks, and every root in the Heart pulls tight." },
             // ---------- The Sealed Adit (dungeon D1; PROVISIONAL moves until D2 gives each boss its mechanics, DUNGEON_DESIGN.md) ----------
-            new EliteMove { mob = "Gang-Boss Haddo Lusk", name = "Tally-Stick", windup = 2.2f, blow = 3.6f, reach = 3.8f, every = 12, callMost = 2, callReach = 66,   // (the default 22 in the first Adit; drawn out three times)
+            new EliteMove { mob = "Gang-Boss Haddo Lusk", name = "Tally-Stick", windup = 2.2f, blow = 3.6f, reach = 3.8f, every = 12, callMost = 2, callReach = 66,
+                cc = "stun", ccName = "Floored", ccSeconds = 2, ccEvery = 14, ccText = "Haddo's tally-stick takes the legs from under you.",   // (the default 22 in the first Adit; drawn out three times)
                 deathCall = 3, deathText = "Boots in the drift behind: Lusk's relief shift walks in, three of them.",   // the first boss: a lesson, not a wall (the paper fight: his two guards answer, nobody else)
                 call = "Lusk roars: \"Overseers! Earn your cut!\"", callShort = "Earn your cut!",
                 enrage = "Lusk throws the tally book down and comes round the table." },
             // Nix's two-part fight (D5): first his engine, then him on foot. Together about one and three-quarter elites of health.
-            new EliteMove { mob = "The Rock-Eater", name = "Rock-Crush", windup = 2, blow = 3.8f, reach = 3.6f, every = 10, knock = 4, health = .95f, callReach = 42, callMost = 2,
+            new EliteMove { mob = "The Rock-Eater", name = "Rock-Crush", windup = 2, blow = 3.8f, reach = 3.6f, every = 10, knock = 4, health = 1.6f, callReach = 42, callMost = 2,   // health 1.6 (was .95): the duo (2026-10-11, Chris: "the duo boss needs to be tougher")
+                cc = "disorient", ccName = "Shaken", ccSeconds = 3, ccEvery = 12, ccReach = 5, ccText = "The floor heaves under the Rock-Eater: the cave swims round you.",
                 call = "The Rock-Eater bellows across the workshop. The guards come running.", callShort = "Bellow",
                 enrage = "The crystals on the Rock-Eater's back blaze violet and it tears at the floor." },
-            new EliteMove { mob = "Nix, the turncoat", name = "Goad-Hook", windup = 1.6f, blow = 3.6f, reach = 3.4f, every = 9, disarm = 4, health = .8f, callReach = 66,   // (22 before the Adit was drawn out)
+            new EliteMove { mob = "Nix, the turncoat", name = "Goad-Hook", windup = 1.6f, blow = 3.6f, reach = 3.4f, every = 9, disarm = 4, health = .8f, callReach = 66, holdable = true,   // (22 before the Adit was drawn out); holdable: the duo's play is to hold him
+                cc = "fear", ccName = "Shriek", ccSeconds = 3, ccEvery = 15, ccReach = 4, ccText = "Nix shrieks in your face and you run before you know it.",
                 call = "Nix shrieks: \"Get them off me!\"", callShort = "Get them off me!",
                 enrage = "Nix stops dodging and comes at you with the goad in both hands." },
             new EliteMove { mob = "Cinder-Warden Ysolt", name = "Ember Blow", windup = 2, blow = 4.2f, reach = 3.8f, every = 10, callReach = 42, callMost = 2,
+                cc = "fear", ccName = "The fire sees you", ccSeconds = 4, ccEvery = 16, ccReach = 6, ccText = "Ysolt lifts the brand and the fire looks back at you: you run from it.",
                 knock = 5, ringEvery = 15, ringReach = 4.5f, ringBlow = 1.6f, ringName = "Flame Ring",
                 call = "Ysolt lifts the brand: \"The fire sees you.\"", callShort = "The fire sees you",
                 enrage = "Ysolt steps into the heat and comes out burning." },
@@ -108,7 +118,7 @@ namespace Crulanda.Encounter
                     new BossPhase { at = .333f, kind = "stamp", seconds = 2, text = "Sorrel stamps again, and this time comes back with the poleaxe." } },   // his guards, not the captain down the hall
                 call = "Sorrel bellows: \"Platform! Hold the ramp!\"", callShort = "Hold the ramp!",
                 enrage = "Sorrel goes to the rack and comes back with something heavier." },
-            new EliteMove { mob = "Rail-Captain Orsk Danner", name = "The Dead Line", boss = true, callOnPull = true, phases = new[] { new BossPhase { at = .5f, kind = "rally", text = "Danner, without turning: \"More.\"" } }, health = BossHealth, hit = BossHit, windup = 2.2f, blow = 3.2f, reach = 4, every = 12, callReach = 10,   // sturdy, not savage: his guards and the shadows are the fight (the paper fight at level 12)
+            new EliteMove { mob = "Rail-Captain Orsk Danner", name = "The Dead Line", boss = true, callOnPull = true, cc = "root", ccName = "Chained", ccSeconds = 4, ccEvery = 14, ccText = "Danner's coupling chain wraps your legs: you stand where you are.", phases = new[] { new BossPhase { at = .5f, kind = "rally", text = "Danner, without turning: \"More.\"" } }, health = BossHealth, hit = BossHit, windup = 2.2f, blow = 3.2f, reach = 4, every = 12, callReach = 10,   // sturdy, not savage: his guards and the shadows are the fight (the paper fight at level 12)
                 call = "Danner says, quietly: \"Guards.\" They step out of the dark.", callShort = "Guards.", enrageAt = .35f, enrageHaste = .6f,
                 enrage = "Danner draws a second blade. The letter stays buttoned in his coat." },
         };

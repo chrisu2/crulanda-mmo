@@ -59,12 +59,16 @@ namespace Crulanda.Encounter
         public string Apply(string kind, Actor by, float seconds)
         {
             if (!actor.IsAlive || Game || seconds <= 0) return "Nothing to hold";
-            if (IsBoss && (kind == "incap" || kind == "fear")) { session.FloatText(transform.position, "Immune", Color.white); return "Immune"; }
-            var d = diminish.TryGetValue(kind, out var was) && Time.time - was.at < DrWindow ? (Time.time, was.n + 1) : (Time.time, 0);
-            if (d.Item2 >= 2) { diminish[kind] = (was.at, was.n); session.FloatText(transform.position, "Immune", Color.white); return "Immune (too soon)"; }
-            diminish[kind] = d;
-            if (d.Item2 == 1) seconds *= .5f;
-            if (Elite && (kind == "incap" || kind == "fear")) seconds *= EliteHold;
+            bool holdable = Elite && Move != null && Move.holdable;   // the duo's Nix (2026-10-11): held the whole fight if the party keeps him held
+            if (IsBoss && !holdable && (kind == "incap" || kind == "fear")) { session.FloatText(transform.position, "Immune", Color.white); return "Immune"; }
+            if (!holdable)
+            {
+                var d = diminish.TryGetValue(kind, out var was) && Time.time - was.at < DrWindow ? (Time.time, was.n + 1) : (Time.time, 0);
+                if (d.Item2 >= 2) { diminish[kind] = (was.at, was.n); session.FloatText(transform.position, "Immune", Color.white); return "Immune (too soon)"; }
+                diminish[kind] = d;
+                if (d.Item2 == 1) seconds *= .5f;
+                if (Elite && (kind == "incap" || kind == "fear")) seconds *= EliteHold;
+            }
             float until = Time.time + seconds;
             switch (kind)
             {

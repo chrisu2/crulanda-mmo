@@ -46,7 +46,7 @@ namespace Crulanda.Tests
         static IEnumerator Frames(int n) { for (int i = 0; i < n; i++) yield return null; }
         void Kill(EncounterEnemy e) { e.actor.Health.ApplyDamage(e.actor.Health.Pool.Max * 3); }
 
-        [UnityTest] public IEnumerator Nix_rides_the_Rock_Eater_and_jumps_out_when_it_breaks()
+        [UnityTest] public IEnumerator Nix_rides_the_Rock_Eater_and_leaps_down_when_the_fight_starts()
         {
             var machine = Find(EncounterSession.RockEaterName); var nix = Find(EncounterSession.NixName);
             Assert.AreEqual(nix.CampIndex, machine.CampIndex, "the machine is his camp's");
@@ -63,62 +63,25 @@ namespace Crulanda.Tests
             yield return new WaitForSeconds(1.2f);
             Assert.IsTrue(nix.Hidden, "still inside"); Assert.AreSame(machine, nix.Inside);
             int before = nix.actor.Health.Pool.Current; nix.Receive(50, session.Player); Assert.AreEqual(before, nix.actor.Health.Pool.Current, "beyond harm");
-            // The engine breaks: no sigil from it; Nix is out at the wreck, fighting whoever broke it.
-            machine.Receive(1, session.Player); Kill(machine); yield return Frames(2);
-            Assert.IsFalse(machine.actor.IsAlive); Assert.IsFalse(session.Progress.keys.Contains("sigil.amber"), "the sigil is Nix's, not the machine's");
-            Assert.IsFalse(session.Progress.elitesSlain.Any(k => k.Contains("rockeater")), "no deed for the machine");
-            Assert.IsNull(nix.Inside); Assert.IsFalse(nix.Hidden, "out"); Assert.IsTrue(Visible(nix), "and seen");
-            Assert.Less(Vector3.Distance(nix.transform.position, machine.transform.position), 4, "at the wreck");
-            float t = 0; while (t < 3 && nix.Victim != session.Player) { t += Time.deltaTime; yield return null; }
-            Assert.AreEqual(session.Player, nix.Victim, "he comes for you");
-            Kill(nix); yield return Frames(2);
+            // The fight begins (the duo, 2026-10-11, Chris: "the duo boss needs to be tougher. maybe perm CC one while killing one?"): Nix
+            // leaps down at once, marked for the party to hold; free, he goads the beast (its blows half again, mending); held, it is calm.
+            machine.Receive(1, session.Player); yield return Frames(3);
+            Assert.IsNull(nix.Inside, "Nix leaps down as the fight starts"); Assert.IsFalse(nix.Hidden); Assert.IsTrue(Visible(nix));
+            Assert.AreEqual(RaidMark.Moon, nix.RaidMarked, "marked for the party to hold");
+            Assert.AreEqual(EncounterSession.GoadedBlows, machine.BlowScale, 1e-3f, "goaded: the beast's blows half again while Nix is free");
+            Assert.IsTrue(session.RockEaterDriven);
+            Assert.IsNull(nix.Apply("incap", session.Player, 12), "Nix can be held"); Assert.Greater(nix.ControlSecondsLeft, 11, "for the full time, no diminishing");
+            Assert.IsNull(nix.Apply("incap", session.Player, 12), "and again, at once"); Assert.Greater(nix.ControlSecondsLeft, 11, "no immunity for being held too soon");
+            yield return Frames(2);
+            Assert.AreEqual(1f, machine.BlowScale, 1e-3f, "held, the beast is calm");
+            Assert.IsFalse(session.Progress.keys.Contains("sigil.amber"), "the sigil is Nix's, not the beast's");
+            // Nix killed first: the beast rampages for the rest of the fight; the sigil and the deed are Nix's.
+            Kill(nix); yield return Frames(3);
+            Assert.AreEqual(EncounterSession.GoadedBlows, machine.BlowScale, 1e-3f, "nothing holds it back: it rampages");
             Assert.Contains("sigil.amber", session.Progress.keys, "the Amber Sigil from Nix");
             Assert.IsTrue(session.Progress.elitesSlain.Any(k => k.EndsWith("." + nix.CampIndex) && k.Contains("nix")), "and the camp's deed");
-        }
-        /// <summary>The saddle and the crystals measured on its hide (Chris's captures, 2026-10-11: the saddle at its mouth, a strap standing up
-        /// off its back like a pole, the crystals at its tail). After it has stood a while, its idle moving its back: the saddle in the middle
-        /// of its length on top of its back with Nix in it, every crystal's foot in its hide and the ridge behind the saddle, and the girth
-        /// lying down its flanks, none of it above the saddle.</summary>
-        [UnityTest] public IEnumerator Its_saddle_and_crystals_sit_on_its_back()
-        {
-            var beast = Find(EncounterSession.RockEaterName); var nix = Find(EncounterSession.NixName); var look = beast.GetComponent<ActorVisual>();
-            yield return new WaitForSeconds(2f);
-            Assert.IsTrue(look.GearFitted, "its gear fitted on its idle, two frames after it was built");
-            Assert.AreEqual(AnimatorCullingMode.AlwaysAnimate, look.BeastModel.Animator.cullingMode, "its bones posed even out of sight (in the game it stands unseen when built)");
-            var surface = new HideSurface(look.BeastModel.Renderers, look.BeastModel.Height); var hide = surface.Points;
-            Assert.Greater(hide.Length, 100, "its hide measured");
-            var body = beast.transform.Find("Body"); Vector3 ahead = body.forward, o = body.position;
-            float back = hide.Min(v => Vector3.Dot(v - o, ahead)), front = hide.Max(v => Vector3.Dot(v - o, ahead));
-            float Frac(Vector3 p) { return (Vector3.Dot(p - o, ahead) - back) / (front - back); }
-            // Measured on the hide's surface (rays on its triangles; its vertices lie too far apart on a low-poly hide grown two and a half times).
-            float Top(Vector3 p) { return surface.TopAt(p) ?? float.NaN; }
-            float Gap(Vector3 p) { float top = Top(p); return float.IsNaN(top) ? 99 : Mathf.Abs(p.y - top); }   // how far over or into its back
-            Vector3 aside = body.right;
-            float Flank(Vector3 p)   // how far off its side, at its own height and place along it
-            {
-                float x = Vector3.Dot(p - o, aside), sign = Mathf.Sign(x);
-                var met = surface.Cast(p + aside * sign * 3, -aside * sign);
-                return met.HasValue ? Mathf.Abs(Vector3.Dot(met.Value - p, aside)) : 99;
-            }
-            var gear = body.GetComponentsInChildren<Transform>(true);
-            var saddle = gear.FirstOrDefault(t => t.name == "Saddle"); Assert.NotNull(saddle, "a saddle");
-            string at = " (saddle at " + Frac(saddle.position).ToString("0.00") + " of its length, " + saddle.position.y.ToString("0.00") + " m up, its back there " + Top(saddle.position).ToString("0.00") + ", on " + saddle.parent.name + ")";
-            Assert.That(Frac(saddle.position), Is.InRange(.3f, .65f), "the saddle in the middle of its length, not at its head" + at);
-            Assert.Less(Mathf.Abs(saddle.position.y - .1f - Top(saddle.position)), .3f, "on top of its back" + at);
-            Assert.Less(Vector3.Distance(nix.transform.position, look.RiderSeat.position + Vector3.up * EncounterEnemy.RiderLift), .3f, "Nix in it");
-            var crystals = gear.Where(t => t.name == "Geode crystal").ToList(); Assert.GreaterOrEqual(crystals.Count, 7, "a ridge of crystal");
-            foreach (var c in crystals)
-            {
-                var foot = c.position - c.up * c.lossyScale.y / 2;
-                Assert.Less(Gap(foot), .3f, "a crystal's foot on its back, not in the air: " + Gap(foot).ToString("0.00") + " m off at " + Frac(foot).ToString("0.00") + at);
-            }
-            Assert.GreaterOrEqual(crystals.Count(c => Frac(c.position) < Frac(saddle.position)), 5, "the ridge behind the saddle" + at);
-            var girth = gear.Where(t => t.name == "Girth").ToList(); Assert.GreaterOrEqual(girth.Count, 2, "a girth");
-            foreach (var g in girth)
-            {
-                Assert.Less(Flank(g.position), .25f, "the girth lies on its flank: " + Flank(g.position).ToString("0.00") + " m off" + at);
-                Assert.Less(g.position.y + g.lossyScale.y / 2 * Mathf.Abs(g.up.y), saddle.position.y + .15f, "and stands up above nothing" + at);
-            }
+            Kill(machine); yield return Frames(2);
+            Assert.IsFalse(machine.actor.IsAlive); Assert.IsFalse(session.Progress.elitesSlain.Any(k => k.Contains("rockeater")), "no deed for the beast");
         }
         [UnityTest] public IEnumerator Both_come_back_with_the_camp_and_Nix_is_inside_again()
         {

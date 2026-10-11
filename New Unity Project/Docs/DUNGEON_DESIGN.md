@@ -38,6 +38,29 @@ Nothing in the dungeon is a machine. Chris's choices (01:04, the question prompt
   over the wide chambers' floors.
 - The built halls: the kit's walls turned to face into the halls (they faced the rock), end walls back to back, the floor flags darkened.
 
+## 0.07 The group runs Chris watched (2026-10-11, 16:50-18:00; PLAYTEST_NOTES 133-141; toolsalidation\group_run.ps1)
+A party of five led by a sim through the Adit at three times speed, on his screen, each run logged (`D:\crulanda-workun-captures`).
+What the runs settled:
+- **Pace:** with the scaling eased, the sims armoured and hitting like players, and no blow over 60% of a member's health, the 17:37
+  run cleared 37 of 67 camps in 30 game-minutes (two deaths, both at the Gang-Boss), on course for about 55-60 minutes: the 60-75 minute
+  brief (0.06) is within reach of the bosses' fights and the wings' events.
+- **The duo** (Chris: "the duo boss needs to be tougher. maybe perm CC one while killing one?"): Nix leaps down as the Rock-Eater is
+  engaged, marked for the party to hold; free, he goads the beast (its blows half again, mending 2% a second); held (he can be, for the
+  full time, as long as the party keeps him held), it is calm; Nix killed first, it rampages. The Rock-Eater's health 1.6 (was .95).
+  The play: hold Nix, kill the beast, then Nix. (EncounterSession.TickDuo; EliteMove.holdable.)
+- **Bosses that hold the party** (Chris: "needs some of the bosses to stun or cc members of the party? maybe freeze? stun? fear?
+  disorient?"): Haddo Lusk floors whoever he fights (stun 2 s, every 14); the Rock-Eater shakes everyone within 5 m (disoriented 3 s,
+  every 12: your steps go the wrong way); Nix's shriek (fear 3 s within 4 m, every 15); Ysolt's "the fire sees you" (fear 4 s within
+  6 m, every 16); Danner's coupling chain (root 4 s, every 14). EliteMove.cc; EncounterSession.HoldPlayer; SimCompanion.HoldUntil.
+- **A camp nobody can reach** held the 17:37 run (an Ash mender up where no one got at it): a leader gives a camp up after 45 s with
+  nothing to fight, and strollers keep to their own floor.
+- The scorecard at the end (0.08 below), the party leaving held mobs alone, the leader waiting for the whole party: CHANGELOG 16:50.
+
+## 0.08 The scorecard (Chris, 2026-10-11, 17:44)
+When a sim-led run is called cleared or the dungeon's last boss falls (and by /scorecard): every member with its class, damage and
+healing a second over the run's fighting time, deaths; the MVP (the most damage and healing together, a death counted against it as a
+tenth of the best) and the healer of the run; what dropped, off whom, to whom; the coin. CombatMeter.Scorecard, EncounterHud.DrawScorecard.
+
 ## 0.06 How long a run takes (Chris, 2026-10-11, about 01:21)
 "all you did in the dungeon was make it bigger which in turn has less mobs and would not take 60-75mins to complete". **A full run of the
 Sealed Adit takes 60-75 minutes.** The scale-up (0.25) made the caves three times longer with the same camps; the time has to come from

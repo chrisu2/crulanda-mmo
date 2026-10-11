@@ -58,6 +58,10 @@ namespace Crulanda.Encounter
             if (EncounterInput.Press(KeyCode.Slash)) { Running = !Running; session.Message(Running ? "Running." : "Walking."); }
             var move = Vector2.ClampMagnitude(EncounterInput.Move, 1);
             Vector3 direction = Quaternion.Euler(0, yaw, 0) * new Vector3(move.x, 0, move.y);
+            // Held by a boss (EncounterSession.HoldPlayer): stunned or rooted you stand; feared you run from it; disoriented your steps go the wrong way.
+            if (session.PlayerStunned || session.PlayerRooted) direction = Vector3.zero;
+            else if (session.PlayerFeared) { var away = transform.position - session.PlayerFearFrom; away.y = 0; direction = away.sqrMagnitude > .01f ? away.normalized : transform.forward; }
+            else if (session.PlayerDisoriented) direction = -direction;
             // Water (surface and depth come from the same model the water is drawn with).
             var here = transform.position; float surface = 0, depth = 0;
             var zone = Crulanda.World.ZoneBuilder.Active;

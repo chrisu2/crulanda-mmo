@@ -210,7 +210,7 @@ namespace Crulanda.Encounter
                 if (Across(point - transform.position) < 1.2f || !ClearOfCamp(point)) continue;
                 // On the floor itself, and straight there: not over lava or in a wall, and not the long way round a lake (the Ember Vent's
                 // camps by its lava had walked round it and out of their camps).
-                if (!NavMesh.SamplePosition(point, out var at, 1, NavMesh.AllAreas)) continue;
+                if (!NavMesh.SamplePosition(point, out var at, 1, NavMesh.AllAreas) || Mathf.Abs(at.position.y - home.y) > 1) continue;   // on its own floor, not a ledge or a column's top
                 if (strollPath == null) strollPath = new NavMeshPath();
                 if (!NavMesh.CalculatePath(transform.position, at.position, NavMesh.AllAreas, strollPath) || strollPath.status != NavMeshPathStatus.PathComplete) continue;
                 float length = 0; var corners = strollPath.corners; for (int c = 1; c < corners.Length; c++) length += Vector3.Distance(corners[c - 1], corners[c]);
@@ -289,7 +289,7 @@ namespace Crulanda.Encounter
                 if (Move != null && Time.time >= nextBlowAt) { BeginBlow(); return; }
                 swing = Time.time + SwingInterval;
                 if (Figure != null) Figure.Strike();
-                int damage = session.Kit.ResolveEnemyHit(this, Victim, CappedBlow(Victim, Mathf.RoundToInt(HitBase * OverHitNow * GroupDamageScale)));
+                int damage = session.Kit.ResolveEnemyHit(this, Victim, CappedBlow(Victim, Mathf.RoundToInt(HitBase * OverHitNow * GroupDamageScale * BlowScale)));
                 session.FloatText(Victim.transform.position, "−" + damage, new Color(1, .45f, .35f));
             }
         }
@@ -326,6 +326,8 @@ namespace Crulanda.Encounter
         /// <summary>No single blow takes more than three fifths of a party member's health (2026-10-11, the group run: Gang-Boss Haddo Lusk's
         /// Tally-Stick came to about 1,050 against people of 439, a one-shot every cycle; a fight should be lost over blows, not in one).</summary>
         public const float MaxBlowShare = .6f;
+        /// <summary>Its blows scaled by what drives it (the Rock-Eater goaded by Nix: 1.5; EncounterSession.TickDuo).</summary>
+        public float BlowScale = 1;
         public int CappedBlow(Actor victim, int raw)
         {
             if (victim == null || victim.Health == null || session.PartyActor(victim.EntityId.Value) == null) return raw;

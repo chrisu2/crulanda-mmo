@@ -1,5 +1,30 @@
 # Changelog
 
+## 2026-10-11, 16:50 on — Chris watching a group run of the Adit (notes 133-141; branch feet-bow-adit-kit)
+Chris: "need to show a test run of the dungeon with a group", then a report a minute as he watched (PLAYTEST_NOTES 133-141). Built and run
+on his screen the same hour, each run in `D:\crulanda-workun-captures`:
+- **RunCapture** (`Crulanda.exe --crulanda-run-capture <folder> --crulanda-zone zone.adit --crulanda-class class.paladin`): you at
+  level 11 with four sims (a Warrior tanking and leading, a Druid, a Ranger with its wolf, a Rogue for the holds), the gates open, a sim
+  leading the run camp by camp, you following, fighting, searching every body and wearing upgrades; dead, up at the stone. At three times
+  speed; every camp, death, mend and item logged (run-log.txt), the whole in run-summary.txt with the meter; a shot every four game minutes
+  and at each elite.
+- **Found by the runs:** the group scaling for four sims made a level-10 picket 2,106 health hitting for 72 against people of 415 (a
+  full party with a Druid mending every 2.5 s died ten times at the first camp): eased to .6 health and .2 damage a share. The sims had
+  no armour at all: now the armour of their class's pieces (SimCompanion.ArmourFor). The sims hit 40% of a player: raised to a player's
+  blow. Gang-Boss Haddo Lusk's Tally-Stick came to about 1,050 against 439 health: no single blow takes more than 60% of a party member's
+  health now (EncounterEnemy.MaxBlowShare). The Druid did heal all along (155 mends in nine minutes, on the record).
+- **The party holds four sims** (five with you; the dungeons are five-player); **a sim Ranger brings its wolf** (RangerPet with a sim
+  master, a party member the mobs can turn on).
+- **The meter** (/meter; /meter reset): damage and healing a member with its class, each a second over the party's fighting time;
+  CombatMeter hears every blow a party member lands and every mend (Combatant.Healed).
+- **Raid marks and holds as icons** on the nameplate (Icons/mark: skull, moon, cross; held, stunned, feared, silenced), the held mob's plate
+  tinted (Chris: "you say Moon it really need to show an ICon", "show who is CCd").
+- Captures draw the HUD's panels at their defaults (the party frame was off a 1440x900 window under Chris's saved positions).
+- **The Rock-Eater:** "thats just a bear"; the stone rework shown at 16:46 ("this model is horrific, i like the original better"); the
+  16:26 bear kept.
+- **The Salt-Mender** built (see 15:00 below); its tests written, not yet run (lane A on the full run).
+All of it TESTED only by the runs Chris watched; the full set to run on it; nothing published.
+
 ## 2026-10-11, 15:00 on — The Rock-Eater's saddle on its back; the three missing fourth paths (branch feet-bow-adit-kit)
 Chris, 14:26: "keep developing. once completed continue working on classes/perks/talent builds and add new classes/races based on lore
 canon. and all phases after." Nothing here is seen by Chris yet.

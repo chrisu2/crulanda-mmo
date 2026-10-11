@@ -46,7 +46,9 @@ namespace Crulanda.Encounter
         public bool Healer { get { return sim.classId == "class.druid" || sim.classId == "class.paladin"; } }
         public float Reach { get { return Melee ? 2.4f : 20; } }
         public float Interval { get { return Melee ? 2.0f : 2.4f; } }
-        public int Hit { get { return Mathf.RoundToInt((Melee ? 6 : 5) + (Melee ? 2.4f : 2.2f) * sim.level); } }
+        /// <summary>A sim's blow: a player's of its level, near enough (2026-10-11, the group run's meter: sims at 8-15 a second against you at 30,
+        /// "still low for most"; they hit (6 + 2.4 a level) before, 40% of a player's).</summary>
+        public int Hit { get { return Mathf.RoundToInt((Melee ? 12 : 10) + (Melee ? 4f : 3.6f) * sim.level); } }
         public int HealAmount { get { return Mathf.RoundToInt(12 + 5 * sim.level); } }
         /// <summary>Experience from the party's kills (EncounterSession.EnemyDied): a level when it has enough, said in Party.</summary>
         public void GainXp(int xp)

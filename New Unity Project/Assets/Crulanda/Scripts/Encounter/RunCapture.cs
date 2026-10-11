@@ -58,7 +58,7 @@ namespace Crulanda.Encounter
             var leader = s.PartySims.Find(c => c != null && c.Dungeon != null);
             int camps = leader.CampsLeft, left = camps; Log("Leader: " + leader.sim.name + ", " + camps + " camps.");
             var motor = s.Player.GetComponent<AdventurerMotor>(); AdventurerMotor.Running = true;
-            int deaths = 0, warps = 0, shots = 0, elitesSeen = 0, mends = 0, looted = 0; var lootTally = new SortedDictionary<string, int>(); float lootUntil = 0; var seen = new HashSet<string>(); var mending = new Dictionary<SimCompanion, string>(); var engagedAt = new Dictionary<EncounterEnemy, float>();
+            int deaths = 0, warps = 0, shots = 0, elitesSeen = 0, mends = 0, looted = 0; var lootTally = new SortedDictionary<string, int>(); float lootUntil = 0; var seen = new HashSet<string>(); var mending = new Dictionary<SimCompanion, string>(); var engagedAt = new Dictionary<EncounterEnemy, float>(); var searched = new HashSet<EncounterEnemy>();
             float start = Time.time, realStart = Time.realtimeSinceStartup, nextShot = Time.time + 20, nextSwing = 0, stuckAt = Time.time, deadAt = -1; var stuckFrom = s.Player.transform.position;
             string leadingName = leader.LeadingName;
             Time.timeScale = Speed;
@@ -111,7 +111,7 @@ namespace Crulanda.Encounter
                 if (foe == null)
                 {
                     float nearest = 12;
-                    foreach (var e in s.Enemies) if (e != null && !e.actor.IsAlive && e.Camp && !e.Game && e.Drops != null && e.Drops.Count > 0) { float d = Vector3.Distance(e.transform.position, me); if (d < nearest) { nearest = d; corpse = e; } }
+                    foreach (var e in s.Enemies) if (e != null && !e.actor.IsAlive && e.Camp && !e.Game && !searched.Contains(e) && (e.Drops == null || e.Drops.Count > 0 || e.Coins > 0)) { float d = Vector3.Distance(e.transform.position, me); if (d < nearest) { nearest = d; corpse = e; } }
                     var body = s.LootableCorpse;
                     if (body != null && Time.time >= lootUntil)
                     {
@@ -121,7 +121,7 @@ namespace Crulanda.Encounter
                             string Named(string id) { var d = s.Items.Get(id); return d != null ? d.name : id; }
                             var had = body.Drops != null ? body.Drops.Select(d => Named(d.item) + (d.count > 1 ? " x" + d.count : "")).ToList() : new List<string>();
                             foreach (var d in (body.Drops ?? new List<LootDrop>())) { var key = Named(d.item); lootTally.TryGetValue(key, out var n); lootTally[key] = n + d.count; }
-                            int coinBefore = s.Progress.gold; s.TakeAllLoot(); looted++;
+                            int coinBefore = s.Progress.gold; s.TakeAllLoot(); looted++; searched.Add(body);
                             Log(Clock(t) + "  searched " + body.Name + ": " + (had.Count > 0 ? string.Join(", ", had) : "nothing") + (s.Progress.gold > coinBefore ? ", " + (s.Progress.gold - coinBefore) + " coin" : "") + (body.Drops != null && body.Drops.Count > 0 ? " (left on it: " + string.Join(", ", body.Drops.Select(d => Named(d.item))) + ")" : ""));
                             // Anything better than what you wear goes on (the loot's worth, seen in play).
                             for (int bi = 0; bi < s.Progress.bag.Count; bi++)
@@ -133,7 +133,7 @@ namespace Crulanda.Encounter
                                 if (s.EquipFromBag(bi)) Log(Clock(t) + "  equipped " + d.name + " (" + d.slot + ", armour " + d.armor + (worn != null ? ", was " + worn.name : "") + ")");
                             }
                         }
-                        lootUntil = Time.time + 1.5f;
+                        lootUntil = Time.time + 1.5f; if (!s.LootOpen && s.LootBody == null) searched.Add(body);   // nothing on it (CanTakeAny): not again
                         if (corpse == body) corpse = null;
                     }
                 }

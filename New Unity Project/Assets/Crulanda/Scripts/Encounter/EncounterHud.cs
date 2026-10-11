@@ -945,11 +945,13 @@ namespace Crulanda.Encounter
         void DrawMeter()
         {
             var m = session.Meter; var rows = new List<CombatMeter.Row>(m.Rows); float t = m.CombatSeconds;
-            var r = new Rect(1100, 456, 340, 44 + 22 * Mathf.Max(1, rows.Count));
+            var r = new Rect(1100, 456, 340, 60 + 22 * Mathf.Max(1, rows.Count));
             Fill(r, new Color(0, 0, 0, .55f));
             GUI.contentColor = gold; GUI.Label(new Rect(r.x + 10, r.y + 6, 200, 20), "DAMAGE AND HEALING", small); GUI.contentColor = Color.white;
             GUI.Label(new Rect(r.x + 10, r.y + 22, 310, 18), "over " + Mathf.RoundToInt(t) + " s of fighting  ·  /meter reset", tiny);
-            float y = r.y + 42;
+            GUI.contentColor = new Color(1, .75f, .5f); GUI.Label(new Rect(r.x + 178, r.y + 40, 80, 18), "damage", tiny);
+            GUI.contentColor = new Color(.5f, 1, .7f); GUI.Label(new Rect(r.x + 256, r.y + 40, 80, 18), "healing", tiny); GUI.contentColor = Color.white;
+            float y = r.y + 58;
             foreach (var row in rows)
             {
                 GUI.Label(new Rect(r.x + 10, y, 170, 20), row.name, small);

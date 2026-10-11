@@ -614,5 +614,33 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
 - **132. "all you did in the dungeon was make it bigger which in turn has less mobs and would not take 60-75mins to complete"** (Chris,
   2026-10-11, about 01:21.) The brief for the Adit: a 60-75 minute run (DUNGEON_DESIGN 0.06). The scale-up spread the same camps over
   three times the length; the content that makes the time (mobs, patrols, side rooms, events) was not built. OPEN.
+- **133. "thats just a bear"** (Chris, 2026-10-11, 16:36, of the Rock-Eater captures: the bear's body tinted violet with crystals and a
+  saddle.) He chose a rework of the bear over a new model; shown the rework at 16:46 (stone hide, rock slabs, digging claws, horned
+  snout): **"this model is horrific, i like the original better."** The 16:26 bear is kept (commit e7bc6bb). CLOSED by his choice.
+- **134. "need to show a test run of the dungeon with a group"** (Chris, 2026-10-11, 16:50.) Built: RunCapture (--crulanda-run-capture),
+  a party of five running the Sealed Adit, timed and photographed, on his screen. The runs since are in D:\crulanda-workun-captures.
+- **135. "so once again no healing from the druid?? and no groups?"** (Chris, 2026-10-11, 16:58, the first run: a party of four dying
+  at the first camp.) Measured: the Druid mended 155 times in nine minutes; the group scaling for four sims had made each picket 2,106
+  health hitting for 72 against people of 415. Scaling eased (EncounterEnemy.GroupScale: .6 health, .2 damage a share). TESTED by the
+  17:09 run (camps falling); not VERIFIED.
+- **136. "need a paladin, ranger pet, etc..."** and **"need a cc class also"** (Chris, 2026-10-11, 16:59-17:01.) The party holds four sims
+  now (five with you); a sim Ranger brings its wolf; the run's party: you the Paladin, a Warrior tank leading, a Druid, a Ranger and
+  wolf, a Rogue for the holds. TESTED in the 17:09 run.
+- **137. "they need to loot to test the loot db"** (Chris, 2026-10-11, 17:11.) The run's player searches every body within 12 m, each
+  thing taken logged by name, upgrades worn (17:27 run). **"dont see looting"** (17:24): it was logged by item id and nothing worn; fixed.
+- **138. "also its not showing who is in the party"**, **"still can't see party on screen"** (Chris, 2026-10-11, 17:11, 17:24.) The capture
+  window (1440x900) drew the panels at his 3440x1440 positions, the party frame off the screen; captures draw the panels at their
+  defaults now (EncounterHud.DefaultPanels). Seen in the 17:28 shot. In his own game the frames are where he put them.
+- **139. "need to give the warrior some gear he is being decimated."**, **"kill it its not working implement fixes and give the warrior
+  some better gear"** (Chris, 2026-10-11, 17:12, 17:16.) The sims had no armour at all (only a health formula); now the armour of their
+  class's pieces at their level (SimCompanion.ArmourFor: the Warrior 207-222), and the run's sims carry bought upgrades. **"also a
+  little unbalanced now that warrior has gear and other not equiping gear?"** (17:25): every member is geared the same way (the log
+  lists each one's armour); the sims never take loot, they buy upgrades in their economy; only you wear what you loot.
+- **140. "you say Moon it really need to show an ICon to see it better"** and **"show who is CCd"** (Chris, 2026-10-11, 17:12-17:13.)
+  The raid marks are icons over the name (Icons/mark: skull, moon, cross) and a held mob shows its hold's icon (held, stunned, feared,
+  silenced) with the plate tinted. Seen in the 17:28 shot.
+- **141. "also need to show a dps meter and a healing meter to check balance on classes"**, **"put the class next to name in dps meter"**,
+  **"i see there name but not their class"** (Chris, 2026-10-11, 17:14, 17:24, 17:25.) /meter: damage and healing a member with its
+  class, each a second over the party's fighting time; /meter reset. In the run's summary too. Seen in the 17:28 shot.
 - **110. New dungeon pieces for the Adit** (Chris's download, 41 FBX: modular stone walls, floor, columns, stairs, an entrance arch, torches, candelabra, chests, barrels, bones, rocks, bars, books, potions). Chris chose: dress the whole Adit and rebuild its built rooms from the modular pieces; raw cave stays rock. In progress.
 - **108. "Still no bow animations on ranger."** Kevin Iglesias's archer clips (load, hold, release) since 2026-10-10; then "bow still twisted", "bow is backwards", "not facing target": the archer turns side-on as the clips are made, turns to her target while fighting standing (AdventurerMotor turned her only while moving), and the bow is set by its own mesh axes (rounded back to the mark, string to the archer). Chris, 20:45: "bow looks better" ... "move forward". To check in play.

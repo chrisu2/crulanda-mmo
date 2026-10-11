@@ -289,7 +289,7 @@ namespace Crulanda.Encounter
                 if (Move != null && Time.time >= nextBlowAt) { BeginBlow(); return; }
                 swing = Time.time + SwingInterval;
                 if (Figure != null) Figure.Strike();
-                int damage = session.Kit.ResolveEnemyHit(this, Victim, Mathf.RoundToInt(HitBase * OverHitNow * GroupDamageScale));
+                int damage = session.Kit.ResolveEnemyHit(this, Victim, Capped(Victim, Mathf.RoundToInt(HitBase * OverHitNow * GroupDamageScale)));
                 session.FloatText(Victim.transform.position, "−" + damage, new Color(1, .45f, .35f));
             }
         }
@@ -323,6 +323,14 @@ namespace Crulanda.Encounter
         /// <summary>Seconds until this enemy may swing again (0 = ready as soon as it is in reach).</summary>
         public float NextSwingIn { get { return Mathf.Max(0, swing - Time.time); } }
         public void Stagger(float seconds) { if (seconds > 0 && actor.IsAlive) swing = Mathf.Max(swing, Time.time) + seconds; }
+        /// <summary>No single blow takes more than three fifths of a party member's health (2026-10-11, the group run: Gang-Boss Haddo Lusk's
+        /// Tally-Stick came to about 1,050 against people of 439, a one-shot every cycle; a fight should be lost over blows, not in one).</summary>
+        public const float MaxBlowShare = .6f;
+        int Capped(Actor victim, int raw)
+        {
+            if (victim == null || victim.Health == null || session.PartyActor(victim.EntityId.Value) == null) return raw;
+            return Mathf.Min(raw, Mathf.Max(1, Mathf.RoundToInt(victim.Health.Pool.Max * MaxBlowShare)));
+        }
         public void Receive(int damage, Actor source)
         {
             if (!actor.IsAlive || Inside != null) return;   // inside its machine, nothing reaches it

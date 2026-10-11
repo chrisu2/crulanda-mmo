@@ -44,6 +44,19 @@ resolutions", and on the dungeon: "all you did in the dungeon was make it bigger
 to complete". Whoever works on this next: verify everything yourself, show Chris pictures before anything is published, and never call a
 report fixed until he has seen it in his own build.
 
+## 2026-10-11, 16:50 on: Chris watching group runs of the Adit (PLAYTEST_NOTES 133-141; CHANGELOG 16:50)
+- **The group run tool:** `toolsalidation\group_run.ps1` runs lane B's build with `--crulanda-run-capture` (RunCapture.cs): a party of
+  five led by a sim through the Adit at 3x, on the screen, everything logged to `D:\crulanda-workun-captures\<name>un-log.txt` and
+  summed in run-summary.txt with the meter. The runs of the evening are kept beside it (adit-group-1707-scaling-too-hard,
+  -1709-no-gear, -1722-geared, -1727-boss-wall, and the one running).
+- **Balance changes made from what the runs showed (all TESTED only by the runs; the full set to run):** group scaling .6/.2 a share
+  (was 1/.45); sims wear their class's armour (they had none); sims hit like a player (they hit 40%); no single blow over 60% of a party
+  member's health (the Gang-Boss's Tally-Stick one-shot everyone). The Druid healed all along (on the record, 155 mends in nine minutes).
+- New: the party of five (MaxPartySims 4), the sim Ranger's wolf, the meter (/meter), marks and holds as icons, captures' panels at their
+  defaults. The Rock-Eater stays the bear Chris preferred.
+- **OPEN:** whether the group clears the Gang-Boss and how long the whole run takes (the brief: 60-75 minutes; the first ten camps took
+  8.5 game minutes, which points to about 60 with the bosses). The Salt-Mender's tests have not run. Nothing published.
+
 ## 2026-10-11, 15:00-17:00: the Rock-Eater fixed in the game, the fourth paths, the Salt-Mender, Direct3D 11 (Chris away; "keep developing")
 Status words as Chris asked: VERIFIED (he saw it), TESTED (a test measures it), BUILT (made, no test yet), OPEN.
 - **The Rock-Eater's saddle, crystals and girth: TESTED and seen in the built game's captures** (16:26, adit-94 front, side, back: Nix in

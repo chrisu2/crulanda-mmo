@@ -86,7 +86,7 @@ namespace Crulanda.Encounter
         {
             foreach (var who in PartyNear(Move.ringReach).ToList())
             {
-                int dealt = session.Kit.ResolveEnemyHit(this, who, Mathf.RoundToInt(HitBase * Move.ringBlow * OverHitNow * GroupDamageScale));
+                int dealt = session.Kit.ResolveEnemyHit(this, who, Capped(who, Mathf.RoundToInt(HitBase * Move.ringBlow * OverHitNow * GroupDamageScale)));
                 if (Move.knock > 0) Knock(who, Move.knock * .6f);
                 session.FloatText(who.transform.position, (Move.ringName ?? "Burst") + " " + dealt, RageColor);
             }

@@ -265,8 +265,32 @@ namespace Crulanda.Encounter
             if (!graph.IsValid() || !actOf.TryGetValue(slot, out int i)) return;
             bool flinch = slot == "hit" || slot == "hithead";
             if (flinch && Acting && acting != "hit" && acting != "hithead") return;
+            if (flinch && bowOn && HasBow) return;   // a shot being drawn is not broken by a flinch
             var (p, c) = acts[i]; p.SetTime(0); p.SetSpeed(flinch ? 1.4f : 1.25f);
             acting = slot; actUntil = Time.time + c.length / (flinch ? 1.4f : 1.25f);
+        }
+        // ---------- the bow (Kevin Iglesias's archer clips; 2026-10-10, Chris: "still no bow animations"; "bow is not held correctly") ----------
+        /// <summary>Foot IK on every clip (on since the figures were built); the motion capture compares a stride with it off.</summary>
+        public void SetFootIK(bool on) { foreach (var s in slots) s.p.SetApplyFootIK(on); for (int i = 0; i < acts.Count; i++) acts[i].p.SetApplyFootIK(on); }
+        /// <summary>The figure has the archer's three clips (Load, Hold, Release).</summary>
+        public bool HasBow { get { return actOf.ContainsKey("bowload") && actOf.ContainsKey("bowhold") && actOf.ContainsKey("bowrelease"); } }
+        /// <summary>On while shooting: the upper body nocks and draws (Load), holds at full draw (Hold) until <see cref="BowLoose"/>, looses
+        /// (Release) and draws again. Turned on, it starts at the draw.</summary>
+        public bool Bow { get { return bowOn; } set { if (value && !bowOn && Time.time - bowAt > BowCycle) bowAt = Time.time - ClipLen("bowrelease") / BowRate; bowOn = value; } }
+        bool bowOn; float bowAt = -99; double bowTime;
+        const float BowRate = 1.2f;
+        float BowCycle { get { return (ClipLen("bowrelease") + ClipLen("bowload")) / BowRate; } }
+        /// <summary>An arrow loosed now.</summary>
+        public void BowLoose() { bowAt = Time.time; }
+        float ClipLen(string slot) { return actOf.TryGetValue(slot, out int i) ? acts[i].c.length : 0; }
+        /// <summary>How far the string is drawn (0 loosed or reaching for the arrow, 1 at full draw), from where the clips are.</summary>
+        public float BowDraw { get; private set; }
+        string BowSlot()
+        {
+            float t = Time.time - bowAt, rel = ClipLen("bowrelease") / BowRate, load = ClipLen("bowload") / BowRate;
+            if (t < rel) { BowDraw = 0; bowTime = t * BowRate; return "bowrelease"; }
+            if (t < rel + load) { float u = (t - rel) / Mathf.Max(.01f, load); BowDraw = Mathf.SmoothStep(0, 1, Mathf.InverseLerp(.55f, 1, u)); bowTime = (t - rel) * BowRate; return "bowload"; }
+            BowDraw = 1; float hold = ClipLen("bowhold"); bowTime = hold > 0 ? (t - rel - load) % hold : 0; return "bowhold";
         }
         /// <summary>Holds the spell pose while a cast is drawn (the release is <see cref="Act"/>("castshot")).</summary>
         public bool Casting { get { return casting; } set { if (value && !casting && actOf.TryGetValue("castenter", out int ce)) acts[ce].p.SetTime(0); casting = value; } }
@@ -288,12 +312,13 @@ namespace Crulanda.Encounter
         void DriveUpper(float dt)
         {
             if (!layers.IsValid()) return;
-            bool on = Acting || casting;
+            bool bow = bowOn && HasBow, on = Acting || casting || bow;
             // A cast drawn: the gathering of the hands (Spell_Simple_Enter) held at its end, not the loop's arms held out (Round 22, note 51).
-            string slot = Acting ? acting : casting ? (actOf.ContainsKey("castenter") ? "castenter" : "castloop") : null;
+            string slot = Acting ? acting : bow ? BowSlot() : casting ? (actOf.ContainsKey("castenter") ? "castenter" : "castloop") : null;
+            if (bow && !Acting && actOf.TryGetValue(slot, out int bi)) acts[bi].p.SetTime(bowTime);   // the bow's clips run by the shot's own clock
             for (int i = 0; i < acts.Count; i++) upper.SetInputWeight(i, slot != null && actOf.TryGetValue(slot, out int s) && s == i ? 1 : 0);
             if (!Acting) acting = null;
-            float aim = !on ? 0 : Acting ? 1 : .45f;   // a cast drawn: the arm half-raised over the walk, not held out full for the whole draw (Round 22, note 51)
+            float aim = !on ? 0 : Acting || bow ? 1 : .45f;   // a cast drawn: the arm half-raised over the walk, not held out full for the whole draw (Round 22, note 51)
             layerWeight = Mathf.MoveTowards(layerWeight, aim, dt * (on ? 12 : 5));
             layers.SetInputWeight(1, layerWeight);
             if (slot == "castloop" && actOf.TryGetValue("castloop", out int cl)) { var (p, c) = acts[cl]; if (c.length > 0 && p.GetTime() > c.length) p.SetTime(p.GetTime() % c.length); }
@@ -333,13 +358,15 @@ namespace Crulanda.Encounter
         /// </summary>
         static readonly string[] Dirs = { "F", "FR", "R", "BR", "B", "BL", "L", "FL" };
         static readonly string[] DirFiles = { "Forward", "ForwardRight", "Right", "BackwardRight", "Backward", "BackwardLeft", "Left", "ForwardLeft" };
-        static AnimationClip KiClip(bool female, string file)
+        internal static AnimationClip KiClip(bool female, string file)
         {
             foreach (var c in Resources.LoadAll<AnimationClip>("Characters/Animations/KI/" + (female ? "Female/HumanF@" : "Male/HumanM@") + file))
                 if (c != null && !c.name.StartsWith("__preview__")) return c;
             return null;
         }
         bool ki; readonly List<string> morroIdles = new List<string>();
+        /// <summary>A woman's figure (Kevin's female clips).</summary>
+        public bool Female { get { return spec.female; } }
         /// <summary>Starts the figure's graph (play mode only; in edit mode the figure keeps its bind pose).</summary>
         public void StartMotion(string label)
         {
@@ -385,6 +412,9 @@ namespace Crulanda.Encounter
             // The upper body's layer over the mixer (playtest note 25): its clips, a mask from the spine up, weight 0 until a blow.
             var actions = new List<(string, AnimationClip)>();
             foreach (var (slot, clip) in Actions) { var c = Clip(clip); if (c != null) actions.Add((slot, c)); }
+            // The bow (Kevin Iglesias's Human Archer Animations, 2026-10-10): nock and draw, hold at full draw, loose. Upper body only.
+            foreach (var (slot, file) in new[] { ("bowload", "BowShot01 - Load"), ("bowhold", "BowShot01 - Hold"), ("bowrelease", "BowShot01 - Release") })
+            { var c = KiClip(spec.female, file); if (c != null) actions.Add((slot, c)); }
             if (actions.Count > 0)
             {
                 upper = AnimationMixerPlayable.Create(graph, actions.Count);

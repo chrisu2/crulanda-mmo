@@ -49,7 +49,7 @@ namespace Crulanda.Tests
             if (root != null && Directory.Exists(root)) Directory.Delete(root, true);
         }
 
-        struct Foot { public float ankle, toe, yaw, side; }
+        struct Foot { public float ankle, toe, yaw, side, tilt; }
         /// <summary>A foot now: its ankle's and toes' heights above the ground under each, how far it turns from the body's heading
         /// (degrees, from the ankle to the toes), and which side of the body it is on (+ right).</summary>
         Foot Read(bool left)
@@ -61,7 +61,8 @@ namespace Crulanda.Tests
             float G(Vector3 p) { return p.y - GroundUnder(p); }
             var along = toe.position - ankle.position; along.y = 0; var fwd = motor.transform.forward; fwd.y = 0;
             float yaw = along.sqrMagnitude > 1e-6f ? Vector3.Angle(along, fwd) : 0;
-            return new Foot { ankle = G(ankle.position), toe = G(toe.position), yaw = yaw, side = Vector3.Dot(ankle.position - motor.transform.position, motor.transform.right) };
+            var d = toe.position - ankle.position; float tilt = Mathf.Atan2(-d.y, new Vector2(d.x, d.z).magnitude) * Mathf.Rad2Deg;   // the ball below the ankle, degrees
+            return new Foot { ankle = G(ankle.position), toe = G(toe.position), yaw = yaw, side = Vector3.Dot(ankle.position - motor.transform.position, motor.transform.right), tilt = tilt };
         }
         /// <summary>The visible ground under a point: the first collider a ray down from above meets that is not the player's own (the
         /// ground mesh, a bridge deck); the zone's height function where there is none.</summary>
@@ -92,11 +93,18 @@ namespace Crulanda.Tests
                 {
                     float lowToe = win.Min(x => pick(x).toe), lowAnkle = win.Min(x => pick(x).ankle);
                     if (lowToe > stand.toe + .05f) problems.Add(what + " " + name + " foot at " + F(w - t0) + "s: its toes never come down (lowest " + F(lowToe) + " m, standing " + F(stand.toe) + ")");
-                    if (lowAnkle > stand.ankle + .06f) problems.Add(what + " " + name + " foot at " + F(w - t0) + "s: its heel never comes down, on its toes (ankle lowest " + F(lowAnkle) + " m, standing " + F(stand.ankle) + ")");
+                    if (lowAnkle > stand.ankle + .035f) problems.Add(what + " " + name + " foot at " + F(w - t0) + "s: its heel never comes down, on its toes (ankle lowest " + F(lowAnkle) + " m, standing " + F(stand.ankle) + ")");
                     if (lowToe < stand.toe - .05f) problems.Add(what + " " + name + " foot at " + F(w - t0) + "s: sunk into the ground (toes " + F(lowToe) + " m, standing " + F(stand.toe) + ")");
                     foreach (var x in win)
                     {
+                        var up = pick(x);
+                        if (up.ankle > stand.ankle + .15f && up.tilt < stand.tilt - 15)
+                        { problems.Add(what + " " + name + " foot at " + F(x.t - t0) + "s: lifted with its toes pulled up toward the shin (tilt " + up.tilt.ToString("0") + ", standing " + stand.tilt.ToString("0") + " degrees)"); break; }
+                    }
+                    foreach (var x in win)
+                    {
                         var f = pick(x); if (f.toe > stand.toe + .04f) continue;   // only a foot that is down
+                        if (f.ankle < stand.ankle + .05f && f.tilt > stand.tilt + 15) { problems.Add(what + " " + name + " foot at " + F(x.t - t0) + "s: down on its toes, pointed " + (f.tilt - stand.tilt).ToString("0") + " degrees more than standing (tilt " + f.tilt.ToString("0") + ")"); break; }
                         if (f.yaw > 30) { problems.Add(what + " " + name + " foot at " + F(x.t - t0) + "s: down but turned " + f.yaw.ToString("0") + " degrees from the way it goes"); break; }
                         if (name == "left" ? f.side > .02f : f.side < -.02f) { problems.Add(what + " " + name + " foot at " + F(x.t - t0) + "s: down on the wrong side of the body (crossed)"); break; }
                         if (Mathf.Abs(f.side) < .06f) { problems.Add(what + " " + name + " foot at " + F(x.t - t0) + "s: down on the middle line (" + F(f.side) + " m out): the feet land one in front of the other"); break; }
@@ -110,7 +118,7 @@ namespace Crulanda.Tests
             var problems = new List<string>();
             var stand = new List<(float t, Foot l, Foot r)>(); yield return Sample(1, stand);
             var standL = stand.Last().l; var standR = stand.Last().r;
-            problems.Add("(standing: left toe " + F(standL.toe) + " ankle " + F(standL.ankle) + " yaw " + standL.yaw.ToString("0") + "; right toe " + F(standR.toe) + " ankle " + F(standR.ankle) + " yaw " + standR.yaw.ToString("0") + ")");
+            problems.Add("(standing: left toe " + F(standL.toe) + " ankle " + F(standL.ankle) + " yaw " + standL.yaw.ToString("0") + " tilt " + standL.tilt.ToString("0") + "; right toe " + F(standR.toe) + " ankle " + F(standR.ankle) + " yaw " + standR.yaw.ToString("0") + " tilt " + standR.tilt.ToString("0") + ")");
             var cc = session.Player.GetComponent<CharacterController>(); var me = motor.transform.position;
             float capsule = cc != null ? me.y + cc.center.y - cc.height / 2 - GroundUnder(me) : float.NaN;
             var model = figure.Figure.Animator.transform;

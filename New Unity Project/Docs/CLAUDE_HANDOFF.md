@@ -54,8 +54,12 @@ report fixed until he has seen it in his own build.
   member's health (the Gang-Boss's Tally-Stick one-shot everyone). The Druid healed all along (on the record, 155 mends in nine minutes).
 - New: the party of five (MaxPartySims 4), the sim Ranger's wolf, the meter (/meter), marks and holds as icons, captures' panels at their
   defaults. The Rock-Eater stays the bear Chris preferred.
-- **OPEN:** whether the group clears the Gang-Boss and how long the whole run takes (the brief: 60-75 minutes; the first ten camps took
-  8.5 game minutes, which points to about 60 with the bosses). The Salt-Mender's tests have not run. Nothing published.
+- Since then (17:40-18:30, Chris still watching): the scorecard, the party leaving held mobs alone, the leader waiting for the whole party
+  (16 m) and giving up unreachable camps, the duo (Nix held, the beast goaded or calm), bosses that stun/fear/root/disorient, the Rogue's
+  dirks and Throw Knife, far mobs standing still (CPU), the run's bags. All TESTED by today's suites (EditMode 10/10, 8/8; PlayMode
+  51/53 then 14/14 with the two fixed) and the runs; **the full PlayMode set has not finished on today's code** (the 16:26 run hit the
+  runner's time-out with the machine shared). The Gang-Boss falls (14:33 in the 17:56 run); the Rock-Eater and Nix fell at 22-23
+  minutes in the 17:37 run (before the duo rework). **Run the full set on a quiet machine before publishing.** Nothing published.
 
 ## 2026-10-11, 15:00-17:00: the Rock-Eater fixed in the game, the fourth paths, the Salt-Mender, Direct3D 11 (Chris away; "keep developing")
 Status words as Chris asked: VERIFIED (he saw it), TESTED (a test measures it), BUILT (made, no test yet), OPEN.

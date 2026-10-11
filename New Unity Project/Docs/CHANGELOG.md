@@ -30,6 +30,17 @@ on his screen the same hour, each run in `D:\crulanda-workun-captures`:
   12 m behind and pulls nothing until they are all within reach (SimCompanion.PartyBehind).
 - **A raid mark dies with its mob** (Chris, 17:41: "once the mob that was cc dies. take off the icon").
 - GroupRunTests measures the party of five, the sim's wolf, the sims' armour and blows, the blow cap, the meter, the scorecard, the mark.
+- **The duo and the bosses' holds** (17:47-17:56; DUNGEON_DESIGN 0.07): Nix leaps down to be held, the Rock-Eater goaded, calm or
+  rampaging, 1.6 health; Haddo floors, the Rock-Eater shakes, Nix and Ysolt fear, Danner chains. TESTED (RockEaterTests 3/3).
+- **The Rogue's pair of dirks and Throw Knife** (18:00; Chris: "rogue should have daggers. and maybe a crossbow to pull but mainly
+  melee"): Lowtown dirks in both hands from the first (the second knife in the left fist, knife.off), on sim Rogues too; Throw Knife,
+  a knife thrown at 20 m, the pull. TESTED (RogueRulesTests, RogueLoopTests).
+- **A leader gives up a camp nobody can reach** after 45 s (the 17:37 run's Ash mender); strollers keep to their floor; mobs further
+  than 70 m from you stand still (the strolling's path-finding for 148 mobs at 3x pegged the CPU: "pegging cpu 100% alot of times");
+  the run's player throws away the cheapest thing when the bags fill and warps on when stuck against clutter; the leader waits at 16 m.
+- The full PlayMode set started at 16:26 never finished (the runner's time-out, no results; the machine was shared with the group runs
+  and builds): **the full set is unproven on today's code and must run on a quiet machine.** Today's suites: EditMode 10/10 + 8/8,
+  PlayMode 51/53 then the two fixed, 14/14.
 - **The Rock-Eater:** "thats just a bear"; the stone rework shown at 16:46 ("this model is horrific, i like the original better"); the
   16:26 bear kept.
 - **The Salt-Mender** built (see 15:00 below); its tests written, not yet run (lane A on the full run).

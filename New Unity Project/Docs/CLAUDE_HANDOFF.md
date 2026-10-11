@@ -9,7 +9,26 @@ Chris wants you to continue developing the existing Unity project, not restart i
 Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
 The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
 
-## RESUME HERE (updated 2026-10-10, 20:20) — Chris stopped the session: "bow still not right. feet still not right"
+## RESUME HERE (updated 2026-10-10, 20:45) — feet and bow fixed at the root; Chris: "move forward"
+**The feet (notes 107, 111) and the bow (108):** Chris confirmed both in the motion capture ("finally looks fixed", "bow looks
+better ... move forward"). The cause of the feet, after hours of wrong runtime fixes: Editor/CharacterImport.cs forced every clip to
+build its avatar from its own file; vendor clips must copy their maker's avatar (Kevin's from Resources/Characters/Animations/KI/
+Models/HumanM_Model and HumanF_Model, added with their original guids). **Read the memory note animation-import-check-first before
+touching any animation.** Kevin's clips now play as made, with no foot correction (the ground-gap lowering stays). Unity's Starter
+Assets third-person clips are in Resources/Characters/Animations/Unity (Chris downloaded them; unused now he chose Kevin's run:
+remove them or use their jumps later). Bow: the archer turns side-on, faces her target while fighting standing (AdventurerMotor),
+and the held bow is set by its mesh axes.
+
+**Published:** a playable build from branch feet-bow-adit-kit (commit 3416d47) at 20:45 if the game was closed (check
+D:\crulanda-work\release-publish-2045.log). PR #2 updated; do not merge until Chris has played it.
+
+**Open (PLAYTEST_NOTES 112):** the bowstring is not drawn back at full draw and no arrow shows; Morro's idles (a foot turned out)
+and the walk's toes dipping, flagged by FootTests (which now animate in batch runs: before, they measured a frozen pose and passed
+whatever the feet did). Captures: tools/validation/capture_motion.ps1 -BowOnly skips the jumps and runs.
+
+**Next, in Chris's order:** the room builder and the Adit rework (DUNGEON_DESIGN.md section 0), the Ranger's Skirmisher.
+
+## Earlier resume note (2026-10-10, 20:20) — Chris stopped the session: "bow still not right. feet still not right"
 **Read first:** the open reports in PLAYTEST_NOTES.md (107, 108, 109, 111) and the memory notes in
 C:\Users\ChrisWin11\.claude\projects\D--code-mmo\memory (reports stay OPEN until Chris confirms them in his own build; record
 his briefs verbatim; the dungeon brief). Chris is frustrated that his feet reports were marked done and came back again and again.

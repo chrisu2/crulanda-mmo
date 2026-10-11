@@ -568,7 +568,7 @@
       "rank": "elite",
       "groups": [
         {
-          "chance": 0.5,
+          "chance": 1,
           "signature": true,
           "pick": [
             {
@@ -588,7 +588,7 @@
       "rank": "elite",
       "groups": [
         {
-          "chance": 0.5,
+          "chance": 1,
           "signature": true,
           "pick": [
             {
@@ -617,7 +617,7 @@
       "rank": "elite",
       "groups": [
         {
-          "chance": 0.5,
+          "chance": 1,
           "signature": true,
           "pick": [
             {
@@ -649,7 +649,7 @@
       "rank": "elite",
       "groups": [
         {
-          "chance": 0.5,
+          "chance": 1,
           "signature": true,
           "pick": [
             {
@@ -695,7 +695,7 @@
       "rank": "elite",
       "groups": [
         {
-          "chance": 0.5,
+          "chance": 1,
           "signature": true,
           "pick": [
             {
@@ -715,7 +715,7 @@
       "rank": "elite",
       "groups": [
         {
-          "chance": 0.5,
+          "chance": 1,
           "signature": true,
           "pick": [
             {
@@ -747,7 +747,7 @@
       "rank": "elite",
       "groups": [
         {
-          "chance": 0.5,
+          "chance": 1,
           "signature": true,
           "pick": [
             {

@@ -57,6 +57,12 @@ What the runs settled:
   nothing to fight, and strollers keep to their own floor.
 - The scorecard at the end (0.08 below), the party leaving held mobs alone, the leader waiting for the whole party: CHANGELOG 16:50.
 
+## 0.075 Boss loot (Chris, 2026-10-11, 18:59: "any good loot drops?")
+Two runs, two bosses each, coin only in the player's bags (the named piece rolled at 50% and, in a party, rolled for round the five).
+Decided: **every Adit boss drops one of its named pieces every time** (the signature groups of loot.adit.json at chance 1; the 20%
+"runner's" extras as they were). The Rock-Eater has no table of its own: its pieces are Nix's. The group's roll still decides who takes
+it; the scorecard says who did.
+
 ## 0.08 The scorecard (Chris, 2026-10-11, 17:44)
 When a sim-led run is called cleared or the dungeon's last boss falls (and by /scorecard): every member with its class, damage and
 healing a second over the run's fighting time, deaths; the MVP (the most damage and healing together, a death counted against it as a

@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-10-10 night — Feet and bow at the root, built halls, ghostly Hollow Men, the full-length Adit (branch feet-bow-adit-kit)
+- **Feet:** the clip importer (Editor/CharacterImport) built each vendor clip's avatar from its own file; Kevin Iglesias's clips now copy
+  his HumanM/HumanF avatars. His run stands flat (Editor/FootDiag); every runtime foot correction of the evening removed; FootTests now
+  animate in batch runs. Chris, in the captures: "finally looks fixed". Published 20:41.
+- **Bow:** the archer turns side-on as the clips are made, faces her target while fighting standing (AdventurerMotor), and the bow is set
+  by its own mesh (rounded back to the mark, string to the archer). Chris: "bow looks better". Published 20:41.
+- **D9 room builder** in the Adit: the Geode Floor's foundry hall and the Rock-Eater's berth, the Ember Vent's Cult of Ash chapter-house.
+- **Hollow Men are apparitions** (see-through ashen grey, violet eyes; GAME-ONLY look, the books have them as stone).
+- **The Adit drawn out three times** (Chris: "3x, full-length run"; DUNGEON_DESIGN 0.25): 1,353 m of cave, the zone 800 m square. Adit
+  suites 17/18 (the escort test, see the handoff). Not published.
+- **Machine words** out of the Adit's item texts ("engine oil" became "drill-grease"; Chris's rule).
+- **Docs:** the handoff rewritten as one current page (the old notes in HANDOFF_ARCHIVE.md), GAME_BRIEF brought up to the code,
+  LORE_AUDIT.md for Chris's decisions, CLAUDE.md names lane B, the Steam copy marked out of date.
+
 ## Phase 0 — Foundation (unreleased)
 - Project layout, six runtime asmdefs, editor asmdef, EditMode + PlayMode test asmdefs.
 - Core: categorised logging with ring buffer, EventBus, Services, ContentId/EntityId, hierarchical GameTags + TagSet,

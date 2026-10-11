@@ -56,6 +56,9 @@ because they had grown to 146 KB of notes that contradicted each other). Replace
 
 ## Open (see PLAYTEST_NOTES.md for each)
 - 113: the Adit bigger **and "more to do"**: the scale is done; the content is next (DUNGEON_DESIGN 0.25, wing by wing).
+- **114-118, a tester's report Chris pasted at about 22:05 (on the 20:41 build), all open:** the HUD clipped at the left and top (chat
+  and party frame cut, no player frame or minimap seen); after alt-tab or chat, keys ignored until a click in the window; the shop not
+  closing on "Goodbye"; the camera going inside walls in buildings; "/invite Thatch" not working (the Who list's Invite does).
 - 112: the bowstring is not drawn back at full draw and no arrow shows; Morro's idles turn a foot out (import them from a source avatar
   like Kevin's); the walk's toes dip 3-6 cm in places.
 - 99 (parts): a mob answering a call fights with its weapon sheathed. 101: the helmets are untextured code shapes.

@@ -44,9 +44,12 @@ because they had grown to 146 KB of notes that contradicted each other). Replace
 - Docs: this handoff rewritten, the old one archived; GAME_BRIEF brought up to the code.
 
 ## Tests and builds
-- Adit suites on the drawn-out layout: 17 of 18 pass. **Failing: the Weaver escort's second wave never reaches her**
-  (AditWeaverTests "two waves of three": 3 of 6). The test now reports the wave places and when they fired; fix before merging.
-- Published playable build: 20:41 (feet and bow; the Adit before the scale-up). The drawn-out Adit is not yet published.
+- Adit suites on the drawn-out layout: 17 of 18 pass. **Failing: AditWeaverTests "two waves of three" (3 of 6).** Diagnosed
+  (22:15): both waves spawn (6 of 6); the second comes out 13.5 m past the lock and the test's lock takes 4 s (`MatchSeconds = 4`),
+  so she is done before they reach her. In play the lock takes over half a minute. Likely fix: raise the test's `MatchSeconds` to
+  about 15, or keep the test's loop going after Done until both waves have come. Run AditWeaverTests, then all Adit suites.
+- Published playable build: 20:41 (feet and bow; the Adit before the scale-up). The drawn-out Adit is **not published** (Chris,
+  22:15: "complete handoff and save"). Publish it once the escort test is green.
 
 ## Open (see PLAYTEST_NOTES.md for each)
 - 113: the Adit bigger **and "more to do"**: the scale is done; the content is next (DUNGEON_DESIGN 0.25, wing by wing).
@@ -59,7 +62,7 @@ because they had grown to 146 KB of notes that contradicted each other). Replace
   Rule from Chris: no machine words in player-facing text.
 
 ## Next, in order
-1. Fix the escort's second wave; run the Adit suites green; publish the drawn-out Adit for Chris to walk.
+1. Fix the escort test (see "Tests and builds"); run the Adit suites green; publish the drawn-out Adit for Chris to walk.
 2. The lore audit: a list for Chris (each label with its book reference or none), then fix only what he approves.
 3. "More to do" in the Adit, a wing at a time, frames shown to Chris before the next (DUNGEON_DESIGN 0.25).
 4. Note 112's three items.

@@ -50,7 +50,8 @@ Nothing counts as done until it is VERIFIED. Read the clock (`Get-Date`) before 
 - BUILT (2026-10-10, not seen by Chris): the room builder's halls (the Geode Floor's foundry hall and the Rock-Eater's berth, the Ember
   Vent's chapter-house); the Hollow Men as apparitions; Chris's lore decisions in the data (the Salt-Menders as forerunners, the
   Stillwood, the toll CANON-EXPANDED, Klyther as in the novels).
-- **The full PlayMode set has not run since 2026-10-09** (245/245 then). Tonight only the Adit suites ran; the feet import, the bow,
+- **The full PlayMode set has not run on this branch.** WEB_LOG.md records 245/245 on 2026-10-09, but no results file for that run
+  is on disk (the oldest is 2026-10-10 21:52), so even that is unproven. Tonight only the Adit suites ran; the feet import, the bow,
   the room builder, the scale-up and the lore renames reach further than those.
 
 ## To do, every phase
@@ -65,12 +66,14 @@ them is not verified is under "Verify first". Phase 8 is now; 8.5 and 9 follow.
    plays at 3440x1440), 24 (dead-tree joins), 25 (swings: an upper-body layer only; real swings need the Melee pack), 26 (roofs fade),
    27 (crowns, not "gold"), 28 (the horse kept out of the inn), 29 and 30 (drinking, sitting), 39 (crags, "to look at again"), 43 (red
    mobs hit harder), 57-61 (round 23, marked UNTESTED: straw hats, cows' colliders, the character sheet, sign text, farmers working),
-   99's done parts (the Adit's first look), 106 (the horizon, a first pass). Every other note marked DONE or FIXED in PLAYTEST_NOTES.md
-   was marked by the agent: go through them in play with Chris.
+   99's done parts (the Adit's first look), 106 (the horizon, a first pass). **In all, 79 notes in PLAYTEST_NOTES.md are marked DONE or
+   FIXED by the agent and only 2 are confirmed by Chris (107 and 111, in a capture):** the real list to verify is those 79, the ones
+   above first. Go through them in play with Chris.
 5. Docs that disagree with the code: DUNGEON_DESIGN section 9 step 6 says quest gear is not handed out (it is: QuestLog.GearRewards,
    TESTED); CLASS_STATUS.md lists Mira's Hush as left (it is in: HealerCompanion.Hush, C5); ROADMAP 8.5 says the game has no archery
    clips (Kevin's Archer clips are in, in part); the ROADMAP's status column is dated 2026-10-09; KNOWN_ISSUES.md's top half is from
-   Phase 0.
+   Phase 0; GAME_BRIEF.md's header still says "Updated 2026-09-30" (it was changed 2026-10-10), its Verdant Shore paragraph still says
+   levels 11-13 and the cap rising to 13 (corrected only in a parenthesis), and "the painted style pass is next" is dated 2026-09-30.
 
 ### Phase 8: the vertical slice (now)
 **8A. The Sealed Adit (DUNGEON_DESIGN.md)**
@@ -112,10 +115,13 @@ frames, and Chris's word:
 
 **8D. Classes and crowd control (CLASS_STATUS.md, CC_DESIGN.md, TALENT_DEPTH.md)**
 - Fourth paths to design and build: the Ranger's Skirmisher (melee), the Mage's Cinderwright (pets), the Rogue's Swashbuckler
-  (support). BUILT, not played by Chris: the Paladin's Vanguard, the Warrior's Jailer, the Archivist's Cantor (the Druid has four).
+  (support). The Paladin's Vanguard, the Warrior's Jailer and the Archivist's Cantor: TESTED in EditMode 00:25 tonight
+  (PaladinRulesTests, WarriorTalentTests, ArchivistRulesTests); their PlayMode tests (PaladinLoopTests, CrowdControlTests,
+  ArchivistLoopTests) have not run tonight (the full run covers them); Chris has not played them. The Druid has four.
 - Own figures for the Rogue and the Archivist (they borrow the Ranger's and the Mage's). OPEN.
 - Turn the Unmade (a Paladin fear against the Wasting's things). OPEN.
-- Crowd control: C1-C4 and C5's casts to interrupt BUILT (2026-10-08). C5's "pulls re-tuned around CC" has no record: check it.
+- Crowd control: C1-C4 and C5's casts to interrupt BUILT (2026-10-08), with Mira's Hush; their tests are PlayMode
+  (CrowdControlTests, ArchivistLoopTests), not run tonight. C5's "pulls re-tuned around CC" has no record: check it.
   C5's "the dungeon deepened" is the scale-up (TESTED).
 - Note 42 (a better shield off wolves than off the Brood Weave-Eater): waits for Chris to name the two shields.
 

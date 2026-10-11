@@ -58,7 +58,7 @@ namespace Crulanda.Encounter
             var leader = s.PartySims.Find(c => c != null && c.Dungeon != null);
             int camps = leader.CampsLeft, left = camps; Log("Leader: " + leader.sim.name + ", " + camps + " camps.");
             var motor = s.Player.GetComponent<AdventurerMotor>(); AdventurerMotor.Running = true;
-            int deaths = 0, warps = 0, shots = 0, elitesSeen = 0, mends = 0, looted = 0; var lootTally = new SortedDictionary<string, int>(); float lootUntil = 0; var seen = new HashSet<string>(); var mending = new Dictionary<SimCompanion, string>(); var engagedAt = new Dictionary<EncounterEnemy, float>(); var searched = new HashSet<EncounterEnemy>(); float idleLogAt = 0;
+            int deaths = 0, warps = 0, shots = 0, elitesSeen = 0, mends = 0, looted = 0; var lootTally = new SortedDictionary<string, int>(); float lootUntil = 0; var seen = new HashSet<string>(); var mending = new Dictionary<SimCompanion, string>(); var engagedAt = new Dictionary<EncounterEnemy, float>(); var searched = new HashSet<EncounterEnemy>(); float idleLogAt = 0; int holds = 0; string lastHold = null; var simHeld = new Dictionary<SimCompanion, bool>();
             float start = Time.time, realStart = Time.realtimeSinceStartup, nextShot = Time.time + 20, nextSwing = 0, stuckAt = Time.time, deadAt = -1; var stuckFrom = s.Player.transform.position;
             string leadingName = leader.LeadingName;
             Time.timeScale = Speed;
@@ -75,6 +75,16 @@ namespace Crulanda.Encounter
                     leadingName = leader.LeadingName;
                     bool elite = leader.Leading.HasValue && s.Enemies.Exists(e => e != null && e.Elite && e.actor.IsAlive && Vector3.Distance(e.transform.position, leader.Leading.Value) < 20);
                     if (elite && seen.Add(leadingName)) { elitesSeen++; Shot(s, directory, Clock(t).Replace(':', 'm') + "-" + Slug(leadingName), ref shots, leader); }
+                }
+                // Every hold a boss puts on the party, as it lands (Chris, 2026-10-11: "are the bosses cc party members?"; the 20-second
+                // snapshots missed holds of two to four seconds).
+                var hold = s.PlayerHoldLabel; if (hold != null && !hold.StartsWith(lastHold ?? " ")) { holds++; Log(Clock(t) + "  you: " + hold.Split(' ')[0].ToLower() + " (" + leadingName + ")"); }
+                lastHold = hold != null ? hold.Split(' ')[0] : null;
+                foreach (var c in s.PartySims)
+                {
+                    if (c == null) continue; bool now = c.HeldNow; simHeld.TryGetValue(c, out var was);
+                    if (now && !was) { holds++; Log(Clock(t) + "  " + c.sim.name + ": " + (c.Activity ?? "held").ToLower() + " (" + leadingName + ")"); }
+                    simHeld[c] = now;
                 }
                 // Every mend a sim starts (its Activity "Mending ..."), by name, so the healing is on the record (Chris, 2026-10-11:
                 // "so once again no healing from the druid??").
@@ -176,7 +186,7 @@ namespace Crulanda.Encounter
             if (!s.ScorecardOpen) s.ShowScorecard((s.Zone.Zone.displayName ?? s.ZoneId) + (done ? " cleared" : " so far"));
             yield return null; yield return null;
             ScreenCapture.CaptureScreenshot(Path.Combine(directory, "99-scorecard.png")); yield return new WaitForSeconds(.6f);
-            Log(Clock(total) + "  " + (done ? "the run is done: every camp cleared." : "stopped (the real-time limit): " + (camps - left) + " of " + camps + " camps cleared.") + " Mends seen: " + mends + "; bodies searched: " + looted + ".");
+            Log(Clock(total) + "  " + (done ? "the run is done: every camp cleared." : "stopped (the real-time limit): " + (camps - left) + " of " + camps + " camps cleared.") + " Mends seen: " + mends + "; bodies searched: " + looted + "; holds the bosses put on the party: " + holds + ".");
             Log("Loot taken: " + (lootTally.Count == 0 ? "nothing" : string.Join(", ", lootTally.Select(kv => kv.Key + (kv.Value > 1 ? " x" + kv.Value : "")))) + "; coin " + s.Progress.gold + ".");
             foreach (var line in s.Meter.Scorecard()) Log(line);
             Finish(s, directory, log, total, camps, camps - left, deaths, warps, done);

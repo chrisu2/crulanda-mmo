@@ -44,7 +44,7 @@ because they had grown to 146 KB of notes that contradicted each other). Replace
 - Docs: this handoff rewritten, the old one archived; GAME_BRIEF brought up to the code.
 
 ## Tests and builds
-- EditMode 444/444 (about 22:40, after the lore decisions; the Adit elites' call ranges set for the drawn-out layout: Lusk and Nix 66 m,
+- EditMode 444/444 (about 23:05, after the lore decisions; the Adit elites' call ranges set for the drawn-out layout: Lusk and Nix 66 m,
   the Quartermaster 48 m, so each call still reaches its kin).
 - Adit suites on the drawn-out layout: 17 of 18 pass. **Failing: AditWeaverTests "two waves of three" (3 of 6).** What the test
   reported (run at about 21:50): both waves spawn (6 of 6); the second comes out 13.5 m past the lock; the test sets the lock to 4 s

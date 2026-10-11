@@ -47,7 +47,18 @@ namespace Crulanda.Encounter
         /// engaged, Nix leaps down at once, marked for the party to hold. Free, he goads the beast: its blows half again and it mends 2% a
         /// second. Held (he can be, for the full time, as long as the party keeps him held), it is calm. Nix killed first, the beast rampages
         /// for the rest of the fight. So: hold Nix, kill the beast, then Nix.</summary>
-        public const float GoadedBlows = 1.5f, GoadedMend = .02f;
+        public const float GoadedBlows = 1.5f, GoadedMend = .005f;   // the mend .5% a second (2% made the 18:23 run a stalemate: 23 minutes on the beast, no kill)
+        /// <summary>The duo's state for the run log: "Nix held 12s", "Nix free", "Nix down", "Nix in the saddle"; null when the beast is not up.</summary>
+        public string DuoState
+        {
+            get
+            {
+                var m = Enemies.Find(e => e != null && e.Camp && e.MobName == RockEaterName && e.actor.IsAlive); if (m == null) return null;
+                var r = Rider(m); if (r == null || !r.actor.IsAlive) return "Nix down, the beast " + (m.BlowScale > 1 ? "rampaging" : "calm");
+                if (r.Inside == m) return "Nix in the saddle";
+                return (SimCompanion.Held(r) ? "Nix held " + r.ControlSecondsLeft.ToString("0") + "s" : "Nix free") + ", the beast " + Mathf.RoundToInt(m.actor.Health.Pool.Ratio * 100) + "%" + (m.BlowScale > 1 ? " goaded" : "");
+            }
+        }
         float duoMendAt; bool duoRampaging;
         void TickDuo()
         {

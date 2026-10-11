@@ -88,12 +88,12 @@ namespace Crulanda.Encounter
                 call = "Lusk roars: \"Overseers! Earn your cut!\"", callShort = "Earn your cut!",
                 enrage = "Lusk throws the tally book down and comes round the table." },
             // Nix's two-part fight (D5): first his engine, then him on foot. Together about one and three-quarter elites of health.
-            new EliteMove { mob = "The Rock-Eater", name = "Rock-Crush", windup = 2, blow = 3.8f, reach = 3.6f, every = 10, knock = 4, health = 1.6f, callReach = 42, callMost = 2,   // health 1.6 (was .95): the duo (2026-10-11, Chris: "the duo boss needs to be tougher")
-                cc = "disorient", ccName = "Shaken", ccSeconds = 3, ccEvery = 12, ccReach = 5, ccText = "The floor heaves under the Rock-Eater: the cave swims round you.",
+            new EliteMove { mob = "The Rock-Eater", name = "Rock-Crush", windup = 2, blow = 3.8f, reach = 3.6f, every = 10, knock = 4, health = 1.3f, callReach = 42, callMost = 2,   // health 1.3 (was .95): the duo (2026-10-11, Chris: "the duo boss needs to be tougher"; 1.6 with the mend was a stalemate)
+                cc = "disorient", ccName = "Shaken", ccSeconds = 3, ccEvery = 20, ccReach = 5, ccText = "The floor heaves under the Rock-Eater: the cave swims round you.",
                 call = "The Rock-Eater bellows across the workshop. The guards come running.", callShort = "Bellow",
                 enrage = "The crystals on the Rock-Eater's back blaze violet and it tears at the floor." },
             new EliteMove { mob = "Nix, the turncoat", name = "Goad-Hook", windup = 1.6f, blow = 3.6f, reach = 3.4f, every = 9, disarm = 4, health = .8f, callReach = 66, holdable = true,   // (22 before the Adit was drawn out); holdable: the duo's play is to hold him
-                cc = "fear", ccName = "Shriek", ccSeconds = 3, ccEvery = 15, ccReach = 4, ccText = "Nix shrieks in your face and you run before you know it.",
+                cc = "fear", ccName = "Shriek", ccSeconds = 3, ccEvery = 25, ccReach = 4, ccText = "Nix shrieks in your face and you run before you know it.",
                 call = "Nix shrieks: \"Get them off me!\"", callShort = "Get them off me!",
                 enrage = "Nix stops dodging and comes at you with the goad in both hands." },
             new EliteMove { mob = "Cinder-Warden Ysolt", name = "Ember Blow", windup = 2, blow = 4.2f, reach = 3.8f, every = 10, callReach = 42, callMost = 2,

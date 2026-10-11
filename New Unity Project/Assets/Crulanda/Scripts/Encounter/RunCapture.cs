@@ -67,7 +67,7 @@ namespace Crulanda.Encounter
             {
                 float t = Time.time - start; var me = s.Player.transform.position;
                 // The leader's state when nothing moves (every 20 s of nobody fighting), to see what holds the run.
-                if (Time.time >= idleLogAt) { idleLogAt = Time.time + 20; Log(Clock(t) + (s.InCombat ? "  fighting: " : "  quiet: ") + string.Join("; ", s.PartySims.Where(c => c != null).Select(c => c.sim.name.Split(' ')[0] + " " + (c.Activity ?? "").ToLower() + " (" + Vector3.Distance(c.transform.position, me).ToString("0") + " m)")) + "; bags " + s.Progress.bag.Take(Inventory.BagSize).Count(b => !b.Empty) + "/" + Inventory.BagSize); }
+                if (Time.time >= idleLogAt) { idleLogAt = Time.time + 20; Log(Clock(t) + (s.InCombat ? "  fighting: " : "  quiet: ") + string.Join("; ", s.PartySims.Where(c => c != null).Select(c => c.sim.name.Split(' ')[0] + " " + (c.Activity ?? "").ToLower() + " (" + Vector3.Distance(c.transform.position, me).ToString("0") + " m)")) + "; bags " + s.Progress.bag.Take(Inventory.BagSize).Count(b => !b.Empty) + "/" + Inventory.BagSize + (s.DuoState != null ? "; " + s.DuoState : "")); }
                 // A camp cleared: the leader moves its mark on.
                 if (leader.CampsLeft < left) { Log(Clock(t) + "  camp " + (camps - leader.CampsLeft) + "/" + camps + " cleared: " + leadingName + "; next " + leader.LeadingName); left = leader.CampsLeft; }
                 if (leader.LeadingName != leadingName)

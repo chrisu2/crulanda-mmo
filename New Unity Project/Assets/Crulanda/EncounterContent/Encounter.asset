@@ -1060,6 +1060,102 @@ MonoBehaviour:
     globalCooldown: 1.5
     duration: 3
     statusId:
+  - id: salt.shard
+    name: Salt Shard
+    description: "A shard of salt crystal thrown at up to 25 metres. The Wasting's things take a quarter more."
+    effect: 0
+    power: 8
+    cost: 10
+    cooldown: 0
+    range: 25
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 0
+    statusId:
+  - id: salt.binding
+    name: Binding Salt
+    description: "A handful of salt thrown with the chant: the target is held in white crystal for 8 seconds. Striking it breaks the hold."
+    effect: 4
+    power: 0
+    cost: 25
+    cooldown: 20
+    range: 15
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 8
+    statusId:
+  - id: salt.ward
+    name: Salt-Ward
+    description: "A ward of salt-stone on you for 10 seconds; each blow it takes is grounded back into Salt."
+    effect: 2
+    power: 20
+    cost: 20
+    cooldown: 12
+    range: 0
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 10
+    statusId:
+  - id: salt.seal
+    name: Seal the Wound
+    description: "A sharp handful of salt: light damage, and the target is silenced for 3 seconds."
+    effect: 4
+    power: 6
+    cost: 15
+    cooldown: 12
+    range: 20
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 3
+    statusId:
+  - id: salt.line
+    name: Draw the Line
+    description: "A line of salt across the ground: the target must come for you for 4 seconds."
+    effect: 1
+    power: 0
+    cost: 10
+    cooldown: 8
+    range: 20
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 4
+    statusId:
+  - id: salt.sung_wall
+    name: Sung Wall
+    description: "A wall of salt sung up around you: the party within 8 metres takes 15% less for 8 seconds."
+    effect: 2
+    power: 15
+    cost: 30
+    cooldown: 30
+    range: 0
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 8
+    statusId:
+  - id: salt.sifting
+    name: Song of Sifting
+    description: "Salt sung down over the target's ground: every enemy within 4 metres of it burns each second for 5 seconds."
+    effect: 0
+    power: 4
+    cost: 30
+    cooldown: 15
+    range: 25
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 5
+    statusId:
+  - id: salt.calcify
+    name: Calcify
+    description: "The target crusted into salt and stunned for 3 seconds; the Wasting's things 2 seconds more. Talent."
+    effect: 4
+    power: 6
+    cost: 20
+    cooldown: 25
+    range: 20
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 3
+    statusId:
   - id: ability.shield_bash
     name: Shield Bash
     description: "A blow with the shield's face: stops the target's blow and silences it 3 seconds."
@@ -1545,6 +1641,49 @@ MonoBehaviour:
         level: 1
         talentId: ca-chorus
     talentTree: {fileID: 4900000, guid: 4a212c4a60b94032aed04b1295fd0325, type: 3}
+  - definition:
+      id: class.saltmender
+      displayName: Salt-Mender
+      role: 4
+      resource: 5
+      maxResource: 100
+      combatRegen: 4
+      restingRegen: 20
+      stats:
+        baseHealth: 165
+        healthPerLevel: 20
+        healthPerStamina: 5
+        baseAttackPower: 8
+        attackPowerPerLevel: 1
+        attackPowerPerStrength: 1
+        spellPowerPerIntellect: 2
+        armorPerAgility: 1
+      unlocks:
+      - abilityId: salt.shard
+        level: 1
+        talentId:
+      - abilityId: salt.binding
+        level: 2
+        talentId:
+      - abilityId: salt.ward
+        level: 3
+        talentId:
+      - abilityId: salt.seal
+        level: 4
+        talentId:
+      - abilityId: salt.line
+        level: 5
+        talentId:
+      - abilityId: salt.sung_wall
+        level: 6
+        talentId:
+      - abilityId: salt.sifting
+        level: 8
+        talentId:
+      - abilityId: salt.calcify
+        level: 1
+        talentId: ss-calcify
+    talentTree: {fileID: 4900000, guid: b7e94b011c294431bd9be85595f3273a, type: 3}
   questFiles:
   - {fileID: 4900000, guid: dadeaa3314444542a04b4e17d9dbc0c4, type: 3}
   - {fileID: 4900000, guid: 2f37ccf5ed8d46928976a7b5854444ed, type: 3}

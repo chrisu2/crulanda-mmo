@@ -1,0 +1,57 @@
+{
+ "id": "saltmender",
+ "name": "Salt-Mender",
+ "resource": "Salt",
+ "resourceDesc": "Salt, a pouch of a hundred, pays for every working; it comes back slowly in a fight and quickly out of one, from the earth itself, and a ward that is struck grounds the blow into it.",
+ "identity": "The salt-magic of the West: bind the Chaos, seal the Wound, sing a wall into place. Not a healer: salt holds, wards and burns the Wasting's things.",
+ "branches": [
+  {
+   "id": "salt-speaker",
+   "name": "Salt-Speaker",
+   "role": "control",
+   "loop": "Bind the one you don't want in white crystal, seal the caster's mouth, and calcify what breaks loose; what your salt holds, the party hits harder.",
+   "tradeoff": "Every hold is Salt not thrown as shards, and a bound foe is not a dead one.",
+   "nodes": [
+    {"id": "ss-long-binding", "name": "Long Binding", "tier": 0, "col": 1, "max": 5, "req": null, "kind": "passive", "icon": "clock", "desc": "Binding Salt holds 1s longer per rank.", "emphasis": {"control": 1}, "impl": true},
+    {"id": "ss-quick-chant", "name": "Quick Chant", "tier": 0, "col": 2, "max": 3, "req": null, "kind": "modifier", "icon": "bolt", "desc": "Seal the Wound comes back 2s sooner per rank.", "emphasis": {"control": 1}, "impl": true},
+    {"id": "ss-first-sea", "name": "Salt of the First Sea", "tier": 1, "col": 0, "max": 3, "req": null, "kind": "modifier", "icon": "crystal", "desc": "Binding Salt costs 5 less Salt per rank.", "emphasis": {"tempo": 1}, "impl": true},
+    {"id": "ss-calcify", "name": "Calcify", "tier": 1, "col": 1, "max": 1, "req": null, "kind": "active", "icon": "chain", "desc": "New action: Calcify: the target crusted into salt and stunned for 3s; the Wasting's things 2s more.", "emphasis": {"control": 3}, "impl": true},
+    {"id": "ss-white-crust", "name": "White Crust", "tier": 1, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "target", "desc": "A foe your salt holds (bound, sealed or calcified) takes 3% more from the party per rank.", "emphasis": {"damage": 1, "support": 1}, "impl": true},
+    {"id": "ss-deep-crystal", "name": "Deep Crystal", "tier": 2, "col": 1, "max": 3, "req": "ss-calcify", "kind": "passive", "icon": "clock", "desc": "Calcify holds half a second longer per rank.", "emphasis": {"control": 1.5}, "impl": true},
+    {"id": "ss-sealed", "name": "I Seal the Wound", "tier": 2, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "star", "desc": "Seal the Wound silences twice as long.", "emphasis": {"control": 2}, "impl": true}
+   ]
+  },
+  {
+   "id": "mason",
+   "name": "Mason",
+   "role": "tank",
+   "loop": "Draw the line and stand behind your Salt-Ward: every blow it takes is grounded back into Salt; sing the wall up when the party is hard pressed.",
+   "tradeoff": "The Mason holds the line on wards that must be kept up; let the ward fall and there is only robe and salt between you and the blow.",
+   "nodes": [
+    {"id": "ms-thick-salt", "name": "Thick Salt", "tier": 0, "col": 1, "max": 5, "req": null, "kind": "passive", "icon": "shield", "desc": "Salt-Ward is 8% stronger per rank.", "emphasis": {"mitigation": 1}, "impl": true},
+    {"id": "ms-grounding", "name": "Grounding", "tier": 0, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "crystal", "desc": "Each blow your Salt-Ward takes grounds 1 more Salt per rank.", "emphasis": {"sustain": 1}, "impl": true},
+    {"id": "ms-mortar", "name": "Sap-and-Salt Mortar", "tier": 1, "col": 0, "max": 3, "req": null, "kind": "passive", "icon": "shield", "desc": "You take 2% less per rank.", "emphasis": {"mitigation": 1}, "impl": true},
+    {"id": "ms-line-held", "name": "Line Held", "tier": 1, "col": 1, "max": 3, "req": null, "kind": "modifier", "icon": "chain", "desc": "Draw the Line holds 1s longer and draws more hate per rank.", "emphasis": {"threat": 1.5}, "impl": true},
+    {"id": "ms-spiked-wall", "name": "Spiked Wall", "tier": 1, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "sword", "desc": "While your Salt-Ward holds, a foe that strikes you takes 3 and 2 more per rank.", "emphasis": {"damage": 0.5, "threat": 0.5}, "impl": true},
+    {"id": "ms-wide-wall", "name": "Wide Wall", "tier": 2, "col": 1, "max": 3, "req": "ms-thick-salt", "kind": "modifier", "icon": "target", "desc": "Sung Wall reaches 2m further and turns 3% more per rank.", "emphasis": {"support": 1.5}, "impl": true},
+    {"id": "ms-mason-of-the-weave", "name": "Mason of the Weave", "tier": 2, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "star", "desc": "Salt-Ward also wards everyone in your party within 8m at half its worth.", "emphasis": {"support": 2, "mitigation": 1}, "impl": true}
+   ]
+  },
+  {
+   "id": "sifter",
+   "name": "Sifter",
+   "role": "dps",
+   "loop": "Throw salt shards from range, sing the Song of Sifting over a pack, and save the deepest burn for the Wasting's things.",
+   "tradeoff": "The Sifter's shards are thin against the living: its strength is against the Weave-Eaters and the Hollow Men.",
+   "nodes": [
+    {"id": "sf-sharp-salt", "name": "Sharp Salt", "tier": 0, "col": 1, "max": 5, "req": null, "kind": "passive", "icon": "dagger", "desc": "Salt Shard hits 3% harder per rank.", "emphasis": {"damage": 1}, "impl": true},
+    {"id": "sf-sifting-song", "name": "The Song of Sifting", "tier": 0, "col": 2, "max": 3, "req": null, "kind": "modifier", "icon": "note", "desc": "The Song of Sifting lasts 1s longer per rank.", "emphasis": {"damage": 1}, "impl": true},
+    {"id": "sf-bane", "name": "Bane of the Wasting", "tier": 1, "col": 0, "max": 3, "req": null, "kind": "passive", "icon": "skull", "desc": "Your salt hits the Wasting's things 8% harder per rank.", "emphasis": {"damage": 1}, "impl": true},
+    {"id": "sf-light-hand", "name": "Light Hand", "tier": 1, "col": 1, "max": 3, "req": null, "kind": "modifier", "icon": "bolt", "desc": "Salt Shard costs 2 less Salt per rank.", "emphasis": {"tempo": 1}, "impl": true},
+    {"id": "sf-brine", "name": "Brine", "tier": 1, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "drop", "desc": "Salt Shard slows its target 10% per rank for 3s.", "emphasis": {"control": 1}, "impl": true},
+    {"id": "sf-crystal-rain", "name": "Crystal Rain", "tier": 2, "col": 1, "max": 3, "req": "sf-sharp-salt", "kind": "modifier", "icon": "target", "desc": "The Song of Sifting falls 1m wider per rank.", "emphasis": {"damage": 1}, "impl": true},
+    {"id": "sf-split-shard", "name": "Split Shard", "tier": 2, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "star", "desc": "Salt Shard splits: a second shard at half strikes a foe within 5m of the target.", "emphasis": {"damage": 2}, "impl": true}
+   ]
+  }
+ ]
+}

@@ -329,6 +329,7 @@ namespace Crulanda.Encounter
             if (Hidden) Pounce();
             if (TappedBy == null && source != null && !Game) TappedBy = source.EntityId.Value;
             int actual = actor.GetComponent<Combatant>().Damage(Mathf.RoundToInt(damage * session.Kit.PartyDamageMultiplier(this) * OverTakenNow));
+            if (!Game && source != null) session.Meter.Damage(source, actual);
             if (actor.IsAlive && Figure != null) Figure.Flinch();
             if (actor.IsAlive) ControlStruck();   // a hold breaks on damage (EncounterEnemy.Control)
             if (Game) { if (actor.IsAlive) GetComponent<GameAnimal>()?.Bolt(source != null ? source.transform.position : transform.position); }

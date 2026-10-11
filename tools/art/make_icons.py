@@ -2407,6 +2407,8 @@ def build_all(C):
             out.append(('gear/' + safe(fam) + '__' + pal, gear_icon(fam + pal, looks, (fam, FAMILIES[fam][0], pal, False)), fam + '/' + pal, 1, False))
     # by kind (new content without a picture yet) and by slot (the Armoury's unknown pieces: grey)
     for k, spec in KINDS.items(): out.append(('kind/' + k, plain_icon('kind' + k, spec), 'kind:' + k, 1, False))
+    for k, (bg, fn) in MARKS.items():
+        c = Icon('mark' + k, bg); fn(c); out.append(('mark/' + k, c, 'mark:' + k, 1, False))
     for slot, (fam, var) in SLOT_SILHOUETTE.items():
         c = Icon('slot' + slot, SLOT_FALLBACK_BG); draw_gear(c, mkpal(GREY), fam, var, False); out.append(('slot/' + slot, c, 'slot:' + slot, 0, False))
     return out, missing
@@ -2490,6 +2492,80 @@ def a_cinder_burst(c):
     for x, y in ((18, 22), (82, 24), (16, 80), (84, 82), (50, 12)): c.spark(x, y, 7, '#ffd070', .8)
 ABILITIES.update({'mage.kindle_hound': ('#3a1e10', a_kindle_hound), 'mage.stoke': ('#40200e', a_stoke), 'mage.cinder_burst': ('#3a1a0e', a_cinder_burst)})
 BRANCH.update({'cinderwright': ('#3a1e10', ['#ff7a2a', '#ffd070', '#ffb040', '#e0503a', '#fff2c0'])})
+
+# ---- the Salt-Mender (Phase 9.2, 2026-10-11; CLASS_BUILD_MATRIX.md): salt shards, the binding, the ward, the seal, the line, the wall,
+# the sifting song, calcify ----
+SALT = '#eeeee4'
+def m_crystal(c, x, y, h, w, rot, color=SALT, glow=None):
+    c.push(rot=rot, cx=x, cy=y)
+    shard = c.poly([(x - w, y + h * .2), (x, y - h * .6), (x + w, y + h * .2), (x, y + h * .5)])
+    c.part(shard, color, 'gem'); c.part(c.AND(shard, c.rect(0, -20, x, 140)), lite(color, .5), 'gem', ink=False, light=.5)
+    c.pop()
+def a_salt_shard(c):
+    c.back(c.ell(50, 50, 36), '#cfe8ff', .35, 10)
+    for y in (34, 50, 66): c.glow(c.taper([(10, y + 10), (36, y)], .5, 3, smooth=False), '#f4f4ea', halo=4, power=.4)
+    m_crystal(c, 60, 46, 44, 11, 45); c.spark(80, 22, 8, '#ffffff', .8)
+def a_binding_salt(c):
+    c.back(c.ell(50, 52, 38), '#e8e8dc', .45, 10)
+    for i in range(9): m_crystal(c, 22 + (i % 5) * 14, 40 + (i // 5) * 22 + (i % 2) * 6, 22, 6, (i * 37) % 60 - 30)
+    rings(c, 50, 52, (38,), '#ffffff', .6, w=3)
+def a_salt_ward(c):
+    c.back(c.ell(50, 50, 38), '#dfe8f0', .4, 10)
+    m_shield(c, '#d8d8cc', '#ffffff'); m_crystal(c, 50, 48, 30, 8, 0)
+def a_seal_wound(c):
+    c.back(c.ell(50, 50, 36), '#f0e8d0', .4, 10)
+    c.part(c.ell(50, 54, 22, 14), '#5a2a26', 'matte'); c.part(c.rect(28, 50, 72, 58, 3), SALT, 'gem')
+    for x in (30, 50, 70): m_crystal(c, x, 30, 18, 5, (x - 50) * .6)
+def a_draw_line(c):
+    c.back(c.ell(50, 50, 38), '#e0d8c0', .35, 10)
+    c.part(c.rect(10, 60, 90, 68, 3), SALT, 'gem'); c.spark(50, 64, 10, '#ffffff', .8)
+    c.part(c.poly([(50, 18), (62, 40), (54, 38), (54, 52), (46, 52), (46, 38), (38, 40)]), '#d83a2a', 'soft')
+def a_sung_wall(c):
+    c.back(c.ell(50, 50, 40), '#cfe8ff', .4, 12)
+    for i in range(6): m_crystal(c, 18 + i * 13, 58 - abs(i - 2.5) * 4, 40, 8, 0)
+    rings(c, 50, 56, (40,), '#ffffff', .5, a0=200, a1=340, w=3)
+def a_sifting(c):
+    c.back(c.ell(50, 34, 30), '#f4f4ea', .4, 10)
+    for i in range(14): x = 16 + (i * 29) % 70; y = 22 + (i * 17) % 60; c.spark(x, y, 4 + (i % 3), '#ffffff', .7)
+    c.part(c.ell(50, 82, 30, 8), '#cfcfc4', 'matte')
+def a_calcify(c):
+    c.back(c.ell(50, 50, 38), '#e8e8dc', .45, 10)
+    body = c.poly([(36, 86), (34, 50), (40, 30), (50, 22), (60, 30), (66, 50), (64, 86)], smooth=True, n=3)
+    c.part(body, '#8a8a84', 'matte'); c.part(body, SALT, 'gem', alpha=.55)
+    for x, y in ((40, 40), (60, 46), (46, 66), (58, 74)): m_crystal(c, x, y, 16, 5, (x * 7) % 40 - 20)
+ABILITIES.update({'salt.shard': ('#2a3440', a_salt_shard), 'salt.binding': ('#30302a', a_binding_salt), 'salt.ward': ('#2a3038', a_salt_ward),
+                  'salt.seal': ('#3a2a24', a_seal_wound), 'salt.line': ('#33302a', a_draw_line), 'salt.sung_wall': ('#24303c', a_sung_wall),
+                  'salt.sifting': ('#2e2e2a', a_sifting), 'salt.calcify': ('#30302c', a_calcify)})
+BRANCH.update({'salt-speaker': ('#30302a', ['#eeeee4', '#cfe8ff', '#d8d0b0', '#ffffff', '#c8c0a0']),
+               'mason': ('#2e2c28', ['#d8d8cc', '#8a8a84', '#cfe8ff', '#e0b040', '#c8c0b0']),
+               'sifter': ('#28303a', ['#f4f4ea', '#9fc8ff', '#cfcfc4', '#ffffff', '#e0e8f0'])})
+
+# ---- the marks over a mob's name (2026-10-11, Chris: "you say Moon it really need to show an ICon", "show who is CCd"): the raid
+# marks (skull, moon, cross) and the holds (held, stunned, feared, silenced). Icons/mark/<id>, drawn by EncounterHud on the nameplate.
+def k_skull(c):
+    c.part(c.ell(50, 44, 26, 24), '#f4f4ee', 'matte'); c.part(c.rect(36, 60, 64, 76, 4), '#f4f4ee', 'matte')
+    for x in (40, 60): c.part(c.ell(x, 44, 7, 8), '#1a1a22', 'matte')
+    c.part(c.poly([(50, 54), (45, 62), (55, 62)]), '#1a1a22', 'matte')
+    for x in (42, 50, 58): c.part(c.rect(x - 2, 66, x + 2, 76, 1), '#1a1a22', 'matte')
+def k_moon(c):
+    c.part(c.sub(c.ell(50, 50, 30), c.ell(62, 44, 26)), '#bfe0ff', 'soft'); c.spark(72, 30, 7, '#ffffff', .8)
+def k_cross(c):
+    c.part(c.poly([(28, 22), (38, 22), (50, 40), (62, 22), (72, 22), (56, 50), (72, 78), (62, 78), (50, 60), (38, 78), (28, 78), (44, 50)]), '#ff5a48', 'soft')
+def k_held(c):
+    for i, (x, y) in enumerate(((26, 30), (42, 46), (58, 62))):
+        r = 45 if i % 2 == 0 else -45
+        c.part(c.sub(c.ell(x, y, 13, 8, rot=r), c.ell(x, y, 7, 3, rot=r)), '#dfe6ee', 'metal')
+    c.part(c.sub(c.ell(70, 72, 12), c.ell(70, 72, 6)), '#dfe6ee', 'metal')
+def k_stunned(c):
+    for x, y, r in ((30, 40, 9), (50, 26, 11), (70, 40, 9)): c.spark(x, y, r, '#fff0a0', .9)
+    c.part(c.poly([(46, 44), (60, 44), (52, 60), (62, 60), (40, 84), (46, 66), (38, 66)]), '#ffd040', 'soft')
+def k_feared(c):
+    for y in (36, 52, 68): c.glow(c.taper([(14, y), (74, y - 6)], .5, 4, smooth=False), '#c8b0ff', halo=5, power=.6)
+    c.part(c.poly([(70, 22), (88, 44), (70, 66), (74, 44)]), '#e0d0ff', 'soft')
+def k_silenced(c):
+    c.part(c.ell(50, 50, 28), '#8a94a0', 'matte'); c.part(c.ell(50, 50, 20), '#2a2e36', 'matte')
+    c.part(c.rect(24, 46, 76, 54, 3), '#ff5a48', 'soft')
+MARKS = {'skull': ('#30303a', k_skull), 'moon': ('#1e2a44', k_moon), 'cross': ('#3a2222', k_cross), 'held': ('#2a2e36', k_held), 'stunned': ('#3a3418', k_stunned), 'feared': ('#2c2440', k_feared), 'silenced': ('#2a2e36', k_silenced)}
 
 def main():
     here = os.path.dirname(os.path.abspath(__file__))

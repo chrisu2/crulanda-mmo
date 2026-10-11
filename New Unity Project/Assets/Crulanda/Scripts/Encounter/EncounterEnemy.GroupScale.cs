@@ -14,7 +14,11 @@ namespace Crulanda.Encounter
     {
         // Raised (playtest note 91, 2026-10-07: "mobs still way too easy in group, can level without healer or CC"): a sim adds about
         // a player's worth of health to the mob and nearly half again of its blows, so a group's tank needs a healer and the pulls a plan.
-        public const float HealthPerShare = 1f, DamagePerShare = .45f, MinShare = .25f, MaxShare = 1.25f;
+        // Eased 2026-10-11 for the party of five (the group run of the Adit, RunCapture: four level-11 sims made each level-10 picket
+        // 2,106 health hitting for 72 against people of 415, and a full group with a Druid mending every 2.5 s died ten times at the first
+        // camp without clearing it): three fifths of a player's health and a fifth of its blows per share, so five against a camp of three
+        // is a fight a healer can keep up with.
+        public const float HealthPerShare = .6f, DamagePerShare = .2f, MinShare = .25f, MaxShare = 1.25f;
         float unscaledHealth = -1;
         /// <summary>The group shares this mob is scaled for (0: not scaled).</summary>
         public float GroupShares { get; private set; }

@@ -313,7 +313,7 @@ namespace Crulanda.Encounter
             {
                 var c = s.Companion.actor.GetComponent<Combatant>();
                 c.Apply(new StatusEffectDefinition { id = "status.shared_shelter", name = "Shared shelter", duration = 5, incomingDamageMultiplier = .7f });
-                int healed = c.Heal(20);
+                int healed = c.Heal(20, s.Player);
                 s.AddHealingThreat(healed);
                 s.FloatText(s.Companion.transform.position, "+" + healed, new Color(.3f, 1, .7f));
             }

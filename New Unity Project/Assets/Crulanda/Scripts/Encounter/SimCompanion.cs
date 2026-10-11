@@ -87,11 +87,19 @@ namespace Crulanda.Encounter
             return d.value > 0 ? RollChoice.Greed : RollChoice.Pass;
         }
         public static int MaxHealthFor(SimAdventurer s) { return (s.classId == "class.warrior" || s.classId == "class.paladin" ? 150 : 115) + 22 * Mathf.Max(1, s.level); }
+        /// <summary>The armour of the pieces a sim wears (SimGear.For: its class's weight at its level), summed as the player's is.</summary>
+        public static int ArmourFor(SimAdventurer s, ItemDatabase items)
+        {
+            int armour = 0; if (s == null || items == null) return 0;
+            foreach (var id in SimGear.For(s, items)) { var d = items.Get(id); if (d != null) armour += d.armor; }
+            return armour;
+        }
 
         public void Init(Actor a, EncounterSession s, SimAdventurer data, int partySlot)
         {
             actor = a; session = s; sim = data; slot = partySlot; agent = GetComponent<NavMeshAgent>(); visual = GetComponent<ActorVisual>();
             actor.Stats.SetBase(Crulanda.Core.StatType.MaxHealth, MaxHealthFor(sim)); actor.Health.ApplyHealing(actor.Health.Pool.Max);
+            actor.Stats.SetBase(Crulanda.Core.StatType.Armor, ArmourFor(sim, session.Items));   // what it wears turns blows as yours does (2026-10-11; it had no armour at all)
             nextAct = Time.time + .5f + slot * .3f; joinedAt = Time.time;
         }
         /// <summary>What this grouping was worth to it (5.5): a point a minute, one for every three kills.</summary>
@@ -302,7 +310,7 @@ namespace Crulanda.Encounter
                 var who = healing; healing = null; if (visual != null) visual.Casting = false;
                 if (who.IsAlive && Vector3.Distance(who.transform.position, transform.position) <= 28)
                 {
-                    int healed = who.GetComponent<Combatant>().Heal(MendFor(who));
+                    int healed = who.GetComponent<Combatant>().Heal(MendFor(who), actor);
                     session.FloatText(who.transform.position, "+" + healed, new Color(.3f, 1, .7f)); session.HealThreat(actor, healed);
                     visual?.CastRelease(); if (healed > 0) HealFx.Show(who.transform);
                 }

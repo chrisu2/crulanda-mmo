@@ -132,7 +132,7 @@ namespace Crulanda.Encounter
         int HealActor(Actor target, int amount)
         {
             if (target == null || !target.IsAlive || amount <= 0) return 0;
-            int healed = target.GetComponent<Combatant>().Heal(amount);
+            int healed = target.GetComponent<Combatant>().Heal(amount, s.Player);
             if (healed > 0) { s.AddHealingThreat(healed); s.FloatText(target.transform.position, "+" + healed, new Color(1, .95f, .6f)); }
             return healed;
         }
@@ -280,7 +280,7 @@ namespace Crulanda.Encounter
         /// <summary>Shared Heat: each of its bites builds your Heat.</summary>
         public void OnPetBite(EncounterEnemy target, int bite) { if (R("cw-shared-heat") > 0) GainHeat(R("cw-shared-heat")); }
         /// <summary>Kinship: an Ember Bolt that lands mends the hound.</summary>
-        void MendHound() { int k = R("cw-kinship"); if (k > 0 && HoundUp) Hound.actor.GetComponent<Combatant>().Heal(Mathf.RoundToInt(Hound.actor.Health.Pool.Max * .02f * k)); }
+        void MendHound() { int k = R("cw-kinship"); if (k > 0 && HoundUp) Hound.actor.GetComponent<Combatant>().Heal(Mathf.RoundToInt(Hound.actor.Health.Pool.Max * .02f * k), s.Player); }
         /// <summary>Kindle Hound: the ember hound at your side; again, it sinks back into the embers.</summary>
         bool KindleHound(AbilityDefinition a)
         {

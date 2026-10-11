@@ -16,6 +16,15 @@ namespace Crulanda.Encounter
         void OnPetBite(EncounterEnemy target, int bite);
     }
 
+    /// <summary>A party sim Ranger as its wolf's keeper: a plain wolf, no talents.</summary>
+    public sealed class SimPetMaster : IPetMaster
+    {
+        public float PetHealthScale { get { return 1; } }
+        public float PetBiteScale { get { return 1; } }
+        public bool PetHolds { get { return false; } }
+        public void OnPetBite(EncounterEnemy target, int bite) { }
+    }
+
     /// <summary>
     /// The Ranger's wolf (Phase 5.1b): a grey wolf on the pack's model (ActorLook.Wolf) that keeps to heel like Mira does, hunts
     /// joins whatever the Ranger fights (note 90), goes where the Ranger sets it (Sic; with Pack Sense whatever the Ranger shoots, the first bite harder), bites every two seconds with threat of its
@@ -30,6 +39,10 @@ namespace Crulanda.Encounter
         public IPetMaster kit;
         /// <summary>What it is called in what you are told ("wolf", "hound").</summary>
         public string Kind = "wolf";
+        /// <summary>Whose it is: you (null) or a party sim's (a sim Ranger's wolf, 2026-10-11, Chris: "need a paladin, ranger pet, etc"): it
+        /// heels to that sim and joins whatever that sim fights.</summary>
+        public SimCompanion Master;
+        Transform Heel { get { return Master != null ? Master.transform : session.Player.transform; } }
         NavMeshAgent agent; ActorVisual visual;
         float nextBite, nextCatchUp, fury = 1; int baseHealth;
         /// <summary>What it is hunting (null at heel).</summary>
@@ -68,8 +81,8 @@ namespace Crulanda.Encounter
         /// </summary>
         void Assist()
         {
-            var t = session.Target;
-            if (t != null && t.actor.IsAlive && session.FightingTarget && session.Distance(t) < 30) { Hunt(t, 1); return; }
+            var t = Master != null ? Master.Quarry : session.Target;
+            if (t != null && t.actor.IsAlive && (Master != null || session.FightingTarget) && Vector3.Distance(Heel.position, t.transform.position) < 30) { Hunt(t, 1); return; }
             EncounterEnemy best = null; float bestD = 25;
             foreach (var e in session.Enemies)
             {
@@ -86,8 +99,8 @@ namespace Crulanda.Encounter
         void Update()
         {
             if (session == null || session.Paused || actor == null || !actor.IsAlive) return;
-            var player = session.Player; if (player == null) return;
-            if (Quarry != null && (!Quarry.actor.IsAlive || !Quarry.Engaged && session.Distance(Quarry) > 40)) { Quarry = null; fury = 1; }
+            var player = Heel; if (player == null || (Master != null && !Master.actor.IsAlive)) return;
+            if (Quarry != null && (!Quarry.actor.IsAlive || !Quarry.Engaged && Vector3.Distance(player.position, Quarry.transform.position) > 40)) { Quarry = null; fury = 1; }
             if (Quarry == null) { if (Mode == Order.Assist) Assist(); else Defend(); }
             float toPlayer = Vector3.Distance(transform.position, player.transform.position);
             if (Time.time >= nextCatchUp)

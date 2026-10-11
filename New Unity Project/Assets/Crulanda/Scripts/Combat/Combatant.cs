@@ -51,7 +51,14 @@ namespace Crulanda.Combat
             }
             return mitigated > 0 ? actor.Health.ApplyDamage(mitigated) : 0;
         }
-        public int Heal(int amount) { return actor.Health.ApplyHealing(amount); }
+        /// <summary>Raised on every mend with a named healer (healer, healed, amount): the party's meter listens (CombatMeter).</summary>
+        public static event System.Action<Actor, Actor, int> Healed;
+        public int Heal(int amount, Actor by = null)
+        {
+            int healed = actor.Health.ApplyHealing(amount);
+            if (by != null && healed > 0) Healed?.Invoke(by, actor, healed);
+            return healed;
+        }
         public bool Apply(StatusEffectDefinition definition)
         {
             Statuses.Tick(Time.time);

@@ -141,7 +141,7 @@ namespace Crulanda.Encounter
         int HealActor(Actor target, int amount)
         {
             if (target == null || !target.IsAlive || amount <= 0) return 0;
-            int healed = target.GetComponent<Combatant>().Heal(amount); if (healed > 0) HealFx.Show(target.transform);
+            int healed = target.GetComponent<Combatant>().Heal(amount, s.Player); if (healed > 0) HealFx.Show(target.transform);
             if (healed > 0) { s.AddHealingThreat(healed); s.FloatText(target.transform.position, "+" + healed, new Color(1, .95f, .6f)); }
             return healed;
         }

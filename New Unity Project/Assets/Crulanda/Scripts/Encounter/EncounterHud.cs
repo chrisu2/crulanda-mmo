@@ -101,6 +101,7 @@ namespace Crulanda.Encounter
             if (session.MapOpen) maps.DrawWindow(session, gold, ink);
             if (session.QuestBookOpen) DrawQuestBook();
             if (session.WhoOpen) DrawWho();
+            if (session.MeterOpen) DrawMeter();
             if (session.Conversation != null) DrawConversation();
             DrawLoot();
             if (uiUnlocked) DrawPanelHandles();
@@ -169,7 +170,7 @@ namespace Crulanda.Encounter
         }
         static Color ResourceColor(Crulanda.Core.ResourceKind kind)
         {
-            switch (kind) { case Crulanda.Core.ResourceKind.Mana: return new Color(.18f, .38f, .9f); case Crulanda.Core.ResourceKind.Breath: return new Color(.2f, .66f, .62f); default: return new Color(.86f, .62f, .16f); }
+            switch (kind) { case Crulanda.Core.ResourceKind.Mana: return new Color(.18f, .38f, .9f); case Crulanda.Core.ResourceKind.Breath: return new Color(.2f, .66f, .62f); case Crulanda.Core.ResourceKind.Salt: return new Color(.86f, .86f, .8f); default: return new Color(.86f, .62f, .16f); }
         }
 
         // ---------- frames ----------
@@ -503,6 +504,7 @@ namespace Crulanda.Encounter
                 case "class.mage": return new Color(.6f, .45f, .95f);
                 case "class.rogue": return new Color(.95f, .85f, .35f);
                 case "class.archivist": return new Color(.55f, .8f, 1f);
+                case "class.saltmender": return new Color(.92f, .92f, .86f);
                 default: return new Color(.78f, .61f, .43f);
             }
         }
@@ -811,13 +813,24 @@ namespace Crulanda.Encounter
                 }
                 // Level-coloured names (grey, green, yellow, orange, red by how the enemy compares to you).
                 Outlined(new Rect(a.x - 150, a.y - 25, 300, 22), p.name, plateText, target ? gold : ConColor(p.e.actor.Level));
-                if (p.e.RaidMarked != RaidMark.None)   // the raid mark above the name (CC step C3)
-                    Outlined(new Rect(a.x - 150, a.y - 45, 300, 22), p.e.RaidMarked == RaidMark.Skull ? "[ SKULL ]" : p.e.RaidMarked == RaidMark.Moon ? "( MOON )" : "< CROSS >", plateText,
+                if (p.e.RaidMarked != RaidMark.None)   // the raid mark above the name (CC step C3): an icon (Chris, 2026-10-11: "you say Moon it really need to show an ICon")
+                {
+                    var icon = Mark(p.e.RaidMarked == RaidMark.Skull ? "skull" : p.e.RaidMarked == RaidMark.Moon ? "moon" : "cross");
+                    if (icon != null) { Fill(new Rect(a.x - 18, a.y - 63, 36, 36), new Color(0, 0, 0, .55f)); GUI.DrawTexture(new Rect(a.x - 16, a.y - 61, 32, 32), icon); }
+                    else Outlined(new Rect(a.x - 150, a.y - 45, 300, 22), p.e.RaidMarked == RaidMark.Skull ? "[ SKULL ]" : p.e.RaidMarked == RaidMark.Moon ? "( MOON )" : "< CROSS >", plateText,
                         p.e.RaidMarked == RaidMark.Skull ? Color.white : p.e.RaidMarked == RaidMark.Moon ? new Color(.6f, .8f, 1) : new Color(1, .4f, .35f));
+                }
                 Fill(new Rect(a.x - 66, a.y - 1, 132, 8), new Color(0, 0, 0, .75f));
                 Bar(new Rect(a.x - 65, a.y, 130, 6), p.e.actor.Health.Pool.Ratio, new Color(.8f, .3f, .25f), "");
                 var held = p.e.ControlLabel;   // crowd control on any mob, not just your target (CC step C4)
-                if (held != null) Outlined(new Rect(a.x - 150, a.y + 6, 300, 20), held, plateText, ControlRings.ColourFor(p.e));
+                if (held != null)
+                {
+                    // Who is held, seen at a glance (Chris, 2026-10-11: "show who is CCd"): the hold's icon beside its name and the plate tinted.
+                    var hc = ControlRings.ColourFor(p.e); var hi = Mark(HoldIcon(held));
+                    Fill(new Rect(a.x - 70, a.y - 27, 140, 26), new Color(hc.r, hc.g, hc.b, .3f));
+                    if (hi != null) { Fill(new Rect(a.x - 100, a.y - 30, 30, 30), new Color(0, 0, 0, .6f)); GUI.DrawTexture(new Rect(a.x - 98, a.y - 28, 26, 26), hi); }
+                    Outlined(new Rect(a.x - 150, a.y + 6, 300, 20), held, plateText, hc);
+                }
                 else if (p.e.Casting && p.e.Cast != null)
                 {
                     Fill(new Rect(a.x - 66, a.y + 9, 132, 6), new Color(0, 0, 0, .75f));
@@ -927,6 +940,33 @@ namespace Crulanda.Encounter
             }
         }
         void Frame(Rect r) { GUI.color = ink; GUI.DrawTexture(r, Texture2D.whiteTexture); GUI.color = Color.white; }
+        /// <summary>The party's damage and healing meter (/meter): a row a member, damage and healing done, and each a second over the
+        /// party's fighting time since the reset. Under the quest tracker on the right.</summary>
+        void DrawMeter()
+        {
+            var m = session.Meter; var rows = new List<CombatMeter.Row>(m.Rows); float t = m.CombatSeconds;
+            var r = new Rect(1100, 456, 340, 44 + 22 * Mathf.Max(1, rows.Count));
+            Fill(r, new Color(0, 0, 0, .55f));
+            GUI.contentColor = gold; GUI.Label(new Rect(r.x + 10, r.y + 6, 200, 20), "DAMAGE AND HEALING", small); GUI.contentColor = Color.white;
+            GUI.Label(new Rect(r.x + 10, r.y + 22, 310, 18), "over " + Mathf.RoundToInt(t) + " s of fighting  ·  /meter reset", tiny);
+            float y = r.y + 42;
+            foreach (var row in rows)
+            {
+                GUI.Label(new Rect(r.x + 10, y, 170, 20), row.name, small);
+                GUI.contentColor = new Color(1, .75f, .5f); GUI.Label(new Rect(r.x + 178, y, 80, 20), row.damage.ToString("N0") + " " + row.Dps(t).ToString("0") + "/s", small);
+                GUI.contentColor = new Color(.5f, 1, .7f); GUI.Label(new Rect(r.x + 256, y, 74, 20), row.healing.ToString("N0") + " " + row.Hps(t).ToString("0") + "/s", small);
+                GUI.contentColor = Color.white; y += 22;
+            }
+            if (rows.Count == 0) GUI.Label(new Rect(r.x + 10, y, 300, 20), "Nothing yet.", small);
+        }
+        static Texture2D Mark(string id) { return IconDb.Load(IconDb.PathFor("mark", id)); }
+        /// <summary>Which hold icon a mob's control label calls for (Icons/mark): held, stunned, feared, silenced; null for none.</summary>
+        static string HoldIcon(string label)
+        {
+            if (string.IsNullOrEmpty(label)) return null;
+            if (label.StartsWith("Held")) return "held"; if (label.StartsWith("Stunned")) return "stunned"; if (label.StartsWith("Fleeing")) return "feared"; if (label.StartsWith("Silenced")) return "silenced";
+            return null;
+        }
         void Bar(Rect r, float fill, Color color, string label)
         {
             GUI.color = new Color(.12f,.15f,.17f); GUI.DrawTexture(r, Texture2D.whiteTexture);

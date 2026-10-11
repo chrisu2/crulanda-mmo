@@ -222,7 +222,7 @@ namespace Crulanda.Encounter
             if (!Need(Bark >= 30, "Barkmend needs 30 Bark.")) return false;
             return Start(a, () => {
                 if (Bark < 30) return; Bark -= 30;
-                int healed = PlayerCombat.Heal(Mathf.RoundToInt(s.Player.Health.Pool.Max * .12f));
+                int healed = PlayerCombat.Heal(Mathf.RoundToInt(s.Player.Health.Pool.Max * .12f), s.Player);
                 s.AddHealingThreat(healed); s.FloatText(s.Player.transform.position, "+" + healed, new Color(.3f, 1, .7f));
             });
         }
@@ -313,7 +313,7 @@ namespace Crulanda.Encounter
         int HealActor(Actor target, int amount)
         {
             if (target == null || !target.IsAlive || amount <= 0) return 0;
-            int healed = target.GetComponent<Combatant>().Heal(amount); if (healed > 0) HealFx.Show(target.transform);
+            int healed = target.GetComponent<Combatant>().Heal(amount, s.Player); if (healed > 0) HealFx.Show(target.transform);
             if (healed > 0) { s.AddHealingThreat(healed); s.FloatText(target.transform.position, "+" + healed, new Color(.3f, 1, .7f)); }
             return healed;
         }

@@ -44,6 +44,25 @@ resolutions", and on the dungeon: "all you did in the dungeon was make it bigger
 to complete". Whoever works on this next: verify everything yourself, show Chris pictures before anything is published, and never call a
 report fixed until he has seen it in his own build.
 
+## 2026-10-11, 15:00-17:00: the Rock-Eater fixed in the game, the fourth paths, the Salt-Mender, Direct3D 11 (Chris away; "keep developing")
+Status words as Chris asked: VERIFIED (he saw it), TESTED (a test measures it), BUILT (made, no test yet), OPEN.
+- **The Rock-Eater's saddle, crystals and girth: TESTED and seen in the built game's captures** (16:26, adit-94 front, side, back: Nix in
+  the saddle on its back, the crystal ridge behind him, shards at the shoulders, a girth down the flank). Two game-only causes found and
+  fixed (CHANGELOG). Not VERIFIED until Chris sees it.
+- **Direct3D 11 is now the game's first graphics API.** From 15:45 the Adit crashed every D3D12 run on this PC, the published 00:33 build
+  too (NVIDIA driver reset, nvlddmkm events 14/153; a fresh copy ran once, then crashed: the driver's cached build of something in the
+  Adit). D3D11 ran it cleanly twice. **If Chris's game crashes entering the Adit, this is why; the next published build avoids it.** A
+  reboot may also clear the driver's state. OPEN: whether D3D12 recovers after a reboot.
+- **The three missing fourth paths: TESTED** (EditMode and PlayMode suites green), not played: the Ranger's Skirmisher, the Rogue's
+  Swashbuckler, the Mage's Cinderwright (an ember hound; the forge-golem dropped, no machines). TALENT_DEPTH.md.
+- **The Salt-Mender, an eighth class from the canon: BUILT**, its tests written (SaltMenderRulesTests, SaltMenderLoopTests) and to run after
+  the full run. CLASS_BUILD_MATRIX.md "Phase 9.2 and 9.3 from the canon" has the reading of the books behind it, the Tinker and the
+  Engineer set aside as machinery, the Knight (no "Stormlight": undefined in the books and another author's term), and the races
+  (goblins first; no race layer exists yet, every figure is human: OPEN).
+- The Adit's floors darker and their dressing denser: TESTED (AditTests 25/25 with it), in the 16:12-16:26 captures.
+- Full run on the afternoon's code started 16:26: EditMode 449/449; PlayMode running.
+- Commits 2f2330c, b51ebb4 pushed to feet-bow-adit-kit; backup 16:27.
+
 ## 2026-10-11 afternoon: the Adit pass (Chris, 12:23: "get busy and do better than yesterday"; "keep working until i say stop . dont stop
 to ask questions"; he was away from about 12:33)
 - The full run on the night's code (80045ff, 12:24-13:46): EditMode 447/447, PlayMode 279/280; the one failure is note 112(b), Morro

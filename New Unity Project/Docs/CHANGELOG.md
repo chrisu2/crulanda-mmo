@@ -29,6 +29,14 @@ canon. and all phases after." Nothing here is seen by Chris yet.
   is the driver's cached build of something in the Adit, not the game's files. Direct3D 11 ran the Adit cleanly twice. D3D12 stays as
   the fallback.
 - Icons for every new ability and talent (tools/art/make_icons.py). TALENT_DEPTH.md and CLASS_STATUS.md record all three.
+- **The Salt-Mender, an eighth class and the first from the canon (Phase 9.2; CLASS_BUILD_MATRIX.md):** Book 1's Salt-Speaker ("I bind the
+  Chaos! I seal the Wound!") and book 3's Mender-Craft, on a new resource, Salt (refilled from the earth out of a fight, and by a ward that
+  is struck). Salt Shard, Binding Salt (held in white crystal), Salt-Ward (a ward that grounds blows into Salt), Seal the Wound (a silence),
+  Draw the Line (a taunt), Sung Wall (the party takes 15% less), Song of Sifting (salt over a pack), Calcify (a talent: a stun); the
+  Wasting's things (Weave-Eaters, the Hollow Men) take a quarter more from salt. Three paths, rows 0-2: the Salt-Speaker (control), the
+  Mason (tank; Klyther's salt-stone craft) and the Sifter (ranged), 21 talents. Not a healer: no salt-magic heals in the books. Playable
+  from the pause menu; no sims of it yet; it wears the Mage's robe figure until its own is made.
+- **The Tinker and the Engineer are set aside** (machinery; no machines). Klyther's book-3 craft goes to the Salt-Mender's Mason path.
 - **The Adit's floors** two fifths of the kit's grey (half still read pale), their dressing denser.
 - Runs: EditMode 17/17 (the three classes' rules, the icons), PlayMode 28/28 (the Mage, Rogue and Ranger loops; RockEaterTests 3/3).
 

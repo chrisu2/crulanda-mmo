@@ -12,7 +12,7 @@ namespace Crulanda.Encounter
     /// </summary>
     public sealed partial class EncounterSession
     {
-        public const int MaxPartySims = 3, InviteLevelGap = 5;
+        public const int MaxPartySims = 4, InviteLevelGap = 5;   // a party of five with you (the dungeons are five-player: DUNGEON_DESIGN; was 3 until 2026-10-11)
         public const float BusyBelow = .15f;
         public readonly List<SimCompanion> PartySims = new List<SimCompanion>();
         /// <summary>The who list (O): every adventurer online (EncounterHud.Who).</summary>
@@ -64,8 +64,31 @@ namespace Crulanda.Encounter
             var c = a.gameObject.AddComponent<SimCompanion>(); a.gameObject.SetActive(true); c.Init(a, this, s, FreeSlot());
             SimGear.Dress(a.GetComponent<ActorVisual>(), s, Items);
             PartySims.Add(c);
+            if (s.classId == "class.ranger") SummonSimWolf(c);   // a sim Ranger brings its wolf (2026-10-11)
             if (!returning) Message(s.name + " has joined your party.");
             return true;
+        }
+        /// <summary>The party sims' wolves (a sim Ranger's), party members the enemies can turn on (PartyActor).</summary>
+        public readonly List<RangerPet> SimPets = new List<RangerPet>();
+        public RangerPet SummonSimWolf(SimCompanion c)
+        {
+            if (c == null) return null; DismissSimWolf(c);
+            var point = c.transform.position - c.transform.forward * 1.5f + c.transform.right * 1.2f;
+            if (NavMesh.SamplePosition(point, out var hit, 8, NavMesh.AllAreas)) point = hit.position + Vector3.up;
+            var wolf = SpawnActor(c.sim.name.Split(' ')[0] + "'s wolf", content.player, point, new Color(.45f, .44f, .42f), "pet." + c.sim.id, ActorLook.Wolf, c.sim.level);
+            AddAgent(wolf.gameObject, 5.5f, .5f);
+            var pet = wolf.gameObject.AddComponent<RangerPet>(); pet.Master = c; wolf.gameObject.SetActive(true); pet.Init(wolf, this, new SimPetMaster());
+            SimPets.Add(pet); return pet;
+        }
+        public void DismissSimWolf(SimCompanion c)
+        {
+            foreach (var p in SimPets.ToArray())
+            {
+                if (p == null) { SimPets.Remove(p); continue; }
+                if (p.Master != c) continue;
+                foreach (var e in Enemies) if (e != null && e.Victim == p.actor) e.ResetFight();
+                SimPets.Remove(p); Destroy(p.gameObject);
+            }
         }
         /// <summary>How long a sim takes to come from another zone when invited (seconds; tests shorten it).</summary>
         public static float InviteTravelSeconds = 30;
@@ -177,6 +200,7 @@ namespace Crulanda.Encounter
         {
             var c = PartySim(simId); if (c == null) return;
             c.Remember(kicked);
+            DismissSimWolf(c);
             foreach (var e in Enemies) if (e != null && e.Victim == c.actor) e.ResetFight();
             c.sim.x = c.transform.position.x; c.sim.z = c.transform.position.z;
             PartySims.Remove(c); Destroy(c.gameObject);

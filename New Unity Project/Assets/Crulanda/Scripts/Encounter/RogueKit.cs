@@ -223,7 +223,7 @@ namespace Crulanda.Encounter
             return Start(a, () => {
                 flourish = HastePerPoint * cp; flourishUntil = Time.time + a.duration + 3 * R("bk-long-flourish"); Combo = 0;
                 if (cp >= MaxCombo && R("bk-encore") > 0)
-                    foreach (var who in Party()) if (who != null && who.IsAlive) who.GetComponent<Combatant>().Heal(Mathf.Max(1, Mathf.RoundToInt(who.Health.Pool.Max * EncoreMend)));
+                    foreach (var who in Party()) if (who != null && who.IsAlive) who.GetComponent<Combatant>().Heal(Mathf.Max(1, Mathf.RoundToInt(who.Health.Pool.Max * EncoreMend)), s.Player);
                 s.FloatText(s.Player.transform.position, "Flourish!", new Color(1, .82f, .35f));
                 s.Message("Rallying Flourish: you and Mira " + Mathf.RoundToInt(flourish * 100) + "% quicker for " + (flourishUntil - Time.time).ToString("0") + " seconds" + (cp >= MaxCombo && R("bk-encore") > 0 ? ", and the party mended." : "."));
             });

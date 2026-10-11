@@ -38,8 +38,12 @@ namespace Crulanda.Encounter
         static bool uiUnlocked; static string dragging; static Vector2 dragFrom;
         /// <summary>How far a panel is moved from its place on the 1440x900 canvas: where the player put it, else (on a wide screen) out to
         /// the screen's edge on its side.</summary>
+        /// <summary>The panels where the game puts them, the saved positions ignored (a capture at 1440x900 under Chris's 3440x1440 positions
+        /// had the party frame off the screen, 2026-10-11).</summary>
+        public static bool DefaultPanels;
         static Vector2 PanelOffset(string id)
         {
+            if (DefaultPanels) { float dx = 0; foreach (var pn in Panels) if (pn.id == id) dx = pn.anchor * CanvasOffset.x / CanvasScale; return new Vector2(dx, 0); }
             if (panelOffsets.TryGetValue(id, out var o)) return o;
             float x = 0, y = 0; bool saved = false;
             try { saved = PlayerPrefs.HasKey("ui.pos." + id + ".x"); if (saved) { x = PlayerPrefs.GetFloat("ui.pos." + id + ".x"); y = PlayerPrefs.GetFloat("ui.pos." + id + ".y"); } } catch { }

@@ -67,7 +67,7 @@ namespace Crulanda.Encounter
         public override float PartyDamageMultiplier(EncounterEnemy enemy)
         { return (Marked(enemy) ? 1 + MarkBonus + .02f * R("pf-keen-eye") : 1) * (Pack(enemy) ? 1 + PackPerRank * R("sk-pack-tactics") : 1); }
         int Shot(float amount) { return Mathf.Max(1, Mathf.RoundToInt(amount * (1 + .03f * R("mk-steady-hand")))); }
-        void MendWolf() { int bond = R("bb-mending-bond"); if (bond > 0 && Wolf != null && Wolf.actor.IsAlive) Wolf.actor.GetComponent<Combatant>().Heal(Mathf.RoundToInt(Wolf.actor.Health.Pool.Max * .02f * bond)); }
+        void MendWolf() { int bond = R("bb-mending-bond"); if (bond > 0 && Wolf != null && Wolf.actor.IsAlive) Wolf.actor.GetComponent<Combatant>().Heal(Mathf.RoundToInt(Wolf.actor.Health.Pool.Max * .02f * bond), s.Player); }
 
         // ---------- action bar ----------
         public override int ActionCount { get { return BarIds.Length; } }

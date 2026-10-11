@@ -39,6 +39,10 @@ namespace Crulanda.Encounter
         public static string StartClassOverride;
         public ClassDefinition ClassDef { get; private set; }
         public TalentTree Talents { get; private set; }
+        /// <summary>The party's damage and healing meter (/meter; CombatMeter).</summary>
+        public CombatMeter Meter { get { if (meter == null) { meter = new CombatMeter(this); Combatant.Healed += OnHealed; } return meter; } }
+        CombatMeter meter; public bool MeterOpen;
+        void OnHealed(Actor by, Actor who, int amount) { meter?.Heal(by, amount); }
         public ClassKit Kit { get; private set; }
         public WarriorKit Warrior { get { return Kit as WarriorKit; } }
         // ---------- zone (generated world) or the legacy Quiet Trail defaults ----------
@@ -94,7 +98,7 @@ namespace Crulanda.Encounter
         /// <summary>The figure a class wears and the tint of its capsule stand-in (the classes added 2026-10-05 included).</summary>
         public static ActorLook LookForClass(string classId)
         {
-            switch (classId) { case "class.druid": return ActorLook.Druid; case "class.paladin": return ActorLook.Paladin; case "class.ranger": case "class.rogue": return ActorLook.Ranger; case "class.mage": case "class.archivist": return ActorLook.Mage; default: return ActorLook.Warrior; }
+            switch (classId) { case "class.druid": return ActorLook.Druid; case "class.paladin": return ActorLook.Paladin; case "class.ranger": case "class.rogue": return ActorLook.Ranger; case "class.mage": case "class.archivist": case "class.saltmender": return ActorLook.Mage; default: return ActorLook.Warrior; }
         }
         public static Color TintForClass(string classId)
         {
@@ -106,6 +110,7 @@ namespace Crulanda.Encounter
                 case "class.mage": return new Color(.4f, .3f, .7f);
                 case "class.rogue": return new Color(.22f, .2f, .24f);
                 case "class.archivist": return new Color(.78f, .76f, .7f);
+                case "class.saltmender": return new Color(.9f, .9f, .86f);
                 default: return new Color(.2f, .58f, .72f);
             }
         }
@@ -1630,6 +1635,7 @@ namespace Crulanda.Encounter
             if (Player != null && Player.EntityId.Value == id) return Player;
             if (Companion != null && Progress.recruited && Companion.actor.EntityId.Value == id) return Companion.actor;
             if (Pet != null && Pet.actor != null && Pet.actor.EntityId.Value == id) return Pet.actor;   // the Ranger's wolf (RangerPet)
+            foreach (var p in SimPets) if (p != null && p.actor != null && p.actor.EntityId.Value == id) return p.actor;   // the sim Rangers' wolves
             foreach (var c in PartySims) if (c != null && c.actor != null && c.actor.EntityId.Value == id) return c.actor;   // invited sims (Phase 5.2b)
             if (Weaver != null && Weaver.actor != null && Weaver.actor.EntityId.Value == id) return Weaver.actor;   // Mother Quillet on her way to the lock (D4)
             return null;
@@ -1703,7 +1709,7 @@ namespace Crulanda.Encounter
             bool marking = EncounterInput.Sneak;   // Ctrl+1-4: raid marks on your target (CC step C3); Ctrl alone still sneaks
             for (int slot = 0; slot < (marking ? 4 : ActionCount); slot++)
                 if (!BuildOpen && slot < 13 && EncounterInput.Press(EncounterInput.SlotKey(slot))) { if (marking) MarkTarget((RaidMark)((slot + 1) % 4)); else UseAbility(slot); }
-            Kit.Tick(InCombat);
+            Kit.Tick(InCombat); Meter.Tick(InCombat, Time.deltaTime);
             if (AutoAttack && !Kit.MeleeAutoAttacks && !Kit.RangedAutoAttacks) AutoAttack = false;
             // The swing in melee, or the bow's auto-shot at its range (the Ranger: ClassKit.RangedAutoAttacks).
             if (AutoAttack && Target != null && Target.actor.IsAlive && Time.time >= nextSwing && Distance(Target) < Kit.AutoAttackRange && !PlayerStunned && !PlayerDisarmed)
@@ -1864,7 +1870,7 @@ namespace Crulanda.Encounter
         }
         /// <summary>A body that still has something to take (camp mobs until looted; story enemies by their saved record).</summary>
         public bool CanLoot(EncounterEnemy e) { return e != null && !e.actor.IsAlive && (e.Camp ? !e.Looted : !Progress.FindEnemy(e.persistentId).looted); }
-        EncounterEnemy LootableCorpse { get { return Enemies.Find(e => CanLoot(e) && Distance(e) < 3.6f && (!e.Camp || CanTakeAny(e))) ?? SkinnableBody; } }
+        public EncounterEnemy LootableCorpse { get { return Enemies.Find(e => CanLoot(e) && Distance(e) < 3.6f && (!e.Camp || CanTakeAny(e))) ?? SkinnableBody; } }
         public Crulanda.World.ZoneDoor NearbyDoor
         {
             get
@@ -2025,6 +2031,7 @@ namespace Crulanda.Encounter
                 case "class.mage": return (13 + L, 8 + L / 2, 10 + L / 2, 22 + 2 * L, 20 + 2 * L);
                 case "class.rogue": return (16 + (3 * L) / 2, 14 + L, 22 + 2 * L, 8 + L / 2, 10 + L / 2);
                 case "class.archivist": return (14 + L, 8 + L / 2, 10 + L / 2, 20 + 2 * L, 22 + 2 * L);
+                case "class.saltmender": return (17 + (3 * L) / 2, 12 + L, 10 + L / 2, 16 + 2 * L, 18 + 2 * L);
                 default: return (20 + 2 * L, 20 + 2 * L, 15 + L, 8 + L / 2, 10 + L / 2);   // the Warrior
             }
         }
@@ -2105,7 +2112,7 @@ namespace Crulanda.Encounter
         public void Message(string text) { Messages.Add(text); if (Messages.Count > 6) Messages.RemoveAt(0); ChatSay(ChatChannel.System, null, text); }
         public void FloatText(Vector3 point, string text, Color color) { Floating.Add(new CombatText { position = point + Vector3.up * 1.5f, text = text, color = color, expires = Time.time + 1.3f }); }
         public void Resume() { Paused = false; Time.timeScale = 1; }
-        void OnDestroy() { Time.timeScale = 1; Crulanda.World.WorldWeather.Turned -= OnWeatherTurned; }
+        void OnDestroy() { Time.timeScale = 1; Crulanda.World.WorldWeather.Turned -= OnWeatherTurned; if (meter != null) Combatant.Healed -= OnHealed; }
         /// <summary>The zone's weather turns: a line in the chat ("It starts to rain.").</summary>
         void OnWeatherTurned(Crulanda.World.WeatherKind from, Crulanda.World.WeatherKind to)
         {

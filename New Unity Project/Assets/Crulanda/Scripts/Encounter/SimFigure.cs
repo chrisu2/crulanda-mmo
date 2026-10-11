@@ -219,7 +219,7 @@ namespace Crulanda.Encounter
             {
                 if (Time.time < healAt) return;
                 healAt = 0; if (visual != null) visual.Casting = false;
-                int healed = actor.GetComponent<Combatant>().Heal(Mathf.RoundToInt(12 + 5 * sim.level)); visual?.CastRelease();
+                int healed = actor.GetComponent<Combatant>().Heal(Mathf.RoundToInt(12 + 5 * sim.level), actor); visual?.CastRelease();
                 if (healed > 0) { Session.FloatText(transform.position, "+" + healed, new Color(.3f, 1, .7f)); HealFx.Show(transform); }
                 return;
             }

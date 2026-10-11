@@ -115,6 +115,14 @@ namespace Crulanda.Encounter
             wasInWater = inWater;
             if (direction.sqrMagnitude > .01f)
                 transform.rotation = Quaternion.Slerp(transform.rotation, Swimming ? Quaternion.LookRotation(direction) : Quaternion.Euler(0, yaw, 0), Time.deltaTime * 12);
+            // Standing in a fight (auto-attacking, or casting at the target), the figure turns to its target: it only turned to the
+            // camera's heading while moving, so an archer who stopped shot off to the side, the bow's back to the shooter as seen from
+            // the mark (2026-10-10, Chris: "not facing target", "bow is backwards").
+            else if (!Swimming && session.Target != null && session.Target.actor.IsAlive && !session.Target.Game && (session.AutoAttack || (session.PlayerCasting && !session.Working)))
+            {
+                var to = session.Target.transform.position - transform.position; to.y = 0;
+                if (to.sqrMagnitude > .04f) transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(to), Time.deltaTime * 10);
+            }
             var p = transform.position;
             if (p.y < Crulanda.World.Hollow.Lowest && !(wet && p.y > surface - 12)) Teleport(session.RecoveryPoint);   // fell out of the world (a cave's deep floor is not that)
         }

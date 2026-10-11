@@ -628,7 +628,7 @@ namespace Crulanda.Encounter
                 model.Chest.rotation = Quaternion.AngleAxis(chest * .6f, body.up) * model.Chest.rotation;
             }
             else aimTwist = Mathf.MoveTowardsAngle(aimTwist, 0, Mathf.Max(dt, .001f) * 400);
-            float archerTurn = dead ? 0 : aimTwist * still;
+            float archerTurn = dead ? 0 : aimTwist * still; ArcherTurn = archerTurn;
             float twist = fresh ? p.twist * arms : 0;
             if (twist != 0 && model.Spine != null && model.Chest != null)
             {
@@ -655,63 +655,14 @@ namespace Crulanda.Encounter
                 else if (p.lean != 0 || Mathf.Abs(archerTurn) > .01f) { body.localEulerAngles = new Vector3(p.lean, archerTurn, 0); leaned = true; }
                 else if (staggering || leaned) { staggering = leaned = false; body.localEulerAngles = Vector3.zero; }
             }
-            if (fresh && !dead) Heels(p.slot);
             SyncFrames();
             bool clipBow = model.HasBow && model.Bow;
             BowUpright(fresh && (clipBow || p.twist != 0 || bowHeld != null) ? (clipBow ? 1 : arms) : 0);   // and while the arms come down after
             BowString(fresh && (clipBow || p.twist != 0 && arms > .6f));
         }
-        // ---------- the heels (2026-10-10, Chris: "run on tip toes", then "feet backwards and screwed up") ----------
-        // Kevin's walk and run are made on the balls of the feet: on his own model (Editor/FootDiag, 2026-10-10) the foot on the ground
-        // stands about 30 degrees heel-up running and 17 walking, and our bodies play them the same within two degrees. While a figure
-        // walks or runs on the ground, a foot whose ball is down (about as low in the body as standing) is turned about its ball toward
-        // the pitch it stands with, heel down, and the leg bends to carry the ankle there (two bones, the knee kept in its own plane).
-        // The turn is about the side axis of the body's forward (or of the foot's heading when that points forward), so a foot pointing
-        // straight down cannot flip round; the levelling tried before turned about the foot's own heading and did ("feet backwards").
-        // The sink that lowered a moving figure until its lowest ankle sat as low as standing is gone: with the clips' heels up it
-        // pushed the toes under the ground ("missing part of foot").
-        float standPitchL = float.NaN, standPitchR = float.NaN, standBallL = float.NaN, standBallR = float.NaN, aimTwist;
-        const float HeelDown = .75f;   // how much of a planted heel's lift comes down
-        void Heels(string slot)
-        {
-            if (model.FootL == null || model.FootR == null || model.BallL == null || model.BallR == null || model.UpperLegL == null || model.UpperLegR == null || model.LowerLegL == null || model.LowerLegR == null) return;
-            bool grounded = motor == null || (!motor.Airborne && !motor.Swimming);
-            bool standing = grounded && speed < .3f && slot == null;
-            float moving = grounded && (slot == null || slot == "sneak") ? Mathf.InverseLerp(.3f, .8f, speed) : 0;
-            Heel(model.UpperLegL, model.LowerLegL, model.FootL, model.BallL, ref standPitchL, ref standBallL, standing, moving);
-            Heel(model.UpperLegR, model.LowerLegR, model.FootR, model.BallR, ref standPitchR, ref standBallR, standing, moving);
-        }
-        void Heel(Transform thigh, Transform calf, Transform foot, Transform ball, ref float standPitch, ref float standBall, bool standing, float moving)
-        {
-            Vector3 A = foot.position, B = ball.position, v = B - A, h = new Vector3(v.x, 0, v.z), fwd = body.forward; fwd.y = 0;
-            if (fwd.sqrMagnitude < 1e-6f || v.sqrMagnitude < 1e-6f) return;
-            fwd.Normalize();
-            float pitch = Mathf.Atan2(-v.y, h.magnitude * (Vector3.Dot(h, fwd) >= 0 ? 1 : -1)) * Mathf.Rad2Deg;   // over 90: pointing back
-            float ballY = body.InverseTransformPoint(B).y;
-            if (standing)
-            {
-                standPitch = float.IsNaN(standPitch) ? pitch : Mathf.Lerp(standPitch, pitch, .1f);
-                standBall = float.IsNaN(standBall) ? ballY : Mathf.Lerp(standBall, ballY, .1f);
-                return;
-            }
-            if (moving <= 0 || float.IsNaN(standPitch)) return;
-            float w = moving * Mathf.InverseLerp(standBall + .14f, standBall + .06f, ballY);   // 1 with the ball down, 0 lifted
-            float delta = Mathf.Min(45, (pitch - standPitch) * HeelDown * w);
-            if (delta < .5f) return;
-            var heading = h.sqrMagnitude > .09f * v.sqrMagnitude && Vector3.Dot(h, fwd) > .5f * h.magnitude ? h.normalized : fwd;
-            var turn = Quaternion.AngleAxis(-delta, Vector3.Cross(Vector3.up, heading));   // about the ball: the toes up, the heel down
-            var footRot = turn * foot.rotation; var ankle = B + turn * (A - B);
-            // The leg: the hip, the knee in the plane it bends in now, the ankle where the heel comes down.
-            Vector3 hip = thigh.position, knee = calf.position;
-            float l1 = (knee - hip).magnitude, l2 = (A - knee).magnitude; var to = ankle - hip;
-            float d = Mathf.Clamp(to.magnitude, Mathf.Abs(l1 - l2) + .001f, l1 + l2 - .001f); var dir = to.normalized;
-            var n = Vector3.Cross(dir, knee - hip); if (n.sqrMagnitude < 1e-8f) n = Vector3.Cross(dir, fwd); n.Normalize();
-            float bend = Mathf.Acos(Mathf.Clamp((l1 * l1 + d * d - l2 * l2) / (2 * l1 * d), -1, 1)) * Mathf.Rad2Deg;
-            var kneeTo = hip + Quaternion.AngleAxis(bend, n) * dir * l1;
-            thigh.rotation = Quaternion.FromToRotation(knee - hip, kneeTo - hip) * thigh.rotation;
-            calf.rotation = Quaternion.FromToRotation(foot.position - calf.position, ankle - calf.position) * calf.rotation;
-            foot.rotation = footRot;
-        }
+        float aimTwist;
+        /// <summary>How far the figure is turned side-on for the bow this frame (degrees; the motion capture logs it).</summary>
+        public float ArcherTurn { get; private set; }
         // The player's capsule rests on its skin (CharacterController.skinWidth, 8 cm), and the model hung from the capsule's bottom, so
         // the whole figure stood 8-9 cm above the ground (FootTests, 2026-10-10: capsule bottom .087 above it, the toes .09-.12 standing).
         // On the ground the model is lowered by the gap a ray finds between the capsule's bottom and the ground under it; in the air the
@@ -821,7 +772,24 @@ namespace Crulanda.Encounter
             var along = transform.forward;
             if (model.HandL != null && model.UpperArmL != null) { var a = model.HandL.position - model.UpperArmL.position; a.y = 0; if (a.sqrMagnitude > .0004f) along = a.normalized; }
             along.y = 0; if (along.sqrMagnitude < 1e-4f) along = body.forward;
-            b.rotation = Quaternion.Slerp(b.parent.rotation * bowRest, Quaternion.LookRotation(along, Vector3.up) * Quaternion.Euler(0, 0, -10), w);   // canted a little, the top limb out
+            along.Normalize();
+            // The bow set by its own mesh (2026-10-10, Chris: "bow is backwards", "rounded edge to mob and string towards shooter"):
+            // the length from bottom nock to top nock stands up, and the depth from the grip to the string points back along the
+            // arrow at the shooter, so the bow's rounded back faces the mark and its string the archer. (Turning the holder by
+            // LookRotation set the bow's thickness along the arrow: from behind its flat face showed, a quarter turn out.)
+            var mf = bowMesh != null && bowMesh.transform.IsChildOf(b) ? bowMesh : null;
+            Quaternion want;
+            if (mf != null && mf.sharedMesh != null && stringTop != stringBottom)
+            {
+                var lenL = (stringTop - stringBottom).normalized;
+                var depthL = (stringTop + stringBottom) / 2 - mf.sharedMesh.bounds.center; depthL -= Vector3.Dot(depthL, lenL) * lenL;
+                if (depthL.sqrMagnitude < 1e-8f) depthL = Vector3.Cross(lenL, Vector3.forward);
+                var meshWant = Quaternion.LookRotation(-along, Vector3.up) * Quaternion.Inverse(Quaternion.LookRotation(depthL.normalized, lenL));
+                var rel = Quaternion.Inverse(b.rotation) * mf.transform.rotation;   // the mesh in its holder, fixed
+                want = meshWant * Quaternion.Inverse(rel);
+            }
+            else want = Quaternion.LookRotation(along, Vector3.up);   // before the string is found (the first frame)
+            b.rotation = Quaternion.Slerp(b.parent.rotation * bowRest, want, w);
         }
         /// <summary>
         /// Edit mode (captures, tests): the model as it stands <paramref name="time"/> seconds into <paramref name="pose"/>, walking at

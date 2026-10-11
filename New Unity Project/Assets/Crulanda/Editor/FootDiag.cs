@@ -49,7 +49,7 @@ namespace Crulanda.EditorTools
                     AnimationClip clip = null;
                     foreach (var c in Resources.LoadAll<AnimationClip>("Characters/Animations/" + clipName)) if (c != null && !c.name.StartsWith("__preview__")) clip = c;
                     if (clip == null) { sb.AppendLine("  no clip " + clipName); continue; }
-                    sb.AppendLine("  " + clipName + " (" + clip.length.ToString("0.00") + " s), left foot: shin-foot angle / pitch below level / ankle and ball over the lowest point of the model, at each tenth of the clip");
+                    sb.AppendLine("  " + clipName + " (" + clip.length.ToString("0.00") + " s), left foot: pitch below level / yaw against the hips' forward / knee against it / ankle over the lowest point, at each tenth of the clip");
                     foreach (var (label, src, avatar) in who)
                     {
                         if (avatar == null || !avatar.isHuman) { sb.AppendLine("    " + label + ": no humanoid avatar"); continue; }
@@ -65,7 +65,12 @@ namespace Crulanda.EditorTools
                                 float low = float.MaxValue; foreach (var t in go.GetComponentsInChildren<Transform>()) low = Mathf.Min(low, t.position.y);
                                 var shin = foot.position - calf.position; var fv = toes.position - foot.position;
                                 float pitch = Mathf.Atan2(-fv.y, new Vector2(fv.x, fv.z).magnitude) * Mathf.Rad2Deg;
-                                line.Append("  " + Vector3.Angle(shin, fv).ToString("0") + "/" + pitch.ToString("0") + "/" + (foot.position.y - low).ToString("0.00") + "," + (toes.position.y - low).ToString("0.00"));
+                                // Which way the foot points against the hips' forward (the thighs' line turned a quarter), and the knee.
+                                var thL = anim.GetBoneTransform(HumanBodyBones.LeftUpperLeg); var thR = anim.GetBoneTransform(HumanBodyBones.RightUpperLeg);
+                                var fwd = Vector3.Cross(thR.position - thL.position, Vector3.up); fwd.y = 0; fwd.Normalize();
+                                var flat = new Vector3(fv.x, 0, fv.z); float yaw = flat.sqrMagnitude > 1e-6f ? Vector3.SignedAngle(fwd, flat, Vector3.up) : 0;
+                                var kneeOut = calf.position - (thL.position + foot.position) / 2; kneeOut.y = 0; float knee = kneeOut.sqrMagnitude > 1e-6f ? Vector3.SignedAngle(fwd, kneeOut, Vector3.up) : 0;
+                                line.Append("  " + pitch.ToString("0") + "/y" + yaw.ToString("0") + "/k" + knee.ToString("0") + "/" + (foot.position.y - low).ToString("0.00"));
                             }
                             sb.AppendLine(line.ToString());
                             Object.DestroyImmediate(go);

@@ -3,8 +3,6 @@ using System.Collections;
 using System.IO;
 using System.Text;
 using UnityEngine;
-using UnityEngine.Animations;
-using UnityEngine.Playables;
 using Crulanda.World;
 
 namespace Crulanda.Encounter
@@ -21,51 +19,17 @@ namespace Crulanda.Encounter
     {
         public const string Flag = "--crulanda-motion-capture";
         public static bool Requested { get { return Array.IndexOf(Environment.GetCommandLineArgs(), Flag) >= 0; } }
+        /// <summary>--crulanda-motion-bow-only: straight to the bow, without the jumps, runs and strides (2026-10-10, Chris: "why do
+        /// you keep playing the jump/running animations again and again ... after approval").</summary>
+        static bool BowOnly { get { return Array.IndexOf(Environment.GetCommandLineArgs(), "--crulanda-motion-bow-only") >= 0; } }
         Camera side; Transform watch; Vector3 offset; readonly StringBuilder report = new StringBuilder();
-        // Kevin Iglesias's own figure (his HumanF or HumanM model, on its own avatar) running his run clip a stride ahead of ours, so the
-        // frames show whether a foot is his clip's or comes from our body (2026-10-10, Chris: "feet backwards and screwed up").
-        Transform kevin; PlayableGraph kevinGraph;
-        /// <summary>A figure a stride ahead of ours: <paramref name="src"/> on <paramref name="avatar"/> (its own when null) playing
-        /// <paramref name="clip"/> as made, nothing of ours on it (no foot correction, no foot IK).</summary>
-        void Beside(string label, GameObject src, Avatar avatar, AnimationClip clip, Material look, bool tint)
-        {
-            if (kevin != null) Destroy(kevin.gameObject);
-            if (kevinGraph.IsValid()) kevinGraph.Destroy();
-            if (src == null || clip == null) { report.AppendLine("no " + label + ": model " + (src != null) + " clip " + (clip != null)); return; }
-            kevin = Instantiate(src).transform; kevin.name = label;
-            var anim = kevin.GetComponentInChildren<Animator>(); if (anim == null) anim = kevin.gameObject.AddComponent<Animator>();
-            if (avatar != null) anim.avatar = avatar;
-            anim.applyRootMotion = false; anim.cullingMode = AnimatorCullingMode.AlwaysAnimate; anim.runtimeAnimatorController = null;
-            report.AppendLine(label + ": avatar " + (anim.avatar != null ? anim.avatar.name + " human " + anim.avatar.isHuman : "none") + ", clip " + clip.name);
-            if (look != null)
-                foreach (var r in kevin.GetComponentsInChildren<Renderer>())
-                {
-                    var m = new Material(look); var c = tint ? new Color(.78f, .72f, .62f) : Color.white;
-                    if (m.HasProperty("_BaseColor")) m.SetColor("_BaseColor", c);
-                    if (m.HasProperty("_Color")) m.SetColor("_Color", c);
-                    var ms = r.sharedMaterials; for (int i = 0; i < ms.Length; i++) ms[i] = m; r.sharedMaterials = ms;
-                }
-            var p = AnimationClipPlayable.Create(kevinGraph = PlayableGraph.Create(label), clip); p.SetApplyFootIK(false);
-            AnimationPlayableOutput.Create(kevinGraph, "out", anim).SetSourcePlayable(p); kevinGraph.SetTimeUpdateMode(DirectorUpdateMode.GameTime); kevinGraph.Play();
-        }
-        static AnimationClip UnityClip(string file)
-        {
-            foreach (var c in Resources.LoadAll<AnimationClip>("Characters/Animations/Unity/" + file + ".anim")) if (c != null && !c.name.StartsWith("__preview__")) return c;
-            return null;
-        }
-        void OnDestroy() { if (kevinGraph.IsValid()) kevinGraph.Destroy(); }
         void LateUpdate()
         {
-            if (kevin != null && watch != null)
-            {
-                var f = watch.forward; f.y = 0; f = f.sqrMagnitude > 1e-4f ? f.normalized : Vector3.forward;
-                var at = watch.position + f * 1.3f; var z = ZoneBuilder.Active; float g = z != null ? z.Ground(new Vector2(at.x, at.z)).y : at.y - 1;
-                kevin.SetPositionAndRotation(new Vector3(at.x, g, at.z), Quaternion.LookRotation(-f));   // his model faces -z, as ours does
-            }
             if (side == null || watch == null) return;
             side.transform.position = watch.position + watch.rotation * offset;
             side.transform.LookAt(watch.position + Vector3.down * (offset.y < -.3f ? .6f : .1f));   // the actor's origin is about a metre up: head to feet in frame, or the feet close
         }
+        Transform aimMark;
         IEnumerator Shot(string directory, string name, AdventurerMotor motor, float since)
         {
             ScreenCapture.CaptureScreenshot(Path.Combine(directory, name + ".png"));
@@ -74,6 +38,13 @@ namespace Crulanda.Encounter
             {
                 var z = Crulanda.World.ZoneBuilder.Active; var p = motor.transform.position; float ground = z != null ? z.Ground(new Vector2(p.x, p.z)).y : 0;
                 feet = " feet L" + (fig.FootL.position.y - ground).ToString("0.00") + " R" + (fig.FootR.position.y - ground).ToString("0.00") + " hips " + (fig.Hips.position.y - ground).ToString("0.00");
+            }
+            if (aimMark != null && fig != null && fig.HandL != null && fig.UpperArmL != null)
+            {
+                var to = aimMark.position - motor.transform.position; to.y = 0;
+                var arm = fig.HandL.position - fig.UpperArmL.position; arm.y = 0;
+                var vis = motor.GetComponent<ActorVisual>();
+                feet += "  facing-vs-mark " + Vector3.SignedAngle(to, motor.transform.forward, Vector3.up).ToString("0") + " archer-turn " + (vis != null ? vis.ArcherTurn.ToString("0") : "?") + " bow-arm-vs-mark " + Vector3.SignedAngle(to, arm, Vector3.up).ToString("0");
             }
             report.AppendLine(name + "  t=" + since.ToString("0.00") + "  airborne=" + motor.Airborne + " rising=" + motor.Rising + " landedAge=" + motor.LandedAge.ToString("0.00") + " y=" + motor.transform.position.y.ToString("0.00") + feet + "  mix " + (fig != null ? fig.Mix : ""));
             yield return null;
@@ -108,6 +79,8 @@ namespace Crulanda.Encounter
             var main = Camera.main; watch = s.Player.transform; offset = new Vector3(4.8f, .1f, .4f);   // on the figure's right
             side = new GameObject("Motion camera").AddComponent<Camera>(); side.CopyFrom(main); side.depth = main.depth + 1; side.fieldOfView = 40;
             float[] frames = { .02f, .08f, .14f, .2f, .26f, .32f, .38f, .44f, .5f, .55f, .6f, .66f, .74f, .85f, 1.0f };
+            if (!BowOnly)
+            {
             Time.timeScale = .25f;
             yield return Jump(directory, "jump-stand", motor, frames);
             Time.timeScale = 1; yield return new WaitForSeconds(1);
@@ -133,37 +106,16 @@ namespace Crulanda.Encounter
                 for (int k = 1; k <= 6; k++) { yield return new WaitForSeconds(.07f); yield return Shot(directory, tag + "-0" + k, motor, 0); }
             }
             fig?.SetFootIK(true);
-            // The same stride with a figure a stride ahead playing a clip as made: Kevin's own figure on his run (kevin-NN), then our
-            // own Ranger outfit (the body's avatar, as the game builds a figure) on Unity's Starter Assets run and walk (unity-run-NN,
-            // unity-walk-NN; Chris chose them, 2026-10-10, after Kevin's own figure ran on its toes too).
-            if (fig != null)
-            {
-                var look = motor.GetComponentInChildren<SkinnedMeshRenderer>()?.sharedMaterial;
-                string sex = fig.Female ? "Female" : "Male";
-                var bodyAvatar = Resources.Load<GameObject>("Characters/Bodies/Superhero_" + sex + "_FullBody")?.GetComponent<Animator>()?.avatar;
-                var outfit = Resources.Load<GameObject>("Characters/Outfits/" + sex + "_Ranger");
-                var kevinModel = Resources.Load<GameObject>("Characters/Animations/KI/Models/" + (fig.Female ? "HumanF_Model" : "HumanM_Model"));
-                var passes = new[] {
-                    ("kevin", "Kevin's figure", kevinModel, (Avatar)null, ModelFigure.KiClip(fig.Female, "Run01_Forward"), true),
-                    ("unity-run", "Our outfit on Unity's run", outfit, bodyAvatar, UnityClip("Locomotion--Run_N"), false),
-                    ("unity-walk", "Our outfit on Unity's walk", outfit, bodyAvatar, UnityClip("Locomotion--Walk_N"), false) };
-                foreach (var (tag, label, src, avatar, clip, tint) in passes)
-                {
-                    Beside(label, src, avatar, clip, look, tint); offset = new Vector3(3.4f, -.55f, .85f); yield return new WaitForSeconds(.25f);
-                    for (int k = 1; k <= 8; k++) { yield return new WaitForSeconds(.06f); yield return Shot(directory, tag + "-0" + k, motor, 0); }
-                }
-                if (kevin != null) Destroy(kevin.gameObject);
-                if (kevinGraph.IsValid()) kevinGraph.Destroy();
-            }
             offset = new Vector3(4.8f, .1f, .4f);
             Time.timeScale = 1; EncounterInput.Scripted = null; AdventurerMotor.Running = false;
             yield return new WaitForSeconds(1);
+            }
             // The bow: the nearest boar or wolf, stunned where it stands, 13 m in front of the archer; seen from her left.
             EncounterEnemy mark = null; float near = float.MaxValue;
             foreach (var e in s.Enemies) if (e != null && e.actor.IsAlive && !e.Game) { float d = Vector3.Distance(e.transform.position, s.Player.transform.position); if (d < near) { near = d; mark = e; } }
             if (mark == null || s.Kit == null || !s.Kit.RangedAutoAttacks) { report.AppendLine("no bow shots: no mark, or not a Ranger"); Done(directory); yield break; }
             mark.actor.Stats.SetBase(Crulanda.Core.StatType.MaxHealth, 100000); mark.actor.Health.ApplyHealing(100000);
-            mark.Apply("stun", s.Player, 120);
+            mark.Apply("stun", s.Player, 120); aimMark = mark.transform;
             var toMark = mark.transform.position - s.Player.transform.position; toMark.y = 0;
             var stand = mark.transform.position - toMark.normalized * 13; motor.Teleport(s.Zone.Ground(new Vector2(stand.x, stand.z), 1.1f));
             motor.SetView(Mathf.Atan2(toMark.x, toMark.z) * Mathf.Rad2Deg, 10, 5);

@@ -32,6 +32,9 @@ namespace Crulanda.Tests
             session = UnityEngine.Object.FindFirstObjectByType<EncounterSession>(); zone = ZoneBuilder.Active;
             motor = session.Player.GetComponent<AdventurerMotor>(); figure = session.Player.GetComponent<ActorVisual>();
             Assert.NotNull(figure.Figure, "the player is a modelled figure");
+            // Batch runs draw nothing, and a figure's Animator culls its bones when it is not drawn (CullUpdateTransforms): the feet
+            // stood still in one pose and every measure below read the same whatever the clips did (2026-10-10). Always animate here.
+            figure.Figure.Animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
             // The longest straight leg of road, faced along.
             Vector2 from = Vector2.zero, to = Vector2.up; float best = 0;
             foreach (var r in zone.Zone.roads)

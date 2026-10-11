@@ -642,5 +642,25 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
 - **141. "also need to show a dps meter and a healing meter to check balance on classes"**, **"put the class next to name in dps meter"**,
   **"i see there name but not their class"** (Chris, 2026-10-11, 17:14, 17:24, 17:25.) /meter: damage and healing a member with its
   class, each a second over the party's fighting time; /meter reset. In the run's summary too. Seen in the 17:28 shot.
+- **142. "once the mob that was cc dies. take off the icon"** (Chris, 2026-10-11, 17:41.) A raid mark dies with its mob. TESTED (GroupRunTests).
+- **143. "what dropped off the first elite? you need to have a run down of dps deaths loot drops etc. kinda like a scorecard when a dungeon
+  is complete. maybe an mvp"**, **"final boss kill can also call the scorecard"** (Chris, 2026-10-11, 17:44-17:46.) The scorecard
+  (DUNGEON_DESIGN 0.08): on the leader's call or the last boss; /scorecard. TESTED (GroupRunTests). The first elite that run: a Veridian
+  Shield of the Oak and 22 coin.
+- **144. "party doesnt ignore the CC mobs"** (Chris, 2026-10-11, 17:45.) Sims, wolves and the run's player leave a held mob alone while
+  anything else stands. BUILT (SimCompanion.Held); seen in the 17:56 run.
+- **145. "warrior needs to wait on party"** (Chris, 2026-10-11, 17:46.) The leader stops while anyone alive is more than 12 m behind and
+  pulls nothing until all are up. BUILT; seen in the 17:56 run.
+- **146. "so the duo boss needs to be tougher. maybe perm CC one while killing one?"**, **"rock caller fell pretty fast"** (Chris,
+  2026-10-11, 17:47.) The duo rebuilt (DUNGEON_DESIGN 0.07): Nix leaps down to be held; free, he goads the beast; held, it is calm; the
+  Rock-Eater's health 1.6. TESTED (RockEaterTests) once the suites pass.
+- **147. "needs some of the bosses to stun or cc members of the party? maybe freeze? stun? fear? disorient?"** (Chris, 2026-10-11, 17:49.)
+  Holds on the party (EliteMove.cc): Haddo floors, the Rock-Eater shakes (disorient), Nix and Ysolt fear, Danner chains (root). BUILT.
+- **148. "looks like party is stuck"**, **"definitely still stuck"** (Chris, 2026-10-11, 17:50-17:52; the 17:37 run at the Lava ledge,
+  an Ash mender up where no one reached it.) A leader gives a camp up after 45 s with nothing to fight; strollers keep to their floor.
+  BUILT; the 17:56 run passed the Lava ledge.
+- **149. "rogue should have daggers. and maybe a crossbow to pull but mainly melee"** (Chris, 2026-10-11, 18:00.) A pair of Lowtown
+  dirks from the first, one in each hand (the second knife in the left fist: knife.off); Throw Knife, a knife thrown at 20 m, the pull (no
+  crossbow: a thrown knife has no mechanism, and a crossbow is on the no-machines line); sim Rogues carry the pair. BUILT, tests written.
 - **110. New dungeon pieces for the Adit** (Chris's download, 41 FBX: modular stone walls, floor, columns, stairs, an entrance arch, torches, candelabra, chests, barrels, bones, rocks, bars, books, potions). Chris chose: dress the whole Adit and rebuild its built rooms from the modular pieces; raw cave stays rock. In progress.
 - **108. "Still no bow animations on ranger."** Kevin Iglesias's archer clips (load, hold, release) since 2026-10-10; then "bow still twisted", "bow is backwards", "not facing target": the archer turns side-on as the clips are made, turns to her target while fighting standing (AdventurerMotor turned her only while moving), and the bow is set by its own mesh axes (rounded back to the mark, string to the archer). Chris, 20:45: "bow looks better" ... "move forward". To check in play.

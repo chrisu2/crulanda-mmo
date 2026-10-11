@@ -125,7 +125,7 @@ namespace Crulanda.Encounter
                         var after = new Dictionary<string, int>(); foreach (var st in s.Progress.bag) if (!st.Empty) { after.TryGetValue(st.item, out var n); after[st.item] = n + st.count; }
                         foreach (var kv in after) { before.TryGetValue(kv.Key, out var had); if (kv.Value > had) { gained.Add(Named(kv.Key) + (kv.Value - had > 1 ? " x" + (kv.Value - had) : "")); var key = Named(kv.Key); lootTally.TryGetValue(key, out var n); lootTally[key] = n + kv.Value - had; } }
                         int coin = s.Progress.gold - coinBefore; looted++; searched.Add(body);
-                        Log(Clock(t) + "  searched " + body.Name + ": " + (gained.Count > 0 ? string.Join(", ", gained) : "nothing") + (coin > 0 ? (gained.Count > 0 ? ", " : "") + coin + " coin" : "") + (body.Drops != null && body.Drops.Count > 0 ? " (left on it: " + string.Join(", ", body.Drops.Select(d => Named(d.item))) + ")" : ""));
+                        Log(Clock(t) + "  searched " + body.Name + ": " + (gained.Count > 0 ? string.Join(", ", gained) + (coin > 0 ? ", " + coin + " coin" : "") : coin > 0 ? coin + " coin" : "nothing") + (body.Drops != null && body.Drops.Count > 0 ? " (left on it: " + string.Join(", ", body.Drops.Select(d => Named(d.item))) + ")" : ""));
                         // Anything better than what you wear goes on (the loot's worth, seen in play).
                         for (int bi = 0; bi < s.Progress.bag.Count; bi++)
                         {

@@ -27,6 +27,32 @@
       "canonStatus": "GAME-ONLY"
     },
     {
+      "id": "item.rogues_dirk",
+      "name": "Lowtown Dirk",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 2,
+      "level": 1,
+      "value": 4,
+      "weaponDamage": 6,
+      "look": "knife:needle/oakhaven",
+      "description": "A thin, quick knife of the Lowtown kind, one of a pair. The Rogue's first (Chris, 2026-10-11: \"rogue should have daggers\").",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "item.rogues_second_dirk",
+      "name": "Lowtown Dirk (the pair)",
+      "kind": "gear",
+      "slot": "offhand",
+      "quality": 2,
+      "level": 1,
+      "value": 4,
+      "weaponDamage": 3,
+      "look": "knife.off:needle/oakhaven",
+      "description": "The other of the pair, for the left hand.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
       "id": "item.training_blade",
       "name": "Tempered Trailblade",
       "kind": "gear",

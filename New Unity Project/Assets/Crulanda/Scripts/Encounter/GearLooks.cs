@@ -87,6 +87,7 @@ namespace Crulanda.Encounter
             new GearFamily("sword.leaf", "mainhand", 2, "bronze", "root"),
             new GearFamily("sword.great", "mainhand", 0, "steel", "wood", "living"),
             new GearFamily("knife", "mainhand", 2, "hooked", "needle", "glass", "sickle"),
+            new GearFamily("knife.off", "offhand", 2, "hooked", "needle", "glass", "sickle"),   // a second knife in the left fist (the Rogue's pair, 2026-10-11)
             new GearFamily("axe.hand", "mainhand", 2, "wedge", "hatchet"),
             new GearFamily("axe.bearded", "mainhand", 2, "plain", "hooked"),
             new GearFamily("axe.crescent", "mainhand", 2, "plain", "spiked"),

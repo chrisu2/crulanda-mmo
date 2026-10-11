@@ -25,7 +25,7 @@ namespace Crulanda.Encounter
             "lk-quick-kick", "lk-dust", "lk-feel-the-pins", "lk-ward-break", "lk-tumblers", "lk-hum", "lk-vibration",
             "bk-showmanship", "bk-light-blade", "bk-from-behind", "bk-long-flourish", "bk-tumble", "bk-wide-open", "bk-encore", "bk-dashing" };   // the Swashbuckler, rows 0-3
         public static readonly string[] BarIds = { "rogue.sinister_strike", "rogue.eviscerate", "rogue.sap", "rogue.gouge", "rogue.kick", "rogue.blind", "rogue.vanish",
-            "rogue.opening_cut", "rogue.rallying_flourish", "rogue.tumble" };
+            "rogue.opening_cut", "rogue.rallying_flourish", "rogue.tumble", "rogue.throw_knife" };
         public const int MaxCombo = 5;
         public const float SapSeconds = 40, GougeSeconds = 4, BlindSeconds = 10, KickSilence = 3;
 
@@ -99,6 +99,7 @@ namespace Crulanda.Encounter
                 case "rogue.opening_cut": return OpeningCut(a);   // the Swashbuckler
                 case "rogue.rallying_flourish": return RallyingFlourish(a);
                 case "rogue.tumble": return Tumble(a);
+                case "rogue.throw_knife": return ThrowKnife(a);
             }
             return false;
         }
@@ -243,6 +244,17 @@ namespace Crulanda.Encounter
                 }
                 tumbleUntil = Time.time + a.duration;
                 s.FloatText(s.Player.transform.position, "Tumble", new Color(.85f, .9f, 1));
+            });
+        }
+        /// <summary>Throw Knife: a knife thrown at up to 20 m, light damage, the pull (Chris, 2026-10-11: "maybe a crossbow to pull but mainly
+        /// melee"; a thrown knife, no mechanism). A combo point.</summary>
+        bool ThrowKnife(AbilityDefinition a)
+        {
+            if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
+            return Start(a, () => {
+                if (!s.LandsOn(t, a.range)) return;
+                s.Bolt(t, new Color(.8f, .82f, .85f), .1f, true); s.BeginAutoAttack();
+                t.Receive(Dmg(a.power + s.WeaponDamage * .4f), s.Player); AddCombo(t, 1);
             });
         }
         /// <summary>Shard Poison: a swing sometimes leaves a burning shard in the wound.</summary>

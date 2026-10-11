@@ -1134,7 +1134,7 @@ def g_neck(c, P, fam, v, glow):
 def draw_gear(c, P, family, variant, glow=False):
     f = family
     if f.startswith('sword.'): g_sword(c, P, f, variant, glow)
-    elif f == 'knife': g_knife(c, P, variant, glow)
+    elif f == 'knife' or f == 'knife.off': g_knife(c, P, variant, glow)
     elif f.startswith('axe.'): g_axe(c, P, f, variant, glow)
     elif f == 'cleaver': g_cleaver(c, P, variant, glow)
     elif f == 'club': g_club(c, P, variant, glow)
@@ -1156,7 +1156,7 @@ def draw_gear(c, P, family, variant, glow=False):
 
 FAMILIES = {
     'sword.short': ('plain', 'notched'), 'sword.arming': ('straight', 'curved', 'disc'), 'sword.falchion': ('clipped', 'heavy'), 'sword.sabre': ('officer', 'broken'),
-    'sword.leaf': ('bronze', 'root'), 'sword.great': ('steel', 'wood', 'living'), 'knife': ('hooked', 'needle', 'glass', 'sickle'), 'axe.hand': ('wedge', 'hatchet'),
+    'sword.leaf': ('bronze', 'root'), 'sword.great': ('steel', 'wood', 'living'), 'knife': ('hooked', 'needle', 'glass', 'sickle'), 'knife.off': ('hooked', 'needle', 'glass', 'sickle'), 'axe.hand': ('wedge', 'hatchet'),
     'axe.bearded': ('plain', 'hooked'), 'axe.crescent': ('plain', 'spiked'), 'cleaver': ('slab', 'notched'), 'club': ('plain', 'studded', 'bound', 'tusk', 'tankard'),
     'mace.flanged': ('six', 'fist'), 'hammer.war': ('pick', 'maul'), 'mace.root': ('burl', 'antler', 'briar'), 'polearm': ('spear', 'harpoon', 'fork', 'billhook', 'spade'),
     'staff': ('knob', 'crook', 'forked', 'skull'), 'shield.buckler': ('plain', 'tusk', 'chitin'), 'shield.round': ('boards', 'hide', 'cask', 'lid'),
@@ -2566,6 +2566,13 @@ def k_silenced(c):
     c.part(c.ell(50, 50, 28), '#8a94a0', 'matte'); c.part(c.ell(50, 50, 20), '#2a2e36', 'matte')
     c.part(c.rect(24, 46, 76, 54, 3), '#ff5a48', 'soft')
 MARKS = {'skull': ('#30303a', k_skull), 'moon': ('#1e2a44', k_moon), 'cross': ('#3a2222', k_cross), 'held': ('#2a2e36', k_held), 'stunned': ('#3a3418', k_stunned), 'feared': ('#2c2440', k_feared), 'silenced': ('#2a2e36', k_silenced)}
+
+# ---- the Rogue's thrown knife (2026-10-11): the pull ----
+def a_throw_knife(c):
+    c.back(c.ell(56, 44, 34), '#c8ccd2', .35, 10)
+    for y in (40, 56, 72): c.glow(c.taper([(8, y + 12), (34, y)], .5, 3, smooth=False), '#e8ecf0', halo=4, power=.4)
+    c.push(rot=40, sc=.9, dx=6, dy=-4); g_knife(c, _P(), 'needle', False); c.pop(); c.spark(82, 22, 8, '#ffffff', .8)
+ABILITIES.update({'rogue.throw_knife': ('#2a2e36', a_throw_knife)})
 
 def main():
     here = os.path.dirname(os.path.abspath(__file__))

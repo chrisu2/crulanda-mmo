@@ -23,7 +23,7 @@ namespace Crulanda.Encounter
         {
             return classId == "class.warrior" || classId == "class.paladin" ? "heavy" : classId == "class.ranger" || classId == "class.rogue" ? "leather" : "cloth";
         }
-        public static bool CarriesWeapon(string classId) { return classId == "class.warrior" || classId == "class.paladin"; }
+        public static bool CarriesWeapon(string classId) { return classId == "class.warrior" || classId == "class.paladin" || classId == "class.rogue"; }
         /// <summary>Whether a piece by its name is of the class's weight (a Hauberk for the mail classes, a Jerkin for leather, a Tunic for cloth).</summary>
         public static bool Suits(string classId, string name)
         {
@@ -52,7 +52,8 @@ namespace Crulanda.Encounter
                 var id = Pick(items, ArmourSlots[i], s, i, d => d.name.Contains(want[i]));
                 if (id != null) ids.Add(id);
             }
-            if (CarriesWeapon(s.classId))
+            if (s.classId == "class.rogue") { ids.Add("item.rogues_dirk"); ids.Add("item.rogues_second_dirk"); }   // a Rogue's pair of dirks (2026-10-11)
+            else if (CarriesWeapon(s.classId))
             {
                 var fm = SimEconomy.Worn(s, "mainhand"); var main = fm != null && items.Get(fm) != null ? fm : Pick(items, "mainhand", s, 7, d => true); if (main != null) ids.Add(main);
                 var fo = SimEconomy.Worn(s, "offhand"); var off = fo != null && items.Get(fo) != null ? fo : Pick(items, "offhand", s, 8, d => d.name.Contains("Shield") || d.name.Contains("Buckler")); if (off != null) ids.Add(off);

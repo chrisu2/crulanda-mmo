@@ -78,7 +78,9 @@ namespace Crulanda.Encounter
             Inventory.Ensure(Progress);
             // The class's own first weapon (Round 22, note 48: "mage should start with wand or staff"): a wand for the Mage, a bow for the Ranger, the blade for the rest.
             string starter = ClassDef != null && (ClassDef.id == "class.mage" || ClassDef.id == "class.archivist" || ClassDef.id == "class.saltmender") ? "item.apprentice_wand" : ClassDef != null && ClassDef.id == "class.ranger" ? "item.hunting_bow" : content.itemId;
+            if (ClassDef != null && ClassDef.id == "class.rogue") starter = "item.rogues_dirk";   // the Rogue's pair of dirks (Chris, 2026-10-11)
             if (Progress.equipment[(int)EquipSlot.MainHand].Empty) Progress.equipment[(int)EquipSlot.MainHand] = new ItemStack { item = starter, count = 1 };
+            if (ClassDef != null && ClassDef.id == "class.rogue" && Progress.equipment[(int)EquipSlot.OffHand].Empty) Progress.equipment[(int)EquipSlot.OffHand] = new ItemStack { item = "item.rogues_second_dirk", count = 1 };
         }
         /// <summary>What taking says when the bags could not hold everything.</summary>
         public const string BodyKeepsLine = "Your bags are full. The rest stays on the body.";

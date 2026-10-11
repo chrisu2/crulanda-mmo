@@ -37,7 +37,15 @@ namespace Crulanda.Tests
         void Level10() { session.Progress.experience = EncounterProgress.XpForLevel(10); session.Player.SetLevel(10); }
         EncounterEnemy Foe() { var e = session.Enemies.Find(x => x != null && x.actor.IsAlive && !x.Elite && !x.Game && !x.Engaged); Assert.NotNull(e, "A living mob."); return e; }
         void Near(EncounterEnemy e, float d) { session.Player.GetComponent<AdventurerMotor>().Teleport(e.transform.position + Vector3.back * d); session.Select(e); }
-        const int Sinister = 0, Eviscerate = 1, Sap = 2, Gouge = 3, Kick = 4, Blind = 5, Vanish = 6, OpeningCut = 7, Flourish = 8, Tumble = 9;
+        const int Sinister = 0, Eviscerate = 1, Sap = 2, Gouge = 3, Kick = 4, Blind = 5, Vanish = 6, OpeningCut = 7, Flourish = 8, Tumble = 9, ThrowKnife = 10;
+        /// <summary>The pull (Chris, 2026-10-11: "maybe a crossbow to pull but mainly melee"): a knife thrown from 15 m lands, starts the fight and gives a point.</summary>
+        [UnityTest] public IEnumerator Throw_Knife_pulls_from_range()
+        {
+            Level10(); var e = Foe(); Near(e, 15); yield return null;
+            int before = e.actor.Health.Pool.Current;
+            Assert.IsTrue(session.UseAbility(ThrowKnife), "Throw Knife at 15 m");
+            Assert.Less(e.actor.Health.Pool.Current, before, "the knife lands"); Assert.AreEqual(1, Rogue.Combo, "a point");
+        }
 
         /// <summary>The Swashbuckler (TALENT_DEPTH.md, 2026-10-11): Opening Cut Exposes the target (the party's blows on it 8% harder, Wide
         /// Open more), the Flourish spends the combo on haste (your swings and Mira's casts; Encore mends the party on five), Tumble rolls
@@ -77,7 +85,10 @@ namespace Crulanda.Tests
         [UnityTest] public IEnumerator The_Rogue_is_its_own_character()
         {
             Assert.AreEqual("class.rogue", session.ClassDef.id); Assert.AreEqual(Crulanda.Core.ResourceKind.Focus, session.ClassDef.resource);
-            Assert.AreEqual(10, session.Kit.ActionCount, "seven, and the Swashbuckler's three"); Assert.AreEqual("Level 3", session.Kit.ActionLockLabel(Gouge));
+            Assert.AreEqual(11, session.Kit.ActionCount, "seven, the Swashbuckler's three, the thrown knife"); Assert.AreEqual("Level 3", session.Kit.ActionLockLabel(Gouge));
+            // A pair of dirks from the first (Chris, 2026-10-11: "rogue should have daggers"): one in each hand.
+            Assert.AreEqual("item.rogues_dirk", session.Progress.equipment[(int)EquipSlot.MainHand].item, "a dirk in the right hand");
+            Assert.AreEqual("item.rogues_second_dirk", session.Progress.equipment[(int)EquipSlot.OffHand].item, "and its pair in the left");
             Assert.IsTrue(session.Kit.MeleeAutoAttacks); Assert.AreEqual(ActorLook.Ranger, EncounterSession.LookForClass("class.rogue"));
             yield return null;
         }

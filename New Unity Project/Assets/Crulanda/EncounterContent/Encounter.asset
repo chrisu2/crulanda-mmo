@@ -832,6 +832,18 @@ MonoBehaviour:
     globalCooldown: 1
     duration: 4
     statusId:
+  - id: rogue.throw_knife
+    name: Throw Knife
+    description: "A knife thrown at up to 20 metres: light damage, and a combo point. The pull."
+    effect: 0
+    power: 5
+    cost: 10
+    cooldown: 6
+    range: 20
+    castTime: 0
+    globalCooldown: 1
+    duration: 0
+    statusId:
   - id: archivist.shard_note
     name: Shard Note
     description: "A 1.5-second cast at up to 25 metres: one sung note, sharp as a shard."
@@ -1591,6 +1603,9 @@ MonoBehaviour:
       - abilityId: rogue.tumble
         level: 1
         talentId: bk-tumble
+      - abilityId: rogue.throw_knife
+        level: 2
+        talentId: 
     talentTree: {fileID: 4900000, guid: d42a25e91b3b4f919864d43a597a8380, type: 3}
   - definition:
       id: class.archivist

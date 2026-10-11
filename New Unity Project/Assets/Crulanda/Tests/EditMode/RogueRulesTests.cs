@@ -29,6 +29,22 @@ namespace Crulanda.Tests
             var only = new List<string>(RogueKit.ImplementedIds); only.Remove("lk-dust");
             Assert.Throws<ArgumentException>(() => TalentTree.Parse("class.rogue", Json, 15, only));
         }
+        /// <summary>The Rogue's pair of dirks (Chris, 2026-10-11: "rogue should have daggers. and maybe a crossbow to pull but mainly melee"):
+        /// a knife for each hand in the items, the second drawn in the left fist (knife.off), on every sim Rogue; and Throw Knife on the bar.</summary>
+        [Test] public void A_pair_of_dirks_and_a_thrown_knife()
+        {
+            var content = UnityEditor.AssetDatabase.LoadAssetAtPath<EncounterContent>("Assets/Crulanda/EncounterContent/Encounter.asset");
+            var items = ItemDatabase.Parse(content.itemFiles.Select(f => f.text).ToList());
+            var main = items.Get("item.rogues_dirk"); var off = items.Get("item.rogues_second_dirk");
+            Assert.NotNull(main, "a dirk"); Assert.AreEqual("mainhand", main.slot); Assert.NotNull(off, "its pair"); Assert.AreEqual("offhand", off.slot);
+            var looks = File.ReadAllText(Path.Combine(Application.dataPath, "Crulanda/Resources/Gear/looks.json"));
+            StringAssert.Contains("\"item.rogues_dirk\",            \"look\": \"knife:", looks, "the dirk's look, a knife"); StringAssert.Contains("\"item.rogues_second_dirk\",     \"look\": \"knife.off:", looks, "its pair's, in the left fist");
+            Assert.IsTrue(SimGear.CarriesWeapon("class.rogue"));
+            var sim = new SimAdventurer { id = "t", name = "Test", classId = "class.rogue", level = 5, gearSeed = 3 };
+            var worn = SimGear.For(sim, items);
+            Assert.Contains("item.rogues_dirk", worn, "a sim Rogue carries the dirk"); Assert.Contains("item.rogues_second_dirk", worn, "and its pair");
+            Assert.AreEqual("rogue.throw_knife", RogueKit.BarIds.Last(), "Throw Knife, the pull, on the bar");
+        }
         [Test] public void The_class_and_its_seven_moves_are_in_the_content()
         {
             var content = UnityEditor.AssetDatabase.LoadAssetAtPath<EncounterContent>("Assets/Crulanda/EncounterContent/Encounter.asset");

@@ -160,7 +160,7 @@ namespace Crulanda.Encounter
                     if (e == null || !e.actor.IsAlive || !e.FightingParty || e.LeaveAlone || Held(e)) continue;
                     float d = Vector3.Distance(e.transform.position, transform.position); if (d < bestD) { best = e; bestD = d; }
                 }
-                if (best == null && Leading.HasValue && waitingAt == null && Vector3.Distance(transform.position, Leading.Value) < 18 && PartyBehind() <= 12)   // no pull till the party is up
+                if (best == null && Leading.HasValue && waitingAt == null && Vector3.Distance(transform.position, Leading.Value) < 18 && PartyBehind() <= 16)   // no pull till the party is up
                 {
                     // At the camp it leads to: the nearest of its mobs still standing (not while it waits at a shut gate: the camp past it is not its to pull, D7).
                     foreach (var e in session.Enemies)
@@ -466,7 +466,7 @@ namespace Crulanda.Encounter
                 // The whole party, not only you (Chris, 2026-10-11, watching the run: "warrior needs to wait on party"): it stops while
                 // anyone alive is more than 12 m behind, and pulls nothing until they are all within reach.
                 float behind = PartyBehind();
-                if (behind > 12) { Activity = "Waiting for the party"; agent.isStopped = true; return; }
+                if (behind > 16) { Activity = "Waiting for the party"; agent.isStopped = true; return; }
                 if (toCamp > 6) { Activity = (waitingAt != null ? "Going to the " : "Leading you to the ") + LeadingName.ToLower(); agent.isStopped = false; agent.speed = 4.2f; agent.SetDestination(Leading.Value); return; }
                 Activity = (waitingAt != null ? "Waiting at the " : "At the ") + LeadingName.ToLower(); agent.isStopped = true; return;
             }

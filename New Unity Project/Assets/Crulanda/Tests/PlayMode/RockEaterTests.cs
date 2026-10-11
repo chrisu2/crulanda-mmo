@@ -57,15 +57,16 @@ namespace Crulanda.Tests
             Assert.IsTrue(Visible(machine)); Assert.IsFalse(nix.CanAnswer, "no call brings him out");
             Assert.AreEqual(ActorLook.RockEater, machine.GetComponent<ActorVisual>().Look);
             Assert.IsNull(LootContext.From(machine.persistentId, session.Zone.Zone.camps, 11, true).mob, "the machine's corpse rolls no named piece of Nix's");
-            // Walking up to the engine (well inside the 8 m a hidden mob pounces from) does not bring him out, and nothing reaches him inside it.
+            // In the saddle nothing reaches him; and walking up to the beast (well inside the 8 m a hidden mob pounces from) starts the fight,
+            // which brings him down (the duo, 2026-10-11): the Rock-Eater engages, Nix leaps down.
             Assert.AreEqual(11, session.Progress.Level);
+            int before = nix.actor.Health.Pool.Current; nix.Receive(50, session.Player); Assert.AreEqual(before, nix.actor.Health.Pool.Current, "beyond harm in the saddle");
             session.Player.GetComponent<AdventurerMotor>().Teleport(machine.transform.position + machine.transform.forward * 4f);
             yield return new WaitForSeconds(1.2f);
-            Assert.IsTrue(nix.Hidden, "still inside"); Assert.AreSame(machine, nix.Inside);
-            int before = nix.actor.Health.Pool.Current; nix.Receive(50, session.Player); Assert.AreEqual(before, nix.actor.Health.Pool.Current, "beyond harm");
+            if (!machine.Engaged) machine.Receive(1, session.Player);
             // The fight begins (the duo, 2026-10-11, Chris: "the duo boss needs to be tougher. maybe perm CC one while killing one?"): Nix
             // leaps down at once, marked for the party to hold; free, he goads the beast (its blows half again, mending); held, it is calm.
-            machine.Receive(1, session.Player); yield return Frames(3);
+            yield return Frames(3);
             Assert.IsNull(nix.Inside, "Nix leaps down as the fight starts"); Assert.IsFalse(nix.Hidden); Assert.IsTrue(Visible(nix));
             Assert.AreEqual(RaidMark.Moon, nix.RaidMarked, "marked for the party to hold");
             Assert.AreEqual(EncounterSession.GoadedBlows, machine.BlowScale, 1e-3f, "goaded: the beast's blows half again while Nix is free");

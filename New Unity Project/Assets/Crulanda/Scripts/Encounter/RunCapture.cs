@@ -67,7 +67,7 @@ namespace Crulanda.Encounter
             {
                 float t = Time.time - start; var me = s.Player.transform.position;
                 // The leader's state when nothing moves (every 20 s of nobody fighting), to see what holds the run.
-                if (Time.time >= idleLogAt) { idleLogAt = Time.time + 20; if (!s.InCombat) Log(Clock(t) + "  quiet: the leader " + (leader.Activity ?? "").ToLower() + ", " + Vector3.Distance(leader.transform.position, me).ToString("0") + " m from you; " + s.PartySims.Count(c => c != null && c.actor.IsAlive) + " sims up; bags " + s.Progress.bag.Take(Inventory.BagSize).Count(b => !b.Empty) + "/" + Inventory.BagSize); }
+                if (Time.time >= idleLogAt) { idleLogAt = Time.time + 20; Log(Clock(t) + (s.InCombat ? "  fighting: " : "  quiet: ") + string.Join("; ", s.PartySims.Where(c => c != null).Select(c => c.sim.name.Split(' ')[0] + " " + (c.Activity ?? "").ToLower() + " (" + Vector3.Distance(c.transform.position, me).ToString("0") + " m)")) + "; bags " + s.Progress.bag.Take(Inventory.BagSize).Count(b => !b.Empty) + "/" + Inventory.BagSize); }
                 // A camp cleared: the leader moves its mark on.
                 if (leader.CampsLeft < left) { Log(Clock(t) + "  camp " + (camps - leader.CampsLeft) + "/" + camps + " cleared: " + leadingName + "; next " + leader.LeadingName); left = leader.CampsLeft; }
                 if (leader.LeadingName != leadingName)
@@ -158,9 +158,9 @@ namespace Crulanda.Encounter
                 if (dist > reach) { motor.SetView(Mathf.Atan2(to.x, to.z) * Mathf.Rad2Deg, 14, 7); EncounterInput.Scripted = Vector2.up; }
                 else EncounterInput.Scripted = Vector2.zero;
                 // Stuck behind something (the caves' props): a warp to the leader's heels.
-                if (Time.time - stuckAt > 6)
+                if (Time.time - stuckAt > 4)
                 {
-                    if (foe == null && Vector3.Distance(leader.transform.position, me) > 12 && Vector3.Distance(stuckFrom, me) < 1.5f)
+                    if (foe == null && dist > reach + 1 && Vector3.Distance(stuckFrom, me) < 1)   // meant to be walking and not moving: stuck on the cave's clutter
                     {
                         var at = leader.transform.position - leader.transform.forward * 2.5f;
                         if (NavMesh.SamplePosition(at, out var hit, 4, NavMesh.AllAreas)) { motor.Teleport(hit.position + Vector3.up * 1.05f); warps++; Log(Clock(t) + "  stuck; warped to the leader (" + warps + ")"); }

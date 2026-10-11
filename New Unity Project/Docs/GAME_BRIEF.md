@@ -78,7 +78,7 @@ reference only:
   cozy wooden houses built into the trees, waterfalls, flowers and glowing plants). Decided: **the Verdant Shore** (CANON,
   Book 3: "a forest that didn't know when to stop", trunks as wide as houses, the Veridian Keepers and their temple), set in
   the game's time, before the books' exodus. It is the fifth zone, **levels 11-13, after the Ash Rim**, so the level cap rises
-  to 13; the way there crosses the ash-mountains west, as the survivors do in Book 3. The references are style only: nothing
+  to 13 (as decided on 2026-09-30; since 2026-10-07 the cap is 15 and the Shore is 13-15); the way there crosses the ash-mountains west, as the survivors do in Book 3. The references are style only: nothing
   is copied from any other game.
 
 ## Standing rules

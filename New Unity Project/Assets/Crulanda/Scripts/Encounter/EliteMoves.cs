@@ -102,7 +102,7 @@ namespace Crulanda.Encounter
                 enrage = "The Quiet Miner stops working. For the first time, he looks at you." },
             new EliteMove { mob = "The Vent-Hound", name = "Ember Lunge", windup = 1.5f, blow = 3.6f, reach = 4.4f, every = 9,
                 enrage = "The Vent-Hound's coat glows along the spine." },
-            new EliteMove { mob = "Quartermaster Brannigan Sorrel", name = "Boot-Heel Stamp", windup = 2, blow = 4.2f, reach = 3.6f, every = 10, callReach = 48, callMost = 2,   // (14 in the first Adit; the gunners stand 44.6 m off now)
+            new EliteMove { mob = "Quartermaster Brannigan Sorrel", name = "Boot-Heel Stamp", windup = 2, blow = 4.2f, reach = 3.6f, every = 10, callReach = 30, callMost = 2,   // (14 in the first Adit; 48 brought the gunners until the carriage moved to Danner, who stands 32 m off now, 2026-10-11: his guard answers, never he)
                 phases = new[] {
                     new BossPhase { at = .667f, kind = "stamp", seconds = 2, text = "Sorrel stamps: the platform jumps under you. He goes to the rack and comes back with a maul." },
                     new BossPhase { at = .333f, kind = "stamp", seconds = 2, text = "Sorrel stamps again, and this time comes back with the poleaxe." } },   // his guards, not the captain down the hall

@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-10-11, small hours — The escort on the drawn-out Adit; saves deep in it (branch feet-bow-adit-kit)
+- **A save deep in the Adit came back a new character.** The save check refused any place more than 60 m down, and the drawn-out
+  Adit's Rail Hall is 80-90 m down: the game would have said "Save could not be loaded" and started a fresh character there. Found by
+  the escort test (the reloaded character had no XP and no keys). Now 250 m down or up and 500 m across (`EncounterSave.Placeable`);
+  AditTests checks every floor of the dungeon against it, and an EditMode test saves 95 m down and reads it back. No format change.
+- **The Weaver's waves come by distance:** the first when she is 27 m from the lock, the second at 13 m (they came at a share of the
+  walk; on the drawn-out walk the second came out more than 30 m from her and gave up at once, past the leash).
+- **The carriage stands by Danner** (his home was 38 m from it, so he never came for her); Danner and his guard moved one row back so
+  the carriage is clear of the hall's narrowing end.
+- **The Quartermaster's call is 30 m** (was 48): Danner now stands 32 m from her, and a call may not bring a second elite. His guard
+  (two Sandthrone, 28.8 m) answers instead of the gunners.
+- The escort test now waits (up to 4 minutes) for all six of the waves, checks where each wave comes out, checks the second can reach
+  her inside half the game's lock time, and checks the fight is over before it saves and reloads.
+
 ## 2026-10-10 night — Feet and bow at the root, built halls, ghostly Hollow Men, the full-length Adit (branch feet-bow-adit-kit)
 - **Feet:** the clip importer (Editor/CharacterImport) built each vendor clip's avatar from its own file; Kevin Iglesias's clips now copy
   his HumanM/HumanF avatars. His run stands flat (Editor/FootDiag); every runtime foot correction of the evening removed; FootTests now

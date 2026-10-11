@@ -920,11 +920,11 @@
       "levelMax": 12,
       "respawn": 900,
       "center": {
-        "x": 104.39,
-        "y": 259.6
+        "x": 107.1,
+        "y": 233.59
       },
       "cave": "The Sealed Adit",
-      "along": 685.94,
+      "along": 658.76,
       "aside": -10
     },
     {
@@ -942,11 +942,11 @@
       "harder": true,
       "guards": "Rail-Captain's guard",
       "center": {
-        "x": 113.7,
-        "y": 264.98
+        "x": 116.89,
+        "y": 238.0
       },
       "cave": "The Sealed Adit",
-      "along": 689.94,
+      "along": 662.76,
       "aside": 0
     },
     {

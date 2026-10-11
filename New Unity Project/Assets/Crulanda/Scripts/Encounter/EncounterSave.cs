@@ -42,6 +42,15 @@ namespace Crulanda.Encounter
             this.talents = talents ?? throw new ArgumentNullException(nameof(talents));
             this.slot = string.IsNullOrWhiteSpace(slot) ? throw new ArgumentException("Save slot missing.") : slot;
         }
+        /// <summary>How far from the zone's centre (across) and from sea level (down or up) a saved place may be: anything further is not a
+        /// save this game wrote. Was 60 down until the drawn-out Sealed Adit (2026-10-10) put its floors 80-90 m down, and a save there
+        /// came back a new character (2026-10-11); AditTests checks every floor of the dungeon against these.</summary>
+        public const float MaxAcross = 500, MaxDepth = 250, MaxHeight = 250;
+        public static bool Placeable(float x, float y, float z)
+        {
+            return !float.IsNaN(x) && !float.IsNaN(y) && !float.IsNaN(z) && !float.IsInfinity(x) && !float.IsInfinity(y) && !float.IsInfinity(z) &&
+                Math.Abs(x) <= MaxAcross && Math.Abs(z) <= MaxAcross && y >= -MaxDepth && y <= MaxHeight;
+        }
         public void Write(EncounterProgress progress)
         {
             if (!talents.Validate(progress, out var reason)) throw new InvalidOperationException(reason);
@@ -64,9 +73,7 @@ namespace Crulanda.Encounter
                 var p = JsonUtility.FromJson<EncounterProgress>(envelope.payloadJson);
                 if (p == null || !Guid.TryParse(p.playerId, out _) || !Guid.TryParse(p.companionId, out _) ||
                     p.enemies == null || p.experience < 0 || p.gold < 0 ||
-                    float.IsNaN(p.x) || float.IsNaN(p.y) || float.IsNaN(p.z) ||
-                    float.IsInfinity(p.x) || float.IsInfinity(p.y) || float.IsInfinity(p.z) ||
-                    Math.Abs(p.x) > 500 || Math.Abs(p.z) > 500 || p.y < -60 || p.y > 60)   // (a cave's floor may lie well under the land)
+                    !Placeable(p.x, p.y, p.z))
                     throw new InvalidOperationException("Invalid encounter data.");
                 // Level curve changed in format 5: convert experience first so every level-based check sees the same level.
                 if (from < 5) p.experience = EncounterProgress.MigrateExperience(p.experience);

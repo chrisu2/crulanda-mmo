@@ -13,7 +13,8 @@ formatVersion: 1. payloadType: CrulandaEncounter. DTO: EncounterProgress.
     still her current health and the format did not change. A saved value of exactly her level-1 full health (130) is read as
     full health at any level (`EncounterSession.CompanionHealthFromSave`), so a save from before she grew loads her whole and
     not wounded. Any other value is her health as saved.
-- x/y/z: player position; bounds and finite values validated at load.
+- x/y/z: player position; finite values within 500 m of the zone's centre and 250 m of sea level, checked at load (`EncounterSave.Placeable`;
+  the depth limit was 60 m until a save on the drawn-out Sealed Adit's deep floors came back a new character, 2026-10-11).
 - recruited, relationship, gold.
 - inventory: item-ID list; equippedItem: item ID.
 - enemies: records of id, dead and looted; prevent duplicate rewards after reload. Camp mobs are not saved, and neither is what lies on their bodies (loot step L1: drops are rolled when a mob dies and live on the body until it is emptied or respawns) or an open loot window.

@@ -69,6 +69,8 @@ namespace Crulanda.Tests
                     from = next.position; walked.Add((h, s, next.position));
                 }
             }
+            // Every floor is a place a save may hold (a save 80 m down came back a new character, 2026-10-11).
+            foreach (var w in walked) Assert.IsTrue(EncounterSave.Placeable(w.at.x, w.at.y, w.at.z), w.cave.Name + ": a save " + w.s + " m in (" + w.at + ") loads again");
             foreach (var cp in zone.Zone.camps)
             {
                 var h = Cave(cp.cave); Assert.NotNull(h, cp.name + " names its cave");

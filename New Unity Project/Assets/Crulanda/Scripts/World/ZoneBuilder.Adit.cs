@@ -712,7 +712,10 @@ namespace Crulanda.World
                 for (float s = from + 8 * X; s < to; s += 30) { int i = RingAt(s); Glow(t, c[i] + Vector3.up * h.Height[i] * .7f, 30 * CW, .7f, RailBlue, .7f); }
                 // The carriage: an armoured body on eight wheels, plates riveted down its side, the rear open on stacked crates of
                 // glowing geodes, a gangway up from the platform.
-                float sc = to - 16 * X; var qc = Along(sc); var car = On(sc, line);
+                // The carriage stands where Rail-Captain Danner keeps, 14 m short of his camp as in the first Adit (to - 16 there): drawn
+                // out, "to - 16 * X" put it 38 m from him, past the reach of a mob's leash, and he never came for the Weaver at the lock.
+                var danner = Zone.camps == null ? null : System.Array.Find(Zone.camps, cp => cp != null && cp.cave == h.Name && cp.tag == "railcaptain");
+                float sc = danner != null ? Mathf.Min(danner.along - 14, to - 12) : to - 16 * X; var qc = Along(sc); var car = On(sc, line);
                 var plate = Tint(art.metal, new Color(.26f, .27f, .29f));
                 Part(PrimitiveType.Cube, t, car + qc * new Vector3(0, 1.75f, 2.2f), new Vector3(2.8f, 2.4f, 6), plate, qc);   // the armoured cab
                 Part(PrimitiveType.Cube, t, car + qc * new Vector3(0, 3.05f, 2.2f), new Vector3(3, .2f, 6.2f), dark, qc);
@@ -731,9 +734,9 @@ namespace Crulanda.World
                 lit.Add(Part(PrimitiveType.Sphere, t, car + qc * new Vector3(1.53f, 1.5f, 1.2f), new Vector3(.06f, .16f, .16f), geode, qc));
                 lit.Add(Glow(t, car + qc * new Vector3(2.1f, 1.6f, 1.2f), 4, .7f, GeodeViolet, .7f).gameObject);
                 RailGeodes = lit.ToArray(); RailLock = t.TransformPoint(On(sc + 1.2f, line + 2.6f));
-                // The second wave out of the dark toward the far end, 16 m past the carriage (the far end itself is 33 m past it now: they came
+                // The second wave out of the dark toward the far end, 14 m past the carriage (the far end itself is 33 m past it now: they came
                 // too late to matter), by the line where the hall has narrowed (drawn out, the line runs 23 m off the way: there it is in the rock).
-                float s2 = Mathf.Min(to - 4.5f * X, sc + 16);
+                float s2 = Mathf.Min(to - 4.5f * X, sc + 14);   // 13 m from the lock when it comes (AditWeaver.Wave2At), she is then some 26 m from them: inside the leash's 30
                 RailWaves = new[] { t.TransformPoint(On(sc - 9.5f, line + 1)), t.TransformPoint(On(s2, Mathf.Max(line + 2, -h.Half[RingAt(s2)] * .5f))) };
                 // The way out (D8): the gangway at the carriage's bed, on the platform side. With the lock matched the goblins set the
                 // carriage to run back up the line to a siding under the yard (EncounterSession.Adit, kind "carriage").

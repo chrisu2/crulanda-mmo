@@ -137,8 +137,10 @@ CAMPS = [
     (MAIN, 38, -3, -3, mob("Quartermaster's guards", 'Sandthrone platform guard', 'outrider', 2, 12, 12, tag='platformguard', radius=1.5)),
     (MAIN, 38, 2, 0, mob('Quartermaster Brannigan Sorrel', 'Quartermaster Brannigan Sorrel', 'outrider', 1, 12, 12, tag='railquartermaster', canon='GAME-ONLY', radius=1, elite=True, guards="Quartermaster's guards")),
     (MAIN, 39, 2, 9, mob('Carriage gunners', 'Sandthrone carriage gunner', 'outrider', 2, 12, 12, tag='gunner', radius=2)),
-    (MAIN, 40, -2, -5, mob("Rail-Captain's guard", 'Sandthrone platform guard', 'outrider', 2, 12, 12, tag='platformguard', radius=1.5)),
-    (MAIN, 40, 2, 0, mob('Rail-Captain Orsk Danner', 'Rail-Captain Orsk Danner', 'outrider', 1, 12, 12, tag='railcaptain', canon='GAME-ONLY', radius=1, elite=True, harder=True, guards="Rail-Captain's guard")),
+    # Danner and his guard on row 39 (row 40 in the first Adit): drawn out, row 40 is where the hall narrows to its end, and the carriage,
+    # which stands 14 m short of him (ZoneBuilder.RailHall), would have run into the hall's walls there (2026-10-10).
+    (MAIN, 39, -2, -5, mob("Rail-Captain's guard", 'Sandthrone platform guard', 'outrider', 2, 12, 12, tag='platformguard', radius=1.5)),
+    (MAIN, 39, 2, 0, mob('Rail-Captain Orsk Danner', 'Rail-Captain Orsk Danner', 'outrider', 1, 12, 12, tag='railcaptain', canon='GAME-ONLY', radius=1, elite=True, harder=True, guards="Rail-Captain's guard")),
 
     ('The Geode Floor', 3, 0, 0, mob("Cutters' drift", 'Sandthrone geode-cutter', 'outrider', 2, 11, 11, tag='cutter', radius=1.6)),
     ('The Geode Floor', 5, 2, -3, mob('The cutting floor', 'Sandthrone geode-cutter', 'outrider', 3, 11, 11, tag='cutter', radius=2.5)),

@@ -58,7 +58,7 @@ namespace Crulanda.Encounter
             var leader = s.PartySims.Find(c => c != null && c.Dungeon != null);
             int camps = leader.CampsLeft, left = camps; Log("Leader: " + leader.sim.name + ", " + camps + " camps.");
             var motor = s.Player.GetComponent<AdventurerMotor>(); AdventurerMotor.Running = true;
-            int deaths = 0, warps = 0, shots = 0, elitesSeen = 0, mends = 0, looted = 0; var lootTally = new SortedDictionary<string, int>(); float lootUntil = 0; var seen = new HashSet<string>(); var mending = new Dictionary<SimCompanion, string>(); var engagedAt = new Dictionary<EncounterEnemy, float>(); var searched = new HashSet<EncounterEnemy>(); float idleLogAt = 0; int holds = 0; string lastHold = null; var simHeld = new Dictionary<SimCompanion, bool>();
+            int deaths = 0, warps = 0, shots = 0, elitesSeen = 0, mends = 0, looted = 0; var lootTally = new SortedDictionary<string, int>(); float lootUntil = 0; var seen = new HashSet<string>(); var mending = new Dictionary<SimCompanion, string>(); var engagedAt = new Dictionary<EncounterEnemy, float>(); var searched = new HashSet<EncounterEnemy>(); float idleLogAt = 0, pathAt = 0; Vector3 pathGoal = Vector3.zero; NavMeshPath path = null; int holds = 0; string lastHold = null; var simHeld = new Dictionary<SimCompanion, bool>();
             float start = Time.time, realStart = Time.realtimeSinceStartup, nextShot = Time.time + 20, nextSwing = 0, stuckAt = Time.time, deadAt = -1; var stuckFrom = s.Player.transform.position;
             string leadingName = leader.LeadingName;
             Time.timeScale = Speed;
@@ -166,15 +166,23 @@ namespace Crulanda.Encounter
                     if (Time.time >= nextSwing) { nextSwing = Time.time + .6f; s.UseAbility(0); s.UseAbility(2); s.UseAbility(1); }
                 }
                 var to = goal - me; to.y = 0; float dist = to.magnitude;
-                if (dist > reach) { motor.SetView(Mathf.Atan2(to.x, to.z) * Mathf.Rad2Deg, 14, 7); EncounterInput.Scripted = Vector2.up; }
+                // Along the cave's own paths, corner by corner, as the sims go (a straight line stopped at every wall and pot: Chris, 2026-10-11,
+                // "stuck on wall"); the path refreshed every half second.
+                if (dist > reach)
+                {
+                    if (Time.time >= pathAt || pathGoal != goal) { pathAt = Time.time + .5f; pathGoal = goal; if (path == null) path = new NavMeshPath(); NavMesh.SamplePosition(goal, out var g, 3, NavMesh.AllAreas); NavMesh.CalculatePath(me, g.hit ? g.position : goal, NavMesh.AllAreas, path); }
+                    var step = to; if (path != null && path.corners.Length > 1) { int ci = 1; while (ci < path.corners.Length - 1 && Vector3.Distance(new Vector3(path.corners[ci].x, 0, path.corners[ci].z), new Vector3(me.x, 0, me.z)) < 1.2f) ci++; step = path.corners[ci] - me; step.y = 0; }
+                    if (step.sqrMagnitude < .01f) step = to;
+                    motor.SetView(Mathf.Atan2(step.x, step.z) * Mathf.Rad2Deg, 14, 7); EncounterInput.Scripted = Vector2.up;
+                }
                 else EncounterInput.Scripted = Vector2.zero;
-                // Stuck behind something (the caves' props): a warp to the leader's heels.
+                // Stuck all the same (a prop the paths run through): a warp to beside what you are after, in a fight or out of one.
                 if (Time.time - stuckAt > 4)
                 {
-                    if (foe == null && dist > reach + 1 && Vector3.Distance(stuckFrom, me) < 1)   // meant to be walking and not moving: stuck on the cave's clutter
+                    if (dist > reach + 1 && Vector3.Distance(stuckFrom, me) < 1)
                     {
-                        var at = leader.transform.position - leader.transform.forward * 2.5f;
-                        if (NavMesh.SamplePosition(at, out var hit, 4, NavMesh.AllAreas)) { motor.Teleport(hit.position + Vector3.up * 1.05f); warps++; Log(Clock(t) + "  stuck; warped to the leader (" + warps + ")"); }
+                        var at = goal - to.normalized * Mathf.Min(2.5f, dist * .5f);
+                        if (NavMesh.SamplePosition(at, out var hit, 4, NavMesh.AllAreas)) { motor.Teleport(hit.position + Vector3.up * 1.05f); warps++; Log(Clock(t) + "  stuck; warped " + (foe != null ? "to the fight" : corpse != null ? "to the body" : "to the leader") + " (" + warps + ")"); }
                     }
                     stuckAt = Time.time; stuckFrom = me;
                 }

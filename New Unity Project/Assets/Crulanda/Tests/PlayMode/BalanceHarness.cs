@@ -9,6 +9,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using Crulanda.Encounter;
+using Crulanda.Abilities;
 
 namespace Crulanda.Tests
 {
@@ -22,10 +23,14 @@ namespace Crulanda.Tests
     [Explicit("long: the balance harness, run by name"), Category("Balance")]
     public class BalanceHarness
     {
-        public static float FightSeconds = 180; public static int Seeds = 5; public static float Step = .05f;   // game seconds a frame (Time.captureDeltaTime): as fast as the editor runs, the same steps every run
-        static readonly string[] Classes = { "class.warrior", "class.druid", "class.paladin", "class.ranger", "class.mage", "class.rogue", "class.archivist", "class.saltmender" };
+        public static float FightSeconds = 90; public static int Seeds = 3; public static float Step = .05f;   // game seconds a frame (Time.captureDeltaTime): as fast as the editor runs, the same steps every run
+        static readonly string[] AllClasses = { "class.warrior", "class.druid", "class.paladin", "class.ranger", "class.mage", "class.rogue", "class.archivist", "class.saltmender" };
+        /// <summary>CRULANDA_BALANCE_CLASSES=mage,archivist runs those only (about two a chunk); each set writes its own balance-<set>.csv.</summary>
+        static string[] Classes { get { var f = Environment.GetEnvironmentVariable("CRULANDA_BALANCE_CLASSES"); if (string.IsNullOrEmpty(f)) return AllClasses;
+            var want = f.Split(',').Select(x => x.Trim().ToLowerInvariant()).Select(x => x.StartsWith("class.") ? x : "class." + x).ToList(); return want.Where(AllClasses.Contains).ToArray(); } }
+        static string CsvName { get { var f = Environment.GetEnvironmentVariable("CRULANDA_BALANCE_CLASSES"); return string.IsNullOrEmpty(f) ? "balance.csv" : "balance-" + f.Replace(",", "-").Replace(" ", "") + ".csv"; } }
         static string Out { get { var d = Environment.GetEnvironmentVariable("CRULANDA_BALANCE_OUT"); return string.IsNullOrEmpty(d) ? @"D:\crulanda-work\outputs\balance" : d; } }
-        readonly List<string> csv = new List<string> { "class,build,role,scenario,seed,seconds,dps,hps,resource_max,resource_used,time_to_oom" };
+        readonly List<string> csv = new List<string> { "class,build,role,scenario,seed,seconds,dps,hps,resource_max,resource_used,time_to_oom,foes_hit" };
         // Never in the rotation: forms (the build's own is taken once at the start), escapes and crowd control that would end the fight;
         // once a fight: summons and standing auras.
         static readonly HashSet<string> Never = new HashSet<string> { "druid.barkhide", "druid.thornclaw", "druid.rootmend", "druid.thornsong", "mage.unbind", "mage.quench", "mage.bind",
@@ -45,8 +50,9 @@ namespace Crulanda.Tests
                 yield return SceneManager.LoadSceneAsync("PlayableEncounter", LoadSceneMode.Single);
                 SceneManager.sceneLoaded -= OnLoaded; yield return null; yield return null;
                 s = UnityEngine.Object.FindFirstObjectByType<EncounterSession>();
-                if (s == null || s.Kit == null) { csv.Add(cls + ",LOAD FAILED,,,,,,,,,"); continue; }
+                if (s == null || s.Kit == null) { csv.Add(cls + ",LOAD FAILED,,,,,,,,,,"); continue; }
                 if (s.Companion != null) s.Companion.gameObject.SetActive(false);
+                s.Progress.experience = EncounterProgress.XpForLevel(15); s.Player.SetLevel(15);   // the gear asks for the level
                 string gear = Gear(); csv.Add("# " + cls + " gear: " + gear);
                 foreach (var branch in s.Talents.Branches.ToList())
                     for (int seed = 0; seed < Seeds; seed++)
@@ -56,15 +62,15 @@ namespace Crulanda.Tests
                         yield return Fight(cls, branch, role, "aoe3", seed, 3);
                         if (role.Contains("heal")) yield return Fight(cls, branch, role, "heal", seed, 0);
                     }
-                File.WriteAllLines(Path.Combine(Out, "balance.csv"), csv);
+                File.WriteAllLines(Path.Combine(Out, CsvName), csv);
                 EncounterSession.StartClassOverride = null;
                 var empty = SceneManager.CreateScene("Empty-" + Guid.NewGuid().ToString("N")); SceneManager.SetActiveScene(empty);
                 yield return SceneManager.UnloadSceneAsync("PlayableEncounter");
                 try { if (Directory.Exists(root)) Directory.Delete(root, true); } catch { }
             }
             Time.captureDeltaTime = 0;
-            File.WriteAllLines(Path.Combine(Out, "balance.csv"), csv);
-            File.WriteAllText(Path.Combine(Out, "BALANCE_TABLE.md"), Table(csv));
+            File.WriteAllLines(Path.Combine(Out, CsvName), csv);
+            File.WriteAllText(Path.Combine(Out, CsvName.Replace(".csv", "") + "_TABLE.md"), Table(csv));
             Assert.Greater(csv.Count, 1, "rows");
         }
 
@@ -105,19 +111,27 @@ namespace Crulanda.Tests
             s.Progress.experience = EncounterProgress.XpForLevel(15); s.Player.SetLevel(15); Buy(branch);
             s.Player.Health.Pool.Fill(); s.Player.Resource.Pool.Fill(); s.Kit.ClearTransient();
             var foes = s.Enemies.Where(x => x != null && x.actor.IsAlive).OrderBy(x => x.transform.position.sqrMagnitude).Take(Math.Max(1, targets)).ToList();
-            if (foes.Count == 0) { csv.Add(string.Join(",", cls, branch.id, role, scenario, seed, "NO FOE", "", "", "", "", "")); yield break; }
+            if (foes.Count == 0) { csv.Add(string.Join(",", cls, branch.id, role, scenario, seed, "NO FOE", "", "", "", "", "", "")); yield break; }
             var motor = s.Player.GetComponent<AdventurerMotor>(); var at = foes[0].transform.position;
             for (int i = 0; i < foes.Count; i++)
             {
                 Dummy(foes[i]); var ag = foes[i].GetComponent<UnityEngine.AI.NavMeshAgent>();
-                var p = at + Quaternion.Euler(0, i * 120, 0) * Vector3.right * (i == 0 ? 0 : 1.4f);
+                var p = at + Quaternion.Euler(0, i * 120 + seed * 23, 0) * Vector3.right * (i == 0 ? 0 : 1.4f + .15f * seed);
+                if (targets == 0) p = at + Vector3.forward * 80 + Vector3.right * 3 * i;   // the heal test: no foe in reach, nothing to strike
                 if (ag != null && ag.isOnNavMesh) ag.Warp(p); else foes[i].transform.position = p;
             }
             motor.Teleport(at + Vector3.back * 2.4f + Vector3.up * .5f); s.Player.transform.rotation = Quaternion.LookRotation(Vector3.forward);
-            if (targets > 0) s.Select(foes[0]);
+            if (targets > 0) s.Select(foes[0]); else s.Select(null);
             yield return null;
             var used1 = new HashSet<string>();
             { int form = SlotOf((cls == "class.druid" ? "druid." : "") + branch.id); if (form >= 0 && s.Kit.ActionLockLabel(form) == null) { s.UseAbility(form); yield return new WaitForSeconds(1.6f); } }
+            // The fight is deterministic (no crit or damage rolls in combat), so the seed changes the opening instead: a late start of
+            // .4 s a seed, and which of the equally-ranked abilities leads.
+            if (seed > 0) yield return new WaitForSeconds(.4f * seed);
+            var order = Enumerable.Range(0, s.Kit.ActionCount).Where(i => s.Kit.ActionAt(i) != null)
+                .OrderByDescending(i => targets == 0 && s.Kit.ActionAt(i).effect == AbilityEffect.Heal ? 1 : 0)   // the heal test: mends first
+                .ThenByDescending(i => s.Kit.ActionAt(i).cooldown)   // cooldowns (the splashes, the big hits) when ready, the filler last
+                .ThenBy(i => (i + seed) % Math.Max(1, s.Kit.ActionCount)).ToList();
             s.Meter.Reset(); var pool = s.Player.Resource.Pool; int last = pool.Current, used = 0; float oom = -1, t = 0, hurt = 0;
             Time.captureDeltaTime = Step;
             while (t < FightSeconds)
@@ -126,7 +140,7 @@ namespace Crulanda.Tests
                 if (targets > 0 && (s.Target == null || !s.Target.actor.IsAlive)) { var f = foes.FirstOrDefault(x => x != null && x.actor.IsAlive); if (f != null) s.Select(f); }
                 if (targets == 0) { hurt += dt; if (hurt >= 1) { hurt -= 1; s.Player.Health.ApplyDamage(Mathf.Min(s.Player.Health.Pool.Current - 1, Mathf.RoundToInt(s.Player.Health.Pool.Max * .04f))); } }
                 if (s.Player.Health.Pool.Current < s.Player.Health.Pool.Max * .3f && targets > 0) s.Player.Health.Pool.Fill();
-                for (int slot = 0; slot < s.Kit.ActionCount; slot++)
+                foreach (int slot in order)
                 {
                     var ab = s.Kit.ActionAt(slot); if (ab == null || s.Kit.ActionLockLabel(slot) != null || Never.Contains(ab.id) || used1.Contains(ab.id)) continue;
                     if (s.UseAbility(slot)) { if (Once.Contains(ab.id)) used1.Add(ab.id); break; }
@@ -135,9 +149,10 @@ namespace Crulanda.Tests
                 if (oom < 0 && pool.Max > 0 && pool.Ratio < .05f) oom = t;
             }
             Time.captureDeltaTime = 0;
+            int hit = foes.Count(f => f != null && f.actor.Health.Pool.Current < 5000000);
             int dmg = 0, heal = 0; foreach (var r in s.Meter.Rows) { dmg += r.damage; heal += r.healing; }
             if (s.Player.Health.Pool.Current <= 0) s.Player.Health.Revive(s.Player.Health.Pool.Max);
-            csv.Add(string.Join(",", cls, branch.id, role, scenario, seed, t.ToString("0.0"), (dmg / t).ToString("0.0"), (heal / t).ToString("0.0"), pool.Max, used, oom < 0 ? "" : oom.ToString("0.0")));
+            csv.Add(string.Join(",", cls, branch.id, role, scenario, seed, t.ToString("0.0"), (dmg / t).ToString("0.0"), (heal / t).ToString("0.0"), pool.Max, used, oom < 0 ? "" : oom.ToString("0.0"), hit));
             foreach (var f in foes) if (f != null) { f.actor.Health.Pool.SetMax(5000000, false); f.actor.Health.Pool.SetCurrent(5000000); }
         }
 

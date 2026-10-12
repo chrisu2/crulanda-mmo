@@ -1,4 +1,4 @@
-﻿using Crulanda.Combat;
+using Crulanda.Combat;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -109,7 +109,7 @@ namespace Crulanda.Encounter
                     farmer.enabled = false; if (farmer.Carrying) farmer.PutDownLoad();
                     if (agent != null && agent.isOnNavMesh) { agent.Warp(field.transform.position); agent.isStopped = true; }
                     yield return new WaitForSeconds(.5f); vis.Pose = ActorPose.Work; yield return new WaitForSeconds(2);
-                    var side = farmer.transform.right; motor.Teleport(farmer.transform.position + side * 1.9f + farmer.transform.forward * .4f + Vector3.up * .2f); yield return null;
+                    var side = vis.transform.right; if (vis.Figure != null && vis.Figure.Animator != null) { side = vis.Figure.Animator.transform.right; side.y = 0; side.Normalize(); } motor.Teleport(farmer.transform.position + side * 2.4f + Vector3.up * .2f); yield return null;
                     var mine = s.Player.GetComponentsInChildren<Renderer>().Where(x => x.enabled).ToList(); foreach (var x in mine) x.enabled = false;   // the Mender out of the shot: the farmer close
                     s.Player.transform.rotation = Quaternion.LookRotation(-side);
                     for (int i = 0; i < 3; i++)
@@ -145,7 +145,7 @@ namespace Crulanda.Encounter
                 }
                 motor.Teleport(s.Zone.Ground(new Vector2(14, 14), 1.1f)); yield return new WaitForSeconds(2);
                 var pv = s.Player.GetComponentInChildren<ActorVisual>();
-                View(90, 2, 2.2f); yield return Shot("step5-03-feet-side-standing", "the Mender's feet side on, standing: lower sole " + (pv != null ? (pv.SoleGap * 100).ToString("0.0") : "?") + " cm off the ground", null);
+                View(90, 20, 3.2f); yield return Shot("step5-03-feet-side-standing", "the Mender's feet side on, standing: lower sole " + (pv != null ? (pv.SoleGap * 100).ToString("0.0") : "?") + " cm off the ground", null);
                 if (s.Companion != null)
                 {
                     s.Progress.recruited = false; motor.Teleport(s.Companion.transform.position + s.Companion.transform.forward * 2 + Vector3.up); yield return new WaitForSeconds(1);
@@ -157,9 +157,15 @@ namespace Crulanda.Encounter
             {
                 Buy("bc-");
                 var foe = NearFoe(); yield return new WaitForSeconds(1);
+
                 if (foe != null)
                 {
                     Use("mage.raise_thrall"); yield return new WaitForSeconds(2f);
+                // Step 6 (Chris 1:29, "meter should be movable in the ui. pet bar should be movable in the ui."): both shown moved.
+                EncounterHud.ShowPanelMoved("meter", new Vector2(-640, -330)); EncounterHud.ShowPanelMoved("pet", new Vector2(520, -420)); s.MeterOpen = true;
+                View(0, 14, 6); yield return Shot("step6-01-meter-and-pet-bar-moved", "the meter moved to the middle left and the pet bar up to the middle (pet " + (s.Pet != null ? "out" : "NONE") + "); default " + EncounterHud.PanelRect("meter") + " / " + EncounterHud.PanelRect("pet"), null, false);
+                EncounterHud.ShowPanelMoved("meter", null); EncounterHud.ShowPanelMoved("pet", null);
+
                     var thrall = s.Pet != null ? s.Pet.transform : null;
                     View(110, 10, 3.4f); yield return Shot("step4-08-bonecaller-thrall", "the Bonecaller's bone thrall raised beside the Mage (" + (thrall != null ? "up" : "NOT RAISED") + ")", thrall);
                     s.Select(foe); Use("mage.marrow_drain"); yield return new WaitForSeconds(2.4f);

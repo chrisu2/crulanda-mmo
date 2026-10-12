@@ -44,6 +44,9 @@ namespace Crulanda.Encounter
         public static void ResetPanels() { foreach (var pn in Panels) { try { PlayerPrefs.DeleteKey("ui.pos." + pn.id + ".x"); PlayerPrefs.DeleteKey("ui.pos." + pn.id + ".y"); } catch { } panelOffsets.Remove(pn.id); } }
         /// <summary>Forget the in-memory positions (as a fresh run would), so the next read comes from PlayerPrefs.</summary>
         public static void ForgetPanelCache() { panelOffsets.Clear(); }
+        static readonly Dictionary<string, Vector2> shotOffsets = new Dictionary<string, Vector2>();
+        /// <summary>For captures: a panel shown moved without touching the player's saved positions (null: back).</summary>
+        public static void ShowPanelMoved(string id, Vector2? offset) { if (offset.HasValue) shotOffsets[id] = offset.Value; else shotOffsets.Remove(id); }
         static readonly Dictionary<string, Vector2> panelOffsets = new Dictionary<string, Vector2>();
         static bool uiUnlocked; static string dragging; static Vector2 dragFrom;
         /// <summary>How far a panel is moved from its place on the 1440x900 canvas: where the player put it, else (on a wide screen) out to
@@ -53,6 +56,7 @@ namespace Crulanda.Encounter
         public static bool DefaultPanels;
         static Vector2 PanelOffset(string id)
         {
+            if (shotOffsets.TryGetValue(id, out var so)) return so;
             if (DefaultPanels) { float dx = 0; foreach (var pn in Panels) if (pn.id == id) dx = pn.anchor * CanvasOffset.x / CanvasScale; return new Vector2(dx, 0); }
             if (panelOffsets.TryGetValue(id, out var o)) return o;
             float x = 0, y = 0; bool saved = false;

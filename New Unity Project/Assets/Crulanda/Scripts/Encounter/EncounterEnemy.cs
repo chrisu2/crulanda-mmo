@@ -354,7 +354,7 @@ namespace Crulanda.Encounter
             if (!actor.IsAlive || Inside != null) return;   // inside its machine, nothing reaches it
             if (Hidden) Pounce();
             if (TappedBy == null && source != null && !Game) TappedBy = source.EntityId.Value;
-            int actual = actor.GetComponent<Combatant>().Damage(Mathf.RoundToInt(damage * session.Kit.PartyDamageMultiplier(this) * OverTakenNow * (source != null && source == session.Player ? session.PlayerDamageScale : 1)));
+            int actual = actor.GetComponent<Combatant>().Damage(Mathf.RoundToInt(damage * session.Kit.PartyDamageMultiplier(this) * OverTakenNow * session.DamageScaleFor(source)));
             if (!Game && source != null) session.Meter.Damage(source, actual);
             if (actor.IsAlive && Figure != null) Figure.Flinch();
             if (actor.IsAlive) ControlStruck();   // a hold breaks on damage (EncounterEnemy.Control)

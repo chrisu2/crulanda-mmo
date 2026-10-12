@@ -35,7 +35,7 @@ namespace Crulanda.Tests
         // once a fight: summons and standing auras.
         static readonly HashSet<string> Never = new HashSet<string> { "druid.barkhide", "druid.thornclaw", "druid.rootmend", "druid.thornsong", "mage.unbind", "mage.quench", "mage.bind",
             "rogue.vanish", "rogue.tumble", "rogue.sap", "rogue.blind", "ranger.disengage", "druid.sleep_of_the_wood" };
-        static readonly HashSet<string> Once = new HashSet<string> { "mage.raise_thrall", "ranger.call_companion", "druid.seedling", "paladin.oath", "paladin.colours" };
+        static readonly HashSet<string> Once = new HashSet<string> { "mage.raise_thrall", "ranger.call_companion", "paladin.oath", "paladin.colours" };
         int SlotOf(string id) { for (int i = 0; i < s.Kit.ActionCount; i++) { var a = s.Kit.ActionAt(i); if (a != null && a.id == id) return i; } return -1; }
         string root; EncounterSession s;
         void OnLoaded(Scene scene, LoadSceneMode mode) { var x = UnityEngine.Object.FindFirstObjectByType<EncounterSession>(); if (x != null) x.SaveDirectoryOverride = root; }
@@ -137,6 +137,7 @@ namespace Crulanda.Tests
             int cheapest = order.Where(i => !Never.Contains(s.Kit.ActionAt(i).id) && !Once.Contains(s.Kit.ActionAt(i).id) && (targets == 0 ? s.Kit.ActionAt(i).effect == AbilityEffect.Heal : s.Kit.ActionAt(i).effect == AbilityEffect.Damage))
                 .OrderBy(i => s.Kit.ActionAt(i).cost).DefaultIfEmpty(-1).First();
             var uses = new Dictionary<string, int>();
+            if (seed == 0) csv.Add("# locks " + cls + " " + branch.id + " " + scenario + ": " + string.Join(" ", Enumerable.Range(0, s.Kit.ActionCount).Where(i => s.Kit.ActionAt(i) != null && s.Kit.ActionLockLabel(i) != null).Select(i => s.Kit.ActionAt(i).id + "=" + s.Kit.ActionLockLabel(i).Replace(" ", "_"))));
             s.Meter.Reset(); var pool = s.Player.Resource.Pool; int last = pool.Current, used = 0; float oom = -1, t = 0, hurt = 0;
             Time.captureDeltaTime = Step;
             while (t < FightSeconds)

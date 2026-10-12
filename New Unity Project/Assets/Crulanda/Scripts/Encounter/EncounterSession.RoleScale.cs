@@ -1,3 +1,4 @@
+using Crulanda.Gameplay;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -14,14 +15,27 @@ namespace Crulanda.Encounter
     {
         public static readonly Dictionary<string, float> BuildDamageScale = new Dictionary<string, float>
         {
-            // DPS toward the median (a Ranger's pet is not scaled: its share is left in, so the Ranger's own blows take more of the cut)
-            { "class.ranger/marksman", .67f }, { "class.druid/thornclaw", .80f }, { "class.ranger/skirmisher", .80f }, { "class.paladin/judicator", .92f },
+            // DPS toward the median
+            { "class.ranger/marksman", .75f }, { "class.druid/thornclaw", .80f }, { "class.ranger/skirmisher", .85f }, { "class.paladin/judicator", .92f },
             { "class.mage/combustion", 1.65f }, { "class.archivist/the-unwriting", 2.4f },
             // under the role caps
-            { "class.ranger/pathfinder", .43f }, { "class.rogue/thiefs-grace", .82f }, { "class.rogue/swashbuckler", .72f }, { "class.paladin/vanguard", .92f },
+            { "class.ranger/pathfinder", .60f }, { "class.rogue/thiefs-grace", .82f }, { "class.rogue/swashbuckler", .72f }, { "class.paladin/vanguard", .92f },
             { "class.warrior/support", .93f }, { "class.warrior/jailer", .93f },
             { "class.paladin/sanctuary", .62f }, { "class.saltmender/mender", .85f },
+            // pet builds toward the DPS median (the companion's blows take PetDamageScale, below)
+            { "class.ranger/beastbond", .75f }, { "class.mage/bonecaller", 1.6f },
         };
+        /// <summary>The same for the build's companion (Ranger pet, thrall): only the pet builds are scaled.</summary>
+        public static readonly Dictionary<string, float> BuildPetDamageScale = new Dictionary<string, float> { { "class.ranger/beastbond", .75f }, { "class.mage/bonecaller", 1.6f } };
+        public float PetDamageScale { get { var lead = LeadBuild; return lead != null && BuildPetDamageScale.TryGetValue(lead, out var v) ? v : 1; } }
+        /// <summary>The scale on any blow by the party side: the player's, or the player's own companion.</summary>
+        public float DamageScaleFor(Actor source)
+        {
+            if (source == null) return 1;
+            if (source == Player) return PlayerDamageScale;
+            if (Pet != null && source == Pet.actor) return PetDamageScale;
+            return 1;
+        }
         public const float HealerDpsCap = .50f, ControlDpsCap = .75f, SupportDpsCap = .75f;
         int scaleCount = -1; List<TalentRank> scaleList; float scale = 1;
         /// <summary>The build the player has spent most in (class/branch id), or null with no ranks.</summary>

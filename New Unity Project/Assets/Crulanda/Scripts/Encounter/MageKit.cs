@@ -332,8 +332,8 @@ namespace Crulanda.Encounter
             {
                 float t = i * Mathf.PI * 2 / 14, r = reach * (.35f + .55f * ((i * 7) % 5) / 4f);
                 var g = GameObject.CreatePrimitive(PrimitiveType.Cylinder); UnityEngine.Object.Destroy(g.GetComponent<Collider>());
-                g.transform.SetParent(root.transform, false); g.transform.localPosition = new Vector3(Mathf.Cos(t) * r, .25f, Mathf.Sin(t) * r);
-                g.transform.localRotation = Quaternion.Euler(Mathf.Sin(t) * 18, 0, Mathf.Cos(t) * -18); g.transform.localScale = new Vector3(.07f, .3f, .07f);
+                g.transform.SetParent(root.transform, false); g.transform.localPosition = new Vector3(Mathf.Cos(t) * r, .45f, Mathf.Sin(t) * r);
+                g.transform.localRotation = Quaternion.Euler(Mathf.Sin(t) * 18, 0, Mathf.Cos(t) * -18); g.transform.localScale = new Vector3(.13f, .5f, .13f);   // a metre tall, thick enough to read from the camera (step-4 frames)
                 g.GetComponent<Renderer>().material.color = BoneWhite;
             }
             UnityEngine.Object.Destroy(root, 1.5f);

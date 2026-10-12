@@ -102,17 +102,19 @@ namespace Crulanda.Encounter
                     farmer.enabled = false; if (farmer.Carrying) farmer.PutDownLoad();
                     if (agent != null && agent.isOnNavMesh) { agent.Warp(field.transform.position); agent.isStopped = true; }
                     yield return new WaitForSeconds(.5f); vis.Pose = ActorPose.Work; yield return new WaitForSeconds(2);
-                    var side = farmer.transform.right; motor.Teleport(farmer.transform.position + side * 2.6f + Vector3.up * .2f); yield return null;
+                    var side = farmer.transform.right; motor.Teleport(farmer.transform.position + side * 1.9f + farmer.transform.forward * .4f + Vector3.up * .2f); yield return null;
+                    var mine = s.Player.GetComponentsInChildren<Renderer>().Where(x => x.enabled).ToList(); foreach (var x in mine) x.enabled = false;   // the Mender out of the shot: the farmer close
                     s.Player.transform.rotation = Quaternion.LookRotation(-side);
                     for (int i = 0; i < 3; i++)
                     {
                         float want = new[] { .1f, .45f, .7f }[i];
                         for (float t = 0; t < 3 && Mathf.Abs(vis.StrokePhase - want) > .04f; t += Time.deltaTime) yield return null;
                         Time.timeScale = 0;
-                        motor.SetView(Quaternion.LookRotation(farmer.transform.position - s.Player.transform.position).eulerAngles.y - 25, 6, 2.2f);
+                        motor.SetView(Quaternion.LookRotation(farmer.transform.position - s.Player.transform.position).eulerAngles.y, 4, .5f);
                         yield return Shot("step4-0" + (5 + i) + "-hoe-hands-phase-" + want.ToString("0.00"), "a farmer hoeing, hands " + (vis.HandSpread * 100).ToString("0") + " cm apart on the shaft (45-60 wanted), stroke phase " + vis.StrokePhase.ToString("0.00"), farmer.transform);
                         Time.timeScale = 1;
                     }
+                    foreach (var x in mine) x.enabled = true;
                 }
             }
             else if (cls == "class.mage")
@@ -123,7 +125,7 @@ namespace Crulanda.Encounter
                 {
                     Use("mage.raise_thrall"); yield return new WaitForSeconds(2f);
                     var thrall = s.Pet != null ? s.Pet.transform : null;
-                    View(150, 12, 4f); yield return Shot("step4-08-bonecaller-thrall", "the Bonecaller's bone thrall raised beside the Mage (" + (thrall != null ? "up" : "NOT RAISED") + ")", thrall);
+                    View(110, 10, 3.4f); yield return Shot("step4-08-bonecaller-thrall", "the Bonecaller's bone thrall raised beside the Mage (" + (thrall != null ? "up" : "NOT RAISED") + ")", thrall);
                     s.Select(foe); Use("mage.marrow_drain"); yield return new WaitForSeconds(2.4f);
                     View(200, 14, 6f); yield return Shot("step4-09-bonecaller-marrow-drain", "Marrow Drain on the foe; target: " + s.Kit.TargetStatus(foe), foe.transform);
                     yield return new WaitForSeconds(1.6f);

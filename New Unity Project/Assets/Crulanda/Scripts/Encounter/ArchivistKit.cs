@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -195,6 +195,22 @@ namespace Crulanda.Encounter
         public const int UnwriteTicks = 6;
         static readonly Color VoidGrey = new Color(.62f, .58f, .7f), StillWhite = new Color(.85f, .92f, 1);
         public PeriodicEffects Periodic { get { return periodic; } }
+        /// <summary>A ring of motes round someone (step-4 frames: the Unwriting and the Still Vow showed nothing on the body): <paramref name="name"/>
+        /// at <paramref name="height"/>, gone after <paramref name="seconds"/> (or sooner, when <see cref="EndAura"/> lifts it).</summary>
+        public static GameObject Aura(Transform who, string name, Color col, float seconds, float radius, float height, int motes)
+        {
+            if (who == null) return null;
+            var old = who.Find(name); if (old != null) UnityEngine.Object.Destroy(old.gameObject);
+            var root = new GameObject(name); root.transform.SetParent(who, false); root.transform.localPosition = Vector3.up * height;
+            for (int i = 0; i < motes; i++)
+            {
+                float t = i * Mathf.PI * 2 / motes; var g = GameObject.CreatePrimitive(PrimitiveType.Sphere); UnityEngine.Object.Destroy(g.GetComponent<Collider>());
+                g.transform.SetParent(root.transform, false); g.transform.localPosition = new Vector3(Mathf.Cos(t) * radius, (i % 2) * .12f, Mathf.Sin(t) * radius); g.transform.localScale = Vector3.one * .11f;
+                g.GetComponent<Renderer>().material.color = col;
+            }
+            root.AddComponent<AuraSpin>(); UnityEngine.Object.Destroy(root, seconds); return root;
+        }
+        public static void EndAura(Transform who, string name) { var a = who != null ? who.Find(name) : null; if (a != null) UnityEngine.Object.Destroy(a.gameObject); }
         public bool Unwritten(EncounterEnemy e) { return e != null && periodic.Has("unwrite", e); }
         public int UnwriteTick(AbilityDefinition a) { return Dmg((a.power + Level) * (1 + .05f * R("uw-deep-unwriting"))); }
         /// <summary>Unwrite (a talent): the target sung out of the record, a little each 2 s for 12 s (Long Silence: longer; Deep Unwriting:
@@ -212,6 +228,7 @@ namespace Crulanda.Encounter
         void PutUnwrite(EncounterEnemy t, AbilityDefinition a)
         {
             periodic.Remove("unwrite", t);
+            Aura(t.transform, "Unwriting", VoidGrey * .8f, UnwriteEvery * (UnwriteTicks + R("uw-long-silence")) + .3f, .55f, 1.4f, 8);
             periodic.Add("unwrite", t, Time.time, UnwriteEvery, UnwriteTicks + R("uw-long-silence"), UnwriteTick(a), (e, i) => {
                 var enemy = (EncounterEnemy)e.target;
                 if (!enemy.actor.IsAlive) { Spread(enemy, a); return false; }
@@ -263,7 +280,7 @@ namespace Crulanda.Encounter
         void Ward(Actor who, int size)
         {
             if (who == null || !who.IsAlive) return;
-            var c = who.GetComponent<Combatant>(); c.AddBarrier(size, StillnessSeconds);
+            var c = who.GetComponent<Combatant>(); c.AddBarrier(size, StillnessSeconds); Aura(who.transform, "Stillness ward", StillWhite, StillnessSeconds, .6f, 1f, 12);
             int pain = R("vw-hushed-pain"); if (pain > 0) c.Apply(new StatusEffectDefinition { id = "status.hushed_pain", name = "Hushed Pain", duration = StillnessSeconds, incomingDamageMultiplier = 1 - .03f * pain });
             int grace = R("vw-grace"); if (grace > 0) HealActor(who, Mathf.Max(1, Mathf.RoundToInt(who.Health.Pool.Max * .04f * grace)));
             s.FloatText(who.transform.position + Vector3.up * 1.6f, "Stillness " + size, StillWhite); HealFx.Show(who.transform);

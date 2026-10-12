@@ -43,7 +43,7 @@ ModelImporter:
     clipAnimations:
     - serializedVersion: 16
       name: idle
-      takeName: idle
+      takeName: anc_crea_ossuary_knight__Rig|idle
       internalID: -5252816984213320552
       firstFrame: 0
       lastFrame: 60
@@ -72,7 +72,7 @@ ModelImporter:
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
       name: move_slow
-      takeName: move_slow
+      takeName: anc_crea_ossuary_knight__Rig|move_slow
       internalID: -1246043683663289434
       firstFrame: 0
       lastFrame: 30
@@ -101,7 +101,7 @@ ModelImporter:
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
       name: move_fast
-      takeName: move_fast
+      takeName: anc_crea_ossuary_knight__Rig|move_fast
       internalID: -7717711572874394805
       firstFrame: 0
       lastFrame: 24
@@ -130,7 +130,7 @@ ModelImporter:
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
       name: attack_01
-      takeName: attack_01
+      takeName: anc_crea_ossuary_knight__Rig|attack_01
       internalID: 6068442366802068183
       firstFrame: 0
       lastFrame: 24
@@ -159,7 +159,7 @@ ModelImporter:
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
       name: hit_01
-      takeName: hit_01
+      takeName: anc_crea_ossuary_knight__Rig|hit_01
       internalID: 5905015903970572396
       firstFrame: 0
       lastFrame: 24
@@ -188,7 +188,7 @@ ModelImporter:
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
       name: death_01
-      takeName: death_01
+      takeName: anc_crea_ossuary_knight__Rig|death_01
       internalID: -8574063939073756356
       firstFrame: 0
       lastFrame: 36

@@ -1,4 +1,4 @@
-#if UNITY_EDITOR
+﻿#if UNITY_EDITOR
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -78,7 +78,7 @@ namespace Crulanda.Tests
                             problems.Add(p + "exit to " + e.to + " can't be walked to from the start");
                     foreach (var camp in z.camps)   // where the camp stands: on the land, or on a cave's floor under it (StandAt, as it spawns)
                         if (!NavMesh.SamplePosition(s.Zone.StandAt(camp.center, float.NegativeInfinity), out var to, Mathf.Max(2.5f, camp.radius), NavMesh.AllAreas) || !NavReach.Walkable(start.position, to.position))
-                            problems.Add(p + "camp '" + camp.name + "' can't be walked to from the start");
+                            problems.Add(p + "camp '" + camp.name + "' can't be walked to from the start (its ground " + to.position + ")");
                 }
                 // Camps: most of each pack must find walkable ground; levels inside the zone's band.
                 string shortId = id.Replace("zone.", "");

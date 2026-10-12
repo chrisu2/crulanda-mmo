@@ -1,4 +1,4 @@
-#if UNITY_EDITOR
+﻿#if UNITY_EDITOR
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -72,10 +72,15 @@ namespace Crulanda.Tests
                 string id = def.id; var exits = def.exits;
                 for (int k = 0; k < exits.Length; k++)
                 {
+                    // The last travel saved the character in the zone it arrived in; a fresh save folder each time, or the session
+                    // rebuilds that zone instead of this one (EncounterSession: a character saved elsewhere loads there).
+                    if (Directory.Exists(root)) Directory.Delete(root, true);
                     ZoneBuilder.RequestedZoneId = id;
                     yield return SceneManager.LoadSceneAsync("Oakhaven", LoadSceneMode.Single);
                     for (int i = 0; i < 3; i++) yield return null;
-                    var s = UnityEngine.Object.FindFirstObjectByType<EncounterSession>(); var exit = s.Zone.Zone.exits[k];
+                    var s = UnityEngine.Object.FindFirstObjectByType<EncounterSession>();
+                    if (s == null || s.Zone == null || s.Zone.Zone.id != id) { problems.Add(def.displayName + ": asked for " + id + ", built " + (s != null && s.Zone != null ? s.Zone.Zone.id : "nothing")); continue; }
+                    var exit = s.Zone.Zone.exits[k];
                     string name = s.Zone.Zone.displayName + " -> " + exit.name + ": ";
                     s.Player.GetComponent<AdventurerMotor>().enabled = false;
                     // Start 14 m inside the zone on the line from the exit toward the centre, then walk in.

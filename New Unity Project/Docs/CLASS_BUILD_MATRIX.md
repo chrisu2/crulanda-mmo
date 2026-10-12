@@ -229,3 +229,12 @@ Warrior nine-node talent prototype is now implemented with B-key UI, live effect
 - Sim rotation: SimCompanion.PathRotation; odd mage variants play Bonecaller.
 - Saves: TalentMigration refunds retired cw- picks. Chris's saves were backed up in save-backups\20261012-1040-before-path-rework.
 - Status: UNVERIFIED (needs Chris).
+
+## Archivist — the Unwriting (replaces the Archive) and the Still Vow (replaces the Silent Vow)
+- The Unwriting (damage over time, like a shadow priest; prefix uw-; 10 nodes, 23 ranks): Unwrite is a damage-over-time effect whose Hollow Echo ticks heal; Erasure hits an unwritten target x1.5; Spreading Grey; capstone The Unwritten.
+- The Still Vow (shields/support, like Discipline; prefix vw-; 9 nodes, 20 ranks): Vow of Stillness puts a barrier on whoever is most hurt; Atonement makes Shard Note damage heal; also Hushed Pain, Second Ward, Grace, Steady Voice; capstone Vow Kept.
+- New abilities: archivist.unwrite, archivist.erasure, archivist.stillness (slots 10-12, 13 actions in total).
+- Sim rotation: SimCompanion.PathRotation (Unwrites, Wards). Odd archivist variants play the Unwriting; even ones play the Still Vow.
+- Saves: TalentMigration refunds retired ar- and sv- picks. Chris's save (ar-resonance, sv-quick-hush) was backed up first.
+- Open: the Original Song (Lull) and the old Hush talents can no longer be reached.
+- Status: UNVERIFIED (needs Chris).

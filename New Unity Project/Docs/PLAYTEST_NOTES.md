@@ -689,3 +689,6 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
 - 170 (13:09) "the dps/healing meter is missing" (OPEN; it was off by default; now shown, /meter toggles)
 - 171 (13:10) "skeleton bone dude for mage look lousy" (OPEN)
 - 172 (13:12) "otherwise seems to work well. map seems a big desolate need to fill in a bit more to resemble elwyn forest in wow" (OPEN; plan in Docs/ZONE_FILL_PLAN.md, after the publish)
+- 173 (17:06) "did you animate the skeleton? id like to see how he moves" (OPEN; new thrall on the old rig's six clips; in-game video in outputs/thrall-*.mp4)
+- 174 (17:13) "ok definitely keep working and test all the new classes and all the new test builds and compare dps and hps to see if they are viable builds" (OPEN; balance harness, Docs/BALANCE_REPORT.md)
+- 175 (17:21) "maybe put a helm or hood on him. his head is TOO round" (OPEN; narrower skull, brow ridge, cheekbones, angular jaw, a tattered grave-cloth hood)

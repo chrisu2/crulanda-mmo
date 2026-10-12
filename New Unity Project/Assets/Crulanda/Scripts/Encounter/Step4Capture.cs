@@ -168,6 +168,23 @@ namespace Crulanda.Encounter
 
                     var thrall = s.Pet != null ? s.Pet.transform : null;
                     View(110, 10, 3.4f); yield return Shot("step4-08-bonecaller-thrall", "the Bonecaller's bone thrall raised beside the Mage (" + (thrall != null ? "up" : "NOT RAISED") + ")", thrall);
+                    // Note 173 (Chris 17:06, "id like to see how he moves"): 15 s of video frames at 24 fps, the thrall idling, following and attacking (encoded to MP4 outside).
+                    if (thrall != null)
+                    {
+                        var vdir = Path.Combine(dir, "thrall-video"); Directory.CreateDirectory(vdir); int vf = 0;
+                        IEnumerator Rec(float seconds) { int n = Mathf.RoundToInt(seconds * 24); for (int i = 0; i < n; i++) { yield return new WaitForEndOfFrame(); ScreenCapture.CaptureScreenshot(Path.Combine(vdir, "f" + (vf++).ToString("0000") + ".png")); yield return null; } }
+                        Time.captureFramerate = 24;
+                        var pmot = s.Player.GetComponent<AdventurerMotor>();
+                        var away = -(foe.transform.position - s.Player.transform.position); away.y = 0; s.Player.transform.rotation = Quaternion.LookRotation(away);
+                        pmot.SetView(Quaternion.LookRotation(away).eulerAngles.y + 120, 12, 4.5f);
+                        yield return Rec(4);                                                   // idle beside the Mage
+                        EncounterInput.Scripted = new Vector2(0, 1); yield return Rec(5);      // follows as the Mage walks off
+                        EncounterInput.Scripted = null;
+                        s.Player.transform.rotation = Quaternion.LookRotation(-away); FaceFoe(foe); s.Select(foe); s.PetAttack();
+                        yield return Rec(6);                                                   // sent in: runs to the foe and attacks
+                        Time.captureFramerate = 0; report.AppendLine("thrall-video: " + vf + " frames at 24 fps (idle 4 s, follow 5 s, attack 6 s)");
+                        s.PetOrder(RangerPet.Order.Assist); foe = NearFoe(); yield return new WaitForSeconds(1);
+                    }
                     s.Select(foe); Use("mage.marrow_drain"); yield return new WaitForSeconds(2.4f);
                     FaceFoe(foe); yield return Shot("step4-09-bonecaller-marrow-drain", "Marrow Drain on the foe; target: " + s.Kit.TargetStatus(foe), foe.transform);
                     yield return new WaitForSeconds(1.6f);

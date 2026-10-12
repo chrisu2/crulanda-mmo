@@ -59,18 +59,33 @@ def ring(z, rx, ry, minor, bone, front_gap=.035, back_gap=0.0, droop=0.0, m=BONE
     bm.to_mesh(me); bm.free(); return add(o, bone)
 
 H = 1.88
-# ---- skull and jaw ----
-sk = sphere((0, .01, 1.70), (.105, .125, .118), "head", seg=16, rings=12)
-sphere((0, -.045, 1.635), (.082, .07, .05), "head", seg=14, rings=8)            # cheekbones / upper jaw
+# ---- skull and jaw (Chris 17:21, "his head is TOO round": narrower, a brow ridge, cheekbones, an angular jaw; a hood over it) ----
+sk = sphere((0, .015, 1.71), (.088, .112, .118), "head", seg=14, rings=10)         # cranium, narrow and long
+cube((0, -.088, 1.725), (.082, .022, .016), "head", bevel=.008)                     # brow ridge
 for s in (1, -1):
-    sphere((s * .042, -.098, 1.695), (.032, .03, .03), "head", DARK, 10, 6)   # eye sockets
-    sphere((s * .042, -.112, 1.695), (.009, .006, .009), "head", GLOW, 6, 4)  # a faint grave-light
-cube((0, -.112, 1.648), (.011, .01, .017), "head", DARK)                 # nose hole
-jaw = sphere((0, -.045, 1.578), (.062, .06, .026), "head", seg=14, rings=8)      # jaw (on the head bone: it hangs a little open)
-for i in range(8):
-    x = -.049 + i * .014
-    cube((x, -.111, 1.607), (.0055, .004, .009), "head")                  # upper teeth
-    cube((x, -.103, 1.592), (.0055, .004, .008), "head")                  # lower teeth
+    sphere((s * .062, -.07, 1.655), (.026, .032, .018), "head", seg=8, rings=6)       # cheekbones
+    sphere((s * .036, -.094, 1.69), (.026, .022, .026), "head", DARK, 10, 6)         # eye sockets, under the brow
+    sphere((s * .036, -.108, 1.69), (.008, .006, .008), "head", GLOW, 6, 4)          # a faint grave-light
+cube((0, -.06, 1.64), (.06, .045, .03), "head", bevel=.012)                          # upper jaw, squarer
+cube((0, -.108, 1.655), (.009, .008, .015), "head", DARK)                            # nose hole
+jaw = cube((0, -.055, 1.58), (.055, .05, .018), "head", bevel=.006)                  # an angular jaw
+cube((0, -.1, 1.572), (.03, .012, .016), "head", bevel=.004)                         # chin
+for s in (1, -1): cube((s * .05, -.02, 1.6), (.008, .03, .03), "head", bevel=.004)    # the jaw's back, up to the skull
+for i in range(7):
+    x = -.042 + i * .014
+    cube((x, -.104, 1.612), (.0055, .004, .009), "head")                             # upper teeth
+    cube((x, -.098, 1.596), (.0055, .004, .008), "head")                             # lower teeth
+# a tattered grave-cloth hood, open at the face, hanging to the shoulders
+bpy.ops.mesh.primitive_uv_sphere_add(segments=20, ring_count=12, location=(0, .02, 1.70)); hood = bpy.context.object
+bm = bmesh.new(); bm.from_mesh(hood.data)
+kill = [v for v in bm.verts if v.co.y < -.3 and abs(v.co.x) < .62 and -.8 < v.co.z < .5]
+bmesh.ops.delete(bm, geom=kill, context='VERTS')
+for v in bm.verts:
+    if v.co.z < -.3:
+        v.co.z -= random.uniform(.1, .9); v.co.x *= 1.25; v.co.y *= 1.15   # drapes down and out over the shoulders, ragged
+bm.to_mesh(hood.data); bm.free(); hood.scale = (.135, .15, .15)
+md = hood.modifiers.new("s", "SOLIDIFY"); md.thickness = .06
+add(hood, "head", CLOTH)
 # ---- neck and spine ----
 for i in range(4): rod((0, .02, 1.45 + i * .025), (0, .02, 1.468 + i * .025), .022, "neck", knobs=False)
 for i in range(9):

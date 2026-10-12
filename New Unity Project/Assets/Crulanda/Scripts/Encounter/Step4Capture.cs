@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Crulanda.Combat;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -74,9 +75,11 @@ namespace Crulanda.Encounter
             dir = directory; Directory.CreateDirectory(dir); session = s;
             Crulanda.World.WorldClock.Hour = 11;
             var weather = Crulanda.World.WorldWeather.Active; if (weather != null) weather.Force(weather.TourKind(), true);
-            s.Player.Stats.SetBase(Crulanda.Core.StatType.MaxHealth, 4000); s.Player.Health.ApplyHealing(100000);
             s.Progress.experience = EncounterProgress.XpForLevel(15); s.Player.SetLevel(15);
+            s.Player.Stats.SetBase(Crulanda.Core.StatType.MaxHealth, 4000); s.Player.Health.ApplyHealing(100000);   // after the level, which resets the base
             yield return new WaitForSeconds(3);
+            s.Player.Stats.SetBase(Crulanda.Core.StatType.MaxHealth, 4000); s.Player.Health.ApplyHealing(100000);
+            report.AppendLine("health " + s.Player.Health.Pool.Current + "/" + s.Player.Health.Pool.Max);
             var motor = s.Player.GetComponent<AdventurerMotor>();
             string cls = s.Progress.classId;
             if (cls == "class.saltmender")
@@ -152,7 +155,7 @@ namespace Crulanda.Encounter
                 motor.Teleport(s.Zone.Ground(Vector2.zero) + new Vector3(10, 1, -10)); yield return new WaitForSeconds(2);
                 var hp = s.Player.Health; hp.ApplyDamage(hp.Pool.Max / 2); yield return new WaitForSeconds(1.6f);
                 Use("archivist.stillness"); yield return new WaitForSeconds(.5f);
-                View(160, 12, 3.2f); yield return Shot("step4-13-still-vow-shield", "the Still Vow's Vow of Stillness barrier on the most hurt (you, at " + hp.Pool.Current + "/" + hp.Pool.Max + "); status: " + s.Kit.StatusLine, null);
+                View(160, 12, 3.2f); yield return Shot("step4-13-still-vow-shield", "the Still Vow's Vow of Stillness barrier on the most hurt (you, at " + hp.Pool.Current + "/" + hp.Pool.Max + "); barrier " + s.Player.GetComponent<Combatant>().Barrier + ", ward ring " + (AuraSpin.All.Exists(x => x.Follow == s.Player.transform) ? "shown" : "MISSING"), null);
             }
             else report.AppendLine("class " + cls + " has no step-4 frames");
             File.WriteAllText(Path.Combine(dir, "step4-" + cls.Replace("class.", "") + ".txt"), report.ToString());

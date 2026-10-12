@@ -200,17 +200,19 @@ namespace Crulanda.Encounter
         public static GameObject Aura(Transform who, string name, Color col, float seconds, float radius, float height, int motes)
         {
             if (who == null) return null;
-            var old = who.Find(name); if (old != null) UnityEngine.Object.Destroy(old.gameObject);
-            var root = new GameObject(name); root.transform.SetParent(who, false); root.transform.localPosition = Vector3.up * height;
+            EndAura(who, name);
+            // Not parented to the actor (a scaled or offset root threw the ring metres off, step-4 frames 11-13): it follows in world space.
+            var root = new GameObject(name);
             for (int i = 0; i < motes; i++)
             {
                 float t = i * Mathf.PI * 2 / motes; var g = GameObject.CreatePrimitive(PrimitiveType.Sphere); UnityEngine.Object.Destroy(g.GetComponent<Collider>());
                 g.transform.SetParent(root.transform, false); g.transform.localPosition = new Vector3(Mathf.Cos(t) * radius, (i % 2) * .12f, Mathf.Sin(t) * radius); g.transform.localScale = Vector3.one * .11f;
                 g.GetComponent<Renderer>().material.color = col;
             }
-            root.AddComponent<AuraSpin>(); UnityEngine.Object.Destroy(root, seconds); return root;
+            var spin = root.AddComponent<AuraSpin>(); spin.Follow = who; spin.Height = height; spin.Place();
+            UnityEngine.Object.Destroy(root, seconds); return root;
         }
-        public static void EndAura(Transform who, string name) { var a = who != null ? who.Find(name) : null; if (a != null) UnityEngine.Object.Destroy(a.gameObject); }
+        public static void EndAura(Transform who, string name) { foreach (var a in AuraSpin.All.ToArray()) if (a != null && a.Follow == who && a.name == name) UnityEngine.Object.Destroy(a.gameObject); }
         public bool Unwritten(EncounterEnemy e) { return e != null && periodic.Has("unwrite", e); }
         public int UnwriteTick(AbilityDefinition a) { return Dmg((a.power + Level) * (1 + .05f * R("uw-deep-unwriting"))); }
         /// <summary>Unwrite (a talent): the target sung out of the record, a little each 2 s for 12 s (Long Silence: longer; Deep Unwriting:

@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using Crulanda.Gameplay;
 
@@ -381,6 +381,8 @@ namespace Crulanda.Encounter
         /// The companion bar (playtest note 93, 2026-10-07: "a companion UI element that I can have him attack, assist, stay"): while the
         /// Ranger's wolf is out, left of the action bar, its health and three orders, the standing one lit.
         /// </summary>
+        /// <summary>The pet frame's name: the Bonecaller's thrall is not a wolf (step-4 frames).</summary>
+        public static string PetLabel(string kind) { return kind == "thrall" ? "Thrall" : "Wolf"; }
         void DrawPetBar()
         {
             var pet = session.Pet; if (pet == null || pet.actor == null || !pet.actor.IsAlive) return;
@@ -388,7 +390,7 @@ namespace Crulanda.Encounter
             var box = new Rect(x0, y, 250, 76);
             Fill(box, new Color(.07f, .06f, .05f, .9f)); Fill(new Rect(box.x, box.y, box.width, 2), new Color(.62f, .52f, .33f));
             var hp = pet.actor.Health.Pool;
-            Shadow(new Rect(box.x + 8, box.y + 4, 120, 20), "Wolf", tiny, Color.white);
+            Shadow(new Rect(box.x + 8, box.y + 4, 120, 20), PetLabel(pet.Kind), tiny, Color.white);
             var bar = new Rect(box.x + 60, box.y + 9, 182, 10); Fill(bar, new Color(0, 0, 0, .6f));
             Fill(new Rect(bar.x, bar.y, bar.width * Mathf.Clamp01(hp.Ratio), bar.height), new Color(.3f, .75f, .3f));
             string[] labels = { "Attack", "Assist", "Stay" };

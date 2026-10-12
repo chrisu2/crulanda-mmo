@@ -299,6 +299,7 @@ namespace Crulanda.Encounter
             return Start(a, () => {
                 if (!s.LandsOn(t, a.range)) return;
                 s.Bolt(t, DrainGreen, .16f);
+                ArchivistKit.Aura(t.transform, "Marrow drain", new Color(.55f, .08f, .1f), DrainEvery * (DrainTicks + R("bc-long-drain")) + .3f, .5f, 1.1f, 8);   // the drain shows on the body
                 periodic.Add("marrow", t, Now, DrainEvery, DrainTicks + R("bc-long-drain"), Dmg(a.power + Level), (e, i) => {
                     var enemy = (EncounterEnemy)e.target; if (!enemy.actor.IsAlive) return false;
                     Hit(enemy, e.value); int back = Mathf.Max(1, Mathf.RoundToInt(e.value * DrainShare));

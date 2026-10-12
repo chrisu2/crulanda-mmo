@@ -22,7 +22,7 @@ namespace Crulanda.Tests
     [Explicit("long: the balance harness, run by name"), Category("Balance")]
     public class BalanceHarness
     {
-        public static float FightSeconds = 60; public static int Seeds = 3; public static float Speed = 8;
+        public static float FightSeconds = 180; public static int Seeds = 5; public static float Step = .05f;   // game seconds a frame (Time.captureDeltaTime): as fast as the editor runs, the same steps every run
         static readonly string[] Classes = { "class.warrior", "class.druid", "class.paladin", "class.ranger", "class.mage", "class.rogue", "class.archivist", "class.saltmender" };
         static string Out { get { var d = Environment.GetEnvironmentVariable("CRULANDA_BALANCE_OUT"); return string.IsNullOrEmpty(d) ? @"D:\crulanda-work\outputs\balance" : d; } }
         readonly List<string> csv = new List<string> { "class,build,role,scenario,seed,seconds,dps,hps,resource_max,resource_used,time_to_oom" };
@@ -47,6 +47,7 @@ namespace Crulanda.Tests
                 s = UnityEngine.Object.FindFirstObjectByType<EncounterSession>();
                 if (s == null || s.Kit == null) { csv.Add(cls + ",LOAD FAILED,,,,,,,,,"); continue; }
                 if (s.Companion != null) s.Companion.gameObject.SetActive(false);
+                string gear = Gear(); csv.Add("# " + cls + " gear: " + gear);
                 foreach (var branch in s.Talents.Branches.ToList())
                     for (int seed = 0; seed < Seeds; seed++)
                     {
@@ -61,12 +62,29 @@ namespace Crulanda.Tests
                 yield return SceneManager.UnloadSceneAsync("PlayableEncounter");
                 try { if (Directory.Exists(root)) Directory.Delete(root, true); } catch { }
             }
-            Time.timeScale = 1;
+            Time.captureDeltaTime = 0;
             File.WriteAllLines(Path.Combine(Out, "balance.csv"), csv);
             File.WriteAllText(Path.Combine(Out, "BALANCE_TABLE.md"), Table(csv));
             Assert.Greater(csv.Count, 1, "rows");
         }
 
+        /// <summary>Standard gear: an uncommon piece at level 15 in every slot (ItemDatabase.GearId, seed 7), bagged and worn.</summary>
+        string Gear()
+        {
+            if (s.Items == null) return "no item database";
+            int worn = 0;
+            foreach (var slot in ItemDatabase.SlotIds)
+            {
+                string id = ItemDatabase.GearId(slot, 15, 2, 7);
+                try
+                {
+                    Inventory.Add(s.Progress, s.Items, id, 1);
+                    for (int i = 0; i < s.Progress.bag.Count; i++) if (s.Progress.bag[i] != null && s.Progress.bag[i].item == id) { if (s.EquipFromBag(i)) worn++; break; }
+                }
+                catch (Exception e) { Debug.LogWarning("balance gear " + id + ": " + e.Message); }
+            }
+            return worn + " of " + ItemDatabase.SlotIds.Length + " slots worn";
+        }
         void Buy(TalentBranchData branch)
         {
             s.Progress.talents = new List<TalentRank>();
@@ -101,7 +119,7 @@ namespace Crulanda.Tests
             var used1 = new HashSet<string>();
             { int form = SlotOf((cls == "class.druid" ? "druid." : "") + branch.id); if (form >= 0 && s.Kit.ActionLockLabel(form) == null) { s.UseAbility(form); yield return new WaitForSeconds(1.6f); } }
             s.Meter.Reset(); var pool = s.Player.Resource.Pool; int last = pool.Current, used = 0; float oom = -1, t = 0, hurt = 0;
-            Time.timeScale = Speed;
+            Time.captureDeltaTime = Step;
             while (t < FightSeconds)
             {
                 yield return null; float dt = Time.deltaTime; t += dt;
@@ -116,7 +134,7 @@ namespace Crulanda.Tests
                 int now = pool.Current; if (now < last) used += last - now; last = now;
                 if (oom < 0 && pool.Max > 0 && pool.Ratio < .05f) oom = t;
             }
-            Time.timeScale = 1;
+            Time.captureDeltaTime = 0;
             int dmg = 0, heal = 0; foreach (var r in s.Meter.Rows) { dmg += r.damage; heal += r.healing; }
             if (s.Player.Health.Pool.Current <= 0) s.Player.Health.Revive(s.Player.Health.Pool.Max);
             csv.Add(string.Join(",", cls, branch.id, role, scenario, seed, t.ToString("0.0"), (dmg / t).ToString("0.0"), (heal / t).ToString("0.0"), pool.Max, used, oom < 0 ? "" : oom.ToString("0.0")));

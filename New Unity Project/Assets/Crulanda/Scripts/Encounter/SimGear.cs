@@ -52,7 +52,7 @@ namespace Crulanda.Encounter
                 var id = Pick(items, ArmourSlots[i], s, i, d => d.name.Contains(want[i]));
                 if (id != null) ids.Add(id);
             }
-            if (s.classId == "class.rogue") { ids.Add("item.rogues_dirk"); ids.Add("item.rogues_second_dirk"); }   // a Rogue's pair of dirks (2026-10-11)
+            if (s.classId == "class.rogue" && items.Get("item.rogues_dirk") != null && items.Get("item.rogues_second_dirk") != null) { ids.Add("item.rogues_dirk"); ids.Add("item.rogues_second_dirk"); }   // a Rogue's pair of dirks (2026-10-11); a database without them falls through to a weapon at the level
             else if (CarriesWeapon(s.classId))
             {
                 var fm = SimEconomy.Worn(s, "mainhand"); var main = fm != null && items.Get(fm) != null ? fm : Pick(items, "mainhand", s, 7, d => true); if (main != null) ids.Add(main);

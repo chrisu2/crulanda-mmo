@@ -42,8 +42,8 @@ namespace Crulanda.Tests
         {
             yield return Load(10);
             Assert.Greater(CropField.All.Count, 0, "Oakhaven has crop fields");
-            var farmer = UnityEngine.Object.FindObjectsByType<Villager>(FindObjectsSortMode.None).FirstOrDefault(v => v.Role == "farmer" && v.GetComponentsInChildren<Transform>(true).Any(t => t.name == "Tine"));
-            Assert.NotNull(farmer, "a farmer with a fork");
+            var farmer = UnityEngine.Object.FindObjectsByType<Villager>(FindObjectsSortMode.None).FirstOrDefault(v => v.Role == "farmer" && v.GetComponentsInChildren<Transform>(true).Any(t => t.name == "Hoe blade"));
+            Assert.NotNull(farmer, "a farmer with a hoe");
             var anim = farmer.GetComponentInChildren<Animator>(); if (anim != null) anim.cullingMode = AnimatorCullingMode.AlwaysAnimate;
             var vis = farmer.GetComponent<ActorVisual>(); var agent = farmer.GetComponent<UnityEngine.AI.NavMeshAgent>();
             farmer.enabled = false; if (farmer.Carrying) farmer.PutDownLoad();
@@ -51,12 +51,17 @@ namespace Crulanda.Tests
             if (agent != null && agent.isOnNavMesh) { agent.Warp(field.transform.position); agent.isStopped = true; }
             for (int i = 0; i < 10; i++) yield return null;
             vis.Pose = ActorPose.Work;
-            int start = -1; float t0 = 0; var fails = new List<string>(); int framesHoeing = 0; var gaps = new List<float>();
+            int start = -1; float t0 = 0; var fails = new List<string>(); int framesHoeing = 0; var gaps = new List<float>(); var draws = new List<float>(); float lowestDraw = 9, groundY = 0; bool inSoil = false; float enterAt = 0, minAt = 0;
             float end = Time.time + 9;
             while (Time.time < end)
             {
                 yield return null;
                 if (!vis.Hoeing) continue; framesHoeing++;
+                // The draw (note 155): in the soil the blade travels toward the body, not just down.
+                var flat = vis.BladeEdge - farmer.transform.position; flat.y = 0; float out_ = Vector3.Dot(flat, farmer.transform.forward);
+                groundY = farmer.transform.position.y - (agent != null ? agent.baseOffset : 1); if (vis.StrokePhase > .5f && vis.StrokePhase < .78f) lowestDraw = Mathf.Min(lowestDraw, vis.BladeEdge.y - groundY);
+                if (vis.BladeInSoil) { if (!inSoil) { enterAt = out_; minAt = out_; inSoil = true; } else minAt = Mathf.Min(minAt, out_); }
+                else if (inSoil) { inSoil = false; draws.Add(enterAt - minAt); }
                 if (vis.HoeReport(out float l, out float r))
                 {
                     if (l > .04f) fails.Add("left hand " + (l * 100).ToString("0.0") + " cm off the shaft");
@@ -69,6 +74,8 @@ namespace Crulanda.Tests
             int strokes = vis.StrokeCount - start; Assert.GreaterOrEqual(strokes, 2, "strokes struck in nine seconds");
             float period = (Time.time - t0) / strokes;
             Assert.That(period, Is.InRange(1f, 3.2f), "a stroke every 1 to 3 s");
+            Assert.GreaterOrEqual(draws.Count, 2, "draws seen (the blade in the soil, then out); strike gaps " + string.Join(",", gaps.Select(g => g.ToString("0.00"))) + "; lowest edge in the draw " + lowestDraw.ToString("0.00") + "; ground " + groundY.ToString("0.00"));
+            foreach (var dr in draws) if (dr < .3f) fails.Add("the draw brought the blade only " + (dr * 100).ToString("0") + " cm toward the feet (30 wanted)");
             foreach (var g in gaps) if (g > .10f || g < -.3f) fails.Add("the tines " + (g * 100).ToString("0") + " cm over the ground at the strike");
             Assert.IsEmpty(fails.Distinct().Take(12).ToList(), string.Join("; ", fails.Distinct().Take(12)));
         }

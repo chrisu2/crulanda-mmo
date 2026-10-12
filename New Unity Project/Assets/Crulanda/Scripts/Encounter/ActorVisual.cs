@@ -833,11 +833,12 @@ namespace Crulanda.Encounter
                     }
                     Brim(M(.9f, .74f, .32f), .62f, .26f, .07f);
                     {
-                        // The pitchfork on the tool holder, tines up (note 119: it had been built onto the arm itself).
-                        var fork = HandTool(wood, .79f, null, Vector3.zero); float top = tradeToolShaft * (1 - ToolGrip);
-                        Part(PrimitiveType.Cube, fork, new Vector3(0, top, 0), new Vector3(.14f, .02f, .02f), iron).name = "Tine bar";
-                        for (int i = -1; i <= 1; i++) Part(PrimitiveType.Cube, fork, new Vector3(i * .05f, top + .1f, 0), new Vector3(.02f, .2f, .02f), iron).name = "Tine";
-                        tradeToolHeadReach = .2f;   // the tines' points, past the shaft's end (the hoe stroke strikes with them: note 150)
+                        // A draw hoe on the tool holder (note 155: the pitchfork was the wrong tool for hoeing): a flat iron blade hung at a
+                        // right angle from the shaft's end, its edge toward the user; carried upright, the blade stands out ahead.
+                        var hoe = HandTool(wood, .79f, null, Vector3.zero); float top = tradeToolShaft * (1 - ToolGrip);
+                        Part(PrimitiveType.Cube, hoe, new Vector3(0, top - .01f, .03f), new Vector3(.05f, .05f, .07f), iron).name = "Hoe neck";
+                        Part(PrimitiveType.Cube, hoe, new Vector3(0, top, .09f), new Vector3(.17f, .014f, .13f), iron).name = "Hoe blade";
+                        tradeToolHeadReach = .15f;   // the blade's edge, out from the shaft's end (the stroke sets it in: notes 150, 155)
                     }
                     break;
                 case "hunter":

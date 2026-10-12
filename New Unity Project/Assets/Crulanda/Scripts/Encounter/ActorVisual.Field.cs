@@ -13,9 +13,9 @@ namespace Crulanda.Encounter
     public sealed partial class ActorVisual
     {
         /// <summary>One hoe stroke, in seconds.</summary>
-        public const float StrokePeriod = 1.7f;
+        public const float StrokePeriod = 1.8f;
         /// <summary>Where in the stroke the head meets the soil (0-1 of the period).</summary>
-        const float StrikeAt = .62f;
+        const float StrikeAt = .47f;
         float hoeTime; bool hoeActive; Vector3 hoeButt, hoeDir; float tradeToolHeadReach = .05f;
         /// <summary>Strokes struck so far (the farmer steps along the row after each: Villager).</summary>
         public int StrokeCount { get; private set; }
@@ -31,19 +31,29 @@ namespace Crulanda.Encounter
         /// <summary>For a ploughman: puts the hands on these points this frame (call before LateUpdate, each frame).</summary>
         public void HandsOn(Vector3 left, Vector3 right) { handsL = left; handsR = right; handsFrame = Time.frameCount; }
 
-        /// <summary>The stroke at <paramref name="k"/> (0-1): how raised (1: the head up, 0: down at the soil) and how far pulled back.</summary>
-        static void StrokeAt(float k, out float lift, out float pull)
+        // The draw hoe's stroke (Docs/HOE_TECHNIQUE.md; Chris 09:47: "looks like they are just banging into onto the ground"): reach
+        // forward and lift a little, set the blade in at an angle a little past the mark, draw it back toward the feet just under the
+        // surface (the soil going with it), then recover. Keys in the body's frame: the rear (right) hand and the blade's edge, as
+        // (ahead, height over the ground).
+        static readonly Vector2 RecoverHand = new Vector2(.18f, 1.08f), LiftHand = new Vector2(.3f, 1.15f), EnterHand = new Vector2(.26f, 1.1f), DrawnHand = new Vector2(.06f, 1.04f);
+        static readonly Vector2 RecoverEdge = new Vector2(.62f, .12f), LiftEdge = new Vector2(1.12f, .36f), EnterEdge = new Vector2(1.05f, -.03f), DrawnEdge = new Vector2(.5f, -.03f);
+        /// <summary>The stroke at <paramref name="k"/> (0-1): the rear hand and the blade's edge (ahead, height), and whether the blade is in the soil.</summary>
+        static void StrokeAt(float k, out Vector2 hand, out Vector2 edge, out float draw)
         {
-            if (k < .45f) { lift = Mathf.SmoothStep(0, 1, k / .45f); pull = 1 - lift; }
-            else if (k < StrikeAt) { float u = (k - .45f) / (StrikeAt - .45f); lift = 1 - u * u; pull = 0; }   // down fast, quickening
-            else if (k < .85f) { lift = 0; pull = Mathf.SmoothStep(0, 1, (k - StrikeAt) / (.85f - StrikeAt)); }   // drawn back through the soil
-            else { lift = 0; pull = 1; }   // a pause: the step along the row
+            if (k < .35f) { float u = Mathf.SmoothStep(0, 1, k / .35f); hand = Vector2.Lerp(RecoverHand, LiftHand, u); edge = Vector2.Lerp(RecoverEdge, LiftEdge, u); draw = 0; }
+            else if (k < StrikeAt) { float u = (k - .35f) / (StrikeAt - .35f); u *= u; hand = Vector2.Lerp(LiftHand, EnterHand, u); edge = Vector2.Lerp(LiftEdge, EnterEdge, u); draw = 0; }   // set in, quickening
+            else if (k < .8f) { float u = Mathf.SmoothStep(0, 1, (k - StrikeAt) / (.8f - StrikeAt)); hand = Vector2.Lerp(EnterHand, DrawnHand, u); edge = Vector2.Lerp(EnterEdge, DrawnEdge, u); draw = 1; }   // drawn back to the feet
+            else { float u = Mathf.SmoothStep(0, 1, (k - .8f) / .2f); hand = Vector2.Lerp(DrawnHand, RecoverHand, u); edge = Vector2.Lerp(DrawnEdge, RecoverEdge, u); draw = 0; }   // out of the soil; the step
         }
-        /// <summary>Where the hoe stroke is (0-1; the strike at 0.62), for captures.</summary>
+        /// <summary>Where in the stroke the hoe is (0-1; set in at <see cref="StrikeAt"/>), for captures.</summary>
         public float StrokePhase { get { return HoeK; } }
         float HoeK { get { return Mathf.Repeat(hoeTime / StrokePeriod, 1); } }
-        /// <summary>The back's bend for the stroke: stooped to the soil, straighter with the tool raised.</summary>
-        float HoeBend() { StrokeAt(HoeK, out float lift, out _); return 24 - lift * 14; }
+        /// <summary>The back's slight bend for the stroke (a draw hoe is worked nearly upright), a little more as it draws.</summary>
+        float HoeBend() { StrokeAt(HoeK, out _, out _, out float draw); return 12 + draw * 6; }
+        /// <summary>The blade's edge this frame, and whether it is in the soil (the draw), for tests.</summary>
+        public Vector3 BladeEdge { get; private set; }
+        public bool BladeInSoil { get; private set; }
+        Transform clod;
 
         float Ground()
         {
@@ -56,7 +66,7 @@ namespace Crulanda.Encounter
         /// <summary>After the back is bent: the hoe stroke (both arms), or the hands on a ploughman's handles.</summary>
         void FieldArms(float dt, bool hoe)
         {
-            hoeActive = false;
+            hoeActive = false; BladeInSoil = false;
             if (handsFrame >= Time.frameCount - 1 && handsL.HasValue && model.UpperArmL != null && model.HandL != null && model.UpperArmR != null && model.HandR != null)
             {
                 Vector3 o = body.right;
@@ -67,42 +77,57 @@ namespace Crulanda.Encounter
                 CurlRound(model.FingersL, model.HandL, model.MiddleL, handsL.Value, body.right, .8f);
                 return;
             }
-            if (!hoe || !HoeReady) { hoeTime = 0; return; }
+            if (!hoe || !HoeReady) { hoeTime = 0; if (clod != null) clod.gameObject.SetActive(false); return; }
             float before = HoeK; hoeTime += dt; float k = HoeK;
-            StrokeAt(k, out float lift, out float pull);
-            Vector3 up = body.up, ahead = body.forward, side = body.right;
+            StrokeAt(k, out var hand, out var edge, out float draw);
+            Vector3 up = Vector3.up, ahead = body.forward, side = body.right; ahead.y = 0; ahead.Normalize();
             if (model.Chest != null && Vector3.Dot(model.UpperArmR.position - model.Chest.position, side) < 0) side = -side;
-            var mid = (model.UpperArmL.position + model.UpperArmR.position) / 2;
-            // The shaft's slope and the hands' middle, between three keys: down at the strike, drawn back, raised.
-            float down = Mathf.Lerp(-58, -46, pull), slope = Mathf.Lerp(down, 48, lift);
-            var d = (Quaternion.AngleAxis(-slope, side) * ahead).normalized;   // tilted up by slope degrees about the right-hand side
-            if (Vector3.Dot(d, up) * Mathf.Sign(slope) < 0) d = (Quaternion.AngleAxis(slope, side) * ahead).normalized;
-            var centre = mid + side * .1f + ahead * Mathf.Lerp(Mathf.Lerp(.36f, .24f, pull), .3f, lift) - up * Mathf.Lerp(.44f, .06f, lift);
-            Vector3 rear = centre - d * .18f, front = centre + d * .18f;
-            Reach(model.UpperArmR, model.LowerArmR, model.HandR, rear, -up + side * .8f - ahead * .2f);
-            Reach(model.UpperArmL, model.LowerArmL, model.HandL, front, -up - side * .5f - ahead * .2f);
-            // The shaft through both fists as they landed (an arm too short for its mark stops short; the shaft follows the hands).
-            Vector3 gR = Grip(model.HandR, model.MiddleR), gL = Grip(model.HandL, model.MiddleL);
-            var dir = gL - gR; if (dir.sqrMagnitude < 1e-4f) dir = d; dir.Normalize();
+            float ground = Ground(); var foot = transform.position; foot.y = ground;
+            // The shaft runs up the body's middle line, in front of it (held like a broom, thumbs up the handle).
+            var line = foot + side * .02f;
+            Vector3 rear = line + ahead * hand.x + up * hand.y, edgeAt = line + ahead * edge.x + up * edge.y;
+            // The rear (top) hand first; the shaft from its fist to the blade's mark; the front hand where the shaft passes nearest
+            // its own shoulder (between a hand's width and two feet down the shaft), so a short arm still closes on it.
+            Reach(model.UpperArmR, model.LowerArmR, model.HandR, rear - (Grip(model.HandR, model.MiddleR) - model.HandR.position), -up + side * .8f - ahead * .3f);
+            Vector3 gR = Grip(model.HandR, model.MiddleR);
+            var dir = (edgeAt - gR); if (dir.sqrMagnitude < 1e-4f) dir = ahead - up; dir.Normalize();
+            float t = Mathf.Clamp(Vector3.Dot(model.UpperArmL.position - gR, dir), .25f, .6f);
+            var front = gR + dir * t;
+            // The front hand turned across the shaft (knuckles up its line, the palm on it), then reached twice so the fist, not the wrist, lands on it.
+            for (int pass = 0; pass < 2; pass++)
+            {
+                Reach(model.UpperArmL, model.LowerArmL, model.HandL, front - (Grip(model.HandL, model.MiddleL) - model.HandL.position), -up - side * .6f - ahead * .3f);
+                var across = Vector3.ProjectOnPlane(model.MiddleL.position - model.HandL.position, dir); var want = Vector3.ProjectOnPlane(front - model.HandL.position, dir);
+                if (across.sqrMagnitude > 1e-6f && want.sqrMagnitude > 1e-6f) PointBone(model.HandL, model.MiddleL.position - model.HandL.position, (model.MiddleL.position - model.HandL.position) + (want.normalized - across.normalized) * .03f, 1);
+            }
+            Vector3 gL = Grip(model.HandL, model.MiddleL);
             CurlRound(model.FingersR, model.HandR, model.MiddleR, gR, dir, 1);
             CurlRound(model.FingersL, model.HandL, model.MiddleL, gL, dir, 1);
-            gR = Grip(model.HandR, model.MiddleR); gL = Grip(model.HandL, model.MiddleL); dir = gL - gR; if (dir.sqrMagnitude < 1e-4f) dir = d; dir.Normalize();
-            float L = tradeToolShaft * tradeTool.lossyScale.y, reach = tradeToolHeadReach;
-            // How far up the shaft from the rear fist the head's end is: near the end of the shaft when raised; slid so the head's
-            // far point is just into the soil when it slopes down to it.
-            float ground = Ground(), far = L - .08f;
-            float toSoil = dir.y < -.2f ? (gR.y - (ground - .02f)) / -dir.y - reach : far;
-            float soilW = Mathf.InverseLerp(-.2f, -.5f, dir.y);
-            float headAt = Mathf.Clamp(Mathf.Lerp(far, toSoil, soilW), Vector3.Distance(gR, gL) + .25f, L - .02f);
+            float L = tradeToolShaft * tradeTool.lossyScale.y;
+            var face = Vector3.Cross(body.right, dir); if (face.sqrMagnitude < 1e-4f) face = -up; face.Normalize();   // the blade hangs from the shaft's end, edge to the user
+            float headAt = dir.y < -.15f ? (edgeAt.y - gR.y - face.y * tradeToolHeadReach) / dir.y : L - .08f;
+            headAt = Mathf.Clamp(headAt, Vector3.Distance(gR, gL) + .25f, L - .02f);
             hoeButt = gR + dir * (headAt - L); hoeDir = dir; hoeActive = true;
+            var tip = gR + dir * headAt + face * tradeToolHeadReach; BladeEdge = tip;
+            BladeInSoil = draw > 0 && tip.y < ground + .05f;
             if (before < StrikeAt && k >= StrikeAt)
             {
-                StrokeCount++;
-                var tip = gR + dir * (headAt + reach); StrikeGap = tip.y - ground;
+                StrokeCount++; StrikeGap = tip.y - ground;
                 Puff(new Vector3(tip.x, ground + .03f, tip.z));
             }
-        }
-        /// <summary>The middle of a closed hand: a little past the knuckles' root toward them (the palm).</summary>
+            // The soil the blade draws: a clod pushed ahead of the edge toward the feet, left where the draw ends.
+            if (clod == null && Application.isPlaying)
+            {
+                var c = GameObject.CreatePrimitive(PrimitiveType.Sphere); c.name = "Clod"; Destroy(c.GetComponent<Collider>());
+                c.GetComponent<Renderer>().sharedMaterial = Mat(new Color(.3f, .21f, .13f)); clod = c.transform; clod.SetParent(transform, true);
+            }
+            if (clod != null)
+            {
+                bool show = draw > 0 || k >= .8f && k < .92f;
+                if (clod.gameObject.activeSelf != show) clod.gameObject.SetActive(show);
+                if (draw > 0) { var toBody = foot - tip; toBody.y = 0; clod.position = new Vector3(tip.x, ground + .04f, tip.z) + toBody.normalized * .07f; clod.localScale = new Vector3(.2f, .09f, .14f) * Mathf.Lerp(.5f, 1.1f, Mathf.InverseLerp(StrikeAt, .8f, k)); clod.rotation = Quaternion.LookRotation(toBody.sqrMagnitude > 1e-4f ? toBody : ahead); }
+            }
+        }        /// <summary>The middle of a closed hand: a little past the knuckles' root toward them (the palm).</summary>
         static Vector3 Grip(Transform hand, Transform middle) { return middle != null ? Vector3.Lerp(hand.position, middle.position, .75f) : hand.position; }
         /// <summary>Two-bone reach: the upper arm and forearm turned so the wrist lands on <paramref name="target"/> (or as near as the
         /// arm reaches), the elbow bending toward <paramref name="pole"/>. The wrist is put where the hand's grip lands on the mark.</summary>

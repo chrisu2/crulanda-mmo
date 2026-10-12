@@ -27,6 +27,22 @@ namespace Crulanda.Encounter
         }        /// <summary>Note 150 (Chris, 2026-10-12: he needs to see farmers digging and ploughing): a farmer hoeing in a field from the side
         /// at the top of the stroke and at the strike, eight frames through one stroke, then the plough team from the side and three-quarters;
         /// close (2.6 m), HUD hidden, what is in the way hidden. Named note150-*.png.</summary>
+        /// <summary>The renderers between a camera at <paramref name="from"/> and <paramref name="to"/>, and the villagers near the
+        /// subject (whole props, crows near it), but not the subject's own.</summary>
+        static System.Collections.Generic.List<Renderer> InTheWayOf(Vector3 from, Vector3 to, Transform keep)
+        {
+            var hidden = new System.Collections.Generic.List<Renderer>();
+            foreach (var r in UnityEngine.Object.FindObjectsByType<Renderer>(FindObjectsSortMode.None))
+            {
+                if (r == null || !r.enabled || r.transform.IsChildOf(keep) || r is ParticleSystemRenderer || r is TrailRenderer) continue;
+                var c = r.bounds.center; var ab = to - from; float u = Mathf.Clamp01(Vector3.Dot(c - from, ab) / ab.sqrMagnitude);
+                bool inWay = Vector3.Distance(c, from + ab * u) < 1.4f + r.bounds.extents.magnitude * .5f && u < .97f && r.bounds.size.magnitude < 12;
+                bool passer = r.GetComponentInParent<Villager>() != null && Vector3.Distance(c, to) < 7;
+                bool crow = r.name.ToLowerInvariant().Contains("crow") && Vector3.Distance(c, to) < 6;
+                if (inWay || passer || crow) hidden.Add(r);
+            }
+            return hidden;
+        }
         IEnumerator FieldWork(EncounterSession s, Camera cam, System.Collections.Generic.List<Villager> holders, string directory)
         {
             EncounterHud.Hidden = true;
@@ -41,18 +57,24 @@ namespace Crulanda.Encounter
                 fv.Pose = ActorPose.Work; var ft = farmer.transform;
                 for (float t = 0; t < 2.5f; t += Time.deltaTime) yield return null;
                 System.Collections.Generic.List<Renderer> hidden;
-                var at = CaptureFraming.ClearSpot(ft.position, ft.eulerAngles.y + 90, 2.6f, 1.1f, 40, ft, out hidden); CaptureFraming.Hide(hidden);
-                Aim(cam, at, ft, anim, true, .9f);
-                foreach (var (phase, name) in new[] { (.44f, "note150-hoeing-side-raised.png"), (.63f, "note150-hoeing-side-strike.png") })
+                // Square to the side (the draw reads across the frame), 2.8 m; whatever stands between, and anyone near, hidden.
+                var at = ft.position + Quaternion.Euler(0, ft.eulerAngles.y + 90, 0) * Vector3.forward * 2.8f;
+                hidden = InTheWayOf(at, ft.position + ft.forward * .5f, ft);
+                CaptureFraming.Hide(hidden);
+                var centre = ft.position + ft.forward * .45f - Vector3.up * .15f;   // between the farmer and the blade (the transform rides at the hips)
+                cam.transform.position = at + ft.forward * .45f + Vector3.up * .05f; cam.transform.LookAt(centre);
+                foreach (var (phase, name) in new[] { (.34f, "note155-hoe-side-lifted.png"), (.48f, "note155-hoe-side-set-in.png"), (.7f, "note155-hoe-side-drawing.png") })
                 {
                     while (Mathf.Abs(fv.StrokePhase - phase) > .02f) yield return null;
                     ScreenCapture.CaptureScreenshot(Path.Combine(directory, name)); yield return null; yield return null;
                 }
                 while (fv.StrokePhase > .05f) yield return null;
-                for (int i = 0; i < 8; i++)
+                // One stroke in eight frames, each named for its phase (Docs/HOE_TECHNIQUE.md).
+                var seq = new[] { (.03f, "recover"), (.18f, "reach"), (.33f, "lift"), (.43f, "setting-in"), (.49f, "in-soil"), (.58f, "draw-start"), (.68f, "draw-mid"), (.79f, "drawn-to-feet") };
+                for (int i = 0; i < seq.Length; i++)
                 {
-                    float want = i / 8f + .02f; while (Mathf.Abs(fv.StrokePhase - want) > .02f) yield return null;
-                    ScreenCapture.CaptureScreenshot(Path.Combine(directory, "note150-stroke-seq-" + (i + 1) + ".png")); yield return null;
+                    while (Mathf.Abs(fv.StrokePhase - seq[i].Item1) > .015f) yield return null;
+                    ScreenCapture.CaptureScreenshot(Path.Combine(directory, "note155-stroke-" + (i + 1) + "-" + seq[i].Item2 + ".png")); yield return null;
                 }
                 CaptureFraming.Show(hidden); Debug.Log("Life capture: note150 hoeing " + farmer.Name + ", strokes " + fv.StrokeCount + ", strike gap " + fv.StrikeGap.ToString("0.00"));
                 fv.Pose = ActorPose.None; farmer.enabled = true; if (agent != null && agent.isOnNavMesh) agent.isStopped = false;
@@ -81,6 +103,11 @@ namespace Crulanda.Encounter
                             bool passer = r.GetComponentInParent<Villager>() != null && Vector3.Distance(c, mid) < 7;
                             if (inWay || passer) hidden.Add(r);
                         }
+                        // A prop is hidden whole (a table's top with its legs), and so are the birds that land on the team.
+                        var whole = new System.Collections.Generic.List<Renderer>();
+                        foreach (var r in hidden) { var up = r.transform.parent; if (up != null && up.GetComponentsInChildren<Renderer>().Length <= 12) whole.AddRange(up.GetComponentsInChildren<Renderer>()); }
+                        foreach (var cb in UnityEngine.Object.FindObjectsByType<Renderer>(FindObjectsSortMode.None)) if (cb != null && cb.name.ToLowerInvariant().Contains("crow") && Vector3.Distance(cb.bounds.center, mid) < 6) whole.Add(cb);
+                        hidden.AddRange(whole);
                         CaptureFraming.Hide(hidden);
                         cam.transform.position = at; cam.transform.LookAt(mid + Vector3.up * .8f);
                         yield return null;

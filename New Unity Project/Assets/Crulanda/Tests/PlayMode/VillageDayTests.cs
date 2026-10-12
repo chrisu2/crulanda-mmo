@@ -57,7 +57,7 @@ namespace Crulanda.Tests
             var holders = UnityEngine.Object.FindObjectsByType<ActorVisual>(FindObjectsSortMode.None)
                 .Select(v => (v, tool: v.GetComponentsInChildren<Transform>(true).FirstOrDefault(t => t.name == "Trade tool"), anim: v.GetComponentInChildren<Animator>()))
                 .Where(x => x.tool != null && x.anim != null && x.anim.isHuman && ShaftOf(x.tool) != null && ShaftOf(x.tool).localScale.y > .5f).ToList();
-            Assert.Greater(holders.Count(x => x.tool.GetComponentsInChildren<Transform>(true).Any(t => t.name == "Tine")), 0, "the farmers' forks are on the tool holder");
+            Assert.Greater(holders.Count(x => x.tool.GetComponentsInChildren<Transform>(true).Any(t => t.name == "Hoe blade")), 0, "the farmers' hoes are on the tool holder");
             foreach (var x in holders) x.anim.cullingMode = AnimatorCullingMode.AlwaysAnimate;   // posed in a batch run too (FootTests)
             float Seg(Vector3 q, Vector3 a, Vector3 b) { var ab = b - a; float t = Mathf.Clamp01(Vector3.Dot(q - a, ab) / ab.sqrMagnitude); return Vector3.Distance(q, a + ab * t); }
             var fails = new System.Collections.Generic.List<string>(); int carried = 0, talking = 0, working = 0, staffSeen = 0;

@@ -36,6 +36,8 @@ namespace Crulanda.Encounter
                 var e = cam.transform.eulerAngles; motor.SetView(e.y + 45, e.x > 180 ? e.x - 360 : e.x, Vector3.Distance(cam.transform.position, player.position));
                 yield return null; yield return null; blocked = InWay();
             }
+            blocked.RemoveAll(r => r == null || r.transform.IsChildOf(player) || (also != null && r.transform.IsChildOf(also)) || (session.Pet != null && r.transform.IsChildOf(session.Pet.transform)));   // never hide what the frame is of
+            foreach (var a in AuraSpin.All) if (a != null && a.Follow != null) report.AppendLine("  ring " + a.name + ": root " + a.Follow.position.ToString("F2") + ", body " + a.BodyPoint.ToString("F2") + ", ring at " + a.transform.position.ToString("F2"));
             CaptureFraming.Hide(blocked);
             yield return new WaitForSecondsRealtime(.1f);
             ScreenCapture.CaptureScreenshot(Path.Combine(dir, name + ".png"));

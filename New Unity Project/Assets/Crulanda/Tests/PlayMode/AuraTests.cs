@@ -33,6 +33,26 @@ namespace Crulanda.Tests
             Object.Destroy(who); yield return null; yield return null;
             Assert.AreEqual(0, AuraSpin.All.FindAll(a => a.Follow == null).Count, "gone with its actor");
         }
+        /// <summary>On real actors (the player's figure and a foe in PlayableEncounter): the ring centres on the drawn body, within 35 cm of
+        /// its meshes' centre on the ground plane, between its feet and its head.</summary>
+        [UnityTest] public IEnumerator An_aura_ring_centres_on_a_real_actors_body()
+        {
+            EncounterSession.StartClassOverride = "class.archivist";
+            yield return UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("PlayableEncounter", UnityEngine.SceneManagement.LoadSceneMode.Single); yield return null; yield return null;
+            var s = Object.FindFirstObjectByType<EncounterSession>(); Assert.NotNull(s);
+            var foe = s.Enemies.Find(x => x != null && x.actor.IsAlive); Assert.NotNull(foe, "a foe");
+            foreach (var who in new[] { s.Player.transform, foe.transform })
+            {
+                var ring = ArchivistKit.Aura(who, "Test ring", Color.white, 5, .55f, 1f, 8); yield return null; yield return null;
+                var body = AuraSpin.BodyOf(who); Assert.Greater(body.Length, 0, who.name + " has a drawn body");
+                Bounds b = body[0].bounds; foreach (var r in body) b.Encapsulate(r.bounds);
+                var c = ring.transform.position; float flat = new Vector2(c.x - b.center.x, c.z - b.center.z).magnitude;
+                Assert.Less(flat, .35f, who.name + ": ring " + c.ToString("F2") + " vs body centre " + b.center.ToString("F2") + " (root " + who.position.ToString("F2") + ")");
+                Assert.That(c.y, Is.InRange(b.min.y, b.max.y + .3f), who.name + ": ring height in the figure");
+                Object.Destroy(ring);
+            }
+            EncounterSession.StartClassOverride = null;
+        }
         [Test] public void The_pet_frame_names_the_thrall() { Assert.AreEqual("Thrall", EncounterHud.PetLabel("thrall")); Assert.AreEqual("Wolf", EncounterHud.PetLabel("wolf")); }
     }
 }

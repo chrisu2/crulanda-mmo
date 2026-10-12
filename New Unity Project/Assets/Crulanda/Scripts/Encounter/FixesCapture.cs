@@ -19,9 +19,10 @@ namespace Crulanda.Encounter
         string dir; readonly System.Text.StringBuilder report = new System.Text.StringBuilder();
         IEnumerator Shot(string name, string what)
         {
-            yield return new WaitForSeconds(.6f);
+            // Real time: the menu's pause stops the game clock (time scale 0), and a game-time wait would never end.
+            yield return new WaitForSecondsRealtime(.6f);
             ScreenCapture.CaptureScreenshot(Path.Combine(dir, name + ".png")); report.AppendLine(name + ".png: " + what);
-            Debug.Log("Fixes capture: " + name + " " + what); yield return new WaitForSeconds(.5f);
+            Debug.Log("Fixes capture: " + name + " " + what); yield return new WaitForSecondsRealtime(.5f);
         }
 
         public IEnumerator Run(EncounterSession s, string directory)
@@ -66,8 +67,8 @@ namespace Crulanda.Encounter
                 yield return Shot("fix-03-auto-shot-on", "note 124: the auto shot running; the bar reads: " + s.AutoAttackStatus + " (auto " + s.AutoAttack + ")");
                 s.Escape(); bool stopped = !s.AutoAttack; bool kept = s.Target == foe;
                 yield return Shot("fix-04-esc-stops-auto-shot", "note 124: one Esc: auto shot " + (stopped ? "stopped" : "STILL ON") + ", target " + (kept ? "kept" : "dropped") + ", menu " + (s.Paused ? "OPEN" : "shut"));
-                s.Escape(); s.Escape(); bool paused = s.Paused;
-                yield return Shot("fix-05-esc-third-opens-menu", "note 124: Esc again drops the target (" + (s.Target == null) + "), a third opens the menu (" + paused + ")");
+                s.Escape(); bool dropped = s.Target == null; s.Escape(); bool paused = s.Paused;
+                yield return Shot("fix-05-esc-third-opens-menu", "note 124: Esc again drops the target (" + dropped + "), a third opens the menu (" + paused + ")");
                 if (s.Paused) s.Resume();
                 foreach (var e in s.Enemies) if (e != null) e.ResetFight();
                 s.Player.Health.ApplyHealing(100000);

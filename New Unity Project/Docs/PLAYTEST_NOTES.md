@@ -672,3 +672,11 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
 - **155. "looks like they are just banging into onto the ground. research and look up videos online to see how people actually use hoes"** (Chris, 2026-10-12, 09:47.) OPEN. Reference: Docs/HOE_TECHNIQUE.md (draw hoe, thumbs-up grip, modest lift, angled entry, draw back toward the feet).
 
 - **156. 'Rework existing paths into the new builds'** (Chris, 2026-10-12, 10:33, his choice on the open decision: keep four paths a class). OPEN. The Mage's Cinderwright becomes the necromancer (the Bonecaller); the Archivist's Archive becomes the damage-over-time build (the Unwriting) and its Silent Vow the shield/support build (the Still Vow). Saves: points in a retired path are refunded (TalentMigration); Chris's saves backed up first to D:\crulanda-work\save-backups\20261012-1040-before-path-rework.
+
+## 2026-10-12 12:53-12:57 (Chris, verbatim; OPEN)
+- 158 (12:53) "publish and finish what is not done" (OPEN)
+- 159 (12:54) "there should not be see thru houses." (OPEN; fix: outdoors no building fades, only the one you stand in; CameraAndTargetTests.Outdoors_a_house_between_camera_and_player_stays_solid)
+- 160 (12:54) "i think claude fixed the feet" (OPEN; FootTests on feet-bow-adit-kit 12:58: still FAILS, toes sink up to 6 cm walking, standing right foot turned 52 degrees)
+- 161 (12:55) "i dont want a bunch of candidates. only need 3 at most" (OPEN; pruned to the newest 3)
+- 162 (12:56) "only foot issue i see so far is it fall below the ground" (OPEN)
+- 163 (12:57) "and these are hovering above the ground" (OPEN; NPCs/sims on the path)

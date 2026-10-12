@@ -31,3 +31,5 @@ Note 150 frame review. Hoeing frames are good (both hands on the shaft, tines in
 ## Open decisions (Chris)
 - 112b: copying the pack's own avatar onto the Morro clips needs the Morro pack downloaded again (its source avatar isn't on disk).
 - See-through houses outdoors (the screen-door fade shows in the frames): keep it, or limit it.
+## Rule (Chris 12:55, 2026-10-12): at most 3 candidate-* folders in D:\crulanda-work. Delete the oldest before making a new one; never the published build.
+

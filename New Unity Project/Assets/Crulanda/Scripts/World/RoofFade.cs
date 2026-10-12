@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace Crulanda.World
@@ -125,6 +125,8 @@ namespace Crulanda.World
         /// it; a small piece as its big part; solid otherwise.</summary>
         void Aim(Vector3 camera, Vector3 head, Vector3 body)
         {
+            // Outdoors a house is never see-through (Chris, 12:54: "there should not be see thru houses."): only the building you stand in fades.
+            if (!Holds(body)) { for (int i = 0; i < parts.Length; i++) target[i] = 1; return; }
             Vector3 c = transform.InverseTransformPoint(camera), h = transform.InverseTransformPoint(head), b = transform.InverseTransformPoint(body);
             var whole = bounds; whole.Expand(.3f);
             bool near = whole.Contains(c) || Entry(whole, c, h) >= 0 || Entry(whole, c, b) >= 0;

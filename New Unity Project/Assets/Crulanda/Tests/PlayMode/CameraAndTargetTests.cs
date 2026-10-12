@@ -1,4 +1,4 @@
-#if UNITY_EDITOR
+﻿#if UNITY_EDITOR
 using System;
 using System.Collections;
 using System.IO;
@@ -53,7 +53,20 @@ namespace Crulanda.Tests
             Assert.AreNotEqual("Crulanda/Fade", tree.GetComponentInChildren<Renderer>().sharedMaterial.shader.name);
         }
 
-        /// <summary>Inside the Golden Cask (set at an angle) the room stays a room: with the camera inside behind you no wall fades; with
+        /// <summary>Outdoors no house turns see-through (Chris, 2026-10-12 12:54: "there should not be see thru houses."): the player
+        /// outside the inn with the camera on its far side, the view straight through it, and every part of the inn stays solid.</summary>
+        [UnityTest] public IEnumerator Outdoors_a_house_between_camera_and_player_stays_solid()
+        {
+            var innProp = ZoneBuilder.Active.Zone.props.First(p => p != null && p.kind == "inn");
+            var inn = RoofFade.All.OrderBy(r => Vector2.Distance(new Vector2(r.transform.position.x, r.transform.position.z), innProp.at)).First();
+            float reach = Mathf.Max(inn.Half.x, inn.Half.y) + 3;
+            Vector3 pos = inn.transform.TransformPoint(new Vector3(reach, 0, 0)), head = pos + Vector3.up * 1.5f, body = pos + Vector3.up * .7f;
+            Vector3 camera = inn.transform.TransformPoint(new Vector3(-reach, 2, 0));
+            for (float t = 0; t < .8f; t += Time.deltaTime) { RoofFade.UpdateAll(camera, head, body); yield return null; }
+            Assert.AreEqual(0, inn.FadedBigParts, "outdoors the inn stays solid with the view through it");
+            foreach (var r in inn.GetComponentsInChildren<Renderer>()) Assert.AreNotEqual("Crulanda/Fade", r.sharedMaterial != null ? r.sharedMaterial.shader.name : "", r.name + " is not dithered");
+            foreach (var other in RoofFade.All) Assert.AreEqual(0, other.FadedBigParts, other.name + " outdoors: solid");
+        }        /// <summary>Inside the Golden Cask (set at an angle) the room stays a room: with the camera inside behind you no wall fades; with
         /// the camera outside behind the back wall that wall fades and the rest stays; and the camera itself, turned all the way round,
         /// stays within the walls (playtest note 120, Chris, 2026-10-11: "GOING IN A BUILDING MAKES IT DISAPPEAR"; the tester's note 117,
         /// "The camera goes inside walls when you walk into a building"). Before, every part of the inn faded at once.</summary>

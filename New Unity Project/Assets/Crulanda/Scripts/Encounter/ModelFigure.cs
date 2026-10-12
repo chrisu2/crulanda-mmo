@@ -267,7 +267,16 @@ namespace Crulanda.Encounter
             HandL = B("hand_l", HumanBodyBones.LeftHand); HandR = B("hand_r", HumanBodyBones.RightHand); MiddleL = B("middle_01_l", HumanBodyBones.LeftMiddleProximal); MiddleR = B("middle_01_r", HumanBodyBones.RightMiddleProximal);
             UpperLegL = B("thigh_l", HumanBodyBones.LeftUpperLeg); UpperLegR = B("thigh_r", HumanBodyBones.RightUpperLeg); LowerLegL = B("calf_l", HumanBodyBones.LeftLowerLeg); LowerLegR = B("calf_r", HumanBodyBones.RightLowerLeg);
             FootL = B("foot_l", HumanBodyBones.LeftFoot); FootR = B("foot_r", HumanBodyBones.RightFoot); BallL = B("ball_l", HumanBodyBones.LeftToes); BallR = B("ball_r", HumanBodyBones.RightToes);
+            var f = new[] { "index", "middle", "ring", "pinky" };
+            var hb = new[,] { { HumanBodyBones.RightIndexProximal, HumanBodyBones.RightIndexIntermediate, HumanBodyBones.RightIndexDistal }, { HumanBodyBones.RightMiddleProximal, HumanBodyBones.RightMiddleIntermediate, HumanBodyBones.RightMiddleDistal }, { HumanBodyBones.RightRingProximal, HumanBodyBones.RightRingIntermediate, HumanBodyBones.RightRingDistal }, { HumanBodyBones.RightLittleProximal, HumanBodyBones.RightLittleIntermediate, HumanBodyBones.RightLittleDistal } };
+            FingersR = new Transform[4, 3];
+            for (int i = 0; i < 4; i++) for (int j = 0; j < 3; j++) FingersR[i, j] = B(f[i] + "_0" + (j + 1) + "_r", hb[i, j]);
         }
+        /// <summary>The right hand's fingers (index, middle, ring, little; knuckle to tip), any of them null on a rig without them:
+        /// closed round a staff's shaft (ActorVisual.StaffArm, playtest note 119).</summary>
+        public Transform[,] FingersR;
+        /// <summary>True when every finger of the right hand was found.</summary>
+        public bool HasFingersR { get { if (FingersR == null) return false; foreach (var t in FingersR) if (t == null) return false; return true; } }
         /// <summary>True when the figure was drawn last frame (so its Animator, which culls its bones when it is not, posed them
         /// this frame).</summary>
         public bool Visible { get { foreach (var r in Renderers) if (r != null && r.isVisible) return true; return false; } }

@@ -830,8 +830,45 @@ namespace Crulanda.Encounter
             if (model.UpperArmR == null || model.LowerArmR == null || model.HandR == null) return;
             Vector3 up = body.up, ahead = body.forward, outward = body.right;
             if (model.Chest != null && Vector3.Dot(model.UpperArmR.position - model.Chest.position, outward) < 0) outward = -outward;   // the right arm's own side
-            PointBone(model.UpperArmR, model.LowerArmR.position - model.UpperArmR.position, (-up + outward * .22f + ahead * .12f).normalized, w);
-            PointBone(model.LowerArmR, model.HandR.position - model.LowerArmR.position, (ahead + outward * .1f - up * .2f).normalized, w);
+            // Chris, 2026-10-12 (note 119): "standing weird", the fork floating in front of an open hand. Now the upper arm hangs
+            // nearly straight down by the side, the forearm reaches down and forward (about 35 degrees under level, an elbow of some
+            // 55), the knuckles point ahead with the knuckle row upright, and the fingers close round the shaft (palm in).
+            PointBone(model.UpperArmR, model.LowerArmR.position - model.UpperArmR.position, (-up + outward * .1f + ahead * .1f).normalized, w);
+            PointBone(model.LowerArmR, model.HandR.position - model.LowerArmR.position, (-up * .58f + ahead * .8f + outward * .04f).normalized, w);
+            if (model.MiddleR == null) return;
+            PointBone(model.HandR, model.MiddleR.position - model.HandR.position, (ahead - outward * .1f - up * .08f).normalized, w);
+            if (!model.HasFingersR) return;
+            var F = model.FingersR;
+            var len = (model.MiddleR.position - model.HandR.position).normalized;
+            var line = Vector3.ProjectOnPlane(F[0, 0].position - F[3, 0].position, len); var upright = Vector3.ProjectOnPlane(up, len);
+            if (line.sqrMagnitude > 1e-8f && upright.sqrMagnitude > 1e-8f) model.HandR.rotation = Quaternion.Slerp(Quaternion.identity, Quaternion.FromToRotation(line, upright), w) * model.HandR.rotation;
+            var knuckles = (F[0, 0].position - F[3, 0].position).normalized;
+            float s = Mathf.Sign(Vector3.Dot(knuckles, Vector3.Cross(F[1, 1].position - F[1, 0].position, -outward))); if (s == 0) s = 1;
+            for (int i = 0; i < 4; i++) for (int j = 0; j < 3; j++) F[i, j].rotation = Quaternion.AngleAxis(s * FingerCurl[j] * w, knuckles) * F[i, j].rotation;
+        }
+        /// <summary>How far each joint of a finger bends round a staff's shaft (knuckle, middle, tip), in degrees.</summary>
+        static readonly float[] FingerCurl = { 72, 88, 55 };
+        /// <summary>Where the closed right hand holds a staff: amid the middle finger's knuckle and its two joints, which ring the
+        /// shaft. False on a rig without fingers.</summary>
+        bool StaffGrip(out Vector3 at)
+        {
+            at = default;
+            if (model == null || !model.HasFingersR || model.MiddleR == null) return false;
+            var F = model.FingersR; at = (model.MiddleR.position + F[1, 1].position + F[1, 2].position) / 3; return true;
+        }
+        /// <summary>For tests (playtest note 119): with a long tool held like a staff, how far the shaft's axis passes from the
+        /// middle knuckle and from the middle fingertip joint, how far the upper arm is from hanging straight down and the elbow's
+        /// bend, in degrees. False when no staff is held.</summary>
+        public bool StaffHoldReport(out float knuckleGap, out float tipGap, out float shoulderFromDown, out float elbowBend)
+        {
+            knuckleGap = tipGap = shoulderFromDown = elbowBend = 0;
+            if (model == null || tradeTool == null || !tradeToolLong || !tradeTool.gameObject.activeInHierarchy || ToolAtWork || staffHold < .99f || !model.HasFingersR) return false;
+            Vector3 o = tradeTool.position, d = tradeTool.up;
+            float Gap(Vector3 p) { var v = p - o; return (v - Vector3.Dot(v, d) * d).magnitude; }
+            knuckleGap = Gap(model.MiddleR.position); tipGap = Gap(model.FingersR[1, 2].position);
+            var ua = model.LowerArmR.position - model.UpperArmR.position; var fa = model.HandR.position - model.LowerArmR.position;
+            shoulderFromDown = Vector3.Angle(ua, -body.up); elbowBend = Vector3.Angle(ua, fa);
+            return true;
         }
         /// <summary>Turns <paramref name="bone"/> so its limb (now pointing <paramref name="now"/>) points <paramref name="want"/>, by <paramref name="w"/>.</summary>
         static void PointBone(Transform bone, Vector3 now, Vector3 want, float w)

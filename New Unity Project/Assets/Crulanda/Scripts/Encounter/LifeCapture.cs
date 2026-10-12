@@ -16,7 +16,15 @@ namespace Crulanda.Encounter
         public const string Flag = "--crulanda-life-capture";
         public static bool Requested { get { return Array.IndexOf(Environment.GetCommandLineArgs(), Flag) >= 0; } }
 
-        public IEnumerator Run(EncounterSession s, string directory)
+        /// <summary>The capture camera at <paramref name="at"/> on the subject. Tight (note 119): level with the hips, which it looks at,
+        /// so head and feet are both in frame at 2 m.</summary>
+        static void Aim(Camera cam, Vector3 at, Transform subject, Animator anim, bool tight, float look)
+        {
+            var hips = tight && anim != null && anim.isHuman ? anim.GetBoneTransform(HumanBodyBones.Hips) : null;
+            if (hips == null) { cam.transform.position = at; cam.transform.LookAt(subject.position + Vector3.up * look); return; }
+            var target = hips.position + Vector3.up * .02f; var flat = at - target; flat.y = 0;
+            cam.transform.position = target + flat.normalized * 2f + Vector3.up * .08f; cam.transform.LookAt(target);
+        }        public IEnumerator Run(EncounterSession s, string directory)
         {
             Directory.CreateDirectory(directory);
             Crulanda.World.WorldClock.Hour = 11;
@@ -57,25 +65,31 @@ namespace Crulanda.Encounter
             holders.Sort((a, b) => ((b.Role == "farmer" ? 2 : 0) + (b.Carrying ? 0 : 1)).CompareTo((a.Role == "farmer" ? 2 : 0) + (a.Carrying ? 0 : 1)));   // farmers first, those with free hands first
             if (holders.Count == 0) Debug.Log("Life capture: nobody carries a trade tool");
             motor.Teleport(s.Zone.Ground(Vector2.zero) + new Vector3(0, 1, 60)); yield return null;   // the player well out of these shots
+            // --crulanda-farmers-only (note 119, Chris 2026-10-12): one farmer, close (2 m, head to feet in frame), HUD hidden, from the
+            // side, the front and three-quarters, walking then standing.
+            bool tight = Array.IndexOf(Environment.GetCommandLineArgs(), "--crulanda-farmers-only") >= 0;
+            float dist = tight ? 2f : 3.6f, high = tight ? 1.05f : 1.7f, look = tight ? .9f : .55f; int most = tight ? 1 : 3;
+            bool hudWas = EncounterHud.Hidden; if (tight) EncounterHud.Hidden = true;
+            var walkShots = tight ? new[] { (90f, "walking-side"), (0f, "walking-front"), (45f, "walking-three-quarter") } : new[] { (90f, "walking-side"), (0f, "walking-front"), (180f, "walking-back") };
             var cam = CaptureFraming.Own(); int taken = 0;
             foreach (var farmer in holders)
             {
-                if (taken >= 3) break; taken++;
+                if (taken >= most) break; taken++;
                 var fv = farmer.GetComponent<ActorVisual>(); var ft = farmer.transform; var anim = farmer.GetComponentInChildren<Animator>();
                 if (anim != null) anim.cullingMode = AnimatorCullingMode.AlwaysAnimate;
                 string who = farmer.Name.Replace(' ', '-').ToLowerInvariant(); string tag = "farmer-" + who + "-" + farmer.Role;
                 // Walking: follow alongside for a moment, then the shot.
                 farmer.enabled = true;
-                foreach (var (angle, what) in new[] { (90f, "walking-side"), (0f, "walking-front"), (180f, "walking-back") })
+                foreach (var (angle, what) in walkShots)
                 {
                     System.Collections.Generic.List<Renderer> hidden = null;
                     for (float t = 0; t < 1.2f; t += Time.deltaTime)
                     {
                         if (farmer.Carrying) farmer.PutDownLoad();   // a load puts the tool away: hands free for these frames
                         CaptureFraming.Show(hidden);
-                        var at = CaptureFraming.ClearSpot(ft.position, ft.eulerAngles.y + angle, 3.6f, 1.7f, 60, ft, out hidden);
+                        var at = CaptureFraming.ClearSpot(ft.position, ft.eulerAngles.y + angle, dist, high, 60, ft, out hidden);
                         CaptureFraming.Hide(hidden);
-                        cam.transform.position = at; cam.transform.LookAt(ft.position + Vector3.up * .55f);
+                        Aim(cam, at, ft, anim, tight, look);
                         yield return null;
                     }
                     string file = tag + "-" + what + ".png";
@@ -85,13 +99,13 @@ namespace Crulanda.Encounter
                 }
                 // Standing, then at work: stopped where it is.
                 farmer.enabled = false; var agent = farmer.GetComponent<UnityEngine.AI.NavMeshAgent>(); if (agent != null && agent.isOnNavMesh) agent.isStopped = true;
-                foreach (var (angle, what, pose) in new[] { (90f, "standing-side", ActorPose.Talk), (0f, "standing-front", ActorPose.Talk), (180f, "standing-back", ActorPose.Talk), (60f, "at-work", ActorPose.Work), (-90f, "at-work-side", ActorPose.Work) })
+                foreach (var (angle, what, pose) in tight ? new[] { (90f, "standing-side", ActorPose.None), (0f, "standing-front", ActorPose.None), (45f, "standing-three-quarter", ActorPose.None) } : new[] { (90f, "standing-side", ActorPose.Talk), (0f, "standing-front", ActorPose.Talk), (180f, "standing-back", ActorPose.Talk), (60f, "at-work", ActorPose.Work), (-90f, "at-work-side", ActorPose.Work) })
                 {
                     if (fv != null) fv.Pose = pose;
                     if (farmer.Carrying) farmer.PutDownLoad();
-                    var at = CaptureFraming.ClearSpot(ft.position, ft.eulerAngles.y + angle, 3.6f, 1.7f, 60, ft, out var hidden);
+                    var at = CaptureFraming.ClearSpot(ft.position, ft.eulerAngles.y + angle, dist, high, 60, ft, out var hidden);
                     CaptureFraming.Hide(hidden);
-                    cam.transform.position = at; cam.transform.LookAt(ft.position + Vector3.up * .55f);
+                    Aim(cam, at, ft, anim, tight, look);
                     yield return new WaitForSeconds(1.5f);
                     string file = tag + "-" + what + ".png";
                     ScreenCapture.CaptureScreenshot(Path.Combine(directory, file)); yield return new WaitForSeconds(.4f);
@@ -101,7 +115,7 @@ namespace Crulanda.Encounter
                 if (fv != null) fv.Pose = ActorPose.None;
                 if (agent != null && agent.isOnNavMesh) agent.isStopped = false; farmer.enabled = true;
             }
-            CaptureFraming.Release();
+            CaptureFraming.Release(); EncounterHud.Hidden = hudWas;
             motor.Teleport(s.Zone.Ground(Vector2.zero) + new Vector3(18, 1, -18)); motor.SetView(-45, 22, 30);
             yield return new WaitForSeconds(2.5f);
             ScreenCapture.CaptureScreenshot(Path.Combine(directory, "06-wide.png")); yield return new WaitForSeconds(.5f);

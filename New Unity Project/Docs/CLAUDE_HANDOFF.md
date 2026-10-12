@@ -63,3 +63,9 @@ From the candidate build, 1440x900 windowed, temp saves (Chris's save untouched)
   settings round them with `screen_prefs.ps1 -Save` / `-Restore`.
 - After meaningful work: commit, push the branch, `tools\Backup.ps1`, copy this page to
   `D:\crulanda-work\outputs\Crulanda-Claude-Handoff.md` and check the copy's hash.
+## Note 119 (2026-10-12, 00:30): TESTED, BUILT, OPEN until Chris checks
+- Grip: a long tool's shaft now passes through the closed right hand (ActorVisual.StaffGrip: amid the middle finger's knuckle and joints; StaffArm curls all four fingers 72/88/55 degrees about the knuckle row, knuckle row upright, palm in).
+- Stance: upper arm hangs near straight down, forearm down-and-forward (~35 degrees under level), shaft vertical, butt by the foot.
+- Test: VillageDayTests.A_long_tool_is_held_in_the_fist_like_a_staff_clear_of_the_arm now also needs the shaft within 3 cm of the knuckles, fingertip within 4 cm, upper arm within 30 degrees of down, elbow 20-80 degrees (ActorVisual.StaffHoldReport). Passes in lane A.
+- Candidate (NoPublish): D:\crulanda-work\candidate-20261012-0012. Capture: --crulanda-life-capture <dir> --crulanda-farmers-only (one farmer, 2 m, hips-level camera, HUD hidden; side/front/three-quarter, walking and standing).
+- 112b (Morro clips on the pack's own avatar) not done here: the pack's source avatar is not in the project or downloads.

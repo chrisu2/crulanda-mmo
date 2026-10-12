@@ -1002,7 +1002,7 @@ namespace Crulanda.Encounter
                     tradeTool.rotation = Quaternion.LookRotation(side, along);
                     tradeTool.position = fist + along * (tradeToolShaft * ToolGrip - .1f) * tradeTool.lossyScale.y;
                 }
-                else { tradeTool.rotation = body.rotation * Quaternion.Euler(-4, 0, 0); tradeTool.position = fist; }
+                else { tradeTool.rotation = body.rotation * Quaternion.Euler(-4, 0, 0); tradeTool.position = model != null && staffHold > .5f && StaffGrip(out var grip) ? grip : fist; }
             }
             else
             {

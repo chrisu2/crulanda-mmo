@@ -60,7 +60,7 @@ namespace Crulanda.Tests
             Assert.Greater(holders.Count(x => x.tool.GetComponentsInChildren<Transform>(true).Any(t => t.name == "Tine")), 0, "the farmers' forks are on the tool holder");
             foreach (var x in holders) x.anim.cullingMode = AnimatorCullingMode.AlwaysAnimate;   // posed in a batch run too (FootTests)
             float Seg(Vector3 q, Vector3 a, Vector3 b) { var ab = b - a; float t = Mathf.Clamp01(Vector3.Dot(q - a, ab) / ab.sqrMagnitude); return Vector3.Distance(q, a + ab * t); }
-            var fails = new System.Collections.Generic.List<string>(); int carried = 0, talking = 0, working = 0;
+            var fails = new System.Collections.Generic.List<string>(); int carried = 0, talking = 0, working = 0, staffSeen = 0;
             var last = holders.ToDictionary(x => x.v, x => x.v.transform.position);
             for (int f = 0; f < 270; f++)
             {
@@ -81,6 +81,18 @@ namespace Crulanda.Tests
                     var fist = wr + (wr - el) * .3f;
                     string who = x.v.name + (x.v.ToolAtWork ? " at work" : pose == ActorPose.Talk ? " talking" : speed > .5f ? " walking" : " standing") + ": ";
                     float inFist = Seg(fist, b0, b1);
+                    // Note 119 (Chris, 2026-10-12: "standing weird", "holding the hoe better but still not great"; the frames had the
+                    // shaft some 20 cm in front of an open hand): held like a staff, the shaft runs through the closed hand (within 3 cm
+                    // of the middle knuckle, the middle fingertip closed round it), the upper arm hangs near straight down and the elbow
+                    // is bent only as a relaxed arm is.
+                    if (x.v.StaffHoldReport(out float knuckle, out float tip, out float shoulder, out float elbow))
+                    {
+                        inFist = 0; staffSeen++;
+                        if (knuckle > .03f) fails.Add(who + "the shaft is " + (knuckle * 100).ToString("0.0") + " cm from the knuckles (over 3)");
+                        if (tip > .04f) fails.Add(who + "the fingers are open: the middle fingertip " + (tip * 100).ToString("0.0") + " cm off the shaft");
+                        if (shoulder > 30) fails.Add(who + "the upper arm is held out " + shoulder.ToString("0") + " degrees from hanging down");
+                        if (elbow < 20 || elbow > 80) fails.Add(who + "the elbow is bent " + elbow.ToString("0") + " degrees (natural: 20 to 80)");
+                    }
                     if (inFist > .07f) fails.Add(who + "the fist is " + inFist.ToString("0.00") + " m off the shaft");
                     float arm = new[] { el, (el + wr) / 2, (sh + el) / 2, sh }.Min(q => Seg(q, b0, b1));
                     if (arm < .06f) fails.Add(who + "the shaft goes through the arm (" + arm.ToString("0.00") + " m from the forearm or upper arm)");
@@ -97,6 +109,7 @@ namespace Crulanda.Tests
                     if (legGap < .07f) fails.Add(who + "the shaft goes through a leg (" + legGap.ToString("0.00") + " m)");
                 }
             }
+            Assert.Greater(staffSeen, 0, "a long tool seen held like a staff in a modelled hand with fingers");
             Assert.Greater(carried, 0, "a long tool seen carried"); Assert.Greater(talking, 0, "a long tool seen while its villager stands and talks"); Assert.Greater(working, 0, "a long tool seen at work");
             Assert.IsEmpty(fails.Distinct().Take(12).ToList(), fails.Count + " bad frames (carried " + carried + ", talking " + talking + ", at work " + working + "):\n" + string.Join("\n", fails.Distinct().Take(12)));
         }

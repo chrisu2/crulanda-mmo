@@ -172,7 +172,10 @@ namespace Crulanda.Encounter
                     if (thrall != null)
                     {
                         var vdir = Path.Combine(dir, "thrall-video"); Directory.CreateDirectory(vdir); int vf = 0;
-                        IEnumerator Rec(float seconds) { int n = Mathf.RoundToInt(seconds * 24); for (int i = 0; i < n; i++) { yield return new WaitForEndOfFrame(); ScreenCapture.CaptureScreenshot(Path.Combine(vdir, "f" + (vf++).ToString("0000") + ".png")); yield return null; } }
+                        // A camera of its own locked on the thrall, close and side on (Chris 17:40), drawn over the game camera.
+                        var closeCam = new GameObject("Thrall close-up camera").AddComponent<Camera>(); closeCam.CopyFrom(Camera.main); closeCam.depth = Camera.main.depth + 5; closeCam.fieldOfView = 40;
+                        void Aim() { var tp = thrall.position; var side = thrall.right; side.y = 0; side.Normalize(); closeCam.transform.position = tp + side * 2.6f + Vector3.up * 1.2f; closeCam.transform.LookAt(tp + Vector3.up * .95f); }
+                        IEnumerator Rec(float seconds) { int n = Mathf.RoundToInt(seconds * 24); for (int i = 0; i < n; i++) { Aim(); yield return new WaitForEndOfFrame(); ScreenCapture.CaptureScreenshot(Path.Combine(vdir, "f" + (vf++).ToString("0000") + ".png")); yield return null; } }
                         Time.captureFramerate = 24;
                         var pmot = s.Player.GetComponent<AdventurerMotor>();
                         var away = -(foe.transform.position - s.Player.transform.position); away.y = 0; s.Player.transform.rotation = Quaternion.LookRotation(away);
@@ -180,8 +183,12 @@ namespace Crulanda.Encounter
                         yield return Rec(4);                                                   // idle beside the Mage
                         EncounterInput.Scripted = new Vector2(0, 1); yield return Rec(5);      // follows as the Mage walks off
                         EncounterInput.Scripted = null;
-                        s.Player.transform.rotation = Quaternion.LookRotation(-away); FaceFoe(foe); s.Select(foe); s.PetAttack();
-                        yield return Rec(6);                                                   // sent in: runs to the foe and attacks
+                        // A dummy to hit: the foe held still four metres ahead of the thrall.
+                        foe.enabled = false; var fa = foe.GetComponent<UnityEngine.AI.NavMeshAgent>(); var dummyAt = thrall.position + thrall.forward * 4;
+                        if (fa != null && fa.isOnNavMesh) { fa.Warp(dummyAt); fa.isStopped = true; } foe.actor.Health.Pool.SetMax(500000, false); foe.actor.Health.Pool.SetCurrent(500000);
+                        s.Select(foe); s.PetAttack();
+                        yield return Rec(6);
+                        Destroy(closeCam.gameObject); foe.enabled = true;                                                   // sent in: runs to the foe and attacks
                         Time.captureFramerate = 0; report.AppendLine("thrall-video: " + vf + " frames at 24 fps (idle 4 s, follow 5 s, attack 6 s)");
                         s.PetOrder(RangerPet.Order.Assist); foe = NearFoe(); yield return new WaitForSeconds(1);
                     }

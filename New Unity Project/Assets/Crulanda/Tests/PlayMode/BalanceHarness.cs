@@ -26,6 +26,12 @@ namespace Crulanda.Tests
         static readonly string[] Classes = { "class.warrior", "class.druid", "class.paladin", "class.ranger", "class.mage", "class.rogue", "class.archivist", "class.saltmender" };
         static string Out { get { var d = Environment.GetEnvironmentVariable("CRULANDA_BALANCE_OUT"); return string.IsNullOrEmpty(d) ? @"D:\crulanda-work\outputs\balance" : d; } }
         readonly List<string> csv = new List<string> { "class,build,role,scenario,seed,seconds,dps,hps,resource_max,resource_used,time_to_oom" };
+        // Never in the rotation: forms (the build's own is taken once at the start), escapes and crowd control that would end the fight;
+        // once a fight: summons and standing auras.
+        static readonly HashSet<string> Never = new HashSet<string> { "druid.barkhide", "druid.thornclaw", "druid.rootmend", "druid.thornsong", "mage.unbind", "mage.quench", "mage.bind",
+            "rogue.vanish", "rogue.tumble", "rogue.sap", "rogue.blind", "ranger.disengage", "druid.sleep_of_the_wood" };
+        static readonly HashSet<string> Once = new HashSet<string> { "mage.raise_thrall", "ranger.call_companion", "druid.seedling", "paladin.oath", "paladin.colours" };
+        int SlotOf(string id) { for (int i = 0; i < s.Kit.ActionCount; i++) { var a = s.Kit.ActionAt(i); if (a != null && a.id == id) return i; } return -1; }
         string root; EncounterSession s;
         void OnLoaded(Scene scene, LoadSceneMode mode) { var x = UnityEngine.Object.FindFirstObjectByType<EncounterSession>(); if (x != null) x.SaveDirectoryOverride = root; }
 
@@ -77,6 +83,7 @@ namespace Crulanda.Tests
         IEnumerator Fight(string cls, TalentBranchData branch, string role, string scenario, int seed, int targets)
         {
             UnityEngine.Random.InitState(1000 + seed);
+            if (s.Player.Health.Pool.Current <= 0) s.Player.Health.Revive(s.Player.Health.Pool.Max);
             s.Progress.experience = EncounterProgress.XpForLevel(15); s.Player.SetLevel(15); Buy(branch);
             s.Player.Health.Pool.Fill(); s.Player.Resource.Pool.Fill(); s.Kit.ClearTransient();
             var foes = s.Enemies.Where(x => x != null && x.actor.IsAlive).OrderBy(x => x.transform.position.sqrMagnitude).Take(Math.Max(1, targets)).ToList();
@@ -91,20 +98,27 @@ namespace Crulanda.Tests
             motor.Teleport(at + Vector3.back * 2.4f + Vector3.up * .5f); s.Player.transform.rotation = Quaternion.LookRotation(Vector3.forward);
             if (targets > 0) s.Select(foes[0]);
             yield return null;
+            var used1 = new HashSet<string>();
+            { int form = SlotOf((cls == "class.druid" ? "druid." : "") + branch.id); if (form >= 0 && s.Kit.ActionLockLabel(form) == null) { s.UseAbility(form); yield return new WaitForSeconds(1.6f); } }
             s.Meter.Reset(); var pool = s.Player.Resource.Pool; int last = pool.Current, used = 0; float oom = -1, t = 0, hurt = 0;
             Time.timeScale = Speed;
             while (t < FightSeconds)
             {
                 yield return null; float dt = Time.deltaTime; t += dt;
                 if (targets > 0 && (s.Target == null || !s.Target.actor.IsAlive)) { var f = foes.FirstOrDefault(x => x != null && x.actor.IsAlive); if (f != null) s.Select(f); }
-                if (targets == 0) { hurt += dt; if (hurt >= 1) { hurt -= 1; s.Player.Health.ApplyDamage(Mathf.RoundToInt(s.Player.Health.Pool.Max * .04f)); } }
+                if (targets == 0) { hurt += dt; if (hurt >= 1) { hurt -= 1; s.Player.Health.ApplyDamage(Mathf.Min(s.Player.Health.Pool.Current - 1, Mathf.RoundToInt(s.Player.Health.Pool.Max * .04f))); } }
                 if (s.Player.Health.Pool.Current < s.Player.Health.Pool.Max * .3f && targets > 0) s.Player.Health.Pool.Fill();
-                for (int slot = 0; slot < s.Kit.ActionCount; slot++) { if (s.Kit.ActionLockLabel(slot) != null) continue; if (s.UseAbility(slot)) break; }
+                for (int slot = 0; slot < s.Kit.ActionCount; slot++)
+                {
+                    var ab = s.Kit.ActionAt(slot); if (ab == null || s.Kit.ActionLockLabel(slot) != null || Never.Contains(ab.id) || used1.Contains(ab.id)) continue;
+                    if (s.UseAbility(slot)) { if (Once.Contains(ab.id)) used1.Add(ab.id); break; }
+                }
                 int now = pool.Current; if (now < last) used += last - now; last = now;
                 if (oom < 0 && pool.Max > 0 && pool.Ratio < .05f) oom = t;
             }
             Time.timeScale = 1;
             int dmg = 0, heal = 0; foreach (var r in s.Meter.Rows) { dmg += r.damage; heal += r.healing; }
+            if (s.Player.Health.Pool.Current <= 0) s.Player.Health.Revive(s.Player.Health.Pool.Max);
             csv.Add(string.Join(",", cls, branch.id, role, scenario, seed, t.ToString("0.0"), (dmg / t).ToString("0.0"), (heal / t).ToString("0.0"), pool.Max, used, oom < 0 ? "" : oom.ToString("0.0")));
             foreach (var f in foes) if (f != null) { f.actor.Health.Pool.SetMax(5000000, false); f.actor.Health.Pool.SetCurrent(5000000); }
         }

@@ -61,9 +61,9 @@ namespace Crulanda.Encounter
     /// <summary>Makes, reads and writes the roster.</summary>
     public static class SimRoster
     {
-        public const int Count = 50;   // round 27: forty; 2026-10-08: ten more, the Rogues and Archivists (the first forty unchanged)
+        public const int Count = 56;   // round 27: forty; 2026-10-08: ten more, the Rogues and Archivists; 2026-10-12: six Salt-Menders (the first fifty unchanged)
         public const string Slot = "world";
-        public static readonly string[] ClassIds = { "class.warrior", "class.druid", "class.paladin", "class.ranger", "class.mage", "class.rogue", "class.archivist" };
+        public static readonly string[] ClassIds = { "class.warrior", "class.druid", "class.paladin", "class.ranger", "class.mage", "class.rogue", "class.archivist", "class.saltmender" };
         static readonly string[] FirstFive = { "class.warrior", "class.druid", "class.paladin", "class.ranger", "class.mage" };
         /// <summary>Home zones by level band (WORLD_ZONES.md): the village for the low levels, the Shore for the cap.</summary>
         public static readonly (string zone, string folk, int lo, int hi)[] Homes = {
@@ -79,7 +79,7 @@ namespace Crulanda.Encounter
             var r = new SeededRandom(seed); var sims = new List<SimAdventurer>(Count); var used = new HashSet<string>();
             for (int i = 0; i < Count; i++)
             {
-                var s = new SimAdventurer { id = "sim." + (i + 1).ToString("00"), classId = i < 40 ? FirstFive[i % FirstFive.Length] : ClassIds[5 + i % 2] };
+                var s = new SimAdventurer { id = "sim." + (i + 1).ToString("00"), classId = i < 40 ? FirstFive[i % FirstFive.Length] : i < 50 ? ClassIds[5 + i % 2] : "class.saltmender" };
                 // Levels: a spread over the bands, more at the bottom where the player starts (1-5: 8, 4-8: 5, 7-10: 3, 9-12: 2, 11-13: 2).
                 int band = i < 8 ? 0 : i < 13 ? 1 : i < 16 ? 2 : i < 18 ? 3 : i < 20 ? 4 : (i - 20) % 5;   // the second twenty: four a band (12/9/7/6/6 in all)
                 var home = Homes[band];
@@ -146,7 +146,7 @@ namespace Crulanda.Encounter
         }
         public static string ClassName(string classId)
         {
-            switch (classId) { case "class.druid": return "Druid"; case "class.paladin": return "Paladin"; case "class.ranger": return "Ranger"; case "class.mage": return "Mage"; case "class.rogue": return "Rogue"; case "class.archivist": return "Archivist"; default: return "Warrior"; }
+            switch (classId) { case "class.druid": return "Druid"; case "class.paladin": return "Paladin"; case "class.ranger": return "Ranger"; case "class.mage": return "Mage"; case "class.rogue": return "Rogue"; case "class.archivist": return "Archivist"; case "class.saltmender": return "Salt-Mender"; default: return "Warrior"; }
         }
     }
 }

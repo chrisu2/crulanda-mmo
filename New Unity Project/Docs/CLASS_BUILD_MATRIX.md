@@ -29,14 +29,20 @@ the Ghost-Oaks for sap that, with salt and sand, makes a glowing mortar (book3/c
   (chapter_3.md:20-22), a Salt-Wall that grows spikes and absorbs the enemy's force and grounds it (chapter_8.md:32-34), salt-crystal
   arrowheads that dissolve Void things and the Song of Sifting (chapter_4.md:46-50), salt-resonance coating a blade in white, caustic
   frost (chapter_9.md:96). The game's Salt-Menders are their forerunners (decided 2026-10-10, CANON-EXPANDED).
-- **Not a healer**: no salt-magic heals in the books (searched 2026-10-11). Its support is wards.
+- No salt-magic heals in the books (searched 2026-10-11): the first three paths support with wards. **The fourth path, the Mender, heals:
+  CANON-EXPANDED** at Chris's word (2026-10-12, notes 153-154: "ok since they do use salt and chants they can be a bard like healer" + "with
+  some shamanistic"), built from the canon's chant ("I seal the Wound!") and its Salt-Wall that grounds the blow. No machines.
 - Resource: **Salt** (a pouch of 100), spent by every working and refilled from the earth out of a fight (GAME-ONLY).
 - Paths (rows 0-2 first, as the first seven classes began):
   - **Salt-Speaker** (control): Binding Salt (a handful thrown with the chant: the target held in white crystal), Seal the Wound (a silence).
   - **Mason** (tank; Klyther's craft): Salt-Ward (a barrier that grounds what strikes it into Salt), Sung Wall (a ward the party stands behind), a taunt.
   - **Sifter** (ranged): salt-crystal shards (the Song of Sifting), harder on the Wasting's things (the Weave-Eaters, the Unmade).
+  - **Mender** (healer, CANON-EXPANDED; built 2026-10-12, rows 0-3, 25 ranks): Mender-Craft (a chant kept up, healing over time for
+    the party near you), Salt Circle (the party stands in salt), Close the Cut (a direct heal), Salt Cairn (a placed salt-stone that mends,
+    sifts the Wasting's grey and grounds the blow), Call the Deep Earth (the cairn wakes the earth's spirit).
   - Written for later: **Frost-Edge** (melee: the blade in white, caustic frost).
-- Look: the Mage's robe figure with a salt-white mantle until an own figure is made (Phase 8.5's figures).
+- Look: its own figure since 2026-10-12 (ActorLook.SaltMender: a salt-white robe, a sea-grey hood, a salt pouch at the hip, a salt-stone
+  charm, a plain staff). GAME-ONLY.
 
 **The Knight** (a later candidate, PROVISIONAL): Kaelith Dawnstrike fights "like a dancer composed entirely of... light" with a blade of
 golden sunlight that unmakes corruption rather than cutting flesh (book2/chapter_29.md:81, chapter_30.md:13; CANON); the High Concord

@@ -241,7 +241,7 @@ namespace Crulanda.Encounter
                 visual?.CastRelease();
                 var hand = visual != null ? visual.RightHandle : null; var from = hand != null ? hand.position : transform.position + Vector3.up * 1.3f;
                 bool arrow = sim.classId == "class.ranger";
-                var colour = sim.classId == "class.mage" ? new Color(1, .55f, .15f) : sim.classId == "class.druid" ? new Color(.45f, .85f, .3f) : sim.classId == "class.archivist" ? new Color(.6f, .8f, 1) : new Color(.9f, .88f, .8f);
+                var colour = sim.classId == "class.mage" ? new Color(1, .55f, .15f) : sim.classId == "class.druid" ? new Color(.45f, .85f, .3f) : sim.classId == "class.archivist" ? new Color(.6f, .8f, 1) : sim.classId == "class.saltmender" ? new Color(.97f, .97f, .92f) : new Color(.9f, .88f, .8f);
                 Bolt.Fire(from, q.transform, colour, arrow ? .1f : .18f, arrow ? .22f : .28f, arrow);
             }
             q.Receive(dmg, actor);

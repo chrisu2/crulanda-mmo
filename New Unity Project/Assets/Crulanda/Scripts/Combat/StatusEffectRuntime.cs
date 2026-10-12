@@ -85,6 +85,15 @@ namespace Crulanda.Combat
             if (index < 0) return false;
             RemoveAt(index); return true;
         }
+        /// <summary>Lifts every harmful working (one that makes its bearer take more, or the Wasting's grey: an id with "grey" or "wasting"):
+        /// the Salt Cairn's sifting (2026-10-12). Returns how many were lifted.</summary>
+        public int RemoveHarmful()
+        {
+            int n = 0;
+            foreach (var e in active.ToArray())
+                if (e.damageMultiplier > 1 || e.id.Contains("grey") || e.id.Contains("wasting")) { Remove(e.id); n++; }
+            return n;
+        }
         public void Clear() { while (active.Count > 0) RemoveAt(active.Count - 1); }
         void RemoveAt(int index)
         {

@@ -1,8 +1,8 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Crulanda.Encounter
 {
-    public enum ActorLook { Warrior, Druid, Healer, Collector, Warden, Sentry, Outrider, Pale, Villager, Hollow, Cultist, Wolf, Boar, WeaveEater, Deserter, BanditKing, Keeper, Stag, Spider, Bramble, Bear, Skeleton, Paladin, Ranger, Mage, RockEater }
+    public enum ActorLook { Warrior, Druid, Healer, Collector, Warden, Sentry, Outrider, Pale, Villager, Hollow, Cultist, Wolf, Boar, WeaveEater, Deserter, BanditKing, Keeper, Stag, Spider, Bramble, Bear, Skeleton, Paladin, Ranger, Mage, RockEater, SaltMender }
     /// <summary>Body language layered over walking: working a hoe or bucket, talking, sitting, cowering.</summary>
     public enum ActorPose { None, Work, Talk, Sit, Cower, Hammer, Chop, Gather, Knead, Swim, Sneak, Drink, Slump }
 
@@ -425,6 +425,8 @@ namespace Crulanda.Encounter
                 // The classes of Phase 5.1 (2026-10-05; GAME-ONLY looks): the Paladin in ivory and gold, the Ranger in forest green, the Mage in violet.
                 case ActorLook.Paladin: clothC = new Color(.88f, .84f, .72f); accentC = new Color(.86f, .68f, .22f); legC = new Color(.3f, .26f, .2f); break;
                 case ActorLook.Ranger: clothC = new Color(.24f, .42f, .2f); accentC = new Color(.46f, .3f, .15f); legC = new Color(.3f, .24f, .15f); break;
+                // The Salt-Mender (2026-10-12; GAME-ONLY look): salt-white robe, a sea-grey hood and sash, the brown of the earth below.
+                case ActorLook.SaltMender: clothC = new Color(.86f, .85f, .79f); accentC = new Color(.34f, .44f, .5f); legC = new Color(.36f, .32f, .27f); break;
                 case ActorLook.Mage: clothC = new Color(.28f, .2f, .52f); accentC = new Color(.82f, .7f, .3f); legC = new Color(.18f, .15f, .3f); break;
                 case ActorLook.Healer: clothC = new Color(.1f, .44f, .36f); accentC = new Color(.95f, .86f, .6f); legC = new Color(.1f, .3f, .27f); break;
                 case ActorLook.Collector: clothC = new Color(.14f, .22f, .54f); accentC = new Color(.76f, .78f, .82f); legC = new Color(.12f, .14f, .24f); break;
@@ -483,6 +485,18 @@ namespace Crulanda.Encounter
                     var staffM = HeldModel("Cartoon_Staff_01", armR, new Vector3(0, -.62f, .1f), new Vector3(0, 90, 0), 1, .4f);
                     var slungM = HeldModel("Cartoon_Staff_01", body, new Vector3(.1f, .25f, -.27f), new Vector3(0, 0, -30), 1, .4f);
                     held = staffM != null ? new[] { staffM } : new Transform[0]; stowed = slungM != null ? new[] { slungM } : new Transform[0];
+                    break;
+                }
+                case ActorLook.SaltMender:   // a plain staff, the salt pouch at the right hip, a salt-stone on a cord at the chest
+                {
+                    var pouch = Part(PrimitiveType.Sphere, body, new Vector3(.2f, -.08f, .09f), new Vector3(.15f, .17f, .11f), accent);
+                    var tie = Part(PrimitiveType.Cylinder, body, new Vector3(.2f, .01f, .09f), new Vector3(.07f, .02f, .07f), Mat(new Color(.95f, .95f, .9f)));
+                    var charm = Part(PrimitiveType.Cube, body, new Vector3(0, .5f, .19f), new Vector3(.06f, .08f, .04f), Mat(new Color(.95f, .95f, .9f), .6f), new Vector3(0, 0, 45));
+                    var staffS = HeldModel("Cartoon_Staff_01", armR, new Vector3(0, -.62f, .1f), new Vector3(0, 90, 0), 1, .4f);
+                    var slungS = HeldModel("Cartoon_Staff_01", body, new Vector3(.1f, .25f, -.27f), new Vector3(0, 0, -30), 1, .4f);
+                    var kit = modelled && model.Hood != null ? new[] { pouch.transform, tie.transform, charm.transform, model.Hood.transform } : new[] { pouch.transform, tie.transform, charm.transform };
+                    classKit = kit;
+                    held = staffS != null ? new[] { staffS } : new Transform[0]; stowed = slungS != null ? new[] { slungS } : new Transform[0];
                     break;
                 }
                 case ActorLook.Ranger:   // the bow in the left hand, limbs up and down in front of the fist; slung across the back for swimming

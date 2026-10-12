@@ -1168,6 +1168,54 @@ MonoBehaviour:
     globalCooldown: 1.5
     duration: 3
     statusId:
+  - id: salt.close_cut
+    name: Close the Cut
+    description: "Salt pressed into the worst wound in the party within 30 metres: it closes. CANON-EXPANDED."
+    effect: 3
+    power: 22
+    cost: 18
+    cooldown: 0
+    range: 30
+    castTime: 1.5
+    globalCooldown: 1.5
+    duration: 0
+    statusId:
+  - id: salt.mender_craft
+    name: Mender-Craft
+    description: "The chant kept up (\"I seal the Wound!\"): every 2 seconds the party within 12 metres mends, for 4 Salt a verse. Again to stop. Talent. CANON-EXPANDED."
+    effect: 4
+    power: 0
+    cost: 5
+    cooldown: 0
+    range: 0
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 0
+    statusId:
+  - id: salt.circle
+    name: Salt Circle
+    description: "A ring of salt poured at your feet for 10 seconds: the party standing in it mends each second and takes 10% less. Talent. CANON-EXPANDED."
+    effect: 4
+    power: 4
+    cost: 25
+    cooldown: 20
+    range: 0
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 10
+    statusId:
+  - id: salt.cairn
+    name: Salt Cairn
+    description: "Salt-stone stacked on the ground for 15 seconds, calling the earth: every 3 seconds the party within 10 metres mends and the Wasting's grey is sifted out. Talent. CANON-EXPANDED."
+    effect: 4
+    power: 10
+    cost: 30
+    cooldown: 30
+    range: 0
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 15
+    statusId:
   - id: ability.shield_bash
     name: Shield Bash
     description: "A blow with the shield's face: stops the target's blow and silences it 3 seconds."
@@ -1698,6 +1746,18 @@ MonoBehaviour:
       - abilityId: salt.calcify
         level: 1
         talentId: ss-calcify
+      - abilityId: salt.close_cut
+        level: 7
+        talentId:
+      - abilityId: salt.mender_craft
+        level: 1
+        talentId: md-mender-craft
+      - abilityId: salt.circle
+        level: 1
+        talentId: md-salt-circle
+      - abilityId: salt.cairn
+        level: 1
+        talentId: md-salt-cairn
     talentTree: {fileID: 4900000, guid: b7e94b011c294431bd9be85595f3273a, type: 3}
   questFiles:
   - {fileID: 4900000, guid: dadeaa3314444542a04b4e17d9dbc0c4, type: 3}

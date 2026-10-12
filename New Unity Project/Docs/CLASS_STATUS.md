@@ -18,7 +18,7 @@ and icons for everything on the bar (IconCoverageTests).
 | Ranger | Focus | Marksman ranged, Beastbond pet, Pathfinder control, **Skirmisher melee** (2026-10-11) | 17-19 of 17-19 (rows 0-2; nothing deeper written); the Skirmisher 16 of 21 ranks (rows 0-3 built, 4-6 written) | Snare Trap (hold 20 s) / Pin (silence); Feint (the next blow misses) | own; the wolf |
 | Mage | Mana + Heat | Combustion ranged, Heatweaver control, Spellbinder support, **Cinderwright pets** (2026-10-11) | 17-19 of 17-19 (rows 0-2; nothing deeper written); the Cinderwright 16 of 21 ranks (rows 0-3 built, 4-6 written) | Ash Hex (held 25 s) / Quench (silence) | own; the staff; the ember hound |
 | Rogue | Focus + combo points | Thief's Grace stealth, Shardwork poisons, Locksmith, **Swashbuckler support** (2026-10-11) | 16-17 of 16-17 (rows 0-3; nothing deeper written); the Swashbuckler 16 of 21 ranks (rows 0-3 built, 4-6 written) | Sap, Gouge, Blind / Kick; Vanish; pick-lock; Opening Cut (Exposed), Tumble; Throw Knife (the pull, 2026-10-11) | borrows the Ranger's; a pair of Lowtown dirks, one in each hand (2026-10-11) |
-| Salt-Mender (2026-10-11, the first class from the canon; CLASS_BUILD_MATRIX.md) | Salt | Salt-Speaker control, Mason tank, Sifter ranged | 21 of 21 (rows 0-2) | Binding Salt (held 8 s) / Seal the Wound (silence); Calcify (stun, a talent); Draw the Line (taunt) | borrows the Mage's; **no sims of it yet** |
+| Salt-Mender (2026-10-11, the first class from the canon; CLASS_BUILD_MATRIX.md) | Salt | Salt-Speaker control, Mason tank, Sifter ranged, **Mender healer** (2026-10-12, CANON-EXPANDED) | 32 of 32 (rows 0-2; the Mender rows 0-3, 25 ranks) | Binding Salt (held 8 s) / Seal the Wound (silence); Calcify (stun, a talent); Draw the Line (taunt) | its own (ActorLook.SaltMender: salt-white robe, sea-grey hood, salt pouch, salt-stone charm); six sims (sims 51-56; heal when no Druid is along) |
 | Archivist | Mana | the Silent Vow, the Lull, the Archive, **the Cantor healer** (2026-10-10) | 21 of the first three (rows 0-3; nothing deeper written); the Cantor 10 of 15 (rows 0-3 built, 4-6 written) | Lull (three sleep), Echo Bind / Hush; songs; echo-jar; Mending Phrase, the Song of Mending, Chorus of the Weave | borrows the Mage's |
 
 **At the cap of 15 every class is complete:** talent points are your level plus one (16 at 15), and every branch has at least 16 ranks
@@ -43,9 +43,14 @@ have theirs designed (rows 4-6 in their files, marked `impl: false`); the Paladi
   (salt-stone, sap-mortar) is the Salt-Mender's Mason path (CLASS_BUILD_MATRIX.md, "Phase 9.2 and 9.3 from the canon").
 - **The Knight** (Talira Frostveil, Kaelith Dawnstrike: swordmaster, Stormlight); overlaps the Paladin's Oathguard, to resolve.
 - **The Salt-Mender** (the salt-magic of the West): designed 2026-10-11 from Book 1's Salt-Speaker and book 3's Mender-Craft
-  (CLASS_BUILD_MATRIX.md): Salt-Speaker control, Mason tank, Sifter ranged; not a healer (no salt-magic heals in the books). **Built
-  2026-10-11** (SaltMenderKit, Talents/saltmender.json, eight workings, icons; SaltMenderRulesTests, SaltMenderLoopTests). Left: sims of
-  it (SimAdventurers.ClassIds, an AI rotation), its own figure, rows 3-6.
+  (CLASS_BUILD_MATRIX.md): Salt-Speaker control, Mason tank, Sifter ranged. **Built
+  2026-10-11** (SaltMenderKit, Talents/saltmender.json, eight workings, icons; SaltMenderRulesTests, SaltMenderLoopTests). **2026-10-12:
+  the Mender** (Chris: "a bard like healer" "with some shamanistic"; CANON-EXPANDED, no salt-magic heals in the books): Close the Cut
+  (level 7, a direct heal on the worst wound), Mender-Craft (a chant kept up: the party within 12 m mends every 2 s for Salt a verse),
+  Salt Circle (a ring poured at your feet: mends and 10% less inside), Salt Cairn (stacked salt-stone: mends, sifts the Wasting's grey,
+  grounds part of each blow; Call the Deep Earth, the signature); 11 talents, rows 0-3, 25 ranks; icons; its own figure; six Salt-Mender
+  sims (SimRoster 56) that heal (the mend, a chant, a cairn) when no Druid is along. TESTED (lane A), not seen by Chris. Left: rows 3-6 of
+  the first three paths, a Frost-Edge; no enemy yet lays a grey on the party for the cairn to sift.
 - The Rogue and the Archivist were on that list and are done.
 
 CLASS_BUILD_MATRIX.md holds 20 candidates in all (Cleric, Shaman, Necromancer, Warlock, Bard, Monk, Seer, Engineer and more); the

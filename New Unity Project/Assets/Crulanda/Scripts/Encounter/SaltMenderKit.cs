@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Crulanda.Gameplay;
@@ -11,8 +11,8 @@ namespace Crulanda.Encounter
     /// The Salt-Mender (Phase 9.2, 2026-10-11; CANON roots, GAME-ONLY kit, PROVISIONAL names; CLASS_BUILD_MATRIX.md "Phase 9.2 and 9.3 from
     /// the canon"): the salt-magic of the West. Book 1's Salt-Speaker throws salt and chants to bind the Chaos and seal the Wound,
     /// calcifying Weave-Eaters into white crystal (B1F:5486-5498); book 3's Salt-Menders sing a wall into place, raise a Salt-Wall that takes
-    /// the enemy's force and grounds it, and loose salt-crystal heads that dissolve the Void's things; Klyther lays the salt-stone. Not a
-    /// healer: no salt-magic heals in the books. On Salt, a pouch of 100 spent by every working and refilled from the earth out of a fight.
+    /// the enemy's force and grounds it, and loose salt-crystal heads that dissolve the Void's things; Klyther lays the salt-stone. No salt-magic
+    /// heals in the books: the fourth path, the Mender (chant, circle, cairn), is CANON-EXPANDED at Chris\'s word (2026-10-12). On Salt, a pouch of 100 spent by every working and refilled from the earth out of a fight.
     /// Bar: 1 Salt Shard, 2 Binding Salt, 3 Salt-Ward, 4 Seal the Wound, 5 Draw the Line, 6 Sung Wall, 7 Song of Sifting, 8 Calcify
     /// (talent). Three paths, rows 0-2 (Talents/saltmender.json): the Salt-Speaker (control), the Mason (tank) and the Sifter (ranged).
     /// The Wasting's things (Weave-Eaters, the Hollow Men) take more from salt. Nothing here is saved.
@@ -22,8 +22,10 @@ namespace Crulanda.Encounter
         public static readonly string[] ImplementedIds = {
             "ss-long-binding", "ss-quick-chant", "ss-first-sea", "ss-calcify", "ss-white-crust", "ss-deep-crystal", "ss-sealed",
             "ms-thick-salt", "ms-grounding", "ms-mortar", "ms-line-held", "ms-spiked-wall", "ms-wide-wall", "ms-mason-of-the-weave",
-            "sf-sharp-salt", "sf-sifting-song", "sf-bane", "sf-light-hand", "sf-brine", "sf-crystal-rain", "sf-split-shard" };
-        public static readonly string[] BarIds = { "salt.shard", "salt.binding", "salt.ward", "salt.seal", "salt.line", "salt.sung_wall", "salt.sifting", "salt.calcify" };
+            "sf-sharp-salt", "sf-sifting-song", "sf-bane", "sf-light-hand", "sf-brine", "sf-crystal-rain", "sf-split-shard",
+            "md-mender-craft", "md-long-verse", "md-steady-breath", "md-salt-circle", "md-wide-ring", "md-sealing-hands",
+            "md-salt-cairn", "md-grounding-stone", "md-sifting-hands", "md-deep-earth", "md-answered" };
+        public static readonly string[] BarIds = { "salt.shard", "salt.binding", "salt.ward", "salt.seal", "salt.line", "salt.sung_wall", "salt.sifting", "salt.calcify", "salt.close_cut", "salt.mender_craft", "salt.circle", "salt.cairn" };
         public const float BaneBonus = .25f, WallReach = 8, WallCut = .15f, SiftReach = 4, BindSeconds = 8, SealSilence = 3, CalcifyStun = 3, WardGround = 3;
 
         readonly Dictionary<string, AbilityDefinition> abilities = new Dictionary<string, AbilityDefinition>(StringComparer.Ordinal);
@@ -104,6 +106,10 @@ namespace Crulanda.Encounter
                 case "salt.sung_wall": return SungWall(a);
                 case "salt.sifting": return SongOfSifting(a);
                 case "salt.calcify": return Calcify(a);
+                case "salt.close_cut": return CloseTheCut(a);
+                case "salt.mender_craft": return MenderCraft(a);
+                case "salt.circle": return SaltCircle(a);
+                case "salt.cairn": return SaltCairn(a);
             }
             return false;
         }
@@ -218,11 +224,156 @@ namespace Crulanda.Encounter
             });
         }
 
+        // ---------- the Mender (the healer; CANON-EXPANDED, Chris 2026-10-12: "ok since they do use salt and chants they can be a bard like
+        // healer" + "with some shamanistic") ----------
+        // The books give salt no healing; this path is the game's: the Mender-Craft chant ("I seal the Wound!") mends the party near you while
+        // you keep it up, a salt circle poured at your feet mends and steadies whoever stands in it, Close the Cut seals one wound, and a salt
+        // cairn set on the ground calls the earth up: it mends, sifts the Wasting's grey out of the party and grounds part of each blow.
+        public const float ChantReach = 12, ChantEvery = 2, CircleRadius = 4, CircleCut = .1f, CircleSeconds = 10, CairnReach = 10, CairnEvery = 3, CairnSeconds = 15, MendReach = 30;
+        bool chanting; float chantNext;
+        Vector3 circleAt; float circleUntil, circleNext; GameObject circleGo;
+        Vector3 cairnAt; float cairnUntil, cairnNext; GameObject cairnGo;
+        public bool Chanting { get { return chanting; } }
+        /// <summary>Verses of the Mender-Craft sung since the kit was made (for the tests and the meter).</summary>
+        public int Verses { get; private set; }
+        public bool CircleDown { get { return Now < circleUntil; } }
+        public bool CairnStands { get { return Now < cairnUntil; } }
+        public Vector3 CairnAt { get { return cairnAt; } }
+        public float CircleReach { get { return CircleRadius + R("md-wide-ring"); } }
+        public int ChantCost { get { return Mathf.Max(1, 4 - R("md-steady-breath")); } }
+        public int ChantTick { get { return Dmg((3 + Level) * (1 + .05f * R("md-long-verse"))); } }
+        public float CairnGround { get { return .04f * R("md-grounding-stone") + (R("md-deep-earth") > 0 ? .05f : 0); } }
+        static float Flat(Vector3 a, Vector3 b) { a.y = b.y = 0; return Vector3.Distance(a, b); }
+        public bool InCircle(Actor who) { return CircleDown && who != null && Flat(who.transform.position, circleAt) <= CircleReach; }
+        public bool ByCairn(Actor who) { return CairnStands && who != null && Flat(who.transform.position, cairnAt) <= CairnReach; }
+        /// <summary>The most hurt of the party within reach of you (you, Mira, the sims).</summary>
+        public Actor MostHurt(float reach)
+        {
+            Actor best = null; float low = 2;
+            foreach (var who in Party())
+                if (who != null && who.IsAlive && Vector3.Distance(who.transform.position, s.Player.transform.position) <= reach && who.Health.Pool.Ratio < low) { low = who.Health.Pool.Ratio; best = who; }
+            return best;
+        }
+        int Mend(Actor who, int amount)
+        {
+            if (who == null || !who.IsAlive || amount <= 0) return 0;
+            int healed = who.GetComponent<Combatant>().Heal(amount, s.Player);
+            if (healed > 0) { HealFx.Show(who.transform); s.AddHealingThreat(healed); s.FloatText(who.transform.position, "+" + healed, new Color(.3f, 1, .7f)); }
+            return healed;
+        }
+        int Power(string id) { return abilities.TryGetValue(id, out var a) ? Mathf.RoundToInt(a.power) : 0; }
+        /// <summary>Close the Cut: a handful of salt pressed into the worst wound in the party (Sealing Hands: more; Answered: quicker while you chant).</summary>
+        bool CloseTheCut(AbilityDefinition a)
+        {
+            var who = MostHurt(MendReach); if (!Need(who != null, "No one near enough to mend.")) return false;
+            var use = With(a, a.cost, a.cooldown); use.castTime = Mathf.Max(.5f, a.castTime - (chanting ? .25f * R("md-answered") : 0));
+            return Start(use, () => {
+                var t = MostHurt(MendReach) ?? who;
+                Mend(t, Dmg((a.power + 3 * Level) * (1 + .06f * R("md-sealing-hands"))));
+            });
+        }
+        /// <summary>Mender-Craft (a talent): the chant taken up, and kept up until you stop it or the Salt runs out: every 2 s the party within
+        /// 12 m mends (Long Verse: more), for 4 Salt a verse (Steady Breath: less). Pressed again, the chant falls quiet.</summary>
+        bool MenderCraft(AbilityDefinition a)
+        {
+            if (chanting) { chanting = false; s.Message("The Mender-Craft falls quiet."); return true; }
+            return Start(a, () => {
+                chanting = true; chantNext = Now;
+                s.FloatText(s.Player.transform.position, "Mender-Craft", SaltWhite);
+                s.Message("\"I seal the Wound!\" The Mender-Craft is sung: the party near you mends while you keep it up.");
+            });
+        }
+        /// <summary>Salt Circle (a talent): a ring of salt poured at your feet for 10 s: whoever of the party stands in it (4 m; Wide Ring: more)
+        /// mends each second and takes 10% less.</summary>
+        bool SaltCircle(AbilityDefinition a)
+        {
+            return Start(a, () => {
+                circleAt = s.Player.transform.position; circleUntil = Now + CircleSeconds; circleNext = Now;
+                DrawCircle(); s.FloatText(circleAt, "Salt Circle", SaltWhite);
+            });
+        }
+        /// <summary>Salt Cairn (a talent): salt-stone stacked on the ground before you for 15 s, calling the earth: every 3 s the party within
+        /// 10 m mends and the Wasting's grey is sifted out of them (harmful workings lifted); Grounding Stone grounds part of each blow; Call the
+        /// Deep Earth wakes the earth's spirit in it: a fifth of everyone's health back when it is raised, and 5 s longer.</summary>
+        bool SaltCairn(AbilityDefinition a)
+        {
+            return Start(a, () => {
+                var fwd = s.Player.transform.forward; fwd.y = 0; if (fwd.sqrMagnitude < .01f) fwd = Vector3.forward;
+                cairnAt = s.Player.transform.position + fwd.normalized * 1.5f;
+                bool deep = R("md-deep-earth") > 0;
+                cairnUntil = Now + CairnSeconds + (deep ? 5 : 0); cairnNext = Now + .1f;
+                DrawCairn(); s.FloatText(cairnAt, deep ? "The Deep Earth answers" : "Salt Cairn", SaltWhite);
+                if (deep) foreach (var who in Party()) if (ByCairn(who)) Mend(who, Mathf.RoundToInt(who.Health.Pool.Max * .2f));
+            });
+        }
+        void TickMender()
+        {
+            if (chanting && Now >= chantNext)
+            {
+                chantNext = Now + ChantEvery; var pool = s.Player.Resource.Pool;
+                if (!s.Player.IsAlive || pool.Current < ChantCost) { chanting = false; s.Message("Out of Salt: the Mender-Craft falls quiet."); }
+                else
+                {
+                    pool.SetCurrent(pool.Current - ChantCost); Verses++;
+                    foreach (var who in Party()) if (who != null && who.IsAlive && Vector3.Distance(who.transform.position, s.Player.transform.position) <= ChantReach) Mend(who, ChantTick);
+                }
+            }
+            if (CircleDown && Now >= circleNext)
+            {
+                circleNext = Now + 1;
+                foreach (var who in Party()) if (InCircle(who) && who.IsAlive) Mend(who, Dmg(Power("salt.circle") + .6f * Level));
+            }
+            else if (!CircleDown && circleGo != null) { UnityEngine.Object.Destroy(circleGo); circleGo = null; }
+            if (CairnStands && Now >= cairnNext)
+            {
+                cairnNext = Now + CairnEvery; int sifted = 0;
+                foreach (var who in Party())
+                {
+                    if (!ByCairn(who) || !who.IsAlive) continue;
+                    Mend(who, Dmg(Power("salt.cairn") + 1.5f * Level));
+                    int lifted = who.GetComponent<Combatant>().Statuses.RemoveHarmful(); sifted += lifted;
+                    if (lifted > 0 && R("md-sifting-hands") > 0) Mend(who, Dmg((4 + Level) * R("md-sifting-hands")));   // Sifting Hands
+                }
+                if (sifted > 0) s.FloatText(cairnAt, "The grey sifted out", SaltWhite);
+            }
+            else if (!CairnStands && cairnGo != null) { UnityEngine.Object.Destroy(cairnGo); cairnGo = null; }
+        }
+        static GameObject Bit(PrimitiveType kind, Transform parent, Vector3 at, Vector3 scale, Quaternion turn, Color colour)
+        {
+            var g = GameObject.CreatePrimitive(kind); var col = g.GetComponent<Collider>(); if (col != null) UnityEngine.Object.Destroy(col);
+            g.transform.SetParent(parent, false); g.transform.localPosition = at; g.transform.localRotation = turn; g.transform.localScale = scale;
+            g.GetComponent<Renderer>().material.color = colour; return g;
+        }
+        void DrawCircle()
+        {
+            if (circleGo != null) UnityEngine.Object.Destroy(circleGo);
+            circleGo = new GameObject("Salt circle"); circleGo.transform.position = circleAt + Vector3.up * .02f;
+            float r = CircleReach; int n = Mathf.RoundToInt(r * 9);
+            for (int i = 0; i < n; i++)
+            {
+                float t = i * Mathf.PI * 2 / n; var at = new Vector3(Mathf.Cos(t) * r, 0, Mathf.Sin(t) * r);
+                Bit(PrimitiveType.Cube, circleGo.transform, at, new Vector3(.08f, .04f, r * 2 * Mathf.PI / n * 1.05f), Quaternion.LookRotation(new Vector3(-at.z, 0, at.x)), SaltWhite);
+            }
+        }
+        void DrawCairn()
+        {
+            if (cairnGo != null) UnityEngine.Object.Destroy(cairnGo);
+            cairnGo = new GameObject("Salt cairn"); cairnGo.transform.position = cairnAt;
+            var stone = new Color(.78f, .77f, .72f);
+            Bit(PrimitiveType.Sphere, cairnGo.transform, new Vector3(0, .1f, 0), new Vector3(.55f, .24f, .48f), Quaternion.Euler(0, 20, 0), stone);
+            Bit(PrimitiveType.Sphere, cairnGo.transform, new Vector3(.02f, .3f, 0), new Vector3(.42f, .22f, .36f), Quaternion.Euler(0, -35, 4), new Color(.85f, .84f, .8f));
+            Bit(PrimitiveType.Sphere, cairnGo.transform, new Vector3(-.01f, .47f, .01f), new Vector3(.28f, .18f, .25f), Quaternion.Euler(0, 60, -5), stone);
+            Bit(PrimitiveType.Cube, cairnGo.transform, new Vector3(0, .66f, 0), new Vector3(.09f, .2f, .09f), Quaternion.Euler(0, 45, 8), SaltWhite);   // the salt crystal on top
+            Bit(PrimitiveType.Cylinder, cairnGo.transform, new Vector3(0, .005f, 0), new Vector3(1.1f, .005f, 1.1f), Quaternion.identity, SaltWhite);   // salt strewn round its foot
+        }
+
         // ---------- incoming blows, the party's blows ----------
         public override int ResolveEnemyHit(EncounterEnemy enemy, Actor victim, int raw)
         {
             if (victim == null || !victim.IsAlive) return 0;
             float mult = victim == s.Player ? 1 - .02f * R("ms-mortar") : 1;   // Mortar
+            if (InCircle(victim)) mult *= 1 - CircleCut;   // the Salt Circle
+            if (ByCairn(victim)) mult *= 1 - CairnGround;   // Grounding Stone, the Deep Earth
             bool warded = victim == s.Player && Warded;
             int dealt = victim.GetComponent<Combatant>().Damage(Mathf.RoundToInt(raw * mult));
             if (warded)
@@ -236,8 +387,12 @@ namespace Crulanda.Encounter
         public override float PartyDamageMultiplier(EncounterEnemy enemy) { return Holds(enemy) ? 1 + .03f * R("ss-white-crust") : 1; }
 
         // ---------- per frame / lifecycle ----------
-        public override void Tick(bool inCombat) { periodic.Tick(Now); }
-        public override void ResetState() { periodic.Clear(); heldUntil.Clear(); wardUntil = wallUntil = 0; }
+        public override void Tick(bool inCombat) { periodic.Tick(Now); TickMender(); }
+        public override void ResetState()
+        {
+            periodic.Clear(); heldUntil.Clear(); wardUntil = wallUntil = 0; chanting = false; circleUntil = cairnUntil = 0;
+            if (circleGo != null) UnityEngine.Object.Destroy(circleGo); if (cairnGo != null) UnityEngine.Object.Destroy(cairnGo); circleGo = cairnGo = null;
+        }
         public override void ClearTransient() { ResetState(); if (s.Player != null) PlayerCombat.ClearBarrier(); }
 
         // ---------- HUD ----------
@@ -248,6 +403,9 @@ namespace Crulanda.Encounter
                 var parts = new List<string>();
                 int barrier = PlayerCombat.Barrier; if (barrier > 0) parts.Add((Warded ? "Salt-Ward " : "Barrier ") + barrier);
                 if (WallSung) parts.Add("Sung Wall " + (wallUntil - Now).ToString("0") + "s");
+                if (chanting) parts.Add("Chanting");
+                if (CircleDown) parts.Add("Salt Circle " + (circleUntil - Now).ToString("0") + "s");
+                if (CairnStands) parts.Add("Cairn " + (cairnUntil - Now).ToString("0") + "s");
                 return parts.Count == 0 ? null : string.Join("  ·  ", parts);
             }
         }

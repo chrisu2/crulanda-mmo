@@ -1,3 +1,5 @@
+﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
 using Crulanda.Gameplay;
@@ -29,7 +31,9 @@ namespace Crulanda.Encounter
             {
                 if (sim.classId == "class.warrior") return PartyRole.Tank;
                 if (sim.classId == "class.druid") return PartyRole.Healer;
-                if (sim.classId == "class.paladin") return session.PartySims.Exists(c => c != null && c != this && c.sim.classId == "class.druid") || session.PartySims.Exists(c => c != null && c != this && c.sim.classId == "class.warrior") == false ? PartyRole.Tank : PartyRole.Healer;
+                // A Salt-Mender heals when no Druid is along (the Mender path, 2026-10-12), else throws salt with the others.
+                if (sim.classId == "class.saltmender") return session.PartySims.Exists(c => c != null && c != this && c.sim.classId == "class.druid") ? PartyRole.Damage : PartyRole.Healer;
+                if (sim.classId == "class.paladin") return session.PartySims.Exists(c => c != null && c != this && c.sim.classId == "class.druid" || c.sim.classId == "class.saltmender") || session.PartySims.Exists(c => c != null && c != this && c.sim.classId == "class.warrior") == false ? PartyRole.Tank : PartyRole.Healer;
                 return PartyRole.Damage;
             }
         }
@@ -43,7 +47,36 @@ namespace Crulanda.Encounter
         float nextHold, nextKick;
         /// <summary>Has an interrupt (Kick, Hush, Shield Bash, Censure, Quench): stops a cast in its reach every 12 s.</summary>
         public bool Interrupter { get { return sim.classId == "class.rogue" || sim.classId == "class.archivist" || sim.classId == "class.warrior" || sim.classId == "class.paladin" || sim.classId == "class.mage"; } }
-        public bool Healer { get { return sim.classId == "class.druid" || sim.classId == "class.paladin"; } }
+        public bool Healer { get { return sim.classId == "class.druid" || sim.classId == "class.paladin" || sim.classId == "class.saltmender"; } }
+        /// <summary>A Salt-Mender sim's rotation (2026-10-12): the mend above (Close the Cut) on the most hurt; the Mender-Craft chant over the
+        /// party within 12 m every 4 s of a fight (or while anyone near it is hurt); a salt cairn every 20 s when two or more are hurt; salt shards between.</summary>
+        float nextChant, nextCairn;
+        public int Chants { get; private set; }
+        public int Cairns { get; private set; }
+        void SaltRotation()
+        {
+            if (sim.classId != "class.saltmender" || !(session.InCombat || PartyNear(12).Exists(a => a.Health.Pool.Ratio < .9f))) return;   // in a fight, or anyone near it hurt
+            if (Time.time >= nextChant)
+            {
+                nextChant = Time.time + 4; Chants++;
+                foreach (var who in PartyNear(12)) { int healed = who.GetComponent<Combatant>().Heal(Mathf.Max(3, Mathf.RoundToInt(who.Health.Pool.Max * .04f)), actor); if (healed > 0) { session.FloatText(who.transform.position, "+" + healed, new Color(.3f, 1, .7f)); session.HealThreat(actor, healed); } }
+                if (Chants == 1 && sim.chatty > .4f) session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .7f ? "chanting, stay close" : "I seal the Wound! Keep near me.");
+            }
+            if (Time.time >= nextCairn && PartyNear(25).Count(a => a.Health.Pool.Ratio < .75f) >= 2)
+            {
+                nextCairn = Time.time + 20; Cairns++;
+                foreach (var who in PartyNear(10)) { who.GetComponent<Combatant>().Statuses.RemoveHarmful(); int healed = who.GetComponent<Combatant>().Heal(Mathf.RoundToInt(who.Health.Pool.Max * .1f), actor); if (healed > 0) { HealFx.Show(who.transform); session.HealThreat(actor, healed); } }
+                session.FloatText(transform.position + Vector3.up * 2, "Salt Cairn", new Color(.95f, .95f, .9f));
+            }
+        }
+        List<Actor> PartyNear(float reach)
+        {
+            var near = new List<Actor>();
+            void Consider(Actor a) { if (a != null && a.IsAlive && Vector3.Distance(a.transform.position, transform.position) <= reach && !near.Contains(a)) near.Add(a); }
+            Consider(session.Player); if (session.Progress.recruited && session.Companion != null) Consider(session.Companion.actor);
+            foreach (var p in session.PartySims) if (p != null) Consider(p.actor);
+            return near;
+        }
         public float Reach { get { return Melee ? 2.4f : 20; } }
         public float Interval { get { return Melee ? 2.0f : 2.4f; } }
         /// <summary>A sim's blow: a player's of its level, near enough (2026-10-11, the group run's meter: sims at 8-15 a second against you at 30,
@@ -369,6 +402,7 @@ namespace Crulanda.Encounter
                     return;
                 }
             }
+            SaltRotation();
             TickGate();   // a shut gate ahead: the run waits at it and goes on when it opens (D7)
             var quarry = Quarry;
             // A camp nobody can get at (2026-10-11, the group run: an Ash mender up where no one reached it held the run): forty-five seconds
@@ -439,7 +473,7 @@ namespace Crulanda.Encounter
                         visual?.CastRelease();
                         var hand = visual != null ? visual.RightHandle : null; var from = hand != null ? hand.position : transform.position + Vector3.up * 1.3f;
                         bool arrow = sim.classId == "class.ranger";
-                        var colour = sim.classId == "class.mage" ? new Color(1, .55f, .15f) : sim.classId == "class.druid" ? new Color(.45f, .85f, .3f) : sim.classId == "class.archivist" ? new Color(.6f, .8f, 1) : new Color(.9f, .88f, .8f);
+                        var colour = sim.classId == "class.mage" ? new Color(1, .55f, .15f) : sim.classId == "class.druid" ? new Color(.45f, .85f, .3f) : sim.classId == "class.archivist" ? new Color(.6f, .8f, 1) : sim.classId == "class.saltmender" ? new Color(.97f, .97f, .92f) : new Color(.9f, .88f, .8f);
                         Bolt.Fire(from, quarry.transform, colour, arrow ? .1f : .18f, arrow ? .22f : .28f, arrow);
                     }
                     quarry.Receive(dmg, actor);

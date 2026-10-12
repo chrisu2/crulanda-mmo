@@ -1,4 +1,4 @@
-#if UNITY_EDITOR
+﻿#if UNITY_EDITOR
 using System;
 using System.Collections;
 using System.IO;
@@ -153,6 +153,30 @@ namespace Crulanda.Tests
             yield return Mended(session.Player, "you, with the Warrior hurt worse 40 m off", .7f);
         }
 
+        /// <summary>A Salt-Mender sim heals the party when no Druid is along (the Mender path, 2026-10-12): it mends the most hurt, and in a
+        /// fight, or while anyone near it is hurt, it chants the Mender-Craft over everyone near it.</summary>
+        [UnityTest] public IEnumerator A_Salt_Mender_sim_heals_the_party_and_chants_in_a_fight()
+        {
+            session.Progress.recruited = false;
+            var pop = SimPopulation.Active;
+            var two = pop.World.sims.Where(x => x.zone == "zone.oakhaven").Take(2).ToList(); if (two.Count < 2) two = pop.World.sims.Take(2).ToList();
+            foreach (var x in two) { x.zone = "zone.oakhaven"; x.onlineFrom = 0; x.onlineHours = 24; x.friendly = .9f; x.level = session.Progress.Level; }
+            two[0].classId = "class.saltmender"; two[1].classId = "class.warrior";
+            pop.Refresh(); yield return null;
+            Assert.IsTrue(session.Invite(two[0].id), "the Salt-Mender joins"); Assert.IsTrue(session.Invite(two[1].id), "the Warrior joins");
+            var mender = session.PartySim(two[0].id);
+            Assert.AreEqual(SimCompanion.PartyRole.Healer, mender.Role); Assert.IsTrue(mender.Healer);
+            Assert.AreEqual(ActorLook.SaltMender, mender.GetComponent<ActorVisual>().Look, "its own figure");
+            var p = session.Player.transform.position;
+            mender.GetComponent<UnityEngine.AI.NavMeshAgent>().Warp(p + Vector3.left * 2); yield return null;
+            var you = session.Player; you.Health.ApplyDamage(Mathf.RoundToInt(you.Health.Pool.Max * (you.Health.Pool.Ratio - .7f)));
+            int before = you.Health.Pool.Current; float t = 0;
+            while (t < 6 && you.Health.Pool.Current < before + mender.MendFor(you) * .9f) { t += Time.deltaTime; yield return null; }
+            Assert.GreaterOrEqual(you.Health.Pool.Current, before + mender.MendFor(you) * .9f, "it mends you");
+            you.Health.ApplyDamage(Mathf.RoundToInt(you.Health.Pool.Max * (you.Health.Pool.Ratio - .7f))); t = 0;
+            while (t < 6 && mender.Chants == 0) { t += Time.deltaTime; yield return null; }
+            Assert.Greater(mender.Chants, 0, "with you hurt near it, it chants the Mender-Craft");
+        }
         [UnityTest] public IEnumerator Mira_mends_a_hurt_sim_in_the_party()
         {
             session.Progress.recruited = true;

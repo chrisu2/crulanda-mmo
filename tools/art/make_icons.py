@@ -2540,6 +2540,29 @@ BRANCH.update({'salt-speaker': ('#30302a', ['#eeeee4', '#cfe8ff', '#d8d0b0', '#f
                'mason': ('#2e2c28', ['#d8d8cc', '#8a8a84', '#cfe8ff', '#e0b040', '#c8c0b0']),
                'sifter': ('#28303a', ['#f4f4ea', '#9fc8ff', '#cfcfc4', '#ffffff', '#e0e8f0'])})
 
+# ---- the Salt-Mender's fourth path, the Mender (2026-10-12; CANON-EXPANDED healer: chant, circle, cut, cairn) ----
+def a_close_cut(c):
+    c.back(c.ell(50, 50, 38), '#9fe8c0', .4, 10)
+    c.part(c.ell(50, 54, 24, 12, rot=-30), '#7a3a32', 'matte'); c.part(c.line([(30, 66), (70, 42)], 6), SALT, 'gem')
+    for x, y in ((34, 30), (66, 74)): m_crystal(c, x, y, 18, 5, 20)
+    c.spark(78, 24, 8, '#d0ffe0', .9)
+def a_mender_craft(c):
+    c.back(c.ell(50, 50, 40), '#cfeedd', .4, 12)
+    m_note(c, SALT, '#9fe8c0'); rings(c, 50, 54, (30, 40), '#a0f0c0', .55, a0=200, a1=340, w=3)
+    c.spark(24, 30, 6, '#ffffff', .8); c.spark(78, 66, 6, '#d0ffe0', .8)
+def a_salt_circle(c):
+    c.back(c.ell(50, 56, 40, 26), '#9fe8c0', .35, 12)
+    c.part(c.sub(c.ell(50, 60, 40, 20), c.ell(50, 60, 33, 15)), SALT, 'gem')
+    for x in (38, 50, 62): c.part(c.rect(x - 3, 40, x + 3, 64, 2), '#d8d0b0', 'soft')
+    c.spark(50, 30, 9, '#d0ffe0', .8)
+def a_salt_cairn(c):
+    c.back(c.ell(50, 54, 38), '#bfe8cf', .35, 12)
+    for y, rx, ry in ((76, 28, 11), (60, 22, 10), (46, 15, 8)): c.part(c.ell(50, y, rx, ry), '#bdbcb4', 'soft')
+    m_crystal(c, 50, 28, 26, 7, 0); c.part(c.ell(50, 88, 36, 5), SALT, 'gem', alpha=.8)
+ABILITIES.update({'salt.close_cut': ('#1e342c', a_close_cut), 'salt.mender_craft': ('#20302c', a_mender_craft),
+                  'salt.circle': ('#1e2e2a', a_salt_circle), 'salt.cairn': ('#2a2e2a', a_salt_cairn)})
+BRANCH.update({'mender': ('#1e302a', ['#eeeee4', '#9fe8c0', '#bdbcb4', '#d0ffe0', '#cfe8ff'])})
+
 # ---- the marks over a mob's name (2026-10-11, Chris: "you say Moon it really need to show an ICon", "show who is CCd"): the raid
 # marks (skull, moon, cross) and the holds (held, stunned, feared, silenced). Icons/mark/<id>, drawn by EncounterHud on the nameplate.
 def k_skull(c):

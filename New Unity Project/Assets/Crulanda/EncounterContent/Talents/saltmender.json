@@ -3,7 +3,7 @@
  "name": "Salt-Mender",
  "resource": "Salt",
  "resourceDesc": "Salt, a pouch of a hundred, pays for every working; it comes back slowly in a fight and quickly out of one, from the earth itself, and a ward that is struck grounds the blow into it.",
- "identity": "The salt-magic of the West: bind the Chaos, seal the Wound, sing a wall into place. Not a healer: salt holds, wards and burns the Wasting's things.",
+ "identity": "The salt-magic of the West: bind the Chaos, seal the Wound, sing a wall into place; and, as the Mender (CANON-EXPANDED), chant, circle and cairn to mend the party.",
  "branches": [
   {
    "id": "salt-speaker",
@@ -51,6 +51,27 @@
     {"id": "sf-brine", "name": "Brine", "tier": 1, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "drop", "desc": "Salt Shard slows its target 10% per rank for 3s.", "emphasis": {"control": 1}, "impl": true},
     {"id": "sf-crystal-rain", "name": "Crystal Rain", "tier": 2, "col": 1, "max": 3, "req": "sf-sharp-salt", "kind": "modifier", "icon": "target", "desc": "The Song of Sifting falls 1m wider per rank.", "emphasis": {"damage": 1}, "impl": true},
     {"id": "sf-split-shard", "name": "Split Shard", "tier": 2, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "star", "desc": "Salt Shard splits: a second shard at half strikes a foe within 5m of the target.", "emphasis": {"damage": 2}, "impl": true}
+   ]
+  },
+  {
+   "id": "mender",
+   "name": "Mender",
+   "role": "healer",
+   "loop": "Take up the Mender-Craft and keep it sung while you work; pour a salt circle where the party must stand, close the worst cut with salt, and stack a cairn to call the earth up when the grey comes.",
+   "tradeoff": "The chant drinks Salt every verse and the circle and the cairn hold the ground, not the party: a Mender whose party scatters mends little.",
+   "canon": "CANON-EXPANDED: no salt-magic heals in the books; Chris, 2026-10-12: a bard-like healer with some shamanistic.",
+   "nodes": [
+    {"id": "md-mender-craft", "name": "Mender-Craft", "tier": 0, "col": 1, "max": 1, "req": null, "kind": "active", "icon": "note", "desc": "New action: Mender-Craft: the chant (\"I seal the Wound!\") kept up while you will it: every 2s the party within 12m mends, for 4 Salt a verse.", "emphasis": {"healing": 3}, "impl": true},
+    {"id": "md-long-verse", "name": "Long Verse", "tier": 0, "col": 2, "max": 5, "req": null, "kind": "passive", "icon": "heart", "desc": "The Mender-Craft mends 5% more per rank.", "emphasis": {"healing": 1}, "impl": true},
+    {"id": "md-steady-breath", "name": "Steady Breath", "tier": 0, "col": 0, "max": 3, "req": null, "kind": "modifier", "icon": "wind", "desc": "Each verse of the Mender-Craft costs 1 less Salt per rank.", "emphasis": {"tempo": 1}, "impl": true},
+    {"id": "md-salt-circle", "name": "Salt Circle", "tier": 1, "col": 1, "max": 1, "req": "md-mender-craft", "kind": "active", "icon": "target", "desc": "New action: Salt Circle: a ring of salt poured at your feet for 10s; the party standing in it mends each second and takes 10% less.", "emphasis": {"healing": 2, "mitigation": 1}, "impl": true},
+    {"id": "md-wide-ring", "name": "Wide Ring", "tier": 1, "col": 2, "max": 3, "req": null, "kind": "modifier", "icon": "spiral", "desc": "The Salt Circle is poured 1m wider per rank.", "emphasis": {"support": 1}, "impl": true},
+    {"id": "md-sealing-hands", "name": "Sealing Hands", "tier": 1, "col": 0, "max": 3, "req": null, "kind": "passive", "icon": "hand", "desc": "Close the Cut mends 6% more per rank.", "emphasis": {"healing": 1}, "impl": true},
+    {"id": "md-salt-cairn", "name": "Salt Cairn", "tier": 2, "col": 1, "max": 1, "req": "md-salt-circle", "kind": "active", "icon": "crystal", "desc": "New action: Salt Cairn: salt-stone stacked on the ground for 15s, calling the earth: every 3s the party within 10m mends and the Wasting's grey is sifted out of them.", "emphasis": {"healing": 2, "support": 1}, "impl": true},
+    {"id": "md-grounding-stone", "name": "Grounding Stone", "tier": 2, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "shield", "desc": "The party within the Salt Cairn's reach takes 4% less per rank: the cairn grounds the blow, as the Salt-Wall does.", "emphasis": {"mitigation": 1}, "impl": true},
+    {"id": "md-sifting-hands", "name": "Sifting Hands", "tier": 2, "col": 0, "max": 2, "req": null, "kind": "passive", "icon": "drop", "desc": "When the Salt Cairn sifts the grey out of someone, it mends them more per rank.", "emphasis": {"healing": 1}, "impl": true},
+    {"id": "md-deep-earth", "name": "Call the Deep Earth", "tier": 3, "col": 1, "max": 1, "req": "md-salt-cairn", "kind": "signature", "icon": "star", "desc": "The Salt Cairn wakes the earth's spirit: a fifth of everyone's health back when it is raised, 5s longer, and it grounds 5% more.", "emphasis": {"healing": 2, "mitigation": 1}, "impl": true},
+    {"id": "md-answered", "name": "The Answered Chant", "tier": 3, "col": 2, "max": 2, "req": null, "kind": "modifier", "icon": "bolt", "desc": "While you chant the Mender-Craft, Close the Cut is cast 0.25s quicker per rank.", "emphasis": {"tempo": 1}, "impl": true}
    ]
   }
  ]

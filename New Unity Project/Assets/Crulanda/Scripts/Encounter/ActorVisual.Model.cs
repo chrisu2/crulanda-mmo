@@ -87,6 +87,7 @@ namespace Crulanda.Encounter
                 case ActorLook.Druid: s.kit = ModelFigure.Kit.Ranger; s.hood = true; s.hoodColour = ClothTint(clothC, .8f); s.hair = 1; break;
                 case ActorLook.Paladin: s.kit = ModelFigure.Kit.Ranger; s.bleach = true; s.hair = 3; s.beard = true; break;
                 case ActorLook.Ranger: s.kit = ModelFigure.Kit.Ranger; s.hood = true; s.hoodColour = ClothTint(clothC, .8f); s.hair = 2; break;
+                case ActorLook.SaltMender: s.kit = ModelFigure.Kit.Ranger; s.bleach = true; s.shirt = ClothTint(clothC, .2f); s.hood = true; s.hoodColour = ClothTint(accentC, .75f); s.hair = 0; s.beard = true; break;   // an elder of the West, salt-white
                 case ActorLook.Mage: s.kit = ModelFigure.Kit.Peasant; s.hood = true; s.hoodColour = ClothTint(accentC, .75f); s.hair = 1; break;
                 case ActorLook.Healer: s.hood = true; s.hoodColour = ClothTint(clothC, .8f); s.hair = 2; break;
                 case ActorLook.Collector: case ActorLook.Warden: s.kit = ModelFigure.Kit.Ranger; s.bleach = true; s.shirt = ClothTint(new Color(.93f, .93f, .95f), .15f); break;   // Concord white, for the tabard

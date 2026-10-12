@@ -102,7 +102,7 @@ namespace Crulanda.Encounter
         /// <summary>The figure a class wears and the tint of its capsule stand-in (the classes added 2026-10-05 included).</summary>
         public static ActorLook LookForClass(string classId)
         {
-            switch (classId) { case "class.druid": return ActorLook.Druid; case "class.paladin": return ActorLook.Paladin; case "class.ranger": case "class.rogue": return ActorLook.Ranger; case "class.mage": case "class.archivist": case "class.saltmender": return ActorLook.Mage; default: return ActorLook.Warrior; }
+            switch (classId) { case "class.druid": return ActorLook.Druid; case "class.paladin": return ActorLook.Paladin; case "class.ranger": case "class.rogue": return ActorLook.Ranger; case "class.saltmender": return ActorLook.SaltMender; case "class.mage": case "class.archivist": return ActorLook.Mage; default: return ActorLook.Warrior; }
         }
         public static Color TintForClass(string classId)
         {

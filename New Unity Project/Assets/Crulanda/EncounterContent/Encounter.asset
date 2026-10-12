@@ -964,6 +964,42 @@ MonoBehaviour:
     globalCooldown: 1.5
     duration: 8
     statusId: 
+  - id: archivist.unwrite
+    name: Unwrite
+    description: "The target sung out of the record: a little every 2 seconds for 12 seconds. Talent. CANON-EXPANDED."
+    effect: 0
+    power: 4
+    cost: 15
+    cooldown: 0
+    range: 30
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 12
+    statusId:
+  - id: archivist.erasure
+    name: Erasure
+    description: "A hard note that strikes out what is written; half again on an unwritten foe. Talent. CANON-EXPANDED."
+    effect: 0
+    power: 14
+    cost: 20
+    cooldown: 8
+    range: 30
+    castTime: 1
+    globalCooldown: 1.5
+    duration: 0
+    statusId:
+  - id: archivist.stillness
+    name: Vow of Stillness
+    description: "A ward of silence on the most hurt of your party within 30 metres for 10 seconds. Talent. CANON-EXPANDED."
+    effect: 4
+    power: 20
+    cost: 20
+    cooldown: 6
+    range: 30
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 10
+    statusId:
   - id: mage.ash_hex
     name: Ash Hex
     description: "A 1.5-second cast: a person or beast turned to smouldering ash for 25 seconds. Damage breaks it; one at a time."
@@ -1703,6 +1739,15 @@ MonoBehaviour:
       - abilityId: archivist.chorus
         level: 1
         talentId: ca-chorus
+      - abilityId: archivist.unwrite
+        level: 1
+        talentId: uw-unwrite
+      - abilityId: archivist.erasure
+        level: 1
+        talentId: uw-erasure
+      - abilityId: archivist.stillness
+        level: 1
+        talentId: vw-stillness
     talentTree: {fileID: 4900000, guid: 4a212c4a60b94032aed04b1295fd0325, type: 3}
   - definition:
       id: class.saltmender

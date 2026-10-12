@@ -13,8 +13,8 @@ namespace Crulanda.Encounter
         /// <summary>The toe bone's height over the sole of the shoe.</summary>
         public const float ToeRest = 0f, GroundFixMax = .2f;
         /// <summary>Per-foot planting (WIP 2026-10-12): off until it stops lifting the player 77 cm in GroundingTests.</summary>
-        public static bool PlantFeet = false;
-        Vector3 plantLast; float groundFix; bool groundBaseSet; float groundBaseY;
+        public static bool PlantFeet = true;
+        Vector3 plantLast; readonly Quaternion[] plantRot = new Quaternion[2], plantThigh = new Quaternion[2]; readonly bool[] plantWrote = new bool[2]; float groundFix; bool groundBaseSet; float groundBaseY;
         /// <summary>The lower foot's sole over the ground under it this frame (m; negative is sunk), after the fix.</summary>
         public float SoleGap { get; private set; }
         public float GroundFix { get { return groundFix; } }
@@ -52,6 +52,10 @@ namespace Crulanda.Encounter
         void PlantFoot(Transform thigh, Transform calf, Transform foot, Transform ball)
         {
             if (thigh == null || calf == null || foot == null || ball == null) return;
+            // Only over a pose the clips wrote this frame: a culled Animator leaves the bones as we left them, and planting on top of
+            // our own last frame piles up (the player lifted 77 cm in GroundingTests).
+            int fi = foot == model.FootL ? 0 : 1;
+            if (plantWrote[fi] && Quaternion.Angle(foot.localRotation, plantRot[fi]) < .01f && Quaternion.Angle(thigh.localRotation, plantThigh[fi]) < .01f) return;
             float g = GroundUnder(ball.position, transform.position.y - 1), gap = ball.position.y - ToeRest - g;
             if (gap > .08f || gap < -.15f) return;
             var fwd = transform.forward; fwd.y = 0; if (fwd.sqrMagnitude < 1e-4f) return; fwd.Normalize();
@@ -69,10 +73,11 @@ namespace Crulanda.Encounter
             { var d = ball.position - foot.position; float tilt = Mathf.Atan2(-d.y, new Vector2(d.x, d.z).magnitude) * Mathf.Rad2Deg;
               if (tilt > 32) { var axis = Vector3.Cross(Vector3.up, new Vector3(d.x, 0, d.z)).normalized; if (axis.sqrMagnitude > .5f) foot.rotation = Quaternion.AngleAxis(-(tilt - 32) * w, axis) * foot.rotation; } }
             gap = ball.position.y - ToeRest - g;
-            if (w <= 0) return;
+            if (w <= 0) { plantRot[fi] = foot.localRotation; plantThigh[fi] = thigh.localRotation; plantWrote[fi] = true; return; }
             var keep = foot.rotation; var ankle = foot.position + Vector3.down * (gap * w);
             Reach(thigh, calf, foot, ankle, transform.forward);
             foot.rotation = keep;
+            plantRot[fi] = foot.localRotation; plantThigh[fi] = thigh.localRotation; plantWrote[fi] = true;
         }
     }
 }

@@ -136,7 +136,7 @@ namespace Crulanda.Tests
                 .ThenBy(i => (i + seed) % Math.Max(1, s.Kit.ActionCount)).ToList();
             int cheapest = order.Where(i => !Never.Contains(s.Kit.ActionAt(i).id) && !Once.Contains(s.Kit.ActionAt(i).id) && (targets == 0 ? s.Kit.ActionAt(i).effect == AbilityEffect.Heal : s.Kit.ActionAt(i).effect == AbilityEffect.Damage))
                 .OrderBy(i => s.Kit.ActionAt(i).cost).DefaultIfEmpty(-1).First();
-            var uses = new Dictionary<string, int>();
+            var uses = new Dictionary<string, int>(); var lastUse = new Dictionary<int, float>();
             if (seed == 0) csv.Add("# locks " + cls + " " + branch.id + " " + scenario + ": " + string.Join(" ", Enumerable.Range(0, s.Kit.ActionCount).Where(i => s.Kit.ActionAt(i) != null && s.Kit.ActionLockLabel(i) != null).Select(i => s.Kit.ActionAt(i).id + "=" + s.Kit.ActionLockLabel(i).Replace(" ", "_"))));
             s.Meter.Reset(); var pool = s.Player.Resource.Pool; int last = pool.Current, used = 0; float oom = -1, t = 0, hurt = 0;
             Time.captureDeltaTime = Step;
@@ -147,12 +147,12 @@ namespace Crulanda.Tests
                 if (targets == 0) { hurt += dt; if (hurt >= 1) { hurt -= 1; s.Player.Health.ApplyDamage(Mathf.Min(s.Player.Health.Pool.Current - 1, Mathf.RoundToInt(s.Player.Health.Pool.Max * .04f))); } }
                 if (s.Player.Health.Pool.Current < s.Player.Health.Pool.Max * .3f && targets > 0) s.Player.Health.Pool.Fill();
                 if (!s.PlayerCasting)   // a cast in hand is let finish
-                foreach (int slot in order)
+                foreach (int slot in order.OrderByDescending(i => targets == 0 && s.Kit.ActionAt(i) != null && s.Kit.ActionAt(i).effect == AbilityEffect.Heal ? 1 : 0).ThenByDescending(i => s.Kit.ActionAt(i) != null ? s.Kit.ActionAt(i).cooldown : 0).ThenBy(i => lastUse.TryGetValue(i, out var w) ? w : -1))   // equal ones taken in turn (a Thornsong alternates Seedshot and Thornbolt)
                 {
                     var ab = s.Kit.ActionAt(slot); if (ab == null || s.Kit.ActionLockLabel(slot) != null || Never.Contains(ab.id) || used1.Contains(ab.id)) continue;
                     // Mana-aware: a costly ability waits while the pool is under a fifth, the cheapest one (the filler) never waits.
                     if (ab.cost > 0 && slot != cheapest && pool.Max > 0 && pool.Current - ab.cost < pool.Max * .2f) continue;
-                    if (s.UseAbility(slot)) { if (Once.Contains(ab.id)) used1.Add(ab.id); uses[ab.id] = (uses.TryGetValue(ab.id, out var n) ? n : 0) + 1; break; }
+                    if (s.UseAbility(slot)) { if (Once.Contains(ab.id)) used1.Add(ab.id); lastUse[slot] = t; uses[ab.id] = (uses.TryGetValue(ab.id, out var n) ? n : 0) + 1; break; }
                 }
                 int now = pool.Current; if (now < last) used += last - now; last = now;
                 if (oom < 0 && pool.Max > 0 && pool.Ratio < .05f) oom = t;

@@ -694,3 +694,4 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
 - 175 (17:21) "maybe put a helm or hood on him. his head is TOO round" (OPEN; narrower skull, brow ridge, cheekbones, angular jaw, a tattered grave-cloth hood)
 - 176 (17:53) "just keep it for now" / "we have other things to accomplish" (OPEN; thrall kept as is)
 - 177 (18:22) "control classes should not be top tier dps for sure" / "or healers" (OPEN; role DPS caps: healer <= 50%, control/support <= 75% of the DPS median; RoleCapTests)
+- 178 (19:18) "still need other healers to test. paladin, cleric (new class) , shaman (new class), salt mender" (OPEN; party heal test with Mira + 3 sims queued; Cleric and Shaman queued after a canon check and design doc; classes 8 -> 10)

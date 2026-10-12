@@ -24,7 +24,75 @@ namespace Crulanda.Encounter
             if (hips == null) { cam.transform.position = at; cam.transform.LookAt(subject.position + Vector3.up * look); return; }
             var target = hips.position + Vector3.up * .02f; var flat = at - target; flat.y = 0;
             cam.transform.position = target + flat.normalized * 2f + Vector3.up * .08f; cam.transform.LookAt(target);
-        }        public IEnumerator Run(EncounterSession s, string directory)
+        }        /// <summary>Note 150 (Chris, 2026-10-12: he needs to see farmers digging and ploughing): a farmer hoeing in a field from the side
+        /// at the top of the stroke and at the strike, eight frames through one stroke, then the plough team from the side and three-quarters;
+        /// close (2.6 m), HUD hidden, what is in the way hidden. Named note150-*.png.</summary>
+        IEnumerator FieldWork(EncounterSession s, Camera cam, System.Collections.Generic.List<Villager> holders, string directory)
+        {
+            EncounterHud.Hidden = true;
+            var field = Crulanda.World.CropField.All.Count > 0 ? Crulanda.World.CropField.All[0] : null;
+            Villager farmer = null; foreach (var v in holders) if (v.Role == "farmer") { farmer = v; break; }
+            if (field != null && farmer != null)
+            {
+                var fv = farmer.GetComponent<ActorVisual>(); var anim = farmer.GetComponentInChildren<Animator>(); if (anim != null) anim.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+                var agent = farmer.GetComponent<UnityEngine.AI.NavMeshAgent>(); farmer.enabled = false; if (farmer.Carrying) farmer.PutDownLoad();
+                if (agent != null && agent.isOnNavMesh) { agent.Warp(field.transform.position); agent.isStopped = true; }
+                farmer.transform.rotation = Quaternion.LookRotation(field.transform.forward);
+                fv.Pose = ActorPose.Work; var ft = farmer.transform;
+                for (float t = 0; t < 2.5f; t += Time.deltaTime) yield return null;
+                System.Collections.Generic.List<Renderer> hidden;
+                var at = CaptureFraming.ClearSpot(ft.position, ft.eulerAngles.y + 90, 2.6f, 1.1f, 40, ft, out hidden); CaptureFraming.Hide(hidden);
+                Aim(cam, at, ft, anim, true, .9f);
+                foreach (var (phase, name) in new[] { (.44f, "note150-hoeing-side-raised.png"), (.63f, "note150-hoeing-side-strike.png") })
+                {
+                    while (Mathf.Abs(fv.StrokePhase - phase) > .02f) yield return null;
+                    ScreenCapture.CaptureScreenshot(Path.Combine(directory, name)); yield return null; yield return null;
+                }
+                while (fv.StrokePhase > .05f) yield return null;
+                for (int i = 0; i < 8; i++)
+                {
+                    float want = i / 8f + .02f; while (Mathf.Abs(fv.StrokePhase - want) > .02f) yield return null;
+                    ScreenCapture.CaptureScreenshot(Path.Combine(directory, "note150-stroke-seq-" + (i + 1) + ".png")); yield return null;
+                }
+                CaptureFraming.Show(hidden); Debug.Log("Life capture: note150 hoeing " + farmer.Name + ", strokes " + fv.StrokeCount + ", strike gap " + fv.StrikeGap.ToString("0.00"));
+                fv.Pose = ActorPose.None; farmer.enabled = true; if (agent != null && agent.isOnNavMesh) agent.isStopped = false;
+            }
+            PlowTeam.Forced = true;
+            for (int i = 0; i < 60 && (PlowTeam.Active == null || !PlowTeam.Active.Out); i++) { if (PlowTeam.Active != null) PlowTeam.Active.CheckNow(); yield return null; }
+            var team = PlowTeam.Active;
+            if (team != null && team.Out)
+            {
+                for (float t = 0; t < 4; t += Time.deltaTime) yield return null;   // on a straight row
+                foreach (var (angle, name) in new[] { (90f, "note150-plough-side.png"), (40f, "note150-plough-three-quarter.png") })
+                {
+                    System.Collections.Generic.List<Renderer> hidden = null;
+                    for (float t = 0; t < .8f; t += Time.deltaTime)
+                    {
+                        CaptureFraming.Show(hidden);
+                        var mid = (team.Horse.position + team.Ploughman.transform.position) / 2 - Vector3.up * .0f;
+                        var yaw = Quaternion.LookRotation(team.Horse.forward).eulerAngles.y + angle;
+                        var at = CaptureFraming.ClearSpot(mid, yaw, 5.2f, 1.6f, 40, team.Ploughman.transform, out hidden, team.Horse);
+                        // Anything else standing in the corridor from the camera to the team, or a passer-by near it, is hidden too.
+                        foreach (var r in UnityEngine.Object.FindObjectsByType<Renderer>(FindObjectsSortMode.None))
+                        {
+                            if (r == null || !r.enabled || r.transform.IsChildOf(team.transform) || r is ParticleSystemRenderer || r is TrailRenderer) continue;
+                            var c = r.bounds.center; var ab = mid - at; float u = Mathf.Clamp01(Vector3.Dot(c - at, ab) / ab.sqrMagnitude);
+                            bool inWay = Vector3.Distance(c, at + ab * u) < 1.8f + r.bounds.extents.magnitude * .5f && u < .97f && r.bounds.size.magnitude < 12;
+                            bool passer = r.GetComponentInParent<Villager>() != null && Vector3.Distance(c, mid) < 7;
+                            if (inWay || passer) hidden.Add(r);
+                        }
+                        CaptureFraming.Hide(hidden);
+                        cam.transform.position = at; cam.transform.LookAt(mid + Vector3.up * .8f);
+                        yield return null;
+                    }
+                    ScreenCapture.CaptureScreenshot(Path.Combine(directory, name)); yield return new WaitForSeconds(.3f);
+                    CaptureFraming.Show(hidden); Debug.Log("Life capture: " + name);
+                }
+            }
+            else Debug.Log("Life capture: no plough team");
+            PlowTeam.Forced = false;
+        }
+        public IEnumerator Run(EncounterSession s, string directory)
         {
             Directory.CreateDirectory(directory);
             Crulanda.World.WorldClock.Hour = 11;
@@ -115,6 +183,7 @@ namespace Crulanda.Encounter
                 if (fv != null) fv.Pose = ActorPose.None;
                 if (agent != null && agent.isOnNavMesh) agent.isStopped = false; farmer.enabled = true;
             }
+            if (Array.IndexOf(Environment.GetCommandLineArgs(), "--crulanda-field-work") >= 0) yield return FieldWork(s, cam, holders, directory);
             CaptureFraming.Release(); EncounterHud.Hidden = hudWas;
             motor.Teleport(s.Zone.Ground(Vector2.zero) + new Vector3(18, 1, -18)); motor.SetView(-45, 22, 30);
             yield return new WaitForSeconds(2.5f);

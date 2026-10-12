@@ -837,6 +837,7 @@ namespace Crulanda.Encounter
                         var fork = HandTool(wood, .79f, null, Vector3.zero); float top = tradeToolShaft * (1 - ToolGrip);
                         Part(PrimitiveType.Cube, fork, new Vector3(0, top, 0), new Vector3(.14f, .02f, .02f), iron).name = "Tine bar";
                         for (int i = -1; i <= 1; i++) Part(PrimitiveType.Cube, fork, new Vector3(i * .05f, top + .1f, 0), new Vector3(.02f, .2f, .02f), iron).name = "Tine";
+                        tradeToolHeadReach = .2f;   // the tines' points, past the shaft's end (the hoe stroke strikes with them: note 150)
                     }
                     break;
                 case "hunter":
@@ -994,7 +995,13 @@ namespace Crulanda.Encounter
             if (toolAway) return;
             bool working = model != null ? ToolAtWork : WorkPose;
             var fist = Fist(out var along);
-            if (tradeToolLong)
+            if (tradeToolLong && hoeActive)
+            {
+                var face = Vector3.Cross(body.right, hoeDir); if (face.sqrMagnitude < 1e-4f) face = body.forward;
+                tradeTool.rotation = Quaternion.LookRotation(face, hoeDir);
+                tradeTool.position = hoeButt + hoeDir * (tradeToolShaft * ToolGrip * tradeTool.lossyScale.y);
+            }
+            else if (tradeToolLong)
             {
                 if (working)
                 {

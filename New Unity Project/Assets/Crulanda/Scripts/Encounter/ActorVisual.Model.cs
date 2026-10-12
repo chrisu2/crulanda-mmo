@@ -470,6 +470,7 @@ namespace Crulanda.Encounter
                     p.elbowL = p.elbowR = -35; p.lean = 10; break;
                 case ActorPose.Work:     // hoeing (or hauling a bucket): a lift and a stroke down, leaning into it (playtest note 76: it read as standing still)
                 {
+                    if (HoeReady && speed < 1.1f) { p.bend = HoeBend(); break; }   // a long tool: the two-handed stroke (FieldArms, note 150)
                     float k = Mathf.Repeat(t * .9f, 1), lift = k < .55f ? Mathf.SmoothStep(0, 1, k / .55f) : 1 - Mathf.SmoothStep(0, 1, (k - .55f) / .2f);
                     float chop = 25 + lift * 85;
                     p.arms = true; p.armL = new Vector3(-chop, 0, 12); p.armR = new Vector3(-chop + 8, 0, -12); p.elbowL = p.elbowR = -20 - lift * 20; p.lean = 16 - lift * 8; break;
@@ -662,6 +663,7 @@ namespace Crulanda.Encounter
                 else if (p.lean != 0 || Mathf.Abs(archerTurn) > .01f) { body.localEulerAngles = new Vector3(p.lean, archerTurn, 0); leaned = true; }
                 else if (staggering || leaned) { staggering = leaned = false; body.localEulerAngles = Vector3.zero; }
             }
+            if (fresh && !dead) FieldArms(dt, ToolAtWork && Pose == ActorPose.Work); else hoeActive = false;   // after the body is placed
             SyncFrames();
             bool clipBow = model.HasBow && model.Bow;
             BowUpright(fresh && (clipBow || p.twist != 0 || bowHeld != null) ? (clipBow ? 1 : arms) : 0);   // and while the arms come down after

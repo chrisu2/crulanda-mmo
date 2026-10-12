@@ -271,7 +271,12 @@ namespace Crulanda.Encounter
             var hb = new[,] { { HumanBodyBones.RightIndexProximal, HumanBodyBones.RightIndexIntermediate, HumanBodyBones.RightIndexDistal }, { HumanBodyBones.RightMiddleProximal, HumanBodyBones.RightMiddleIntermediate, HumanBodyBones.RightMiddleDistal }, { HumanBodyBones.RightRingProximal, HumanBodyBones.RightRingIntermediate, HumanBodyBones.RightRingDistal }, { HumanBodyBones.RightLittleProximal, HumanBodyBones.RightLittleIntermediate, HumanBodyBones.RightLittleDistal } };
             FingersR = new Transform[4, 3];
             for (int i = 0; i < 4; i++) for (int j = 0; j < 3; j++) FingersR[i, j] = B(f[i] + "_0" + (j + 1) + "_r", hb[i, j]);
+            FingersL = new Transform[4, 3];
+            for (int i = 0; i < 4; i++) for (int j = 0; j < 3; j++) FingersL[i, j] = B(f[i] + "_0" + (j + 1) + "_l", (HumanBodyBones)((int)hb[i, j] - 15));   // the left hand's bones are 15 before the right's
         }
+        /// <summary>The left hand's fingers, as <see cref="FingersR"/> (a hoe's front hand, a plough's handle).</summary>
+        public Transform[,] FingersL;
+        public bool HasFingersL { get { if (FingersL == null) return false; foreach (var t in FingersL) if (t == null) return false; return true; } }
         /// <summary>The right hand's fingers (index, middle, ring, little; knuckle to tip), any of them null on a rig without them:
         /// closed round a staff's shaft (ActorVisual.StaffArm, playtest note 119).</summary>
         public Transform[,] FingersR;

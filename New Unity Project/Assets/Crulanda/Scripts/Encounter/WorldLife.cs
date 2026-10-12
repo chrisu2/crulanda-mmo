@@ -498,6 +498,7 @@ namespace Crulanda.Encounter
         void UpdateTimed()
         {
             foreach (var coop in Zone.Coops) coop.Dry(Time.deltaTime / 420);   // a pan lasts about four hours
+            PlowTeam.Tend(this);   // the plough team out on a bare field by day (note 150)
             if (Time.time < nextLay) return;
             nextLay = Time.time + 20;
             if (WorldClock.Between(4, 5)) { Stock.Clear(); MorningCask(); }   // the stock is the day's deliveries: yesterday's are eaten, sold or burnt
@@ -971,6 +972,7 @@ namespace Crulanda.Encounter
             until = Time.time + (activity == "home" ? HomeStay : 14 + life.R01 * 30);
             visual.Pose = PoseFor(activity);
             var look = life.LookFor(transform.position); if (look.HasValue) Face(look.Value);
+            if (activity == "field") FaceRow();
             if (Coop != null) KeeperStart();
             if ((activity == "home" || activity == "sleep") && home != null) Hide();
         }
@@ -1288,6 +1290,39 @@ namespace Crulanda.Encounter
             var q = p + new Vector3(life.R01 - .5f, 0, life.R01 - .5f) * r * 2;
             return NavMesh.SamplePosition(q, out var hit, 2.5f, NavMesh.AllAreas) ? hit.position : (Vector3?)null;
         }
+        /// <summary>A hoeing farmer faces along the furrows (the field's Z), toward the far end, and steps a little way along the
+        /// row after each stroke (playtest note 150: "needs to see farmers digging"), turning back at the field's end.</summary>
+        void FaceRow()
+        {
+            if (Role != "farmer") return; var crop = Crulanda.World.CropField.At(transform.position); if (crop == null) return;
+            var z = crop.transform.InverseTransformPoint(transform.position).z; var along = crop.transform.forward * (z > 0 ? -1 : 1); along.y = 0;
+            if (along.sqrMagnitude > .01f) transform.rotation = Quaternion.LookRotation(along);
+            strokesSeen = visual.StrokeCount;
+        }
+        int strokesSeen;
+        void FieldStep()
+        {
+            if (Time.time >= stepAt && Time.time < stepAt + .6f && agent.isOnNavMesh)
+            {
+                var d = stepTo - transform.position; d.y = 0; agent.Move(Vector3.ClampMagnitude(d, .8f * Time.deltaTime));
+            }
+            if (visual.StrokeCount == strokesSeen) return;
+            if (!visual.Hoeing) { strokesSeen = visual.StrokeCount; return; }
+            // A short step, a moment after the stroke is drawn back (the pause in the stroke).
+            if (visual.StrokeCount > strokesSeen && agent.isOnNavMesh)
+            {
+                strokesSeen = visual.StrokeCount;
+                var crop = Crulanda.World.CropField.At(transform.position);
+                var next = transform.position + transform.forward * .35f;
+                if (crop != null)
+                {
+                    var local = crop.transform.InverseTransformPoint(next);
+                    if (Mathf.Abs(local.z) > crop.Field.size.y / 2 - .8f) { transform.rotation = Quaternion.LookRotation(-transform.forward); return; }   // the row's end: turn back along it
+                }
+                stepTo = next; stepAt = Time.time + .4f;   // in the stroke's pause, after the draw back
+            }
+        }
+        Vector3 stepTo; float stepAt = -9;
         void Face(Vector3 p) { var to = p - transform.position; to.y = 0; if (to.sqrMagnitude > .01f) transform.rotation = Quaternion.LookRotation(to); }
         void KeeperStart()
         {
@@ -1389,6 +1424,7 @@ namespace Crulanda.Encounter
             if (state == State.Activity)
             {
                 if (activity == "green" || activity == "well") Chat();
+                if (activity == "field") FieldStep();
                 if (activity == "herd") Herd();
                 else if (Time.time > until)
                 {

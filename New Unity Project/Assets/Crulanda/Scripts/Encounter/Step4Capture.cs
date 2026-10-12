@@ -20,7 +20,7 @@ namespace Crulanda.Encounter
         public static bool Requested { get { return Array.IndexOf(Environment.GetCommandLineArgs(), Flag) >= 0; } }
         string dir; readonly System.Text.StringBuilder report = new System.Text.StringBuilder(); EncounterSession session;
 
-        IEnumerator Shot(string name, string what, Transform also)
+        IEnumerator Shot(string name, string what, Transform also, bool clear = true)
         {
             yield return new WaitForSecondsRealtime(.4f);
             var player = session.Player.transform; var motor = session.Player.GetComponent<AdventurerMotor>(); var cam = Camera.main;
@@ -30,7 +30,7 @@ namespace Crulanda.Encounter
                 if (also != null) l.AddRange(CaptureFraming.InTheWay(cam.transform.position, also.position + Vector3.up * .3f, also, player));
                 return l;
             }
-            var blocked = InWay();
+            var blocked = clear ? InWay() : new List<Renderer>();
             for (int k = 0; k < 8 && blocked.Count > 0 && motor.enabled; k++)
             {
                 var e = cam.transform.eulerAngles; motor.SetView(e.y + 45, e.x > 180 ? e.x - 360 : e.x, Vector3.Distance(cam.transform.position, player.position));
@@ -62,6 +62,8 @@ namespace Crulanda.Encounter
             if (!ok) report.AppendLine(id + " NOT USED (slot " + slot + ", lock " + (slot >= 0 ? session.Kit.ActionLockLabel(slot) : "-") + ")");
             return ok;
         }
+        void FaceFoe(EncounterEnemy foe) { var d = foe.transform.position - session.Player.transform.position; d.y = 0; session.Player.GetComponent<AdventurerMotor>().SetView(Quaternion.LookRotation(d).eulerAngles.y + 15, 16, 5.5f); }
+        int Dithered() { int n = 0; foreach (var r in FindObjectsByType<Renderer>(FindObjectsSortMode.None)) if (r.enabled && r.sharedMaterial != null && r.sharedMaterial.shader.name == "Crulanda/Fade") n++; return n; }
         void View(float turn, float pitch, float dist) { session.Player.GetComponent<AdventurerMotor>().SetView(session.Player.transform.eulerAngles.y + turn, pitch, dist); }
         EncounterEnemy NearFoe()
         {
@@ -121,7 +123,36 @@ namespace Crulanda.Encounter
                     }
                     foreach (var x in mine) x.enabled = true;
                 }
-            }
+                            // Step 5 (13:22): the open village with nothing dithered, the view through a wall, feet side on, Mira's invite.
+                var innP = Crulanda.World.ZoneBuilder.Active.Zone.props.FirstOrDefault(p => p != null && p.kind == "inn");
+                if (innP != null)
+                {
+                    var inn = Crulanda.World.RoofFade.All.OrderBy(r => Vector2.Distance(new Vector2(r.transform.position.x, r.transform.position.z), innP.at)).First();
+                    motor.Teleport(s.Zone.Ground(innP.at + new Vector2(0, -22), 1.1f)); s.Player.transform.rotation = Quaternion.LookRotation(Vector3.forward); yield return new WaitForSeconds(1.5f);
+                    motor.SetView(180, 8, 7); yield return new WaitForSeconds(.8f);
+                    yield return Shot("step5-01-village-open-view", "the village from the road: " + Dithered() + " renderers dithered (0 wanted)", null, false);
+                    float reach = Mathf.Max(inn.Half.x, inn.Half.y) + 2.5f;
+                    for (int k = 0; k < 16; k++)
+                    {
+                        var dir = Quaternion.Euler(0, k * 22.5f, 0) * Vector3.right; var at = inn.transform.TransformPoint(dir * reach);
+                        if (!UnityEngine.AI.NavMesh.SamplePosition(at, out var nh, 3, UnityEngine.AI.NavMesh.AllAreas)) continue;
+                        motor.Teleport(nh.position + Vector3.up); s.Player.transform.rotation = Quaternion.LookRotation(-dir); yield return null;
+                        motor.SetView(Quaternion.LookRotation(dir).eulerAngles.y + 180, 15, 9); yield return new WaitForSeconds(1f);
+                        var cam = Camera.main.transform.position; var head = s.Player.transform.position + Vector3.up * .8f;
+                        if (Physics.Raycast(cam, (head - cam).normalized, out var hit, Vector3.Distance(cam, head), ~0, QueryTriggerInteraction.Ignore) && hit.collider.GetComponentInParent<Crulanda.World.RoofFade>() == inn)
+                        { yield return Shot("step5-02-behind-a-wall", "behind the inn: its blocking parts faded " + inn.FadedBigParts + " of " + inn.BigParts + ", everything else solid (" + Dithered() + " renderers dithered in all)", null, false); break; }
+                    }
+                }
+                motor.Teleport(s.Zone.Ground(new Vector2(14, 14), 1.1f)); yield return new WaitForSeconds(2);
+                var pv = s.Player.GetComponentInChildren<ActorVisual>();
+                View(90, 2, 2.2f); yield return Shot("step5-03-feet-side-standing", "the Mender's feet side on, standing: lower sole " + (pv != null ? (pv.SoleGap * 100).ToString("0.0") : "?") + " cm off the ground", null);
+                if (s.Companion != null)
+                {
+                    s.Progress.recruited = false; motor.Teleport(s.Companion.transform.position + s.Companion.transform.forward * 2 + Vector3.up); yield return new WaitForSeconds(1);
+                    s.SelectFriendly(null, true); bool ok = s.InviteTarget(); yield return new WaitForSeconds(.5f);
+                    var d = s.Companion.transform.position - s.Player.transform.position; d.y = 0; motor.SetView(Quaternion.LookRotation(d).eulerAngles.y + 20, 10, 4);
+                    yield return Shot("step5-04-mira-invite", "Mira targeted and invited: " + (ok ? "she joins" : "REFUSED") + ", in party " + s.Progress.recruited, s.Companion.transform);
+                }}
             else if (cls == "class.mage")
             {
                 Buy("bc-");
@@ -132,7 +163,7 @@ namespace Crulanda.Encounter
                     var thrall = s.Pet != null ? s.Pet.transform : null;
                     View(110, 10, 3.4f); yield return Shot("step4-08-bonecaller-thrall", "the Bonecaller's bone thrall raised beside the Mage (" + (thrall != null ? "up" : "NOT RAISED") + ")", thrall);
                     s.Select(foe); Use("mage.marrow_drain"); yield return new WaitForSeconds(2.4f);
-                    View(200, 14, 6f); yield return Shot("step4-09-bonecaller-marrow-drain", "Marrow Drain on the foe; target: " + s.Kit.TargetStatus(foe), foe.transform);
+                    FaceFoe(foe); yield return Shot("step4-09-bonecaller-marrow-drain", "Marrow Drain on the foe; target: " + s.Kit.TargetStatus(foe), foe.transform);
                     yield return new WaitForSeconds(1.6f);
                     if (thrall != null) { var a = s.Pet.GetComponent<UnityEngine.AI.NavMeshAgent>(); if (a != null) a.Warp(foe.transform.position + Vector3.back * 1.5f); }
                     yield return new WaitForSeconds(.3f);
@@ -148,7 +179,7 @@ namespace Crulanda.Encounter
                 if (foe != null)
                 {
                     Use("archivist.unwrite"); yield return new WaitForSeconds(2.6f);
-                    View(200, 14, 6f); yield return Shot("step4-11-unwriting-dot", "the Unwriting's damage over time on the foe; target: " + s.Kit.TargetStatus(foe), foe.transform);
+                    FaceFoe(foe); yield return Shot("step4-11-unwriting-dot", "the Unwriting's damage over time on the foe; target: " + s.Kit.TargetStatus(foe), foe.transform);
                     yield return new WaitForSeconds(1.6f); Use("archivist.erasure"); yield return new WaitForSeconds(.3f);
                     View(200, 14, 6f); yield return Shot("step4-12-unwriting-erasure", "Erasure on the unwritten foe; target: " + s.Kit.TargetStatus(foe), foe.transform);
                     foreach (var e in s.Enemies) if (e != null) e.ResetFight();

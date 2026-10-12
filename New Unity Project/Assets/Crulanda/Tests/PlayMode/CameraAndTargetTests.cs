@@ -58,6 +58,7 @@ namespace Crulanda.Tests
         /// once the player moves on; and every other building stays solid throughout.</summary>
         [UnityTest] public IEnumerator Outdoors_only_the_house_in_the_way_fades_and_only_while_it_blocks()
         {
+            var sess = UnityEngine.Object.FindFirstObjectByType<EncounterSession>(); var mot = sess.Player.GetComponent<AdventurerMotor>(); mot.enabled = false;   // the motor fades by the real camera every frame
             var innProp = ZoneBuilder.Active.Zone.props.First(p => p != null && p.kind == "inn");
             var inn = RoofFade.All.OrderBy(r => Vector2.Distance(new Vector2(r.transform.position.x, r.transform.position.z), innProp.at)).First();
             float reach = Mathf.Max(inn.Half.x, inn.Half.y) + 3;
@@ -67,10 +68,20 @@ namespace Crulanda.Tests
             // Not in the way: the camera on the player's side.
             yield return Settle(inn.transform.TransformPoint(new Vector3(reach + 5, 2.5f, 0)), pos);
             Assert.AreEqual(0, inn.FadedBigParts, "a house not in the way is solid"); Assert.AreEqual(0, OthersFaded(), "no other building fades");
-            // In the way: the camera beyond the inn, the view straight through it.
-            yield return Settle(inn.transform.TransformPoint(new Vector3(-reach, 2, 0)), pos);
+            // In the way: the camera beyond the inn, the view straight through it (checked by a ray, round the inn until one is blocked).
+            bool blocked = false; Vector3 cam = Vector3.zero;
+            for (int k = 0; k < 16 && !blocked; k++)
+            {
+                var dir = Quaternion.Euler(0, k * 22.5f, 0) * Vector3.right; pos = inn.transform.TransformPoint(dir * reach); var head = pos + Vector3.up * 1.5f;
+                UnityEngine.AI.NavMesh.SamplePosition(pos, out var nh, 3, UnityEngine.AI.NavMesh.AllAreas); if (nh.hit) pos = nh.position;
+                cam = inn.transform.TransformPoint(-dir * reach) + Vector3.up * 2;
+                blocked = Physics.Raycast(cam, (pos + Vector3.up * 1.5f - cam).normalized, out var hit, Vector3.Distance(cam, pos + Vector3.up * 1.5f), ~0, QueryTriggerInteraction.Ignore) && hit.collider.GetComponentInParent<RoofFade>() == inn;
+            }
+            Assert.IsTrue(blocked, "a view through the inn");
+            yield return Settle(cam, pos);
+            var inWay = Physics.RaycastAll(cam, (pos + Vector3.up * 1.5f - cam).normalized, Vector3.Distance(cam, pos + Vector3.up * 1.5f), ~0, QueryTriggerInteraction.Ignore).Select(h => h.collider.GetComponentInParent<RoofFade>()).Where(x => x != null).ToList();
             Assert.Greater(inn.FadedBigParts, 0, "the house between the camera and the player fades"); Assert.Less(inn.FadedBigParts, inn.BigParts, "only the parts in the way");
-            Assert.AreEqual(0, OthersFaded(), "no other building fades");
+            Assert.AreEqual(0, RoofFade.All.Count(o => o != inn && !inWay.Contains(o) && o.FadedBigParts > 0), "no building out of the way fades");
             // The player moves on (out to the side): solid again.
             var moved = inn.transform.TransformPoint(new Vector3(-reach, 0, reach + 4));
             yield return Settle(inn.transform.TransformPoint(new Vector3(-reach - 5, 2.5f, reach + 4)), moved);

@@ -29,7 +29,7 @@ namespace Crulanda.Encounter
         public float PoseHandOverShoulder { get; private set; }
         public float PoseHandAhead { get; private set; }
         public float PoseElbowOverShoulder { get; private set; }
-        public const float HoeHandsMin = .47f, HoeHandsMax = .58f, HoeRearBack = .22f, HoeTopBelowChest = .12f, HoeTopAhead = .34f;
+        public const float HoeHandsMin = .47f, HoeHandsMax = .58f, HoeRearBack = .22f, HoeTopBelowChest = 0f, HoeTopAhead = .3f;
         Vector3? handsL, handsR; int handsFrame = -1;
         /// <summary>How far the farther hand ended from its mark (<see cref="HandsOn"/>), as last posed, in metres.</summary>
         public float HandsGap { get; private set; } = float.NaN;
@@ -56,7 +56,7 @@ namespace Crulanda.Encounter
         public float StrokePhase { get { return HoeK; } }
         float HoeK { get { return Mathf.Repeat(hoeTime / StrokePeriod, 1); } }
         /// <summary>The back's slight bend for the stroke (a draw hoe is worked nearly upright), a little more as it draws.</summary>
-        float HoeBend() { StrokeAt(HoeK, out _, out _, out float draw); return 12 + draw * 6; }
+        float HoeBend() { StrokeAt(HoeK, out _, out _, out float draw); return 22 + draw * 8; }   // bent a little more over the shaft, so the front arm reaches 45-60 cm down it with relaxed shoulders (note 168)
         /// <summary>The blade's edge this frame, and whether it is in the soil (the draw), for tests.</summary>
         public Vector3 BladeEdge { get; private set; }
         public bool BladeInSoil { get; private set; }

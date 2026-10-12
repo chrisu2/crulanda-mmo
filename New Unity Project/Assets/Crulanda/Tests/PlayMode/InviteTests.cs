@@ -19,7 +19,7 @@ namespace Crulanda.Tests
         {
             root = Path.Combine(Path.GetTempPath(), "Crulanda-inv-" + Guid.NewGuid().ToString("N"));
             SceneManager.sceneLoaded += OnLoaded;
-            yield return SceneManager.LoadSceneAsync("PlayableEncounter", LoadSceneMode.Single);
+            yield return SceneManager.LoadSceneAsync("Oakhaven", LoadSceneMode.Single);
             SceneManager.sceneLoaded -= OnLoaded; yield return null;
             session = UnityEngine.Object.FindFirstObjectByType<EncounterSession>(); Assert.NotNull(session);
         }
@@ -28,7 +28,7 @@ namespace Crulanda.Tests
         {
             SceneManager.sceneLoaded -= OnLoaded;
             var empty = SceneManager.CreateScene("Empty-" + Guid.NewGuid().ToString("N")); SceneManager.SetActiveScene(empty);
-            yield return SceneManager.UnloadSceneAsync("PlayableEncounter");
+            yield return SceneManager.UnloadSceneAsync("Oakhaven");
             if (Directory.Exists(root)) Directory.Delete(root, true);
         }
         [UnityTest] public IEnumerator Mira_targeted_in_the_inn_joins_by_invite()

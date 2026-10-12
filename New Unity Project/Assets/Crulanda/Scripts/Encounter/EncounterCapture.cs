@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -23,7 +23,7 @@ namespace Crulanda.Encounter
         }
         public static bool Requested
         {
-            get { var a = Environment.GetCommandLineArgs(); return Array.IndexOf(a, "--crulanda-capture") >= 0 || Array.IndexOf(a, "--crulanda-ui-capture") >= 0 || Array.IndexOf(a, "--crulanda-world-capture") >= 0 || WardrobeCapture.Requested || LootCapture.Requested || EliteCapture.Requested || LifeCapture.Requested || MotionCapture.Requested || RunCapture.Requested || FixesCapture.Requested; }
+            get { var a = Environment.GetCommandLineArgs(); return Array.IndexOf(a, "--crulanda-capture") >= 0 || Array.IndexOf(a, "--crulanda-ui-capture") >= 0 || Array.IndexOf(a, "--crulanda-world-capture") >= 0 || WardrobeCapture.Requested || LootCapture.Requested || EliteCapture.Requested || LifeCapture.Requested || MotionCapture.Requested || RunCapture.Requested || FixesCapture.Requested || Step4Capture.Requested; }
         }
         IEnumerator Start()
         {
@@ -34,6 +34,8 @@ namespace Crulanda.Encounter
             if (loot >= 0 && loot + 1 < args.Length) { yield return gameObject.AddComponent<LootCapture>().Run(session, args[loot + 1]); yield break; }
             int life = Array.IndexOf(args, LifeCapture.Flag);
             if (life >= 0 && life + 1 < args.Length) { yield return gameObject.AddComponent<LifeCapture>().Run(session, args[life + 1]); yield break; }
+            int step4 = Array.IndexOf(args, Step4Capture.Flag);
+            if (step4 >= 0 && step4 + 1 < args.Length) { yield return gameObject.AddComponent<Step4Capture>().Run(session, args[step4 + 1]); yield break; }
             int fixes = Array.IndexOf(args, FixesCapture.Flag);
             if (fixes >= 0 && fixes + 1 < args.Length) { yield return gameObject.AddComponent<FixesCapture>().Run(session, args[fixes + 1]); yield break; }
             int run = Array.IndexOf(args, RunCapture.Flag);

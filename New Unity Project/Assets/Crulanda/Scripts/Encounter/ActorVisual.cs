@@ -849,7 +849,7 @@ namespace Crulanda.Encounter
                     {
                         // A draw hoe on the tool holder (note 155: the pitchfork was the wrong tool for hoeing): a flat iron blade hung at a
                         // right angle from the shaft's end, its edge toward the user; carried upright, the blade stands out ahead.
-                        var hoe = HandTool(wood, .79f, null, Vector3.zero); float top = tradeToolShaft * (1 - ToolGrip);
+                        var hoe = HandTool(wood, 1.0f, null, Vector3.zero); float top = tradeToolShaft * (1 - ToolGrip);   // a long handle (note 157): the back hand at its end, the front one 45-60 cm lower, the blade still reaching the soil
                         Part(PrimitiveType.Cube, hoe, new Vector3(0, top - .01f, .03f), new Vector3(.05f, .05f, .07f), iron).name = "Hoe neck";
                         Part(PrimitiveType.Cube, hoe, new Vector3(0, top, .09f), new Vector3(.17f, .014f, .13f), iron).name = "Hoe blade";
                         tradeToolHeadReach = .15f;   // the blade's edge, out from the shaft's end (the stroke sets it in: notes 150, 155)

@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Crulanda.Encounter
 {
@@ -23,6 +23,9 @@ namespace Crulanda.Encounter
         public float StrikeGap { get; private set; } = float.NaN;
         /// <summary>Hoeing this frame (a modelled farmer at work with a long tool, standing).</summary>
         public bool Hoeing { get { return hoeActive; } }
+        /// <summary>Fist to fist along the hoe shaft this frame, in metres (45-60 cm wanted).</summary>
+        public float HandSpread { get; private set; }
+        public const float HoeHandsMin = .47f, HoeHandsMax = .58f, HoeRearBack = .22f;
         Vector3? handsL, handsR; int handsFrame = -1;
         /// <summary>How far the farther hand ended from its mark (<see cref="HandsOn"/>), as last posed, in metres.</summary>
         public float HandsGap { get; private set; } = float.NaN;
@@ -86,12 +89,15 @@ namespace Crulanda.Encounter
             // The shaft runs up the body's middle line, in front of it (held like a broom, thumbs up the handle).
             var line = foot + side * .02f;
             Vector3 rear = line + ahead * hand.x + up * hand.y, edgeAt = line + ahead * edge.x + up * edge.y;
+            // The back hand sits further up the shaft's line (toward the hip and chest), so the front hand can close on it a full 45-60 cm lower down (note 157).
+            { var d0 = edgeAt - rear; if (d0.sqrMagnitude > 1e-4f) rear -= d0.normalized * HoeRearBack; }
             // The rear (top) hand first; the shaft from its fist to the blade's mark; the front hand where the shaft passes nearest
             // its own shoulder (between a hand's width and two feet down the shaft), so a short arm still closes on it.
             Reach(model.UpperArmR, model.LowerArmR, model.HandR, rear - (Grip(model.HandR, model.MiddleR) - model.HandR.position), -up + side * .8f - ahead * .3f);
             Vector3 gR = Grip(model.HandR, model.MiddleR);
             var dir = (edgeAt - gR); if (dir.sqrMagnitude < 1e-4f) dir = ahead - up; dir.Normalize();
-            float t = Mathf.Clamp(Vector3.Dot(model.UpperArmL.position - gR, dir), .25f, .6f);
+            // Hands wide (Chris 10:34, note 157: "widen the hand spacing"): the back hand at the shaft's end, the front one 45-58 cm down it, about the top third.
+            float t = Mathf.Clamp(Vector3.Dot(model.UpperArmL.position - gR, dir), HoeHandsMin, HoeHandsMax);
             var front = gR + dir * t;
             // The front hand turned across the shaft (knuckles up its line, the palm on it), then reached twice so the fist, not the wrist, lands on it.
             for (int pass = 0; pass < 2; pass++)
@@ -100,7 +106,7 @@ namespace Crulanda.Encounter
                 var across = Vector3.ProjectOnPlane(model.MiddleL.position - model.HandL.position, dir); var want = Vector3.ProjectOnPlane(front - model.HandL.position, dir);
                 if (across.sqrMagnitude > 1e-6f && want.sqrMagnitude > 1e-6f) PointBone(model.HandL, model.MiddleL.position - model.HandL.position, (model.MiddleL.position - model.HandL.position) + (want.normalized - across.normalized) * .03f, 1);
             }
-            Vector3 gL = Grip(model.HandL, model.MiddleL);
+            Vector3 gL = Grip(model.HandL, model.MiddleL); HandSpread = Vector3.Distance(gR, gL);
             CurlRound(model.FingersR, model.HandR, model.MiddleR, gR, dir, 1);
             CurlRound(model.FingersL, model.HandL, model.MiddleL, gL, dir, 1);
             float L = tradeToolShaft * tradeTool.lossyScale.y;

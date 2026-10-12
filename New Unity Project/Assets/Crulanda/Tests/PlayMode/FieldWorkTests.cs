@@ -1,4 +1,4 @@
-#if UNITY_EDITOR
+﻿#if UNITY_EDITOR
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -66,6 +66,7 @@ namespace Crulanda.Tests
                 {
                     if (l > .04f) fails.Add("left hand " + (l * 100).ToString("0.0") + " cm off the shaft");
                     if (r > .04f) fails.Add("right hand " + (r * 100).ToString("0.0") + " cm off the shaft");
+                    if (vis.HandSpread < .45f || vis.HandSpread > .6f) fails.Add("hands " + (vis.HandSpread * 100).ToString("0") + " cm apart on the shaft (45-60 wanted)");
                 }
                 if (start < 0 && vis.StrokeCount > 0) { start = vis.StrokeCount; t0 = Time.time; }
                 if (start >= 0 && vis.StrokeCount > start + gaps.Count) gaps.Add(vis.StrikeGap);

@@ -26,7 +26,7 @@ namespace Crulanda.Encounter
             if (pop == null) { Debug.LogError("Life capture: no sims."); Application.Quit(1); yield break; }
             foreach (var x in pop.World.sims) if (x.homeZone == s.ZoneId) { x.zone = s.ZoneId; x.onlineFrom = 0; x.onlineHours = 24; }
             pop.Refresh();
-            yield return new WaitForSeconds(90);   // their day gets going
+            yield return new WaitForSeconds(Array.IndexOf(Environment.GetCommandLineArgs(), "--crulanda-farmers-only") >= 0 ? 8 : 90);   // their day gets going
             var motor = s.Player.GetComponent<AdventurerMotor>();
             int n = 1;
             foreach (var (doing, name) in new[] { (SimFigure.Doing.Hunt, "hunting"), (SimFigure.Doing.Hunt, "hunting-2"), (SimFigure.Doing.Gather, "gathering"), (SimFigure.Doing.Inn, "inn"), (SimFigure.Doing.Loiter, "about") })
@@ -43,29 +43,65 @@ namespace Crulanda.Encounter
                 ScreenCapture.CaptureScreenshot(Path.Combine(directory, file)); yield return new WaitForSeconds(.5f);
                 Debug.Log("Life capture: " + file + " " + f.sim.name + " " + f.Doings);
             }
-            // A farmer with the fork (playtest notes 95, 109 and 119: "farmers hoes still going thru the arm and not held like a staff"):
-            // about the fields (07), then standing and talking from the front, the side and the back (08-10), and at work hoeing (11).
-            Villager farmer = null;
-            foreach (var v in UnityEngine.Object.FindObjectsByType<Villager>(FindObjectsSortMode.None)) if (v.Role == "farmer" && v.gameObject.activeInHierarchy) { farmer = v; break; }
-            if (farmer == null) Debug.Log("Life capture: no farmer");
-            else
+            // Farmers and the others who carry a trade tool (playtest notes 95, 109 and 119: "farmers hoes still going thru the arm and
+            // not held like a staff"; Chris on the step-2 frames: "can't see the farmers"): up to three, each close up (3 m) from the
+            // side, the front and the back while walking, then standing, then at work, on the capture's own camera with nothing between
+            // (CaptureFraming: a clear bearing, else what is in the way hidden for the shot). Named farmer-<name>-<what>.png.
+            var holders = new System.Collections.Generic.List<Villager>();
+            foreach (var v in UnityEngine.Object.FindObjectsByType<Villager>(FindObjectsSortMode.None))
             {
-                var fv = farmer.GetComponent<ActorVisual>(); var cam = Camera.main; var ft = farmer.transform;
-                motor.Teleport(ft.position + ft.forward * 30 + Vector3.up); yield return null; motor.enabled = false;   // the player out of the shot
-                cam.transform.position = ft.position + ft.right * 4 + Vector3.up * 1.4f; cam.transform.LookAt(ft.position + Vector3.up);
-                yield return null; ScreenCapture.CaptureScreenshot(Path.Combine(directory, "07-farmer-about.png")); yield return new WaitForSeconds(.5f);
+                if (!v.gameObject.activeInHierarchy) continue;
+                bool tool = false; foreach (var tr in v.GetComponentsInChildren<Transform>(true)) if (tr.name == "Trade tool") { tool = true; break; }
+                if (tool) holders.Add(v);
+            }
+            holders.Sort((a, b) => ((b.Role == "farmer" ? 2 : 0) + (b.Carrying ? 0 : 1)).CompareTo((a.Role == "farmer" ? 2 : 0) + (a.Carrying ? 0 : 1)));   // farmers first, those with free hands first
+            if (holders.Count == 0) Debug.Log("Life capture: nobody carries a trade tool");
+            motor.Teleport(s.Zone.Ground(Vector2.zero) + new Vector3(0, 1, 60)); yield return null;   // the player well out of these shots
+            var cam = CaptureFraming.Own(); int taken = 0;
+            foreach (var farmer in holders)
+            {
+                if (taken >= 3) break; taken++;
+                var fv = farmer.GetComponent<ActorVisual>(); var ft = farmer.transform; var anim = farmer.GetComponentInChildren<Animator>();
+                if (anim != null) anim.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+                string who = farmer.Name.Replace(' ', '-').ToLowerInvariant(); string tag = "farmer-" + who + "-" + farmer.Role;
+                // Walking: follow alongside for a moment, then the shot.
+                farmer.enabled = true;
+                foreach (var (angle, what) in new[] { (90f, "walking-side"), (0f, "walking-front"), (180f, "walking-back") })
+                {
+                    System.Collections.Generic.List<Renderer> hidden = null;
+                    for (float t = 0; t < 1.2f; t += Time.deltaTime)
+                    {
+                        if (farmer.Carrying) farmer.PutDownLoad();   // a load puts the tool away: hands free for these frames
+                        CaptureFraming.Show(hidden);
+                        var at = CaptureFraming.ClearSpot(ft.position, ft.eulerAngles.y + angle, 3.6f, 1.7f, 60, ft, out hidden);
+                        CaptureFraming.Hide(hidden);
+                        cam.transform.position = at; cam.transform.LookAt(ft.position + Vector3.up * .55f);
+                        yield return null;
+                    }
+                    string file = tag + "-" + what + ".png";
+                    ScreenCapture.CaptureScreenshot(Path.Combine(directory, file)); yield return new WaitForSeconds(.4f);
+                    CaptureFraming.Show(hidden);
+                    Debug.Log("Life capture: " + file + " " + farmer.Name + " (" + farmer.Role + "), moving " + (farmer.GetComponent<UnityEngine.AI.NavMeshAgent>() != null ? farmer.GetComponent<UnityEngine.AI.NavMeshAgent>().velocity.magnitude.ToString("0.0") : "?") + " m/s");
+                }
+                // Standing, then at work: stopped where it is.
                 farmer.enabled = false; var agent = farmer.GetComponent<UnityEngine.AI.NavMeshAgent>(); if (agent != null && agent.isOnNavMesh) agent.isStopped = true;
-                foreach (var (angle, name, pose) in new[] { (0f, "08-farmer-front", ActorPose.Talk), (90f, "09-farmer-side", ActorPose.Talk), (180f, "10-farmer-back", ActorPose.Talk), (60f, "11-farmer-at-work", ActorPose.Work) })
+                foreach (var (angle, what, pose) in new[] { (90f, "standing-side", ActorPose.Talk), (0f, "standing-front", ActorPose.Talk), (180f, "standing-back", ActorPose.Talk), (60f, "at-work", ActorPose.Work), (-90f, "at-work-side", ActorPose.Work) })
                 {
                     if (fv != null) fv.Pose = pose;
-                    var dir = Quaternion.Euler(0, angle, 0) * ft.forward;
-                    cam.transform.position = ft.position + dir * 2.6f + Vector3.up * 1.4f; cam.transform.LookAt(ft.position + Vector3.up);
+                    if (farmer.Carrying) farmer.PutDownLoad();
+                    var at = CaptureFraming.ClearSpot(ft.position, ft.eulerAngles.y + angle, 3.6f, 1.7f, 60, ft, out var hidden);
+                    CaptureFraming.Hide(hidden);
+                    cam.transform.position = at; cam.transform.LookAt(ft.position + Vector3.up * .55f);
                     yield return new WaitForSeconds(1.5f);
-                    ScreenCapture.CaptureScreenshot(Path.Combine(directory, name + ".png")); yield return new WaitForSeconds(.5f);
-                    Debug.Log("Life capture: " + name + " " + farmer.Name);
+                    string file = tag + "-" + what + ".png";
+                    ScreenCapture.CaptureScreenshot(Path.Combine(directory, file)); yield return new WaitForSeconds(.4f);
+                    CaptureFraming.Show(hidden);
+                    Debug.Log("Life capture: " + file + " " + farmer.Name + " (" + farmer.Role + "), " + hidden.Count + " things hidden");
                 }
-                farmer.enabled = true; motor.enabled = true;
+                if (fv != null) fv.Pose = ActorPose.None;
+                if (agent != null && agent.isOnNavMesh) agent.isStopped = false; farmer.enabled = true;
             }
+            CaptureFraming.Release();
             motor.Teleport(s.Zone.Ground(Vector2.zero) + new Vector3(18, 1, -18)); motor.SetView(-45, 22, 30);
             yield return new WaitForSeconds(2.5f);
             ScreenCapture.CaptureScreenshot(Path.Combine(directory, "06-wide.png")); yield return new WaitForSeconds(.5f);

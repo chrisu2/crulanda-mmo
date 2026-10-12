@@ -1127,6 +1127,8 @@ namespace Crulanda.Encounter
             DropLoad(); loadKind = what; loadCount = count; load = LoadProps.Build(transform, what, count);
             if (visual != null) visual.Carry = what == Load.Bread || what == Load.Goods ? ActorVisual.Carrying.Front : what == Load.Grain || what == Load.Flour || what == Load.Logs ? ActorVisual.Carrying.Shoulder : ActorVisual.Carrying.Side;
         }
+        /// <summary>Puts down whatever is carried (the capture tools' farmer frames: a load puts the trade's tool away).</summary>
+        public void PutDownLoad() { DropLoad(); }
         void DropLoad() { if (load != null) Destroy(load); load = null; loadKind = Load.None; if (visual != null) visual.Carry = ActorVisual.Carrying.None; }
         /// <summary>Capture/debug: go straight to a place of this kind and work there for a minute.</summary>
         public bool WorkAt(string place)

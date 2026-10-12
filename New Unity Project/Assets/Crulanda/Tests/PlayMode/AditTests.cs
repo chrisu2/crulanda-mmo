@@ -124,8 +124,15 @@ namespace Crulanda.Tests
                 }
             }
             finally { Time.timeScale = 1; }
-            var still = mobs.Where(e => e != null && e.actor.IsAlive && !e.Hidden && e.Inside == null && !moved.Contains(e)).ToList();
-            Assert.Less(still.Count, mobs.Count * .25f, still.Count + " of " + mobs.Count + " stood still: " + string.Join(", ", still.Take(12).Select(e => e.actor.DisplayName)));
+            // A camp's mob more than EncounterEnemy.StrollRange from the player stands on purpose (the CPU, Chris 2026-10-11), so the strolling is
+            // measured on the patrols and the camps in the player's reach; the far ones are counted only for the message.
+            var player = s.Player.transform.position;
+            var inReach = mobs.Where(e => e != null && e.actor.IsAlive && !e.Hidden && e.Inside == null
+                && (e.Patrol != null || Across(start[e] - player) <= EncounterEnemy.StrollRange - 5)).ToList();
+            Assert.GreaterOrEqual(inReach.Count, 16, "the patrols and the near camps to watch");
+            var still = inReach.Where(e => !moved.Contains(e)).ToList();
+            Assert.Less(still.Count, inReach.Count * .25f, still.Count + " of the " + inReach.Count + " in reach stood still (" + (mobs.Count - inReach.Count) + " farther than "
+                + EncounterEnemy.StrollRange + " m stand by design): " + string.Join(", ", still.Take(12).Select(e => e.actor.DisplayName)));
             Assert.IsEmpty(strayed.Distinct().Take(8).ToList(), "a mob left its camp: " + string.Join("; ", strayed.Distinct().Take(8)));
             var lazy = walked.Where(w => w.Value < 20).Select(w => w.Key.actor.DisplayName + " " + w.Value.ToString("0") + " m (its road " + w.Key.Patrol.Length + " points, "
                 + Across(w.Key.Patrol[w.Key.Patrol.Length - 1] - w.Key.Patrol[0]).ToString("0") + " m end to end; now " + Across(w.Key.transform.position - start[w.Key]).ToString("0") + " m out)").ToList();

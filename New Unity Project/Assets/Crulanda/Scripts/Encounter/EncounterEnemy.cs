@@ -176,13 +176,15 @@ namespace Crulanda.Encounter
         /// <summary>A camp's mobs stroll about their camp, a few seconds at each spot, a body's width from each other; a patrol walks its
         /// road back and forth (its leash held from where it is met, not where it set out); on the way home from a broken leash it only goes
         /// home. A mob of no camp (a story mob, a wave of the escort) and one riding inside another keep their place.</summary>
+        /// <summary>Beyond this from the player a camp's mob stands rather than strolls (the CPU, below); patrols walk at any range.</summary>
+        public const float StrollRange = 70;
         void Idle()
         {
             if (!agent.isOnNavMesh) return;
             if (!Camp || Evading || Inside != null) { agent.SetDestination(home); strolling = false; return; }
             // Far from everyone (no party member within 70 m): it stands; the strolling's path-finding for a hundred and fifty mobs at once pegged
             // the CPU (Chris, 2026-10-11, watching the group run: "pegging cpu 100% alot of times").
-            if (Patrol == null && session.Player != null && (transform.position - session.Player.transform.position).sqrMagnitude > 70 * 70) { if (strolling) { strolling = false; agent.ResetPath(); } return; }
+            if (Patrol == null && session.Player != null && (transform.position - session.Player.transform.position).sqrMagnitude > StrollRange * StrollRange) { if (strolling) { strolling = false; agent.ResetPath(); } return; }
             if (Patrol != null) home = transform.position;
             agent.speed = baseSpeed * StrollPace * (Slowed ? slowFactor : 1);
             bool there = !agent.pathPending && agent.remainingDistance <= Mathf.Max(.5f, agent.stoppingDistance);

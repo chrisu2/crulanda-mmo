@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Crulanda.Gameplay;
@@ -14,8 +14,8 @@ namespace Crulanda.Encounter
     /// emptied and four seconds in which no Heat builds. Cinder Field burns the ground under the target, Smoulder slows, Ember
     /// Ward is a barrier. Bind makes the next Ember Bolt weaker and banks a Charge; Unbind spends it so the whole party hits
     /// harder for a while. Bar: 1 Ember Bolt, 2 Scorch, 3 Flare, 4 Cinder Field, 5 Smoulder, 6 Ember Ward, 7 Bind, 8 Unbind,
-    /// 9 Quench (talent), 0 Ash Hex; the Cinderwright's - Kindle Hound, = Stoke, [ Cinder Burst (talent). Base abilities, rows 0-2 of
-    /// Talents/mage.json and the Cinderwright's rows 0-3. Nothing here is saved.
+    /// 9 Quench (talent), 0 Ash Hex; the Bonecaller's (the necromancer, 2026-10-12) - Raise Bone Thrall, = Marrow Drain, [ Bone Spikes (talent). Base
+    /// abilities, rows 0-2 of Talents/mage.json and the Bonecaller's rows 0-3. Nothing here is saved.
     /// </summary>
     public sealed class MageKit : ClassKit, IPetMaster
     {
@@ -23,10 +23,10 @@ namespace Crulanda.Encounter
             "cb-kindling", "cb-hot-hands", "cb-stoked", "cb-flashpoint", "cb-backdraft", "cb-inferno", "cb-white-heat",
             "hw-cinders", "hw-slow-burn", "hw-wide-field", "hw-embers-underfoot", "hw-heat-haze", "hw-long-burn", "hw-firestorm",
             "sb-reservoir", "sb-ward-weave", "sb-quench", "sb-shared-flame", "sb-steady-mind", "sb-quickening", "sb-binding-oath",
-            "cw-banked-coals", "cw-hot-jaws", "cw-kinship", "cw-long-stoke", "cw-cinder-burst", "cw-shared-heat", "cw-white-coals", "cw-wide-burst"   // the Cinderwright, rows 0-3
+            "bc-hard-bone", "bc-sharp-marrow", "bc-grave-bond", "bc-long-drain", "bc-bone-spikes", "bc-death-echo", "bc-bone-armour", "bc-wide-spikes"   // the Bonecaller, rows 0-3
         };
         public static readonly string[] BarIds = { "mage.ember_bolt", "mage.scorch", "mage.flare", "mage.cinder_field", "mage.smoulder", "mage.ember_ward", "mage.bind", "mage.unbind", "mage.quench", "mage.ash_hex",
-            "mage.kindle_hound", "mage.stoke", "mage.cinder_burst" };
+            "mage.raise_thrall", "mage.marrow_drain", "mage.bone_spikes" };
         public const int MaxHeat = 100, FlareMinHeat = 30, EmberHeat = 15, ScorchHeat = 10, SmoulderHeat = 5;
         public const float OverloadBurn = .08f, OverloadSeconds = 4, HeatKept = 10, BoundLoss = .4f, UnbindBonus = .15f;
 
@@ -114,9 +114,9 @@ namespace Crulanda.Encounter
                 case "mage.unbind": return Unbind(a);
                 case "mage.quench": return Quench(a);
                 case "mage.ash_hex": return AshHex(a);
-                case "mage.kindle_hound": return KindleHound(a);   // the Cinderwright
-                case "mage.stoke": return Stoke(a);
-                case "mage.cinder_burst": return CinderBurst(a);
+                case "mage.raise_thrall": return RaiseThrall(a);   // the Bonecaller
+                case "mage.marrow_drain": return MarrowDrain(a);
+                case "mage.bone_spikes": return BoneSpikes(a);
             }
             return false;
         }
@@ -262,56 +262,81 @@ namespace Crulanda.Encounter
         public override float PartyDamageMultiplier(EncounterEnemy enemy) { return Unbound ? 1 + Bonus : 1; }
         public override float CompanionHaste { get { return Unbound ? .1f * R("sb-quickening") : 0; } }
 
-        // ---------- the Cinderwright (pets; 2026-10-11, TALENT_DEPTH.md; GAME-ONLY; no machines: the "forge-golem" of the first plan
-        // is gone, Chris, 2026-10-11) ----------
-        // An ember hound at heel, a fire spirit in a hound's shape (the wolf's body, RangerPet, dressed in embers): Kindle Hound calls it,
-        // Stoke pours the Mage's Heat into its bites (Heat spent on the hound is Heat that cannot Overload you), Cinder Burst flares it.
-        public const int StokeMinHeat = 20;
-        public const float StokePerHeat = .01f, BurstReach = 4, BurstCost = .15f, WhiteCoalsHeat = 60, WhiteCoalsCut = .3f;
-        float stokeUntil, stoke, whiteCoalsUntil;
-        /// <summary>The ember hound at heel (null until kindled, or once it has gone out).</summary>
-        public RangerPet Hound { get { return s.Pet; } }
-        bool HoundUp { get { return Hound != null && Hound.actor != null && Hound.actor.IsAlive; } }
-        public bool Stoked { get { return Now < stokeUntil; } }
-        public float StokeBonus { get { return Stoked ? stoke : 0; } }
-        public float PetHealthScale { get { return 1 + .08f * R("cw-banked-coals"); } }
-        public float PetBiteScale { get { return (1 + .1f * R("cw-hot-jaws")) * (1 + StokeBonus); } }
+        // ---------- the Bonecaller (the necromancer; reworked from the Cinderwright, Chris 2026-10-12: "give the mage a necro build",
+        // then "Rework existing paths into the new builds"; GAME-ONLY: the books have no necromancy, the game's risen dead (the ossuary
+        // knight) are its bones; not the Wasting, which unmakes, where this calls the bones of the dead back up; no machines) ----------
+        // A bone thrall at heel (the risen dead's skeleton, a party member like the Ranger's wolf): Raise Bone Thrall calls it, Marrow
+        // Drain draws the life out of a foe over time into you and the thrall, Bone Spikes bursts the ground round the thrall.
+        public const float DrainEvery = 2, DrainShare = .5f, SpikeReach = 4, SpikeCost = .1f, BoneArmourCut = .3f;
+        public const int DrainTicks = 5;
+        /// <summary>The bone thrall at heel (null until raised, or once it has fallen).</summary>
+        public RangerPet Thrall { get { return s.Pet; } }
+        bool ThrallUp { get { return Thrall != null && Thrall.actor != null && Thrall.actor.IsAlive; } }
+        public bool Draining { get { foreach (var e in s.Enemies) if (e != null && periodic.Has("marrow", e)) return true; return false; } }
+        public float PetHealthScale { get { return 1 + .08f * R("bc-hard-bone"); } }
+        public float PetBiteScale { get { return 1 + .1f * R("bc-sharp-marrow"); } }
         public bool PetHolds { get { return false; } }
-        /// <summary>Shared Heat: each of its bites builds your Heat.</summary>
-        public void OnPetBite(EncounterEnemy target, int bite) { if (R("cw-shared-heat") > 0) GainHeat(R("cw-shared-heat")); }
-        /// <summary>Kinship: an Ember Bolt that lands mends the hound.</summary>
-        void MendHound() { int k = R("cw-kinship"); if (k > 0 && HoundUp) Hound.actor.GetComponent<Combatant>().Heal(Mathf.RoundToInt(Hound.actor.Health.Pool.Max * .02f * k), s.Player); }
-        /// <summary>Kindle Hound: the ember hound at your side; again, it sinks back into the embers.</summary>
-        bool KindleHound(AbilityDefinition a)
+        /// <summary>Death Echo: each of its blows gives you back Mana.</summary>
+        public void OnPetBite(EncounterEnemy target, int bite)
         {
-            if (HoundUp) return Start(With(a, 0, 0), () => { s.DismissPet(); s.Message("Your hound sinks back into the embers."); });
-            return Start(a, () => { s.SummonPet(this, "Ember hound", "hound"); s.Message("An ember hound kindles at your side."); });
+            int k = R("bc-death-echo"); if (k <= 0) return;
+            var pool = s.Player.Resource.Pool; pool.SetCurrent(Mathf.Min(pool.Max, pool.Current + k));
         }
-        /// <summary>Stoke: all your Heat (20 at least) poured into the hound: its bites 1% harder per point for 10 s (Long Stoke: longer);
-        /// White Coals: stoked from 60, it takes 30% less for that while.</summary>
-        bool Stoke(AbilityDefinition a)
+        /// <summary>Grave Bond: an Ember Bolt that lands mends the thrall.</summary>
+        void MendHound() { int k = R("bc-grave-bond"); if (k > 0 && ThrallUp) Thrall.actor.GetComponent<Combatant>().Heal(Mathf.RoundToInt(Thrall.actor.Health.Pool.Max * .02f * k), s.Player); }
+        static readonly Color BoneWhite = new Color(.86f, .84f, .74f), DrainGreen = new Color(.5f, .85f, .55f);
+        /// <summary>Raise Bone Thrall: the bones of the dead stood up at your side; again, they are laid down.</summary>
+        bool RaiseThrall(AbilityDefinition a)
         {
-            if (!Need(HoundUp, "No hound: Kindle Hound first.") || !Need(Heat >= StokeMinHeat, "Stoke needs " + StokeMinHeat + " Heat.")) return false;
+            if (ThrallUp) return Start(With(a, 0, 0), () => { s.DismissPet(); s.Message("Your bone thrall is laid back down."); });
+            return Start(a, () => { s.SummonPet(this, "Bone thrall", "thrall", ActorLook.Skeleton); s.Message("The bones of the dead stand up at your side."); });
+        }
+        /// <summary>Marrow Drain: the life drawn out of the target every 2 s for 10 s (Long Drain: longer); half of each draw mends you and
+        /// your thrall. Bone Armour: while it draws, the thrall takes 30% less.</summary>
+        bool MarrowDrain(AbilityDefinition a)
+        {
+            if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
             return Start(a, () => {
-                int spent = Heat; Heat = 0; stoke = spent * StokePerHeat; stokeUntil = Now + a.duration + 3 * R("cw-long-stoke");
-                whiteCoalsUntil = R("cw-white-coals") > 0 && spent >= WhiteCoalsHeat ? stokeUntil : 0;
-                s.FloatText(Hound.transform.position, "Stoked", new Color(1, .55f, .15f));
-                s.Message("Stoke: " + spent + " Heat into your hound; its bites " + Mathf.RoundToInt(stoke * 100) + "% harder for " + (stokeUntil - Now).ToString("0") + " seconds.");
+                if (!s.LandsOn(t, a.range)) return;
+                s.Bolt(t, DrainGreen, .16f);
+                periodic.Add("marrow", t, Now, DrainEvery, DrainTicks + R("bc-long-drain"), Dmg(a.power + Level), (e, i) => {
+                    var enemy = (EncounterEnemy)e.target; if (!enemy.actor.IsAlive) return false;
+                    Hit(enemy, e.value); int back = Mathf.Max(1, Mathf.RoundToInt(e.value * DrainShare));
+                    PlayerCombat.Heal(back, s.Player); if (ThrallUp) Thrall.actor.GetComponent<Combatant>().Heal(back, s.Player);
+                    if (resetting == false) s.FloatText(enemy.transform.position + Vector3.up * 1.6f, "drained", DrainGreen);
+                    return true;
+                });
+                s.Message("Marrow Drain: the life drawn out of " + t.actor.DisplayName + ".");
             });
         }
-        /// <summary>Cinder Burst (a talent): the hound flares, every foe within 4 m of it (Wide Burst: further) burning; it costs the hound
-        /// 15% of its health.</summary>
-        bool CinderBurst(AbilityDefinition a)
+        /// <summary>Bone Spikes (a talent): bone bursts up round the thrall: every foe within 4 m (Wide Spikes: further) is struck and
+        /// slowed; it costs the thrall a tenth of its health.</summary>
+        bool BoneSpikes(AbilityDefinition a)
         {
-            if (!Need(HoundUp, "No hound: Kindle Hound first.")) return false;
+            if (!Need(ThrallUp, "No thrall: Raise Bone Thrall first.")) return false;
             return Start(a, () => {
-                if (!HoundUp) return;
-                var at = Hound.transform.position; float reach = BurstReach + R("cw-wide-burst"); int dealt = Dmg(a.power + 3 * Level), n = 0;
+                if (!ThrallUp) return;
+                var at = Thrall.transform.position; float reach = SpikeReach + R("bc-wide-spikes"); int dealt = Dmg(a.power + 3 * Level);
                 foreach (var e in s.Enemies.ToArray())
-                    if (e != null && e.actor.IsAlive && !e.Game && !e.Hidden && (e.transform.position - at).sqrMagnitude <= reach * reach) { Hit(e, dealt); n++; }
-                Hound.actor.GetComponent<Combatant>().Damage(Mathf.Max(1, Mathf.RoundToInt(Hound.actor.Health.Pool.Max * BurstCost)));
-                s.FloatText(at, "Cinder Burst", new Color(1, .5f, .12f));
+                    if (e != null && e.actor.IsAlive && !e.Game && !e.Hidden && (e.transform.position - at).sqrMagnitude <= reach * reach) { Hit(e, dealt); if (e.actor.IsAlive) e.Slow(.4f, 3); }
+                Thrall.actor.GetComponent<Combatant>().Damage(Mathf.Max(1, Mathf.RoundToInt(Thrall.actor.Health.Pool.Max * SpikeCost)));
+                SpikeFx(at, reach);
+                s.FloatText(at, "Bone Spikes", BoneWhite);
             });
+        }
+        /// <summary>The spikes seen: a ring of bone shards standing out of the ground for a second and a half.</summary>
+        static void SpikeFx(Vector3 at, float reach)
+        {
+            var root = new GameObject("Bone spikes"); root.transform.position = at;
+            for (int i = 0; i < 14; i++)
+            {
+                float t = i * Mathf.PI * 2 / 14, r = reach * (.35f + .55f * ((i * 7) % 5) / 4f);
+                var g = GameObject.CreatePrimitive(PrimitiveType.Cylinder); UnityEngine.Object.Destroy(g.GetComponent<Collider>());
+                g.transform.SetParent(root.transform, false); g.transform.localPosition = new Vector3(Mathf.Cos(t) * r, .25f, Mathf.Sin(t) * r);
+                g.transform.localRotation = Quaternion.Euler(Mathf.Sin(t) * 18, 0, Mathf.Cos(t) * -18); g.transform.localScale = new Vector3(.07f, .3f, .07f);
+                g.GetComponent<Renderer>().material.color = BoneWhite;
+            }
+            UnityEngine.Object.Destroy(root, 1.5f);
         }
 
         // ---------- incoming blows ----------
@@ -320,7 +345,7 @@ namespace Crulanda.Encounter
             if (victim == null || !victim.IsAlive) return 0;
             int haze = R("hw-heat-haze");
             float mult = haze > 0 && InField(enemy) ? 1 - .04f * haze : 1;
-            if (HoundUp && victim == Hound.actor && Now < whiteCoalsUntil) mult *= 1 - WhiteCoalsCut;   // White Coals
+            if (ThrallUp && victim == Thrall.actor && R("bc-bone-armour") > 0 && Draining) mult *= 1 - BoneArmourCut;   // Bone Armour
             return victim.GetComponent<Combatant>().Damage(Mathf.RoundToInt(raw * mult));
         }
 
@@ -333,14 +358,14 @@ namespace Crulanda.Encounter
         public override void ResetState()
         {
             resetting = true; periodic.Clear(); resetting = false;
-            Heat = Charges = 0; Binding = backdraft = false; heatKeptUntil = overloadedUntil = fieldUntil = unboundUntil = 0; stokeUntil = whiteCoalsUntil = 0;
+            Heat = Charges = 0; Binding = backdraft = false; heatKeptUntil = overloadedUntil = fieldUntil = unboundUntil = 0;
         }
         public override void ClearTransient()
         {
             resetting = true; periodic.Clear(); resetting = false;
-            fieldUntil = unboundUntil = 0; backdraft = false; stokeUntil = whiteCoalsUntil = 0;
+            fieldUntil = unboundUntil = 0; backdraft = false;
             if (s.Player != null) PlayerCombat.ClearBarrier();
-            if (Hound != null) Hound.Refit();
+            if (Thrall != null) Thrall.Refit();
         }
 
         // ---------- HUD ----------
@@ -352,7 +377,7 @@ namespace Crulanda.Encounter
                 if (Binding) parts.Add("Binding"); if (Charges > 0) parts.Add("Charge banked");
                 if (Unbound) parts.Add("Unbound " + (unboundUntil - Now).ToString("0.0") + "s");
                 if (FieldBurning) parts.Add("Cinder Field");
-                if (HoundUp) parts.Add("Hound " + Hound.actor.Health.Pool.Current + "/" + Hound.actor.Health.Pool.Max + (Stoked ? " stoked " + (stokeUntil - Now).ToString("0") + "s" : ""));
+                if (ThrallUp) parts.Add("Thrall " + Thrall.actor.Health.Pool.Current + "/" + Thrall.actor.Health.Pool.Max);
                 int barrier = PlayerCombat.Barrier; if (barrier > 0) parts.Add("Barrier " + barrier);
                 return string.Join("  ·  ", parts);
             }
@@ -361,6 +386,7 @@ namespace Crulanda.Encounter
         {
             var parts = new List<string>();
             if (periodic.Has("scorch", enemy)) parts.Add("Scorched");
+            if (periodic.Has("marrow", enemy)) parts.Add("Drained");
             if (InField(enemy)) parts.Add("In the cinders");
             if (enemy.Rooted) parts.Add("HELD " + enemy.RootRemaining.ToString("0.0") + "s"); else if (enemy.Slowed) parts.Add("SMOULDERING");
             return parts.Count == 0 ? null : string.Join("  ·  ", parts);

@@ -22,23 +22,39 @@ namespace Crulanda.Tests
             var t = Tree();
             int count = 0; foreach (var b in t.Branches) count += b.nodes.Length;
             Assert.AreEqual(4, t.Branches.Count); Assert.AreEqual(MageKit.ImplementedIds.Length, count); Assert.AreEqual(29, count);
+            Assert.IsNull(t.Find("cw-hot-jaws"), "the Cinderwright is gone");
             foreach (var id in MageKit.ImplementedIds) Assert.NotNull(t.Find(id), id);
-            CollectionAssert.AreEqual(new[] { "combustion", "heatweaver", "spellbinder", "cinderwright" }, t.Branches.Select(b => b.id).ToArray());
+            CollectionAssert.AreEqual(new[] { "combustion", "heatweaver", "spellbinder", "bonecaller" }, t.Branches.Select(b => b.id).ToArray());
         }
-        /// <summary>The Cinderwright (TALENT_DEPTH.md, 2026-10-11; no machines, so an ember hound and no forge-golem): the fourth path, pets;
-        /// tiers 0-3 built, 4-6 written and not loaded; Cinder Burst behind row 2, and rows 0-3 within a level-15 Mage's sixteen points.</summary>
-        [Test] public void The_Cinderwright_is_the_fourth_path_and_its_rows_follow_the_calculator()
+        /// <summary>The Bonecaller (the necromancer, reworked from the Cinderwright, Chris 2026-10-12; GAME-ONLY; no machines): the fourth
+        /// path, a bone thrall; tiers 0-3 built (19 ranks), 4-6 written and not loaded; Bone Spikes behind row 2, and rows 0-3 within a
+        /// level-15 Mage's sixteen points.</summary>
+        [Test] public void The_Bonecaller_is_the_fourth_path_and_its_rows_follow_the_calculator()
         {
             var t = TalentTree.Parse("class.mage", File.ReadAllText(Path.Combine(Application.dataPath, "Crulanda/EncounterContent/Talents/mage.json")), 15, MageKit.ImplementedIds);
-            Assert.AreEqual("cinderwright", t.Branches[3].id); Assert.AreEqual("pet", t.Branches[3].role);
-            foreach (var written in new[] { "cw-twin-embers", "cw-ash-coat", "cw-rekindle", "cw-the-great-hound" }) Assert.IsNull(t.Find(written), written + " is written, not built");
+            Assert.AreEqual("bonecaller", t.Branches[3].id); Assert.AreEqual("pet", t.Branches[3].role);
+            Assert.GreaterOrEqual(t.Branches[3].nodes.Sum(n => n.max), 16, "at least sixteen ranks in rows 0-3");
+            foreach (var written in new[] { "bc-twin-thralls", "bc-ossuary-coat", "bc-rise-again", "bc-the-bone-lord" }) Assert.IsNull(t.Find(written), written + " is written, not built");
             var p = EncounterSession.FreshProgress("class.mage"); p.experience = EncounterProgress.XpForLevel(15);
-            Assert.IsFalse(t.Propose(p, "cw-cinder-burst", 1, out _, out _), "Cinder Burst is a row-2 talent");
-            Buy(t, p, "cw-banked-coals", "cw-banked-coals", "cw-banked-coals", "cw-hot-jaws", "cw-hot-jaws", "cw-hot-jaws", "cw-kinship", "cw-kinship", "cw-kinship",
-                "cw-long-stoke", "cw-long-stoke", "cw-cinder-burst", "cw-shared-heat", "cw-shared-heat", "cw-shared-heat", "cw-white-coals");
+            Assert.IsFalse(t.Propose(p, "bc-bone-spikes", 1, out _, out _), "Bone Spikes is a row-2 talent");
+            Buy(t, p, "bc-hard-bone", "bc-hard-bone", "bc-hard-bone", "bc-sharp-marrow", "bc-sharp-marrow", "bc-sharp-marrow", "bc-grave-bond", "bc-grave-bond", "bc-grave-bond",
+                "bc-long-drain", "bc-long-drain", "bc-bone-spikes", "bc-death-echo", "bc-death-echo", "bc-death-echo", "bc-bone-armour");
             Assert.AreEqual(0, t.Available(p));
             foreach (var line in File.ReadAllLines(Path.Combine(Application.dataPath, "Crulanda/EncounterContent/Talents/mage.json")))
-                if (line.Contains("\"cw-")) foreach (var word in new[] { "golem", "forge", "engine", "machine", "gear", "piston" }) StringAssert.DoesNotContain(word, line.ToLowerInvariant(), "no machines (Chris, 2026-10-11)");
+                if (line.Contains("\"bc-")) foreach (var word in new[] { "golem", "forge", "engine", "machine", "gear", "piston" }) StringAssert.DoesNotContain(word, line.ToLowerInvariant(), "no machines (Chris, 2026-10-11)");
+        }
+        /// <summary>A save with points in a retired path (the Cinderwright, the Archive, the Silent Vow) loads with them refunded and every
+        /// other pick kept (2026-10-12).</summary>
+        [Test] public void A_retired_paths_points_are_refunded_and_the_rest_kept()
+        {
+            var p = AtLevel(10);
+            p.talents = new List<TalentRank> { new TalentRank { id = "cw-hot-jaws", rank = 2 }, new TalentRank { id = "cb-kindling", rank = 3 }, new TalentRank { id = "sv-quick-hush", rank = 1 }, new TalentRank { id = "ar-resonance", rank = 1 } };
+            var said = TalentMigration.DropRetired(p);
+            StringAssert.Contains("4 points refunded", said);
+            Assert.AreEqual(1, p.talents.Count); Assert.AreEqual("cb-kindling", p.talents[0].id); Assert.AreEqual(3, p.talents[0].rank);
+            Assert.IsTrue(Tree().Validate(p, out var why), why);
+            Assert.IsNull(TalentMigration.DropRetired(p), "nothing more to drop");
+            Assert.IsFalse(TalentMigration.Retired("ca-chorus")); Assert.IsFalse(TalentMigration.Retired("bc-hard-bone"));
         }
         [Test] public void Implemented_flag_without_code_is_rejected()
         {

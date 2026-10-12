@@ -65,19 +65,20 @@ namespace Crulanda.Encounter
             SimGear.Dress(a.GetComponent<ActorVisual>(), s, Items);
             PartySims.Add(c);
             if (s.classId == "class.ranger") SummonSimWolf(c);   // a sim Ranger brings its wolf (2026-10-11)
+            else if (s.classId == "class.mage" && SimCompanion.Bonecaller(s)) SummonSimWolf(c, ActorLook.Skeleton);   // a Bonecaller its bone thrall (2026-10-12)
             if (!returning) Message(s.name + " has joined your party.");
             return true;
         }
         /// <summary>The party sims' wolves (a sim Ranger's), party members the enemies can turn on (PartyActor).</summary>
         public readonly List<RangerPet> SimPets = new List<RangerPet>();
-        public RangerPet SummonSimWolf(SimCompanion c)
+        public RangerPet SummonSimWolf(SimCompanion c, ActorLook look = ActorLook.Wolf)
         {
             if (c == null) return null; DismissSimWolf(c);
             var point = c.transform.position - c.transform.forward * 1.5f + c.transform.right * 1.2f;
             if (NavMesh.SamplePosition(point, out var hit, 8, NavMesh.AllAreas)) point = hit.position + Vector3.up;
-            var wolf = SpawnActor(c.sim.name.Split(' ')[0] + "'s wolf", content.player, point, new Color(.45f, .44f, .42f), "pet." + c.sim.id, ActorLook.Wolf, c.sim.level);
+            var wolf = SpawnActor(c.sim.name.Split(' ')[0] + (look == ActorLook.Skeleton ? "'s bone thrall" : "'s wolf"), content.player, point, new Color(.45f, .44f, .42f), "pet." + c.sim.id, look, c.sim.level);
             AddAgent(wolf.gameObject, 5.5f, .5f);
-            var pet = wolf.gameObject.AddComponent<RangerPet>(); pet.Master = c; wolf.gameObject.SetActive(true); pet.Init(wolf, this, new SimPetMaster());
+            var pet = wolf.gameObject.AddComponent<RangerPet>(); pet.Master = c; if (look == ActorLook.Skeleton) pet.Kind = "thrall"; wolf.gameObject.SetActive(true); pet.Init(wolf, this, new SimPetMaster());
             SimPets.Add(pet); return pet;
         }
         public void DismissSimWolf(SimCompanion c)

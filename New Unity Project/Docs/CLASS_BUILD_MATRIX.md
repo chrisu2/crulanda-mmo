@@ -220,3 +220,12 @@ The level-10 prototype samples build identity. Full endgame tree size, point cad
 
 ## Handoff update â€” 2026-09-28
 Warrior nine-node talent prototype is now implemented with B-key UI, live effects, allocation/refund/respec and v1-to-v2 save migration. Verified: 142 EditMode tests, 22 PlayMode tests, Windows build success. UI has not been visually inspected and user has not tested this talent build. Earlier statements above saying no playable tree or schema 1 are historical. Full-class node calculator remains unfinished. See CLAUDE_HANDOFF.md for authoritative current status and next work.
+
+## Mage — Bonecaller (replaces Cinderwright) — GAME-ONLY
+- Why this path: Cinderwright was the pet path, so the minion code carries over. Spellbinder is the Mage's only support path, so it stays.
+- Label: GAME-ONLY. D:\code\crulanda has no necromancy; the word only appears as an insult. This is not the Wasting.
+- Talents: 12 nodes. Tiers 1-3 are live (8 ids, at least 16 ranks reachable). Tiers 4-6 are written but impl:false.
+- Abilities: Raise Thrall (a skeleton pet), Marrow Drain (damage over time; each tick heals you and the thrall 50%), Bone Spikes (an area hit around the thrall that slows foes and costs the thrall 10% health).
+- Sim rotation: SimCompanion.PathRotation; odd mage variants play Bonecaller.
+- Saves: TalentMigration refunds retired cw- picks. Chris's saves were backed up in save-backups\20261012-1040-before-path-rework.
+- Status: UNVERIFIED (needs Chris).

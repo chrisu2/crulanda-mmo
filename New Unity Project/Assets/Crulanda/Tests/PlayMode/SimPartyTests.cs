@@ -177,6 +177,32 @@ namespace Crulanda.Tests
             while (t < 6 && mender.Chants == 0) { t += Time.deltaTime; yield return null; }
             Assert.Greater(mender.Chants, 0, "with you hurt near it, it chants the Mender-Craft");
         }
+        /// <summary>The reworked paths played by sims (2026-10-12): a Bonecaller Mage brings its bone thrall; an Archivist of the Unwriting
+        /// unwrites what it fights; one of the Still Vow wards the most hurt.</summary>
+        [UnityTest] public IEnumerator Sims_play_the_Bonecaller_the_Unwriting_and_the_Still_Vow()
+        {
+            session.Progress.recruited = false;
+            var pop = SimPopulation.Active;
+            var three = pop.World.sims.Where(x => x.zone == "zone.oakhaven").Take(3).ToList(); if (three.Count < 3) three = pop.World.sims.Take(3).ToList();
+            foreach (var x in three) { x.zone = "zone.oakhaven"; x.onlineFrom = 0; x.onlineHours = 24; x.friendly = .9f; x.level = session.Progress.Level; }
+            three[0].classId = "class.mage"; three[0].variant = 1; three[1].classId = "class.archivist"; three[1].variant = 3; three[2].classId = "class.archivist"; three[2].variant = 4;
+            Assert.IsTrue(SimCompanion.Bonecaller(three[0])); Assert.IsTrue(SimCompanion.Unwriter(three[1])); Assert.IsTrue(SimCompanion.StillVow(three[2]));
+            pop.Refresh(); yield return null;
+            foreach (var x in three) Assert.IsTrue(session.Invite(x.id), x.classId + " joins");
+            var thrall = session.SimPets.FirstOrDefault(p => p != null && p.Master == session.PartySim(three[0].id));
+            Assert.NotNull(thrall, "the Bonecaller brings its thrall"); Assert.AreEqual(ActorLook.Skeleton, thrall.GetComponent<ActorVisual>().Look); StringAssert.Contains("bone thrall", thrall.actor.DisplayName);
+            var unwriter = session.PartySim(three[1].id); var vow = session.PartySim(three[2].id);
+            var p0 = session.Player.transform.position;
+            foreach (var c in new[] { unwriter, vow }) c.GetComponent<UnityEngine.AI.NavMeshAgent>().Warp(p0 + Vector3.left * 2);
+            var e = session.Enemies.Where(x => x != null && x.actor.IsAlive && !x.Elite && !x.Game).OrderBy(x => Vector3.Distance(x.transform.position, p0)).First();
+            session.Player.GetComponent<AdventurerMotor>().Teleport(e.transform.position + Vector3.back * 6); session.Select(e); yield return null;
+            e.Receive(1, session.Player);
+            var you = session.Player; you.Health.ApplyDamage(Mathf.RoundToInt(you.Health.Pool.Max * .3f));
+            float t = 0; while (t < 10 && (unwriter.Unwrites == 0 || vow.Wards == 0)) { t += Time.deltaTime; yield return null; }
+            if (!session.InCombat && unwriter.Unwrites == 0) Assert.Inconclusive("no fight could be started here");
+            Assert.Greater(unwriter.Unwrites, 0, "the Unwriting sim unwrites its quarry");
+            Assert.Greater(vow.Wards, 0, "the Still Vow sim wards the most hurt");
+        }
         [UnityTest] public IEnumerator Mira_mends_a_hurt_sim_in_the_party()
         {
             session.Progress.recruited = true;

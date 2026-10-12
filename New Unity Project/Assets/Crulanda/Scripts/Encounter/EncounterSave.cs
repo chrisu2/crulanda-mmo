@@ -136,6 +136,7 @@ namespace Crulanda.Encounter
                     p.inventory = new List<string>(); p.equippedItem = null;
                 }
                 if (p.bag.Count > Inventory.BagSize * 4 || p.equipment.Count != ItemDatabase.SlotIds.Length) throw new InvalidOperationException("Invalid item data.");
+                var retired = TalentMigration.DropRetired(p); if (retired != null) message = retired;   // paths reworked 2026-10-12
                 if (!talents.Validate(p, out var reason)) throw new InvalidOperationException(reason);
                 progress = p;
                 return true;
@@ -255,6 +256,22 @@ namespace Crulanda.Encounter
             string body = json.Substring(0, json.Length - 1).TrimEnd();
             for (int i = 0; i < Lists.Length; i++) if (!Has[i].IsMatch(json)) body += (body.EndsWith("{") ? "" : ",") + "\"" + Lists[i] + "\":[]";
             return body + "}";
+        }
+    }
+    /// <summary>Talent paths reworked (2026-10-12, Chris: "Rework existing paths into the new builds"): the Mage's Cinderwright became the
+    /// Bonecaller (cw-), the Archivist's Archive the Unwriting (ar-) and its Silent Vow the Still Vow (sv-). A save's points in a retired
+    /// path are refunded (dropped from the allocation, so they are free to spend again); every other pick is kept as it was.</summary>
+    public static class TalentMigration
+    {
+        public static readonly string[] RetiredPrefixes = { "cw-", "ar-", "sv-" };
+        public static bool Retired(string id) { if (string.IsNullOrEmpty(id)) return false; foreach (var x in RetiredPrefixes) if (id.StartsWith(x, StringComparison.Ordinal)) return true; return false; }
+        /// <summary>Drops the retired picks; returns what to tell the player, or null when nothing was retired.</summary>
+        public static string DropRetired(EncounterProgress p)
+        {
+            if (p == null || p.talents == null) return null;
+            int points = 0; foreach (var t in p.talents) if (t != null && Retired(t.id)) points += Math.Max(0, t.rank);
+            if (p.talents.RemoveAll(t => t != null && Retired(t.id)) == 0) return null;
+            return "Talent paths reworked (the Cinderwright is now the Bonecaller, the Archive the Unwriting, the Silent Vow the Still Vow): " + points + (points == 1 ? " point" : " points") + " refunded [B]. Nothing else changed.";
         }
     }
 }

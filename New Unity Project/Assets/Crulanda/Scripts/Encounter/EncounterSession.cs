@@ -82,13 +82,13 @@ namespace Crulanda.Encounter
         /// <summary>Whistles up the Ranger's wolf beside the player (the old one, if any, let go first).</summary>
         public RangerPet SummonWolf(IPetMaster kit) { return SummonPet(kit, "Your wolf", "wolf"); }
         /// <summary>Calls a pet on the wolf's body beside the player (the old one, if any, let go first): the Ranger's wolf, or the Mage's
-        /// ember hound (named "Ember hound", which ActorVisual dresses in embers).</summary>
-        public RangerPet SummonPet(IPetMaster kit, string name, string kind)
+        /// bone thrall (the Bonecaller's, on the risen dead's skeleton).</summary>
+        public RangerPet SummonPet(IPetMaster kit, string name, string kind, ActorLook look = ActorLook.Wolf)
         {
             DismissPet();
             var point = Player.transform.position - Player.transform.forward * 1.5f + Player.transform.right * 1.2f;
             if (NavMesh.SamplePosition(point, out var hit, 8, NavMesh.AllAreas)) point = hit.position + Vector3.up;
-            var wolf = SpawnActor(name, content.player, point, new Color(.45f, .44f, .42f), "pet." + Progress.playerId, ActorLook.Wolf, Progress.Level);
+            var wolf = SpawnActor(name, content.player, point, new Color(.45f, .44f, .42f), "pet." + Progress.playerId, look, Progress.Level);
             AddAgent(wolf.gameObject, 5.5f, .5f);
             var pet = wolf.gameObject.AddComponent<RangerPet>(); pet.Kind = kind; wolf.gameObject.SetActive(true); pet.Init(wolf, this, kit);
             Pet = pet; return pet;

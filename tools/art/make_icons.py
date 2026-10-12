@@ -2563,6 +2563,48 @@ ABILITIES.update({'salt.close_cut': ('#1e342c', a_close_cut), 'salt.mender_craft
                   'salt.circle': ('#1e2e2a', a_salt_circle), 'salt.cairn': ('#2a2e2a', a_salt_cairn)})
 BRANCH.update({'mender': ('#1e302a', ['#eeeee4', '#9fe8c0', '#bdbcb4', '#d0ffe0', '#cfe8ff'])})
 
+# ---- the reworked paths (2026-10-12): the Mage's Bonecaller (the necromancer, GAME-ONLY), the Archivist's Unwriting (damage over
+# time) and Still Vow (wards and atonement), both CANON-EXPANDED ----
+BONE = '#e4dcc4'
+def m_skullhead(c, x, y, s, colr=BONE):
+    head = c.U_(c.ell(x, y, s, s * .9), c.rect(x - s * .55, y + s * .4, x + s * .55, y + s * 1.05, 3))
+    c.part(head, colr, 'soft')
+    for dx in (-.38, .38): c.part(c.ell(x + dx * s, y + s * .05, s * .24, s * .28), '#1c1a20', 'matte')
+    c.part(c.poly([(x, y + s * .3), (x - s * .1, y + s * .5), (x + s * .1, y + s * .5)]), '#1c1a20', 'matte')
+def a_raise_thrall(c):
+    c.back(c.ell(50, 60, 38, 28), '#7fb08a', .35, 12)
+    c.part(c.ell(50, 86, 34, 8), '#3a3228', 'matte')
+    for x, r in ((30, -20), (70, 20)): c.part(c.line([(x, 86), (x + r * .3, 60)], 5), BONE, 'soft')
+    m_skullhead(c, 50, 40, 20); c.spark(78, 22, 7, '#c8ffd0', .8)
+def a_marrow_drain(c):
+    c.back(c.ell(50, 50, 38), '#6fbf80', .35, 12)
+    c.part(c.line([(18, 30), (40, 48), (60, 52), (82, 72)], 5, smooth=True), '#9fe8a8', 'gem')
+    c.part(c.rect(16, 22, 30, 38, 4), BONE, 'soft'); c.part(c.ell(78, 74, 10), '#9fe8a8', 'gem')
+    for x, y in ((40, 48), (60, 52)): c.spark(x, y, 5, '#d8ffd8', .7)
+def a_bone_spikes(c):
+    c.back(c.ell(50, 70, 40, 24), '#c8c0a8', .35, 12)
+    for i, x in enumerate((18, 32, 46, 60, 74, 86)):
+        h = 30 + (i % 3) * 12; c.part(c.poly([(x - 6, 86), (x + 1, 86 - h * 1.4), (x + 6, 86)]), BONE, 'soft')
+    c.part(c.ell(50, 88, 40, 6), '#3a3228', 'matte')
+def a_unwrite(c):
+    c.back(c.ell(50, 50, 38), '#8a80a8', .4, 12)
+    pg = c.rect(26, 18, 74, 82, 4); c.part(pg, '#d8d0c0', 'soft')
+    for y in (30, 42, 54, 66): c.part(c.rect(32, y, 68 - (y % 24), y + 4, 2), '#5a5068', 'matte')
+    c.part(c.ell(60, 62, 18, 22), '#2a2634', 'matte', alpha=.8); rings(c, 60, 62, (24,), '#b0a0d0', .5, w=3)
+def a_erasure(c):
+    c.back(c.ell(50, 50, 38), '#a090c0', .4, 10)
+    c.part(c.rect(22, 30, 78, 70, 4), '#d8d0c0', 'soft')
+    c.part(c.line([(18, 74), (82, 26)], 9), '#3a3448', 'matte'); c.glow(c.line([(18, 74), (82, 26)], 4), '#c8b8ff', halo=6, power=.6)
+def a_stillness(c):
+    c.back(c.ell(50, 50, 40), '#bfd8ff', .4, 12)
+    m_shield(c, '#dfeeff', '#ffffff'); c.part(c.rect(36, 46, 64, 52, 2), '#3a5a8a', 'matte')
+    c.spark(76, 24, 8, '#ffffff', .8)
+ABILITIES.update({'mage.raise_thrall': ('#1e2a22', a_raise_thrall), 'mage.marrow_drain': ('#1c2a20', a_marrow_drain), 'mage.bone_spikes': ('#2a2822', a_bone_spikes),
+                  'archivist.unwrite': ('#241f30', a_unwrite), 'archivist.erasure': ('#28223a', a_erasure), 'archivist.stillness': ('#1e2a3a', a_stillness)})
+BRANCH.update({'bonecaller': ('#1e261e', [BONE, '#9fe8a8', '#c8c0a8', '#6fbf80', '#ffffff']),
+               'the-unwriting': ('#221e2c', ['#b0a0d0', '#8a80a8', '#d8d0c0', '#c8b8ff', '#6a6080']),
+               'the-still-vow': ('#1e2634', ['#dfeeff', '#bfd8ff', '#ffffff', '#9fc8ff', '#e0e8f0'])})
+
 # ---- the marks over a mob's name (2026-10-11, Chris: "you say Moon it really need to show an ICon", "show who is CCd"): the raid
 # marks (skull, moon, cross) and the holds (held, stunned, feared, silenced). Icons/mark/<id>, drawn by EncounterHud on the nameplate.
 def k_skull(c):

@@ -50,6 +50,44 @@ namespace Crulanda.Encounter
         public bool Healer { get { return sim.classId == "class.druid" || sim.classId == "class.paladin" || sim.classId == "class.saltmender"; } }
         /// <summary>A Salt-Mender sim's rotation (2026-10-12): the mend above (Close the Cut) on the most hurt; the Mender-Craft chant over the
         /// party within 12 m every 4 s of a fight (or while anyone near it is hurt); a salt cairn every 20 s when two or more are hurt; salt shards between.</summary>
+        /// <summary>Which of the reworked paths a sim plays (2026-10-12), by its variant: a Mage with an odd variant is a Bonecaller (it
+        /// brings a bone thrall); an Archivist with an odd one plays the Unwriting (it unwrites its quarry), with an even one the Still
+        /// Vow (it wards the most hurt).</summary>
+        public static bool Bonecaller(SimAdventurer s) { return s != null && s.classId == "class.mage" && (s.variant & 1) == 1; }
+        public static bool Unwriter(SimAdventurer s) { return s != null && s.classId == "class.archivist" && (s.variant & 1) == 1; }
+        public static bool StillVow(SimAdventurer s) { return s != null && s.classId == "class.archivist" && (s.variant & 1) == 0; }
+        float nextUnwrite, nextWard, unwriteNext; EncounterEnemy unwriting; int unwriteLeft;
+        public int Unwrites { get; private set; }
+        public int Wards { get; private set; }
+        void PathRotation()
+        {
+            if (!session.InCombat) return;
+            if (Unwriter(sim))
+            {
+                var q = Quarry;
+                if (q != null && q.actor.IsAlive && Time.time >= nextUnwrite && Vector3.Distance(q.transform.position, transform.position) <= 30)
+                {
+                    nextUnwrite = Time.time + 12; unwriting = q; unwriteLeft = 6; unwriteNext = Time.time + 2; Unwrites++;
+                    session.FloatText(q.transform.position + Vector3.up * 1.8f, "Unwritten", new Color(.62f, .58f, .7f));
+                }
+                if (unwriting != null && Time.time >= unwriteNext)
+                {
+                    if (!unwriting.actor.IsAlive || unwriteLeft <= 0) unwriting = null;
+                    else { unwriteNext = Time.time + 2; unwriteLeft--; unwriting.Receive(Mathf.Max(2, Hit / 3), actor); }
+                }
+            }
+            else if (StillVow(sim) && Time.time >= nextWard)
+            {
+                var hurt = MostHurt(30);
+                if (hurt != null && hurt.Health.Pool.Ratio < .9f)
+                {
+                    nextWard = Time.time + 8; Wards++;
+                    int size = Mathf.RoundToInt(hurt.Health.Pool.Max * .12f);
+                    hurt.GetComponent<Combatant>().AddBarrier(size, 10); HealFx.Show(hurt.transform);
+                    session.FloatText(hurt.transform.position + Vector3.up * 1.6f, "Stillness " + size, new Color(.85f, .92f, 1));
+                }
+            }
+        }
         float nextChant, nextCairn;
         public int Chants { get; private set; }
         public int Cairns { get; private set; }
@@ -402,7 +440,7 @@ namespace Crulanda.Encounter
                     return;
                 }
             }
-            SaltRotation();
+            SaltRotation(); PathRotation();
             TickGate();   // a shut gate ahead: the run waits at it and goes on when it opens (D7)
             var quarry = Quarry;
             // A camp nobody can get at (2026-10-11, the group run: an Ash mender up where no one reached it held the run): forty-five seconds

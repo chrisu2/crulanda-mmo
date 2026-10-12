@@ -988,37 +988,37 @@ MonoBehaviour:
     globalCooldown: 1.5
     duration: 4
     statusId: 
-  - id: mage.kindle_hound
-    name: Kindle Hound
-    description: "Call an ember hound to your side, a fire spirit in a hound's shape that fights what you fight. Again: it sinks back into the embers."
+  - id: mage.raise_thrall
+    name: Raise Bone Thrall
+    description: "The bones of the dead stood up at your side: a thrall that fights for you. Again, it is laid down. GAME-ONLY."
     effect: 4
     power: 0
-    cost: 25
-    cooldown: 2
+    cost: 30
+    cooldown: 3
     range: 0
-    castTime: 0
+    castTime: 1.5
     globalCooldown: 1.5
     duration: 0
     statusId:
-  - id: mage.stoke
-    name: Stoke
-    description: "Pour all your Heat (20 at least) into the hound: its bites land 1% harder per point for 10 seconds."
-    effect: 4
-    power: 0
-    cost: 5
-    cooldown: 12
-    range: 0
+  - id: mage.marrow_drain
+    name: Marrow Drain
+    description: "The life drawn out of the target every 2 seconds for 10 seconds; half of each draw mends you and your thrall. GAME-ONLY."
+    effect: 0
+    power: 6
+    cost: 20
+    cooldown: 0
+    range: 30
     castTime: 0
     globalCooldown: 1.5
     duration: 10
     statusId:
-  - id: mage.cinder_burst
-    name: Cinder Burst
-    description: "The hound flares: every enemy within 4 metres of it burns. It costs the hound 15% of its health. Talent."
+  - id: mage.bone_spikes
+    name: Bone Spikes
+    description: "Bone bursts up round your thrall: every foe within 4 metres struck and slowed, at a tenth of the thrall's health. Talent. GAME-ONLY."
     effect: 0
-    power: 14
+    power: 10
     cost: 20
-    cooldown: 15
+    cooldown: 8
     range: 0
     castTime: 0
     globalCooldown: 1.5
@@ -1593,15 +1593,15 @@ MonoBehaviour:
       - abilityId: mage.ash_hex
         level: 6
         talentId: 
-      - abilityId: mage.kindle_hound
+      - abilityId: mage.raise_thrall
         level: 2
         talentId:
-      - abilityId: mage.stoke
+      - abilityId: mage.marrow_drain
         level: 6
         talentId:
-      - abilityId: mage.cinder_burst
+      - abilityId: mage.bone_spikes
         level: 1
-        talentId: cw-cinder-burst
+        talentId: bc-bone-spikes
     talentTree: {fileID: 4900000, guid: 317285d9fd0e47d3845a82d3780fa675, type: 3}
   - definition:
       id: class.rogue

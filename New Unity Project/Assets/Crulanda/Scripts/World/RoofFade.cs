@@ -28,6 +28,7 @@ namespace Crulanda.World
         public bool Faded { get { if (alpha != null) foreach (var a in alpha) if (a < .999f) return true; return false; } }
         /// <summary>The big parts (walls, roofs, chimneys), and how many of them are faded now (for the tests).</summary>
         public int BigParts { get { if (!ready) Prepare(); int n = 0; foreach (var b in big) if (b) n++; return n; } }
+        public Vector3 Size { get { if (!ready) Prepare(); return bounds.size; } }
         public int FadedBigParts { get { if (!ready) Prepare(); int n = 0; for (int i = 0; i < parts.Length; i++) if (big[i] && alpha[i] < .999f) n++; return n; } }
 
         void OnEnable() { All.Add(this); }
@@ -64,7 +65,8 @@ namespace Crulanda.World
         Bounds LocalBounds(Renderer r)
         {
             var mf = r.GetComponent<MeshFilter>(); Bounds src; Matrix4x4 m;
-            if (mf != null && mf.sharedMesh != null) { src = mf.sharedMesh.bounds; m = transform.worldToLocalMatrix * r.transform.localToWorldMatrix; }
+            // A statically batched part's mesh is the whole scene's combined mesh: its bounds spanned the village, and far houses faded (Chris 12:58).
+            if (mf != null && mf.sharedMesh != null && !mf.sharedMesh.name.StartsWith("Combined Mesh") && !r.isPartOfStaticBatch) { src = mf.sharedMesh.bounds; m = transform.worldToLocalMatrix * r.transform.localToWorldMatrix; }
             else { src = r.bounds; m = transform.worldToLocalMatrix; }
             Vector3 c = src.center, e = src.extents; var lb = new Bounds(m.MultiplyPoint3x4(c), Vector3.zero);
             for (int k = 0; k < 8; k++) lb.Encapsulate(m.MultiplyPoint3x4(c + Vector3.Scale(e, new Vector3((k & 1) == 0 ? -1 : 1, (k & 2) == 0 ? -1 : 1, (k & 4) == 0 ? -1 : 1))));
@@ -125,8 +127,6 @@ namespace Crulanda.World
         /// it; a small piece as its big part; solid otherwise.</summary>
         void Aim(Vector3 camera, Vector3 head, Vector3 body)
         {
-            // Outdoors a house is never see-through (Chris, 12:54: "there should not be see thru houses."): only the building you stand in fades.
-            if (!Holds(body)) { for (int i = 0; i < parts.Length; i++) target[i] = 1; return; }
             Vector3 c = transform.InverseTransformPoint(camera), h = transform.InverseTransformPoint(head), b = transform.InverseTransformPoint(body);
             var whole = bounds; whole.Expand(.3f);
             bool near = whole.Contains(c) || Entry(whole, c, h) >= 0 || Entry(whole, c, b) >= 0;

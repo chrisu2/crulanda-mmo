@@ -25,7 +25,11 @@ namespace Crulanda.Encounter
         public bool Hoeing { get { return hoeActive; } }
         /// <summary>Fist to fist along the hoe shaft this frame, in metres (45-60 cm wanted).</summary>
         public float HandSpread { get; private set; }
-        public const float HoeHandsMin = .47f, HoeHandsMax = .58f, HoeRearBack = .22f;
+        /// <summary>The hoer's pose this frame (note 164): the higher fist over the lower shoulder, the nearer fist ahead of the chest, the higher elbow over its shoulder (m).</summary>
+        public float PoseHandOverShoulder { get; private set; }
+        public float PoseHandAhead { get; private set; }
+        public float PoseElbowOverShoulder { get; private set; }
+        public const float HoeHandsMin = .47f, HoeHandsMax = .58f, HoeRearBack = .22f, HoeTopBelowChest = .12f, HoeTopAhead = .34f;
         Vector3? handsL, handsR; int handsFrame = -1;
         /// <summary>How far the farther hand ended from its mark (<see cref="HandsOn"/>), as last posed, in metres.</summary>
         public float HandsGap { get; private set; } = float.NaN;
@@ -91,6 +95,9 @@ namespace Crulanda.Encounter
             Vector3 rear = line + ahead * hand.x + up * hand.y, edgeAt = line + ahead * edge.x + up * edge.y;
             // The back hand sits further up the shaft's line (toward the hip and chest), so the front hand can close on it a full 45-60 cm lower down (note 157).
             { var d0 = edgeAt - rear; if (d0.sqrMagnitude > 1e-4f) rear -= d0.normalized * HoeRearBack; }
+            // The top hand at the waist to the chest and well in front (Chris 13:01: "his arms are out of place or awkward", the fist was at his chin).
+            { var chestP = model.Chest != null ? model.Chest.position : foot + up * 1.3f; if (rear.y > chestP.y - HoeTopBelowChest) rear.y = chestP.y - HoeTopBelowChest;
+              float fwd = Vector3.Dot(rear - chestP, ahead); if (fwd < HoeTopAhead) rear += ahead * (HoeTopAhead - fwd); }
             // The rear (top) hand first; the shaft from its fist to the blade's mark; the front hand where the shaft passes nearest
             // its own shoulder (between a hand's width and two feet down the shaft), so a short arm still closes on it.
             Reach(model.UpperArmR, model.LowerArmR, model.HandR, rear - (Grip(model.HandR, model.MiddleR) - model.HandR.position), -up + side * .8f - ahead * .3f);
@@ -107,6 +114,9 @@ namespace Crulanda.Encounter
                 if (across.sqrMagnitude > 1e-6f && want.sqrMagnitude > 1e-6f) PointBone(model.HandL, model.MiddleL.position - model.HandL.position, (model.MiddleL.position - model.HandL.position) + (want.normalized - across.normalized) * .03f, 1);
             }
             Vector3 gL = Grip(model.HandL, model.MiddleL); HandSpread = Vector3.Distance(gR, gL);
+            { var ch = model.Chest != null ? model.Chest.position : foot + up * 1.3f; float sh = Mathf.Min(model.UpperArmL.position.y, model.UpperArmR.position.y);
+              PoseHandOverShoulder = Mathf.Max(gL.y, gR.y) - sh; PoseHandAhead = Mathf.Min(Vector3.Dot(gL - ch, ahead), Vector3.Dot(gR - ch, ahead));
+              PoseElbowOverShoulder = Mathf.Max(model.LowerArmL.position.y - model.UpperArmL.position.y, model.LowerArmR.position.y - model.UpperArmR.position.y); }
             CurlRound(model.FingersR, model.HandR, model.MiddleR, gR, dir, 1);
             CurlRound(model.FingersL, model.HandL, model.MiddleL, gL, dir, 1);
             float L = tradeToolShaft * tradeTool.lossyScale.y;

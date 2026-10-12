@@ -945,10 +945,12 @@ namespace Crulanda.Encounter
         void Frame(Rect r) { GUI.color = ink; GUI.DrawTexture(r, Texture2D.whiteTexture); GUI.color = Color.white; }
         /// <summary>The party's damage and healing meter (/meter): a row a member, damage and healing done, and each a second over the
         /// party's fighting time since the reset. Under the quest tracker on the right.</summary>
+        /// <summary>Where the meter sits on the 1440x900 canvas for a party of <paramref name="rows"/>.</summary>
+        public static Rect MeterRect(int rows) { return new Rect(1100, 456, 340, 60 + 22 * Mathf.Max(1, rows)); }
         void DrawMeter()
         {
             var m = session.Meter; var rows = new List<CombatMeter.Row>(m.Rows); float t = m.CombatSeconds;
-            var r = new Rect(1100, 456, 340, 60 + 22 * Mathf.Max(1, rows.Count));
+            var r = MeterRect(rows.Count);
             Fill(r, new Color(0, 0, 0, .55f));
             GUI.contentColor = gold; GUI.Label(new Rect(r.x + 10, r.y + 6, 200, 20), "DAMAGE AND HEALING", small); GUI.contentColor = Color.white;
             GUI.Label(new Rect(r.x + 10, r.y + 22, 310, 18), "over " + Mathf.RoundToInt(t) + " s of fighting  ·  /meter reset", tiny);

@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.AI;
 using Crulanda.Gameplay;
 using Crulanda.Combat;
@@ -265,7 +265,9 @@ namespace Crulanda.Encounter
             if (!session.Player.IsAlive) { ResetFight(); return; }
             // The leash. A mob fighting alone is held by its own home. A linked group (EncounterEnemy.Social) is held by where its
             // pull began, by its target only: those who came from across the camp are not sent back for having come.
-            if (Group == null && Vector3.Distance(transform.position, home) > session.Leash) { if (inFight) GoHome(); else ResetFight(); return; }
+            // Chris 13:05, "leash is too short on fighting boards. they keep reseting even while fighting": a mob in a fight (struck or striking
+            // within the last few seconds, ranged kiting included) never breaks off; only past the far leash and quiet for a while.
+            if (Group == null && Vector3.Distance(transform.position, home) > (inFight ? FarLeash : session.Leash) && (!inFight || Quiet)) { if (inFight) GoHome(); else ResetFight(); return; }
             // Noticing you: within 5 m and, until a fight is on, only with a clear line to you, so a mob inside a rock cave or
             // behind a wall doesn't come for you through it. On its way home from a broken leash it notices nobody.
             if (!Evading && !EncounterSession.Unseen && Time.time >= lostUntil && Vector3.Distance(transform.position, session.Player.transform.position) < 5 && (Victim != null || Sees(session.Player.transform.position)))
@@ -274,7 +276,7 @@ namespace Crulanda.Encounter
             Victim = session.CombatActor(id);   // your party, or a sim that came for it (Phase 5.3a)
             if (Victim == null) { if (inFight) ClearFight(); Idle(); return; }
             strolling = false;
-            if (Vector3.Distance(Victim.transform.position, Group != null ? Group.anchor : home) > session.Leash + 6) { Disengage(); return; }
+            if (Vector3.Distance(Victim.transform.position, Group != null ? Group.anchor : home) > FarLeash + 6 && Quiet) { Disengage(); return; }
             if (!inFight) Engage();   // the camp hears of it (EncounterSession.RaiseAlarm)
             if (Move != null && TickElite()) return;   // an elite drawing back for its heavy blow stands still and does not swing
             if (TickFlee()) return;   // bolting at low health (EncounterEnemy.Flee)
@@ -289,7 +291,7 @@ namespace Crulanda.Encounter
             bool blocked = agent.isOnNavMesh && !agent.pathPending && agent.pathStatus != NavMeshPathStatus.PathComplete;
             if (!inReach && blocked) { if (unreachableSince < 0) unreachableSince = Time.time; else if (Time.time - unreachableSince > 4) { session.Message(actor.DisplayName + " gives up the chase."); GoHome(); return; } }
             else unreachableSince = -1;
-            if (inReach && Time.time >= swing)
+            if (inReach && Time.time >= swing && MarkSwing())
             {
                 if (Move != null && Time.time >= nextBlowAt) { BeginBlow(); return; }
                 swing = Time.time + SwingInterval;
@@ -338,8 +340,17 @@ namespace Crulanda.Encounter
             if (victim == null || victim.Health == null || session.PartyActor(victim.EntityId.Value) == null) return raw;
             return Mathf.Min(raw, Mathf.Max(1, Mathf.RoundToInt(victim.Health.Pool.Max * MaxBlowShare)));
         }
+        /// <summary>How far from home a mob in a fight may be drawn (40 m at least), and how long without a blow before it gives up.</summary>
+        public float FarLeash { get { return Mathf.Max(40, session != null ? session.Leash : 30); } }
+        public const float QuietSeconds = 5;
+        float lastBlowAt = -100;
+        /// <summary>No blow taken or struck for QuietSeconds.</summary>
+        public bool Quiet { get { return Time.time - lastBlowAt > QuietSeconds; } }
+        public void MarkBlow() { lastBlowAt = Time.time; }
+        bool MarkSwing() { lastBlowAt = Time.time; return true; }
         public void Receive(int damage, Actor source)
         {
+            if (damage > 0) lastBlowAt = Time.time;
             if (!actor.IsAlive || Inside != null) return;   // inside its machine, nothing reaches it
             if (Hidden) Pounce();
             if (TappedBy == null && source != null && !Game) TappedBy = source.EntityId.Value;

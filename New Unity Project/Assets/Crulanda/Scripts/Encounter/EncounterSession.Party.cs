@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -99,24 +99,41 @@ namespace Crulanda.Encounter
         /// face to face.</summary>
         public bool InviteMira()
         {
-            if (Companion == null) { Message("Mira isn't here."); return false; }
+            if (Companion == null) { Message("Mira isn't in this zone. Find her in Oakhaven."); return false; }
             if (Progress.recruited) { Message("Mira is already in your party."); return false; }
             Progress.recruited = true; Progress.relationship++; Message("Mira: I'll keep you standing. Lead the way."); ReconcileQuests();
             return true;
         }
         /// <summary>/invite by name (Round 24, playtest note 67): a sim standing here joins at once; one online elsewhere accepts by
         /// the same rules, sets out, and arrives at the road's end nearest you after <see cref="InviteTravelSeconds"/>.</summary>
+        /// <summary>A typed name fits a sim's whole name, its start, or any one of its names (a byname alone: "Thatch").</summary>
+        public static bool NameFits(string full, string typed)
+        {
+            if (string.IsNullOrEmpty(full) || string.IsNullOrEmpty(typed)) return false; typed = typed.Trim();
+            if (full.StartsWith(typed, StringComparison.OrdinalIgnoreCase)) return true;
+            foreach (var w in full.Split(' ')) if (w.StartsWith(typed, StringComparison.OrdinalIgnoreCase)) return true;
+            return false;
+        }
+        /// <summary>Invite whoever you have targeted (Chris 12:59, "i cant invite mira ."): Mira, a sim, or a clear word why not. Never silent.</summary>
+        public bool InviteTarget()
+        {
+            if (FocusMira || (FocusVillager != null && string.Equals(FocusVillager.Name, "Mira", StringComparison.OrdinalIgnoreCase))) return InviteMira();
+            if (FocusSim != null) return Invite(FocusSim.id);
+            if (FocusVillager != null) { Message(FocusVillager.Name + " has work of their own and won't join a party."); return false; }
+            Message("Target someone to invite, or type /invite <name>."); return false;
+        }
         public bool InviteByName(string name)
         {
             if (string.Equals(name, "Mira", StringComparison.OrdinalIgnoreCase)) return InviteMira();
-            var pop = SimPopulation.Active; if (pop == null || string.IsNullOrEmpty(name)) { Message("Invite whom? /invite <name>."); return false; }
+            if (string.IsNullOrWhiteSpace(name)) return InviteTarget();   // /invite alone: your target
+            var pop = SimPopulation.Active; if (pop == null) { Message("Nobody is online to invite."); return false; }
             // The name as typed, else by its start (a first name): among those online, one standing here before one away (first names repeat).
             var s = pop.World.sims.Find(x => string.Equals(x.name, name, StringComparison.OrdinalIgnoreCase));
             if (s == null)
             {
                 var hour = Crulanda.World.WorldClock.Hour;
-                var like = pop.World.sims.FindAll(x => x.name.StartsWith(name, StringComparison.OrdinalIgnoreCase) && (x.IsOnlineAt(hour) || InParty(x.id)));
-                s = like.Find(x => x.zone == ZoneId && pop.Find(x.id) != null) ?? (like.Count > 0 ? like[0] : pop.World.sims.Find(x => x.name.StartsWith(name, StringComparison.OrdinalIgnoreCase)));
+                var like = pop.World.sims.FindAll(x => NameFits(x.name, name) && (x.IsOnlineAt(hour) || InParty(x.id)));   // a first name or a byname ("/invite Thatch", note 118)
+                s = like.Find(x => x.zone == ZoneId && pop.Find(x.id) != null) ?? (like.Count > 0 ? like[0] : pop.World.sims.Find(x => NameFits(x.name, name)));
             }
             if (s == null) { Message("Nobody called " + name + "."); return false; }
             if (!s.IsOnlineAt(Crulanda.World.WorldClock.Hour) && !InParty(s.id)) { Message(s.name + " is not online."); return false; }

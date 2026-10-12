@@ -53,19 +53,45 @@ namespace Crulanda.Tests
             Assert.AreNotEqual("Crulanda/Fade", tree.GetComponentInChildren<Renderer>().sharedMaterial.shader.name);
         }
 
-        /// <summary>Outdoors no house turns see-through (Chris, 2026-10-12 12:54: "there should not be see thru houses."): the player
-        /// outside the inn with the camera on its far side, the view straight through it, and every part of the inn stays solid.</summary>
-        [UnityTest] public IEnumerator Outdoors_a_house_between_camera_and_player_stays_solid()
+        /// <summary>Chris, 2026-10-12 12:58: "i dont want see thru houses like this . i just wanted a fix for the camera when i was behind
+        /// something. doesnt out inside." A house not in the way stays solid; one between the camera and the player fades; it is solid again
+        /// once the player moves on; and every other building stays solid throughout.</summary>
+        [UnityTest] public IEnumerator Outdoors_only_the_house_in_the_way_fades_and_only_while_it_blocks()
         {
             var innProp = ZoneBuilder.Active.Zone.props.First(p => p != null && p.kind == "inn");
             var inn = RoofFade.All.OrderBy(r => Vector2.Distance(new Vector2(r.transform.position.x, r.transform.position.z), innProp.at)).First();
             float reach = Mathf.Max(inn.Half.x, inn.Half.y) + 3;
-            Vector3 pos = inn.transform.TransformPoint(new Vector3(reach, 0, 0)), head = pos + Vector3.up * 1.5f, body = pos + Vector3.up * .7f;
-            Vector3 camera = inn.transform.TransformPoint(new Vector3(-reach, 2, 0));
-            for (float t = 0; t < .8f; t += Time.deltaTime) { RoofFade.UpdateAll(camera, head, body); yield return null; }
-            Assert.AreEqual(0, inn.FadedBigParts, "outdoors the inn stays solid with the view through it");
+            Vector3 pos = inn.transform.TransformPoint(new Vector3(reach, 0, 0));
+            IEnumerator Settle(Vector3 camera, Vector3 at) { for (float t = 0; t < .8f; t += Time.deltaTime) { RoofFade.UpdateAll(camera, at + Vector3.up * 1.5f, at + Vector3.up * .7f); yield return null; } }
+            int OthersFaded() { return RoofFade.All.Count(o => o != inn && o.FadedBigParts > 0); }
+            // Not in the way: the camera on the player's side.
+            yield return Settle(inn.transform.TransformPoint(new Vector3(reach + 5, 2.5f, 0)), pos);
+            Assert.AreEqual(0, inn.FadedBigParts, "a house not in the way is solid"); Assert.AreEqual(0, OthersFaded(), "no other building fades");
+            // In the way: the camera beyond the inn, the view straight through it.
+            yield return Settle(inn.transform.TransformPoint(new Vector3(-reach, 2, 0)), pos);
+            Assert.Greater(inn.FadedBigParts, 0, "the house between the camera and the player fades"); Assert.Less(inn.FadedBigParts, inn.BigParts, "only the parts in the way");
+            Assert.AreEqual(0, OthersFaded(), "no other building fades");
+            // The player moves on (out to the side): solid again.
+            var moved = inn.transform.TransformPoint(new Vector3(-reach, 0, reach + 4));
+            yield return Settle(inn.transform.TransformPoint(new Vector3(-reach - 5, 2.5f, reach + 4)), moved);
+            Assert.AreEqual(0, inn.FadedBigParts, "solid again once it no longer blocks");
             foreach (var r in inn.GetComponentsInChildren<Renderer>()) Assert.AreNotEqual("Crulanda/Fade", r.sharedMaterial != null ? r.sharedMaterial.shader.name : "", r.name + " is not dithered");
-            foreach (var other in RoofFade.All) Assert.AreEqual(0, other.FadedBigParts, other.name + " outdoors: solid");
+        }        /// <summary>Chris 12:59, "tree disappeared.": a tree not in the way stays drawn and solid; one right at the lens is faint, never gone;
+        /// and no building's fade box spans more than a building (a batched mesh's box once spanned the village).</summary>
+        [UnityTest] public IEnumerator Trees_never_vanish_and_fade_boxes_are_building_sized()
+        {
+            foreach (var r in RoofFade.All) { var z = r.Size; Assert.Less(Mathf.Max(z.x, z.z), 40f, r.name + " fade box " + z); }
+            var s = UnityEngine.Object.FindFirstObjectByType<EncounterSession>(); var p = s.Player.transform.position;
+            var tree = TreeFade.All.OrderBy(t => Vector3.Distance(t.transform.position, p)).First();
+            var away = (p - tree.transform.position); away.y = 0; away = away.normalized;
+            Vector3 cam = p + away * 6 + Vector3.up * 3;   // the camera on the far side of the player from the tree
+            for (float t = 0; t < .6f; t += Time.deltaTime) { TreeFade.UpdateAll(cam, p + Vector3.up * 1.5f, p + Vector3.up * .7f); yield return null; }
+            Assert.IsFalse(tree.Faded, "a tree not in the way is solid");
+            foreach (var r in tree.GetComponentsInChildren<Renderer>()) { Assert.IsTrue(r.enabled && r.gameObject.activeInHierarchy, r.name + " is drawn"); }
+            var trunk = tree.transform.position + Vector3.up * 1.2f; var lens = trunk + away * 1.5f;
+            for (float t = 0; t < .6f; t += Time.deltaTime) { TreeFade.UpdateAll(lens, trunk - away * 6, trunk - away * 6 + Vector3.down * .8f); yield return null; }
+            Assert.GreaterOrEqual(tree.Alpha, TreeFade.NearAlpha - .01f, "a tree at the lens is faint, not gone");
+            foreach (var r in tree.GetComponentsInChildren<Renderer>()) Assert.IsTrue(r.enabled, r.name + " still drawn");
         }        /// <summary>Inside the Golden Cask (set at an angle) the room stays a room: with the camera inside behind you no wall fades; with
         /// the camera outside behind the back wall that wall fades and the rest stays; and the camera itself, turned all the way round,
         /// stays within the walls (playtest note 120, Chris, 2026-10-11: "GOING IN A BUILDING MAKES IT DISAPPEAR"; the tester's note 117,

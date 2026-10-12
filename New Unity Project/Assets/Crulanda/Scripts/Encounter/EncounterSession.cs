@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -41,7 +41,7 @@ namespace Crulanda.Encounter
         public TalentTree Talents { get; private set; }
         /// <summary>The party's damage and healing meter (/meter; CombatMeter).</summary>
         public CombatMeter Meter { get { if (meter == null) { meter = new CombatMeter(this); Combatant.Healed += OnHealed; } return meter; } }
-        CombatMeter meter; public bool MeterOpen;
+        CombatMeter meter; public bool MeterOpen = true;   // shown from the start (Chris 13:09, "the dps/healing meter is missing"); /meter hides it
         /// <summary>The run's scorecard (CombatMeter.Scorecard): shown when a sim-led run is called cleared or the dungeon's last boss falls, and
         /// by /scorecard (Chris, 2026-10-11).</summary>
         public bool ScorecardOpen; public string ScorecardTitle;

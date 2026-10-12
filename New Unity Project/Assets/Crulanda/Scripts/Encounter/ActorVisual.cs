@@ -1036,7 +1036,7 @@ namespace Crulanda.Encounter
         {
             if (core != null) { Drift(); return; }
             if (beastModel != null) { BeastLate(); return; }
-            if (model != null) { ModelLate(); return; }
+            if (model != null) { GroundFeet(); ModelLate(); return; }   // feet onto the ground first, so the arms' IK works on the settled figure
             if (body == null || legL == null) return;
             // Swimming: the kit goes on the back, so no sword stands out of the water like a mast; out of a fight too (playtest note 79).
             bool stow = Pose == ActorPose.Swim || (Fighting != null && !Fighting(gameObject) && !Casting);

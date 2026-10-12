@@ -66,6 +66,9 @@ namespace Crulanda.Tests
                 {
                     if (l > .04f) fails.Add("left hand " + (l * 100).ToString("0.0") + " cm off the shaft");
                     if (r > .04f) fails.Add("right hand " + (r * 100).ToString("0.0") + " cm off the shaft");
+                    if (vis.PoseHandOverShoulder > 0) fails.Add("a fist " + (vis.PoseHandOverShoulder * 100).ToString("0") + " cm above the shoulder");
+                    if (vis.PoseHandAhead < .25f) fails.Add("a fist only " + (vis.PoseHandAhead * 100).ToString("0") + " cm in front of the chest");
+                    if (vis.PoseElbowOverShoulder > 0) fails.Add("an elbow " + (vis.PoseElbowOverShoulder * 100).ToString("0") + " cm above its shoulder");
                     if (vis.HandSpread < .45f || vis.HandSpread > .6f) fails.Add("hands " + (vis.HandSpread * 100).ToString("0") + " cm apart on the shaft (45-60 wanted)");
                 }
                 if (start < 0 && vis.StrokeCount > 0) { start = vis.StrokeCount; t0 = Time.time; }

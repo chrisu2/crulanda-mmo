@@ -33,7 +33,17 @@ namespace Crulanda.Encounter
         // ---------- movable panels (playtest note 97, 2026-10-08: "I can't move the UI, should be able to drag where I want") ----------
         static readonly (string id, string label, Rect rect, int anchor)[] Panels = {
             ("frames", "Your frames", new Rect(10, 10, 705, 240), -1), ("minimap", "Minimap", new Rect(1215, 0, 225, 240), 1),
-            ("tracker", "Quest tracker", new Rect(1110, 236, 330, 200), 1), ("bar", "Action bar", new Rect(150, 772, 1140, 128), 0) };
+            ("tracker", "Quest tracker", new Rect(1110, 236, 330, 200), 1), ("bar", "Action bar", new Rect(150, 772, 1140, 128), 0),
+            // Chris 2026-10-12 1:29, "meter should be movable in the ui. pet bar should be movable in the ui."
+            ("meter", "Damage meter", new Rect(1100, 456, 340, 148), 1), ("pet", "Pet bar", new Rect(85, 800, 250, 76), 0) };
+        /// <summary>A panel's rect on the canvas where it is drawn now (its place plus the offset the player gave it).</summary>
+        public static Rect PanelRect(string id) { foreach (var pn in Panels) if (pn.id == id) { var r = pn.rect; r.position += PanelOffset(id); return r; } return Rect.zero; }
+        /// <summary>Move a panel by an offset from its place (what a drag does), saved.</summary>
+        public static void MovePanel(string id, Vector2 offset) { SetPanelOffset(id, offset); }
+        /// <summary>Every panel back where the game puts it, the saved positions forgotten.</summary>
+        public static void ResetPanels() { foreach (var pn in Panels) { try { PlayerPrefs.DeleteKey("ui.pos." + pn.id + ".x"); PlayerPrefs.DeleteKey("ui.pos." + pn.id + ".y"); } catch { } panelOffsets.Remove(pn.id); } }
+        /// <summary>Forget the in-memory positions (as a fresh run would), so the next read comes from PlayerPrefs.</summary>
+        public static void ForgetPanelCache() { panelOffsets.Clear(); }
         static readonly Dictionary<string, Vector2> panelOffsets = new Dictionary<string, Vector2>();
         static bool uiUnlocked; static string dragging; static Vector2 dragFrom;
         /// <summary>How far a panel is moved from its place on the 1440x900 canvas: where the player put it, else (on a wide screen) out to
@@ -71,7 +81,7 @@ namespace Crulanda.Encounter
             if (e.type == EventType.MouseDrag && dragging != null) { SetPanelOffset(dragging, mouse - dragFrom); e.Use(); }
             if (e.type == EventType.MouseUp && dragging != null) { dragging = null; e.Use(); }
             if (GUI.Button(new Rect(620, 380, 200, 40), "Lock UI", button)) { uiUnlocked = false; dragging = null; }
-            if (GUI.Button(new Rect(620, 426, 200, 32), "Put them back", slim)) foreach (var pn in Panels) { try { PlayerPrefs.DeleteKey("ui.pos." + pn.id + ".x"); PlayerPrefs.DeleteKey("ui.pos." + pn.id + ".y"); } catch { } panelOffsets.Remove(pn.id); }
+            if (GUI.Button(new Rect(620, 426, 200, 32), "Put them back", slim)) ResetPanels();
         }
         static bool displayOpen; static int resPick = -1;
         // Full screen is always borderless at the monitor's own size (playtest note 121, Chris, 2026-10-11: "going full screen at

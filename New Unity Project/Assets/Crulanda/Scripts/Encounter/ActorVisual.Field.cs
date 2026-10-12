@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace Crulanda.Encounter
 {
@@ -56,7 +56,7 @@ namespace Crulanda.Encounter
         public float StrokePhase { get { return HoeK; } }
         float HoeK { get { return Mathf.Repeat(hoeTime / StrokePeriod, 1); } }
         /// <summary>The back's slight bend for the stroke (a draw hoe is worked nearly upright), a little more as it draws.</summary>
-        float HoeBend() { StrokeAt(HoeK, out _, out _, out float draw); return 22 + draw * 8; }   // bent a little more over the shaft, so the front arm reaches 45-60 cm down it with relaxed shoulders (note 168)
+        float HoeBend() { StrokeAt(HoeK, out _, out _, out float draw); return 30 + draw * 8; }   // bent a little more over the shaft, so the front arm reaches 45-60 cm down it with relaxed shoulders (note 168)
         /// <summary>The blade's edge this frame, and whether it is in the soil (the draw), for tests.</summary>
         public Vector3 BladeEdge { get; private set; }
         public bool BladeInSoil { get; private set; }
@@ -113,7 +113,22 @@ namespace Crulanda.Encounter
                 var across = Vector3.ProjectOnPlane(model.MiddleL.position - model.HandL.position, dir); var want = Vector3.ProjectOnPlane(front - model.HandL.position, dir);
                 if (across.sqrMagnitude > 1e-6f && want.sqrMagnitude > 1e-6f) PointBone(model.HandL, model.MiddleL.position - model.HandL.position, (model.MiddleL.position - model.HandL.position) + (want.normalized - across.normalized) * .03f, 1);
             }
-            Vector3 gL = Grip(model.HandL, model.MiddleL); HandSpread = Vector3.Distance(gR, gL);
+            Vector3 gL = Grip(model.HandL, model.MiddleL);
+            // A front arm too short for the mark leaves the fists closer than 45 cm (38-44 cm in the step-5 frames): the top hand slides
+            // back up the same shaft line instead (the shaft does not move), so the spread is kept whatever the arm could reach.
+            for (int pass = 0; pass < 2; pass++)
+            {
+                float along = Vector3.Dot(gL - gR, dir); float want = Mathf.Clamp(along, HoeHandsMin + .01f, HoeHandsMax - .01f);
+                if (Mathf.Abs(want - along) < .005f) break;
+                float back = want - along;   // how far the top hand slides up the shaft (dir points down it)
+                if (back > 0 && dir.y < -.05f) { float sh = Mathf.Min(model.UpperArmL.position.y, model.UpperArmR.position.y) - .1f; back = Mathf.Min(back, Mathf.Max(0, (sh - gR.y) / -dir.y)); }   // never over the shoulder (note 164)
+                if (back > 0) { var chP = model.Chest != null ? model.Chest.position : foot + up * 1.3f; float aheadNow = Vector3.Dot(gR - chP, ahead), lose = -Vector3.Dot(dir, ahead); if (lose > .05f) back = Mathf.Min(back, Mathf.Max(0, (aheadNow - .28f) / lose)); }   // and still ahead of the chest
+                if (back < .005f && want > along) break;
+                var to = gR - dir * back;
+                Reach(model.UpperArmR, model.LowerArmR, model.HandR, to - (Grip(model.HandR, model.MiddleR) - model.HandR.position), -up + side * .8f - ahead * .3f);
+                gR = Grip(model.HandR, model.MiddleR);
+            }
+            HandSpread = Vector3.Distance(gR, gL);
             { var ch = model.Chest != null ? model.Chest.position : foot + up * 1.3f; float sh = Mathf.Min(model.UpperArmL.position.y, model.UpperArmR.position.y);
               PoseHandOverShoulder = Mathf.Max(gL.y, gR.y) - sh; PoseHandAhead = Mathf.Min(Vector3.Dot(gL - ch, ahead), Vector3.Dot(gR - ch, ahead));
               PoseElbowOverShoulder = Mathf.Max(model.LowerArmL.position.y - model.UpperArmL.position.y, model.LowerArmR.position.y - model.UpperArmR.position.y); }

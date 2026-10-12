@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using Crulanda.Gameplay;
 
@@ -91,7 +91,7 @@ namespace Crulanda.Encounter
             // The movable panels (playtest note 97): each drawn where the player put it (EncounterHud.Display, PanelOffset).
             using (mFrames.Auto()) { At("frames"); DrawPlayerFrame(); DrawPartyFrame(); if (session.Target != null) DrawTargetFrame(); else if (session.HasFriendlyFocus) DrawFriendFrame(); }
             using (mMap.Auto()) { At("minimap"); maps.DrawMinimap(session, gold); }
-            using (mPanels.Auto()) { At("tracker"); DrawQuestTracker(); At(null); DrawChat(); DrawCenter(); At("bar"); DrawActionBar(); DrawPetBar(); DrawMicroMenu(); DrawXpBar(); At(null); }
+            using (mPanels.Auto()) { At("tracker"); DrawQuestTracker(); At(null); DrawChat(); DrawCenter(); At("bar"); DrawActionBar(); At("pet"); DrawPetBar(); At("bar"); DrawMicroMenu(); DrawXpBar(); At(null); }
             var windows = mWindows.Auto();
             if (session.CharacterOpen) DrawCharacter();
             if (session.VendorNpc != null) DrawVendor();
@@ -101,7 +101,7 @@ namespace Crulanda.Encounter
             if (session.MapOpen) maps.DrawWindow(session, gold, ink);
             if (session.QuestBookOpen) DrawQuestBook();
             if (session.WhoOpen) DrawWho();
-            if (session.MeterOpen) DrawMeter();
+            if (session.MeterOpen) { At("meter"); DrawMeter(); At(null); }
             if (session.ScorecardOpen) DrawScorecard();
             if (session.Conversation != null) DrawConversation();
             DrawLoot();

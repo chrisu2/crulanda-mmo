@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR
+#if UNITY_EDITOR
 using System;
 using System.Collections;
 using System.IO;
@@ -64,10 +64,13 @@ namespace Crulanda.Tests
             float reach = Mathf.Max(inn.Half.x, inn.Half.y) + 3;
             Vector3 pos = inn.transform.TransformPoint(new Vector3(reach, 0, 0));
             IEnumerator Settle(Vector3 camera, Vector3 at) { for (float t = 0; t < .8f; t += Time.deltaTime) { RoofFade.UpdateAll(camera, at + Vector3.up * 1.5f, at + Vector3.up * .7f); yield return null; } }
-            int OthersFaded() { return RoofFade.All.Count(o => o != inn && o.FadedBigParts > 0); }
+            string OthersFaded(Vector3 c, Vector3 at) { var t = at + Vector3.up * 1.5f; var bo = at + Vector3.up * .7f;
+                bool Crosses(RoofFade o, Vector3 to) { var d = to - c; float len = d.magnitude; foreach (var rr in o.GetComponentsInChildren<Renderer>()) { var bb = rr.bounds; bb.Expand(.3f); if (bb.Contains(c) || bb.IntersectRay(new Ray(c, d / len), out float hh) && hh < len) return true; } return false; }
+                var way = RoofFade.All.Where(o => Crosses(o, t) || Crosses(o, bo)).ToList();   // a building whose own parts' boxes cross the line of sight is in the way (the fade works by those boxes)
+                return string.Join(",", RoofFade.All.Where(o => o != inn && !way.Contains(o) && o.FadedBigParts > 0).Select(o => o.name)); }
             // Not in the way: the camera on the player's side.
-            yield return Settle(inn.transform.TransformPoint(new Vector3(reach + 5, 2.5f, 0)), pos);
-            Assert.AreEqual(0, inn.FadedBigParts, "a house not in the way is solid"); Assert.AreEqual(0, OthersFaded(), "no other building fades");
+            var cam0 = inn.transform.TransformPoint(new Vector3(reach + 5, 2.5f, 0)); yield return Settle(cam0, pos);
+            Assert.AreEqual(0, inn.FadedBigParts, "a house not in the way is solid"); Assert.AreEqual("", OthersFaded(cam0, pos), "no building out of the way fades");
             // In the way: the camera beyond the inn, the view straight through it (checked by a ray, round the inn until one is blocked).
             bool blocked = false; Vector3 cam = Vector3.zero;
             for (int k = 0; k < 16 && !blocked; k++)

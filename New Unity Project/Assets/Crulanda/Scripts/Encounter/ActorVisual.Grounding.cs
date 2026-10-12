@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace Crulanda.Encounter
 {
@@ -12,7 +12,9 @@ namespace Crulanda.Encounter
     {
         /// <summary>The toe bone's height over the sole of the shoe.</summary>
         public const float ToeRest = 0f, GroundFixMax = .2f;
-        float groundFix; bool groundBaseSet; float groundBaseY;
+        /// <summary>Per-foot planting (WIP 2026-10-12): off until it stops lifting the player 77 cm in GroundingTests.</summary>
+        public static bool PlantFeet = false;
+        Vector3 plantLast; float groundFix; bool groundBaseSet; float groundBaseY;
         /// <summary>The lower foot's sole over the ground under it this frame (m; negative is sunk), after the fix.</summary>
         public float SoleGap { get; private set; }
         public float GroundFix { get { return groundFix; } }
@@ -42,6 +44,35 @@ namespace Crulanda.Encounter
             groundFix = Mathf.MoveTowards(groundFix, want, Mathf.Max(.02f, Mathf.Abs(want - groundFix)) * Mathf.Min(1, Time.deltaTime * 12));
             var lp = model.Model.localPosition; lp.y = groundBaseY + groundFix / scale; model.Model.localPosition = lp;
             SoleGap = gap + (want - groundFix) * 0;   // measured before this frame's move
+            if (PlantFeet && Pose == ActorPose.None) { PlantFoot(model.UpperLegL, model.LowerLegL, model.FootL, model.BallL); PlantFoot(model.UpperLegR, model.LowerLegR, model.FootR, model.BallR); }
+        }
+        /// <summary>FootTests (bx, 13:27): the idle had the right foot turned 52 degrees and the left toes 7 cm up; the walk set a toe 4-9 cm
+        /// into the ground. A foot that is down (its ball within 8 cm of the ground) is turned to point within 20 degrees of the body's
+        /// heading, and its leg is reached so the ball rests on the ground, the knee bending forward.</summary>
+        void PlantFoot(Transform thigh, Transform calf, Transform foot, Transform ball)
+        {
+            if (thigh == null || calf == null || foot == null || ball == null) return;
+            float g = GroundUnder(ball.position, transform.position.y - 1), gap = ball.position.y - ToeRest - g;
+            if (gap > .08f || gap < -.15f) return;
+            var fwd = transform.forward; fwd.y = 0; if (fwd.sqrMagnitude < 1e-4f) return; fwd.Normalize();
+            var along = ball.position - foot.position; along.y = 0;
+            if (along.sqrMagnitude > 1e-5f)
+            {
+                float yaw = Vector3.SignedAngle(along, fwd, Vector3.up), lim = 18;
+                if (Mathf.Abs(yaw) > lim) foot.rotation = Quaternion.AngleAxis(yaw - Mathf.Sign(yaw) * lim, Vector3.up) * foot.rotation;
+            }
+            // Down to (or up onto) the ground: the ankle moved by the ball's gap, the leg reached to it, the foot's turn kept.
+            var still = transform.position - plantLast; still.y = 0; float speed = Time.deltaTime > 0 ? still.magnitude / Time.deltaTime : 0;
+            float w = speed < .3f ? 1 : Mathf.InverseLerp(.08f, .03f, gap);   // standing: planted; moving: fading in as the foot comes down, so a lifting step is not pinned
+            if (foot == model.FootR) plantLast = transform.position;
+            // Flat on the ground, not up on its toes (FootTests: tilt 40-67 against 25 standing): the foot pitched back toward a 25 degree ankle-to-ball slope.
+            { var d = ball.position - foot.position; float tilt = Mathf.Atan2(-d.y, new Vector2(d.x, d.z).magnitude) * Mathf.Rad2Deg;
+              if (tilt > 32) { var axis = Vector3.Cross(Vector3.up, new Vector3(d.x, 0, d.z)).normalized; if (axis.sqrMagnitude > .5f) foot.rotation = Quaternion.AngleAxis(-(tilt - 32) * w, axis) * foot.rotation; } }
+            gap = ball.position.y - ToeRest - g;
+            if (w <= 0) return;
+            var keep = foot.rotation; var ankle = foot.position + Vector3.down * (gap * w);
+            Reach(thigh, calf, foot, ankle, transform.forward);
+            foot.rotation = keep;
         }
     }
 }

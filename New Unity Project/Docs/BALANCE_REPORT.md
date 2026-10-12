@@ -1,106 +1,93 @@
-# Balance report (harness v4, 2026-10-12)
+# Balance report: retune round 1 (2026-10-12, 18:45)
 
-Harness: `Assets/Crulanda/Tests/PlayMode/BalanceHarness.cs` (PlayMode, Explicit, Category "Balance").
-Every class and every talent branch at level 15, in standard gear: an uncommon level-15 piece in each of the 9 slots, all 9 worn for all 8 classes.
-Fights last 90 s with 3 seeds, a fixed 0.05 s timestep, and dummies at 5M HP.
-Raw CSV: `D:\crulanda-work\outputs\balance\balance-mage-archivist-saltmender-warrior-druid-paladin-ranger-rogue.csv`.
-Each build is flagged when it is more than 15% off its role's median in that scenario. Roles with a single build (utility) are not flagged.
+Harness: `Assets/Crulanda/Tests/PlayMode/BalanceHarness.cs`. It runs all 8 classes and every talent build at level 15 in standard gear (9 of 9 slots worn). Fights last 90 s on 3 seeds with a fixed 0.05 s step, and a full run of all 8 classes takes about 6 min.
+"Before" is harness v5 with no retune (`Docs/balance_v5_before.csv`). "After" is the retuned game (`Docs/balance_v5_after.csv`).
 
-## Harness fixes this round
-- **HPS read 0.** The heal test still had the last enemy selected, and every slot was tried in bar order, so the filler damage spell always went first. Now the heal test clears the target, moves the foes 80 m away, and tries heal-effect abilities first.
-- **Seeds were identical.** Combat has no damage or crit rolls, so the fight is deterministic and `Random.InitState` changed nothing. Now each seed changes the opening: a start delay of 0.4 s per seed, a different tie order among equal abilities, and a rotated splash spread. Some kits still come out identical across seeds (sd 0). That is real determinism, not a bug.
-- **AoE equal to single target.** The bar-order rotation never got past the filler. It now uses cooldown-first priority (cooldowns when ready, the filler last). A new `foes_hit` column counts the dummies that took damage.
-- **Gear 0 of 9.** Gear was equipped before the level was set, so every level-15 item was refused. Fixed by setting the level first.
-- **Class filter.** `CRULANDA_BALANCE_CLASSES=mage,archivist` selects classes, and each set writes `balance-<set>.csv`. The whole run of 8 classes takes about 5 min, not hours, because of the fixed timestep.
+## Harness checks this round
+- **Casts are let finish.** The rotation waits while `PlayerCasting` is true.
+- **Mana-aware rotation.** A costly ability waits while the pool would drop under 20%. The cheapest filler never waits. No build runs dry any more: in v4 Paladin and Rogue went OOM in about 6 s.
+- **Per-ability use counts.** Seed 0 writes a `# uses` line per build to the CSV, so a kit's rotation can be read straight off it.
+- **Druid.** The use counts show thornsong spamming `seedshot` (47 casts, 12 DPS) and rootmend casting cat abilities (`rake`). In the heal test, rootmend casts only `swiftroot` (6 casts, 3.3 HPS). The harness does take the form (`druid.<branch>`), so either the form isn't sticking after `Kit.ClearTransient` or the Thornsong and Rootmend kits are really this weak. **Not retuned yet; I need to look into the kit first.**
+- **Archivist splash.** `echo_jar` is the class's only splash. It has a long cooldown and goes off once a fight, so 1 of 3 dummies hit is the kit's real behaviour, not a reach problem. It has no AoE build.
+- **Mage combustion** used its whole rotation (ember_bolt, scorch, smoulder, flare, cinder_field). It really was low, so it was retuned up.
 
-## Known harness caveats (before reading the outliers)
-- The rotation is crude and the same for every class. Kits that rely on combo builders or form cycling, or that need procs set up, will read low.
-- **Druid thornsong (12 DPS)** and **druid rootmend in the heal test (3.3 HPS)**: rootmend's seed sd of about 31 in single target suggests the form or opener fails on some seeds. Check these before any retune.
-- **Archivist** builds hit only 1 of 3 dummies in AoE, and their numbers are flat across seeds. Its reach-limited jar splash may not be in the cooldown-first priority, or the dummies sit outside JarReach.
-- **Rogue** and **Warrior support/tank** builds hit only 1 of 3. That may be correct for single-target kits.
-- Time to OOM is short for Paladin (about 6 s) and Rogue (about 6-12 s). After that they run on regeneration.
+## Retune
+`Scripts/Encounter/EncounterSession.RoleScale.cs` holds `BuildDamageScale`. It scales the player's own blows by the build they have spent the most points in, applied in `EncounterEnemy.Receive`.
+- Pets are not scaled. That is why the Ranger factors are steeper: the pet's share stays in.
+- Healing, crowd control and utility are not touched.
 
-## Results
+| build | scale |
+|---|---|
+| ranger/marksman | ×0.67 |
+| ranger/skirmisher | ×0.80 |
+| druid/thornclaw | ×0.80 |
+| paladin/judicator | ×0.92 |
+| mage/combustion | ×1.65 |
+| archivist/the-unwriting | ×2.4 |
+| ranger/pathfinder | ×0.43 (cap) |
+| rogue/thiefs-grace | ×0.82 (cap) |
+| rogue/swashbuckler | ×0.72 (cap) |
+| paladin/vanguard | ×0.92 (cap) |
+| warrior/support | ×0.93 (cap) |
+| warrior/jailer | ×0.93 (cap) |
+| paladin/sanctuary | ×0.62 (cap) |
+| saltmender/mender | ×0.85 (cap) |
 
-### single
+**Role caps** (note 177; Chris 18:22: "control classes should not be top tier dps for sure" / "or healers"). Measured on single-target DPS against the DPS-role median:
+- healer at most 50%
+- control and support at most 75%
+- 3 points of slack, for "about"
 
-| class | build | role | DPS | ±sd | HPS | foes hit | OOM s | vs role median | flag |
-|---|---|---|---|---|---|---|---|---|---|
-| archivist | the-lull | control | 22.5 | 0.0 | 0.0 | 1 | - | -53% (n=6) | **OUTLIER** |
-| mage | heatweaver | control | 48.0 | 3.0 | 0.0 | 1 | - | +1% (n=6) |  |
-| ranger | pathfinder | control | 83.6 | 0.9 | 0.0 | 1 | 33.1 | +76% (n=6) | **OUTLIER** |
-| rogue | thiefs-grace | control | 58.8 | 0.8 | 0.0 | 1 | 9.0 | +24% (n=6) | **OUTLIER** |
-| saltmender | salt-speaker | control | 35.4 | 2.1 | 0.0 | 1 | 25.5 | -25% (n=6) | **OUTLIER** |
-| warrior | jailer | control | 46.7 | 0.3 | 0.0 | 1 | 28.2 | -1% (n=6) |  |
-| archivist | the-unwriting | dps | 26.1 | 0.2 | 0.0 | 1 | - | -61% (n=10) | **OUTLIER** |
-| druid | thornclaw | dps | 91.8 | 0.3 | 0.0 | 1 | - | +36% (n=10) | **OUTLIER** |
-| druid | thornsong | dps | 12.2 | 0.1 | 0.0 | 1 | - | -82% (n=10) | **OUTLIER** |
-| mage | combustion | dps | 38.3 | 6.3 | 0.0 | 1 | - | -43% (n=10) | **OUTLIER** |
-| paladin | judicator | dps | 82.0 | 1.3 | 0.0 | 1 | 6.1 | +22% (n=10) | **OUTLIER** |
-| ranger | marksman | dps | 98.5 | 2.6 | 0.0 | 1 | 51.0 | +46% (n=10) | **OUTLIER** |
-| ranger | skirmisher | dps | 88.0 | 0.6 | 0.0 | 1 | 39.2 | +31% (n=10) | **OUTLIER** |
-| rogue | shardwork | dps | 70.2 | 1.6 | 0.0 | 1 | 11.6 | +4% (n=10) |  |
-| saltmender | sifter | dps | 64.5 | 0.3 | 0.0 | 1 | 30.0 | -4% (n=10) |  |
-| warrior | dps | dps | 61.6 | 0.4 | 0.0 | 1 | 38.0 | -8% (n=10) |  |
-| archivist | the-cantor | healer | 22.7 | 0.2 | 0.0 | 1 | - | -8% (n=4) |  |
-| druid | rootmend | healer | 21.8 | 30.8 | 0.0 | 1 | - | -12% (n=4) |  |
-| paladin | sanctuary | healer | 54.8 | 0.2 | 0.0 | 1 | 18.7 | +122% (n=4) | **OUTLIER** |
-| saltmender | mender | healer | 26.8 | 0.8 | 0.0 | 1 | 24.1 | +8% (n=4) |  |
-| mage | bonecaller | pet | 39.1 | 2.7 | 3.6 | 1 | - | -44% (n=2) | **OUTLIER** |
-| ranger | beastbond | pet | 100.2 | 0.2 | 0.0 | 1 | 34.5 | +44% (n=2) | **OUTLIER** |
-| archivist | the-still-vow | support | 15.6 | 0.0 | 0.0 | 1 | - | -67% (n=5) | **OUTLIER** |
-| mage | spellbinder | support | 40.0 | 3.2 | 0.0 | 1 | - | -16% (n=5) | **OUTLIER** |
-| paladin | vanguard | support | 54.6 | 2.0 | 0.0 | 1 | 6.1 | +15% (n=5) |  |
-| rogue | swashbuckler | support | 71.9 | 0.8 | 0.0 | 1 | 5.8 | +51% (n=5) | **OUTLIER** |
-| warrior | support | support | 47.6 | 0.3 | 0.0 | 1 | 30.7 | +0% (n=5) |  |
-| druid | barkhide | tank | 42.9 | 4.3 | 0.0 | 1 | - | -4% (n=4) |  |
-| paladin | oathguard | tank | 55.1 | 0.9 | 0.0 | 1 | 6.1 | +23% (n=4) | **OUTLIER** |
-| saltmender | mason | tank | 37.2 | 0.3 | 0.0 | 1 | 21.0 | -17% (n=4) | **OUTLIER** |
-| warrior | tank | tank | 46.4 | 0.9 | 0.0 | 1 | 48.1 | +4% (n=4) |  |
-| rogue | locksmith | utility | 51.9 | 0.2 | 0.0 | 1 | 6.2 | +0% (n=1) |  |
+`BalanceHarness.CapViolations` fails the harness run when a build breaks its cap. It caught pathfinder at 84% on the first retune pass, and the scale was lowered after that.
 
-### aoe3
+## Before and after
+DPS-role median (single target): before 68.7, after 69.5.
 
-| class | build | role | DPS | ±sd | HPS | foes hit | OOM s | vs role median | flag |
-|---|---|---|---|---|---|---|---|---|---|
-| archivist | the-lull | control | 22.7 | 0.2 | 0.0 | 1 | - | -53% (n=6) | **OUTLIER** |
-| mage | heatweaver | control | 48.5 | 3.2 | 0.0 | 3 | - | +1% (n=6) |  |
-| ranger | pathfinder | control | 67.5 | 0.8 | 0.0 | 3 | 21.6 | +41% (n=6) | **OUTLIER** |
-| rogue | thiefs-grace | control | 59.9 | 0.2 | 0.0 | 1 | 8.1 | +25% (n=6) | **OUTLIER** |
-| saltmender | salt-speaker | control | 36.9 | 0.3 | 0.0 | 3 | 24.3 | -23% (n=6) | **OUTLIER** |
-| warrior | jailer | control | 47.3 | 0.6 | 0.0 | 3 | 24.0 | -1% (n=6) |  |
-| archivist | the-unwriting | dps | 26.1 | 0.2 | 0.0 | 1 | - | -61% (n=10) | **OUTLIER** |
-| druid | thornclaw | dps | 90.4 | 0.0 | 0.0 | 1 | - | +36% (n=10) | **OUTLIER** |
-| druid | thornsong | dps | 12.4 | 0.1 | 0.0 | 1 | - | -81% (n=10) | **OUTLIER** |
-| mage | combustion | dps | 42.9 | 4.5 | 0.0 | 3 | - | -36% (n=10) | **OUTLIER** |
-| paladin | judicator | dps | 87.4 | 3.1 | 0.0 | 3 | 22.5 | +31% (n=10) | **OUTLIER** |
-| ranger | marksman | dps | 91.7 | 1.6 | 0.0 | 3 | 52.5 | +37% (n=10) | **OUTLIER** |
-| ranger | skirmisher | dps | 68.2 | 1.5 | 0.0 | 3 | 35.2 | +2% (n=10) |  |
-| rogue | shardwork | dps | 71.2 | 1.3 | 0.0 | 1 | 15.6 | +7% (n=10) |  |
-| saltmender | sifter | dps | 64.5 | 0.3 | 0.0 | 3 | 30.5 | -3% (n=10) |  |
-| warrior | dps | dps | 65.2 | 0.4 | 0.0 | 3 | 46.0 | -2% (n=10) |  |
-| archivist | the-cantor | healer | 22.7 | 0.2 | 0.0 | 1 | - | -10% (n=4) |  |
-| druid | rootmend | healer | 22.0 | 31.1 | 0.0 | 1 | - | -13% (n=4) |  |
-| paladin | sanctuary | healer | 55.5 | 0.0 | 0.0 | 3 | 6.1 | +120% (n=4) | **OUTLIER** |
-| saltmender | mender | healer | 27.9 | 0.0 | 0.0 | 3 | 26.3 | +10% (n=4) |  |
-| mage | bonecaller | pet | 39.3 | 3.4 | 0.1 | 3 | - | -27% (n=2) | **OUTLIER** |
-| ranger | beastbond | pet | 68.5 | 0.7 | 0.0 | 3 | 37.0 | +27% (n=2) | **OUTLIER** |
-| archivist | the-still-vow | support | 15.6 | 0.0 | 0.0 | 1 | - | -66% (n=5) | **OUTLIER** |
-| mage | spellbinder | support | 40.4 | 2.9 | 0.0 | 3 | - | -13% (n=5) |  |
-| paladin | vanguard | support | 54.9 | 2.2 | 0.0 | 3 | 6.1 | +18% (n=5) | **OUTLIER** |
-| rogue | swashbuckler | support | 71.4 | 1.4 | 0.0 | 1 | 6.1 | +54% (n=5) | **OUTLIER** |
-| warrior | support | support | 46.4 | 1.6 | 0.0 | 1 | 37.1 | +0% (n=5) |  |
-| druid | barkhide | tank | 46.0 | 0.0 | 0.0 | 3 | - | -2% (n=4) |  |
-| paladin | oathguard | tank | 55.6 | 0.1 | 0.0 | 3 | 6.5 | +18% (n=4) | **OUTLIER** |
-| saltmender | mason | tank | 37.0 | 0.0 | 0.0 | 3 | 22.5 | -21% (n=4) | **OUTLIER** |
-| warrior | tank | tank | 47.9 | 0.6 | 0.0 | 1 | 45.9 | +2% (n=4) |  |
-| rogue | locksmith | utility | 51.4 | 0.7 | 0.0 | 1 | 5.2 | +0% (n=1) |  |
+| class | build | role | single DPS before | after | % of DPS median before | after | cap | 3-target DPS after (foes hit) | OOM s after | status |
+|---|---|---|---|---|---|---|---|---|---|---|
+| mage | heatweaver | control | 48.0 | 48.0 | 70% | 69% | 75% | 48.5 (3) | - | ok |
+| warrior | jailer | control | 51.7 | 47.9 | 75% | 69% | 75% | 47.9 (2) | - | ok |
+| rogue | thiefs-grace | control | 58.1 | 47.5 | 85% | 68% | 75% | 47.3 (1) | - | ok |
+| ranger | pathfinder | control | 81.6 | 47.0 | 119% | 68% | 75% | 28.2 (3) | - | ok |
+| saltmender | salt-speaker | control | 39.5 | 39.5 | 57% | 57% | 75% | 40.9 (3) | 28.5 | ok |
+| archivist | the-lull | control | 22.5 | 22.5 | 33% | 32% | 75% | 22.7 (1) | - | ok |
+| paladin | judicator | dps | 80.1 | 73.7 | 117% | 106% | - | 71.7 (3) | - | ok |
+| ranger | marksman | dps | 99.5 | 73.6 | 145% | 106% | - | 61.0 (3) | - | ok |
+| ranger | skirmisher | dps | 86.1 | 73.2 | 125% | 105% | - | 50.9 (3) | - | ok |
+| druid | thornclaw | dps | 91.8 | 73.2 | 134% | 105% | - | 72.2 (1) | - | ok |
+| warrior | dps | dps | 68.7 | 70.2 | 100% | 101% | - | 69.2 (3) | - | ok |
+| rogue | shardwork | dps | 68.8 | 68.8 | 100% | 99% | - | 66.6 (1) | - | ok |
+| saltmender | sifter | dps | 65.7 | 65.7 | 96% | 95% | - | 65.7 (3) | - | ok |
+| mage | combustion | dps | 38.3 | 63.3 | 56% | 91% | - | 71.0 (3) | - | ok |
+| archivist | the-unwriting | dps | 26.1 | 62.9 | 38% | 91% | - | 62.9 (1) | - | ok |
+| druid | thornsong | dps | 12.2 | 12.2 | 18% | 18% | - | 12.4 (1) | - | **still off** |
+| paladin | sanctuary | healer | 52.2 | 32.5 | 76% | 47% | 50% | 31.9 (3) | - | ok |
+| saltmender | mender | healer | 38.3 | 32.3 | 56% | 46% | 50% | 33.6 (3) | 31.7 | ok |
+| archivist | the-cantor | healer | 22.7 | 22.7 | 33% | 33% | 50% | 22.7 (1) | - | ok |
+| druid | rootmend | healer | 21.8 | 21.8 | 32% | 31% | 50% | 22.0 (1) | - | ok |
+| ranger | beastbond | pet | 96.7 | 96.7 | 141% | 139% | - | 66.1 (3) | - | - |
+| mage | bonecaller | pet | 39.1 | 39.1 | 57% | 56% | - | 39.3 (3) | - | - |
+| paladin | vanguard | support | 52.5 | 48.3 | 76% | 70% | 75% | 48.5 (3) | - | ok |
+| rogue | swashbuckler | support | 67.1 | 48.3 | 98% | 70% | 75% | 47.9 (1) | - | ok |
+| warrior | support | support | 51.7 | 47.7 | 75% | 69% | 75% | 47.1 (1) | - | ok |
+| mage | spellbinder | support | 40.0 | 40.0 | 58% | 58% | 75% | 40.4 (3) | - | ok |
+| archivist | the-still-vow | support | 15.6 | 15.6 | 23% | 22% | 75% | 15.6 (1) | - | ok |
+| paladin | oathguard | tank | 52.5 | 52.5 | 76% | 76% | - | 52.6 (3) | - | - |
+| warrior | tank | tank | 48.8 | 48.1 | 71% | 69% | - | 48.6 (1) | - | - |
+| druid | barkhide | tank | 42.1 | 42.1 | 61% | 61% | - | 45.2 (3) | - | - |
+| saltmender | mason | tank | 41.2 | 41.2 | 60% | 59% | - | 40.9 (3) | 27.0 | - |
+| rogue | locksmith | utility | 56.3 | 56.3 | 82% | 81% | - | 56.2 (1) | - | - |
 
-### heal
+### Healer HPS (heal test: player hurt 4%/s, no foe in reach)
 
-| class | build | role | DPS | ±sd | HPS | foes hit | OOM s | vs role median | flag |
-|---|---|---|---|---|---|---|---|---|---|
-| archivist | the-cantor | healer | 0.0 | 0.0 | 24.6 | 0 | - | +6% (n=4) |  |
-| druid | rootmend | healer | 0.0 | 0.0 | 3.3 | 0 | - | -86% (n=4) | **OUTLIER** |
-| paladin | sanctuary | healer | 0.0 | 0.0 | 25.3 | 0 | - | +9% (n=4) |  |
-| saltmender | mender | healer | 0.0 | 0.0 | 22.0 | 0 | - | -6% (n=4) |  |
+| class | build | HPS before | after |
+|---|---|---|---|
+| archivist | the-cantor | 24.6 | 24.6 |
+| druid | rootmend | 3.3 | 3.3 |
+| paladin | sanctuary | 25.3 | 25.3 |
+| saltmender | mender | 23.4 | 23.4 |
+## Still open
+- **Druid thornsong** (18% of the DPS median) and **rootmend HPS** (3.3): see the Druid check above. They need a look at the kit or form before any number changes.
+- **Ranger beastbond** (pet, 139%). Its damage is almost all the pet, which `BuildDamageScale` doesn't touch. It is the only pet build besides Bonecaller (57%), so the pet role is far apart. Next step is a pet damage scale.
+- **Archivist builds and Mage spellbinder** are well under their caps (Archivist 22-33%, spellbinder 59%). Under a cap is allowed. Whether they're viable depends on the value of their crowd control and support, which this harness doesn't measure.
+- **Tanks** have no cap. Paladin oathguard is at 77% of the DPS median.

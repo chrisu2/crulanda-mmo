@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.AI;
 using Crulanda.Gameplay;
 using Crulanda.Combat;
@@ -354,7 +354,7 @@ namespace Crulanda.Encounter
             if (!actor.IsAlive || Inside != null) return;   // inside its machine, nothing reaches it
             if (Hidden) Pounce();
             if (TappedBy == null && source != null && !Game) TappedBy = source.EntityId.Value;
-            int actual = actor.GetComponent<Combatant>().Damage(Mathf.RoundToInt(damage * session.Kit.PartyDamageMultiplier(this) * OverTakenNow));
+            int actual = actor.GetComponent<Combatant>().Damage(Mathf.RoundToInt(damage * session.Kit.PartyDamageMultiplier(this) * OverTakenNow * (source != null && source == session.Player ? session.PlayerDamageScale : 1)));
             if (!Game && source != null) session.Meter.Damage(source, actual);
             if (actor.IsAlive && Figure != null) Figure.Flinch();
             if (actor.IsAlive) ControlStruck();   // a hold breaks on damage (EncounterEnemy.Control)

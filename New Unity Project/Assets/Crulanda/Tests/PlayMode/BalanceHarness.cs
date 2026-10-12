@@ -72,6 +72,8 @@ namespace Crulanda.Tests
             File.WriteAllLines(Path.Combine(Out, CsvName), csv);
             File.WriteAllText(Path.Combine(Out, CsvName.Replace(".csv", "") + "_TABLE.md"), Table(csv));
             Assert.Greater(csv.Count, 1, "rows");
+            var over = CapViolations(csv); File.WriteAllLines(Path.Combine(Out, "role_caps.txt"), over.DefaultIfEmpty("all non-DPS builds under their caps"));
+            Assert.IsEmpty(over, "non-DPS builds over their damage cap (note 177): " + string.Join("; ", over));
         }
 
         /// <summary>Standard gear: an uncommon piece at level 15 in every slot (ItemDatabase.GearId, seed 7), bagged and worn.</summary>
@@ -132,6 +134,9 @@ namespace Crulanda.Tests
                 .OrderByDescending(i => targets == 0 && s.Kit.ActionAt(i).effect == AbilityEffect.Heal ? 1 : 0)   // the heal test: mends first
                 .ThenByDescending(i => s.Kit.ActionAt(i).cooldown)   // cooldowns (the splashes, the big hits) when ready, the filler last
                 .ThenBy(i => (i + seed) % Math.Max(1, s.Kit.ActionCount)).ToList();
+            int cheapest = order.Where(i => !Never.Contains(s.Kit.ActionAt(i).id) && !Once.Contains(s.Kit.ActionAt(i).id) && (targets == 0 ? s.Kit.ActionAt(i).effect == AbilityEffect.Heal : s.Kit.ActionAt(i).effect == AbilityEffect.Damage))
+                .OrderBy(i => s.Kit.ActionAt(i).cost).DefaultIfEmpty(-1).First();
+            var uses = new Dictionary<string, int>();
             s.Meter.Reset(); var pool = s.Player.Resource.Pool; int last = pool.Current, used = 0; float oom = -1, t = 0, hurt = 0;
             Time.captureDeltaTime = Step;
             while (t < FightSeconds)
@@ -140,10 +145,13 @@ namespace Crulanda.Tests
                 if (targets > 0 && (s.Target == null || !s.Target.actor.IsAlive)) { var f = foes.FirstOrDefault(x => x != null && x.actor.IsAlive); if (f != null) s.Select(f); }
                 if (targets == 0) { hurt += dt; if (hurt >= 1) { hurt -= 1; s.Player.Health.ApplyDamage(Mathf.Min(s.Player.Health.Pool.Current - 1, Mathf.RoundToInt(s.Player.Health.Pool.Max * .04f))); } }
                 if (s.Player.Health.Pool.Current < s.Player.Health.Pool.Max * .3f && targets > 0) s.Player.Health.Pool.Fill();
+                if (!s.PlayerCasting)   // a cast in hand is let finish
                 foreach (int slot in order)
                 {
                     var ab = s.Kit.ActionAt(slot); if (ab == null || s.Kit.ActionLockLabel(slot) != null || Never.Contains(ab.id) || used1.Contains(ab.id)) continue;
-                    if (s.UseAbility(slot)) { if (Once.Contains(ab.id)) used1.Add(ab.id); break; }
+                    // Mana-aware: a costly ability waits while the pool is under a fifth, the cheapest one (the filler) never waits.
+                    if (ab.cost > 0 && slot != cheapest && pool.Max > 0 && pool.Current - ab.cost < pool.Max * .2f) continue;
+                    if (s.UseAbility(slot)) { if (Once.Contains(ab.id)) used1.Add(ab.id); uses[ab.id] = (uses.TryGetValue(ab.id, out var n) ? n : 0) + 1; break; }
                 }
                 int now = pool.Current; if (now < last) used += last - now; last = now;
                 if (oom < 0 && pool.Max > 0 && pool.Ratio < .05f) oom = t;
@@ -153,9 +161,27 @@ namespace Crulanda.Tests
             int dmg = 0, heal = 0; foreach (var r in s.Meter.Rows) { dmg += r.damage; heal += r.healing; }
             if (s.Player.Health.Pool.Current <= 0) s.Player.Health.Revive(s.Player.Health.Pool.Max);
             csv.Add(string.Join(",", cls, branch.id, role, scenario, seed, t.ToString("0.0"), (dmg / t).ToString("0.0"), (heal / t).ToString("0.0"), pool.Max, used, oom < 0 ? "" : oom.ToString("0.0"), hit));
+            if (seed == 0) csv.Add("# uses " + cls + " " + branch.id + " " + scenario + ": " + string.Join(" ", uses.OrderByDescending(x => x.Value).Select(x => x.Key + "=" + x.Value)));
             foreach (var f in foes) if (f != null) { f.actor.Health.Pool.SetMax(5000000, false); f.actor.Health.Pool.SetCurrent(5000000); }
         }
 
+        /// <summary>Note 177 (Chris 18:22, "control classes should not be top tier dps for sure" / "or healers"): single-target DPS of each
+        /// healer, control and support build against the DPS-role median; healer at most 50%, control and support at most 75% (3 points'
+        /// slack for "about").</summary>
+        public static List<string> CapViolations(List<string> rows)
+        {
+            var data = rows.Skip(1).Select(l => l.Split(',')).Where(c => c.Length >= 11 && c[3] == "single" && float.TryParse(c[6], out _)).ToList();
+            var builds = data.GroupBy(c => (c[0], c[1], c[2])).Select(g => (key: g.Key, dps: g.Average(c => float.Parse(c[6])))).ToList();
+            var dps = builds.Where(b => b.key.Item3 == "dps").Select(b => b.dps).OrderBy(x => x).ToList(); if (dps.Count == 0) return new List<string>();
+            float med = dps.Count % 2 == 1 ? dps[dps.Count / 2] : (dps[dps.Count / 2 - 1] + dps[dps.Count / 2]) / 2;
+            var bad = new List<string>();
+            foreach (var b in builds)
+            {
+                float cap = b.key.Item3.Contains("heal") ? EncounterSession.HealerDpsCap : b.key.Item3 == "control" ? EncounterSession.ControlDpsCap : b.key.Item3 == "support" ? EncounterSession.SupportDpsCap : -1;
+                if (cap > 0 && b.dps > med * (cap + .03f)) bad.Add(b.key.Item1.Replace("class.", "") + " " + b.key.Item2 + " (" + b.key.Item3 + ") " + b.dps.ToString("0.0") + " = " + (100 * b.dps / med).ToString("0") + "% of " + med.ToString("0.0") + ", cap " + (cap * 100).ToString("0") + "%");
+            }
+            return bad;
+        }
         /// <summary>Mean of the seeds a build and scenario; each build against its role's median in that scenario, flagged past 15%.</summary>
         public static string Table(List<string> rows)
         {

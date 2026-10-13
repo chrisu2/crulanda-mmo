@@ -23,6 +23,11 @@ namespace Crulanda.Encounter
         public abstract string ActionLockLabel(int slot);
         /// <summary>Runs after the session's generic checks (alive, unpaused, unlocked, off cooldown).</summary>
         public abstract bool Use(int slot);
+        /// <summary>Slots that sit on a small bar of their own, not the chosen ten (the Druid's four forms, Shift+1-4; Docs/ACTION_BAR.md).</summary>
+        public virtual int[] StanceSlots { get { return System.Array.Empty<int>(); } }
+        /// <summary>The key the chosen bar keeps for a slot: its ability's id, or the kit's own key where the slot's ability changes (the
+        /// Druid's form abilities).</summary>
+        public virtual string BookKey(int slot) { var a = ActionAt(slot); return a != null ? a.id : null; }
 
         public virtual void ApplyStats() { }
         /// <summary>Data-only reset for respawn/load, when the previous actors are being destroyed.</summary>

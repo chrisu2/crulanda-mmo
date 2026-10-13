@@ -45,3 +45,7 @@ weapon racks and crates; a training court with archery targets in a row; referen
 - `--crulanda-training-capture <folder> --crulanda-class class.cleric --crulanda-zone zone.oakhaven --crulanda-temp-save`: tf-01..tf-05.
   Last frames: `D:\crulanda-work\ui-captures\training-20261013-1417` (TESTED: TrainingFieldTests 4/4, EditMode 462/462; not yet seen in
   play by Chris).
+
+## Chris, 2026-10-13 ~15:02 (brief, verbatim; not built yet)
+
+"also have sims wonder into the fighting arena (dummies) to practice and improve their dps"

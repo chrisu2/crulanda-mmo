@@ -1275,7 +1275,8 @@ namespace Crulanda.Encounter
         /// 2026-10-11: "no way to turn off auto shot"; Esc went past it to the menu).</summary>
         public void Escape()
         {
-            if (LootOpen && !Paused) CloseLoot();
+            if (SpellbookOpen && !Paused) { SpellbookOpen = false; BookPick = null; }
+            else if (LootOpen && !Paused) CloseLoot();
             else if (Conversation != null && !Paused) Conversation = null;
             else if (VendorNpc != null && !Paused) CloseVendor();
             else if (TradesOpen && !Paused) TradesOpen = false;
@@ -1733,8 +1734,13 @@ namespace Crulanda.Encounter
             TickInvite();   // a sim's invitation lapses after thirty seconds (round 27)
 
             bool marking = EncounterInput.Sneak;   // Ctrl+1-4: raid marks on your target (CC step C3); Ctrl alone still sneaks
-            for (int slot = 0; slot < (marking ? 4 : ActionCount); slot++)
-                if (!BuildOpen && slot < 13 && EncounterInput.Press(EncounterInput.SlotKey(slot))) { if (marking) MarkTarget((RaidMark)((slot + 1) % 4)); else UseAbility(slot); }
+            if (!BuildOpen && EncounterInput.Press(KeyCode.P)) { SpellbookOpen = !SpellbookOpen; BookPick = null; }   // the spellbook (Docs/ACTION_BAR.md)
+            var stances = Kit.StanceSlots;
+            if (!marking && stances.Length > 0 && EncounterInput.Shifted)   // Shift+1-4: the stance bar (the Druid's forms)
+            { for (int i = 0; i < stances.Length && i < 9; i++) if (!BuildOpen && EncounterInput.Press(EncounterInput.SlotKey(i))) UseAbility(stances[i]); }
+            else
+                for (int slot = 0; slot < (marking ? 4 : BarSlots); slot++)   // the chosen bar: 1-0, then the slots bought with AA (EncounterSession.Bar)
+                    if (!BuildOpen && slot < 14 && EncounterInput.Press(EncounterInput.SlotKey(slot))) { if (marking) MarkTarget((RaidMark)((slot + 1) % 4)); else { int kit = BarKitSlot(slot); if (kit >= 0) UseAbility(kit); } }
             Kit.Tick(InCombat); Meter.Tick(InCombat, Time.deltaTime); TickDuo(); TendSpirit(); TendTraining();
             if (AutoAttack && !Kit.MeleeAutoAttacks && !Kit.RangedAutoAttacks) AutoAttack = false;
             // The swing in melee, or the bow's auto-shot at its range (the Ranger: ClassKit.RangedAutoAttacks).

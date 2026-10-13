@@ -91,7 +91,7 @@ namespace Crulanda.Encounter
             // The movable panels (playtest note 97): each drawn where the player put it (EncounterHud.Display, PanelOffset).
             using (mFrames.Auto()) { At("frames"); DrawPlayerFrame(); DrawPartyFrame(); if (session.Target != null) DrawTargetFrame(); else if (session.HasFriendlyFocus) DrawFriendFrame(); }
             using (mMap.Auto()) { At("minimap"); maps.DrawMinimap(session, gold); }
-            using (mPanels.Auto()) { At("tracker"); DrawQuestTracker(); At(null); DrawChat(); DrawCenter(); At("bar"); DrawActionBar(); At("pet"); DrawPetBar(); At("bar"); DrawMicroMenu(); DrawXpBar(); At(null); }
+            using (mPanels.Auto()) { At("tracker"); DrawQuestTracker(); At(null); DrawChat(); DrawCenter(); At("bar"); DrawActionBar(); At(null); if (session.SpellbookOpen) DrawSpellbook(); At("pet"); DrawPetBar(); At("bar"); DrawMicroMenu(); DrawXpBar(); At(null); }
             var windows = mWindows.Auto();
             if (session.CharacterOpen) DrawCharacter();
             if (session.VendorNpc != null) DrawVendor();
@@ -101,7 +101,7 @@ namespace Crulanda.Encounter
             if (session.MapOpen) maps.DrawWindow(session, gold, ink);
             if (session.QuestBookOpen) DrawQuestBook();
             if (session.WhoOpen) DrawWho();
-            if (session.MeterOpen) { At("meter"); DrawMeter(); At(null); }
+            if (session.MeterOpen && !BigWindowOpen) { At("meter"); DrawMeter(); At(null); }   // not over a big window (Chris, 2026-10-13: it lay over the talents)
             if (session.ScorecardOpen) DrawScorecard();
             if (session.Conversation != null) DrawConversation();
             DrawLoot();
@@ -407,14 +407,24 @@ namespace Crulanda.Encounter
         }
         void DrawActionBar()
         {
-            int n = session.ActionCount; const float size = 50, gap = 6;
+            int n = session.BarSlots; const float size = 50, gap = 6;   // the chosen bar (EncounterSession.Bar, Docs/ACTION_BAR.md)
             float total = n * (size + gap) - gap, x0 = 720 - total / 2, y = 808;
             Fill(new Rect(x0 - 12, y - 10, total + 24, 82), new Color(.07f, .06f, .05f, .9f));
             Fill(new Rect(x0 - 12, y - 10, total + 24, 2), new Color(.62f, .52f, .33f));
             string hover = null; var mouse = Event.current.mousePosition;
-            for (int i = 0; i < n; i++)
+            for (int b = 0; b < n; b++)
             {
-                var a = session.ActionAt(i); var r = new Rect(x0 + i * (size + gap), y, size, size);
+                int i = session.BarKitSlot(b); var r = new Rect(x0 + b * (size + gap), y, size, size);
+                bool placing = session.SpellbookOpen && session.BookPick != null;
+                if (i < 0)   // an empty slot: the spellbook fills it
+                {
+                    Fill(new Rect(r.x - 2, r.y - 2, r.width + 4, r.height + 4), placing ? gold : new Color(.25f, .25f, .25f)); Fill(r, new Color(.1f, .09f, .08f));
+                    Shadow(r, EncounterInput.SlotLabel(b), keybind, new Color(.6f, .6f, .6f));
+                    if (GUI.Button(r, GUIContent.none, GUIStyle.none)) { if (placing) { session.PlaceOnBar(b, session.BookPick); session.BookPick = null; } else session.SpellbookOpen = true; }
+                    if (r.Contains(mouse)) hover = "An empty slot: choose what goes here in the spellbook (" + "P)";
+                    continue;
+                }
+                var a = session.ActionAt(i);
                 float remaining = session.CooldownRemaining(i); string locked = session.ActionLockLabel(i);
                 bool usable = session.Player.IsAlive && !session.Paused && locked == null;
                 Fill(new Rect(r.x - 2, r.y - 2, r.width + 4, r.height + 4), locked == null ? new Color(.62f, .52f, .33f) : new Color(.25f, .25f, .25f));
@@ -436,20 +446,77 @@ namespace Crulanda.Encounter
                     Shadow(r, remaining < 10 ? remaining.ToString("0.0") : Mathf.CeilToInt(remaining).ToString(), abbrev, new Color(1, .95f, .6f));
                 }
                 else if (remaining > 0) Fill(r, new Color(0, 0, 0, .35f));
-                Shadow(r, EncounterInput.SlotLabel(i), keybind, new Color(.9f, .9f, .9f));
+                Shadow(r, EncounterInput.SlotLabel(b), keybind, new Color(.9f, .9f, .9f));
                 string sub = locked ?? (a.cost > 0 ? a.cost.ToString() : "");
                 if (sub.Length > 0) Shadow(new Rect(r.x, r.yMax - 16, r.width - 3, 16), sub, new GUIStyle(keybind) { alignment = TextAnchor.LowerRight, fontSize = 10 }, locked == null ? new Color(.7f, .85f, 1) : new Color(.8f, .6f, .5f));
                 Shadow(new Rect(r.x - 6, r.yMax + 2, r.width + 12, 16), a.name.Length > 10 ? a.name.Substring(0, 9) + "…" : a.name, new GUIStyle(barText) { fontSize = 10, wordWrap = false, clipping = TextClipping.Clip }, new Color(.85f, .82f, .75f));
-                if (GUI.Button(r, GUIContent.none, GUIStyle.none) && usable) session.UseAbility(i);
+                if (placing) Fill(new Rect(r.x - 2, r.y - 2, r.width + 4, 2), gold);
+                if (GUI.Button(r, GUIContent.none, GUIStyle.none)) { if (placing) { session.PlaceOnBar(b, session.BookPick); session.BookPick = null; } else if (session.SpellbookOpen) session.BookPick = session.Kit.BookKey(i); else if (usable) session.UseAbility(i); }
                 if (r.Contains(mouse))
                     hover = a.name + (locked != null ? "  (" + locked + ")" : "") + "\n" + a.description +
                         (a.cost > 0 ? "\nCost: " + a.cost + " " + ResourceName(session.ClassDef.resource) : "") + (a.cooldown > 0 ? "   Cooldown: " + a.cooldown + "s" : "");
+            }
+            // The stance bar (the Druid's forms, Shift+1-4), small, above the left end of the chosen bar.
+            var stances = session.Kit.StanceSlots;
+            for (int s2 = 0; s2 < stances.Length; s2++)
+            {
+                int i = stances[s2]; var a = session.ActionAt(i); if (a == null) continue;
+                var r = new Rect(x0 + s2 * 40, y - 52, 36, 36); string locked = session.ActionLockLabel(i); bool active = locked == "Active";
+                Fill(new Rect(r.x - 2, r.y - 2, r.width + 4, r.height + 4), active ? gold : new Color(.35f, .3f, .22f));
+                var icon = IconDb.Ability(a.id) ?? IconDb.Talent(a.id);
+                if (icon != null) GUI.DrawTexture(new Rect(r.x + 1, r.y + 1, r.width - 2, r.height - 2), icon, ScaleMode.ScaleToFit); else Shadow(r, Abbreviation(a.name), abbrev, Color.white);
+                Shadow(new Rect(r.x + 2, r.y, r.width, 14), "⇧" + (s2 + 1), new GUIStyle(keybind) { fontSize = 9 }, new Color(.9f, .9f, .9f));
+                if (GUI.Button(r, GUIContent.none, GUIStyle.none) && session.Player.IsAlive && !session.Paused) session.UseAbility(i);
+                if (r.Contains(mouse)) hover = a.name + (locked != null && !active ? "  (" + locked + ")" : active ? "  (your form)" : "") + "\n" + a.description + "\nShift+" + (s2 + 1);
             }
             if (hover != null)
             {
                 var h = small.CalcHeight(new GUIContent(hover), 380) + 16; var tr = new Rect(x0 + total - 400, y - 20 - h, 400, h);
                 Fill(tr, new Color(.04f, .05f, .07f, .95f)); Fill(new Rect(tr.x, tr.y, tr.width, 2), gold);
                 GUI.Label(new Rect(tr.x + 10, tr.y + 8, 380, h), hover, small);
+            }
+        }
+        /// <summary>The spellbook (P; Docs/ACTION_BAR.md): every ability of yours and to come; click one, then a bar slot, to put it there.
+        /// Alternate advancement at the foot: the points past the level cap and the next slot to buy.</summary>
+        /// <summary>A window that fills much of the screen: the meter keeps out of its way.</summary>
+        bool BigWindowOpen { get { return session.BuildOpen || session.CharacterOpen || session.InventoryOpen || session.QuestBookOpen || session.MapOpen || session.TradesOpen || session.SpellbookOpen; } }
+        void DrawSpellbook()
+        {
+            var book = session.Book(); const float w = 560; int rows = (book.Count + 1) / 2;
+            float h = 128 + rows * 46; var box = new Rect(720 - w / 2, Mathf.Max(40, 780 - h - 40), w, h);
+            Fill(box, new Color(.06f, .05f, .04f, .96f)); Fill(new Rect(box.x, box.y, box.width, 2), gold);
+            Shadow(new Rect(box.x + 14, box.y + 8, 300, 24), "SPELLBOOK", frameName, gold);
+            Shadow(new Rect(box.x + 14, box.y + 32, w - 60, 18), "Your bar has " + session.BarSlots + " slots. Click an ability, then a slot on the bar. P or Esc closes.", tiny, Color.white);
+            if (GUI.Button(new Rect(box.xMax - 32, box.y + 6, 24, 22), "x", slim)) { session.SpellbookOpen = false; session.BookPick = null; }
+            var mouse = Event.current.mousePosition; string tip = null;
+            for (int k = 0; k < book.Count; k++)
+            {
+                var e = book[k]; var a = session.ActionAt(e.slot); if (a == null) continue;
+                var r = new Rect(box.x + 14 + (k % 2) * (w / 2 - 6), box.y + 58 + (k / 2) * 46, w / 2 - 22, 40);
+                bool picked = session.BookPick == e.key; int at = session.Progress.bar.IndexOf(e.key);
+                Fill(r, picked ? new Color(.38f, .3f, .12f) : new Color(.12f, .11f, .09f));
+                if (picked) Fill(new Rect(r.x, r.y, r.width, 2), gold);
+                var icon = IconDb.Ability(a.id) ?? IconDb.Talent(a.id);
+                if (icon != null) { GUI.color = e.yours ? Color.white : new Color(.45f, .45f, .45f); GUI.DrawTexture(new Rect(r.x + 3, r.y + 3, 34, 34), icon, ScaleMode.ScaleToFit); GUI.color = Color.white; }
+                Shadow(new Rect(r.x + 42, r.y + 2, r.width - 46, 18), a.name, small, e.yours ? Color.white : new Color(.55f, .55f, .55f));
+                string note = !e.yours ? (session.ActionLockLabel(e.slot) ?? "to come") : at >= 0 ? "on the bar: " + EncounterInput.SlotLabel(at) : "not on the bar";
+                Shadow(new Rect(r.x + 42, r.y + 20, r.width - 46, 16), note, tiny, at >= 0 ? new Color(.7f, .85f, 1) : new Color(.75f, .7f, .6f));
+                if (GUI.Button(r, GUIContent.none, GUIStyle.none)) session.BookPick = picked ? null : e.key;
+                if (r.Contains(mouse)) tip = a.name + "\n" + a.description;
+            }
+            float ay = box.yMax - 58; Fill(new Rect(box.x + 10, ay - 6, w - 20, 1), new Color(.62f, .52f, .33f, .6f));
+            bool capped = session.Progress.Level >= EncounterProgress.LevelCap; int extra = session.Progress.aaSlots, have = session.AaAvailable;
+            string aa = !capped ? "Alternate advancement opens at level " + EncounterProgress.LevelCap + ": experience past it earns points that buy up to " + ActionBarRules.MaxExtraSlots + " more bar slots."
+                : extra >= ActionBarRules.MaxExtraSlots ? "Alternate advancement: all " + ActionBarRules.MaxExtraSlots + " extra slots bought (" + have + " points to spare)."
+                : "Alternate advancement: " + have + " point" + (have == 1 ? "" : "s") + " (" + ActionBarRules.AaProgress(session.Progress.experience) + " of " + ActionBarRules.AaPointXp + " experience to the next). The next slot costs " + session.NextSlotCost + ".";
+            GUI.Label(new Rect(box.x + 14, ay, w - 170, 48), aa, tiny);
+            GUI.enabled = capped && extra < ActionBarRules.MaxExtraSlots && have >= session.NextSlotCost;
+            if (GUI.Button(new Rect(box.xMax - 146, ay + 4, 132, 28), "Buy a bar slot", slim)) session.BuyBarSlot();
+            GUI.enabled = true;
+            if (tip != null)
+            {
+                var th = small.CalcHeight(new GUIContent(tip), 360) + 14; var tr = new Rect(box.xMax + 8, box.y, 380, th);
+                Fill(tr, new Color(.04f, .05f, .07f, .95f)); Fill(new Rect(tr.x, tr.y, tr.width, 2), gold); GUI.Label(new Rect(tr.x + 10, tr.y + 7, 360, th), tip, small);
             }
         }
         /// <summary>
@@ -533,10 +600,13 @@ namespace Crulanda.Encounter
         static string ResourceShort(Crulanda.Core.ResourceKind kind) { return kind == Crulanda.Core.ResourceKind.Breath ? "Breath" : kind.ToString(); }
         public static string Pips(int value, int max) { return new string('●', Mathf.Clamp(value, 0, max)) + new string('○', Mathf.Max(0, max - value)); }
         // Panel geometry follows the branch count: 3 trees fit the original panel; 4 (Druid) use the full width.
-        float PanelX, PanelW, TreeLeft, TreeWidth, CellWidth, TileWidth;
-        const float TileHeight = 96, TierTop = 272, TierHeight = 128;
-        void LayoutTrees(int branches)
+        float PanelX, PanelW, TreeLeft, TreeWidth, CellWidth, TileWidth, TileHeight = 96, TierHeight = 128;
+        const float TierTop = 272, TreesBottom = 690;
+        /// <summary>The rows close up when a tree is four deep (Chris, 2026-10-13: the Mender's fourth row ran over Refund all and Close):
+        /// every row fits between the trees' top and the hint line at 700; three rows keep the old 128 spacing.</summary>
+        void LayoutTrees(int branches, int rows = 3)
         {
+            TierHeight = Mathf.Min(128, (TreesBottom - TierTop) / Mathf.Max(1, rows)); TileHeight = Mathf.Min(96, TierHeight - 8);
             PanelX = branches > 3 ? 20 : 155; PanelW = branches > 3 ? 1400 : 1130; TreeLeft = PanelX + 25;
             TreeWidth = (PanelW - 50 - 12 * (branches - 1)) / branches; CellWidth = TreeWidth / 4f; TileWidth = CellWidth - 6;
         }
@@ -544,7 +614,8 @@ namespace Crulanda.Encounter
         { return new Rect(TreeLeft + branch * (TreeWidth + 12) + n.col * CellWidth + 2, TierTop + n.tier * TierHeight, TileWidth, TileHeight); }
         void DrawBuild()
         {
-            var tree = session.Talents; var p = session.Progress; LayoutTrees(tree.Branches.Count);
+            var tree = session.Talents; var p = session.Progress; int deepest = 0; foreach (var br in tree.Branches) foreach (var nd in br.nodes) deepest = Mathf.Max(deepest, nd.tier);
+            LayoutTrees(tree.Branches.Count, deepest + 1);
             GUI.color = new Color(ink.r, ink.g, ink.b, 1); GUI.DrawTexture(new Rect(PanelX, 95, PanelW, 685), Texture2D.whiteTexture); GUI.color = Color.white;
             GUI.Label(new Rect(TreeLeft, 108, 850, 32), session.ClassDef.displayName.ToUpperInvariant() + " TALENTS", heading);
             GUI.Label(new Rect(TreeLeft, 142, PanelW - 50, 40), "Level " + p.Level + "  ·  " + tree.Available(p) + " of " + tree.Budget(p.Level) +

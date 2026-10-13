@@ -87,7 +87,12 @@ namespace Crulanda.Encounter
         public void GainGlimmer(int n) { Glimmer = Clamp(Glimmer + n, PoolCap); }
 
         // ---------- action bar ----------
-        public override int ActionCount { get { return 11; } }   // the eleventh, on the minus key: Sleep of the Wood (CC_DESIGN section 2)
+        public override int ActionCount { get { return 11; } }
+        static readonly int[] stances = { 0, 1, 2, 3 };
+        /// <summary>The four forms on a bar of their own (Chris, 2026-10-13: the forms do not use up the ten).</summary>
+        public override int[] StanceSlots { get { return stances; } }
+        /// <summary>Slots 4-7 hold the current form's abilities: the bar keeps the place, not the ability.</summary>
+        public override string BookKey(int slot) { return slot >= 4 && slot < 8 ? "druid.form." + (slot - 4) : base.BookKey(slot); }   // the eleventh, on the minus key: Sleep of the Wood (CC_DESIGN section 2)
         public override AbilityDefinition ActionAt(int slot)
         {
             string id = slot < 4 ? ShiftIds[slot] : slot < 8 ? FormIds[(int)Form][slot - 4] : slot < 11 ? UtilityIds[slot - 8] : null;

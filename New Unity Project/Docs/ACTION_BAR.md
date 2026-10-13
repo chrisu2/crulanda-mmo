@@ -21,3 +21,9 @@ Each class kit has a fixed bar of 11 to 13 abilities in a fixed order (`BarIds`)
 - **The group heals** asked for at ~14:25 ("yes give a slower group heal") go in as spellbook abilities: the Paladin's Mending Oath
   (GAME-ONLY), the Salt-Mender's Seal the Wound (CANON-EXPANDED, Mother Vane's "I seal the Wound!"), the Cantor's Mending Verse
   (CANON-EXPANDED, the Song of Mending): slow casts that mend the whole party in reach, slotted by choice.
+
+## Chris's answers (2026-10-13 ~15:00)
+
+- Alternate advancement: **up to four more slots, 14 in all** (keys -, =, [ and ] after 1-0).
+- Each extra slot costs **1, 2, 3, then 4** AA points (one point fills like a level's worth of experience past the cap).
+- The Druid's four forms sit on **a small bar of their own** and do not use up the ten.

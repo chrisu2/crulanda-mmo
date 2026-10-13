@@ -143,7 +143,7 @@ namespace Crulanda.Encounter
         {
             if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
             var use = With(a, a.cost, Mathf.Max(0, a.castTime - .15f * R("sc-quick-squall")));
-            return Start(use, () => { if (!s.LandsOn(t, a.range)) return; s.Bolt(t, new Color(.7f, .8f, 1), .15f); t.Receive(Dmg((a.power + 2 * Level) * (1 + .04f * R("sc-gale"))), s.Player); charge = Mathf.Min(5, charge + 1); });
+            return Start(use, () => { if (!s.LandsOn(t, a.range)) return; s.Bolt(t, new Color(.7f, .8f, 1), .15f); t.Receive(Dmg((a.power + 2 * Level) * (1 + .04f * R("sc-gale"))), s.Player); charge = Mathf.Min(5, charge + 1); lastFight = Now; });
         }
         bool Thunderhead(AbilityDefinition a)
         {
@@ -217,13 +217,14 @@ namespace Crulanda.Encounter
         // ---------- per frame / lifecycle ----------
         // The Squall's charge fades six seconds after the fight ends, not at once (2026-10-13, the balance harness: against dummies that do
         // not fight back the session is never "in combat", the charge was wiped every tick and Thunderhead never fired once).
-        float outOfCombatSince = -1;
+        // (Second fix, the same day: the clock ran from the first quiet moment and never restarted, so after six seconds the charge was
+        // wiped every frame and Thunderhead still never fired. It now runs from the last Squall or the last moment in combat.)
+        float lastFight = -99;
         public override void Tick(bool inCombat)
         {
             periodic.Tick(Now);
-            if (inCombat) { outOfCombatSince = -1; return; }
-            if (outOfCombatSince < 0) outOfCombatSince = Now;
-            if (Now - outOfCombatSince > 6) { ancestorSpent = mountainSpent = false; charge = 0; }
+            if (inCombat) lastFight = Now;
+            if (Now - lastFight > 6) { ancestorSpent = mountainSpent = false; charge = 0; }
         }
         public override void ResetState() { periodic.Clear(); charge = 0; earthskinUntil = 0; ancestorSpent = mountainSpent = false; }
         public override void ClearTransient() { ResetState(); if (s.Player != null) PlayerCombat.ClearBarrier(); }

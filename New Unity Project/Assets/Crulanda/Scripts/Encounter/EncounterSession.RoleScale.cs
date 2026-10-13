@@ -16,17 +16,24 @@ namespace Crulanda.Encounter
         public static readonly Dictionary<string, float> BuildDamageScale = new Dictionary<string, float>
         {
             // DPS toward the median
-            { "class.ranger/marksman", .75f }, { "class.druid/thornclaw", .80f }, { "class.ranger/skirmisher", .85f }, { "class.paladin/judicator", .92f },
+            { "class.ranger/marksman", 0.64f }, { "class.druid/thornclaw", 0.74f }, { "class.ranger/skirmisher", 0.75f }, { "class.paladin/judicator", 0.8f },
             { "class.mage/combustion", 1.65f }, { "class.druid/thornsong", 2.1f }, { "class.archivist/the-unwriting", 2.4f },
             // under the role caps
             { "class.ranger/pathfinder", .60f }, { "class.rogue/thiefs-grace", .82f }, { "class.rogue/swashbuckler", .72f }, { "class.paladin/vanguard", .92f },
             { "class.warrior/support", .93f }, { "class.warrior/jailer", .93f },
             { "class.paladin/sanctuary", .62f }, { "class.saltmender/mender", .85f },
             // pet builds toward the DPS median (the companion's blows take PetDamageScale, below)
-            { "class.ranger/beastbond", .75f }, { "class.mage/bonecaller", 1.6f },
+            { "class.ranger/beastbond", 0.7f }, { "class.mage/bonecaller", 1.6f },
+            { "class.archivist/the-lull", 2.14f },   // 2026-10-13 fixed-dummy retune
+            { "class.archivist/the-still-vow", 3.11f },   // 2026-10-13 fixed-dummy retune
+            { "class.mage/spellbinder", 1.16f },   // 2026-10-13 fixed-dummy retune
+            { "class.rogue/locksmith", 0.87f },   // 2026-10-13 fixed-dummy retune
+            { "class.saltmender/mason", 1.25f },   // 2026-10-13 fixed-dummy retune
+            { "class.saltmender/salt-speaker", 1.27f },   // 2026-10-13 fixed-dummy retune
+            { "class.warrior/dps", 0.92f },   // 2026-10-13 fixed-dummy retune
         };
         /// <summary>The same for the build's companion (Ranger pet, thrall): only the pet builds are scaled.</summary>
-        public static readonly Dictionary<string, float> BuildPetDamageScale = new Dictionary<string, float> { { "class.ranger/beastbond", .75f }, { "class.mage/bonecaller", 1.6f }, { "class.ranger/pathfinder", .5f } };
+        public static readonly Dictionary<string, float> BuildPetDamageScale = new Dictionary<string, float> { { "class.ranger/beastbond", 0.7f }, { "class.mage/bonecaller", 1.6f }, { "class.ranger/pathfinder", .5f } };
         public float PetDamageScale { get { var lead = LeadBuild; return lead != null && BuildPetDamageScale.TryGetValue(lead, out var v) ? v : 1; } }
         /// <summary>The scale on any blow by the party side: the player's, or the player's own companion.</summary>
         public float DamageScaleFor(Actor source)
@@ -37,7 +44,12 @@ namespace Crulanda.Encounter
             return 1;
         }
         /// <summary>The healing retune (note 178): a build's own mends scaled toward the healers' median (Druid kit's HealActor).</summary>
-        public static readonly Dictionary<string, float> BuildHealScale = new Dictionary<string, float> { { "class.druid/rootmend", 2.2f } };
+        public static readonly Dictionary<string, float> BuildHealScale = new Dictionary<string, float>
+        {
+            { "class.druid/rootmend", 2.8f },
+            { "class.archivist/the-cantor", 0.38f },   // 2026-10-13 fixed-dummy retune
+            { "class.paladin/sanctuary", 0.83f },   // 2026-10-13 fixed-dummy retune
+        };
         public float PlayerHealScale { get { var lead = LeadBuild; return lead != null && BuildHealScale.TryGetValue(lead, out var v) ? v : 1; } }
         public const float HealerDpsCap = .50f, ControlDpsCap = .75f, SupportDpsCap = .75f;
         int scaleCount = -1; List<TalentRank> scaleList; float scale = 1;

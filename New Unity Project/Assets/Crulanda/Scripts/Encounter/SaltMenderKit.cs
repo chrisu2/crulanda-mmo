@@ -257,7 +257,7 @@ namespace Crulanda.Encounter
         int Mend(Actor who, int amount)
         {
             if (who == null || !who.IsAlive || amount <= 0) return 0;
-            int healed = who.GetComponent<Combatant>().Heal(amount, s.Player);
+            int healed = who.GetComponent<Combatant>().Heal(Mathf.RoundToInt(amount * s.PlayerHealScale), s.Player);   // the build's heal scale (RoleScale)
             if (healed > 0) { HealFx.Show(who.transform); s.AddHealingThreat(healed); s.FloatText(who.transform.position, "+" + healed, new Color(.3f, 1, .7f)); }
             return healed;
         }

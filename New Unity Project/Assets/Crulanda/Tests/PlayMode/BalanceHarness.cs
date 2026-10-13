@@ -37,6 +37,9 @@ namespace Crulanda.Tests
         // once a fight: summons and standing auras.
         static readonly HashSet<string> Never = new HashSet<string> { "druid.barkhide", "druid.thornclaw", "druid.rootmend", "druid.thornsong", "mage.unbind", "mage.quench", "mage.bind",
             "rogue.vanish", "rogue.tumble", "rogue.sap", "rogue.blind", "ranger.disengage", "druid.sleep_of_the_wood" };
+        /// <summary>Kept up: a damage over time with no cooldown, recast when its last use is this many seconds old (2026-10-13: the Cleric's
+        /// Brand costs what Rebuke costs and has no cooldown, so the rotation always reached Rebuke first and never cast it).</summary>
+        static readonly Dictionary<string, float> Every = new Dictionary<string, float> { { "cleric.brand", 7.5f } };
         static readonly HashSet<string> Once = new HashSet<string> { "mage.raise_thrall", "ranger.call_companion", "paladin.oath", "paladin.colours" };
         int SlotOf(string id) { for (int i = 0; i < s.Kit.ActionCount; i++) { var a = s.Kit.ActionAt(i); if (a != null && a.id == id) return i; } return -1; }
         string root; EncounterSession s;
@@ -271,9 +274,12 @@ namespace Crulanda.Tests
                 else if (targets == 0) { hurt += dt; if (hurt >= 1) { hurt -= 1; s.Player.Health.ApplyDamage(Mathf.Min(s.Player.Health.Pool.Current - 1, Mathf.RoundToInt(s.Player.Health.Pool.Max * WoundShare))); } }   // no Mira in the scene: you
                 if (s.Player.Health.Pool.Current < s.Player.Health.Pool.Max * .3f && targets > 0) s.Player.Health.Pool.Fill();
                 if (!s.PlayerCasting)   // a cast in hand is let finish
-                foreach (int slot in order.OrderByDescending(i => targets == 0 && s.Kit.ActionAt(i) != null && s.Kit.ActionAt(i).effect == AbilityEffect.Heal ? 1 : 0).ThenByDescending(i => s.Kit.ActionAt(i) != null ? s.Kit.ActionAt(i).cooldown : 0).ThenBy(i => s.Kit.ActionAt(i) != null && cls == "class.druid" && s.Kit.ActionAt(i).cooldown <= 0 && s.Kit.ActionAt(i).effect == AbilityEffect.Damage && lastUse.TryGetValue(i, out var w) ? w : -1).ThenBy(i => order.IndexOf(i)))   // a Druid's equal fillers taken in turn (Thornsong's loop); every other kit keeps bar order (v6/v7: the turn-taking cost the casters, Mage and Archivist, most of their damage) taken in turn (a Thornsong alternates Seedshot and Thornbolt)
+                foreach (int slot in order.OrderByDescending(i => s.Kit.ActionAt(i) != null && Every.TryGetValue(s.Kit.ActionAt(i).id, out var keepEvery) && (!lastUse.TryGetValue(i, out var keptAt) || t - keptAt >= keepEvery) ? 1 : 0)
+                    .ThenByDescending(i => targets == 0 && s.Kit.ActionAt(i) != null && s.Kit.ActionAt(i).effect == AbilityEffect.Heal ? 1 : 0).ThenByDescending(i => s.Kit.ActionAt(i) != null ? s.Kit.ActionAt(i).cooldown : 0).ThenBy(i => s.Kit.ActionAt(i) != null && cls == "class.druid" && s.Kit.ActionAt(i).cooldown <= 0 && s.Kit.ActionAt(i).effect == AbilityEffect.Damage && lastUse.TryGetValue(i, out var w) ? w : -1).ThenBy(i => order.IndexOf(i)))   // a Druid's equal fillers taken in turn (Thornsong's loop); every other kit keeps bar order (v6/v7: the turn-taking cost the casters, Mage and Archivist, most of their damage) taken in turn (a Thornsong alternates Seedshot and Thornbolt)
                 {
                     var ab = s.Kit.ActionAt(slot); if (ab == null || s.Kit.ActionLockLabel(slot) != null || Never.Contains(ab.id) || used1.Contains(ab.id)) continue;
+                    // A damage fight casts no heals (2026-10-13: the Cleric and Shaman, whose bars lock nothing by build, spent most casts mending nobody).
+                    if (targets > 0 && ab.effect == AbilityEffect.Heal) continue;
                     // Mana-aware: a costly ability waits while the pool is under a fifth, the cheapest one (the filler) never waits.
                     if (ab.cost > 0 && slot != cheapest && pool.Max > 0 && pool.Current - ab.cost < pool.Max * .2f) continue;
                     if (s.UseAbility(slot)) { if (Once.Contains(ab.id)) used1.Add(ab.id); lastUse[slot] = t; uses[ab.id] = (uses.TryGetValue(ab.id, out var n) ? n : 0) + 1; break; }

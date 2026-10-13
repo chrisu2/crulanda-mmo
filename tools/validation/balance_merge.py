@@ -36,22 +36,23 @@ heal_median = statistics.median([t['hps'] for t in table if t['role'] == 'healer
 # The role each build plays, as Chris names them (2026-10-13: "designate it as tank/dps/support/healer/CC"), and its target on the fixed
 # dummies. DPS 62-72 is Chris's (2026-10-13 00:37); the others follow from the role caps on a 67 DPS middle (healer at most 50%, CC and
 # support at most 75%, 3 points of slack) and are PROPOSED until Chris settles them; tank has no rule yet.
-NAME = {'dps': 'DPS', 'tank': 'Tank', 'support': 'Support', 'healer': 'Healer', 'control': 'CC'}
-TARGET = {'dps': (62, 72), 'control': (45, 52), 'support': (45, 52), 'healer': (0, 35), 'tank': (42, 55)}
+NAME = {'dps': 'DPS', 'tank': 'Tank', 'support': 'Support', 'healer': 'Healer', 'control': 'CC', 'pet': 'DPS (pet)', 'utility': 'Support (utility)'}
+TARGET = {'dps': (62, 72), 'pet': (62, 72), 'control': (45, 52), 'support': (45, 52), 'utility': (45, 52), 'healer': (0, 35), 'tank': (42, 55)}
+HPS_T = (40, 50)   # healer HPS on the wounded dummy, PROPOSED
 def status(t):
     lo, hi = TARGET.get(t['role'], (0, 1e9)); v = t['single']
     out = 'ok' if lo <= v <= hi else ('**HIGH**' if v > hi else '**LOW**')
     if t['role'] == 'healer':
         if t['hps'] <= 0: out += ' **NO HEALING**'
-        elif heal_median and abs(t['hps'] / heal_median - 1) > .15: out += ' heal **%s**' % ('HIGH' if t['hps'] > heal_median else 'LOW')
+        elif not (HPS_T[0] <= t['hps'] <= HPS_T[1]): out += ' heal **%s**' % ('HIGH' if t['hps'] > HPS_T[1] else 'LOW')
     return out
 classes = sorted(set(t['cls'] for t in table))
 lines = ['# Balance, every class and build (' + ', '.join(classes) + ')', '',
          'Fixed dummies (level 15, no armour, no blows), 180 s fights, three seeds averaged. DPS = single target; vs 3 = three dummies;',
          'HPS = healing a second on the wounded dummy. Targets (single-target DPS): DPS 62-72 (Chris); CC and Support 45-52, Healer at most 35,',
-         'Tank 42-55 (proposed). Healer HPS within 15%% of the healers\' median (%.1f).' % heal_median, '',
-         '| class | build | role | DPS | DPS vs 3 | HPS | target | status |', '|---|---|---|---|---|---|---|---|']
-order = {'tank': 0, 'dps': 1, 'control': 2, 'support': 3, 'healer': 4}
+         "Tank 42-55 (proposed). Healer HPS 40-50 (proposed; the healers' median is %.1f; the wounded dummy loses 120 a second, the most any healer can show)." % heal_median, '',
+         '| class | build | role | DPS | DPS vs 3 | HPS | DPS target | status |', '|---|---|---|---|---|---|---|---|']
+order = {'tank': 0, 'dps': 1, 'pet': 1, 'control': 2, 'support': 3, 'utility': 3, 'healer': 4}
 counts = {}
 for t in sorted(table, key=lambda t: (t['cls'], order.get(t['role'], 9), t['build'])):
     lo, hi = TARGET.get(t['role'], (0, 0)); st = status(t); counts[st.startswith('ok')] = counts.get(st.startswith('ok'), 0) + 1

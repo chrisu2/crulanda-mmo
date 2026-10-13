@@ -319,3 +319,14 @@ she sells earned by exactly one quest) and PlayMode `HuntTests` (the hides got b
 - ~~Quest rewards that give real equipment~~: done 2026-10-09 (quest gear, above).
 - The well at night and the Hollow Men (new enemy look), finishing Chronicle II.
 - Khaven: Chronicle III and the Sandthrone contracts, which cost Salt-Mender standing.
+
+## 10. The zones filled (2026-10-13 evening; Chris: "all zones full of quests")
+Written by five helpers, one zone each, to the rules of this document and checked against the zone data (givers who live there, kill
+patterns that match real camps, visit points in the zone); the zone content and Oakhaven quest tests passed (4/4). Each quest carries its
+canon label. Every camp and point of interest that had no quest has one; the level gaps are closed.
+
+- **Oakhaven** (11 new, 28 in all): Salt Off the Rim Road (2, Ama Rusk); Harrow Grain for the Mill (2, Sel Harrow); Struck Off the Tithe (2, Grete Lowe); Pim's Three Dares (3, Pim); Nearer Than Last Night (3, Old Tobin); The Wain at the Carter's Rest (3, Nan Pennock); One a Week (3, Ilse Brandt); Stew for the Pickers (4, Hob Linden); Felling Weather (5, Osk Farrow); The Bell-Wether's Bell (6, Ilse Brandt); Fourpence for a Kettle (6, Tamsin Reed).
+- **Khaven** (10 new, 25 in all): The Bearers' Road (5, Hollis Grane); Three Turns and a Tuck (6, Tamsin Rook); Salt for the Hanged (7, Tamsin Rook); Who Gave the Word (9, Tamsin Rook); Nothing That Talks (6, Wynn Tabor); The Long Acre (7, Siv Harl); Hush-Teeth (7, Mattock Jenn); The Name in the Well (7, Old Kestrel); The Final Sum (9, Old Kestrel); Light for the Pass (9, Cato Brisk).
+- **Peaks** (10 new, 25 in all): Smoke on the Khaven Road (9, Pib); Stone Remembers (10, Pib); Names for the Book (10, Pib); The Goatherd's Fold (9, Maddoc Vire); No Deer on the Ash (10, Tarsk); Clipped Coin (11, Hadrik Sull); Where the Mountain Came Down (11, Lisle Tamber); Old Scree-Tusk (12, Lisle Tamber); Where the Song Thins (11, Brother Cael); An Hour Without Eyes (12, Brother Cael).
+- **Ashrim** (10 new, 25 in all): The Empty Hide (13, Oska); What the Pit Keeps (13, Chieftain Grohl); The Ash-Deacon (15, Oska); The Old Sea (15, Oska); Hollin's Press (13, Sefa Brine); Meat That Does Not Crawl (13, Sefa Brine); What the Tear Is Made Of (13, Sefa Brine); Breath on Cold Glass (15, Mother Vane); Violet in the Grey (13, Mother Vane); Never Seen Walking (15, Chieftain Grohl).
+- **Verdant** (11 new, 28 in all): Rust-Lace (13, Alder-Knot); Salt in the Reeds (13, Reed-Song); What Makes a Briar Hunt (13, Alder-Knot); Light Through Leaves (13, Ondine Varro); The Brother Who Went Listening (14, Sister Iselle); Lanterns for the Laid-Down (14, Moss-Lantern); The Quiet in the South Wood (14, Reed-Song); A Name in the Fog (15, Sister Iselle); What the Wood Remembers (15, Sister Iselle); Salt Remembers (15, Oak-Bane); A Heart Still Green (15, Willow-Whisper).

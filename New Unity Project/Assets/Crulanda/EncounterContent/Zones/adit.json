@@ -895,14 +895,14 @@
       "tag": "gunner",
       "look": "outrider",
       "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
-      "radius": 3.6,
+      "radius": 1.8,
       "count": 2,
       "levelMin": 12,
       "levelMax": 12,
       "respawn": 900,
       "center": {
-        "x": 139.01,
-        "y": 243.87
+        "x": 133.0,
+        "y": 247.0
       },
       "cave": "The Sealed Adit",
       "along": 666.76,

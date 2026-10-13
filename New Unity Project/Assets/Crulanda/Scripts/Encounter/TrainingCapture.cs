@@ -16,7 +16,7 @@ namespace Crulanda.Encounter
     {
         public const string Flag = "--crulanda-training-capture";
         public static bool Requested { get { return Array.IndexOf(Environment.GetCommandLineArgs(), Flag) >= 0; } }
-        string dir; readonly System.Text.StringBuilder report = new System.Text.StringBuilder(); EncounterSession session;
+        string dir; readonly System.Text.StringBuilder report = new System.Text.StringBuilder(); EncounterSession session; float keptScale = -1;
 
         IEnumerator Shot(string name, string what, Transform also)
         {
@@ -59,6 +59,9 @@ namespace Crulanda.Encounter
         public IEnumerator Run(EncounterSession s, string directory)
         {
             dir = directory; Directory.CreateDirectory(dir); session = s;
+            // The HUD in frame at 1440x900, as the group run does (the 13:27 frames: the target frame cut off at the left, the player frame
+            // gone, under the player's own saved layout); the player's UI scale is put back at the end.
+            keptScale = EncounterHud.UiScale; EncounterHud.UiScale = 1; EncounterHud.DefaultPanels = true;
             Crulanda.World.WorldClock.Hour = 11;
             var weather = Crulanda.World.WorldWeather.Active; if (weather != null) weather.Force(weather.TourKind(), true);
             yield return new WaitForSeconds(3);
@@ -98,6 +101,7 @@ namespace Crulanda.Encounter
         }
         void Finish()
         {
+            if (keptScale > 0) EncounterHud.UiScale = keptScale;
             File.WriteAllText(Path.Combine(dir, "training.txt"), report.ToString());
             Debug.Log("TRAINING_CAPTURE_DONE"); Application.Quit(0);
         }

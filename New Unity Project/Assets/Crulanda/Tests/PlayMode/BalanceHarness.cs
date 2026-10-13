@@ -26,7 +26,7 @@ namespace Crulanda.Tests
     public class BalanceHarness
     {
         public static float FightSeconds = 90; public static int Seeds = 3; public static float Step = .05f;   // game seconds a frame (Time.captureDeltaTime): as fast as the editor runs, the same steps every run
-        static readonly string[] AllClasses = { "class.warrior", "class.druid", "class.paladin", "class.ranger", "class.mage", "class.rogue", "class.archivist", "class.saltmender" };
+        static readonly string[] AllClasses = { "class.warrior", "class.druid", "class.paladin", "class.ranger", "class.mage", "class.rogue", "class.archivist", "class.saltmender", "class.cleric" };
         /// <summary>CRULANDA_BALANCE_CLASSES=mage,archivist runs those only (about two a chunk); each set writes its own balance-<set>.csv.</summary>
         static string[] Classes { get { var f = Environment.GetEnvironmentVariable("CRULANDA_BALANCE_CLASSES"); if (string.IsNullOrEmpty(f)) return AllClasses;
             var want = f.Split(',').Select(x => x.Trim().ToLowerInvariant()).Select(x => x.StartsWith("class.") ? x : "class." + x).ToList(); return want.Where(AllClasses.Contains).ToArray(); } }
@@ -79,7 +79,7 @@ namespace Crulanda.Tests
         }
 
         // ---------- The party heal test (note 178, Chris 19:18: "still need other healers to test. paladin, cleric (new class) , shaman (new class), salt mender") ----------
-        static readonly (string cls, string build)[] Healers = { ("class.paladin", "sanctuary"), ("class.saltmender", "mender"), ("class.archivist", "the-cantor"), ("class.druid", "rootmend") };
+        static readonly (string cls, string build)[] Healers = { ("class.paladin", "sanctuary"), ("class.saltmender", "mender"), ("class.archivist", "the-cantor"), ("class.druid", "rootmend"), ("class.cleric", "lantern"), ("class.cleric", "choir") };
         /// <summary>Each healer build with Mira and three sims (level-nearest, not healers) for 90 s: every member loses 5% a second
         /// (spread) and one, by the seed, 45% every 4 s (spike); no one is let die (held at 1). HPS, overheal, the share of the healing
         /// that went to others than the healer, mana, and how often a member was under 25%. To party_heal.csv / PARTY_HEAL.md.</summary>
@@ -106,7 +106,7 @@ namespace Crulanda.Tests
                 // returning members, the way a saved party comes back (SimPopulation.RestoreParty). Not healers: the healing is the build's.
                 if (pop != null && pop.World != null)
                 {
-                    var pick = pop.World.sims.Where(x => x.classId != "class.saltmender" && x.classId != "class.paladin" && x.classId != "class.archivist" && x.classId != "class.druid")
+                    var pick = pop.World.sims.Where(x => x.classId != "class.saltmender" && x.classId != "class.paladin" && x.classId != "class.archivist" && x.classId != "class.druid" && x.classId != "class.cleric" && x.classId != "class.shaman")
                         .OrderBy(x => Mathf.Abs(x.level - 15)).ThenBy(x => x.id).Take(3).ToList();
                     int k = 0;
                     foreach (var sim in pick)

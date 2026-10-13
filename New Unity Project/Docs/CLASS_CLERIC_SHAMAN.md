@@ -20,7 +20,7 @@ Resource is **Grace** (mana-like). Each build has a talent tree of 16+ ranks and
 | Censure | dps | Rebuke bolt, Brand (DoT), Sunburst finisher on Branded foes. |
 | Warden | support | Wards (barriers), Absolve (cleanse), Steadfast (damage reduction aura). |
 
-## Shaman (GAME-ONLY): a weather-speaker of the high moors who calls on rain, stone and the old dead
+## Shaman (CANON-EXPANDED, orc-only: Chris 23:00 "Shaman is orc-only", sign-off 23:14): an orc weather-speaker of the high moors who calls on rain, stone and the old dead
 Resource is **Breath** (mana-like). Stones stand in for totems: standing stones raised from the ground, not built.
 
 | build | role | loop |
@@ -44,3 +44,7 @@ Resource is **Breath** (mana-like). Stones stand in for totems: standing stones 
 ## Scaffolding status (2026-10-12 21:30)
 - Talent trees drafted: Docs/classes/cleric.json and shaman.json, in the Talents JSON shape, 4 branches x 17 ranks, all impl:false, canonStatus GAME-ONLY. Kept out of EncounterContent/Talents until the kits exist, so no loader or test picks them up early.
 - Hooks to add next (from the Salt-Mender footprint): ClassKit.cs factory case, Encounter.asset class + abilities + unlocks, EncounterSession look/colour/stat rows (lines ~105/117/2045), EncounterHud.ClassColour, SimAdventurers.ClassIds + ClassName, SimCompanion casting, SimFigure, icons, EditMode rules tests + PlayMode loop tests, BalanceHarness classes 8 -> 10.
+
+## Status 2026-10-12 23:20
+- Cleric: content wired (Encounter.asset, Talents/cleric.json), kit enabled in ClassKit.Create. Compile check waits for suiteQ.
+- Shaman: ShamanKit.cs written (24 talents, 12 abilities), behind #if CRULANDA_SHAMAN. Still needed: content, a talent JSON and the orc race (Docs/RACES.md).

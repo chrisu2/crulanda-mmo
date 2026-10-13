@@ -236,7 +236,7 @@ namespace Crulanda.Encounter
                 if (Now < sanctuaryUntil) parts.Add("Sanctuary " + (sanctuaryUntil - Now).ToString("0") + "s");
                 if (Now < steadfastUntil) parts.Add("Steadfast " + (steadfastUntil - Now).ToString("0") + "s");
                 if (Now < lanternUntil) parts.Add("Lantern Light");
-                return parts.Count == 0 ? null : string.Join("  ·  ", parts);
+                return parts.Count == 0 ? null : string.Join("  ", parts);
             }
         }
         public override string TargetStatus(EncounterEnemy enemy) { return enemy != null && brands.TryGetValue(enemy, out var n) ? "Branded x" + n : null; }

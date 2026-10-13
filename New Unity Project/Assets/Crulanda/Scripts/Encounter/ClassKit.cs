@@ -64,6 +64,7 @@ namespace Crulanda.Encounter
                 case "class.rogue": return new RogueKit(session, definition, catalog);
                 case "class.archivist": return new ArchivistKit(session, definition, catalog);
                 case "class.saltmender": return new SaltMenderKit(session, definition, catalog);   // Phase 9.2, the first class from the canon (2026-10-11)
+                case "class.cleric": return new ClericKit(session, definition, catalog);   // 2026-10-12, Docs/CLASS_CLERIC_SHAMAN.md
                 default: throw new ArgumentException("No class kit for '" + classId + "'.");
             }
         }

@@ -1324,6 +1324,150 @@ MonoBehaviour:
     globalCooldown: 1.5
     duration: 25
     statusId:
+  - id: cleric.rebuke
+    name: Rebuke
+    description: "A hard word of the shrine, struck at up to 25 metres."
+    effect: 0
+    power: 9
+    cost: 8
+    cooldown: 0
+    range: 25
+    castTime: 1.5
+    globalCooldown: 1.5
+    duration: 0
+    statusId:
+  - id: cleric.mend
+    name: Mend
+    description: "A short prayer that mends the most hurt of the party."
+    effect: 3
+    power: 14
+    cost: 12
+    cooldown: 0
+    range: 30
+    castTime: 1.5
+    globalCooldown: 1.5
+    duration: 0
+    statusId:
+  - id: cleric.long_mend
+    name: Long Mend
+    description: "A long prayer that mends the most hurt deeply."
+    effect: 3
+    power: 26
+    cost: 20
+    cooldown: 0
+    range: 30
+    castTime: 2.5
+    globalCooldown: 1.5
+    duration: 0
+    statusId:
+  - id: cleric.vigil
+    name: Vigil
+    description: "A lantern held over the hurt: mends every 2 seconds."
+    effect: 3
+    power: 5
+    cost: 10
+    cooldown: 6
+    range: 30
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 10
+    statusId:
+  - id: cleric.litany
+    name: Litany
+    description: "Words said for all within 10 metres: each is mended."
+    effect: 3
+    power: 9
+    cost: 22
+    cooldown: 8
+    range: 0
+    castTime: 1.5
+    globalCooldown: 1.5
+    duration: 0
+    statusId:
+  - id: cleric.ward
+    name: Ward
+    description: "A ward of faith on the most hurt that takes the blows."
+    effect: 2
+    power: 16
+    cost: 14
+    cooldown: 8
+    range: 30
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 10
+    statusId:
+  - id: cleric.brand
+    name: Brand
+    description: "A sunburst burned on the foe: it smoulders and can be called down."
+    effect: 0
+    power: 4
+    cost: 8
+    cooldown: 0
+    range: 25
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 8
+    statusId:
+  - id: cleric.sunburst
+    name: Sunburst
+    description: "Calls down every Brand on the foe at once."
+    effect: 0
+    power: 14
+    cost: 14
+    cooldown: 6
+    range: 25
+    castTime: 1
+    globalCooldown: 1.5
+    duration: 0
+    statusId:
+  - id: cleric.absolve
+    name: Absolve
+    description: "Lifts a curse or poison from the most hurt."
+    effect: 4
+    power: 0
+    cost: 8
+    cooldown: 10
+    range: 30
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 0
+    statusId:
+  - id: cleric.hymn
+    name: Hymn
+    description: "A hymn held: the party near you mends each second."
+    effect: 3
+    power: 4
+    cost: 24
+    cooldown: 20
+    range: 0
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 6
+    statusId:
+  - id: cleric.sanctuary
+    name: Sanctuary
+    description: "A circle of 6 metres where the party takes less."
+    effect: 4
+    power: 0
+    cost: 20
+    cooldown: 40
+    range: 0
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 10
+    statusId:
+  - id: cleric.steadfast
+    name: Steadfast
+    description: "An aura: the party within 10 metres takes less for a time."
+    effect: 4
+    power: 0
+    cost: 16
+    cooldown: 45
+    range: 0
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 15
+    statusId:
   playerClass:
     id: class.warrior
     displayName: Warrior
@@ -1804,6 +1948,61 @@ MonoBehaviour:
         level: 1
         talentId: md-salt-cairn
     talentTree: {fileID: 4900000, guid: b7e94b011c294431bd9be85595f3273a, type: 3}
+  - definition:
+      id: class.cleric
+      displayName: Cleric
+      role: 1
+      resource: 1
+      maxResource: 100
+      combatRegen: 4
+      restingRegen: 20
+      stats:
+        baseHealth: 160
+        healthPerLevel: 19
+        healthPerStamina: 5
+        baseAttackPower: 6
+        attackPowerPerLevel: 1
+        attackPowerPerStrength: 1
+        spellPowerPerIntellect: 2
+        armorPerAgility: 1
+      unlocks:
+      - abilityId: cleric.rebuke
+        level: 1
+        talentId:
+      - abilityId: cleric.mend
+        level: 1
+        talentId:
+      - abilityId: cleric.long_mend
+        level: 2
+        talentId:
+      - abilityId: cleric.vigil
+        level: 3
+        talentId:
+      - abilityId: cleric.litany
+        level: 4
+        talentId:
+      - abilityId: cleric.ward
+        level: 5
+        talentId:
+      - abilityId: cleric.brand
+        level: 4
+        talentId:
+      - abilityId: cleric.sunburst
+        level: 6
+        talentId:
+      - abilityId: cleric.absolve
+        level: 7
+        talentId:
+      - abilityId: cleric.hymn
+        level: 8
+        talentId:
+      - abilityId: cleric.sanctuary
+        level: 9
+        talentId:
+      - abilityId: cleric.steadfast
+        level: 10
+        talentId:
+    talentTree: {fileID: 4900000, guid: 02d707900e6c46f7967982d6c993cbbf, type: 3}
   questFiles:
   - {fileID: 4900000, guid: dadeaa3314444542a04b4e17d9dbc0c4, type: 3}
   - {fileID: 4900000, guid: 2f37ccf5ed8d46928976a7b5854444ed, type: 3}

@@ -1,4 +1,3 @@
-#if CRULANDA_CLERIC   // off until the Cleric's content (Encounter.asset class, abilities, unlocks; Talents/cleric.json) is wired: Docs/CLASS_CLERIC_SHAMAN.md
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -243,4 +242,3 @@ namespace Crulanda.Encounter
         public override string TargetStatus(EncounterEnemy enemy) { return enemy != null && brands.TryGetValue(enemy, out var n) ? "Branded x" + n : null; }
     }
 }
-#endif

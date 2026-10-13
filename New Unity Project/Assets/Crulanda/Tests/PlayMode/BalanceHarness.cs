@@ -267,6 +267,15 @@ namespace Crulanda.Tests
                 if (targets == 0) p = at + Vector3.forward * 80 + Vector3.right * 3 * i;   // the heal test: no foe in reach, nothing to strike
                 if (ag != null && ag.isOnNavMesh) ag.Warp(p); else foes[i].transform.position = p;
             }
+            // Nothing else near the fight (2026-10-13: the area builds' splash, EncounterSession.Spread, landed on the scene's other sentries
+            // beside the dummy and doubled the Warrior's single-target number): every other mob within 30 m is stilled and taken 150 m off.
+            int away = 0;
+            foreach (var other in s.Enemies)
+                if (other != null && !foes.Contains(other) && (other.transform.position - at).sqrMagnitude < 30 * 30)
+                {
+                    other.enabled = false; var oag = other.GetComponent<UnityEngine.AI.NavMeshAgent>(); if (oag != null) oag.enabled = false;
+                    other.transform.position = at + Vector3.forward * 150 + Vector3.right * 6 * away++;
+                }
             motor.Teleport(at + Vector3.back * 2.4f + Vector3.up * .5f); s.Player.transform.rotation = Quaternion.LookRotation(Vector3.forward);
             if (targets > 0) s.Select(foes[0]); else s.Select(null);
             var wounded = targets == 0 ? WoundedDummy() : null;

@@ -1,6 +1,29 @@
-# Crulanda: Claude handoff (rewritten 2026-10-12 23:59 ET; covers Grok Bot's work on Oct 11-12)
+# Crulanda: Claude handoff (Start here rewritten 2026-10-13 19:10; covers the work to the evening of Oct 13)
 
 ## Start here
+
+**Current state: the evening of 2026-10-13** (Chris away 15:16 to about 23:00: "keep working through all phases ... all balanced and
+testing new dungeons and builds as needed. all zones full of quests. more sims throughout the world"). What was done, in order, is in
+`Docs/TONIGHT_2026-10-13.md` (Progress) and `Docs/CHANGELOG.md` (2026-10-13, 15:20 on). Nothing is VERIFIED until Chris has seen it.
+- **Branch:** `feet-bow-adit-kit`, PR #2. Do not merge without Chris. Last commits tonight: 3d89ef0 (quests, sims, orc, heals),
+  e10a915 (the group-run leader's stall rule), 9deb508 (suite fixes), then the handoff commit.
+- **Published:** the release build of 9deb508 to `D:\crulanda-work\outputs\Crulanda-Playable` (see chainR39.out in lane A; if it says
+  NOT PUBLISHED, a check failed and the 15:17 build is still the playable one). Chris's save backed up first:
+  `D:\crulanda-work\save-backups\20261013-1905-before-evening-publish` (and `20261013-1517-before-bar-publish`).
+- **Tests (TESTED):** EditMode 470/470. Full PlayMode suite 319/327 at 18:36; the 6 new failures fixed and rerun green (43/44, then the
+  Adit nav test 4/4 with its rider rule). Still failing, known and parked: the hoe hand spread, the foot after a jump (Chris parked it).
+- **Balance (TESTED):** all 40 builds in their ranges (BALANCE_ALL.md in `D:\crulanda-work\outputs\balance`). Party heal of five:
+  Sanctuary 73, Mender 75, Cantor 75, Rootmend 88, Lantern 90, Choir 98, Rainspeaker 108.
+- **The Adit group run (TESTED, not seen by Chris):** to the end for the first time, 66 of 67 camps in 78 game minutes
+  (`D:\crulanda-work\run-captures\adit-group-1013-evening-2`). Open: 26 warps to the leader when a member was stuck; the tank fell 7
+  times to the gang-boss and elites; floating damage numbers stack into a white column over a mob at 3x (frame 16 of that run).
+- **For Chris to look at first:** the training yard with sims practising (they go in by themselves; grey numbers when you are near);
+  the orc look (`D:\crulanda-work\ui-captures\figures\orcs-*.png`, a first pass on the human head: green, tusks, taller); any of the 52
+  new quests (Oakhaven's start at levels 2-3: Ama Rusk, Sel Harrow, Grete Lowe, Pim).
+- **Next, in order:** Chris's reactions; an orc face from the packs in `D:\crulanda-work\imports\orcs` if he wants more than the first
+  pass; the Adit's stuck spots (the warps); the Scoundrel (designed in `Docs/CLASS_SCOUNDREL.md`, not started); the parked animation items.
+
+## Oct 12 night (history; these runs were stopped and replaced on Oct 13)
 
 **Read the "2026-10-13, 00:03 on" section below first: it is the current state.** (The bullets about suiteQ, chainR, editR and balC
 further down this section are from the night of Oct 12 and are history: those runs were stopped, and Oct 13's runs replaced them.)

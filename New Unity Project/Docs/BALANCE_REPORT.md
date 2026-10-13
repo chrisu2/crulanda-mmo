@@ -285,3 +285,43 @@ chant the same. The harness now leaves a pet, song or chant that is already up.
 healers (one target) Mender 49.6, Sanctuary 45.3, Rainspeaker 42.1 (the Cantor 105, rescaled), (party of five) Rainspeaker 102, Choir 98,
 Lantern 89; tanks, on damage only, Oathguard 53.1, Warrior Tank 49.0, Mason 48.8. The Paladin sat near the top of all three: Judicator's
 rescale takes it out of DPS. Tanks need their own test (dummies that strike: damage taken, self-healing, threat), still to build.
+
+## Round 6 (2026-10-13, 12:42-13:23): the honest dummies
+
+**Harness faults found and fixed this morning** (each made earlier numbers wrong):
+- The test scene's other sentries stood beside the dummy. Every build with a spell that hits several foes (the Mage's fields, the
+  Shaman's hail and wind, the Druid's brambles, the Salt-Mender's lines) had been landing it on them, so its "single-target" number was
+  inflated; the area builds' new splash doubled the Warrior's. Every other mob within 30 m is now stilled and taken off, once per class.
+- The dummies were picked afresh each fight (the nearest mobs); after the clearing that once chose a mob taken off the navmesh, and the
+  Druid fought from off the mesh and cast nothing (Rootmend 0 HPS, Thornsong 0 DPS). One fight spot and three dummies per class run now.
+- The area spread was cached on the talent point count, the same for every build, so it never switched on. Keyed on the ranks list now.
+- The tank test hit for a flat 40 and kept threat across fights. It now uses a tough level-15 mob's blow (EncounterEnemy.MobHit) and
+  clears threat at each fight's start.
+- A comment had swallowed the end of the rotation's ordering line, so nothing compiled at 12:42 (CS1026).
+
+**The table at 13:23** (before the retune below; `outputs\balance\archive-20261013-chainR14`): 27 of 40 builds in range. Single-target
+numbers fell where the sentries had padded them (the Mage's four, Sifter, Thornsong, Barkhide, the Shaman's four); the Unwriting rose to
+96 (Unwrite, now kept up). Area builds against three: Warrior x2.39, Judicator x2.45, Skirmisher x1.62, Combustion x2.74, Stormcaller
+x3.40.
+
+**Tanks** (three dummies striking a tough level-15 mob's blow every 2 s each; net damage taken a second, lower is sturdier):
+
+| rank | tank | taken /s | self-heal /s | threat /s | near-deaths in 180 s |
+|---|---|---|---|---|---|
+| 1 | Warrior Tank | 46.0 | 0 | 94 | 14 |
+| 2 | Shaman Stonebound | 53.5 | 0 | 44 | 17 |
+| 3 | Druid Barkhide | 62.2 | 0.7 | 227 | 18 |
+| 4 | Salt-Mender Mason | 76.2 | 0 | 50 | 26 |
+| 5 | Paladin Oathguard | 80.5 | 0.7 | 54 | 26 |
+
+The Paladin no longer leads all three roles: Oathguard is the softest tank, Judicator sits under the DPS range before the retune, and
+Sanctuary heals 45. The Druid holds threat best by far; the Shaman worst.
+
+**Retune applied at 13:24** (commit d2a4880; confirm run chainR17): 16 scales (single-target builds to 69, area builds to 64, CC, support
+and tank to 48.5, Rootmend's heal with its glade-fire to 45) and the splash shares toward x2.0 against three (Warrior .39, Judicator .38,
+Skirmisher .81, Combustion .29, Stormcaller .19).
+
+**For Chris (design, not tuning):** four single-target builds already hit several foes with their own spells, so their numbers against
+three run high: the Unwriting x1.42, Thornsong x1.29, Bonecaller x1.51 (the thrall), Sifter x1.34. The Shaman's kit is area-heavy in every
+path (Stonebound, Gravewind and Rainspeaker do about twice as much against three as against one), so its scales are large (2.45, 2.5).
+Either their area spells move to the area builds or the single-target limit (x1.25) relaxes for them.

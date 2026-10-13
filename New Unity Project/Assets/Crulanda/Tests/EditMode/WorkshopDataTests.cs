@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -129,8 +130,12 @@ namespace Crulanda.Tests
             var added = NewProps.Select(n => z.props.SingleOrDefault(p => p != null && p.name == n)).ToList();
             for (int i = 0; i < NewProps.Length; i++) Assert.IsNotNull(added[i], NewProps[i] + " is in Oakhaven's props, once.");
             // Appended: nothing the zone had before moves down the list (BuildProps draws in list order).
-            var tail = z.props.Skip(z.props.Length - NewProps.Length).Select(p => p.name).ToArray();
-            CollectionAssert.AreEqual(NewProps, tail, "The new props are the last six, in order.");
+            // (They were the last six until the training field was appended after them, 2026-10-13: only later rounds may follow them.)
+            int first = Array.FindIndex(z.props, p => p != null && p.name == NewProps[0]);
+            var block = z.props.Skip(first).Take(NewProps.Length).Select(p => p.name).ToArray();
+            CollectionAssert.AreEqual(NewProps, block, "The new props are appended together, in order.");
+            Assert.IsTrue(z.props.Skip(first + NewProps.Length).All(p => p != null && (p.kind == "training_dummy" || p.kind == "mending_dummy")),
+                "After them only what was appended later: the training field.");
             foreach (var p in added)
             {
                 string q = p.name + ": "; float half = Mathf.Max(p.size.x, p.size.y) / 2, reach = Reach(p);

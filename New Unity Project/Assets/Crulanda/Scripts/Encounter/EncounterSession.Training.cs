@@ -54,7 +54,15 @@ namespace Crulanda.Encounter
             var agent = go.AddComponent<NavMeshAgent>(); agent.radius = .35f; agent.height = 1.9f; agent.baseOffset = 1; agent.speed = 0; agent.angularSpeed = 0;
             var e = go.AddComponent<EncounterEnemy>(); e.actor = a; e.persistentId = id; e.session = this; e.Camp = false;
             go.SetActive(true); e.Initialize(); e.enabled = false;   // no thought, no step, no blow: only a body to strike
-            if (agent.isOnNavMesh) agent.isStopped = true;
+            // Switching on, its agent snaps it to the nearest navmesh, which can be metres off (the 13:27 frames): back to its spot, on the
+            // navmesh there if there is one within 3 m, else at the spot with the agent off (it never moves).
+            if ((go.transform.position - point).sqrMagnitude > 1.5f * 1.5f)
+            {
+                if (NavMesh.SamplePosition(point - Vector3.up, out var hit, 3, NavMesh.AllAreas) && agent.isOnNavMesh) agent.Warp(hit.position);
+                else { agent.enabled = false; go.transform.position = point; }
+            }
+            if (agent.enabled && agent.isOnNavMesh) agent.isStopped = true;
+            if (Zone != null) Zone.TrainingDummyLook(go.transform, Vector3.down, false);
             DressTrainingDummy(e); Enemies.Add(e);
             return e;
         }
@@ -70,6 +78,7 @@ namespace Crulanda.Encounter
             var a = go.AddComponent<Actor>(); a.Initialize(content.player, "Mending dummy", Progress.Level, new EntityId(id));
             go.AddComponent<Combatant>();
             go.SetActive(true); DressMendingDummy(a);
+            if (Zone != null) Zone.TrainingDummyLook(go.transform, Vector3.down, true);
             return a;
         }
         void DressMendingDummy(Actor a)

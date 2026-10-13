@@ -49,7 +49,11 @@
 - SocialPull 7/8 at 01:14 ("The first is home"): fixed in 31cad5d (a mob finishes the walk home before strolling; far-off mobs ask
   for the way home at most every 2 s). The full suite from 01:34 (`suiteS.xml`) includes it.
 - **Stopped at 02:29 (Chris: "once ... full playmode suite's result is finish we need to wrap it up"):** only the full suite from 01:34
-  ran to the end (`D:\crulanda-work\chainR9.ps1`, `encounter-validation\suiteS.xml`; result below). **Next session, first:** run
+  ran to the end (`D:\crulanda-work\chainR9.ps1`, `encounter-validation\suiteS.xml`). **Result (01:34-03:00, code as of 01:34):
+  PlayMode 315/318.** SocialPull passed (the walk-home fix). The three failures are the known animation items: the hoe hand spread (hands
+  37-43 cm apart, 45-60 wanted; TODO 5), the foot flake (running after a jump, toes pulled up; TODO 4), and one new: a long tool's shaft
+  through a villager's leg while walking (Grete Lowe, 0.07 m; `A_long_tool_is_held_in_the_fist_like_a_staff_clear_of_the_arm`). The
+  work after 01:34 (spirits, training field, spread, tank test, harness fixes, the grey) is not in this run; chainR12/R13 test it. **Next session, first:** run
   `D:\crulanda-work\chainR12.ps1` (all ten classes on the dummies with every Oct 13 change: the spirits, area spread, tank test, toggles
   and healing fixes; the merge; EditMode `editT`; the lane B release build with -NoPublish) and then `chainR13.ps1` (TrainingFieldTests).
   Both wait for `CHAIN9_DONE` in chainR9.out, which is there. Then tune: `balance_retune.py --apply`, the spread shares

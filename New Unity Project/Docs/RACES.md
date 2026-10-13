@@ -10,7 +10,7 @@ Status: research only. No race code exists yet.
 | Goblins, the "Weavers of the Warrens" (Vibration-Locking, Static-Charting, the Resonance Purge); Snivels, Razzle, Rill | CANON | world_bible.md l.37, l.86-87 |
 | Dwarves (Captain Horgus) | CANON (only seen once) | Book1 l.1904 |
 | Ancient non-human wood-and-moss beings of the Western Shore | CANON (not playable) | world_bible.md l.69 |
-| An orc homeland, orc religion, or orc shamans | NOT IN CANON: orc shamanism would be **CANON-EXPANDED**, linked to Gorm's "ancient references" and the root-sap remedies, and needs Chris's sign-off | — |
+| An orc homeland, orc religion, or orc shamans | NOT IN CANON: orc shamanism would be **CANON-EXPANDED**, linked to Gorm's "ancient references" and the root-sap remedies, and needs Chris's sign-off | ï¿½ |
 
 The canon has no machines, so an orc Shaman should be spirit/root/earth themed, matching the Weave and Root-Mother.
 
@@ -29,7 +29,7 @@ The canon has no machines, so an orc Shaman should be spirit/root/earth themed, 
 7. **Lore:** a short orc page (CANON-EXPANDED) for Chris to approve before any content is written.
 
 ## Status 2026-10-12 23:25 (code only, not compiled yet)
-- Races.cs: Human and Orc. Orc classes (PROVISIONAL): warrior, druid, ranger, rogue, shaman. Shaman is orc-only; Cleric is human-only for now.
+- Races.cs: Human and Orc. Orc classes (Chris, 23:31): Warrior, Ranger, Rogue, Mage and Shaman. No Druid. Shaman is orc-only; Cleric is human-only for now.
 - EncounterProgress.raceId defaults to human, and a loaded save is normalised to its class (Races.For). FreshProgress takes a race. SimAdventurer.raceId plus a Race property.
 - EditMode RaceTests (4 tests).
 - Not done yet: the orc figure, the race pick at character creation, the sim race mix, and UI.

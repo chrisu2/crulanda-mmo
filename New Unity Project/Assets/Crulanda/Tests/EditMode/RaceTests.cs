@@ -21,6 +21,12 @@ namespace Crulanda.Tests
             Assert.AreEqual(Races.Orc, Races.Requires("class.shaman"));
             Assert.IsNull(Races.Requires("class.warrior"));
         }
+        [Test] public void Orcs_play_warrior_ranger_rogue_mage_and_shaman_not_druid()   // Chris 23:31
+        {
+            foreach (var c in new[] { "class.warrior", "class.ranger", "class.rogue", "class.mage", "class.shaman" }) Assert.IsTrue(Races.Allows(Races.Orc, c), c);
+            foreach (var c in new[] { "class.druid", "class.paladin", "class.archivist", "class.saltmender", "class.cleric" }) Assert.IsFalse(Races.Allows(Races.Orc, c), c);
+            Assert.AreEqual(Races.Human, EncounterSession.FreshProgress("class.druid", Races.Orc).raceId, "an orc cannot be a Druid");
+        }
         [Test] public void A_fresh_save_gets_a_race_its_class_allows()
         {
             Assert.AreEqual(Races.Human, EncounterSession.FreshProgress("class.mage").raceId);

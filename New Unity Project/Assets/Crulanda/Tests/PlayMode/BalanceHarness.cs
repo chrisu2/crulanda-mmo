@@ -37,10 +37,11 @@ namespace Crulanda.Tests
         // once a fight: summons and standing auras.
         static readonly HashSet<string> Never = new HashSet<string> { "druid.barkhide", "druid.thornclaw", "druid.rootmend", "druid.thornsong", "mage.unbind", "mage.quench", "mage.bind",
             "rogue.vanish", "rogue.tumble", "rogue.sap", "rogue.blind", "ranger.disengage", "druid.sleep_of_the_wood",
-            "archivist.cadence", "archivist.dirge" };   // songs of pace and slowing: nothing a dummy shows, and one would replace the Song of Mending
+            "archivist.cadence", "archivist.dirge", "mage.ash_hex", "archivist.echo_bind" };   // holds that damage breaks   // songs of pace and slowing: nothing a dummy shows, and one would replace the Song of Mending
         /// <summary>Kept up: a damage over time with no cooldown, recast when its last use is this many seconds old (2026-10-13: the Cleric's
         /// Brand costs what Rebuke costs and has no cooldown, so the rotation always reached Rebuke first and never cast it).</summary>
-        static readonly Dictionary<string, float> Every = new Dictionary<string, float> { { "cleric.brand", 7.5f } };
+        static readonly Dictionary<string, float> Every = new Dictionary<string, float> { { "cleric.brand", 7.5f },
+            { "archivist.unwrite", 11.5f }, { "mage.marrow_drain", 9.5f } };   // the Unwriting's own Unwrite and the Bonecaller's Marrow Drain were never cast either
         static readonly HashSet<string> Once = new HashSet<string> { "mage.raise_thrall", "ranger.call_companion", "paladin.oath", "paladin.colours",
             "archivist.song_of_mending", "salt.mender_craft" };   // 2026-10-13: the healers' songs and chants are toggles: started once (they were never started, or toggled off again)
         int SlotOf(string id) { for (int i = 0; i < s.Kit.ActionCount; i++) { var a = s.Kit.ActionAt(i); if (a != null && a.id == id) return i; } return -1; }

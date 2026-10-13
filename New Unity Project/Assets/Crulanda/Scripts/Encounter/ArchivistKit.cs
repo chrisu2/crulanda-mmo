@@ -28,7 +28,7 @@ namespace Crulanda.Encounter
             "uw-unwrite", "uw-deep-unwriting", "uw-long-silence", "uw-erasure", "uw-hollow-echo", "uw-grey-note", "uw-void-hum", "uw-quick-erasure", "uw-spreading-grey", "uw-the-unwritten",   // the Unwriting
             "ca-clear-voice", "ca-breath", "ca-held-note", "ca-chorus", "ca-long-song", "ca-echoing-mend", "ca-resonant-ward", "ca-quiet-mind", "ca-weave", "ca-symphony" };   // the Cantor, tiers 0-3
         public static readonly string[] BarIds = { "archivist.shard_note", "archivist.lull", "archivist.hush", "archivist.echo_bind", "archivist.cadence", "archivist.dirge", "archivist.echo_jar",
-            "archivist.mending_phrase", "archivist.song_of_mending", "archivist.chorus", "archivist.unwrite", "archivist.erasure", "archivist.stillness" };
+            "archivist.mending_phrase", "archivist.song_of_mending", "archivist.chorus", "archivist.unwrite", "archivist.erasure", "archivist.stillness", "archivist.mending_verse" };
         public const float MendingReach = 10, MendingShare = .01f, HeldNoteShare = .01f, HeldNoteSeconds = 5, LowMend = .35f;
         public const float LullSeconds = 20, LullReach = 6, BindSeconds = 30, HushSilence = 5, DirgeReach = 10, JarReach = 8, JarSeconds = 6, CadenceSpeed = .1f;
         public const int LullMost = 3, JarMost = 3;
@@ -101,6 +101,7 @@ namespace Crulanda.Encounter
                 case "archivist.dirge": return Sing(a, Song.Dirge);
                 case "archivist.echo_jar": return EchoJar(a);
                 case "archivist.mending_phrase": return MendingPhrase(a);
+                case "archivist.mending_verse": return MendingVerse(a);
                 case "archivist.song_of_mending": return Sing(a, Song.Mending);
                 case "archivist.chorus": return Chorus(a);
                 case "archivist.unwrite": return Unwrite(a);
@@ -326,6 +327,15 @@ namespace Crulanda.Encounter
             return Mathf.RoundToInt(heal);
         }
         /// <summary>Mending Phrase: sung 1.5 s (Breath: quicker), then heals whoever is most hurt by then; Held Note leaves a mend behind.</summary>
+        /// <summary>The Mending Verse (Chris, 2026-10-13: "yes give a slower group heal"; CANON-EXPANDED, the Song of Mending): a whole
+        /// verse sung over 3 s mends everyone in your party within 20 m (Clear Voice: more).</summary>
+        bool MendingVerse(AbilityDefinition a)
+        {
+            return Start(a, () => {
+                int heal = Mathf.RoundToInt((a.power + Level) * (1 + .04f * R("ca-clear-voice")));
+                foreach (var who in Party()) if (who != null && who.IsAlive && Vector3.Distance(who.transform.position, s.Player.transform.position) <= a.range) HealActor(who, heal);
+            });
+        }
         bool MendingPhrase(AbilityDefinition a)
         {
             var sung = new AbilityDefinition { id = a.id, name = a.name, description = a.description, effect = a.effect, power = a.power, cost = Mathf.Max(0, a.cost - 3 * R("ca-quiet-mind")),

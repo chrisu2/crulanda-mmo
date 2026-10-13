@@ -2696,6 +2696,12 @@ BRANCH.update({'lantern': ('#4a3a1a', ['#ffd860', '#fff2c0', '#ffe9a0', '#d0a060
                'rainspeaker': ('#1e3440', ['#9fe8ff', '#70b0ff', '#dfe8f0', '#ffffff', '#70d0e0']), 'stormcaller': ('#2a2e3a', ['#ffd860', '#8a90b0', '#bfe0ff', '#ffffff', '#5a607a']),
                'stonebound': ('#3a3222', ['#c8b080', '#8a8a84', '#9be05a', '#c8c0a0', '#7a5434']), 'gravewind': ('#2c2440', ['#c8b0ff', '#eeeee4', '#8a90b0', '#e0d0ff', '#c8c0a8'])})
 
+# ---- the slower group heals (2026-10-13: "yes give a slower group heal") ----
+def a_mending_oath(c): c.back(c.ell(50, 50, 40), '#ffe9a0', .4, 12); rings(c, 50, 54, (40, 28), '#fff2c0', .6, w=3); m_heart(c, '#ffd0d8', '#ffffff'); c.spark(50, 18, 9, '#ffffff', .9)
+def a_mending_verse(c): c.back(c.ell(50, 50, 40), '#9fe8c0', .4, 12); rings(c, 50, 54, (42, 30), '#d0ffe0', .6, w=3); m_note(c, '#d0ffe0', '#ffffff')
+def a_wound_seal(c): c.back(c.ell(50, 50, 40), '#eeeee4', .4, 12); rings(c, 50, 54, (42, 30), '#ffffff', .5, w=3); m_hand(c, '#eeeee4', '#ffffff')
+ABILITIES.update({'paladin.mending_oath': ('#4a3c20', a_mending_oath), 'archivist.mending_verse': ('#1e3a34', a_mending_verse), 'salt.wound_seal': ('#1e342c', a_wound_seal)})
+
 def main():
     here = os.path.dirname(os.path.abspath(__file__))
     ap = argparse.ArgumentParser(description='Paints the Crulanda HUD icons (items, quest items, abilities, talents, trades).')

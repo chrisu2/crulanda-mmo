@@ -388,6 +388,18 @@ MonoBehaviour:
     globalCooldown: 1.5
     duration: 0
     statusId: 
+  - id: paladin.mending_oath
+    name: Mending Oath
+    description: "An oath sworn slowly over 3 seconds: everyone in your party within 20 metres is mended. Slower than Mend, for a hurt party. GAME-ONLY."
+    effect: 3
+    power: 15
+    cost: 30
+    cooldown: 0
+    range: 20
+    castTime: 3
+    globalCooldown: 1.5
+    duration: 0
+    statusId: 
   - id: paladin.ward
     name: Ward
     description: Reduce damage taken by 40% for 5 seconds. Blows taken under it build Conviction.
@@ -940,6 +952,18 @@ MonoBehaviour:
     globalCooldown: 1.5
     duration: 0
     statusId: 
+  - id: archivist.mending_verse
+    name: The Mending Verse
+    description: "A whole verse of the Song of Mending, sung over 3 seconds: everyone in your party within 20 metres is mended. Slower than a phrase, for a hurt party."
+    effect: 3
+    power: 15
+    cost: 28
+    cooldown: 0
+    range: 20
+    castTime: 3
+    globalCooldown: 1.5
+    duration: 0
+    statusId: 
   - id: archivist.song_of_mending
     name: Song of Mending
     description: "A song: every party member within 10 metres of you mends 1% of maximum health a second. One song at a time; use again to stop."
@@ -1216,6 +1240,18 @@ MonoBehaviour:
     globalCooldown: 1.5
     duration: 0
     statusId:
+  - id: salt.wound_seal
+    name: Seal the Wound
+    description: "The Mender-Craft cried out over 3 seconds, I seal the Wound: everyone in your party within 20 metres is mended. Slower than Close the Cut, for a hurt party."
+    effect: 3
+    power: 15
+    cost: 26
+    cooldown: 0
+    range: 20
+    castTime: 3
+    globalCooldown: 1.5
+    duration: 0
+    statusId: 
   - id: salt.mender_craft
     name: Mender-Craft
     description: "The chant kept up (\"I seal the Wound!\"): every 2 seconds the party within 12 metres mends, for 4 Salt a verse. Again to stop. Talent. CANON-EXPANDED."
@@ -1780,6 +1816,9 @@ MonoBehaviour:
       - abilityId: paladin.mend
         level: 1
         talentId: 
+      - abilityId: paladin.mending_oath
+        level: 1
+        talentId: sa-devotion
       - abilityId: paladin.ward
         level: 2
         talentId: 
@@ -2021,6 +2060,9 @@ MonoBehaviour:
       - abilityId: archivist.mending_phrase
         level: 3
         talentId: 
+      - abilityId: archivist.mending_verse
+        level: 1
+        talentId: ca-clear-voice
       - abilityId: archivist.song_of_mending
         level: 5
         talentId: 
@@ -2082,6 +2124,9 @@ MonoBehaviour:
       - abilityId: salt.close_cut
         level: 7
         talentId:
+      - abilityId: salt.wound_seal
+        level: 1
+        talentId: md-mender-craft
       - abilityId: salt.mender_craft
         level: 1
         talentId: md-mender-craft

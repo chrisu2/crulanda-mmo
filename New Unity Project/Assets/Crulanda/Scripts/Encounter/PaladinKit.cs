@@ -27,7 +27,7 @@ namespace Crulanda.Encounter
             "va-colours-held", "va-press-harder", "va-rampart", "va-close-ranks", "va-press-longer", "va-steady-ranks", "va-comrades", "va-under-the-colours", "va-last-stand"
         };
         public static readonly string[] BarIds = { "paladin.smite", "paladin.oath", "paladin.mend", "paladin.ward", "paladin.judgement", "paladin.consecrate", "paladin.lay_on", "paladin.aegis", "paladin.censure", "paladin.rebuke",
-            "paladin.colours", "paladin.close_ranks", "paladin.press_on" };
+            "paladin.colours", "paladin.close_ranks", "paladin.press_on", "paladin.mending_oath" };
         public const int MaxConviction = 3, HealRange = 25;
         public const float WardMultiplier = .6f, ConsecrateRadius = 5, ColoursRadius = 8, PressHaste = .15f;
         const float ConvictionKept = 10;
@@ -90,6 +90,7 @@ namespace Crulanda.Encounter
                 case "paladin.smite": return Smite(a);
                 case "paladin.oath": return Oath(a);
                 case "paladin.mend": return Mend(a);
+                case "paladin.mending_oath": return MendingOath(a);
                 case "paladin.ward": return Ward(a);
                 case "paladin.judgement": return Judgement(a);
                 case "paladin.consecrate": return Consecrate(a);
@@ -256,6 +257,15 @@ namespace Crulanda.Encounter
 
         // ---------- Sanctuary: Mend, Lay On, Aegis ----------
         public int MendAmount(AbilityDefinition a) { return Mathf.RoundToInt((a.power + 2 * Level) * (1 + .04f * R("sa-devotion"))); }
+        /// <summary>Mending Oath (Chris, 2026-10-13: "yes give a slower group heal"; GAME-ONLY): sworn over 3 s, it mends everyone in
+        /// your party within 20 m (Devotion: more).</summary>
+        bool MendingOath(AbilityDefinition a)
+        {
+            return Start(a, () => {
+                int heal = Mathf.RoundToInt((a.power + Level) * (1 + .04f * R("sa-devotion")));
+                foreach (var who in Party()) if (who != null && who.IsAlive && Vector3.Distance(who.transform.position, s.Player.transform.position) <= a.range) HealActor(who, heal);
+            });
+        }
         bool Mend(AbilityDefinition a)
         {
             var target = HealTarget;

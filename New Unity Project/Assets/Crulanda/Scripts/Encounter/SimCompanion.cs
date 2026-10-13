@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
@@ -32,7 +32,8 @@ namespace Crulanda.Encounter
                 if (sim.classId == "class.warrior") return PartyRole.Tank;
                 if (sim.classId == "class.druid") return PartyRole.Healer;
                 // A Salt-Mender heals when no Druid is along (the Mender path, 2026-10-12), else throws salt with the others.
-                if (sim.classId == "class.saltmender") return session.PartySims.Exists(c => c != null && c != this && c.sim.classId == "class.druid") ? PartyRole.Damage : PartyRole.Healer;
+                if (sim.classId == "class.cleric" || sim.classId == "class.shaman") return PartyRole.Healer;   // note 178: the new healers (classes 9-10)
+            if (sim.classId == "class.saltmender") return session.PartySims.Exists(c => c != null && c != this && c.sim.classId == "class.druid") ? PartyRole.Damage : PartyRole.Healer;
                 if (sim.classId == "class.paladin") return session.PartySims.Exists(c => c != null && c != this && c.sim.classId == "class.druid" || c.sim.classId == "class.saltmender") || session.PartySims.Exists(c => c != null && c != this && c.sim.classId == "class.warrior") == false ? PartyRole.Tank : PartyRole.Healer;
                 return PartyRole.Damage;
             }
@@ -47,7 +48,7 @@ namespace Crulanda.Encounter
         float nextHold, nextKick;
         /// <summary>Has an interrupt (Kick, Hush, Shield Bash, Censure, Quench): stops a cast in its reach every 12 s.</summary>
         public bool Interrupter { get { return sim.classId == "class.rogue" || sim.classId == "class.archivist" || sim.classId == "class.warrior" || sim.classId == "class.paladin" || sim.classId == "class.mage"; } }
-        public bool Healer { get { return sim.classId == "class.druid" || sim.classId == "class.paladin" || sim.classId == "class.saltmender"; } }
+        public bool Healer { get { return sim.classId == "class.druid" || sim.classId == "class.paladin" || sim.classId == "class.saltmender" || sim.classId == "class.cleric" || sim.classId == "class.shaman"; } }   // the Cleric and Shaman (note 178) heal when they come
         /// <summary>A Salt-Mender sim's rotation (2026-10-12): the mend above (Close the Cut) on the most hurt; the Mender-Craft chant over the
         /// party within 12 m every 4 s of a fight (or while anyone near it is hurt); a salt cairn every 20 s when two or more are hurt; salt shards between.</summary>
         /// <summary>Which of the reworked paths a sim plays (2026-10-12), by its variant: a Mage with an odd variant is a Bonecaller (it

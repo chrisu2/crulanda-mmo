@@ -58,6 +58,8 @@ namespace Crulanda.Tests
         }
         int SlotOf(string id) { for (int i = 0; i < s.Kit.ActionCount; i++) { var a = s.Kit.ActionAt(i); if (a != null && a.id == id) return i; } return -1; }
         string root; EncounterSession s;
+        /// <summary>One fight spot and the same three dummies for a whole class run (set on its first fight).</summary>
+        List<EncounterEnemy> dummySet; Vector3 fightAt;
         void OnLoaded(Scene scene, LoadSceneMode mode) { var x = UnityEngine.Object.FindFirstObjectByType<EncounterSession>(); if (x != null) x.SaveDirectoryOverride = root; }
 
         [UnityTest, Timeout(3600000)] public IEnumerator Every_class_and_build_on_the_dummies()
@@ -69,7 +71,7 @@ namespace Crulanda.Tests
                 EncounterSession.StartClassOverride = cls; SceneManager.sceneLoaded += OnLoaded;
                 yield return SceneManager.LoadSceneAsync("PlayableEncounter", LoadSceneMode.Single);
                 SceneManager.sceneLoaded -= OnLoaded; yield return null; yield return null;
-                s = UnityEngine.Object.FindFirstObjectByType<EncounterSession>();
+                s = UnityEngine.Object.FindFirstObjectByType<EncounterSession>(); dummySet = null;
                 if (s == null || s.Kit == null) { csv.Add(cls + ",LOAD FAILED,,,,,,,,,,"); continue; }
                 if (s.Companion != null) s.Companion.gameObject.SetActive(false);
                 s.Progress.experience = EncounterProgress.XpForLevel(15); s.Player.SetLevel(15);   // the gear asks for the level
@@ -261,9 +263,27 @@ namespace Crulanda.Tests
                 csv.Add("# state " + cls + " " + branch.id + " " + scenario + " " + seed + ": alive " + s.Player.IsAlive + " hp " + s.Player.Health.Pool.Current + "/" + s.Player.Health.Pool.Max +
                     " casting " + s.PlayerCasting + " lead " + s.LeadBuild + " mira " + (s.Companion != null ? s.Companion.actor.IsAlive + " " + s.Companion.actor.Health.Pool.Current + " active " + s.Companion.gameObject.activeInHierarchy : "none") +
                     " spirit " + (s.Spirit != null) + " bar " + string.Join(" ", Enumerable.Range(0, s.Kit.ActionCount).Select(i => (s.Kit.ActionAt(i) != null ? s.Kit.ActionAt(i).id.Replace("druid.", "") : "-") + "=" + (s.Kit.ActionLockLabel(i) ?? "ok"))));
-            var foes = s.Enemies.Where(x => x != null && x.actor.IsAlive).OrderBy(x => x.transform.position.sqrMagnitude).Take(Math.Max(1, targets)).ToList();
+            if (dummySet == null || dummySet.Count == 0 || dummySet.Any(d => d == null || d.actor == null || !d.actor.IsAlive))
+            {
+                // One fight spot and the same three dummies for the whole class run (2026-10-13: picking the nearest mobs afresh each fight
+                // once chose a mob the clearing below had taken off the navmesh, and the Druid fought from off the mesh, out of reach of
+                // everything). Every other mob within 30 m is stilled and taken 150 m off, once (the area builds' splash, EncounterSession.Spread,
+                // had landed on the scene's other sentries and doubled the Warrior's single-target number).
+                dummySet = s.Enemies.Where(x => x != null && x.actor.IsAlive && !x.Game).OrderBy(x => x.transform.position.sqrMagnitude).Take(3).ToList();
+                if (dummySet.Count > 0)
+                {
+                    fightAt = dummySet[0].transform.position; int away = 0;
+                    foreach (var other in s.Enemies)
+                        if (other != null && !dummySet.Contains(other) && (other.transform.position - fightAt).sqrMagnitude < 30 * 30)
+                        {
+                            other.enabled = false; var oag = other.GetComponent<UnityEngine.AI.NavMeshAgent>(); if (oag != null) oag.enabled = false;
+                            other.transform.position = fightAt + Vector3.forward * 150 + Vector3.right * 6 * away++;
+                        }
+                }
+            }
+            var foes = dummySet.Take(Math.Max(1, targets)).ToList();
             if (foes.Count == 0) { csv.Add(string.Join(",", cls, branch.id, role, scenario, seed, "NO FOE", "", "", "", "", "", "")); yield break; }
-            var motor = s.Player.GetComponent<AdventurerMotor>(); var at = foes[0].transform.position;
+            var motor = s.Player.GetComponent<AdventurerMotor>(); var at = fightAt;
             for (int i = 0; i < foes.Count; i++)
             {
                 Dummy(foes[i]); foes[i].threat.Clear(); var ag = foes[i].GetComponent<UnityEngine.AI.NavMeshAgent>();
@@ -271,14 +291,14 @@ namespace Crulanda.Tests
                 if (targets == 0) p = at + Vector3.forward * 80 + Vector3.right * 3 * i;   // the heal test: no foe in reach, nothing to strike
                 if (ag != null && ag.isOnNavMesh) ag.Warp(p); else foes[i].transform.position = p;
             }
-            // Nothing else near the fight (2026-10-13: the area builds' splash, EncounterSession.Spread, landed on the scene's other sentries
-            // beside the dummy and doubled the Warrior's single-target number): every other mob within 30 m is stilled and taken 150 m off.
-            int away = 0;
-            foreach (var other in s.Enemies)
-                if (other != null && !foes.Contains(other) && (other.transform.position - at).sqrMagnitude < 30 * 30)
+            // The dummies not in this fight stand well off, on the navmesh, where no splash reaches them.
+            int off = 0;
+            foreach (var idle in dummySet)
+                if (!foes.Contains(idle))
                 {
-                    other.enabled = false; var oag = other.GetComponent<UnityEngine.AI.NavMeshAgent>(); if (oag != null) oag.enabled = false;
-                    other.transform.position = at + Vector3.forward * 150 + Vector3.right * 6 * away++;
+                    Dummy(idle); idle.threat.Clear(); var iag = idle.GetComponent<UnityEngine.AI.NavMeshAgent>(); var q = at + Vector3.forward * 60 + Vector3.right * 4 * off++;
+                    if (UnityEngine.AI.NavMesh.SamplePosition(q, out var qh, 25, UnityEngine.AI.NavMesh.AllAreas)) q = qh.position;
+                    if (iag == null || !iag.isOnNavMesh || !iag.Warp(q)) { if (iag != null) iag.enabled = false; idle.transform.position = q; }
                 }
             motor.Teleport(at + Vector3.back * 2.4f + Vector3.up * .5f); s.Player.transform.rotation = Quaternion.LookRotation(Vector3.forward);
             if (targets > 0) s.Select(foes[0]); else s.Select(null);

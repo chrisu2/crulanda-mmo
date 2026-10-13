@@ -18,7 +18,7 @@ namespace Crulanda.Encounter
         public static bool Requested { get { return Array.IndexOf(Environment.GetCommandLineArgs(), Flag) >= 0; } }
         string dir; readonly System.Text.StringBuilder report = new System.Text.StringBuilder(); EncounterSession session; float keptScale = -1;
 
-        IEnumerator Shot(string name, string what, Transform also)
+        IEnumerator Shot(string name, string what, Transform also, bool clear = true)
         {
             yield return new WaitForSecondsRealtime(.6f);
             var player = session.Player.transform; var motor = session.Player.GetComponent<AdventurerMotor>(); var cam = Camera.main;
@@ -28,7 +28,7 @@ namespace Crulanda.Encounter
                 if (also != null) l.AddRange(CaptureFraming.InTheWay(cam.transform.position, also.position + Vector3.up * .3f, also, player));
                 return l;
             }
-            var blocked = InWay();
+            var blocked = clear ? InWay() : new System.Collections.Generic.List<Renderer>();   // the yard's overview hides nothing: its fence is what to see
             for (int k = 0; k < 8 && blocked.Count > 0 && motor.enabled; k++)
             {
                 var e = cam.transform.eulerAngles; motor.SetView(e.y + 45, e.x > 180 ? e.x - 360 : e.x, Vector3.Distance(cam.transform.position, player.position));
@@ -72,8 +72,8 @@ namespace Crulanda.Encounter
 
             // 1. The field: both dummies from a few metres off.
             var mid = (dummy.transform.position + mend.transform.position) / 2; var stand = mid + Quaternion.Euler(0, Yaw(mid, s.Zone.Ground(Vector2.zero)), 0) * Vector3.forward * 13;
-            motor.Teleport(stand + Vector3.up * .3f); motor.SetView(Yaw(stand, mid), 24, 10); yield return new WaitForSeconds(1);
-            yield return Shot("tf-01-yard", "the training yard east of Oakhaven from its gate: the fence, the tents, the banners, the dummies down the left, the butts down the right, the healer's corner, the training and mending dummies", dummy.transform);
+            motor.Teleport(stand + Vector3.up * .3f); motor.SetView(Yaw(stand, mid), 32, 14); yield return new WaitForSeconds(1);
+            yield return Shot("tf-01-yard", "the training yard east of Oakhaven from its gate: the fence, the tents, the banners, the dummies down the left, the butts down the right, the healer's corner, the training and mending dummies", dummy.transform, false);
 
             // 2. Striking the training dummy, the meter timing it.
             var front = dummy.transform.position + dummy.transform.forward * 3;

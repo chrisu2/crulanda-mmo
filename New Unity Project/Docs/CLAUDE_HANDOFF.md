@@ -33,3 +33,5 @@ Note 150 frame review. Hoeing frames are good (both hands on the shaft, tines in
 - See-through houses outdoors (the screen-door fade shows in the frames): keep it, or limit it.
 ## Rule (Chris 12:55, 2026-10-12): at most 3 candidate-* folders in D:\crulanda-work. Delete the oldest before making a new one; never the published build.
 
+
+- Parked (Chris 23:13): foot work, see PLAYTEST_NOTES (FootTests 1 left: 178-degree landing yaw).

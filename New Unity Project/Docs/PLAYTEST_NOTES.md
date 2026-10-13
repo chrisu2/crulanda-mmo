@@ -695,3 +695,6 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
 - 176 (17:53) "just keep it for now" / "we have other things to accomplish" (OPEN; thrall kept as is)
 - 177 (18:22) "control classes should not be top tier dps for sure" / "or healers" (OPEN; role DPS caps: healer <= 50%, control/support <= 75% of the DPS median; RoleCapTests)
 - 178 (19:18) "still need other healers to test. paladin, cleric (new class) , shaman (new class), salt mender" (OPEN; party heal test with Mira + 3 sims queued; Cleric and Shaman queued after a canon check and design doc; classes 8 -> 10)
+
+- TODO (Chris 23:13, parked): foot work. FootTests is down to 1 problem after 0f81dbe (standing to the higher sole): 'running after a jump left foot at 0.161s: down but turned 178 degrees' (the 179-degree reading again; the foot near vertical on landing). Pick up later.
+- TODO: party heal test has no sims because PlayableEncounter has no SimPopulation ('[no SimPopulation]'). Load Oakhaven, or add a SimPopulation for the test.

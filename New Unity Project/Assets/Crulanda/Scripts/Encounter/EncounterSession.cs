@@ -93,13 +93,13 @@ namespace Crulanda.Encounter
             var pet = wolf.gameObject.AddComponent<RangerPet>(); pet.Kind = kind; wolf.gameObject.SetActive(true); pet.Init(wolf, this, kit);
             Pet = pet; return pet;
         }
-        /// <summary>The spirit at your shoulder that nobody commands (SpiritCompanion): the Stormcaller's storm spirit, the Rootmend's
+        /// <summary>The spirit at your shoulder that nobody commands (SpiritCompanion): the Stormcaller's aether butterfly, the Rootmend's
         /// glade-fire. It comes with the build you have spent most in and goes when you change it (checked twice a second).</summary>
         public SpiritCompanion Spirit { get; private set; }
         float spiritCheckAt;
         public static SpiritCompanion.Kinds? SpiritFor(string leadBuild)
         {
-            switch (leadBuild) { case "class.shaman/stormcaller": return SpiritCompanion.Kinds.Storm; case "class.druid/rootmend": return SpiritCompanion.Kinds.GladeFire; default: return null; }
+            switch (leadBuild) { case "class.shaman/stormcaller": return SpiritCompanion.Kinds.Butterfly; case "class.druid/rootmend": return SpiritCompanion.Kinds.GladeFire; default: return null; }
         }
         void TendSpirit()
         {

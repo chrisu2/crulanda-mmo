@@ -18,7 +18,7 @@ namespace Crulanda.Encounter
         /// <summary>Seconds the party has spent in a fight since the reset.</summary>
         public float CombatSeconds { get; private set; }
         public CombatMeter(EncounterSession session) { s = session; }
-        /// <summary>A party member's own row for what is done in its name (SpiritCompanion: the storm spirit, the glade-fire).</summary>
+        /// <summary>A party member's own row for what is done in its name (SpiritCompanion: the aether butterfly, the glade-fire).</summary>
         public sealed class Credit { public string id, name; }
         /// <summary>Set for the length of one blow or mend done on your behalf: counted on that row, not yours.</summary>
         public Credit Redirect;

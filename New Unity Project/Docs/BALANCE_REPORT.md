@@ -91,3 +91,53 @@ DPS-role median (single target): before 68.7, after 69.5.
 - **Ranger beastbond** (pet, 139%). Its damage is almost all the pet, which `BuildDamageScale` doesn't touch. It is the only pet build besides Bonecaller (57%), so the pet role is far apart. Next step is a pet damage scale.
 - **Archivist builds and Mage spellbinder** are well under their caps (Archivist 22-33%, spellbinder 59%). Under a cap is allowed. Whether they're viable depends on the value of their crowd control and support, which this harness doesn't measure.
 - **Tanks** have no cap. Paladin oathguard is at 77% of the DPS median.
+
+---
+
+## Round 2 (2026-10-12, 20:00): harness v6, pet damage scale, party heal test
+Raw CSVs: `Docs/balance_v6.csv` and `Docs/party_heal_v1.csv`. The harness passes 2/2, including the role-cap check.
+
+### Harness fixes
+- **Druid forms.** The form shift was failing on the GCD, which left the previous build's form on: rootmend was fighting in Thornclaw and thornsong in Rootmend. The harness now retries the shift for up to 6 s and logs `# form ...: Active`. All four Druid builds now hold their form on every fight.
+- **Fillers taken in turn.** Equal-ranked abilities with no cooldown now alternate, which is Thornsong's Seedshot and Thornbolt loop. Seedling can now be used every time it's ready (it builds Rootmend's Sap).
+- **Lock log.** At the start of each fight, `# locks` lists every locked ability and the reason.
+
+### Pet damage scale
+| build | before | after |
+|---|---|---|
+| ranger/beastbond | 139% | 103% |
+| mage/bonecaller | 57% | 93% |
+| ranger/pathfinder (control) | 82% | 66% (cap 75%) |
+
+The scales are player and pet ×0.75 for beastbond, ×1.6 for bonecaller, and pet ×0.5 for pathfinder.
+
+### Druid, with forms now held (single target, % of the 70.6 DPS median)
+- **Thornsong:** 12.2 → 31.4 DPS (44%). Still low: a real retune target.
+- **Rootmend:** 0 DPS in its own form, which is correct for a healer. Solo heal test: 4.3 HPS.
+- **Party test:** 17 HPS at 5-9% overheal. Low next to the other healers.
+
+### Open: the Archivist moved with the harness change
+From v5 to v6 the Archivist builds moved sharply, though their kit was not changed:
+
+| build | v5 | v6 |
+|---|---|---|
+| the-unwriting | 92% | 137% |
+| the-lull | 33% | 6% |
+| the-cantor | 33% | 8% |
+| the-still-vow | 23% | 4% |
+
+The no-cooldown filler alternation likely now casts Lull and Hush (sleep and silence) on the dummies. That stops their own damage. **Until that's checked, the v6 Archivist numbers are not trusted, and no Archivist retune is made.**
+
+### Party heal test v1 (note 178)
+90 s fights on 3 seeds. Every member loses 3% per second, and one member chosen by the seed loses 30% every 6 s.
+**Only 2 members (you and Mira):** none of the 3 sims joined, because `Invite` refused or found no sim nearby. Sims in the party are the next fix.
+
+| healer | HPS | overheal | to others | mana used / left |
+|---|---|---|---|---|
+| paladin sanctuary | 41.8 | 32% | 41% | 920 / 99 |
+| saltmender mender | 38.8 | 21% | 42% | 1080 / 100 |
+| archivist the-cantor | 38.5 | 61% | 38% | 961 / 99 |
+| druid rootmend | 17.2 | 7% | 40% | 0 (it runs on Sap) / - |
+
+Nobody dropped under 25% in any fight, so the damage is too light to tell the healers apart. v2 will add the sims and heavier spikes. Cleric and Shaman join it when they're built (`Docs/CLASS_CLERIC_SHAMAN.md`).
+

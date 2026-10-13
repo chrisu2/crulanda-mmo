@@ -53,9 +53,12 @@ namespace Crulanda.Combat
         }
         /// <summary>Raised on every mend with a named healer (healer, healed, amount): the party's meter listens (CombatMeter).</summary>
         public static event System.Action<Actor, Actor, int> Healed;
+        /// <summary>Every mend with a named healer, asked and got (healer, healed, amount, applied): overheal is the difference.</summary>
+        public static event System.Action<Actor, Actor, int, int> HealAttempted;
         public int Heal(int amount, Actor by = null)
         {
             int healed = actor.Health.ApplyHealing(amount);
+            if (by != null) HealAttempted?.Invoke(by, actor, amount, healed);   // the balance harness's overheal (asked against got)
             if (by != null && healed > 0) Healed?.Invoke(by, actor, healed);
             return healed;
         }

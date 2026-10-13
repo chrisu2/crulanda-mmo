@@ -1,0 +1,13 @@
+class,build,seed,seconds,members,hps,overheal_pct,others_share_pct,mana_max,mana_used,mana_left,low_member_seconds
+class.paladin,sanctuary,0,90.0,2,42.0,32,38,100,960,100,0.0
+class.paladin,sanctuary,1,90.0,2,41.0,33,41,100,842,98,0.0
+class.paladin,sanctuary,2,90.0,2,42.5,31,43,100,960,100,0.0
+class.saltmender,mender,0,90.0,2,38.6,21,37,100,1080,100,0.0
+class.saltmender,mender,1,90.0,2,38.9,21,44,100,1080,100,0.0
+class.saltmender,mender,2,90.0,2,38.8,21,44,100,1080,100,0.0
+class.archivist,the-cantor,0,90.0,2,47.4,51,39,100,1020,100,0.0
+class.archivist,the-cantor,1,90.0,2,32.5,67,37,100,843,97,0.0
+class.archivist,the-cantor,2,90.0,2,35.5,64,37,100,1020,100,0.0
+class.druid,rootmend,0,90.0,2,16.4,6,36,100,0,100,0.0
+class.druid,rootmend,1,90.0,2,17.2,5,36,100,0,100,0.0
+class.druid,rootmend,2,90.0,2,18.1,9,48,100,0,100,0.0

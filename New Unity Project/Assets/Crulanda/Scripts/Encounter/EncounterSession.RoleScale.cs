@@ -26,7 +26,7 @@ namespace Crulanda.Encounter
             { "class.ranger/beastbond", .75f }, { "class.mage/bonecaller", 1.6f },
         };
         /// <summary>The same for the build's companion (Ranger pet, thrall): only the pet builds are scaled.</summary>
-        public static readonly Dictionary<string, float> BuildPetDamageScale = new Dictionary<string, float> { { "class.ranger/beastbond", .75f }, { "class.mage/bonecaller", 1.6f } };
+        public static readonly Dictionary<string, float> BuildPetDamageScale = new Dictionary<string, float> { { "class.ranger/beastbond", .75f }, { "class.mage/bonecaller", 1.6f }, { "class.ranger/pathfinder", .5f } };
         public float PetDamageScale { get { var lead = LeadBuild; return lead != null && BuildPetDamageScale.TryGetValue(lead, out var v) ? v : 1; } }
         /// <summary>The scale on any blow by the party side: the player's, or the player's own companion.</summary>
         public float DamageScaleFor(Actor source)

@@ -33,7 +33,7 @@ namespace Crulanda.Encounter
                 if (sim.classId == "class.druid") return PartyRole.Healer;
                 // A Salt-Mender heals when no Druid is along (the Mender path, 2026-10-12), else throws salt with the others.
                 if (sim.classId == "class.cleric" || sim.classId == "class.shaman") return PartyRole.Healer;   // note 178: the new healers (classes 9-10)
-            if (sim.classId == "class.saltmender") return session.PartySims.Exists(c => c != null && c != this && c.sim.classId == "class.druid") ? PartyRole.Damage : PartyRole.Healer;
+                if (sim.classId == "class.saltmender") return session.PartySims.Exists(c => c != null && c != this && c.sim.classId == "class.druid") ? PartyRole.Damage : PartyRole.Healer;
                 if (sim.classId == "class.paladin") return session.PartySims.Exists(c => c != null && c != this && c.sim.classId == "class.druid" || c.sim.classId == "class.saltmender") || session.PartySims.Exists(c => c != null && c != this && c.sim.classId == "class.warrior") == false ? PartyRole.Tank : PartyRole.Healer;
                 return PartyRole.Damage;
             }

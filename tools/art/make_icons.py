@@ -2639,6 +2639,63 @@ def a_throw_knife(c):
     c.push(rot=40, sc=.9, dx=6, dy=-4); g_knife(c, _P(), 'needle', False); c.pop(); c.spark(82, 22, 8, '#ffffff', .8)
 ABILITIES.update({'rogue.throw_knife': ('#2a2e36', a_throw_knife)})
 
+# ---- the Cleric and the Shaman (2026-10-13; Docs/CLASS_CLERIC_SHAMAN.md): nine more motif words their talents use, their abilities, their branches ----
+def m_sun(c, A, B):
+    rays(c, 50, 50, 22, 46, 12, lite(A, .3), .6, 7); c.part(c.ell(50, 50, 20), A, 'gem'); c.shine(c.ell(44, 44, 6, 4), .7)
+def m_ring(c, A, B):
+    c.part(c.sub(c.ell(50, 50, 34), c.ell(50, 50, 22)), A, 'metal'); c.spark(72, 30, 8, lite(A, .5), .8)
+def m_cloud(c, A, B):
+    cl = c.poly([(16, 62), (24, 44), (40, 36), (56, 30), (74, 38), (86, 52), (84, 66), (20, 68)], smooth=True, n=3); c.part(cl, A, 'soft')
+    for x in (34, 50, 66): c.part(c.line([(x, 74), (x - 6, 90)], 3), B, 'soft')
+def m_fist(c, A, B):
+    c.part(c.poly([(30, 40), (70, 40), (74, 70), (60, 84), (34, 84), (26, 66)], smooth=True, n=3), A, 'matte')
+    for x in (36, 48, 60): c.part(c.rect(x - 4, 32, x + 4, 48, 3), lite(A, .25), 'matte')
+def m_root(c, A, B):
+    c.part(c.rect(46, 10, 54, 46, 2), B, 'matte')
+    for pts in (((50, 46), (34, 62), (22, 84)), ((50, 46), (52, 66), (46, 90)), ((50, 46), (66, 60), (80, 82))): c.part(c.taper(list(pts), 4, 1.5, smooth=True), A, 'matte')
+def m_snow(c, A, B):
+    for r in (0, 60, 120): c.push(rot=r); c.part(c.rect(47, 12, 53, 88, 2), A, 'gem'); c.pop()
+    c.spark(50, 50, 10, '#ffffff', .9)
+def m_stone(c, A, B):
+    st = c.poly([(26, 70), (30, 40), (50, 26), (72, 36), (78, 62), (62, 82), (38, 82)], smooth=True, n=2); c.part(st, A, 'matte'); c.part(c.poly([(40, 44), (56, 36), (62, 52)]), lite(A, .3), 'matte', ink=False)
+MOTIFS.update(dict(fire=m_flame, ring=m_ring, sun=m_sun, cloud=m_cloud, fist=m_fist, link=m_chain, root=m_root, snow=m_snow, stone=m_stone))
+
+def _ab(bg, fn): return (bg, fn)
+def a_cl_rebuke(c): c.back(c.ell(50, 50, 38), '#ffe9a0', .4, 10); m_sun(c, '#ffd860', '#ffffff'); c.part(c.rect(44, 60, 56, 92, 3), '#6a4a30', 'matte')
+def a_cl_mend(c): c.back(c.ell(50, 50, 38), '#9fe8c0', .45, 10); m_heart(c, '#ffd0d8', '#ffffff'); c.spark(76, 26, 8, '#fff8d0', .8)
+def a_cl_long_mend(c): c.back(c.ell(50, 50, 40), '#70d0a0', .4, 12); m_heart(c, '#ffd0d8', '#ffffff'); rings(c, 50, 52, (40,), '#d0ffe0', .6, w=3)
+def a_cl_vigil(c): c.back(c.ell(50, 50, 38), '#ffe9a0', .4, 10); m_eye(c, '#ffd860', '#ffffff'); c.spark(50, 20, 10, '#ffffff', .9)
+def a_cl_litany(c): c.back(c.ell(50, 50, 38), '#cfe8ff', .4, 10); m_note(c, '#ffe9a0', '#ffffff'); rings(c, 50, 54, (40,), '#ffe9a0', .5, w=3)
+def a_cl_ward(c): c.back(c.ell(50, 50, 38), '#9fc8ff', .4, 10); m_shield(c, '#ffe9a0', '#ffffff')
+def a_cl_brand(c): c.back(c.ell(50, 50, 36), '#ff9a3a', .45, 10); m_flame(c, '#ffb040', '#ffffff'); c.part(c.rect(46, 70, 54, 94, 2), '#5a3a26', 'matte')
+def a_cl_sunburst(c): rays(c, 50, 50, 10, 48, 16, '#ffd860', .7, 9); c.part(c.ell(50, 50, 16), '#fff2c0', 'gem')
+def a_cl_absolve(c): c.back(c.ell(50, 50, 38), '#d0ffe0', .4, 10); m_hand(c, '#ffe9a0', '#ffffff'); c.spark(74, 28, 8, '#ffffff', .8)
+def a_cl_hymn(c): c.back(c.ell(50, 50, 40), '#cfe8ff', .4, 12); m_note(c, '#ffffff', '#ffe9a0'); rings(c, 50, 50, (46,), '#ffffff', .4, w=3)
+def a_cl_sanctuary(c): c.back(c.ell(50, 50, 40), '#ffe9a0', .45, 12); rings(c, 50, 56, (40, 30), '#fff2c0', .6, w=3); m_sun(c, '#ffd860', '#ffffff')
+def a_cl_steadfast(c): c.back(c.ell(50, 50, 38), '#9fc8ff', .4, 10); m_shield(c, '#d8d8cc', '#ffffff'); m_sun(c, '#ffd860', '#ffffff')
+def a_sh_squall(c): c.back(c.ell(50, 50, 38), '#9fc8ff', .4, 10); m_wind(c, '#bfe0ff', '#ffffff'); m_drop(c, '#70b0ff', '#ffffff')
+def a_sh_tide_mend(c): c.back(c.ell(50, 50, 38), '#70d0e0', .45, 10); m_drop(c, '#9fe8ff', '#ffffff'); c.spark(76, 26, 8, '#ffffff', .8)
+def a_sh_rain_call(c): c.back(c.ell(50, 50, 40), '#70b0ff', .4, 12); m_cloud(c, '#dfe8f0', '#9fc8ff')
+def a_sh_chain_mend(c): c.back(c.ell(50, 50, 38), '#70d0e0', .4, 10); m_chain(c, '#9fe8ff', '#ffffff'); m_heart(c, '#d0ffe0', '#ffffff')
+def a_sh_thunderhead(c): c.back(c.ell(50, 50, 40), '#8a90b0', .4, 12); m_cloud(c, '#5a607a', '#ffd860'); m_bolt(c, '#ffd860', '#ffffff')
+def a_sh_hailfall(c): c.back(c.ell(50, 50, 38), '#cfe8ff', .4, 10); m_snow(c, '#ffffff', '#cfe8ff'); m_cloud(c, '#9fb0c8', '#ffffff')
+def a_sh_earthskin(c): c.back(c.ell(50, 50, 38), '#c8b080', .4, 10); m_stone(c, '#8a8a84', '#c8c0a0'); m_shield(c, '#c8b080', '#ffffff')
+def a_sh_rooting_stamp(c): c.back(c.ell(50, 50, 38), '#9be05a', .4, 10); m_root(c, '#7a5434', '#a0a050'); m_fist(c, '#c8a060', '#ffffff')
+def a_sh_cairn(c): c.back(c.ell(50, 50, 38), '#c8c0a0', .4, 10); m_stone(c, '#8a8a84', '#c8c0a0'); rings(c, 50, 56, (40,), '#eeeee4', .5, w=3)
+def a_sh_moor_wind(c): c.back(c.ell(50, 50, 38), '#c8b0ff', .4, 10); m_wind(c, '#e0d0ff', '#ffffff')
+def a_sh_mist(c): c.back(c.ell(50, 50, 40), '#dfe8f0', .5, 14); m_cloud(c, '#eeeee4', '#dfe8f0'); m_eye(c, '#8a90b0', '#ffffff')
+def a_sh_barrow_call(c): c.back(c.ell(50, 50, 38), '#8a90b0', .4, 10); m_skull(c, '#eeeee4', '#c8c0a8'); m_wind(c, '#c8b0ff', '#ffffff')
+ABILITIES.update({'cleric.rebuke': _ab('#4a3a1a', a_cl_rebuke), 'cleric.mend': _ab('#1e3a34', a_cl_mend), 'cleric.long_mend': _ab('#1e3a2c', a_cl_long_mend), 'cleric.vigil': _ab('#4a3a1a', a_cl_vigil),
+                  'cleric.litany': _ab('#22304a', a_cl_litany), 'cleric.ward': _ab('#24304a', a_cl_ward), 'cleric.brand': _ab('#40200e', a_cl_brand), 'cleric.sunburst': _ab('#4a3a1a', a_cl_sunburst),
+                  'cleric.absolve': _ab('#1e3a34', a_cl_absolve), 'cleric.hymn': _ab('#22304a', a_cl_hymn), 'cleric.sanctuary': _ab('#4a3a1a', a_cl_sanctuary), 'cleric.steadfast': _ab('#24304a', a_cl_steadfast),
+                  'shaman.squall': _ab('#22304a', a_sh_squall), 'shaman.tide_mend': _ab('#1e3440', a_sh_tide_mend), 'shaman.rain_call': _ab('#22304a', a_sh_rain_call), 'shaman.chain_mend': _ab('#1e3440', a_sh_chain_mend),
+                  'shaman.thunderhead': _ab('#2a2e3a', a_sh_thunderhead), 'shaman.hailfall': _ab('#2a3440', a_sh_hailfall), 'shaman.earthskin': _ab('#3a3222', a_sh_earthskin), 'shaman.rooting_stamp': _ab('#2a3a22', a_sh_rooting_stamp),
+                  'shaman.cairn': _ab('#30302a', a_sh_cairn), 'shaman.moor_wind': _ab('#2c2440', a_sh_moor_wind), 'shaman.mist': _ab('#2a2e36', a_sh_mist), 'shaman.barrow_call': _ab('#2a2e36', a_sh_barrow_call)})
+BRANCH.update({'lantern': ('#4a3a1a', ['#ffd860', '#fff2c0', '#ffe9a0', '#d0a060', '#ffffff']), 'choir': ('#22304a', ['#cfe8ff', '#ffe9a0', '#ffffff', '#9fc8ff', '#dfeeff']),
+               'censure': ('#40200e', ['#ffb040', '#ffd860', '#ff7a2a', '#fff2c0', '#e0503a']), 'warden': ('#24304a', ['#9fc8ff', '#d8d8cc', '#ffe9a0', '#ffffff', '#8fb8e8']),
+               'rainspeaker': ('#1e3440', ['#9fe8ff', '#70b0ff', '#dfe8f0', '#ffffff', '#70d0e0']), 'stormcaller': ('#2a2e3a', ['#ffd860', '#8a90b0', '#bfe0ff', '#ffffff', '#5a607a']),
+               'stonebound': ('#3a3222', ['#c8b080', '#8a8a84', '#9be05a', '#c8c0a0', '#7a5434']), 'gravewind': ('#2c2440', ['#c8b0ff', '#eeeee4', '#8a90b0', '#e0d0ff', '#c8c0a8'])})
+
 def main():
     here = os.path.dirname(os.path.abspath(__file__))
     ap = argparse.ArgumentParser(description='Paints the Crulanda HUD icons (items, quest items, abilities, talents, trades).')

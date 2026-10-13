@@ -19,7 +19,7 @@ Each class kit has a fixed bar of 11 to 13 abilities in a fixed order (`BarIds`)
   their tests and the balance harness work as they do. The bar's choice and the AA points are saved per character: a save-format change,
   so Chris's save is backed up first and old saves get the default ten.
 - **The group heals** asked for at ~14:25 ("yes give a slower group heal") go in as spellbook abilities: the Paladin's Mending Oath
-  (GAME-ONLY), the Salt-Mender's Seal the Wound (CANON-EXPANDED, Mother Vane's "I seal the Wound!"), the Cantor's Mending Verse
+  (GAME-ONLY), the Salt-Mender's Mending Cry (CANON-EXPANDED, the Mender-Craft cried aloud), the Cantor's Mending Verse
   (CANON-EXPANDED, the Song of Mending): slow casts that mend the whole party in reach, slotted by choice.
 
 ## Chris's answers (2026-10-13 ~15:00)

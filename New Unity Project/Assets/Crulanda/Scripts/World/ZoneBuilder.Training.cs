@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Crulanda.World
@@ -11,6 +12,19 @@ namespace Crulanda.World
     /// </summary>
     public sealed partial class ZoneBuilder
     {
+        /// <summary>A place in the training yard a sim may practise at (Chris, 2026-10-13: "also have sims wonder into the fighting arena
+        /// (dummies) to practice and improve their dps"): what it strikes or shoots at (an aim point about chest high), where it stands to
+        /// do it, and whether that is a butt for the bow and the bolt (across the yard) or a dummy for the blade (a step in front).</summary>
+        public sealed class PracticeMark { public Transform aim; public Vector3 stand; public bool ranged; }
+        /// <summary>The yard's dummies and butts (SimFigure's practice).</summary>
+        public readonly List<PracticeMark> PracticeMarks = new List<PracticeMark>();
+        void Mark(Transform t, Vector3 local, Vector3 standLocal, bool ranged)
+        {
+            var aim = new GameObject(ranged ? "Practice butt" : "Practice dummy").transform; aim.SetParent(t, false);
+            var at = t.TransformPoint(local); at.y = HeightAt(at.x, at.z) + 1.25f; aim.position = at;
+            var stand = t.TransformPoint(standLocal); stand.y = HeightAt(stand.x, stand.z);
+            PracticeMarks.Add(new PracticeMark { aim = aim, stand = stand, ranged = ranged });
+        }
         /// <summary>
         /// The sparring yard (Chris, 2026-10-13 ~13:40: "sparring area needs to resemble something like this", with pictures of a fenced
         /// yard of tents, banners, dummies, weapon racks and targets; "try the small props pack in downloads"). GAME-ONLY. A fenced ground
@@ -51,14 +65,21 @@ namespace Crulanda.World
             foreach (float side in new[] { -1f, 1f }) foreach (float z in new[] { -hz / 3, hz / 3 }) GroundProp(t, "Fantasy/Banner_2", new Vector3(side * (hx + .35f), 0, z), side < 0 ? 90 : -90, 3.0f);
             // Dummies and mannequins down the left, facing in.
             string[] dummies = { "Megapack/Models/Outpost/Dummy", "SmallProps/Manequin_1_A_001", "Fantasy/Dummy", "SmallProps/Manequin_2_A_002" };
-            for (int i = 0; i < dummies.Length; i++) GroundProp(t, dummies[i], new Vector3(-hx + 1.6f, 0, -1.6f + i * 2.2f), 90, dummies[i].StartsWith("SmallProps") ? 1.8f : 1.9f, true);
+            for (int i = 0; i < dummies.Length; i++)
+            {
+                GroundProp(t, dummies[i], new Vector3(-hx + 1.6f, 0, -1.6f + i * 2.2f), 90, dummies[i].StartsWith("SmallProps") ? 1.8f : 1.9f, true);
+                Mark(t, new Vector3(-hx + 1.6f, 0, -1.6f + i * 2.2f), new Vector3(-hx + 3.0f, 0, -1.6f + i * 2.2f), false);   // a sim with a blade a step in front
+            }
             // Archery butts down the right, facing in.
             string[] butts = { "SmallProps/PracticeTarget_1_A", "SmallProps/PracticeTarget_2_A", "Megapack/Models/Arrow Target", "SmallProps/PracticeTarget_1_B" };
             // Each faces into the yard, its back to the fence (Chris, 14:25). The pack's butts are made facing along their own x, the
             // Megapack's along its z (read from their shapes: the face's thin axis, the legs behind it), so they turn differently.
             // (PracticeTarget_2 faces the other way from PracticeTarget_1: Chris, 15:20, "one target still backwards".)
             for (int i = 0; i < butts.Length; i++)
+            {
                 GroundProp(t, butts[i], new Vector3(hx - 1.4f, 0, 1.0f + i * 1.9f), butts[i].StartsWith("SmallProps/PracticeTarget_2") ? 0 : butts[i].StartsWith("SmallProps") ? 180 : -90, 1.7f, true);   // their lanes clear of the healer's corner
+                Mark(t, new Vector3(hx - 1.4f, 0, 1.0f + i * 1.9f), new Vector3(hx - 9.4f, 0, 1.0f + i * 1.9f), true);   // a sim with a bow or a spell across the yard
+            }
             // Weapon stands by the left tent and against the back fence (the Fantasy peg rack is a wall board 35 cm high: it came in lying flat
             // and seventeen times too big, the 14:12 frame's "giant beams").
             // Standing on the ground a step in from the fence (Chris, 15:20: "weapon wracks sit on the ground. not hanging on fence").

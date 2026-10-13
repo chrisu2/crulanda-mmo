@@ -1,5 +1,29 @@
 # Changelog
 
+## 2026-10-13, 15:20 on: the evening's work while Chris is away (branch feet-bow-adit-kit; plan in TONIGHT_2026-10-13.md)
+Chris: "keep working through all phases", "all balanced and testing new dungeons and builds as needed. all zones full of quests. more
+sims throughout the world", "also have sims wonder into the fighting arena (dummies) to practice and improve their dps", "shaman is not an orc".
+- **Group heals retuned:** power 15 to 33 (about 55 a member at level 15, five members in 3 s). The Salt-Mender's is now The Mending Cry
+  (Seal the Wound was already its silence). The one-target heal test leaves group heals out; the party heal test casts them.
+- **The Cantor:** the song, held note and symphony are shares of the singer's own health (a share of each target's let the 3,000-health
+  dummy read the song three times stronger, and the retune had cut the Cantor to 0.16, 12 a second in a party). Its phrase weighs .4 and
+  the song more. Wounded dummy: Sanctuary 45, Mender 50, Cantor 47. Party of five: Sanctuary 73, Mender 75, Cantor 75 (were 54, 53, 12);
+  Rootmend 88, Lantern 90, Choir 98, Rainspeaker 108. All 40 builds in their ranges.
+- **Sims practise at the training yard:** the yard's four dummies and four butts are marks a sim can stand at (a blade at a dummy, a
+  bow or a spell across the yard at a butt). The less practised go more often. A session is 70-115 s of blows or shots, with grey numbers
+  when you are near. Each session closes a sixth of the gap to fully practised, worth up to a tenth more damage (SimAdventurer.practice,
+  saved in the world slot, format 1 still). Some say so in the chat. PlayMode SimPracticeTests.
+- **More sims:** the roster grows from 56 to 80. The 24 new are eight Clerics, eight Shamans (all orcs) and eight more Rogues, Archivists
+  and Salt-Menders, most of them in the Peaks, the Rim and the Shore. An old world grows on load. The Cleric and Shaman are finished as
+  world classes: their own look, colours, attributes (balance-neutral) and gear weight. Sim healers of every healing class mend themselves.
+- **The orc figure (first pass):** an orc is the same humanoid body and clips (so it wears all the gear), drawn 15% taller (a woman 10%),
+  with green skin, no beard, a shaved or cropped head and two ivory tusks at the jaw. Orc sims and orc players (every Shaman) use it.
+  Frames: `D:\crulanda-work\ui-captures\figures\orcs-*.png`. No orc face model yet: the orc packs in `imports\orcs` are still to try.
+- **Quests: 52 new across the five zones** (Oakhaven 11, Khaven 10, the Peaks 10, the Ash Rim 10, the Verdant Shore 11): every camp and
+  point of interest without a quest has one, the level gaps are closed (Oakhaven 2, 3 and 5; Khaven 7; the Rim 13), and each zone has a
+  new chain. 13 new quest items with painted icons, 4 new Chronicle pages. Each is labelled CANON-EXPANDED or GAME-ONLY.
+- **Fixed:** a collect or interact objective's narration was spoken by its target ("kill:mob.spider.khaven*: A skein of grey silk...").
+
 ## 2026-10-13, 00:03 on — balance on fixed dummies, every class and build (branch feet-bow-adit-kit)
 Chris: "i want to run dps and healing per sec on test runs to test for balance and functionality" / "on all classes" / fixed dummies /
 "62-72 is good range" / "a number for each build, each class and designate it as tank/dps/support/healer/CC" / "why is the druid healing

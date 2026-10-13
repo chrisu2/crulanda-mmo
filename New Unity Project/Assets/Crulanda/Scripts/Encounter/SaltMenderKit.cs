@@ -108,7 +108,7 @@ namespace Crulanda.Encounter
                 case "salt.sifting": return SongOfSifting(a);
                 case "salt.calcify": return Calcify(a);
                 case "salt.close_cut": return CloseTheCut(a);
-                case "salt.wound_seal": return SealTheWound(a);
+                case "salt.wound_seal": return MendingCry(a);
                 case "salt.mender_craft": return MenderCraft(a);
                 case "salt.circle": return SaltCircle(a);
                 case "salt.cairn": return SaltCairn(a);
@@ -264,16 +264,16 @@ namespace Crulanda.Encounter
             return healed;
         }
         int Power(string id) { return abilities.TryGetValue(id, out var a) ? Mathf.RoundToInt(a.power) : 0; }
-        /// <summary>Close the Cut: a handful of salt pressed into the worst wound in the party (Sealing Hands: more; Answered: quicker while you chant).</summary>
-        /// <summary>Seal the Wound (Chris, 2026-10-13: "yes give a slower group heal"; CANON-EXPANDED, Mother Vane's "I seal the Wound!"):
-        /// the Mender-Craft cried out over 3 s mends everyone in your party within 20 m (Sealing Hands: more).</summary>
-        bool SealTheWound(AbilityDefinition a)
+        /// <summary>The Mending Cry (Chris, 2026-10-13: "yes give a slower group heal"; CANON-EXPANDED, the Mender-Craft cried aloud): over
+        /// 3 s it mends everyone in your party within 20 m (Sealing Hands: more). Not Seal the Wound, which is the Salt-Speaker's silence.</summary>
+        bool MendingCry(AbilityDefinition a)
         {
             return Start(a, () => {
                 int heal = Dmg((a.power + Level) * (1 + .06f * R("md-sealing-hands")));
                 foreach (var who in Party()) if (who != null && who.IsAlive && Vector3.Distance(who.transform.position, s.Player.transform.position) <= a.range) Mend(who, heal);
             });
         }
+        /// <summary>Close the Cut: a handful of salt pressed into the worst wound in the party (Sealing Hands: more; Answered: quicker while you chant).</summary>
         bool CloseTheCut(AbilityDefinition a)
         {
             var who = MostHurt(MendReach); if (!Need(who != null, "No one near enough to mend.")) return false;

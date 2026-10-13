@@ -2153,6 +2153,17 @@ QUEST = {
     'item.adit_tally_book': (book, ('#5a3a22', '#9a9aa0'), dict(wrap='#3a2a1a')), 'item.adit_echo_jar': (flask, ('#c8a888',), dict(shape='round', glowc='#ffd0e0', cork='#8a5a3a')),
     'item.ysolt_ash_brand': (shard, ('#3a2a26', 'metal'), dict(glowc='#ff7a30', spark=True)), 'item.unmade_shard': (shard, ('#a8a8ac',), dict(glowc='#d8d8e0', thin=True)),
     'item.adit_sealed_letter': (letter, ('#2a2a30',), dict(broken=False)),
+    # the zones filled with quests (2026-10-13, Chris: "all zones full of quests")
+    'item.brook_mark': (pelt, ('#5e4636',), dict(small=True, bristle=True, belly='#7a5e4a', spots='#1a1410')), 'item.wether_bell': (bell,),
+    'item.hesk_tally': (book, ('#6b4a2c', '#8d96a3'), dict(wrap='#3e2c1c')),
+    'item.miners_names': (letter, ('#8a8680',), dict(broken=False)), 'item.grey_bristle': (pelt, ('#6a5040',), dict(small=True, bristle=True, belly='#a8a8ac')),
+    'item.scree_tusk_hide': (pelt, ('#a4a4a8',), dict(stone=True, bristle=True, belly='#c4c4c8')),
+    'item.hunters_pouch': (pouch, ('#6e6458',), dict(tie='#f0a83a')), 'item.knoll_harpoon': (fang, (), dict(bone='#cfc8b8', root='#c8862e', curve=.4)),
+    'item.violet_grit': (crystal, ('#c8b0e8', '#a64dff'), dict(n=3)), 'item.tear_daub': (salt, ('#8a3ab0',)),
+    'item.harls_noose': (_cordloop, ('#6b5236',), dict(w=7)), 'item.picket_orders': (letter, ('#c9963a',), dict(broken=False, pouch_=True)),
+    'item.reckoners_slate': (shard, ('#e4e8ee', 'gem'), dict(glowc='#c8d4ff')), 'item.rest_candles': (sack, ('#8a7456', '#f0e6c0'), dict(tie='#5a3f28', knots=2)),
+    'item.treenails': (log, ('#9a8462', '#efe0bc'), dict(ring='#b89a6a')), 'item.wystan_mask': (maskpiece,),
+    'item.green_heartwood': (log, ('#8a8a8c', '#cfe4a4'), dict(ring='#5f9a48', glowc='#7fe08a')),
 }
 # what a kind looks like when an item has no picture of its own (new content): the resolver's second step
 KINDS = {

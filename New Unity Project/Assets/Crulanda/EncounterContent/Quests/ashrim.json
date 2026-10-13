@@ -24,6 +24,26 @@
       "id": "item.first_sea_salt",
       "name": "Salt of the First Sea",
       "description": "A sack of white salt, tied with three knots by Mother Vane. It is heavier than salt should be."
+    },
+    {
+      "id": "item.hunters_pouch",
+      "name": "Ash-Walker salt-pouch",
+      "description": "A hunter's salt-pouch of grey hide, tied with amber cord in one family's own knot. A cultist wore it on his belt like a purse."
+    },
+    {
+      "id": "item.knoll_harpoon",
+      "name": "Kesh's harpoon",
+      "description": "Petrified leviathan bone, too old to burn, with a barb that was never quite straight. The amber cord has been cut away."
+    },
+    {
+      "id": "item.violet_grit",
+      "name": "Violet grit",
+      "description": "A pinch of the grey a Hollow Man leaves, with violet grains in it that catch the light. It is cold, and stays cold in your hand."
+    },
+    {
+      "id": "item.tear_daub",
+      "name": "Pot of tear-daub",
+      "description": "A clay pot no bigger than an egg, crusted purple at the rim, with a thumbprint pressed into the daub."
     }
   ],
   "documents": [
@@ -50,6 +70,12 @@
       "title": "The Waybook at Wain's Rest",
       "text": "Wain's Rest, on the salt road. Wains and travellers, as they come.\n\nSix wains west with salt from the old pans, for the Peaks road. Ate the mutton. Complained of the mutton.\nFour wains. Carter Hobb says the pans are crusting grey at the far edge. Says it the way you'd say rain.\nTwo wains, one driver. He would not stop for his supper. Said the water tastes of copper now, and so it does.\nNo wains.\nNo wains. Grey on the south fields this morning. By noon it was at the hedge.\nThe orchard-men have gone up the north road to Oakhaven with what they could carry. Hollin asked me to come. I said the book wants keeping.\nNo wains. The road is quiet at night in a way I don't like. Not quiet like sleeping. Quiet like listening.\n\n(Pressed hard into the foot of the page, in the same hand:) If you are reading this, you came by the road, so the road is still there. Go back the way you came.",
       "canonStatus": "GAME-ONLY: Wain's Rest, its waybook, the salt road and its people. The copper taste of the grey's dust is CANON (book1 ch.20); the Wasting creeping on is CANON (world_bible.md)."
+    },
+    {
+      "id": "doc.ashrim.tally",
+      "title": "The Deacon's Tally",
+      "text": "Given to the light at the pit, this moon, that the Kings may know us ready.\n\nRidge salt, two casks. It would not burn. Buried it, deep.\nA wain-horse off the salt road. Old. It went quietly.\nThe last rafters of Wain's Rest, for the fire.\nA hound that came too near the pit. It did not mean to be given. Few do.\nOne Ash-Walker, young, taken on the knoll. Given on the third night.\nHe would not kneel. He would not say the words. He said his aunt would come for him, and said it again, and then he said nothing.\nHis harpoon would not burn. I keep it. A thing the light refuses is a thing to be studied.\n\nThe eternal Void hungers for the light. Feed it.",
+      "canonStatus": "CANON-EXPANDED: 'The eternal Void hungers for the light' is the cult's cry (book1 ch.10), and preparing for the Kings belongs to the later House of Ash (series_bible.md), used early as in the Litany; the Ash-Deacon, his tally and Kesh are GAME-ONLY."
     }
   ],
   "quests": [
@@ -794,6 +820,534 @@
       "rewards": {
         "xp": 300,
         "gold": 60,
+        "reputation": [
+          {
+            "faction": "ashwalkers",
+            "amount": 250
+          }
+        ]
+      }
+    },
+    {
+      "id": "side.ashrim.knoll",
+      "title": "The Empty Hide",
+      "kind": "side",
+      "giver": "Oska",
+      "turnIn": "Oska",
+      "zone": "zone.ashrim",
+      "level": 13,
+      "canonStatus": "CANON-EXPANDED: the Ash-Walkers who hunt the Weave-Eaters (book1 ch.20) and the Cult of Ash (book1 ch.10) are canon, and the purple tear is the later House of Ash's sign (series_bible.md), used early as at the shrine; Kesh, the hide and the trail are GAME-ONLY.",
+      "summary": "Oska's nephew Kesh went up to the Hunters' Knoll to watch for Eaters and has not come down. Go and look for him.",
+      "offer": "Oska is carving, and carving badly, which you have not seen her do. \"My sister's boy, Kesh. He took his turn on the Hunters' Knoll, out north-west past Cinderfold, watching the plain for Eaters. Three nights.\" She pares a curl of bone away and frowns at it. \"He should have come down yesterday with a story nobody believed. He's a terrible liar. He didn't come down.\"\n\n\"Go up and look. I'd go myself, but if I find what I think I'll find, I'll do something stupid with this harpoon.\"",
+      "progress": "\"The knoll. North-west, past Cinderfold. Go on.\"",
+      "complete": "Oska hears it all with the harpoon across her knees. \"Dragged.\" She turns the harpoon over, and over again. \"Then he was alive to be dragged.\" She stands. \"Go and tell Grohl. He'll know where bone-masks take what they drag. I'll be here. Carving.\"",
+      "steps": [
+        {
+          "text": "Look for Kesh on the Hunters' Knoll, north-west past Cinderfold.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.ashrim",
+              "at": {
+                "x": -100,
+                "y": 152
+              },
+              "radius": 8,
+              "text": "Search the hide on the Hunters' Knoll",
+              "say": "The hide is standing and empty. Kesh's sleeping-fur is still rolled and tied. His harpoon is gone from its pegs, and his salt-cask has been kicked over and the salt trodden into the ash. Round the foot of the knoll the ash is churned with bare prints, and through the middle of them run two long furrows, the kind boot-heels make when someone is dragged. They go south."
+            }
+          ]
+        },
+        {
+          "text": "Follow the furrows south to the salt road.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.ashrim",
+              "at": {
+                "x": -137,
+                "y": 89
+              },
+              "radius": 6,
+              "text": "Follow the furrows to the salt road",
+              "say": "The furrows cross the salt road by the wayside shrine at Wain's Rest. Someone has daubed a purple tear on the shrine's stone, fresh enough to come off on your thumb. South of the road the ash is trodden flat by many feet, and the trail is lost among the snags, still going south."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 330,
+        "gold": 70,
+        "reputation": [
+          {
+            "faction": "ashwalkers",
+            "amount": 250
+          }
+        ]
+      }
+    },
+    {
+      "id": "side.ashrim.pouches",
+      "title": "What the Pit Keeps",
+      "kind": "side",
+      "giver": "Chieftain Grohl",
+      "turnIn": "Oska",
+      "zone": "zone.ashrim",
+      "level": 13,
+      "requires": [
+        "side.ashrim.knoll"
+      ],
+      "canonStatus": "CANON-EXPANDED: the Cult of Ash and its bone masks (book1 ch.10) and the Ash-Walkers' salt (book1 ch.20) are canon; the pouches, the family knots and the Ash Pit's trophies are GAME-ONLY.",
+      "summary": "Take the Ash-Walker salt-pouches the cultists at the Ash Pit wear as trophies, and bring them to Oska, who can tell by the knots whose they were.",
+      "offer": "Grohl hears you out with his one eye shut. \"Dragged south, over the salt road. Then the Ash Pit, in the far south-west.\" The eye opens. \"The bone-masks at the pit don't take prisoners. They take offerings.\"\n\n\"And they keep trophies. Every one of them wears a salt-pouch on his belt, and every pouch was a hunter of ours, lost on the ash these ten years. Bring five home and give them to Oska. Every family ties its own knot, and she knows them all.\"",
+      "progress": "\"Five pouches. They wear them on the belt, on the left. Like a purse.\"",
+      "complete": "\"Kesh's.\" Oska unpicks the knot, which she taught him, and ties it again properly. \"Tied this week. So they had him this week.\" She does not look up. \"The Ash-Deacon keeps the pit. Whatever's given to the light down there, he does the giving.\"",
+      "steps": [
+        {
+          "text": "Take the salt-pouches from the cultists at the Ash Pit.",
+          "objectives": [
+            {
+              "type": "collect",
+              "zone": "zone.ashrim",
+              "target": "kill:mob.cultist.ashrim.5.*",
+              "item": "item.hunters_pouch",
+              "count": 5,
+              "text": "Ash-Walker salt-pouches"
+            }
+          ]
+        },
+        {
+          "text": "Bring the pouches to Oska.",
+          "objectives": [
+            {
+              "type": "deliver",
+              "zone": "zone.ashrim",
+              "target": "Oska",
+              "item": "item.hunters_pouch",
+              "count": 5,
+              "text": "Give the pouches to Oska",
+              "say": "Oska lays the pouches in a row along her anvil and reads the knots with her fingers, one by one, saying each name under her breath. At the fifth she stops."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 400,
+        "gold": 90,
+        "reputation": [
+          {
+            "faction": "ashwalkers",
+            "amount": 250
+          }
+        ]
+      }
+    },
+    {
+      "id": "side.ashrim.deacon",
+      "title": "The Ash-Deacon",
+      "kind": "side",
+      "giver": "Oska",
+      "turnIn": "Oska",
+      "zone": "zone.ashrim",
+      "level": 15,
+      "minLevel": 13,
+      "requires": [
+        "side.ashrim.pouches"
+      ],
+      "canonStatus": "CANON-EXPANDED: Ash-Walker harpoons of petrified leviathan bone (book1 ch.20) and the Cult of Ash (book1 ch.10) are canon; the Ash-Deacon, Kesh and his harpoon are GAME-ONLY.",
+      "summary": "Bring down the Ash-Deacon at the bottom of the Ash Pit and take back Kesh's harpoon, which would not burn. The Deacon is dangerous alone.",
+      "offer": "Oska has stopped carving altogether. \"The Ash-Deacon. He kneels at the bottom of the pit, and the rest kneel round him, and whatever's carried down to him gets burned.\" Her voice is perfectly level. \"Kesh had his harpoon with him. My bone, my cord. It won't have burned; the old bone never does. So the Deacon has it still.\"\n\n\"Bring it back to me. And take friends. He's no hedge-preacher: the grey's in him, and his flock will stand for him.\"",
+      "progress": "\"The old bone doesn't burn. He has it. Go and get it.\"",
+      "complete": "\"Too old to burn.\" Oska sets it on the pegs among the harpoons she is making, old grey bone among the new. \"His was the first I let him carve himself. Look at that barb. Crooked as the toll road.\" She picks up her knife, and puts it down again. \"Thank you. Go and eat something. I can't.\"",
+      "steps": [
+        {
+          "text": "Bring down the Ash-Deacon in the Ash Pit and take back Kesh's harpoon.",
+          "say": "The Deacon carried Kesh's harpoon as a staff. It lies beside him in the ash, grey bone without a mark of fire on it. Tucked into his belt, where another man would keep a prayer, is a strip of hide written close on both sides.",
+          "objectives": [
+            {
+              "type": "collect",
+              "zone": "zone.ashrim",
+              "target": "kill:mob.deacon.ashrim.6.*",
+              "item": "item.knoll_harpoon",
+              "text": "Kesh's harpoon",
+              "document": "doc.ashrim.tally"
+            }
+          ]
+        },
+        {
+          "text": "Bring the harpoon home to Oska.",
+          "objectives": [
+            {
+              "type": "deliver",
+              "zone": "zone.ashrim",
+              "target": "Oska",
+              "item": "item.knoll_harpoon",
+              "text": "Give Kesh's harpoon to Oska",
+              "say": "Oska takes it in both hands and runs her thumb down the shaft to the head, where the amber cord should be, and isn't."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 540,
+        "gold": 125,
+        "reputation": [
+          {
+            "faction": "ashwalkers",
+            "amount": 350
+          }
+        ]
+      }
+    },
+    {
+      "id": "side.ashrim.oldsea",
+      "title": "The Old Sea",
+      "kind": "side",
+      "giver": "Oska",
+      "turnIn": "Oska",
+      "zone": "zone.ashrim",
+      "level": 15,
+      "requires": [
+        "side.ashrim.deacon"
+      ],
+      "canonStatus": "CANON-EXPANDED: a beast of the First Era turned to grey stone on the ash plain is canon (book1 ch.20); the Ash-Walkers giving their dead to the old sea and Grohl's cord of names are GAME-ONLY.",
+      "summary": "The Ash-Walkers give their dead to the old sea. There is nothing of Kesh to give, so go to the Drowned Leviathan after dark and say his name to it, then tell Grohl.",
+      "offer": "\"We give our dead to the old sea.\" Oska says it as if you ought to have known. \"South, where the leviathan's spine comes up out of the ash. The ash was sea once, and the old ones say it remembers. We carry our dead out at night and lay them along the spine, and by spring the ash has them.\"\n\n\"There's nothing of Kesh to carry. So somebody goes out at night and says his name to it, once, loud, so it knows to look for him. I can't. I'd stay out there. Go after dark. Then tell Grohl; he keeps the names.\"",
+      "progress": "\"After dark. Once, loud. Then Grohl.\"",
+      "complete": "Oska listens to the part about the surf and nods once, as if it is what she expected, and as if she is not going to weep in front of a townsman about it. \"Good. Then it's looking for him.\" She takes up her knife. The barbs come out straight.",
+      "steps": [
+        {
+          "text": "Go to the Drowned Leviathan after dark and say Kesh's name.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.ashrim",
+              "at": {
+                "x": 16,
+                "y": -132
+              },
+              "radius": 9,
+              "night": true,
+              "text": "Say Kesh's name to the old sea, at night",
+              "say": "You stand by the great grey spine with the dark all round you and say his name, once, loud, as Oska asked. The ash does nothing. Then, far down under your feet, so low you feel it in your teeth more than hear it, something like surf."
+            }
+          ]
+        },
+        {
+          "text": "Tell Chieftain Grohl it is done.",
+          "objectives": [
+            {
+              "type": "talk",
+              "zone": "zone.ashrim",
+              "target": "Chieftain Grohl",
+              "text": "Tell Grohl it is done",
+              "say": "Grohl takes down a cord from the peg by the cave mouth, long as a man and heavy with knots, and ties one more at the end of it. He does not ask whose. \"Kesh. Oska's sister's boy. Couldn't lie to save himself.\" He hangs it back up. \"Now he's kept.\""
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 400,
+        "gold": 85,
+        "reputation": [
+          {
+            "faction": "ashwalkers",
+            "amount": 250
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.brine.orchard",
+      "title": "Hollin's Press",
+      "kind": "npc",
+      "giver": "Sefa Brine",
+      "turnIn": "Sefa Brine",
+      "zone": "zone.ashrim",
+      "level": 13,
+      "canonStatus": "GAME-ONLY: the Last Orchard, Hollin and his press. The grey that unmakes rather than destroys is CANON (world_bible.md).",
+      "summary": "Thin out the ash hounds denning in the Last Orchard, north of the enclave, and look in at Hollin's press-house to see whether his cider barrels are sound.",
+      "offer": "\"Hollin kept the Last Orchard, up north along the rim, and paid for his salt in cider. Good cider. Too good. Half my debts started with a cup of it.\" Sefa Brine doesn't look up from her scales. \"When the grey got into his trees he went up the north road to his kin at Oakhaven, with his family and what they could carry. He left the press-barrels sealed and told me they were mine if I fetched them.\"\n\n\"The hounds got there first. They den among his trees now. Thin them out, six or so, and look in at the press-house. If the barrels are sound I'll send a cart. Well. I'll send someone with a cart.\"",
+      "progress": "\"Six hounds, and the press-house. The house at the end of the orchard lane.\"",
+      "complete": "\"Grey.\" Sefa writes something on her tally-board and rubs it out again. \"Well, there's my debts settled; nobody's going to drink that.\" A pause. \"Hollin always said his cider would keep forever. He was right, the old liar. It just won't be cider while it does.\"",
+      "steps": [
+        {
+          "text": "Thin out the hounds in the Last Orchard and look in at Hollin's press-house.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.ashrim",
+              "target": "mob.hound.ashrim.8.*",
+              "count": 6,
+              "text": "Orchard hounds"
+            },
+            {
+              "type": "visit",
+              "zone": "zone.ashrim",
+              "at": {
+                "x": 23,
+                "y": 139
+              },
+              "radius": 6,
+              "text": "Look in at the press-house",
+              "say": "The press-house door hangs on one hinge. Hollin's barrels are where he left them, sealed with pitch and his mark. You work a bung loose. The cider has gone grey in the barrel: no smell, no sourness, no anything. Not spoiled. Finished."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 400,
+        "gold": 90,
+        "reputation": [
+          {
+            "faction": "ashwalkers",
+            "amount": 250
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.brine.flank",
+      "title": "Meat That Does Not Crawl",
+      "kind": "npc",
+      "giver": "Sefa Brine",
+      "turnIn": "Sefa Brine",
+      "zone": "zone.ashrim",
+      "level": 13,
+      "canonStatus": "CANON-EXPANDED: \"We have meat that does not crawl\" is Grohl's, to the refugees (book1 ch.20); the ash hounds and Sefa's salting are GAME-ONLY.",
+      "summary": "Bring Sefa Brine five ash-hound flanks to salt down for the enclave's stores.",
+      "offer": "\"Grohl tells every stray who comes in off the ash that we have meat that does not crawl.\" Sefa Brine sniffs. \"He never says who salts it.\" She raps an empty cask with her knuckles. \"Ash-hound flank. It smells of smoke before it's been near a fire, and salt draws that out. A week in the cask and it's meat. A fortnight and it's very nearly food.\"\n\n\"Bring me five flanks off the hounds, out in the western snags or up at the Last Orchard. Fresh ones. Well. Ones that have stopped moving.\"",
+      "progress": "\"Five flanks. The cask's waiting, and so is Grohl's boast.\"",
+      "complete": "\"There. In a fortnight that'll feed the caves for a week, and Grohl can go on telling strays about meat that does not crawl.\" She wipes her hands on her apron. \"You can have the first slice. It'll taste of smoke anyway. Everything here does.\"",
+      "steps": [
+        {
+          "text": "Bring Sefa Brine five ash-hound flanks.",
+          "objectives": [
+            {
+              "type": "bring",
+              "zone": "zone.ashrim",
+              "target": "Sefa Brine",
+              "item": "mat.hound_flank",
+              "count": 5,
+              "text": "Ash-hound flanks",
+              "say": "Sefa takes the flanks one at a time, sniffs each, and packs them into the cask between handfuls of salt, the way you might lay a fire."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 380,
+        "gold": 85,
+        "reputation": [
+          {
+            "faction": "ashwalkers",
+            "amount": 250
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.brine.daub",
+      "title": "What the Tear Is Made Of",
+      "kind": "npc",
+      "giver": "Sefa Brine",
+      "turnIn": "Sefa Brine",
+      "zone": "zone.ashrim",
+      "level": 13,
+      "requires": [
+        "main.ashrim.2"
+      ],
+      "canonStatus": "CANON-EXPANDED: the Cult of Ash (book1 ch.10), the purple tear of the later House of Ash (series_bible.md, used early), the Glittering Coast and Port Caelum (world_bible.md) and the Sandthrone toll in the Shattered Peaks are canon; the orchil daub and the road it comes by are GAME-ONLY.",
+      "summary": "Take four pots of purple daub from the cultists at the tear-marked shrine, so Sefa Brine can tell where the cult gets its paint.",
+      "offer": "Sefa Brine has a broken bone-mask on her table and is scratching at its purple tear with a thumbnail. \"Grohl burned the litany. I'd sooner know who sells them their paint.\" She sniffs her thumb. \"Nothing on the ash makes purple. Nothing. So it comes from somewhere, and somebody carries it, and somebody gets paid.\"\n\n\"The bone-masks at the shrine carry their daub in little pots, to touch the tears up when the ash wears them off. Bring me four. I'll tell you where it came from by the smell.\"",
+      "progress": "\"Four pots. They keep them on a thong round the neck, so the daub stays warm and soft.\"",
+      "complete": "Sefa unstops a pot, sniffs, and holds it at arm's length. \"Orchil. Lichen-purple, scraped off the rocks of the Glittering Coast and steeped in... well. Steeped. You don't want to know in what.\" She stops it again. \"Four crowns a pot at Port Caelum, and dearer every mile. It comes up the toll road with the wool and the iron, and the toll-gate takes its cut like anything else.\" She sets the pots in a row. \"So the Peaks sell the bone-masks their tears. I'll mention it, next time they ask my price for salt.\"",
+      "steps": [
+        {
+          "text": "Take pots of tear-daub from the cultists at the tear-marked shrine.",
+          "objectives": [
+            {
+              "type": "collect",
+              "zone": "zone.ashrim",
+              "target": "kill:mob.cultist.ashrim.2.*",
+              "item": "item.tear_daub",
+              "count": 4,
+              "text": "Pots of tear-daub"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 390,
+        "gold": 85,
+        "reputation": [
+          {
+            "faction": "ashwalkers",
+            "amount": 250
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.vane.fraying",
+      "title": "Breath on Cold Glass",
+      "kind": "npc",
+      "giver": "Mother Vane",
+      "turnIn": "Mother Vane",
+      "zone": "zone.ashrim",
+      "level": 15,
+      "canonStatus": "CANON-EXPANDED: Weave-Eaters born of the Weave's frayed threads are canon (book1 ch.20); the Fraying and Vane's measuring of it are GAME-ONLY.",
+      "summary": "Stand at the lip of the Fraying, south-east behind the Ridge, and thin the Weave-Eaters rising out of it, so Mother Vane knows how fast it is growing.",
+      "offer": "Mother Vane draws a line in the ash of the cave floor with one finger, then another beside it, a little to the west. \"The Fraying. South-east, behind the Ridge, where the grey licks in. Most of the Eaters on the Rim start there. They rise out of it like breath on cold glass.\" She draws a third line, further west again. \"It's growing. I want to know how fast.\"\n\n\"Go and stand at its lip and look at it. Then thin what's rising out of it. Six. Count them as you go; I'll want the number, not a guess.\"",
+      "progress": "\"Six, and the lip of it. The number, mind. Not a guess.\"",
+      "complete": "\"Six, and more rising behind them.\" Vane rubs out her lines with the heel of her hand. \"When I was a girl you could stand on the Ridge and not see it at all.\" She watches the fire a while. \"Don't tell Grohl it's growing. He knows. He just doesn't like to hear it said.\"",
+      "steps": [
+        {
+          "text": "Stand at the lip of the Fraying, south-east behind the Ridge.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.ashrim",
+              "at": {
+                "x": 126,
+                "y": -121
+              },
+              "radius": 8,
+              "text": "Stand at the lip of the Fraying",
+              "say": "The grey ends in an edge you can't quite look at, like a blade turned toward you. Past it the ash has no grain at all. As you watch, a stir in the nothing becomes a shape, and the shape becomes an Eater, and it turns toward you."
+            }
+          ]
+        },
+        {
+          "text": "Thin the Weave-Eaters rising out of the Fraying.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.ashrim",
+              "target": "mob.weaveeater.ashrim.7.*",
+              "count": 6,
+              "text": "Eaters out of the Fraying"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 480,
+        "gold": 110,
+        "reputation": [
+          {
+            "faction": "ashwalkers",
+            "amount": 250
+          }
+        ]
+      }
+    },
+    {
+      "id": "side.ashrim.violet",
+      "title": "Violet in the Grey",
+      "kind": "side",
+      "giver": "Mother Vane",
+      "turnIn": "Mother Vane",
+      "zone": "zone.ashrim",
+      "level": 13,
+      "requires": [
+        "main.ashrim.1"
+      ],
+      "canonStatus": "CANON-EXPANDED: the Void-Seed planted in Oakhaven's water to force a local Wasting, and the Hollow Men, are canon (book1 ch.4); that Cinderfold was seeded the same way, and the grit, are GAME-ONLY.",
+      "summary": "Put down the Hollow Men of Cinderfold and see whether there is violet grit in what is left of them, as there was violet in Oakhaven's well.",
+      "offer": "Mother Vane has been turning your story of Oakhaven over: the black wagon, the ledger, the seed in the well. \"Cinderfold went grey in one night. All of it at once, and Sefa's people with it.\" She keeps her voice low; Sefa's stall is not far off. \"The grey doesn't come all at once. Not by itself. It creeps. Ask the Reach-Stones.\"\n\n\"Oakhaven's well had a seed in it, and the seed glowed violet in the dark. Put down the hollows in Cinderfold and look in the grey of them. If there's violet grit in it, bring me five pinches. If there isn't, bring me nothing, and I'll be glad.\"",
+      "progress": "\"Five pinches. Or none. I'd rather none.\"",
+      "complete": "\"Seeded.\" Mother Vane lays a cloth over the bowl the way you would cover a face. \"Same as your well. Somebody walked down Cinderfold's lane with a seed in his pocket, and walked home after.\" She looks across at Sefa's stall. \"Not a word to her. Not yet. Let me find the way to say it, if there is one.\"",
+      "steps": [
+        {
+          "text": "Put down the Hollow Men of Cinderfold and search the grey of them for violet grit.",
+          "objectives": [
+            {
+              "type": "collect",
+              "zone": "zone.ashrim",
+              "target": "kill:mob.hollow.ashrim.4.*",
+              "item": "item.violet_grit",
+              "count": 5,
+              "text": "Pinches of violet grit"
+            }
+          ]
+        },
+        {
+          "text": "Bring the grit to Mother Vane.",
+          "objectives": [
+            {
+              "type": "deliver",
+              "zone": "zone.ashrim",
+              "target": "Mother Vane",
+              "item": "item.violet_grit",
+              "count": 5,
+              "text": "Give the grit to Mother Vane",
+              "say": "She tips the grit into a bowl of salt. It hisses like fat on a griddle, and the salt round each grain goes grey."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 400,
+        "gold": 90,
+        "reputation": [
+          {
+            "faction": "ashwalkers",
+            "amount": 250
+          }
+        ]
+      }
+    },
+    {
+      "id": "side.ashrim.watch",
+      "title": "Never Seen Walking",
+      "kind": "side",
+      "giver": "Chieftain Grohl",
+      "turnIn": "Chieftain Grohl",
+      "zone": "zone.ashrim",
+      "level": 15,
+      "requires": [
+        "side.ashrim.statue"
+      ],
+      "canonStatus": "CANON-EXPANDED: the Silent Statues, faceless monoliths in the Wasting (book1/world_bible.md), and the Pale Things as watchers rather than mere monsters (world_bible.md) are canon; this statue, the print and whatever walks it are GAME-ONLY.",
+      "summary": "Watch the Silent Statue after dark, then tell Mother Vane exactly what you saw.",
+      "offer": "\"Vane says nearer.\" Grohl is sharpening the glass spikes of his mace one at a time, which takes a long while. \"She says it every year. This year she said it twice.\" He tries a spike with his thumb. \"Nobody's ever seen the thing move. So somebody has to watch it at night, when nobody does. You. You've the least sense of anyone here.\"\n\n\"Go to the Silent Statue after dark and watch it. Then tell Vane exactly what you saw. Not what you think you saw. She'll know the difference.\"",
+      "progress": "\"After dark. Watch it. Don't touch it.\"",
+      "complete": "Grohl stops sharpening. \"Something's walking it.\" He says it over to himself, as if tasting it. \"Well. That's worse.\" He goes back to the spikes. \"I'll set a watch on it. Not you. You've had enough of that one.\"",
+      "steps": [
+        {
+          "text": "Watch the Silent Statue after dark.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.ashrim",
+              "at": {
+                "x": 141,
+                "y": -50
+              },
+              "radius": 9,
+              "night": true,
+              "text": "Watch the Silent Statue after dark",
+              "say": "For a long while it is only stone. Then the moon comes out from behind the ash-cloud and there is a face on it: not carved, only shadow, as if the stone remembered having one. It is looking at the enclave. At its foot, in the smooth ash, there is a single print, long and narrow, of no foot you know. Only the one."
+            }
+          ]
+        },
+        {
+          "text": "Tell Mother Vane exactly what you saw.",
+          "objectives": [
+            {
+              "type": "talk",
+              "zone": "zone.ashrim",
+              "target": "Mother Vane",
+              "text": "Tell Mother Vane what you saw",
+              "say": "Vane hears it with her eyes shut. \"One print.\" She opens them. \"Then it isn't walking. Something is walking it.\""
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 400,
+        "gold": 85,
         "reputation": [
           {
             "faction": "ashwalkers",

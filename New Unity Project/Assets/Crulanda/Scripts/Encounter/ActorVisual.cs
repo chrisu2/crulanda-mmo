@@ -33,10 +33,13 @@ namespace Crulanda.Encounter
         /// <summary>The bare figure's parts that worn armour recolours, hides or tucks away (see ActorVisual.GearArmor.cs): torso, chest and shoulders; sleeves; hands; legs and hips; boots; the belt; the hair (the long fall and the bun tuck under a cap); the Druid's cloak.</summary>
         Renderer[] baseChest, baseSleeves, baseHands, baseLegs, baseBoots; Renderer baseBelt; Transform[] hairParts; Transform hairLong, hairBun, druidCloak;
         /// <summary>Villagers pass their trade (<paramref name="role"/>) to get its outfit and tool; see <see cref="Dress"/>.</summary>
-        public static ActorVisual Attach(GameObject actor, ActorLook look, int variant = 0, bool child = false, string role = null)
+        public static ActorVisual Attach(GameObject actor, ActorLook look, int variant = 0, bool child = false, string role = null, bool orc = false)
         {
-            var v = actor.AddComponent<ActorVisual>(); v.variant = variant; v.child = child; v.role = role; v.Build(look); return v;
+            var v = actor.AddComponent<ActorVisual>(); v.variant = variant; v.child = child; v.role = role; v.orc = orc; v.Build(look); return v;
         }
+        /// <summary>An orc (Docs/RACES.md): green, tusked, taller (ActorVisual.Model.cs, Orcish and Tusks).</summary>
+        public bool Orc { get { return orc; } }
+        bool orc;
         /// <summary>Trades with a recognisable outfit. Others (gossip, drinker, child) wear plain clothes with a random hat or apron.</summary>
         public static bool HasOutfit(string role)
         {

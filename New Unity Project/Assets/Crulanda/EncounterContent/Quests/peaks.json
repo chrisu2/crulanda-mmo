@@ -24,6 +24,21 @@
       "id": "item.pilgrim_journal",
       "name": "Soot-black journal",
       "description": "The waystation keeper's journal, wrapped in oilcloth."
+    },
+    {
+      "id": "item.miners_names",
+      "name": "Pib's list of names",
+      "description": "A page in big, careful letters, folded round a chip of grey stone. Five names, and a space."
+    },
+    {
+      "id": "item.grey_bristle",
+      "name": "Grey-tipped bristle",
+      "description": "A rockhide's bristle, pulled with the root. The tip is grey, smooth and cold; the root is not."
+    },
+    {
+      "id": "item.scree_tusk_hide",
+      "name": "Old Scree-Tusk's grey hide",
+      "description": "Grey right through and smooth as river stone. It weighs next to nothing, and it is never warm."
     }
   ],
   "documents": [
@@ -68,6 +83,18 @@
       "title": "The Foreman's Notice",
       "text": "NOTICE. The Umbra working is closed by the foreman's order.\n\nThe deep level has gone bad. The stone down there is grey and smooth and does not ring under the pick. It makes no sound at all. Pell put his pick into it and drew it back without its point: not broken off, gone, clean, as if it had never had one.\n\nWe have walled the mouth with good mortar. Do not open it, for any price. The grey has got into the roots of the mountain.\n\n- Bram Tolley, foreman",
       "canonStatus": "CANON-EXPANDED: old mining tunnels under the Shattered Peaks (book2 ch.19) and the void slowly eating the Peaks' stone (world_bible.md) are CANON; the working, its foreman and this notice are GAME-ONLY."
+    },
+    {
+      "id": "doc.peaks.miners_names",
+      "title": "What the Grey Stone Remembered",
+      "text": "Written large and careful, in a goblin's hand not used to these letters:\n\nHEARD IN THE GREY STONE OFF THE WALKERS BY THE OLD ADIT\nby Pib of the Warrens, as near as the stone said it\n\nPELL. Remembers the sound his pick did not make.\nOSWY DUNN. Remembers bread burnt on the bottom, and being told off for it.\nGIL and GARRET MABE, brothers, in the one stone. They remember each other.\nWAT CORLEY. Remembers somebody singing in the dark to keep the others brave. He thinks it was him.\nThe fifth stone had forgotten already. I am sorry. I listened a long time.\n\nBelow it, in Maddoc Vire's hand: Entered in the book of the Rest. Went up the road. Did not come down.",
+      "canonStatus": "GAME-ONLY: the miners and their names. The Hollow Men (book1 ch.4) and the goblins as the old record-keepers (world_bible.md) are CANON."
+    },
+    {
+      "id": "doc.peaks.song",
+      "title": "Where the Pass Still Sings",
+      "text": "Copied fair from Brother Cael's slate, in a small, upright hand:\n\nThe Cold Tarn, north shore, after dark. Heard: one note, clear, like a glass struck once. The water remembers.\nThe foot of the Umbra scarp. Heard: the mountain's own note, low and slow. Old. Whole.\nThe Broken Post, on the east road. Heard: nothing. The wind out of the east carries no note at all, not even its own.\n\nIt is coming from the east. We knew. Now it is written.\n\nTo be carried south to the Archive by whichever of us goes over next.",
+      "canonStatus": "CANON-EXPANDED: the Silent Pilgrims, the Original Song and the Archive of Silence are CANON (world_bible.md); Brother Cael's notes are GAME-ONLY."
     }
   ],
   "quests": [
@@ -744,6 +771,539 @@
       "rewards": {
         "xp": 250,
         "gold": 52
+      }
+    },
+    {
+      "id": "side.peaks.smoke",
+      "title": "Smoke on the Khaven Road",
+      "kind": "side",
+      "giver": "Pib",
+      "turnIn": "Pib",
+      "zone": "zone.peaks",
+      "level": 9,
+      "canonStatus": "CANON-EXPANDED: goblins (the Weavers of the Warrens) are CANON (world_bible.md) and the Sandthrone toll in the Peaks is CANON-EXPANDED (the draft chapter_5.md); Pib's kin, the pickets' signal and their hiding place are GAME-ONLY.",
+      "summary": "Two of Pib's people are hiding in the pines below the Signal Tower, waiting for a chance to run for Khaven. Put down the pickets who watch the road, then whistle the goblins the all-clear.",
+      "offer": "Pib has a lump of charcoal and is drawing on the back of a flour sack: a tower, a fire, a road going down. \"The tower on the spur, over the Khaven road. Whenever anyone comes up it, the pickets throw green wood on their fire, and the gate sees the smoke before it sees you.\" He draws a great deal of smoke.\n\n\"When one of us gets out, we run that way, for Khaven. The smoke goes up and the riders come down.\" Two tiny marks go in among the pines under the tower. \"Nim and Tobble. Three nights up a tree, waiting for a gap. Put the pickets down, then go to the edge of those pines and whistle. One note, held long. A tune means Company. The Company always whistles tunes.\"",
+      "complete": "Pib hears it all with his whole face. \"Nim's the small one. She'll have glared at you. She glares at everyone she likes.\" He rubs the smoke off his sack with a thumb. \"Khaven by morning, and then wherever goblins go.\" A pause. \"Thank you. We don't say it often. It catches in the teeth.\"",
+      "steps": [
+        {
+          "text": "Put down the Sandthrone pickets at the Signal Tower, on the spur above the Khaven road.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.peaks",
+              "target": "mob.outrider.peaks.5.*",
+              "count": 5,
+              "text": "Signal-tower pickets",
+              "say": "The last picket goes down beside his own fire, and nobody throws on the green wood."
+            }
+          ]
+        },
+        {
+          "text": "Go to the edge of the pines below the Signal Tower and whistle one long note.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.peaks",
+              "at": {
+                "x": -114,
+                "y": -138
+              },
+              "radius": 7,
+              "text": "Whistle at the edge of the tower pines",
+              "say": "You whistle one long note. For a while, nothing. Then two small grey shapes drop out of a pine, look at you very hard, and are away down the slope toward the Khaven road without a sound."
+            }
+          ]
+        },
+        {
+          "text": "Tell Pib his people are away.",
+          "objectives": [
+            {
+              "type": "talk",
+              "zone": "zone.peaks",
+              "target": "Pib",
+              "text": "Return to Pib"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 210,
+        "gold": 40,
+        "reputation": [
+          {
+            "faction": "sandthrone",
+            "amount": -100
+          }
+        ]
+      }
+    },
+    {
+      "id": "side.peaks.stone",
+      "title": "Stone Remembers",
+      "kind": "side",
+      "giver": "Pib",
+      "turnIn": "Pib",
+      "zone": "zone.peaks",
+      "level": 10,
+      "requires": [
+        "side.peaks.smoke"
+      ],
+      "canonStatus": "CANON-EXPANDED: the Hollow Men are CANON (book1 ch.4); the goblins as the High City's old record-keepers and aether-geodes as fossilized memory are CANON (world_bible.md); that Pib can hear names in the hollows' grey stone is GAME-ONLY.",
+      "summary": "Pib says stone remembers, and the grey stone off the Hollow Men by the Sealed Adit remembers best. Bring him five petrified shards from them.",
+      "offer": "\"Those grey walkers by the old adit.\" Pib doesn't look west when he says it. \"The old man with the book thinks they were miners. They were. I can hear it on them when the wind's that way.\"\n\n\"Goblins kept the High City's records once, before the Purge. Every name, every light. You learn things, doing that, and the first thing you learn is that stone remembers. It's why the Company cuts the singing stones out of this mountain.\" He holds out his cupped hands. \"Bring me the grey off the walkers when you put them down. Five pieces. If I hold each one to the right note I can hear who it was. Somebody ought to.\"",
+      "complete": "Pib lays the five shards in a row on the bench and puts his ear to each in turn, humming under his breath, a different note for each. At the fourth he stops humming for a long time.\n\nThen he finds a stub of pencil and writes, slowly, in big careful letters, like someone working in a hand that isn't his. \"Five of them, in four stones. Two were brothers; they went into the one stone together.\" He folds the paper round a chip of the grey. \"The fifth stone had forgotten already. I listened a long time.\"",
+      "steps": [
+        {
+          "text": "Bring Pib five petrified shards from the Hollow Men by the Sealed Adit, along the ore road west of the Rest.",
+          "objectives": [
+            {
+              "type": "bring",
+              "zone": "zone.peaks",
+              "target": "Pib",
+              "item": "junk.petrified_shard",
+              "count": 5,
+              "text": "Petrified shards for Pib",
+              "say": "\"Gently. They were somebody.\" Pib takes them one at a time, the way you would take eggs from under a hen."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 230,
+        "gold": 45
+      }
+    },
+    {
+      "id": "side.peaks.names",
+      "title": "Names for the Book",
+      "kind": "side",
+      "giver": "Pib",
+      "turnIn": "Maddoc Vire",
+      "zone": "zone.peaks",
+      "level": 10,
+      "requires": [
+        "side.peaks.stone"
+      ],
+      "canonStatus": "CANON-EXPANDED: the Hollow Men (book1 ch.4) and the old mining tunnels under the Peaks (book2 ch.19) are CANON; the miners' names, Pib's list and the reading at the adit are GAME-ONLY.",
+      "giveOnAccept": [
+        "item.miners_names"
+      ],
+      "summary": "Read the names Pib heard in the grey stone aloud at the mouth of the Sealed Adit, then take his list to Maddoc Vire for his book.",
+      "offer": "Pib pushes the folded paper across to you with one finger, as if it might be hot. \"Two things want doing with this, and I can't do either of them.\"\n\n\"The names want saying where they were lost: at the mouth of the old adit, out loud, by a mouth that isn't a goblin's. The stone's more used to yours.\" His ears go flat. \"Then take it to the old man with the book. He writes down everyone who goes up the road. These went up, and nobody wrote them down.\"",
+      "complete": "Maddoc reads the list twice. Then he opens his book at a clean page and copies each name out in his best hand, with the day beside it, and on the last line he writes: one more, not known.\n\n\"Pell I knew,\" he says, without looking up. \"Owed me for a loaf.\" He blots the page and closes the book on it. \"I'll call that paid.\"",
+      "steps": [
+        {
+          "text": "Read the names aloud at the mouth of the Sealed Adit, at the end of the ore road.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.peaks",
+              "at": {
+                "x": -145,
+                "y": -42
+              },
+              "radius": 7,
+              "text": "Read the names at the Sealed Adit",
+              "say": "You read them to the bricked mouth of the adit, one at a time: Pell. Oswy Dunn. Gil Mabe and Garret Mabe. Wat Corley. The wind drops while you read. When you have finished it gets up again, and somewhere behind the bricks a little grit runs down, and stops."
+            }
+          ]
+        },
+        {
+          "text": "Take Pib's list to Maddoc Vire at the Pilgrims' Rest.",
+          "objectives": [
+            {
+              "type": "deliver",
+              "zone": "zone.peaks",
+              "target": "Maddoc Vire",
+              "item": "item.miners_names",
+              "text": "Bring the list to Maddoc",
+              "say": "\"What's this, then?\" Maddoc unfolds the paper, and the chip of grey drops into his palm. He closes his hand on it and doesn't open it again."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 190,
+        "gold": 30,
+        "documents": [
+          "doc.peaks.miners_names"
+        ]
+      }
+    },
+    {
+      "id": "npc.maddoc.fold",
+      "title": "The Goatherd's Fold",
+      "kind": "npc",
+      "giver": "Maddoc Vire",
+      "turnIn": "Maddoc Vire",
+      "zone": "zone.peaks",
+      "level": 9,
+      "canonStatus": "GAME-ONLY",
+      "summary": "Wolves have moved into the pines by the old goatherd's fold, at the shieling on the drove track. Clear them out and look the fold over, so Maddoc can tell the goatherd it is still standing.",
+      "offer": "Maddoc turns his book back a long way. \"Wenlow Brack. Goatherd. Kept the shieling at the end of the drove track for forty years, and paid the toll in goats, two at a time, till there weren't any.\" He finds the line. \"He's the only man I ever wrote in going down. He asked me to mind the fold till he came back.\"\n\n\"I can't mind it from here, and the wolves have moved in: a pack in the pines past the fold. Clear them out, and look the fold over for me, so I can tell him it's standing. If he asks.\"",
+      "complete": "\"Standing, then.\" Maddoc writes something small in the margin by Wenlow's name. \"Forty-one notches. That'll be the goats.\" He shuts the book. \"If he ever comes back up the road he'll count them himself, and they'll be right. He never lost count of a goat in his life. Only of the years.\"",
+      "steps": [
+        {
+          "text": "Clear the wolves out of the pines by the Goatherd's Shieling, at the end of the drove track.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.peaks",
+              "target": "mob.wolf.peaks.6.*",
+              "count": 5,
+              "text": "Shieling wolves"
+            }
+          ]
+        },
+        {
+          "text": "Look the old fold over at the shieling.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.peaks",
+              "at": {
+                "x": 18,
+                "y": -119
+              },
+              "radius": 6,
+              "text": "Look over the goatherd's fold",
+              "say": "The fold walls are sound, if low. On the gatepost someone has cut a notch for every goat the toll took, forty-one of them, the last few cut deep. A bell hangs from a nail, its clapper tied up with twine so the wind can't ring it."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 200,
+        "gold": 40
+      }
+    },
+    {
+      "id": "npc.tarsk.hides",
+      "title": "No Deer on the Ash",
+      "kind": "npc",
+      "giver": "Tarsk",
+      "turnIn": "Tarsk",
+      "zone": "zone.peaks",
+      "level": 10,
+      "canonStatus": "CANON-EXPANDED: the Ash-Walkers and their enclave in the caves of the Eastern Ridge are CANON (book1 ch.20); the custom of carrying hides home over the pass is GAME-ONLY.",
+      "summary": "Nothing lives on the Ash Rim that you could make a boot from. Tarsk wants four hill-deer hides to carry home to the enclave.",
+      "offer": "Tarsk is mending his boot with a strip cut from an older, worse boot. \"On the ash there are no deer. There are crows, and what the crows eat.\" He pulls the stitch tight with his teeth. \"Every Ash-Walker who comes over the pass carries hides home. That is the custom. I have been here a season and I have carried nothing.\"\n\n\"Hill deer graze in the east pines, in the high pines where the bears are, and by the tarn. They see you long before you see them. Go low, and go slow. Four hides.\"",
+      "complete": "Tarsk runs a thumb along each hide, checking the grain the way Yara checks coin. \"Good. Boots for the children before the cold.\" He rolls them tight and binds them with salt-cord. \"On the Rim they will ask where I got them. I will tell them: from someone who goes low and slow.\" It may be a joke. With Tarsk you can never be sure.",
+      "steps": [
+        {
+          "text": "Hunt the hill deer in the Peaks' pines and bring Tarsk four hides.",
+          "objectives": [
+            {
+              "type": "bring",
+              "zone": "zone.peaks",
+              "target": "Tarsk",
+              "item": "hide.hill_deer",
+              "count": 4,
+              "text": "Hill-deer hides for Tarsk",
+              "say": "\"Four.\" He counts them again anyway."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 220,
+        "gold": 45,
+        "reputation": [
+          {
+            "faction": "ashwalkers",
+            "amount": 150
+          }
+        ]
+      }
+    },
+    {
+      "id": "faction.sandthrone.coin",
+      "title": "Clipped Coin",
+      "kind": "faction",
+      "giver": "Hadrik Sull",
+      "turnIn": "Hadrik Sull",
+      "zone": "zone.peaks",
+      "level": 11,
+      "canonStatus": "CANON faction (Sandthrone), GAME-ONLY quest",
+      "summary": "Someone in the Company is clipping the toll coin before it reaches the strongbox. Hadrik Sull will pay for six clipped Sandthrone coins off the pickets and the gate-guards, as proof.",
+      "offer": "Hadrik holds a coin up to the light between finger and thumb. \"Desert gold. Struck in the south, honest weight. Now look at the edge.\" It has been pared like a fingernail. \"Every coin that comes off this gate is a little lighter than the one that went into it. A shaving, no more. Fifty men and a shaving each, and somebody is buying himself a farm.\"\n\n\"The Company can't be seen taking coin off its own pickets. You, on the other hand, take it off them most days.\" He flicks you the coin. \"Six more like that, off the pickets at the tower or the guards at the gate. Same terms as ever.\"",
+      "complete": "Hadrik weighs each coin on the flat of his hand with his eyes shut, and names a figure for each. \"A grain short. A grain. Two grains. A grain...\" He opens his eyes and smiles without any pleasure in it. \"The tower's coins are the lightest. They'll be skimming at the fire, where the watch can reach without getting up.\"\n\nHe pays you in coin that has not been clipped. You check.",
+      "steps": [
+        {
+          "text": "Take six clipped toll coins off the Sandthrone pickets at the Signal Tower or the guards at the toll gate, and bring them to Hadrik Sull.",
+          "objectives": [
+            {
+              "type": "bring",
+              "zone": "zone.peaks",
+              "target": "Hadrik Sull",
+              "item": "junk.toll_coin",
+              "count": 6,
+              "text": "Clipped toll coins for Hadrik",
+              "say": "\"Let's see who's been at the shears.\" He spreads them on his knee."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 260,
+        "gold": 60,
+        "reputation": [
+          {
+            "faction": "sandthrone",
+            "amount": 350
+          }
+        ]
+      }
+    },
+    {
+      "id": "side.peaks.bristles",
+      "title": "Where the Mountain Came Down",
+      "kind": "side",
+      "giver": "Lisle Tamber",
+      "turnIn": "Lisle Tamber",
+      "zone": "zone.peaks",
+      "level": 11,
+      "requires": [
+        "npc.yara.rockhide"
+      ],
+      "canonStatus": "CANON-EXPANDED: the void slowly eating the Peaks' stone is CANON (world_bible.md) and so are the Salt-Menders; the grey at the avalanche scar and what it does to the boars are GAME-ONLY.",
+      "summary": "The rockhides off the avalanche scar come back grey at the tips. Lisle Tamber wants five bristles from the boars that root there, to learn whether the grey takes living things.",
+      "offer": "Lisle has one of Yara's rockhides spread over her knees and is going over it a hand's breadth at a time. \"Yara says this one came off the avalanche scar, east, up the scree path past the switchback. Feel along the spine.\" The bristles there are grey at the tips, and smooth, and cold. \"That isn't age. That's the scar.\"\n\n\"At the head of the scar the rock has gone grey, like the stone down the old adit. If it's getting into the boars that root by it, then it takes living things, and if it takes living things it can walk.\" She folds the hide. \"Five bristles off the scar boars. Pull them, don't cut them; I want the roots. And wash your hands after.\"",
+      "complete": "Lisle lays the bristles out on salt and watches them a long while. The grey creeps no further up the shafts, and down at the roots, where the boar was warm, there is none at all.\n\n\"It's on them, not in them.\" She sits back. \"They rub against the grey and carry it about like wallow-mud. It doesn't take what's living.\" She writes that down, then adds two more words and underlines them twice: not yet.",
+      "steps": [
+        {
+          "text": "Pull grey-tipped bristles from the rockhide boars on the avalanche scar, up the scree path from the toll road.",
+          "objectives": [
+            {
+              "type": "collect",
+              "zone": "zone.peaks",
+              "target": "kill:mob.boar.peaks.7.*",
+              "item": "item.grey_bristle",
+              "count": 5,
+              "text": "Grey-tipped bristles",
+              "say": "Five bristles, each grey at the tip and cold, and each with its root."
+            }
+          ]
+        },
+        {
+          "text": "Bring the bristles to Lisle Tamber at the Pilgrims' Rest.",
+          "objectives": [
+            {
+              "type": "deliver",
+              "zone": "zone.peaks",
+              "target": "Lisle Tamber",
+              "item": "item.grey_bristle",
+              "count": 5,
+              "text": "Bring the bristles to Lisle",
+              "say": "\"In here. Don't shake them.\" She holds out a fold of salted paper."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 270,
+        "gold": 55,
+        "reputation": [
+          {
+            "faction": "saltmenders",
+            "amount": 150
+          }
+        ]
+      }
+    },
+    {
+      "id": "side.peaks.scree_tusk",
+      "title": "Old Scree-Tusk",
+      "kind": "side",
+      "giver": "Lisle Tamber",
+      "turnIn": "Lisle Tamber",
+      "zone": "zone.peaks",
+      "level": 12,
+      "minLevel": 11,
+      "requires": [
+        "side.peaks.bristles"
+      ],
+      "canonStatus": "CANON-EXPANDED: the void slowly eating the Peaks' stone is CANON (world_bible.md); Old Scree-Tusk and the grey that has gone into him are GAME-ONLY.",
+      "summary": "Old Scree-Tusk has rooted at the grey head of the avalanche scar for years. Look at where he roots, bring him down, and bring Lisle Tamber his hide, to learn why the grey has gone into him and not the others.",
+      "offer": "\"Not yet,\" Lisle says, tapping the words she underlined. \"I don't like a finding with not yet in it.\"\n\n\"Yara's drovers talk about an old boar at the very head of the scar. Old Scree-Tusk. Bigger than a mule, they say, and he never leaves the grey. Roots in it, sleeps in it.\" She turns her pen over and over. \"The others brush past it. He's stood in it for years. If the grey takes anything living, it'll have taken him. Go and look at where he roots, then bring him down and bring me his hide. Carry it on a stick, if you've any sense.\"",
+      "complete": "The hide is grey right through, smooth as river stone, and it weighs next to nothing. Lisle doesn't lay salt on this one. She looks at it a long time without touching it.\n\n\"It takes what keeps still,\" she says at last. \"Long enough in one place, and the grey stops telling you apart from the stone.\" She wraps the hide in salted cloth and ties it twice. \"Remind me never to settle down.\"",
+      "steps": [
+        {
+          "text": "Look at the grey head of the avalanche scar, where Old Scree-Tusk roots, and bring him down for his hide.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.peaks",
+              "at": {
+                "x": 158,
+                "y": 32
+              },
+              "radius": 9,
+              "text": "Look at the head of the scar",
+              "say": "The rock at the scar's head isn't broken; it's gone, smooth and grey, like wax that never warmed. Worn into it is a trench, boar-wide and knee-deep, where something has rooted in the same place for years. The bottom of the trench is grey too."
+            },
+            {
+              "type": "kill",
+              "zone": "zone.peaks",
+              "target": "mob.boar.peaks.8.*",
+              "count": 1,
+              "text": "Old Scree-Tusk",
+              "say": "Old Scree-Tusk comes down the way the mountainside did, all at once and with a great deal of noise, and then the scar is quiet."
+            },
+            {
+              "type": "collect",
+              "zone": "zone.peaks",
+              "target": "kill:mob.boar.peaks.8.*",
+              "item": "item.scree_tusk_hide",
+              "count": 1,
+              "text": "Old Scree-Tusk's grey hide",
+              "say": "His hide comes away grey right through, smooth and cold, and so light the wind tries to take it."
+            }
+          ]
+        },
+        {
+          "text": "Bring Old Scree-Tusk's hide to Lisle Tamber at the Pilgrims' Rest.",
+          "objectives": [
+            {
+              "type": "deliver",
+              "zone": "zone.peaks",
+              "target": "Lisle Tamber",
+              "item": "item.scree_tusk_hide",
+              "text": "Bring the hide to Lisle",
+              "say": "\"On the salt. Gently.\" She takes it off the stick, not out of your hands."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 340,
+        "gold": 70,
+        "reputation": [
+          {
+            "faction": "saltmenders",
+            "amount": 200
+          }
+        ]
+      }
+    },
+    {
+      "id": "side.peaks.song",
+      "title": "Where the Song Thins",
+      "kind": "side",
+      "giver": "Brother Cael",
+      "turnIn": "Brother Cael",
+      "zone": "zone.peaks",
+      "level": 11,
+      "canonStatus": "CANON-EXPANDED: the Silent Pilgrims and the Original Song are CANON (world_bible.md), and so is the void eating the Peaks' stone; the listening places and what is heard at them are GAME-ONLY.",
+      "summary": "Brother Cael wants to know where the old song can still be heard in the pass and where it has gone thin. Listen at the Cold Tarn after dark, at the foot of the Umbra scarp and at the Broken Post on the east road.",
+      "offer": "Brother Cael writes on his slate and turns it to you.\n\nThe pass used to sing all through. The old song, the first one, that the world was made to. Now there are places where it is thin.\n\nHe wipes the slate with his sleeve and writes again, smaller. I cannot leave the ear in the stone; it must be kept. Go where I tell you and listen. Not with your ears. Stand still until the wind stops being wind. The tarn's north shore, after dark. The foot of the Umbra scarp. The Broken Post on the east road.",
+      "complete": "Cael hears your account with his brass tube held against his chest, as if to hear it twice. When you come to the Broken Post he stops you with a raised hand, and for a while he doesn't write anything.\n\nThen he writes for a long time, copies it out fair on a clean page and gives it to you. The last line he has underlined: It is coming from the east. We knew. Now it is written.",
+      "steps": [
+        {
+          "text": "Listen at the three places Brother Cael named: the Cold Tarn's north shore after dark, the foot of the Umbra scarp, and the Broken Post on the east road.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.peaks",
+              "at": {
+                "x": -30,
+                "y": 149
+              },
+              "radius": 7,
+              "night": true,
+              "text": "The tarn's north shore, after dark",
+              "say": "You stand still until the wind stops being wind. Under it, very faint, the tarn is ringing: one clear note, like a glass struck once and left to sound."
+            },
+            {
+              "type": "visit",
+              "zone": "zone.peaks",
+              "at": {
+                "x": -100,
+                "y": 20
+              },
+              "radius": 8,
+              "text": "The foot of the Umbra scarp",
+              "say": "Under the scarp the note is so low you feel it in your teeth before you hear it: the mountain's own, slow as breathing, and very old."
+            },
+            {
+              "type": "visit",
+              "zone": "zone.peaks",
+              "at": {
+                "x": 147,
+                "y": -83
+              },
+              "radius": 9,
+              "text": "The Broken Post on the east road",
+              "say": "At the Post the wind comes up out of the east, and it carries nothing at all. No note. Not even the sound of itself. You find you have been holding your breath, and you let it go."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 280,
+        "gold": 50,
+        "documents": [
+          "doc.peaks.song"
+        ]
+      }
+    },
+    {
+      "id": "side.peaks.gate",
+      "title": "An Hour Without Eyes",
+      "kind": "side",
+      "giver": "Brother Cael",
+      "turnIn": "Brother Cael",
+      "zone": "zone.peaks",
+      "level": 12,
+      "minLevel": 11,
+      "requires": [
+        "side.peaks.song"
+      ],
+      "canonStatus": "CANON-EXPANDED: the Silent Pilgrims and the Archive of Silence are CANON (world_bible.md), the Sandthrone are a CANON company and their toll in the Peaks is CANON-EXPANDED (the draft chapter_5.md); the six pilgrims and their crossing are GAME-ONLY.",
+      "summary": "Six Silent Pilgrims are waiting in the pines below the toll gate to carry Brother Cael's notes south to the Archive, and the Sandthrone captain holds every pilgrim he sees from his eyrie. Make sure he sees nothing, and watch them through from the eyrie.",
+      "offer": "Brother Cael has a folded page sewn into a linen cover, and his slate is already written on when you come.\n\nSix of my order wait in the pines below the gate, to go over and carry this south to the Archive. From his eyrie the captain sees every pilgrim on the road, and every pilgrim he sees he holds at the gate until the toll is paid. We have nothing to pay with. We never have.\n\nHe wipes the slate and writes one more line: The captain must see nothing for an hour.\n\nHe does not write how. He looks at your weapon, and then, with great care, at the sky.",
+      "complete": "Cael hears you out with his eyes shut. When you tell him the six went through the gate without a word said, he writes one line and holds it up a long time, so you are sure to read it.\n\nThank you.\n\nThen he rubs it out, slowly, and writes it again, as if once were not enough.",
+      "steps": [
+        {
+          "text": "Bring down the Sandthrone captain in his eyrie above the toll gate.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.peaks",
+              "target": "mob.captain.peaks.3.*",
+              "count": 1,
+              "text": "The Sandthrone captain",
+              "say": "The captain goes down on his own lookout, and for the first time in a long while nobody is watching the road."
+            }
+          ]
+        },
+        {
+          "text": "Watch the gate from the captain's eyrie while the pilgrims go through.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.peaks",
+              "at": {
+                "x": 62,
+                "y": 98
+              },
+              "radius": 7,
+              "text": "Watch the gate from the eyrie",
+              "say": "Below, a file of masked pilgrims in dyed linen comes out of the gate pines and up to the gate. With no word from the eyrie the guards fall to arguing over whose job it is to stop them, and while they argue the pilgrims walk through, one after another, and are gone round the bend of the road."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 330,
+        "gold": 65,
+        "reputation": [
+          {
+            "faction": "sandthrone",
+            "amount": -200
+          }
+        ]
       }
     }
   ]

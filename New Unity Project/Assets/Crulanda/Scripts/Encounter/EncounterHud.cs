@@ -575,6 +575,8 @@ namespace Crulanda.Encounter
                 case "class.rogue": return new Color(.95f, .85f, .35f);
                 case "class.archivist": return new Color(.55f, .8f, 1f);
                 case "class.saltmender": return new Color(.92f, .92f, .86f);
+                case "class.cleric": return new Color(1f, .95f, .72f);
+                case "class.shaman": return new Color(.4f, .6f, 1f);
                 default: return new Color(.78f, .61f, .43f);
             }
         }

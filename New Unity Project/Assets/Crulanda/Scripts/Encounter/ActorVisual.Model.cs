@@ -102,7 +102,43 @@ namespace Crulanda.Encounter
             // On a peasant's outfit only the hood is the ranger's: bleached, it takes its colour true (Mira's cream, a hen-wife's
             // red kerchief), not the ranger's green under a tint.
             if (s.kit == ModelFigure.Kit.Peasant) s.bleach = true;
+            if (orc) Orcish(ref s);
             return s;
+        }
+        /// <summary>Orc skin: the kit's pale skin times a green (moss, sage, olive, a darker fen green), by the variant.</summary>
+        static readonly Color[] OrcSkins = { new Color(.62f, .8f, .46f), new Color(.54f, .72f, .4f), new Color(.68f, .76f, .46f), new Color(.48f, .64f, .4f) };
+        /// <summary>How much taller an orc is drawn than a man (a woman: <see cref="OrcWomanScale"/>). The canon's orcs stand about
+        /// seven feet (world_bible: Gorm); the kit's man is about six.</summary>
+        public const float OrcScale = 1.15f, OrcWomanScale = 1.1f;
+        /// <summary>
+        /// An orc (Chris, 2026-10-13: "shaman is not an orc"; Docs/RACES.md, step 3): CANON as a people (green, tusked, about seven feet:
+        /// Gorm, Krunk). Built on the same humanoid body and clips as everyone else, so it wears the same gear: green skin, taller, no
+        /// beard, the head shaved or cropped (a woman's tied back), dark hair; the tusks are hung on the head after (<see cref="Tusks"/>).
+        /// </summary>
+        void Orcish(ref ModelFigure.Spec s)
+        {
+            s.skin = OrcSkins[Mathf.Abs(variant) % OrcSkins.Length]; s.scale = (s.female ? OrcWomanScale : OrcScale) * (s.scale > 0 ? s.scale : 1);
+            s.beard = false; s.hair = s.female ? 2 : (Mathf.Abs(variant) % 2 == 0 ? 4 : 3); s.hairColour = new Color(.42f, .38f, .34f);
+        }
+        static Material tuskMat;
+        /// <summary>An orc's two tusks: ivory points standing up from the corners of the lower jaw, a little forward and out, hung on the
+        /// Head bone. Made in the bind pose, like the frames (the jaw about 3 cm above the Head bone, the face about 9 cm in front).</summary>
+        void Tusks(ModelFigure m)
+        {
+            if (tuskMat == null) { tuskMat = new Material(Shader.Find("Standard")) { color = new Color(.93f, .89f, .76f), name = "Orc tusk" }; tuskMat.SetFloat("_Glossiness", .35f); }
+            float s = m.Model.localScale.y; var jaw = body.InverseTransformPoint(m.HeadBone.position);
+            foreach (float side in new[] { -1f, 1f })
+            {
+                var t = GameObject.CreatePrimitive(PrimitiveType.Capsule); t.name = "Tusk " + (side < 0 ? "L" : "R");
+                var c = t.GetComponent<Collider>(); if (Application.isPlaying) Destroy(c); else DestroyImmediate(c);
+                t.transform.SetParent(body, false);
+                t.transform.localPosition = jaw + new Vector3(side * .03f, .035f, .088f) * s;
+                t.transform.localRotation = Quaternion.Euler(-18, 0, side * -12);
+                t.transform.localScale = new Vector3(.013f, .022f, .013f) * s;
+                t.transform.SetParent(m.HeadBone, true);
+                var r = t.GetComponent<MeshRenderer>(); r.sharedMaterial = tuskMat; r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                m.Renderers.Add(r);
+            }
         }
         /// <summary>A trade's model: the outfit and its dyes (the old outfit's colours), a hood for the hooded trades, a beard,
         /// grey hair for an elder.</summary>
@@ -146,6 +182,7 @@ namespace Crulanda.Encounter
             model = m; actorRef = GetComponent<Crulanda.Gameplay.Actor>();
             if (child) m.HeadBone.localScale = Vector3.one * ChildHead;   // a child's head is large for the body (the clips turn bones, they never scale them)
             Frames();
+            if (orc) Tusks(m);
             // What armour recolours (Cover): the shirt, the sleeves (and, for gloves, the bare hands), the breeches, the shoes.
             baseChest = new[] { m.Torso }; baseSleeves = new[] { m.Arms }; baseHands = new[] { m.Arms }; baseLegs = new[] { m.Legs }; baseBoots = new[] { m.Feet };
             baseBelt = null;   // the outfit's belts go under a chest piece (ModelFigure.ShowExtras)

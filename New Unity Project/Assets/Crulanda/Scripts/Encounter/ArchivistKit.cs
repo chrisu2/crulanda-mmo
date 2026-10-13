@@ -29,7 +29,7 @@ namespace Crulanda.Encounter
             "ca-clear-voice", "ca-breath", "ca-held-note", "ca-chorus", "ca-long-song", "ca-echoing-mend", "ca-resonant-ward", "ca-quiet-mind", "ca-weave", "ca-symphony" };   // the Cantor, tiers 0-3
         public static readonly string[] BarIds = { "archivist.shard_note", "archivist.lull", "archivist.hush", "archivist.echo_bind", "archivist.cadence", "archivist.dirge", "archivist.echo_jar",
             "archivist.mending_phrase", "archivist.song_of_mending", "archivist.chorus", "archivist.unwrite", "archivist.erasure", "archivist.stillness", "archivist.mending_verse" };
-        public const float MendingReach = 10, MendingShare = .01f, HeldNoteShare = .01f, HeldNoteSeconds = 5, LowMend = .35f;
+        public const float MendingReach = 10, MendingShare = .017f, HeldNoteShare = .004f, HeldNoteSeconds = 5, LowMend = .35f, PhraseWeight = .4f;   // 2026-10-13: the Cantor heals a party by its song; its phrase and held note for one were overtuned (105 a second on the wounded dummy at full healing, 91 in a party)
         public const float LullSeconds = 20, LullReach = 6, BindSeconds = 30, HushSilence = 5, DirgeReach = 10, JarReach = 8, JarSeconds = 6, CadenceSpeed = .1f;
         public const int LullMost = 3, JarMost = 3;
         public enum Song { None, Cadence, Dirge, Mending }
@@ -322,7 +322,7 @@ namespace Crulanda.Encounter
         }
         public int PhraseAmount(AbilityDefinition a, Actor target)
         {
-            float heal = (a.power + 3 * Level) * (1 + .04f * R("ca-clear-voice"));
+            float heal = (a.power + 3 * Level) * (1 + .04f * R("ca-clear-voice")) * PhraseWeight;
             if (R("ca-echoing-mend") > 0 && target != null && target.Health.Pool.Ratio < LowMend) heal *= 1.3f;   // Echoing Mend
             return Mathf.RoundToInt(heal);
         }
@@ -344,7 +344,7 @@ namespace Crulanda.Encounter
                 var target = MostHurt(a.range);
                 HealActor(target, PhraseAmount(a, target));
                 int held = R("ca-held-note");
-                if (held > 0 && target != null && target.IsAlive) heldNotes.Add((target, Time.time + HeldNoteSeconds, Mathf.Max(1, Mathf.RoundToInt(target.Health.Pool.Max * HeldNoteShare * held))));
+                if (held > 0 && target != null && target.IsAlive) heldNotes.Add((target, Time.time + HeldNoteSeconds, Mathf.Max(1, Mathf.RoundToInt(SingerHealth * HeldNoteShare * held))));
             });
         }
         /// <summary>Chorus of the Weave: a barrier on every party member within 15 m (Resonant Ward: larger; Symphony of Mending: a heal too).</summary>
@@ -356,12 +356,16 @@ namespace Crulanda.Encounter
                 {
                     if (who == null || !who.IsAlive || Vector3.Distance(who.transform.position, s.Player.transform.position) > a.range) continue;
                     who.GetComponent<Combatant>().AddBarrier(size, a.duration); n++;
-                    if (R("ca-symphony") > 0) HealActor(who, Mathf.Max(1, Mathf.RoundToInt(who.Health.Pool.Max * .08f)));
+                    if (R("ca-symphony") > 0) HealActor(who, Mathf.Max(1, Mathf.RoundToInt(SingerHealth * .08f)));
                 }
                 s.FloatText(s.Player.transform.position + Vector3.up * 1.5f, "Chorus", SongBlue);
                 s.Message("Chorus of the Weave: " + n + (n == 1 ? " shielded." : " shielded."));
             });
         }
+        /// <summary>What the Cantor's shares are of (the Song of Mending, the Held Note, the Symphony): the singer's own health. (2026-10-13:
+        /// a share of each one's own let the wounded dummy's 3,000 read the song three times stronger than a party's, the retune cut the
+        /// Cantor's healing to a sixth, and a party under it got 12 a second.)</summary>
+        int SingerHealth { get { return s.Player != null ? s.Player.Health.Pool.Max : 0; } }
         /// <summary>The Song of Mending's reach (The Weave: further).</summary>
         public float MendingSongReach { get { return MendingReach + 2 * R("ca-weave"); } }
 
@@ -373,7 +377,7 @@ namespace Crulanda.Encounter
                 mendNext = Time.time + 1; float share = MendingShare + .005f * R("ca-long-song"), reach = MendingSongReach;
                 foreach (var who in Party())
                     if (who != null && who.IsAlive && who.Health.Pool.Ratio < 1 && Vector3.Distance(who.transform.position, s.Player.transform.position) <= reach)
-                        HealActor(who, Mathf.Max(1, Mathf.RoundToInt(who.Health.Pool.Max * share)));
+                        HealActor(who, Mathf.Max(1, Mathf.RoundToInt(SingerHealth * share)));
             }
             if (heldNotes.Count > 0 && Time.time >= heldNext)
             {

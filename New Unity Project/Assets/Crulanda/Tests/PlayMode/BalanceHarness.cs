@@ -42,6 +42,9 @@ namespace Crulanda.Tests
         /// Brand costs what Rebuke costs and has no cooldown, so the rotation always reached Rebuke first and never cast it).</summary>
         static readonly Dictionary<string, float> Every = new Dictionary<string, float> { { "cleric.brand", 7.5f },
             { "archivist.unwrite", 11.5f }, { "mage.marrow_drain", 9.5f } };   // the Unwriting's own Unwrite and the Bonecaller's Marrow Drain were never cast either
+        /// <summary>The slower group heals (2026-10-13): for a hurt party, so the party heal test casts them and the one-target heal test
+        /// (the wounded dummy alone) does not (a 3 s cast for one cut every one-target healer's number).</summary>
+        static readonly HashSet<string> GroupHeals = new HashSet<string> { "paladin.mending_oath", "archivist.mending_verse", "salt.wound_seal" };
         static readonly HashSet<string> Once = new HashSet<string> { "mage.raise_thrall", "ranger.call_companion", "paladin.oath", "paladin.colours",
             "archivist.song_of_mending", "salt.mender_craft" };   // 2026-10-13: the healers' songs and chants are toggles: started once (they were never started, or toggled off again)
         /// <summary>A once-a-fight toggle already on: the pet up, the song or the chant going (2026-10-13: casting it again in the next
@@ -315,7 +318,7 @@ namespace Crulanda.Tests
                 .OrderByDescending(i => targets == 0 && s.Kit.ActionAt(i).effect == AbilityEffect.Heal ? 1 : 0)   // the heal test: mends first
                 .ThenByDescending(i => s.Kit.ActionAt(i).cooldown)   // cooldowns (the splashes, the big hits) when ready, the filler last
                 .ThenBy(i => (i + seed) % Math.Max(1, s.Kit.ActionCount)).ToList();
-            int cheapest = order.Where(i => !Never.Contains(s.Kit.ActionAt(i).id) && !Once.Contains(s.Kit.ActionAt(i).id) && (targets == 0 ? s.Kit.ActionAt(i).effect == AbilityEffect.Heal : s.Kit.ActionAt(i).effect == AbilityEffect.Damage))
+            int cheapest = order.Where(i => !Never.Contains(s.Kit.ActionAt(i).id) && !Once.Contains(s.Kit.ActionAt(i).id) && !(targets == 0 && GroupHeals.Contains(s.Kit.ActionAt(i).id)) && (targets == 0 ? s.Kit.ActionAt(i).effect == AbilityEffect.Heal : s.Kit.ActionAt(i).effect == AbilityEffect.Damage))
                 .OrderBy(i => s.Kit.ActionAt(i).cost).DefaultIfEmpty(-1).First();
             var uses = new Dictionary<string, int>(); var lastUse = new Dictionary<int, float>();
             if (seed == 0) csv.Add("# locks " + cls + " " + branch.id + " " + scenario + ": " + string.Join(" ", Enumerable.Range(0, s.Kit.ActionCount).Where(i => s.Kit.ActionAt(i) != null && s.Kit.ActionLockLabel(i) != null).Select(i => s.Kit.ActionAt(i).id + "=" + s.Kit.ActionLockLabel(i).Replace(" ", "_"))));
@@ -348,6 +351,7 @@ namespace Crulanda.Tests
                     if (Once.Contains(ab.id) && AlreadyOn(ab.id)) { used1.Add(ab.id); continue; }
                     // A damage fight casts no heals (2026-10-13: the Cleric and Shaman, whose bars lock nothing by build, spent most casts mending nobody).
                     if (targets > 0 && ab.effect == AbilityEffect.Heal) continue;
+                    if (targets == 0 && GroupHeals.Contains(ab.id)) continue;   // one hurt: the one-target mends
                     // Mana-aware: a costly ability waits while the pool is under a fifth, the cheapest one (the filler) never waits.
                     if (ab.cost > 0 && slot != cheapest && pool.Max > 0 && pool.Current - ab.cost < pool.Max * .2f) continue;
                     if (s.UseAbility(slot)) { if (Once.Contains(ab.id)) used1.Add(ab.id); lastUse[slot] = t; uses[ab.id] = (uses.TryGetValue(ab.id, out var n) ? n : 0) + 1; break; }

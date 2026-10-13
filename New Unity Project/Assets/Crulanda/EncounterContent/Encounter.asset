@@ -392,7 +392,7 @@ MonoBehaviour:
     name: Mending Oath
     description: "An oath sworn slowly over 3 seconds: everyone in your party within 20 metres is mended. Slower than Mend, for a hurt party. GAME-ONLY."
     effect: 3
-    power: 15
+    power: 33
     cost: 30
     cooldown: 0
     range: 20
@@ -956,7 +956,7 @@ MonoBehaviour:
     name: The Mending Verse
     description: "A whole verse of the Song of Mending, sung over 3 seconds: everyone in your party within 20 metres is mended. Slower than a phrase, for a hurt party."
     effect: 3
-    power: 15
+    power: 33
     cost: 28
     cooldown: 0
     range: 20
@@ -1241,10 +1241,10 @@ MonoBehaviour:
     duration: 0
     statusId:
   - id: salt.wound_seal
-    name: Seal the Wound
-    description: "The Mender-Craft cried out over 3 seconds, I seal the Wound: everyone in your party within 20 metres is mended. Slower than Close the Cut, for a hurt party."
+    name: The Mending Cry
+    description: "The Mender-Craft cried aloud over 3 seconds: everyone in your party within 20 metres is mended. Slower than Close the Cut, for a hurt party. Talent. CANON-EXPANDED."
     effect: 3
-    power: 15
+    power: 33
     cost: 26
     cooldown: 0
     range: 20
@@ -1816,9 +1816,6 @@ MonoBehaviour:
       - abilityId: paladin.mend
         level: 1
         talentId: 
-      - abilityId: paladin.mending_oath
-        level: 1
-        talentId: sa-devotion
       - abilityId: paladin.ward
         level: 2
         talentId: 
@@ -1849,6 +1846,9 @@ MonoBehaviour:
       - abilityId: paladin.press_on
         level: 7
         talentId: 
+      - abilityId: paladin.mending_oath
+        level: 1
+        talentId: sa-devotion
     talentTree: {fileID: 4900000, guid: ae359ffc02cb42b486625e88fc47b2f5, type: 3}
   - definition:
       id: class.ranger
@@ -2060,9 +2060,6 @@ MonoBehaviour:
       - abilityId: archivist.mending_phrase
         level: 3
         talentId: 
-      - abilityId: archivist.mending_verse
-        level: 1
-        talentId: ca-clear-voice
       - abilityId: archivist.song_of_mending
         level: 5
         talentId: 
@@ -2078,6 +2075,9 @@ MonoBehaviour:
       - abilityId: archivist.stillness
         level: 1
         talentId: vw-stillness
+      - abilityId: archivist.mending_verse
+        level: 1
+        talentId: ca-clear-voice
     talentTree: {fileID: 4900000, guid: 4a212c4a60b94032aed04b1295fd0325, type: 3}
   - definition:
       id: class.saltmender
@@ -2124,9 +2124,6 @@ MonoBehaviour:
       - abilityId: salt.close_cut
         level: 7
         talentId:
-      - abilityId: salt.wound_seal
-        level: 1
-        talentId: md-mender-craft
       - abilityId: salt.mender_craft
         level: 1
         talentId: md-mender-craft
@@ -2136,6 +2133,9 @@ MonoBehaviour:
       - abilityId: salt.cairn
         level: 1
         talentId: md-salt-cairn
+      - abilityId: salt.wound_seal
+        level: 1
+        talentId: md-mender-craft
     talentTree: {fileID: 4900000, guid: b7e94b011c294431bd9be85595f3273a, type: 3}
   - definition:
       id: class.cleric

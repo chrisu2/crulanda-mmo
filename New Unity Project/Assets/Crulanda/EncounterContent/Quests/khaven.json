@@ -24,6 +24,26 @@
       "id": "item.charnel_silk",
       "name": "Charnel silk",
       "description": "A skein of grey spider-silk from the Carrion Heights, strong as cord and cold to hold. Dorra Vey says it takes a dye like nothing else."
+    },
+    {
+      "id": "item.harls_noose",
+      "name": "Harl Emmet's noose",
+      "description": "A length of tarred hemp, grey with grave-mud, still tied in a Khaven knot: three turns and a tuck."
+    },
+    {
+      "id": "item.picket_orders",
+      "name": "The picket's order-roll",
+      "description": "Oiled sheets rolled tight in a leather tube, every one sealed with a sun on a bar of sand."
+    },
+    {
+      "id": "item.reckoners_slate",
+      "name": "The Reckoner's slate",
+      "description": "A pane of cold, pale glass scratched from edge to edge with names, a number after each. It is heavier at one end, as if the sum were."
+    },
+    {
+      "id": "item.rest_candles",
+      "name": "Bundle of tallow candles",
+      "description": "A dozen of Cato Brisk's candles wrapped in sacking and tied with twine. Rank as a boar, and they burn all night."
     }
   ],
   "documents": [
@@ -50,6 +70,12 @@
       "title": "What the Wood Repeats",
       "text": "Leaves from a daybook, the hand careful at first and less careful toward the end:\n\nI came to Khaven to listen to the wood. My order holds that the Original Song was never lost, only scattered, and that here and there the world still hums a line of it.\n\nThird night. While the wind blows, the wood is silent. When it drops, they begin. Not words. Names.\n\nNinth night. I knew one: Tamsin Ade, from the low row by the creek. Said over and over, the way a miser counts his coin.\n\nTwelfth night. It is not the trees. Something pale stands between them, and the trees only say over what it says.\n\nFourteenth night. It does not sing. It counts. Every name in Khaven, and a number after each.\n\nFifteenth night. Tonight it said my name, and then a number.\n\n(The rest of the page is a tally: strokes in fives, line after line, down to the torn edge.)",
       "canonStatus": "CANON-EXPANDED: the Silent Pilgrims and their belief in the Original Song are CANON, and so are the Pale Things as cosmic auditors (world_bible.md); the Listener and his daybook are GAME-ONLY. Tamsin Ade is from the sexton's register (GAME-ONLY)."
+    },
+    {
+      "id": "doc.khaven.picket_orders",
+      "title": "Orders, the Khaven Picket",
+      "text": "Oiled sheets in a leather tube, each with the Company's seal pressed into the wax: a sun on a bar of sand.\n\nThe Khaven picket, at the old north watch. Orders as given, copied fair.\n\nItem. Khaven pays toll at its own gate as at the road: one in ten of coin, of beasts and of grain. The Company counts. The village does not.\n\nItem (at the thaw). One Harl Emmet, of Khaven, struck a Company man at the gate over a goat taken in toll. The Company's hand is not struck twice. Hang him at the village tree, the village keeper to tie the knot and the village to watch. No salt to be laid on him. Bury him low by the creek, so that Khaven sees him walk.\n\nItem (at the dark of the moon). A Bureau wagon comes in by the Gloom road with cargo for the Concord escort. Take the Bureau's coin at the gate, and the cargo with it, and ride it north. Ask nothing of the cargo. Count it, and send the count up the road.\n\nItem. Any man of the picket found drinking at the Cracked Hearth pays his own score.",
+      "canonStatus": "GAME-ONLY: the picket, its orders and Harl Emmet. The Sandthrone are CANON (world_bible.md), and so is the Investigation Bureau's wagon (book1 ch.4)."
     }
   ],
   "quests": [
@@ -703,6 +729,483 @@
       "rewards": {
         "xp": 165,
         "gold": 32
+      }
+    },
+    {
+      "id": "npc.hollis.bearers",
+      "title": "The Bearers' Road",
+      "kind": "npc",
+      "giver": "Hollis Grane",
+      "turnIn": "Hollis Grane",
+      "zone": "zone.khaven",
+      "level": 5,
+      "canonStatus": "GAME-ONLY",
+      "summary": "Hollis Grane carried Khaven's dead down the Corpse Road when he was a bearer. He wants to know whether the two coffin stones still stand, and what is chalked on them.",
+      "offer": "Hollis Grane sits as near the Cracked Hearth's fire as a man can without being in it. \"I was Khaven's smith till the smithy fell. Before that I was a bearer, like my father. The wood steadings brought their dead down the Corpse Road on our shoulders, and we rested them on the coffin stones and chalked the name on the stone, so the road would know who it had carried.\"\n\n\"Nobody's walked it since the deserters strung their rope across it. Go and look at the two stones for me: the one under the west thicket, and the one where the road comes down to the plague pit. And mind the blackthorn south of the road. There's men in it who'll have your boots.\"",
+      "complete": "\"Grane. On both of them.\" Hollis turns his cup round and round on the board. \"My father. I carried him down that road twenty years back and chalked him on every stone, and the rain should have had it off inside a month.\"\n\nHe drinks. \"Somebody's kept it fresh. Wenna, I expect. She'll say not.\"",
+      "steps": [
+        {
+          "text": "Walk the Corpse Road and look at both coffin stones.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.khaven",
+              "at": {
+                "x": -133,
+                "y": -64
+              },
+              "radius": 7,
+              "text": "The coffin stone under the west thicket",
+              "say": "A long flat stone at the roadside, worn hollow in the middle by a hundred years of coffins. Chalked along its edge, fresh as this morning: GRANE."
+            },
+            {
+              "type": "visit",
+              "zone": "zone.khaven",
+              "at": {
+                "x": -69,
+                "y": -140
+              },
+              "radius": 7,
+              "text": "The coffin stone by the plague pit",
+              "say": "The second stone leans where the Corpse Road runs down to the pit. The same name is chalked on it in the same square hand, and the rain has not touched it."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 90,
+        "gold": 12
+      }
+    },
+    {
+      "id": "side.khaven.harl_rope",
+      "title": "Three Turns and a Tuck",
+      "kind": "side",
+      "giver": "Tamsin Rook",
+      "turnIn": "Tamsin Rook",
+      "zone": "zone.khaven",
+      "level": 6,
+      "canonStatus": "CANON creature (Hollow Men, book1 ch.4); Harl Emmet, his hanging and the salt custom are GAME-ONLY (the sexton's register, doc.khaven.low_row).",
+      "summary": "Tamsin Rook hanged Harl Emmet in the spring, on the Sandthrone's word. Now he walks with the hollows of the plague pit, her rope still on him. Put them down and bring her back her knot.",
+      "offer": "The Gallows-Keeper is sanding the drop's trapdoor, slowly, as if it had done something to her. \"Harl Emmet. Struck an outrider at the gate who was taking his goat for toll, and the Company had me hang him for it. Hanged for a goat.\" She blows off the dust. \"It wasn't even a good goat.\"\n\n\"They made me bury him in the rope, and no salt, so Khaven would see him walk. Well, he's walking. Wynn Tabor's seen him at the plague pit with the grey ones, my knot still under his ear. Put them down, and bring me my knot. I'll know it. I tie a Khaven knot: three turns and a tuck.\"",
+      "complete": "Tamsin works the knot loose with her thumbs, the way she tied it, and coils the rope over her arm. She hangs it on a nail on the gallows post. There are a great many nails.\n\n\"That's the rope off him. He's owed his salt yet, and I'll see he has it.\"",
+      "steps": [
+        {
+          "text": "Put down the hollows at the plague pit, and find the one wearing Tamsin's rope.",
+          "say": "One of the grey dead wore a length of tarred hemp about its neck, tied three turns and a tuck. It went down whispering 'hungry', like the rest, and you cut the rope from what was left.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.khaven",
+              "target": "mob.hollow.khaven.6.*",
+              "count": 4,
+              "text": "Plague pit hollows put down"
+            },
+            {
+              "type": "collect",
+              "zone": "zone.khaven",
+              "target": "kill:mob.hollow.khaven.6.*",
+              "item": "item.harls_noose",
+              "text": "Harl Emmet's noose"
+            }
+          ]
+        },
+        {
+          "text": "Bring the noose to Tamsin Rook at the Gallows Tree.",
+          "objectives": [
+            {
+              "type": "deliver",
+              "zone": "zone.khaven",
+              "target": "Tamsin Rook",
+              "item": "item.harls_noose",
+              "text": "Give Tamsin her rope",
+              "say": "\"Three turns and a tuck. That's mine.\" She doesn't take her eyes off it. \"Give it here.\""
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 125,
+        "gold": 20
+      }
+    },
+    {
+      "id": "side.khaven.harl_salt",
+      "title": "Salt for the Hanged",
+      "kind": "side",
+      "giver": "Tamsin Rook",
+      "turnIn": "Tamsin Rook",
+      "zone": "zone.khaven",
+      "level": 7,
+      "requires": [
+        "side.khaven.harl_rope"
+      ],
+      "canonStatus": "GAME-ONLY: the crossroads burials and the salt custom (the sexton's register, doc.khaven.low_row). Salt as a ward follows the Salt-Menders' salt-magic (CANON, world_bible.md).",
+      "summary": "Harl Emmet was owed salt, and so is every man hanged since the Company came. Get salt from Wenna Coyle, lay it on the hanged men's graves at the Gibbet Crossroads, and see that Ansel Morrow writes it in his register.",
+      "offer": "\"Salt on the tongue, so the dead lie quiet. Khaven's always done it, for everybody, hanged or not. The Company stopped it for the hanged.\" Tamsin counts on her fingers and stops at three. \"Three under the gibbet at the crossroads since they came, and not one of them salted. Harl makes four, and there's nothing left of him to salt but what you swept up at the pit.\"\n\n\"Wenna keeps salt, the good kind, off the Rim. Ask her for a twist of it. Lay it on the three at the crossroads and say Harl's name over them; he'll hear it there as well as anywhere. Then go to Ansel and see he writes it down. If it isn't in Ansel's book, it didn't happen.\"",
+      "complete": "\"Salt.\" Tamsin says the word as if it were a name too. \"That's four of them lying quiet, and Harl with them, after his fashion.\"\n\n\"I tied the knot. Ansel wrote the line. Somebody gave the word, and it wasn't either of us.\" She looks north, toward the Fallen Watch. \"I'll think on that.\"",
+      "steps": [
+        {
+          "text": "Ask Wenna Coyle for salt.",
+          "objectives": [
+            {
+              "type": "talk",
+              "zone": "zone.khaven",
+              "target": "Wenna Coyle",
+              "text": "Ask Wenna Coyle for salt",
+              "say": "\"For the hanged? About time somebody asked.\" She fills a twist of paper from a crock behind her bench. \"Rim salt. Don't tell Cato what it cost me, or he'll want to sell it.\""
+            }
+          ]
+        },
+        {
+          "text": "Lay the salt on the hanged men's graves at the Gibbet Crossroads, and say Harl Emmet's name.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.khaven",
+              "at": {
+                "x": -105,
+                "y": -126
+              },
+              "radius": 7,
+              "text": "Salt the graves at the Gibbet Crossroads",
+              "say": "You lay a pinch of salt at the head of each low grave under the gibbet and say Harl Emmet's name over them, feeling a fool. The chain on the gibbet, which has been creaking, stops."
+            }
+          ]
+        },
+        {
+          "text": "Ask Ansel Morrow to write it in his register.",
+          "objectives": [
+            {
+              "type": "talk",
+              "zone": "zone.khaven",
+              "target": "Ansel Morrow",
+              "text": "Have Ansel Morrow write it down",
+              "say": "Ansel opens the register to the low row and finds the line: 'Harl Emmet, the gallows. No salt.' Under it, in a hand steadier than the rest, he writes: 'Salt. Late, but salt.'"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 130,
+        "gold": 18
+      }
+    },
+    {
+      "id": "side.khaven.harl_word",
+      "title": "Who Gave the Word",
+      "kind": "side",
+      "giver": "Tamsin Rook",
+      "turnIn": "Tamsin Rook",
+      "zone": "zone.khaven",
+      "level": 9,
+      "minLevel": 7,
+      "requires": [
+        "side.khaven.harl_salt"
+      ],
+      "canonStatus": "CANON company (Sandthrone, world_bible.md); the picket, its orders and Harl Emmet are GAME-ONLY.",
+      "summary": "The order to hang Harl Emmet came down on paper from the Sandthrone picket at the Fallen Watch. Break the picket and bring Tamsin Rook its order-roll.",
+      "offer": "Tamsin has the rope off its nail again and is turning it in her hands. \"The Company likes things on paper. The word to hang Harl came down from the picket at the Fallen Watch, sealed. Their sergeant read it out under my tree, put it back in his roll and rode home to his supper.\"\n\n\"I want that paper. Not for vengeance. Vengeance is a young woman's game, and it doesn't keep.\" She hangs the rope back on its nail. \"I want it so that when the Company's gone, and it will go, there's a page somewhere that says who hanged Harl Emmet. Break the picket. The roll will be on one of them.\"",
+      "complete": "Tamsin reads the roll by the lamp, all of it, twice. Then she rolls it up and puts it inside her coat.\n\n\"'The village keeper to tie the knot.' There it is. The Company gave the word.\" Her mouth goes thin. \"It doesn't say who tied it. I'll have to say that myself, when the time comes. I've had the practice.\"",
+      "steps": [
+        {
+          "text": "Break the Sandthrone picket at the Fallen Watch and take its order-roll.",
+          "say": "The order-roll was in a leather tube at a picket outrider's belt, every sheet sealed with a sun on a bar of sand.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.khaven",
+              "target": "mob.outrider.khaven.7.*",
+              "count": 5,
+              "text": "Picket outriders"
+            },
+            {
+              "type": "collect",
+              "zone": "zone.khaven",
+              "target": "kill:mob.outrider.khaven.7.*",
+              "item": "item.picket_orders",
+              "text": "The picket's order-roll",
+              "document": "doc.khaven.picket_orders"
+            }
+          ]
+        },
+        {
+          "text": "Bring the order-roll to Tamsin Rook.",
+          "objectives": [
+            {
+              "type": "deliver",
+              "zone": "zone.khaven",
+              "target": "Tamsin Rook",
+              "item": "item.picket_orders",
+              "text": "Give Tamsin the order-roll",
+              "say": "\"Give it here.\" She weighs the tube in her hand before she opens it. \"Heavier than a rope.\""
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 185,
+        "gold": 36,
+        "reputation": [
+          {
+            "faction": "sandthrone",
+            "amount": -100
+          },
+          {
+            "faction": "oakhaven",
+            "amount": 100
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.wynn.hides",
+      "title": "Nothing That Talks",
+      "kind": "npc",
+      "giver": "Wynn Tabor",
+      "turnIn": "Wynn Tabor",
+      "zone": "zone.khaven",
+      "level": 6,
+      "canonStatus": "GAME-ONLY",
+      "summary": "Nobody in Khaven will make a coffin of Stillwood timber, so the poor are buried sewn in hide. Wynn Tabor wants three hill-deer hides from the Ridge pines north-east of the walls.",
+      "offer": "Wynn Tabor sits on his step with one leg stuck straight out in front of him. \"The creek's given Ansel back more dead than he has boxes for, and nobody in Khaven will cut the Stillwood for coffin-boards. Grey wood talks. You don't want to be laid in something that talks.\"\n\n\"So the poor go down sewn in hide, the way they did in my grandfather's day. Deer's best; it keeps the shape. The deer won't come near the Stillwood now. They've gone east, up into the Ridge pines. Three hides.\" He slaps the straight leg. \"I'd go myself, but they'd hear this knee coming from the Peaks.\"",
+      "complete": "Wynn rolls the hides and ties them with a thong. \"Ansel sews a better seam than he digs, I'll say that for him.\" He looks at the bundle a while.\n\n\"Nobody in Khaven goes into the ground in anything that talks this week. That's something.\"",
+      "steps": [
+        {
+          "text": "Hunt hill deer in the Ridge pines north-east of the village, and bring three hides to Wynn Tabor.",
+          "objectives": [
+            {
+              "type": "bring",
+              "zone": "zone.khaven",
+              "target": "Wynn Tabor",
+              "item": "hide.hill_deer",
+              "count": 3,
+              "text": "Hill-deer hides for Wynn",
+              "say": "He runs a thumb down each hide, against the hair and back. \"No holes worth the name. Good.\""
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 110,
+        "gold": 18
+      }
+    },
+    {
+      "id": "npc.siv.barley",
+      "title": "The Long Acre",
+      "kind": "npc",
+      "giver": "Siv Harl",
+      "turnIn": "Siv Harl",
+      "zone": "zone.khaven",
+      "level": 7,
+      "canonStatus": "GAME-ONLY",
+      "summary": "Mire boars are rooting up what the flood has left of Khaven's barley ground in the Drowned Fields, south of Gloom Creek and east of the drowned graveyard. Siv Harl wants six of them gone.",
+      "offer": "Siv Harl has flour on her apron and none in her bin. \"I baked for Khaven twenty years, till the oven cracked the winter the smithy fell. Nobody's mended either. Bread wants flour, and flour wants barley, and the barley ground was down the creek: the Long Acre, we called it. The children call it the Drowned Fields now, and they're not wrong.\"\n\n\"Every spring the creek takes a strip, and what it leaves the mire boars have, seed and root. Six of them, and I'll sow what seed I've kept and see what comes up.\" She looks at the sky, which is the colour it always is. \"Something will. Something always does, here.\"",
+      "complete": "\"Six.\" Siv wipes her hands on her apron, which only makes them floury. \"Mattock will say it was the creek all along and the boars only finishing up. Let him. I'll sow tomorrow.\"",
+      "steps": [
+        {
+          "text": "Kill mire boars in the Drowned Fields, south of Gloom Creek and east of the drowned graveyard.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.khaven",
+              "target": "mob.boar.khaven.8.*",
+              "count": 6,
+              "text": "Mire boars"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 140,
+        "gold": 25
+      }
+    },
+    {
+      "id": "npc.mattock.teeth",
+      "title": "Hush-Teeth",
+      "kind": "npc",
+      "giver": "Mattock Jenn",
+      "turnIn": "Mattock Jenn",
+      "zone": "zone.khaven",
+      "level": 7,
+      "canonStatus": "GAME-ONLY",
+      "summary": "Mattock Jenn sells wolf's-tooth charms to the frightened, and the Sandthrone are the most frightened customers he has. He wants four wolf fangs, from any wolf at all.",
+      "offer": "Mattock Jenn keeps the far end of the chandler's stall. There is very little on it, laid out very tidily. \"The Company men are frightened of the Stillwood. Big men, good swords, and they won't stand under a grey tree after dark. Frightened men buy charms, and the charm they'll pay for is a tooth off a Hush wolf, on a thong.\"\n\n\"Any wolf's tooth, mind. I'll tell them it's from the Hush. They can't tell the difference, and it does them exactly as much good.\" He straightens a thong that is already straight. \"Four fangs. Siv calls it selling lies. I call it selling sleep.\"",
+      "complete": "Mattock threads the teeth on thongs with quick, neat fingers and hangs them at the front of the stall, where an outrider would see them first. \"Hush-teeth. A crown apiece, two for the nervous.\"\n\nHe pays you out of the first sale before it has been made.",
+      "steps": [
+        {
+          "text": "Take fangs from the grey wolves of the Stillwood or the Hush, and bring four to Mattock Jenn.",
+          "objectives": [
+            {
+              "type": "bring",
+              "zone": "zone.khaven",
+              "target": "Mattock Jenn",
+              "item": "junk.wolf_fang",
+              "count": 4,
+              "text": "Wolf fangs for Mattock",
+              "say": "\"Good long ones.\" He holds one up to the lamp. \"That one's from the Hush if ever I saw one. Which I haven't.\""
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 130,
+        "gold": 26
+      }
+    },
+    {
+      "id": "side.khaven.well",
+      "title": "The Name in the Well",
+      "kind": "side",
+      "giver": "Old Kestrel",
+      "turnIn": "Old Kestrel",
+      "zone": "zone.khaven",
+      "level": 7,
+      "requires": [
+        "side.khaven.listener"
+      ],
+      "canonStatus": "CANON-EXPANDED: the Blood-Stone Well is CANON (the Khaven village map), and so are the Pale Things as cosmic auditors (world_bible.md); the naming custom is GAME-ONLY.",
+      "summary": "Old Kestrel's true name went down the Blood-Stone Well the night he was born, as Khaven names did once. He wants to know whether the counting thing has learned to read the well. Look into it after dark, then ask Ansel Morrow what name the pale watcher called him by.",
+      "offer": "Old Kestrel lowers his voice, though only the crows are listening. \"Kestrel's not my name. It's what my mother called me, for I was thin and sharp in the nose. My name she whispered down the Blood-Stone Well the night I was born, as Khaven mothers did then, and nobody's said it aloud since. Not even me. That's how I made sure.\"\n\n\"The thing the Listener heard counts names. If it's learned to read the well, all my care's been no more use than this blanket.\" He grips your sleeve. \"Look into the well after dark, and listen. Then ask Ansel Morrow what the pale thing at his crypt called him. Ansel's a by-name too. Don't tell him I said so.\"",
+      "complete": "\"Held.\" Old Kestrel lets go of the blanket he has been twisting. \"Well, then. Well.\"\n\n\"But a thing that counts doesn't stop because the sum won't come out. It goes looking for the figures it's missing.\" He looks east, toward the Carrion Heights and the crows. \"Come back when you're stronger. I'll have thought how to ask you.\"",
+      "steps": [
+        {
+          "text": "Look into the Blood-Stone Well after dark, and listen.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.khaven",
+              "at": {
+                "x": -2,
+                "y": 2
+              },
+              "radius": 6,
+              "night": true,
+              "text": "The Blood-Stone Well, at night",
+              "say": "You lean over the well's red lip. Far down, the water is red even in the dark, and perfectly still. You listen a long while. It says nothing at all, the way a locked box says nothing."
+            }
+          ]
+        },
+        {
+          "text": "Ask Ansel Morrow what name the pale watcher called him.",
+          "objectives": [
+            {
+              "type": "talk",
+              "zone": "zone.khaven",
+              "target": "Ansel Morrow",
+              "text": "Ask Ansel Morrow",
+              "say": "\"Ansel. It counted me as Ansel, every night it stood there.\" Something like a smile. \"That's not the name my mother gave the well. Tell Kestrel the well's held.\""
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 125,
+        "gold": 15
+      }
+    },
+    {
+      "id": "side.khaven.reckoner",
+      "title": "The Final Sum",
+      "kind": "side",
+      "giver": "Old Kestrel",
+      "turnIn": "Old Kestrel",
+      "zone": "zone.khaven",
+      "level": 9,
+      "minLevel": 8,
+      "requires": [
+        "side.khaven.well",
+        "main.khaven.2"
+      ],
+      "canonStatus": "CANON-EXPANDED: the Pale Things / Pale Kings as cosmic auditors are CANON (world_bible.md); the Pale Reckoner and the Charnel Barrow are GAME-ONLY.",
+      "summary": "A pale thing far bigger than the watcher at the crypt sits at the Charnel Barrow on the Carrion Heights, adding up Khaven. Destroy the Pale Reckoner and bring Old Kestrel its slate. It is past what one blade can do alone.",
+      "offer": "\"The crows came down off the Carrion Heights last night, every one, and sat in rows on our roof till it was light.\" Old Kestrel's hands are steady for once. \"Wenna says something's put them off their perch. Something bigger than a crow.\"\n\n\"The Charnel Barrow, up on the Heights, where Khaven carried its old bones out of the flood's reach. There's a pale thing sitting among them, bigger than the one at Ansel's crypt, with a slate on its knee, adding us up: the bones' names, the living's, and the ones it hasn't got.\" He lets go of the blanket. \"They say it's past one blade. Take friends. Then bring me the slate. I want to see what I come to.\"",
+      "complete": "Old Kestrel holds the slate to the lamp and reads down it with one finger, his lips moving. Wenna's name. Ansel's. Dorra's, and he stops there a long moment. Near the bottom, 'Kestrel', and after it, where the number should be, the glass is scratched and scratched again and left blank.\n\n\"It couldn't finish me.\" He laughs, for the first time since you have known him, and it turns into a cough. \"Put it on the fire. No. Give it here. A man ought to know what he's worth, even when it's nothing anybody can count.\"",
+      "steps": [
+        {
+          "text": "Destroy the Pale Reckoner at the Charnel Barrow on the Carrion Heights, and take its slate.",
+          "say": "Where the Reckoner sat, a pane of pale glass lies face down among the bones, cold enough to hurt the fingers.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.khaven",
+              "target": "mob.pale.khaven.9.*",
+              "text": "The Pale Reckoner",
+              "say": "Its last blow never lands. It sets down its hand like a clerk at the end of the day, and is gone, and every crow on the Heights goes up at once."
+            },
+            {
+              "type": "collect",
+              "zone": "zone.khaven",
+              "target": "kill:mob.pale.khaven.9.*",
+              "item": "item.reckoners_slate",
+              "text": "The Reckoner's slate"
+            }
+          ]
+        },
+        {
+          "text": "Bring the slate to Old Kestrel.",
+          "objectives": [
+            {
+              "type": "deliver",
+              "zone": "zone.khaven",
+              "target": "Old Kestrel",
+              "item": "item.reckoners_slate",
+              "text": "Give Old Kestrel the slate",
+              "say": "\"Give it here. Gently. It's all of us on there.\""
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 220,
+        "gold": 45,
+        "reputation": [
+          {
+            "faction": "oakhaven",
+            "amount": 150
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.cato.candles",
+      "title": "Light for the Pass",
+      "kind": "npc",
+      "giver": "Cato Brisk",
+      "turnIn": "Maddoc Vire",
+      "zone": "zone.khaven",
+      "level": 9,
+      "minLevel": 8,
+      "requires": [
+        "npc.cato.tallow"
+      ],
+      "canonStatus": "GAME-ONLY: the candles. The Sandthrone toll in the Peaks is CANON-EXPANDED (the draft chapter_5.md); Maddoc Vire and the pilgrims' rest are GAME-ONLY.",
+      "giveOnAccept": [
+        "item.rest_candles"
+      ],
+      "summary": "Cato Brisk has made candles of the carrion-boar tallow and sold a bundle to Maddoc Vire, who keeps the pilgrims' rest on the pass below the Sandthrone toll gate. Carry it up the north road into the Shattered Peaks.",
+      "offer": "Cato Brisk is wrapping candles in sacking, a dozen to a bundle. \"Your tallow, these. Rank as sin, and they burn all night.\" He ties the twine with a merchant's knot. \"There's a rest-house up the north road, on the pass below the Company's toll gate. Maddoc Vire keeps it. Pilgrims sit there in the dark for days, waiting on the Sandthrone to name a price, and Maddoc writes every one of them down. A man can't write in the dark.\"\n\n\"He's paid me for a bundle already, in advance, which nobody does. Take it up to him. Mind the sacking; they mark.\"",
+      "complete": "Maddoc sets a candle in the neck of a bottle and lights it, and the pilgrims on the benches turn their faces to it the way you would to a fire. He breathes in, and his face does something complicated. \"Boar.\"\n\n\"Well. They'll see to write by, and that's all a candle's for. Tell Cato he's paid. Tell him I'll want another bundle before the snow, and I'll pay for that one in advance as well, more fool me.\"",
+      "steps": [
+        {
+          "text": "Take the candles up the north road to Maddoc Vire at the pilgrims' rest in the Shattered Peaks.",
+          "objectives": [
+            {
+              "type": "deliver",
+              "zone": "zone.peaks",
+              "target": "Maddoc Vire",
+              "item": "item.rest_candles",
+              "text": "Give Maddoc Vire the candles",
+              "say": "\"Cato's candles? Paid for and come at last.\" He weighs the bundle in both hands. \"Heavier than I paid for. That's not like Cato.\""
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 140,
+        "gold": 25
       }
     }
   ]

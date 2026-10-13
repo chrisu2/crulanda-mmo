@@ -55,7 +55,7 @@ namespace Crulanda.Encounter
         public static readonly Dictionary<string, float> BuildHealScale = new Dictionary<string, float>
         {
             { "class.druid/rootmend", 1.8f },
-            { "class.archivist/the-cantor", 0.16f },   // 2026-10-13 fixed-dummy retune
+            { "class.archivist/the-cantor", 1f },   // 2026-10-13: back to 1 (the song's share now of the singer's health), for the retune
             { "class.paladin/sanctuary", 0.83f },   // 2026-10-13 fixed-dummy retune
             { "class.shaman/rainspeaker", 1.15f },   // 2026-10-13 fixed-dummy retune
         };

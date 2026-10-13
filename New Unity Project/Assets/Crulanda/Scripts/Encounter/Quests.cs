@@ -469,7 +469,8 @@ namespace Crulanda.Encounter
         void Completed(QuestObjectiveDef o, string speaker = null)
         {
             // A kill or flag line is narration: its target is an enemy id pattern or a state name, not someone speaking.
-            if (!string.IsNullOrEmpty(o.say)) Say(o.say, speaker ?? (o.type == "kill" || o.type == "flag" ? null : o.target));
+            // A collect or interact line is narration too: its target is where the thing came from or the thing used ("kill:mob.spider.khaven*", a crate), not a speaker (2026-10-13).
+            if (!string.IsNullOrEmpty(o.say)) Say(o.say, speaker ?? (o.type == "kill" || o.type == "flag" || o.type == "collect" || o.type == "interact" ? null : o.target));
             if (!string.IsNullOrEmpty(o.document)) Reveal(o.document);
         }
         void Advance(QuestDef q, QuestState s)

@@ -14,12 +14,13 @@ namespace Crulanda.Encounter
     /// the camp mobs of its level (bold ones more), working the nodes of its trade (cautious ones more), selling at the stall and
     /// forging or brewing at the station when it has the makings (5.3c, SimEconomy), resting at the inn (when hurt, or now and
     /// then), taking the road to another zone when it has outgrown this one or feels like it (5.3b), or standing about the named
-    /// places (chatty ones more). It fights in its class's way, falls when beaten, comes to at the zone's recovery point and runs
+    /// places (chatty ones more), or practising at the training yard's dummies and butts (2026-10-13: the less practised more; each
+    /// session makes it a little better, up to a tenth more damage). It fights in its class's way, falls when beaten, comes to at the zone's recovery point and runs
     /// back for its corpse (5.3b), and levels up from its kills (dinging in the chat). A mob it hits first is its kill.
     /// </summary>
     public sealed class SimFigure : MonoBehaviour
     {
-        public enum Doing { Loiter, Hunt, Gather, Inn, Down, CorpseRun, Travel, Trade, Craft }
+        public enum Doing { Loiter, Hunt, Gather, Inn, Down, CorpseRun, Travel, Trade, Craft, Practice }
         public SimAdventurer sim; public SimPopulation population; public ActorVisual visual; public Actor actor; NavMeshAgent agent;
         public Doing Activity { get; private set; } = Doing.Loiter;
         /// <summary>Inside the inn: not drawn, not targetable, no plate.</summary>
@@ -28,13 +29,17 @@ namespace Crulanda.Encounter
         public ZoneInteractable Node { get; private set; }
         public ZoneExit Exit { get; private set; }
         public RecipeDef Recipe { get; private set; }
+        /// <summary>The yard's dummy or butt it is practising at.</summary>
+        public ZoneBuilder.PracticeMark Mark { get; private set; }
+        /// <summary>Tests: how long a session at the yard lasts once there (else 70-115 s).</summary>
+        public static float? PracticeSeconds;
         public Vector3 CorpseAt { get; private set; }
         public int Kills { get; private set; }
-        float until, nextAct, nextHeal, stuckSince, workUntil, downSince, lastTrade, healAt; int pick, goal; Renderer[] renderers; Transform corpse;
+        float until, nextAct, nextHeal, stuckSince, workUntil, downSince, lastTrade, healAt; int pick, goal, practised; Renderer[] renderers; Transform corpse;
         EncounterSession Session { get { return population.Session; } }
         public bool Walking { get { return agent != null && agent.isOnNavMesh && !agent.isStopped && agent.remainingDistance > agent.stoppingDistance + .1f; } }
         public bool Melee { get { return sim.classId == "class.warrior" || sim.classId == "class.paladin" || sim.classId == "class.rogue"; } }
-        public bool Healer { get { return sim.classId == "class.druid" || sim.classId == "class.paladin"; } }
+        public bool Healer { get { return sim.classId == "class.druid" || sim.classId == "class.paladin" || sim.classId == "class.cleric" || sim.classId == "class.shaman" || sim.classId == "class.saltmender"; } }
         public string Doings
         {
             get
@@ -43,7 +48,8 @@ namespace Crulanda.Encounter
                 {
                     case Doing.Hunt: return Quarry != null ? "fighting " + Quarry.actor.DisplayName : "hunting";
                     case Doing.Gather: return "gathering"; case Doing.Inn: return "at the inn"; case Doing.Down: return "fallen"; case Doing.CorpseRun: return "running back";
-                    case Doing.Travel: return Exit != null ? "off to " + Session.ZoneName(Exit.to) : "travelling"; case Doing.Trade: return "trading"; case Doing.Craft: return Recipe != null && Recipe.profession == "alchemy" ? "brewing" : "at the forge";
+                    case Doing.Travel: return Exit != null ? "off to " + Session.ZoneName(Exit.to) : "travelling"; case Doing.Trade: return "trading";
+                    case Doing.Practice: return "practising at the yard"; case Doing.Craft: return Recipe != null && Recipe.profession == "alchemy" ? "brewing" : "at the forge";
                     default: return "about";
                 }
             }
@@ -61,7 +67,7 @@ namespace Crulanda.Encounter
             f.actor = go.AddComponent<Actor>(); f.actor.Initialize(pop.Session.content.player, s.name, s.level, new Crulanda.Core.EntityId(s.id)); go.AddComponent<Combatant>();
             f.agent = go.AddComponent<NavMeshAgent>(); f.agent.speed = 1.7f; f.agent.angularSpeed = 360; f.agent.acceleration = 8; f.agent.stoppingDistance = .5f; f.agent.radius = .3f; f.agent.height = 2; f.agent.baseOffset = 1;
             f.agent.avoidancePriority = 80;   // villagers (60) go first: a sim steps aside
-            f.visual = ActorVisual.Attach(go, EncounterSession.LookForClass(s.classId), s.variant);
+            f.visual = ActorVisual.Attach(go, EncounterSession.LookForClass(s.classId), s.variant, false, null, s.Race == Races.Orc);   // an orc sim looks an orc (2026-10-13)
             go.SetActive(true);   // ActorVisual hides the placeholder capsule itself; the figure is built under "Body", so nothing else is touched here
             f.Refit();
             SimGear.Dress(f.visual, s, pop.Session.Items);   // its own gear by its level and class (Phase 5.2 round 2)
@@ -98,6 +104,21 @@ namespace Crulanda.Encounter
             }
             return best;
         }
+        /// <summary>A dummy or butt in the training yard no other sim is at, of its kind (a blade's dummy, a bow's or a spell's butt;
+        /// either when its own are taken), nearest first.</summary>
+        public ZoneBuilder.PracticeMark FindMark(float within = 220)
+        {
+            var zb = Session.Zone; if (zb == null || zb.PracticeMarks.Count == 0) return null;
+            ZoneBuilder.PracticeMark best = null; float bestD = float.MaxValue;
+            foreach (var m in zb.PracticeMarks)
+            {
+                if (m == null || m.aim == null || population.Figures.Exists(o => o != null && o != this && o.Mark == m)) continue;
+                float d = Vector3.Distance(m.stand, transform.position); if (d > within) continue;
+                if (m.ranged == Melee) d += 1000;   // its own kind first
+                if (d < bestD) { best = m; bestD = d; }
+            }
+            return best;
+        }
         ZoneDoor Inn { get { var zb = Session.Zone; return zb == null ? null : zb.Doors.Find(d => d != null && d.kind == "inn"); } }
         Vector3? Place(string kind) { var life = VillageLife.Active; if (life == null || !life.Places.TryGetValue(kind, out var list) || list.Count == 0) return null; return list[Mathf.Abs(sim.variant) % list.Count]; }
         /// <summary>The road out it would take: to a zone whose levels suit it (its own home best when it has outgrown this one).</summary>
@@ -116,10 +137,10 @@ namespace Crulanda.Encounter
         /// <summary>What next, by score: its personality, its health, what is near, what it carries, and a little chance.</summary>
         public void Choose()
         {
-            Quarry = null; Node = null; Exit = null; Recipe = null; float health = actor.Health.Pool.Ratio;
+            Quarry = null; Node = null; Exit = null; Recipe = null; Mark = null; float health = actor.Health.Pool.Ratio;
             if (!population.Lively) { Begin(Doing.Loiter); return; }
             float Noise() { return Random.value * .3f; }
-            var prey = health > .6f ? FindPrey() : null; var node = FindNode(); var inn = Inn; var exit = FindExit();
+            var prey = health > .6f ? FindPrey() : null; var node = FindNode(); var inn = Inn; var exit = FindExit(); var mark = health > .6f ? FindMark() : null;
             int goods = SimEconomy.GoodsCount(sim); var recipe = SimEconomy.Craftable(sim, Session.Professions?.Db, Session.Items);
             float hunt = prey != null ? .35f + .6f * sim.bold + Noise() : -1;
             float gather = node != null ? .3f + .5f * (1 - sim.bold) + Noise() : -1;
@@ -129,8 +150,11 @@ namespace Crulanda.Encounter
             int fit = SimPopulation.Suits(Session.ZoneId, sim.level);
             float travel = exit != null && Time.time - lastTrade > 60 ? (fit < 0 ? .9f : .05f + .1f * sim.bold) + Noise() * .5f : -1;
             float loiter = .25f + .45f * sim.chatty + Noise();
-            float top = Mathf.Max(Mathf.Max(Mathf.Max(hunt, gather), Mathf.Max(rest, loiter)), Mathf.Max(Mathf.Max(trade, craft), travel));
-            if (top == hunt) Begin(Doing.Hunt, prey: prey);
+            // The yard (2026-10-13): the less practised more, the bold a little more (they want the edge).
+            float practise = mark != null ? .15f + .45f * (1 - Mathf.Clamp01(sim.practice)) + .1f * sim.bold + Noise() : -1;
+            float top = Mathf.Max(Mathf.Max(Mathf.Max(hunt, gather), Mathf.Max(rest, loiter)), Mathf.Max(Mathf.Max(trade, craft), Mathf.Max(travel, practise)));
+            if (top == practise) Begin(Doing.Practice, mark: mark);
+            else if (top == hunt) Begin(Doing.Hunt, prey: prey);
             else if (top == gather) Begin(Doing.Gather, node: node);
             else if (top == craft) Begin(Doing.Craft, recipe: recipe);
             else if (top == trade) Begin(Doing.Trade);
@@ -139,9 +163,9 @@ namespace Crulanda.Encounter
             else Begin(Doing.Loiter);
         }
         /// <summary>Starts an activity (tests and the choice).</summary>
-        public void Begin(Doing what, EncounterEnemy prey = null, ZoneInteractable node = null, ZoneExit exit = null, RecipeDef recipe = null)
+        public void Begin(Doing what, EncounterEnemy prey = null, ZoneInteractable node = null, ZoneExit exit = null, RecipeDef recipe = null, ZoneBuilder.PracticeMark mark = null)
         {
-            Activity = what; Quarry = prey; Node = node; Exit = exit; Recipe = recipe; stuckSince = Time.time; goal = 0; workUntil = 0;
+            Activity = what; Quarry = prey; Node = node; Exit = exit; Recipe = recipe; Mark = mark; stuckSince = Time.time; goal = 0; workUntil = 0; practised = 0;
             switch (what)
             {
                 case Doing.Hunt: goal = 2 + Mathf.Abs(sim.gearSeed) % 3; until = Time.time + 240; if (prey == null) Quarry = FindPrey(); if (Quarry == null) { Activity = Doing.Loiter; until = Time.time + 20; } break;
@@ -151,6 +175,7 @@ namespace Crulanda.Encounter
                 case Doing.Craft: { if (Recipe == null) Recipe = SimEconomy.Craftable(sim, Session.Professions?.Db, Session.Items); var at = Recipe != null ? Place(Recipe.profession == "alchemy" ? "bench" : "forge") : null; until = Time.time + 120; if (at == null) { Activity = Doing.Loiter; until = Time.time + 20; } else Go(at.Value); break; }
                 case Doing.Travel: { if (Exit == null) Exit = FindExit(); until = Time.time + 300; if (Exit == null) { Activity = Doing.Loiter; until = Time.time + 20; } else { Go(Session.Zone.Ground(Exit.at)); SimChatter.Active?.Leaving(sim, Exit); } break; }
                 case Doing.CorpseRun: until = Time.time + 180; Go(CorpseAt); break;
+                case Doing.Practice: if (Mark == null) Mark = FindMark(); until = Time.time + 240; if (Mark == null) { Activity = Doing.Loiter; until = Time.time + 20; } else Go(Mark.stand); break;
                 default: until = Time.time + 30 + (sim.variant % 5) * 6 + sim.chatty * 30; pick++; Go(population.Spot(sim, pick)); break;
             }
         }
@@ -178,6 +203,7 @@ namespace Crulanda.Encounter
                 case Doing.Craft: Craft(); break;
                 case Doing.Travel: Travel(); break;
                 case Doing.CorpseRun: CorpseRun(); break;
+                case Doing.Practice: Practise(); break;
                 default: Loiter(); break;
             }
             if (!Session.InCombat && !InFight && Time.time >= nextHeal) { nextHeal = Time.time + 1; actor.Health.ApplyHealing(Mathf.Max(2, actor.Health.Pool.Max / 60)); }
@@ -234,18 +260,46 @@ namespace Crulanda.Encounter
             if (face.sqrMagnitude > .01f) transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(face), Time.deltaTime * 8);
             if (Time.time < nextAct) return;
             nextAct = Time.time + (Melee ? 2.0f : 2.4f);
-            int dmg = Mathf.RoundToInt((Melee ? 6 : 5) + (Melee ? 2.4f : 2.2f) * sim.level);
+            int dmg = sim.Practised((Melee ? 6 : 5) + (Melee ? 2.4f : 2.2f) * sim.level);   // its yard practice too
+            Attack(q.transform);
+            q.Receive(dmg, actor);
+            if (sim.classId == "class.warrior") q.threat.Add(actor.EntityId.Value, dmg * 1.5f);
+        }
+        /// <summary>A blow (the strike) or a shot (the release and its bolt or arrow) at <paramref name="at"/>: the same at a mob or a dummy.</summary>
+        void Attack(Transform at)
+        {
             if (Melee) visual?.Strike();
             else
             {
                 visual?.CastRelease();
                 var hand = visual != null ? visual.RightHandle : null; var from = hand != null ? hand.position : transform.position + Vector3.up * 1.3f;
                 bool arrow = sim.classId == "class.ranger";
-                var colour = sim.classId == "class.mage" ? new Color(1, .55f, .15f) : sim.classId == "class.druid" ? new Color(.45f, .85f, .3f) : sim.classId == "class.archivist" ? new Color(.6f, .8f, 1) : sim.classId == "class.saltmender" ? new Color(.97f, .97f, .92f) : new Color(.9f, .88f, .8f);
-                Bolt.Fire(from, q.transform, colour, arrow ? .1f : .18f, arrow ? .22f : .28f, arrow);
+                var colour = sim.classId == "class.cleric" ? new Color(1, .92f, .6f) : sim.classId == "class.shaman" ? new Color(.55f, .75f, 1) : sim.classId == "class.mage" ? new Color(1, .55f, .15f) : sim.classId == "class.druid" ? new Color(.45f, .85f, .3f) : sim.classId == "class.archivist" ? new Color(.6f, .8f, 1) : sim.classId == "class.saltmender" ? new Color(.97f, .97f, .92f) : new Color(.9f, .88f, .8f);
+                Bolt.Fire(from, at, colour, arrow ? .1f : .18f, arrow ? .22f : .28f, arrow);
             }
-            q.Receive(dmg, actor);
-            if (sim.classId == "class.warrior") q.threat.Add(actor.EntityId.Value, dmg * 1.5f);
+        }
+        /// <summary>
+        /// At the training yard (Chris, 2026-10-13: "also have sims wonder into the fighting arena (dummies) to practice and improve their
+        /// dps"): to its dummy or butt, then a minute or two of blows or shots at it, at its own pace, a grey number over the dummy when you
+        /// are near enough to see; done, it is a little better (a sixth of the way to fully practised) and may say so.
+        /// </summary>
+        void Practise()
+        {
+            var m = Mark; if (m == null || m.aim == null || Time.time >= until) { Done(); return; }
+            if (!Near(m.stand, 1.2f)) { if (!Walking && Time.time - stuckSince > 1) Go(m.stand); if (Time.time - stuckSince > 60 && !Walking) Choose(); return; }
+            agent.isStopped = true; Face(m.aim.position);
+            if (practised == 0) until = Mathf.Min(until, Time.time + (PracticeSeconds ?? 70 + (Mathf.Abs(sim.variant) % 4) * 15));   // there: a while at it
+            if (Time.time < nextAct) return;
+            nextAct = Time.time + (Melee ? 2.0f : 2.4f) + (Mathf.Abs(sim.variant) % 5) * .1f; practised++;
+            Attack(m.aim);
+            var player = Session.Player;
+            if (player != null && Vector3.Distance(player.transform.position, m.aim.position) < 22)
+                Session.FloatText(m.aim.position + Vector3.up * .5f, sim.Practised((Melee ? 6 : 5) + (Melee ? 2.4f : 2.2f) * sim.level).ToString(), new Color(.78f, .78f, .74f));
+            void Done()
+            {
+                if (practised >= 6) { sim.practice = Mathf.Min(1, sim.practice + (1 - sim.practice) / 6f); SimChatter.Active?.Practised(sim); }
+                Mark = null; Choose();
+            }
         }
         /// <summary>Experience from a kill (its own, or the party's): a level when it has enough, said in the chat.</summary>
         public void GainXp(int xp)

@@ -121,7 +121,7 @@ namespace Crulanda.Encounter
         /// <summary>The figure a class wears and the tint of its capsule stand-in (the classes added 2026-10-05 included).</summary>
         public static ActorLook LookForClass(string classId)
         {
-            switch (classId) { case "class.druid": return ActorLook.Druid; case "class.paladin": return ActorLook.Paladin; case "class.ranger": case "class.rogue": return ActorLook.Ranger; case "class.saltmender": return ActorLook.SaltMender; case "class.mage": case "class.archivist": return ActorLook.Mage; default: return ActorLook.Warrior; }
+            switch (classId) { case "class.druid": return ActorLook.Druid; case "class.paladin": return ActorLook.Paladin; case "class.ranger": case "class.rogue": return ActorLook.Ranger; case "class.saltmender": return ActorLook.SaltMender; case "class.mage": case "class.archivist": case "class.cleric": return ActorLook.Mage; case "class.shaman": return ActorLook.Druid; default: return ActorLook.Warrior; }   // the Cleric robed, the Shaman in moor leathers (an orc figure to come: Chris, 2026-10-13, "shaman is not an orc")
         }
         public static Color TintForClass(string classId)
         {
@@ -134,6 +134,8 @@ namespace Crulanda.Encounter
                 case "class.rogue": return new Color(.22f, .2f, .24f);
                 case "class.archivist": return new Color(.78f, .76f, .7f);
                 case "class.saltmender": return new Color(.9f, .9f, .86f);
+                case "class.cleric": return new Color(.93f, .88f, .7f);   // a hill shrine's undyed wool and gold thread
+                case "class.shaman": return new Color(.36f, .42f, .5f);   // rain on the high moors
                 default: return new Color(.2f, .58f, .72f);
             }
         }
@@ -1391,7 +1393,7 @@ namespace Crulanda.Encounter
             UnityEngine.SceneManagement.SceneManager.LoadScene(gameObject.scene.name);
             return true;
         }
-        Actor SpawnActor(string label, Crulanda.Data.ActorArchetypeDefinition definition, Vector3 point, Color color, string id, ActorLook look, int level = 1, int variant = -1)
+        Actor SpawnActor(string label, Crulanda.Data.ActorArchetypeDefinition definition, Vector3 point, Color color, string id, ActorLook look, int level = 1, int variant = -1, bool orc = false)
         {
             var go = new GameObject(label);
             go.SetActive(false); go.transform.SetParent(actorsRoot.transform); go.transform.position = point;
@@ -1403,7 +1405,7 @@ namespace Crulanda.Encounter
             var actor = go.AddComponent<Actor>();
             actor.Initialize(definition, label, label == "You" ? Progress.Level : level, new EntityId(id));
             go.AddComponent<Combatant>();
-            ActorVisual.Attach(go, look, variant >= 0 ? variant : LookVariant(label));
+            ActorVisual.Attach(go, look, variant >= 0 ? variant : LookVariant(label), false, null, orc);
             return actor;
         }
         void SpawnParty()
@@ -1422,7 +1424,7 @@ namespace Crulanda.Encounter
                 if (Progress.Level < 11) Progress.experience = EncounterProgress.XpForLevel(11);
             }
             actorsRoot = new GameObject("Encounter Actors");
-            Player = SpawnActor("You", content.player, new Vector3(Progress.x, Progress.y, Progress.z), TintForClass(ClassDef.id), Progress.playerId, LookForClass(ClassDef.id));
+            Player = SpawnActor("You", content.player, new Vector3(Progress.x, Progress.y, Progress.z), TintForClass(ClassDef.id), Progress.playerId, LookForClass(ClassDef.id), orc: Races.For(ClassDef.id, Progress.raceId) == Races.Orc);
             var controller = Player.gameObject.AddComponent<CharacterController>(); controller.height = 2; controller.radius = .4f; controller.stepOffset = .35f;
             controller.minMoveDistance = 0;
             var motor = Player.gameObject.AddComponent<AdventurerMotor>(); motor.session = this; motor.view = View;
@@ -2071,6 +2073,8 @@ namespace Crulanda.Encounter
                 case "class.rogue": return (16 + (3 * L) / 2, 14 + L, 22 + 2 * L, 8 + L / 2, 10 + L / 2);
                 case "class.archivist": return (14 + L, 8 + L / 2, 10 + L / 2, 20 + 2 * L, 22 + 2 * L);
                 case "class.saltmender": return (17 + (3 * L) / 2, 12 + L, 10 + L / 2, 16 + 2 * L, 18 + 2 * L);
+                case "class.cleric": return (16 + (3 * L) / 2, 12 + L, 14 + L, 18 + 2 * L, 20 + 2 * L);   // 2026-10-13: its own (it had the Warrior's); balance-neutral (ApplyInnate)
+                case "class.shaman": return (18 + (3 * L) / 2, 15 + L, 14 + L, 17 + 2 * L, 18 + 2 * L);
                 default: return (20 + 2 * L, 20 + 2 * L, 15 + L, 8 + L / 2, 10 + L / 2);   // the Warrior
             }
         }

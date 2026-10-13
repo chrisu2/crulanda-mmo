@@ -37,6 +37,27 @@ namespace Crulanda.Tests
         static readonly string[] Frames = { "Arm L", "Arm L/Forearm L", "Arm L/Forearm L/Hand L", "Arm R", "Arm R/Forearm R", "Arm R/Forearm R/Hand R",
             "Leg L", "Leg L/Shin L", "Leg L/Shin L/Foot L", "Leg R", "Leg R/Shin R", "Leg R/Shin R/Foot R", "Head frame", "Chest frame", "Hips frame" };
 
+        /// <summary>The orc figure (Chris, 2026-10-13: "shaman is not an orc"): the same model and frames, taller, green, tusked, beardless.</summary>
+        [Test] public void An_orc_is_the_same_model_taller_green_and_tusked()
+        {
+            Assume.That(ModelFigure.Available, "The character kits are in the project (Resources/Characters).");
+            var man = Figure(ActorLook.Druid, 3); var go = new GameObject("Orc test figure"); new GameObject("Body").transform.SetParent(go.transform, false); go.transform.position = new Vector3(-6, 1, 0); made.Add(go);
+            var orc = ActorVisual.Attach(go, ActorLook.Druid, 3, false, null, true);   // variant 3: a man (a woman is drawn 10% taller)
+            Assert.IsTrue(orc.Orc); Assert.NotNull(orc.Model, "a model"); foreach (var f in Frames) Assert.NotNull(orc.transform.Find("Body/" + f), "the frame " + f);
+            float tall = orc.Model.Model.localScale.y / man.Model.Model.localScale.y; Assert.IsTrue(Mathf.Abs(tall - ActorVisual.OrcScale) < .01f || Mathf.Abs(tall - ActorVisual.OrcWomanScale) < .01f, "taller by an orc's scale (" + tall + ")");
+            var tusks = orc.Model.HeadBone.GetComponentsInChildren<MeshRenderer>(true); int n = 0; foreach (var r in tusks) if (r.name.StartsWith("Tusk")) n++;
+            Assert.AreEqual(2, n, "two tusks on the head");
+            foreach (var r in man.Model.HeadBone.GetComponentsInChildren<MeshRenderer>(true)) Assert.IsFalse(r.name.StartsWith("Tusk"), "a man has none");
+            var skin = orc.Model.Head.sharedMaterials[0].color; Assert.Greater(skin.g, skin.r, "green skin (" + skin + ")");
+            foreach (var r in orc.Model.Hair) Assert.IsFalse(r.name.Contains("Beard"), "no beard");
+            // The tusks stand at the face: in front of the Head bone and above it, either side of the middle.
+            var head = orc.transform.Find("Body").InverseTransformPoint(orc.Model.HeadBone.position);
+            foreach (var r in tusks) if (r.name.StartsWith("Tusk"))
+            {
+                var p = orc.transform.Find("Body").InverseTransformPoint(r.transform.position) - head;
+                Assert.That(p.z, Is.InRange(.05f, .14f), r.name + " in front"); Assert.That(p.y, Is.InRange(0f, .08f), r.name + " at the jaw"); Assert.That(Mathf.Abs(p.x), Is.InRange(.015f, .06f), r.name + " to one side");
+            }
+        }
         [Test] public void Every_person_is_a_model_with_its_frames()
         {
             Assume.That(ModelFigure.Available, "The character kits are in the project (Resources/Characters).");

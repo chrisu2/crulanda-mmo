@@ -59,7 +59,7 @@ namespace Crulanda.Encounter
             var fig = pop.Find(s.id); if (fig == null) { Message(s.name + " is not here."); return false; }
             var at = fig.transform.position; pop.Figures.Remove(fig); Destroy(fig.gameObject);
             if (NavMesh.SamplePosition(at, out var hit, 6, NavMesh.AllAreas)) at = hit.position + Vector3.up;
-            var a = SpawnActor(s.name, content.player, at, EncounterHud.ClassColour(s.classId), s.id, LookForClass(s.classId), s.level, s.variant);
+            var a = SpawnActor(s.name, content.player, at, EncounterHud.ClassColour(s.classId), s.id, LookForClass(s.classId), s.level, s.variant, s.Race == Races.Orc);
             AddAgent(a.gameObject, 4.6f);
             var c = a.gameObject.AddComponent<SimCompanion>(); a.gameObject.SetActive(true); c.Init(a, this, s, FreeSlot());
             SimGear.Dress(a.GetComponent<ActorVisual>(), s, Items);

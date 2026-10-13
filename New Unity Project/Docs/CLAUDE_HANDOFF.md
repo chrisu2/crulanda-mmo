@@ -41,8 +41,8 @@
   run them. Then: tune the spread shares and the spirits so pet and player land on 62-72 and the area builds on x1.7; read the tank
   ranking; keep one class (the Paladin) from leading all three roles; show Chris the field in a build.
 - **Next class, designed not built:** the Scoundrel (`Docs/CLASS_SCOUNDREL.md`; Chris: an assassin-type rogue with charisma for songs,
-  merchants and dealing; a single-target DPS path, a group-CC path, a support path; canon root Valen, "yes good example"). Four open
-  questions for Chris at the end of the doc. Build only when he says go.
+  merchants and dealing; a single-target DPS path, a group-CC path, a support path; canon root Valen, "yes good example"). Chris settled
+  the questions (Scoundrel; three paths for now; races once all races are defined; song, special weapons later). Build when he says go.
 - **The grey (TODO 8) done:** Hollow Men's blows grey (EncounterEnemy.Grey.cs), EditMode test. GAME-ONLY mechanic, CANON creature.
 - **Adit NavMesh tests 3/3 (01:12):** the column and plinth tops are off the navmesh (TODO 14's code is done); the group run to the end
   is still to do (`tools\validation\group_run.ps1` on Chris's screen, with the lane B build the chain makes).

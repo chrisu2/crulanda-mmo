@@ -1,4 +1,4 @@
-# The Scoundrel: design draft (2026-10-13, not built)
+# The Scoundrel: design (2026-10-13; settled with Chris, not built)
 
 ## Chris's brief (verbatim)
 
@@ -33,21 +33,23 @@ innkeeper's rumour (a hint toward a quest or a rare mob).
 | **Cutthroat** | DPS, single target | 62-72, at the top of it; x1.25 or less against three | The assassin: a quick cut as filler, a debt marked on one foe and collected as one hard blow ("the debt comes due"), poisoned wine (damage over time), a finisher that spends Nerve |
 | **Silver Tongue** | CC of groups | 45-52 | The Song of Sifting and the Glimmer: a verse that dazes up to four foes near the target (damage breaks it); "Stay.", one word that holds one foe (Vala's Command Voice); a dissonant note that interrupts a cast and slows those near |
 | **Fixer** | Support | 45-52 | Wheeling and dealing in a fight: a war-verse (the party does more), a rallying verse (the party's pools refill faster), a bribe (a non-elite humanlike foe stops fighting for a while), calling in a favour (an ally's longest cooldown comes back sooner) |
-| (a fourth?) | | | Every class has four builds; the brief names three. Chris to say: a fourth, or three |
 
 ## Build plan (when Chris says go)
 
 Same steps as the Cleric and Shaman, with what Oct 13 taught:
 - Content: class, 12 abilities, unlocks **gated by path talents** (the Cleric's and Shaman's bars locked nothing, so every build cast
-  everything); talents JSON, 4 paths x 17 ranks; ScoundrelKit.cs; icons in make_icons.py; sim roster; save slot.
+  everything); talents JSON, 3 paths x 17 ranks (three for now); ScoundrelKit.cs; icons in make_icons.py; sim roster; save slot.
 - Charm: a merchant price hook and a rumour line at innkeepers.
 - Balance harness: the toggled verses on the harness's once-a-fight list (and left alone when already up); the group daze kept off the
   dummies; Cutthroat not on the area list.
 - Tests: kit smoke, talents, the role targets, the group daze (holds four, damage breaks it), the merchant prices.
 
-## Open questions for Chris
+## Chris's answers (2026-10-13, verbatim)
 
-1. The name: "Scoundrel" (the canon's own word) or another?
-2. A fourth path, or three?
-3. Which races may be one?
-4. Voice only, or an instrument too? (The canon has no instruments in anyone's hands; Valen sang.)
+"open questions answered : 1. Scoundrel 2. Three for now 3: (we still need to define all races) 4. Sing / Song but we will look at special
+weapons that enchance that later."
+
+- **Name:** Scoundrel.
+- **Paths:** three for now (Cutthroat, Silver Tongue, Fixer); no fourth.
+- **Races:** open until all the races are defined (a TODO of its own, `Docs/RACES.md`).
+- **Voice:** singing and song, no instrument; special weapons that enhance the song come later.

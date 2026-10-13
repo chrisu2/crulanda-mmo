@@ -25,7 +25,18 @@
 - EditMode suite in lane A: **456/460, the new code compiles.** The four failures fixed: icons for the Cleric's and Shaman's 24 abilities
   and 115 talents (nine new motif words in make_icons.py: fire, ring, sun, cloud, fist, link, root, snow, stone), and the three rules tests
   that counted eight classes (ten now). Rerun 26/26. Commit 05c78ff.
-- **Running (one Unity, lane A): the balance harness over all ten classes**, two at a time (`D:\crulanda-work\chainBal.ps1`, pid 24128;
+- **Balance, first pass (00:11-00:24, all ten classes on the old dummies, 90 s):** `outputsalancerchive-20261013-0024` and the table
+  reported to Chris. Two kits were broken on the dummies and fixed (commit 7363d97): the Cleric's Censure never cast Brand or Sunburst
+  (Rebuke now brands); the Shaman's Thunderhead never fired (the Squall charge was wiped every tick out of combat; it fades after 6 s now).
+- **Chris, 00:27: "create test dummies to test the dps and wounded test dummies for the heal test so there are no variables in the mobs":**
+  the harness's dummies are level 15, no armour, five million health, no blows; the heal test wounds Mira (3,000 health, 4% a second)
+  instead of the healer; fights 180 s (commits 0489ed9, 7b0f2c3).
+- Party-heal test 1/1 (after the Cleric talent flags). SocialPull 7/8: `A_linked_group_resets_together_and_stays_home` ("The second is
+  home") OPEN.
+- **Running (one Unity, lane A): `D:\crulanda-work\chainR5.ps1`** (pid 812; `encounter-validation\chainR5.out`): the full PlayMode suite
+  without NamedLootTests (suiteS.xml), then the balance harness over all ten classes on the new dummies (bal2-*.csv), then
+  `balance_merge.py` → `outputsalance\BALANCE_ALL.md`.
+- (The earlier note, kept for the record:) the balance harness over all ten classes, two at a time (`D:\crulanda-work\chainBal.ps1`, pid 24128;
   progress in `encounter-validation\chainBal.out`, each set's CSV in `outputsalancealance-<set>.csv`). Chris, 00:11: "once you got it
   straight i want to run dps and healing per sec on test runs to test for balance and functionality ... on all classes". When all five
   sets are in: `python toolsalidationalance_merge.py` writes `outputsalance\BALANCE_ALL.md` (every build's DPS single and vs 3,
@@ -122,6 +133,9 @@
 11. Elwynn-style zone fill (note 172, `Docs/ZONE_FILL_PLAN.md`).
 12. 112b, the Morro clips on the pack's avatar: waiting on Chris (the pack needs downloading again).
 13. Republish, only with Chris's OK. Back up saves first.
+14. (From Oct 11, dropped from this list by mistake:) **the kit's column and plinth tops are walkable in the NavMesh bake** (ZoneBuilder.Adit), so a
+    mob or the run's leader ends up standing on a pedestal and a group run of the Adit stalls (`toolsalidation\group_run.ps1`; the 18:44
+    run on Oct 11). Exclude those tops from the bake, then rerun the group run to the end for its scorecard.
 
 ## Key docs (in `Docs\`)
 - `BALANCE_REPORT.md`: harness rounds v1-v8, caps, retunes.

@@ -42,6 +42,8 @@ namespace Crulanda.World
             // Banners: either side of the gate and at the four corners.
             foreach (float x in new[] { -gate - .4f, gate + .4f }) GroundProp(t, "Fantasy/Banner_1", new Vector3(x, 0, hz + .3f), 0, 2.8f);
             foreach (var (x, z) in new[] { (-hx + .5f, -hz + .5f), (hx - .5f, -hz + .5f), (-hx + .5f, hz - .5f), (hx - .5f, hz - .5f) }) GroundProp(t, "Fantasy/Banner_2", new Vector3(x, 0, z), 0, 3.2f);
+            // Pennants along the side fences, as in Chris's picture of a sparring yard (13:40).
+            foreach (float side in new[] { -1f, 1f }) foreach (float z in new[] { -hz / 3, hz / 3 }) GroundProp(t, "Fantasy/Banner_2", new Vector3(side * (hx + .35f), 0, z), side < 0 ? 90 : -90, 3.0f);
             // Dummies and mannequins down the left, facing in.
             string[] dummies = { "Megapack/Models/Outpost/Dummy", "SmallProps/Manequin_1_A_001", "Fantasy/Dummy", "SmallProps/Manequin_2_A_002" };
             for (int i = 0; i < dummies.Length; i++) GroundProp(t, dummies[i], new Vector3(-hx + 1.6f, 0, -1.6f + i * 2.2f), 90, dummies[i].StartsWith("SmallProps") ? 1.8f : 1.9f, true);

@@ -260,6 +260,14 @@
         "y": 20
       },
       "radius": 5
+    },
+    {
+      "name": "Training yard",
+      "center": {
+        "x": 58,
+        "y": 26
+      },
+      "radius": 11
     }
   ],
   "roads": [

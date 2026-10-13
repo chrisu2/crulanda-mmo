@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-10-13, 00:03 on — balance on fixed dummies, every class and build (branch feet-bow-adit-kit)
+Chris: "i want to run dps and healing per sec on test runs to test for balance and functionality" / "on all classes" / fixed dummies /
+"62-72 is good range" / "a number for each build, each class and designate it as tank/dps/support/healer/CC" / "why is the druid healing
+so low". Details and the table in BALANCE_REPORT.md, round 5.
+- **Balance harness:** fixed dummies (level 15, no armour, 5,000,000 health, no blows) and a wounded dummy (Mira at 3,000 losing 4% a
+  second); 180 s fights. The meter names the fight on screen. `balance_merge.py` lists every class and build with its role (Tank, DPS,
+  CC, Support, Healer), DPS, HPS, target and status; `balance_retune.py` moves a build outside its target to the middle.
+- **Fixed:** a refreshed heal or damage over time keeps its tick schedule (the Druid's Seedling never healed: 8.6 HPS, now 40.6); the
+  Druid and Paladin heal the most hurt member of the whole party, sims too; the Shaman's Thunderhead fires (the charge was wiped every
+  frame after six quiet seconds); the Archivist, Paladin and Salt-Mender kits apply the build heal scale.
+- **Retuned:** DPS builds into 62-72 (Marksman, Skirmisher, Judicator, Thornclaw, Beastbond, Warrior DPS down; Cleric Censure and Shaman
+  Stormcaller up); CC, Support and Tank builds into 45-52 (proposed); healers 40-50 HPS (proposed).
+- **The grey** (handoff item 8): the Hollow Men's blows grey whoever they hit (a tenth more taken for 12 s, lifted by the cleanses).
+  GAME-ONLY mechanic on a CANON creature.
+- **Mobs walk home:** one back from a broken leash finishes the walk home and rests before strolling; far-off mobs ask for the way home at
+  most every 2 s (the first version asked every frame).
+- **Tests:** EditMode 461/461 at 00:51; the Adit NavMesh tests 3/3 at 01:12 (handoff item 14's column tops are off the navmesh);
+  SocialPull 7/8 at 01:14 before the walk-home fix.
+
 ## 2026-10-11, 16:50 on — Chris watching a group run of the Adit (notes 133-141; branch feet-bow-adit-kit)
 Chris: "need to show a test run of the dungeon with a group", then a report a minute as he watched (PLAYTEST_NOTES 133-141). Built and run
 on his screen the same hour, each run in `D:\crulanda-workun-captures`:

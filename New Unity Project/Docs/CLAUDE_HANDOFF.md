@@ -21,26 +21,26 @@
   2. Fix the compile and test failures. The new code is in `ClericKit.cs`, `ShamanKit.cs`, `Races.cs`, `RaceTests.cs` and `BalanceHarness.cs`, plus the Cleric and Shaman blocks in `Encounter.asset`. Then rerun the failing test groups alone.
   3. Read `balC` and report Cleric and Shaman DPS and HPS against the role medians and the caps. Check that the party heal rows now say "3 sims joined".
 
-## 2026-10-13, 00:03 on (Claude, Fable 5.1): pickup
-- EditMode suite in lane A: **456/460, the new code compiles.** The four failures fixed: icons for the Cleric's and Shaman's 24 abilities
-  and 115 talents (nine new motif words in make_icons.py: fire, ring, sun, cloud, fist, link, root, snow, stone), and the three rules tests
-  that counted eight classes (ten now). Rerun 26/26. Commit 05c78ff.
-- **Balance, first pass (00:11-00:24, all ten classes on the old dummies, 90 s):** `outputsalancerchive-20261013-0024` and the table
-  reported to Chris. Two kits were broken on the dummies and fixed (commit 7363d97): the Cleric's Censure never cast Brand or Sunburst
-  (Rebuke now brands); the Shaman's Thunderhead never fired (the Squall charge was wiped every tick out of combat; it fades after 6 s now).
-- **Chris, 00:27: "create test dummies to test the dps and wounded test dummies for the heal test so there are no variables in the mobs":**
-  the harness's dummies are level 15, no armour, five million health, no blows; the heal test wounds Mira (3,000 health, 4% a second)
-  instead of the healer; fights 180 s (commits 0489ed9, 7b0f2c3).
-- Party-heal test 1/1 (after the Cleric talent flags). SocialPull 7/8: `A_linked_group_resets_together_and_stays_home` ("The second is
-  home") OPEN.
-- **Running (one Unity, lane A): `D:\crulanda-work\chainR5.ps1`** (pid 812; `encounter-validation\chainR5.out`): the full PlayMode suite
-  without NamedLootTests (suiteS.xml), then the balance harness over all ten classes on the new dummies (bal2-*.csv), then
-  `balance_merge.py` → `outputsalance\BALANCE_ALL.md`.
-- (The earlier note, kept for the record:) the balance harness over all ten classes, two at a time (`D:\crulanda-work\chainBal.ps1`, pid 24128;
-  progress in `encounter-validation\chainBal.out`, each set's CSV in `outputsalancealance-<set>.csv`). Chris, 00:11: "once you got it
-  straight i want to run dps and healing per sec on test runs to test for balance and functionality ... on all classes". When all five
-  sets are in: `python toolsalidationalance_merge.py` writes `outputsalance\BALANCE_ALL.md` (every build's DPS single and vs 3,
-  HPS, against the role medians and the caps). Then the full PlayMode suite (skip NamedLootTests), SocialPull, and the party-heal check.
+## 2026-10-13, 00:03 on (Claude): pickup, then balance on fixed dummies
+- EditMode 456/460 at first (the Cleric and Shaman compile); the four failures fixed (icons for their 24 abilities and 115 talents, the
+  class count of ten), commit 05c78ff. After the refresh fix: **EditMode 461/461** (00:51).
+- **Balance (Chris: "dps and healing per sec on test runs ... on all classes", fixed dummies, "62-72 is good range", "a number for each
+  build ... tank/dps/support/healer/CC", "why is the druid healing so low").** All in `Docs/BALANCE_REPORT.md`, round 5. The table is
+  `D:\crulanda-work\outputs\balance\BALANCE_ALL.md` (`python tools\validation\balance_merge.py`); `balance_retune.py [--apply]
+  [--skip=a,b]` moves builds outside their target. Older runs in `outputs\balance\archive-*`.
+  - Fixed: refreshed heals/damage over time keep their tick schedule (the Druid's Seedling never healed); the Druid and Paladin heal the
+    whole party; the Shaman's charge; the heal scale in the Archivist, Paladin and Salt-Mender kits; the harness (no heals in damage
+    fights, Brand/Unwrite/Marrow Drain kept up, songs started once, heals taking turns in the heal tests).
+  - 35 of 40 builds in range after the first retune (01:15 run); the second retune and the harness's healing fixes are in the confirm run.
+  - Targets other than Chris's 62-72 DPS are PROPOSED (CC/Support 45-52, Tank 42-55, Healer at most 35 DPS and 40-50 HPS): ask Chris.
+- **The grey (TODO 8) done:** Hollow Men's blows grey (EncounterEnemy.Grey.cs), EditMode test. GAME-ONLY mechanic, CANON creature.
+- **Adit NavMesh tests 3/3 (01:12):** the column and plinth tops are off the navmesh (TODO 14's code is done); the group run to the end
+  is still to do (`tools\validation\group_run.ps1` on Chris's screen, with the lane B build the chain makes).
+- SocialPull 7/8 at 01:14 ("The first is home"): fixed in 31cad5d (a mob finishes the walk home before strolling; far-off mobs ask
+  for the way home at most every 2 s). The full suite from 01:34 (`suiteS.xml`) includes it.
+- **Running, one Unity at a time, lane A:** `D:\crulanda-work\chainR9.ps1` (full PlayMode suite without NamedLootTests, output
+  `encounter-validation\chainR9.out`), then `chainR12.ps1` (all ten classes again, the merge, EditMode `editT`, then the lane B release
+  build with -NoPublish; output `chainR12.out`). Then: retune anything still out of range, report the table to Chris, run the group run.
 
 ## Rules (from CLAUDE.md and Chris)
 - Run Unity only in the validation lanes: lane A (`D:\crulanda-work\encounter-validation`, tests) and lane B (`encounter-validation-b`, builds and captures).

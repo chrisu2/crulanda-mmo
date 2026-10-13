@@ -195,3 +195,50 @@ Raw: Docs/balance_v8.csv, Docs/party_heal_v3.csv. The harness passes 2/2, includ
 "yeh marksman too high. 62-72 is good range"
 
 My reading: on the fixed dummies (level 15, no armour, no blows; 180 s fights) a DPS build should land at **62-72 single-target DPS**; the Marksman (Ranger) is over it and comes down first. Healer and control/support caps (50% / 75% of the DPS median) stand.
+
+## Chris, 2026-10-13 (briefs, verbatim)
+
+"you should create test dummies to test the dps and wounded test dummies for the heal test so there are no variables in the mobs"
+"well i need a number for each build, each class and designate it as tank/dps/support/healer/CC?"
+"why is the druid healing so low and needs to be fixed"
+
+## Round 5 (2026-10-13, 00:44-02:30): fixed dummies, every class and build with a role, a number and a target
+
+**Method.** The dummies are fixed (level 15, no armour, 5,000,000 health, no blows); the heal test's wounded dummy is Mira at 3,000
+health losing 4% a second (120 a second, the most any healer can show). Fights are 180 s, three seeds averaged. Tables:
+`tools\validation\balance_merge.py` writes `D:\crulanda-work\outputs\balance\BALANCE_ALL.md`; `tools\validation\balance_retune.py`
+moves a build outside its target to the middle of it (scales in `EncounterSession.RoleScale.cs`).
+
+**Roles and targets** (single-target DPS on the dummies):
+
+| Role | Target | Source |
+|---|---|---|
+| DPS (pet builds too) | 62-72 | Chris, 00:37 |
+| CC | 45-52 | PROPOSED (75% cap on a 67 middle) |
+| Support (the Rogue's utility build too) | 45-52 | PROPOSED |
+| Tank | 42-55 | PROPOSED (no rule before) |
+| Healer | at most 35 DPS; 40-50 HPS on the wounded dummy | PROPOSED (50% cap; HPS round the healers' median) |
+
+**Functionality found by the dummies (each fixed, TESTED in the harness, not yet seen by Chris):**
+- The Druid's healing (8.6 HPS): a heal or damage over time recast before its first tick restarted its clock (`PeriodicEffects.Add`).
+  Seedling, recast every 1.8 s on its 2 s tick, never healed, so no Sap, so no Quickbloom or Burst Bloom. A refresh now keeps the
+  schedule (EditMode test). Rootmend went to 35 HPS, then 40.6 with its heal scale. The same fix lifted the Archivist's Cantor from 25 to
+  119 HPS.
+- The Druid and Paladin healed only you and Mira, never the sims in your party (`HealTarget`). In the party test a party of five spent
+  350-590 member-seconds low under them against 10-40 under the Cleric and Shaman. Both now heal the most hurt member of the whole party.
+- The Shaman's Thunderhead never fired: the Squall charge was wiped every frame once six quiet seconds had passed. It now fades six
+  seconds after the last Squall or fight.
+- The harness, not the kits, sank the Cleric and Shaman: their bars lock nothing by build, so damage fights spent most casts on heals
+  for nobody. Damage fights now cast no heals. Brand, Unwrite and Marrow Drain (damage over time with no cooldown) were never cast,
+  starved by the filler; they are now kept up. The healers' songs and chants (Song of Mending, the Mender's chant) were never started;
+  they now start once. In the heal tests heals take turns, so Quickbloom, Lay On, Long Mend and Chain Mend get cast.
+
+**Retune applied** (scales; the build's own blows, its pet's where it has one, its own heals):
+- DPS down to 62-72: Marksman .75 to .64, Skirmisher .85 to .75, Judicator .92 to .80 to .64 (Lay On no longer eats its fight),
+  Thornclaw .80 to .74, Beastbond .75 to .70 (pet too), Warrior DPS 1 to .92.
+- Up: Cleric Censure 1.68, Shaman Stormcaller 1.67; CC and Support into 45-52: the Lull 2.14, the Still Vow 3.11, Spellbinder 1.16,
+  Salt-speaker 1.27, Gravewind 1.15, Cleric Warden 2.32; Tank Mason 1.25. Locksmith down to .87.
+- Heal scale: Rootmend 2.2 to 2.8, the Cantor .16 (it healed all 120 a second), Paladin Sanctuary .83. The Archivist, Paladin and
+  Salt-Mender kits now apply the heal scale at all (only the Cleric, Druid and Shaman did).
+
+After the first retune 35 of 40 builds were in range (the run at 01:15). The table below is the confirm run.

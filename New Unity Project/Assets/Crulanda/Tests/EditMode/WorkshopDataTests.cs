@@ -134,8 +134,8 @@ namespace Crulanda.Tests
             int first = Array.FindIndex(z.props, p => p != null && p.name == NewProps[0]);
             var block = z.props.Skip(first).Take(NewProps.Length).Select(p => p.name).ToArray();
             CollectionAssert.AreEqual(NewProps, block, "The new props are appended together, in order.");
-            Assert.IsTrue(z.props.Skip(first + NewProps.Length).All(p => p != null && (p.kind == "training_dummy" || p.kind == "mending_dummy")),
-                "After them only what was appended later: the training field.");
+            Assert.IsTrue(z.props.Skip(first + NewProps.Length).All(p => p != null && (p.kind == "training_yard" || p.kind == "training_dummy" || p.kind == "mending_dummy")),
+                "After them only what was appended later: the training yard and its dummies.");
             foreach (var p in added)
             {
                 string q = p.name + ": "; float half = Mathf.Max(p.size.x, p.size.y) / 2, reach = Reach(p);

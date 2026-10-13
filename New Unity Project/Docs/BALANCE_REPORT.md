@@ -325,3 +325,13 @@ Skirmisher .81, Combustion .29, Stormcaller .19).
 three run high: the Unwriting x1.42, Thornsong x1.29, Bonecaller x1.51 (the thrall), Sifter x1.34. The Shaman's kit is area-heavy in every
 path (Stonebound, Gravewind and Rainspeaker do about twice as much against three as against one), so its scales are large (2.45, 2.5).
 Either their area spells move to the area builds or the single-target limit (x1.25) relaxes for them.
+
+## Chris, 2026-10-13 ~13:40 (brief, verbatim)
+
+"why is one in the river? sparring area needs to resemble something like this? try the small props pack in downloads to help."
+(With two reference pictures: a fenced sparring yard with tents, banners, dummies on stands, weapon racks and crates; and a stone
+training court with archery targets in a row and recruits drilling. References for the layout only: nothing is copied from them.)
+
+Why in the river: the spot was chosen by a script that kept clear of roads, buildings and props but never checked water; the creek runs
+through that field and the mending dummy stood on its bank. The yard moves to dry, open ground and is laid out as a fenced sparring
+ground (Docs/TRAINING_YARD.md).

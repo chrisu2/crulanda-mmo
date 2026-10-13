@@ -35,6 +35,8 @@ namespace Crulanda.World
         /// <paramref name="yaw"/> about the vertical. Only its meshes come along (no kit scripts, colliders or lights); solid adds a box
         /// collider the navmesh keeps clear. Null when the model is missing, so the caller can draw its painted stand-in.
         /// </summary>
+        static Material smallPropsAtlas;
+        static Material SmallPropsAtlas { get { if (smallPropsAtlas == null) smallPropsAtlas = Resources.Load<Material>("Props/SmallProps/SmallPropsAtlas"); return smallPropsAtlas; } }
         public static GameObject ModelProp(Transform parent, string path, Vector3 foot, float yaw, float height, bool solid = false, float? width = null, Vector3? box = null)
         {
             var src = PropSource(path); if (src == null) return null;
@@ -54,6 +56,8 @@ namespace Crulanda.World
             t.localScale = k; t.localRotation = Quaternion.Euler(0, yaw, 0);
             t.localPosition = foot + t.localRotation * new Vector3(-b.center.x * k.x, -b.min.y * k.y, -b.center.z * k.z);
             foreach (var r in go.GetComponentsInChildren<Renderer>(true)) { r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On; r.receiveShadows = true; }
+            if (path.StartsWith("SmallProps/") && SmallPropsAtlas != null)   // the Small Props Pack (RG Poly, CC0): one atlas for all its models
+                foreach (var r in go.GetComponentsInChildren<Renderer>(true)) { var mats = r.sharedMaterials; for (int i = 0; i < mats.Length; i++) mats[i] = SmallPropsAtlas; r.sharedMaterials = mats; }
             if (path.StartsWith("Nature/")) DressNature(go);
             if (solid) { var col = go.AddComponent<BoxCollider>(); col.center = b.center; col.size = b.size; go.AddComponent<NavBlocker>(); }
             return go;

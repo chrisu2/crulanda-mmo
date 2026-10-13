@@ -78,6 +78,18 @@ namespace Crulanda.Tests
             Assert.AreEqual(max, m.Health.Pool.Current, "nobody practising: whole again");
         }
 
+        [UnityTest] public IEnumerator Both_dummies_stand_on_dry_ground_inside_the_yard()
+        {
+            // Chris, 2026-10-13: "why is one in the river?" (the first field was on the creek's bank): both now inside the fenced yard.
+            var s = Session(); yield return null;
+            var yard = s.Zone.Zone.props.FirstOrDefault(p => p != null && p.kind == "training_yard"); Assert.NotNull(yard, "Oakhaven has a training yard");
+            foreach (var (name, at) in new[] { ("training dummy", s.TrainingDummy.transform.position), ("mending dummy", s.MendingDummy.transform.position) })
+            {
+                var flat = new Vector2(at.x, at.z);
+                Assert.IsFalse(s.Zone.WaterAt(flat, out _, out _), "the " + name + " is not in water");
+                Assert.Less(Vector2.Distance(flat, yard.at), Mathf.Max(yard.size.x, yard.size.y) / 2, "the " + name + " stands inside the yard");
+            }
+        }
         [UnityTest] public IEnumerator Clicking_the_mending_dummy_selects_it_as_a_friend()
         {
             var s = Session(); Assert.NotNull(s.MendingDummy); yield return null;

@@ -71,9 +71,9 @@ namespace Crulanda.Encounter
             if (dummy == null || mend == null) { Finish(); yield break; }
 
             // 1. The field: both dummies from a few metres off.
-            var mid = (dummy.transform.position + mend.transform.position) / 2; var stand = mid + Quaternion.Euler(0, Yaw(mid, s.Zone.Ground(Vector2.zero)), 0) * Vector3.forward * 7;
-            motor.Teleport(stand + Vector3.up * .3f); motor.SetView(Yaw(stand, mid), 14, 7); yield return new WaitForSeconds(1);
-            yield return Shot("tf-01-field", "the training field south-east of Oakhaven: the straw training dummy and the bandaged mending dummy", dummy.transform);
+            var mid = (dummy.transform.position + mend.transform.position) / 2; var stand = mid + Quaternion.Euler(0, Yaw(mid, s.Zone.Ground(Vector2.zero)), 0) * Vector3.forward * 13;
+            motor.Teleport(stand + Vector3.up * .3f); motor.SetView(Yaw(stand, mid), 24, 10); yield return new WaitForSeconds(1);
+            yield return Shot("tf-01-yard", "the training yard east of Oakhaven from its gate: the fence, the tents, the banners, the dummies down the left, the butts down the right, the healer's corner, the training and mending dummies", dummy.transform);
 
             // 2. Striking the training dummy, the meter timing it.
             var front = dummy.transform.position + dummy.transform.forward * 3;

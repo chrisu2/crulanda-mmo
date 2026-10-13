@@ -1,7 +1,7 @@
 """Proposes (and with --apply writes) the per-build scales in EncounterSession.RoleScale.cs from the balance harness's CSVs on the fixed
 dummies (2026-10-13). Targets, single-target DPS: DPS (and pet builds) 62-72 (Chris: "62-72 is good range"), to 67; CC, Support (and
 utility) 45-52, to 48.5; Tank 42-55, to 48.5; Healer at most 35, to 32. Healer HPS on the wounded dummy 40-50, to 45 (BuildHealScale).
-All but Chris's DPS range are PROPOSED. Builds in range are left alone. A build with a companion in BuildPetDamageScale gets the same
+Targets for the level cap of 15, settled by Chris 2026-10-13 02:07 ("good til lvl 15 and will change as we progress to 30"). Builds in range are left alone. A build with a companion in BuildPetDamageScale gets the same
 factor on its pet (the harness measures both together). Usage: python balance_retune.py [csv folder] [--apply] [--skip=cleric,shaman]."""
 import csv, glob, os, re, statistics, sys
 

@@ -211,13 +211,16 @@ moves a build outside its target to the middle of it (scales in `EncounterSessio
 
 **Roles and targets** (single-target DPS on the dummies):
 
-| Role | Target | Source |
+| Role | Target (level 15) | Source |
 |---|---|---|
 | DPS (pet builds too) | 62-72 | Chris, 00:37 |
-| CC | 45-52 | PROPOSED (75% cap on a 67 middle) |
-| Support (the Rogue's utility build too) | 45-52 | PROPOSED |
-| Tank | 42-55 | PROPOSED (no rule before) |
-| Healer | at most 35 DPS; 40-50 HPS on the wounded dummy | PROPOSED (50% cap; HPS round the healers' median) |
+| CC | 45-52 | proposed, settled by Chris 02:07 |
+| Support (the Rogue's utility build too) | 45-52 | proposed, settled by Chris 02:07 |
+| Tank | 42-55 | proposed, settled by Chris 02:07 |
+| Healer | at most 35 DPS; 40-50 HPS on the wounded dummy | proposed, settled by Chris 02:07 |
+
+Chris, 2026-10-13 02:07 (verbatim): "the #s you proposed are good til lvl 15 and will change as we progress to 30". These are the targets
+for the level cap of 15 (the dummies are level 15). They are set again as the cap rises to 30 (Phase 9).
 
 **Functionality found by the dummies (each fixed, TESTED in the harness, not yet seen by Chris):**
 - The Druid's healing (8.6 HPS): a heal or damage over time recast before its first tick restarted its clock (`PeriodicEffects.Add`).

@@ -32,7 +32,8 @@
     whole party; the Shaman's charge; the heal scale in the Archivist, Paladin and Salt-Mender kits; the harness (no heals in damage
     fights, Brand/Unwrite/Marrow Drain kept up, songs started once, heals taking turns in the heal tests).
   - 35 of 40 builds in range after the first retune (01:15 run); the second retune and the harness's healing fixes are in the confirm run.
-  - Targets other than Chris's 62-72 DPS are PROPOSED (CC/Support 45-52, Tank 42-55, Healer at most 35 DPS and 40-50 HPS): ask Chris.
+  - Targets settled by Chris for level 15 (02:07: "the #s you proposed are good til lvl 15 and will change as we progress to 30"):
+    DPS 62-72, CC and Support 45-52, Tank 42-55, Healer at most 35 DPS and 40-50 HPS. Set them again for levels 16-30 (Phase 9).
 - **The grey (TODO 8) done:** Hollow Men's blows grey (EncounterEnemy.Grey.cs), EditMode test. GAME-ONLY mechanic, CANON creature.
 - **Adit NavMesh tests 3/3 (01:12):** the column and plinth tops are off the navmesh (TODO 14's code is done); the group run to the end
   is still to do (`tools\validation\group_run.ps1` on Chris's screen, with the lane B build the chain makes).

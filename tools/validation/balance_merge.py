@@ -34,11 +34,11 @@ for role in set(t['role'] for t in table):
     medians[role] = statistics.median([t['single'] for t in table if t['role'] == role])
 heal_median = statistics.median([t['hps'] for t in table if t['role'] == 'healer' and t['hps'] > 0]) if any(t['role'] == 'healer' and t['hps'] > 0 for t in table) else 0
 # The role each build plays, as Chris names them (2026-10-13: "designate it as tank/dps/support/healer/CC"), and its target on the fixed
-# dummies. DPS 62-72 is Chris's (2026-10-13 00:37); the others follow from the role caps on a 67 DPS middle (healer at most 50%, CC and
-# support at most 75%, 3 points of slack) and are PROPOSED until Chris settles them; tank has no rule yet.
+# dummies, for the level cap of 15. DPS 62-72 is Chris's (2026-10-13 00:37); the others, from the role caps on a 67 DPS middle, he
+# settled at 02:07: "the #s you proposed are good til lvl 15 and will change as we progress to 30".
 NAME = {'dps': 'DPS', 'tank': 'Tank', 'support': 'Support', 'healer': 'Healer', 'control': 'CC', 'pet': 'DPS (pet)', 'utility': 'Support (utility)'}
 TARGET = {'dps': (62, 72), 'pet': (62, 72), 'control': (45, 52), 'support': (45, 52), 'utility': (45, 52), 'healer': (0, 35), 'tank': (42, 55)}
-HPS_T = (40, 50)   # healer HPS on the wounded dummy, PROPOSED
+HPS_T = (40, 50)   # healer HPS on the wounded dummy (Chris, 02:07, for level 15)
 def status(t):
     lo, hi = TARGET.get(t['role'], (0, 1e9)); v = t['single']
     out = 'ok' if lo <= v <= hi else ('**HIGH**' if v > hi else '**LOW**')
@@ -49,8 +49,8 @@ def status(t):
 classes = sorted(set(t['cls'] for t in table))
 lines = ['# Balance, every class and build (' + ', '.join(classes) + ')', '',
          'Fixed dummies (level 15, no armour, no blows), 180 s fights, three seeds averaged. DPS = single target; vs 3 = three dummies;',
-         'HPS = healing a second on the wounded dummy. Targets (single-target DPS): DPS 62-72 (Chris); CC and Support 45-52, Healer at most 35,',
-         "Tank 42-55 (proposed). Healer HPS 40-50 (proposed; the healers' median is %.1f; the wounded dummy loses 120 a second, the most any healer can show)." % heal_median, '',
+         'HPS = healing a second on the wounded dummy. Targets for level 15 (single-target DPS), settled by Chris: DPS 62-72; CC and Support 45-52, Healer at most 35,',
+         "Tank 42-55. Healer HPS 40-50 (the healers' median is %.1f; the wounded dummy loses 120 a second, the most any healer can show)." % heal_median, '',
          '| class | build | role | DPS | DPS vs 3 | HPS | DPS target | status |', '|---|---|---|---|---|---|---|---|']
 order = {'tank': 0, 'dps': 1, 'pet': 1, 'control': 2, 'support': 3, 'utility': 3, 'healer': 4}
 counts = {}

@@ -177,18 +177,27 @@ namespace Crulanda.Encounter
         /// road back and forth (its leash held from where it is met, not where it set out); on the way home from a broken leash it only goes
         /// home. A mob of no camp (a story mob, a wave of the escort) and one riding inside another keep their place.</summary>
         /// <summary>Beyond this from the player a camp's mob stands rather than strolls (the CPU, below); patrols walk at any range.</summary>
-        public const float StrollRange = 70;
+        public const float StrollRange = 70; float homeAskAt;
         void Idle()
         {
             if (!agent.isOnNavMesh) return;
-            if (!Camp || Evading || Inside != null) { agent.SetDestination(home); strolling = false; return; }
+            // The walk home from a broken leash counts as a stroll: it is finished, then a rest, before the camp is strolled again
+            // (SocialPullTests, 2026-10-13: a wolf whose three seconds of evading ran out short of home strolled off from there).
+            if (!Camp || Evading || Inside != null) { agent.SetDestination(home); strolling = Camp && Evading; return; }
             // Far from everyone (no party member within 70 m): it stands; the strolling's path-finding for a hundred and fifty mobs at once pegged
             // the CPU (Chris, 2026-10-11, watching the group run: "pegging cpu 100% alot of times").
             if (Patrol == null && session.Player != null && (transform.position - session.Player.transform.position).sqrMagnitude > StrollRange * StrollRange)
             {
                 // Not yet home (back from a chase): it walks home first, then stands (SocialPullTests, 2026-10-13: a linked group's second mob stopped short of home).
-                var toHome = home - transform.position; toHome.y = 0;
-                if (toHome.sqrMagnitude > 1.5f * 1.5f) { strolling = false; agent.SetDestination(home); return; }
+                // Asked at most every 2 s and only when not already on its way: a beast halts 2.1 m short, and asking every frame cost a
+                // path search a frame for every mob out there (the CPU the 70 m rule was for).
+                var toHome = home - transform.position; toHome.y = 0; float near = Mathf.Max(1.5f, agent.stoppingDistance + .5f);
+                if (toHome.sqrMagnitude > near * near)
+                {
+                    strolling = false; var heading = agent.destination - home; heading.y = 0;
+                    if (Time.time >= homeAskAt && !agent.pathPending && (!agent.hasPath || heading.sqrMagnitude > 1)) { agent.SetDestination(home); homeAskAt = Time.time + 2; }
+                    return;
+                }
                 if (strolling) { strolling = false; agent.ResetPath(); }
                 return;
             }

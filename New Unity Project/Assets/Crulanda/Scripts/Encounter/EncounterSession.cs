@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -1328,6 +1328,7 @@ namespace Crulanda.Encounter
                 Progress = FreshProgress(ClassDef.id); ArmNewCharacter();
                 if (message != "File not found.") { Message("Save could not be loaded: " + message); saveBlocked = true; }
             }
+            Progress.raceId = Races.For(ClassDef.id, Progress.raceId);   // a save from before races is human; a Shaman is an orc (Docs/RACES.md)
             if (StartClassOverride == null) CharacterProfile.Remember(root, ClassDef.id);
             // The scene builds its opening zone first; if this character is saved elsewhere, rebuild that zone instead.
             if (Zone != null && !saveBlocked && !string.IsNullOrEmpty(Progress.zoneId) && Progress.zoneId != Zone.Zone.id && Zone.HasZone(Progress.zoneId))
@@ -1348,9 +1349,9 @@ namespace Crulanda.Encounter
             ReconcileQuests();
             nextSave = Time.time + 30;
         }
-        public static EncounterProgress FreshProgress(string classId = "class.warrior")
+        public static EncounterProgress FreshProgress(string classId = "class.warrior", string raceId = null)
         {
-            var p = new EncounterProgress { classId = classId, playerId = EntityId.New().Value, companionId = EntityId.New().Value };
+            var p = new EncounterProgress { classId = classId, raceId = Races.For(classId, raceId), playerId = EntityId.New().Value, companionId = EntityId.New().Value };
             Inventory.Ensure(p); return p;
         }
         /// <summary>A look's odd variant from the mob's name: ash hounds, withered or grey Keepers and briars, the Hollow Root-Warden, a doe.</summary>

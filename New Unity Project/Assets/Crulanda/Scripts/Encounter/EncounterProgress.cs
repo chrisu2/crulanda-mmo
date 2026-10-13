@@ -15,6 +15,8 @@ namespace Crulanda.Encounter
     public sealed class EncounterProgress
     {
         public string classId = "class.warrior";
+        /// <summary>The player's people (Docs/RACES.md). Empty in a save from before races: read as human (Races.Normalize).</summary>
+        public string raceId = Races.Human;
         /// <summary>Zone the saved position belongs to. Empty = the original Quiet Trail test map.</summary>
         public string zoneId;
         public List<TalentRank> talents = new List<TalentRank>();

@@ -27,3 +27,9 @@ The canon has no machines, so an orc Shaman should be spirit/root/earth themed, 
 5. **UI:** race on the character sheet and in the party frames.
 6. **Tests:** saves default to human; a non-orc can't pick Shaman; the orc figure passes Foot/Grounding.
 7. **Lore:** a short orc page (CANON-EXPANDED) for Chris to approve before any content is written.
+
+## Status 2026-10-12 23:25 (code only, not compiled yet)
+- Races.cs: Human and Orc. Orc classes (PROVISIONAL): warrior, druid, ranger, rogue, shaman. Shaman is orc-only; Cleric is human-only for now.
+- EncounterProgress.raceId defaults to human, and a loaded save is normalised to its class (Races.For). FreshProgress takes a race. SimAdventurer.raceId plus a Race property.
+- EditMode RaceTests (4 tests).
+- Not done yet: the orc figure, the race pick at character creation, the sim race mix, and UI.

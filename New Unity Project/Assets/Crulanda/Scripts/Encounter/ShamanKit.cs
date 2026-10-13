@@ -1,4 +1,3 @@
-#if CRULANDA_SHAMAN   // off until the Shaman's content (Encounter.asset class, abilities, unlocks; Talents/shaman.json) and the orc race are wired: Docs/CLASS_CLERIC_SHAMAN.md, Docs/RACES.md
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -231,4 +230,3 @@ namespace Crulanda.Encounter
         }
     }
 }
-#endif

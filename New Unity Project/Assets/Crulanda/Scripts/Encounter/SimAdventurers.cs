@@ -17,6 +17,9 @@ namespace Crulanda.Encounter
     public sealed class SimAdventurer
     {
         public string id, name, folk, classId, homeZone, zone;
+        /// <summary>The sim's people (Docs/RACES.md); empty in an old roster: human, or the race its class needs (Races.For).</summary>
+        public string raceId;
+        public string Race { get { return Races.For(classId, raceId); } }
         public int level = 1, variant, gearSeed;
         /// <summary>0-1 each: bold (fights above their level), friendly (helps, greets), chatty (talks in the channels).</summary>
         public float bold, friendly, chatty;

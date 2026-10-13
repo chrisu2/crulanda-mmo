@@ -261,3 +261,27 @@ the foes in your fight with small damage over time and mends a little (its canon
 Rootmend's glade-fire mends the most hurt of the party (CANON-EXPANDED: no fairies in the canon, only the phrase "fairy tale"; the
 witch-fire wisp of book 1 ch. 13, a hovering orb of light bound to its maker's will, lit with the Whispering Glade's regenerative gold and
 silver light, book 3 ch. 5). The meter shows each on its own row; a pet build's DPS is player and pet together, on 62-72.
+
+## Chris, 2026-10-13 02:16-02:25 (briefs, verbatim)
+
+"i do want some classes to specialize in AOE (like a cleave paladin, or cleave warrior) or a ranger with scatter arrows or volley but i
+dont want dps vs 1 and dps vs 3 to be the same for every class ..this should be based on specializations"
+"just make the heal dummy party aligned?" / "or target aligned if solo"
+"what are the top 3 best healers, best 3 top dps, and top 3 best tanks! remember i dont want one class dominating all 3 positions"
+"these dummies should be targetable and hitable / healable of course"
+
+**Area by specialization** (`EncounterSession.Spread.cs`, GAME-ONLY): while the lead build is an area specialist, each of your own
+blows splashes a share onto up to two more foes near the struck one (never a held foe, a hidden one, a rider or game; your pet's and
+spirit's blows do not splash). Specialists, PROPOSED: Warrior DPS (Sweeping blows, .55, 5 m), Paladin Judicator (Wide judgement, .55,
+5 m), Ranger Skirmisher (Scatter shot, .5, 8 m), Mage Combustion (Spreading flame, .5, 6 m), Shaman Stormcaller (Forked storm, .45, 6 m).
+Every other damage build is a single-target specialist. Table targets, PROPOSED: an area build does at least 1.7 times against three what
+it does against one; a single-target build at most 1.25 times.
+
+**Found on the way:** the harness cast the once-a-fight toggles again each fight, so the Ranger's wolf was sent away in every fight
+against three (the Rangers did less against three than against one), and the Bonecaller's thrall, the Song of Mending and the Mender's
+chant the same. The harness now leaves a pet, song or chant that is already up.
+
+**Top three at 01:15** (before the second retune): DPS Marksman 70.5, Skirmisher 69.9, Shardwork 69.6 (Judicator 83.6, rescaled);
+healers (one target) Mender 49.6, Sanctuary 45.3, Rainspeaker 42.1 (the Cantor 105, rescaled), (party of five) Rainspeaker 102, Choir 98,
+Lantern 89; tanks, on damage only, Oathguard 53.1, Warrior Tank 49.0, Mason 48.8. The Paladin sat near the top of all three: Judicator's
+rescale takes it out of DPS. Tanks need their own test (dummies that strike: damage taken, self-healing, threat), still to build.

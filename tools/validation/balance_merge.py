@@ -38,10 +38,18 @@ heal_median = statistics.median([t['hps'] for t in table if t['role'] == 'healer
 # settled at 02:07: "the #s you proposed are good til lvl 15 and will change as we progress to 30".
 NAME = {'dps': 'DPS', 'tank': 'Tank', 'support': 'Support', 'healer': 'Healer', 'control': 'CC', 'pet': 'DPS (pet)', 'utility': 'Support (utility)'}
 TARGET = {'dps': (62, 72), 'pet': (62, 72), 'control': (45, 52), 'support': (45, 52), 'utility': (45, 52), 'healer': (0, 35), 'tank': (42, 55)}
+# Area specialists (EncounterSession.BuildSpread; Chris 2026-10-13: AoE "based on specializations", not the same for every class):
+# against three they should do at least 1.7 times what they do against one; every other damage build at most 1.25 times (PROPOSED).
+AOE = {'warrior/dps', 'paladin/judicator', 'ranger/skirmisher', 'mage/combustion', 'shaman/stormcaller'}
+AOE_MIN, ST_MAX = 1.7, 1.25
 HPS_T = (40, 50)   # healer HPS on the wounded dummy (Chris, 02:07, for level 15)
 def status(t):
     lo, hi = TARGET.get(t['role'], (0, 1e9)); v = t['single']
     out = 'ok' if lo <= v <= hi else ('**HIGH**' if v > hi else '**LOW**')
+    if t['role'] in ('dps', 'pet') and t['single'] > 0:
+        ratio = t['aoe'] / t['single']; aoe = (t['cls'] + '/' + t['build']) in AOE
+        if aoe and ratio < AOE_MIN: out += ' **AoE LOW** (x%.2f)' % ratio
+        elif not aoe and ratio > ST_MAX: out += ' area high (x%.2f)' % ratio
     if t['role'] == 'healer':
         if t['hps'] <= 0: out += ' **NO HEALING**'
         elif not (HPS_T[0] <= t['hps'] <= HPS_T[1]): out += ' heal **%s**' % ('HIGH' if t['hps'] > HPS_T[1] else 'LOW')
@@ -51,13 +59,15 @@ lines = ['# Balance, every class and build (' + ', '.join(classes) + ')', '',
          'Fixed dummies (level 15, no armour, no blows), 180 s fights, three seeds averaged. DPS = single target; vs 3 = three dummies;',
          'HPS = healing a second on the wounded dummy. Targets for level 15 (single-target DPS), settled by Chris: DPS 62-72; CC and Support 45-52, Healer at most 35,',
          "Tank 42-55. Healer HPS 40-50 (the healers' median is %.1f; the wounded dummy loses 120 a second, the most any healer can show)." % heal_median, '',
-         '| class | build | role | DPS | DPS vs 3 | HPS | DPS target | status |', '|---|---|---|---|---|---|---|---|']
+         '| class | build | role | DPS | DPS vs 3 | vs 3 / 1 | HPS | DPS target | status |', '|---|---|---|---|---|---|---|---|---|']
 order = {'tank': 0, 'dps': 1, 'pet': 1, 'control': 2, 'support': 3, 'utility': 3, 'healer': 4}
 counts = {}
 for t in sorted(table, key=lambda t: (t['cls'], order.get(t['role'], 9), t['build'])):
     lo, hi = TARGET.get(t['role'], (0, 0)); st = status(t); counts[st.startswith('ok')] = counts.get(st.startswith('ok'), 0) + 1
     tgt = ('at most %d' % hi) if lo == 0 else '%d-%d' % (lo, hi)
-    lines.append('| %s | %s | %s | %.1f | %.1f | %s | %s | %s |' % (t['cls'], t['build'], NAME.get(t['role'], t['role']), t['single'], t['aoe'],
+    kind = (' (AoE)' if (t['cls'] + '/' + t['build']) in AOE else ' (single)') if t['role'] in ('dps', 'pet') else ''
+    lines.append('| %s | %s | %s%s | %.1f | %.1f | %s | %s | %s | %s |' % (t['cls'], t['build'], NAME.get(t['role'], t['role']), kind, t['single'], t['aoe'],
+                 ('x%.2f' % (t['aoe'] / t['single'])) if t['single'] > 0 else '-',
                  ('%.1f' % t['hps']) if t['hps'] > 0 else '-', tgt, st))
 lines += ['', 'In range: %d of %d builds.' % (counts.get(True, 0), len(table)),
           'Role medians (single DPS): ' + ', '.join('%s %.1f' % (NAME.get(r, r), m) for r, m in sorted(medians.items())) + '; DPS median %.1f.' % dps_median,

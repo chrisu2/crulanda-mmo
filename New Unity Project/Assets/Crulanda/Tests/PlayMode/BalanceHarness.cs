@@ -44,6 +44,18 @@ namespace Crulanda.Tests
             { "archivist.unwrite", 11.5f }, { "mage.marrow_drain", 9.5f } };   // the Unwriting's own Unwrite and the Bonecaller's Marrow Drain were never cast either
         static readonly HashSet<string> Once = new HashSet<string> { "mage.raise_thrall", "ranger.call_companion", "paladin.oath", "paladin.colours",
             "archivist.song_of_mending", "salt.mender_craft" };   // 2026-10-13: the healers' songs and chants are toggles: started once (they were never started, or toggled off again)
+        /// <summary>A once-a-fight toggle already on: the pet up, the song or the chant going (2026-10-13: casting it again in the next
+        /// fight sent the Ranger's wolf away, so every fight against three ran without it).</summary>
+        bool AlreadyOn(string id)
+        {
+            switch (id)
+            {
+                case "ranger.call_companion": case "mage.raise_thrall": return s.Pet != null && s.Pet.actor != null && s.Pet.actor.IsAlive;
+                case "archivist.song_of_mending": return s.Kit is ArchivistKit ak && ak.Singing.ToString() == "Mending";
+                case "salt.mender_craft": return s.Kit is SaltMenderKit sk && sk.Chanting;
+                default: return false;
+            }
+        }
         int SlotOf(string id) { for (int i = 0; i < s.Kit.ActionCount; i++) { var a = s.Kit.ActionAt(i); if (a != null && a.id == id) return i; } return -1; }
         string root; EncounterSession s;
         void OnLoaded(Scene scene, LoadSceneMode mode) { var x = UnityEngine.Object.FindFirstObjectByType<EncounterSession>(); if (x != null) x.SaveDirectoryOverride = root; }
@@ -175,6 +187,7 @@ namespace Crulanda.Tests
                     foreach (int slot in slots.OrderByDescending(i => s.Kit.ActionAt(i).effect == AbilityEffect.Heal ? 1 : 0).ThenByDescending(i => s.Kit.ActionAt(i).cooldown).ThenBy(i => lastUse.TryGetValue(i, out var w) ? w : -1))
                     {
                         var ab = s.Kit.ActionAt(slot); if (ab == null || s.Kit.ActionLockLabel(slot) != null || Never.Contains(ab.id) || sung.Contains(ab.id)) continue;
+                        if (Once.Contains(ab.id) && AlreadyOn(ab.id)) { sung.Add(ab.id); continue; }
                         if (ab.effect == AbilityEffect.Damage) continue;   // a healer at work, no foe in reach
                         if (ab.cost > 0 && pool.Max > 0 && pool.Current - ab.cost < pool.Max * .1f) continue;
                         if (s.UseAbility(slot)) { lastUse[slot] = t; if (Once.Contains(ab.id)) sung.Add(ab.id); break; }
@@ -283,6 +296,7 @@ namespace Crulanda.Tests
                     .ThenBy(i => targets == 0 && lastUse.TryGetValue(i, out var healUsedAt) ? healUsedAt : -1)   // the heal test: heals take turns, so the first in slot order does not starve the rest (2026-10-13).ThenByDescending(i => s.Kit.ActionAt(i) != null ? s.Kit.ActionAt(i).cooldown : 0).ThenBy(i => s.Kit.ActionAt(i) != null && cls == "class.druid" && s.Kit.ActionAt(i).cooldown <= 0 && s.Kit.ActionAt(i).effect == AbilityEffect.Damage && lastUse.TryGetValue(i, out var w) ? w : -1).ThenBy(i => order.IndexOf(i)))   // a Druid's equal fillers taken in turn (Thornsong's loop); every other kit keeps bar order (v6/v7: the turn-taking cost the casters, Mage and Archivist, most of their damage) taken in turn (a Thornsong alternates Seedshot and Thornbolt)
                 {
                     var ab = s.Kit.ActionAt(slot); if (ab == null || s.Kit.ActionLockLabel(slot) != null || Never.Contains(ab.id) || used1.Contains(ab.id)) continue;
+                    if (Once.Contains(ab.id) && AlreadyOn(ab.id)) { used1.Add(ab.id); continue; }
                     // A damage fight casts no heals (2026-10-13: the Cleric and Shaman, whose bars lock nothing by build, spent most casts mending nobody).
                     if (targets > 0 && ab.effect == AbilityEffect.Heal) continue;
                     // Mana-aware: a costly ability waits while the pool is under a fifth, the cheapest one (the filler) never waits.

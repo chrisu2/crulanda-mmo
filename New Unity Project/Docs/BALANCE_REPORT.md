@@ -189,3 +189,9 @@ Raw: Docs/balance_v8.csv, Docs/party_heal_v3.csv. The harness passes 2/2, includ
 - The turn-taking fix worked: the Mage and Archivist are back to their v5/v6 numbers. Combustion 92%, bonecaller 91%, heatweaver 70%, spellbinder 58%, the-unwriting 92%, the-lull 33%, the-cantor 33%, the-still-vow 23% (all of the 68.6 DPS median).
 - The Druid holds: thornsong 96%, thornclaw 105%.
 - Party test: still **0 sims joined**, even when they are put in the zone directly. The test scene's SimPopulation is likely null or has no sims. Next: build three SimAdventurers outright. HPS is the same as v2 (cantor 65-73, sanctuary 54-55, mender 48.5, rootmend 33-37).
+
+## Chris, 2026-10-13 00:37 (brief, verbatim)
+
+"yeh marksman too high. 62-72 is good range"
+
+My reading: on the fixed dummies (level 15, no armour, no blows; 180 s fights) a DPS build should land at **62-72 single-target DPS**; the Marksman (Ranger) is over it and comes down first. Healer and control/support caps (50% / 75% of the DPS median) stand.

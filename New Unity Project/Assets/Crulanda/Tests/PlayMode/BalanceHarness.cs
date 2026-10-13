@@ -260,7 +260,8 @@ namespace Crulanda.Tests
                 .OrderBy(i => s.Kit.ActionAt(i).cost).DefaultIfEmpty(-1).First();
             var uses = new Dictionary<string, int>(); var lastUse = new Dictionary<int, float>();
             if (seed == 0) csv.Add("# locks " + cls + " " + branch.id + " " + scenario + ": " + string.Join(" ", Enumerable.Range(0, s.Kit.ActionCount).Where(i => s.Kit.ActionAt(i) != null && s.Kit.ActionLockLabel(i) != null).Select(i => s.Kit.ActionAt(i).id + "=" + s.Kit.ActionLockLabel(i).Replace(" ", "_"))));
-            s.Meter.Reset(); var pool = s.Player.Resource.Pool; int last = pool.Current, used = 0; float oom = -1, t = 0, hurt = 0;
+            s.Meter.Reset(); s.Meter.RunName = cls.Replace("class.", "") + " / " + branch.id + " · " + scenario + " · seed " + seed;   // read on the meter when the fights run on screen (Chris 2026-10-13)
+            var pool = s.Player.Resource.Pool; int last = pool.Current, used = 0; float oom = -1, t = 0, hurt = 0;
             Time.captureDeltaTime = Step;
             while (t < FightSeconds)
             {

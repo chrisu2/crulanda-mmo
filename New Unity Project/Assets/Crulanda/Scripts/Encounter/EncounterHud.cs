@@ -953,7 +953,7 @@ namespace Crulanda.Encounter
             var r = MeterRect(rows.Count);
             Fill(r, new Color(0, 0, 0, .55f));
             GUI.contentColor = gold; GUI.Label(new Rect(r.x + 10, r.y + 6, 200, 20), "DAMAGE AND HEALING", small); GUI.contentColor = Color.white;
-            GUI.Label(new Rect(r.x + 10, r.y + 22, 310, 18), "over " + Mathf.RoundToInt(t) + " s of fighting  ·  /meter reset", tiny);
+            GUI.Label(new Rect(r.x + 10, r.y + 22, 420, 18), (session.Meter.RunName != null ? session.Meter.RunName + "  ·  " : "") + "over " + Mathf.RoundToInt(t) + " s of fighting  ·  /meter reset", tiny);   // the run's name when one is set (the balance harness names each fight)
             GUI.contentColor = new Color(1, .75f, .5f); GUI.Label(new Rect(r.x + 178, r.y + 40, 80, 18), "damage", tiny);
             GUI.contentColor = new Color(.5f, 1, .7f); GUI.Label(new Rect(r.x + 256, r.y + 40, 80, 18), "healing", tiny); GUI.contentColor = Color.white;
             float y = r.y + 58;

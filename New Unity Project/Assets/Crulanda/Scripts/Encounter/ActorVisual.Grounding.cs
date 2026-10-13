@@ -31,12 +31,17 @@ namespace Crulanda.Encounter
             if (ball == null) return 0; var p = ball.position;
             return p.y - ToeRest - GroundUnder(p, transform.position.y - 1);
         }
+        Vector3 groundLast;
         void GroundFeet()
         {
             if (model == null || model.Model == null || model.BallL == null || model.BallR == null) return;
             if (!groundBaseSet) { groundBaseY = model.Model.localPosition.y; groundBaseSet = true; }
             bool dead = actorRef != null && !actorRef.IsAlive;
             float gl = SoleGapOf(model.BallL), gr = SoleGapOf(model.BallR), gap = Mathf.Min(gl, gr);
+            // Standing, both feet are down: the body sits to the higher sole so the leg that cannot reach (the idle's straight left
+            // leg, 5 cm up in FootTests) lands, and PlantFoot bends the other knee to its ground. Moving, the lower foot leads.
+            { var mv = transform.position - groundLast; mv.y = 0; groundLast = transform.position; float sp = Time.deltaTime > 0 ? mv.magnitude / Time.deltaTime : 0;
+              if (sp < .3f && Mathf.Max(gl, gr) < .08f) gap = Mathf.Max(gl, gr); }
             SoleGap = gap;
             if (dead || Riding || Pose == ActorPose.Swim || LyingLow || gap > .25f || gap < -.3f) return;   // in the air, in the water, in a saddle: leave it
             float scale = Mathf.Max(.01f, model.Model.lossyScale.y / Mathf.Max(.01f, Mathf.Abs(model.Model.localScale.y)));

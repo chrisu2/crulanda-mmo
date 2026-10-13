@@ -163,7 +163,9 @@ namespace Crulanda.Encounter
         {
             if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
             var use = With(a, a.cost, Mathf.Max(0, a.castTime - .15f * R("cn-stern")));
-            return Start(use, () => { if (!s.LandsOn(t, a.range)) return; s.Bolt(t, new Color(1, .9f, .55f), .15f); t.Receive(Dmg((a.power + 2 * Level) * (1 + .04f * R("cn-hard-word"))), s.Player); });
+            // Rebuke brands the foe as it lands (2026-10-13, the balance harness: the Censure build never cast Brand or Sunburst, 8 DPS; the
+            // rotation's filler was always Rebuke and Sunburst needs a Brand), so Rebuke, Rebuke, Sunburst is the loop.
+            return Start(use, () => { if (!s.LandsOn(t, a.range)) return; s.Bolt(t, new Color(1, .9f, .55f), .15f); t.Receive(Dmg((a.power + 2 * Level) * (1 + .04f * R("cn-hard-word"))), s.Player); if (t.actor.IsAlive) brands[t] = Mathf.Min(3, (brands.TryGetValue(t, out var n) ? n : 0) + 1); });
         }
         bool Brand(AbilityDefinition a)
         {

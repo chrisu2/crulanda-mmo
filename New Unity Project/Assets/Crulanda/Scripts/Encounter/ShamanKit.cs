@@ -215,7 +215,16 @@ namespace Crulanda.Encounter
         public override bool MeleeAutoAttacks { get { return false; } }
 
         // ---------- per frame / lifecycle ----------
-        public override void Tick(bool inCombat) { periodic.Tick(Now); if (!inCombat) { ancestorSpent = mountainSpent = false; charge = 0; } }
+        // The Squall's charge fades six seconds after the fight ends, not at once (2026-10-13, the balance harness: against dummies that do
+        // not fight back the session is never "in combat", the charge was wiped every tick and Thunderhead never fired once).
+        float outOfCombatSince = -1;
+        public override void Tick(bool inCombat)
+        {
+            periodic.Tick(Now);
+            if (inCombat) { outOfCombatSince = -1; return; }
+            if (outOfCombatSince < 0) outOfCombatSince = Now;
+            if (Now - outOfCombatSince > 6) { ancestorSpent = mountainSpent = false; charge = 0; }
+        }
         public override void ResetState() { periodic.Clear(); charge = 0; earthskinUntil = 0; ancestorSpent = mountainSpent = false; }
         public override void ClearTransient() { ResetState(); if (s.Player != null) PlayerCombat.ClearBarrier(); }
         public override string StatusLine

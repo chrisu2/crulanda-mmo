@@ -181,3 +181,11 @@ Taking equal-ranked damage fillers in turn helped Thornsong but cost the casters
 
 **The fix:** turn-taking is now only used for the Druid, and every other kit keeps bar order. **The v7 Mage and Archivist numbers are not valid.** Treat the v5/v6 Mage numbers as current until v8 runs.
 
+
+---
+
+## Round 4 (v8, 2026-10-12 22:19): confirm run
+Raw: Docs/balance_v8.csv, Docs/party_heal_v3.csv. The harness passes 2/2, including the role caps.
+- The turn-taking fix worked: the Mage and Archivist are back to their v5/v6 numbers. Combustion 92%, bonecaller 91%, heatweaver 70%, spellbinder 58%, the-unwriting 92%, the-lull 33%, the-cantor 33%, the-still-vow 23% (all of the 68.6 DPS median).
+- The Druid holds: thornsong 96%, thornclaw 105%.
+- Party test: still **0 sims joined**, even when they are put in the zone directly. The test scene's SimPopulation is likely null or has no sims. Next: build three SimAdventurers outright. HPS is the same as v2 (cantor 65-73, sanctuary 54-55, mender 48.5, rootmend 33-37).

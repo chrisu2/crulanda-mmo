@@ -16,6 +16,15 @@ so low". Details and the table in BALANCE_REPORT.md, round 5.
   GAME-ONLY mechanic on a CANON creature.
 - **Mobs walk home:** one back from a broken leash finishes the walk home and rests before strolling; far-off mobs ask for the way home at
   most every 2 s (the first version asked every frame).
+- **Spirits nobody commands** (Chris: a pet for the Shaman DPS, a helper for the Druid healer, both from the canon): the Stormcaller's aether
+  butterfly (CANON-EXPANDED, book 1 ch. 18 "Blue burns"; stings foes in the fight, mends a little) and the Rootmend's glade-fire
+  (CANON-EXPANDED, the witch-fire wisp lit with the Whispering Glade's light; mends the most hurt). Own meter rows; pet and player
+  together on 62-72 for a damage build.
+- **Oakhaven's training field** south-east of town (map landmark): a training dummy to strike and a mending dummy to heal (party aligned
+  within 40 m); PlayMode TrainingFieldTests.
+- **Area by specialization:** Warrior DPS, Judicator, Skirmisher, Combustion and Stormcaller splash their blows onto up to two foes near
+  the target; every other damage build is single-target. The table shows vs 3 / 1.
+- **Tank test:** three dummies that strike; damage taken, self-healing, net intake, threat and near-deaths, ranked.
 - **Tests:** EditMode 461/461 at 00:51; the Adit NavMesh tests 3/3 at 01:12 (handoff item 14's column tops are off the navmesh);
   SocialPull 7/8 at 01:14 before the walk-home fix.
 

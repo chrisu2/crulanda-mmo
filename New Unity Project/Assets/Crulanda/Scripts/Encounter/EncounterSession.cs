@@ -1645,7 +1645,7 @@ namespace Crulanda.Encounter
             }
         }
         /// <summary>Story enemies of this zone (saved, stay dead) as opposed to camp mobs.</summary>
-        public List<EncounterEnemy> StoryEnemies { get { return Enemies.FindAll(e => !e.Camp); } }
+        public List<EncounterEnemy> StoryEnemies { get { return Enemies.FindAll(e => !e.Camp && e != TrainingDummy); } }   // not the yard's dummy: it never stays down, and the zone would never be clear
         /// <summary>Collider and agent. Beasts and Weave-Eaters are bulkier than a person: wider apart, and they stop further off.</summary>
         static void AddAgent(GameObject go, float speed, float radius = .45f)
         {

@@ -90,6 +90,46 @@ namespace Crulanda.Tests
             Assert.IsEmpty(problems, problems.Count + " walkable triangles on solids (first 25):\n" + string.Join("\n", problems));
         }
 
+        /// <summary>Every camp's mobs can be walked to from the way in, or come down to it from a ledge, the gates open (2026-10-13: the evening
+        /// group run's leader could not reach the Ember Vent's lava ledge and stood eleven minutes leading the party to it).</summary>
+        [UnityTest] public IEnumerator Every_camp_can_be_walked_to_from_the_way_in()
+        {
+            var s = UnityEngine.Object.FindFirstObjectByType<EncounterSession>(); Assert.NotNull(s); Assert.AreEqual("zone.adit", s.ZoneId);
+            s.Zone.OpenGates(); for (int i = 0; i < 10; i++) yield return null;
+            Assert.IsTrue(NavMesh.SamplePosition(s.Player.transform.position, out var start, 4, NavMesh.AllAreas), "the way in is on the mesh");
+            var bad = new List<string>(); var path = new NavMeshPath(); int n = 0, ledges = 0;
+            foreach (var e in s.Enemies)
+            {
+                if (e == null || !e.Camp || e.Game) continue; n++;
+                if (e.MobName == EncounterSession.NixName) continue;   // a rider: Nix sits in the Rock-Eater's saddle, up off the floor
+                if (!NavMesh.SamplePosition(e.transform.position, out var at, 4f, NavMesh.AllAreas)) { bad.Add(e.Name + " at " + e.transform.position.ToString("0.0") + ": off the mesh"); continue; }
+                if (!NavMesh.CalculatePath(start.position, at.position, NavMesh.AllAreas, path) || path.status != NavMeshPathStatus.PathComplete)
+                {
+                    // Up on a ledge it can come down from (a one-way drop: the Ember Vent's chapel, the lava ledge): pulled, it comes to the party
+                    // (the evening run's 47:28 frame), so that is a way to it.
+                    var back = new NavMeshPath();
+                    if (NavMesh.CalculatePath(at.position, start.position, NavMesh.AllAreas, back) && back.status == NavMeshPathStatus.PathComplete) { ledges++; continue; }
+                    var near = path.corners.Length > 0 ? path.corners[path.corners.Length - 1] : start.position;   // as near as a path comes
+                    bad.Add(e.Name + " at " + e.transform.position.ToString("0.0") + ": no way there (" + path.status + "; the nearest reachable " + near.ToString("0.0") + ", " + Vector3.Distance(near, at.position).ToString("0.0") + " m off, " + (at.position.y - near.y).ToString("0.0") + " m up; " + WalkableNear(at.position, start.position) + ")");
+                }
+            }
+            Assert.Greater(n, 60, "the Adit's camp mobs");
+            Debug.Log("Adit camp mobs on ledges they come down from: " + ledges);
+            Assert.IsEmpty(bad, "camp mobs no one can walk to, and that cannot come down");
+        }
+        /// <summary>The nearest spot on the same floor (within 2.5 m of its height) that a path from the way in reaches, out to 30 m.</summary>
+        static string WalkableNear(Vector3 at, Vector3 start)
+        {
+            var p = new NavMeshPath();
+            for (float r = 1; r <= 30; r += 1)
+                for (int k = 0; k < 16; k++)
+                {
+                    var q = at + Quaternion.Euler(0, k * 22.5f, 0) * Vector3.forward * r;
+                    if (NavMesh.SamplePosition(q, out var h, .8f, NavMesh.AllAreas) && Mathf.Abs(h.position.y - at.y) < 2.5f && NavMesh.CalculatePath(start, h.position, NavMesh.AllAreas, p) && p.status == NavMeshPathStatus.PathComplete)
+                        return "walkable at x " + h.position.x.ToString("0.0") + " z " + h.position.z.ToString("0.0") + ", " + r + " m away";
+                }
+            return "nothing walkable on its floor within 30 m";
+        }
         [UnityTest] public IEnumerator A_point_dropped_on_a_solids_top_snaps_to_the_floor_beside_it()
         {
             var zone = ZoneBuilder.Active; Assert.AreEqual("zone.adit", zone.Zone.id);

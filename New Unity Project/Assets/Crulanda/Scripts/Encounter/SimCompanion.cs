@@ -288,6 +288,8 @@ namespace Crulanda.Encounter
             session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? "follow me, " + LeadingName.ToLower() + " this way" : "Follow me. The " + LeadingName.ToLower() + " are this way.");
             return LeadingName;
         }
+        /// <summary>Where it leads, with "the" once ("the vent-hound", not "the the vent-hound").</summary>
+        string ThePlace { get { var n = (LeadingName ?? "").ToLower(); return n.StartsWith("the ") ? n : "the " + n; } }
         /// <summary>A camp out of reach, left behind: on to the next on the route, or the run ends.</summary>
         void LeaveCamp()
         {
@@ -554,8 +556,8 @@ namespace Crulanda.Encounter
                     else if (!session.InCombat && Time.time - leadBestAt > 45) { leadSeen = 0; LeaveCamp(); return; }
                     leadSeen = Time.time;
                 }
-                if (toCamp > 6) { Activity = (waitingAt != null ? "Going to the " : "Leading you to the ") + LeadingName.ToLower(); agent.isStopped = false; agent.speed = 4.2f; agent.SetDestination(Leading.Value); return; }
-                Activity = (waitingAt != null ? "Waiting at the " : "At the ") + LeadingName.ToLower(); agent.isStopped = true; return;
+                if (toCamp > 6) { Activity = (waitingAt != null ? "Going to " : "Leading you to ") + ThePlace; agent.isStopped = false; agent.speed = 4.2f; agent.SetDestination(Leading.Value); return; }
+                Activity = (waitingAt != null ? "Waiting at " : "At ") + ThePlace; agent.isStopped = true; return;
             }
             // At your side: a pace behind, each in its own place so they do not stack.
             Activity = toPlayer > 4 ? "Following you" : "At your side";

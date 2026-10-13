@@ -177,11 +177,12 @@ namespace Crulanda.Tests
             yield return StandAtDoor(s, door);
             Assert.AreSame(door, s.NearbyDoor); Assert.AreEqual("Knock · Tanner house", s.InteractPrompt);
             Assert.AreEqual("The Tanners are abed. A child coughs, and somebody hushes her.", life.KnockLine(door), "Step 5 gives Maud wares, so a knock here will open them instead; KnockLine still answers.");
-            // The knock itself, at a house where nobody trades: Osk Farrow and Pim.
+            // The knock itself: Osk Farrow and Pim have work for you (their quests, 2026-10-13), so the shutter opens; the household is still named.
             var farrow = s.Zone.Doors.Single(d => d.name == "Farrow house");
             yield return StandAtDoor(s, farrow);
+            Assert.AreEqual("The Farrows are abed. A child coughs, and somebody hushes him.", life.KnockLine(farrow));
             s.Interact();
-            Assert.AreEqual("Farrow house: The Farrows are abed. A child coughs, and somebody hushes him.", s.Messages.Last());
+            Assert.AreEqual("Farrow house: " + EncounterSession.ShutterLine, s.Messages.Last());
             // A farm's folk go by the head's family name: Grete Lowe and Nan Pennock at the Brook farm.
             Assert.AreEqual("The Lowes are abed. Somebody turns over and snores.", life.KnockLine(s.Zone.Doors.Single(d => d.name == "Brook farmhouse")));
             // Someone at home with wares for you opens up at the door: Ama Rusk sells from her stall by day.

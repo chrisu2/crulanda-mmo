@@ -108,7 +108,7 @@ namespace Crulanda.Tests
         [UnityTest] public IEnumerator The_Salt_Mender_is_its_own_character_on_Salt()
         {
             Assert.AreEqual("class.saltmender", session.ClassDef.id); Assert.AreEqual(Crulanda.Core.ResourceKind.Salt, session.ClassDef.resource);
-            Assert.AreEqual(12, session.Kit.ActionCount); Assert.AreEqual("Level 2", session.Kit.ActionLockLabel(Binding));
+            Assert.AreEqual(13, session.Kit.ActionCount, "with the Mending Cry (2026-10-13)"); Assert.AreEqual("Level 2", session.Kit.ActionLockLabel(Binding));
             Level(10); Assert.AreEqual("Talent", session.Kit.ActionLockLabel(Calcify));
             Assert.AreEqual(ActorLook.SaltMender, EncounterSession.LookForClass("class.saltmender"));
             yield return null;

@@ -200,7 +200,7 @@ namespace Crulanda.Encounter
         {
             ItemStyles(); var p = session.Progress; var w = CharRect; var pl = session.Player; var cls = session.ClassDef;
             Fill(new Rect(w.x - 3, w.y - 3, w.width + 6, w.height + 6), new Color(.3f, .22f, .12f, .98f)); Fill(w, new Color(.08f, .075f, .07f, .97f));
-            Shadow(new Rect(w.x + 16, w.y + 10, w.width - 32, 28), "You  ·  Level " + p.Level + " " + cls.displayName, heading, gold);
+            Shadow(new Rect(w.x + 16, w.y + 10, w.width - 32, 28), "You  ·  Level " + p.Level + " " + Races.Name(p.raceId) + " " + cls.displayName, heading, gold);
             // A standing figure in the middle, lightly tinted by what you wear.
             var mid = new Rect(w.x + 100, w.y + 64, w.width - 200, 250);
             Fill(mid, new Color(1, 1, 1, .03f));

@@ -87,7 +87,7 @@ namespace Crulanda.Encounter
             Fill(new Rect(372, 22, 290, 70), new Color(0, 0, 0, .55f));
             Portrait(new Vector2(668, 54), 74, col, s.name.Substring(0, 1), s.level.ToString());
             Shadow(new Rect(380, 24, 240, 20), s.name, frameName, col);
-            Shadow(new Rect(380, 46, 260, 20), "<" + SimRoster.ClassName(s.classId) + " " + s.level + " · " + s.folk + ">", tiny, new Color(1, .84f, .45f));
+            Shadow(new Rect(380, 46, 260, 20), "<" + Races.Name(s.Race) + " " + SimRoster.ClassName(s.classId) + " " + s.level + " · " + s.folk + ">", tiny, new Color(1, .84f, .45f));
             var body = session.FocusSimBody;
             if (member)
             {

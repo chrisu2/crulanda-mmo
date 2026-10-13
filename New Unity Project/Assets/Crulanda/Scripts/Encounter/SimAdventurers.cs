@@ -88,6 +88,7 @@ namespace Crulanda.Encounter
                 var home = Homes[band];
                 s.level = home.lo + r.NextInt(0, home.hi - home.lo + 1);
                 s.homeZone = s.zone = home.zone; s.folk = home.folk;
+                s.raceId = Races.Allows(Races.Orc, s.classId) && i % 4 == 3 ? Races.Orc : Races.For(s.classId);   // about one in four of the classes orcs play (Docs/RACES.md); by index, so the rolls (names, levels) are as before
                 string name;
                 do { name = First[r.NextInt(0, First.Length)] + " " + Bynames[r.NextInt(0, Bynames.Length)]; } while (!used.Add(name));
                 s.name = name; s.variant = r.NextInt(0, 1000); s.gearSeed = r.NextInt(0, 100000);

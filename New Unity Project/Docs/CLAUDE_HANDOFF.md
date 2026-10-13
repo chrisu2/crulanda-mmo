@@ -21,6 +21,16 @@
   2. Fix the compile and test failures. The new code is in `ClericKit.cs`, `ShamanKit.cs`, `Races.cs`, `RaceTests.cs` and `BalanceHarness.cs`, plus the Cleric and Shaman blocks in `Encounter.asset`. Then rerun the failing test groups alone.
   3. Read `balC` and report Cleric and Shaman DPS and HPS against the role medians and the caps. Check that the party heal rows now say "3 sims joined".
 
+## 2026-10-13, 00:03 on (Claude, Fable 5.1): pickup
+- EditMode suite in lane A: **456/460, the new code compiles.** The four failures fixed: icons for the Cleric's and Shaman's 24 abilities
+  and 115 talents (nine new motif words in make_icons.py: fire, ring, sun, cloud, fist, link, root, snow, stone), and the three rules tests
+  that counted eight classes (ten now). Rerun 26/26. Commit 05c78ff.
+- **Running (one Unity, lane A): the balance harness over all ten classes**, two at a time (`D:\crulanda-work\chainBal.ps1`, pid 24128;
+  progress in `encounter-validation\chainBal.out`, each set's CSV in `outputsalancealance-<set>.csv`). Chris, 00:11: "once you got it
+  straight i want to run dps and healing per sec on test runs to test for balance and functionality ... on all classes". When all five
+  sets are in: `python toolsalidationalance_merge.py` writes `outputsalance\BALANCE_ALL.md` (every build's DPS single and vs 3,
+  HPS, against the role medians and the caps). Then the full PlayMode suite (skip NamedLootTests), SocialPull, and the party-heal check.
+
 ## Rules (from CLAUDE.md and Chris)
 - Run Unity only in the validation lanes: lane A (`D:\crulanda-work\encounter-validation`, tests) and lane B (`encounter-validation-b`, builds and captures).
 - Never run Unity on `D:\code\mmo`.

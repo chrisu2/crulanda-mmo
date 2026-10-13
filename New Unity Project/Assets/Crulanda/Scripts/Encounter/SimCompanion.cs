@@ -489,6 +489,9 @@ namespace Crulanda.Encounter
                 foreach (var e in session.Enemies)
                     if (e != null && e.actor.IsAlive && e.Casting && e.FightingParty && e.CastProgress > .25f && Vector3.Distance(e.transform.position, transform.position) <= Reach + 1.5f)
                     {
+                        // A kick that does not take (immune, or too soon after the last) waits too (2026-10-13: it was tried again every frame,
+                        // and "Immune" stacked into a white column over the Cinder-Warden in the evening group run).
+                        nextKick = Time.time + 4;
                         if (e.Apply("silence", actor, 3) == null)
                         {
                             nextKick = Time.time + 12;

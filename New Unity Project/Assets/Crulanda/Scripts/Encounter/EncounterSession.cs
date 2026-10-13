@@ -1290,7 +1290,7 @@ namespace Crulanda.Encounter
         }
         public readonly List<string> Messages = new List<string>();
         public readonly List<CombatText> Floating = new List<CombatText>();
-        public bool InCombat { get { return FightingTarget || Enemies.Exists(e => e != null && e.FightingParty); } }   // a sim's fight elsewhere is not yours
+        public bool InCombat { get { return FightingTarget || Enemies.Exists(e => e != null && e.FightingParty) || TrainingBusy; } }   // a sim's fight elsewhere is not yours
         public int WeaponDamage { get { return Player == null ? 0 : Player.Stats.GetRounded(StatType.AttackPower); } }
         float nextSwing, nextRegen, nextSave;
         EncounterSave saves;
@@ -1469,7 +1469,7 @@ namespace Crulanda.Encounter
                 else if (spawn.veteran) a.Stats.SetBase(StatType.MaxHealth, content.veteranHealth);
                 if (Progress.FindEnemy(spawn.id).dead) enemy.RestoreDead();
             }
-            SpawnCamps(); SpawnGame();
+            SpawnCamps(); SpawnGame(); SpawnTrainingField();
             restoring = false;
         }
         struct EnemySpawn { public string id, name; public Vector3 point; public bool veteran; public ActorLook look; public int level; }
@@ -1735,7 +1735,7 @@ namespace Crulanda.Encounter
             bool marking = EncounterInput.Sneak;   // Ctrl+1-4: raid marks on your target (CC step C3); Ctrl alone still sneaks
             for (int slot = 0; slot < (marking ? 4 : ActionCount); slot++)
                 if (!BuildOpen && slot < 13 && EncounterInput.Press(EncounterInput.SlotKey(slot))) { if (marking) MarkTarget((RaidMark)((slot + 1) % 4)); else UseAbility(slot); }
-            Kit.Tick(InCombat); Meter.Tick(InCombat, Time.deltaTime); TickDuo(); TendSpirit();
+            Kit.Tick(InCombat); Meter.Tick(InCombat, Time.deltaTime); TickDuo(); TendSpirit(); TendTraining();
             if (AutoAttack && !Kit.MeleeAutoAttacks && !Kit.RangedAutoAttacks) AutoAttack = false;
             // The swing in melee, or the bow's auto-shot at its range (the Ranger: ClassKit.RangedAutoAttacks).
             if (AutoAttack && Target != null && Target.actor.IsAlive && Time.time >= nextSwing && Distance(Target) < Kit.AutoAttackRange && !PlayerStunned && !PlayerDisarmed)
@@ -1753,17 +1753,17 @@ namespace Crulanda.Encounter
             Floating.RemoveAll(f => f.expires < Time.time);
         }
         public float Distance(EncounterEnemy enemy) { return Vector3.Distance(Player.transform.position, enemy.transform.position); }
-        public void Select(EncounterEnemy enemy) { Target = enemy; AutoAttack = false; if (enemy != null) { FocusVillager = null; FocusMira = false; FocusSimId = null; } }
+        public void Select(EncounterEnemy enemy) { Target = enemy; AutoAttack = false; if (enemy != null) { FocusVillager = null; FocusMira = false; FocusSimId = null; FocusMending = false; } }
         // ---------- friendly target (left-click a villager or Mira) ----------
         /// <summary>The villager you clicked (null = none). E talks to the selected friend first when they are in reach.</summary>
         public Villager FocusVillager { get; private set; }
         public bool FocusMira { get; private set; }
-        public bool HasFriendlyFocus { get { return FocusMira || (FocusVillager != null && FocusVillager.Visible) || FocusSimBody != null; } }
-        public string FocusName { get { return FocusMira ? "Mira" : FocusVillager != null ? FocusVillager.Name : FocusSim?.name; } }
-        public Vector3 FocusPosition { get { var sb = FocusSimBody; return FocusMira && Companion != null ? Companion.transform.position : FocusVillager != null ? FocusVillager.transform.position : sb != null ? sb.position : Vector3.zero; } }
+        public bool HasFriendlyFocus { get { return FocusMending || FocusMira || (FocusVillager != null && FocusVillager.Visible) || FocusSimBody != null; } }
+        public string FocusName { get { return FocusMending ? "Mending dummy" : FocusMira ? "Mira" : FocusVillager != null ? FocusVillager.Name : FocusSim?.name; } }
+        public Vector3 FocusPosition { get { if (FocusMending && MendingDummy != null) return MendingDummy.transform.position; var sb = FocusSimBody; return FocusMira && Companion != null ? Companion.transform.position : FocusVillager != null ? FocusVillager.transform.position : sb != null ? sb.position : Vector3.zero; } }
         public void SelectFriendly(Villager v, bool mira)
         {
-            FocusVillager = mira ? null : v; FocusMira = mira; FocusSimId = null;
+            FocusVillager = mira ? null : v; FocusMira = mira; FocusSimId = null; FocusMending = false;
             if (mira || v != null) { Target = null; AutoAttack = false; }
         }
         /// <summary>
@@ -1790,6 +1790,8 @@ namespace Crulanda.Encounter
             if (SimPopulation.Active != null) foreach (var f in SimPopulation.Active.Figures) if (f != null && !f.Hidden && Hit(f.transform.position, .95f, out float sd) && sd < best) { best = sd; simPick = f.sim.id; }
             foreach (var c in PartySims) if (c != null && Hit(c.transform.position, .95f, out float cd) && cd < best) { best = cd; simPick = c.sim.id; }
             if (simPick != null) { SelectSim(simPick); return; }
+            // The mending dummy (the training field): nearer than anyone else under the pointer.
+            if (MendingDummy != null && Hit(MendingDummy.transform.position, .95f, out float dd) && dd < best) { SelectMending(); return; }
             SelectFriendly(pick, mira);
         }
         /// <summary>Who E would talk to: the selected friend when in reach, otherwise the nearest of Mira and the villagers. In reach

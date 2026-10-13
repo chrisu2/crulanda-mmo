@@ -1134,6 +1134,8 @@ namespace Crulanda.World
                     case "well": Well(t, p.variant); break;
                     case "coop": Coop(t, string.IsNullOrEmpty(p.name) ? "Hen coop" : p.name); break;
                     case "forge": Forge(t); break;
+                    case "training_dummy": TrainingDummyProp(t, false); break;   // the training field (EncounterSession.Training)
+                    case "mending_dummy": TrainingDummyProp(t, true); break;
                     case "stall": Stall(t, p.variant); break;
                     case "oven": Oven(t); break;
                     case "tannery": Tannery(t); break;

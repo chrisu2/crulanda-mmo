@@ -302,6 +302,7 @@ namespace Crulanda.Encounter
             yield return s.Player;
             if (s.Progress.recruited && s.Companion != null) yield return s.Companion.actor;
             foreach (var c in s.PartySims) if (c != null && c.actor != null) yield return c.actor;
+            foreach (var d in s.Healables()) yield return d;   // the training field's mending dummy, while you are near (EncounterSession.Training)
         }
         /// <summary>The most hurt living party member within <paramref name="reach"/> of you (you, if nobody is hurt).</summary>
         public Actor MostHurt(float reach)

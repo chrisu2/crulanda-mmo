@@ -79,6 +79,7 @@ namespace Crulanda.Encounter
             yield return s.Player;
             if (s.Progress.recruited && s.Companion != null) yield return s.Companion.actor;
             foreach (var c in s.PartySims) if (c != null && c.actor != null) yield return c.actor;
+            foreach (var d in s.Healables()) yield return d;   // the training field's mending dummy, while you are near (EncounterSession.Training)
         }
         static readonly Color SaltWhite = new Color(.95f, .95f, .9f);
 

@@ -109,6 +109,7 @@ namespace Crulanda.Encounter
             yield return s.Player;
             if (s.Progress.recruited && s.Companion != null) yield return s.Companion.actor;
             foreach (var c in s.PartySims) if (c != null && c.actor != null) yield return c.actor;
+            foreach (var d in s.Healables()) yield return d;   // the training field's mending dummy, while you are near (EncounterSession.Training)
         }
         Actor MostHurt()
         {
@@ -141,6 +142,7 @@ namespace Crulanda.Encounter
                 }
                 if (s.Progress.recruited && s.Companion != null) Consider(s.Companion.actor);
                 foreach (var c in s.PartySims) if (c != null) Consider(c.actor);
+                foreach (var d in s.Healables()) Consider(d);   // the training field's mending dummy
                 return best;
             }
         }

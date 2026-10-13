@@ -133,6 +133,7 @@ namespace Crulanda.Encounter
             yield return s.Player;
             if (s.Progress != null && s.Progress.recruited && s.Companion != null && s.Companion.gameObject.activeInHierarchy) yield return s.Companion.actor;
             foreach (var c in s.PartySims) if (c != null && c.actor != null) yield return c.actor;
+            foreach (var d in s.Healables()) yield return d;   // the training field's mending dummy, while you are near (EncounterSession.Training)
         }
         Actor MostHurt()
         {

@@ -33,7 +33,7 @@ namespace Crulanda.Encounter
         }
         public bool InParty(string simId) { return PartySims.Exists(x => x != null && x.sim.id == simId); }
         public SimCompanion PartySim(string simId) { return PartySims.Find(x => x != null && x.sim.id == simId); }
-        public void SelectSim(string simId) { FocusSimId = simId; if (simId != null) { FocusVillager = null; FocusMira = false; Target = null; AutoAttack = false; } }
+        public void SelectSim(string simId) { FocusSimId = simId; if (simId != null) { FocusVillager = null; FocusMira = false; FocusMending = false; Target = null; AutoAttack = false; } }
 
         /// <summary>Why this sim would not join (null: it will).</summary>
         public string InviteRefusal(SimAdventurer s)

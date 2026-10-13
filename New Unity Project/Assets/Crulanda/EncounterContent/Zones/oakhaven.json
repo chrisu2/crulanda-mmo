@@ -1459,6 +1459,15 @@
       },
       "radius": 14,
       "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "Training field",
+      "text": "Straw for blades, bandages for prayers: somewhere to try a build before the road does.",
+      "at": {
+        "x": 22,
+        "y": -40
+      },
+      "radius": 6
     }
   ],
   "props": [
@@ -3622,6 +3631,24 @@
         "y": 137
       },
       "rotation": 45
+    },
+    {
+      "kind": "training_dummy",
+      "name": "Training dummy",
+      "at": {
+        "x": 20,
+        "y": -40
+      },
+      "rotation": 300
+    },
+    {
+      "kind": "mending_dummy",
+      "name": "Mending dummy",
+      "at": {
+        "x": 25,
+        "y": -41
+      },
+      "rotation": 300
     }
   ],
   "groves": [

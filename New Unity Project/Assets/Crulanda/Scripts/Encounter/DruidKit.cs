@@ -313,6 +313,7 @@ namespace Crulanda.Encounter
                 }
                 if (s.Progress.recruited && s.Companion != null) Consider(s.Companion.actor);
                 foreach (var c in s.PartySims) if (c != null) Consider(c.actor);
+                foreach (var d in s.Healables()) Consider(d);   // the training field's mending dummy
                 return best;
             }
         }

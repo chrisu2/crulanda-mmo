@@ -57,6 +57,7 @@ namespace Crulanda.Encounter
         /// <summary>Target frame for a clicked villager or Mira: green ring, name, trade, and what E will do.</summary>
         void DrawFriendFrame()
         {
+            if (session.FocusMending && session.MendingDummy != null) { DrawMendingFrame(session.MendingDummy); return; }
             var sim = session.FocusSim;
             if (sim != null && session.FocusVillager == null && !session.FocusMira) { DrawSimFrame(sim); return; }
             var v = session.FocusVillager; string name = session.FocusName; if (name == null) return;
@@ -81,6 +82,15 @@ namespace Crulanda.Encounter
         }
 
         /// <summary>A sim you clicked (Phase 5.2b): name in the class's colour, class, level and folk, and Invite (or Leave party).</summary>
+        /// <summary>The training field's mending dummy: its health, and what it is for.</summary>
+        void DrawMendingFrame(Crulanda.Gameplay.Actor a)
+        {
+            Fill(new Rect(372, 22, 290, 70), new Color(0, 0, 0, .55f));
+            Portrait(new Vector2(668, 54), 74, new Color(.35f, .8f, .4f), "M", a.Level.ToString());
+            Shadow(new Rect(380, 24, 240, 20), "Mending dummy", frameName, new Color(.55f, 1, .55f));
+            UnitBar(new Rect(378, 45, 244, 18), a.Health.Pool.Ratio, HealthGreen, a.Health.Pool.Current + " / " + a.Health.Pool.Max);
+            Shadow(new Rect(380, 66, 280, 20), "Heal it: loses 4% a second while you are near  ·  /meter", tiny, Color.white);
+        }
         void DrawSimFrame(SimAdventurer s)
         {
             var col = ClassColour(s.classId); bool member = session.InParty(s.id);

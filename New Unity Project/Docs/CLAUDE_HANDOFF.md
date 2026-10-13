@@ -61,6 +61,18 @@ further down this section are from the night of Oct 12 and are history: those ru
   (`EncounterSession.Spread.cs`) to x1.7 against three, and the spirits so pet and player land on 62-72; report the table and the tank
   ranking to Chris; show him the training field in a build (republish only with his OK).
 
+- **2026-10-13, 12:42 on (Claude, after the restart):** chainR12 failed to compile (a comment had swallowed the end of a harness line);
+  fixed. Then the harness itself was found unfair, four ways (BALANCE_REPORT.md round 6): the test scene's other sentries took the area
+  spells (single-target numbers padded), the dummies were re-picked each fight (once off the navmesh: the Druid cast nothing), the
+  spread cache never switched on, the tank test hit for a flat 40 with threat piling up. All fixed; the honest table at 13:23 (27 of 40
+  in range), the tank ranking (Warrior, Shaman Stonebound, Druid Barkhide, Mason, Paladin Oathguard), the retune applied (d2a4880).
+  EditMode 461/462 (WorkshopDataTests insisted on "the last six" props; now the append rule, 37106f1). TrainingFieldTests 3/3. The
+  13:27 training frames (`D:\crulanda-work\ui-captures\training-20261013-1327`) showed the training dummy's nameplate floating off its
+  model (its agent snapped it away) and the HUD cut off under the saved layout: each dummy's look now on its own actor, the capture
+  frames the HUD (37106f1, 740f779).
+  **Running:** chainR17 (the confirm balance run of the retune), then chainR18 (EditMode, TrainingFieldTests, a fresh lane B build, the
+  training frames again). Then: report the confirmed table to Chris; his design question on the single-target builds with area spells.
+
 ## Rules (from CLAUDE.md and Chris)
 - Run Unity only in the validation lanes: lane A (`D:\crulanda-work\encounter-validation`, tests) and lane B (`encounter-validation-b`, builds and captures).
 - Never run Unity on `D:\code\mmo`.

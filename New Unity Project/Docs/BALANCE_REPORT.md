@@ -359,3 +359,9 @@ band; the Paladin no longer leads any.
 
 Open for Chris: a party target for healers. The Paladin, Salt-Mender and the Cantor heal one at a time and leave a party low; they need a
 group heal of their own, or the party test needs its own band.
+
+## Chris, 2026-10-13 ~14:25 (briefs, verbatim)
+
+"looks good except target should all be facing with back to fence." (the training yard)
+"yes give a slower group heal" (answer to: should every healer also meet a party target; the Paladin's Sanctuary, the Salt-Mender's Mender
+and the Archivist's Cantor heal one at a time and leave a party of five low)

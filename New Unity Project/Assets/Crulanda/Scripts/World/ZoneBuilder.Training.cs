@@ -54,7 +54,9 @@ namespace Crulanda.World
             for (int i = 0; i < dummies.Length; i++) GroundProp(t, dummies[i], new Vector3(-hx + 1.6f, 0, -1.6f + i * 2.2f), 90, dummies[i].StartsWith("SmallProps") ? 1.8f : 1.9f, true);
             // Archery butts down the right, facing in.
             string[] butts = { "SmallProps/PracticeTarget_1_A", "SmallProps/PracticeTarget_2_A", "Megapack/Models/Arrow Target", "SmallProps/PracticeTarget_1_B" };
-            for (int i = 0; i < butts.Length; i++) GroundProp(t, butts[i], new Vector3(hx - 1.4f, 0, 1.0f + i * 1.9f), -90, 1.7f, true);   // their lanes clear of the healer's corner
+            // Each faces into the yard, its back to the fence (Chris, 14:25). The pack's butts are made facing along their own x, the
+            // Megapack's along its z (read from their shapes: the face's thin axis, the legs behind it), so they turn differently.
+            for (int i = 0; i < butts.Length; i++) GroundProp(t, butts[i], new Vector3(hx - 1.4f, 0, 1.0f + i * 1.9f), butts[i].StartsWith("SmallProps") ? 180 : -90, 1.7f, true);   // their lanes clear of the healer's corner
             // Weapon stands by the left tent and against the back fence (the Fantasy peg rack is a wall board 35 cm high: it came in lying flat
             // and seventeen times too big, the 14:12 frame's "giant beams").
             GroundProp(t, "Fantasy/WeaponStand", new Vector3(-hx + 1.3f, 0, -hz + 5.6f), 90, 1.6f, true);

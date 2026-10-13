@@ -60,6 +60,11 @@ namespace Crulanda.Encounter
         public List<string> keys = new List<string>();
         /// <summary>The spirit stones touched (ZoneInteractable.Key): where you wake in that zone after a fall (D3).</summary>
         public List<string> spiritStones = new List<string>();
+        /// <summary>The chosen action bar (ActionBarRules; Docs/ACTION_BAR.md): book keys, "" for an empty slot. Within format 10: a save
+        /// without it loads with the default ten.</summary>
+        public List<string> bar = new List<string>();
+        /// <summary>Bar slots bought with alternate advancement points past the level cap (0-4).</summary>
+        public int aaSlots;
         // ---------- quests (save format 4; older saves load with these empty) ----------
         public List<QuestState> quests = new List<QuestState>();
         public List<string> questsDone = new List<string>();
@@ -73,11 +78,6 @@ namespace Crulanda.Encounter
         // ---------- discoveries (save format 7; older saves load with this empty) ----------
         /// <summary>Hidden finds already found, by id ("secret.&lt;zone&gt;.&lt;slug&gt;"): each pays out once, ever. See DiscoveryLog.</summary>
         public List<string> discoveries = new List<string>();
-        /// <summary>The chosen action bar (ActionBarRules; Docs/ACTION_BAR.md): book keys, "" for an empty slot. Within format 10: a save
-        /// without it loads with the default ten.</summary>
-        public List<string> bar = new List<string>();
-        /// <summary>Bar slots bought with alternate advancement points past the level cap (0-4).</summary>
-        public int aaSlots;
         // ---------- trades (save format 8; older saves load with both empty) ----------
         /// <summary>Trades learned and the skill in each (1-100): gathering skills, Cooking and crafts. See ProfessionLog.</summary>
         public List<ProfessionSkill> professions = new List<ProfessionSkill>();

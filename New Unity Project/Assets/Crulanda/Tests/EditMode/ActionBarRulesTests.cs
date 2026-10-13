@@ -29,11 +29,14 @@ namespace Crulanda.Tests
         }
         [Test] public void The_players_choices_are_kept_and_an_unlocked_ability_takes_a_locked_slot()
         {
-            var chosen = new List<string> { "a5", "a0", "c0", "a3", "", "", "", "", "", "" };
-            var bar = ActionBarRules.Reconcile(chosen, Book(6, 2), 10);
-            Assert.AreEqual("a5", bar[0]); Assert.AreEqual("a0", bar[1]); Assert.AreEqual("a3", bar[3], "the player's order stays");
-            Assert.IsFalse(bar.Contains("c0"), "a slot holding something not yet yours gives way when there is something yours");
-            CollectionAssert.IsSubsetOf(new[] { "a1", "a2", "a4" }, bar, "the empty slots fill with what is yours");
+            // Empty slots take what is yours first (a full bar of ten has room, so c0 may stay)...
+            var roomy = ActionBarRules.Reconcile(new List<string> { "a5", "a0", "c0", "a3", "", "", "", "", "", "" }, Book(6, 2), 10);
+            Assert.AreEqual("a5", roomy[0]); Assert.AreEqual("a0", roomy[1]); Assert.AreEqual("a3", roomy[3], "the player's order stays");
+            CollectionAssert.IsSubsetOf(new[] { "a1", "a2", "a4" }, roomy, "the empty slots fill with what is yours");
+            // ...and on a bar with no room, a slot holding something not yet yours gives way to something that is.
+            var tight = ActionBarRules.Reconcile(new List<string> { "a5", "a0", "c0", "a3" }, Book(6, 2), 4);
+            Assert.IsFalse(tight.Contains("c0")); Assert.AreEqual("a1", tight[2], "in the locked one's place");
+            Assert.AreEqual("a5", tight[0]); Assert.AreEqual("a3", tight[3]);
         }
         [Test] public void A_key_the_book_no_longer_has_is_emptied_and_refilled()
         {

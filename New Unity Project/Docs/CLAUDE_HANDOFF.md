@@ -1,6 +1,8 @@
 # Crulanda: Claude handoff (rewritten 2026-10-12 23:59 ET; covers Grok Bot's work on Oct 11-12)
 
 ## Start here
+
+**UPDATE 2026-10-13 12:05 AM ET: all test runs were STOPPED by Chris's request.** suiteQ and chainR (editR, socialR, balC) did not finish, so no results exist. Keep-awakes 19320/26952 are stopped too. **Claude's first job:** in a validation lane (never D:\code\mmo), run the EditMode suite first (this is the first compile of the Cleric, Shaman and race code) and fix any compile errors. Then run the full PlayMode suite (skip NamedLootTests), the SocialPull rerun, and the Cleric/Shaman balance and party-heal runs. Report pass/fail counts to Chris. Ignore any older text below that says these are running.
 - **Branch:** `feet-bow-adit-kit`, PR #2. Do not merge it, and do not publish, without Chris.
 - **Published build:** commit 8dbb69d, published at 1:42 PM on Oct 12. Everything after that is committed and pushed but not published.
 - **Save backups:**

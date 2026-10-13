@@ -25,7 +25,7 @@ namespace Crulanda.Tests
     [Explicit("long: the balance harness, run by name"), Category("Balance")]
     public class BalanceHarness
     {
-        public static float FightSeconds = 90; public static int Seeds = 3; public static float Step = .05f;   // game seconds a frame (Time.captureDeltaTime): as fast as the editor runs, the same steps every run
+        public static float FightSeconds = 180; public static int Seeds = 3;   // three minutes: long enough to average the cooldown cycles (the training-dummy practice Chris pointed to, 2026-10-13); was 90 public static float Step = .05f;   // game seconds a frame (Time.captureDeltaTime): as fast as the editor runs, the same steps every run
         static readonly string[] AllClasses = { "class.warrior", "class.druid", "class.paladin", "class.ranger", "class.mage", "class.rogue", "class.archivist", "class.saltmender", "class.cleric", "class.shaman" };
         /// <summary>CRULANDA_BALANCE_CLASSES=mage,archivist runs those only (about two a chunk); each set writes its own balance-<set>.csv.</summary>
         static string[] Classes { get { var f = Environment.GetEnvironmentVariable("CRULANDA_BALANCE_CLASSES"); if (string.IsNullOrEmpty(f)) return AllClasses;
@@ -55,7 +55,7 @@ namespace Crulanda.Tests
                 if (s == null || s.Kit == null) { csv.Add(cls + ",LOAD FAILED,,,,,,,,,,"); continue; }
                 if (s.Companion != null) s.Companion.gameObject.SetActive(false);
                 s.Progress.experience = EncounterProgress.XpForLevel(15); s.Player.SetLevel(15);   // the gear asks for the level
-                string gear = Gear(); csv.Add("# " + cls + " gear: " + gear);
+                string gear = Gear(); csv.Add("# " + cls + " gear: " + gear); if (cls == Classes[0]) csv.Add("# " + DummyNote);
                 foreach (var branch in s.Talents.Branches.ToList())
                     for (int seed = 0; seed < Seeds; seed++)
                     {
@@ -204,10 +204,26 @@ namespace Crulanda.Tests
                 foreach (var id in ids) if (s.Talents.Propose(s.Progress, id, 1, out var next, out _)) s.Progress.talents = next;
             s.Kit.ApplyStats();
         }
+        /// <summary>A test dummy (Chris, 2026-10-13: "create test dummies to test the dps ... so there are no variables in the mobs"): whatever
+        /// mob stood there, now level 15, no armour, not an elite, five million health, no blows and no moving.</summary>
+        public const int DummyLevel = 15, DummyArmour = 0; public const string DummyNote = "dummies: level 15, armour 0, 5,000,000 health, no blows; the wounded dummy: Mira at 3,000 health losing 4% a second";
         static void Dummy(EncounterEnemy e)
         {
             e.enabled = false; var a = e.GetComponent<UnityEngine.AI.NavMeshAgent>(); if (a != null && a.isOnNavMesh) a.isStopped = true;
+            e.Elite = false; e.actor.SetLevel(DummyLevel); e.actor.Stats.SetBase(Crulanda.Core.StatType.Armor, DummyArmour);
             e.actor.Health.Pool.SetMax(5000000, false); e.actor.Health.Pool.SetCurrent(5000000);
+        }
+        /// <summary>The wounded dummy for the heal test ("wounded test dummies for the heal test"): Mira, a party member the kits mend, standing
+        /// still, doing nothing, at 3,000 health; the harness wounds her 4% a second.</summary>
+        public const int WoundedHealth = 3000; public const float WoundShare = .04f;
+        HealerCompanion WoundedDummy()
+        {
+            var m = s.Companion; if (m == null) return null;
+            s.Progress.recruited = true; m.gameObject.SetActive(true); m.MatchLevel(15); m.enabled = false;
+            var ag = m.GetComponent<UnityEngine.AI.NavMeshAgent>(); if (ag != null && ag.isOnNavMesh) ag.isStopped = true;
+            m.actor.Stats.SetBase(Crulanda.Core.StatType.MaxHealth, WoundedHealth); if (!m.actor.IsAlive) m.actor.Health.Revive(WoundedHealth); m.actor.Health.Pool.Fill();
+            var at = s.Player.transform.position + s.Player.transform.forward * 2.5f; if (ag != null && ag.isOnNavMesh) ag.Warp(at); else m.transform.position = at;
+            return m;
         }
         IEnumerator Fight(string cls, TalentBranchData branch, string role, string scenario, int seed, int targets)
         {
@@ -227,6 +243,7 @@ namespace Crulanda.Tests
             }
             motor.Teleport(at + Vector3.back * 2.4f + Vector3.up * .5f); s.Player.transform.rotation = Quaternion.LookRotation(Vector3.forward);
             if (targets > 0) s.Select(foes[0]); else s.Select(null);
+            var wounded = targets == 0 ? WoundedDummy() : null;
             yield return null;
             var used1 = new HashSet<string>();
             { int form = SlotOf((cls == "class.druid" ? "druid." : "") + branch.id);   // the build's form, retried until it holds (a shift on the GCD failed and left the last build's form on)
@@ -249,7 +266,8 @@ namespace Crulanda.Tests
             {
                 yield return null; float dt = Time.deltaTime; t += dt;
                 if (targets > 0 && (s.Target == null || !s.Target.actor.IsAlive)) { var f = foes.FirstOrDefault(x => x != null && x.actor.IsAlive); if (f != null) s.Select(f); }
-                if (targets == 0) { hurt += dt; if (hurt >= 1) { hurt -= 1; s.Player.Health.ApplyDamage(Mathf.Min(s.Player.Health.Pool.Current - 1, Mathf.RoundToInt(s.Player.Health.Pool.Max * .04f))); } }
+                if (targets == 0 && wounded != null) { hurt += dt; if (hurt >= 1) { hurt -= 1; wounded.actor.Health.ApplyDamage(Mathf.Min(wounded.actor.Health.Pool.Current - 1, Mathf.RoundToInt(wounded.actor.Health.Pool.Max * WoundShare))); } }
+                else if (targets == 0) { hurt += dt; if (hurt >= 1) { hurt -= 1; s.Player.Health.ApplyDamage(Mathf.Min(s.Player.Health.Pool.Current - 1, Mathf.RoundToInt(s.Player.Health.Pool.Max * WoundShare))); } }   // no Mira in the scene: you
                 if (s.Player.Health.Pool.Current < s.Player.Health.Pool.Max * .3f && targets > 0) s.Player.Health.Pool.Fill();
                 if (!s.PlayerCasting)   // a cast in hand is let finish
                 foreach (int slot in order.OrderByDescending(i => targets == 0 && s.Kit.ActionAt(i) != null && s.Kit.ActionAt(i).effect == AbilityEffect.Heal ? 1 : 0).ThenByDescending(i => s.Kit.ActionAt(i) != null ? s.Kit.ActionAt(i).cooldown : 0).ThenBy(i => s.Kit.ActionAt(i) != null && cls == "class.druid" && s.Kit.ActionAt(i).cooldown <= 0 && s.Kit.ActionAt(i).effect == AbilityEffect.Damage && lastUse.TryGetValue(i, out var w) ? w : -1).ThenBy(i => order.IndexOf(i)))   // a Druid's equal fillers taken in turn (Thornsong's loop); every other kit keeps bar order (v6/v7: the turn-taking cost the casters, Mage and Archivist, most of their damage) taken in turn (a Thornsong alternates Seedshot and Thornbolt)

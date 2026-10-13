@@ -32,21 +32,34 @@ dps_median = statistics.median([t['single'] for t in table if t['role'] == 'dps'
 medians = {}
 for role in set(t['role'] for t in table):
     medians[role] = statistics.median([t['single'] for t in table if t['role'] == role])
-lines = ['# Balance, all classes (' + ', '.join(sorted(set(t["cls"] for t in table))) + ')', '',
-         'Single-target DPS, DPS against three, HPS in the heal test; seeds averaged. DPS-role median: %.1f.' % dps_median,
-         'Caps on single-target DPS as a share of the DPS median: healer 50%, control and support 75% (3 points of slack).', '',
-         '| class | build | role | DPS single | DPS vs 3 | HPS | vs role median | vs DPS median | flag |', '|---|---|---|---|---|---|---|---|---|']
-violations = []
-for t in sorted(table, key=lambda t: (t['role'], t['cls'], t['build'])):
-    med = medians.get(t['role'], 0); vs_role = (t['single'] / med - 1) if med else 0
-    share = t['single'] / dps_median if dps_median else 0
-    flag = ''
-    if t['role'] in CAPS and share > CAPS[t['role']] + SLACK: flag = '**OVER CAP** (%.0f%% of DPS median)' % (share * 100); violations.append((t, share))
-    elif abs(vs_role) > .15: flag = '**OUTLIER**'
-    if t['role'] == 'healer' and t['hps'] <= 0: flag = (flag + ' ' if flag else '') + '**NO HEALING**'
-    lines.append('| %s | %s | %s | %.1f | %.1f | %.1f | %+.0f%% | %.0f%% | %s |' % (t['cls'], t['build'], t['role'], t['single'], t['aoe'], t['hps'], vs_role * 100, share * 100, flag))
-lines += ['', 'Role medians (single DPS): ' + ', '.join('%s %.1f' % (r, m) for r, m in sorted(medians.items())),
-          'Cap violations: ' + (', '.join('%s/%s %.0f%%' % (t['cls'], t['build'], s * 100) for t, s in violations) if violations else 'none'),
+heal_median = statistics.median([t['hps'] for t in table if t['role'] == 'healer' and t['hps'] > 0]) if any(t['role'] == 'healer' and t['hps'] > 0 for t in table) else 0
+# The role each build plays, as Chris names them (2026-10-13: "designate it as tank/dps/support/healer/CC"), and its target on the fixed
+# dummies. DPS 62-72 is Chris's (2026-10-13 00:37); the others follow from the role caps on a 67 DPS middle (healer at most 50%, CC and
+# support at most 75%, 3 points of slack) and are PROPOSED until Chris settles them; tank has no rule yet.
+NAME = {'dps': 'DPS', 'tank': 'Tank', 'support': 'Support', 'healer': 'Healer', 'control': 'CC'}
+TARGET = {'dps': (62, 72), 'control': (45, 52), 'support': (45, 52), 'healer': (0, 35), 'tank': (42, 55)}
+def status(t):
+    lo, hi = TARGET.get(t['role'], (0, 1e9)); v = t['single']
+    out = 'ok' if lo <= v <= hi else ('**HIGH**' if v > hi else '**LOW**')
+    if t['role'] == 'healer':
+        if t['hps'] <= 0: out += ' **NO HEALING**'
+        elif heal_median and abs(t['hps'] / heal_median - 1) > .15: out += ' heal **%s**' % ('HIGH' if t['hps'] > heal_median else 'LOW')
+    return out
+classes = sorted(set(t['cls'] for t in table))
+lines = ['# Balance, every class and build (' + ', '.join(classes) + ')', '',
+         'Fixed dummies (level 15, no armour, no blows), 180 s fights, three seeds averaged. DPS = single target; vs 3 = three dummies;',
+         'HPS = healing a second on the wounded dummy. Targets (single-target DPS): DPS 62-72 (Chris); CC and Support 45-52, Healer at most 35,',
+         'Tank 42-55 (proposed). Healer HPS within 15%% of the healers\' median (%.1f).' % heal_median, '',
+         '| class | build | role | DPS | DPS vs 3 | HPS | target | status |', '|---|---|---|---|---|---|---|---|']
+order = {'tank': 0, 'dps': 1, 'control': 2, 'support': 3, 'healer': 4}
+counts = {}
+for t in sorted(table, key=lambda t: (t['cls'], order.get(t['role'], 9), t['build'])):
+    lo, hi = TARGET.get(t['role'], (0, 0)); st = status(t); counts[st.startswith('ok')] = counts.get(st.startswith('ok'), 0) + 1
+    tgt = ('at most %d' % hi) if lo == 0 else '%d-%d' % (lo, hi)
+    lines.append('| %s | %s | %s | %.1f | %.1f | %s | %s | %s |' % (t['cls'], t['build'], NAME.get(t['role'], t['role']), t['single'], t['aoe'],
+                 ('%.1f' % t['hps']) if t['hps'] > 0 else '-', tgt, st))
+lines += ['', 'In range: %d of %d builds.' % (counts.get(True, 0), len(table)),
+          'Role medians (single DPS): ' + ', '.join('%s %.1f' % (NAME.get(r, r), m) for r, m in sorted(medians.items())) + '; DPS median %.1f.' % dps_median,
           'Files: ' + ', '.join(os.path.basename(f) for f in files if '_TABLE' not in f)]
 open(out, 'w', encoding='utf-8').write('\n'.join(lines) + '\n')
 print('\n'.join(lines))

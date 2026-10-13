@@ -99,7 +99,7 @@ namespace Crulanda.Tests
                 s.Progress.experience = EncounterProgress.XpForLevel(15); s.Player.SetLevel(15); Gear();
                 foreach (var e in s.Enemies.ToList()) if (e != null) Dummy(e);   // no fight: the hurt is the harness's
                 s.Progress.recruited = true; if (s.Companion != null) { s.Companion.gameObject.SetActive(true); s.Companion.MatchLevel(15); }
-                var pop = SimPopulation.Active; int added = 0;
+                var pop = SimPopulation.Active; int added = 0; string diag = pop == null ? "no SimPopulation" : pop.World == null ? "no sim world" : "";
                 // Three sims put in this zone at your side and online all day (the test scene has none standing about), then invited as
                 // returning members, the way a saved party comes back (SimPopulation.RestoreParty). Not healers: the healing is the build's.
                 if (pop != null && pop.World != null)
@@ -113,9 +113,11 @@ namespace Crulanda.Tests
                         sim.zone = pop.ZoneId; sim.x = at.x; sim.z = at.z; sim.onlineFrom = 0; sim.onlineHours = 24;
                     }
                     pop.Refresh();
+                    for (float w0 = Time.time; Time.time - w0 < 6 && pick.Any(x => pop.Find(x.id) == null); ) { yield return new WaitForSeconds(.25f); pop.Refresh(); }   // the figures come in over frames
+                    diag = "pop ok, picked " + pick.Count + ", figures " + pick.Count(x => pop.Find(x.id) != null) + " (zone " + pop.ZoneId + ")";
                     foreach (var sim in pick) if (s.Invite(sim.id, true)) added++;
                 }
-                rows.Add("# party " + cls + " " + build + ": " + added + " sims joined: " + string.Join(" ", s.PartySims.Where(c => c != null).Select(c => c.sim.name + "(" + c.sim.classId.Replace("class.", "") + " " + c.sim.level + ")")));
+                rows.Add("# party " + cls + " " + build + ": " + added + " sims joined [" + diag + "]: " + string.Join(" ", s.PartySims.Where(c => c != null).Select(c => c.sim.name + "(" + c.sim.classId.Replace("class.", "") + " " + c.sim.level + ")")));
                 yield return null;
                 for (int seed = 0; seed < Seeds; seed++) yield return PartyFight(cls, branch, seed, rows);
                 EncounterSession.StartClassOverride = null;

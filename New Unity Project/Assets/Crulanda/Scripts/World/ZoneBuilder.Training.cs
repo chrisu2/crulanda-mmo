@@ -24,18 +24,23 @@ namespace Crulanda.World
         {
             float hx = Mathf.Max(8, size.x) / 2, hz = Mathf.Max(6, size.y) / 2, gate = 2.6f;
             float G(float x, float z) { return LocalGround(t, x, z); }
-            Transform Side(string name, float x, float z, float yaw)
+            // A closed ring of plank panels (Chris, 14:20: "area is not closed in like the pictures i sent you"; the rail fence read as open):
+            // the Megapack's fence panels (3.56 m long, 1.56 m high as made) fitted end to end, about 3 m apart, 1.3 m high, solid; the only
+            // gap is the gate.
+            int panel = 0;
+            void Panels(float x0, float z0, float x1, float z1)
             {
-                var side = new GameObject(name).transform; side.SetParent(t, false); side.localPosition = new Vector3(x, G(x, z), z); side.localRotation = Quaternion.Euler(0, yaw, 0);
-                return side;
+                float dx = x1 - x0, dz = z1 - z0, len = Mathf.Sqrt(dx * dx + dz * dz); if (len < .5f) return;
+                int n = Mathf.Max(1, Mathf.RoundToInt(len / 3f)); float seg = len / n, yaw = Mathf.Atan2(-dz, dx) * Mathf.Rad2Deg;
+                for (int i = 0; i < n; i++)
+                {
+                    float f = (i + .5f) / n, x = x0 + dx * f, z = z0 + dz * f;
+                    ModelProp(t, panel++ % 2 == 0 ? "Megapack/Models/Fence_1_1" : "Megapack/Models/Fence_1_2", new Vector3(x, G(x, z), z), yaw, 1.3f, true, null, new Vector3(seg, 1.3f, .12f));
+                }
             }
-            // The fence, with the gate in the front.
-            Fence(Side("Yard fence, back", 0, -hz, 0), 2 * hx);
-            Fence(Side("Yard fence, left", -hx, 0, 90), 2 * hz);
-            Fence(Side("Yard fence, right", hx, 0, 90), 2 * hz);
-            float front = hx - gate;
-            Fence(Side("Yard fence, front left", -(gate + front / 2), hz, 0), front);
-            Fence(Side("Yard fence, front right", gate + front / 2, hz, 0), front);
+            Panels(-hx, -hz, hx, -hz);                       // back
+            Panels(-hx, -hz, -hx, hz); Panels(hx, -hz, hx, hz);   // sides
+            Panels(-hx, hz, -gate, hz); Panels(gate, hz, hx, hz); // front, either side of the gate
             // Two tents at the back, their open sides to the yard.
             GroundProp(t, "Megapack/Models/Tent_1", new Vector3(-hx + 3.4f, 0, -hz + 2.8f), 180, 3.0f, true);
             GroundProp(t, "Megapack/Models/Tent_1", new Vector3(hx - 3.4f, 0, -hz + 2.8f), 180, 3.0f, true);

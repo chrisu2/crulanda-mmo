@@ -27,6 +27,21 @@ namespace Crulanda.World
             { "Fantasy/Barrel", new Vector3(-90, 0, 0) }, { "Fantasy/Stool", new Vector3(-90, 0, 0) }, { "Fantasy/Chandelier", new Vector3(-90, 0, 0) },
             { "Fantasy/Dummy", new Vector3(-90, 0, 0) }, { "Fantasy/Banner_1", new Vector3(-90, 0, 0) }, { "Fantasy/CandleStick", new Vector3(0, 0, -90) },
             { "Medieval/Prefabs/CandleV1", new Vector3(-90, 0, 0) },
+            // The Small Props Pack's "Unity FBX" models stand on their heads: their vertices are the glTF copies' turned half round X (read
+            // 2026-10-13 after Chris: "two archer targets upside down", "two dummies upside down"); only PracticeTarget_1_B is upright.
+            { "SmallProps/Basin_A", new Vector3(180, 0, 0) },
+            { "SmallProps/Bucket_1_A", new Vector3(180, 0, 0) },
+            { "SmallProps/Hammer_1_A", new Vector3(180, 0, 0) },
+            { "SmallProps/Manequin_1_A_001", new Vector3(180, 0, 0) },
+            { "SmallProps/Manequin_1_A_002", new Vector3(180, 0, 0) },
+            { "SmallProps/Manequin_2_A_001", new Vector3(180, 0, 0) },
+            { "SmallProps/Manequin_2_A_002", new Vector3(180, 0, 0) },
+            { "SmallProps/PracticeTarget_1_A", new Vector3(180, 0, 0) },
+            { "SmallProps/PracticeTarget_1_C", new Vector3(180, 0, 0) },
+            { "SmallProps/PracticeTarget_2_A", new Vector3(180, 0, 0) },
+            { "SmallProps/PracticeTarget_2_B", new Vector3(180, 0, 0) },
+            { "SmallProps/PracticeTarget_2_C", new Vector3(180, 0, 0) },
+            { "SmallProps/Stool_A", new Vector3(180, 0, 0) },
         };
 
         /// <summary>

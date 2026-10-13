@@ -298,15 +298,21 @@ namespace Crulanda.Encounter
         }
 
         // ---------- Rootmend ----------
-        /// <summary>Lowest-health living party member within heal range (you or recruited Mira).</summary>
+        /// <summary>Lowest-health living party member within heal range: you, recruited Mira or a sim in your party.</summary>
         public Actor HealTarget
         {
             get
             {
-                Actor best = s.Player;
-                if (s.Progress.recruited && s.Companion != null && s.Companion.actor.IsAlive &&
-                    Vector3.Distance(s.Player.transform.position, s.Companion.transform.position) <= HealRange &&
-                    s.Companion.actor.Health.Pool.Ratio < s.Player.Health.Pool.Ratio) best = s.Companion.actor;
+                // The whole party, the sims too (2026-10-13, the party heal test: only you and Mira were ever healed, so a party of
+                // five spent half the fight low under this healer while the Cleric and Shaman kept everyone up).
+                Actor best = s.Player; float low = s.Player.Health.Pool.Ratio;
+                void Consider(Actor who)
+                {
+                    if (who != null && who.IsAlive && who.Health.Pool.Ratio < low && Vector3.Distance(s.Player.transform.position, who.transform.position) <= HealRange)
+                    { best = who; low = who.Health.Pool.Ratio; }
+                }
+                if (s.Progress.recruited && s.Companion != null) Consider(s.Companion.actor);
+                foreach (var c in s.PartySims) if (c != null) Consider(c.actor);
                 return best;
             }
         }

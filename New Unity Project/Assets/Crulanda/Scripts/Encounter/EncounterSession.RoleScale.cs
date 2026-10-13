@@ -16,7 +16,7 @@ namespace Crulanda.Encounter
         public static readonly Dictionary<string, float> BuildDamageScale = new Dictionary<string, float>
         {
             // DPS toward the median
-            { "class.ranger/marksman", 0.64f }, { "class.druid/thornclaw", 0.74f }, { "class.ranger/skirmisher", 0.75f }, { "class.paladin/judicator", 0.8f },
+            { "class.ranger/marksman", 0.64f }, { "class.druid/thornclaw", 0.74f }, { "class.ranger/skirmisher", 0.75f }, { "class.paladin/judicator", 0.64f },
             { "class.mage/combustion", 1.65f }, { "class.druid/thornsong", 2.1f }, { "class.archivist/the-unwriting", 2.4f },
             // under the role caps
             { "class.ranger/pathfinder", .60f }, { "class.rogue/thiefs-grace", .82f }, { "class.rogue/swashbuckler", .72f }, { "class.paladin/vanguard", .92f },
@@ -31,6 +31,10 @@ namespace Crulanda.Encounter
             { "class.saltmender/mason", 1.25f },   // 2026-10-13 fixed-dummy retune
             { "class.saltmender/salt-speaker", 1.27f },   // 2026-10-13 fixed-dummy retune
             { "class.warrior/dps", 0.92f },   // 2026-10-13 fixed-dummy retune
+            { "class.cleric/censure", 1.68f },   // 2026-10-13 fixed-dummy retune
+            { "class.cleric/warden", 2.32f },   // 2026-10-13 fixed-dummy retune
+            { "class.shaman/gravewind", 1.15f },   // 2026-10-13 fixed-dummy retune
+            { "class.shaman/stormcaller", 1.67f },   // 2026-10-13 fixed-dummy retune
         };
         /// <summary>The same for the build's companion (Ranger pet, thrall): only the pet builds are scaled.</summary>
         public static readonly Dictionary<string, float> BuildPetDamageScale = new Dictionary<string, float> { { "class.ranger/beastbond", 0.7f }, { "class.mage/bonecaller", 1.6f }, { "class.ranger/pathfinder", .5f } };
@@ -47,7 +51,7 @@ namespace Crulanda.Encounter
         public static readonly Dictionary<string, float> BuildHealScale = new Dictionary<string, float>
         {
             { "class.druid/rootmend", 2.8f },
-            { "class.archivist/the-cantor", 0.38f },   // 2026-10-13 fixed-dummy retune
+            { "class.archivist/the-cantor", 0.16f },   // 2026-10-13 fixed-dummy retune
             { "class.paladin/sanctuary", 0.83f },   // 2026-10-13 fixed-dummy retune
         };
         public float PlayerHealScale { get { var lead = LeadBuild; return lead != null && BuildHealScale.TryGetValue(lead, out var v) ? v : 1; } }

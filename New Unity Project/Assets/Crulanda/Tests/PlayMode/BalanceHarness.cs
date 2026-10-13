@@ -36,11 +36,13 @@ namespace Crulanda.Tests
         // Never in the rotation: forms (the build's own is taken once at the start), escapes and crowd control that would end the fight;
         // once a fight: summons and standing auras.
         static readonly HashSet<string> Never = new HashSet<string> { "druid.barkhide", "druid.thornclaw", "druid.rootmend", "druid.thornsong", "mage.unbind", "mage.quench", "mage.bind",
-            "rogue.vanish", "rogue.tumble", "rogue.sap", "rogue.blind", "ranger.disengage", "druid.sleep_of_the_wood" };
+            "rogue.vanish", "rogue.tumble", "rogue.sap", "rogue.blind", "ranger.disengage", "druid.sleep_of_the_wood",
+            "archivist.cadence", "archivist.dirge" };   // songs of pace and slowing: nothing a dummy shows, and one would replace the Song of Mending
         /// <summary>Kept up: a damage over time with no cooldown, recast when its last use is this many seconds old (2026-10-13: the Cleric's
         /// Brand costs what Rebuke costs and has no cooldown, so the rotation always reached Rebuke first and never cast it).</summary>
         static readonly Dictionary<string, float> Every = new Dictionary<string, float> { { "cleric.brand", 7.5f } };
-        static readonly HashSet<string> Once = new HashSet<string> { "mage.raise_thrall", "ranger.call_companion", "paladin.oath", "paladin.colours" };
+        static readonly HashSet<string> Once = new HashSet<string> { "mage.raise_thrall", "ranger.call_companion", "paladin.oath", "paladin.colours",
+            "archivist.song_of_mending", "salt.mender_craft" };   // 2026-10-13: the healers' songs and chants are toggles: started once (they were never started, or toggled off again)
         int SlotOf(string id) { for (int i = 0; i < s.Kit.ActionCount; i++) { var a = s.Kit.ActionAt(i); if (a != null && a.id == id) return i; } return -1; }
         string root; EncounterSession s;
         void OnLoaded(Scene scene, LoadSceneMode mode) { var x = UnityEngine.Object.FindFirstObjectByType<EncounterSession>(); if (x != null) x.SaveDirectoryOverride = root; }
@@ -160,6 +162,7 @@ namespace Crulanda.Tests
             Combatant.HealAttempted += onTry;
             var pool = s.Player.Resource.Pool; int last = pool.Current, used = 0; float t = 0, tick = 0, spike = 0, low = 0;
             var lastUse = new Dictionary<int, float>(); var slots = Enumerable.Range(0, s.Kit.ActionCount).Where(i => s.Kit.ActionAt(i) != null).ToList();
+            var sung = new HashSet<string>();   // songs and chants started (Once): never toggled off again
             Time.captureDeltaTime = Step;
             while (t < FightSeconds)
             {
@@ -170,10 +173,10 @@ namespace Crulanda.Tests
                 if (!s.PlayerCasting)
                     foreach (int slot in slots.OrderByDescending(i => s.Kit.ActionAt(i).effect == AbilityEffect.Heal ? 1 : 0).ThenByDescending(i => s.Kit.ActionAt(i).cooldown).ThenBy(i => lastUse.TryGetValue(i, out var w) ? w : -1))
                     {
-                        var ab = s.Kit.ActionAt(slot); if (ab == null || s.Kit.ActionLockLabel(slot) != null || Never.Contains(ab.id)) continue;
+                        var ab = s.Kit.ActionAt(slot); if (ab == null || s.Kit.ActionLockLabel(slot) != null || Never.Contains(ab.id) || sung.Contains(ab.id)) continue;
                         if (ab.effect == AbilityEffect.Damage) continue;   // a healer at work, no foe in reach
                         if (ab.cost > 0 && pool.Max > 0 && pool.Current - ab.cost < pool.Max * .1f) continue;
-                        if (s.UseAbility(slot)) { lastUse[slot] = t; break; }
+                        if (s.UseAbility(slot)) { lastUse[slot] = t; if (Once.Contains(ab.id)) sung.Add(ab.id); break; }
                     }
                 int now = pool.Current; if (now < last) used += last - now; last = now;
             }
@@ -275,7 +278,8 @@ namespace Crulanda.Tests
                 if (s.Player.Health.Pool.Current < s.Player.Health.Pool.Max * .3f && targets > 0) s.Player.Health.Pool.Fill();
                 if (!s.PlayerCasting)   // a cast in hand is let finish
                 foreach (int slot in order.OrderByDescending(i => s.Kit.ActionAt(i) != null && Every.TryGetValue(s.Kit.ActionAt(i).id, out var keepEvery) && (!lastUse.TryGetValue(i, out var keptAt) || t - keptAt >= keepEvery) ? 1 : 0)
-                    .ThenByDescending(i => targets == 0 && s.Kit.ActionAt(i) != null && s.Kit.ActionAt(i).effect == AbilityEffect.Heal ? 1 : 0).ThenByDescending(i => s.Kit.ActionAt(i) != null ? s.Kit.ActionAt(i).cooldown : 0).ThenBy(i => s.Kit.ActionAt(i) != null && cls == "class.druid" && s.Kit.ActionAt(i).cooldown <= 0 && s.Kit.ActionAt(i).effect == AbilityEffect.Damage && lastUse.TryGetValue(i, out var w) ? w : -1).ThenBy(i => order.IndexOf(i)))   // a Druid's equal fillers taken in turn (Thornsong's loop); every other kit keeps bar order (v6/v7: the turn-taking cost the casters, Mage and Archivist, most of their damage) taken in turn (a Thornsong alternates Seedshot and Thornbolt)
+                    .ThenByDescending(i => targets == 0 && s.Kit.ActionAt(i) != null && s.Kit.ActionAt(i).effect == AbilityEffect.Heal ? 1 : 0)
+                    .ThenBy(i => targets == 0 && lastUse.TryGetValue(i, out var healUsedAt) ? healUsedAt : -1)   // the heal test: heals take turns, so the first in slot order does not starve the rest (2026-10-13).ThenByDescending(i => s.Kit.ActionAt(i) != null ? s.Kit.ActionAt(i).cooldown : 0).ThenBy(i => s.Kit.ActionAt(i) != null && cls == "class.druid" && s.Kit.ActionAt(i).cooldown <= 0 && s.Kit.ActionAt(i).effect == AbilityEffect.Damage && lastUse.TryGetValue(i, out var w) ? w : -1).ThenBy(i => order.IndexOf(i)))   // a Druid's equal fillers taken in turn (Thornsong's loop); every other kit keeps bar order (v6/v7: the turn-taking cost the casters, Mage and Archivist, most of their damage) taken in turn (a Thornsong alternates Seedshot and Thornbolt)
                 {
                     var ab = s.Kit.ActionAt(slot); if (ab == null || s.Kit.ActionLockLabel(slot) != null || Never.Contains(ab.id) || used1.Contains(ab.id)) continue;
                     // A damage fight casts no heals (2026-10-13: the Cleric and Shaman, whose bars lock nothing by build, spent most casts mending nobody).

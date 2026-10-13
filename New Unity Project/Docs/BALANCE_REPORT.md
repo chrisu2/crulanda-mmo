@@ -365,3 +365,7 @@ group heal of their own, or the party test needs its own band.
 "looks good except target should all be facing with back to fence." (the training yard)
 "yes give a slower group heal" (answer to: should every healer also meet a party target; the Paladin's Sanctuary, the Salt-Mender's Mender
 and the Archivist's Cantor heal one at a time and leave a party of five low)
+"they are limited on single targets if they are an aoe build" (answer to: four single-target builds hit several foes with their own
+spells, the Unwriting, Thornsong, Bonecaller, Sifter, and the Shaman's kit is area-heavy). Applied: a damage build doing over x1.25 against
+three is held to the area band against one (62-67, moved to 64), as the splash builds are: the Unwriting 1.72 to 1.60, Thornsong 2.62 to
+2.42, Bonecaller 2.37 to 2.21 (its thrall's scale with it), Sifter 1.41 to 1.31. The table labels them "(area spells)".

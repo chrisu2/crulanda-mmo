@@ -44,8 +44,11 @@ changes = []   # (table, key, old, new)
 for k in sorted(single):
     if skipped(k): continue
     v = statistics.mean(single[k]); r = role[k]; lo, hi, mid = DPS_T.get(r, (0, 1e9, 0)); old = dmg.get(k, 1.0)
-    if r == 'dps': lo, hi, mid = AOE_T if k in AOE else ST_T
-    line = '%-34s %-8s DPS %6.1f  scale %.2f' % (k, r + ('/area' if k in AOE else ''), v, old)
+    # Chris, 2026-10-13: "they are limited on single targets if they are an aoe build": a damage build whose own spells do more than
+    # 1.25 times against three (the Unwriting, Thornsong, Bonecaller, Sifter) is held to the area band against one, as the splash builds are.
+    area = k in AOE or (k in three and v > 0 and statistics.mean(three[k]) / v > 1.25)
+    if r == 'dps': lo, hi, mid = AOE_T if area else ST_T
+    line = '%-34s %-8s DPS %6.1f  scale %.2f' % (k, r + ('/area' if r == 'dps' and area else ''), v, old)
     if v > 0 and not (lo <= v <= hi):
         new = round(old * mid / v, 2); changes.append(('BuildDamageScale', k, old, new)); line += '  -> %.2f (to %.1f)' % (new, mid)
     if r == 'healer' and k in heal:

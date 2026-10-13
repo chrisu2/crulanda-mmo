@@ -17,13 +17,13 @@ namespace Crulanda.Encounter
         {
             // DPS toward the median
             { "class.ranger/marksman", 0.64f }, { "class.druid/thornclaw", 0.74f }, { "class.ranger/skirmisher", 0.69f }, { "class.paladin/judicator", 0.71f },
-            { "class.mage/combustion", 1.88f }, { "class.druid/thornsong", 2.62f }, { "class.archivist/the-unwriting", 1.72f },
+            { "class.mage/combustion", 1.88f }, { "class.druid/thornsong", 2.42f }, { "class.archivist/the-unwriting", 1.6f },
             // under the role caps
             { "class.ranger/pathfinder", .60f }, { "class.rogue/thiefs-grace", .82f }, { "class.rogue/swashbuckler", .72f }, { "class.paladin/vanguard", .92f },
             { "class.warrior/support", .93f }, { "class.warrior/jailer", .93f },
             { "class.paladin/sanctuary", .62f }, { "class.saltmender/mender", .85f },
             // pet builds toward the DPS median (the companion's blows take PetDamageScale, below)
-            { "class.ranger/beastbond", 0.7f }, { "class.mage/bonecaller", 2.37f },
+            { "class.ranger/beastbond", 0.7f }, { "class.mage/bonecaller", 2.21f },
             { "class.archivist/the-lull", 2.14f },   // 2026-10-13 fixed-dummy retune
             { "class.archivist/the-still-vow", 3.11f },   // 2026-10-13 fixed-dummy retune
             { "class.mage/spellbinder", 1.52f },   // 2026-10-13 fixed-dummy retune
@@ -37,11 +37,11 @@ namespace Crulanda.Encounter
             { "class.shaman/stormcaller", 2.08f },   // 2026-10-13 fixed-dummy retune
             { "class.druid/barkhide", 1.33f },   // 2026-10-13 fixed-dummy retune
             { "class.mage/heatweaver", 1.39f },   // 2026-10-13 fixed-dummy retune
-            { "class.saltmender/sifter", 1.41f },   // 2026-10-13 fixed-dummy retune
+            { "class.saltmender/sifter", 1.31f },   // 2026-10-13 fixed-dummy retune
             { "class.shaman/stonebound", 2.45f },   // 2026-10-13 fixed-dummy retune
         };
         /// <summary>The same for the build's companion (Ranger pet, thrall): only the pet builds are scaled.</summary>
-        public static readonly Dictionary<string, float> BuildPetDamageScale = new Dictionary<string, float> { { "class.ranger/beastbond", 0.7f }, { "class.mage/bonecaller", 2.37f }, { "class.ranger/pathfinder", .5f } };
+        public static readonly Dictionary<string, float> BuildPetDamageScale = new Dictionary<string, float> { { "class.ranger/beastbond", 0.7f }, { "class.mage/bonecaller", 2.21f }, { "class.ranger/pathfinder", .5f } };
         public float PetDamageScale { get { var lead = LeadBuild; return lead != null && BuildPetDamageScale.TryGetValue(lead, out var v) ? v : 1; } }
         /// <summary>The scale on any blow by the party side: the player's, or the player's own companion.</summary>
         public float DamageScaleFor(Actor source)

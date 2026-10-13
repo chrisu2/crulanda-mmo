@@ -57,7 +57,9 @@ def status(t):
     if t['role'] in ('dps', 'pet') and t['single'] > 0:
         ratio = t['aoe'] / t['single']; aoe = (t['cls'] + '/' + t['build']) in AOE
         if aoe and ratio < AOE_MIN: out += ' **AoE LOW** (x%.2f)' % ratio
-        elif not aoe and ratio > ST_MAX: out += ' area high (x%.2f)' % ratio
+        # Chris, 2026-10-13: "they are limited on single targets if they are an aoe build": an area build (a splash build, or one whose
+        # own spells do over x1.25 against three) is held to 62-67 against one.
+        if (aoe or ratio > ST_MAX) and t['single'] > 67.5: out += ' **area build over 67 single**'
     if t['role'] == 'healer':
         if t['hps'] <= 0: out += ' **NO HEALING**'
         elif not (HPS_T[0] <= t['hps'] <= HPS_T[1]): out += ' heal **%s**' % ('HIGH' if t['hps'] > HPS_T[1] else 'LOW')
@@ -73,7 +75,7 @@ counts = {}
 for t in sorted(table, key=lambda t: (t['cls'], order.get(t['role'], 9), t['build'])):
     lo, hi = TARGET.get(t['role'], (0, 0)); st = status(t); counts[st.startswith('ok')] = counts.get(st.startswith('ok'), 0) + 1
     tgt = ('at most %d' % hi) if lo == 0 else '%d-%d' % (lo, hi)
-    kind = (' (AoE)' if (t['cls'] + '/' + t['build']) in AOE else ' (single)') if t['role'] in ('dps', 'pet') else ''
+    kind = (' (AoE)' if (t['cls'] + '/' + t['build']) in AOE else ' (area spells)' if t['single'] > 0 and t['aoe'] / t['single'] > ST_MAX else ' (single)') if t['role'] in ('dps', 'pet') else ''
     lines.append('| %s | %s | %s%s | %.1f | %.1f | %s | %s | %s | %s |' % (t['cls'], t['build'], NAME.get(t['role'], t['role']), kind, t['single'], t['aoe'],
                  ('x%.2f' % (t['aoe'] / t['single'])) if t['single'] > 0 else '-',
                  ('%.1f' % t['hps']) if t['hps'] > 0 else '-', tgt, st))

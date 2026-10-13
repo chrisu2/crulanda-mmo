@@ -257,6 +257,10 @@ namespace Crulanda.Tests
             if (s.Player.Health.Pool.Current <= 0) s.Player.Health.Revive(s.Player.Health.Pool.Max);
             s.Progress.experience = EncounterProgress.XpForLevel(15); s.Player.SetLevel(15); Buy(branch);
             s.Player.Health.Pool.Fill(); s.Player.Resource.Pool.Fill(); s.Kit.ClearTransient();
+            if (cls == "class.druid")   // 2026-10-13: after the Rootmend's first heal fight the Druid cast nothing more; the state at each start
+                csv.Add("# state " + cls + " " + branch.id + " " + scenario + " " + seed + ": alive " + s.Player.IsAlive + " hp " + s.Player.Health.Pool.Current + "/" + s.Player.Health.Pool.Max +
+                    " casting " + s.PlayerCasting + " lead " + s.LeadBuild + " mira " + (s.Companion != null ? s.Companion.actor.IsAlive + " " + s.Companion.actor.Health.Pool.Current + " active " + s.Companion.gameObject.activeInHierarchy : "none") +
+                    " spirit " + (s.Spirit != null) + " bar " + string.Join(" ", Enumerable.Range(0, s.Kit.ActionCount).Select(i => (s.Kit.ActionAt(i) != null ? s.Kit.ActionAt(i).id.Replace("druid.", "") : "-") + "=" + (s.Kit.ActionLockLabel(i) ?? "ok"))));
             var foes = s.Enemies.Where(x => x != null && x.actor.IsAlive).OrderBy(x => x.transform.position.sqrMagnitude).Take(Math.Max(1, targets)).ToList();
             if (foes.Count == 0) { csv.Add(string.Join(",", cls, branch.id, role, scenario, seed, "NO FOE", "", "", "", "", "", "")); yield break; }
             var motor = s.Player.GetComponent<AdventurerMotor>(); var at = foes[0].transform.position;

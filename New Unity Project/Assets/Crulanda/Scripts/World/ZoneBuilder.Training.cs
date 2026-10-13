@@ -55,10 +55,11 @@ namespace Crulanda.World
             // Archery butts down the right, facing in.
             string[] butts = { "SmallProps/PracticeTarget_1_A", "SmallProps/PracticeTarget_2_A", "Megapack/Models/Arrow Target", "SmallProps/PracticeTarget_1_B" };
             for (int i = 0; i < butts.Length; i++) GroundProp(t, butts[i], new Vector3(hx - 1.4f, 0, 1.0f + i * 1.9f), -90, 1.7f, true);   // their lanes clear of the healer's corner
-            // Weapon stands by the left tent, a peg rack against the back fence.
+            // Weapon stands by the left tent and against the back fence (the Fantasy peg rack is a wall board 35 cm high: it came in lying flat
+            // and seventeen times too big, the 14:12 frame's "giant beams").
             GroundProp(t, "Fantasy/WeaponStand", new Vector3(-hx + 1.3f, 0, -hz + 5.6f), 90, 1.6f, true);
             GroundProp(t, "Fantasy/WeaponStand", new Vector3(-hx + 6.4f, 0, -hz + 1.0f), 0, 1.6f, true);
-            GroundProp(t, "Fantasy/Peg_Rack", new Vector3(0, 0, -hz + .7f), 0, 1.7f, true);
+            GroundProp(t, "Fantasy/WeaponStand", new Vector3(0, 0, -hz + .9f), 0, 1.6f, true);
             // Stores by the right tent.
             Crate(t, new Vector3(hx - 1.1f, G(hx - 1.1f, -hz + 1.1f) + .41f, -hz + 1.1f), .82f, 20);
             Crate(t, new Vector3(hx - 2.0f, G(hx - 2.0f, -hz + 1.0f) + .41f, -hz + 1.0f), .82f, -12);

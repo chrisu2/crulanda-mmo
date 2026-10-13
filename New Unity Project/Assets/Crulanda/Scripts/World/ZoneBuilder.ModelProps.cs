@@ -25,7 +25,7 @@ namespace Crulanda.World
         /// showed which, 2026-10-07): the turn is put on the model's own parts before it is measured.</summary>
         static readonly Dictionary<string, Vector3> PropTurns = new Dictionary<string, Vector3> {
             { "Fantasy/Barrel", new Vector3(-90, 0, 0) }, { "Fantasy/Stool", new Vector3(-90, 0, 0) }, { "Fantasy/Chandelier", new Vector3(-90, 0, 0) },
-            { "Fantasy/Dummy", new Vector3(-90, 0, 0) }, { "Fantasy/Banner_1", new Vector3(-90, 0, 0) }, { "Fantasy/CandleStick", new Vector3(0, 0, -90) },
+            { "Fantasy/Dummy", new Vector3(-90, 0, 0) }, { "Fantasy/Banner_1", new Vector3(-90, 0, 0) }, { "Fantasy/Banner_2", new Vector3(-90, 0, 0) },   // Banner_2 made Z up like Banner_1 (2.08 m along z): lying flat it came in some 15 times too big (the 14:12 yard frame) { "Fantasy/CandleStick", new Vector3(0, 0, -90) },
             { "Medieval/Prefabs/CandleV1", new Vector3(-90, 0, 0) },
             // The Small Props Pack's "Unity FBX" models stand on their heads: their vertices are the glTF copies' turned half round X (read
             // 2026-10-13 after Chris: "two archer targets upside down", "two dummies upside down"); only PracticeTarget_1_B is upright.

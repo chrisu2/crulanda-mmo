@@ -246,10 +246,11 @@ namespace Crulanda.Tests
             var at = s.Player.transform.position + s.Player.transform.forward * 2.5f; if (ag != null && ag.isOnNavMesh) ag.Warp(at); else m.transform.position = at;
             return m;
         }
-        /// <summary>The tank test (Chris, 2026-10-13: "top 3 best tanks"): three dummies strike you in turn, a blow of 40 (before your
-        /// mitigation, through the kit's own ResolveEnemyHit) every 2 s each; damage taken, self-healing, net intake and threat a second,
-        /// and the times your health fell under 30% and was filled (each a death you would have had). "# tank" lines; balance_merge.py ranks them.</summary>
-        public const int TankBlow = 40; public const float TankStrikeEvery = 2;
+        /// <summary>The tank test (Chris, 2026-10-13: "top 3 best tanks"): three dummies strike you in turn, each a tough level-15 mob's blow
+        /// (EncounterEnemy.MobHit; before your mitigation, through the kit's own ResolveEnemyHit) every 2 s; damage taken, self-healing, net
+        /// intake and threat a second (the threat tables cleared at each fight's start), and the times your health fell under 30% and was
+        /// filled (each a death you would have had). "# tank" lines; balance_merge.py ranks them.</summary>
+        public static int TankBlow { get { return Mathf.RoundToInt(EncounterEnemy.MobHit(DummyLevel, false, true)); } } public const float TankStrikeEvery = 2;
         IEnumerator Fight(string cls, TalentBranchData branch, string role, string scenario, int seed, int targets)
         {
             UnityEngine.Random.InitState(1000 + seed);
@@ -261,7 +262,7 @@ namespace Crulanda.Tests
             var motor = s.Player.GetComponent<AdventurerMotor>(); var at = foes[0].transform.position;
             for (int i = 0; i < foes.Count; i++)
             {
-                Dummy(foes[i]); var ag = foes[i].GetComponent<UnityEngine.AI.NavMeshAgent>();
+                Dummy(foes[i]); foes[i].threat.Clear(); var ag = foes[i].GetComponent<UnityEngine.AI.NavMeshAgent>();
                 var p = at + Quaternion.Euler(0, i * 120 + seed * 23, 0) * Vector3.right * (i == 0 ? 0 : 1.4f + .15f * seed);
                 if (targets == 0) p = at + Vector3.forward * 80 + Vector3.right * 3 * i;   // the heal test: no foe in reach, nothing to strike
                 if (ag != null && ag.isOnNavMesh) ag.Warp(p); else foes[i].transform.position = p;

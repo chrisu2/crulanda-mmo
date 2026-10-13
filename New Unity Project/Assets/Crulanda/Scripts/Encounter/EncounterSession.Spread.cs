@@ -27,14 +27,16 @@ namespace Crulanda.Encounter
             { "class.mage/combustion", new Spread("Spreading flame", .5f, 6, 2) },
             { "class.shaman/stormcaller", new Spread("Forked storm", .45f, 6, 2) },
         };
-        bool spreading; string spreadFor; int spreadCount = -1; Spread? spreadNow;
+        bool spreading; string spreadFor; int spreadCount = -1; Spread? spreadNow; List<TalentRank> spreadList;
         /// <summary>The lead build's spread, or null for a single-target build (cached until your ranks change).</summary>
         public Spread? PlayerSpread
         {
             get
             {
                 var list = Progress != null ? Progress.talents : null; int count = 0; if (list != null) foreach (var t in list) if (t != null) count += t.rank;
-                if (count != spreadCount || spreadFor == null) { spreadCount = count; spreadFor = LeadBuild ?? ""; spreadNow = BuildSpread.TryGetValue(spreadFor, out var v) ? v : (Spread?)null; }
+                // Keyed on the ranks list itself as well as its count (as PlayerDamageScale is): every build spends the same points, so the count
+                // alone kept the class's first build (2026-10-13: the Warrior's DPS build did not cleave in the harness).
+                if (!ReferenceEquals(list, spreadList) || count != spreadCount || spreadFor == null) { spreadList = list; spreadCount = count; spreadFor = LeadBuild ?? ""; spreadNow = BuildSpread.TryGetValue(spreadFor, out var v) ? v : (Spread?)null; }
                 return spreadNow;
             }
         }

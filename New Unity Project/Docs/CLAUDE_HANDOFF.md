@@ -2,7 +2,8 @@
 
 ## Start here
 
-**UPDATE 2026-10-13 12:05 AM ET: all test runs were STOPPED by Chris's request.** suiteQ and chainR (editR, socialR, balC) did not finish, so no results exist. Keep-awakes 19320/26952 are stopped too. **Claude's first job:** in a validation lane (never D:\code\mmo), run the EditMode suite first (this is the first compile of the Cleric, Shaman and race code) and fix any compile errors. Then run the full PlayMode suite (skip NamedLootTests), the SocialPull rerun, and the Cleric/Shaman balance and party-heal runs. Report pass/fail counts to Chris. Ignore any older text below that says these are running.
+**Read the "2026-10-13, 00:03 on" section below first: it is the current state.** (The bullets about suiteQ, chainR, editR and balC
+further down this section are from the night of Oct 12 and are history: those runs were stopped, and Oct 13's runs replaced them.)
 - **Branch:** `feet-bow-adit-kit`, PR #2. Do not merge it, and do not publish, without Chris.
 - **Published build:** commit 8dbb69d, published at 1:42 PM on Oct 12. Everything after that is committed and pushed but not published.
 - **Save backups:**

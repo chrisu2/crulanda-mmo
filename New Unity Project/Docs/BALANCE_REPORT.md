@@ -335,3 +335,27 @@ training court with archery targets in a row and recruits drilling. References f
 Why in the river: the spot was chosen by a script that kept clear of roads, buildings and props but never checked water; the creek runs
 through that field and the mending dummy stood on its bank. The yard moves to dry, open ground and is laid out as a fenced sparring
 ground (Docs/TRAINING_YARD.md).
+
+**Confirm run (13:32-13:55, `outputs\balance\BALANCE_ALL.md`): 40 of 40 builds in range.** Single-target DPS builds 66.9-69.6; area
+builds 63.8-65.3 against one and x1.94-2.60 against three (Stormcaller eased again afterwards, .19 to .12, commit 4c059c8); CC, support and
+tanks 46.2-53.2; healers 44.6-49.6 HPS on the wounded dummy.
+
+**Top three now:** single target: Shardwork 69.6, Thornsong 69.3, Censure/the Unwriting/Sifter 69.0 (all within three points by design);
+against three: Stormcaller 166.7, Combustion 141.9, Warrior DPS 132.3; healers (one target): Mender 49.6, Rootmend 49.1, the Cantor 47.6;
+tanks: Warrior, Shaman Stonebound, Druid Barkhide. The Druid sits near the top in all three roles, but only within the noise of a tight
+band; the Paladin no longer leads any.
+
+**Healing a party of five** (each loses 5% a second, a 45% blow every 4 s; seconds of member-time spent under 25%, lower is better):
+
+| healer | HPS | member-seconds low |
+|---|---|---|
+| Shaman Rainspeaker | 107.9 | 5 |
+| Cleric Choir | 97.2 | 5 |
+| Cleric Lantern | 89.7 | 24 |
+| Druid Rootmend | 87.6 | 52 (was 59 HPS, 380 low: the whole-party heal target and the glade-fire) |
+| Paladin Sanctuary | 56.8 | 457 |
+| Salt-Mender Mender | 49.3 | 525 |
+| Archivist Cantor | 16.5 | 699 (its heal scale was cut to .16 because it filled the one-target test) |
+
+Open for Chris: a party target for healers. The Paladin, Salt-Mender and the Cantor heal one at a time and leave a party low; they need a
+group heal of their own, or the party test needs its own band.

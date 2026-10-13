@@ -70,8 +70,15 @@ further down this section are from the night of Oct 12 and are history: those ru
   13:27 training frames (`D:\crulanda-work\ui-captures\training-20261013-1327`) showed the training dummy's nameplate floating off its
   model (its agent snapped it away) and the HUD cut off under the saved layout: each dummy's look now on its own actor, the capture
   frames the HUD (37106f1, 740f779).
-  **Running:** chainR17 (the confirm balance run of the retune), then chainR18 (EditMode, TrainingFieldTests, a fresh lane B build, the
-  training frames again). Then: report the confirmed table to Chris; his design question on the single-target builds with area spells.
+  **Confirm run 13:55: 40 of 40 builds in range** (BALANCE_REPORT.md; the Stormcaller's splash eased once more after it, untested).
+  Party-of-five healing reported (the Paladin, Salt-Mender and the Cantor leave a party low). **Open for Chris:** a party target for
+  healers; the single-target builds whose own spells hit several foes (the Unwriting, Thornsong, Bonecaller, Sifter, the Shaman's kit).
+- **The training field became a training yard** (Chris, ~13:40: "why is one in the river? sparring area needs to resemble something like
+  this? try the small props pack"; then "two archer targets upside down", "two dummies upside down", "area is not closed in"):
+  `Docs/TRAINING_YARD.md`. On dry ground at (58, 26), a closed ring of plank panels, tents, banners, dummies, butts, a healer's corner; the
+  Small Props Pack (CC0) imported to `Resources/Props/SmallProps` with an atlas material and half turns for its upside-down models.
+  TrainingFieldTests 4/4, EditMode 462/462; frames `D:\crulanda-work\ui-captures\training-20261013-1417` sent to Chris. Lane B holds a
+  release build of all this (not published: republish only with Chris's OK, saves backed up first).
 
 ## Rules (from CLAUDE.md and Chris)
 - Run Unity only in the validation lanes: lane A (`D:\crulanda-work\encounter-validation`, tests) and lane B (`encounter-validation-b`, builds and captures).

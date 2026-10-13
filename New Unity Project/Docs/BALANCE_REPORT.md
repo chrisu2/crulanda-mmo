@@ -245,3 +245,19 @@ for the level cap of 15 (the dummies are level 15). They are set again as the ca
   Salt-Mender kits now apply the heal scale at all (only the Cleric, Druid and Shaman did).
 
 After the first retune 35 of 40 builds were in range (the run at 01:15). The table below is the confirm run.
+
+## Chris, 2026-10-13 02:08-02:15 (briefs, verbatim)
+
+"is there only two pet classes? give the shaman dps a pet (uncontrollable that throws out small dots and heals),"
+"have the druid healer have a fairy to help heal to catch up #s"
+"remember pet+class should be on par for 62-72 combined" / "since it is a dps class"
+"well if not a druid fairy then something canon related for druid that has the same functionality"
+"ok but the shaman should find something canon related also"
+"put a few test dummies in town so the player can test their builds maybe just one for dps and one for heals. maybe near the blacksmith or training grounds/area"
+
+Answer: two classes had pets (the Ranger's wolf for Beastbond, kept at half strength by the Pathfinder; the Mage's Bonecaller thrall).
+Done (`SpiritCompanion.cs`, a spirit at the shoulder that nobody commands, coming with the build): the Stormcaller's storm spirit stings
+the foes in your fight with small damage over time and mends a little (its canon root being looked up: the name is PROVISIONAL); the
+Rootmend's glade-fire mends the most hurt of the party (CANON-EXPANDED: no fairies in the canon, only the phrase "fairy tale"; the
+witch-fire wisp of book 1 ch. 13, a hovering orb of light bound to its maker's will, lit with the Whispering Glade's regenerative gold and
+silver light, book 3 ch. 5). The meter shows each on its own row; a pet build's DPS is player and pet together, on 62-72.

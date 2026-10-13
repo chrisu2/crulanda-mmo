@@ -93,6 +93,25 @@ namespace Crulanda.Encounter
             var pet = wolf.gameObject.AddComponent<RangerPet>(); pet.Kind = kind; wolf.gameObject.SetActive(true); pet.Init(wolf, this, kit);
             Pet = pet; return pet;
         }
+        /// <summary>The spirit at your shoulder that nobody commands (SpiritCompanion): the Stormcaller's storm spirit, the Rootmend's
+        /// glade-fire. It comes with the build you have spent most in and goes when you change it (checked twice a second).</summary>
+        public SpiritCompanion Spirit { get; private set; }
+        float spiritCheckAt;
+        public static SpiritCompanion.Kinds? SpiritFor(string leadBuild)
+        {
+            switch (leadBuild) { case "class.shaman/stormcaller": return SpiritCompanion.Kinds.Storm; case "class.druid/rootmend": return SpiritCompanion.Kinds.GladeFire; default: return null; }
+        }
+        void TendSpirit()
+        {
+            if (Time.time < spiritCheckAt || Player == null) return; spiritCheckAt = Time.time + .5f;
+            var want = SpiritFor(LeadBuild);
+            if (Spirit != null && (want == null || Spirit.Kind != want.Value)) { Destroy(Spirit.gameObject); Spirit = null; }
+            if (Spirit == null && want != null)
+            {
+                Spirit = new GameObject("Spirit " + SpiritCompanion.NameOf(want.Value)).AddComponent<SpiritCompanion>(); Spirit.Init(this, want.Value);
+                Message("Your " + SpiritCompanion.NameOf(want.Value) + " comes to your shoulder.");
+            }
+        }
         public void DismissPet()
         {
             if (Pet == null) return;
@@ -1716,7 +1735,7 @@ namespace Crulanda.Encounter
             bool marking = EncounterInput.Sneak;   // Ctrl+1-4: raid marks on your target (CC step C3); Ctrl alone still sneaks
             for (int slot = 0; slot < (marking ? 4 : ActionCount); slot++)
                 if (!BuildOpen && slot < 13 && EncounterInput.Press(EncounterInput.SlotKey(slot))) { if (marking) MarkTarget((RaidMark)((slot + 1) % 4)); else UseAbility(slot); }
-            Kit.Tick(InCombat); Meter.Tick(InCombat, Time.deltaTime); TickDuo();
+            Kit.Tick(InCombat); Meter.Tick(InCombat, Time.deltaTime); TickDuo(); TendSpirit();
             if (AutoAttack && !Kit.MeleeAutoAttacks && !Kit.RangedAutoAttacks) AutoAttack = false;
             // The swing in melee, or the bow's auto-shot at its range (the Ranger: ClassKit.RangedAutoAttacks).
             if (AutoAttack && Target != null && Target.actor.IsAlive && Time.time >= nextSwing && Distance(Target) < Kit.AutoAttackRange && !PlayerStunned && !PlayerDisarmed)

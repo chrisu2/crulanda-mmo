@@ -18,8 +18,17 @@ namespace Crulanda.Encounter
         /// <summary>Seconds the party has spent in a fight since the reset.</summary>
         public float CombatSeconds { get; private set; }
         public CombatMeter(EncounterSession session) { s = session; }
+        /// <summary>A party member's own row for what is done in its name (SpiritCompanion: the storm spirit, the glade-fire).</summary>
+        public sealed class Credit { public string id, name; }
+        /// <summary>Set for the length of one blow or mend done on your behalf: counted on that row, not yours.</summary>
+        public Credit Redirect;
         Row RowFor(Actor by)
         {
+            if (Redirect != null && by != null && by == s.Player)
+            {
+                if (!rows.TryGetValue(Redirect.id, out var spirit)) rows[Redirect.id] = spirit = new Row { id = Redirect.id, name = Redirect.name };
+                return spirit;
+            }
             if (by == null || by.EntityId == null) return null;
             string id = by.EntityId.Value; if (s.PartyActor(id) == null) return null;   // a sim fighting in the world is not the party's
             if (!rows.TryGetValue(id, out var r)) rows[id] = r = new Row { id = id, name = NameFor(by) };

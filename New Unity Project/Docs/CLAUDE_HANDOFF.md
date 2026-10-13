@@ -134,7 +134,7 @@
 12. 112b, the Morro clips on the pack's avatar: waiting on Chris (the pack needs downloading again).
 13. Republish, only with Chris's OK. Back up saves first.
 14. (From Oct 11, dropped from this list by mistake:) **the kit's column and plinth tops are walkable in the NavMesh bake** (ZoneBuilder.Adit), so a
-    mob or the run's leader ends up standing on a pedestal and a group run of the Adit stalls (`toolsalidation\group_run.ps1`; the 18:44
+    mob or the run's leader ends up standing on a pedestal and a group run of the Adit stalls (`tools\validation\group_run.ps1`; the 18:44
     run on Oct 11). Exclude those tops from the bake, then rerun the group run to the end for its scorecard.
 
 ## Key docs (in `Docs\`)

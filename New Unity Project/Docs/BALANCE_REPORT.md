@@ -141,3 +141,43 @@ The no-cooldown filler alternation likely now casts Lull and Hush (sleep and sil
 
 Nobody dropped under 25% in any fight, so the damage is too light to tell the healers apart. v2 will add the sims and heavier spikes. Cleric and Shaman join it when they're built (`Docs/CLASS_CLERIC_SHAMAN.md`).
 
+
+---
+
+## Round 3 (2026-10-12, 20:09 run, read 20:48): harness v7, Druid retune, heavier party test
+Raw: `Docs/balance_v7.csv`, `Docs/party_heal_v2.csv`.
+
+### Druid retune (`BuildDamageScale` thornsong ×2.1; `BuildHealScale` rootmend ×2.2, applied in DruidKit.HealActor)
+| build | before | after |
+|---|---|---|
+| thornsong DPS | 31.4 (44% of median) | 65.6 (96%) |
+| rootmend solo HPS | 4.3 | 7.3 |
+| rootmend party HPS | 17.2 | 32.6-37.3 (heavier damage) |
+
+### Party heal test v2 (5%/s to everyone, plus a 45% spike every 4 s; 90 s; 3 seeds)
+**Still only you and Mira.** The test scene has **0 sim figures**, so no sims could be invited. Next fix: spawn three sims for the test directly.
+
+| healer | HPS | overheal | to others | mana used / left | member-seconds under 25% |
+|---|---|---|---|---|---|
+| archivist the-cantor | 67.9-77.5 | 20-29% | 36-41% | 843-1020 / 97-100 | 0 |
+| paladin sanctuary | 53.8-55.4 | 1-2% | 38-44% | 842-960 / 98-100 | 43-45 |
+| saltmender mender | 48.5 | 1% | 32-39% | 1080 / 100 | 35-47 |
+| druid rootmend | 32.6-37.3 | 2-3% | 37-46% | 0 (Sap) | 60-93 |
+
+- Under this damage, the-cantor is the only healer that keeps everyone above 25%.
+- Rootmend is still the weakest: 60-93 member-seconds under 25%.
+- Paladin and Salt-Mender sit at about 1% overheal, so they are throughput-capped: they heal all they can and still fall behind. Their spare mana says the cap comes from their cooldowns and GCD, not mana.
+
+### Harness regression found in v7
+Taking equal-ranked damage fillers in turn helped Thornsong but cost the casters most of their damage (v6 → v7, % of median):
+
+| build | v6 | v7 |
+|---|---|---|
+| mage combustion | 91% | 64% |
+| mage heatweaver | 69% | 56% |
+| mage spellbinder | 59% | 44% |
+| mage bonecaller | 93% | 75% |
+| archivist builds | (various) | 1-29% |
+
+**The fix:** turn-taking is now only used for the Druid, and every other kit keeps bar order. **The v7 Mage and Archivist numbers are not valid.** Treat the v5/v6 Mage numbers as current until v8 runs.
+

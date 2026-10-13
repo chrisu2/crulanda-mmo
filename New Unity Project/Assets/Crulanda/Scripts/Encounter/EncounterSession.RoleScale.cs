@@ -17,7 +17,7 @@ namespace Crulanda.Encounter
         {
             // DPS toward the median
             { "class.ranger/marksman", .75f }, { "class.druid/thornclaw", .80f }, { "class.ranger/skirmisher", .85f }, { "class.paladin/judicator", .92f },
-            { "class.mage/combustion", 1.65f }, { "class.archivist/the-unwriting", 2.4f },
+            { "class.mage/combustion", 1.65f }, { "class.druid/thornsong", 2.1f }, { "class.archivist/the-unwriting", 2.4f },
             // under the role caps
             { "class.ranger/pathfinder", .60f }, { "class.rogue/thiefs-grace", .82f }, { "class.rogue/swashbuckler", .72f }, { "class.paladin/vanguard", .92f },
             { "class.warrior/support", .93f }, { "class.warrior/jailer", .93f },
@@ -36,6 +36,9 @@ namespace Crulanda.Encounter
             if (Pet != null && source == Pet.actor) return PetDamageScale;
             return 1;
         }
+        /// <summary>The healing retune (note 178): a build's own mends scaled toward the healers' median (Druid kit's HealActor).</summary>
+        public static readonly Dictionary<string, float> BuildHealScale = new Dictionary<string, float> { { "class.druid/rootmend", 2.2f } };
+        public float PlayerHealScale { get { var lead = LeadBuild; return lead != null && BuildHealScale.TryGetValue(lead, out var v) ? v : 1; } }
         public const float HealerDpsCap = .50f, ControlDpsCap = .75f, SupportDpsCap = .75f;
         int scaleCount = -1; List<TalentRank> scaleList; float scale = 1;
         /// <summary>The build the player has spent most in (class/branch id), or null with no ranks.</summary>

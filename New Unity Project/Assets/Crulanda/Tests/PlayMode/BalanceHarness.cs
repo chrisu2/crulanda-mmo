@@ -80,8 +80,8 @@ namespace Crulanda.Tests
 
         // ---------- The party heal test (note 178, Chris 19:18: "still need other healers to test. paladin, cleric (new class) , shaman (new class), salt mender") ----------
         static readonly (string cls, string build)[] Healers = { ("class.paladin", "sanctuary"), ("class.saltmender", "mender"), ("class.archivist", "the-cantor"), ("class.druid", "rootmend") };
-        /// <summary>Each healer build with Mira and three sims (level-nearest, not healers) for 90 s: every member loses 3% a second
-        /// (spread) and one, by the seed, 30% every 6 s (spike); no one is let die (held at 1). HPS, overheal, the share of the healing
+        /// <summary>Each healer build with Mira and three sims (level-nearest, not healers) for 90 s: every member loses 5% a second
+        /// (spread) and one, by the seed, 45% every 4 s (spike); no one is let die (held at 1). HPS, overheal, the share of the healing
         /// that went to others than the healer, mana, and how often a member was under 25%. To party_heal.csv / PARTY_HEAL.md.</summary>
         [UnityTest, Timeout(1800000)] public IEnumerator Party_heal_test()
         {
@@ -100,8 +100,11 @@ namespace Crulanda.Tests
                 foreach (var e in s.Enemies.ToList()) if (e != null) Dummy(e);   // no fight: the hurt is the harness's
                 s.Progress.recruited = true; if (s.Companion != null) { s.Companion.gameObject.SetActive(true); s.Companion.MatchLevel(15); }
                 var pop = SimPopulation.Active; int added = 0;
-                if (pop != null) foreach (var sim in pop.World.sims.Where(x => x.classId != "class.saltmender").OrderBy(x => Mathf.Abs(x.level - 15)).ToList())
-                    { if (added >= 3) break; if (s.Invite(sim.id, true)) added++; }
+                for (float w0 = Time.time; pop != null && Time.time - w0 < 8 && pop.Figures.Count(f => f != null && !f.Hidden) < 3; ) yield return new WaitForSeconds(.5f);   // the sims walk in
+                // Three sims standing in the zone (not hidden, not fighting, not healers: the healing is the build's), invited as returning members.
+                if (pop != null) foreach (var f in pop.Figures.Where(f => f != null && !f.Hidden && !f.InFight && f.sim.classId != "class.saltmender" && f.sim.classId != "class.paladin").OrderBy(f => Mathf.Abs(f.sim.level - 15)).ToList())
+                    { if (added >= 3) break; if (s.Invite(f.sim.id, true)) added++; }
+                rows.Add("# party " + cls + " " + build + ": " + added + " sims joined of " + (pop != null ? pop.Figures.Count : 0) + " figures");
                 yield return null;
                 for (int seed = 0; seed < Seeds; seed++) yield return PartyFight(cls, branch, seed, rows);
                 EncounterSession.StartClassOverride = null;
@@ -140,8 +143,8 @@ namespace Crulanda.Tests
             while (t < FightSeconds)
             {
                 yield return null; float dt = Time.deltaTime; t += dt; tick += dt; spike += dt;
-                if (tick >= 1) { tick -= 1; foreach (var m in members) m.Health.ApplyDamage(Mathf.Min(m.Health.Pool.Current - 1, Mathf.RoundToInt(m.Health.Pool.Max * .03f))); }
-                if (spike >= 6) { spike -= 6; var m = members[rng.Next(members.Count)]; m.Health.ApplyDamage(Mathf.Min(m.Health.Pool.Current - 1, Mathf.RoundToInt(m.Health.Pool.Max * .30f))); }
+                if (tick >= 1) { tick -= 1; foreach (var m in members) m.Health.ApplyDamage(Mathf.Min(m.Health.Pool.Current - 1, Mathf.RoundToInt(m.Health.Pool.Max * .05f))); }
+                if (spike >= 4) { spike -= 4; var m = members[rng.Next(members.Count)]; m.Health.ApplyDamage(Mathf.Min(m.Health.Pool.Current - 1, Mathf.RoundToInt(m.Health.Pool.Max * .45f))); }
                 foreach (var m in members) if (m.Health.Pool.Ratio < .25f) low += dt;
                 if (!s.PlayerCasting)
                     foreach (int slot in slots.OrderByDescending(i => s.Kit.ActionAt(i).effect == AbilityEffect.Heal ? 1 : 0).ThenByDescending(i => s.Kit.ActionAt(i).cooldown).ThenBy(i => lastUse.TryGetValue(i, out var w) ? w : -1))
@@ -231,7 +234,7 @@ namespace Crulanda.Tests
                 if (targets == 0) { hurt += dt; if (hurt >= 1) { hurt -= 1; s.Player.Health.ApplyDamage(Mathf.Min(s.Player.Health.Pool.Current - 1, Mathf.RoundToInt(s.Player.Health.Pool.Max * .04f))); } }
                 if (s.Player.Health.Pool.Current < s.Player.Health.Pool.Max * .3f && targets > 0) s.Player.Health.Pool.Fill();
                 if (!s.PlayerCasting)   // a cast in hand is let finish
-                foreach (int slot in order.OrderByDescending(i => targets == 0 && s.Kit.ActionAt(i) != null && s.Kit.ActionAt(i).effect == AbilityEffect.Heal ? 1 : 0).ThenByDescending(i => s.Kit.ActionAt(i) != null ? s.Kit.ActionAt(i).cooldown : 0).ThenBy(i => s.Kit.ActionAt(i) != null && s.Kit.ActionAt(i).cooldown <= 0 && lastUse.TryGetValue(i, out var w) ? w : -1).ThenBy(i => order.IndexOf(i)))   // equal fillers taken in turn taken in turn (a Thornsong alternates Seedshot and Thornbolt)
+                foreach (int slot in order.OrderByDescending(i => targets == 0 && s.Kit.ActionAt(i) != null && s.Kit.ActionAt(i).effect == AbilityEffect.Heal ? 1 : 0).ThenByDescending(i => s.Kit.ActionAt(i) != null ? s.Kit.ActionAt(i).cooldown : 0).ThenBy(i => s.Kit.ActionAt(i) != null && cls == "class.druid" && s.Kit.ActionAt(i).cooldown <= 0 && s.Kit.ActionAt(i).effect == AbilityEffect.Damage && lastUse.TryGetValue(i, out var w) ? w : -1).ThenBy(i => order.IndexOf(i)))   // a Druid's equal fillers taken in turn (Thornsong's loop); every other kit keeps bar order (v6/v7: the turn-taking cost the casters, Mage and Archivist, most of their damage) taken in turn (a Thornsong alternates Seedshot and Thornbolt)
                 {
                     var ab = s.Kit.ActionAt(slot); if (ab == null || s.Kit.ActionLockLabel(slot) != null || Never.Contains(ab.id) || used1.Contains(ab.id)) continue;
                     // Mana-aware: a costly ability waits while the pool is under a fifth, the cheapest one (the filler) never waits.

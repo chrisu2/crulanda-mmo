@@ -856,6 +856,13 @@ namespace Crulanda.Encounter
             foreach (var e in session.Enemies) EnemyPlateAt(e, 25);
             // Game animals (deer, rabbits): a plate when close or targeted, so the fields are not a sea of names.
             foreach (var e in session.Game) EnemyPlateAt(e, session.Target == e ? 25 : 12);
+            // The training yard's mending dummy: a friend's name over it, so it is found (Chris, 15:20: "i dont see a healing dummy").
+            var mend = session.MendingDummy;
+            if (mend != null)
+            {
+                var top = mend.transform.position + Vector3.up * 1.2f; float dd = Vector3.Distance(player, top);
+                if (dd < 40 && ToCanvas(top, out var dp) && OnCanvasX(dp.x)) AddPlate(new Plate { dist = dd, fade = 1, top = -41, at = dp, named = true, name = "Mending dummy", title = Bracketed("Heal me"), mark = ' ' }, Mathf.Max(TextWidth(plateText, "Mending dummy"), 30) + 12);
+            }
             // Mira: nameplate, plus a gold ! until she has joined you (after that, whatever the quests say).
             var mira = session.Companion; if (mira == null) return;
             var head = mira.transform.position + Vector3.up * 1.4f; float md = Vector3.Distance(player, head);

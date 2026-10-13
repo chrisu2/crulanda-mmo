@@ -186,6 +186,8 @@ namespace Crulanda.Encounter
             if (kicked) SimMemory.Note(sim, SimMemory.Deed.Kicked);
         }
         float heldUntil, campIdleSince = -1; string heldKind; Vector3 fearFrom;
+        // Headway toward the camp it leads to (2026-10-13): the nearest it has come, when, and the last frame it was leading.
+        float leadBest, leadBestAt, leadSeen; Vector3 leadFor;
         /// <summary>A boss's hold on this sim (EliteMove.cc): "stun", "root", "fear" or "disorient", for seconds, from where (fear runs from it).</summary>
         public void HoldUntil(string kind, float seconds, Vector3 from)
         {
@@ -285,6 +287,12 @@ namespace Crulanda.Encounter
             Leading = pick.transform.position; LeadingName = pick.Elite ? pick.Name : SimChatter.Plural(pick.Name);
             session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? "follow me, " + LeadingName.ToLower() + " this way" : "Follow me. The " + LeadingName.ToLower() + " are this way.");
             return LeadingName;
+        }
+        /// <summary>A camp out of reach, left behind: on to the next on the route, or the run ends.</summary>
+        void LeaveCamp()
+        {
+            session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? "cant reach that one. leave it, on we go" : "Leave that one, it is out of our reach. On we go.");
+            if (route.Count > 1) { route.RemoveAt(0); Leading = route[0].at; LeadingName = route[0].name; } else StopLeading();
         }
         public void StopLeading() { Leading = null; LeadingName = null; route.Clear(); Dungeon = null; StoppedBy = null; waitingAt = null; }
         /// <summary>A dungeon run (round 27): the camps still to clear, in the order the passage meets them, each with the gate across the
@@ -449,12 +457,7 @@ namespace Crulanda.Encounter
             if (Leading.HasValue && quarry == null && waitingAt == null && !CampCleared() && Vector3.Distance(transform.position, Leading.Value) < 18 && !session.InCombat)
             {
                 if (campIdleSince < 0) campIdleSince = Time.time;
-                else if (Time.time - campIdleSince > 45)
-                {
-                    campIdleSince = -1;
-                    session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? "cant reach that one. leave it, on we go" : "Leave that one, it is out of our reach. On we go.");
-                    if (route.Count > 1) { route.RemoveAt(0); Leading = route[0].at; LeadingName = route[0].name; } else StopLeading();
-                }
+                else if (Time.time - campIdleSince > 45) { campIdleSince = -1; LeaveCamp(); }
             }
             else campIdleSince = -1;
             if (Leading.HasValue && quarry == null && waitingAt == null && CampCleared())
@@ -532,6 +535,8 @@ namespace Crulanda.Encounter
                 return;
             }
             // Leading a run (5.6): on to the camp while you keep up; waits when you fall behind. At a shut gate it waits for you to open it (D7).
+            // No headway for 45 s out of a fight (2026-10-13, the evening group run: the leader stood "leading you to the lava ledge" for
+            // eleven minutes, the camp up where no path reaches and never within the 18 m of the rule above): that camp is left behind.
             if (Leading.HasValue)
             {
                 float toCamp = Vector3.Distance(transform.position, Leading.Value);
@@ -540,6 +545,15 @@ namespace Crulanda.Encounter
                 // anyone alive is more than 12 m behind, and pulls nothing until they are all within reach.
                 float behind = PartyBehind();
                 if (behind > 16) { Activity = "Waiting for the party"; agent.isStopped = true; return; }
+                if (toCamp > 6 && waitingAt == null)
+                {
+                    // Headway along the path it walks (a cave's way winds: the straight line can grow while it goes the right way).
+                    float left = agent.hasPath && !agent.pathPending && !float.IsInfinity(agent.remainingDistance) ? agent.remainingDistance : toCamp;
+                    if (leadFor != Leading.Value || Time.time - leadSeen > 1) { leadFor = Leading.Value; leadBest = left; leadBestAt = Time.time; }
+                    else if (left < leadBest - 1.5f) { leadBest = left; leadBestAt = Time.time; }
+                    else if (!session.InCombat && Time.time - leadBestAt > 45) { leadSeen = 0; LeaveCamp(); return; }
+                    leadSeen = Time.time;
+                }
                 if (toCamp > 6) { Activity = (waitingAt != null ? "Going to the " : "Leading you to the ") + LeadingName.ToLower(); agent.isStopped = false; agent.speed = 4.2f; agent.SetDestination(Leading.Value); return; }
                 Activity = (waitingAt != null ? "Waiting at the " : "At the ") + LeadingName.ToLower(); agent.isStopped = true; return;
             }

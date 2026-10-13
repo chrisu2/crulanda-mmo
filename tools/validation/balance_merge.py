@@ -10,11 +10,19 @@ CAPS = {'healer': .50, 'control': .75, 'support': .75}
 SLACK = .03
 
 rows = {}   # (class, build, role) -> {scenario: [dps...], 'hps': [hps...]}
+tanks = {}  # (class, build) -> lists of the tank test's figures ("# tank" lines: taken, self-heal, net, threat a second; refills)
 files = sorted(glob.glob(os.path.join(folder, 'balance-*.csv')), key=os.path.getmtime)
 for f in files:
     if '_TABLE' in f: continue
     with open(f, encoding='utf-8') as h:
         for r in csv.reader(h):
+            if r and r[0].startswith('# tank '):
+                import re
+                m = re.match(r'# tank (\S+) (\S+) \d+: taken ([\d.]+) self-heal ([\d.]+) net (-?[\d.]+) threat ([\d.]+) refills (\d+)', ','.join(r))
+                if m:
+                    k = (m.group(1).replace('class.', ''), m.group(2)); d = tanks.setdefault(k, {'taken': [], 'self': [], 'net': [], 'threat': [], 'refills': []})
+                    for name, g in (('taken', 3), ('self', 4), ('net', 5), ('threat', 6), ('refills', 7)): d[name].append(float(m.group(g)))
+                continue
             if not r or r[0].startswith('#') or r[0] == 'class': continue
             cls, build, role, scen = r[0].replace('class.', ''), r[1], r[2], r[3]
             try: dps, hps = float(r[6]), float(r[7])
@@ -69,6 +77,11 @@ for t in sorted(table, key=lambda t: (t['cls'], order.get(t['role'], 9), t['buil
     lines.append('| %s | %s | %s%s | %.1f | %.1f | %s | %s | %s | %s |' % (t['cls'], t['build'], NAME.get(t['role'], t['role']), kind, t['single'], t['aoe'],
                  ('x%.2f' % (t['aoe'] / t['single'])) if t['single'] > 0 else '-',
                  ('%.1f' % t['hps']) if t['hps'] > 0 else '-', tgt, st))
+if tanks:
+    lines += ['', '## Tanks (three dummies striking 40 every 2 s each; lower net intake is sturdier)', '',
+              '| rank | class | build | taken /s | self-heal /s | net /s | threat /s | near-deaths in 180 s |', '|---|---|---|---|---|---|---|---|']
+    for i, ((c, b), d) in enumerate(sorted(tanks.items(), key=lambda kv: mean(kv[1]['net']))):
+        lines.append('| %d | %s | %s | %.1f | %.1f | %.1f | %.1f | %.1f |' % (i + 1, c, b, mean(d['taken']), mean(d['self']), mean(d['net']), mean(d['threat']), mean(d['refills'])))
 lines += ['', 'In range: %d of %d builds.' % (counts.get(True, 0), len(table)),
           'Role medians (single DPS): ' + ', '.join('%s %.1f' % (NAME.get(r, r), m) for r, m in sorted(medians.items())) + '; DPS median %.1f.' % dps_median,
           'Files: ' + ', '.join(os.path.basename(f) for f in files if '_TABLE' not in f)]

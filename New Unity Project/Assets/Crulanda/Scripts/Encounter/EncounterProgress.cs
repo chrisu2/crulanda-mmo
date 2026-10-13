@@ -193,6 +193,8 @@ namespace Crulanda.Encounter
         public void Clear() { values.Clear(); forced = null; until = 0; }
         public void Remove(string id) { if (id != null) values.Remove(id); if (forced == id) { forced = null; until = 0; } }
         public bool IsEmpty { get { return values.Count == 0; } }
+        /// <summary>The threat held by one party member (0 if none); the balance harness's tank test reads it.</summary>
+        public float Of(string id) { return id != null && values.TryGetValue(id, out var v) ? v : 0; }
     }
 }
 

@@ -81,6 +81,7 @@ namespace Crulanda.Tests
                         yield return Fight(cls, branch, role, "single", seed, 1);
                         yield return Fight(cls, branch, role, "aoe3", seed, 3);
                         if (role.Contains("heal")) yield return Fight(cls, branch, role, "heal", seed, 0);
+                        if (role == "tank") yield return Fight(cls, branch, role, "tank", seed, 3);   // the tank test: three dummies that strike
                     }
                 File.WriteAllLines(Path.Combine(Out, CsvName), csv);
                 EncounterSession.StartClassOverride = null;
@@ -245,6 +246,10 @@ namespace Crulanda.Tests
             var at = s.Player.transform.position + s.Player.transform.forward * 2.5f; if (ag != null && ag.isOnNavMesh) ag.Warp(at); else m.transform.position = at;
             return m;
         }
+        /// <summary>The tank test (Chris, 2026-10-13: "top 3 best tanks"): three dummies strike you in turn, a blow of 40 (before your
+        /// mitigation, through the kit's own ResolveEnemyHit) every 2 s each; damage taken, self-healing, net intake and threat a second,
+        /// and the times your health fell under 30% and was filled (each a death you would have had). "# tank" lines; balance_merge.py ranks them.</summary>
+        public const int TankBlow = 40; public const float TankStrikeEvery = 2;
         IEnumerator Fight(string cls, TalentBranchData branch, string role, string scenario, int seed, int targets)
         {
             UnityEngine.Random.InitState(1000 + seed);
@@ -282,6 +287,7 @@ namespace Crulanda.Tests
             if (seed == 0) csv.Add("# locks " + cls + " " + branch.id + " " + scenario + ": " + string.Join(" ", Enumerable.Range(0, s.Kit.ActionCount).Where(i => s.Kit.ActionAt(i) != null && s.Kit.ActionLockLabel(i) != null).Select(i => s.Kit.ActionAt(i).id + "=" + s.Kit.ActionLockLabel(i).Replace(" ", "_"))));
             s.Meter.Reset(); s.Meter.RunName = cls.Replace("class.", "") + " / " + branch.id + " · " + scenario + " · seed " + seed;   // read on the meter when the fights run on screen (Chris 2026-10-13)
             var pool = s.Player.Resource.Pool; int last = pool.Current, used = 0; float oom = -1, t = 0, hurt = 0;
+            bool tankTest = scenario == "tank"; float strike = 0; int striker = 0, taken = 0, refills = 0;
             Time.captureDeltaTime = Step;
             while (t < FightSeconds)
             {
@@ -289,7 +295,16 @@ namespace Crulanda.Tests
                 if (targets > 0 && (s.Target == null || !s.Target.actor.IsAlive)) { var f = foes.FirstOrDefault(x => x != null && x.actor.IsAlive); if (f != null) s.Select(f); }
                 if (targets == 0 && wounded != null) { hurt += dt; if (hurt >= 1) { hurt -= 1; wounded.actor.Health.ApplyDamage(Mathf.Min(wounded.actor.Health.Pool.Current - 1, Mathf.RoundToInt(wounded.actor.Health.Pool.Max * WoundShare))); } }
                 else if (targets == 0) { hurt += dt; if (hurt >= 1) { hurt -= 1; s.Player.Health.ApplyDamage(Mathf.Min(s.Player.Health.Pool.Current - 1, Mathf.RoundToInt(s.Player.Health.Pool.Max * WoundShare))); } }   // no Mira in the scene: you
-                if (s.Player.Health.Pool.Current < s.Player.Health.Pool.Max * .3f && targets > 0) s.Player.Health.Pool.Fill();
+                if (tankTest)
+                {
+                    strike += dt; float every = TankStrikeEvery / Mathf.Max(1, foes.Count);
+                    while (strike >= every)
+                    {
+                        strike -= every; var striking = foes[striker++ % foes.Count];
+                        if (striking != null && striking.actor.IsAlive && s.Player.IsAlive) taken += s.Kit.ResolveEnemyHit(striking, s.Player, TankBlow);
+                    }
+                }
+                if (s.Player.Health.Pool.Current < s.Player.Health.Pool.Max * .3f && targets > 0) { if (tankTest) refills++; s.Player.Health.Pool.Fill(); }
                 if (!s.PlayerCasting)   // a cast in hand is let finish
                 foreach (int slot in order.OrderByDescending(i => s.Kit.ActionAt(i) != null && Every.TryGetValue(s.Kit.ActionAt(i).id, out var keepEvery) && (!lastUse.TryGetValue(i, out var keptAt) || t - keptAt >= keepEvery) ? 1 : 0)
                     .ThenByDescending(i => targets == 0 && s.Kit.ActionAt(i) != null && s.Kit.ActionAt(i).effect == AbilityEffect.Heal ? 1 : 0)
@@ -311,6 +326,13 @@ namespace Crulanda.Tests
             int dmg = 0, heal = 0; foreach (var r in s.Meter.Rows) { dmg += r.damage; heal += r.healing; }
             if (s.Player.Health.Pool.Current <= 0) s.Player.Health.Revive(s.Player.Health.Pool.Max);
             csv.Add(string.Join(",", cls, branch.id, role, scenario, seed, t.ToString("0.0"), (dmg / t).ToString("0.0"), (heal / t).ToString("0.0"), pool.Max, used, oom < 0 ? "" : oom.ToString("0.0"), hit));
+            if (tankTest)
+            {
+                string me = s.Player.EntityId.Value; int self = 0; foreach (var r in s.Meter.Rows) if (r.id == me) self += r.healing;
+                float threat = 0; foreach (var f in foes) if (f != null) threat += f.threat.Of(me);
+                csv.Add("# tank " + cls + " " + branch.id + " " + seed + ": taken " + (taken / t).ToString("0.0") + " self-heal " + (self / t).ToString("0.0") +
+                    " net " + ((taken - self) / t).ToString("0.0") + " threat " + (threat / t).ToString("0.0") + " refills " + refills + " health " + s.Player.Health.Pool.Max);
+            }
             if (seed == 0) csv.Add("# uses " + cls + " " + branch.id + " " + scenario + ": " + string.Join(" ", uses.OrderByDescending(x => x.Value).Select(x => x.Key + "=" + x.Value)));
             foreach (var f in foes) if (f != null) { f.actor.Health.Pool.SetMax(5000000, false); f.actor.Health.Pool.SetCurrent(5000000); }
         }

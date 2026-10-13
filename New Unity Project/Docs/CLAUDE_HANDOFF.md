@@ -40,14 +40,21 @@
   less for the rest); the tank test in the harness. None of these have been run yet: chainR12 (balance) and chainR13 (training tests)
   run them. Then: tune the spread shares and the spirits so pet and player land on 62-72 and the area builds on x1.7; read the tank
   ranking; keep one class (the Paladin) from leading all three roles; show Chris the field in a build.
+- **Next class, designed not built:** the Scoundrel (`Docs/CLASS_SCOUNDREL.md`; Chris: an assassin-type rogue with charisma for songs,
+  merchants and dealing; a single-target DPS path, a group-CC path, a support path; canon root Valen, "yes good example"). Four open
+  questions for Chris at the end of the doc. Build only when he says go.
 - **The grey (TODO 8) done:** Hollow Men's blows grey (EncounterEnemy.Grey.cs), EditMode test. GAME-ONLY mechanic, CANON creature.
 - **Adit NavMesh tests 3/3 (01:12):** the column and plinth tops are off the navmesh (TODO 14's code is done); the group run to the end
   is still to do (`tools\validation\group_run.ps1` on Chris's screen, with the lane B build the chain makes).
 - SocialPull 7/8 at 01:14 ("The first is home"): fixed in 31cad5d (a mob finishes the walk home before strolling; far-off mobs ask
   for the way home at most every 2 s). The full suite from 01:34 (`suiteS.xml`) includes it.
-- **Running, one Unity at a time, lane A:** `D:\crulanda-work\chainR9.ps1` (full PlayMode suite without NamedLootTests, output
-  `encounter-validation\chainR9.out`), then `chainR12.ps1` (all ten classes again, the merge, EditMode `editT`, then the lane B release
-  build with -NoPublish; output `chainR12.out`). Then: retune anything still out of range, report the table to Chris, run the group run.
+- **Stopped at 02:29 (Chris: "once ... full playmode suite's result is finish we need to wrap it up"):** only the full suite from 01:34
+  ran to the end (`D:\crulanda-work\chainR9.ps1`, `encounter-validation\suiteS.xml`; result below). **Next session, first:** run
+  `D:\crulanda-work\chainR12.ps1` (all ten classes on the dummies with every Oct 13 change: the spirits, area spread, tank test, toggles
+  and healing fixes; the merge; EditMode `editT`; the lane B release build with -NoPublish) and then `chainR13.ps1` (TrainingFieldTests).
+  Both wait for `CHAIN9_DONE` in chainR9.out, which is there. Then tune: `balance_retune.py --apply`, the spread shares
+  (`EncounterSession.Spread.cs`) to x1.7 against three, and the spirits so pet and player land on 62-72; report the table and the tank
+  ranking to Chris; show him the training field in a build (republish only with his OK).
 
 ## Rules (from CLAUDE.md and Chris)
 - Run Unity only in the validation lanes: lane A (`D:\crulanda-work\encounter-validation`, tests) and lane B (`encounter-validation-b`, builds and captures).

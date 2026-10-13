@@ -25,7 +25,7 @@ namespace Crulanda.Encounter
             { "class.paladin/judicator", new Spread("Wide judgement", 0.38f, 5, 2) },  // the cleave paladin
             { "class.ranger/skirmisher", new Spread("Scatter shot", 0.81f, 8, 2) },     // scatter arrows, the volley
             { "class.mage/combustion", new Spread("Spreading flame", 0.29f, 6, 2) },
-            { "class.shaman/stormcaller", new Spread("Forked storm", 0.19f, 6, 2) },
+            { "class.shaman/stormcaller", new Spread("Forked storm", 0.12f, 6, 2) },
         };
         bool spreading; string spreadFor; int spreadCount = -1; Spread? spreadNow; List<TalentRank> spreadList;
         /// <summary>The lead build's spread, or null for a single-target build (cached until your ranks change).</summary>

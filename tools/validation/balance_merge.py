@@ -78,7 +78,7 @@ for t in sorted(table, key=lambda t: (t['cls'], order.get(t['role'], 9), t['buil
                  ('x%.2f' % (t['aoe'] / t['single'])) if t['single'] > 0 else '-',
                  ('%.1f' % t['hps']) if t['hps'] > 0 else '-', tgt, st))
 if tanks:
-    lines += ['', '## Tanks (three dummies striking 40 every 2 s each; lower net intake is sturdier)', '',
+    lines += ['', '## Tanks (three dummies each striking a tough level-15 mob's blow every 2 s; lower net intake is sturdier)', '',
               '| rank | class | build | taken /s | self-heal /s | net /s | threat /s | near-deaths in 180 s |', '|---|---|---|---|---|---|---|---|']
     for i, ((c, b), d) in enumerate(sorted(tanks.items(), key=lambda kv: mean(kv[1]['net']))):
         lines.append('| %d | %s | %s | %.1f | %.1f | %.1f | %.1f | %.1f |' % (i + 1, c, b, mean(d['taken']), mean(d['self']), mean(d['net']), mean(d['threat']), mean(d['refills'])))

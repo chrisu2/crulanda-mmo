@@ -26,7 +26,7 @@
      "emphasis": {
       "healer": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "ln-vigil",
@@ -41,7 +41,7 @@
      "emphasis": {
       "healer": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "ln-thrift",
@@ -56,7 +56,7 @@
      "emphasis": {
       "healer": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "ln-quick-prayer",
@@ -71,7 +71,7 @@
      "emphasis": {
       "healer": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "ln-lantern-light",
@@ -86,7 +86,7 @@
      "emphasis": {
       "healer": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "ln-keeper",
@@ -101,7 +101,7 @@
      "emphasis": {
       "healer": 2
      },
-     "impl": false
+     "impl": true
     }
    ]
   },
@@ -125,7 +125,7 @@
      "emphasis": {
       "healer": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "ch-wide-ring",
@@ -140,7 +140,7 @@
      "emphasis": {
       "healer": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "ch-held-note",
@@ -155,7 +155,7 @@
      "emphasis": {
       "healer": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "ch-answer",
@@ -170,7 +170,7 @@
      "emphasis": {
       "healer": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "ch-sanctuary",
@@ -185,7 +185,7 @@
      "emphasis": {
       "healer": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "ch-chorus",
@@ -200,7 +200,7 @@
      "emphasis": {
       "healer": 2
      },
-     "impl": false
+     "impl": true
     }
    ]
   },
@@ -224,7 +224,7 @@
      "emphasis": {
       "dps": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "cn-deep-brand",
@@ -239,7 +239,7 @@
      "emphasis": {
       "dps": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "cn-stern",
@@ -254,7 +254,7 @@
      "emphasis": {
       "dps": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "cn-sunburst",
@@ -269,7 +269,7 @@
      "emphasis": {
       "dps": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "cn-witness",
@@ -284,7 +284,7 @@
      "emphasis": {
       "dps": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "cn-judgement",
@@ -299,7 +299,7 @@
      "emphasis": {
       "dps": 2
      },
-     "impl": false
+     "impl": true
     }
    ]
   },
@@ -323,7 +323,7 @@
      "emphasis": {
       "support": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "wd-absolve",
@@ -338,7 +338,7 @@
      "emphasis": {
       "support": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "wd-steadfast",
@@ -353,7 +353,7 @@
      "emphasis": {
       "support": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "wd-renew",
@@ -383,7 +383,7 @@
      "emphasis": {
       "support": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "wd-bulwark",
@@ -398,7 +398,7 @@
      "emphasis": {
       "support": 2
      },
-     "impl": false
+     "impl": true
     }
    ]
   }

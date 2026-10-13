@@ -100,11 +100,22 @@ namespace Crulanda.Tests
                 foreach (var e in s.Enemies.ToList()) if (e != null) Dummy(e);   // no fight: the hurt is the harness's
                 s.Progress.recruited = true; if (s.Companion != null) { s.Companion.gameObject.SetActive(true); s.Companion.MatchLevel(15); }
                 var pop = SimPopulation.Active; int added = 0;
-                for (float w0 = Time.time; pop != null && Time.time - w0 < 8 && pop.Figures.Count(f => f != null && !f.Hidden) < 3; ) yield return new WaitForSeconds(.5f);   // the sims walk in
-                // Three sims standing in the zone (not hidden, not fighting, not healers: the healing is the build's), invited as returning members.
-                if (pop != null) foreach (var f in pop.Figures.Where(f => f != null && !f.Hidden && !f.InFight && f.sim.classId != "class.saltmender" && f.sim.classId != "class.paladin").OrderBy(f => Mathf.Abs(f.sim.level - 15)).ToList())
-                    { if (added >= 3) break; if (s.Invite(f.sim.id, true)) added++; }
-                rows.Add("# party " + cls + " " + build + ": " + added + " sims joined of " + (pop != null ? pop.Figures.Count : 0) + " figures");
+                // Three sims put in this zone at your side and online all day (the test scene has none standing about), then invited as
+                // returning members, the way a saved party comes back (SimPopulation.RestoreParty). Not healers: the healing is the build's.
+                if (pop != null && pop.World != null)
+                {
+                    var pick = pop.World.sims.Where(x => x.classId != "class.saltmender" && x.classId != "class.paladin" && x.classId != "class.archivist" && x.classId != "class.druid")
+                        .OrderBy(x => Mathf.Abs(x.level - 15)).ThenBy(x => x.id).Take(3).ToList();
+                    int k = 0;
+                    foreach (var sim in pick)
+                    {
+                        var at = s.Player.transform.position - s.Player.transform.forward * (2 + k) + s.Player.transform.right * (k % 2 == 0 ? 1.5f : -1.5f); k++;
+                        sim.zone = pop.ZoneId; sim.x = at.x; sim.z = at.z; sim.onlineFrom = 0; sim.onlineHours = 24;
+                    }
+                    pop.Refresh();
+                    foreach (var sim in pick) if (s.Invite(sim.id, true)) added++;
+                }
+                rows.Add("# party " + cls + " " + build + ": " + added + " sims joined: " + string.Join(" ", s.PartySims.Where(c => c != null).Select(c => c.sim.name + "(" + c.sim.classId.Replace("class.", "") + " " + c.sim.level + ")")));
                 yield return null;
                 for (int seed = 0; seed < Seeds; seed++) yield return PartyFight(cls, branch, seed, rows);
                 EncounterSession.StartClassOverride = null;

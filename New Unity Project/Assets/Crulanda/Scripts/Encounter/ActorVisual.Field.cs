@@ -56,7 +56,7 @@ namespace Crulanda.Encounter
         public float StrokePhase { get { return HoeK; } }
         float HoeK { get { return Mathf.Repeat(hoeTime / StrokePeriod, 1); } }
         /// <summary>The back's slight bend for the stroke (a draw hoe is worked nearly upright), a little more as it draws.</summary>
-        float HoeBend() { StrokeAt(HoeK, out _, out _, out float draw); return 36 + draw * 8; }   // bent a little more over the shaft, so the front arm reaches 45-60 cm down it with relaxed shoulders (note 168)
+        float HoeBend() { StrokeAt(HoeK, out _, out _, out float draw); return 40 + draw * 8; }   // bent a little more over the shaft, so the front arm reaches 45-60 cm down it with relaxed shoulders (note 168)
         /// <summary>The blade's edge this frame, and whether it is in the soil (the draw), for tests.</summary>
         public Vector3 BladeEdge { get; private set; }
         public bool BladeInSoil { get; private set; }
@@ -121,8 +121,8 @@ namespace Crulanda.Encounter
                 float along = Vector3.Dot(gL - gR, dir); float want = Mathf.Clamp(along, HoeHandsMin + .01f, HoeHandsMax - .01f);
                 if (Mathf.Abs(want - along) < .005f) break;
                 float back = want - along;   // how far the top hand slides up the shaft (dir points down it)
-                if (back > 0 && dir.y < -.05f) { float sh = Mathf.Min(model.UpperArmL.position.y, model.UpperArmR.position.y) - .1f; back = Mathf.Min(back, Mathf.Max(0, (sh - gR.y) / -dir.y)); }   // never over the shoulder (note 164)
-                if (back > 0) { var chP = model.Chest != null ? model.Chest.position : foot + up * 1.3f; float aheadNow = Vector3.Dot(gR - chP, ahead), lose = -Vector3.Dot(dir, ahead); if (lose > .05f) back = Mathf.Min(back, Mathf.Max(0, (aheadNow - .28f) / lose)); }   // and still ahead of the chest
+                if (back > 0 && dir.y < -.05f) { float sh = Mathf.Min(model.UpperArmL.position.y, model.UpperArmR.position.y) - .04f; back = Mathf.Min(back, Mathf.Max(0, (sh - gR.y) / -dir.y)); }   // never over the shoulder (note 164)
+                if (back > 0) { var chP = model.Chest != null ? model.Chest.position : foot + up * 1.3f; float aheadNow = Vector3.Dot(gR - chP, ahead), lose = -Vector3.Dot(dir, ahead); if (lose > .05f) back = Mathf.Min(back, Mathf.Max(0, (aheadNow - .26f) / lose)); }   // and still ahead of the chest
                 if (back < .005f && want > along) break;
                 var to = gR - dir * back;
                 Reach(model.UpperArmR, model.LowerArmR, model.HandR, to - (Grip(model.HandR, model.MiddleR) - model.HandR.position), -up + side * .8f - ahead * .3f);

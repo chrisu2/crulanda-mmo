@@ -1,0 +1,406 @@
+{
+ "id": "shaman",
+ "name": "Shaman",
+ "resource": "Breath",
+ "resourceDesc": "Breath, a lungful of a hundred, pays for every calling; it returns with every stone you stand by.",
+ "identity": "A weather-speaker of the high moors who calls on rain, stone and the old dead; standing stones raised from the ground, not built. GAME-ONLY (no shamans in canon).",
+ "canonStatus": "GAME-ONLY",
+ "branches": [
+  {
+   "id": "rainspeaker",
+   "name": "Rainspeaker",
+   "role": "healer",
+   "loop": "Call the rain on the party, Tide Mend the one under, Chain Mend when three are low.",
+   "tradeoff": "The rain falls where you stood: move and it does not follow.",
+   "nodes": [
+    {
+     "id": "rs-soft-rain",
+     "name": "Soft Rain",
+     "tier": 0,
+     "col": 0,
+     "max": 5,
+     "req": null,
+     "kind": "passive",
+     "icon": "drop",
+     "desc": "Rain Call heals 4% more per rank.",
+     "emphasis": {
+      "healer": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "rs-long-rain",
+     "name": "Long Rain",
+     "tier": 0,
+     "col": 1,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "clock",
+     "desc": "Rain Call lasts 2s longer per rank.",
+     "emphasis": {
+      "healer": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "rs-tide",
+     "name": "High Tide",
+     "tier": 0,
+     "col": 2,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "heart",
+     "desc": "Tide Mend heals 5% more per rank.",
+     "emphasis": {
+      "healer": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "rs-chain",
+     "name": "Running Water",
+     "tier": 1,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "ring",
+     "desc": "Chain Mend leaps once more per rank.",
+     "emphasis": {
+      "healer": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "rs-spring-stone",
+     "name": "Spring Stone",
+     "tier": 1,
+     "col": 1,
+     "max": 2,
+     "req": null,
+     "kind": "active",
+     "icon": "stone",
+     "desc": "A stone that gives the party 1% health a second per rank.",
+     "emphasis": {
+      "healer": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "rs-flood",
+     "name": "The Flood",
+     "tier": 2,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "signature",
+     "icon": "star",
+     "desc": "Once a fight, Rain Call heals triple for 4s.",
+     "emphasis": {
+      "healer": 2
+     },
+     "impl": false
+    }
+   ]
+  },
+  {
+   "id": "stormcaller",
+   "name": "Stormcaller",
+   "role": "dps",
+   "loop": "Squall to build the Thunderhead, loose it, and drop Hailfall on the pack.",
+   "tradeoff": "The Thunderhead held too long breaks on you.",
+   "nodes": [
+    {
+     "id": "sc-squall",
+     "name": "Hard Squall",
+     "tier": 0,
+     "col": 0,
+     "max": 5,
+     "req": null,
+     "kind": "passive",
+     "icon": "bolt",
+     "desc": "Squall deals 4% more per rank.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "sc-charge",
+     "name": "Gathering Cloud",
+     "tier": 0,
+     "col": 1,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "clock",
+     "desc": "Thunderhead charges 10% faster per rank.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "sc-hail",
+     "name": "Heavy Hail",
+     "tier": 0,
+     "col": 2,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "ring",
+     "desc": "Hailfall's circle is 0.5 m wider per rank.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "sc-wind",
+     "name": "Wind at the Back",
+     "tier": 1,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "bolt",
+     "desc": "Squall casts 0.15s faster per rank.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "sc-stormstone",
+     "name": "Storm Stone",
+     "tier": 1,
+     "col": 1,
+     "max": 2,
+     "req": null,
+     "kind": "active",
+     "icon": "stone",
+     "desc": "A stone that strikes the nearest foe every 2s.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "sc-tempest",
+     "name": "The Tempest",
+     "tier": 2,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "signature",
+     "icon": "star",
+     "desc": "A loosed Thunderhead also hits two more foes.",
+     "emphasis": {
+      "dps": 2
+     },
+     "impl": false
+    }
+   ]
+  },
+  {
+   "id": "stonebound",
+   "name": "Stonebound",
+   "role": "tank",
+   "loop": "Earthskin on, Rooting Stamp to hold the pack, Cairn when the blow comes.",
+   "tradeoff": "Rooted, you do not move either.",
+   "nodes": [
+    {
+     "id": "sb-earthskin",
+     "name": "Thick Earthskin",
+     "tier": 0,
+     "col": 0,
+     "max": 5,
+     "req": null,
+     "kind": "passive",
+     "icon": "shield",
+     "desc": "Earthskin cuts 2% more damage per rank.",
+     "emphasis": {
+      "tank": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "sb-stamp",
+     "name": "Heavy Stamp",
+     "tier": 0,
+     "col": 1,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "ring",
+     "desc": "Rooting Stamp holds 1s longer per rank.",
+     "emphasis": {
+      "tank": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "sb-cairn",
+     "name": "High Cairn",
+     "tier": 0,
+     "col": 2,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "stone",
+     "desc": "Cairn absorbs 6% more per rank.",
+     "emphasis": {
+      "tank": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "sb-grip",
+     "name": "Grip of Stone",
+     "tier": 1,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "clock",
+     "desc": "Taunted foes are slowed 5% per rank.",
+     "emphasis": {
+      "tank": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "sb-standing",
+     "name": "Standing Stone",
+     "tier": 1,
+     "col": 1,
+     "max": 2,
+     "req": null,
+     "kind": "active",
+     "icon": "stone",
+     "desc": "A stone that draws the pack's notice to it for 4s.",
+     "emphasis": {
+      "tank": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "sb-mountain",
+     "name": "The Mountain",
+     "tier": 2,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "signature",
+     "icon": "star",
+     "desc": "Once a fight, take no damage for 3s.",
+     "emphasis": {
+      "tank": 2
+     },
+     "impl": false
+    }
+   ]
+  },
+  {
+   "id": "gravewind",
+   "name": "Gravewind",
+   "role": "control",
+   "loop": "Moor Wind to push, Mist to blind, Barrow-call to send them running.",
+   "tradeoff": "What runs comes back.",
+   "nodes": [
+    {
+     "id": "gw-wind",
+     "name": "Strong Wind",
+     "tier": 0,
+     "col": 0,
+     "max": 5,
+     "req": null,
+     "kind": "passive",
+     "icon": "bolt",
+     "desc": "Moor Wind pushes 0.5 m further per rank.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "gw-mist",
+     "name": "Thick Mist",
+     "tier": 0,
+     "col": 1,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "clock",
+     "desc": "Mist blinds 1s longer per rank.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "gw-barrow",
+     "name": "Old Barrow",
+     "tier": 0,
+     "col": 2,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "eye",
+     "desc": "Barrow-call fears 1s longer per rank.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "gw-still",
+     "name": "Still Air",
+     "tier": 1,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "ring",
+     "desc": "Moor Wind slows 5% per rank after.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "gw-grave-stone",
+     "name": "Grave Stone",
+     "tier": 1,
+     "col": 1,
+     "max": 2,
+     "req": null,
+     "kind": "active",
+     "icon": "stone",
+     "desc": "A stone that fears the first foe that comes near.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "gw-dead-speak",
+     "name": "The Dead Speak",
+     "tier": 2,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "signature",
+     "icon": "star",
+     "desc": "Barrow-call reaches every foe within 8 m.",
+     "emphasis": {
+      "control": 2
+     },
+     "impl": false
+    }
+   ]
+  }
+ ]
+}

@@ -40,3 +40,7 @@ Resource is **Breath** (mana-like). Stones stand in for totems: standing stones 
 - A 90 s party fight: Mira plus 3 sims taking spread and spike damage.
 - Every healer build runs it: Paladin sanctuary, Salt-Mender mender, Archivist cantor, Druid rootmend, and later Cleric Lantern and Choir and Shaman Rainspeaker.
 - Report HPS, overheal % and mana used and left.
+
+## Scaffolding status (2026-10-12 21:30)
+- Talent trees drafted: Docs/classes/cleric.json and shaman.json, in the Talents JSON shape, 4 branches x 17 ranks, all impl:false, canonStatus GAME-ONLY. Kept out of EncounterContent/Talents until the kits exist, so no loader or test picks them up early.
+- Hooks to add next (from the Salt-Mender footprint): ClassKit.cs factory case, Encounter.asset class + abilities + unlocks, EncounterSession look/colour/stat rows (lines ~105/117/2045), EncounterHud.ClassColour, SimAdventurers.ClassIds + ClassName, SimCompanion casting, SimFigure, icons, EditMode rules tests + PlayMode loop tests, BalanceHarness classes 8 -> 10.

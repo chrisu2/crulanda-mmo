@@ -55,7 +55,15 @@ namespace Crulanda.Encounter
                 if (tint.HasValue) { var c = tint.Value; c.a = m.startColor.mode == ParticleSystemGradientMode.Color ? m.startColor.color.a : 1; m.startColor = new ParticleSystem.MinMaxGradient(c); }
                 cycle = Mathf.Max(cycle, m.duration); linger = Mathf.Max(linger, m.startLifetime.constantMax + m.startDelay.constantMax);
             }
-            var life = go.AddComponent<FxLife>(); life.stopAt = Time.time + (hold > 0 ? hold : Mathf.Clamp(cycle * .92f, .3f, 2.5f)); life.linger = Mathf.Clamp(linger, .3f, 4);
+            // A tint reaches the materials too (an effect whose colour is in its material, the crystals' blue): each keeps its own
+            // brightness and takes the tint's hue.
+            var owned = new List<Material>();
+            if (tint.HasValue)
+                foreach (var r in go.GetComponentsInChildren<ParticleSystemRenderer>(true))
+                    foreach (var m in r.materials)
+                        foreach (var prop in new[] { "_Color", "_TintColor", "_EmissionColor" })
+                            if (m != null && m.HasProperty(prop)) { if (!owned.Contains(m)) owned.Add(m); var c = m.GetColor(prop); float l = Mathf.Max(c.r, Mathf.Max(c.g, c.b)); m.SetColor(prop, new Color(tint.Value.r * l, tint.Value.g * l, tint.Value.b * l, c.a)); }
+            var life = go.AddComponent<FxLife>(); life.owned = owned; life.stopAt = Time.time + (hold > 0 ? hold : Mathf.Clamp(cycle * .92f, .3f, 2.5f)); life.linger = Mathf.Clamp(linger, .3f, 4);
             Played++;
             return go;
         }
@@ -331,6 +339,9 @@ namespace Crulanda.Encounter
     public sealed class FxLife : MonoBehaviour
     {
         public float stopAt, linger = 1; bool stopped; float goneAt;
+        /// <summary>Material copies made for a tint: freed with the effect.</summary>
+        public List<Material> owned;
+        void OnDestroy() { if (owned != null) foreach (var m in owned) if (m != null) Destroy(m); }
         void Update()
         {
             if (!stopped && Time.time >= stopAt)

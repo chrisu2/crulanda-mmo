@@ -29,7 +29,7 @@ namespace Crulanda.Encounter
             var mid = (a.position + b.position) / 2 + Vector3.up * 1.1f; var across = Vector3.Cross(Vector3.up, b.position - a.position).normalized;
             float span = Vector3.Distance(a.position, b.position);
             // The clear side (a yard post or a fence between the camera and the pair spoiled frames: 2026-10-14), a little higher if neither is.
-            float off = 4.5f + span * .55f; var at = mid + across * off + Vector3.up * 1.2f;
+            float off = 4.5f + span * .55f; var at = mid + across * off + Vector3.up * (1.2f + Mathf.Max(0, span - 5) * .4f);   // higher for a ranged pair: over the yard's posts (they have no collider)
             if (Physics.Linecast(mid, at)) { var other = mid - across * off + Vector3.up * 1.2f; at = !Physics.Linecast(mid, other) ? other : mid + across * off * .7f + Vector3.up * 4; }
             side.transform.position = at; side.transform.LookAt(mid);
         }

@@ -34,7 +34,11 @@ are backwards", "traps need to be something besides a circle on the ground", "no
   and the run order (section 16).
 - **Parked:** the Stylized Newbie Weapons Pack (skinned meshes driven by the pack's own script; a bake is needed before they can be held).
 - **Runs:** chainR70 (the merge) EditMode 484/485, the touched PlayMode classes 54/56 (the hoe stroke count under the clip, the parked
-  shaft); chainR71 23/24 (the plough's stroke period); the final run (chainR72, 14:36): FINAL
+  shaft); chainR71 23/24 (the plough's stroke period); the final run (chainR72, 14:36-16:33): EditMode 484/485, the full PlayMode suite 345/349 (NodeStreamTests, the woods grown
+  differently without the nodes, and FieldWorkTests, the fists under the ploughing clip, fixed in the published build; SocialPullTests'
+  linked group 3.5 m from home, and the parked tool shaft), the Mage and the Rogue 2/2 with all 43 builds in range, the release build
+  (0 shader errors), Oakhaven's tour 109 a second. **Published 16:33** (the 16:28 build); the save backed up to
+  `save-backups/20261014-1633-before-woods-publish`.
 
 ## 2026-10-14, 00:20 to the end: play-test fixes, the Scoundrel, the drowned dead, the dungeons after the Adit
 Chris (23:40-00:10, play-testing): "cant see all classes", "only thing on orc that move is belt, staff and teeth", "at level 1 the orc

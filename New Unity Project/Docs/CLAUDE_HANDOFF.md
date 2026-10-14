@@ -6,15 +6,15 @@
 What was done, in order, is in `Docs/TONIGHT_2026-10-13.md` (Progress, 2026-10-14 11:40 on) and `Docs/CHANGELOG.md` (2026-10-14,
 11:40 on). Nothing is VERIFIED until Chris has seen it in his build.
 - **Branch:** `feet-bow-adit-kit`, PR #2. Do not merge to `main` without Chris. The Adit rework is on `adit-rework` (pushed, not merged).
-- **Published:** FINAL-PUBLISH. Save backed up first: FINAL-SAVE.
-- **Tests (TESTED):** the final run (chainR72): FINAL-TESTS. Known and parked: EliteFightTests needs a graphics device in batch mode;
+- **Published:** the release build of 16:28 at 16:33 (commit 4465b1da, the woods and the rest of CHANGELOG 2026-10-14 11:40 on) to `D:/crulanda-work/outputs/Crulanda-Playable`. Save backed up first: `D:/crulanda-work/save-backups/20261014-1633-before-woods-publish`.
+- **Tests (TESTED):** the final run (chainR72): EditMode 484/485, the full PlayMode suite 345/349 (two of the four fixed in the published build, see CHANGELOG), balance 43 of 43 builds in range, Oakhaven 109 a second. Known and parked: EliteFightTests needs a graphics device in batch mode;
   GroundingTests (a sim's sole 2.8 cm up); VillageDayTests (Wat Stook's tool shaft through a leg while walking); the CraftPix boar's
   EditMode test is inconclusive.
 - **Balance (TESTED):** all 49 builds in range (`D:/crulanda-work/outputs/balance/BALANCE_ALL.md`, and `balance-summary.csv` to sort).
 - **New today, for Chris to look at first:**
   - **The wild woods** in every zone (Chris's "Elwynn" brief): Oakhaven's wild country wooded with its own trees, great oaks only in a
     few dense old-forest patches, the floor open. Frames: `D:/crulanda-work/world-captures/oakhaven-21-the-mastwood.png`, `-37-lark-hill.png`,
-    `-38-sallow-bottom.png`. Frame rate in the tour: FINAL-FPS (110 before the woods).
+    `-38-sallow-bottom.png`. Frame rate in the tour: 109 a second (110 before the woods).
   - **Kevin's melee, spell and work motions** and **every spell's effect**: `D:/crulanda-work/ui-captures/combat3/<class>/sheet-b.png`
     (one tile an ability; `combat2` has every class). The hoe under the ploughing clip: `ui-captures/life-1014c/farmer-*-at-work-side.png`.
   - **The archery butts** facing their lanes (`ui-captures/training-1014c/tf-01-yard.png`) and **the jaw trap** (`ui-captures/fixes-1014c`).

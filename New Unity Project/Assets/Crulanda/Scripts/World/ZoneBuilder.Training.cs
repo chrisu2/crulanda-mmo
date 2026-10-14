@@ -101,9 +101,10 @@ namespace Crulanda.World
         }
         /// <summary>
         /// Turns a standing target (an archery butt) about the vertical so its face looks at <paramref name="toward"/>, from its own
-        /// shape: the face is the upper part's thinnest horizontal spread, and the stand's legs reach out behind it (the lower part's
-        /// middle lies behind the upper part's), so the front is away from the legs. Left as it is when its meshes cannot be read or
-        /// show no legs to tell front from back.
+        /// shape: the face is the upper part's thinnest horizontal spread; a tripod butt stands on two legs splayed under its face
+        /// with a short prop behind, so the lower part's middle lies in front of the disc (the Small Props targets, read from their
+        /// meshes 2026-10-14: the legs' middle 3-12 cm out on the painted side; turned the other way they all faced the fence, Chris,
+        /// "now three are backward"). Left as it is when its meshes cannot be read or the legs stand under the disc (the Megapack's).
         /// </summary>
         public static bool FaceLane(GameObject go, Vector3 toward)
         {
@@ -126,10 +127,11 @@ namespace Crulanda.World
             var n = new Vector3(-Mathf.Sin(angle), 0, Mathf.Cos(angle));   // at right angles to it
             float behind = Vector3.Dot(cl - cu, n);
             if (Mathf.Abs(behind) < .02f) return false;
-            var front = behind > 0 ? -n : n;
+            var front = behind > 0 ? n : -n;   // the legs' side
             var want = toward - cu; want.y = 0; if (want.sqrMagnitude < .01f) return false;
             float turn = Vector3.SignedAngle(front, want.normalized, Vector3.up);
             go.transform.RotateAround(new Vector3(cu.x, go.transform.position.y, cu.z), Vector3.up, turn);
+            Debug.Log("Butt " + go.name + ": legs " + (behind * 100).ToString("0") + " cm off the disc, turned " + turn.ToString("0") + " degrees to its lane.");
             return true;
         }
         /// <summary>The dummy's look under <paramref name="t"/>, its feet at <paramref name="foot"/> (local).</summary>

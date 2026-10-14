@@ -199,7 +199,7 @@ namespace Crulanda.Tests
                         answered = true;
                         // The paper fight (EliteBalanceTests) counts those who answer as normal mobs: no second elite within a call.
                         // A pair the zone makes on purpose, each the other's guard (the reworked Adit's Ysolt and Varrow: they pull together).
-                        bool pair = guards[e] == kin || guards[c] == lord;
+                        bool pair = (guards[e] != null && guards[e].Contains(c)) || (guards[c] != null && guards[c].Contains(e));
                         Assert.IsFalse(kin.elite && !pair, lord.mob + "'s call reaches " + kin.mob + ", another elite. Shorten the call or count it in the balance table.");
                     }
                     if (!answered) unanswered.Add(lord.mob);

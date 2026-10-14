@@ -1,5 +1,41 @@
 # Changelog
 
+## 2026-10-14, 11:40 on: the woods, Kevin's motions, every spell's effect, real fire, the Adit's elites
+Chris (11:40-14:40, verbatim in PLAYTEST_NOTES 179-188): "Filling the zones in the Elwynn style. is next.", "you can start expanding
+adit so not so empty next on the agenda.", "we need more spell animations and melee animations also", "here is elwyn very dense area
+for good level adventures" (eight pictures), "you now have these animations to implement in game", "id like to keep some of the trees we
+have now. only the big tree in some areas maybe making it a dense forest area.", "ploughing would be good one to use on the hoe", "we
+need new spell effects also for ALL spells", "i added some spell effects, aoe effects, melee effects, fire to myassets", "still a couple
+are backwards", "traps need to be something besides a circle on the ground", "now three are backward".
+- **The wild woods** (`ZoneBuilder.Woods.cs`, `ZoneDefinition.woods`; every zone): the open wild is one canopy of the zone's own trees
+  with the roads, water, camps, fields and sights cut into it; a few old-forest patches are dense, with great oaks (the Verdant giant at
+  half size) only there; the floor open with ferns, bushes, fallen trunks, stumps, mushrooms and stones; the woods thin toward the
+  village. Oakhaven: 1,558 wooded cells of 8 m, 53 great oaks, 1,082 broadleaves, 161 pines, 780 things on the floor; mostly green and
+  gold (the even leaf mix read as a wood of reds). The frame rate: 110 a second in the tour, then 79 once the woods were greener (the
+  kit's common tree is the heavier), so the woods' own trees are not drawn past 220-300 m, in the fog. WoodsTests.
+- **Kevin Iglesias's motions** (his Melee, Spellcasting, Throwing and Crafting Animations FREE, 90 clips, `ModelFigure.KiActs/KiWork`,
+  `ActorVisual.Motions.cs`): a blow by what the hands hold (one-handed from the right and the left, two-handed, the polearm's thrust, the
+  shield's bash); a spell by what it does (a bolt from the right hand, a mend from the left, a long cast from both, a thing called down
+  or raised, all round the caster; a knife, a flask, a net thrown); the cast held in Kevin's pose; the plough's stroke working the
+  farmer's body under the hand-set hoe stroke; gathering, the pick at a seam and at the block. SpellFxTests checks every ability's
+  motion has its clip for both bodies.
+- **Every spell's effect** (`SpellFx.cs`; Hovl's Magic Effects FREE, Matthew Guz's Slash Effects FREE, Vefects' Free Fire VFX in
+  `Resources/Fx`, 95 MB): each of the 148 abilities has an element and a look (a slash across the foe, a burst on every foe struck, a
+  glow on every one mended and a circle for a mend of the party, a ward's shield, a hex's shadow, a ground effect for what is called
+  down; 40 with a look of their own); a cast glows in the hand with a circle under the feet for a long one; bolts burst with the pack's
+  hits. The fire pack's three URP shaders were written again for the built-in pipeline (same GUIDs); the Mage's fire spells and
+  Consecrate burn with real flames, and so do the camps' campfires and the cookfires. CombatCapture (`--crulanda-combat-capture`)
+  frames every class's abilities at the training dummy: `D:/crulanda-work/ui-captures/combat2/<class>/sheet-b.png`.
+- **Fixes from Chris's reports:** the archery butts turned by their own shape to face their lanes (a tripod's legs splay under its
+  painted face; the first rule turned three to the fence); the Snare Trap a jaw trap with teeth, a pan, springs and a chain to a stake
+  that snaps shut on what it catches; the Morro idles on Morro's own man (112b, the pack downloaded again); squirrels never hunted.
+- **The Adit rework (branch `adit-rework`, pushed):** the twelve new elites' moves (the engine's moves only) and signature loot
+  (nineteen pieces, icons painted); ADIT_REWORK.md sections 16-17. Still red there: the cave web's joins, rock tops, unreachable camps
+  and the run order (section 16).
+- **Parked:** the Stylized Newbie Weapons Pack (skinned meshes driven by the pack's own script; a bake is needed before they can be held).
+- **Runs:** chainR70 (the merge) EditMode 484/485, the touched PlayMode classes 54/56 (the hoe stroke count under the clip, the parked
+  shaft); chainR71 23/24 (the plough's stroke period); the final run (chainR72, 14:36): FINAL
+
 ## 2026-10-14, 00:20 to the end: play-test fixes, the Scoundrel, the drowned dead, the dungeons after the Adit
 Chris (23:40-00:10, play-testing): "cant see all classes", "only thing on orc that move is belt, staff and teeth", "at level 1 the orc
 shaman only has healing spells?", "there is no target or self or party bars"; then "after scoundrel design. build him and put in game";
@@ -28,7 +64,10 @@ at 01:30, "i think adit dungeon need to be more complex like wow's wailing caves
   copied). 18 caves, about 2.9 km, 97 camps, 9 gates, run wing by wing. Build steps 1-3 of 7 are written. Its first Unity run: EditMode
   488/495 and Adit PlayMode 19/30, so it is TESTED as failing. Section 16 lists what is red: the caves' joins, rock tops, unreachable camps,
   the run order, and the twelve new elites still to write.
-- **The final run on main (chainR69):** RESULTS
+- **The full run on main (chainR69, 11:20):** EditMode 480/481 (the CraftPix boar test inconclusive); the full PlayMode suite 344/348:
+  EliteFightTests (no graphics device in batch mode), GroundingTests (a sim's sole 2.8 cm up), HuntTests (squirrels were not on the
+  never-hunted list: fixed), VillageDayTests (the parked tool shaft through a leg). The balance sets and the group run did not run: a
+  Unity licensing helper left behind held the chain for an hour (a watchdog clears them now, D:/crulanda-work/licwatch.ps1).
 
 ## 2026-10-13, 22:00 on: whole orcs and Chris's new creatures
 Chris: "ok but we had whole orc assets", "that was the whole point of adding those asset", "their mouth and teeth dont line up"; at 22:50,

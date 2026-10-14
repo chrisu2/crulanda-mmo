@@ -88,4 +88,10 @@ lines += ['', 'In range: %d of %d builds.' % (counts.get(True, 0), len(table)),
           'Role medians (single DPS): ' + ', '.join('%s %.1f' % (NAME.get(r, r), m) for r, m in sorted(medians.items())) + '; DPS median %.1f.' % dps_median,
           'Files: ' + ', '.join(os.path.basename(f) for f in files if '_TABLE' not in f)]
 open(out, 'w', encoding='utf-8').write('\n'.join(lines) + '\n')
+# The same table as a CSV to sort (Chris, 2026-10-14: "give me a balance sheet for all that is sortable. csv?"): balance-summary.csv
+# beside the markdown, one row a build; the runs themselves (build, scenario, seed) are in the per-set CSVs.
+import csv
+rows = [[c.strip() for c in l.strip().strip('|').split('|')] for l in lines if l.startswith('| ')]
+rows = [r for r in rows if not set(''.join(r)) <= set('-: ')]
+with open(os.path.join(os.path.dirname(out), 'balance-summary.csv'), 'w', encoding='utf-8', newline='') as h: csv.writer(h).writerows(rows)
 print('\n'.join(lines))

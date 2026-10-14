@@ -88,8 +88,11 @@ namespace Crulanda.Encounter
         }
         static void Stand(EncounterSession s, AdventurerMotor motor, EncounterEnemy dummy, float distance)
         {
-            var d = dummy.transform.position - s.Player.transform.position; d.y = 0; if (d.sqrMagnitude < .01f) d = Vector3.forward;
-            var at = dummy.transform.position - d.normalized * distance;
+            // In front of the dummy, along its own facing: it faces into the yard, with the yard's width clear before it. Standing on the
+            // line from wherever the player spawned put the party outside the fence (Chris, 2026-10-14 20:40: "why do they run test
+            // outside the area?").
+            var d = -dummy.transform.forward; d.y = 0; if (d.sqrMagnitude < .01f) d = Vector3.forward;
+            var at = dummy.transform.position - d.normalized * Mathf.Min(distance, 12.5f);
             motor.Teleport(s.Zone.Ground(new Vector2(at.x, at.z), 1.1f)); motor.SetView(Mathf.Atan2(d.x, d.z) * Mathf.Rad2Deg, 10, 6);
         }
         /// <summary>Every point in one path, as the balance harness buys them.</summary>

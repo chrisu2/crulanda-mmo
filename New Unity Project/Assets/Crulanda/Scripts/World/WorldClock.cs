@@ -198,6 +198,19 @@ namespace Crulanda.World
     }
 
     /// <summary>A chicken coop: hens roost inside at night. The hen-wife opens it in the morning and shuts it at dusk.</summary>
+    /// <summary>A fold of sheep (the Old Fold; Chris, 2026-10-14: "does anyone feed or tend to this flock of sheep?", "or extract
+    /// their wool for market?"): the yard the flock stands in, its gate toward the village, the feed trough, and the fleeces the
+    /// shepherd has shorn and not yet carried to the stall. GAME-ONLY.</summary>
+    public sealed class ZoneFold
+    {
+        public string name; public Vector3 yard, gate, trough; public float radius = 6; public int sheep;
+        /// <summary>Fleeces shorn today and waiting at the fold; the day they were shorn (one shearing a day).</summary>
+        public int Wool; public bool Shorn;
+        public float FedAt = -999; public Vector3 FeedSpot;
+        public bool Feeding { get { return Time.time - FedAt < 28; } }
+        /// <summary>The shearing: a fleece a sheep, once a day (Shorn is cleared with the coops' LaidToday at 4-5).</summary>
+        public int Shear() { if (Shorn) return 0; Shorn = true; Wool += sheep; return sheep; }
+    }
     public sealed class ZoneCoop
     {
         public string name;

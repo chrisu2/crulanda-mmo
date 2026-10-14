@@ -718,5 +718,6 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
 - 194 (19:30, a picture at Vell's smithy: a sword rack and a barrel of blades by a plank wall) "some reason this sparks or lights up" (OPEN)
 - 195 (19:45, a picture at Harrow farm by the hen-wife) "bottom of this barn flashes when walking buy it alternating from brick to wood and it should be turn around 180 so the cows nearby can get in to sleep at night" (OPEN)
 - 196 (19:50, a picture of the Old Fold with Mira) "does anyone feed or tend to this flock of sheep?" (a sheep stands in the fold's wall; nobody tends them; OPEN)
-- 197 (19:55) "or extract their wool for market?" (OPEN: a shepherd for the Old Fold who shears the flock, the wool to the market)
+- 197 (19:55) "or extract their wool for market?" (a shepherd a flock: Tam and Nell Sedge for Oakhaven's two; the count at the gate at first light, the shearing through the morning, the fleeces to the produce stall after the midday meal, the afternoon feed; the merchant offers the fleeces; OPEN until Chris sees them)
 - 198 (20:00) "all need an exit command to close the .exe" (OPEN)
+- 199 (20:40, two pictures of the Scoundrel combat capture at the training yard's fence, Mira in the grass outside) "why do they run test outside the area?" (CombatCapture stood the player on the line from the spawn to the dummy, through the fence; now in front of the dummy along its facing, into the yard; OPEN until the next capture)

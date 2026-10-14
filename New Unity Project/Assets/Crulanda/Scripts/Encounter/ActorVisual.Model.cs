@@ -551,10 +551,10 @@ namespace Crulanda.Encounter
                     p.elbowL = p.elbowR = -35; p.lean = 10; break;
                 case ActorPose.Work:     // hoeing (or hauling a bucket): a lift and a stroke down, leaning into it (playtest note 76: it read as standing still)
                 {
-                    // Kevin's ploughing stroke with the hoe (2026-10-14, Chris: "ploughing would be good one to use on the hoe"): the clip
-                    // works the body and the shaft is laid through both hands (PloughHands); the hand-set stroke where the clip is missing.
-                    if (HoeReady && speed < 1.1f && model.Has("k.plough")) { p.slot = "k.plough"; p.hoe = true; ploughing = true; break; }
-                    if (HoeReady && speed < 1.1f) { p.bend = HoeBend(); p.hoe = true; break; }   // a long tool: the two-handed stroke (HoeStance, FieldArms; note 150)
+                    // A long tool: the two-handed stroke (HoeStance, FieldArms; note 150). Under it the body works to Kevin's ploughing
+                    // clip (2026-10-14, Chris: "ploughing would be good one to use on the hoe"), its own lean taking half the stroke's bend;
+                    // the arms and the hoe stay the hand-set stroke (the clip alone held the shaft upright like a staff: frames 14:05).
+                    if (HoeReady && speed < 1.1f) { bool plough = model.Has("k.plough"); if (plough) p.slot = "k.plough"; p.bend = HoeBend() * (plough ? .5f : 1); p.hoe = true; break; }
                     float k = Mathf.Repeat(t * .9f, 1), lift = k < .55f ? Mathf.SmoothStep(0, 1, k / .55f) : 1 - Mathf.SmoothStep(0, 1, (k - .55f) / .2f);
                     float chop = 25 + lift * 85;
                     p.arms = true; p.armL = new Vector3(-chop, 0, 12); p.armR = new Vector3(-chop + 8, 0, -12); p.elbowL = p.elbowR = -20 - lift * 20; p.lean = 16 - lift * 8; break;

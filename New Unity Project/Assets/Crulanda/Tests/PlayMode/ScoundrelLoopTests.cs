@@ -32,9 +32,9 @@ namespace Crulanda.Tests
         void OnLoaded(Scene scene, LoadSceneMode mode) { UnityEngine.Object.FindFirstObjectByType<EncounterSession>().SaveDirectoryOverride = root; }
         [UnityTearDown] public IEnumerator Cleanup()
         {
-            EncounterSession.StartClassOverride = null; SceneManager.sceneLoaded -= OnLoaded;
+            EncounterSession.StartClassOverride = null; SceneManager.sceneLoaded -= OnLoaded; var was = SceneManager.GetActiveScene().name;
             var empty = SceneManager.CreateScene("Empty-" + Guid.NewGuid().ToString("N")); SceneManager.SetActiveScene(empty);
-            yield return SceneManager.UnloadSceneAsync("PlayableEncounter");
+            yield return SceneManager.UnloadSceneAsync(was);
             if (Directory.Exists(root)) Directory.Delete(root, true);
         }
         const int QuickCut = 0, Jeer = 1, Settle = 2, Wine = 3, MarkDebt = 4, Glimmer = 5, Jagged = 6, Stay = 7, WarVerse = 8, Rally = 9, Bribe = 10, Favour = 11;
@@ -84,8 +84,14 @@ namespace Crulanda.Tests
         }
         [UnityTest] public IEnumerator Glimmer_dazes_four_and_a_blow_wakes_only_the_one_it_lands_on()
         {
+            // The test scene has too few ordinary mobs for a verse of four: this one plays in Oakhaven, among its camps.
+            SceneManager.sceneLoaded += OnLoaded;
+            yield return SceneManager.LoadSceneAsync("Oakhaven", LoadSceneMode.Single);
+            SceneManager.sceneLoaded -= OnLoaded; yield return null;
+            session = UnityEngine.Object.FindFirstObjectByType<EncounterSession>(); Assert.NotNull(Kit, "a Scoundrel in Oakhaven");
             Level15(); Learn("st-glimmer");
-            var foes = Foes().Take(5).ToList(); if (foes.Count < 4) Assert.Ignore("the scene has fewer than four mobs");
+            var foes = session.Enemies.Where(x => x != null && x.actor.IsAlive && x.Camp && !x.Elite && !x.Game && !x.Hidden).Take(5).ToList();
+            Assert.GreaterOrEqual(foes.Count, 4, "Oakhaven's camps");
             var at = foes[0].transform.position;
             for (int i = 1; i < foes.Count; i++) Put(foes[i], at + Quaternion.Euler(0, i * 72, 0) * Vector3.forward * (1.2f + .4f * i));
             Near(foes[0], 2.5f); yield return null;

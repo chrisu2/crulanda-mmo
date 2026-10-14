@@ -32,6 +32,7 @@ namespace Crulanda.Encounter
             { "class.saltmender/salt-speaker", 1.27f },   // 2026-10-13 fixed-dummy retune
             { "class.warrior/dps", 1.1f },   // 2026-10-13 fixed-dummy retune
             { "class.cleric/censure", 1.68f },   // 2026-10-13 fixed-dummy retune
+            { "class.scoundrel/cutthroat", 0.86f },   // 2026-10-14: 80.2 on the dummies, to the middle of 62-72
             { "class.cleric/warden", 2.32f },   // 2026-10-13 fixed-dummy retune
             { "class.shaman/gravewind", 2.5f },   // 2026-10-13 fixed-dummy retune
             { "class.shaman/stormcaller", 2.08f },   // 2026-10-13 fixed-dummy retune

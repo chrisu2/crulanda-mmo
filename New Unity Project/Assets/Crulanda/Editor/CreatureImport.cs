@@ -20,7 +20,7 @@ namespace Crulanda.EditorTools
         const string Root = "Assets/Crulanda/Resources/Creatures/";
         /// <summary>Raised when these rules change, so Unity imports the creatures again (2026-10-13: the makers' normals for the new models,
         /// and the loop of an "Armature|" take by its own name; 2026-10-14: the Orc Shaman's clips cut to the pack's own frames).</summary>
-        public override uint GetVersion() { return 5; }
+        public override uint GetVersion() { return 6; }
         /// <summary>
         /// The Orc Shaman's clip files (the Orc Army Pack, 24 fps): each holds the pack's whole master take (frames 0-650, every clip in a
         /// row), and the pack cuts its own clip out of it by these frames. Its body (the skinned Character1 bones) is baked only inside
@@ -87,6 +87,10 @@ namespace Crulanda.EditorTools
                 var only = clips.OrderByDescending(c => c.lastFrame - c.firstFrame).First();   // the file's real take (each has a one-frame one too)
                 only.name = u >= 0 ? file.Substring(u + 1) : file;
                 only.loopTime = System.Array.IndexOf(Loops, only.name) >= 0;
+                // The Living Birds' hops and flights carry the bird forward in the clip and snap it back at the loop (Chris, 2026-10-14 19:20:
+                // "birds hop around funny..looks like maybe back and forth"): the root's travel and turn are baked to where the clip began,
+                // and the code moves the bird.
+                if (file.StartsWith("Bird_")) { only.lockRootPositionXZ = true; only.keepOriginalPositionXZ = true; only.lockRootHeightY = true; only.keepOriginalPositionY = true; only.lockRootRotation = true; only.keepOriginalOrientation = true; }
                 // The Orc Shaman's: the pack's own frames out of its master take (its cycles' ends blended to meet, as the pack has them).
                 if (file.StartsWith("OrcShaman_") && OrcShamanFrames.TryGetValue(only.name, out var frames))
                 { only.firstFrame = frames.first; only.lastFrame = frames.last; only.loopPose = only.loopTime; }

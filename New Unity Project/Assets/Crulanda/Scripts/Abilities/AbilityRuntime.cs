@@ -57,6 +57,18 @@ namespace Crulanda.Abilities
         }
         public void Interrupt() { Casting = null; pendingEffect = null; castStarted = castEnds = 0; }
         public void Reset() { Interrupt(); ready.Clear(); globalReady = 0; }
+        /// <summary>The longest personal cooldown still running (seconds) and whose it is; 0 and null when none (a Scoundrel's favour, 2026-10-14).</summary>
+        public float Longest(float now, out string id)
+        {
+            id = null; float most = 0;
+            foreach (var kv in ready) if (kv.Value - now > most) { most = kv.Value - now; id = kv.Key; }
+            return most;
+        }
+        /// <summary>Brings one ability's personal cooldown <paramref name="seconds"/> sooner, never before <paramref name="now"/>.</summary>
+        public void Shorten(string id, float seconds, float now)
+        {
+            if (id != null && seconds > 0 && ready.TryGetValue(id, out var at)) ready[id] = Math.Max(now, at - seconds);
+        }
         static bool ValidTime(float value) { return value >= 0 && !float.IsNaN(value) && !float.IsInfinity(value); }
     }
 }

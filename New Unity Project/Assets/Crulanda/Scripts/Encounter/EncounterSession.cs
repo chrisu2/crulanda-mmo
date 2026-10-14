@@ -121,7 +121,7 @@ namespace Crulanda.Encounter
         /// <summary>The figure a class wears and the tint of its capsule stand-in (the classes added 2026-10-05 included).</summary>
         public static ActorLook LookForClass(string classId)
         {
-            switch (classId) { case "class.druid": return ActorLook.Druid; case "class.paladin": return ActorLook.Paladin; case "class.ranger": case "class.rogue": return ActorLook.Ranger; case "class.saltmender": return ActorLook.SaltMender; case "class.mage": case "class.archivist": case "class.cleric": return ActorLook.Mage; case "class.shaman": return ActorLook.Druid; default: return ActorLook.Warrior; }   // the Cleric robed, the Shaman in moor leathers (an orc figure to come: Chris, 2026-10-13, "shaman is not an orc")
+            switch (classId) { case "class.druid": return ActorLook.Druid; case "class.paladin": return ActorLook.Paladin; case "class.ranger": case "class.rogue": case "class.scoundrel": return ActorLook.Ranger; case "class.saltmender": return ActorLook.SaltMender; case "class.mage": case "class.archivist": case "class.cleric": return ActorLook.Mage; case "class.shaman": return ActorLook.Druid; default: return ActorLook.Warrior; }   // the Cleric robed, the Shaman in moor leathers (an orc figure to come: Chris, 2026-10-13, "shaman is not an orc")
         }
         public static Color TintForClass(string classId)
         {
@@ -136,6 +136,7 @@ namespace Crulanda.Encounter
                 case "class.saltmender": return new Color(.9f, .9f, .86f);
                 case "class.cleric": return new Color(.93f, .88f, .7f);   // a hill shrine's undyed wool and gold thread
                 case "class.shaman": return new Color(.36f, .42f, .5f);   // rain on the high moors
+                case "class.scoundrel": return new Color(.42f, .12f, .16f);   // a claret doublet, wine-dark (2026-10-14)
                 default: return new Color(.2f, .58f, .72f);
             }
         }
@@ -377,18 +378,19 @@ namespace Crulanda.Encounter
             if (v.Role == "merchant" && VillageLife.Active != null && VillageLife.Active.Count("stall.eggs") > 0 && Items.Get(FreshEggs) != null) VendorStock.Insert(0, FreshEggs);
             if (VendorNpc == null) bagsForShop = !InventoryOpen;
             VendorNpc = v.Name; vendorAt = at ?? v.transform.position; InventoryOpen = true; Conversation = null; TradesOpen = false; v.Hold(30);
+            if (Charm.Haggle(Progress, VendorNpc)) Message("You haggle with " + VendorNpc + ": a further twentieth off what you buy here today.");   // the Scoundrel (Charm.cs)
         }
         public const string FreshEggs = "food.fresh_eggs";
         /// <summary>The bags were opened by the shop (they were shut when it opened).</summary>
         bool bagsForShop;
         /// <summary>Shuts the shop, and the bags with it if the shop opened them (the tester's note 116, 2026-10-10: "The shop didn't close
         /// on 'Goodbye', and I didn't close the bags": the shop's window went, the bags it had opened stayed).</summary>
-        public void CloseVendor() { if (VendorNpc != null && bagsForShop) InventoryOpen = false; bagsForShop = false; VendorNpc = null; VendorSim = null; VendorStock = new List<string>(); }
+        public void CloseVendor() { Charm.Current = null;  if (VendorNpc != null && bagsForShop) InventoryOpen = false; bagsForShop = false; VendorNpc = null; VendorSim = null; VendorStock = new List<string>(); }
         // ---------- trading with a sim (round 27) ----------
         /// <summary>The sim whose goods the merchant window shows, if it is a sim you trade with (null for a village merchant).</summary>
         public SimAdventurer VendorSim { get; private set; }
         /// <summary>What an item costs from this window: a sim asks twice its value (a merchant four times).</summary>
-        public int VendorPrice(ItemDef d) { return d == null ? 0 : VendorSim != null ? Math.Max(1, d.value * 2) : Inventory.Price(d); }
+        public int VendorPrice(ItemDef d) { return d == null ? 0 : VendorSim != null ? Math.Max(1, d.value * 2) : Charm.Ask(Progress, Inventory.Price(d)); }   // a Scoundrel's charm at a merchant (Charm.cs)
         /// <summary>What a sim pays for a stack: its value, half as much again for what its own trade uses (ore to a smith, herbs to a brewer).</summary>
         public int SimOffer(SimAdventurer s, ItemDef d, int count)
         {
@@ -459,7 +461,7 @@ namespace Crulanda.Encounter
                 if (item == FreshEggs) { VillageLife.Active.Take("stall.eggs"); if (VillageLife.Active.Count("stall.eggs") == 0) VendorStock.Remove(item); }
                 if (d != null && d.kind == "bag") VendorStock.Remove(item);
                 // The coin goes to the seller's household (ADDENDUM C: the purses, step 7, spend it).
-                VillageLife.Active?.Paid(VendorNpc, Inventory.Price(d));
+                VillageLife.Active?.Paid(VendorNpc, Charm.Ask(Progress, Inventory.Price(d)));
             }
             else Message(why);
         }
@@ -1235,7 +1237,7 @@ namespace Crulanda.Encounter
                 if (Player.Resource.Pool.Current < cost) return false;
                 Player.Resource.Pool.Change(-cost); return true;
             }, effect);
-            if (result == AbilityStartResult.InsufficientResource) Message("Not enough " + ClassDef.resource + ".");
+            if (result == AbilityStartResult.InsufficientResource) Message("Not enough " + (string.IsNullOrEmpty(ClassDef.resourceName) ? ClassDef.resource.ToString() : ClassDef.resourceName) + ".");
             // An instant blow or spell on a target shows (playtest note 25): a swing in melee, a release at range. Casts are TickCastPose's.
             if (result == AbilityStartResult.Started && a.castTime <= 0 && Target != null && Target.actor.IsAlive && !Kit.OwnBlow(a))
             { if (Kit.MeleeAutoAttacks || a.range <= 5 || (Distance(Target) < 3.5f && !Kit.RangedAutoAttacks)) PlayerFigure?.Strike(); else PlayerFigure?.CastRelease(); }   // a bow's shot is loosed at any range
@@ -2075,6 +2077,7 @@ namespace Crulanda.Encounter
                 case "class.saltmender": return (17 + (3 * L) / 2, 12 + L, 10 + L / 2, 16 + 2 * L, 18 + 2 * L);
                 case "class.cleric": return (16 + (3 * L) / 2, 12 + L, 14 + L, 18 + 2 * L, 20 + 2 * L);   // 2026-10-13: its own (it had the Warrior's); balance-neutral (ApplyInnate)
                 case "class.shaman": return (18 + (3 * L) / 2, 15 + L, 14 + L, 17 + 2 * L, 18 + 2 * L);
+                case "class.scoundrel": return (15 + (3 * L) / 2, 12 + L, 20 + 2 * L, 12 + L, 16 + 2 * L);   // quick hands and a ready tongue (2026-10-14); balance-neutral (ApplyInnate)
                 default: return (20 + 2 * L, 20 + 2 * L, 15 + L, 8 + L / 2, 10 + L / 2);   // the Warrior
             }
         }

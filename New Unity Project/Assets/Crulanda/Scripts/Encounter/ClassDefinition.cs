@@ -23,6 +23,8 @@ namespace Crulanda.Encounter
         public string displayName = "Warrior";
         public ClassRole role = ClassRole.Tank;
         public ResourceKind resource = ResourceKind.Vigor;
+        /// <summary>What the HUD calls the pool when it is not the kind's own name (the Scoundrel's Nerve, a Focus pool; 2026-10-14). Empty: the kind's name.</summary>
+        public string resourceName;
         public int maxResource = 100;
         public int combatRegen = 5;
         public int restingRegen = 12;

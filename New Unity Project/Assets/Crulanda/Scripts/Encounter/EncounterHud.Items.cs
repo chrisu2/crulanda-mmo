@@ -90,7 +90,7 @@ namespace Crulanda.Encounter
             var named = LootLines(d); if (named != null) lines.Add(named);
             if (d.level > 1) lines.Add((d.level > session.Progress.Level ? "<color=#ff5544>" : "") + "Requires level " + d.level + (d.level > session.Progress.Level ? "</color>" : ""));
             if (!string.IsNullOrEmpty(d.description)) lines.Add("<i>" + d.description + "</i>");
-            lines.Add("Sells for " + (d.value) + " crowns");
+            lines.Add("Sells for " + Charm.Pay(session.Progress, d.value) + " crowns");   // the Scoundrel's charm (Charm.cs)
             if (compare && d.kind == "gear")
             {
                 var worn = session.Progress.equipment[ItemDatabase.SlotIndex(d.slot)];
@@ -242,7 +242,7 @@ namespace Crulanda.Encounter
                 "Agility  " + st.GetRounded(Crulanda.Core.StatType.Agility), "Intellect  " + st.GetRounded(Crulanda.Core.StatType.Intellect),
                 "Spirit  " + st.GetRounded(Crulanda.Core.StatType.Spirit) };
             string[] right = {
-                "Health  " + pl.Health.Pool.Max, EncounterHud.ResourceName(cls.resource) + "  " + pl.Resource.Pool.Max,
+                "Health  " + pl.Health.Pool.Max, EncounterHud.ResourceName(cls) + "  " + pl.Resource.Pool.Max,
                 "Attack power  " + st.GetRounded(Crulanda.Core.StatType.AttackPower), "Armor  " + st.GetRounded(Crulanda.Core.StatType.Armor),
                 "Damage taken  " + Mathf.RoundToInt(100f * 100 / (100 + st.Get(Crulanda.Core.StatType.Armor))) + "%" };
             for (int i = 0; i < left.Length; i++) { Shadow(new Rect(w.x + 24, y + i * 24, 220, 22), left[i], text, Color.white); Shadow(new Rect(w.x + 254, y + i * 24, 220, 22), right[i], text, Color.white); }

@@ -1648,6 +1648,150 @@ MonoBehaviour:
     globalCooldown: 1.5
     duration: 5
     statusId: 
+  - id: scoundrel.quick_cut
+    name: Quick Cut
+    description: "A quick cut with the dirk. Builds 8 Nerve, and starts automatic weapon attacks."
+    effect: 0
+    power: 5
+    cost: 0
+    cooldown: 0
+    range: 3.2
+    castTime: 0
+    globalCooldown: 1
+    duration: 0
+    statusId: 
+  - id: scoundrel.jeer
+    name: Jeer
+    description: "A mocking verse shouted at a foe up to 20 metres off: light damage, and it comes for you. The pull."
+    effect: 0
+    power: 5
+    cost: 10
+    cooldown: 8
+    range: 20
+    castTime: 0
+    globalCooldown: 1
+    duration: 0
+    statusId: 
+  - id: scoundrel.settle_score
+    name: Settle the Score
+    description: "A finisher: all your Nerve (40 at least) on one hard cut. The more Nerve, the harder it lands."
+    effect: 0
+    power: 8
+    cost: 40
+    cooldown: 6
+    range: 3.2
+    castTime: 0
+    globalCooldown: 1
+    duration: 0
+    statusId: 
+  - id: scoundrel.poisoned_wine
+    name: Poisoned Wine
+    description: "A splash of poisoned wine in the cut: the target takes damage every 2 seconds for 10 seconds."
+    effect: 0
+    power: 3
+    cost: 20
+    cooldown: 10
+    range: 3.2
+    castTime: 0
+    globalCooldown: 1
+    duration: 10
+    statusId: 
+  - id: scoundrel.mark_debt
+    name: Mark the Debt
+    description: "Marks the target for 8 seconds. A fifth of every blow you land on it is owed, and when the mark ends the debt comes due in one hard blow."
+    effect: 0
+    power: 8
+    cost: 25
+    cooldown: 20
+    range: 3.2
+    castTime: 0
+    globalCooldown: 1
+    duration: 8
+    statusId: 
+  - id: scoundrel.glimmer
+    name: Glimmer
+    description: "A high, bright verse of the Glass Coast: the target and up to three foes within 8 metres of it stand dazed for 8 seconds. Any blow wakes the one it lands on."
+    effect: 4
+    power: 0
+    cost: 35
+    cooldown: 30
+    range: 20
+    castTime: 1.5
+    globalCooldown: 1.5
+    duration: 8
+    statusId: 
+  - id: scoundrel.jagged_verse
+    name: Jagged Verse
+    description: "A jagged, sour verse: light damage, the target's spell is stopped and it is silenced 3 seconds, and foes within 6 metres of it are slowed."
+    effect: 4
+    power: 6
+    cost: 20
+    cooldown: 12
+    range: 10
+    castTime: 0
+    globalCooldown: 1
+    duration: 3
+    statusId: 
+  - id: scoundrel.stay
+    name: Stay
+    description: "One word in a Matriarch's voice, \"Stay.\": the target is held 4 seconds, and blows do not break it."
+    effect: 4
+    power: 0
+    cost: 25
+    cooldown: 30
+    range: 10
+    castTime: 0
+    globalCooldown: 1
+    duration: 4
+    statusId: 
+  - id: scoundrel.war_verse
+    name: War-Verse
+    description: "A verse to fight by: while you sing it, the party's blows land 6% harder. One verse at a time; use again to stop."
+    effect: 7
+    power: 6
+    cost: 15
+    cooldown: 0
+    range: 0
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 0
+    statusId: 
+  - id: scoundrel.rallying_verse
+    name: Rallying Verse
+    description: "A quick refrain: for 10 seconds you gain 3 Nerve a second, and Mira 3 mana."
+    effect: 7
+    power: 3
+    cost: 25
+    cooldown: 40
+    range: 0
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 10
+    statusId: 
+  - id: scoundrel.bribe
+    name: Bribe
+    description: "A purse pressed into a hand: a foe that can be bought (not an elite, a beast or a dead thing) stops fighting for 15 seconds. Costs crowns equal to its level; any blow ends it."
+    effect: 4
+    power: 0
+    cost: 20
+    cooldown: 30
+    range: 10
+    castTime: 0
+    globalCooldown: 1
+    duration: 15
+    statusId: 
+  - id: scoundrel.favour
+    name: Call in a Favour
+    description: "Someone owes you: of Mira and your party within 30 metres, the one with the longest wait has it cut by 10 seconds."
+    effect: 7
+    power: 10
+    cost: 20
+    cooldown: 45
+    range: 30
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 0
+    statusId: 
   playerClass:
     id: class.warrior
     displayName: Warrior
@@ -2247,6 +2391,62 @@ MonoBehaviour:
         level: 8
         talentId: 
     talentTree: {fileID: 4900000, guid: 1a8b9b2f52d342858f00c3b297a913ef, type: 3}
+  - definition:
+      id: class.scoundrel
+      displayName: Scoundrel
+      role: 4
+      resource: 3
+      resourceName: Nerve
+      maxResource: 100
+      combatRegen: 4
+      restingRegen: 20
+      stats:
+        baseHealth: 160
+        healthPerLevel: 20
+        healthPerStamina: 5
+        baseAttackPower: 12
+        attackPowerPerLevel: 2
+        attackPowerPerStrength: 1
+        spellPowerPerIntellect: 1
+        armorPerAgility: 1
+      unlocks:
+      - abilityId: scoundrel.quick_cut
+        level: 1
+        talentId: 
+      - abilityId: scoundrel.jeer
+        level: 2
+        talentId: 
+      - abilityId: scoundrel.settle_score
+        level: 1
+        talentId: ct-settle
+      - abilityId: scoundrel.poisoned_wine
+        level: 1
+        talentId: ct-poisoned-wine
+      - abilityId: scoundrel.mark_debt
+        level: 1
+        talentId: ct-mark-debt
+      - abilityId: scoundrel.glimmer
+        level: 1
+        talentId: st-glimmer
+      - abilityId: scoundrel.jagged_verse
+        level: 1
+        talentId: st-jagged-verse
+      - abilityId: scoundrel.stay
+        level: 1
+        talentId: st-stay
+      - abilityId: scoundrel.war_verse
+        level: 1
+        talentId: fx-war-verse
+      - abilityId: scoundrel.rallying_verse
+        level: 1
+        talentId: fx-rallying-verse
+      - abilityId: scoundrel.bribe
+        level: 1
+        talentId: fx-bribe
+      - abilityId: scoundrel.favour
+        level: 1
+        talentId: fx-favour
+    talentTree: {fileID: 4900000, guid: 212336acfcfe4e88afaeed050f8430bf, type: 3}
   questFiles:
   - {fileID: 4900000, guid: dadeaa3314444542a04b4e17d9dbc0c4, type: 3}
   - {fileID: 4900000, guid: 2f37ccf5ed8d46928976a7b5854444ed, type: 3}

@@ -2713,6 +2713,34 @@ def a_mending_verse(c): c.back(c.ell(50, 50, 40), '#9fe8c0', .4, 12); rings(c, 5
 def a_wound_seal(c): c.back(c.ell(50, 50, 40), '#eeeee4', .4, 12); rings(c, 50, 54, (42, 30), '#ffffff', .5, w=3); m_hand(c, '#eeeee4', '#ffffff')
 ABILITIES.update({'paladin.mending_oath': ('#4a3c20', a_mending_oath), 'archivist.mending_verse': ('#1e3a34', a_mending_verse), 'salt.wound_seal': ('#1e342c', a_wound_seal)})
 
+# ---- the Scoundrel (2026-10-14; Docs/CLASS_SCOUNDREL.md): a coin for its dealing, its twelve, its three paths (singing, no instrument, no machines) ----
+def m_coin(c, A, B):
+    c.part(c.ell(50, 50, 36), A, 'metal'); c.part(c.sub(c.ell(50, 50, 29), c.ell(50, 50, 25)), lite(A, .35), 'metal', ink=False)
+    c.part(c.star(50, 50, 14, 6, 5), B, 'metal'); c.shine(c.ell(38, 36, 8, 5, rot=-30), .55)
+MOTIFS.update(dict(coin=m_coin))
+def a_sc_quick_cut(c): c.back(c.ell(50, 50, 38), '#e07a8a', .35, 10); m_dagger(c, '#d8d0c0', '#c04a5a'); slash(c, [(12, 84), (40, 56), (68, 30), (90, 12)], 5, '#ffd0d8')
+def a_sc_jeer(c): c.back(c.ell(50, 50, 38), '#ffb0c0', .4, 10); rings(c, 22, 50, (24, 36, 48), '#ffd0d8', .55, a0=-45, a1=45, w=3); m_note(c, '#ffd0d8', '#ffffff')
+def a_sc_settle_score(c): c.back(c.ell(50, 50, 40), '#c0303a', .45, 12); m_dagger(c, '#e8e0d0', GOLD); slash(c, [(8, 30), (40, 50), (70, 66), (94, 80)], 7, '#ff7070'); c.spark(80, 22, 9, '#fff2c0', .9)
+def a_sc_poisoned_wine(c):
+    c.back(c.ell(50, 50, 38), '#7ad070', .35, 10); m_flask(c, '#8a1e40', GOLD)
+    for x, y in ((24, 30), (78, 34), (70, 84)): c.glow(c.ell(x, y, 4), '#9be05a', halo=5, power=.7)
+def a_sc_mark_debt(c): c.back(c.ell(50, 50, 38), GOLD, .4, 10); m_coin(c, GOLD, '#8a2a30'); slash(c, [(14, 30), (52, 54), (86, 82)], 5, '#c0303a')
+def a_sc_glimmer(c): rays(c, 50, 50, 16, 46, 12, '#fff2c0', .6, 6); c.back(c.ell(50, 50, 30), '#fff8e0', .35, 10); m_note(c, '#fff8e0', '#ffffff'); c.spark(78, 22, 8, '#ffffff', .9)
+def a_sc_jagged_verse(c): c.back(c.ell(50, 50, 38), '#c8a0ff', .4, 10); m_note(c, '#e0d0ff', '#ffffff'); slash(c, [(8, 88), (30, 66), (22, 56), (52, 40), (44, 30), (92, 10)], 4, '#ffe070')
+def a_sc_stay(c): c.back(c.ell(50, 50, 38), '#9fc8ff', .4, 10); m_hand(c, IVORY, '#9fc8ff'); rings(c, 50, 50, (44,), '#dfeeff', .5, w=3)
+def a_sc_war_verse(c): c.back(c.ell(50, 50, 40), '#ff9070', .4, 12); m_banner(c, '#c0303a', GOLD); c.spark(82, 78, 8, '#fff2c0', .8)
+def a_sc_rallying_verse(c): c.back(c.ell(50, 50, 40), '#9fe8c0', .4, 12); rings(c, 50, 54, (42, 30), '#d0ffe0', .6, w=3); m_note(c, '#d0ffe0', '#ffffff')
+def a_sc_bribe(c):
+    c.back(c.ell(50, 50, 38), GOLD, .35, 10); m_hand(c, IVORY, '#c8a060')
+    c.push(sc=.42, dx=18, dy=-22); m_coin(c, GOLD, '#8a6a20'); c.pop()
+def a_sc_favour(c): c.back(c.ell(50, 50, 38), '#70d0c0', .4, 10); m_chain(c, GOLD, '#ffffff'); c.spark(76, 24, 8, '#ffffff', .8)
+ABILITIES.update({'scoundrel.quick_cut': ('#3a1a20', a_sc_quick_cut), 'scoundrel.jeer': ('#3a2028', a_sc_jeer), 'scoundrel.settle_score': ('#3a1418', a_sc_settle_score),
+                  'scoundrel.poisoned_wine': ('#2a1a2a', a_sc_poisoned_wine), 'scoundrel.mark_debt': ('#3a3018', a_sc_mark_debt), 'scoundrel.glimmer': ('#3a3420', a_sc_glimmer),
+                  'scoundrel.jagged_verse': ('#2a2440', a_sc_jagged_verse), 'scoundrel.stay': ('#22304a', a_sc_stay), 'scoundrel.war_verse': ('#3a1e18', a_sc_war_verse),
+                  'scoundrel.rallying_verse': ('#1e3a2c', a_sc_rallying_verse), 'scoundrel.bribe': ('#3a3018', a_sc_bribe), 'scoundrel.favour': ('#1e3434', a_sc_favour)})
+BRANCH.update({'cutthroat': ('#3a1418', ['#c0303a', '#e8e0d0', '#9be05a', GOLD, '#ff9070']), 'silver-tongue': ('#2a2440', ['#e0d0ff', '#fff2c0', '#c8a0ff', '#9fc8ff', '#ffffff']),
+               'fixer': ('#3a3018', [GOLD, '#c0303a', '#9fe8c0', '#fff2c0', '#d07050'])})
+
 def main():
     here = os.path.dirname(os.path.abspath(__file__))
     ap = argparse.ArgumentParser(description='Paints the Crulanda HUD icons (items, quest items, abilities, talents, trades).')

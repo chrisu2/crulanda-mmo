@@ -64,6 +64,20 @@ def _csvs():
     for k in sorted(runs):
         d = runs[k]; run_rows.append(list(k) + [d.get('dps_single', ''), d.get('dps_aoe3', ''), d.get('hps_heal', '') or '', d.get('hps_single', '') or ''])
     with open(os.path.join(folder, 'balance-runs.csv'), 'w', encoding='utf-8', newline='') as h: csv.writer(h).writerows(run_rows)
+    # And a workbook of both, numbers as numbers with filters (Chris: "balance runs still not sortable"); skipped without openpyxl.
+    try:
+        from openpyxl import Workbook
+        from openpyxl.styles import Font
+        wb = Workbook(); ws = wb.active
+        for k, (title, rows_) in enumerate((('Summary', out_rows), ('Runs', run_rows))):
+            if k: ws = wb.create_sheet()
+            ws.title = title
+            for r in rows_: ws.append([None if c == '' else c for c in r])
+            for c in ws[1]: c.font = Font(bold=True)
+            ws.freeze_panes = 'A2'; ws.auto_filter.ref = ws.dimensions
+            for col in ws.columns: ws.column_dimensions[col[0].column_letter].width = max(10, min(28, max(len(str(c.value or '')) for c in col) + 2))
+        wb.save(os.path.join(folder, 'balance.xlsx'))
+    except ImportError: pass
 _csvs()
 dps_median = statistics.median([t['single'] for t in table if t['role'] == 'dps']) if any(t['role'] == 'dps' for t in table) else 0
 medians = {}

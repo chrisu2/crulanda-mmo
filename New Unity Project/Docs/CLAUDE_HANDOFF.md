@@ -2,33 +2,25 @@
 
 ## Start here
 
-**Current state: the evening of 2026-10-13** (Chris away 15:16 to about 23:00: "keep working through all phases ... all balanced and
-testing new dungeons and builds as needed. all zones full of quests. more sims throughout the world"). What was done, in order, is in
-`Docs/TONIGHT_2026-10-13.md` (Progress) and `Docs/CHANGELOG.md` (2026-10-13, 15:20 on). Nothing is VERIFIED until Chris has seen it.
-- **Branch:** `feet-bow-adit-kit`, PR #2. Do not merge without Chris. Last commits tonight: 3d89ef0 (quests, sims, orc, heals),
-  e10a915 (the group-run leader's stall rule), 9deb508 (suite fixes), the "Immune" fix, c347252 (the carriage gunners), then the docs.
-- **Published:** the release build of 9dfb8e4 at 23:27 to `D:/crulanda-work/outputs/Crulanda-Playable`: whole orcs and Chris's new
-  creatures (CHANGELOG, 2026-10-13 22:00 on). Save backed up first: `D:/crulanda-work/save-backups/20261013-2325-before-creatures-publish`.
-- **Orcs and creatures (TESTED, not seen by Chris):** every orc is a whole orc: the Orc Shaman for Shamans and Mages, the axe orc for
-  Warriors, Rangers and Rogues. Wild boars, the Toon RTS undead as the Bonecaller's thrall (it crumbles), the Living Birds in place of the
-  crows, squirrels in the groves. Frames: `D:/crulanda-work/ui-captures/creatures/brief-*.png`, `.../figures/orcs-*.png`, and
-  `.../training-shaman-20261013-2238` (the orc Shaman in play). Our gear does not show on a whole orc (it wears its own).
-- **Tests (TESTED):** EditMode 470/470. Full PlayMode suite 319/327 at 18:36; the 6 new failures fixed and rerun green (43/44, then the
-  Adit nav test 4/4 with its rider rule). Still failing, known and parked: the hoe hand spread, the foot after a jump (Chris parked it).
-- **Balance (TESTED):** all 40 builds in their ranges (BALANCE_ALL.md in `D:\crulanda-work\outputs\balance`). Party heal of five:
-  Sanctuary 73, Mender 75, Cantor 75, Rootmend 88, Lantern 90, Choir 98, Rainspeaker 108.
-- **The Adit group run (TESTED, not seen by Chris):** to the end for the first time, 66 of 67 camps in 78 game minutes
-  (`D:\crulanda-work\run-captures\adit-group-1013-evening-2`), then as an orc Shaman (`adit-group-1013-shaman`) and once more
-  (`adit-group-1013-evening-3`: every camp cleared, the carriage gunners too, in 71 game minutes).
-  - The warps are the run tool moving its auto-pilot player when it sticks; party sims catch up by themselves.
-  - The tank still falls to the gang-boss and the elites. That is the boss pressure Chris settled on.
-  - The "Immune" column over the Cinder-Warden is fixed.
-- **For Chris to look at first:** the training yard with sims practising (they go in by themselves; grey numbers when you are near;
-  frame: `D:/crulanda-work/ui-captures/training-20261013-2034/tf-06-sims-practising.png`);
-  the orc look (`D:\crulanda-work\ui-captures\figures\orcs-*.png`, a first pass on the human head: green, tusks, taller); any of the 52
-  new quests (Oakhaven's start at levels 2-3: Ama Rusk, Sel Harrow, Grete Lowe, Pim).
-- **Next, in order:** Chris's reactions; an orc face from the packs in `D:\crulanda-work\imports\orcs` if he wants more than the first
-  pass; the run bot playing the Shaman's kit better (14 a second against the Paladin's 33); the Scoundrel (designed in `Docs/CLASS_SCOUNDREL.md`, not started); the parked animation items.
+**Current state: the end of 2026-10-14** (Chris back from 10:43; his words verbatim in PLAYTEST_NOTES 179-188 and TONIGHT_2026-10-13.md).
+What was done, in order, is in `Docs/TONIGHT_2026-10-13.md` (Progress, 2026-10-14 11:40 on) and `Docs/CHANGELOG.md` (2026-10-14,
+11:40 on). Nothing is VERIFIED until Chris has seen it in his build.
+- **Branch:** `feet-bow-adit-kit`, PR #2. Do not merge to `main` without Chris. The Adit rework is on `adit-rework` (pushed, not merged).
+- **Published:** FINAL-PUBLISH. Save backed up first: FINAL-SAVE.
+- **Tests (TESTED):** the final run (chainR72): FINAL-TESTS. Known and parked: EliteFightTests needs a graphics device in batch mode;
+  GroundingTests (a sim's sole 2.8 cm up); VillageDayTests (Wat Stook's tool shaft through a leg while walking); the CraftPix boar's
+  EditMode test is inconclusive.
+- **Balance (TESTED):** all 49 builds in range (`D:/crulanda-work/outputs/balance/BALANCE_ALL.md`, and `balance-summary.csv` to sort).
+- **New today, for Chris to look at first:**
+  - **The wild woods** in every zone (Chris's "Elwynn" brief): Oakhaven's wild country wooded with its own trees, great oaks only in a
+    few dense old-forest patches, the floor open. Frames: `D:/crulanda-work/world-captures/oakhaven-21-the-mastwood.png`, `-37-lark-hill.png`,
+    `-38-sallow-bottom.png`. Frame rate in the tour: FINAL-FPS (110 before the woods).
+  - **Kevin's melee, spell and work motions** and **every spell's effect**: `D:/crulanda-work/ui-captures/combat3/<class>/sheet-b.png`
+    (one tile an ability; `combat2` has every class). The hoe under the ploughing clip: `ui-captures/life-1014c/farmer-*-at-work-side.png`.
+  - **The archery butts** facing their lanes (`ui-captures/training-1014c/tf-01-yard.png`) and **the jaw trap** (`ui-captures/fixes-1014c`).
+  - **Real fire**: the Mage's fire spells and the camps' fires burn with Vefects' flames.
+- **Next, in order:** Chris's reactions to the above; the Adit rework (below); the Stylized Newbie Weapons Pack (skinned meshes: a bake
+  before they can be held); the older list.
 
 ## Oct 12 night (history; these runs were stopped and replaced on Oct 13)
 
@@ -185,25 +177,25 @@ further down this section are from the night of Oct 12 and are history: those ru
 - Their rigs and scale haven't been checked against the humanoid/ModelFigure rig yet.
 
 ## TODO, in order
-1. Read `suiteQ`, `editR`, `socialR` and `balC`. Fix compile and test failures.
-2. Cleric and Shaman DPS and HPS: retune against the medians and caps, and check the party heal test with 3 sims.
-3. Orcs:
-   - Check the rig and scale of the orc packs.
-   - Build the orc figure. Gear fit, feet and the hoe then need re-checking at the new size.
-   - Add a race pick at character creation, restricted to the classes each race allows.
-4. Foot flake: "running after a jump, left foot down but turned 178 degrees" (parked by Chris 23:13).
-5. Hoe hand spread: hands are 33-43 cm apart (45-60 wanted), and the left hand is 6-7 cm off the shaft.
-6. Spell effects: cast poses, trails, impacts and lingering effects for the Mage/Bonecaller, Archivist and Salt-Mender, with frames.
-7. Bonecaller tiers 4-6.
-8. An enemy that applies the grey (Adit/Wasting).
-9. HUD cutoff (note 114), with a test that measures it.
-10. The sim-follow flake.
-11. Elwynn-style zone fill (note 172, `Docs/ZONE_FILL_PLAN.md`).
-12. 112b, the Morro clips on the pack's avatar: waiting on Chris (the pack needs downloading again).
-13. Republish, only with Chris's OK. Back up saves first.
-14. (From Oct 11, dropped from this list by mistake:) **the kit's column and plinth tops are walkable in the NavMesh bake** (ZoneBuilder.Adit), so a
-    mob or the run's leader ends up standing on a pedestal and a group run of the Adit stalls (`tools\validation\group_run.ps1`; the 18:44
-    run on Oct 11). Exclude those tops from the bake, then rerun the group run to the end for its scorecard.
+1. **Chris's reactions** to the woods, the motions, the effects, the butts and the trap (the frames named under Start here).
+2. **The Adit rework** (Chris: "adit dungeon need to be more complex like wow's wailing caves or the deadmine"; "you can start expanding
+   adit so not so empty next on the agenda"): branch `adit-rework`, worktree `D:\code\mmo-adit`, `Docs/ADIT_REWORK.md`. Build steps 1-3
+   written, the twelve new elites' moves and loot written (sections 14-17). Its first Unity run: EditMode 488/495, Adit PlayMode 19/30.
+   Red, in the order to fix (section 16): the cave web's joins (the Cutting Drift's lip into the Foundry), rock tops the navmesh bakes
+   on, the Sandthrone pickets 12 m up with no way there, two overseers 1.2 m apart, the run order from the bridge's tower, Lusk's door
+   after his death, the planner's modes test. Then S4-S7 (the releases, the Wake, the NEW moves, the cave map), then Chris's decisions
+   (section 1), then merge. Test with `rt.ps1` against the worktree's Assets (chainR68.ps1 is the pattern).
+3. **The Stylized Newbie Weapons Pack** (downloaded 12:01): its weapons are skinned meshes driven by the pack's own character script;
+   bake each to a plain mesh (an editor method) before `model.weapon` looks can hold them. Low-level gear.
+4. The hoe stroke's measures under the ploughing clip (FieldWorkTests: a stroke every 1-3 s), if the final run shows it red.
+5. Spell effects, second pass: each class's own colours and shapes where the packs' stock looks repeat (the healing glow is one green
+   for every healer; a cast's hand glow is the same sparks for all).
+6. Bonecaller tiers 4-6.
+7. An enemy that applies the grey (Adit/Wasting).
+8. The sim-follow flake.
+9. GroundingTests' sim 2.8 cm up; the parked tool shaft (VillageDayTests); EliteFightTests under -nographics.
+10. The three later dungeons (DUNGEON_DESIGN.md) when the level cap rises past 15.
+11. Republish only with Chris's OK; back up the save first (`chainR61.ps1` is the pattern).
 
 ## Key docs (in `Docs\`)
 - `BALANCE_REPORT.md`: harness rounds v1-v8, caps, retunes.

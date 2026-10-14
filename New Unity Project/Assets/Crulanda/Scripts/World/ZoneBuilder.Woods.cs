@@ -65,7 +65,30 @@ namespace Crulanda.World
             int oaks = 0, broad = 0, pines = 0, snags = 0, floor = 0;
             foreach (var c in cells)
             {
-                if (!woodsMask[c.k]) continue;
+                if (!woodsMask[c.k])
+                {
+                    // A glade: not bare (Chris, 2026-10-14 19:25, from the creek by Hollin farm: "still empty feeling"): a lone tree in one
+                    // cell of eight, a bush, a stump or a stone in one of three.
+                    float g1 = R01, g2 = R01, g3 = R01, g4 = R01;
+                    var gp = c.at + new Vector2((g1 - .5f) * cell * .8f, (g2 - .5f) * cell * .8f);
+                    if (!WoodsGround(gp, 1)) continue;
+                    if (g3 < .12f)
+                    {
+                        var spot = Spot(gp, 3.2f);
+                        if (spot.HasValue && spot.Value.magnitude >= w.from && Hollow.CoverAt(spot.Value, 3) <= 0)
+                        {
+                            var lone = Root(new ZoneProp { kind = "tree", at = spot.Value, rotation = g4 * 360, scale = .9f + g2 * .5f }, statics);
+                            Broadleaf(lone, g1 < .7f ? 0 : g1 < .88f ? 3 : 1); trunks.Add(spot.Value); woodsTrees.Add(spot.Value); woodsRoots.Add(lone); broad++;
+                        }
+                    }
+                    else if (g3 < .47f && TrunkClear(gp, 1.9f))
+                    {
+                        int before = statics.childCount;
+                        if (g3 < .3f) Bush(gp, false); else if (g3 < .38f) WoodsStump(gp, g4, g1); else EdgeRock(gp);
+                        for (int k = before; k < statics.childCount; k++) { woodsFloor.Add(statics.GetChild(k)); floor++; }
+                    }
+                    continue;
+                }
                 // The cell's draws, all taken whatever grows, so a tree dropped never moves the next.
                 float jx = R01, jz = R01, roll = R01, size = R01, look = R01, yaw = R01, f = R01, fa = R01, fr = R01, fy = R01, fs = R01;
                 var at = c.at + new Vector2((jx - .5f) * cell * .8f, (jz - .5f) * cell * .8f);
@@ -131,9 +154,9 @@ namespace Crulanda.World
         {
             if (NearRoad(p, 3.5f + more) || Water.NearWater(p, 3 + more) || NearProp(p, 6 + more)) return false;
             if (Hollow.CoverAt(p, 4 + more) > 0 || Unmade(p.x, p.y) > 0) return false;
-            if (Zone.wasting != null && p.x > Zone.wasting.x - 30) return false;
+            if (Zone.wasting != null && p.x > Zone.wasting.x - 14) return false;
             foreach (var c in Zone.clearings) if (c != null && Vector2.Distance(p, c.center) < c.radius + 3 + more) return false;
-            foreach (var l in Zone.landmarks) if (l != null && Vector2.Distance(p, l.at) < l.radius * .7f + 2 + more) return false;
+            foreach (var l in Zone.landmarks) if (l != null && Vector2.Distance(p, l.at) < l.radius * .45f + 2 + more) return false;
             if (Zone.lakes != null) foreach (var l in Zone.lakes) if (l != null && Vector2.Distance(p, l.center) < l.radius + 4 + more) return false;
             if (Zone.tallGrass != null) foreach (var g in Zone.tallGrass) if (g != null && Vector2.Distance(p, g.center) < g.radius + 2 + more) return false;
             foreach (var f in Zone.fields)

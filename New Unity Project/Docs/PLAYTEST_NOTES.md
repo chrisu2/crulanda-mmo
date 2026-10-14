@@ -714,3 +714,4 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
 - 190 (19:05) "we need a buff ui so i know what buff/songs are on the party" (OPEN; a row of the buffs and songs on you and on each party member, with their time left, by the party frames)
 - 191 (19:10) "also need to see how much nerve the scoundrel has built up" (OPEN: the player frame shows the resource pool; Nerve starts empty and builds with Quick Cut)
 - 192 (19:20) "birds hop around funny..looks like maybe back and forth." (OPEN; the Living Birds on the ground)
+- 193 (19:25, a picture from the creek bank by Hollin farm, the Wasting on the right) "still empty feeling. back is to hollin farm." (OPEN: the open meadow between the creek and the grey; the woods kept 30 m off the Wasting and clear of the farm, their glades 90 m wide and bare)

@@ -162,7 +162,7 @@ namespace Crulanda.Encounter
             { "ranger.call_companion", ("self", M + "Smoke effects/Dust puff", 1) }, { "ranger.snare_trap", ("self", M + "Smoke effects/Dust puff", .7f) },
             { "rogue.vanish", ("self", M + "Smoke effects/Smoke puff", 1) }, { "rogue.tumble", ("self", M + "Smoke effects/Dust puff", .7f) },
             { "ranger.disengage", ("self", M + "Smoke effects/Dust puff", .8f) }, { "ability.intercept", ("self", M + "Smoke effects/Dust puff", .8f) },
-            { "rogue.blind", ("foe", M + "Smoke effects/Smoke puff", .6f) }, { "scoundrel.bribe", ("foe", M + "Sparks/Sparks explode yellow", .8f) },
+            { "rogue.blind", ("foe", M + "Smoke effects/Smoke puff", .6f) }, { "scoundrel.poisoned_wine", ("foe", M + "Sparks/Sparks explode green", .8f) }, { "scoundrel.bribe", ("foe", M + "Sparks/Sparks explode yellow", .8f) },
             { "scoundrel.favour", ("ground", M + "Portals/Portal yellow", .5f) }, { "scoundrel.glimmer", ("foe", M + "Sparks/Sparks flashing pink", 1) },
             { "ability.breaching_blow", ("foe", M + "Slash effects/Charge slash red", .8f) }, { "ability.shield_bash", ("foe", M + "Slash effects/Stone slash", .8f) },
             { "paladin.rebuke", ("foe", M + "Slash effects/Stone slash", .8f) }, { "paladin.smite", ("foe", M + "Hits and explosions/Holy hit", 1) },
@@ -245,7 +245,11 @@ namespace Crulanda.Encounter
             else if (motion == "omni" && a.effect == AbilityEffect.Damage) { Play(Ground(e), me.position + Vector3.up * .05f, me.rotation, .7f, null, 1.2f); foreach (var t in r.struck) Burst(e, t); }
             else if (motion == "call" && a.effect == AbilityEffect.Damage) { Play(Ground(e), (foe != null ? foe.position : me.position + me.forward * 4) + Vector3.up * .05f, Quaternion.identity, .7f, null, 1.3f); foreach (var t in r.struck) Burst(e, t); }
             // A bolt or a blow from afar: a burst on every foe struck (a bolt's own burst shows where it lands).
-            else if (a.effect == AbilityEffect.Damage || a.effect == AbilityEffect.Breach) { if (!r.bolted) foreach (var t in r.struck) Burst(e, t); }
+            else if (a.effect == AbilityEffect.Damage || a.effect == AbilityEffect.Breach)
+            {
+                if (!r.bolted) foreach (var t in r.struck) Burst(e, t);
+                if (r.struck.Count == 0 && !r.bolted && foe != null) Burst(e, foe);   // a burn or a poison that bites later: shown on the foe now
+            }
             // A ward: its shield on the caster.
             else if (a.effect == AbilityEffect.Guard) Play(Shield(e), me.position + Vector3.up * .05f, me.rotation, .8f, me, 1.6f);
             // A rally: a glow round the caster.
@@ -266,7 +270,14 @@ namespace Crulanda.Encounter
         /// <summary>Every one mended: the healing glow on them; a mend of the party: the healing circle under the healer.</summary>
         static void Mends(Resolve r, EncounterSession s)
         {
-            if (r.mended.Count == 0) return;
+            if (r.mended.Count == 0)
+            {
+                // A mend that comes over time (Vigil, Hymn, Rain Call): its glow on the caster now, and the circle for a mend of the party.
+                if (r.a.effect != AbilityEffect.Heal) return;
+                Mend(s.Player.transform, r.element);
+                if (ActorVisual.MotionFor(r.a) == "omni") Play(M + "Magic circles/Healing circle", s.Player.transform.position + Vector3.up * .05f, Quaternion.identity, .8f, null, 1.4f);
+                return;
+            }
             foreach (var t in r.mended) Mend(t, r.element);
             if (r.mended.Count >= 2 || ActorVisual.MotionFor(r.a) == "omni") Play(M + "Magic circles/Healing circle", s.Player.transform.position + Vector3.up * .05f, Quaternion.identity, .8f, null, 1.4f);
         }

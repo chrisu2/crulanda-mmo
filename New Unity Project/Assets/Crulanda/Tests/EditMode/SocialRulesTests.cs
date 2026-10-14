@@ -114,7 +114,7 @@ namespace Crulanda.Tests
                 {
                     if (guards[e] == null) continue;
                     Assert.IsTrue(z.camps[e].elite, "Only an elite's camp has guards.");
-                    foreach (int c in guards[e]) { Assert.IsFalse(z.camps[c].elite, "An elite guards nobody."); pairs.Add(z.camps[e].name + " <- " + z.camps[c].name); }
+                    foreach (int c in guards[e]) { Assert.IsFalse(z.camps[c].elite && !(z.camps[e].guards ?? "").Split(',').Any(n => n.Trim() == z.camps[c].name), "An elite guards nobody unless the lord's camp names it (the reworked Adit's Varrow with Ysolt)."); pairs.Add(z.camps[e].name + " <- " + z.camps[c].name); }
                 }
             }
             // The king and the guard before his throne, the quartermaster and his store's men, the Deacon and his pit, Greyheart
@@ -164,7 +164,7 @@ namespace Crulanda.Tests
                 Assert.That(m.enrageAt, Is.InRange(.2f, .4f)); Assert.Less(m.enrageHaste, .8f, "Enraged, it swings faster.");
                 Assert.Greater(m.callAt, m.enrageAt, "It calls before it enrages.");
             }
-            Assert.AreEqual(21, EliteMoves.All.Select(m => m.name).Distinct().Count(), "Twenty-one different moves.");
+            Assert.AreEqual(33, EliteMoves.All.Select(m => m.name).Distinct().Count(), "Thirty-three different moves (the reworked Adit's twelve among them, 2026-10-14).");
             // Dungeon end bosses are a step harder than outdoor named elites: Caddock and the Hollow Root-Warden, and only they.
             CollectionAssert.AreEquivalent(new[] { "Caddock, the Bandit King", "The Hollow Root-Warden", "Rail-Captain Orsk Danner" }, EliteMoves.All.Where(m => m.boss).Select(m => m.mob).ToList());
             // Nix's two-part fight (D5): the engine and the goblin are each lighter than one elite and together a step above one.
@@ -205,7 +205,8 @@ namespace Crulanda.Tests
                     if (!answered) unanswered.Add(lord.mob);
                 }
             }
-            CollectionAssert.AreEquivalent(new[] { "The Pale Reckoner" }, unanswered, "When a pale camp stands within its call, take the Reckoner off this list and out of the docs' exception.");
+            // (Hollowsong's choir comes at his call once S4 looses it, ADIT_REWORK 5.)
+            CollectionAssert.AreEquivalent(new[] { "Brother Hollowsong", "The Pale Reckoner" }, unanswered, "When a pale camp stands within its call, take the Reckoner off this list and out of the docs' exception.");
             // A call across a hillside reaches a whole camp: the Sexton and the captain bring two, not all of them.
             Assert.AreEqual(2, EliteMoves.For("The Grey Sexton", false).callMost); Assert.AreEqual(2, EliteMoves.For("Sandthrone captain", false).callMost);
             Assert.AreEqual(0, EliteMoves.For("Old Whitefoot", true).callMost, "The howl brings the whole pack.");

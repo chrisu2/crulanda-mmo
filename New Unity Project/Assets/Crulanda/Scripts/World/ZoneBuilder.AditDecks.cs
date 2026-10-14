@@ -336,8 +336,14 @@ namespace Crulanda.World
             }
             else
             {
-                Vector3 L(int k) { return spot.mid[k] - spot.across[k] * spot.half; }
-                Vector3 R(int k) { return spot.mid[k] + spot.across[k] * spot.half; }
+                // The planks run 0.55 m past each end (the same height), onto the deck or the floor they meet: with the strip ending
+                // exactly at its data the navmesh did not join deck to deck (the tally stage to its ramps, the walkway to the far ramp)
+                // nor a cave's lip to a deck (AditNavDiagnostics, 2026-10-14 17:14).
+                var back = spot.mid[0] - spot.mid[1]; back.y = 0; var on = spot.mid[N] - spot.mid[N - 1]; on.y = 0;
+                var ext0 = back.sqrMagnitude > 1e-6f ? back.normalized * .55f : Vector3.zero; var extN = on.sqrMagnitude > 1e-6f ? on.normalized * .55f : Vector3.zero;
+                Vector3 Mid(int k) { return k == 0 ? spot.mid[0] + ext0 : k == N ? spot.mid[N] + extN : spot.mid[k]; }
+                Vector3 L(int k) { return Mid(k) - spot.across[k] * spot.half; }
+                Vector3 R(int k) { return Mid(k) + spot.across[k] * spot.half; }
                 Vector3 Down(Vector3 p, int k) { return new Vector3(p.x, spot.solid[k] ? spot.under[k] - .3f : spot.mid[k].y - thick, p.z); }
                 float run = 0;
                 for (int k = 0; k < N; k++)
@@ -349,7 +355,6 @@ namespace Crulanda.World
                     fm.Quad(L(k), L(k + 1), Down(L(k + 1), k + 1), Down(L(k), k), -side, new Vector2(r0, L(k).y / 2), new Vector2(r1, L(k + 1).y / 2), new Vector2(r1, Down(L(k + 1), k + 1).y / 2), new Vector2(r0, Down(L(k), k).y / 2));
                     fm.Quad(Down(L(k), k), Down(R(k), k), Down(R(k + 1), k + 1), Down(L(k + 1), k + 1), Vector3.down, new Vector2(0, r0), new Vector2(spot.half, r0), new Vector2(spot.half, r1), new Vector2(0, r1));
                 }
-                var back = spot.mid[0] - spot.mid[1]; back.y = 0; var on = spot.mid[N] - spot.mid[N - 1]; on.y = 0;
                 fm.Quad(L(0), R(0), Down(R(0), 0), Down(L(0), 0), back, new Vector2(0, L(0).y / 2), new Vector2(spot.half, R(0).y / 2), new Vector2(spot.half, Down(R(0), 0).y / 2), new Vector2(0, Down(L(0), 0).y / 2));
                 fm.Quad(L(N), R(N), Down(R(N), N), Down(L(N), N), on, new Vector2(0, L(N).y / 2), new Vector2(spot.half, R(N).y / 2), new Vector2(spot.half, Down(R(N), N).y / 2), new Vector2(0, Down(L(N), N).y / 2));
             }

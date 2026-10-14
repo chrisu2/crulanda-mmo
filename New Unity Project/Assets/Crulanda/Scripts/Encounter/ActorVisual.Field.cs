@@ -29,7 +29,15 @@ namespace Crulanda.Encounter
         public float PoseHandOverShoulder { get; private set; }
         public float PoseHandAhead { get; private set; }
         public float PoseElbowOverShoulder { get; private set; }
-        public const float HoeHandsMin = .47f, HoeHandsMax = .58f, HoeRearBack = .22f, HoeTopBelowChest = .06f, HoeTopAhead = .36f;
+        /// <summary>The hands' spread on the shaft: wanted, and the least and most it may be when the front arm is short (m).</summary>
+        public const float HoeHands = .49f, HoeHandsMin = .47f, HoeHandsMax = .58f;
+        /// <summary>The hoer's stance (2026-10-14): the shoulders turned this far from square, the leading (left) one forward; the
+        /// leading collarbone swung this far forward as its arm reaches down the shaft; the stroke worked this far to the side of the
+        /// feet (negative: the left), the shaft across the body and the blade out in front of the leading foot.</summary>
+        public const float HoeTurn = 40, HoeReachOut = 28, HoeLine = -.45f;
+        /// <summary>The top fist's limits (notes 164, 168): at least this far under the lower shoulder and in front of the chest, and
+        /// this far clear of the leading shoulder; each arm is planned this much short of its full reach.</summary>
+        public const float HoeUnderShoulder = .03f, HoeFistAhead = .28f, HoeFistClear = .16f, HoeReachSpare = .015f;
         Vector3? handsL, handsR; int handsFrame = -1;
         /// <summary>How far the farther hand ended from its mark (<see cref="HandsOn"/>), as last posed, in metres.</summary>
         public float HandsGap { get; private set; } = float.NaN;
@@ -40,17 +48,18 @@ namespace Crulanda.Encounter
 
         // The draw hoe's stroke (Docs/HOE_TECHNIQUE.md; Chris 09:47: "looks like they are just banging into onto the ground"): reach
         // forward and lift a little, set the blade in at an angle a little past the mark, draw it back toward the feet just under the
-        // surface (the soil going with it), then recover. Keys in the body's frame: the rear (right) hand and the blade's edge, as
-        // (ahead, height over the ground).
-        static readonly Vector2 RecoverHand = new Vector2(.18f, 1.08f), LiftHand = new Vector2(.3f, 1.15f), EnterHand = new Vector2(.26f, 1.1f), DrawnHand = new Vector2(.06f, 1.04f);
+        // surface (the soil going with it), then recover. Keys in the body's frame: the blade's edge as (ahead, height over the ground);
+        // the top (right) fist from the chest as (to the right, under the lower shoulder, ahead), forward and up a little for the
+        // lift, back and down with the draw.
+        static readonly Vector3 RecoverFist = new Vector3(.18f, .10f, .30f), LiftFist = new Vector3(.16f, .08f, .34f), EnterFist = new Vector3(.17f, .09f, .33f), DrawnFist = new Vector3(.20f, .12f, .29f);
         static readonly Vector2 RecoverEdge = new Vector2(.62f, .12f), LiftEdge = new Vector2(1.12f, .36f), EnterEdge = new Vector2(1.05f, -.03f), DrawnEdge = new Vector2(.5f, -.03f);
-        /// <summary>The stroke at <paramref name="k"/> (0-1): the rear hand and the blade's edge (ahead, height), and whether the blade is in the soil.</summary>
-        static void StrokeAt(float k, out Vector2 hand, out Vector2 edge, out float draw)
+        /// <summary>The stroke at <paramref name="k"/> (0-1): the top fist's key, the blade's edge (ahead, height), and whether the blade is in the soil.</summary>
+        static void StrokeAt(float k, out Vector3 fist, out Vector2 edge, out float draw)
         {
-            if (k < .35f) { float u = Mathf.SmoothStep(0, 1, k / .35f); hand = Vector2.Lerp(RecoverHand, LiftHand, u); edge = Vector2.Lerp(RecoverEdge, LiftEdge, u); draw = 0; }
-            else if (k < StrikeAt) { float u = (k - .35f) / (StrikeAt - .35f); u *= u; hand = Vector2.Lerp(LiftHand, EnterHand, u); edge = Vector2.Lerp(LiftEdge, EnterEdge, u); draw = 0; }   // set in, quickening
-            else if (k < .8f) { float u = Mathf.SmoothStep(0, 1, (k - StrikeAt) / (.8f - StrikeAt)); hand = Vector2.Lerp(EnterHand, DrawnHand, u); edge = Vector2.Lerp(EnterEdge, DrawnEdge, u); draw = 1; }   // drawn back to the feet
-            else { float u = Mathf.SmoothStep(0, 1, (k - .8f) / .2f); hand = Vector2.Lerp(DrawnHand, RecoverHand, u); edge = Vector2.Lerp(DrawnEdge, RecoverEdge, u); draw = 0; }   // out of the soil; the step
+            if (k < .35f) { float u = Mathf.SmoothStep(0, 1, k / .35f); fist = Vector3.Lerp(RecoverFist, LiftFist, u); edge = Vector2.Lerp(RecoverEdge, LiftEdge, u); draw = 0; }
+            else if (k < StrikeAt) { float u = (k - .35f) / (StrikeAt - .35f); u *= u; fist = Vector3.Lerp(LiftFist, EnterFist, u); edge = Vector2.Lerp(LiftEdge, EnterEdge, u); draw = 0; }   // set in, quickening
+            else if (k < .8f) { float u = Mathf.SmoothStep(0, 1, (k - StrikeAt) / (.8f - StrikeAt)); fist = Vector3.Lerp(EnterFist, DrawnFist, u); edge = Vector2.Lerp(EnterEdge, DrawnEdge, u); draw = 1; }   // drawn back to the feet
+            else { float u = Mathf.SmoothStep(0, 1, (k - .8f) / .2f); fist = Vector3.Lerp(DrawnFist, RecoverFist, u); edge = Vector2.Lerp(DrawnEdge, RecoverEdge, u); draw = 0; }   // out of the soil; the step
         }
         /// <summary>Where in the stroke the hoe is (0-1; set in at <see cref="StrikeAt"/>), for captures.</summary>
         public float StrokePhase { get { return HoeK; } }
@@ -86,48 +95,58 @@ namespace Crulanda.Encounter
             }
             if (!hoe || !HoeReady) { hoeTime = 0; if (clod != null) clod.gameObject.SetActive(false); return; }
             float before = HoeK; hoeTime += dt; float k = HoeK;
-            StrokeAt(k, out var hand, out var edge, out float draw);
+            StrokeAt(k, out var key, out var edge, out float draw);
             Vector3 up = Vector3.up, ahead = body.forward, side = body.right; ahead.y = 0; ahead.Normalize();
             if (model.Chest != null && Vector3.Dot(model.UpperArmR.position - model.Chest.position, side) < 0) side = -side;
             float ground = Ground(); var foot = transform.position; foot.y = ground;
-            // The shaft runs up the body's middle line, in front of it (held like a broom, thumbs up the handle).
-            var line = foot + side * .02f;
-            Vector3 rear = line + ahead * hand.x + up * hand.y, edgeAt = line + ahead * edge.x + up * edge.y;
-            // The back hand sits further up the shaft's line (toward the hip and chest), so the front hand can close on it a full 45-60 cm lower down (note 157).
-            { var d0 = edgeAt - rear; if (d0.sqrMagnitude > 1e-4f) rear -= d0.normalized * HoeRearBack; }
-            // The top hand at the waist to the chest and well in front (Chris 13:01: "his arms are out of place or awkward", the fist was at his chin).
-            { var chestP = model.Chest != null ? model.Chest.position : foot + up * 1.3f; if (rear.y > chestP.y - HoeTopBelowChest) rear.y = chestP.y - HoeTopBelowChest;
-              float fwd = Vector3.Dot(rear - chestP, ahead); if (fwd < HoeTopAhead) rear += ahead * (HoeTopAhead - fwd); }
-            // The rear (top) hand first; the shaft from its fist to the blade's mark; the front hand where the shaft passes nearest
-            // its own shoulder (between a hand's width and two feet down the shaft), so a short arm still closes on it.
-            Reach(model.UpperArmR, model.LowerArmR, model.HandR, rear - (Grip(model.HandR, model.MiddleR) - model.HandR.position), -up + side * .8f - ahead * .3f);
-            Vector3 gR = Grip(model.HandR, model.MiddleR);
-            var dir = (edgeAt - gR); if (dir.sqrMagnitude < 1e-4f) dir = ahead - up; dir.Normalize();
-            // Hands wide (Chris 10:34, note 157: "widen the hand spacing"): the back hand at the shaft's end, the front one 45-58 cm down it, about the top third.
-            float t = Mathf.Clamp(Vector3.Dot(model.UpperArmL.position - gR, dir), HoeHandsMin, HoeHandsMax);
-            var front = gR + dir * t;
-            // The front hand turned across the shaft (knuckles up its line, the palm on it), then reached twice so the fist, not the wrist, lands on it.
-            for (int pass = 0; pass < 2; pass++)
+            // The stroke is worked out in front of the leading (left) foot, the shaft across the body from the top fist (2026-10-14).
+            // On the body's middle line the front hand's place on the shaft was 70-85 cm from its shoulder, out of an arm's 54-57 cm
+            // reach, so it stopped short of the shaft (4-9 cm off it) and the fists came 20-45 cm apart.
+            var edgeAt = foot + side * HoeLine + ahead * edge.x + up * edge.y;
+            // The leading arm reaches down the shaft: its collarbone swung forward (the back is bent and turned by now: HoeStance).
+            var clav = HoeClavicle(); if (clav != null) clav.rotation = Quaternion.AngleAxis(HoeReachOut * hoeStance * Mathf.Sign(Vector3.Dot(side, body.right)), up) * clav.rotation;
+            Vector3 chest = model.Chest != null ? model.Chest.position : foot + up * 1.3f, shL = model.UpperArmL.position, shR = model.UpperArmR.position;
+            float low = Mathf.Min(shL.y, shR.y);
+            float reachL = ArmReach(model.UpperArmL, model.LowerArmL, model.HandL, model.MiddleL) - HoeReachSpare, reachR = ArmReach(model.UpperArmR, model.LowerArmR, model.HandR, model.MiddleR) - HoeReachSpare;
+            // The top fist: its key in front of the chest, then moved the least it takes for both arms to reach (the front hand a full
+            // spread further down the shaft toward the blade's mark), clear of the leading shoulder, under the shoulders and in front
+            // of the chest (notes 157, 164, 168). It starts from the key every frame and each step is small, so it follows the stroke.
+            Vector3 TopFist(float under, float minAhead)
             {
-                Reach(model.UpperArmL, model.LowerArmL, model.HandL, front - (Grip(model.HandL, model.MiddleL) - model.HandL.position), -up - side * .6f - ahead * .3f);
-                var across = Vector3.ProjectOnPlane(model.MiddleL.position - model.HandL.position, dir); var want = Vector3.ProjectOnPlane(front - model.HandL.position, dir);
-                if (across.sqrMagnitude > 1e-6f && want.sqrMagnitude > 1e-6f) PointBone(model.HandL, model.MiddleL.position - model.HandL.position, (model.MiddleL.position - model.HandL.position) + (want.normalized - across.normalized) * .03f, 1);
+                var g = chest + side * key.x + ahead * key.z; g.y = low - key.y;
+                for (int pass = 0; pass < 8; pass++)
+                {
+                    var v = g - shR; if (v.magnitude > reachR) g = shR + v.normalized * reachR;
+                    var d = (edgeAt - g).normalized; v = g + d * HoeHands - shL; float over = v.magnitude - reachL; if (over > 0) g -= v.normalized * over;
+                    v = g - shL; if (v.magnitude < HoeFistClear) g = shL + v.normalized * HoeFistClear;
+                    if (g.y > low - under) g.y = low - under;
+                    float fw = Vector3.Dot(g - chest, ahead); if (fw < minAhead) g += ahead * (minAhead - fw);
+                }
+                return g;
             }
-            Vector3 gL = Grip(model.HandL, model.MiddleL);
-            // A front arm too short for the mark leaves the fists closer than 45 cm (38-44 cm in the step-5 frames): the top hand slides
-            // back up the same shaft line instead (the shaft does not move), so the spread is kept whatever the arm could reach.
-            for (int pass = 0; pass < 2; pass++)
+            // Hands wide (Chris 10:34, note 157: "widen the hand spacing"): the front hand a spread down the shaft, or as far down as its
+            // arm reaches (never nearer than the least spread).
+            float Spread(Vector3 g, Vector3 d)
             {
-                float along = Vector3.Dot(gL - gR, dir); float want = Mathf.Clamp(along, HoeHandsMin + .01f, HoeHandsMax - .01f);
-                if (Mathf.Abs(want - along) < .005f) break;
-                float back = want - along;   // how far the top hand slides up the shaft (dir points down it)
-                if (back > 0 && dir.y < -.05f) { float sh = Mathf.Min(model.UpperArmL.position.y, model.UpperArmR.position.y) - .1f; back = Mathf.Min(back, Mathf.Max(0, (sh - gR.y) / -dir.y)); }   // never over the shoulder (note 164)
-                if (back > 0) { var chP = model.Chest != null ? model.Chest.position : foot + up * 1.3f; float aheadNow = Vector3.Dot(gR - chP, ahead), lose = -Vector3.Dot(dir, ahead); if (lose > .05f) back = Mathf.Min(back, Mathf.Max(0, (aheadNow - .28f) / lose)); }   // and still ahead of the chest
-                if (back < .005f && want > along) break;
-                var to = gR - dir * back;
-                Reach(model.UpperArmR, model.LowerArmR, model.HandR, to - (Grip(model.HandR, model.MiddleR) - model.HandR.position), -up + side * .8f - ahead * .3f);
-                gR = Grip(model.HandR, model.MiddleR);
+                var w = g - shL; float b = Vector3.Dot(w, d), disc = b * b - w.sqrMagnitude + reachL * reachL, s = HoeHands;
+                if (disc >= 0) s = Mathf.Clamp(s, -b - Mathf.Sqrt(disc), -b + Mathf.Sqrt(disc));
+                return s;
             }
+            var gR = TopFist(HoeUnderShoulder, HoeFistAhead);
+            var dir = edgeAt - gR; if (dir.sqrMagnitude < 1e-4f) dir = ahead - up; dir.Normalize();
+            float spread = Spread(gR, dir);
+            if (spread < HoeHandsMin)
+            {
+                // Out of reach with the full margins (a short-armed figure, an idle that drops the leading shoulder): half of them.
+                var g2 = TopFist(HoeUnderShoulder * .5f, HoeFistAhead - HoeUnderShoulder * .5f); var d2 = edgeAt - g2;
+                if (d2.sqrMagnitude > 1e-4f) { d2.Normalize(); float s2 = Spread(g2, d2); if (s2 > spread) { gR = g2; dir = d2; spread = s2; } }
+            }
+            spread = Mathf.Clamp(spread, HoeHandsMin, HoeHandsMax);
+            GripAt(model.UpperArmR, model.LowerArmR, model.HandR, model.MiddleR, gR, dir, -up + side * .8f - ahead * .3f, .6f);
+            GripAt(model.UpperArmL, model.LowerArmL, model.HandL, model.MiddleL, gR + dir * spread, dir, -up - side * .6f - ahead * .3f, .3f);
+            gR = Grip(model.HandR, model.MiddleR); Vector3 gL = Grip(model.HandL, model.MiddleL);
+            // The shaft is laid through both fists as they closed (each is on it), and on to the blade.
+            if ((gL - gR).sqrMagnitude > .04f) dir = (gL - gR).normalized;
             HandSpread = Vector3.Distance(gR, gL);
             { var ch = model.Chest != null ? model.Chest.position : foot + up * 1.3f; float sh = Mathf.Min(model.UpperArmL.position.y, model.UpperArmR.position.y);
               PoseHandOverShoulder = Mathf.Max(gL.y, gR.y) - sh; PoseHandAhead = Mathf.Min(Vector3.Dot(gL - ch, ahead), Vector3.Dot(gR - ch, ahead));
@@ -160,6 +179,63 @@ namespace Crulanda.Encounter
             }
         }        /// <summary>The middle of a closed hand: a little past the knuckles' root toward them (the palm).</summary>
         static Vector3 Grip(Transform hand, Transform middle) { return middle != null ? Vector3.Lerp(hand.position, middle.position, .75f) : hand.position; }
+        /// <summary>How far an arm's grip reaches from its shoulder, straight (upper arm, forearm and three quarters of the hand).</summary>
+        static float ArmReach(Transform upper, Transform lower, Transform hand, Transform middle)
+        {
+            return Vector3.Distance(upper.position, lower.position) + Vector3.Distance(lower.position, hand.position) + (middle != null ? .75f * Vector3.Distance(hand.position, middle.position) : 0);
+        }
+        /// <summary>A hand closed on a bar at <paramref name="at"/>: the wrist on the forearm's line, turned <paramref name="square"/>
+        /// of the way to square with the bar (the bar across the palm; a reaching arm keeps it nearly straight, as a bent wrist
+        /// shortens the reach), and the arm reached so the grip, not the wrist, lands there; three times, as the hand turns with the
+        /// forearm.</summary>
+        static void GripAt(Transform upper, Transform lower, Transform hand, Transform middle, Vector3 at, Vector3 bar, Vector3 pole, float square)
+        {
+            if (upper == null || lower == null || hand == null) return;
+            for (int i = 0; i < 3; i++)
+            {
+                if (middle != null)
+                {
+                    var fore = (hand.position - lower.position).normalized; var across = Vector3.ProjectOnPlane(fore, bar);
+                    if (across.sqrMagnitude > 1e-4f) PointBone(hand, middle.position - hand.position, Vector3.Slerp(fore, across.normalized, square), 1);
+                }
+                Reach(upper, lower, hand, at - (Grip(hand, middle) - hand.position), pole);
+            }
+        }
+        ModelFigure hoeClavOf; Transform hoeClav;
+        /// <summary>The leading (left) collarbone of this figure, or null.</summary>
+        Transform HoeClavicle()
+        {
+            if (hoeClavOf != model) { hoeClavOf = model; var t = model.BonesFor(new[] { "clavicle_l" })[0]; hoeClav = t != null && t.name == "clavicle_l" ? t : null; }
+            return hoeClav;
+        }
+        float hoeStance;
+        /// <summary>The hoer's stance (2026-10-14). The idles under the stroke turn the shoulders 15-35 degrees either way as they look
+        /// about, and the back's bend about the body's right then tipped them 10-45 degrees, so the front hand's place on the shaft
+        /// moved out of its reach from one stroke to the next. Before the back bends (<paramref name="turned"/> false) the shoulders
+        /// are squared to the stroke, so the bend tips neither; once it is bent (true) they are turned <see cref="HoeTurn"/> about the
+        /// upright, both staying level, so the leading (left) one is forward, as a hoer stands with the lower hand's side to the work,
+        /// and the head is turned back onto the work. Taken and left at once with the grip on the shaft, as the arms go straight to
+        /// it and straight back (a turned body under a staff-held tool is no pose of any clip).</summary>
+        void HoeStance(bool on, bool apply, bool turned)
+        {
+            if (!turned) hoeStance = on ? 1 : 0;
+            if (!apply || hoeStance <= 0 || model.Spine == null || model.Chest == null || model.UpperArmL == null || model.UpperArmR == null) return;
+            Vector3 ahead = body.forward, side = body.right; ahead.y = 0; ahead.Normalize();
+            float sgn = 1; if (Vector3.Dot(model.UpperArmR.position - model.Chest.position, side) < 0) { side = -side; sgn = -1; }   // turned toward the right arm's own side
+            float turn;
+            if (!turned)
+            {
+                var line = model.UpperArmR.position - model.UpperArmL.position;
+                float yaw = Mathf.Atan2(-Vector3.Dot(line, ahead), Vector3.Dot(line, side)) * Mathf.Rad2Deg;   // positive: the left shoulder ahead
+                turn = Mathf.DeltaAngle(yaw, 0) * hoeStance * sgn;
+            }
+            else turn = HoeTurn * hoeStance * sgn;
+            model.Spine.rotation = Quaternion.AngleAxis(turn * .4f, body.up) * model.Spine.rotation;
+            model.Chest.rotation = Quaternion.AngleAxis(turn * .6f, body.up) * model.Chest.rotation;
+            // The head back onto the work, the turn shared by the neck and the head (all of it in the neck twisted the collar open).
+            if (turned && model.Neck != null) model.Neck.rotation = Quaternion.AngleAxis(-turn * .45f, body.up) * model.Neck.rotation;
+            if (turned && model.HeadBone != null) model.HeadBone.rotation = Quaternion.AngleAxis(-turn * (model.Neck != null ? .6f : 1.05f), body.up) * model.HeadBone.rotation;
+        }
         /// <summary>Two-bone reach: the upper arm and forearm turned so the wrist lands on <paramref name="target"/> (or as near as the
         /// arm reaches), the elbow bending toward <paramref name="pole"/>. The wrist is put where the hand's grip lands on the mark.</summary>
         static void Reach(Transform upper, Transform lower, Transform hand, Vector3 target, Vector3 pole)

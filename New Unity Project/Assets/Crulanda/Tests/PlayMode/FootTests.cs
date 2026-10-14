@@ -108,7 +108,10 @@ namespace Crulanda.Tests
                     {
                         var f = pick(x); if (f.toe > stand.toe + .04f) continue;   // only a foot that is down
                         if (f.ankle < stand.ankle + .05f && f.tilt > stand.tilt + 15) { problems.Add(what + " " + name + " foot at " + F(x.t - t0) + "s: down on its toes, pointed " + (f.tilt - stand.tilt).ToString("0") + " degrees more than standing (tilt " + f.tilt.ToString("0") + ")"); break; }
-                        if (f.yaw > 30) { problems.Add(what + " " + name + " foot at " + F(x.t - t0) + "s: down but turned " + f.yaw.ToString("0") + " degrees from the way it goes"); break; }
+                        // A foot stood upright on its toes (heel straight over the ball, leaving the ground) has no heading to turn: Kevin's walk
+                        // and run pass upright at toe-off on his own model too, the ball 2-4 cm up, and the heading of a foot 70+ degrees from
+                        // level reads anything from 0 to 180 (2026-10-14: the planting that spun such feet round to the heading is gone).
+                        if (f.yaw > 30 && f.tilt < 70) { problems.Add(what + " " + name + " foot at " + F(x.t - t0) + "s: down but turned " + f.yaw.ToString("0") + " degrees from the way it goes"); break; }
                         if (name == "left" ? f.side > .02f : f.side < -.02f) { problems.Add(what + " " + name + " foot at " + F(x.t - t0) + "s: down on the wrong side of the body (crossed)"); break; }
                         if (Mathf.Abs(f.side) < .06f) { problems.Add(what + " " + name + " foot at " + F(x.t - t0) + "s: down on the middle line (" + F(f.side) + " m out): the feet land one in front of the other"); break; }
                     }
@@ -134,10 +137,13 @@ namespace Crulanda.Tests
                 if (f.yaw > 30) problems.Add("standing, the " + name + " foot is turned " + f.yaw.ToString("0") + " degrees");
             }
             // Walking, then running, then a running jump and the run after it.
+            // Each gait settles 0.6 s of game time before it is measured: the clips blend over a quarter second, and the 40 frames
+            // waited before were 0.2 s in a batch run (200 frames a second), so the walk was measured with the idle still a fifth in
+            // ("down on the middle line" whenever the test ran first and the narrow Morro stance was the one playing; 2026-10-14).
             EncounterInput.Scripted = new Vector2(0, 1); AdventurerMotor.Running = false;
-            for (int i = 0; i < 40; i++) yield return null;
+            for (float settle = Time.time + .6f; Time.time < settle;) yield return null;
             var walk = new List<(float t, Foot l, Foot r)>(); yield return Sample(2, walk); Check("walking", walk, standL, standR, problems);
-            AdventurerMotor.Running = true; for (int i = 0; i < 40; i++) yield return null;
+            AdventurerMotor.Running = true; for (float settle = Time.time + .6f; Time.time < settle;) yield return null;
             var run = new List<(float t, Foot l, Foot r)>(); yield return Sample(2, run); Check("running", run, standL, standR, problems);
             motor.Jump(); float deadline = Time.time + 2; while (Time.time < deadline && !motor.Airborne) yield return null;
             while (Time.time < deadline && motor.Airborne) yield return null;

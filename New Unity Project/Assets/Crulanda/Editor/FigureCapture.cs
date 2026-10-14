@@ -21,7 +21,7 @@ namespace Crulanda.EditorTools
         public static void Orcs()
         {
             Stage();
-            var specs = new[] { O(ActorLook.Druid, 3, "Shaman"), O(ActorLook.Druid, 4, "Shaman (woman)"), O(ActorLook.Warrior, 1, "Warrior"), O(ActorLook.Ranger, 5, "Ranger"), O(ActorLook.Mage, 7, "Mage"), P(ActorLook.Druid, 3, null, "Human druid") };
+            var specs = new[] { O(ActorLook.Druid, 3, "Shaman"), O(ActorLook.Druid, 4, "Shaman (grey)"), O(ActorLook.Warrior, 1, "Warrior"), O(ActorLook.Ranger, 5, "Ranger"), O(ActorLook.Mage, 7, "Mage"), P(ActorLook.Druid, 3, null, "Human druid") };
             Row("orcs-front", specs); Row("orcs-side", specs, 90);
             Row("orcs-faces", specs, 0, close: true); Row("orcs-faces-side", specs, 60, close: true);
             Debug.Log("FIGURE_CAPTURE_DONE");
@@ -120,6 +120,7 @@ namespace Crulanda.EditorTools
                 if (s.gear != null) v.ApplyGearIds(s.gear, s.db, s.looks);
                 if (s.carry != ActorVisual.Carrying.None) { LoadProps.Build(go.transform, s.load, s.count); v.Carry = s.carry; }
                 if (s.dead) v.PreviewDead(); else v.Preview(s.pose, s.walk, s.time);
+                if (v.BeastModel != null) v.BeastModel.Sample(s.walk > 0 ? "walk" : "idle", .4f);   // a whole orc on its own clips, not its file's rest pose
                 if (s.act != null) v.PreviewAct(s.act, s.time);
             }
             float width = specs.Length * gap + .3f, halfH = Mathf.Tan(cam.fieldOfView * .5f * Mathf.Deg2Rad), aspect = 16f / 9;

@@ -63,9 +63,14 @@ namespace Crulanda.Encounter
             return new ModelBeast.Coat().Skin(skin, Resources.Load<Texture2D>("CreatureSkins/Treant/" + kind + "_Normal"), tint)
                 .Lit(Resources.Load<Texture2D>("CreatureSkins/Treant/" + kind + "_Glow"), glow);
         }
-        /// <summary>The whole-orc model for an orc of this look (the casters: the Shaman, in the Druid's look, and the Mage), or null (an
-        /// orc of the other classes keeps the orc's head on the people's body until the pack's warrior is in).</summary>
-        public static string OrcKind(ActorLook look) { return (look == ActorLook.Druid || look == ActorLook.Mage) && ModelBeast.Available("OrcShaman") ? "OrcShaman" : null; }
+        /// <summary>The whole-orc model for an orc of this look: the Orc Shaman for the casters (the Shaman, in the Druid's look, and the
+        /// Mage), the stylized axe orc for the Warrior, the Ranger and the Rogue; null without them (the orc's head on the people's body).</summary>
+        public static string OrcKind(ActorLook look)
+        {
+            if ((look == ActorLook.Druid || look == ActorLook.Mage) && ModelBeast.Available("OrcShaman")) return "OrcShaman";
+            if ((look == ActorLook.Warrior || look == ActorLook.Ranger) && ModelBeast.Available("OrcBrute")) return "OrcBrute";   // the Warrior, the Ranger and the Rogue: the axe orc
+            return null;
+        }
         /// <summary>The Orc Shaman's skin, from the pack's: mostly greens (CANON: orcs are green), now and then the grey or the dark; its staff's own map.</summary>
         ModelBeast.Coat OrcCoat()
         {
@@ -149,6 +154,13 @@ namespace Crulanda.Encounter
                 var pal = Resources.Load<Texture2D>("Creatures/Spider_palette" + tint) ?? Resources.Load<Texture2D>("Creatures/Spider_palette");
                 if (pal != null) coat = new ModelBeast.Coat().Skin(pal, null, Color.white);
                 height = elite ? .95f : .8f; walk = 1.4f; run = 4.5f; LieDepth = .15f;
+            }
+            else if (kind == "OrcBrute")
+            {
+                // The stylized orc of the first pack, whole, with its axe, on its own clips (idle, walk, run, two blows, a death); its pink
+                // skin is the green of Resources/Characters/Orc/OrcSkin (recoloured: canon orcs are green).
+                coat = new ModelBeast.Coat().Map("Axe", Resources.Load<Texture2D>("CreatureSkins/OrcBrute/Axe")).Map("", Resources.Load<Texture2D>("Characters/Orc/OrcSkin"));
+                height = 2.1f + Mathf.Abs(variant % 5) * .02f; walk = 1.4f; run = 5.5f; LieDepth = 0;
             }
             else if (kind == "OrcShaman")
             {

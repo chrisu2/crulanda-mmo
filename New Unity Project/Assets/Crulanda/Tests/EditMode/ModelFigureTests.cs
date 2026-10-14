@@ -42,9 +42,10 @@ namespace Crulanda.Tests
         [Test] public void An_orc_is_the_same_model_taller_green_and_tusked()
         {
             Assume.That(ModelFigure.Available, "The character kits are in the project (Resources/Characters).");
-            // A Warrior's look: the orc's head on the people's body (the casters wear the whole orc: An_orc_shaman_is_the_whole_orc).
-            var man = Figure(ActorLook.Warrior, 3); var go = new GameObject("Orc test figure"); new GameObject("Body").transform.SetParent(go.transform, false); go.transform.position = new Vector3(-6, 1, 0); made.Add(go);
-            var orc = ActorVisual.Attach(go, ActorLook.Warrior, 3, false, null, true);
+            // The fallback, on a look with no whole orc (the Paladin's): the orc's head on the people's body. Every orc class wears a whole
+            // orc (An_orc_shaman_is_the_whole_orc).
+            var man = Figure(ActorLook.Paladin, 3); var go = new GameObject("Orc test figure"); new GameObject("Body").transform.SetParent(go.transform, false); go.transform.position = new Vector3(-6, 1, 0); made.Add(go);
+            var orc = ActorVisual.Attach(go, ActorLook.Paladin, 3, false, null, true);
             Assert.IsTrue(orc.Orc); Assert.NotNull(orc.Model, "a model"); foreach (var f in Frames) Assert.NotNull(orc.transform.Find("Body/" + f), "the frame " + f);
             float tall = orc.Model.Model.localScale.y / man.Model.Model.localScale.y; Assert.IsTrue(Mathf.Abs(tall - ActorVisual.OrcScale) < .01f || Mathf.Abs(tall - ActorVisual.OrcWomanScale) < .01f, "taller by an orc's scale (" + tall + ")");
             // The orc's own head (the pack's, baked) on the Head bone, the man's head under it not drawn; a man has none.
@@ -73,6 +74,12 @@ namespace Crulanda.Tests
             var mats = orc.BeastModel.Renderers.SelectMany(r => r.sharedMaterials).Where(m => m != null).ToList();
             Assert.IsTrue(mats.Any(m => m.mainTexture != null && m.mainTexture.name.StartsWith("Skin_")), "its skin map (" + string.Join(", ", mats.Select(m => m.name + ":" + (m.mainTexture ? m.mainTexture.name : "-"))) + ")");
             Assert.IsNull(Figure(ActorLook.Druid, 0).BeastModel, "a man in the Druid's look is the people's body");
+            // The Warrior, Ranger and Rogue (their looks): the axe orc, whole, on its own clips.
+            Assume.That(ModelBeast.Available("OrcBrute"), "the axe orc is in Resources/Creatures");
+            var g2 = new GameObject("Orc warrior test figure"); new GameObject("Body").transform.SetParent(g2.transform, false); g2.transform.position = new Vector3(-12, 1, 0); made.Add(g2);
+            var brute = ActorVisual.Attach(g2, ActorLook.Warrior, 0, false, null, true);
+            Assert.NotNull(brute.BeastModel, "the whole axe orc"); Assert.AreEqual("OrcBrute", brute.BeastModel.Kind);
+            foreach (var slot in new[] { "idle", "walk", "run", "attack", "attack2", "death" }) Assert.NotNull(ModelBeast.SlotClip("OrcBrute", slot), "its " + slot);
         }
         [Test] public void Every_person_is_a_model_with_its_frames()
         {

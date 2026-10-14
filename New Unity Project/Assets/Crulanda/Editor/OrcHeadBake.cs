@@ -65,6 +65,35 @@ namespace Crulanda.EditorTools
             Object.DestroyImmediate(go);
             Debug.Log("ORC_BAKE_DONE\n" + log);
         }
+        /// <summary>
+        /// The stylized orc's clips for the whole orc of the martial classes (2026-10-13, Chris: "we had whole orc assets"): each of the
+        /// pack's clip files carries the whole model again (14 MB each), so only its clip is kept, as a .anim under
+        /// Resources/Creatures/OrcBruteClips named as ModelBeast's motions look for it (Idle, Walk, Run, Attack1, Attack2, Die); the
+        /// cycles loop. Staged at Assets/OrcStaging/Clips. Writes orc-clips.txt.
+        /// </summary>
+        public static void BakeBruteClips()
+        {
+            AssetDatabase.Refresh();
+            const string dst = "Assets/Crulanda/Resources/Creatures/OrcBruteClips"; Directory.CreateDirectory(dst);
+            var log = new StringBuilder();
+            var names = new System.Collections.Generic.Dictionary<string, string> { { "Atack1", "Attack1" }, { "Atack2", "Attack2" }, { "Die", "Die" }, { "Idle", "Idle" }, { "Running", "Run" }, { "Walk", "Walk" } };
+            foreach (var path in AssetDatabase.FindAssets("t:Model", new[] { Stage + "/Clips" }).Select(AssetDatabase.GUIDToAssetPath))
+            {
+                string file = Path.GetFileNameWithoutExtension(path), name = names.Where(kv => file.StartsWith(kv.Key)).Select(kv => kv.Value).FirstOrDefault();
+                if (name == null) { log.AppendLine("skipped " + file); continue; }
+                // As the model is imported under Resources/Creatures (CreatureImport): a generic rig, so the curves are its bones' own.
+                var mi = (ModelImporter)AssetImporter.GetAtPath(path);
+                if (mi.animationType != ModelImporterAnimationType.Generic) { log.AppendLine(file + ": was " + mi.animationType); mi.animationType = ModelImporterAnimationType.Generic; mi.avatarSetup = ModelImporterAvatarSetup.CreateFromThisModel; mi.SaveAndReimport(); }
+                var clip =AssetDatabase.LoadAllAssetsAtPath(path).OfType<AnimationClip>().Where(c => !c.name.StartsWith("__preview__")).OrderByDescending(c => c.length).FirstOrDefault();
+                if (clip == null) { log.AppendLine("no clip in " + file); continue; }
+                var copy = Object.Instantiate(clip); copy.name = name;
+                var set = AnimationUtility.GetAnimationClipSettings(copy); set.loopTime = name == "Idle" || name == "Walk" || name == "Run"; AnimationUtility.SetAnimationClipSettings(copy, set);
+                var outPath = dst + "/" + name + ".anim"; AssetDatabase.DeleteAsset(outPath); AssetDatabase.CreateAsset(copy, outPath);
+                log.AppendLine(file + " -> " + name + " (" + copy.length.ToString("0.00") + " s, " + AnimationUtility.GetCurveBindings(copy).Length + " curves, legacy " + copy.legacy + ")");
+            }
+            AssetDatabase.SaveAssets(); File.WriteAllText("orc-clips.txt", log.ToString());
+            Debug.Log("ORC_CLIPS_DONE\n" + log);
+        }
         static SkinnedMeshRenderer Find(GameObject go, string name) { return go.GetComponentsInChildren<SkinnedMeshRenderer>(true).FirstOrDefault(r => r.name == name); }
         /// <summary>The parts baked in rest pose into the Head bone's frame, one submesh each, saved as <paramref name="asset"/>.</summary>
         static Mesh Combine(GameObject go, string[] parts, Matrix4x4 frame, StringBuilder log, string asset)

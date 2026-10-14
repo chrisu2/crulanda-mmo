@@ -719,3 +719,4 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
 - 195 (19:45, a picture at Harrow farm by the hen-wife) "bottom of this barn flashes when walking buy it alternating from brick to wood and it should be turn around 180 so the cows nearby can get in to sleep at night" (OPEN)
 - 196 (19:50, a picture of the Old Fold with Mira) "does anyone feed or tend to this flock of sheep?" (a sheep stands in the fold's wall; nobody tends them; OPEN)
 - 197 (19:55) "or extract their wool for market?" (OPEN: a shepherd for the Old Fold who shears the flock, the wool to the market)
+- 198 (20:00) "all need an exit command to close the .exe" (OPEN)

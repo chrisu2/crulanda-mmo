@@ -638,7 +638,7 @@ namespace Crulanda.Encounter
             // (2026-10-13, Chris: "cant see all classes. need another mechanism to be able to choose": one button a class ran off the screen
             // at ten classes; now a grid of three across.)
             int rows = (others.Count + 2) / 3;
-            Frame(new Rect(475, 325, 490, 240 + 48 * rows));
+            Frame(new Rect(475, 325, 490, 296 + 48 * rows));
             GUI.Label(new Rect(525, 351, 400, 35), "EXPEDITION PAUSED", heading);
             GUI.Label(new Rect(525, 398, 400, 35), "Progress autosaves out of combat.", text);
             if (controlsOpen) { DrawControls(); return; }
@@ -651,6 +651,8 @@ namespace Crulanda.Encounter
             for (int i = 0; i < others.Count; i++)
                 if (GUI.Button(new Rect(525 + (i % 3) * 132, 534 + 48 * (i / 3), 126, 44), others[i].definition.displayName, button)) { session.SwitchCharacter(others[i].definition.id); break; }
             GUI.enabled = true;
+            // Chris 2026-10-14: "all need an exit command to close the .exe" (also /exit and /quit in the chat): saved first, out of combat.
+            if (GUI.Button(new Rect(525, 540 + 48 * rows + 8, 126, 44), "Quit game", button)) session.Quit();
         }
         public static string ResourceName(Crulanda.Core.ResourceKind kind) { return kind == Crulanda.Core.ResourceKind.Breath ? "Shift Breath" : kind.ToString(); }
         static string ResourceShort(Crulanda.Core.ResourceKind kind) { return kind == Crulanda.Core.ResourceKind.Breath ? "Breath" : kind.ToString(); }

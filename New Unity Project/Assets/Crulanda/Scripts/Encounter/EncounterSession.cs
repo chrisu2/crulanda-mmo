@@ -629,6 +629,8 @@ namespace Crulanda.Encounter
             workPose = ActorPose.None; workRecipe = recipe; workName = name; workStart = Time.time; workSeconds = Mathf.Max(.1f, seconds); workAt = Player.transform.position; workHealth = Player.Health.Pool.Current; workDone = done;
         }
         /// <summary>Stops the work in hand, if any (nothing is gathered), saying so when <paramref name="say"/>.</summary>
+        /// <summary>Saves and closes the game (the pause menu's Quit, /exit and /quit; Chris, 2026-10-14).</summary>
+        public void Quit() { try { if (Player != null && Player.IsAlive && !InCombat) Save(); } catch (Exception) { } Application.Quit(); }
         public void CancelWork(bool say = false) { if (workDone == null) return; workDone = null; workName = null; if (say) Message(WorkStoppedLine); }
         void TickWork()
         {

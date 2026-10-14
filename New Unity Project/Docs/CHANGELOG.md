@@ -39,7 +39,7 @@ are backwards", "traps need to be something besides a circle on the ground", "no
   linked group 3.5 m from home, and the parked tool shaft), the Mage and the Rogue 2/2 with all 43 builds in range, the release build
   (0 shader errors), Oakhaven's tour 109 a second. **Published 16:33** (the 16:28 build); the save backed up to
   `save-backups/20261014-1633-before-woods-publish`.
-- **After the publish (16:40-17:10; written and compiled, to verify in chainR76):** the frames of the published build: the casters'
+- **After the publish (16:40-17:10; verified by chainR76, 14/14 and the yard frame; published again at 18:24, the save backed up to `save-backups/20261014-1822-before-butts-publish`):** the frames of the published build: the casters'
   effects under the raised camera (`ui-captures/combat3`), the jaw trap, the yard. The butts: the shape rule's logged turns showed the
   three Small Props butts had sat where the hand-set turns put them, so the four turns are set outright (the second kind is painted on
   the far side from its legs; the Megapack's turned the other way). The woods keep clear of the gathering nodes and stations as the

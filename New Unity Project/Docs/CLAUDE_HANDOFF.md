@@ -6,7 +6,7 @@
 What was done, in order, is in `Docs/TONIGHT_2026-10-13.md` (Progress, 2026-10-14 11:40 on) and `Docs/CHANGELOG.md` (2026-10-14,
 11:40 on). Nothing is VERIFIED until Chris has seen it in his build.
 - **Branch:** `feet-bow-adit-kit`, PR #2. Do not merge to `main` without Chris. The Adit rework is on `adit-rework` (pushed, not merged).
-- **Published:** the release build of 16:28 at 16:33 (commit 4465b1da, the woods and the rest of CHANGELOG 2026-10-14 11:40 on) to `D:/crulanda-work/outputs/Crulanda-Playable`. Save backed up first: `D:/crulanda-work/save-backups/20261014-1633-before-woods-publish`.
+- **Published:** the release build of 18:23 at 18:24 (the butts facing their lanes, the woods clear of the seams, the puffs small; chainR76 14/14), after the release build of 16:28 at 16:33 (commit 4465b1da, the woods and the rest of CHANGELOG 2026-10-14 11:40 on) to `D:/crulanda-work/outputs/Crulanda-Playable`. Save backed up first: `D:/crulanda-work/save-backups/20261014-1633-before-woods-publish`.
 - **Tests (TESTED):** the final run (chainR72): EditMode 484/485, the full PlayMode suite 345/349 (two of the four fixed in the published build, see CHANGELOG), balance 43 of 43 builds in range, Oakhaven 109 a second. Known and parked: EliteFightTests needs a graphics device in batch mode;
   GroundingTests (a sim's sole 2.8 cm up); VillageDayTests (Wat Stook's tool shaft through a leg while walking); the CraftPix boar's
   EditMode test is inconclusive.

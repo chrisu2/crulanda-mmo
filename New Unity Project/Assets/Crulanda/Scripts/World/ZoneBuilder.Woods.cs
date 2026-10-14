@@ -85,10 +85,18 @@ namespace Crulanda.World
                         else if (roll < w.snags) { tree = DeadTree(at, .6f + size * .5f, DeadBark(), 3, statics); snags++; }
                         else if (roll < w.snags + (deep ? w.deepOaks : w.oaks) && TrunkClear(at, 7) && !NearRoad(at, 6) && WoodsGround(at, 5))
                         {
-                            // A great oak of the old forest: the giant's own build at about half size; its leaf mostly yellow-green, now and then
-                            // deep green or gold (the deep green alone read as a dark flat cap at this size: frames 2026-10-14).
-                            tree = Root(new ZoneProp { kind = "giant_tree", at = at, rotation = yaw * 360, scale = w.oakScale * (.85f + size * .35f) }, statics);
-                            GiantTree(tree, look < .2f ? 0 : look < .8f ? 1 : 2); oaks++;
+                            // The old forest's big trees. At oakScale under .7 they are the zone's own broadleaf grown large (Chris, 2026-10-14
+                            // 18:55: the giant at half size read as "mushroom looking tree tops"); the Verdant Shore keeps its giants.
+                            if (w.oakScale < .7f)
+                            {
+                                tree = Root(new ZoneProp { kind = "tree", name = "Old oak", at = at, rotation = yaw * 360, scale = 1.9f + size * .6f }, statics);
+                                Broadleaf(tree, look < .72f ? 0 : look < .88f ? 3 : 1); oaks++;
+                            }
+                            else
+                            {
+                                tree = Root(new ZoneProp { kind = "giant_tree", at = at, rotation = yaw * 360, scale = w.oakScale * (.85f + size * .35f) }, statics);
+                                GiantTree(tree, look < .2f ? 0 : look < .8f ? 1 : 2); oaks++;
+                            }
                         }
                         else
                         {
@@ -155,8 +163,21 @@ namespace Crulanda.World
         void FallenTrunk(Vector2 at, float r1, float r2)
         {
             var t = Root(new ZoneProp { kind = "log", name = "Fallen trunk", at = at, rotation = r1 * 360 }, statics);
-            var bark = Tint(art.bark, Wither(new Color(.36f, .31f, .26f))); var heart = Tint(art.timber, Wither(new Color(.56f, .46f, .33f)));
-            var earth = Tint(art.bark, Wither(new Color(.24f, .2f, .16f)));
+            // The kit's dead tree laid on its side, a little into the ground (Chris, 2026-10-14 18:55: "dont like these trees new
+            // bottoms/roots ... coloring is off": the built trunk's black end and moss blob); the built trunk when the kit is missing.
+            if (HasProp("Nature/DeadTree_1"))
+            {
+                var kit = ModelProp(t, "Nature/DeadTree_" + (1 + (int)(r2 * 4.99f)), Vector3.zero, 0, 6 + r2 * 3);
+                if (kit != null)
+                {
+                    kit.transform.localRotation = Quaternion.Euler(0, 0, 84 + r2 * 5); kit.transform.localPosition = new Vector3(0, .35f, 0);
+                    DressNature(kit, Wither(new Color(.42f, .34f, .26f)));
+                    var col = t.gameObject.AddComponent<CapsuleCollider>(); col.direction = 0; col.center = new Vector3(-2.8f, .35f, 0); col.height = 6; col.radius = .4f;
+                    t.gameObject.AddComponent<NavBlocker>(); return;
+                }
+            }
+            var bark = Tint(art.bark, Wither(new Color(.42f, .34f, .26f))); var heart = Tint(art.timber, Wither(new Color(.64f, .52f, .38f)));
+            var earth = Tint(art.bark, Wither(new Color(.34f, .27f, .2f)));
             float len = 4.5f + r2 * 3, rad = .36f + r2 * .16f;
             var a = new Vector3(-len / 2, LocalGround(t, -len / 2, 0) + rad * .75f, 0); var b = new Vector3(len / 2, LocalGround(t, len / 2, 0) + rad * .7f, 0);
             var d = b - a; var along = Quaternion.FromToRotation(Vector3.up, d.normalized);

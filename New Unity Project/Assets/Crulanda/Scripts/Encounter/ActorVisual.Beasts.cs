@@ -316,7 +316,11 @@ namespace Crulanda.Encounter
             bool fighting = enemyRef != null && enemyRef.Engaged;
             float t = Time.time + beastPhase;
             string rest = LyingLow ? "headlow" : fighting ? "idle" : beastModel.Kind == "Wolf" ? (Mathf.Sin(t * .21f) > .6f ? "idle2" : "idle") : (Mathf.Sin(t * .3f) > 0 ? "eat" : "idle");
-            beastModel.Drive(LyingLow ? 0 : speed, rest);
+            // In the air (the player's orc jumping; the packs have no jump clip): the legs run, not stand (Chris, 2026-10-14 18:55:
+            // "when orc jump his legs dont move or bend").
+            if (!motorChecked) { motor = GetComponent<AdventurerMotor>(); motorChecked = true; }
+            bool airborne = motor != null && motor.Airborne;
+            beastModel.Drive(LyingLow ? 0 : airborne ? Mathf.Max(speed, 4.5f) : speed, rest);
         }
         /// <summary>A blow as it lands (EncounterEnemy): a modelled beast attacks (a wolf bites, a stag drives its antlers, a doe kicks).</summary>
         public void Strike(string motion = null)

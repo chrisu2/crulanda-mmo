@@ -61,7 +61,7 @@ namespace Crulanda.Tests
             }
             Assert.IsEmpty(problems.Take(20).ToList(), problems.Count + " problems");
             // The great oaks: some, and only in the old forest's few patches (not one in every corner).
-            var oaks = zone.GetComponentsInChildren<Transform>(true).Where(x => x.name == "giant_tree").Select(x => new Vector2(x.position.x, x.position.z)).ToList();
+            var oaks = zone.GetComponentsInChildren<Transform>(true).Where(x => x.name == "Old oak" || x.name == "giant_tree").Select(x => new Vector2(x.position.x, x.position.z)).ToList();
             Debug.Log("Woods test: " + oaks.Count + " great oaks");
             Assert.Greater(oaks.Count, 8, "great oaks in the old forest");
             Assert.Less(oaks.Count, trees.Count / 3, "the great oaks only in some areas");

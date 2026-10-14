@@ -68,11 +68,14 @@ are backwards", "traps need to be something besides a circle on the ground", "no
     VillageWorkTests knows the fold's places.
   - The combat capture stands in front of the dummy, along its facing into the yard; it had stood on the line from the spawn, through
     the fence ("why do they run test outside the area?").
-  - Still open: the inn's tables and benches on their sides and the tankards floating (note 192; the cause is not found), a sheep in
-    the fold's wall (196).
+  - **The inn's tables and benches** (note 194a; "all the tables and benches are turned on their sides"): the Fantasy pack's one-mesh
+    files carry Blender's -90 on the prefab root, and ModelProp zeroed it, so every table, bench, stool and mug of that pack lay on
+    its side, the mugs set at table height floating; the root's turn is kept now. KitPropTests checks every Fantasy prop stands up.
+  - Still open: a sheep in the fold's wall (196).
   - **Runs:** chainR78 (the fixes to 20:00): WoodsTests, MovablePanelTests, ScoundrelLoopTests, OrcMotionTests, NodeStreamTests and
     HudTests 17/17, the release build (0 shader errors), the Scoundrel frames (`ui-captures/combat4/scoundrel`), the creature tour
-    (`creatures-evening`), the life capture (`life-evening`), Oakhaven's tour; CHAIN78_RESULT. chainR79 (the shepherd and the
+    (`creatures-evening`), the life capture (`life-evening`), Oakhaven's tour 109 a second; **published 19:42**, the save backed up to
+    `save-backups/20261014-1942-before-evening-publish`. chainR79 (the shepherd and the
     capture): CHAIN79_RESULT.
 
 ## 2026-10-14, 00:20 to the end: play-test fixes, the Scoundrel, the drowned dead, the dungeons after the Adit

@@ -27,6 +27,17 @@ namespace Crulanda.Encounter
         ModelBeast model;
         /// <summary>The animal's model (game deer: the pack's stag or deer; <see cref="ModelBeast"/>), or null for a body of primitives.</summary>
         public ModelBeast Model { get { return model; } }
+        /// <summary>A wild bird for a crow's place (the Living Birds): the model, its skin (CreatureSkins/Birds) and its height, by r and the zone.</summary>
+        static (string, string, float) Songbird(float r)
+        {
+            var zone = Crulanda.World.ZoneBuilder.Active; string biome = zone != null && zone.Zone != null ? zone.Zone.biome : "";
+            if (biome == "gloom" || biome == "ash" || r < .3f) return ("BirdCrow", "crow", .36f);
+            float k = (r - .3f) / .7f;
+            if (k < .2f) return ("BirdRobin", "robin", .2f);
+            if (k < .35f) return ("BirdBlueJay", "blueJay", .24f);
+            if (k < .5f) return ("BirdCardinal", "cardinal", .21f);
+            return ("BirdLittleBird", k < .7f ? "sparrow" : k < .85f ? "chickadee" : "goldfinch", .15f);
+        }
         /// <summary>Wears the pack's animal of this kind, its head <paramref name="height"/> m up, in <paramref name="coat"/> (null:
         /// its own colours), if it is in the build.</summary>
         bool MakeModel(string animal, float height, float walk, float run, ModelBeast.Coat coat = null)
@@ -170,6 +181,10 @@ namespace Crulanda.Encounter
                     break;
                 case "crow":
                     Speed = .5f; FleeSpeed = 7; FleeRadius = 7; torso = .18f; flank = .08f;
+                    // The Living Birds (Chris, 2026-10-13: "Living Birds to replace all birds in game"): a crow in Khaven's dusk and on the Rim's
+                    // ash; elsewhere a crow now and then and mostly the songbirds, robin, blue jay, cardinal, and the little bird as a sparrow,
+                    // a chickadee or a goldfinch.
+                    { var (bird, skin, tall) = Songbird(r); if (MakeModel(bird, tall, .5f, 7, new ModelBeast.Coat().Map("", Resources.Load<Texture2D>("CreatureSkins/Birds/" + skin)))) { model.TipsOver = true; break; } }
                     if (MakeModel("Raven", .36f, .5f, 7)) { model.TipsOver = true; break; }   // the carrion raven (Ashen Marches): it hops, and flies on its own wingbeat
                     var black = new Color(.07f, .07f, .09f);
                     Part(PrimitiveType.Sphere, body, new Vector3(0, .18f, 0), new Vector3(.16f, .15f, .3f), black);
@@ -188,6 +203,16 @@ namespace Crulanda.Encounter
                     // Two thin dark legs on splayed toes; tucked back under the tail in flight (see Critter.Fly).
                     var claw = new Color(.13f, .13f, .14f);
                     foreach (int s in new[] { -1, 1 }) Toes(Leg(new Vector3(s * .035f, .13f, .01f), .02f, claw, s < 0 ? 0 : .5f, 30), .036f, claw);
+                    break;
+                case "squirrel":
+                    // Chris, 2026-10-13: "Furry Squirrel to put in forest areas" (Rip Vertices' squirrel, its fur's colour map on a plain
+                    // material: the pack's fur shaders are URP and HDRP only). Two primitives without it.
+                    Speed = .9f; FleeSpeed = 5; FleeRadius = 6; torso = .12f; flank = .06f;
+                    if (MakeModel("Squirrel", .26f, .9f, 4.5f, new ModelBeast.Coat().Map("", Resources.Load<Texture2D>("CreatureSkins/Squirrel/Squirrel_Albedo")))) break;
+                    var red = new Color(.55f, .3f, .16f);
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .1f, 0), new Vector3(.1f, .1f, .18f), red);
+                    Head = Part(PrimitiveType.Sphere, body, new Vector3(0, .17f, .09f), Vector3.one * .08f, red);
+                    Part(PrimitiveType.Capsule, body, new Vector3(0, .2f, -.12f), new Vector3(.08f, .12f, .08f), red, new Vector3(-30, 0, 0));
                     break;
                 case "deer":
                     Speed = 1.2f; FleeSpeed = 7.5f; FleeRadius = 16; torso = 1; flank = .23f;

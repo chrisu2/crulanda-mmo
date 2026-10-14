@@ -162,6 +162,18 @@ namespace Crulanda.Encounter
                     else Critters.Add(Critter.Spawn(this, group.kind, group.center, group.radius));
             SpawnFarmhands(z);
             StartEconomy();
+            // Squirrels in the woods (Chris, 2026-10-13: "Furry Squirrel to put in forest areas"): one or two in each broadleaf or pine
+            // grove, up to ten a zone; drawn last, so nothing drawn before them moves.
+            if (Zone != null && Zone.Zone.groves != null)
+            {
+                int squirrels = 0;
+                foreach (var g in Zone.Zone.groves)
+                {
+                    if (g == null || (g.kind != "broadleaf" && g.kind != "pine") || squirrels >= 10) continue;
+                    float rad = Mathf.Clamp(Mathf.Min(g.size.x, g.size.y) * .4f, 4, 14);
+                    for (int i = 0, n = g.count >= 40 ? 2 : 1; i < n && squirrels < 10; i++, squirrels++) Critters.Add(Critter.Spawn(this, "squirrel", g.center, rad));
+                }
+            }
         }
         static readonly string[] KeeperNames = { "Goody Marl", "Hettie Brook", "Nan Pennock", "Old Sorrel" };
         public static string[] DefaultNames { get { return Names; } }

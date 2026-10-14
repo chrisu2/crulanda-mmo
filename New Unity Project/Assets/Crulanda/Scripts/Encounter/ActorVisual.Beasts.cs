@@ -23,7 +23,7 @@ namespace Crulanda.Encounter
             {
                 case ActorLook.Wolf: return "Wolf";
                 case ActorLook.Stag: return variant % 2 == 1 ? "Deer" : "Stag";
-                case ActorLook.Boar: return "Boar";
+                case ActorLook.Boar: return ModelBeast.Available("WildBoar") ? "WildBoar" : "Boar";   // Chris, 2026-10-13: "Wild Boar to replace the boars"
                 case ActorLook.Bear: return "Bear";         // Blink's stylized bear (Asset Store)
                 case ActorLook.RockEater: return "Bear";    // the Rock-Eater: the bear's body, grown and turned to stone (BuildModelBeast)
                 case ActorLook.Spider: return "Spider";     // ChillLands' crypt spider (Ashen Marches)
@@ -86,6 +86,8 @@ namespace Crulanda.Encounter
         bool BuildModelBeast(ActorLook look)
         {
             string kind = orc && OrcKind(look) != null ? OrcKind(look) : look == ActorLook.Keeper ? KeeperKind() : BeastKind(look, variant);
+            // The Bonecaller's bone thrall (Chris, 2026-10-13: "Use Toon RS Unit - Undead for the bonecaller's pet"): the Toon RTS undead.
+            if (look == ActorLook.Skeleton && (name ?? "").IndexOf("thrall", System.StringComparison.OrdinalIgnoreCase) >= 0 && ModelBeast.Available("UndeadUnit")) kind = "UndeadUnit";
             if ((!Models && look != ActorLook.Keeper) || !ModelBeast.Available(kind)) return false;   // (a Keeper has no other body)
             ModelBeast.Coat coat = null; float height, walk, run;
             bool elite = name != null && name.EndsWith("(elite)");   // a camp's elite (EncounterSession.SpawnCamps): a size bigger than its pack
@@ -118,7 +120,13 @@ namespace Crulanda.Encounter
                 else if (n.Contains("Mire")) hide = new Color(.5f, .5f, .4f);
                 else if (n.Contains("Rockhide") || n.Contains("Scree")) hide = new Color(.6f, .6f, .64f);
                 if (gloom) hide *= .8f;
-                coat = new ModelBeast.Coat().Set("Wild_animals_map", new Color(hide.r, hide.g, hide.b, 1));
+                if (kind == "WildBoar")
+                {
+                    // The Rip Vertices boar's own hide (its colour and normal maps), shaded a little by the camp's kind as the palette was.
+                    var base0 = new Color(.56f, .49f, .43f); var tint = Color.Lerp(Color.white, new Color(hide.r / base0.r, hide.g / base0.g, hide.b / base0.b), .5f);
+                    coat = new ModelBeast.Coat().Skin(Resources.Load<Texture2D>("CreatureSkins/WildBoar/WildBoar_Albedo"), Resources.Load<Texture2D>("CreatureSkins/WildBoar/WildBoar_Normal"), tint);
+                }
+                else coat = new ModelBeast.Coat().Set("Wild_animals_map", new Color(hide.r, hide.g, hide.b, 1));
                 height = elite ? 1.1f : .95f; walk = 1.1f; run = 4.2f; LieDepth = .2f;
             }
             else if (look == ActorLook.Keeper)
@@ -172,7 +180,8 @@ namespace Crulanda.Encounter
             {
                 // Khaven's drowned dead: bone stained by the creek mud they rose out of.
                 var pal = Resources.Load<Texture2D>("Creatures/Skeleton_palette");
-                if (pal != null) coat = new ModelBeast.Coat().Skin(pal, null, new Color(.84f, .86f, .76f));
+                if (kind == "UndeadUnit") coat = new ModelBeast.Coat().Map("", Resources.Load<Texture2D>("CreatureSkins/UndeadUnit/UndeadUnit_Map"));   // it falls into a heap of bones as they do (Crumbles; Chris: "undead can just collapse into a pile of bones on death")
+                else if (pal != null) coat = new ModelBeast.Coat().Skin(pal, null, new Color(.84f, .86f, .76f));
                 height = elite ? 1.95f : 1.82f; walk = 1.2f; run = 3.6f; LieDepth = 0;
             }
             else { bool doe = variant % 2 == 1; height = (doe ? 1.6f : 1.9f) * (elite ? 1.1f : 1); walk = 1.4f; run = 4.5f; LieDepth = .45f; }

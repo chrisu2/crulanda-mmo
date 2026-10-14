@@ -18,6 +18,9 @@ namespace Crulanda.EditorTools
     public sealed class CreatureImport : AssetPostprocessor
     {
         const string Root = "Assets/Crulanda/Resources/Creatures/";
+        /// <summary>Raised when these rules change, so Unity imports the creatures again (2026-10-13: the makers' normals for the new models,
+        /// and the loop of an "Armature|" take by its own name).</summary>
+        public override uint GetVersion() { return 2; }
         /// <summary>How sharp an edge must be to stay hard when the normals are smoothed (degrees).</summary>
         public const float Smoothing = 70;
         void OnPreprocessModel()
@@ -30,6 +33,11 @@ namespace Crulanda.EditorTools
             m.importAnimation = true; m.isReadable = true;
             m.importNormals = ModelImporterNormals.Calculate; m.normalCalculationMode = ModelImporterNormalCalculationMode.AreaAndAngleWeighted;
             m.normalSmoothingAngle = Smoothing; m.importTangents = ModelImporterTangents.None;
+            // The detailed models (2026-10-13: the orcs, the wild boar, the Toon RTS undead, the squirrel, the Living Birds) keep their makers'
+            // normals: calculated, the axe orc came out faceted, and these are not rounded (ModelBeast: only the low-poly animals are).
+            string file = System.IO.Path.GetFileName(assetPath);
+            if (file.StartsWith("Orc") || file.StartsWith("WildBoar") || file.StartsWith("UndeadUnit") || file.StartsWith("Squirrel") || file.StartsWith("Bird"))
+            { m.importNormals = ModelImporterNormals.Import; m.importTangents = ModelImporterTangents.CalculateMikk; }
         }
         /// <summary>A palette texture (CraftPix's swatches): no mipmaps or compression to bleed one swatch into the next.</summary>
         void OnPreprocessTexture()
@@ -46,7 +54,7 @@ namespace Crulanda.EditorTools
             t.textureType = TextureImporterType.Default; t.sRGBTexture = true; t.mipmapEnabled = false; t.filterMode = FilterMode.Bilinear;
             t.wrapMode = TextureWrapMode.Clamp; t.textureCompression = TextureImporterCompression.Uncompressed; t.alphaSource = TextureImporterAlphaSource.None;
         }
-        static readonly string[] Loops = { "Run", "Idle", "Idle_2", "Idle_2_HeadLow", "Idle_Headlow", "Walk", "Gallop", "Eating", "WalkForward", "RunForward", "WalkBackward", "RunBackward", "IdleCombat", "Eat", "Sleep", "StunnedLoop" };
+        static readonly string[] Loops = { "Run", "Running", "Walking", "Idle2", "watch01", "watch02", "peck", "preen", "sing", "ruffle", "hopForward", "flyStraight", "flyLeft", "flyRight", "Idle", "Idle_2", "Idle_2_HeadLow", "Idle_Headlow", "Walk", "Gallop", "Eating", "WalkForward", "RunForward", "WalkBackward", "RunBackward", "IdleCombat", "Eat", "Sleep", "StunnedLoop" };
         void OnPreprocessAnimation()
         {
             if (!assetPath.StartsWith(Root)) return;
@@ -67,7 +75,8 @@ namespace Crulanda.EditorTools
             foreach (var c in keep)
             {
                 c.name = c.takeName.StartsWith(arm) ? c.takeName.Substring(arm.Length) : c.takeName;
-                c.loopTime = System.Array.IndexOf(Loops, c.name) >= 0;
+                int bar = c.name.LastIndexOf('|');   // a take named "Armature|Idle" loops by its own name (the squirrel's, 2026-10-13)
+                c.loopTime = System.Array.IndexOf(Loops, bar >= 0 ? c.name.Substring(bar + 1) : c.name) >= 0;
             }
             m.clipAnimations = keep.ToArray();
         }

@@ -1,5 +1,28 @@
 # Changelog
 
+## 2026-10-13, 22:00 on: whole orcs and Chris's new creatures
+Chris: "ok but we had whole orc assets", "that was the whole point of adding those asset", "their mouth and teeth dont line up"; at 22:50,
+"Use Toon RS Unit - Undead for the bonecaller's pet. Living Birds to replace all birds in game. Wild Boar to replace the boars. Furry
+Squirrel to put in forest areas. Let me know how they turn out."; "undead can just collapse into a pile of bones on death".
+- **Whole orcs.** All are played by their own clips through ModelBeast, as the Keepers' treants are, and wear their own outfits, so our
+  armour does not show on them.
+  - The Orc Army Pack's Orc Shaman is the figure of every orc Shaman and Mage: its robes, leathers and staff on their own maps, mostly
+    green, now and then grey or dark.
+  - The stylized axe orc is the figure of every orc Warrior, Ranger and Rogue. Its clips are kept as `.anim` files, because each of the
+    pack's clip files carried the 14 MB model again. Its pink skin is recoloured green: canon orcs are green.
+  - The orc head on the people's body stays as the fallback.
+  - These detailed models are no longer "rounded" (that pulled the Orc Shaman's teeth off its jaw), and they keep their makers' normals.
+- **Wild boars:** Rip Vertices' realistic boar replaces the boars, with its own colour and normal maps, on its idle, walk, run, two
+  attacks, hit, death and jump.
+- **The Bonecaller's bone thrall:** the Toon RTS undead with sword and shield, on its idle, walk and attack. It falls into a heap of bones
+  when it dies.
+- **Birds:** the Living Birds replace the crows. Khaven and the Ash Rim keep crows; elsewhere it is a crow now and then and mostly
+  robins, blue jays, cardinals, sparrows, chickadees and goldfinches, all sharing the pack's 16 clips. Chickens stay (the pack has none).
+- **Squirrels:** one or two in each broadleaf and pine grove, up to ten a zone, using the pack's colour map on a plain material (its fur
+  shaders are URP and HDRP only).
+- Frames: `D:\crulanda-work\ui-captures\creatures\brief-*.png` and `D:\crulanda-work\ui-captures\figures\orcs-*.png`.
+- **Fixed:** the chains mistook Unity Hub's own process (`unity.exe serve`) for an editor job and waited on it.
+
 ## 2026-10-13, 15:20 on: the evening's work while Chris is away (branch feet-bow-adit-kit; plan in TONIGHT_2026-10-13.md)
 Chris: "keep working through all phases", "all balanced and testing new dungeons and builds as needed. all zones full of quests. more
 sims throughout the world", "also have sims wonder into the fighting arena (dummies) to practice and improve their dps", "shaman is not an orc".

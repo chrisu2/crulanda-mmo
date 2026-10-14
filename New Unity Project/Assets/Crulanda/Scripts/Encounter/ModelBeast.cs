@@ -324,7 +324,7 @@ namespace Crulanda.Encounter
             foreach (var r in go.GetComponentsInChildren<Renderer>(true))
             {
                 r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On; r.receiveShadows = true;
-                bool painted = coat != null && coat.Albedo != null;
+                bool painted = coat != null && (coat.Albedo != null || coat.Maps.Count > 0);   // a model with its own maps (the orcs) is not rounded: rounding pulled the Orc Shaman's teeth off its jaw (Chris, 2026-10-13: "their mouth and teeth dont line up")
                 if (r is SkinnedMeshRenderer sk)
                 {
                     sk.updateWhenOffscreen = false; sk.skinnedMotionVectors = false;
@@ -350,15 +350,16 @@ namespace Crulanda.Encounter
         /// <summary>Its motions, a mixer slot each, and the clips that can fill them (the first the file has): standing, grazing
         /// and the head-low idle loop; walk and gallop loop with the ground; the rest are one-shots.</summary>
         static readonly (string slot, string[] clips, bool loop)[] Motions = {
-            ("idle", new[] { "Idle", "idle" }, true), ("idle2", new[] { "Idle_2" }, true), ("headlow", new[] { "Idle_2_HeadLow", "Idle_Headlow" }, true),
-            ("eat", new[] { "Eating", "Eat" }, true), ("walk", new[] { "Walk", "WalkForward", "Run", "move_slow" }, true), ("run", new[] { "Gallop", "RunForward", "move_fast", "Run" }, true),
-            ("attack", new[] { "Attack", "Attack_Headbutt", "Attack_1", "Attack1", "attack_01", "Attack01" }, false), ("kick", new[] { "Attack_Kick", "Attack" }, false),
-            ("attack2", new[] { "Attack2", "Attack02" }, false), ("attack3", new[] { "Attack3", "Attack03" }, false),
-            ("hitL", new[] { "Idle_HitReact_Left", "GetHitFromFront", "hit_01", "Hit" }, false), ("hitR", new[] { "Idle_HitReact_Right", "Idle_HitReact_Left", "GetHitFromFront", "hit_01", "Hit" }, false),
-            ("death", new[] { "Death", "Death1", "death_01", "Die" }, false), ("death2", new[] { "Death2" }, false), ("death3", new[] { "Death3" }, false),
-            ("jump", new[] { "Gallop_Jump", "Jump_toIdle", "Jump_ToIdle" }, false), ("roar", new[] { "Buff", "BattleCry" }, false),
+            ("idle", new[] { "Idle", "idle", "watch01" }, true), ("idle2", new[] { "Idle_2", "Idle2", "preen", "watch02" }, true), ("headlow", new[] { "Idle_2_HeadLow", "Idle_Headlow" }, true),
+            ("eat", new[] { "Eating", "Eat", "peck" }, true), ("walk", new[] { "Walk", "Walking", "WalkForward", "Run", "move_slow", "hopForward", "Running" }, true),
+            ("run", new[] { "Gallop", "RunForward", "move_fast", "Run", "Running", "flyStraight" }, true),   // (2026-10-13: the wild boar, the squirrel, the Living Birds)
+            ("attack", new[] { "Attack", "Attack_Headbutt", "Attack_1", "Attack1", "attack_01", "Attack01", "Attack_Charge_Gore" }, false), ("kick", new[] { "Attack_Kick", "Attack" }, false),
+            ("attack2", new[] { "Attack2", "Attack02", "Attack_Bite_Forward_Lunge_Tear" }, false), ("attack3", new[] { "Attack3", "Attack03" }, false),
+            ("hitL", new[] { "Idle_HitReact_Left", "GetHitFromFront", "hit_01", "Hit", "Get_Hit", "worried" }, false), ("hitR", new[] { "Idle_HitReact_Right", "Idle_HitReact_Left", "GetHitFromFront", "hit_01", "Hit", "Get_Hit", "worried" }, false),
+            ("death", new[] { "Death", "Death1", "death_01", "Die", "Dying", "die" }, false), ("death2", new[] { "Death2" }, false), ("death3", new[] { "Death3" }, false),
+            ("jump", new[] { "Gallop_Jump", "Jump_toIdle", "Jump_ToIdle", "Jump" }, false), ("roar", new[] { "Buff", "BattleCry" }, false),
             ("cast", new[] { "CastSpell" }, false), ("spell", new[] { "Spell" }, false), ("block", new[] { "Block" }, false),   // the Orc Shaman's (2026-10-13)
-            ("takeoff", new[] { "takeoff" }, false), ("land", new[] { "land" }, false) };
+            ("takeoff", new[] { "takeoff", "flyStraight" }, false), ("land", new[] { "land", "landing" }, false) };
         // (The treants have one cycle, "Run", a heavy stride: it is their walk, its rate following the ground all the way up. Blink's
         // bear has a file per clip, Creatures/BearClips; ChillLands' Ashen Marches creatures name theirs in lower case.)
         static readonly Dictionary<string, AnimationClip[]> clipsOf = new Dictionary<string, AnimationClip[]>();
@@ -368,7 +369,7 @@ namespace Crulanda.Encounter
             if (!clipsOf.TryGetValue(kind, out var all))
             {
                 all = Resources.LoadAll<AnimationClip>("Creatures/" + kind);
-                var more = Resources.LoadAll<AnimationClip>("Creatures/" + kind + "Clips");   // a file per clip (the bear)
+                var more = Resources.LoadAll<AnimationClip>(kind.StartsWith("Bird") ? "Creatures/BirdClips" : "Creatures/" + kind + "Clips");   // a file per clip (the bear); the Living Birds share one set (BirdClips)
                 if (more.Length > 0) { var both = new AnimationClip[all.Length + more.Length]; all.CopyTo(both, 0); more.CopyTo(both, all.Length); all = both; }
                 clipsOf[kind] = all;
             }

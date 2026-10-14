@@ -40,6 +40,24 @@ namespace Crulanda.Tests
             Object.DestroyImmediate(mesh); return b;
         }
 
+        /// <summary>Chris's assets of 2026-10-13 22:50: the wild boar, the Toon RTS undead (the Bonecaller's thrall), the squirrel and the
+        /// Living Birds are in, each with the motions it is driven by; the boar's camp and the thrall wear them.</summary>
+        [Test] public void The_new_creatures_are_in_with_their_motions()
+        {
+            var want = new (string kind, string[] slots)[] { ("WildBoar", new[] { "idle", "walk", "run", "attack", "attack2", "hitL", "death" }), ("UndeadUnit", new[] { "idle", "walk", "attack" }),
+                ("Squirrel", new[] { "idle", "walk", "run", "death" }), ("BirdCrow", new[] { "idle", "walk", "run", "eat", "death" }), ("BirdRobin", new[] { "idle", "run" }),
+                ("BirdBlueJay", new[] { "idle", "run" }), ("BirdCardinal", new[] { "idle", "run" }), ("BirdLittleBird", new[] { "idle", "run" }) };
+            foreach (var (kind, slots) in want)
+            {
+                Assert.IsTrue(ModelBeast.Available(kind), kind + " in Resources/Creatures");
+                foreach (var slot in slots) Assert.NotNull(ModelBeast.SlotClip(kind, slot), kind + ": " + slot);
+            }
+            Assert.IsTrue(ModelBeast.SlotClip("Squirrel", "idle").isLooping, "the squirrel's idle loops (its take is named Squirrel_Armature|Idle)");
+            var boar = Beast(ActorLook.Boar, 0); Assert.NotNull(boar.BeastModel); Assert.AreEqual("WildBoar", boar.BeastModel.Kind, "the boars are the wild boar");
+            var go = new GameObject("Bone thrall"); new GameObject("Body").transform.SetParent(go.transform, false); made.Add(go);
+            var thrall = ActorVisual.Attach(go, ActorLook.Skeleton, 0); Assert.NotNull(thrall.BeastModel); Assert.AreEqual("UndeadUnit", thrall.BeastModel.Kind, "the thrall is the Toon RTS undead");
+            Assert.IsTrue(thrall.BeastModel.Crumbles, "it falls into a heap of bones");
+        }
         [Test] public void The_animals_are_in_with_their_clips()
         {
             foreach (var kind in new[] { "Wolf", "Stag", "Deer" })
@@ -55,7 +73,7 @@ namespace Crulanda.Tests
         [Test] public void Wolves_hounds_stags_and_does_stand_on_the_ground_facing_forward()
         {
             Assume.That(ModelBeast.Available("Wolf") && ModelBeast.Available("Stag") && ModelBeast.Available("Deer") && ModelBeast.Available("Boar"));
-            foreach (var (look, variant, kind, height) in new[] { (ActorLook.Wolf, 0, "Wolf", 1f), (ActorLook.Wolf, 1, "Wolf", 1f), (ActorLook.Stag, 0, "Stag", 1.9f), (ActorLook.Stag, 1, "Deer", 1.6f), (ActorLook.Boar, 0, "Boar", .95f) })
+            foreach (var (look, variant, kind, height) in new[] { (ActorLook.Wolf, 0, "Wolf", 1f), (ActorLook.Wolf, 1, "Wolf", 1f), (ActorLook.Stag, 0, "Stag", 1.9f), (ActorLook.Stag, 1, "Deer", 1.6f), (ActorLook.Boar, 0, ModelBeast.Available("WildBoar") ? "WildBoar" : "Boar", .95f) })
             {
                 var v = Beast(look, variant); var m = v.BeastModel; string what = look + " " + variant;
                 Assert.NotNull(m, what + " is a model."); Assert.AreEqual(kind, m.Kind, what + " wears the " + kind + ".");
@@ -107,6 +125,7 @@ namespace Crulanda.Tests
         [Test] public void The_boar_is_moved_by_the_code()
         {
             Assume.That(ModelBeast.Available("Boar"));
+            Assume.That(!ModelBeast.Available("WildBoar"), "the CraftPix boar is worn only without the Wild Boar (Chris, 2026-10-13: \"Wild Boar to replace the boars\")");
             var v = Beast(ActorLook.Boar, 0, "Wild boar"); var m = v.BeastModel; float ground = v.transform.position.y - 1;
             Assert.IsTrue(m.Procedural, "CraftPix's boar has no clips: the code moves it.");
             Assert.IsTrue(m.Renderers.TrueForAll(r => System.Array.TrueForAll(r.sharedMaterials, x => x.mainTexture != null)), "It keeps its palette texture.");

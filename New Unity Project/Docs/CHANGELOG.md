@@ -75,8 +75,11 @@ are backwards", "traps need to be something besides a circle on the ground", "no
   - **Runs:** chainR78 (the fixes to 20:00): WoodsTests, MovablePanelTests, ScoundrelLoopTests, OrcMotionTests, NodeStreamTests and
     HudTests 17/17, the release build (0 shader errors), the Scoundrel frames (`ui-captures/combat4/scoundrel`), the creature tour
     (`creatures-evening`), the life capture (`life-evening`), Oakhaven's tour 109 a second; **published 19:42**, the save backed up to
-    `save-backups/20261014-1942-before-evening-publish`. chainR79 (the shepherd and the
-    capture): CHAIN79_RESULT.
+    `save-backups/20261014-1942-before-evening-publish`. chainR79 (the shepherds, the inn's tables,
+    the capture in the yard): EditMode VillageWorkTests, VillageEconomyTests and KitPropTests 16/16; PlayMode VillageDayTests,
+    VillageErrandTests, VillageHomeTests and VillageStreamTests 15/16 (the home test's count of folk, 24, now 26 with the shepherds:
+    fixed after); the release build (0 shader errors); the Scoundrel frames inside the yard (`ui-captures/combat5/scoundrel`);
+    **published 19:54**, the save backed up to `save-backups/20261014-1954-before-shepherd-publish`.
 
 ## 2026-10-14, 00:20 to the end: play-test fixes, the Scoundrel, the drowned dead, the dungeons after the Adit
 Chris (23:40-00:10, play-testing): "cant see all classes", "only thing on orc that move is belt, staff and teeth", "at level 1 the orc

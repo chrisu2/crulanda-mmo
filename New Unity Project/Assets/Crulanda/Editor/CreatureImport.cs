@@ -19,8 +19,19 @@ namespace Crulanda.EditorTools
     {
         const string Root = "Assets/Crulanda/Resources/Creatures/";
         /// <summary>Raised when these rules change, so Unity imports the creatures again (2026-10-13: the makers' normals for the new models,
-        /// and the loop of an "Armature|" take by its own name).</summary>
-        public override uint GetVersion() { return 3; }
+        /// and the loop of an "Armature|" take by its own name; 2026-10-14: the Orc Shaman's clips cut to the pack's own frames).</summary>
+        public override uint GetVersion() { return 4; }
+        /// <summary>
+        /// The Orc Shaman's clip files (the Orc Army Pack, 24 fps): each holds the pack's whole master take (frames 0-650, every clip in a
+        /// row), and the pack cuts its own clip out of it by these frames. Its body (the skinned Character1 bones) is baked only inside
+        /// those frames, while its staff, belt, eyes and teeth (rigid meshes on the control rig under "locomotion") play the whole take:
+        /// taken whole, the orc stood still with its arms down while its staff acted out every other clip apart from its hands (2026-10-14,
+        /// Chris: the staff floating by the ground, out to the side). Written here and not read from the meta: Unity writes this rule's
+        /// output back into the meta on import.
+        /// </summary>
+        static readonly Dictionary<string, (int first, int last)> OrcShamanFrames = new Dictionary<string, (int first, int last)> {
+            ["Walk"] = (10, 37), ["Run"] = (45, 63), ["Idle"] = (75, 96), ["BattleCry"] = (120, 200), ["Block"] = (228, 250), ["Attack01"] = (260, 281),
+            ["Attack02"] = (290, 322), ["Attack03"] = (350, 366), ["CastSpell"] = (372, 436), ["Spell"] = (450, 484), ["Hit"] = (500, 520), ["Die"] = (550, 572) };
         /// <summary>How sharp an edge must be to stay hard when the normals are smoothed (degrees).</summary>
         public const float Smoothing = 70;
         void OnPreprocessModel()
@@ -71,6 +82,9 @@ namespace Crulanda.EditorTools
                 var only = clips.OrderByDescending(c => c.lastFrame - c.firstFrame).First();   // the file's real take (each has a one-frame one too)
                 only.name = u >= 0 ? file.Substring(u + 1) : file;
                 only.loopTime = System.Array.IndexOf(Loops, only.name) >= 0;
+                // The Orc Shaman's: the pack's own frames out of its master take (its cycles' ends blended to meet, as the pack has them).
+                if (file.StartsWith("OrcShaman_") && OrcShamanFrames.TryGetValue(only.name, out var frames))
+                { only.firstFrame = frames.first; only.lastFrame = frames.last; only.loopPose = only.loopTime; }
                 m.clipAnimations = new[] { only }; return;
             }
             var keep = clips.Where(c => c.takeName.StartsWith(arm)).ToList();

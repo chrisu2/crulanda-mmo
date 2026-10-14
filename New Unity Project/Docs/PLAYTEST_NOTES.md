@@ -712,3 +712,5 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
 - 188 (14:05) "traps need to be something besides a circle on the ground" (IN PROGRESS: the Snare Trap a jaw trap with teeth, a pan, springs and a chain to a stake; it snaps shut on what it catches)
 - 189 (18:55, the 18:24 build, three pictures) "when orc jump his legs dont move or bend. these mushroom looking tree tops dont actually fit the vibe. dont like these trees new bottoms/roots. these tree roots need to be a little more randomized. coloring is off" (the great oaks' flat dark caps in the woods; the fallen trunk's black end and moss; the giant's uniform green buttresses; OPEN)
 - 190 (19:05) "we need a buff ui so i know what buff/songs are on the party" (OPEN; a row of the buffs and songs on you and on each party member, with their time left, by the party frames)
+- 191 (19:10) "also need to see how much nerve the scoundrel has built up" (OPEN: the player frame shows the resource pool; Nerve starts empty and builds with Quick Cut)
+- 192 (19:20) "birds hop around funny..looks like maybe back and forth." (OPEN; the Living Birds on the ground)

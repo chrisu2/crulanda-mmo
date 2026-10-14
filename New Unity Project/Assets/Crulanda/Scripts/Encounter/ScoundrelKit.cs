@@ -320,6 +320,11 @@ namespace Crulanda.Encounter
                 return parts.Count == 0 ? null : string.Join("  ·  ", parts);
             }
         }
+        public override IEnumerable<(string name, float remaining)> PartyBuffs()
+        {
+            if (Verse == Verses.War) yield return ("War-Verse", 0);
+            if (Now < rallyUntil) yield return ("Rallying Verse", rallyUntil - Now);
+        }
         public override string TargetStatus(EncounterEnemy enemy)
         {
             if (enemy == null) return null;

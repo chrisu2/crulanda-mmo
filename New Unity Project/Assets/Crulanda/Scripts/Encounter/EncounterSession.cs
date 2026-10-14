@@ -1216,6 +1216,8 @@ namespace Crulanda.Encounter
         public float CooldownRemaining(AbilityDefinition ability) { return abilities.Remaining(ability, Time.time); }
         /// <summary>A cast in progress, or work (gathering) on the same bar.</summary>
         public bool PlayerCasting { get { return abilities.IsCasting || Working; } }
+        /// <summary>A status effect's name for the HUD's buff row (its id when the content has no name for it).</summary>
+        public string StatusName(string id) { var d = content != null ? content.FindStatus(id) : null; return d != null && !string.IsNullOrEmpty(d.name) ? d.name : id; }
         /// <summary>The player's figure (blows, flinches and casts on it: playtest note 25).</summary>
         public ActorVisual PlayerFigure { get { if (playerFigure == null && Player != null) playerFigure = Player.GetComponent<ActorVisual>(); return playerFigure; } }
         ActorVisual playerFigure; bool castPosed; string castMotion; ActorPose workPose; (GameObject hand, GameObject circle) castFx;

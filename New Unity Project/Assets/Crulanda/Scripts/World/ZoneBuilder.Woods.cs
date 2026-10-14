@@ -83,15 +83,18 @@ namespace Crulanda.World
                         else if (roll < w.snags) { tree = DeadTree(at, .6f + size * .5f, DeadBark(), 3, statics); snags++; }
                         else if (roll < w.snags + (deep ? w.deepOaks : w.oaks) && TrunkClear(at, 7) && !NearRoad(at, 6) && WoodsGround(at, 5))
                         {
-                            // A great oak of the old forest: the giant's own build at about half size; its leaf mostly deep or yellow green, now and then gold.
+                            // A great oak of the old forest: the giant's own build at about half size; its leaf mostly yellow-green, now and then
+                            // deep green or gold (the deep green alone read as a dark flat cap at this size: frames 2026-10-14).
                             tree = Root(new ZoneProp { kind = "giant_tree", at = at, rotation = yaw * 360, scale = w.oakScale * (.85f + size * .35f) }, statics);
-                            GiantTree(tree, look < .5f ? 0 : look < .85f ? 1 : 2); oaks++;
+                            GiantTree(tree, look < .2f ? 0 : look < .8f ? 1 : 2); oaks++;
                         }
                         else
                         {
                             // The zone's own broadleaf, as a grove grows it (a little taller in the old forest).
                             tree = Root(new ZoneProp { kind = "tree", at = at, rotation = yaw * 360, scale = (deep ? 1.1f : .8f) + size * .5f }, statics);
-                            Broadleaf(tree, (int)(look * 4)); broad++;
+                            // Mostly green (variant 0: fresh or yellow-green), a little gold and autumn (Chris's pictures are green and gold; the
+                            // even mix read as a wood of reds: frames 2026-10-14).
+                            Broadleaf(tree, look < .72f ? 0 : look < .88f ? 3 : 1); broad++;
                         }
                     }
                     if (tree != null) { if (Hollow.CoverAt(at, 3) > 0) DestroyImmediate(tree.gameObject); else { trunks.Add(at); woodsTrees.Add(at); } }

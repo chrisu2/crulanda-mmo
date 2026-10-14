@@ -1762,7 +1762,7 @@ namespace Crulanda.Encounter
             if (AutoAttack && Target != null && Target.actor.IsAlive && Time.time >= nextSwing && Distance(Target) < Kit.AutoAttackRange && !PlayerStunned && !PlayerDisarmed)
             {
                 nextSwing = Time.time + Kit.SwingInterval(content.playerSwingInterval);
-                if (Kit.MeleeAutoAttacks) { PlayerFigure?.Strike(); SpellFx.Slash(Player.transform, Target.transform, false, .55f); } else { PlayerFigure?.CastRelease(); Bolt(Target, new Color(.9f, .88f, .8f), .1f, true); }
+                if (Kit.MeleeAutoAttacks) { PlayerFigure?.Strike(); SpellFx.Slash(Player.transform, Target.transform, false, .6f); } else { PlayerFigure?.CastRelease(); Bolt(Target, new Color(.9f, .88f, .8f), .1f, true); }
                 Target.Receive(WeaponDamage, Player); Kit.OnAutoHit();
             }
             if (Time.time >= nextRegen)

@@ -31,8 +31,16 @@ namespace Crulanda.Encounter
             Vector3 top = gl.y >= gr.y ? gl : gr, low = gl.y >= gr.y ? gr : gl, d = low - top;
             if (d.sqrMagnitude < .01f) d = -body.up * .6f + body.forward * .4f;
             hoeDir = d.normalized; hoeButt = top - hoeDir * .1f; hoeActive = true;
-            float scale = tradeTool != null ? tradeTool.lossyScale.y : 1;
-            BladeEdge = hoeButt + hoeDir * (tradeToolShaft * scale + tradeToolHeadReach); BladeInSoil = BladeEdge.y < Ground() + .03f;
+            float scale = tradeTool != null ? tradeTool.lossyScale.y : 1, ground = Ground();
+            bool was = BladeInSoil;
+            BladeEdge = hoeButt + hoeDir * (tradeToolShaft * scale + tradeToolHeadReach); BladeInSoil = BladeEdge.y < ground + .03f;
+            // The same measures as the hand-set stroke (FieldWorkTests): the hands' spread and height, a stroke each time the blade goes in.
+            HandSpread = Vector3.Distance(gl, gr);
+            Vector3 ahead = body.forward; ahead.y = 0; ahead.Normalize();
+            var ch = model.Chest != null ? model.Chest.position : transform.position + Vector3.up * .3f; float sh = Mathf.Min(model.UpperArmL.position.y, model.UpperArmR.position.y);
+            PoseHandOverShoulder = Mathf.Max(gl.y, gr.y) - sh; PoseHandAhead = Mathf.Min(Vector3.Dot(gl - ch, ahead), Vector3.Dot(gr - ch, ahead));
+            PoseElbowOverShoulder = Mathf.Max(model.LowerArmL.position.y - model.UpperArmL.position.y, model.LowerArmR.position.y - model.UpperArmR.position.y);
+            if (BladeInSoil && !was) { StrokeCount++; StrikeGap = BladeEdge.y - ground; Puff(new Vector3(BladeEdge.x, ground + .03f, BladeEdge.z)); }
             CurlRound(model.FingersR, model.HandR, model.MiddleR, gr, body.right, .8f);
             CurlRound(model.FingersL, model.HandL, model.MiddleL, gl, body.right, .8f);
         }

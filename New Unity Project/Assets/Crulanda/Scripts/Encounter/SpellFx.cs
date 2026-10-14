@@ -40,7 +40,7 @@ namespace Crulanda.Encounter
 
         /// <summary>Plays an effect once at a point (or following <paramref name="follow"/>): it emits for <paramref name="hold"/>
         /// seconds (0: one cycle of its longest system), stops and is gone when its last particle is.</summary>
-        public static GameObject Play(string path, Vector3 at, Quaternion rot, float scale = 1, Transform follow = null, float hold = 0)
+        public static GameObject Play(string path, Vector3 at, Quaternion rot, float scale = 1, Transform follow = null, float hold = 0, Color? tint = null)
         {
             if (Off || !Application.isPlaying) return null;
             var src = Load(path); if (src == null) return null;
@@ -52,6 +52,7 @@ namespace Crulanda.Encounter
             foreach (var ps in go.GetComponentsInChildren<ParticleSystem>(true))
             {
                 var m = ps.main; m.scalingMode = ParticleSystemScalingMode.Hierarchy; m.stopAction = ParticleSystemStopAction.None;
+                if (tint.HasValue) { var c = tint.Value; c.a = m.startColor.mode == ParticleSystemGradientMode.Color ? m.startColor.color.a : 1; m.startColor = new ParticleSystem.MinMaxGradient(c); }
                 cycle = Mathf.Max(cycle, m.duration); linger = Mathf.Max(linger, m.startLifetime.constantMax + m.startDelay.constantMax);
             }
             var life = go.AddComponent<FxLife>(); life.stopAt = Time.time + (hold > 0 ? hold : Mathf.Clamp(cycle * .92f, .3f, 2.5f)); life.linger = Mathf.Clamp(linger, .3f, 4);
@@ -232,14 +233,14 @@ namespace Crulanda.Encounter
             {
                 if (own.where == "foe" && foe != null) Play(own.path, Chest(foe), Face(me, foe), own.scale);
                 else if (own.where == "ground") Play(own.path, (foe != null ? foe.position : me.position + me.forward * 4) + Vector3.up * .05f, Quaternion.identity, own.scale, null, 1.6f);
-                else if (own.where == "nova") Play(own.path, me.position + Vector3.up * .05f, me.rotation, own.scale, null, 1.6f);
+                else if (own.where == "nova") Play(own.path, me.position + Vector3.up * .05f, me.rotation, own.scale, null, 1.6f, a.id == "mage.bone_spikes" ? new Color(.95f, .92f, .82f) : (Color?)null);   // spikes of bone, not the pack's blue crystal
                 else Play(own.path, me.position + Vector3.up * .05f, me.rotation, own.scale, me, 1.4f);
                 if (own.where == "foe" || own.where == "self") { foreach (var t in r.struck) if (t != foe) Burst(e, t); }
                 else foreach (var t in r.struck) Burst(e, t);
                 Mends(r, s); return;
             }
             // A blow: the slash across the foe.
-            if (melee && r.struck.Count > 0) { foreach (var t in r.struck) Slash(me, t, motion == "heavy"); if (e == "holy" || e == "nature" || e == "charm") Burst(e, r.struck[0]); }
+            if (melee && r.struck.Count > 0) { foreach (var t in r.struck) Slash(me, t, motion == "heavy", 1, e); if (e == "holy" || e == "nature" || e == "charm") Burst(e, r.struck[0]); }
             // What works all round the caster, or is called down at the foe.
             else if (motion == "omni" && a.effect == AbilityEffect.Damage) { Play(Ground(e), me.position + Vector3.up * .05f, me.rotation, .7f, null, 1.2f); foreach (var t in r.struck) Burst(e, t); }
             else if (motion == "call" && a.effect == AbilityEffect.Damage) { Play(Ground(e), (foe != null ? foe.position : me.position + me.forward * 4) + Vector3.up * .05f, Quaternion.identity, .7f, null, 1.3f); foreach (var t in r.struck) Burst(e, t); }
@@ -279,14 +280,15 @@ namespace Crulanda.Encounter
             Play(M + "Character auras/Healing", t.position + Vector3.up * .05f, t.rotation, .7f, t, 1.1f);
             if (element == "holy") Play(M + "Sparks/Sparks flashing yellow", Chest(t), Quaternion.identity, .7f, t, .8f);
         }
-        static readonly string[] Slashes = { S + "Basic Slash Blue", S + "Double Slash", S + "Shiny Slash " };
+        static readonly string[] Slashes = { S + "Double Slash", S + "Shiny Slash " };   // their colour is their start colour, so they take the element's (the pack's Basic Slash is blue in its material)
         static int slashTurn;
         /// <summary>A blow's slash across the foe, facing the way it was struck; a heavy one is the exploding slash.</summary>
-        public static void Slash(Transform from, Transform to, bool heavy, float scale = 1)
+        public static void Slash(Transform from, Transform to, bool heavy, float scale = 1, string element = "steel")
         {
             if (from == null || to == null) return;
             string p = heavy ? S + "Explosion Slash " : Slashes[slashTurn++ % Slashes.Length];
-            Play(p, Chest(to) - Face(from, to) * Vector3.forward * .3f, Face(from, to), scale);
+            Color tint = element == "holy" ? new Color(1, .85f, .45f) : element == "nature" ? new Color(.55f, 1, .5f) : element == "charm" ? new Color(1, .75f, .85f) : element == "fire" ? new Color(1, .6f, .3f) : new Color(.92f, .94f, 1);
+            Play(p, Chest(to) - Face(from, to) * Vector3.forward * .3f, Face(from, to), scale * .5f, null, 0, heavy ? (Color?)null : tint);   // the pack's slashes are made some 4 m across: half that sits on a body (combat frames, 2026-10-14)
         }
 
         // ------------------------------------------------------------------ a cast being drawn

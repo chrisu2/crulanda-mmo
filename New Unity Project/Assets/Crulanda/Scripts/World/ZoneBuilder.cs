@@ -5083,15 +5083,27 @@ namespace Crulanda.World
             Glow(t, tip + inward * .3f + Vector3.up * .2f, 7.5f, 1.35f, new Color(1, .6f, .3f), 1.35f).gameObject.AddComponent<Flicker>();
         }
         /// <summary>A campfire: a ring of stones, crossed logs on a bed of embers, two flames, a flickering light.</summary>
+        /// <summary>Real flames under a prop (Vefects' Free Fire VFX in Resources/Fx/Fire, its shaders written for the built-in pipeline;
+        /// 2026-10-14, Chris: "i added ... fire to myassets"): false when the pack is missing, for the painted flames instead. Draws nothing.</summary>
+        bool RealFire(Transform t, Vector3 local, float scale, string kind = "VFX_Fire_01_Small_Simple")
+        {
+            var src = Resources.Load<GameObject>("Fx/Fire/Particles/" + kind); if (src == null) return false;
+            var f = Instantiate(src, t); f.name = "Fire"; f.transform.localPosition = local; f.transform.localRotation = Quaternion.identity; f.transform.localScale = Vector3.one * scale;
+            foreach (var ps in f.GetComponentsInChildren<ParticleSystem>(true)) { var m = ps.main; m.scalingMode = ParticleSystemScalingMode.Hierarchy; }
+            return true;
+        }
         void Campfire(Transform t, Vector3 at)
         {
             var stone = Tint(art.stone, new Color(.34f, .32f, .3f)); var wood = Tint(art.timber, new Color(.22f, .15f, .09f));
             for (int i = 0; i < 9; i++) { var q = Quaternion.Euler(0, i * 40, 0); Lump(BoulderAt(i), t, at + q * new Vector3(0, .08f, .72f), new Vector3(.34f, .24f, .3f), stone, i * 47); }
             for (int i = 0; i < 3; i++) Part(PrimitiveType.Cylinder, t, at + new Vector3(0, .14f, 0), new Vector3(.1f, .5f, .1f), wood, Quaternion.Euler(0, i * 60, 70));
             Part(PrimitiveType.Cylinder, t, at + new Vector3(0, .05f, 0), new Vector3(.9f, .03f, .9f), art.glass);
-            if (cone == null) cone = ZoneMeshes.Cone(1, 1);
-            MeshPart(cone, t, at + new Vector3(0, .1f, 0), Glowing(new Color(1, .5f, .15f), 2.6f)).transform.localScale = new Vector3(.4f, .9f, .4f);
-            MeshPart(cone, t, at + new Vector3(.12f, .1f, -.08f), Glowing(new Color(1, .75f, .3f), 2.2f)).transform.localScale = new Vector3(.22f, .6f, .22f);
+            if (!RealFire(t, at + new Vector3(0, .06f, 0), .55f))
+            {
+                if (cone == null) cone = ZoneMeshes.Cone(1, 1);
+                MeshPart(cone, t, at + new Vector3(0, .1f, 0), Glowing(new Color(1, .5f, .15f), 2.6f)).transform.localScale = new Vector3(.4f, .9f, .4f);
+                MeshPart(cone, t, at + new Vector3(.12f, .1f, -.08f), Glowing(new Color(1, .75f, .3f), 2.2f)).transform.localScale = new Vector3(.22f, .6f, .22f);
+            }
             Glow(t, at + new Vector3(0, 1.1f, 0), 11, 1.9f, new Color(1, .55f, .25f), 1.9f).gameObject.AddComponent<Flicker>();
         }
         /// <summary>A torn company banner on a pole: two strips of sand-coloured cloth, one hanging shorter where it ripped, a faded red stripe.</summary>

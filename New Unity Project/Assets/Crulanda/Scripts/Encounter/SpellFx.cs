@@ -175,10 +175,20 @@ namespace Crulanda.Encounter
             var l = new List<string> { Hit(e), Glow(e), Shield(e), Ground(e), M + "Character auras/Healing", M + "Magic circles/Healing circle", M + "Character auras/Buff",
                 M + "Character auras/Debuff", M + "Magic circles/Magic circle 2", M + "Sparks/Sparks explode red", M + "Smoke effects/Dust puff", M + "Sparks/Sparks flashing yellow", S + "Explosion Slash " };
             if (a != null && a.id != null && Own.TryGetValue(a.id, out var o)) l.Add(o.path);
+            if (a != null && a.id != null && Burns.TryGetValue(a.id, out var b)) l.Add(b.path);
             l.AddRange(Slashes);
             return l;
         }
 
+        /// <summary>Real fire (Vefects' Free Fire VFX, its URP shaders written again for the built-in pipeline): what burns on the foe
+        /// ("foe", following it), on the ground at it ("ground") or round the caster ("self"), and for how long.</summary>
+        const string F = "Fx/Fire/Particles/";
+        static readonly Dictionary<string, (string where, string path, float scale, float hold)> Burns = new Dictionary<string, (string, string, float, float)>
+        {
+            { "mage.smoulder", ("foe", F + "VFX_Fire_01_Small_Simple", .45f, 4) }, { "mage.scorch", ("foe", F + "VFX_Fire_01_Small_Simple", .55f, 1.2f) },
+            { "mage.cinder_field", ("ground", F + "VFX_Fire_Floor_01_Simple", .8f, 5) }, { "mage.flare", ("foe", F + "VFX_Fire_01_Medium_Simple", .5f, 1) },
+            { "paladin.consecrate", ("self", F + "VFX_Fire_Floor_02_Simple", .7f, 2.5f) },
+        };
         // ------------------------------------------------------------------ an ability resolving
         sealed class Resolve { public AbilityDefinition a; public string element; public readonly List<Transform> struck = new List<Transform>(), mended = new List<Transform>(); public bool bolted; }
         static Resolve now;
@@ -210,6 +220,12 @@ namespace Crulanda.Encounter
             if (Off || s == null || s.Player == null) return;
             var a = r.a; var me = s.Player.transform; var foe = s.Target != null && s.Target.actor.IsAlive ? s.Target.transform : r.struck.Count > 0 ? r.struck[0] : null;
             string motion = ActorVisual.MotionFor(a); string e = r.element;
+            if (a.id != null && Burns.TryGetValue(a.id, out var burn))
+            {
+                if (burn.where == "foe" && foe != null) Play(burn.path, foe.position + Vector3.up * .1f, Quaternion.identity, burn.scale, foe, burn.hold);
+                else if (burn.where == "ground") Play(burn.path, (foe != null ? foe.position : me.position + me.forward * 4) + Vector3.up * .05f, Quaternion.identity, burn.scale, null, burn.hold);
+                else if (burn.where == "self") Play(burn.path, me.position + Vector3.up * .05f, Quaternion.identity, burn.scale, null, burn.hold);
+            }
             bool melee = a.range <= 5 && a.range > .5f && (motion == null || motion == "heavy" || motion == "bash");
             // A look of its own.
             if (a.id != null && Own.TryGetValue(a.id, out var own))

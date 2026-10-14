@@ -605,6 +605,7 @@ namespace Crulanda.World
                 Rod(t, from, new Vector3(0, LocalGround(t, 0, 0) + .2f, 0) + q * new Vector3(0, 0, .06f), .11f, art.bark);
             }
             var tongue = PropMesh("Flame", () => ZoneMeshes.Cone(.1f, .34f, 6));
+            if (!RealFire(t, new Vector3(0, LocalGround(t, 0, 0) + .05f, 0), .36f))   // real flames between the logs (2026-10-14), the painted tongues without the pack
             for (int k = 0; k < 3; k++) MeshPart(tongue, t, new Vector3((k - 1) * .07f, LocalGround(t, 0, 0) + .06f, (k % 2) * .06f - .03f), flame, Quaternion.Euler((k - 1) * 8, k * 50, (k - 1) * -10)).transform.localScale = new Vector3(1, .8f + k % 2 * .45f, 1);
             // The tripod and the pot on its chain.
             var apex = new Vector3(0, g + 1.45f, 0);

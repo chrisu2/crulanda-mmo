@@ -19,6 +19,12 @@ What was done, in order, is in `Docs/TONIGHT_2026-10-13.md` (Progress, 2026-10-1
     (one tile an ability; `combat2` has every class). The hoe under the ploughing clip: `ui-captures/life-1014c/farmer-*-at-work-side.png`.
   - **The archery butts** facing their lanes (`ui-captures/training-1014c/tf-01-yard.png`) and **the jaw trap** (`ui-captures/fixes-1014c`).
   - **Real fire**: the Mage's fire spells and the camps' fires burn with Vefects' flames.
+- **The evening (18:55-20:40; PLAYTEST_NOTES 189-199, CHANGELOG "The evening's reports"):** the orc's legs in the air, the old oaks
+  in place of the half-size giants, the giants' roots, the kit's fallen trunks, fuller glades, **the buff row and the Nerve panel**,
+  the birds' hops, the Morro villagers on their own avatars again, the forge's sparks off, the barn, the glint fade, **Quit** (pause
+  menu, `/exit`, `/quit`), **the shepherds** (Tam and Nell Sedge at Oakhaven's two folds: the count, the shearing, the fleeces to the
+  stall, the feed), the combat capture inside the yard. Published: EVENING_PUBLISH. Open: the inn's tables and benches on their
+  sides (note 192; cause not found), a sheep in the fold's wall (196).
 - **Next, in order:** Chris's reactions to the above; the Adit rework (below); the Stylized Newbie Weapons Pack (skinned meshes: a bake
   before they can be held); the older list.
 

@@ -58,7 +58,10 @@ namespace Crulanda.World
             // A holder of our own round the kit's object, so a root mesh or a root scale in the kit never matters.
             var go = new GameObject("Model " + path.Substring(path.LastIndexOf('/') + 1)); var t = go.transform;
             t.SetParent(parent, false); t.localPosition = Vector3.zero; t.localRotation = Quaternion.identity; t.localScale = Vector3.one;
-            var inst = Instantiate(src, t, false); inst.transform.localPosition = Vector3.zero; inst.transform.localRotation = Quaternion.identity;
+            // The kit's own root rotation is kept: a one-mesh file's node (Blender's -90 about x, Z up) lands on the prefab root, and
+            // zeroing it laid the Fantasy pack's tables and benches on their sides (Chris, 2026-10-14 19:35: "all the tables and
+            // benches are turned on their sides"; the mugs set at table height then floated). KitPropTests.
+            var inst = Instantiate(src, t, false); inst.transform.localPosition = Vector3.zero; inst.transform.localRotation = src.transform.localRotation;
             foreach (var c in go.GetComponentsInChildren<Component>(true))
                 if (!(c is Transform) && !(c is MeshFilter) && !(c is MeshRenderer) && !(c is SkinnedMeshRenderer)) { if (Application.isPlaying) Destroy(c); else DestroyImmediate(c); }
             if (PropTurns.TryGetValue(path, out var turn)) inst.transform.localRotation = Quaternion.Euler(turn);

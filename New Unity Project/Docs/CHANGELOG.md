@@ -45,6 +45,35 @@ are backwards", "traps need to be something besides a circle on the ground", "no
   the far side from its legs; the Megapack's turned the other way). The woods keep clear of the gathering nodes and stations as the
   zone file has them, whatever a test's filter strips (NodeStreamTests), and a tree pushed off a trunk never lands in the village's
   reach (WoodsTests). The pack's dust and smoke puffs at a fifth of their size (they filled the frame).
+- **The evening's reports (18:55-20:40, PLAYTEST_NOTES 189-199), fixed and built twice more:**
+  - The orc's legs run in the air (the packs have no jump clip; "when orc jump his legs dont move or bend"); the giant at half size
+    read as "mushroom looking tree tops", so the old-forest big trees are now the zone's own broadleaf grown large ("Old oak"), the
+    Verdant Shore keeping its giants; the giants' roots bark-coloured, five to eight buttresses unevenly round, some without a root;
+    the fallen trunks the kit's dead trees laid down (the built trunk's black end and moss blob were "coloring is off"); the glades
+    fuller with bushes and ferns ("still empty feeling").
+  - **The buff row** (`EncounterHud.DrawBuffs`): the buffs and songs on you and on each of the party as chips by the frames, with
+    their seconds left; a kit's party-wide buff (the Scoundrel's verse, a rally) through `ClassKit.PartyBuffs`. **The Nerve panel**
+    (`DrawNervePanel`): a small movable panel of ten pips, one lit a tenth of Nerve built, dragged like the other panels.
+  - The Living Birds' hops and flights stay where the code puts the bird (root travel and turn baked out at import; "birds hop around
+    funny..looks like maybe back and forth"); the Morro idles back on their own avatars (on Morro's man the villagers stood with their
+    arms spread and what they carried floated: the farmer's sack, the skinner's bundle); the fire pack's stand-in sparks and trails off
+    (white stars at the forge: "that glint was coming from the blacksmith"); the barn's stone sill 10 cm proud of the boards (it
+    flickered) and Harrow barn turned to its cows; a poor or common drop's glint goes out after three minutes untaken.
+  - **Quit:** a "Quit game" button on the pause menu and `/exit`, `/quit` in the chat, saved first and out of combat ("all need an
+    exit command to close the .exe").
+  - **A shepherd a flock** (`ZoneFold`, `VillageWork` "shepherd"; "does anyone feed or tend to this flock of sheep?", "or extract their
+    wool for market?"): Oakhaven's two flocks have Tam and Nell Sedge, who count the flock at the gate at first light, shear through
+    the morning (a fleece a sheep, once a day), carry the fleeces to the produce stall after the midday meal (the merchant then offers
+    them) and feed the flock in the afternoon. GAME-ONLY, on the hen-wife's pattern. VillageDayTests counts the folds and shepherds;
+    VillageWorkTests knows the fold's places.
+  - The combat capture stands in front of the dummy, along its facing into the yard; it had stood on the line from the spawn, through
+    the fence ("why do they run test outside the area?").
+  - Still open: the inn's tables and benches on their sides and the tankards floating (note 192; the cause is not found), a sheep in
+    the fold's wall (196).
+  - **Runs:** chainR78 (the fixes to 20:00): WoodsTests, MovablePanelTests, ScoundrelLoopTests, OrcMotionTests, NodeStreamTests and
+    HudTests 17/17, the release build (0 shader errors), the Scoundrel frames (`ui-captures/combat4/scoundrel`), the creature tour
+    (`creatures-evening`), the life capture (`life-evening`), Oakhaven's tour; CHAIN78_RESULT. chainR79 (the shepherd and the
+    capture): CHAIN79_RESULT.
 
 ## 2026-10-14, 00:20 to the end: play-test fixes, the Scoundrel, the drowned dead, the dungeons after the Adit
 Chris (23:40-00:10, play-testing): "cant see all classes", "only thing on orc that move is belt, staff and teeth", "at level 1 the orc

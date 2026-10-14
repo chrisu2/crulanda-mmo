@@ -343,7 +343,7 @@ def make_decks():
     # The Geode Foundry: the haul drift's landing out over the hall (+12), the catwalk along the south wall, the cross-walk, the north
     # ramp down to the walkway at +6, and the far ramp to the floor (enter high, work down round the edge).
     F1 = CAVE['F1']; F2 = 'F2'
-    deck('The haul-drift landing', 'F1', F1.length - 15, F1.length - 4.4, aside=0, rise=0, rise2=1.5, width=9)   # up to the catwalk's height and onto it (it stopped 2.5 m short and 1.5 m low: AditNavDiagnostics 2026-10-14)
+    deck('The haul-drift landing', 'F1', F1.length - 15, F1.length - 7, aside=0, rise=0, width=9)   # the builder lays an apron from the lip to the catwalk (ZoneBuilder.AditDecks.JoinAprons)
     deck('The catwalk', F2, (208, 13), (160, 13), aside=16.5, rise=12, width=3)
     deck('The cross-walk', F2, (160, 13), aside=17.5, aside2=-17.5, rise=12, width=3)
     deck('The north ramp', F2, (160, 13), (178, 13), aside=-16.5, rise=12, rise2=6, width=3)

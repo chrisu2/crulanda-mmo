@@ -302,9 +302,40 @@ namespace Crulanda.World
             var solidRoot = new GameObject("Decks").transform; solidRoot.SetParent(root, false);
             var look = new GameObject("Look").transform; look.SetParent(root, false);
             foreach (var spot in DeckSpots) BuildDeck(spot, solidRoot, look);
+            JoinAprons(solidRoot);
             BuildCaveWater(root, look);
             foreach (var dl in dropLooks) BuildDrop(dl.def, dl.from, dl.to, root, look);
             if (Application.isPlaying && look.childCount > 0) StaticBatchingUtility.Combine(look.gameObject);
+        }
+        /// <summary>A short apron of planks from each raised lip or mouth of a cave to the nearest deck end within 5 m and 2 m of its
+        /// height (the Cutting Drift's lip onto the Foundry's catwalk, its mouth onto the bridge tower; AditNavDiagnostics 2026-10-14:
+        /// the landing stopped 2.5 m short and the navmesh never joined them). Walked on and in the navmesh like a deck.</summary>
+        void JoinAprons(Transform solidRoot)
+        {
+            var plank = Tint(art.timber, new Color(.4f, .29f, .18f));
+            foreach (var h in Hollow.All)
+            {
+                var ends = new List<(Vector3 at, string name)>();
+                if (h.Join != null && h.JoinRaised) ends.Add((h.At(h.Length - .6f), h.Name + "'s lip"));
+                if (h.Parent != null && h.MouthRaised) ends.Add((h.At(.6f), h.Name + "'s mouth"));
+                foreach (var (lip, name) in ends)
+                {
+                    float y = lip.y; if (h.FloorAt(new Vector2(lip.x, lip.z), out float fy)) y = fy;
+                    var from = new Vector3(lip.x, y, lip.z); Vector3? best = null; float bestD = 5;
+                    foreach (var d in DeckSpots)
+                    {
+                        if (d.mid == null || d.mid.Length == 0) continue;
+                        foreach (var e in new[] { d.mid[0], d.mid[d.mid.Length - 1] }) { float dd = Vector3.Distance(e, from); if (dd < bestD && Mathf.Abs(e.y - from.y) < 2) { bestD = dd; best = e; } }
+                    }
+                    if (best == null || bestD < .3f) continue;
+                    var to = best.Value; var dir = to - from;
+                    var o = GameObject.CreatePrimitive(PrimitiveType.Cube); o.name = "Apron: " + name; o.transform.SetParent(solidRoot, false);
+                    o.transform.position = (from + to) / 2 - Vector3.up * .08f; o.transform.rotation = Quaternion.LookRotation(dir.normalized, Vector3.up);
+                    o.transform.localScale = new Vector3(3, .16f, dir.magnitude + 1.2f);
+                    o.GetComponent<MeshRenderer>().sharedMaterial = plank; o.AddComponent<NavWalkable>();
+                    Debug.Log("Apron " + name + ": " + from.ToString("0.0") + " to " + to.ToString("0.0") + " (" + bestD.ToString("0.0") + " m).");
+                }
+            }
         }
         /// <summary>A solid box (a post, a rail) standing on <paramref name="foot"/>: in the way of you and every agent (NavBlocker).</summary>
         static void DeckBlock(Transform parent, Vector3 foot, Vector3 size, Quaternion rot)

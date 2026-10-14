@@ -85,6 +85,27 @@ namespace Crulanda.Tests
                     sb.AppendLine((d.def != null ? d.def.name : "?") + " | " + end + " | " + e.y.ToString("0.0") + " | " + (floor ? fy.ToString("0.0") : "-") + " | " + link);
                 }
             }
+            // Each deck end to end (its own planks joined?), and each pair of deck ends within 2 m of each other (the junction joined?).
+            sb.AppendLine(); sb.AppendLine("deck | first end to last end | ends on mesh");
+            string Path(Vector3 a, Vector3 b) { var p = new NavMeshPath(); bool ok = NavMesh.CalculatePath(a, b, NavMesh.AllAreas, p); return ok && p.status == NavMeshPathStatus.PathComplete ? "complete" : ok ? p.status.ToString() : "none"; }
+            foreach (var d in zone.DeckSpots)
+            {
+                if (d.mid == null || d.mid.Length < 2) continue;
+                var a = d.mid[0] + Vector3.up * .2f; var b = d.mid[d.mid.Length - 1] + Vector3.up * .2f;
+                sb.AppendLine((d.def != null ? d.def.name : "?") + " | " + Path(a, b) + " | " + OnMesh(a, 1f) + "/" + OnMesh(b, 1f));
+            }
+            sb.AppendLine(); sb.AppendLine("junction | between | gap (m) | heights | path");
+            var spots = zone.DeckSpots.Where(d => d.mid != null && d.mid.Length >= 1).ToList();
+            for (int i = 0; i < spots.Count; i++)
+                for (int j = i + 1; j < spots.Count; j++)
+                    foreach (var ea in new[] { spots[i].mid[0], spots[i].mid[spots[i].mid.Length - 1] })
+                        foreach (var eb in new[] { spots[j].mid[0], spots[j].mid[spots[j].mid.Length - 1] })
+                        {
+                            float gap = Vector3.Distance(ea, eb); if (gap > 2.5f) continue;
+                            sb.AppendLine((spots[i].def != null ? spots[i].def.name : "?") + " <-> " + (spots[j].def != null ? spots[j].def.name : "?") + " | " + gap.ToString("0.00") + " | " + ea.y.ToString("0.0") + "/" + eb.y.ToString("0.0") + " | " + Path(ea + Vector3.up * .2f, eb + Vector3.up * .2f));
+                        }
+            var settings = NavMesh.GetSettingsByID(0);
+            sb.AppendLine(); sb.AppendLine("bake: radius " + settings.agentRadius + " height " + settings.agentHeight + " slope " + settings.agentSlope + " climb " + settings.agentClimb + " voxel " + settings.voxelSize + " region " + settings.minRegionArea);
             sb.AppendLine(); sb.AppendLine("join | from (the cave's end) | to (the target's floor there) | path");
             foreach (var h in Hollow.All)
             {

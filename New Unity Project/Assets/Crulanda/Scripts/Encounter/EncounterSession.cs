@@ -1554,18 +1554,31 @@ namespace Crulanda.Encounter
                 if (camp.rare > 0 && RareDice() >= camp.rare) continue;   // a rare camp, not here this visit (last in the list: no other camp's draws move)
                 var look = LookFor(camp.look, camp.elite); bool beast = ActorVisual.IsBeast(look);
                 string tag = string.IsNullOrEmpty(camp.tag) ? (camp.look ?? "mob") : camp.tag;
-                float gap = GapFor(look, camp.elite); var placed = new List<Vector2>();
+                float gap = GapFor(look, camp.elite); var placed = new List<Vector2>(); var stood = new List<Vector3>();
                 for (int n = 0; n < camp.count; n++)
                 {
                     var spot = camp.center + new Vector2((float)rng.NextDouble() - .5f, (float)rng.NextDouble() - .5f) * camp.radius * 2;
                     // Hunters in hiding lie where the tall grass is sure to be, not out at the corners of the camp.
                     if (camp.ambush) spot = camp.center + Vector2.ClampMagnitude(spot - camp.center, camp.radius) * EncounterEnemy.AmbushSpread(camp.radius);
                     // A patrol sets out from the head of its road, side by side; the rest a body's width from the others of the camp.
-                    if (camp.route != null && camp.route.Length > 1) spot = camp.route[0] + Side(camp.route) * gap * 1.15f * (n - (camp.count - 1) / 2f);
+                    bool patrol = camp.route != null && camp.route.Length > 1;
+                    if (patrol) spot = camp.route[0] + Side(camp.route) * gap * 1.15f * (n - (camp.count - 1) / 2f);
                     else spot = Spaced(spot, camp.center, gap, placed);
-                    placed.Add(spot);
-                    var point = Zone.StandAt(spot, DeckHeight(camp, spot), 1);   // a camp in a cave stands on its floor (or up on its deck: the Adit rework)
-                    if (NavMesh.SamplePosition(point, out var hit, 3, NavMesh.AllAreas)) point = hit.position + Vector3.up; else continue;
+                    // A camp in a cave stands on its floor (or up on its deck: the Adit rework). The navmesh's nearest point to two spaced
+                    // spots can be one point (a camp on a 3 m deck against a wall: the bowl's rim's overseers 1.2 m apart, AditTests 19:24),
+                    // so a spot whose footing lands on another's is drawn again, up to eight times, then let go.
+                    Vector3 point = default; bool footed = false;
+                    for (int tries = 0; tries < 8 && !footed; tries++)
+                    {
+                        if (tries > 0) spot = Spaced(camp.center + new Vector2((float)rng.NextDouble() - .5f, (float)rng.NextDouble() - .5f) * camp.radius * 2, camp.center, gap, placed);
+                        point = Zone.StandAt(spot, DeckHeight(camp, spot), 1);
+                        if (!NavMesh.SamplePosition(point, out var hit, 3, NavMesh.AllAreas)) { if (patrol) break; continue; }
+                        point = hit.position + Vector3.up; footed = true;
+                        if (patrol) break;
+                        foreach (var w in stood) { var d = w - point; d.y = 0; if (d.magnitude < gap * .9f) { footed = false; break; } }
+                    }
+                    if (!footed) continue;
+                    placed.Add(spot); stood.Add(point);
                     int level = camp.levelMin + rng.Next(Mathf.Max(1, camp.levelMax - camp.levelMin + 1));
                     // Only the first mob of an elite camp is the elite (its pack stays normal).
                     bool elite = camp.elite && n == 0;

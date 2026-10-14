@@ -158,8 +158,8 @@ namespace Crulanda.Encounter
             { "mage.raise_thrall", ("self", M + "Portals/Portal green", .6f) }, { "mage.bone_spikes", ("nova", M + "AoE effects/Crystals front attack", .8f) },
             { "mage.cinder_field", ("ground", M + "AoE effects/Ground AOE explosion", .9f) }, { "mage.flare", ("foe", M + "AoE effects/Red energy explosion", .5f) },
             { "shaman.hailfall", ("ground", M + "AoE effects/Snow AOE", .8f) }, { "shaman.thunderhead", ("foe", M + "Character auras/Lightning aura", .8f) },
-            { "shaman.barrow_call", ("ground", M + "Portals/Portal blue", .6f) }, { "shaman.moor_wind", ("nova", M + "Smoke effects/Smoke vortex", .8f) },
-            { "shaman.mist", ("ground", M + "Smoke effects/Smoke ground", 1) }, { "shaman.rooting_stamp", ("nova", M + "Smoke effects/Dust ground", 1) },
+            { "shaman.barrow_call", ("ground", M + "Portals/Portal blue", .6f) }, { "shaman.moor_wind", ("nova", M + "Smoke effects/Smoke vortex", .3f) },
+            { "shaman.mist", ("ground", M + "Smoke effects/Smoke ground", .5f) }, { "shaman.rooting_stamp", ("nova", M + "Smoke effects/Dust ground", .5f) },
             { "shaman.cairn", ("ground", M + "AoE effects/Crystals crossfade", .5f) }, { "salt.cairn", ("self", M + "AoE effects/Crystals crossfade", .5f) },
             { "salt.sung_wall", ("self", M + "AoE effects/Crystals crossfade 2", .6f) }, { "salt.circle", ("nova", M + "Magic circles/Freeze circle", 1) },
             { "cleric.sanctuary", ("nova", M + "Magic circles/Healing circle", 1) }, { "cleric.sunburst", ("ground", M + "AoE effects/Laser AOE", .7f) },
@@ -167,10 +167,10 @@ namespace Crulanda.Encounter
             { "archivist.chorus", ("nova", M + "AoE effects/Plexus AoE", .8f) }, { "archivist.erasure", ("foe", M + "Environment/Teleport", .6f) },
             { "archivist.unwrite", ("foe", M + "Environment/Teleport", .5f) }, { "druid.bramblestorm", ("ground", M + "AoE effects/AoE slash green", .8f) },
             { "ranger.whirling_spear", ("nova", M + "AoE effects/AoE slash orange", .6f) }, { "druid.rending_flurry", ("foe", S + "Multiple Slash 2 ", 1) },
-            { "ranger.call_companion", ("self", M + "Smoke effects/Dust puff", 1) }, { "ranger.snare_trap", ("self", M + "Smoke effects/Dust puff", .7f) },
-            { "rogue.vanish", ("self", M + "Smoke effects/Smoke puff", 1) }, { "rogue.tumble", ("self", M + "Smoke effects/Dust puff", .7f) },
-            { "ranger.disengage", ("self", M + "Smoke effects/Dust puff", .8f) }, { "ability.intercept", ("self", M + "Smoke effects/Dust puff", .8f) },
-            { "rogue.blind", ("foe", M + "Smoke effects/Smoke puff", .6f) }, { "scoundrel.poisoned_wine", ("foe", M + "Sparks/Sparks explode green", .8f) }, { "scoundrel.bribe", ("foe", M + "Sparks/Sparks explode yellow", .8f) },
+            { "ranger.call_companion", ("self", M + "Smoke effects/Dust puff", .22f) }, { "ranger.snare_trap", ("self", M + "Smoke effects/Dust puff", .22f) },
+            { "rogue.vanish", ("self", M + "Smoke effects/Smoke puff", .25f) }, { "rogue.tumble", ("self", M + "Smoke effects/Dust puff", .22f) },
+            { "ranger.disengage", ("self", M + "Smoke effects/Dust puff", .22f) }, { "ability.intercept", ("self", M + "Smoke effects/Dust puff", .22f) },
+            { "rogue.blind", ("foe", M + "Smoke effects/Smoke puff", .25f) }, { "scoundrel.poisoned_wine", ("foe", M + "Sparks/Sparks explode green", .8f) }, { "scoundrel.bribe", ("foe", M + "Sparks/Sparks explode yellow", .8f) },
             { "scoundrel.favour", ("ground", M + "Portals/Portal yellow", .5f) }, { "scoundrel.glimmer", ("foe", M + "Sparks/Sparks flashing pink", 1) },
             { "ability.breaching_blow", ("foe", M + "Slash effects/Charge slash red", .8f) }, { "ability.shield_bash", ("foe", M + "Slash effects/Stone slash", .8f) },
             { "paladin.rebuke", ("foe", M + "Slash effects/Stone slash", .8f) }, { "paladin.smite", ("foe", M + "Hits and explosions/Holy hit", 1) },
@@ -264,7 +264,8 @@ namespace Crulanda.Encounter
             else if (a.effect == AbilityEffect.Rally) Play(M + "Character auras/Buff", me.position + Vector3.up * .05f, me.rotation, .9f, me, 1.5f);
             // A taunt: a red flash on the foe.
             else if (a.effect == AbilityEffect.Taunt) { if (foe != null) Play(M + "Sparks/Sparks explode red", Chest(foe), Quaternion.identity, .8f); }
-            else if (a.effect == AbilityEffect.Intercept) Play(M + "Smoke effects/Dust puff", me.position, me.rotation, .8f);
+            else if (a.effect == AbilityEffect.Intercept) Play(M + "Smoke effects/Dust puff", me.position, me.rotation, .22f);
+            // (The pack's smoke and dust are made some 5 m across: a fifth to a quarter of that is a puff at a figure's feet; combat frames 15:00.)
             // A hold or a hex on the foe; a blessing on oneself.
             else if (a.effect == AbilityEffect.ApplyStatus)
             {

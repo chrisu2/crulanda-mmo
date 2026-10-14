@@ -63,11 +63,24 @@ namespace Crulanda.Encounter
             return new ModelBeast.Coat().Skin(skin, Resources.Load<Texture2D>("CreatureSkins/Treant/" + kind + "_Normal"), tint)
                 .Lit(Resources.Load<Texture2D>("CreatureSkins/Treant/" + kind + "_Glow"), glow);
         }
+        /// <summary>The whole-orc model for an orc of this look (the casters: the Shaman, in the Druid's look, and the Mage), or null (an
+        /// orc of the other classes keeps the orc's head on the people's body until the pack's warrior is in).</summary>
+        public static string OrcKind(ActorLook look) { return (look == ActorLook.Druid || look == ActorLook.Mage) && ModelBeast.Available("OrcShaman") ? "OrcShaman" : null; }
+        /// <summary>The Orc Shaman's skin, from the pack's: mostly greens (CANON: orcs are green), now and then the grey or the dark; its staff's own map.</summary>
+        ModelBeast.Coat OrcCoat()
+        {
+            string[] skins = { "Green03", "Green", "Green02", "Green03", "Grey", "Green", "Dark" };
+            var skin = Resources.Load<Texture2D>("CreatureSkins/OrcShaman/Skin_" + skins[Mathf.Abs(variant) % skins.Length]) ?? Resources.Load<Texture2D>("CreatureSkins/OrcShaman/Skin_Green03");
+            // By the file's own material names (the pack's prefab gives them these maps): _Armas1 its staff, _CueroMAT and _CueroMAT2 its
+            // leathers, the rest (phong2, lambert11) its skin, eyes and teeth.
+            return new ModelBeast.Coat().Map("Armas", Resources.Load<Texture2D>("CreatureSkins/OrcShaman/Weapon")).Map("CueroMAT2", Resources.Load<Texture2D>("CreatureSkins/OrcShaman/Leather02"))
+                .Map("Cuero", Resources.Load<Texture2D>("CreatureSkins/OrcShaman/Leather01")).Map("", skin);
+        }
         /// <summary>Builds a wolf, ash hound, stag or doe as a model (when models are on and the animal is in the build); false
         /// leaves it to the old body.</summary>
         bool BuildModelBeast(ActorLook look)
         {
-            string kind = look == ActorLook.Keeper ? KeeperKind() : BeastKind(look, variant);
+            string kind = orc && OrcKind(look) != null ? OrcKind(look) : look == ActorLook.Keeper ? KeeperKind() : BeastKind(look, variant);
             if ((!Models && look != ActorLook.Keeper) || !ModelBeast.Available(kind)) return false;   // (a Keeper has no other body)
             ModelBeast.Coat coat = null; float height, walk, run;
             bool elite = name != null && name.EndsWith("(elite)");   // a camp's elite (EncounterSession.SpawnCamps): a size bigger than its pack
@@ -136,6 +149,12 @@ namespace Crulanda.Encounter
                 var pal = Resources.Load<Texture2D>("Creatures/Spider_palette" + tint) ?? Resources.Load<Texture2D>("Creatures/Spider_palette");
                 if (pal != null) coat = new ModelBeast.Coat().Skin(pal, null, Color.white);
                 height = elite ? .95f : .8f; walk = 1.4f; run = 4.5f; LieDepth = .15f;
+            }
+            else if (kind == "OrcShaman")
+            {
+                // A whole orc (Chris, 2026-10-13: "we had whole orc assets", "that was the whole point of adding those asset"): the pack's
+                // Orc Shaman in its own robes and with its own staff, on its own clips; the canon's orcs stand about seven feet.
+                coat = OrcCoat(); height = 2.08f + Mathf.Abs(variant % 5) * .02f; walk = 1.3f; run = 5.5f; LieDepth = 0;
             }
             else if (look == ActorLook.Skeleton)
             {
@@ -290,7 +309,7 @@ namespace Crulanda.Encounter
         /// <summary>A thrust whatever the hands hold (the Ranger's spear work, the bow slung: the jab and the cross in turn).</summary>
         public void Thrust() { if (model != null) model.Act((punchLeft = !punchLeft) ? "jab" : "cross"); else Strike(); }
         /// <summary>A spell let fly (an instant one, or a cast as it completes): the release over the walk.</summary>
-        public void CastRelease() { if (BowReady) { Shoot(); return; } if (model != null) model.Act("castshot"); }   // a bow looses an arrow (and comes out to)
+        public void CastRelease() { if (BowReady) { Shoot(); return; } if (model != null) model.Act("castshot"); else if (beastModel != null && beastModel.Has("cast")) beastModel.Play("cast"); }   // a bow looses an arrow (and comes out to)
         /// <summary>A cast being drawn: the spell pose held over the walk.</summary>
         bool castingNow;
         public bool Casting { get { return castingNow; } set { castingNow = value; bool bow = value && BowReady; drawing = bow; if (model != null) model.Casting = value && !bow; } }   // a bow is drawn, not a spell

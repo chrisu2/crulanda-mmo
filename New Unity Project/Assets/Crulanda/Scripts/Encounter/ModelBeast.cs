@@ -37,6 +37,16 @@ namespace Crulanda.Encounter
             /// <summary>Under a painted skin: light of this colour where the mask is white (a treant's moss, its sap-light).</summary>
             public Texture GlowMap; public Color GlowColour;
             public Coat Lit(Texture mask, Color colour) { GlowMap = mask; GlowColour = colour; return this; }
+            /// <summary>A texture for the materials whose names hold <paramref name="part"/> ("" for every other): a model with its own
+            /// maps (the Orc Shaman's skin and its staff), each kept on its own material.</summary>
+            public readonly List<(string part, Texture map)> Maps = new List<(string, Texture)>();
+            public Coat Map(string part, Texture map) { if (map != null) Maps.Add((part, map)); return this; }
+            public Texture MapFor(string material)
+            {
+                foreach (var (part, map) in Maps) if (part.Length > 0 && material.IndexOf(part, System.StringComparison.OrdinalIgnoreCase) >= 0) return map;
+                foreach (var (part, map) in Maps) if (part.Length == 0) return map;
+                return null;
+            }
             public string Key
             {
                 get
@@ -45,6 +55,7 @@ namespace Crulanda.Encounter
                     var s = new System.Text.StringBuilder();
                     foreach (var k in keys) s.Append(k).Append('=').Append(Hex(Colours[k])).Append(Glowing.Contains(k) ? "*" : "").Append(';');
                     if (Albedo != null) s.Append("skin=").Append(Albedo.name).Append('/').Append(Normal != null ? Normal.name : "-").Append('/').Append(Hex(Tint)).Append(';');
+                    foreach (var (part, map) in Maps) s.Append("map=").Append(part).Append('/').Append(map.name).Append(';');
                     if (GlowMap != null) s.Append("lit=").Append(GlowMap.name).Append('/').Append(GlowColour.ToString("0.00")).Append(';');
                     return s.ToString();
                 }
@@ -138,7 +149,7 @@ namespace Crulanda.Encounter
                 for (int i = 0; i < own.Length; i++)
                 {
                     string n = own[i] != null ? own[i].name.Replace(" (Instance)", "") : "";
-                    var atlas = Atlas(own[i], n);
+                    var atlas = (coat != null ? coat.MapFor(n) : null) ?? Atlas(own[i], n);
                     Color c = coat != null && coat.Colours.TryGetValue(n, out var set) ? set : atlas != null ? Color.white : FileColour(own[i]);
                     bool glowing = coat != null && coat.Glowing.Contains(n);
                     if (!glowing && !Shiny(n)) c = new Color(c.r * shade, c.g * shade, c.b * shade, 1);   // no two of a herd quite alike
@@ -340,12 +351,13 @@ namespace Crulanda.Encounter
         /// and the head-low idle loop; walk and gallop loop with the ground; the rest are one-shots.</summary>
         static readonly (string slot, string[] clips, bool loop)[] Motions = {
             ("idle", new[] { "Idle", "idle" }, true), ("idle2", new[] { "Idle_2" }, true), ("headlow", new[] { "Idle_2_HeadLow", "Idle_Headlow" }, true),
-            ("eat", new[] { "Eating", "Eat" }, true), ("walk", new[] { "Walk", "WalkForward", "Run", "move_slow" }, true), ("run", new[] { "Gallop", "RunForward", "move_fast" }, true),
-            ("attack", new[] { "Attack", "Attack_Headbutt", "Attack_1", "Attack1", "attack_01" }, false), ("kick", new[] { "Attack_Kick", "Attack" }, false),
-            ("attack2", new[] { "Attack2" }, false), ("attack3", new[] { "Attack3" }, false),
-            ("hitL", new[] { "Idle_HitReact_Left", "GetHitFromFront", "hit_01" }, false), ("hitR", new[] { "Idle_HitReact_Right", "Idle_HitReact_Left", "GetHitFromFront", "hit_01" }, false),
-            ("death", new[] { "Death", "Death1", "death_01" }, false), ("death2", new[] { "Death2" }, false), ("death3", new[] { "Death3" }, false),
-            ("jump", new[] { "Gallop_Jump", "Jump_toIdle", "Jump_ToIdle" }, false), ("roar", new[] { "Buff" }, false),
+            ("eat", new[] { "Eating", "Eat" }, true), ("walk", new[] { "Walk", "WalkForward", "Run", "move_slow" }, true), ("run", new[] { "Gallop", "RunForward", "move_fast", "Run" }, true),
+            ("attack", new[] { "Attack", "Attack_Headbutt", "Attack_1", "Attack1", "attack_01", "Attack01" }, false), ("kick", new[] { "Attack_Kick", "Attack" }, false),
+            ("attack2", new[] { "Attack2", "Attack02" }, false), ("attack3", new[] { "Attack3", "Attack03" }, false),
+            ("hitL", new[] { "Idle_HitReact_Left", "GetHitFromFront", "hit_01", "Hit" }, false), ("hitR", new[] { "Idle_HitReact_Right", "Idle_HitReact_Left", "GetHitFromFront", "hit_01", "Hit" }, false),
+            ("death", new[] { "Death", "Death1", "death_01", "Die" }, false), ("death2", new[] { "Death2" }, false), ("death3", new[] { "Death3" }, false),
+            ("jump", new[] { "Gallop_Jump", "Jump_toIdle", "Jump_ToIdle" }, false), ("roar", new[] { "Buff", "BattleCry" }, false),
+            ("cast", new[] { "CastSpell" }, false), ("spell", new[] { "Spell" }, false), ("block", new[] { "Block" }, false),   // the Orc Shaman's (2026-10-13)
             ("takeoff", new[] { "takeoff" }, false), ("land", new[] { "land" }, false) };
         // (The treants have one cycle, "Run", a heavy stride: it is their walk, its rate following the ground all the way up. Blink's
         // bear has a file per clip, Creatures/BearClips; ChillLands' Ashen Marches creatures name theirs in lower case.)

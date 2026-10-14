@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
 using Crulanda.Encounter;
@@ -41,22 +42,37 @@ namespace Crulanda.Tests
         [Test] public void An_orc_is_the_same_model_taller_green_and_tusked()
         {
             Assume.That(ModelFigure.Available, "The character kits are in the project (Resources/Characters).");
-            var man = Figure(ActorLook.Druid, 3); var go = new GameObject("Orc test figure"); new GameObject("Body").transform.SetParent(go.transform, false); go.transform.position = new Vector3(-6, 1, 0); made.Add(go);
-            var orc = ActorVisual.Attach(go, ActorLook.Druid, 3, false, null, true);   // variant 3: a man (a woman is drawn 10% taller)
+            // A Warrior's look: the orc's head on the people's body (the casters wear the whole orc: An_orc_shaman_is_the_whole_orc).
+            var man = Figure(ActorLook.Warrior, 3); var go = new GameObject("Orc test figure"); new GameObject("Body").transform.SetParent(go.transform, false); go.transform.position = new Vector3(-6, 1, 0); made.Add(go);
+            var orc = ActorVisual.Attach(go, ActorLook.Warrior, 3, false, null, true);
             Assert.IsTrue(orc.Orc); Assert.NotNull(orc.Model, "a model"); foreach (var f in Frames) Assert.NotNull(orc.transform.Find("Body/" + f), "the frame " + f);
             float tall = orc.Model.Model.localScale.y / man.Model.Model.localScale.y; Assert.IsTrue(Mathf.Abs(tall - ActorVisual.OrcScale) < .01f || Mathf.Abs(tall - ActorVisual.OrcWomanScale) < .01f, "taller by an orc's scale (" + tall + ")");
-            var tusks = orc.Model.HeadBone.GetComponentsInChildren<MeshRenderer>(true); int n = 0; foreach (var r in tusks) if (r.name.StartsWith("Tusk")) n++;
-            Assert.AreEqual(2, n, "two tusks on the head");
-            foreach (var r in man.Model.HeadBone.GetComponentsInChildren<MeshRenderer>(true)) Assert.IsFalse(r.name.StartsWith("Tusk"), "a man has none");
+            // The orc's own head (the pack's, baked) on the Head bone, the man's head under it not drawn; a man has none.
+            Assume.That(ActorVisual.OrcKit, "the baked orc head is in Resources/Characters/Orc");
+            var orcHead = orc.Model.HeadBone.GetComponentsInChildren<MeshRenderer>(true).FirstOrDefault(r => r.name == "Orc head"); Assert.NotNull(orcHead, "the orc's head");
+            Assert.IsTrue(orc.Model.Head.forceRenderingOff, "the man's head not drawn under it");
+            Assert.IsFalse(man.Model.HeadBone.GetComponentsInChildren<MeshRenderer>(true).Any(r => r.name.StartsWith("Orc")), "a man has none");
             var skin = orc.Model.Head.sharedMaterials[0].color; Assert.Greater(skin.g, skin.r, "green skin (" + skin + ")");
             foreach (var r in orc.Model.Hair) Assert.IsFalse(r.name.Contains("Beard"), "no beard");
-            // The tusks stand at the face: in front of the Head bone and above it, either side of the middle.
-            var head = orc.transform.Find("Body").InverseTransformPoint(orc.Model.HeadBone.position);
-            foreach (var r in tusks) if (r.name.StartsWith("Tusk"))
-            {
-                var p = orc.transform.Find("Body").InverseTransformPoint(r.transform.position) - head;
-                Assert.That(p.z, Is.InRange(.05f, .14f), r.name + " in front"); Assert.That(p.y, Is.InRange(0f, .08f), r.name + " at the jaw"); Assert.That(Mathf.Abs(p.x), Is.InRange(.015f, .06f), r.name + " to one side");
-            }
+            // It sits on the neck: its crown above the Head bone about where a man's is, its face forward, centred.
+            var bodyT = orc.transform.Find("Body"); var bone = bodyT.InverseTransformPoint(orc.Model.HeadBone.position); var b = orcHead.bounds;
+            float crown = bodyT.InverseTransformPoint(new Vector3(b.center.x, b.max.y, b.center.z)).y - bone.y, mid = bodyT.InverseTransformPoint(b.center).x - bone.x;
+            Assert.That(crown, Is.InRange(.18f, .34f), "its crown above the Head bone (" + crown + ")"); Assert.That(Mathf.Abs(mid), Is.LessThan(.03f), "centred (" + mid + ")");
+            Assert.Greater(bodyT.InverseTransformPoint(b.center).z, bone.z - .02f, "its face forward");
+        }
+        /// <summary>The whole orc (Chris, 2026-10-13: "we had whole orc assets"): an orc Shaman (the Druid's look) or Mage is the pack's Orc
+        /// Shaman, on its own clips (walk, run, attacks, a cast, a hit, a death), about seven feet, in green; a man of the same look is not.</summary>
+        [Test] public void An_orc_shaman_is_the_whole_orc()
+        {
+            Assume.That(ModelBeast.Available("OrcShaman"), "the Orc Shaman is in Resources/Creatures");
+            var go = new GameObject("Orc shaman test figure"); new GameObject("Body").transform.SetParent(go.transform, false); go.transform.position = new Vector3(-9, 1, 0); made.Add(go);
+            var orc = ActorVisual.Attach(go, ActorLook.Druid, 0, false, null, true);
+            Assert.NotNull(orc.BeastModel, "the whole orc"); Assert.AreEqual("OrcShaman", orc.BeastModel.Kind); Assert.IsNull(orc.Model, "not the people's body");
+            foreach (var slot in new[] { "idle", "walk", "run", "attack", "attack2", "cast", "hitL", "death" }) Assert.NotNull(ModelBeast.SlotClip("OrcShaman", slot), "its " + slot);
+            Assert.That(orc.BeastModel.Height, Is.InRange(2.0f, 2.2f), "about seven feet");
+            var mats = orc.BeastModel.Renderers.SelectMany(r => r.sharedMaterials).Where(m => m != null).ToList();
+            Assert.IsTrue(mats.Any(m => m.mainTexture != null && m.mainTexture.name.StartsWith("Skin_")), "its skin map (" + string.Join(", ", mats.Select(m => m.name + ":" + (m.mainTexture ? m.mainTexture.name : "-"))) + ")");
+            Assert.IsNull(Figure(ActorLook.Druid, 0).BeastModel, "a man in the Druid's look is the people's body");
         }
         [Test] public void Every_person_is_a_model_with_its_frames()
         {

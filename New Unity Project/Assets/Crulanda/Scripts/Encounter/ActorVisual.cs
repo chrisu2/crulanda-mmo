@@ -418,6 +418,7 @@ namespace Crulanda.Encounter
             if (look == ActorLook.Bramble) { BuildBramble(); lastPosition = transform.position; return; }
             if (look == ActorLook.Keeper) { if (!BuildModelBeast(look) && capsule != null) capsule.enabled = true; lastPosition = transform.position; return; }   // a treant (ActorVisual.Beasts.cs)
             if (IsBeast(look)) { BuildBeast(look); lastPosition = transform.position; return; }
+            if (orc && OrcKind(look) != null && BuildModelBeast(look)) { lastPosition = transform.position; return; }   // a whole orc (ActorVisual.Beasts.cs)
             if (look == ActorLook.Skeleton) { if (BuildModelBeast(look)) { lastPosition = transform.position; return; } look = ActorLook.Hollow; }   // the risen dead (ActorVisual.Beasts.cs); a Hollow Man without the model
             Material skin = Mat(new Color(.76f, .6f, .48f));
             Color clothC, accentC, legC;

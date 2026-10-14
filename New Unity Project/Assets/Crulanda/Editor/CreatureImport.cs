@@ -46,7 +46,7 @@ namespace Crulanda.EditorTools
             t.textureType = TextureImporterType.Default; t.sRGBTexture = true; t.mipmapEnabled = false; t.filterMode = FilterMode.Bilinear;
             t.wrapMode = TextureWrapMode.Clamp; t.textureCompression = TextureImporterCompression.Uncompressed; t.alphaSource = TextureImporterAlphaSource.None;
         }
-        static readonly string[] Loops = { "Idle", "Idle_2", "Idle_2_HeadLow", "Idle_Headlow", "Walk", "Gallop", "Eating", "WalkForward", "RunForward", "WalkBackward", "RunBackward", "IdleCombat", "Eat", "Sleep", "StunnedLoop" };
+        static readonly string[] Loops = { "Run", "Idle", "Idle_2", "Idle_2_HeadLow", "Idle_Headlow", "Walk", "Gallop", "Eating", "WalkForward", "RunForward", "WalkBackward", "RunBackward", "IdleCombat", "Eat", "Sleep", "StunnedLoop" };
         void OnPreprocessAnimation()
         {
             if (!assetPath.StartsWith(Root)) return;

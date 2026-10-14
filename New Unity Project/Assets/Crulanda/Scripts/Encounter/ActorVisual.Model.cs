@@ -106,7 +106,7 @@ namespace Crulanda.Encounter
             return s;
         }
         /// <summary>Orc skin: the kit's pale skin times a green (moss, sage, olive, a darker fen green), by the variant.</summary>
-        static readonly Color[] OrcSkins = { new Color(.62f, .8f, .46f), new Color(.54f, .72f, .4f), new Color(.68f, .76f, .46f), new Color(.48f, .64f, .4f) };
+        static readonly Color[] OrcSkins = { new Color(.74f, 1.18f, .9f), new Color(.7f, 1.1f, .84f), new Color(.78f, 1.2f, .92f), new Color(.66f, 1.04f, .8f) };   // the kit's pale skin to the orc head's olive (OrcHead)
         /// <summary>How much taller an orc is drawn than a man (a woman: <see cref="OrcWomanScale"/>). The canon's orcs stand about
         /// seven feet (world_bible: Gorm); the kit's man is about six.</summary>
         public const float OrcScale = 1.15f, OrcWomanScale = 1.1f;
@@ -119,6 +119,46 @@ namespace Crulanda.Encounter
         {
             s.skin = OrcSkins[Mathf.Abs(variant) % OrcSkins.Length]; s.scale = (s.female ? OrcWomanScale : OrcScale) * (s.scale > 0 ? s.scale : 1);
             s.beard = false; s.hair = s.female ? 2 : (Mathf.Abs(variant) % 2 == 0 ? 4 : 3); s.hairColour = new Color(.42f, .38f, .34f);
+            if (OrcKit) s.hood = false;   // the orc's own head and topknot (OrcHead): a man's hood does not go over it
+        }
+        static Mesh orcHead, orcHair; static Material orcSkin; static bool orcLoaded;
+        /// <summary>The orc's head from the pack, baked (Editor/OrcHeadBake.cs; Resources/Characters/Orc): head, eyes, teeth and tusks, and
+        /// its hair, in the frame of its Head bone; the skin recoloured green from the pack's pink.</summary>
+        public static bool OrcKit
+        {
+            get
+            {
+                if (!orcLoaded) { orcLoaded = true; orcHead = Resources.Load<Mesh>("Characters/Orc/OrcHead"); orcHair = Resources.Load<Mesh>("Characters/Orc/OrcHair"); orcSkin = Resources.Load<Material>("Characters/Orc/OrcSkin"); }
+                return orcHead != null && orcSkin != null;
+            }
+        }
+        /// <summary>The pack's head to a man's: its crown .257 above its Head bone, a man's about .215, so about the same height, but broader
+        /// and deeper, with the brow and jaw forward.</summary>
+        public const float OrcHeadFit = .7f, OrcHeadWide = 1.2f, OrcHeadLift = .045f;   // its jaw is long: smaller, and lifted so the chin clears the collar (22:20 frames)
+        /// <summary>
+        /// The orc's own head (2026-10-13, Chris chose "Orc face" after the first pass's tusks on a man's head): the pack's head, eyes, teeth,
+        /// tusks and topknot hung on the Head bone at its place, turned with the body, sized by <see cref="OrcHeadFit"/>; the man's head,
+        /// eyes, brows and hair are kept from drawing (forceRenderingOff, which nothing that shows or hides a figure touches). False without
+        /// the kit (the tusks then).
+        /// </summary>
+        bool OrcHead(ModelFigure m)
+        {
+            if (!OrcKit) return false;
+            float s = m.Model.localScale.y;
+            foreach (var (mesh, label) in new[] { (orcHead, "Orc head"), (orcHair, "Orc hair") })
+            {
+                if (mesh == null) continue;
+                var go = new GameObject(label); go.transform.SetParent(body, false);
+                go.transform.SetPositionAndRotation(m.HeadBone.position + body.up * OrcHeadLift * s, body.rotation); go.transform.localScale = Vector3.one * OrcHeadFit * s;
+                go.AddComponent<MeshFilter>().sharedMesh = mesh;
+                var r = go.AddComponent<MeshRenderer>(); var mats = new Material[mesh.subMeshCount]; for (int i = 0; i < mats.Length; i++) mats[i] = orcSkin; r.sharedMaterials = mats;
+                go.transform.SetParent(m.HeadBone, true);
+                m.Renderers.Add(r);
+            }
+            if (m.Head != null) m.Head.forceRenderingOff = true;
+            foreach (var h in m.Hair) if (h != null) h.forceRenderingOff = true;
+            foreach (var r in m.Renderers) if (r != null && r.name.Contains("Eye")) r.forceRenderingOff = true;
+            return true;
         }
         static Material tuskMat;
         /// <summary>An orc's two tusks: ivory points standing up from the corners of the lower jaw, a little forward and out, hung on the
@@ -182,7 +222,7 @@ namespace Crulanda.Encounter
             model = m; actorRef = GetComponent<Crulanda.Gameplay.Actor>();
             if (child) m.HeadBone.localScale = Vector3.one * ChildHead;   // a child's head is large for the body (the clips turn bones, they never scale them)
             Frames();
-            if (orc) Tusks(m);
+            if (orc && !OrcHead(m)) Tusks(m);
             // What armour recolours (Cover): the shirt, the sleeves (and, for gloves, the bare hands), the breeches, the shoes.
             baseChest = new[] { m.Torso }; baseSleeves = new[] { m.Arms }; baseHands = new[] { m.Arms }; baseLegs = new[] { m.Legs }; baseBoots = new[] { m.Feet };
             baseBelt = null;   // the outfit's belts go under a chest piece (ModelFigure.ShowExtras)
@@ -209,6 +249,7 @@ namespace Crulanda.Encounter
             // across and .32 tall, the model's is about .17 across, .25 tall and .21 deep.
             float hs = m.HeadBone.localScale.y;   // a child's larger head
             var sh = new Vector3(.58f, .8f, .72f) * hs;
+            if (orc && OrcKit) { sh.x *= OrcHeadWide; sh.z *= OrcHeadWide; }   // what an orc wears on its head, as broad as its head
             var headAt = L(m.HeadBone) + new Vector3(0, .12f * s, .01f * s) * hs;   // a little high, so a helmet's rim clears the eyes
             headFrame = Region("Head frame", m.HeadBone, headAt - new Vector3(0, .8f * sh.y, 0), sh);
             headOutline = Outline(false); hairOutline = Outline(true);

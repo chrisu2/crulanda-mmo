@@ -159,11 +159,15 @@ namespace Crulanda.Encounter
             foreach (var group in z.life.critters)
             {
                 if (group == null || group.kind != "sheep" || Zone == null) continue;
-                var yard = Zone.Ground(group.center); var toVillage = -new Vector2(group.center.x, group.center.y); toVillage = toVillage.sqrMagnitude > 1 ? toVillage.normalized : Vector2.up;
+                // The gate on the side toward the village, snapped to the nearer axis (a fold's walls run square, its gap mid-side: the
+                // Old Fold's east wall); the trough the fold's own crate where the zone has one by the flock.
+                var yard = Zone.Ground(group.center); var toVillage = -new Vector2(group.center.x, group.center.y);
+                toVillage = toVillage.sqrMagnitude < 1 ? Vector2.up : Mathf.Abs(toVillage.x) > Mathf.Abs(toVillage.y) ? new Vector2(Mathf.Sign(toVillage.x), 0) : new Vector2(0, Mathf.Sign(toVillage.y));
                 var side = new Vector2(-toVillage.y, toVillage.x);
                 var fold = new ZoneFold { name = "The fold", yard = yard, radius = group.radius, sheep = group.count,
-                    gate = Zone.Ground(group.center + toVillage * (group.radius + 1.2f)), trough = Zone.Ground(group.center + side * group.radius * .55f) };
+                    gate = Zone.Ground(group.center + toVillage * (group.radius + 2.2f)), trough = Zone.Ground(group.center + side * group.radius * .55f) };
                 foreach (var l in z.landmarks) if (l != null && Vector2.Distance(l.at, group.center) < l.radius + 4) { fold.name = l.name; break; }
+                foreach (var p in z.props) if (p != null && p.name != null && p.name.IndexOf("trough", System.StringComparison.OrdinalIgnoreCase) >= 0 && Vector2.Distance(p.at, group.center) < group.radius + 4) { fold.trough = Zone.Ground(p.at + (group.center - p.at).normalized * 1.1f); break; }
                 Folds.Add(fold);
                 string name = ShepherdNames[(Folds.Count - 1) % ShepherdNames.Length];
                 ZoneDoor near = null; float best = float.MaxValue;

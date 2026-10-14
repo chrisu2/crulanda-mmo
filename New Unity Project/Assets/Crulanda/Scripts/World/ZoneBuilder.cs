@@ -1841,7 +1841,7 @@ namespace Crulanda.World
             if (WalksIn(t.name, size)) { WalkInBarn(t, w, d); return; }
             var boards = Tint(art.timber, new Color(.4f, .25f, .16f));
             BoxPart(t, new Vector3(0, h / 2, 0), new Vector3(w, h, d), boards);
-            Footing(t, w + .3f, d + .3f, .45f, .4f, 1, 1.75f);   // a stone sill round the boards' foot, stepping up and down the slope, open at the doors
+            Footing(t, w + .5f, d + .5f, .45f, .4f, 1, 1.75f);   // a stone sill round the boards' foot, stepping up and down the slope, open at the doors; 10 cm proud of the boards (flush, it flickered stone and wood: Chris 2026-10-14 19:45)
             for (float x = -w / 2; x <= w / 2 + .01f; x += 1.2f)
                 foreach (int sz in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(x, h / 2, sz * (d / 2 + .04f)), new Vector3(.12f, h, .08f), art.timber);
             // The doors in a frame of two posts and a lintel, braced corner to corner, down to the highest ground across the

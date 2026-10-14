@@ -17,7 +17,7 @@ namespace Crulanda.EditorTools
     {
         const string Root = "Assets/Crulanda/Resources/Characters/";
         /// <summary>Bumped when the import settings change, so Unity imports the models and clips again.</summary>
-        public override uint GetVersion() { return 10; }
+        public override uint GetVersion() { return 11; }
         void OnPreprocessModel()
         {
             if (!assetPath.StartsWith(Root)) return;
@@ -46,9 +46,8 @@ namespace Crulanda.EditorTools
             if (path.StartsWith(ki + "Male/")) return ki + "Models/HumanM_Model.fbx";
             if (path.StartsWith(ki + "Female/")) return ki + "Models/HumanF_Model.fbx";
             if (path.StartsWith(unity) && !path.EndsWith("/Armature.fbx")) return unity + "Armature.fbx";
-            // Morro Motion's idles on Morro's own man (note 112b, 2026-10-14: Chris downloaded the pack again): each made from its own
-            // file, a clip's avatar was its first frame's skeleton, and the idles stood with a foot turned out.
-            if (path.StartsWith(Root + "Animations/Morro/") && !path.Contains("/Model/")) return Root + "Animations/Morro/Model/MorroMan_Idle_MoCap.fbx";
+            // (Morro Motion's idles on Morro's own man was tried 2026-10-14 (note 112b) and taken out the same evening: retargeted from his
+            // avatar the villagers stood with their arms spread and what they carried floated beside their heads, Chris 19:40.)
             return null;
         }
         /// <summary>The library's clips: the "_Loop" ones loop, and every one keeps its root where it was made (turn, height and

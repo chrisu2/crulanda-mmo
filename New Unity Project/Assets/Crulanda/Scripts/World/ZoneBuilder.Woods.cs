@@ -142,7 +142,8 @@ namespace Crulanda.World
                 if (Vector2.Distance(p, s.player) < 12 + more || Vector2.Distance(p, s.companion) < 12 + more || Vector2.Distance(p, s.recovery) < 12 + more) return false;
                 if (s.enemies != null) foreach (var e in s.enemies) if (e != null && Vector2.Distance(p, e.at) < 5 + more) return false;
             }
-            foreach (var o in Zone.nodes) if (o != null && Vector2.Distance(p, o.at) < 5 + more) return false;
+            // Not the gathering nodes: they are placed after the woods, clear of the trunks (BuildNodes), and a zone built without them
+            // must grow the same woods (NodeStreamTests, 2026-10-14: 2635 trees then 2624).
             foreach (var s in Zone.secrets) if (s != null && Vector2.Distance(p, s.at) < s.radius + 4 + more) return false;
             if (Zone.stations != null) foreach (var s in Zone.stations) if (s != null && Vector2.Distance(p, s.at) < 6 + more) return false;
             if (Zone.life != null && Zone.life.critters != null) foreach (var c in Zone.life.critters) if (c != null && Vector2.Distance(p, c.center) < c.radius + 3 + more) return false;

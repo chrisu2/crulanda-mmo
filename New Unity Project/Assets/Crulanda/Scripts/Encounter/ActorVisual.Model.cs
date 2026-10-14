@@ -522,6 +522,8 @@ namespace Crulanda.Encounter
         /// <summary>The sitting clip puts the hips this far behind where the figure stands: a seated body is moved forward by it, so a
         /// villager placed on a stool sits on it and not beside it (playtest note 30).</summary>
         const float SitShift = .42f;
+        /// <summary>Kevin's ploughing clip under the hoe stroke (off: the hand-set stroke alone, as FieldWorkTests measures it).</summary>
+        public static bool PloughClip;
         struct PoseState { public string slot; public bool arms, hoe; public Vector3 armL, armR; public float elbowL, elbowR, lean, drop, bend, shift, twist, weight; }
         PoseState PoseOf(ActorPose pose, float speed, float t)
         {
@@ -554,7 +556,8 @@ namespace Crulanda.Encounter
                     // A long tool: the two-handed stroke (HoeStance, FieldArms; note 150). Under it the body works to Kevin's ploughing
                     // clip (2026-10-14, Chris: "ploughing would be good one to use on the hoe"), its own lean taking half the stroke's bend;
                     // the arms and the hoe stay the hand-set stroke (the clip alone held the shaft upright like a staff: frames 14:05).
-                    if (HoeReady && speed < 1.1f) { bool plough = model.Has("k.plough"); if (plough) p.slot = "k.plough"; p.bend = HoeBend() * (plough ? .5f : 1); p.hoe = true; break; }
+                    // (With the clip under it the fists came in to 22-25 cm of the chest and 44 cm apart, FieldWorkTests 16:20: off until it is tuned.)
+                    if (HoeReady && speed < 1.1f) { bool plough = PloughClip && model.Has("k.plough"); if (plough) p.slot = "k.plough"; p.bend = HoeBend() * (plough ? .5f : 1); p.hoe = true; break; }
                     float k = Mathf.Repeat(t * .9f, 1), lift = k < .55f ? Mathf.SmoothStep(0, 1, k / .55f) : 1 - Mathf.SmoothStep(0, 1, (k - .55f) / .2f);
                     float chop = 25 + lift * 85;
                     p.arms = true; p.armL = new Vector3(-chop, 0, 12); p.armR = new Vector3(-chop + 8, 0, -12); p.elbowL = p.elbowR = -20 - lift * 20; p.lean = 16 - lift * 8; break;

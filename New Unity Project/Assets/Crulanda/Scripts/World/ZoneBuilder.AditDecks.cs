@@ -412,7 +412,13 @@ namespace Crulanda.World
                 // No post where another deck lies in its span or under its foot (the cross-walk's posts went down through the north
                 // ramp, the catwalk's through the walkway, and each carved the lower deck's navmesh: AditNavDiagnostics 18:45); that
                 // stretch hangs from its braces instead.
-                foreach (var other in DeckSpots) if (other != spot && other.Top(new Vector2(top.x, top.z), out float oy) && oy > foot - .1f && oy < under + .6f) return;
+                foreach (var other in DeckSpots)
+                {
+                    if (other == spot) continue;
+                    // Under the post or within 0.8 m of it (the carve round a post reaches 0.7 m: the cross-walk's posts beside the north ramp's edge still cut it, 19:24).
+                    foreach (var off in new[] { Vector2.zero, new Vector2(.8f, 0), new Vector2(-.8f, 0), new Vector2(0, .8f), new Vector2(0, -.8f) })
+                        if (other.Top(new Vector2(top.x, top.z) + off, out float oy) && oy > foot - .1f && oy < under + .6f) return;
+                }
                 float tall = under - foot, w = style == "stone" ? .7f : .26f; var at = new Vector3(top.x, foot, top.z);
                 Part(PrimitiveType.Cube, look, at + Vector3.up * tall / 2, new Vector3(w, tall, w), style == "stone" ? cut : post);
                 DeckBlock(solidRoot, at, new Vector3(w + .05f, Mathf.Max(.1f, tall - .15f), w + .05f), Quaternion.identity);

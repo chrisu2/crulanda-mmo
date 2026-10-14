@@ -4695,6 +4695,7 @@ namespace Crulanda.World
             // Solid where it stands: you walk round a brazier, the desk, a stack of crates or the plunder, and so do the deserters.
             void Block(Vector3 at, Vector3 size, Quaternion rot)
             {
+                if (InDeckWay(t.TransformPoint(at), .4f)) return;   // never on a deck's planks (a block sat on the Foundry's walkway and cut its navmesh: AditNavDiagnostics 2026-10-14)
                 var o = new GameObject("Solid"); o.transform.SetParent(t, false); o.transform.localPosition = at + rot * new Vector3(0, size.y / 2, 0); o.transform.localRotation = rot;
                 o.AddComponent<BoxCollider>().size = size; o.AddComponent<NavBlocker>();
             }

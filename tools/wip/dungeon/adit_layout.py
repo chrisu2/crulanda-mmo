@@ -326,7 +326,7 @@ def make_decks():
     deck("Lusk's tally stage", W, (0, -183), (0, -172), aside=0, rise=3.5, width=12, style='stone', solid=True)
     deck('The tally ramp (north)', W, (0, -172), (0, -162), aside=0, rise=3.5, rise2=0, width=6, style='scree')
     # The overlook: a timber balcony out over the Gallery from the drift's end, where the trestle starts.
-    deck('The overlook balcony', W, along(W, 26, -14), along(W, 34, -14), aside=0, rise=0, width=10)
+    deck('The overlook balcony', W, along(W, 26, -16.75), along(W, 34.8, -16.75), aside=0, rise=0, width=5.5)   # the lip's south half, over the trestle head and not the ramp (its planks took the ramp's headroom: AditNavDiagnostics 2026-10-14)
     # The Miners' Trestle down the Gallery's west wall (+14, +12 at the landing where the bridge starts, then down to the floor).
     G = 'G'; tr = -28
     deck("The Miners' Trestle (head)", G, (62, -19), (62, -14), aside=tr, rise=14, width=4)

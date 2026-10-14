@@ -124,10 +124,10 @@ namespace Crulanda.Tests
                 "Greyheart <- The Greying", "The Root-Warden <- The Heart's withered",
                 // The Sealed Adit (dungeon D1): the gang-boss, the quartermaster, the rail-captain and Nix each name their guards.
                 "Gang-Boss Haddo Lusk <- Gang-boss's guards", "Quartermaster Brannigan Sorrel <- Quartermaster's guards", "Rail-Captain Orsk Danner <- Rail-Captain's guard", "Nix and the Rock-Eater <- Workshop guards",
-                // The Adit rework: every wing's boss names its guards (Cinder-Warden Ysolt names Sister Ashe Varrow, an elite, which pairs nobody yet).
+                // The Adit rework: every wing's boss names its guards (Cinder-Warden Ysolt names Sister Ashe Varrow, an elite: the data names her, so she guards).
                 "Brack the Bailer <- Bailers' chain", "Overseer Grael Vosk <- Whip-hands", "Urn-Keeper Sabel <- Urn-tenders", "Loremaster Ivo Senn <- Lectors",
                 "Master-at-Arms Corvane <- Armourers", "The Grey Whisperer <- Whisperer's hollow", "The Foreman Who Forgot <- The Foreman's shift",
-                "Powder-Sergeant Hobb <- Hobb's sappers", "Old Kettle, the pitch-boiler <- Pitch-gangers" }, pairs,
+                "Powder-Sergeant Hobb <- Hobb's sappers", "Old Kettle, the pitch-boiler <- Pitch-gangers", "Cinder-Warden Ysolt <- Sister Ashe Varrow" }, pairs,
                 "If a camp moved, pair it in the data: \"guards\" on the elite's camp names its guard camps.");
         }
 
@@ -164,7 +164,7 @@ namespace Crulanda.Tests
                 Assert.That(m.enrageAt, Is.InRange(.2f, .4f)); Assert.Less(m.enrageHaste, .8f, "Enraged, it swings faster.");
                 Assert.Greater(m.callAt, m.enrageAt, "It calls before it enrages.");
             }
-            Assert.AreEqual(33, EliteMoves.All.Select(m => m.name).Distinct().Count(), "Thirty-three different moves (the reworked Adit's twelve among them, 2026-10-14).");
+            Assert.AreEqual(33, EliteMoves.All.Select(m => m.name).Distinct().Count(), "Thirty-three different moves (the reworked Adit's twelve among them, 2026-10-14; the Old Burrower's Earth-Heave, not a second Rock-Crush).");
             // Dungeon end bosses are a step harder than outdoor named elites: Caddock and the Hollow Root-Warden, and only they.
             CollectionAssert.AreEquivalent(new[] { "Caddock, the Bandit King", "The Hollow Root-Warden", "Rail-Captain Orsk Danner" }, EliteMoves.All.Where(m => m.boss).Select(m => m.mob).ToList());
             // Nix's two-part fight (D5): the engine and the goblin are each lighter than one elite and together a step above one.

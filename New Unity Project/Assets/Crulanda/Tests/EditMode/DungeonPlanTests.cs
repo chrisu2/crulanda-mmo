@@ -40,6 +40,7 @@ namespace Crulanda.Tests
         /// fork only once a side and the others it waits for are done.</summary>
         ZoneWing[] Web()
         {
+            Clear();   // a test plans the same dungeon more than once: its camps once, not stacked (the room boss's step held six camps, three of each)
             Camp("a1", "a", 1, X(0)); Camp("a2", "a", 2, X(10));
             Camp("b1", "b", 1, X(20));
             Camp("c1", "c", 1, X(200));
@@ -79,6 +80,7 @@ namespace Crulanda.Tests
         /// <summary>A wing of three fights with a side boss off its middle, a side camp, and a side room (an optional wing) off its start.</summary>
         ZoneWing[] WithSides()
         {
+            Clear();   // a test plans the same dungeon more than once: its camps once, not stacked (the room boss's step held six camps, three of each)
             Camp("w1", "w", 1, X(0)); Camp("w2", "w", 2, X(100)); Camp("w3", "w", 3, X(200));
             Camp("side boss", "w", 0, X(105, 0, 15), elite: true, optional: true);
             Camp("side camp", "w", 0, X(150, 0, 10), optional: true);

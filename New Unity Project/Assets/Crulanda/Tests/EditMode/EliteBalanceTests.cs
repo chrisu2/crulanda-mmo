@@ -203,7 +203,7 @@ namespace Crulanda.Tests
                 }
             // Six elites stand with guards (Caddock, Hesk, the Brood Weave-Eater's broodmate, the Ash-Deacon, Greyheart, the
             // Root-Warden) and four have kin in earshot of their call (Hesk, Old Whitefoot, the Grey Sexton, the Sandthrone captain).
-            Assert.AreEqual(20 * Kits.Length, guarded, "Twenty elites have guards (fourteen of them the reworked Adit's, 2026-10-14)."); Assert.AreEqual(9 * Kits.Length, answered, "Nine elites' calls are answered by kin (five of them the Sealed Adit's: Nix's since the Adit was filled, 2026-10-11, the Back drift cutters in his reach).");
+            Assert.AreEqual(20 * Kits.Length, guarded, "Twenty elites have guards (fourteen of them the reworked Adit's, 2026-10-14)."); Assert.AreEqual(15 * Kits.Length, answered, "Fifteen elites' calls are answered by kin (eleven of them the Sealed Adit's: Nix's since the Adit was filled, 2026-10-11, the Back drift cutters in his reach; the rework's bosses with guards in earshot, 2026-10-14).");
         }
         /// <summary>The least health a careful player with Mira ends with when an elite's call is answered.</summary>
         const float CallMargin = .1f;

@@ -150,7 +150,7 @@ namespace Crulanda.Encounter
                 call = "Brack bangs the bucket on the chain: \"Bail!\"", callShort = "Bail!", enrage = "Brack wades in up to the waist and keeps coming." },
             new EliteMove { mob = "Old Bristle", name = "Charge", windup = 1.5f, blow = 3.8f, reach = 4.6f, every = 9, knock = 5,
                 cc = "disorient", ccName = "Trample", ccSeconds = 3, ccEvery = 18, ccReach = 5, ccText = "Old Bristle's trotters go over you.", enrage = "Old Bristle's bristles stand straight up." },
-            new EliteMove { mob = "The Old Burrower", name = "Rock-Crush", windup = 2, blow = 4, reach = 3.8f, every = 10, knock = 6,
+            new EliteMove { mob = "The Old Burrower", name = "Earth-Heave", windup = 2, blow = 4, reach = 3.8f, every = 10, knock = 6,
                 cc = "disorient", ccName = "Burrow", ccSeconds = 3, ccEvery = 16, ccReach = 6, ccText = "The Old Burrower goes under and comes up beneath you.", enrage = "The Old Burrower stops circling." },
             new EliteMove { mob = "Powder-Sergeant Hobb", name = "Fuse-Pick", windup = 1.8f, blow = 3.8f, reach = 3.6f, every = 10, callReach = 30, callMost = 2,
                 ringEvery = 12, ringReach = 4.5f, ringName = "Short Fuse",

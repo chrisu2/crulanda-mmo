@@ -78,7 +78,7 @@ namespace Crulanda.Tests
             Assert.AreEqual(12, loot.GearOrder.Count(g => g.legacy));
             Assert.AreEqual(3, loot.Sets.Count, "Three sets: the Deserter King's Due, the Vigil and the Adit-Runner's Kit.");
             Assert.AreEqual(49, named.Count(id => items.Get(id).quality == 2), "49 uncommon.");
-            Assert.AreEqual(75, named.Count(id => items.Get(id).quality == 3), "75 rare (26 the Sealed Adit\'s, the Quiet Miner's cap the 26th) (the Sentinel's Helm the 49th, 2026-10-07).");
+            Assert.AreEqual(94, named.Count(id => items.Get(id).quality == 3), "94 rare (45 the Sealed Adit's: the Quiet Miner's cap the 26th, the rework's nineteen signature pieces of 2026-10-14) (the Sentinel's Helm the 49th, 2026-10-07).");
             Assert.AreEqual(7, named.Count(id => items.Get(id).quality == 4), "7 epic.");
         }
 

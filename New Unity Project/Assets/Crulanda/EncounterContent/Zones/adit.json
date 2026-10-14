@@ -2165,13 +2165,13 @@
       "cave": "The Sealed Adit",
       "style": "timber",
       "wall": 0,
-      "from": 371.87,
-      "to": 379.88,
-      "aside": 0,
-      "aside2": 0,
+      "from": 371.27,
+      "to": 380.84,
+      "aside": 2.5,
+      "aside2": 2.5,
       "rise": 0,
       "rise2": 0,
-      "width": 10,
+      "width": 5.5,
       "canonStatus": "GAME-ONLY"
     },
     {

@@ -522,7 +522,7 @@ namespace Crulanda.Encounter
         /// <summary>The sitting clip puts the hips this far behind where the figure stands: a seated body is moved forward by it, so a
         /// villager placed on a stool sits on it and not beside it (playtest note 30).</summary>
         const float SitShift = .42f;
-        struct PoseState { public string slot; public bool arms; public Vector3 armL, armR; public float elbowL, elbowR, lean, drop, bend, shift, twist, weight; }
+        struct PoseState { public string slot; public bool arms, hoe; public Vector3 armL, armR; public float elbowL, elbowR, lean, drop, bend, shift, twist, weight; }
         PoseState PoseOf(ActorPose pose, float speed, float t)
         {
             var p = new PoseState();
@@ -549,7 +549,7 @@ namespace Crulanda.Encounter
                     p.elbowL = p.elbowR = -35; p.lean = 10; break;
                 case ActorPose.Work:     // hoeing (or hauling a bucket): a lift and a stroke down, leaning into it (playtest note 76: it read as standing still)
                 {
-                    if (HoeReady && speed < 1.1f) { p.bend = HoeBend(); break; }   // a long tool: the two-handed stroke (FieldArms, note 150)
+                    if (HoeReady && speed < 1.1f) { p.bend = HoeBend(); p.hoe = true; break; }   // a long tool: the two-handed stroke (HoeStance, FieldArms; note 150)
                     float k = Mathf.Repeat(t * .9f, 1), lift = k < .55f ? Mathf.SmoothStep(0, 1, k / .55f) : 1 - Mathf.SmoothStep(0, 1, (k - .55f) / .2f);
                     float chop = 25 + lift * 85;
                     p.arms = true; p.armL = new Vector3(-chop, 0, 12); p.armR = new Vector3(-chop + 8, 0, -12); p.elbowL = p.elbowR = -20 - lift * 20; p.lean = 16 - lift * 8; break;
@@ -728,10 +728,14 @@ namespace Crulanda.Encounter
                 PoseArm(armR, foreR, model.UpperArmR, model.LowerArmR, poseArmR, poseElbowR, arms);
             }
             if (staffHold > 0 && fresh && !dead) StaffArm(staffHold);
+            // A hoer's shoulders squared to the stroke before the back bends, and turned once it is (HoeStance).
+            bool hoer = p.hoe && ToolAtWork && Pose == ActorPose.Work && !dead;
+            HoeStance(hoer, fresh && !dead, false);
             // An elder's stoop and a sleeper's slump bend the back, not the legs.
             float bend = fresh ? stoop + p.bend : 0;
             if (bend != 0 && model.Spine != null) model.Spine.rotation = Quaternion.AngleAxis(bend * .5f, body.right) * model.Spine.rotation;
             if (bend != 0 && model.Chest != null) model.Chest.rotation = Quaternion.AngleAxis(bend * .5f, body.right) * model.Chest.rotation;
+            HoeStance(hoer, fresh && !dead, true);
             // The figure as a whole moves only for a pose that leans or drops it, or a drinker's reel, and is put back once after:
             // otherwise the body is left to others (an elite's wind-up lean, an ambusher's crouch, a death).
             if (!dead)

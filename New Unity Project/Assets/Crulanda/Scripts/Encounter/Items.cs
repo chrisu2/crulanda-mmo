@@ -404,7 +404,7 @@ namespace Crulanda.Encounter
         public static int Sell(EncounterProgress p, ItemDatabase db, int bagIndex)
         {
             if (bagIndex < 0 || bagIndex >= p.bag.Count || p.bag[bagIndex].Empty) return 0;
-            var s = p.bag[bagIndex]; var d = db.Get(s.item); int gold = (d != null ? d.value : 0) * s.count;
+            var s = p.bag[bagIndex]; var d = db.Get(s.item); int gold = Charm.Pay(p, (d != null ? d.value : 0) * s.count);   // a Scoundrel is paid a tenth more (Charm.cs)
             p.gold += gold; p.bag[bagIndex] = new ItemStack(); return gold;
         }
         /// <summary>What "Sell junk" takes: junk, and anything of poor quality. Materials and tools are common quality, so they stay.</summary>
@@ -420,7 +420,7 @@ namespace Crulanda.Encounter
         public static bool Buy(EncounterProgress p, ItemDatabase db, string item, out string why)
         {
             why = null; var d = db.Get(item); if (d == null) { why = "Not for sale."; return false; }
-            int price = Price(d);
+            int price = Charm.Ask(p, Price(d));   // a Scoundrel asks a tenth less (Charm.cs)
             if (p.gold < price) { why = "You need " + price + " crowns."; return false; }
             if (Add(p, db, item, 1) > 0) { why = "Your bags are full."; return false; }
             p.gold -= price; return true;

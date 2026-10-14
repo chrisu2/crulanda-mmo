@@ -80,10 +80,24 @@ namespace Crulanda.Encounter
             if (bm != null)
             {
                 var bones = bm.Model.GetComponentsInChildren<Transform>(); var was = bones.Select(t => t.localRotation).ToArray();
-                yield return new WaitForSeconds(2);
+                // And whether it holds its staff (2026-10-14, Chris: its arms at its sides, its staff floating by the ground): the Orc Shaman's
+                // staff (a rigid mesh on a control of its own, not on the hand) in its right hand's frame, frame by frame; held, it barely shifts.
+                var hand = bones.FirstOrDefault(t => t.name == "Character1_RightHand"); var staff = bm.Renderers.FirstOrDefault(r => r != null && r.name == "polySurface238");
+                var staffMesh = staff != null ? staff.GetComponent<MeshFilter>()?.sharedMesh : null; Vector3 centre = Vector3.zero;
+                if (staffMesh != null && staffMesh.isReadable && staffMesh.vertexCount > 0) { foreach (var p in staffMesh.vertices) centre += p; centre /= staffMesh.vertexCount; } else staff = null;
+                var held = new System.Collections.Generic.List<Vector3>();
+                for (float t = 0; t < 2; t += Time.deltaTime) { yield return null; if (hand != null && staff != null) held.Add(hand.InverseTransformPoint(staff.transform.TransformPoint(centre))); }
                 var turned = bones.Where((t, i) => Quaternion.Angle(t.localRotation, was[i]) > 2).Select(t => t.name).ToList();
+                string holds = "";
+                if (held.Count > 0)
+                {
+                    var mean = Vector3.zero; foreach (var o in held) mean += o; mean /= held.Count;
+                    float shift = held.Max(o => hand.TransformVector(o - mean).magnitude), away = hand.TransformVector(mean).magnitude;
+                    holds = "; its staff in its right hand's frame over those 2 s (" + held.Count + " frames): " + away.ToString("0.000") + " m from the hand bone, shifting at most " + shift.ToString("0.000") + " m (held: a few cm)";
+                }
                 report.AppendLine("orc in play: " + bm.Kind + ", animator on " + bm.Animator.enabled + ", culling " + bm.Animator.cullingMode + ", avatar " + (bm.Animator.avatar != null ? bm.Animator.avatar.name + " valid " + bm.Animator.avatar.isValid + " human " + bm.Animator.avatar.isHuman : "none")
-                    + ", renderers seen " + bm.Renderers.Count(r => r != null && r.isVisible) + " of " + bm.Renderers.Count + ", motion " + bm.Moving + "; " + turned.Count + " of " + bones.Length + " bones turned in 2 s: " + string.Join(", ", turned.Take(24)));
+                    + ", renderers seen " + bm.Renderers.Count(r => r != null && r.isVisible) + " of " + bm.Renderers.Count + ", motion " + bm.Moving + "; clips: idle " + bm.ClipLength("idle").ToString("0.000") + " s, walk " + bm.ClipLength("walk").ToString("0.000")
+                    + " s, cast " + bm.ClipLength("cast").ToString("0.000") + " s, death " + bm.ClipLength("death").ToString("0.000") + " s; " + turned.Count + " of " + bones.Length + " bones turned in 2 s: " + string.Join(", ", turned.Take(24)) + holds);
             }
             yield return Shot("tf-01-yard", "the training yard east of Oakhaven from its gate: the fence, the tents, the banners, the dummies down the left, the butts down the right, the healer's corner, the training and mending dummies", dummy.transform, false);
 

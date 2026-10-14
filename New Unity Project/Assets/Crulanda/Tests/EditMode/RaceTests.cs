@@ -26,6 +26,8 @@ namespace Crulanda.Tests
             foreach (var c in new[] { "class.warrior", "class.ranger", "class.rogue", "class.mage", "class.shaman" }) Assert.IsTrue(Races.Allows(Races.Orc, c), c);
             foreach (var c in new[] { "class.druid", "class.paladin", "class.archivist", "class.saltmender", "class.cleric" }) Assert.IsFalse(Races.Allows(Races.Orc, c), c);
             Assert.AreEqual(Races.Human, EncounterSession.FreshProgress("class.druid", Races.Orc).raceId, "an orc cannot be a Druid");
+            // The Scoundrel: races open until all are defined (Chris, 2026-10-13): both peoples for now.
+            Assert.IsTrue(Races.Allows(Races.Human, "class.scoundrel")); Assert.IsTrue(Races.Allows(Races.Orc, "class.scoundrel")); Assert.IsNull(Races.Requires("class.scoundrel"));
         }
         [Test] public void A_fresh_save_gets_a_race_its_class_allows()
         {

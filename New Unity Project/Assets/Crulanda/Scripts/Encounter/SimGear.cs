@@ -21,9 +21,9 @@ namespace Crulanda.Encounter
 
         public static string Weight(string classId)
         {
-            return classId == "class.warrior" || classId == "class.paladin" ? "heavy" : classId == "class.ranger" || classId == "class.rogue" || classId == "class.shaman" ? "leather" : "cloth";
+            return classId == "class.warrior" || classId == "class.paladin" ? "heavy" : classId == "class.ranger" || classId == "class.rogue" || classId == "class.shaman" || classId == "class.scoundrel" ? "leather" : "cloth";
         }
-        public static bool CarriesWeapon(string classId) { return classId == "class.warrior" || classId == "class.paladin" || classId == "class.rogue"; }
+        public static bool CarriesWeapon(string classId) { return classId == "class.warrior" || classId == "class.paladin" || classId == "class.rogue" || classId == "class.scoundrel"; }
         /// <summary>Whether a piece by its name is of the class's weight (a Hauberk for the mail classes, a Jerkin for leather, a Tunic for cloth).</summary>
         public static bool Suits(string classId, string name)
         {
@@ -53,6 +53,7 @@ namespace Crulanda.Encounter
                 if (id != null) ids.Add(id);
             }
             if (s.classId == "class.rogue" && items.Get("item.rogues_dirk") != null && items.Get("item.rogues_second_dirk") != null) { ids.Add("item.rogues_dirk"); ids.Add("item.rogues_second_dirk"); }   // a Rogue's pair of dirks (2026-10-11); a database without them falls through to a weapon at the level
+            else if (s.classId == "class.scoundrel" && items.Get("item.scoundrels_dirk") != null) ids.Add("item.scoundrels_dirk");   // a Scoundrel's one dirk (2026-10-14)
             else if (CarriesWeapon(s.classId))
             {
                 var fm = SimEconomy.Worn(s, "mainhand"); var main = fm != null && items.Get(fm) != null ? fm : Pick(items, "mainhand", s, 7, d => true); if (main != null) ids.Add(main);

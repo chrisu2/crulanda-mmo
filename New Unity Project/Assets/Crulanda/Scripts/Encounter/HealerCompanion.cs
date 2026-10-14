@@ -34,6 +34,16 @@ namespace Crulanda.Encounter
         void Awake() { agent = GetComponent<NavMeshAgent>(); }
         float nextHush;
         public const float HushCooldown = 15, HushSeconds = 4;
+        /// <summary>Her longest wait in seconds (Hush, or a spell's own cooldown), for a Scoundrel's favour (ScoundrelKit, 2026-10-14).</summary>
+        public float LongestWait { get { return Mathf.Max(0, Mathf.Max(nextHush - Time.time, abilities.Longest(Time.time, out _))); } }
+        /// <summary>A Scoundrel's favour called in: her longest wait comes up to <paramref name="seconds"/> sooner. The seconds taken off.</summary>
+        public float CallInFavour(float seconds)
+        {
+            float now = Time.time, hush = nextHush - now, spell = abilities.Longest(now, out var id);
+            if (seconds <= 0 || (hush <= 0 && spell <= 0)) return 0;
+            if (hush >= spell) { float cut = Mathf.Min(seconds, hush); nextHush -= cut; return cut; }
+            float less = Mathf.Min(seconds, spell); abilities.Shorten(id, less, now); return less;
+        }
         /// <summary>Hush (CC_DESIGN section 2, step C5): a mob casting at your party, past the first third of its cast, within 25 m, is silenced 4 s; every 15 s.</summary>
         void Hush()
         {

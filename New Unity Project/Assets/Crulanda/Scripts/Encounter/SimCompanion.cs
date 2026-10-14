@@ -42,12 +42,25 @@ namespace Crulanda.Encounter
         public Vector3? Leading { get; private set; }
         public string LeadingName { get; private set; }
         float nextTaunt;
-        public bool Melee { get { return sim.classId == "class.warrior" || sim.classId == "class.paladin" || sim.classId == "class.rogue"; } }
+        public bool Melee { get { return sim.classId == "class.warrior" || sim.classId == "class.paladin" || sim.classId == "class.rogue" || sim.classId == "class.scoundrel"; } }
         /// <summary>A Rogue or an Archivist (CC_DESIGN section 3): holds the moon in a fight of two or more.</summary>
-        public bool Controller { get { return sim.classId == "class.rogue" || sim.classId == "class.archivist"; } }
+        public bool Controller { get { return sim.classId == "class.rogue" || sim.classId == "class.archivist" || sim.classId == "class.scoundrel"; } }
         float nextHold, nextKick;
         /// <summary>Has an interrupt (Kick, Hush, Shield Bash, Censure, Quench): stops a cast in its reach every 12 s.</summary>
-        public bool Interrupter { get { return sim.classId == "class.rogue" || sim.classId == "class.archivist" || sim.classId == "class.warrior" || sim.classId == "class.paladin" || sim.classId == "class.mage"; } }
+        public bool Interrupter { get { return sim.classId == "class.rogue" || sim.classId == "class.archivist" || sim.classId == "class.warrior" || sim.classId == "class.paladin" || sim.classId == "class.mage" || sim.classId == "class.scoundrel"; } }
+        /// <summary>Its longest wait in seconds (a hold, a kick, a heal, a taunt), for a Scoundrel's favour (ScoundrelKit, 2026-10-14).</summary>
+        public float LongestWait { get { return Mathf.Max(0, Mathf.Max(Mathf.Max(nextHold, nextKick), Mathf.Max(nextHeal, nextTaunt)) - Time.time); } }
+        /// <summary>A Scoundrel's favour called in: its longest wait comes up to <paramref name="seconds"/> sooner. The seconds taken off.</summary>
+        public float CallInFavour(float seconds)
+        {
+            float now = Time.time, wait = LongestWait; if (wait <= 0 || seconds <= 0) return 0;
+            float cut = Mathf.Min(seconds, wait);
+            if (nextHold - now >= wait - .001f) nextHold -= cut;
+            else if (nextKick - now >= wait - .001f) nextKick -= cut;
+            else if (nextHeal - now >= wait - .001f) nextHeal -= cut;
+            else nextTaunt -= cut;
+            return cut;
+        }
         public bool Healer { get { return sim.classId == "class.druid" || sim.classId == "class.paladin" || sim.classId == "class.saltmender" || sim.classId == "class.cleric" || sim.classId == "class.shaman"; } }   // the Cleric and Shaman (note 178) heal when they come
         /// <summary>A Salt-Mender sim's rotation (2026-10-12): the mend above (Close the Cut) on the most hurt; the Mender-Craft chant over the
         /// party within 12 m every 4 s of a fight (or while anyone near it is hurt); a salt cairn every 20 s when two or more are hurt; salt shards between.</summary>
@@ -269,8 +282,8 @@ namespace Crulanda.Encounter
             if (moon == null || moon.Incapacitated || Vector3.Distance(moon.transform.position, transform.position) > 25) return;
             if (moon.Apply("incap", actor, 20) != null) { nextHold = Time.time + 6; return; }
             nextHold = Time.time + 25;
-            bool rogue = sim.classId == "class.rogue";
-            string what = rogue ? (sim.chatty > .65f ? "gouged moon, dont touch it" : "Moon is held. Leave it be.") : (sim.chatty > .65f ? "lulling moon" : "Moon's asleep. Don't wake it.");
+            bool rogue = sim.classId == "class.rogue", scoundrel = sim.classId == "class.scoundrel";
+            string what = rogue ? (sim.chatty > .65f ? "gouged moon, dont touch it" : "Moon is held. Leave it be.") : scoundrel ? (sim.chatty > .65f ? "sang moon still, dont touch it" : "Moon's dazed. Leave it be.") : (sim.chatty > .65f ? "lulling moon" : "Moon's asleep. Don't wake it.");
             session.ChatSay(ChatChannel.Party, sim.name, marked ? (sim.chatty > .65f ? "moon on " + moon.actor.DisplayName.ToLower() + ", " + what : "Moon on the " + moon.actor.DisplayName + ". " + what) : what);
         }
         /// <summary>Leads the party to a camp of about its level (5.6, "dungeon runs"): the nearest, or an elite when the party is three

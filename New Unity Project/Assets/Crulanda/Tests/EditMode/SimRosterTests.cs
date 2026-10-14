@@ -23,6 +23,8 @@ namespace Crulanda.Tests
             // 2026-10-13 (Chris: "more sims throughout the world"): eight Clerics and eight Shamans, every Shaman an orc, the 24 new mostly higher.
             Assert.AreEqual(8, a.Count(s => s.classId == "class.cleric")); Assert.AreEqual(8, a.Count(s => s.classId == "class.shaman"));
             Assert.IsTrue(a.Where(s => s.classId == "class.shaman").All(s => s.Race == Races.Orc), "every Shaman an orc");
+            // 2026-10-14: eight Scoundrels after the eighty (sims 81-88).
+            Assert.AreEqual(8, a.Count(s => s.classId == "class.scoundrel")); Assert.IsTrue(a.Skip(80).All(s => s.classId == "class.scoundrel"));
             Assert.GreaterOrEqual(a.Skip(56).Count(s => s.level >= 9), 15, "the 24 new mostly in the higher zones");
             foreach (var s in a)
             {

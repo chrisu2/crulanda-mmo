@@ -26,7 +26,7 @@ namespace Crulanda.Tests
     public class BalanceHarness
     {
         public static float FightSeconds = 180, Step = .05f; public static int Seeds = 3;   // three minutes: long enough to average the cooldown cycles (the training-dummy practice Chris pointed to, 2026-10-13); was 90   // game seconds a frame (Time.captureDeltaTime): as fast as the editor runs, the same steps every run
-        static readonly string[] AllClasses = { "class.warrior", "class.druid", "class.paladin", "class.ranger", "class.mage", "class.rogue", "class.archivist", "class.saltmender", "class.cleric", "class.shaman" };
+        static readonly string[] AllClasses = { "class.warrior", "class.druid", "class.paladin", "class.ranger", "class.mage", "class.rogue", "class.archivist", "class.saltmender", "class.cleric", "class.shaman", "class.scoundrel" };
         /// <summary>CRULANDA_BALANCE_CLASSES=mage,archivist runs those only (about two a chunk); each set writes its own balance-<set>.csv.</summary>
         static string[] Classes { get { var f = Environment.GetEnvironmentVariable("CRULANDA_BALANCE_CLASSES"); if (string.IsNullOrEmpty(f)) return AllClasses;
             var want = f.Split(',').Select(x => x.Trim().ToLowerInvariant()).Select(x => x.StartsWith("class.") ? x : "class." + x).ToList(); return want.Where(AllClasses.Contains).ToArray(); } }
@@ -37,7 +37,8 @@ namespace Crulanda.Tests
         // once a fight: summons and standing auras.
         static readonly HashSet<string> Never = new HashSet<string> { "druid.barkhide", "druid.thornclaw", "druid.rootmend", "druid.thornsong", "mage.unbind", "mage.quench", "mage.bind",
             "rogue.vanish", "rogue.tumble", "rogue.sap", "rogue.blind", "ranger.disengage", "druid.sleep_of_the_wood",
-            "archivist.cadence", "archivist.dirge", "mage.ash_hex", "archivist.echo_bind" };   // holds that damage breaks   // songs of pace and slowing: nothing a dummy shows, and one would replace the Song of Mending
+            "archivist.cadence", "archivist.dirge", "mage.ash_hex", "archivist.echo_bind",
+            "scoundrel.glimmer", "scoundrel.bribe", "scoundrel.favour" };   // the Scoundrel (2026-10-14): its group daze and its bribe kept off the dummies (damage breaks them); a favour needs an ally, and the damage fights have none   // holds that damage breaks   // songs of pace and slowing: nothing a dummy shows, and one would replace the Song of Mending
         /// <summary>Kept up: a damage over time with no cooldown, recast when its last use is this many seconds old (2026-10-13: the Cleric's
         /// Brand costs what Rebuke costs and has no cooldown, so the rotation always reached Rebuke first and never cast it).</summary>
         static readonly Dictionary<string, float> Every = new Dictionary<string, float> { { "cleric.brand", 7.5f },
@@ -46,7 +47,7 @@ namespace Crulanda.Tests
         /// (the wounded dummy alone) does not (a 3 s cast for one cut every one-target healer's number).</summary>
         static readonly HashSet<string> GroupHeals = new HashSet<string> { "paladin.mending_oath", "archivist.mending_verse", "salt.wound_seal" };
         static readonly HashSet<string> Once = new HashSet<string> { "mage.raise_thrall", "ranger.call_companion", "paladin.oath", "paladin.colours",
-            "archivist.song_of_mending", "salt.mender_craft" };   // 2026-10-13: the healers' songs and chants are toggles: started once (they were never started, or toggled off again)
+            "archivist.song_of_mending", "salt.mender_craft", "scoundrel.war_verse" };   // the Scoundrel's War-Verse (2026-10-14): a toggle, sung once and left up   // 2026-10-13: the healers' songs and chants are toggles: started once (they were never started, or toggled off again)
         /// <summary>A once-a-fight toggle already on: the pet up, the song or the chant going (2026-10-13: casting it again in the next
         /// fight sent the Ranger's wolf away, so every fight against three ran without it).</summary>
         bool AlreadyOn(string id)
@@ -56,6 +57,7 @@ namespace Crulanda.Tests
                 case "ranger.call_companion": case "mage.raise_thrall": return s.Pet != null && s.Pet.actor != null && s.Pet.actor.IsAlive;
                 case "archivist.song_of_mending": return s.Kit is ArchivistKit ak && ak.Singing.ToString() == "Mending";
                 case "salt.mender_craft": return s.Kit is SaltMenderKit sk && sk.Chanting;
+                case "scoundrel.war_verse": return s.Kit is ScoundrelKit sd && sd.Verse == ScoundrelKit.Verses.War;
                 default: return false;
             }
         }

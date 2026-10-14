@@ -446,8 +446,12 @@ namespace Crulanda.Encounter
         /// <summary>A one-shot (an attack, a flinch) is playing.</summary>
         public bool Busy { get { return shot != null; } }
         /// <summary>Plays a one-shot over whatever it is doing (attack, kick, hitL, hitR, jump), easing in and out.</summary>
+        /// <summary>When a hit has no clip of its own (the thrall's Toon RTS undead has none), a short flinch: the model rocks back and recovers.</summary>
+        float flinchAt = -1;
+        public bool Flinching { get { return flinchAt >= 0 && Time.time - flinchAt < .35f; } }
         public void Play(string slot)
         {
+            if ((slot == "hitL" || slot == "hitR") && !proc && !slotOf.ContainsKey(slot) && !dead && Model != null) { flinchAt = Time.time; return; }
             if (dead) return;
             if (proc) { if (procLengths.ContainsKey(slot)) { shot = slot; shotTime = 0; } return; }
             if (!slotOf.TryGetValue(slot, out int i)) return;
@@ -481,6 +485,12 @@ namespace Crulanda.Encounter
             if (tipping) { TipTick(dt); if (!graph.IsValid() || !graph.IsPlaying()) return; }
             if (proc) { ProcTick(dt); return; }
             if (!graph.IsValid()) return;
+            if (flinchAt >= 0 && !tipping)
+            {
+                float f = (Time.time - flinchAt) / .35f;
+                if (f >= 1) { flinchAt = -1; Model.localRotation = baseRot; }
+                else Model.localRotation = Quaternion.Euler(-14 * Mathf.Sin(f * Mathf.PI), 0, 0) * baseRot;   // rocked back and up again
+            }
             float speed = pace;
             System.Array.Clear(want, 0, want.Length);
             bool gallops = slotOf.ContainsKey("run");

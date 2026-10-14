@@ -88,6 +88,9 @@ namespace Crulanda.Encounter
             string kind = orc && OrcKind(look) != null ? OrcKind(look) : look == ActorLook.Keeper ? KeeperKind() : BeastKind(look, variant);
             // The Bonecaller's bone thrall (Chris, 2026-10-13: "Use Toon RS Unit - Undead for the bonecaller's pet"): the Toon RTS undead.
             if (look == ActorLook.Skeleton && (name ?? "").IndexOf("thrall", System.StringComparison.OrdinalIgnoreCase) >= 0 && ModelBeast.Available("UndeadUnit")) kind = "UndeadUnit";
+            // Khaven's drowned dead and the other risen (2026-10-14, Chris's list: "the Fantasy Skeleton ... could replace Khaven's drowned dead"):
+            // DzenGames' Fantasy Skeleton, on its own seven clips.
+            else if (look == ActorLook.Skeleton && ModelBeast.Available("FantasySkeleton")) kind = "FantasySkeleton";
             if ((!Models && look != ActorLook.Keeper) || !ModelBeast.Available(kind)) return false;   // (a Keeper has no other body)
             ModelBeast.Coat coat = null; float height, walk, run;
             bool elite = name != null && name.EndsWith("(elite)");   // a camp's elite (EncounterSession.SpawnCamps): a size bigger than its pack
@@ -180,7 +183,8 @@ namespace Crulanda.Encounter
             {
                 // Khaven's drowned dead: bone stained by the creek mud they rose out of.
                 var pal = Resources.Load<Texture2D>("Creatures/Skeleton_palette");
-                if (kind == "UndeadUnit") coat = new ModelBeast.Coat().Map("", Resources.Load<Texture2D>("CreatureSkins/UndeadUnit/UndeadUnit_Map"));   // it falls into a heap of bones as they do (Crumbles; Chris: "undead can just collapse into a pile of bones on death")
+                if (kind == "UndeadUnit") coat = new ModelBeast.Coat().Map("", Resources.Load<Texture2D>("CreatureSkins/UndeadUnit/UndeadUnit_Map"));
+                else if (kind == "FantasySkeleton") coat = new ModelBeast.Coat().Map("", Resources.Load<Texture2D>("CreatureSkins/FantasySkeleton/FantasySkeleton_Albedo"));   // its own bone, stained no further: the map is already weathered   // it falls into a heap of bones as they do (Crumbles; Chris: "undead can just collapse into a pile of bones on death")
                 else if (pal != null) coat = new ModelBeast.Coat().Skin(pal, null, new Color(.84f, .86f, .76f));
                 height = elite ? 1.95f : 1.82f; walk = 1.2f; run = 3.6f; LieDepth = 0;
             }

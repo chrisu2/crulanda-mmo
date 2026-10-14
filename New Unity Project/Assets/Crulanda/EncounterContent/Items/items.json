@@ -51,6 +51,18 @@
       "canonStatus": "GAME-ONLY"
     },
     {
+      "id": "item.scoundrels_dirk",
+      "name": "Tollroad Dirk",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 2,
+      "level": 1,
+      "value": 4,
+      "weaponDamage": 7,
+      "description": "A slim knife with a worn grip, quick to hand and quicker to hide. The Scoundrel's first; the other hand is for gesturing.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
       "id": "item.training_blade",
       "name": "Tempered Trailblade",
       "kind": "gear",

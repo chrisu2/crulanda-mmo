@@ -754,6 +754,7 @@ namespace Crulanda.Encounter
             if (rng.Next(3) == 0) { var day = StockLine(v); if (day != null) return day; }
             var purse = PurseLine(v); if (purse != null && rng.Next(3) == 0) return purse;
             if (v.Role == "innkeeper" && Session.Progress != null && !Session.Progress.recruited && rng.Next(3) == 0) return InnkeeperOnMira;
+            if (v.Role == "innkeeper" && Charm.Has(Session.Progress) && rng.Next(2) == 0) { var rumour = Rumour(); if (rumour != null) return rumour; }   // the Scoundrel's charm (Charm.cs)
             if (!v.Keeper && TradeLines.TryGetValue(v.Role, out var trade) && rng.Next(3) > 0) return trade[rng.Next(trade.Length)];
             if (v.Role == "henwife" && v.Coop != null)
             {
@@ -767,6 +768,21 @@ namespace Crulanda.Encounter
             var pool = mood == "afraid" ? (EnemiesCleared ? Relieved : Afraid) : EnemiesCleared ? Relieved : Wary;
             if (pool == Wary && Zone.Zone.id == "zone.oakhaven") pool = Session.Quests != null && Session.Quests.IsDone(HollowQuest) ? WaryAfterHollow : WaryRaided;
             return pool[rng.Next(pool.Length)];
+        }
+        /// <summary>The Scoundrel's charm at the inn (Docs/CLASS_SCOUNDREL.md; GAME-ONLY): the innkeeper lets slip a rumour, work that someone
+        /// here has going (a quest you could take now) or an elite seen about (one of this zone's camps); null when there is nothing to tell.</summary>
+        string Rumour()
+        {
+            string zoneId = Zone.Zone.id; var work = new List<QuestDef>();
+            if (Session.Quests != null)
+                foreach (var q in Session.Quests.Db.Ordered)
+                    if (q != null && q.kind != "bounty" && q.kind != "main" && !string.IsNullOrEmpty(q.giver) && q.giver != "auto" && q.giver != "board" &&
+                        q.level <= Session.Progress.Level + 2 && Session.Quests.Status(q, zoneId) == QuestStatus.Available) work.Add(q);
+            if (work.Count > 0 && rng.Next(2) == 0) { var q = work[rng.Next(work.Count)]; return "Between you and me, " + q.giver + " has work going. \"" + q.title + "\", they're calling it."; }
+            var elites = new List<ZoneCamp>();
+            foreach (var c in Zone.Zone.camps) if (c != null && c.elite && !string.IsNullOrEmpty(c.mob)) elites.Add(c);
+            if (elites.Count > 0) { var c = elites[rng.Next(elites.Count)]; return "Word at the bar: " + c.mob + " has been seen about" + (string.IsNullOrEmpty(c.name) || c.name == c.mob ? "" : ", out by " + c.name) + ". Take friends."; }
+            return work.Count > 0 ? "Between you and me, " + work[0].giver + " has work going." : null;
         }
         /// <summary>The innkeeper, and the village, on meat the player sold today (a sale of anything whose trade is "inn.meat").</summary>
         const string MeatSoldInnkeeper = "Somebody's been selling meat in the village. It's all in the pot; the stew's not thin tonight.";

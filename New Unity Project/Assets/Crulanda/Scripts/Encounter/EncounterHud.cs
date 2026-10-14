@@ -183,7 +183,7 @@ namespace Crulanda.Encounter
             Shadow(new Rect(96, 24, 240, 20), "You · " + cls.displayName, frameName, Color.white);
             if (!string.IsNullOrEmpty(session.Progress.title)) Shadow(new Rect(96, 4, 300, 18), "\u201C" + session.Progress.title + "\u201D", tiny, gold);   // the title worn (Achievements)
             UnitBar(new Rect(96, 45, 244, 18), p.Health.Pool.Ratio, HealthGreen, p.Health.Pool.Current + " / " + p.Health.Pool.Max);
-            UnitBar(new Rect(96, 66, 244, 13), p.Resource.Pool.Ratio, ResourceColor(cls.resource), p.Resource.Pool.Current + " " + ResourceShort(cls.resource));
+            UnitBar(new Rect(96, 66, 244, 13), p.Resource.Pool.Ratio, ResourceColor(cls.resource), p.Resource.Pool.Current + " " + ResourceShort(cls));
             var status = session.Kit.StatusLine;
             if (!string.IsNullOrEmpty(status)) Shadow(new Rect(96, 84, 300, 20), status, tiny, new Color(1, .92f, .75f));
         }
@@ -454,7 +454,7 @@ namespace Crulanda.Encounter
                 if (GUI.Button(r, GUIContent.none, GUIStyle.none)) { if (placing) { session.PlaceOnBar(b, session.BookPick); session.BookPick = null; } else if (session.SpellbookOpen) session.BookPick = session.Kit.BookKey(i); else if (usable) session.UseAbility(i); }
                 if (r.Contains(mouse))
                     hover = a.name + (locked != null ? "  (" + locked + ")" : "") + "\n" + a.description +
-                        (a.cost > 0 ? "\nCost: " + a.cost + " " + ResourceName(session.ClassDef.resource) : "") + (a.cooldown > 0 ? "   Cooldown: " + a.cooldown + "s" : "");
+                        (a.cost > 0 ? "\nCost: " + a.cost + " " + ResourceName(session.ClassDef) : "") + (a.cooldown > 0 ? "   Cooldown: " + a.cooldown + "s" : "");
             }
             // The stance bar (the Druid's forms, Shift+1-4), small, above the left end of the chosen bar.
             var stances = session.Kit.StanceSlots;
@@ -577,6 +577,7 @@ namespace Crulanda.Encounter
                 case "class.saltmender": return new Color(.92f, .92f, .86f);
                 case "class.cleric": return new Color(1f, .95f, .72f);
                 case "class.shaman": return new Color(.4f, .6f, 1f);
+                case "class.scoundrel": return new Color(.86f, .36f, .44f);   // claret and rose (2026-10-14)
                 default: return new Color(.78f, .61f, .43f);
             }
         }
@@ -604,6 +605,9 @@ namespace Crulanda.Encounter
         }
         public static string ResourceName(Crulanda.Core.ResourceKind kind) { return kind == Crulanda.Core.ResourceKind.Breath ? "Shift Breath" : kind.ToString(); }
         static string ResourceShort(Crulanda.Core.ResourceKind kind) { return kind == Crulanda.Core.ResourceKind.Breath ? "Breath" : kind.ToString(); }
+        /// <summary>The class's own name for its pool when it has one (the Scoundrel's Nerve), else the kind's.</summary>
+        public static string ResourceName(ClassDefinition cls) { return cls != null && !string.IsNullOrEmpty(cls.resourceName) ? cls.resourceName : ResourceName(cls != null ? cls.resource : Crulanda.Core.ResourceKind.None); }
+        static string ResourceShort(ClassDefinition cls) { return cls != null && !string.IsNullOrEmpty(cls.resourceName) ? cls.resourceName : ResourceShort(cls != null ? cls.resource : Crulanda.Core.ResourceKind.None); }
         public static string Pips(int value, int max) { return new string('●', Mathf.Clamp(value, 0, max)) + new string('○', Mathf.Max(0, max - value)); }
         // Panel geometry follows the branch count: 3 trees fit the original panel; 4 (Druid) use the full width.
         float PanelX, PanelW, TreeLeft, TreeWidth, CellWidth, TileWidth, TileHeight = 96, TierHeight = 128;

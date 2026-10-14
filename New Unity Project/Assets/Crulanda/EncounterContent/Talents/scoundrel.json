@@ -1,0 +1,412 @@
+{
+ "id": "scoundrel",
+ "name": "Scoundrel",
+ "resource": "Nerve",
+ "resourceDesc": "Nerve, a pool of a hundred, built by blade strikes (Quick Cut, and every swing of the dirk) and spent on verses and finishers; it comes back between fights.",
+ "identity": "A blade and a voice: a street scoundrel who fights with a dirk and a song, and talks his way through the rest. CANON-EXPANDED: Valen, the canon's own street-level scoundrel (world_bible.md), sang a jagged verse when his hands were gone (book 3 ch. 4); the Glass Coast's Glimmer, the sound of trade, laughter and the scoundrel's wit (book 3 ch. 11); Matriarch Vala's Command Voice, \"Stay.\" (book 1 ch. 23). No bard order exists in the canon. Singing, no instrument. No machines.",
+ "canonStatus": "CANON-EXPANDED",
+ "branches": [
+  {
+   "id": "cutthroat",
+   "name": "Cutthroat",
+   "role": "dps",
+   "loop": "Quick Cut for Nerve, keep Poisoned Wine in the wound, Mark the Debt, and Settle the Score when your Nerve runs high.",
+   "tradeoff": "Everything lands on one foe: a pack is cut down one throat at a time.",
+   "nodes": [
+    {
+     "id": "ct-settle",
+     "name": "Settle the Score",
+     "tier": 0,
+     "col": 0,
+     "max": 1,
+     "req": null,
+     "kind": "active",
+     "icon": "dagger",
+     "desc": "Learn Settle the Score: a finisher that spends all your Nerve on one hard cut.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "ct-keen-dirk",
+     "name": "Keen Dirk",
+     "tier": 0,
+     "col": 1,
+     "max": 5,
+     "req": null,
+     "kind": "passive",
+     "icon": "target",
+     "desc": "Quick Cut and Settle the Score deal 4% more per rank.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "ct-steady-nerve",
+     "name": "Steady Nerve",
+     "tier": 0,
+     "col": 2,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "bolt",
+     "desc": "Quick Cut builds 2 more Nerve per rank.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "ct-poisoned-wine",
+     "name": "Poisoned Wine",
+     "tier": 1,
+     "col": 0,
+     "max": 1,
+     "req": null,
+     "kind": "active",
+     "icon": "flask",
+     "desc": "Learn Poisoned Wine: the target takes damage every 2 seconds for 10 seconds.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "ct-strong-vintage",
+     "name": "Strong Vintage",
+     "tier": 1,
+     "col": 1,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "drop",
+     "desc": "Poisoned Wine deals 10% more per rank.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "ct-mark-debt",
+     "name": "Mark the Debt",
+     "tier": 2,
+     "col": 0,
+     "max": 1,
+     "req": null,
+     "kind": "active",
+     "icon": "coin",
+     "desc": "Learn Mark the Debt: a fifth of your blows on the marked foe comes due as one hard blow.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "ct-compounding",
+     "name": "Compounding",
+     "tier": 2,
+     "col": 1,
+     "max": 2,
+     "req": null,
+     "kind": "modifier",
+     "icon": "clock",
+     "desc": "The debt owes 5% more of your blows per rank.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "ct-paid-in-full",
+     "name": "Paid in Full",
+     "tier": 3,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "signature",
+     "icon": "star",
+     "desc": "A debt that comes due on a foe under 35% health lands double.",
+     "emphasis": {
+      "dps": 2
+     },
+     "impl": true
+    }
+   ]
+  },
+  {
+   "id": "silver-tongue",
+   "name": "Silver Tongue",
+   "role": "control",
+   "loop": "Glimmer the pack before the fight, Jagged Verse the caster, and Stay the one that breaks loose.",
+   "tradeoff": "A dazed foe wakes at the first blow: the party must leave it be.",
+   "nodes": [
+    {
+     "id": "st-glimmer",
+     "name": "Glimmer",
+     "tier": 0,
+     "col": 0,
+     "max": 1,
+     "req": null,
+     "kind": "active",
+     "icon": "note",
+     "desc": "Learn Glimmer: the target and up to three foes near it stand dazed for 8 seconds.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "st-long-glimmer",
+     "name": "Long Glimmer",
+     "tier": 0,
+     "col": 1,
+     "max": 5,
+     "req": null,
+     "kind": "passive",
+     "icon": "clock",
+     "desc": "Glimmer holds 1 second longer per rank.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "st-silver-voice",
+     "name": "Silver Voice",
+     "tier": 0,
+     "col": 2,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "ring",
+     "desc": "Glimmer and Jagged Verse cost 3 less Nerve per rank.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "st-jagged-verse",
+     "name": "Jagged Verse",
+     "tier": 1,
+     "col": 0,
+     "max": 1,
+     "req": null,
+     "kind": "active",
+     "icon": "bolt",
+     "desc": "Learn Jagged Verse: it stops a spell, silences for 3 seconds and slows the foes near.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "st-sour-note",
+     "name": "Sour Note",
+     "tier": 1,
+     "col": 1,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "wind",
+     "desc": "Jagged Verse slows 5% more, and comes back 1 second sooner, per rank.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "st-stay",
+     "name": "Stay",
+     "tier": 2,
+     "col": 0,
+     "max": 1,
+     "req": null,
+     "kind": "active",
+     "icon": "hand",
+     "desc": "Learn Stay: one word holds the target for 4 seconds, and blows do not break it.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "st-held-word",
+     "name": "Held Word",
+     "tier": 2,
+     "col": 1,
+     "max": 2,
+     "req": null,
+     "kind": "modifier",
+     "icon": "chain",
+     "desc": "Stay holds half a second longer per rank.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "st-whole-room",
+     "name": "The Whole Room",
+     "tier": 3,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "signature",
+     "icon": "star",
+     "desc": "Glimmer takes a fifth foe, and reaches 2 metres further.",
+     "emphasis": {
+      "control": 2
+     },
+     "impl": true
+    }
+   ]
+  },
+  {
+   "id": "fixer",
+   "name": "Fixer",
+   "role": "support",
+   "loop": "Sing the War-Verse all fight, Rally when the pools run low, Bribe the extra hand, and call in a Favour when it counts.",
+   "tradeoff": "Little damage of your own: your worth is in everyone else's.",
+   "nodes": [
+    {
+     "id": "fx-war-verse",
+     "name": "War-Verse",
+     "tier": 0,
+     "col": 0,
+     "max": 1,
+     "req": null,
+     "kind": "active",
+     "icon": "banner",
+     "desc": "Learn the War-Verse: while you sing it, the party's blows land 6% harder.",
+     "emphasis": {
+      "support": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "fx-rousing",
+     "name": "Rousing Verse",
+     "tier": 0,
+     "col": 1,
+     "max": 5,
+     "req": null,
+     "kind": "passive",
+     "icon": "note",
+     "desc": "The War-Verse lifts the party's blows 1% more per rank.",
+     "emphasis": {
+      "support": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "fx-good-company",
+     "name": "Good Company",
+     "tier": 0,
+     "col": 2,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "shield",
+     "desc": "While you sing the War-Verse, the party within 15 metres takes 2% less per rank.",
+     "emphasis": {
+      "support": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "fx-rallying-verse",
+     "name": "Rallying Verse",
+     "tier": 1,
+     "col": 0,
+     "max": 1,
+     "req": null,
+     "kind": "active",
+     "icon": "heart",
+     "desc": "Learn the Rallying Verse: for 10 seconds you gain 3 Nerve a second, and Mira 3 mana.",
+     "emphasis": {
+      "support": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "fx-bribe",
+     "name": "Bribe",
+     "tier": 1,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "active",
+     "icon": "coin",
+     "desc": "Learn Bribe: a foe that can be bought stops fighting for 15 seconds.",
+     "emphasis": {
+      "support": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "fx-deep-pockets",
+     "name": "Deep Pockets",
+     "tier": 1,
+     "col": 2,
+     "max": 2,
+     "req": null,
+     "kind": "modifier",
+     "icon": "hand",
+     "desc": "A Bribe holds 5 seconds longer per rank.",
+     "emphasis": {
+      "support": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "fx-favour",
+     "name": "Call in a Favour",
+     "tier": 2,
+     "col": 0,
+     "max": 1,
+     "req": null,
+     "kind": "active",
+     "icon": "link",
+     "desc": "Learn Call in a Favour: the ally with the longest wait has it cut by 10 seconds.",
+     "emphasis": {
+      "support": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "fx-old-friends",
+     "name": "Old Friends",
+     "tier": 2,
+     "col": 1,
+     "max": 2,
+     "req": null,
+     "kind": "modifier",
+     "icon": "clock",
+     "desc": "Call in a Favour cuts 3 seconds more per rank.",
+     "emphasis": {
+      "support": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "fx-everyones-friend",
+     "name": "Everyone's Friend",
+     "tier": 3,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "signature",
+     "icon": "star",
+     "desc": "While you sing the War-Verse, Mira casts 10% faster.",
+     "emphasis": {
+      "support": 2
+     },
+     "impl": true
+    }
+   ]
+  }
+ ]
+}

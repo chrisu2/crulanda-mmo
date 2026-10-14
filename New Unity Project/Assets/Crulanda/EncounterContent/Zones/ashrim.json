@@ -2017,6 +2017,7 @@
       "canonStatus": "CANON-EXPANDED (the Bureau and the Seekers post their wanted bills; the village its bounties)"
     }
   ],
+  "woods": { "cover": 0.35, "from": 60, "ramp": 50, "spacing": 10, "edge": 12, "scale": 80, "deepAbove": 1, "oaks": 0, "snags": 1, "pineAbove": 1, "floor": 0.4 },
   "groves": [
     {
       "name": "Ashen snags",

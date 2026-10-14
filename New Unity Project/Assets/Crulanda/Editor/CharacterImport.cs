@@ -17,7 +17,7 @@ namespace Crulanda.EditorTools
     {
         const string Root = "Assets/Crulanda/Resources/Characters/";
         /// <summary>Bumped when the import settings change, so Unity imports the models and clips again.</summary>
-        public override uint GetVersion() { return 9; }
+        public override uint GetVersion() { return 10; }
         void OnPreprocessModel()
         {
             if (!assetPath.StartsWith(Root)) return;
@@ -46,6 +46,9 @@ namespace Crulanda.EditorTools
             if (path.StartsWith(ki + "Male/")) return ki + "Models/HumanM_Model.fbx";
             if (path.StartsWith(ki + "Female/")) return ki + "Models/HumanF_Model.fbx";
             if (path.StartsWith(unity) && !path.EndsWith("/Armature.fbx")) return unity + "Armature.fbx";
+            // Morro Motion's idles on Morro's own man (note 112b, 2026-10-14: Chris downloaded the pack again): each made from its own
+            // file, a clip's avatar was its first frame's skeleton, and the idles stood with a foot turned out.
+            if (path.StartsWith(Root + "Animations/Morro/") && !path.Contains("/Model/")) return Root + "Animations/Morro/Model/MorroMan_Idle_MoCap.fbx";
             return null;
         }
         /// <summary>The library's clips: the "_Loop" ones loop, and every one keeps its root where it was made (turn, height and
@@ -63,7 +66,10 @@ namespace Crulanda.EditorTools
             // jump's middle and the fall); the turns, the jump's start and landing and the idles' crossings play once.
             string file = Path.GetFileNameWithoutExtension(assetPath); bool ki = assetPath.Contains("/Animations/KI/");
             bool kiLoop = ki && (file.Contains("@Walk01") || file.Contains("@Run01") || file.Contains("@Sprint01") || file.Contains("@Talk01") || file.Contains("@Fall01")
-                || file.EndsWith("@Idle01") || file.EndsWith("@Idle02") || file.EndsWith("@Jump01"));
+                || file.EndsWith("@Idle01") || file.EndsWith("@Idle02") || file.EndsWith("@Jump01")
+                // his melee, spellcasting, throwing and crafting sets (2026-10-14, Chris: "we need more spell animations and melee
+                // animations"): the combat stances, the cast held, the work's loops, the gathering and the pick's strokes loop
+                || file.Contains("@CombatIdle") || file.Contains("@CastingIdle") || file.EndsWith(" - Loop") || file.Contains("@Gathering") || file.Contains("@MiningOneHand"));
             // Unity's Starter Assets third-person clips (Animations/Unity, 2026-10-10; the forward walk and run since Kevin's go on their
             // toes): the walk, run, idle and in-air loop; they face the other way from ours, as Kevin's do (without the turn everyone ran
             // backwards: Chris, "still running backwards").

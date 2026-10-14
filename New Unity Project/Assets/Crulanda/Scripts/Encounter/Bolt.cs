@@ -18,6 +18,7 @@ namespace Crulanda.Encounter
         public static Bolt Fire(Vector3 from, Transform target, Color colour, float size = .18f, float seconds = .28f, bool arrow = false)
         {
             if (target == null) return null;
+            if (!arrow) SpellFx.Bolted();
             var go = new GameObject(arrow ? "Arrow" : "Bolt");
             var b = go.AddComponent<Bolt>();
             b.target = target; b.from = from; b.lastTo = Aim(target); b.t0 = Time.time; b.seconds = Mathf.Max(.08f, seconds); b.size = size; b.colour = colour; b.arrow = arrow;
@@ -62,6 +63,9 @@ namespace Crulanda.Encounter
         /// <summary>A few embers thrown out from the point of impact, fading over a third of a second.</summary>
         public static void Burst(Vector3 at, Color colour, float size)
         {
+            // The magic pack's hit for the bolt's colour (SpellFx, 2026-10-14); the old embers where it is missing.
+            var hit = SpellFx.HitForColour(colour);
+            if (SpellFx.Has(hit)) { SpellFx.Play(hit, at, Quaternion.identity, Mathf.Clamp(size * 4, .45f, 1.1f)); return; }
             var root = new GameObject("Burst"); root.transform.position = at;
             var burst = root.AddComponent<BoltBurst>(); burst.colour = colour;
             int n = Mathf.Clamp(Mathf.RoundToInt(size * 40), 5, 12);
@@ -86,6 +90,7 @@ namespace Crulanda.Encounter
         public static void Show(Transform target)
         {
             if (target == null) return;
+            if (SpellFx.Has("Fx/Magic/Prefabs/Character auras/Healing")) { if (!SpellFx.Resolving) SpellFx.Mend(target); return; }   // the magic pack's healing glow (SpellFx)
             var root = new GameObject("Heal"); root.transform.position = target.position + Vector3.up * .9f;
             var burst = root.AddComponent<BoltBurst>(); burst.colour = Green; burst.rising = true;
             for (int i = 0; i < 9; i++)

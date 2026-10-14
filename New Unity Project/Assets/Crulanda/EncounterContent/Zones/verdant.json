@@ -2174,6 +2174,7 @@
       "canonStatus": "CANON-EXPANDED (the Bureau and the Seekers post their wanted bills; the village its bounties)"
     }
   ],
+  "woods": { "cover": 0.65, "from": 70, "ramp": 50, "spacing": 9, "edge": 12, "scale": 90, "deepAbove": 0.6, "deepOaks": 0.45, "oaks": 0.08, "oakScale": 0.9, "snags": 0.02, "pineAbove": 0.8, "floor": 1.2 },
   "groves": [
     {
       "name": "The Emerald Cathedral",

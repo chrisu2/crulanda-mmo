@@ -38,6 +38,8 @@ namespace Crulanda.World
         public string[] objectives = new string[0];
         public ZoneExit[] exits = new ZoneExit[0];
         public ZoneGrove[] groves = new ZoneGrove[0];
+        /// <summary>The wild woods round the village (ZoneBuilder.Woods.cs); cover 0 (the default): none.</summary>
+        public ZoneWoods woods = new ZoneWoods();
         public string waterTint;   // optional hex, e.g. dark Gloom Creek
         public float waterReflect; // optional sky reflection face-on 0..1 (0 = the water material's own); murky water ~.3
         /// <summary>
@@ -175,6 +177,20 @@ namespace Crulanda.World
     /// <summary>One kind of weather a zone can have and how often (a weight, relative to the zone's other kinds).</summary>
     [Serializable] public sealed class ZoneWeather { public string kind; public float weight = 1; }
     /// <summary>An area filled with trees. kind: dead (grey, leafless, darkened ground), pine, broadleaf.</summary>
+    /// <summary>
+    /// The wild woods (Chris, 2026-10-14, "Filling the zones in the Elwynn style"; ZoneBuilder.Woods.cs). cover: the share of the open
+    /// wild that is wood (0: none). from: no woods nearer the middle than this; ramp: over the next ramp metres they thin in. spacing:
+    /// one tree a cell this wide. edge: kept back from the zone's edge (its own forest ring stands there). scale: the noise's feature
+    /// size in metres (glades and stands). deepAbove: the old forest (always wood, its great oaks a deepOaks share of its trees)
+    /// where a slow noise is above this (1: none); oaks: the great oaks' share elsewhere (0: none); snags: dead snags' share; pineAbove:
+    /// pine stands (never in the old forest) where a third noise is above this (0: all pine). oakScale: the great oaks' size (.5 about
+    /// 14 m; 1 a giant of the Verdant Shore). floor: the forest floor's density. seed: varies them.
+    /// </summary>
+    [Serializable] public sealed class ZoneWoods
+    {
+        public float cover, from = 80, ramp = 60, spacing = 8, edge = 12, scale = 90, deepAbove = 1, deepOaks = .55f, oaks, oakScale = .5f, snags = .04f, pineAbove = .62f, floor = 1;
+        public int seed;
+    }
     [Serializable] public sealed class ZoneGrove { public string name, kind = "dead"; public Vector2 center, size; public int count = 30; }
     [Serializable] public sealed class ZoneLighting
     {

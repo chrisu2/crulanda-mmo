@@ -81,7 +81,7 @@ namespace Crulanda.World
             props = new GameObject("Zone props").transform; props.SetParent(transform, false);
             statics = new GameObject("Zone static scenery").transform; statics.SetParent(transform, false);
             PrepareRelief(); PrepareShapes(); Water = new ZoneWater(); Water.Prepare(Zone, (x, z) => HeightAt(x, z, false)); PrepareHollows(); Lap("prepare");
-            BuildLighting(); BuildGround(); Lap("ground"); BuildWater(); BuildWasting(); Lap("water"); BuildProps(); BuildHomeDoors(); Lap("props"); BuildGroves(); BuildExits(); Lap("groves");
+            BuildLighting(); BuildGround(); Lap("ground"); BuildWater(); BuildWasting(); Lap("water"); BuildProps(); BuildHomeDoors(); Lap("props"); BuildGroves(); BuildExits(); BuildWoods(); Lap("groves");
             BuildForestEdge(); BuildMeadow(); BuildCrops(); BuildBoundaries(); Lap("edge"); BuildBackdrop(); DistantRanges.Build(transform, Zone, Half + BackdropWidth); Lap("backdrop");
             if (art.grass != null && art.grass.Length > 0)
             {
@@ -106,7 +106,7 @@ namespace Crulanda.World
             Splashes.Ensure(this); TreeFade.Begin(art.fade);
             var view = Camera.main;
             if (view != null && art.post != null && view.GetComponent<ZonePost>() == null) view.gameObject.AddComponent<ZonePost>().Init(art.post, Zone, sunLight);
-            int before = MergeStatics();
+            int before = MergeStatics(); CullWoodsFloor();
             try { StaticBatchingUtility.Combine(statics.gameObject); } catch (Exception e) { Debug.LogWarning("Static batching skipped: " + e.Message); }
             Debug.Log("Static scenery merged: " + before + " renderers into " + statics.GetComponentsInChildren<MeshRenderer>().Length + ".");
             Lap("batching");
@@ -3659,6 +3659,7 @@ namespace Crulanda.World
             float open = 1;
             foreach (var g in Zone.groves)
                 if (Mathf.Abs(p.x - g.center.x) < g.size.x / 2 && Mathf.Abs(p.y - g.center.y) < g.size.y / 2) open = g.kind == "dead" ? .15f : .45f;
+            if (InWoods(p)) open = Mathf.Min(open, .55f);   // under the wild woods' canopy (ZoneBuilder.Woods.cs)
             foreach (var (at, r) in grassBuildings) if ((p - at).sqrMagnitude < r * r) return 0;
             if (p.magnitude < Zone.flatRadius * .45f) open *= .35f;
             if (Zone.biome == "ash") return 0;                       // nothing grows in the ash

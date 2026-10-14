@@ -525,14 +525,15 @@ namespace Crulanda.Encounter
         struct PoseState { public string slot; public bool arms, hoe; public Vector3 armL, armR; public float elbowL, elbowR, lean, drop, bend, shift, twist, weight; }
         PoseState PoseOf(ActorPose pose, float speed, float t)
         {
-            var p = new PoseState();
+            var p = new PoseState(); ploughing = false;
             switch (pose)
             {
                 case ActorPose.Sit: p.slot = "sit"; p.shift = SitShift; break;
                 case ActorPose.Swim: p.slot = "swim"; break;   // still or moving: the stroke (slowed when still); the tread clip read as no pose at all
                 case ActorPose.Sneak: p.slot = speed > .3f ? "sneak" : "crouch"; break;
                 case ActorPose.Talk: p.slot = "talk"; break;
-                case ActorPose.Gather: p.slot = "gather"; break;
+                case ActorPose.Gather: p.slot = model.Has("k.gather1") ? GatherSlot : "gather"; break;   // Kevin's gathering, one of three by the figure (2026-10-14)
+                case ActorPose.Mine: p.slot = model.Has("k.mine") ? "k.mine" : "gather"; break;          // Kevin's pick at a seam
                 case ActorPose.Cower: p.slot = "crouch"; p.arms = true; p.armL = new Vector3(-150, 0, 25); p.armR = new Vector3(-150, 0, -25); p.elbowL = p.elbowR = -70; break;
                 case ActorPose.Hammer:   // steady strikes with the right hand; the left holds the work
                 {
@@ -541,6 +542,7 @@ namespace Crulanda.Encounter
                 }
                 case ActorPose.Chop:     // a big overhead swing, then a pause to set the next log
                 {
+                    if (model.Has("k.chop")) { p.slot = "k.chop"; break; }   // Kevin's pick driven down at the block (2026-10-14)
                     float k = Mathf.Repeat(t * .8f, 1), axe = k < .55f ? Mathf.SmoothStep(0, 1, k / .55f) * 160 : Mathf.Max(0, 160 - (k - .55f) * 900);
                     p.arms = true; p.armL = new Vector3(-axe, 0, 6); p.armR = new Vector3(-axe, 0, -6); p.elbowL = p.elbowR = -10; p.lean = axe < 40 ? 14 : 0; break;
                 }
@@ -549,6 +551,9 @@ namespace Crulanda.Encounter
                     p.elbowL = p.elbowR = -35; p.lean = 10; break;
                 case ActorPose.Work:     // hoeing (or hauling a bucket): a lift and a stroke down, leaning into it (playtest note 76: it read as standing still)
                 {
+                    // Kevin's ploughing stroke with the hoe (2026-10-14, Chris: "ploughing would be good one to use on the hoe"): the clip
+                    // works the body and the shaft is laid through both hands (PloughHands); the hand-set stroke where the clip is missing.
+                    if (HoeReady && speed < 1.1f && model.Has("k.plough")) { p.slot = "k.plough"; p.hoe = true; ploughing = true; break; }
                     if (HoeReady && speed < 1.1f) { p.bend = HoeBend(); p.hoe = true; break; }   // a long tool: the two-handed stroke (HoeStance, FieldArms; note 150)
                     float k = Mathf.Repeat(t * .9f, 1), lift = k < .55f ? Mathf.SmoothStep(0, 1, k / .55f) : 1 - Mathf.SmoothStep(0, 1, (k - .55f) / .2f);
                     float chop = 25 + lift * 85;
@@ -729,7 +734,7 @@ namespace Crulanda.Encounter
             }
             if (staffHold > 0 && fresh && !dead) StaffArm(staffHold);
             // A hoer's shoulders squared to the stroke before the back bends, and turned once it is (HoeStance).
-            bool hoer = p.hoe && ToolAtWork && Pose == ActorPose.Work && !dead;
+            bool hoer = p.hoe && !ploughing && ToolAtWork && Pose == ActorPose.Work && !dead;
             HoeStance(hoer, fresh && !dead, false);
             // An elder's stoop and a sleeper's slump bend the back, not the legs.
             float bend = fresh ? stoop + p.bend : 0;

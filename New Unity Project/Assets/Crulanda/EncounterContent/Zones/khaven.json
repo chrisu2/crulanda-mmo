@@ -829,6 +829,7 @@
       "depth": 0.8
     }
   ],
+  "woods": { "cover": 0.6, "from": 70, "ramp": 50, "spacing": 8, "edge": 12, "scale": 80, "deepAbove": 1, "oaks": 0, "snags": 0.3, "pineAbove": 0.45, "floor": 0.8 },
   "groves": [
     {
       "name": "The Stillwood",

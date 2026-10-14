@@ -369,6 +369,7 @@ namespace Crulanda.Encounter
         {
             if (damage > 0) lastBlowAt = Time.time;
             if (!actor.IsAlive || Inside != null) return;   // inside its machine, nothing reaches it
+            SpellFx.Struck(transform);   // struck by an ability resolving: its effect shows here
             if (Hidden) Pounce();
             if (TappedBy == null && source != null && !Game) TappedBy = source.EntityId.Value;
             int actual = actor.GetComponent<Combatant>().Damage(Mathf.RoundToInt(damage * session.Kit.PartyDamageMultiplier(this) * OverTakenNow * session.DamageScaleFor(source)));

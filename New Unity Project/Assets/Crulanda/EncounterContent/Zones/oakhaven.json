@@ -3672,6 +3672,7 @@
       "rotation": 245.9
     }
   ],
+  "woods": { "cover": 0.65, "from": 85, "ramp": 60, "spacing": 8, "edge": 12, "scale": 90, "deepAbove": 0.64, "deepOaks": 0.55, "oaks": 0, "snags": 0.04, "pineAbove": 0.64, "floor": 1 },
   "groves": [
     {
       "name": "The Old Orchard",

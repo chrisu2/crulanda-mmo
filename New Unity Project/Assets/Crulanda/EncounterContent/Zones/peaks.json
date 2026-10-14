@@ -1853,6 +1853,7 @@
       "canonStatus": "CANON-EXPANDED (the Bureau and the Seekers post their wanted bills; the village its bounties)"
     }
   ],
+  "woods": { "cover": 0.45, "from": 60, "ramp": 50, "spacing": 8, "edge": 12, "scale": 70, "deepAbove": 1, "oaks": 0, "snags": 0.08, "pineAbove": 0, "floor": 0.6 },
   "groves": [
     {
       "name": "Wolf pines",

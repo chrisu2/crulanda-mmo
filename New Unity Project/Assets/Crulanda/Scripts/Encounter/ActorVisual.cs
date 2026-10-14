@@ -4,7 +4,7 @@ namespace Crulanda.Encounter
 {
     public enum ActorLook { Warrior, Druid, Healer, Collector, Warden, Sentry, Outrider, Pale, Villager, Hollow, Cultist, Wolf, Boar, WeaveEater, Deserter, BanditKing, Keeper, Stag, Spider, Bramble, Bear, Skeleton, Paladin, Ranger, Mage, RockEater, SaltMender }
     /// <summary>Body language layered over walking: working a hoe or bucket, talking, sitting, cowering.</summary>
-    public enum ActorPose { None, Work, Talk, Sit, Cower, Hammer, Chop, Gather, Knead, Swim, Sneak, Drink, Slump }
+    public enum ActorPose { None, Work, Talk, Sit, Cower, Hammer, Chop, Gather, Knead, Swim, Sneak, Drink, Slump, Mine }
 
     /// <summary>
     /// Placeholder humanoid built from primitives under the actor's "Body" (so death poses and form scaling still apply
@@ -992,7 +992,7 @@ namespace Crulanda.Encounter
         /// <summary>The trade's tool is at work this frame (the hoe's stroke, the hammer's blow, the axe's swing; walking wins over a
         /// work pose, so not while moving). Set by a modelled figure.</summary>
         public bool ToolAtWork { get; private set; }
-        bool WorkPose { get { return Pose == ActorPose.Work || Pose == ActorPose.Hammer || Pose == ActorPose.Chop; } }
+        bool WorkPose { get { return Pose == ActorPose.Work || Pose == ActorPose.Hammer || Pose == ActorPose.Chop || Pose == ActorPose.Mine; } }
         /// <summary>The middle of the right fist: past the wrist by a third of the forearm (a modelled figure), or the old arm's end.</summary>
         Vector3 Fist(out Vector3 along)
         {

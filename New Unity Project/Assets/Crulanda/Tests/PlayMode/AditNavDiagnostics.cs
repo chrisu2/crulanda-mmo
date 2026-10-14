@@ -70,6 +70,39 @@ namespace Crulanda.Tests
                 int on = 0; for (int k = 0; k < d.mid.Length; k++) if (OnMesh(d.mid[k] + Vector3.up * .2f, 1f)) on++;
                 sb.AppendLine((d.def != null ? d.def.name : "?") + " | " + (d.cave != null ? d.cave.Name : "-") + " | " + (d.root != null) + " | " + on + "/" + d.mid.Length + " | " + (d.def != null ? d.def.rise.ToString("0.0") : "?") + " | " + d.high.ToString("0.0"));
             }
+            // The links (the breaks are here: every floor and deck carries mesh, 16:57): from each deck's middle down to its cave's floor
+            // under its first and last plank, and from each joining cave's end to its target's floor at the join.
+            sb.AppendLine(); sb.AppendLine("deck | end | plank end y | floor there | path from the deck to the floor there");
+            foreach (var d in zone.DeckSpots)
+            {
+                if (d.mid == null || d.mid.Length == 0 || d.cave == null) continue;
+                var middle = d.mid[d.mid.Length / 2] + Vector3.up * .2f;
+                foreach (var (end, k) in new[] { ("first", 0), ("last", d.mid.Length - 1) })
+                {
+                    var e = d.mid[k]; float fy = 0; bool floor = Hollow.FloorUnder(new Vector2(e.x, e.z), ref fy);
+                    string link = "no floor";
+                    if (floor) { var path = new NavMeshPath(); bool ok = NavMesh.CalculatePath(middle, new Vector3(e.x, fy + .2f, e.z), NavMesh.AllAreas, path); link = ok && path.status == NavMeshPathStatus.PathComplete ? "complete" : ok ? path.status.ToString() : "none"; }
+                    sb.AppendLine((d.def != null ? d.def.name : "?") + " | " + end + " | " + e.y.ToString("0.0") + " | " + (floor ? fy.ToString("0.0") : "-") + " | " + link);
+                }
+            }
+            sb.AppendLine(); sb.AppendLine("join | from (the cave's end) | to (the target's floor there) | path");
+            foreach (var h in Hollow.All)
+            {
+                if (h.Join == null) continue;
+                var from = h.At(h.Length - 1.5f); var to = h.Join.At(h.JoinAlong); float ty = 0;
+                if (!h.Join.FloorAt(new Vector2(to.x, to.z), out ty)) { sb.AppendLine(h.Name + " | " + from + " | no floor in " + h.Join.Name + " at " + to + " | -"); continue; }
+                var path = new NavMeshPath(); bool ok = NavMesh.CalculatePath(from + Vector3.up * .2f, new Vector3(to.x, ty + .2f, to.z), NavMesh.AllAreas, path);
+                sb.AppendLine(h.Name + " | " + from.ToString("0.0") + " | " + new Vector3(to.x, ty, to.z).ToString("0.0") + " | " + (ok && path.status == NavMeshPathStatus.PathComplete ? "complete" : ok ? path.status.ToString() : "none") + (h.JoinRaised ? " (a lip " + h.JoinRise.ToString("0") + " m up)" : ""));
+            }
+            sb.AppendLine(); sb.AppendLine("mouth | the child's first row | the parent's floor there | path");
+            foreach (var h in Hollow.All)
+            {
+                if (h.Parent == null) continue;
+                var from = h.At(1.5f); var to = h.Parent.At(h.ParentAlong); float ty = 0;
+                if (!h.Parent.FloorAt(new Vector2(to.x, to.z), out ty)) { sb.AppendLine(h.Name + " | " + from + " | no floor | -"); continue; }
+                var path = new NavMeshPath(); bool ok = NavMesh.CalculatePath(from + Vector3.up * .2f, new Vector3(to.x, ty + .2f, to.z), NavMesh.AllAreas, path);
+                sb.AppendLine(h.Name + " | " + from.ToString("0.0") + " | " + new Vector3(to.x, ty, to.z).ToString("0.0") + " | " + (ok && path.status == NavMeshPathStatus.PathComplete ? "complete" : ok ? path.status.ToString() : "none") + (h.MouthRaised ? " (a mouth " + h.MouthRise.ToString("0") + " m up)" : ""));
+            }
             // The camps the nav test could not reach, and what is under each.
             sb.AppendLine(); sb.AppendLine("camp | centre | floor under | navmesh within 1.2 m | within 6 m (nearest y)");
             foreach (var c in zone.Zone.camps)

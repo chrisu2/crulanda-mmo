@@ -149,7 +149,7 @@ namespace Crulanda.Tests
         {
             var elites = Camps().Where(x => x.camp.elite).ToList();
             Assert.AreEqual(32, elites.Count, "Twelve camp elites in the five zones and twenty in the Sealed Adit since its rework (the rare Quiet Miner among them).");
-            Assert.AreEqual(21, EliteMoves.All.Length, "Twenty camp elites, and the Rock-Eater, which rides beside Nix in his camp (D5).");
+            Assert.AreEqual(33, EliteMoves.All.Length, "Twenty camp elites, the Rock-Eater, which rides beside Nix in his camp (D5), and the reworked Adit's twelve (2026-10-14).");
             var plain = EliteMoves.For("nobody at all", false);
             foreach (var (zone, camp, _) in elites)
             {
@@ -199,7 +199,7 @@ namespace Crulanda.Tests
                         answered = true;
                         // The paper fight (EliteBalanceTests) counts those who answer as normal mobs: no second elite within a call.
                         // A pair the zone makes on purpose, each the other's guard (the reworked Adit's Ysolt and Varrow: they pull together).
-                        bool pair = (guards[e] != null && guards[e].Contains(c)) || (guards[c] != null && guards[c].Contains(e));
+                        bool pair = (lord.guards ?? "").Split(',').Any(n => n.Trim() == kin.name) || (kin.guards ?? "").Split(',').Any(n => n.Trim() == lord.name);
                         Assert.IsFalse(kin.elite && !pair, lord.mob + "'s call reaches " + kin.mob + ", another elite. Shorten the call or count it in the balance table.");
                     }
                     if (!answered) unanswered.Add(lord.mob);

@@ -72,7 +72,7 @@ namespace Crulanda.Tests
             Assert.AreEqual(7, paths.Count, "Seven loot files: " + string.Join(", ", paths.Select(Path.GetFileName)));
             var items = LootTestData.Items(); var loot = LootTestData.Loot(items, LootTestData.Looks());
             var named = items.Items.Keys.Where(k => k.StartsWith("loot.", StringComparison.Ordinal)).ToList();
-            Assert.AreEqual(136, named.Count, "104 named items (ITEMS_V1.md), the five legendaries (2026-10-05) and the Sentinel's Helm (2026-10-07), the Sealed Adit's seventeen (2026-10-08), its set of five and The Dead Line's three (web/adit-quests-loot), and the Quiet Miner's cap (D3).");
+            Assert.AreEqual(155, named.Count, "104 named items (ITEMS_V1.md), the reworked Adit's nineteen (2026-10-14), the five legendaries (2026-10-05) and the Sentinel's Helm (2026-10-07), the Sealed Adit's seventeen (2026-10-08), its set of five and The Dead Line's three (web/adit-quests-loot), and the Quiet Miner's cap (D3).");
             Assert.AreEqual(109 + 17 + 8 + 1 + 13, loot.Gear.Count,   // and the Sealed Adit's seventeen, its set of five and The Dead Line's three, and the Quiet Miner's cap
  "A gear entry for each, and for the thirteen named items already in the game (the Sentinel's Helm the thirteenth, 2026-10-07).");
             Assert.AreEqual(12, loot.GearOrder.Count(g => g.legacy));
@@ -168,7 +168,7 @@ namespace Crulanda.Tests
                 Assert.AreEqual(gen.value, d.value, d.id + ": value is generated gear's.");
                 Assert.AreEqual(gen.level, d.level, d.id + ": required level is the curve level less one.");
             }
-            Assert.AreEqual(136, n, "110 of the five zones and the world, 26 of the Sealed Adit");
+            Assert.AreEqual(155, n, "110 of the five zones and the world, 45 of the Sealed Adit");
         }
 
         [Test] public void Named_gear_stat_budgets_hold()

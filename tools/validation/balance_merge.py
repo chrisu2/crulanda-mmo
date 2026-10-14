@@ -11,7 +11,7 @@ SLACK = .03
 
 rows = {}   # (class, build, role) -> {scenario: [dps...], 'hps': [hps...]}
 tanks = {}  # (class, build) -> lists of the tank test's figures ("# tank" lines: taken, self-heal, net, threat a second; refills)
-files = sorted(glob.glob(os.path.join(folder, 'balance-*.csv')), key=os.path.getmtime)
+files = sorted((f for f in glob.glob(os.path.join(folder, 'balance-*.csv')) if not os.path.basename(f).startswith(('balance-summary', 'balance-runs', 'balance-all'))), key=os.path.getmtime)   # not the sheets this writes
 for f in files:
     if '_TABLE' in f: continue
     with open(f, encoding='utf-8') as h:
@@ -36,6 +36,35 @@ for (cls, build, role), d in rows.items():
     single = mean(d.get('single', [])); aoe = mean(d.get('aoe3', []))
     hps = max(mean(d.get('hps:heal', [])), mean(d.get('hps:single', [])))
     table.append(dict(cls=cls, build=build, role=role, single=single, aoe=aoe, hps=hps))
+# Two CSVs to sort in a spreadsheet (Chris, 2026-10-14: "give me a balance sheet for all that is sortable. csv?", "well it is not
+# sortable in a spreadsheet", "dps is mixed with single and aoe3. i need these seperate"): balance-summary.csv, one row a build with
+# single-target DPS, DPS against three and HPS in their own columns and every number plain (the target as its two ends, blanks for
+# none); balance-runs.csv, one row a build and seed with the same columns from that seed's runs.
+def _csvs():
+    import csv
+    name = {'dps': 'DPS', 'tank': 'Tank', 'support': 'Support', 'healer': 'Healer', 'control': 'CC', 'pet': 'DPS (pet)', 'utility': 'Support (utility)'}
+    target = {'dps': (62, 72), 'pet': (62, 72), 'control': (45, 52), 'support': (45, 52), 'utility': (45, 52), 'healer': (0, 35), 'tank': (42, 55)}
+    out_rows = [['class', 'build', 'role', 'dps_single', 'dps_vs_3', 'vs3_over_single', 'hps', 'target_min', 'target_max', 'in_range']]
+    for t in sorted(table, key=lambda t: (t['cls'], t['role'], t['build'])):
+        lo, hi = target.get(t['role'], (0, 0))
+        out_rows.append([t['cls'], t['build'], name.get(t['role'], t['role']), round(t['single'], 1), round(t['aoe'], 1), round(t['aoe'] / t['single'], 2) if t['single'] > 0 else '',
+                         round(t['hps'], 1) if t['hps'] > 0 else '', lo, hi, 1 if (lo <= t['single'] <= hi or (lo == 0 and t['single'] <= hi)) else 0])
+    with open(os.path.join(folder, 'balance-summary.csv'), 'w', encoding='utf-8', newline='') as h: csv.writer(h).writerows(out_rows)
+    runs = {}
+    for f in files:
+        if '_TABLE' in f: continue
+        with open(f, encoding='utf-8') as h:
+            for r in csv.reader(h):
+                if not r or r[0].startswith('#') or r[0] == 'class' or len(r) < 8: continue
+                try: dps, hps = float(r[6]), float(r[7])
+                except ValueError: continue
+                k = (r[0].replace('class.', ''), r[1], name.get(r[2], r[2]), r[4]); d = runs.setdefault(k, {})
+                d['dps_' + r[3]] = dps; d['hps_' + r[3]] = hps
+    run_rows = [['class', 'build', 'role', 'seed', 'dps_single', 'dps_vs_3', 'hps_heal', 'hps_single']]
+    for k in sorted(runs):
+        d = runs[k]; run_rows.append(list(k) + [d.get('dps_single', ''), d.get('dps_aoe3', ''), d.get('hps_heal', '') or '', d.get('hps_single', '') or ''])
+    with open(os.path.join(folder, 'balance-runs.csv'), 'w', encoding='utf-8', newline='') as h: csv.writer(h).writerows(run_rows)
+_csvs()
 dps_median = statistics.median([t['single'] for t in table if t['role'] == 'dps']) if any(t['role'] == 'dps' for t in table) else 0
 medians = {}
 for role in set(t['role'] for t in table):
@@ -88,10 +117,3 @@ lines += ['', 'In range: %d of %d builds.' % (counts.get(True, 0), len(table)),
           'Role medians (single DPS): ' + ', '.join('%s %.1f' % (NAME.get(r, r), m) for r, m in sorted(medians.items())) + '; DPS median %.1f.' % dps_median,
           'Files: ' + ', '.join(os.path.basename(f) for f in files if '_TABLE' not in f)]
 open(out, 'w', encoding='utf-8').write('\n'.join(lines) + '\n')
-# The same table as a CSV to sort (Chris, 2026-10-14: "give me a balance sheet for all that is sortable. csv?"): balance-summary.csv
-# beside the markdown, one row a build; the runs themselves (build, scenario, seed) are in the per-set CSVs.
-import csv
-rows = [[c.strip() for c in l.strip().strip('|').split('|')] for l in lines if l.startswith('| ')]
-rows = [r for r in rows if not set(''.join(r)) <= set('-: ')]
-with open(os.path.join(os.path.dirname(out), 'balance-summary.csv'), 'w', encoding='utf-8', newline='') as h: csv.writer(h).writerows(rows)
-print('\n'.join(lines))

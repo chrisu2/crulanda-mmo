@@ -7,8 +7,12 @@ testing new dungeons and builds as needed. all zones full of quests. more sims t
 `Docs/TONIGHT_2026-10-13.md` (Progress) and `Docs/CHANGELOG.md` (2026-10-13, 15:20 on). Nothing is VERIFIED until Chris has seen it.
 - **Branch:** `feet-bow-adit-kit`, PR #2. Do not merge without Chris. Last commits tonight: 3d89ef0 (quests, sims, orc, heals),
   e10a915 (the group-run leader's stall rule), 9deb508 (suite fixes), the "Immune" fix, c347252 (the carriage gunners), then the docs.
-- **Published:** the release build of the last commit at 20:34 (c347252 at 19:59 before it) to `D:\crulanda-work\outputs\Crulanda-Playable` (after Adit, zone and Rock-Eater
-  tests 14/14; 19:07 was the first evening publish). Chris's save backed up first: `D:\crulanda-work\save-backups\20261013-1905-before-evening-publish`.
+- **Published:** the release build of 9dfb8e4 at 23:27 to `D:/crulanda-work/outputs/Crulanda-Playable`: whole orcs and Chris's new
+  creatures (CHANGELOG, 2026-10-13 22:00 on). Save backed up first: `D:/crulanda-work/save-backups/20261013-2325-before-creatures-publish`.
+- **Orcs and creatures (TESTED, not seen by Chris):** every orc is a whole orc: the Orc Shaman for Shamans and Mages, the axe orc for
+  Warriors, Rangers and Rogues. Wild boars, the Toon RTS undead as the Bonecaller's thrall (it crumbles), the Living Birds in place of the
+  crows, squirrels in the groves. Frames: `D:/crulanda-work/ui-captures/creatures/brief-*.png`, `.../figures/orcs-*.png`, and
+  `.../training-shaman-20261013-2238` (the orc Shaman in play). Our gear does not show on a whole orc (it wears its own).
 - **Tests (TESTED):** EditMode 470/470. Full PlayMode suite 319/327 at 18:36; the 6 new failures fixed and rerun green (43/44, then the
   Adit nav test 4/4 with its rider rule). Still failing, known and parked: the hoe hand spread, the foot after a jump (Chris parked it).
 - **Balance (TESTED):** all 40 builds in their ranges (BALANCE_ALL.md in `D:\crulanda-work\outputs\balance`). Party heal of five:

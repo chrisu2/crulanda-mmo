@@ -1118,3 +1118,19 @@ distances standing in for the navmesh, gave quick 47 fights, standard 48, full 5
 **Left:** the releases, the Wake and its event step, the bosses' new moves and loot, the bar, the pen bar and the bookcase worked by hand,
 The Margins, the cave map. The order from the bridge's tower (the Foundry before the floor and the river) rests on the navmesh's lengths
 and the height rule: `A_sim_leads_the_whole_adit_wing_by_wing` checks it on the first Unity run.
+
+## 16. First Unity run (2026-10-14, chainR68; main merged in; lane A)
+**EditMode 488/495, the Adit PlayMode classes 19/30.** TESTED as failing; the rework stays on `adit-rework`, not live. What is red, in the
+order to fix:
+- **The cave web's geometry (Hollow.cs / ZoneBuilder.AditDecks):** the overlook loop opens over the Hub knoll; the Cutting Drift's lip
+  into the Geode Foundry is not joined on the navmesh; two solids carry walkable tops (one in the Sealed Adit near (11, -6, -303), one in
+  the Muster Yard); a solid's top under the Scriptorium is on the navmesh; Sandthrone pickets at about (61, -43, -3) stand 12 m up with no
+  way there; the way through is walked by 56 of 480 breadcrumbs (over 100 wanted); the yard-to-Adit walk breaks 189 m in; two Sandthrone
+  overseers spawn 1.2 m apart.
+- **The run:** from the bridge's tower the leader takes the Gallery before the Geode Foundry (the height rule against the navmesh's
+  lengths, section 15); a run does not pass Lusk's door after his death; the planner's modes test counts six steps for a boss and his
+  guard where it wants two.
+- **The new elites (build step S4, not written yet):** the twelve need their own moves and signature loot lists (Brack the Bailer, Old
+  Bristle, Overseer Grael Vosk, Urn-Keeper Sabel, Loremaster Ivo Senn and the rest); the guard count in the elite balance test (57, the
+  test wants 30); Cinder-Warden Ysolt's call reaches Sister Ashe Varrow.
+- Results: `D:\crulanda-work\encounter-validation\aditEdit1.xml` and `aditPlay1.xml`.

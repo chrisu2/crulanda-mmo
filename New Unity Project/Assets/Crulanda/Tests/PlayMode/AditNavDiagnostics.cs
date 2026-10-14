@@ -94,6 +94,42 @@ namespace Crulanda.Tests
                 var a = d.mid[0] + Vector3.up * .2f; var b = d.mid[d.mid.Length - 1] + Vector3.up * .2f;
                 sb.AppendLine((d.def != null ? d.def.name : "?") + " | " + Path(a, b) + " | " + OnMesh(a, 1f) + "/" + OnMesh(b, 1f));
             }
+            // Along each deck, every metre: where the mesh is missing over the planks, and what stands there (the colliders within a
+            // box 1 m wide and 2 m high over the plank: a wall, a pillar, a post, a crate).
+            sb.AppendLine(); sb.AppendLine("deck | samples off the mesh | first gap at | what stands there");
+            foreach (var d in zone.DeckSpots)
+            {
+                if (d.mid == null || d.mid.Length < 2) continue;
+                int off = 0; Vector3? first = null; string what = "";
+                for (int k = 0; k + 1 < d.mid.Length; k++)
+                {
+                    float seg = Vector3.Distance(d.mid[k], d.mid[k + 1]); int steps = Mathf.Max(1, Mathf.CeilToInt(seg));
+                    for (int s = 0; s < steps; s++)
+                    {
+                        var p = Vector3.Lerp(d.mid[k], d.mid[k + 1], s / (float)steps);
+                        if (OnMesh(p + Vector3.up * .2f, .6f)) continue;
+                        off++;
+                        if (first == null)
+                        {
+                            first = p;
+                            var hits = Physics.OverlapBox(p + Vector3.up * 1.1f, new Vector3(.5f, 1, .5f), Quaternion.identity, ~0, QueryTriggerInteraction.Ignore);
+                            what = string.Join("; ", hits.Where(h => h != null && (d.root == null || !h.transform.IsChildOf(d.root))).Select(h => h.transform.root.name + "/" + h.name).Distinct().Take(6));
+                        }
+                    }
+                }
+                if (off > 0) sb.AppendLine((d.def != null ? d.def.name : "?") + " | " + off + " | " + first.Value.ToString("0.0") + " | " + what);
+            }
+            // Deck ends of different caves within 8 m of each other (a landing that should meet a catwalk).
+            sb.AppendLine(); sb.AppendLine("across caves | between | gap (m) | heights");
+            var all = zone.DeckSpots.Where(d => d.mid != null && d.mid.Length >= 1).ToList();
+            for (int i = 0; i < all.Count; i++)
+                for (int j = i + 1; j < all.Count; j++)
+                {
+                    if (all[i].cave == all[j].cave) continue;
+                    foreach (var ea in new[] { all[i].mid[0], all[i].mid[all[i].mid.Length - 1] })
+                        foreach (var eb in new[] { all[j].mid[0], all[j].mid[all[j].mid.Length - 1] })
+                        { float gap = Vector3.Distance(ea, eb); if (gap <= 8) sb.AppendLine((all[i].def != null ? all[i].def.name : "?") + " <-> " + (all[j].def != null ? all[j].def.name : "?") + " | " + gap.ToString("0.00") + " | " + ea.y.ToString("0.0") + "/" + eb.y.ToString("0.0")); }
+                }
             sb.AppendLine(); sb.AppendLine("junction | between | gap (m) | heights | path");
             var spots = zone.DeckSpots.Where(d => d.mid != null && d.mid.Length >= 1).ToList();
             for (int i = 0; i < spots.Count; i++)

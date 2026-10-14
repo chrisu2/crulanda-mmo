@@ -318,9 +318,11 @@ def make_decks():
     # to the north rim (its top over the falling floor: 0 to 8 m). Railed.
     top = -3.0
     def rise_at(key, x, z, y): return round(y - CAVE[key].at_(along(key, x, z))[1], 2)
-    deck("The overseers' south steps", W, (-1, -327), (-2.5, -318), aside=-8, aside2=-12.5, rise=rise_at(W, -1, -327, top), rise2=rise_at(W, -2.5, -318, top), width=3)
-    deck("The overseers' walk", W, (-2.5, -318), (-3, -287), aside=-12.5, rise=rise_at(W, -2.5, -318, top), rise2=rise_at(W, -3, -287, top), width=3)
-    deck("The overseers' stair", W, (-3, -287), (-1, -268), aside=-12.5, aside2=-9, rise=rise_at(W, -3, -287, top), rise2=rise_at(W, -1, -268, -8.6), width=3)
+    # The walk's north end comes down to 5 m over the falling floor (level, it ran 8.4 m up at aside 12.5, where the bowl's wall
+    # (Half 20, Height 12, bumps to 19 %) leans in to about 8 m: its planks were in the shell from z -298 on; AditNavDiagnostics 19:24).
+    deck("The overseers' south steps", W, (-1, -327), (-2.5, -318), aside=-8, aside2=-11.5, rise=rise_at(W, -1, -327, top), rise2=rise_at(W, -2.5, -318, top), width=3)
+    deck("The overseers' walk", W, (-2.5, -318), (-3, -287), aside=-11.5, rise=rise_at(W, -2.5, -318, top), rise2=5.0, width=3)
+    deck("The overseers' stair", W, (-3, -287), (-1, -268), aside=-11.5, aside2=-9, rise=5.0, rise2=rise_at(W, -1, -268, -8.6), width=3)
     # Lusk's tally stage on its spoil heap, a ramp up at either end (the hill-with-a-ramp lesson: you fight up to him).
     deck('The tally ramp (south)', W, (0, -193), (0, -183), aside=0, rise=0, rise2=3.5, width=6, style='scree')
     deck("Lusk's tally stage", W, (0, -183), (0, -172), aside=0, rise=3.5, width=12, style='stone', solid=True)
@@ -479,7 +481,7 @@ def make_camps():
     # --- the pinned head, 0-31 (their places in the Adit as it was: elitesSlain "mob.<tag>.adit.<i>" keeps)
     head = [
         camp('W', (0, -355), mob('Adit pickets', 'Sandthrone picket', 'deserter', 2, 10, 10, 'picket', 1.6), 'workings', 1, gate='none'),                       # 0
-        camp('W', (-3, -302), mob("The bowl's rim", 'Sandthrone overseer', 'deserter', 3, 10, 10, 'overseer', 1.2), 'workings', 2, aside=-12.5, gate='none'),     # 1 (rise below)
+        camp('W', (-3, -302), mob("The bowl's rim", 'Sandthrone overseer', 'deserter', 3, 10, 10, 'overseer', 1.2), 'workings', 2, aside=-11.5, gate='none'),     # 1 (rise below; on the overseers' walk, its aside)
         camp('W', (0, -290), mob("The cages' guard", 'Sandthrone digger', 'deserter', 3, 10, 10, 'digger', 3), 'workings', 3, aside=3, gate='none'),              # 2
         camp('W', (2, -240), mob("Sappers' drift", 'Sandthrone sapper', 'deserter', 3, 11, 11, 'sapper', 2), 'workings', 5, gate='none'),                          # 3
         camp('W', (0, -175), mob("Gang-boss's guards", 'Sandthrone overseer', 'deserter', 2, 11, 11, 'overseer', 1.2), 'workings', 7, rise=3.5, aside=-3, gate='none'),   # 4
@@ -512,7 +514,10 @@ def make_camps():
         camp('B', (12, 98), mob(FOREMAN, FOREMAN, 'hollow', 1, 11, 11, 'foreman', 1, canon='GAME-ONLY (the unmade are CANON)', elite=True, guards="The Foreman's shift", key='sigil.grey', keyName='the Grey Sigil'), 'breach', 5, aside=-4, gate=LDOOR),   # 31
     ]
     # The bowl's rim stands on the overseers' walk: its rise over the floor there.
-    w = CAVE['W']; rim = head[1]; rim['rise'] = round(-3.0 - w.at_(rim['along'])[1], 2)
+    w = CAVE['W']; rim = head[1]; walk = next(d for d in DECKS if d['name'] == "The overseers' walk")
+    f = (rim['along'] - walk['from']) / (walk['to'] - walk['from'])
+    y0 = w.at_(walk['from'])[1] + walk['rise']; y1 = w.at_(walk['to'])[1] + walk['rise2']   # the walk's planks, straight between its ends
+    rim['rise'] = round(y0 + (y1 - y0) * f - w.at_(rim['along'])[1], 2)
     rest = [
         # The Old Workings
         camp('W', (-1, -276), mob('Ore-cart loaders', 'Sandthrone digger', 'deserter', 3, 10, 10, 'digger', 3), 'workings', 4, aside=8, gate='none'),

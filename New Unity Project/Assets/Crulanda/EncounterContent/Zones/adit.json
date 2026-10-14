@@ -2083,7 +2083,7 @@
       "from": 44.14,
       "to": 53.26,
       "aside": -8,
-      "aside2": -12.5,
+      "aside2": -11.5,
       "rise": 0.0,
       "rise2": 1.98,
       "width": 3,
@@ -2096,10 +2096,10 @@
       "wall": 0,
       "from": 53.26,
       "to": 84.38,
-      "aside": -12.5,
-      "aside2": -12.5,
+      "aside": -11.5,
+      "aside2": -11.5,
       "rise": 1.98,
-      "rise2": 8.39,
+      "rise2": 5.0,
       "width": 3,
       "canonStatus": "GAME-ONLY"
     },
@@ -2110,9 +2110,9 @@
       "wall": 0,
       "from": 84.38,
       "to": 103.49,
-      "aside": -12.5,
+      "aside": -11.5,
       "aside2": -9,
-      "rise": 8.39,
+      "rise": 5.0,
       "rise2": -0.01,
       "width": 3,
       "canonStatus": "GAME-ONLY"
@@ -2935,16 +2935,16 @@
       "levelMax": 10,
       "respawn": 900,
       "center": {
-        "x": -16.39,
-        "y": -302.59
+        "x": -15.39,
+        "y": -302.54
       },
       "cave": "The Sealed Adit",
       "along": 69.28,
-      "aside": -12.5,
+      "aside": -11.5,
       "wing": "workings",
       "step": 2,
       "gate": "none",
-      "rise": 6.64
+      "rise": 4.89
     },
     {
       "name": "The cages' guard",

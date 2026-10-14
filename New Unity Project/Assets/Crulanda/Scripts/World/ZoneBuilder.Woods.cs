@@ -19,6 +19,8 @@ namespace Crulanda.World
         readonly List<Vector2> woodsTrees = new List<Vector2>();
         readonly List<Transform> woodsFloor = new List<Transform>(), woodsRoots = new List<Transform>();
         bool[] woodsMask; float woodsCell; int woodsAxis;
+        /// <summary>The gathering nodes' and stations' spots (and their margins) as the zone file has them, before any test filter.</summary>
+        (Vector2 at, float margin)[] WoodsKeepClear = new (Vector2, float)[0];
         /// <summary>Where the wild woods' trees stand (empty in a zone with no woods).</summary>
         public IReadOnlyList<Vector2> WoodsTrees { get { return woodsTrees; } }
         /// <summary>True inside a cell of the wild woods.</summary>
@@ -72,7 +74,7 @@ namespace Crulanda.World
                 if (!(rim && roll > .66f) && WoodsGround(at, 1.5f))
                 {
                     Transform tree = null; var spot = Spot(at, pine ? 2.6f : 3.2f);
-                    if (spot.HasValue)
+                    if (spot.HasValue && spot.Value.magnitude >= w.from)   // pushed off a trunk, never into the village's reach
                     {
                         at = spot.Value;
                         if (pine)
@@ -142,10 +144,8 @@ namespace Crulanda.World
                 if (Vector2.Distance(p, s.player) < 12 + more || Vector2.Distance(p, s.companion) < 12 + more || Vector2.Distance(p, s.recovery) < 12 + more) return false;
                 if (s.enemies != null) foreach (var e in s.enemies) if (e != null && Vector2.Distance(p, e.at) < 5 + more) return false;
             }
-            // Not the gathering nodes: they are placed after the woods, clear of the trunks (BuildNodes), and a zone built without them
-            // must grow the same woods (NodeStreamTests, 2026-10-14: 2635 trees then 2624).
+            foreach (var (at, margin) in WoodsKeepClear) if (Vector2.Distance(p, at) < margin + more) return false;   // the nodes and stations as the file has them (NodeStreamTests)
             foreach (var s in Zone.secrets) if (s != null && Vector2.Distance(p, s.at) < s.radius + 4 + more) return false;
-            if (Zone.stations != null) foreach (var s in Zone.stations) if (s != null && Vector2.Distance(p, s.at) < 6 + more) return false;
             if (Zone.life != null && Zone.life.critters != null) foreach (var c in Zone.life.critters) if (c != null && Vector2.Distance(p, c.center) < c.radius + 3 + more) return false;
             return true;
         }

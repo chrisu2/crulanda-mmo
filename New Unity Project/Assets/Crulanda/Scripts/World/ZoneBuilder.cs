@@ -72,6 +72,9 @@ namespace Crulanda.World
         {
             Zone = (RequestedZoneId != null ? ParsedZone(RequestedZoneId) : null) ?? ParseZone(zoneJson != null ? zoneJson.text : "{}");
             RequestedZoneId = null;
+            // The woods keep clear of the gathering nodes and stations as the file has them, filter or no filter (NodeStreamTests builds
+            // the zone without its nodes and wants the same woods: ZoneBuilder.Woods.cs).
+            if (Zone != null) WoodsKeepClear = Zone.nodes.Where(n => n != null).Select(n => (n.at, 5f)).Concat((Zone.stations ?? new ZoneStation[0]).Where(s => s != null).Select(s => (s.at, 6f))).ToArray();
             if (Zone != null && DefinitionFilter != null) Zone = DefinitionFilter(Zone);
             if (Zone == null || string.IsNullOrEmpty(Zone.id) || art == null) { Debug.LogError("Zone definition or art missing."); enabled = false; return; }
             Active = this;

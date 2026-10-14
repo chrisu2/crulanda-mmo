@@ -72,15 +72,12 @@ namespace Crulanda.World
             }
             // Archery butts down the right, facing in.
             string[] butts = { "SmallProps/PracticeTarget_1_A", "SmallProps/PracticeTarget_2_A", "Megapack/Models/Arrow Target", "SmallProps/PracticeTarget_1_B" };
-            // Each faces into the yard, its back to the fence (Chris, 14:25). The pack's butts are made facing along their own x, the
-            // Megapack's along its z (read from their shapes: the face's thin axis, the legs behind it), so they turn differently.
-            // (PracticeTarget_2 faces the other way from PracticeTarget_1: Chris, 15:20, "one target still backwards".)
+            // Each faces into the yard, its back to the fence (Chris, 14:25). Settled from the frames and Chris's three reports
+            // (2026-10-14, "still a couple are backwards", "now three are backward"; the butts' turns logged by FaceLane): the Small
+            // Props targets face the lane at 180, the second kind too (its paint is on the far side from its legs), the Megapack's at 90.
             for (int i = 0; i < butts.Length; i++)
             {
-                var butt = GroundProp(t, butts[i], new Vector3(hx - 1.4f, 0, 1.0f + i * 1.9f), butts[i].StartsWith("SmallProps/PracticeTarget_2") ? 0 : butts[i].StartsWith("SmallProps") ? 180 : -90, 1.7f, true);   // their lanes clear of the healer's corner
-                // Then turned by its own shape to face its lane (2026-10-14, Chris: "still a couple are backwards": the hand-set turns
-                // were read from the models by eye, and two packs make their butts facing different ways).
-                if (butt != null) FaceLane(butt, t.TransformPoint(new Vector3(hx - 9.4f, 0, 1.0f + i * 1.9f)));
+                GroundProp(t, butts[i], new Vector3(hx - 1.4f, 0, 1.0f + i * 1.9f), butts[i].StartsWith("SmallProps") ? 180 : 90, 1.7f, true);   // their lanes clear of the healer's corner
                 Mark(t, new Vector3(hx - 1.4f, 0, 1.0f + i * 1.9f), new Vector3(hx - 9.4f, 0, 1.0f + i * 1.9f), true);   // a sim with a bow or a spell across the yard
             }
             // Weapon stands by the left tent and against the back fence (the Fantasy peg rack is a wall board 35 cm high: it came in lying flat

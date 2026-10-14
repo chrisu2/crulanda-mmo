@@ -83,9 +83,9 @@ namespace Crulanda.World
                     }
                     else if (g3 < .47f && TrunkClear(gp, 1.9f))
                     {
-                        int before = statics.childCount;
+                        int was = statics.childCount;
                         if (g3 < .3f) Bush(gp, false); else if (g3 < .38f) WoodsStump(gp, g4, g1); else EdgeRock(gp);
-                        for (int k = before; k < statics.childCount; k++) { woodsFloor.Add(statics.GetChild(k)); floor++; }
+                        for (int k = was; k < statics.childCount; k++) { woodsFloor.Add(statics.GetChild(k)); floor++; }
                     }
                     continue;
                 }

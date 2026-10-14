@@ -203,15 +203,16 @@ namespace Crulanda.Encounter
             Message(c.sim.name + " leads the way to the " + camp.ToLower() + ".");
             return true;
         }
-        /// <summary>/dungeon (round 27): a party sim (the boldest) leads you through the zone's dungeon, camp by camp.</summary>
-        public bool LeadDungeon()
+        /// <summary>/dungeon (round 27): a party sim (the boldest) leads you through the zone's dungeon, camp by camp. "/dungeon quick" leaves
+        /// what may be left, "/dungeon full" takes every side room too (the Adit rework, DungeonPlan).</summary>
+        public bool LeadDungeon(string mode = null)
         {
             if (PartySims.Count == 0) { Message("You are not in a party: /invite someone first."); return false; }
             if (InCombat) { Message("Not while you are fighting."); return false; }
             var c = PartySims.Find(x => x != null && x.sim.bold > .5f) ?? PartySims.Find(x => x != null); if (c == null) return false;
             foreach (var p in PartySims) if (p != null && p != c) p.StopLeading();
-            if (c.LeadDungeon(out var why) == null) { Message(c.sim.name + ": " + why); return false; }
-            Message(c.sim.name + " leads the way into " + c.Dungeon + " (" + c.CampsLeft + " camps)."); return true;
+            if (c.LeadDungeon(mode, out var why) == null) { Message(c.sim.name + ": " + why); return false; }
+            Message(c.sim.name + " leads the way into " + c.Dungeon + " (" + c.CampsLeft + " camps" + (c.RunMode == DungeonPlan.Mode.Standard ? "" : ", " + DungeonPlan.Describe(c.RunMode)) + ")."); return true;
         }
         /// <summary>Sends a party sim back to the world where it stands.</summary>
         public void LeaveParty(string simId, bool kicked = false)

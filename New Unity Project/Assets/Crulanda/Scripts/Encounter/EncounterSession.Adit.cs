@@ -9,7 +9,8 @@ namespace Crulanda.Encounter
     /// The Sealed Adit's dungeon objects (Docs/DUNGEON_DESIGN.md section 9, step D3; Chris, 2026-10-09: "gate on the stair", "keep them"):
     /// - the rail sigils its three branch bosses carry (ZoneCamp.key), taken from the body at the first kill and kept for good
     ///   (Progress.keys);
-    /// - the cage-lift gate at the head of the stair: the three sigils set in its frame raise it, once and for good ("adit.lift");
+    /// - the singing door at the Gallery's north neck, the head of the shaft stair (the Adit rework; it was the winch gate): the three sigils
+    ///   set in its sockets wake it, once and for good ("adit.lift");
     /// - the gate onto the Rail Hall's platform, shut again on every visit: a goblin freed in "The Pressed" hums its lock open
     ///   (the quiet way), or blasting powder from the keg up the stair blows it (the loud way: the Quartermaster's people come);
     /// - the Gallery's spirit stone: touched once, it is where you wake in the Adit (Progress.spiritStones, RecoveryPoint);
@@ -104,7 +105,7 @@ namespace Crulanda.Encounter
             var keyed = KeyCamps(); int have = KeysHeld(keyed);
             FloatText(e.transform.position + Vector3.up * 1.2f, char.ToUpperInvariant(camp.keyName[0]) + camp.keyName.Substring(1), new Color(1, .82f, .35f));
             Message("You take " + camp.keyName + " from " + camp.mob + ". Rail sigils " + have + "/" + keyed.Count +
-                (have < keyed.Count ? ": the others are down the other ways off the Gallery." : ": set them in the frame by the winch gate, at the head of the stair."));
+                (have < keyed.Count ? ": the others are down the other ways off the Gallery." : ": set them in the sockets of the singing door, at the Gallery's north end."));
         }
 
         /// <summary>What E says at one of the Adit's things, or null for the prop's own prompt.</summary>
@@ -155,7 +156,7 @@ namespace Crulanda.Encounter
             }
             if (!Progress.keys.Contains(LiftWoken)) Progress.keys.Add(LiftWoken);
             g.SetOpen(true);
-            Message("You set the three sigils in the frame. Deep in the shaft something wakes; the chains take up, and the cage-gate climbs into its frame.");
+            Message("You set the three sigils in their sockets. The door takes up their three notes and sings them back, louder, and the stone grinds up into the rock.");
             Save(false);
         }
         void UsePlatformGate(ZoneInteractable i)
@@ -244,14 +245,21 @@ namespace Crulanda.Encounter
         /// <summary>Whether a camp stands past a shut gate in its cave (the run a sim leads waits there).</summary>
         public ZoneGate GateBefore(ZoneCamp camp)
         {
-            if (Zone == null || camp == null || string.IsNullOrEmpty(camp.cave)) return null;
+            if (Zone == null || camp == null) return null;
+            if (!string.IsNullOrEmpty(camp.gate)) { var named = GateAhead(camp); return named != null && !named.Open ? named : null; }   // (the Adit rework) the gate its data names
+            if (string.IsNullOrEmpty(camp.cave)) return null;
             foreach (var g in Zone.Gates) if (g != null && !g.Open && g.Cave == camp.cave && camp.along > g.Along) return g;
             return null;
         }
-        /// <summary>The last gate across the cave before a camp, open or shut (D7: the run a sim leads waits at it while it is shut), or null.</summary>
+        /// <summary>The last gate across the cave before a camp, open or shut (D7: the run a sim leads waits at it while it is shut), or null.
+        /// (The Adit rework) A camp whose data names its gate (ZoneCamp.gate, by title; "none": no gate) has that one: in a web of caves the
+        /// way to a camp need not come up its own cave from the mouth (the Geode Foundry's hall is reached from its far end, past the chute
+        /// door by how far in it stands but never through it).</summary>
         public ZoneGate GateAhead(ZoneCamp camp)
         {
-            if (Zone == null || camp == null || string.IsNullOrEmpty(camp.cave)) return null;
+            if (Zone == null || camp == null) return null;
+            if (!string.IsNullOrEmpty(camp.gate)) return camp.gate == "none" ? null : Zone.Gates.Find(g => g != null && g.Title == camp.gate);
+            if (string.IsNullOrEmpty(camp.cave)) return null;
             ZoneGate last = null;
             foreach (var g in Zone.Gates) if (g != null && g.Cave == camp.cave && camp.along > g.Along && (last == null || g.Along > last.Along)) last = g;
             return last;

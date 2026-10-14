@@ -15,6 +15,7 @@ namespace Crulanda.Encounter
     {
         NavMeshData data;
         NavMeshDataInstance instance;
+        readonly List<NavMeshLinkInstance> links = new List<NavMeshLinkInstance>();
         void Awake()
         {
             var zone = ZoneBuilder.Active;
@@ -26,6 +27,11 @@ namespace Crulanda.Encounter
             data = NavMeshBuilder.BuildNavMeshData(NavMesh.GetSettingsByIndex(0), sources, reach, Vector3.zero, Quaternion.identity);
             if (data != null) instance = NavMesh.AddNavMeshData(data);
             else Debug.LogError("Could not build encounter navigation.");
+            // (The Adit rework) The caves' one-way drops (ZoneDrop): a link down off each lip, never back up. A camp's mobs keep off them
+            // (their agents leave DropArea out of their mask).
+            if (zone != null && data != null)
+                foreach (var d in zone.Drops)
+                    links.Add(NavMesh.AddLink(new NavMeshLinkData { startPosition = d.from, endPosition = d.to, width = d.width, bidirectional = false, area = DropArea, agentTypeID = NavMesh.GetSettingsByIndex(0).agentTypeID }));
         }
         static List<NavMeshBuildSource> ZoneSources(ZoneBuilder zone)
         {
@@ -87,10 +93,15 @@ namespace Crulanda.Encounter
                         }
                     }
                 }
-            }            return sources;
+            }
+            // (The Adit rework) The caves' pools, streams and flooded stretches (ZoneCaveWater), as the land's water: wading costs, swim-deep is not walked.
+            foreach (var (centre, rot, size, swim) in zone.CaveWaterAreas) sources.Add(Modifier(centre, rot, size, swim ? 1 : ShallowsArea));
+            return sources;
         }
         /// <summary>Navigation area for wadeable water: walkable, but agents avoid it when a dry way exists.</summary>
         public const int ShallowsArea = 3;
+        /// <summary>Navigation area of the caves' one-way drops (the Adit rework): the party may take them down; a camp's mobs keep off them.</summary>
+        public const int DropArea = 4;
         static NavMeshBuildSource Modifier(Vector3 centre, Quaternion rot, Vector3 size, int area)
         { return new NavMeshBuildSource { shape = NavMeshBuildSourceShape.ModifierBox, size = size, transform = Matrix4x4.TRS(centre, rot, Vector3.one), area = area }; }
         static List<NavMeshBuildSource> LegacySources()
@@ -129,6 +140,11 @@ namespace Crulanda.Encounter
             }
             return sources;
         }
-        void OnDestroy() { if (instance.valid) instance.Remove(); if (data != null) Destroy(data); }
+        void OnDestroy()
+        {
+            foreach (var l in links) NavMesh.RemoveLink(l);
+            links.Clear();
+            if (instance.valid) instance.Remove(); if (data != null) Destroy(data);
+        }
     }
 }

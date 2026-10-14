@@ -17,6 +17,12 @@ namespace Crulanda.World
         public string Lord;
         /// <summary>The bars, moved up by <see cref="Rise"/> metres as it opens.</summary>
         public Transform Grille; public float Rise = 2.5f;
+        /// <summary>(The Adit rework, ZoneGateDef) What kind of gate it is (liftgate, platformgate, bossdoor, bar, pen, hiddendoor), the mob whose
+        /// death opens it (or null), and whether it is worked from its far side (a bar lifted from the hub's side only).</summary>
+        public string Kind, OpensOn; public bool FromFar;
+        /// <summary>Where its bars go as it opens, in its own frame, instead of up by <see cref="Rise"/> (a bookcase sliding aside into
+        /// the rock); zero: up.</summary>
+        public Vector3 Slide;
         /// <summary>Shown once it is open (the lift's frame: the three sigils set in their sockets).</summary>
         public GameObject[] Lights = new GameObject[0];
         BoxCollider wall; NavMeshObstacle cut; float lift, target;
@@ -45,6 +51,6 @@ namespace Crulanda.World
             lift = Mathf.MoveTowards(lift, target, Time.deltaTime * Rise / 2.5f);   // two and a half seconds up into the frame
             Place();
         }
-        void Place() { if (Grille != null) Grille.localPosition = new Vector3(0, lift, 0); }
+        void Place() { if (Grille != null) Grille.localPosition = Slide.sqrMagnitude > 0 ? Slide * (lift / Mathf.Max(.01f, Rise)) : new Vector3(0, lift, 0); }
     }
 }

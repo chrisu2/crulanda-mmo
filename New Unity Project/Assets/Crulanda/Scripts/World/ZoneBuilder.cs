@@ -24,6 +24,12 @@ namespace Crulanda.World
         /// <summary>Tests only: changes the zone's definition after it is chosen and before anything is built (to build a zone
         /// without some of its props and compare the two). Null in play; a test that sets it clears it in its teardown.</summary>
         public static Func<ZoneDefinition, ZoneDefinition> DefinitionFilter;
+        /// <summary>
+        /// A zone's JSON to build instead of the one in <see cref="zones"/> (the Adit rework: a fixture in a test, or the staged Adit behind
+        /// its flag): used when its id is the zone being built, or when no zone of that id is registered (a fixture). Null in play; whoever
+        /// sets it clears it.
+        /// </summary>
+        public static string ZoneJsonOverride;
         public bool HasZone(string id)
         {
             if (string.IsNullOrEmpty(id)) return false;
@@ -70,7 +76,14 @@ namespace Crulanda.World
 
         void Awake()
         {
-            Zone = (RequestedZoneId != null ? ParsedZone(RequestedZoneId) : null) ?? ParseZone(zoneJson != null ? zoneJson.text : "{}");
+            Zone = null;
+            if (ZoneJsonOverride != null)
+            {
+                var over = ParseZone(ZoneJsonOverride);
+                string wanted = RequestedZoneId ?? (zoneJson != null ? JsonUtility.FromJson<ZoneDefinition>(zoneJson.text)?.id : null);
+                if (over != null && !string.IsNullOrEmpty(over.id) && (over.id == wanted || !HasZone(over.id))) Zone = over;
+            }
+            Zone = Zone ?? (RequestedZoneId != null ? ParsedZone(RequestedZoneId) : null) ?? ParseZone(zoneJson != null ? zoneJson.text : "{}");
             RequestedZoneId = null;
             if (Zone != null && DefinitionFilter != null) Zone = DefinitionFilter(Zone);
             if (Zone == null || string.IsNullOrEmpty(Zone.id) || art == null) { Debug.LogError("Zone definition or art missing."); enabled = false; return; }
@@ -80,8 +93,8 @@ namespace Crulanda.World
             rng = new System.Random(Zone.seed);
             props = new GameObject("Zone props").transform; props.SetParent(transform, false);
             statics = new GameObject("Zone static scenery").transform; statics.SetParent(transform, false);
-            PrepareRelief(); PrepareShapes(); Water = new ZoneWater(); Water.Prepare(Zone, (x, z) => HeightAt(x, z, false)); PrepareHollows(); Lap("prepare");
-            BuildLighting(); BuildGround(); Lap("ground"); BuildWater(); BuildWasting(); Lap("water"); BuildProps(); BuildHomeDoors(); Lap("props"); BuildGroves(); BuildExits(); Lap("groves");
+            PrepareRelief(); PrepareShapes(); Water = new ZoneWater(); Water.Prepare(Zone, (x, z) => HeightAt(x, z, false)); PrepareHollows(); PrepareCaveWorks(); Lap("prepare");
+            BuildLighting(); BuildGround(); Lap("ground"); BuildWater(); BuildWasting(); Lap("water"); BuildProps(); BuildCaveWorks(); BuildHomeDoors(); Lap("props"); BuildGroves(); BuildExits(); Lap("groves");
             BuildForestEdge(); BuildMeadow(); BuildCrops(); BuildBoundaries(); Lap("edge"); BuildBackdrop(); DistantRanges.Build(transform, Zone, Half + BackdropWidth); Lap("backdrop");
             if (art.grass != null && art.grass.Length > 0)
             {
@@ -230,15 +243,33 @@ namespace Crulanda.World
         }
         readonly Dictionary<Vector2, float> fixedGround = new Dictionary<Vector2, float>();
         /// <summary>
-        /// Where to stand at a point: on the land, or on a cave passage's floor under it (Hollow), whichever is nearer the height
-        /// <paramref name="near"/> (where the thing was, or float.NegativeInfinity to prefer any passage floor): camps and their
-        /// respawns inside a cave, a save made down in one, and secrets tucked into one.
+        /// Where to stand at a point: on the land, on a cave passage's floor under it (Hollow; the bed of a pool sunk into it), or on a deck
+        /// in a cave (ZoneDeck), whichever is nearest the height <paramref name="near"/> (where the thing was), or float.NegativeInfinity
+        /// for the first passage floor there (decks then left out): camps and their respawns inside a cave, a save made down in one, and
+        /// secrets tucked into one. Caves may lie over each other where one opens high in another's wall, and decks stand over floors.
         /// </summary>
         public Vector3 StandAt(Vector2 p, float near, float lift = 0)
         {
-            float land = HeightAt(p.x, p.y), floor = land;
-            if (Hollow.FloorUnder(p, ref floor) && (float.IsNegativeInfinity(near) || Mathf.Abs(near - floor) < Mathf.Abs(near - land))) return new Vector3(p.x, floor + lift, p.y);
+            float land = HeightAt(p.x, p.y), best = land; bool any = false, first = float.IsNegativeInfinity(near);
+            foreach (var h in Hollow.All)
+            {
+                if (!h.FloorAt(p, out float f)) continue;
+                f -= BasinDip(h, p);
+                if (first) return new Vector3(p.x, f + lift, p.y);
+                if (!any || Mathf.Abs(near - f) < Mathf.Abs(near - best)) { best = f; any = true; }
+            }
+            if (!first && DeckTop(p, near, out float deck) && (!any || Mathf.Abs(near - deck) < Mathf.Abs(near - best))) { best = deck; any = true; }
+            if (any && Mathf.Abs(near - best) < Mathf.Abs(near - land)) return new Vector3(p.x, best + lift, p.y);
             return new Vector3(p.x, land + lift, p.y);
+        }
+        /// <summary>Every floor at a point in a cave, the caves' (the bed where a pool is sunk into one) and the decks' tops, into
+        /// <paramref name="into"/> (cleared first). False when there is none.</summary>
+        public bool FloorsAt(Vector2 p, List<float> into)
+        {
+            into.Clear();
+            foreach (var h in Hollow.All) if (h.FloorAt(p, out float f)) into.Add(f - BasinDip(h, p));
+            foreach (var d in DeckSpots) if (d.Top(p, out float y)) into.Add(y);
+            return into.Count > 0;
         }
         static List<Vector2> Densify(Vector2[] pts, float step)
         {
@@ -4326,11 +4357,28 @@ namespace Crulanda.World
                 // A branch opens out of a cave already made: its mouth on that cave's floor (the Sealed Adit's ways out of the Gallery).
                 var parent = string.IsNullOrEmpty(p.within) ? null : Hollow.All.Find(o => o.Name == p.within);
                 float? mouthY = null; float parentAlong = 0;
-                if (parent != null && parent.FloorSmooth(p.at, out float fy)) { mouthY = fy; parentAlong = parent.Along[parent.Nearest(p.at, out _)]; }
+                // (the Adit rework) A mouth high in the parent's wall: rise metres over its floor there.
+                if (parent != null && parent.FloorSmooth(p.at, out float fy)) { mouthY = fy + p.rise; parentAlong = parent.Along[parent.Nearest(p.at, out _)]; }
                 var h = new Hollow(string.IsNullOrEmpty(p.name) ? "cavern" : p.name, p.at, p.rotation, plan, (x, z) => HeightAt(x, z), mouthY);
-                if (parent != null) { h.Parent = parent; h.ParentAlong = parentAlong; }
+                if (parent != null) { h.Parent = parent; h.ParentAlong = parentAlong; h.MouthRise = p.rise; }
+                h.Style = string.IsNullOrEmpty(p.style) ? null : p.style;
                 Hollow.All.Add(h);
             }
+            // (the Adit rework) A cave whose far end opens into another (ZoneProp.joins): which, how far into it, and how far its end stands
+            // over the other's floor there (a level way back round, or a lip over a hall).
+            foreach (var p in Zone.props)
+            {
+                if (p == null || p.kind != "cavern" || string.IsNullOrEmpty(p.joins)) continue;
+                string name = string.IsNullOrEmpty(p.name) ? "cavern" : p.name;
+                var h = Hollow.All.Find(o => o.Name == name); var target = Hollow.All.Find(o => o.Name == p.joins);
+                if (h == null || target == null || target == h || h.Centre.Count < 2) { Debug.LogWarning(Zone.id + ": the cavern '" + name + "' joins '" + p.joins + "', which is not a cavern of the zone."); continue; }
+                var end = h.Centre[h.Centre.Count - 1]; var at = new Vector2(end.x, end.z);
+                h.Join = target; h.JoinAlong = target.Along[target.Nearest(at, out _)];
+                h.JoinRise = target.FloorSmooth(at, out float ty) ? end.y - ty : 0;
+            }
+            // Where each ring has a floor of its own, now that every cave is made (a branch's first metres and a joining cave's last ones
+            // are the other's air).
+            foreach (var h in Hollow.All) h.ComputeFloored();
         }
         static float[][] PlanRows(float[] flat)
         {
@@ -4408,8 +4456,17 @@ namespace Crulanda.World
             }
             // A cave in a network (the Sealed Adit): its walls are open where another's passage runs through them, and none of it
             // stands in the other's air (Hollow.Open), so a branch's mouth is a hole in the Gallery's wall.
-            bool linked = Hollow.All.Count > 1 && Hollow.All.Exists(o => o != h && (o.Parent == h || h.Parent == o));
-            bool Cut(Vector3 a, Vector3 b2, Vector3 d) { return linked && Hollow.OpenInOther(h, t.TransformPoint((a + b2 + d) / 3)); }
+            bool linked = Hollow.All.Count > 1 && Hollow.All.Exists(o => o != h && (o.Parent == h || h.Parent == o || o.Join == h || h.Join == o));
+            // (The Adit rework) Where a mouth opens high in a wall, or a joining cave's end stands out over a hall (a lip), a face with any
+            // corner in the other's air goes too: the wall's faces are metres tall, and a half-cut one stood across the doorway's sill.
+            var sharp = Hollow.All.FindAll(o => o != h && ((o.Parent == h && o.MouthRaised) || (h.Parent == o && h.MouthRaised) || (o.Join == h && o.JoinRaised) || (h.Join == o && h.JoinRaised)));
+            bool SharpOpen(Vector3 world) { foreach (var o in sharp) if (o.Open(world)) return true; return false; }
+            bool Cut(Vector3 a, Vector3 b2, Vector3 d)
+            {
+                if (!linked) return false;
+                if (Hollow.OpenInOther(h, t.TransformPoint((a + b2 + d) / 3))) return true;
+                return sharp.Count > 0 && (SharpOpen(t.TransformPoint(a)) || SharpOpen(t.TransformPoint(b2)) || SharpOpen(t.TransformPoint(d)));
+            }
             for (int i = 0; i + 1 < n; i++)
                 for (int k = 0; k + 1 < P; k++)
                 {
@@ -4431,15 +4488,17 @@ namespace Crulanda.World
             // What shows inside is the painted lining over that shell (the shell stays the collider and the navmesh's obstacle, not
             // drawn), and against it the rock, dripstone, root and earth that break the walls up. With no cave art the shell shows.
             var paint = roots ? art.caveEarth : art.cave;
-            var lining = paint != null ? Tint(paint, roots ? new Color(.5f, .4f, .27f) : variant == 2 ? AditLining(h.Name) : new Color(.56f, .51f, .45f)) : null;
-            if (lining != null) { body.GetComponent<MeshRenderer>().enabled = false; CaveLining(t, h, c, ring, n, P, seed, lining, linked); }
+            var lining = paint != null ? Tint(paint, roots ? new Color(.5f, .4f, .27f) : variant == 2 ? AditLining(AditPart(h)) : new Color(.56f, .51f, .45f)) : null;
+            if (lining != null) { body.GetComponent<MeshRenderer>().enabled = false; CaveLining(t, h, c, ring, n, P, seed, lining, linked, sharp.Count > 0 ? (Func<Vector3, bool>)SharpOpen : null); }
             int dressedFrom = t.childCount;
             CaveDressing(t, h, c, right, ring, n, P, roots, lining ?? (roots ? knoll : rock));
-            if (linked) for (int k = t.childCount - 1; k >= dressedFrom; k--)   // no fallen stone, ledge or dripstone in another cave's way
+            bool decked = DeckSpots.Count > 0;   // (the Adit rework) nor in a deck's way
+            if (linked || decked) for (int k = t.childCount - 1; k >= dressedFrom; k--)   // no fallen stone, ledge or dripstone in another cave's way
                 {
                     var r = t.GetChild(k).GetComponentInChildren<Renderer>(); if (r == null) continue;
-                    var b = r.bounds; bool inWay = Hollow.OpenInOther(h, b.center, 1f);
-                    for (int q = 0; q < 6 && !inWay; q++) { var e = Vector3.zero; e[q / 2] = (q % 2 == 0 ? 1 : -1) * b.extents[q / 2]; inWay = Hollow.OpenInOther(h, b.center + e, 1f); }
+                    var b = r.bounds; bool inWay = linked && Hollow.OpenInOther(h, b.center, 1f);
+                    for (int q = 0; q < 6 && !inWay && linked; q++) { var e = Vector3.zero; e[q / 2] = (q % 2 == 0 ? 1 : -1) * b.extents[q / 2]; inWay = Hollow.OpenInOther(h, b.center + e, 1f); }
+                    if (!inWay && decked) inWay = DeckOverlaps(b, .3f);
                     if (inWay) DestroyImmediate(t.GetChild(k).gameObject);
                 }
 
@@ -4450,7 +4509,8 @@ namespace Crulanda.World
                 float th = Mathf.Clamp(k - 1, 0, K) * Mathf.PI / K;
                 return 2f + 2.4f * Mathf.PerlinNoise(h.Along[i] * .16f + seed + 40, th * 1.3f + 5) + .9f * Mathf.PerlinNoise(h.Along[i] * .55f + seed, th * 3.4f + 9) + Mathf.Sin(th) * h.Height[i] * .35f;   // big swells and smaller knuckles
             }
-            int m = n + 3; var outer = new Vector3[m, P]; var outAlong = new float[m];
+            bool joined = h.Join != null;   // (the Adit rework) a joining cave's end stays open into the other: no tip closes its knoll
+            int m = n + (joined ? 0 : 3); var outer = new Vector3[m, P]; var outAlong = new float[m];
             for (int i = 0; i < n; i++)
             {
                 outAlong[i] = h.Along[i];
@@ -4464,7 +4524,7 @@ namespace Crulanda.World
             }
             var fwdEnd = c[n - 1] - c[n - 2]; fwdEnd.y = 0; fwdEnd.Normalize();
             var tip = c[n - 1] + fwdEnd * 3.5f + Vector3.up * 1.4f;
-            for (int j = 1; j <= 3; j++)
+            for (int j = 1; j <= 3 && !joined; j++)
             {
                 outAlong[n - 1 + j] = h.Along[n - 1] + j * 1.2f;
                 for (int k = 0; k < P; k++)
@@ -4556,28 +4616,68 @@ namespace Crulanda.World
             // The floor: the passage's own, from wall foot to wall foot (the land is cut away inside, see ZoneMeshes.Ground), and a lip
             // of it out of the mouth onto the ground outside, so the way in has no seam. Earth over rock; walkable (navmesh), solid.
             {
-                var fv = new List<Vector3>(); var fuv = new List<Vector2>(); var ft = new List<int>();
+                var fv = new List<Vector3>(); var fuv = new List<Vector2>(); var ft = new List<int>(); var ends = new List<Vector3>();
                 var outward = c[0] - c[1]; outward.y = 0; outward.Normalize();
+                // (The Adit rework) A cave with pools or streams sunk into its floor (ZoneCaveWater) has its floor in columns about 1.2 m
+                // across, each point let down into the basin under it; every other cave keeps the one strip from wall foot to wall foot.
+                int cols = 1;
+                if (HasBasins(h)) { float halfMost = 0; for (int i = 0; i < n; i++) halfMost = Mathf.Max(halfMost, h.Half[i]); cols = Mathf.Clamp(Mathf.CeilToInt(halfMost * 2 / 1.2f), 2, 96); }
+                float scaleY = Mathf.Max(.01f, t.lossyScale.y);
                 for (int i = h.Parent != null ? 0 : -1; i < n; i++)
                 {
                     int r = Mathf.Max(0, i); Vector3 a = ring[r, 1], b = ring[r, P - 2];
                     if (i < 0) { a += outward * 2.4f; b += outward * 2.4f; a.y = LocalGround(t, a.x, a.z) + .02f; b.y = LocalGround(t, b.x, b.z) + .02f; }   // over the land's cut edge
-                    else a.y = b.y = c[r].y + (h.Parent != null ? .012f : 0);   // a branch's floor a hair over its parent's where they meet
-                    float fvv = (i < 0 ? -2.4f : h.Along[r]) / 2.4f;
-                    fv.Add(a); fv.Add(b); fuv.Add(new Vector2(0, fvv)); fuv.Add(new Vector2(Vector3.Distance(a, b) / 2.4f, fvv));
+                    else a.y = b.y = c[r].y + (h.Parent != null || h.Join != null ? .012f : 0);   // a branch's floor a hair over its parent's where they meet
+                    float fvv = (i < 0 ? -2.4f : h.Along[r]) / 2.4f, across = Vector3.Distance(a, b);
+                    ends.Add(a); ends.Add(b);
+                    for (int q = 0; q <= cols; q++)
+                    {
+                        var at = q == 0 ? a : q == cols ? b : Vector3.Lerp(a, b, q / (float)cols);
+                        if (cols > 1 && i >= 0)
+                        {
+                            var w = t.TransformPoint(at); float dip = BasinDip(h, new Vector2(w.x, w.z)) / scaleY;
+                            at.y -= q == 0 || q == cols ? Mathf.Min(dip, 1.05f) : dip;   // (the walls' feet go 1.2 m under the floor)
+                        }
+                        fv.Add(at); fuv.Add(new Vector2(q / (float)cols * across / 2.4f, fvv));
+                    }
                 }
-                int rowsF = fv.Count / 2;
+                int rowsF = ends.Count / 2, perRow = cols + 1;
                 for (int i = 0; i + 1 < rowsF; i++)
                 {
-                    int o = i * 2;
                     // A quad wholly in another cave's air is that cave's floor already (a branch's mouth in the Gallery).
-                    if (linked && Hollow.OpenInOther(h, t.TransformPoint((fv[o] + fv[o + 1] + fv[o + 2] + fv[o + 3]) / 4) + Vector3.up * .3f, .8f)) continue;   // the Gallery's floor there already (a band showed)
-                    ft.AddRange(new[] { o, o + 2, o + 1, o + 1, o + 2, o + 3 });
+                    if (linked && Hollow.FloorGivesWay(h, t.TransformPoint((ends[i * 2] + ends[i * 2 + 1] + ends[i * 2 + 2] + ends[i * 2 + 3]) / 4) + Vector3.up * .3f)) continue;   // the Gallery's floor there already (a band showed)
+                    for (int q = 0; q < cols; q++)
+                    {
+                        int o = i * perRow + q;
+                        ft.AddRange(new[] { o, o + perRow, o + 1, o + 1, o + perRow, o + perRow + 1 });
+                    }
                 }
                 if (ft.Count > 2 && Vector3.Cross(fv[ft[1]] - fv[ft[0]], fv[ft[2]] - fv[ft[0]]).y < 0) for (int q = 0; q < ft.Count; q += 3) { int sw = ft[q + 1]; ft[q + 1] = ft[q + 2]; ft[q + 2] = sw; }   // facing up
-                var floorMesh = new Mesh { name = h.Name + " floor" }; floorMesh.SetVertices(fv); floorMesh.SetUVs(0, fuv); floorMesh.SetTriangles(ft, 0); floorMesh.RecalculateNormals(); floorMesh.RecalculateBounds();
+                var floorMesh = new Mesh { name = h.Name + " floor" }; if (fv.Count > 65000) floorMesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32; floorMesh.SetVertices(fv); floorMesh.SetUVs(0, fuv); floorMesh.SetTriangles(ft, 0); floorMesh.RecalculateNormals(); floorMesh.RecalculateBounds();
                 var ground = MeshPart(floorMesh, t, Vector3.zero, Tint(art.soil, roots ? new Color(.2f, .16f, .1f) : new Color(.34f, .3f, .25f)));
                 ground.AddComponent<MeshCollider>().sharedMesh = floorMesh; ground.AddComponent<NavWalkable>();
+            }
+            // (The Adit rework) Where this cave's floor runs out as a ledge over another cave's air (a doorway high in a hall's wall, a lip
+            // over the Gallery), rock hangs under it, so from the floor below it reads as a shelf of the wall and not a sheet in the air.
+            // Its own stream; no colliders. Only for such mouths and lips: every other cave is as it was.
+            if (sharp.Count > 0)
+            {
+                var lr = TreeRandom(t.position + new Vector3(2.9f, 0, 6.1f)); float LR() { return (float)lr.NextDouble(); }
+                var ledgeRock = RockTint(new Color(.42f, .4f, .37f));
+                for (int i = 0; i < n; i += 2)
+                {
+                    if (!h.Floored(i)) continue;
+                    var w0 = h.Centre[i]; var q0 = new Vector2(w0.x, w0.z); bool hangs = false;
+                    foreach (var o in sharp) if (o.FloorAt(q0, out float under) && w0.y - under > 1.5f) { hangs = true; break; }
+                    if (!hangs) continue;
+                    for (int k = -1; k <= 1; k++)
+                    {
+                        var at = c[i] + right[i] * (k * h.Half[i] * .55f) + Vector3.down * .15f;
+                        float yaw = LR() * 360, wide = h.Half[i] * .5f + LR(), deep = 1.4f + LR() * 1.8f, long_ = 1.2f + LR();
+                        if (InDeckWay(t.TransformPoint(at), .3f)) continue;
+                        MeshPart(CragRock((int)(yaw / 60)), t, at, ledgeRock, Quaternion.Euler(180, yaw, 0)).transform.localScale = new Vector3(wide, deep, long_);
+                    }
+                }
             }
             // Where things stand inside: the passage floor under a point (in the root's frame), not the land far above it.
             float FloorY(float x, float z)
@@ -4876,7 +4976,9 @@ namespace Crulanda.World
         /// where it meets the knoll's cut face. In stretches of ten rings, so each takes the lights near it; it casts shadow both
         /// ways, as the shell did (no sun reaches the floor). No colliders; draws from no stream.
         /// </summary>
-        void CaveLining(Transform t, Hollow h, Vector3[] c, Vector3[,] ring, int n, int P, float seed, Material m, bool linked = false)
+        /// <param name="cutAlso">(The Adit rework) A world point in the air of a cave whose mouth opens high in this one's wall, or whose end
+        /// stands over it as a lip: a face with any corner there goes too (null: the face's middle alone decides, as everywhere else).</param>
+        void CaveLining(Transform t, Hollow h, Vector3[] c, Vector3[,] ring, int n, int P, float seed, Material m, bool linked = false, Func<Vector3, bool> cutAlso = null)
         {
             int W = 2 * P - 1; var g = new Vector3[n, W]; var nrm = new Vector3[n, W]; var col = new Color[n, W];
             for (int i = 0; i < n; i++)
@@ -4918,6 +5020,7 @@ namespace Crulanda.World
                     {
                         int a = i * W + k, b = a + W, d = a + 1, e = b + 1;
                         if (linked && Hollow.OpenInOther(h, t.TransformPoint((v[a] + v[b] + v[d] + v[e]) / 4))) continue;   // open into the next cave
+                        if (linked && cutAlso != null && (cutAlso(t.TransformPoint(v[a])) || cutAlso(t.TransformPoint(v[b])) || cutAlso(t.TransformPoint(v[d])) || cutAlso(t.TransformPoint(v[e])))) continue;
                         tri.AddRange(turned ? new[] { a, d, b, d, e, b } : new[] { a, b, d, d, b, e });
                     }
                 var mesh = new Mesh { name = h.Name + " lining" }; mesh.SetVertices(v); mesh.SetNormals(vn); mesh.SetColors(vc); mesh.SetTriangles(tri, 0); mesh.RecalculateBounds();
@@ -5293,10 +5396,13 @@ namespace Crulanda.World
                     : Says("camp") ? "camp" : Says("log", "trunk") ? "log" : Says("stump") ? "stump" : Says("rocks", "cleft") ? "rocks" : Says("stone") ? "stone" : Says("scrape") ? "scrape" : null;
                 var sr = new System.Random(Zone.seed ^ (Mathf.RoundToInt(s.at.x * 8) * 73856093) ^ (Mathf.RoundToInt(s.at.y * 8) * 19349663) ^ 0x51c2e7);
                 float R() { return (float)sr.NextDouble(); }
-                var at = s.at;
-                if (s.kind == "herb" || (s.kind != "vista" && scene != null)) at = SecretClear(at, scene == "camp" ? 1.9f : scene == "log" ? 1.5f : scene == "rocks" ? .9f : .5f);
+                var at = s.at; float near = float.NegativeInfinity;
+                // (The Adit rework) One placed in a cave by along and aside (its floor, or a deck over it at rise): exactly there.
+                var inCave = string.IsNullOrEmpty(s.cave) ? null : Hollow.All.Find(o => o.Name == s.cave);
+                if (inCave != null) { var w = inCave.At(s.along, s.aside); at = s.at = new Vector2(w.x, w.z); near = w.y + s.rise; }
+                else if (s.kind == "herb" || (s.kind != "vista" && scene != null)) at = SecretClear(at, scene == "camp" ? 1.9f : scene == "log" ? 1.5f : scene == "rocks" ? .9f : .5f);
                 var t = new GameObject("Secret: " + (string.IsNullOrEmpty(s.name) ? s.id : s.name)).transform; t.SetParent(all, false);
-                t.position = StandAt(at, float.NegativeInfinity); t.rotation = Quaternion.Euler(0, s.rotation, 0);   // in a cave: on its floor
+                t.position = StandAt(at, near); t.rotation = Quaternion.Euler(0, s.rotation, 0);   // in a cave: on its floor (or the deck it names)
                 // In a cave, a key on its nail or a page in a crack hangs on the rock itself: the nearest wall at its height, facing out.
                 if ((s.kind == "key" || s.kind == "note") && CaveWall(t.position + Vector3.up * s.height, out var wallAt, out var outOf))
                 { t.position = new Vector3(wallAt.x, t.position.y, wallAt.z) + outOf * .03f; t.rotation = Quaternion.LookRotation(-outOf); }

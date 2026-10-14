@@ -268,7 +268,7 @@ namespace Crulanda.Tests
                     var normal = ctx; normal.elite = false;
                     Assert.IsFalse(loot.Matching(normal).Any(d => d.groups.Any(g => g.signature)), c.mob + "'s pack mates do not roll the list.");
                 }
-            Assert.AreEqual(20, elites, "Twelve elites, and the Sealed Adit's eight (its rare among them).");
+            Assert.AreEqual(32, elites, "Twelve elites, and the Sealed Adit's twenty since its rework (its rare among them).");
         }
 
         [Test] public void Every_zone_has_named_gear_for_every_slot()

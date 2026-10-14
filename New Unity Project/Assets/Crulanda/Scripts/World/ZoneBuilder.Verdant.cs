@@ -351,8 +351,10 @@ namespace Crulanda.World
     public sealed class FallingWater : MonoBehaviour
     {
         public float speed = .6f; Material m; Color tint;
+        /// <summary>Underground (a fall in a cave, the Adit rework): its tint stays as made, whatever the hour outside.</summary>
+        public bool steady;
         void Start() { var r = GetComponent<Renderer>(); if (r != null) { m = r.material; tint = m.GetColor("_TintColor"); } }
         // The sheet is unlit: its tint takes the hour's light, so the fall is moonlit at night and not the brightest thing in view.
-        void Update() { if (m == null) return; m.mainTextureOffset = new Vector2(0, -Time.time * speed); m.SetColor("_TintColor", HourTint.Of(tint)); }
+        void Update() { if (m == null) return; m.mainTextureOffset = new Vector2(0, -Time.time * speed); m.SetColor("_TintColor", steady ? tint : HourTint.Of(tint)); }
     }
 }

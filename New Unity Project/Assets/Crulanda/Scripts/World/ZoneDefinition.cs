@@ -70,6 +70,23 @@ namespace Crulanda.World
         /// <summary>Pin on the overworld map, normalised 0..1 from the image's top-left corner.</summary>
         public Vector2 worldMapPosition = new Vector2(-1, -1);
         public string worldMapNote;
+        // ---- the works in a dungeon's caves (the Adit rework, Docs/ADIT_REWORK.md; all GAME-ONLY, all optional: a zone without them builds as it did) ----
+        /// <summary>Walkable decks in caves: trestles, catwalks, rope bridges, platforms, islands, scree ramps (<see cref="ZoneDeck"/>; ZoneBuilder.AditDecks).</summary>
+        public ZoneDeck[] decks = new ZoneDeck[0];
+        /// <summary>One-way drops off a ledge or a deck into the cave below (<see cref="ZoneDrop"/>).</summary>
+        public ZoneDrop[] drops = new ZoneDrop[0];
+        /// <summary>Pools, streams and flooded stretches in caves (<see cref="ZoneCaveWater"/>; ZoneBuilder.AditWater).</summary>
+        public ZoneCaveWater[] caveWater = new ZoneCaveWater[0];
+        /// <summary>Gates across caves' ways (<see cref="ZoneGateDef"/>; built as ZoneGate by ZoneBuilder.Adit).</summary>
+        public ZoneGateDef[] gates = new ZoneGateDef[0];
+        /// <summary>Named places in caves (<see cref="ZoneAnchor"/>): where a run regroups, where a wave comes from, a chamber's middle.</summary>
+        public ZoneAnchor[] anchors = new ZoneAnchor[0];
+        /// <summary>A dungeon's wings, in the order they open (<see cref="ZoneWing"/>; the run a sim leads).</summary>
+        public ZoneWing[] wings = new ZoneWing[0];
+        /// <summary>A dungeon's events (<see cref="ZoneEvent"/>: the Wake).</summary>
+        public ZoneEvent[] events = new ZoneEvent[0];
+        /// <summary>Trails of living lichen along the run's way (<see cref="ZoneCrumb"/>).</summary>
+        public ZoneCrumb[] crumbs = new ZoneCrumb[0];
     }
     /// <summary>
     /// Ambient life. villagers: how many named villagers live here (homes are the zone's barred houses, given by households).
@@ -152,6 +169,18 @@ namespace Crulanda.World
         /// <summary>A patrol (playtest note 131, Chris, 2026-10-11: "should all patrol"): the points of its road, walked back and forth side
         /// by side while it has nobody to fight. Empty = its mobs stroll about the camp. The Sealed Adit's are written by adit_layout.py.</summary>
         public Vector2[] route;
+        /// <summary>The Adit rework (Docs/ADIT_REWORK.md; GAME-ONLY): the wing it belongs to (<see cref="ZoneWing.id"/>) and its place in that
+        /// wing's run (1, 2...; 0 for a patrol, a camp off the route or one released later).</summary>
+        public string wing; public int step;
+        /// <summary>What brings it (empty: it is there from the start, as every camp was): "kill:&lt;mob&gt;" (that mob's death), "event:&lt;id&gt;" (a
+        /// wave of an event), "loose:&lt;mob&gt;" (a boss's phase). It is not spawned with the others, but when that happens.</summary>
+        public string after;
+        /// <summary>The gate (by title) the run waits at before it, "none" for no gate; empty: the last gate before it in its cave.</summary>
+        public string gate;
+        /// <summary>The run may leave it (a side room's camp); passive: it ignores you until struck (the Old Burrower).</summary>
+        public bool optional, passive;
+        /// <summary>How far above its cave's floor it stands (on a deck: a trestle's landing, a catwalk); 0 on the floor.</summary>
+        public float rise;
     }
     /// <summary>Walk into the radius and press E to travel; you arrive at <see cref="arrive"/> in the other zone.</summary>
     [Serializable] public sealed class ZoneExit { public string to, name; public Vector2 at, arrive; public float radius = 5; }
@@ -169,6 +198,10 @@ namespace Crulanda.World
         public string id, name, kind = "cache", prompt, text, item, document, needs, canonStatus;
         public Vector2 at; public float radius = 2.5f, rotation, height;
         public int xp, gold;
+        /// <summary>In a cave (the Adit rework): which cave, how far in, how far to the right of its middle and how far above its floor it
+        /// stands (a deck, a niche over a landing). <see cref="at"/> is then written from these when the zone is built. Empty cave: at, as
+        /// every secret was.</summary>
+        public string cave; public float along, aside, rise;
     }
     /// <summary>A secret as built in the world (ZoneBuilder.Secrets): its data, where it stands, and its visible parts.</summary>
     public sealed class ZoneSecretSpot { public ZoneSecret def; public Vector3 position; public Transform root; }
@@ -257,7 +290,90 @@ namespace Crulanda.World
         /// <summary>A cavern opening out of another (by name, listed before it): its mouth stands on that cave's floor, and each cave's
         /// walls are open where the other runs through them (the Sealed Adit's branches off the Gallery).</summary>
         public string within;
+        /// <summary>A cavern within another: its mouth this many metres up the other's wall (0: on its floor, as every branch was). A
+        /// doorway high in a hall's wall, reached by a deck or left by a drop (the Adit rework: the Foundry's doors off the Gallery).</summary>
+        public float rise;
+        /// <summary>A cavern whose far end opens into another cave (by name) instead of closing: its last rows stay full width, out in the
+        /// other's air at the other's floor plus the lip its plan gives (a level way back round, or a ledge over a hall), and the two
+        /// caves' walls are open into each other there. Empty: it closes, as every cave did.</summary>
+        public string joins;
+        /// <summary>How the Sealed Adit dresses a cavern of variant 2 (ZoneBuilder.Adit): "main" (the Workings, the Gallery, the stair and
+        /// the Rail Hall), "geode", "vent", "breach", or any other word for a plain cave of lamps and rubble. Empty: by its name, as the
+        /// first Adit's caves were.</summary>
+        public string style;
     }
+    /// <summary>
+    /// A deck in a cave (GAME-ONLY; the Adit rework, ZoneBuilder.AditDecks): a walkable way of planks, cut stone, rope or scree, running
+    /// from <see cref="from"/> to <see cref="to"/> metres along its cave, its middle <see cref="aside"/> then <see cref="aside2"/> metres to the
+    /// right of the cave's middle, its top <see cref="rise"/> metres over the cave's floor at its start and <see cref="rise2"/> at its end
+    /// (straight between). One that runs across a hall keeps from and to alike and goes from aside to aside2. Everything on it stands in
+    /// the navmesh; the way under it stays walkable where there is room.
+    /// - style: timber (planks on posts), stone (cut stone on piers), rope (a rope bridge: planks on ropes, posts at its ends), scree
+    ///   (a rubble ramp, always built up from the floor).
+    /// - rails: both, left, right (as you walk it from its start), none, or empty: on every open edge (not along the wall it hugs, not
+    ///   where a floor, another deck or a drop carries on). A rail is a solid 1.6 m: nobody falls off by walking.
+    /// - wall: -1 or 1: it hugs the cave's left or right wall at its height (aside and aside2 are not used); 0: it stands free.
+    /// - width across; solid: built up from the floor (a plinth). Any stretch under 2.5 m over the floor is built up anyway.
+    /// - radius: a round deck (an island, a platform) of that radius at from and aside, its top rise over the floor.
+    /// </summary>
+    [Serializable] public sealed class ZoneDeck
+    {
+        public string name, cave, style = "timber", rails, canonStatus;
+        public int wall;
+        public float from, to, aside, aside2, rise, rise2, width = 3, radius;
+        public bool solid;
+    }
+    /// <summary>
+    /// A one-way drop (GAME-ONLY): off a ledge or a deck's open end in one cave (from metres along fromCave, fromAside to the right of its
+    /// middle, fromRise over its floor: where you step off, a metre or so in from the edge, on the floor or deck there) down to where you
+    /// land (to, toAside, toRise in toCave; empty toCave: the same cave; in a pool, its bed). Agents may take it down, never up
+    /// (EncounterNavigation: a one-way link; a camp's mobs not at all). No deck rail stands across its start. falls: a stream falls down
+    /// it too (a sheet of water from the lip, mist and foam at its foot). scenery: only that look, no way down (a fall beside a stair).
+    /// </summary>
+    [Serializable] public sealed class ZoneDrop
+    {
+        public string name, fromCave, toCave;
+        public float from, fromAside, fromRise, to, toAside, toRise, width = 2;
+        public bool falls, scenery;
+    }
+    /// <summary>
+    /// Water in a cave (GAME-ONLY; ZoneBuilder.AditWater). depth: how deep in the middle (over about 1.45 m you swim).
+    /// - a pool: radius over 0, round at from and aside, a basin sunk into the floor (its surface a hand under the floor, its banks
+    ///   easing down over about twice its depth);
+    /// - a stream: from..to along the cave, half metres either side of aside, sunk the same way, its surface following the floor;
+    /// - flood: the water stands depth over the cave's lowest floor between from and to, from wall to wall, and on until the floor
+    ///   climbs out of it (a drowned working, a flooded drift; the layout lets the floor rise out of it at both ends).
+    /// A sunk basin is kept a metre deep at most where it meets a wall (the rock's foot is 1.2 m under the floor): deep water is a pool
+    /// in the middle of a chamber, or a flood. Nothing of a cave's furnishing is set down in water.
+    /// </summary>
+    [Serializable] public sealed class ZoneCaveWater
+    {
+        public string name, cave;
+        public float from, to, aside, half = 2.5f, radius, depth = 1;
+        public bool flood;
+    }
+    /// <summary>
+    /// A gate across a cave's way (GAME-ONLY; built as a ZoneGate by ZoneBuilder.Adit): its title, its cave and how far in; kind (liftgate,
+    /// platformgate, bossdoor, bar, pen, hiddendoor); the prompt E shows at it (empty: there is nothing to use, it opens of itself); lord:
+    /// the elite whose people answer the loud way; opensOn: the mob whose death opens it; look (grille, door, boards, bar, stockade,
+    /// bookcase, song; empty: by its kind); side: "far" when it is worked from beyond it (a bar lifted from the hub's side only).
+    /// </summary>
+    [Serializable] public sealed class ZoneGateDef { public string title, cave, kind, prompt, lord, opensOn, look, side; public float along; }
+    /// <summary>A named place in a cave (GAME-ONLY): along, aside and rise over its floor (a deck). ZoneBuilder.Anchors holds where each stands.</summary>
+    [Serializable] public sealed class ZoneAnchor { public string name, cave; public float along, aside, rise; }
+    /// <summary>
+    /// A wing of a dungeon (GAME-ONLY; the run a sim leads): id and name; after: the wings or groups done before it opens (comma-separated);
+    /// group: wings of which one is enough (the Scriptorium or the Muster Yard); exit: "drop" or "walk", the way home from its end; home:
+    /// the anchor the run regroups at after it; optional: the run leaves it to you.
+    /// </summary>
+    [Serializable] public sealed class ZoneWing { public string id, name, after, group, exit, home; public bool optional; }
+    /// <summary>An event of a dungeon (GAME-ONLY: the Wake): its id and kind, the wing it belongs to and its place in that wing's run, the anchor
+    /// it centres on, and its waves.</summary>
+    [Serializable] public sealed class ZoneEvent { public string id, kind, wing, anchor; public int step; public ZoneWave[] waves = new ZoneWave[0]; }
+    /// <summary>A wave of an event: at seconds in, the camp (by name) it brings.</summary>
+    [Serializable] public sealed class ZoneWave { public float at; public string camp; }
+    /// <summary>A trail of living lichen along a cave (GAME-ONLY): from..to along it, aside of its middle (the way the run goes).</summary>
+    [Serializable] public sealed class ZoneCrumb { public string cave; public float from, to, aside; }
     /// <summary>
     /// A thing to gather that is not a prop: an ore seam, a windfall, a herb. node: its kind ("node.copper") in the trades'
     /// content, which says how it looks, what E offers and what it gives. rotation: its yaw (a seam's rock lies on its +Z side,

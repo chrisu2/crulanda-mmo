@@ -65,7 +65,7 @@ namespace Crulanda.Encounter
             // Water (surface and depth come from the same model the water is drawn with).
             var here = transform.position; float surface = 0, depth = 0;
             var zone = Crulanda.World.ZoneBuilder.Active;
-            bool wet = zone != null && zone.WaterAt(new Vector2(here.x, here.z), out surface, out depth);
+            bool wet = zone != null && zone.WaterAtPoint(here, out surface, out depth);   // (a cave's pools and streams too: the Adit rework)
             float feetUnder = wet ? surface - (here.y - 1) : 0;                     // how far the feet are below the surface
             // Hysteresis so the state doesn't flicker along a depth line: in at 0.12 m, out at 0.04 m.
             bool inWater = wet && feetUnder > (wasInWater ? .04f : .12f);
@@ -158,7 +158,7 @@ namespace Crulanda.Encounter
             if (groundCollider != null) { float g = zoneHere.HeightAt(camAt.x, camAt.z) + .35f; if (camAt.y < g) camAt.y = g; }
             // Keep the camera above any water surface (no looking up at the water from underneath).
             var zone = Crulanda.World.ZoneBuilder.Active;
-            if (zone != null && zone.WaterAt(new Vector2(camAt.x, camAt.z), out float s, out _) && camAt.y < s + .2f) camAt.y = s + .2f;
+            if (zone != null && zone.WaterAtPoint(camAt, out float s, out _) && camAt.y < s + .2f) camAt.y = s + .2f;
             view.transform.position = camAt;
             view.transform.rotation = rotation;
             // Trees between the camera and you turn see-through.
@@ -172,7 +172,7 @@ namespace Crulanda.Encounter
             controller.enabled = false; transform.position = point; controller.enabled = true; vertical = 0;
             // Arriving in water (spawn, load, travel) is not "entering" it: no splash.
             var zone = Crulanda.World.ZoneBuilder.Active;
-            wasInWater = zone != null && zone.WaterAt(new Vector2(point.x, point.z), out float s, out _) && point.y - 1 < s;
+            wasInWater = zone != null && zone.WaterAtPoint(point, out float s, out _) && point.y - 1 < s;
         }
         void Start() { Teleport(transform.position); }
     }

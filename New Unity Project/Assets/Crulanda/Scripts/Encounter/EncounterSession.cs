@@ -1548,6 +1548,7 @@ namespace Crulanda.Encounter
             for (int c = 0; c < Zone.Zone.camps.Length; c++)
             {
                 var camp = Zone.Zone.camps[c]; if (camp == null) continue;
+                if (!string.IsNullOrEmpty(camp.after)) continue;   // (the Adit rework) one released later (a boss's relief, an event's wave): not here at the start
                 if (camp.rare > 0 && RareDice() >= camp.rare) continue;   // a rare camp, not here this visit (last in the list: no other camp's draws move)
                 var look = LookFor(camp.look, camp.elite); bool beast = ActorVisual.IsBeast(look);
                 string tag = string.IsNullOrEmpty(camp.tag) ? (camp.look ?? "mob") : camp.tag;
@@ -1561,7 +1562,7 @@ namespace Crulanda.Encounter
                     if (camp.route != null && camp.route.Length > 1) spot = camp.route[0] + Side(camp.route) * gap * 1.15f * (n - (camp.count - 1) / 2f);
                     else spot = Spaced(spot, camp.center, gap, placed);
                     placed.Add(spot);
-                    var point = Zone.StandAt(spot, float.NegativeInfinity, 1);   // a camp in a cave stands on its floor
+                    var point = Zone.StandAt(spot, DeckHeight(camp, spot), 1);   // a camp in a cave stands on its floor (or up on its deck: the Adit rework)
                     if (NavMesh.SamplePosition(point, out var hit, 3, NavMesh.AllAreas)) point = hit.position + Vector3.up; else continue;
                     int level = camp.levelMin + rng.Next(Mathf.Max(1, camp.levelMax - camp.levelMin + 1));
                     // Only the first mob of an elite camp is the elite (its pack stays normal).
@@ -1569,6 +1570,7 @@ namespace Crulanda.Encounter
                     string id = "mob." + tag + "." + zoneShort + "." + c + "." + n;
                     var a = SpawnActor(elite ? camp.mob + " (elite)" : camp.mob, content.enemy, point, Color.grey, id, look, level);
                     AddAgent(a.gameObject, look == ActorLook.Wolf ? 4.2f : look == ActorLook.Boar ? 3.8f : look == ActorLook.Bear ? 4f : look == ActorLook.WeaveEater ? 3.4f : 2.8f, beast ? .6f : .45f);
+                    a.GetComponent<NavMeshAgent>().areaMask &= ~(1 << EncounterNavigation.DropArea);   // (the Adit rework) a camp's mobs never take a one-way drop: they would be gone from their camp for good
                     var enemy = a.gameObject.AddComponent<EncounterEnemy>(); enemy.actor = a; enemy.persistentId = id; enemy.session = this;
                     enemy.Camp = true; enemy.Elite = elite; enemy.RespawnSeconds = Mathf.Max(20, camp.respawn); enemy.CampCenter = camp.center; enemy.CampRadius = camp.radius;
                     enemy.Ambusher = camp.ambush; enemy.Skinnable = look == ActorLook.Wolf || look == ActorLook.Boar || look == ActorLook.Stag || look == ActorLook.Bear;
@@ -1643,6 +1645,17 @@ namespace Crulanda.Encounter
                     }
                 }
             }
+        }
+        /// <summary>
+        /// The height a camp's mob is stood nearest (ZoneBuilder.StandAt): a camp up on a deck in a cave (ZoneCamp.rise: a trestle's landing,
+        /// a catwalk, a bridge's tower; the Adit rework) its cave's floor there plus its rise, so it stands on the deck and not on the floor
+        /// under it; every other camp float.NegativeInfinity (the first cave floor there, as every camp stood).
+        /// </summary>
+        public static float DeckHeight(Crulanda.World.ZoneCamp camp, Vector2 spot)
+        {
+            if (camp == null || camp.rise <= 0 || string.IsNullOrEmpty(camp.cave)) return float.NegativeInfinity;
+            var cave = Crulanda.World.Hollow.All.Find(h => h.Name == camp.cave); if (cave == null) return float.NegativeInfinity;
+            return (cave.FloorAt(spot, out float floor) ? floor : cave.At(camp.along, camp.aside).y) + camp.rise;
         }
         /// <summary>Story enemies of this zone (saved, stay dead) as opposed to camp mobs.</summary>
         public List<EncounterEnemy> StoryEnemies { get { return Enemies.FindAll(e => !e.Camp && e != TrainingDummy); } }   // not the yard's dummy: it never stays down, and the zone would never be clear
@@ -2024,6 +2037,7 @@ namespace Crulanda.Encounter
         {
             if (restoring) return;
             if (enemy.Game) { GameDied(enemy); return; }   // no experience, no coin, no "zone clear" (EncounterSession.Hunt)
+            OpenGatesOf(enemy);   // (the Adit rework) a boss's door opens as he falls, whoever brought him down
             // A sim's kill (it hit first, out of your party): nothing for you, no loot on the body (Phase 5.3a; classic tagging).
             if (enemy.TappedBy != null && enemy.TappedBy != Player.EntityId.Value && PartyActor(enemy.TappedBy) == null) { if (Target == enemy) AutoAttack = false; return; }
             if (enemy.Camp) RollCorpse(enemy);   // the loot is decided as it dies, so the body can show it
@@ -2048,6 +2062,14 @@ namespace Crulanda.Encounter
                 if (Progress.Level > before) ApplyLevel();
             }
             if (!enemy.Camp && StoryEnemies.TrueForAll(e => !e.actor.IsAlive)) Message(ZoneTitle + " is clear for now. " + (Inventory.IsEquipped(Progress, content.itemId) ? "Save [F5]." : "Equip your reward [I], then save [F5]."));
+        }
+        /// <summary>The doors a camp's mob holds shut (ZoneGate.OpensOn: Lusk's door, the chute door, the cloister door, the sluice-boards; the
+        /// Adit rework) open as it dies, for this visit (they shut again on the next).</summary>
+        void OpenGatesOf(EncounterEnemy enemy)
+        {
+            if (Zone == null || enemy == null || !enemy.Camp || string.IsNullOrEmpty(enemy.MobName)) return;
+            foreach (var g in Zone.Gates)
+                if (g != null && !g.Open && g.OpensOn == enemy.MobName) { g.SetOpen(true); Message(g.Title + " opens as " + enemy.Name + " falls."); }
         }
         void ApplyLevel()
         {

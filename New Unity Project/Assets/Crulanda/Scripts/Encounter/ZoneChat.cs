@@ -157,7 +157,7 @@ namespace Crulanda.Encounter
                     case "/friends": ListFriends(); return;
                     case "/assist": case "/a": Assist(arg); return;
                     case "/lead": case "/run": Lead(arg); return;
-                    case "/dungeon": LeadDungeon(); return;
+                    case "/dungeon": LeadDungeon(arg); return;   // "/dungeon quick", "/dungeon full" (the Adit rework)
                     case "/scorecard": ScorecardOpen = !ScorecardOpen; if (ScorecardOpen && ScorecardTitle == null) ScorecardTitle = (Meter.RunName ?? "The run") + " so far"; return;
                     case "/level": TesterLevel(arg); return;   // Chris, 2026-10-13: "i need a way to fast level for testing" / "and then reset to 1 when not testing"
                     case "/aa": TesterAa(arg); return;
@@ -176,7 +176,7 @@ namespace Crulanda.Encounter
                             TravelTo(new Crulanda.World.ZoneExit { to = "zone.adit", name = "/adit", arrive = adit.spawns.player });
                             return;
                         }
-                    case "/help": Message("Testing: /level <1-" + EncounterProgress.LevelCap + "> sets your level (down to 1 starts over), /aa <n> gives alternate advancement points at the cap."); Message("Chat: /s say, /z zone, /t trade, /lfg, /p party, /w <name> <words> whisper, /r reply; /invite <name> (anyone online, anywhere), /leave [name], /who, /friend <name>, /friends, /assist [name], /lead [name] (a sim leads a run to a camp), /dungeon (a sim leads you through the dungeon); /g guild chat, /guild (who is in it), /gquit."); return;
+                    case "/help": Message("Testing: /level <1-" + EncounterProgress.LevelCap + "> sets your level (down to 1 starts over), /aa <n> gives alternate advancement points at the cap."); Message("Chat: /s say, /z zone, /t trade, /lfg, /p party, /w <name> <words> whisper, /r reply; /invite <name> (anyone online, anywhere), /leave [name], /who, /friend <name>, /friends, /assist [name], /lead [name] (a sim leads a run to a camp), /dungeon [quick|full] (a sim leads you through the dungeon: quick leaves what may be left, full takes every side room); /g guild chat, /guild (who is in it), /gquit."); return;
                     case "/s": case "/say": case "/z": case "/zone": case "/ooc": case "/t": case "/trade": case "/lfg": case "/l": case "/p": case "/party": case "/g": case "/gu": break;
                     default: Message("Unknown command " + cmd + ". /help lists them."); return;
                 }

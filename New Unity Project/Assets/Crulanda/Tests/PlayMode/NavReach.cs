@@ -32,6 +32,23 @@ namespace Crulanda.Tests
             return Hollow.All != null && Hollow.All.Count > 0 && ViaCaves(start, to);
         }
 
+        /// <summary>How far the way is from one point to another on the navmesh (the areas in <paramref name="mask"/>), leg after leg where the
+        /// search gives up part way; +infinity where a leg gets no nearer (the way is cut, or winds back on itself too far to follow).</summary>
+        public static float Length(Vector3 from, Vector3 to, int mask = NavMesh.AllAreas)
+        {
+            var path = new NavMeshPath(); float total = 0;
+            for (int leg = 0; leg < 16; leg++)
+            {
+                if (!NavMesh.CalculatePath(from, to, mask, path) || path.corners.Length == 0) return float.PositiveInfinity;
+                for (int i = 1; i < path.corners.Length; i++) total += Vector3.Distance(path.corners[i - 1], path.corners[i]);
+                if (path.status == NavMeshPathStatus.PathComplete) return total;
+                var end = path.corners[path.corners.Length - 1];
+                if ((end - from).sqrMagnitude < 1 || (end - to).sqrMagnitude >= (from - to).sqrMagnitude - .25f) return float.PositiveInfinity;
+                from = end;
+            }
+            return float.PositiveInfinity;
+        }
+
         static bool Complete(Vector3 a, Vector3 b, NavMeshPath path)
         { return NavMesh.CalculatePath(a, b, NavMesh.AllAreas, path) && path.status == NavMeshPathStatus.PathComplete; }
 

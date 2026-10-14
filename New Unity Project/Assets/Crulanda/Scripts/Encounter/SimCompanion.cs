@@ -234,13 +234,14 @@ namespace Crulanda.Encounter
                     if (e == null || !e.actor.IsAlive || !e.FightingParty || e.LeaveAlone || Held(e)) continue;
                     float d = Vector3.Distance(e.transform.position, transform.position); if (d < bestD) { best = e; bestD = d; }
                 }
-                if (best == null && Leading.HasValue && waitingAt == null && Vector3.Distance(transform.position, Leading.Value) < 18 && PartyBehind() <= 16)   // no pull till the party is up
+                if (best == null && Leading.HasValue && waitingAt == null && !Regrouping && Vector3.Distance(transform.position, Leading.Value) < 18 && PartyBehind() <= 16)   // no pull till the party is up
                 {
-                    // At the camp it leads to: the nearest of its mobs still standing (not while it waits at a shut gate: the camp past it is not its to pull, D7).
+                    // At the camp it leads to: the nearest of its mobs still standing (not while it waits at a shut gate: the camp past it is not its to pull, D7;
+                    // not while the party gathers at a wing's home; on the camp's own floor or deck, not one 12 m below it: the Adit rework).
                     foreach (var e in session.Enemies)
                     {
                         if (e == null || !e.actor.IsAlive || !e.Camp || e.Game) continue;
-                        float d = Vector3.Distance(e.transform.position, Leading.Value); if (d < 16 && d < bestD) { best = e; bestD = d; }
+                        float d = Vector3.Distance(e.transform.position, Leading.Value); if (d < 16 && d < bestD && SameFloor(e.transform.position, Leading.Value)) { best = e; bestD = d; }
                     }
                 }
                 return best;
@@ -290,34 +291,64 @@ namespace Crulanda.Encounter
         }
         /// <summary>Where it leads, with "the" once ("the vent-hound", not "the the vent-hound").</summary>
         string ThePlace { get { var n = (LeadingName ?? "").ToLower(); return n.StartsWith("the ") ? n : "the " + n; } }
-        /// <summary>A camp out of reach, left behind: on to the next on the route, or the run ends.</summary>
+        /// <summary>A camp out of reach, left behind: on to the next on the route, or the run ends. (A regroup nobody comes to, and a side
+        /// room behind a gate nobody opens, are left the same way, each with its own words.)</summary>
         void LeaveCamp()
         {
-            session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? "cant reach that one. leave it, on we go" : "Leave that one, it is out of our reach. On we go.");
-            if (route.Count > 1) { route.RemoveAt(0); Leading = route[0].at; LeadingName = route[0].name; } else StopLeading();
+            var step = route.Count > 0 ? route[0] : null; bool chatty = sim.chatty > .65f;
+            string say = step != null && step.regroup ? (chatty ? "cant wait here all day. on we go" : "We cannot wait here all day. On we go.")
+                : step != null && step.optional && waitingAt != null ? (chatty ? "still shut. leave it, on we go" : "That stays shut. We leave it be and go on.")
+                : (chatty ? "cant reach that one. leave it, on we go" : "Leave that one, it is out of our reach. On we go.");
+            session.ChatSay(ChatChannel.Party, sim.name, say);
+            waitingAt = null; StoppedBy = null;
+            if (route.Count > 0) route.RemoveAt(0);
+            PassRegroups();
+            if (route.Count > 0) BeginStep(); else StopLeading();
         }
-        public void StopLeading() { Leading = null; LeadingName = null; route.Clear(); Dungeon = null; StoppedBy = null; waitingAt = null; }
-        /// <summary>A dungeon run (round 27): the camps still to clear, in the order the passage meets them, each with the gate across the
-        /// way before it (D7: shut, the run waits at it), and the dungeon's name.</summary>
-        readonly System.Collections.Generic.List<(Vector3 at, string name, bool boss, Crulanda.World.ZoneGate gate)> route = new System.Collections.Generic.List<(Vector3, string, bool, Crulanda.World.ZoneGate)>();
+        public void StopLeading() { Leading = null; LeadingName = null; route.Clear(); Dungeon = null; StoppedBy = null; waitingAt = null; wingSeen.Clear(); }
+        /// <summary>A dungeon run (round 27; the Adit rework: RouteStep, DungeonPlan): the steps still to go, in order, each with the gate across
+        /// the way before it (D7: shut, the run waits at it), and the dungeon's name.</summary>
+        readonly List<RouteStep> route = new List<RouteStep>();
+        /// <summary>The run's steps still to go, the one it leads to now first (read only: the tests and the run capture).</summary>
+        public IReadOnlyList<RouteStep> Route { get { return route; } }
+        /// <summary>The wings of the run in the order it takes them (DungeonPlan; empty in a dungeon without wings).</summary>
+        public readonly List<string> WingOrder = new List<string>();
+        /// <summary>Which run it leads (/dungeon quick, /dungeon, /dungeon full).</summary>
+        public DungeonPlan.Mode RunMode { get; private set; }
         public string Dungeon { get; private set; }
-        /// <summary>The shut gate ahead that the run will wait at (the Sealed Adit's cage-lift or platform gate), or null once it is open or there is none.</summary>
+        /// <summary>The shut gate ahead that the run will wait at (the Sealed Adit's singing door or platform gate), or null once it is open or there is none.</summary>
         public string StoppedBy { get; private set; }
-        public int CampsLeft { get { return route.Count; } }
-        Crulanda.World.ZoneGate waitingAt;
+        /// <summary>The fights still to go (a regroup is not one).</summary>
+        public int CampsLeft { get { int n = 0; foreach (var s in route) if (!s.regroup) n++; return n; } }
+        /// <summary>The name of the wing of the step it leads to now, or null (a dungeon without wings).</summary>
+        public string Wing { get { return route.Count > 0 ? route[0].wingName : null; } }
+        /// <summary>The fights still to go in the wing it is in now.</summary>
+        public int WingCampsLeft { get { int n = 0; if (route.Count == 0) return 0; foreach (var s in route) if (s.wing == route[0].wing && !s.regroup) n++; return n; } }
+        /// <summary>Gathering the party at a wing's home before the next (the Adit rework): nothing is pulled meanwhile.</summary>
+        public bool Regrouping { get { return route.Count > 0 && route[0].regroup && waitingAt == null; } }
+        Crulanda.World.ZoneGate waitingAt; float waitingSince;
         /// <summary>Waiting at a shut gate for you to open it (D7).</summary>
         public bool WaitingAtGate { get { return waitingAt != null; } }
-        /// <summary>A shut gate before the next camp: the run goes to it and waits, saying what it wants; open, the run goes on (D7).</summary>
+        /// <summary>The wings it has fought its way into this run (a regroup is only for a wing the party went through).</summary>
+        readonly HashSet<string> wingSeen = new HashSet<string>();
+        /// <summary>A place's name inside a sentence: "the Geode Foundry", not "The Geode Foundry".</summary>
+        static string Within(string name) { return name != null && name.StartsWith("The ") ? "the " + name.Substring(4) : name; }
+        /// <summary>A shut gate before the next step: the run goes to it and waits on its own side of it, saying what it wants; open, the run
+        /// goes on (D7). A side room's gate (the pen's) is waited at a while, then left.</summary>
         void TickGate()
         {
             if (Dungeon == null || route.Count == 0) return;
             var g = route[0].gate;
             if (g != null && !g.Open)
             {
-                if (waitingAt == g) return;
-                waitingAt = g; StoppedBy = g.Title; Leading = g.transform.position - g.transform.forward * 2.5f; LeadingName = g.Title.StartsWith("The ") ? g.Title.Substring(4) : g.Title;   // "Waiting at the winch gate"
+                if (waitingAt == g) { if (route[0].optional && Time.time - waitingSince > 45) LeaveCamp(); return; }
+                waitingAt = g; waitingSince = Time.time; StoppedBy = g.Title; Leading = GateSide(g); LeadingName = g.Title.StartsWith("The ") ? g.Title.Substring(4) : g.Title;   // "Waiting at the singing door"
                 var thing = session.Zone.Interactables.Find(i => i.gate == g); var prompt = thing != null ? session.InteractPromptFor(thing) : null;
-                session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? g.Title.ToLower() + " is shut. " + (prompt ?? "open it").ToLower() + "?" : g.Title + " is shut against us. " + (prompt ?? "It wants opening") + ".");
+                // A boss's door (the Adit rework) says whose death opens it: the run comes to one shut only when he was left standing.
+                bool door = prompt == null && !string.IsNullOrEmpty(g.OpensOn);
+                session.ChatSay(ChatChannel.Party, sim.name, door
+                    ? (sim.chatty > .65f ? g.Title.ToLower() + " is shut till " + g.OpensOn.ToLower() + " drops" : g.Title + " is shut against us. It opens when " + g.OpensOn + " falls.")
+                    : (sim.chatty > .65f ? g.Title.ToLower() + " is shut. " + (prompt ?? "open it").ToLower() + "?" : g.Title + " is shut against us. " + (prompt ?? "It wants opening") + "."));
             }
             else if (waitingAt != null)
             {
@@ -325,17 +356,52 @@ namespace Crulanda.Encounter
                 session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? "open! on we go" : "It's open. On we go.");
             }
         }
-        /// <summary>
-        /// Leads the party through the zone's dungeon (a walk-in cave with camps in it): every camp whose ground is the cave's floor, in
-        /// the order the passage reaches them from the mouth, the boss (an elite at the far end) last. Refuses (null, and why) when there
-        /// is none, or when you are more than a level under its first camp (its camps are harder).
-        /// </summary>
-        public string LeadDungeon(out string why)
+        /// <summary>Where to wait at a shut gate: a step from it on the side the leader is on (a door the run comes to from its far end, as the
+        /// Geode Foundry's chute door from the hall, is waited at from the hall).</summary>
+        Vector3 GateSide(Crulanda.World.ZoneGate g)
         {
-            why = null; route.Clear(); Dungeon = null; StoppedBy = null;
+            var f = g.transform.forward; float side = Vector3.Dot(transform.position - g.transform.position, f) > 0 ? 1 : -1;
+            var at = g.transform.position + f * (2.5f * side);
+            return NavMesh.SamplePosition(at, out var hit, 3, NavMesh.AllAreas) ? hit.position : at;
+        }
+        /// <summary>
+        /// Leads the party through the zone's dungeon (a walk-in cave with camps in it). A dungeon of wings (ZoneDefinition.wings: the Sealed
+        /// Adit reworked) is run as DungeonPlan orders it: wing by wing, the nearest open one next, each wing's fights in its own order, a
+        /// regroup at a wing's home where its way out comes down; <paramref name="mode"/> "quick" takes only what must be done, "full" every
+        /// side room and both sides of a fork, anything else the standard run (with the side bosses in the wings it goes through). Any other
+        /// dungeon: every camp whose ground is the cave's floor, in the order the passage reaches them from the mouth, the boss (an elite at
+        /// the far end) last. Refuses (null, and why) when there is none, or when you are more than a level under its first camp (its camps
+        /// are harder).
+        /// </summary>
+        public string LeadDungeon(out string why) { return LeadDungeon(null, out why); }
+        public string LeadDungeon(string mode, out string why)
+        {
+            why = null; route.Clear(); Dungeon = null; StoppedBy = null; waitingAt = null; wingSeen.Clear(); WingOrder.Clear(); walks.Clear(); RunMode = DungeonPlan.ParseMode(mode);
             if (session.Zone == null) { why = "There is nowhere to go."; return null; }
-            // The caves with their own mouths; a branch's camps come where the passage meets the branch (the Sealed Adit: the
-            // Workings, then each way off the Gallery in the order you pass it, then the stair and the Rail Hall).
+            var zone = session.Zone.Zone;
+            if (zone.wings != null && zone.wings.Length > 0 && zone.camps != null && Crulanda.World.Hollow.All.Count > 0)
+            {
+                var steps = DungeonPlan.Plan(zone, RunMode, transform.position, CampStand, AnchorAt, WalkLength, CampStanding, QuestWants, WingOrder);
+                int firstFight = steps.FindIndex(s => !s.regroup);
+                if (firstFight < 0) { why = "There is nothing left standing in " + zone.displayName + "."; return null; }
+                int first = steps[firstFight].level; if (session.Progress.Level < first - 1) { why = zone.displayName + " is too much for us yet (level " + first + " at the door)."; return null; }
+                foreach (var s in steps) if (!s.regroup) s.gate = session.GateAhead(zone.camps[s.Camp]);   // past a gate: the run waits at it while it is shut (D7)
+                foreach (var s in steps) if (s.regroup) s.gate = ExitGate(s, steps);   // a wing's way out, behind its boss's door
+                route.AddRange(steps);
+                // The first shut gate the run will wait at: not a boss's door it opens on its way (his death opens it).
+                for (int k = 0; k < route.Count && StoppedBy == null; k++)
+                {
+                    var g = route[k].gate; if (g == null || g.Open) continue;
+                    bool opensOnTheWay = false;
+                    if (!string.IsNullOrEmpty(g.OpensOn)) for (int j = 0; j < k && !opensOnTheWay; j++) foreach (int c in route[j].camps) if (zone.camps[c].mob == g.OpensOn) opensOnTheWay = true;
+                    if (!opensOnTheWay) StoppedBy = g.Title;
+                }
+                Dungeon = zone.dungeon || WingOrder.Count == 0 ? zone.displayName : WingOrder[0];
+                Begin();
+                return Dungeon;
+            }
+            // The caves with their own mouths; a branch's camps come where the passage meets the branch (a dungeon without wings: Crowsfoot
+            // Hollow's, the first Sealed Adit's).
             foreach (var h in Crulanda.World.Hollow.All)
             {
                 if (h.Parent != null) continue;
@@ -343,13 +409,122 @@ namespace Crulanda.Encounter
                 Gather(h, camps, true);
                 if (camps.Count == 0) continue;
                 int first = camps[0].lo; if (session.Progress.Level < first - 1) { why = h.Name + " is too much for us yet (level " + first + " at the door)."; return null; }
-                foreach (var cp in camps) { route.Add((cp.at, cp.name, cp.boss, cp.gate)); if (StoppedBy == null && cp.gate != null && !cp.gate.Open) StoppedBy = cp.gate.Title; }   // the first shut gate: the run waits there (D7)
-                Dungeon = session.Zone.Zone.dungeon ? session.Zone.Zone.displayName : h.Name; Leading = route[0].at; LeadingName = route[0].name;
-                session.Meter.BeginRun(Dungeon);   // the scorecard counts from here
-                session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? "ok, " + Dungeon + " run. " + route.Count + " camps to the bottom, stay close" : "Follow me into " + Dungeon + ". " + route.Count + " camps between us and the end. Stay close.");
+                foreach (var cp in camps) { route.Add(new RouteStep { at = cp.at, name = cp.name, boss = cp.boss, gate = cp.gate, level = cp.lo }); if (StoppedBy == null && cp.gate != null && !cp.gate.Open) StoppedBy = cp.gate.Title; }   // the first shut gate: the run waits there (D7)
+                Dungeon = session.Zone.Zone.dungeon ? session.Zone.Zone.displayName : h.Name;
+                Begin();
                 return Dungeon;
             }
             why = "There is no dungeon in these parts."; return null;
+        }
+        /// <summary>The run sets out: its mark on the first step, the scorecard counting from here, and the word to the party.</summary>
+        void Begin()
+        {
+            BeginStep();
+            session.Meter.BeginRun(Dungeon);   // the scorecard counts from here
+            int n = CampsLeft; string way = RunMode == DungeonPlan.Mode.Quick ? " (the quick way)" : RunMode == DungeonPlan.Mode.Full ? " (every side room too)" : "";
+            session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? "ok, " + Dungeon + " run. " + n + " camps to the bottom" + way + ", stay close" : "Follow me into " + Dungeon + ". " + n + " camps between us and the end" + way + ". Stay close.");
+        }
+        /// <summary>Its mark on the step it leads to now.</summary>
+        void BeginStep()
+        {
+            var s = route[0]; Leading = s.at; LeadingName = s.name;
+        }
+        /// <summary>A regroup after a wing the run never fought through (its camps were down before the leader came to them) is passed by:
+        /// there is nobody to gather.</summary>
+        void PassRegroups() { while (route.Count > 0 && route[0].regroup && !wingSeen.Contains(route[0].wing)) route.RemoveAt(0); }
+        /// <summary>The door on a wing's way out that its own boss's death opens (the Geode Foundry's chute door, the cloister door, the
+        /// sluice-boards), not one across the way to a fight (Lusk's door, before the Workings' last camps): the regroup at the wing's home
+        /// waits at it while it is shut. Null when there is none.</summary>
+        Crulanda.World.ZoneGate ExitGate(RouteStep regroup, List<RouteStep> steps)
+        {
+            var camps = session.Zone.Zone.camps;
+            foreach (var g in session.Zone.Gates)
+            {
+                if (g == null || string.IsNullOrEmpty(g.OpensOn)) continue;
+                bool mine = false, onTheWay = false;
+                foreach (var s in steps)
+                {
+                    if (s.gate == g) onTheWay = true;
+                    if (!s.regroup && s.wing == regroup.wing) foreach (int c in s.camps) if (camps[c].mob == g.OpensOn) mine = true;
+                }
+                if (mine && !onTheWay) return g;
+            }
+            return null;
+        }
+        /// <summary>Where a camp stands, as it spawns: on its cave's floor, or up on its deck (ZoneCamp.rise; the Adit rework).</summary>
+        Vector3 CampStand(int c)
+        {
+            var cp = session.Zone.Zone.camps[c]; var h = string.IsNullOrEmpty(cp.cave) ? null : Crulanda.World.Hollow.All.Find(o => o.Name == cp.cave);
+            float y;
+            if (h != null && (h.FloorSmooth(cp.center, out y) || h.FloorAt(cp.center, out y)))
+            {
+                if (cp.rise > 0) y = session.Zone.StandAt(cp.center, y + cp.rise).y;
+                return new Vector3(cp.center.x, y, cp.center.y);
+            }
+            return session.Zone.StandAt(cp.center, float.NegativeInfinity);
+        }
+        Vector3? AnchorAt(string name) { return session.Zone.Anchors.TryGetValue(name, out var p) ? (Vector3?)p : null; }
+        /// <summary>Whether anything of a camp is alive (a camp cleared, or a rare one not here this visit, is not).</summary>
+        bool CampStanding(int c) { foreach (var e in session.Enemies) if (e != null && e.Camp && !e.Game && e.CampIndex == c && e.actor.IsAlive) return true; return false; }
+        bool AnyStanding(int[] cs) { foreach (int c in cs) if (CampStanding(c)) return true; return false; }
+        /// <summary>Whether a live quest still wants a camp's elite dead (a kill objective of its current step that matches the elite's id).</summary>
+        bool QuestWants(int c)
+        {
+            var log = session.Quests; if (log == null) return false;
+            var cp = session.Zone.Zone.camps[c]; string tag = string.IsNullOrEmpty(cp.tag) ? (cp.look ?? "mob") : cp.tag;
+            string id = "mob." + tag + "." + session.Zone.Zone.id.Replace("zone.", "") + "." + c + ".0";   // its elite (EncounterSession.SpawnCamps)
+            foreach (var (quest, state) in log.Active())
+            {
+                var step = log.CurrentStep(state); if (step == null) continue;
+                for (int i = 0; i < step.objectives.Length; i++) { var o = step.objectives[i]; if (o.type == "kill" && QuestLog.Matches(o.target, id) && log.Count(state, i) < o.count) return true; }
+            }
+            return false;
+        }
+        /// <summary>How far it is to walk from a to b (the navmesh, the drops taken down, the gates as they stand): leg after leg where the
+        /// search gives up part way (NavMesh.CalculatePath stops short on a long way), and the rest of the way twice over where a leg gets
+        /// no nearer (a shut gate, or no way at all).</summary>
+        float WalkLength(Vector3 a, Vector3 b)
+        {
+            if (walks.TryGetValue((a, b), out var known)) return known;
+            float total = 0;
+            if (!NavMesh.SamplePosition(a, out var ha, 4, NavMesh.AllAreas) || !NavMesh.SamplePosition(b, out var hb, 4, NavMesh.AllAreas)) return walks[(a, b)] = 3 * Vector3.Distance(a, b);
+            var from = ha.position; var to = hb.position; var path = new NavMeshPath();
+            for (int leg = 0; leg < 8; leg++)
+            {
+                if (!NavMesh.CalculatePath(from, to, NavMesh.AllAreas, path) || path.corners.Length == 0) break;
+                for (int i = 1; i < path.corners.Length; i++) total += Vector3.Distance(path.corners[i - 1], path.corners[i]);
+                var end = path.corners[path.corners.Length - 1];
+                if (path.status == NavMeshPathStatus.PathComplete) return walks[(a, b)] = total;
+                bool nearer = (end - from).sqrMagnitude >= 1 && (end - to).sqrMagnitude < (from - to).sqrMagnitude - .25f;
+                from = end; if (!nearer) break;
+            }
+            return walks[(a, b)] = total + 2 * Vector3.Distance(from, to);
+        }
+        readonly Dictionary<(Vector3, Vector3), float> walks = new Dictionary<(Vector3, Vector3), float>();
+        /// <summary>Whether a mob is on the same floor or deck as a place (the Adit rework: a camp up on a deck is not held up by the mobs 12 m
+        /// under it, nor pulled from there); a slope's fall over the distance is allowed for.</summary>
+        static bool SameFloor(Vector3 mob, Vector3 place) { var d = mob - place; return Mathf.Abs(d.y) < 5 + .45f * new Vector2(d.x, d.z).magnitude; }
+        /// <summary>A step after a patrolling side boss (the Old Burrower round its pool): its mark follows the nearest of it.</summary>
+        void TrackStep()
+        {
+            if (route.Count == 0 || !route[0].follow || waitingAt != null || Time.time < nextTrack) return;
+            nextTrack = Time.time + .5f; EncounterEnemy near = null; float best = float.MaxValue;
+            foreach (var e in session.Enemies)
+            {
+                if (e == null || !e.Camp || !e.actor.IsAlive || System.Array.IndexOf(route[0].camps, e.CampIndex) < 0) continue;
+                float d = Vector3.Distance(e.transform.position, transform.position); if (d < best) { best = d; near = e; }
+            }
+            if (near != null) { route[0].at = near.transform.position; Leading = route[0].at; }
+        }
+        float nextTrack;
+        /// <summary>The step it leads to is done: a fight when none of its mobs is left near it (a patrolling side boss: when it is down), a
+        /// regroup when the leader stands there and the party has gathered.</summary>
+        bool StepDone()
+        {
+            if (!Leading.HasValue) return false;
+            if (route.Count > 0 && route[0].regroup) return Vector3.Distance(transform.position, Leading.Value) < 7 && PartyBehind() < 12 && !session.InCombat;
+            if (route.Count > 0 && route[0].follow) return !AnyStanding(route[0].camps);
+            return CampCleared();
         }
         /// <summary>A cave's camps in the order the way through meets them, each branch's run spliced in where it opens.</summary>
         void Gather(Crulanda.World.Hollow h, System.Collections.Generic.List<(float along, Vector3 at, string name, bool boss, int lo, Crulanda.World.ZoneGate gate)> into, bool root)
@@ -380,11 +555,11 @@ namespace Crulanda.Encounter
             }
             while (k < kids.Count) Gather(kids[k++], into, false);
         }
-        /// <summary>No mob of the camp left near where it led to: the run is done.</summary>
+        /// <summary>No mob of the camp left near where it led to (on its floor or deck: the Adit rework): the run is done.</summary>
         bool CampCleared()
         {
             if (!Leading.HasValue) return false;
-            foreach (var e in session.Enemies) if (e != null && e.actor.IsAlive && e.Camp && !e.Game && Vector3.Distance(e.transform.position, Leading.Value) < 16) return false;
+            foreach (var e in session.Enemies) if (e != null && e.actor.IsAlive && e.Camp && !e.Game && Vector3.Distance(e.transform.position, Leading.Value) < 16 && SameFloor(e.transform.position, Leading.Value)) return false;
             return true;
         }
         void Update()
@@ -452,23 +627,35 @@ namespace Crulanda.Encounter
                 }
             }
             SaltRotation(); PathRotation();
+            TrackStep();   // a patrolling side boss: the mark follows it (the Adit rework)
             TickGate();   // a shut gate ahead: the run waits at it and goes on when it opens (D7)
             var quarry = Quarry;
+            // In a wing: at one of its fights, or fighting near one (the Adit rework: a regroup at a wing's home is for a wing the party went through,
+            // not one whose camps were down before the leader came to them).
+            if (Leading.HasValue && route.Count > 0 && !route[0].regroup && route[0].wing != null && waitingAt == null)
+            { float near = Vector3.Distance(transform.position, Leading.Value); if (near < 20 || session.InCombat && near < 35) wingSeen.Add(route[0].wing); }
             // A camp nobody can get at (2026-10-11, the group run: an Ash mender up where no one reached it held the run): forty-five seconds
-            // at the camp with nothing to fight and it is left behind.
-            if (Leading.HasValue && quarry == null && waitingAt == null && !CampCleared() && Vector3.Distance(transform.position, Leading.Value) < 18 && !session.InCombat)
+            // at the camp with nothing to fight and it is left behind (and a regroup the party never comes to).
+            if (Leading.HasValue && quarry == null && waitingAt == null && !StepDone() && Vector3.Distance(transform.position, Leading.Value) < 18 && !session.InCombat)
             {
                 if (campIdleSince < 0) campIdleSince = Time.time;
                 else if (Time.time - campIdleSince > 45) { campIdleSince = -1; LeaveCamp(); }
             }
             else campIdleSince = -1;
-            if (Leading.HasValue && quarry == null && waitingAt == null && CampCleared())
+            if (Leading.HasValue && quarry == null && waitingAt == null && StepDone())
             {
-                if (route.Count > 1)
+                var done = route.Count > 0 ? route[0] : null;
+                if (done != null) { route.RemoveAt(0); PassRegroups(); }
+                if (route.Count > 0)
                 {
-                    // A dungeon run (round 27): on to the next camp down the passage.
-                    route.RemoveAt(0); Leading = route[0].at; LeadingName = route[0].name;
-                    session.ChatSay(ChatChannel.Party, sim.name, route[0].boss ? (sim.chatty > .65f ? "boss next. " + LeadingName + ". buff up" : "That's the last before " + LeadingName + ". Ready yourselves.") : (sim.chatty > .65f ? "clear. next: " + LeadingName.ToLower() : "Clear. On to " + LeadingName + "."));
+                    // A dungeon run (round 27): on to the next step, a regroup at a wing's home or the next wing as it comes (the Adit rework).
+                    BeginStep(); var next = route[0]; bool chatty = sim.chatty > .65f;
+                    string say;
+                    if (next.regroup) say = chatty ? "clear. regroup at " + ThePlace : "Clear. Gather at " + ThePlace + " before we go on.";
+                    else if (done != null && done.regroup) say = chatty ? "all here. next: " + (next.wingName ?? LeadingName).ToLower() : "All here. On to " + Within(next.wingName ?? LeadingName) + ".";
+                    else if (done != null && next.wingName != null && next.wing != done.wing) say = chatty ? "clear. on to " + next.wingName.ToLower() : "Clear. On to " + Within(next.wingName) + ".";
+                    else say = next.boss ? (chatty ? "boss next. " + LeadingName + ". buff up" : "That's the last before " + LeadingName + ". Ready yourselves.") : (chatty ? "clear. next: " + LeadingName.ToLower() : "Clear. On to " + LeadingName + ".");
+                    session.ChatSay(ChatChannel.Party, sim.name, say);
                 }
                 else if (Dungeon != null)
                 {

@@ -76,8 +76,8 @@ namespace Crulanda.Tests
                     foreach (var e in z.exits)
                         if (!NavMesh.SamplePosition(s.Zone.Ground(e.at), out var to, Mathf.Max(2.5f, e.radius), NavMesh.AllAreas) || !NavReach.Walkable(start.position, to.position))
                             problems.Add(p + "exit to " + e.to + " can't be walked to from the start");
-                    foreach (var camp in z.camps)   // where the camp stands: on the land, or on a cave's floor under it (StandAt, as it spawns)
-                        if (!NavMesh.SamplePosition(s.Zone.StandAt(camp.center, float.NegativeInfinity), out var to, Mathf.Max(2.5f, camp.radius), NavMesh.AllAreas) || !NavReach.Walkable(start.position, to.position))
+                    foreach (var camp in z.camps)   // where the camp stands: on the land, or on a cave's floor under it, or up on its deck there (StandAt, as it spawns: the Adit rework's trestle, bridge tower and catwalks)
+                        if (!NavMesh.SamplePosition(s.Zone.StandAt(camp.center, EncounterSession.DeckHeight(camp, camp.center)), out var to, Mathf.Max(2.5f, camp.radius), NavMesh.AllAreas) || !NavReach.Walkable(start.position, to.position))
                             problems.Add(p + "camp '" + camp.name + "' can't be walked to from the start (its ground " + to.position + ")");
                 }
                 // Camps: most of each pack must find walkable ground; levels inside the zone's band.
@@ -86,7 +86,7 @@ namespace Crulanda.Tests
                 {
                     var camp = z.camps[c];
                     int spawned = s.Enemies.Count(e => e.Camp && e.persistentId.Contains("." + shortId + "." + c + "."));
-                    if (camp.rare <= 0 && spawned < Mathf.CeilToInt(camp.count * .75f)) problems.Add(p + "camp '" + camp.name + "' spawned " + spawned + "/" + camp.count);
+                    if (camp.rare <= 0 && string.IsNullOrEmpty(camp.after) && spawned < Mathf.CeilToInt(camp.count * .75f)) problems.Add(p + "camp '" + camp.name + "' spawned " + spawned + "/" + camp.count);
                     if (camp.levelMin < z.levelMin - 1 || camp.levelMax > z.levelMax + (camp.harder ? 3 : 1)) problems.Add(p + "camp '" + camp.name + "' levels " + camp.levelMin + "-" + camp.levelMax + " outside " + z.levelMin + "-" + z.levelMax);
                 }
                 // Quest people and props that the zone is responsible for.

@@ -15,10 +15,17 @@ namespace Crulanda.Encounter
     /// camp (/dungeon); you follow and fight; dead, you recover at the stone and the run goes on. The game runs at three times speed; the
     /// times written are the game's. run-log.txt has a line per camp cleared and per death, run-summary.txt the whole; a shot every four
     /// game minutes and at each elite. RUN_CAPTURE_DONE in the log.
+    /// (The Adit rework) A dungeon of wings is run as the leader plans it (DungeonPlan): a line as each wing begins, each camp's place in its
+    /// wing, each regroup and each wait at a gate. --crulanda-run-mode quick|full picks the run (the standard run without it). The gates the
+    /// run's quests or hands open stand open; the bosses' doors are left to the bosses (a door still shut after a minute's wait is opened for
+    /// the run, and the log says so: a boss's death should have opened it).
     /// </summary>
     public sealed class RunCapture : MonoBehaviour
     {
-        public const string Flag = "--crulanda-run-capture";
+        public const string Flag = "--crulanda-run-capture", ModeFlag = "--crulanda-run-mode";
+        /// <summary>The run asked for (--crulanda-run-mode quick|full), or null for the standard run.</summary>
+        static string ModeArg { get { var a = Environment.GetCommandLineArgs(); int i = Array.IndexOf(a, ModeFlag); return i >= 0 && i + 1 < a.Length ? a[i + 1] : null; } }
+        string wingsRun;
         public static bool Requested { get { return Array.IndexOf(Environment.GetCommandLineArgs(), Flag) >= 0; } }
         public const float Speed = 3, RealLimitSeconds = 50 * 60, ShotEvery = 240;
 
@@ -31,8 +38,11 @@ namespace Crulanda.Encounter
             var weather = Crulanda.World.WorldWeather.Active; if (weather != null) weather.Force(weather.TourKind(), true);
             if (s.Progress.Level < 11) { s.Progress.experience = EncounterProgress.XpForLevel(11); s.Player.SetLevel(11); }
             s.Player.Health.ApplyHealing(s.Player.Health.Pool.Max); s.Player.Resource.Pool.Fill();
-            s.Zone.OpenGates();
-            Log("The " + (s.Zone.Zone.displayName ?? s.ZoneId) + ": a level-" + s.Progress.Level + " " + s.ClassDef.displayName + " with three sims; the gates open (the run's quests are not done here).");
+            // The gates the run's quests open (the singing door's sigils, the platform gate's goblin) stand open, and for the full run those worked
+            // by hand (a pen's bar, a bookcase); a boss's door is left to its boss, and a bar worked from its far side stays as it is (the Adit rework).
+            bool everything = DungeonPlan.ParseMode(ModeArg) == DungeonPlan.Mode.Full;
+            foreach (var g in s.Zone.Gates) if (g != null && (g.Kind == "liftgate" || g.Kind == "platformgate" || everything && (g.Kind == "pen" || g.Kind == "hiddendoor"))) g.SetOpen(true, true);
+            Log("The " + (s.Zone.Zone.displayName ?? s.ZoneId) + ": a level-" + s.Progress.Level + " " + s.ClassDef.displayName + " with three sims; the gates its quests open stand open (the run's quests are not done here), the bosses' doors are left to the bosses.");
             // The group: a Druid, a Mage and a Ranger from the sim roster, brought here at level 11.
             var pop = SimPopulation.Active;
             if (pop == null) { Debug.LogError("Run capture: no sims."); Application.Quit(1); yield break; }
@@ -54,9 +64,12 @@ namespace Crulanda.Encounter
             yield return new WaitForSeconds(.5f);
             Log("The party: you (" + s.ClassDef.displayName + ", " + s.Player.Health.Pool.Max + " health, armour " + s.Player.Stats.GetRounded(Crulanda.Core.StatType.Armor) + "), " + string.Join(", ", s.PartySims.Where(c => c != null).Select(c => c.sim.name + " (" + SimRoster.ClassName(c.sim.classId) + ", " + c.Role + ", " + c.actor.Health.Pool.Max + " health, armour " + c.actor.Stats.GetRounded(Crulanda.Core.StatType.Armor) + ")")) + (s.SimPets.Count > 0 ? "; " + string.Join(", ", s.SimPets.Select(p => p.actor.DisplayName)) : "") + ".");
             // Dressed for the Adit: the temp save has no gear, so each party member's own level-11 kit (the sims' SimGear is on them already).
-            if (!s.LeadDungeon()) { Log("Nobody could lead the run."); Finish(s, directory, log, 0, 0, 0, 0, 0, false); yield break; }
+            if (!s.LeadDungeon(ModeArg)) { Log("Nobody could lead the run."); Finish(s, directory, log, 0, 0, 0, 0, 0, false); yield break; }
             var leader = s.PartySims.Find(c => c != null && c.Dungeon != null);
-            int camps = leader.CampsLeft, left = camps; Log("Leader: " + leader.sim.name + ", " + camps + " camps.");
+            int camps = leader.CampsLeft, left = camps;
+            if (leader.WingOrder.Count > 0) wingsRun = DungeonPlan.Describe(leader.RunMode) + ": " + string.Join(", ", leader.WingOrder);
+            Log("Leader: " + leader.sim.name + ", " + camps + " camps" + (wingsRun != null ? "; " + wingsRun : "") + ".");
+            string wingNow = null; int wingNo = 0, wingDone = 0, wingCamps = 0; float gateSince = -1; bool regrouping = false;
             var motor = s.Player.GetComponent<AdventurerMotor>(); AdventurerMotor.Running = true;
             int deaths = 0, warps = 0, shots = 0, elitesSeen = 0, mends = 0, looted = 0; var lootTally = new SortedDictionary<string, int>(); float lootUntil = 0; var seen = new HashSet<string>(); var mending = new Dictionary<SimCompanion, string>(); var engagedAt = new Dictionary<EncounterEnemy, float>(); var searched = new HashSet<EncounterEnemy>(); float idleLogAt = 0, pathAt = 0; Vector3 pathGoal = Vector3.zero; NavMeshPath path = null; int holds = 0; string lastHold = null; var simHeld = new Dictionary<SimCompanion, bool>();
             float start = Time.time, realStart = Time.realtimeSinceStartup, nextShot = Time.time + 20, nextSwing = 0, stuckAt = Time.time, deadAt = -1; var stuckFrom = s.Player.transform.position;
@@ -69,7 +82,18 @@ namespace Crulanda.Encounter
                 // The leader's state when nothing moves (every 20 s of nobody fighting), to see what holds the run.
                 if (Time.time >= idleLogAt) { idleLogAt = Time.time + 20; Log(Clock(t) + (s.InCombat ? "  fighting: " : "  quiet: ") + string.Join("; ", s.PartySims.Where(c => c != null).Select(c => c.sim.name.Split(' ')[0] + " " + (c.Activity ?? "").ToLower() + " (" + Vector3.Distance(c.transform.position, me).ToString("0") + " m)")) + "; bags " + s.Progress.bag.Take(Inventory.BagSize).Count(b => !b.Empty) + "/" + Inventory.BagSize + (s.DuoState != null ? "; " + s.DuoState : "")); }
                 // A camp cleared: the leader moves its mark on.
-                if (leader.CampsLeft < left) { Log(Clock(t) + "  camp " + (camps - leader.CampsLeft) + "/" + camps + " cleared: " + leadingName + "; next " + leader.LeadingName); left = leader.CampsLeft; }
+                if (leader.CampsLeft < left) { wingDone++; Log(Clock(t) + "  camp " + (camps - leader.CampsLeft) + "/" + camps + " cleared" + (wingNow != null ? " (wing " + wingNow + ": camp " + wingDone + "/" + wingCamps + ")" : "") + ": " + leadingName + "; next " + leader.LeadingName); left = leader.CampsLeft; }
+                // The wing it is in now, a regroup at a wing's home, a wait at a shut gate (the Adit rework).
+                if (leader.Wing != wingNow) { wingNow = leader.Wing; wingDone = 0; wingCamps = leader.WingCampsLeft; if (wingNow != null) { wingNo++; Log(Clock(t) + "  wing " + wingNo + ": " + wingNow + " (" + wingCamps + " camps)"); } }
+                if (leader.Regrouping != regrouping) { regrouping = leader.Regrouping; if (regrouping) Log(Clock(t) + "  regrouping at the " + leader.LeadingName); }
+                if (!leader.WaitingAtGate) gateSince = -1;
+                else if (gateSince < 0) { gateSince = Time.time; Log(Clock(t) + "  waiting at " + leader.StoppedBy); }
+                else if (Time.time - gateSince > 60)
+                {
+                    var shut = s.Zone.Gates.Find(g => g != null && !g.Open && g.Title == leader.StoppedBy);
+                    if (shut != null) { shut.SetOpen(true); Log(Clock(t) + "  " + shut.Title + " still shut after a minute (it opens " + (string.IsNullOrEmpty(shut.OpensOn) ? "by hand" : "when " + shut.OpensOn + " falls") + "): opened for the run"); }
+                    gateSince = -1;
+                }
                 if (leader.LeadingName != leadingName)
                 {
                     leadingName = leader.LeadingName;
@@ -195,7 +219,7 @@ namespace Crulanda.Encounter
             if (!s.ScorecardOpen) s.ShowScorecard((s.Zone.Zone.displayName ?? s.ZoneId) + (done ? " cleared" : " so far"));
             yield return null; yield return null;
             ScreenCapture.CaptureScreenshot(Path.Combine(directory, "99-scorecard.png")); yield return new WaitForSeconds(.6f);
-            Log(Clock(total) + "  " + (done ? "the run is done: every camp cleared." : "stopped (the real-time limit): " + (camps - left) + " of " + camps + " camps cleared.") + " Mends seen: " + mends + "; bodies searched: " + looted + "; holds the bosses put on the party: " + holds + ".");
+            Log(Clock(total) + "  " + (done ? "the run is done: every camp on it cleared." : "stopped (the real-time limit): " + (camps - left) + " of " + camps + " camps cleared.") + " Mends seen: " + mends + "; bodies searched: " + looted + "; holds the bosses put on the party: " + holds + ".");
             Log("Loot taken: " + (lootTally.Count == 0 ? "nothing" : string.Join(", ", lootTally.Select(kv => kv.Key + (kv.Value > 1 ? " x" + kv.Value : "")))) + "; coin " + s.Progress.gold + ".");
             foreach (var line in s.Meter.Scorecard()) Log(line);
             Finish(s, directory, log, total, camps, camps - left, deaths, warps, done);
@@ -217,9 +241,10 @@ namespace Crulanda.Encounter
                 "Party: you (" + s.ClassDef.displayName + ", level " + s.Progress.Level + ") and " + string.Join(", ", s.PartySims.Where(c => c != null).Select(c => c.sim.name + " the " + SimRoster.ClassName(c.sim.classId))),
                 "Game time: " + (int)(total / 60) + " min " + ((int)(total % 60)).ToString("00") + " s (run at " + Speed + "x; the time is the game's)",
                 "Camps cleared: " + (done ? camps : cleared) + " of " + camps + (done ? " (the run done)" : " (stopped before the end)"),
+                "Wings, in the order run: " + (wingsRun ?? "(a dungeon without wings)"),
                 "Mobs down at the end: " + slain + "; elites slain: " + elites,
                 "Your deaths: " + deaths + "; warps to the leader when stuck: " + warps,
-                "The gates were opened for the run (their quests are not done here).",
+                "The gates the run's quests open were opened for it (the quests are not done here); the bosses' doors were left to the bosses.",
                 "Scorecard:" };
             summary.AddRange(s.Meter.Scorecard().Select(l => "  " + l));
             File.WriteAllLines(Path.Combine(directory, "run-summary.txt"), summary);

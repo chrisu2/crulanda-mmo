@@ -2298,6 +2298,63 @@
           "chance": 0.45
         }
       ]
+    },
+    {
+      "tag": "burrower",
+      "levelMin": 10,
+      "levelMax": 13,
+      "gearChance": 0.12,
+      "entries": [
+        {
+          "item": "hide.bear",
+          "chance": 0.75
+        },
+        {
+          "item": "junk.bear_claw",
+          "chance": 0.4,
+          "max": 2
+        },
+        {
+          "item": "mat.bear_haunch",
+          "chance": 0.45
+        }
+      ]
+    },
+    {
+      "tag": "bristle",
+      "levelMin": 10,
+      "levelMax": 13,
+      "gearChance": 0.12,
+      "entries": [
+        {
+          "item": "junk.boar_tusk",
+          "chance": 0.6
+        },
+        {
+          "item": "junk.boar_meat",
+          "chance": 0.5
+        },
+        {
+          "item": "hide.boar",
+          "chance": 0.7
+        }
+      ]
+    },
+    {
+      "tag": "pithound",
+      "levelMin": 10,
+      "levelMax": 12,
+      "gearChance": 0.12,
+      "entries": [
+        {
+          "item": "junk.ash_hide",
+          "chance": 0.7
+        },
+        {
+          "item": "mat.hound_flank",
+          "chance": 0.45
+        }
+      ]
     }
   ]
 }

@@ -94,9 +94,76 @@ namespace Crulanda.World
         /// <summary>The ring nearest a ground point, and how far the point is from its centre on the ground plane.</summary>
         public int Nearest(Vector2 p, out float flat)
         {
+            // The rings by 16 m cells first (the Adit rework's caves run to some 3 km, and the walls ask this of every face of every cave):
+            // the same ring as the plain scan below gives, ties to the lowest index as it does; the plain scan when none is near enough.
+            if (!gridMade) MakeGrid();
+            if (gridStart != null)
+            {
+                int cx = Mathf.FloorToInt((p.x - gridX0) / GridCell), cz = Mathf.FloorToInt((p.y - gridZ0) / GridCell);
+                if (cx >= -GridReach && cx < gridW + GridReach && cz >= -GridReach && cz < gridH + GridReach)
+                {
+                    int found = -1; float foundD = float.MaxValue;
+                    for (int r = 1; r <= GridReach; r++)
+                    {
+                        // The block of cells within r of p's cell (all nine at r = 1, then only the new ring of cells round them): a ring in no
+                        // cell of it is more than r cells away, so one found nearer than that is the nearest of all.
+                        for (int gz = cz - r; gz <= cz + r; gz++)
+                        {
+                            if (gz < 0 || gz >= gridH) continue;
+                            for (int gx = cx - r; gx <= cx + r; gx++)
+                            {
+                                if (gx < 0 || gx >= gridW || (r > 1 && Mathf.Max(Mathf.Abs(gx - cx), Mathf.Abs(gz - cz)) < r)) continue;
+                                int cell = gz * gridW + gx;
+                                for (int q = gridStart[cell]; q < gridStart[cell + 1]; q++)
+                                {
+                                    int i = gridItems[q]; float dx = p.x - Centre[i].x, dz = p.y - Centre[i].z, d = dx * dx + dz * dz;
+                                    if (d < foundD || (d == foundD && i < found)) { foundD = d; found = i; }
+                                }
+                            }
+                        }
+                        float sure = r * GridCell - .05f;
+                        if (found >= 0 && foundD < sure * sure) { flat = Mathf.Sqrt(foundD); return found; }
+                    }
+                }
+            }
             int best = 0; float bestD = float.MaxValue;
             for (int i = 0; i < Centre.Count; i++) { float dx = p.x - Centre[i].x, dz = p.y - Centre[i].z, d = dx * dx + dz * dz; if (d < bestD) { bestD = d; best = i; } }
             flat = Mathf.Sqrt(bestD); return best;
+        }
+        const float GridCell = 16; const int GridReach = 4;
+        bool gridMade; int[] gridStart, gridItems; int gridW, gridH; float gridX0, gridZ0;
+        /// <summary>The rings filed by 16 m cells, each cell's in ring order (made at the first <see cref="Nearest"/>; a short cave keeps the plain scan).</summary>
+        void MakeGrid()
+        {
+            gridMade = true; int n = Centre.Count; if (n < 64) return;
+            float x0 = float.MaxValue, z0 = float.MaxValue, x1 = float.MinValue, z1 = float.MinValue;
+            foreach (var c in Centre) { x0 = Mathf.Min(x0, c.x); z0 = Mathf.Min(z0, c.z); x1 = Mathf.Max(x1, c.x); z1 = Mathf.Max(z1, c.z); }
+            gridX0 = x0; gridZ0 = z0; gridW = Mathf.FloorToInt((x1 - x0) / GridCell) + 1; gridH = Mathf.FloorToInt((z1 - z0) / GridCell) + 1;
+            if ((long)gridW * gridH > 1 << 20) return;   // (never in a zone's caves)
+            var cellOf = new int[n]; var count = new int[gridW * gridH + 1];
+            for (int i = 0; i < n; i++)
+            {
+                int gx = Mathf.Clamp(Mathf.FloorToInt((Centre[i].x - gridX0) / GridCell), 0, gridW - 1), gz = Mathf.Clamp(Mathf.FloorToInt((Centre[i].z - gridZ0) / GridCell), 0, gridH - 1);
+                cellOf[i] = gz * gridW + gx; count[cellOf[i] + 1]++;
+            }
+            for (int k = 1; k < count.Length; k++) count[k] += count[k - 1];
+            var start = (int[])count.Clone(); var items = new int[n];
+            for (int i = 0; i < n; i++) items[start[cellOf[i]]++] = i;   // ascending within each cell
+            gridStart = count; gridItems = items;
+        }
+        /// <summary>
+        /// A ground point in the passage's own terms (<see cref="At"/> turned round): how far in from the mouth, along the nearest ring's
+        /// way, and how far to the right of the middle.
+        /// </summary>
+        public void Local(Vector2 p, out float along, out float aside)
+        {
+            along = aside = 0; if (Centre.Count == 0) return;
+            int i = Nearest(p, out _); along = Along[i]; if (Centre.Count < 2) return;
+            int j = i + 1 < Centre.Count ? i + 1 : i - 1;
+            var fwd = new Vector2(Centre[j].x - Centre[i].x, Centre[j].z - Centre[i].z); if (j < i) fwd = -fwd;
+            if (fwd.sqrMagnitude < 1e-8f) return;
+            fwd.Normalize(); var d = p - new Vector2(Centre[i].x, Centre[i].z);
+            along = Along[i] + Vector2.Dot(d, fwd); aside = d.x * fwd.y - d.y * fwd.x;
         }
         /// <summary>
         /// How much of a ground point the passage covers where it runs near the surface: 1 well inside the walls, easing to 0 at
@@ -127,12 +194,54 @@ namespace Crulanda.World
             }
             return false;
         }
-        /// <summary>The passage floor under a ground point, if the point is within the passage's walls.</summary>
+        /// <summary>The passage floor under a ground point, if the point is within the passage's walls (and the ring there has a floor of its
+        /// own: <see cref="Floored"/>).</summary>
         public bool FloorAt(Vector2 p, out float y)
         {
             y = 0; if (Centre.Count == 0 || !box.Contains(p)) return false;
-            int i = Nearest(p, out float d); if (d > Half[i]) return false;
+            int i = Nearest(p, out float d); if (d > Half[i] || !Floored(i)) return false;
             y = Centre[i].y; return true;
+        }
+        bool[] floored;
+        /// <summary>
+        /// Whether ring i has a floor of its own: not where it runs through another cave's open air (a branch's first metres in its parent,
+        /// a joining cave's last metres out in the cave it joins), where the floor is the other's, or nothing (a lip over a hall: the hall's
+        /// floor far below). Every ring until <see cref="ComputeFloored"/> has run.
+        /// </summary>
+        public bool Floored(int i) { return floored == null || i < 0 || i >= floored.Length || floored[i]; }
+        /// <summary>Works out <see cref="Floored"/> once all the zone's caves are made (ZoneBuilder.PrepareHollows): the test the floor's mesh
+        /// makes to leave a stretch out (ZoneBuilder.Cavern), at each ring.</summary>
+        public void ComputeFloored()
+        {
+            floored = new bool[Centre.Count];
+            for (int i = 0; i < Centre.Count; i++) floored[i] = !FloorGivesWay(this, Centre[i] + Vector3.up * .3f);
+        }
+        /// <summary>
+        /// Whether a point just over cave <paramref name="h"/>'s floor is another cave's open air, so that h's floor gives way there to the
+        /// other's (ZoneBuilder.Cavern leaves that stretch of h's floor out): as <see cref="OpenInOther"/> at .8 of the way to the walls, but a
+        /// branch of h, or a cave that joins h, does not take h's floor where its own floor is out in h's air (its mouth, its end): there
+        /// it is h's floor that holds. (Without that, a joining cave's end reaching h's middle left neither floor there.)
+        /// </summary>
+        public static bool FloorGivesWay(Hollow h, Vector3 p)
+        {
+            foreach (var o in All)
+            {
+                if (o == h || !o.Open(p, .8f)) continue;
+                if ((o.Parent == h || o.Join == h) && o.Centre.Count > 0)
+                {
+                    int j = o.Nearest(new Vector2(p.x, p.z), out _);
+                    if (h.Open(o.Centre[j] + Vector3.up * .3f, .8f)) continue;   // the branch's own floor is out in h's air here: h's floor holds
+                }
+                return true;
+            }
+            return false;
+        }
+        /// <summary>Every cave floor under a ground point, one for each cave whose walls it is within and which has a floor of its own there
+        /// (<paramref name="into"/> is cleared first). Caves may lie one over another where one opens high in the other's wall.</summary>
+        public static void FloorsUnder(Vector2 p, List<float> into)
+        {
+            into.Clear();
+            foreach (var h in All) if (h.FloorAt(p, out float f)) into.Add(f);
         }
         /// <summary>
         /// The passage floor under a ground point, if the point is within the passage's walls, eased between the nearest ring and
@@ -142,7 +251,7 @@ namespace Crulanda.World
         public bool FloorSmooth(Vector2 p, out float y)
         {
             y = 0; if (Centre.Count == 0 || !box.Contains(p)) return false;
-            int i = Nearest(p, out float d); if (d > Half[i]) return false;
+            int i = Nearest(p, out float d); if (d > Half[i] || !Floored(i)) return false;
             y = Centre[i].y; if (Centre.Count < 2) return true;
             var a = new Vector2(Centre[i].x, Centre[i].z);
             int j = i == 0 ? 1 : i == Centre.Count - 1 ? i - 1 : Vector2.Dot(p - a, new Vector2(Centre[i + 1].x, Centre[i + 1].z) - a) >= 0 ? i + 1 : i - 1;
@@ -179,6 +288,17 @@ namespace Crulanda.World
         public float Length { get { return Along.Count > 0 ? Along[Along.Count - 1] : 0; } }
         /// <summary>The cave this one opens out of (null for one with its own mouth on the land), and how far into it.</summary>
         public Hollow Parent; public float ParentAlong;
+        /// <summary>How far up its parent's wall its mouth opens (ZoneProp.rise; 0: on the parent's floor).</summary>
+        public float MouthRise;
+        /// <summary>The cave its far end opens into (ZoneProp.joins; null: it closes), how far into that cave, and how far its end stands
+        /// over that cave's floor (about 0: a level way through; more: a lip over it).</summary>
+        public Hollow Join; public float JoinAlong, JoinRise;
+        /// <summary>How the Sealed Adit dresses it (ZoneProp.style; empty: by its name).</summary>
+        public string Style;
+        /// <summary>Its mouth opens high in its parent's wall: their walls are opened by the whole of each face there (ZoneBuilder.Cavern).</summary>
+        public bool MouthRaised { get { return Parent != null && MouthRise > .5f; } }
+        /// <summary>Its end opens high over the cave it joins (a lip): as <see cref="MouthRaised"/>.</summary>
+        public bool JoinRaised { get { return Join != null && JoinRise > .5f; } }
         /// <summary>
         /// Whether a point is in the open air of the passage, well inside its walls and under its roof (<paramref name="shrink"/> of the
         /// way to them): another cave's wall standing there is cut away (ZoneBuilder.Cavern), so one passage opens into the next. Not

@@ -20,6 +20,7 @@
   there are no limitations"; and **"not just bigger but more too do!"** So: the Adit (already its own zone, zone.adit) grows to three
   times its length with chambers far wider and taller, and the new length is filled: more packs and patrols, more bosses and
   mini-bosses, events, side areas, secrets and things to use, not empty tunnel.
+- **The Adit rework (Chris, 2026-10-14, verbatim):** "i think adit dungeon need to be more complex like wow's wailing caves or the deadmine. adit is nothing like those". The plan (a web of wings at three heights round the Singing Gallery; design only, his four questions first) is in ADIT_REWORK.md.
 
 ## 0.05 No machines (Chris, 2026-10-11, about 01:03, on the Rock-Eater: "more machines!!!!!  i told you NO Machines!")
 Nothing in the dungeon is a machine. Chris's choices (01:04, the question prompt):

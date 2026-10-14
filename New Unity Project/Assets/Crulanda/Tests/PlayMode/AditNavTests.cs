@@ -52,6 +52,7 @@ namespace Crulanda.Tests
                 foreach (var box in blocker.GetComponents<BoxCollider>())
                 {
                     var tr = box.transform; var sc = tr.lossyScale;
+                    if (tr.parent != null && tr.parent.name == "Decks") continue;   // a deck's own posts and rails (the Adit rework): its planks stand on them
                     var size = Vector3.Scale(box.size, new Vector3(Mathf.Abs(sc.x), Mathf.Abs(sc.y), Mathf.Abs(sc.z)));
                     if (size.y < minHeight) continue;
                     var at = tr.TransformPoint(box.center); if (!Hollow.InsideAny(at, 0)) continue;   // the caves' solids, not the slopes' rocks outside
@@ -116,6 +117,51 @@ namespace Crulanda.Tests
             Assert.Greater(n, 60, "the Adit's camp mobs");
             Debug.Log("Adit camp mobs on ledges they come down from: " + ledges);
             Assert.IsEmpty(bad, "camp mobs no one can walk to, and that cannot come down");
+        }
+        /// <summary>
+        /// (The Adit rework) The web joins up and its ways home run one way. Every cave that joins another (the Workings' lip 14 m up the Gallery,
+        /// the Cutting Drift onto the Foundry's catwalk, the Flooded Working into the tally hall, the Dry Ledge back into the river, the Muster Yard
+        /// into the chapel, the cloister onto the Gallery's floor, the Breach's lip over the falls) can be walked (or dropped) from its end into
+        /// the cave it joins. The chute and the falls are drops: down in a few steps, never back up them (the way back up is the long way round),
+        /// and a camp's mobs never take them. The cloister stair is the chapter-house's short way home.
+        /// </summary>
+        [UnityTest, Timeout(300000)] public IEnumerator The_web_joins_up_and_its_ways_home_run_one_way()
+        {
+            var zone = ZoneBuilder.Active; Assert.AreEqual("zone.adit", zone.Zone.id);
+            zone.OpenGates(); for (int i = 0; i < 3; i++) yield return null;
+            Hollow Cave(string name) { var h = Hollow.All.Find(o => o.Name == name); Assert.NotNull(h, name); return h; }
+            Vector3 On(Vector3 p, string what, float reach = 3) { Assert.IsTrue(NavMesh.SamplePosition(p, out var hit, reach, NavMesh.AllAreas), what + " is on the navmesh (" + p + ")"); return hit.position; }
+            Vector3 Anchor(string name) { Assert.IsTrue(zone.Anchors.TryGetValue(name, out var a), "the anchor '" + name + "'"); return On(a + Vector3.up * .2f, "the " + name, 5); }   // (the altar's anchor is the altar's own place: the floor beside it)
+            // Each join, from the joining cave's last stretch of floor to the floor of the cave it joins, under its end (in the doorway).
+            int joins = 0;
+            foreach (var h in Hollow.All)
+            {
+                if (h.Join == null) continue; joins++;
+                int last = h.Centre.Count - 1; while (last > 0 && !h.Floored(last)) last--;
+                var from = On(h.Centre[last] + Vector3.up * .2f, h.Name + "'s last floor (" + h.Along[last].ToString("0") + " m in)");
+                var end = h.Centre[h.Centre.Count - 1]; if (!h.Join.FloorAt(new Vector2(end.x, end.z), out float under)) under = h.Join.At(h.JoinAlong).y;
+                var to = On(new Vector3(end.x, under + .2f, end.z), h.Join.Name + "'s floor where " + h.Name + " joins it", 5);
+                Assert.Less(NavReach.Length(from, to), float.PositiveInfinity, h.Name + " joins " + h.Join.Name + (h.JoinRaised ? " (a lip " + h.JoinRise.ToString("0") + " m up)" : "") + ": the way on from " + from + " to " + to);
+                yield return null;
+            }
+            Assert.GreaterOrEqual(joins, 6, "the web's joins (loops and lips)");
+            // The drops: down in a few steps, not back up them; mobs keep off them.
+            int noDrops = NavMesh.AllAreas & ~(1 << EncounterNavigation.DropArea);
+            foreach (var (top, pool) in new[] { (Cave("The Geode Foundry").At(10), "chute pool"), (Cave("The Grey Breach").At(206), "plunge pool") })
+            {
+                var lip = On(top + Vector3.up * .2f, "above the " + pool); var foot = Anchor(pool);
+                Assert.Less(NavReach.Length(lip, foot), 60, "down to the " + pool + " by the drop");
+                Assert.Greater(NavReach.Length(foot, lip), 120, "no way back up the drop from the " + pool + ": only the long way round");
+                Assert.Greater(NavReach.Length(lip, foot, noDrops), 120, "a camp's mob does not take the drop to the " + pool);
+                yield return null;
+            }
+            // The cloister stair: from the chapel's altar to the Gallery's floor, far shorter than back through the chapter-house.
+            var altar = Anchor("altar"); var cloister = Anchor("cloister foot");
+            float home = NavReach.Length(altar, cloister); Assert.Less(home, float.PositiveInfinity, "the cloister stair from the altar to the Gallery");
+            var door = zone.Gates.Find(g => g != null && g.Title == "The cloister door"); Assert.NotNull(door, "the cloister door");
+            door.SetOpen(false, true); door.Recarve(); for (int i = 0; i < 3; i++) yield return null;
+            Assert.Greater(NavReach.Length(altar, cloister), home + 50, "with the cloister door shut it is the long way back through the chapter-house (" + home.ToString("0") + " m by the stair)");
+            door.SetOpen(true, true);
         }
         /// <summary>The nearest spot on the same floor (within 2.5 m of its height) that a path from the way in reaches, out to 30 m.</summary>
         static string WalkableNear(Vector3 at, Vector3 start)

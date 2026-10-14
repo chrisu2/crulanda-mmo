@@ -34,7 +34,13 @@ namespace Crulanda.Tests
             { "picket", SocialKind.Call }, { "digger", SocialKind.Call }, { "overseer", SocialKind.Call }, { "sapper", SocialKind.Call }, { "gangboss", SocialKind.Call }, { "carrier", SocialKind.Call }, { "watchman", SocialKind.Call },
             { "platformguard", SocialKind.Call }, { "docker", SocialKind.Call }, { "railquartermaster", SocialKind.Call }, { "gunner", SocialKind.Call }, { "railcaptain", SocialKind.Call }, { "cutter", SocialKind.Call }, { "sorter", SocialKind.Call },
             { "nix", SocialKind.Call }, { "ashinitiate", SocialKind.Call }, { "ashmender", SocialKind.Call }, { "ysolt", SocialKind.Call }, { "foreman", SocialKind.Call }, { "venthound", SocialKind.Solitary }, { "crawler", SocialKind.Pack }, { "greybear", SocialKind.Solitary },
-            { "quietminer", SocialKind.Solitary }   // D3: the rare keeps to himself
+            { "quietminer", SocialKind.Solitary },   // D3: the rare keeps to himself
+            // The Adit rework (Docs/ADIT_REWORK.md): the cult's zealots and scribes, the smelters, the grey whisperers, the ash-bound dead and
+            // the new elites call; the Company's pit-hounds pack; Old Bristle and the Old Burrower keep to themselves.
+            { "zealot", SocialKind.Call }, { "ashscribe", SocialKind.Call }, { "smelter", SocialKind.Call }, { "whisperer", SocialKind.Call }, { "ashbound", SocialKind.Call },
+            { "pithound", SocialKind.Pack }, { "bristle", SocialKind.Solitary }, { "burrower", SocialKind.Solitary },
+            { "bailer", SocialKind.Call }, { "vosk", SocialKind.Call }, { "urnkeeper", SocialKind.Call }, { "loremaster", SocialKind.Call }, { "armsmaster", SocialKind.Call },
+            { "varrow", SocialKind.Call }, { "greywhisperer", SocialKind.Call }, { "hollowsong", SocialKind.Call }, { "hobb", SocialKind.Call }, { "kettle", SocialKind.Call }
         };
 
         [Test] public void Every_camp_in_the_five_zones_has_a_sensible_kind()
@@ -117,7 +123,11 @@ namespace Crulanda.Tests
                 "Caddock's hall <- King's guard", "The Quartermaster's desk <- Store Caves", "The Ash-Deacon <- Ash-pit cultists",
                 "Greyheart <- The Greying", "The Root-Warden <- The Heart's withered",
                 // The Sealed Adit (dungeon D1): the gang-boss, the quartermaster, the rail-captain and Nix each name their guards.
-                "Gang-Boss Haddo Lusk <- Gang-boss's guards", "Quartermaster Brannigan Sorrel <- Quartermaster's guards", "Rail-Captain Orsk Danner <- Rail-Captain's guard", "Nix and the Rock-Eater <- Workshop guards" }, pairs,
+                "Gang-Boss Haddo Lusk <- Gang-boss's guards", "Quartermaster Brannigan Sorrel <- Quartermaster's guards", "Rail-Captain Orsk Danner <- Rail-Captain's guard", "Nix and the Rock-Eater <- Workshop guards",
+                // The Adit rework: every wing's boss names its guards (Cinder-Warden Ysolt names Sister Ashe Varrow, an elite, which pairs nobody yet).
+                "Brack the Bailer <- Bailers' chain", "Overseer Grael Vosk <- Whip-hands", "Urn-Keeper Sabel <- Urn-tenders", "Loremaster Ivo Senn <- Lectors",
+                "Master-at-Arms Corvane <- Armourers", "The Grey Whisperer <- Whisperer's hollow", "The Foreman Who Forgot <- The Foreman's shift",
+                "Powder-Sergeant Hobb <- Hobb's sappers", "Old Kettle, the pitch-boiler <- Pitch-gangers" }, pairs,
                 "If a camp moved, pair it in the data: \"guards\" on the elite's camp names its guard camps.");
         }
 
@@ -138,7 +148,7 @@ namespace Crulanda.Tests
         [Test] public void Each_of_the_twelve_elites_has_its_own_move()
         {
             var elites = Camps().Where(x => x.camp.elite).ToList();
-            Assert.AreEqual(20, elites.Count, "Twelve camp elites in the five zones and eight in the Sealed Adit (the rare Quiet Miner among them).");
+            Assert.AreEqual(32, elites.Count, "Twelve camp elites in the five zones and twenty in the Sealed Adit since its rework (the rare Quiet Miner among them).");
             Assert.AreEqual(21, EliteMoves.All.Length, "Twenty camp elites, and the Rock-Eater, which rides beside Nix in his camp (D5).");
             var plain = EliteMoves.For("nobody at all", false);
             foreach (var (zone, camp, _) in elites)

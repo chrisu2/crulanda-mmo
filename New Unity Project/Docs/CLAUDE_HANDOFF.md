@@ -6,22 +6,24 @@
 testing new dungeons and builds as needed. all zones full of quests. more sims throughout the world"). What was done, in order, is in
 `Docs/TONIGHT_2026-10-13.md` (Progress) and `Docs/CHANGELOG.md` (2026-10-13, 15:20 on). Nothing is VERIFIED until Chris has seen it.
 - **Branch:** `feet-bow-adit-kit`, PR #2. Do not merge without Chris. Last commits tonight: 3d89ef0 (quests, sims, orc, heals),
-  e10a915 (the group-run leader's stall rule), 9deb508 (suite fixes), then the handoff commit.
-- **Published:** the release build of 9deb508 to `D:\crulanda-work\outputs\Crulanda-Playable` (see chainR39.out in lane A; if it says
-  NOT PUBLISHED, a check failed and the 15:17 build is still the playable one). Chris's save backed up first:
-  `D:\crulanda-work\save-backups\20261013-1905-before-evening-publish` (and `20261013-1517-before-bar-publish`).
+  e10a915 (the group-run leader's stall rule), 9deb508 (suite fixes), the "Immune" fix, c347252 (the carriage gunners), then the docs.
+- **Published:** the release build of c347252 at 19:59 to `D:\crulanda-work\outputs\Crulanda-Playable` (after Adit, zone and Rock-Eater
+  tests 14/14; 19:07 was the first evening publish). Chris's save backed up first: `D:\crulanda-work\save-backups\20261013-1905-before-evening-publish`.
 - **Tests (TESTED):** EditMode 470/470. Full PlayMode suite 319/327 at 18:36; the 6 new failures fixed and rerun green (43/44, then the
   Adit nav test 4/4 with its rider rule). Still failing, known and parked: the hoe hand spread, the foot after a jump (Chris parked it).
 - **Balance (TESTED):** all 40 builds in their ranges (BALANCE_ALL.md in `D:\crulanda-work\outputs\balance`). Party heal of five:
   Sanctuary 73, Mender 75, Cantor 75, Rootmend 88, Lantern 90, Choir 98, Rainspeaker 108.
 - **The Adit group run (TESTED, not seen by Chris):** to the end for the first time, 66 of 67 camps in 78 game minutes
-  (`D:\crulanda-work\run-captures\adit-group-1013-evening-2`). Open: 26 warps to the leader when a member was stuck; the tank fell 7
-  times to the gang-boss and elites; floating damage numbers stack into a white column over a mob at 3x (frame 16 of that run).
+  (`D:\crulanda-work\run-captures\adit-group-1013-evening-2`), then as an orc Shaman (`adit-group-1013-shaman`) and once more
+  (`adit-group-1013-evening-3`: every camp cleared, the carriage gunners too, in 71 game minutes).
+  - The warps are the run tool moving its auto-pilot player when it sticks; party sims catch up by themselves.
+  - The tank still falls to the gang-boss and the elites. That is the boss pressure Chris settled on.
+  - The "Immune" column over the Cinder-Warden is fixed.
 - **For Chris to look at first:** the training yard with sims practising (they go in by themselves; grey numbers when you are near);
   the orc look (`D:\crulanda-work\ui-captures\figures\orcs-*.png`, a first pass on the human head: green, tusks, taller); any of the 52
   new quests (Oakhaven's start at levels 2-3: Ama Rusk, Sel Harrow, Grete Lowe, Pim).
 - **Next, in order:** Chris's reactions; an orc face from the packs in `D:\crulanda-work\imports\orcs` if he wants more than the first
-  pass; the Adit's stuck spots (the warps); the Scoundrel (designed in `Docs/CLASS_SCOUNDREL.md`, not started); the parked animation items.
+  pass; the run bot playing the Shaman's kit better (14 a second against the Paladin's 33); the Scoundrel (designed in `Docs/CLASS_SCOUNDREL.md`, not started); the parked animation items.
 
 ## Oct 12 night (history; these runs were stopped and replaced on Oct 13)
 

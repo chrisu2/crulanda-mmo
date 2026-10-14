@@ -216,7 +216,7 @@ namespace Crulanda.Encounter
                 "Group run of " + (s.Zone.Zone.displayName ?? s.ZoneId) + " (" + DateTime.Now.ToString("yyyy-MM-dd HH:mm") + ")",
                 "Party: you (" + s.ClassDef.displayName + ", level " + s.Progress.Level + ") and " + string.Join(", ", s.PartySims.Where(c => c != null).Select(c => c.sim.name + " the " + SimRoster.ClassName(c.sim.classId))),
                 "Game time: " + (int)(total / 60) + " min " + ((int)(total % 60)).ToString("00") + " s (run at " + Speed + "x; the time is the game's)",
-                "Camps cleared: " + cleared + " of " + camps + (done ? " (the run done)" : " (stopped before the end)"),
+                "Camps cleared: " + (done ? camps : cleared) + " of " + camps + (done ? " (the run done)" : " (stopped before the end)"),
                 "Mobs down at the end: " + slain + "; elites slain: " + elites,
                 "Your deaths: " + deaths + "; warps to the leader when stuck: " + warps,
                 "The gates were opened for the run (their quests are not done here).",

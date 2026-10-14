@@ -1,5 +1,35 @@
 # Changelog
 
+## 2026-10-14, 00:20 to the end: play-test fixes, the Scoundrel, the drowned dead, the dungeons after the Adit
+Chris (23:40-00:10, play-testing): "cant see all classes", "only thing on orc that move is belt, staff and teeth", "at level 1 the orc
+shaman only has healing spells?", "there is no target or self or party bars"; then "after scoundrel design. build him and put in game";
+at 01:30, "i think adit dungeon need to be more complex like wow's wailing caves or the deadmine. adit is nothing like those".
+- **Play-test fixes (00:20, published):** the pause menu shows the characters in a grid of three; a panel keeps 40 px on the screen (the
+  frames had been saved off a smaller window); the Shaman's Thunderhead at level 2, its mends at 3 and 4.
+- **The orc moves as the pack made it (01:51, published 01:53):** CreatureImport took each of the Orc Army Pack's clip files whole (a
+  27 s master take), so the orc stood still and the staff swung. It now slices the pack's own frame ranges (walk, run, idle, battle cry,
+  block, three attacks, two casts, hit, die). OrcMotionTests: the staff stays within 3 cm of the hand.
+- **The creature tour** (`--crulanda-creature-tour`, in the release build): boars at a camp, in a fight and dead; a bird and a squirrel
+  close up. Frames in `D:\crulanda-work\ui-captures\creatures`.
+- **Khaven's drowned dead are DzenGames' Fantasy Skeleton**, its take sliced into the pack's seven clips (CreatureImport version 5);
+  they crumble to bones on death. The thrall flinches when struck (a creature with no hit clip rocks back).
+- **The run bot fights with its kit:** a mend when the party is under 45%, else the first ready damage ability; casters and archers
+  fight from 12 m (the Shaman's run had been 14 a second).
+- **The Scoundrel (built):** `class.scoundrel` (GAME-ONLY), Nerve as its resource, 12 abilities over three paths of 17 ranks: Cutthroat
+  (Settle the Score, Poisoned Wine, Mark the Debt), Silver Tongue (Glimmer dazes up to four, the Jagged Verse, Stay) and Fixer (War-Verse,
+  Rallying Verse, Bribe, Call in a Favour). The charm: a tenth off and a tenth more at merchants, a haggle once a day per merchant (a
+  further twentieth, kept for the session), an innkeeper's rumour. Human and orc. Cutthroat scaled 0.86 (80.2 to 69.0 on the dummies).
+  ScoundrelRulesTests and ScoundrelLoopTests 8/8 (the Glimmer test plays in Oakhaven's camps).
+- **The hoe grip and the foot after a jump** (failing for days): fixed in ActorVisual.Field/Grounding/Model. FieldWorkTests and FootTests 3/3.
+- **The three dungeons after the Adit, designed** (DUNGEON_DESIGN.md, each in the Adit's nine-section format; built when the level cap
+  rises past 15): the Sludge-Tunnels (18-20), the Deep Veins (23-25), the Transit Hub (27-29).
+- **The Adit rework (Chris's 01:30 brief): on its own branch, not live.** `Docs/ADIT_REWORK.md` on branch `adit-rework` (pushed): a
+  web of wings at three heights round a great cave, the Singing Gallery, after the lessons of Chris's three dungeons (no names or layouts
+  copied). 18 caves, about 2.9 km, 97 camps, 9 gates, run wing by wing. Build steps 1-3 of 7 are written. Its first Unity run: EditMode
+  488/495 and Adit PlayMode 19/30, so it is TESTED as failing. Section 16 lists what is red: the caves' joins, rock tops, unreachable camps,
+  the run order, and the twelve new elites still to write.
+- **The final run on main (chainR69):** RESULTS
+
 ## 2026-10-13, 22:00 on: whole orcs and Chris's new creatures
 Chris: "ok but we had whole orc assets", "that was the whole point of adding those asset", "their mouth and teeth dont line up"; at 22:50,
 "Use Toon RS Unit - Undead for the bonecaller's pet. Living Birds to replace all birds in game. Wild Boar to replace the boars. Furry

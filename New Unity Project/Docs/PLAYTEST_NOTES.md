@@ -698,3 +698,9 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
 
 - TODO (Chris 23:13, parked): foot work. FootTests is down to 1 problem after 0f81dbe (standing to the higher sole): 'running after a jump left foot at 0.161s: down but turned 178 degrees' (the 179-degree reading again; the foot near vertical on landing). Pick up later.
 - TODO: party heal test has no sims because PlayableEncounter has no SimPopulation ('[no SimPopulation]'). Load Oakhaven, or add a SimPopulation for the test.
+
+## 2026-10-14 (Chris, verbatim)
+- 179 (11:40) "Filling the zones in the Elwynn style. is next." (OPEN; note 172 and Docs/ZONE_FILL_PLAN.md, every zone, Oakhaven first)
+- 180 (11:40) "you can start expanding adit so not so empty next on the agenda." (OPEN; after the zone fill; Docs/ADIT_REWORK.md on branch adit-rework)
+- 181 (11:45) "we need more spell animations and melee animations also" (OPEN; Kevin Iglesias' Human Melee Animations FREE is downloaded but was never imported: five attacks, combat idles, a hit, a death; for spells, his Human Spellcasting Animations FREE, which Chris must download from the Asset Store)
+- 182 (12:05) "here is elwyn very dense area for good level adventures. use these for reference and search online for more images and ideas." (with eight pictures: two zone maps, the region map, five views at ground level; OPEN). Lessons taken (no names, layouts or assets copied): the map is one canopy, with the roads, a river, lakes, farms and camps cut into it; at eye level, huge thick-trunked trees stand far apart under a high, closed canopy, the floor open (grass, bushes, fallen logs, stumps, flowers) so you see between the trunks; homes and small camps tucked among the trunks; red dirt roads with fences, signposts and lamp posts; mountains framing two sides, a river along a third; a sight every 100-150 m.

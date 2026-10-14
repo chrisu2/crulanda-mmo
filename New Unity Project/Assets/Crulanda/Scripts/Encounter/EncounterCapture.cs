@@ -23,7 +23,7 @@ namespace Crulanda.Encounter
         }
         public static bool Requested
         {
-            get { var a = Environment.GetCommandLineArgs(); return Array.IndexOf(a, "--crulanda-capture") >= 0 || Array.IndexOf(a, "--crulanda-ui-capture") >= 0 || Array.IndexOf(a, "--crulanda-world-capture") >= 0 || WardrobeCapture.Requested || TrainingCapture.Requested || LootCapture.Requested || EliteCapture.Requested || LifeCapture.Requested || MotionCapture.Requested || RunCapture.Requested || FixesCapture.Requested || Step4Capture.Requested; }
+            get { var a = Environment.GetCommandLineArgs(); return Array.IndexOf(a, "--crulanda-capture") >= 0 || Array.IndexOf(a, "--crulanda-ui-capture") >= 0 || Array.IndexOf(a, "--crulanda-world-capture") >= 0 || WardrobeCapture.Requested || TrainingCapture.Requested || CreatureTourCapture.Requested || LootCapture.Requested || EliteCapture.Requested || LifeCapture.Requested || MotionCapture.Requested || RunCapture.Requested || FixesCapture.Requested || Step4Capture.Requested; }
         }
         IEnumerator Start()
         {
@@ -36,6 +36,8 @@ namespace Crulanda.Encounter
             if (life >= 0 && life + 1 < args.Length) { yield return gameObject.AddComponent<LifeCapture>().Run(session, args[life + 1]); yield break; }
             int step4 = Array.IndexOf(args, Step4Capture.Flag);
             if (step4 >= 0 && step4 + 1 < args.Length) { yield return gameObject.AddComponent<Step4Capture>().Run(session, args[step4 + 1]); yield break; }
+            int tour = Array.IndexOf(args, CreatureTourCapture.Flag);
+            if (tour >= 0 && tour + 1 < args.Length) { yield return gameObject.AddComponent<CreatureTourCapture>().Run(session, args[tour + 1]); yield break; }
             int training = Array.IndexOf(args, TrainingCapture.Flag);
             if (training >= 0 && training + 1 < args.Length) { yield return gameObject.AddComponent<TrainingCapture>().Run(session, args[training + 1]); yield break; }
             int fixes = Array.IndexOf(args, FixesCapture.Flag);

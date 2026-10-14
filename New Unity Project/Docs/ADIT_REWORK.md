@@ -1134,3 +1134,15 @@ order to fix:
   Bristle, Overseer Grael Vosk, Urn-Keeper Sabel, Loremaster Ivo Senn and the rest); the guard count in the elite balance test (57, the
   test wants 30); Cinder-Warden Ysolt's call reaches Sister Ashe Varrow.
 - Results: `D:\crulanda-work\encounter-validation\aditEdit1.xml` and `aditPlay1.xml`.
+
+## 17. The twelve new elites' moves and loot (2026-10-14, 14:50; WRITTEN, compiled, not run in Unity)
+- **Moves** (EliteMoves.cs): Vosk's Lash (a root) and his rally at half health; Sabel's Ash in the Eyes; Senn's Lullaby of Ash (a stun
+  within 6 m) and his copyists on the pull; Corvane's Shield-Bash and "Form up!"; Varrow's Kindling ring; the Whisperer's Long Lull;
+  Hollowsong's Unsung note and his choir at half; Brack's Bucket Douse; Old Bristle's charge and trample; the Old Burrower's Burrow;
+  Hobb's Short Fuse ring; Old Kettle's Hot Pitch ring and the pitch that holds your boots. With the engine's moves only: what section 5
+  marks NEW (a cast to interrupt, a phase that looses more, Ysolt raised by her sister, a death that releases a shift) waits for S4.
+- **Loot** (loot.adit.json, nineteen pieces, icons painted): two for each required boss (Vosk, Sabel, Senn, Corvane, Varrow, the
+  Whisperer, Hollowsong), one for each optional or hidden one (Brack, Old Bristle, the Old Burrower, Hobb, Old Kettle), on the
+  generated curve at their levels. LootDataTests' boss count 63 to 82; LootIdBaseline has the ids.
+- SocialRulesTests lets a designed pair (Ysolt and Varrow, each the other's guard) call each other.
+

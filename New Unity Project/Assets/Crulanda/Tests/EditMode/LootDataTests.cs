@@ -232,7 +232,7 @@ namespace Crulanda.Tests
             Assert.AreEqual(18, counts["quest"], "Eighteen quest rewards (three of them The Dead Line's, side.adit.dead_line).");
             Assert.AreEqual(5, counts["vendor"], "Five vendor pieces.");
             Assert.AreEqual(6, counts["world"], "Six world drops.");
-            Assert.AreEqual(63, counts["boss"], "42 signature pieces (18 the Sealed Adit's, the Quiet Miner's cap among them), 5 from rare tables, 6 epics, 5 legendaries, and the Adit-Runner's Kit's five.");
+            Assert.AreEqual(82, counts["boss"], "61 signature pieces (37 the Sealed Adit's, the Quiet Miner's cap and the reworked Adit's nineteen among them), 5 from rare tables, 6 epics, 5 legendaries, and the Adit-Runner's Kit's five.");
             Assert.AreEqual(44, counts["mob"], "44 from ordinary mobs.");
         }
 

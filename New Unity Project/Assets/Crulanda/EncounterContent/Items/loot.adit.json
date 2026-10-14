@@ -366,6 +366,276 @@
       "spirit": 10,
       "description": "A bead of goblin glass on a cord, traded up the pass years ago. Hold it to a lock and it hums the note the lock wants.",
       "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.vosks_whip_hand",
+      "name": "Vosk's Whip-Hand Glove",
+      "kind": "gear",
+      "slot": "hands",
+      "quality": 3,
+      "level": 11,
+      "value": 48,
+      "armor": 29,
+      "stamina": 12,
+      "strength": 19,
+      "description": "One glove, the right, its palm worn to a shine by the whip's stock. The left he never needed.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.overseers_catwalk_boots",
+      "name": "Overseer's Catwalk Boots",
+      "kind": "gear",
+      "slot": "feet",
+      "quality": 3,
+      "level": 11,
+      "value": 48,
+      "armor": 29,
+      "stamina": 19,
+      "agility": 12,
+      "description": "Soled for the Foundry's grating. They grip where the hall's heat has sweated everyone else off the walkway.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.urn_keepers_ash_cord",
+      "name": "Urn-Keeper's Ash Cord",
+      "kind": "gear",
+      "slot": "neck",
+      "quality": 3,
+      "level": 11,
+      "value": 48,
+      "stamina": 6,
+      "intellect": 13,
+      "spirit": 12,
+      "description": "Clay beads, each pinched from a different urn. She could name every one of them, and did, to anyone who would listen.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.sabels_cinerary_shroud",
+      "name": "Sabel's Cinerary Shroud",
+      "kind": "gear",
+      "slot": "chest",
+      "quality": 3,
+      "level": 11,
+      "value": 48,
+      "armor": 45,
+      "stamina": 12,
+      "intellect": 19,
+      "description": "Grey linen that will not come clean, however it is washed. The ash is in the weave now.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.loremasters_iron_bound_hymnal",
+      "name": "Loremaster's Iron-Bound Hymnal",
+      "kind": "gear",
+      "slot": "offhand",
+      "quality": 3,
+      "level": 11,
+      "value": 48,
+      "armor": 53,
+      "stamina": 5,
+      "intellect": 16,
+      "spirit": 10,
+      "description": "Clasped with iron so it cannot be opened by accident. The lullaby is on the last page; the rest is blank.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.copyists_ink_black_wraps",
+      "name": "Copyist's Ink-Black Wraps",
+      "kind": "gear",
+      "slot": "hands",
+      "quality": 3,
+      "level": 11,
+      "value": 48,
+      "armor": 29,
+      "stamina": 10,
+      "intellect": 11,
+      "spirit": 10,
+      "description": "Silk once, black to the wrist with the Scriptorium's ink. Senn's copyists wore them so their hands would not show the shaking.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.corvanes_drill_yard_heater",
+      "name": "Corvane's Drill-Yard Heater",
+      "kind": "gear",
+      "slot": "offhand",
+      "quality": 3,
+      "level": 11,
+      "value": 48,
+      "armor": 53,
+      "stamina": 19,
+      "strength": 12,
+      "description": "A plain heater with the rim notched for every recruit it taught to keep a guard up. The notches go all the way round.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.master_at_arms_barbute",
+      "name": "Master-at-Arms' Barbute",
+      "kind": "gear",
+      "slot": "head",
+      "quality": 3,
+      "level": 11,
+      "value": 48,
+      "armor": 29,
+      "stamina": 19,
+      "strength": 12,
+      "description": "Dented over the left eye, which is where Corvane's recruits always swung first. He let them.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.varrows_brazier_staff",
+      "name": "Varrow's Brazier-Staff",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 3,
+      "level": 11,
+      "value": 67,
+      "weaponDamage": 36,
+      "stamina": 7,
+      "intellect": 14,
+      "spirit": 10,
+      "description": "A forked staff with a brazier cup in the fork. It is still warm, and will be for a long time.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.ember_sisters_cassock",
+      "name": "Ember-Sister's Cassock",
+      "kind": "gear",
+      "slot": "chest",
+      "quality": 3,
+      "level": 11,
+      "value": 48,
+      "armor": 45,
+      "stamina": 12,
+      "intellect": 10,
+      "spirit": 9,
+      "description": "Scorched at the hem, mended at the hem, scorched again. She stood too close to her sister's fire by choice.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.whisperers_grey_mask",
+      "name": "The Whisperer's Grey Mask",
+      "kind": "gear",
+      "slot": "head",
+      "quality": 3,
+      "level": 11,
+      "value": 48,
+      "armor": 29,
+      "stamina": 12,
+      "intellect": 19,
+      "description": "A mask of grey cloth with no mouth. Whatever she whispered through, it was not that.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.hush_cord",
+      "name": "Hush-Cord",
+      "kind": "gear",
+      "slot": "neck",
+      "quality": 3,
+      "level": 11,
+      "value": 48,
+      "stamina": 6,
+      "intellect": 12,
+      "spirit": 13,
+      "description": "A knotted cord worn at the throat. Worn, the knots feel as if they are being tied a little tighter.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.hollowsongs_unsung_torc",
+      "name": "Hollowsong's Unsung Torc",
+      "kind": "gear",
+      "slot": "neck",
+      "quality": 3,
+      "level": 12,
+      "value": 52,
+      "stamina": 7,
+      "intellect": 13,
+      "spirit": 13,
+      "description": "A plain band of grey metal. Hold it to your ear and there is a note in it, just under hearing, that nobody sings.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.pilgrims_unmade_mantle",
+      "name": "Pilgrim's Unmade Mantle",
+      "kind": "gear",
+      "slot": "shoulders",
+      "quality": 3,
+      "level": 12,
+      "value": 52,
+      "armor": 31,
+      "stamina": 20,
+      "spirit": 13,
+      "description": "A Silent Pilgrim's shawl, the pattern unmade from the edges in. What is left of it still keeps the cold off.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.bracks_sump_waders",
+      "name": "Brack's Sump-Waders",
+      "kind": "gear",
+      "slot": "feet",
+      "quality": 3,
+      "level": 11,
+      "value": 48,
+      "armor": 29,
+      "stamina": 19,
+      "strength": 12,
+      "description": "Waders to the thigh, tarred twice. Brack bailed the Flooded Working for a year and never once got his feet wet, he said.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.old_bristles_tusk",
+      "name": "Old Bristle's Tusk",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 3,
+      "level": 12,
+      "value": 73,
+      "weaponDamage": 38,
+      "stamina": 13,
+      "strength": 20,
+      "description": "The left tusk, hafted. The right one is in the pen's gatepost, where he left it.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.burrowers_claw_gauntlets",
+      "name": "Burrower's Claw-Gauntlets",
+      "kind": "gear",
+      "slot": "hands",
+      "quality": 3,
+      "level": 13,
+      "value": 56,
+      "armor": 33,
+      "stamina": 23,
+      "strength": 13,
+      "description": "Gauntlets fitted with the Old Burrower's foreclaws. They go through packed earth as if it were bread.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.powder_sergeants_match_cord",
+      "name": "Powder-Sergeant's Match-Cord",
+      "kind": "gear",
+      "slot": "neck",
+      "quality": 3,
+      "level": 12,
+      "value": 52,
+      "stamina": 11,
+      "strength": 10,
+      "agility": 12,
+      "description": "A length of slow-match worn round the neck, as Hobb wore his, lit at one end. Do not lean over a keg in it.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.adit.old_kettles_pitch_ladle",
+      "name": "Old Kettle's Pitch-Ladle",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 3,
+      "level": 13,
+      "value": 78,
+      "weaponDamage": 41,
+      "stamina": 13,
+      "strength": 23,
+      "description": "An iron ladle with its bowl beaten into a fist. The pitch on it never quite sets.",
+      "canonStatus": "GAME-ONLY"
     }
   ],
   "vendors": [],
@@ -558,6 +828,139 @@
       "id": "loot.adit.weavers_tuning_drop",
       "look": "neck.pendant:glass/pilgrim",
       "source": "quest:side.adit.dead_line"
+    },
+    {
+      "id": "loot.adit.vosks_whip_hand",
+      "look": "hands.gloves:fingerless/sandthrone",
+      "source": "boss:Overseer Grael Vosk",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.adit.overseers_catwalk_boots",
+      "look": "feet.boots:hobnail/sandthrone",
+      "source": "boss:Overseer Grael Vosk",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.adit.urn_keepers_ash_cord",
+      "look": "neck.cord:beads/cult",
+      "source": "boss:Urn-Keeper Sabel",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.adit.sabels_cinerary_shroud",
+      "look": "chest.robe:shroud/cult",
+      "source": "boss:Urn-Keeper Sabel",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.adit.loremasters_iron_bound_hymnal",
+      "look": "offhand.hung:shuttered/cult",
+      "source": "boss:Loremaster Ivo Senn",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.adit.copyists_ink_black_wraps",
+      "look": "hands.wraps:silk/cult",
+      "source": "boss:Loremaster Ivo Senn",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.adit.corvanes_drill_yard_heater",
+      "look": "shield.heater:plain/cult",
+      "source": "boss:Master-at-Arms Corvane",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.adit.master_at_arms_barbute",
+      "look": "head.barbute:plain/cult",
+      "source": "boss:Master-at-Arms Corvane",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.adit.varrows_brazier_staff",
+      "look": "staff:forked/cult+glow",
+      "source": "boss:Sister Ashe Varrow",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.adit.ember_sisters_cassock",
+      "look": "chest.robe:cassock/cult",
+      "source": "boss:Sister Ashe Varrow",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.adit.whisperers_grey_mask",
+      "look": "head.mask:tear/pale",
+      "source": "boss:The Grey Whisperer",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.adit.hush_cord",
+      "look": "neck.cord:knot/pale",
+      "source": "boss:The Grey Whisperer",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.adit.hollowsongs_unsung_torc",
+      "look": "neck.torc:band/pale",
+      "source": "boss:Brother Hollowsong",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.adit.pilgrims_unmade_mantle",
+      "look": "shoulder.mantle:shawl/pilgrim",
+      "source": "boss:Brother Hollowsong",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.adit.bracks_sump_waders",
+      "look": "feet.boots:waders/sandthrone",
+      "source": "boss:Brack the Bailer",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.adit.old_bristles_tusk",
+      "look": "club:tusk/khaven",
+      "source": "boss:Old Bristle",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.adit.burrowers_claw_gauntlets",
+      "look": "hands.gauntlets:bone/khaven",
+      "source": "boss:The Old Burrower",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.adit.powder_sergeants_match_cord",
+      "look": "neck.cord:knot/tollroad",
+      "source": "boss:Powder-Sergeant Hobb",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.adit.old_kettles_pitch_ladle",
+      "look": "mace.flanged:fist/tollroad",
+      "source": "boss:Old Kettle, the pitch-boiler",
+      "boss": true,
+      "unique": true
     }
   ],
   "drops": [
@@ -767,6 +1170,231 @@
           "pick": [
             {
               "item": "loot.adit.runners_scale_jerkin"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drop.adit.overseer_grael_vosk",
+      "zone": "adit",
+      "mob": "Overseer Grael Vosk",
+      "rank": "elite",
+      "groups": [
+        {
+          "chance": 1,
+          "signature": true,
+          "pick": [
+            {
+              "item": "loot.adit.vosks_whip_hand"
+            },
+            {
+              "item": "loot.adit.overseers_catwalk_boots"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drop.adit.urn_keeper_sabel",
+      "zone": "adit",
+      "mob": "Urn-Keeper Sabel",
+      "rank": "elite",
+      "groups": [
+        {
+          "chance": 1,
+          "signature": true,
+          "pick": [
+            {
+              "item": "loot.adit.urn_keepers_ash_cord"
+            },
+            {
+              "item": "loot.adit.sabels_cinerary_shroud"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drop.adit.loremaster_ivo_senn",
+      "zone": "adit",
+      "mob": "Loremaster Ivo Senn",
+      "rank": "elite",
+      "groups": [
+        {
+          "chance": 1,
+          "signature": true,
+          "pick": [
+            {
+              "item": "loot.adit.loremasters_iron_bound_hymnal"
+            },
+            {
+              "item": "loot.adit.copyists_ink_black_wraps"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drop.adit.master_at_arms_corvane",
+      "zone": "adit",
+      "mob": "Master-at-Arms Corvane",
+      "rank": "elite",
+      "groups": [
+        {
+          "chance": 1,
+          "signature": true,
+          "pick": [
+            {
+              "item": "loot.adit.corvanes_drill_yard_heater"
+            },
+            {
+              "item": "loot.adit.master_at_arms_barbute"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drop.adit.sister_ashe_varrow",
+      "zone": "adit",
+      "mob": "Sister Ashe Varrow",
+      "rank": "elite",
+      "groups": [
+        {
+          "chance": 1,
+          "signature": true,
+          "pick": [
+            {
+              "item": "loot.adit.varrows_brazier_staff"
+            },
+            {
+              "item": "loot.adit.ember_sisters_cassock"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drop.adit.the_grey_whisperer",
+      "zone": "adit",
+      "mob": "The Grey Whisperer",
+      "rank": "elite",
+      "groups": [
+        {
+          "chance": 1,
+          "signature": true,
+          "pick": [
+            {
+              "item": "loot.adit.whisperers_grey_mask"
+            },
+            {
+              "item": "loot.adit.hush_cord"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drop.adit.brother_hollowsong",
+      "zone": "adit",
+      "mob": "Brother Hollowsong",
+      "rank": "elite",
+      "groups": [
+        {
+          "chance": 1,
+          "signature": true,
+          "pick": [
+            {
+              "item": "loot.adit.hollowsongs_unsung_torc"
+            },
+            {
+              "item": "loot.adit.pilgrims_unmade_mantle"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drop.adit.brack_the_bailer",
+      "zone": "adit",
+      "mob": "Brack the Bailer",
+      "rank": "elite",
+      "groups": [
+        {
+          "chance": 1,
+          "signature": true,
+          "pick": [
+            {
+              "item": "loot.adit.bracks_sump_waders"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drop.adit.old_bristle",
+      "zone": "adit",
+      "mob": "Old Bristle",
+      "rank": "elite",
+      "groups": [
+        {
+          "chance": 1,
+          "signature": true,
+          "pick": [
+            {
+              "item": "loot.adit.old_bristles_tusk"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drop.adit.the_old_burrower",
+      "zone": "adit",
+      "mob": "The Old Burrower",
+      "rank": "elite",
+      "groups": [
+        {
+          "chance": 1,
+          "signature": true,
+          "pick": [
+            {
+              "item": "loot.adit.burrowers_claw_gauntlets"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drop.adit.powder_sergeant_hobb",
+      "zone": "adit",
+      "mob": "Powder-Sergeant Hobb",
+      "rank": "elite",
+      "groups": [
+        {
+          "chance": 1,
+          "signature": true,
+          "pick": [
+            {
+              "item": "loot.adit.powder_sergeants_match_cord"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drop.adit.old_kettle_the_pitch_boiler",
+      "zone": "adit",
+      "mob": "Old Kettle, the pitch-boiler",
+      "rank": "elite",
+      "groups": [
+        {
+          "chance": 1,
+          "signature": true,
+          "pick": [
+            {
+              "item": "loot.adit.old_kettles_pitch_ladle"
             }
           ]
         }

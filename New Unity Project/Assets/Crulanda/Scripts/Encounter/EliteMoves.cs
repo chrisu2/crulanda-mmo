@@ -121,6 +121,43 @@ namespace Crulanda.Encounter
             new EliteMove { mob = "Rail-Captain Orsk Danner", name = "The Dead Line", boss = true, callOnPull = true, cc = "root", ccName = "Chained", ccSeconds = 4, ccEvery = 14, ccText = "Danner's coupling chain wraps your legs: you stand where you are.", phases = new[] { new BossPhase { at = .5f, kind = "rally", text = "Danner, without turning: \"More.\"" } }, health = BossHealth, hit = BossHit, windup = 2.2f, blow = 3.2f, reach = 4, every = 12, callReach = 10,   // sturdy, not savage: his guards and the shadows are the fight (the paper fight at level 12)
                 call = "Danner says, quietly: \"Guards.\" They step out of the dark.", callShort = "Guards.", enrageAt = .35f, enrageHaste = .6f,
                 enrage = "Danner draws a second blade. The letter stays buttoned in his coat." },
+            // The reworked Adit's elites (Docs/ADIT_REWORK.md section 5; 2026-10-14), with the moves the engine has today. What section 5
+            // marks NEW (a cast to interrupt, a phase that looses more, a boss raised by her sister, a death that releases a shift) waits
+            // for build step S4. GAME-ONLY.
+            new EliteMove { mob = "Overseer Grael Vosk", name = "Lash", windup = 1.8f, blow = 3.8f, reach = 4.2f, every = 10, callAt = .5f, callReach = 50, callMost = 3,
+                cc = "root", ccName = "Lashed", ccSeconds = 3, ccEvery = 12, ccText = "Vosk's whip wraps your shins: you stand where you are.",
+                call = "Vosk cracks the whip at the catwalk: \"Drive them!\"", callShort = "Drive them!", enrage = "Vosk throws the whip down and takes up the pick." },
+            new EliteMove { mob = "Urn-Keeper Sabel", name = "Cinerary Blow", windup = 2, blow = 4, reach = 3.8f, every = 11, callReach = 30, callMost = 2,
+                cc = "disorient", ccName = "Ash in the Eyes", ccSeconds = 3, ccEvery = 18, ccReach = 6, ccText = "Sabel tips an urn and the ash fills your eyes.",
+                call = "Sabel knocks on an urn: \"Wake, and serve.\"", callShort = "Wake, and serve", enrage = "Sabel breaks the last urn over her own head and laughs." },
+            new EliteMove { mob = "Loremaster Ivo Senn", name = "Iron-Bound Spine", windup = 2.2f, blow = 4, reach = 3.6f, every = 11, callOnPull = true, callReach = 30, callMost = 2,
+                cc = "stun", ccName = "Lullaby of Ash", ccSeconds = 4, ccEvery = 18, ccReach = 6, ccText = "Senn reads a line of the old hymn and your eyes close.",
+                call = "Senn snaps the book shut: \"Copyists. To me.\"", callShort = "Copyists, to me", enrage = "Senn tears the page out and reads it aloud." },
+            new EliteMove { mob = "Master-at-Arms Corvane", name = "Shield-Bash", windup = 1.6f, blow = 3.8f, reach = 3.4f, every = 10, callOnPull = true, callReach = 30, callMost = 3, knock = 3,
+                cc = "stun", ccName = "Shield-bashed", ccSeconds = 2, ccEvery = 12, ccText = "Corvane's shield-rim takes you on the jaw.",
+                call = "Corvane raps his shield: \"Form up!\"", callShort = "Form up!", enrage = "Corvane sets his feet and stops giving ground." },
+            new EliteMove { mob = "Sister Ashe Varrow", name = "Brand-Strike", windup = 2, blow = 3.6f, reach = 3.6f, every = 11, callReach = 8,
+                ringEvery = 14, ringReach = 4.5f, ringName = "Kindling",
+                call = "Varrow sets her hand on the brazier: \"Sister, I am here.\"", callShort = "Sister, I am here", enrage = "Varrow's robe catches and she does not put it out." },
+            new EliteMove { mob = "The Grey Whisperer", name = "Hush", windup = 2, blow = 3.8f, reach = 3.6f, every = 11, callAt = .4f, callReach = 40, callMost = 3,
+                cc = "stun", ccName = "The Long Lull", ccSeconds = 4, ccEvery = 14, ccReach = 8, ccText = "The whisper reaches you and you forget to move.",
+                call = "The Whisperer whispers, and the crawlers who fled come back out of the grey.", callShort = "Come back", enrage = "The Whisperer stops whispering." },
+            new EliteMove { mob = "Brother Hollowsong", name = "The Unsung", boss = true, health = BossHealth, hit = BossHit, windup = 2.2f, blow = 4.2f, reach = 3.8f, every = 11, callAt = .5f, callReach = 40, callMost = 3,
+                cc = "stun", ccName = "The Unsung", ccSeconds = 3, ccEvery = 18, ccReach = 8, ccText = "Hollowsong sings the note nobody sings and you cannot move for hearing it.",
+                call = "Hollowsong's choir comes up the shaft stair, singing nothing.", callShort = "The choir", enrage = "Hollowsong's song goes on without him." },
+            new EliteMove { mob = "Brack the Bailer", name = "Bucket-Swing", windup = 1.8f, blow = 3.8f, reach = 3.8f, every = 10, knock = 4, callReach = 26, callMost = 2,
+                cc = "disorient", ccName = "Bucket Douse", ccSeconds = 3, ccEvery = 16, ccReach = 4, ccText = "Brack empties the bucket over you, sump-water and all.",
+                call = "Brack bangs the bucket on the chain: \"Bail!\"", callShort = "Bail!", enrage = "Brack wades in up to the waist and keeps coming." },
+            new EliteMove { mob = "Old Bristle", name = "Charge", windup = 1.5f, blow = 3.8f, reach = 4.6f, every = 9, knock = 5,
+                cc = "disorient", ccName = "Trample", ccSeconds = 3, ccEvery = 18, ccReach = 5, ccText = "Old Bristle's trotters go over you.", enrage = "Old Bristle's bristles stand straight up." },
+            new EliteMove { mob = "The Old Burrower", name = "Rock-Crush", windup = 2, blow = 4, reach = 3.8f, every = 10, knock = 6,
+                cc = "disorient", ccName = "Burrow", ccSeconds = 3, ccEvery = 16, ccReach = 6, ccText = "The Old Burrower goes under and comes up beneath you.", enrage = "The Old Burrower stops circling." },
+            new EliteMove { mob = "Powder-Sergeant Hobb", name = "Fuse-Pick", windup = 1.8f, blow = 3.8f, reach = 3.6f, every = 10, callReach = 30, callMost = 2,
+                ringEvery = 12, ringReach = 4.5f, ringName = "Short Fuse",
+                call = "Hobb whistles for the sappers.", callShort = "Sappers!", enrage = "Hobb lights the whole bandolier." },
+            new EliteMove { mob = "Old Kettle, the pitch-boiler", name = "Ladle", windup = 2, blow = 4, reach = 3.6f, every = 11, ringEvery = 14, ringReach = 4.5f, ringName = "Hot Pitch",
+                cc = "root", ccName = "Stuck in the pitch", ccSeconds = 3, ccEvery = 18, ccReach = 4.5f, ccText = "The pitch takes your boots and holds them.",
+                callReach = 26, callMost = 2, call = "Old Kettle bangs the ladle on the pot: \"Who's hungry?\"", callShort = "Who's hungry?", enrage = "Old Kettle tips the pot over." },
         };
         static readonly EliteMove Blow = new EliteMove { name = "Heavy Blow" }, Lunge = new EliteMove { name = "Savage Lunge", windup = 1.7f, blow = 3.8f, reach = 4.2f, every = 10 };
         /// <summary>The move of the elite a camp names; a plain heavy blow (a lunge, for a beast) when it is not one of the twelve.</summary>

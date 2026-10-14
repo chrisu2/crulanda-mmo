@@ -198,7 +198,9 @@ namespace Crulanda.Tests
                         if (Vector2.Distance(kin.center, lord.center) - kin.radius > m.callReach) continue;
                         answered = true;
                         // The paper fight (EliteBalanceTests) counts those who answer as normal mobs: no second elite within a call.
-                        Assert.IsFalse(kin.elite, lord.mob + "'s call reaches " + kin.mob + ", another elite. Shorten the call or count it in the balance table.");
+                        // A pair the zone makes on purpose, each the other's guard (the reworked Adit's Ysolt and Varrow: they pull together).
+                        bool pair = guards[e] == kin || guards[c] == lord;
+                        Assert.IsFalse(kin.elite && !pair, lord.mob + "'s call reaches " + kin.mob + ", another elite. Shorten the call or count it in the balance table.");
                     }
                     if (!answered) unanswered.Add(lord.mob);
                 }

@@ -165,8 +165,9 @@ namespace Crulanda.Tests
                 Assert.Greater(m.callAt, m.enrageAt, "It calls before it enrages.");
             }
             Assert.AreEqual(33, EliteMoves.All.Select(m => m.name).Distinct().Count(), "Thirty-three different moves (the reworked Adit's twelve among them, 2026-10-14; the Old Burrower's Earth-Heave, not a second Rock-Crush).");
-            // Dungeon end bosses are a step harder than outdoor named elites: Caddock and the Hollow Root-Warden, and only they.
-            CollectionAssert.AreEquivalent(new[] { "Caddock, the Bandit King", "The Hollow Root-Warden", "Rail-Captain Orsk Danner" }, EliteMoves.All.Where(m => m.boss).Select(m => m.mob).ToList());
+            // Dungeon end bosses are a step harder than outdoor named elites: Caddock, the Hollow Root-Warden, the Rail-Captain and (the Adit
+            // rework) Brother Hollowsong, the Wake's boss, and only they.
+            CollectionAssert.AreEquivalent(new[] { "Caddock, the Bandit King", "The Hollow Root-Warden", "Rail-Captain Orsk Danner", "Brother Hollowsong" }, EliteMoves.All.Where(m => m.boss).Select(m => m.mob).ToList());
             // Nix's two-part fight (D5): the engine and the goblin are each lighter than one elite and together a step above one.
             var rock = EliteMoves.For(EncounterSession.RockEaterName, false); var nix = EliteMoves.For(EncounterSession.NixName, false);
             Assert.That(rock.health, Is.InRange(.7f, 1.4f)); Assert.That(nix.health, Is.InRange(.7f, 1f)); Assert.That(rock.health + nix.health, Is.InRange(1.5f, 2.2f), "two parts, a step above one elite together (the beast 1.3 since the duo was eased, 2026-10-11 18:43)");

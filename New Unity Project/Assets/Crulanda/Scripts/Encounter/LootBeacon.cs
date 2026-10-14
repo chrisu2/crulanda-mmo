@@ -19,7 +19,7 @@ namespace Crulanda.Encounter
         /// <summary>The quality this beacon shows: 0 poor to 4 epic.</summary>
         public int Quality { get; private set; }
         static Material[] mats; static Mesh beamMesh, starMesh, ringMesh; static int pulsedFrame = -1;
-        Transform glint, ring; float phase, glintSize;
+        Transform glint, ring; float phase, glintSize, born;
 
         /// <summary>Lights (or relights) the beacon over a body for the best quality on it. A negative quality puts it out.</summary>
         public static void Show(EncounterEnemy e, int quality)
@@ -64,6 +64,7 @@ namespace Crulanda.Encounter
 
         void Build(int quality, string id)
         {
+            born = Time.time;
             Quality = quality; Shared();
             phase = (id != null ? Mathf.Abs(id.GetHashCode() % 1000) : 0) * .0063f;
             float h = BeamHeight(quality);
@@ -88,6 +89,9 @@ namespace Crulanda.Encounter
         }
         void LateUpdate()
         {
+            // A poor or common drop nobody took in three minutes stops twinkling (Chris, 2026-10-14 19:30: a kill's glint behind the
+            // smithy's wall, "some reason this sparks or lights up"); better things keep their beacon.
+            if (Quality <= 1 && Time.time - born > 180) { Destroy(gameObject); return; }
             float t = Time.time + phase;
             var cam = Camera.main;
             if (glint != null)

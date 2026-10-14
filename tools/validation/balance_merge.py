@@ -78,6 +78,21 @@ def _csvs():
             for col in ws.columns: ws.column_dimensions[col[0].column_letter].width = max(10, min(28, max(len(str(c.value or '')) for c in col) + 2))
         wb.save(os.path.join(folder, 'balance.xlsx'))
     except ImportError: pass
+    # And a page that sorts by itself (click a heading), for a machine with no spreadsheet (Chris: "still can't sort number in a spreadsheet").
+    import html as _h, time as _t
+    def _table(tid, rows_):
+        head = ''.join('<th onclick="sortBy(' + "'%s',%d" % (tid, i) + ')">%s</th>' % _h.escape(str(c)) for i, c in enumerate(rows_[0]))
+        body = ''.join('<tr>' + ''.join('<td class="%s">%s</td>' % ('n' if isinstance(c, (int, float)) else 't', '' if c in ('', None) else _h.escape(str(c))) for c in r) + '</tr>' for r in rows_[1:])
+        return '<table id="%s"><thead><tr>%s</tr></thead><tbody>%s</tbody></table>' % (tid, head, body)
+    page = ('<!doctype html><html><head><meta charset="utf-8"><title>Crulanda balance</title><style>body{font-family:Segoe UI,Arial,sans-serif;margin:16px;background:#1b1b1b;color:#eee}'
+            'h1{font-size:20px}h2{font-size:16px;margin-top:28px}table{border-collapse:collapse;font-size:13px}th{cursor:pointer;background:#333;position:sticky;top:0;padding:4px 8px;text-align:left;user-select:none}'
+            'th:hover{background:#444}td{padding:3px 8px;border-bottom:1px solid #2a2a2a}td.n{text-align:right;font-variant-numeric:tabular-nums}tr:nth-child(even){background:#222}</style></head><body>'
+            '<h1>Crulanda balance: fixed dummies at level 15 (' + _t.strftime('%Y-%m-%d %H:%M') + ')</h1><p>Click a heading to sort; again to reverse. in_range 1 = inside the targets (DPS 62-72, CC and Support 45-52, Healer at most 35, Tank 42-55).</p>'
+            '<h2>Summary (one row a build)</h2>' + _table('t0', out_rows) + '<h2>Runs (one row a build and seed)</h2>' + _table('t1', run_rows) +
+            '<script>var dir={};function sortBy(id,col){var t=document.getElementById(id),tb=t.tBodies[0],rows=Array.from(tb.rows);var k=id+col;dir[k]=!dir[k];'
+            'rows.sort(function(a,b){var x=a.cells[col].textContent,y=b.cells[col].textContent,nx=parseFloat(x),ny=parseFloat(y);'
+            "var c=(!isNaN(nx)&&!isNaN(ny))?nx-ny:(x===''?1:y===''?-1:x.localeCompare(y));return dir[k]?c:-c});rows.forEach(function(r){tb.appendChild(r)});}</script></body></html>")
+    open(os.path.join(folder, 'balance.html'), 'w', encoding='utf-8').write(page)
 _csvs()
 dps_median = statistics.median([t['single'] for t in table if t['role'] == 'dps']) if any(t['role'] == 'dps' for t in table) else 0
 medians = {}

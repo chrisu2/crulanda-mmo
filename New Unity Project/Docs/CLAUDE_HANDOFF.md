@@ -7,7 +7,7 @@ testing new dungeons and builds as needed. all zones full of quests. more sims t
 `Docs/TONIGHT_2026-10-13.md` (Progress) and `Docs/CHANGELOG.md` (2026-10-13, 15:20 on). Nothing is VERIFIED until Chris has seen it.
 - **Branch:** `feet-bow-adit-kit`, PR #2. Do not merge without Chris. Last commits tonight: 3d89ef0 (quests, sims, orc, heals),
   e10a915 (the group-run leader's stall rule), 9deb508 (suite fixes), the "Immune" fix, c347252 (the carriage gunners), then the docs.
-- **Published:** the release build of c347252 at 19:59 to `D:\crulanda-work\outputs\Crulanda-Playable` (after Adit, zone and Rock-Eater
+- **Published:** the release build of the last commit at 20:34 (c347252 at 19:59 before it) to `D:\crulanda-work\outputs\Crulanda-Playable` (after Adit, zone and Rock-Eater
   tests 14/14; 19:07 was the first evening publish). Chris's save backed up first: `D:\crulanda-work\save-backups\20261013-1905-before-evening-publish`.
 - **Tests (TESTED):** EditMode 470/470. Full PlayMode suite 319/327 at 18:36; the 6 new failures fixed and rerun green (43/44, then the
   Adit nav test 4/4 with its rider rule). Still failing, known and parked: the hoe hand spread, the foot after a jump (Chris parked it).
@@ -19,7 +19,8 @@ testing new dungeons and builds as needed. all zones full of quests. more sims t
   - The warps are the run tool moving its auto-pilot player when it sticks; party sims catch up by themselves.
   - The tank still falls to the gang-boss and the elites. That is the boss pressure Chris settled on.
   - The "Immune" column over the Cinder-Warden is fixed.
-- **For Chris to look at first:** the training yard with sims practising (they go in by themselves; grey numbers when you are near);
+- **For Chris to look at first:** the training yard with sims practising (they go in by themselves; grey numbers when you are near;
+  frame: `D:/crulanda-work/ui-captures/training-20261013-2034/tf-06-sims-practising.png`);
   the orc look (`D:\crulanda-work\ui-captures\figures\orcs-*.png`, a first pass on the human head: green, tusks, taller); any of the 52
   new quests (Oakhaven's start at levels 2-3: Ama Rusk, Sel Harrow, Grete Lowe, Pim).
 - **Next, in order:** Chris's reactions; an orc face from the packs in `D:\crulanda-work\imports\orcs` if he wants more than the first

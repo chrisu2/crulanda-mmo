@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using Crulanda.Abilities;
 
@@ -10,7 +11,7 @@ namespace Crulanda.Encounter
     /// Frames of Oakhaven's training field (EncounterSession.Training) for Chris to look at before anything is published. Run the player
     /// windowed, as a Cleric (it strikes and it heals), on a temp save:
     /// Crulanda.exe --crulanda-training-capture &lt;folder&gt; --crulanda-class class.cleric --crulanda-zone zone.oakhaven --crulanda-temp-save.
-    /// Writes tf-01..tf-05 and training.txt (what each frame should show, and the numbers behind it); TRAINING_CAPTURE_DONE in the log.
+    /// Writes tf-01..tf-06 and training.txt (what each frame should show, and the numbers behind it); TRAINING_CAPTURE_DONE in the log.
     /// </summary>
     public sealed class TrainingCapture : MonoBehaviour
     {
@@ -97,6 +98,21 @@ namespace Crulanda.Encounter
             yield return Use(10, a => a.effect == AbilityEffect.Heal);
             float hps = 0; foreach (var r in s.Meter.Rows) if (r.id == mine) hps = r.Hps(s.Meter.CombatSeconds);
             yield return Shot("tf-05-mending-dummy-healed", "healed: " + mp.Current + " of " + mp.Max + "; the meter " + hps.ToString("0") + " healing a second; in a fight " + s.InCombat, mend.transform);
+            // 6. Sims at practice (Chris, 2026-10-13: "have sims wonder into the fighting arena (dummies) to practice and improve their dps").
+            // They go of their own accord; here up to four of the village's are sent to the yard's marks, so the frame does not wait on
+            // their choices, and it is taken from the gate once two are at work.
+            var pop = SimPopulation.Active; int sent = 0;
+            if (pop != null)
+                foreach (var f in pop.Figures.ToList())
+                {
+                    if (f == null || f.Hidden || sent >= 4) continue;
+                    var m = f.FindMark(400); if (m == null) continue;
+                    f.Begin(SimFigure.Doing.Practice, mark: m); sent++;
+                }
+            int AtWork() { return pop == null ? 0 : pop.Figures.Count(f => f != null && f.Activity == SimFigure.Doing.Practice && f.Mark != null && Vector3.Distance(f.transform.position, f.Mark.stand) < 1.6f); }
+            for (float w = 0; w < 75 && AtWork() < Mathf.Min(2, sent); w += 1) yield return new WaitForSeconds(1);
+            motor.Teleport(stand + Vector3.up * .3f); motor.SetView(Yaw(stand, mid), 32, 14); yield return new WaitForSeconds(5);
+            yield return Shot("tf-06-sims-practising", sent + " sims sent to the yard; " + AtWork() + " at a dummy or a butt, striking or shooting (grey numbers over it)", dummy.transform);
             Finish();
         }
         void Finish()

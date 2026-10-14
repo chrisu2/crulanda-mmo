@@ -263,7 +263,17 @@ namespace Crulanda.World
                     float wallAt = Mathf.Min(WallOut(h, i, side, up + .2f), WallOut(h, i, side, up + 2.2f));
                     aside = side * Mathf.Max(0, wallAt - .45f - spot.half);
                 }
-                var w = h.At(s, aside); return new Vector3(w.x, top, w.z);
+                var w = h.At(s, aside);
+                // Inside the cave's air at a head over the planks, both edges: a deck laid by its aside alone ran into the rock where the
+                // wall leans in at its height (the overseers' walk and stair, 16 and 11 samples in the shell: AditNavDiagnostics 18:45).
+                for (int pass = 0; pass < 24 && Mathf.Abs(aside) > .01f; pass++)
+                {
+                    var c = h.At(s, 0); var outward = new Vector3(w.x - c.x, 0, w.z - c.z); if (outward.sqrMagnitude > 1e-6f) outward.Normalize();
+                    var edge = new Vector3(w.x, top + 1.2f, w.z) + outward * spot.half;
+                    if (h.Open(edge, .97f)) break;
+                    aside = Mathf.MoveTowards(aside, 0, .25f); w = h.At(s, aside);
+                }
+                return new Vector3(w.x, top, w.z);
             }
             float length = 0; var last = Point(0);
             for (int k = 1; k <= 64; k++) { var p = Point(k / 64f); length += new Vector2(p.x - last.x, p.z - last.z).magnitude; last = p; }
@@ -368,6 +378,10 @@ namespace Crulanda.World
             void Post(Vector3 top, float under)
             {
                 float foot = SurfaceBelow(new Vector2(top.x, top.z), under - .3f, spot); if (float.IsNegativeInfinity(foot) || under - foot < .4f) return;
+                // No post where another deck lies in its span or under its foot (the cross-walk's posts went down through the north
+                // ramp, the catwalk's through the walkway, and each carved the lower deck's navmesh: AditNavDiagnostics 18:45); that
+                // stretch hangs from its braces instead.
+                foreach (var other in DeckSpots) if (other != spot && other.Top(new Vector2(top.x, top.z), out float oy) && oy > foot - .1f && oy < under + .6f) return;
                 float tall = under - foot, w = style == "stone" ? .7f : .26f; var at = new Vector3(top.x, foot, top.z);
                 Part(PrimitiveType.Cube, look, at + Vector3.up * tall / 2, new Vector3(w, tall, w), style == "stone" ? cut : post);
                 DeckBlock(solidRoot, at, new Vector3(w + .05f, Mathf.Max(.1f, tall - .15f), w + .05f), Quaternion.identity);

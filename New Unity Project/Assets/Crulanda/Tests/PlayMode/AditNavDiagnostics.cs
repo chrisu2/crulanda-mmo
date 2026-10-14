@@ -128,7 +128,7 @@ namespace Crulanda.Tests
                     if (all[i].cave == all[j].cave) continue;
                     foreach (var ea in new[] { all[i].mid[0], all[i].mid[all[i].mid.Length - 1] })
                         foreach (var eb in new[] { all[j].mid[0], all[j].mid[all[j].mid.Length - 1] })
-                        { float gap = Vector3.Distance(ea, eb); if (gap <= 8) sb.AppendLine((all[i].def != null ? all[i].def.name : "?") + " <-> " + (all[j].def != null ? all[j].def.name : "?") + " | " + gap.ToString("0.00") + " | " + ea.y.ToString("0.0") + "/" + eb.y.ToString("0.0")); }
+                        { float gap = Vector3.Distance(ea, eb); if (gap <= 8) sb.AppendLine((all[i].def != null ? all[i].def.name : "?") + " <-> " + (all[j].def != null ? all[j].def.name : "?") + " | " + gap.ToString("0.00") + " | " + ea.ToString("0.0") + " / " + eb.ToString("0.0")); }
                 }
             sb.AppendLine(); sb.AppendLine("junction | between | gap (m) | heights | path");
             var spots = zone.DeckSpots.Where(d => d.mid != null && d.mid.Length >= 1).ToList();

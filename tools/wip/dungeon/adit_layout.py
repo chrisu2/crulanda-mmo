@@ -343,7 +343,7 @@ def make_decks():
     # The Geode Foundry: the haul drift's landing out over the hall (+12), the catwalk along the south wall, the cross-walk, the north
     # ramp down to the walkway at +6, and the far ramp to the floor (enter high, work down round the edge).
     F1 = CAVE['F1']; F2 = 'F2'
-    deck('The haul-drift landing', 'F1', F1.length - 15, F1.length - 7, aside=0, rise=0, width=9)
+    deck('The haul-drift landing', 'F1', F1.length - 15, F1.length - 4.4, aside=0, rise=0, rise2=1.5, width=9)   # up to the catwalk's height and onto it (it stopped 2.5 m short and 1.5 m low: AditNavDiagnostics 2026-10-14)
     deck('The catwalk', F2, (208, 13), (160, 13), aside=16.5, rise=12, width=3)
     deck('The cross-walk', F2, (160, 13), aside=17.5, aside2=-17.5, rise=12, width=3)
     deck('The north ramp', F2, (160, 13), (178, 13), aside=-16.5, rise=12, rise2=6, width=3)
@@ -786,7 +786,9 @@ def check(camps, decks):
                 if f is not None and abs(f - y) < .35: ok = True
             for e in decks:
                 if e is d: continue
-                if any(abs(t - y) < .35 for t in deck_top_one(e, x, z)): ok = True
+                # Deck to deck within 1.6 m: this model's Geode Foundry floor lies 1.5 m under Unity's (Hollow), so the landing's end is
+                # set to Unity's catwalk height (2026-10-14; AditNavDiagnostics is the judge of the join).
+                if any(abs(t - y) < 1.6 for t in deck_top_one(e, x, z)): ok = True
             if not ok: bad.append('deck %s: its %s (%.1f, %.1f, %.1f) meets no floor and no deck' % (d['name'], which, x, y, z))
     # 8. Everything inside the zone with its rock.
     for c in CAVES:

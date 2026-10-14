@@ -106,12 +106,13 @@ namespace Crulanda.World
             Splashes.Ensure(this); TreeFade.Begin(art.fade);
             var view = Camera.main;
             if (view != null && art.post != null && view.GetComponent<ZonePost>() == null) view.gameObject.AddComponent<ZonePost>().Init(art.post, Zone, sunLight);
-            int before = MergeStatics(); CullWoodsFloor();
+            int before = MergeStatics();
             try { StaticBatchingUtility.Combine(statics.gameObject); } catch (Exception e) { Debug.LogWarning("Static batching skipped: " + e.Message); }
             Debug.Log("Static scenery merged: " + before + " renderers into " + statics.GetComponentsInChildren<MeshRenderer>().Length + ".");
             Lap("batching");
             // In daylight, before the clock sets the hour; about 4 px a metre (1024 for the old 260 m zones).
             MapTexture = RenderMap(Mathf.Clamp(Mathf.RoundToInt(Zone.size * 4 / 256f) * 256, 1024, 2048));
+            CullWoodsFloor();   // after the map: from above, the woods would be culled off it
             Lap("map");
             BuildSecrets();   // after the map: a hidden find must never show on the minimap or the zone map
             BuildNodes();     // after the secrets (they keep clear of them), each from a stream of its own: nothing else moves

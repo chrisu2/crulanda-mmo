@@ -17,7 +17,7 @@ namespace Crulanda.World
     public sealed partial class ZoneBuilder
     {
         readonly List<Vector2> woodsTrees = new List<Vector2>();
-        readonly List<Transform> woodsFloor = new List<Transform>();
+        readonly List<Transform> woodsFloor = new List<Transform>(), woodsRoots = new List<Transform>();
         bool[] woodsMask; float woodsCell; int woodsAxis;
         /// <summary>Where the wild woods' trees stand (empty in a zone with no woods).</summary>
         public IReadOnlyList<Vector2> WoodsTrees { get { return woodsTrees; } }
@@ -97,7 +97,7 @@ namespace Crulanda.World
                             Broadleaf(tree, look < .72f ? 0 : look < .88f ? 3 : 1); broad++;
                         }
                     }
-                    if (tree != null) { if (Hollow.CoverAt(at, 3) > 0) DestroyImmediate(tree.gameObject); else { trunks.Add(at); woodsTrees.Add(at); } }
+                    if (tree != null) { if (Hollow.CoverAt(at, 3) > 0) DestroyImmediate(tree.gameObject); else { trunks.Add(at); woodsTrees.Add(at); woodsRoots.Add(tree); } }
                 }
                 // The floor, a step off the trunk.
                 float a = fa * Mathf.PI * 2; var fp = c.at + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * (2.6f + fr * 2.4f);
@@ -198,14 +198,17 @@ namespace Crulanda.World
         }
 
         /// <summary>After the merge: the woods' floor (bushes, trunks, stumps, mushrooms, stones) is not drawn once it is small on the
-        /// screen, so the woods cost little past the near distance. The trees themselves stay (they make the skyline).</summary>
+        /// screen, nor are the woods' own trees past some 220-300 m (in the fog by then): the zone's frame rate stays where it was
+        /// (Oakhaven's tour, 2026-10-14: 110 a second with the woods, then lower once they were greener, the kit's common tree being the
+        /// heavier). The groves and the forest's edge keep the skyline.</summary>
         void CullWoodsFloor()
         {
-            foreach (var t in woodsFloor)
-            {
-                if (t == null) continue; var rs = t.GetComponentsInChildren<Renderer>(); if (rs.Length == 0) continue;
-                var lod = t.gameObject.AddComponent<LODGroup>(); lod.SetLODs(new[] { new LOD(.012f, rs) }); lod.RecalculateBounds();
-            }
+            foreach (var (list, at) in new[] { (woodsFloor, .012f), (woodsRoots, .035f) })
+                foreach (var t in list)
+                {
+                    if (t == null) continue; var rs = t.GetComponentsInChildren<Renderer>(); if (rs.Length == 0) continue;
+                    var lod = t.gameObject.AddComponent<LODGroup>(); lod.SetLODs(new[] { new LOD(at, rs) }); lod.RecalculateBounds();
+                }
         }
     }
 }

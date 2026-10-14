@@ -58,11 +58,25 @@ namespace Crulanda.Encounter
         {
             if (shotOffsets.TryGetValue(id, out var so)) return so;
             if (DefaultPanels) { float dx = 0; foreach (var pn in Panels) if (pn.id == id) dx = pn.anchor * CanvasOffset.x / CanvasScale; return new Vector2(dx, 0); }
-            if (panelOffsets.TryGetValue(id, out var o)) return o;
+            if (panelOffsets.TryGetValue(id, out var o)) return OnScreen(id, o);
             float x = 0, y = 0; bool saved = false;
             try { saved = PlayerPrefs.HasKey("ui.pos." + id + ".x"); if (saved) { x = PlayerPrefs.GetFloat("ui.pos." + id + ".x"); y = PlayerPrefs.GetFloat("ui.pos." + id + ".y"); } } catch { }
             if (!saved) foreach (var pn in Panels) if (pn.id == id) x = pn.anchor * CanvasOffset.x / CanvasScale;
-            return panelOffsets[id] = new Vector2(x, y);
+            return OnScreen(id, panelOffsets[id] = new Vector2(x, y));
+        }
+        /// <summary>A panel kept on the screen whatever its saved place (2026-10-13, Chris: "there is no target or self or party bars": the
+        /// frames were saved off the edge of a smaller window, and not even their drag box showed). The saved place is kept, so on the big
+        /// screen it comes back where it was put.</summary>
+        public static Vector2 OnScreen(string id, Vector2 o)
+        {
+            foreach (var pn in Panels)
+            {
+                if (pn.id != id) continue;
+                float mx = CanvasOffset.x / CanvasScale, my = CanvasOffset.y / CanvasScale, r = pn.rect.xMax, b = pn.rect.yMax;
+                const float Keep = 40;   // at least this much of it on the screen, to see and drag back
+                o.x = Mathf.Max(-mx - r + Keep, Mathf.Min(o.x, 1440 + mx - pn.rect.x - Keep)); o.y = Mathf.Max(-my - b + Keep, Mathf.Min(o.y, 900 + my - pn.rect.y - Keep));
+            }
+            return o;
         }
         static void SetPanelOffset(string id, Vector2 o) { panelOffsets[id] = o; try { PlayerPrefs.SetFloat("ui.pos." + id + ".x", o.x); PlayerPrefs.SetFloat("ui.pos." + id + ".y", o.y); } catch { } }
         /// <summary>Draw what follows where this panel was put (null: back to the canvas).</summary>

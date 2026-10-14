@@ -74,6 +74,17 @@ namespace Crulanda.Encounter
             // 1. The field: both dummies from a few metres off.
             var mid = (dummy.transform.position + mend.transform.position) / 2; var stand = mid + Quaternion.Euler(0, Yaw(mid, s.Zone.Ground(Vector2.zero)), 0) * Vector3.forward * 13;
             motor.Teleport(stand + Vector3.up * .3f); motor.SetView(Yaw(stand, mid), 32, 14); yield return new WaitForSeconds(1);
+            // A whole orc in play (2026-10-14, Chris: "the only thing on orc that move is belt, staff and teeth"): what turns in two seconds of
+            // its idle, and what its animator is doing.
+            var orcVis = s.Player.GetComponent<ActorVisual>(); var bm = orcVis != null ? orcVis.BeastModel : null;
+            if (bm != null)
+            {
+                var bones = bm.Model.GetComponentsInChildren<Transform>(); var was = bones.Select(t => t.localRotation).ToArray();
+                yield return new WaitForSeconds(2);
+                var turned = bones.Where((t, i) => Quaternion.Angle(t.localRotation, was[i]) > 2).Select(t => t.name).ToList();
+                report.AppendLine("orc in play: " + bm.Kind + ", animator on " + bm.Animator.enabled + ", culling " + bm.Animator.cullingMode + ", avatar " + (bm.Animator.avatar != null ? bm.Animator.avatar.name + " valid " + bm.Animator.avatar.isValid + " human " + bm.Animator.avatar.isHuman : "none")
+                    + ", renderers seen " + bm.Renderers.Count(r => r != null && r.isVisible) + " of " + bm.Renderers.Count + ", motion " + bm.Moving + "; " + turned.Count + " of " + bones.Length + " bones turned in 2 s: " + string.Join(", ", turned.Take(24)));
+            }
             yield return Shot("tf-01-yard", "the training yard east of Oakhaven from its gate: the fence, the tents, the banners, the dummies down the left, the butts down the right, the healer's corner, the training and mending dummies", dummy.transform, false);
 
             // 2. Striking the training dummy, the meter timing it.

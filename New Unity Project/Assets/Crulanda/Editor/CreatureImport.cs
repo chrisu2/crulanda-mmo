@@ -20,7 +20,7 @@ namespace Crulanda.EditorTools
         const string Root = "Assets/Crulanda/Resources/Creatures/";
         /// <summary>Raised when these rules change, so Unity imports the creatures again (2026-10-13: the makers' normals for the new models,
         /// and the loop of an "Armature|" take by its own name).</summary>
-        public override uint GetVersion() { return 2; }
+        public override uint GetVersion() { return 3; }
         /// <summary>How sharp an edge must be to stay hard when the normals are smoothed (degrees).</summary>
         public const float Smoothing = 70;
         void OnPreprocessModel()
@@ -38,6 +38,9 @@ namespace Crulanda.EditorTools
             string file = System.IO.Path.GetFileName(assetPath);
             if (file.StartsWith("Orc") || file.StartsWith("WildBoar") || file.StartsWith("UndeadUnit") || file.StartsWith("Squirrel") || file.StartsWith("Bird"))
             { m.importNormals = ModelImporterNormals.Import; m.importTangents = ModelImporterTangents.CalculateMikk; }
+            // A model and the files of its clips each keep their top node (2026-10-13: a clip file with one top node lost it on import, its
+            // bones' paths no longer matched the model's, and only the staff, belt and teeth moved: Chris, "the only thing on orc that move").
+            if (file.StartsWith("Orc") || file.StartsWith("UndeadUnit") || file.StartsWith("Bird")) m.preserveHierarchy = true;
         }
         /// <summary>A palette texture (CraftPix's swatches): no mipmaps or compression to bleed one swatch into the next.</summary>
         void OnPreprocessTexture()

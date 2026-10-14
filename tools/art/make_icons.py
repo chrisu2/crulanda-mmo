@@ -2684,7 +2684,7 @@ def a_cl_absolve(c): c.back(c.ell(50, 50, 38), '#d0ffe0', .4, 10); m_hand(c, '#f
 def a_cl_hymn(c): c.back(c.ell(50, 50, 40), '#cfe8ff', .4, 12); m_note(c, '#ffffff', '#ffe9a0'); rings(c, 50, 50, (46,), '#ffffff', .4, w=3)
 def a_cl_sanctuary(c): c.back(c.ell(50, 50, 40), '#ffe9a0', .45, 12); rings(c, 50, 56, (40, 30), '#fff2c0', .6, w=3); m_sun(c, '#ffd860', '#ffffff')
 def a_cl_steadfast(c): c.back(c.ell(50, 50, 38), '#9fc8ff', .4, 10); m_shield(c, '#d8d8cc', '#ffffff'); m_sun(c, '#ffd860', '#ffffff')
-def a_sh_squall(c): c.back(c.ell(50, 50, 38), '#9fc8ff', .4, 10); m_wind(c, '#bfe0ff', '#ffffff'); m_drop(c, '#70b0ff', '#ffffff')
+def a_sh_squall(c): c.back(c.ell(50, 50, 38), '#8a98c0', .4, 10); m_wind(c, '#bfe0ff', '#ffffff'); m_bolt(c, '#ffe070', '#ffffff')   # a storm's bolt, not a drop: it read as a heal (Chris, 2026-10-13)
 def a_sh_tide_mend(c): c.back(c.ell(50, 50, 38), '#70d0e0', .45, 10); m_drop(c, '#9fe8ff', '#ffffff'); c.spark(76, 26, 8, '#ffffff', .8)
 def a_sh_rain_call(c): c.back(c.ell(50, 50, 40), '#70b0ff', .4, 12); m_cloud(c, '#dfe8f0', '#9fc8ff')
 def a_sh_chain_mend(c): c.back(c.ell(50, 50, 38), '#70d0e0', .4, 10); m_chain(c, '#9fe8ff', '#ffffff'); m_heart(c, '#d0ffe0', '#ffffff')

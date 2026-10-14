@@ -317,6 +317,10 @@ namespace Crulanda.Encounter
             var go = Object.Instantiate(src, parent, false); go.name = "Model"; b.Model = go.transform;
             b.Model.localPosition = Vector3.zero; b.Model.localRotation = Quaternion.identity; b.Model.localScale = Vector3.one;
             b.Animator = go.GetComponent<Animator>(); if (b.Animator == null) b.Animator = go.AddComponent<Animator>();
+            // A generic rig of its own bones (2026-10-13, Chris playing the orc: "the only thing on orc that move is belt, staff and teeth"):
+            // a model that came with a human avatar (the orcs' packs) takes its own clips' bone curves only on the bones a human avatar
+            // does not claim, so its body stood still while the staff swung.
+            if (b.Animator.avatar == null || b.Animator.avatar.isHuman || !b.Animator.avatar.isValid) b.Animator.avatar = AvatarBuilder.BuildGenericAvatar(go, "");
             b.Animator.applyRootMotion = false; b.Animator.cullingMode = AnimatorCullingMode.CullUpdateTransforms; b.Animator.runtimeAnimatorController = null;
             b.bones = new Dictionary<string, Transform>();
             foreach (var t in go.GetComponentsInChildren<Transform>(true)) if (!b.bones.ContainsKey(t.name)) b.bones[t.name] = t;

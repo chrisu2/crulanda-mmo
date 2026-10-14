@@ -2217,13 +2217,13 @@ MonoBehaviour:
         level: 1
         talentId: 
       - abilityId: shaman.rain_call
-        level: 2
-        talentId: 
-      - abilityId: shaman.chain_mend
         level: 3
         talentId: 
-      - abilityId: shaman.thunderhead
+      - abilityId: shaman.chain_mend
         level: 4
+        talentId: 
+      - abilityId: shaman.thunderhead
+        level: 2
         talentId: 
       - abilityId: shaman.hailfall
         level: 5

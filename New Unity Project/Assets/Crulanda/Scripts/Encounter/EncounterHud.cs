@@ -585,7 +585,10 @@ namespace Crulanda.Encounter
             // Each class is a separate character with its own save; switching saves this one first. One button per other class.
             var others = new List<PlayableClass>();
             foreach (var c in session.content.AllClasses()) if (c.definition.id != session.ClassDef.id) others.Add(c);
-            Frame(new Rect(475, 325, 490, 250 + 48 * Mathf.Max(0, others.Count - 1)));
+            // (2026-10-13, Chris: "cant see all classes. need another mechanism to be able to choose": one button a class ran off the screen
+            // at ten classes; now a grid of three across.)
+            int rows = (others.Count + 2) / 3;
+            Frame(new Rect(475, 325, 490, 240 + 48 * rows));
             GUI.Label(new Rect(525, 351, 400, 35), "EXPEDITION PAUSED", heading);
             GUI.Label(new Rect(525, 398, 400, 35), "Progress autosaves out of combat.", text);
             if (controlsOpen) { DrawControls(); return; }
@@ -594,8 +597,9 @@ namespace Crulanda.Encounter
             if (GUI.Button(new Rect(657, 448, 126, 44), "Controls", button)) controlsOpen = true;
             if (GUI.Button(new Rect(789, 448, 126, 44), "Display", button)) displayOpen = true;   // resolution, mode, UI scale (playtest note 94)   // key bindings (playtest note 75)
             GUI.enabled = !session.InCombat;
+            if (others.Count > 0) GUI.Label(new Rect(525, 500, 400, 30), "Play another character (each its own save):", text);
             for (int i = 0; i < others.Count; i++)
-                if (GUI.Button(new Rect(525, 504 + 48 * i, 390, 44), "Play your " + others[i].definition.displayName + " (separate character)", button)) { session.SwitchCharacter(others[i].definition.id); break; }
+                if (GUI.Button(new Rect(525 + (i % 3) * 132, 534 + 48 * (i / 3), 126, 44), others[i].definition.displayName, button)) { session.SwitchCharacter(others[i].definition.id); break; }
             GUI.enabled = true;
         }
         public static string ResourceName(Crulanda.Core.ResourceKind kind) { return kind == Crulanda.Core.ResourceKind.Breath ? "Shift Breath" : kind.ToString(); }

@@ -20,11 +20,11 @@ namespace Crulanda.Tests
                 {
                     var home = EncounterHud.PanelRect(id);
                     Assert.Greater(home.width, 0, id + " is a movable panel");
-                    var to = new Vector2(-300, -200);
+                    var to = new Vector2(-200, -200);   // (2026-10-13: a panel keeps 40 px on the screen: 300 left took the pet bar off it)
                     EncounterHud.MovePanel(id, to);
                     EncounterHud.ForgetPanelCache();   // as a new run would
                     var moved = EncounterHud.PanelRect(id);
-                    Assert.AreEqual(home.x - 300, moved.x, .01f, id + " kept its new x"); Assert.AreEqual(home.y - 200, moved.y, .01f, id + " kept its new y");
+                    Assert.AreEqual(home.x - 200, moved.x, .01f, id + " kept its new x"); Assert.AreEqual(home.y - 200, moved.y, .01f, id + " kept its new y");
                     EncounterHud.ResetPanels(); EncounterHud.ForgetPanelCache();
                     var back = EncounterHud.PanelRect(id);
                     Assert.AreEqual(home.position.x, back.position.x, .01f, id + " back in place"); Assert.AreEqual(home.position.y, back.position.y, .01f, id + " back in place");

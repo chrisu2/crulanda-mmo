@@ -83,7 +83,8 @@ namespace Crulanda.EditorTools
                 if (name == null) { log.AppendLine("skipped " + file); continue; }
                 // As the model is imported under Resources/Creatures (CreatureImport): a generic rig, so the curves are its bones' own.
                 var mi = (ModelImporter)AssetImporter.GetAtPath(path);
-                if (mi.animationType != ModelImporterAnimationType.Generic) { log.AppendLine(file + ": was " + mi.animationType); mi.animationType = ModelImporterAnimationType.Generic; mi.avatarSetup = ModelImporterAvatarSetup.CreateFromThisModel; mi.SaveAndReimport(); }
+                if (mi.animationType != ModelImporterAnimationType.Generic || !mi.preserveHierarchy)
+                { log.AppendLine(file + ": was " + mi.animationType); mi.animationType = ModelImporterAnimationType.Generic; mi.avatarSetup = ModelImporterAvatarSetup.CreateFromThisModel; mi.preserveHierarchy = true; mi.SaveAndReimport(); }   // its top node kept, as the model's (CreatureImport)
                 var clip =AssetDatabase.LoadAllAssetsAtPath(path).OfType<AnimationClip>().Where(c => !c.name.StartsWith("__preview__")).OrderByDescending(c => c.length).FirstOrDefault();
                 if (clip == null) { log.AppendLine("no clip in " + file); continue; }
                 var copy = Object.Instantiate(clip); copy.name = name;

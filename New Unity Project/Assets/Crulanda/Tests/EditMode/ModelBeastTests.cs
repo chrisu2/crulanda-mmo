@@ -58,6 +58,21 @@ namespace Crulanda.Tests
             var thrall = ActorVisual.Attach(go, ActorLook.Skeleton, 0); Assert.NotNull(thrall.BeastModel); Assert.AreEqual("UndeadUnit", thrall.BeastModel.Kind, "the thrall is the Toon RTS undead");
             Assert.IsTrue(thrall.BeastModel.Crumbles, "it falls into a heap of bones");
         }
+        /// <summary>Khaven's drowned dead wear DzenGames' Fantasy Skeleton (2026-10-14), its one master take sliced into the pack's seven clips
+        /// (not the whole take: the Orc Shaman's lesson); the thrall, whose pack has no hit clip, rocks back when struck.</summary>
+        [Test] public void The_drowned_dead_are_the_fantasy_skeleton_and_the_thrall_flinches()
+        {
+            Assume.That(ModelBeast.Available("FantasySkeleton"), "the Fantasy Skeleton is in Resources/Creatures");
+            foreach (var slot in new[] { "idle", "walk", "attack", "hitL", "death" }) Assert.NotNull(ModelBeast.SlotClip("FantasySkeleton", slot), "its " + slot);
+            Assert.Less(ModelBeast.SlotClip("FantasySkeleton", "idle").length, 4, "its idle is the pack's slice, not the whole take (" + ModelBeast.SlotClip("FantasySkeleton", "idle").length + " s)");
+            Assert.Less(ModelBeast.SlotClip("FantasySkeleton", "walk").length, 1.5f, "its walk is the pack's slice");
+            var dead = Beast(ActorLook.Skeleton, 0, "Drowned dead"); Assert.NotNull(dead.BeastModel); Assert.AreEqual("FantasySkeleton", dead.BeastModel.Kind); Assert.IsTrue(dead.BeastModel.Crumbles, "they still fall into bones");
+            Assume.That(ModelBeast.Available("UndeadUnit"));
+            var go = new GameObject("Bone thrall"); new GameObject("Body").transform.SetParent(go.transform, false); made.Add(go);
+            var thrall = ActorVisual.Attach(go, ActorLook.Skeleton, 0); Assert.AreEqual("UndeadUnit", thrall.BeastModel.Kind);
+            Assert.IsNull(ModelBeast.SlotClip("UndeadUnit", "hitL"), "the pack has no hit clip");
+            thrall.BeastModel.Play("hitL"); Assert.IsTrue(thrall.BeastModel.Flinching, "struck, it flinches all the same");
+        }
         [Test] public void The_animals_are_in_with_their_clips()
         {
             foreach (var kind in new[] { "Wolf", "Stag", "Deer" })

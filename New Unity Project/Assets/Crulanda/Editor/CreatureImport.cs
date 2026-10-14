@@ -20,7 +20,7 @@ namespace Crulanda.EditorTools
         const string Root = "Assets/Crulanda/Resources/Creatures/";
         /// <summary>Raised when these rules change, so Unity imports the creatures again (2026-10-13: the makers' normals for the new models,
         /// and the loop of an "Armature|" take by its own name; 2026-10-14: the Orc Shaman's clips cut to the pack's own frames).</summary>
-        public override uint GetVersion() { return 4; }
+        public override uint GetVersion() { return 5; }
         /// <summary>
         /// The Orc Shaman's clip files (the Orc Army Pack, 24 fps): each holds the pack's whole master take (frames 0-650, every clip in a
         /// row), and the pack cuts its own clip out of it by these frames. Its body (the skinned Character1 bones) is baked only inside
@@ -32,6 +32,11 @@ namespace Crulanda.EditorTools
         static readonly Dictionary<string, (int first, int last)> OrcShamanFrames = new Dictionary<string, (int first, int last)> {
             ["Walk"] = (10, 37), ["Run"] = (45, 63), ["Idle"] = (75, 96), ["BattleCry"] = (120, 200), ["Block"] = (228, 250), ["Attack01"] = (260, 281),
             ["Attack02"] = (290, 322), ["Attack03"] = (350, 366), ["CastSpell"] = (372, 436), ["Spell"] = (450, 484), ["Hit"] = (500, 520), ["Die"] = (550, 572) };
+        /// <summary>DzenGames' Fantasy Skeleton (Khaven's drowned dead, 2026-10-14): one master take the pack slices into seven clips (its own
+        /// meta's frames), named for the motions ModelBeast plays. (name, first, last, loops)</summary>
+        static readonly (string name, int first, int last, bool loop)[] FantasySkeletonClips = {
+            ("Idle", 0, 70, true), ("Attack", 71, 118, false), ("Walk", 119, 141, true), ("Hit", 142, 186, false), ("CastSpell", 186, 246, false),
+            ("Idle_2", 246, 315, true), ("Death", 315, 346, false) };
         /// <summary>How sharp an edge must be to stay hard when the normals are smoothed (degrees).</summary>
         public const float Smoothing = 70;
         void OnPreprocessModel()
@@ -47,7 +52,7 @@ namespace Crulanda.EditorTools
             // The detailed models (2026-10-13: the orcs, the wild boar, the Toon RTS undead, the squirrel, the Living Birds) keep their makers'
             // normals: calculated, the axe orc came out faceted, and these are not rounded (ModelBeast: only the low-poly animals are).
             string file = System.IO.Path.GetFileName(assetPath);
-            if (file.StartsWith("Orc") || file.StartsWith("WildBoar") || file.StartsWith("UndeadUnit") || file.StartsWith("Squirrel") || file.StartsWith("Bird"))
+            if (file.StartsWith("Orc") || file.StartsWith("WildBoar") || file.StartsWith("UndeadUnit") || file.StartsWith("Squirrel") || file.StartsWith("Bird") || file.StartsWith("FantasySkeleton"))
             { m.importNormals = ModelImporterNormals.Import; m.importTangents = ModelImporterTangents.CalculateMikk; }
             // A model and the files of its clips each keep their top node (2026-10-13: a clip file with one top node lost it on import, its
             // bones' paths no longer matched the model's, and only the staff, belt and teeth moved: Chris, "the only thing on orc that move").
@@ -86,6 +91,12 @@ namespace Crulanda.EditorTools
                 if (file.StartsWith("OrcShaman_") && OrcShamanFrames.TryGetValue(only.name, out var frames))
                 { only.firstFrame = frames.first; only.lastFrame = frames.last; only.loopPose = only.loopTime; }
                 m.clipAnimations = new[] { only }; return;
+            }
+            if (Path.GetFileName(assetPath).StartsWith("FantasySkeleton") && clips.Length > 0)
+            {
+                var take = clips.OrderByDescending(c => c.lastFrame - c.firstFrame).First();
+                m.clipAnimations = FantasySkeletonClips.Select(f => new ModelImporterClipAnimation { name = f.name, takeName = take.takeName, firstFrame = f.first, lastFrame = f.last, loopTime = f.loop, loopPose = f.loop }).ToArray();
+                return;
             }
             var keep = clips.Where(c => c.takeName.StartsWith(arm)).ToList();
             if (keep.Count == 0) keep = clips.ToList();

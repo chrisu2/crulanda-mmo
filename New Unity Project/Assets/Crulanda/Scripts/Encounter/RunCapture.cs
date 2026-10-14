@@ -159,11 +159,12 @@ namespace Crulanda.Encounter
                         if (corpse == body) corpse = null;
                     }
                 }
-                Vector3 goal = foe != null ? foe.transform.position : corpse != null ? corpse.transform.position : leader.transform.position; float reach = foe != null ? 2.6f : corpse != null ? 2.5f : 4.5f;
+                // A caster or an archer fights from range (2026-10-14: the bot walked every class into melee, so the Shaman's run was 14 a second).
+                Vector3 goal = foe != null ? foe.transform.position : corpse != null ? corpse.transform.position : leader.transform.position; float reach = foe != null ? (MeleeClass(s) ? 2.6f : 12f) : corpse != null ? 2.5f : 4.5f;
                 if (foe != null)
                 {
                     if (s.Target != foe) s.Select(foe);
-                    if (Time.time >= nextSwing) { nextSwing = Time.time + .6f; s.UseAbility(0); s.UseAbility(2); s.UseAbility(1); }
+                    if (Time.time >= nextSwing) { nextSwing = Time.time + .4f; BotCast(s); }
                 }
                 var to = goal - me; to.y = 0; float dist = to.magnitude;
                 // Along the cave's own paths, corner by corner, as the sims go (a straight line stopped at every wall and pot: Chris, 2026-10-11,
@@ -208,6 +209,23 @@ namespace Crulanda.Encounter
             var look = leader != null && leader.Leading.HasValue ? leader.Leading.Value : s.Player.transform.position + s.Player.transform.forward;
             var to = look - s.Player.transform.position; to.y = 0; if (to.sqrMagnitude > .1f) motor.SetView(Mathf.Atan2(to.x, to.z) * Mathf.Rad2Deg, 12, 8);
             ScreenCapture.CaptureScreenshot(Path.Combine(directory, (shots < 10 ? "0" : "") + shots + "-" + name + ".png")); shots++;
+        }
+        static bool MeleeClass(EncounterSession s) { var id = s.ClassDef != null ? s.ClassDef.id : ""; return id == "class.warrior" || id == "class.paladin" || id == "class.rogue" || id == "class.scoundrel"; }
+        /// <summary>The bot's turn (2026-10-14, Chris: the Shaman "plays poorly ... 14 damage a second against the Paladin's 33"; it pressed
+        /// slots 1-3 whatever they were, and for a Shaman two of them are mends): a mend when someone of the party is under 45% and the kit
+        /// has one, else the first ready damage ability on the bar in its order, else the first slot.</summary>
+        static void BotCast(EncounterSession s)
+        {
+            if (s.PlayerCasting || s.Kit == null) return;
+            bool hurt = s.Player.Health.Pool.Ratio < .45f || s.PartySims.Exists(c => c != null && c.actor != null && c.actor.IsAlive && c.actor.Health.Pool.Ratio < .45f);
+            for (int pass = 0; pass < 2; pass++)
+                for (int i = 0; i < s.Kit.ActionCount; i++)
+                {
+                    var a = s.Kit.ActionAt(i); if (a == null || s.Kit.ActionLockLabel(i) != null) continue;
+                    bool want = pass == 0 ? hurt && a.effect == Crulanda.Abilities.AbilityEffect.Heal : a.effect == Crulanda.Abilities.AbilityEffect.Damage;
+                    if (want && s.UseAbility(i)) return;
+                }
+            s.UseAbility(0);
         }
         void Finish(EncounterSession s, string directory, List<string> log, float total, int camps, int cleared, int deaths, int warps, bool done)
         {

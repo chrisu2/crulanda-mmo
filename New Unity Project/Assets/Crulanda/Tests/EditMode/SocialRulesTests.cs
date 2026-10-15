@@ -41,7 +41,8 @@ namespace Crulanda.Tests
             { "pithound", SocialKind.Pack }, { "bristle", SocialKind.Solitary }, { "burrower", SocialKind.Solitary },
             { "bailer", SocialKind.Call }, { "vosk", SocialKind.Call }, { "urnkeeper", SocialKind.Call }, { "loremaster", SocialKind.Call }, { "armsmaster", SocialKind.Call },
             { "varrow", SocialKind.Call }, { "greywhisperer", SocialKind.Call }, { "hollowsong", SocialKind.Call }, { "hobb", SocialKind.Call }, { "kettle", SocialKind.Call },
-            { "warden", SocialKind.Call }   // the grey picket (2026-10-15): Concord wardens, people: they call
+            { "warden", SocialKind.Call },   // the grey picket (2026-10-15): Concord wardens, people: they call
+            { "forager", SocialKind.Call }   // the foragers' camp (2026-10-15): deserters living rough; its data says call
         };
 
         [Test] public void Every_camp_in_the_five_zones_has_a_sensible_kind()

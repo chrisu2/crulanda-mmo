@@ -118,6 +118,7 @@ namespace Crulanda.World
             CullWoodsFloor();   // after the map: from above, the woods would be culled off it
             Lap("map");
             BuildSecrets();   // after the map: a hidden find must never show on the minimap or the zone map
+            if (Hollow.All.Count > 0 && Application.isPlaying) gameObject.AddComponent<PropCull>().Init(props);   // a zone with caves: far props not drawn (note 225)
             BuildNodes();     // after the secrets (they keep clear of them), each from a stream of its own: nothing else moves
             BuildStations();  // the trades' stations of their own (field anvils, benches, cookfires): streams of their own, no colliders
             gameObject.AddComponent<WorldWeather>().Init(this, sunLight);   // before the clock: its first light already has the weather in it
@@ -1008,7 +1009,7 @@ namespace Crulanda.World
                 foreach (var mr in root.GetComponentsInChildren<MeshRenderer>())
                 {
                     total++;
-                    if (!mr.enabled || mr.sharedMaterials.Length != 1 || mr.sharedMaterial == null || mr.name == "Footing" || mr.name == "Door steps") continue;
+                    if (!mr.enabled || mr.sharedMaterials.Length != 1 || mr.sharedMaterial == null || mr.name == "Footing" || mr.name == "Footing coping" || mr.name == "Door steps") continue;
                     var mf = mr.GetComponent<MeshFilter>(); if (mf == null || mf.sharedMesh == null || mf.sharedMesh.subMeshCount != 1 || !mf.sharedMesh.isReadable) continue;
                     if (mr.GetComponent<MonoBehaviour>() != null) continue;
                     var key = (mr.sharedMaterial, mr.shadowCastingMode, mr.receiveShadows);

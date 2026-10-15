@@ -1765,9 +1765,25 @@ namespace Crulanda.Encounter
         // Timed for the performance probe (playtest note 23).
         static readonly Unity.Profiling.ProfilerMarker perfMark = new Unity.Profiling.ProfilerMarker("PERF.Session");
         void Update() { using (perfMark.Auto()) UpdateTimed(); }
+        float nextDormant;
+        /// <summary>Twice a second: far, idle camp mobs sleep, near ones wake (EncounterEnemy.Dormant). A sleeper whose camp is
+        /// drawn into a fight (Victim set) is woken by its own pull.</summary>
+        void TickDormant()
+        {
+            if (Time.time < nextDormant || Player == null) return;
+            nextDormant = Time.time + .5f; var at = Player.transform.position;
+            foreach (var e in Enemies)
+            {
+                if (e == null) continue;
+                float d2 = (e.transform.position - at).sqrMagnitude;
+                if (e.Dormant) { if (d2 < EncounterEnemy.WakeRange * EncounterEnemy.WakeRange || !e.actor.IsAlive || e.threat.Any) e.SetDormant(false); }
+                else if (d2 > EncounterEnemy.SleepRange * EncounterEnemy.SleepRange && e.CanSleep) e.SetDormant(true);
+            }
+        }
         void UpdateTimed()
         {
             if (Player == null) return;
+            TickDormant();
             AdvanceToast();
             // The day turns at six in the morning: the boards draw again (Bounties). A rare posting taken on keeps its courier abroad.
             if (lastHour >= 0 && Bounties.DayTurned(lastHour, Crulanda.World.WorldClock.Hour)) Progress.days++;

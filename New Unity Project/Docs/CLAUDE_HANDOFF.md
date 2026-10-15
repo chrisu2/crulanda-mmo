@@ -42,7 +42,7 @@ Nothing is VERIFIED until Chris has seen it in his build.
   The Cutting Drift and the whole Geode Foundry opened at 21:56 (a knoll face wider than the drift's tube: `Cut` now tries each
   edge's middle). The chapel opened at 23:41 (the altar stood in the doorway to the cloister stair) and the island under Lusk's stage
   went at 00:13 (shelves inside a solid deck's body): **every floor of the Adit is reachable from the yard** (R99), the camps,
-  gates and breadcrumbs tests green, the Adit nav set 19/23. Left for the morning: the Scriptorium solid with mesh on its top, the
+  gates and breadcrumbs tests green, the Adit nav set 19/23 (R100, 00:24). Left for the morning: the Scriptorium solid with mesh on its top, the
   web test's shut-door length (NavReach wants the hop search and an honest length), the fixture knoll ray; then play the run
   (ADIT_REWORK.md section 18, "Left").
   The real short blocks the map names: the Pen's floor from the hall beside Lusk's stage (a "Solid" at (7, -24, -183)), and the

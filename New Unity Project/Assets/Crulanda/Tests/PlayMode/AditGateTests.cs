@@ -68,7 +68,7 @@ namespace Crulanda.Tests
             Assert.Less(lift.Along, platform.Along, "the lift at the stair's head, the platform gate at its foot");
             Assert.IsTrue(Walkable(CampAt("Spoil heaps")), "the Workings are open to Lusk's door");
             Assert.IsFalse(Walkable(CampAt("Pool watch")), "Lusk's door is shut until he falls");
-            OpenTheBossDoors(); yield return Frames(3);
+            OpenTheBossDoors(); yield return Frames(60);
             Assert.IsTrue(Walkable(CampAt("Pool watch")), "the Gallery is open");
             Assert.IsFalse(Walkable(CampAt("Stair guard")), "nobody walks through the singing door");
             Assert.AreEqual("Set the rail sigils (0/3)", session.InteractPromptFor(Thing("liftgate")));
@@ -94,7 +94,7 @@ namespace Crulanda.Tests
                 var e = Boss(boss); e.actor.Health.ApplyDamage(e.actor.Health.Pool.Max * 3); yield return null;
                 Assert.IsTrue(g.Open, door + " opens as " + boss + " falls");
             }
-            yield return Frames(3);
+            yield return Frames(60);
             Assert.IsTrue(Walkable(CampAt("Pool watch")), "through Lusk's door to the Gallery");
             // A run that finds Lusk's door shut again (as it would with Lusk left standing) waits at it.
             var lusk = session.Zone.Gates.Find(x => x != null && x.Title == "Lusk's door"); lusk.SetOpen(false, true); yield return Frames(2);
@@ -110,7 +110,7 @@ namespace Crulanda.Tests
             float t = 0; while (t < 8 && !c.WaitingAtGate) { t += Time.deltaTime; yield return null; }
             Assert.IsTrue(c.WaitingAtGate, "the run waits at Lusk's door"); Assert.AreEqual("Lusk's door", c.StoppedBy);
             Assert.IsTrue(session.Chat.Any(l => l.channel == ChatChannel.Party && l.text.ToLower().Contains("gang-boss haddo lusk")), "it says whose death opens it");
-            lusk.SetOpen(true, true); yield return Frames(3);
+            lusk.SetOpen(true, true); yield return Frames(60);
             Assert.IsFalse(c.WaitingAtGate, "open: on we go"); Assert.IsNull(c.StoppedBy);
         }
         [UnityTest] public IEnumerator The_run_waits_at_the_lift_and_goes_on_when_it_opens()
@@ -134,7 +134,7 @@ namespace Crulanda.Tests
             StringAssert.StartsWith("Waiting at the", c.Activity);
             Assert.IsTrue(session.Chat.Any(l => l.channel == ChatChannel.Party && l.text.Contains("rail sigils")), "it says what the gate wants");
             foreach (var k in new[] { "sigil.amber", "sigil.ember", "sigil.grey" }) session.Progress.keys.Add(k);
-            session.UseInteractable(lift); yield return Frames(3);
+            session.UseInteractable(lift); yield return Frames(60);
             Assert.IsTrue(lift.gate.Open); Assert.IsFalse(c.WaitingAtGate, "open: on we go"); Assert.IsNull(c.StoppedBy);
             Assert.AreEqual("Stair guard", c.LeadingName, "the first camp past the lift (the Adit rework)");
         }
@@ -151,7 +151,7 @@ namespace Crulanda.Tests
             var foreman = Boss("The Foreman Who Forgot"); foreman.actor.Health.ApplyDamage(foreman.actor.Health.Pool.Max * 3); yield return null;
             Assert.Contains("sigil.grey", session.Progress.keys);
             Assert.AreEqual("Set the rail sigils (3/3)", session.InteractPromptFor(i));
-            session.UseInteractable(i); yield return Frames(3);
+            session.UseInteractable(i); yield return Frames(60);
             Assert.IsTrue(i.gate.Open); Assert.Contains(EncounterSession.LiftWoken, session.Progress.keys);
             Assert.IsTrue(i.gate.Lights.All(l => l.activeSelf), "the three sigils lit in their sockets");
             Assert.IsTrue(Walkable(CampAt("Stair guard")), "the stair is open");
@@ -169,7 +169,7 @@ namespace Crulanda.Tests
             session.UseInteractable(Thing("powder")); Assert.IsTrue(session.CarryingPowder);
             Assert.AreEqual("Blow the gate (loud)", session.InteractPromptFor(gate));
             int ready = session.Enemies.Count(e => e != null && e.Camp && !e.Elite && e.CanAnswer);
-            session.UseInteractable(gate); yield return Frames(3);
+            session.UseInteractable(gate); yield return Frames(60);
             Assert.IsTrue(gate.gate.Open); Assert.IsFalse(session.CarryingPowder, "the powder is spent");
             int coming = ready - session.Enemies.Count(e => e != null && e.Camp && !e.Elite && e.CanAnswer);
             Assert.GreaterOrEqual(coming, 3, "the Quartermaster's people come for you");
@@ -180,7 +180,7 @@ namespace Crulanda.Tests
             var gate = Thing("platformgate");
             Assert.AreEqual("Call the goblins to the gate (quiet)", session.InteractPromptFor(gate));
             int ready = session.Enemies.Count(e => e != null && e.Camp && !e.Elite && e.CanAnswer);
-            session.UseInteractable(gate); yield return Frames(3);
+            session.UseInteractable(gate); yield return Frames(60);
             Assert.IsTrue(gate.gate.Open);
             Assert.AreEqual(ready, session.Enemies.Count(e => e != null && e.Camp && !e.Elite && e.CanAnswer), "nobody in the hall heard");
         }
@@ -224,7 +224,7 @@ namespace Crulanda.Tests
             session.Player.GetComponent<AdventurerMotor>().Teleport(first.position + Vector3.up); yield return Frames(2);
             // Without Pib's quest the lock holds, and the prompt says whose it is to open.
             StringAssert.Contains("Pib", session.InteractPromptFor(first));
-            session.UseInteractable(first); yield return Frames(3);
+            session.UseInteractable(first); yield return Frames(60);
             Assert.AreEqual(shut, door.localRotation, "still shut without the quest");
             Assert.IsFalse(session.Progress.usedInteractables.Contains(first.Key(session.Zone.Zone.id)), "not counted as opened");
             // With it: the door swings open and the goblin slips away.

@@ -128,7 +128,7 @@ namespace Crulanda.Tests
         [UnityTest, Timeout(300000)] public IEnumerator The_web_joins_up_and_its_ways_home_run_one_way()
         {
             var zone = ZoneBuilder.Active; Assert.AreEqual("zone.adit", zone.Zone.id);
-            zone.OpenGates(); for (int i = 0; i < 3; i++) yield return null;
+            zone.OpenGates(); for (int i = 0; i < 60; i++) yield return null;   // a second: the gates' carves are lifted by the navmesh's own update
             Hollow Cave(string name) { var h = Hollow.All.Find(o => o.Name == name); Assert.NotNull(h, name); return h; }
             Vector3 On(Vector3 p, string what, float reach = 3) { Assert.IsTrue(NavMesh.SamplePosition(p, out var hit, reach, NavMesh.AllAreas), what + " is on the navmesh (" + p + ")"); return hit.position; }
             Vector3 Anchor(string name) { Assert.IsTrue(zone.Anchors.TryGetValue(name, out var a), "the anchor '" + name + "'"); return On(a + Vector3.up * .2f, "the " + name, 5); }   // (the altar's anchor is the altar's own place: the floor beside it)
@@ -197,7 +197,7 @@ namespace Crulanda.Tests
         [UnityTest, Timeout(600000)] public IEnumerator Every_mob_stands_on_the_way_through_and_pockets_are_few()
         {
             var zone = ZoneBuilder.Active; Assert.AreEqual("zone.adit", zone.Zone.id);
-            zone.OpenGates(); for (int i = 0; i < 3; i++) yield return null;
+            zone.OpenGates(); for (int i = 0; i < 60; i++) yield return null;   // a second: the gates' carves are lifted by the navmesh's own update
             Assert.IsTrue(NavMesh.SamplePosition(zone.Ground(zone.Zone.spawns.player, .2f), out var start, 2.5f, NavMesh.AllAreas), "the yard is on the navmesh");
             var crumbs = NavReach.CaveCrumbs(start.position, out var reach);
             Assert.Greater(reach.Count, 100, "the way through is walked (" + reach.Count + " of " + crumbs.Count + " breadcrumbs)");

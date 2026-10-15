@@ -165,7 +165,17 @@ namespace Crulanda.Tests
             // Floor regions: in every hall (a ring 8 m or more across), the floor sampled every 3 m along and across, and whether the
             // way in reaches each sample (the gates open); the unreached samples by cave with their extents (the tally hall beside Lusk's
             // stage and the Geode Foundry under its lip: AditNavTests, 2026-10-14 20:26).
-            zone.OpenGates(); for (int i = 0; i < 3; i++) yield return null;
+            zone.OpenGates(); for (int i = 0; i < 60; i++) yield return null;   // a second: a gate's carve is lifted by the navmesh's own update, not at once
+            // Each gate, open: whether the way crosses it (two metres before to two metres beyond, along its facing).
+            sb.AppendLine(); sb.AppendLine("gate | at | open | crossed (2 m before to 2 m beyond)");
+            foreach (var g in zone.Gates)
+            {
+                if (g == null) continue;
+                var f = g.transform.forward; f.y = 0; f.Normalize(); var at = g.transform.position;
+                bool a = NavMesh.SamplePosition(at - f * 2 + Vector3.up * .2f, out var ha, 2.5f, NavMesh.AllAreas), b = NavMesh.SamplePosition(at + f * 2 + Vector3.up * .2f, out var hb, 2.5f, NavMesh.AllAreas);
+                var gp = new NavMeshPath(); string crossed = !a || !b ? "no mesh " + (a ? "beyond" : "before") : NavMesh.CalculatePath(ha.position, hb.position, NavMesh.AllAreas, gp) ? gp.status.ToString() : "none";
+                sb.AppendLine(g.Title + " | " + at.ToString("0.0") + " | " + g.Open + " | " + crossed);
+            }
             sb.AppendLine(); sb.AppendLine("cave | floor samples | reached from the start | not reached (extents x, z; the first few)");
             var startAt = zone.Ground(zone.Zone.spawns.player, .2f); bool haveStart = NavMesh.SamplePosition(startAt, out var sh, 3, NavMesh.AllAreas);
             var regionPath = new NavMeshPath();
@@ -185,7 +195,13 @@ namespace Crulanda.Tests
                     }
                 }
                 string ext = lost.Count == 0 ? "-" : "x " + lost.Min(v => v.x).ToString("0") + ".." + lost.Max(v => v.x).ToString("0") + ", z " + lost.Min(v => v.z).ToString("0") + ".." + lost.Max(v => v.z).ToString("0") + "; " + string.Join(" ", lost.Take(4).Select(v => v.ToString("0")));
-                sb.AppendLine(h.Name + " | " + total + " | " + reached + " | " + lost.Count + " (" + ext + ")");
+                string near = "";
+                if (lost.Count > 0)
+                {
+                    var hits = Physics.OverlapBox(lost[0] + Vector3.up * 1.1f, new Vector3(1.5f, 1, 1.5f), Quaternion.identity, ~0, QueryTriggerInteraction.Ignore);
+                    near = " | by the first: " + string.Join("; ", hits.Where(x => x != null).Select(x => x.transform.root.name + "/" + x.name).Distinct().Take(5));
+                }
+                sb.AppendLine(h.Name + " | " + total + " | " + reached + " | " + lost.Count + " (" + ext + ")" + near);
             }
             sb.AppendLine(); sb.AppendLine("camp | centre | floor under | navmesh within 1.2 m | within 6 m (nearest y)");
             foreach (var c in zone.Zone.camps)

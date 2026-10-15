@@ -50,7 +50,7 @@ namespace Crulanda.Tests
         [UnityTest] public IEnumerator The_network_is_built_and_every_camp_is_walkable_from_the_yard()
         {
             var zone = ZoneBuilder.Active; Assert.AreEqual("zone.adit", zone.Zone.id); Assert.IsTrue(zone.Zone.dungeon, "a dungeon");
-            zone.OpenGates(); for (int i = 0; i < 3; i++) yield return null;   // the way through, with its gates open (D3; AditGateTests has them shut)
+            zone.OpenGates(); for (int i = 0; i < 60; i++) yield return null;   // a second: the gates' carves are lifted by the navmesh's own update   // the way through, with its gates open (D3; AditGateTests has them shut)
             var main = Cave(Main); Assert.NotNull(main, "the main way"); Assert.IsNull(main.Parent);
             var gallery = Cave(Gallery); Assert.NotNull(gallery, "the hub"); Assert.AreSame(main, gallery.Parent, "the Gallery's sump drift opens off the dark drift");
             Assert.AreSame(gallery, main.Join, "the Workings end in the Gallery"); Assert.AreEqual(14, main.JoinRise, .3f, "the overlook: a lip 14 m up its wall");

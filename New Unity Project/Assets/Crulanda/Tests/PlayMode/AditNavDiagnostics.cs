@@ -178,7 +178,7 @@ namespace Crulanda.Tests
             }
             sb.AppendLine(); sb.AppendLine("cave | floor samples | reached from the start | not reached (extents x, z; the first few)");
             var startAt = zone.Ground(zone.Zone.spawns.player, .2f); bool haveStart = NavMesh.SamplePosition(startAt, out var sh, 3, NavMesh.AllAreas);
-            var regionPath = new NavMeshPath(); var allGot = new List<Vector3>();
+            var regionPath = new NavMeshPath(); var allGot = new List<Vector3>(); var caveLost = new Dictionary<Hollow, List<Vector3>>();
             foreach (var h in Hollow.All)
             {
                 if (!h.Half.Any(x => x >= 8)) continue;
@@ -213,7 +213,34 @@ namespace Crulanda.Tests
                     }
                 }
                 sb.AppendLine(h.Name + " | " + total + " | " + reached + " | " + lost.Count + " (" + ext + ")" + near);
-                allGot.AddRange(got);
+                allGot.AddRange(got); caveLost[h] = lost;
+            }
+            // The same samples reached by hops: from any reached sample to an unreached one within 30 m by a short complete path, again
+            // and again until nothing changes. A search from the yard (even leg by leg) ends in pockets the straight-line heuristic
+            // prefers; hops measure the mesh itself (R88 and R89, 2026-10-14: "unreached" samples complete from a reached one 3 m off).
+            var allReached = new List<Vector3>(allGot); var pending = new List<(Hollow h, Vector3 p)>();
+            foreach (var kv in caveLost) foreach (var p in kv.Value) pending.Add((kv.Key, p));
+            var hopped = new Dictionary<Hollow, int>(); bool changed = true; int passes = 0;
+            while (changed && passes++ < 60)
+            {
+                changed = false;
+                for (int i = pending.Count - 1; i >= 0; i--)
+                {
+                    var (hc, u) = pending[i]; bool ok = false;
+                    for (int r = allReached.Count - 1; r >= 0 && !ok; r--)
+                    {
+                        var v = allReached[r]; if ((v - u).sqrMagnitude > 30 * 30) continue;
+                        if (NavMesh.CalculatePath(v, u, NavMesh.AllAreas, regionPath) && regionPath.status == NavMeshPathStatus.PathComplete) ok = true;
+                    }
+                    if (ok) { allReached.Add(u); pending.RemoveAt(i); hopped[hc] = hopped.TryGetValue(hc, out var c) ? c + 1 : 1; changed = true; }
+                }
+            }
+            sb.AppendLine(); sb.AppendLine("cave | reached by hops (added to the above) | still not reached (the first few)");
+            foreach (var h in Hollow.All)
+            {
+                if (!caveLost.ContainsKey(h)) continue;
+                var left = pending.Where(x => x.h == h).Select(x => x.p).ToList();
+                sb.AppendLine(h.Name + " | " + (hopped.TryGetValue(h, out var hn) ? hn : 0) + " | " + left.Count + (left.Count > 0 ? " (" + string.Join(" ", left.Take(5).Select(v => v.ToString("0"))) + ")" : ""));
             }
             sb.AppendLine(); sb.AppendLine("camp | centre | floor under | navmesh within 1.2 m | within 6 m (nearest y)");
             foreach (var c in zone.Zone.camps)

@@ -341,8 +341,8 @@ namespace Crulanda.World
             // 4 m wide and 4 m tall in bays along the walls, a second row over the first where the cave's air allows (7.5 m up checked as
             // 3.5 m was), windows in the upper row (the kit's arched ones in every bay of the chapel, its square ones in every other bay
             // elsewhere), a pillar of the kit at every bay join with a torch on every other, the kit's corner piece where a side wall meets
-            // an end wall, its arched passage at twice its size for the door (its 2 m arch is too narrow for the way: at twice, 4 m clear
-            // and the crown some 5 m up, 8 m tall like the two rows), floor tiles 4 m square toned down for the cave, ceiling tiles over a
+            // an end wall, its open doorway piece (wall_doorway_sides) at twice its size for the door (its 2 m slot is too narrow for the
+            // way: at twice, 4 m clear and 5 m tall, 8 m tall like the two rows), floor tiles 4 m square toned down for the cave, ceiling tiles over a
             // room narrower than 12 m, banners between the pillars in the chapel. Every module is placed by an explicit box (its width
             // along the wall, its height, its thickness), never by its height alone: a piece whose own height is small, scaled by it, is a
             // slab (the 01:29 tour). The walls are solid for the navmesh as before: a Block the size of each module and of each corner's
@@ -391,8 +391,8 @@ namespace Crulanda.World
                 Block(corner + r * new Vector3(0, 0, 1), new Vector3(KitThick, KitHigh * rows, 3), r);
                 return rows;
             }
-            // A wall of the kit across the way at s, out to w either side: the corner pieces, modules in bays from the door's bay (8 m, the
-            // passage at twice the kit's size) or from the middle out to the corners' legs, a second row where the air allows. With
+            // A wall of the kit across the way at s, out to w either side: the corner pieces, modules in bays from the door's bay (10 m, the
+            // kit's doorway piece at twice its size) or from the middle out to the corners' legs, a second row where the air allows. With
             // `greatWindow` (the chapel's apse), a third row over the door's bay of two arched windows with the fire's pane behind them,
             // when the air 11.5 m up is the cave's own.
             void KitEndWall(float s, float w, bool door, int facing, bool greatWindow = false)
@@ -411,11 +411,16 @@ namespace Crulanda.World
                         Block(foot, new Vector3(bay, KitHigh * rows, KitThick), q);
                     }
                 }
-                if (door) { Run(4, w - 2); Run(-(w - 2), -4); } else Run(-(w - 2), w - 2);
+                if (door) { Run(5, w - 2); Run(-(w - 2), -5); } else Run(-(w - 2), w - 2);
                 if (!door) return;
                 var mid = On(s, 0); if (!Free(mid)) return;
-                if (Kit("wall_doorway", mid, yaw, new Vector3(8, 8, KitThick)) == null) return;   // the kit's open doorway at twice its size: 4 m clear, 8 m tall (wall_arched is a blind arch, stone inside it: the 02:00 frames, Chris: "now this looks blocked??")
-                foreach (int side in new[] { -1, 1 }) Block(On(s, side * 3), new Vector3(2, 8, KitThick), q);
+                // The door: the kit's wall_doorway_sides, the one piece of the pack that is open through (read from its vertices, 02:20: wall_arched
+                // is a blind arch with stone inside it, the 02:00 frames, Chris: "now this looks blocked?? does the door open?"; wall_doorway is a
+                // shut red door leaf with its ring, the 02:13 frame). It is a passage 5 m wide and 4 m deep, a 2 m slot 2.5 m tall between
+                // two walls, boxed here to 10 m wide, 8 m tall and the wall's 1 m thickness: the opening comes out 4 m clear and 5 m tall,
+                // open on both faces, the side walls flattened into the wall. Nothing else stands in its 10 m bay (the runs start at 5).
+                if (Kit("wall_doorway_sides", mid, yaw, new Vector3(10, 8, KitThick)) == null) return;
+                foreach (int side in new[] { -1, 1 }) Block(On(s, side * 3.5f), new Vector3(3, 8, KitThick), q);   // the jambs, |a| 2..5: 4 m clear for the navmesh
                 if (!greatWindow || !Free(mid + Vector3.up * 11.5f)) return;
                 foreach (float a in new[] { -2f, 2f }) Kit("wall_archedwindow_open", On(s, a) + Vector3.up * 8, yaw, new Vector3(4, 4, KitThick));
                 var pane = mid + Vector3.up * 10 - q * new Vector3(0, 0, facing * .6f);   // the fire behind the wall

@@ -1596,6 +1596,21 @@ namespace Crulanda.World
                             var edge = barge.mid[k] + barge.across[k] * side * (barge.half + .04f); float bottom = level - .6f, top = barge.mid[k].y - .05f;
                             Part(PrimitiveType.Cube, cw, new Vector3(edge.x, (top + bottom) / 2, edge.z), new Vector3(.08f, top - bottom, .16f), iron, Quaternion.LookRotation(Fwd(barge, k)));
                         }
+                    // A low gunwale along both sides, for the eye only (the deck has no rails: they walled the gangway off, R129), left open
+                    // where the gangway comes aboard.
+                    var gang = Deck("The gangway"); var gangAt = gang != null ? gang.mid[gang.mid.Length - 1] : new Vector3(1e6f, 0, 0);
+                    foreach (var dk in new[] { barge, castle })
+                    {
+                        if (dk == null) continue; int M = dk.mid.Length - 1;
+                        for (int k = 0; k < M; k++)
+                            foreach (int side in new[] { -1, 1 })
+                            {
+                                var a = dk.mid[k] + dk.across[k] * side * (dk.half - .08f); var b = dk.mid[k + 1] + dk.across[k + 1] * side * (dk.half - .08f);
+                                var mid = (a + b) / 2; if (Vector2.Distance(new Vector2(mid.x, mid.z), new Vector2(gangAt.x, gangAt.z)) < dk.half + 1.6f && side > 0 && dk == barge) continue;
+                                var d = b - a; if (d.sqrMagnitude < .01f) continue;
+                                Part(PrimitiveType.Cube, cw, mid + Vector3.up * .25f, new Vector3(.14f, .5f, d.magnitude + .02f), tar, Quaternion.LookRotation(d));
+                            }
+                    }
                     int hatch = Mathf.Min(N, Mathf.RoundToInt(N * .35f));
                     Part(PrimitiveType.Cube, cw, barge.mid[hatch] + Vector3.up * .03f, new Vector3(2.6f, .06f, 2.6f), tar, Quaternion.LookRotation(Fwd(barge, hatch)));
                     var geodeLit = Glowing(GeodeViolet, 1.5f);

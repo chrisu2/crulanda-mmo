@@ -149,8 +149,10 @@ namespace Crulanda.Tests
 
             // Another visit: the warps cut at the bollards stop it as well.
             yield return SceneManager.LoadSceneAsync("Oakhaven", LoadSceneMode.Single); yield return Frames(4);
-            session = UnityEngine.Object.FindFirstObjectByType<EncounterSession>(); haul = session.Haul;
-            Assert.IsNotNull(haul); Assert.AreEqual(AditHaul.Stage.Waiting, haul.Now, "aground again on a new visit");
+            session = UnityEngine.Object.FindFirstObjectByType<EncounterSession>();
+            for (float until = Time.time + 10; session.Haul == null && Time.time < until;) yield return null;   // (R129: null four frames in on the second load)
+            haul = session.Haul;
+            Assert.IsNotNull(haul, "the haul on a new visit"); Assert.AreEqual(AditHaul.Stage.Waiting, haul.Now, "aground again on a new visit");
             var warps = Thing("warps"); Assert.AreEqual("Cut the warps", session.InteractPromptFor(warps));
             Assert.IsTrue(haul.Begin());
             session.Player.GetComponent<AdventurerMotor>().Teleport(warps.position + Vector3.up * 1.05f); yield return Frames(2);

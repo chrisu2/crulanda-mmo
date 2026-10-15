@@ -213,7 +213,13 @@ namespace Crulanda.Tests
             var wings = c.WingOrder.ToList(); var steps = c.Route.ToList();
             Debug.Log("AditTests: the quick run's wings: " + string.Join(", ", wings) + "; " + c.CampsLeft + " camps");
             CollectionAssert.AreEqual(new[] { "The Old Workings", "The Miners' Trestle", "The Geode Foundry" }, wings.Take(3).ToArray(), "down the Workings, onto the trestle, over the bridge into the Foundry (enter high, work down)");
-            Assert.AreEqual("The Deep Way", wings.Last(), "the Deep Way last, through the singing door");
+            // (S6) The Black Cove last, down the Dead Line past the Rail Hall, with the Deep Way (through the singing door) just before it, and the
+            // run's last fight Danner and his guard on the stern castle.
+            Assert.AreEqual("The Black Cove", wings.Last(), "the Black Cove last (Danner's finale on his barge)");
+            Assert.AreEqual("The Deep Way", wings[wings.Count - 2], "the Deep Way before it, through the singing door");
+            var lastFight = steps.Last(x => !x.regroup);
+            Assert.IsTrue(lastFight.camps.Any(i => camps[i].mob == EncounterSession.DannerName), "the run ends with Danner: " + lastFight.name);
+            Assert.AreEqual("The Black Cove", camps[lastFight.Camp].cave, "on his barge in the Black Cove");
             Assert.AreEqual(1, wings.Count(w => w == "The Scriptorium" || w == "The Muster Yard"), "one side of the fork: " + string.Join(", ", wings));
             foreach (var (before, after) in new[] { ("The Ash Garden", "The Chapel of Embers"), ("The Sunless River", "The Grey Breach"), ("The Geode Foundry", "The Deep Way"), ("The Grey Breach", "The Deep Way"), ("The Chapel of Embers", "The Deep Way") })
                 Assert.Less(wings.IndexOf(before), wings.IndexOf(after), before + " before " + after);

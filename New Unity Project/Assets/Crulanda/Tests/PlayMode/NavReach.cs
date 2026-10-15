@@ -41,7 +41,9 @@ namespace Crulanda.Tests
             {
                 if (!NavMesh.CalculatePath(from, to, mask, path) || path.corners.Length == 0) return float.PositiveInfinity;
                 for (int i = 1; i < path.corners.Length; i++) total += Vector3.Distance(path.corners[i - 1], path.corners[i]);
-                if (path.status == NavMeshPathStatus.PathComplete) return total;
+                // Complete in one leg: the length. Complete after a partial leg: that leg may have wandered (round the chapel's lake, the
+                // cloister stair came out 236 m where it is about 100), so the hops' length is taken where it is the shorter.
+                if (path.status == NavMeshPathStatus.PathComplete) return leg == 0 || mask != NavMesh.AllAreas || Hollow.All == null || Hollow.All.Count == 0 ? total : Mathf.Min(total, HopLength(start, to));
                 var end = path.corners[path.corners.Length - 1];
                 // Each leg must get somewhere (not: nearer as the crow flies; a leg round the Gallery or down a winding drift ends farther
                 // off than it began, and the search gave up on the whole reworked Adit for that: the floor map of 2026-10-14 21:12).

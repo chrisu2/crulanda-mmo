@@ -73,7 +73,7 @@ are backwards", "traps need to be something besides a circle on the ground", "no
     its side, the mugs set at table height floating; the root's turn is kept now. KitPropTests checks every Fantasy prop stands up.
   - Still open: a sheep in the fold's wall (196): fixed after (the flock's radius 5 of a 7 m fold; the 20:12 tour frame).
 - **After the shutdown (23:15-23:30; Chris back: notes 200-204):** the Living Birds' motion node is Bip01 (the hop's travel sat on it,
-  below the root the clips' locks were on: "birds still hopping"; creature import 7; BirdMotionTests watches a crow hop in place);
+  below the root the clips' locks were on: "birds still hopping"; creature import 7; BirdMotionTests, 1/1 at 23:44: a crow's Bip01 strays under 15 cm over 2.5 s of hopping);
   the Scoundrel's Nerve starts at nothing when the kit wakes and drains six seconds after the last blow, never while auto-attacking
   a dummy ("scoundrel nerve should start at 0", no finisher at a fight's start), and a swing builds none ("shouldn't get nerve on auto
   attack"). chainR94: ScoundrelLoopTests and HudTests 8/8, the release build, **published 23:30**, the save backed up to

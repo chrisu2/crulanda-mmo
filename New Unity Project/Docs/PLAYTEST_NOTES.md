@@ -781,3 +781,6 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
   prop more than 70 m from the camera is not drawn (PropCull), and a camp's mob alive, idle and standing more than 85 m from you sleeps,
   its update, figure, animators and drawing off, until you are within 75 m or it is pulled (EncounterEnemy.Dormant). OPEN until the next
   probe and Chris's look.)
+- 226 (2026-10-15 ~12:40, after the 04:30 shutdown) "continue working. phase 8 and 9" then "i told you to finish adit before shutting
+  down". The Adit first: its four open questions put to him (ADIT_REWORK section 1): Q1 "20 minute respawn", Q2 "Keep ~75 min
+  (Recommended)", Q3 "Build the Cove", Q4 "Yes, add them". Then Phase 8.6 and 9.

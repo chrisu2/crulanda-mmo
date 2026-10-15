@@ -2265,8 +2265,11 @@ namespace Crulanda.Encounter
             // A party still fighting goes on without you (2026-10-15, the run's party at Nix: you fell, got up at the stone, and every sim was
             // pulled back with you and the duo reset to full while they had it at 86%: every group run wiped there). Only the fallen come to
             // the stone with you, and only a fight with nobody left alive in it resets. A whole party down is as it always was.
-            bool fighting = PartySims.Exists(c => c != null && c.actor.IsAlive && Enemies.Exists(e => e != null && e.actor.IsAlive && e.Victim == c.actor))
-                || (Companion != null && Companion.actor.IsAlive && Enemies.Exists(e => e != null && e.actor.IsAlive && e.Victim == Companion.actor));
+            // In a fight: a mob alive and in it (on someone, or with threat on its list) with a living party member within 40 m of it. Not
+            // "a mob on a living member": at your death Nix was on you, and the three sims beside him at 7% were pulled out (R150).
+            bool InIt(EncounterEnemy e) { return e != null && e.actor.IsAlive && (e.Victim != null || e.threat.Any) && (PartySims.Exists(c => c != null && c.actor.IsAlive && Vector3.Distance(c.transform.position, e.transform.position) < 40)
+                || (Companion != null && Companion.actor.IsAlive && Vector3.Distance(Companion.transform.position, e.transform.position) < 40)); }
+            bool fighting = Enemies.Exists(InIt);
             Player.Health.Revive(Player.Health.Pool.Max);
             Player.GetComponent<AdventurerMotor>().Teleport(RecoveryPoint);
             if (!fighting || !Companion.actor.IsAlive)
@@ -2277,7 +2280,8 @@ namespace Crulanda.Encounter
             }
             HealPartySimsAfterRecover(fighting);
             foreach (var e in Enemies)
-                if (e != null && (!fighting || e.Victim == null || !e.Victim.IsAlive || e.Victim == Player)) e.ResetFight();
+                if (e != null && (!fighting || !InIt(e))) e.ResetFight();
+                else if (e != null && e.Victim == Player) e.threat.Remove(Player.EntityId.Value);   // it turns to the party still at it
             Message((BoundStone() != null ? "You wake beside the spirit stone." : "Recovered at camp.") + " Defeated enemies and collected rewards remain recorded.");
         }
         public void Save(bool announce = true)

@@ -8,7 +8,7 @@ Chris played the Adit build through the small hours; his words verbatim in PLAYT
 (memory: plain-words-no-run-names).
 - **Branches:** `feet-bow-adit-kit` (PR #2) and `adit-rework` (worktree `D:\code\mmo-adit`, main merged in to the last commit), both
   pushed. Do not merge either to `main` without Chris. **The published build comes from `adit-rework`.**
-- **Published:** 04:14 from `adit-rework` with everything below (the save backed up to `save-backups/20261015-0414-before-final-publish`). Save backups in `D:/crulanda-work/save-backups/20261015-*`.
+- **Published:** 04:28 from `adit-rework` with everything below (the save backed up to `save-backups/20261015-0428-before-closing-publish`). Save backups in `D:/crulanda-work/save-backups/20261015-*`.
 - **The Adit's lag (notes 218, 225) is the night's big fix:** with the frame cap off, the yard went from 13 to 124 frames a second and the
   Tally Hall from 17 to 166 (the probe in the Adit camera tour: `D:/crulanda-work/world-captures/adit-tour/adit-perf.txt`). The cost
   was the zone's props (the whole dungeon drawn from anywhere: 15,857 renderers, 56 million triangles) and its 186 mobs. Now in a zone
@@ -22,7 +22,7 @@ Chris played the Adit build through the small hours; his words verbatim in PLAYT
 - **Asked of Chris, not answered:** whether "slow the progress down" (note 219) also means slower levelling (less XP); the 14
   decisions at the end of `PHASE8_6_LIVING_WORLD.md` and the 13 at the end of `DUNGEON2_DESIGN.md`; the bandit camp, the Bandit King and
   loot.
-- **Open work, in order:** Chris's reactions; FINAL_TESTS; the fixture cave's two reds in `AditCaveBuildTests` (the test cave's rail and
+- **Open work, in order:** Chris's reactions (the last tests: EditMode 22/22, PlayMode 35/36 at 04:10 with the one red fixed and BuildingGroundTests 2/2 at 04:27; every footing now 3 cm further out, so check a few buildings' looks); the fixture cave's two reds in `AditCaveBuildTests` (the test cave's rail and
   loop, not the Adit's); sound effects and ambient sounds for the Sound panel's two empty channels (`AudioMix.Effective`); the Adit
   played through; Phase 8.6 once Chris decides.
 - **How work runs:** up to three helpers (Chris: "you can run 3 bots at most"), none running Unity; compile with the scratch Roslyn

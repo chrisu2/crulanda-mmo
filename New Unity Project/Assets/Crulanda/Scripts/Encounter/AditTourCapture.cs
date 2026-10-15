@@ -90,7 +90,7 @@ namespace Crulanda.Encounter
             // came out near black (2026-10-15 00:55). The frames are for looking at the dungeon, not at its lighting. (The ambient is the
             // clock's, set again every frame: a lamp, not a lifted ambient.)
             var lamp = new GameObject("Tour lamp").AddComponent<Light>(); lamp.transform.SetParent(s.View.transform, false);
-            lamp.type = LightType.Point; lamp.range = 80; lamp.intensity = 3.2f; lamp.color = new Color(1, .93f, .8f); lamp.shadows = LightShadows.None;
+            lamp.type = LightType.Point; lamp.range = 60; lamp.intensity = .8f;   // a quarter of the first try: at 3.2 the chapel's stone came out white (Chris, 2026-10-15 01:10: "looks bad") lamp.color = new Color(1, .93f, .8f); lamp.shadows = LightShadows.None;
             var body = Array.FindAll(s.Player.GetComponentsInChildren<Renderer>(), r => r.enabled); foreach (var r in body) r.enabled = false;
             report.AppendLine("The Sealed Adit, camera tour (" + DateTime.Now.ToString("yyyy-MM-dd HH:mm") + "): zone " + zone.Zone.id + ", " + Hollow.All.Count + " caves, " + zone.Gates.Count + " gates opened.");
 
@@ -138,7 +138,7 @@ namespace Crulanda.Encounter
             Shot("ash-garden", Ash, 50, 0, 0, 3.5f, Ash, 82, 0, 1, "the Ash Garden past its gatehouse: the urns, the Urn-Keeper at the far end");
             Shot("scriptorium", Scriptorium, 16, 0, 0, 3, Scriptorium, 48, 0, 1.2f, "the Scriptorium: the copyists' desks and the Loremaster");
             Shot("muster-yard", Muster, 42, 0, 0, 3.5f, Muster, 82, 0, 1.2f, "the Muster Yard: the zealots in ranks, the armourers and Corvane");
-            Shot("chapel-of-embers", Chapel, 14, 0, 0, 4, Chapel, 50, 0, 1, "the Chapel of Embers from its door: the lake of fire, the altar beyond");
+            Shot("chapel-of-embers", Chapel, 26, 0, 0, 3.5f, Chapel, 63, 0, 1, "the Chapel of Embers from inside its east door: the nave, the lake of fire, the altar at the far end");   // inside the nave (from its door the frame was the east wall with the fire through the arch: Chris, 01:10)
             Shot("cloister-stair", Chapel, 88, 0, 0, 2.6f, Chapel, 118, 0, 1.2f, "the cloister stair past the cloister door, on toward the Gallery");
             // The river wing and the Breach.
             Shot("sunless-river", River, 30, 0, 0, 3, River, 72, 0, .5f, "the Sunless River from near its mouth, looking downstream");

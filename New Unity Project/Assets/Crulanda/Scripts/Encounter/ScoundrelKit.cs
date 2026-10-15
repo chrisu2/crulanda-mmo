@@ -48,7 +48,7 @@ namespace Crulanda.Encounter
         readonly Dictionary<EncounterEnemy, (float due, float owed)> debts = new Dictionary<EncounterEnemy, (float, float)>();
         /// <summary>The verse being sung (one at a time; the War-Verse is the only one kept up).</summary>
         public Verses Verse { get; private set; }
-        float rallyUntil;
+        float rallyUntil, fightAt, drain; Crulanda.Gameplay.VitalPool wokePool;
 
         public ScoundrelKit(EncounterSession session, ClassDefinition definition, IEnumerable<AbilityDefinition> catalog) : base(session)
         {
@@ -284,7 +284,9 @@ namespace Crulanda.Encounter
         public override float PartyDamageMultiplier(EncounterEnemy enemy) { return Verse == Verses.War ? 1 + WarBonus : 1; }
         public override float CompanionHaste { get { return Verse == Verses.War && R("fx-everyones-friend") > 0 ? FriendHaste : 0; } }
         /// <summary>Every swing of the dirk builds Nerve, and is run up on the target's debt.</summary>
-        public override void OnAutoHit() { Nerve(SwingNerve); var t = s.Target; if (t != null) Owe(t, s.WeaponDamage); }
+        // A swing builds no Nerve (Chris, 2026-10-14 23:20: "shouldn't get nerve on auto attack"): Nerve comes from the cuts and the
+        // verses, so a finisher is earned, not waited for. The swing still marks the debt.
+        public override void OnAutoHit() { var t = s.Target; if (t != null) Owe(t, s.WeaponDamage); }
         /// <summary>Good Company: while the War-Verse is sung, the party near you takes less.</summary>
         public override int ResolveEnemyHit(EncounterEnemy enemy, Actor victim, int raw)
         {
@@ -300,6 +302,21 @@ namespace Crulanda.Encounter
         public override void Tick(bool inCombat)
         {
             periodic.Tick(Now);
+            // Nerve is a fight's own (Chris, 2026-10-14 23:15: "scoundrel nerve should start at 0. you shouldnt be able to use a finisher
+            // at start of fight"): it starts at nothing when the kit wakes, and six seconds after the last blow struck or taken it drains
+            // away at ten a second. Not while auto-attacking a dummy that does not fight back (the balance harness and the capture: the
+            // session is out of combat then, FightingTarget not).
+            var pool = s.Player != null ? s.Player.Resource.Pool : null;
+            if (pool != null)
+            {
+                if (pool != wokePool) { wokePool = pool; pool.SetCurrent(0); fightAt = Now; }   // a fresh pool (the kit's first tick, a respawn, a load) is bound full: emptied
+                if (inCombat || s.FightingTarget) { fightAt = Now; drain = 0; }
+                else if (Now - fightAt > 6 && pool.Current > 0)
+                {
+                    drain += Time.deltaTime * 10; int d = (int)drain;
+                    if (d > 0) { pool.Change(-Mathf.Min(d, pool.Current)); drain -= d; }
+                }
+            }
             if (debts.Count == 0) return;
             foreach (var kv in debts.ToList())
             {
@@ -309,7 +326,7 @@ namespace Crulanda.Encounter
                 debts.Remove(kv.Key); Collect(e, kv.Value.owed);
             }
         }
-        public override void ResetState() { periodic.Clear(); debts.Clear(); Verse = Verses.None; rallyUntil = 0; }
+        public override void ResetState() { periodic.Clear(); debts.Clear(); Verse = Verses.None; rallyUntil = 0; wokePool = null; drain = 0; }
         public override string StatusLine
         {
             get

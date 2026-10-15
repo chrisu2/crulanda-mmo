@@ -48,9 +48,10 @@ Nothing is VERIFIED until Chris has seen it in his build.
   28 frames: `D:/crulanda-work/world-captures/adit-tour` once it has run), and the release of `after` camps (bosses' relief shifts,
   the Wake's waves), which the data named and nothing spawned. **The Phase 8.6 plan** is written:
   `Docs/PHASE8_6_LIVING_WORLD.md` (PROVISIONAL; fourteen one-line decisions for Chris at its end; the inn-door jam's cause is in it:
-  a 1.6 m door and a navmesh baked at agent radius .5 leave a 0.6 m strip, one body at a time). Left on the Adit: the way home from
-  the altar (the stair is whole; a detour begins at the chapel's west door), the fixture test's knoll ray and rail check; then play
-  the run. The Adit camera tour ran once (28 frames, too dark: a lamp on its camera now, re-run pending); the release of `after`
+  a 1.6 m door and a navmesh baked at agent radius .5 leave a 0.6 m strip, one body at a time). **The Adit's nav, camps, gate and release tests are 26/26 (01:41):** every floor reachable, the way home
+  down the cloister stair (its foot was 1.5 m below the Gallery's floor), the bosses' relief shifts, the Wake's waves and the keg's
+  release written and tested. Left: the fixture test's knoll ray and rail check; the built rooms on the dungeon packs (a helper);
+  then play the run. The Adit camera tour ran once (28 frames, too dark: a lamp on its camera now, re-run pending); the release of `after`
   camps is being written (ADIT_REWORK.md section 18).
   The real short blocks the map names: the Pen's floor from the hall beside Lusk's stage (a "Solid" at (7, -24, -183)), and the
   Cutting Drift's own floor past its Company door. Start the next Adit session from `adit-nav-diagnostics-R88.txt`. The diagnostics (`AditNavDiagnostics`, lane A) write

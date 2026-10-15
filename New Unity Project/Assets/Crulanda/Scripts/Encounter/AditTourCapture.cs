@@ -161,7 +161,8 @@ namespace Crulanda.Encounter
             // came out near black (2026-10-15 00:55). The frames are for looking at the dungeon, not at its lighting. (The ambient is the
             // clock's, set again every frame: a lamp, not a lifted ambient.)
             var lamp = new GameObject("Tour lamp").AddComponent<Light>(); lamp.transform.SetParent(s.View.transform, false);
-            lamp.type = LightType.Point; lamp.range = 60; lamp.intensity = .8f;   // a quarter of the first try: at 3.2 the chapel's stone came out white (Chris, 2026-10-15 01:10: "looks bad") lamp.color = new Color(1, .93f, .8f); lamp.shadows = LightShadows.None;
+            lamp.type = LightType.Point; lamp.range = 60; lamp.intensity = .8f;   // a quarter of the first try: at 3.2 the chapel's stone came out white (Chris, 2026-10-15 01:10: "looks bad")
+            lamp.color = new Color(1, .93f, .8f); lamp.shadows = LightShadows.None;   // (these stood inside the comment above until 2026-10-15)
             var body = Array.FindAll(s.Player.GetComponentsInChildren<Renderer>(), r => r.enabled); foreach (var r in body) r.enabled = false;
             report.AppendLine("The Sealed Adit, camera tour (" + DateTime.Now.ToString("yyyy-MM-dd HH:mm") + "): zone " + zone.Zone.id + ", " + Hollow.All.Count + " caves, " + zone.Gates.Count + " gates opened.");
 

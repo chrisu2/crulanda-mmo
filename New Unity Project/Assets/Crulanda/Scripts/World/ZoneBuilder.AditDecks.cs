@@ -340,7 +340,8 @@ namespace Crulanda.World
         /// <summary>A solid box (a post, a rail) standing on <paramref name="foot"/>: in the way of you and every agent (NavBlocker).</summary>
         static void DeckBlock(Transform parent, Vector3 foot, Vector3 size, Quaternion rot, string what = null)
         {
-            var o = new GameObject(what == null ? "Solid" : "Solid: " + what); o.transform.SetParent(parent, false);   // named for AditNavDiagnostics (what stands in a deck's way) o.transform.localPosition = foot + rot * new Vector3(0, size.y / 2, 0); o.transform.localRotation = rot;
+            var o = new GameObject(what == null ? "Solid" : "Solid: " + what); o.transform.SetParent(parent, false);   // named for AditNavDiagnostics (what stands in a deck's way)
+            o.transform.localPosition = foot + rot * new Vector3(0, size.y / 2, 0); o.transform.localRotation = rot;   // (2026-10-15: since cbc484dc these two stood inside the comment above, so every deck's post, rail and body block was built at the root's origin)
             o.AddComponent<BoxCollider>().size = size; o.AddComponent<NavBlocker>();
         }
 

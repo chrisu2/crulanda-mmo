@@ -6263,7 +6263,7 @@
     },
     {
       "id": "secret.oakhaven.elins-cairn",
-      "name": "Elin's Cairn",
+      "name": "Wren's Cairn",
       "kind": "vista",
       "at": {
         "x": -214,
@@ -6271,7 +6271,7 @@
       },
       "radius": 5,
       "rotation": 180,
-      "text": "A pile of stones on the crown of the knoll, one on another, thirty and more. Sel Harrow climbs up on the seventh day of every week and puts a stone on it: one for each week since the collectors' wagon went down the West road with Elin in it. From here you can see the road all the way to the Bound Stone. He watched it out of sight from here.",
+      "text": "A pile of stones on the crown of the knoll, one on another, thirty and more. Sel Harrow climbs up on the seventh day of every week and puts a stone on it: one for each week since the collectors' wagon went down the West road with Wren in it. From here you can see the road all the way to the Bound Stone. He watched it out of sight from here.",
       "xp": 35,
       "canonStatus": "GAME-ONLY: the Harrows and their daughter, and the cairn. The Concord's taking of resonance candidates from Oakhaven is CANON (book1 ch.4)."
     },

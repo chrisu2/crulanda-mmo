@@ -90,13 +90,19 @@ namespace Crulanda.World
         public ZoneHousehold[] households = new ZoneHousehold[0];
         /// <summary>Whose workshop a prop is (a trade then works its own rather than any of the kind).</summary>
         public ZoneWorkshop[] workshops = new ZoneWorkshop[0];
+        /// <summary>Stories of the villagers who are not residents (the named folk of names), by name; a resident's go on the resident.
+        /// Said one time in three when spoken to (ZoneLore.Story; 2026-10-15, Chris: "stories from npcs").</summary>
+        public ZoneStory[] stories = new ZoneStory[0];
     }
     /// <summary>
     /// role: any villager role, or stranger (keeps to one place). place: a place kind (inn, green, woods...).
     /// title: the nameplate subtitle. works: an ordinary villager with the role's working day and a home (an innkeeper), not
-    /// one who keeps a post day and night.
+    /// one who keeps a post day and night. stories: two or three lines of their own, memories, grudges and hopes tied to the
+    /// canon (GAME-ONLY lines about CANON things), said one time in three when spoken to (ZoneLore.Story).
     /// </summary>
-    [Serializable] public sealed class ZoneResident { public string name, role, title, place, look; public Vector2 at; public bool works; }
+    [Serializable] public sealed class ZoneResident { public string name, role, title, place, look; public Vector2 at; public bool works; public string[] stories = new string[0]; }
+    /// <summary>A named person's stories (<see cref="ZoneLife.stories"/>): name as the villager is named, and their lines.</summary>
+    [Serializable] public sealed class ZoneStory { public string name; public string[] lines = new string[0]; }
     /// <summary>
     /// A household (GAME-ONLY): the folk who share one house. house names a prop of kind house, mill or barn (a barn gets a door
     /// of its own) or inn (its rooms upstairs). members name spawned villagers, hen-wives and residents; kin is free text for
@@ -165,10 +171,13 @@ namespace Crulanda.World
     ///   key: a key hidden somewhere else, for a chest that names it in needs. These are found by searching (E, prompt).
     /// Rewards: xp, gold, an item id, a document id (a readable page, as quests give). height lifts the prop off the ground
     /// (something tucked up under a bridge or in a tree); rotation turns it. canonStatus as everywhere.
+    /// clue: the Discoveries tab's line for it while it is not found, a riddle in the book's voice that points at the region and
+    /// the hiding place; hint: what a villager says about it, in theirs (2026-10-15, Chris: "still havent found many secrets";
+    /// Phase 8.6 3e). Neither names a landmark on the map (DiscoveryLog.Validate); either stands in for the other when missing.
     /// </summary>
     [Serializable] public sealed class ZoneSecret
     {
-        public string id, name, kind = "cache", prompt, text, item, document, needs, canonStatus;
+        public string id, name, kind = "cache", prompt, text, item, document, needs, canonStatus, clue, hint;
         public Vector2 at; public float radius = 2.5f, rotation, height;
         public int xp, gold;
     }

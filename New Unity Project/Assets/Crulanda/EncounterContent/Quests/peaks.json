@@ -95,6 +95,20 @@
       "title": "Where the Pass Still Sings",
       "text": "Copied fair from Brother Cael's slate, in a small, upright hand:\n\nThe Cold Tarn, north shore, after dark. Heard: one note, clear, like a glass struck once. The water remembers.\nThe foot of the Umbra scarp. Heard: the mountain's own note, low and slow. Old. Whole.\nThe Broken Post, on the east road. Heard: nothing. The wind out of the east carries no note at all, not even its own.\n\nIt is coming from the east. We knew. Now it is written.\n\nTo be carried south to the Archive by whichever of us goes over next.",
       "canonStatus": "CANON-EXPANDED: the Silent Pilgrims, the Original Song and the Archive of Silence are CANON (world_bible.md); Brother Cael's notes are GAME-ONLY."
+    },
+    {
+      "id": "doc.peaks.crossings",
+      "title": "The Pilgrims' Crossings",
+      "kind": "lore",
+      "text": "Pressed between two flat stones in the cairn at the spur's end, a page in the careful hand of the Silent Pilgrims:\n\nOne stone for every crossing. We have crossed since the Archive was young: south to north in spring with the echo-jars empty, north to south in autumn with them full. The pass holds the song still. At the tarn, the Earth note. At the shrine, the Spirit. At the spur's end, where the wind drops, the Silence, which is not nothing. It is the sound of the mountain holding.\n\nThe mountain is being eaten from the east. We hear it in the Silence now, a grain at a time. Elder Orym says a thing that is eaten slowly can be sung whole again, if one knows the song. We do not know the song. We know where it was.\n\nThe Company has put a gate on the road and calls it a toll. We pay in stones, as we always have. They have not yet learned to count stones.",
+      "canonStatus": "CANON-EXPANDED: the Silent Pilgrims, the Archive of Silence, Elder Orym, the Original Song's three notes and the void eating the Peaks' stone are CANON (world_bible.md, book3 ch.5); the cairn, the crossings and the page are GAME-ONLY."
+    },
+    {
+      "id": "doc.peaks.watchers",
+      "title": "What the Watchers Count",
+      "kind": "lore",
+      "text": "A leaf from a Salt-Mender's notebook, weighted with a stone on the ledge above the east road:\n\nFourth night on the ledge. The pale shapes do not watch the road; they watch what comes up it. I have tested this. A mule: no interest. A pilgrim: one of them turned. Me: all of them.\n\nThey are not sentries. A sentry stops you. These let you pass and make a mark. I believe they are auditors, in the old sense: they come to see whether the account is true. Whose account, I cannot say. The Council's, I would guess, since the Council has been drawing on something for three hundred years and has never once shown the ledger.\n\nIf they are counting us toward a sum, there will be a day the sum is reached. I would like very much to know the number. I would like more to be somewhere else on that day.  - L. T.",
+      "canonStatus": "CANON-EXPANDED: the Pale Things as cosmic auditors and the Council's hidden cost are CANON (world_bible.md); Lisle Tamber, the Salt-Menders' scholar, and her notebook are GAME-ONLY."
     }
   ],
   "quests": [

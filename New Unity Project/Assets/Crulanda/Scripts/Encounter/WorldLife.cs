@@ -26,6 +26,9 @@ namespace Crulanda.Encounter
         static readonly string[] Names = { "Brannoc Vell", "Wil Carder", "Ama Rusk", "Hedda Thorne", "Sel Harrow", "Garet Moss", "Old Tobin", "Pim",
             "Osk Farrow", "Lisbet Crane", "Ilse Brandt", "Corwin Ashby", "Aldo Crisp", "Maud Tanner", "Fen Walker", "Edda Pell", "Nettie", "Tamsin Reed",
             "Jory", "Grete Lowe", "Hob Linden", "Wenna Scrope" };
+        /// <summary>The villagers' names a zone spawns, in order: its own list (life.names) or, without one, Oakhaven's (ZoneLoreTests
+        /// checks every one of them has stories; 2026-10-15).</summary>
+        public static string[] VillagerNames(ZoneLife life) { return life != null && life.names != null && life.names.Length > 0 ? life.names : Names; }
         // The trades come first so a small village still gets its smith and baker; a trade whose workplace the zone
         // lacks falls back to farming or gossip (see Init).
         static readonly string[] Roles = { "blacksmith", "farmer", "merchant", "baker", "gossip", "hunter", "drinker", "child", "lumberjack", "herbalist",
@@ -198,10 +201,10 @@ namespace Crulanda.Encounter
             }
         }
         /// <summary>The folds' shepherds, in order (GAME-ONLY).</summary>
-        static readonly string[] ShepherdNames = { "Tam Sedge", "Nell Sedge" };
+        public static readonly string[] ShepherdNames = { "Tam Sedge", "Nell Sedge" };
         /// <summary>The sheep folds of this zone, a shepherd each.</summary>
         public readonly List<ZoneFold> Folds = new List<ZoneFold>();
-        static readonly string[] KeeperNames = { "Goody Marl", "Hettie Brook", "Nan Pennock", "Old Sorrel" };
+        public static readonly string[] KeeperNames = { "Goody Marl", "Hettie Brook", "Nan Pennock", "Old Sorrel" };
         public static string[] DefaultNames { get { return Names; } }
         /// <summary>The trades of the default villagers, by index (before a trade this village lacks a place for falls back).</summary>
         public static string[] DefaultRoles { get { return Roles; } }
@@ -767,17 +770,27 @@ namespace Crulanda.Encounter
             { "innkeeper", new[] { "Ale's thin and the stew's thinner. Sit where you like.", "The Cask stood before the Concord and it'll stand after." } } };
         /// <summary>The innkeeper on Mira, while she still sits in the corner of his taproom (before she joins you).</summary>
         const string InnkeeperOnMira = "Mira's in the corner. Don't crowd her; she's the only mender we've got.";
+        /// <summary>
+        /// What someone says when spoken to (toPlayer) or among themselves. Spoken to, one time in three it is one of their own stories
+        /// (ZoneLore.Story, the zone's data: memories, grudges and hopes), and one time in four after that a hint at one of the zone's
+        /// secrets not yet found (ZoneLore.SecretHint; 2026-10-15, Chris: "still havent found many secrets", "stories from npcs");
+        /// then the day's news, the trade's lines and the village's mood as before.
+        /// </summary>
         public string LineFor(Villager v, bool toPlayer)
         {
             if (Zone.Zone.life.mood == "keepers")
             {
                 // The Verdant Shore: the Keepers and the two travellers among them have their own lines, and none of Oakhaven's talk.
                 if (!toPlayer) return KeeperChatter[rng.Next(KeeperChatter.Length)];
+                if (rng.Next(3) == 0) { var tale = ZoneLore.Story(Zone.Zone, v.Name, rng); if (tale != null) return tale; }
+                if (rng.Next(4) == 0) { var hint = ZoneLore.SecretHint(Zone.Zone, Session.Discoveries, rng); if (hint != null) return hint; }
                 if (OwnLines.TryGetValue(v.Name, out var own) && rng.Next(2) == 0) return own[rng.Next(own.Length)];
                 return v.Keeper ? Keepers[rng.Next(Keepers.Length)] : OwnLines.TryGetValue(v.Name, out var mine) ? mine[rng.Next(mine.Length)] : Keepers[rng.Next(Keepers.Length)];
             }
             if (v.PassedOut) return "Zzz...";
             if (!toPlayer) return Chatter[rng.Next(Chatter.Length)];
+            if (rng.Next(3) == 0) { var tale = ZoneLore.Story(Zone.Zone, v.Name, rng); if (tale != null) return tale; }
+            if (rng.Next(4) == 0) { var hint = ZoneLore.SecretHint(Zone.Zone, Session.Discoveries, rng); if (hint != null) return hint; }
             if (rng.Next(3) == 0) { var day = StockLine(v); if (day != null) return day; }
             var purse = PurseLine(v); if (purse != null && rng.Next(3) == 0) return purse;
             if (v.Role == "innkeeper" && Session.Progress != null && !Session.Progress.recruited && rng.Next(3) == 0) return InnkeeperOnMira;
@@ -797,9 +810,11 @@ namespace Crulanda.Encounter
             return pool[rng.Next(pool.Length)];
         }
         /// <summary>The Scoundrel's charm at the inn (Docs/CLASS_SCOUNDREL.md; GAME-ONLY): the innkeeper lets slip a rumour, work that someone
-        /// here has going (a quest you could take now) or an elite seen about (one of this zone's camps); null when there is nothing to tell.</summary>
+        /// here has going (a quest you could take now), an elite seen about (one of this zone's camps) or, one time in three, where something
+        /// lies hidden (a secret's hint, 2026-10-15); null when there is nothing to tell.</summary>
         string Rumour()
         {
+            if (rng.Next(3) == 0) { var hint = ZoneLore.SecretHint(Zone.Zone, Session.Discoveries, rng); if (hint != null) return hint; }
             string zoneId = Zone.Zone.id; var work = new List<QuestDef>();
             if (Session.Quests != null)
                 foreach (var q in Session.Quests.Db.Ordered)

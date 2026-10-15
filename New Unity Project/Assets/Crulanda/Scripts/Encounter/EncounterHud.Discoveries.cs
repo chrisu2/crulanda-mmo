@@ -1,10 +1,11 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Crulanda.Encounter
 {
     /// <summary>
     /// Discoveries (hidden finds, DiscoveryLog): the "Discovered" toast, and the quest book's Discoveries tab, which counts every
-    /// zone's secrets and names only the ones found. Nothing here draws on a map.
+    /// zone's secrets, names only the ones found and gives a clue for the rest. Nothing here draws on a map.
     /// </summary>
     public sealed partial class EncounterHud
     {
@@ -39,7 +40,8 @@ namespace Crulanda.Encounter
 
         /// <summary>
         /// The quest book's Discoveries tab. Left: found / total for the whole world, then every zone (this one first) with its own
-        /// count. Right, on parchment: the chosen zone's finds by name and text, then how many more lie hidden there, as a number only.
+        /// count. Right, on parchment: the chosen zone's finds by name and text, then how many more lie hidden there and a clue for
+        /// each (ZoneSecret.clue, a riddle that points without naming the spot; 2026-10-15, Chris: "still havent found many secrets").
         /// </summary>
         void BookDiscoveries(Rect list, Rect page)
         {
@@ -61,7 +63,7 @@ namespace Crulanda.Encounter
                 Shadow(new Rect(r.xMax - 90, r.y + 7, 80, 20), t.found.Count + " / " + t.total, qCount, all ? new Color(.55f, 1, .55f) : gold);
                 y += 38;
             }
-            Shadow(new Rect(list.x + 10, list.yMax - 62, list.width - 20, 54), "No map shows these places: lookouts, caches and things left behind. Wander off the road and look.", tiny, new Color(.75f, .75f, .72f));
+            Shadow(new Rect(list.x + 10, list.yMax - 62, list.width - 20, 54), "No map shows these places: lookouts, caches and things left behind. Wander off the road and look, and listen to the village: people talk.", tiny, new Color(.75f, .75f, .72f));
 
             var sel = tallies.Find(t => t.zoneId == bookZone);
             Fill(page, Parchment);
@@ -75,6 +77,9 @@ namespace Crulanda.Encounter
             var view = new Rect(page.x + 20, py, page.width - 30, page.yMax - 16 - py); float width = view.width - 24, height = 0;
             foreach (var d in sel.found) height += EntryHeight(d, width);
             measureContent.text = rest; float restH = rest.Length > 0 ? qSmall.CalcHeight(measureContent, width) : 0; height += restH + 8;
+            // The clues of what is still hidden (2026-10-15): "STILL HIDDEN", then a riddle a line, each measured for its wrap.
+            var clueH = new List<float>(sel.clues.Count);
+            if (sel.clues.Count > 0) { height += 30; foreach (var c in sel.clues) { measureContent.text = "·  " + c; float ch = qSmall.CalcHeight(measureContent, width - 8) + 6; clueH.Add(ch); height += ch; } }
             discoveryScroll = GUI.BeginScrollView(view, discoveryScroll, new Rect(0, 0, width, height));
             float yy = 0;
             foreach (var d in sel.found)
@@ -84,7 +89,12 @@ namespace Crulanda.Encounter
                 if (!string.IsNullOrEmpty(d.canonStatus)) { Ink(new Rect(0, yy + 2, width, 20), "Lore status: " + d.canonStatus, qSmall, new Color(.45f, .38f, .28f)); yy += 22; }
                 yy += 14;
             }
-            if (restH > 0) Ink(new Rect(0, yy, width, restH), rest, qSmall, new Color(.35f, .27f, .18f));
+            if (restH > 0) { Ink(new Rect(0, yy, width, restH), rest, qSmall, new Color(.35f, .27f, .18f)); yy += restH + 8; }
+            if (sel.clues.Count > 0)
+            {
+                Ink(new Rect(0, yy + 4, width, 24), "STILL HIDDEN", qHead, new Color(.42f, .22f, .05f)); yy += 30;
+                for (int i = 0; i < sel.clues.Count; i++) { Ink(new Rect(8, yy, width - 8, clueH[i]), "·  " + sel.clues[i], qSmall, new Color(.33f, .26f, .17f)); yy += clueH[i]; }
+            }
             GUI.EndScrollView();
         }
         /// <summary>A found secret's height on the page: its name, its text, its lore status and the gap after it.</summary>

@@ -1,5 +1,29 @@
 # Changelog
 
+## 2026-10-15, 01:05 on: clues to every secret, stories from everyone, the book of lore (a helper's pass; OPEN until Chris's build)
+Chris (2026-10-14 23:40, verbatim): "find recipes/ book of lore/still havent found many secrets. all this for ALL Zones"; (2026-10-15 01:05):
+"improve polish, secrets, lore, clues, stories from npcs, etc". Phase 8.6 3c-3e, the secrets and the book first (recipes to find not yet).
+- **Clues to every secret, every zone** (`ZoneSecret.clue` and `hint`; `Scripts/Encounter/ZoneLore.cs`): the Discoveries tab names
+  the found and, under "STILL HIDDEN", gives a riddle a line for the rest (`DiscoveryLog.Tally.clues`); villagers spoken to say a
+  secret's hint one time in four (after their stories), the innkeeper's charmed rumour one time in three, only of secrets not yet
+  found and not shut behind a key (`ZoneLore.SecretHint`). Neither line names a landmark on the map (`DiscoveryLog.Validate`,
+  `DiscoveryLog.Mentions`). 48 secrets have their two lines: the four zone files carry theirs; Oakhaven's 25 (another hand grew it
+  from 15 the same night) are in `Resources/Lore/oakhaven.json`, merged in by `ZoneLore.Apply`, to be folded into oakhaven.json.
+- **Stories from everyone** (`ZoneResident.stories`, `ZoneLife.stories`, `ZoneStory`): two or three lines each for 57 named people
+  (Oakhaven's 20 villagers, three hen-wives, two shepherds and four residents; Khaven's six and four; the Peaks' seven; the Rim's four;
+  the Shore's seven), memories, grudges and hopes tied to the canon (Hallow's Creek, the collectors and the Harrow girl, the Hollow
+  Men, the Silent Pilgrims and the Archive, the Salt-Menders, the Sandthrone, the Pale Things as auditors, the Ash-Walkers' salt, the
+  Root-Mother and the cycles), said one time in three when spoken to (`VillageLife.LineFor`, `ZoneLore.Story`). All GAME-ONLY lines.
+- **The book of lore** (`DocumentDef.kind = "lore"`, `EncounterSession.LorePages`, `EncounterHud.BookLore`): a Lore tab in the quest
+  book (seven tabs now, 100 apart) lists the lore pages found, how many lie unread in each zone, then every other page found; a
+  revealed lore page opens there. Eight pages at eight new `note` secrets (two each in Khaven, the Peaks, the Rim and the Shore,
+  labelled CANON-EXPANDED / GAME-ONLY / PROVISIONAL): the Beacon Roll, What the Crows Wait For, the Pilgrims' Crossings, What the
+  Watchers Count, How a Salt Line Is Laid, The Faceless One, The Lantern Count, What the Falls Remember.
+- Tests: `ZoneLoreTests` (seven: every secret's two lines and no landmark in them, every named person's stories and no orphans, every
+  lore page at a find, the hint rule, the story rule, the side file's merge, the book's clue list) and the landmark case in
+  `DiscoveryLogTests`. Compile-checked only (Roslyn); OPEN: the EditMode run, `SecretPlacementTests` over the eight new notes (placed
+  1.8 m from proven spots), a look at the Discoveries and Lore tabs, and the seven tabs' fit at 1440 wide.
+
 ## 2026-10-14, 11:40 on: the woods, Kevin's motions, every spell's effect, real fire, the Adit's elites
 Chris (11:40-14:40, verbatim in PLAYTEST_NOTES 179-188): "Filling the zones in the Elwynn style. is next.", "you can start expanding
 adit so not so empty next on the agenda.", "we need more spell animations and melee animations also", "here is elwyn very dense area

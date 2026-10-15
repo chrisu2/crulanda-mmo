@@ -228,11 +228,12 @@ namespace Crulanda.Tests
                 new ZoneSecret { id = "secret.test.loop-a", name = "A", kind = "cache", prompt = "Search", needs = "secret.test.loop-b", canonStatus = "GAME-ONLY" },
                 new ZoneSecret { id = "secret.test.loop-b", name = "B", kind = "cache", prompt = "Search", needs = "secret.test.loop-a", canonStatus = "GAME-ONLY" },
                 new ZoneSecret { id = "secret.test.view", name = "View", kind = "vista", radius = 0, item = "no.such.item", document = "no.such.page" },
+                new ZoneSecret { id = "secret.test.told", name = "Told", kind = "cache", prompt = "Search", canonStatus = "GAME-ONLY", clue = "Look behind the old well.", hint = "Jory says it's by the OLD WELL." },   // 2026-10-15: a clue or hint that names a landmark
             };
             string all = string.Join("\n", DiscoveryLog.Validate(new[] { bad }, Items(), Quests()));
             foreach (var expected in new[] { "Duplicate secret id 'secret.test.well'", "its id should be secret.test.<slug>", "unknown kind 'urn'", "no prompt for E",
                 "needs unknown secret 'secret.test.nowhere'", "a key that no chest needs", "go round in a circle", "a lookout needs a radius", "no canonStatus",
-                "unknown item 'no.such.item'", "unknown Chronicle page 'no.such.page'", "a landmark has its name" })
+                "unknown item 'no.such.item'", "unknown Chronicle page 'no.such.page'", "a landmark has its name", "Secret 'secret.test.told': its clue or hint names the landmark 'The Old Well'" })
                 StringAssert.Contains(expected, all);
         }
     }

@@ -685,6 +685,14 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
   - keep 5 m or more from the foot of free crags (their rock lumps and scree reach past the colliders);
   - nothing in or on Crowsfoot Hollow but its own strongbox and key, and nothing on the surface within 12 m of its passage
     (a camp or find over it would be seated on its floor).
+- **Clues, hints and the book of lore** (2026-10-15; Chris, 23:40: "find recipes/ book of lore/still havent found many secrets. all
+  this for ALL Zones", 01:05: "improve polish, secrets, lore, clues, stories from npcs"): every secret has a `clue` (the Discoveries
+  tab's "STILL HIDDEN" line for it, a riddle that points at the region and the hiding place) and a `hint` (what a villager says of
+  it, spoken to, one time in four after the stories; the innkeeper's charmed rumours too), neither naming a landmark on the map
+  (`DiscoveryLog.Validate`; `ZoneLore.cs`, `ZoneLoreTests`). Oakhaven's lines live in `Resources/Lore/oakhaven.json` until they are
+  folded into oakhaven.json (written while another hand had it). Eight pages of the book of lore (`documents` with `"kind": "lore"`,
+  the quest book's Lore tab) lie at new `note` secrets: two each in Khaven, the Peaks, the Rim and the Shore, beside a lookout's cairn
+  or a proven find, 1.8 m toward the zone's middle; SecretPlacementTests has not yet run over them (OPEN).
 - **Per zone** (GAME-ONLY placement; canonStatus on each):
   - Oakhaven: the Road's End (vista, now where the ruts run into the grey), the Poacher's Cold Camp, a Salt-Mender's Drop behind
     the old wayshrine, a Leaf from the Chapel Book (hollow stump), Moonbells; in the dungeon a Key on the Drop and the
@@ -694,12 +702,16 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
     stone where the Crowsfoot track starts to climb). Fifteen.
   - Khaven: the Old Beacon (vista, on a new `Beacon mound` shape east of the walls), a Key Under the Gallows, the Outrider's Hoard
     (chest; needs the key), a Page from the Sexton's Register (drowned chapel wall), Widow's-Lamps; in the outer ring Where the
-    Crows Wait (vista), the Listener's Daybook and Coins for the Hanged.
+    Crows Wait (vista), the Listener's Daybook and Coins for the Hanged; the book of lore's the Beacon Roll (by the beacon's stones)
+    and Old Kestrel's Tin (under the crows' cairn). Ten.
   - Peaks: Above the East Road (vista on the High Ledge), the Goat-Path Camp, a Silent Pilgrim's Echo-Jar, a Letter Never Sent,
-    Frostbells; in the outer ring the Picket's Skim, Scored in the Mortar (the Sealed Adit) and the Spur's End (vista).
+    Frostbells; in the outer ring the Picket's Skim, Scored in the Mortar (the Sealed Adit) and the Spur's End (vista); the book of
+    lore's the Pilgrims' Crossings (in the spur's cairn) and a Leaf from a Mender's Notebook (on the High Ledge). Ten.
   - Ashland Rim: the Salt Line (vista in the southern gap of the Eastern Ridge), an Ash-Walker Cache, a Cultist's Hidden Letter,
-    Last-Light, the Cinderfold Tin; in the outer ring a Page from the Waybook, a Bone-Carver's Bundle and Last-Light in the Grey.
-  - Verdant Shore: Above Mossveil Falls and the Mossy Outcrop (lookouts), the Tapper's Stump, a Glass-Ship's Log, Lantern-Moss.
+    Last-Light, the Cinderfold Tin; in the outer ring a Page from the Waybook, a Bone-Carver's Bundle and Last-Light in the Grey; the
+    book of lore's the Salt-Speaker's Slab (by the salt line) and the Chieftain's Watch (at the Silent Statue's foot). Ten.
+  - Verdant Shore: Above Mossveil Falls and the Mossy Outcrop (lookouts), the Tapper's Stump, a Glass-Ship's Log, Lantern-Moss, a
+    Pilgrim's Abandoned Pack; the book of lore's the Lantern Count (on the outcrop) and Willow-Whisper's Leaf (at the falls' lip). Eight.
 - The capture tour shoots one find per zone up close (`87-secret-<slug>`; the first chest, cache, herb, note or key).
 
 ## Things to gather (`ZoneBuilder.BuildNodes`, `ZoneBuilder.Nodes.cs`; GAME-ONLY)

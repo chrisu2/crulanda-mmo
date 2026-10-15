@@ -1126,8 +1126,10 @@ namespace Crulanda.World
                 bool drop = (p.kind == "ruin" || p.kind == "ruined_house") && !ClearOfBuildings(p, t);
                 if (p.kind == "wall") WarnWallInBuilding(p);
                 // New landmark kinds draw from their own stream, after taking the draws the kind that stood here took, so
-                // every later prop, tree and rock keeps the layout it had.
-                var zoneRng = rng; int legacy = p.kind == "cave" ? 30 : p.kind == "rib" ? 6 : p.kind == "perch" || p.kind == "wallow" || p.kind == "brood" || p.kind == "cavern" || p.kind == "monolith" || p.kind == "giant_tree" || p.kind == "treehouse" || p.kind == "waterfall" || p.kind == "mushrooms" || p.kind == "fallen_giant" || p.kind == "leathershop" || p.kind == "dryhut" || p.kind == "kitchen" || p.kind == "gamerack" ? 0 : -1;
+                // every later prop, tree and rock keeps the layout it had. A ruined_house of variant 1 (Wick's cot, Oakhaven's fill,
+                // 2026-10-15: a ruin added after the zone was laid out) draws from its own stream too, so the groves after it keep
+                // their trees; variant 0 (the Hollins' and the other zones' ruins) draws from the zone's, as it always did.
+                var zoneRng = rng; int legacy = p.kind == "cave" ? 30 : p.kind == "rib" ? 6 : p.kind == "perch" || p.kind == "wallow" || p.kind == "brood" || p.kind == "cavern" || p.kind == "monolith" || p.kind == "giant_tree" || p.kind == "treehouse" || p.kind == "waterfall" || p.kind == "mushrooms" || p.kind == "fallen_giant" || p.kind == "leathershop" || p.kind == "dryhut" || p.kind == "kitchen" || p.kind == "gamerack" || p.kind == "skep" || (p.kind == "ruined_house" && p.variant == 1) ? 0 : -1;
                 if (legacy >= 0) { for (int k = 0; k < legacy; k++) _ = R01; rng = new System.Random(Zone.seed ^ (Mathf.RoundToInt(p.at.x * 8) * 73856093) ^ (Mathf.RoundToInt(p.at.y * 8) * 19349663)); }
                 switch (p.kind)
                 {
@@ -1210,6 +1212,7 @@ namespace Crulanda.World
                     case "wallow": Wallow(t, p.size.x > 0 ? p.size.x : 6); break;
                     case "cave": Cave(t, p.size.x > 0 ? p.size.x : 20); break;
                     case "shelter": Shelter(t); break;
+                    case "skep": Skep(t); break;   // a bee-wife's straw hives on a bench (Oakhaven's fill, 2026-10-15)
                     case "brazier": Brazier(t, Vector3.zero, p.variant == 1 ? Bone : null); Solid(t, new Vector3(0, .6f, 0), new Vector3(.8f, 1.2f, .8f)); break;
                     case "brood": Brood(t, p.size.x > 0 ? p.size.x : 5); break;
                     case "rib": Rib(t, p.size.x > 0 ? p.size.x : 6, p.size.y > 0 ? p.size.y : 7); break;
@@ -5145,6 +5148,31 @@ namespace Crulanda.World
             Part(PrimitiveType.Cube, t, new Vector3(1.1f, .5f, .5f), new Vector3(.35f, .2f, .3f), Tint(art.stone, new Color(.94f, .94f, .91f)));   // salt
             Solid(t, new Vector3(0, 1.1f, .2f), new Vector3(4, 2.2f, 3.8f));
         }
+        /// <summary>
+        /// A bee-wife's skeps (GAME-ONLY, Oakhaven's fill, 2026-10-15): three straw domes on a plank bench laid across two stone
+        /// blocks, each with its dark flight hole to the front, a flat stone weighting the lid of the last. Front faces -Z. Draws from
+        /// its own stream (TreeRandom, as the haystacks do), so nothing else in the zone moves.
+        /// </summary>
+        void Skep(Transform t)
+        {
+            var sr = TreeRandom(t.position); float S() { return (float)sr.NextDouble(); }
+            var stone = Tint(art.stone, new Color(.5f, .49f, .46f)); var plank = Tint(art.timber, Wither(new Color(.46f, .38f, .27f)));
+            var hole = Tint(art.stone, new Color(.05f, .045f, .04f));
+            foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(s * .95f, .21f, 0), new Vector3(.5f, .42f, .5f), stone, Quaternion.Euler(0, (S() - .5f) * 10, 0));
+            Part(PrimitiveType.Cube, t, new Vector3(0, .45f, 0), new Vector3(2.7f, .06f, .62f), plank);
+            float lidX = 0, lidY = 0;
+            for (int k = -1; k <= 1; k++)
+            {
+                var straw = Tint(art.hay, new Color(.72f + S() * .1f, .6f + S() * .08f, .34f + S() * .06f));
+                float x = k * .82f + (S() - .5f) * .06f, r = .25f + S() * .04f, h = .3f + S() * .05f;
+                Part(PrimitiveType.Cylinder, t, new Vector3(x, .48f + h / 2, 0), new Vector3(r * 2, h / 2, r * 2), straw);   // the straw coil's straight sides
+                Part(PrimitiveType.Sphere, t, new Vector3(x, .48f + h, 0), new Vector3(r * 2, r * 1.35f, r * 2), straw);   // its dome
+                Part(PrimitiveType.Cube, t, new Vector3(x, .56f, -r), new Vector3(.08f, .05f, .03f), hole);   // the flight hole
+                lidX = x; lidY = .48f + h + r * 1.35f / 2;
+            }
+            Part(PrimitiveType.Cube, t, new Vector3(lidX, lidY + .01f, 0), new Vector3(.28f, .05f, .24f), stone, Quaternion.Euler(0, S() * 40, 0));   // a flat stone weighting the last lid
+            Solid(t, new Vector3(0, .55f, 0), new Vector3(3, 1.1f, .8f));
+        }
         /// <summary>A fire-bowl on three legs (iron, or bone) with glowing coals and a flame; burns day and night.</summary>
         void Brazier(Transform t, Vector3 at, Material legs)
         {
@@ -5781,7 +5809,7 @@ namespace Crulanda.World
                 case "signpost": return 1.3f;
                 case "cart": return 2.4f;
                 case "rock": return 1.2f * (1 + Mathf.Max(0, p.variant) * .6f);
-                case "monolith": case "grave": case "wayshrine": case "idol": case "shrine": case "board": case "brazier": case "barrels": case "crates": case "haystack": case "woodpile": case "target": case "dummy": case "banner": return 1.2f;
+                case "monolith": case "grave": case "wayshrine": case "idol": case "shrine": case "board": case "brazier": case "barrels": case "crates": case "haystack": case "woodpile": case "target": case "dummy": case "banner": case "skep": return 1.2f;
             }
             return 0;
         }

@@ -19,8 +19,10 @@ namespace Crulanda.Encounter
     [Serializable] public sealed class FactionDef { public string id, name, description, canonStatus; public int start; public bool fixedStanding; }
     /// <summary>A quest item: carried in the quest bag, not equipment.</summary>
     [Serializable] public sealed class QuestItemDef { public string id, name, description; }
-    /// <summary>A readable page kept in the Chronicle (the ledger, a lullaby, a letter).</summary>
-    [Serializable] public sealed class DocumentDef { public string id, title, text, canonStatus; }
+    /// <summary>A readable page kept in the Chronicle (the ledger, a lullaby, a letter). kind "lore" (2026-10-15, Chris: "book of lore"):
+    /// a page of the book of lore, found at a hidden find (ZoneSecret.document) and listed in the quest book's Lore tab; empty: a
+    /// Chronicle page as before.</summary>
+    [Serializable] public sealed class DocumentDef { public string id, title, text, canonStatus, kind; public bool IsLore { get { return kind == "lore"; } } }
     /// <summary>
     /// kind: main | side | npc | faction. giver/turnIn: a villager's name, "Mira", or "auto" (starts itself in its zone).
     /// Steps run in order; a step is done when all its objectives are.

@@ -1151,19 +1151,46 @@ namespace Crulanda.Encounter
             }
         }
         /// <summary>
-        /// The quest book's Discoveries tab: every zone, this one first and the rest by level, with how many secrets each holds and
-        /// the ones found (the rest are only counted). This zone's are the ones in play here (SecretSpots); other zones' come from
-        /// their data.
+        /// The quest book's Discoveries tab: every zone, this one first and the rest by level, with how many secrets each holds, the
+        /// ones found and a clue for the rest (ZoneLore merges a zone's side file of clues in first). This zone's are the ones in play
+        /// here (SecretSpots); other zones' come from their data.
         /// </summary>
         public List<DiscoveryLog.Tally> DiscoveryTallies()
         {
             var list = new List<DiscoveryLog.Tally>();
             if (Discoveries == null || Zone == null) return list;
+            ZoneLore.Apply(Zone.Zone);
             var here = new List<Crulanda.World.ZoneSecret>(); foreach (var spot in SecretSpots) here.Add(spot.def);
             list.Add(Discoveries.TallyOf(Zone.Zone.id, Zone.Zone.displayName, here, true));
             var others = Zone.AllZones().FindAll(z => z != null && z.id != Zone.Zone.id);
             others.Sort((a, b) => a.levelMin != b.levelMin ? a.levelMin.CompareTo(b.levelMin) : string.CompareOrdinal(a.id, b.id));
-            foreach (var z in others) list.Add(Discoveries.TallyOf(z.id, z.displayName, z.secrets, false));
+            foreach (var z in others) { ZoneLore.Apply(z); list.Add(Discoveries.TallyOf(z.id, z.displayName, z.secrets, false)); }
+            return list;
+        }
+        /// <summary>A page of the book of lore (<see cref="LorePages"/>): the page, the zone whose hidden find holds it, whether it is found.</summary>
+        public sealed class LorePage { public DocumentDef doc; public string zoneName; public bool found; }
+        /// <summary>
+        /// The book of lore (the quest book's Lore tab; 2026-10-15, Chris: "book of lore"): every page of kind "lore" in the quest
+        /// content, zone by zone in the Discoveries tab's order (this zone first, then by level) as their hidden finds hold them, and
+        /// last any held by no find (given another way, or not placed yet: its zone is empty).
+        /// </summary>
+        public List<LorePage> LorePages()
+        {
+            var list = new List<LorePage>(); var seen = new HashSet<string>(StringComparer.Ordinal);
+            if (Quests == null || Progress == null) return list;
+            if (Zone != null)
+            {
+                var zones = new List<Crulanda.World.ZoneDefinition> { Zone.Zone };
+                var others = Zone.AllZones().FindAll(z => z != null && z.id != Zone.Zone.id);
+                others.Sort((a, b) => a.levelMin != b.levelMin ? a.levelMin.CompareTo(b.levelMin) : string.CompareOrdinal(a.id, b.id));
+                zones.AddRange(others);
+                foreach (var z in zones)
+                    foreach (var s in z.secrets ?? NoSecrets)
+                        if (s != null && !string.IsNullOrEmpty(s.document) && seen.Add(s.document) && Quests.Db.Documents.TryGetValue(s.document, out var doc) && doc.IsLore)
+                            list.Add(new LorePage { doc = doc, zoneName = z.displayName, found = Progress.documents.Contains(doc.id) });
+            }
+            foreach (var doc in Quests.Db.Documents.Values)
+                if (doc != null && doc.IsLore && seen.Add(doc.id)) list.Add(new LorePage { doc = doc, zoneName = "", found = Progress.documents.Contains(doc.id) });
             return list;
         }
 

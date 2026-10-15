@@ -32,8 +32,14 @@ Nothing is VERIFIED until Chris has seen it in his build.
   named and not yet looked at); EditMode 44/44. The decks are whole and joined; the big find at 20:55 was that every branch cave's floor was cut off a few metres past
   its mouth by its parent's knoll and shell (faces metres wide crossing the passage with their middles in the rock): `ZoneBuilder.Cut`
   now drops a face with a corner inside another passage. That lifted the Sunless River (9 to 59 of 341 samples reached) and the Dry Ledge (0 to 54) but not the
-  Pen, the Cutting Drift, the Foundry, the Muster Yard, the Chapel or the Breach: the next session starts by reading the R87 map
-  (`adit-nav-diagnostics-R87.txt`), which names what the line from the nearest reached sample to the first unreached one meets. The diagnostics (`AditNavDiagnostics`, lane A) write
+  Pen, the Cutting Drift, the Foundry, the Muster Yard, the Chapel or the Breach: the R87 map (21:12) then showed most "unreached" floor was PathComplete from a
+  reached sample metres away: one `NavMesh.CalculatePath` from the yard gives up part way through the drawn-out dungeon, so the
+  camps test, the breadcrumbs and the run order were measuring the search budget, not the caves. `NavReach.Length` now searches
+  leg by leg without giving up on a leg that ends farther off as the crow flies, and the camps test and the map use it (R88: Adit classes 16/23, AditGateTests green); still a leg-by-leg search ends in pockets,
+  so the map now also floods by hops (R90's "reached by hops" table is the measure of the mesh itself), and NavReach wants that hop
+  search next.
+  The real short blocks the map names: the Pen's floor from the hall beside Lusk's stage (a "Solid" at (7, -24, -183)), and the
+  Cutting Drift's own floor past its Company door. Start the next Adit session from `adit-nav-diagnostics-R88.txt`. The diagnostics (`AditNavDiagnostics`, lane A) write
   `D:/crulanda-work/encounter-validation/adit-nav-diagnostics.txt`: the deck tables, a floor map of every hall (reached from the yard
   or not, what stands by the first unreached sample), each gate's crossing. Run the Adit set with a copy of `D:\crulanda-work\chainR86.ps1`.
 - **Next, in order:** Chris's reactions to the above; the Adit (section 18's "still red"); the Stylized Newbie Weapons Pack (skinned

@@ -98,7 +98,9 @@ first a mix of the Deadmines, Wailing Caverns and Scarlet Monastery; bands low 1
 run under the smelters, a syndicate boss), the Deep Veins (23-25, the Warrens: the penal-legion mine of book1 ch.9, geode seams, the
 Blind Crow's goblins as allies, a Council overseer and his unmade labour as bosses), the Transit Hub (27-29, the Crown: the junction
 of every soul-prism and geode, cargo lifts, redaction squads, a Councillor's lieutenant; its last boss drops the letter that opens the Spire).
-**Endgame at the cap** (30 later; a cap-15 version in the Shore first): raids (the Spire of Agony first, ten players: you and sims, a
+**Raids (Chris, 2026-10-15, the question prompt: "Wait for the Spire at 30" and "20"):** no cap-15 raid; the Spire of Agony at 30 is
+the first, and a raid is **twenty players** (you and nineteen sims). The class sets' higher tiers drop there (PLAYTEST_NOTES 228).
+**Endgame at the cap** (30 later; the cap-15 Shore version dropped 2026-10-15): raids (the Spire of Agony first, twenty players: you and sims, a
 guild run, several bosses with the Adit's mechanics at scale; the Ashlands Sanctum later); world bosses (one roaming elite per high
 zone on a long timer, the Weave-Eater brood's mother on the Rim, a Pale King's shadow on the Shore, announced in Zone chat, a full
 group needed, guilds forming up); challenges (timed dungeon runs with a rating the sims' guilds compete on, a weekly notice-board bounty,

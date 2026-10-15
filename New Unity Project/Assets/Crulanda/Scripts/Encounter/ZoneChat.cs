@@ -177,6 +177,13 @@ namespace Crulanda.Encounter
                             TravelTo(new Crulanda.World.ZoneExit { to = "zone.adit", name = "/adit", arrive = adit.spawns.player });
                             return;
                         }
+                    case "/loc":   // where you stand, in the map's terms (2026-10-15, Chris: "a complete map of the dungeon? so i can verify locations"; tools/wip/dungeon/adit_map.py)
+                        {
+                            var at = Player.transform.position; string cave = null;
+                            foreach (var h in Crulanda.World.Hollow.All) if (h.Inside(at, .5f)) { cave = h.Name; break; }
+                            Message("You are at x " + at.x.ToString("0.0") + ", z " + at.z.ToString("0.0") + ", height " + at.y.ToString("0.0") + (cave != null ? " (" + cave + ")" : "") + ".");
+                            return;
+                        }
                     case "/music":   // the zone's music (2026-10-15, Chris's three packs; ZoneMusic): /music <0-1> sets the level, /music off silences it
                         {
                             if (arg.Length == 0) { Message("Music is at " + Mathf.RoundToInt(Crulanda.World.ZoneMusic.Volume * 100) + "%: /music <0-1> sets it, /music off silences it."); return; }

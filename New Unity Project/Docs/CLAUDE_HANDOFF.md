@@ -40,9 +40,11 @@ Nothing is VERIFIED until Chris has seen it in his build.
   Drift, the Pitch Pit and the Scriptorium are wholly reachable; **really cut off were four places;** the Pen was opened at
   21:48 (the Spoil heaps camp's dressing blocks had walled the strip beside Lusk's stage: the camp is on the west side now, R92).
   The Cutting Drift and the whole Geode Foundry opened at 21:56 (a knoll face wider than the drift's tube: `Cut` now tries each
-  edge's middle). **Left: the Chapel's west half** (one straight wall at x about 110; the lake's blocks were capped and that was not
-  it; R93's `encounter-validation/navmesh-chapel-west.png` shows it; the chapel's Hall() west end and door are the next suspects).
-  Fix that, give NavReach the hop search, and most of the Adit's red tests should follow (ADIT_REWORK.md section 18).
+  edge's middle). The chapel opened at 23:41 (the altar stood in the doorway to the cloister stair) and the island under Lusk's stage
+  went at 00:13 (shelves inside a solid deck's body): **every floor of the Adit is reachable from the yard** (R99), the camps,
+  gates and breadcrumbs tests green, the Adit nav set 19/23. Left for the morning: the Scriptorium solid with mesh on its top, the
+  web test's shut-door length (NavReach wants the hop search and an honest length), the fixture knoll ray; then play the run
+  (ADIT_REWORK.md section 18, "Left").
   The real short blocks the map names: the Pen's floor from the hall beside Lusk's stage (a "Solid" at (7, -24, -183)), and the
   Cutting Drift's own floor past its Company door. Start the next Adit session from `adit-nav-diagnostics-R88.txt`. The diagnostics (`AditNavDiagnostics`, lane A) write
   `D:/crulanda-work/encounter-validation/adit-nav-diagnostics.txt`: the deck tables, a floor map of every hall (reached from the yard

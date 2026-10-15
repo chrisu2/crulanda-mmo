@@ -28,6 +28,7 @@ Q4 "Yes, add them". Three helpers built on their own worktrees, merged into `adi
 - Tests (lane A): the Adit set R130-R135 (AditNav, AditCove, AditPolish, AditTests, gates, releases, item and loot classes). the Adit play set 27/27 at 16:15 (AditPolish incl. the leader sent from the yard to Nix, AditCove, AditTests, AditCaveBuild, AditNav); the party tests 22/22 at 16:39 (SimPartyTests, GroupRunTests) with damage by role
 - The stag table for Oakhaven's Red hart (levels 1-13), the hide test reading the table for a camp's levels.
 - **Party sims' damage by role** (Chris, watching: "tank is really doing too much damage compared to actual dps users": the tank 29/s, the Rogue 13, the Ranger 12 and its wolf 8, the Druid healer 12): damage-dealers hit 1.6 times their blow, tanks and healers half; the tank's threat three full blows a swing so it holds the mobs. SimCompanion.RoleDamage.
+- **The Nix duo (17:00-17:21):** the healer mends the tank first under 60%; the Rock-Eater hits for half (its blows had sat at the 60% cap), health .9, its Shaken on its own foe only; AditNixFightTests (the run's party at the duo): the beast now dies in 61 s with the tank up, Nix on foot is still too long for the party (left OPEN). Published 17:21 (EditMode elite and social rules 21/21).
 - **Published 16:31 and again after 16:39** (the role change); saves backed up to `save-backups/20261015-1631-*` and `-before-roles-publish`.
 
 ## 2026-10-15, 02:45-04:00: Chris playing the Adit build (notes 216-225; all OPEN until he sees them)

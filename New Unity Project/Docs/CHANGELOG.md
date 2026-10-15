@@ -1,5 +1,35 @@
 # Changelog
 
+## 2026-10-15, 12:40-18:00: the Adit finished (Chris: "i told you to finish adit before shutting down"; deadline 18:00)
+Chris answered the rework's four questions (ADIT_REWORK section 1): Q1 "20 minute respawn", Q2 "Keep ~75 min", Q3 "Build the Cove",
+Q4 "Yes, add them". Three helpers built on their own worktrees, merged into `adit-rework`; then merged into this branch.
+- **Respawn** 1200 s on every Adit camp (adit_layout.py RESPAWN, adit.json).
+- **The Cove (S6; ADIT_REWORK 20):** the Dead Line west from the Rail Hall into the Black Cove: black swim water, a quay, a two-tier
+  scaffold, the ore barge hauled off by two rope teams by hand (kill them or cut the warps and she stays fast; afloat, two crews come up
+  from the hold), the netters' Weighted Net (a 3 s root), Rail-Captain Danner on the stern castle, a spare wagon rides you out. About +5
+  minutes. No machine.
+- **The polish (S7; ADIT_REWORK 21):** the Grey Spreads (three lines in the Breach grey the lamps and loose a seep each); swing-load
+  buckets on hand-hauled ropes over the Foundry's catwalks (a knock along the walk, never off it, no damage); the lichen trails built;
+  secrets' rewards; Old Burrower and Old Kettle eased.
+- **A deck bug since 2026-10-14 20:11:** a comment swallowed the line that placed every deck's posts, rails and solid bodies, so none
+  stood where built. Fixed; then the rails that now stood across ways were found and opened (the Foundry's north ramp head; the Cove's
+  gangway, quay and barge rails) and the Dead Line's mouth moved off the Rail Hall's closed end.
+- **Class sets, tier 1 (loot DESIGN.md 3.6 and 3.8; Chris: "we need set pieces like 6 pieces..."):** eleven six-piece sets, one a class,
+  class-only, from six Adit bosses (one slot each; 40% a kill for a class in the party; certain on the 8th kill without your piece);
+  specials at 2, 4 and 6 worn that change the class's own abilities (cooldown, cost, cast time, power, procs) through one hook in
+  `StartAbility`. Higher tiers come from raids (the Spire at 30, twenty players: Chris's answers). Sims wear them for looks only so far.
+- **The far-prop culling** leaves the caves' shells and anything over 20 m drawn (far shells culled had opened neighbours' mouths on the
+  sky); a branch cave counts as under rock to its walls for the water's no-sun switch.
+- **A map of the dungeon** (`tools/wip/dungeon/adit_map.py` writes `D:/crulanda-work/outputs/adit-map.html`): every cave, camp, boss,
+  gate, secret, deck and pool, hover cards with coordinates, and the run order with 74 links checked (none broken). `/loc` in game.
+- **Sim-led runs:** the leader no longer gives a camp up as "out of reach" while it is still walking there (the give-up timer compared
+  two measures; a long way back after a wipe now walks the caves' route leg by leg), and the run bot no longer stands at a body it
+  cannot search. The standard group run (a Paladin bot, a Warrior tank, a Druid healer, a Rogue, a Ranger) was played three times on Chris's screen: the first stood an hour (the leader gave Nix up after a wipe, the bot at a body it could not search), the second stood in water and fell off the rope bridge (rails opened by R129's CarriesOn rule beside the bridge tower), the third (16:22-16:31, every fix in) cleared 15 of 51 camps in 21 minutes, walked back from the yard after a wipe without stalling, and was stopped at its third death at Nix (Nix and the Rock-Eater stun the tank every 14 s; the party cannot beat him): Nix is a balance item, not a broken dungeon. The bot now takes each path corner (it cut the decks' turns and stepped off their open junctions) and counts swimming as stuck.
+- Tests (lane A): the Adit set R130-R135 (AditNav, AditCove, AditPolish, AditTests, gates, releases, item and loot classes). the Adit play set 27/27 at 16:15 (AditPolish incl. the leader sent from the yard to Nix, AditCove, AditTests, AditCaveBuild, AditNav); the party tests 22/22 at 16:39 (SimPartyTests, GroupRunTests) with damage by role
+- The stag table for Oakhaven's Red hart (levels 1-13), the hide test reading the table for a camp's levels.
+- **Party sims' damage by role** (Chris, watching: "tank is really doing too much damage compared to actual dps users": the tank 29/s, the Rogue 13, the Ranger 12 and its wolf 8, the Druid healer 12): damage-dealers hit 1.6 times their blow, tanks and healers half; the tank's threat three full blows a swing so it holds the mobs. SimCompanion.RoleDamage.
+- **Published 16:31 and again after 16:39** (the role change); saves backed up to `save-backups/20261015-1631-*` and `-before-roles-publish`.
+
 ## 2026-10-15, 02:45-04:00: Chris playing the Adit build (notes 216-225; all OPEN until he sees them)
 - **The walk-in barns' walls flickered stone and wood** (note 216): their stone sill stood in the boards' own face. It is 10 cm proud now,
   and the building test measures every building in every zone for a face in its footing's (the coping is left unmerged for it).

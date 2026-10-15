@@ -1,6 +1,27 @@
-# Crulanda: Claude handoff (Start here rewritten 2026-10-15 04:10; covers the work to the small hours of Oct 15)
+# Crulanda: Claude handoff (Start here rewritten 2026-10-15 ~16:00; covers the Adit finished on the afternoon of Oct 15)
 
 ## Start here
+
+**Current state: 2026-10-15 afternoon. Chris: "i told you to finish adit before shutting down" and a deadline at 18:00.** The Adit
+rework is finished in code and merged into `feet-bow-adit-kit` (the working branch, PR #2); `adit-rework` (worktree `D:\code\mmo-adit`)
+is the same. Nothing is VERIFIED until Chris sees it; talk to him in game terms (memory: plain-words-no-run-names, finish-the-named-task).
+- **Chris's answers (ADIT_REWORK section 1):** respawn 20 minutes; keep the ~75 minute run; build the Cove; add the Foundry's buckets.
+  Raids: the Spire at 30 is the first, twenty players. Class sets: "6 pieces. 2/6 give 1 special, 4/6 another ... 6/6 ... 3 special
+  abilities and these are class specific"; the Adit's are tier 1 (dungeon), higher tiers from raids (loot DESIGN.md 3.6, 3.8).
+- **What landed today (CHANGELOG "2026-10-15, 12:40-18:00"):** the Cove (S6), the polish (S7), eleven class sets, the deck-placement bug
+  and the rails it stood up, the far-prop culling kept off cave walls, the dungeon map (`tools/wip/dungeon/adit_map.py`, `/loc`), the
+  sim leader's give-up timer and long walk back, the run bot's unsearchable bodies.
+- **Speed:** the Adit with the Cove 100 fps at the yard and 125 in the Tally Hall (from 13 and 17 before PropCull and sleeping mobs).
+- **Tests:** the Adit play set 27/27 at 16:15 (AditPolish incl. the leader sent from the yard to Nix, AditCove, AditTests, AditCaveBuild, AditNav); the party tests 22/22 at 16:39 (SimPartyTests, GroupRunTests) with damage by role. **Group run:** The standard group run (a Paladin bot, a Warrior tank, a Druid healer, a Rogue, a Ranger) was played three times on Chris's screen: the first stood an hour (the leader gave Nix up after a wipe, the bot at a body it could not search), the second stood in water and fell off the rope bridge (rails opened by R129's CarriesOn rule beside the bridge tower), the third (16:22-16:31, every fix in) cleared 15 of 51 camps in 21 minutes, walked back from the yard after a wipe without stalling, and was stopped at its third death at Nix (Nix and the Rock-Eater stun the tank every 14 s; the party cannot beat him): Nix is a balance item, not a broken dungeon. The bot now takes each path corner (it cut the decks' turns and stepped off their open junctions) and counts swimming as stuck..
+- **Open, in order:** (1) Nix and the Rock-Eater too hard for a sim party (three runs wiped there; the tank stunned every 14 s): tune his stun and damage, then the group run again to the Cove; (2) monsters' and sims' crowd control and area moves (Chris asked: most mobs have none; sims only the Rogue/Archivist hold and interrupts): one signature move a mob type, a control move for the classes without one, an area move for sims at three or more mobs; (3) the Cove's water still shows bright streaks in the tour frame near the camera (probably the tour lamp; check in play); (4) sims wear class sets for looks only; the action bar shows the old cooldowns; (5) the fixture and tour captures for Chris (the Cove, the buckets) and his play-through.
+- **Helpers' worktrees** (`D:\code\mmo-cove` adit-cove, `D:\code\mmo-polish` adit-polish, `D:\code\mmo-sets` class-sets) are merged and
+  can be removed (`git worktree remove`), their branches deleted, once Chris is happy.
+- **Phase 8.6 and Phase 9 wait:** the 14 decisions at the end of PHASE8_6_LIVING_WORLD.md (defaults proposed in chat 2026-10-15 ~13:00:
+  8.6 now, looks wait on 8.5, three craft slots with Leatherworking and Weaving, coin-only recipes, 30-minute buffs, bigger inns with
+  double doors and taprooms everywhere, step aside and shelter in rain); Phase 9 first zone to be picked by Chris; the orc race playable
+  next (Races.cs has the rule, no figure or pick yet).
+
+## Oct 15 small hours (history; Start here as it stood at 04:10)
 
 **Current state: 2026-10-15, about 04:30, the PC shut down at Chris's word** ("once all is done and clear. shutdown the computer").
 Chris played the Adit build through the small hours; his words verbatim in PLAYTEST_NOTES 199-225, what was done in CHANGELOG's

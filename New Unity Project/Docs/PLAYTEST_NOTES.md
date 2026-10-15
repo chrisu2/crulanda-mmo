@@ -791,3 +791,12 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
 - 228 (~13:05) "most of the higher 6/6 pieces are raid..but no raid is made yet" (the Adit's class sets are the dungeon tier, tier 1;
   higher tiers come from raids; the first raid is to be designed: ROADMAP's endgame, a ten-player raid of you and sims. OPEN.)
   Asked (the question prompt): the first raid now at 15 or the Spire at 30: "Wait for the Spire at 30"; raid size: "20".
+- 229 (~13:10) "can you produce a complete map of the dungeon? so i can verify locations" then "ok i also need a step by step progression
+  to make sure everything links together" (tools/wip/dungeon/adit_map.py: the map page with the run order and 74 links checked; /loc).
+- 230 (14:50-16:30, watching the group runs) "been standing about 5-10 mins"; "is the warrior tanking? as a support/tank role he is
+  putting out more dps than the dps"; "someone fell off the path"; "now stuck party"; "unstuck. but still getting caught on
+  environment"; "just standing in water. not full group i guess"; "tank is really doing too much damage compared to actual dps users";
+  "also most mobs dont seem to be cc or aoe still a thing?"; "i do see a cc" / "i assume by rogue"; "fell off again when it reached the
+  planks/scaffolding"; "wiped because he fell off". And: "it needs to be fixed and soon. i have a deadline today at 6pm". (CHANGELOG
+  2026-10-15 12:40-18:00: the leader's give-up and long walk, the bot's corners and water, the bridge rails, damage by role. Nix too
+  hard and crowd control/area moves left OPEN.)

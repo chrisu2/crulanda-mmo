@@ -1202,6 +1202,13 @@ was done, in order. TESTED where a run shows it; the rework stays on `adit-rewor
   dressing skipped (or Block() told to keep out of a child's mouth) and read the Pen's row. For the Cutting Drift, the Gallery's knoll
   is about 13 m thick at the crown where the drift's mouth sits 12 m up (Thick(): 2 + swells + sin(th) * Height * .35), so its faces
   are wide there: try `Cut` with the corner rule at shrink .9 for knolls, or cut any knoll face within a tube's Half of its centreline.
+- **The pictures (R91, `navmesh-pen-and-stage.png`, `-cutting-drift-mouth.png`, `-chapel-west.png`, `-foundry-lip.png`; 50 m
+  across, a tenth of a metre a pixel, north up, walkable blue, samples reached green and not red):** the stage still has mesh under it
+  (an island of red inside its outline: the body block did not take it); the hall's east strip beside the stage (x 6-14) is cut from
+  the floor south of z -185, where the "Spoil heaps" camp's dressing blocks stand round (9, -190) by the south ramp's rubble flank,
+  and the Pen hangs off that strip; the Chapel's west half is parted from the built hall by one straight wall at x about 110 across the
+  whole passage (a shell or knoll face line, not slivers); the Foundry's floor is all mesh and all red (it hangs off the drift); the
+  drift's floor past x 107 is a narrowing, not a wall. First try: the Spoil heaps camp moved west (R92, if it ran).
 - **Still red after R86 (PlayMode 19/29; see R88 above for the change):** the camps nobody can walk to (the Pen's, the Cutting Drift's and everything past them),
   the breadcrumbs (56 of 480), the sim's run order (the Foundry unreachable), the web's joins (the cloister stair from the altar),
   the centreline walk at the tally stage, the fixture trestle's rail (a raycast; new in R83, not looked at), the fixture knoll ray,

@@ -521,7 +521,7 @@ def make_camps():
     rest = [
         # The Old Workings
         camp('W', (-1, -276), mob('Ore-cart loaders', 'Sandthrone digger', 'deserter', 3, 10, 10, 'digger', 3), 'workings', 4, aside=8, gate='none'),
-        camp('W', (0, -190), mob('Spoil heaps', 'Sandthrone digger', 'deserter', 3, 11, 11, 'digger', 2.5), 'workings', 6, aside=9, gate='none'),
+        camp('W', (0, -190), mob('Spoil heaps', 'Sandthrone digger', 'deserter', 3, 11, 11, 'digger', 2.5), 'workings', 6, aside=-9, gate='none'),   # the west side: on the east its dressing blocks walled the strip beside the stage that the Pen hangs off (the R91 picture)
         camp('W', (12, -20), mob('Overlook watch', 'Sandthrone watchman', 'outrider', 3, 11, 11, 'watchman', 2), 'workings', 9, gate=LDOOR),
         camp('W', (-1, -282), mob("Lusk's relief shift", 'Sandthrone overseer', 'deserter', 3, 11, 11, 'overseer', 2), 'workings', after='kill:' + LUSK, aside=-3, gate='none'),
         # The Flooded Working (optional)

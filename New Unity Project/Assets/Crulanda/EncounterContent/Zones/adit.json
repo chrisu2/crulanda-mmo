@@ -3668,12 +3668,12 @@
       "levelMax": 11,
       "respawn": 900,
       "center": {
-        "x": 9.0,
+        "x": -9.0,
         "y": -190.0
       },
       "cave": "The Sealed Adit",
       "along": 181.77,
-      "aside": 9,
+      "aside": -9,
       "wing": "workings",
       "step": 6,
       "gate": "none"

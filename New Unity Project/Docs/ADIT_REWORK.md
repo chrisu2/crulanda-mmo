@@ -1189,7 +1189,13 @@ was done, in order. TESTED where a run shows it; the rework stays on `adit-rewor
   124/263, the River 90, the Dry Ledge 119, the Deep Way 659/1142) but "unreached" samples complete from a reached one 3 m off
   remained, and sixty-four legs (R89) changed nothing: a leg-by-leg search ends in a pocket the straight-line heuristic prefers. R90
   adds the honest measure, a flood fill by hops (reached sample to unreached within 30 m by a short complete path, until nothing
-  changes): see its "reached by hops" table. The tests' reach (NavReach) wants the same hop search next.
+  changes). **R90, the measure of the mesh itself (`adit-nav-diagnostics-R90.txt`):** wholly reachable from the yard: the Flooded
+  Working, the Scriptorium, the Sunless River, the Dry Ledge, the Quiet Miner's Drift, the Pitch Pit; all but a few samples: the
+  Singing Gallery (4), the Ash Garden (2), the Muster Yard (5, at x 205), the Grey Breach (1), the Deep Way (7), the Sealed Adit (33:
+  the bowl's east pocket at (9..12, -303) and under Lusk's stage). **Really cut off:** the Pen (all 74: from the hall beside the stage,
+  a "Solid" at (7, -24, -183) in the way), the Cutting Drift past its first metres (204 of 213: the Gallery's knoll at about x 107,
+  "by the first") and so the whole Geode Foundry (458), and the Chapel's west half (109 of 263, x 109-119, z 137-140). Four blocks,
+  then, not forty; the tests' reach (NavReach) wants the hop search so they say the same.
 - **Still red after R86 (PlayMode 19/29; see R88 above for the change):** the camps nobody can walk to (the Pen's, the Cutting Drift's and everything past them),
   the breadcrumbs (56 of 480), the sim's run order (the Foundry unreachable), the web's joins (the cloister stair from the altar),
   the centreline walk at the tally stage, the fixture trestle's rail (a raycast; new in R83, not looked at), the fixture knoll ray,

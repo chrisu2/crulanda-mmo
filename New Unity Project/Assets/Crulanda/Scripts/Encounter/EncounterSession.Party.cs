@@ -226,11 +226,13 @@ namespace Crulanda.Encounter
             Message(c.sim.name + " leaves your party.");
             SimPopulation.Active?.Refresh();
         }
-        void HealPartySimsAfterRecover()
+        /// <summary>After you recover: the party comes to the stone with you, healed; while some of it is still fighting, only the fallen
+        /// (revived) come, and the rest fight on where they are.</summary>
+        void HealPartySimsAfterRecover(bool fighting = false)
         {
             foreach (var c in PartySims)
             {
-                if (c == null) continue;
+                if (c == null || (fighting && c.actor.IsAlive)) continue;
                 if (!c.actor.IsAlive) c.actor.Health.Revive(c.actor.Health.Pool.Max); else c.actor.Health.ApplyHealing(c.actor.Health.Pool.Max);
                 var agent = c.GetComponent<NavMeshAgent>(); if (agent != null) agent.Warp(RecoveryPoint + Vector3.left * (2 + c.slot) - Vector3.up * .1f);
             }

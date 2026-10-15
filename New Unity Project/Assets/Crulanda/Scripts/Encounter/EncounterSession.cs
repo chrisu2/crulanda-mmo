@@ -2262,13 +2262,22 @@ namespace Crulanda.Encounter
         public void Recover()
         {
             if (Player.IsAlive) return;
+            // A party still fighting goes on without you (2026-10-15, the run's party at Nix: you fell, got up at the stone, and every sim was
+            // pulled back with you and the duo reset to full while they had it at 86%: every group run wiped there). Only the fallen come to
+            // the stone with you, and only a fight with nobody left alive in it resets. A whole party down is as it always was.
+            bool fighting = PartySims.Exists(c => c != null && c.actor.IsAlive && Enemies.Exists(e => e != null && e.actor.IsAlive && e.Victim == c.actor))
+                || (Companion != null && Companion.actor.IsAlive && Enemies.Exists(e => e != null && e.actor.IsAlive && e.Victim == Companion.actor));
             Player.Health.Revive(Player.Health.Pool.Max);
             Player.GetComponent<AdventurerMotor>().Teleport(RecoveryPoint);
-            Companion.actor.Health.Revive(Companion.actor.Health.Pool.Max);
-            Companion.actor.Health.ApplyHealing(1000); Companion.actor.Resource.Pool.Fill();
-            Companion.GetComponent<NavMeshAgent>().Warp(RecoveryPoint + Vector3.right * 2.5f - Vector3.up * .1f);
-            HealPartySimsAfterRecover();
-            foreach (var e in Enemies) e.ResetFight();
+            if (!fighting || !Companion.actor.IsAlive)
+            {
+                Companion.actor.Health.Revive(Companion.actor.Health.Pool.Max);
+                Companion.actor.Health.ApplyHealing(1000); Companion.actor.Resource.Pool.Fill();
+                Companion.GetComponent<NavMeshAgent>().Warp(RecoveryPoint + Vector3.right * 2.5f - Vector3.up * .1f);
+            }
+            HealPartySimsAfterRecover(fighting);
+            foreach (var e in Enemies)
+                if (e != null && (!fighting || e.Victim == null || !e.Victim.IsAlive || e.Victim == Player)) e.ResetFight();
             Message((BoundStone() != null ? "You wake beside the spirit stone." : "Recovered at camp.") + " Defeated enemies and collected rewards remain recorded.");
         }
         public void Save(bool announce = true)

@@ -72,6 +72,13 @@ are backwards", "traps need to be something besides a circle on the ground", "no
     files carry Blender's -90 on the prefab root, and ModelProp zeroed it, so every table, bench, stool and mug of that pack lay on
     its side, the mugs set at table height floating; the root's turn is kept now. KitPropTests checks every Fantasy prop stands up.
   - Still open: a sheep in the fold's wall (196): fixed after (the flock's radius 5 of a 7 m fold; the 20:12 tour frame).
+- **After the shutdown (23:15-23:30; Chris back: notes 200-204):** the Living Birds' motion node is Bip01 (the hop's travel sat on it,
+  below the root the clips' locks were on: "birds still hopping"; creature import 7; BirdMotionTests watches a crow hop in place);
+  the Scoundrel's Nerve starts at nothing when the kit wakes and drains six seconds after the last blow, never while auto-attacking
+  a dummy ("scoundrel nerve should start at 0", no finisher at a fight's start), and a swing builds none ("shouldn't get nerve on auto
+  attack"). chainR94: ScoundrelLoopTests and HudTests 8/8, the release build, **published 23:30**, the save backed up to
+  `save-backups/20261014-2330-before-nerve-publish`. Chris's briefs of 23:30-23:35 (villager and NPC AI; more to do, gathering and
+  the professions worth doing; better gear that changes the look) are queued as ROADMAP.md's Phase 8.6.
 - **The Adit rework, the evening's runs (20:00-21:40, `adit-rework`; ADIT_REWORK.md section 18):** the overseers' walk down out of
   the shell, a cave's blocks tried through their whole height, solid decks' bodies filled against a walkable island, the decks named
   for the diagnostics, the EditMode set 44/44; then the diagnostics' floor map found the reach tests themselves measuring a search's

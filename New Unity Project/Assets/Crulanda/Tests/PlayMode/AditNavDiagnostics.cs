@@ -1,6 +1,7 @@
 #if UNITY_EDITOR
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -161,6 +162,31 @@ namespace Crulanda.Tests
                 sb.AppendLine(h.Name + " | " + from.ToString("0.0") + " | " + new Vector3(to.x, ty, to.z).ToString("0.0") + " | " + (ok && path.status == NavMeshPathStatus.PathComplete ? "complete" : ok ? path.status.ToString() : "none") + (h.MouthRaised ? " (a mouth " + h.MouthRise.ToString("0") + " m up)" : ""));
             }
             // The camps the nav test could not reach, and what is under each.
+            // Floor regions: in every hall (a ring 8 m or more across), the floor sampled every 3 m along and across, and whether the
+            // way in reaches each sample (the gates open); the unreached samples by cave with their extents (the tally hall beside Lusk's
+            // stage and the Geode Foundry under its lip: AditNavTests, 2026-10-14 20:26).
+            zone.OpenGates(); for (int i = 0; i < 3; i++) yield return null;
+            sb.AppendLine(); sb.AppendLine("cave | floor samples | reached from the start | not reached (extents x, z; the first few)");
+            var startAt = zone.Ground(zone.Zone.spawns.player, .2f); bool haveStart = NavMesh.SamplePosition(startAt, out var sh, 3, NavMesh.AllAreas);
+            var regionPath = new NavMeshPath();
+            foreach (var h in Hollow.All)
+            {
+                if (!h.Half.Any(x => x >= 8)) continue;
+                int total = 0, reached = 0; var lost = new List<Vector3>();
+                for (float along = 1; along < h.Length; along += 3)
+                {
+                    int i = h.Nearest(new Vector2(h.At(along).x, h.At(along).z), out _); if (!h.Floored(i)) continue;
+                    for (float aside = -h.Half[i] * .85f; aside <= h.Half[i] * .85f; aside += 3)
+                    {
+                        var p = h.At(along, aside); if (!h.FloorAt(new Vector2(p.x, p.z), out float fy)) continue;
+                        if (!NavMesh.SamplePosition(new Vector3(p.x, fy + .2f, p.z), out var hit, 1f, NavMesh.AllAreas)) continue;
+                        total++;
+                        if (haveStart && NavMesh.CalculatePath(sh.position, hit.position, NavMesh.AllAreas, regionPath) && regionPath.status == NavMeshPathStatus.PathComplete) reached++; else lost.Add(hit.position);
+                    }
+                }
+                string ext = lost.Count == 0 ? "-" : "x " + lost.Min(v => v.x).ToString("0") + ".." + lost.Max(v => v.x).ToString("0") + ", z " + lost.Min(v => v.z).ToString("0") + ".." + lost.Max(v => v.z).ToString("0") + "; " + string.Join(" ", lost.Take(4).Select(v => v.ToString("0")));
+                sb.AppendLine(h.Name + " | " + total + " | " + reached + " | " + lost.Count + " (" + ext + ")");
+            }
             sb.AppendLine(); sb.AppendLine("camp | centre | floor under | navmesh within 1.2 m | within 6 m (nearest y)");
             foreach (var c in zone.Zone.camps)
             {

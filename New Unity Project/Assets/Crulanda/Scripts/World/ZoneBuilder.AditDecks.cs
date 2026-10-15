@@ -71,7 +71,6 @@ namespace Crulanda.World
     sealed class FaceMesh
     {
         readonly List<Vector3> v = new List<Vector3>(); readonly List<Vector2> uv = new List<Vector2>(); readonly List<int> tri = new List<int>();
-        public bool Empty { get { return tri.Count == 0; } }
         public void Tri(Vector3 a, Vector3 b, Vector3 c, Vector3 want, Vector2 ua, Vector2 ub, Vector2 uc)
         {
             int o = v.Count; v.Add(a); v.Add(b); v.Add(c); uv.Add(ua); uv.Add(ub); uv.Add(uc);
@@ -361,14 +360,10 @@ namespace Crulanda.World
             int N = spot.mid.Length - 1;
 
             // The deck itself.
-            var fm = new FaceMesh(); var sk = new FaceMesh();
+            var fm = new FaceMesh();
             if (spot.round)
             {
-                // A solid body stops half a metre over the floor (the navmesh reads this mesh: reaching under the floor, it left the floor
-                // under it a walkable island, walled in; a stand under the tally stage the tests walked to); a skirt for the eye and the
-                // feet closes the gap below (not a navmesh source).
-                const int Seg = 24; var c = spot.mid[0]; float bottom = spot.solid[0] ? spot.under[0] + .5f : c.y - thick; var cb = new Vector3(c.x, bottom, c.z);
-                float low0 = spot.under[0] - .3f;
+                const int Seg = 24; var c = spot.mid[0]; float bottom = spot.solid[0] ? spot.under[0] - .3f : c.y - thick; var cb = new Vector3(c.x, bottom, c.z);
                 for (int k = 0; k < Seg; k++)
                 {
                     float a0 = k * Mathf.PI * 2 / Seg, a1 = (k + 1) * Mathf.PI * 2 / Seg;
@@ -377,7 +372,6 @@ namespace Crulanda.World
                     fm.Tri(c, p0, p1, Vector3.up, new Vector2(c.x, c.z) / 2, new Vector2(p0.x, p0.z) / 2, new Vector2(p1.x, p1.z) / 2);
                     float arc0 = a0 * spot.half / 2, arc1 = a1 * spot.half / 2;
                     fm.Quad(p0, p1, b1, b0, outward, new Vector2(arc0, p0.y / 2), new Vector2(arc1, p1.y / 2), new Vector2(arc1, bottom / 2), new Vector2(arc0, bottom / 2));
-                    if (spot.solid[0]) sk.Quad(b0, b1, new Vector3(p1.x, low0, p1.z), new Vector3(p0.x, low0, p0.z), outward, new Vector2(arc0, bottom / 2), new Vector2(arc1, bottom / 2), new Vector2(arc1, low0 / 2), new Vector2(arc0, low0 / 2));
                     fm.Tri(cb, b0, b1, Vector3.down, new Vector2(c.x, c.z) / 2, new Vector2(p0.x, p0.z) / 2, new Vector2(p1.x, p1.z) / 2);
                 }
             }
@@ -391,9 +385,7 @@ namespace Crulanda.World
                 Vector3 Mid(int k) { return k == 0 ? spot.mid[0] + ext0 : k == N ? spot.mid[N] + extN : spot.mid[k]; }
                 Vector3 L(int k) { return Mid(k) - spot.across[k] * spot.half; }
                 Vector3 R(int k) { return Mid(k) + spot.across[k] * spot.half; }
-                Vector3 Down(Vector3 p, int k) { return new Vector3(p.x, spot.solid[k] ? spot.under[k] + .5f : spot.mid[k].y - thick, p.z); }   // a solid body stops half a metre over the floor (see the round deck)
-                Vector3 Low(Vector3 p, int k) { return new Vector3(p.x, spot.under[k] - .3f, p.z); }
-                void Skirt(Vector3 a, Vector3 b, int ka, int kb, Vector3 want, float ra, float rb) { if (!spot.solid[ka] && !spot.solid[kb]) return; sk.Quad(Down(a, ka), Down(b, kb), Low(b, kb), Low(a, ka), want, new Vector2(ra, Down(a, ka).y / 2), new Vector2(rb, Down(b, kb).y / 2), new Vector2(rb, Low(b, kb).y / 2), new Vector2(ra, Low(a, ka).y / 2)); }
+                Vector3 Down(Vector3 p, int k) { return new Vector3(p.x, spot.solid[k] ? spot.under[k] - .3f : spot.mid[k].y - thick, p.z); }
                 float run = 0;
                 for (int k = 0; k < N; k++)
                 {
@@ -403,9 +395,7 @@ namespace Crulanda.World
                     fm.Quad(R(k), R(k + 1), Down(R(k + 1), k + 1), Down(R(k), k), side, new Vector2(r0, R(k).y / 2), new Vector2(r1, R(k + 1).y / 2), new Vector2(r1, Down(R(k + 1), k + 1).y / 2), new Vector2(r0, Down(R(k), k).y / 2));
                     fm.Quad(L(k), L(k + 1), Down(L(k + 1), k + 1), Down(L(k), k), -side, new Vector2(r0, L(k).y / 2), new Vector2(r1, L(k + 1).y / 2), new Vector2(r1, Down(L(k + 1), k + 1).y / 2), new Vector2(r0, Down(L(k), k).y / 2));
                     fm.Quad(Down(L(k), k), Down(R(k), k), Down(R(k + 1), k + 1), Down(L(k + 1), k + 1), Vector3.down, new Vector2(0, r0), new Vector2(spot.half, r0), new Vector2(spot.half, r1), new Vector2(0, r1));
-                    Skirt(R(k), R(k + 1), k, k + 1, side, r0, r1); Skirt(L(k), L(k + 1), k, k + 1, -side, r0, r1);
                 }
-                Skirt(L(0), R(0), 0, 0, back, 0, spot.half); Skirt(L(N), R(N), N, N, on, 0, spot.half);
                 fm.Quad(L(0), R(0), Down(R(0), 0), Down(L(0), 0), back, new Vector2(0, L(0).y / 2), new Vector2(spot.half, R(0).y / 2), new Vector2(spot.half, Down(R(0), 0).y / 2), new Vector2(0, Down(L(0), 0).y / 2));
                 fm.Quad(L(N), R(N), Down(R(N), N), Down(L(N), N), on, new Vector2(0, L(N).y / 2), new Vector2(spot.half, R(N).y / 2), new Vector2(spot.half, Down(R(N), N).y / 2), new Vector2(0, Down(L(N), N).y / 2));
             }
@@ -413,11 +403,19 @@ namespace Crulanda.World
             var mesh = fm.Make(deck.name);
             deck.AddComponent<MeshFilter>().sharedMesh = mesh; deck.AddComponent<MeshRenderer>().sharedMaterial = deckMat;
             deck.AddComponent<MeshCollider>().sharedMesh = mesh; deck.AddComponent<NavWalkable>();
-            if (!sk.Empty)
-            {
-                var skirt = new GameObject("Deck skirt: " + deck.name.Substring(6)); skirt.transform.SetParent(look, false);
-                var sm = sk.Make(skirt.name); skirt.AddComponent<MeshFilter>().sharedMesh = sm; skirt.AddComponent<MeshRenderer>().sharedMaterial = deckMat; skirt.AddComponent<MeshCollider>().sharedMesh = sm;
-            }
+            // A solid body's inside is no place to stand: the navmesh read the body's faces under the floor and left the floor under it a
+            // walkable island, walled in (the stand under Lusk's tally stage the tests walked to; AditNavDiagnostics 20:26), so a block
+            // that is not walkable fills it, from under the floor to a hand under the planks.
+            if (spot.round) { if (spot.solid[0]) DeckBlock(solidRoot, new Vector3(spot.mid[0].x, spot.under[0] - .3f, spot.mid[0].z), new Vector3(spot.half * 2 - .4f, Mathf.Max(.1f, spot.mid[0].y - thick - .35f - (spot.under[0] - .3f)), spot.half * 2 - .4f), Quaternion.identity, "body of " + d.name); }
+            else
+                for (int k = 0; k < N; k++)
+                {
+                    if (!spot.solid[k] || !spot.solid[k + 1]) continue;
+                    var a = spot.mid[k]; var b = spot.mid[k + 1]; var dir = b - a; dir.y = 0; if (dir.sqrMagnitude < 1e-6f) continue;
+                    float low = Mathf.Min(spot.under[k], spot.under[k + 1]) - .3f, top = Mathf.Min(a.y, b.y) - thick - .35f; if (top - low < .2f) continue;
+                    var foot = (a + b) / 2; foot.y = low;
+                    DeckBlock(solidRoot, foot, new Vector3(spot.half * 2 - .4f, top - low, dir.magnitude + .1f), Quaternion.LookRotation(dir), "body of " + d.name);
+                }
 
             // Posts (piers in stone) down to what is under them, solid to a hand under the deck so its top stays whole in the navmesh; a
             // rope bridge hangs from its ends and a scree ramp is rubble to the floor.

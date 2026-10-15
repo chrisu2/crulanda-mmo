@@ -42,9 +42,14 @@ Nothing is VERIFIED until Chris has seen it in his build.
   The Cutting Drift and the whole Geode Foundry opened at 21:56 (a knoll face wider than the drift's tube: `Cut` now tries each
   edge's middle). The chapel opened at 23:41 (the altar stood in the doorway to the cloister stair) and the island under Lusk's stage
   went at 00:13 (shelves inside a solid deck's body): **every floor of the Adit is reachable from the yard** (R99), the camps,
-  gates and breadcrumbs tests green, the Adit nav set 19/23 (R100, 00:24). Left for the morning: the Scriptorium solid with mesh on its top, the
-  web test's shut-door length (NavReach wants the hop search and an honest length), the fixture knoll ray; then play the run
-  (ADIT_REWORK.md section 18, "Left").
+  gates and breadcrumbs tests green, the Adit nav set 19/23 (R100, 00:24). The "solid" with mesh on its top was a buried cave's knoll poking into the hall (fixed 00:49).
+  Three helpers worked the small hours (Chris: "you can run 3 bots at most"): `AditDataTests` (every reference in the Adit's data
+  resolves), the Adit camera tour (`Crulanda.exe --crulanda-adit-tour <dir> --crulanda-zone zone.adit --crulanda-temp-save`,
+  28 frames: `D:/crulanda-work/world-captures/adit-tour` once it has run), and the release of `after` camps (bosses' relief shifts,
+  the Wake's waves), which the data named and nothing spawned. **The Phase 8.6 plan** is written:
+  `Docs/PHASE8_6_LIVING_WORLD.md` (PROVISIONAL; fourteen one-line decisions for Chris at its end; the inn-door jam's cause is in it:
+  a 1.6 m door and a navmesh baked at agent radius .5 leave a 0.6 m strip, one body at a time). Left on the Adit: the stair home from
+  the chapel (a gap on the stair itself), the fixture test's knoll ray and rail check; then play the run (ADIT_REWORK.md section 18).
   The real short blocks the map names: the Pen's floor from the hall beside Lusk's stage (a "Solid" at (7, -24, -183)), and the
   Cutting Drift's own floor past its Company door. Start the next Adit session from `adit-nav-diagnostics-R88.txt`. The diagnostics (`AditNavDiagnostics`, lane A) write
   `D:/crulanda-work/encounter-validation/adit-nav-diagnostics.txt`: the deck tables, a floor map of every hall (reached from the yard

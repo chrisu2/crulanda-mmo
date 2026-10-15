@@ -729,3 +729,4 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
 - 202 (23:20) "shouldn't get nerve on auto attack" (the swing's 3 Nerve gone; the cuts and the verses build it; OPEN)
 - 203 (23:30) "so what is the phases look like? the villagers and npcs need better ai" (a brief: the villagers' and NPCs' AI; OPEN, to be planned)
 - 204 (23:35) "more things to do. more incentives for gathering/professions. make better gear. have gear change the way your character looks when equipping" (a brief; queued in ROADMAP.md with 203; OPEN)
+- 205 (23:40, asked what the villagers did) "running into each other and sometimes get stuck or delayed at door of inn..prob need double doors and inn a bit bigger so for people. need more / better loot obtained from crafting armor/weapons/potions/food buffs. find recipes/ book of lore/still havent found many secrets. all this for ALL Zones" (ROADMAP Phase 8.6; OPEN)

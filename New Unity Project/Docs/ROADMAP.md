@@ -65,8 +65,14 @@ class's figure, and Chris has looked at it.
 ## Phase 8.6 plan: the living world's second pass (Chris, 2026-10-14 23:30-23:35, verbatim; queued, its place to be decided)
 Chris: "so what is the phases look like? the villagers and npcs need better ai" and "more things to do. more incentives for
 gathering/professions. make better gear. have gear change the way your character looks when equipping" (PLAYTEST_NOTES 203-204).
-- **Villager and NPC AI** (what he saw is still to be asked: idling, walking into things, repeated lines, mobs that do not react).
-- **More to do; gathering and the professions worth doing** (incentives: what the gathered and the made are for).
+After Phase 8 (Chris, 23:25: "work on phase 8"). His answer to what he saw (23:40, verbatim, PLAYTEST_NOTES 205): "running into each
+other and sometimes get stuck or delayed at door of inn..prob need double doors and inn a bit bigger so for people. need more / better
+loot obtained from crafting armor/weapons/potions/food buffs. find recipes/ book of lore/still havent found many secrets. all this for
+ALL Zones".
+- **Villager and NPC AI:** they run into each other and get stuck or delayed at the inn's door; the inn's door made double and the
+  inn a little bigger for the people in it; the villagers' way-finding and giving way to each other (every zone).
+- **More to do; gathering and the professions worth doing:** more and better loot made by crafting (armour, weapons, potions, food
+  buffs); recipes to find; a book of lore; the secrets ("still havent found many"): every zone.
 - **Better gear, and gear that changes the character's look when equipped** (with Phase 8.5's fit overhaul: the one phase if Chris
   wants them together).
 

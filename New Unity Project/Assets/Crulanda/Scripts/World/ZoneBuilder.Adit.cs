@@ -39,6 +39,9 @@ namespace Crulanda.World
         public GameObject[] CoveWarps;
         /// <summary>(S6) The name of the warps' interactable (kind "warps", at the north bollards): "Cut the warps".</summary>
         public const string AditWarps = "The barge's warps";
+        /// <summary>(S6) The spare ore wagon at the Dead Line's end (kind "carriage", as the Rail Hall's): once the lock is matched or Danner is
+        /// dead the goblins walk you up the line from here too, so the way home from the Cove is not the walk back (lesson L2).</summary>
+        public const string AditSpareWagon = "The spare wagon at the line's end";
         /// <summary>(S6) The black water's surface in the Cove (its flood), or NaN outside it.</summary>
         public float CoveWaterLevel = float.NaN;
         /// <summary>The lock matched (D4): the carriage's geodes go dull and their light goes out.</summary>
@@ -1527,6 +1530,9 @@ namespace Crulanda.World
                     foreach (int side in new[] { -1, 1 }) Part(PrimitiveType.Cylinder, t, stop + qe * new Vector3(side * .7f, .6f, -.35f), new Vector3(.3f, .2f, .3f), iron, qe * Quaternion.Euler(90, 0, 0));
                     Block(stop, new Vector3(2.2f, 1, .5f), qe);
                 }
+                // The spare wagon on the line short of the buffers: the way out from the Cove (EncounterSession.RideCarriage, kind "carriage").
+                Cart(h.Length - 12, 0, false);
+                Interactables.Add(new ZoneInteractable { name = AditSpareWagon, prompt = "Ride the spare wagon up the line", kind = "carriage", position = t.TransformPoint(On(h.Length - 12, 1.9f)) });
             }
             // The Black Cove: still black water from wall to wall under a beach of black scree; the quay along the west wall with lantern posts at
             // its water's edge; the timber bollards and the warps the rope teams haul on (CoveWarps; EncounterSession.Haul); the ore barge, her

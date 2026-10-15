@@ -200,6 +200,10 @@ namespace Crulanda.Tests
             Assert.IsFalse(session.Progress.keys.Contains(EncounterSession.WeaverLock));
             Assert.IsTrue(session.RideAllowed, "Danner dead");
             StringAssert.Contains("one ride out", session.InteractPromptFor(ride));
+            // The spare wagon at the Dead Line's end is a way out too, so nobody walks back from the Cove (lesson L2).
+            var spare = session.Zone.Interactables.Find(i => i.name == ZoneBuilder.AditSpareWagon); Assert.IsNotNull(spare, "the spare wagon at the line's end");
+            Assert.AreEqual("carriage", spare.kind); StringAssert.Contains("one ride out", session.InteractPromptFor(spare));
+            Assert.IsTrue(NavMesh.SamplePosition(spare.position, out _, 2.5f, NavMesh.AllAreas), "stood beside on the Dead Line's floor");
             motor.Teleport(ride.position + Vector3.up); yield return Frames(2);
             session.UseInteractable(ride); Assert.IsTrue(session.Working, "on the bar");
             yield return new WaitForSeconds(.8f);

@@ -271,23 +271,51 @@ namespace Crulanda.World
             }
             int hallTorches = 0;
             // A wall across the way at s, out to w either side: 2 m modules out from the middle, an arched door 3.6 m wide when `door`.
+            // The end wall of a built room, from the kit (Chris, 2026-10-15 01:12-01:14, of the chapel's: "just the shape and design is bad",
+            // "use some of the dungeon assedt not just plain walls and arch"): wall modules in bays out from the door, the kit's wall-top as a
+            // cornice along the top course, a window in the second course of every other bay, the entrance-top module over the arch with
+            // plain modules beside it, and a column of the kit's three parts either side of the door. Both faces, as before.
             void EndWall(float s, float w, bool door, int courses = 2)
             {
-                var q = Along(s); float from = door ? 2.3f : 0;
+                var q = Along(s); float from = door ? 2.3f : 0; int bay = 0;
+                string Course(int k) { return k == courses - 1 && courses > 1 ? "ModularStoneWall_top" : "ModularStoneWall"; }
                 foreach (int side in new[] { -1, 1 })
-                    for (float a = from + 1; a < w + .6f; a += 2)
+                    for (float a = from + 1; a < w + .6f; a += 2, bay++)
                     {
                         var foot = On(s, side * a); if (!Free(foot) || !Free(foot + Vector3.up * 3.5f)) continue;
                         // The kit's wall is dressed on one face (its back is flat): an end wall is seen from both sides, so two, back to back
                         // (Chris, 2026-10-11, "looks terrible": two flat black slabs round an arch, the walls' backs).
-                        if (Piece("ModularStoneWall", foot, YawAt(s) + 90, 2.02f) == null) continue;
-                        Piece("ModularStoneWall", foot, YawAt(s) - 90, 2.02f);
-                        for (int k = 1; k < courses; k++) { Piece("ModularStoneWall", foot + Vector3.up * 2 * k, YawAt(s) + 90, 2.02f); Piece("ModularStoneWall", foot + Vector3.up * 2 * k, YawAt(s) - 90, 2.02f); }
+                        if (Piece(Course(0), foot, YawAt(s) + 90, 2.02f) == null) continue;
+                        Piece(Course(0), foot, YawAt(s) - 90, 2.02f);
+                        for (int k = 1; k < courses; k++)
+                        {
+                            Piece(Course(k), foot + Vector3.up * 2 * k, YawAt(s) + 90, 2.02f); Piece(Course(k), foot + Vector3.up * 2 * k, YawAt(s) - 90, 2.02f);
+                            if (k == 1 && courses > 2 && bay % 2 == 1) { Piece("Window", foot + Vector3.up * 2.3f, YawAt(s) + 90, 1.4f); Piece("Window", foot + Vector3.up * 2.3f, YawAt(s) - 90, 1.4f); }
+                        }
                         Block(foot, new Vector3(2.05f, 2 * courses, .7f), q);
                     }
                 if (!door) return;
                 Piece("Entrance", On(s, 0), YawAt(s) + 90, 3.4f, null, new Vector3(.6f, 3.4f, 4.6f));
                 foreach (int side in new[] { -1, 1 }) Block(On(s, side * 2.05f), new Vector3(.6f, 3.4f, .6f), q);
+                // Over the arch, from its top up to the cornice: the entrance-top module in the middle with plain modules beside it, the
+                // door's bay being 4.6 m to the modules' 2; the cornice along the top. Then the columns, bottom, middle and top, either
+                // side of the door, standing proud of the wall.
+                for (float y = 3.4f; y < 2 * courses - .4f; y += 2.02f)
+                {
+                    bool top = y + 2.02f >= 2 * courses - .4f;
+                    foreach (float a in new[] { -1.55f, 0f, 1.55f })
+                    {
+                        string piece = top ? "ModularStoneWall_top" : a == 0 && y < 3.5f ? "ModularStoneWall_EntranceTop" : "ModularStoneWall";
+                        Piece(piece, On(s, a) + Vector3.up * y, YawAt(s) + 90, 2.02f); Piece(piece, On(s, a) + Vector3.up * y, YawAt(s) - 90, 2.02f);
+                    }
+                }
+                float tall = 2 * courses;
+                foreach (int side in new[] { -1, 1 })
+                {
+                    var foot = On(s, side * 2.85f); if (!Free(foot)) continue;
+                    Piece("ModularColumn_bottom", foot, YawAt(s), .6f); Piece("ModularColumn_middle", foot + Vector3.up * .6f, YawAt(s), tall - 1.2f); Piece("ModularColumn_top", foot + Vector3.up * (tall - .6f), YawAt(s), .6f);
+                    Block(foot, new Vector3(1, tall, 1), q);
+                }
             }
             // A hall from s0 to s1, its walls w either side of the way.
             // (The Adit rework) columns false: no columns before the walls nor torches between them (the foundry's catwalks run along its walls).
@@ -308,7 +336,10 @@ namespace Crulanda.World
                         var foot = On(s, side * w); if (!Free(foot) || !Free(foot + Vector3.up * 3.5f)) continue;
                         float yaw = YawAt(s) + (side > 0 ? 0 : 180);   // the dressed face into the hall (it faced the rock: the hall showed flat backs)
                         if (Piece("ModularStoneWall", foot, yaw, 2.02f) == null) continue;
-                        for (int k = 1; k < courses; k++) Piece("ModularStoneWall", foot + Vector3.up * 2 * k, yaw, 2.02f);
+                        // The top course the kit's wall-top (a cornice) in a tall room, and a window in the second course of every other bay
+                        // (Chris, 2026-10-15: "use some of the dungeon assedt not just plain walls and arch").
+                        for (int k = 1; k < courses; k++) Piece(k == courses - 1 && courses > 2 ? "ModularStoneWall_top" : "ModularStoneWall", foot + Vector3.up * 2 * k, yaw, 2.02f);
+                        if (courses > 2 && ((int)((s - s0) / 2)) % 2 == 1) Piece("Window", foot + Vector3.up * 2.3f, yaw, 1.4f);
                         Block(foot, new Vector3(.7f, 2 * courses, 2.05f), Along(s));
                     }
                 for (float s = s0 + 3; columns && s < s1 - 2; s += columnsEvery)

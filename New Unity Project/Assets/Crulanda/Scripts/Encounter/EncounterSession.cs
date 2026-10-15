@@ -1811,7 +1811,7 @@ namespace Crulanda.Encounter
             }
             if (Time.time >= nextRegen)
             {
-                nextRegen = Time.time + 1; Player.Resource.Pool.Change(InCombat ? ClassDef.combatRegen : ClassDef.restingRegen);
+                nextRegen = Time.time + 1; Player.Resource.Pool.Change(InCombat ? ClassDef.combatRegen : Kit.RestingResourceRegen ? ClassDef.restingRegen : 0);
                 if (!InCombat) { Player.Health.ApplyHealing(RestRegen); if (Companion.actor.IsAlive) Companion.actor.Health.ApplyHealing(7); }
             }
             if (!InCombat && Time.time > nextSave) { Save(false); nextSave = Time.time + 30; }

@@ -59,6 +59,34 @@ namespace Crulanda.Tests
         }
         static Vector2 Size(ZoneProp p) { return p.size.x > 0 ? p.size : p.kind == "house" ? new Vector2(7, 5) : p.kind == "mill" ? new Vector2(7, 6) : p.kind == "ruined_house" ? new Vector2(8, 6) : new Vector2(12, 8); }
 
+        /// <summary>
+        /// A wall face in the footing's own face flickers stone and wood as the camera moves (Chris, 2026-10-14 19:45 and 2026-10-15,
+        /// note 216: the walk-in barns' boards). The footing's face on each side is its coping's outermost vertex less the coping's
+        /// 5 cm; any other mesh's vertex within 1.5 cm of that plane, inside the footing's height and run, is a face in it. Null if none.
+        /// </summary>
+        static string FlushWithFooting(Transform t, Transform footing)
+        {
+            var coping = t.Find("Footing coping"); if (coping == null) return null;
+            Vector3 L(Transform from, Vector3 v) { return t.InverseTransformPoint(from.TransformPoint(v)); }
+            float px = float.MinValue, nx = float.MaxValue, pz = float.MinValue, nz = float.MaxValue, top = float.MinValue, foot = float.MaxValue;
+            foreach (var v in coping.GetComponent<MeshFilter>().sharedMesh.vertices) { var l = L(coping, v); px = Mathf.Max(px, l.x); nx = Mathf.Min(nx, l.x); pz = Mathf.Max(pz, l.z); nz = Mathf.Min(nz, l.z); top = Mathf.Max(top, l.y); }
+            foreach (var v in footing.GetComponent<MeshFilter>().sharedMesh.vertices) foot = Mathf.Min(foot, L(footing, v).y);
+            px -= .05f; nx += .05f; pz -= .05f; nz += .05f;
+            foreach (var mf in t.GetComponentsInChildren<MeshFilter>())
+            {
+                if (mf.transform == footing || mf.transform == coping || mf.sharedMesh == null || !mf.sharedMesh.isReadable) continue;
+                var r = mf.GetComponent<Renderer>(); if (r == null || !r.enabled) continue;
+                foreach (var v in mf.sharedMesh.vertices)
+                {
+                    var l = L(mf.transform, v); if (l.y < foot || l.y > top - .1f) continue;
+                    bool inX = l.x > nx + .02f && l.x < px - .02f, inZ = l.z > nz + .02f && l.z < pz - .02f;
+                    if ((Mathf.Abs(l.x - px) < .015f || Mathf.Abs(l.x - nx) < .015f) && inZ) return "'" + mf.name + "' has a face in its footing's side (x " + l.x.ToString("0.00") + ")";
+                    if ((Mathf.Abs(l.z - pz) < .015f || Mathf.Abs(l.z - nz) < .015f) && inX) return "'" + mf.name + "' has a face in its footing's front or back (z " + l.z.ToString("0.00") + ")";
+                }
+            }
+            return null;
+        }
+
         [UnityTest] public IEnumerator Every_building_stands_on_stone_down_to_the_ground()
         {
             var first = UnityEngine.Object.FindFirstObjectByType<EncounterSession>();
@@ -87,6 +115,7 @@ namespace Crulanda.Tests
                         low = Mathf.Min(low, zone.Ground(new Vector2(w.x, w.z)).y);
                     }
                     if (bottom > low - .1f) problems.Add(q + "its footing stops " + (bottom - low).ToString("0.00") + " m above the lowest ground round it");
+                    string flush = FlushWithFooting(t, footing); if (flush != null) problems.Add(q + flush);
                     // A door's threshold stone stands at the ground across the doorway, not under it (houses and barns: the inn's floor is level).
                     if (p.kind == "house" || p.kind == "barn" || p.kind == "mill")
                     {

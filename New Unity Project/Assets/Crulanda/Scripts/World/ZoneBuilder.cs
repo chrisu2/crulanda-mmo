@@ -1822,7 +1822,7 @@ namespace Crulanda.World
             Eaves(roof, L - .2f, W, H, roofH, thatch);
             Gables(roof, L / 2, W, H, roofH, W / 2 + .7f, L / 2 + .5f, stone, W, .2f);
             // The stone sill round the outside, open at the doorway, and the threshold and steps.
-            Footing(t, W + .3f, L + .3f, .45f, .4f, 1, doorW / 2 + .1f);
+            Footing(t, W + .5f, L + .5f, .45f, .4f, 1, doorW / 2 + .1f);   // 10 cm proud of the boards: at W + .3 its face was the boards' own and the stone and planks flickered as the camera moved (Chris, 2026-10-15, note 216)
             DoorSteps(t, 0, -L / 2 - .15f, sill, doorW + .24f);
             Barns.Add(new ZoneBarn { name = t.name, door = t.TransformPoint(new Vector3(0, 0, -L / 2 - 2.4f)), inside = t.TransformPoint(new Vector3(0, 0, -L / 2 + 1.3f)),
                 right = t.TransformDirection(Vector3.forward), stalls = stalls.ToArray(), aisle = aisle.ToArray(), faces = faces.ToArray() });

@@ -68,6 +68,11 @@ namespace Crulanda.Tests
             { Assert.IsTrue(t.Propose(p, id, 1, out var next, out var why), id + ": " + why); p.talents = next; }
             Assert.IsFalse(t.Propose(p, "ct-mark-debt", 1, out _, out _), "row 2 needs 10");
         }
+        [Test] public void Nerve_does_not_fill_on_its_own_out_of_combat()
+        {
+            var kit = (ScoundrelKit)System.Runtime.CompilerServices.RuntimeHelpers.GetUninitializedObject(typeof(ScoundrelKit));   // a kit wants a live session; the rule is the class's own
+            Assert.IsFalse(kit.RestingResourceRegen, "Chris 2026-10-15: Nerve \"should not fill up until i start fighting\"");
+        }
         [Test] public void The_class_and_its_twelve_are_in_the_content_on_Nerve()
         {
             var content = Content; var cls = content.FindClass("class.scoundrel"); Assert.NotNull(cls);

@@ -71,7 +71,11 @@ are backwards", "traps need to be something besides a circle on the ground", "no
   - **The inn's tables and benches** (note 194a; "all the tables and benches are turned on their sides"): the Fantasy pack's one-mesh
     files carry Blender's -90 on the prefab root, and ModelProp zeroed it, so every table, bench, stool and mug of that pack lay on
     its side, the mugs set at table height floating; the root's turn is kept now. KitPropTests checks every Fantasy prop stands up.
-  - Still open: a sheep in the fold's wall (196).
+  - Still open: a sheep in the fold's wall (196): fixed after (the flock's radius 5 of a 7 m fold; the 20:12 tour frame).
+- **The Adit rework, the evening's runs (20:00-21:40, `adit-rework`; ADIT_REWORK.md section 18):** the overseers' walk down out of
+  the shell, a cave's blocks tried through their whole height, solid decks' bodies filled against a walkable island, the decks named
+  for the diagnostics, the EditMode set 44/44; then the diagnostics' floor map found the reach tests themselves measuring a search's
+  budget, and the hop map (R90) found four real blocks: the Pen, the Cutting Drift (and so the Foundry), the Chapel's west half.
   - **Runs:** chainR78 (the fixes to 20:00): WoodsTests, MovablePanelTests, ScoundrelLoopTests, OrcMotionTests, NodeStreamTests and
     HudTests 17/17, the release build (0 shader errors), the Scoundrel frames (`ui-captures/combat4/scoundrel`), the creature tour
     (`creatures-evening`), the life capture (`life-evening`), Oakhaven's tour 109 a second; **published 19:42**, the save backed up to

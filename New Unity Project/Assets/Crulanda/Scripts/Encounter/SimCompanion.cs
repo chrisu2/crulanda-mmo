@@ -202,7 +202,7 @@ namespace Crulanda.Encounter
         }
         float heldUntil, campIdleSince = -1; string heldKind; Vector3 fearFrom;
         // Headway toward the camp it leads to (2026-10-13): the nearest it has come, when, and the last frame it was leading.
-        float leadBest, leadBestAt, leadSeen; Vector3 leadFor;
+        float leadBest, leadBestAt, leadSeen; Vector3 leadFor; int leadKind;
         /// <summary>A boss's hold on this sim (EliteMove.cc): "stun", "root", "fear" or "disorient", for seconds, from where (fear runs from it).</summary>
         public void HoldUntil(string kind, float seconds, Vector3 from)
         {
@@ -768,8 +768,15 @@ namespace Crulanda.Encounter
                 if (toCamp > 6 && waitingAt == null)
                 {
                     // Headway along the path it walks (a cave's way winds: the straight line can grow while it goes the right way).
-                    float left = legging ? legLeft : agent.hasPath && !agent.pathPending && !float.IsInfinity(agent.remainingDistance) ? agent.remainingDistance : toCamp;
-                    if (leadFor != Leading.Value || Time.time - leadSeen > 1) { leadFor = Leading.Value; leadBest = left; leadBestAt = Time.time; }
+                    // Three measures of what is left, never compared with one another (chainR134: the first frame, its path not yet worked out,
+                    // set the best at the straight line, 469 m; the path's own length, 880 m round by the caves, never came under it, and 45 s on
+                    // the camp was left with the leader walking well): the caves' way when it legs (2), the agent's path when it knows it (1),
+                    // else the straight line (0). A new measure is its own best from there (the clock runs on); a frame with no measure counts nothing.
+                    bool known = agent.hasPath && !agent.pathPending && !float.IsInfinity(agent.remainingDistance);
+                    int kind = legging ? 2 : known ? 1 : 0;
+                    float left = kind == 2 ? legLeft : kind == 1 ? agent.remainingDistance : toCamp;
+                    if (leadFor != Leading.Value || Time.time - leadSeen > 1) { leadFor = Leading.Value; leadKind = kind; leadBest = left; leadBestAt = Time.time; }
+                    else if (kind != leadKind) { if (kind != 0) { leadKind = kind; leadBest = left; } }
                     else if (left < leadBest - 1.5f) { leadBest = left; leadBestAt = Time.time; }
                     else if (!session.InCombat && Time.time - leadBestAt > 45) { leadSeen = 0; LeaveCamp(); return; }
                     leadSeen = Time.time;
@@ -790,6 +797,8 @@ namespace Crulanda.Encounter
         Vector3 leadLegFor, legTo; bool legging; float legLeft, nextLeg;
         /// <summary>Whether it is walking the caves' way leg by leg to its camp now (a long way the navmesh's search gave up on).</summary>
         public bool Legging { get { return legging; } }
+        /// <summary>For a test's log: the headway it measures to its camp (its best so far, by which measure, and seconds since it last improved).</summary>
+        public string HeadwayNote { get { return "best " + leadBest.ToString("0") + " m (" + (leadKind == 2 ? "caves' way" : leadKind == 1 ? "path" : "straight") + "), " + (Time.time - leadBestAt).ToString("0") + " s since better"; } }
         /// <summary>A mend: the party's healer gives a sixth of the healed one's health (or its old flat sum, if more); a tank's is the flat sum.</summary>
         public int MendFor(Actor who) { return Role == PartyRole.Healer ? Mathf.Max(HealAmount, Mathf.RoundToInt(who.Health.Pool.Max * .16f)) : HealAmount; }
         /// <summary>The most hurt of the party within <paramref name="reach"/>: you, Mira (when recruited), the sims, Mother Quillet.</summary>

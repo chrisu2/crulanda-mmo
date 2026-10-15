@@ -172,16 +172,20 @@ namespace Crulanda.Tests
                 for (int i = 0; i < 30 && !c.Route.First().camps.Contains(nixCamp); i++) yield return null;
                 Assert.IsTrue(c.Route.First().camps.Contains(nixCamp), "Nix's fight is the leader's step: " + c.LeadingName);
                 var at = c.Route.First().at; var motor = session.Player.GetComponent<AdventurerMotor>();
-                Time.timeScale = 4; float t = 0, closest = float.MaxValue; bool legged = false;
+                Time.timeScale = 4; float t = 0, closest = float.MaxValue, nextNote = 0; bool legged = false; var agent = c.GetComponent<NavMeshAgent>();
+                void Note(string when) { Debug.Log("AditPolishTests leader " + when + " t=" + t.ToString("0") + "s at " + c.transform.position.ToString("0.0") + ", " + Vector3.Distance(c.transform.position, at).ToString("0") + " m from Nix's camp; legging " + c.Legging + "; path " + (agent == null ? "none" : agent.pathStatus + (agent.pathPending ? " (pending)" : "") + ", " + agent.remainingDistance.ToString("0") + " m left, to " + agent.destination.ToString("0.0")) + "; " + c.HeadwayNote + "; " + c.Activity + "; step " + c.LeadingName); }
                 while (t < 300 && Vector3.Distance(c.transform.position, at) > 25)
                 {
                     // You keep up: a pace behind the leader.
                     var behind = c.transform.position - c.transform.forward * 2.5f;
                     if (Vector3.Distance(session.Player.transform.position, c.transform.position) > 6 && NavMesh.SamplePosition(behind, out var hit, 3, NavMesh.AllAreas)) motor.Teleport(hit.position + Vector3.up);
                     legged |= c.Legging; closest = Mathf.Min(closest, Vector3.Distance(c.transform.position, at));
+                    if (t >= nextNote) { nextNote = t + 10; Note("every 10 s:"); }
+                    if (!(c.Route.Count > 0 && c.Route.First().camps.Contains(nixCamp))) Note("as it gave Nix up:");
                     Assert.IsTrue(c.Route.Count > 0 && c.Route.First().camps.Contains(nixCamp), "Nix's fight is not given up (at " + t.ToString("0") + " s, " + closest.ToString("0") + " m off at the closest)");
                     t += Time.deltaTime; yield return null;
                 }
+                Note("at the end:");
                 Assert.LessOrEqual(Vector3.Distance(c.transform.position, at), 25, "the leader reached Nix's camp (" + closest.ToString("0") + " m off at the closest; walked the caves' way: " + legged + ")");
             }
             finally { Time.timeScale = 1; EncounterSession.ReleaseDelay = keepDelay; }

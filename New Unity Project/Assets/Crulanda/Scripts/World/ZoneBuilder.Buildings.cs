@@ -45,6 +45,9 @@ namespace Crulanda.World
         void Footing(Transform t, float w, float d, float top, float thick, float climb, float gap = 0, Vector2? backGap = null, Material stone = null)
         {
             const float course = .3f, length = 1.4f;
+            // 3 cm further out all round than asked (2026-10-15, note 216 and the building test's flush check): thirteen buildings had
+            // timber lying in the footing's own face (barns' boards and posts, houses' rails, ruins' beams), flickering stone and wood.
+            w += .06f; d += .06f;
             var blocks = new List<CombineInstance>(); var caps = new List<CombineInstance>(); var vents = new List<CombineInstance>();
             float hw = w / 2, hd = d / 2;
             // The sides: along x or z, the face's plane, the way it looks, and the stretch along it (front and back take the corners).
@@ -90,7 +93,7 @@ namespace Crulanda.World
                     if (tall > 1.05f && index % 2 == 1 && step > .9f && vy - .12f > hi + .08f && vy + .2f < crown - .12f)
                     {
                         float mid = (u0 + u1) / 2;
-                        Block(vents, mid - .24f, mid + .24f, vy - .12f, vy + .12f, .015f, .05f);
+                        Block(vents, mid - .24f, mid + .24f, vy - .12f, vy + .12f, .03f, .05f);   // 3 cm proud: at 1.5 it lay all but in the footing's face
                         Block(caps, mid - .34f, mid + .34f, vy + .12f, vy + .2f, .03f, .05f);
                     }
                 }

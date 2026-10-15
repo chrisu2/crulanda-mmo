@@ -8,9 +8,9 @@ Chris played the Adit build through the small hours; his words verbatim in PLAYT
 (memory: plain-words-no-run-names).
 - **Branches:** `feet-bow-adit-kit` (PR #2) and `adit-rework` (worktree `D:\code\mmo-adit`, main merged in to the last commit), both
   pushed. Do not merge either to `main` without Chris. **The published build comes from `adit-rework`.**
-- **Published:** FINAL_PUBLISH. Save backups in `D:/crulanda-work/save-backups/20261015-*`.
-- **The Adit's lag (notes 218, 225) is the night's big fix:** with the frame cap off, the yard went from 13 to 248 frames a second and the
-  Tally Hall from 17 to 282 (the probe in the Adit camera tour: `D:/crulanda-work/world-captures/adit-tour/adit-perf.txt`). The cost
+- **Published:** 04:14 from `adit-rework` with everything below (the save backed up to `save-backups/20261015-0414-before-final-publish`). Save backups in `D:/crulanda-work/save-backups/20261015-*`.
+- **The Adit's lag (notes 218, 225) is the night's big fix:** with the frame cap off, the yard went from 13 to 124 frames a second and the
+  Tally Hall from 17 to 166 (the probe in the Adit camera tour: `D:/crulanda-work/world-captures/adit-tour/adit-perf.txt`). The cost
   was the zone's props (the whole dungeon drawn from anywhere: 15,857 renderers, 56 million triangles) and its 186 mobs. Now in a zone
   with caves a prop more than 70 m from the camera is not drawn (`PropCull`), and a camp's idle mob more than 85 m from you sleeps
   (`EncounterEnemy.Dormant`; wakes at 75 m, or the moment a call, threat or foe reaches it; road patrols never sleep). Watch for pop-in in

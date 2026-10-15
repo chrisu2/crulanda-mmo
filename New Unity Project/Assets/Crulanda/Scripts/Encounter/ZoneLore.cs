@@ -145,8 +145,10 @@ namespace Crulanda.Encounter
             var names = new List<string>(); if (z == null) return names;
             Apply(z);
             if (z.life == null) return names;
-            foreach (var r in z.life.residents ?? new ZoneResident[0]) if (r != null && r.stories != null && r.stories.Length > 0 && !names.Contains(r.name)) names.Add(r.name);
-            foreach (var st in z.life.stories ?? new ZoneStory[0]) if (st != null && st.lines != null && st.lines.Length > 0 && !names.Contains(st.name)) names.Add(st.name);
+            // A person whose lines are all blank has no story (as Story() tells it): the test's "Blank", 2026-10-15 01:55.
+            bool Any(string[] lines) { if (lines == null) return false; foreach (var l in lines) if (!string.IsNullOrWhiteSpace(l)) return true; return false; }
+            foreach (var r in z.life.residents ?? new ZoneResident[0]) if (r != null && Any(r.stories) && !names.Contains(r.name)) names.Add(r.name);
+            foreach (var st in z.life.stories ?? new ZoneStory[0]) if (st != null && Any(st.lines) && !names.Contains(st.name)) names.Add(st.name);
             return names;
         }
     }

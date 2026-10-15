@@ -2,33 +2,42 @@
 
 ## Start here
 
-**Current state: the end of 2026-10-14** (Chris back from 10:43; his words verbatim in PLAYTEST_NOTES 179-188 and TONIGHT_2026-10-13.md).
-What was done, in order, is in `Docs/TONIGHT_2026-10-13.md` (Progress, 2026-10-14 11:40 on) and `Docs/CHANGELOG.md` (2026-10-14,
-11:40 on). Nothing is VERIFIED until Chris has seen it in his build.
-- **Branch:** `feet-bow-adit-kit`, PR #2. Do not merge to `main` without Chris. The Adit rework is on `adit-rework` (pushed, not merged).
-- **Published:** the release build of 18:23 at 18:24 (the butts facing their lanes, the woods clear of the seams, the puffs small; chainR76 14/14), after the release build of 16:28 at 16:33 (commit 4465b1da, the woods and the rest of CHANGELOG 2026-10-14 11:40 on) to `D:/crulanda-work/outputs/Crulanda-Playable`. Save backed up first: `D:/crulanda-work/save-backups/20261014-1633-before-woods-publish`.
-- **Tests (TESTED):** the final run (chainR72): EditMode 484/485, the full PlayMode suite 345/349 (two of the four fixed in the published build, see CHANGELOG), balance 43 of 43 builds in range, Oakhaven 109 a second. Known and parked: EliteFightTests needs a graphics device in batch mode;
-  GroundingTests (a sim's sole 2.8 cm up); VillageDayTests (Wat Stook's tool shaft through a leg while walking); the CraftPix boar's
-  EditMode test is inconclusive.
-- **Balance (TESTED):** all 49 builds in range (`D:/crulanda-work/outputs/balance/BALANCE_ALL.md`, and `balance-summary.csv` to sort).
-- **New today, for Chris to look at first:**
-  - **The wild woods** in every zone (Chris's "Elwynn" brief): Oakhaven's wild country wooded with its own trees, great oaks only in a
-    few dense old-forest patches, the floor open. Frames: `D:/crulanda-work/world-captures/oakhaven-21-the-mastwood.png`, `-37-lark-hill.png`,
-    `-38-sallow-bottom.png`. Frame rate in the tour: 109 a second (110 before the woods).
-  - **Kevin's melee, spell and work motions** and **every spell's effect**: `D:/crulanda-work/ui-captures/combat3/<class>/sheet-b.png`
-    (one tile an ability; `combat2` has every class). The hoe under the ploughing clip: `ui-captures/life-1014c/farmer-*-at-work-side.png`.
-  - **The archery butts** facing their lanes (`ui-captures/training-1014c/tf-01-yard.png`) and **the jaw trap** (`ui-captures/fixes-1014c`).
-  - **Real fire**: the Mage's fire spells and the camps' fires burn with Vefects' flames.
-- **The evening (18:55-20:40; PLAYTEST_NOTES 189-199, CHANGELOG "The evening's reports"):** the orc's legs in the air, the old oaks
-  in place of the half-size giants, the giants' roots, the kit's fallen trunks, fuller glades, **the buff row and the Nerve panel**,
-  the birds' hops, the Morro villagers on their own avatars again, the forge's sparks off, the barn, the glint fade, **Quit** (pause
-  menu, `/exit`, `/quit`), **the shepherds** (Tam and Nell Sedge at Oakhaven's two folds: the count, the shearing, the fleeces to the
-  stall, the feed), the combat capture inside the yard. Published at 19:42 (the fixes to 20:00) and at
-  19:54 (the shepherds, the inn's tables, the capture; saves backed up to `save-backups/20261014-1942-...` and `-1954-...`). The inn's tables and benches stood up again (the
-  Fantasy pack's root turn kept in ModelProp; KitPropTests): `world-captures/oakhaven-99-inn-drinkers-night.png`. The Old Fold's
-  flock inside its walls, the shepherd shearing: `oakhaven-23-the-old-fold-night.png`.
-- **Next, in order:** Chris's reactions to the above; the Adit rework (below); the Stylized Newbie Weapons Pack (skinned meshes: a bake
-  before they can be held); the older list.
+**Current state: the night of 2026-10-14, 23:00** (Chris away from 20:30: "keep working till 11pm then backup, publish, and create a
+handoff. i wont be here to approve anything so you have full reign. shutdown at 11pm"). His words of the day verbatim in
+PLAYTEST_NOTES 179-199; what was done, in order, in `Docs/CHANGELOG.md` (2026-10-14, 11:40 on, and "The evening's reports").
+Nothing is VERIFIED until Chris has seen it in his build.
+- **Branch:** `feet-bow-adit-kit`, PR #2, pushed. Do not merge to `main` without Chris. The Adit rework is on `adit-rework` (worktree
+  `D:\code\mmo-adit`, pushed, not merged).
+- **Published (the playable build):** 19:54, the build of 19:51; the same build again at 20:12 (nothing newer). Saves backed up to
+  `D:/crulanda-work/save-backups/20261014-1954-before-shepherd-publish` and `-2012-before-night-publish`. It holds everything below.
+- **New today, for Chris to look at first (all BUILT, OPEN until he sees them):**
+  - **The wild woods** in every zone (the "Elwynn" brief): the zone's own trees as one canopy, old oaks (the broadleaf grown large,
+    not the half giant) only in the dense old-forest patches, fallen trunks the kit's dead trees, fuller glades. Frames:
+    `D:/crulanda-work/world-captures/oakhaven-21-the-mastwood.png`, `-37-lark-hill.png`, `-38-sallow-bottom.png`. Tour 111 a second.
+  - **Kevin's melee, spell and work motions** and **every spell's effect**: `D:/crulanda-work/ui-captures/combat3/<class>/sheet-b.png`;
+    the Scoundrel inside the yard: `ui-captures/combat5/scoundrel`.
+  - **The buff row** by the frames and **the Nerve panel** (movable): `ui-captures/combat4/scoundrel/10-scoundrel_rallying_verse-b.png`.
+  - **The inn's tables and benches standing** (the Fantasy pack's root turn kept in ModelProp; every table, bench, stool and mug of
+    that pack had lain on its side): `world-captures/oakhaven-99-inn-drinkers-night.png`.
+  - **The shepherds** Tam and Nell Sedge at Oakhaven's two flocks (the count at the gate, the shearing, the fleeces to the stall, the
+    afternoon feed; the merchant offers fleeces), the Old Fold's flock inside its walls: `world-captures/oakhaven-23-the-old-fold-night.png`.
+  - **Quit**: the pause menu's "Quit game", `/exit` and `/quit` (saved first, out of combat).
+  - Also: the orc's legs run in the air, the giants' roots, the birds' hops, the Morro villagers on their own avatars (the farmer's
+    sack and the skinner's bundle in their hands), the forge's sparks off, the barn's sill and turn, a poor drop's glint fading.
+- **Tests (TESTED):** the full PlayMode suite 345/349 at 16:33 (chainR72; see CHANGELOG); after that only the classes each change
+  touched (test-budget: Chris, "you just tested for 7 hours"): chainR76 14/14, R78 17/17, R79 EditMode 16/16 and PlayMode 15/16
+  (the home test's count, fixed). Balance 49 of 49 builds in range (`D:/crulanda-work/outputs/balance/balance.html`, the page Chris sorts).
+- **The Adit rework (`adit-rework`; ADIT_REWORK.md section 18):** the evening's runs took it from 18/29 Adit PlayMode classes to
+  20/29 at 20:06 and 19/29 after (one test, the fixture trestle's rail raycast, went red when the deck blocks were
+  named and not yet looked at); EditMode 44/44. The decks are whole and joined; the big find at 20:55 was that every branch cave's floor was cut off a few metres past
+  its mouth by its parent's knoll and shell (faces metres wide crossing the passage with their middles in the rock): `ZoneBuilder.Cut`
+  now drops a face with a corner inside another passage. That lifted the Sunless River (9 to 59 of 341 samples reached) and the Dry Ledge (0 to 54) but not the
+  Pen, the Cutting Drift, the Foundry, the Muster Yard, the Chapel or the Breach: the next session starts by reading the R87 map
+  (`adit-nav-diagnostics-R87.txt`), which names what the line from the nearest reached sample to the first unreached one meets. The diagnostics (`AditNavDiagnostics`, lane A) write
+  `D:/crulanda-work/encounter-validation/adit-nav-diagnostics.txt`: the deck tables, a floor map of every hall (reached from the yard
+  or not, what stands by the first unreached sample), each gate's crossing. Run the Adit set with a copy of `D:\crulanda-work\chainR86.ps1`.
+- **Next, in order:** Chris's reactions to the above; the Adit (section 18's "still red"); the Stylized Newbie Weapons Pack (skinned
+  meshes: a bake before they can be held); the fixture test's knoll ray; the older list below.
 
 ## Oct 12 night (history; these runs were stopped and replaced on Oct 13)
 

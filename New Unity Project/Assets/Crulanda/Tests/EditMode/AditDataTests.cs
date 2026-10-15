@@ -33,7 +33,7 @@ namespace Crulanda.Tests
         /// <summary>Every camp's mob, and the elites' mobs (what "kill:", "loose:", opensOn and lord may name).</summary>
         static HashSet<string> mobs, elites;
         /// <summary>Event keys the code raises without a ZoneEvent (Docs/ADIT_REWORK.md E4: taking the keg releases Hobb and his sappers).</summary>
-        static readonly string[] CodeEvents = { "powder" };
+        static readonly string[] CodeEvents = { "powder", "haul1", "haul2" };   // (S6) the barge's crew up out of the hold to Danner's calls once the Haul has her afloat (EncounterSession.Haul)
 
         [OneTimeSetUp] public void Load()
         {
@@ -277,8 +277,10 @@ namespace Crulanda.Tests
                 Assert.IsTrue(full.Any(s => s.camps.Any(i => zone.camps[i] == c)), "the full run fights " + c.name);
             // The web: in at the Workings, the only wing after nothing; out by the Deep Way, after the Wake, which waits for the four wings
             // before it; one side of the vent fork (the Scriptorium or the Muster Yard) in the quick run, both in the full.
-            Assert.AreEqual("The Old Workings", quickOrder.First()); Assert.AreEqual("The Deep Way", quickOrder.Last());
-            Assert.AreEqual("The Old Workings", fullOrder.First()); Assert.AreEqual("The Deep Way", fullOrder.Last());
+            // (S6) The run ends in the Black Cove, after the Deep Way (Danner on his barge); the full run may take the Pitch Pit off the Rail Hall last.
+            Assert.AreEqual("The Old Workings", quickOrder.First()); Assert.AreEqual("The Black Cove", quickOrder.Last());
+            Assert.AreEqual("The Old Workings", fullOrder.First()); Assert.Contains(fullOrder.Last(), new[] { "The Black Cove", "The Pitch Pit" }, string.Join(", ", fullOrder));
+            Assert.Less(quickOrder.IndexOf("The Deep Way"), quickOrder.IndexOf("The Black Cove")); Assert.Less(fullOrder.IndexOf("The Deep Way"), fullOrder.IndexOf("The Black Cove"));
             Assert.AreEqual(1, quickOrder.Count(w => w == "The Scriptorium" || w == "The Muster Yard"), "one side of the fork: " + string.Join(", ", quickOrder));
             Assert.AreEqual(2, fullOrder.Count(w => w == "The Scriptorium" || w == "The Muster Yard"), "both sides of the fork: " + string.Join(", ", fullOrder));
             Assert.Less(fullOrder.IndexOf("The Geode Foundry"), fullOrder.IndexOf("The Deep Way")); Assert.Less(fullOrder.IndexOf("The Grey Breach"), fullOrder.IndexOf("The Deep Way"));

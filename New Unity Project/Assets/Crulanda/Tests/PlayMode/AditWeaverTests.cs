@@ -16,10 +16,11 @@ using Crulanda.World;
 namespace Crulanda.Tests
 {
     /// <summary>
-    /// The Weaver's unlocking (DUNGEON_DESIGN.md section 4, dungeon step D4): with The Pressed done, Danner lies in the dark and the goblin who
-    /// opens the platform gate quietly is Mother Quillet, who waits by it as one of your party; spoken to, she walks to the carriage's lock with
-    /// two waves coming for her and Danner standing up at half the lock; matched, the geodes go dark, "adit.lock" is kept and Pib's quest moves
-    /// on; if she falls the waves go back into the dark and she is by the gate again a little later.
+    /// The Weaver's unlocking (DUNGEON_DESIGN.md section 4, dungeon step D4): with The Pressed done, the goblin who opens the platform gate
+    /// quietly is Mother Quillet, who waits by it as one of your party; spoken to, she walks to the carriage's lock with two waves coming for
+    /// her; matched, the geodes go dark, "adit.lock" is kept and Pib's quest moves on; if she falls the waves go back into the dark and she is
+    /// by the gate again a little later. (S6, the Black Cove: Danner keeps the stern castle of his barge down the Dead Line, so he no longer
+    /// lies in the hall's dark nor stands up at half the lock; ADIT_REWORK.md section 20.)
     /// </summary>
     public class AditWeaverTests
     {
@@ -80,11 +81,12 @@ namespace Crulanda.Tests
             }
         }
 
-        [UnityTest] public IEnumerator A_quiet_gate_brings_Mother_Quillet_and_Danner_lies_in_the_dark()
+        [UnityTest] public IEnumerator A_quiet_gate_brings_Mother_Quillet_and_Danner_keeps_his_barge()
         {
-            var danner = Danner(); Assert.NotNull(danner, "Danner is in the hall");
-            Assert.IsTrue(danner.Hidden, "he lies in the dark while the escort can happen");
-            Assert.IsFalse(danner.CanAnswer, "and no call draws him out");
+            var danner = Danner(); Assert.NotNull(danner, "Danner is in the Adit");
+            Assert.IsTrue(session.CoveFinale, "(S6) his camp stands in the Black Cove");
+            Assert.AreEqual("The Black Cove", session.Zone.Zone.camps[danner.CampIndex].cave, "on his barge");
+            Assert.IsFalse(danner.Hidden, "he does not lie in the hall's dark: he is on his stern castle");
             Assert.IsNull(session.Weaver, "nobody at the gate yet");
             var gate = Thing("platformgate");
             session.UseInteractable(gate); yield return Frames(3);
@@ -97,7 +99,7 @@ namespace Crulanda.Tests
             var path = new NavMeshPath();
             Assert.IsTrue(NavMesh.CalculatePath(w.Gate, w.LockAt, NavMesh.AllAreas, path) && path.status == NavMeshPathStatus.PathComplete, "a way down the platform to the lock");
             Assert.Less(Vector3.Distance(w.LockAt, session.Zone.RailLock), 2, "she stands at the lock, by the carriage");
-            Assert.Greater(Vector3.Distance(w.LockAt, danner.transform.position), 9, "out of Danner's notice: he waits for the half-way mark");
+            Assert.Greater(Vector3.Distance(w.LockAt, danner.transform.position), 100, "Danner is far down the Dead Line, out of it all");
             Assert.IsFalse(CarriageDark, "the carriage's geodes glow");
         }
 
@@ -118,7 +120,7 @@ namespace Crulanda.Tests
             session.UseInteractable(w.talk); yield return null;
             Assert.AreEqual(AditWeaver.Stage.Walking, w.Now, "spoken to, she sets off");
             // Each of the waves' people is cut down as soon as it picks someone to fight; Danner too, once he is up.
-            var cameFor = new Dictionary<EncounterEnemy, Actor>(); float leftAtFirst = -1, leftAtSecond = -1, matchedWhenRose = -1; Actor dannerFor = null;
+            var cameFor = new Dictionary<EncounterEnemy, Actor>(); float leftAtFirst = -1, leftAtSecond = -1; Actor dannerFor = null;
             // On until the lock is matched AND both waves have come for her (the test's lock is short: the second wave, out of the far dark,
             // can still be on its way when she is done), with a time limit (2026-10-10: the drawn-out Adit; a review Chris pasted).
             float waveSpeed = 0;
@@ -134,7 +136,6 @@ namespace Crulanda.Tests
                     if (e.Victim == null) continue;
                     cameFor[e] = e.Victim; e.actor.Health.ApplyDamage(e.actor.Health.Pool.Max * 3);
                 }
-                if (matchedWhenRose < 0 && !danner.Hidden) matchedWhenRose = w.Matched;
                 if (guard != null && guard.Activity == "Guarding " + AditWeaver.Name) guarded = true;
                 if (dannerFor == null && danner.actor.IsAlive && danner.Victim != null) { dannerFor = danner.Victim; danner.actor.Health.ApplyDamage(danner.actor.Health.Pool.Max * 3); }
             });
@@ -150,8 +151,8 @@ namespace Crulanda.Tests
 
             Assert.That(leftAtFirst, Is.InRange(AditWeaver.Wave1At - 3, AditWeaver.Wave1At + .5f), "the first wave as she nears the carriage");
             Assert.That(leftAtSecond, Is.InRange(AditWeaver.Wave2At - 3, AditWeaver.Wave2At + .5f), "the second when she is close");
-            Assert.That(matchedWhenRose, Is.InRange(.5f, .7f), "Danner stood up with the lock half matched");
-            Assert.AreSame(w.actor, dannerFor, "and came for her");
+            Assert.IsNull(dannerFor, "(S6) Danner never came for her: he keeps his barge in the Black Cove");
+            Assert.IsFalse(danner.Hidden, "and never lay hidden");
             Assert.IsTrue(guarded, "the sim guarded her on the way (D7)");
             Assert.Contains(EncounterSession.WeaverLock, session.Progress.keys, "kept for good");
             Assert.IsTrue(CarriageDark, "the geodes have gone dark");

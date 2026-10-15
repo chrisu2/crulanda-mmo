@@ -150,6 +150,7 @@ namespace Crulanda.Encounter
         {
             if (lord == null || lord.Move == null || puller == null || lord.CampIndex < 0) return 0;
             int n = 0; List<EncounterEnemy> kin = null;
+            int hold = HaulCall(lord, puller);   // (S6) the barge afloat: two of her crew up out of the hold to each of Danner's calls (EncounterSession.Haul.cs)
             foreach (var e in Enemies)
             {
                 if (e == null || e == lord || e.CampIndex < 0 || !e.CanAnswer) continue;
@@ -166,7 +167,7 @@ namespace Crulanda.Encounter
                 int most = lord.Move.callMost > 0 ? Mathf.Min(lord.Move.callMost, kin.Count) : kin.Count;
                 for (int i = 0; i < most; i++) { kin[i].Answer(lord, puller, SocialAggro.CallBeat + SocialAggro.CallStagger * n); n++; }
             }
-            if (n == 0) return 0;
+            if (n == 0 && hold == 0) return 0;
             if (!string.IsNullOrEmpty(lord.Move.callShort)) FloatText(lord.transform.position + Vector3.up * .5f, lord.Move.callShort, new Color(1, .82f, .35f));
             Message(lord.Move.call);
             return n;

@@ -274,8 +274,27 @@ CAVES = [
         (-62, 330, 2.5, 3.5, None), (-64, 336, 2.5, 3.5, -100), (-70, 346, 2.5, 3.5, -102), (-80, 354, 2.5, 3.5, -104.5), (-92, 360, 8, 6, -106),
         (-104, 362, 10, 7, -106), (-114, 360, 8, 6, -106)],
         within='D', canon='GAME-ONLY'),
+    # (S6, the Deadmines end-piece; Chris 2026-10-15, Q3 "Build the Cove") DL The Dead Line: the old line runs on west out of the Rail
+    # Hall's far end, a rail tunnel falling gently, with two sidings where the rearguard and the spare wagons stand.
+    Cave('DL', 'The Dead Line', 'deadline', [
+        (-88, 302, 4.5, 5.5, None), (-96, 302, 4.5, 5.5, -100), (-104, 302, 4.5, 5.5, -100.5), (-118, 301, 4.5, 5.5, -102), (-134, 300, 9, 7, -103.5),
+        (-146, 299, 9, 7, -104.5), (-158, 298, 4.5, 5.5, -105.5), (-178, 296, 4.5, 5.5, -107.5), (-198, 293, 4.5, 5.5, -109), (-214, 290, 9, 7, -110.5),
+        (-226, 287, 9, 7, -111.5), (-238, 283, 4.5, 5.5, -112.5), (-250, 276, 4.5, 5.5, -113.5), (-258, 268, 4.5, 5.5, -114)],
+        within='D', canon='CANON-EXPANDED: the mag-rail line south under the range (book2 ch.19); GAME-ONLY: this stretch, its sidings and all in it'),
+    # BC The Black Cove: off the Dead Line's end, a beach of black scree down into a great natural cave of still black water, 88 m across
+    # and 36 high; the quay along its west wall, the scaffold, the moored ore barge and its stern castle; the drain at its south end,
+    # where the water goes out under the range. Swim water (the flood), 2.6 m deep over a floor 121 m under the yard.
+    Cave('BC', 'The Black Cove', 'cove', [
+        (-252, 274.5, 4.5, 5.5, None), (-262, 262, 5, 6, -114), (-272, 250, 9, 9, -114.3), (-284, 238, 22, 20, -115), (-294, 224, 36, 28, -117),
+        (-302, 208, 42, 34, -119.5), (-304, 190, 44, 36, -121), (-304, 165, 44, 36, -121), (-304, 140, 42, 34, -121), (-302, 120, 30, 26, -121),
+        (-299, 106, 14, 14, -121), (-298, 98, 6, 8, -121)],
+        within='DL', canon='GAME-ONLY (the Black Cove, its quay, the barge and all in it; the Sandthrone are CANON)'),
 ]
 CAVE = {c.key: c for c in CAVES}
+# (S6) Danner's finale in the Black Cove (his camp and his guard on the stern castle; no rising in the Weaver's escort; the carriage rides
+# once the lock is matched or he is dead: EncounterSession.Haul.cs reads it from where his camp stands). False keeps him in the Rail Hall
+# as before S6 (Docs/ADIT_REWORK.md section 11, S6: until the Cove's own group run passes; then revert the two quest texts of section 20).
+COVE_FINALE = True
 
 def build_caves():
     Cave.ALL[:] = []
@@ -299,8 +318,9 @@ def along(key, x, z): return A(key, x, z)[0]
 
 # ---------------------------------------------------------------- decks (ADIT_REWORK sections 3; timber, stone, rope and rubble, no machines)
 DECKS = []
-def deck(name, key, start, end=None, aside=0.0, aside2=None, rise=0.0, rise2=None, width=3.0, style='timber', rails=None, radius=0.0, solid=False, wall=0, canon='GAME-ONLY'):
-    """start/end: world (x, z) on the cave's line, or a number (an along)."""
+def deck(name, key, start, end=None, aside=0.0, aside2=None, rise=0.0, rise2=None, width=3.0, style='timber', rails=None, radius=0.0, solid=False, wall=0, canon='GAME-ONLY', free=()):
+    """start/end: world (x, z) on the cave's line, or a number (an along). free: the ends ('start', 'end') that stop in the open on purpose
+    (a barge's bow and her stern castle's back, railed): check 6 lets them be."""
     def al(p): return p if isinstance(p, (int, float)) else along(key, *p)
     f = al(start); t = f if end is None else al(end)
     d = dict(name=name, cave=CAVE[key].name, style=style, wall=wall, **{'from': round(f, 2)}, to=round(t, 2), aside=aside, aside2=aside if aside2 is None else aside2,
@@ -308,7 +328,7 @@ def deck(name, key, start, end=None, aside=0.0, aside2=None, rise=0.0, rise2=Non
     if rails: d['rails'] = rails
     if radius: d['radius'] = radius
     if solid: d['solid'] = True
-    d['_key'] = key
+    d['_key'] = key; d['_free'] = tuple(free)
     DECKS.append(d); return d
 
 def make_decks():
@@ -351,6 +371,46 @@ def make_decks():
     deck('The north ramp', F2, (160, 13), (178, 13), aside=-16.5, rise=12, rise2=6, width=3)
     deck('The walkway', F2, (178, 13), (204, 13), aside=-16.5, rise=6, width=3)
     deck('The far ramp', F2, (204, 13), (222, 13), aside=-16.5, aside2=-10, rise=6, rise2=0, width=3)
+    if 'BC' in CAVE: cove_decks()
+
+# (S6) The Black Cove's works: heights over its black water (the flood's surface, WATER_Y), asides to the right going south (west).
+WATER_Y = -121 + 2.6      # the cove's floor and the flood's depth (make_works)
+QUAY_Y, TIER1_Y, TIER2_Y = WATER_Y + .8, WATER_Y + .8 + 2.2, WATER_Y + .8 + 3.4
+BARGE_Y, CASTLE_Y = WATER_Y + 4.2, WATER_Y + 7.5
+QUAY_A, SCAFF_A, BARGE_A, STAIR_A = 28.5, 22.5, 14.5, 11.0
+def cz(z):
+    """The Black Cove's along where its line crosses z (it runs south down x about -304)."""
+    return along('BC', -304, z)
+def rise_to(key, at, top):
+    """The rise over a cave's floor (its middle, at that along) that puts a deck's end at the height top."""
+    return round(top - CAVE[key].at_(at)[1], 2)
+
+def cove_decks():
+    """The quay along the west wall from the beach; the scaffold beside the barge (tier 1 at quay +2.2, a ramp at its north end; tier 2 at
+    +3.4, its ramp at the south end: the ramps alternate ends); the gangway from tier 2 onto the barge's deck; the barge (45 m by 10, deck
+    at water +4.2: a solid plank-and-iron hull from the cove's floor) and her stern castle (+7.5) with a stair up its east side; the scree
+    landing stage at the quay's south end, where a swimmer climbs out. Timber, rope and rubble, hand-worked: no machine (0.05)."""
+    B = 'BC'; shore = 74.0   # where the beach's floor comes up to the quay's height
+    q0, q1 = shore, cz(146)
+    deck('The quay', B, q0, q1, aside=QUAY_A, rise=rise_to(B, q0, QUAY_Y), rise2=rise_to(B, q1, QUAY_Y), width=8, rails='left')
+    r0, r1 = cz(208), cz(200)
+    deck('The scaffold ramp (north)', B, r0, r1, aside=QUAY_A - 4, aside2=SCAFF_A, rise=rise_to(B, r0, QUAY_Y), rise2=rise_to(B, r1, TIER1_Y), width=3)
+    t0, t1 = r1, cz(176)
+    deck('The scaffold, tier 1', B, t0, t1, aside=SCAFF_A, rise=rise_to(B, t0, TIER1_Y), rise2=rise_to(B, t1, TIER1_Y), width=3)
+    u0, u1 = t1, cz(170)
+    deck('The scaffold ramp (south)', B, u0, u1, aside=SCAFF_A, rise=rise_to(B, u0, TIER1_Y), rise2=rise_to(B, u1, TIER2_Y), width=3)
+    v0, v1 = u1, cz(160)
+    deck('The scaffold, tier 2', B, v0, v1, aside=SCAFF_A, rise=rise_to(B, v0, TIER2_Y), rise2=rise_to(B, v1, TIER2_Y), width=3, free=('end',))
+    g = cz(166)
+    deck('The gangway', B, g, aside=SCAFF_A, aside2=BARGE_A + 2, rise=rise_to(B, g, TIER2_Y), width=2.6, rails='both')
+    b0, b1 = cz(200), cz(165)
+    deck('The ore barge', B, b0, b1, aside=BARGE_A, rise=rise_to(B, b0, BARGE_Y), rise2=rise_to(B, b1, BARGE_Y), width=10, solid=True, free=('start', 'end'))
+    s0, s1 = cz(177), cz(165)
+    deck("The stern castle's stair", B, s0, s1, aside=STAIR_A, rise=rise_to(B, s0, BARGE_Y), rise2=rise_to(B, s1, CASTLE_Y), width=3)
+    c0, c1 = cz(165), cz(155)
+    deck('The stern castle', B, c0, c1, aside=BARGE_A, rise=rise_to(B, c0, CASTLE_Y), rise2=rise_to(B, c1, CASTLE_Y), width=10, solid=True, free=('start', 'end'))   # (its stair comes up its east side: check 6 holds the stair's end to it)
+    l0, l1 = q1, cz(136)
+    deck('The landing stage', B, l0, l1, aside=QUAY_A, rise=rise_to(B, l0, QUAY_Y), rise2=0, width=5, style='scree')
 
 # ---------------------------------------------------------------- water, drops, gates, anchors
 WATER, DROPS, GATES, ANCHORS = [], [], [], []
@@ -369,6 +429,8 @@ def make_works():
     stream('The wet way', 'R', (-16, 44.5), (-86, 39.5), 0, 5.8, 1.1)
     pool("The Lurker's Pool", 'R', -122, 39, 13, 1.3)
     pool('The drowned drift', 'B', 5, 102, 8, .5)
+    if 'BC' in CAVE:   # (S6) the Black Cove's black water, wall to wall over its floor, 2.6 m deep (swim): out from the beach to the drain
+        WATER.append(dict(name='The black water', cave=CAVE['BC'].name, **{'from': round(cz(196), 2)}, to=round(cz(108), 2), depth=2.6, flood=True))
     def drop(name, fk, fp, tk, tp, width=2.5, falls=False):
         fa, fs = A(fk, *fp); ta, ts = A(tk, *tp)
         d = dict(name=name, fromCave=CAVE[fk].name, toCave=CAVE[tk].name, **{'from': fa}, fromAside=fs, fromRise=0, to=ta, toAside=ts, toRise=0, width=width)
@@ -426,6 +488,18 @@ def make_works():
     anchor('powder bay', 'D', (53, 242))
     anchor('hall', 'D', (-2, 296))
     anchor('rail spirit stone', 'D', (40, 271), aside=7)   # just inside the platform gate, to the right of the way
+    # (S6) Where the carriage stands in the Rail Hall: 14 m short of Danner's old camp, as ZoneBuilder.Adit's RailHall put it while he
+    # stood there (so the Weaver's lock, her waves and the mules stand where they did now that he keeps the barge).
+    anchor('carriage', 'D', round(A('D', -66, 302)[0] - 14, 2), aside=0)
+    if 'BC' in CAVE:
+        B = 'BC'
+        anchor('cove', B, cz(190), aside=0)
+        anchor('haul', B, cz(208), aside=QUAY_A, rise=rise_to(B, cz(208), QUAY_Y))                  # the quay's north end: the haul starts as you come onto it
+        anchor('bollards north', B, cz(204), aside=QUAY_A - 3, rise=rise_to(B, cz(204), QUAY_Y))    # the bow's warps
+        anchor('bollards south', B, cz(156), aside=QUAY_A - 3, rise=rise_to(B, cz(156), QUAY_Y))    # the stern's warps
+        anchor('barge bow', B, cz(198), aside=BARGE_A, rise=rise_to(B, cz(198), BARGE_Y))
+        anchor('stern castle', B, cz(160), aside=BARGE_A, rise=rise_to(B, cz(160), CASTLE_Y))
+        anchor('drain', B, cz(112), aside=0)
 
 # ---------------------------------------------------------------- camps (ADIT_REWORK section 4; the array's head is pinned: no save moves)
 S = 'GAME-ONLY band; CANON company (Sandthrone)'
@@ -476,6 +550,32 @@ LUSK, NIX, YSOLT, FOREMAN = 'Gang-Boss Haddo Lusk', 'Nix, the turncoat', 'Cinder
 SORREL, DANNER, SABEL, WHISPERER, HOLLOWSONG = 'Quartermaster Brannigan Sorrel', 'Rail-Captain Orsk Danner', 'Urn-Keeper Sabel', 'The Grey Whisperer', 'Brother Hollowsong'
 LDOOR, SDOOR, PGATE, PEN = "Lusk's door", 'The singing door', 'The platform gate', 'The pen gate'
 
+def deck_camp(key, at, top, d, wing, step=0, aside=0.0, **kw):
+    """A camp standing on a deck whose top is at height top (its rise over the cave's floor there written from it)."""
+    a = at if isinstance(at, (int, float)) else along(key, *at)
+    return camp(key, ('al', a, aside), d, wing, step, rise=rise_to(key, a, top), **kw)
+
+def danner_camps():
+    """(S6) Rail-Captain Danner and his guard on the stern castle of the ore barge in the Black Cove (pinned 15 and 16)."""
+    B = 'BC'
+    return [deck_camp(B, cz(158), CASTLE_Y, mob("Rail-Captain's guard", 'Sandthrone platform guard', 'outrider', 2, 12, 12, 'platformguard', 1.2), 'cove', 5, aside=BARGE_A - 2.5, gate=PGATE),   # 15
+            deck_camp(B, cz(160.5), CASTLE_Y, mob(DANNER, DANNER, 'outrider', 1, 12, 12, 'railcaptain', 1, canon='GAME-ONLY', elite=True, harder=True, guards="Rail-Captain's guard"), 'cove', 5, aside=BARGE_A + 1.5, gate=PGATE)]   # 16
+
+BG = "GAME-ONLY band (the barge's crew); CANON company (Sandthrone)"
+def cove_camps():
+    """(S6) The Dead Line's rearguard; the Black Cove's two rope teams on the quay (the Haul: hand over hand on the warps round the bollards),
+    the harbour netters on the scaffold (Weighted Net), and the bargemen who come up out of the hold to Danner's calls once the haul has her
+    off the bar (released by EncounterSession.Haul: event:haul1, event:haul2). No machine: ropes, timber bollards, hands."""
+    B = 'BC'
+    return [
+        camp('DL', (-140, 299.5), mob('Siding rearguard', 'Sandthrone docker', 'deserter', 3, 12, 12, 'docker', 2.5), 'cove', 1, aside=2, gate=PGATE),
+        deck_camp(B, cz(214), QUAY_Y, mob('Rope team (north)', 'Sandthrone bargeman', 'deserter', 3, 12, 12, 'bargeman', 1.6, canon=BG), 'cove', 2, aside=QUAY_A - 1, gate=PGATE),
+        deck_camp(B, cz(188), TIER1_Y, mob('Harbour netters', 'Sandthrone harbour netter', 'deserter', 3, 12, 12, 'netter', 1.1, canon=BG), 'cove', 3, aside=SCAFF_A, gate=PGATE),
+        deck_camp(B, cz(152), QUAY_Y, mob('Rope team (south)', 'Sandthrone bargeman', 'deserter', 3, 12, 12, 'bargeman', 1.6, canon=BG), 'cove', 4, aside=QUAY_A - 1, gate=PGATE),
+        deck_camp(B, cz(186), BARGE_Y, mob('Up from the hold (first)', 'Sandthrone bargeman', 'deserter', 2, 12, 12, 'bargeman', 1.5, canon=BG), 'cove', after='event:haul1', aside=BARGE_A, gate='none'),
+        deck_camp(B, cz(180), BARGE_Y, mob('Up from the hold (second)', 'Sandthrone bargeman', 'deserter', 2, 12, 12, 'bargeman', 1.5, canon=BG), 'cove', after='event:haul2', aside=BARGE_A, gate='none'),
+    ]
+
 def make_camps():
     pick = lambda **kw: kw
     # --- the pinned head, 0-31 (their places in the Adit as it was: elitesSlain "mob.<tag>.adit.<i>" keeps)
@@ -491,12 +591,13 @@ def make_camps():
         camp('G', (34, -3.5), mob('Landing guard', 'Sandthrone watchman', 'outrider', 3, 11, 11, 'watchman', 1.2), 'ledge', 1, rise=12, gate=LDOOR),               # 8
         camp('G', (62, -3.5), mob('Bridge-tower crossbows', 'Sandthrone picket', 'deserter', 2, 11, 11, 'picket', .9), 'ledge', 2, rise=12, gate=LDOOR),         # 9
         camp('D', (14, 288), mob('Platform guards', 'Sandthrone platform guard', 'outrider', 3, 12, 12, 'platformguard', 3), 'deep', 6, aside=14, gate=PGATE),  # 10
-        camp('D', (36, 278), mob('Siding dockers', 'Sandthrone docker', 'deserter', 4, 12, 12, 'docker', 3), 'deep', 4, aside=10, gate=PGATE),                   # 11
+        camp('D', (36, 278), mob('Siding dockers', 'Sandthrone docker', 'deserter', 4, 12, 12, 'docker', 3), 'deep', 4, aside=10, gate=PGATE, optional=COVE_FINALE),   # 11 (S6: off the quick run, for the Cove's time: Q2)
         camp('D', (-25, 300), mob("Quartermaster's guards", 'Sandthrone platform guard', 'outrider', 2, 12, 12, 'platformguard', 1.5), 'deep', 7, aside=12, gate=PGATE),   # 12
         camp('D', (-28, 300), mob(SORREL, SORREL, 'outrider', 1, 12, 12, 'railquartermaster', 1, canon='GAME-ONLY', elite=True, guards="Quartermaster's guards"), 'deep', 7, aside=14, gate=PGATE),   # 13
         camp('D', (-45, 300), mob('Carriage gunners', 'Sandthrone carriage gunner', 'outrider', 3, 12, 12, 'gunner', 2), 'deep', 5, aside=-12, gate=PGATE),     # 14
+        *(danner_camps() if COVE_FINALE else [
         camp('D', (-62, 302), mob("Rail-Captain's guard", 'Sandthrone platform guard', 'outrider', 2, 12, 12, 'platformguard', 1.5), 'deep', 8, aside=-5, gate=PGATE),   # 15
-        camp('D', (-66, 302), mob(DANNER, DANNER, 'outrider', 1, 12, 12, 'railcaptain', 1, canon='GAME-ONLY', elite=True, harder=True, guards="Rail-Captain's guard"), 'deep', 8, aside=0, gate=PGATE),   # 16
+        camp('D', (-66, 302), mob(DANNER, DANNER, 'outrider', 1, 12, 12, 'railcaptain', 1, canon='GAME-ONLY', elite=True, harder=True, guards="Rail-Captain's guard"), 'deep', 8, aside=0, gate=PGATE)]),   # 16
         camp('F1', (140, -44), mob('The cutting floor', 'Sandthrone geode-cutter', 'outrider', 3, 11, 11, 'cutter', 4), 'foundry', 1, gate=LDOOR),               # 17
         camp('F1', (199, -34), mob('Haul-drift porters', 'Sandthrone geode-carrier', 'outrider', 3, 11, 11, 'carrier', 1.6), 'foundry', 2, gate=LDOOR),         # 18
         camp('F2', (186, 13), mob('Catwalk sorters', 'Sandthrone sorter', 'deserter', 3, 11, 11, 'sorter', 1.2), 'foundry', 3, rise=12, aside=16.5, gate=LDOOR), # 19
@@ -587,6 +688,9 @@ def make_camps():
         camp('KP', (-106, 362), mob('Old Kettle, the pitch-boiler', 'Old Kettle, the pitch-boiler', 'deserter', 1, 13, 13, 'kettle', 1, canon='GAME-ONLY', elite=True, guards='Pitch-gangers'), 'pitch', gate=PGATE, optional=True),
         # The Old Burrower (optional, passive): it wanders a loop round the Lurker's Pool.
         patrol('R', None, None, mob('The Old Burrower', 'The Old Burrower', 'bear', 1, 13, 13, 'burrower', 1.5, canon='GAME-ONLY (the Rock-Eater\'s wild kin)', elite=True, guards='none', social='solitary', passive=True, optional=True), 'river', gate=LDOOR, loop=ring_route(-122, 39, 17.5, 12)),
+        # (S6) The Dead Line and the Black Cove: after every camp of the rework, so none before them moves (only the patrols and the rare
+        # Quiet Miner, at the end, move on six places).
+        *(cove_camps() if COVE_FINALE else []),
     ]
     patrols = [
         patrol('W', (0.5, -348), (-1, -322), mob('Drift patrol', 'Sandthrone picket', 'deserter', 2, 10, 10, 'picket', 1.2), 'workings', gate='none'),
@@ -627,7 +731,7 @@ WINGS = [
     dict(id='wake', name='The Wake', after='foundry,chapel,breach,floor', home='island'),
     dict(id='deep', name='The Deep Way', after='wake'),
     dict(id='pitch', name='The Pitch Pit', after='deep', optional=True),
-]
+] + ([dict(id='cove', name='The Black Cove', after='deep', exit='walk')] if COVE_FINALE else [])
 EVENTS = [dict(id='wake', kind='hold', wing='wake', anchor='island', step=1,
                waves=[dict(at=15, camp='Wake porters'), dict(at=60, camp='Wake zealots'), dict(at=105, camp='Wake crawlers'), dict(at=150, camp=HOLLOWSONG)])]
 
@@ -680,6 +784,10 @@ def make_secrets():
             text='In the Lurker\'s Pool, under a hand of black water, a leather purse snagged on a rock. Somebody\'s month of pay.', xp=80, gold=35),
         inc('ember_cap', 'Ember-Cap', 'herb', 'VC', (89, 120), prompt='Pick the ember-cap', aside=-2.2,
             text='Low on the cloister stair\'s wall, where the chapel\'s heat seeps through the rock: a cluster of small red caps that glow like coals.', xp=90),
+        *([inc('scaffold_a', "A Rigger's Tin", 'cache', 'BC', (-304, 181), prompt='Search under the scaffold planks', aside=SCAFF_A, rise=rise_to('BC', cz(181), TIER1_Y),
+               text="Wedged under a loose plank of the scaffold's first tier, a rigger's tin: twine, a marlinspike and a twist of coins against a wet week.", xp=60, gold=20),
+           inc('scaffold_b', 'The Gangway Purse', 'cache', 'BC', (-304, 162), prompt='Feel along the beam under the top tier', aside=SCAFF_A, rise=rise_to('BC', cz(162), TIER2_Y),
+               text='Hung on a nail under the top tier, where the bargemen go aboard, a purse nobody has come back for.', xp=60, gold=30)] if 'BC' in CAVE else []),
         inc('kettle_tally', "A Pitch-Boiler's Tally", 'note', 'D', (38, 274), prompt='Read the tally chalked on the board', aside=-8,
             text='A board leaned against the platform\'s end, chalked with barrels of pitch and the name of whoever boils it: "Old Kettle, north-west, past the sleepers."',
             document='doc.adit.kettle_tally', xp=70),
@@ -689,7 +797,8 @@ PLACES = [   # landmarks (named like their caves, the maps show each one's level
     ('The Sealed Adit', (0, -368), 6), ('The Cage Bowl', (-2, -292), 14), ("Lusk's Tally Hall", (0, -177), 12), ('The Flooded Working', (-60, -238), 10),
     ('The Pen', (56, -181), 8), ('The Singing Gallery', (62, 18), 18), ('The Geode Foundry', (186, 13), 18), ('The Ash Garden', (158, 62), 15),
     ('The Scriptorium', (172, 116), 12), ('The Muster Yard', (217, 106), 12), ('The Chapel of Embers', (130, 152), 16), ('The Sunless River', (-122, 39), 16),
-    ('The Grey Breach', (5, 102), 14), ('The Deep Way', (63, 154), 8), ('The Rail Hall', (-20, 300), 18)]
+    ('The Grey Breach', (5, 102), 14), ('The Deep Way', (63, 154), 8), ('The Rail Hall', (-20, 300), 18), ('The Dead Line', (-170, 297), 8),
+    ('The Black Cove', (-304, 185), 18)]
 
 # ---------------------------------------------------------------- checks
 def fail(msg): sys.exit('LAYOUT CHECK FAILED: ' + msg)
@@ -729,6 +838,9 @@ def check(camps, decks):
             if c.floored[i]: continue
             if c.parent and r[5] < 40: continue
             if c.join and r[5] > c.length - 45: continue
+            # (S6) a cave's closing end in the air of a branch opening out of it there (the Dead Line's end in the Black Cove's mouth): the
+            # branch's own floor carries on under it.
+            if any(o.parent is c and o.floor_at(r[0], r[1]) is not None and abs(o.floor_at(r[0], r[1]) - r[4]) < 1 for o in CAVES): continue
             bad.append('%s: no floor of its own at %.0f m (%.1f, %.1f)' % (c.name, r[5], r[0], r[1])); break
     # 4. Slopes: no floor steeper than 23 degrees between rings a metre and more apart (agents climb 45; feet a little less).
     for c in CAVES:
@@ -785,6 +897,7 @@ def check(camps, decks):
         if d.get('radius'): continue
         c = CAVE[d['_key']]
         for which, s, a, r in (('start', d['from'], d['aside'], d['rise']), ('end', d['to'], d['aside2'], d['rise2'])):
+            if which in d.get('_free', ()): continue
             x, y, z = c.at_(s, a); y = deck_y(d, 0 if which == 'start' else 1); ok = False
             for o in CAVES:
                 f = o.floor_at(x, z)
@@ -852,7 +965,7 @@ def zone(camps):
                      'ambientGround': '#2C2F33', 'fogColor': '#8C98A8', 'fogStart': 40, 'fogEnd': 220, 'skyTint': '#5E7096', 'skyExposure': 1, 'skyHaze': 1},
         'spawns': {'player': {'x': yard[0], 'y': yard[1]}, 'playerFacing': 0, 'companion': {'x': yard[0] + 2, 'y': yard[1] - 2},
                    'recovery': {'x': yard[0] - 2, 'y': yard[1] - 2}, 'leash': 24, 'enemies': []},
-        'objectives': ['Find out what the Sandthrone are cutting under the pass', 'Win the three rail sigils off the Gallery\'s wings', 'Stop the carriage on the dead line'],
+        'objectives': ['Find out what the Sandthrone are cutting under the pass', 'Win the three rail sigils off the Gallery\'s wings', 'Stop the carriage on the dead line'] + (['Bring down Danner on his barge in the Black Cove'] if COVE_FINALE else []),
         'exits': [{'to': 'zone.peaks', 'name': 'The cut back up to the Peaks', 'at': {'x': yard[0], 'y': yard[1] - 9}, 'arrive': {'x': -140.5, 'y': -42}, 'radius': 3.5}],
         'roads': [{'name': 'Adit track', 'width': 3, 'points': [{'x': yard[0], 'y': yard[1] - 11}, {'x': yard[0], 'y': yard[1]}, {'x': main_at[0], 'y': main_at[1] + 1}]}],
         'clearings': [{'name': 'The Adit cut', 'center': {'x': yard[0], 'y': yard[1] + 2}, 'radius': 9}],
@@ -884,6 +997,19 @@ def pictures(camps):
         for i, r in enumerate(c.rings[::2]):
             cx, cz = P(r[0], r[1]); rr = r[2] * s; col = colour(r[4]) if c.floored[i * 2] else (60, 60, 60)
             g.ellipse((cx - rr, cz - rr, cx + rr, cz + rr), fill=col)
+    for w in WATER:
+        c = next(o for o in CAVES if o.name == w['cave'])
+        if w.get('radius'):
+            cx, _, cz = c.at_(w['from'], w['aside']); a = P(cx, cz); rr = w['radius'] * s
+            g.ellipse((a[0] - rr, a[1] - rr, a[0] + rr, a[1] + rr), fill=(40, 90, 160))
+        elif w.get('flood'):   # (S6) wall to wall: the cave's own width
+            for k in range(30):
+                sa = w['from'] + (w['to'] - w['from']) * k / 29; x, _, z = c.at_(sa); a = P(x, z); rr = c.half_at(sa) * .8 * s
+                g.ellipse((a[0] - rr, a[1] - rr, a[0] + rr, a[1] + rr), fill=(30, 60, 120))
+        else:
+            for k in range(30):
+                sa = w['from'] + (w['to'] - w['from']) * k / 29; x, _, z = c.at_(sa, w['aside']); a = P(x, z); rr = w['half'] * s
+                g.ellipse((a[0] - rr, a[1] - rr, a[0] + rr, a[1] + rr), fill=(40, 90, 160))
     for d in DECKS:
         c = CAVE[d['_key']]
         if d.get('radius'):
@@ -891,15 +1017,6 @@ def pictures(camps):
             g.ellipse((a[0] - rr, a[1] - rr, a[0] + rr, a[1] + rr), outline=(250, 240, 220), width=2); continue
         a = P(*[c.at_(d['from'], d['aside'])[k] for k in (0, 2)]); b = P(*[c.at_(d['to'], d['aside2'])[k] for k in (0, 2)])
         g.line((a, b), fill=(250, 240, 220), width=max(2, int(d['width'] * s * .6)))
-    for w in WATER:
-        c = next(o for o in CAVES if o.name == w['cave'])
-        if w.get('radius'):
-            cx, _, cz = c.at_(w['from'], w['aside']); a = P(cx, cz); rr = w['radius'] * s
-            g.ellipse((a[0] - rr, a[1] - rr, a[0] + rr, a[1] + rr), fill=(40, 90, 160))
-        else:
-            for k in range(30):
-                sa = w['from'] + (w['to'] - w['from']) * k / 29; x, _, z = c.at_(sa, w['aside']); a = P(x, z); rr = w['half'] * s
-                g.ellipse((a[0] - rr, a[1] - rr, a[0] + rr, a[1] + rr), fill=(40, 90, 160))
     for d in DROPS:
         fc = next(o for o in CAVES if o.name == d['fromCave']); tc = next(o for o in CAVES if o.name == d['toCave'])
         a = P(*[fc.at_(d['from'], d['fromAside'])[k] for k in (0, 2)]); b = P(*[tc.at_(d['to'], d['toAside'])[k] for k in (0, 2)])

@@ -71,6 +71,69 @@ namespace Crulanda.Encounter
             for (float w = 0; w < .5f; w += Time.deltaTime) { view.SetPositionAndRotation(eye, look); yield return null; }
         }
 
+        /// <summary>
+        /// Chris, 2026-10-15 (note 218): "outside the cave is very slow and laggy". Frames a second at the yard's view (the frame cap off,
+        /// the tour's lamp off), everything on, then each suspect off in turn: shadows, every point and spot light, the grass, and the
+        /// renderers of each of the zone's six biggest groups (the caves among them). With Unity's counters at the end. Written to
+        /// adit-perf.txt beside the frames.
+        /// </summary>
+        IEnumerator YardProbe(Vector3 eye, Vector3 at, Vector3 stand)
+        {
+            var lines = new List<string>(); var view = session.View.transform; var look = Quaternion.LookRotation(at - eye);
+            session.Player.GetComponent<AdventurerMotor>().Teleport(stand);
+            int vs = QualitySettings.vSyncCount, cap = Application.targetFrameRate; QualitySettings.vSyncCount = 0; Application.targetFrameRate = -1;
+            IEnumerator Measure(string label)
+            {
+                for (float w = 0; w < .6f; w += Time.unscaledDeltaTime) { view.SetPositionAndRotation(eye, look); yield return null; }
+                int frames = 0; float t0 = Time.realtimeSinceStartup;
+                while (Time.realtimeSinceStartup - t0 < 2.5f) { frames++; view.SetPositionAndRotation(eye, look); yield return null; }
+                float fps = frames / (Time.realtimeSinceStartup - t0);
+                var line = "PERF yard " + label + " " + fps.ToString("0") + " fps " + (1000 / Mathf.Max(1, fps)).ToString("0.0") + " ms"; Debug.Log(line); lines.Add(line);
+            }
+            IEnumerator Run(IEnumerator m) { while (m.MoveNext()) yield return m.Current; }
+            yield return Run(Measure("all"));
+            var sh = QualitySettings.shadows; QualitySettings.shadows = ShadowQuality.Disable; yield return Run(Measure("no-shadows")); QualitySettings.shadows = sh;
+            var lights = Array.FindAll(FindObjectsByType<Light>(FindObjectsSortMode.None), l => l.enabled && l.type != LightType.Directional);
+            int shadowed = 0; foreach (var l in lights) if (l.shadows != LightShadows.None) shadowed++;
+            lines.Add("COUNT point and spot lights " + lights.Length + " (" + shadowed + " casting shadows)");
+            foreach (var l in lights) l.enabled = false; yield return Run(Measure("no-point-lights")); foreach (var l in lights) if (l != null) l.enabled = true;
+            var fields = new List<Behaviour>(); fields.AddRange(FindObjectsByType<GrassField>(FindObjectsSortMode.None)); fields.AddRange(FindObjectsByType<PlantField>(FindObjectsSortMode.None));
+            foreach (var f in fields) f.enabled = false; yield return Run(Measure("no-grass")); foreach (var f in fields) f.enabled = true;
+            // The renderers by the zone's top-level group: the six biggest, each switched off in turn.
+            var groups = new Dictionary<Transform, List<Renderer>>(); int visible = 0;
+            foreach (var r in FindObjectsByType<Renderer>(FindObjectsSortMode.None))
+            {
+                if (!r.enabled || !r.gameObject.activeInHierarchy) continue; visible++;
+                var t = r.transform; while (t.parent != null && t.parent.parent != null) t = t.parent;
+                if (!groups.TryGetValue(t, out var list)) groups[t] = list = new List<Renderer>(); list.Add(r);
+            }
+            lines.Add("COUNT enabled renderers " + visible);
+            var top = new List<KeyValuePair<Transform, List<Renderer>>>(groups); top.Sort((x, y) => y.Value.Count.CompareTo(x.Value.Count));
+            for (int i = 0; i < top.Count && i < 6; i++)
+            {
+                var rs = top[i].Value; lines.Add("GROUP " + top[i].Key.name + " " + rs.Count + " renderers");
+                foreach (var r in rs) r.enabled = false; yield return Run(Measure("no " + top[i].Key.name)); foreach (var r in rs) if (r != null) r.enabled = true;
+            }
+            // Unity's counters at the yard's view, everything on, over 120 frames.
+            var names = new[] { ("Internal", "Main Thread"), ("Internal", "Render Thread"), ("Render", "Camera.Render"), ("Render", "Culling"), ("Render", "Shadows.RenderShadowMap"),
+                ("Render", "Batches Count"), ("Render", "SetPass Calls Count"), ("Render", "Draw Calls Count"), ("Render", "Triangles Count"), ("Render", "Shadow Casters Count"), ("Scripts", "BehaviourUpdate") };
+            var recs = new List<(string, Unity.Profiling.ProfilerRecorder)>();
+            foreach (var (cat, n) in names)
+            {
+                var c = cat == "Internal" ? Unity.Profiling.ProfilerCategory.Internal : cat == "Scripts" ? Unity.Profiling.ProfilerCategory.Scripts : Unity.Profiling.ProfilerCategory.Render;
+                recs.Add((n, Unity.Profiling.ProfilerRecorder.StartNew(c, n, 1, Unity.Profiling.ProfilerRecorderOptions.SumAllSamplesInFrame | Unity.Profiling.ProfilerRecorderOptions.Default)));
+            }
+            var sums = new double[recs.Count];
+            for (int f = 0; f < 120; f++) { view.SetPositionAndRotation(eye, look); yield return null; for (int i = 0; i < recs.Count; i++) sums[i] += recs[i].Item2.LastValue; }
+            for (int i = 0; i < recs.Count; i++)
+            {
+                var (n, r) = recs[i]; double avg = sums[i] / 120; bool time = r.UnitType == Unity.Profiling.ProfilerMarkerDataUnit.TimeNanoseconds;
+                lines.Add("PROF " + n + " " + (r.Valid ? (time ? (avg / 1e6).ToString("0.00") + " ms" : avg.ToString("0")) : "n/a")); r.Dispose();
+            }
+            QualitySettings.vSyncCount = vs; Application.targetFrameRate = cap;
+            File.WriteAllLines(Path.Combine(dir, "adit-perf.txt"), lines);
+        }
+
         public IEnumerator Run(EncounterSession s, string directory)
         {
             dir = directory; Directory.CreateDirectory(dir); session = s;
@@ -151,6 +214,7 @@ namespace Crulanda.Encounter
             Shot("rail-hall", Deep, 178, 0, 0, 4.5f, Deep, 232, 0, 3, "the Rail Hall from the platform gate: the platform, the carriage and its line");
             Shot("pitch-pit", Pit, 8, 0, 0, 2.6f, Pit, 42, 0, .5f, "the Pitch Pit from its mouth off the Rail Hall");
 
+            if (shots.Count > 0) { lamp.enabled = false; yield return YardProbe(shots[0].eye, shots[0].at, shots[0].stand); lamp.enabled = true; }
             foreach (var f in shots) yield return Frame(f.place, f.eye, f.at, f.stand, f.where);
 
             motor.enabled = true; foreach (var r in body) r.enabled = true;

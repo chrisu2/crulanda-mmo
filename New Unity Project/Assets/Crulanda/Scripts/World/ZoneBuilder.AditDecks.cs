@@ -305,6 +305,7 @@ namespace Crulanda.World
             JoinAprons(solidRoot);
             BuildCaveWater(root, look);
             foreach (var dl in dropLooks) BuildDrop(dl.def, dl.from, dl.to, root, look);
+            BuildAditPolish(root, look);   // (S7) the lichen, the swing-loads, the Breach's hidden seeps (ZoneBuilder.AditPolish.cs)
             if (Application.isPlaying && look.childCount > 0) StaticBatchingUtility.Combine(look.gameObject);
         }
         /// <summary>A short apron of planks from each raised lip or mouth of a cave to the nearest deck end within 5 m and 2 m of its

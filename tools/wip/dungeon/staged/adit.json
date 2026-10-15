@@ -315,6 +315,7 @@
       "needs": "secret.adit.nail_key",
       "xp": 140,
       "gold": 40,
+      "item": "loot.adit.runners_hobnail_boots",
       "cave": "The Singing Gallery",
       "along": 255.7,
       "aside": -27.0,
@@ -331,7 +332,8 @@
       "prompt": "Search the niche by the landing",
       "text": "A niche cut in the rock at the trestle landing's back, where the lamp-men kept their oil and their pay.",
       "xp": 90,
-      "gold": 25,
+      "gold": 45,
+      "document": "doc.adit.lamp_oil",
       "cave": "The Singing Gallery",
       "along": 175.2,
       "aside": -28.5,
@@ -366,7 +368,7 @@
       "prompt": "Search the censor's box",
       "text": "Under the desk, a small iron-bound box: the fines the censor took from copyists who wrote what they should not.",
       "xp": 60,
-      "gold": 30,
+      "gold": 60,
       "cave": "The Censored Room",
       "along": 17.0,
       "aside": 1.5,
@@ -402,6 +404,7 @@
       "needs": "secret.adit.grey_key",
       "xp": 140,
       "gold": 55,
+      "item": "loot.adit.runners_scale_jerkin",
       "canonStatus": "GAME-ONLY (the unmade are CANON)",
       "cave": "The Grey Breach",
       "along": 175.06,
@@ -418,7 +421,7 @@
       "prompt": "Feel in the pool for the purse",
       "text": "In the Lurker's Pool, under a hand of black water, a leather purse snagged on a rock. Somebody's month of pay.",
       "xp": 80,
-      "gold": 35,
+      "gold": 60,
       "cave": "The Sunless River",
       "along": 151.36,
       "aside": -1.28,
@@ -435,6 +438,7 @@
       "prompt": "Pick the ember-cap",
       "text": "Low on the cloister stair's wall, where the chapel's heat seeps through the rock: a cluster of small red caps that glow like coals.",
       "xp": 90,
+      "item": "herb.last_light",
       "cave": "The Chapel of Embers",
       "along": 111.88,
       "aside": -2.2,
@@ -1511,17 +1515,17 @@
         74.822,
         3.8,
         5,
-        9.345,
+        10.345,
         -83.19,
         79.188,
         4,
         5,
-        11.345,
+        12.545,
         -87.313,
         83.311,
         4,
         5,
-        11.845
+        13.345
       ],
       "style": "chapel",
       "within": "The Scriptorium",
@@ -2083,7 +2087,7 @@
       "from": 44.14,
       "to": 53.26,
       "aside": -8,
-      "aside2": -12.5,
+      "aside2": -11.5,
       "rise": 0.0,
       "rise2": 1.98,
       "width": 3,
@@ -2096,10 +2100,10 @@
       "wall": 0,
       "from": 53.26,
       "to": 84.38,
-      "aside": -12.5,
-      "aside2": -12.5,
+      "aside": -11.5,
+      "aside2": -11.5,
       "rise": 1.98,
-      "rise2": 8.39,
+      "rise2": 5.0,
       "width": 3,
       "canonStatus": "GAME-ONLY"
     },
@@ -2110,9 +2114,9 @@
       "wall": 0,
       "from": 84.38,
       "to": 103.49,
-      "aside": -12.5,
+      "aside": -11.5,
       "aside2": -9,
-      "rise": 8.39,
+      "rise": 5.0,
       "rise2": -0.01,
       "width": 3,
       "canonStatus": "GAME-ONLY"
@@ -2165,13 +2169,13 @@
       "cave": "The Sealed Adit",
       "style": "timber",
       "wall": 0,
-      "from": 371.87,
-      "to": 379.88,
-      "aside": 0,
-      "aside2": 0,
+      "from": 371.27,
+      "to": 380.84,
+      "aside": 2.5,
+      "aside2": 2.5,
       "rise": 0,
       "rise2": 0,
-      "width": 10,
+      "width": 5.5,
       "canonStatus": "GAME-ONLY"
     },
     {
@@ -2722,6 +2726,45 @@
       "aside": -0.62
     },
     {
+      "name": "grey line 1",
+      "cave": "The Grey Breach",
+      "along": 45,
+      "aside": 0
+    },
+    {
+      "name": "grey line 2",
+      "cave": "The Grey Breach",
+      "along": 100,
+      "aside": 0
+    },
+    {
+      "name": "grey line 3",
+      "cave": "The Grey Breach",
+      "along": 160,
+      "aside": 0
+    },
+    {
+      "name": "swing load 1",
+      "cave": "The Geode Foundry",
+      "along": 108,
+      "aside": 16.5,
+      "rise": 12
+    },
+    {
+      "name": "swing load 2",
+      "cave": "The Geode Foundry",
+      "along": 82,
+      "aside": 16.5,
+      "rise": 12
+    },
+    {
+      "name": "swing load 3",
+      "cave": "The Geode Foundry",
+      "along": 69,
+      "aside": 5,
+      "rise": 12
+    },
+    {
       "name": "powder bay",
       "cave": "The Deep Way",
       "along": 140.41,
@@ -2911,7 +2954,7 @@
       "count": 2,
       "levelMin": 10,
       "levelMax": 10,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": -0.0,
         "y": -355.0
@@ -2933,18 +2976,18 @@
       "count": 3,
       "levelMin": 10,
       "levelMax": 10,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
-        "x": -16.39,
-        "y": -302.59
+        "x": -15.39,
+        "y": -302.54
       },
       "cave": "The Sealed Adit",
       "along": 69.28,
-      "aside": -12.5,
+      "aside": -11.5,
       "wing": "workings",
       "step": 2,
       "gate": "none",
-      "rise": 6.64
+      "rise": 4.89
     },
     {
       "name": "The cages' guard",
@@ -2956,7 +2999,7 @@
       "count": 3,
       "levelMin": 10,
       "levelMax": 10,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": -0.59,
         "y": -289.95
@@ -2978,7 +3021,7 @@
       "count": 3,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 2.0,
         "y": -240.0
@@ -3000,7 +3043,7 @@
       "count": 2,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": -3.0,
         "y": -175.0
@@ -3023,7 +3066,7 @@
       "count": 1,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "elite": true,
       "guards": "Gang-boss's guards",
       "center": {
@@ -3048,7 +3091,7 @@
       "count": 3,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": -4.0,
         "y": -112.0
@@ -3070,7 +3113,7 @@
       "count": 3,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 80.0,
         "y": 2.0
@@ -3092,7 +3135,7 @@
       "count": 3,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 34.0,
         "y": -3.5
@@ -3115,7 +3158,7 @@
       "count": 2,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 62.0,
         "y": -3.5
@@ -3138,7 +3181,7 @@
       "count": 3,
       "levelMin": 12,
       "levelMax": 12,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 20.67,
         "y": 304.81
@@ -3160,7 +3203,7 @@
       "count": 4,
       "levelMin": 12,
       "levelMax": 12,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 42.37,
         "y": 283.79
@@ -3182,7 +3225,7 @@
       "count": 2,
       "levelMin": 12,
       "levelMax": 12,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": -23.73,
         "y": 312.54
@@ -3204,7 +3247,7 @@
       "count": 1,
       "levelMin": 12,
       "levelMax": 12,
-      "respawn": 900,
+      "respawn": 1200,
       "elite": true,
       "guards": "Quartermaster's guards",
       "center": {
@@ -3228,7 +3271,7 @@
       "count": 3,
       "levelMin": 12,
       "levelMax": 12,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": -45.28,
         "y": 289.73
@@ -3250,7 +3293,7 @@
       "count": 2,
       "levelMin": 12,
       "levelMax": 12,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": -62.04,
         "y": 297.14
@@ -3272,7 +3315,7 @@
       "count": 1,
       "levelMin": 12,
       "levelMax": 12,
-      "respawn": 900,
+      "respawn": 1200,
       "elite": true,
       "harder": true,
       "guards": "Rail-Captain's guard",
@@ -3297,7 +3340,7 @@
       "count": 3,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 140.0,
         "y": -44.0
@@ -3319,7 +3362,7 @@
       "count": 3,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 198.99,
         "y": -34.0
@@ -3341,7 +3384,7 @@
       "count": 3,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 186.0,
         "y": -3.5
@@ -3364,7 +3407,7 @@
       "count": 2,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 238.0,
         "y": 18.0
@@ -3386,7 +3429,7 @@
       "count": 1,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "elite": true,
       "guards": "Workshop guards",
       "key": "sigil.amber",
@@ -3412,7 +3455,7 @@
       "count": 3,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 133.0,
         "y": 62.0
@@ -3434,7 +3477,7 @@
       "count": 3,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 150.0,
         "y": 57.0
@@ -3456,7 +3499,7 @@
       "count": 4,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 216.0,
         "y": 96.0
@@ -3503,7 +3546,7 @@
       "count": 3,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 124.0,
         "y": 152.0
@@ -3525,7 +3568,7 @@
       "count": 1,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "elite": true,
       "guards": "Sister Ashe Varrow",
       "key": "sigil.ember",
@@ -3551,7 +3594,7 @@
       "count": 3,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "flee": 0.25,
       "center": {
         "x": -148.0,
@@ -3574,7 +3617,7 @@
       "count": 3,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": -81.85,
         "y": 119.68
@@ -3596,7 +3639,7 @@
       "count": 3,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 4.27,
         "y": 94.52
@@ -3618,7 +3661,7 @@
       "count": 1,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "elite": true,
       "guards": "The Foreman's shift",
       "key": "sigil.grey",
@@ -3644,7 +3687,7 @@
       "count": 3,
       "levelMin": 10,
       "levelMax": 10,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 6.03,
         "y": -277.09
@@ -3666,14 +3709,14 @@
       "count": 3,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
-        "x": 9.0,
+        "x": -9.0,
         "y": -190.0
       },
       "cave": "The Sealed Adit",
       "along": 181.77,
-      "aside": 9,
+      "aside": -9,
       "wing": "workings",
       "step": 6,
       "gate": "none"
@@ -3688,7 +3731,7 @@
       "count": 3,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 12.0,
         "y": -20.0
@@ -3710,7 +3753,7 @@
       "count": 3,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": -5.71,
         "y": -281.38
@@ -3732,7 +3775,7 @@
       "count": 3,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": -60.0,
         "y": -238.0
@@ -3754,7 +3797,7 @@
       "count": 1,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "elite": true,
       "guards": "Bailers' chain",
       "center": {
@@ -3778,7 +3821,7 @@
       "count": 2,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 52.0,
         "y": -181.0
@@ -3800,7 +3843,7 @@
       "count": 1,
       "levelMin": 12,
       "levelMax": 12,
-      "respawn": 900,
+      "respawn": 1200,
       "elite": true,
       "guards": "none",
       "social": "solitary",
@@ -3825,7 +3868,7 @@
       "count": 3,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 41.0,
         "y": 34.0
@@ -3847,7 +3890,7 @@
       "count": 2,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 50.0,
         "y": 62.0
@@ -3869,7 +3912,7 @@
       "count": 2,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 186.0,
         "y": 29.5
@@ -3892,7 +3935,7 @@
       "count": 1,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "elite": true,
       "guards": "Whip-hands",
       "center": {
@@ -3917,7 +3960,7 @@
       "count": 3,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 216.0,
         "y": 21.0
@@ -3939,7 +3982,7 @@
       "count": 4,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 180.0,
         "y": 17.0
@@ -3961,7 +4004,7 @@
       "count": 3,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 146.0,
         "y": 13.0
@@ -3983,7 +4026,7 @@
       "count": 2,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 140.0,
         "y": 67.0
@@ -4005,7 +4048,7 @@
       "count": 2,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 176.0,
         "y": 67.0
@@ -4027,7 +4070,7 @@
       "count": 1,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "elite": true,
       "guards": "Urn-tenders",
       "center": {
@@ -4051,7 +4094,7 @@
       "count": 2,
       "levelMin": 10,
       "levelMax": 10,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 152.0,
         "y": 51.0
@@ -4073,7 +4116,7 @@
       "count": 2,
       "levelMin": 10,
       "levelMax": 10,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 166.0,
         "y": 73.0
@@ -4095,7 +4138,7 @@
       "count": 3,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 172.0,
         "y": 108.0
@@ -4117,7 +4160,7 @@
       "count": 2,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 168.0,
         "y": 124.0
@@ -4139,7 +4182,7 @@
       "count": 1,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "elite": true,
       "guards": "Lectors",
       "center": {
@@ -4163,7 +4206,7 @@
       "count": 2,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 211.91,
         "y": 119.7
@@ -4185,7 +4228,7 @@
       "count": 1,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "elite": true,
       "guards": "Armourers",
       "center": {
@@ -4209,7 +4252,7 @@
       "count": 3,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 137.92,
         "y": 164.04
@@ -4231,7 +4274,7 @@
       "count": 1,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "elite": true,
       "guards": "none",
       "center": {
@@ -4255,7 +4298,7 @@
       "count": 3,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 159.42,
         "y": 159.32
@@ -4277,7 +4320,7 @@
       "count": 3,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "flee": 0.25,
       "center": {
         "x": 14.0,
@@ -4300,7 +4343,7 @@
       "count": 3,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "flee": 0.25,
       "center": {
         "x": -50.0,
@@ -4323,7 +4366,7 @@
       "count": 3,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": -23.99,
         "y": 13.01
@@ -4345,7 +4388,7 @@
       "count": 2,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "flee": 0.2,
       "center": {
         "x": -50.0,
@@ -4368,7 +4411,7 @@
       "count": 3,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "flee": 0.25,
       "center": {
         "x": -128.0,
@@ -4391,7 +4434,7 @@
       "count": 2,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": -40.0,
         "y": 118.99
@@ -4413,7 +4456,7 @@
       "count": 2,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "flee": 0.2,
       "center": {
         "x": -22.84,
@@ -4436,7 +4479,7 @@
       "count": 1,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "elite": true,
       "guards": "Whisperer's hollow",
       "center": {
@@ -4460,7 +4503,7 @@
       "count": 4,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "flee": 0.25,
       "center": {
         "x": -12.01,
@@ -4483,7 +4526,7 @@
       "count": 2,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": -36.0,
         "y": 118.0
@@ -4505,7 +4548,7 @@
       "count": 4,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 36.0,
         "y": 38.0
@@ -4527,7 +4570,7 @@
       "count": 4,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 88.0,
         "y": 62.0
@@ -4549,7 +4592,7 @@
       "count": 5,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "flee": 0.25,
       "center": {
         "x": 34.0,
@@ -4572,7 +4615,7 @@
       "count": 1,
       "levelMin": 12,
       "levelMax": 12,
-      "respawn": 900,
+      "respawn": 1200,
       "elite": true,
       "guards": "none",
       "center": {
@@ -4596,7 +4639,7 @@
       "count": 3,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 62.0,
         "y": 86.0
@@ -4618,7 +4661,7 @@
       "count": 3,
       "levelMin": 12,
       "levelMax": 12,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 62.0,
         "y": 132.0
@@ -4640,7 +4683,7 @@
       "count": 3,
       "levelMin": 12,
       "levelMax": 12,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 63.0,
         "y": 200.0
@@ -4662,7 +4705,7 @@
       "count": 2,
       "levelMin": 12,
       "levelMax": 12,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 50.15,
         "y": 241.08
@@ -4684,7 +4727,7 @@
       "count": 1,
       "levelMin": 12,
       "levelMax": 12,
-      "respawn": 900,
+      "respawn": 1200,
       "elite": true,
       "guards": "Hobb's sappers",
       "center": {
@@ -4708,7 +4751,7 @@
       "count": 2,
       "levelMin": 12,
       "levelMax": 12,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 60.5,
         "y": 216.0
@@ -4730,7 +4773,7 @@
       "count": 3,
       "levelMin": 12,
       "levelMax": 12,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 50.0,
         "y": 252.0
@@ -4752,7 +4795,7 @@
       "count": 3,
       "levelMin": 12,
       "levelMax": 12,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": -85.0,
         "y": 290.0
@@ -4774,7 +4817,7 @@
       "count": 2,
       "levelMin": 12,
       "levelMax": 12,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": -98.01,
         "y": 361.0
@@ -4796,7 +4839,7 @@
       "count": 1,
       "levelMin": 13,
       "levelMax": 13,
-      "respawn": 900,
+      "respawn": 1200,
       "elite": true,
       "guards": "Pitch-gangers",
       "center": {
@@ -4820,7 +4863,7 @@
       "count": 1,
       "levelMin": 13,
       "levelMax": 13,
-      "respawn": 900,
+      "respawn": 1200,
       "elite": true,
       "guards": "none",
       "social": "solitary",
@@ -4900,7 +4943,7 @@
       "count": 2,
       "levelMin": 10,
       "levelMax": 10,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 0.96,
         "y": -347.98
@@ -4935,7 +4978,7 @@
       "count": 2,
       "levelMin": 10,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 4.19,
         "y": -321.03
@@ -4978,7 +5021,7 @@
       "count": 2,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": -5.75,
         "y": -94.99
@@ -5021,7 +5064,7 @@
       "count": 3,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 78.0,
         "y": 34.0
@@ -5096,7 +5139,7 @@
       "count": 2,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 126.74,
         "y": -27.68
@@ -5151,7 +5194,7 @@
       "count": 3,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 140.0,
         "y": 53.0
@@ -5190,7 +5233,7 @@
       "count": 2,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 90.39,
         "y": 140.03
@@ -5233,7 +5276,7 @@
       "count": 2,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": -154.59,
         "y": 62.14
@@ -5276,7 +5319,7 @@
       "count": 2,
       "levelMin": 11,
       "levelMax": 11,
-      "respawn": 900,
+      "respawn": 1200,
       "flee": 0.25,
       "center": {
         "x": -100.09,
@@ -5320,7 +5363,7 @@
       "count": 2,
       "levelMin": 11,
       "levelMax": 12,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 62.0,
         "y": 140.0
@@ -5359,7 +5402,7 @@
       "count": 2,
       "levelMin": 12,
       "levelMax": 12,
-      "respawn": 900,
+      "respawn": 1200,
       "center": {
         "x": 42.24,
         "y": 295.04
@@ -5399,6 +5442,75 @@
       ],
       "wing": "deep",
       "gate": "The platform gate"
+    },
+    {
+      "name": "The grey seep (first)",
+      "mob": "Greyed crawler",
+      "tag": "crawler",
+      "look": "spider",
+      "canonStatus": "GAME-ONLY (the Wasting is CANON)",
+      "radius": 2.5,
+      "count": 2,
+      "levelMin": 11,
+      "levelMax": 11,
+      "respawn": 1200,
+      "flee": 0.25,
+      "center": {
+        "x": -141.0,
+        "y": 119.03
+      },
+      "cave": "The Grey Breach",
+      "along": 20.0,
+      "aside": 0.0,
+      "wing": "breach",
+      "gate": "none",
+      "after": "event:greyline1"
+    },
+    {
+      "name": "The grey seep (second)",
+      "mob": "Greyed crawler",
+      "tag": "crawler",
+      "look": "spider",
+      "canonStatus": "GAME-ONLY (the Wasting is CANON)",
+      "radius": 2.5,
+      "count": 2,
+      "levelMin": 11,
+      "levelMax": 11,
+      "respawn": 1200,
+      "flee": 0.25,
+      "center": {
+        "x": -86.32,
+        "y": 122.34
+      },
+      "cave": "The Grey Breach",
+      "along": 75.0,
+      "aside": 0.0,
+      "wing": "breach",
+      "gate": "none",
+      "after": "event:greyline2"
+    },
+    {
+      "name": "The grey seep (third)",
+      "mob": "Greyed crawler",
+      "tag": "crawler",
+      "look": "spider",
+      "canonStatus": "GAME-ONLY (the Wasting is CANON)",
+      "radius": 2.5,
+      "count": 2,
+      "levelMin": 11,
+      "levelMax": 11,
+      "respawn": 1200,
+      "flee": 0.25,
+      "center": {
+        "x": -26.71,
+        "y": 117.34
+      },
+      "cave": "The Grey Breach",
+      "along": 135.0,
+      "aside": 0.0,
+      "wing": "breach",
+      "gate": "none",
+      "after": "event:greyline3"
     },
     {
       "name": "The Quiet Miner",

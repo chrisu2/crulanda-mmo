@@ -32,6 +32,7 @@ DOCS = os.path.join(ROOT, 'New Unity Project', 'Docs')
 SIZE = 800
 RESPAWN = 1200         # ADIT_REWORK Q1: Chris, 2026-10-15, "20 minute respawn"
 RARE_RESPAWN = 1200
+GREY_LINES = (45, 100, 160)   # (S7) the Grey Spreads' lines, metres along the Grey Breach
 
 # ---------------------------------------------------------------- the trace (Hollow's constructor)
 def catmull(p0, p1, p2, p3, t):
@@ -423,6 +424,16 @@ def make_works():
     anchor('altar', 'VC', (110, 152))
     anchor("lurker's pool", 'R', (-122, 39))
     anchor('foreman', 'B', (10, 100))
+    # (S7) The Grey Spreads (ADIT_REWORK E6): three lines across the Breach, in the quiet between its fights (the mouth crawlers at 13 m,
+    # the Hollow drift at 79, the Grey den at 122, the Whisperer at 141, the Foreman at 178). Crossing one greys the lamps behind it,
+    # shows the static there and lets a seep of crawlers out 25 m behind (EncounterSession.GreySpread.cs). GAME-ONLY.
+    for n, a in enumerate(GREY_LINES): anchor('grey line %d' % (n + 1), 'B', a, aside=0)
+    # (S7) The swing-loads (Chris, 2026-10-15, Q4 "Yes, add them"): ore buckets on ropes across the Foundry's high walks, swung by hand by
+    # rope teams on the hall floor (EncounterSession's AditSwingLoad). Where each bucket's arc bottoms out on its walk: two on the catwalk
+    # (clear of the sorters at 95 m) and one on the cross-walk. GAME-ONLY; no wheel, winch or crane: a rope from a block lashed under a tie-beam.
+    anchor('swing load 1', 'F2', 108, aside=16.5, rise=12)
+    anchor('swing load 2', 'F2', 82, aside=16.5, rise=12)
+    anchor('swing load 3', 'F2', 69, aside=5, rise=12)   # (its team, 9 m on into the hall, clear of the slag pit at (81, -7))
     anchor('powder bay', 'D', (53, 242))
     anchor('hall', 'D', (-2, 296))
     anchor('rail spirit stone', 'D', (40, 271), aside=7)   # just inside the platform gate, to the right of the way
@@ -602,7 +613,12 @@ def make_camps():
         patrol('D', (30, 282), (-40, 300), mob('Platform round', 'Sandthrone platform guard', 'outrider', 2, 12, 12, 'platformguard', 1.2), 'deep', gate=PGATE, aside=18),
     ]
     rare = [camp('Q', (-84, 176), mob('The Quiet Miner', 'The Quiet Miner', 'pale', 1, 12, 12, 'quietminer', 1.2, canon='GAME-ONLY (the unmade are CANON)', elite=True, guards='none', respawn=RARE_RESPAWN, rare=.2, social='solitary'), 'quiet', gate=LDOOR, optional=True)]
-    camps = head + rest + patrols + rare
+    # (S7) The Grey Spreads' seeps: two crawlers each (the plan's three cut to two to hold the run near 75 minutes), 25 m behind their line,
+    # released when it is crossed ("event:greylineN", raised by the code), sent at whoever crossed it. After the patrols, before the rare
+    # (released camps draw nothing from the camps' stream, so no other camp's draws move).
+    seeps = [camp('B', ('al', a - 25, 0), mob('The grey seep (%s)' % nth, 'Greyed crawler', 'spider', 2, 11, 11, 'crawler', 2.5, canon=GB, flee=.25), 'breach',
+                  after='event:greyline%d' % (n + 1), gate='none') for n, (a, nth) in enumerate(zip(GREY_LINES, ('first', 'second', 'third')))]
+    camps = head + rest + patrols + seeps + rare
     pinned = {5: LUSK, 13: SORREL, 16: DANNER, 21: NIX, 25: 'The Vent-Hound', 27: YSOLT, 31: FOREMAN}
     for i, m in pinned.items(): assert camps[i]['mob'] == m, (i, camps[i]['mob'])
     assert camps[-1]['mob'] == 'The Quiet Miner'
@@ -663,23 +679,25 @@ def make_secrets():
                  'The Company never came this far with a lamp.', xp=60, height=1.4),
         inc('behind_falls', 'Behind the Falls', 'chest', 'G', (35, 77), prompt='Open the chest behind the falls', needs='secret.adit.nail_key',
             text='Behind the sheet of falling water, in the dry under the lip, an old miners\' chest with a rusted lock. The key from the dark drift turns in it.',
-            xp=140, gold=40),
+            xp=140, gold=40, item='loot.adit.runners_hobnail_boots'),   # (S7) a rare piece: the Adit-Runner's boots
         inc('lamp_niche', "The Lamp-Man's Niche", 'cache', 'G', (33.5, -3.5), prompt='Search the niche by the landing', rise=12,
-            text='A niche cut in the rock at the trestle landing\'s back, where the lamp-men kept their oil and their pay.', xp=90, gold=25),
+            text='A niche cut in the rock at the trestle landing\'s back, where the lamp-men kept their oil and their pay.', xp=90, gold=45,
+            document='doc.adit.lamp_oil'),   # (S7) their mixing card, a page like a recipe, and more of their pay
         inc('censored_room', 'The Struck-Out Pages', 'note', 'VSx', (149, 118), prompt='Read the struck-out pages',
             text='On a reading desk in the room behind the shelves, a history of the order with whole pages inked over, and one the censor missed.',
             document='doc.adit.censored_history', xp=120),
         inc('censored_box', 'The Censor\'s Box', 'cache', 'VSx', (147, 119.5), prompt='Search the censor\'s box',
-            text='Under the desk, a small iron-bound box: the fines the censor took from copyists who wrote what they should not.', xp=60, gold=30),
+            text='Under the desk, a small iron-bound box: the fines the censor took from copyists who wrote what they should not.', xp=60, gold=60),   # (S7) worth the search
         inc('grey_key', 'The Grey Key', 'key', 'Q', (-84, 179), prompt='Take the grey key',
             text='At the drift\'s dead end, on a nail over a miner\'s cot gone grey as ash: a key with no colour at all.', xp=80, height=1.3),
         inc('foremans_box', "The Foreman's Strongbox", 'chest', 'B', (14, 108), prompt="Open the Foreman's strongbox", needs='secret.adit.grey_key',
-            text='The Foreman\'s strongbox, its gilt gone dull and grey. The grey key opens it without a sound.', xp=140, gold=55,
+            text='The Foreman\'s strongbox, its gilt gone dull and grey. The grey key opens it without a sound.', xp=140, gold=55, item='loot.adit.runners_scale_jerkin',   # (S7) a rare piece: the Adit-Runner's jerkin
             canonStatus='GAME-ONLY (the unmade are CANON)'),
         inc('drowned_purse', 'A Drowned Purse', 'cache', 'R', (-117, 36), prompt='Feel in the pool for the purse',
-            text='In the Lurker\'s Pool, under a hand of black water, a leather purse snagged on a rock. Somebody\'s month of pay.', xp=80, gold=35),
+            text='In the Lurker\'s Pool, under a hand of black water, a leather purse snagged on a rock. Somebody\'s month of pay.', xp=80, gold=60),   # (S7) a month's pay
         inc('ember_cap', 'Ember-Cap', 'herb', 'VC', (89, 120), prompt='Pick the ember-cap', aside=-2.2,
-            text='Low on the cloister stair\'s wall, where the chapel\'s heat seeps through the rock: a cluster of small red caps that glow like coals.', xp=90),
+            text='Low on the cloister stair\'s wall, where the chapel\'s heat seeps through the rock: a cluster of small red caps that glow like coals.', xp=90,
+            item='herb.last_light'),   # (S7) a rare herb (Last-light) to carry out
         inc('kettle_tally', "A Pitch-Boiler's Tally", 'note', 'D', (38, 274), prompt='Read the tally chalked on the board', aside=-8,
             text='A board leaned against the platform\'s end, chalked with barrels of pitch and the name of whoever boils it: "Old Kettle, north-west, past the sleepers."',
             document='doc.adit.kettle_tally', xp=70),

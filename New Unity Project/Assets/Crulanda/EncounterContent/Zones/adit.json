@@ -315,6 +315,7 @@
       "needs": "secret.adit.nail_key",
       "xp": 140,
       "gold": 40,
+      "item": "loot.adit.runners_hobnail_boots",
       "cave": "The Singing Gallery",
       "along": 255.7,
       "aside": -27.0,
@@ -331,7 +332,8 @@
       "prompt": "Search the niche by the landing",
       "text": "A niche cut in the rock at the trestle landing's back, where the lamp-men kept their oil and their pay.",
       "xp": 90,
-      "gold": 25,
+      "gold": 45,
+      "document": "doc.adit.lamp_oil",
       "cave": "The Singing Gallery",
       "along": 175.2,
       "aside": -28.5,
@@ -366,7 +368,7 @@
       "prompt": "Search the censor's box",
       "text": "Under the desk, a small iron-bound box: the fines the censor took from copyists who wrote what they should not.",
       "xp": 60,
-      "gold": 30,
+      "gold": 60,
       "cave": "The Censored Room",
       "along": 17.0,
       "aside": 1.5,
@@ -402,6 +404,7 @@
       "needs": "secret.adit.grey_key",
       "xp": 140,
       "gold": 55,
+      "item": "loot.adit.runners_scale_jerkin",
       "canonStatus": "GAME-ONLY (the unmade are CANON)",
       "cave": "The Grey Breach",
       "along": 175.06,
@@ -418,7 +421,7 @@
       "prompt": "Feel in the pool for the purse",
       "text": "In the Lurker's Pool, under a hand of black water, a leather purse snagged on a rock. Somebody's month of pay.",
       "xp": 80,
-      "gold": 35,
+      "gold": 60,
       "cave": "The Sunless River",
       "along": 151.36,
       "aside": -1.28,
@@ -435,6 +438,7 @@
       "prompt": "Pick the ember-cap",
       "text": "Low on the cloister stair's wall, where the chapel's heat seeps through the rock: a cluster of small red caps that glow like coals.",
       "xp": 90,
+      "item": "herb.last_light",
       "cave": "The Chapel of Embers",
       "along": 111.88,
       "aside": -2.2,
@@ -2720,6 +2724,45 @@
       "cave": "The Grey Breach",
       "along": 175.76,
       "aside": -0.62
+    },
+    {
+      "name": "grey line 1",
+      "cave": "The Grey Breach",
+      "along": 45,
+      "aside": 0
+    },
+    {
+      "name": "grey line 2",
+      "cave": "The Grey Breach",
+      "along": 100,
+      "aside": 0
+    },
+    {
+      "name": "grey line 3",
+      "cave": "The Grey Breach",
+      "along": 160,
+      "aside": 0
+    },
+    {
+      "name": "swing load 1",
+      "cave": "The Geode Foundry",
+      "along": 108,
+      "aside": 16.5,
+      "rise": 12
+    },
+    {
+      "name": "swing load 2",
+      "cave": "The Geode Foundry",
+      "along": 82,
+      "aside": 16.5,
+      "rise": 12
+    },
+    {
+      "name": "swing load 3",
+      "cave": "The Geode Foundry",
+      "along": 69,
+      "aside": 5,
+      "rise": 12
     },
     {
       "name": "powder bay",
@@ -5399,6 +5442,75 @@
       ],
       "wing": "deep",
       "gate": "The platform gate"
+    },
+    {
+      "name": "The grey seep (first)",
+      "mob": "Greyed crawler",
+      "tag": "crawler",
+      "look": "spider",
+      "canonStatus": "GAME-ONLY (the Wasting is CANON)",
+      "radius": 2.5,
+      "count": 2,
+      "levelMin": 11,
+      "levelMax": 11,
+      "respawn": 1200,
+      "flee": 0.25,
+      "center": {
+        "x": -141.0,
+        "y": 119.03
+      },
+      "cave": "The Grey Breach",
+      "along": 20.0,
+      "aside": 0.0,
+      "wing": "breach",
+      "gate": "none",
+      "after": "event:greyline1"
+    },
+    {
+      "name": "The grey seep (second)",
+      "mob": "Greyed crawler",
+      "tag": "crawler",
+      "look": "spider",
+      "canonStatus": "GAME-ONLY (the Wasting is CANON)",
+      "radius": 2.5,
+      "count": 2,
+      "levelMin": 11,
+      "levelMax": 11,
+      "respawn": 1200,
+      "flee": 0.25,
+      "center": {
+        "x": -86.32,
+        "y": 122.34
+      },
+      "cave": "The Grey Breach",
+      "along": 75.0,
+      "aside": 0.0,
+      "wing": "breach",
+      "gate": "none",
+      "after": "event:greyline2"
+    },
+    {
+      "name": "The grey seep (third)",
+      "mob": "Greyed crawler",
+      "tag": "crawler",
+      "look": "spider",
+      "canonStatus": "GAME-ONLY (the Wasting is CANON)",
+      "radius": 2.5,
+      "count": 2,
+      "levelMin": 11,
+      "levelMax": 11,
+      "respawn": 1200,
+      "flee": 0.25,
+      "center": {
+        "x": -26.71,
+        "y": 117.34
+      },
+      "cave": "The Grey Breach",
+      "along": 135.0,
+      "aside": 0.0,
+      "wing": "breach",
+      "gate": "none",
+      "after": "event:greyline3"
     },
     {
       "name": "The Quiet Miner",

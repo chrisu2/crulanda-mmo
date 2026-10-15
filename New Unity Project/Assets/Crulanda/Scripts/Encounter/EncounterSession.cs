@@ -2164,6 +2164,7 @@ namespace Crulanda.Encounter
             if (restoring) return;
             if (enemy.Game) { GameDied(enemy); return; }   // no experience, no coin, no "zone clear" (EncounterSession.Hunt)
             OpenGatesOf(enemy);   // (the Adit rework) a boss's door opens as he falls, whoever brought him down
+            GreySeepOnDeath(enemy);   // (S7) the Foreman's death stops the Grey Spreads (EncounterSession.GreySpread.cs)
             // A sim's kill (it hit first, out of your party): nothing for you, no loot on the body (Phase 5.3a; classic tagging).
             if (enemy.TappedBy != null && enemy.TappedBy != Player.EntityId.Value && PartyActor(enemy.TappedBy) == null) { if (Target == enemy) AutoAttack = false; return; }
             if (enemy.Camp) RollCorpse(enemy);   // the loot is decided as it dies, so the body can show it

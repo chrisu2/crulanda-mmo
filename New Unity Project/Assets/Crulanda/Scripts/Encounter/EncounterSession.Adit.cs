@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using Crulanda.Gameplay;
 using Crulanda.World;
 
 namespace Crulanda.Encounter
@@ -32,6 +33,8 @@ namespace Crulanda.Encounter
             foreach (var i in Zone.Interactables) if (i.kind == "liftgate" && i.gate != null && Progress.keys.Contains(LiftWoken)) i.gate.SetOpen(true, true);
             StartWeaver();   // the Weaver's unlocking (EncounterSession.Weaver.cs)
             StartEvents();   // (the Adit rework) the Wake, started where its anchor is reached once its wing is open (EncounterSession.Release.cs)
+            StartGreySeep();   // (S7) the Grey Spreads' lines across the Breach (EncounterSession.GreySpread.cs)
+            StartSwingLoads();   // (S7) the Foundry's swing-loads and their rope teams (AditSwingLoad)
             // The pressed goblins in their cages, and the doors of those opened before standing open (playtest note 125).
             foreach (var i in Zone.Interactables)
             {
@@ -49,6 +52,48 @@ namespace Crulanda.Encounter
                 }
         }
         readonly Dictionary<ZoneInteractable, GameObject> caged = new Dictionary<ZoneInteractable, GameObject>();
+        /// <summary>You, your party sims and Mira (when she is with you), the living and the dead (the bucket and the grey lines ask).</summary>
+        public List<Actor> PartyActors()
+        {
+            partyActors.Clear();
+            if (Player != null) partyActors.Add(Player);
+            foreach (var c in PartySims) if (c != null && c.actor != null) partyActors.Add(c.actor);
+            if (Companion != null && Progress != null && Progress.recruited && Companion.actor != null) partyActors.Add(Companion.actor);
+            return partyActors;
+        }
+        readonly List<Actor> partyActors = new List<Actor>();
+        /// <summary>The Foundry's swing-loads at work this visit (S7), one for each the zone built (ZoneBuilder.SwingLoads).</summary>
+        public readonly List<AditSwingLoad> SwingLoads = new List<AditSwingLoad>();
+        /// <summary>
+        /// (S7; Chris, 2026-10-15, Q4 "Yes, add them") Each swing-load the builder made set swinging, out of step with the others, with its rope
+        /// team on the floor below: two pressed goblins and a Sandthrone hand on the tag line, one behind another (PROVISIONAL looks: the
+        /// goblins as the caged ones, the hand as a deserter). Figures only: no collider, no fight.
+        /// </summary>
+        void StartSwingLoads()
+        {
+            SwingLoads.Clear(); AditSwingLoad.NewVisit();
+            if (Zone == null) return;
+            for (int k = 0; k < Zone.SwingLoads.Count; k++)
+            {
+                var spot = Zone.SwingLoads[k]; if (spot == null || spot.root == null || spot.bucket == null) continue;
+                var swing = spot.root.gameObject.AddComponent<AditSwingLoad>();
+                swing.spot = spot; swing.session = this; swing.phase = k * .37f; swing.period = 5.6f + k * .45f;
+                var aside = Vector3.Cross(Vector3.up, spot.teamFacing).normalized;
+                for (int m = 0; m < 3; m++)
+                    swing.AddHauler(Hauler(spot.team - spot.teamFacing * (m * .95f) + aside * (m % 2 == 0 ? .12f : -.12f), spot.teamFacing, k * 3 + m, m == 1));
+                SwingLoads.Add(swing);
+            }
+        }
+        /// <summary>One of a rope team, facing the bucket with the line in hand.</summary>
+        Transform Hauler(Vector3 feet, Vector3 facing, int seed, bool company)
+        {
+            var go = new GameObject(company ? "Sandthrone rope-hand" : "Pressed goblin on the rope");
+            go.transform.SetPositionAndRotation(feet + Vector3.up * (company ? 1f : .66f), Quaternion.LookRotation(facing));
+            var body = GameObject.CreatePrimitive(PrimitiveType.Capsule); body.name = "Body"; Destroy(body.GetComponent<Collider>()); body.transform.SetParent(go.transform, false);
+            var v = company ? ActorVisual.Attach(go, ActorLook.Deserter, 60 + seed * 5) : ActorVisual.Attach(go, ActorLook.Villager, 41 + seed * 6, true, "goblin");
+            v.Pose = ActorPose.Work;
+            return go.transform;
+        }
         /// <summary>A pressed goblin huddled in a cage (PROVISIONAL look: the small villager figure, grey-green, long-eared, in rags, until
         /// the goblins have a figure of their own; the goblins are CANON, the Weavers of the Warrens).</summary>
         GameObject PressedGoblin(Transform cage, int k)

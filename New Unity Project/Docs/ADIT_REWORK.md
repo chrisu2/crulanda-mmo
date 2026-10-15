@@ -1244,6 +1244,11 @@ was done, in order. TESTED where a run shows it; the rework stays on `adit-rewor
   file resolves: 97 camps, 9 gates, 27 anchors, 22 decks, the planner's three runs), the Adit camera tour
   (`--crulanda-adit-tour <dir>`, 28 frames), and the release of `after` camps (a boss's relief shift, the Wake's waves, Hollowsong's
   choir), which the data names and the code never spawned: being written.
+- **01:03:** with the decks as breadcrumbs of the tests' reach helper the Foundry's first floor is walked from the yard: the Adit nav,
+  camps and gate tests and the fixture class 25/28. The diagnostics' step-by-step walk of every cave found no broken step, so the
+  cloister stair is whole; the altar's way home of 236 m is a detour that starts somewhere at the chapel's west door (the table flags
+  a complete step four times its straight length now). The fixture test's two (its knoll ray; a rail check that stopped passing
+  when the deck bodies changed) are the test cave's, not the Adit's.
 - **Left (2026-10-15):**
   the web test's shut-door line (`home`, the stair way with the door open, came out 236 m: NavReach.Length pads a way with legs that
   wander into pockets, so the shut way is not 50 m longer; NavReach wants the hop search, and an honest length with it); the fixture

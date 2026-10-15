@@ -230,7 +230,12 @@ namespace Crulanda.Tests
                     {
                         steps++;
                         var sp = new NavMeshPath();
-                        if (!(NavMesh.CalculatePath(prev.Value, here.position, NavMesh.AllAreas, sp) && sp.status == NavMeshPathStatus.PathComplete)) broken.Add(prev.Value.ToString("0") + " -> " + here.position.ToString("0") + " (" + along.ToString("0") + " m in)");
+                        // Broken: no complete path; or a complete one four times the straight distance (and over 12 m): the way goes round
+                        // (the chapel's stair came out whole, step by step, while the way home from the altar was 236 m: a detour at the
+                        // door, not a gap on the stair, 2026-10-15 01:03).
+                        bool ok = NavMesh.CalculatePath(prev.Value, here.position, NavMesh.AllAreas, sp) && sp.status == NavMeshPathStatus.PathComplete;
+                        float straight = Vector3.Distance(prev.Value, here.position), walked = 0; for (int c = 1; ok && c < sp.corners.Length; c++) walked += Vector3.Distance(sp.corners[c - 1], sp.corners[c]);
+                        if (!ok || (walked > 12 && walked > straight * 4)) broken.Add(prev.Value.ToString("0") + " -> " + here.position.ToString("0") + " (" + along.ToString("0") + " m in" + (ok ? ", " + walked.ToString("0") + " m round" : "") + ")");
                     }
                     prev = here.position;
                 }

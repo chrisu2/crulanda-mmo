@@ -329,8 +329,8 @@ namespace Crulanda.World
                 Part(PrimitiveType.Cube, t, new Vector3(sx, ly - .1f, zb), new Vector3(.19f, .03f, .19f), iron);
                 foreach (int a in new[] { -1, 1 }) foreach (int b in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(sx + a * .075f, ly - .005f, zb + b * .075f), new Vector3(.016f, .19f, .016f), iron);
                 Part(PrimitiveType.Cylinder, t, new Vector3(sx, ly - .045f, zb), new Vector3(.05f, .045f, .05f), Tint(art.timber, new Color(.92f, .86f, .7f)));   // the candle
-                Part(PrimitiveType.Sphere, t, new Vector3(sx, ly + .025f, zb), new Vector3(.028f, .05f, .028f), Glowing(new Color(1, .74f, .32f), 2.6f));   // its flame
-                Glow(t, new Vector3(sx, ly, zb), 4.5f, .4f, new Color(1, .7f, .38f), 1.1f);
+                var flame = Part(PrimitiveType.Sphere, t, new Vector3(sx, ly + .025f, zb), new Vector3(.028f, .05f, .028f), Glowing(new Color(1, .74f, .32f), 2.6f));   // its flame
+                CandleFlame.Attach(flame, Glow(t, new Vector3(sx, ly, zb), 4.5f, .4f, new Color(1, .7f, .38f), 1.1f));   // wavering with its light (the candle pack, 2026-10-15)
             }
             // A bench under the first front window, and barrels at the far corner, clear of the window boxes.
             float bx = frontWindows.Count > 0 ? frontWindows[0] : -w / 2 + 1.5f, bz = face - .32f, bg = LocalGround(t, bx, bz);

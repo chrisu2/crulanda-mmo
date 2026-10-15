@@ -212,17 +212,26 @@ namespace Crulanda.World
 
     /// <summary>
     /// Firelight: a light (and a flame) wavering like fire. Only on lamp lights (ZoneBuilder.Glow): the clock sets their light each
-    /// frame and this, running after it, only ever scales that.
+    /// frame and this, running after it, only ever scales that. A CandleFlame on the flame reads <see cref="Factor"/> so the flame
+    /// wavers with its light (2026-10-15, the candle pack).
     /// </summary>
     public sealed class Flicker : MonoBehaviour
     {
         Light glow; float seed;
+        /// <summary>How the light stands now against its set intensity (about 0.85 to 1.15).</summary>
+        public float Factor { get; private set; } = 1;
         void Start() { glow = GetComponent<Light>(); seed = UnityEngine.Random.value * 100; }
         void LateUpdate()
         {
             if (glow == null) return;
-            float t = Time.time * 6.5f + seed;
-            glow.intensity *= 1 + .22f * (Mathf.PerlinNoise(t, seed) - .5f) + .05f * Mathf.Sin(t * 2.9f);
+            Factor = Curve(Time.time, seed);
+            glow.intensity *= Factor;
+        }
+        /// <summary>The waver at a time, for a seed: a slow Perlin wander with a quicker tremble on it.</summary>
+        public static float Curve(float time, float seed)
+        {
+            float t = time * 6.5f + seed;
+            return 1 + .22f * (Mathf.PerlinNoise(t, seed) - .5f) + .05f * Mathf.Sin(t * 2.9f);
         }
     }
 }

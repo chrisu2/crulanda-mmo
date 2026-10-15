@@ -200,6 +200,19 @@ namespace Crulanda.Tests
             // stage and the Geode Foundry under its lip: AditNavTests, 2026-10-14 20:26).
             zone.OpenGates(); for (int i = 0; i < 60; i++) yield return null;   // a second: a gate's carve is lifted by the navmesh's own update, not at once
             // Each gate, open: whether the way crosses it (two metres before to two metres beyond, along its facing).
+            // The solid decks' body blocks (ModifierBox, not walkable inside): how many each deck has and the heights they span, and
+            // whether the floor under the deck's middle is still on the navmesh (the island under Lusk's tally stage, R97).
+            sb.AppendLine(); sb.AppendLine("solid deck | body blocks | they span y | floor under its middle on the mesh");
+            foreach (var d in zone.DeckSpots)
+            {
+                if (d.def == null || d.solid == null || !d.solid.Any(x => x)) continue;
+                var bodies = UnityEngine.Object.FindObjectsByType<NavBlocker>(FindObjectsSortMode.None).Select(b => b.gameObject).Where(g => g.name == "Solid: body of " + d.def.name).ToList();
+                float lo = float.MaxValue, hi = float.MinValue;
+                foreach (var g in bodies) { var c = g.GetComponent<BoxCollider>(); if (c == null) continue; lo = Mathf.Min(lo, c.bounds.min.y); hi = Mathf.Max(hi, c.bounds.max.y); }
+                var midp = d.mid[d.mid.Length / 2]; NavMeshHit uh = default; float fy = 0;
+                bool under = d.cave != null && d.cave.FloorAt(new Vector2(midp.x, midp.z), out fy) && NavMesh.SamplePosition(new Vector3(midp.x, fy + .2f, midp.z), out uh, .8f, NavMesh.AllAreas) && Mathf.Abs(uh.position.y - fy) < .8f;
+                sb.AppendLine(d.def.name + " | " + bodies.Count + " | " + (bodies.Count > 0 ? lo.ToString("0.0") + ".." + hi.ToString("0.0") : "-") + " | " + under + (under ? " (" + uh.position.ToString("0.0") + ")" : ""));
+            }
             sb.AppendLine(); sb.AppendLine("gate | at | open | crossed (2 m before to 2 m beyond)");
             foreach (var g in zone.Gates)
             {

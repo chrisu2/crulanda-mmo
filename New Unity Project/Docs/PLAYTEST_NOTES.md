@@ -788,3 +788,6 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
   Hallow's Creek, the Deep Veins and the Transit Hub designed, not built; Caddock as he was; the three loot layers) and then: "loot: we
   need set pieces like 6 pieces. 2/6 give 1 special, 4/6 another special ability 6/6 full set 3 special abilities and these are class
   specific." (loot DESIGN.md 3.6 and 3.8. OPEN.)
+- 228 (~13:05) "most of the higher 6/6 pieces are raid..but no raid is made yet" (the Adit's class sets are the dungeon tier, tier 1;
+  higher tiers come from raids; the first raid is to be designed: ROADMAP's endgame, a ten-player raid of you and sims. OPEN.)
+  Asked (the question prompt): the first raid now at 15 or the Spire at 30: "Wait for the Spire at 30"; raid size: "20".

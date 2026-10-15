@@ -1230,6 +1230,16 @@ was done, in order. TESTED where a run shows it; the rework stays on `adit-rewor
   the stage's island, which the body blocks did not take (a Box source is its faces; the floor under it kept its head-room): every
   NavBlocker box now also goes in as a ModifierBox, which marks its whole inside not walkable; the web test's last line (the cloister
   door shut and re-carved, three frames waited: a second now).
+- **R97-R99 (23:56-00:13): the island under Lusk's stage.** The ModifierBox took the bowl's east pocket and the Gallery's rim (R97) but
+  not the floor under the stage; R98's new table showed the stage's eight body blocks in place and the floor under its middle still on
+  the mesh. The bake reads surfaces: a floor under a body whose bottom is below it keeps its head-room. Now a solid body has shelves
+  inside it every 1.2 m or less (2dab45f9), so no span in it, the floor included, is tall enough to stand in. **R99: the Sealed Adit 0
+  unreached — every floor of the Adit is reachable from the yard; the breadcrumbs test green; 19/23.** The centreline walk moved on to
+  the Foundry's first floor and its one search from the yard (5ef7f190: leg by leg now; R100 RESULT).
+- **Left (2026-10-15):** the Scriptorium solid at (162, -63.3, 113.3) with mesh on its top (and the one walkable triangle on a solid);
+  the web test's shut-door line (`home`, the stair way with the door open, came out 236 m: NavReach.Length pads a way with legs that
+  wander into pockets, so the shut way is not 50 m longer; NavReach wants the hop search, and an honest length with it); the fixture
+  test's knoll ray; then the run itself, played.
   Then NavReach gets the hop search and the camps, breadcrumbs and run-order tests are read again.
 - **Still red after R86 (PlayMode 19/29; see R88 above for the change):** the camps nobody can walk to (the Pen's, the Cutting Drift's and everything past them),
   the breadcrumbs (56 of 480), the sim's run order (the Foundry unreachable), the web's joins (the cloister stair from the altar),

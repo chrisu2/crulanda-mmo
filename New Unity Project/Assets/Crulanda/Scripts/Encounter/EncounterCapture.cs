@@ -23,7 +23,7 @@ namespace Crulanda.Encounter
         }
         public static bool Requested
         {
-            get { var a = Environment.GetCommandLineArgs(); return Array.IndexOf(a, "--crulanda-capture") >= 0 || Array.IndexOf(a, "--crulanda-ui-capture") >= 0 || Array.IndexOf(a, "--crulanda-world-capture") >= 0 || WardrobeCapture.Requested || TrainingCapture.Requested || CreatureTourCapture.Requested || LootCapture.Requested || EliteCapture.Requested || LifeCapture.Requested || MotionCapture.Requested || RunCapture.Requested || FixesCapture.Requested || Step4Capture.Requested; }
+            get { var a = Environment.GetCommandLineArgs(); return Array.IndexOf(a, "--crulanda-capture") >= 0 || Array.IndexOf(a, "--crulanda-ui-capture") >= 0 || Array.IndexOf(a, "--crulanda-world-capture") >= 0 || WardrobeCapture.Requested || TrainingCapture.Requested || CreatureTourCapture.Requested || LootCapture.Requested || EliteCapture.Requested || LifeCapture.Requested || MotionCapture.Requested || RunCapture.Requested || FixesCapture.Requested || Step4Capture.Requested || AditTourCapture.Requested; }
         }
         IEnumerator Start()
         {
@@ -48,6 +48,8 @@ namespace Crulanda.Encounter
             if (motion >= 0 && motion + 1 < args.Length) { yield return gameObject.AddComponent<MotionCapture>().Run(session, args[motion + 1]); yield break; }
             int elite = Array.IndexOf(args, EliteCapture.Flag);
             if (elite >= 0 && elite + 1 < args.Length) { yield return gameObject.AddComponent<EliteCapture>().Run(session, args[elite + 1]); yield break; }
+            int aditTour = Array.IndexOf(args, AditTourCapture.Flag);
+            if (aditTour >= 0 && aditTour + 1 < args.Length) { yield return gameObject.AddComponent<AditTourCapture>().Run(session, args[aditTour + 1]); yield break; }
             int ui = Array.IndexOf(args, "--crulanda-ui-capture");
             if (ui >= 0 && ui + 1 < args.Length) { yield return CaptureInterface(args[ui + 1]); yield break; }
             int world = Array.IndexOf(args, "--crulanda-world-capture");

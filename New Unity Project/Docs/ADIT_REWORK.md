@@ -1213,7 +1213,14 @@ was done, in order. TESTED where a run shows it; the rework stays on `adit-rewor
   drops a face whose edge's middle is inside another cave's passage (the Gallery's knoll faces are wider than the drift's tube), and
   the Cutting Drift and the whole Geode Foundry are reachable (0 unreached, were 204 and 458).** One block is left: the Chapel's west
   half (109 samples: the straight wall at x about 110). The chapel's lake of fire was capped to leave a 2.6 m walkway either side
-  (c83a16d4) and that was not it; look at R93's `navmesh-chapel-west.png` and the chapel's Hall() west end (nave.x) and door next.
+  (c83a16d4) and that was not it; look at R93's `navmesh-chapel-west.png` and the chapel's Hall() west end and door next.
+  **What that picture shows (21:58):** the built nave (pews and columns, all green) fills x 110-140, z 138-163; its west wall at x about
+  110 runs the nave's whole depth with no gap to be seen; west of it (x 90-109: the cave's narrowing and the top of the cloister
+  stair, all red) the mesh is whole. The chapel's along runs from its mouth at the Scriptorium (east) westward, so the nave's "out" end
+  is the west one, at `e = Mathf.Min(nave.y, altarAt + 5)`: if the altar's anchor sits at x about 115, the out wall and its door stand
+  at x 110, and the door (`Piece("Entrance", On(s, 0), ...)` with its side blocks at 2.05 m) is the thing to check: its box
+  (.6 x 3.4 x 4.6) is the doorway's width if it is a NavBlocker. Also a thin strip of cave floor runs along the nave's south wall at
+  z about 138, red west of x 120 and green east of it: split there too.
   Then NavReach gets the hop search and the camps, breadcrumbs and run-order tests are read again.
 - **Still red after R86 (PlayMode 19/29; see R88 above for the change):** the camps nobody can walk to (the Pen's, the Cutting Drift's and everything past them),
   the breadcrumbs (56 of 480), the sim's run order (the Foundry unreachable), the web's joins (the cloister stair from the altar),

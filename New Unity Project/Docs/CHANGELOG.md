@@ -20,8 +20,19 @@ store cache; a picture of fly-out hotbar buttons: "keep this in mind when design
 - **Plans written:** `PHASE8_6_LIVING_WORLD.md` (the villagers' way-finding and the inn's door — a 1.6 m door and a navmesh at radius .5
   leave a 0.6 m strip — crafting loot, recipes, the book of lore, secrets, gear looks; fourteen decisions), `DUNGEON2_DESIGN.md`
   (Hallow's Creek, levels 16-18; thirteen decisions), `DUNGEONS_3_AND_4.md`; ACTION_BAR.md's fly-out slots.
-- **In flight at 01:45:** the dungeon packs (KayKit, the Modular Pack) into the builder; the water, grass and candle shaders as built-in
-  shaders; zone music from the three packs and the Fantasy pack's market props.
+- **Published 02:02** from the Adit branch with main merged in (the save backed up to `save-backups/20261015-0202-before-adit-publish`):
+  the new places, the lore and the Adit in one build ("well i wanted to see the new places and adit").
+- **The dungeon packs:** the KayKit Dungeon Pack (88 pieces, CC0) and the Dungeon Modular Pack (13 pieces) in the builder, every piece
+  sized by an explicit box; the chapter-house's four rooms rebuilt on KayKit's 4 m grid (floors, walls in bays with pillars, arched
+  windows, torches, banners, the altar's dais and stair, the apse's window). The frames at 02:00 showed stone walls and a filled arch
+  where the door is ("now this looks blocked?? does the door open?": walkable, but the blind-arch piece): the open doorway piece now.
+- **The shader kit:** the game already had hand-written water and grass shaders doing what the packs do; they took the one thing each
+  pack adds (caustic threads on shallow beds; a push-away from the player and the villagers), and a candle flame that wavers with its
+  light is new (the inn's sign lantern, the cookfires, the torches, campfires and braziers). The water and grass changes are in place and
+  proven only by a build's shader-error count.
+- **Zone music** (ZoneMusic: thirteen tracks of Chris's three ithappy packs by zone, night, the grey's edge, the caves and the fight;
+  long quiet gaps; `/music`; the WAVs on disk and in the backup, not in git: 593 MB) and **the Fantasy pack's market pieces** (sixteen
+  round Oakhaven's stalls and the inn's yard). A proving build of all of it: PROVING_BUILD.
 
 ## 2026-10-15, 01:05 on: clues to every secret, stories from everyone, the book of lore (a helper's pass; OPEN until Chris's build)
 Chris (2026-10-14 23:40, verbatim): "find recipes/ book of lore/still havent found many secrets. all this for ALL Zones"; (2026-10-15 01:05):

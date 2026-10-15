@@ -1208,7 +1208,10 @@ was done, in order. TESTED where a run shows it; the rework stays on `adit-rewor
   the floor south of z -185, where the "Spoil heaps" camp's dressing blocks stand round (9, -190) by the south ramp's rubble flank,
   and the Pen hangs off that strip; the Chapel's west half is parted from the built hall by one straight wall at x about 110 across the
   whole passage (a shell or knoll face line, not slivers); the Foundry's floor is all mesh and all red (it hangs off the drift); the
-  drift's floor past x 107 is a narrowing, not a wall. First try: the Spoil heaps camp moved west (R92, if it ran).
+  drift's floor past x 107 is a narrowing, not a wall. **R92 (21:48): the Spoil heaps camp moved to the hall's west
+  side, and the Pen is wholly reachable (0 of 74 unreached, was 74); the Sealed Adit's own pocket 22 (was 33).** Two real blocks are
+  left: the Cutting Drift past x 107 (and with it the Foundry: 458) and the Chapel's west half (109: the wall at x 110). Then NavReach
+  gets the hop search and the camps, breadcrumbs and run-order tests are read again.
 - **Still red after R86 (PlayMode 19/29; see R88 above for the change):** the camps nobody can walk to (the Pen's, the Cutting Drift's and everything past them),
   the breadcrumbs (56 of 480), the sim's run order (the Foundry unreachable), the web's joins (the cloister stair from the altar),
   the centreline walk at the tally stage, the fixture trestle's rail (a raycast; new in R83, not looked at), the fixture knoll ray,

@@ -2056,26 +2056,6 @@
     },
     {
       "tag": "stag",
-      "levelMin": 1,
-      "levelMax": 13,
-      "gearChance": 0.05,
-      "entries": [
-        {
-          "item": "hide.hill_deer",
-          "chance": 1
-        },
-        {
-          "item": "mat.venison",
-          "chance": 0.5
-        },
-        {
-          "item": "junk.velvet_tine",
-          "chance": 0.3
-        }
-      ]
-    },
-    {
-      "tag": "stag",
       "levelMin": 14,
       "levelMax": 15,
       "gearChance": 0.12,
@@ -2091,6 +2071,26 @@
         {
           "item": "mat.venison",
           "chance": 0.5
+        }
+      ]
+    },
+    {
+      "tag": "stag",
+      "levelMin": 1,
+      "levelMax": 13,
+      "gearChance": 0.05,
+      "entries": [
+        {
+          "item": "hide.hill_deer",
+          "chance": 1
+        },
+        {
+          "item": "mat.venison",
+          "chance": 0.5
+        },
+        {
+          "item": "junk.velvet_tine",
+          "chance": 0.3
         }
       ]
     },

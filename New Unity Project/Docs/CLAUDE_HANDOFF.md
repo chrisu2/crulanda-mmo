@@ -25,7 +25,8 @@ What was done, in order, is in `Docs/TONIGHT_2026-10-13.md` (Progress, 2026-10-1
   menu, `/exit`, `/quit`), **the shepherds** (Tam and Nell Sedge at Oakhaven's two folds: the count, the shearing, the fleeces to the
   stall, the feed), the combat capture inside the yard. Published at 19:42 (the fixes to 20:00) and at
   19:54 (the shepherds, the inn's tables, the capture; saves backed up to `save-backups/20261014-1942-...` and `-1954-...`). The inn's tables and benches stood up again (the
-  Fantasy pack's root turn kept in ModelProp; KitPropTests). Open: a sheep in the fold's wall (196).
+  Fantasy pack's root turn kept in ModelProp; KitPropTests): `world-captures/oakhaven-99-inn-drinkers-night.png`. The Old Fold's
+  flock inside its walls, the shepherd shearing: `oakhaven-23-the-old-fold-night.png`.
 - **Next, in order:** Chris's reactions to the above; the Adit rework (below); the Stylized Newbie Weapons Pack (skinned meshes: a bake
   before they can be held); the older list.
 

@@ -79,7 +79,10 @@ are backwards", "traps need to be something besides a circle on the ground", "no
     the capture in the yard): EditMode VillageWorkTests, VillageEconomyTests and KitPropTests 16/16; PlayMode VillageDayTests,
     VillageErrandTests, VillageHomeTests and VillageStreamTests 15/16 (the home test's count of folk, 24, now 26 with the shepherds:
     fixed after); the release build (0 shader errors); the Scoundrel frames inside the yard (`ui-captures/combat5/scoundrel`);
-    **published 19:54**, the save backed up to `save-backups/20261014-1954-before-shepherd-publish`.
+    **published 19:54**, the save backed up to `save-backups/20261014-1954-before-shepherd-publish`. chainR81 (20:06): the same build
+    again (nothing newer: the fold's flock was in it), Oakhaven's tour 111 a second with the inn's tables standing
+    (`world-captures/oakhaven-99-inn-drinkers-night.png`) and the Old Fold's flock inside its walls, the shepherd shearing
+    (`oakhaven-23-the-old-fold-night.png`); the save backed up again (`20261014-2012-before-night-publish`).
 
 ## 2026-10-14, 00:20 to the end: play-test fixes, the Scoundrel, the drowned dead, the dungeons after the Adit
 Chris (23:40-00:10, play-testing): "cant see all classes", "only thing on orc that move is belt, staff and teeth", "at level 1 the orc

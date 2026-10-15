@@ -5106,8 +5106,8 @@ namespace Crulanda.World
             for (int i = 0; i < 9; i++) { var q = Quaternion.Euler(0, i * 40, 0); Lump(BoulderAt(i), t, at + q * new Vector3(0, .08f, .72f), new Vector3(.34f, .24f, .3f), stone, i * 47); }
             for (int i = 0; i < 3; i++) Part(PrimitiveType.Cylinder, t, at + new Vector3(0, .14f, 0), new Vector3(.1f, .5f, .1f), wood, Quaternion.Euler(0, i * 60, 70));
             Part(PrimitiveType.Cylinder, t, at + new Vector3(0, .05f, 0), new Vector3(.9f, .03f, .9f), art.glass);
-            if (!RealFire(t, at + new Vector3(0, .06f, 0), .55f))
             var fireLight = Glow(t, at + new Vector3(0, 1.1f, 0), 11, 1.9f, new Color(1, .55f, .25f), 1.9f); fireLight.gameObject.AddComponent<Flicker>();
+            if (!RealFire(t, at + new Vector3(0, .06f, 0), .55f))
             {
                 if (cone == null) cone = ZoneMeshes.Cone(1, 1);
                 // The painted tongues waver with the light (CandleFlame, 2026-10-15).

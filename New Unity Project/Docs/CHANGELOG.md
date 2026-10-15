@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-10-15, 02:45-04:00: Chris playing the Adit build (notes 216-225; all OPEN until he sees them)
+- **The walk-in barns' walls flickered stone and wood** (note 216): their stone sill stood in the boards' own face. It is 10 cm proud now,
+  and the building test measures every building in every zone for a face in its footing's (the coping is left unmerged for it).
+- **Nerve sat at 90-100 out of combat** (217): the class's resting regeneration refilled what the drain took. The Scoundrel has none
+  (ClassKit.RestingResourceRegen).
+- **Mira's mana** (219): her pool grows with your level as her heal does, a heal costs a quarter more than that, she warns when low and
+  out, and drinks between fights (about 40 s from empty at 11). **Her damage spells** (223): Briar Lash and Kindled Seed (GAME-ONLY)
+  while everyone is above 80% and she above half mana.
+- **Cave water** (220-222): no sun in a cave pool's colour, highlights, glints or caustics, and no foam lines on a flood's shallow floor,
+  while the camera is in a cave (UndergroundShading, the water shader's _CrulandaUnderground).
+- **Roamers** (224): every other open-air camp of two or more sends its last mob round a loop well outside the camp; camp rests 2-6 s.
+- **The Adit's lag** (218, 225): the probe in the Adit camera tour (adit-perf.txt) found the zone's props (15,857 renderers, 56 million
+  triangles: the whole dungeon drawn from anywhere) and its 186 mobs the cost, 13 fps at the yard and 17 in the Tally Hall with the frame
+  cap off; shadows, its 250 lights and the grass cost nothing. Far props are no longer drawn in a zone with caves (PropCull, 70 m) and
+  far idle camp mobs sleep (EncounterEnemy.Dormant, 85 m, waking at 75 or when pulled). RESULT_LINE
+- Published 03:27 (barn, Nerve, the Sound panel, roamers' first half) and NIGHT_PUBLISH.
+
 ## 2026-10-15, 00:40-01:45: the small hours with three helpers (Chris: "you can run 3 bots at most")
 Chris (verbatim, PLAYTEST_NOTES 203-212): "the villagers and npcs need better ai"; "more things to do. more incentives for
 gathering/professions. make better gear. have gear change the way your character looks when equipping"; "running into each other and

@@ -123,7 +123,7 @@ namespace Crulanda.World
             var view = Camera.main;
             if (view != null && art.post != null && view.GetComponent<ZonePost>() == null) view.gameObject.AddComponent<ZonePost>().Init(art.post, Zone, sunLight);
             int before = MergeStatics();
-            try { StaticBatchingUtility.Combine(statics.gameObject); } catch (Exception e) { Debug.LogWarning("Static batching skipped: " + e.Message); }
+            if (!NoStaticBatching) try { StaticBatchingUtility.Combine(statics.gameObject); } catch (Exception e) { Debug.LogWarning("Static batching skipped: " + e.Message); }
             Debug.Log("Static scenery merged: " + before + " renderers into " + statics.GetComponentsInChildren<MeshRenderer>().Length + ".");
             Lap("batching");
             // In daylight, before the clock sets the hour; about 4 px a metre (1024 for the old 260 m zones).
@@ -1028,6 +1028,8 @@ namespace Crulanda.World
         /// "Footing" and "Door steps"). Colliders and the parts' transforms stay; only their mesh renderers go. Returns how many
         /// renderers there were.
         /// </summary>
+        /// <summary>Tests that read the scenery's meshes (BuildingGroundTests' flush faces) set this: static batching leaves them unreadable.</summary>
+        public static bool NoStaticBatching;
         int MergeStatics()
         {
             int total = 0;

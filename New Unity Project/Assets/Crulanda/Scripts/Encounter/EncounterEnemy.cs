@@ -267,6 +267,7 @@ namespace Crulanda.Encounter
         void UpdateTimed()
         {
             if (session == null || session.Paused) return;
+            if (Sleeping()) return;   // far and idle: nothing to do (EncounterEnemy.Dormant)
             if (!actor.IsAlive) { if (Camp && Time.time >= respawnAt) Respawn(); return; }
             if (Game) return;   // no threat, no aggro, no swing: GameAnimal grazes, wanders and bolts
             if (ControlTick()) return;   // held, stunned or fleeing: nothing else this frame (EncounterEnemy.Control)

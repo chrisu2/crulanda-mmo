@@ -28,7 +28,7 @@ namespace Crulanda.Tests
         void OnLoaded(Scene scene, LoadSceneMode mode) { var s = UnityEngine.Object.FindFirstObjectByType<EncounterSession>(); if (s != null) s.SaveDirectoryOverride = root; }
         [UnitySetUp] public IEnumerator Setup()
         {
-            WorldClock.Hour = 11;
+            WorldClock.Hour = 11; ZoneBuilder.NoStaticBatching = true;   // the flush-face check reads the walls' meshes
             root = Path.Combine(Path.GetTempPath(), "Crulanda-buildings-" + Guid.NewGuid().ToString("N"));
             SceneManager.sceneLoaded += OnLoaded;
             yield return SceneManager.LoadSceneAsync("Oakhaven", LoadSceneMode.Single);
@@ -36,7 +36,7 @@ namespace Crulanda.Tests
         }
         [UnityTearDown] public IEnumerator Cleanup()
         {
-            WorldClock.Hour = 8.5f; ZoneBuilder.RequestedZoneId = null;
+            WorldClock.Hour = 8.5f; ZoneBuilder.RequestedZoneId = null; ZoneBuilder.NoStaticBatching = false;
             SceneManager.sceneLoaded -= OnLoaded;
             var empty = SceneManager.CreateScene("Empty-" + Guid.NewGuid().ToString("N")); SceneManager.SetActiveScene(empty);
             yield return SceneManager.UnloadSceneAsync("Oakhaven");

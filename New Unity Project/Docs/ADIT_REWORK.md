@@ -1237,7 +1237,14 @@ was done, in order. TESTED where a run shows it; the rework stays on `adit-rewor
   unreached — every floor of the Adit is reachable from the yard; the breadcrumbs test green; 19/23.** The centreline walk moved on to
   the Foundry's first floor and its one search from the yard (5ef7f190: leg by leg now; R100, 00:24: still 19/23, the Foundry's first floor
   still unreached from the yard by that search though the hop map reaches all of it: NavReach's heuristic, the first thing left).
-- **Left (2026-10-15):** the Scriptorium solid at (162, -63.3, 113.3) with mesh on its top (and the one walkable triangle on a solid);
+- **00:49: the "solids" with mesh on their tops were knolls.** A branch cave's knoll (the rock mound built over its passage) was a
+  navmesh source like a walk-in cave's hill, and its crown poked into the parent's hall near the wall as a floating floor (the
+  Censored Room's over the Scriptorium at y -59.7, the Kennel's in the Muster Yard). A branch cave's knoll is buried rock now, not a
+  source (6353aafd): both solid-top tests green. With the helpers of the small hours: `AditDataTests` (every reference in the zone
+  file resolves: 97 camps, 9 gates, 27 anchors, 22 decks, the planner's three runs), the Adit camera tour
+  (`--crulanda-adit-tour <dir>`, 28 frames), and the release of `after` camps (a boss's relief shift, the Wake's waves, Hollowsong's
+  choir), which the data names and the code never spawned: being written.
+- **Left (2026-10-15):**
   the web test's shut-door line (`home`, the stair way with the door open, came out 236 m: NavReach.Length pads a way with legs that
   wander into pockets, so the shut way is not 50 m longer; NavReach wants the hop search, and an honest length with it); the fixture
   test's knoll ray; then the run itself, played.

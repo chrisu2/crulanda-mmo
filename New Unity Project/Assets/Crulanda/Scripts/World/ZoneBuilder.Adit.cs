@@ -271,51 +271,31 @@ namespace Crulanda.World
             }
             int hallTorches = 0;
             // A wall across the way at s, out to w either side: 2 m modules out from the middle, an arched door 3.6 m wide when `door`.
-            // The end wall of a built room, from the kit (Chris, 2026-10-15 01:12-01:14, of the chapel's: "just the shape and design is bad",
-            // "use some of the dungeon assedt not just plain walls and arch"): wall modules in bays out from the door, the kit's wall-top as a
-            // cornice along the top course, a window in the second course of every other bay, the entrance-top module over the arch with
-            // plain modules beside it, and a column of the kit's three parts either side of the door. Both faces, as before.
+            // The Dungeon kit's end wall (the Rail Hall, the Foundry and the vent's halls; the chapter-house's rooms are KitHall's now, below):
+            // plain modules both faces (the kit's wall is dressed on one face; Chris, 2026-10-11, "looks terrible": two flat black slabs round
+            // an arch, the walls' backs), the arch, plain modules over it. The 01:12 dressing (the wall-top cornice, windows, the entrance-top
+            // and a three-part column either side of the door) is gone: the 01:29 tour showed the column's drum, scaled by its own height
+            // as every Piece is, as a 20 m pale slab across the chapel's west end and the scriptorium (frames adit-17 and adit-19). A piece
+            // whose own height is small is never placed by height again: a box, or not at all.
             void EndWall(float s, float w, bool door, int courses = 2)
             {
-                var q = Along(s); float from = door ? 2.3f : 0; int bay = 0;
-                string Course(int k) { return k == courses - 1 && courses > 1 ? "ModularStoneWall_top" : "ModularStoneWall"; }
+                var q = Along(s); float from = door ? 2.3f : 0;
                 foreach (int side in new[] { -1, 1 })
-                    for (float a = from + 1; a < w + .6f; a += 2, bay++)
+                    for (float a = from + 1; a < w + .6f; a += 2)
                     {
                         var foot = On(s, side * a); if (!Free(foot) || !Free(foot + Vector3.up * 3.5f)) continue;
-                        // The kit's wall is dressed on one face (its back is flat): an end wall is seen from both sides, so two, back to back
-                        // (Chris, 2026-10-11, "looks terrible": two flat black slabs round an arch, the walls' backs).
-                        if (Piece(Course(0), foot, YawAt(s) + 90, 2.02f) == null) continue;
-                        Piece(Course(0), foot, YawAt(s) - 90, 2.02f);
-                        for (int k = 1; k < courses; k++)
-                        {
-                            Piece(Course(k), foot + Vector3.up * 2 * k, YawAt(s) + 90, 2.02f); Piece(Course(k), foot + Vector3.up * 2 * k, YawAt(s) - 90, 2.02f);
-                            if (k == 1 && courses > 2 && bay % 2 == 1) { Piece("Window", foot + Vector3.up * 2.3f, YawAt(s) + 90, 1.4f); Piece("Window", foot + Vector3.up * 2.3f, YawAt(s) - 90, 1.4f); }
-                        }
+                        if (Piece("ModularStoneWall", foot, YawAt(s) + 90, 2.02f) == null) continue;
+                        Piece("ModularStoneWall", foot, YawAt(s) - 90, 2.02f);
+                        for (int k = 1; k < courses; k++) { Piece("ModularStoneWall", foot + Vector3.up * 2 * k, YawAt(s) + 90, 2.02f); Piece("ModularStoneWall", foot + Vector3.up * 2 * k, YawAt(s) - 90, 2.02f); }
                         Block(foot, new Vector3(2.05f, 2 * courses, .7f), q);
                     }
                 if (!door) return;
                 Piece("Entrance", On(s, 0), YawAt(s) + 90, 3.4f, null, new Vector3(.6f, 3.4f, 4.6f));
                 foreach (int side in new[] { -1, 1 }) Block(On(s, side * 2.05f), new Vector3(.6f, 3.4f, .6f), q);
-                // Over the arch, from its top up to the cornice: the entrance-top module in the middle with plain modules beside it, the
-                // door's bay being 4.6 m to the modules' 2; the cornice along the top. Then the columns, bottom, middle and top, either
-                // side of the door, standing proud of the wall.
+                // Over the arch, from its top up to the wall's top: plain modules, the door's bay being 4.6 m to the modules' 2.
                 for (float y = 3.4f; y < 2 * courses - .4f; y += 2.02f)
-                {
-                    bool top = y + 2.02f >= 2 * courses - .4f;
                     foreach (float a in new[] { -1.55f, 0f, 1.55f })
-                    {
-                        string piece = top ? "ModularStoneWall_top" : a == 0 && y < 3.5f ? "ModularStoneWall_EntranceTop" : "ModularStoneWall";
-                        Piece(piece, On(s, a) + Vector3.up * y, YawAt(s) + 90, 2.02f); Piece(piece, On(s, a) + Vector3.up * y, YawAt(s) - 90, 2.02f);
-                    }
-                }
-                float tall = 2 * courses;
-                foreach (int side in new[] { -1, 1 })
-                {
-                    var foot = On(s, side * 2.85f); if (!Free(foot)) continue;
-                    Piece("ModularColumn_bottom", foot, YawAt(s), .6f); Piece("ModularColumn_middle", foot + Vector3.up * .6f, YawAt(s), tall - 1.2f); Piece("ModularColumn_top", foot + Vector3.up * (tall - .6f), YawAt(s), .6f);
-                    Block(foot, new Vector3(1, tall, 1), q);
-                }
+                    { Piece("ModularStoneWall", On(s, a) + Vector3.up * y, YawAt(s) + 90, 2.02f); Piece("ModularStoneWall", On(s, a) + Vector3.up * y, YawAt(s) - 90, 2.02f); }
             }
             // A hall from s0 to s1, its walls w either side of the way.
             // (The Adit rework) columns false: no columns before the walls nor torches between them (the foundry's catwalks run along its walls).
@@ -336,10 +316,7 @@ namespace Crulanda.World
                         var foot = On(s, side * w); if (!Free(foot) || !Free(foot + Vector3.up * 3.5f)) continue;
                         float yaw = YawAt(s) + (side > 0 ? 0 : 180);   // the dressed face into the hall (it faced the rock: the hall showed flat backs)
                         if (Piece("ModularStoneWall", foot, yaw, 2.02f) == null) continue;
-                        // The top course the kit's wall-top (a cornice) in a tall room, and a window in the second course of every other bay
-                        // (Chris, 2026-10-15: "use some of the dungeon assedt not just plain walls and arch").
-                        for (int k = 1; k < courses; k++) Piece(k == courses - 1 && courses > 2 ? "ModularStoneWall_top" : "ModularStoneWall", foot + Vector3.up * 2 * k, yaw, 2.02f);
-                        if (courses > 2 && ((int)((s - s0) / 2)) % 2 == 1) Piece("Window", foot + Vector3.up * 2.3f, yaw, 1.4f);
+                        for (int k = 1; k < courses; k++) Piece("ModularStoneWall", foot + Vector3.up * 2 * k, yaw, 2.02f);   // plain courses (the 01:12 cornice and windows went with the slab: see EndWall)
                         Block(foot, new Vector3(.7f, 2 * courses, 2.05f), Along(s));
                     }
                 for (float s = s0 + 3; columns && s < s1 - 2; s += columnsEvery)
@@ -354,6 +331,144 @@ namespace Crulanda.World
                 if (wallIn) EndWall(s0, w, doorIn, courses);
                 if (wallOut) EndWall(s1, w, doorOut, courses);
                 Glow(t, On((s0 + s1) / 2, 0) + Vector3.up * (2 * courses), Mathf.Max(s1 - s0, w * 2) * .9f, .8f, torchFire, .8f);
+            }
+
+            // ---------- the kit hall (2026-10-15; Chris, 01:10-01:16, of a frame of the Chapel of Embers' end wall: "still not sure what this is
+            // and looks bad", "just the shape and design is bad", "use some of the dungeon assedt not just plain walls and arch", "dungeon modular
+            // pack and stylized hand painted dungeon in myassets and kaykit dungeon pack in downloads can be used to fix some of those issues") ----------
+            // The chapter-house's rooms (the Ash Garden, the Scriptorium, the Muster Yard, the Chapel of Embers) built from the KayKit Dungeon
+            // Pack (Resources/Props/KayKit, CC0; ZoneBuilder.ModelProps) on its 4 m grid instead of the Dungeon kit's 2 m slabs: wall modules
+            // 4 m wide and 4 m tall in bays along the walls, a second row over the first where the cave's air allows (7.5 m up checked as
+            // 3.5 m was), windows in the upper row (the kit's arched ones in every bay of the chapel, its square ones in every other bay
+            // elsewhere), a pillar of the kit at every bay join with a torch on every other, the kit's corner piece where a side wall meets
+            // an end wall, its arched passage at twice its size for the door (its 2 m arch is too narrow for the way: at twice, 4 m clear
+            // and the crown some 5 m up, 8 m tall like the two rows), floor tiles 4 m square toned down for the cave, ceiling tiles over a
+            // room narrower than 12 m, banners between the pillars in the chapel. Every module is placed by an explicit box (its width
+            // along the wall, its height, its thickness), never by its height alone: a piece whose own height is small, scaled by it, is a
+            // slab (the 01:29 tour). The walls are solid for the navmesh as before: a Block the size of each module and of each corner's
+            // two legs, the arch's jambs blocked, 4 m clear between them. The bays are the room's run shared equally, so a module is
+            // stretched a little (3 to 5 m) rather than a gap left at the end. The rooms keep their spans and widths (Span, RoomWidth) and
+            // the camps' spots (Room). The pack's "fbx(unity)" exports are Y up in metres: a wall's foot at y 0, centred on x and z, its
+            // length along x, so a side wall's module is turned 90 from the way and an end wall's not at all.
+            const float KitBay = 4, KitHigh = 4, KitThick = 1, KitFloorShade = .55f;   // the kit's sand-coloured flags toned down less than the Dungeon kit's near-white ones
+            bool KitHas() { return HasProp("KayKit/wall"); }
+            GameObject Kit(string name, Vector3 foot, float yaw, Vector3 box)
+            {
+                if (kit == null) { kit = new GameObject("Adit kit").transform; kit.SetParent(t, false); }
+                var piece = ModelProp(kit, "KayKit/" + name, foot, yaw, box.y, false, null, box);
+                if (piece != null && name.StartsWith("floor_")) Shade(piece, KitFloorShade);
+                return piece;
+            }
+            // How many rows of modules stand on a foot: none where the foot or the air 3.5 m up is another cave's, one row when 7.5 m up is, else two.
+            int KitRows(Vector3 foot) { return !Free(foot) || !Free(foot + Vector3.up * 3.5f) ? 0 : Free(foot + Vector3.up * 7.5f) ? 2 : 1; }
+            // A torch of the kit in its bracket on a face (face: the face at the floor; inward: into the room), its bracket's back on the face
+            // (the model's z 0, the torch out along +z to .62), 1.7 m up; its fire a light when `lit`.
+            void KitTorch(Vector3 face, Vector3 inward, bool lit)
+            {
+                inward.y = 0; if (inward.sqrMagnitude < .01f) return; inward.Normalize();
+                var foot = face + inward * .31f + Vector3.up * 1.7f; if (!Free(foot)) return;
+                if (Kit("torch_mounted", foot, Quaternion.LookRotation(inward).eulerAngles.y, new Vector3(.55f, 1.06f, .62f)) == null) return;
+                if (lit) Glow(t, foot + inward * .25f + Vector3.up * 1.05f, 9, .95f, torchFire, .95f).gameObject.AddComponent<Flicker>();
+            }
+            // A banner of the kit on a wall face, hanging from 3.7 m to .5 m as the kit hangs it (its pole just inside the face, the cloth out).
+            void KitBanner(string name, float wide, Vector3 face, Vector3 inward)
+            {
+                inward.y = 0; if (inward.sqrMagnitude < .01f) return; inward.Normalize();
+                var foot = face + inward * .02f + Vector3.up * .53f; if (!Free(foot + inward * .3f)) return;
+                Kit(name, foot, Quaternion.LookRotation(inward).eulerAngles.y, new Vector3(wide, 3.2f, .34f));
+            }
+            // The kit's corner piece on a room's corner (s, a): its post on the corner, one leg 2 m along the end wall toward the way, the other
+            // 2 m along the side wall into the room (facing: which way along the cave the room lies from this end wall). The model's legs run
+            // along its -x and +z from the post at its origin, so a yaw lays them along the two walls and the foot (the model's middle, which
+            // ModelProp puts on the spot) is set off from the corner by the model's middle. Returns the rows it stands.
+            int KitCorner(float s, float a, int facing, int side)
+            {
+                var corner = On(s, a); int rows = KitRows(corner); if (rows == 0) return 0;
+                float yaw = YawAt(s) + (facing > 0 ? (side > 0 ? 0 : 90) : (side > 0 ? -90 : 180));
+                var r = Quaternion.Euler(0, yaw, 0); var foot = corner + r * new Vector3(-.75f, 0, .75f);
+                for (int k = 0; k < rows; k++) if (Kit("wall_corner", foot + Vector3.up * KitHigh * k, yaw, new Vector3(2.5f, KitHigh, 2.5f)) == null) return 0;
+                Block(corner + r * new Vector3(-1, 0, 0), new Vector3(3, KitHigh * rows, KitThick), r);
+                Block(corner + r * new Vector3(0, 0, 1), new Vector3(KitThick, KitHigh * rows, 3), r);
+                return rows;
+            }
+            // A wall of the kit across the way at s, out to w either side: the corner pieces, modules in bays from the door's bay (8 m, the
+            // passage at twice the kit's size) or from the middle out to the corners' legs, a second row where the air allows. With
+            // `greatWindow` (the chapel's apse), a third row over the door's bay of two arched windows with the fire's pane behind them,
+            // when the air 11.5 m up is the cave's own.
+            void KitEndWall(float s, float w, bool door, int facing, bool greatWindow = false)
+            {
+                var q = Along(s); float yaw = YawAt(s);
+                foreach (int side in new[] { -1, 1 }) KitCorner(s, side * w, facing, side);
+                void Run(float a0, float a1)
+                {
+                    float len = a1 - a0; if (len < 1.2f) return; int bays = Mathf.Max(1, Mathf.RoundToInt(len / KitBay)); float bay = len / bays;
+                    for (int i = 0; i < bays; i++)
+                    {
+                        float a = a0 + (i + .5f) * bay; var foot = On(s, a); int rows = KitRows(foot); if (rows == 0) continue;
+                        var box = new Vector3(bay, KitHigh, KitThick);
+                        if (Kit("wall", foot, yaw, box) == null) continue;
+                        if (rows > 1) Kit("wall", foot + Vector3.up * KitHigh, yaw, box);
+                        Block(foot, new Vector3(bay, KitHigh * rows, KitThick), q);
+                    }
+                }
+                if (door) { Run(4, w - 2); Run(-(w - 2), -4); } else Run(-(w - 2), w - 2);
+                if (!door) return;
+                var mid = On(s, 0); if (!Free(mid)) return;
+                if (Kit("wall_arched", mid, yaw, new Vector3(8, 8, KitThick)) == null) return;   // the kit's arched passage at twice its size: 4 m clear, 8 m tall
+                foreach (int side in new[] { -1, 1 }) Block(On(s, side * 3), new Vector3(2, 8, KitThick), q);
+                if (!greatWindow || !Free(mid + Vector3.up * 11.5f)) return;
+                foreach (float a in new[] { -2f, 2f }) Kit("wall_archedwindow_open", On(s, a) + Vector3.up * 8, yaw, new Vector3(4, 4, KitThick));
+                var pane = mid + Vector3.up * 10 - q * new Vector3(0, 0, facing * .6f);   // the fire behind the wall
+                Part(PrimitiveType.Cube, t, pane, new Vector3(7.6f, 3.4f, .04f), Glowing(new Color(1, .42f, .12f), 1.2f), q);
+                Glow(t, mid + Vector3.up * 9.5f + q * new Vector3(0, 0, facing * 1.5f), 10, .9f, new Color(1, .5f, .2f), .9f).gameObject.AddComponent<Flicker>();
+            }
+            // A hall of the kit from s0 to s1, its walls w either side of the way (the KitHall of the comment above). Without the pack (the
+            // tests' bare scenes, an old validation copy) the Dungeon kit's Hall stands in.
+            void KitHall(float s0, float s1, float w, bool wallIn, bool doorIn, bool wallOut, bool doorOut, Func<float, float, bool> bare = null, bool chapel = false)
+            {
+                if (s0 < 0 || s1 - s0 < 6) return;
+                if (!KitHas()) { Hall(s0, s1, w, wallIn, doorIn, wallOut, doorOut, 9, bare, chapel ? 4 : 3); return; }
+                hallSpans.Add(new Vector2(s0 - 3, s1 + 3));
+                // The floor: the kit's 4 m tiles, their tops 3 cm over the cave's floor, none under the lake.
+                for (float s = s0 + 2; s < s1 - 1; s += KitBay)
+                    for (float a = -w + 2; a < w - 1; a += KitBay)
+                    {
+                        if (bare != null && bare(s, a)) continue;
+                        var at = On(s, a); if (Free(at)) Kit("floor_tile_large", at + Vector3.down * .12f, YawAt(s), new Vector3(KitBay, .15f, KitBay));
+                    }
+                int rowsMax = 1;
+                foreach (int side in new[] { -1, 1 })
+                {
+                    // The side wall's run, short of the corner pieces' legs where there is an end wall; its bays.
+                    float run0 = wallIn ? s0 + 2 : s0, run1 = wallOut ? s1 - 2 : s1, len = run1 - run0; if (len < 2) continue;
+                    int bays = Mathf.Max(1, Mathf.RoundToInt(len / KitBay)); float bay = len / bays;
+                    for (int i = 0; i < bays; i++)
+                    {
+                        float s = run0 + (i + .5f) * bay; if (h.Half[RingAt(s)] * .82f < w - .2f) continue;   // the rock bulges in here: it shows
+                        var foot = On(s, side * w); int rows = KitRows(foot); if (rows == 0) continue; rowsMax = Mathf.Max(rowsMax, rows);
+                        float yaw = YawAt(s) + 90; var box = new Vector3(bay, KitHigh, KitThick);
+                        if (Kit(K() < .2f ? "wall_cracked" : "wall", foot, yaw, box) == null) continue;
+                        if (rows > 1) Kit(chapel ? "wall_archedwindow_open" : i % 2 == 1 ? "wall_window_open" : "wall", foot + Vector3.up * KitHigh, yaw, box);
+                        Block(foot, new Vector3(KitThick, KitHigh * rows, bay), Along(s));
+                        if (chapel && i % 2 == 0) KitBanner(i % 4 == 0 ? "banner_red" : "banner_triple_red", i % 4 == 0 ? 1.5f : 3.7f, On(s, side * (w - .5f)), On(s, 0) - foot);
+                    }
+                    // A pillar at every bay join, sunk a little into the wall and standing proud of it, a torch on every other one.
+                    for (int i = 1; i < bays; i++)
+                    {
+                        float s = run0 + i * bay; if (h.Half[RingAt(s)] * .82f < w - .2f) continue;
+                        float a = side * (w - .5f); var foot = On(s, a); int rows = KitRows(foot); if (rows == 0 || !Room(s, a, .8f)) continue;
+                        for (int k = 0; k < rows; k++) Kit("pillar", foot + Vector3.up * KitHigh * k, YawAt(s), new Vector3(1.5f, KitHigh, 1.5f));
+                        Block(foot, new Vector3(1.5f, KitHigh * rows, 1.5f), Along(s));
+                        if (i % 2 == 1) KitTorch(On(s, side * (w - 1.25f)), On(s, 0) - foot, hallTorches++ % 2 == 0);
+                    }
+                }
+                if (wallIn) KitEndWall(s0, w, doorIn, 1);
+                if (wallOut) KitEndWall(s1, w, doorOut, -1, chapel);
+                if (w * 2 <= 12)   // a narrow room: the kit's ceiling tiles on the walls' top
+                    for (float s = s0 + 2; s < s1 - 1; s += KitBay)
+                        for (float a = -w + 2; a < w - 1; a += KitBay)
+                        { var at = On(s, a) + Vector3.up * KitHigh * rowsMax; if (Free(at)) Kit("ceiling_tile", at, YawAt(s), new Vector3(KitBay, .35f, KitBay)); }
+                Glow(t, On((s0 + s1) / 2, 0) + Vector3.up * KitHigh * rowsMax, Mathf.Max(s1 - s0, w * 2) * .9f, .8f, torchFire, .8f);
             }
             // ---- furnishings (cut stone, timber and iron; the kit's books, candles and candelabra) ----
             var urnClay = Tint(art.stone, new Color(.45f, .3f, .22f)); var ashGrey = Tint(art.stone, new Color(.2f, .19f, .19f));
@@ -1114,7 +1229,8 @@ namespace Crulanda.World
 
             // The Cult of Ash's chapter-house, a room to a cave (the Scarlet Monastery's lesson: wings you know from one look): the ash garden of
             // the order's dead (urns, graves, ash on the flags), the scriptorium (shelves, lecterns, reading desks) and the muster yard (racks
-            // of weapons, ranks of dummies). The old chapter-house's pieces (ChapterHouse), each where its cave is widest.
+            // of weapons, ranks of dummies). The old chapter-house's pieces (ChapterHouse), each where its cave is widest. The rooms are the
+            // KayKit hall's since 2026-10-15 (KitHall: Chris of the Dungeon kit's flat walls, "just the shape and design is bad").
             void ChapterRoom()
             {
                 EmberWalls();
@@ -1123,20 +1239,20 @@ namespace Crulanda.World
                 switch (part)
                 {
                     case "ashgarden":
-                        Hall(span.x, span.y, w, true, true, false, false, 9, null, 3);   // the gatehouse arch in; open at its far end (the ways on leave from there)
+                        KitHall(span.x, span.y, w, true, true, false, false);   // the gatehouse arch in; open at its far end (the ways on leave from there)
                         for (float s = span.x + 1.2f; s < span.y - .8f; s += 2.4f) foreach (int side in new[] { -1, 1 }) Urn(s, side * (w - 1.2f));
                         for (float s = span.x + 1.2f; s < span.y - .8f; s += 4.8f) foreach (int side in new[] { -1, 1 }) Urn(s, side * (w - 3.4f));   // a second row of urns
                         for (float s = span.x + 2; s < span.y - 1.5f; s += 3.6f) foreach (int side in new[] { -1, 1 }) { Grave(s, side * w * .3f); Grave(s + 1.8f, side * w * .55f); }
                         for (int k = 0; k < 14; k++) { float s = span.x + 1 + R9() * (span.y - span.x - 2); Part(PrimitiveType.Cylinder, t, On(s, (R9() - .5f) * w * 1.4f) + Vector3.up * .01f, new Vector3(1.5f + R9() * 2, .01f, 1.5f + R9() * 2), ashGrey); }
                         break;
                     case "scriptorium":
-                        Hall(span.x, span.y, w, true, true, true, true, 9, null, 3);
+                        KitHall(span.x, span.y, w, true, true, true, true);
                         for (float s = span.x + 1; s < span.y - 1; s += 2.6f) foreach (int side in new[] { -1, 1 }) Shelf(s, side, w);
                         for (float s = span.x + 2.5f; s < span.y - 2; s += 4.5f) foreach (int side in new[] { -1, 1 }) Lectern(s, side * (w - 2.8f));
                         for (float s = span.x + 4; s < span.y - 3; s += 6) { Lectern(s, w * .32f); Lectern(s + 3, -w * .32f); }   // reading desks out on the floor
                         break;
                     case "musteryard":
-                        Hall(span.x, span.y, w, true, true, true, true, 9, null, 3);
+                        KitHall(span.x, span.y, w, true, true, true, true);
                         for (float s = span.x + 1; s < span.y - 1; s += 3) foreach (int side in new[] { -1, 1 }) Rack(s, side, w);
                         for (float s = span.x + 2.5f; s < span.y - 2; s += 3.5f) foreach (int side in new[] { -1, 1 }) { Dummy(s, side * (w - 3.6f)); Dummy(s + 1.7f, side * (w - 6.5f)); }   // two ranks of dummies either side
                         break;
@@ -1163,7 +1279,10 @@ namespace Crulanda.World
                 // nave at x about 110: the cloister stair and the chapel's west half were cut off from the altar, the R91 picture).
                 rz = Mathf.Min(rz, (cw - 2.6f) / 1.5f); rx = Mathf.Min(rx, rz * 1.8f);
                 float lrx = rx + 1, lrz = rz + 1;
-                Hall(nave.x, e, cw, true, true, true, true, 9, (s, a) => lake >= 0 && Mathf.Pow((s - lakeAt) / lrz, 2) + Mathf.Pow(a / lrx, 2) < 1, 4);
+                // The nave from the kit (KitHall, 2026-10-15): arched windows in every upper bay, banners between the pillars, the great window
+                // in a third row over the cloister door. The Dungeon kit's four-course hall stands in without the pack.
+                bool kitted = KitHas();
+                KitHall(nave.x, e, cw, true, true, true, true, (s, a) => lake >= 0 && Mathf.Pow((s - lakeAt) / lrz, 2) + Mathf.Pow(a / lrx, 2) < 1, true);
                 var basalt = Tint(art.stone, new Color(.18f, .15f, .14f)); var cloth = Tint(art.cloth, new Color(.45f, .08f, .06f));
                 if (lake >= 0)
                 {
@@ -1185,27 +1304,42 @@ namespace Crulanda.World
                         Banner(t, On(s + 1.2f, side * (cw - .45f)), Along(s).eulerAngles.y, cloth, dark, 6.4f);
                     }
                 }
-                // Two blocks of pews either side of the carpet, before the lake and between it and the altar, room to cross round the lake.
-                for (float s = nave.x + 3; s < altarAt - 4; s += 1.3f)
+                // The altar's dais (the kit, 2026-10-15): the kit's flags a step up, 8 m wide, from 4 m before the altar to the apse wall, on a
+                // plinth of black stone whose sides are its kerb, the kit's wide stair at its front. A shallow step, 12 cm: the navmesh is the
+                // cave's floor and the pieces are for the eye, so a taller one would have the Warden and her people wading in it.
+                const float dais = .12f; float d0 = altarAt - 4, d1 = Mathf.Min(e - 1, altarAt + 4);
+                if (kitted)
+                {
+                    for (float s = d0 + 2; s < d1 - .5f; s += KitBay) foreach (float a in new[] { -2f, 2f })
+                        { var at = On(s, a); if (Free(at)) Kit("floor_tile_large", at + Vector3.up * (dais - .12f), YawAt(s), new Vector3(KitBay, .15f, Mathf.Min(KitBay, (d1 - s) * 2))); }
+                    Part(PrimitiveType.Cube, t, On((d0 + d1) / 2, 0) + Vector3.up * dais / 2, new Vector3(8.2f, dais, d1 - d0), basalt, Along(altarAt));
+                    Kit("stairs_wide", On(d0 - .6f, 0), YawAt(altarAt), new Vector3(7, dais * 1.28f, 1.2f));   // its rail's 5.1 to its treads' 4
+                }
+                // Two blocks of pews either side of the carpet, before the lake and between it and the altar (short of the dais's stair), room to
+                // cross round the lake.
+                for (float s = nave.x + 3; s < (kitted ? d0 - 2 : altarAt - 4); s += 1.3f)
                 {
                     if (lake >= 0 && Mathf.Abs(s - lakeAt) < rz + 3) continue;
                     foreach (int side in new[] { -1, 1 }) { Pew(s, side * 3.4f, 3.2f); Pew(s, side * 7.6f, 3.2f); }
                 }
-                // The altar, the carpet up to it, a tall candelabrum either side.
+                // The altar, the carpet up to it (to the dais's stair), a tall candelabrum either side.
                 {
                     var qa = Along(altarAt); var altar = On(altarAt, 0);
                     if (Room(altarAt, 0, 1.4f, true))
                     {
-                        Part(PrimitiveType.Cube, t, altar + Vector3.up * .5f, new Vector3(2.4f, 1, 1.2f), basalt, qa);
-                        Part(PrimitiveType.Cube, t, altar + Vector3.up * 1.03f, new Vector3(2.6f, .08f, 1.4f), Tint(art.cloth, new Color(.3f, .06f, .05f)), qa);
-                        for (int g = 0; g < 3; g++) Part(PrimitiveType.Sphere, t, altar + qa * new Vector3(-.6f + g * .6f, 1.15f, 0), new Vector3(.2f, .14f, .18f), Glowing(new Color(.55f, .3f, .8f), .6f));   // geodes set out for the fire, gone dim
-                        Lamp(altar + qa * new Vector3(0, 1.4f, -.5f), EmberRed, 10, 1.2f, .1f);
-                        Block(altar, new Vector3(2.5f, 1.1f, 1.3f), qa);
+                        Part(PrimitiveType.Cube, t, altar + Vector3.up * (dais + .5f), new Vector3(2.4f, 1, 1.2f), basalt, qa);
+                        Part(PrimitiveType.Cube, t, altar + Vector3.up * (dais + 1.03f), new Vector3(2.6f, .08f, 1.4f), Tint(art.cloth, new Color(.3f, .06f, .05f)), qa);
+                        for (int g = 0; g < 3; g++) Part(PrimitiveType.Sphere, t, altar + qa * new Vector3(-.6f + g * .6f, dais + 1.15f, 0), new Vector3(.2f, .14f, .18f), Glowing(new Color(.55f, .3f, .8f), .6f));   // geodes set out for the fire, gone dim
+                        Lamp(altar + qa * new Vector3(0, dais + 1.4f, -.5f), EmberRed, 10, 1.2f, .1f);
+                        Block(altar, new Vector3(2.5f, 1.1f + dais, 1.3f), qa);
                     }
-                    Piece("Carpet", On(altarAt - 4.5f, 0) + Vector3.up * .01f, YawAt(altarAt), .06f, null, new Vector3(2.4f, .06f, 6.6f));
-                    foreach (int side in new[] { -1, 1 }) { var cd = On(altarAt, side * 2.1f); if (Free(cd)) { Piece("Candelabrum_tall", cd, YawAt(altarAt), 1.9f); Block(cd, new Vector3(.6f, 1.9f, .6f), qa); } }
+                    Piece("Carpet", On(kitted ? d0 - 4.5f : altarAt - 4.5f, 0) + Vector3.up * .01f, YawAt(altarAt), .06f, null, new Vector3(2.4f, .06f, 6.6f));
+                    foreach (int side in new[] { -1, 1 }) { var cd = On(altarAt, side * 2.1f) + Vector3.up * dais; if (Free(cd)) { Piece("Candelabrum_tall", cd, YawAt(altarAt), 1.9f); Block(cd, new Vector3(.6f, 1.9f, .6f), qa); } }
                 }
+                // The kit's shield banners either side of the cloister door (the great window is KitEndWall's, a third row over the door).
+                if (kitted) { foreach (int side in new[] { -1, 1 }) KitBanner("banner_shield_red", 2.2f, On(e - .5f, side * 5.5f), Along(e) * Vector3.back); }
                 // The great window over the cloister door in the apse's wall: a pane of the fire behind it in a dark stone frame, banners either side.
+                else
                 {
                     var q = Along(e); var win = On(e - .45f, 0) + Vector3.up * 6.1f; var frame = Tint(art.stone, new Color(.16f, .14f, .13f));
                     Part(PrimitiveType.Cube, t, win, new Vector3(2.6f, 3.2f, .04f), Glowing(new Color(1, .42f, .12f), 1.2f), q);

@@ -52,6 +52,45 @@ namespace Crulanda.World
         /// </summary>
         static Material smallPropsAtlas;
         static Material SmallPropsAtlas { get { if (smallPropsAtlas == null) smallPropsAtlas = Resources.Load<Material>("Props/SmallProps/SmallPropsAtlas"); return smallPropsAtlas; } }
+        /// <summary>
+        /// The KayKit Dungeon Pack (Kay Lousberg, CC0; Resources/Props/KayKit, brought in 2026-10-15 after Chris, 01:12-01:16, of the chapel's
+        /// end wall: "use some of the dungeon assedt not just plain walls and arch", "kaykit dungeon pack in downloads"): one palette atlas
+        /// (dungeon_texture.png) for the whole pack, as the Small Props Pack has. Its "fbx(unity)" exports are Y up in metres with no node
+        /// turn (read from the files: UnitScaleFactor 100, no rotation on the mesh node; the plain "fbx" set is the Blender kind, a -90
+        /// turn and a scale of 100 on the node, like the Dungeon kit), so no PropTurns entry and no path rule: a wall stands 4 m by 4 m,
+        /// 1 m thick, its foot at y 0, centred on x and z.
+        /// </summary>
+        static Material kayKitAtlas;
+        static Material KayKitAtlas { get { if (kayKitAtlas == null) kayKitAtlas = Resources.Load<Material>("Props/KayKit/KayKitAtlas"); return kayKitAtlas; } }
+        /// <summary>
+        /// The Dungeon Modular Pack (logicalbeat, Asset Store EULA; Resources/Props/DungeonModular, 2026-10-15, Chris: "dungeon modular pack
+        /// ... in myassets"): thirteen meshes on a 4 m grid (Wall_A/B 4 x 4 x 0.2, Wall_C 4 x 2, Pillar_A 0.82 x 4, Pillar_B 0.82 x 2,
+        /// Arch_A 2.5 x 3.46 x 0.5, Step_A 4 x 2 x 4, Tile_A/B 4 x 4, Torch_A/B 0.7 tall, Handrail_A 2 x 1.2), their detail in the
+        /// textures, not the meshes (a wall is eight vertices). Its own materials are a shader graph the project does not have, so the
+        /// pieces take a Standard material a family each (M_Wall, M_Pillar, M_Arch, M_Step, M_Tile, M_Torch, M_Handrail: the colour and
+        /// normal maps), by the family in the mesh's material name (Step_A carries M_Step_A and M_Wall_A), else by the file's name.
+        /// </summary>
+        static readonly Dictionary<string, Material> dungeonModularMats = new Dictionary<string, Material>();
+        static Material DungeonModularMat(string family)
+        {
+            if (!dungeonModularMats.TryGetValue(family, out var m)) { m = Resources.Load<Material>("Props/DungeonModular/M_" + family); dungeonModularMats[family] = m; }
+            return m;
+        }
+        static void DressDungeonModular(GameObject go, string file)
+        {
+            string own = file.Split('_')[0];   // Wall_A -> Wall
+            foreach (var r in go.GetComponentsInChildren<Renderer>(true))
+            {
+                var mats = r.sharedMaterials;
+                for (int i = 0; i < mats.Length; i++)
+                {
+                    string name = mats[i] != null ? mats[i].name : "", family = own;
+                    if (name.StartsWith("M_")) { var parts = name.Split('_'); if (parts.Length > 1) family = parts[1]; }
+                    var m = DungeonModularMat(family) ?? DungeonModularMat(own); if (m != null) mats[i] = m;
+                }
+                r.sharedMaterials = mats;
+            }
+        }
         public static GameObject ModelProp(Transform parent, string path, Vector3 foot, float yaw, float height, bool solid = false, float? width = null, Vector3? box = null)
         {
             var src = PropSource(path); if (src == null) return null;
@@ -73,6 +112,9 @@ namespace Crulanda.World
             foreach (var r in go.GetComponentsInChildren<Renderer>(true)) { r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On; r.receiveShadows = true; }
             if (path.StartsWith("SmallProps/") && SmallPropsAtlas != null)   // the Small Props Pack (RG Poly, CC0): one atlas for all its models
                 foreach (var r in go.GetComponentsInChildren<Renderer>(true)) { var mats = r.sharedMaterials; for (int i = 0; i < mats.Length; i++) mats[i] = SmallPropsAtlas; r.sharedMaterials = mats; }
+            if (path.StartsWith("KayKit/") && KayKitAtlas != null)   // the KayKit Dungeon Pack (CC0): one atlas for the whole pack
+                foreach (var r in go.GetComponentsInChildren<Renderer>(true)) { var mats = r.sharedMaterials; for (int i = 0; i < mats.Length; i++) mats[i] = KayKitAtlas; r.sharedMaterials = mats; }
+            if (path.StartsWith("DungeonModular/")) DressDungeonModular(go, path.Substring(path.LastIndexOf('/') + 1));
             if (path.StartsWith("Nature/")) DressNature(go);
             if (solid) { var col = go.AddComponent<BoxCollider>(); col.center = b.center; col.size = b.size; go.AddComponent<NavBlocker>(); }
             return go;
@@ -185,6 +227,18 @@ namespace Crulanda.World
             ("Megapack/Models/Buildings/Buiilding_6_1", 7.6f), ("Megapack/Models/Buildings/Stable_1", 4.1f), ("Megapack/Models/Buildings/Tower_1", 9.5f), ("Megapack/Models/Buildings/Windmill", 13),
             ("Village/Wall_Plaster_Straight", 3), ("Village/Wall_Plaster_Door_Round", 3), ("Village/Wall_Plaster_Window_Wide_Round", 3), ("Village/Wall_UnevenBrick_Straight", 3),
             ("Village/Roof_RoundTiles_6x8", 3), ("Village/Floor_WoodDark", .3f), ("Village/Door_1_Round", 2.4f), ("Village/Prop_Chimney", 2.5f), ("Village/Corner_Exterior_Wood", 3), ("Village/Stairs_Exterior_Straight", 1.5f),
+            // The KayKit Dungeon Pack at its own sizes (the chapter-house's rooms, 2026-10-15): walls 4 m, pillars 4 m, the stair 5.1 m to its rail.
+            ("KayKit/wall", 4), ("KayKit/wall_doorway", 4), ("KayKit/wall_arched", 4), ("KayKit/wall_doorway_sides", 4), ("KayKit/wall_archedwindow_open", 4), ("KayKit/wall_window_open", 4),
+            ("KayKit/wall_corner", 4), ("KayKit/wall_pillar", 4), ("KayKit/wall_broken", 4), ("KayKit/wall_cracked", 4), ("KayKit/wall_half", 4), ("KayKit/wall_endcap", 4),
+            ("KayKit/pillar", 4), ("KayKit/pillar_decorated", 4), ("KayKit/column", 1.4f), ("KayKit/stairs", 5.1f), ("KayKit/stairs_wide", 5.1f), ("KayKit/stairs_narrow", 5.1f),
+            ("KayKit/floor_tile_large", .15f), ("KayKit/floor_tile_small", .15f), ("KayKit/floor_tile_small_broken_A", .15f), ("KayKit/floor_tile_large_rocks", .64f), ("KayKit/ceiling_tile", .35f),
+            ("KayKit/torch_mounted", 1.06f), ("KayKit/torch_lit", 1.13f), ("KayKit/banner_red", 3.2f), ("KayKit/banner_triple_red", 3.2f), ("KayKit/banner_shield_red", 3.2f),
+            ("KayKit/table_long", 1), ("KayKit/table_medium", 1), ("KayKit/chair", 1.23f), ("KayKit/stool", .5f), ("KayKit/shelves", 1.95f), ("KayKit/chest", 1.3f), ("KayKit/candle_lit", 1.05f),
+            ("KayKit/candle_triple", .87f), ("KayKit/barrel_large", 2), ("KayKit/box_large", 1.5f), ("KayKit/crates_stacked", 2.14f), ("KayKit/keg", 2.05f), ("KayKit/rubble_half", 3.5f),
+            ("KayKit/sword_shield", 1.67f), ("KayKit/barrier", 1.1f), ("KayKit/bed_frame", 1.06f), ("KayKit/trunk_large_A", 1),
+            // The Dungeon Modular Pack at its own sizes (metres from its centimetre files).
+            ("DungeonModular/Wall_A", 4), ("DungeonModular/Wall_B", 4), ("DungeonModular/Wall_C", 2), ("DungeonModular/Pillar_A", 4), ("DungeonModular/Pillar_B", 2), ("DungeonModular/Arch_A", 3.46f),
+            ("DungeonModular/Step_A", 2), ("DungeonModular/Tile_B", .2f), ("DungeonModular/Torch_A", .72f), ("DungeonModular/Torch_B", .71f), ("DungeonModular/Handrail_A", 1.19f), ("DungeonModular/Handrail_B", 1.25f),
         };
     }
 }

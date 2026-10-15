@@ -25,7 +25,10 @@ store cache; a picture of fly-out hotbar buttons: "keep this in mind when design
 - **The dungeon packs:** the KayKit Dungeon Pack (88 pieces, CC0) and the Dungeon Modular Pack (13 pieces) in the builder, every piece
   sized by an explicit box; the chapter-house's four rooms rebuilt on KayKit's 4 m grid (floors, walls in bays with pillars, arched
   windows, torches, banners, the altar's dais and stair, the apse's window). The frames at 02:00 showed stone walls and a filled arch
-  where the door is ("now this looks blocked?? does the door open?": walkable, but the blind-arch piece): the open doorway piece now.
+  where the door is ("now this looks blocked?? does the door open?": walkable, but the blind-arch piece). KayKit's arched wall is a
+  blind arch (124 vertices of stone in its opening) and its "doorway" is a shut red leaf with a ring; the one wall piece with nothing in
+  its slot is the doorway-with-returns piece, now boxed 10 x 8 x 1 m: a 4 m clear, 5 m tall opening on both faces, the side runs
+  starting at 5 m, the jamb blocks 2..5 m (the navmesh gap stays 4 m). A flat lintel, not an arch: the kit has no open arch.
 - **The shader kit:** the game already had hand-written water and grass shaders doing what the packs do; they took the one thing each
   pack adds (caustic threads on shallow beds; a push-away from the player and the villagers), and a candle flame that wavers with its
   light is new (the inn's sign lantern, the cookfires, the torches, campfires and braziers). The water and grass changes are in place and

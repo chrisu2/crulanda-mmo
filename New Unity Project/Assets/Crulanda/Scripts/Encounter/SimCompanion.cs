@@ -812,6 +812,10 @@ namespace Crulanda.Encounter
         /// <summary>The most hurt of the party within <paramref name="reach"/>: you, Mira (when recruited), the sims, Mother Quillet.</summary>
         Actor MostHurt(float reach)
         {
+            // The tank first when it is under 60% (2026-10-15: at the Rock-Eater the healer mended a damage-dealer eight times while the tank
+            // died unhealed; every group wipe there began with the tank).
+            foreach (var p in session.PartySims)
+                if (p != null && p.Role == PartyRole.Tank && p.actor.IsAlive && p.actor.Health.Pool.Ratio < .6f && Vector3.Distance(p.transform.position, transform.position) <= reach) return p.actor;
             Actor best = null; float low = 1;
             void Consider(Actor a) { if (a != null && a.IsAlive && a.Health.Pool.Ratio < low && Vector3.Distance(a.transform.position, transform.position) <= reach) { best = a; low = a.Health.Pool.Ratio; } }
             Consider(session.Player);

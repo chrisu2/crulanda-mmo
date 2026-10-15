@@ -27,6 +27,8 @@ namespace Crulanda.World
             { "Fantasy/Barrel", new Vector3(-90, 0, 0) }, { "Fantasy/Stool", new Vector3(-90, 0, 0) }, { "Fantasy/Chandelier", new Vector3(-90, 0, 0) },
             { "Fantasy/Dummy", new Vector3(-90, 0, 0) }, { "Fantasy/Banner_1", new Vector3(-90, 0, 0) }, { "Fantasy/Banner_2", new Vector3(-90, 0, 0) }, { "Fantasy/WeaponStand", new Vector3(-90, 0, 0) },   // the weapon stand made Z up too: it lay tipped against the yard's fence (Chris, 15:20) and in Vell's smithy   // Banner_2 made Z up like Banner_1 (2.08 m along z): lying flat it came in some 15 times too big (the 14:12 yard frame) { "Fantasy/CandleStick", new Vector3(0, 0, -90) },
             { "Medieval/Prefabs/CandleV1", new Vector3(-90, 0, 0) },
+            // Fantasy2/ (ithappy's Fantasy FREE, the market pieces, 2026-10-15) needs no entry: Blender's export with the turn baked in
+            // (UpAxis Y, every node's rotation zero, metres), read from the files; MarketPropTests measures them standing.
             // The Small Props Pack's "Unity FBX" models stand on their heads: their vertices are the glTF copies' turned half round X (read
             // 2026-10-13 after Chris: "two archer targets upside down", "two dummies upside down"); only PracticeTarget_1_B is upright.
             { "SmallProps/Basin_A", new Vector3(180, 0, 0) },
@@ -242,6 +244,12 @@ namespace Crulanda.World
             // The Dungeon Modular Pack at its own sizes (metres from its centimetre files).
             ("DungeonModular/Wall_A", 4), ("DungeonModular/Wall_B", 4), ("DungeonModular/Wall_C", 2), ("DungeonModular/Pillar_A", 4), ("DungeonModular/Pillar_B", 2), ("DungeonModular/Arch_A", 3.46f),
             ("DungeonModular/Step_A", 2), ("DungeonModular/Tile_B", .2f), ("DungeonModular/Torch_A", .72f), ("DungeonModular/Torch_B", .71f), ("DungeonModular/Handrail_A", 1.19f), ("DungeonModular/Handrail_B", 1.25f),
+            // The Fantasy FREE market pieces (2026-10-15; ZoneBuilder.Market has them by variant, at the pack's own metre heights).
+            ("Fantasy2/stall_001", 2.57f), ("Fantasy2/stall_table_001", 1.08f), ("Fantasy2/table_001", .78f), ("Fantasy2/jug_001", .34f), ("Fantasy2/jug_002", .51f), ("Fantasy2/jug_003", .57f),
+            ("Fantasy2/jug_004", .33f), ("Fantasy2/jug_005", .45f), ("Fantasy2/plate_001", .07f), ("Fantasy2/plate_002", .07f), ("Fantasy2/plate_003", .07f), ("Fantasy2/bag_001", .57f),
+            ("Fantasy2/bag_002", .57f), ("Fantasy2/bag_003", .57f), ("Fantasy2/bag_004", .57f), ("Fantasy2/box_001", .54f), ("Fantasy2/box_001_001", .34f), ("Fantasy2/box_002", .17f),
+            ("Fantasy2/box_003", .32f), ("Fantasy2/bucket_001", .48f), ("Fantasy2/barrel_001", .73f), ("Fantasy2/holder_001", 2.01f), ("Fantasy2/pointer_001", 2.17f), ("Fantasy2/log_001", 1.81f),
+            ("Fantasy2/log_002", .74f), ("Fantasy2/log_003", .32f), ("Fantasy2/log_004", .54f), ("Fantasy2/cart_001", 1.16f),
         };
     }
 }

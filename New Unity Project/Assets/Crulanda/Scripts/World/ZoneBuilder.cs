@@ -1174,6 +1174,7 @@ namespace Crulanda.World
                     case "training_yard": TrainingYard(t, p.size); break;   // the sparring yard round the training field's dummies
                     case "training_dummy": case "mending_dummy": break;   // the training field: its look goes on the session's own dummies (EncounterSession.Training)
                     case "stall": Stall(t, p.variant); break;
+                    case "market": MarketProp(t, p); break;   // the Fantasy pack's market pieces (ZoneBuilder.Market.cs; Chris, 2026-10-15: the fantasy assets in Downloads)
                     case "oven": Oven(t); break;
                     case "tannery": Tannery(t); break;
                     case "woodpile": Woodpile(t); break;

@@ -177,7 +177,19 @@ namespace Crulanda.Encounter
                             TravelTo(new Crulanda.World.ZoneExit { to = "zone.adit", name = "/adit", arrive = adit.spawns.player });
                             return;
                         }
-                    case "/help": Message("Testing: /level <1-" + EncounterProgress.LevelCap + "> sets your level (down to 1 starts over), /aa <n> gives alternate advancement points at the cap."); Message("Chat: /s say, /z zone, /t trade, /lfg, /p party, /w <name> <words> whisper, /r reply; /invite <name> (anyone online, anywhere), /leave [name], /who, /friend <name>, /friends, /assist [name], /lead [name] (a sim leads a run to a camp), /dungeon [quick|full] (a sim leads you through the dungeon: quick leaves what may be left, full takes every side room); /g guild chat, /guild (who is in it), /gquit."); return;
+                    case "/music":   // the zone's music (2026-10-15, Chris's three packs; ZoneMusic): /music <0-1> sets the level, /music off silences it
+                        {
+                            if (arg.Length == 0) { Message("Music is at " + Mathf.RoundToInt(Crulanda.World.ZoneMusic.Volume * 100) + "%: /music <0-1> sets it, /music off silences it."); return; }
+                            if (arg == "off") { Crulanda.World.ZoneMusic.Volume = 0; Message("Music off (/music on brings it back)."); return; }
+                            if (arg == "on") { Crulanda.World.ZoneMusic.Volume = Crulanda.World.ZoneMusic.DefaultVolume; Message("Music on, at " + Mathf.RoundToInt(Crulanda.World.ZoneMusic.DefaultVolume * 100) + "%."); return; }
+                            if (float.TryParse(arg.TrimEnd('%'), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out float level))
+                            {
+                                if (level > 1) level /= 100;   // "/music 50" reads as a half
+                                Crulanda.World.ZoneMusic.Volume = level; Message(level <= 0 ? "Music off (/music on brings it back)." : "Music at " + Mathf.RoundToInt(Mathf.Clamp01(level) * 100) + "%."); return;
+                            }
+                            Message("/music <0-1> sets the music's level; /music off silences it."); return;
+                        }
+                    case "/help": Message("Testing: /level <1-" + EncounterProgress.LevelCap + "> sets your level (down to 1 starts over), /aa <n> gives alternate advancement points at the cap."); Message("Chat: /s say, /z zone, /t trade, /lfg, /p party, /w <name> <words> whisper, /r reply; /invite <name> (anyone online, anywhere), /leave [name], /who, /friend <name>, /friends, /assist [name], /lead [name] (a sim leads a run to a camp), /dungeon (a sim leads you through the dungeon); /g guild chat, /guild (who is in it), /gquit."); Message("Music: /music <0-1> sets its level, /music off silences it."); return;
                     case "/s": case "/say": case "/z": case "/zone": case "/ooc": case "/t": case "/trade": case "/lfg": case "/l": case "/p": case "/party": case "/g": case "/gu": break;
                     default: Message("Unknown command " + cmd + ". /help lists them."); return;
                 }

@@ -745,3 +745,10 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
 - 215 (02:30) "need to be able to mute/adjust sliders for music, sounds, enviromental sounds, combat music, etc." (a Sound panel in the
   pause menu: Master, Music, Combat music, Sound effects, Ambient sounds, each a slider and a Mute; kept between runs. The game's only
   sound so far is the zone music: the effects and ambient sliders are ready for sounds still to come. OPEN.)
+- 216 (02:45, three pictures of a walk-in barn's plank wall with a stone band at its foot coming and going) "when i move these textures
+  change. ive seen it mostly on barns and houses" (the walk-in barn's stone sill was built at the boards' own face, 15 cm out both: the
+  two fought for the same pixels. The sill now stands 10 cm proud; the building test measures every building for a face in its footing's.
+  The painted barn had the same fault fixed 2026-10-14 19:45. OPEN.)
+- 217 (02:50, the Nerve panel at 97 / 100 out of combat) "goes up and down from 90-100..never reset to 0 and should not fill up until i
+  start fighting" (the class's resting regeneration, 12 a second, refilled what the drain took. The Scoundrel has none now: Nerve fills
+  only in a fight and drains to 0 after. OPEN.)

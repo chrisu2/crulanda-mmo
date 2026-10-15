@@ -326,6 +326,7 @@ namespace Crulanda.Encounter
                 debts.Remove(kv.Key); Collect(e, kv.Value.owed);
             }
         }
+        public override bool RestingResourceRegen { get { return false; } }
         public override void ResetState() { periodic.Clear(); debts.Clear(); Verse = Verses.None; rallyUntil = 0; wokePool = null; drain = 0; }
         public override string StatusLine
         {

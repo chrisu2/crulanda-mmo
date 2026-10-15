@@ -38,6 +38,9 @@ namespace Crulanda.Encounter
         public virtual void Tick(bool inCombat) { }
 
         public virtual bool MeleeAutoAttacks { get { return true; } }
+        /// <summary>Whether the class's resource fills on its own out of combat (the class's restingRegen). The Scoundrel's Nerve does
+        /// not: it is built by fighting and drains after (Chris, 2026-10-15: "never reset to 0 and should not fill up until i start fighting").</summary>
+        public virtual bool RestingResourceRegen { get { return true; } }
         /// <summary>A bow's auto-shot (the Ranger): automatic attacks at <see cref="AutoAttackRange"/> instead of in melee.</summary>
         public virtual bool RangedAutoAttacks { get { return false; } }
         public virtual float AutoAttackRange { get { return 3.2f; } }

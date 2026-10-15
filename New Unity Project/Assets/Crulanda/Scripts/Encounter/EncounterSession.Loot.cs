@@ -214,7 +214,7 @@ namespace Crulanda.Encounter
             Conversation = null; if (VendorNpc != null) CloseVendor(); TradesOpen = false; QuestBookOpen = false; ReadingDocument = null; MapOpen = false;
         }
         /// <summary>Whether E on this camp body would take anything now: coins, a thing the bags have room for, or loot not yet rolled. A body with nothing that fits leaves E to Mira, villagers, nodes and doors.</summary>
-        bool CanTakeAny(EncounterEnemy e) { return e.Drops == null || e.Coins > 0 || Items == null || e.Drops.Exists(d => Inventory.Room(Progress, Items, d.item) > 0 && !HoldsUnique(d.item)); }
+        public bool CanTakeAny(EncounterEnemy e) { return e.Drops == null || e.Coins > 0 || Items == null || e.Drops.Exists(d => Inventory.Room(Progress, Items, d.item) > 0 && !HoldsUnique(d.item)); }
         public void CloseLoot() { lootBody = null; }
         /// <summary>Take all [E]: the coins, then each thing in order; what does not fit stays on the body. The window shuts either way.</summary>
         public void TakeAllLoot()

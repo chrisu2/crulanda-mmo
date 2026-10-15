@@ -133,6 +133,60 @@ namespace Crulanda.Tests
             Assert.Less(Mathf.Abs(session.Player.transform.position.y - y), .6f, "never off a ledge");
         }
 
+        /// <summary>(adit-final group run, 2026-10-15) Nix's death opens the chute door: the beast first, Nix leaping down, then Nix.</summary>
+        [UnityTest] public IEnumerator Nixs_death_opens_the_chute_door()
+        {
+            yield return null;
+            var door = session.Zone.Gates.Find(g => g != null && g.Title == "The chute door"); Assert.NotNull(door); Assert.AreEqual(EncounterSession.NixName, door.OpensOn); Assert.IsFalse(door.Open);
+            var beast = session.Enemies.Find(e => e != null && e.Camp && e.MobName == EncounterSession.RockEaterName); Assert.NotNull(beast, "the Rock-Eater");
+            var nix = session.Enemies.Find(e => e != null && e.Camp && e.MobName == EncounterSession.NixName); Assert.NotNull(nix, "Nix");
+            beast.actor.Health.ApplyDamage(beast.actor.Health.Pool.Max * 3); yield return null; yield return null;
+            Assert.IsFalse(door.Open, "not on the beast's death");
+            Assert.IsTrue(nix.actor.IsAlive); nix.actor.Health.ApplyDamage(nix.actor.Health.Pool.Max * 3); yield return null;
+            Assert.IsTrue(door.Open, "open on Nix's");
+        }
+
+        /// <summary>
+        /// (adit-final group run, 2026-10-15) A leader sent a long way through the caves gets there: woken at the yard after a wipe at Nix, the
+        /// leader's path to his camp 880 m off came back partial (the navmesh's search gives up on a long way), it stood at the path's end and
+        /// 45 s on left the camp as out of reach; Nix never fell, the chute door never opened. Now it walks the caves' own way leg by leg
+        /// (CaveWay). Here: every camp before Nix's down, the party at the yard; within 300 s (game time, run at 4x) the leader is within 25 m
+        /// of Nix's camp and Nix's fight is still its step.
+        /// </summary>
+        [UnityTest] public IEnumerator A_leader_sent_from_the_yard_to_Nix_gets_there_and_does_not_give_him_up()
+        {
+            yield return null;
+            var pop = SimPopulation.Active; var s = pop.World.sims.First();
+            s.zone = "zone.adit"; s.onlineFrom = 0; s.onlineHours = 24; s.friendly = .9f; s.level = 11; session.Progress.experience = EncounterProgress.XpForLevel(9);
+            var p = session.Player.transform.position; s.x = p.x + 2; s.z = p.z; pop.Refresh(); yield return null;
+            Assert.IsTrue(session.Invite(s.id, true)); var c = session.PartySim(s.id);
+            Assert.IsNotNull(c.LeadDungeon("quick", out var why), why);
+            int nixCamp = CampIndex("Nix and the Rock-Eater");
+            float keepDelay = EncounterSession.ReleaseDelay; EncounterSession.ReleaseDelay = 1e5f;   // no relief shift walking in behind
+            try
+            {
+                // Every mob but Nix's camp and the ones after him down, so the run's next fight is his.
+                var after = new HashSet<int>(); bool seen = false;
+                foreach (var st in c.Route) { if (st.camps.Contains(nixCamp)) seen = true; if (seen) foreach (int k in st.camps) after.Add(k); }
+                foreach (var e in session.Enemies.ToArray()) if (e != null && e.Camp && e.actor.IsAlive && !after.Contains(e.CampIndex)) e.actor.Health.ApplyDamage(e.actor.Health.Pool.Max * 3);
+                for (int i = 0; i < 30 && !c.Route.First().camps.Contains(nixCamp); i++) yield return null;
+                Assert.IsTrue(c.Route.First().camps.Contains(nixCamp), "Nix's fight is the leader's step: " + c.LeadingName);
+                var at = c.Route.First().at; var motor = session.Player.GetComponent<AdventurerMotor>();
+                Time.timeScale = 4; float t = 0, closest = float.MaxValue; bool legged = false;
+                while (t < 300 && Vector3.Distance(c.transform.position, at) > 25)
+                {
+                    // You keep up: a pace behind the leader.
+                    var behind = c.transform.position - c.transform.forward * 2.5f;
+                    if (Vector3.Distance(session.Player.transform.position, c.transform.position) > 6 && NavMesh.SamplePosition(behind, out var hit, 3, NavMesh.AllAreas)) motor.Teleport(hit.position + Vector3.up);
+                    legged |= c.Legging; closest = Mathf.Min(closest, Vector3.Distance(c.transform.position, at));
+                    Assert.IsTrue(c.Route.Count > 0 && c.Route.First().camps.Contains(nixCamp), "Nix's fight is not given up (at " + t.ToString("0") + " s, " + closest.ToString("0") + " m off at the closest)");
+                    t += Time.deltaTime; yield return null;
+                }
+                Assert.LessOrEqual(Vector3.Distance(c.transform.position, at), 25, "the leader reached Nix's camp (" + closest.ToString("0") + " m off at the closest; walked the caves' way: " + legged + ")");
+            }
+            finally { Time.timeScale = 1; EncounterSession.ReleaseDelay = keepDelay; }
+        }
+
         [UnityTest] public IEnumerator The_lichen_runs_along_the_way_on()
         {
             yield return null;

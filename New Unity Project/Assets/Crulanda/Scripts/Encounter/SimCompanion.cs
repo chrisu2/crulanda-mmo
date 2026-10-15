@@ -752,16 +752,29 @@ namespace Crulanda.Encounter
                 // anyone alive is more than 12 m behind, and pulls nothing until they are all within reach.
                 float behind = PartyBehind();
                 if (behind > 16) { Activity = "Waiting for the party"; agent.isStopped = true; return; }
+                // A long way through the caves (2026-10-15, the adit-final run: woken at the yard after a wipe at Nix, the leader was sent at his
+                // camp 400 m off, its path came back partial (the navmesh's search gives up on a long way), it stood at the path's end, and the
+                // camp was left as "out of reach" 45 s on: Nix never fell and his chute door never opened). Once the path to the camp comes back
+                // partial, it walks the caves' own way leg by leg (CaveWay) until it is within 30 m, and its headway is that way's length.
+                if (leadLegFor != Leading.Value) { leadLegFor = Leading.Value; legging = false; nextLeg = 0; }
+                if (toCamp <= 30) legging = false;
+                else if (!legging && agent.hasPath && !agent.pathPending && agent.pathStatus != NavMeshPathStatus.PathComplete) legging = true;
+                if (legging && Time.time >= nextLeg)
+                {
+                    nextLeg = Time.time + 1.5f;
+                    if (Crulanda.World.CaveWay.Next(session.Zone, transform.position, Leading.Value, 30, out var wp, out float wayLeft)) { legTo = wp; legLeft = wayLeft; }
+                    else legging = false;
+                }
                 if (toCamp > 6 && waitingAt == null)
                 {
                     // Headway along the path it walks (a cave's way winds: the straight line can grow while it goes the right way).
-                    float left = agent.hasPath && !agent.pathPending && !float.IsInfinity(agent.remainingDistance) ? agent.remainingDistance : toCamp;
+                    float left = legging ? legLeft : agent.hasPath && !agent.pathPending && !float.IsInfinity(agent.remainingDistance) ? agent.remainingDistance : toCamp;
                     if (leadFor != Leading.Value || Time.time - leadSeen > 1) { leadFor = Leading.Value; leadBest = left; leadBestAt = Time.time; }
                     else if (left < leadBest - 1.5f) { leadBest = left; leadBestAt = Time.time; }
                     else if (!session.InCombat && Time.time - leadBestAt > 45) { leadSeen = 0; LeaveCamp(); return; }
                     leadSeen = Time.time;
                 }
-                if (toCamp > 6) { Activity = (waitingAt != null ? "Going to " : "Leading you to ") + ThePlace; agent.isStopped = false; agent.speed = 4.2f; agent.SetDestination(Leading.Value); return; }
+                if (toCamp > 6) { Activity = (waitingAt != null ? "Going to " : "Leading you to ") + ThePlace; agent.isStopped = false; agent.speed = 4.2f; agent.SetDestination(legging ? legTo : Leading.Value); return; }
                 Activity = (waitingAt != null ? "Waiting at " : "At ") + ThePlace; agent.isStopped = true; return;
             }
             // At your side: a pace behind, each in its own place so they do not stack.
@@ -773,6 +786,10 @@ namespace Crulanda.Encounter
         }
         /// <summary>How far a party healer reaches, and how often the party's healer mends (a Paladin tanking: every 6 s).</summary>
         public const float HealReach = 25, MendEvery = 2.5f;
+        /// <summary>Walking a long way leg by leg (CaveWay): the camp it is for, whether it is, the leg's end, the way left, the next re-plan.</summary>
+        Vector3 leadLegFor, legTo; bool legging; float legLeft, nextLeg;
+        /// <summary>Whether it is walking the caves' way leg by leg to its camp now (a long way the navmesh's search gave up on).</summary>
+        public bool Legging { get { return legging; } }
         /// <summary>A mend: the party's healer gives a sixth of the healed one's health (or its old flat sum, if more); a tank's is the flat sum.</summary>
         public int MendFor(Actor who) { return Role == PartyRole.Healer ? Mathf.Max(HealAmount, Mathf.RoundToInt(who.Health.Pool.Max * .16f)) : HealAmount; }
         /// <summary>The most hurt of the party within <paramref name="reach"/>: you, Mira (when recruited), the sims, Mother Quillet.</summary>

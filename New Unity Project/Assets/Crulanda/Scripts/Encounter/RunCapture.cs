@@ -72,7 +72,7 @@ namespace Crulanda.Encounter
             string wingNow = null; int wingNo = 0, wingDone = 0, wingCamps = 0; float gateSince = -1; bool regrouping = false;
             var motor = s.Player.GetComponent<AdventurerMotor>(); AdventurerMotor.Running = true;
             int deaths = 0, warps = 0, shots = 0, elitesSeen = 0, mends = 0, looted = 0; var lootTally = new SortedDictionary<string, int>(); float lootUntil = 0; var seen = new HashSet<string>(); var mending = new Dictionary<SimCompanion, string>(); var engagedAt = new Dictionary<EncounterEnemy, float>(); var searched = new HashSet<EncounterEnemy>(); float idleLogAt = 0, pathAt = 0; Vector3 pathGoal = Vector3.zero; NavMeshPath path = null; int holds = 0; string lastHold = null; var simHeld = new Dictionary<SimCompanion, bool>();
-            float start = Time.time, realStart = Time.realtimeSinceStartup, nextShot = Time.time + 20, nextSwing = 0, stuckAt = Time.time, deadAt = -1; var stuckFrom = s.Player.transform.position;
+            float start = Time.time, realStart = Time.realtimeSinceStartup, nextShot = Time.time + 20, nextSwing = 0, stuckAt = Time.time, deadAt = -1, atCorpseSince = -1; var stuckFrom = s.Player.transform.position;
             string leadingName = leader.LeadingName;
             Time.timeScale = Speed;
             Shot(s, directory, "00-" + Clock(0) + "-setting-out", ref shots, leader);
@@ -147,7 +147,7 @@ namespace Crulanda.Encounter
                 if (foe == null)
                 {
                     float nearest = 12;
-                    foreach (var e in s.Enemies) if (e != null && e.Camp && !e.Game && s.CanLoot(e) && !searched.Contains(e)) { float d = Vector3.Distance(e.transform.position, me); if (d < nearest) { nearest = d; corpse = e; } }
+                    foreach (var e in s.Enemies) if (e != null && e.Camp && !e.Game && s.CanLoot(e) && s.CanTakeAny(e) && !searched.Contains(e)) { float d = Vector3.Distance(e.transform.position, me); if (d < nearest) { nearest = d; corpse = e; } }   // (2026-10-15, adit-final: a body with nothing you may take, its pieces rolled to others, held the bot beside it for an hour)
                     var body = s.LootableCorpse;
                     if (body != null && Time.time >= lootUntil && !searched.Contains(body))
                     {
@@ -201,6 +201,10 @@ namespace Crulanda.Encounter
                     motor.SetView(Mathf.Atan2(step.x, step.z) * Mathf.Rad2Deg, 14, 7); EncounterInput.Scripted = Vector2.up;
                 }
                 else EncounterInput.Scripted = Vector2.zero;
+                // At a body four seconds and it is not searched (out of reach of the search: on a deck over you, or nothing on it is yours):
+                // it is passed by, so the bot never stands at one for good while the leader waits for the party (adit-final, 24:41 on).
+                if (foe == null && corpse != null && dist <= reach) { if (atCorpseSince < 0) atCorpseSince = Time.time; else if (Time.time - atCorpseSince > 4) { searched.Add(corpse); atCorpseSince = -1; } }
+                else atCorpseSince = -1;
                 // Stuck all the same (a prop the paths run through): a warp to beside what you are after, in a fight or out of one.
                 if (Time.time - stuckAt > 4)
                 {

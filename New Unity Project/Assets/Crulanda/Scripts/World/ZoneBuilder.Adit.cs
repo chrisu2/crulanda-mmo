@@ -1124,6 +1124,9 @@ namespace Crulanda.World
                 int lake = AnchorRing("lake"), altarI = AnchorRing("altar");
                 float altarAt = altarI >= 0 ? h.Along[altarI] : nave.y - 6, e = Mathf.Min(nave.y, altarAt + 5);
                 float lakeAt = lake >= 0 ? h.Along[lake] : -1, rx = lake >= 0 ? h.Half[lake] * .42f : 0, rz = lake >= 0 ? Mathf.Min(8, h.Half[lake] * .45f) : 0;
+                // The lake leaves a walkway 2.6 m wide either side of it, whatever the ring's width (its rim and its blocks spanned the whole
+                // nave at x about 110: the cloister stair and the chapel's west half were cut off from the altar, the R91 picture).
+                rz = Mathf.Min(rz, (cw - 2.6f) / 1.5f); rx = Mathf.Min(rx, rz * 1.8f);
                 float lrx = rx + 1, lrz = rz + 1;
                 Hall(nave.x, e, cw, true, true, true, true, 9, (s, a) => lake >= 0 && Mathf.Pow((s - lakeAt) / lrz, 2) + Mathf.Pow(a / lrx, 2) < 1, 4);
                 var basalt = Tint(art.stone, new Color(.18f, .15f, .14f)); var cloth = Tint(art.cloth, new Color(.45f, .08f, .06f));
@@ -1138,7 +1141,7 @@ namespace Crulanda.World
                         float a = k / 48f * Mathf.PI * 2; var rim = mid + q * new Vector3(Mathf.Cos(a) * rx * 1.04f, .05f, Mathf.Sin(a) * rz * 1.04f);
                         Lump(BoulderAt(k % 40), t, rim, new Vector3(1.2f + A() * 1f, .45f + A() * .35f, 1f + A() * .8f), basalt, A() * 360);
                     }
-                    Block(mid, new Vector3(rx * 1.9f, 1.2f, rz * 1.1f), q); Block(mid, new Vector3(rx * 1.1f, 1.2f, rz * 1.9f), q);
+                    Block(mid, new Vector3(rx * 1.9f, 1.2f, rz * 1.0f), q); Block(mid, new Vector3(rx * 1.2f, 1.2f, rz * 1.5f), q);   // within the walkway's edge (rz * 1.5 at most)
                     for (int k = -1; k <= 1; k++) Glow(t, mid + q * new Vector3(0, 3.5f, k * rz * .6f), 14 * CW, 1.1f, new Color(1, .45f, .12f), 1.1f).gameObject.AddComponent<Flicker>();
                     for (int k = 0; k < 4; k++)
                     {

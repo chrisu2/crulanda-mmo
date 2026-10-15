@@ -162,7 +162,7 @@ namespace Crulanda.Tests
             var altar = Anchor("altar"); var cloister = Anchor("cloister foot");
             float home = NavReach.Length(altar, cloister); Assert.Less(home, float.PositiveInfinity, "the cloister stair from the altar to the Gallery");
             var door = zone.Gates.Find(g => g != null && g.Title == "The cloister door"); Assert.NotNull(door, "the cloister door");
-            door.SetOpen(false, true); door.Recarve(); for (int i = 0; i < 3; i++) yield return null;
+            door.SetOpen(false, true); door.Recarve(); for (int i = 0; i < 60; i++) yield return null;   // a second: the carve is the navmesh's own update
             Assert.Greater(NavReach.Length(altar, cloister), home + 50, "with the cloister door shut it is the long way back through the chapter-house (" + home.ToString("0") + " m by the stair)");
             door.SetOpen(true, true);
         }

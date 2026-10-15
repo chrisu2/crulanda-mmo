@@ -1221,6 +1221,15 @@ was done, in order. TESTED where a run shows it; the rework stays on `adit-rewor
   at x 110, and the door (`Piece("Entrance", On(s, 0), ...)` with its side blocks at 2.05 m) is the thing to check: its box
   (.6 x 3.4 x 4.6) is the doorway's width if it is a NavBlocker. Also a thin strip of cave floor runs along the nave's south wall at
   z about 138, red west of x 120 and green east of it: split there too.
+- **R95 (23:41): it was the altar.** The cave narrows at the altar's anchor, so the nave's west wall was built there too and the altar's
+  block and candelabra stood in the doorway to the cloister stair; the altar stands 4.5 m inside the wall now (c16a0410) and the
+  chapel is wholly reachable. **Every floor of the Adit is reachable from the yard** but the bowl's east pocket (9..12, -303), the
+  island under Lusk's stage, four samples at the Gallery's south rim, two in the Ash Garden, five in the Muster Yard's east (x 205), one
+  in the Breach, seven in the Deep Way. AditNavTests, AditTests, AditGateTests and the diagnostics 18/23; the camps test and the
+  gates green. Red: the solid tops (two, and the Scriptorium's); the breadcrumbs (56 of 480) and the centreline walk, both broken at
+  the stage's island, which the body blocks did not take (a Box source is its faces; the floor under it kept its head-room): every
+  NavBlocker box now also goes in as a ModifierBox, which marks its whole inside not walkable; the web test's last line (the cloister
+  door shut and re-carved, three frames waited: a second now).
   Then NavReach gets the hop search and the camps, breadcrumbs and run-order tests are read again.
 - **Still red after R86 (PlayMode 19/29; see R88 above for the change):** the camps nobody can walk to (the Pen's, the Cutting Drift's and everything past them),
   the breadcrumbs (56 of 480), the sim's run order (the Foundry unreachable), the web's joins (the cloister stair from the altar),

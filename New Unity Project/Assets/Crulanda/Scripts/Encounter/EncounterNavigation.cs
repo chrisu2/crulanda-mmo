@@ -52,8 +52,11 @@ namespace Crulanda.Encounter
                         // Oriented box: a rotated wall must not blank out the axis-aligned area around it (e.g. an inn interior).
                         var tr = box.transform; var scale = tr.lossyScale;
                         var size = Vector3.Scale(box.size, new Vector3(Mathf.Abs(scale.x), Mathf.Abs(scale.y), Mathf.Abs(scale.z))) + new Vector3(.2f, 0, .2f);
-                        sources.Add(new NavMeshBuildSource { shape = NavMeshBuildSourceShape.Box, size = size,
-                            transform = Matrix4x4.TRS(tr.TransformPoint(box.center), tr.rotation, Vector3.one), area = 1 });
+                        var at = Matrix4x4.TRS(tr.TransformPoint(box.center), tr.rotation, Vector3.one);
+                        sources.Add(new NavMeshBuildSource { shape = NavMeshBuildSourceShape.Box, size = size, transform = at, area = 1 });
+                        // And the box's inside: a Box source is its faces, and a floor under a block with head-room between them stayed
+                        // walkable (the island under Lusk's tally stage, the Adit rework, 2026-10-14); the modifier marks the volume.
+                        sources.Add(new NavMeshBuildSource { shape = NavMeshBuildSourceShape.ModifierBox, size = size, transform = at, area = 1 });
                         continue;
                     }
                     var b = col.bounds;

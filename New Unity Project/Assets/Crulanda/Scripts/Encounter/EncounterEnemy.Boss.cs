@@ -6,11 +6,14 @@ using Crulanda.Gameplay;
 
 namespace Crulanda.Encounter
 {
-    /// <summary>A boss's moment at a health mark (DUNGEON_DESIGN.md section 9 step 2, D2): "stamp", "terrify", "reset" or "rally".</summary>
+    /// <summary>A boss's moment at a health mark (DUNGEON_DESIGN.md section 9 step 2, D2): "stamp", "terrify", "reset", "rally" or "loose".</summary>
     public sealed class BossPhase
     {
         public float at; public string kind, text;
         public float seconds = 2;   // the stun of a stamp or a terrify
+        /// <summary>A "loose" phase's camp, by name (the Adit rework, ADIT_REWORK.md S4, 2026-10-15): a camp released later (ZoneCamp.after
+        /// "loose:&lt;this boss&gt;") is brought now, or a live idle camp's mobs are sent in (Corvane's hound). EncounterSession.Loose.</summary>
+        public string camp;
     }
 
     /// <summary>
@@ -100,6 +103,9 @@ namespace Crulanda.Encounter
                 case "rally":
                     if (Victim != null) session.Rally(this, Victim);
                     break;
+                case "loose":   // (the Adit rework) a camp let loose at this mark: the urn-risen, the hound (EncounterSession.Release.cs)
+                    session.Loose(this, p.camp, Victim);
+                    break;
             }
         }
         /// <summary>A burst round it: everyone in its ring is hit.</summary>
@@ -148,8 +154,11 @@ namespace Crulanda.Encounter
         /// <summary>When it dies: kin of its kind within reach answer, the patrol that walks in after a boss.</summary>
         void DeathCall()
         {
-            if (Move == null || Move.deathCall <= 0) return;
             var foe = lastFoe != null && lastFoe.IsAlive ? lastFoe : session.Player;
+            // (The Adit rework, 2026-10-15) A camp released by its death (ZoneCamp.after "kill:<this mob>": Lusk's relief shift) comes in its
+            // place a few seconds on, with the move's deathText as its line; it stands in for the kin search (ADIT_REWORK.md S3; EncounterSession.Release.cs).
+            if (Camp && !Game && session.ReleaseAfter("kill:" + MobName, foe, this, Move != null && !string.IsNullOrEmpty(Move.deathText) ? Move.deathText : "Boots on the stone: more of them come.", EncounterSession.ReleaseDelay) > 0) return;
+            if (Move == null || Move.deathCall <= 0) return;
             var kin = session.Enemies.Where(e => e != null && e != this && e.CanAnswer && !e.Engaged && !string.IsNullOrEmpty(Kin) && e.Kin == Kin
                 && Vector3.Distance(e.transform.position, transform.position) <= Move.deathReach).OrderBy(e => Vector3.Distance(e.transform.position, transform.position)).Take(Move.deathCall).ToList();
             for (int i = 0; i < kin.Count; i++) kin[i].Answer(this, foe, SocialAggro.CallBeat + SocialAggro.CallStagger * i);

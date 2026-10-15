@@ -94,17 +94,20 @@ namespace Crulanda.Encounter
                 enrage = "The crystals on the Rock-Eater's back blaze violet and it tears at the floor." },
             new EliteMove { mob = "Nix, the turncoat", name = "Goad-Hook", windup = 1.6f, blow = 3.6f, reach = 3.4f, every = 9, disarm = 4, health = .8f, callReach = 66, holdable = true,   // (22 before the Adit was drawn out); holdable: the duo's play is to hold him
                 cc = "fear", ccName = "Shriek", ccSeconds = 3, ccEvery = 25, ccReach = 4, ccText = "Nix shrieks in your face and you run before you know it.",
+                deathText = "Boots on the far ramp behind you: the Berth's night crew comes down it, three cutters.",   // his death releases the Berth night crew (ADIT_REWORK 5.3; 2026-10-15)
                 call = "Nix shrieks: \"Get them off me!\"", callShort = "Get them off me!",
                 enrage = "Nix stops dodging and comes at you with the goad in both hands." },
             new EliteMove { mob = "Cinder-Warden Ysolt", name = "Ember Blow", windup = 2, blow = 4.2f, reach = 3.8f, every = 10, callReach = 42, callMost = 2,
                 cc = "fear", ccName = "The fire sees you", ccSeconds = 4, ccEvery = 16, ccReach = 6, ccText = "Ysolt lifts the brand and the fire looks back at you: you run from it.",
                 knock = 5, ringEvery = 15, ringReach = 4.5f, ringBlow = 1.6f, ringName = "Flame Ring",
+                deathText = "A bell rings in the cloister. Three zealots come in at the chapel's other door, behind you.",   // her death releases The cloister bell (ADIT_REWORK 5.6; 2026-10-15)
                 call = "Ysolt lifts the brand: \"The fire sees you.\"", callShort = "The fire sees you",
                 enrage = "Ysolt steps into the heat and comes out burning." },
             new EliteMove { mob = "The Foreman Who Forgot", name = "What the Grey Takes", windup = 2.4f, blow = 4.4f, reach = 3.6f, every = 12, callReach = 120, callMost = 2,
                 blinkEvery = 14, phases = new[] {
                     new BossPhase { at = .5f, kind = "reset", text = "The Foreman stops. He looks at his hands, then at you, as if for the first time." },
                     new BossPhase { at = .25f, kind = "terrify", seconds = 3, text = "The Foreman opens his mouth and the grey comes out of it. You cannot move." } },   // the Hollow drift, back up the breach
+                deathText = "Something in the walls lets go. Two Hollow Men come out of the grey behind you: what the grey kept.",   // his death releases What the grey kept (ADIT_REWORK 5.8; 2026-10-15)
                 call = "The Foreman calls a shift-name nobody has answered to in years. Something in the grey answers.", callShort = "Shift!",
                 enrage = "The Foreman flickers, and for a moment there is less of him." },
             // The rare (D3, one visit in five): a slow, heavy swing of a pick that has worked this drift since before the seal; alone, he calls nobody.
@@ -116,6 +119,7 @@ namespace Crulanda.Encounter
                 phases = new[] {
                     new BossPhase { at = .667f, kind = "stamp", seconds = 2, text = "Sorrel stamps: the platform jumps under you. He goes to the rack and comes back with a maul." },
                     new BossPhase { at = .333f, kind = "stamp", seconds = 2, text = "Sorrel stamps again, and this time comes back with the poleaxe." } },   // his guards, not the captain down the hall
+                deathText = "Boots at the line's far end: Sorrel's dockers come up the platform, three of them.",   // his death releases Sorrel's dockers (ADIT_REWORK 5.10; 2026-10-15)
                 call = "Sorrel bellows: \"Platform! Hold the ramp!\"", callShort = "Hold the ramp!",
                 enrage = "Sorrel goes to the rack and comes back with something heavier." },
             new EliteMove { mob = "Rail-Captain Orsk Danner", name = "The Dead Line", boss = true, callOnPull = true, cc = "root", ccName = "Chained", ccSeconds = 4, ccEvery = 14, ccText = "Danner's coupling chain wraps your legs: you stand where you are.", phases = new[] { new BossPhase { at = .5f, kind = "rally", text = "Danner, without turning: \"More.\"" } }, health = BossHealth, hit = BossHit, windup = 2.2f, blow = 3.2f, reach = 4, every = 12, callReach = 10,   // sturdy, not savage: his guards and the shadows are the fight (the paper fight at level 12)
@@ -129,12 +133,16 @@ namespace Crulanda.Encounter
                 call = "Vosk cracks the whip at the catwalk: \"Drive them!\"", callShort = "Drive them!", enrage = "Vosk throws the whip down and takes up the pick." },
             new EliteMove { mob = "Urn-Keeper Sabel", name = "Cinerary Blow", windup = 2, blow = 4, reach = 3.8f, every = 11, callReach = 30, callMost = 2,
                 cc = "disorient", ccName = "Ash in the Eyes", ccSeconds = 3, ccEvery = 18, ccReach = 6, ccText = "Sabel tips an urn and the ash fills your eyes.",
+                phases = new[] {   // the urn-risen climb out at two thirds and a third (ADIT_REWORK.md section 5 item 4; the camps are "loose:Urn-Keeper Sabel"; 2026-10-15)
+                    new BossPhase { at = .66f, kind = "loose", camp = "Urn-risen (first)", text = "Sabel raps on the nearest urn and its lid lifts from inside: the Ash-bound dead climb out, grey to the eyes." },
+                    new BossPhase { at = .33f, kind = "loose", camp = "Urn-risen (second)", text = "Sabel kicks over the second urn. More of the dead climb out of the ash." } },
                 call = "Sabel knocks on an urn: \"Wake, and serve.\"", callShort = "Wake, and serve", enrage = "Sabel breaks the last urn over her own head and laughs." },
             new EliteMove { mob = "Loremaster Ivo Senn", name = "Iron-Bound Spine", windup = 2.2f, blow = 4, reach = 3.6f, every = 11, callOnPull = true, callReach = 30, callMost = 2,
                 cc = "stun", ccName = "Lullaby of Ash", ccSeconds = 4, ccEvery = 18, ccReach = 6, ccText = "Senn reads a line of the old hymn and your eyes close.",
                 call = "Senn snaps the book shut: \"Copyists. To me.\"", callShort = "Copyists, to me", enrage = "Senn tears the page out and reads it aloud." },
             new EliteMove { mob = "Master-at-Arms Corvane", name = "Shield-Bash", windup = 1.6f, blow = 3.8f, reach = 3.4f, every = 10, callOnPull = true, callReach = 30, callMost = 3, knock = 3,
                 cc = "stun", ccName = "Shield-bashed", ccSeconds = 2, ccEvery = 12, ccText = "Corvane's shield-rim takes you on the jaw.",
+                phases = new[] { new BossPhase { at = .5f, kind = "loose", camp = "The Vent-Hound", text = "Corvane bellows down the yard: \"Loose the hound!\"" } },   // if it still lives it leaves the kennel and joins (section 5 item 5; 2026-10-15)
                 call = "Corvane raps his shield: \"Form up!\"", callShort = "Form up!", enrage = "Corvane sets his feet and stops giving ground." },
             new EliteMove { mob = "Sister Ashe Varrow", name = "Brand-Strike", windup = 2, blow = 3.6f, reach = 3.6f, every = 11, callReach = 8,
                 ringEvery = 14, ringReach = 4.5f, ringName = "Kindling",

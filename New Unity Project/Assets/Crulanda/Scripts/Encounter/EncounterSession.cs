@@ -1550,8 +1550,22 @@ namespace Crulanda.Encounter
             for (int c = 0; c < Zone.Zone.camps.Length; c++)
             {
                 var camp = Zone.Zone.camps[c]; if (camp == null) continue;
-                if (!string.IsNullOrEmpty(camp.after)) continue;   // (the Adit rework) one released later (a boss's relief, an event's wave): not here at the start
+                if (!string.IsNullOrEmpty(camp.after)) continue;   // (the Adit rework) one released later (a boss's relief, an event's wave): not here at the start; EncounterSession.Release.cs brings it
                 if (camp.rare > 0 && RareDice() >= camp.rare) continue;   // a rare camp, not here this visit (last in the list: no other camp's draws move)
+                SpawnCampMobs(c, rng, zoneShort);
+            }
+            SpawnOutliers();
+        }
+        /// <summary>
+        /// One camp's mobs, drawn from <paramref name="rng"/> (the zone's camp stream at the start; a released camp's own stream later), each
+        /// stood on the navmesh, armed and made social; the list of those that stood. Factored out of SpawnCamps on 2026-10-15 (the Adit
+        /// rework) so a camp released later (ZoneCamp.after: a boss's relief shift, an event's wave) spawns exactly as it would have at the
+        /// start, with the same ids (mob.&lt;tag&gt;.&lt;zone&gt;.&lt;camp&gt;.&lt;n&gt;: deeds, quests and loot read the camp from them); EncounterSession.Release.cs.
+        /// </summary>
+        List<EncounterEnemy> SpawnCampMobs(int c, System.Random rng, string zoneShort)
+        {
+            var camp = Zone.Zone.camps[c]; var spawned = new List<EncounterEnemy>();
+            {
                 var look = LookFor(camp.look, camp.elite); bool beast = ActorVisual.IsBeast(look);
                 string tag = string.IsNullOrEmpty(camp.tag) ? (camp.look ?? "mob") : camp.tag;
                 float gap = GapFor(look, camp.elite); var placed = new List<Vector2>(); var stood = new List<Vector3>();
@@ -1606,9 +1620,10 @@ namespace Crulanda.Encounter
                     if (elite) a.transform.localScale = Vector3.one * 1.18f; else if (tough) a.transform.localScale = Vector3.one * 1.08f;
                     ConfigureSocial(enemy, camp, c, level, beast);   // its kind, its kin and, for the elite, its move (EncounterSession.Social)
                     if (elite && camp.mob == NixName) SpawnRockEater(enemy, camp, c, level);   // his beast, and him in its saddle (EncounterSession.RockEater)
+                    spawned.Add(enemy);
                 }
             }
-            SpawnOutliers();
+            return spawned;
         }
         /// <summary>
         /// Outlying mobs (playtest note 92, 2026-10-07: "still need more camps, pretty deserted to level up"): round each outdoor camp of

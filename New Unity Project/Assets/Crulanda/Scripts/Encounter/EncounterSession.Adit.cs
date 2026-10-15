@@ -31,6 +31,7 @@ namespace Crulanda.Encounter
             foreach (var g in Zone.Gates) if (g != null) g.Recarve();   // the navmesh is built after the gates: cut them into it now
             foreach (var i in Zone.Interactables) if (i.kind == "liftgate" && i.gate != null && Progress.keys.Contains(LiftWoken)) i.gate.SetOpen(true, true);
             StartWeaver();   // the Weaver's unlocking (EncounterSession.Weaver.cs)
+            StartEvents();   // (the Adit rework) the Wake, started where its anchor is reached once its wing is open (EncounterSession.Release.cs)
             // The pressed goblins in their cages, and the doors of those opened before standing open (playtest note 125).
             foreach (var i in Zone.Interactables)
             {
@@ -132,7 +133,12 @@ namespace Crulanda.Encounter
                 case "platformgate": UsePlatformGate(i); return true;
                 case "powder":
                     if (CarryingPowder) Message("You have a keg on your shoulder already.");
-                    else { CarryingPowder = true; Message("You heave a keg of blasting powder onto your shoulder. Mind the lamps."); }
+                    else
+                    {
+                        CarryingPowder = true; Message("You heave a keg of blasting powder onto your shoulder. Mind the lamps.");
+                        // (The Adit rework, ADIT_REWORK.md E4) Taking the keg brings Powder-Sergeant Hobb and his sappers down the stair behind you.
+                        ReleaseAfter("event:powder", Player, null, "Boots on the stair above: Powder-Sergeant Hobb and his sappers come down after the keg.", ReleaseDelay);
+                    }
                     return true;
                 case "stone": TouchStone(i); return true;
                 case "weaver": TalkToWeaver(); return true;
@@ -158,6 +164,7 @@ namespace Crulanda.Encounter
             g.SetOpen(true);
             Message("You set the three sigils in their sockets. The door takes up their three notes and sings them back, louder, and the stone grinds up into the rock.");
             Save(false);
+            StartEvent(WakeEvent);   // (the Adit rework, E1) the door's song wakes the Gallery: the Wake, when the zone has it (EncounterSession.Release.cs)
         }
         void UsePlatformGate(ZoneInteractable i)
         {

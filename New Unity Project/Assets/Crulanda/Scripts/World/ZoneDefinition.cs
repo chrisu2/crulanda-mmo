@@ -370,8 +370,9 @@ namespace Crulanda.World
     /// <summary>An event of a dungeon (GAME-ONLY: the Wake): its id and kind, the wing it belongs to and its place in that wing's run, the anchor
     /// it centres on, and its waves.</summary>
     [Serializable] public sealed class ZoneEvent { public string id, kind, wing, anchor; public int step; public ZoneWave[] waves = new ZoneWave[0]; }
-    /// <summary>A wave of an event: at seconds in, the camp (by name) it brings.</summary>
-    [Serializable] public sealed class ZoneWave { public float at; public string camp; }
+    /// <summary>A wave of an event: at seconds in, the camp (by name) it brings, and the line said as it comes (empty: the code's own line for that
+    /// camp, else a plain one; EncounterSession.Release.cs, 2026-10-15).</summary>
+    [Serializable] public sealed class ZoneWave { public float at; public string camp, text; }
     /// <summary>A trail of living lichen along a cave (GAME-ONLY): from..to along it, aside of its middle (the way the run goes).</summary>
     [Serializable] public sealed class ZoneCrumb { public string cave; public float from, to, aside; }
     /// <summary>
